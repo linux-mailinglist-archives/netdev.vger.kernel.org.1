@@ -1,311 +1,189 @@
-Return-Path: <netdev+bounces-287891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QD4fNVibBWrAYwIAu9opvQ
-	(envelope-from <netdev+bounces-287891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:52:24 +0200
+	id 0D7ILaubBWrAYwIAu9opvQ
+	(envelope-from <netdev+bounces-287893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:53:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 501C454001F
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:52:24 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59876540030
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:53:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5273A3051BE0
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:51:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8D2AC300B1AF
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D34438E8D2;
-	Thu, 14 May 2026 09:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8C43A1CE3;
+	Thu, 14 May 2026 09:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="JUq6Zhwo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MNDX+nEg";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rfz4c17j"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB153AB460
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E13A395AD5
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778752318; cv=none; b=u7bbE9iZV4JkC2ffSHBCi/LGQ1gvS0jUth3zcymiOqyKfl1tdhnxNd3D3Jd7gGfTUnSu7CNlc8a8TgtsAAv3oGfQqxiZXckAKrrkoaPxL/9O3MWoyAWMLY7GKMHiAVwi2hXfPnuzygKySm3WeOvQU3ukKxEZLh1VpkFn1aFZQd0=
+	t=1778752424; cv=none; b=sO+UGJz50horTU+7IG4cgGMRFHB/hMNuDaVrhQaJs1UgdL4ByEihiaHmz8Yw0lWhw0LymGsQxKy1qiV6/XT8Ei2ZV5rgpJkZ0DjOSusaclR1lFFhDbmlf9M6yreZiXCbsZHL+otG2aBY8fEzZMx5FzyINjpcYMqt6WlrTfu4mKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778752318; c=relaxed/simple;
-	bh=DRa5gFAMZReP5rS89YaOQ0iTsUZjOtfVvaxpF4vJaoo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cQ77rCWcfGQ2IPoEi3+ujfBorXcvI1a+d1+31CG495V7MjXb42UgE1tvj8nmHUxSNYdGxCf7pZvA3a0XEcfKDn1g8QUUevG0zNJ+wydm08xYCa3IQT8KpqmBUBROmpUBByzs3ZVJQ2CknCim3g+CvKaM41x6FvwqNeJPMwUuBbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=JUq6Zhwo; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1778752308; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=CxW3tkQ3BeVxSBLznN8g21CQrZL33sjFfOstwUzgUmo=;
-	b=JUq6Zhwo7ovcZvtjSfboz9Yo24i8WSnTsMqnk/K1iGrzV0QWDoHJw3Fo1GsJTVocom6kBdmLo3vAiIbIxmHEwjoep0Nwh0Qb/2y+5aYhb0xAY7xe/2bicXCYmni0j73yfN6CBzV+CC9O0kTGHvWvMyfk+hX2shKlLSY2Np5+LlY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R791e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X2wPzIg_1778752305;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X2wPzIg_1778752305 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 14 May 2026 17:51:46 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Dong Yibo <dong100@mucse.com>,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v43 8/8] eea: introduce callback for ndo_get_stats64 and register netdev
-Date: Thu, 14 May 2026 17:51:38 +0800
-Message-Id: <20260514095138.80680-9-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20260514095138.80680-1-xuanzhuo@linux.alibaba.com>
-References: <20260514095138.80680-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1778752424; c=relaxed/simple;
+	bh=QrjK6BQ59ep/1bMn2obVpOo9paaD/nkuAL/gEMrLF8U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mM2FZEc1ybtsU7iGO2KxuBMB482OyVsm0+BucJjTw8/SM+wcViJ5+qBxYRQOvToHt7ftbCw8aBlSU62uE2GZyjX29znnkN/NWND3TPSHRMGBKM51PKFaS4pHzwGrIsfYcXfFTRCnjl6dQG5wZZjG+NWZdA7MHdVOBc+xqGSE1hU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MNDX+nEg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rfz4c17j; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778752422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I0se+N3hFO2P7mdYqzi9ilKsAjBpW37BH2P7iQnnZDk=;
+	b=MNDX+nEgmKXLXcIYCJl3igSoO0D+obFAcP0uvHiEZmS46d8o7uD+hW8SrO2jhkjza2LVJb
+	Rc4AtjZEzIxxssxYl2vphnyWO3+RVHG4sBNim60xmthqqVFi8/sGq6MSa9AhRBDKDlDFAf
+	0vfJdV2BdNonrTC9WHmGeNojz9AnnJ8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-669-wOACrYbcM3mkhD1YX6II5g-1; Thu, 14 May 2026 05:53:41 -0400
+X-MC-Unique: wOACrYbcM3mkhD1YX6II5g-1
+X-Mimecast-MFC-AGG-ID: wOACrYbcM3mkhD1YX6II5g_1778752420
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48fda34ed0aso3045755e9.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 02:53:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778752420; x=1779357220; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I0se+N3hFO2P7mdYqzi9ilKsAjBpW37BH2P7iQnnZDk=;
+        b=rfz4c17jyomiL5Q/6HL0BsLcxBtuwOiAXbQk7z8tvJdAZ9rXR1jL2h06zWzqF83T01
+         HWH0ITtlTeKqFOf/tJiKR9ZA/W/jOR+EOQkQhRaxWrT1ym6Os/k4vrgmYr5WiRg7/Glk
+         lGObzeqXuU6v+QBffl2807mgMsOyp5vZqOE/AoqEH69prxKG+huiyUu8pD8LL7D1wyJe
+         w6DYosDIHpm2hxBMCIVPn+8Kar+rnbNMj6N7oy2TK+0wJRaIm9IfaBi9HX5BQsaikosf
+         L8WTufrMeFFbw3qBd9bGvlyeJA7nKZIOx8wYrXEJuuTmKRXsDwsIbr6MvVnVzrasJQhn
+         ibPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778752420; x=1779357220;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I0se+N3hFO2P7mdYqzi9ilKsAjBpW37BH2P7iQnnZDk=;
+        b=d3zv4AN5enLAAoR/bLfLEt05Zo5H9+z780LtJzQlfqrZAbabNSYHsrWW5ZQEewcmq3
+         eIAI7ZLLLiEiRu4w36BxDAlNC75csCrRdKeGwnovzk/tu1p6K9HTUe0fe4FxmBFziahT
+         xPiKM+mg5MI16eMQhuMr2SHwU2Dg92M/HNvVLJYyzf77JVejrxaDNBgHgVNDMFNbGRBS
+         v/HPNcvOY6Ouxar/TSc9VfqzeKpPgZ/j4VwRtvZwveOPfZDke9E/teGTl/9fWYzkboT+
+         y3STJ9G3vh97+6qL/XOYCgnzz2Gn5TZqNsQ51ypLOZXSEszv69aDTXyak18mWyWzzW4d
+         VOSg==
+X-Forwarded-Encrypted: i=1; AFNElJ/Pd443yn5+99C18LlnNJj3heZMLtDba+wgQ3dzH3b1K/MJ/EdQoRSCAEh/DGjcCSOwqsK7CZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoPe1KSuMFgh0ck7SFYn/aKB+L4TRFueo3KsaFLZISV6/N5nZc
+	xoz3SGQylZgXctX8zgLO51iLNzJM6ZY9ULRglKInuvJX7bGdRreSYDgrfxCMaQHep3GwcunKMSh
+	y0zRH+pr2x/2ozKD7qqb5gyf7ChwKae6RjHUrIIFhWi+O5PK4j433WLUMDA==
+X-Gm-Gg: Acq92OEHWUtgxNx9dqZmpfZP2/3QVAI9hl80WmWMyEUU7jMPPdsIsMFsAqyTd3GE/FA
+	uBm2tohwzTfcFbwN9aDtdUkFmPGp9SKcY0ZP92vF8qMRa0h+4HZwcUl7AXUgxq/Qg43Vs5+wYgx
+	Ta+zVDG8Km312Zxh/XSibgPa6vX+OAQaDrjD+vfghz+fShQ8EMq0e+8Un/hdTpumpKiJjVdPeYH
+	YVJoSKmDcFVz5p0gNFOkY/DYAXKSjW446emOH9oMV4vFT4FLwqJALZmJ59whR56zdwSLdcZDkcJ
+	dxnkJSwhhDjeSrr136z42M0JD76wlyPegQkbFdwMFyGQYt6ZSI7MG+cWGqAhBhOMchjYVN0EaCU
+	WXeuBtBoyj7EDdrFkyykB/SAc9tVhIjFpRZWKTrNm6+MOcl41HuCFGss=
+X-Received: by 2002:a05:600c:a11a:b0:487:219e:42d with SMTP id 5b1f17b1804b1-48fc9a143afmr81776855e9.11.1778752420296;
+        Thu, 14 May 2026 02:53:40 -0700 (PDT)
+X-Received: by 2002:a05:600c:a11a:b0:487:219e:42d with SMTP id 5b1f17b1804b1-48fc9a143afmr81776595e9.11.1778752419903;
+        Thu, 14 May 2026 02:53:39 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.9.106])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fd6498a7esm50954115e9.4.2026.05.14.02.53.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 May 2026 02:53:39 -0700 (PDT)
+Message-ID: <a0d4052c-2e8d-4dec-afcb-c8050f5d1ac7@redhat.com>
+Date: Thu, 14 May 2026 11:53:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 1b215e28dce9
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 501C454001F
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/8] net/mlx5: Prepare eswitch infrastructure for
+ satellite PF support
+To: Moshe Shemesh <moshe@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ Akiva Goldberger <agoldberger@nvidia.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+References: <20260510053448.326823-1-tariqt@nvidia.com>
+ <20260513192539.7fd96592@kernel.org>
+ <639580c8-f93f-4945-acfa-ff116b841f6a@nvidia.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <639580c8-f93f-4945-acfa-ff116b841f6a@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 59876540030
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-287891-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,stu.xidian.edu.cn,gmail.com];
+	TAGGED_FROM(0.00)[bounces-287893-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alibaba.com:email,linux.alibaba.com:mid,linux.alibaba.com:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-This commit adds support for ndo_get_stats64 to provide accurate
-interface statistics. With the TX and RX data paths now fully functional,
-it is appropriate to register the netdevice and expose the interface to
-userspace.
+On 5/14/26 9:56 AM, Moshe Shemesh wrote:
+> On 5/14/2026 5:25 AM, Jakub Kicinski wrote:
+>> External email: Use caution opening links or attachments
+>>
+>>
+>> On Sun, 10 May 2026 08:34:40 +0300 Tariq Toukan wrote:
+>>> This series prepares the mlx5 eswitch command interface and vport
+>>> infrastructure for satellite PF support.
+>>
+>> Could you perhaps start by explaining what "satellite PF" is?
+>> And how it differs from "socket direct"
+> 
+> Satellite PF is another type of Physical Function, its role and 
+> privileges are similar to the host PF, but unlike host PF the Satellite 
+> PF is on the DPU and not on another host. So it's kind of "Satellite" 
+> for the ECPF which is also on the DPU.
+> 
+> The next patchset will introduce the Satellite PF, while this patchset 
+> only does some preparations. Small changes to prepare the eswitch to 
+> manage another PF.
+> 
+> While Socket Direct is a hardware PCIe topology, that adds another PCIe 
+> link to the NIC, the Satellite PF is just logical entity, by firmware 
+> configuration, no hardware change.
 
-Registered the network device via register_netdev, and updated the
-corresponding unregister_netdev and dev_close routines to ensure
-synchronization.
+My understanding is that Jakub wants you to capture the above info in
+the cover letter.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/ethernet/alibaba/eea/eea_net.c | 83 ++++++++++++++++++++--
- drivers/net/ethernet/alibaba/eea/eea_net.h |  5 ++
- 2 files changed, 84 insertions(+), 4 deletions(-)
+Thanks,
 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-index f4505eed8bdd..63e68580de94 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
-@@ -112,6 +112,11 @@ static void eea_bind_q_and_cfg(struct eea_net *enet,
- 	struct eea_net_tx *tx;
- 	int i;
- 
-+	/* Since 'ndo_get_stats64' is not called in softirq context, there is no
-+	 * need to use 'spin_lock_bh'.
-+	 */
-+	spin_lock(&enet->stats_lock);
-+
- 	enet->cfg = ctx->cfg;
- 	enet->rx = ctx->rx;
- 	enet->tx = ctx->tx;
-@@ -131,6 +136,8 @@ static void eea_bind_q_and_cfg(struct eea_net *enet,
- 
- 		blk->rx = rx;
- 	}
-+
-+	spin_unlock(&enet->stats_lock);
- }
- 
- static void eea_unbind_q_and_cfg(struct eea_net *enet,
-@@ -140,6 +147,8 @@ static void eea_unbind_q_and_cfg(struct eea_net *enet,
- 	struct eea_net_rx *rx;
- 	int i;
- 
-+	spin_lock(&enet->stats_lock);
-+
- 	ctx->cfg = enet->cfg;
- 	ctx->rx = enet->rx;
- 	ctx->tx = enet->tx;
-@@ -156,6 +165,8 @@ static void eea_unbind_q_and_cfg(struct eea_net *enet,
- 
- 		blk->rx = NULL;
- 	}
-+
-+	spin_unlock(&enet->stats_lock);
- }
- 
- static void eea_free_rxtx_q_mem(struct eea_net_init_ctx *ctx)
-@@ -342,6 +353,60 @@ static int eea_netdev_open(struct net_device *netdev)
- 	return err;
- }
- 
-+/* Statistics may be reset to zero upon device reset. This is expected behavior
-+ * for now and will be addressed in the future.
-+ */
-+static void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u64 packets, bytes, drop, lerr;
-+	u32 start;
-+	int i;
-+
-+	spin_lock(&enet->stats_lock);
-+
-+	if (enet->rx) {
-+		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+			struct eea_net_rx *rx = enet->rx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&rx->stats.syncp);
-+				packets = u64_stats_read(&rx->stats.packets);
-+				bytes = u64_stats_read(&rx->stats.bytes);
-+				drop = u64_stats_read(&rx->stats.drops);
-+				lerr = u64_stats_read(&rx->stats.length_errors);
-+			} while (u64_stats_fetch_retry(&rx->stats.syncp,
-+						       start));
-+
-+			tot->rx_packets       += packets;
-+			tot->rx_bytes         += bytes;
-+			tot->rx_dropped       += drop;
-+			tot->rx_length_errors += lerr;
-+			tot->rx_errors        += lerr;
-+		}
-+	}
-+
-+	if (enet->tx) {
-+		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+			struct eea_net_tx *tx = &enet->tx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&tx->stats.syncp);
-+				packets = u64_stats_read(&tx->stats.packets);
-+				bytes = u64_stats_read(&tx->stats.bytes);
-+				drop = u64_stats_read(&tx->stats.drops);
-+			} while (u64_stats_fetch_retry(&tx->stats.syncp,
-+						       start));
-+
-+			tot->tx_packets += packets;
-+			tot->tx_bytes   += bytes;
-+			tot->tx_dropped += drop;
-+		}
-+	}
-+
-+	spin_unlock(&enet->stats_lock);
-+}
-+
- /* resources: ring, buffers, irq */
- int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
- {
-@@ -349,7 +414,9 @@ int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
- 	int err, error;
- 
- 	if (!netif_running(enet->netdev) || !enet->started) {
-+		spin_lock(&enet->stats_lock);
- 		enet->cfg = ctx->cfg;
-+		spin_unlock(&enet->stats_lock);
- 		return 0;
- 	}
- 
-@@ -607,6 +674,7 @@ static const struct net_device_ops eea_netdev = {
- 	.ndo_stop           = eea_netdev_stop,
- 	.ndo_start_xmit     = eea_tx_xmit,
- 	.ndo_validate_addr  = eth_validate_addr,
-+	.ndo_get_stats64    = eea_stats,
- 	.ndo_features_check = passthru_features_check,
- };
- 
-@@ -640,6 +708,8 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
- 		return NULL;
- 	}
- 
-+	spin_lock_init(&enet->stats_lock);
-+
- 	return enet;
- }
- 
-@@ -725,11 +795,13 @@ int eea_net_probe(struct eea_device *edev)
- 
- 	eea_update_ts_off(edev, enet);
- 
--	netdev_dbg(enet->netdev, "eea probe success.\n");
-+	netif_carrier_off(enet->netdev);
- 
--	/* Queue TX/RX implementation is still in progress. register_netdev is
--	 * deferred until these are completed in subsequent commits.
--	 */
-+	err = register_netdev(enet->netdev);
-+	if (err)
-+		goto err_reset_dev;
-+
-+	netdev_dbg(enet->netdev, "eea probe success.\n");
- 
- 	return 0;
- 
-@@ -781,6 +853,8 @@ void eea_net_remove(struct eea_device *edev, bool ha)
- 		return;
- 	}
- 
-+	unregister_netdev(netdev);
-+
- 	if (!enet->wait_pci_ready) {
- 		eea_device_reset(edev);
- 		eea_destroy_adminq(enet);
-@@ -801,6 +875,7 @@ void eea_net_shutdown(struct eea_device *edev)
- 	rtnl_lock();
- 
- 	netif_device_detach(netdev);
-+	dev_close(netdev);
- 
- 	if (!enet->wait_pci_ready) {
- 		eea_device_reset(edev);
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
-index 6a5b2f908c76..848bb90bccf8 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.h
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
-@@ -165,6 +165,11 @@ struct eea_net {
- 	u32 speed;
- 
- 	u64 hw_ts_offset;
-+
-+	/* Protect the tx and rx of struct eea_net, when eea_stats accesses the
-+	 * stats from rx and tx queues.
-+	 */
-+	spinlock_t stats_lock;
- };
- 
- int eea_net_probe(struct eea_device *edev);
--- 
-2.32.0.3.g01195cf9f
+Paolo
 
 
