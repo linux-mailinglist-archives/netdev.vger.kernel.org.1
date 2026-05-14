@@ -1,144 +1,203 @@
-Return-Path: <netdev+bounces-288050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBB/FhQBBmrFdwIAu9opvQ
-	(envelope-from <netdev+bounces-288050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 19:06:28 +0200
+	id AHd+AFwHBmrFdwIAu9opvQ
+	(envelope-from <netdev+bounces-288065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 19:33:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6811754510B
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 19:06:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7F4F5455AA
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 19:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 10CC43003498
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:06:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EEB70300F790
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0669D2DF15C;
-	Thu, 14 May 2026 17:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBCB8342523;
+	Thu, 14 May 2026 17:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g5EPzIWT"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Ne7cNB7O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+Received: from sonic301-38.consmr.mail.ne1.yahoo.com (sonic301-38.consmr.mail.ne1.yahoo.com [66.163.184.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C523C386C21
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 17:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501CE282F3A
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 17:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.184.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778778382; cv=none; b=sEuVldjNn77QBJMKL85jPUhm27R7qqBaqavxvlSTl+0Rio/jgOz6X4rbPVOerDFY/XoXLnVxRcMP8aulzP4nV/9rl5c3NY7IUA6SPK1YHgaStNXlZs946l5aehc6vbBRwQ2dgWJyqpbBZwZdP1961UrZHGxZ0qH9mDr3Zw+AHMA=
+	t=1778779922; cv=none; b=OhVJ7s1gGeTiRacpZ7MgEda90U31aeXG6UWiljJeC3XSA73nMz1bRPkvuSyB8hzWzGQRtLPiC+GtANtwkxVQ89nlWTxm8z7JqDVzfNkwX8yM0+pcNzSirC5s8S8kPUJugFIr7jSRLhXTEkknN302YUQptM4ib8epel6Ddm1+BP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778778382; c=relaxed/simple;
-	bh=J+qjlNG7yCfPi70a30kgJbcx9ouEfqYTcUcggQ3HxqE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LGpWkXeIIf4EeJnBDmBqY5colS5QHvjPd5FztLClyrY8w04iCvxmXD/YTZoohUE2Ca/ltLw4LFaARP+wLdBSJ2C+Mxegnskddjd9i6ARK9ZUh1iR0kZYlW4zl2mAdv63UZA9+VqJOOmtiACVHycll1HlKhNcGYUMpY8UrPPuUP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g5EPzIWT; arc=none smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1309f4ee97fso10396126c88.1
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 10:06:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778778381; x=1779383181; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xsBBm4ZuQ5MGBzgA0ddyoKX5Ai5E3Bfgkd3FNlRPfrc=;
-        b=g5EPzIWTEnYC9BWKWbN0rt6f3IbnYn4vkaTKUumPdGr2nICHJaiBUBbFwPTb0YPaqp
-         6DcJBg2tkjj0D+6PBWCmjOnHN71B+p/mp+1yeOdlL1wcaXzUuAr4JHta6uIYMZG7nS3n
-         WTQZuEeSY+mILnc28yeFy22gpbPCnQAr8WotDeR52/78ll2oiKiUckoeymGvVIMsNxqF
-         IqXX+zDvLFrMMpoZeozoKPuEWckySWE9kUlysrrSlF35/JN9D6dgXLAI/B9ZKYxZxILb
-         WZyFHoVbbiocMDbUD5QYEHV42t/CoLdbgEPRgm1KvWt5et7dB8LBYrKi7v1+Xem/LU1i
-         Frmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778778381; x=1779383181;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xsBBm4ZuQ5MGBzgA0ddyoKX5Ai5E3Bfgkd3FNlRPfrc=;
-        b=P8/xmuyjAP+1PLCpnnHIMSAYY+VXiPepKtQq/Kk1li5WuwGQw2sRJCA/9nXZCzb2yB
-         Jcp7K2OBxmDX3mg2TX3E45KhZsCugmYC+CSKCrgy4H0kGywT6OXQg/VVxc9w40WBvlJh
-         zsgwIo6Rm/2MsCrVA44TBDFB7ziklx8BXQ2lnAvd+PEgR/1o+sKskXxt1//oWCFHxoLb
-         Pl3j+0JBfaz0T7xwnnTGdwasWARr5hr1W4v4DCRW0SO2Xsq08TbulTpF4CdxRp6M03LS
-         cMr3+BnAV0M//mahLLKtWjvjzFN8LttU8AgN6Tg/1x7/vab9kHybkS/hG0l5c8KWZob7
-         guQw==
-X-Gm-Message-State: AOJu0YyxiMJCjl7uSl4jroGs1+BtY6NZg3LH8YNkNF2jM9nDZLMwEzde
-	TgiRmZD43xP7XYv5KmT5/YnxgO7Nkg8DBmNmgEVq52D+/tCHOlvoRW9G
-X-Gm-Gg: Acq92OFgsoX3VpgnUwVYkjz0RG9/6IU+Cm+pAV0ch8AUZLPkrbEg18us+e1vOyffbu/
-	CSWMcI120Vg6HLwWZwrpuDIFmU22J+VMA6Y3UlWPSOvI34XXFrPQDlkLgHkWcmlnSYV+P1qSBmN
-	ODWVH8QkvLidDL+7k6+151Q/C2LOOkkqHzNwsD3+UgUUL1N4SsaxiFNRURY5+k6oXbTzHo208C+
-	Xa0p4J8L8zkhoZnepY6alszBd2Ck+szIXEK7ljiJBcaQfsFktqp2D7qyPrEbKFpZ2Ag5+8ldLMU
-	zExSdKJ6QT2kSaEHSaPW4cOeqO0a1UhChAVP+EUOuhSX6aF4oxVbETlTmf/QuGye/DEBJ2/1vwd
-	FB+9GtcJuii+Eq7pzPYwjUfHjmXFqAhM+cFgQhURi9T3FCjH1TRLJIc69r+h07zO8E7MYh8HIkS
-	f2ecwjrdivDytBqCvmWXmwib7jwsPMAUhorw==
-X-Received: by 2002:a05:7022:670e:b0:130:c9cc:3384 with SMTP id a92af1059eb24-1349ac64a08mr4862213c88.30.1778778380849;
-        Thu, 14 May 2026 10:06:20 -0700 (PDT)
-Received: from localhost.localdomain ([148.135.103.3])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cbed531esm5349141c88.8.2026.05.14.10.06.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 10:06:20 -0700 (PDT)
-From: Qi Tang <tpluszz77@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: netdev@vger.kernel.org,
-	lyutoon@gmail.com,
-	dsahern@kernel.org,
-	idosch@nvidia.com,
-	horms@kernel.org,
-	paul@paul-moore.com,
-	huw@codeweavers.com,
-	linux-security-module@vger.kernel.org,
-	Qi Tang <tpluszz77@gmail.com>
-Subject: Re: [PATCH net 0/4] net: trust-after-modification fixes for IPv4 options + netlabel
-Date: Fri, 15 May 2026 01:06:13 +0800
-Message-ID: <20260514170613.4098569-1-tpluszz77@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260514165139.436961-1-tpluszz77@gmail.com>
-References: <20260514165139.436961-1-tpluszz77@gmail.com>
+	s=arc-20240116; t=1778779922; c=relaxed/simple;
+	bh=e4j8oDUo7SMDEd23DYNwxIvhF/0Xnmro6uA3NQyoq98=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=azOnjWXavgN5RFV8diQ4HRTROJdiW6x8a8E+XtexMvnV1LoUSQ10rO5hvtloT/7hl1D4cDiLSMeTZZspjW9MrLKIMGUTkZnNeGowr3kyb56nIt9HmQq6shAfuTckWVjaDCWHQbXYcI6gYVuR6rzxQFe+Dzh2T52xpOCgDomPDyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=Ne7cNB7O; arc=none smtp.client-ip=66.163.184.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1778779919; bh=i2vPqlj8KNEnBhS+nIteciS3u9mAPHOTQVqdtjqlIDw=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=Ne7cNB7O7WRis6l48cw3X29rSXSFRPLEr2feIt/dMw/eD7HSUmppI+GA2NTAIPBV2p1bVq4PwjTegpCmfaAQ7DGdZXc//PSEyOoTpYe7nOdnP2vqzIacjW5o+eJ5yk24Xu3zg5Pmut8s0YR+42PQAgMJKAjlMQawasXATMuLC7bmaP6BcbWd37aCo605I+PqMev/UtuDJo/cJMSGNwwz5TkxtRwZUAn5C07ja12Bq7QJZgbu+wobcUBOe+upuTnBKMcDBExMZgCkTSYEE6nRoVjbghKCGFvhlVufPqjSMeeUhDtoTROW8ZHdEzajPvZVEdu2QdSSUEdfAAXKHMo02w==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1778779919; bh=7TS8DaHCtjtyCOLiRoNgXQCW/+qAxJ6gdjZKjGfkZE6=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=TrqIbHkFZMGhkviHGXJlmwrChB4EVtFVE8KujlG8PfLABf/UdHf0D+PQJ4ahaML/Gpgnx0RyGqiIaDgoATkAmIVxDvQbPxHSWjiuEizjcQxAjQdZ7llXDtjESRG1Acvk4RT9UHeUpJsxi8ZY4bl733DRzieqMux3Xq///uyjcbkON2OjxMz1IdGmMrpPDDI/B4i6IPH8tHHyUlpXNGoudVYxTtUDKWlHwIBMY8M0AKlRu2DPpKlqBUDIpBPJ2LQuWjaN/LmADMNFrHz8u/jBpGOFeOxurJ1WBb+Qd1MT8+E1qh0PqjP5Bt9+dWr+AAka3qC0IEvYNz5CgErQPtBgog==
+X-YMail-OSG: ooYDRH0VM1mKc9T21LCAtyC_UUWWtrXGzBx1v5sn0QBPV8HXXO9dUEvYScTNBFz
+ oKY_JbcYUBDeEBuBnpQ3YfrXiBh5neanPQazFb5v7OWhOC7JqEMtA0N.ssWfUSxazZsQ3lAJlPdE
+ IHJdfvC3elw9_3up2arVvtOZyjoOOYnLiMZxPA2MnGDJuVP7uVmRmHxGowGotEiAjpHNPzgVgcod
+ yiLj4AVSS.YSc.tRi8OeJUdJch4DrsSnqBhBxGOOppUws88alWWrlmTZSWr5ke67kghPQuKvCAWy
+ NxnKgY_qvpVuxBS_scWXW.eQAXwYYavEeePgo0fM_GVoZEGakPSxmG1YFK7Uh5adn4IAFHKd5G1A
+ PF1UQon0lpI59C2YGbSrijR4ct2uzmgFTfFJwc1mfu0_7oDdK25d.hsZW_RyOSFgF4fKliuSZEwe
+ zfs6TrBitJwOKRT4a7P1HgWWHtKqO.rD6uaxK1V8iFHfy7VSXK7Xh0_YU508CggwdKrAS22Sf520
+ WKNaeBAzpub9Gn6UEtJ1zyn2tNxAldXX.ic0oL7wvpxyA05bbjlWYibuA7928C5IC2vyUeE_Sdxm
+ qRVeXF7ak_VM.M7QcFV8jv1cYxXK4YwApupRJtal1494xApO1dKaNEp0KG6iQ5nCei5TVPuDSf91
+ .peBCUF_UdhIiqAk2xfNYiDUeTIDrf6sjkiVGhQpjUnI23kcXcEOEsGpBWFimhiZenDZ76kdMwqR
+ 6Dt4oLISVF0TwmluWmZWLqENSRm.m7s4J7BtxWZgNOQrDViPbrGzo9ZGT40WIAxcQpiZhWqycvmf
+ m0T5tLzEX_q3UBRYedsFpbnFJiUcoomkvbZ5iBIaFh96apD_R2SajTSwCoK8PGApuAsqLh7hDYRj
+ MKGpmpTUfaioSqcd0uRXgooh9LZeOBXVOORfwdiqK3rpid_V4t.IY2LtbeAmzd0uW0d7HnFLl8LW
+ 65C84RVGYYG82V_dmnXxE1d907XLfdcEKW6NFlzxVYK7WF5Fs5IYZvvwyEHI_GueKsSePSo0GCRG
+ zYfnjlj9FYRqlPTPQE.wST6xmaILgKKqXZY2m1C3grxqHRkC3oLMSMjEuAo8xZK16dUxGxzG0TdB
+ ki2Xo4c0TwPUwRsTH6_dLLsqYkqmMe6gfH79sCG8MPK4B94Z07KUtTGcEhOb7BXXsKTkC3TJ9oWr
+ ObnARfphyXRrZ08JN38KbNeleFCBZ_4ZhGlxj8xEvQWR5duh_0F3OrRoAiGWLQh4wjyl9iXJ3Bke
+ YQwBTt9P2_ZxuHFxjhKcv1RZszjiq0mpt6wfZsm6fBAaCWg._MCHB2hzfZjqHIm5wii7LGUk2r8F
+ OAL3NXAChCBdhU1UlwJhoPVGeLPz2NaS5u_HZjD5XQPjRjkuMXPUTTEMQ46rO04OliE4lC8AlWW6
+ w79ZrWJmRF3_9ceQwY3EMnjDNcxMU.S3zJ2PXi_vub41D_SG2HyWjJeYhSs47zgZQmZFevoUNgbu
+ Y793zB9Q6NPeceGQQSTJOEqxtYv91iKHsLLKQ5vbwUZFKwN6AppBm.ZSjNPK4fJCCRsKzJZtpvXu
+ xi_J.ScZGpx478qjcjej0ulbrJrqLX7LRF0e_06MaeCY3.JTdwUPqPW1MaQdfq1zyh4CkOnIad3K
+ 6ufarr9AcHf9cDcgoXVD6sxRJD15hErKiDma5vN.hi7utJTKWQi3baiXDiRaNlvs5EBo40U9HKVM
+ fFB9AFdBfkEOsN4bamGo6ygkGqvIzatC1kTSmxs1tKgmaAhSZOS4Af_cUlbITO2_fh1PB7zcF_AO
+ cadDvt9nxmJ_DfMabJwv8QE4tJGAXaurae.VgSGwJaRYGeUcEBSAftM_0LJZ1AWvs.zNaQkcaEl_
+ aCsfdAza9l6wmAKl7xWNjGerDmXGa24C4O2PQv72znRZQAgWwdcuLVVI76j4C1lpwUnQDFBazWJ2
+ u.PqAT9.ti3bOr8qcsL_0QNnZSfYp.RY87eVOOxylc8BtX8Px3F2_oH2VXRaKL2FdNYvPaz_gfc.
+ GHGAfsHtDOjkEsVjkBNQPp91h6au7yoeGN33evu7WkOB9cJW1.GSACdFd3mlIgGl_cOVc9b9VmMC
+ DnzzgwPLD2FyW7by0ssSFVY4w.TFLVhDnSXGuBrG5PpyeC5GFbBThSa1jiSlqJRih26eRqs0Zj0K
+ rJi.AjEpObhDw.uIQjRDaoNbO.q27jnmyX225FVpy9oSQDe96msp5mCQ7o6WwxyGNa9cEi.cmDtr
+ 6ssgDS0WczxD7OI1buA6jo.k9kNOhtBeS6bPZf_cMNIvFWtuPWQ.mi_wnzbE3YQrRpyo.zcGZrDk
+ 21n8T
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: d8367289-f829-468e-8bda-437b31d418e6
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.ne1.yahoo.com with HTTP; Thu, 14 May 2026 17:31:59 +0000
+Received: by hermes--production-gq1-7bb7df5c46-zj6qc (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ee76f6b666610504e63d45a3cfbbc655;
+          Thu, 14 May 2026 17:11:19 +0000 (UTC)
+Message-ID: <7e165421-a688-4025-a33a-8eefbb84c4b5@schaufler-ca.com>
+Date: Thu, 14 May 2026 10:11:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6811754510B
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/4] netlabel: validate CALIPSO option against skb
+ tail in netlbl_skbuff_getattr
+To: Qi Tang <tpluszz77@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+Cc: netdev@vger.kernel.org, lyutoon@gmail.com, stable@vger.kernel.org,
+ Paul Moore <paul@paul-moore.com>, Simon Horman <horms@kernel.org>,
+ Huw Davies <huw@codeweavers.com>, linux-security-module@vger.kernel.org,
+ Casey Schaufler <casey@schaufler-ca.com>
+References: <20260514165139.436961-4-tpluszz77@gmail.com>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <20260514165139.436961-4-tpluszz77@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.25725 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-Rspamd-Queue-Id: B7F4F5455AA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,nvidia.com,paul-moore.com,codeweavers.com];
-	TAGGED_FROM(0.00)[bounces-288050-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288065-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,redhat.com,google.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,paul-moore.com,kernel.org,codeweavers.com,schaufler-ca.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
+	DMARC_NA(0.00)[schaufler-ca.com: no valid DMARC record];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[yahoo.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[casey@schaufler-ca.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Sorry, v1 went out unthreaded and 1/4 was duplicated.  I will
-resend properly as [PATCH net v2 0/4] in ~24h.  Please ignore
-the v1 thread.
+On 5/14/2026 9:51 AM, Qi Tang wrote:
+> netlbl_skbuff_getattr() locates the CALIPSO option in the IPv6 HBH
+> header via calipso_optptr() and hands the bare pointer to
+> calipso_getattr() -> calipso_opt_getattr().  The consumer re-reads
+> calipso[1] (option data length) and calipso[6] (cat_len/4) and walks
+> calipso + 10 for cat_len bytes via netlbl_bitmap_walk().
+>
+> ipv6_hop_calipso() validates these bytes only at parse time inside
+> ipv6_parse_hopopts().  An nftables PRE_ROUTING payload write
+> reachable from an unprivileged user namespace can rewrite both bytes
+> between parse and the SELinux/Smack peer-label consume path
+> (selinux_sock_rcv_skb_compat -> selinux_netlbl_sock_rcv_skb ->
+> netlbl_skbuff_getattr).  The self-consistency check
+> (cat_len + 8 > len) inside calipso_opt_getattr() is defeated by
+> mutating both bytes consistently, allowing a ~232-byte
+> slab-out-of-bounds read from calipso + 10 whose set bits become MLS
+> categories driving the access decision.
+>
+> netlbl_skbuff_getattr() has the skb; gate the consume on the option
+> fitting within skb_tail_pointer().  The IPv6 option layout is
+> type(1) + length(1) + length bytes of data, so requiring
+> ptr + 2 + ptr[1] <= skb_tail covers the option and its embedded
+> bitmap.
+>
+> Runtime confirmation (Smack peer-label policy + nft HBH mutation):
 
-Qi Tang <tpluszz77@gmail.com>
-Tong Liu <lyutoon@gmail.com>
+I'm the Smack maintainer and do not understand what you are trying
+to say. Smack does not use CALIPSO, although support is on the
+wish list.
+
+> Udp6InDatagrams increments to 1 with the mutated cat_len, showing
+> selinux/smack_socket_sock_rcv_skb -> netlbl_skbuff_getattr ->
+> calipso_opt_getattr -> netlbl_bitmap_walk runs end-to-end past the
+> option's true bound; with this patch the consume path short-circuits
+> at the bounds check and the counter stays 0.
+>
+> Reported-by: Qi Tang <tpluszz77@gmail.com>
+> Reported-by: Tong Liu <lyutoon@gmail.com>
+> Fixes: 2917f57b6bc1 ("calipso: Allow the lsm to label the skbuff directly.")
+> Signed-off-by: Qi Tang <tpluszz77@gmail.com>
+> ---
+>  net/netlabel/netlabel_kapi.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+> index 3583fa63dd01f..4af8ab76964e0 100644
+> --- a/net/netlabel/netlabel_kapi.c
+> +++ b/net/netlabel/netlabel_kapi.c
+> @@ -1399,11 +1399,20 @@ int netlbl_skbuff_getattr(const struct sk_buff *skb,
+>  			return 0;
+>  		break;
+>  #if IS_ENABLED(CONFIG_IPV6)
+> -	case AF_INET6:
+> +	case AF_INET6: {
+> +		const unsigned char *tail = skb_tail_pointer(skb);
+> +		u8 opt_data_len;
+> +
+>  		ptr = calipso_optptr(skb);
+> -		if (ptr && calipso_getattr(ptr, secattr) == 0)
+> +		if (!ptr || ptr + 2 > tail)
+> +			break;
+> +		opt_data_len = ptr[1];	/* IPv6 option data length */
+> +		if (ptr + 2 + opt_data_len > tail)
+> +			break;
+> +		if (calipso_getattr(ptr, secattr) == 0)
+>  			return 0;
+>  		break;
+> +	}
+>  #endif /* IPv6 */
+>  	}
+>  
 
