@@ -1,197 +1,190 @@
-Return-Path: <netdev+bounces-288048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288049-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UEK3LsP9BWrFdwIAu9opvQ
-	(envelope-from <netdev+bounces-288048-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:52:19 +0200
+	id 2G8GL9f+BWrFdwIAu9opvQ
+	(envelope-from <netdev+bounces-288049-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:56:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4EEB544F1D
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:52:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8B7544FC4
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:56:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A6EDF300E49C
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:52:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 205BC304DA3D
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4876333EB10;
-	Thu, 14 May 2026 16:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6E5344D8C;
+	Thu, 14 May 2026 16:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXAkRKMd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iEOHmK+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7E23176E0
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 16:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AF5344D9A
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 16:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778777530; cv=none; b=Fby/sOQ1mLUEdZJJgl298F1GEWv8J7RKRy1bdlYoVQ/3NylQY2qn1CxcRGcNQDeGf1LxhdjUtaVSEM1b4y01wxJC5nEhRB1z65MBiU6ikjn/SqWmNfHfHOtnWSNlR/7x7HyDg9SfV5MI6W4ngO0gtbWtNRSX59HsuWg1bmtuGcw=
+	t=1778777766; cv=none; b=rS6HPJJDvai6sqhp/c5cNfl96hLelPLQ6/IxukmAqQv7XBIc6kAkdnicEXpTx2d3EU6dvfZsitU85EArOj1VhWzxr+qA7BPMaEucYOQt/WiAQZAb4qPFgjaHbupU5Lg2l8zHd/XD5XZ/pwpufpX2HTJrCfSSKWImL+G1tMcwZK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778777530; c=relaxed/simple;
-	bh=3EPvR1ScT1B0f5NL80yDzKu7nP5JRSuTf0PXBGwV2lo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lP6VCH/+npR98tteDXmBITSGr284hNVgAAZP1n25pTlegIgbY9yVoYQD4+s8Obg2Ifktcd/KjnH8CQEB+kS48xu0Q8WczUaV4a2wh8IlJk7k+ciQgjY/tfP6lBs9rPkNjcYSIDX6riqwBhb1p9JFsldMX7cn8OUi1BzEpjGbcls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lXAkRKMd; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c80203b9d7bso3471445a12.0
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:52:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778777528; x=1779382328; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GwRQjyq3ZOtr85xXuZw5Nv7geOh6ncaBN6Zn+7ncG30=;
-        b=lXAkRKMdHAhoZ0VoElce6HoTabmLMhQ6cyZSgGmude2x4xovzRMmk8+BYDOsXuipBK
-         oekH0NCebx6pFss8Ap0vV0LyWCQ/4YGrWtL/pKKAHWaBpepdxhYMVJBja/rxQMDfKNYe
-         /xQkZ6ARfR/AfXG3z28OG1md0CLTySY9L2dWa+GTvBEuv5t1BRsc3b446KHRMmKXGr9D
-         hhUvoqzN5Sz5PqIsjFObX756EyRQNuMTm9CxvAh52SWUZG1CdaedjlF931LUd8B/Z+Dw
-         sLaWzjc5XTlAEw/ImEMm6K6wTBqVCQQGIlef65pjBIlI7NdSAJecEhp4GxRS+5l5mW+6
-         Aaew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778777528; x=1779382328;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GwRQjyq3ZOtr85xXuZw5Nv7geOh6ncaBN6Zn+7ncG30=;
-        b=sMKyEpst1c9feP1WJHcW4rpvlPmiF5IkC+RRZ2cu/86GL8+cJo0bK88GQgO5F9VTlf
-         Kf2wuuQXXw58qHV657wazdD5hMaE8RrapPDPrYMhMaUt9+wMdDl5/nUUV41RwS0J4blw
-         H8UO/KKD7vT/EDs57V2YpgkTbSf15SnvVDOmwR4J6MSlN0kfW5zfxtcud5fW8xM22M8b
-         IGUr3h9qABHhBnMf8W8Uwc+98nujJZH3d8Y56iLohClq+1NLGdVDWMDmTkRpfnTvzr/u
-         DU3MrJJEH30YplqeDDRilYrdsXjsrYLIzyXH1Ewe+e2wOcEveGb9S9N3vRHcnauoYh+J
-         nCMg==
-X-Gm-Message-State: AOJu0YxxBk7029laHOYsOAcSw0RrNuOAvE1oIAHu6f2xanKYhLWdRxcz
-	LTifGeEO4imPjRBCfg5UWG8emmiU4JRcQGwmHDUudIeyFcum6+eT3q+l/TrxmI3dMMk=
-X-Gm-Gg: Acq92OGg+9A6Uxjg0X7nx0YQYii8qLUvVXzk8kJ0hOZ7AAIysMd/clCI0iutyk+WGzG
-	YtbTS/z4KKmnVjuN0YJZNJD5w1ddzwLKh3OEQTifFS4kqmeeXCVk74YE7u89oMdgE0O1yPofFi1
-	wAJnWGx8aB5MEIygw4kmm364A4daTjFB7ilqsQzRTTjATaFPVLRgaEoTt7HMB1TNqFLvfgB3aws
-	CMvZsFalTe8c7/It9a64A2pnI1+7Mx/JwFeY8VUDiNI2Vwg+ANbEYlFsyjjb94XIcL26ft0kVtr
-	GokhGcSk2kCTzmwynmarZLK7RJpXeVwAlzaRAsiGClg6SKBRQCymov3OwdI5qAAdXHfxmJEOW1z
-	26zed3qj3FK6iFiq8AgsmJYB5CJuUnD/hyMOa/05svZTZjBQY2SbV4LkMS3thdqQW8X2/PsPR/c
-	6SqtMX6nz/2irTXfCnQIyy16s3phO8/A==
-X-Received: by 2002:a17:902:7d95:b0:2bd:3bfd:22c3 with SMTP id d9443c01a7336-2bd7e88ee80mr2444355ad.24.1778777528083;
-        Thu, 14 May 2026 09:52:08 -0700 (PDT)
-Received: from Tplus.localdomain ([114.243.117.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5c2631basm27937825ad.34.2026.05.14.09.52.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 09:52:07 -0700 (PDT)
-From: Qi Tang <tpluszz77@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: netdev@vger.kernel.org,
-	lyutoon@gmail.com,
-	stable@vger.kernel.org,
-	Qi Tang <tpluszz77@gmail.com>,
-	Paul Moore <paul@paul-moore.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-security-module@vger.kernel.org
-Subject: [PATCH net 4/4] netlabel: validate CIPSO option against skb tail in netlbl_skbuff_getattr
-Date: Fri, 15 May 2026 00:51:34 +0800
-Message-ID: <20260514165139.436961-5-tpluszz77@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1778777766; c=relaxed/simple;
+	bh=h0vIxQW1o/CHC8BrmUxr0KArHGEjC6lk0b9gPDhmLU4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tCUNH8xO8SLylkHpSZi2uuGeW8gsfZ/Bf61YHkHTrq+t5QKz9H8ns5nZIh6R828xidp5kJRROhHJWdW0GF1ietXzhlzckzwL5dJWqREQK9Pxbi81rc8udEJcNHO6W2GYOpcmIbSFSYLPcPvzUqPCu2yNmX/EIWCqAA/OoSFkVPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iEOHmK+j; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778777765; x=1810313765;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=h0vIxQW1o/CHC8BrmUxr0KArHGEjC6lk0b9gPDhmLU4=;
+  b=iEOHmK+j6lDowGZ97fBox+s+SNqEUBLy6m4SacGpLnUF+SfVgcZrjTRP
+   0b+zOxWQD1o4l+xvs+PkKbnRSxDsbvwoT4tHD9ImCq/uhJKZvQlCCD4Iu
+   6MVYBomFKzLXkDYzhxMYvL8Q9M2wt3yroeQaYB6aZKyzuF6tDeAXypGEN
+   XF2V4MlN7yc27z/p3tttbmF8BOx0sh4xvmViJ6VRbSNktVjdkaZIZGBDB
+   c0iv3END09bsiuY7dUjCYIDFrRcucBh0+HtW1LV0SeFUMVJ+0WzfvzAjI
+   RUCOT/2a4oMuEMe9sPf+8c9/u/gidHq/U0llSXLC+QaIx8kZcsKLsKF6d
+   w==;
+X-CSE-ConnectionGUID: XZT205HeTPKiXSv4r3fo1A==
+X-CSE-MsgGUID: zPHscEEYR6GGt5+RPMG6CQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11786"; a="79844623"
+X-IronPort-AV: E=Sophos;i="6.23,234,1770624000"; 
+   d="scan'208";a="79844623"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2026 09:56:04 -0700
+X-CSE-ConnectionGUID: 4aFh++A5RgKwHikKC+LKNw==
+X-CSE-MsgGUID: gKOUc+owRy2SP9DGAgxAtg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,234,1770624000"; 
+   d="scan'208";a="243409539"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2026 09:56:03 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Date: Thu, 14 May 2026 09:55:21 -0700
+Subject: [PATCH iwl-net] ice: add missing xa_destroy for sched_node_ids
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B4EEB544F1D
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260514-jk-fix-missing-xa-destroy-v1-1-de437bf52347@intel.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWM0Q6CMBAEf4Xss5e0gBr9FeMD0CseajG9KhjCv
+ 1v1cbI7s0A5CiuOxYLIL1EZQwa7KdBdmtAzicuM0pQ7s7U1DVfyMtNdVCX0NDfkWFMc3+QqfzC
+ +2lvbMrL/iJyfv/YJMt0ocML5P+izHbhL3zLW9QNmiZbmhgAAAA==
+X-Change-ID: 20260514-jk-fix-missing-xa-destroy-d3f90f3711be
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Michal Wilczynski <michal.wilczynski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.16-dev-3fed5
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2316;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=h0vIxQW1o/CHC8BrmUxr0KArHGEjC6lk0b9gPDhmLU4=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhizWf9O/M2Q0P81JuPldRO1jfv8Ewxzuf82vIlwnyC33i
+ 53GmyDcUcrCIMbFICumyKLgELLyuvGEMK03znIwc1iZQIYwcHEKwESOqjH8r3a6e4lLZclMt4Z3
+ WSZOjtp/G6q8FJX3mxtkLf5evXrdGkaGHx9TQ/pXXFj6x/up4NHlug0cZZ4ib+0vtUVIpGm3/LF
+ mAAA=
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+X-Rspamd-Queue-Id: 0B8B7544FC4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,paul-moore.com,kernel.org];
-	TAGGED_FROM(0.00)[bounces-288048-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288049-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-netlbl_skbuff_getattr() locates the CIPSO option in the IPv4 IP header
-via cipso_v4_optptr() and hands the bare pointer to cipso_v4_getattr().
-The consumer re-reads cipso[1] (option length), cipso[6] (tag type),
-and then cipso_v4_parsetag_*() re-reads further bytes from the skb.
+Commit 16dfa49406bc ("ice: Introduce new parameters in ice_sched_node")
+added a sched_node_ids xarray to the port info structure, but never called
+xa_destroy on it.
 
-__ip_options_compile() validates these bytes only at parse time.  An
-nftables LOCAL_IN payload write reachable from an unprivileged user
-namespace can rewrite them after parse and before the SELinux/Smack
-peer-label consume path (selinux_sock_rcv_skb_compat ->
-selinux_netlbl_sock_rcv_skb -> netlbl_skbuff_getattr).  This is the
-IPv4 analogue of the CALIPSO IPv6 trust-after-modification fixed in
-the previous patch: the tag parsers walk the option using attacker-
-controlled length bytes, producing slab-out-of-bounds reads whose
-contents feed into the MLS access decision.
+Since xarrays can allocate internal memory, this can result in a memory
+leak even if every element in the xarray has been removed.
 
-Validate the option fits within skb_tail_pointer(skb) before invoking
-cipso_v4_getattr().
+Add a call to xa_destroy the structure during ice_deinit_hw(), and one to
+the unrolling cleanup path during errors in ice_init_hw(). While here,
+remove the overly verbose comment explaining the nature of the
+sched_node_ids xarray.
 
-Runtime confirmation (Smack peer-label policy + nft LOCAL_IN
-mutation of tag_len): UdpInDatagrams increments to 1 and recvfrom
-returns the payload, showing netlbl_skbuff_getattr ->
-cipso_v4_getattr -> cipso_v4_parsetag_rbm -> netlbl_bitmap_walk runs
-end-to-end past the option's true bound; with this patch the
-consume path short-circuits at the bounds check and the counter
-stays 0.
+This was caught by Sashiko during development of unrelated code.
 
-Reported-by: Qi Tang <tpluszz77@gmail.com>
-Reported-by: Tong Liu <lyutoon@gmail.com>
-Fixes: 04f81f0154e4 ("cipso: don't use IPCB() to locate the CIPSO IP option")
-Signed-off-by: Qi Tang <tpluszz77@gmail.com>
+Fixes: 16dfa49406bc ("ice: Introduce new parameters in ice_sched_node")
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- net/netlabel/netlabel_kapi.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
-index 4af8ab76964e0..ace561a2904a4 100644
---- a/net/netlabel/netlabel_kapi.c
-+++ b/net/netlabel/netlabel_kapi.c
-@@ -1393,11 +1393,21 @@ int netlbl_skbuff_getattr(const struct sk_buff *skb,
- 	unsigned char *ptr;
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index b617a6bff891..38d0d7e59494 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1051,14 +1051,13 @@ int ice_init_hw(struct ice_hw *hw)
  
- 	switch (family) {
--	case AF_INET:
-+	case AF_INET: {
-+		const unsigned char *tail = skb_tail_pointer(skb);
-+		u8 opt_len, tag_len;
+ 	hw->evb_veb = true;
+ 
+-	/* init xarray for identifying scheduling nodes uniquely */
+ 	xa_init_flags(&hw->port_info->sched_node_ids, XA_FLAGS_ALLOC);
+ 
+ 	/* Query the allocated resources for Tx scheduler */
+ 	status = ice_sched_query_res_alloc(hw);
+ 	if (status) {
+ 		ice_debug(hw, ICE_DBG_SCHED, "Failed to get scheduler allocated resources\n");
+-		goto err_unroll_alloc;
++		goto err_unroll_xarray;
+ 	}
+ 	ice_sched_get_psm_clk_freq(hw);
+ 
+@@ -1146,6 +1145,8 @@ int ice_init_hw(struct ice_hw *hw)
+ 	ice_cleanup_fltr_mgmt_struct(hw);
+ err_unroll_sched:
+ 	ice_sched_cleanup_all(hw);
++err_unroll_xarray:
++	xa_destroy(&hw->port_info->sched_node_ids);
+ err_unroll_alloc:
+ 	devm_kfree(ice_hw_to_dev(hw), hw->port_info);
+ err_unroll_cqinit:
+@@ -1186,6 +1187,8 @@ void ice_deinit_hw(struct ice_hw *hw)
+ 
+ 	/* Clear VSI contexts if not already cleared */
+ 	ice_clear_all_vsi_ctx(hw);
 +
- 		ptr = cipso_v4_optptr(skb);
--		if (ptr && cipso_v4_getattr(ptr, secattr) == 0)
-+		if (!ptr || ptr + 8 > tail)
-+			break;
-+		opt_len = ptr[1];	/* total CIPSO option length */
-+		tag_len = ptr[7];	/* first tag length */
-+		if (ptr + opt_len > tail || ptr + 6 + tag_len > tail)
-+			break;
-+		if (cipso_v4_getattr(ptr, secattr) == 0)
- 			return 0;
- 		break;
-+	}
- #if IS_ENABLED(CONFIG_IPV6)
- 	case AF_INET6: {
- 		const unsigned char *tail = skb_tail_pointer(skb);
--- 
-2.47.3
++	xa_destroy(&hw->port_info->sched_node_ids);
+ }
+ 
+ /**
+
+---
+base-commit: c78bdba7b9666020c0832150a4fc4c0aebc7c6ac
+change-id: 20260514-jk-fix-missing-xa-destroy-d3f90f3711be
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
 
 
