@@ -1,202 +1,267 @@
-Return-Path: <netdev+bounces-287863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287864-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHhgH7+NBWpNYgIAu9opvQ
-	(envelope-from <netdev+bounces-287863-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:54:23 +0200
+	id SPYDIlKPBWppYgIAu9opvQ
+	(envelope-from <netdev+bounces-287864-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:01:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D2F53F815
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:54:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FFAD53F8C7
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A5C9C3013A5D
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 08:54:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1F7AB301FA96
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687263DD87F;
-	Thu, 14 May 2026 08:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158A5379C32;
+	Thu, 14 May 2026 09:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rd5YIxja"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E223D7D9A;
-	Thu, 14 May 2026 08:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778748856; cv=none; b=OO9X+3hjgWhc26sSM6Ir+TCnz39o1ShhvfPZBIPWD6ORs+TnAlhCCgIUv3y/sgCJEFuyveDKl4/1yXNEsvo/dSjyyOGc/4sv98jEfLh6YycMPrDAmrjxDYFWynKWnxGGXcHjqXhE4LCxkDJXzGgDJSW8WFxuUDtxX4c9dqfePHY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778748856; c=relaxed/simple;
-	bh=6IHsZSLzMCg+WQ/Qk+2i/icI7kf53u1QeCeB1gEUvhE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tg/ly4MWrBWK7z3ppIvnjA1N5XVIokqune+VcXwjXouGqn3jn+uXa2BsqP0Y0Q8mYSjgqufb9J7JnXcEuVvGbJ59xGCEquS6R04LLHOblmxw4E2JErblcX4wbMLsKFWvIFafY8ORZ1YdNNOsrZY/UhkhM06pNRtsbl3J/sDQPWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-42-6a058dafad9a
-Date: Thu, 14 May 2026 17:54:02 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "David Hildenbrand (Arm)" <david@kernel.org>,
-	Pedro Falcato <pfalcato@suse.de>,
-	"Vlastimil Babka (SUSE)" <vbabka@kernel.org>, linux-mm@kvack.org,
-	akpm@linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
-	davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
-	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
-	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
-	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
-	horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
-	ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
-	brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
-	usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
-	almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
-	bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
-	sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com
-Subject: Re: [PATCH v4] mm: introduce a new page type for page pool in page
- type
-Message-ID: <20260514085402.GA63255@system.software.com>
-References: <20260224051347.19621-1-byungchul@sk.com>
- <982b9bc1-0a0a-4fc5-8e3a-3672db2b29a1@nvidia.com>
- <4af19eda-c29c-4302-92d5-c0915267fc0c@kernel.org>
- <agRB2QTbzceRgpzX@pedro-suse>
- <1817a749-8232-43ab-a0f5-350e5aade235@kernel.org>
- <f3e38c07-d410-4c8e-a572-68d52dc55353@nvidia.com>
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9486936CE06
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778749259; cv=pass; b=ElmXxVCmtfwb/P4TZamzw+X/P0w0iLssSU3JYRWOMOZBNr/RM1PHvaqwV9nPyD5EkYDFdj0p2PSRMAWpY+7uceGUP0y03iZaINEJwLDcNOIWT9dtowA/M1jblnc4q3PFmuNxekgZ2myJfGKw5UrlY7VZv/YKIoNFINKum9kWcvE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778749259; c=relaxed/simple;
+	bh=m7RtcNCvqTTTVbq1olYq5UQ2jWQ8DqMTKo7FEqsvrFg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PW+uXF/fB8Y6XYqJ/qSNn5ayLsS4SyXceY43Y8eYm4T+f4YgfQhY0a1E8uL71lUMgHs7NcrxZ5nj2a2UtG8MX3NHqgO+CGoxficjZc6NsdhrvOvFNYa8ktQ1p5bwInbjUslfQ5coYHgOQXmTzcMTDChIFbHrd7r6YdDCexBbU8M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rd5YIxja; arc=pass smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8b4000e51fdso78462236d6.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 02:00:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778749256; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k0NSBbf17g2tHHGcqqpWExUtRjippSh0XfANoP7sryqTemNnlP4HKbCeZJ2RdntxDc
+         lIkpCg0bBtG+1WjF86RIpJGTSVXRFGyovKtXjnd6xvy76R+WD/BYDs4lbpSS8KQw3hcY
+         JWi0psPNj3bzJx/hSFTpF83rk92myDZgAAptxedjPErX0O2n3weS7szGhXpYiXBBVe7T
+         PCg5mOPa7cNVo8wKJ8DQeFUxz+yIhYOfgU3BfV6Azv7c9LjBZEVCS7MaKYi81Rucn4xj
+         LsLPCL48KBDQ/cG3DMkymVsG5pP3w3VAb3KwazU2wZT8UYVeJPfUvivzk23nw33Hqer6
+         wHwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=G6SfA0ZbRxSpsTevybP6k7CoIEEjF5qSuiSOwzPk5nQ=;
+        fh=wXZ97+qOKETjQJe3NqCD3XdSQiNtGXi8dIciDAgwCXE=;
+        b=TfcKMYfoa9qZfkxulDlagfInVuX9WQive49N394VkDPQVYS+Evk+Rr6KFV8DY5Bldh
+         uFlqrMI0dozUogQtUT6G157QkyM2B4IhzzMT0ySzCkQj1Yr+n5p87qP4YClovYDgSzrB
+         PnhVY5gFPEV5lWUzOizJ0OrwILkp6KOijzecVPW6FPNCfwzKfT4hCtoKitx9roza/4UN
+         GDpsHarJ64CGecAe5AXEvD1H9ukgAh8u6z4ajcgVi82P7ZEjK5jxbAiOuCHAwHXqHile
+         0Py3OnYIJe2Um7Ru25rUlUjsYkb7PqtSlSH+jvKlobJWBs9DStZG262FVUaWfCBPGqCb
+         ICOQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778749256; x=1779354056; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G6SfA0ZbRxSpsTevybP6k7CoIEEjF5qSuiSOwzPk5nQ=;
+        b=Rd5YIxjatRbbXMp1G4JCAxBq0zLibSL3h8faDt2MHhSjBf2P0iBhVhMbMIT8hkJUhp
+         Ky9LVQiLW1p7zt9TQZTZDc0a2TEhAWLrPzdQmh1sCO4hBc38KYoel7mEsZmbGMmJx3w4
+         /Wf/aS5JmpX2CU9zpd9wkMA6JK5McSeCyRLQenLPzxe7uzOHbtkpIzi4eGneaFGFQAr+
+         KsXktLOBXEQ+h88E5vvOOgEE809Db/Fj/6qLe/hN1Wg6U2vvZtZVs2zW3h/kVjMSrHgV
+         /aBvbzRmyvbeeBAaBQhIQvVmhrlN8GFTJB/urXyUK9K3bi0+ACsjtjlI1QyR59VBQ97P
+         WksQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778749256; x=1779354056;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=G6SfA0ZbRxSpsTevybP6k7CoIEEjF5qSuiSOwzPk5nQ=;
+        b=nTLM4GIFOzcMUHBXNZJPiN6lqpEuu5aldg4NwsLjj99RjZ0HdKzXcmug3EJ5oDv6+H
+         LsFCyk6QeJESEgF7w2h4Odh0dZKVvJdbcPsMm0GiwOCDry/jw0CFdRPkjfjbv2Me+Q8T
+         S4rtryKIWmdAjIs2acmCT/XW+U482qdPItIfqoxNNTwQn2Dh01QgNYmsh8RqhbY7+lNb
+         0DoolqB/IMRCUCyKZ5jWyTEjJMrwk/LxDLENvSN2B7RyAjYw7It/gS2YT+SWCbaotA38
+         qFcZxKn7fXLgkN7h4xHaUZacrfX05XMDl6uItbxXjGaH8LBKaBdv/2WMedPnnBZfCXYb
+         hMEg==
+X-Forwarded-Encrypted: i=1; AFNElJ994nQp6xnDZOAbUdBuJH6uHlMDVs4QWU4vtXFeow4j3dH1bEBPQNxO8VezRbG+asgcM8nKFF8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhL+haAjoOu2yX6KzNTDBNlzUDlvlix0CVQIqap/K9mk6lMQ+W
+	V8A2MHA4jAFgN2G+gxhQ/yvsIf3kZnvmCKMBV0FaZ/KyWh6lFbBRRt7D2XELbMlqDjaJriWgDxh
+	htBS0jUGtMU8co8UDmWM8ev+bqxnPTQJ8VTdLAM9etseA4A1QMQISHiD/8cg=
+X-Gm-Gg: Acq92OHqJESt9iVyWod+0ew3KEu5089BrxVvN9XOz8WdUADaRUtNaidtlm5yXkGtvLO
+	heNyspPRqP6jUWekn6oTmiDeyKVp/aNsSX+I9h+RhDi9XRmiQ8iZH/O1lLh/KQxsNeHmOewBoO/
+	6g6OcOsneprjsty0MjQ8FNlR9VwTvvbxSvjRMNESIjBqpi5a8X/fMfWZ8u7LFZU2x9QLjkqMXhD
+	nQdoxCg6p3GD9I8/170zk7eoh83HIF3ESj9kjZ2ElemUwaSoLDwlQchwAkZaoLDljeBztZm7ajJ
+	Rd8/WiDTaF0zalM7t+CXCD4wZspbKmdcBBr15XK9aE/1WMvkd1LIclYJwuaAiIpeHs310PHBg+4
+	/8l0To2IcZqCOuHjpoB3uMhXToVol
+X-Received: by 2002:a05:6214:1d23:b0:8a6:d318:4909 with SMTP id
+ 6a1803df08f44-8c7b8cf5437mr99519516d6.2.1778749254087; Thu, 14 May 2026
+ 02:00:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f3e38c07-d410-4c8e-a572-68d52dc55353@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sb0yTVxTGd9973z80NLmrIlfIvnTZVNwcI8YcDTNqdHmNczHq1OgHbeQV
-	ilBMEQQXQx0kKlp0MDYo1VSZBWsNWoS2BAwDVkBiNBjIKyooGzI3hg5NQ4HAKMbotyfP85zf
-	OR+OhHU9fIxkNB1WzCZDml7QEM2/kRc/v27lU+P7/hPBXuMW4Op4DlQ98fEQcg9zYHfVI3gd
-	eijCTFMAwau2dgH+aR1DUHkxiMF+t4DAcN0EAn/DMIK/y64JMBQYFOGqZzMMOJ8RaDzhxTB4
-	tkMAa8EkhqbQqAg/+KpnwbUWEe7VF/Hw08RlDF7LExHuN9gF6HfP8PCsxUqg03aFwMvSNgwD
-	RWsg4FgAwa4RBH9V2UVoq/FyEDxzXoCe8gYO6pp6RCjpdgjwR8EAgu7WQQKlUycFOPl8gEDF
-	8SIEk+Oz8NFzr3mo+L1fXBMvH1dVQW4deYHlm1cecHJv2Y9EVm/d5mS/7bEoOzxZcm11nFyo
-	dmPZ4zolyJ6xYlF+1NsoyB1lk0T2P10p+32vONmaPypsWbBbk5ikpBmzFfMXq/dpUn5Rm7hD
-	16NyTlcOYQt6RAtRhMTocmZ3Wvi3+n7d9KyWJEI/YX1dyWFboIuYqoZwWM+ni5mlroQUIo2E
-	aZ/E8ptDJBzMo1vZbVvFXElLgf1a6sfhko5e5pj7VLn4JviQdZb/OTeAaRxTp59z4WWYxrKq
-	aSlsR9DVzO2qnONE0Y9Zc307F+Ywmh/Bit0z4ptDF7LfqlVyDlHbe1jbe1jbO6wDYRfSGU3Z
-	6QZj2vJlKbkmY86y/RnpHjT7bM5jU3t8aOzethZEJaSP1DYnk1Qdb8jOzE1vQUzC+vnaswGU
-	qtMmGXKPKuaMveasNCWzBcVKRB+tTQgeSdLRZMNh5aCiHFLMb1NOioixIGf9qoQhW8JivChx
-	5TcfNN4w73KRrEuxtZuXPrXG7Hu4cfd3U5vyqh3+SOOWl+fTx+5s21XoSo7+3uv+bN26DQfO
-	lGy64N3vXRt9pzxRd/NozaepEwkjeXk5K/Z27fiKj+r/OWqnaXswvtMXM961hC2MFBovfHs3
-	d+N6m/PrwORIsf2jJD3JTDF8GYfNmYb/AbHJpGtoAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SXUhTcRjG+Z//+XK1OC2tk93EIipDS8p4o5DqpkOgfUAFdZErD25+FZuZ
-	BtFMo2nNj0rUbYGhpenEmk0307LN/LwoFO1k5XKVZolFijgtyxlRdy/P8/ye9+ZhsaKBCmY1
-	ySmiNlmVqKRlpCx6R2ZorZGK3+x7EQaWWisN1dNpUPHOQYHPOkKApaoewaTvNQO/mtsQTLS2
-	0/DF/R1B2e0pDJbnWSSM2GcQOBtHEHwurqHhY5uXgWpbFHjuDpPQdKUBgzevgwZj1iyGZt84
-	A5cclfPFdXoG3Lc6KXhRn0vBzZk7GBr07xjobbTQMGj9RcGwy0hCp+keCd8KWzF4cndBW+ly
-	mOoeQ/CpwsJAa20DAVPXbtHQV9JIgL25j4EbPaU0vM/yIOhxe0ko/GGgwTDqIcGckYtgdnq+
-	fDx/kgLzs0FmV7iQIUm04B77ioWH914RQn9xASlIj7sIwWl6ywiltrNCXWWIkCP1YMFWlU0L
-	tu/XGeFNfxMtdBTPkoJzaLvgdEwQgjFznD6w4phsZ6yYqEkVtZsiY2TqIqmZOHM/KO1q2Ues
-	R2+4HBTA8txWvtc+R+UgliW5tfxAd5xfprl1vCT5sP8O5NbzevsNMgfJWMwNsHxmi4/0G8u4
-	Q3yXybwQknPAlxc6sT+k4O4QvDW7hPljLOU7Sz4sAJgL4aW5UcL/DHOr+Io51i8HcJG8taps
-	oSeIW8O31LcT+Uhu+o82/Ueb/tGlCFehQE1yapJKkxgRpktQpydr0sJOnU6yofk53b3wo8CB
-	Jnv3uhDHIuVieUscGa+gVKm69CQX4lmsDJTntaF4hTxWlX5e1J4+oT2bKOpcaBVLKlfI9x0V
-	YxRcnCpFTBDFM6L2r0uwAcF6ZF23dvqgunsmqMvr+mbuiz5cPpbX8qiya2u7frAj43Pokghp
-	X9T+vT+L+suNF92GrNUO5RaUlxs8tK3bVr1Bm23e0+5RPh0JX2I4t1L5Mn74mmJgfwosGnuS
-	Mj205bK9pt+Qdn1UfTIq+ub5Pu/Go51HYip3F2Wsjwu2RUTsOf7gp5LUqVXhIVirU/0G+OL6
-	okoDAAA=
-X-CFilter-Loop: Reflected
-X-Rspamd-Queue-Id: 12D2F53F815
+References: <20260512094859.3673997-1-edumazet@google.com> <20260512094859.3673997-3-edumazet@google.com>
+ <ff0a041e-16c9-4e9c-b717-ff8a2bb85d84@redhat.com> <CANn89iJ=t=DPd5cw0YTdcj9dNv9BthW+=3jcHDXgtQYmp1nX1w@mail.gmail.com>
+In-Reply-To: <CANn89iJ=t=DPd5cw0YTdcj9dNv9BthW+=3jcHDXgtQYmp1nX1w@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 14 May 2026 02:00:42 -0700
+X-Gm-Features: AVHnY4JX08Z4zWalV2fPBft9iY8GzDHkDgfPHXEvk5l5GtYVr3XweV5JanSuIlc
+Message-ID: <CANn89iKNrjWqQ+8XPQOTyTAciKk+rXS+=S45xoJ+3pSTOfiwBQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] net/sched: fq_codel: local packets no longer
+ count against memory limit
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Simon Horman <horms@kernel.org>, 
+	Jiri Pirko <jiri@resnulli.us>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	"David S . Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 3FFAD53F8C7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[sk.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287863-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[49];
+	TAGGED_FROM(0.00)[bounces-287864-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RSPAMD_URIBL_FAIL(0.00)[msgid.link:query timed out];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,toke.dk,vger.kernel.org,gmail.com,davemloft.net];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RSPAMD_EMAILBL_FAIL(0.00)[edumazet.google.com:query timed out];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,suse.de,kvack.org,linux-foundation.org,vger.kernel.org,skhynix.com,oracle.com,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	NEURAL_HAM(-0.00)[-0.932];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mojatatu.com:email,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026 at 02:06:06PM +0200, Dragos Tatulea wrote:
-> On 13.05.26 11:36, David Hildenbrand (Arm) wrote:
-> > On 5/13/26 11:26, Pedro Falcato wrote:
-> >> On Wed, May 13, 2026 at 11:12:43AM +0200, Vlastimil Babka (SUSE) wrote:
-> >>> On 5/13/26 11:00, Dragos Tatulea wrote:
-> >>>>
-> >>>>
-> >>>>
-> >>>> Seems like this patch broke tcp_mmap because
-> >>>> validate_page_before_insert() returns -EINVAL due
-> >>>> to a page having a type. Here's the full flow:
-> >>>>
-> >>>> getsockopt(TCP_ZEROCOPY_RECEIVE) returns -EINVAL because of the
-> >>>> below flow in the kernel:
-> >>>>
-> >>>> tcp_zerocopy_receive()
-> >>>> -> tcp_zerocopy_vm_insert_batch()
-> >>>>   -> vm_insert_pages()
-> >>>>     -> insert_pages()
-> >>>>       -> insert_page_in_batch_locked()
-> >>>>         -> validate_page_before_insert() returns -EINVAL
-> >>>>            because page_has_type(page) is now true.
-> >>>>
-> >>>> The patch below fixes the issue. But is this a valid fix?
-> >>>
-> >>> Hmm the check traces back to commit 0ee930e6cafa0 "mm/memory.c: prevent
-> >>> mapping typed pages to userspace"
-> >>>
-> >>>> Pages which use page_type must never be mapped to userspace as it would
-> >>>> destroy their page type.  Add an explicit check for this instead of
-> >>>> assuming that kernel drivers always get this right.
-> >>>
-> >>> So uh, this doesn't look good I think.
-> >>
-> >> Yep, you fundamentally can't map a page with a type as page type aliases with
-> >> mapcount. Even with the given diff, just mapping it will increment the mapcount
-> >> and wreak havoc. I think we need to revert this patch for now.
-> >>
-> >> I'm not sure what the long term plan for this would be. If page types are moved
-> >> to memdesc types, then the two stop colliding and that could work. I don't know
-> >> if that's Willy's plan, however.
-> >>
-> >> (then there's the other question: are page pool pages really folios? not really.
-> >> they are mappable, but they aren't part of the page cache, or anon, nor are
-> >> they in the LRU or have rmap capabilities. perhaps we need a different memdesc
-> >> for those. we're one step away from reinventing class polymorphism from first
-> >> principles ;)
+On Thu, May 14, 2026 at 1:49=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Thu, May 14, 2026 at 1:24=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
+rote:
 > >
-> > Zi Yan is working on this: non-folio pages would no longer mess with
-> > rmap/mapcounts, and page table walking code will identify them to be non-folio
-> > things to skip them.
+> > On 5/12/26 11:48 AM, Eric Dumazet wrote:
+> > > Commit 95b58430abe7 ("fq_codel: add memory limitation per queue")
+> > > claimed that the 32Mb default was "reasonable even for heavy duty usa=
+ges."
+> > >
+> > > In practice, this is not the case.
+> > >
+> > > Packets that are associated with local sockets sk_wmem_alloc
+> > > do not really need additional memory control.
+> > >
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > ---
+> > >  net/sched/sch_fq_codel.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
+> > > index 1b1de693d4c64a1f5f4e9e788371829dea91740e..71107dc52be799a14f370=
+f2ad74d2eadd93992c1 100644
+> > > --- a/net/sched/sch_fq_codel.c
+> > > +++ b/net/sched/sch_fq_codel.c
+> > > @@ -212,7 +212,7 @@ static int fq_codel_enqueue(struct sk_buff *skb, =
+struct Qdisc *sch,
+> > >               q->new_flow_count++;
+> > >               WRITE_ONCE(flow->deficit, q->quantum);
+> > >       }
+> > > -     get_codel_cb(skb)->mem_usage =3D skb->truesize;
+> > > +     get_codel_cb(skb)->mem_usage =3D is_skb_wmem(skb) ? 0 : skb->tr=
+uesize;
+> > >       q->memory_usage +=3D get_codel_cb(skb)->mem_usage;
+> > >       memory_limited =3D q->memory_usage > q->memory_limit;
+> > >       qdisc_qlen_inc(sch);
 > >
-> > It will take a while, though ...
+> > I *think* this patch is causing TDC self-tests failures:
 > >
-> So do I get it right that the path forward here is to revert this commit [1]
-> and wait until the work from Zi Yan is ready?
+> > # not ok 704 a4bb - Test FQ_CODEL with HTB parent - force packet drop w=
+ith empty queue
+> > # Could not match regex pattern. Verify command output:
+> > # qdisc fq_codel 10: parent 1:10 limit 10240p flows 1 quantum 1514 targ=
+et 99us interval 999us memory_limit 1b ecn drop_batch 64
+> > #  Sent 490 bytes 5 pkt (dropped 0, overlimits 0 requeues 0)
+> > #  backlog 0b 0p requeues 0
+> > #   maxpacket 98 drop_overlimit 0 new_flow_count 1 ecn_mark 0
+> > #   new_flows_len 1 old_flows_len 0
+> >
+> > whole log at:
+> >
+> > https://github.com/p4tc-dev/tc-executor/tree/storage/artifacts/645644/1=
+-tdc-sh
+> >
+> > Looking at the test code, I think the patch broke it, but the failures
+> > started a little afterward the patch merge, so I'm possibly
+> > misunderstanding something here.
+> >
+> > Thanks,
+> >
+> > Paolo
+> >
+>
+> It seems this test uses a memory limit of 1 byte.
+>
+> $TC qdisc add dev $DUMMY parent 1:10 handle 10: fq_codel memory_limit
+> 1 flows 1 target 0.1ms interval 1ms
+>
+> This might be a typo, I think they expected a limit of 0 packet.
+>
+> commit cbe9588b12d058cbb16735fd468c82ec4b3d1256
+> Author: Cong Wang <xiyou.wangcong@gmail.com>
+> Date:   Thu Apr 3 14:16:32 2025 -0700
+>
+>     selftests/tc-testing: Add a test case for FQ_CODEL with HTB parent
+>
+>     Add a test case for FQ_CODEL with HTB parent to verify packet drop
+>     behavior when the queue becomes empty. This helps ensure proper
+>     notification mechanisms between qdiscs.
+>
+>     Note this is best-effort, it is hard to play with those parameters
+>     perfectly to always trigger ->qlen_notify().
+>
+>     Cc: Pedro Tammela <pctammela@mojatatu.com>
+>     Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+>     Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+>     Link: https://patch.msgid.link/20250403211636.166257-2-xiyou.wangcong=
+@gmail.com
+>     Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>     Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-I think it's the best way for now.
+I do not think we care much about the precise
+get_codel_cb(skb)->mem_usage value.
 
-	Byungchul
-> 
-> [1] db359fccf212 ("mm: introduce a new page type for page pool in page type")
-> 
-> Thanks,
-> Dragos
+A value of 2 bytes would let the test pass.
+
+diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
+index 71107dc52be799a14f370f2ad74d2eadd93992c1..916f4d7756e0cb9ec6e81ba69cc=
+e59910ee2545a
+100644
+--- a/net/sched/sch_fq_codel.c
++++ b/net/sched/sch_fq_codel.c
+@@ -212,7 +212,7 @@ static int fq_codel_enqueue(struct sk_buff *skb,
+struct Qdisc *sch,
+                q->new_flow_count++;
+                WRITE_ONCE(flow->deficit, q->quantum);
+        }
+-       get_codel_cb(skb)->mem_usage =3D is_skb_wmem(skb) ? 0 : skb->truesi=
+ze;
++       get_codel_cb(skb)->mem_usage =3D is_skb_wmem(skb) ? 2 : skb->truesi=
+ze;
+        q->memory_usage +=3D get_codel_cb(skb)->mem_usage;
+        memory_limited =3D q->memory_usage > q->memory_limit;
+        qdisc_qlen_inc(sch);
 
