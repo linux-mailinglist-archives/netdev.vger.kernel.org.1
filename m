@@ -1,240 +1,297 @@
-Return-Path: <netdev+bounces-287938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287939-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDwRMPe1BWqeZwIAu9opvQ
-	(envelope-from <netdev+bounces-287938-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:45:59 +0200
+	id UKukD0i2BWpZaAIAu9opvQ
+	(envelope-from <netdev+bounces-287939-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:47:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C061D5412D2
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:45:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA62054132C
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:47:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5149D300AD53
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:45:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A60F83016277
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8341E393DDA;
-	Thu, 14 May 2026 11:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8B23C09ED;
+	Thu, 14 May 2026 11:47:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4JEizDX";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdTFDFD7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DbECCrJY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5E23C378A
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF793B8D7E
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778759150; cv=none; b=EMWGybqWySRJRbeq9EwenrqUzpxsyVKxVbQ/EbYP3IrDN9nDIDHa4cnojTyYvPHZAx69GybxVj6w2eX6KXGAxHV/pVBoRaHSe1wDnOPkiMCEa9w7KzESH3cIzFnj1z3vzpQzp3XwkJB1YrOZGemba5ytD0rp6IvLIomGZsFZBB0=
+	t=1778759237; cv=none; b=GUbkVwDGB0qbVbYHoICiq1cYX+W8dDHpCprkgw2nGTIr8jqXOh1kD7UrHy3Yiy1lZHcxRUbYEP9sdMyYsdC9HqRJxLvSDSnIwAlYXq/D3YwLAMe5arCmPlJt2FCQJnTh3RJCdTFmXRnIhjRcb1QweSY/Jeair5NmAW0VBOf4Fss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778759150; c=relaxed/simple;
-	bh=HzzKtLdDSOU6qk7De5CYxTiWMfze0a1cgEfK3lOcNlM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qUlSI/jaqv8c6cNbKosBKY6qCbHgiOrATVckVOx79f+A83Kbj/O4OPE15Ae1nB70nQFStpO2wnvEU0ecn8f4R3JBbxfZ0xwtDYy2CcSKHZk4rjWcTiw1zTFhSEn4gvTG9eZ2Rlmrpr/MS47NcgWJpmVTAmjfY/RSpV5bNt7kg0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h4JEizDX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OdTFDFD7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778759144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zZr60InQnZWO1LkpnVVTcP+GBmOQnYBqSDneZ78egzQ=;
-	b=h4JEizDXhRmMv8dlbKCJLHLb1bRm4M5erDHufIWgPtw97v7/K2kqcH2PQFiARTVGkYE+NC
-	5Y1iFJZRtZoYnIbipm1FQzqyU/uA1Y9nDtRqQXcMkN2TUIJTMtIvm74IWywv7v9C0ckcnT
-	Dx+xhJB8Td7Cp6TVzd3HxTih4xe692c=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-7wncK0YQPOO5qF5Ta4rN9A-1; Thu, 14 May 2026 07:45:43 -0400
-X-MC-Unique: 7wncK0YQPOO5qF5Ta4rN9A-1
-X-Mimecast-MFC-AGG-ID: 7wncK0YQPOO5qF5Ta4rN9A_1778759142
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48e89faa62eso21923105e9.1
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 04:45:43 -0700 (PDT)
+	s=arc-20240116; t=1778759237; c=relaxed/simple;
+	bh=efEdLYBGwXMk1FZ6NvnTRdf+WewLtg4Mqsibp1Nr4EI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=i5x09QZ0x4SRemqjOB2p827nCLZ/24gg86lAI4jdl+xzTESUzDxRHTEe8ZbzM/R88OvOEzTpP/YkQJ7rRH7YVoNos5E2tuPXFEGGSjogv+8HEYm2WOoxXwMvg6XriBKXGa5bTSD2eIwisJeSh54JJ92WpVPeyBp+jq4U+7n7++E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DbECCrJY; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-51494d74d4bso139431621cf.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 04:47:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778759142; x=1779363942; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zZr60InQnZWO1LkpnVVTcP+GBmOQnYBqSDneZ78egzQ=;
-        b=OdTFDFD7JaXCOs8XCSf1TIgk75lSZVyA2seKJvO60P8gslr05DHIK4cyHJaeOLoxPy
-         ihVHmwVJsqfLAbNQ+PNTNhv8R3omhi4wGm+XQ2ZMhMxkjAcLUbOJ3b6oyn9VqpspOgR3
-         VhfhvpfTnAge2iU46B7ReTWlmPLVKkuxtjU9T0IdeSW8kXERma5QRH7RVBUpGbkGdvMy
-         BCyMmkfFLAgD3e0sCYjcgPEZWHWq+eiKl9wwPAOflOigUDFBzmT2XPdvyozP5Hgzm5mB
-         s8KPrCr66n5JsA+yyeKcfzQG3RkfBhKcFO4GJj4drKEYLdBDwEpfmltBaOG8DTK10qkf
-         DZ/Q==
+        d=google.com; s=20251104; t=1778759235; x=1779364035; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jvDeDkJghz++54GrljZdOEdxppinnGvlOHppuZiSKQI=;
+        b=DbECCrJY1ABArBVkFHAa1rJoMUYa5OdlHiCge9spb5atJ3gVLtt/WpU8Tc7KXuQrDa
+         Koj0Axmj8r2ITx09zFlYBW26X6MiM1znkih5cZv4X6yhwVas55softPY6KtZHhb19ybY
+         2tekpgQX08WAeUXx19eQIN1Ar15ro6secGCIDbmOSAXw5N9Suh4yOrvXiSp951xUAOEI
+         uPi7HpCehcjePuz2DH+Xlcxyj3CTKyZsusnYptkj3yVKT+TUBkiA1x/iZkpnJHISA2fl
+         IuPUw09ZWloVwAs5Mb4jBSc5scmGNc50m7bWCOazm2U7yTMkzwlGWwqLjojzw167cAmT
+         aMCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778759142; x=1779363942;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zZr60InQnZWO1LkpnVVTcP+GBmOQnYBqSDneZ78egzQ=;
-        b=Y9s77nBQpNYe2LLZ97MBABSnB0OMYhEEGFMGMRS+abkyUfBoV5iLr9FwDbKmRc0DY/
-         yD+IScGLke9/YEvuuXP8e9KVKWDc7oEk93CCQihTw96dYqz/V46tVCmgrDu579fL489V
-         4d0zsSSKQI9d659mIilyW49SzlDHwot4cBYYeAWrAzy6bu5M+TZ93iWLTZFY1XDL9qoE
-         LMSM2T+rsx9FtgLX0EykRJXe7uQkrShwuoQz7hdC658yAuwHFzgwJQlyS2dOGTM5pbtE
-         u9tV0OLcQAG4GXp68B20f0qrShVeBVtFWKfCnIR/7oNK6mLL6TWE7xhG45G6SBECyG84
-         jJmw==
-X-Forwarded-Encrypted: i=1; AFNElJ+w3WkPfIqdWZ6RzgMbOzJRXlBJkmFvMIPqtTSqrGNthOD/5ptndOWo31gobsEa/hVgYEiyIek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTLR4zDCf9V/Mj6LbO8I94y9E3fz8LvudUhsOnz+8+VLQTeG0v
-	bI92EfbgyQ46pb9xQcdpdV9jp89CeaA5iahk8pu03dcEtJvQsUtirYHTc2bA45SOsCNn9MWhs38
-	TVu5H++7ncnrVRfsuaBOckibSQabxZd7xxl3Y4mOrA7vXhPOH8YnIWXrDUQ==
-X-Gm-Gg: Acq92OHLi7vOwbzBcg+Dx81Itj7gDWBibSFOXzfT+Feq/ZYfj4rQvpzGUiWvQ3ZvcYY
-	agxuSlNKJeDbL3sjL6XVkPdEoWhMKk+3xyxz8A9PeK9VRxrYB59+eSB7KGSQo/mMXAmHaAogoS2
-	WijRJT6VUil3EbmkghJ1R0XKJqlKv3FF1uM/6QM0TljlQvq6q7EWxRmsdb7Ubj/Kwh4+aRVYE8Y
-	N8PZcqeeuaTWdFnBIP9asPWTLK6b9nf0uRahs9BJX6uuQzv4Ax70i2EwZ/ZBZNsjoKSa4FQfWBf
-	rv9zaTWLcKUFPTK24+H2hpgHsTgWbxNhQNg+vpl09ZG53w/F9ZwoLMeSw5vanxNDv6VGjygU6lP
-	b2IN623H5L8tiWc99qY4z7E0pc5R3k1sK+4Wh1ICZVpRcAJ/8cteav+Q=
-X-Received: by 2002:a05:600c:4ecc:b0:488:ac01:72b6 with SMTP id 5b1f17b1804b1-48fc9a391fbmr124907435e9.21.1778759142423;
-        Thu, 14 May 2026 04:45:42 -0700 (PDT)
-X-Received: by 2002:a05:600c:4ecc:b0:488:ac01:72b6 with SMTP id 5b1f17b1804b1-48fc9a391fbmr124906965e9.21.1778759141942;
-        Thu, 14 May 2026 04:45:41 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.9.106])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fdb2c7f93sm57514445e9.10.2026.05.14.04.45.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 May 2026 04:45:41 -0700 (PDT)
-Message-ID: <b4ddcc50-ba34-4788-8931-40f31ec43986@redhat.com>
-Date: Thu, 14 May 2026 13:45:39 +0200
+        d=1e100.net; s=20251104; t=1778759235; x=1779364035;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jvDeDkJghz++54GrljZdOEdxppinnGvlOHppuZiSKQI=;
+        b=rAt42uAXeZZFrK613rhIPu/ZL3Q2w7WRQ+cqWPVRMXKQHc/VWC2tGFXwAT1IkVw6ao
+         cAbPcFaJmpV/jwaTnaz6hwNj8lxIBzVpyVDn5kvW+FaggP3LsSav/6awSp4k6ZLREDnJ
+         itvySAasT7HePP6OawUA6FOu4WSXYuvvklhrP7nCAZvN/kTSOVe7axLWhnNz0murKmTJ
+         EnipdD7OtL1EGz4bFNsYZnKn46Qnc4lYNVfLmVwP8LBsdf61TOacLgwAsTuZwojdqhO3
+         1Cf3b0zNrHY8hFU3m6tifkK/Sp0pYXo37cQOAsDWGZzAKXXDstjamV2Cpd8Xkqvvh1JH
+         dFRg==
+X-Forwarded-Encrypted: i=1; AFNElJ9DFGGuDV2h1ieEsUv5RC8fhlTCpHByOjIMr/oWQdKJfrNm/6+Lx+pK9NcOu0sfSP1cwCtV5h8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiYinQNrFwHjupgN+JcKVXGYGhRBsuqGjJdD4MH5AI5sG0yYsS
+	cz21mcFJT2Q5VA0oiKuWZcVzZulSoOD2F1cZsU9nMr9RoDIjiZsB0hdF9lCp4fdjJmM9izWYiEs
+	++cabwXX0bQSoag==
+X-Received: from qtbir3.prod.google.com ([2002:a05:622a:6dc3:b0:50e:5ff6:e88c])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:2588:b0:509:11bd:9d3 with SMTP id d75a77b69052e-516415f4efemr40519191cf.1.1778759234878;
+ Thu, 14 May 2026 04:47:14 -0700 (PDT)
+Date: Thu, 14 May 2026 11:47:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net: core: dev: add reprocess depth limit for
- another_round in __netif_receive_skb_core
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf.kernel@gmail.com>,
- Kuniyuki Iwashima <kuniyu@google.com>,
- Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>,
- Krishna Kumar <krikku@gmail.com>,
- Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, Xuewei Feng
- <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>,
- Ke Xu <xuke@tsinghua.edu.cn>, stable@vger.kernel.org
-References: <20260512022127.7818-1-zhaoyz24@mails.tsinghua.edu.cn>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260512022127.7818-1-zhaoyz24@mails.tsinghua.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C061D5412D2
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
+Message-ID: <20260514114713.4134674-1-edumazet@google.com>
+Subject: [PATCH net-next] net/sched: sch_dualpi2: annotate data-races in dualpi2_dump_stats()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@toke.dk>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Vineet Agarwal <agarwal.vineet2006@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: AA62054132C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,gmail.com,mails.tsinghua.edu.cn,126.com,tsinghua.edu.cn,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-287938-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287939-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,toke.dk,vger.kernel.org,gmail.com,google.com];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tsinghua.edu.cn:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 5/12/26 4:21 AM, Yizhou Zhao wrote:
-> In __netif_receive_skb_core(), the another_round label can be reached 
-> via a TC ingress redirect (bpf_redirect_peer returning -EAGAIN).
-> 
-> Across network namespaces, two BPF programs on peer devices can redirect
-> packets back and forth indefinitely, creating an unbounded loop that 
-> monopolizes a CPU core in softirq context. This leads to RCU stalls, 
-> soft lockups, and system-wide denial of service.
-> 
-> We reproduced it by creating a pair of TC BPF programs across two 
-> network namespaces that redirect packets to each other, and the RCU 
-> subsystem detects a stall:
-> 
-> ```
-> [   24.835219] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> [   24.835837] rcu: 	(detected by 0, t=21002 jiffies, g=-627, q=2 ncpus=1)
-> [   24.835959] rcu: All QSes seen, last rcu_preempt kthread activity 21002 (4294691810-4294670808), jiffies_till_next_fqs=3, root ->qsmask 0x0
-> [   24.836239] rcu: rcu_preempt kthread starved for 21002 jiffies! g-627 f0x2 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-> [   24.836362] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-> [   24.836460] rcu: RCU grace-period kthread stack dump:
-> [   24.836601] task:rcu_preempt     state:R  running task     stack:15448 pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00080000
-> [   24.837139] Call Trace:
-> [   24.837568]  <TASK>
-> [   24.838008]  __schedule+0x4ed/0xea0
-> [   24.838934]  schedule+0x22/0xd0
-> [   24.839023]  schedule_timeout+0x81/0x100
-> [   24.839095]  ? __pfx_process_timeout+0x10/0x10
-> [   24.839165]  rcu_gp_fqs_loop+0x11b/0x650
-> [   24.839226]  ? __pfx_rcu_gp_kthread+0x10/0x10
-> [   24.839282]  rcu_gp_kthread+0x17e/0x210
-> [   24.839333]  ? __pfx_rcu_gp_kthread+0x10/0x10
-> [   24.839383]  kthread+0xdd/0x110
-> [   24.839433]  ? __pfx_kthread+0x10/0x10
-> [   24.839481]  ret_from_fork+0x1aa/0x260
-> [   24.839538]  ? __pfx_kthread+0x10/0x10
-> [   24.839585]  ret_from_fork_asm+0x1a/0x30
-> [   24.839686]  </TASK>
-> ......
-> ```
-> 
-> Fix this by adding a depth counter when it is about to go to another_round
-> label. When the counter exceeds XMIT_RECURSION_LIMIT (8), the packet is 
-> dropped. This follows the same pattern as dev_xmit_recursion() which 
-> protects the TX redirect path with the same limit.
-> 
-> Reuse SKB_DROP_REASON_TC_RECLASSIFY_LOOP for observability.
-> 
-> Fixes: 9aa1206e8f48 ("bpf: Add redirect_peer helper")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-> Reported-by: Xuewei Feng <fengxw06@126.com>
-> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-> Assisted-by: GLM:GLM-5.1
-> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> ---
-> Changes in v2:
-> - Move the check just after `another` is set to true to avoid affecting the fast path
-> - Reuse SKB_DROP_REASON_TC_RECLASSIFY_LOOP to avoid adding new drop reason
-> - Link to v1: https://lore.kernel.org/netdev/20260511063005.38134-1-zhaoyz24@mails.tsinghua.edu.cn/
-> ---
->  net/core/dev.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 831129f2a..bb9ae92f0 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -5958,6 +5958,7 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
->  	struct net_device *orig_dev;
->  	bool deliver_exact = false;
->  	int ret = NET_RX_DROP;
-> +	int redirect_depth = 0;
+dualpi2_dump_stats() runs without qdisc lock held.
 
-As reported by sashiko, the above will cause an unused variable warning,
-should be protected by #ifdef CONFIG_NET_INGRESS compiler guard.
+Add missing READ_ONCE()/WRITE_ONCE() annotations.
 
-Also please respect the reverse christmas tree order above.
+Fixes: d4de8bffbef4 ("sched: Dump configuration and statistics of dualpi2 qdisc")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Vineet Agarwal <agarwal.vineet2006@gmail.com>
+---
+ net/sched/sch_dualpi2.c | 68 ++++++++++++++++++++---------------------
+ 1 file changed, 34 insertions(+), 34 deletions(-)
 
-/P
+diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
+index c6416f09dddd8f170b92e50fb89377a15773c5bf..8b3bc646730499dac1798372ef5b647c2e9e5a57 100644
+--- a/net/sched/sch_dualpi2.c
++++ b/net/sched/sch_dualpi2.c
+@@ -190,7 +190,7 @@ static bool skb_apply_step(struct sk_buff *skb, struct dualpi2_sched_data *q)
+ static bool dualpi2_mark(struct dualpi2_sched_data *q, struct sk_buff *skb)
+ {
+ 	if (INET_ECN_set_ce(skb)) {
+-		q->ecn_mark++;
++		WRITE_ONCE(q->ecn_mark, q->ecn_mark + 1);
+ 		return true;
+ 	}
+ 	return false;
+@@ -198,7 +198,7 @@ static bool dualpi2_mark(struct dualpi2_sched_data *q, struct sk_buff *skb)
+ 
+ static void dualpi2_reset_c_protection(struct dualpi2_sched_data *q)
+ {
+-	q->c_protection_credit = q->c_protection_init;
++	WRITE_ONCE(q->c_protection_credit, q->c_protection_init);
+ }
+ 
+ /* This computes the initial credit value and WRR weight for the L queue (wl)
+@@ -403,12 +403,12 @@ static int dualpi2_enqueue_skb(struct sk_buff *skb, struct Qdisc *sch,
+ 
+ 	cb = dualpi2_skb_cb(skb);
+ 	cb->ts = ktime_get_ns();
+-	q->memory_used += skb->truesize;
++	WRITE_ONCE(q->memory_used, q->memory_used + skb->truesize);
+ 	if (q->memory_used > q->max_memory_used)
+-		q->max_memory_used = q->memory_used;
++		WRITE_ONCE(q->max_memory_used, q->memory_used);
+ 
+ 	if (qdisc_qlen(sch) > q->maxq)
+-		q->maxq = qdisc_qlen(sch);
++		WRITE_ONCE(q->maxq, qdisc_qlen(sch));
+ 
+ 	if (skb_in_l_queue(skb)) {
+ 		/* Apply step thresh if skb is L4S && L-queue len >= min_qlen */
+@@ -417,14 +417,14 @@ static int dualpi2_enqueue_skb(struct sk_buff *skb, struct Qdisc *sch,
+ 		/* Keep the overall qdisc stats consistent */
+ 		qdisc_qlen_inc(sch);
+ 		qdisc_qstats_backlog_inc(sch, skb);
+-		++q->packets_in_l;
++		WRITE_ONCE(q->packets_in_l, q->packets_in_l + 1);
+ 		if (!q->l_head_ts)
+-			q->l_head_ts = cb->ts;
++			WRITE_ONCE(q->l_head_ts, cb->ts);
+ 		return qdisc_enqueue_tail(skb, q->l_queue);
+ 	}
+-	++q->packets_in_c;
++	WRITE_ONCE(q->packets_in_c, q->packets_in_c + 1);
+ 	if (!q->c_head_ts)
+-		q->c_head_ts = cb->ts;
++		WRITE_ONCE(q->c_head_ts, cb->ts);
+ 	return qdisc_enqueue_tail(skb, sch);
+ }
+ 
+@@ -531,17 +531,16 @@ static struct sk_buff *dequeue_packet(struct Qdisc *sch,
+ 
+ 		/* Keep the global queue size consistent */
+ 		qdisc_qlen_dec(sch);
+-		q->memory_used -= skb->truesize;
+ 	} else if (c_len) {
+ 		skb = __qdisc_dequeue_head(&sch->q);
+ 		WRITE_ONCE(q->c_head_ts, head_enqueue_time(sch));
+ 		if (qdisc_qlen(q->l_queue))
+ 			*credit_change = ~((s32)q->c_protection_wl) + 1;
+-		q->memory_used -= skb->truesize;
+ 	} else {
+ 		dualpi2_reset_c_protection(q);
+ 		return NULL;
+ 	}
++	WRITE_ONCE(q->memory_used, q->memory_used - skb->truesize);
+ 	*credit_change *= qdisc_pkt_len(skb);
+ 	qdisc_qstats_backlog_dec(sch, skb);
+ 	return skb;
+@@ -564,7 +563,7 @@ static int do_step_aqm(struct dualpi2_sched_data *q, struct sk_buff *skb,
+ 		}
+ 
+ 		if (dualpi2_mark(q, skb))
+-			++q->step_marks;
++			WRITE_ONCE(q->step_marks, q->step_marks + 1);
+ 	}
+ 	qdisc_bstats_update(q->l_queue, skb);
+ 	return 0;
+@@ -600,7 +599,8 @@ static struct sk_buff *dualpi2_qdisc_dequeue(struct Qdisc *sch)
+ 			continue;
+ 		}
+ 
+-		q->c_protection_credit += credit_change;
++		WRITE_ONCE(q->c_protection_credit,
++			   q->c_protection_credit + credit_change);
+ 		qdisc_bstats_update(sch, skb);
+ 		break;
+ 	}
+@@ -876,7 +876,7 @@ static int dualpi2_change(struct Qdisc *sch, struct nlattr *opt,
+ 				WARN_ON_ONCE(1);
+ 				break;
+ 			}
+-			q->memory_used -= skb->truesize;
++			WRITE_ONCE(q->memory_used, q->memory_used - skb->truesize);
+ 			rtnl_qdisc_drop(skb, sch);
+ 		} else if (qdisc_qlen(q->l_queue)) {
+ 			skb = qdisc_dequeue_internal(q->l_queue, true);
+@@ -890,7 +890,7 @@ static int dualpi2_change(struct Qdisc *sch, struct nlattr *opt,
+ 			 */
+ 			qdisc_qlen_dec(sch);
+ 			qdisc_qstats_backlog_dec(sch, skb);
+-			q->memory_used -= skb->truesize;
++			WRITE_ONCE(q->memory_used, q->memory_used - skb->truesize);
+ 			rtnl_qdisc_drop(skb, q->l_queue);
+ 			qdisc_qstats_drop(sch);
+ 		} else {
+@@ -1046,15 +1046,15 @@ static int dualpi2_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
+ 	struct dualpi2_sched_data *q = qdisc_priv(sch);
+ 	struct tc_dualpi2_xstats st = {
+ 		.prob			= READ_ONCE(q->pi2_prob),
+-		.packets_in_c		= q->packets_in_c,
+-		.packets_in_l		= q->packets_in_l,
+-		.maxq			= q->maxq,
+-		.ecn_mark		= q->ecn_mark,
+-		.credit			= q->c_protection_credit,
+-		.step_marks		= q->step_marks,
+-		.memory_used		= q->memory_used,
+-		.max_memory_used	= q->max_memory_used,
+-		.memory_limit		= q->memory_limit,
++		.packets_in_c		= READ_ONCE(q->packets_in_c),
++		.packets_in_l		= READ_ONCE(q->packets_in_l),
++		.maxq			= READ_ONCE(q->maxq),
++		.ecn_mark		= READ_ONCE(q->ecn_mark),
++		.credit			= READ_ONCE(q->c_protection_credit),
++		.step_marks		= READ_ONCE(q->step_marks),
++		.memory_used		= READ_ONCE(q->memory_used),
++		.max_memory_used	= READ_ONCE(q->max_memory_used),
++		.memory_limit		= READ_ONCE(q->memory_limit),
+ 	};
+ 	u64 qc, ql;
+ 
+@@ -1074,16 +1074,16 @@ static void dualpi2_reset(struct Qdisc *sch)
+ 
+ 	qdisc_reset_queue(sch);
+ 	qdisc_reset_queue(q->l_queue);
+-	q->c_head_ts = 0;
+-	q->l_head_ts = 0;
+-	q->pi2_prob = 0;
+-	q->packets_in_c = 0;
+-	q->packets_in_l = 0;
+-	q->maxq = 0;
+-	q->ecn_mark = 0;
+-	q->step_marks = 0;
+-	q->memory_used = 0;
+-	q->max_memory_used = 0;
++	WRITE_ONCE(q->c_head_ts, 0);
++	WRITE_ONCE(q->l_head_ts, 0);
++	WRITE_ONCE(q->pi2_prob, 0);
++	WRITE_ONCE(q->packets_in_c, 0);
++	WRITE_ONCE(q->packets_in_l, 0);
++	WRITE_ONCE(q->maxq, 0);
++	WRITE_ONCE(q->ecn_mark, 0);
++	WRITE_ONCE(q->step_marks, 0);
++	WRITE_ONCE(q->memory_used, 0);
++	WRITE_ONCE(q->max_memory_used, 0);
+ 	dualpi2_reset_c_protection(q);
+ }
+ 
+-- 
+2.54.0.563.g4f69b47b94-goog
 
 
