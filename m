@@ -1,148 +1,174 @@
-Return-Path: <netdev+bounces-287936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MnFCPSyBWqeZwIAu9opvQ
-	(envelope-from <netdev+bounces-287936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:33:08 +0200
+	id QJ2pCpC1BWqeZwIAu9opvQ
+	(envelope-from <netdev+bounces-287937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:44:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59EEE5410EB
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:33:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A06F541267
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:44:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5E65630254D1
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:33:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA3F63008A61
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D363A7588;
-	Thu, 14 May 2026 11:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304C43C1F40;
+	Thu, 14 May 2026 11:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZ9WxG//"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rToDaxWu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54FB368D67
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778758384; cv=none; b=aFDlFtfJ6IPOamqnf44ftE30YQUgYWUWpDrmG5dMy+rxN5cUsdU7CBj8tm6qkFPzDzOKqmH7aYUnZim4bVA1+e0wizjkOynDRwDrRCiNd9shqOxt9g9WEJX9wM1y57/MG6x1mHHwF6OmGS7gjRul3wglD5Ra1/bKuzZj3mF8NIc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778758384; c=relaxed/simple;
-	bh=bhaZ8fijgpxpOxD/qtp5p7oENJE3emvbuPvo4yZJSLc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MFy4fQKezLiBbk36IP8i8jpbxqd7SGtTCWEPZ3Hl98jSITiioDNSrL3SJjURL8g4NAsEnzN+57jZxaPKZJTkRgL+XLLnLBonV6r+8I4glNuBfae0yZS3Dejhf7a8Xkq6rf+558tHuBzl/ylWmUoli826g5HkeEM/Xi6xV2Nf5ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZ9WxG//; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55400C2BCB3;
-	Thu, 14 May 2026 11:33:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778758383;
-	bh=bhaZ8fijgpxpOxD/qtp5p7oENJE3emvbuPvo4yZJSLc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WZ9WxG//iDWN/mAHeSRB7BsKoBmPjRAWXdWABglrMNKA2PUWvC9BRgVxJKcGW+As+
-	 C4cfKgyFd33AHlaCEpm5b8fu3ydwuCavx1xcnVhw4dEgQAzwgbKbH8bjlyS70f7HYZ
-	 nuLawvJzt9fp2yzbbLTfIkK9Ik9DG+fNpxBvVoL1wtgVkQ9RAfwXdd2e9ByVUA0BnJ
-	 jfnrwsr7Euy9jVxWQ84AgQ2vy7s4M/Qw+WfScgUD6L4gPZ+SEFZQKpR8ZEkr1m/yTj
-	 bUlV5hCGbRNnQ9ZGgREiO/jhj09WupzkwMHFVWzoYtWB5RmRE8+gEsjcLQs4s/ON8d
-	 61oXj2EieeA3A==
-Date: Thu, 14 May 2026 14:32:57 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Will Mortensen <will@extrahop.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>, netdev <netdev@vger.kernel.org>,
-	Shahar Shitrit <shshitrit@nvidia.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jeremy Royal <jeremyr@extrahop.com>
-Subject: Re: [PATCH v2] net/mlx5: don't printk garbage when transceiver
- overheats
-Message-ID: <20260514113257.GO15586@unreal>
-References: <20260512-b4-mlx5-sensor-fix-v2-1-531fee4fd7fd@extrahop.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10E938736B
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778758911; cv=pass; b=rwGSuB30q6yQXekkOf4cx1F5THauzUciv4FimjZwQwzqn1jHrT5paLp7WtiuHSKKuuvFXR8yUq0EkANn2eTeBnV1pt2BznIcF2JWoUzFPQkXU1oTM2aXaq8+kpghogsfTA5TmSoObSNXtHXwZIXqDFznPUScGI6qxgnxWBn79QU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778758911; c=relaxed/simple;
+	bh=kv467D/XoMhGiSVjKU11VbhHNBo8WeJHJpbMRzqUQvs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i8HUNnq0cQ+dIurIwTdmIbI8a2EuYm1OZMx1/UBQslJaZPKE48HmBLU6XtszCcvJxyFITtKRQnWSvm+og7qBDugttslO+zcCY8zgqmvArYxrCFohRFQ7t7/i+zAj5WliYVSkoFu+NeKqAYUWHe0H947/U/oPo4ctAswRkyd40Gc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rToDaxWu; arc=pass smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5165195c8b0so1132341cf.0
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 04:41:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778758908; cv=none;
+        d=google.com; s=arc-20240605;
+        b=K8EEaxyazV8KbfhaC/Yq6XtmmI4q928tWrKkC41juo1VMeiI5SrNZdlPvUOvjo6mRV
+         COfQj9tYb1Yi0IE/pK2qiVXA9/slhMMrjHnHoplNQcRaNuzkwT+C7HVchgDgLu/Adyl/
+         z78m4WuVDVWInqm3iy94JCgfpC7FVguVYCG7tJtgPqhKsZNWw1FIzqf2s9UFk/to8OoB
+         xAicYIcZAPn5n2tE2Rn8FMQmpT5JFegTeUC/yD4KNoqOMJQjS6LIROBOrFJ9ySSYY4qG
+         LYsaXI0bILim6Zorcv808nPCu+CAuGXu5MR7DbAkuHsntcZlOlE2sQeL9Q97zbAiA8sC
+         C0pQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FyYIDxnGqYFvsZOiPf9MOOGSH/PxiYpL7rMNChWORiU=;
+        fh=5C2woG64U508Htc0luwbRxxhATyiu3f94AXBAQocSz4=;
+        b=Ko54P0IU5zI+LMITEkzeWBNDvW0xe6/4GUI4sez5e98f+/haY2/A5EC1A42qkvNz1E
+         K2hUw0EyE6rW+QLTBQgyzxRKkAZeZAgBae+LTiLH2FnwdE+uSsPX18ummcNOHji1dnmA
+         g6bO5QhJkJI/DoXcQoaruR5fzA3VuI4PltjHC5hGVxKdEXz+8kv97tXHik3IyNxd+OVE
+         AnMi+hZmVgLQItIZvPJ4ELMVdcO3Cb/AgKgd1AAzSkPl74iiaA7w02nkPk9zYKucd4tN
+         xVi7MPuMRhzZSQm9LK/1jfpE+Bu4sG0OyEiMLQqqRLCBsZHZaxXrXY3wfxVwRcUbVy3E
+         t+pQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778758908; x=1779363708; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FyYIDxnGqYFvsZOiPf9MOOGSH/PxiYpL7rMNChWORiU=;
+        b=rToDaxWu/wn3TAoIL3+W/lzjodnro+AAGxqbkU22xhjplk3LIqq7dNjO1XfVQUw/Zj
+         a4hgNey1mrRooJZIX5E2qnIoGtZNJK1QlN2tZ1Evoaz/VViRx+lsTIhA5YsMMSpIK/6U
+         JGSa0Bqw25J0JhKUCExal/kn2jfRjXRJ/tRPlhADiv0+zuzme9BpE4FbTJ9D4DTCNUTc
+         q8FVtWjMnEuS6ScnSASNs+mKYD9+e4OrE3OSrA3XdZlNdjFXuGJJcDsWg4wTdceFGTnp
+         eu9o+6MAO+vZLstkeOZeIyuRNhMerAquWvV0MkHdtj9OqSgAPEpWkRbyu3hIRlQIW5iZ
+         mfEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778758908; x=1779363708;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FyYIDxnGqYFvsZOiPf9MOOGSH/PxiYpL7rMNChWORiU=;
+        b=I2eclS9/GWwzhsTUz8aVOvcN/li5gfjJteJpYFtQP/6x2ifhRxtfd5AZGk5UjXzsuQ
+         hmzT2BIqPu5xsQZJgYZCqmzjVnV/B/LdAfj/5SYbInTec8d5C9GmNxyTJiqCsmNXw++7
+         rV1nOpCF+wZPK0cXEpMK3bfcsjHX9wKuyhO15WN7Y0+wyZYJQiNMpzCx2N78y0RSW8GS
+         4I3bR2EGkJ64t7sBV9gMh8tPsbv8gdNfqtSoJakG9nxk4rUlTacFD7eQzNB57kbeI+7q
+         6M3kTezRdjX0pFjzYkOjW0vjTVpdbRCpUM3kNcGjIpl1TdjY9gKfCgK7VxawD4fr4Nln
+         XbnA==
+X-Gm-Message-State: AOJu0YzwZRP2dgQcT3UwPhPSqIOHt4d1Nc/R2H0ulgZlGuE9ok6DJeRI
+	nCVaiEJWlppLhXSOE0F6wWc4XjSGYN7vAqB6+FdHs2pAneOrlg45tBI4QAP7yGWbWJOtxx7D5QI
+	Rvl3AGWTmN9YWEGadTM/5XmcUZtXnMNazFrMY6oPn
+X-Gm-Gg: Acq92OHSoDfaFVbNceyJXtE0/RS94bltLKCQRzI2i1pE8CSAmNHJed/ALIkMRfYLXXa
+	gR5wXGi9X7dm8LqguNtr+hf1/y5ASfOZCOh5ZFvdJy/cAobiBBsOm5KGzhDB6HzWWBd/1PNuikt
+	p9aw79STLEKu7nyHOqsdJUddAy7qDZOmHeO+iNGRkZr+tzbH9JH2g8hFKm9UjtVHe/uI+J+mttU
+	woVGKZ8COqsa4uNtppWy84jpKEqLlSUT2lBRLibwAqqrrHef4KrtAAnxcv4c6Js0bbeWLo2EmfV
+	WJb5zIM5rjlVg+Y799vlICUBdDKMB8K0oVIIs50GFKxVQQG+zAFsol6IWEdKH+dJzVNFd5/w/a+
+	zKYE+HEZ2MRPFIr+Bt+ViDPWGqAU6HjgnH5v69mt8
+X-Received: by 2002:ac8:5996:0:b0:50f:b257:9301 with SMTP id
+ d75a77b69052e-5162f625bb0mr98872181cf.52.1778758907886; Thu, 14 May 2026
+ 04:41:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260512-b4-mlx5-sensor-fix-v2-1-531fee4fd7fd@extrahop.com>
-X-Rspamd-Queue-Id: 59EEE5410EB
+References: <20260508072918.324797-1-agarwal.vineet2006@gmail.com>
+In-Reply-To: <20260508072918.324797-1-agarwal.vineet2006@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 14 May 2026 04:41:36 -0700
+X-Gm-Features: AVHnY4KsUbeVyglV3gUXtjT0w6MfWMHctdVoEHMDw5qkkO4w62bUONu4Pgel1bQ
+Message-ID: <CANn89iKDAZJ8Xm4yGjnoMt5uSpezsYzH9RyiazwcsCio1Uop6g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net/sched: sch_dualpi2: annotate lockless
+ stats reads in dump path
+To: Vineet Agarwal <agarwal.vineet2006@gmail.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 7A06F541267
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287936-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287937-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 12:32:38AM -0700, Will Mortensen wrote:
-> When the mlx5 driver processes a temperature warning event, in events.c
-> and hwmon.c, temp_warn() calls print_sensor_names_in_bit_set(), which
-> calls hwmon_get_sensor_name() to get the NUL-terminated name of the
-> relevant sensor, and then prints it to dmesg. In particular,
-> print_sensor_names_in_bit_set() passes the bit index ("sensor index")
-> within the 128-bit vector in the warning event to
-> hwmon_get_sensor_name(). But hwmon_get_sensor_name() was expecting the
-> index of the hwmon channel, and the driver registers hwmon channels for
-> at most only two sensors: the ASIC sensor (sensor index 0) and the
-> module sensor (sensor index 64 or 65 if we're on a 2-port NIC). So when
-> the warning event concerned a module, hwmon_get_sensor_name() took the
-> 64th or 65th element of the likely 2-element temp_channel_desc array and
-> thus returned a pointer to some other kernel memory past the end of it,
-> which was printed to dmesg up to the first NUL byte.
-> 
-> A further difficulty is that, at least in testing on our CX-8 C8240 with
-> firmware 40.47.1088, the warning event can have bits set for other
-> modules, e.g. if this PCI physical function is associated with
-> port/module 0, we might expect bit 64 to be set, but bit 65 (for port/
-> module 1) can also be set.
-> 
-> Fix this by clarifying that the argument to hwmon_get_sensor_name() is
-> the raw sensor index, and correctly converting it to the hwmon channel
-> index. Return NULL if the sensor index doesn't correspond to a hwmon
-> channel (e.g. because it's for the other port's module).
-> 
-> Fixes: 46fd50cfcc12 ("net/mlx5: Add sensor name to temperature event message")
-> Signed-off-by: Will Mortensen <will@extrahop.com>
+On Fri, May 8, 2026 at 12:29=E2=80=AFAM Vineet Agarwal
+<agarwal.vineet2006@gmail.com> wrote:
+>
+> dualpi2_dump_stats() runs without holding the qdisc lock and provides
+> best-effort statistics to userspace.
+>
+> These fields are updated concurrently from enqueue and dequeue paths
+> and may be observed locklessly in the dump path.
+>
+> Use READ_ONCE() to ensure safe single-copy loads of these counters and
+> prevent compiler optimizations that could otherwise result in torn or
+> inconsistent observations on weakly ordered architectures.
+>
+> No WRITE_ONCE() annotations are added because these statistics are
+> maintained as best-effort counters, and the update paths already use
+> simple non-synchronized increments consistent with existing qdisc
+> statistics patterns. The intent of this change is only to make the
+> lockless read semantics explicit.
 
-Your Signed-off-by needs to be last.
+I missed this V2, sorry for the delay.
 
-> Reviewed-by: Jeremy Royal <jeremyr@extrahop.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/events.c |  2 ++
->  drivers/net/ethernet/mellanox/mlx5/core/hwmon.c  | 15 ++++++++++++++-
->  drivers/net/ethernet/mellanox/mlx5/core/hwmon.h  |  2 +-
->  3 files changed, 17 insertions(+), 2 deletions(-)
+I think we can cook a  more correct patch, with READ_ONCE() and WRITE_ONCE(=
+).
 
-I would take a simpler approach by removing this extra complexity and  
-using a static temp_channel_desc[64] array, avoiding any dynamic  
-allocation. But this change is acceptable as well.
+I will send it now.
 
-Thanks
+Thanks.
 
