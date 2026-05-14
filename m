@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-288046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288047-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OUYBvz9BWrFdwIAu9opvQ
-	(envelope-from <netdev+bounces-288046-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:53:16 +0200
+	id WJIAFR3+BWrFdwIAu9opvQ
+	(envelope-from <netdev+bounces-288047-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:53:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F24D544F53
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD413544F69
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF94530393B2
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:52:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 505D6307354B
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA7433A007;
-	Thu, 14 May 2026 16:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9CF31E830;
+	Thu, 14 May 2026 16:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUu0u3Y9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTvNdvcK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9B83176E0
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 16:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935333176E0
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 16:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778777521; cv=none; b=lAIO6XBYdba/n+2D0kF7+gPCF03LPOgi8z6RFkCihtnppR3WBckV6FgY92QghsdB4exutR3y+L0S9F2tB2ELjOuJ7fsQKON+8NRfjBVH6hD7PDFtaxdlgdzALlOyN8ypI8GLIj2MapnWUnEzsD8L8Sd/O4R+g/yCnIW/ak0DgnM=
+	t=1778777527; cv=none; b=NnGXkh1J10cFsv/mYp93qnd69bac/EnZRo8/cbURe/y/ifIQcnSsQrcMIJ3473dIQhFOrMTByr8AX4NWcBOTbzLAVFq8X3fFhxYFPAgaipdJviijsY9oz9THDuRug1e2aUmbxeh5CG3pFw3DFTBp9qq0MM3iln+3Eayk1/5FmJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778777521; c=relaxed/simple;
-	bh=VWpmt7ZBipt2gqkQ22zGchyfxEm1SG+l/GA+JXxNTFo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cHmJpKV9dXyS3awVwkR0sExO3TwQkhryK+qzm6UGh/sYquHsEhdZMUOBvwYjwNz/r6nAHhSuNnGBVczsXOOz3+F+Lynsrw8G9IFsoLSS5NjfHkm+uft8dGTqAM93zhYtagEE4dTlJv8xRsUWUWMk3gUSNSiCCh8vDTskx4vHyvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUu0u3Y9; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1778777527; c=relaxed/simple;
+	bh=EEBJAfZmjfkpZOGOEVFX0CZS3rPpON7xamOmHMjuQC4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mwbt7fBEzG2pnpjhVGzVDq2kYQiFD3T0J1sHwbTm93eIzbF7CORe6WczeF2IzoRZoNZNGmy8yfSn8e0lPdVRw9fPZXnOfhO3+C7gGjuB9jgT7zvTAPAFZgRrg88vjSKBC+XyeeinsoppsFVasMatTQbRnz+ddJZM5bNWAJiCdFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PTvNdvcK; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2bcf48850c4so29762805ad.1
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:51:59 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2b941cd869cso52682845ad.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:52:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778777519; x=1779382319; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778777524; x=1779382324; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hLkhEyS3YOk/ybEPnJJKQINlNol+OlnMGeyHoaMKMO0=;
-        b=QUu0u3Y9TYoomQ82R0gBkV9/ncxvxi39Ja03Fjh0kqbItDOH5STrklBxtcdORxiUTI
-         WUB+SZDvDtuSPFiLZ4i3EYR4/qwJVQc3yHA1aWdoP+2pwHoaOS+Hse1RG1VPIzmliqJy
-         IOXfvJI1AsPCihdzxTRLItQkRCxJ/bkDtWr4l/Ndi/266DF7LCoM0d0vTY9MLNuxSTi8
-         lG70Bpb1I1FJHq2vVF/f228i+r6MXza31suupl6EiLzmqzV1S4//FKmagS/uNfCYPXaQ
-         U5lD3yBADSLFY3ocS1yrffaosJrCFKAQj1AV4wBdJPfWMq516P1F5JuRx10bU8iSXmqJ
-         YMog==
+        bh=fTws1unEaZCkPMbtIVOShoAmXukkkseioq0bAhEtMn4=;
+        b=PTvNdvcKk4OaAc8TIqBV3X2sinIU5wSnc/QXp4vNj5farp7xXeSCO6EJa5suKEmMgT
+         twlqv7gFncd3GEGsYUV2izXLCqD8fRawZcQ+wDMiBy4z+5d18UIQezJ1qWoZKvDg8bjD
+         ac0Eyxn7VV2E70X4m0N+GMxglcO4Dd60AsGTO27wpA7df6AkCfws9/x4u8PGA9Rq+PKW
+         0dAquRkj9T5JDxbE2aIrsOI25ycDllEdtGFHtuadPKc+J+d6SgDrLG8OHqpejkZ1IuYC
+         +UjDf58zZzDjs0oTYANWcViMIUPFlcitjeUAT6hRalkkwqZYj5oazeQzW48wA1h45hzP
+         I+6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778777519; x=1779382319;
+        d=1e100.net; s=20251104; t=1778777524; x=1779382324;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hLkhEyS3YOk/ybEPnJJKQINlNol+OlnMGeyHoaMKMO0=;
-        b=hLWRr2o/sM127xH3fVrshUQDx0vfz9ye0tz826qyRlXbl8v2WPsdAwjH7MszSEXap8
-         j7Oyjfkd6kIVohCbCr0jNTNn12/HwAtxUjgtSXd3HQyNWw01uwRQwra9K5/jDTrgH/wg
-         au01aDz0lxCcjDPN2pLPKiL5dJoxtsY9ZaFpn1wBf12s0ysUjS6APL5Su29mcyGSNz70
-         HG2b29oZCnBzIHffH1/Krdo7ov5F1qj9JdoNCylcoex6AetDdjiWmiiJiLJNPmg4p8Ch
-         XQYTnaI+5rl4n7vFmcME9umHxoDMeTAwgwT5kNHLcpJSa8XOWrS0NilVeMbaeHAjtv1k
-         hPRA==
-X-Gm-Message-State: AOJu0Yy05UW87p67j4C9ICZkxntmFal0wTz6Lwk0kSrGnsmNNwMWb70L
-	84DmXCnhbcMAZIdLN92T+guyGDNq0Tw5y3HOvJmBo+xyQ2Jgvu4UgCqIxCIwYjyTDgs=
-X-Gm-Gg: Acq92OFwgDtP3CUoWZjh3wfcKYDa3JAAUI1AOK/3/kWpmMqqtPYouykvxJNhtHxo8p3
-	FOStzZE7pzaDlMzg+eOnT19UJYM3rYbHD7FxYCVQ3ubaZ+OfX+08Y8+tp+lmAZ9tsCpU41J3J9J
-	FQGeKU5wuN8qOZrowR+MjdvgoH+FCoQVbdHx9Fe0xXZ24P0uYripDm4bB+BwWoGpaygjeEs7hRb
-	1YrL6kBEuYUvBkbSE7Z9ixX3MephpcEFSg8uk8lTk9xCjF7CQPRT6Z80JFZxyo9GmtpS9EoPrP8
-	a+Q87+1TWeVgcG2F5Km/bBWS51eP+ZAvp23IDllv8h0whAzyYZHoHVEUx/cccf4i8pxiWrBlCjz
-	ThZPiShFqVwoM0O5htOCpuxUZuXL7m2DfdVBlXMn1XJHjoLsADraARc6g4XTs/3eXybeyxfr3OP
-	FtlIw2JZSiuRnZXO4l11ln/XvskFk8NA==
-X-Received: by 2002:a17:902:a618:b0:2b4:656b:aeb0 with SMTP id d9443c01a7336-2bd7e9399f5mr2829825ad.35.1778777519198;
-        Thu, 14 May 2026 09:51:59 -0700 (PDT)
+        bh=fTws1unEaZCkPMbtIVOShoAmXukkkseioq0bAhEtMn4=;
+        b=YMdhXA6R+qKzyLYaWiyIJMh/pISYNTOAJaPCyDHLY2LeKQByaZxi5bBq6GsCtW+1+U
+         e4WjojXhpqIipYUt9zPVQ8P75YPIR8kcdfZ+KJMo9wWCePBIQv1gk1sShv07W6bWz60i
+         kto4M2SKVNtJbz7JOmW+BSGeOQO0bHPB0e4pHzz8g393lB/jglHrTuv1ywv1cVgnmVYh
+         mr+qq1uUPbXfq5aKv0yP7EJamGutGDDi5X4mVbxGuJQzLqV0kMwyxGN4MqFgkhPdllY9
+         nxIAoKjOU024d+DMokXupC0FnAlOFEDcWcqFxR5nmuiLHlwDzp2yn6oNpj8yWnXYd+1G
+         ASRQ==
+X-Gm-Message-State: AOJu0YyxC2Tb3tFc+h5OJJjIgfvB2q69VvhAEXFopE5fhEaudknX86Oq
+	ZkilvDNw4gq70nzEcYynV6c4Gu6oqXLjLj2Uqp1iiL9hvu7aczTPh464
+X-Gm-Gg: Acq92OGdf27rL+pCAAZERqZr47nRDS4uY2maX6ID4zBRn1Fd82Aa/4DimX/PwOWokrW
+	AoGXF5oMSeov2lENXFkAom+POkXjGZayGvcd8wjpjImiUC7sPR2ccIY+Bb7j7gujEhYrK3flPkK
+	h4/hlcFWNQw7eS8zkCV80ytOrv7qGsyyuP9rNQYVEo/IVJgVp/ENAty9ok5JhBwXlLjncrL/Akc
+	3mcvSey2497E+56l7PY/r7UL6oMBhbcmc0QdSmYJ3Mk1Q1OsMkkPI2eFSKh+Y/v1YvcuyVGFcsE
+	zuhfBYruA2HslMVSVjbi/IL1LBWha/yckYQGzLPbYXIg6xKHUEdS8QIwxOYg+/drNgK9ccOIDzf
+	hPRW0UkyCFSyQeKBQhpkf8mM1RN53ek3cNyCop7bJ5kfxhG+ZbTM6NFn3z1gH4w8tNbGvod/oGx
+	MqRYDoDr4WZr/T1v9FR+gwpq9iEQsMGw==
+X-Received: by 2002:a17:902:d512:b0:2b4:5f96:184d with SMTP id d9443c01a7336-2bd7e86c6a4mr3703895ad.5.1778777523797;
+        Thu, 14 May 2026 09:52:03 -0700 (PDT)
 Received: from Tplus.localdomain ([114.243.117.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5c2631basm27937825ad.34.2026.05.14.09.51.55
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5c2631basm27937825ad.34.2026.05.14.09.51.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 09:51:58 -0700 (PDT)
+        Thu, 14 May 2026 09:52:03 -0700 (PDT)
 From: Qi Tang <tpluszz77@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -82,12 +82,13 @@ Cc: netdev@vger.kernel.org,
 	lyutoon@gmail.com,
 	stable@vger.kernel.org,
 	Qi Tang <tpluszz77@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net 2/4] ipv4: ipmr: clamp ip_hdrlen against skb_headlen in ipmr_cache_report
-Date: Fri, 15 May 2026 00:51:32 +0800
-Message-ID: <20260514165139.436961-3-tpluszz77@gmail.com>
+	Paul Moore <paul@paul-moore.com>,
+	Simon Horman <horms@kernel.org>,
+	Huw Davies <huw@codeweavers.com>,
+	linux-security-module@vger.kernel.org
+Subject: [PATCH net 3/4] netlabel: validate CALIPSO option against skb tail in netlbl_skbuff_getattr
+Date: Fri, 15 May 2026 00:51:33 +0800
+Message-ID: <20260514165139.436961-4-tpluszz77@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -96,84 +97,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6F24D544F53
+X-Rspamd-Queue-Id: DD413544F69
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,paul-moore.com,kernel.org,codeweavers.com];
+	TAGGED_FROM(0.00)[bounces-288047-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,nvidia.com];
-	TAGGED_FROM(0.00)[bounces-288046-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-ipmr_cache_report() copies ip_hdrlen(pkt) bytes from pkt->data into
-a freshly allocated 128-byte skb that is delivered to userspace via
-the mrouted IGMP raw socket and via igmpmsg_netlink_event:
+netlbl_skbuff_getattr() locates the CALIPSO option in the IPv6 HBH
+header via calipso_optptr() and hands the bare pointer to
+calipso_getattr() -> calipso_opt_getattr().  The consumer re-reads
+calipso[1] (option data length) and calipso[6] (cat_len/4) and walks
+calipso + 10 for cat_len bytes via netlbl_bitmap_walk().
 
-  const int ihl = ip_hdrlen(pkt);
-  ...
-  skb_put(skb, ihl);
-  skb_copy_to_linear_data(skb, pkt->data, ihl);
+ipv6_hop_calipso() validates these bytes only at parse time inside
+ipv6_parse_hopopts().  An nftables PRE_ROUTING payload write
+reachable from an unprivileged user namespace can rewrite both bytes
+between parse and the SELinux/Smack peer-label consume path
+(selinux_sock_rcv_skb_compat -> selinux_netlbl_sock_rcv_skb ->
+netlbl_skbuff_getattr).  The self-consistency check
+(cat_len + 8 > len) inside calipso_opt_getattr() is defeated by
+mutating both bytes consistently, allowing a ~232-byte
+slab-out-of-bounds read from calipso + 10 whose set bits become MLS
+categories driving the access decision.
 
-ip_rcv_core() validates iph->ihl and pskb_may_pull()s ihl*4 bytes at
-parse time.  An nftables PRE_ROUTING payload write reachable from an
-unprivileged user namespace can flip the ihl nibble from 5 to 15
-between parse and ipmr_cache_report().  When the original skb is
-non-linear (received via a NIC driver that uses paged frags), only
-the parse-time ihl*4 = 20 bytes are in the linear region; the
-consumer copies 60 bytes, and the extra 40 bytes are read from
-skb_shared_info or adjacent slab memory and queued back to userspace,
-a kernel heap-content infoleak.  PoC observation: recvfrom on the
-mroute socket returns 28 bytes without mutation, 68 bytes with
-mutation (40 extra bytes leaked).
+netlbl_skbuff_getattr() has the skb; gate the consume on the option
+fitting within skb_tail_pointer().  The IPv6 option layout is
+type(1) + length(1) + length bytes of data, so requiring
+ptr + 2 + ptr[1] <= skb_tail covers the option and its embedded
+bitmap.
 
-Clamp ihl against skb_headlen(pkt) so only bytes actually present
-in the linear region are copied.
+Runtime confirmation (Smack peer-label policy + nft HBH mutation):
+Udp6InDatagrams increments to 1 with the mutated cat_len, showing
+selinux/smack_socket_sock_rcv_skb -> netlbl_skbuff_getattr ->
+calipso_opt_getattr -> netlbl_bitmap_walk runs end-to-end past the
+option's true bound; with this patch the consume path short-circuits
+at the bounds check and the counter stays 0.
 
 Reported-by: Qi Tang <tpluszz77@gmail.com>
 Reported-by: Tong Liu <lyutoon@gmail.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: 2917f57b6bc1 ("calipso: Allow the lsm to label the skbuff directly.")
 Signed-off-by: Qi Tang <tpluszz77@gmail.com>
 ---
- net/ipv4/ipmr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/netlabel/netlabel_kapi.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 2628cd3a93a68..b40f3dd8f650f 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -1056,7 +1056,7 @@ static void ipmr_cache_resolve(struct net *net, struct mr_table *mrt,
- static int ipmr_cache_report(const struct mr_table *mrt,
- 			     struct sk_buff *pkt, vifi_t vifi, int assert)
- {
--	const int ihl = ip_hdrlen(pkt);
-+	const int ihl = min_t(int, ip_hdrlen(pkt), skb_headlen(pkt));
- 	struct sock *mroute_sk;
- 	struct igmphdr *igmp;
- 	struct igmpmsg *msg;
+diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+index 3583fa63dd01f..4af8ab76964e0 100644
+--- a/net/netlabel/netlabel_kapi.c
++++ b/net/netlabel/netlabel_kapi.c
+@@ -1399,11 +1399,20 @@ int netlbl_skbuff_getattr(const struct sk_buff *skb,
+ 			return 0;
+ 		break;
+ #if IS_ENABLED(CONFIG_IPV6)
+-	case AF_INET6:
++	case AF_INET6: {
++		const unsigned char *tail = skb_tail_pointer(skb);
++		u8 opt_data_len;
++
+ 		ptr = calipso_optptr(skb);
+-		if (ptr && calipso_getattr(ptr, secattr) == 0)
++		if (!ptr || ptr + 2 > tail)
++			break;
++		opt_data_len = ptr[1];	/* IPv6 option data length */
++		if (ptr + 2 + opt_data_len > tail)
++			break;
++		if (calipso_getattr(ptr, secattr) == 0)
+ 			return 0;
+ 		break;
++	}
+ #endif /* IPv6 */
+ 	}
+ 
 -- 
 2.47.3
 
