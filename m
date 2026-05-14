@@ -1,389 +1,270 @@
-Return-Path: <netdev+bounces-287876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +PB3OjiVBWpLYwIAu9opvQ
-	(envelope-from <netdev+bounces-287876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:26:16 +0200
+	id 8IKWBUmVBWpLYwIAu9opvQ
+	(envelope-from <netdev+bounces-287877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:26:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84A6453FC08
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:26:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A984A53FC0F
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:26:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6015F3037697
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:24:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B5813038AC2
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF7F39D6F0;
-	Thu, 14 May 2026 09:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27C639E9C3;
+	Thu, 14 May 2026 09:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYVoSYa2"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="j3AStO6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010007.outbound.protection.outlook.com [40.93.198.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5D0399004
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778750676; cv=none; b=gMXdoHl1+2T1rlaeB6bL1N926Cd5S5xZPCuZZSvJALj7IaP+R32KficKEzvQF0BxxFqI9Ad0eMHx/JOYLhBt3bfVYA21cmK86d8UN3+ZUPQihgv8a8pfscazXIAsLXuD43LDAGEflMHI/dpqj1M188DU9q6ENqxewYpjvpEHQPw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778750676; c=relaxed/simple;
-	bh=i2jheD0cUUltvGibmv9bbjaVPeKNiPHEpKsDyGqDjqE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CeILDsoIOSJspxGrZPm8Hpwrl4wY/WQ9Bb5qeyPvrzN3gkxUzIcyPu5rw8vd2znVGnTDP3dVyLS9ZdX+OTlBaBjbA5jvUpput88NOcFHfYVa6ZOrzjrIUPJtaUuXTgNP5fJdCpou53fGJhH+44/PwO+UyMxMi6Kbc2D5pGiaJLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DYVoSYa2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778750673;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R3j06QFXutHGSOLwWfxBDGFISqmpb4y3Cflc+QGUtLs=;
-	b=DYVoSYa2CWz0Qw8+FQBqJVdZfddgTxsB/ZK/d647oF6FfL0C7TjeaUBYQDkQgB8zP30YWo
-	3NplwhfVJgnBzbRM0AdbXHgAt/Buelo0uJp+W8Cfh2fLu3QP+elLA5BSiSbhVbrFyVuy2v
-	lwFjggkTl/OwCcM8E6DvVwqzo2uSMtk=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-680-KsM_h6_yNeGKbRU3_3tkdg-1; Thu,
- 14 May 2026 05:24:27 -0400
-X-MC-Unique: KsM_h6_yNeGKbRU3_3tkdg-1
-X-Mimecast-MFC-AGG-ID: KsM_h6_yNeGKbRU3_3tkdg_1778750665
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F44B180035D;
-	Thu, 14 May 2026 09:24:24 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.197])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DCAA130002DA;
-	Thu, 14 May 2026 09:24:18 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: jiawenwu@trustnetic.com
-Cc: netdev@vger.kernel.org,
-	mengyuanlou@net-swift.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	linux@armlinux.org.uk,
-	horms@kernel.org,
-	kees@kernel.org,
-	larysa.zaremba@intel.com,
-	leitao@debian.org,
-	joe@dama.to,
-	jacob.e.keller@intel.com,
-	fabio.baltieri@gmail.com
-Subject: Re: [PATCH net-next v3 5/5] net: wangxun: implement pci_error_handlers ops
-Date: Thu, 14 May 2026 11:24:00 +0200
-Message-ID: <20260514092415.90852-1-pabeni@redhat.com>
-In-Reply-To: <20260509100540.32612-6-jiawenwu@trustnetic.com>
-References: <20260509100540.32612-6-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C2C39D6E7;
+	Thu, 14 May 2026 09:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778750692; cv=fail; b=NDyUqIA7ok1/ntv7DO/H1/vFcAYWKpDYsDn9/Tjgn13yB8aVg1JrUE5NwXxUXBeeJB8tEgFwLsGXpGuvER8fKyOiju1n+gNI10TcivYCsXVfnTrIFRpg7FLme90eA51uimyroNVD/jzcngxbJyCi0HyPEH9LZb18DLmdj1rsHXw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778750692; c=relaxed/simple;
+	bh=mmH4ueowQlRks+aHcHjFpUUiYbi5QxRaiiyqrasNQAQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=FeXOrz36gm5rVpj4zfIRSxecqugr+IQw4uGLBEv4RIctHB979BhE3zYj4TqiQrBLvhHY7qKGhWo6OuzmApWFWZWg9w4rHq/oPWCcJTJDEDeBkscKS9mnNjSN2zh9uzOr/1syEJifxJmbwWLQQG6yHgTrOmQrkf6t0twY2ee3+KU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=j3AStO6o; arc=fail smtp.client-ip=40.93.198.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hGcHRZmWLylh+qKEiSzDY+I6pJDx+xXc+ber76YGUZjl9n1QvuQVi+JykpCjjSLOfx8Sg0IyQjSbnNf/s8kjxey/3A2OfmvR0A2N8ZbdqUrrAbS65xY5rnrpz+J+Fot+8jazt62FEKP81jO6w6aDOVh4QVzLbwa99KNW5HEBHYTect9XOyNmopgB8CK2t44DHr66GwVujOpBREvTGn49C3SyVnHINNHhvQcHyDUF+Maxk5FLvWpZJoSCO+jGaqvwtQ29qW6oLQBMfYLt1yE0cSTB3b0fW0em/RaFIT7GnQ/HSaNTM+KmoaDKlcPrX/igKJj2fi8lmBZ3eHW3Y3HoWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VDvkHTPnDFqCk9Rs/nbQI8/TkRPBlh6b198wAzNqDr8=;
+ b=EQmsBV+R4n+6mOyH4JnGl5Mqpl25+pqIftox4RVqXdEWPYHktDxGdGDzy+cyRA3ejUc4JIot3zQBE1+psoDk+1WD4hFmMQyxWzX5g2SBwbVVZAHggnqBP6xLRTjUxN/AM62wnn0brbzfuiUcjfdntxjdqKBfGHVFz3J5T8eveMZOwsN1ShsK3DlcQf/Jui5hCRUEHeHPUYj+Cmem0yImCm5oCS8QXflvIINugH/ZM5m3en+HGQrZtiqp90q3/asZ5NAZSw7T+xNYTGPehaFtqiCeijhRwr82yHpdN1Tpj+iXVTFqnz6yKjyzkyVV78dV+QcgwHFdKlnorxeGzF7bTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VDvkHTPnDFqCk9Rs/nbQI8/TkRPBlh6b198wAzNqDr8=;
+ b=j3AStO6oGCEtwWgW2lGKlHWkmBZ8YYzAgd9AehArDTvhMsROkGQjSJX+3m0QDl+dglfGFIrDDSSigSFnmG4Z13Fp4dLhSVoslSaHCE/yVmp18UfSsfPYPvnEFnx/vUPwASh8OGHKumJvPJ8FtZAfGMjQu99AOu7la60BNoQKDUUwDqIJRHw7aru46OWJuPaxbWxIgySc2fb3GkUEDCK/2Tlp3GzMImvT3vqF7Je/PiJ1xDajRAUs/mDNBTp7e/isgBHoRkPqq2GTXis4TS3Y8jROyKsKg04r3EdocoLAt2ZnTfoW9BSpCiYag07/Wcsgezqid/0XHVq/wC66JHqG3w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
+ by CY5PR12MB6081.namprd12.prod.outlook.com (2603:10b6:930:2b::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Thu, 14 May
+ 2026 09:24:46 +0000
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7%7]) with mapi id 15.20.9913.009; Thu, 14 May 2026
+ 09:24:45 +0000
+Message-ID: <f4f5e3b2-64c4-4ad2-8678-d29ae08150e6@nvidia.com>
+Date: Thu, 14 May 2026 11:24:36 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] mm: introduce a new page type for page pool in page
+ type
+To: Byungchul Park <byungchul@sk.com>
+Cc: "David Hildenbrand (Arm)" <david@kernel.org>,
+ Pedro Falcato <pfalcato@suse.de>, "Vlastimil Babka (SUSE)"
+ <vbabka@kernel.org>, linux-mm@kvack.org, akpm@linux-foundation.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+ leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+ ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
+ kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
+ baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
+ asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com
+References: <20260224051347.19621-1-byungchul@sk.com>
+ <982b9bc1-0a0a-4fc5-8e3a-3672db2b29a1@nvidia.com>
+ <4af19eda-c29c-4302-92d5-c0915267fc0c@kernel.org>
+ <agRB2QTbzceRgpzX@pedro-suse>
+ <1817a749-8232-43ab-a0f5-350e5aade235@kernel.org>
+ <f3e38c07-d410-4c8e-a572-68d52dc55353@nvidia.com>
+ <20260514085402.GA63255@system.software.com>
+Content-Language: en-US
+From: Dragos Tatulea <dtatulea@nvidia.com>
+In-Reply-To: <20260514085402.GA63255@system.software.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0083.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cd::8) To CH3PR12MB8728.namprd12.prod.outlook.com
+ (2603:10b6:610:171::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Rspamd-Queue-Id: 84A6453FC08
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|CY5PR12MB6081:EE_
+X-MS-Office365-Filtering-Correlation-Id: 65d1f41b-6be9-4f23-700b-08deb19aa335
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|1800799024|7416014|11063799003|18002099003|22082099003|56012099003|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	lg6eGdfTsHbNcY5qpna7vnfCRRoBy5W9TmafUDmfyPlge0OMimi751pytTayOjhshZr1CFxIuu2W5uhi3G8yAzkUq8B8fxiNXCKfWPoAwOEqU7yfR3yo06db0t171rZv9eFr4INjnGxkIeJdKdmSxUSBi7qj3cWkcDWstzxr+FoynyQfg45jehYjGhl4BJ452IsKSAXNoZF9yexepzWlgIJjLp4FikyjOgf+uvGf/qLCSLDLpGoaOLWGuGticOixcNqIpnd4XThPqukRwVm4Rr+Q8vmZBRfu+Zw/iHHQBqtHOWuvD/un3/pSYeBHpPXnVu0pO3KBBLpbMtOqLb4dLSMQrsnQ60/EGblw77R1hOQ1Lqk/z/KLNO57dP1G+3TZAN9+h4zjSsgvnVGkBjx3aXaoUBCXdjtQeNuyTctsyNdjJngttFednTjeb25fZPyopw9l2nVWf9PlFujwglB+8jAmKXRlT04pBcRlKL7hqHsXvUQ8XGLnLslQmcL/TirTIDxscxTHxXqNYdkhJCGgGG2u157zAStXL/KU93simrqcUkiC568ltPI1Sqeac8GzE7gll0Z7hy1azjbqvQTj8JszlwrTQ0D2rJ/24e8XK6DzeoE3MKknZBqGsYO00MCWA6AryGqEPwLsolQv8zWQT/Y/LZRMHBJWZA+cjcNokNSp2lo0FJuQb0IxqcM5MiG6
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014)(11063799003)(18002099003)(22082099003)(56012099003)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q2NwL0Ria2xvamVqWFFkTGlRbVljNnBqSEgvSC9YUkxUK21lU2FnUzlhNjQy?=
+ =?utf-8?B?VFlXSU8wTHF5WWVjemo3djdTMlNiZ1BGVncxTXVsczZhMnhiN2JJenVpTzZj?=
+ =?utf-8?B?Ym1SZVFZNEVoN1d1ZG1PRVR2bjBITmVKVnM3VE5VWGxHVXdPY3FYY2l0VFhV?=
+ =?utf-8?B?eFdxaGFPMG56VGdWS2NFLzBHQlhBa3NRNzE0VlVoY1F3eVBkSFNwVnV4ZDhT?=
+ =?utf-8?B?T2NBOE1jaXR2RmpRL0RZbjFrTHhLbEdiZXIxeFJkbzdlRXZBYlJjSXMzNGJX?=
+ =?utf-8?B?OVlnVENjejVVVUlCQ1IvZTFmaFNQVDF1SlNaQmJFRkZYWDdodHk0akNWR2d4?=
+ =?utf-8?B?NXo1bDd2bEI4RHVNOTlyU3FnSVNaMngwR0x3MXJJN0syMlVrcHR4dnIrSEZh?=
+ =?utf-8?B?Sy9vNkF3RTJQV0hzRDA3cmI2eFAxWVRBTVRycVRVWVd5VDdlTm0yNk5ZNE05?=
+ =?utf-8?B?Z3dKWDBMT3c2a082Q3d3emJwU1BkQ0dJbmdhOGthNXlLaUJMTHZ2dnhnZmR0?=
+ =?utf-8?B?T1lLaExjS1pKMXByN0kvZjg2blVPUDdGdVh6dnNMOC9ndnQwaFhDQ0FBcHJT?=
+ =?utf-8?B?NkF1dnF5MmxMUmszeFJJcWw0WVlQc2JpNFlUN2oxbmtQVFBuYTNhNmJYUUhI?=
+ =?utf-8?B?THBUZUdUeUFQU04zRjRwY3BjeDl5T240bzlqNk1WbGlyM21GeFJzZjBDUkVm?=
+ =?utf-8?B?UWZtZXpYazFRc3NseWlHUjBkbkN6WjBtL21Va20reExIVHdVOXRzbUZqWFQ3?=
+ =?utf-8?B?dU9NK2NuaHM5aUxPNUdXOXg0RTlTTjZZaFB4WmlRRVM0YzJUYWF2d1E1OHhJ?=
+ =?utf-8?B?M2FqNG1WNEhVaWI2WmlHaVZwWncxSlpJZWdNeERxQ0p6UlJOc1VDbWlYNVE1?=
+ =?utf-8?B?YVNnVFMzSmdsaDV5cURRM3BiNDVTVzFrYkl0Z2g4aTF0VHFRSktSTGxWN05k?=
+ =?utf-8?B?RFpUcDAvcmhQRHU1Sk1nOGYyU25lbEJlOEE4QUU2anduUW1aVkh0bjNsb2JL?=
+ =?utf-8?B?aHpjdW1TTGw1YlZSRlJoOGhwVTMxM1dncU5LWmVMM1Q1Skl3aW9QZ1Q1SDdJ?=
+ =?utf-8?B?K3NEb2FOeUJ4TC9DOHl5QkZGUHR3eDIrR3dtelc3MHlURkdUc0d6WkpLRGJr?=
+ =?utf-8?B?c053SjRjdTdmZUJFS0dqbUVFZGRtRG1aakF2UkpyQnI0VmVkWVVWd1BjZElO?=
+ =?utf-8?B?OGROdlIyTHFSTlZscUNGSmdyWU1Yb0YxOWRia2hhN2xTcWdDeTZOeEhzUzQ5?=
+ =?utf-8?B?THo5RkxSdTdVcHp4RUsyaEgvdVZQb1p3SStvTlAwZFF6c1ZtNzFvcEI4VlJP?=
+ =?utf-8?B?UTBDcE9FRnFuN0t1c0Mzc2lBaGxFZm81WmlWTlJTb1ZNcEVlWEcvcS9XK3dD?=
+ =?utf-8?B?aTdvSkl4QzFOU2Z6TFFyVHFzRnhaYUY0S1JuTENTMVJzTmZ5ZkozWWw2TU54?=
+ =?utf-8?B?amZzUDdOQUx6N2MxUVJldHRTcjZFZHpOdUdsdjRmeDljUHhBQUUwbnc5OUpl?=
+ =?utf-8?B?OVBKK0pscXluQXZCNnQ2MG9jSlNPS0I0Y2lYSDVkL1VVR3lnSnMybEprN2lO?=
+ =?utf-8?B?OGZqalJmenpVZ2lnL1ZTSjFCeDZkdlcxbTY5YWx0ZzhPK3IybWk3YzdqUk91?=
+ =?utf-8?B?OExTR25oaEZXQ2tYN1ZQRDRsUXVzRHFRdm5Mdi9aOFJPdm50cUkveW11L3Na?=
+ =?utf-8?B?eFhqc0lQMXh5Nzdwd0NJSGF1S3BPc3M5YTdpc2hkeTY2ODVWUDkxWVBZd1p3?=
+ =?utf-8?B?NWc0S2ZoQ1Nxak5NTmdHc09JR2hCMEVwVXdrZjhxS3ZjcFczWHhMYzRzcmVV?=
+ =?utf-8?B?ZXJ6NDRzd2NyUUs1T1RsUWhQMTR0UUVGRkwzcVM1cVRDQXpyUThSenh1dlgy?=
+ =?utf-8?B?NndlV1ZSMEdhSm9EbjNLcWtYRFFVc2NFUHFQNWsxN0Q0eDlOSE0xV0xHY3E2?=
+ =?utf-8?B?ZlE0Y0x3VGhoVU1TcVUyQVZCR1g1bS93SFBQYlpxUmh6K3N6bkU4RFFEMGNI?=
+ =?utf-8?B?VE9mMm10d2ZyTm41M3R0RkJNQmlpQ1pjbFpZQUFYcS93QThHUjZLSHJpZmRH?=
+ =?utf-8?B?TnNxSzY3WENrU1o1bk4yQjV3YjAySXdNTDNxNXJOdlNMSUlIeDZoRmpPcUFP?=
+ =?utf-8?B?aktjTE04ZTNTU3F3VjdzYkJVMjFwT3A1cFVBWCtTdHBLQW05dXJvQ1h2UXpO?=
+ =?utf-8?B?d0VIc1JuUGJBNS9MaTRwR0ozOUovRXJKOHRZTi9GOXlOUlZlR0JuRGVYanBl?=
+ =?utf-8?B?eFd6dmNnUGl6VndoQU44bG9MTG5xR2NtemVCMzg0RmdnYWtjRUhxMkRoaG94?=
+ =?utf-8?B?WWxjM2l3Qm92VFlLSGZweDh5UFpheXhlclplVER3cXRqRkpEMzFOUT09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 65d1f41b-6be9-4f23-700b-08deb19aa335
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2026 09:24:45.6777
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xaNShV1FrSrUJS+tmyYrywS1H/8H5rfTc6GUSyTWwNbhi7TYCMFo+R/SS74E28sh0nt1xHgPE4rVkFqmZihtBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6081
+X-Rspamd-Queue-Id: A984A53FC0F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,debian.org,dama.to];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287876-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-287877-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,suse.de,kvack.org,linux-foundation.org,vger.kernel.org,skhynix.com,oracle.com,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid,Nvidia.com:dkim]
 X-Rspamd-Action: no action
 
-From: AI Reviewer <ai@example.com>
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
----
-net: wangxun: implement pci_error_handlers ops
 
-This patch adds AER error_detected, slot_reset, and resume callbacks
-for the libwx, ngbe, and txgbe drivers, gates pci_disable_device()
-behind a new WX_STATE_DISABLED bit, and adds pci_save_state() at the
-end of probe.
+On 14.05.26 10:54, Byungchul Park wrote:
+> On Wed, May 13, 2026 at 02:06:06PM +0200, Dragos Tatulea wrote:
+>> On 13.05.26 11:36, David Hildenbrand (Arm) wrote:
+>>> On 5/13/26 11:26, Pedro Falcato wrote:
+>>>> On Wed, May 13, 2026 at 11:12:43AM +0200, Vlastimil Babka (SUSE) wrote:
+>>>>> On 5/13/26 11:00, Dragos Tatulea wrote:
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> Seems like this patch broke tcp_mmap because
+>>>>>> validate_page_before_insert() returns -EINVAL due
+>>>>>> to a page having a type. Here's the full flow:
+>>>>>>
+>>>>>> getsockopt(TCP_ZEROCOPY_RECEIVE) returns -EINVAL because of the
+>>>>>> below flow in the kernel:
+>>>>>>
+>>>>>> tcp_zerocopy_receive()
+>>>>>> -> tcp_zerocopy_vm_insert_batch()
+>>>>>>   -> vm_insert_pages()
+>>>>>>     -> insert_pages()
+>>>>>>       -> insert_page_in_batch_locked()
+>>>>>>         -> validate_page_before_insert() returns -EINVAL
+>>>>>>            because page_has_type(page) is now true.
+>>>>>>
+>>>>>> The patch below fixes the issue. But is this a valid fix?
+>>>>>
+>>>>> Hmm the check traces back to commit 0ee930e6cafa0 "mm/memory.c: prevent
+>>>>> mapping typed pages to userspace"
+>>>>>
+>>>>>> Pages which use page_type must never be mapped to userspace as it would
+>>>>>> destroy their page type.  Add an explicit check for this instead of
+>>>>>> assuming that kernel drivers always get this right.
+>>>>>
+>>>>> So uh, this doesn't look good I think.
+>>>>
+>>>> Yep, you fundamentally can't map a page with a type as page type aliases with
+>>>> mapcount. Even with the given diff, just mapping it will increment the mapcount
+>>>> and wreak havoc. I think we need to revert this patch for now.
+>>>>
+>>>> I'm not sure what the long term plan for this would be. If page types are moved
+>>>> to memdesc types, then the two stop colliding and that could work. I don't know
+>>>> if that's Willy's plan, however.
+>>>>
+>>>> (then there's the other question: are page pool pages really folios? not really.
+>>>> they are mappable, but they aren't part of the page cache, or anon, nor are
+>>>> they in the LRU or have rmap capabilities. perhaps we need a different memdesc
+>>>> for those. we're one step away from reinventing class polymorphism from first
+>>>> principles ;)
+>>>
+>>> Zi Yan is working on this: non-folio pages would no longer mess with
+>>> rmap/mapcounts, and page table walking code will identify them to be non-folio
+>>> things to skip them.
+>>>
+>>> It will take a while, though ...
+>>>
+>> So do I get it right that the path forward here is to revert this commit [1]
+>> and wait until the work from Zi Yan is ready?
+> 
+> I think it's the best way for now.
+> 
+Ack. Can you do it please? This is a more complicated revert and the risk that I
+mess it up is higher.
 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> index deb9fac2e1a9..64d43bf6e9da 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> @@ -4,11 +4,119 @@
->
->  #include <linux/netdevice.h>
->  #include <linux/pci.h>
-> +#include <linux/aer.h>
->
->  #include "wx_type.h"
->  #include "wx_lib.h"
->  #include "wx_err.h"
->
-> +/**
-> + * wx_io_error_detected - called when PCI error is detected
-> + * @pdev: Pointer to PCI device
-> + * @state: The current pci connection state
-> + *
-> + * Return: pci_ers_result_t.
-> + *
-> + * This function is called after a PCI bus error affecting
-> + * this device has been detected.
-> + */
-> +static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-> +					     pci_channel_state_t state)
-> +{
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +	struct net_device *netdev;
-> +
-> +	if (!wx)
-> +		return PCI_ERS_RESULT_DISCONNECT;
-> +
-> +	netdev = wx->netdev;
-> +	if (!netif_device_present(netdev))
-> +		return PCI_ERS_RESULT_DISCONNECT;
-> +
-> +	if (state == pci_channel_io_perm_failure)
-> +		return PCI_ERS_RESULT_DISCONNECT;
-> +
-> +	rtnl_lock();
-> +	netif_device_detach(netdev);
-> +
-> +	if (netif_running(netdev))
-> +		wx->close_suspend(wx);
+Thanks,
+Dragos
 
-[High]
-
-Should this path consult pci_channel_offline(pdev) (or the state
-argument) before invoking close_suspend()?  When state ==
-pci_channel_io_frozen, MMIO is unreliable: reads return all-ones and
-writes are dropped.
-
-close_suspend() walks into ngbe_down()/txgbe_down(), which call
-wx_disable_pcie_master() and wx_disable_rx_queue() in
-drivers/net/ethernet/wangxun/libwx/wx_hw.c.  Both use read_poll_timeout
-on MMIO:
-
-  wx_disable_pcie_master() polls WX_PX_TRANSACTION_PENDING with
-  WX_PCI_MASTER_DISABLE_TIMEOUT (around 80 ms)
-
-  wx_disable_rx_queue() polls WX_PX_RR_CFG (~100 us per queue)
-
-When the channel is frozen, those polls cannot succeed and will spin
-the full timeout for every queue.  wx_update_stats() at the tail of
-disable_device additionally accumulates 0xFFFFFFFF reads as garbage
-counters.
-
-Documentation/PCI/pci-error-recovery.rst suggests error_detected
-should avoid MMIO when the channel is frozen and only quiesce (stop
-queues, free IRQs, disable the device).  Would skipping close_suspend
-or substituting an MMIO-free quiesce path be appropriate when
-pci_channel_offline(pdev) is true?
-
-> +
-> +	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-> +		pci_disable_device(pdev);
-> +	rtnl_unlock();
-> +
-> +	/* Request a slot reset. */
-> +	return PCI_ERS_RESULT_NEED_RESET;
-> +}
-> +
-> +/**
-> + * wx_io_slot_reset - called after the pci bus has been reset.
-> + * @pdev: Pointer to PCI device
-> + *
-> + * Return: pci_ers_result_t.
-> + *
-> + * Restart the card from scratch, as if from a cold-boot.
-> + */
-> +static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-> +{
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +	pci_ers_result_t result;
-> +
-> +	if (pci_enable_device_mem(pdev)) {
-> +		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-> +		result = PCI_ERS_RESULT_DISCONNECT;
-
-[Medium]
-
-What unwinds the resources released by close_suspend() in
-wx_io_error_detected() when this path returns
-PCI_ERS_RESULT_DISCONNECT?
-
-netif_device_detach() only clears __LINK_STATE_PRESENT; it does not
-clear __LINK_STATE_START, so netif_running() still reports true.
-After this failure, the AER core calls error_detected again with
-pci_channel_io_perm_failure and the driver short-circuits, leaving the
-netdev in a half-torn-down state until ngbe_remove/txgbe_remove
-eventually runs.
-
-In the meantime, any rtnl path gated on netif_running() (for example
-wx_set_features and wx_update_rsc, which call wx->do_reset ->
-reinit_locked -> *_down -> *_disable_device touching freed
-wx->rx_ring[i]/tx_ring[i]) would dereference freed rings.  Should this
-failure path also clear LINK_STATE_START (e.g., via dev_close()) so
-those callers see the netdev as down?
-
-> +	} else {
-> +		/* make all bar access done before reset. */
-> +		smp_mb__before_atomic();
-
-[Low]
-
-Is the comment "make all bar access done before reset." accurate?
-
-The PCI bus reset happens before slot_reset is invoked by the AER
-core, so "before reset" reads temporally backwards.  There is also no
-BAR/MMIO access in this function prior to the barrier — only
-pci_enable_device_mem(), which touches config space.
-
-smp_mb__before_atomic() is a CPU barrier paired with the following
-non-RMW atomic (clear_bit) per Documentation/atomic_t.txt and
-memory-barriers.txt; it does not order MMIO/BAR accesses (which would
-require a readback or wmb()-class primitive).  Could the comment be
-updated to reflect what the barrier actually does?
-
-> +		clear_bit(WX_STATE_DISABLED, wx->state);
-> +		pci_set_master(pdev);
-> +		pci_restore_state(pdev);
-
-[Medium]
-
-Should pci_save_state(pdev) be called again here after
-pci_restore_state(pdev)?
-
-pci_restore_state() ends with dev->state_saved = false, and the
-canonical pattern in other AER slot_reset implementations
-(ixgbe_io_slot_reset, igb, e1000e) is restore-then-save so that
-subsequent recovery cycles start from a known-good baseline.  Without
-re-saving, repeated AER events on the same device would rely on stale
-or partially-cleared per-cap save state.
-
-> +		pci_wake_from_d3(pdev, false);
-> +
-> +		wx->do_reset(wx->netdev, false);
-
-[Medium]
-
-Should rtnl_lock be held around this do_reset() call?
-
-Every other call site of wx->do_reset() runs under rtnl_lock:
-wx_reset_subtask() in wx_err.c takes it explicitly, wx_set_features
-and wx_update_rsc are invoked under rtnl by netdev_ops, and
-wx_io_resume() takes rtnl_lock around ndo_open.
-
-txgbe_do_reset -> txgbe_reset writes wx->mac_table[]
-(wx_flush_sw_mac_table + wx_mac_set_default_filter) and reprograms HW
-(txgbe_reset_hw, wx_start_hw); ngbe_reset also writes mac_table[].
-netif_device_detach() in error_detected only clears
-__LINK_STATE_PRESENT and stops TX queues — it does not block
-rtnl-protected ndo callbacks (ndo_set_mac_address, ndo_set_features,
-ndo_vlan_rx_add_vid, ethtool_ops).  Those userspace-triggered paths
-run under rtnl_lock and would concurrently modify mac_table[] / HW
-registers, racing with do_reset.
-
-> +		result = PCI_ERS_RESULT_RECOVERED;
-> +	}
-> +
-> +	pci_aer_clear_nonfatal_status(pdev);
-> +
-> +	return result;
-> +}
-> +
-> +/**
-> + * wx_io_resume - called when traffic can start flowing again.
-> + * @pdev: Pointer to PCI device
-> + *
-> + * This callback is called when the error recovery driver tells us that
-> + * its OK to resume normal operation.
-> + */
-> +static void wx_io_resume(struct pci_dev *pdev)
-> +{
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +	struct net_device *netdev;
-> +	int err;
-> +
-> +	netdev = wx->netdev;
-> +	rtnl_lock();
-> +	if (netif_running(netdev)) {
-> +		err = netdev->netdev_ops->ndo_open(netdev);
-> +		if (err) {
-> +			wx_err(wx, "Failed to open netdev after reset\n");
-> +			goto out;
-> +		}
-> +	}
-> +	netif_device_attach(netdev);
-> +out:
-> +	rtnl_unlock();
-> +}
-
-[High]
-
-When ndo_open() fails here, what state is the netdev left in?
-
-ngbe_open()/txgbe_open() free their resources on failure paths and
-return without clearing __LINK_STATE_START (only dev_close() does
-that, and ndo_open is being called directly here).  netif_device_attach
-is then skipped, so __LINK_STATE_PRESENT stays cleared.
-
-The result is a netdev where netif_running() returns true (LINK_START
-set) but PRESENT is clear, with rings/IRQs/phylink already freed by
-close_suspend in error_detected and only partially re-allocated.  AER
-treats recovery as complete (resume returns void).
-
-Code paths gated only on netif_running() — wx_reset_subtask in
-wx_err.c, wx_tx_timeout, wx_set_features -> wx->do_reset, ethtool
-callbacks — would then dereference freed Tx/Rx rings, freed IRQ
-handlers, or a disconnected phylink.  For example:
-
-  void wx_reset_subtask(struct wx *wx)
-  {
-        ...
-        if (!netif_running(wx->netdev) ||
-            test_bit(WX_STATE_RESETTING, wx->state))
-                goto out;
-        ...
-        if (wx->do_reset)
-                wx->do_reset(wx->netdev, true);
-  }
-
-would call into reinit_locked -> *_down -> *_disable_device on freed
-rings.  Should the failure path here force the netdev fully down (e.g.,
-dev_close_many or equivalent) so netif_running() reports false?
--- 
-This is an AI-generated review.
 
 
