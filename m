@@ -1,229 +1,269 @@
-Return-Path: <netdev+bounces-288085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPsBBTRFBmqAhgIAu9opvQ
-	(envelope-from <netdev+bounces-288085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 23:57:08 +0200
+	id eKoKAENIBmo3hwIAu9opvQ
+	(envelope-from <netdev+bounces-288086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 00:10:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 692B45473E4
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 23:57:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D8654758E
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 00:10:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BA6C2303FFA7
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 21:52:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4FDFD30778E1
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 21:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4BD3D1AB1;
-	Thu, 14 May 2026 21:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69B13D1AB3;
+	Thu, 14 May 2026 21:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kx11IEuX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b="ml3z/PcQ";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b="ap3AfDvQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from acj35aaf84.lhr1.oracleemaildelivery.com (acj35aaf84.lhr1.oracleemaildelivery.com [130.35.116.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AAD23D1CAF
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 21:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0E33D0BEC
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 21:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.35.116.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778795539; cv=none; b=Up5e+2Lpp4tsSyyFeN2JV52vOHV/ZWU9xRchY8EflhgBXKnGH6Gm4DgFNeTBaC68Lifah6Sx9AKFFq7gXYDK1yjMLfLgqvAGxPmF7gRrBvbtgBiTnc31PJ5tMDFgGJG2VRnsFINQJiNftlqFdZM1aiLfAkG/ziJsaKgzx6BdCy0=
+	t=1778795703; cv=none; b=KRxixHV9NF5H8vEiLCzRjjOYohrl6YRVRypXKnMHcLuxYcqUxzANi5utdPHd8BoKfmwubqOFS8aFqwLFcbdnvPB8K5qIsc79VTYbtE7SUlz9QwLmnSfQS62kA1UE5zjkMh4gv+rN13i0gk7ie6OVSnFPNqvf5KJUbrf3U1j10bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778795539; c=relaxed/simple;
-	bh=tSiLvPSEsXkMXXwxZsxqtDF/spinGn8+ZL5/TT1mXgw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q2fLzQdZKXpFHLNJQRxEPB58BOSXko7eDLdK8E68L6dd4IvyL+kREmOoYtpb7+SjbxX2TkprRZXMLkklthcj50ufhZWe71gtZvbw2MNFYiRWe7mMvJjFrZBoF6pB5T4NTVzPVrBDUqaAKxhDl58Ci/IfzPfsYDJ6L1S4YkfGtJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kx11IEuX; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-369002b26f4so1548459a91.3
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 14:52:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778795536; x=1779400336; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=n5GMG7yqxFlWKKbJOnpHzuTHyp5R5BwNKepla0Okl+I=;
-        b=kx11IEuX7RClwKauTq5TYBPnrTAVRozMmhO1jfiCVNkyCu2Vqq/9qhXh9PFxq4YWJl
-         LrqNVPjqyyvjx3y4wW9jIK8zqhG5EoyIFpIxc20TPom25w+E1E35T9qMClqxU7xB8D8R
-         BIxJCE7ALpUZNHzujuOXCSfH1fiFlCD4dICgEQnw8EsG3Ts6u4klTUBZW8bSkZE9OG6g
-         mH09bFeW5dfE3cOmOOPNxoG8VCcLbNa2aREoHn3yubPahqYeVRppTgu4WLtTSG3L6pQx
-         l13WxFzUqf1YAl1pG6S2/WYxx4po1YSUfJOzE7IW6xjUilfPVDPjOeG9xPmp0Ly3bAZq
-         BkoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778795536; x=1779400336;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n5GMG7yqxFlWKKbJOnpHzuTHyp5R5BwNKepla0Okl+I=;
-        b=YQbAULxqNo/cmKtk+tG74hVOAcrx+dZlM+6d4CeGiCoLV+YsWPf/XD8BkO3jDpxnPM
-         jszSNX1o10k2fnsH/a3EW1VggluuYLObOmoBis7sKCtDwvs4k+M+fQhDq1QXVlFhOif9
-         14VUiNcULTyVKvrLmqQtiHCwBP3XQLUNd33VuBYsB6NTVhuWg0pOOzqXOcq5MGBCixWR
-         b+53QpmmsVuSsNusBwVFU4nx7ZdCEW4pq53xz5XIwrHmLENDlhozCERd1m5/94sjoriK
-         nB3u4KCcT55n7f1N9eFjbI71stPJzmjXYsEEDl0CEQXmf0vOoNTXbL8F3iCt9DXOsqWY
-         QgVQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/CtxFM4s+ovz2Rh82XN1uAWE+ehh0Nc8LWxrOah5WFu4vbvrOInNjnsz0BWznk2MPUdf9awRU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRzImRsxlGR8Dld6v1kjDBjKhPgfU3UeuIHSoDrSXbKR/19VXx
-	k35KrL/ntlSAa0ze00h0CxEOWfF44INua6Ho+ixfF14F5UIUMYix9sfv
-X-Gm-Gg: Acq92OF1YzQUL/yw/pKMLfU8cC/t2Ek7KTVbel1ENTnMyabK1TSADr/t3MHmC8zi6Em
-	L5NLEuWC4Has/gx+AFg5W4Yd85ilwK7MK9OtzV8AHcjiwyLg85nt6AHX8X399X1lXGov9cCcGWm
-	DxWLb49vQGlj8uXwvF2uVcPR2u8bShhSsdKJXfif6cNWw/JFWOUP/nNt6xB0HfDoXKPNeql6kE1
-	FBwl3eSpGFsDXQ9NjHfMGA64YiG+DICOGgtK4K5tZFm8E5cr1drXKCUJ8nQzVIgn/UNJdPu9g2R
-	52deo4vgP1osUuNPZVwMGhsyI3RMpGQ6Ws1onMbmCTHr6xOpn4iFCDnFxmbd6rdbZOhEmSpZx49
-	2ZnyvxoNF+m3rgIQ8rPMPvCy7S3zTr/5yV1D5I5R65ZQdXoPj+WAntlIx7B+1DxcEOYxEwuN5tf
-	J3XS6lCQFb1hsdDEfaObfj32HJJ1LlPUmpYEcTDtsS4rk=
-X-Received: by 2002:a17:90b:38ce:b0:365:fd4b:24f5 with SMTP id 98e67ed59e1d1-369519c513bmr962379a91.8.1778795536139;
-        Thu, 14 May 2026 14:52:16 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3695124601asm649171a91.2.2026.05.14.14.52.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 14:52:15 -0700 (PDT)
-Date: Fri, 15 May 2026 06:52:11 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, kerneljasonxing@gmail.com,
-	kuniyu@google.com, mhal@rbox.co, jiayuan.chen@linux.dev,
-	steffen.klassert@secunet.com, vakzz@zellic.io, ben@decadent.org.uk,
-	herbert@gondor.apana.org.au, dsahern@kernel.org,
-	sultan@kerneltoast.com, netdev@vger.kernel.org,
-	stable@vger.kernel.org, imv4bel@gmail.com
-Subject: Re: [PATCH net v3] net: skbuff: propagate shared-frag marker through
- frag-transfer helpers
-Message-ID: <agZEC3YDCAhkrcvr@v4bel>
-References: <agW4vC0r8QOUKtRT@v4bel>
- <agYZTjQSunDj6rOD@krikkit>
+	s=arc-20240116; t=1778795703; c=relaxed/simple;
+	bh=PipobQV8GzD2uy/Yc+uPejUYe/8lnLIqddXK5EZzE2U=;
+	h=From:To:Cc:Subject:Date:Message-id:In-reply-to:References:
+	 MIME-version:Content-type; b=QQ2kUpTsDWeNCIBhHjxFA/Eyv3qwnvtR0yXFBuRmgJ61+Atd+1fMFbyE8e65qvhlCTV+kQjuhI4nlW0+yxKNcBOcaKUxPZedf7BvdQd+IQH3hYkmJoQXljiSakbpzRvv7wjvf/oD9GpNRDRAX0SuJKkeTswTteWmUW3IMnJk+ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com; dkim=pass (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b=ml3z/PcQ; dkim=pass (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b=ap3AfDvQ; arc=none smtp.client-ip=130.35.116.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=oracle-uk-012026;
+ d=raczylo.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=Y0VxplqXo7KwodoVFRokARH6ngjpKYSLboSPOiip+Ho=;
+ b=ml3z/PcQnNB4+KyGkzr1ppRyY3b9eav4IITiORcVyUbEBuJLyg3VzgJ0nnWS2jM/tVq3nQGXI2o5
+   NDblxyQD+wIqt3ltMlMPma1VElnnG33NPnfSvNMDtHwWngPR5F0m5bU/YI7v4UqgjWHzT4qESAi0
+   +CL0n0F520tHoV7BT/BRZMwbQMm/VBB/PkwLVyQEFk9LJwWAJN347UBuEe7ulsJSYPDfH56RfUyo
+   oinoRrG4Bk2sv6nA27Pv6MRQ23YZ7VidNE5OfF4BcGnMwutIo4fAxhC57B2l74qjyBm3WKBmNCPj
+   7dHoeCmZgc1BZ71cxUnScwxehXCuqLjpy0Hkzg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=prod-lhr-20191104;
+ d=lhr1.rp.oracleemaildelivery.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=Y0VxplqXo7KwodoVFRokARH6ngjpKYSLboSPOiip+Ho=;
+ b=ap3AfDvQK0ifwzn3mk7eTU0hX3PEvu4PiZFXtGcyCWRpfGHDE/zfvJSQqEwaDGpjtM2U23RXUSlW
+   p30gjMofu2mBDaTD3vpeBmIL9wo50xHMTGDtm0UFhIKXLl2y44B7gYmeZMcv7xe6Ma/IxRG3Eit8
+   N6qmOYWRD6EYwuBdPk8SQ4+YPDieTgPAIiupk+jxf96iN/ET0dpAvY/h6/zj1OoEMLGu+82vC/J8
+   7qQZh9bBSTbuo+k+I7QdfHxpjY/W45Mr4eaGvHz/folmOLuLEiNemN6/uQykmuO9zNiYQhSOJPe6
+   s9ZwEunv7ZrMCKePiToXEFSNQf3PVsd/OxARdQ==
+Received: by omta-ad1-fd2-1402-uk-london-1.omtaad1.vcndplhr.oraclevcn.com
+ (Oracle Communications Messaging Server 8.1.0.1.20260212 64bit (built Feb 12
+ 2026))
+ with ESMTPS id <0TF10AG1DRJO5X10@omta-ad1-fd2-1402-uk-london-1.omtaad1.vcndplhr.oraclevcn.com> for
+ netdev@vger.kernel.org; Thu, 14 May 2026 21:55:00 +0000 (GMT)
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+From: Lukasz Raczylo <lukasz@raczylo.com>
+To: netdev@vger.kernel.org
+Cc: Theo Lebrun <theo.lebrun@bootlin.com>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,	linux-rpi-kernel@lists.infradead.org
+Subject: [PATCH net-next v2 0/3] net: macb: candidate fixes for silent TX stall
+ on BCM2712/RP1
+Date: Thu, 14 May 2026 22:54:56 +0100
+Message-id: <20260514215459.36109-1-lukasz@raczylo.com>
+X-Mailer: git-send-email 2.54.0
+In-reply-to: <cover.1777064117.git.lukasz@raczylo.com>
+References: <cover.1777064117.git.lukasz@raczylo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <agYZTjQSunDj6rOD@krikkit>
-X-Rspamd-Queue-Id: 692B45473E4
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8bit
+Reporting-Meta:
+ AAHf+Z0YX8zBMsksb6gSGL9ZV3VCbo9am2PhbSO1iipMaVnbSZPP4U7YWpbXzRHK
+ g669lhZ1JQctwueluqllYAuNG1sS6Qw9c21Imo7/Z9nzjSa7t8SqcmtIFar5g3Yt
+ Ij2hVqHRCB2nMgUSHQ3gY3zHeT3V1SgwQNHusr0dJUtl2EhQinx8QYlYPTk/q6no
+ oyDsV03BDzjEK5FjIyLSTz7+N+bxcmLT+l8v/vOhfNXL0p4tENJlCsYXr59fbx7U
+ 41VPRtTBo2tfpT5HelozDOGZCc0pKxJwRfrh7r4D0BUmtS7DBjRQYPHzJzO1zYwR
+ w6o60TG8TnWe2blKyBDH7YXmaBVFkrRrlu8tnPNTetSr7cbJEoxNkqAPVQBw6zjB
+ puIc5+PgMJZ1nG78bMRJ32zb5hXU2K4/enF+ab+/61lN0jOg3U/URBOZr8hwFyo=
+X-Rspamd-Queue-Id: 18D8654758E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [4.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[raczylo.com : SPF not aligned (relaxed),reject];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[raczylo.com:s=oracle-uk-012026,lhr1.rp.oracleemaildelivery.com:s=prod-lhr-20191104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-288086-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288085-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rbox.co,linux.dev,secunet.com,zellic.io,decadent.org.uk,gondor.apana.org.au,kerneltoast.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	GREYLIST(0.00)[pass,body];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[raczylo.com:-,lhr1.rp.oracleemaildelivery.com:-];
+	FROM_NEQ_ENVFROM(0.00)[lukasz@raczylo.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_SPAM(0.00)[0.778];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[raczylo.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu, May 14, 2026 at 08:49:50PM +0200, Sabrina Dubroca wrote:
-> 2026-05-14, 20:57:48 +0900, Hyunwoo Kim wrote:
-> > Three frag-transfer helpers (__pskb_copy_fclone(), skb_try_coalesce(),
-> > and skb_shift()) fail to propagate the SKBFL_SHARED_FRAG bit in
-> > skb_shinfo()->flags when moving frags from source to destination.
-> > __pskb_copy_fclone() defers the rest of the shinfo metadata to
-> > skb_copy_header() after copying frag descriptors, but that helper
-> > only carries over gso_{size,segs,type} and never touches
-> > skb_shinfo()->flags; skb_try_coalesce() and skb_shift() move frag
-> > descriptors directly and leave flags untouched.  As a result, the
-> > destination skb keeps a reference to the same externally-owned or
-> > page-cache-backed pages while reporting skb_has_shared_frag() as
-> > false.
-> > 
-> > The mismatch is harmful in any in-place writer that uses
-> > skb_has_shared_frag() to decide whether shared pages must be detoured
-> > through skb_cow_data().  ESP input is one such writer (esp4.c,
-> > esp6.c), and a single nft 'dup to <local>' rule -- or any other
-> > nf_dup_ipv4() / xt_TEE caller -- is enough to land a pskb_copy()'d
-> > skb in esp_input() with the marker stripped, letting an unprivileged
-> > user write into the page cache of a root-owned read-only file via
-> > authencesn-ESN stray writes.
-> > 
-> > Set SKBFL_SHARED_FRAG on the destination whenever frag descriptors
-> > were actually moved from the source.  skb_copy() and skb_copy_expand()
-> > share skb_copy_header() too but linearize all paged data into freshly
-> > allocated head storage and emerge with nr_frags == 0, so
-> > skb_has_shared_frag() returns false on its own; they need no change.
-> > 
-> > The same omission exists in skb_gro_receive() and skb_gro_receive_list().
-> > The former moves the incoming skb's frag descriptors into the
-> > accumulator's last sub-skb via two paths (a direct frag-move loop and
-> > the head_frag + memcpy path); the latter chains the incoming skb whole
-> > onto p's frag_list.  Downstream skb_segment() reads only
-> > skb_shinfo(p)->flags, and skb_segment_list() reuses each sub-skb's
-> > shinfo as the nskb -- both p and lp must carry the marker.
-> > 
-> > Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
-> > Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
-> > Reported-by: William Bowling <vakzz@zellic.io>
-> > Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> > ---
-> > Changes in v3:
-> > - Include the skb_gro_receive() audit patch suggested by Sultan
-> > - v2: https://lore.kernel.org/all/agToIEDI4TaTNLRb@v4bel/
-> > Changes in v2:
-> > - Also propagate SHARED_FRAG in skb_try_coalesce() and skb_shift()
-> > - v1: https://lore.kernel.org/all/agRfuVOeMI5pbHhY@v4bel/
-> > ---
-> >  net/core/gro.c    | 4 ++++
-> >  net/core/skbuff.c | 5 +++++
-> >  2 files changed, 9 insertions(+)
-> 
-> I think we should also be propagating SKBFL_SHARED_FRAG in
-> tcp_clone_payload(). It's copying frags from skbs in sk_write_queue to
-> a new skb in the same way as those functions you're fixing here.
+Hi netdev, Théo, Andrea, linux-rpi,
 
-Agreed. tcp_clone_payload() is the same pattern and the propagation is 
-missing.
+v2 of the silent TX stall series.  The v1 RFC sits at:
 
-On current mainline with v3 applied I couldn't find an obvious way to 
-drive this into a user-page write on its own, since the TX-side write 
-paths I checked all stage their writes through the linear region first 
-(via skb_ensure_writable / skb_cow_data).
+  https://lore.kernel.org/netdev/cover.1777064117.git.lukasz@raczylo.com/T/
 
-That said, a future TX consumer that depends on the flag would regress 
-immediately, so the fix is right. 
+Reframing first.  The v1 cover claimed "zero events post-patch";
+that was true at the user-space watchdog visibility level only.
+A dmesg sweep prompted by Andrea's review -- with patch 3's warn
+made unconditional, per his ask -- revealed kernel-level evidence
+that patches 1 and 2 are partial at best.  Patch 3 is empirically
+the load-bearing fix on this platform: it caught and recovered a
+real lost-TCOMP stall on pi-data-02 at 2026-05-05T13:24:09Z
+(queue 0, tail=259564431 head=259564433 after ~260M TX, HW
+ETHS tx_frames counter advancing through the event while driver
+tx_tail did not) without user-space involvement.
 
-I'll wait for a bit more review on the current patch and then fold this 
-change into v4. Thank you.
+So the v2 narrative reads:
 
+  * Patch 1 (PCIe posted-write flush) and patch 2 (PCIe read
+    barrier before descriptor check) close two specific
+    candidate races in the TSTART / TX_USED paths.  Plausible
+    and well-motivated, but I cannot prove either fires in
+    isolation on this hardware -- my 1 Hz trace shows TX
+    freezes, not which mechanism caused them.
 
-Best regards,
-Hyunwoo Kim
+  * Patch 3 (TX stall watchdog) is the safety net that
+    empirically does the recovery work.  13 days of production
+    runtime on 24 nodes since 2026-05-02 in the same form
+    (anchored against the rpi-6.18.y vendor fork, in
+    raspberrypi/linux#7340 -- merged 2026-05-08 after review
+    feedback from pelwell that this v2 incorporates).
 
-> 
-> -------- 8< --------
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index f9d8755705f7..6e4bb411dc04 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -2626,6 +2626,7 @@ static int tcp_clone_payload(struct sock *sk, struct sk_buff *to,
->  			todo = min_t(int, skb_frag_size(fragfrom),
->  				     probe_size - len);
->  			len += todo;
-> +			skb_shinfo(to)->flags |= skb_shinfo(skb)->flags & SKBFL_SHARED_FRAG;
->  			if (lastfrag &&
->  			    skb_frag_page(fragfrom) == skb_frag_page(lastfrag) &&
->  			    skb_frag_off(fragfrom) == skb_frag_off(lastfrag) +
-> 
-> -- 
-> Sabrina
+The v1 cover's "zero stalls in 95 node-hours of post-patch
+uptime" framing was misleading.  Apologies for that.
+
+## What changed in v2
+
+Patch 1 (PCIe posted-write flush after TSTART doorbell):
+  * Gates the readback behind a new MACB_CAPS_PCIE_POSTED_WRITES
+    capability, set only on raspberrypi_rp1_config.  v1
+    applied the readback to every macb variant; SoC-integrated
+    parts (Atmel, Microchip, SiFive, Xilinx) have no posted-write
+    fabric and were paying the readback latency for no benefit.
+  * Commit message notes that the readback also flushes the
+    preceding macb_tx_lpi_wake() NCR write on the same path --
+    not just TSTART -- since it functions as a PCIe read barrier
+    for all prior posted writes by the same requester.
+
+Patch 2 (PCIe read barrier before TX completion descriptor check):
+  * Dropped the ISR read.  v1 read ISR in macb_tx_poll() with
+    `queue_readl(queue, ISR) & MACB_BIT(TCOMP)`; that's
+    destructive on RP1 silicon (MACB_CAPS_ISR_CLEAR_ON_WRITE
+    is not set on raspberrypi_rp1_config; the existing handler
+    assumes read-clear semantics and processes every bit
+    returned from queue_readl(queue, ISR) in one pass).  v1's
+    masked-and-discarded read silently consumed any other bit
+    set in ISR at that instant -- RCOMP being the worst case
+    (RX completion never scheduled until the line re-asserts).
+  * v2 substitutes `(void)queue_readl(queue, IMR)` -- IMR is
+    the read-only interrupt mask mirror, no side effects, still
+    flushes prior peripheral DMA writes via PCIe completion
+    ordering.  Loses the "directly sample latched TCOMP" half
+    of v1's claim; keeps the PCIe-barrier half, which is the
+    half that addresses the documented race in the existing
+    macb_tx_complete_pending() rmb() comment.
+
+Patch 3 (TX stall watchdog):
+  * Tail movement is tracked via a `bool tx_stall_tail_moved`
+    set by macb_tx_complete() under tx_ptr_lock when tail
+    advances, and cleared by the watchdog tick on the same lock.
+    v1 snapshotted tx_tail and compared between ticks; while
+    that worked correctly given tx_tail is free-running u32,
+    the bool form is unambiguously cleaner, doesn't depend on
+    counter behaviour, and is what pelwell asked for when he
+    reviewed the same series on the rpi side
+    (raspberrypi/linux#7340).
+  * netif_carrier_ok() gate added at the top of the watchdog
+    tick.  Eliminates the boot-time false positive seen in v1
+    where, between macb_open() and link-autoneg-completion,
+    queue->tx_head can advance from kernel-queued packets while
+    tx_tail stays at 0 (no TCOMPs yet), tripping the snapshot
+    check.  Observed 6 such fires during a 2026-05-02 fleet
+    rolling reboot.
+  * netdev_warn_once -> netdev_warn_ratelimited.  v1's
+    netdev_warn_once made operational accounting impossible
+    after the first fire on a given netdev; ratelimited keeps
+    bounded log noise but lets operators count events.  Andrea
+    asked for this directly.
+
+Patches 1 and 3 are independently revertable.  Patch 2 v2 is a
+two-line readback before an existing check; trivially revertable
+in isolation, semantically dependent on the existing
+macb_tx_complete_pending() recovery path that it strengthens.
+
+## What I haven't done
+
+  * TSO+SG-off canary.  rtheobald (cilium#43198 #4188846955)
+    and the launchpad #2133877 commenter (#34) both report
+    TSO+SG-off *together* mask the stall; my matrix has TSO+GSO
+    tested off, not TSO+SG.  Happy to canary-test this on one
+    node if reviewers want the data point before deciding which
+    of patches 1/2 the SG path actually exercises.
+
+  * Per-patch isolation testing.  All three deployed
+    simultaneously on the 24-node fleet; I cannot independently
+    prove patch 1 or patch 2 does anything on its own.  Patch 3
+    has direct production evidence (lost-TCOMP recovery
+    described above).  If reviewers want a bisection-style
+    canary I can stagger one-patch / two-patch / three-patch
+    nodes for >=1 week each.
+
+## Status and testing
+
+  * Mainline-anchored:  v2 builds clean against current net-next
+    HEAD, applies cleanly.  Boot-tested and brief-sanity in a
+    canary build before this send.
+  * raspberrypi/linux rpi-6.18.y anchored equivalents:  in
+    production on 24 nodes since 2026-05-02 (now 13 days); in
+    raspberrypi/linux master since 2026-05-08 (6 days).
+  * The v2 patch 2 IMR-barrier form was rolled to all 24 Pi
+    nodes earlier today (2026-05-14, ~14:00 UTC) as a
+    vendor-fork-anchored update.  ~120 cumulative node-hours
+    of runtime since: zero mid-runtime TX stalls; zero user-space
+    watchdog RECOVER events.  Cover-letter-thread reply with
+    detail accompanies this series.
+
+The series does not depend on any other in-flight work.  Happy
+to split, rebase, drop, or restructure on feedback.
+
+Lukasz Raczylo (3):
+  net: macb: flush PCIe posted write after TSTART doorbell (PCIe-only)
+  net: macb: insert PCIe read barrier before TX completion descriptor
+    check
+  net: macb: add TX stall watchdog to recover from lost TCOMP interrupts
+
+ drivers/net/ethernet/cadence/macb.h      | 14 ++++
+ drivers/net/ethernet/cadence/macb_main.c | 95 ++++++++++++++++++++++++
+ 2 files changed, 109 insertions(+)
+
+-- 
+2.54.0
+
 
