@@ -1,228 +1,276 @@
-Return-Path: <netdev+bounces-287821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287822-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IyFKPdZBWomVQIAu9opvQ
-	(envelope-from <netdev+bounces-287821-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 07:13:27 +0200
+	id MEJvI+pZBWomVQIAu9opvQ
+	(envelope-from <netdev+bounces-287822-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 07:13:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04AA553DECD
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 07:13:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3437253DEBE
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 07:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 663B230779EE
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 05:10:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 23C0630058FC
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 05:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236EC3BE15C;
-	Thu, 14 May 2026 05:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4052B3AF64B;
+	Thu, 14 May 2026 05:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dxydN7sb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L3ahaRDS"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249C636604C;
-	Thu, 14 May 2026 05:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE48D531;
+	Thu, 14 May 2026 05:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778735451; cv=none; b=qYUffJILFnoVInQPb+BnF42HQ9I4RtKPbjldpt26X/Y87iZvxYrBZAEfi3eQMJ+YTibzGlQoFMm1wRBYueGDPb5dQdR+xKYDjtIfeesql1rxFpvb+Z8N3haXv5O8uYeEMmkjjCmddOxerc37aFi6//6jiGH8o5urdMDmYZFNnjc=
+	t=1778735592; cv=none; b=Wz7C1r0OLqa8MNFsaoZPNjg+g32GKeN+j3ZOcCsICqoS0z+pyQQdWFTFK+RmAZnVZyZWEKwHwSO6qgq1dtb5+D3i5Wt3YteApvYJiUdxTy1T7oMLcKaB3CeLzmEjkckiokDzuLa8FUYVfxgCxHrY8MgZZMS6X61A0rWhSn080Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778735451; c=relaxed/simple;
-	bh=q+zJyCGqjovaiIwt437MGOpY+gdYRqEuHxG+92IxJ4g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qKGlviK5xYk04C2lyVCHyKZBcGL9E7iLkowdylt/Pd9lgYiOOlQMZRySn4g3ix16NRTHBNdES9gJdZY9ngBHe0QY1YeZhjVflq+rQysz0nsD8N0C36egpTHr0TZ7lgTSWNj8Th6XqmF3q/v89a3Z9SFeCbtU9Z5MWbWmpQWCU3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dxydN7sb; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778735447;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KfBmWLVLAOipY3O8m0a/fBCDqmiOi2Nx5QlLflxw4E0=;
-	b=dxydN7sbiNIy8HQc7UmyMtvgBv3e5JAwv6K8Lr/cWgPPHvbprVEWJsSG9p9LXpN4dJ+k8N
-	Qp+x9l2528f0ieQgpFC8oHebmqttNJ/VivNIQX7YlzH8uahIJy47nARSy2md3ONrIrwh8+
-	A8P+EyqmrNowraN/fgxzq+Y8hZckvNc=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v4 2/2] selftests/bpf: verify syncookie statistics in tcp_custom_syncookie
-Date: Thu, 14 May 2026 13:09:58 +0800
-Message-ID: <20260514051015.177926-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20260514051015.177926-1-jiayuan.chen@linux.dev>
-References: <20260514051015.177926-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1778735592; c=relaxed/simple;
+	bh=T9lfvGxrx+biqnw8/N/a4VAT5kVWPPAwubFu6rH2Nk8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lZLHf/PWetB96EsP6xeb59au6gnegteOtowvol54iEYioB97Ml4myUdeEahhhLjM6gMG2tJq6tSpuiVzbPnqQuq+n8sUoI4j4hwJpRZ2XrKD3BikPQqYlmNt2pBbKeo2MDPlR3+wBIt/fOnE/ppPUMDtjM16EqapRCesg9J03/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L3ahaRDS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C6CFC2BCB7;
+	Thu, 14 May 2026 05:13:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778735592;
+	bh=T9lfvGxrx+biqnw8/N/a4VAT5kVWPPAwubFu6rH2Nk8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=L3ahaRDShL6X91Z8UGBD/vcEmEDVpqcU5IIBoqQsXnLeAjEeOlB4o6huo52jDbNRU
+	 RG58Z3b2cinRyHysOH9ssA7NWEcyIbmweRFQkrwekEyXpbWo7oyAbAslE+qgBgDOok
+	 hcGC9DccTeC75Os+LGlKwEPmeVsaJXRqpJngAGoZ3TunHP1NqEkZIU1Uo+2AhAmyTe
+	 aWI3rZK7cb/gOSQ1rLTDQ7yX51YCnRemJRJhG1LC7DcSZooobPpqPkAVkF63BiFhYg
+	 C52FSkh6cp0GqiIwomPbjYk9i/EwcGjNqH+Y3gyX/pmTh3htNl4G5Gf5ZJt8Ym1CY6
+	 7GrgVvnI7cNyQ==
+Message-ID: <d784e8d3-e6af-4437-93f2-3103720b8454@kernel.org>
+Date: Thu, 14 May 2026 07:13:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 04AA553DECD
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next 0/4] xdp: reuse generic skb XDP handling for
+ veth
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, magnus.karlsson@intel.com, stfomichev@gmail.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, bjorn@kernel.org,
+ lorenzo@kernel.org, toke@redhat.com, Liang Chen <liangchen.linux@gmail.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>,
+ "huangjie.albert" <huangjie.albert@bytedance.com>
+References: <20260509084858.773921-1-maciej.fijalkowski@intel.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20260509084858.773921-1-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 3437253DEBE
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[linux.dev,google.com,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-287821-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-287822-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com,huawei.com,bytedance.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,huawei.com:email]
 X-Rspamd-Action: no action
 
-Add read_tcpext_snmp() helper to network_helpers which reads a
-TcpExt SNMP counter via nstat, and use it in the tcp_custom_syncookie
-test to verify that LINUX_MIB_SYNCOOKIESRECV is incremented and
-LINUX_MIB_SYNCOOKIESFAILED stays unchanged across a successful
-BPF custom syncookie validation.
 
-The delta is captured between start_server() and accept(), which
-covers the full SYN/ACK/cookie-check path for one connection.
 
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- tools/testing/selftests/bpf/network_helpers.c | 22 +++++++++++++++++++
- tools/testing/selftests/bpf/network_helpers.h |  1 +
- .../bpf/prog_tests/tcp_custom_syncookie.c     | 20 +++++++++++++++++
- 3 files changed, 43 insertions(+)
+On 09/05/2026 10.48, Maciej Fijalkowski wrote:
+> Hi,
+> 
+> this series is an attempt to make skb-backed XDP handling in veth use
+> the generic skb XDP machinery instead of converting skb-backed packets
+> into xdp_frames for XDP_TX and XDP_REDIRECT. 
 
-diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
-index b82f572641b7d..4e3848f60261e 100644
---- a/tools/testing/selftests/bpf/network_helpers.c
-+++ b/tools/testing/selftests/bpf/network_helpers.c
-@@ -621,6 +621,28 @@ int get_socket_local_port(int sock_fd)
- 	return -1;
- }
- 
-+int read_tcpext_snmp(const char *name, unsigned long *val)
-+{
-+	char cmd[128], buf[128];
-+	int ret = 0;
-+	FILE *f;
-+
-+	snprintf(cmd, sizeof(cmd),
-+		 "nstat -azs TcpExt%s | awk '/TcpExt/ {print $2}'", name);
-+	f = popen(cmd, "r");
-+	if (!f)
-+		return -errno;
-+
-+	if (!fgets(buf, sizeof(buf), f)) {
-+		ret = ferror(f) ? -errno : -ENODATA;
-+		goto out;
-+	}
-+	*val = strtoul(buf, NULL, 10);
-+out:
-+	pclose(f);
-+	return ret;
-+}
-+
- int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param)
- {
- 	struct ifreq ifr = {0};
-diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testing/selftests/bpf/network_helpers.h
-index 79a010c88e11c..c53cd781df6e6 100644
---- a/tools/testing/selftests/bpf/network_helpers.h
-+++ b/tools/testing/selftests/bpf/network_helpers.h
-@@ -84,6 +84,7 @@ int make_sockaddr(int family, const char *addr_str, __u16 port,
- 		  struct sockaddr_storage *addr, socklen_t *len);
- char *ping_command(int family);
- int get_socket_local_port(int sock_fd);
-+int read_tcpext_snmp(const char *name, unsigned long *val);
- int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
- int set_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
- 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-index eaf441dc7e79b..00d5c32674fc9 100644
---- a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-@@ -91,12 +91,21 @@ static void transfer_message(int sender, int receiver)
- 
- static void create_connection(struct test_tcp_custom_syncookie_case *test_case)
- {
-+	unsigned long failed_before, failed_after;
-+	unsigned long recv_before, recv_after;
- 	int server, client, child;
- 
- 	server = start_server(test_case->family, test_case->type, test_case->addr, 0, 0);
- 	if (!ASSERT_NEQ(server, -1, "start_server"))
- 		return;
- 
-+	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesRecv", &recv_before),
-+		       "read SyncookiesRecv before"))
-+		goto close_server;
-+	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesFailed", &failed_before),
-+		       "read SyncookiesFailed before"))
-+		goto close_server;
-+
- 	client = connect_to_fd(server, 0);
- 	if (!ASSERT_NEQ(client, -1, "connect_to_fd"))
- 		goto close_server;
-@@ -105,9 +114,20 @@ static void create_connection(struct test_tcp_custom_syncookie_case *test_case)
- 	if (!ASSERT_NEQ(child, -1, "accept"))
- 		goto close_client;
- 
-+	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesRecv", &recv_after),
-+		       "read SyncookiesRecv after"))
-+		goto close_child;
-+	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesFailed", &failed_after),
-+		       "read SyncookiesFailed after"))
-+		goto close_child;
-+
-+	ASSERT_EQ(recv_after - recv_before, 1, "SyncookiesRecv delta");
-+	ASSERT_EQ(failed_after - failed_before, 0, "SyncookiesFailed delta");
-+
- 	transfer_message(client, child);
- 	transfer_message(child, client);
- 
-+close_child:
- 	close(child);
- close_client:
- 	close(client);
--- 
-2.43.0
+I support this idea.  Thanks for working on this Maciej.
+
+I basically proposed the same back in Aug 2023 [1].  My patchset[2] was
+motivated by a performance improvement 23.5% see [3], that comes from
+avoiding to reallocate most veth packets when XDP is loaded.
+
+Please read veth_benchmark04.org[4] as it documents a number of
+pitfalls, and highlight that the main trick to avoid reallocation is
+changing net_device needed_headroom (when XDP is loaded).
+
+[1] 
+https://lore.kernel.org/all/169272715407.1975370.3989385869434330916.stgit@firesoul/
+[2] 
+https://lore.kernel.org/all/169272709850.1975370.16698220879817216294.stgit@firesoul/
+[3] 
+https://github.com/xdp-project/xdp-project/blob/main/areas/core/veth_benchmark03.org
+[4] 
+https://github.com/xdp-project/xdp-project/blob/main/areas/core/veth_benchmark04.org
+
+
+> This was brought up by
+> Jakub during review of previous work, which was focused on addressing
+> splats from AF_XDP selftests shrinking multi-buffer packet:
+> 
+>    https://lore.kernel.org/bpf/20251029221315.2694841-1-maciej.fijalkowski@intel.com/
+> 
+> veth currently has two different XDP input paths:
+>    - xdp_frame input, coming through ndo_xdp_xmit(), for example from
+>      devmap redirects; and
+>    - skb input, coming through ndo_start_xmit(), for example from the
+>      regular networking stack, pktgen, or other skb producers.
+> 
+> The xdp_frame path is naturally frame-based and this series keeps it on
+> the existing veth xdp_frame handling path. The skb path, however, is
+> still fundamentally skb-backed, but today veth converts it into an
+> xdp_frame for XDP_TX/XDP_REDIRECT. That conversion is awkward and has
+> been pointed out as undesirable before, because veth has to pin skb data,
+> construct an xdp_frame view of it, and then restore/massage XDP memory
+> metadata around that conversion.
+> 
+
+Yes, I really dislike the veth approach of stealing the SKB "head"/data
+page by bumping the page refcnt directly.  If is awkward as you say.
+I would be happy to see that code improved.
+
+> This series takes a different approach: skb-backed veth XDP now reuses
+> the generic skb XDP execution path. veth provides its own xdp_buff,
+> xdp_rxq_info and page_pool to the generic XDP helper, so the generic code
+> can still perform the required skb COW using veth's page_pool when the
+> skb head/frags cannot be used directly. XDP_TX then uses generic_xdp_tx()
+> and XDP_REDIRECT uses xdp_do_generic_redirect(), while the xdp_frame
+> input path keeps using the existing veth xdp_frame TX/redirect handling.
+
+I also used this approach in my patchset, so I like it.
+
+https://lore.kernel.org/all/169272715407.1975370.3989385869434330916.stgit@firesoul/
+
+> The problem this series tries to address more generally is that
+> skb-backed generic XDP can end up with memory whose provenance is not
+> described correctly by a single queue-level MEM_TYPE_PAGE_SHARED value.
+> When skb is COWed the underlying memory is page_pool backed but current
+> logic does not respect it.
+> 
+> For that reason the series introduces MEM_TYPE_PAGE_POOL_OR_SHARED. This
+> type is not bound to a single registered page_pool allocator. Instead,
+> the return path inspects the individual netmem and dispatches either to
+> the page_pool return path or to page_frag_free(). This lets generic
+> skb-backed XDP handle mixed page_pool/page-shared memory without
+> mutating rxq->mem.type per packet.
+
+I'm unsure about the introduction of MEM_TYPE_PAGE_POOL_OR_SHARED an 
+ambiguous memory type.  In [5] I considered adding two new memory types 
+MEM_TYPE_KMALLOC_SKB and MEM_TYPE_SKB_SMALL_HEAD_CACHE that __xdp_return 
+would handle, but I labeled is as an "uncertain approach" myself.
+
+[5] 
+https://github.com/xdp-project/xdp-project/blob/main/areas/core/veth_benchmark04.org#uncertain-approach
+
+
+> The veth part also removes the old rq->xdp_mem juggling. For incoming
+> xdp_frames, veth now uses a local rxq view whose mem.type is taken from
+> frame->mem_type. This preserves the frame's original memory type for
+> XDP_TX/XDP_REDIRECT without overwriting the persistent rq->xdp_rxq memory
+> model used by skb-backed generic XDP.
+> 
+> One visible datapath change is that skb-backed veth XDP_TX no longer
+> uses veth's xdp_frame bulk queue. It now follows the generic skb XDP_TX
+> path. The xdp_frame-originated path is unchanged and still uses the
+> existing veth bulk path. The old skb-backed path had batching, but it
+> also paid the cost of converting skb-backed packets into xdp_frames. The
+> new path removes that conversion and keeps skb-backed packets on the
+> generic skb XDP path. From my local tests that consisted of
+> pktgen + xdp_bench I did not notice any major performance regressions,
+> however Lorenzo and Jesper might disagree here, hence the RFC status. I
+> am fed up of internal wars with Sashiko so I would be pleased to get
+> some human feedback.
+> 
+
+My benchmarking in above documents, showed that needed_headroom change 
+was a bigger performance boost than loosing the batching.
+
+For a long time, I have considered adding batching to the generic-XDP 
+code path, simply via SKB-list trick.  I did an experiment doing this in 
+the past and my benchmarking showed 30% TX performance boost, because 
+xmit_more takes effect.  Given people are not suppose to use generic-XDP 
+if they care about performance, I never followed up.  If veth start to 
+use this generic redirect code path, then it makes sense to do this. In 
+production we have code that does XDP redirect of SKBs into veth (I have 
+recommended to redirect native xdp_frame's instead, but because traffic 
+first need to travel through some DDoS filters in iptables, it cannot be 
+done without first moving those filters into XDP).
+
+
+> In particular, let's discuss:
+> 
+>    - whether MEM_TYPE_PAGE_POOL_OR_SHARED is an acceptable way to describe
+>      skb-backed generic XDP memory that may be page_pool-backed after COW
+>      or ordinary page-shared memory otherwise;
+> 
+>    - whether passing caller-provided xdp_buff/rxq/page_pool context into
+>      the generic skb XDP helper is the right API shape;
+> 
+>    - whether letting veth provide its own page_pool to generic XDP is
+>      acceptable for avoiding the old skb->xdp_frame conversion; could
+>      veth just piggy-back on system's page_pool? even though it could,
+>      we still need xdp_buff being passed (metadata) and other refactors
+>      that allow veth to bump stats and do the redirect flush;
+> 
+>    - whether skb-backed veth XDP_TX using generic_xdp_tx(), while keeping
+>      xdp_frame-originated traffic on the existing veth bulk path, is an
+>      acceptable split;
+> 
+>    - the INDIRECT_CALL for taking the COW path; I wanted to preserve
+>      existing behavior, but is it really needed or maybe it would be
+>      possible to come up with conditions that would cover both generic
+>      XDP path and veth?
+> 
+> FWIW I do like the end result on veth side. If I missed CCing someone,
+> mea culpa.
+
+Added Cc
+- Liang Chen <liangchen.linux@gmail.com>
+- Yunsheng Lin <linyunsheng@huawei.com>
+- huangjie.albert@bytedance.com
+
+> 
+> Thanks,
+> Maciej
+> 
+> Maciej Fijalkowski (4):
+>    xdp: add mixed page_pool/page_shared memory type
+>    xdp: return status from generic_xdp_tx()
+>    xdp: split generic XDP skb handling
+>    veth: use generic skb XDP handling
+> 
+>   drivers/net/veth.c        | 179 ++++++++------------------------------
+>   include/linux/netdevice.h |  33 ++++++-
+>   include/net/xdp.h         |   1 +
+>   kernel/bpf/devmap.c       |   2 +-
+>   net/core/dev.c            | 124 ++++++++++++++++++++------
+>   net/core/filter.c         |   2 +-
+>   net/core/xdp.c            |  54 ++++++++++--
+>   7 files changed, 216 insertions(+), 179 deletions(-)
+> 
 
 
