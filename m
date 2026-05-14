@@ -1,65 +1,63 @@
-Return-Path: <netdev+bounces-287758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287759-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CHjJFfcVBWoUSQIAu9opvQ
-	(envelope-from <netdev+bounces-287758-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:23:19 +0200
+	id ADhmJagWBWoUSQIAu9opvQ
+	(envelope-from <netdev+bounces-287759-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:26:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E2153C503
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:23:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 225F953C56E
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:26:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC1BC3015E17
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 00:23:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BA8BD3030D39
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 00:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24B226F293;
-	Thu, 14 May 2026 00:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79F828641F;
+	Thu, 14 May 2026 00:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RkoSgbwJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CLs7QubT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F95B1A76BB;
-	Thu, 14 May 2026 00:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C476E282F2F;
+	Thu, 14 May 2026 00:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778718195; cv=none; b=QackDUH583WvsQQyLr7iq3Uz2Dk9Gxmx0uJEjgwwNykUZwpj9OFkceqmme8tQZUZNB/nmTYHLlGu4pfilXDWFUbCHwak9NwEuPKCDs4yfVfOGzrk7REkJgjBwpeCxQ2XuwJXQoJOBeK4kHRRyTnCLFh2vOYfCydz7A1X7RrgB7g=
+	t=1778718373; cv=none; b=RHJCVyKEKzogIR7Gpgo3Rx0ZNp0nYQ98Nu98ktY7MqCydlYakyXRRcQBu/J72vmyI4RDKwoQcvDF8J8yjUuq29iWMJH0c1z+g3O7ims6FUFK8tsKGVrlkamHzgQtp8uUhMzkRvTA/5rim26R3G0B9CKE5QmikP2MDj2l2yTODCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778718195; c=relaxed/simple;
-	bh=LBlMw0rC/Sl8ZWesQ3L3vS8PBcEnOpafwNwjAK7J3iU=;
+	s=arc-20240116; t=1778718373; c=relaxed/simple;
+	bh=dfLlsE5ugU7pDsQEXdX528yXK2CP7H4o3e4kFKOeTBc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BHECixMfzGrGQchd3Y8xYPbjnyIr4o67Iw6k4yARYxAjKF/FXeraE9iLKRtR0I5fj5jdUP+bQIn+4Kouw93cejsbkSbKlWib8EQ1/3sYP8+5Y14YU1Duqllr9Fd8DlQ7ibOlg5Mqz/4r5tk0mypiRe6ahJ3Tr5QDok5Y7faG+xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RkoSgbwJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7FF5C19425;
-	Thu, 14 May 2026 00:23:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CIMin+vmVjQPxuBuSJv5WAJE9bC2o6TYPKI48Mvyd6hzWvxrS+SbpB/8N7RVKeCPIOuaIp8MfwlWVQm6CKTSFiDIHuUxGTqRUVFsbcgooQX89ArlO1eQoRIPx+LEcav7SJ86Gvl85QJsSk/bI+ckv1ZBaK3RSixCuijeWPSihWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CLs7QubT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C9F0C19425;
+	Thu, 14 May 2026 00:26:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778718195;
-	bh=LBlMw0rC/Sl8ZWesQ3L3vS8PBcEnOpafwNwjAK7J3iU=;
+	s=k20201202; t=1778718373;
+	bh=dfLlsE5ugU7pDsQEXdX528yXK2CP7H4o3e4kFKOeTBc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RkoSgbwJmWqPbAJACPMSC+HRD/oGmlD1NBCewEkZD/y6GGmQCUp7UsWoaDa6VQVKR
-	 j5YcMDdAJxtd6DSDkTtSEB4d4hIE53Ax9oE8tWb2LLjfYfd7dQXD74tlaQ9O5UfnTR
-	 kxOD5neDOHvn3e+KR7hvEX/pNYzJapeWcc4XdjYfBvf8knC5uhIyBjLSznP33AcMlO
-	 Ef9+GyYrc44ZtILO7gFlUcRaTJtd3Ax/2QfE/uMR2J+xWkQM+9oh4MLDvOSqN2RZKG
-	 3r1biYWk2pz8ENekFtXKwgY++ARTkubNfrFw0B+lXM5QZs3Ndb+J8vQPgntTuRwVhJ
-	 +NCXfxCIm40tA==
-Date: Wed, 13 May 2026 17:23:14 -0700
+	b=CLs7QubT8WDKNuTPf6s93dA1N+HnSy5BadtX/Z9bxPBeUTemrAC68lDUKvZwJDpW9
+	 HRika1wqw/3KSRquPqD93VIClewTs/H4Siy56T4j2IiGdQDMm680n+NAumKhBQiMW6
+	 hi2aZ8kEEZzL6+eLYpxV2r0oPfk/dviWQMw7EdlFrK7Z0z4MHtrclPuq0gPJXI1TZe
+	 mWX2NSf4j3cwrx15F/y2AkmvxhkxvXH5cGzhGDChqgNvydtBBppyaV0izU86N8ym+c
+	 GwtMZcE8nipS+2Wq2XlDfaNTfopljqP8jbqDQg3/u+bATUsyrpvxcJdS/BVtKk/LWo
+	 l6z2XpFzprO+w==
+Date: Wed, 13 May 2026 17:26:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Eric Joyner <eric.joyner@amd.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, Brett Creeley <brett.creeley@amd.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Abhijit
- Gangurde <abhijit.gangurde@amd.com>, Allen Hubbe <allen.hubbe@amd.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH net-next 3/4] RDMA/ionic: Add debugfs support
-Message-ID: <20260513172314.35e71e7b@kernel.org>
-In-Reply-To: <20260513072113.GE15586@unreal>
-References: <20260506041935.1061-1-eric.joyner@amd.com>
-	<20260506041935.1061-4-eric.joyner@amd.com>
-	<20260513072113.GE15586@unreal>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, kernel-team@cloudflare.com
+Subject: Re: [PATCH net] net: Clear skb metadata before LWT xmit
+Message-ID: <20260513172612.6dcc5887@kernel.org>
+In-Reply-To: <87jyt78y93.fsf@cloudflare.com>
+References: <20260428-wip-skb-local-storage-from-scratch-v1-1-8f7ca9b378ce@cloudflare.com>
+	<20260430173153.5cd1d348@kernel.org>
+	<87jyt78y93.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,41 +66,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C8E2153C503
+X-Rspamd-Queue-Id: 225F953C56E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287758-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-287759-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Wed, 13 May 2026 10:21:13 +0300 Leon Romanovsky wrote:
-> 3. The patch is too large and exposes too many details that should be
->    gathered through the FW (fwctl).
+On Wed, 13 May 2026 11:17:12 +0200 Jakub Sitnicki wrote:
+> I actually wanted to double-check with you and Daniel - is consuming
+> metadata from TC egress supposed to be supported?
 
-Why? What's wrong with debugfs? Much easier for people to access.
+Not AFAIK, let's see if Daniel has a use case in mind.
 
