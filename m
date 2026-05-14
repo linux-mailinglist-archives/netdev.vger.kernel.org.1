@@ -1,210 +1,224 @@
-Return-Path: <netdev+bounces-287907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287908-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id LsVANBqiBWroZAIAu9opvQ
-	(envelope-from <netdev+bounces-287907-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:21:14 +0200
+	id sLNkGYukBWppZQIAu9opvQ
+	(envelope-from <netdev+bounces-287908-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:31:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27A4654052E
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:21:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F1F540623
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D40F230057BD
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:21:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BEA633019926
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02051367298;
-	Thu, 14 May 2026 10:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60420357D0E;
+	Thu, 14 May 2026 10:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="VS5aZHUb";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="srz6LnlD"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WMsmFB6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821A8386572;
-	Thu, 14 May 2026 10:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD53A221F39
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 10:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778754071; cv=none; b=W2rhQVI9Yg5IbOH0P4S8/687a5QyhbZmvevYs0wDSMPi1RaPSsnPFsG/xzAv3hhfXLhVtH8mxJl2ks1oY5H5J4YlZz7MQKpoVAn2WRlLROOB3VqNOWOg8VuPEmv0vRr1v0IdiycMKWKi+LTef2qaiquu5Si48j4K45ZAjpS0ZFM=
+	t=1778754683; cv=none; b=UmOGAwGJ2c2wizTaTVoUTJkfp/eEEz0br+A3jc6G0wDHtPI/8ibnfBqleRSYSH5RzipDN13lIpuMUpLRK80yj8rvAN9ebntKIN2DDVp8QgpbexwZBLrsvILPoUWUXJkB+b68/BxQqcz6gVFji0VaZWXSOVDUR7tg1h6kFqUvZX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778754071; c=relaxed/simple;
-	bh=fyftp4iasBnUciMCnM4ih4eUsfsD+0Ri23BKLLqY2ZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G2NFLpGUG1bhqKKMDo+UEeIS/o6YHYfGQG6UJqSpuRaATnKE7osRc2p3TtaWZM3YGSNlLU8ZZBm1h4nHfpuWhTqENPY7NJeRrjF6Fyp6biMEreDGY3CxiDEDdHv2RN3QXfqo+GQpOs7LuCdae+fqdYpDkY/WDYa7cm7UErcc1HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=VS5aZHUb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=srz6LnlD; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id 96F33EC021F;
-	Thu, 14 May 2026 06:21:07 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 14 May 2026 06:21:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1778754067; x=
-	1778840467; bh=oF8/clMVOVZTaaaI32fozRcP/Wi9a3HrHpi5Mv76kI0=; b=V
-	S5aZHUb5RPGhOhQnfFh3G4dJ7exkG4pk2NQXht8jHBSL+7QQ+rImjSWTrFQoLcqM
-	HGS26c9Uv62aScZ41am969nLFzhgAI2JoHUdpWD4Nk9J7wlYor2CfUVMMuZQuLd9
-	xtMNKMUK2z9bYebj4k7+xD2D5p3ya1Sl44SPCznuT/y9GYyrPT5xh4mjQbyPX09M
-	F1DAF8xURY56SLn6gvnfb8TGbBtM04NI0234pCnQvrAocg9Tu7RYBL+jyIBrRzCo
-	x5VydIebM5RBOObgyWvzLW9j4F/3A48agi/xZsgsTn5ZNfud0FqiE3tzEFeF3uq7
-	s1tZ1dm+6fJmzTU2l1Uug==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1778754067; x=1778840467; bh=oF8/clMVOVZTaaaI32fozRcP/Wi9a3HrHpi
-	5Mv76kI0=; b=srz6LnlDTMXtHv3m8z7dsucblkUkP9zWHgkFixn/QS+MRV/UUWP
-	1Qo7HO04W5+zDrUwibHJUDGlpxvi7QOrtRKaFtnm4kXUUwfq/HSByRFBUjP6NdnO
-	4nRfgZbjzOFi5wgR97phkLuFe2MmkUB5KWaSUu1ywBLEP8+fDSbXUeJgChC7Achr
-	1A8KCkcoHVRzje0GetL4fkiEi4D6ZnvZ7IvsHQvYqVLof35khCwGEZ23un+ApmMo
-	VlrLiqp+zIrsCbE5Aq4ULxxsSqJF2S99eBOPQJ+YjaFrcYGwNZzLwxn06JEO0Tcs
-	VMaW9MtfNjuDYXcUWQilqvOncO60FrjkEyA==
-X-ME-Sender: <xms:EaIFamyImrPr1ohksyZhJvs_5zPXw5VapGcAZkWBtr7qkSaxW-2PFw>
-    <xme:EaIFauPcMQSw6pLpb5jEkbwO3ngpLBEdB0QTCEPWreAzuGIutWnyr25Ljt0uYz_zT
-    GRU0CK4aj8NTvOuo4rm5tsgTZ5KHc0DsZ12xpv8HHr5frnIhIoyz8M>
-X-ME-Received: <xmr:EaIFauea1NNJspmCLGH4vcWRSPYWY914xpDqigqxjihLXHr4c8lxGlS8n10ysc5d6W3DK_sYs6uzymx1vJGXZkA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdejvdeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
-    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
-    nhgvthdpnhgspghrtghpthhtohepudejpdhmohguvgepshhmthhpohhuthdprhgtphhtth
-    hopehimhhvgegsvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehr
-    vgguhhgrthdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgtohhmpdhr
-    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epshhtrggslhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhhrghl
-    sehrsghogidrtghopdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvth
-    dprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:EaIFai5XS3YJ6722Vai9ffVY4TNuq9NOkelNN-vWCdj4GMCi5dD2ow>
-    <xmx:EaIFamIlj13qmb0dxB7qgdstrg4MfG30Fz64qwhoXeyO-4VWXIxvew>
-    <xmx:EaIFam6SCYEJQ1qGK7b3ShqpX-vpudhDV9CBIZsBOuQC_aRYI5JbTQ>
-    <xmx:EaIFalZMqTakV01b7_KSkyKLnBHVyvkHSrbDHlFwoSPPWlQlqb3Yeg>
-    <xmx:E6IFagyq0Bl9nsFPUymvN7fvbKgePQ0jUgpv58QyXwdQelrwzOx6EYkj>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 14 May 2026 06:21:05 -0400 (EDT)
-Date: Thu, 14 May 2026 12:21:02 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, kuba@kernel.org,
-	steffen.klassert@secunet.com, netdev@vger.kernel.org,
-	stable@vger.kernel.org, mhal@rbox.co, davem@davemloft.net,
-	horms@kernel.org, edumazet@google.com, kerneljasonxing@gmail.com,
-	herbert@gondor.apana.org.au, vakzz@zellic.io, kuniyu@google.com,
-	jiayuan.chen@linux.dev, ben@decadent.org.uk, dsahern@kernel.org
-Subject: Re: [PATCH net v2] net: skbuff: propagate shared-frag marker through
- frag-transfer helpers
-Message-ID: <agWiDlvu351MSuqO@krikkit>
-References: <agToIEDI4TaTNLRb@v4bel>
- <92ec6190-0255-4b7c-9524-254cb37476ab@redhat.com>
- <agWYGuJ__OtpgjnB@v4bel>
+	s=arc-20240116; t=1778754683; c=relaxed/simple;
+	bh=tUQXUqeeODt1JKFOoSl1r5fEIizO+lV/kuaxVYPZk2U=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=Wkxklx7avPwNfouo+6L031eZ6/t/usE+TpV7BeClaOmJvxgU4NDLvaZzMuxT0jXhjJXosFgyfNJ7H08D3lzZ3zfH/4fcZO5sT+/t6sW2msFjnfRQfq4UGSsHL8Cm80aKCK7hmz+Jn0OFLnzo4UM9ZW9qUmkxr16MewaGnt1X8QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WMsmFB6o; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id AC8061A35B5;
+	Thu, 14 May 2026 10:31:11 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 78C2C60495;
+	Thu, 14 May 2026 10:31:11 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 635AB11AFA057;
+	Thu, 14 May 2026 12:31:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1778754670; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=i+ER/V7BqPBVcuw5u4kn1XH/+1ROjOBqJjLVfUa0dTo=;
+	b=WMsmFB6oOYpXVZ7gDNQB/+wS3d5hKqjildZxAPiV2yRwqJnSphqGeu8MEHNVtzhalFE9nJ
+	f0drDnkagj5ZSbDHTPzCbvGrjZ1rT1LG1WlrBGz3TAOcQNFtMnPXz3SsufYByUBXKPLQLC
+	OzD2XR4Oe1Fc0ubk0PK18oPQLTnWHQxhS87+8JB1IeLZs2btUazhOgZqi25hY/fCVeuDp8
+	kqLvWiXanhnnpZykOVioNl5uSSlkLEt2qMwOcBr5bLJD+I3n4kLyJPIWej4Cd38VqZ4cBS
+	+iyedRwC6XCBAyCYILzsAwJfpXnbwS47IMVXnzSCj/ZYzhgFajKpNQHky9xECA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <agWYGuJ__OtpgjnB@v4bel>
-X-Rspamd-Queue-Id: 27A4654052E
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 14 May 2026 12:31:02 +0200
+Message-Id: <DIIBWIZCWTLY.P8H6UNUWM22K@bootlin.com>
+Subject: Re: [RFC PATCH net-next 0/3] net: macb: candidate fixes for silent
+ TX stall on BCM2712/RP1
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S
+ . Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-rpi-kernel@lists.infradead.org>
+To: "Lukasz Raczylo" <lukasz@raczylo.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <cover.1777064117.git.lukasz@raczylo.com>
+In-Reply-To: <cover.1777064117.git.lukasz@raczylo.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: C0F1F540623
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-287907-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DMARC_NA(0.00)[queasysnail.net];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,secunet.com,vger.kernel.org,rbox.co,davemloft.net,google.com,gmail.com,gondor.apana.org.au,zellic.io,linux.dev,decadent.org.uk];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287908-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:url,bootlin.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-2026-05-14, 18:38:34 +0900, Hyunwoo Kim wrote:
-> On Thu, May 14, 2026 at 10:04:29AM +0200, Paolo Abeni wrote:
-> > On 5/13/26 11:07 PM, Hyunwoo Kim wrote:
-> > > Three frag-transfer helpers (__pskb_copy_fclone(), skb_try_coalesce(),
-> > > and skb_shift()) fail to propagate the SKBFL_SHARED_FRAG bit in
-> > > skb_shinfo()->flags when moving frags from source to destination.
-> > > __pskb_copy_fclone() defers the rest of the shinfo metadata to
-> > > skb_copy_header() after copying frag descriptors, but that helper
-> > > only carries over gso_{size,segs,type} and never touches
-> > > skb_shinfo()->flags; skb_try_coalesce() and skb_shift() move frag
-> > > descriptors directly and leave flags untouched.  As a result, the
-> > > destination skb keeps a reference to the same externally-owned or
-> > > page-cache-backed pages while reporting skb_has_shared_frag() as
-> > > false.
-> > > 
-> > > The mismatch is harmful in any in-place writer that uses
-> > > skb_has_shared_frag() to decide whether shared pages must be detoured
-> > > through skb_cow_data().  ESP input is one such writer (esp4.c,
-> > > esp6.c), and a single nft 'dup to <local>' rule -- or any other
-> > > nf_dup_ipv4() / xt_TEE caller -- is enough to land a pskb_copy()'d
-> > > skb in esp_input() with the marker stripped, letting an unprivileged
-> > > user write into the page cache of a root-owned read-only file via
-> > > authencesn-ESN stray writes.
-> > > 
-> > > Set SKBFL_SHARED_FRAG on the destination whenever frag descriptors
-> > > were actually moved from the source.  skb_copy() and skb_copy_expand()
-> > > share skb_copy_header() too but linearize all paged data into freshly
-> > > allocated head storage and emerge with nr_frags == 0, so
-> > > skb_has_shared_frag() returns false on its own; they need no change.
-> > > 
-> > > Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
-> > > Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
-> > 
-> > WRT the 2nd fixes tag, I *think* f4c50a4034e6 would need
-> > additionally/instead a follow-up similar to the one mentioned by Jakub here:
-> > 
-> > https://lore.kernel.org/all/20260510084520.476745b5@kernel.org/
-> 
-> Agreed. tracing SKBFL_SHARED_FRAG propagation paths one by one is
-> not a robust direction for the fix. Even minor logic changes elsewhere
-> could cause the issue to resurface.
+Hello Lukasz,
+
+On Sat Apr 25, 2026 at 12:38 AM CEST, Lukasz Raczylo wrote:
+> This series proposes three candidate fixes for the silent TX stall
+> observed on Raspberry Pi 5 (BCM2712 SoC, Cadence GEM via RP1 PCIe
+> south bridge).  The bug has been reported, with reproducers, at:
+
+I've taken over the MACB driver maintenance following Clandiu & Nicolas'
+work. I have read with curiosity your series and links attached
+(though I skimmed over parts because there's been a lot of discussion).
+
+Have you moved forward since your initial post? I've seen your
+still-working-on-it message from May 8th on the rpi kernel PR. I have a
+few remarks and/or questions:
+
+ - You still think the two fix patches solve it? Any clearer picture of
+   which of the two patches inbetween [1/3] or[2/3] fixes it? Does
+   [3/3] ever trigger on your targets?
+
+ - Can you clarify the exact symptoms? I've seen a few contradictory
+   facts. Two I remember:
+
+    - You say here it is a Tx stall but I've seen messages in the linked
+      threads that say explicitely broken Tx & Rx.
+      https://github.com/cilium/cilium/issues/43198#issue-3706713821
+
+    - You say here link down/up fixes it, but there is a comment that
+      says they unload/reload the module (rtheobald). They don't say
+      explicitely that link down/up doesn't work for them though, but
+      someone before in the thread recommended link down/up. Another
+      one says "Only power cycle recovers the node" (lexfrei).
+
+    - Also, some messages point out disabling TSO / SG / EEE helped it.
+      Any comment on that? It would help point fingers.
+
+    - Some comments are about DT props missing. Is that lead dead now?
+
+ - I've seen no mention of the bug having been reproduced on upstream
+   kernel (?). What does the rpi kernel bring to the table that makes
+   everyone use it?
+
+ - Anything was found to increase the reproducibility of the bug? If it
+   was then a bisect could be made possible, as I've seen mentions that
+   it didn't appear on some older kernels.
+
+Now about the patches:
+
+> Reading the current driver we identified three plausible races
+> between driver and hardware, each of which could independently
+> produce the observed behaviour.  We did not determine which is the
+> actual root cause -- that likely requires either BCM2712/RP1
+> documentation we do not have, or dynamic tracing of the driver
+> during an in-situ stall.  The series therefore attempts to close
+> all three, with each commit message stating which specific race
+> that patch is targeting.
 >
-> As a follow-up,	eliminating the in-place handling in esp_input -- accepting 
+>   Patch 1/3 -- flush PCIe posted write after TSTART doorbell.
+>   Writes to NCR are posted PCIe writes and may not reach the MAC
+>   before the driver returns.  If the TSTART doorbell is lost, no
+>   TX starts, no TCOMP arrives, and the ring goes quiescent.  A
+>   read-back of NCR after the write is a standard read-after-write
+>   PCIe flush.
 
-It would close this group of vulnerabilities, but there are other
-parts of the networking stack that consume this flag. For those,
-chasing missing flag propagation is still a useful task.
+ - Makes sense, but only on MACB mounted over PCI, which is not the
+   majority.
+ - IDK if we can do better than a readl(NCR) on all platforms.
+ - I am surprised it is the only writel() that needs to be flushed?
 
-> the performance trade-off -- seems necessary. That was actually the
-> direction of my initial proposal:
->
-> https://lore.kernel.org/all/afLDKSvAvMwGh7Fy@v4bel/
+>   Patch 2/3 -- re-check ISR after IER re-enable in macb_tx_poll().
+>   An existing comment in macb_tx_poll() notes that completions
+>   raised while TCOMP is masked do not re-fire when IER is
+>   re-enabled, and mitigates the window with macb_tx_complete_pending(),
+>   which inspects driver-visible ring state only (after rmb()).  On
+>   PCIe-attached parts the descriptor DMA write that sets TX_USED
+>   can remain in flight when that check runs; the rmb() orders CPU
+>   writes but does not retire peripheral DMA.  Reading ISR directly
+>   after IER re-enable addresses this in two ways: (a) the MMIO read
+>   is an architected PCIe read barrier for prior DMA writes, so a
+>   subsequent macb_tx_complete_pending() sees up-to-date TX_USED
+>   state; (b) it directly observes a pending TCOMP bit if the
+>   hardware has one set.  Either signal reschedules NAPI.
 
-But you chose to abandon this approach (I guess because of the AI
-feedback Simon forwarded? feedback doesn't necessarily mean "drop this
-entirely").
+This will not fly because ISR might be read-to-clear.
+See macb_queue_isr_clear() and how it is used. So we cannot re-read ISR
+safely on those platforms.
 
--- 
-Sabrina
+>   Patch 3/3 -- TX stall watchdog.  Defence-in-depth.  If patches
+>   1 and 2 close the races we identified, this patch performs a
+>   single spin_lock_irqsave/unlock and a branch per queue per
+>   second with no other effect.  If a further race remains that we
+>   have not identified, it invokes the driver's own existing
+>   macb_tx_restart(), which already verifies that TBQP is behind
+>   tx_head before re-asserting TSTART.  We include this patch
+>   because we have empirically observed multi-minute stalls on this
+>   hardware; we are willing to drop it if the preference is for
+>   1 and 2 to stand alone.
+
+Good idea, but that is what ndo_tx_timeout() is meant for no? It is a
+mechanism that is not specific to our HW so that should be implemented
+at the subsystem level, and it looks like it already is. :-)
+
+We are aware of a few software scheduling races that we plan on fixing.
+If your above patches ended up not fixing the issue, you could look
+into those.
+https://lore.kernel.org/netdev/DHIT9TPJQJ46.21A89R5UAFXVH@bootlin.com/
+
+Thanks!
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
