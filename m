@@ -1,332 +1,231 @@
-Return-Path: <netdev+bounces-287928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJF3HBqqBWpyZgIAu9opvQ
-	(envelope-from <netdev+bounces-287928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:55:22 +0200
+	id MEOhLE2sBWrHZgIAu9opvQ
+	(envelope-from <netdev+bounces-287929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:04:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4E12540A92
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:55:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B05B3540C03
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:04:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 83195309B0C7
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:51:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C12DA3003BE4
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4A13BE631;
-	Thu, 14 May 2026 10:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54A93A7588;
+	Thu, 14 May 2026 10:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ckGOYb3E"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UvYzigWJ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="suo/og8l"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040363BB687;
-	Thu, 14 May 2026 10:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4C318EB0
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 10:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778755877; cv=none; b=OX7+DwEZsmrGaXbLNdnKhp91kxsoM9oUAGqbGHMB3838UQqTUby2qd1uLeKwoH8DiIf4YamcBzFaJoBnRJ253ZuHUO+ntEQb4H3qfZ6vfkaWfgSHrClzQJxhgj3w1zeKS7UyAVhHVN+cIQ6Y34CVY9UTmr5GM0Ew5snyPJHtP2s=
+	t=1778756371; cv=none; b=oGkZHQvRqzeAOBcqPiBEYJZVdjoUBt7PH9D23x6RN2zNruqZitP7Wv22TIlKSvCTPqa2GASFZ/J7Jenuu0rcQ52A9pzJnKumB8NX0qeFuniaGoUb9j0LwLJseau5k+NmH+CDoA6ltCIkz7DVGe5j7+TR2rmIhJI2U5swYeoVSBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778755877; c=relaxed/simple;
-	bh=GLC1Dg4DAQYOUX5stTUxmUbQS2csfmdPXEjjgpMel0c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qMbTCeq89KUoc6WH21Oeslf7Q+BGP3JExnZOXVv/JbEHZpDI970+u9VnywwfdcUZtB6t5m2zEtlf2Et6h6x9M697FUardKVJZGK5qmkPvyU3msNCkPCVoUOVrIl+rnYATxG9DbMFoujuWIGk+9ij03+h0TW7gt7J/PD6f2EXsE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ckGOYb3E; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1778755876; x=1810291876;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GLC1Dg4DAQYOUX5stTUxmUbQS2csfmdPXEjjgpMel0c=;
-  b=ckGOYb3EzZ8VOZdSS5YYDoAKLQb9WBSFVUnGd4v4/Bdi7S3YlhNHUtTU
-   efa4rNtdDgyHxBJCq0tSZXsw+2tFeTkdWoFDXxPGWikPp7eNzGEY7WHrE
-   5VnY06dm7I6I7GE6NiaX5qnrrej9b6rSCCiF/8FmqfUxkYhLiKM6Dd2G1
-   t9ImyRbs4Eh6iRq+rPje3JWApG9mVGxVl9UBNPVwrJ8TD8oc3pAqLzX2I
-   3arGQ65XDetktXGLuuEIcx/neBNmDUIM85Lz7ETxZeSsSs1OwYAtJQzdL
-   ypvNRk7T1CxJXNpIYDOc3mc/EE/RGDfkl9awROh0Md26IXa1z5btGinfl
-   g==;
-X-CSE-ConnectionGUID: kYThZSFMTzyTA5rtXI+lEw==
-X-CSE-MsgGUID: h4zf1VzfQ0OdptI4p7gMkg==
-X-IronPort-AV: E=Sophos;i="6.23,234,1770620400"; 
-   d="scan'208";a="57503058"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 May 2026 03:51:15 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 14 May 2026 03:51:14 -0700
-Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 14 May 2026 03:51:11 -0700
-From: Thangaraj Samynathan <thangaraj.s@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <bryan.whitehead@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 5/5] net: lan743x: Add PCS/XPCS support for SFP on PCI11x1x
-Date: Thu, 14 May 2026 16:20:28 +0530
-Message-ID: <20260514105028.42942-6-thangaraj.s@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260514105028.42942-1-thangaraj.s@microchip.com>
-References: <20260514105028.42942-1-thangaraj.s@microchip.com>
+	s=arc-20240116; t=1778756371; c=relaxed/simple;
+	bh=+mUnVQylUsDcmls59bbfiO0X1W5hSrNZLgtjUmSZ+zU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CagbjV+wHZjjmFbV3Y2N+bSjuFMopLszYxBR02SLF6tABSSbU2HGM+LI6xXATmSHVA9MngN60OBmvI2KfTQQzfi1qZLESOFi67CNMfC6B4L9fl4UxtcRUV+QoiFGK0ZFl7CAq8KGCnPjbEtuAEBZhiSpvellaBRjjIXQh4uyEns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UvYzigWJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=suo/og8l; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778756369;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=udt7N9vsXQlnId0Awve0KX4MLn70Hej/jGjPBdK6ljQ=;
+	b=UvYzigWJtvfXBpoulxzgagYD3LdJJ3Pg7Wjsz0tMam+TWwjzdxLiZ8jywt7Qpui7W6gpvC
+	He5ZZUJ5UAZIBwM8Fba0zFrnntyZJFz3tSDYj6frSCjFTLmGR6sch4LfGmdNlvQuvxjTsd
+	S+iECKjM+jiQp2aITURBgM2Hvt/h8uY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-1Sl21YuNOtqbHAXP0eF8eA-1; Thu, 14 May 2026 06:59:28 -0400
+X-MC-Unique: 1Sl21YuNOtqbHAXP0eF8eA-1
+X-Mimecast-MFC-AGG-ID: 1Sl21YuNOtqbHAXP0eF8eA_1778756367
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b941d4b7f2cso763693066b.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 03:59:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778756367; x=1779361167; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=udt7N9vsXQlnId0Awve0KX4MLn70Hej/jGjPBdK6ljQ=;
+        b=suo/og8l5OyTy1fWy74zzkBNmBU0i/6aTdTSy5UqDdIh6VDFz0W5P5V1M0G3pXk0yV
+         4Rwrr5IuVdXo20uTtBnJnWijUy8T3S7MDbCsQR2Hg3gPnaGZIEDC3bB7cAT/u0lwVHds
+         e1UgkBXOPXAlvaKbUeePb+OGYXl8eW5AfvhGC2xCyLH+25nxVrZXNtRX6G/uhwNLE+go
+         OW5aynFSlKHxFTwSwNmaf8re+6RomngHj/V5go8cvlmzW9ZgwdROZcwrSFreUsVM1Pdv
+         igpVIj4nMJ0AbGLsKb5sEMyif8BXggfZx68tvqwLZFWvCfX1jp/nahBm+HpLndzj53OD
+         4Rww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778756367; x=1779361167;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=udt7N9vsXQlnId0Awve0KX4MLn70Hej/jGjPBdK6ljQ=;
+        b=VLKK2+4NV5H1Xqyd6jTOUeNQhe1ivfdl1D41rqEMEtzrHWe4Fm+cZJml6210T7ed3Z
+         Ie3D2RPPQaRDRPmBvxCdaswj79JI4Gby1AKUd6+KCItpixZuqEDbm13//NMsGlwHpKxe
+         vpVkl0TfiytNTLTUH3eQH8RXrmqooVH/DwqSTC2lfmgtszjL1NUWNZo4q6VkzwrOlH9d
+         hB8u2ngA33RCy0c7zC8Y0+UcdD3xTYNreF68hPv2ZFyrEyEgxun8noA44GISo/dkU74p
+         w6Hxn9+KvNRRh1NLmXeAAKT9uVSBBECHT4qK+/6MWkzQibFRYzo7W4EkxUy0r9BE/1JP
+         q4tQ==
+X-Gm-Message-State: AOJu0YzGykPHAUUtvO8dK/O+2RYPTuXiHOxyu9vC2iIFA/P2r/axpMNY
+	ildeHrrwngSSsLeMPAq0N4fT9SHnQcGJWHA+Qm/aZcs3ge+aVoNo9T9p81SIAYoSTFNyUbnzAg/
+	pKg7/2RU5Ac+PhZJ3nhJDgzzzYF1mAgq2BDHM4K3pKQIU7mPDMfyEXUqIzA==
+X-Gm-Gg: Acq92OGw4Mdoxqg+nxhm+Yx7NfAJNP8PuGLppNSeLTAthWVQLIeKR4U0XxzF7r2i7Fy
+	ztV4XQVq+ixX76Ec/c47U1au5IJJoOk7h2PA7y39iE1dgfTd2V457ZHy5R1VwzHT/n5g/qhGzCx
+	5cnPs7u+vHKcsU14hNl1I8iR3tWh3BJdkwlmCSlHCQBoFc4s8oLl16GAHAljVWZ+acpoyOlmU/k
+	K/LhdGs5Z6U/D+pKvbeAbkxJI8REEyajqrBWAUZNdopEpMdFvSc0ToQn2WEsG11cZakPkfza5td
+	jXcZTYtliLORQMAaCF9jCbOhthDOn2ZzX3FWr6OEqEoxUaHcQ1p5ORmp5utnS6p+ULL+HqY4VuB
+	AQWZ0h1bnkCNut5L7WIk3aHx1YA9n9mi323zzgo3ClbyFrD9nOLsNXSQ=
+X-Received: by 2002:a17:907:86a0:b0:bd4:3df7:3791 with SMTP id a640c23a62f3a-bd43df7571emr431254966b.14.1778756366670;
+        Thu, 14 May 2026 03:59:26 -0700 (PDT)
+X-Received: by 2002:a17:907:86a0:b0:bd4:3df7:3791 with SMTP id a640c23a62f3a-bd43df7571emr431252266b.14.1778756366139;
+        Thu, 14 May 2026 03:59:26 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.9.106])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68310b3e6d1sm617415a12.5.2026.05.14.03.59.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 May 2026 03:59:24 -0700 (PDT)
+Message-ID: <eb06cfd2-6ee4-475d-bafd-9331b879692e@redhat.com>
+Date: Thu, 14 May 2026 12:59:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Rspamd-Queue-Id: D4E12540A92
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: qualcomm: rmnet: fix endpoint use-after-free in
+ rmnet_dellink()
+To: Weiming Shi <bestswngs@gmail.com>,
+ Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
+ Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+References: <20260511120015.2298403-4-bestswngs@gmail.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260511120015.2298403-4-bestswngs@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: B05B3540C03
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [4.84 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thangaraj.s@microchip.com,netdev@vger.kernel.org];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_FROM(0.00)[bounces-287928-lists,netdev=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	TAGGED_FROM(0.00)[bounces-287929-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.998];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,oss.qualcomm.com,lunn.ch,davemloft.net,google.com,kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,microchip.com:mid,microchip.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	R_DKIM_ALLOW(0.00)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	GREYLIST(0.00)[pass,body];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.155];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c15:e001:75::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,asu.edu:email]
 X-Rspamd-Action: no action
 
-Add a PCS MII bus and XPCS instance to support SFP modules on PCI11x1x
-platforms.
+On 5/11/26 2:00 PM, Weiming Shi wrote:
+> From: Security Analysis <xmei5@asu.edu>
+> 
+> rmnet_dellink() removes the endpoint from the hash table with
+> hlist_del_init_rcu() and then immediately frees it with kfree(). However,
+> RCU readers on the receive path (rmnet_rx_handler ->
+> __rmnet_map_ingress_handler) may still hold a reference to the endpoint and
+> dereference ep->egress_dev after the memory has been freed. The endpoint is
+> a kmalloc-32 object, and the stale read at offset 8 corresponds to the
+> egress_dev pointer.
+> 
+>   BUG: unable to handle page fault for address: ffffffffde942eef
+>   Oops: 0002 [#1] SMP NOPTI
+>   CPU: 1 UID: 0 PID: 137 Comm: poc_write Not tainted 7.0.0+ #4 PREEMPTLAZY
+>   RIP: 0010:rmnet_vnd_rx_fixup (rmnet_vnd.c:27)
+>   Call Trace:
+>    <TASK>
+>    __rmnet_map_ingress_handler (rmnet_handlers.c:48 rmnet_handlers.c:101)
+>    rmnet_rx_handler (rmnet_handlers.c:129 rmnet_handlers.c:235)
+>    __netif_receive_skb_core.constprop.0 (net/core/dev.c:6096)
+>    __netif_receive_skb_one_core (net/core/dev.c:6208)
+>    netif_receive_skb (net/core/dev.c:6467)
+>    tun_get_user (drivers/net/tun.c:1955)
+>    tun_chr_write_iter (drivers/net/tun.c:2003)
+>    vfs_write (fs/read_write.c:688)
+>    ksys_write (fs/read_write.c:740)
+>    </TASK>
+> 
+> Replace kfree() with kfree_rcu_mightsleep() so the endpoint memory remains
+> valid through the RCU grace period. Also remove the rmnet_vnd_dellink() call
+> and inline only the nr_rmnet_devs decrement, since rmnet_vnd_dellink() would
+> set ep->egress_dev to NULL during the grace period, creating a data race with
+> lockless readers.
+> 
+> Fixes: ceed73a2cf4a ("drivers: net: ethernet: qualcomm: rmnet: Initial implementation")
+> Assisted-by: Claude:claude-opus-4-7
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 
-Register a dedicated mdiobus for PCS access when SFP support is enabled
-and initialize it with C45 read/write callbacks wired to the internal
-SGMII access functions. Set phy_mask to ~0 to prevent the MDIO bus scan
-from probing internal SGMII registers as PHY addresses.
+SoB tag must match the 'From' header, and must be a real name, likely
+'From' should be fixed.
 
-Integrate the XPCS instance with phylink by providing a mac_select_pcs
-callback. Support SGMII and 2.5GBASE-X interfaces in phylink, allowing
-proper link configuration for SFP modules.
+Also you must specify the target tree in the subj prefix ('net' in this
+case).
 
-Cleanup the PCS mdiobus and XPCS instance during driver removal. Update
-adapter structure to hold PCS mdiobus and XPCS references.
+Please have an accurate read of
 
-Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
----
- drivers/net/ethernet/microchip/lan743x_main.c | 92 ++++++++++++++++++-
- drivers/net/ethernet/microchip/lan743x_main.h |  5 +
- 2 files changed, 94 insertions(+), 3 deletions(-)
+Documentation/process/maintainer-netdev.rst
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index 649065c36434..72f135fba8e2 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -15,7 +15,6 @@
- #include <linux/rtnetlink.h>
- #include <linux/iopoll.h>
- #include <linux/crc16.h>
--#include <linux/phylink.h>
- 
- #include "lan743x_main.h"
- #include "lan743x_ethtool.h"
-@@ -1192,6 +1191,28 @@ static int lan743x_get_lsd(int speed, int duplex, u8 mss)
- 	return lsd;
- }
- 
-+static int pci11x1x_pcs_read(struct mii_bus *bus, int addr, int devnum,
-+			     int regnum)
-+{
-+	struct lan743x_adapter *adapter = bus->priv;
-+
-+	if (addr)
-+		return -EOPNOTSUPP;
-+
-+	return lan743x_sgmii_read(adapter, devnum, regnum);
-+}
-+
-+static int pci11x1x_pcs_write(struct mii_bus *bus, int addr, int devnum,
-+			      int regnum, u16 val)
-+{
-+	struct lan743x_adapter *adapter = bus->priv;
-+
-+	if (addr)
-+		return -EOPNOTSUPP;
-+
-+	return lan743x_sgmii_write(adapter, devnum, regnum, val);
-+}
-+
- static int lan743x_sgmii_mpll_set(struct lan743x_adapter *adapter,
- 				  u16 baud)
- {
-@@ -3268,6 +3289,18 @@ static void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable)
- 	lan743x_csr_write(adapter, MAC_CR, mac_cr);
- }
- 
-+static struct phylink_pcs *lan743x_phylink_mac_select(struct phylink_config *config,
-+						      phy_interface_t interface)
-+{
-+	struct net_device *netdev = to_net_dev(config->dev);
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+
-+	if (adapter->xpcs)
-+		return adapter->xpcs;
-+
-+	return NULL;
-+}
-+
- static void lan743x_phylink_mac_config(struct phylink_config *config,
- 				       unsigned int link_an_mode,
- 				       const struct phylink_link_state *state)
-@@ -3399,6 +3432,7 @@ static const struct phylink_mac_ops lan743x_phylink_mac_ops = {
- 	.mac_link_up = lan743x_phylink_mac_link_up,
- 	.mac_disable_tx_lpi = lan743x_mac_disable_tx_lpi,
- 	.mac_enable_tx_lpi = lan743x_mac_enable_tx_lpi,
-+	.mac_select_pcs = lan743x_phylink_mac_select,
- };
- 
- static int lan743x_phylink_create(struct lan743x_adapter *adapter)
-@@ -3422,6 +3456,7 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
- 
- 	switch (adapter->phy_interface) {
- 	case PHY_INTERFACE_MODE_SGMII:
-+	case PHY_INTERFACE_MODE_2500BASEX:
- 		__set_bit(PHY_INTERFACE_MODE_SGMII,
- 			  adapter->phylink_config.supported_interfaces);
- 		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-@@ -3489,12 +3524,13 @@ static int lan743x_phylink_connect(struct lan743x_adapter *adapter)
- 	struct device_node *dn = adapter->pdev->dev.of_node;
- 	struct net_device *dev = adapter->netdev;
- 	struct phy_device *phydev;
--	int ret;
-+	int ret = 0;
- 
- 	if (dn)
- 		ret = phylink_of_phy_connect(adapter->phylink, dn, 0);
- 
--	if (!dn || (ret && !lan743x_phy_handle_exists(dn))) {
-+	if (!adapter->is_sfp_support_en &&
-+	    (!dn || (ret && !lan743x_phy_handle_exists(dn)))) {
- 		phydev = phy_find_first(adapter->mdiobus);
- 		if (phydev) {
- 			/* attach the mac to the phy */
-@@ -3767,6 +3803,11 @@ static void lan743x_hardware_cleanup(struct lan743x_adapter *adapter)
- 
- static void lan743x_mdiobus_cleanup(struct lan743x_adapter *adapter)
- {
-+#ifdef CONFIG_LAN743X_SFP
-+	if (adapter->xpcs)
-+		xpcs_destroy_pcs(adapter->xpcs);
-+#endif
-+
- 	mdiobus_unregister(adapter->mdiobus);
- }
- 
-@@ -3881,6 +3922,44 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
- 	return 0;
- }
- 
-+#ifdef CONFIG_LAN743X_SFP
-+static int lan743x_pcs_mdiobus_init(struct lan743x_adapter *adapter)
-+{
-+	struct phylink_pcs *pcs;
-+	int ret;
-+
-+	adapter->pcs_mdiobus = devm_mdiobus_alloc(&adapter->pdev->dev);
-+	if (!adapter->pcs_mdiobus)
-+		return -ENOMEM;
-+
-+	adapter->pcs_mdiobus->priv = (void *)adapter;
-+	adapter->pcs_mdiobus->read_c45 = pci11x1x_pcs_read;
-+	adapter->pcs_mdiobus->write_c45 = pci11x1x_pcs_write;
-+	adapter->pcs_mdiobus->name = "lan743x-pcs-mdiobus-c45";
-+	adapter->pcs_mdiobus->phy_mask = ~0;
-+	netif_dbg(adapter, drv, adapter->netdev, "lan743x-pcs-mdiobus-c45\n");
-+	snprintf(adapter->pcs_mdiobus->id, MII_BUS_ID_SIZE, "pci-pcs-%s", pci_name(adapter->pdev));
-+
-+	if (!adapter->phy_interface)
-+		lan743x_phy_interface_select(adapter);
-+
-+	ret = devm_mdiobus_register(&adapter->pdev->dev, adapter->pcs_mdiobus);
-+	if (ret) {
-+		netdev_err(adapter->netdev, "failed to register pcs mdiobus\n");
-+		return ret;
-+	}
-+
-+	pcs = xpcs_create_pcs_mdiodev(adapter->pcs_mdiobus, 0);
-+	if (IS_ERR(pcs)) {
-+		netdev_err(adapter->netdev, "failed to create xpcs\n");
-+		return PTR_ERR(pcs);
-+	}
-+
-+	adapter->xpcs = pcs;
-+	return 0;
-+}
-+#endif /* CONFIG_LAN743X_SFP */
-+
- static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
- {
- 	int ret;
-@@ -4002,6 +4081,13 @@ static int lan743x_pcidev_probe(struct pci_dev *pdev,
- 	if (ret)
- 		goto cleanup_hardware;
- 
-+#ifdef CONFIG_LAN743X_SFP
-+	if (adapter->is_sfp_support_en) {
-+		ret = lan743x_pcs_mdiobus_init(adapter);
-+		if (ret)
-+			goto cleanup_mdiobus;
-+	}
-+#endif
- 	adapter->netdev->netdev_ops = &lan743x_netdev_ops;
- 	adapter->netdev->ethtool_ops = &lan743x_ethtool_ops;
- 	adapter->netdev->features = NETIF_F_SG | NETIF_F_TSO |
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index a25864bd8328..a16fc69c4466 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.h
-+++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -8,6 +8,9 @@
- #include <dt-bindings/gpio/gpio.h>
- #include <linux/i2c.h>
- #include <linux/phy.h>
-+#ifdef CONFIG_LAN743X_SFP
-+#include <linux/pcs/pcs-xpcs.h>
-+#endif
- #include <linux/phylink.h>
- #include <linux/platform_device.h>
- #include <linux/property.h>
-@@ -1108,6 +1111,7 @@ struct lan743x_sw_nodes {
- struct lan743x_adapter {
- 	struct net_device       *netdev;
- 	struct mii_bus		*mdiobus;
-+	struct mii_bus		*pcs_mdiobus;
- 	int                     msg_enable;
- #ifdef CONFIG_PM
- 	u32			wolopts;
-@@ -1145,6 +1149,7 @@ struct lan743x_adapter {
- 	u32			flags;
- 	u32			hw_cfg;
- 	phy_interface_t		phy_interface;
-+	struct phylink_pcs      *xpcs;
- 	struct phylink		*phylink;
- 	struct phylink_config	phylink_config;
- 	int			rx_tstamp_filter;
--- 
-2.34.1
+before submitting the next revision
+
+> ---
+>  drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
+> index 269c0449760c..2e17a43aec5a 100644
+> --- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
+> +++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
+> @@ -213,8 +213,8 @@ static void rmnet_dellink(struct net_device *dev, struct list_head *head)
+>  	ep = rmnet_get_endpoint(real_port, mux_id);
+>  	if (ep) {
+>  		hlist_del_init_rcu(&ep->hlnode);
+> -		rmnet_vnd_dellink(mux_id, real_port, ep);
+> -		kfree(ep);
+> +		real_port->nr_rmnet_devs--;
+> +		kfree_rcu_mightsleep(ep);
+
+This is under the rtnl lock and will wait for an rcu grace period, which
+is bad for rtnl lock contention. Please add an rcu field to `struct
+rmnet_endpoint` and use kfree_rcu() instead.
+
+/P
 
 
