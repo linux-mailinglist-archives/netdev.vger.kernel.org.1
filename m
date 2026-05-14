@@ -1,168 +1,332 @@
-Return-Path: <netdev+bounces-288079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288084-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kJpMH5YwBmrhfwIAu9opvQ
-	(envelope-from <netdev+bounces-288079-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 22:29:10 +0200
+	id oOoSK1ZHBmo3hwIAu9opvQ
+	(envelope-from <netdev+bounces-288084-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 00:06:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B321546B6F
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 22:29:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DBE6547557
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 00:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C17A3014119
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:29:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6EB8302BE3C
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 21:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430933BFE2D;
-	Thu, 14 May 2026 20:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F07D3CD8B5;
+	Thu, 14 May 2026 21:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MfVLs6PB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b="XHmWM63h";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b="FWKEPpYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from acj35aaf118.lhr1.oracleemaildelivery.com (acj35aaf118.lhr1.oracleemaildelivery.com [130.35.116.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE29282F3A;
-	Thu, 14 May 2026 20:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95163AA1AE
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 21:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.35.116.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778790547; cv=none; b=qD+5oqpGA+Nx/wN0MHvlJAcxyL6Ut3mxpyTNGvI05GsdzwyXjy0rWgvK00wiMHKK27IF2Jhn9EFyhF5IbiwcL/eZzi8rh7pnjYTUYZdaMlkQrsxe/7UbVRMaGavcOJ1QFErFuysTbh5EIgCBVd8dZE8w/uGb6fX3zVUmLGShHYQ=
+	t=1778795496; cv=none; b=fTd7BBlH74fTY47suvl2fzXNcloy0Dax6QNLMR95RHf/C7s8S8QQuLr2/ZZ4JesVu6C+Sg9cOvWOs7LOR429+7cOL3tkrfFph9HZ+fjZJJRYkIKvbXbVuexBpLoY4gFuVlizI0d/3reSbEarrNpWoa7spWhYQSSCiaGv1G5/byo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778790547; c=relaxed/simple;
-	bh=WYEZ+dPObHt5hmrhhbH7GFqUbFObKwL+IZ1qBKpCbqE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=buWIUmkKcj+YdsSmb08yjctv+q+IfS9aIuykVeBQ55OViMIksIPKVX1M5kXZo7PtIMXcm2Gxn7OsHvfktS4bv9bpVWgvVBxETr8iP+yYubQHnX2dlzcodxdu6PrSRBeL2h8g5/r+fyGtuVHM9exWXS1OTeTkuofUimOuz2FNbBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MfVLs6PB; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778790545; x=1810326545;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WYEZ+dPObHt5hmrhhbH7GFqUbFObKwL+IZ1qBKpCbqE=;
-  b=MfVLs6PBU5eOxjpIg8VoRaNFQqUS60n9Du4fcWFiXkqoksa70eTmP+GS
-   NE3MRBALeYPl30mM/ov3MCiKiSThlx4UUz9fa1zg7eL4DJoPHT5jCJyMR
-   bvlxGeHD4mSywQd6ryC0xKQeiV3v+ndrDtvaKvVzX6tnUWdm3MFHMucvx
-   vH8FqxDaIs36gXssJLBWqijF6SufLrjebshZzPRLqUsy4L55oJMk3/fZx
-   o/iI2sUVx+deaKTYDS/sPz3muiWBGfuOWYucQ5Np1wO46cji+kHHRa6sQ
-   +uDCSFzIUtMVLIr5fn2BBSM6bWtzNYNXoGt2k14qSbUBNSqJaZmDtC9YA
-   g==;
-X-CSE-ConnectionGUID: XId8jSmaROOeriqRxFADfw==
-X-CSE-MsgGUID: 2ook4UjhSayyw+Nx+XV1Kg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11786"; a="83355268"
-X-IronPort-AV: E=Sophos;i="6.23,235,1770624000"; 
-   d="scan'208";a="83355268"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2026 13:29:05 -0700
-X-CSE-ConnectionGUID: G6h6ELAETkesj8PpJAy8FQ==
-X-CSE-MsgGUID: To/4DETzS4GEq19uZxuA5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,235,1770624000"; 
-   d="scan'208";a="232092652"
-Received: from igk-lkp-server01.igk.intel.com (HELO bdf09bfdbd5f) ([10.211.93.152])
-  by fmviesa009.fm.intel.com with ESMTP; 14 May 2026 13:29:01 -0700
-Received: from kbuild by bdf09bfdbd5f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wNcfz-000000008rh-0Xcq;
-	Thu, 14 May 2026 20:28:59 +0000
-Date: Thu, 14 May 2026 22:28:54 +0200
-From: kernel test robot <lkp@intel.com>
-To: Frank Li <Frank.Li@nxp.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: Re: [PATCH 1/1] dt-bindings: net: dsa: Convert lan9303.txt to yaml
- format
-Message-ID: <202605142234.F1IZjPJb-lkp@intel.com>
-References: <20260512214704.1084890-1-Frank.Li@nxp.com>
+	s=arc-20240116; t=1778795496; c=relaxed/simple;
+	bh=v1WbssdjlAYsj76P2Oqd446UGI6DiRZfUFIUbs26B6s=;
+	h=From:To:Cc:Subject:Date:Message-id:In-reply-to:References:
+	 MIME-version:Content-type; b=lbvSa/yn7Efp+a2RuUhj4oq2pcv5H2gBtO2Z2NETxSDIjCgS3YtVXt5NMpf/HCpNeBiGaLNS1NHU1sFY/r6ajS/nrEsLZBgDHwpWvkrwveR+6pB5aQo0eduZegjvZOkzWUga2qBm1ss1CqI6oQy6C4mYytyo0Ug0EukyfX49E7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com; dkim=pass (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b=XHmWM63h; dkim=pass (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b=FWKEPpYh; arc=none smtp.client-ip=130.35.116.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=oracle-uk-012026;
+ d=raczylo.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=zytAQkalIZDBrKG7HNFd87+dd8k5KjA5x/4SFOlRADY=;
+ b=XHmWM63hH6hB+UBuhkN2ds52BvtS6l86qvWJ9dOSsewHmikzKF+l8VHoJqU3geua7eZqYg70TFUk
+   JGQMSq8cDCI+cKcVUIxOVItnFpiWKUrvRjUa2LSiCoJxfGWRv2VVTP+zuRV2iPBiEnJG0EpF/5YZ
+   InF743UuRfYKKaE7vdJZPSmPS6u6XN4NH4DrQKpEP0gN1Mw8B4jVZ8BpdqwINImKUQIaKGgW3sTJ
+   A5jTqZkecaD5TpHjHh/+DEbdfjzY2wslp3wtehyDVOqSBJL5FjIQjWmgVlv7TRxQtnoV9cJZ82wS
+   WJh0Py+LR7bbpBYALW4i308AjPUjHhKs3x3J6Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=prod-lhr-20191104;
+ d=lhr1.rp.oracleemaildelivery.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=zytAQkalIZDBrKG7HNFd87+dd8k5KjA5x/4SFOlRADY=;
+ b=FWKEPpYhq/jV3cLX6gcy3eicc2IpZJrlpwJsXytaUdK+hwu71/8SQKQcHU8IcbR79uYWtpgnAImR
+   GhM9vYC4RYCCQlYPloAFDpELlZWLD3SfiiLe4mOhBxeJ8IH6VB0CNruDue/VE5MKXeS9pfOYiBUH
+   OP1dtSb/B/DXFPoQx9JpNWSvd7V8NPOX6HtU52/3IqdABQHVNZvpjaJj3+ehNHnDncjmadswpbbG
+   FnLRlayOQ7OYSS4hjlIWKJkRrBbRIP4z+iJZWApfc3mInfv3Q/kEQT9Xg1SlAeUjtZsNHsKcmzR5
+   K2i2M1ewcjRoFAN/Ka1ItuKSf1BEjnnwk+wQeQ==
+Received: by omta-ad3-fd1-1402-uk-london-1.omtaad3.vcndplhr.oraclevcn.com
+ (Oracle Communications Messaging Server 8.1.0.1.20260212 64bit (built Feb 12
+ 2026))
+ with ESMTPS id <0TF1045N4RDVCD30@omta-ad3-fd1-1402-uk-london-1.omtaad3.vcndplhr.oraclevcn.com> for
+ netdev@vger.kernel.org; Thu, 14 May 2026 21:51:31 +0000 (GMT)
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+From: Lukasz Raczylo <lukasz@raczylo.com>
+To: netdev@vger.kernel.org
+Cc: Theo Lebrun <theo.lebrun@bootlin.com>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,	linux-rpi-kernel@lists.infradead.org
+Subject: Re: [RFC PATCH net-next 0/3] net: macb: candidate fixes for silent TX
+ stall on BCM2712/RP1
+Date: Thu, 14 May 2026 22:51:29 +0100
+Message-id: <20260514215129.33559-1-lukasz@raczylo.com>
+X-Mailer: git-send-email 2.54.0
+In-reply-to: <cover.1777064117.git.lukasz@raczylo.com>
+References: <cover.1777064117.git.lukasz@raczylo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260512214704.1084890-1-Frank.Li@nxp.com>
-X-Rspamd-Queue-Id: 2B321546B6F
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8bit
+Reporting-Meta:
+ AAF8Kp2gGUnFKGIyrDw9wVbSVsYvduq9aPUjTQJs1LwRIXNFCb2jTFY/DkgZ45l6
+ wryQXW8fC4CLX28S2PcOVvYYdB9UgtQ5lsLmEHEwKO6RNntQn7Srzpk8vxq1PVyS
+ 1R+VXqQ+bItSKBnwvG3MKMM+sBcNzwx7qffTT5njUIAX+dsS4sKz75EBpD4eCbp6
+ 1Y++QvO6AmWoakYKiq2ewMs0gYfpuXJWLPISqiS7s9Xx9Nk+JGOJbzQ1DsoKgyXx
+ aZXJBo10Vmm2QOwP88qE778sG9xPIDdkrg2CXsEIqjyNKs/vVaeW9PWNFcdq57x1
+ P8Ibk9dSPSh2zUwDCaHPfIwWjoF4cVz2ghtW1/Yk7nimLdVOYZAqr9V4RUFz2apA
+ Pr8UaevSnLT6ySM7n1t0oNiCplj2oMvI4nYtvOEMjIjUDdUFJQGifq8h3CKpv08=
+X-Rspamd-Queue-Id: 4DBE6547557
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [4.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[raczylo.com : SPF not aligned (relaxed),reject];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_REJECT(1.00)[raczylo.com:s=oracle-uk-012026,lhr1.rp.oracleemaildelivery.com:s=prod-lhr-20191104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-288084-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288079-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	GREYLIST(0.00)[pass,body];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,01.org:url,git-scm.com:url,intel.com:email,intel.com:mid,intel.com:dkim]
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[raczylo.com:-,lhr1.rp.oracleemaildelivery.com:-];
+	FROM_NEQ_ENVFROM(0.00)[lukasz@raczylo.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_SPAM(0.00)[0.931];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,raczylo.com:mid]
 X-Rspamd-Action: no action
 
-Hi Frank,
+Andrea, Théo --
 
-kernel test robot noticed the following build warnings:
+Thanks both.  Replying to multiple points in one mail since they
+intersect.
 
-[auto build test WARNING on robh/for-next]
-[also build test WARNING on linus/master v7.1-rc3 next-20260508]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+First a correction to the v1 cover: the "zero events post-patch"
+claim was true only at the user-space watchdog visibility level.
+With patch 3's warn made unconditional (which is what Andrea's
+review re-tested with on v6.19.10), kernel-level evidence on my
+side now matches what Andrea saw -- patches 1 and 2 are partial,
+patch 3 is empirically the load-bearing fix on this platform.
+The v2 cover acknowledges this and reframes.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Frank-Li/dt-bindings-net-dsa-Convert-lan9303-txt-to-yaml-format/20260514-202017
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-patch link:    https://lore.kernel.org/r/20260512214704.1084890-1-Frank.Li%40nxp.com
-patch subject: [PATCH 1/1] dt-bindings: net: dsa: Convert lan9303.txt to yaml format
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-docutils: docutils (Docutils 0.21.2, Python 3.13.5, on linux)
-reproduce: (https://download.01.org/0day-ci/archive/20260514/202605142234.F1IZjPJb-lkp@intel.com/reproduce)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605142234.F1IZjPJb-lkp@intel.com/
+## Andrea -- patches 1 and 3
 
-All warnings (new ones prefixed by >>):
+Concrete data from a dmesg sweep across the 24-node fleet
+(macb-v2 image, 2026-05-02 to 2026-05-05, 6.18.24 + this series
+with netdev_warn_once swapped to netdev_warn):
 
-   Warning: Documentation/devicetree/bindings/regulator/motorola,cpcap-regulator.yaml references a file that doesn't exist: Documentation/devicetree/bindings/mfd/motorola,cpcap.yaml
-   Warning: Documentation/devicetree/bindings/regulator/siliconmitus,sm5703-regulator.yaml references a file that doesn't exist: Documentation/devicetree/bindings/mfd/siliconmitus,sm5703.yaml
-   Warning: Documentation/devicetree/bindings/rtc/motorola,cpcap-rtc.yaml references a file that doesn't exist: Documentation/devicetree/bindings/mfd/motorola,cpcap.yaml
-   Warning: Documentation/doc-guide/parse-headers.rst references a file that doesn't exist: Documentation/userspace-api/media/Makefile
-   Warning: Documentation/leds/leds-lp5812.rst references a file that doesn't exist: Documentation/ABI/testing/sysfs-class-led-multicolor.rst
->> Warning: Documentation/networking/dsa/lan9303.rst references a file that doesn't exist: Documentation/devicetree/bindings/net/dsa/lan9303.txt
-   Warning: Documentation/translations/it_IT/doc-guide/parse-headers.rst references a file that doesn't exist: Documentation/userspace-api/media/Makefile
-   Warning: Documentation/translations/ja_JP/SubmittingPatches references a file that doesn't exist: linux-2.6.12-vanilla/Documentation/dontdiff
-   Warning: Documentation/translations/ja_JP/process/submit-checklist.rst references a file that doesn't exist: Documentation/translations/ja_JP/SubmitChecklist
-   Warning: Documentation/translations/zh_CN/doc-guide/parse-headers.rst references a file that doesn't exist: Documentation/userspace-api/media/Makefile
-   Warning: Documentation/translations/zh_CN/filesystems/gfs2-glocks.rst references a file that doesn't exist: Documentation/filesystems/gfs2-glocks.rst
+  * 1 mid-runtime real stall, pi-data-02 2026-05-05T13:24:09Z,
+    queue 0, tail=259564431 head=259564433 (2 stuck descriptors
+    after ~260M TX).  HW ETHS tx_frames counter advanced through
+    the event (~1535 fps mid-stall); driver tx_tail did not.
+    Patch 3 watchdog re-kicked TSTART; user-space watchdog
+    logged zero RECOVER events for that window -- kernel-level
+    recovery completed before user-space noticed.  Consistent
+    with the lost-TCOMP pattern.
+
+  * 6 boot-time false positives during the 2026-05-02 rolling
+    reboot, all tail=0 head=5-7.  Patch 3 v1 has a real bug:
+    tx_stall_last_tail is initialised to tx_tail (=0) at
+    macb_open(), first tick fires at +1000 ms; if autoneg
+    hasn't completed by then, tail is still 0 from no-TCOMPs
+    while head moves from kernel-queued packets, false stall
+    fires.  v2 fixes this (details below).
+
+
+## Théo -- the four questions on the cover
+
+Welcome to macb maintenance.  Quick answers; raw 1 Hz traces,
+dmesg dumps, and event logs available on request for any of
+these.
+
+  1. Tx-only or Tx+Rx broken?
+
+     Tx-only at the MAC counter level.  Per-node 1 Hz trace
+     captures the same signature on every wedge:
+     /sys/class/net/end0/statistics/tx_packets freezes at a
+     single second, rx_packets continues to grow, MAC IRQ
+     counter (on the assigned CPU) continues to advance,
+     NET_RX softirq counter continues to advance.  The
+     "broken Tx & Rx" reports (lexfrei et al on cilium#43198)
+     are the user-space symptom: TX dead -> TCP can't ACK ->
+     nothing comes back -> looks bidirectionally dead from
+     applications.  At the MAC counters the asymmetry is
+     unambiguous.
+
+  2. Recovery: link down/up vs module reload vs power cycle?
+
+     On any system that's still otherwise responsive, link
+     down/up suffices and is the lightest known recovery.  My
+     user-space watchdog has run that primitive on 24 nodes
+     for ~3 weeks; ~6-10 s wedge-to-Ready, every time.
+     `modprobe -r macb && modprobe macb` (rtheobald) is a
+     heavier-weight equivalent of the same thing -- works but
+     unnecessary if link-toggle alone fixes the silicon state.
+     "Power cycle only" (lexfrei) was on Ubuntu raspi 6.17 with
+     the ondemand governor + frequent RCU stalls preceding the
+     wedge (per launchpad bug body's "KEY OBSERVATION" section);
+     my read is that case escalated past clean NIC freeze into
+     kernel-wide unresponsiveness, so a NIC-level recovery
+     couldn't reach it.
+
+  3. TSO / SG / EEE disabling helped some reporters?
+
+     Mixed picture, with one gap in my matrix.
+
+     Tested fleet-wide since 2026-04-24 as baseline before this
+     series:
+       * EEE off (--set-eee end0 eee off + advertise 0x0)
+       * TSO off (-K tso off)
+       * GSO off (-K gso off)
+       * RX/TX rings 4096/2048 (default 512)
+       * IRQ affinity moved off CPU0 to CPU3
+       * CPU governor schedutil (default) -- earlier tested
+         performance, no change
+       * qdisc fq -> pfifo_fast
+
+     With all of those, the stall still fires.  Pre-patch
+     fleet rate was multiple per hour with these knobs already
+     applied.
+
+     Untested by me: TSO + SG (scatter-gather, NETIF_F_SG) off
+     *together*.  That is the specific combination rtheobald
+     (cilium#43198 comment 4188846955) and the launchpad
+     commenter (#34) report as masking the stall -- "must be
+     both, not just one".  I tested TSO + GSO, not TSO + SG.
+
+     Both patch 1 (PCIe-fabric race on TSTART) and patch 2
+     (peripheral DMA retirement race on TX_USED) are
+     consistent with descriptor-fragment-path interactions
+     that SG-off would mask, so the workaround being real
+     isn't surprising.  Closing the race rather than masking
+     it should still be the right thing for mainline.  Happy
+     to canary-test TSO+SG-off on one node if you want the
+     data point before v2 review.
+
+  4. cdns,*-max-pipe DT props -- lead dead?
+
+     Yes, dead, per the commenter who pursued it (launchpad
+     #2133877 comment #30, April 2026): they patched mainline
+     6.18.18 to add the device_property_read calls for
+     cdns,ar2r-max-pipe / cdns,aw2w-max-pipe / cdns,use-aw2b-fill
+     *and* added those properties to bcm2712-rpi-5-b.dts; ran
+     a few hours; their own follow-up: "this is a dud" -- node
+     hung anyway.
+
+     For reference, my build (raspberrypi/linux rpi-6.18.y @
+     f2f68e79f16f) has the driver-side reads present but the
+     DTS does not set the properties, so the AMP register
+     defaults are in effect on my fleet and the bug still
+     fires.  Two independent confirmations the DT props are
+     not the fix.
+
+
+## My own audit -- two issues v2 fixes
+
+Worth disclosing before someone else catches them.
+
+  * Patch 2 (v1) reads ISR in macb_tx_poll(), masks off
+    everything except TCOMP, and discards the rest.
+    raspberrypi_rp1_config does not set
+    MACB_CAPS_ISR_CLEAR_ON_WRITE -- the driver assumes
+    read-clear ISR semantics on RP1, and macb_interrupt()
+    relies on processing every bit it reads in one pass for
+    that case to be correct.  My v1 patch breaks that contract:
+    any RCOMP / ROVR / TXUBR / etc. set in ISR at the moment of
+    my read is silently consumed and never processed.  RCOMP
+    being lost is the worst case (RX completion never scheduled
+    until something else asserts the line).  Race window is
+    ~200-500 ns per macb_tx_poll completion; significant at
+    moderate-to-heavy RX load on a level-triggered IRQ where
+    the consumed bit drops the line before GIC delivery.
+
+    v2 patch 2 drops the ISR read entirely and substitutes
+    (void)queue_readl(queue, IMR).  IMR is the read-only mask
+    mirror, no side effects, still flushes prior peripheral
+    DMA writes via PCIe ordering.  Loses the "directly sample
+    latched TCOMP" half of v1's claim; keeps the PCIe-barrier
+    half (which is the half that actually addresses the
+    documented race in the existing macb_tx_complete_pending()
+    rmb() comment).
+
+  * Patch 3 (v1) boot-time false positive described above to
+    Andrea.  v2 fixes:
+
+      - netif_carrier_ok() gate -- no carrier, no completion is
+        possible, don't fire.
+
+      - tracks tail movement via a bool tx_stall_tail_moved set
+        by macb_tx_complete() under tx_ptr_lock when tail
+        advances, cleared by the watchdog tick on the same
+        lock.  Form suggested by pelwell when he reviewed the
+        same series anchored against rpi-6.18.y at
+        raspberrypi/linux#7340 (merged 2026-05-08); 13 days of
+        fleet runtime in this form since 2026-05-02 across 24
+        nodes.  Folded into mainline v2 patch 3 directly rather
+        than carried as a fix-up.
+
+      - netdev_warn_once -> netdev_warn_ratelimited per
+        Andrea's ask -- operator visibility doesn't disappear
+        after the first fire.
+
+
+## v2 follows
+
+Sending [PATCH net-next v2 0/3] threaded under the v1 cover
+shortly.  Plan to drop "RFC" from the subject prefix (~3 weeks
+production runtime + the rpi in-tree merge tip the balance
+toward a regular PATCH); happy to revert to RFC if you'd
+prefer the iterative-review cadence.
+
+Tested-on context for v2:
+  * mainline-anchored:  builds clean against current net-next
+    HEAD, applies cleanly.  Boot-tested in a canary build of
+    my Talos image before this reply.
+  * rpi-6.18.y-anchored equivalents:  in production on 24 nodes
+    since 2026-05-02; in raspberrypi/linux master tip since
+    2026-05-08.
+  * The v2 patch 2 IMR-barrier form (the one that fixes the
+    destructive ISR-read regression described above) was rolled
+    to all 24 Pi nodes earlier today (2026-05-14, ~14:00 UTC) as
+    a vendor-fork-anchored update.  ~120 cumulative node-hours
+    of runtime since:  zero mid-runtime TX stalls; zero user-space
+    watchdog RECOVER events; the 5 dmesg "TX stall detected" lines
+    are all boot-time false positives of the form `tail=0 head=N`
+    that the new `netif_carrier_ok()` gate in patch 3 eliminates.
+    Pre-patch baseline rate (~0.5 stall/node-hour at fleet level)
+    would have predicted on the order of 60 mid-runtime stalls in
+    that window; observed is 0.
+
+Thanks again to both for the review.
 
 --
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Lukasz Raczylo
 
