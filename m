@@ -1,169 +1,134 @@
-Return-Path: <netdev+bounces-287914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287915-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mKirGDOnBWrtZQIAu9opvQ
-	(envelope-from <netdev+bounces-287914-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:42:59 +0200
+	id 0LNrGpqnBWrtZQIAu9opvQ
+	(envelope-from <netdev+bounces-287915-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:44:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCB2F54085C
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:42:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D249F5408AE
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:44:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7DA7F302497B
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:39:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1E88302A536
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52515387341;
-	Thu, 14 May 2026 10:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE83387348;
+	Thu, 14 May 2026 10:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IoC+8l/7"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21563859DC
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 10:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FC7385D9F;
+	Thu, 14 May 2026 10:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778755142; cv=none; b=DCq6/mdkfYhK/NhSdzF3hDu6GNmKWZdmUGOYIi9exh3U5ZmiD2q6TW+gdEA7+f/AJTVpgLkZg9VJyD41W4qfBVY92xaLqhCOpNzUmjtw1S6JBtzSIGa1RIJeMMFQ2j7u5IPZUAWDyGw+wKql4AAvVHzD3Q64ZgD9lCtmdSAzDqs=
+	t=1778755261; cv=none; b=sbXtMxBnrSvAP+Zxw+KtqYT7qsQIkKCpLECwqjFcZusQlmCyBO3m6ezE7Tkt3e7enLiUx1owxwq2pDJ8rXIy3WiRmeA2RbJl1G8F2UvmUYVQrjuD1PI5gPC6aDfV1TZRo6RUfdG5SkVFLTG7R19cXxWQBbR5hmIoRvHnbnmUOAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778755142; c=relaxed/simple;
-	bh=Dp7wpANo6hZOELEjCTDK5fabhzCycxcBtPvddLI6s0Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tgrkMKEYWictEf6mEVBoRCodjs0Vnnj3Td8JCD1kX0P0oLqqt57VVTvQaiFgbifOo5yGjfq18es7qX7l0wrEZRmjiYHIH4bXKxAF/2J1Lwf4UCzaz4x0ptEs6CBZWfKj8+O6ZvDEJ+nar1cEOjcwVWwJJAQzTkkb/uICGHFZxbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64EAcNhl011106;
-	Thu, 14 May 2026 19:38:23 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64EAcNEP011103
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 14 May 2026 19:38:23 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <260a0064-0fa2-40cc-bb8c-1ee29f12dd1d@I-love.SAKURA.ne.jp>
-Date: Thu, 14 May 2026 19:38:19 +0900
+	s=arc-20240116; t=1778755261; c=relaxed/simple;
+	bh=j4aeJ7hXLCW0IznM2rND+H9lSOsX/xzQ3lxoy3VVbRM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=V6WSH8QxSAAcr20hGdOoab2wwgrKomxJlMGbALWX1GV4Y8DDGcc8Xco/2+qT/j/b5cbGHV4UoZ1fIjjKB8CuAEk2kYqaKQzb78a1tBhNwsET+EpFRsFYYWTilqpIMLS9IXH2+XSH3SSnlmlyf7zyUOsFJlCsSLMjKUVKjV+Zr1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IoC+8l/7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D53C0C2BCB3;
+	Thu, 14 May 2026 10:41:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778755260;
+	bh=j4aeJ7hXLCW0IznM2rND+H9lSOsX/xzQ3lxoy3VVbRM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IoC+8l/7IR59VKZpjXx2e4VsFxFV1Ixw8dQabrjc2zDtvzaCYPNoN2zvkd8xHkyGH
+	 fJd4RimnDPWJ4UYaDdfxV86xJvAVf8YbHP3kAbxcuNkFcPl25zufNw/kd5u+MvONC0
+	 27f2oIHcaV2+UnG+YxRBF23kpA5DCT0b7uoyjPII/3x2EqoIZnjxzB9dP3ZFcJvTRM
+	 4cQ5zQX6rpxuFkt7ogKNF4QoSrh1qo+2Tz7mv8lf6s3itgKfvgjkT3XU99XHTJXrAB
+	 cy4nPTmXJecHsSPSZjy9gRuB6Q06toLUQ1P8R8eI61xuIArTjvPyWTmU6wWzCtsvfk
+	 RK3haeaFMgqXQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DAC3931095;
+	Thu, 14 May 2026 10:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ipv6: addrconf: skip autoconf on unregistering
- devices
-To: Xu Rao <raoxu@uniontech.com>, idosch@nvidia.com
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-        horms@kernel.org, kuba@kernel.org, kuniyu@google.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com,
-        syzbot+e2af46126e0644cbebdd@syzkaller.appspotmail.com,
-        willemb@google.com
-References: <20260513073031.GA344043@shredder>
- <16DB33EB3B04B258+20260514094412.1497787-1-raoxu@uniontech.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <16DB33EB3B04B258+20260514094412.1497787-1-raoxu@uniontech.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav204.rs.sakura.ne.jp
-X-Virus-Status: clean
-X-Rspamd-Queue-Id: BCB2F54085C
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net/smc: reject CHID-0 ACCEPT that matches an empty
+ ism_dev slot
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177875520580.4063424.14829510725858797644.git-patchwork-notify@kernel.org>
+Date: Thu, 14 May 2026 10:40:05 +0000
+References: <20260511062138.2839584-1-xmei5@asu.edu>
+In-Reply-To: <20260511062138.2839584-1-xmei5@asu.edu>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: netdev@vger.kernel.org, alibuda@linux.alibaba.com,
+ dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
+ ubraun@linux.ibm.com, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ bestswngs@gmail.com
+X-Rspamd-Queue-Id: D249F5408AE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287914-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[i-love.sakura.ne.jp];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linux.alibaba.com,linux.ibm.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287915-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,e2af46126e0644cbebdd];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.978];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,I-love.SAKURA.ne.jp:mid,syzkaller.appspot.com:url]
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 2026/05/14 18:44, Xu Rao wrote:
-> The reproducer is the syz repro from the syzbot report:
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sun, 10 May 2026 23:21:38 -0700 you wrote:
+> On the SMC-D client, slot 0 of ini->ism_dev[]/ini->ism_chid[] is
+> reserved for an SMC-Dv1 device. smc_find_ism_v2_device_clnt()
+> populates V2 entries starting at index 1, so when no V1 device is
+> selected slot 0 is left in its kzalloc()'ed state with ism_dev[0] ==
+> NULL and ism_chid[0] == 0.
 > 
-> https://syzkaller.appspot.com/x/repro.syz?x=103f3dba580000
+> smc_v2_determine_accepted_chid() then matches the peer's CHID against
+> the array starting from index 0 using the CHID alone. A malicious
+> peer replying to a SMC-Dv2-only proposal with d1.chid == 0 matches
+> the empty slot, ini->ism_selected becomes 0, and the subsequent
+> ism_dev[0]->lgr_lock dereference in smc_conn_create() faults at
+> offsetof(struct smcd_dev, lgr_lock) == 0x68:
 > 
-> I don't have a standalone C reproducer. I asked syzbot to test the patch
-> against the original report tree:
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-> 
-> The reproducer did not trigger the issue with this patch applied:
+> [...]
 
-Will you test your patch with
+Here is the summary with links:
+  - [net] net/smc: reject CHID-0 ACCEPT that matches an empty ism_dev slot
+    https://git.kernel.org/netdev/net/c/277740023def
 
--		if (dev->reg_state == NETREG_UNREGISTERING)
--			break;
--
-+		WARN_ON(dev->reg_state == NETREG_UNREGISTERING);
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-and confirm that WARN_ON() fires, for nobody knows whether this refcount
-was obtained after dev->reg_state became NETREG_UNREGISTERING ?
-
-Please be aware that the stack traces that follow
-
-  unregister_netdevice: waiting for netdevsim1 to become free. Usage count = 2
-
-do not indicate that these references are obtained after the
-
-  unregister_netdevice: waiting for netdevsim1 to become free. Usage count = 2
-
-message was printed. The stack traces indicates only where the leaking refcount
-was obtained.
-
->> The kernel repeatedly sends NETDEV_UNREGISTER notifications when it's
->> waiting for the reference count to drop.
-
-It is true that the kernel repeatedly sends NETDEV_UNREGISTER notifications,
-but it is not always true that the NETDEV_UNREGISTER handlers works for
-every notification. Some NETDEV_UNREGISTER handlers do something for only
-the first NETDEV_UNREGISTER notification and is do nothing for the subsequent
-NETDEV_UNREGISTER notifications, for a NETDEV_UNREGISTER handler might
-unregister cleanup functions (and fails to cleanup resources obtained
-afterwards).
-
-My experience says that operations which are not serialized by the RTNL lock is
-more prone to this refcount race than the netdev handlers which are serialized
-by the RTNL lock. To close such race, we need to check operations which are not
-serialized by the RTNL lock. An example was commit 5d5602236f5d ("can: j1939:
-make j1939_session_activate() fail if device is no longer registered").
-
-> The guard only affects the MTU / UP / CHANGE paths. The problem I was
-> trying to avoid is creating new IPv6 state once the device is already in
-> NETREG_UNREGISTERING. In the syzbot trace, addrconf_notify() is reached
-> from a NETDEV_CHANGE path and then creates a link-local address and its
-> route while unregister is already in progress. The route then holds a
-> netdev reference via fib6_nh_init().
-> 
-> So the patch does not rely on suppressing unregister processing; it only
-> prevents late autoconf from adding new state during unregister.
-
-Unless you confirmed that WARN_ON() fires, a single successful "#syz test" response
-is not sufficient for believing that your patch actually fixes this problem.
-
-I think that we want some debug printk() patches like
-https://lore.kernel.org/all/e0c7030b-261c-4ed1-b6b0-bf3b83a41d60@I-love.SAKURA.ne.jp/T/
-in order to get more debug information.
 
 
