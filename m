@@ -1,231 +1,198 @@
-Return-Path: <netdev+bounces-287929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287930-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MEOhLE2sBWrHZgIAu9opvQ
-	(envelope-from <netdev+bounces-287929-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:04:45 +0200
+	id YNUeBt6tBWrkZgIAu9opvQ
+	(envelope-from <netdev+bounces-287930-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:11:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05B3540C03
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:04:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 168DD540D2A
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:11:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C12DA3003BE4
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:59:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2500A3006834
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54A93A7588;
-	Thu, 14 May 2026 10:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CD13A7583;
+	Thu, 14 May 2026 11:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UvYzigWJ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="suo/og8l"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="c0PWv/zP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012020.outbound.protection.outlook.com [40.93.195.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4C318EB0
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 10:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778756371; cv=none; b=oGkZHQvRqzeAOBcqPiBEYJZVdjoUBt7PH9D23x6RN2zNruqZitP7Wv22TIlKSvCTPqa2GASFZ/J7Jenuu0rcQ52A9pzJnKumB8NX0qeFuniaGoUb9j0LwLJseau5k+NmH+CDoA6ltCIkz7DVGe5j7+TR2rmIhJI2U5swYeoVSBw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778756371; c=relaxed/simple;
-	bh=+mUnVQylUsDcmls59bbfiO0X1W5hSrNZLgtjUmSZ+zU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CagbjV+wHZjjmFbV3Y2N+bSjuFMopLszYxBR02SLF6tABSSbU2HGM+LI6xXATmSHVA9MngN60OBmvI2KfTQQzfi1qZLESOFi67CNMfC6B4L9fl4UxtcRUV+QoiFGK0ZFl7CAq8KGCnPjbEtuAEBZhiSpvellaBRjjIXQh4uyEns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UvYzigWJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=suo/og8l; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778756369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=udt7N9vsXQlnId0Awve0KX4MLn70Hej/jGjPBdK6ljQ=;
-	b=UvYzigWJtvfXBpoulxzgagYD3LdJJ3Pg7Wjsz0tMam+TWwjzdxLiZ8jywt7Qpui7W6gpvC
-	He5ZZUJ5UAZIBwM8Fba0zFrnntyZJFz3tSDYj6frSCjFTLmGR6sch4LfGmdNlvQuvxjTsd
-	S+iECKjM+jiQp2aITURBgM2Hvt/h8uY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-44-1Sl21YuNOtqbHAXP0eF8eA-1; Thu, 14 May 2026 06:59:28 -0400
-X-MC-Unique: 1Sl21YuNOtqbHAXP0eF8eA-1
-X-Mimecast-MFC-AGG-ID: 1Sl21YuNOtqbHAXP0eF8eA_1778756367
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b941d4b7f2cso763693066b.1
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 03:59:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778756367; x=1779361167; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=udt7N9vsXQlnId0Awve0KX4MLn70Hej/jGjPBdK6ljQ=;
-        b=suo/og8l5OyTy1fWy74zzkBNmBU0i/6aTdTSy5UqDdIh6VDFz0W5P5V1M0G3pXk0yV
-         4Rwrr5IuVdXo20uTtBnJnWijUy8T3S7MDbCsQR2Hg3gPnaGZIEDC3bB7cAT/u0lwVHds
-         e1UgkBXOPXAlvaKbUeePb+OGYXl8eW5AfvhGC2xCyLH+25nxVrZXNtRX6G/uhwNLE+go
-         OW5aynFSlKHxFTwSwNmaf8re+6RomngHj/V5go8cvlmzW9ZgwdROZcwrSFreUsVM1Pdv
-         igpVIj4nMJ0AbGLsKb5sEMyif8BXggfZx68tvqwLZFWvCfX1jp/nahBm+HpLndzj53OD
-         4Rww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778756367; x=1779361167;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=udt7N9vsXQlnId0Awve0KX4MLn70Hej/jGjPBdK6ljQ=;
-        b=VLKK2+4NV5H1Xqyd6jTOUeNQhe1ivfdl1D41rqEMEtzrHWe4Fm+cZJml6210T7ed3Z
-         Ie3D2RPPQaRDRPmBvxCdaswj79JI4Gby1AKUd6+KCItpixZuqEDbm13//NMsGlwHpKxe
-         vpVkl0TfiytNTLTUH3eQH8RXrmqooVH/DwqSTC2lfmgtszjL1NUWNZo4q6VkzwrOlH9d
-         hB8u2ngA33RCy0c7zC8Y0+UcdD3xTYNreF68hPv2ZFyrEyEgxun8noA44GISo/dkU74p
-         w6Hxn9+KvNRRh1NLmXeAAKT9uVSBBECHT4qK+/6MWkzQibFRYzo7W4EkxUy0r9BE/1JP
-         q4tQ==
-X-Gm-Message-State: AOJu0YzGykPHAUUtvO8dK/O+2RYPTuXiHOxyu9vC2iIFA/P2r/axpMNY
-	ildeHrrwngSSsLeMPAq0N4fT9SHnQcGJWHA+Qm/aZcs3ge+aVoNo9T9p81SIAYoSTFNyUbnzAg/
-	pKg7/2RU5Ac+PhZJ3nhJDgzzzYF1mAgq2BDHM4K3pKQIU7mPDMfyEXUqIzA==
-X-Gm-Gg: Acq92OGw4Mdoxqg+nxhm+Yx7NfAJNP8PuGLppNSeLTAthWVQLIeKR4U0XxzF7r2i7Fy
-	ztV4XQVq+ixX76Ec/c47U1au5IJJoOk7h2PA7y39iE1dgfTd2V457ZHy5R1VwzHT/n5g/qhGzCx
-	5cnPs7u+vHKcsU14hNl1I8iR3tWh3BJdkwlmCSlHCQBoFc4s8oLl16GAHAljVWZ+acpoyOlmU/k
-	K/LhdGs5Z6U/D+pKvbeAbkxJI8REEyajqrBWAUZNdopEpMdFvSc0ToQn2WEsG11cZakPkfza5td
-	jXcZTYtliLORQMAaCF9jCbOhthDOn2ZzX3FWr6OEqEoxUaHcQ1p5ORmp5utnS6p+ULL+HqY4VuB
-	AQWZ0h1bnkCNut5L7WIk3aHx1YA9n9mi323zzgo3ClbyFrD9nOLsNXSQ=
-X-Received: by 2002:a17:907:86a0:b0:bd4:3df7:3791 with SMTP id a640c23a62f3a-bd43df7571emr431254966b.14.1778756366670;
-        Thu, 14 May 2026 03:59:26 -0700 (PDT)
-X-Received: by 2002:a17:907:86a0:b0:bd4:3df7:3791 with SMTP id a640c23a62f3a-bd43df7571emr431252266b.14.1778756366139;
-        Thu, 14 May 2026 03:59:26 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.9.106])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68310b3e6d1sm617415a12.5.2026.05.14.03.59.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 May 2026 03:59:24 -0700 (PDT)
-Message-ID: <eb06cfd2-6ee4-475d-bafd-9331b879692e@redhat.com>
-Date: Thu, 14 May 2026 12:59:23 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9180357D03;
+	Thu, 14 May 2026 11:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778757080; cv=fail; b=iPdMybuAVVKuSAWU7yWUOBtDPt1sgyKKRGk9ZnKuEZyJHtO3rZ11xA63iCF68HdVQsAH3bYaZkxAjKxGluBUU2pWZBZfYvTTZXvtMcoRzykc8TIZsvWJUxw6wEe/cNukOseHWAnTpyxtivISw9lwIq8W9fo3v7jc95oIEKzW1qY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778757080; c=relaxed/simple;
+	bh=HKqodaFdS5LML5X5GhYqnwNAwz/m/hMbjkBwNvhOjEI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KpF+rcIlmEFT0FhLUREaqxc6eNiA1irbYqDf6M0coLGBmBhNktCA4etwXqx/z7sl63WTqqrKSzE/KIVciThkHtv6TgmTi4oDvUGRIfeMBxOjvuuRQ8Gs1Hot+cQLWkr5Y3GqfYjxLiW4iJ3hy14TPf2dWwv4im6fc6/3k+5Ts6I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=c0PWv/zP; arc=fail smtp.client-ip=40.93.195.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rkarbKSX8UBRwUGJ1wq/Ji0I9srgk38tBomUeCqfciEivBReeucL1W4bXtu2xCWRKsrJX/eyCqIG5gDsYtOBQT/La8qD2dgjSKehf04UizahQ4qEmu4QfNxRimeOoXK/eeoe2jLrNG60zIcEyh43HTD3lGB/QlESO4F/BrrnKZ/qbUn0blPMVgi6cNE/eHp8GkEBXxKpVsDJVjRSiwCPLCwI/tikKHVi8RgYuN7wunFRSVxLPD13rJmW3edmfe7km6GUiO+YVJ0pMdCriZwwsVblnOPOXMTjAq7z8jidT2Zzrdhg11XaNtUpzkwNBPhMnsMu95VNXK6CGFZuCOfnoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=49sgA6YMf7HVnEzQNrMm6TPQCz1bIe1u4LcfDyjf9lo=;
+ b=FQ1+EkZlDwNS1qRyMy6GHBBZgUQx6aGstDdbVAhpeKM3neAyAnnw0V1hy92TKktbGZ6GobkEfE78WvT6IEnZA7JpSod13CagD430pythvZTwvYK0kyGPN5gWPUdEVPMywRwUr3h1oKFsmAcoRwSLqfHPGHLiNixwedJT++JpiLXgOyyHx/ZWc6Fpp2eMS9YfpcFTHfJ1Q6bisQ/Apc1Zvrx1mLIiUnJ6zb6bSMCDjqm3xyTI1MyZInvwaD2bZH93aCoEfvAvwmvKuU6I01LQKumQ7AcuyuOf4VOsJJ7iG4iemS6FD6dtbdQNSYq73GR1KEOVpPckkDX4eiD23SoplQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=49sgA6YMf7HVnEzQNrMm6TPQCz1bIe1u4LcfDyjf9lo=;
+ b=c0PWv/zPkTI8WYTjhUnJPZ11807L5xXEB3HMCeMS/3JX2rFoYt0i3418gSe6IyWHiH7OtCUdtA0X3MH7pQz0eq+pAiikgtqmfguy4oIT5ytkMfdag+Ws4mvmlGwESjamCD5KcLXidFy/rKwgAzYiHiP5Abg1atr39a5b2VHC0GXk9H6hucaZq5Y4MPccUooRG55nu2V1kVGhpjgl+uYsw/tCL7J/mZFWMWS0UoH1PAusoytQfmloZDmmodrdLTaNIqYIFwJfoveW4QZR8Vu/XFngaP6/Js8k7JrVjMAp19td+xSPkb8qmc25CHMIjRs/Zcb8GtISg7EiSoz5j8Y87A==
+Received: from SJ0PR03CA0080.namprd03.prod.outlook.com (2603:10b6:a03:331::25)
+ by IA0PR12MB8908.namprd12.prod.outlook.com (2603:10b6:208:48a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.12; Thu, 14 May
+ 2026 11:11:13 +0000
+Received: from SJ5PEPF000001D6.namprd05.prod.outlook.com
+ (2603:10b6:a03:331:cafe::1c) by SJ0PR03CA0080.outlook.office365.com
+ (2603:10b6:a03:331::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9913.12 via Frontend Transport; Thu,
+ 14 May 2026 11:11:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SJ5PEPF000001D6.mail.protection.outlook.com (10.167.242.58) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.25.13 via Frontend Transport; Thu, 14 May 2026 11:11:12 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 14 May
+ 2026 04:10:57 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Thu, 14 May 2026 04:10:57 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Thu, 14 May 2026 04:10:51 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Boris Pismenny <borisp@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, "Mark
+ Bloch" <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
+	<sdf@fomichev.me>, Shahar Shitrit <shshitrit@nvidia.com>, William Tu
+	<witu@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Sabrina Dubroca <sd@queasysnail.net>, Kees Cook
+	<kees@kernel.org>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>, Gal Pressman
+	<gal@nvidia.com>
+Subject: [PATCH net-next 0/2] net/mlx5e: simplify and optimize napi poll flow
+Date: Thu, 14 May 2026 14:10:36 +0300
+Message-ID: <20260514111038.338251-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: qualcomm: rmnet: fix endpoint use-after-free in
- rmnet_dellink()
-To: Weiming Shi <bestswngs@gmail.com>,
- Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
- Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
-References: <20260511120015.2298403-4-bestswngs@gmail.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260511120015.2298403-4-bestswngs@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B05B3540C03
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D6:EE_|IA0PR12MB8908:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc18b5b9-be79-4b87-c100-08deb1a98280
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|7416014|376014|1800799024|82310400026|56012099003|18002099003|11063799003;
+X-Microsoft-Antispam-Message-Info:
+	TSQJ/YLYkf+Z/J0Yb57fFa30U3YoEbk9A3MxKGYpcLi1Hmwz6f1+6JxzV+liaSc415XtMDcWE1VIbz8NDrDh9KUT414kqVpNHbG0XwYyAtbIIq2FWHLJXgXRUbIPasCVGaOAhWJO9gm/Uo4nEcxRj50ceNGTFGg/4OmE/YhpH37kaM0W0IAGO2pWzNid1o8WD14A58Ab4EORgA84QlOCLJ2rpPC5lILQQFxFcg9+dDuJ1qMBdLs2D/G+GwM86+n26WTbfqrnygd0gdxU2ZZ33nLm3mKys875FCeTu8LD5wN4CBIbw3WGfxvNySL/TMP/o8RFMcEJimRXoRX29AJS+DhW1AjB0oX0f1JPtP0jMeZDDwyjujxBjLjOtAi3uWQvC03t+nYAv/2P7T3BZeg6+Hz8rYigW/yQjuA8kY0CLv6UBqc4DIxwGWobb22e91nHMUeZfFU+cBEQii/zgs6lg8ZF09u8C2jzyUxd0zifL/8Zq9zwEX+WF0pJBNo7SjEIkl8PyYg3EO8k0cRtX57gQOvmLCbrUF0JGWL9nvHVyiSGb2TFeOoEegl0L29PgCyY0nHOGVh95pyGT2W9rO950Kx6m6b9s+3LaOQlka1vRr23q4s6B3Ye2QT+4teKUcmloSknGBd/ysqfJ+QeUy+lCnLey6RHLwlhF7cpCV4YFObi5VZiT3lwXqOjhvUXgOpnaUH+KD5mQOz3z8xk2xN8GoFdp7dZLZBKYB5U+TtEf9Q=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(7416014)(376014)(1800799024)(82310400026)(56012099003)(18002099003)(11063799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	tzxfzNOyfeW5oXKKJNL3UsVfrXWGCfj57PE0FdBSF2EADIJ7ql6Hv4dIv/UGo0owMoiRn5rg6vT5ccSfdG1RXnOHnBACGJGBILooCsaafzgbfTPJdw1AOEhxXt5EWz1/H68lt6FL215uIr8pfY/4LiMSGiEtzvO4RtoK2WBk9xMs+oBz0i101DHfke7wWzPmurIIToP//lvWspPphuRJ0J8kmFPl2ODyXxo7V2FM50auxjl8gEbZauY6xzke37aotRknxV9BRZivI/AqzeZySqlMB5fBSjsAmKhq0pRc8MEqyFm+hQFpXbL+vXrJpkKCqeQIU7YZhiI9dqwqam5epKdsuywrTgZAkuqfjKkJ9ceUVBGZhqqQIZSh4d+bbsfrYcmqRi7s6iNHV5S9+LPpZd0JCwK8NilxBDgBtw5pdFkvhqVy8LGDjjwGmvOKRTvk
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2026 11:11:12.9981
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc18b5b9-be79-4b87-c100-08deb1a98280
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001D6.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8908
+X-Rspamd-Queue-Id: 168DD540D2A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.84 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	TAGGED_FROM(0.00)[bounces-287929-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,oss.qualcomm.com,lunn.ch,davemloft.net,google.com,kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,google.com,queasysnail.net,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
-	R_DKIM_ALLOW(0.00)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	TAGGED_FROM(0.00)[bounces-287930-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	GREYLIST(0.00)[pass,body];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	NEURAL_SPAM(0.00)[0.155];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c15:e001:75::/64:c];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,asu.edu:email]
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-On 5/11/26 2:00 PM, Weiming Shi wrote:
-> From: Security Analysis <xmei5@asu.edu>
-> 
-> rmnet_dellink() removes the endpoint from the hash table with
-> hlist_del_init_rcu() and then immediately frees it with kfree(). However,
-> RCU readers on the receive path (rmnet_rx_handler ->
-> __rmnet_map_ingress_handler) may still hold a reference to the endpoint and
-> dereference ep->egress_dev after the memory has been freed. The endpoint is
-> a kmalloc-32 object, and the stale read at offset 8 corresponds to the
-> egress_dev pointer.
-> 
->   BUG: unable to handle page fault for address: ffffffffde942eef
->   Oops: 0002 [#1] SMP NOPTI
->   CPU: 1 UID: 0 PID: 137 Comm: poc_write Not tainted 7.0.0+ #4 PREEMPTLAZY
->   RIP: 0010:rmnet_vnd_rx_fixup (rmnet_vnd.c:27)
->   Call Trace:
->    <TASK>
->    __rmnet_map_ingress_handler (rmnet_handlers.c:48 rmnet_handlers.c:101)
->    rmnet_rx_handler (rmnet_handlers.c:129 rmnet_handlers.c:235)
->    __netif_receive_skb_core.constprop.0 (net/core/dev.c:6096)
->    __netif_receive_skb_one_core (net/core/dev.c:6208)
->    netif_receive_skb (net/core/dev.c:6467)
->    tun_get_user (drivers/net/tun.c:1955)
->    tun_chr_write_iter (drivers/net/tun.c:2003)
->    vfs_write (fs/read_write.c:688)
->    ksys_write (fs/read_write.c:740)
->    </TASK>
-> 
-> Replace kfree() with kfree_rcu_mightsleep() so the endpoint memory remains
-> valid through the RCU grace period. Also remove the rmnet_vnd_dellink() call
-> and inline only the nr_rmnet_devs decrement, since rmnet_vnd_dellink() would
-> set ep->egress_dev to NULL during the grace period, creating a data race with
-> lockless readers.
-> 
-> Fixes: ceed73a2cf4a ("drivers: net: ethernet: qualcomm: rmnet: Initial implementation")
-> Assisted-by: Claude:claude-opus-4-7
-> Reported-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+Hi,
 
-SoB tag must match the 'From' header, and must be a real name, likely
-'From' should be fixed.
+This series simplifies the mlx5e napi poll flow and reduces branching in
+hot paths by leveraging existing dependencies between channel features.
 
-Also you must specify the target tree in the subj prefix ('net' in this
-case).
+Patch 1 avoids passing the full channel object to kTLS RX code paths
+when only the async ICOSQ is needed, and slightly optimizes the common
+flow in the pending resync handling logic.
 
-Please have an accurate read of
+Patch 2 further reduces branches in napi poll by relying on established
+feature dependencies between XDP, async ICOSQ, XSK, and kTLS RX state.
 
-Documentation/process/maintainer-netdev.rst
+Regards,
+Tariq
 
-before submitting the next revision
+Tariq Toukan (2):
+  net/mlx5e: Reduce branches in napi poll
+  net/mlx5e: Let kTLS RX get async ICOSQ param in napi poll
 
-> ---
->  drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-> index 269c0449760c..2e17a43aec5a 100644
-> --- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-> +++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-> @@ -213,8 +213,8 @@ static void rmnet_dellink(struct net_device *dev, struct list_head *head)
->  	ep = rmnet_get_endpoint(real_port, mux_id);
->  	if (ep) {
->  		hlist_del_init_rcu(&ep->hlnode);
-> -		rmnet_vnd_dellink(mux_id, real_port, ep);
-> -		kfree(ep);
-> +		real_port->nr_rmnet_devs--;
-> +		kfree_rcu_mightsleep(ep);
+ .../mellanox/mlx5/core/en_accel/ktls_rx.c     |  5 +--
+ .../mellanox/mlx5/core/en_accel/ktls_txrx.h   | 12 +++----
+ .../net/ethernet/mellanox/mlx5/core/en_txrx.c | 35 ++++++++++---------
+ 3 files changed, 25 insertions(+), 27 deletions(-)
 
-This is under the rtnl lock and will wait for an rcu grace period, which
-is bad for rtnl lock contention. Please add an rcu field to `struct
-rmnet_endpoint` and use kfree_rcu() instead.
 
-/P
+base-commit: 18dc8e6d15d7a30888beec46a1e01ca0f98508fa
+-- 
+2.44.0
 
 
