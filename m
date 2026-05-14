@@ -1,150 +1,130 @@
-Return-Path: <netdev+bounces-287859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id APNVNNeKBWo5YQIAu9opvQ
-	(envelope-from <netdev+bounces-287859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:41:59 +0200
+	id kObhCwqMBWo5YQIAu9opvQ
+	(envelope-from <netdev+bounces-287860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:47:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE60A53F6D2
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:41:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A21FA53F763
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:47:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 48D8530091D9
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 08:41:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0705E3006B18
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 08:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320D53DD840;
-	Thu, 14 May 2026 08:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41690175A83;
+	Thu, 14 May 2026 08:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="EssHxRVR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CpRpluom"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D1B3DD52C;
-	Thu, 14 May 2026 08:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0C718872A
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 08:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778748113; cv=none; b=U83ySflwey7tzhRc0oIZZt6iAD1ckwYKhR0jbdJp5F7SGAVuOJ2mkAx8kRHAzbNWrQ4ykLpJxvsiY44p1W84Qe2OK8uPhztKXsiq4fxKN1M2IYhoOJhMEO4IRcqXFxbSY69jj5BbEGKGV3pXKlwWqb+IOlSqdpEY0YZ3ilpv8h8=
+	t=1778748423; cv=none; b=ZqqJHtAwT5mNvZ1Z+C4lLmpHg+MjDZsccAtoM46bJxk78Kq87LQckwjgCNYQ5q7qqzz4J+J7FoQ5ELhxlBxpUSPLbYbS21IjCmQtk24SPDLaIGPcjEb0O6sh3bgpxB9T5xcWfOSqoqsXCJnVjAKMWK3F4xUNkmINyUwGiX2rTxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778748113; c=relaxed/simple;
-	bh=BUf6yRc7cfw2DkYZCvBJARr5GmPhS/x9SOsA8vTUsxM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kej3wy4XBZiVpAUvPS4iAC3h1Ttms+4PtetU/CKj2IKW+OMia4U09Pzm/dfq0S8ZrPzR+m5wYr/ZkWC266mFI+uitEQhSG3n4umT6Re3h+FPIxfuWjPqe7crWWNbHLcv/4k2s2T82lgL4yn+9BRDf45M24tkp0wgDph1I28g7CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=EssHxRVR; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 9559F206BC;
-	Thu, 14 May 2026 10:41:42 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gsw1yiwEDnVI; Thu, 14 May 2026 10:41:38 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 38AE02068C;
-	Thu, 14 May 2026 10:41:38 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 38AE02068C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1778748098;
-	bh=0tW/UzCnqky1KfmQSl9AmA6QmBv78yWhZjcKJ3d0+Ck=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=EssHxRVRqpLZsn7E8j8nD7eZ3ZdED1EXLFsFM4y2PAwCE2qqWz13UYwyqUMp6slh2
-	 pGftnzSNQ/96L2hXh7AdJxSxbIDcPGn0mFkMFyGafOdbGX9hCrJRCdczb483Lfxawb
-	 8qt9I9LNvqCZazTLMYk3d532vjuCnM6ghuahc0ByWSJOuZAoyc6MFu5GrBe8j7C1tY
-	 E8mtooKSZu9iPVs6r0l9NjuKAl+zz9rsmIT3y9uuPxNvHImBAyCFdolMWqtRAbTz7O
-	 Go61vucC9PZPaMrFbwpxV9/gChM7SnwYHPalDnzTC+CE3e10B1ZJ6jGJG7CIQB/pAM
-	 RPhMSXjzIw6LA==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Thu, 14 May
- 2026 10:41:37 +0200
-Received: (nullmailer pid 2298820 invoked by uid 1000);
-	Thu, 14 May 2026 08:41:36 -0000
-Date: Thu, 14 May 2026 10:41:36 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Alessandro Schino <7991aleschino@gmail.com>
-CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <linux-kernel@vger.kernel.org>, e521588
-	<alessandro.schino@sbb.ch>
-Subject: Re: [PATCH] esp: fix page frag reference leak on skb_to_sgvec failure
-Message-ID: <agWKwJor5JSBW_QB@secunet.com>
-References: <20260514081123.1626-1-7991aleschino@gmail.com>
+	s=arc-20240116; t=1778748423; c=relaxed/simple;
+	bh=Tjk2mgXP8nCLMjxaj84LrGvT2za1jn81Qql0+HH2m60=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BvqT9ycbTFoOoGjoW8Gri6bvywx+YPBssf4GKJ5/2XifJ6SKkKvkmCOabjH6kE9d5uXLUwjqJULTRtjGw83FCB+9VrOcWdZipKwh3sNG+NnvoYfOzRBW765HgnL6N/ItpjKAbKUZu/9iJaixae/XX4JhvRg7JSScMSagdSmFM4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CpRpluom; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1707b255-05ac-4d7d-8f06-3c7ac37a23f9@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778748418;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L+5vhYqOMs+08q5GCwnmHLIY4Q44MOJ70WpVzrtoxJk=;
+	b=CpRpluomy60mzT8PZlRIqei7RdDxjZrTBwPkEex8a/yMA/MUUD1TrZgUoHQKbrHC79uiQd
+	l38VOplzHlzN+3w8edRGDeuUFFEglJP3F3WP6dWFGgoO3NI0TPOA4hjkx2Xfl0vQ3fhFUF
+	qZtB+w3iVhIGX7szMjPg4XSbcvyACwc=
+Date: Thu, 14 May 2026 16:46:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260514081123.1626-1-7991aleschino@gmail.com>
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Rspamd-Queue-Id: CE60A53F6D2
+Subject: Re: [PATCH net] net: skbuff: preserve shared-frag marker during
+ coalescing
+To: William Bowling <vakzz@zellic.io>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>
+References: <20260513041635.1289541-1-vakzz@zellic.io>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260513041635.1289541-1-vakzz@zellic.io>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: A21FA53F763
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287859-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287860-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sbb.ch:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,secunet.com:mid,secunet.com:dkim];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,linux.dev:mid,linux.dev:dkim]
 X-Rspamd-Action: no action
 
-On Thu, May 14, 2026 at 10:11:23AM +0200, Alessandro Schino wrote:
-> From: e521588 <alessandro.schino@sbb.ch>
-> 
-> In esp_output_tail(), when esp->inplace is false, the old skb page frags
-> are replaced with a new page from the xfrm page_frag cache. The source
-> scatterlist (sg) is built from the old frags before the replacement, and
-> esp_ssg_unref() is responsible for releasing the old page references
-> after the crypto operation completes.
-> 
-> However, if the second skb_to_sgvec() call (which builds the destination
-> scatterlist from the new page) fails, the code jumps to error_free which
-> only calls kfree(tmp). The old page frag references captured in the
-> source scatterlist are never released:
-> 
->   1. sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
->   2. nr_frags is set to 1 and frag[0] is replaced with the new page
->   3. Second skb_to_sgvec() fails -> goto error_free
->   4. kfree(tmp) frees the sg[] memory but old frags are not unref'd
->   5. kfree_skb() only releases frag[0] (the new page), not the old ones
-> 
-> Fix this by calling esp_ssg_unref() before the goto error_free when the
-> second skb_to_sgvec() fails. At this point, the source scatterlist in
-> tmp is fully populated, so esp_ssg_unref() can properly release all old
-> page frag references.
-> 
-> The same issue exists in both esp4 and esp6 as the code is identical.
-> 
-> Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
 
-As this is a fix, please add a 'Fixes:' tag to the commit message.
+On 5/13/26 12:16 PM, William Bowling wrote:
+> skb_try_coalesce() can attach paged frags from @from to @to.  If @from
+> has SKBFL_SHARED_FRAG set, the resulting @to skb can contain the same
+> externally-owned or page-cache-backed frags, but the shared-frag marker
+> is currently lost.
+>
+> That breaks the invariant relied on by later in-place writers.  In
+> particular, ESP input checks skb_has_shared_frag() before deciding
+> whether an uncloned nonlinear skb can skip skb_cow_data().  If TCP
+> receive coalescing has moved shared frags into an unmarked skb, ESP can
+> see skb_has_shared_frag() as false and decrypt in place over page-cache
+> backed frags.
+>
+> Propagate SKBFL_SHARED_FRAG when skb_try_coalesce() transfers paged
+> frags.  The tailroom copy path does not need the marker because it copies
+> bytes into @to's linear data rather than transferring frag descriptors.
+>
+> Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
+> Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
 
-Thanks!
+Tested-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
+I have reproduced and tesed it in 5.15/6.6/upstream with 
+https://github.com/v12-security/pocs/tree/main/fragnesia
+
+This patch fixed the issue.
+
+Thanks
+
 
