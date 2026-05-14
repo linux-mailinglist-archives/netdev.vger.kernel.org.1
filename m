@@ -1,141 +1,197 @@
-Return-Path: <netdev+bounces-288026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288027-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDaZF/buBWpWdgIAu9opvQ
-	(envelope-from <netdev+bounces-288026-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:49:10 +0200
+	id AIm1IBLwBWq3dgIAu9opvQ
+	(envelope-from <netdev+bounces-288027-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:53:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFEB2544405
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:49:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFFE9544552
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 725C4301226B
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:48:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69E5E3038142
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14AC2BD01B;
-	Thu, 14 May 2026 15:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4015D2E8DEA;
+	Thu, 14 May 2026 15:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Gge5iAVQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f8YV4Yj6"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94573090D7;
-	Thu, 14 May 2026 15:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3D2316197
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 15:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778773715; cv=none; b=D7rcJL6xgjJPWu2fmZHZ+4HEZMqNtt5EKLFRnXPQUcU+UCT0SbEa9Wh4V3ckmMGfOUpS4mVu+t0j56gbeiolDiJOS0xGpNOEpnRkHPpN8QDzvQ4ogITrdgYV/ghLxLY947wHmI1+xV59JMxt/RRxxmc3477wjsRQCwvd2zXO+hc=
+	t=1778774000; cv=none; b=Gtxz16KfnEJsdqJgA7YILtNR0ERFPsVmwty7qW/MCGsGpRwfsImBupDWE5yHT5eKrC3h9BuVGst+Z1twmjqIbPDkIqUwO/XgeGPtwcOvWHGRjq/yxk6/hfpiUUoJWfnOVrv0hFnF4mCgZkEOsN5b25Ig77AZnCj59AuwdBzp074=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778773715; c=relaxed/simple;
-	bh=23Y3629JSdEQ48nstGuML13Om1OZG3R1qIfmIRU3RrA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XqXfO15OByUTGlXZi/QNf2xwhKizB5wojQUjkvt0urHDgnRxuE+sPhkEqy5CiibpL4G4XlHnOxIjOAjdOr+3xVSN1CWx8byfc7hL8DQ7VNvDdqkMHcoMqeoOqyQxGpKM+Vd6Zd79+FxEl9dSRF1OKoG9vx9EZB7CkTEzLGfIoWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Gge5iAVQ; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
-	Content-Type; bh=PeqDcMV0a947KRRCLlzeVviDR+jdI93Fkb47jTMUgeA=;
-	b=Gge5iAVQvCEnCeDXs9jkwTc+4hzg742EX8wSnOS97Uz+7CkrRzxpEwmnxZ+pS6
-	Z3DzSbciJREdSadYhSXTht+Lz9onidmYvQT5hK449mCERhlHIct77UmOSyuMXFQ8
-	31OlXAkiqrfs3L3UsH9dr4jcLh/amjer/uYvWqK9OPJLo=
-Received: from [IPV6:2601:647:6300:a030:d09:4215:2d93:9875] (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wD3PxY47gVq6khdBQ--.36545S2;
-	Thu, 14 May 2026 23:46:06 +0800 (CST)
-Message-ID: <da3e46ad-a713-4d02-8ca2-fa402e236597@163.com>
-Date: Thu, 14 May 2026 08:46:00 -0700
+	s=arc-20240116; t=1778774000; c=relaxed/simple;
+	bh=l+rLmMg/hVX2hhsETNj9o6r4r9qcBCC30BsnxOxqUDs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NwO9LyjNaDZRlXl5lL3Do+eLEs45P27D+VbkM42EHhTosbk53cGh8MifW6SpC6Z4RnTJZU8a5NxVcDl0xjuxr3x5Z7iQuNzUQ7gS9xay79fO6oCXNotXn7cIenZD/a0FGFhkq2n2ZuJiFIY/nIlWlP6QWUBsJaFbPuersYGSfrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f8YV4Yj6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778773997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wPJD4cSvgohi5bUcmXKy4d3gwoNT23eATH97E0wX5lw=;
+	b=f8YV4Yj6aVnGFNvDvQDzPh1VBg/zx5S6FdS53xcrEquDONcJFDL97jRU2of+uIrMwT1yla
+	6eWpkrzqAaA6MV4gNwY/wMd8bqX/AnBcKX+xqyRd6ZtQJ1CTEuiQTMXrenpjXf3YRby5Am
+	4a0k2EYfJnlc278syF/lQCHweP5hstU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-139-aVvCfNSXPFq9J8wwaUEzPw-1; Thu,
+ 14 May 2026 11:53:14 -0400
+X-MC-Unique: aVvCfNSXPFq9J8wwaUEzPw-1
+X-Mimecast-MFC-AGG-ID: aVvCfNSXPFq9J8wwaUEzPw_1778773993
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 47831180061E;
+	Thu, 14 May 2026 15:53:12 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.48.83])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 37AF130002DA;
+	Thu, 14 May 2026 15:53:07 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3 0/4] rxrpc: Better fix for DATA/RESPONSE decrypt vs splice()
+Date: Thu, 14 May 2026 16:52:58 +0100
+Message-ID: <20260514155304.2249591-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
-To: David Ahern <dsahern@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Edward Adam Davis <eadavis@qq.com>, akpm@linux-foundation.org,
- arjan@linux.intel.com, davem@davemloft.net, edumazet@google.com,
- hdanton@sina.com, horms@kernel.org, kuba@kernel.org, kuniyu@google.com,
- leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com
-References: <20260513234655.GW7702@ziepe.ca>
- <tencent_3CCD70788A6EAC2D356D4C9674E8D2EEEA0A@qq.com>
- <20260514115048.GX7702@ziepe.ca>
- <139794f1-80b8-49d9-829a-0629379def51@kernel.org>
- <20260514141409.GA7702@ziepe.ca>
- <200b3923-d794-4779-8f90-a8b858861d4c@kernel.org>
-From: Zhu Yanjun <mounter625@163.com>
-In-Reply-To: <200b3923-d794-4779-8f90-a8b858861d4c@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3PxY47gVq6khdBQ--.36545S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Xr18uryxZw45Cr4rJr1rCrg_yoW3Awc_ur
-	4Dur92kr10qF4xZa1xJF1xZrsYgr4UWr1UAws5Xr13J34DAwsIqrsakryrZw48ZF47KFy7
-	GF1Syw1Yq3W2kjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU1TKZtUUUUU==
-X-CM-SenderInfo: hprx03thuwjki6rwjhhfrp/xtbCzR+m3moF7j81LAAA3N
-X-Rspamd-Queue-Id: BFEB2544405
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Rspamd-Queue-Id: DFFE9544552
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288026-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[163.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mounter625@163.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[qq.com,linux-foundation.org,linux.intel.com,davemloft.net,google.com,sina.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288027-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,auristor.com,kernel.org,davemloft.net,google.com,lists.infradead.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+Here are two patches containing better fixes for the in-place decryption of
+DATA and RESPONSE packets that can corrupt pagecache spliced into UDP
+packets and sent to an AF_RXRPC server [CVE-2026-43500], plus a patch to
+precheck the length of rxgk-secured DATA packets.
 
-在 2026/5/14 7:26, David Ahern 写道:
-> On 5/14/26 8:14 AM, Jason Gunthorpe wrote:
->> Edward, please come with a fixup on top of this since it was already
->> applied
->>
-> Zhu Yanjun: As author of the patch that introduced the bug and
-> maintainer of the rxe code, why have you not addressed this problem? It
-> has been well known for many weeks now and multiple people have
-I am aware of the issue and have been following the discussion and 
-proposed fixes.
+[!] Note that Hyunwoo Kim's fix is included as that is a prerequisite for
+the main patches to build.  This is in Linus's tree, but not yet net/main.
 
-I did not want to rush a change without fully understanding the 
-implications on RXE
+Of the main patches, one patch fixes DATA decryption by having recvmsg
+unconditionally extract the data into a flat bounce buffer and, if need be,
+decrypt it there.  It doesn't seem to cause a performance problem to do
+this even on unencrypted packets; for encrypted packets it makes sure the
+content is correctly aligned for crypto which seems to get a small
+performance gain.
 
-behavior and existing users. I am currently reviewing the proposed 
-approaches and
+Further, it means that DATA packets are no longer copied in the I/O thread,
+avoiding a slowdown of the protocol engine that runs there.
 
-working on a proper fix.
+The other main patch fixes RESPONSE decryption by having the connection
+event handler worker copy the data to a flat buffer and, again, decrypt it
+there.  This simplifies RESPONSE handling.
 
-I appreciate everyone who helped investigate and test the issue.
+With these two fixes, the data content of the received sk_buff no longer
+gets altered.
 
-Zhu Yanjun
+David
 
+The patches can be found here also:
 
-> attempted fixes. Seems like you need to step up and take care of it.
->
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-fixes
+
+Changes
+=======
+ver #3)
+- Fixed Sashiko review comments[2]:
+  - Fix wrong abort codes.
+  - Fix skipped rxgk_put.
+  - Fix some mis-sizeofs.
+  - Fix flipped length check comparison.
+
+ver #2)
+- In rxrpc_verify_data():
+  - Flipped the order of the buffer size comparison.
+  - Used max() not umin() to calculate the minimum buffer size.
+- In rxrpc_verify_response(), returned -ENOMEM rather than uninitialised
+  ret.
+- Removed the xdr wrappers that were added to make backporting easier.
+- Fixed Sashiko review comments[1]:
+  - Added length prechecking of received packets secured with RxGK, thereby
+    avoiding looking at an unallocated buffer.
+  - Added missing crypto free.
+
+[1] https://sashiko.dev/#/patchset/20260511160753.607296-1-dhowells%40redhat.com
+[2] https://sashiko.dev/#/patchset/20260513131941.1439155-1-dhowells%40redhat.com
+
+David Howells (3):
+  crypto/krb5, rxrpc: Fix lack of pre-decrypt/pre-verify length checks
+  rxrpc: Fix DATA decrypt vs splice() by copying data to buffer in
+    recvmsg
+  rxrpc: Fix RESPONSE packet verification to extract skb to a linear
+    buffer
+
+Hyunwoo Kim (1):
+  rxrpc: Also unshare DATA/RESPONSE packets when paged frags are present
+
+ Documentation/crypto/krb5.rst |  17 +++-
+ crypto/krb5/krb5_api.c        |  54 ++++++++++--
+ include/crypto/krb5.h         |   9 +-
+ include/trace/events/rxrpc.h  |   1 +
+ net/rxrpc/ar-internal.h       |  14 +--
+ net/rxrpc/call_event.c        |  20 +----
+ net/rxrpc/call_object.c       |   2 +
+ net/rxrpc/conn_event.c        |  29 +++---
+ net/rxrpc/insecure.c          |   8 +-
+ net/rxrpc/recvmsg.c           |  76 +++++++++++++---
+ net/rxrpc/rxgk.c              | 160 ++++++++++++++--------------------
+ net/rxrpc/rxgk_app.c          |  46 ++++------
+ net/rxrpc/rxgk_common.h       |  66 +++++++-------
+ net/rxrpc/rxkad.c             | 115 +++++++++---------------
+ 14 files changed, 315 insertions(+), 302 deletions(-)
 
 
