@@ -1,117 +1,114 @@
-Return-Path: <netdev+bounces-288024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288025-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aGK+F8bpBWr5dQIAu9opvQ
-	(envelope-from <netdev+bounces-288024-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:27:02 +0200
+	id cGWTD0HuBWpWdgIAu9opvQ
+	(envelope-from <netdev+bounces-288025-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:46:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4862D54404D
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:27:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DEF8544393
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:46:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1C8573024AAC
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:24:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A379F300950C
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF903428834;
-	Thu, 14 May 2026 15:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A5B1A6824;
+	Thu, 14 May 2026 15:45:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="pgvz75ge"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="D1BVIKXX";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RJdzz2/T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258C2425CE1
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 15:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6539175A6D;
+	Thu, 14 May 2026 15:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778772229; cv=none; b=rVldVucgatQKM12NvLkm0lmlvSMB6ASex+zL3G8xZuz54Rekfv6FbtlQAxuQHo0bm21kcsOoLZdyoVzdqlrcmSmOIMwTuvJfZbyCv+mrofkqyDxOXBQWAmKM1Rqnhpmk9RwGNTRYBPJrnwmdEcKYm8TGF9ULWHf5z6nnZ+874rE=
+	t=1778773552; cv=none; b=p9aXCXXyZ5aX1ZU4rm0OzGwi7dwoToiRGqIbaC838pS7+gLN+tRdcQuQvpftXwgG0/FJIrYX2HuiuJ7FvweP7dsgAWEfzRwSXokYsyFPcUdEx5ALbdbXvrzqf0RWYm045IsdHcOgjdE/kQ7ORTArBS2U98iab+8JkxlolrZSOEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778772229; c=relaxed/simple;
-	bh=UOMIBF6IJOiBHJ031b0CiERDKfflOx7IIddTWub9PkI=;
+	s=arc-20240116; t=1778773552; c=relaxed/simple;
+	bh=2eZQ28o2aeUb29+g7yRCupFzyRVNMQupfH8jXxpZaOY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pYW5QVkxWPXlNSKqzMu4yExJwZCDmOrrLGrJ9Zyu/Fj/KIL/QzeHxIQcn/wu3Yu3jccEmYWiOBG9iCaa9eyz+nGGtGkq1q2yvYhGAhXCxpQ9xaH6/UbESw9LaULQzOWudt6jtl4sV6rcbJJ21aq5HeAXoUlaA5BIErICdqYlwT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=pgvz75ge; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48896199cbaso70756955e9.1
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 08:23:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778772226; x=1779377026; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+gKCjNZN7Myh92wsTwdDyQ4hRCAPzb5zU67ocdyFfL8=;
-        b=pgvz75ge3T3pHSXjcn5SK35lIsvHyNnjvKxGsk1OE1n1+GkVrHDOlAel/reR/ffZ66
-         8Qcdr5EqrphM+swYHeUSFA0GNDCG2n2v8Ht4+kZsD/D+aLdhS4Jc2O6vt+l4yIiw3Rj3
-         9GKlGwBgqAl+t/5vIS5AwdiEyHuRgQ7dTWqGGjIBzPC1Y86UcpVcuIlT7VjpEgyc8Bv9
-         guo3BZGH5CowE/Pqdi94y423KthAb2trDX0vSUI4sxMAeZ54t28gIi5OFFTCcGqurkAp
-         TO/ZucoFQWaqi9yUErHCg6U+LQz+sNZdi27KukZJJCYEMXBVFvrfXb62CHBPyOshjyhy
-         dLzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778772226; x=1779377026;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+gKCjNZN7Myh92wsTwdDyQ4hRCAPzb5zU67ocdyFfL8=;
-        b=gz8VxamH2/AgKHU6J5qE9KVqliyA9biD3fxpGXGyrvVDTOHN5uHfaOpWrgeWC9xRaU
-         GdvwK1SzZ0t9dh4rEFwbo/4M7dwGYmEtwp68/KH//dy2MrFzyqqZ9wg5zeXCI9h0GE7z
-         Pv4UMWZAXjpNcctufkTROeFLre5VPhV3xdAMNKpHA3msZc60dmYW23v6Iwb0GXhbkc6I
-         mwHJMNvVuepicltrJbr5Glmcaqsb6E+NpKG910aS5cilBgMT31nJWxTSJx83n3FvZ5o2
-         Kon2K9s0VL8BwUFmvy5c354beyhD4RGuIiQnxZMZMQfjZzMyn+v8RmtHsndUIWNy1GEZ
-         YRkw==
-X-Forwarded-Encrypted: i=1; AFNElJ9xHzFpWmYexCZyktX5TJcfjtFze+2O5NLuIaNZT3+0Qh8wfCeaTEUNJOxZxfg8Za4que6rgoM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+69dN+6jT6hJGcsLS5lUHEVyk9Nl/J4uO6UrPZiy5ttVMcnfH
-	BeoL53LMc8FmQGSL1IhS94WZq7aXDfGblX5OtxU2tu9F96rmbjg9W8AQa0mftGiZ/p4=
-X-Gm-Gg: Acq92OEs64NKbjQHZDvcs0zeK5SbrEjMdZqxpERGmbtab2UTXPn/kU59rW00Q72iwP+
-	IAURiBqdZV9wVT2fBy+KvIqvcS5k7z4xlo+iqjHc4hGe1sHCdQnmdmPeuE7n/U6Yy9RWdcsIHs5
-	APGqECdfMH0nyu1/2mRCcjkw3S/1SzObc6EUfRq/dDDMhTRmO2PokkLO8QAY50iuGEW6L6Yx24E
-	x1LCYNMBwHAW6lnQB+SV8jileWCH3zqh8ObRQj7ryeGu/PhnmuiOx/qqw17J7T42x1DCGYPCdt8
-	kciyK5LWDAmLg8ebg1q3ix9yJncHso2k1Mu/iD4UjJQHZ6hnQEKWrrMtvZ1D2a467p59PBOooMM
-	rJ7xddbFvBquvNCHzG67k190Bujhdpv7hYVfJJBjIMG11H17l6vWaCSOt2Z1EsB6DmdvX1JrNzm
-	4AB0TUek95jjcBSXCSFTMJjeAjD5e7e3xL7Fe+82D7CTPyoDFjddEnWX5+uuRC4uUKifgqsBfEd
-	Vqtfe3dJl6mtTdCFiGqJeOGmATTnCjRBGfLFSQkZJsYHs6w2IPFFevj1VUvG+EPVgW7jKjl8EyM
-	tgIcuk5FaXARKHG0Nas=
-X-Received: by 2002:a05:600c:c104:b0:48f:e230:2a25 with SMTP id 5b1f17b1804b1-48fe2302b27mr16709485e9.32.1778772225397;
-        Thu, 14 May 2026 08:23:45 -0700 (PDT)
-Received: from aspen.lan (aztw-34-b2-v4wan-166919-cust780.vm26.cable.virginm.net. [82.37.195.13])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9ec39806sm7358296f8f.9.2026.05.14.08.23.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 08:23:44 -0700 (PDT)
-Date: Thu, 14 May 2026 16:23:41 +0100
-From: Daniel Thompson <daniel@riscstar.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
-	arnd@arndb.de, gregkh@linuxfoundation.org,
-	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
-	alexandre.torgue@foss.st.com, ast@kernel.org,
-	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
-	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
-	julianbraha@gmail.com, livelycarpet87@gmail.com,
-	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
-	rohan.g.thomas@altera.com, sdf@fomichev.me,
-	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
-	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 12/12] arm64: dts: qcom: qcs6490-rb3gen2: enable
- TC9564 with a single QCS8081 phy
-Message-ID: <agXo_evi1oFLBJoo@aspen.lan>
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-13-elder@riscstar.com>
- <01d6ea18-e022-41c7-a642-ac0321957923@oss.qualcomm.com>
- <agRzai1UoHEIotZe@aspen.lan>
- <3c6e7ec5-f600-44ee-a97a-211a99102744@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gKGsBmANOWLh4YNRfccH+dJ/nnYEiY5uYromck4rRP4DOd7PchgyqIgpFsfOUc7nWfSDgDItFwiNEIFUtL41DjPMh3HN/cMJRG52vTLnJ9qJO02mSPXKOQPLNqAaXognGx1mH3LX8IYGtMEaLZRUYsQL/81bJHr0fkLHpX41F6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=D1BVIKXX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RJdzz2/T; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id CC65B14001D8;
+	Thu, 14 May 2026 11:45:48 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 14 May 2026 11:45:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778773548; x=
+	1778859948; bh=UsgCLgF9UwbEiwmeUtgZkK88jnAqNvlDzxdt4itg7V4=; b=D
+	1BVIKXX3t118XISFBRL8rWMzGtSS2KpxPIqjLYqAT4Yd0mVS0cpvJDR5lF1KiNBy
+	PFmBa0HSNn1SQ3MnyY/Li03JHCjN3OPUyjfneHnhzqHNIfWp+eTr+EuK/2Oel7MB
+	DVTiu6DLPxDjDVNb2edWFSe8Oy/7cHD6xk9j1xfLSudbDDhIIUq+a4MBV+XvFbbt
+	62nhUNzQpllx+Q/jMiqp0EuQNwOas3fJSFueI6x1vVaDiBKRgOR/F5gDLcow1h7o
+	zmfwSsRzodSRVaozpa4uMOpHmOkScp7ffg69m+289trqw+A4GwKNus74vB7TF+mt
+	klcB0NvzEJczYRmboO6ig==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778773548; x=1778859948; bh=UsgCLgF9UwbEiwmeUtgZkK88jnAqNvlDzxd
+	t4itg7V4=; b=RJdzz2/TR+QVl1zoMiTFWHiec21D4kFmQ0x7ovD42KVNs8FxzqF
+	mqWSTpMJUW8Q9x+22W9YtenEnspnIXFOplhYWe4MnCMHY37hyqPBMjlC5C13IEHE
+	eyo4XwsJlk+YDD+hrTpWvlyDFYgX0laTU5jNSUZabl2BmMnU7fCYsAlfkI5s3VSJ
+	73omUKCt50huhoXdTqJWijgzWTRuvSWBYjucrIOgnwjKfNCN4FT5vMz6fhY9Bnvo
+	7D1iI5w7SXJMlTuo7aUwiKs9wsogMsdYU7lSnxJ1Qmv2XMGXzM+evV/wMuEbx1Vv
+	gXH5LCTw5kkE+6Cy9PcTjJZfSTjFHsbHI0g==
+X-ME-Sender: <xms:K-4FarvkBKr5b1gO1rTKdYgErAJEhChKJc0uhmTPe0C74qc6kf5D1g>
+    <xme:K-4FaoYkPhmSyOY71Cr4hAcgnDm1Mb1bNegZczKAEWyGcrBrlXtwJHtVVSz_K92m1
+    X1UclImawhjKfS6v1j_gH5xj9ux1hyJlgQbdRyRqy-gZjHDO2Bq1_o>
+X-ME-Received: <xmr:K-4Fak6NrzY0x8wYzSPH5JXyAJOqjHDnzlqjbdRiNZBnYYDU5q18GNTmJqaTJ9MJ9Pk8T47slHXPCk_TZQyDUkI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdejleduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedujedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtohepihhmvhegsggvlhesghhmrghilhdrtghomhdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgv
+    thdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopehsthgrsghlvgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
+    thhopehmhhgrlhesrhgsohigrdgtohdprhgtphhtthhopegurghvvghmsegurghvvghmlh
+    hofhhtrdhnvght
+X-ME-Proxy: <xmx:K-4FagkXQQwfMnTmZ7T5ECYM1M7Umkhwmp7ung3959P03VQ3notdww>
+    <xmx:K-4FaqGXdMkQOR-oAgm46DzdNUPxhv90R0XyTO3asgFUKY8EtZlY_A>
+    <xmx:K-4FakHRc4p7vcfOGwFI7Ty7ko_TOimfiUHCCihhccQSdRrypZ8yTg>
+    <xmx:K-4Fai2e25FYnrtz6vUVhzwObrJA-9DGiU-XzzMt-fP6Ulz2A55Prw>
+    <xmx:LO4Far8mub6S-7QFXXVHA-scgYyjyF_Ydv3EFoQfd_RDJZ3rZVxcsW6J>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 14 May 2026 11:45:46 -0400 (EDT)
+Date: Thu, 14 May 2026 17:45:45 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: David Ahern <dsahern@kernel.org>
+Cc: Hyunwoo Kim <imv4bel@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+	kuba@kernel.org, steffen.klassert@secunet.com,
+	netdev@vger.kernel.org, stable@vger.kernel.org, mhal@rbox.co,
+	davem@davemloft.net, horms@kernel.org, edumazet@google.com,
+	kerneljasonxing@gmail.com, herbert@gondor.apana.org.au,
+	vakzz@zellic.io, kuniyu@google.com, jiayuan.chen@linux.dev,
+	ben@decadent.org.uk
+Subject: Re: [PATCH net v2] net: skbuff: propagate shared-frag marker through
+ frag-transfer helpers
+Message-ID: <agXuKbQMVTYT5Jgb@krikkit>
+References: <agToIEDI4TaTNLRb@v4bel>
+ <92ec6190-0255-4b7c-9524-254cb37476ab@redhat.com>
+ <agWYGuJ__OtpgjnB@v4bel>
+ <agWiDlvu351MSuqO@krikkit>
+ <69f72d09-8054-4d26-b277-9e9b7a8854c1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -120,246 +117,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3c6e7ec5-f600-44ee-a97a-211a99102744@lunn.ch>
-X-Rspamd-Queue-Id: 4862D54404D
+In-Reply-To: <69f72d09-8054-4d26-b277-9e9b7a8854c1@kernel.org>
+X-Rspamd-Queue-Id: 6DEF8544393
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-288024-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
+	TAGGED_FROM(0.00)[bounces-288025-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@riscstar.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,kernel.org,secunet.com,vger.kernel.org,rbox.co,davemloft.net,google.com,gondor.apana.org.au,zellic.io,linux.dev,decadent.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,aspen.lan:mid,1c:email]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026 at 04:35:13PM +0200, Andrew Lunn wrote:
-> > However the real reason we jammed this on is because I couldn't find a
-> > way to get the phy/mdio code to turn one on. However it is possible to
-> > add regulator support to MDIO devices by extending their existing logic
-> > to manage resets so it can also manage a regulator. It comes out fairly
-> > clean so we can add that to the patch set and remove the
-> > regulator-always-on.
->
-> We, I have rejected this before. It might look clean and easy, but it
-> is not. How do you determine the order of enabling reset, regulators
-> clocks? How do you specify the need sleeps in between these different
-> operations?
+2026-05-14, 08:37:19 -0600, David Ahern wrote:
+> On 5/14/26 4:21 AM, Sabrina Dubroca wrote:
+> > 2026-05-14, 18:38:34 +0900, Hyunwoo Kim wrote:
+> >> On Thu, May 14, 2026 at 10:04:29AM +0200, Paolo Abeni wrote:
+> >>> On 5/13/26 11:07 PM, Hyunwoo Kim wrote:
+> 
+> >> Agreed. tracing SKBFL_SHARED_FRAG propagation paths one by one is
+> >> not a robust direction for the fix. Even minor logic changes elsewhere
+> >> could cause the issue to resurface.
+> >>
+> >> As a follow-up,	eliminating the in-place handling in esp_input -- accepting 
+> > 
+> > It would close this group of vulnerabilities, but there are other
+> > parts of the networking stack that consume this flag. For those,
+> > chasing missing flag propagation is still a useful task.
+> > 
+> 
+> Seems like this should be an skb helper to manage the flag with really
+> good documentation on when it needs to be set, reset and propagated.
+> 
+> I walked skbuff.c yesterday as well, and there are several places where
+> it is not clear if the flag needs to be propagated or not.
 
-I agree it is only easy for the easy cases. I can even be specific
-that, for me, the easy cases mean enabling a single regulator and where
-power-on reset is not significantly slower than reset-pin reset
-meaning we don’t need to distinguish between a power-cycling reset and
-a reset-pin reset).
+Or maybe even something like a skb_transfer_frag that handles updating
+the frags array and copying the flag. Then we wouldn't have to chase
+functions that mess with frags[] directly and forget to also adjust
+flags.
 
-However I think that complex cases cannot be handled by generic MDIO
-code. I think these cases are best solved from the MDIO probe method of
-individual PHY drivers.
-
-
-> There is nothing in particular MDIO specific here, and there is
-> generic power sequencing code in the kernel. And a while back,
-> somebody said they would look at what is needed to make MDIO busses
-> and Ethernet PHYs make use of that generic power sequencing code. That
-> is the better way to do this.
-
-I’d love to know if they got anywhere. I’ve reviewed the pwrseq
-subsystem and I don’t think it is intended to solve the problems
-presented by the ethernet phys on a rb3gen2. Let me try to explain my
-reasoning. Maybe someone will be able to point out what I have missed!
-
-I’m afraid this must be necessarily long but to help navigate the
-general structure is:
-
- 1. Quick review of the pwrseq subsystem
- 2. Quick review of the PCI power control driver, both the concept and
-    to note why some PCI power control drivers do not use pwrseq
- 3. Summarize how this works on DT
- 4. Introduce a description of an qca8081 in “modern devicetree”
- 5. Examine whether pwrseq or the power control driver concept would
-    make writing MDIO device drivers easier than “just doing it in the
-    probe method”
-
-pwrseq is only generic in the sense that has a compact consumer API and
-that it provides reusable tools that allow *specific* power sequencing
-drivers to be written relatively easily. The specific drivers created
-with these tools typically bind to something concrete in the DT (e.g.
-compatible = "pcie-m2-m-connector" or "qcom,wcn6855-pmu"): things you
-can point to such as the M.2 slot or a special purpose power management
-unit in a combo chip.
-
-The pwrseq core allows each driver to register a .match() method to
-allow pwrseq driver recognise that another driver has asked for its
-help to enable a pwrseq target. They usually match, not by compatible
-but by traversing the phandle relationships from the device’s DT node
-to verify that they link back to the pwrseq driver in the expected
-manner.
-
-For ethernet phys I'm doubtful pwrseq offers any benefit because most
-phys are standalone and therefore just get a bunch of board level
-regulators: there isn’t anything concrete in the DT for which we can
-instantiate a pwrseq device. Without a device it is difficult to fire
-up a driver that is responsible for knowing what power sequence is
-needed to activate the phy. It is therefore better to encode this
-knowledge in the phy driver instead.
-
-Another related-but-different concept is PCI power control drivers.
-When pwrseq was introduced the first client was a PCI power control
-driver. PCI power control drivers are used to solve chicken-and-egg bus
-enumeration problems. They work binding a platform bus driver to any
-PCI device with a compatible string (e.g. compatible = "pci17cb,1103")
-before attempting to enumerate the real device. The platform device
-driver responsible for turning on the power ready for enumeration but
-does not drive the actual PCI device. This ensures the device can
-respond to enumeration requests and, eventually, probe the “real” PCI
-driver.
-
-Note that the PCI power control drivers do not have to use the pwrseq
-framework to turn the power on. There are examples of both in the
-current tree:
-
-* pci-pwrctrl-pwrseq.c uses pwrseq and is, at it's core, just table of
-  compatible strings and pwrseq target names. This allows it recognize,
-  from the compatible string what pwrseq target to request.
-  For example on wcn6855 it can request that only the WLAN hardware
-  be enabled (BT power-on is requested separately before using the
-  HCI UART).
-
-* pci-pwrctrl-tc9563.c is the power controller driver for the
-  TC956x PCIe switch. This is an example of the case where there
-  is nothing for a pwrseq driver to bind to. TC956x just gets a bunch
-  of individual regulators and a reset line. For that reason
-  pci-pwrctrl-tc9563 just uses the regular C code to grab everything
-  is needs, relying on things like the bulk regulator helpers keep the
-  code as compact as possible.
-
-One key insight about the above is that there are three separate device
-drivers parsing specific properties of the node. Having all the
-properties related to a device in a single node was very strongly
-pushed for by Rob H[1] and AFAIK is a key expectation for new DT
-bindings. This strongly influences the scope of pwrseq and PCI power
-control (and power domains) and discourages giving DT a generic means
-to express power sequencing. That knowledge is handed to us implicitly
-by the compatible string!
-
-For example, in the case of WCN6855[2] we have:
-
-1. pci-pwrctrl-pwrseq which uses the compatible string to get itself
-   bound and to decide what pwrseq target to enable.
-2. pwrseq-qcom-wcn which reads all the *-supply properties together
-   with a couple of clocks and enable lines. It ensures we don't
-   enable anything until the power lines have settled.
-3. ath11k[_pci] which isn’t probed until the device is “on” and
-   then reads the remaining properties such as qcom,calibration-variant
-
-[1]: https://lore.kernel.org/all/CAL_JsqLAnJqZ95_bf6_fFmPJFMjuy43UfP2UxzEmFMNnG_t-Ug@mail.gmail.com/
-[2]: https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts#L987C1-L1004C3
-
-In short, the pwrseq client API is beguilingly simple but that does not
-mean the providers are generic. In the above example there must still
-be something, written in C, that contains knowledge of how to turn on a
-wcn6855.
-
-Let’s turn our attention to MDIO.
-
-Following the pattern above where all the links related to power come
-from the main device node, then the phy node for the qca8081 in an
-rb3gen2 would look like something like this:
-
-    tc956x_emac1_phy: ethernet-phy@1c {
-        compatible = "ethernet-phy-id004d.d101";
-        reg = <0x1c>;
-
-        reset-gpios = <&tc956x_emac0 1 GPIO_ACTIVE_LOW>;
-        # On RB3gen2 all supplies are controlled by a single GPIO
-        # so we link all supplies to that single regulator
-        avdd-supply = <&qep_1p8>;
-        avdd18-supply = <&qep_1p8>;
-        vdd-supply = <&qep_1p8>;
-        vddldo-supply = <&qep_1p8>;
-        vdd18-supply = <&qep_1p8>;
-        vdd125-supply = <&qep_1p8>;
-
-        pinctrl-names = "default";
-        pinctrl-0 = <&qep_irq_pin>;
-        interrupts-extended = <&tlmm 101 IRQ_TYPE_LEVEL_LOW>;
-    };
-
-Once we have established what the DT looks like then the question
-becomes where to put "something, written in C [or Rust], that contains
-burned in knowledge of how to turn on a wcn6855^H^H^H^H^H^H^Hqca8081"?
-
-The qca8081 on rb3gen2 just gets a bunch of individual regulators and a
-reset. As in the pci-pwrctrl-tc9563 example above, this means there is
-nothing in the DT for a pwrseq driver to bind to. Even if we could find
-a way to do that, it is not obviously useful to decouple how to turn on
-an MDIO device from how to drive it. Thus I think the right answer to
-that is to put the code to fire up the regulators into the qca808x.c
-driver and it looks to me like the existing probe/remove methods would
-already work perfectly well as the place to put it.
-
-Does MDIO bus code need to know about pwrseq at all? I don't think so.
-Perhaps there are phys that are suitable to be managed via pwrseq
-because they are part of a larger ethernet chip with some kind of PMU,
-but that doesn’t require it to be exposed outside the driver. The
-drivers for such a phy can simply call the pwrseq APIs from its probe
-method.
-
-Do we need something equivalent to PCI power control for the MDIO bus?
-I don't think the same chicken-and-egg problem actually exists for MDIO
-bus. If a subnode with a compatible string (and regulators) exists we
-don't need to scan that address because we already know enough about
-the bus to probe the driver and therefore can let the driver handle
-turning on the power (just like we do for I2C or SPI drivers).
-
-MDIO does have bus scanning but we only need to scan for things we
-don’t know about and must do so on the assumption they are already
-powered on. That’s because when we don’t know what’s there then your
-earlier question ("How do you determine the order of enabling reset,
-regulators clocks?") is impossible to answer. There could be a generic
-bus-supply property to handle easy cases where a single regulator
-activates everything on the bus although this isn’t needed on RB3gen2
-since we statically know what is on the bus.
-
-If you've got this far and not found a fatal mistake in the reasoning
-then perhaps it sounds like an awful lot of churn to have to modify
-each PHY driver every time that PHY is used in an embedded platform
-with software controlled regulators!
-
-That, in a nutshell, is why I was tempted to copy the phy-supply
-property to cover the "easy cases" we discussed at the outset. Doing so
-does nothing to impede the hard cases since the code for that would
-still work fine from the MDIO probe method. At worst a driver might
-have to register with a flag to suppress any generic power/reset logic
-from the core (since it's obviously wrong to wait for a reset to
-complete on a device that isn't powered up).
-
-To be clear I’m very happy to back away from phy-supply. We use the same
-patterns we see in I2C and SPI drivers and rely purely on probe methods
-instead to turn on regulators. However I don’t see how to exploit power
-sequencing code to help describe these things generically.
-
-
-Daniel.
+-- 
+Sabrina
 
