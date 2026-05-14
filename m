@@ -1,297 +1,180 @@
-Return-Path: <netdev+bounces-287939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UKukD0i2BWpZaAIAu9opvQ
-	(envelope-from <netdev+bounces-287939-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:47:20 +0200
+	id mKxEMKq3BWrGaAIAu9opvQ
+	(envelope-from <netdev+bounces-287940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:53:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA62054132C
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:47:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65BC6541418
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A60F83016277
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:47:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C25C3096878
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8B23C09ED;
-	Thu, 14 May 2026 11:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C0F3C2BA8;
+	Thu, 14 May 2026 11:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DbECCrJY"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Eyab5e+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF793B8D7E
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380AA3859DC
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778759237; cv=none; b=GUbkVwDGB0qbVbYHoICiq1cYX+W8dDHpCprkgw2nGTIr8jqXOh1kD7UrHy3Yiy1lZHcxRUbYEP9sdMyYsdC9HqRJxLvSDSnIwAlYXq/D3YwLAMe5arCmPlJt2FCQJnTh3RJCdTFmXRnIhjRcb1QweSY/Jeair5NmAW0VBOf4Fss=
+	t=1778759452; cv=none; b=kdKMgTOljW4dhBTB+x2FWEvrdypOOCkRTXM4L+vWbQ1LtXrykZoIDD/3hzr5qJQ7kCAwoByIM+7Oy5tBU/KmPRr6Hv1qCyPfAR2KEbHy89JfxNUdrKMjNv1rsPb1RNtXGei8/qKOxn2GxYSyNV2KRY26klGRRbWi4IUydW1h4Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778759237; c=relaxed/simple;
-	bh=efEdLYBGwXMk1FZ6NvnTRdf+WewLtg4Mqsibp1Nr4EI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=i5x09QZ0x4SRemqjOB2p827nCLZ/24gg86lAI4jdl+xzTESUzDxRHTEe8ZbzM/R88OvOEzTpP/YkQJ7rRH7YVoNos5E2tuPXFEGGSjogv+8HEYm2WOoxXwMvg6XriBKXGa5bTSD2eIwisJeSh54JJ92WpVPeyBp+jq4U+7n7++E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DbECCrJY; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-51494d74d4bso139431621cf.1
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 04:47:15 -0700 (PDT)
+	s=arc-20240116; t=1778759452; c=relaxed/simple;
+	bh=aLH5YBATn9eCNSGgtO3MOr4x22/bBQ7ESfJaSuBS89c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RKTWajXBju3f9DwtgbWd2UmwYWK4bsdAXCoE1SRnhzGmDP6XbSWwt56FcEUm6VFiyU8ZyrXock917KuhPpd0aWTns1rGsLrqGC+3fc9m15ob0++VtOD0lQ1asgky6MMy4BnLfhHasUUjxylC9wGIR9j85IN4g723huTMwQAdrdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Eyab5e+l; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-514ae601e01so49212251cf.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 04:50:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778759235; x=1779364035; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jvDeDkJghz++54GrljZdOEdxppinnGvlOHppuZiSKQI=;
-        b=DbECCrJY1ABArBVkFHAa1rJoMUYa5OdlHiCge9spb5atJ3gVLtt/WpU8Tc7KXuQrDa
-         Koj0Axmj8r2ITx09zFlYBW26X6MiM1znkih5cZv4X6yhwVas55softPY6KtZHhb19ybY
-         2tekpgQX08WAeUXx19eQIN1Ar15ro6secGCIDbmOSAXw5N9Suh4yOrvXiSp951xUAOEI
-         uPi7HpCehcjePuz2DH+Xlcxyj3CTKyZsusnYptkj3yVKT+TUBkiA1x/iZkpnJHISA2fl
-         IuPUw09ZWloVwAs5Mb4jBSc5scmGNc50m7bWCOazm2U7yTMkzwlGWwqLjojzw167cAmT
-         aMCw==
+        d=ziepe.ca; s=google; t=1778759449; x=1779364249; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eDBCsEhXxpxSONCF+uEB0GBHYti2oMl8hGXWjjN3tJ8=;
+        b=Eyab5e+lFUjSm4nW7eNvM6JdJ32/ERycNju1lNdhR8GloSudULEoHKEIOfAWwwCyxk
+         1hLLj+q0IAW0WwIfH4kR2Cl8+ACdg2zaHD6rF7kkUJ0UAvGUjdlw7SC97bMSX3fPg+bQ
+         OOawlstlFz2ig0izecthlVxL2FcB+WazdNVoW8tbv4KkQ2o5m8ZQbsduaB0RVhb/ueFE
+         0KiPk6EYrHYS5744qMquHsgLjmapzvLRWV9iCrycWRlAk6x6WjrPc4f5C//OBtmqgOGK
+         Y24zVHpX6JwO3SNLCfjdiArqkAzvTi5b6OXi7x5YeNl+YhEPQmOl5IT5B8efllbDhCbN
+         zQpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778759235; x=1779364035;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jvDeDkJghz++54GrljZdOEdxppinnGvlOHppuZiSKQI=;
-        b=rAt42uAXeZZFrK613rhIPu/ZL3Q2w7WRQ+cqWPVRMXKQHc/VWC2tGFXwAT1IkVw6ao
-         cAbPcFaJmpV/jwaTnaz6hwNj8lxIBzVpyVDn5kvW+FaggP3LsSav/6awSp4k6ZLREDnJ
-         itvySAasT7HePP6OawUA6FOu4WSXYuvvklhrP7nCAZvN/kTSOVe7axLWhnNz0murKmTJ
-         EnipdD7OtL1EGz4bFNsYZnKn46Qnc4lYNVfLmVwP8LBsdf61TOacLgwAsTuZwojdqhO3
-         1Cf3b0zNrHY8hFU3m6tifkK/Sp0pYXo37cQOAsDWGZzAKXXDstjamV2Cpd8Xkqvvh1JH
-         dFRg==
-X-Forwarded-Encrypted: i=1; AFNElJ9DFGGuDV2h1ieEsUv5RC8fhlTCpHByOjIMr/oWQdKJfrNm/6+Lx+pK9NcOu0sfSP1cwCtV5h8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiYinQNrFwHjupgN+JcKVXGYGhRBsuqGjJdD4MH5AI5sG0yYsS
-	cz21mcFJT2Q5VA0oiKuWZcVzZulSoOD2F1cZsU9nMr9RoDIjiZsB0hdF9lCp4fdjJmM9izWYiEs
-	++cabwXX0bQSoag==
-X-Received: from qtbir3.prod.google.com ([2002:a05:622a:6dc3:b0:50e:5ff6:e88c])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:2588:b0:509:11bd:9d3 with SMTP id d75a77b69052e-516415f4efemr40519191cf.1.1778759234878;
- Thu, 14 May 2026 04:47:14 -0700 (PDT)
-Date: Thu, 14 May 2026 11:47:13 +0000
+        d=1e100.net; s=20251104; t=1778759449; x=1779364249;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eDBCsEhXxpxSONCF+uEB0GBHYti2oMl8hGXWjjN3tJ8=;
+        b=GaxzBZwIVyuEJEbCoo5Yx3d+/oRs3iIb8Scd9g8kKJL+4iyLL02LqTqULBv+Lnqbuv
+         MhkDANaXTzmtQ270C/XaLrhbUrrfCKJiuXeJ/qfVpSY4ga5WtAcby32EJTKOMGgZ2KQ4
+         xMUmdugdpoHYEBMeM/0qD77wAdMutwgrsEEORmx+nRe3b/jsvIsoLKm7+0lTtvtudiuT
+         gOAc2Jw7R0vP02P1zKQTVGSkaZIecsTiAippcaC3tGjzsgAOLfeWGExBCTD33LH+TyWw
+         9916OFh4dHrwePHEe7Pda2FmKvPqMnL8L7Bk5b9/OLPj1W/kDQEQqviz3bivkGLu5ycK
+         2Ppg==
+X-Forwarded-Encrypted: i=1; AFNElJ+FLlaJ4MmeOUAcfoUd70/5k7Q1gL+H97km39cO4JBI5L4JLUTizmLgJHcWdSbM8W0uABSZsTc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwF/SP4o5m81DWYJiHqrioLpDiOOvSGCqmOmmf37dWaWARz5/C7
+	U9LARHfmrHyq7oPvcoJy/OG7DoQcno9PIuNIHne1gEn2QUHJGJC6Sj52clgilmPiLKE=
+X-Gm-Gg: Acq92OEBNGJnY+GEfmmezY8vRg3Gh3N7fIjX8tYYGxJqVz5qBFj74u+Yq7rFkyL++3/
+	NQrxgunZj+z2HdRKDVgZo94wwG9KxlBszfbThor7rYJuXqN7oTDoCtiu0607YsysSunOVyrbIwN
+	MSEEMqZegVQk4ayavosfBEyMUss496NY1SQnimWQfbtLRJlu0/l88qvJb/eNbRBqGoXiFt1yYXt
+	zv+gpEL/ylSk1NnV0zh7+O5j8iEtN9KFbQMJf4fUeqY8/FRNyWZ6OoxKihUOd+3lx4ZN7iMwUyJ
+	DnlcP3e4/Pjd7RD/zh30f8jxvJlLZzMzr+UUnkRIGQ+3S47qvQYxtRtwyTFYKRrJXdV5Z+tlF5Y
+	DLZDPLf0mcSlwqh1xaEgw9kOqPCXk6Wz3vuIju/+WF4RYiDBpukmvmgekBi+ilcjUIdpc9W7XO0
+	2Ct9XQZWCem1aUGq8qmHULjUySouCd9+QaUjrsSe8zgtgpQndhlgumjkbKy7q2UkGr8imjoMGY7
+	HwbwA==
+X-Received: by 2002:ac8:7fc2:0:b0:50e:5aed:caea with SMTP id d75a77b69052e-5162fe26062mr96232451cf.14.1778759449125;
+        Thu, 14 May 2026 04:50:49 -0700 (PDT)
+Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5164585fa0asm15519921cf.31.2026.05.14.04.50.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 May 2026 04:50:48 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1wNUaW-000000057Ee-0Djd;
+	Thu, 14 May 2026 08:50:48 -0300
+Date: Thu, 14 May 2026 08:50:48 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: akpm@linux-foundation.org, arjan@linux.intel.com, davem@davemloft.net,
+	dsahern@kernel.org, edumazet@google.com, hdanton@sina.com,
+	horms@kernel.org, kuba@kernel.org, kuniyu@google.com,
+	leon@kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com, yanjun.zhu@linux.dev,
+	zyjzyj2000@gmail.com
+Subject: Re: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
+Message-ID: <20260514115048.GX7702@ziepe.ca>
+References: <20260513234655.GW7702@ziepe.ca>
+ <tencent_3CCD70788A6EAC2D356D4C9674E8D2EEEA0A@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260514114713.4134674-1-edumazet@google.com>
-Subject: [PATCH net-next] net/sched: sch_dualpi2: annotate data-races in dualpi2_dump_stats()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@toke.dk>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Vineet Agarwal <agarwal.vineet2006@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: AA62054132C
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_3CCD70788A6EAC2D356D4C9674E8D2EEEA0A@qq.com>
+X-Rspamd-Queue-Id: 65BC6541418
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287939-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-287940-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[ziepe.ca];
+	FREEMAIL_TO(0.00)[qq.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,linux.dev,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,toke.dk,vger.kernel.org,gmail.com,google.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-dualpi2_dump_stats() runs without qdisc lock held.
+On Thu, May 14, 2026 at 03:31:22PM +0800, Edward Adam Davis wrote:
+> On Wed, 13 May 2026 20:46:55 -0300, Jason Gunthorpe wrote:
+> > On Wed, May 13, 2026 at 02:17:28PM -0400, Leon Romanovsky wrote:
+> > >
+> > > On Thu, 07 May 2026 20:50:10 +0800, Edward Adam Davis wrote:
+> > > > We must serialize calls to nldev_dellink() or risk a crash as syzbot
+> > > > reported:
+> > > >
+> > > > Call Trace:
+> > > >  udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
+> > > >  rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
+> > > >  rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
+> > > >  rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
+> > > >  rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
+> > > >
+> > > > [...]
+> > >
+> > > Applied, thanks!
+> > >
+> > > [1/1] RDMA/nldev: add mutual exclusion in nldev_dellink()
+> > >       https://git.kernel.org/rdma/rdma/c/0b28000b64f40d
+> > 
+> > This seems like a rxe bug, I would have expected the lock to be inside
+> > rxe to protect its racy implementation of rxe_net_del(), which looks
+> > like it is possibly also triggered by NETDEV_UNREGISTER...
+> No, it was triggered by RDMA_NLDEV_CMD_DELLINK, you can see the "call trace".
+> > 
+> > ie it should not change nldev_dellink().
+> While this could be fixed within RXE, the same issue affects all other
+> RXE-like submodules when they subsequently support the "dellink" interface,
+> therefore, handling this within nldev_dellink() is relatively more appropriate.
 
-Add missing READ_ONCE()/WRITE_ONCE() annotations.
+Why would other modules have an issue? The problem is rxe's racey
+refcounting scheme for its lazy socket creation. There is nothing
+wrong with nldev, and now you've created some nasty BKL in the nldev
+code to fix rxe while ignoring its other races.
 
-Fixes: d4de8bffbef4 ("sched: Dump configuration and statistics of dualpi2 qdisc")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Vineet Agarwal <agarwal.vineet2006@gmail.com>
----
- net/sched/sch_dualpi2.c | 68 ++++++++++++++++++++---------------------
- 1 file changed, 34 insertions(+), 34 deletions(-)
-
-diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
-index c6416f09dddd8f170b92e50fb89377a15773c5bf..8b3bc646730499dac1798372ef5b647c2e9e5a57 100644
---- a/net/sched/sch_dualpi2.c
-+++ b/net/sched/sch_dualpi2.c
-@@ -190,7 +190,7 @@ static bool skb_apply_step(struct sk_buff *skb, struct dualpi2_sched_data *q)
- static bool dualpi2_mark(struct dualpi2_sched_data *q, struct sk_buff *skb)
- {
- 	if (INET_ECN_set_ce(skb)) {
--		q->ecn_mark++;
-+		WRITE_ONCE(q->ecn_mark, q->ecn_mark + 1);
- 		return true;
- 	}
- 	return false;
-@@ -198,7 +198,7 @@ static bool dualpi2_mark(struct dualpi2_sched_data *q, struct sk_buff *skb)
- 
- static void dualpi2_reset_c_protection(struct dualpi2_sched_data *q)
- {
--	q->c_protection_credit = q->c_protection_init;
-+	WRITE_ONCE(q->c_protection_credit, q->c_protection_init);
- }
- 
- /* This computes the initial credit value and WRR weight for the L queue (wl)
-@@ -403,12 +403,12 @@ static int dualpi2_enqueue_skb(struct sk_buff *skb, struct Qdisc *sch,
- 
- 	cb = dualpi2_skb_cb(skb);
- 	cb->ts = ktime_get_ns();
--	q->memory_used += skb->truesize;
-+	WRITE_ONCE(q->memory_used, q->memory_used + skb->truesize);
- 	if (q->memory_used > q->max_memory_used)
--		q->max_memory_used = q->memory_used;
-+		WRITE_ONCE(q->max_memory_used, q->memory_used);
- 
- 	if (qdisc_qlen(sch) > q->maxq)
--		q->maxq = qdisc_qlen(sch);
-+		WRITE_ONCE(q->maxq, qdisc_qlen(sch));
- 
- 	if (skb_in_l_queue(skb)) {
- 		/* Apply step thresh if skb is L4S && L-queue len >= min_qlen */
-@@ -417,14 +417,14 @@ static int dualpi2_enqueue_skb(struct sk_buff *skb, struct Qdisc *sch,
- 		/* Keep the overall qdisc stats consistent */
- 		qdisc_qlen_inc(sch);
- 		qdisc_qstats_backlog_inc(sch, skb);
--		++q->packets_in_l;
-+		WRITE_ONCE(q->packets_in_l, q->packets_in_l + 1);
- 		if (!q->l_head_ts)
--			q->l_head_ts = cb->ts;
-+			WRITE_ONCE(q->l_head_ts, cb->ts);
- 		return qdisc_enqueue_tail(skb, q->l_queue);
- 	}
--	++q->packets_in_c;
-+	WRITE_ONCE(q->packets_in_c, q->packets_in_c + 1);
- 	if (!q->c_head_ts)
--		q->c_head_ts = cb->ts;
-+		WRITE_ONCE(q->c_head_ts, cb->ts);
- 	return qdisc_enqueue_tail(skb, sch);
- }
- 
-@@ -531,17 +531,16 @@ static struct sk_buff *dequeue_packet(struct Qdisc *sch,
- 
- 		/* Keep the global queue size consistent */
- 		qdisc_qlen_dec(sch);
--		q->memory_used -= skb->truesize;
- 	} else if (c_len) {
- 		skb = __qdisc_dequeue_head(&sch->q);
- 		WRITE_ONCE(q->c_head_ts, head_enqueue_time(sch));
- 		if (qdisc_qlen(q->l_queue))
- 			*credit_change = ~((s32)q->c_protection_wl) + 1;
--		q->memory_used -= skb->truesize;
- 	} else {
- 		dualpi2_reset_c_protection(q);
- 		return NULL;
- 	}
-+	WRITE_ONCE(q->memory_used, q->memory_used - skb->truesize);
- 	*credit_change *= qdisc_pkt_len(skb);
- 	qdisc_qstats_backlog_dec(sch, skb);
- 	return skb;
-@@ -564,7 +563,7 @@ static int do_step_aqm(struct dualpi2_sched_data *q, struct sk_buff *skb,
- 		}
- 
- 		if (dualpi2_mark(q, skb))
--			++q->step_marks;
-+			WRITE_ONCE(q->step_marks, q->step_marks + 1);
- 	}
- 	qdisc_bstats_update(q->l_queue, skb);
- 	return 0;
-@@ -600,7 +599,8 @@ static struct sk_buff *dualpi2_qdisc_dequeue(struct Qdisc *sch)
- 			continue;
- 		}
- 
--		q->c_protection_credit += credit_change;
-+		WRITE_ONCE(q->c_protection_credit,
-+			   q->c_protection_credit + credit_change);
- 		qdisc_bstats_update(sch, skb);
- 		break;
- 	}
-@@ -876,7 +876,7 @@ static int dualpi2_change(struct Qdisc *sch, struct nlattr *opt,
- 				WARN_ON_ONCE(1);
- 				break;
- 			}
--			q->memory_used -= skb->truesize;
-+			WRITE_ONCE(q->memory_used, q->memory_used - skb->truesize);
- 			rtnl_qdisc_drop(skb, sch);
- 		} else if (qdisc_qlen(q->l_queue)) {
- 			skb = qdisc_dequeue_internal(q->l_queue, true);
-@@ -890,7 +890,7 @@ static int dualpi2_change(struct Qdisc *sch, struct nlattr *opt,
- 			 */
- 			qdisc_qlen_dec(sch);
- 			qdisc_qstats_backlog_dec(sch, skb);
--			q->memory_used -= skb->truesize;
-+			WRITE_ONCE(q->memory_used, q->memory_used - skb->truesize);
- 			rtnl_qdisc_drop(skb, q->l_queue);
- 			qdisc_qstats_drop(sch);
- 		} else {
-@@ -1046,15 +1046,15 @@ static int dualpi2_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 	struct dualpi2_sched_data *q = qdisc_priv(sch);
- 	struct tc_dualpi2_xstats st = {
- 		.prob			= READ_ONCE(q->pi2_prob),
--		.packets_in_c		= q->packets_in_c,
--		.packets_in_l		= q->packets_in_l,
--		.maxq			= q->maxq,
--		.ecn_mark		= q->ecn_mark,
--		.credit			= q->c_protection_credit,
--		.step_marks		= q->step_marks,
--		.memory_used		= q->memory_used,
--		.max_memory_used	= q->max_memory_used,
--		.memory_limit		= q->memory_limit,
-+		.packets_in_c		= READ_ONCE(q->packets_in_c),
-+		.packets_in_l		= READ_ONCE(q->packets_in_l),
-+		.maxq			= READ_ONCE(q->maxq),
-+		.ecn_mark		= READ_ONCE(q->ecn_mark),
-+		.credit			= READ_ONCE(q->c_protection_credit),
-+		.step_marks		= READ_ONCE(q->step_marks),
-+		.memory_used		= READ_ONCE(q->memory_used),
-+		.max_memory_used	= READ_ONCE(q->max_memory_used),
-+		.memory_limit		= READ_ONCE(q->memory_limit),
- 	};
- 	u64 qc, ql;
- 
-@@ -1074,16 +1074,16 @@ static void dualpi2_reset(struct Qdisc *sch)
- 
- 	qdisc_reset_queue(sch);
- 	qdisc_reset_queue(q->l_queue);
--	q->c_head_ts = 0;
--	q->l_head_ts = 0;
--	q->pi2_prob = 0;
--	q->packets_in_c = 0;
--	q->packets_in_l = 0;
--	q->maxq = 0;
--	q->ecn_mark = 0;
--	q->step_marks = 0;
--	q->memory_used = 0;
--	q->max_memory_used = 0;
-+	WRITE_ONCE(q->c_head_ts, 0);
-+	WRITE_ONCE(q->l_head_ts, 0);
-+	WRITE_ONCE(q->pi2_prob, 0);
-+	WRITE_ONCE(q->packets_in_c, 0);
-+	WRITE_ONCE(q->packets_in_l, 0);
-+	WRITE_ONCE(q->maxq, 0);
-+	WRITE_ONCE(q->ecn_mark, 0);
-+	WRITE_ONCE(q->step_marks, 0);
-+	WRITE_ONCE(q->memory_used, 0);
-+	WRITE_ONCE(q->max_memory_used, 0);
- 	dualpi2_reset_c_protection(q);
- }
- 
--- 
-2.54.0.563.g4f69b47b94-goog
-
+Jason
 
