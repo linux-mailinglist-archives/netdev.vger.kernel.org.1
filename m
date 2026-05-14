@@ -1,113 +1,119 @@
-Return-Path: <netdev+bounces-287988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287990-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Ck7KLDYBWqacAIAu9opvQ
-	(envelope-from <netdev+bounces-287988-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:14:08 +0200
+	id gPqSGgXbBWrAcQIAu9opvQ
+	(envelope-from <netdev+bounces-287990-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:24:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 640BA542E39
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:14:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A09E543089
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:24:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AF2C13089844
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:08:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2717830817DC
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A6B3FD13D;
-	Thu, 14 May 2026 14:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C5E3DDDC2;
+	Thu, 14 May 2026 14:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuDcjYLT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oHcE4wn4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010A03FA5F9;
-	Thu, 14 May 2026 14:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8F2428837
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 14:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778767687; cv=none; b=itUsbQPbCXXZcRHom/RP7z9ZfcXrigeU9ak70ur23FzUaCxqUlu9q5Im6J/JIAVa+w6HPNBcalcBqm/bmHrpkWV/1IcycxHaOH6ZysMDmp46DhfSdnYpZM63ZDjNbKQ+EWxqlYHvgIj1oo/W1LLekXqrBPHLQFwSWT2labzaoHg=
+	t=1778767776; cv=none; b=Fq6AwQscdcmiZZNP972UzCpPFmHu0bsTU4A0yPdDcHfoB87mjB06HNWrijFyHUlxdi2xh13K9Z6R72d6Rr6MvNtm/RUvnDtPC3VUBA5ndIfziLw/fsyMLOsAphj/ZNMtocVRrqegRsns4kBfjZEEi96zEVrQuJhuJ+RgXy+QUmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778767687; c=relaxed/simple;
-	bh=imLyI5VX/UiHKhYAptgg2Ym4C+4f2expui1LJpsnLnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rDme/EIl954X+mFp6CXtO/tB/Ur1RT9RtxGt8zeTV7iDRmfRT432P0BgO9lr8dVIDnW7MJ8qUIuWiKgXhe1EEpRFbIM8VLBPgfwwMQ7NO9V6M7UPtxuyRM2Ua6vhm4iNGA9l4ps7G4d1I6B3ZBJzN6WK4yEu5RKsfASir+M+Aqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuDcjYLT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 372FCC2BCC7;
-	Thu, 14 May 2026 14:08:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778767685;
-	bh=imLyI5VX/UiHKhYAptgg2Ym4C+4f2expui1LJpsnLnc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NuDcjYLT7nKnd0/dVsCi7VI7CK/Nn07EJGpF5f0JsHZwyo4MyQzQfZk/mflJ/AKHJ
-	 sp7oGVRYOgo0SVEtpUc5+kED425f+b2Jkk0GzBwS2h5ir4AkV21lXDdaGu4kkxN5IU
-	 JCUQS9JYW+RZih4AqWYjcoO01F8SdivepOFRPvFf2w31cXaEn/YmQNooH0NXw1UUF2
-	 DDBrzVdfqk/JEpwRn76xo0qXfFJMcRPJtG9PTrYtxzRROvEuc74wO4MKz7VfWxz+CF
-	 tm4uhkFZaLTx8qY8akRLBFAB1A6vL6qH023mThLlpRchfl8G+I2VY4CIBID6tewI1l
-	 bW+Zn/j5KPz3w==
-Date: Thu, 14 May 2026 07:08:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Rodolfo Giometti <giometti@enneenne.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] pps: make number of PPS devices configurable
-Message-ID: <20260514070804.7cbb6181@kernel.org>
-In-Reply-To: <65a3d091-0648-4c6c-8062-869d0fcec8dc@linux.dev>
-References: <20260514112614.2016026-1-vadim.fedorenko@linux.dev>
-	<20260514065526.2ed937dc@kernel.org>
-	<65a3d091-0648-4c6c-8062-869d0fcec8dc@linux.dev>
+	s=arc-20240116; t=1778767776; c=relaxed/simple;
+	bh=VZe7viTjyyuvoeg4TEvS6pWNba6qbS1ennxYCshmPbc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iWwnkoiYJoePbYjOU0HsjsGdCVtTwSeq5SJ4doP3/ezS0KGUakWpdPcQrllQgiUffSyyFZ9P2qXz7zILZ/ANVoKWiOCuFhX08vfH5r5N/05i5oBYd8xVGKJu8pggdtChYQFSP+yVaCjMSgd06s1OqH9a5cqVfzguM3/C2zy5QrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oHcE4wn4; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <174e2370-959e-4b41-ab55-8058b84a12f6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778767760;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r3/oAeJ+mSCafBgEIshGhkz6UcGuH8qgDexlJq8w9tQ=;
+	b=oHcE4wn4DtcHOwgvBlagGPKGttGhrqPo4VMPj8SWZo/8qKwNP15R1GalXVb5uMhVUKhv1a
+	P5tPEqidchyWXU5eUYwY4jZrQ9+q9cqGi98/iimdeKQrypeMKvlmD/EaXCV68bx7CX9lx7
+	sOpdy9555Iv+bHCf0l2eEggvn5hMLAc=
+Date: Thu, 14 May 2026 15:09:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [RFC PATCH] pps: make number of PPS devices configurable
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Rodolfo Giometti <giometti@enneenne.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260514112614.2016026-1-vadim.fedorenko@linux.dev>
+ <20260514065526.2ed937dc@kernel.org>
+ <65a3d091-0648-4c6c-8062-869d0fcec8dc@linux.dev>
+ <20260514070804.7cbb6181@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260514070804.7cbb6181@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 640BA542E39
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 6A09E543089
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287988-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TAGGED_FROM(0.00)[bounces-287990-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	RCPT_COUNT_THREE(0.00)[4];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu, 14 May 2026 15:03:03 +0100 Vadim Fedorenko wrote:
-> On 14/05/2026 14:55, Jakub Kicinski wrote:
-> > On Thu, 14 May 2026 11:26:14 +0000 Vadim Fedorenko wrote:  
-> >> Modern systems may have more than 16 PPS sources and current hard-coded
-> >> limit breaks registration of some devices. Make the limit configurable
-> >> via Kconfig, keep default value of 16 devices. UAPI has to be changed to
-> >> support maximum possible number.  
-> > 
-> > Hm, since this is effectively just sizing an IDR maybe we should just
-> > bump it to 64? It appears to cost nothing if not used.  
+On 14/05/2026 15:08, Jakub Kicinski wrote:
+> On Thu, 14 May 2026 15:03:03 +0100 Vadim Fedorenko wrote:
+>> On 14/05/2026 14:55, Jakub Kicinski wrote:
+>>> On Thu, 14 May 2026 11:26:14 +0000 Vadim Fedorenko wrote:
+>>>> Modern systems may have more than 16 PPS sources and current hard-coded
+>>>> limit breaks registration of some devices. Make the limit configurable
+>>>> via Kconfig, keep default value of 16 devices. UAPI has to be changed to
+>>>> support maximum possible number.
+>>>
+>>> Hm, since this is effectively just sizing an IDR maybe we should just
+>>> bump it to 64? It appears to cost nothing if not used.
+>>
+>> Just bump to 64, but keep it constant? In this case maybe 256 just to
+>> align with the max minor value for chardev (in compat mode)?
 > 
-> Just bump to 64, but keep it constant? In this case maybe 256 just to
-> align with the max minor value for chardev (in compat mode)?
+> That's fine too (the value is the count right? It's not the max id?
+> Cause 256 would spill out of u8)
 
-That's fine too (the value is the count right? It's not the max id?
-Cause 256 would spill out of u8)
+It's the count. Max id will be 255.
 
