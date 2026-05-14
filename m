@@ -1,196 +1,189 @@
-Return-Path: <netdev+bounces-288069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288070-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GFzeAgARBmobegIAu9opvQ
-	(envelope-from <netdev+bounces-288069-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:14:24 +0200
+	id OJI5M8cUBmp3egIAu9opvQ
+	(envelope-from <netdev+bounces-288070-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:30:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53ED8545C0E
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:14:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9027545E18
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 672CA3016ED0
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:14:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A166D30072AF
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8887D391E6D;
-	Thu, 14 May 2026 18:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D023655FA;
+	Thu, 14 May 2026 18:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TDklkNMk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDRWyMGM"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E213115BD;
-	Thu, 14 May 2026 18:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0681D26A1CF
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 18:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778782460; cv=none; b=CM0hfOkvpxV21gvAA3yIOJ+NurdQMYafLdwEZ+Ksor2qeJh9qukSGVr21LCLURKbZk3I9DYeEHvOPoYYpy8GqX6v3HN3IwheKtvU+SQta5Mf2kJWoDByk8Z0vCrqMcMhPn/MkYG1QQgIU+JziCeBgs5bkxX3URfNbly5kPO5HQ4=
+	t=1778783426; cv=none; b=bGtNTC0NZlc2bafwQkINudQDwnXkZBNUfettievjMuU4IyeYG69qyrG0s9F4mW2CwDPU9HAGpIPEQYs2gJ/gCQK/3fxfHVNRCSG4FIRgeyyADYDmJCfB6S5Nw5KIJNffNKv09MYEPOQZryV1zb3z3Iu0vWcCUwg91nV4fqPrsgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778782460; c=relaxed/simple;
-	bh=BQ7qpMLSNXeBFl5qOYux37jkMV7llWRcNVE9SfAA2MM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A6qF2ADjvoZbKzPLoWGodJXb3bEFM8m4gef444bWWJzNE1CGw9+vG0DCWMmgCjgGS7ETCIHEGfKgmuPhvIxnkRRKT1+NpJR1JiU7vFNlnA1CIURgwhP3GmIF5B43f0kRHhB3wxJ5z2HyE2dS7/rq2yO4EFv6NIa9c4JGLwl9s+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TDklkNMk; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1778782459; x=1810318459;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=BQ7qpMLSNXeBFl5qOYux37jkMV7llWRcNVE9SfAA2MM=;
-  b=TDklkNMkHE+ntWlumtmNhhu56wBJCDMd2kME0Hm/+lfq3fh3mOD1OPgF
-   1jtqjJt2vDeEca75ZyQ+22OzCObtOmppDWD7TsDw1BaDL9E5CyLpv7DYq
-   xUONDl2lm+T92f12xzjLPPiFL1R9p8D+MRtIMWfRcSgt39ZH8/jdG+7h5
-   X8GxvTO9bUvvRYHXWwQrxNx62lvx/tzzyPL38bTwI2zeSdgM8G9CYNMWr
-   xzujF4NX97U6khlIxkXDQ3bSjO0WxBwm+8QVdyfM7ApBvzKezGRZc7yps
-   37iuZI1MJvFMiDtJUPX+IX8bxz/JhLi/IjWcyiOnT+njfbG+NjdPB+xv1
-   w==;
-X-CSE-ConnectionGUID: l6cMKygMTVSs5+14yW2K1w==
-X-CSE-MsgGUID: vnaWtqheS02Sq0tvd0rzXA==
-X-IronPort-AV: E=Sophos;i="6.23,235,1770620400"; 
-   d="scan'208";a="288887666"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 May 2026 11:14:18 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 14 May 2026 11:14:17 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Thu, 14 May 2026 11:14:13 -0700
-Date: Thu, 14 May 2026 20:14:13 +0200
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Steen
- Hegelund" <steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, "Herve
- Codina" <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, Mohsin Bashir
-	<mohsin.bashr@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next v4 09/13] net: lan966x: add PCIe FDMA support
-Message-ID: <20260514181413.n7o6jwwfoez4up6z@DEN-DL-M70577>
-References: <20260508-lan966x-pci-fdma-v4-9-14e0c89d8d63@microchip.com>
- <20260509082720.503A6C2BCB2@smtp.kernel.org>
- <73a19f89-ccd7-4762-8e07-812d8d95ead2@redhat.com>
+	s=arc-20240116; t=1778783426; c=relaxed/simple;
+	bh=Geh2ltdSeCVx2RDd9OVcFGSMPDFuS/R9rLGG9L0n78w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aNkgox79habwkcQeP6Jl+fb0KI7Q0gK2vn05zH3v32JitxKclSnMAfXA3WBGRj/7O61dDukPRbYJkEtnKNfATYOkEcFcNnBsIlJtcHQRonnRWbizE5o110Q3tBHdwYpwBDhlQK5t7nYwVM0grKcNINHbvgf97vXnNz2IT1osOAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDRWyMGM; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4893940bb5eso51864865e9.3
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:30:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778783423; x=1779388223; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QDvdudeeJAHgJGuZXL6tml+bzI7syuTzDcLB+eMLOx0=;
+        b=EDRWyMGMjir7OpKYn0HyzUeZIzVBWxj31SB8FtQr49EyffcWq+6Xj2MscHdzqwhYNe
+         qrzkEWhuxR4rdKZFvWaoWzeqSTmgCjxZm+BOuQ/ZShdhk1cXPLel70PEzZlx/7wxU938
+         /3cBVSN/twyjYPfZUeugziudPcDBg4OrKm3P23dLVVm50kpIq/9u90WFFeTgSEGJLn44
+         TOf+eXa0v9v363ViOyeUGoq72nK6U9nBu1Ngdj/lhkNfg0Ma5ugk/uhofJAkFommqTgr
+         u+pV8I8nV0JVO+XaAMxR7NusL9dF77VblO+h70UIlYa102sCgBJXp84iLUWZHrV9XBYc
+         +i8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778783423; x=1779388223;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QDvdudeeJAHgJGuZXL6tml+bzI7syuTzDcLB+eMLOx0=;
+        b=U3Pw1zKS3T6O1M6M35k5Bq9COoaQpykws8icG5tpSVKZqJBOxqanq8ylvgsn+L2VqM
+         X7g5VKDpxeArStX8LyhxjvyFfo416Bu50SZQ1oJKL3ZPzNdA7/IckTID30qieMMQJ20m
+         vSHU9jIt7bCbtkx5z3Aj74613EVfhQt/bZwJYrZ8vESz4YFu1PRNFr6U5/SyvtUNZUNw
+         8x0c8X+tNyIabtxS9Mu8ZCJhLfHV6d5NUPQd6m6ifbppbAm8d/eUgwHBD2JFwvI9NqOp
+         /7jG9xqFY7onwvKIiIBj2o/MvoX2ky8hEI5c1UVsE0CCznj2ZF1sL2gfawzqnOmneK9O
+         O6EQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9VpzLzf8Q+sQt+yBUFxS2ml5caumgk1oRWJC/ez5y0TszSqW0u34/rwBdElUWIROxvJZFXGG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0KTZ+vjB8GDagV2+Psn5CNexNYvL+qT28PQ2u992fTgu/CfQJ
+	BWNdxNoOhT+HP25UHKjP+9o9zLr0E4hAYkXt4ErkMkCkYjC6BcMYzfdq
+X-Gm-Gg: Acq92OG2jTc9n4DpJgPKJ9GPSaAFAN9EkiIE+PzbRgyLEaln4ZLhEUHrd7U5OTEiZn8
+	jbsfv5AblFg0voVf7dktsALX0eKdw8+9OVTg0DNuece16bgj1P9ENmfCbF96YPP6TXrac1VpUkj
+	yByWetHgMYUZy7ngvcW171VPtGwbqkZcXI7v3lpyqUh1AD0eSFY5EnJsf+V5cs8Ubi+LzfEZ4H5
+	UWywBROKvGRKm7TKjcjVgs+nIJG/jW3g1q4S+aLYoXcIgd4jV0JhuZ7YrSfitZAbt0jNYXzYWAE
+	OiKBm8+CyXwRchHTqocBljb6kfAjIGm0+IJvgcE0G+U8jnt6K12eNPqQfR38JN8wIxhRk9C31dc
+	4L7jlnH/7ucEf/AfvJ1P9ZIQiPZMFouORmSr9zZNemoO49Vg6mDAx9/xjACAm0zaSlgXiOqBkLN
+	p6qskWUazHcXnOBUQEJ+RNhgG+TttJq7sQucpu8IulZEGPmIFv5Eq93gVqZ+yAw3tb8fTxQ15fM
+	K8kx1z6+T4=
+X-Received: by 2002:a05:600d:8447:b0:48f:e230:80a1 with SMTP id 5b1f17b1804b1-48fe6328b5fmr5516255e9.31.1778783423173;
+        Thu, 14 May 2026 11:30:23 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fd76801f2sm31320475e9.7.2026.05.14.11.30.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 May 2026 11:30:22 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>
+Subject: [PATCH net v2] idpf: handle NULL adev in idpf_idc_vdev_mtu_event
+Date: Thu, 14 May 2026 19:30:19 +0100
+Message-ID: <20260514183019.49527-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <73a19f89-ccd7-4762-8e07-812d8d95ead2@redhat.com>
-X-Rspamd-Queue-Id: 53ED8545C0E
+X-Rspamd-Queue-Id: C9027545E18
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288069-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lists.osuosl.org,vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-288070-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:dkim]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-> On 5/9/26 10:27 AM, sashiko-bot@kernel.org wrote:
-> > Thank you for your contribution! Sashiko AI review found 10 potential issue(s) to consider:
-> >> +static int lan966x_fdma_pci_napi_poll(struct napi_struct *napi, int weight)
-> >> +{
-> > [ ... ]
-> >> +    /* Get all received skbs. */
-> >> +    while (counter < weight) {
-> >> +            if (!fdma_has_frames(fdma))
-> >> +                    break;
-> >> +            /* Order DONE read before DCB/frame reads below. */
-> >> +            dma_rmb();
-> >> +            counter++;
-> >> +            switch (lan966x_fdma_pci_rx_check_frame(rx, &src_port)) {
-> >> +            case FDMA_PASS:
-> >> +                    break;
-> >> +            case FDMA_ERROR:
-> >> +                    fdma_dcb_advance(fdma);
-> >> +                    goto allocate_new;
-> >> +            }
-> >> +            skb = lan966x_fdma_pci_rx_get_frame(rx, src_port);
-> >> +            fdma_dcb_advance(fdma);
-> >> +            if (!skb)
-> >> +                    goto allocate_new;
-> >
-> > If napi_alloc_skb() fails due to memory pressure, does branching to
-> > allocate_new prematurely break out of the processing loop? Since the hardware
-> > interrupt was already cleared, and napi_complete_done() is called below,
-> > will this cause the RX queue to stall permanently for the remaining
-> > unprocessed frames? Should the code drop the packet and continue instead?
-> 
-> I went over the series and sashiko feedback, and generally speaking the
-> series LGTM, but I think this one is real and should be addressed.
+idpf_idc_vport_dev_ctrl(adapter, false) clears vport->vdev_info->adev
+to NULL but keeps vport->vdev_info itself. An MTU change after that
+calls idpf_idc_vdev_mtu_event(), which dereferences vdev_info->adev for
+device_lock() before reaching the (!adev || ...) check.
 
-Thanks for reviewing. Before I respin, I'd like to sanity-check the design
-expectation.
+Cache vdev_info->adev once with READ_ONCE() and bail out if NULL before
+locking. Use the cached pointer on both the lock and unlock paths so
+the unlock matches the device actually acquired and cannot re-fetch a
+NULL slot.
 
-I had already looked at this and concluded it was fine — the reasoning being
-that any leftover DCBs (frames) would be drained on the next IRQ when new
-traffic arrives. Same pattern exists in all other Microchip FDMA drivers
-(lan966x platform, sparx5/lan969x, ocelot) and has been running since their
-introduction without a reported issue, AFAIK.
+Fixes: ed6e1c8796a4 ("idpf: implement IDC vport aux driver MTU change handler")
+Cc: stable@vger.kernel.org
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+v2: cache vdev_info->adev with READ_ONCE() to avoid double-fetch and
+    use the cached pointer on the unlock path (Alok Tiwari)
+---
+ drivers/net/ethernet/intel/idpf/idpf_idc.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-Is calling napi_complete_done() with DCBs still pending in the ring itself a
-NAPI-contract violation — in that case this is a pattern that needs fixing
-across all four drivers.
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+index b7d6b08fc89e..9f764135507c 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+@@ -162,9 +162,12 @@ void idpf_idc_vdev_mtu_event(struct iidc_rdma_vport_dev_info *vdev_info,
+ 
+ 	set_bit(event_type, event.type);
+ 
+-	device_lock(&vdev_info->adev->dev);
+-	adev = vdev_info->adev;
+-	if (!adev || !adev->dev.driver)
++	adev = READ_ONCE(vdev_info->adev);
++	if (!adev)
++		return;
++
++	device_lock(&adev->dev);
++	if (!adev->dev.driver)
+ 		goto unlock;
+ 	iadrv = container_of(adev->dev.driver,
+ 			     struct iidc_rdma_vport_auxiliary_drv,
+@@ -172,7 +175,7 @@ void idpf_idc_vdev_mtu_event(struct iidc_rdma_vport_dev_info *vdev_info,
+ 	if (iadrv->event_handler)
+ 		iadrv->event_handler(vdev_info, &event);
+ unlock:
+-	device_unlock(&vdev_info->adev->dev);
++	device_unlock(&adev->dev);
+ }
+ 
+ /**
+-- 
+2.53.0
 
-Happy to go either way — just want to make sure I understand the problem :-)
-
-> 
-> Also it would be very helpful if you could (for future series/revision)
-> reply to the (wrong) sashiko comments individually explaining with a few
-> words why the are off: decoding the context requires much more time for
-> whoever has not wrote the code itself.
-
-Ack.
-
-> 
-> I understand that dealing with AI feedback is a pain, but, paraphrasing
-> a great aphorisms creator, I can assure you that ours (maintainers) pain
-> is greater.
-
-I can only imagine.
-
-> 
-> Thanks,
-> 
-> Paolo
-> 
-
-/Daniel
 
