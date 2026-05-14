@@ -1,183 +1,141 @@
-Return-Path: <netdev+bounces-288025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288026-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGWTD0HuBWpWdgIAu9opvQ
-	(envelope-from <netdev+bounces-288025-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:46:09 +0200
+	id yDaZF/buBWpWdgIAu9opvQ
+	(envelope-from <netdev+bounces-288026-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:49:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DEF8544393
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:46:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEB2544405
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A379F300950C
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:45:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 725C4301226B
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A5B1A6824;
-	Thu, 14 May 2026 15:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14AC2BD01B;
+	Thu, 14 May 2026 15:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="D1BVIKXX";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RJdzz2/T"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Gge5iAVQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6539175A6D;
-	Thu, 14 May 2026 15:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94573090D7;
+	Thu, 14 May 2026 15:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778773552; cv=none; b=p9aXCXXyZ5aX1ZU4rm0OzGwi7dwoToiRGqIbaC838pS7+gLN+tRdcQuQvpftXwgG0/FJIrYX2HuiuJ7FvweP7dsgAWEfzRwSXokYsyFPcUdEx5ALbdbXvrzqf0RWYm045IsdHcOgjdE/kQ7ORTArBS2U98iab+8JkxlolrZSOEM=
+	t=1778773715; cv=none; b=D7rcJL6xgjJPWu2fmZHZ+4HEZMqNtt5EKLFRnXPQUcU+UCT0SbEa9Wh4V3ckmMGfOUpS4mVu+t0j56gbeiolDiJOS0xGpNOEpnRkHPpN8QDzvQ4ogITrdgYV/ghLxLY947wHmI1+xV59JMxt/RRxxmc3477wjsRQCwvd2zXO+hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778773552; c=relaxed/simple;
-	bh=2eZQ28o2aeUb29+g7yRCupFzyRVNMQupfH8jXxpZaOY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gKGsBmANOWLh4YNRfccH+dJ/nnYEiY5uYromck4rRP4DOd7PchgyqIgpFsfOUc7nWfSDgDItFwiNEIFUtL41DjPMh3HN/cMJRG52vTLnJ9qJO02mSPXKOQPLNqAaXognGx1mH3LX8IYGtMEaLZRUYsQL/81bJHr0fkLHpX41F6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=D1BVIKXX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RJdzz2/T; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id CC65B14001D8;
-	Thu, 14 May 2026 11:45:48 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 14 May 2026 11:45:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1778773548; x=
-	1778859948; bh=UsgCLgF9UwbEiwmeUtgZkK88jnAqNvlDzxdt4itg7V4=; b=D
-	1BVIKXX3t118XISFBRL8rWMzGtSS2KpxPIqjLYqAT4Yd0mVS0cpvJDR5lF1KiNBy
-	PFmBa0HSNn1SQ3MnyY/Li03JHCjN3OPUyjfneHnhzqHNIfWp+eTr+EuK/2Oel7MB
-	DVTiu6DLPxDjDVNb2edWFSe8Oy/7cHD6xk9j1xfLSudbDDhIIUq+a4MBV+XvFbbt
-	62nhUNzQpllx+Q/jMiqp0EuQNwOas3fJSFueI6x1vVaDiBKRgOR/F5gDLcow1h7o
-	zmfwSsRzodSRVaozpa4uMOpHmOkScp7ffg69m+289trqw+A4GwKNus74vB7TF+mt
-	klcB0NvzEJczYRmboO6ig==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1778773548; x=1778859948; bh=UsgCLgF9UwbEiwmeUtgZkK88jnAqNvlDzxd
-	t4itg7V4=; b=RJdzz2/TR+QVl1zoMiTFWHiec21D4kFmQ0x7ovD42KVNs8FxzqF
-	mqWSTpMJUW8Q9x+22W9YtenEnspnIXFOplhYWe4MnCMHY37hyqPBMjlC5C13IEHE
-	eyo4XwsJlk+YDD+hrTpWvlyDFYgX0laTU5jNSUZabl2BmMnU7fCYsAlfkI5s3VSJ
-	73omUKCt50huhoXdTqJWijgzWTRuvSWBYjucrIOgnwjKfNCN4FT5vMz6fhY9Bnvo
-	7D1iI5w7SXJMlTuo7aUwiKs9wsogMsdYU7lSnxJ1Qmv2XMGXzM+evV/wMuEbx1Vv
-	gXH5LCTw5kkE+6Cy9PcTjJZfSTjFHsbHI0g==
-X-ME-Sender: <xms:K-4FarvkBKr5b1gO1rTKdYgErAJEhChKJc0uhmTPe0C74qc6kf5D1g>
-    <xme:K-4FaoYkPhmSyOY71Cr4hAcgnDm1Mb1bNegZczKAEWyGcrBrlXtwJHtVVSz_K92m1
-    X1UclImawhjKfS6v1j_gH5xj9ux1hyJlgQbdRyRqy-gZjHDO2Bq1_o>
-X-ME-Received: <xmr:K-4Fak6NrzY0x8wYzSPH5JXyAJOqjHDnzlqjbdRiNZBnYYDU5q18GNTmJqaTJ9MJ9Pk8T47slHXPCk_TZQyDUkI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdejleduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedujedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepihhmvhegsggvlhesghhmrghilhdrtghomhdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgv
-    thdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-    dprhgtphhtthhopehsthgrsghlvgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehmhhgrlhesrhgsohigrdgtohdprhgtphhtthhopegurghvvghmsegurghvvghmlh
-    hofhhtrdhnvght
-X-ME-Proxy: <xmx:K-4FagkXQQwfMnTmZ7T5ECYM1M7Umkhwmp7ung3959P03VQ3notdww>
-    <xmx:K-4FaqGXdMkQOR-oAgm46DzdNUPxhv90R0XyTO3asgFUKY8EtZlY_A>
-    <xmx:K-4FakHRc4p7vcfOGwFI7Ty7ko_TOimfiUHCCihhccQSdRrypZ8yTg>
-    <xmx:K-4Fai2e25FYnrtz6vUVhzwObrJA-9DGiU-XzzMt-fP6Ulz2A55Prw>
-    <xmx:LO4Far8mub6S-7QFXXVHA-scgYyjyF_Ydv3EFoQfd_RDJZ3rZVxcsW6J>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 14 May 2026 11:45:46 -0400 (EDT)
-Date: Thu, 14 May 2026 17:45:45 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: David Ahern <dsahern@kernel.org>
-Cc: Hyunwoo Kim <imv4bel@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-	kuba@kernel.org, steffen.klassert@secunet.com,
-	netdev@vger.kernel.org, stable@vger.kernel.org, mhal@rbox.co,
-	davem@davemloft.net, horms@kernel.org, edumazet@google.com,
-	kerneljasonxing@gmail.com, herbert@gondor.apana.org.au,
-	vakzz@zellic.io, kuniyu@google.com, jiayuan.chen@linux.dev,
-	ben@decadent.org.uk
-Subject: Re: [PATCH net v2] net: skbuff: propagate shared-frag marker through
- frag-transfer helpers
-Message-ID: <agXuKbQMVTYT5Jgb@krikkit>
-References: <agToIEDI4TaTNLRb@v4bel>
- <92ec6190-0255-4b7c-9524-254cb37476ab@redhat.com>
- <agWYGuJ__OtpgjnB@v4bel>
- <agWiDlvu351MSuqO@krikkit>
- <69f72d09-8054-4d26-b277-9e9b7a8854c1@kernel.org>
+	s=arc-20240116; t=1778773715; c=relaxed/simple;
+	bh=23Y3629JSdEQ48nstGuML13Om1OZG3R1qIfmIRU3RrA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XqXfO15OByUTGlXZi/QNf2xwhKizB5wojQUjkvt0urHDgnRxuE+sPhkEqy5CiibpL4G4XlHnOxIjOAjdOr+3xVSN1CWx8byfc7hL8DQ7VNvDdqkMHcoMqeoOqyQxGpKM+Vd6Zd79+FxEl9dSRF1OKoG9vx9EZB7CkTEzLGfIoWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Gge5iAVQ; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=PeqDcMV0a947KRRCLlzeVviDR+jdI93Fkb47jTMUgeA=;
+	b=Gge5iAVQvCEnCeDXs9jkwTc+4hzg742EX8wSnOS97Uz+7CkrRzxpEwmnxZ+pS6
+	Z3DzSbciJREdSadYhSXTht+Lz9onidmYvQT5hK449mCERhlHIct77UmOSyuMXFQ8
+	31OlXAkiqrfs3L3UsH9dr4jcLh/amjer/uYvWqK9OPJLo=
+Received: from [IPV6:2601:647:6300:a030:d09:4215:2d93:9875] (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wD3PxY47gVq6khdBQ--.36545S2;
+	Thu, 14 May 2026 23:46:06 +0800 (CST)
+Message-ID: <da3e46ad-a713-4d02-8ca2-fa402e236597@163.com>
+Date: Thu, 14 May 2026 08:46:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <69f72d09-8054-4d26-b277-9e9b7a8854c1@kernel.org>
-X-Rspamd-Queue-Id: 6DEF8544393
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
+To: David Ahern <dsahern@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: Edward Adam Davis <eadavis@qq.com>, akpm@linux-foundation.org,
+ arjan@linux.intel.com, davem@davemloft.net, edumazet@google.com,
+ hdanton@sina.com, horms@kernel.org, kuba@kernel.org, kuniyu@google.com,
+ leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com,
+ syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com
+References: <20260513234655.GW7702@ziepe.ca>
+ <tencent_3CCD70788A6EAC2D356D4C9674E8D2EEEA0A@qq.com>
+ <20260514115048.GX7702@ziepe.ca>
+ <139794f1-80b8-49d9-829a-0629379def51@kernel.org>
+ <20260514141409.GA7702@ziepe.ca>
+ <200b3923-d794-4779-8f90-a8b858861d4c@kernel.org>
+From: Zhu Yanjun <mounter625@163.com>
+In-Reply-To: <200b3923-d794-4779-8f90-a8b858861d4c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3PxY47gVq6khdBQ--.36545S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Xr18uryxZw45Cr4rJr1rCrg_yoW3Awc_ur
+	4Dur92kr10qF4xZa1xJF1xZrsYgr4UWr1UAws5Xr13J34DAwsIqrsakryrZw48ZF47KFy7
+	GF1Syw1Yq3W2kjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU1TKZtUUUUU==
+X-CM-SenderInfo: hprx03thuwjki6rwjhhfrp/xtbCzR+m3moF7j81LAAA3N
+X-Rspamd-Queue-Id: BFEB2544405
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288025-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
+	TAGGED_FROM(0.00)[bounces-288026-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,kernel.org,secunet.com,vger.kernel.org,rbox.co,davemloft.net,google.com,gondor.apana.org.au,zellic.io,linux.dev,decadent.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[163.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mounter625@163.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[qq.com,linux-foundation.org,linux.intel.com,davemloft.net,google.com,sina.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim]
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-2026-05-14, 08:37:19 -0600, David Ahern wrote:
-> On 5/14/26 4:21 AM, Sabrina Dubroca wrote:
-> > 2026-05-14, 18:38:34 +0900, Hyunwoo Kim wrote:
-> >> On Thu, May 14, 2026 at 10:04:29AM +0200, Paolo Abeni wrote:
-> >>> On 5/13/26 11:07 PM, Hyunwoo Kim wrote:
-> 
-> >> Agreed. tracing SKBFL_SHARED_FRAG propagation paths one by one is
-> >> not a robust direction for the fix. Even minor logic changes elsewhere
-> >> could cause the issue to resurface.
-> >>
-> >> As a follow-up,	eliminating the in-place handling in esp_input -- accepting 
-> > 
-> > It would close this group of vulnerabilities, but there are other
-> > parts of the networking stack that consume this flag. For those,
-> > chasing missing flag propagation is still a useful task.
-> > 
-> 
-> Seems like this should be an skb helper to manage the flag with really
-> good documentation on when it needs to be set, reset and propagated.
-> 
-> I walked skbuff.c yesterday as well, and there are several places where
-> it is not clear if the flag needs to be propagated or not.
 
-Or maybe even something like a skb_transfer_frag that handles updating
-the frags array and copying the flag. Then we wouldn't have to chase
-functions that mess with frags[] directly and forget to also adjust
-flags.
+在 2026/5/14 7:26, David Ahern 写道:
+> On 5/14/26 8:14 AM, Jason Gunthorpe wrote:
+>> Edward, please come with a fixup on top of this since it was already
+>> applied
+>>
+> Zhu Yanjun: As author of the patch that introduced the bug and
+> maintainer of the rxe code, why have you not addressed this problem? It
+> has been well known for many weeks now and multiple people have
+I am aware of the issue and have been following the discussion and 
+proposed fixes.
 
--- 
-Sabrina
+I did not want to rush a change without fully understanding the 
+implications on RXE
+
+behavior and existing users. I am currently reviewing the proposed 
+approaches and
+
+working on a proper fix.
+
+I appreciate everyone who helped investigate and test the issue.
+
+Zhu Yanjun
+
+
+> attempted fixes. Seems like you need to step up and take care of it.
+>
+
 
