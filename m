@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-288104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WMl7OqlXBmqhiwIAu9opvQ
-	(envelope-from <netdev+bounces-288104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:15:53 +0200
+	id AKUKGblXBmqhiwIAu9opvQ
+	(envelope-from <netdev+bounces-288105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:16:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A4A4547B42
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:15:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9303547B50
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:16:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 362C43015A5D
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00088303B7EC
 	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 23:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A591F0E34;
-	Thu, 14 May 2026 23:15:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448A13812FB;
+	Thu, 14 May 2026 23:15:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="BsiQELl8"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="gbeNdo8Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6B13F412A
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 23:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A515145A1F
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 23:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778800551; cv=none; b=IJporBckeFUA+4vGDtWbUNbcD1lvJ8nIPE3YBiw83CumESu3xmOOPkfs7OVYV8anyeeHCqhd5fnOpfSZUWcYLYyt7SygdWpG/UCyCBgbaLcvFJ0wKOFRmbAR6sBZBU8IuELHoRAKheRsnCTM5tfX1Bzes8VHDF2xtPC4hWtvzj8=
+	t=1778800552; cv=none; b=b+E0oe2zQFUd1k0uOiL4nELIRD2RNbPNlc9YAnTxqLh6IaFCpMogLSNLQC+uAcNFCB8qMjJcjenZsSmoDHI/Mx8n/4oH18kJU4aeabKTJTnAzoVi4zEMA7XMiEuLuj0gJAMlgQ+iUUwCp306yFKXyZwjw/ZnEu68lCZfMGm80HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778800551; c=relaxed/simple;
-	bh=xuV7oMBwpQNICf7ypffjb3A6oSPDRmw6SqWhdxSYP6g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K+r5D37JtONs6QHfFm+K0J0jL8KPhQT1nS5BYYBR+iOqaA5IM5Jt1d35mH53P5N9JUshY+1rEcyBdbbAP1tgLIiLEAwwjEZW6ngk5t4fM+xa82H5QWo3PBBlNLb50fHYY1I7nAQ+aKJKaSKWix5EpikxDHUMQ7Jb2MlSSQpG3gY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=BsiQELl8; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1778800552; c=relaxed/simple;
+	bh=MtJHNlbiZerjdPEzOlj263GMPVJy10WoBSXyLLQ4UyU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=crPV3nCcfStbTpD8QPyYkb/qI0Fbz/NvLjqnC1E+SqIL72sZGs54npHzSYb26ZpyT9cK0SF0/SyTnmh/w4jvP3w3xlCEhfAo3wrVwqcVGK+IWnZSpKu4Zp99ntL6efyNMfNKCM9G3d4n6jEDmv7eahCeu36u1OZDgBP8g3z3bwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=gbeNdo8Q; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48374014a77so73859595e9.3
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 16:15:49 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488af96f6b2so100577395e9.0
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 16:15:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1778800547; x=1779405347; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HZKElj0kEL0YEHL3WJfdeYYaJhFprPYfcLNJbvBp48k=;
-        b=BsiQELl8hfSQX3Hi6pYs1oscX1F+6GrPTA/VU9R/g5GOhDr1RXjUcyM59IfwJGF2oP
-         Ovl2h2630d8CEmaPTa7yN4o1I0e+qcr5/9GSGddeM/RNaBNiKm/C7HmqpiaHiUCNGpMw
-         xHOdZK9VAcqRG7uYY6Reg3r9T3MSkc9SmNYQRDzTLPt25GtXw1Wz8wZoGi9s+5xBPwgW
-         zOHdp8qM2mABVBrq1IHMySVVuiDnguE/KSAMnv/clEsYeM51SY0XbLyk2Y4Ot4ENmsEU
-         QyOVgEdyeBh8wqiHeLEtJqu1wHyWjE4ik23KG3j4k09HPKRWWP+IRuUE/4ECszXVvEnF
-         TyCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778800548; x=1779405348;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=openvpn.net; s=google; t=1778800549; x=1779405349; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HZKElj0kEL0YEHL3WJfdeYYaJhFprPYfcLNJbvBp48k=;
-        b=Mcvg6DUWWKspgB3THmKJmW13n5VE2kBc23WNsZiKBRWOFw+nP6eh1YpvIt6CS6jNQs
-         AZF9VcGUMlb558dAXo/4j33ofYyWqQ/XpWAivNKBopWpetWa0Vh0Q7dYmCN8ZVZp54Q8
-         lYajn19/TZp4woIkNQAxoMCYd5x1/ET8or4liEXQ7Cl5hBBTkZc/KbjDeAcsil2cWIiU
-         irfHOvs/Y2jkkDiNKUjrRTFdF2smrSNicFDTUj+vmMfpjitRDhzJ9LTaXK0vumCgrvrM
-         7W3kODhZO1l7hbKK71ATA46vAwD3+zcSC2387O7pDeZ4L96MiHLaJw/wByDxw1en/SUs
-         oAIg==
-X-Gm-Message-State: AOJu0YylbZJ6gAuokqWjoXv14MZOtKOzMUdTYQ8NBzuKbcNf0jxKh/7n
-	+kdS98mqyBypTBSgkNB4hXOZa9QPf3bEdPonOo+n92lT5VgeeO835YdWBAlt7C7KSHKm4A+N9Kq
-	3e2UTodVvAvPOfhBOlNb42T3E3Gs8a/5Nh1JI9JhBmc3CsKBYOEroMCBYFboZ6XBCO98=
-X-Gm-Gg: Acq92OFgLQC7YNueuTg+TnscMekG1xlepQGAKahZhvUbYUOJTKioMjvRxtz7onx3vbO
-	J+crZTvxprlDOlTLbi5E216z9oAGt1nXKh24tvGgTLmPPYgi2ikM81VQu78pBrgfrzrllsLbEoQ
-	FOgQQJgT39d89xz+V2FsqNaTpyySDfg6mQ5bBV+CKjUmZwPsCYlsIImFnKZYd2x5YUxfHI/Ajyu
-	St9l7ouwPO3b/4tBz4dcYhkkXFrz0s9RuMdOa/JqClp+UkSDlOMihEsb2ZNkchwA/TRy9VaWobJ
-	FcOkdYmzx5RGWHmzmEk6Vsnt7dXF44wa0SNXNE/PNTH7BzQMkju4Lj/7CAvU+Gvlts5d5eGbBcH
-	Nqz0mdeXrvCfqpybPKQfBFHv+L0X2JeJODI3CU5j1/iACe0dfv68Rzc+/Yw+jA/fq90DBSe9kwV
-	3Yzss5ksPlNyNvu8jjr8T+6jZpvAkDrxLNaSYct8tJKLgzwA==
-X-Received: by 2002:a05:600c:3506:b0:485:40db:d40c with SMTP id 5b1f17b1804b1-48fe60e13d1mr17435085e9.3.1778800547554;
-        Thu, 14 May 2026 16:15:47 -0700 (PDT)
+        bh=OqoRDlzgxB40s7RWtbhlam/wZ2ILK++oCwT7V3WKKyA=;
+        b=gbeNdo8QG1aCXE7m8O44UomH2iz4583WE2KQB6K61nttTm0LW8fhMfwtl+u8MoTwvm
+         f5VXpf0BNn5R5JeU4YvZ3+/RM2zpDiwXqCj4o6YyljD1iAmeeniOdUFWpv1CUPDjv/Fj
+         u7ua3CJESJamqZN/sSjIUHr7Dysx9xstHz+zZxIHut2jpJwhBOeoMcmoIWPGPpsVez68
+         oLNrk93ICLK2Gwd26LKwRMxkJ55RwSyHMdxp6QgTViz+6hNKVi4e+BpPsV2gXNfApJNN
+         YSU9FkJpoh/9SzoOaahSRrGS8Me0YjYo9zzRrlOMl2es0NrLnuDY4CuiuxuXHph2e9xM
+         nwNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778800549; x=1779405349;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OqoRDlzgxB40s7RWtbhlam/wZ2ILK++oCwT7V3WKKyA=;
+        b=jBojQCyR4KYIb023zD2vwuMZ66cvgKogPEvGK1yV/1rz42tnsQMbTWV6qc4uizSHjd
+         G/MwZzBs3Swi2FyqNxqjdIPOgPrQlFJZtmxedRh0O7fp5MWFIxsw1+61l5UPu39d5BSx
+         UnnNcEQnwdf13DcB9XLkUzAu0gNtB8/czKaWBahHUiHKoiZlqOC58sY8XfKUUb+4Gzdm
+         0e+q7CEoyHRjaG+hOzIpnbsy4YmfKRx8Nqzpubj8+hbfbi90KVDbiE5NLmjkv5OnB7/3
+         7ZP1o/Id//nQ0YU2b8IMwrAkMxqkzfO1sTGQb6Qy1pqnbK1BjCA6XVIEmmQwkESKEjbB
+         jJsA==
+X-Gm-Message-State: AOJu0YzSIv66qkYr1LbgE7iVEfAH3Nnp7hzp43pA9gt00hD+ADXyTBYg
+	fd0yAD2QvYqX0C0k1ybEjcFukbTHtkPQrJwzEKBc1eqx20DBAAVfdTTT5u3dET+4C13DPS0p//X
+	q5aPdJnSetR4iTgkPDKP/BW1YfuGuFluGSKY8IM5GEJZ0l/iIS1MSD6syFG90gi76lIs=
+X-Gm-Gg: Acq92OE28NZLdS2n+c5odBOg2+9+FafLbt5cxknQ/szgsF9KqnTxUtXFvcZoiY5vdYv
+	2W5AkVSD9RKJIAunc0jK0gMXRBTedSmlMFLvt0pFXp0PqEPI7NphfKpiTkPDGQn5iItoR/A7WPO
+	rXKG2OrDrTfjJJFHDrK7yxOoploDK5kPvU5oXuYLEPoiUe/Wrj5TR1W8Sds5LMWOSgZT9/CFup7
+	0muy2PA0UvvnFbqO+CLkGFaxut9tBUm+JVlNnR8WKHVBg4mNrGFYc7s2379DKSJ3lLzgu+tYpuq
+	XIhbNCXQKMjS7dI4eodUxfjlpIjHE9jDJkfdouOoRCTWT7qtNdMr/ubqRn/QIuMZfETwbjq1Yg1
+	SRCwAk5Jy8rgErwa0SlYwmB2otS9Bd8npB77fKjrwcFTUBU9/Db4GNFtgSlWebBwFUbE28BOM4K
+	46p2U7i/qvlL6DWG9aVQuQUfMcDmzxuPpOl1Vx0TLfpxtNJw==
+X-Received: by 2002:a05:600c:8b75:b0:488:7ff6:1f75 with SMTP id 5b1f17b1804b1-48fe6321cdamr17622285e9.21.1778800548808;
+        Thu, 14 May 2026 16:15:48 -0700 (PDT)
 Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:a628:d33e:601:ebb9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c8344asm39155855e9.1.2026.05.14.16.15.46
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c8344asm39155855e9.1.2026.05.14.16.15.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 16:15:47 -0700 (PDT)
+        Thu, 14 May 2026 16:15:48 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: Sabrina Dubroca <sd@queasysnail.net>,
@@ -83,11 +85,16 @@ Cc: Sabrina Dubroca <sd@queasysnail.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Ralf Lici <ralf@mandelbit.com>,
+	linux-kselftest@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
 	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net 0/5] pull request: fixes for ovpn 2026-05-14
-Date: Fri, 15 May 2026 01:15:39 +0200
-Message-ID: <20260514231544.795993-1-antonio@openvpn.net>
+Subject: [PATCH net 1/5] selftests: ovpn: reduce remaining ping flood counts
+Date: Fri, 15 May 2026 01:15:40 +0200
+Message-ID: <20260514231544.795993-2-antonio@openvpn.net>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260514231544.795993-1-antonio@openvpn.net>
+References: <20260514231544.795993-1-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,110 +102,123 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6A4A4547B42
+X-Rspamd-Queue-Id: B9303547B50
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288105-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[openvpn.net:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288104-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[openvpn.net:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mandelbit.com:email]
 X-Rspamd-Action: no action
 
-Hello netdev team,
+From: Ralf Lici <ralf@mandelbit.com>
 
-This batch includes a few fixes for net. Specifically:
+Commit 201ba706318d ("selftests: ovpn: reduce ping count in test.sh")
+lowered the baseline traffic flood ping count to avoid flakes on slower
+CI instances, however some instances were left out.
 
-Patch 1 fixes the remaining of the selftests in order to avoid
-TCP failures on slow kernels, where pings cannot be always
-delivered on time.
+Apply the same limit to the remaining ovpn selftest flood pings that
+still request 500 packets.
 
-Patch 2 fixes a RCU deref outside of the RCU read critical area.
+Fixes: 201ba706318d ("selftests: ovpn: reduce ping count in test.sh")
+Signed-off-by: Ralf Lici <ralf@mandelbit.com>
+Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+---
+ tools/testing/selftests/net/ovpn/test-close-socket.sh | 2 +-
+ tools/testing/selftests/net/ovpn/test-mark.sh         | 6 +++---
+ tools/testing/selftests/net/ovpn/test.sh              | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-Patch 3 fixes a potential UAF in case of a TCP peer that fails
-to be added to the hash table, while being fully initialized.
-In this scenario, potentially ongoing TCP socket syscalls would
-attempt accessing a free'd peer.
+diff --git a/tools/testing/selftests/net/ovpn/test-close-socket.sh b/tools/testing/selftests/net/ovpn/test-close-socket.sh
+index af1532b4d2da..ec9a51bbf3c9 100755
+--- a/tools/testing/selftests/net/ovpn/test-close-socket.sh
++++ b/tools/testing/selftests/net/ovpn/test-close-socket.sh
+@@ -53,7 +53,7 @@ ovpn_run_ping_traffic() {
+ 
+ 	for p in $(seq 1 ${OVPN_NUM_PEERS}); do
+ 		ovpn_cmd_ok "send ping traffic to peer ${p}" \
+-			ip netns exec ovpn_peer0 ping -qfc 500 -w 3 \
++			ip netns exec ovpn_peer0 ping -qfc 100 -w 3 \
+ 				5.5.5.$((p + 1))
+ 	done
+ }
+diff --git a/tools/testing/selftests/net/ovpn/test-mark.sh b/tools/testing/selftests/net/ovpn/test-mark.sh
+index 5a8f47554286..7c1d56e9c525 100755
+--- a/tools/testing/selftests/net/ovpn/test-mark.sh
++++ b/tools/testing/selftests/net/ovpn/test-mark.sh
+@@ -66,7 +66,7 @@ ovpn_mark_run_baseline_traffic() {
+ 
+ 	for p in $(seq 1 3); do
+ 		ovpn_cmd_ok "send baseline traffic to peer ${p}" \
+-			ip netns exec ovpn_peer0 ping -qfc 500 -w 3 \
++			ip netns exec ovpn_peer0 ping -qfc 100 -w 3 \
+ 				5.5.5.$((p + 1))
+ 	done
+ }
+@@ -101,7 +101,7 @@ ovpn_mark_verify_drop_traffic() {
+ 	local total_count
+ 
+ 	for p in $(seq 1 3); do
+-		if ping_output=$(ip netns exec ovpn_peer0 ping -qfc 500 -w 1 \
++		if ping_output=$(ip netns exec ovpn_peer0 ping -qfc 100 -w 1 \
+ 			5.5.5.$((p + 1)) 2>&1); then
+ 			printf '%s\n' "expected ping to peer ${p} to fail \
+ 				after nft drop rule"
+@@ -144,7 +144,7 @@ ovpn_mark_verify_traffic_recovery() {
+ 	sleep 1
+ 	for p in $(seq 1 3); do
+ 		ovpn_cmd_ok "send recovery traffic to peer ${p}" \
+-			ip netns exec ovpn_peer0 ping -qfc 500 -w 3 \
++			ip netns exec ovpn_peer0 ping -qfc 100 -w 3 \
+ 				5.5.5.$((p + 1))
+ 	done
+ }
+diff --git a/tools/testing/selftests/net/ovpn/test.sh b/tools/testing/selftests/net/ovpn/test.sh
+index c06e3135fbef..9b5610837032 100755
+--- a/tools/testing/selftests/net/ovpn/test.sh
++++ b/tools/testing/selftests/net/ovpn/test.sh
+@@ -110,7 +110,7 @@ ovpn_run_basic_traffic() {
+ 
+ ovpn_run_lan_traffic() {
+ 	ovpn_cmd_ok "ping LAN behind peer1" \
+-		ip netns exec ovpn_peer0 ping -qfc 500 -w 3 "${OVPN_LAN_IP}"
++		ip netns exec ovpn_peer0 ping -qfc 100 -w 3 "${OVPN_LAN_IP}"
+ }
+ 
+ ovpn_run_float_mode() {
+@@ -127,7 +127,7 @@ ovpn_run_float_mode() {
+ 	for p in $(seq 1 ${OVPN_NUM_PEERS}); do
+ 		peer_ns="ovpn_peer${p}"
+ 		ovpn_cmd_ok "ping tunnel after float peer ${p}" \
+-			ip netns exec "${peer_ns}" ping -qfc 500 -w 3 5.5.5.1
++			ip netns exec "${peer_ns}" ping -qfc 100 -w 3 5.5.5.1
+ 	done
+ }
+ 
+-- 
+2.53.0
 
-Patch 4 fixes a race condition betwen interface teardown and a
-new peer being added via netlink. The race condition would lead
-to the "ghost peer" endlessly holding the netdev while the core
-is waiting for it to be released.
-
-Patch 5 fixes dev dstats updates by ensuring they are always
-performed with BH disabled, to avoid concurrent updates on the
-same CPU.
-
-Please pull or let me know of any issue.
-
-Thanks a lot,
-	Antonio
-
-
-The following changes since commit 93d809adc13001e9d3a3ceb8d1e60fae2fb740d6:
-
-  Merge branch 'vsock-virtio-fix-vsockmon-tap-skb-construction' (2026-05-12 12:52:18 +0200)
-
-are available in the Git repository at:
-
-  https://github.com/OpenVPN/ovpn-net-next.git tags/ovpn-net-20260514
-
-for you to fetch changes up to 0c0dddc07d272a8d25922e48041e8e4d2434df7e:
-
-  ovpn: disable BHs when updating device stats (2026-05-15 00:43:55 +0200)
-
-----------------------------------------------------------------
-Included fixes:
-* fix TCP selftest failures by reducing number of attempted pings
-* fix RCU ptr deref outside of RCU read section
-* fix UAF in case of TCP peer failed to be added to hashtable
-* fix race condition between iface teardown and new peer being added
-* ensure dstats are updated with BH disabled to avoid concurrency
-
-----------------------------------------------------------------
-Antonio Quartulli (1):
-      ovpn: fix race between deleting interface and adding new peer
-
-David Carlier (2):
-      ovpn: tcp - use cached peer pointer in ovpn_tcp_close()
-      ovpn: respect peer refcount in CMD_NEW_PEER error path
-
-Ralf Lici (2):
-      selftests: ovpn: reduce remaining ping flood counts
-      ovpn: disable BHs when updating device stats
-
- drivers/net/ovpn/io.c                              | 12 +++++------
- drivers/net/ovpn/main.c                            | 12 ++---------
- drivers/net/ovpn/netlink.c                         |  8 +++++---
- drivers/net/ovpn/peer.c                            | 23 ++++++++++++++++++----
- drivers/net/ovpn/peer.h                            |  1 -
- drivers/net/ovpn/stats.h                           | 16 +++++++++++++++
- drivers/net/ovpn/tcp.c                             | 19 +++++++++++-------
- drivers/net/ovpn/udp.c                             |  2 +-
- .../selftests/net/ovpn/test-close-socket.sh        |  2 +-
- tools/testing/selftests/net/ovpn/test-mark.sh      |  6 +++---
- tools/testing/selftests/net/ovpn/test.sh           |  4 ++--
- 11 files changed, 67 insertions(+), 38 deletions(-)
 
