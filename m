@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-288379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJgBB3NPB2rBxgIAu9opvQ
-	(envelope-from <netdev+bounces-288379-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:53:07 +0200
+	id iPS4JPJSB2pIygIAu9opvQ
+	(envelope-from <netdev+bounces-288380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:08:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 228E5554189
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:53:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3699C5547CE
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:08:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 157F53069A1F
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:43:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E519130298CB
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3200E3D3331;
-	Fri, 15 May 2026 16:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A52318EDA;
+	Fri, 15 May 2026 16:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lA/ygI+v"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RQ70Fcs2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9A53CE080;
-	Fri, 15 May 2026 16:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E94331214
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 16:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778863339; cv=none; b=Jun/eVJJSf351nj8+gwUGxSu0poRub4HKtDuSerCWBxZwQU1mPCfv6UGk6tTxyuxfWWclGheFUah5FhClqqvtkCNcSHN/k3xq6/lyVaB+uT5DBuDk7Y5K+ym+yc4w3KEYMfs8Kpjc3kuXjmbmAxHPxkLt2xwD1M/Nzo9CWCDWD4=
+	t=1778863448; cv=none; b=tieLVXHnWb+5jqQ7CIqPuosOncMmnZVPNnFnusoMt3PvKXLlx7CvtoWHRS+7c2nf1xOxUzoLPqJrZosSFgT0KTXgR6TZbTvD64YIKYP6j1cH3uK0umsDwOdT7n5RB7AlG6vQHDOY4hq2nd8PtvaUtF/b7/mEE+2m8KTriMGR+50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778863339; c=relaxed/simple;
-	bh=+by9VGMs1cPagtgQJQ25ByyxwRsRvF4tA32qBIVlrE0=;
+	s=arc-20240116; t=1778863448; c=relaxed/simple;
+	bh=qEGHeTHTB5/uUgZai71P/1vmcO3UUZGvctapHQgBDOQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mjQV/oELicCOH5A+Ko6btgU2IdusMMYcivtkUOi/OczuTzvHSisUHhdnAZdAsLa/eIcVyniMSgRZmK0lF8+LIS26xnm1WAazwGocUluKrY+ZOL+F4TWUuXpvtfhwhuvX8u/kxqYWEuLFtW7WcTJ/uPJtZuGF7QgiLPNEFHQqTPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lA/ygI+v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45CE8C2BCB0;
-	Fri, 15 May 2026 16:42:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778863338;
-	bh=+by9VGMs1cPagtgQJQ25ByyxwRsRvF4tA32qBIVlrE0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lA/ygI+v1N4XRm0r2uGzp1WTxiR8b56/G6PnbhZfTiyIl8mjiULkoCF5hxilWz7rU
-	 SfSM9jOYxPCmstBZp/aNMkUSjqCUybcC5SFStcA0hIuVm4zgOI2WjmVGBH+A/UtG7G
-	 37ClZheTJlAZj47ZiIq6Cxf0kb4OPU98xxa3+ZF7N6TB4TERxTyLpJTjD41OZyC9q3
-	 SYGzErBzMuUkohEaNRtTXMuDP0vB9MfSB/CyYeHdb1fZtCs40oMrsoBgHgc5eux4t3
-	 WR0RFAUzWPA6HUlAm1bWQgR/7Xo2120NYUa9gA++LmL5q8z0Z5T252xkJtG3A6aWKm
-	 LE0jlB+80O49A==
-Date: Fri, 15 May 2026 17:42:13 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@mork.no
-Subject: Re: [PATCH net-next v7 1/2] net: sfp: apply I2C adapter quirks to
- limit block size
-Message-ID: <20260515164213.GE227382@horms.kernel.org>
-References: <20260507093301.1144740-2-jelonek.jonas@gmail.com>
- <20260510164726.1401317-1-horms@kernel.org>
- <5129a58d-8852-4395-85e1-8991934810b8@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qzt9WmrQUc3gdxMh/dp1ByGVhkFPk9radcDsT5OwX4yDjmTp7dBDq61t6genDUV0k7mU6Qg0bRuJBrQWQDDltPeJG9hpibfv1PuLOTIOfCnrN7XOuHn895BPy+w4M5/fwOySaCrQ22+7sbVjzonH3WhEw7sIVwfkdYQmwuxc7ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RQ70Fcs2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=di4WxEwImvWxYCM4Z6mGnsS0K4LS8j6Oo7Kf+kLHwak=; b=RQ
+	70Fcs2BzqVStTSQZDX3X3ibiZhzuwKnrpTO7FgzgJyoMcCYMnb/I2rrmrAX6eMqKsiBqSTEBbMWdI
+	XKX9XOBWLJi7JLC5FVnzbVMlN7Y+ezFY8R9CwB77iIBv3iHkdB0ZDl3Y1n0gbaMBjW2nOFYUcm/Sl
+	JSC8V7KepvQy6C0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wNvdt-0035ga-Et; Fri, 15 May 2026 18:44:05 +0200
+Date: Fri, 15 May 2026 18:44:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Petr Wozniak <petr.wozniak@gmail.com>
+Cc: netdev@vger.kernel.org, bjorn@mork.no, linux-phy@lists.infradead.org
+Subject: Re: [PATCH] net: phy: sfp: probe for RollBall I2C-to-MDIO bridge in
+ mdio-i2c
+Message-ID: <32b1d434-7286-491e-9702-7816b0dd3700@lunn.ch>
+References: <20260515161834.23628-1-petr.wozniak@gmail.com>
+ <20260515162232.23758-1-petr.wozniak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,99 +64,52 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5129a58d-8852-4395-85e1-8991934810b8@gmail.com>
-X-Rspamd-Queue-Id: 228E5554189
+In-Reply-To: <20260515162232.23758-1-petr.wozniak@gmail.com>
+X-Rspamd-Queue-Id: 3699C5547CE
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288379-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288380-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,vger.kernel.org,mork.no];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
 X-Rspamd-Action: no action
 
-On Thu, May 14, 2026 at 04:33:47PM +0200, Jonas Jelonek wrote:
-> Hi,
-> 
-> On 10.05.26 18:47, Simon Horman wrote:
-> > [ ... ]
-> >> +	if (i2c->quirks && i2c->quirks->max_read_len)
-> >> +		max_block_size = min(max_block_size, i2c->quirks->max_read_len);
-> >> +	if (i2c->quirks && i2c->quirks->max_write_len)
-> >> +		max_block_size = min(max_block_size, i2c->quirks->max_write_len);
-> > Does applying max_write_len to max_block_size inadvertently throttle reads
-> > and break hardware monitoring?
-> >
-> > The max_block_size dictates sfp->i2c_max_block_size, which subsequently sets
-> > sfp->i2c_block_size. This block size is exclusively used by sfp_i2c_read()
-> > to chunk read transfers. The write message in a chunked sfp_i2c_read()
-> > operation is always exactly 1 byte (the register address), irrespective of
-> > the read payload size. Restricting the read chunk size based on
-> > max_write_len appears to cause unintended side effects.
-> >
-> > If an adapter has a max_write_len of 1, the i2c_block_size becomes 1. This
-> > forces 1-byte read chunking and explicitly skips hwmon device registration
-> > since sfp_hwmon_probe() requires an i2c_block_size >= 2.
-> >
-> > Will this change actually protect writes against the max_write_len quirk?
-> >
-> > Looking at sfp_i2c_write(), it ignores sfp->i2c_block_size and does not
-> > implement chunking. It unconditionally allocates 1 + len bytes and submits
-> > a single i2c_msg. Any write where 1 + len > max_write_len will still be
-> > rejected by the I2C core.
-> >
-> 
-> The concern is structurally valid - the single i2c_block_size does
-> conflate the two direction caps, and on an adapter with
-> max_write_len < max_read_len the read path would be throttled while
-> sfp_i2c_write (which doesn't chunk) wouldn't actually be protected by
-> the write clamp.
-> 
-> However, a sweep of drivers/i2c/busses/ shows no in-tree adapter
-> currently sets max_write_len < max_read_len; the only asymmetric
-> quirks go the other way (read-only caps, or read ≤ write). In every
-> existing case min(max_read_len, max_write_len) collapses to the read
-> cap, so the clamp behaves identically to the situation without this
-> change.
-> 
-> Given that this only has theoretical implications and there won't be a
-> real-world impact right now, I'd keep this as-is. But if handling this
-> properly is desired, I can add another patch splitting the size caps
-> per direction and adding proper handling to sfp_i2c_write.
+On Fri, May 15, 2026 at 06:22:32PM +0200, Petr Wozniak wrote:
+> I realise I sent v2 without testing it on hardware first — apologies.
+> I will test and follow up with a v3 with Tested-by once verified.
 
-Thanks, I'm also unsure if it's worth fixing if it doesn't effect anything
-in practice.
+Please take a read of
 
-> 
-> >> +
-> >> +	sfp->i2c_max_block_size = max_block_size;
-> >>  	return 0;
-> >>  }
-> 
-> Regards,
-> Jonas Jelonek
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+https://docs.kernel.org/process/submitting-patches.html
+
+You need to include a version number in the Subject line, and indicate
+which tree this patch is for.
+
+Also, please start a new thread for every version of the patch.
+
+      Andrew
 
