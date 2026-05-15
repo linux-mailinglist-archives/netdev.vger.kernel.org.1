@@ -1,64 +1,105 @@
-Return-Path: <netdev+bounces-288423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288424-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cG9/GepoB2qZ2AIAu9opvQ
-	(envelope-from <netdev+bounces-288423-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:41:46 +0200
+	id 8OldHY9qB2oJ2QIAu9opvQ
+	(envelope-from <netdev+bounces-288424-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:48:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C65E55669F
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:41:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 184545567F1
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:48:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 144873006013
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:39:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9FAD63053EB8
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27ABF3F99EA;
-	Fri, 15 May 2026 18:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEC64F7994;
+	Fri, 15 May 2026 18:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CpcHhAaf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QLQ9yJNB";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSG+50wy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7433F6C5F
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 18:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEED83F6C47
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 18:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778870349; cv=none; b=tZUz09COSrNazJ2SlBZZBdRxxn9RoJarFxFYUop5wJdsMaF9JG442FD7QAqIV+aMb+id6lzr2+t/nxnDQ4Bk+CC7mdXaAdskhec9qa2Z/AvwcaF+OOcDattFomS6z7vS+1Aei13QtIvJ9jXKFXMJpSs/DEWzU34HUdM0+vF9L3U=
+	t=1778870767; cv=none; b=KlzlfZU26ypsq1myhN4mjkqWAYAGIFNodHLY7eY0GIcjzy9F6jqSLdRwf7DZ78VdSP5Ock1QgoFwnX7DYBaY1TUQn+BVvXLuFwZcw0wbLoS+NMiiUHPz0G6OP7KOWnqKr9W7poC+8pjS+YK+V5UcgJbJbLGR7ibCJ1SUeP1/0dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778870349; c=relaxed/simple;
-	bh=alyM4fL2zP9I3YpMAWZdGzHyvU+rcfKXgtXzmLlxz5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T9FWvT3OPtyk65XK9yt1bk5JPIHq+f1hQ5DfuwhoAl1FqU3XqJbAVATVn+U3QsXGxEgdtFavOwNE32xJW9o3jhGl6EdhMeeZ8BpU58ZKBnPqnuYhMpSkzR3dx7NwLxn64fVMAeq4+f7jWmgsEiZRCdSTUsjJJV9jVHUTpDPFST8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CpcHhAaf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDB3CC2BCB0;
-	Fri, 15 May 2026 18:39:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778870347;
-	bh=alyM4fL2zP9I3YpMAWZdGzHyvU+rcfKXgtXzmLlxz5o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CpcHhAafYdNJIZjTmlcyy+G8z8ZDFrFHmttbjLFFxwIFrOpkjRX56KVyPUAvLagjb
-	 iLsOA4Zj0zBM5MpYbSDsIEa8K10zAjinzUzdlWIYd/CG9lrYDPWruO4dNNkmcIUerq
-	 CYjezSixDI/2YcqxP7oGISc9bd51+yvSbLUyNoZ7lpggwNoZwcNmy3TBWrWIOXiZQN
-	 p9At37cn8+bMa7tlKH7/K1WrIp3Tyylk6vBU441PMaliOUG1JBUNBghF6Ey2FvlTu+
-	 c16UGY/dVYVcXZPO8IdFZ8LjJipIVhf5XkzQTPHFi5hEl/ezAzH4k3N0SDbJE+uarL
-	 shaqNZuF+lIWQ==
-From: Simon Horman <horms@kernel.org>
-To: przemyslaw.korba@intel.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com,
-	arkadiusz.kubalewski@intel.com
-Subject: Re: [PATCH iwl-net] ice: suppress DPLL errors during reset recovery
-Date: Fri, 15 May 2026 19:38:52 +0100
-Message-ID: <20260515183852.280895-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260511083841.1078696-1-przemyslaw.korba@intel.com>
-References: <20260511083841.1078696-1-przemyslaw.korba@intel.com>
+	s=arc-20240116; t=1778870767; c=relaxed/simple;
+	bh=8Fico6GxGLx0BFWtWqZ5m7ahdl/3AhNeMXDzjZrDjXc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Oskler6glK9nnmCGr/eb4EvtJl0OeHQs9AleiyVSZZpdZPmqzDTmN8Cul7ZFfFEQu8dmC0dtBTnNLEMcjhS+Zdgyq/LAEoWSUZqc/Zi3YdkFGO5lFhWtZggJu8mekGU3gj3+0EbGjV9Mq7zA/ET4fgjdduPv+KGuCVSSsQWOljM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QLQ9yJNB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hSG+50wy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778870758;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tnGQlXm7u5Sp1TJeQ4tRREW84oeSFGKNmP1Xyq1kCQo=;
+	b=QLQ9yJNBedLy6t5tMVMOtl8f0GdmiSCfBEnT9ebEMNnwLqdKVcCs7OaNwToDbUtT0ImFMG
+	GvYyT+an3S5gmu5B4FeYqey3ga2ESy03FsNQAvU7vR310pOPWcyC5B0of2+3ucK3hZFWRp
+	7rV/Y2auUPPPG1FGvZKqDvIdRzN/TgY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-155-lW_zfHZGOEKqaZBBqOypag-1; Fri, 15 May 2026 14:45:57 -0400
+X-MC-Unique: lW_zfHZGOEKqaZBBqOypag-1
+X-Mimecast-MFC-AGG-ID: lW_zfHZGOEKqaZBBqOypag_1778870756
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-45e55c44ac1so70070f8f.0
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 11:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778870756; x=1779475556; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tnGQlXm7u5Sp1TJeQ4tRREW84oeSFGKNmP1Xyq1kCQo=;
+        b=hSG+50wy1LveZQiQofGOaReceGRQhAsmZswKZjgjw5MycG/awgzqlBi/Qm24CLleoo
+         sWpVGQkwGyvZwMLDoC2btKo2FGgBH/4hZVzzdiooqN6foxGVjhG2J/ojhfajdEX52NrN
+         UDlV2mjffSA69JgGELdj5rR7fjk5JXtXGdAWrVImSYLBlGLsXfbBBKkLZTH4Nq7BFo9B
+         LUfEjMMW8oJJr3sQoNjPqrKhAPo7L9YgzGU1/S4vqlpOHYA6FyqTzbtAi6LbkOc3H42m
+         +FHAspwVXWjWLmlBLv9hFN9f385EuJscjJUhtggwYPCClZ9ge/4IQK33kY57P1zDuMcD
+         ZpMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778870756; x=1779475556;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tnGQlXm7u5Sp1TJeQ4tRREW84oeSFGKNmP1Xyq1kCQo=;
+        b=WG5Vnsp2858kYYXEMKUlVaOfv/lcrptcnL/m668NX3xZNw1P2lT9wvnHokD+41daq0
+         mHNM/wFKxHOC/iRc7bjSogLAl7fZcY7m7lIW8UnC7k5Npi05pffmsqXLyYrM9mLt/yLQ
+         Cc4yC+bZWym//nNX81CJe269XrdIo/bLwotITg2lH/vE3CU6QhiQDIuRMKfAhKrnTCDY
+         ttDwKcSQ12O2qPiJFQD+sNtjuZl3+01dP7iMrYxSXIMzavXwkN6c3+LWVHgPRiRMn6oS
+         e5p8IWTkUjh/I1RuJHg2XWYkDFTZPGula6JTkkypF/Old+tw4LPNWy2jfUYFW6hXCcAP
+         B8xw==
+X-Gm-Message-State: AOJu0YxGjMvYEqUldJqss3VoBCTERjWLRwwSEaM93b6sXqD3sABjEHdr
+	mRQ8oYIvn22pBJBj2pY6AeXLe0q1pHzzmbInSg1xLoX/MqG7SK5dVYBMl7xNrS5huduobJNPHYW
+	a0WWUNDmFjdA/7LXcpjYylr7kVLMc75v/yzf07LQ7zM4ubFsrkaetUE8oaw==
+X-Gm-Gg: Acq92OGPbehcrJmqDK7PWdOiXeoVqztQytpztKPqpMOyoDbRcuIY4Zfc4O/QkS08dLB
+	agTAY8tohjUklRGRMD1F7vJsfK8XQcOgixCsUKRHtWUZjd2TR7bQiBshRuzmxR8OgPqSeS856g0
+	jj9F61+sTbNs7JjDXdCa69RpjD/onnEpsLGKFJvcUcdwmS+8d9nx1+o5PPeizNzbmuq/YGK0iGr
+	cOh17+omgVywhUgZfWQAevLJHleIQZ8FytVPgaEVoqezmhVfW1wFR64GdzpcADI5xHXKxuuW3Nt
+	oMVaUMtbkh7DTXB6cbYWC8XOc1f6WGLe3oo+p72p3yJX12I5ra6fe1SD4A+ICrPm+EJtu2W5FdV
+	S43eupdM2esi2VFKdk6rQLqDS6P02a5je6MM=
+X-Received: by 2002:a05:600d:10:b0:48f:cfae:b654 with SMTP id 5b1f17b1804b1-48fe60e5537mr63150725e9.1.1778870755796;
+        Fri, 15 May 2026 11:45:55 -0700 (PDT)
+X-Received: by 2002:a05:600d:10:b0:48f:cfae:b654 with SMTP id 5b1f17b1804b1-48fe60e5537mr63150515e9.1.1778870755390;
+        Fri, 15 May 2026 11:45:55 -0700 (PDT)
+Received: from costa-tp.bos2.lab ([2a00:a041:e223:1b00:fe51:8bb:7986:c897])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe537c788sm75284865e9.12.2026.05.15.11.45.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 11:45:54 -0700 (PDT)
+From: Costa Shulyupin <costa.shul@redhat.com>
+To: Marek Vasut <marex@denx.de>,
+	linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Costa Shulyupin <costa.shul@redhat.com>
+Subject: [PATCH v1] include: Remove unused ks8851_mll.h
+Date: Fri, 15 May 2026 21:45:25 +0300
+Message-ID: <20260515184531.1515418-1-costa.shul@redhat.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,105 +107,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6C65E55669F
+X-Rspamd-Queue-Id: 184545567F1
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288423-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-288424-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[costa.shul@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: 'Simon Horman' <horms@kernel.org>
+The last user was removed in commit 72628da6d634 ("net: ks8851:
+Remove ks8851_mll.c") which consolidated the driver into a
+common implementation. No file includes this header.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Assisted-by: Claude:claude-opus-4-6
+Signed-off-by: Costa Shulyupin <costa.shul@redhat.com>
 ---
-ice: suppress DPLL errors during reset recovery
+ include/linux/ks8851_mll.h | 21 ---------------------
+ 1 file changed, 21 deletions(-)
+ delete mode 100644 include/linux/ks8851_mll.h
 
-This commit suppresses DPLL error logging and counter increments when the admin
-queue returns EBUSY. The intent is to avoid unnecessary warnings and prevent
-the DPLL periodic worker from being disabled during reset recovery.
+diff --git a/include/linux/ks8851_mll.h b/include/linux/ks8851_mll.h
+deleted file mode 100644
+index 57c0a39ed796..000000000000
+--- a/include/linux/ks8851_mll.h
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * ks8861_mll platform data struct definition
+- * Copyright (c) 2012 BTicino S.p.A.
+- */
+-
+-#ifndef _LINUX_KS8851_MLL_H
+-#define _LINUX_KS8851_MLL_H
+-
+-#include <linux/if_ether.h>
+-
+-/**
+- * struct ks8851_mll_platform_data - Platform data of the KS8851_MLL network driver
+- * @macaddr:	The MAC address of the device, set to all 0:s to use the on in
+- *		the chip.
+- */
+-struct ks8851_mll_platform_data {
+-	u8 mac_addr[ETH_ALEN];
+-};
+-
+-#endif
+-- 
+2.53.0
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-> index 0704e92ab0430..78b8836b534b3 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-> @@ -784,7 +784,7 @@ ice_dpll_pin_state_update(struct ice_pf *pf, struct ice_dpll_pin *pin,
->  				   ret,
->  				   libie_aq_str(pf->hw.adminq.sq_last_status),
->  				   pin_type_name[pin_type], pin->idx);
-> -	else
-> +	else if (pf->hw.adminq.sq_last_status != LIBIE_AQ_RC_EBUSY)
-
-Could this check of sq_last_status race with other admin queue commands?
-
-The sq_last_status field seems to be global state that is modified by any
-admin queue command. If this is checked outside of the admin queue lock,
-could another thread (like an ethtool operation) issue an admin queue
-command and overwrite sq_last_status before this check runs?
-
-If it gets overwritten to LIBIE_AQ_RC_OK, this would falsely evaluate as not
-EBUSY and log the error anyway, incrementing the error counter.
-
-[ ... ]
-
-> @@ -2955,7 +2957,9 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
->  	    d->periodic_counter % dp->phase_offset_monitor_period == 0)
->  		ret = ice_dpll_pps_update_phase_offsets(pf, &phase_offset_ntf);
-
-Does the reset recovery suppression also need to be applied inside
-ice_dpll_pps_update_phase_offsets()?
-
-If ice_aq_get_cgu_input_pin_measure() fails with EBUSY during reset recovery,
-it looks like ice_dpll_pps_update_phase_offsets() only checks for
-LIBIE_AQ_RC_EAGAIN before logging an error, which might still spam the log
-with EBUSY errors.
-
->  	if (ret) {
-> -		d->cgu_state_acq_err_num++;
-> +		/* EBUSY is expected during reset recovery */
-> +		if (pf->hw.adminq.sq_last_status != LIBIE_AQ_RC_EBUSY)
-> +			d->cgu_state_acq_err_num++;
->  		/* stop rescheduling this worker */
->  		if (d->cgu_state_acq_err_num >
->  		    ICE_CGU_STATE_ACQ_ERR_THRESHOLD) {
-
-By skipping the increment of the error counter on EBUSY, will this create an
-unbounded polling loop?
-
-Looking at the end of ice_dpll_periodic_work():
-
-resched:
-    kthread_queue_delayed_work(d->kworker, &d->work,
-                               ret ? msecs_to_jiffies(10) :
-                               msecs_to_jiffies(500));
-
-If the firmware gets wedged and persistently returns EBUSY, the error
-threshold will never be reached, and the worker will continue to hammer the
-admin queue every 10ms forever. Is it expected to poll this frequently
-without a backoff mechanism or an upper bound?
 
