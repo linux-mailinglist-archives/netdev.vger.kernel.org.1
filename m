@@ -1,194 +1,174 @@
-Return-Path: <netdev+bounces-288259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288260-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANypOEHvBmr1owIAu9opvQ
-	(envelope-from <netdev+bounces-288259-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:02:41 +0200
+	id ICpTCKzyBmohpQIAu9opvQ
+	(envelope-from <netdev+bounces-288260-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:17:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87DB254CF24
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:02:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1DA54D287
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:17:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 99C6F30EB1FF
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:37:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 05233313BC7B
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E39943CEFD;
-	Fri, 15 May 2026 09:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A15443E4AE;
+	Fri, 15 May 2026 09:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lxMdVq3+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b="eEHFQ+lQ";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b="PZldruDQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011007.outbound.protection.outlook.com [40.107.208.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from acj35aaf121.lhr1.oracleemaildelivery.com (acj35aaf121.lhr1.oracleemaildelivery.com [130.35.116.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD86341C2E9;
-	Fri, 15 May 2026 09:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778837852; cv=fail; b=KrQKPlEdGjjsEhpqH0R+aA5dPMxQeBRi7xpX4Rwmd36exHmPC0bYzcicmYHnLqQSbyKfTulNDgIGnhbtdQNacY8u7dpqqaJCONvMQnZGDXH4fbfkQWfjDhsrHG9GKNfn4XMRkv+xjn9i86Z7VD9zhrwi2abWj3NsG9DZ8zJ7GMw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778837852; c=relaxed/simple;
-	bh=iolVlogE8OVUncd0zDjescS+Qsn9oreUVPPuxmEr+qs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DTqABJ3ia5zqeT74We2UHyBbyMAPtTRG0cluQcjqu8Y4h1x81cmlTV62yS1kpJhB80GaKccsg0FrKYRgiMCDwRAAD4owuuCrsDx5MIfRtZpdDTYumYT+M6ihHAz/Q7W+MKT6nn7OeuUaTnWJjUrE6EiTlITil0pHMnUbKOZAAW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lxMdVq3+; arc=fail smtp.client-ip=40.107.208.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GcbJ6YJIxktvcp5idwBpTi7t4IIMNHjSv7n2FfTzNpO5G64Tb2VeA9i/FIWtxwDSP0+xM31Ctr8n1lA/ZYxamwvesae2+wJh+KjpJBla6Ht9Fs++mNs0vhIxI7PsdrptcZa523J08riq57iqCu3QII8A/LwpNumVgCXv9YwDpmTnh3ZFe9kVfpQcLVboopJff9PIt3Iyh2nJ3SElwmYEyZaX0VICDx+spPnlRiOVJCLy0kUbTH75ztoZE+PRJs4YQ6k32cYoyVwAiNCnaz/cZc3OOQM4OKkOl2QPq0DF7wafk0KgjR6SLulngKzeuhmCI1/OWJpBK33Xo7eYf2l9hw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5pUjtAEwWo7Clp2LrlCNgJnhV9jLsomaNaTo15P3lhg=;
- b=Rs3NPRpKBMRbgT3ttwH1C0ti/ukikBpmaCXE39jtFBRyDHziNCY2LdFyRjk8e0j4qObFur6nAOm8IrC1zUd69xbyzl7a7MI0FKtd3kvm1t5RETBAViPN8dLYATzLtFrtT2sbz5VPmbzoTlK0WWQgEANwMCkSJ0Jp44NAk/ZnvAg20cYA7WcmO3pzmKS/HaJcQ3bMHp5RWnW/Br6OVTsW2S79bY77d0AMpTxqzZFbCkYyWqKVk2zk+eDHgEGM4ELeExd64i4ZtyejKxWAGLrFq3/b+ghSVvDKMUHQOPNu5QxeVgn5bl57L5CpTRxEB5Tb2WfAHC1Id3sdo79dj0FRAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5pUjtAEwWo7Clp2LrlCNgJnhV9jLsomaNaTo15P3lhg=;
- b=lxMdVq3+DRx3jJp36yBpJ0oE5Izpi/+Uy9CTt1wVZDzMtBx37jPmxjo8aNpA+e1avWvaTZue4nQzi2fUQpfyurzx1hqz99lMGk63+9Db3Q0GVmXXONp+7Jh56myPHtTNxfPrSFpBxgxKjOSO8+NPxS8dmPOETCk5RwrijFelZt2AKXSdf7yltWqwqaNmq6P6u2Mwucfhh74/LobPdQSLQN6s1BoagQeQ7DxokHdh3ixXU+nXldsnrGvHtTu0iRagBc92gylRK+L+ZcACd9C1gEiK8jEF0jignxluZRYtyvG0l6GMiVHrfnXnUFdx0BGjjVD34eEki96EpnGMvy9H4A==
-Received: from BL1PR13CA0266.namprd13.prod.outlook.com (2603:10b6:208:2ba::31)
- by CH3PR12MB7570.namprd12.prod.outlook.com (2603:10b6:610:149::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.19; Fri, 15 May
- 2026 09:37:25 +0000
-Received: from BL02EPF0002992B.namprd02.prod.outlook.com
- (2603:10b6:208:2ba:cafe::50) by BL1PR13CA0266.outlook.office365.com
- (2603:10b6:208:2ba::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.9 via Frontend Transport; Fri, 15
- May 2026 09:37:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL02EPF0002992B.mail.protection.outlook.com (10.167.249.56) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.13 via Frontend Transport; Fri, 15 May 2026 09:37:22 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 15 May
- 2026 02:37:02 -0700
-Received: from [10.221.212.38] (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 15 May
- 2026 02:36:57 -0700
-Message-ID: <e5e1ae53-a458-4248-87b9-aa1e1a241571@nvidia.com>
-Date: Fri, 15 May 2026 12:36:50 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4024D43E489
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 09:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.35.116.121
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778838821; cv=none; b=OJndmdN+l2y1QGlZi0PCX6dQzJhEjYBWyYtwT3hOUpUD4AJIrAJ4bY7UbZW3aspQfYzDYQeO5UFpr+IHcKnieG2qZqJQ6746iEYJl8u5FC5IXX2LuenOTxRpEyD5DEk6iwDNbHcomkOnMt8SVizd02E1Kue3D752WRo7x7XKt2I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778838821; c=relaxed/simple;
+	bh=QLygpKb2dZMhs/Db+eZZHoi1JZ9i/aczi6DYmubhJMI=;
+	h=From:To:Cc:Subject:Date:Message-id:In-reply-to:References:
+	 MIME-version:Content-type; b=enweL8++n7RkGdKxTfoRlBkipMdswKOD5ZR3fxppuiZrmnt/OJ6/njrfeWug1+/99wSEhKAOUoN3NjKK+s9yjfgp6pOuJWzzfu6LDBwRhCI1nn2JXJ75Myy48NBCEMOSToXxTwLsPb5JNBzdbq+aVBeSiXzLeL83j91kQ06RWjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com; dkim=pass (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b=eEHFQ+lQ; dkim=pass (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b=PZldruDQ; arc=none smtp.client-ip=130.35.116.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=oracle-uk-012026;
+ d=raczylo.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=KhYQsRh4VyQqcPigw9u1q21Z8nnaa7Jt0zu3uVsvbqU=;
+ b=eEHFQ+lQtgzYDWG8r7Ox3KeCHeTZJRFTTkU4rhRSQxkHMtQfdmdi1K840ID64unyn9upGGXLnfmc
+   GdComVYel98cJLiYJoPHKmUC8rIak7Dmww2oKSmFhg0W6pv7q0YQ8jY7HOHlJkrnDwLzM7k8M4xH
+   3CQDKrZzt9zOCfUVipWFIaDTYZKGS/Y5/2pb2Fz1VktyviZJINbRUpoHEjgM2eIfsH7AAeegaWrw
+   uRSxbqlpzrbAq0htKye62gQ4266BaO8xJIYpz7EcilTst8nuAZ8eUdt5USkRb3fDoKJKQezlAL3c
+   ozSB0AemT4abLUiKYy6jrM7MSZjfhr0bjzf+2w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=prod-lhr-20191104;
+ d=lhr1.rp.oracleemaildelivery.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=KhYQsRh4VyQqcPigw9u1q21Z8nnaa7Jt0zu3uVsvbqU=;
+ b=PZldruDQRgVfWNWZsMNeBC0hR03cy1qBJomvzcpJc23w+bQTjJss+wWyBCHyIKoucea5Oi1oDN9m
+   rDqLoy2DPutCPzZdJYU9q527Xg3nmmG2rQHxReSPnViYDomzNuksJ5RA54UTzEP6lFG1muywq2g8
+   E+Zlril4T6XAeMMtzWxOnPIfC9wpz7hIJSEfQU7plTdkyZXM7WtnND1SS8jQXormGPySpqOK8aFW
+   m9aQGamQBE1zPNAr9LEJRojqamb8AAUVc0KhQM7FnmvBspE5q/ja264GRguSOEB6AmgZkbEuTY0A
+   s+YAD9N45HtD2M/EJlzd8cncikrSsrKOjA6y8A==
+Received: by omta-ad2-fd2-1401-uk-london-1.omtaad2.vcndplhr.oraclevcn.com
+ (Oracle Communications Messaging Server 8.1.0.1.20260212 64bit (built Feb 12
+ 2026))
+ with ESMTPS id <0TF218O4DOTCD560@omta-ad2-fd2-1401-uk-london-1.omtaad2.vcndplhr.oraclevcn.com> for
+ netdev@vger.kernel.org; Fri, 15 May 2026 09:53:36 +0000 (GMT)
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+From: Lukasz Raczylo <lukasz@raczylo.com>
+To: netdev@vger.kernel.org
+Cc: Theo Lebrun <theo.lebrun@bootlin.com>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,	linux-rpi-kernel@lists.infradead.org
+Subject: [PATCH net-next] net: macb: fix build of TX stall watchdog by
+ replacing undefined netdev_warn_ratelimited
+Date: Fri, 15 May 2026 10:53:36 +0100
+Message-id: <20260515095336.92237-1-lukasz@raczylo.com>
+X-Mailer: git-send-email 2.54.0
+In-reply-to: <20260514215459.36109-4-lukasz@raczylo.com>
+References: <cover.1777064117.git.lukasz@raczylo.com>
+ <20260514215459.36109-1-lukasz@raczylo.com>
+ <20260514215459.36109-4-lukasz@raczylo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/8] net/mlx5: Prepare eswitch infrastructure for
- satellite PF support
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, "Leon
- Romanovsky" <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, "Akiva
- Goldberger" <agoldberger@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Gal Pressman
-	<gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-References: <20260510053448.326823-1-tariqt@nvidia.com>
- <20260513192539.7fd96592@kernel.org>
- <639580c8-f93f-4945-acfa-ff116b841f6a@nvidia.com>
- <20260514161649.7a59a547@kernel.org>
-Content-Language: en-US
-From: Moshe Shemesh <moshe@nvidia.com>
-In-Reply-To: <20260514161649.7a59a547@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0002992B:EE_|CH3PR12MB7570:EE_
-X-MS-Office365-Filtering-Correlation-Id: f13094af-6787-4920-b1f5-08deb265913b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700016|1800799024|82310400026|18002099003|56012099003|22082099003|4143699003|11063799003;
-X-Microsoft-Antispam-Message-Info:
-	qOx6UxUf0YTiuqWQitczDYpPtmXH4MA+W54BM3rvAGURL46SRzphff9m2yYmoygElE6gNmA8SqWLp7AySkYv/1bmrgnHLnPI6534HKdqDpe6xK6oUjXcVrTyNRuceSLpu+pvXT9iCTYLohEZb7FDhEXKG0sdktMTbszh9/VM0ZpSrZLcrxr6rjBxHXlsKV1eysJ72HlNkAmqVS4tJtP3naWjSCWq4t0Gs+0/rBgJwHM1EL6CiuH+Yd9/NqXYvTxP7pd2JH/tpPsUmZMvZFEzUFxX1Ypk9S+NQj74yhLXwlHTN0BnPo9T3InURwOBd+KGJ4Y/2g3l4++XW7LGD1nB24WFZCVY0xBHsOHA97BpEJ+qgjUz+cH5k3sFs6ES6bcKx9OBJHz3/BBzW1dySddRkJGSdD1q5gqxLdhFOKTiYW5SJKYj1EQ8Y5yPKtQMpcHhIGIoW6CcxZsACjfl02T7SinJL8uw25qJyWahZIJk0KuByTVQ5l6meuUbJZh51PCpjeA74+CEZanT+LfFM8XU1Zt1e+Ec+D/eF+cKQNImx1qLcRKIiv1XJD+rS3hMQ51CbnCR9uu6KMJxhFCsz6QnXypR3g7pRnbzD+SzxswAMevjl6fA24WzbiU8tzYqwxaHIZTLhdaoe0tODVI3msZDkjMmShaC0Doqs7oXcmkxqFX0oSJocwD0cku7lAW9q26edi1+KjTIIfQ4kfgrOc7MJDDXI8Y41ol5lhZnOTxdBF0=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700016)(1800799024)(82310400026)(18002099003)(56012099003)(22082099003)(4143699003)(11063799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	TKrI10rAquoSb6kjwPD7DNV6PmDD3haCQR20LK4LIf+BEhHo4nlj9lqAkj+LK8mODzdpOj2LPrEVu6CIKxpoeNe5U1fHba35h5Kla0hkhCltyN8r4StRGkM67BA+iNl974sQ2hFplI8gbBR1dw74IDc+z5PE0XP4WOvRhhmnzpR0xLpyeqJmbYL4VuXtKE1s9ZL3gL/8Ou//AuX1f3U1N1IMalBuV638QtiD1K6QbuqGxGnbJeiNUq5HThvQueBNmStNVeeZLIlIHlVTVqY7+vIiU1U7xVbkUOvT9KGPHZNoOb3XAEWm6RjI4sb17/KrR7c8Iq7OQ2GRSE26LBot/wlL2BSb8/f6cOgWPeFwmdI6juxUdX8wRm4QGU4r0MPYQZG9y2Jf+GoqhurSATkVmzE/CCsty1QMMLct6APonNtQTsfLJPtSqvpbck0p4+ea
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2026 09:37:22.9203
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f13094af-6787-4920-b1f5-08deb265913b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0002992B.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7570
-X-Rspamd-Queue-Id: 87DB254CF24
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8bit
+Reporting-Meta:
+ AAGGMLVl544WMl84tN2V29poZax5nOlse0gFMRELc/TH6YxsiNZHF6OLG0TWO1Bd
+ uRwGSxavSrmdgKx8Xt/6+S5+RT3Vo97Xt8jXUmE8dofHwyXZGJHnX8UpIb/ZZ8dI
+ yV+tDuwG6TNP9wokhjh5VdUF9+UwquEJcbQBKNGtvWOj2aDBUUjHN9YoHv2Lal9h
+ xa2oBHqIwiCWgHUClMGJDQmuaxh/LuM0Vpr7/7KF4P/HjzO1C4Rfam+ul0mTg88Y
+ 4O1EhUzgO3h1gcMk9qjy3ZEYLUqrYRGZr15xr1uuyIZzEKbwoPe+TRZ9nlhn4do7
+ fqGeVcW6UDk6OOlybQJGhGKMpWMn2EtxK25riAqaC8vLQaUfxG0O6538kBKxQd/T
+ SOSLygKjOXthfLxOvPsDgbzdv1QZ5PsHlH8xT4b67npmWQlFjTtPaKz8Vl/rfA==
+X-Rspamd-Queue-Id: 7A1DA54D287
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [4.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[raczylo.com : SPF not aligned (relaxed),reject];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[raczylo.com:s=oracle-uk-012026,lhr1.rp.oracleemaildelivery.com:s=prod-lhr-20191104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288259-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288260-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	GREYLIST(0.00)[pass,meta];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[raczylo.com:-,lhr1.rp.oracleemaildelivery.com:-];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukasz@raczylo.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[moshe@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	NEURAL_SPAM(0.00)[0.853];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
+netdev_warn_ratelimited() does not exist in this kernel -- neither
+mainline net-next nor raspberrypi/linux rpi-6.18.y define a
+netdev_*_ratelimited() family.  I confused it with the existing
+net_warn_ratelimited() / pr_warn_ratelimited() macros when
+authoring v2 patch 3 of the macb silent TX stall series, and the
+result fails to build with implicit-function-declaration.
 
+Replace with the standard `if (printk_ratelimit()) netdev_warn(...)`
+pattern.  Same semantics intended by v2 patch 3 (bounded log noise,
+retains the netdev prefix in the message); works in every kernel
+version.
 
-On 5/15/2026 2:16 AM, Jakub Kicinski wrote:
-> On Thu, 14 May 2026 10:56:26 +0300 Moshe Shemesh wrote:
->> Satellite PF is another type of Physical Function, its role and
->> privileges are similar to the host PF, but unlike host PF the Satellite
->> PF is on the DPU and not on another host. So it's kind of "Satellite"
->> for the ECPF which is also on the DPU.
-> 
-> Do you genuinely think these 2 sentences explain anything?
-> 
-> Maybe it's just me. If anyone reading this thinks Moshe's explanation
-> clarifies things - please speak up..
+Fixes the build of patch 3/3 of:
 
-OK, let me explain the idea of this feature:
-Currently in Smartnic configuration we have 2 Physical Functions : one 
-is the ECPF on the DPU, and it is the eswitch manager and page manager, 
-while the other is the host PF on the external host and it doesn't have 
-privileges of eswitch manager or page manager.
+  https://lore.kernel.org/netdev/20260514215459.36109-1-lukasz@raczylo.com/T/
 
-Now we have a new Smartnic configuration that adds another physical 
-function, on the DPU, that is not eswitch manager and not page manager. 
-The new PF can have its own SFs and the customer can passthrough this 
-Satellite PF to a VM on the DPU and give it to a user that should not 
-have access to the ECPF privileged function.
-As will be shown in the next patchset, the ECPF handles the Satellite PF 
-and the Host PF in a similar way, using the same management framework.
+Caught by an independent build test on the Talos Linux Pi 5 build
+(John Laur / johnlaur on GitHub), reported at:
 
+  https://github.com/siderolabs/sbc-raspberrypi/issues/91#issuecomment-4456874307
+
+Signed-off-by: Lukasz Raczylo <lukasz@raczylo.com>
+---
+ drivers/net/ethernet/cadence/macb_main.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -2057,10 +2057,11 @@ static void macb_tx_stall_watchdog(struct work_struct *work)
+ 	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
+
+ 	if (stalled) {
+-		netdev_warn_ratelimited(bp->dev,
+-					"TX stall detected on queue %u (tail=%u head=%u); re-kicking TSTART\n",
+-					(unsigned int)(queue - bp->queues),
+-					cur_tail, cur_head);
++		if (printk_ratelimit())
++			netdev_warn(bp->dev,
++				    "TX stall detected on queue %u (tail=%u head=%u); re-kicking TSTART\n",
++				    (unsigned int)(queue - bp->queues),
++				    cur_tail, cur_head);
+ 		macb_tx_restart(queue);
+ 	}
+
+--
+2.54.0
 
