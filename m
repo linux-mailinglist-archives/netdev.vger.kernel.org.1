@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-288275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288272-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wApiLXX0Bmo4pgIAu9opvQ
-	(envelope-from <netdev+bounces-288275-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:24:53 +0200
+	id mEWJFmH0BmohpQIAu9opvQ
+	(envelope-from <netdev+bounces-288272-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:24:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5392854D475
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:24:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF20854D446
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:24:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1143C30F87C4
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:57:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AD53A3190467
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB0B4657C2;
-	Fri, 15 May 2026 09:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B7D4534AE;
+	Fri, 15 May 2026 09:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="fpyH5y9D"
+	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="KzdBiR9d"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBF144E045
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB5B44E042
 	for <netdev@vger.kernel.org>; Fri, 15 May 2026 09:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778838965; cv=none; b=oPcYyl0/lDydXgwZqBEEPY1SX2t16mkesITqaisvxOhdGoqjbD3iQHL99JzCVBy0Q1JtPNa2IHrs8tlw51kcy7ggBN/nC48f6vZczRWtmdKLHunNLX3pcdEWKxlozL+43sMEjcD9itQyVpXz8DDwz+SZNjKMFiD83Dj2H8DuktI=
+	t=1778838964; cv=none; b=uijNOogYBFYPkWy/efdNiT/bencv4S8H2DxHJ4d2ecsUbCdVywHZLUMJnWWK7me7WHnOmjbYBn1S5eqxS5rGfEaOEUqb16CCYgyBixyVwzSRQNei9zaHRIKgENejJcofqnEZVuTcTIc1Cg7lFa6GDo2bvP1bRDoJ7feKhhrF7j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778838965; c=relaxed/simple;
-	bh=W40SoSreIU88L+hWn4oxS7WToT9+CfJQByS6Lhm6pok=;
+	s=arc-20240116; t=1778838964; c=relaxed/simple;
+	bh=rtlinpMKG533BM40dbyahnF1pFMM8U2rJrQWFo5Lra4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bJNvbFFfhLjst3i20PhAeaeTqm3Mtk3ik+kLoXv/aVyuoQSzBiPPBMWw2LrNInNvpJ3SUZVEcx2gYpwcUF89D93meV2cvqic3drK4REi5kjp+MROrJJiXTWQpPeXkfJbpdKpmOiI1HTi40+cWl23XO8PC2fuCqhifl1ZPiB3Dcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=fpyH5y9D; arc=none smtp.client-ip=23.88.38.48
+	 MIME-Version; b=GpvmBEYBc12oSNb5TaYjcSrU9VGo1+3ukajPEFUMjLY2WeeKVIaVn9/eyuXIQYwISklnf3DOsfaytottcsUdKIm9+i0s/ILX90OfB4RC3ipDHSrC3F2Bf+u6RQp28vJkrYPeI3Qr7CNXg+UmF5BJZ0QK0ZOhdCvkvYbNZwKTVHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=KzdBiR9d; arc=none smtp.client-ip=23.88.38.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1778838956;
+	s=09092022; t=1778838957;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0K7x5d0HnCXiyQuckQHY2w5gbSJ9qlIcYYGqaA5h0nI=;
-	b=fpyH5y9DbZs5JfNlSpeKGgKA2yCoiAbOeeN5N2PCbKsRBxeizRQiCDCpPSYalLVcP90Kso
-	eCxoEKiaQ8YNA8Fqssh0su02bqCEv/k4OlBYha/y0Xod3PoS2gmX36+bCkYcJcoXetJVHG
-	QrU3/PSESha0H7I5xnFkUT8hlBuGsYt31P7v83FqEvUZnLH7U4eUqdxMxnXMaX7qhgWjDo
-	RE0Qt4ffIBtxbiHRqeRYxQ0WMA2d15MQMoTh1CYHUSg43ac/I0FHtKhbaE1WwnbnWXgV+V
-	FdaApkO86eamjjOvH5cWtyGC5jtxAx0+JMW/LcLBYWN4yX2SMu8QLf6ZYd9nsw==
+	bh=FhfNjkuMbZpr2ack+ilUXPWHeaOvldZUmgcoY4j+Ous=;
+	b=KzdBiR9dK3q3KNFqxvVPUJJ9mvASjFeyFmJxgXi3Pl7WwzY7hkSYJqy5DDsAJjXwig7dcE
+	luK2JPVw63+x43YGA+5SziXHLvYtg69FX67mkOH+U06saSO969F3OcFHkPN8s4BalosU+W
+	kQlG/yuiBxkMHU39dyax4Qkdh/OCMlJGbZW6mEOAAtZ8u0deSbx4CZGr2eADYstc9cd2C/
+	rBAuEhV8MW7kx+RnOrlIpc9yOME11s6h2vqlICRDo3qkoiW7xv+aVVYY4UOvFx2DP7FH2x
+	LSdSbWhbG+D0gu/e5wEOSlASAe2WdulE8ZVtgK5Fey4Zv7DvK+VTw9B87ePk+w==
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -61,9 +61,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Juefei Pu <tomapufckgml@gmail.com>,
 	Xin Liu <bird@lzu.edu.cn>,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 12/14] batman-adv: tp_meter: avoid use of uninit sender vars
-Date: Fri, 15 May 2026 11:55:37 +0200
-Message-ID: <20260515095540.325586-13-sw@simonwunderlich.de>
+Subject: [PATCH net 13/14] batman-adv: frag: disallow unicast fragment in fragment
+Date: Fri, 15 May 2026 11:55:38 +0200
+Message-ID: <20260515095540.325586-14-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260515095540.325586-1-sw@simonwunderlich.de>
 References: <20260515095540.325586-1-sw@simonwunderlich.de>
@@ -74,7 +74,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 5392854D475
+X-Rspamd-Queue-Id: AF20854D446
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288275-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288272-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
@@ -106,20 +106,22 @@ X-Rspamd-Action: no action
 
 From: Sven Eckelmann <sven@narfation.org>
 
-batadv_tp_recv_ack() and batadv_tp_stop() are only valid for tp_vars in the
-BATADV_TP_SENDER role. When called with a BATADV_TP_RECEIVER role, it
-proceeds to read sender-only members that were never initialized, leading
-to undefined behavior.
+batadv_frag_skb_buffer() is called by batadv_batman_skb_recv() when a
+BATADV_UNICAST_FRAG packet is received. Once all fragments are collected
+and the packet is reassembled, batadv_recv_frag_packet() calls
+batadv_batman_skb_recv() again to process the defragmented payload.
 
-This can be triggered when a node that is currently acting as a receiver in
-an ongoing tp_meter session receives a malicious ACK packet.
+A malicious sender can craft a BATADV_UNICAST_FRAG packet whose reassembled
+payload is itself a BATADV_UNICAST_FRAG packet (matryoshka-style nesting).
+Each nesting level recurses through batadv_batman_skb_recv() without bound,
+growing the kernel stack until it is exhausted.
 
-Guard against this by checking tp_vars->role immediately after the
-lookup and bailing out if it is not BATADV_TP_SENDER, before any of
-those members are accessed.
+Since refragmentation or fragments in fragments are not actually allowed,
+discard all packets which are still BATADV_UNICAST_FRAG packets after the
+defragmentation process.
 
 Cc: stable@kernel.org
-Fixes: 33a3bb4a3345 ("batman-adv: throughput meter implementation")
+Fixes: 610bfc6bc99b ("batman-adv: Receive fragmented packets and merge")
 Reported-by: Yuan Tan <yuantan098@gmail.com>
 Reported-by: Yifan Wu <yifanwucs@gmail.com>
 Reported-by: Juefei Pu <tomapufckgml@gmail.com>
@@ -128,42 +130,62 @@ Reviewed-by: Yuan Tan <yuantan098@gmail.com>
 Signed-off-by: Sven Eckelmann <sven@narfation.org>
 Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 ---
- net/batman-adv/tp_meter.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ net/batman-adv/fragmentation.c | 35 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/net/batman-adv/tp_meter.c b/net/batman-adv/tp_meter.c
-index ca6c3f6374bc5..a3593d104caa5 100644
---- a/net/batman-adv/tp_meter.c
-+++ b/net/batman-adv/tp_meter.c
-@@ -664,6 +664,9 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
- 	if (unlikely(!tp_vars))
- 		return;
- 
-+	if (unlikely(tp_vars->role != BATADV_TP_SENDER))
-+		goto out;
-+
- 	if (unlikely(atomic_read(&tp_vars->sending) == 0))
- 		goto out;
- 
-@@ -1101,12 +1104,16 @@ void batadv_tp_stop(struct batadv_priv *bat_priv, const u8 *dst,
- 	if (!tp_vars) {
- 		batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
- 			   "Meter: trying to interrupt an already over connection\n");
--		goto out;
-+		goto out_put_orig_node;
- 	}
- 
-+	if (unlikely(tp_vars->role != BATADV_TP_SENDER))
-+		goto out_put_tp_vars;
-+
- 	batadv_tp_sender_shutdown(tp_vars, return_value);
-+out_put_tp_vars:
- 	batadv_tp_vars_put(tp_vars);
--out:
-+out_put_orig_node:
- 	batadv_orig_node_put(orig_node);
+diff --git a/net/batman-adv/fragmentation.c b/net/batman-adv/fragmentation.c
+index 1152c2ce0c1ea..4a594aa2ebf66 100644
+--- a/net/batman-adv/fragmentation.c
++++ b/net/batman-adv/fragmentation.c
+@@ -304,6 +304,31 @@ batadv_frag_merge_packets(struct hlist_head *chain)
+ 	return skb_out;
  }
  
++/**
++ * batadv_skb_is_frag() - check if newly merged skb is gain a unicast packet
++ * @skb: newly merged skb
++ *
++ * Return: if newly skb is of type BATADV_UNICAST_FRAG
++ */
++static bool batadv_skb_is_frag(struct sk_buff *skb)
++{
++	struct batadv_ogm_packet *batadv_ogm_packet;
++
++	/* packet should hold at least type and version */
++	if (unlikely(!pskb_may_pull(skb, 2)))
++		return false;
++
++	batadv_ogm_packet = (struct batadv_ogm_packet *)skb->data;
++
++	if (batadv_ogm_packet->version != BATADV_COMPAT_VERSION)
++		return false;
++
++	if (batadv_ogm_packet->packet_type != BATADV_UNICAST_FRAG)
++		return false;
++
++	return true;
++}
++
+ /**
+  * batadv_frag_skb_buffer() - buffer fragment for later merge
+  * @skb: skb to buffer
+@@ -337,6 +362,16 @@ bool batadv_frag_skb_buffer(struct sk_buff **skb,
+ 	if (!skb_out)
+ 		goto out_err;
+ 
++	/* fragment in fragment is not allowed. otherwise it is possible
++	 * to exhaust the stack when receiving a matryoshka-style
++	 * "fragments in a fragment packet"
++	 */
++	if (batadv_skb_is_frag(skb_out)) {
++		kfree_skb(skb_out);
++		skb_out = NULL;
++		goto out_err;
++	}
++
+ out:
+ 	ret = true;
+ out_err:
 -- 
 2.47.3
 
