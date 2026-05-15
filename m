@@ -1,219 +1,333 @@
-Return-Path: <netdev+bounces-288469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288470-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLFeD2ySB2pU9AIAu9opvQ
-	(envelope-from <netdev+bounces-288469-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:38:52 +0200
+	id SBUDCbmVB2pU9AIAu9opvQ
+	(envelope-from <netdev+bounces-288470-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:52:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E0C5583B3
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:38:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9565B558774
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:52:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49C653014672
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 21:36:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 75DCE301753E
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 21:52:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CB23ECBC2;
-	Fri, 15 May 2026 21:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B06AE3EDAD3;
+	Fri, 15 May 2026 21:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IcjvZuKz"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jvd6i7wu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012067.outbound.protection.outlook.com [52.101.53.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256CA3EB7FB
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 21:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778880993; cv=none; b=qhg6LGxODCPxSU8MOU1pt56hEv/ekVzeoSZSNoRmM7pNkTPa4q9DIWWZgy6Yv2UH3Cg5AM8jZYYipHl7H3PnrzzWmVDf8L0cl3OdSyM0f9AWGFrgEl+fqHuULQV99x5NpkxaS9SQK1QsiJSWmKA8vRxf37kYFxgtdArtd7aeUek=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778880993; c=relaxed/simple;
-	bh=hlAOhLGh58Gy3zan6ewmiQ7pq8blPJAAQ8CMHzesHaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S3+BMRvhNxIu0cgJRkkF01dvwCIg8axUYd2fuHETrQr5HThDCMulzKj5A6aLtcrUFAUTsZQIUgLmaNKjj2Mv4AKE64+bGLMZbnXs5phu91PPfzyWqUao2utv/2ctdzUNrdps5n3S7Pn9De2uKrAeBimcpJwAlBg3nwV2/R/c3Uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IcjvZuKz; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2bd9c3b550aso2547785ad.2
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 14:36:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778880991; x=1779485791; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tl3ISS/q5ODJOgUNvJqQup6LUHmvQRG/4621LRENO2M=;
-        b=IcjvZuKzQQ7GlGStkVKGcO8VaZv5Y1gqGewN/waRGok2q3hQ7vfohyRhZigSwTw3F1
-         PMImTmq00PceeC+zt/TLEFUQWiCZpQOjlrz395hXRU+66mlCToG5LzO6swuOdhhT2bKV
-         vlqRgttZ2qJydgmjynhgP5aNBsvgTYQjF62FCZzVrsCJ7MwD/Iy3IadrUARnhiOIQQqy
-         qUjcXYmlC74ibpN90tVCF7ZIT9iU+7T0HshnLD/EvwAH7CXVPE8UAtWdUboanKhjDqPL
-         +xbSRI3B5kUXgF4Dj/OZYMAvnEqOOh/Z0rq4YAr0dF/N7cb4L35X2VhucX9gwAdB+c+v
-         WgGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778880991; x=1779485791;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Tl3ISS/q5ODJOgUNvJqQup6LUHmvQRG/4621LRENO2M=;
-        b=LJqcPbBV3YW4tLEhqPkJgcg5flC2JQUocypWXHc4Nbhus+zPjASm+PmIL/O63s0VoZ
-         uxvXoebJeKeNXtjp5vuEK+kJ8AtBq3sGTWn/7AgFPJGlRe+g3WRRJC8KwLsAb01DKSIg
-         Gp4GXqMDh2zLlou7nOwB+9TLjrSCWtnarGlZ5bdKxDuxP6POyMXwd0+T0IIX6y+CSlaC
-         rEyTDAEHLLlnKZr6O1jDaYh9RGSF/xH2KlN9akCqVC9IK1l9Ap1RShEtPOYM2kDygQUH
-         Pr59TlMi5gTAUrK2MRV1pfiAHKdhx/wvAnL1o+cEYxHbSXn6UWhY2AfvF88TOWYm0A9b
-         w5/g==
-X-Forwarded-Encrypted: i=1; AFNElJ8CqolH0N1J/sKFagvQLfZXXoC6bFEliGplFYps9Dfve/ObfUYGjX+bM06fRFhlrFk+vESSElQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw25QpZ5Hm2n4RvAHR1/VlQwmadm0NHGyntzWbVZT7Mn9TBxzzj
-	11MADwWNyz5O2VgPZUJ1rptQPmPAf11XFhOHdNkiWZxiaD8dvqqf04Fr
-X-Gm-Gg: Acq92OFq7zHPAPXrcmpiEF2NzLIrcp4Nvbi0NZpeJcGXdGwLXZQelOQN6Ekeqh4NVRc
-	Z8AlwU0/Jl6avwMyesV4LJHEjZkcg+2ftziEYs09e9yyDwXpr+aXyr9bG/oanAi6Ije3i50xtI5
-	Pl1yIrKJfoIkWDNcZBgHqMMLRSuK9g3Ark1CTrV7esMwikHpGjseesSlOgRnuYA6GKBCBCUd7TD
-	MJ9JWs+SGRsnvum11PFfLfeKTUWoRcLCcrO/vx+1FYU/VLPyApH5FYL0z68ZvtSC/rinSbpM87Y
-	dQg9SX9kmZ2FzoIzyHxrWb6msHF+hj3+DwseXwdxKZewO8blLAf/MbQirSS49Pr2FhlgXAMX+mH
-	niyh22pzjZBGnIF3UGbtUAvxBaP3BUX9AuPf6ZghFnPiJSOAR2Rry1T9ZfWsvhJVbNgERgGDPDf
-	2Hfnw5zrITf+JuemohbsxvGGosxgZVNZGIrX3s8tXM16M=
-X-Received: by 2002:a17:902:fa0c:b0:2bc:dca9:f0ef with SMTP id d9443c01a7336-2bd7e8cbbc5mr40307095ad.36.1778880991168;
-        Fri, 15 May 2026 14:36:31 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5bd5fae5sm70746195ad.6.2026.05.15.14.36.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 14:36:30 -0700 (PDT)
-Date: Sat, 16 May 2026 06:36:26 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Aaron Esau <aaron1esau@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, sultan@kerneltoast.com,
-	sd@queasysnail.net, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, dsahern@kernel.org,
-	netdev@vger.kernel.org, stable@vger.kernel.org,
-	gregkh@linuxfoundation.org, imv4bel@gmail.com
-Subject: Re: [PATCH net v4] net: skbuff: propagate shared-frag marker through
- frag-transfer helpers
-Message-ID: <ageR2qzTRtpH8JGY@v4bel>
-References: <aga1VyHpHaUhnGZa@v4bel>
- <20260515164121.2608076-1-aaron1esau@gmail.com>
- <ageAmZcEMu4Yjyyl@v4bel>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047A230F95C;
+	Fri, 15 May 2026 21:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778881973; cv=fail; b=AhmmlxjJED1zjnxV3903uB/cap4CgpK5+pQL3y4aHBnQZZ4bGleqrS4VS6UOwiDm9s8VnxPhiSUDrbd3LPaqMU33ARzBoYJBOi1AbC/ALtIItt3LnPMYe0lOtyyS12BzaqwARxshSElBHa71SybO9HZJM09UDGTIQ72tHip9hG0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778881973; c=relaxed/simple;
+	bh=UOojlB8iK2Eb6MIqBwBodhFSGduXhBrr/7x4bJ1W54s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Wlx5fpJ7moqsXP0pdAxqY+jMd+fmuAnys6bX1U20P83WAm7cA7KG+I9pLZ9fBfTm52B/OsqCbW3Z7v71jZANQQFDLY/phaXzkCsI0pGBlPGPiComLvJ7TH0/RWz3HvFfkgheF2YD22qBqqg5pHx8DHmgmg9+s8HeFDSkuxtcmIw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=jvd6i7wu; arc=fail smtp.client-ip=52.101.53.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jf7MLopo4YFk50GtRSmVc4/IlsT+FatBqvdhcjgghfu5qOkKGfRT/t1pdsfT3DyIXSpRTwxRARB6FG9+UpJH9roqbFNj1C8wpgwlLZoe1Aux61SyApGqSyKjVPL3DcuaDB8VhJaHNgkri8whEAdWaE3B/aQLmi9RryCf9l0fA97QZEOBUsKjDrbAg/hv1ypOI1NWWN5TpK4ampkwfcu9kBZ20aLZIUixyFlmUzkBs/Uypolsss1HCGBk05tmgsS7j69maTqa2LOxPh9zYEnf6yFVIgkUvf8qq8qEJnV78AEwgbEGDD+SQMNMavleiNvioN29UQU7Acye8OtSYs1iRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Yfa40nVo5TurXFyv1nJ8VOPLVYxZzUQOAbrHeokSTQk=;
+ b=h9+Y+wiz5+14AyWr/oYn4LXBDprJNHbrAXyLtaaApVF7m3UDYAROFCUImENCmX/3y1opxXjsczAMa1CLZlTUDpMI+b8wmCAtzVLrMZRGlaLBckaqz5VK5G0kjj+YafiNxQQZXJclr6PHn6zHm+lqOCgYcpoXd6winz4A2meyBJPO4DgQG7HFoCodgC7iHy7/odffRvhLuDbsOaRiYI1gqBmCMhpB8PA1695bCe/2PFTiSoB9GNuJa/prcx2k4WfgQQzX0W7HV3cZ0ZuaU3+BtLiSlzQfcyKTrn/nZI6xiqh9dDH0GTmrVRORbvcfKySsH1h8vUsJzZM4fCcaizIymA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=microchip.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Yfa40nVo5TurXFyv1nJ8VOPLVYxZzUQOAbrHeokSTQk=;
+ b=jvd6i7wut4lRVp9/0A3JvcjrTvWj828vuTaI9fbdDfVI5LN/Mx9MW3CT1FPx7+9n2rNW77nR7YSedPsQtG1ExMzqyat5/ee96i2QD2jW20MdrRXA6i7zC+Ujxl6W5UQ3wdGjFu7R9WvMsKE6gO3ff2d7vzTfFDANfGhH10/gheAyWY6baKPy3xzlayXt9tZDSE4UKh1udJvh5HhkISs7Q1YqpLF9F6LGk+mOqOE38/c3RcRQaoHUR+wOTA57HJ+4gYnl0za+GfHbLHY+lYTSozYvVNpzCSpnwBhz55ByJGvhisra2v/Eh2jOZFYCTbVlbJpuz+MHHxzW6/SSAlbItg==
+Received: from DM6PR02CA0114.namprd02.prod.outlook.com (2603:10b6:5:1b4::16)
+ by MW3PR12MB4442.namprd12.prod.outlook.com (2603:10b6:303:55::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.19; Fri, 15 May
+ 2026 21:52:46 +0000
+Received: from CH3PEPF00000011.namprd21.prod.outlook.com
+ (2603:10b6:5:1b4:cafe::b2) by DM6PR02CA0114.outlook.office365.com
+ (2603:10b6:5:1b4::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.25.20 via Frontend Transport; Fri, 15
+ May 2026 21:52:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CH3PEPF00000011.mail.protection.outlook.com (10.167.244.116) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.71.0 via Frontend Transport; Fri, 15 May 2026 21:52:45 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 15 May
+ 2026 14:52:31 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Fri, 15 May 2026 14:52:31 -0700
+Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.126.190.182)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Fri, 15
+ May 2026 14:52:31 -0700
+From: David Thompson <davthompson@nvidia.com>
+To: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, David Thompson
+	<davthompson@nvidia.com>
+Subject: [PATCH net] net: lan743x: avoid netdev-based logging before netdev registration
+Date: Fri, 15 May 2026 21:52:29 +0000
+Message-ID: <20260515215229.3881949-1-davthompson@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ageAmZcEMu4Yjyyl@v4bel>
-X-Rspamd-Queue-Id: A8E0C5583B3
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000011:EE_|MW3PR12MB4442:EE_
+X-MS-Office365-Filtering-Correlation-Id: 702598f0-6a52-4100-d2eb-08deb2cc4c6a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|376014|18002099003|56012099003|11063799003;
+X-Microsoft-Antispam-Message-Info:
+	gKRQIEDWsRb1DBoKdeKjB7whYwuYejOITYgRyI2cyy1ZeRzifh76kTnXjNyBnc5rLJUvU92afr6ToPKGxlUoMXY4Kpw3OIUr5vWVAByRungErm2oNSMn9rKZOhEHWLWjxK2s5zKRTUaxR4w4fPRQX6oiG+qnVOlW2TT36R/aXsO1xbvtBrwtmjwhnyeHevpQZmQSzHiUwLm+W6CICEMjnG7iDnC7F0RdVI1pWnffjc6a23D3pxOzus4VgaCrLxK+49+dMv/UCC7339AJ3itCA+nKudW8gM7DG5yvlc+7945HzLOSM9O6EElOuH5yU/00ckzOhgTiV5/V7pE8kDyK+rRoFc9iimjhvHSuqgZTz1sHZYimxVopnELnaJ/gpnrIFRU1Yir0V0DWcu3epnY1beUoMOtHUHDj7u29u/SCRVcK4Ula4HI6Fofru0vomxiD1ze2bR8WuiDSfRiaQUZTBe8QrOKMTdDvSSP8ASR+0hSorgF35WuyQ56ODxFN6KtWGlcbYPhlbTJbSnr3LGdWGLY9P3bVaR3BU9QHfFYqC4BYrEjeyT+1aOv2BQyrG//3JhfTuMlvSKI9aqOiVoEgjNNodaiUs+Rqx4t0MAIGTEbYzYwebsQVJmkf9kXEQiJHy2b9FaNf/0rtraZ8SZVQ5KkKS7xZgf141gxUAv88xGv7hFyQAzI73wlnwHeGNK0X3Is4Vvgg3/RgfqReILFV4yyolzE3bAVWr028chmc/0s=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(376014)(18002099003)(56012099003)(11063799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	uqGxqNQ7FGTpV35fffkj2fgQz4WUZ2Zaf1oMACq/eSw8ftckluwR3ENUDCfsSnNRveHt9bH+uFQNooLngm99PeT+yTUJ8UE5A/e2T3Fyw+7JU9ZlbbtD/EWXxpakDxpES9St6rTZBPw0DO2t5yt2g5OR447Xi8W0ggiIRnVCM/v356o2QwA4eHQslx91E2noR9vgsXYxmrNOXreN7k9kpZeLHK9Dznc8V1W89WNUOFg3Edgyjfd5mDM/31/QN+WwOFv71k3yMOLs0x4K2bul8cCtYq/25Sgzh432MXc9/A6rR9m2Uawl2oibCqo6/5c37iDg0qhmlDnQG8XCndigIVQC60m14NcsU6AVMyuTe7M0gKRnW8/Awt31+u5DJyl7l2B3f3/+ubdlfD0UgfueGGFxN/S/yzJQlx7a4SGxOjqz0rzc1vG6+qvChtfKlxwc
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2026 21:52:45.6860
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 702598f0-6a52-4100-d2eb-08deb2cc4c6a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000011.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4442
+X-Rspamd-Queue-Id: 9565B558774
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288469-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,kerneltoast.com,queasysnail.net,secunet.com,gondor.apana.org.au,vger.kernel.org,linuxfoundation.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288470-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davthompson@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-On Sat, May 16, 2026 at 05:22:49AM +0900, Hyunwoo Kim wrote:
-> On Fri, May 15, 2026 at 11:41:21AM -0500, Aaron Esau wrote:
-> > skb_segment() propagates SKBFL_SHARED_FRAG from head_skb only.  When
-> > segments pull frags from frag_list members, the flag is never
-> > propagated from those members into the segment skb.
-> > 
-> > There are two miss sites:
-> > 
-> > 1. Line ~4986: a new nskb propagates only from head_skb, but frag_skb
-> >    may already point to a list_skb carried over from the previous
-> >    segment's iteration (i, nfrags, frag_skb persist across the outer
-> >    do/while).
-> > 
-> > 2. When the inner loop exhausts head_skb frags and switches to a
-> >    list_skb (line ~4999-5002), frag_skb is updated but its
-> >    SKBFL_SHARED_FRAG is not propagated into nskb.
-> > 
-> > Your v4 GRO fix means head_skb will normally carry the flag, so
-> > skb_segment() picks it up indirectly.  But skb_segment() itself should
-> > propagate from frag_list members directly --- otherwise any non-GRO
-> > frag_list producer re-exposes the gap.
-> > 
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -4986,7 +4986,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
-> >  
-> > -		skb_shinfo(nskb)->flags |= skb_shinfo(head_skb)->flags &
-> > -					   SKBFL_SHARED_FRAG;
-> > +		skb_shinfo(nskb)->flags |= (skb_shinfo(head_skb)->flags |
-> > +					    skb_shinfo(frag_skb)->flags) &
-> > +					   SKBFL_SHARED_FRAG;
-> >  
-> >  		if (skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
-> > @@ -5000,6 +5001,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
-> >  				frag = skb_shinfo(list_skb)->frags;
-> >  				frag_skb = list_skb;
-> >  
-> > +				skb_shinfo(nskb)->flags |= skb_shinfo(frag_skb)->flags & SKBFL_SHARED_FRAG;
-> > +
-> >  				if (!skb_headlen(list_skb)) {
-> >  					BUG_ON(!nfrags);
-> >  				} else {
-> > 
-> > Site 1 covers segments that start mid-list_skb (frag_skb carried from
-> > the previous segment).  Site 2 covers segments that switch from
-> > head_skb frags to list_skb frags mid-construction.
-> > 
-> > Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
-> 
-> If I understand correctly, triggering this in practice requires both
-> an skb with SHARED_FRAG asymmetry and that skb reaching skb_segment()
-> with GSO set, is that right? Looking at mainline, I couldn't find any
-> code path that produces such a combination.
-> 
-> Do you happen to have a reproducer or a concrete trigger call path?
-> If so, please share, I'd appreciate it.
-> 
-> Anyway, since I consider this one of the "relatively" more concerning
-> items among the "potential issues", I'll wait a bit longer for
-> additional reviews and then include it in v5.
-> 
-> As a heads-up, after this one, I don't plan to fold further "potential"
-> fixes into this patch. This patch is intended as an urgent fix for an 
-> actually triggerable issue, and the remaining potential issues are
-> more likely to be addressed together as a separate batch later:
-> 
-> https://lore.kernel.org/all/20260514163802.1d49d7cb@kernel.org/
-> 
-> Thanks for the review.
-> 
-> Best regards,
-> Hyunwoo Kim
+This patch updates the lan743x driver to prevent the use of netdev-based
+logging APIs (such as netdev_dbg) before the network device has been
+successfully registered. Using netdev-based logging prior to registration
+results in log messages referencing "(unnamed net_device) (uninitialized)",
+which can be confusing and less informative.
 
-Ah, I see. you've released another exploit publicly.
+The driver must use netif_msg_x APIs and device-based logging (e.g. dev_dbg)
+until netdev registration is complete. This ensures log entries are
+associated with the correct device context and improves log clarity. After
+registration, netdev-based logging APIs can be used safely.
 
-https://github.com/v12-security/pocs/tree/main/fragnesia-5db89c99566fc
+Fixes: 23f0703c125b ("lan743x: Add main source files for new lan743x driver")
+Signed-off-by: David Thompson <davthompson@nvidia.com>
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 72 ++++++++++++-------
+ 1 file changed, 45 insertions(+), 27 deletions(-)
 
-It looks like the exploit doesn't work because the GRO propagation
-in the already-published v4 patch prevents the SHARED_FRAG asymmetry
-from being created in the first place.
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index f3332417162e..53492573f08d 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -108,9 +108,10 @@ static int lan743x_pci_init(struct lan743x_adapter *adapter,
+ 	if (ret)
+ 		goto return_error;
+ 
+-	netif_info(adapter, probe, adapter->netdev,
+-		   "PCI: Vendor ID = 0x%04X, Device ID = 0x%04X\n",
+-		   pdev->vendor, pdev->device);
++	if (netif_msg_probe(adapter))
++		pci_info(pdev,
++			 "PCI: Vendor ID = 0x%04X, Device ID = 0x%04X\n",
++			 pdev->vendor, pdev->device);
+ 	bars = pci_select_bars(pdev, IORESOURCE_MEM);
+ 	if (!test_bit(0, &bars))
+ 		goto disable_device;
+@@ -192,10 +193,11 @@ static int lan743x_csr_init(struct lan743x_adapter *adapter)
+ 
+ 	csr->id_rev = lan743x_csr_read(adapter, ID_REV);
+ 	csr->fpga_rev = lan743x_csr_read(adapter, FPGA_REV);
+-	netif_info(adapter, probe, adapter->netdev,
+-		   "ID_REV = 0x%08X, FPGA_REV = %d.%d\n",
+-		   csr->id_rev,	FPGA_REV_GET_MAJOR_(csr->fpga_rev),
+-		   FPGA_REV_GET_MINOR_(csr->fpga_rev));
++	if (netif_msg_probe(adapter))
++		dev_info(&adapter->pdev->dev,
++			 "ID_REV = 0x%08X, FPGA_REV = %d.%d\n",
++			 csr->id_rev, FPGA_REV_GET_MAJOR_(csr->fpga_rev),
++			 FPGA_REV_GET_MINOR_(csr->fpga_rev));
+ 	if (!ID_REV_IS_VALID_CHIP_ID_(csr->id_rev))
+ 		return -ENODEV;
+ 
+@@ -953,8 +955,9 @@ int lan743x_sgmii_read(struct lan743x_adapter *adapter, u8 mmd, u16 addr)
+ 	u32 val;
+ 
+ 	if (mmd > 31) {
+-		netif_err(adapter, probe, adapter->netdev,
+-			  "%s mmd should <= 31\n", __func__);
++		if (netif_msg_probe(adapter))
++			dev_err(&adapter->pdev->dev,
++				"%s mmd should <= 31\n", __func__);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -983,8 +986,9 @@ static int lan743x_sgmii_write(struct lan743x_adapter *adapter,
+ 	int ret;
+ 
+ 	if (mmd > 31) {
+-		netif_err(adapter, probe, adapter->netdev,
+-			  "%s mmd should <= 31\n", __func__);
++		if (netif_msg_probe(adapter))
++			dev_err(&adapter->pdev->dev,
++				"%s mmd should <= 31\n", __func__);
+ 		return -EINVAL;
+ 	}
+ 	mutex_lock(&adapter->sgmii_rw_lock);
+@@ -1215,8 +1219,14 @@ static void lan743x_mac_set_address(struct lan743x_adapter *adapter,
+ 	lan743x_csr_write(adapter, MAC_RX_ADDRH, addr_hi);
+ 
+ 	ether_addr_copy(adapter->mac_address, addr);
+-	netif_info(adapter, drv, adapter->netdev,
+-		   "MAC address set to %pM\n", addr);
++	if (netif_msg_drv(adapter)) {
++		if (adapter->netdev->reg_state == NETREG_REGISTERED)
++			netdev_info(adapter->netdev,
++				    "MAC address set to %pM\n", addr);
++		else
++			dev_info(&adapter->pdev->dev,
++				 "MAC address set to %pM\n", addr);
++	}
+ }
+ 
+ static int lan743x_mac_init(struct lan743x_adapter *adapter)
+@@ -1370,8 +1380,9 @@ static void lan743x_phy_interface_select(struct lan743x_adapter *adapter)
+ 	else
+ 		adapter->phy_interface = PHY_INTERFACE_MODE_RGMII;
+ 
+-	netif_dbg(adapter, drv, adapter->netdev,
+-		  "selected phy interface: 0x%X\n", adapter->phy_interface);
++	if (netif_msg_drv(adapter))
++		dev_dbg(&adapter->pdev->dev,
++			"selected phy interface: 0x%X\n", adapter->phy_interface);
+ }
+ 
+ static void lan743x_rfe_open(struct lan743x_adapter *adapter)
+@@ -3168,7 +3179,7 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
+ 	}
+ 
+ 	adapter->phylink = pl;
+-	netdev_dbg(netdev, "lan743x phylink created");
++	dev_dbg(&adapter->pdev->dev, "lan743x phylink created");
+ 
+ 	return 0;
+ }
+@@ -3581,30 +3592,36 @@ static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
+ 	adapter->mdiobus->priv = (void *)adapter;
+ 	if (adapter->is_pci11x1x) {
+ 		if (adapter->is_sgmii_en) {
+-			netif_dbg(adapter, drv, adapter->netdev,
+-				  "SGMII operation\n");
++			if (netif_msg_drv(adapter))
++				dev_dbg(&adapter->pdev->dev,
++					"SGMII operation\n");
+ 			adapter->mdiobus->read = lan743x_mdiobus_read_c22;
+ 			adapter->mdiobus->write = lan743x_mdiobus_write_c22;
+ 			adapter->mdiobus->read_c45 = lan743x_mdiobus_read_c45;
+ 			adapter->mdiobus->write_c45 = lan743x_mdiobus_write_c45;
+ 			adapter->mdiobus->name = "lan743x-mdiobus-c45";
+-			netif_dbg(adapter, drv, adapter->netdev,
+-				  "lan743x-mdiobus-c45\n");
++			if (netif_msg_drv(adapter))
++				dev_dbg(&adapter->pdev->dev,
++					"lan743x-mdiobus-c45\n");
+ 		} else {
+-			netif_dbg(adapter, drv, adapter->netdev,
+-				  "RGMII operation\n");
++			if (netif_msg_drv(adapter))
++				dev_dbg(&adapter->pdev->dev,
++					"RGMII operation\n");
+ 			// Only C22 support when RGMII I/F
+ 			adapter->mdiobus->read = lan743x_mdiobus_read_c22;
+ 			adapter->mdiobus->write = lan743x_mdiobus_write_c22;
+ 			adapter->mdiobus->name = "lan743x-mdiobus";
+-			netif_dbg(adapter, drv, adapter->netdev,
+-				  "lan743x-mdiobus\n");
++			if (netif_msg_drv(adapter))
++				dev_dbg(&adapter->pdev->dev,
++					"lan743x-mdiobus\n");
+ 		}
+ 	} else {
+ 		adapter->mdiobus->read = lan743x_mdiobus_read_c22;
+ 		adapter->mdiobus->write = lan743x_mdiobus_write_c22;
+ 		adapter->mdiobus->name = "lan743x-mdiobus";
+-		netif_dbg(adapter, drv, adapter->netdev, "lan743x-mdiobus\n");
++		if (netif_msg_drv(adapter))
++			dev_dbg(&adapter->pdev->dev,
++				"lan743x-mdiobus\n");
+ 	}
+ 
+ 	snprintf(adapter->mdiobus->id, MII_BUS_ID_SIZE,
+@@ -3696,8 +3713,9 @@ static int lan743x_pcidev_probe(struct pci_dev *pdev,
+ 
+ 	ret = lan743x_phylink_create(adapter);
+ 	if (ret < 0) {
+-		netif_err(adapter, probe, netdev,
+-			  "failed to setup phylink (%d)\n", ret);
++		if (netif_msg_probe(adapter))
++			dev_err(&pdev->dev,
++				"failed to setup phylink (%d)\n", ret);
+ 		goto cleanup_mdiobus;
+ 	}
+ 
+-- 
+2.43.0
 
-In any case, v5 will be submitted shortly.
 
