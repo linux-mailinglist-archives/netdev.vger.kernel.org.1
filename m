@@ -1,241 +1,164 @@
-Return-Path: <netdev+bounces-288212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288213-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IIE1FX7MBmrynwIAu9opvQ
-	(envelope-from <netdev+bounces-288212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:34:22 +0200
+	id YIlTImTMBmrynwIAu9opvQ
+	(envelope-from <netdev+bounces-288213-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:33:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E49DE54AA35
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:34:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B51C54AA19
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AB1913076D68
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:31:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 60A5A302925A
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99EBC3EFD00;
-	Fri, 15 May 2026 07:30:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="MYp/CBZE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE37E3EDE45;
+	Fri, 15 May 2026 07:32:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0703EF66B;
-	Fri, 15 May 2026 07:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.229.168.213])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13613DEAC5;
+	Fri, 15 May 2026 07:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.229.168.213
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778830259; cv=none; b=B0YpGTgZOtYheQSdpPJ+h2A8sET0Pj3txPQtdxVT1CDGm9CYhwSt3iIdGwoHQPthjhVScOqZrhGngpbmDDVVtYSYXHnuIfIWMpd4GpIscsanmgsGsbnEzYZEGmNjIeaV2EoSonHN3A7DkKEpaEiPalUiTMXBWJlElfA3x6FUjPE=
+	t=1778830322; cv=none; b=UUaAecBXKzYMjYIPLfVkARpuFlxKWMYU6NwjCiKGjZOqaV2E81jrtFvOxYVEc5kKUTb2ET/D9ddUMbeiF3cnUIwncRtUmxN8X8jL8jruCCJs6XG5vhBGPqoHiMHIvudZgPAQaBrgF+kiHpY2Y/4dVTSduTHMd7cwLs+fZDU1dt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778830259; c=relaxed/simple;
-	bh=d0Kt3xKJRx8BG1SM8nfNrs3y9A0YwGic8Ep8Tg2mZsI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oDMS4k//psDspN+tk4Efddpmn6ALxt6kRG9YSF7YRJSAc8yhfzEwgP3ljvqp2LfsPuPGozELs7XO5ybRX5SVc/JraJ10sgsit2QjRGl4bL04fka4y4kzmwJl1g7V9HPGgsWRjpuR+XmCceDPfbqLffQ8nDTCPUtHX3s8y+0HLOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=MYp/CBZE; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64F7Q5IK235918;
-	Fri, 15 May 2026 00:30:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=z
-	axk6VHkC9O1+l7O4FvdtYcQCnCnI0bBdK8uGHZVBxo=; b=MYp/CBZEg0qvnyPsK
-	u7ieHcP5nD4e/LyKyuO693USSvtr+GX1UjeyHhp6vjCmSheR09gQT9rVnT3GbwRi
-	qvg4VlxOzjr0nBy2VVzKcAOIFnQxk70F+3RsRcuO95zDtM+1oP+CNo8L7GXzt7qw
-	9Nief8fYdve33M/lXL0nqnDlJlPrFXoAgZ/RCc2/FKWIPZCzpaplU3Yqs5c3Q972
-	gJYWXsUn502ninc+ygX9VP9MIwIEQgHoPXoGqRMmnQ/CMyNcY2kYqRp9B9D7glrM
-	+mgjtzkxitmzH7pv/s+eSf5jLfOj1yJlcJXnxZ99recMgfOheVpVZBrA4reAvlma
-	2OFLg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e5m3shn5n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 May 2026 00:30:40 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 15 May 2026 00:30:39 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 15 May 2026 00:30:39 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 0A8953F705B;
-	Fri, 15 May 2026 00:30:31 -0700 (PDT)
-Date: Fri, 15 May 2026 13:00:30 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <oss-drivers@corigine.com>
-CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
-        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
-        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
-        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
-        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
-        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
-        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
-        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
-        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
-        <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v14 net-next 9/9] octeontx2-af: npc: cn20k: Allocate
- npc_priv and dstats dynamically.
-Message-ID: <agbLlpli-whxptBX@rkannoth-OptiPlex-7090>
-References: <20260514062537.3813802-1-rkannoth@marvell.com>
- <20260514062537.3813802-10-rkannoth@marvell.com>
+	s=arc-20240116; t=1778830322; c=relaxed/simple;
+	bh=X3AkEkRJJo0jVO99ov3hOjezsomQAOLSpaf7FKnhiJ0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=lxLEFxOjzUDPstVUUYF02/5DBs8aWDakS443X1X+zxOAM1POhy1A4nNb5Tj1/ZGvI9/ez9tOc0ZheX0sDf/+lAj1AKmQBkfnFtnhke6SbCnxYPhOBLY+z/YhAW8RqOF09GcLVMd75PAaP8LmUQyXdB+bLI0pE8QHXFX/0f1Fy9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=52.229.168.213
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
+ ajax-webmail-app1 (Coremail) ; Fri, 15 May 2026 15:31:16 +0800 (GMT+08:00)
+Date: Fri, 15 May 2026 15:31:16 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
+To: "Andrew Lunn" <andrew@lunn.ch>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk, maxime.chevallier@bootlin.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+	pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com
+Subject: Re: Re: [PATCH net v1 1/2] dt-bindings: ethernet: eswin: refine
+ delay model and HSP register description
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
+ 20241203(6b039d88) Copyright (c) 2002-2026 www.mailtech.cn
+ mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
+In-Reply-To: <2436c6e9-4aad-4ffd-9fef-0cbbe38dc66d@lunn.ch>
+References: <20260507083037.152-1-lizhi2@eswincomputing.com>
+ <20260507083136.175-1-lizhi2@eswincomputing.com>
+ <2436c6e9-4aad-4ffd-9fef-0cbbe38dc66d@lunn.ch>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260514062537.3813802-10-rkannoth@marvell.com>
-X-Proofpoint-GUID: 2e2IpkC-R7Icf1wrfMDb87VupUCFURLg
-X-Authority-Analysis: v=2.4 cv=NtrhtcdJ c=1 sm=1 tr=0 ts=6a06cba0 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8
- a=deVN925vS6uNbc_aF5kA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=O8hF6Hzn-FEA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: 2e2IpkC-R7Icf1wrfMDb87VupUCFURLg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE1MDA3NCBTYWx0ZWRfX0yZVeFx589u0
- XT5g+PpBJoki/to7G2lNKYfWUNWZokwHIAVFhe+Sjzo9TQzqjKaeeclr84Sksucm0BW9zBDYxVN
- g4A0PMmeTmiLO7oD1rcJTs6Q5EThspHS9+1eCbf89arcYQAXv8r707zuIeizwdIQVcvZfF+Tcb+
- TY/1R3n1RigbsJv9IAWdycK7xWtp11tWkP4Mocig6iihK3afXV1QTNYDx5pfbJv/0REx0JeMaJH
- kZckHCZrQuUdGRKLqH1qnvt1nBgfnft+Zp8oHs9MxVZwU5alHytB6A+7idklsZ0y2CwXyeCHcZy
- vJTSLnPsjJF/LG/x3Wm5Br08B4l0oPXryzfhdL2Gb5LT3arRY65aLHsrIIkTX+G4e9yjk2KAiRe
- syOXki3IRE8Xu9jlaFRiUigf4q/4Aa3I4u843J6nqMiZBAG6ivtH6oZt7KK2suy8kuIyeFRSWFb
- bAhe3bLv2NXgOoSd8Ng==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-15_01,2026-05-13_01,2025-10-01_01
-X-Rspamd-Queue-Id: E49DE54AA35
+Message-ID: <29bee81.8323.19e2a8bf746.Coremail.lizhi2@eswincomputing.com>
+X-Coremail-Locale: en_US
+X-CM-TRANSID:TAJkCgBn_HDFywZq+qYZAA--.7037W
+X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAgEIDGoF+ZIKMwACs4
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Rspamd-Queue-Id: 2B51C54AA19
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [2.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:email,marvell.com:dkim];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288212-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288213-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[eswincomputing.com];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
+	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	HAS_X_PRIO_THREE(0.00)[3];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	NEURAL_SPAM(0.00)[0.360];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 2026-05-14 at 11:55:37, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Replace the file-scope static npc_priv with a kcalloc'd struct filled
-> from hardware bank/subbank geometry at init (num_banks is no longer a
-> const compile-time constant; drop init_done and use a non-NULL
-> npc_priv pointer for liveness). Thread npc_priv_get() / pointer access
-> through the CN20K NPC code paths, extend teardown to kfree the root
-> struct on failure and in npc_cn20k_deinit, and adjust MCAM section
-> setup to use the discovered subbank count.
->
-
->>  #include "cn20k/reg.h"
->>  #include "rvu_npc_fs.h"
->>
->> -static struct npc_priv_t npc_priv = {
->> -	.num_banks = MAX_NUM_BANKS,
->> -};
->> +static struct npc_priv_t *npc_priv;
->Since npc_priv and dstats are still declared as global file-scope variables,
->won't probing multiple RVU devices cause these pointers to be overwritten?
->If a second device is probed, the allocations for the first device would be
->leaked and both devices would end up sharing the second device's state.
->On device unbind, devres will automatically free dstats, leaving a dangling
->global pointer. Additionally, npc_cn20k_deinit() explicitly frees npc_priv
->and sets it to NULL.
->If a userspace process reads a debugfs file after device unbind, could it
->cause a NULL pointer dereference on npc_priv or a use-after-free when
->accessing the dstats array?
-While a global file-scope pointer introduces a shared-state risk in
-drivers that support multiple instances, the structural design and
-physical topology of the OcteonTX2 platform eliminate this hazard.
-
-First, the system architecture dictates that exactly one physical RVU
-Admin Function (AF) hardware block exists per SoC layout. Because the
-hardware platform cannot expose multiple active AF instances, there is
-no parallel or sequential device probing sequence to trigger a race
-condition, overwrite existing allocations, or cause memory leaks between distinct devices.
-
-Second, the debugfs nodes and the driver's structural life cycle are
-fundamentally serialized. When a device unbind occurs, the kernel’s
-driver model coordinates the teardown by systematically removing the
-associated debugfs entries before finalizing the subsystem de-initialization.
-Because the debugfs file operations are unlinked and blocked from further
-invocation prior to executing the kfree(npc_priv) routine in
-npc_cn20k_deinit(), any userspace read attempt is rejected at the VFS
-layer, removing the possibility of a post-unbind NULL pointer dereference
-or use-after-free regression.
-
->>   */
->>  struct npc_priv_t {
->>  	int bank_depth;
->> -	const int num_banks;
->> +	int num_banks;
->>  	int num_subbanks;
->>  	int subbank_depth;
->>  	DECLARE_BITMAP(en_map, MAX_NUM_BANKS *
->Now that num_banks and bank_depth are populated from hardware values
->instead of compile-time constants, do we need to validate them against the
->MAX_NUM_BANKS and MAX_SUBBANK_DEPTH constants?
->Looking at npc_mcam_dstats_show(), it loops based on these hardware values
->and indexes into the dstats array:
->npc_mcam_dstats_show() {
->    ...
->	for (int bank = npc_priv->num_banks - 1; bank >= 0; bank--) {
->		for (int idx = npc_priv->bank_depth - 1; idx >= 0; idx--) {
->            ...
->			if (stats < dstats[0][bank][idx])
->				dstats[0][bank][idx] = 0;
->    ...
->}
->Since dstats is still statically sized using MAX_NUM_BANKS and related
->macros, will this result in out-of-bounds accesses if the hardware returns
->larger values?
->Similarly, the en_map bitmap is sized using these same static constants.
->Could operations like set_bit(index, npc_priv->en_map) in
->npc_cn20k_enable_mcam_entry() corrupt the npc_priv_t structure if the
->hardware dimensions exceed the static bitmap size?
-
-The static definitions for the tracking arrays and bitmaps are based
-strictly on the silicon's hard limits, preventing any possibility of
-out-of-bounds corruption.
-
-The compile-time constants (MAX_NUM_BANKS, MAX_NUM_SUB_BANKS, and
-MAX_SUBBANK_DEPTH) do not represent arbitrary bounds; they define the
-absolute, physical maximum limits across all existing and planned SoC
-variants for the CN20K hardware profile. The hardware registers cannot
-expose configuration dimensions that exceed these maximum architectural limits
-because the underlying silicon layout lacks the physical lines or registers
-to support larger structures.
-
-Because the statically allocated arrays and bitmaps (like dstats and
-en_map) are configured to support this full architectural envelope, the
-runtime values assigned to num_banks and bank_depth are structurally
-guaranteed to be less than or equal to these maximum limits. As a result,
-the loops inside npc_mcam_dstats_show() and bit operations inside
-npc_cn20k_enable_mcam_entry() will never cross the boundaries of the
-allocated memory footprint, making runtime validation checks redundant.
+Cgo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZXMtLS0tLQo+IEZyb206ICJBbmRyZXcgTHVubiIgPGFu
+ZHJld0BsdW5uLmNoPgo+IFNlbmQgdGltZTpUaHVyc2RheSwgMDcvMDUvMjAyNiAyMDoyOToxMAo+
+IFRvOiBsaXpoaTJAZXN3aW5jb21wdXRpbmcuY29tCj4gQ2M6IGFuZHJldytuZXRkZXZAbHVubi5j
+aCwgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldCwgZWR1bWF6ZXRAZ29vZ2xlLmNvbSwga3ViYUBrZXJuZWwu
+b3JnLCBwYWJlbmlAcmVkaGF0LmNvbSwgcm9iaEBrZXJuZWwub3JnLCBrcnprK2R0QGtlcm5lbC5v
+cmcsIGNvbm9yK2R0QGtlcm5lbC5vcmcsIG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcsIGRldmljZXRy
+ZWVAdmdlci5rZXJuZWwub3JnLCBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnLCBtY29xdWVs
+aW4uc3RtMzJAZ21haWwuY29tLCBhbGV4YW5kcmUudG9yZ3VlQGZvc3Muc3QuY29tLCBybWsra2Vy
+bmVsQGFybWxpbnV4Lm9yZy51aywgbWF4aW1lLmNoZXZhbGxpZXJAYm9vdGxpbi5jb20sIGxpbnV4
+LXN0bTMyQHN0LW1kLW1haWxtYW4uc3Rvcm1yZXBseS5jb20sIGxpbnV4LWFybS1rZXJuZWxAbGlz
+dHMuaW5mcmFkZWFkLm9yZywgbmluZ3l1QGVzd2luY29tcHV0aW5nLmNvbSwgbGlubWluQGVzd2lu
+Y29tcHV0aW5nLmNvbSwgcGlua2VzaC52YWdoZWxhQGVpbmZvY2hpcHMuY29tLCBwcml0ZXNoLnBh
+dGVsQGVpbmZvY2hpcHMuY29tLCB3ZWlzaGFuZ2p1YW5AZXN3aW5jb21wdXRpbmcuY29tCj4gU3Vi
+amVjdDogUmU6IFtQQVRDSCBuZXQgdjEgMS8yXSBkdC1iaW5kaW5nczogZXRoZXJuZXQ6IGVzd2lu
+OiByZWZpbmUgZGVsYXkgbW9kZWwgYW5kIEhTUCByZWdpc3RlciBkZXNjcmlwdGlvbgo+IAo+ID4g
+ICAgICBldGhlcm5ldEA1MDQwMDAwMCB7Cj4gPiAgICAgICAgICBjb21wYXRpYmxlID0gImVzd2lu
+LGVpYzc3MDAtcW9zLWV0aCIsICJzbnBzLGR3bWFjLTUuMjAiOwo+ID4gICAgICAgICAgcmVnID0g
+PDB4NTA0MDAwMDAgMHgxMDAwMD47Cj4gPiAtICAgICAgICBjbG9ja3MgPSA8JmQwX2Nsb2NrIDE4
+Nj4sIDwmZDBfY2xvY2sgMTcxPiwgPCZkMF9jbG9jayA0MD4sCj4gPiAtICAgICAgICAgICAgICAg
+IDwmZDBfY2xvY2sgMTkzPjsKPiA+IC0gICAgICAgIGNsb2NrLW5hbWVzID0gImF4aSIsICJjZmci
+LCAic3RtbWFjZXRoIiwgInR4IjsKPiA+ICAgICAgICAgIGludGVycnVwdC1wYXJlbnQgPSA8JnBs
+aWM+Owo+ID4gICAgICAgICAgaW50ZXJydXB0cyA9IDw2MT47Cj4gPiAgICAgICAgICBpbnRlcnJ1
+cHQtbmFtZXMgPSAibWFjaXJxIjsKPiA+IC0gICAgICAgIHBoeS1tb2RlID0gInJnbWlpLWlkIjsK
+PiA+IC0gICAgICAgIHBoeS1oYW5kbGUgPSA8JnBoeTA+Owo+ID4gKyAgICAgICAgY2xvY2tzID0g
+PCZkMF9jbG9jayAxODY+LCA8JmQwX2Nsb2NrIDE3MT4sIDwmZDBfY2xvY2sgNDA+LAo+ID4gKyAg
+ICAgICAgICAgICAgICA8JmQwX2Nsb2NrIDE5Mz47Cj4gPiArICAgICAgICBjbG9jay1uYW1lcyA9
+ICJheGkiLCAiY2ZnIiwgInN0bW1hY2V0aCIsICJ0eCI7Cj4gCj4gUGxlYXNlIGRvbid0IG1vdmUg
+dGhlIGNsb2NrcyBhcm91bmQsIHNpbmNlIHRoZXkgaGF2ZSBub3RoaW5nIHRvIGRvCj4gd2l0aCBS
+R01JSSBkZWxheXMuCj4gCj4gCj4gPiAgICAgICAgICByZXNldHMgPSA8JnJlc2V0IDk1PjsKPiA+
+ICAgICAgICAgIHJlc2V0LW5hbWVzID0gInN0bW1hY2V0aCI7Cj4gPiAtICAgICAgICByeC1pbnRl
+cm5hbC1kZWxheS1wcyA9IDwyMDA+Owo+ID4gLSAgICAgICAgdHgtaW50ZXJuYWwtZGVsYXktcHMg
+PSA8MjAwPjsKPiA+IC0gICAgICAgIGVzd2luLGhzcC1zcC1jc3IgPSA8JmhzcF9zcF9jc3IgMHgx
+MDAgMHgxMDggMHgxMTg+Owo+ID4gLSAgICAgICAgc25wcyxheGktY29uZmlnID0gPCZzdG1tYWNf
+YXhpX3NldHVwPjsKPiA+ICsgICAgICAgIGVzd2luLGhzcC1zcC1jc3IgPSA8JmhzcF9zcF9jc3Ig
+MHgxMDAgMHgxMDggMHgxMTggMHgxMTQgMHgxMWM+Owo+ID4gKyAgICAgICAgcGh5LWhhbmRsZSA9
+IDwmcGh5MD47Cj4gPiArICAgICAgICBwaHktbW9kZSA9ICJyZ21paS1pZCI7Cj4gPiAgICAgICAg
+ICBzbnBzLGFhbDsKPiA+ICAgICAgICAgIHNucHMsZml4ZWQtYnVyc3Q7Cj4gPiAgICAgICAgICBz
+bnBzLHRzbzsKPiA+IC0gICAgICAgIHN0bW1hY19heGlfc2V0dXA6IHN0bW1hYy1heGktY29uZmln
+IHsKPiA+ICsgICAgICAgIHNucHMsYXhpLWNvbmZpZyA9IDwmc3RtbWFjX2F4aV9zZXR1cF9nbWFj
+MD47Cj4gPiArCj4gPiArICAgICAgICBzdG1tYWNfYXhpX3NldHVwX2dtYWMwOiBzdG1tYWMtYXhp
+LWNvbmZpZyB7Cj4gCj4gQW5kIHdoYXQgZG8gdGhlc2UgY2hhbmdlcyBoYXZlIHRvIGRvIHdpdGgg
+UkdNSUkgZGVsYXlzPwo+IAoKSGkgQW5kcmV3LAoKQmVmb3JlIHNlbmRpbmcgdGhlIG5leHQgcmV2
+aXNpb24sIEkgd291bGQgbGlrZSB0byBjb25maXJtIG9uZSBwb2ludCBhYm91dAp0aGUgYmluZGlu
+ZyB1cGRhdGUuCgpJbiB5b3VyIHByZXZpb3VzIHJldmlldyBjb21tZW50OgpodHRwczovL2xvcmUu
+a2VybmVsLm9yZy9sa21sLzdlNTkzZWRlLTU5ZWItNDMxNi1hYjcyLTk0OWE1MWMwMDhjNkBsdW5u
+LmNoLwoKeW91IG1lbnRpb25lZCB0aGF0ICJhIHdlbGwgZGVzaWduZWQgYm9hcmQgc2hvdWxkIG5v
+dCBuZWVkIGRlbGF5cyIuCgpCYXNlZCBvbiB0aGF0LCBJIGFtIHBsYW5uaW5nIHRvIHJlbW92ZSBy
+eC1pbnRlcm5hbC1kZWxheS1wcyBhbmQKdHgtaW50ZXJuYWwtZGVsYXktcHMgZnJvbSB0aGUgcmVx
+dWlyZWQgbGlzdC4KClRoZSBpbnRlbnRpb24gaXMgdGhhdCB0aGVzZSBwcm9wZXJ0aWVzIHJlbWFp
+biBhdmFpbGFibGUgZm9yIE1BQy1zaWRlCmZpbmUgdHVuaW5nIHdoZW4gbmVlZGVkLCBidXQgYXJl
+IG9wdGlvbmFsIHNpbmNlIHRoZSByZXF1aXJlZCBSR01JSSBkZWxheQptYXkgaW5zdGVhZCBiZSBw
+cm92aWRlZCBieSB0aGUgUEhZIChmb3IgZXhhbXBsZSB3aXRoIHJnbWlpLWlkKSBvciBieSB0aGUK
+Ym9hcmQgZGVzaWduLgoKV291bGQgeW91IGNvbnNpZGVyIHRoaXMgdG8gYmUgYSBmaXggdG8gYW4g
+b3Zlcmx5IHJlc3RyaWN0aXZlIHNjaGVtYQpyZXF1aXJlbWVudCwgb3IgbW9yZSBvZiBhIHNjaGVt
+YSByZWxheGF0aW9uIC8gaW1wcm92ZW1lbnQ/CgpUaGlzIHdpbGwgaGVscCBkZXRlcm1pbmUgd2hl
+dGhlciB0aGlzIGNoYW5nZSBzaG91bGQgcmVtYWluIGluIHRoZSBuZXQKc2VyaWVzIG9yIGJlIG1v
+dmVkIHRvIGEgZm9sbG93LXVwIG5ldC1uZXh0IHNlcmllcy4KClRoYW5rcywKWmhpIExpCg==
 
