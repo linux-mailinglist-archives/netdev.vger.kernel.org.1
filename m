@@ -1,199 +1,204 @@
-Return-Path: <netdev+bounces-288386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BiSMJVWB2pVzQIAu9opvQ
-	(envelope-from <netdev+bounces-288386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:23:33 +0200
+	id CBYhERFfB2pa0QIAu9opvQ
+	(envelope-from <netdev+bounces-288387-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:59:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8177554F00
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:23:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2153555C2F
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:59:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F29493008CBB
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 17:08:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F86930ACE00
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 17:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05EF44DB54B;
-	Fri, 15 May 2026 17:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CD34F7965;
+	Fri, 15 May 2026 17:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="quaNqs2y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nbC2z9VN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FA5380FE8
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 17:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32FD4F7970
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 17:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778864936; cv=none; b=FUdphNwRmJ9K5+n98uUSSPJ+s84GCmXIBw/bg7Bd+CYtBoTu3rYxN1Pw6fCK6nhZy0rYbGdzNde2nB+uR2xs2LglCcSaWi98wLJDFqvGc1P5GXdXIiL/WGUtvs8ddF208CHjNGPuNge5JKcDn7brfzBAWex+OTui86vkQxubsPc=
+	t=1778865170; cv=none; b=dP+vVvtwHgypv4JgUC/TzBweMt2mg2A4f8FbR0NuHU8ZGh99ltamBxzt0wL33DysSHDSBb6uyYymlQdwMmoX34kj2+edCx9/fR2DtFai9aMRSrBDJKex1vQHzCgO8XRjONZEd8UiD+y6oQJNDYSboiGkXJVq79hCTPm2MBSJ5d8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778864936; c=relaxed/simple;
-	bh=eTAu6ZzvjxS+1EPKMnCFyFy8OhsqgGgyJVexQkk0yMo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=LeoKmUDKftkKsekihN0/QQ9YBPn/Zbp+C8TwIKq0SxR4u6hwWLNKAmOPBDama3wgFzgFQENE+D49GiUJgXzfFK7YrPz6M4MNlj7I6Axa2bsqaa8N8/YC951Q6GBSK+Scz6nm4C8L80Pe9Hh4/8h9WQ5pyGLaTnodvqsx0d5fzv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=quaNqs2y; arc=none smtp.client-ip=74.125.224.45
+	s=arc-20240116; t=1778865170; c=relaxed/simple;
+	bh=0A+nM/+sysN2KGQXhhO4JcJYWEOq2c2OfNIxDSDBn70=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mnkXcTF0x55ZJZxO8vqCNWCqLmfV7ZnFzTv97dcxUR5WEzu0rKTWL6VwIVSg7E73vAZRwJCgyk5p1jnAd0DWs6uH6bgC1LWTlh+8ZhF3683UXGj5QzbONsIaoVj0u0Qh2AhHpyS9Nbqdzs/5nxoydU43/Mau9HBizGsWo5bh3OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nbC2z9VN; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-65c7a459105so2722016d50.0
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 10:08:54 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-83537a80ab6so46164b3a.1
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 10:12:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778864934; x=1779469734; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=r5Dodp1SgGEX8BPNfOmTYAJETBWomYkmsJ9yO/jTFgc=;
-        b=quaNqs2ytRrBYam1t5KpyZrzoOiDF8TnPI3wv5Og0A/wvDXj+Ok4iJswmVPkFqSOsS
-         i8SY2fWxaZN1CEp4wSzA6e0ZbgKiF+HZS3AqRvc+DAEWTh8p12SLVWfzhzEndcfOwoX2
-         HeICh4siaGijAOGS31nQtCtw02fC66+qbGgH/vVFo9KciF8M9S1aZyX65u2JhcF4v2vp
-         tGX9rZnh+evawSe3w/xvxAiMg/BbJRoTraKfWVM2axkuCx8/1QWO8ozGfTsfuB+XB7Sh
-         wAgUr3cJd8JgLxeY4l2s9WOZI7qFleFYS4PoS9zGoUwbhgs+5Be48o8Wrw666AWbgL0h
-         Bq3g==
+        d=gmail.com; s=20251104; t=1778865169; x=1779469969; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=j2H8+FgdgJN+H8gAB0oUD1LeAPsq2ZPySE5IJb34ngg=;
+        b=nbC2z9VNJIseawfjAdnp/plrA0Dhm8GDib7Fvc427Rztntyzd4A8OL6JX8/RA81Wa1
+         frULWNkH5j4Brv2vfWxtqvzWjnlYiUD2ngvDbSgVynZuUwUqQwsNmbKsPZX3i44aJ0Lu
+         agHCJ4kcOu7DVK7Qj5Wda1Ju1JxQeIEAuZc8zYoFszdLSbI7xaAorILvYT40+vDT5Bqe
+         TqYIPqwjgYOJ1IU81dV22OyE1GtQvqvP7fl/kZkQ1jGsZ/Ddu2jB1d+7EwiK+v8Tl/9K
+         vL4oCXgr3nxRoz6si5G84OPH2hLFQZxXL+j09jFw5Gviz3dRRdgnd/eOEUGSIB2wD8X+
+         VQZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778864934; x=1779469734;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r5Dodp1SgGEX8BPNfOmTYAJETBWomYkmsJ9yO/jTFgc=;
-        b=BPAjwlhER2oY3zvVNCYNAyZTixP/ZkCx1foVmK+uFjYPveqaexXY1sZyLuz3TdbpN7
-         xWJLqKuUQ1SqBlS41vFp7sGwOvjtjG6glUsnU6UsFjqazG8ZwaQ776eAic/ZTRVsI60f
-         7HNz+dONx9p3kkeERNqQ1eb3ZmDzizunybInO5s/Bjcta6E7Lf0s1PCFKwJBJ6BXdSsH
-         PwcUeD/TTSVbyHS1T8gje9wV40w5biwvAq+xkXMrdcIyL/dpPSmcVBTN1yvhWG6JYVvd
-         wG9/LtrqVGwpBH10HTfMM+dpLyoVA3HMAz9yO4LNsDzfqJNhfKQgOMv0Y+BpihjbEuG/
-         eY7g==
-X-Gm-Message-State: AOJu0Yy+LHtdK6761MIQQqtCnKk8ZETQnoOb0ab0VegtJM4OL5tJe1q+
-	oernRwunhMN9UPuEkna8RsfIy/dXS8JTYQz+TYsBN7H9p6SZNwhWz6GO
-X-Gm-Gg: Acq92OE2urhUVo8hyDKSXrJkOb33p3YihGk4aysJ4jgRCcV29UjS73E89K8VuVrZ0ab
-	Fhwj9RRt9UsqkDntIvog3H7hBr6uVUYg8snjVaFWTCoCqsf2GUqWyvzkE1GlxN3liyEL4mmQuqm
-	p3QkEv6NZOXfyeZ0C1/VVOh5Y5MSAbjA3Gxs4dmaYjvGbB4glIbQqvUjSBMO1VLUH1GxLgXftTL
-	ZY5w53hpvg8wMstzCoVSOA8yseYPJcQYZYnVu4Fc5iVCg8rDx0Tk1lqc572EokawGNwUKZjA8v1
-	OD/v3vzQjvv97Z6zdSolF0jGZEtbYKw8zTsmR0BOw63mkUYPqXephsZvOKwiQ+jhSszcIkA/ba6
-	j/mzDqQH+x3uwY8znh9Jxen7E0bPOaeGsYkGIakXod4TyH+kJCG+uoVB8UonprZe0OkXb5TCO9l
-	Wxna0bqQT6bXgwXWoX73o=
-X-Received: by 2002:a05:690e:c4c:b0:650:327f:4ff0 with SMTP id 956f58d0204a3-65e0b04afc2mr7539634d50.12.1778864933773;
-        Fri, 15 May 2026 10:08:53 -0700 (PDT)
-Received: from localhost ([2a03:2880:f806:8::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65e0db0b134sm2804059d50.13.2026.05.15.10.08.53
+        d=1e100.net; s=20251104; t=1778865169; x=1779469969;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j2H8+FgdgJN+H8gAB0oUD1LeAPsq2ZPySE5IJb34ngg=;
+        b=KA1/xsFd6SaLk6bFo6KcSJ64brdaDcJmYfBTXZaw6DwRs/sJSpcv1hp47sDrgHO3Uk
+         SYEMMqwGYMKGuLE3hcEWTLAby2f/TIUjCueHIOEFmP90aIB19avNY/gSKwl2WnzCIcFK
+         snr/Cv5QRsOppsnr+MlZzFGMO2gyRJr0suUxaqBNM5n3QqQWK05j/oi+SSc2dhGni7+Q
+         o8AEU4Gc3GcBOko8Q4EU31jqjLOfsVJpjY+DoHWQWDMdJWp01E5Cf3aRDkihK6q51ieZ
+         PQpilQBYmvSm7iYQcpkhUTEMFa0cvenm2LfTfs1eSN513gh/2QW3hy/zmmkwF5o6MZhw
+         S/Ow==
+X-Gm-Message-State: AOJu0YwUo9QIg1J4fAJOqMKQuO08X8o+e9LH0aSQKFuC1QG/cq4Sktqi
+	Vm+VGFGjEM+lkqYAbSiVdl9id8siE/0u1D3D2xPiA388Ru36L7/A9xVf
+X-Gm-Gg: Acq92OGJaVki3o+fEiayTGPzYml7c3YNsXHDvswjw8NeCliv9IorzJUvsTkpFSLh60G
+	+XQyftrzVDqj1N3X/G9IDh1WQBFlGGFfL1EGo8L8A4npt1/0TdB0FuzVgv7QjoAdFCGvTW8+ZQh
+	uRdAE5M/g80svjcLY4c5Pr8mhSc0SbUY1rhzP+EJRFpKj2a8jwXIHxp1grnF6X/Rr0o9cWp/RB2
+	XwdM1VXD4JMvUFLZgMZEIyePitm58JPJBQtYKtLn3I0NFqznC2+4n/lqoR+E/oyQ6s3q/LfrUT/
+	HEbLIKDLl25ewTt1zUhbf+7qcCB7iRtoKAGRaBEiVox/Js6u5RtvdpSOqnTVJX/uf1Xvwoc4v04
+	2CsVgmE3WRWcpeABQ6M3bRQ88RvUwIdKAn8myo6ldE2PlR7QgFR3kfPWi6p6nsE/9nHODnOnK5X
+	KI9OurnNy2nrCEuBDJbIhgB3P6F3GgZBPOIqGOShxTY9irGdUyHkvsDLqow7BMulCOdrJo5xo8r
+	dJCqR0xDXiHZCf3X9CNwfFFWwbFOVK1nsXFehG1OdmNaQP/SwAjyaUNEtOCziAn7rz+
+X-Received: by 2002:a05:6a00:448a:b0:838:1c02:276c with SMTP id d2e1a72fcca58-83f33dee8b8mr5572533b3a.40.1778865168762;
+        Fri, 15 May 2026 10:12:48 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-83f19c5c39esm7730851b3a.36.2026.05.15.10.12.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 10:08:53 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-Date: Fri, 15 May 2026 10:08:52 -0700
-Subject: [PATCH] netdevsim: psp: reset spi on key rotation and check for
- exhaustion on alloc
+        Fri, 15 May 2026 10:12:48 -0700 (PDT)
+Message-ID: <d55bd2281e7b3670c96fb3478d0417c79dc777f3.camel@gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] net: pcs: xpcs: Add handling for 4
+ channel rsfec device
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: mike.marciniszyn@gmail.com, Alexander Duyck <alexanderduyck@fb.com>, 
+ Jakub Kicinski	 <kuba@kernel.org>, kernel-team@meta.com, Andrew Lunn
+ <andrew+netdev@lunn.ch>,  "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Kees
+ Cook <kees@kernel.org>,  Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Fri, 15 May 2026 10:12:46 -0700
+In-Reply-To: <20260511182604.1338-3-mike.marciniszyn@gmail.com>
+References: <20260511182604.1338-1-mike.marciniszyn@gmail.com>
+	 <20260511182604.1338-3-mike.marciniszyn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260515-spi-handle-v1-1-debf8cb467cb@gmail.com>
-X-B4-Tracking: v=1; b=H4sIACNTB2oC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDU0NT3eKCTF2gREpOqq5FUqplapKFiZGZmbkSUENBUWpaZgXYsOjY2lo
- AXSI4OFwAAAA=
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Rspamd-Queue-Id: C8177554F00
+X-Rspamd-Queue-Id: A2153555C2F
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288386-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288387-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com,fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fb.com:email]
 X-Rspamd-Action: no action
 
-The PSP spec states that the lower 31b of the SPI need to be
-non-zero. Though not in the spec, I think it is reasonable to reset
-the lower 31b of the spi space after a key rotation, and to also
-decline to generate session keys when the lower 31b saturate.
+On Mon, 2026-05-11 at 14:26 -0400, mike.marciniszyn@gmail.com wrote:
+> From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+>=20
+> This patch introduces the configuration of vendor specific
+> registers for alignment encoding, PCS Mode, and VL_INTVL
+> over the one or two instances as required.
+>=20
+> The DW_PCS IP specification calls out the need to configure both
+> lanes identically when using 2 lane modes such as 50-R2 and 100-R2, so
+> the programming is repeated for each lane.
+>=20
+> The encoding tables are derived from the IEEE 8023-2022 spec sections
+> 82.2.7 and tables 82-2 and 82-3 for the alignment markers and their
+> insertion.
+>=20
+> Note that there is a conflict between VRs DW_VR_XS_PCS_DIG_STS and
+> and the DW_PCS_IP DW_VR_MII_PCS_PCS_MODE.  The bit mask for
+> DW_VR_XS_PCS_DIG_STS/RX_FIFO_ERR fits within the reserved bits for
+> the DW_PCS IP the DW_VR_MII_PCS_PCS_MODE register so there is no issue.
+>=20
+> There is also a confict between DW_VR_MII_PCS_VL_INTVL and
+> DW_VR_MII_AN_INTR_STS but an_mode differs, so again there is no issue.
+>=20
+> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+> Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
+> ---
+> v2:
+>   - Replace xpcs_write_pcs_prtad() wiht xpcs_write_pcs_mdev() to
+>     avoid hardcoded prtaddr value
+> v1: https://lore.kernel.org/all/20260506190904.4029-3-mike.marciniszyn@gm=
+ail.com/
+>=20
+>  drivers/net/pcs/pcs-xpcs.c | 91 +++++++++++++++++++++++++++++++++++++-
+>  drivers/net/pcs/pcs-xpcs.h | 25 +++++++++++
+>  2 files changed, 115 insertions(+), 1 deletion(-)
+>=20
+>=20
 
-Assisted-by: Claude:claude-opus-4.7
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
-This commit was originally part of the series:
-https://lore.kernel.org/netdev/20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com/
+[...]
 
-But it stands alone, so I am submitting individually first.
----
- drivers/net/netdevsim/psp.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+> @@ -1464,6 +1521,23 @@ xpcs_config_rsfec_pma(struct dw_xpcs *xpcs, const =
+struct pma_pcs_values *v)
+> =20
+>  	for (i =3D 0; mdev && ret >=3D 0 && i < v->lanes;
+>  	     i++, mdev =3D xpcs_find_next_mdev(xpcs, mdev)) {
 
-diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-index 6936ecb8173e..c6000ebc6bc8 100644
---- a/drivers/net/netdevsim/psp.c
-+++ b/drivers/net/netdevsim/psp.c
-@@ -132,14 +132,15 @@ nsim_rx_spi_alloc(struct psp_dev *psd, u32 version,
- 		  struct netlink_ext_ack *extack)
- {
- 	struct netdevsim *ns = psd->drv_priv;
--	unsigned int new;
- 	int i;
- 
--	new = ++ns->psp.spi & PSP_SPI_KEY_ID;
--	if (psd->generation & 1)
--		new |= PSP_SPI_KEY_PHASE;
-+	/* Check if incrementing the spi would change the phase bit */
-+	if ((ns->psp.spi & PSP_SPI_KEY_ID) == PSP_SPI_KEY_ID) {
-+		NL_SET_ERR_MSG(extack, "SPI space exhausted");
-+		return -ENOSPC;
-+	}
- 
--	assoc->spi = cpu_to_be32(new);
-+	assoc->spi = cpu_to_be32(++ns->psp.spi);
- 	assoc->key[0] = psd->generation;
- 	for (i = 1; i < PSP_MAX_KEY; i++)
- 		assoc->key[i] = ns->psp.spi + i;
-@@ -162,6 +163,16 @@ static int nsim_assoc_add(struct psp_dev *psd, struct psp_assoc *pas,
- 
- static int nsim_key_rotate(struct psp_dev *psd, struct netlink_ext_ack *extack)
- {
-+	struct netdevsim *ns = psd->drv_priv;
-+
-+	/* Flip key phase and reset SPI to 0 within that space
-+	 * (will be pre-incremented, as 0 is an invalid SPI).
-+	 */
-+	if (ns->psp.spi & PSP_SPI_KEY_PHASE)
-+		ns->psp.spi = 0;
-+	else
-+		ns->psp.spi = PSP_SPI_KEY_PHASE;
-+
- 	return 0;
- }
- 
+The use of the "find_next_mdev" essentially taints this patch with the
+same issues from the first.
 
----
-base-commit: 822d4a8e390a08ccfaf2abb347ae670b230b196f
-change-id: 20260515-spi-handle-8be9eb842667
+We know the offsets. We shouldn't be blindly reaching around for
+devices and writing to them. If we need to we should be creating the
+devices for the second lane of the PCS ourselves and using that instead
+of letting the phy_device code autoprobe in a device based on the PMD.
 
-Best regards,
--- 
-Daniel Zahka <daniel.zahka@gmail.com>
+Specifically we should just be writing to our bus ID and bus ID + 1 in
+the case of the 50GR2 and 100G configurations as we have to configure
+the 2 lanes. We shouldn't risk this thing going off the rails and
+grabbing some random bus ID if it were loaded on another device. If we
+need to we could make it so that the Meta device ID on the PCS is what
+triggers it setting.
 
+My advice would be to look at creating a new version of
+xpcs_create_pcs_mdiodev, maybe "xpcs_create_pcs_mdiodevs", that you can
+pass a lanes value to and perhaps look at making addr an array of
+addresses. Then you could have that spawn the additional lanes via
+mdio_device_create, record them in the dw_xpcs struct, and avoid having
+to do as much blind searching to find the devices that you are
+currently doing.
 
