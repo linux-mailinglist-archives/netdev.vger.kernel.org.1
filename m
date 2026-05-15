@@ -1,160 +1,128 @@
-Return-Path: <netdev+bounces-288150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eEUvDsp6BmqFkAIAu9opvQ
-	(envelope-from <netdev+bounces-288150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:45:46 +0200
+	id UA60KQp8BmqskAIAu9opvQ
+	(envelope-from <netdev+bounces-288151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:51:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCD7D54883C
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:45:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FA7548910
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:51:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36E17302F3AC
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:45:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 917A9300D4FA
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54215263C9F;
-	Fri, 15 May 2026 01:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7910429DB6C;
+	Fri, 15 May 2026 01:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="iWpYpmae"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKNZd/Lh"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4311DF26E;
-	Fri, 15 May 2026 01:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5425C7260D;
+	Fri, 15 May 2026 01:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778809539; cv=none; b=P/Ha4yNQxJq0OBx3F4vF/b9rvvqHeHgxZTEysjCiHQjV+DNH2FhZve4VtmhPidP0wgHRFVBN25ycY6mC3uap/3gbfqT25WII1Wm8AmGR0isAVc5ulfU5hSZzoUdVJN6rXoG1o35HxOmLsUKJ+DzB6sCxGmuXgFmOTxy3+r+iJPI=
+	t=1778809861; cv=none; b=j0sSKqL4yqv2zjJzumIib+oh9IQhHSajLtpN9D8EG5CQdg+5H4q0PEi54BvoIUTdDXneDZ0XoJQ8YG7E6d+o+8z4EZXiWNo1X6HbTckojpnNdTA9Qrihl1jlrlAHt4xABqJHnFK+2ingL84nftfDmnH2S4pyLczWNo2PwrIFPJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778809539; c=relaxed/simple;
-	bh=HojsEqe/ZE00/5FtnUWKwLEEonCZRaCPMwEdROaACyg=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=B12YHqFRlAyDbWyXK+foQiwYY3B8Z5JXEof2OpcpKK2ESseObPhx/y5s2HB3AuJ1katVOXI5NdCwshAteSsHABm6qtGHB8V8dkMGnSDK5MDDajqhXbVKC13BxoHaDnzFLj1MvbYUGjv/VbCgRRdtJdp5EIuxyNwxpm8sKtwFD6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=iWpYpmae; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=NZylT/MpD46LKACFxAI54Gx5Q6OyGg4L2emvwO6hNhg=;
-	b=iWpYpmae1UUwAnXvW0heug3y+zzckKABnYfamrs0h15gKqFSZY1Lmnylrkq8eNl/mCeH2XeT7
-	70Tm8ow71ZkdNHpr2E5t72IRO8pAV/dUfzPKGscH6kwY4AGR9zrY+mpFlcpiDHz3KAiNn8qtkgl
-	c6dyf/YlTqrgD9c6boZVMeg=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4gGqZl14DFzRhTs;
-	Fri, 15 May 2026 09:37:51 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E446C4056A;
-	Fri, 15 May 2026 09:45:28 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 15 May 2026 09:45:28 +0800
-Message-ID: <c61ee5db-2578-401f-a4fb-f2fb697af731@huawei.com>
-Date: Fri, 15 May 2026 09:45:27 +0800
+	s=arc-20240116; t=1778809861; c=relaxed/simple;
+	bh=lwy+Je7UuTA684S7UnzKNOTYUpSoQbkD+J2jVuPa0RQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SUPELRC+WUVwooaUZK+2lwOBHLp+aThCBrh/IYWqTIR8Qpk4lAuI30yOHNyaF5cg3m7pIs/PTNPPP7WFaoQzZ2x5E6gUC1lodiDKDlWUMz5E8KXrYnSmL2LOX941vO0GUBkjQtlOhWjayBCD3fhLi0wrOjgMyfn63gFDqcv2OUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKNZd/Lh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECD5EC2BCB3;
+	Fri, 15 May 2026 01:51:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778809861;
+	bh=lwy+Je7UuTA684S7UnzKNOTYUpSoQbkD+J2jVuPa0RQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gKNZd/Lhtv113JvuLaSTOA0TzVxBI3lVahnh+OMj4KINz4AF+PrgopesuKn/aEakA
+	 HTSzqDCWAa6LrsV/L1+VO7gZ0fhtmJ8dy7f0EWCxrMSHoenq0PW7hQGfl0KV0rSbq8
+	 XflgBpAWmVZbquHXrwzmDmsOVjh7Gl7dEyaTJju0fyEplndr1c9GXJi4pTlB2KysZY
+	 i7VqrryH7rOuNDiURZagN49R4gPn3EVSE2y8Z4681Zv4DaYv6c7Pd5zhYXl9NniAWF
+	 2JijnRW4YG+r5Lr4rsAt2eZE6eAe6rQA6JhxG2gwlPY6VfXMX8/MzsS57WNIA7URT4
+	 A6U6FaTuMZs6Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F2239E4DB8;
+	Fri, 15 May 2026 01:50:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
-	<shiyongbang@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: hibmcge: fix incorrect packets in the RX path
- issue
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20260512123456.3786635-1-shaojijie@huawei.com>
- <20260514171621.02b2ffb1@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20260514171621.02b2ffb1@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemk100013.china.huawei.com (7.202.194.61)
-X-Rspamd-Queue-Id: DCD7D54883C
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: ifb: report ethtool stats over num_tx_queues
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177880980555.159407.6852919739863639604.git-patchwork-notify@kernel.org>
+Date: Fri, 15 May 2026 01:50:05 +0000
+References: <20260514013739.3549624-1-michael.bommarito@gmail.com>
+In-Reply-To: <20260514013739.3549624-1-michael.bommarito@gmail.com>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, xiangxia.m.yue@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+X-Rspamd-Queue-Id: A6FA7548910
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288150-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288151-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:email,huawei.com:mid,huawei.com:dkim]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+Hello:
 
-on 2026/5/15 8:16, Jakub Kicinski wrote:
-> On Tue, 12 May 2026 20:34:56 +0800 Jijie Shao wrote:
->> Therefore, this patch disables the Relaxed Ordering to ensure the
->> strict order of packets and descriptors.
->>
->> Additionally, during the process of analyzing the issue,
->> it was discovered that the position of dma_rmb() was incorrect.
->> It should first execute dma_sync_single_for_cpu(), and then dma_rmb().
->> This patch has also made the corresponding modifications.
-> Should be a separate patch.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-ok
+On Wed, 13 May 2026 21:37:39 -0400 you wrote:
+> ifb_dev_init() allocates dp->tx_private to dev->num_tx_queues
+> entries via kzalloc_objs(*txp, dev->num_tx_queues). Both IFB
+> per-queue RX and TX stats live in those entries: ifb_xmit() updates
+> txp->rx_stats using the skb queue mapping, ifb_ri_tasklet() updates
+> txp->tx_stats, and ifb_stats64() aggregates both over
+> dev->num_tx_queues.
+> 
+> [...]
 
->
->> Fixes: f72e25594061 ("net: hibmcge: Implement rx_poll function to receive packets")
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->> ---
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c | 4 +++-
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 6 +++---
->>   2 files changed, 6 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> index 068da2fd1fea..5b91b596349c 100644
->> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> @@ -420,6 +420,8 @@ static int hbg_pci_init(struct pci_dev *pdev)
->>   		return -ENOMEM;
->>   
->>   	pci_set_master(pdev);
->> +	pcie_capability_clear_word(pdev, PCI_EXP_DEVCTL,
->> +				   PCI_EXP_DEVCTL_RELAX_EN);
->>   	return 0;
->>   }
->>   
->> @@ -525,4 +527,4 @@ module_exit(hbg_module_exit);
->>   MODULE_LICENSE("GPL");
->>   MODULE_AUTHOR("Huawei Tech. Co., Ltd.");
->>   MODULE_DESCRIPTION("hibmcge driver");
->> -MODULE_VERSION("1.0");
->> +MODULE_VERSION("2.0");
-> Please don't change MODULE_VERSIONs they are meaningless for in-tree
-> modules.
+Here is the summary with links:
+  - [net,v2] net: ifb: report ethtool stats over num_tx_queues
+    https://git.kernel.org/netdev/net/c/5db89c99566f
 
-Our users typically compile the driver as a separate ko (CONFIG_HIBMCGE=M).
-I want to use the version to quickly determine whether the user's driver code has this patch.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks,
-Jijie Shao
 
 
