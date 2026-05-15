@@ -1,108 +1,211 @@
-Return-Path: <netdev+bounces-288114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288115-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mGHYD2RhBmpLjQIAu9opvQ
-	(envelope-from <netdev+bounces-288114-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:57:24 +0200
+	id oMMuHXBiBmpUjQIAu9opvQ
+	(envelope-from <netdev+bounces-288115-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 02:01:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C9DE547E12
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:57:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBF88547E43
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 02:01:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 163C1300BEA6
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 23:57:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D4C7C3011E8B
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 00:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D9C38F927;
-	Thu, 14 May 2026 23:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9E9NBPg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB65E2AD16;
+	Fri, 15 May 2026 00:01:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1EED3016F5;
-	Thu, 14 May 2026 23:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D711E511;
+	Fri, 15 May 2026 00:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778803036; cv=none; b=iT7+Dtcfm4jrNjzflpP1lZw3cLVyzon8vxOhj8t4oKwYjyOvyqt1uyUmQuPakCtHfJXlNIYh2T4gIH6L5fL2TaCivhDJbun+Im9Fy5AgMdDjeuQCOSQV0beOYWhbrw5hLLbOTmKq8vlMfm+BotEkX3ck5N9yPncfaRbvzmZ0NLY=
+	t=1778803307; cv=none; b=i3/kUbQH/SaRIRIToFV3qohd/f96FN+5FlCJcuPOPntZqrNXGbAojrQ/x4WCQRW+/kTnVXR1G0l6ZKZd9JTMY1EcPk+BJlp4DB8Xkz/4AZSUJ/wJbtsJnvWULOni2HR3zyNkpFRsupbpyXO28qVkMnLR+pkcTdtquedb4aNtjc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778803036; c=relaxed/simple;
-	bh=RWTWIwqVzWQfpAUGzl/eLS/TxSSKAmFWkhFN91IfKCA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fwcxcSHxqSAKo6/8e94oexzrzLeKB8vU7HYqVQWQX5RTdlyIHYvb0E/GuAAaciqPt8h6EUuwkXckKU2fuKhhJihsNTTYS6virC2PlKtMHF9vuhrRph0TQPniFeAedgiVViv5KaxtwaMpHrirawz68Fo1hBFR89KbTh2i0DhGl6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D9E9NBPg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04302C2BCB3;
-	Thu, 14 May 2026 23:57:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778803036;
-	bh=RWTWIwqVzWQfpAUGzl/eLS/TxSSKAmFWkhFN91IfKCA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D9E9NBPg6StkIHoseBj6U2d7fSDfkF/XItVuTpwDb31G+TOpEXS17RKjSxhjDSuH1
-	 RS/EOBgoNDgpX6thdkcCK8MrAH1d247Wfs5aAUeNKIxjgLTx8vrQ2YsncJdR0ELKW1
-	 DiWXtXWTCuu/0H87bQYGC6DJ49JpdMYngSbnczublC+L67wglPnKkwQ1KTEuq1lqnl
-	 dAV6kcNe97e95MnRd0aduso2hNW15HQUqe/o2ENF1M8DFks89O+u61tQbWVY97t/RE
-	 EwTqIMjPZNkhAq/TdX5IIRWYMbdzFotYCHZf9fKVbUcZLbD9ieOeJQE57vpBarUUhd
-	 ic0vPdl9RcyEg==
-Date: Thu, 14 May 2026 16:57:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: netlink: warn on overwriting extack
- message
-Message-ID: <20260514165715.3734df47@kernel.org>
-In-Reply-To: <20260513143219.3327287-1-mmyangfl@gmail.com>
-References: <20260513143219.3327287-1-mmyangfl@gmail.com>
+	s=arc-20240116; t=1778803307; c=relaxed/simple;
+	bh=tdH1VrcQncwA79cpJHv5nqOIrihe48zQtl+e4GgZTC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=arfJvm3GH8FOvUQ/L4X3BeiRknUibCoK76buQ+kk0zTWP3tZT+ku5QkD9ILZa04vVx2unPc8fxqYV5rmneFqlHruNfb3rdmtmUtm4nxqI87/ZyxmkVEsDkKwF6FUyHfl3byqnaM7P1luAzKPDDsXi+xHdAdXVjY8JFGjaDJpKT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-85-6a06625d2aa3
+Date: Fri, 15 May 2026 09:01:28 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "David Hildenbrand (Arm)" <david@kernel.org>,
+	Pedro Falcato <pfalcato@suse.de>,
+	"Vlastimil Babka (SUSE)" <vbabka@kernel.org>, linux-mm@kvack.org,
+	akpm@linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+	davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
+	horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
+	ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
+	brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+	usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+	almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+	sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com
+Subject: Re: [PATCH v4] mm: introduce a new page type for page pool in page
+ type
+Message-ID: <20260515000128.GA7850@system.software.com>
+References: <20260224051347.19621-1-byungchul@sk.com>
+ <982b9bc1-0a0a-4fc5-8e3a-3672db2b29a1@nvidia.com>
+ <4af19eda-c29c-4302-92d5-c0915267fc0c@kernel.org>
+ <agRB2QTbzceRgpzX@pedro-suse>
+ <1817a749-8232-43ab-a0f5-350e5aade235@kernel.org>
+ <f3e38c07-d410-4c8e-a572-68d52dc55353@nvidia.com>
+ <20260514085402.GA63255@system.software.com>
+ <f4f5e3b2-64c4-4ad2-8678-d29ae08150e6@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8C9DE547E12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f4f5e3b2-64c4-4ad2-8678-d29ae08150e6@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0yTZxTH87zPe6Pa7LE4eabZsnSbGiIMicazbN6yLHmzZRm6L8u8bNW+
+	kSKt2ioDki1lNhGZXKYjgVIXUG4CprFIoVUMAgNh3lIDeTetRRx2boiGkoZSFFuM0W+//M//
+	/HI+HBFrhrmlosF0UDabdNlaXsWqHi2sSdmxi89KqwungcPZwkPzdC40jHRwEGkJMuBociOY
+	itwWYK6zD0Got5+H/3smEZyuCWNw3LCxEGybQeDxBhH8V3GWh7G+UQGaXV9CoP4BCxePtGMY
+	Lb3CQ7EtiqEzMiHAzx2NMXGrVYCb7hIOfpupw9BuHRHgltfBw92WOQ4edBezMGA/w8KT8l4M
+	gZJN0Fe9BMJ/jiP4t8EhQK+znYHwsZM8DFV6GWjrHBLghK+ah/u2AAJfzygL5bOFPBQ+DLBQ
+	VVCCIDodk0+UTXFQ9cddYVOaVKAovNQz/hhL58/8xUjDFb+yknJpkJE8dr8gVbsOSa2NyVKR
+	4sOSq+koL7kmjwvSneGLvHSlIspKnnsfSZ6OECMVH57gM5Z8q/pEL2cbcmTzhxu+V2Weq7ei
+	/QNJuX5nGW9FvZoilCBSsobOzvSzL3la8QlxZskH9E5jLY4zT1ZQRYnM82KyklrbTsT6KhGT
+	v0V6uCsyv5xIttJBe9V8SU3W0QvjzVy8pCGFmPpDp7gXg0V0oPKf+QVMkqny7CFThMQYL6MN
+	z8R4nEA20Ee3/SjOb5L3aJe7n4l7KJkT6ZwtKry49C16uVFhyxCxv6a1v6a1v9JWI9yENAZT
+	jlFnyF6TmplnMuSm7t5ndKHYt9X/OLutA03e/LobERFpF6q/uc5laThdjiXP2I2oiLWL1SkX
+	YpFar8vLl837vjMfypYt3WiZyGqT1OnhH/Qaskd3UN4ry/tl88spIyYstSJbILOFrPUf/+Lj
+	2vMNiZ6CdOwevBrYbGxFTaYtTmNQn+Z7sv3AUzfJq83oGlv12VhFxvDy6E+fZyw6tUWt90Z2
+	4t9L16cn3b9xtXxk8peU6Kf5pVTDORPfrtyoCV0LdW1fUJcfvPXOV5aaobMk8Wjw/Tey1voe
+	e72Vuy+vTH13SqtlLZm61cnYbNE9BxRLiQppAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+Z+7q8FxmZ6Uvqy70sUoersQfig6BIUZFYRdVp5ytk3b1DQI
+	Vg4ySbPsonPS8u40rJm6eYnSpa0LhVasbM6snJZppJhrUm1G1Lcfz/P83k8vg0ssZCgjVyUL
+	apVMIaVEhGj7+oyl+w5RCStuuYLAUFtDQfVkGlT0WUjw1LgxMJgaEIx7emj41dqBYMzWScHn
+	9m8ISm5M4GB4piPAXf8DgbXJjeBT/k0KPnb001Bt3gau8gECWs424tB/4SEF2TovDq2eERrO
+	WCp9h+u0NLQX2Ul43pBDwuUfZTg0avto6G4yUNBb84uEgbZsAuz6KgK+XrHh4MqJgg5jMEw8
+	HkYwWGGgwVbbiMHE+SIKXhY0YVDf+pKGvC4jBe91LgRd7f0EXJnKpCBzyEVA4ekcBN5J3/GR
+	3HESCh/00lGR/GmHg+Lbh0dx/k7Va4x/lX+R4B13H2G8Ve+keaM5ha+rDOezHF04bzado3jz
+	t0s0//ZVC8U/zPcSvPXdWt5qGcP47IwRKjpkr2hDnKCQpwrq5RsPiuJvl2tRkj0kzVmbS2mR
+	TZKFAhiOXcVNOrpoPxPsAu5tZSnuZ4pdxDkcnmkOYhdz2vo8IguJGJx9w3AZ9zyEv5jFxnCP
+	9IXTIzG7hmserib9IwmbiXPOsWLyTxHI2Qs+TAs4G845fg5hWYjxcRhX8ZPxxwHsRu5LjxP5
+	eTY7j7vX0InlIrH+P1v/n63/ZxsRbkJBclWqUiZXrF6mORafrpKnLTucqDQj3z+Vn5q6aEHj
+	3VvaEMsg6UxxdCeZICFlqZp0ZRviGFwaJF7a7IvEcbL0k4I68YA6RSFo2lAYQ0hDxFv3CAcl
+	7FFZsnBMEJIE9d8WYwJCtehsxtzBncL+k7HBuvIhVawy4uuQtRJGtbcu9LQMOJ+aUkwfBicf
+	zzrqtiTtQcb1R0I/6d4Heq957+8qch76Pidl890Z6zZ1KJ8kR9m04UXYytj5sbqIPP3eEyVJ
+	L9xL7FV97lJRd8vqqbLr2+uOx1wtPtUf17uweUdE82I4sDsyrFRKaOJlkeG4WiP7DVpNal5L
+	AwAA
+X-CFilter-Loop: Reflected
+X-Rspamd-Queue-Id: DBF88547E43
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288114-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[sk.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288115-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,suse.de,kvack.org,linux-foundation.org,vger.kernel.org,skhynix.com,oracle.com,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
+	NEURAL_HAM(-0.00)[-0.933];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,system.software.com:mid]
 X-Rspamd-Action: no action
 
-On Wed, 13 May 2026 22:32:16 +0800 David Yang wrote:
-> When NL_SET_ERR_MSG is called more than once on the same extack, the
-> existing message is silently overwritten. This is hard to detect via
-> static analysis. Emit a rate-limited warning so these cases become
-> visible.
+On Thu, May 14, 2026 at 11:24:36AM +0200, Dragos Tatulea wrote:
+> On 14.05.26 10:54, Byungchul Park wrote:
+> > On Wed, May 13, 2026 at 02:06:06PM +0200, Dragos Tatulea wrote:
+> >> On 13.05.26 11:36, David Hildenbrand (Arm) wrote:
+> >>> On 5/13/26 11:26, Pedro Falcato wrote:
+> >>>> On Wed, May 13, 2026 at 11:12:43AM +0200, Vlastimil Babka (SUSE) wrote:
+> >>>>> On 5/13/26 11:00, Dragos Tatulea wrote:
+> >>>>>>
+> >>>>>>
+> >>>>>>
+> >>>>>> Seems like this patch broke tcp_mmap because
+> >>>>>> validate_page_before_insert() returns -EINVAL due
+> >>>>>> to a page having a type. Here's the full flow:
+> >>>>>>
+> >>>>>> getsockopt(TCP_ZEROCOPY_RECEIVE) returns -EINVAL because of the
+> >>>>>> below flow in the kernel:
+> >>>>>>
+> >>>>>> tcp_zerocopy_receive()
+> >>>>>> -> tcp_zerocopy_vm_insert_batch()
+> >>>>>>   -> vm_insert_pages()
+> >>>>>>     -> insert_pages()
+> >>>>>>       -> insert_page_in_batch_locked()
+> >>>>>>         -> validate_page_before_insert() returns -EINVAL
+> >>>>>>            because page_has_type(page) is now true.
+> >>>>>>
+> >>>>>> The patch below fixes the issue. But is this a valid fix?
+> >>>>>
+> >>>>> Hmm the check traces back to commit 0ee930e6cafa0 "mm/memory.c: prevent
+> >>>>> mapping typed pages to userspace"
+> >>>>>
+> >>>>>> Pages which use page_type must never be mapped to userspace as it would
+> >>>>>> destroy their page type.  Add an explicit check for this instead of
+> >>>>>> assuming that kernel drivers always get this right.
+> >>>>>
+> >>>>> So uh, this doesn't look good I think.
+> >>>>
+> >>>> Yep, you fundamentally can't map a page with a type as page type aliases with
+> >>>> mapcount. Even with the given diff, just mapping it will increment the mapcount
+> >>>> and wreak havoc. I think we need to revert this patch for now.
+> >>>>
+> >>>> I'm not sure what the long term plan for this would be. If page types are moved
+> >>>> to memdesc types, then the two stop colliding and that could work. I don't know
+> >>>> if that's Willy's plan, however.
+> >>>>
+> >>>> (then there's the other question: are page pool pages really folios? not really.
+> >>>> they are mappable, but they aren't part of the page cache, or anon, nor are
+> >>>> they in the LRU or have rmap capabilities. perhaps we need a different memdesc
+> >>>> for those. we're one step away from reinventing class polymorphism from first
+> >>>> principles ;)
+> >>>
+> >>> Zi Yan is working on this: non-folio pages would no longer mess with
+> >>> rmap/mapcounts, and page table walking code will identify them to be non-folio
+> >>> things to skip them.
+> >>>
+> >>> It will take a while, though ...
+> >>>
+> >> So do I get it right that the path forward here is to revert this commit [1]
+> >> and wait until the work from Zi Yan is ready?
+> >
+> > I think it's the best way for now.
+> >
+> Ack. Can you do it please? This is a more complicated revert and the risk that I
+> mess it up is higher.
 
-I don't think this is worth the bloat.
-There's only so much we can do for poorly written code.
--- 
-pw-bot: reject
+I will.
+
+	Byungchul
+> 
+> Thanks,
+> Dragos
+> 
+> 
 
