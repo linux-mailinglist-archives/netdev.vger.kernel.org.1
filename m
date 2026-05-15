@@ -1,221 +1,149 @@
-Return-Path: <netdev+bounces-288164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YI/bIAWPBmoVkwIAu9opvQ
-	(envelope-from <netdev+bounces-288164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 05:12:05 +0200
+	id o1/MA0CSBmq6kwIAu9opvQ
+	(envelope-from <netdev+bounces-288165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 05:25:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F7DA548EC8
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 05:12:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04DE5548F3D
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 05:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DBC573012553
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:12:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2871F3020C12
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E613CC306;
-	Fri, 15 May 2026 03:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ji6+mBKg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79CF3CEB8F;
+	Fri, 15 May 2026 03:25:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9899A3CB918
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 03:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC2D37104C;
+	Fri, 15 May 2026 03:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778814720; cv=none; b=ZRdtaM7BkL9kXVKAGixH69tfYFMOUqDs4G5WsF+6L48kUnO/2mHnHw7TaNHDABiYaZdyh2imWOS0+etRKMxT7a1xf4SrLsxy6jWKX6UzBc1Pt8XCWXCryd0x+D5OpNw/5z93LK7AWny7B2zb+keEhakZKwDl0fvQyoypF6HkvsU=
+	t=1778815548; cv=none; b=vFot8pJhZ+ys5cgDFHoskvrGnFlJS3OAS0yYMqKUa5FCejH4P10eNoDvHvsjld5A48mS8mr1AZ1VuU8K/sAFdSAPjALlPoTwguCiWOGDTJGAUHU+UcUfVHN/AUyZNWcMSz9upjqa/R7vz6yOxOLjcs9hIwlkT4fiVRqbvLPkMPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778814720; c=relaxed/simple;
-	bh=ZAmE1TlWVSf8earAcSnNud/qyU3STr7upmmNnk1CFZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uLHKAifCa0sC15qtaXS8LBixbYwPO0v4e5Pfwd+s3GHY6T0HGpbfeR/CsY1aBmdu+0GF8jxZGjFa4V6ayP68oSqzUL2/dq1h7qe2159pMD/kMrfRuLrER3Q1LRjZq+6G6m1PAsyPUYQy2HlHjsf/miglYS5fw3Aju7LIvFWx5A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ji6+mBKg; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778814718; x=1810350718;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZAmE1TlWVSf8earAcSnNud/qyU3STr7upmmNnk1CFZs=;
-  b=ji6+mBKgqCe7UrdYG/DupSN14bk/CEbCNqls9O858EEvvqmpmXb4GaDb
-   T9OzB4vQ/OqZRkMxCPHlEfZON4GZuUXUGkAPEs0b5775SbixvkVJCo8pc
-   hbPMhsWpC5q9zdTh97+HAvFASRwT8VrIu42NF2K4OdvzF177pjwpLG6Tv
-   sxrxPcIBdNj792hWiyMXiQkbTIL5KISb5Ze6UyHU/YtgVNZZMo5LimVT7
-   0Kgy7IDs88x+DXn4S/5+bil50xfeGFAtBVBn0jtI+caeaR0nq6bDrUEgE
-   C/KoKtc/cPweXaychCDGBN3CoAgnyKWevSpijSlShmrhphhg2OQaQAo03
-   w==;
-X-CSE-ConnectionGUID: 4Qzq1KRNT1ObuQfGJOwDdA==
-X-CSE-MsgGUID: Bl4Z/Iq8RmOU5xu+K/fETA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11786"; a="91150211"
-X-IronPort-AV: E=Sophos;i="6.23,235,1770624000"; 
-   d="scan'208";a="91150211"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2026 20:11:58 -0700
-X-CSE-ConnectionGUID: cG7x5w9FRku+pLtuvvhHmA==
-X-CSE-MsgGUID: jfwwuftCS1aH47xxQssZLg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,235,1770624000"; 
-   d="scan'208";a="238446336"
-Received: from lkp-server02.sh.intel.com (HELO 7a33ad3e7d27) ([10.239.97.151])
-  by orviesa008.jf.intel.com with ESMTP; 14 May 2026 20:11:56 -0700
-Received: from kbuild by 7a33ad3e7d27 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wNiwq-000000000hR-2aAG;
-	Fri, 15 May 2026 03:11:04 +0000
-Date: Fri, 15 May 2026 11:05:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Holger Brunck <holger.brunck@hitachienergy.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org, andrew+netdev@lunn.ch,
-	chleroy@kernel.org, qiang.zhao@nxp.com, horms@kernel.org,
-	Holger Brunck <holger.brunck@hitachienergy.com>
-Subject: Re: [PATCH net] net: wan: fsl_ucc_hdlc: free tx_skbuff in
- uhdlc_memclean
-Message-ID: <202605151029.MIApM8zq-lkp@intel.com>
-References: <20260504161145.2217950-1-holger.brunck@hitachienergy.com>
+	s=arc-20240116; t=1778815548; c=relaxed/simple;
+	bh=LQQ02nApfMFxTcRthuu7JjTO8utIcvBR1w+hwj6B2fQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JKNyW/ZAsyKwa8KkfaR8mC3XhOMokFfToSUbrxadMpAc29x9wBNhbwdxmj3LzsW5WGX6dvZ/ryp0y1SPgeZwtH0n0gu2oSC0wwUYqgowlZxCb+2DBPFQ87Af+/ug/ZtMsHCGwExv9RTRLnvDvstxA0PSRoAKvCmKEnN9EcagHqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: bc0feae4500d11f1aa26b74ffac11d73-20260515
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
+	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:29ee8925-e7c1-4672-80ed-3e0f2a77b278,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-20
+X-CID-INFO: VERSION:1.3.12,REQID:29ee8925-e7c1-4672-80ed-3e0f2a77b278,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-20
+X-CID-META: VersionHash:e7bac3a,CLOUDID:5051c885a860ee1d3c2667d78b9fcec6,BulkI
+	D:260515112535P9WIJ8D7,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
+	|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS
+	:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,A
+	RC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: bc0feae4500d11f1aa26b74ffac11d73-20260515
+X-User: zhaochenguang@kylinos.cn
+Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <zhaochenguang@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1563457295; Fri, 15 May 2026 11:25:34 +0800
+From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next v2] net/ethtool: drop duplicate TSCONFIG HWTSTAMP BUILD_BUG_ON from SET handler
+Date: Fri, 15 May 2026 11:25:50 +0800
+Message-Id: <20260515032550.138572-1-zhaochenguang@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260504161145.2217950-1-holger.brunck@hitachienergy.com>
-X-Rspamd-Queue-Id: 8F7DA548EC8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 04DE5548F3D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288165-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[kylinos.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288164-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.978];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,kylinos.cn:mid]
 X-Rspamd-Action: no action
 
-Hi Holger,
+BUILD_BUG_ON() is evaluated at compile time. The same three checks
+for __HWTSTAMP_TX_CNT, __HWTSTAMP_FILTER_CNT and __HWTSTAMP_FLAG_CNT
+are already present earlier in this file (tsconfig_reply_size()).
+Repeating them at the start of ethnl_set_tsconfig() does not
+strengthen the guarantee; remove the redundant block there and
+keep a single occurrence.
 
-kernel test robot noticed the following build errors:
+Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+---
+v2:
+ - Drop redundant BUILD_BUG_ON checks as suggested by Paolo.
+---
+ net/ethtool/tsconfig.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on v7.1-rc3 next-20260508]
-[cannot apply to net/main linus/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+diff --git a/net/ethtool/tsconfig.c b/net/ethtool/tsconfig.c
+index e4f518e49d4c..239bbf2d826c 100644
+--- a/net/ethtool/tsconfig.c
++++ b/net/ethtool/tsconfig.c
+@@ -302,10 +302,6 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
+ 	struct nlattr **tb = info->attrs;
+ 	int ret;
+ 
+-	BUILD_BUG_ON(__HWTSTAMP_TX_CNT >= 32);
+-	BUILD_BUG_ON(__HWTSTAMP_FILTER_CNT >= 32);
+-	BUILD_BUG_ON(__HWTSTAMP_FLAG_CNT > 32);
+-
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+ 
+-- 
+2.25.1
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Holger-Brunck/net-wan-fsl_ucc_hdlc-free-tx_skbuff-in-uhdlc_memclean/20260514-055007
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260504161145.2217950-1-holger.brunck%40hitachienergy.com
-patch subject: [PATCH net] net: wan: fsl_ucc_hdlc: free tx_skbuff in uhdlc_memclean
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20260515/202605151029.MIApM8zq-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260515/202605151029.MIApM8zq-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605151029.MIApM8zq-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
->> drivers/net/wan/fsl_ucc_hdlc.c:775:32: error: expected ';' in 'for' statement specifier
-     775 |         for (i = 0; i < TX_BD_RING_LEN) {
-         |                                       ^
->> drivers/net/wan/fsl_ucc_hdlc.c:775:14: warning: variable 'i' used in loop condition not modified in loop body [-Wfor-loop-analysis]
-     775 |         for (i = 0; i < TX_BD_RING_LEN) {
-         |                     ^
-   1 warning and 1 error generated.
-
-
-vim +775 drivers/net/wan/fsl_ucc_hdlc.c
-
-   740	
-   741	static void uhdlc_memclean(struct ucc_hdlc_private *priv)
-   742	{
-   743		int i;
-   744	
-   745		qe_muram_free(ioread16be(&priv->ucc_pram->riptr));
-   746		qe_muram_free(ioread16be(&priv->ucc_pram->tiptr));
-   747	
-   748		if (priv->rx_bd_base) {
-   749			dma_free_coherent(priv->dev,
-   750					  RX_BD_RING_LEN * sizeof(struct qe_bd),
-   751					  priv->rx_bd_base, priv->dma_rx_bd);
-   752	
-   753			priv->rx_bd_base = NULL;
-   754			priv->dma_rx_bd = 0;
-   755		}
-   756	
-   757		if (priv->tx_bd_base) {
-   758			dma_free_coherent(priv->dev,
-   759					  TX_BD_RING_LEN * sizeof(struct qe_bd),
-   760					  priv->tx_bd_base, priv->dma_tx_bd);
-   761	
-   762			priv->tx_bd_base = NULL;
-   763			priv->dma_tx_bd = 0;
-   764		}
-   765	
-   766		if (priv->ucc_pram) {
-   767			qe_muram_free(priv->ucc_pram_offset);
-   768			priv->ucc_pram = NULL;
-   769			priv->ucc_pram_offset = 0;
-   770		 }
-   771	
-   772		kfree(priv->rx_skbuff);
-   773		priv->rx_skbuff = NULL;
-   774	
- > 775		for (i = 0; i < TX_BD_RING_LEN) {
-   776			kfree(priv->tx_skbuff[i]);
-   777			priv->tx_skbuff[i] = NULL;
-   778		}
-   779	
-   780		kfree(priv->tx_skbuff);
-   781		priv->tx_skbuff = NULL;
-   782	
-   783		if (priv->uccf) {
-   784			ucc_fast_free(priv->uccf);
-   785			priv->uccf = NULL;
-   786		}
-   787	
-   788		if (priv->rx_buffer) {
-   789			dma_free_coherent(priv->dev,
-   790					  (RX_BD_RING_LEN + TX_BD_RING_LEN) * MAX_RX_BUF_LENGTH,
-   791					  priv->rx_buffer, priv->dma_rx_addr);
-   792			priv->rx_buffer = NULL;
-   793			priv->dma_rx_addr = 0;
-   794	
-   795			priv->tx_buffer = NULL;
-   796			priv->dma_tx_addr = 0;
-   797	
-   798		}
-   799	}
-   800	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
