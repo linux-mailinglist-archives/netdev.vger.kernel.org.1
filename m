@@ -1,189 +1,219 @@
-Return-Path: <netdev+bounces-288468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4IvzCVyQB2rQ8wIAu9opvQ
-	(envelope-from <netdev+bounces-288468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:30:04 +0200
+	id QLFeD2ySB2pU9AIAu9opvQ
+	(envelope-from <netdev+bounces-288469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:38:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA6C558204
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:30:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E0C5583B3
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:38:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 989943020E97
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 21:29:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 49C653014672
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 21:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A98405C54;
-	Fri, 15 May 2026 21:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CB23ECBC2;
+	Fri, 15 May 2026 21:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aPY9GwzE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IcjvZuKz"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010066.outbound.protection.outlook.com [40.93.198.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940FC405C59
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 21:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778880568; cv=fail; b=j0apVF+wCWLzTn137tlC405+SSkGthrOj4cWv/LXVcFLZJVWAByQG9z8UAyEJS6aLefyov9tkwzrMADp1TvvL5CO8HrGOvrqVf075WKAhI+WT9OFtvimBWJH66ojxgdb2zQsp1PvPsydalJEwdrWGLE8EUU5ey2mxzRH1qRXE8M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778880568; c=relaxed/simple;
-	bh=HHCxBgmeguBfjtvpiFLExulwuDXll3l/LwgNsESYs7s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DGYCP+b/anfqunY7sKXF4HxQjYXQcPAjzIzBsDFpM4aomgrYimftri59qcO0OM0Mu9pnD2Z5zwTDOxgt7B6UiB9pjyuWC7OXl4OeNO4SeHwJmCUDvKkv0AMXRCVsGayQd46qc1Ht22mnsPGlLfgOTGOf82XfxxIPPknHqJ3pHwk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=aPY9GwzE; arc=fail smtp.client-ip=40.93.198.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OyAeiS57nYsMtSYWEW7i7N3ZrczGj0HEcJuJ06Vcc2uOD9Z3EP1uS+hXHzYuvHjNibXDY2pemHrfi92ZvLahkIqwqDrla4rAy71RI17bZcKWc2cnNP8ukmQneRCbI1kSLLZkqatkzjybiwSpJ9uCABFPoNSioMXUz7fMqtZdsLvvRiCGWidxy+Q7iHeB4p3XRbbvRRZ62jVlqcTkP/R3HtGFdqeZqTf7Z4dKELH127xbGb7V2WHukvRKmJJLH39hL5yjQMR0DoPhdIuls0jdiItboFrVBSqC06r6EA0lt6S27wJh2aSiNW0tz/e+9ilxhfpIltTlLI5D6jIxy7jf4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Nqjjp9FDR2jG+/rinsgPG+B5DE7kS4QSEFS3CoP/PEs=;
- b=ONaOb2t5pOs7cevBDuMXdl//vXGwwdciHJUBzCRe0XIp393Dbu/8kUu+oM5XSbPYkjGzsHwsq3TCZxWzLZ0+SVvDhHdkmQnnODGL2Yt1mIcbfwE4vMwOd99o3P/bCZ3dyGrxZCBwyXQpAyW802mrRSyWZ3aWX/QvlIC8aPUSbi0fz37bzTsHXu6YJsJ2vtBURt82S/GafmvxlSY0yyWGWK7APwti+NmjhkviRH6E8AXFCxNyU2oVvvT6sf4KKpKsP7AuA7LNM7bViwqlHMryNJmLhQa1OCqv/+w1D3HTStBqq7aO5OXwGJseUEJiiiPKv+R5Kaa2qtDuvEaFGG7Xkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Nqjjp9FDR2jG+/rinsgPG+B5DE7kS4QSEFS3CoP/PEs=;
- b=aPY9GwzEt/tBYBW1qQWeOnii4HI/DMzv6JZhIhx6AtP0TOUaLUbdEdM1RwpNNQfnYFnnGvA4BdMyqj3AXE7J6W7MckluwJ36vdnzOK819TCyPYhbhuR90TSsSp0ru8gCxdPgxzrblk0tB5tw3BZ9qHjq9tIp17Lr5aC1Wnky/Z8=
-Received: from SA0PR11CA0026.namprd11.prod.outlook.com (2603:10b6:806:d3::31)
- by PH7PR12MB5926.namprd12.prod.outlook.com (2603:10b6:510:1d9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.19; Fri, 15 May
- 2026 21:29:22 +0000
-Received: from SA2PEPF00003AE4.namprd02.prod.outlook.com
- (2603:10b6:806:d3:cafe::1) by SA0PR11CA0026.outlook.office365.com
- (2603:10b6:806:d3::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9913.13 via Frontend Transport; Fri,
- 15 May 2026 21:29:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SA2PEPF00003AE4.mail.protection.outlook.com (10.167.248.4) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.13 via Frontend Transport; Fri, 15 May 2026 21:29:21 +0000
-Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Fri, 15 May
- 2026 16:29:19 -0500
-From: "Nikhil P. Rao" <nikhil.rao@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <brett.creeley@amd.com>, <eric.joyner@amd.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-Subject: [PATCH net] pds_core: fix debugfs_lookup dentry leak and error handling
-Date: Fri, 15 May 2026 21:29:07 +0000
-Message-ID: <20260515212907.998028-3-nikhil.rao@amd.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256CA3EB7FB
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 21:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778880993; cv=none; b=qhg6LGxODCPxSU8MOU1pt56hEv/ekVzeoSZSNoRmM7pNkTPa4q9DIWWZgy6Yv2UH3Cg5AM8jZYYipHl7H3PnrzzWmVDf8L0cl3OdSyM0f9AWGFrgEl+fqHuULQV99x5NpkxaS9SQK1QsiJSWmKA8vRxf37kYFxgtdArtd7aeUek=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778880993; c=relaxed/simple;
+	bh=hlAOhLGh58Gy3zan6ewmiQ7pq8blPJAAQ8CMHzesHaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S3+BMRvhNxIu0cgJRkkF01dvwCIg8axUYd2fuHETrQr5HThDCMulzKj5A6aLtcrUFAUTsZQIUgLmaNKjj2Mv4AKE64+bGLMZbnXs5phu91PPfzyWqUao2utv/2ctdzUNrdps5n3S7Pn9De2uKrAeBimcpJwAlBg3nwV2/R/c3Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IcjvZuKz; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2bd9c3b550aso2547785ad.2
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 14:36:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778880991; x=1779485791; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tl3ISS/q5ODJOgUNvJqQup6LUHmvQRG/4621LRENO2M=;
+        b=IcjvZuKzQQ7GlGStkVKGcO8VaZv5Y1gqGewN/waRGok2q3hQ7vfohyRhZigSwTw3F1
+         PMImTmq00PceeC+zt/TLEFUQWiCZpQOjlrz395hXRU+66mlCToG5LzO6swuOdhhT2bKV
+         vlqRgttZ2qJydgmjynhgP5aNBsvgTYQjF62FCZzVrsCJ7MwD/Iy3IadrUARnhiOIQQqy
+         qUjcXYmlC74ibpN90tVCF7ZIT9iU+7T0HshnLD/EvwAH7CXVPE8UAtWdUboanKhjDqPL
+         +xbSRI3B5kUXgF4Dj/OZYMAvnEqOOh/Z0rq4YAr0dF/N7cb4L35X2VhucX9gwAdB+c+v
+         WgGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778880991; x=1779485791;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tl3ISS/q5ODJOgUNvJqQup6LUHmvQRG/4621LRENO2M=;
+        b=LJqcPbBV3YW4tLEhqPkJgcg5flC2JQUocypWXHc4Nbhus+zPjASm+PmIL/O63s0VoZ
+         uxvXoebJeKeNXtjp5vuEK+kJ8AtBq3sGTWn/7AgFPJGlRe+g3WRRJC8KwLsAb01DKSIg
+         Gp4GXqMDh2zLlou7nOwB+9TLjrSCWtnarGlZ5bdKxDuxP6POyMXwd0+T0IIX6y+CSlaC
+         rEyTDAEHLLlnKZr6O1jDaYh9RGSF/xH2KlN9akCqVC9IK1l9Ap1RShEtPOYM2kDygQUH
+         Pr59TlMi5gTAUrK2MRV1pfiAHKdhx/wvAnL1o+cEYxHbSXn6UWhY2AfvF88TOWYm0A9b
+         w5/g==
+X-Forwarded-Encrypted: i=1; AFNElJ8CqolH0N1J/sKFagvQLfZXXoC6bFEliGplFYps9Dfve/ObfUYGjX+bM06fRFhlrFk+vESSElQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw25QpZ5Hm2n4RvAHR1/VlQwmadm0NHGyntzWbVZT7Mn9TBxzzj
+	11MADwWNyz5O2VgPZUJ1rptQPmPAf11XFhOHdNkiWZxiaD8dvqqf04Fr
+X-Gm-Gg: Acq92OFq7zHPAPXrcmpiEF2NzLIrcp4Nvbi0NZpeJcGXdGwLXZQelOQN6Ekeqh4NVRc
+	Z8AlwU0/Jl6avwMyesV4LJHEjZkcg+2ftziEYs09e9yyDwXpr+aXyr9bG/oanAi6Ije3i50xtI5
+	Pl1yIrKJfoIkWDNcZBgHqMMLRSuK9g3Ark1CTrV7esMwikHpGjseesSlOgRnuYA6GKBCBCUd7TD
+	MJ9JWs+SGRsnvum11PFfLfeKTUWoRcLCcrO/vx+1FYU/VLPyApH5FYL0z68ZvtSC/rinSbpM87Y
+	dQg9SX9kmZ2FzoIzyHxrWb6msHF+hj3+DwseXwdxKZewO8blLAf/MbQirSS49Pr2FhlgXAMX+mH
+	niyh22pzjZBGnIF3UGbtUAvxBaP3BUX9AuPf6ZghFnPiJSOAR2Rry1T9ZfWsvhJVbNgERgGDPDf
+	2Hfnw5zrITf+JuemohbsxvGGosxgZVNZGIrX3s8tXM16M=
+X-Received: by 2002:a17:902:fa0c:b0:2bc:dca9:f0ef with SMTP id d9443c01a7336-2bd7e8cbbc5mr40307095ad.36.1778880991168;
+        Fri, 15 May 2026 14:36:31 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5bd5fae5sm70746195ad.6.2026.05.15.14.36.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 14:36:30 -0700 (PDT)
+Date: Sat, 16 May 2026 06:36:26 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: Aaron Esau <aaron1esau@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, sultan@kerneltoast.com,
+	sd@queasysnail.net, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, dsahern@kernel.org,
+	netdev@vger.kernel.org, stable@vger.kernel.org,
+	gregkh@linuxfoundation.org, imv4bel@gmail.com
+Subject: Re: [PATCH net v4] net: skbuff: propagate shared-frag marker through
+ frag-transfer helpers
+Message-ID: <ageR2qzTRtpH8JGY@v4bel>
+References: <aga1VyHpHaUhnGZa@v4bel>
+ <20260515164121.2608076-1-aaron1esau@gmail.com>
+ <ageAmZcEMu4Yjyyl@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE4:EE_|PH7PR12MB5926:EE_
-X-MS-Office365-Filtering-Correlation-Id: 810191f5-b169-4f1d-f541-08deb2c90746
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|376014|1800799024|18002099003|56012099003|11063799003;
-X-Microsoft-Antispam-Message-Info:
-	TKoUa+YYwtARk7jGEeUItzY7nJphMb6nbp92NZNroJF0LEKwi0IiN1gsbZMsyOi0dFjZfzvIdE+OQxhAgBjhgEEn2Ggy4VlofSxRZZzpFegoif8gagGS+wNx/Xx838rf/d64ZV/WGWzRJgbEql7rZnNDCKUAb8S+nrSHYoqgutk0wRrnurc/wxdVvva5I+o8SS+UylmdjwRuL3kO+FRAcc36+voLFGIsYs2gMY/zAQyUgUxd/0bO6L5EPT5KgIwxr4Aai5oqrEVwjYxsMV6vYxKfBwFF8VJ5249T9n11VfXjlD3QLz1hcunAMuwqZGFGw//8ev17WeHmQCUyuHW4HbwIHTBh64IcaSMWbamw2d22h5czMY9GxCdvEJirXF4lO8G28O0jDSLZXKzzlHKYDsAKYOiuxRLRB5XDcUMR9r3XdIjJapnvH2qzWWJnNYI+bxLJB/24+Ur4S//Y/bkdFBQBMvyRN0ByAxvqVy2jNGOrCDwt5aIEXdITwwpkubXC1AJFoz+0MpFKEAy8BWzJVj1Ux+cCxC7bikDswqWQklfkEtTZQmi8vWP9EOOggVipjdGKXjgMJAXoVvRGge+3oWy5f9dlb6wUT492p9od8HEOxOuvMKaM2JMg0ZBb0eENB85Bjo9xBd6U6VG8SPvSq/8G54kdXH4be0n2PPW7tA086/Z3fnLbyOHcsAqvZq0LrD7T8w0kN/h7E98Z41OwrDRMq1PZbU4YEgiXEXyXrk4=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(376014)(1800799024)(18002099003)(56012099003)(11063799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	IWHemzecVUSUUGSE9WEQRrBtlFdVv8ctiv4JOcpeV+j0Lotm1Z0MeXMcHL1MQS4wElgRt3vUbnUC1umERtnXJVZpXaEH/s3mTGe2df27h9wGOKTP4kXhv7NrEFMgAIlTcJpFSSY/uWKBZtdwj+lR3Hx+2xpYeJ7BLdu3hDhGTJC4tVNztelErwa9yOOvMMekj/uWC0jnMM4olbnHVeaooSaxjaFWPTw0Gvy0hYgbiGPkylXnGsei7EUwH1D+ptqIMTr3WIHBI8ujQiLbi0Oh4/r8Y2YGsnGktBmJY1tPFFw1QmuOJQq/Tct4mfqXshJ1JJd0evnGNSYhw5BO6twzweZ11ZeteXDyqy7N27CrnEh8TQObQuFdLqGgnNEO+tk3BS4MQNV13ElrnBITemLTVsAicp3zh8mE9QN6zeqO4N76B15umMD3uTA1XTdZr2J/
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2026 21:29:21.2769
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 810191f5-b169-4f1d-f541-08deb2c90746
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003AE4.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5926
-X-Rspamd-Queue-Id: AFA6C558204
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ageAmZcEMu4Yjyyl@v4bel>
+X-Rspamd-Queue-Id: A8E0C5583B3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288468-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:email,amd.com:mid,amd.com:dkim];
+	TAGGED_FROM(0.00)[bounces-288469-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,kerneltoast.com,queasysnail.net,secunet.com,gondor.apana.org.au,vger.kernel.org,linuxfoundation.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.998];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-debugfs_lookup() returns a dentry with an elevated reference count that
-must be released with dput(). The current code discards the returned
-dentry without calling dput(), causing a reference leak on every
-firmware reset recovery.
+On Sat, May 16, 2026 at 05:22:49AM +0900, Hyunwoo Kim wrote:
+> On Fri, May 15, 2026 at 11:41:21AM -0500, Aaron Esau wrote:
+> > skb_segment() propagates SKBFL_SHARED_FRAG from head_skb only.  When
+> > segments pull frags from frag_list members, the flag is never
+> > propagated from those members into the segment skb.
+> > 
+> > There are two miss sites:
+> > 
+> > 1. Line ~4986: a new nskb propagates only from head_skb, but frag_skb
+> >    may already point to a list_skb carried over from the previous
+> >    segment's iteration (i, nfrags, frag_skb persist across the outer
+> >    do/while).
+> > 
+> > 2. When the inner loop exhausts head_skb frags and switches to a
+> >    list_skb (line ~4999-5002), frag_skb is updated but its
+> >    SKBFL_SHARED_FRAG is not propagated into nskb.
+> > 
+> > Your v4 GRO fix means head_skb will normally carry the flag, so
+> > skb_segment() picks it up indirectly.  But skb_segment() itself should
+> > propagate from frag_list members directly --- otherwise any non-GRO
+> > frag_list producer re-exposes the gap.
+> > 
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -4986,7 +4986,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+> >  
+> > -		skb_shinfo(nskb)->flags |= skb_shinfo(head_skb)->flags &
+> > -					   SKBFL_SHARED_FRAG;
+> > +		skb_shinfo(nskb)->flags |= (skb_shinfo(head_skb)->flags |
+> > +					    skb_shinfo(frag_skb)->flags) &
+> > +					   SKBFL_SHARED_FRAG;
+> >  
+> >  		if (skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
+> > @@ -5000,6 +5001,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+> >  				frag = skb_shinfo(list_skb)->frags;
+> >  				frag_skb = list_skb;
+> >  
+> > +				skb_shinfo(nskb)->flags |= skb_shinfo(frag_skb)->flags & SKBFL_SHARED_FRAG;
+> > +
+> >  				if (!skb_headlen(list_skb)) {
+> >  					BUG_ON(!nfrags);
+> >  				} else {
+> > 
+> > Site 1 covers segments that start mid-list_skb (frag_skb carried from
+> > the previous segment).  Site 2 covers segments that switch from
+> > head_skb frags to list_skb frags mid-construction.
+> > 
+> > Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
+> 
+> If I understand correctly, triggering this in practice requires both
+> an skb with SHARED_FRAG asymmetry and that skb reaching skb_segment()
+> with GSO set, is that right? Looking at mainline, I couldn't find any
+> code path that produces such a combination.
+> 
+> Do you happen to have a reproducer or a concrete trigger call path?
+> If so, please share, I'd appreciate it.
+> 
+> Anyway, since I consider this one of the "relatively" more concerning
+> items among the "potential issues", I'll wait a bit longer for
+> additional reviews and then include it in v5.
+> 
+> As a heads-up, after this one, I don't plan to fold further "potential"
+> fixes into this patch. This patch is intended as an urgent fix for an 
+> actually triggerable issue, and the remaining potential issues are
+> more likely to be addressed together as a separate batch later:
+> 
+> https://lore.kernel.org/all/20260514163802.1d49d7cb@kernel.org/
+> 
+> Thanks for the review.
+> 
+> Best regards,
+> Hyunwoo Kim
 
-Additionally, when CONFIG_DEBUG_FS is disabled, debugfs_lookup()
-returns ERR_PTR(-ENODEV), not NULL. The current check passes for error
-pointers and would call dput() on an invalid pointer, causing a crash.
+Ah, I see. you've released another exploit publicly.
 
-Fixes: bc90fbe0c318 ("pds_core: Rework teardown/setup flow to be more common")
-Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
----
- drivers/net/ethernet/amd/pds_core/debugfs.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+https://github.com/v12-security/pocs/tree/main/fragnesia-5db89c99566fc
 
-diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
-index 04c5e3abd8d7..810a0cd9bcac 100644
---- a/drivers/net/ethernet/amd/pds_core/debugfs.c
-+++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
-@@ -64,9 +64,14 @@ DEFINE_SHOW_ATTRIBUTE(identity);
- 
- void pdsc_debugfs_add_ident(struct pdsc *pdsc)
- {
-+	struct dentry *dentry;
-+
- 	/* This file will already exist in the reset flow */
--	if (debugfs_lookup("identity", pdsc->dentry))
-+	dentry = debugfs_lookup("identity", pdsc->dentry);
-+	if (!IS_ERR_OR_NULL(dentry)) {
-+		dput(dentry);
- 		return;
-+	}
- 
- 	debugfs_create_file("identity", 0400, pdsc->dentry,
- 			    pdsc, &identity_fops);
--- 
-2.43.0
+It looks like the exploit doesn't work because the GRO propagation
+in the already-published v4 patch prevents the SHARED_FRAG asymmetry
+from being created in the first place.
 
+In any case, v5 will be submitted shortly.
 
