@@ -1,233 +1,206 @@
-Return-Path: <netdev+bounces-288237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IhvEMzbBmoxogIAu9opvQ
-	(envelope-from <netdev+bounces-288237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:39:40 +0200
+	id 0GL9OC/eBmp4ogIAu9opvQ
+	(envelope-from <netdev+bounces-288238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:49:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB0E554B83B
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:39:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50CCF54BB87
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:49:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C7B3F303B806
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:37:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 518DA312D28E
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50777402B9D;
-	Fri, 15 May 2026 08:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF4F40627B;
+	Fri, 15 May 2026 08:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6af3o+k"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oTlDHcbb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7217A346FA6
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 08:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778834269; cv=pass; b=ERRtMDyu6A47zYzWLnijJSmQSk2T9P7CDTQdZ2Vp2PY9/w6Ouai7loVwiNLOqB8hskakK3gbbKCd/c9OyCs4c2AOENCJC11AJSy3txKg6X957PoU1Uhw7EeuH7yCDOa6c9DPb6Z2EuzTEUc4SKNY0/rMHzEZb63zf32H2TMusEM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778834269; c=relaxed/simple;
-	bh=unrCV9BlS+NT2H9YcNFBIBdPF5SnAoNci8LrnilLGqE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p9oOMgTd2MsBxwZ6dpuC1vnlFP03ledJmxfwckUeHblxCnzn2fM3PBD7FoxT6JoIBYE2gO+q1d0jstB2+Qf3igOyZk3QeWZWiyxKS4o/8GQGv/S3lT58FuGiVfnKm0vABkuh6OMzgaeYpb+S5sJFuCiZeTwYDUhCuAlIr5pVHxU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6af3o+k; arc=pass smtp.client-ip=74.125.82.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-30246cfd41aso3784045eec.1
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:37:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778834266; cv=none;
-        d=google.com; s=arc-20240605;
-        b=g8qAvd3q1d2VIMtbDk8aOZMnoF6NvKxlRcbySIAZXRlddpmrPydZvZc87rWZe6iaxh
-         FTSMpDA6gEj/vWWSNI4V5SuFxJPuTx9c3zVD8Ok1HQRblqji7Qrq8EQ1y3tmifGJFkRj
-         kfGLbB1/VOir+L4l/FrVPmMRFKj4KLluexIeiujCPX/GNiza6rC+LMj77SWqlZp5oJWt
-         v5rmR+NLlbV7NkLKeKX8lTe3gxyRLw3FWdi2aLjuwvFJvh/amKLyH9kDlXFRDPkaIQ3v
-         5M04PyoKJH5b0lSVCB70yk3WOjRY5v/hclk7mOBR+hpEumC7NF1IphhvTTvKIhB+oubl
-         5trw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Me5hEq/uVA2vry/WusH3UXPaCOwfFKJKOpGLMOeOsm4=;
-        fh=lT+vLTziEnqFn+3Bb5g/xccxDHliMDO9A/H10eoB4D0=;
-        b=H9hLzEvg5RLYzC3hkfwvHwlq0g0O9naBx1WYh0++m+G0cW4xzKfYHcfT2OU8XRV2LO
-         PhLS/ETWgdoXu2fiRBxi2YSBgggtI9gAJcYWBZcX5tVDzTZi6frr6ZHurgDlUw2r17rQ
-         Hn/DjoZnfxbPafVlhbaw6OOrAPNrlVg+7oy+yjuE5ajPganzIEl4iuZVYf1oBuf3Z9g9
-         a/3G+LNEVNzq7dm2qndvzn2V2lK0sLVM4j+ZEr4kQQyrYGvXs2AQVB556pJ8YgioWDsE
-         /z45xnOTJYggb5KA+4BdRs8pywCfq3JT5EYloKQTNI+RD3HzLORuw6yxYPNOLg/98M26
-         Z+WQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778834266; x=1779439066; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Me5hEq/uVA2vry/WusH3UXPaCOwfFKJKOpGLMOeOsm4=;
-        b=J6af3o+kBsvRvTtp5InCk67+NlrHIgODsJqzwPQ4eeD/BCnyKtt777pgo+ofAPURgL
-         HzF6jMMLQnZwqvEoSifIHHtDcnqLkg6tfXFJUMNbt9wOlNkvosQUL6rDxtj5EHMRtLiW
-         ZSCWHveKvVYdi/LPIbok9bDg3toxM2bFzpJqtF51ebmOrU+3nQM18F81oojcUr+8CwcR
-         NKVd7SskLjzvNNJ5ePGlIbeneLV81gyGLhDuLs0MTDHogUxdE/GLW6nkBHrybnLzlgy9
-         HPz0FxaBnNMkD7G/1UMHm15/7xFBqsuWpGyGV03ic1+IxCMQw46To/ZPmsY8SN2Xg4oJ
-         RrYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778834266; x=1779439066;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Me5hEq/uVA2vry/WusH3UXPaCOwfFKJKOpGLMOeOsm4=;
-        b=YUti6WzTtlOFZuZm8wXNwPnAijyjrEHZwIqoMNkGu1b7OroTFZfBjHKhzSsgSvAv2F
-         SmH9xqwAxkM2kdctpgzNqYPOMLvYWEL0V+iYMHaxlKr04EhOHhznWX7ZLTyuBbOvtMzX
-         fCczD2c8MxVeq0bPJ2TSXBkZ8p0mPDn9IyxU63Ts+6Rz3y5LJsWe7ua9fl3W3GfAHYMl
-         BxPO5VzVEXjq37UhKY4Fr9khn8cixXUT1tWDmSS58FrbzybKFOPh4Tu/dogJRGBCXUzD
-         RuQI7q/IfwWunscIWbOl0mfuuIfBvDRZOAZZsNf3zWN23IvK9GR9K9wT7KbvJRuqmOXi
-         RJyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8rTEI60tarBedpkrV/YE1BA8sQZTU6rqlfrfqLVwOxcKimEu4NWIIi8Fv1qXS/tZlGG/Gk8Ig=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxelM2ClZo9Xsn1a/gFoElxiekOmeDtHVA7DnDQYrGYi9hnSVjs
-	f1qHLASzGd/MHwIxsey1WH1TG5kuwZxozZISj39++6o+WwZuVnerbqoVGEzpH+A0Ftf48CLCwoH
-	M3Wnltr009LAH8ONRGI1IqpqIHXxderU=
-X-Gm-Gg: Acq92OFA2NoMcjj7FjaCW6C9dUgR6jqgmb1vtN9xFZRcD1Unq/ujaCY/BubNlyI9WMY
-	nLduFJiDtthX6OvyHW7duXSehpgsDGnSBR8VYJGzoPOyfXHx6tkkzDNV7oUQTcTBtIXlr0ssVRx
-	ChAIedV5oMxFAva7br62StfIjyTbuzRoR3/vSWWf1WSjvoQSNlI27yAJ+M3IErGhNFjZYqDiyVj
-	BTxQomqt0V1BmiiZ0Y1LicPIwRAabh40893AQHPrDbApoDYh58DPT1cBdKIDQ2BTXa22Si7Ps6c
-	PoVGYT5Z
-X-Received: by 2002:a05:7300:fb83:b0:2ed:ff78:2c12 with SMTP id
- 5a478bee46e88-303986b7f00mr1545456eec.34.1778834265492; Fri, 15 May 2026
- 01:37:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2364940B6ED;
+	Fri, 15 May 2026 08:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778834332; cv=none; b=LfCLYU2+bUp/Sz3gLcTF6MFzzEVvY1Tv0EqaErkTj9w29tRvxWoVGD4Blaq7b2JD5dAwIN6NjctDNaAc/5GrnMPHhFXrvfjhsu1LLfPPK6n3U/otLFv7+ewxxFrkMkQCYwf9neV6mtGMqFWa8Gy5qdChPY1Xgve2MmMzfk+mSnw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778834332; c=relaxed/simple;
+	bh=VCkcfRpbv9b5dtqBMjM3iSVKt+J37ohgcYnfnhvDCIo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZiYWsDqRuOrD/0A9ZJi8OGxJtnU4bm2DK2LL9peKNiXPsFAv3V15eGhQqQ58Y7JlDuVisZE3+UJGe9dUZC1NL/fi4KqiPsPxvb3snHqfVCLNE0g6Z6CZCLBy5G7uJ/eskSYUTag/VXZdTi5PfQK9vCKwkL2OOliHlVDBmV86YPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oTlDHcbb; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 6DE43C5CD6A;
+	Fri, 15 May 2026 08:39:38 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1B1A5606FD;
+	Fri, 15 May 2026 08:38:47 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5399011AF8DB0;
+	Fri, 15 May 2026 10:38:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1778834326; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=Xbue0L3dMbDxUEb9yOeuYbYnCHVUV5F8i0WSiWlEXNM=;
+	b=oTlDHcbb6IYx784p9sG3HYhVWHpW3st2KQtSFscrpRhBI1t6M8XrjH3i/Yn1wIZoTFeLsY
+	UykT6lPQa6/tIl/QWwe6lUrukP0t53IKcLfQZvUmZVtt4Fh8+aaMr5U1b5VHUDrRm2/p8V
+	a/VxbouNXOT2ulCKZBvzWKsJ7ieQCJCCpbcBUJbvg5NTp2Jq/wUYWtiabKHtxEhqbpyPO0
+	I9WWplN/77xjrS1wDb3/l8K/HD/rA82qSSm8qOFEUAXJRKod2IC0BaVmatr31VlXM3JDmi
+	FOT2gyvhlhmrwr9hYD2uam8SaG4/ZuFZC1uwjiiyUV+E81ovgW1fmWDtWMnOvA==
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Subject: [PATCH net-next v2 0/8] net: dsa: microchip: Remove unnecessary
+ ksz_dev_ops callbacks
+Date: Fri, 15 May 2026 10:38:35 +0200
+Message-Id: <20260515-clean-ksz-2nd-series-v2-0-35a968a739f6@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260511135703.62470-1-clamor95@gmail.com> <20260511135703.62470-6-clamor95@gmail.com>
- <20260515-utopian-malamute-of-patience-367e8e@quoll>
-In-Reply-To: <20260515-utopian-malamute-of-patience-367e8e@quoll>
-From: Svyatoslav Ryhel <clamor95@gmail.com>
-Date: Fri, 15 May 2026 11:37:34 +0300
-X-Gm-Features: AVHnY4LfeFEmg-csCdRMVtN73Y-dqI06XuWSB80BMJnQTmRPDx1qbsh-tCMg8j0
-Message-ID: <CAPVz0n2wrAdU0JKx7eb7uosCcoGayqNchK591VPph-5_nBAMXg@mail.gmail.com>
-Subject: Re: [PATCH v1 5/6] dt-bindings: phy: tegra: Document Nvidia Tegra
- XMM6260 PHY
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Vinod Koul <vkoul@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Thierry Reding <thierry.reding@kernel.org>, Jonathan Hunter <jonathanh@nvidia.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Peter Chen <peter.chen@kernel.org>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org, 
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EB0E554B83B
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIvbBmoC/22OQQ6CMBBFr0Jm7Zi2BAiuvIdhAWWqjTjVthKUc
+ HcruHT55+f9NzME8pYCHLIZPI02WMcpqF0G+tLymdD2KYMSqhSFlKgHahmv4Y2Ke9xozLuqKEj
+ XtTYCEnr3ZOy0zp6AKSLTFKHZGk+PZ/LErf4eLzZE51/rE6NcoZ9P/feNEgVqIUypSeSVaY+dc
+ 3GwvNfuBs2yLB80glcB2QAAAA==
+X-Change-ID: 20260511-clean-ksz-2nd-series-3b755ec99cf0
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Richard Cochran <richardcochran@gmail.com>
+Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
+ =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Tristram Ha <tristram.ha@microchip.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+X-Mailer: b4 0.14.3
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 50CCF54BB87
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-288238-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288237-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[clamor95@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devicetree.org:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-=D0=BF=D1=82, 15 =D1=82=D1=80=D0=B0=D0=B2. 2026=E2=80=AF=D1=80. =D0=BE 11:2=
-0 Krzysztof Kozlowski <krzk@kernel.org> =D0=BF=D0=B8=D1=88=D0=B5:
->
-> On Mon, May 11, 2026 at 04:57:00PM +0300, Svyatoslav Ryhel wrote:
-> > Document the XMM6260 PHY used by various devices based on the Nvidia Te=
-gra
-> > SoC, describing its usage
-> >
-> > Signed-off-by: Svyatoslav Ryhel <clamor95@gmail.com>
-> > ---
-> >  .../bindings/phy/nvidia,tegra-xmm6260.yaml    | 58 +++++++++++++++++++
-> >  1 file changed, 58 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/phy/nvidia,tegra-=
-xmm6260.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm6260=
-.yaml b/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm6260.yaml
-> > new file mode 100644
-> > index 000000000000..0346433c9772
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm6260.yaml
-> > @@ -0,0 +1,58 @@
-> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/phy/nvidia,tegra-xmm6260.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Nvidia Tegra PHY for XMM6260 modem
->
-> XMM6260 is Infineon modem, so any combination with nvidia,tegra is very
-> confusing.
->
+Hi all,
 
-May you please suggest how to adjust the name then? Thank you.
+This series continues the rework of the KSZ driver initiated by a previous
+series (see [1]), following the discussion we had here [2].
 
-> > +
-> > +description:
-> > +  A hardware configuration used in Tegra SoCs to provide proper intera=
-ction
-> > +  between the application processor and the modem, as well as control =
-over
-> > +  one of the SoC's USB lines for the modem.
-> > +
-> > +maintainers:
-> > +  - Svyatoslav Ryhel <clamor95@gmail.com>
-> > +
-> > +properties:
-> > +  compatible:
-> > +    const: nvidia,tegra-xmm6260
->
-> Also here.
->
-> What sort of phy is this? So far looks more like a software construct.
->
+The KSZ driver got way too convoluted over time because it uses a common
+framework to handle more than 20 switches split in 5 families (see below
+table)
 
-Infineon XMM6260 does not work as an ordinary USB modem, it is a
-standalone CPU which just exposes itself to AP via USB. In order to do
-so, it has to have control over a USB bus of AP which is dedicated to
-it. In case of Tegra - XMM6260 interaction it looks like this: second
-Tegra USB controller is set into HSIC mode and is dedicated solely to
-the modem, modem controls this USB bus. Then the main XMM6260 driver
-performs power and init sequence and once it is ready it calls phy to
-register controller. Phy has its own supply, controls USB controller
-de/register and using enable GPIO sends signal to modem to proceed.
-Additionally, since some XMM626 versions have a few steps to setup
-exposing different USB devices, phy handles controller reinit for each
-step. If treat XMM6260 as an simple USB modem it will never init.
++----------+---------+---------+---------+---------+---------+
+| Family   | KSZ8463 | KSZ87xx | KSZ88xx | KSZ9477 | LAN937X |
++----------+---------+---------+---------+---------+---------+
+| Switches | KSZ8463 | KSZ8795 | KSZ88X3 | KSZ8563 | LAN9370 |
+|          |         | KSZ8794 | KSZ8864 | KSZ9477 | LAN9371 |
+|          |         | KSZ8765 | KSZ8895 | KSZ9896 | LAN9372 |
+|          |         |         |         | KSZ9897 | LAN9373 |
+|          |         |         |         | KSZ9893 | LAN9374 |
+|          |         |         |         | KSZ9563 |         |
+|          |         |         |         | KSZ8567 |         |
+|          |         |         |         | KSZ9567 |         |
+|          |         |         |         | LAN9646 |         |
++----------+---------+---------+---------+---------+---------+
 
-One more benefit of having PHY is that modem driver itself is generic
-and PHY handles SoC specific configurations required by the modem.
-Since this modem was used on a variety of different SoC's (Exynos and
-OMAP for example) they can reuse modem's driver and provide only PHY
-which handles modem interactions with the USB bus.
+The previous series ([1]) replaced the unique dsa_swicth_ops struct used
+by all the KSZ families with one dsa_switch_ops struct for each family.
 
-> Best regards,
-> Krzysztof
->
+These dsa_switch_ops structs still rely on common functions that redirect
+the calls to ksz_dev_ops operations which are custom to each switch
+family. Many of hese ksz_dev_ops callbacks have a direct equivalent in the
+struct dsa_switch_ops. This series directly connects the implementations of
+these ksz_dev_ops operations to the relevant dsa_switch_ops attribute
+to get rid of one unnecessary level of indirection.
+
+On top of this on-going rework I added PTP and periodic output support for
+the KSZ8463 (which was my first goal). There are more than 60 patches for
+all this so this series will be followed by several others and if you
+want to see the full picture we can check my github ([3]).
+
+I haven't finished yet to group all the patches into meaningful series
+but here is more or less what I plan to do next:
+
+- A series will split again some operations to get rid of the
+  if (is_kszXYZ) branches.
+- Maybe another series will be needed to completely move out of
+  ksz_common.c everything that isn't truly common to all the switches
+- A series will add PTP support for the KSZ8463
+- A final series will add periodic output support for the KSZ8463
+
+FYI, I only have a KSZ8463 so, unfortunately, I can't test other switches.
+
+[1]: https://lore.kernel.org/r/20260505-clean-ksz-driver-v1-0-05d70fa42461@bootlin.com
+[2]: https://lore.kernel.org/r/20260304-ksz8463-ptp-v6-0-3f4c47954c71@bootlin.com)
+[3]: https://github.com/bastien-curutchet/linux/tree/ksz_rework
+
+Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+---
+Changes in v2:
+- Remove patches 1 to 7 since they were applied on net-next
+- PATCH 6 (previously 13): Create a LAN937x-specific port_setup()
+  instead of using the KSZ9477 one
+- Link to v1: https://lore.kernel.org/r/20260512-clean-ksz-2nd-series-v1-0-c00f6ce037fa@bootlin.com
+
+---
+Bastien Curutchet (Schneider Electric) (3):
+      net: dsa: microchip: bypass dev_ops for port_setup()
+      net: dsa: microchip: call DSA's phy_{read/write} to do mdio {read/write}
+      net: dsa: microchip: bypass dev_ops for phy_read()/phy_write()
+
+Vladimir Oltean (5):
+      net: dsa: microchip: don't reset on shutdown or driver removal
+      net: dsa: microchip: bypass dev_ops->setup() and teardown() for lan937x
+      net: dsa: microchip: bypass dev_ops->setup() and teardown() for ksz9477
+      net: dsa: microchip: bypass dev_ops->setup() and teardown() for ksz8
+      net: dsa: microchip: remove dev_ops->setup() and teardown()
+
+ drivers/net/dsa/microchip/ksz8.c         | 235 ++++++++++++++++++++++++------
+ drivers/net/dsa/microchip/ksz9477.c      | 184 ++++++++++++++++++++---
+ drivers/net/dsa/microchip/ksz_common.c   | 241 +++----------------------------
+ drivers/net/dsa/microchip/ksz_common.h   |  22 +--
+ drivers/net/dsa/microchip/lan937x_main.c | 169 ++++++++++++++++++----
+ 5 files changed, 520 insertions(+), 331 deletions(-)
+---
+base-commit: 822d4a8e390a08ccfaf2abb347ae670b230b196f
+change-id: 20260511-clean-ksz-2nd-series-3b755ec99cf0
+
+Best regards,
+-- 
+Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+
 
