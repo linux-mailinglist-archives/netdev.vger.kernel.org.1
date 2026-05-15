@@ -1,156 +1,290 @@
-Return-Path: <netdev+bounces-288209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288211-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id COieIFzLBmrynwIAu9opvQ
-	(envelope-from <netdev+bounces-288209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:29:32 +0200
+	id YK8iN5vLBmrynwIAu9opvQ
+	(envelope-from <netdev+bounces-288211-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:30:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A15EF54A947
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:29:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A081454A981
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 924E93002516
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:29:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0ACD53003800
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60893EBF1A;
-	Fri, 15 May 2026 07:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E06C3E3DBF;
+	Fri, 15 May 2026 07:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mJqk6tlh"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SkSodnWs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA7C3E8C60;
-	Fri, 15 May 2026 07:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3813DF01F;
+	Fri, 15 May 2026 07:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778830161; cv=none; b=dlOhYuPAPs5vc3VCe4dSc11mSTstThkhLZh+8RFh8gF4bNGsCUD4nHB/iDCiTBr27VYwcGdJMXdVzPyNdyDpXBKque2ThTWw9msfG+Egub0x0mNjmrDtcSJCgDm2zpm8/QCyiwM1eFGkct+beGtl0Oml/XJ5ggABZRmuG05Ex9A=
+	t=1778830229; cv=none; b=r3amhdUYVr1pePOI4J2GNvIFihA0pX3Ot8bDQJlk/MGV9epDbeP8YhV9Zid66e/PI23TK/5aN/61iRwDRfW/36pgZqkSB8tW7LeFrojTBjQMWPrXmXwpCcjdQZZyP3Pm1b+om1qjJ44s5mUN3I57DU7jSceTEO1mtJli+Dz6J6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778830161; c=relaxed/simple;
-	bh=Nz609sIXNSfx4zkRvanpjMAqc+T7oYl5d5XpZwibQCE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FHjpgvmyH5MtmX/iMSxovYGxn/eqdqnD/40qTv01GxQf+M0V6bsp9OidtuaSztf+cMcr8bCHQ707z8xL1wHR2JRxGRskIPEnKwmLtC9YGarMsq9sdj2kYdZSMO3WIS0R0K2Sa+vMVgccbiABrrXqi432WhOEg1thWEB45JGAsks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mJqk6tlh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555D9C2BCB0;
-	Fri, 15 May 2026 07:29:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778830160;
-	bh=Nz609sIXNSfx4zkRvanpjMAqc+T7oYl5d5XpZwibQCE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mJqk6tlhH8G+drsgS6IYp7FBgGZuGNajkrXly5jKhAmEpg7ilfPOBUVDBr1D+3RWI
-	 yw/KrKIGR9gZAwtTTU/x5LkYQNHwQvPOUN9yAdy0PBKxEdIoijwNZdruXRTIetIn22
-	 HC3dTBAXkKv1bvYHmJpSJxmTu9tjrPzzji0jHFg4OODKYphs8IoxbdTIG70uiviY9N
-	 tIgPE/yvnFncYBf/l7N3C9OEi4k1weBotb3CqOFhvURINy8yFsTZ1dJykXuq9VeXJv
-	 vuLwHfAMd5wjSW65e6JpK1q6NsJTqKB5yJnUgMsHBYHhjlB04IFxQVB/kZ3iNMidfu
-	 AIzE9WkgbyxMQ==
-Date: Fri, 15 May 2026 09:29:18 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Minghuan Lian <minghuan.lian@nxp.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	andrew+netdev@lunn.ch, olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: add NXP i.MX RT1180
- NETC switch
-Message-ID: <20260515-encouraging-hopeful-spider-aee4ae@quoll>
-References: <20260509090632.2959553-1-minghuan.lian@nxp.com>
- <20260509090632.2959553-2-minghuan.lian@nxp.com>
+	s=arc-20240116; t=1778830229; c=relaxed/simple;
+	bh=Qc0V+oBsz9NYag/Rs08yT6DmzNkjs35uRalKHucyqoQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K3UugpiDlE5h3ugzrWwuARDZQX0HHZTdVgYksaAFjuwlILfk+SbBgjg7evgSCWJo9dGoVLLaVxtvvk9stZQKDZIEUkRkr44U9VZa5LEyGLtEccRpWmYJXQZrxeRmLET6uRmprqT+HaSEIUClxrGrvLPkMVqJ3+FOUQ9Fq/tVvK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SkSodnWs; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64F7NV9o236018;
+	Fri, 15 May 2026 00:29:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=6ze7yPiuD3UNPXYW4n8fxVLVH
+	nR1K8F8PdrMkyW5KfY=; b=SkSodnWs364tH+LxXrnN81x1nrnUu2BpmJdmE1hjT
+	UsqTAdDy8tZAt6ShAer1FhaWAusYblZG3H4EcfRmNxvB+DrTF655X+RPRS67p2IO
+	spjERtgoFyQMNFqFQMwvSGXaFMUxjSl4YbjrlkdguKe/ALtrIsBuhmzmm7R5J1FC
+	h/MDiynjVRvbHaGp4CmunP9uAARxyfi1Vlk6+QTPb8eLOBDcbmifMDfp6j+XS8AX
+	RyfYvoFw5WiJmJvT7iODyB7clAq1uV0neZdWLC7het7iI57SiTh4D0/KTZAdR6Wr
+	zSIivZ3kbnUaa51TlULNdOdxOWARkpfUpQ8hmV2Mx2HOQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e5m3shmv3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 May 2026 00:29:49 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 15 May 2026 00:29:48 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 15 May 2026 00:29:48 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 8EC6C3F7057;
+	Fri, 15 May 2026 00:29:40 -0700 (PDT)
+Date: Fri, 15 May 2026 12:59:39 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <oss-drivers@corigine.com>
+CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
+        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
+        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
+        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
+        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
+        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
+        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
+        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
+        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
+        <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v14 net-next 7/9] octeontx2-af: npc: Support for custom
+ KPU profile from filesystem
+Message-ID: <agbLYwt5v6PMWYf6@rkannoth-OptiPlex-7090>
+References: <20260514062537.3813802-1-rkannoth@marvell.com>
+ <20260514062537.3813802-8-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260509090632.2959553-2-minghuan.lian@nxp.com>
-X-Rspamd-Queue-Id: A15EF54A947
+In-Reply-To: <20260514062537.3813802-8-rkannoth@marvell.com>
+X-Proofpoint-GUID: arqEWia0VCSlJjWkDASsbcFIR8tqxRr2
+X-Authority-Analysis: v=2.4 cv=NtrhtcdJ c=1 sm=1 tr=0 ts=6a06cb6d cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8
+ a=aOsrkaatB_mle0zbCPYA:9 a=CjuIK1q_8ugA:10 a=O8hF6Hzn-FEA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: arqEWia0VCSlJjWkDASsbcFIR8tqxRr2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE1MDA3MyBTYWx0ZWRfX1LTArKeIXiXM
+ DZOQ2+AalfsPJ2Em80puE1txUodjwaCNyROYnJpHOP/pjX1cvnlnlHEUZXu69GLD9osbtx5T/n0
+ rKK7/ZAILZhPt6agyHONflyUOz6c0KfpAwNOe6j4L5X/W9uXUYoxarbO4MCnnn95t/9u31xyMwt
+ 2OrWeOux2hoohv2sKsBvnBiXdxXceXvnaU9LM12pq4EY8DnqYgwrpJQX7j55fR07hg/zCVsnIqX
+ MJ48oTU9s/dGxHdW6GSvJ2QH5S0f4GKB4Sw/+OWYS2qJ1jw1hf0GMouPPPSfLxllcJZ3fLiQ3lu
+ tFUgL7tmGlK863y3ia3TEzaRyNkxkY+REfgwKOK4ovW/vZRYH/WODWt6TjRyQ9rLGSkic3YBvnP
+ rZbEdTrlFxUs0ypF6ethCr1Pd3eJ9sIdG/6vTEHszDO59AKNufOa81RfCyWfFRvrbAZvrcRgriP
+ 4AciPph9Axm9WeK0oZQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-15_01,2026-05-13_01,2025-10-01_01
+X-Rspamd-Queue-Id: A081454A981
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288209-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-288211-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	RCPT_COUNT_TWELVE(0.00)[30];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-On Sat, May 09, 2026 at 06:06:29PM +0900, Minghuan Lian wrote:
-> +allOf:
-> +  # Base: always a DSA switch
+On 2026-05-14 at 11:55:35, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> Flashing updated firmware on deployed devices is cumbersome. Provide a
+> mechanism to load a custom KPU (Key Parse Unit) profile directly from
+> the filesystem at module load time.
+>
+> When the rvu_af module is loaded with the kpu_profile parameter, the
+> specified profile is read from /lib/firmware/kpu and programmed into
+> the KPU registers. Add npc_kpu_profile_cam2 for the extended cam format
+> used by filesystem-loaded profiles and support ptype/ptype_mask in
+> npc_config_kpucam when profile->from_fs is set.
+>
 
-I have no clue what you want to say here.
+>> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+>> index ec5b2d6482462..21eb15f38c009 100644
+>> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+>> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+>[ ... ]
+>> @@ -1788,26 +1872,175 @@ static void npc_prepare_default_kpu(struct rvu *rvu,
+>>  	npc_cn20k_update_action_entries_n_flags(rvu, profile);
+>>  }
+>>
+>> +static int npc_alloc_kpu_cam2_n_action2(struct rvu *rvu, int kpu_num,
+>> +					int num_entries)
+>> +{
+>> +	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
+>> +	struct npc_kpu_profile *kpu;
+>> +
+>> +	kpu = &adapter->kpu[kpu_num];
+>> +
+>> +	kpu->cam2 = devm_kcalloc(rvu->dev, num_entries,
+>> +				 sizeof(*kpu->cam2), GFP_KERNEL);
+>Since adapter->kpu can point to the global array npc_kpu_profiles
+>(assigned in npc_prepare_default_kpu), does this store a device-managed
+>allocation inside a global structure?
+>If the device unbinds, the devm subsystem will automatically free this
+>memory. Might this leave dangling pointers in the global state, leading to a
+>use-after-free regression for concurrent or subsequent RVU device probes?
 
-> +  - $ref: /schemas/net/dsa/dsa.yaml#
-> +
-> +  # If the SPI-specific compatible is used, allow SPI properties and require reg.
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          type: array
+The concern regarding devm-allocated memory pointers persisting in a
+global structure is valid in multi-instance architectures, but it is
+not operational in this system due to hardware and driver life-cycle
+guarantees.
 
-??? What? From where did you get such syntax?
+First, the system topology restricts the platform to exactly one physical
+RVU Admin Function (AF) device instance across the entire lifetime of the
+running system. Because there are never concurrent or parallel RVU AF
+hardware device instances probing the system, cross-device global pointer
+corruption or concurrent use-after-free conditions cannot occur.
 
-> +          contains:
-> +            const: nxp,imxrt1180-netc-switch-spi
-> +    then:
-> +      $ref: /schemas/spi/spi-peripheral-props.yaml#
-> +      required:
-> +        - reg
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      # SPI-attached switch representation (current integration)
-> +      - items:
-> +          - const: nxp,imxrt1180-netc-switch-spi
-> +          - const: nxp,imxrt1180-netc-switch
+Second, the life cycle of the global profile structure is tied directly
+to the lifetime of the underlying AF driver module. When the AF driver is
+unbound or unloaded, the module's exit pathways discard the subsystem
+state entirely. Since no subsequent or concurrent probe sequence can run
+independently of this shared lifecycle, the devm-freed pointers inside the
+adapter layout never present a true runtime dangling hazard.
 
-Drop both. You have one compatible.
+>> +	if (!kpu->cam2)
+>> +		return -ENOMEM;
+>> +
+>> +	kpu->action2 = devm_kcalloc(rvu->dev, num_entries,
+>> +				    sizeof(*kpu->action2), GFP_KERNEL);
+>> +	if (!kpu->action2)
+>> +		return -ENOMEM;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int npc_apply_custom_kpu_from_fw(struct rvu *rvu,
+>> +					struct npc_kpu_profile_adapter *profile)
+>> +{
+>> +	size_t hdr_sz = sizeof(struct npc_kpu_profile_fwdata), offset = 0;
+>> +	const struct npc_kpu_profile_fwdata *fw;
+>> +	struct npc_kpu_profile_action *action;
+>> +	struct npc_kpu_profile_cam *cam;
+>> +	struct npc_kpu_fwdata *fw_kpu;
+>> +	int entries, entry, kpu;
+>> +
+>> +	fw = rvu->kpu_fwdata;
+>> +
+>> +	for (kpu = 0; kpu < fw->kpus; kpu++) {
+>> +		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
+>Is this check sufficient to read the fw_kpu structure safely? The condition
+>only verifies that the starting offset is within bounds, but immediately
+>below we dereference fw_kpu->entries.
+>If the remaining firmware data is less than sizeof(*fw_kpu), it seems this
+>will result in an out-of-bounds read. The new npc_apply_custom_kpu_from_fs
+>function handles this correctly by checking for
+>hdr_sz + offset + sizeof(*fw_kpu).
 
-Please do not send us AI slop.
+The observation regarding the potential out-of-bounds boundary check
+is correct, but it targets legacy parsing logic that is completely
+outside the functional scope of this specific patch series.
 
-> +      # Transport-agnostic representation (future integration)
+The npc_apply_custom_kpu_from_fw() is existing code that was
+merely refactored and moved to accommodate upstream review comments.
+It does not introduce the sub-optimal length check as a regression.
 
-Drop comment. Get the binding reviewed internally in NXP.
+This length validation issue will be isolated and submitted
+independently as a standalone bug fix patch targeting the net tree.
 
-> +      - const: nxp,imxrt1180-netc-switch
-> +
-> +  reg:
-> +    description: |
-> +      SPI chip select number (only for SPI-attached deployments).
+>> +static int npc_apply_custom_kpu_from_fs(struct rvu *rvu,
+>> +					struct npc_kpu_profile_adapter *profile)
+>> +{
+>> +	size_t hdr_sz = sizeof(struct npc_kpu_profile_fwdata), offset = 0;
+>> +	const struct npc_kpu_profile_fwdata *fw;
+>> +	struct npc_kpu_profile_action *action;
+>> +	struct npc_kpu_profile_cam2 *cam2;
+>> +	struct npc_kpu_fwdata *fw_kpu;
+>> +	int entries, ret, entry, kpu;
+>> +
+>> +	fw = rvu->kpu_fwdata;
+>> +
+>> +	/* Binary blob contains ikpu actions entries at start of data[0] */
+>> +	profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
+>> +				      sizeof(ikpu_action_entries),
+>> +				      GFP_KERNEL);
+>> +	if (!profile->ikpu2)
+>> +		return -ENOMEM;
+>> +
+>> +	action = (struct npc_kpu_profile_action *)(fw->data + offset);
+>> +
+>> +	if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
+>> +		return -EINVAL;
+>Could this lead to a memory leak of profile->ikpu2 and other devm_kcalloc
+>allocations if the firmware parsing fails midway?
+>Since npc_load_kpu_profile catches the error and falls back to the default
+>profile, the device probe ultimately succeeds. The devm allocations from the
+>failed filesystem attempt appear to remain stranded for the entire lifetime
+>of the device.
 
-Drop description.
+The concern regarding the lifetime of the devm allocations during a
+fallback scenario is understandable, but it does not represent a leaking
+hazard or an operational bug.
 
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
+Because these allocations are bound to the device's lifecycle using the
+managed device resource framework (devm_kcalloc), the kernel guarantees
+automatic reclamation when the underlying RVU physical device unbinds
+or removes.
 
-Best regards,
-Krzysztof
-
+While the failed filesystem parsing attempt results in a fallback to
+the default profile, the device probe itself still completes successfully.
+The allocated profile block remains mapped to the operational device instance
+as an unused buffer structure, rather than an untracked, stranded memory
+leak. Explicitly rolling back or manually freeing devm memory within the
+probe failure path would duplicate the clean-up routines inherently managed
+by the devm subsystem, adding redundant code paths for a non-breaking,
+one-time configuration fallback.
 
