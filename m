@@ -1,169 +1,151 @@
-Return-Path: <netdev+bounces-288353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288354-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKlTKjJLB2q5wwIAu9opvQ
-	(envelope-from <netdev+bounces-288353-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:34:58 +0200
+	id cII+CydHB2r6wAIAu9opvQ
+	(envelope-from <netdev+bounces-288354-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:17:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3277F553807
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:34:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C130C552F6B
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:17:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04C763153DC8
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 15:54:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B0AD03058302
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 15:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D644B305667;
-	Fri, 15 May 2026 15:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5AB3B2FF2;
+	Fri, 15 May 2026 15:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="K3DxjwsM"
+	dkim=pass (2048-bit key) header.d=etehtsea.me header.i=@etehtsea.me header.b="BTYydRqg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from outbound.ci.icloud.com (ci-2002a-snip4-11.eps.apple.com [57.103.88.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE463FF1DA;
-	Fri, 15 May 2026 15:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B987366820
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 15:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.88.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778860447; cv=none; b=IxBUXjQYQH6bRz7u2ALAFfSdS7TcHhideMj6IqIePJyNN+qubp1rK+RxzDf8ASb2xV22rtobOzlF177jOg/epv7B+ilciOV67a3O+7vLtHoCOuzipZpAoE0QT8PPMvhfTdth6c9PvJYnRjiG771KxleI11OSOOHIr/oS1i+KbYc=
+	t=1778860670; cv=none; b=Nmj1EcgULxXYtBU8VprFRpY/5dliN4vRvzgL/Dnq65Am1Qg43fdf+HNOSL2EoiAH2EC6SX4IYFh3HSxrXqHPW1o8JLk0ZkrQzec7clGueBZi46bOtFTaPsl3FzHWMr1prY8ovCI8MtzmUhHRPfjTYpKhtaJ3blmB2zXKCfMyPI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778860447; c=relaxed/simple;
-	bh=2m6hNE+rGWWRszgjJjZdV3kXtKuk3ayDQEvlVFEHccg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nyv/BlwcDuvt0BbJU6rpobYqC6sjFIewzFDQFCfsljTXc26mTYsG+wXqem4JiVsYCB474exD8HZGohziY6adZ/8p2l9aOWkHeK9+zHozcszWW1k+UbJc52pmgr83Ch841YAwOdgfXLmkUMKOPk18Za6N+yIImPKILL1vAH/PbM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=K3DxjwsM; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id CFB244E42CAD;
-	Fri, 15 May 2026 15:54:04 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 9D585606FD;
-	Fri, 15 May 2026 15:54:04 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7D1DC11AF82F1;
-	Fri, 15 May 2026 17:54:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778860443; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=jgFFboY+gNJXBunWTKjK4mQbM9XZJIPH3hYlzV0QAxQ=;
-	b=K3DxjwsMHzxTrUYCC2Nhvd2XryYHdkaq49tQzPVbsfh+OgaIjOUOoluVpVBtoH2IxNO1rb
-	vh3uMdilL9Gq1wrotNbHe/bheW4XyShgwa7JATN6cTMAgzj9BQsVe3ZXz+vqD5F5qb2hCw
-	mLdUY/0eDPHsA1ntKYxnOnUiYcbjUpGkN0SkIclTB8bgE+B1Fzui7WTHXD2QUWzsntrLeu
-	o/NniAOtMEdfctsDZeMurgYwhgUT2P8XgpX+ak7wLTwyQR6zSo0FdwpSA8rLPqsenJpTSe
-	U3gQEbY5QWZ17kn6+q7Ez/OVlaFIUzo88tyda0L1+dPtjlJjzIEV20UhIEWtVA==
-Message-ID: <3e698b9d-254a-4112-9cd5-217447efc8d3@bootlin.com>
-Date: Fri, 15 May 2026 17:54:01 +0200
+	s=arc-20240116; t=1778860670; c=relaxed/simple;
+	bh=VCz6Vzcxv7+HrW6MUnn7R0R4JcxjuaOFDj7RBZs1TrM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QiHQTtaYkOvbvQySq/RBxRhJbQ9ALvdCxycv9TkyC8l9GP2HqbQc1LCPkHgePwsA/62pkXQP6gc1wsEx2CthLDDelUN9xyuomZnarDf44YdBinD1NQX46NtfMaSFQe/23E5Pa/8V5R4IjVT0w+pQcFZ+Ze/j0gwWEK/ndUhyRdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etehtsea.me; spf=pass smtp.mailfrom=etehtsea.me; dkim=pass (2048-bit key) header.d=etehtsea.me header.i=@etehtsea.me header.b=BTYydRqg; arc=none smtp.client-ip=57.103.88.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etehtsea.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etehtsea.me
+Received: from outbound.ci.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-central-1k-60-percent-11 (Postfix) with ESMTPS id 55F011800097;
+	Fri, 15 May 2026 15:57:46 +0000 (UTC)
+X-ICL-Out-Info: HUtFAUMHWwJACUgBTUQeDx5WFlZNRAJCTQ5AHVwDWxxBAFYHXxcOVk1UGVoBdw5GFVEMQAhWRV8VGR5XUFoKWxx5HUcIXx9BFVhWXggXGVFNCEkTBVIHXU1WDUcPWB5cFBcbWkNeCF4fTBwdDlgGEgBNCg42BlkFXglWA0MFNhIUXUVWGVIDRgNcGR0AUktfGV1FD18HWQRADEkGXAJeBUQIVgFYB1MAXQhVXgxeB3IVTR1bGUQOU15UHQ1NQxJCFQQbRh5DBF8vXRdeDF4F
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=etehtsea.me; s=sig1; t=1778860668; x=1781452668; bh=DuQegn9fkCMACsPY0TAXb1FFSz4/Ugl6CDVsxtvsXcM=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=BTYydRqgcIlRgyauh1SL5vYC76n5FVBUdjGDDdnIZP5eE685UFKpDKizQ7bAOSxH+B0qPGYz+FGSAxE9DflSY4p/6efglR9XWKYbuNYn5jS7sIzu/4dsAX1ATpHgJC1BKVSK3VXdtmV/dqZYBc5qAwZgnWUOTUhmLiv/fmBHhi59PMNXeJL+YlRQ0PN8mdGBrmteGNdF1kyXbpVED23aN4sKu3ficofL2FT3x6hcp0URwr8wqClgXd9ZBNb+46yEDT2btyXGVrX17u9LwWERR9Kzc87hRNWM6a6guPNvLgPCzXk0ohwapX7BxfthyuqfcZC5LoAFxgABjFyKxIm/Kw==
+mail-alias-created-date: 1634905887181
+Received: from localhost (unknown [17.57.156.36])
+	by p00-icloudmta-asmtp-us-central-1k-60-percent-11 (Postfix) with ESMTPSA id 4910918009BD;
+	Fri, 15 May 2026 15:57:45 +0000 (UTC)
+From: Konstantin Shabanov <mail@etehtsea.me>
+To: kuba@kernel.org
+Cc: corbet@lwn.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mail@etehtsea.me,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH] docs: netlink: Correct buffer sizing info
+Date: Fri, 15 May 2026 22:57:41 +0700
+Message-ID: <20260515155741.25082-1-mail@etehtsea.me>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260512172757.10c43c86@kernel.org>
+References: <20260512172757.10c43c86@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3 net-next] net: mdio: mscc-miim: Use
- devm_of_mdiobus_register()
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-References: <cover.1778856199.git.christophe.jaillet@wanadoo.fr>
- <139ebd0e3698de5e785bb0c70a4d4da43925a7ae.1778856199.git.christophe.jaillet@wanadoo.fr>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <139ebd0e3698de5e785bb0c70a4d4da43925a7ae.1778856199.git.christophe.jaillet@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 3277F553807
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: MBeYi7hRfafsSMgW6tgjcPjp87ci0_31
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE1MDE2MyBTYWx0ZWRfX9u2+/58yK04i
+ ED6wxzBp2PRTy+TwSw8sHnM9SWblGZIgyuFUeY1XYnhcSuSoWbeQqDsXukWSNKwwLXAnWyqLKE3
+ ngnfDvfqN0Ns3qBlwXRfL/FJOHqjEzvblP2Ige+ckq5PzwW93+sVh1H60axPgH6F6lgMKdQjr+k
+ Qjwe/nqM+WiFkyf1tptA3TJhuUavBxYDX/vL97dEViZ7/v8NKo1u9b07hQNrrYZrOZpFxW3PhU/
+ Bz+Y0fcJgbdXDhRWL2DEjRGhOraeHxJe7ptlkdQBHDyOqSVrXl+OzvG8Byjjv730hINzPKQTBLd
+ 8ukX8le5Om+TIzph/z30sW1GYBeVfJ6FmcOjdpFosnR3eGsX/6r+Sie8ZgErIo=
+X-Proofpoint-GUID: MBeYi7hRfafsSMgW6tgjcPjp87ci0_31
+X-Authority-Info-Out: v=2.4 cv=J46nLQnS c=1 sm=1 tr=0 ts=6a07427a
+ cx=c_apl:c_pps:t_out a=2G65uMN5HjSv0sBfM2Yj2w==:117
+ a=2G65uMN5HjSv0sBfM2Yj2w==:17 a=MKtGQD3n3ToA:10 a=1oJP67jkp3AA:10
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=3HDBlxybAAAA:8 a=UGG5zPGqAAAA:8
+ a=TJPJEJdEWgVQhX8sVwQA:9 a=laEoCiVfU_Unz3mSdgXN:22 a=17ibUXfGiVyGqR_YBevW:22
+X-Rspamd-Queue-Id: C130C552F6B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[etehtsea.me:s=sig1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288353-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[wanadoo.fr,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[etehtsea.me:+];
+	TAGGED_FROM(0.00)[bounces-288354-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[etehtsea.me];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@etehtsea.me,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,etehtsea.me:mid,etehtsea.me:dkim,zx2c4.com:url,netfilter.org:url]
 X-Rspamd-Action: no action
 
-Hi,
+On Tue, 12 May 2026 17:27:57 -0700 Jakub Kicinski wrote:
+> On Tue, 12 May 2026 17:30:53 +0700 Konstantin Shabanov wrote:
+> > Update the docs to match the code (include/linux/netlink.h):
+> >
+> >   /*
+> >    *	skb should fit one page. This choice is good for headerless malloc.
+> >    *	But we should limit to 8K so that userspace does not have to
+> >    *	use enormous buffer sizes on recvmsg() calls just to avoid
+> >    *	MSG_TRUNC when PAGE_SIZE is very large.
+> >   */
+> >   #if PAGE_SIZE < 8192UL
+> >   #define NLMSG_GOODSIZE	SKB_WITH_OVERHEAD(PAGE_SIZE)
+> >   #else
+> >   #define NLMSG_GOODSIZE	SKB_WITH_OVERHEAD(8192UL)
+> >   #endif
+>
+> You should explain what you think the problem is in the commit message.
+> Maybe if you did you'd realize you're comparing kernel header comment
+> to user space guidance which are (obviously?) the inverse of each
+> other..
 
-On 5/15/26 16:50, Christophe JAILLET wrote:
-> Use devm_of_mdiobus_register() instead of hand writing it.
-> This saves some lines of code.
-> 
-> The remove function can be removed completely and the
-> platform_set_drvdata() call at the end of the probe is now also useless and
-> can be removed as-well.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+I thought that the comment is self-explaining:
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+  * But we should limit to 8K so that userspace does not have to
+  *	use enormous buffer sizes on recvmsg() calls just to avoid
+  *	MSG_TRUNC when PAGE_SIZE is very large.
 
-Maxime
+The problem is that according to the comment, kernel isn't going to send
+more than 8K in a single reply and the documentation is currently recommends the opposite:
+to create _at least_ 8K buffer what looks excessive.
+Also, the logic in the comment is aligned with userspace libraries (libmnl [1]
+and wireguard-tools [2]).
 
-> ---
-> Compile tested only.
-> ---
->   drivers/net/mdio/mdio-mscc-miim.c | 12 +-----------
->   1 file changed, 1 insertion(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/mdio/mdio-mscc-miim.c b/drivers/net/mdio/mdio-mscc-miim.c
-> index 4d8f60d458b8..7bdcf3e9baa0 100644
-> --- a/drivers/net/mdio/mdio-mscc-miim.c
-> +++ b/drivers/net/mdio/mdio-mscc-miim.c
-> @@ -322,22 +322,13 @@ static int mscc_miim_probe(struct platform_device *pdev)
->   	if (ret)
->   		return ret;
->   
-> -	ret = of_mdiobus_register(bus, np);
-> +	ret = devm_of_mdiobus_register(dev, bus, np);
->   	if (ret < 0)
->   		return dev_err_probe(dev, ret, "Cannot register MDIO bus\n");
->   
-> -	platform_set_drvdata(pdev, bus);
-> -
->   	return 0;
->   }
->   
-> -static void mscc_miim_remove(struct platform_device *pdev)
-> -{
-> -	struct mii_bus *bus = platform_get_drvdata(pdev);
-> -
-> -	mdiobus_unregister(bus);
-> -}
-> -
->   static const struct mscc_miim_info mscc_ocelot_miim_info = {
->   	.phy_reset_offset = MSCC_PHY_REG_PHY_CFG,
->   	.phy_reset_bits = PHY_CFG_PHY_ENA | PHY_CFG_PHY_COMMON_RESET |
-> @@ -363,7 +354,6 @@ MODULE_DEVICE_TABLE(of, mscc_miim_match);
->   
->   static struct platform_driver mscc_miim_driver = {
->   	.probe = mscc_miim_probe,
-> -	.remove = mscc_miim_remove,
->   	.driver = {
->   		.name = "mscc-miim",
->   		.of_match_table = mscc_miim_match,
-
+[1]: https://git.netfilter.org/libmnl/tree/include/libmnl/libmnl.h?id=54dea548d796653534645c6e3c8577eaf7d77411#n20
+[2]: https://git.zx2c4.com/wireguard-tools/tree/src/netlink.h?id=a998407747005ea7e4e0258d96f105c97241e1d3#n70
 
