@@ -1,85 +1,84 @@
-Return-Path: <netdev+bounces-288426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288428-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yF7UE+ZrB2rY2gIAu9opvQ
-	(envelope-from <netdev+bounces-288426-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:54:30 +0200
+	id WA3pH0xsB2rY2gIAu9opvQ
+	(envelope-from <netdev+bounces-288428-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:56:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4AF556845
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:54:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5CF455687C
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:56:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4F2A530099B4
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:54:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F211305D86D
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB42337FF7F;
-	Fri, 15 May 2026 18:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60E037FF7F;
+	Fri, 15 May 2026 18:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5Cnek7F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YTN8QEiG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC54C381C4
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 18:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCA938423F
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 18:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778871265; cv=none; b=R0PLHUrXy0WCVXuQnAy8BoA6o1aRUOQKVO5hKml/7Fnun2Zb0zeSzwgMCuk05taOBtdLcKZt5lk8nKTbmJNpiC9QH1PUoTOwFN6sflRosOI5CyZFKCXfE2RTIhT6Sp1q/pjWWt8INwKNA/ZAkKSNIhy7qcv7/cIuz8Hlzt1A0hU=
+	t=1778871271; cv=none; b=sc5cKXvwMqCk3DRImihu3n1QWRUbx3GpeRhA/lI1UW3K2knnj6n7+yWXoE6827XTMUGSmwHHegADJOLMI39lf8ht7gD0UTFFuhw7g11gAZAewqSud1G0yjuR9UqSxj3ZWDnoU0PXGouKWsk1c3UYnbhKFOhqdh6DRmHDsw/bcCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778871265; c=relaxed/simple;
-	bh=1ep5ZLVgq0P6ZOuRIHNhve6Q35NR/xV4JtQP4fUWqVQ=;
+	s=arc-20240116; t=1778871271; c=relaxed/simple;
+	bh=5eaIm7oQrXrv26FV2waWzgjgidPzic9XkF5iTxDoZAA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SjyviiukIE7jFBYdDnbAFI+mGDjqh6T0koHuVOq3m5mc6m8mlPFfZJiN7tLzBrnODhAEg1HFNEBLhjhiLL2elgO/WlIOvfyx/rIZN264rzKLYMmtde8ila0IpX4lzeL8Kxln8FV+piNWcSagW3E2UUviRCvNEr1qCBALzbcNZkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5Cnek7F; arc=none smtp.client-ip=209.85.128.44
+	 In-Reply-To:To:Cc; b=kBYWAFvI27IAYSj9kxFVnCN3tvsVZbGXfccgoICRfQwprMKpo8N/t+HioNxWcxo22ogvqzUu/w8z4cNdfiSgWIcxQdl9RHEAa7YDZJoRf+Ii9pdlCP3Onkpqs41t1vjjuP+v+HckwWHY1BqYMmS5vjIwzs2p5FhpqiDLusEeo8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YTN8QEiG; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4891ca4ce02so2635e9.1
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 11:54:23 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4891ca4ce02so2705e9.1
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 11:54:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778871262; x=1779476062; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1778871265; x=1779476065; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=SuHPlWmIOJ+p8xvCO2qGzAHb3LeLHxGU5jkoCFo5buk=;
-        b=e5Cnek7FNN6wB4gRgZEqeaHt5Oi9Uz0dym7Vn4/rOHsyReunpz3VaS7I5UaZCOtEII
-         Lb8gFFmw7i3jvifD7lfHnLXvxTl+pF6BqE4sJMXkg1gTQiNCVwiKg/rTQ8Zjn2r7lwlf
-         pE1NcaFm5ycl1MJHrjnEiAbGLssOcteP2fxphlIMaVnkKAf+2lptTedpmD8ew1boUU7h
-         rRoKD2CX4lyuCZj5P7/j8r/UtBalHpi44oHPLCeB1Ey/lRoM6ksLhF9OnVbSw7gjQT79
-         7yZZLMzI0cb0Upc3dxEV7s5nWNUgrEruffQtWSd0mQnkqkPv9ZJARAkSskbS5hzU1hps
-         sZKw==
+        bh=PNFlWNxHBBoOTkz1i9JncC0yIj0DqDbA8cq/UI1Bf44=;
+        b=YTN8QEiGHHdnprLQd4QF4cecW35GhQVlLJOKOfrlbUIpLU3YETnSZ7SAZ75pD4+xLU
+         JE95jMSsbzu7tvXxTEblYm67ZGMfe/XDBqYu9l9KCvf94QEbwgn2mVSnf+QDmBdO6yUu
+         /JOROf/9RRxy4kRG2d2LLjwPrLrWHvN98DT8Q3xowg5Z5J4Q3BrqkQT6/2faP8j/N7Ei
+         Bkmoa7IdWTvOBsy91glQdiElDn7pmakZxbVgrfE5WsA1HFEnVXh9HICSaz3ZGAusL6aT
+         x5ftNRrsF4nOV+5ATj3tUzsa8cqi5nQRNxo4u2VEaaPgDJlirOcYBlnOy7ES2iFNLF+o
+         f8Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778871262; x=1779476062;
+        d=1e100.net; s=20251104; t=1778871265; x=1779476065;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=SuHPlWmIOJ+p8xvCO2qGzAHb3LeLHxGU5jkoCFo5buk=;
-        b=sg5rOhEpU109+XIx0a6D5xIofGJvryKBtDzBQOciMFo+Zpb8wXa9ZFoElJtx7o25R+
-         sqhEg+d6yYSl7aFxxWg/1KKjJPYyh0vM0s/Vcbq2fdlTOmBx0L7k/r/SarcS3GDzGc5c
-         k5dwCoEojyysw4MWgJH7TZhxNx+Wf/s/6A5Grv1M/VxO2xBa010g6WFWC9AFUYMvi+J1
-         v3ePJbnm3b9DI/pIZseAwP+491bX6StubvDmrMGH9Uz/RP9XJZIoGzO9sx8TJWVvxKUs
-         B3+S5CMQySxXk4vCwhJRv3kT8WqRYs2kBpkhtQwRDpHDV/3DH1TgRSKgQnxyuLjjvrsu
-         559A==
-X-Forwarded-Encrypted: i=1; AFNElJ/YNUxANlrKF8tPGV9GeZm3Ey43e2qXbReqaJlHJFWKWg+CoU8iHjyZFQlH4aZvxONYH0JbLu0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQ0Bcpkj1Cbe23/qNhx6/riTeCsyTVx7CmCGRsATcM1Q40yyC4
-	hCwfbDSy0T9wFskJq8pdUKZ53/D6cqFopBY51//MMVPlk46RiLCYlrfQI6Pk+LxeRg==
-X-Gm-Gg: Acq92OFB4Mstu0KrD9TeR3x0vauJO4GA2pDdGCgYcik+xckg9JVpldioCHmenVtmGmG
-	2pN1uala/I4QKL2GjW05vIuukCQYAMktZVKwNex4vo4eN/b7Fz577IKN1yURo7vhKk0mdK45K0C
-	5zj8GoXuPUckerd30+UE2CJNjLa9yX2Gzi+zctbhEtKNaSzy0Z4KjWh7+yBhJJZ5HlqFG2xCKNu
-	Fpvt2tvXli2x5OjSxC7fyC7RHeF7q6Ub/sx3BpDSCblIsZFQ/2q+5vM7pPfoc6zHHhUYzh4S8gW
-	lDHmVsBwhaorCXytjo2JDRJ91nETB3b/kjknvKyZpNkhoVsFjC+/ugwVGac5oH8nW+UdMqDmfZ8
-	6NL7Gsq0BN/4+RLzwZSb3ShHbYSGLdUe1XTLmk//QLwHiIpkGfVgzZmCsvh8gnkQMuWyeO/nxY/
-	SeuTEnBZhCQQJHMNnIWOW810BVvwSLlrZ3DhEfjYLDU1SoyJUjKshKCkMMGViAzg==
-X-Received: by 2002:a05:600c:4ed3:b0:48f:de33:777a with SMTP id 5b1f17b1804b1-48ff4c84507mr85275e9.11.1778871261929;
-        Fri, 15 May 2026 11:54:21 -0700 (PDT)
+        bh=PNFlWNxHBBoOTkz1i9JncC0yIj0DqDbA8cq/UI1Bf44=;
+        b=JGqeO0CDxCS67fo81EHJwUCPXrT7JXpu+mnVDTeVr/Xws/yhs41aRNWQ2Z/Lct87Zs
+         riV8UI7V28B/+BKdkXePpN6uPr+XonwUPMLBpqRC/DimhWQrQYq/OntONMzNAKv4+1VA
+         utQh0FOTWtRn1zTa/X3xbFMX2rlN27t5q/Q6VniOYHzg5Di3e6yJilSNnWExXi6+NlTk
+         9UDyY+DyUeV/miWHlSoG35dxGuuO8DV9gvu9hZ99lYLdRE3ykrcZLvdO6RQdo+Orbav/
+         x0lug9y1JuvuJCZ4DaHTwcfi52D7HDdLP+52IJYQiqhiHctdaprjuUDi358Sa93QfCld
+         eRaA==
+X-Forwarded-Encrypted: i=1; AFNElJ/FXS3v/lnCAboSs30zesZ2jUWJiZWHmIN0Lnzebe5Cz/jEgD/2Hyz9+e5TRZoyvimj5o9l5Qw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwUW6DgvvN5MMY89RShaSpwpwVX7jNacgOo/Dfg++q9LS6D+Rv
+	f2/hLiIfofwXWR1WnhBKVZVwxp4WuSX5H3IcqGlz6nHAoYZmTI5PwkdVY497Ed12nA==
+X-Gm-Gg: Acq92OGrmih8aeiwswK5/E8d6UyEjjSAg8hbDlDOKhfjYhy9bwlOibYbAfkDRPsv8mn
+	gpgxXLgy4DGm60evj6mziesGErLzkfOAj74nK3UV8yeF3WDbJ0JaKMlmNUw6gJdSl+5KEtrs/Qb
+	fYKgE+qgB9x1hKcWXq/kR6+tt11SzV7TKAKcUgC9cH5suE34Ot7MNx2pKIyvDn3M/ljazIctNgb
+	PowMTQTu72cpUWOW+qq8ogmdLidjunzPHv/Dm1bXcMgLptXEa+VNKoDZA4bwILbeo9bsqNV8olS
+	vuYwDyJIJHBaZYWy3fyojQ6cdOYaI75iduBUV8GgkgHPVh9hbuF5vA/QJ+ahUDTt9bPczjeBBnM
+	Aszbuvi6YOKpPUcJJ1OLwvHxfZtVEIUoim6LpT5PF0gkluTo2X3sZQnYYJ86qkAcm+IHloOZQLc
+	7T866UuH7U5hBi3VD7GQdIfV8TQcBTUYVfVOzqBU/n5/sIMbd+o0KV+p+9Ht0mMw==
+X-Received: by 2002:a05:600c:605a:b0:48a:55dc:9c1e with SMTP id 5b1f17b1804b1-48ff4b2c3bfmr64135e9.10.1778871264521;
+        Fri, 15 May 2026 11:54:24 -0700 (PDT)
 Received: from localhost ([2a00:79e0:288a:8:7481:4dac:8e80:6e9b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe57943b2sm79586725e9.8.2026.05.15.11.54.21
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe79ce3sm20112695e9.31.2026.05.15.11.54.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 11:54:21 -0700 (PDT)
+        Fri, 15 May 2026 11:54:24 -0700 (PDT)
 From: Jann Horn <jannh@google.com>
-Date: Fri, 15 May 2026 20:54:08 +0200
-Subject: [PATCH 1/3] af_unix: Fix UAF read of tail->len in
- unix_stream_data_wait()
+Date: Fri, 15 May 2026 20:54:09 +0200
+Subject: [PATCH 2/3] af_unix: Simplify unix_stream_data_wait()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260515-unix-recv-wait-v1-1-76adb5f063d5@google.com>
+Message-Id: <20260515-unix-recv-wait-v1-2-76adb5f063d5@google.com>
 References: <20260515-unix-recv-wait-v1-0-76adb5f063d5@google.com>
 In-Reply-To: <20260515-unix-recv-wait-v1-0-76adb5f063d5@google.com>
 To: Kuniyuki Iwashima <kuniyu@google.com>, 
@@ -97,27 +96,27 @@ To: Kuniyuki Iwashima <kuniyu@google.com>,
  Simon Horman <horms@kernel.org>
 Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>, 
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jann Horn <jannh@google.com>, stable@vger.kernel.org
+ Jann Horn <jannh@google.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1778871255; l=5214;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1778871255; l=4212;
  i=jannh@google.com; s=20240730; h=from:subject:message-id;
- bh=1ep5ZLVgq0P6ZOuRIHNhve6Q35NR/xV4JtQP4fUWqVQ=;
- b=biFR0H5BnKM6bLseIWGzRNTfIvRlm/vD4ABNpEGL50UdomtRVOj4eqEfC+9PyYKMKMdKTjh0A
- rAlLz7dcLkAC2zvT+3nOa1m74jTU89NiW9kWrw5r0IALbjgMEdzGlgb
+ bh=5eaIm7oQrXrv26FV2waWzgjgidPzic9XkF5iTxDoZAA=;
+ b=6VwkbRKbXyM57UZcd+u9NRFFl6a2vqKgQ5vgB5wq6NdR+FNOk105mWuSrcOwz+9Bf2Z+LL7U7
+ XiNleUuhKGzCWlSfUq4kCilsFmjn9b9WtFSLwY6wfd01XIiUGPC3fl7
 X-Developer-Key: i=jannh@google.com; a=ed25519;
  pk=AljNtGOzXeF6khBXDJVVvwSEkVDGnnZZYqfWhP1V+C8=
-X-Rspamd-Queue-Id: CE4AF556845
+X-Rspamd-Queue-Id: E5CF455687C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DKIM_TRACE(0.00)[google.com:+];
-	TAGGED_FROM(0.00)[bounces-288426-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288428-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -129,147 +128,140 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jannh@google.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-unix_stream_data_wait() does skb_peek_tail(&sk->sk_receive_queue) without
-holding any lock that prevents SKBs on that queue from being dequeued and
-freed.
-This has been the case since commit 79f632c71bea ("unix/stream: fix
-peeking with an offset larger than data in queue").
-The first consequence of this is that the pointer comparison
-`tail != last` can be false even if `last` semantically refers to an
-already-freed SKB while `tail` is a new SKB allocated at the same address;
-which can cause unix_stream_data_wait() to wrongly keep blocking after new
-data has arrived, but only in a weird scenario where a peeking recv() and
-a normal recv() on the same socket are racing, which is probably not a
-real problem.
+The current implementation of unix_stream_data_wait() works like this:
 
-But since commit 2b514574f7e8 ("net: af_unix: implement splice for stream
-af_unix sockets"), `tail` is actually dereferenced, which can cause UAF in
-the following race scenario (where test_setup() runs single-threaded,
-and afterwards, test_thread1() and test_thread2() run concurrently in
-two threads:
-```
-static int socks[2];
-void test_setup(void) {
-  socketpair(AF_UNIX, SOCK_STREAM, 0, socks);
-  send(socks[1], "A", 1, 0);
-  int peekoff = 1;
-  setsockopt(socks[0], SOL_SOCKET, SO_PEEK_OFF, &peekoff, sizeof(peekoff));
-}
-void test_thread1(void) {
-  char dummy;
-  recv(socks[0], &dummy, 1, MSG_PEEK);
-}
-void test_thread2(void) {
-  char dummy;
-  recv(socks[0], &dummy, 1, 0);
-  shutdown(socks[1], SHUT_WR);
-}
-```
+ - unix_stream_read_generic() grabs locks
+ - unix_stream_read_generic() determines that the read must block
+ - unix_stream_read_generic() drops locks
+ - unix_stream_data_wait() sets up a wait_queue_entry
+ - unix_stream_data_wait() rechecks that the read must still block, with
+   less locking protection than unix_stream_read_generic()
+ - unix_stream_data_wait() waits, then loops back to recheck again
 
-when racing like this:
-```
-thread1                       thread2
-unix_stream_read_generic
-  mutex_lock(&u->iolock)
-  skb_peek(&sk->sk_receive_queue)
-  skb_peek_next(skb, &sk->sk_receive_queue)
-  mutex_unlock(&u->iolock)
-                              unix_stream_read_generic
-                                unix_state_lock(sk)
-                                skb_peek(&sk->sk_receive_queue)
-                                unix_state_unlock(sk)
-  unix_stream_data_wait
-    unix_state_lock(sk)
-    tail = skb_peek_tail(&sk->sk_receive_queue)
-                                spin_lock(&sk->sk_receive_queue.lock)
-                                __skb_unlink(skb, &sk->sk_receive_queue)
-                                spin_unlock(&sk->sk_receive_queue.lock)
-                                consume_skb(skb) [frees the SKB]
-    `tail != last`: false
-    `tail`: true
-    `tail->len != last_len` ***UAF***
-```
+That seems needlessly complicated; and it also involves an ugly comparison
+between a potentially-dangling `last` pointer and another
+potentially-dangling `tail` pointer.
 
-Fix the UAF by removing the read of tail->len; checking tail->len would
-only make sense if SKBs in the receive queue of a UNIX socket could grow,
-which AFAIK is not supposed to happen.
+Instead, let's set up a wait_queue_entry
+while the locks grabbed by unix_stream_read_generic() are still held, and
+after the wait, directly retry the read.
 
-Fixes: 2b514574f7e8 ("net: af_unix: implement splice for stream af_unix sockets")
-Cc: stable@vger.kernel.org
 Signed-off-by: Jann Horn <jannh@google.com>
 ---
- net/unix/af_unix.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ net/unix/af_unix.c | 49 ++++++++++++++-----------------------------------
+ 1 file changed, 14 insertions(+), 35 deletions(-)
 
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 1cbf36ea043b..dc71ed79be4a 100644
+index dc71ed79be4a..b38804e2c5ac 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -2711,8 +2711,7 @@ static int unix_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+@@ -2710,39 +2710,22 @@ static int unix_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+ /*
   *	Sleep until more data has arrived. But check for races..
   */
- static long unix_stream_data_wait(struct sock *sk, long timeo,
--				  struct sk_buff *last, unsigned int last_len,
--				  bool freezable)
-+				  struct sk_buff *last, bool freezable)
+-static long unix_stream_data_wait(struct sock *sk, long timeo,
+-				  struct sk_buff *last, bool freezable)
++static long unix_stream_data_wait(struct sock *sk, long timeo, bool freezable)
++__releases(&unix_sk(sk)->iolock)
++__releases(&unix_sk(sk)->lock)
  {
  	unsigned int state = TASK_INTERRUPTIBLE | freezable * TASK_FREEZABLE;
- 	struct sk_buff *tail;
-@@ -2725,7 +2724,6 @@ static long unix_stream_data_wait(struct sock *sk, long timeo,
+-	struct sk_buff *tail;
+ 	DEFINE_WAIT(wait);
  
- 		tail = skb_peek_tail(&sk->sk_receive_queue);
- 		if (tail != last ||
--		    (tail && tail->len != last_len) ||
- 		    sk->sk_err ||
- 		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
- 		    signal_pending(current) ||
-@@ -2921,7 +2919,6 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 	int flags = state->flags;
- 	bool check_creds = false;
- 	struct scm_cookie scm;
--	unsigned int last_len;
- 	struct unix_sock *u;
- 	int copied = 0;
- 	int err = 0;
-@@ -2967,7 +2964,6 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+-	unix_state_lock(sk);
+-
+-	for (;;) {
+-		prepare_to_wait(sk_sleep(sk), &wait, state);
+-
+-		tail = skb_peek_tail(&sk->sk_receive_queue);
+-		if (tail != last ||
+-		    sk->sk_err ||
+-		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
+-		    signal_pending(current) ||
+-		    !timeo)
+-			break;
+-
+-		sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+-		unix_state_unlock(sk);
+-		timeo = schedule_timeout(timeo);
+-		unix_state_lock(sk);
+-
+-		if (sock_flag(sk, SOCK_DEAD))
+-			break;
++	prepare_to_wait(sk_sleep(sk), &wait, state);
++	unix_state_unlock(sk);
++	mutex_unlock(&unix_sk(sk)->iolock);
+ 
+-		sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+-	}
++	sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
++	timeo = schedule_timeout(timeo);
++	sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+ 
+ 	finish_wait(sk_sleep(sk), &wait);
+-	unix_state_unlock(sk);
+ 	return timeo;
+ }
+ 
+@@ -2955,7 +2938,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 	skip = max(sk_peek_offset(sk, flags), 0);
+ 
+ 	do {
+-		struct sk_buff *skb, *last;
++		struct sk_buff *skb;
+ 		int chunk;
+ 
+ 		unix_state_lock(sk);
+@@ -2963,7 +2946,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 			err = -ECONNRESET;
  			goto unlock;
  		}
- 		last = skb = skb_peek(&sk->sk_receive_queue);
--		last_len = last ? last->len : 0;
+-		last = skb = skb_peek(&sk->sk_receive_queue);
++		skb = skb_peek(&sk->sk_receive_queue);
  
  again:
  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-@@ -3001,8 +2997,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+@@ -2989,15 +2972,13 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 			if (sk->sk_shutdown & RCV_SHUTDOWN)
+ 				goto unlock;
  
- 			mutex_unlock(&u->iolock);
+-			unix_state_unlock(sk);
+ 			if (!timeo) {
+ 				err = -EAGAIN;
+-				break;
++				goto unlock;
+ 			}
  
--			timeo = unix_stream_data_wait(sk, timeo, last,
--						      last_len, freezable);
-+			timeo = unix_stream_data_wait(sk, timeo, last, freezable);
+-			mutex_unlock(&u->iolock);
+-
+-			timeo = unix_stream_data_wait(sk, timeo, last, freezable);
++			/* does unix_state_unlock() and drops u->iolock */
++			timeo = unix_stream_data_wait(sk, timeo, freezable);
  
  			if (signal_pending(current)) {
  				err = sock_intr_errno(timeo);
-@@ -3019,7 +3014,6 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+@@ -3013,7 +2994,6 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 
  		while (skip >= unix_skb_len(skb)) {
  			skip -= unix_skb_len(skb);
- 			last = skb;
--			last_len = skb->len;
+-			last = skb;
  			skb = skb_peek_next(skb, &sk->sk_receive_queue);
  			if (!skb)
  				goto again;
-@@ -3094,7 +3088,6 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+@@ -3087,7 +3067,6 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 				break;
  
  			skip = 0;
- 			last = skb;
--			last_len = skb->len;
+-			last = skb;
  			unix_state_lock(sk);
  			skb = skb_peek_next(skb, &sk->sk_receive_queue);
  			if (skb)
