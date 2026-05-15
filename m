@@ -1,139 +1,283 @@
-Return-Path: <netdev+bounces-288294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288295-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IGIOC+QNB2oLrAIAu9opvQ
-	(envelope-from <netdev+bounces-288294-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 14:13:24 +0200
+	id MJIOKrQMB2oLrAIAu9opvQ
+	(envelope-from <netdev+bounces-288295-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 14:08:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF7054F3FF
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 14:13:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42ED754F174
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 14:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E6AC731B3515
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 11:59:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F1EEF300D1EA
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 269843ECBC7;
-	Fri, 15 May 2026 11:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD86480DF5;
+	Fri, 15 May 2026 11:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rasTR9ev"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IeZ6kBXM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010041.outbound.protection.outlook.com [52.101.46.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D409D46AED7;
-	Fri, 15 May 2026 11:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778846332; cv=none; b=GhAq1R6tJAB4pMbrHp/g0irci3ROlX0b9wKHHOhPQ308sp3jKB12Wtz7w3c2tPcFr/B8v+CQk1+Y+2i6TFvzwUjEZKbOCNFZU5Y5vfoBoCRiLAANB1bbkdR3JSc6abGf1Mu4f0KL6VkZz7OEyGFIvvWnsGkaw2uiUMWWRbnI74Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778846332; c=relaxed/simple;
-	bh=oLmBSNOfIkDmPgapk2694FIdy9WMHOyezDfDMzK8p8E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WOrIDnvCL5X/gDGX2k+Adbl742Y6/6ERO7dFUoKEmMoWIp8YfQzPzXy1agpdmesDjxJMlbKZLiT1+PKg2faqCXnD5qZqZAkm5RRW8G6g/pWqxAG85lv218MPIILqQl44d8tvLXBMqEem/t9JM+nr0+jMDNu5u31Kok8Ldu8HxcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rasTR9ev; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tED5dwnj315XjkrIWNQbx34834+SR14pbuCDCqP1fp8=; b=rasTR9evdB4dfCLMjM38qWDGj1
-	bT02YPoZDRO6VV6bIgLy6E+0pxgrHtxk0XFhjeOvm0mDijBy5NmECTkswXzikpfGF5hFus2dCAm+p
-	fzVRL5e28EtFNXn4PQCYbTkPlQBmN1TKXSctPr1rc/ejXk/4VQphRvbiaVwu8AZosntg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wNrBO-0033c2-Pz; Fri, 15 May 2026 13:58:22 +0200
-Date: Fri, 15 May 2026 13:58:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ding Hui <dinghui1111@163.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>,
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>,
-	open list <linux-kernel@vger.kernel.org>, dinghui@lixiang.com,
-	xiasanbo@lixiang.com, yangchen11@lixiang.com,
-	liuxuanjun@lixiang.com
-Subject: Re: [PATCH] net: stmmac: fix fatal bus error on resume by
- reinitializing RX buffers
-Message-ID: <e731631e-53f3-484b-994d-4b551f241d05@lunn.ch>
-References: <20260515053856.2310369-1-dinghui1111@163.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B42F480341;
+	Fri, 15 May 2026 11:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778846385; cv=fail; b=IsPNJT0TKrdSV5HAJJPswxmSMwdreoI+gF/jeGz5SAQfss57xuZTxXLmyVzfBnum36FbvLU3JTz6EetDntu4mE7nNjggSahJClJTBXDWvZYQ42X2gF2+r4S9vD/ThI8TdZ+FHnRLuJeRdzui66YGsM9Ok0Fu64aKRvn60ylCBFw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778846385; c=relaxed/simple;
+	bh=nP6fgBNmdi497U+VRtT35OaY2EaVSNnbRDNttg3HBfU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=GhCQsqhz40IhUq6J48Jt5Hgj0aeiyEcWt8d8T51VwBs2XThNlQip2drlxClJ2lMS+awVeEfo0VUPLqEwatdbeM4tPL0xbDKRjWqhehv6eatZNti5KU3Wg+IB7vnYk45t3D1JC0lVP/VL9PIgoGkzt+5jvahmGEYvz+NcUuVnkBg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IeZ6kBXM; arc=fail smtp.client-ip=52.101.46.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DklaTh9tpGxU736TOv5gytabggvGsEb68mDGCN4aKSpKe5817yJzZHS+wc/MguaQ9HzTk4dOnd6NMRtSbumyOpJzr6VtWLVTEQEzqkhif2L5ayuRDus/ucKVaGOH3ZvIvu8OFEFLIkOLxCMHPvAkw5+joE+YD74/8svZfZaBEt5IBSTCGMA5BynjJLp9RTwV0cC6WRRbr6usSqzFECVJEH5lUrzKJR5JWHj3xyGWjnpDmbUD2HTDyaPIsp+3u6arNmeWpLYG6LwXVT5PSOSyScCcDE3hDofjD/OBCjOrTpaVdEXc+frSWx40avRsmjCNCXhQm4jHNi9cH9p2UmeRlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HpXfgFPkfFCR5HrATfwkbEHvc9Eh7GSdzPEEfYIVBWc=;
+ b=w1+Ba8GU247wP/nlJSyEhHwnUM8EtY2WH2ntkWPZYBFyJk2CVm72qo9+haHFAo0TYAw3N0zhoQJXhO+GRXOqGVgdnX3nHfH35unz0WmdeEPescHi8QgTaQiFyMHdmnyl1XqoIk7O5x293NCzUaiJXkG5/rKUHCRgnOtFacAoNM6+vyqwUEiNjF3r8+znFwsn5i9nAbx8mxCmqDQDpfRwX5BxsOCJBj1aJyDgB2yH54s68VqzM/WPWrG+CaHkAf9jhWDFcw5Y++DNftxERFsEGlb8807A7X46aOH/QLvBMLxX/bvR2aFMyaiTlTJFCuZRc7hB849FfMPkIciaK8UBoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HpXfgFPkfFCR5HrATfwkbEHvc9Eh7GSdzPEEfYIVBWc=;
+ b=IeZ6kBXMOnvq9aAGfpt5O1S7JQ0lqej3pRR8qSjQny/Av1phf6fFi8ENve+A8hBmUwAaflQgxZTBD3bUgy5KXwm4raIOYZ6LP3KrASt4wOO4jDqcyLR7uVFjIZFnakm11ewSztUU+ZqNR6fnUD8TAZvFanRZL+gpf5NcdCeDjJmwYqPVbjqNFwVhNn0b4Fayr4Vrf4GEHf/bi9sTrvvS9POdueYhasBvj4TIPFfPGPZSVMHZex1T2sx+gCgYJcq4dJa8Ck/xQmVoCizC7ZUMMuUXqBaxs9wboDjvUUK46gh4VWOSRdnStsb8s1e6LAAtRO65hT4WQu3fiNBBvuLkNQ==
+Received: from MN2PR15CA0065.namprd15.prod.outlook.com (2603:10b6:208:237::34)
+ by IA1PR12MB9468.namprd12.prod.outlook.com (2603:10b6:208:596::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.12; Fri, 15 May
+ 2026 11:59:38 +0000
+Received: from BN3PEPF0000B06E.namprd21.prod.outlook.com
+ (2603:10b6:208:237:cafe::dc) by MN2PR15CA0065.outlook.office365.com
+ (2603:10b6:208:237::34) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9913.14 via Frontend Transport; Fri,
+ 15 May 2026 11:59:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN3PEPF0000B06E.mail.protection.outlook.com (10.167.243.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.71.0 via Frontend Transport; Fri, 15 May 2026 11:59:38 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 15 May
+ 2026 04:59:21 -0700
+Received: from [10.125.206.85] (10.126.230.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 15 May
+ 2026 04:59:16 -0700
+Message-ID: <d287f657-1f73-4178-8f9b-190ef7e855e5@nvidia.com>
+Date: Fri, 15 May 2026 14:59:09 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260515053856.2310369-1-dinghui1111@163.com>
-X-Rspamd-Queue-Id: 8FF7054F3FF
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/8] net/mlx5: Use v1 response layout for
+ query_esw_functions
+To: Simon Horman <horms@kernel.org>, <tariqt@nvidia.com>
+CC: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <saeedm@nvidia.com>,
+	<leon@kernel.org>, <mbloch@nvidia.com>, <agoldberger@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <gal@nvidia.com>, <dtatulea@nvidia.com>
+References: <20260510053448.326823-3-tariqt@nvidia.com>
+ <20260514191801.12494-2-horms@kernel.org>
+Content-Language: en-US
+From: Moshe Shemesh <moshe@nvidia.com>
+In-Reply-To: <20260514191801.12494-2-horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06E:EE_|IA1PR12MB9468:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45985f2a-1f00-49e9-33c8-08deb27970c3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|376014|1800799024|7416014|13003099007|22082099003|18002099003|56012099003|3023799003|11063799003|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	FrlBWBi5DuGGEr5RXDMATRSuvi1HdcTqTjcF+Ch2J3pfc+Rx8XjXZvwvg2M0eJ7X0965scTuFTs7T1kipSvd9fzKg0oyiQW5bV2pg61Ikp/dSDHlNEPeSe7L4PJWNdyZPKyb5NYNR/iqp8f9D4Vhy8TYYLOLEUkXuqA1VImgD8Mx+9PReinrqc0UYNlMCT5lQ3gi5+Y5f9tm+czBeOg0Py7K4o/c0W2KhDsScpqRmhMsYEFzCi/UfaeWOElXRcQJ6QU0PSLzVEt/fEZHtxBtfTtBPkPlpMqHQZ2mGD8ouVPYGgTv0wIiFBPro6ZaxB1JD8CKjSUtGKFThN0N5UoU//Daw+mZxIdn8Bbyo5B2RVcqZFUmd6VzkHMxVP7T+L5HvEQ+1T7YapsyuHaf9q2e70Obv0QCGDz4jln9UcFszceNHpPNVASRPwhPjOBOfVfwFkRfNmeC9eG7UAZdoGn4ZGc+l2avqGjYIJXYC9L6/gROV0uqIN3p0f+Cten8icYisSnq4Ecn3sBsMXO2XSWGd1MSukpy3EZSOL6GYgra+AAaVBmZtsBdBiofX0cCFDM+HaVk2/LMfcl20ehqt4X9EAwADHjebWbd0mElQE2ASlNfJOy7/T5f+13F2vsOi3PKn4zvH/0d5uO77jenJiXMau60GphBBRCsigt8PAGipiN76xy1aAJ5lgt/ge0+dlva
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(376014)(1800799024)(7416014)(13003099007)(22082099003)(18002099003)(56012099003)(3023799003)(11063799003)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	8x49kfxDgj0+1pgPfNnTZJvckqENrbF5OrTWRye+Mr3LVpnoeiqu2wXoKWD3rkzFg2NbGNWk/lC6PPsfrT4vnFNXOgSrM2pdZMT5Yv1dZKFUIOy7ThKpGMJKhRoIR3maNIw6Gpy4DoRYSNrxrT+Wbh7E0ej2oyPecy1l7EFmsbcfCQZNHk9ua7n7DSo7vXA6F6CbTADX0Yj+mUPhRV4kc7YZAqmMTNiSKYZtaXp13+tZL3JUm4qsCENoxcCrhEg+rKfKHp5BO7FzVW8mCaOU/atNEa97XphJZjcSnMiaDWFv7sZPYlRQkG7T4SnQeU4ocegESFQyj3r59hiJNKXqTMR0oHpQA26KUfwsx2jKB3YWVZFbDL5QhEuoDJO4JzK2lnhE6WiI7mCROsaPLRCXGqWQj4XWieWXPBEXkvyzoIaHOx866I0Z0/R4DmefPgvI
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2026 11:59:38.3867
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45985f2a-1f00-49e9-33c8-08deb27970c3
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B06E.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9468
+X-Rspamd-Queue-Id: 42ED754F174
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288294-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[163.com];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lixiang.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288295-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[moshe@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-> Fix this by treating the RX ring the same way as on close/open around
-> a PM transition:
+
+
+On 5/14/2026 10:18 PM, Simon Horman wrote:
+> From: 'Simon Horman' <horms@kernel.org>
 > 
->  - In stmmac_suspend(), after stmmac_stop_all_dma(), walk every RX
->    queue and free its buffers via dma_free_rx_xskbufs() when an XSK
->    pool is attached or dma_free_rx_skbufs() otherwise, then reset
->    rx_q->buf_alloc_num and clear rx_q->xsk_pool so the queue state
->    matches a freshly closed queue.
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> net/mlx5: Use v1 response layout for query_esw_functions
 > 
->  - In stmmac_resume(), call init_dma_rx_desc_rings() before
->    stmmac_reset_queues_param() so RX buffers are re-allocated and
->    the descriptor buffer-address fields are properly repopulated
->    before the DMA is restarted.
+> This patch teaches mlx5_esw_query_functions() to use the v1 response
+> layout (MLX5_QUERY_ESW_FUNC_OP_MOD_LAYOUT_V1) when the firmware
+> advertises query_host_net_function_v1, allocates the output buffer
+> based on query_host_net_function_num_max, and adds a parser for the
+> new network_function_params layout in mlx5_esw_get_host_pf_info().
+> 
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+>> index 861e79ddb489..8b62dde7eb70 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+> 
+> [ ... ]
+> 
+>> @@ -1100,12 +1133,55 @@ mlx5_esw_host_pf_from_host_params(const void *entry)
+>>        };
+>>   }
+>>
+>> -struct mlx5_esw_pf_info mlx5_esw_get_host_pf_info(const u32 *out)
+>> +static struct mlx5_esw_pf_info
+>> +mlx5_esw_host_pf_from_net_func_params(const u8 *entry, int num_entries)
+>> +{
+>> +     int i;
+>> +
+>> +     for (i = 0; i < num_entries; i++) {
+>> +             int pf_type, state;
+>> +
+>> +             pf_type = MLX5_GET(network_function_params, entry, pci_pf_type);
+>> +             if (pf_type != MLX5_PCI_PF_TYPE_EXTERNAL_HOST_PF) {
+>> +                     entry += MLX5_UN_SZ_BYTES(net_function_params);
+>> +                     continue;
+>> +             }
+>> +
+>> +             state = MLX5_GET(network_function_params, entry, vhca_state);
+>> +
+>> +             return (struct mlx5_esw_pf_info) {
+>> +                     .pf_disabled = state != MLX5_VHCA_STATE_IN_USE,
+> 
+> [Medium]
+> The commit message says "this change does not introduce new
+> functionality," but the legacy parser reads an explicit firmware
+> host_pf_disabled bit while the v1 parser derives pf_disabled from a
+> multi-valued vhca_state enum:
+> 
+>    .pf_disabled = state != MLX5_VHCA_STATE_IN_USE,
+> 
+> Is this mapping intended to be exactly equivalent to the legacy
+> host_pf_disabled bit across all five vhca_state values
+> (INVALID/ALLOCATED/ACTIVE/IN_USE/TEARDOWN_REQUEST)?
+> 
+> The same vhca_state value is interpreted differently elsewhere in
+> mlx5 for SFs. mlx5_sf_to_devlink_opstate() in
+> drivers/net/ethernet/mellanox/mlx5/core/sf/devlink.c reports:
+> 
+>      case MLX5_VHCA_STATE_IN_USE:
+>      case MLX5_VHCA_STATE_TEARDOWN_REQUEST:
+>              return DEVLINK_PORT_FN_OPSTATE_ATTACHED;
+>      case MLX5_VHCA_STATE_INVALID:
+>      case MLX5_VHCA_STATE_ALLOCATED:
+>      case MLX5_VHCA_STATE_ACTIVE:
+>      default:
+>              return DEVLINK_PORT_FN_OPSTATE_DETACHED;
+> 
+> so SFs in TEARDOWN_REQUEST are reported as ATTACHED, while a host
+> PF in TEARDOWN_REQUEST would now end up as pf_disabled = true and
+> therefore DETACHED via mlx5_devlink_pf_port_fn_state_get():
 
-The problem with this is, if the system is under memory pressure, it
-might not be able to allocate the new RX buffers. So on resume, your
-network interface dies.
+PFs do not use the state TEARDOWN_REQUEST.
+Once the ECPF sets the PF disbale_hca, it is down and can't be used till 
+ECPF does PF enable_hca.
+So state != MLX5_VHCA_STATE_IN_USE is the equivalent to the legacy 
+host_pf_disabled.
 
-For configuration changes which require buffers to be change, like
-ethtool --set-ring, sometimes changing the MTU, you first allocate the
-new buffers, and only if successful do you free the old buffers, so
-that you can gracefully fail.
+> 
+>> +                     .num_of_vfs = MLX5_GET(network_function_params,
+>> +                                            entry, pci_num_vfs),
+>> +                     .total_vfs = MLX5_GET(network_function_params,
+>> +                                           entry, pci_total_vfs),
+>> +                     .host_number = MLX5_GET(network_function_params,
+>> +                                             entry, host_number),
+>> +             };
+>> +     }
+> 
+> [Medium]
+> pf_disabled also feeds esw_vfs_changed_event_handler(), which skips
+> VF reload when it is true:
+> 
+>> @@ -3716,7 +3716,7 @@ static void esw_vfs_changed_event_handler(struct mlx5_eswitch *esw)
+> [ ... ]
+>> -     host_pf_info = mlx5_esw_get_host_pf_info(out);
+>> +     host_pf_info = mlx5_esw_get_host_pf_info(esw->dev, out);
+>>        new_num_vfs = host_pf_info.num_of_vfs;
+>>
+>>        if (new_num_vfs == esw->esw_funcs.num_vfs || host_pf_info.pf_disabled)
+> 
+> Could the commit message spell out the firmware/PRM mapping between
+> the legacy host_pf_disabled bit and the vhca_state enum so it is
+> clear that ACTIVE, ALLOCATED and TEARDOWN_REQUEST really should be
+> treated as disabled here?
 
-That free and then release idea does not work for resume.
+Yes, I can add explanation on that in commit message.
 
-So, can you live with the buffers you have, and just reset the
-descriptors?
+> 
+> Would it also be worth aligning with mlx5_sf_to_devlink_opstate()
+> (at least for TEARDOWN_REQUEST) so the devlink opstate reported via
+> mlx5_devlink_pf_port_fn_state_get() stays consistent between SFs and
+> host PFs on v1-capable firmware?
 
-	Andrew
+Same answer as first comment above.
+
+
 
