@@ -1,166 +1,169 @@
-Return-Path: <netdev+bounces-288312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MGEaGIobB2rnrgIAu9opvQ
-	(envelope-from <netdev+bounces-288312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 15:11:38 +0200
+	id 8EYcGxgyB2qQswIAu9opvQ
+	(envelope-from <netdev+bounces-288313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:47:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCB8C5503F0
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 15:11:37 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C758551A6D
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CA8173006B2D
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 13:05:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9D8AB30C93D8
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 13:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D959B2D3A60;
-	Fri, 15 May 2026 13:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628B52868A7;
+	Fri, 15 May 2026 13:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAq8Th8I"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b="ZK96z2wW";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b="FUnauE+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
+Received: from acj35aaf123.lhr1.oracleemaildelivery.com (acj35aaf123.lhr1.oracleemaildelivery.com [130.35.116.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732CD2236EB
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 13:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A576530674B
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 13:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.35.116.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778850326; cv=none; b=VvK+cJ/MQFhL0B13yzPF0KFqAv9V3OvDMa/v0wnVRCS8FtbC0Db9NgklLj0MGABmDyk0cVaJSE2PrhzNsbN2+dD8bSZYX/mQ8w4KkyMJtQRDbXoMHGiJnZxprmSwoLPaUKpA3yM42pfvXdurQtF+ESNtSj6A+bUy9kLdneHcADE=
+	t=1778850533; cv=none; b=VubqHCSw0BTi0RUM02MnfWYnBbofs8iQPJ3WHxXt/br676FinZQj2s4L8Pzz0NA1qAHgGRPH76sssiIx4UX3m6p+Ykwq0MWfSfCKCjr9zD35jzn/7PF9f/BY2tVadEcQopUpUEMilb/eH3Z5L4W19UOc+DV1R5aRSedvZqAyIqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778850326; c=relaxed/simple;
-	bh=honIpHjQXRaEfjMyiAeWROXCZ8T2OieqleA+mRE/X1k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d2A8xZMNavqXBq36g/GL4ehwW99yl/VVKnFbth8VsqGbfR4C9/QgEnqfrs3F4stq1UYn6WWXf99MWcUBfmFA3sYDmR+vYdYIfgU/Ka1Qsa5qdO+8s03PYahy6p4eyd66gqSviMqwAL7vN0kXH8cRjI9PNxqy9mP86AIcZMf40BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WAq8Th8I; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-632a055fa9fso2386700137.1
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 06:05:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778850324; x=1779455124; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qpx8RNnGHJ9ymqlzPRNI9N2p4opJtjSN86qDmoFZ1hs=;
-        b=WAq8Th8IkNwUEg7G+VyKMI/si1veYwNhUa4R8DhH9YWz8gAeR2h48zsFikABHVmpO7
-         EC8kC8xZ1OGUvgNLRxov0R5E1P4JzKs7PvXtg1+es7QoMBJDkc0LRtf5kFu3of25B2za
-         jCmYajzf2WdAaHvzqERVEYNeiMkBxK3yr8qzp9VCeA5TFx7cPMd35dzAqajWv9RnpxOm
-         TcTvXAx3YZU5aiJP0dPEbVP64tCo2F5Z5g6p51RJ1rtHi/udMqWoEwWifZksvbf6/Y80
-         xZZcpqT2yPAx2Go2/OaYDv9ejPTF6RHaF0UH5IQhdB2Z6HD3wPSPGfR7dAzLrTcPQegH
-         zIFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778850324; x=1779455124;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qpx8RNnGHJ9ymqlzPRNI9N2p4opJtjSN86qDmoFZ1hs=;
-        b=jD9webggyp6SqlfC79DDeINigj9xMW9GW833Q3vVcl2lrtR1peFMm9MH3sVRqEPZRs
-         Zbxvf3BGPTTnATTwSl6Yy6B6etE4bqJqY92c8VUV55ZfbqalMsnZM1kBTz9Q5PzguURg
-         toBlDiEmpyS3NunX1tLfKC0PsxGVkBQOWNbAnD5wNgk4XjIutf4bcaOtNgEGLrq3y2NI
-         c9WYAkaiyESPWaSSu6bt+FKShrQkjM+XAsqeA/0xGpnGUeB1wpofgyXmyzENFgSorqs8
-         te35iXF66vyYSA/xggD+hy6FuE04Joc1G4/cpKjry7S34X+bAE8sx1OobLmaqij5l0Wj
-         2hmA==
-X-Forwarded-Encrypted: i=1; AFNElJ9P1aDZyGnGxFaIjtzUIenAEx8XwoMDCz3SIopm9CWggaJF3BRpjo7f5rZEuJpjj7lwx6TKzbw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+xkkiG2u9gep6cv2uhlLCrxWCl8VKB9wxK3PFfviIXKbsIbd1
-	8+foNS/vtmGVtPHtYhNhXoJQrls0V6V4Mn4IraGt8n9AuuDeq2UqFMiO
-X-Gm-Gg: Acq92OGG7kLZHfphTUHt2+WRRXeiA1qU5pR6GBopad2quwbnj9iEJdKyyJbVAhj8FrZ
-	VMEAyz+pp0BRzKjCdxTlA9rOG42cNHU3URDeaeamWUVbCenp7WC6hbAnGbQnPcbi1AzKL40euHG
-	L0cHoDkBv/3q7zrfWHe75s0UC+5xKW6/bMXjIQNWiJ2LLqZEzzajrj+yGuRARLYeWoIc2AB6Qhf
-	1QkiEYVoGS5YUa/7q7sDV1zVhxQIwmLg0RHF0oOqiDtsy+s1JaIS7e/Hq095OSQsfrimiQZu65T
-	Ly9+PJRYjjVmAwjg+YKNAa06lEvfpmrqp/0kLyTrKVuBCvEdYD0SWLyzyT0LMHup3fyLwZAqrSp
-	cZqmShJ9b4D13Kabq2MGW8+uf+3xW2IMpZWLbQs21HZ3lpYZcCxNcn7hIZ30RHPWT/NY9E6Q/ga
-	J0PtxDmMsi37JVlyHAZ+B+j+tZ7F2brqxFx3xwkHq1bpCaG6GUMbQ=
-X-Received: by 2002:a05:6102:304d:b0:62f:2f1f:599b with SMTP id ada2fe7eead31-63a3d21f6e7mr1756693137.7.1778850324210;
-        Fri, 15 May 2026 06:05:24 -0700 (PDT)
-Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-910ba181322sm541982685a.7.2026.05.15.06.05.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 06:05:23 -0700 (PDT)
-From: Yuho Choi <dbgh9129@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yuho Choi <dbgh9129@gmail.com>
-Subject: [PATCH v2] ipv6: route: Unregister netdevice notifier on BPF init failure
-Date: Fri, 15 May 2026 09:05:17 -0400
-Message-ID: <20260515130517.779406-1-dbgh9129@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1778850533; c=relaxed/simple;
+	bh=fhyHfyW5NgKKHtnkNTA8/XP0rmI/Np861eMFIdMbxAE=;
+	h=From:To:Cc:Subject:Date:Message-id:In-reply-to:References:
+	 MIME-version:Content-type; b=oUDWY3FB/xDWoX3Xq3OGvYl6OsYlGPTeVmXE/gMgKxMaSFpToTcuzsuy5jkPyrXnsSmDo8pySrKUgLRMqlv5ql9RU/yXhhCE1G7MdOYfORNw9WObJbpIY7G7gKiXDKPuzSoyLujjNSYiDJ2WFmi7Fhg7jbafjOf6Fhj4KjTHlDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com; dkim=pass (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b=ZK96z2wW; dkim=pass (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b=FUnauE+I; arc=none smtp.client-ip=130.35.116.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=oracle-uk-012026;
+ d=raczylo.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=WmCkvmN6o6bO9QADm6W/QC4PRSk13s/99dA2BWd17CM=;
+ b=ZK96z2wWLtcgsms7cW9HgLYLPhYwqbfZ+L4Hox6lZXc3uYpGVv49ni1N0aVVJGKJd1ivE6DTLJHE
+   fWX/GsYz8GsC7FYU6V6RaDivdQt6/rf+Q6V638tYsVcOnue9m84od18porbpCMnLo2EsKTtdTdxp
+   phGyEFsnhyj6LSHA4z0j58MiFKqDhh200Lpk04vZpyVkIqzA1wqnBV0C3QOwxutYEr8WBRr8eWKT
+   Z93b0R6BymLoA3UCssj3HHL3+OQwmQOiFhc+ycUWsl8fOJDWlMi9h/Vk1GZSjNlRJZnzSeO1b52q
+   ApQMdJOQsNaS9qnyIpy6l/9tSe9ReiWrWRKqBw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=prod-lhr-20191104;
+ d=lhr1.rp.oracleemaildelivery.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=WmCkvmN6o6bO9QADm6W/QC4PRSk13s/99dA2BWd17CM=;
+ b=FUnauE+IcHzKNv1NWpI3gInAWC307+jB9iEcl4VeNd0BwkCtzeD5MVjd3kccUG9yuS1CY527t8G1
+   IWAF0bNABu1BOTyLuFCQj8XPRmpqqxroLurzuWe0x64/bC5QjsdtluWKguE9KXwTBWtNJR1jgYYo
+   GoNoOc+misW24uEoLxUPJJdGxBI5C5TjLYpuOT6K4HgtJCkJxtSfHhe7vpiGOf/aaX1LsIt3l5eT
+   rwJVWdG/KkW+ZxFx619oqMyGXpmI1eHy479vi14IjNnRsBQACzl/gbxeHap0aDJfRjZmu6tctsph
+   aBLd4LvdSycPpV+VX4m+QoeYQE7RMf2B/HpPSw==
+Received: by omta-ad2-fd1-1401-uk-london-1.omtaad2.vcndplhr.oraclevcn.com
+ (Oracle Communications Messaging Server 8.1.0.1.20260212 64bit (built Feb 12
+ 2026))
+ with ESMTPS id <0TF21VYGOXUQAXA0@omta-ad2-fd1-1401-uk-london-1.omtaad2.vcndplhr.oraclevcn.com> for
+ netdev@vger.kernel.org; Fri, 15 May 2026 13:08:50 +0000 (GMT)
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+From: Lukasz Raczylo <lukasz@raczylo.com>
+To: netdev@vger.kernel.org
+Cc: Theo Lebrun <theo.lebrun@bootlin.com>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,	linux-rpi-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v2 3/3] net: macb: add TX stall watchdog to
+ recover from lost TCOMP interrupts
+Date: Fri, 15 May 2026 14:08:49 +0100
+Message-id: <20260515130849.920-1-lukasz@raczylo.com>
+X-Mailer: git-send-email 2.54.0
+In-reply-to: <20260514215459.36109-4-lukasz@raczylo.com>
+References: <20260514215459.36109-1-lukasz@raczylo.com>
+ <20260514215459.36109-4-lukasz@raczylo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: CCB8C5503F0
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8bit
+Reporting-Meta:
+ AAFF3HPCkK227CD7Se5cCyOO/blLikgODObmwE6SfhbsjUFD20BWLFJliQfsfrvY
+ BFb1EX9GcB+16PC4cMFuM4XkUsoI59cMbEc0dTguTmLh8AztN1yrID+AhpyrA/6E
+ oPw85TvWYEiAfAkoBNIvtKaV7qx0LP+FR8DKM1j0BK1QpthmUcjS4BDqu3rjixHj
+ J1Z6d3jrYjIqUkOFqmOhWHv/562DrGjmqiLO5+29OxYrL3hVQOkFxFRt/w8cDfWH
+ CYtJjeNaD01vIzwy0bxLZWFpkmwjnFbf3EsKdqpQfiqzWkdkNRAuuokBLC+MwCoC
+ 56xJY+PEVnOzRE10ZDMLFJBRtYVz6FORJJKr53YcmZTs72zpl+6liOBNR39QAIcq
+ Ns6rjggMJiaEukv73k3q/SdikVn2X2QeM01k+fuBG3rYJVnyjlUKySv7o0c/nj8=
+X-Rspamd-Queue-Id: 6C758551A6D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [4.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[raczylo.com : SPF not aligned (relaxed),reject];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_REJECT(1.00)[raczylo.com:s=oracle-uk-012026,lhr1.rp.oracleemaildelivery.com:s=prod-lhr-20191104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-288313-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-288312-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
+	GREYLIST(0.00)[pass,body];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukasz@raczylo.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[raczylo.com:-,lhr1.rp.oracleemaildelivery.com:-];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_SPAM(0.00)[0.885];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-ip6_route_init() registers ip6_route_dev_notifier before registering the
-IPv6 route BPF iterator target. If bpf_iter_register() fails, the error
-path jumps to out_register_late_subsys and unwinds the RTNL handlers and
-late pernet subsystem, but leaves the netdevice notifier registered.
+self NACK
 
-Unregister the netdevice notifier in the bpf_iter_register() failure
-branch before continuing with the existing cleanup path.
+This patch references netdev_warn_ratelimited(), which does not exist
+in mainline net-next or in raspberrypi/linux rpi-6.18.y -- no
+netdev_*_ratelimited() helper is defined.  I confused it with the
+existing net_warn_ratelimited() / pr_warn_ratelimited() /
+dev_warn_ratelimited() family while authoring v2.  The result fails
+to build with implicit-function-declaration on every kernel that
+includes <linux/netdevice.h>.
 
-Fixes: 138d0be35b14 ("net: bpf: Add netlink and ipv6_route bpf_iter targets")
-Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
----
-Chages since v1:
-- Unregister ip6_route_dev_notifier directlry in the bpf_iter_register() failure path.
- net/ipv6/route.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+The bug was caught by John Laur via an independent build test on the
+Talos Linux Pi 5 build and reported at:
 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index cb521700cee7..de9a1d4c72d8 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -6924,8 +6924,10 @@ int __init ip6_route_init(void)
- #if IS_BUILTIN(CONFIG_IPV6)
- #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
- 	ret = bpf_iter_register();
--	if (ret)
-+	if (ret) {
-+		unregister_netdevice_notifier(&ip6_route_dev_notifier);
- 		goto out_register_late_subsys;
-+	}
- #endif
- #endif
- 
--- 
-2.43.0
+  https://github.com/siderolabs/sbc-raspberrypi/issues/91#issuecomment-4456874307
 
+I incorrectly tried to address this by sending a standalone fix-up
+patch to netdev as:
+
+  https://lore.kernel.org/netdev/20260515095336.92237-1-lukasz@raczylo.com/T/
+
+Andrew Lunn pointed out that this is not the correct workflow on
+netdev -- the right thing to do is self-NACK the broken patch on the
+original thread, wait 24 hours, and resend the whole series as v3.
+Apologies for the noise; this reply is that self-NACK.
+
+Patches 1/3 and 2/3 do not reference netdev_warn_ratelimited() and
+are unaffected by this build break; their content stands.  In v3:
+
+  * 3/3 will use `if (printk_ratelimit()) netdev_warn(...)` in place
+    of the non-existent netdev_warn_ratelimited(), matching the
+    semantics intended in v2 (bounded log noise, retains the netdev
+    prefix in the message).
+  * The standalone fix-up patch above (Message-ID
+    <20260515095336.92237-1-lukasz@raczylo.com>) should be considered
+    withdrawn -- v3 supersedes it.
+  * Cover letter will carry a changelog noting the v2->v3 delta and
+    this self-NACK.
+
+I will send v3 no earlier than 24 hours from this message, per
+Andrew's guidance and standard netdev practice.
+
+Signed-off-by: Lukasz Raczylo <lukasz@raczylo.com>
 
