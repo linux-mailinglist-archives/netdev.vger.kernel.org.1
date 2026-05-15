@@ -1,131 +1,194 @@
-Return-Path: <netdev+bounces-288176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288177-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFFpMqefBmrNlQIAu9opvQ
-	(envelope-from <netdev+bounces-288176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:23:03 +0200
+	id sN8VHi2hBmoMlgIAu9opvQ
+	(envelope-from <netdev+bounces-288177-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:29:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651C95492D8
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:23:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E08DD549333
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8C615300B190
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:23:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7A45D3054A3E
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2560F3D410E;
-	Fri, 15 May 2026 04:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6623D4133;
+	Fri, 15 May 2026 04:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="A2EdxkRY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BOqOnXq5"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC1C3CFF5C;
-	Fri, 15 May 2026 04:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E525C3D0BE5;
+	Fri, 15 May 2026 04:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778818979; cv=none; b=i6su0jkKzusOa+oCxIuu0AMqqgtg4BQQSiLno4qTWCIr+oCZ4hxjMz6vI7UYqVqaUABEenDvf/aLkNEXjUBCoEFuIIYEdzobL9KwQ/2xbtkO3L/PLDN5Kyoaos7O7nzrKJ0WNcvSzfVkt9w7ca5ln92QBOVtffnH43iuUaK93gc=
+	t=1778819285; cv=none; b=PC/Gwo1es+Xf/u5/aVEQqf7P5HPBtpElLSrNYcx0TIfu/rXUS17TjaqugNQkjHNnoY83n0ZXHYjx/NnGvaTG4eRPZu4rlMUvj7H9xh0Ej6td3+ZMQ97K7kEeg9GfgKHs4f4dUFT2kU1IzZZDnSvBGSJSpg0OgbjAEymHr97NVS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778818979; c=relaxed/simple;
-	bh=wRKIbuEXjpxqTkUyNSVCBtUJJm+xY2T42hd7lP5qJe8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S0TDPmqbeXwB2aIYYRgB44AWtsma6dTvWU3hy4YDnon4cpXq7qzFkiQIVBWwtMIm8GOOjNLf5wtPqWVDYXlPW6CtgqCIx+OQ4tCcpXjsECCT3QMaR9w7zSiDDDrKy2hdX6hSm9GoyKW0z9RftevGzJ8IX9jALOzrQmqj6KbfSko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=A2EdxkRY; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=6nH6bJWAeGtbmVExN7pnUKMyzJoqiIby5o4vaYMfyoo=; 
-	b=A2EdxkRYiz9xEqdMomkWf5eJR6kHHn6L7NZUzB43FcPG9jSK4VbmFCUvTRhiST/E5PC6SFd0aI2
-	kIkGNlHHYXV/FeCUzg0bpsfGore6Pt40K37IBd3+MrvaNidnXnrkPjquUBS3aHaRJ+/IZL2QuB1Cu
-	2LuR9+W8jyNu8slE94E5HEeiZftGfQQvw8f3cGuSzas3tGaLfeUqk1xsFLj3lRLtabIe8uNA3W6fR
-	v2VETrcwFILuXt83w5LUJR0mdQxsz2MLkZRNtoCZChYF8Or9HQNrd+xkQ/EFGe2aAAi0hJwILb6ZD
-	9hV4Ch66iYsRkhy0D67WW8k+K14/trmJ9tVw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wNk4O-00EIph-1E;
-	Fri, 15 May 2026 12:22:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 May 2026 12:22:40 +0800
-Date: Fri, 15 May 2026 12:22:40 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Michael Bommarito <michael.bommarito@gmail.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Maciej Zenczykowski <maze@google.com>, Kees Cook <kees@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/2] ipv4: harden against ihl < 5 IP_HDRINCL packets
-Message-ID: <agafkH9xcE9m7P6Q@gondor.apana.org.au>
-References: <cover.1778614451.git.michael.bommarito@gmail.com>
- <agOrCj3YoMAxsxYf@chamomile>
+	s=arc-20240116; t=1778819285; c=relaxed/simple;
+	bh=eaholhXH0T0ZCPDy0hweKNhPYJD49AxYHdU2Laz8nkc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qBt6A2MIvJRFcqb361gdk4toOSR7iNbQcm1E3fyz7saocmX1O7OZyTamZNDRw9GXZMdYcmUBGAd/FcCs6VRYMMG8HXt3/3aJK0AbIvHL8nTodul74GLXISdD+ThVHZg9FChWAhEbQ5ItVNhBzG8S0D7mNL4KF19FX7LXKeIuMgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BOqOnXq5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69BBC2BCB0;
+	Fri, 15 May 2026 04:27:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778819284;
+	bh=eaholhXH0T0ZCPDy0hweKNhPYJD49AxYHdU2Laz8nkc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=BOqOnXq5Txa8KVIj/z/bHSP47kS3TWb/b8ssziqfPDsCZ8maiBD61HfLUGJhbSGKX
+	 DDitz6gt66Fg6ooGTNIU0D4V8he+Iib96KzJ0r3aIJ0i/2atdFDm4sAFKLVxbmJu1B
+	 O/V05O7eKI7dfadaLk10h6z1bttl1I8pBdccMUEGMH1SHdJq7dcGDik2c8aN+6DlHE
+	 qMIMh6BRzt90ABXX1KSxuRXnPvP0ea8+veI+flJ6kmq8EIKDTrI7hW1G9+s94sR+Hk
+	 yBkpsIoslhKetw1FbLyR61kgOiPW6Sjt4WpTwpmHd4q45c8T1aKLDw1CbB6AdN+quz
+	 mXp1WrOWsvWVw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net v2 0/6] mptcp: misc fixes for v7.1-rc4
+Date: Fri, 15 May 2026 06:27:31 +0200
+Message-Id: <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-0-701e96419f2f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <agOrCj3YoMAxsxYf@chamomile>
-X-Rspamd-Queue-Id: 651C95492D8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42OTQ6CMBCFr0Jm7Zi24Sdx5T0MC1oeUJVC2ko0h
+ Ltb8AIu3+Sb772VArxFoEu2ksdig51cCuqUkRka14NtmzIpoUpRSMkOkcc5mplHGwx39o3AFUv
+ 2JmeoMhddm6NThpJi9jiAZLhR+qT6dwwvfYeJu3jHBhvi5D/HiEUe8H99i2TBBVBURitdQV8f8
+ A7P8+R7qrdt+wIp4SrR4AAAAA==
+X-Change-ID: 20260511-net-mptcp-misc-fixes-7-1-rc4-e2640fd4ef2c
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ linux-kselftest@vger.kernel.org, Eric Dumazet <edumaze@google.com>, 
+ Shardul Bankar <shardul.b@mpiricsoftware.com>, stable@vger.kernel.org, 
+ Li Xiasong <lixiasong1@huawei.com>, Gang Yan <yangang@kylinos.cn>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2824; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=eaholhXH0T0ZCPDy0hweKNhPYJD49AxYHdU2Laz8nkc=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBqBqDK2ccR0WHe8pCzPWkNS2G3tWtzMFqi13UcF
+ rKTja/mZzaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCagagygAKCRD2t4JPQmmg
+ c/BLEACxsyXw+ngszNAvWlGIs0SmvxMWFvGKvUo2AClf0UkJ4gHuHoJxux/UiW5ircEpN89XPs8
+ UYE8gvcBPR7t+tKK4ETe9yXBBzhGm7q8maJasFK1SpSAfHWBF55qVD12XgF/ru/JagZBCh+NW8L
+ DE7ZxwbKb09nMAfir30HoxSnW/IGgQbJ5VkD1V28n1jYLg49mohUC00WBBXa7ESxZpGJWJ6t9MF
+ e4Fu9MTum5k3Rjlh7guPQNiGO1bJc9e7rpvVBzWGklL7JQ+N1VXCgZKlSPnPA7VzJzMUJcpKdkt
+ TK5rH9ArAk5cavMjjd205Hs1lqVn22lN8eo/dJpHpS4gLYIaHF2n8KgtCtCe36P/zuHB2TByh60
+ oFVrqR7uzq7ffH9ve1AzCdKJbYRYo3Rkk6+I03VsmyUy4HYr5VQPf+glKFxv2qTykk5zPwd5MjT
+ LM+d5ljwnukn9HsdEVYsOKW12wYX5gvCIqTDt0LIXkepnMP3HYe/pu+5/8fqmQCvE/w3Qfh0D9N
+ S5uwq4pkBBriJu/rxaQ9+JoRVUbtdR0b1M4mWKof3mK0t76yvpmE0wE31WotMfPoHxAJ1unssZD
+ te0IOuCitqkGn8iOumFBjhQMZlU4vRveYj1YvcRGm/oOdq07VCZZExO9J5iLmaF9oA6I4rQpmVd
+ KiwSLH+qoFeVOFg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-Rspamd-Queue-Id: E08DD549333
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,secunet.com,google.com,vger.kernel.org,davemloft.net,kernel.org,redhat.com,strlen.de,netfilter.org];
-	TAGGED_FROM(0.00)[bounces-288176-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-288177-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gondor.apana.org.au:mid,gondor.apana.org.au:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,apana.org.au:email,apana.org.au:url]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,msgid.link:url]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026 at 12:34:50AM +0200, Pablo Neira Ayuso wrote:
-> 
-> There are possibly more ways to mangle ihl in the kernel in 2026, not
-> only NFQUEUE and nft_payload.
+Here are various unrelated fixes:
 
-If a packet will be processed further by our stack, we should not
-allow it to be modified in such a way that it becomes a threat
-to our network stack's consistency.
+- Patch 1: avoid dropping partial packets. A previous version has been
+  sent a few week ago. A fix for 5.10.
 
-This is especially the case in containers where unprivileged users
-may be able to create these mangling rules.
+- Patches 2-3: stop ADD_ADDR timer when an ADD_ADDR can never been sent
+  due to insufficient option space. A fix for v5.10.
 
-So any time after a packet has been mangled by nftables where it
-may result in a bogus packet, it needs to be checked for consistency
-before it is reinjected into our IP stack.
+- Patch 4: reset rcv_wnd_sent on disconnect, just in case the next
+  connection falls back to TCP. A fix for 5.17.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Patch 5: update window_clamp when SO_RCVBUF is set during the
+  connection. A fix similar to a recent one on TCP side, for v6.6.
+
+- Patch 6: avoid wrong time being displayed in the selftests when using
+  uutils 0.8.0 which contains a regression with 'date +%3N'. It doesn't
+  fix an issue in the kernel selftests, but having the fix is helpful
+  for those using uutils 0.8.0.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changes in v2:
+- Patch 2: note for sashiko-nipa
+- Patch 5: remove 'inline' keyword (NIPA) + update Fixes tag (Jakub)
+- Patch 6: new
+- Remove Eric's duplicated address with a typo (not sure how I did that)
+- Link to v1: https://patch.msgid.link/20260511-net-mptcp-misc-fixes-7-1-rc4-v1-0-5ee57cb2b7eb@kernel.org
+
+To: Matthieu Baerts <matttbe@kernel.org>
+To: Mat Martineau <martineau@kernel.org>
+To: Geliang Tang <geliang@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>
+To: Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org
+Cc: mptcp@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: Eric Dumazet <edumaze@google.com>
+
+---
+Gang Yan (1):
+      mptcp: update window_clamp on subflows when SO_RCVBUF is set
+
+Li Xiasong (2):
+      mptcp: pm: fix ADD_ADDR timer infinite retry on option space insufficient
+      selftests: mptcp: join: cover ADD_ADDR tx drop and list progress
+
+Matthieu Baerts (NGI0) (1):
+      selftests: mptcp: drop nanoseconds width specifier
+
+Paolo Abeni (1):
+      mptcp: reset rcv wnd on disconnect
+
+Shardul Bankar (1):
+      mptcp: do not drop partial packets
+
+ net/mptcp/pm.c                                     | 56 ++++++++++++++++++----
+ net/mptcp/protocol.c                               | 25 ++++++++--
+ net/mptcp/sockopt.c                                | 10 +++-
+ tools/testing/selftests/net/mptcp/mptcp_connect.sh |  6 +--
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    | 31 ++++++++++++
+ tools/testing/selftests/net/mptcp/mptcp_lib.sh     | 10 ++--
+ 6 files changed, 113 insertions(+), 25 deletions(-)
+---
+base-commit: 5db89c99566fc4728cc92e941d8e1975711e24b5
+change-id: 20260511-net-mptcp-misc-fixes-7-1-rc4-e2640fd4ef2c
+
+Best regards,
+--  
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
