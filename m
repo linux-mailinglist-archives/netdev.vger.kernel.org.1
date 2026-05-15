@@ -1,223 +1,136 @@
-Return-Path: <netdev+bounces-288183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288184-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPUkCfuhBmoMlgIAu9opvQ
-	(envelope-from <netdev+bounces-288183-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:32:59 +0200
+	id QF2zGESjBmoMlgIAu9opvQ
+	(envelope-from <netdev+bounces-288184-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:38:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 321C554941E
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:32:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B95305494B9
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:38:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D955630420DE
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:28:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA69F30103AD
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27473D47D4;
-	Fri, 15 May 2026 04:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JyRd8jHh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480423D47AB;
+	Fri, 15 May 2026 04:38:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFA83D4103;
-	Fri, 15 May 2026 04:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BDA3D1CB4;
+	Fri, 15 May 2026 04:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778819321; cv=none; b=oP2zv+cajHkqrb57ossCKbljJkrNs3zLCAB5yVwlIJlfTOamv69jyfC/y8xPJ3JuDQ7WSB2ihZUHP+RrmZA/gBCxnLxwWlHBK9qYdH1a+QlmzjmdyHw1mvLtYh3YT1xXU5V6g0HgDFcT2e9AZtw7mK+WIYt6VYGCUuaQ5nZ8JgU=
+	t=1778819882; cv=none; b=idW89sgyZ9ny64b1oZDm3bgxBv7BUyAFk8X8unWYtGg/gWOQ57ZlGMwxkP2VVYfRyL3vd03PlcyWuvdiGc5ZimS3nnfO63h117hu7Pv8Tbis/+gKtxDj9THj5so1GweXAI7lqM/oeAadpNHtpnnzU55NkHx7tuwzKiRAAvEGiV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778819321; c=relaxed/simple;
-	bh=p8Ag+VQTdpeP2qTjHzEKq0SZLd+visfTveYHoYzjYvI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Pfxfv0ekulAd2exjvkwMj2LgCwol+VqRSRrzhYvtfEsOZZ2HQT/nA/CVavz00AUsV9EspQTFGdYlt9olgHiw2Tk1pgW5ClrkjMOn7uk0t8M6VEkJ1Znv6aKvQOZzmyrKZwMAfJ4pRz2EOati2uX3yAHvR+4mlr7fP7AL1eqHR04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JyRd8jHh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 187CDC2BCC7;
-	Fri, 15 May 2026 04:28:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778819321;
-	bh=p8Ag+VQTdpeP2qTjHzEKq0SZLd+visfTveYHoYzjYvI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=JyRd8jHhSblDBehunLDIXFMVK0YVc9hgDXLjT7VQboY3Iu1doG/1F9Mlb2AamzQ5C
-	 OMYEll0E891JMIJvyXAdWapNWstkmxnImRPhShsXmKBjfbrSnEZvHpJyKb1h6wNmlb
-	 vtebA5WNM4pi995YAF0lpSsPu0/YZOUoR4XCg7idqIgnUSceoej3g/xFlbmF9+Jjmx
-	 Q4R0G2Ge7ErmVyR95JHPtWsP83EfbBUBOIrBYtvD4iffyMuIbNQ+9CH3MLiYYFYYK7
-	 lnzXnfuSKwRewbBFx5IFjPhJ5hSHUbl7CCZyd4ttbgeL4G/YPhuM9ywu5JUFrkzBUL
-	 MZeayu2FyPW9w==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 15 May 2026 06:27:37 +0200
-Subject: [PATCH net v2 6/6] selftests: mptcp: drop nanoseconds width
- specifier
+	s=arc-20240116; t=1778819882; c=relaxed/simple;
+	bh=D3ywJOOdtSz+6gpEUbKTjvqIUtsPJPyem0eB1g5Mo2I=;
+	h=Message-ID:Date:Mime-Version:From:To:Cc:Subject:Content-Type; b=mGvAO+ZDkBf1oVeG6LKgUkTt7vEd2so9lXOVS4ridgoQa9Wh8u+27R4/ForHK4uGaMy43SCidVOVHlUIHgbRkJbXjh0OKnfKqqyoirbYoSup4IGcbCg+1DrLM/gclSAKNhHLyGf1OiixHtx4OicQHrBNbA+YNMdnrsVz9RLg2vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4gGvZQ2w5Dz5BNS0;
+	Fri, 15 May 2026 12:37:50 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.99.176])
+	by mse-fl1.zte.com.cn with SMTP id 64F4bjtb084514;
+	Fri, 15 May 2026 12:37:45 +0800 (+08)
+	(envelope-from qiu.yutan@zte.com.cn)
+Received: from mapi (xaxapp04[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Fri, 15 May 2026 12:37:47 +0800 (CST)
+X-Zmail-TransId: 2afb6a06a31b4ee-c5384
+X-Mailer: Zmail v1.0
+Message-ID: <20260515123747432jLXDLIyJm2pu_tVAMf1am@zte.com.cn>
+Date: Fri, 15 May 2026 12:37:47 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-6-701e96419f2f@kernel.org>
-References: <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-0-701e96419f2f@kernel.org>
-In-Reply-To: <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-0-701e96419f2f@kernel.org>
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- linux-kselftest@vger.kernel.org, Eric Dumazet <edumaze@google.com>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3811; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=p8Ag+VQTdpeP2qTjHzEKq0SZLd+visfTveYHoYzjYvI=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBqBqDLmm2dxmHj049HWW99vHr1qVTNX6z3DKVz7
- DbYIxGVV9eJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCagagywAKCRD2t4JPQmmg
- c7daEACJ1ZIXprKjL4UrJ7FWSx7uc/k1IZutTAqcHotyaQe5zXLx44nNJJ/p8/RmGa9D2K58iSZ
- /uypMNr60hM3kKF/IPsuUkZj488KUakzeeO5vhhQz6nuPp/aXuX9UxpqWjS1gWnaX44tNIFVqZv
- e73yAdL3EHIjjlYZxVGp3kaHus9qaYP9kTgMXHdrCDnmFm65y5UqGq4Kr5aVJo2DJ2agh2OpmCM
- TUQWw7bXvZuOiV/ylADurVC+fFDf3X9PGwfmWx1bs2J6BvPImzwOmwb1i7FYTl+hkXARTlmjRJa
- E9g1ylkzhjzPOGl7HWNodxnTHUuK429UmZLiVQsAZK75cmggoe+mfOWnDFvEZINEHFxlOTHGveM
- iH1TMPT8yzMEg/6vKkqfpZJIbdEvrmsOTGd7cnVzM7VYHZVFLXv9TFluvyaY3ef19osuBqpdDtc
- 5L6oPcyerkj8baW0tYc80mKpcjzhot7vdMDA/9z0nKLz/W3WcSo1ndv6xv3ov2kgGovG3IC+QiJ
- 95xbCSJbBdTvOAb33nzSoWTZqJu5vD86WBIev2sT9gy8F0ErzSw1hN416DiOc/9Moa4T8E+sURX
- +nm00fzjOBwcixoKcowmZipbkebYZ8+vDuOlztSY7BXjPYTVErwmAcQp2aM9Ug4ZqjZK09unSJQ
- mGa/E4TQtvdcCQg==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
-X-Rspamd-Queue-Id: 321C554941E
+Mime-Version: 1.0
+From: <qiu.yutan@zte.com.cn>
+To: <jiayuan.chen@linux.dev>, <davem@davemloft.net>, <kuba@kernel.org>
+Cc: <dsahern@kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <horms@kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yang.chuan1@zte.com.cn>,
+        <huang.jian@zte.com.cn>, <zhou.shizhen@zte.com.cn>,
+        <zhang.dongyu1@zte.com.cn>, <ye.guojin@zte.com.cn>,
+        <yang.wei20@zte.com.cn>, <zhang.lin16@zte.com.cn>,
+        <li.hao40@zte.com.cn>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXQtbmV4dF0gbmV0OiBuZWlnaDogUmVuYW1lIE5FSUdIX1ZBUl9JTlRFUlZBTF9QUk9CRV9USU1FX01TIHRvIE5FSUdIX1ZBUl9JTlRFUlZBTF9QUk9CRV9USU1F?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 64F4bjtb084514
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: qiu.yutan@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.132 unknown Fri, 15 May 2026 12:37:50 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6A06A31E.000/4gGvZQ2w5Dz5BNS0
+X-Rspamd-Queue-Id: B95305494B9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.64 / 15.00];
+	SUBJ_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	FAKE_REPLY(1.00)[];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-288184-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[qiu.yutan@zte.com.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288183-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zte.com.cn:email,zte.com.cn:mid]
 X-Rspamd-Action: no action
 
-Using the format specifier +%s%3N with GNU date is honoured, and only
-prints 3 digits of the nanoseconds portion of the seconds since epoch,
-which corresponds to the milliseconds.
+On 5/15/26 10:55 AM, Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
+>> From: Qiu Yutan <qiu.yutan@zte.com.cn>
+>>
+>> During the initialization of arp_tbl, the enumeration constant name
+>> NEIGH_VAR_INTERVAL_PROBE_TIME_MS in the statement
+>> arp_tbl.parms.data[NEIGH_VAR_INTERVAL_PROBE_TIME_MS] = 5*HZ does not
+>> align with its actual meaning (jiffies).
+>I think the macro name NEIGH_VAR_INTERVAL_PROBE_TIME is just meant to 
+>correspond
+>
+>to the configuration item neigh/default/interval_probe_time_ms.
 
-The uutils implementation of date currently does not honour this, and
-always prints all 9 digits. This is a known issue [1], but can be worked
-around by adapting this test to use nanoseconds instead of microseconds,
-and then divide it by 1e6.
+Thank you for your feedback.
 
-This fix is similar to what has been done on systemd side [2], and it is
-needed to run the selftests on Ubuntu 26.04, containing uutils 0.8.0.
+The unit of interval_probe_time_ms is milliseconds, 
+which is user-friendly. Internally in the kernel, it is actually converted 
+to jiffies. Using NEIGH_VAR_INTERVAL_PROBE_TIME to match jiffies makes the 
+code more readable and developer-friendly.
 
-Note that the Fixes tag is there even if this patch doesn't fix an issue
-in the kernel selftests, but it is useful for those using uutils 0.8.0.
+>>
+>> Using NEIGH_VAR_INTERVAL_PROBE_TIME is a better naming choice.
+>>
+>> Fixes: bf48c3fae6d7 ("Merge branch 'net-neigh-introduce-interval_probe_time-for-periodic-probe'")
+>
+>Do not carry Fixes tag since it's not a fix. On the other hand, it is a 
+>merge commit not a regular commit...
 
-Fixes: 048d19d444be ("mptcp: add basic kselftest for mptcp")
-Cc: stable@vger.kernel.org
-Link: https://github.com/uutils/coreutils/issues/11658 [1]
-Link: https://github.com/systemd/systemd/pull/41627 [2]
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
-To: Shuah Khan <shuah@kernel.org>
-Cc: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/mptcp/mptcp_connect.sh |  6 +++---
- tools/testing/selftests/net/mptcp/mptcp_lib.sh     | 10 +++++-----
- 2 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-index a6447f7a31fe..d158678fa6ab 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-@@ -401,7 +401,7 @@ do_transfer()
- 	mptcp_lib_wait_local_port_listen "${listener_ns}" "${port}"
- 
- 	local start
--	start=$(date +%s%3N)
-+	start=$(date +%s%N)
- 	ip netns exec ${connector_ns} \
- 		./mptcp_connect -t ${timeout_poll} -p $port -s ${cl_proto} \
- 			$extra_args $connect_addr < "$cin" > "$cout" &
-@@ -423,7 +423,7 @@ do_transfer()
- 	fi
- 
- 	local stop
--	stop=$(date +%s%3N)
-+	stop=$(date +%s%N)
- 
- 	if $capture; then
- 		sleep 1
-@@ -439,7 +439,7 @@ do_transfer()
- 	fi
- 
- 	local duration
--	duration=$((stop-start))
-+	duration=$(((stop-start) / 1000000))
- 	printf "(duration %05sms) " "${duration}"
- 	if [ ${rets} -ne 0 ] || [ ${retc} -ne 0 ] || [ ${timeout_pid} -ne 0 ]; then
- 		mptcp_lib_pr_fail "client exit code $retc, server $rets"
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_lib.sh b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-index 989a5975dcea..5ef6033775c8 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-@@ -28,7 +28,7 @@ declare -rx MPTCP_LIB_AF_INET6=10
- MPTCP_LIB_SUBTESTS=()
- MPTCP_LIB_SUBTESTS_DUPLICATED=0
- MPTCP_LIB_SUBTEST_FLAKY=0
--MPTCP_LIB_SUBTESTS_LAST_TS_MS=
-+MPTCP_LIB_SUBTESTS_LAST_TS_NS=
- MPTCP_LIB_TEST_COUNTER=0
- MPTCP_LIB_TEST_FORMAT="%02u %-50s"
- MPTCP_LIB_IP_MPTCP=0
-@@ -236,7 +236,7 @@ mptcp_lib_kversion_ge() {
- }
- 
- mptcp_lib_subtests_last_ts_reset() {
--	MPTCP_LIB_SUBTESTS_LAST_TS_MS="$(date +%s%3N)"
-+	MPTCP_LIB_SUBTESTS_LAST_TS_NS="$(date +%s%N)"
- }
- mptcp_lib_subtests_last_ts_reset
- 
-@@ -255,7 +255,7 @@ __mptcp_lib_result_check_duplicated() {
- __mptcp_lib_result_add() {
- 	local result="${1}"
- 	local time="time="
--	local ts_prev_ms
-+	local ts_prev_ns
- 	shift
- 
- 	local id=$((${#MPTCP_LIB_SUBTESTS[@]} + 1))
-@@ -265,9 +265,9 @@ __mptcp_lib_result_add() {
- 	# not to add two '#'
- 	[[ "${*}" != *"#"* ]] && time="# ${time}"
- 
--	ts_prev_ms="${MPTCP_LIB_SUBTESTS_LAST_TS_MS}"
-+	ts_prev_ns="${MPTCP_LIB_SUBTESTS_LAST_TS_NS}"
- 	mptcp_lib_subtests_last_ts_reset
--	time+="$((MPTCP_LIB_SUBTESTS_LAST_TS_MS - ts_prev_ms))ms"
-+	time+="$(((MPTCP_LIB_SUBTESTS_LAST_TS_NS - ts_prev_ns) / 1000000))ms"
- 
- 	MPTCP_LIB_SUBTESTS+=("${result} ${id} - ${KSFT_TEST}: ${*} ${time}")
- }
-
--- 
-2.53.0
-
+I will remove the tag in PATCH v2.
 
