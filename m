@@ -1,107 +1,213 @@
-Return-Path: <netdev+bounces-288143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKrMBZ13BmoUkAIAu9opvQ
-	(envelope-from <netdev+bounces-288143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:32:13 +0200
+	id qHtwOVF4BmoUkAIAu9opvQ
+	(envelope-from <netdev+bounces-288144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:35:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0E55486CA
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:32:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 656375486F9
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 11C4A300CB09
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:32:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E62B1301CFF3
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87B6366DB9;
-	Fri, 15 May 2026 01:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BBD282F03;
+	Fri, 15 May 2026 01:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CQhsIMbH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aoePZStM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65D635C1AD
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F791391;
+	Fri, 15 May 2026 01:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778808730; cv=none; b=PDWIhcVSOeQZz2HfiiZ6TWTBSAxpmpi7ErzhwsiArW83h4qLv9GKkhCl8PpN7YJJV/Apxpf98sRlQ42D8CuACTthGvB/RTDrlYHuKYLNx32p5l7n66QMs/GTWo7uXsS+y8ucX32C1MXFSxo7BxqydBW2eDr3eAuQNPTFOSmLObw=
+	t=1778808911; cv=none; b=kn6sYwqahZ6HRAiAtl7qoCUC7tKgAK4+akyr+/nkwqSZN0sh7ctYJxAflenu47i6AJV9o03oDc2Ly56adqZ+xKSSpiBf6K+Z0QOu9nsqNC07a2j1Gl2ysqBTlaq5JwmOniJa9jRMn7bW+BKgg5/6CsiYJK6jFOLUchdQRM0SuVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778808730; c=relaxed/simple;
-	bh=hziJcy07T49JEzjtW7Gs8Tf25HTZrdijW1Yg0CAk0EE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hjeDos3MHqzYj3mqtnw1p84YwpaZp9hlAUZ/3XgKVBOw8B/1u5vzqd0s61QQf0CvJAnqd28t1GYcbXn4yMjtWa61IkliuPyXGyUjugEpK1IoMoLZ9TAF5Cmr1CyypF80zZH5GbkIylizwX8UWOJc0FxDTgDMvr0wfMJRxDeQMqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CQhsIMbH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 045F1C2BCB3;
-	Fri, 15 May 2026 01:32:09 +0000 (UTC)
+	s=arc-20240116; t=1778808911; c=relaxed/simple;
+	bh=MetcOpFWs7h0xBLOEAcEN86jIbdJx3yD33tX/Dul9QA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IoWFQMB8qdVIvGg2ohdU1zSARf7/7jA79esB8Jqe9JOHmD5DfzAbfG18sr0I1V3h2QBLSrCLxyqrv+gR00pcTdXZpaoZ5mryZNdBlOmJdQBGzHSwAWHMxysB8T6KBA/Bqz4ofpvhgbD8hcsJuUn7HQj3WtG9/KszrudF8FRQqJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aoePZStM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99270C2BCB3;
+	Fri, 15 May 2026 01:35:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778808730;
-	bh=hziJcy07T49JEzjtW7Gs8Tf25HTZrdijW1Yg0CAk0EE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CQhsIMbHuPz3JAWUrFijzfD8hgvJqDDaBf8JPLRxrhMQf4Pt6QdhIDc1iE5ZegORb
-	 bSB14ZIJh2C0EafAhvjycVIAe0BGc7Wp3X+s0Ok1B8p86vy7lnaiUqgnZwJMltpLEF
-	 H0HkMhbIjZ4fzsdQUDlEfCF0mfhQdKDsu/4V52dxTUSANy8SI9W/VKj1feJNlZ8wir
-	 /JTl1F7wNqbC0z08OnrqrHl16SCOhCvceRk5jKcNnS/eVD5UZlBqPzcPRkiB9sMVfZ
-	 Se6B3QRfNOst3sg6psWpkI5HmfZuMBN2Yrk60Tt4r0MeJSMb+8RcCiJfvjroN+qAve
-	 0TgEmX41QAuEg==
-Date: Thu, 14 May 2026 18:32:09 -0700
+	s=k20201202; t=1778808910;
+	bh=MetcOpFWs7h0xBLOEAcEN86jIbdJx3yD33tX/Dul9QA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=aoePZStM19di7cOMDHRSgzmCY+aVOrEE0eWQnRIqxyw0oBc1XEIXblsXeNgeW2ail
+	 osxDIJXAuI+FJt2IqwlWVwy1ICdE5LOIDhr49KJin+5aQ/MtV3fNLK/HLkawW//JSy
+	 BddFgjaY1KaxKoGYeTazmo5XmwD4PCnKQkbLjvsEME6n/uMEhRdLvBENac8OakE2ti
+	 KXab4IpGJ1hJJ530jvQYgUIIWqHjIRuTOu4jTFKnKnPZDqvNdtbX/7NzvqWHQBD12V
+	 2cuYeb6pstSc9LJaq6ayG/piIwbToIsSk9lijYkeDOQHnkPLnqgD1qTeneJ6LuTlPS
+	 cPJOs0y/j1jQw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Joyner <eric.joyner@amd.com>
-Cc: <netdev@vger.kernel.org>, Brett Creeley <brett.creeley@amd.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 5/5] ionic: Add .get_fec_stats ethtool
- handler
-Message-ID: <20260514183209.48fa771a@kernel.org>
-In-Reply-To: <20260512224421.25236-6-eric.joyner@amd.com>
-References: <20260512224421.25236-1-eric.joyner@amd.com>
-	<20260512224421.25236-6-eric.joyner@amd.com>
+To: tariqt@nvidia.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	mbloch@nvidia.com,
+	shayd@nvidia.com,
+	ohartoov@nvidia.com,
+	edwards@nvidia.com,
+	msanalla@nvidia.com,
+	horms@kernel.org,
+	parav@nvidia.com,
+	moshe@nvidia.com,
+	kees@kernel.org,
+	phaddad@nvidia.com,
+	gbayer@linux.ibm.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	gal@nvidia.com
+Subject: Re: [PATCH net] net/mlx5: Skip disabled vports when setting max TX speed
+Date: Thu, 14 May 2026 18:35:08 -0700
+Message-ID: <20260515013508.1308541-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260513063640.334132-1-tariqt@nvidia.com>
+References: <20260513063640.334132-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: AA0E55486CA
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 656375486F9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288143-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-288144-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Tue, 12 May 2026 15:44:21 -0700 Eric Joyner wrote:
-> This includes 802.3ck FEC histogram data that some newer
-> hardware collects.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+net/mlx5: Skip disabled vports when setting max TX speed
 
-Ah. "Some newer hardware"? As Sashiko points out the standard stats
-are designed trying to avoid "does 0 mean unsupported or 0" ambiguity.
-You need to figure out if the device reports them and if not - don't
-set ranges.
+This commit modifies the LAG activation process to skip setting the maximum
+TX speed for disabled vports, preventing firmware commands from being sent
+to uninitialized vports. It stores the aggregated speed in the vport
+structure so it can be applied later if the vport is enabled.
+
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+
+[ ... ]
+
+> @@ -948,6 +966,9 @@ int mlx5_esw_vport_enable(struct mlx5_eswitch *esw, struct mlx5_vport *vport,
+>  
+>  	esw->enabled_vports++;
+>  	esw_debug(esw->dev, "Enabled VPORT(%d)\n", vport_num);
+> +
+> +	if (vport->agg_max_tx_speed)
+
+Could dynamically allocated vports bypass the active LAG QoS speed limits?
+
+If a new vport is allocated dynamically after the LAG is already active,
+it appears agg_max_tx_speed would be zero-initialized. When this new vport
+is subsequently enabled here, the condition evaluates to false, which
+would skip the firmware speed update entirely.
+
+> +		mlx5_esw_vport_set_max_tx_speed(esw, vport);
+
+Does this introduce a race condition with mlx5_lag_modify_device_vports_speed?
+
+If the LAG thread is concurrently updating the speed:
+
+LAG thread (lockless):
+vport->agg_max_tx_speed = speed;
+if (!vport->enabled)
+    continue;
+
+ESW thread (with esw->state_lock):
+vport->enabled = true;
+...
+if (vport->agg_max_tx_speed)
+    mlx5_esw_vport_set_max_tx_speed(esw, vport);
+
+Since there are no shared locks or explicit memory barriers, could CPU
+reordering allow the LAG thread to see a false enabled state while the ESW
+thread sees a zero agg_max_tx_speed, resulting in neither thread issuing the
+firmware command?
+
+>  done:
+>  	mutex_unlock(&esw->state_lock);
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+
+[ ... ]
+
+> @@ -1274,6 +1274,11 @@ static void mlx5_lag_modify_device_vports_speed(struct mlx5_core_dev *mdev,
+>  		if (vport->vport == MLX5_VPORT_UPLINK)
+>  			continue;
+>  
+> +		vport->agg_max_tx_speed = speed;
+> +
+> +		if (!vport->enabled)
+
+Is there a regression here regarding the lifetime of the vport pointer?
+
+This loop locklessly iterates over the esw->vports xarray. Because the xarray
+iteration drops the RCU read lock before executing the loop body, and
+mlx5_esw_vport_free() calls kfree() synchronously without an RCU grace
+period, could a concurrent vport deletion cause these new field accesses to
+operate on freed memory?
+
+> +			continue;
+> +
+>  		ret = mlx5_modify_vport_max_tx_speed(mdev, op_mod,
+>  						     vport->vport, true, speed);
+
+Does this code contain a time-of-check to time-of-use regression
+that is affected by the lockless architecture here?
+
+Looking at mlx5_modify_vport_max_tx_speed(), it queries the firmware
+admin_state and writes it back without holding esw->state_lock. If the LAG
+thread reads an UP state, but mlx5_esw_vport_disable() concurrently disables
+the vport (setting the hardware state to DOWN), could the LAG thread
+accidentally overwrite the admin_state back to UP, effectively reverting the
+disable action?
+
+>  		if (ret)
+-- 
+pw-bot: cr
 
