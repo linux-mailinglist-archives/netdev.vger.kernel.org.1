@@ -1,73 +1,94 @@
-Return-Path: <netdev+bounces-288328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yKVfKFsuB2oLsgIAu9opvQ
-	(envelope-from <netdev+bounces-288328-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:31:55 +0200
+	id wECoCzovB2p3sgIAu9opvQ
+	(envelope-from <netdev+bounces-288327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:35:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DAF85517A9
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:31:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8750C551847
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:35:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1C3A9300B3E6
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 14:31:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4253D3010DB8
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 14:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABF43932D1;
-	Fri, 15 May 2026 14:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E39339B94F;
+	Fri, 15 May 2026 14:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zohomail.in header.i=kshitiz.bartariya@zohomail.in header.b="q65Whuxy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KmZUEdJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-pp-o93.zoho.in (sender-pp-o93.zoho.in [103.117.158.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9752367F51
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 14:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=103.117.158.93
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778855512; cv=pass; b=RrDOF7oi2hIx9oC1Pn5qaIv34ONF4k5VhWV7+QrTlOxP/I1BYDzRwirlJ04ycgWSulACH7ZtB+SD4HBaSzwCZs2eoNfmI145n7sXNRSZPIZr6XqPqYDE4tghzRiMa/5AxpEePMD2SNoEQ1DmSFkktuYKIP+Buqc3NAChP0ozXo0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778855512; c=relaxed/simple;
-	bh=yrzyDnTvFRGO23Rk7kM4kIx3fbpV7VD5uahzJ2pWsUs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tgnyReEmmi76nu0SPyGAqazFpNP54Ueu+W0dLC9/y60kChvNRO2nJEEM6CEYFWJl9a2J1kbuWvc8sWNab2xaDsFxAIZ8OO97tgwmnNu07WE53mb2UOZg79TpAH9thn7B65630z1vBly3UwVuXHfYkOwHeVHn9LByppT0QZsiHvE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zohomail.in; spf=pass smtp.mailfrom=zohomail.in; dkim=pass (1024-bit key) header.d=zohomail.in header.i=kshitiz.bartariya@zohomail.in header.b=q65Whuxy; arc=pass smtp.client-ip=103.117.158.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zohomail.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zohomail.in
-ARC-Seal: i=1; a=rsa-sha256; t=1778855458; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=c9Dx97FbOnI9qaPMQrDk3Bg8gekc+K4OkVCgccXzF9irD8YIV5JjMHVftW8tlW9Xyh6Nkz7PA6H7iXODe7+egQrXXNPbeBUDnMwQ9xtPCmYdFLNW04G2CgF8suLWcHp9NVObD1o2BBrbWsmQqQRJw9a2aE5U8iGVzUgQANGF9cY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1778855458; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=fhIN3zCM8kVhoVPicrrLTx3Drgf0l4gyykQ6YFAV4As=; 
-	b=SCJQffqNTEtFaMaJNiQ17udawf/z/SmlTtwBvM1gBiFZEDBiLDlraJ9IVcCVValuoW1hjFZR9lY+tKW7raKBveH4dNJ0dQtnPUl1woFYFRh1c6lH2uxje4vvTjHtryaF8DeayvF5TBXWW+zap7Nn/RXsNFL88q+VhI/d/mKnndI=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=zohomail.in;
-	spf=pass  smtp.mailfrom=kshitiz.bartariya@zohomail.in;
-	dmarc=pass header.from=<kshitiz.bartariya@zohomail.in>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1778855458;
-	s=zoho; d=zohomail.in; i=kshitiz.bartariya@zohomail.in;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=fhIN3zCM8kVhoVPicrrLTx3Drgf0l4gyykQ6YFAV4As=;
-	b=q65WhuxyGgfj0+TTo3r4e7HWlrrkiHx4KDQ2+ynLsf52hZREFdPWdmq/7/gRmlAV
-	NpXrvVPMZAXv/QwOTLMJbbzY8ayUCTBM+hgkiTLVLqZ522fPQSIgNCyWX6VGpp/mBVS
-	7qnoB0zSgEE1wdziexfujyRmVXQqyL8I2WAgPPd8=
-Received: by mx.zoho.in with SMTPS id 1778855452266322.9274965790356;
-	Fri, 15 May 2026 20:00:52 +0530 (IST)
-From: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
-To: hkallweit1@gmail.com,
-	nic_swsd@realtek.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: r8169: add RX allocation failure counters
-Date: Fri, 15 May 2026 20:00:09 +0530
-Message-ID: <20260515143015.64018-1-kshitiz.bartariya@zohomail.in>
-X-Mailer: git-send-email 2.50.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4A933DEDD
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 14:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778855472; cv=none; b=q+niNF+m2ayvDewH99vO/aLMNuErDRw7LHCqTz6IK6UuiZCIHHkIB3cruZm8wUpPkfUk6Kpfno//B72EwBQWpcgQxUi8k7ETNGmxngTr5KlVdCOkEj9kfW2Ww5IDjBuYKh/g7na2gduHKGgu91ql9xw+v461X1rLZ94kL/yuLE8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778855472; c=relaxed/simple;
+	bh=bV1JeOldTkErlaOe7mZv8IxdkFPY30ISl0S82QP7r9Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nl5yrE0JRxdpGq8FHlse7cndbbHjvLI5FYnK+6BDj96vCabji25DFDIJ5xPKxXGAJWn3xYaQ4/8o2wsIQeNCkksx1vu7fw6BrrYIG0KUNdx2fI0rS65uXFbeViLjPSicUv4oKDMjoon1ZpiVeDG6EhfBB6hZUpL9SeNV7z1rPUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KmZUEdJw; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48fe26a177cso13732525e9.1
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 07:31:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778855469; x=1779460269; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8oRruk2hRCiEL2H/Lc0ikHTSfdx/PqADfnZnuck3Ni8=;
+        b=KmZUEdJwyJ4RTk7ScnujzA+IuLqyja3NISvYqPL7OFT1l/ASWiwyBA/N9S0oz2p1i0
+         nq2Q+JBwTm8auLpQ8DFMxtKHih38pT0UnRsLecoODflPnXFHtqagKbWJ4Gv8Cl8b2FBs
+         3QRGT955MkD9N+ORFO50oHkorrF9IFJIHJYqVolvy2rb74zwUqglrgCsIHe32ob70015
+         5YwL7LQSuHY8Zdxu61TQuijiizhALCyEuELK2MkI+E/UDcmnHtbBBBnVKTJFgdnU6r72
+         p7gLVWJU7NntvXjnPRCYBhEaR9eM38Z/Xo3bc1uu059PSgoQkK9yugNx0Mpg8720t6jU
+         ezHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778855469; x=1779460269;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8oRruk2hRCiEL2H/Lc0ikHTSfdx/PqADfnZnuck3Ni8=;
+        b=FxeZUjtt5QJnUb4LO0081gACnqTuaqAZEKNKAOBJQFwc6UpCWHOJ8+fY/xjb38J4eZ
+         3EnLm1zM+JPAyzkKGjYUfcJA42aTUXwpqZ9me3WFcHrcalBhWhtZBPzfX19xPQg1o0a/
+         ndxETwMlFiM/c+2mQqOZn5hreuJaP40PqO6Xl0RFWUW8ETNjbelq8XSUaj/Hr9PPDjPU
+         FHMBZG98ollGSC5fJ1mJeUKCMvPzH4M72efUo02Bg6Xuyl07PWWkO3+X9/BRJbuBlnB3
+         DeV5v0ZEINGJMq9ybWUzpq0/f63kwg+wFI98GPVcqAzAyS5YwDnry7wXwlw48NNXFyT8
+         F1VA==
+X-Gm-Message-State: AOJu0Yy8wFaMUduuW1O5cKI/IVmfqT5ZpZLo9e13/EOfsvsYDHXpg1cO
+	Ylb6kDkx8INhBD6nflOopRU4z7Wpst6zAENxeW1oQEsNbt1+6ZDiFMuB
+X-Gm-Gg: Acq92OH47K0rUE6vren8qY17kDfbntCJLUYj7/G4+wzzZSpeZRw96bm71yYIYMvTG5V
+	AfGCG8VU2h3LNEHP/nV1AK6jSO6N0vQyIxWJypqn8yQl1JPQfwlxqbx+VQs3fI1mcGJ7ktg3LdF
+	YuY1olXfMdpEbV963zQP2Jft+jcxMS725KN38GBF817bTgm08AhPBBDrUZawAzRRrSepsH2Jrb7
+	XN7TGMDkMIeuEBeNSA7UFLtcRGipyed3kZ2uK3EeKHwO4YVa5KlqLIFD0jP6Hs8hm+rPANrDnyN
+	vFU8m0evLoAaaMc6DkTxWpyrL49ooKIrHIo+mCJPMRev5GBhlT8gPCLfeJjTxQGMQgQ4umzJR/Y
+	txZiIj4zecnZhoh54r7m8Q7YEHRXW+G2stvdyS7nZWZj+52KagskXfV4NvmD5Y8V2NTlXibkmVM
+	KKFID/fdY4bLtzoaB/CfK0ev1pG11ujtz4T6+z
+X-Received: by 2002:a05:600c:3b0f:b0:48f:e230:72fb with SMTP id 5b1f17b1804b1-48fe6631512mr57952455e9.32.1778855469028;
+        Fri, 15 May 2026 07:31:09 -0700 (PDT)
+Received: from builder ([2001:9e8:f130:7416:be24:11ff:fe30:5d85])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe6aff4sm15024815e9.25.2026.05.15.07.31.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 07:31:08 -0700 (PDT)
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jonas Jelonek <jelonek.jonas@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: pse-pd: fix sign on -ENOENT check in of_load_pse_pis()
+Date: Fri, 15 May 2026 14:31:03 +0000
+Message-ID: <20260515143103.1721888-1-jelonek.jonas@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,124 +96,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
-X-Rspamd-Queue-Id: 1DAF85517A9
+X-Rspamd-Queue-Id: 8750C551847
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[zohomail.in,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[zohomail.in:s=zoho];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-288328-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kshitiz.bartariya@zohomail.in,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[zohomail.in:+];
+	TAGGED_FROM(0.00)[bounces-288327-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Add driver-private ethtool counters for RX allocation failures so packet
-drops under memory pressure are easier to diagnose.
+of_count_phandle_with_args() returns the count on success and a negative
+errno on failure, including -ENOENT when the "pairsets" property is
+absent. The existing comparison in of_load_pse_pis() checks against
+ENOENT (positive 2) instead of -ENOENT, so the branch is taken for any
+error return: legitimate DTs that omit "pairsets" trigger a spurious
+"wrong number of pairsets" error and probe fails with -EINVAL.
 
-The new aggregate rx_alloc_fail counter is incremented when the driver
-fails to allocate an RX page, fails to map an RX page for DMA, or fails
-to allocate an skb in the RX receive path. Individual counters for finer
-details are:
- 1. rx_buf_alloc_fail : failed to allocate an RX page
- 2. rx_dma_mapping_fail : failed to map an RX page for DMA
- 3. rx_skb_alloc_fail : failed to allocate an skb
+Compare against -ENOENT so a missing "pairsets" property is correctly
+treated as "this PI has no pairsets, continue".
 
-These are kept in struct rtl8169_private instead of
-struct rtl8169_counters, which contain the hardware tally counters.
-
-Signed-off-by: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
+Fixes: 9be9567a7c59 ("net: pse-pd: Add support for PSE PIs")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ drivers/net/pse-pd/pse_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 791277e750ba..c1a200e14f6f 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -766,6 +766,10 @@ struct rtl8169_private {
- 	dma_addr_t counters_phys_addr;
- 	struct rtl8169_counters *counters;
- 	struct rtl8169_tc_offsets tc_offset;
-+	atomic64_t rx_alloc_fail;
-+	atomic64_t rx_buf_alloc_fail;
-+	atomic64_t rx_dma_mapping_fail;
-+	atomic64_t rx_skb_alloc_fail;
- 	u32 saved_wolopts;
- 
- 	const char *fw_name;
-@@ -1901,6 +1905,10 @@ static const char rtl8169_gstrings[][ETH_GSTRING_LEN] = {
- 	"multicast",
- 	"tx_aborted",
- 	"tx_underrun",
-+	"rx_alloc_fail",
-+	"rx_buf_alloc_fail",
-+	"rx_dma_mapping_fail",
-+	"rx_skb_alloc_fail",
- };
- 
- static int rtl8169_get_sset_count(struct net_device *dev, int sset)
-@@ -1999,6 +2007,10 @@ static void rtl8169_get_ethtool_stats(struct net_device *dev,
- 	data[10] = le32_to_cpu(counters->rx_multicast);
- 	data[11] = le16_to_cpu(counters->tx_aborted);
- 	data[12] = le16_to_cpu(counters->tx_underrun);
-+	data[13] = atomic64_read(&tp->rx_alloc_fail);
-+	data[14] = atomic64_read(&tp->rx_buf_alloc_fail);
-+	data[15] = atomic64_read(&tp->rx_dma_mapping_fail);
-+	data[16] = atomic64_read(&tp->rx_skb_alloc_fail);
- }
- 
- static void rtl8169_get_strings(struct net_device *dev, u32 stringset, u8 *data)
-@@ -4167,12 +4179,17 @@ static struct page *rtl8169_alloc_rx_data(struct rtl8169_private *tp,
- 	struct page *data;
- 
- 	data = alloc_pages_node(node, GFP_KERNEL, get_order(R8169_RX_BUF_SIZE));
--	if (!data)
-+	if (!data) {
-+		atomic64_inc(&tp->rx_alloc_fail);
-+		atomic64_inc(&tp->rx_buf_alloc_fail);
- 		return NULL;
-+	}
- 
- 	mapping = dma_map_page(d, data, 0, R8169_RX_BUF_SIZE, DMA_FROM_DEVICE);
- 	if (unlikely(dma_mapping_error(d, mapping))) {
- 		netdev_err(tp->dev, "Failed to map RX DMA!\n");
-+		atomic64_inc(&tp->rx_alloc_fail);
-+		atomic64_inc(&tp->rx_dma_mapping_fail);
- 		__free_pages(data, get_order(R8169_RX_BUF_SIZE));
- 		return NULL;
- 	}
-@@ -4823,6 +4840,8 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
- 		skb = napi_alloc_skb(&tp->napi, pkt_size);
- 		if (unlikely(!skb)) {
- 			dev->stats.rx_dropped++;
-+			atomic64_inc(&tp->rx_alloc_fail);
-+			atomic64_inc(&tp->rx_skb_alloc_fail);
- 			goto release_descriptor;
- 		}
- 
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 87aa4f4e9724..69dbdbde9d71 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -210,7 +210,7 @@ static int of_load_pse_pis(struct pse_controller_dev *pcdev)
+ 			ret = of_load_pse_pi_pairsets(node, &pi, ret);
+ 			if (ret)
+ 				goto out;
+-		} else if (ret != ENOENT) {
++		} else if (ret != -ENOENT) {
+ 			dev_err(pcdev->dev,
+ 				"error: wrong number of pairsets. Should be 1 or 2, got %d (%pOF)\n",
+ 				ret, node);
+
+base-commit: 5db89c99566fc4728cc92e941d8e1975711e24b5
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 
 
