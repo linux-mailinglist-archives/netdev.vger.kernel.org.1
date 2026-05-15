@@ -1,152 +1,206 @@
-Return-Path: <netdev+bounces-288153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288154-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IBTGLf5+BmrnkAIAu9opvQ
-	(envelope-from <netdev+bounces-288153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:03:42 +0200
+	id AGOMGoqBBmrnkAIAu9opvQ
+	(envelope-from <netdev+bounces-288154-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:14:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDDC5489EA
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:03:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBBB4548AB2
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:14:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A051306A5F7
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 02:02:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B987B3023BC6
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 02:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C11F24886E;
-	Fri, 15 May 2026 02:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZG1bB9vW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01241390222;
+	Fri, 15 May 2026 02:14:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96398204C3B
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 02:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB934387363;
+	Fri, 15 May 2026 02:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778810524; cv=none; b=Vi3iawX0ZfCD/pW7txL1Tkg96SGFGrk4EMGm/Li28xEENioip7QaKHvkUt7PvuZaNGbLzrmysohcSB6TIx2Azv2MS8TQ4LZpW1JLB53FS1yZr6ofluhIJWAbcFdDg1TFGb1yGOvr+K0k8GlvgvSYfnbXZyM9SM3Jdli86OZHHs4=
+	t=1778811269; cv=none; b=H6bK5rQeK2kl5oHSLRxyHT1jGf5cnhSqd84Qj5pStwpgkBeqz3HzjdwYMw44hxddd6AM/r/+n2Zp4X5iBdfT07ZtilDFuO9uGX16OX8qBbkbZY/e89ZHci/MuGXsJkK6+JyyFNFb1ZgC04ezNd94e8UaSxAYsXLswTGpRYdiiy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778810524; c=relaxed/simple;
-	bh=RUo9Zm+kUTt1LGVjRvStOWi2h5sS3Kp5xF+lxLh+nAY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hPYzptVYajsyepNoBurr+dk6b0Wq/5Azt/He54/PKb7Pft7D8UNifhlP8SHH2J7V/aVzfOzvbVvYduqOIyg+cSCWy+sjbchnYME0cLSPuxc4xUxRR1RVO74VWRb9soGcJoAx+BYeVv5ZAc1VRhA8r2HLMCytEo8y5IwKLPnP4ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZG1bB9vW; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f747602d-8208-4b3a-9e16-78632ec7b919@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778810520;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RUo9Zm+kUTt1LGVjRvStOWi2h5sS3Kp5xF+lxLh+nAY=;
-	b=ZG1bB9vW3JbbWw2abv0cdjKWVGchRM2mxJxYJVOtO3E/MhLDrIXzLtWMiN7VRFB7gTQ0Md
-	doMpnNghSNeAXXVK0nSQLAqkDg0aT4Z7BvE0i4JuCAeyAkKHqJe8so0l2mKgkh4f151pO/
-	OIkqipzKm8yYmd2nKpiS0lxpl6jCvQA=
-Date: Fri, 15 May 2026 10:01:50 +0800
+	s=arc-20240116; t=1778811269; c=relaxed/simple;
+	bh=5frOUZ5UqGVTaqdCTNubY/Zpz6V9myJkFEzJbKyGWcs=;
+	h=Message-ID:Date:Mime-Version:From:To:Cc:Subject:Content-Type; b=jkT/VwAU7vE8QWxVHlzVhQsPEsMmkdeJiSc/9N56QSITnzLfKV730W7ULNL35C8Tp8J6XgqEbIt9x2y/jXxkgcP0V5NwJvOi5i7LAQYE7WEJOsZG8fKV31f9D2QtE15x5ZMjhm9UBbdYQ7gegKs9yfW+KpNys8+aq1Ty73UprEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4gGrNn1P7Bz4xQXS;
+	Fri, 15 May 2026 10:14:17 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.99.176])
+	by mse-fl1.zte.com.cn with SMTP id 64F2E70E088146;
+	Fri, 15 May 2026 10:14:07 +0800 (+08)
+	(envelope-from qiu.yutan@zte.com.cn)
+Received: from mapi (xaxapp04[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Fri, 15 May 2026 10:14:08 +0800 (CST)
+X-Zmail-TransId: 2afb6a06817063d-ed5aa
+X-Mailer: Zmail v1.0
+Message-ID: <20260515101408635T6_cWDYOWVYQleZjRtUS1@zte.com.cn>
+Date: Fri, 15 May 2026 10:14:08 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH net v2] net: skbuff: propagate shared-frag marker through
- frag-transfer helpers
-To: Hyunwoo Kim <imv4bel@gmail.com>, Sultan Alsawaf <sultan@kerneltoast.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, kerneljasonxing@gmail.com,
- kuniyu@google.com, mhal@rbox.co, steffen.klassert@secunet.com,
- vakzz@zellic.io, ben@decadent.org.uk, herbert@gondor.apana.org.au,
- dsahern@kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org
-References: <agToIEDI4TaTNLRb@v4bel> <agVpIsaSherjHTYg@sultan-box>
- <agWUdie1xBvBu22I@v4bel>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <agWUdie1xBvBu22I@v4bel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 1DDDC5489EA
+Mime-Version: 1.0
+From: <qiu.yutan@zte.com.cn>
+To: <davem@davemloft.net>, <kuba@kernel.org>
+Cc: <dsahern@kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <horms@kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yang.chuan1@zte.com.cn>,
+        <huang.jian@zte.com.cn>, <zhou.shizhen@zte.com.cn>,
+        <zhang.dongyu1@zte.com.cn>, <ye.guojin@zte.com.cn>,
+        <yang.wei20@zte.com.cn>, <zhang.lin16@zte.com.cn>,
+        <li.hao40@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0XSBuZXQ6IG5laWdoOiBSZW5hbWUgTkVJR0hfVkFSX0lOVEVSVkFMX1BST0JFX1RJTUVfTVMgdG8gTkVJR0hfVkFSX0lOVEVSVkFMX1BST0JFX1RJTUU=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 64F2E70E088146
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: qiu.yutan@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.132 unknown Fri, 15 May 2026 10:14:17 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6A068179.000/4gGrNn1P7Bz4xQXS
+X-Rspamd-Queue-Id: EBBB4548AB2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.64 / 15.00];
+	SUBJ_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288153-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kerneltoast.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rbox.co,secunet.com,zellic.io,decadent.org.uk,gondor.apana.org.au,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288154-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[qiu.yutan@zte.com.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+From: Qiu Yutan <qiu.yutan@zte.com.cn>
 
-On 5/14/26 5:23 PM, Hyunwoo Kim wrote:
-> On Wed, May 13, 2026 at 11:18:10PM -0700, Sultan Alsawaf wrote:
->> On Thu, May 14, 2026 at 06:07:44AM +0900, Hyunwoo Kim wrote:
->>> Changes in v2:
->>> - Also propagate SHARED_FRAG in skb_shift()
->>> - v1: https://lore.kernel.org/all/agRfuVOeMI5pbHhY@v4bel/
->> Hi Hyunwoo,
->>
->> I've been working on mitigating this vulnerability as a member of the kernel
->> team at CIQ, a distro vendor. In particular, we wanted to make sure that there
->> weren't any lingering places missing SHARED_FRAG propagation.
->>
->> To that end, I used Claude to discover that skb_gro_receive() remained unpatched
->> (as you pointed out in the v1 thread). And then I generated a PoC exploiting the
->> vulnerable skb_gro_receive() path.
->>
->> The PoC is a modified version of the original fragnesia PoC. It works 100% of
->> the time, just like the original fragnesia PoC.
->>
->> I have attached the PoC and a patch that fixes skb_gro_receive(). Please take a
->> look at them.
->>
->> Thanks,
->> Sultan
-> Nice catch. Thank you.
->
-> After testing, I plan to merge your patch with v2 into a single patch (not a
-> series) and submit it as v3. I would appreciate it if you could then add an
-> appropriate credit tag of your own.
+During the initialization of arp_tbl, the enumeration constant name
+NEIGH_VAR_INTERVAL_PROBE_TIME_MS in the statement
+arp_tbl.parms.data[NEIGH_VAR_INTERVAL_PROBE_TIME_MS] = 5*HZ does not
+align with its actual meaning (jiffies).
 
-When sending v3, remember to rebase net tree first then generate the patch.
+Using NEIGH_VAR_INTERVAL_PROBE_TIME is a better naming choice.
 
-https://web.git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=f84eca5817390257cef78013d0112481c503b4a3
+Fixes: bf48c3fae6d7 ("Merge branch 'net-neigh-introduce-interval_probe_time-for-periodic-probe'")
+Signed-off-by: Qiu Yutan <qiu.yutan@zte.com.cn>
+---
+ include/net/neighbour.h | 2 +-
+ net/core/neighbour.c    | 8 ++++----
+ net/ipv4/arp.c          | 2 +-
+ net/ipv6/ndisc.c        | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
+diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+index 2dfee6d4258a..f317e910ec3c 100644
+--- a/include/net/neighbour.h
++++ b/include/net/neighbour.h
+@@ -49,7 +49,7 @@ enum {
+ 	NEIGH_VAR_RETRANS_TIME,
+ 	NEIGH_VAR_BASE_REACHABLE_TIME,
+ 	NEIGH_VAR_DELAY_PROBE_TIME,
+-	NEIGH_VAR_INTERVAL_PROBE_TIME_MS,
++	NEIGH_VAR_INTERVAL_PROBE_TIME,
+ 	NEIGH_VAR_GC_STALETIME,
+ 	NEIGH_VAR_QUEUE_LEN_BYTES,
+ 	NEIGH_VAR_PROXY_QLEN,
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 9e12524b67fa..912e6ca3b26e 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -1670,7 +1670,7 @@ static void neigh_managed_work(struct work_struct *work)
+ 	list_for_each_entry(neigh, &tbl->managed_list, managed_list)
+ 		neigh_event_send_probe(neigh, NULL, false);
+ 	queue_delayed_work(system_power_efficient_wq, &tbl->managed_work,
+-			   NEIGH_VAR(&tbl->parms, INTERVAL_PROBE_TIME_MS));
++			   NEIGH_VAR(&tbl->parms, INTERVAL_PROBE_TIME));
+ 	spin_unlock_bh(&tbl->lock);
+ }
 
-Thanks
+@@ -2235,7 +2235,7 @@ static int neightbl_fill_parms(struct sk_buff *skb, struct neigh_parms *parms)
+ 	    nla_put_msecs(skb, NDTPA_LOCKTIME,
+ 			  NEIGH_VAR(parms, LOCKTIME), NDTPA_PAD) ||
+ 	    nla_put_msecs(skb, NDTPA_INTERVAL_PROBE_TIME_MS,
+-			  NEIGH_VAR(parms, INTERVAL_PROBE_TIME_MS), NDTPA_PAD))
++			  NEIGH_VAR(parms, INTERVAL_PROBE_TIME), NDTPA_PAD))
+ 		goto nla_put_failure;
+ 	return nla_nest_end(skb, nest);
 
-> Also, I would appreciate it if you could use AI to explore additional
-> propagation variant paths. From my own analysis, no further ones have been
-> identified.
->
->
-> Best regards,
-> Hyunwoo Kim
->
->
-
-
+@@ -2508,7 +2508,7 @@ static int neightbl_set(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 				call_netevent_notifiers(NETEVENT_DELAY_PROBE_TIME_UPDATE, p);
+ 				break;
+ 			case NDTPA_INTERVAL_PROBE_TIME_MS:
+-				NEIGH_VAR_SET(p, INTERVAL_PROBE_TIME_MS,
++				NEIGH_VAR_SET(p, INTERVAL_PROBE_TIME,
+ 					      nla_get_msecs(tbp[i]));
+ 				break;
+ 			case NDTPA_RETRANS_TIME:
+@@ -3804,7 +3804,7 @@ static struct neigh_sysctl_table {
+ 		NEIGH_SYSCTL_USERHZ_JIFFIES_ENTRY(RETRANS_TIME, "retrans_time"),
+ 		NEIGH_SYSCTL_JIFFIES_ENTRY(BASE_REACHABLE_TIME, "base_reachable_time"),
+ 		NEIGH_SYSCTL_JIFFIES_ENTRY(DELAY_PROBE_TIME, "delay_first_probe_time"),
+-		NEIGH_SYSCTL_MS_JIFFIES_POSITIVE_ENTRY(INTERVAL_PROBE_TIME_MS,
++		NEIGH_SYSCTL_MS_JIFFIES_POSITIVE_ENTRY(INTERVAL_PROBE_TIME,
+ 						       "interval_probe_time_ms"),
+ 		NEIGH_SYSCTL_JIFFIES_ENTRY(GC_STALETIME, "gc_stale_time"),
+ 		NEIGH_SYSCTL_ZERO_INTMAX_ENTRY(QUEUE_LEN_BYTES, "unres_qlen_bytes"),
+diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
+index 51d70180e1cc..601b98185cf5 100644
+--- a/net/ipv4/arp.c
++++ b/net/ipv4/arp.c
+@@ -169,7 +169,7 @@ struct neigh_table arp_tbl = {
+ 			[NEIGH_VAR_RETRANS_TIME] = 1 * HZ,
+ 			[NEIGH_VAR_BASE_REACHABLE_TIME] = 30 * HZ,
+ 			[NEIGH_VAR_DELAY_PROBE_TIME] = 5 * HZ,
+-			[NEIGH_VAR_INTERVAL_PROBE_TIME_MS] = 5 * HZ,
++			[NEIGH_VAR_INTERVAL_PROBE_TIME] = 5 * HZ,
+ 			[NEIGH_VAR_GC_STALETIME] = 60 * HZ,
+ 			[NEIGH_VAR_QUEUE_LEN_BYTES] = SK_WMEM_DEFAULT,
+ 			[NEIGH_VAR_PROXY_QLEN] = 64,
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index e7ad13c5bd26..ca7df107e3bf 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -128,7 +128,7 @@ struct neigh_table nd_tbl = {
+ 			[NEIGH_VAR_RETRANS_TIME] = ND_RETRANS_TIMER,
+ 			[NEIGH_VAR_BASE_REACHABLE_TIME] = ND_REACHABLE_TIME,
+ 			[NEIGH_VAR_DELAY_PROBE_TIME] = 5 * HZ,
+-			[NEIGH_VAR_INTERVAL_PROBE_TIME_MS] = 5 * HZ,
++			[NEIGH_VAR_INTERVAL_PROBE_TIME] = 5 * HZ,
+ 			[NEIGH_VAR_GC_STALETIME] = 60 * HZ,
+ 			[NEIGH_VAR_QUEUE_LEN_BYTES] = SK_WMEM_DEFAULT,
+ 			[NEIGH_VAR_PROXY_QLEN] = 64,
+-- 
+2.25.1
 
