@@ -1,68 +1,45 @@
-Return-Path: <netdev+bounces-288273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288276-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eB5QFLTzBmohpQIAu9opvQ
-	(envelope-from <netdev+bounces-288273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:21:40 +0200
+	id 4P95KIz0Bmo4pgIAu9opvQ
+	(envelope-from <netdev+bounces-288276-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:25:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A48F154D3BB
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:21:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BF3154D4A3
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17AF430A2BC1
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:57:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BC3613150826
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423AB45BD4B;
-	Fri, 15 May 2026 09:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="0ya06e57"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914D5466B5E;
+	Fri, 15 May 2026 09:56:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C7A44DB9C
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 09:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774D343E4AE;
+	Fri, 15 May 2026 09:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778838964; cv=none; b=SY4BLzjmFrihjRVtgYydqJXMugJILKr/xTZDw8cRecST4GTJnJPE4ope5fZ0vEi7KUFBraruR+uGH0qDgM4Rt3ePolJ3eyao64B31ZYnWWTeiVT53IhbdKJa/sg7ftr9KkAdp4q+p8yFq67ZBUuNvN1EqPaQrW4nckikRoAiVsc=
+	t=1778838972; cv=none; b=Nq3sK0VgM2bpXQMME63JTOdwg1CMWD4Pz3gkRI0P/glQyriSK6qKINDtqVDlAfkn8Xg8N6+Krg8wgDEn/dTywr0FOe9ZQcm26xQkFsKwvo8EepNjgYiLbo1UQ7sr4VPtRX8kUq9UjCQvr4+k1NZuTJNoemEVQXak5C2wEZHb208=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778838964; c=relaxed/simple;
-	bh=YvA5yUfrwRqEZHewWc950dJrZjcPZ+8ZQr/ZsbmBc/I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tbq3fdfByxOIs+vBEPeQRO7C++oujsMBQuBS0G46ib1y/5BASQiz1KNRQ2twLoZ0Tp2EMvO+omIifcLdW7UpcdEzFOijxRG+ctTswxS4lp9yVF5yWA9R6F63Gd/tsaoNtSSgcryl6TkqYsrdjmLNfNyjEHqzuZjhDT3aExChXrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=0ya06e57; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1778838958;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pzeglsvftGQq2owmysdqGGIsVR2TLwY6CvuHqBqKR4I=;
-	b=0ya06e57/A7JDgPf04FnAYYR7CDbk/VtV2JfA7EO35HyddZ1cZ2HGzHwyqk+ISWSietKah
-	QlK1xe38dXH+5ulPbVzGkZW2AntNg6YxiAYw6Creye08lPp1O92uyL7rjVnuIo8NJ5xi1J
-	IzxSnC4VJtuGIXwsygPnaf3XRlpn+B5Qo6P47qwsusg2bcP5cGfNGkr+vxQZBI93t2H1Ma
-	+uHpLovM6iUm6TCpPSUIv85DB5QRsONeSyRR3tJmN2ukhOtGaWCL+Fq0VXwwguoeQoRLkN
-	cd47s8mgFTP6TM8QYCxyoc8kqczVJdjiyUFUQX41PdJS2gvsLSaypJGSmPT0Yw==
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Sven Eckelmann <sven@narfation.org>,
-	stable@kernel.org,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 14/14] batman-adv: tp_meter: directly shut down timer on cleanup
-Date: Fri, 15 May 2026 11:55:39 +0200
-Message-ID: <20260515095540.325586-15-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260515095540.325586-1-sw@simonwunderlich.de>
-References: <20260515095540.325586-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1778838972; c=relaxed/simple;
+	bh=UGCagGDoyi3bkk5Q504DGiKrb4e0/4S3z32wD3DgJug=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T4Vj/2uIRGJyfs0CMQBIww3Xk8trorqngZ6ED4g91hKgoYasXVwfXDQuNjwYRPztbM/EjUUol01V7YLVtS8X1q8qWcFkEB5a2n1FpSfN7lAJ+O5kY67W4plWFGxkUC7FtPotjD1DN3EY1dqdOX8pvYzr3ownDWK3jURWrloOMJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB2BC2BCB0;
+	Fri, 15 May 2026 09:56:11 +0000 (UTC)
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH v2] [net-next] dibs: Improve DIBS prompts and help texts
+Date: Fri, 15 May 2026 11:56:02 +0200
+Message-ID: <9093259c43e5d1996965d1522562444419196a19.1778838921.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,85 +47,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A48F154D3BB
+X-Rspamd-Queue-Id: 1BF3154D4A3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
-	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288273-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288276-lists,netdev=lfdr.de,renesas];
+	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DMARC_NA(0.00)[glider.be];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[geert@glider.be,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.984];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-From: Sven Eckelmann <sven@narfation.org>
+The Kconfig prompts for the DIBS options read:
 
-batadv_tp_sender_cleanup() was calling timer_delete_sync() followed by
-timer_delete() to guard against the timer handler re-arming itself between
-the two calls. This double-deletion hack relied on the sending status being
-set to 0 to suppress re-arming.
+    DIBS support (DIBS) [N/m/y/?]
+      intra-OS shortcut with dibs loopback (DIBS_LO) [N/y/?]
 
-Replace both calls with a single timer_shutdown_sync(). This function both
-waits for any running timer callback to complete (like timer_delete_sync())
-and permanently disarms the timer so it cannot be re-armed afterwards,
-making re-arming prevention unconditional and self-documenting.
+Clarify the DIBS prompt by expanding the acronym.
+Capitalize the first character of the DIBS_LO prompt.
+While at it, join the first two lines of the DIBS help text into a real
+sentence.
 
-The re-arming property is also required because otherwise:
-
-1. context 0 (batadv_tp_recv_ack()) checks in
-   batadv_tp_reset_sender_timer() if sending is still 1 -> it is
-2. context 1 changes in batadv_tp_sender_shutdown() sending to 0 and in
-   this process forces the kthread to stop timer in
-   batadv_tp_sender_cleanup()
-3. context 0 continues in batadv_tp_reset_sender_timer() and rearms the
-   timer -> but the reference for it is already gone
-
-Cc: stable@kernel.org
-Fixes: 33a3bb4a3345 ("batman-adv: throughput meter implementation")
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- net/batman-adv/tp_meter.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+v2:
+  - Drop changing dibs to all caps, which was completely wrong for the
+    module name,
+  - Target "net-next" instead of "net".
+---
+ drivers/dibs/Kconfig | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/batman-adv/tp_meter.c b/net/batman-adv/tp_meter.c
-index a3593d104caa5..1fd1526059d8a 100644
---- a/net/batman-adv/tp_meter.c
-+++ b/net/batman-adv/tp_meter.c
-@@ -401,13 +401,7 @@ static void batadv_tp_sender_cleanup(struct batadv_tp_vars *tp_vars)
- 	batadv_tp_list_detach(tp_vars);
+diff --git a/drivers/dibs/Kconfig b/drivers/dibs/Kconfig
+index 5dc347b9b2350667..8f41e562210044df 100644
+--- a/drivers/dibs/Kconfig
++++ b/drivers/dibs/Kconfig
+@@ -1,18 +1,18 @@
+ # SPDX-License-Identifier: GPL-2.0
+ config DIBS
+-	tristate "DIBS support"
++	tristate "Direct Internal Buffer Sharing support"
+ 	default n
+ 	help
+-	  Direct Internal Buffer Sharing (DIBS)
+-	  A communication method that uses common physical (internal) memory
+-	  for synchronous direct access into a remote buffer.
++	  Direct Internal Buffer Sharing (DIBS) is a communication method that
++	  uses common physical (internal) memory for synchronous direct access
++	  into a remote buffer.
  
- 	/* kill the timer and remove its reference */
--	timer_delete_sync(&tp_vars->timer);
--	/* the worker might have rearmed itself therefore we kill it again. Note
--	 * that if the worker should run again before invoking the following
--	 * timer_delete(), it would not re-arm itself once again because the status
--	 * is OFF now
--	 */
--	timer_delete(&tp_vars->timer);
-+	timer_shutdown_sync(&tp_vars->timer);
- 	batadv_tp_vars_put(tp_vars);
- }
+ 	  Select this option to provide the abstraction layer between
+ 	  dibs devices and dibs clients like the SMC protocol.
+ 	  The module name is dibs.
  
+ config DIBS_LO
+-	bool "intra-OS shortcut with dibs loopback"
++	bool "Intra-OS shortcut with dibs loopback"
+ 	depends on DIBS
+ 	default n
+ 	help
 -- 
-2.47.3
+2.43.0
 
 
