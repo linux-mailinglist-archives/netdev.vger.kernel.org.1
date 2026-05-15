@@ -1,247 +1,146 @@
-Return-Path: <netdev+bounces-288174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288175-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Zf4CSWcBmoylQIAu9opvQ
-	(envelope-from <netdev+bounces-288174-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:08:05 +0200
+	id poILES2fBmrPlQIAu9opvQ
+	(envelope-from <netdev+bounces-288175-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:21:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEB42549175
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:08:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DBB5492A5
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 351BD30381F1
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:06:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5FAC0300B9E1
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4583D3D4128;
-	Fri, 15 May 2026 04:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CB33D410C;
+	Fri, 15 May 2026 04:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="h5m3za1z"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE20D3C09F4;
-	Fri, 15 May 2026 04:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EDA3D3CFA;
+	Fri, 15 May 2026 04:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778817923; cv=none; b=KvyeEFenSQnqh0X2Pftku0gIKljVy1Xi3IwDupoxFpZjUoJ0obkvE759h1v5/r6lOqhX6NQLVXtMTY/bbAY5FBKHdM2unXbMNrVO44mJljYUCKvcArd4taCSZGLucXECPAcPFOTPkiG1t/lNRl6P7N96eIQ6Gna6e+lCZOYdctg=
+	t=1778818853; cv=none; b=A9yg2rAYl2EfT6k9778CjM8hrUZynbi/xQuRkLFtjBssvqcU8ZeHTmDiEgFpxRNy947IJZpJQZsi2Y7Eprps/cbW0OnFM5qK3OL1WAclczVVhk/VjDSxIi+bjvTt1sKo8dWPoTLBUqKQoQuGyBenq6YbvfL0mEjRx+QzfQHp3EQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778817923; c=relaxed/simple;
-	bh=ww3iDhHqj2sZVRmFfdi5sIDnONKXle9ygwVgSzDwxfg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WwuH3n+1+fn69STOD2EPrq7KTFSeudZ9cznrvnUbmVnbqyXjsW6Vwgm/X4ZZfvkUaKbzlYs5XWiJs1wqrTvkDspVflxI9YObK+WGebMCtKcTmHxSp77vAQm4Dy7rFP7mXFtud++GX8R0aQUl0fkFtVhAmX6+Ye/KfM45YahJ9/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id 2967820B716C; Thu, 14 May 2026 21:05:18 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2967820B716C
-From: Long Li <longli@microsoft.com>
-To: Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1778818853; c=relaxed/simple;
+	bh=9Ca+GE5zHL3u+0IEX2+Z0VOeZdy7Fkv0nnGmh9y3hh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H2SWQ5FP4fvAgObAWoUipPfW/51iqV9lP+eufNed56TH79T/NeYzpKAqh+gqGK3szzf6O1nHMIQm3O4q5LyhbktXnuV/qNLGThNpGZhvuOQaV4fhvsPj5jl2RZ5n1XeGldIEjI9BI+vsTzQQ592bEh3l0TbUIrSNTRywwS5LyaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=h5m3za1z; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=ZDReuVCfVZrcHmYVCMEAb8W+xlZArwf954j9YhHTfKY=; 
+	b=h5m3za1ztUh188CtdD/j9MIh+F29FStkNcn71OEplUF/eVnbFTAAVJgXo3FoAXlrFe/nbnqiYAL
+	o0t4OSHRrByMAzFgem4OSHqVl2xqV0ZUbrjqi7WI0MBe4dgo+m94/ttJ+2tbjvkkgYFX93kNsVung
+	75dbLbFnSq2a8C36hlJWfWDGy+3ZX8hTMRfp0sfOzj0XfmQjA+9hTkykMgOjTY2FgghD060tvAwhw
+	wQiDAqisdcHXb4mtsBVRGhxfxP+toc0JzyTqWbfRxhv9W3frkOvufAqhLXhXxZvFVlD8ToplHTiuB
+	0L46OW/nHaSjzJHMhry+k/Mh1rUYVQHX7mhQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wNk1u-00EIoB-28;
+	Fri, 15 May 2026 12:20:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 May 2026 12:20:06 +0800
+Date: Fri, 15 May 2026 12:20:06 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
 	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	shradhagupta@linux.microsoft.com
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v10 6/6] RDMA/mana_ib: Allocate interrupt contexts on EQs
-Date: Thu, 14 May 2026 21:05:08 -0700
-Message-ID: <20260515040508.491748-7-longli@microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260515040508.491748-1-longli@microsoft.com>
-References: <20260515040508.491748-1-longli@microsoft.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Maciej Zenczykowski <maze@google.com>, Kees Cook <kees@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net 2/2] ipv4: ah: harden ah_output options-copy guard
+ against ihl < 5
+Message-ID: <agae9ph6pzaQJv3E@gondor.apana.org.au>
+References: <cover.1778614451.git.michael.bommarito@gmail.com>
+ <423b9ce3b45782c09a2fd9c65ad6674a9abb7c72.1778614451.git.michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: EEB42549175
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <423b9ce3b45782c09a2fd9c65ad6674a9abb7c72.1778614451.git.michael.bommarito@gmail.com>
+X-Rspamd-Queue-Id: 41DBB5492A5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.54 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
+	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-288174-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-288175-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.844];
-	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,apana.org.au:email,apana.org.au:url]
 X-Rspamd-Action: no action
 
-Use the GIC functions to allocate interrupt contexts for RDMA EQs. These
-interrupt contexts may be shared with Ethernet EQs when MSI-X vectors
-are limited.
+On Tue, May 12, 2026 at 04:51:15PM -0400, Michael Bommarito wrote:
+> 
+> diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
+> index 4366cbac3f06..8fa31bdf9792 100644
+> --- a/net/ipv4/ah4.c
+> +++ b/net/ipv4/ah4.c
+> @@ -137,7 +137,7 @@ static void ah_output_done(void *data, int err)
+>  	top_iph->tos = iph->tos;
+>  	top_iph->ttl = iph->ttl;
+>  	top_iph->frag_off = iph->frag_off;
+> -	if (top_iph->ihl != 5) {
+> +	if (top_iph->ihl > 5) {
 
-The driver now supports allocating dedicated MSI-X for each EQ. Indicate
-this capability through driver capability bits. The RDMA EQs pass
-use_msi_bitmap=false to share MSI-X vectors with Ethernet, while the
-capability flag advertises that the driver supports per-vPort EQ
-separation when hardware has sufficient vectors.
+As I have said before, if ihl is less than 5, then it's invalid to
+access any fields from the IP header (in fact you can't even access
+ihl itself if it's that short).
 
-Populate eq.irq on all RDMA EQs for consistency with the Ethernet path.
+So if these packets are getting this far into our stack, then things
+are very wrong indeed.
 
-Also relocate the GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE define to its
-numeric BIT(6) position among the other capability flags.
+Now I understand that this is already happening so we have to accept
+it.  But we should try to fix each and one of these issues as other
+places in our IP stack can very much break if you bombard them with
+these bogus packets.
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- drivers/infiniband/hw/mana/main.c | 43 +++++++++++++++++++++++++------
- include/net/mana/gdma.h           |  7 +++--
- 2 files changed, 40 insertions(+), 10 deletions(-)
+To further that end, I suggest that you add a WARN_ON_ONCE for the
+case (top_iph->ihl < 5) and put that at the very start of the AH
+input function so that i can bail out straight away.
 
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index f8a9013f0ca3..df465a9078c1 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -764,7 +764,8 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- {
- 	struct gdma_context *gc = mdev_to_gc(mdev);
- 	struct gdma_queue_spec spec = {};
--	int err, i;
-+	struct gdma_irq_context *gic;
-+	int err, i, msi;
- 
- 	spec.type = GDMA_EQ;
- 	spec.monitor_avl_buf = false;
-@@ -772,11 +773,19 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- 	spec.eq.callback = mana_ib_event_handler;
- 	spec.eq.context = mdev;
- 	spec.eq.log2_throttle_limit = LOG2_EQ_THROTTLE;
--	spec.eq.msix_index = 0;
-+
-+	msi = 0;
-+	gic = mana_gd_get_gic(gc, false, &msi);
-+	if (!gic)
-+		return -ENOMEM;
-+	spec.eq.msix_index = msi;
- 
- 	err = mana_gd_create_mana_eq(mdev->gdma_dev, &spec, &mdev->fatal_err_eq);
--	if (err)
-+	if (err) {
-+		mana_gd_put_gic(gc, false, 0);
- 		return err;
-+	}
-+	mdev->fatal_err_eq->eq.irq = gic->irq;
- 
- 	mdev->eqs = kzalloc_objs(struct gdma_queue *,
- 				 mdev->ib_dev.num_comp_vectors);
-@@ -786,32 +795,50 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- 	}
- 	spec.eq.callback = NULL;
- 	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++) {
--		spec.eq.msix_index = (i + 1) % gc->num_msix_usable;
-+		msi = (i + 1) % gc->num_msix_usable;
-+
-+		gic = mana_gd_get_gic(gc, false, &msi);
-+		if (!gic) {
-+			err = -ENOMEM;
-+			goto destroy_eqs;
-+		}
-+		spec.eq.msix_index = msi;
-+
- 		err = mana_gd_create_mana_eq(mdev->gdma_dev, &spec, &mdev->eqs[i]);
--		if (err)
-+		if (err) {
-+			mana_gd_put_gic(gc, false, msi);
- 			goto destroy_eqs;
-+		}
-+		mdev->eqs[i]->eq.irq = gic->irq;
- 	}
- 
- 	return 0;
- 
- destroy_eqs:
--	while (i-- > 0)
-+	while (i-- > 0) {
- 		mana_gd_destroy_queue(gc, mdev->eqs[i]);
-+		mana_gd_put_gic(gc, false, (i + 1) % gc->num_msix_usable);
-+	}
- 	kfree(mdev->eqs);
- destroy_fatal_eq:
- 	mana_gd_destroy_queue(gc, mdev->fatal_err_eq);
-+	mana_gd_put_gic(gc, false, 0);
- 	return err;
- }
- 
- void mana_ib_destroy_eqs(struct mana_ib_dev *mdev)
- {
- 	struct gdma_context *gc = mdev_to_gc(mdev);
--	int i;
-+	int i, msi;
- 
- 	mana_gd_destroy_queue(gc, mdev->fatal_err_eq);
-+	mana_gd_put_gic(gc, false, 0);
- 
--	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++)
-+	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++) {
- 		mana_gd_destroy_queue(gc, mdev->eqs[i]);
-+		msi = (i + 1) % gc->num_msix_usable;
-+		mana_gd_put_gic(gc, false, msi);
-+	}
- 
- 	kfree(mdev->eqs);
- }
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 6c138cc77407..d84e474309a3 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -615,6 +615,7 @@ enum {
- #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
- #define GDMA_DRV_CAP_FLAG_1_GDMA_PAGES_4MB_1GB_2GB BIT(4)
- #define GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT BIT(5)
-+#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
- 
- /* Driver can handle holes (zeros) in the device list */
- #define GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP BIT(11)
-@@ -631,7 +632,8 @@ enum {
- /* Driver detects stalled send queues and recovers them */
- #define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
- 
--#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
-+/* Driver supports separate EQ/MSIs for each vPort */
-+#define GDMA_DRV_CAP_FLAG_1_EQ_MSI_UNSHARE_MULTI_VPORT BIT(19)
- 
- /* Driver supports linearizing the skb when num_sge exceeds hardware limit */
- #define GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE BIT(20)
-@@ -659,7 +661,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
- 	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
- 	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY | \
--	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY)
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY | \
-+	 GDMA_DRV_CAP_FLAG_1_EQ_MSI_UNSHARE_MULTI_VPORT)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
+Thanks,
 -- 
-2.43.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
