@@ -1,203 +1,156 @@
-Return-Path: <netdev+bounces-288210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288209-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIQZNuvLBmpDoAIAu9opvQ
-	(envelope-from <netdev+bounces-288210-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:31:55 +0200
+	id COieIFzLBmrynwIAu9opvQ
+	(envelope-from <netdev+bounces-288209-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:29:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9372D54A9CC
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:31:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A15EF54A947
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:29:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 397CB3008E3C
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:29:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 924E93002516
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3150E3E4C71;
-	Fri, 15 May 2026 07:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60893EBF1A;
+	Fri, 15 May 2026 07:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hw7o8KdZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mJqk6tlh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346173E4C8C;
-	Fri, 15 May 2026 07:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA7C3E8C60;
+	Fri, 15 May 2026 07:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778830187; cv=none; b=taEuwb/ikcfKcnn6nZsnDzlGnHQaCU08AQEHMaDJO+Lk02pmQHKkKcEX3pD5KRMJz2mdi3JBlqZZtIlcriIpYD8xP7PY7cJOem1Z2ncQR1PKZBPPVUaJWVJRDWiNpC33wC+adzgzCyow9QjwFur0/NAIbL5o0wRu8fIB6Zdy9cA=
+	t=1778830161; cv=none; b=dlOhYuPAPs5vc3VCe4dSc11mSTstThkhLZh+8RFh8gF4bNGsCUD4nHB/iDCiTBr27VYwcGdJMXdVzPyNdyDpXBKque2ThTWw9msfG+Egub0x0mNjmrDtcSJCgDm2zpm8/QCyiwM1eFGkct+beGtl0Oml/XJ5ggABZRmuG05Ex9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778830187; c=relaxed/simple;
-	bh=dPuELiT2Bsqx8fnIaOkzHcfQa8yLb8VhNQiWP13A6Ek=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o/HxEdxfaepRn6G4x3gTU7tHNK+OvVzsJR13WuHHAhUEmBbK5opO7mn53yjRgSYkQg27kGjzI47BSNGVjbpUdruPO7L89iHMg8tetePabs3mj5ferM8rzCX74xij3pTs3/HQmyw10wPY8cP8hrbIyip3+Fefb73eeTEQ7PClL8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hw7o8KdZ; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64F7QCu3235793;
-	Fri, 15 May 2026 00:28:27 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=ZW9mPw4tNY2+UL8Fwefbn8UoC
-	5cQHplDA04VvRfNt5Q=; b=hw7o8KdZS4otf5MjFBBBEVbkj6mcd05+Ka+sSytXw
-	QWSv8w1BrbZpZo2V1Lh63Mm2ursneQ2JjgwMdeuUhVa2aKUMnQj0XcsfB6z+VI+r
-	O8yJTgrlKq3CQupBPd5JBF6uFqM1KgjGfBboW+8Arusj9MIMf1drt+4vAR+sgM4L
-	7ZX5OACsECxBF0lUtLO2+qZhyJ33iJRe10W9z6taamExRTPicTqeCOuTrAsFWipo
-	V6yLFK1nfhuPB364SEYlsV9i4Nyernr9b8t+zmYfyXv56CnssfjAB6LArZRC1Xfa
-	c/y0QS/aKzGa5qtEoWufLw2lS3bkadI63DB0OZz3G7AUQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e5m3shmrd-15
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 May 2026 00:28:26 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 15 May 2026 00:28:24 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 15 May 2026 00:28:24 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 5500B3F7063;
-	Fri, 15 May 2026 00:28:16 -0700 (PDT)
-Date: Fri, 15 May 2026 12:58:15 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <oss-drivers@corigine.com>
-CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
-        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
-        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
-        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
-        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
-        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
-        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
-        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
-        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
-        <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v14 net-next 6/9] octeontx2: cn20k: Coordinate default
- rules with NIX LF lifecycle
-Message-ID: <agbLD0oiKwkDJacw@rkannoth-OptiPlex-7090>
-References: <20260514062537.3813802-1-rkannoth@marvell.com>
- <20260514062537.3813802-7-rkannoth@marvell.com>
+	s=arc-20240116; t=1778830161; c=relaxed/simple;
+	bh=Nz609sIXNSfx4zkRvanpjMAqc+T7oYl5d5XpZwibQCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FHjpgvmyH5MtmX/iMSxovYGxn/eqdqnD/40qTv01GxQf+M0V6bsp9OidtuaSztf+cMcr8bCHQ707z8xL1wHR2JRxGRskIPEnKwmLtC9YGarMsq9sdj2kYdZSMO3WIS0R0K2Sa+vMVgccbiABrrXqi432WhOEg1thWEB45JGAsks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mJqk6tlh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555D9C2BCB0;
+	Fri, 15 May 2026 07:29:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778830160;
+	bh=Nz609sIXNSfx4zkRvanpjMAqc+T7oYl5d5XpZwibQCE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mJqk6tlhH8G+drsgS6IYp7FBgGZuGNajkrXly5jKhAmEpg7ilfPOBUVDBr1D+3RWI
+	 yw/KrKIGR9gZAwtTTU/x5LkYQNHwQvPOUN9yAdy0PBKxEdIoijwNZdruXRTIetIn22
+	 HC3dTBAXkKv1bvYHmJpSJxmTu9tjrPzzji0jHFg4OODKYphs8IoxbdTIG70uiviY9N
+	 tIgPE/yvnFncYBf/l7N3C9OEi4k1weBotb3CqOFhvURINy8yFsTZ1dJykXuq9VeXJv
+	 vuLwHfAMd5wjSW65e6JpK1q6NsJTqKB5yJnUgMsHBYHhjlB04IFxQVB/kZ3iNMidfu
+	 AIzE9WkgbyxMQ==
+Date: Fri, 15 May 2026 09:29:18 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Minghuan Lian <minghuan.lian@nxp.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	andrew+netdev@lunn.ch, olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: add NXP i.MX RT1180
+ NETC switch
+Message-ID: <20260515-encouraging-hopeful-spider-aee4ae@quoll>
+References: <20260509090632.2959553-1-minghuan.lian@nxp.com>
+ <20260509090632.2959553-2-minghuan.lian@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260514062537.3813802-7-rkannoth@marvell.com>
-X-Proofpoint-GUID: 97Elp48jrfrzVKfMTI48D2kSqZ-DCeiz
-X-Authority-Analysis: v=2.4 cv=NtrhtcdJ c=1 sm=1 tr=0 ts=6a06cb1a cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8
- a=0cyJEnxP_0G9nOKdDYoA:9 a=CjuIK1q_8ugA:10 a=O8hF6Hzn-FEA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: 97Elp48jrfrzVKfMTI48D2kSqZ-DCeiz
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE1MDA3MyBTYWx0ZWRfX9fhuAAgiFAEj
- 8uo95x2dm2n5kgKwEmO+QKVdKSKbrYq194AfxBgmhgH+2VrNTs2KrIN9lh1HPq2IzK0GEn6pY0C
- yjS+aAZujPuSwNqbRH8MmjBMgkBSh4rX1X9cxYSiKrlgOn2/hHL/aLirG2puIrW6dgfb0sCPI1q
- oAUoMfV1OqOWGq5BddWExVNiTbM3azmON1tbi5/z2baDdbeLHAQv4hoznZ1vMY3Bl+MyT1Cui6T
- UzjI2K1vkuaVaE3eoPU6JjK6hQoO0I+iLRfoUJx4w+x/iKz1O8vSFwK4ebloAO9G1VNJj0db+Qe
- Vh0JNMWULPJye7OY3Ut/9YrZVBodspEAxQrKuZGxnC4xoVlV8WJIyYbCxhMyu7Zweag8nYVNINy
- exoAZJbOwYhkJkAuRhbyxaUA6eJUKkUrA+nj37fLzlaP5D5OHUYc10hgOBoT2I1XMLF24/aQqsv
- y1Sfy8u1B8/LnMqgahA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-15_01,2026-05-13_01,2025-10-01_01
-X-Rspamd-Queue-Id: 9372D54A9CC
+In-Reply-To: <20260509090632.2959553-2-minghuan.lian@nxp.com>
+X-Rspamd-Queue-Id: A15EF54A947
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:email,marvell.com:dkim];
+	TAGGED_FROM(0.00)[bounces-288209-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288210-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 2026-05-14 at 11:55:34, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Add NIX_LF_DONT_FREE_DFT_IDXS so the PF can send NIX LF free during hw
-> reinit or teardown without the AF freeing CN20K default NPC rule indexes
-> while the driver still owns that state (otx2_init_hw_resources and
-> otx2_free_hw_resources).
->
-> On CN20K, allocate default NPC rules from NIX LF alloc before
-> nix_interface_init, roll back with npc_cn20k_dft_rules_free on failure,
-> and free from NIX LF free when the new flag is not set. Tighten
-> rvu_mbox_handler_nix_lf_alloc error handling: use a single rc, propagate
-> qmem_alloc and other errors, and set -ENOMEM only when kcalloc fails
-> (remove the blanket -ENOMEM at the free_mem path).
->
+On Sat, May 09, 2026 at 06:06:29PM +0900, Minghuan Lian wrote:
+> +allOf:
+> +  # Base: always a DSA switch
 
->> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
->> index f977734ae712c..7df256a9e01c5 100644
->> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
->> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
->> @@ -1566,13 +1567,15 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
->>
->>  	/* Alloc NIX RQ HW context memory and config the base */
->>  	hwctx_size = 1UL << ((ctx_cfg >> 4) & 0xF);
->> -	err = qmem_alloc(rvu->dev, &pfvf->rq_ctx, req->rq_cnt, hwctx_size);
->> -	if (err)
->> +	rc = qmem_alloc(rvu->dev, &pfvf->rq_ctx, req->rq_cnt, hwctx_size);
->> +	if (rc)
->>  		goto free_mem;
->>
->>  	pfvf->rq_bmap = kcalloc(req->rq_cnt, sizeof(long), GFP_KERNEL);
->> -	if (!pfvf->rq_bmap)
->> +	if (!pfvf->rq_bmap) {
->> +		rc = -ENOMEM;
->>  		goto free_mem;
->> +	}
->While reviewing these error handling updates, I noticed a potential
->regression in the surrounding allocation logic. Does this code leak the DMA
->memory for pfvf->rq_ctx and pfvf->rq_bmap if a Virtual Function repeatedly
->sends NIX_LF_ALLOC messages without first sending a corresponding NIX_LF_FREE?
->Since qmem_alloc and kcalloc unconditionally allocate memory and overwrite
->the existing pfvf pointers without freeing the old ones, could an unprivileged
->guest exhaust host memory by continuously triggering this mailbox handler?
->The same pattern appears to apply to pfvf->sq_ctx and pfvf->cq_ctx further
->down in the function.
-The concern regarding multiple sequential allocations without an
-explicit free operation is mathematically valid, but it does not represent
-a realistic vector for host memory exhaustion in this path.
+I have no clue what you want to say here.
 
-The NIX Logical Function (LF) provisioning handler is an administrative
-mailbox message governed by the upstream Virtual Function (VF)
-managed by the RVU core. A VF cannot arbitrarily invoke NIX_LF_ALLOC
-repeatedly to leak memory; the resource virtualization layer tracks the
-lifecycle state of each functional interface, ensuring that an LF cannot be
-re-allocated if it is already in an active or allocated state.
+> +  - $ref: /schemas/net/dsa/dsa.yaml#
+> +
+> +  # If the SPI-specific compatible is used, allow SPI properties and require reg.
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          type: array
 
-Furthermore, introducing extensive state validation or pre-allocation checks here falls
-completely outside the scope of this enhancement patch.
-Since this series focuses solely on replacing uninitialized return values and
-standardizing error tracking, adding complex architectural lifecycle checks
-would break patch granularity. This specific lifecycle robustification is more
-appropriately handled via a dedicated hardening patch in a future net-next cycle.
+??? What? From where did you get such syntax?
+
+> +          contains:
+> +            const: nxp,imxrt1180-netc-switch-spi
+> +    then:
+> +      $ref: /schemas/spi/spi-peripheral-props.yaml#
+> +      required:
+> +        - reg
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      # SPI-attached switch representation (current integration)
+> +      - items:
+> +          - const: nxp,imxrt1180-netc-switch-spi
+> +          - const: nxp,imxrt1180-netc-switch
+
+Drop both. You have one compatible.
+
+Please do not send us AI slop.
+
+> +      # Transport-agnostic representation (future integration)
+
+Drop comment. Get the binding reviewed internally in NXP.
+
+> +      - const: nxp,imxrt1180-netc-switch
+> +
+> +  reg:
+> +    description: |
+> +      SPI chip select number (only for SPI-attached deployments).
+
+Drop description.
+
+> +    maxItems: 1
+> +
+> +required:
+> +  - compatible
+
+Best regards,
+Krzysztof
+
 
