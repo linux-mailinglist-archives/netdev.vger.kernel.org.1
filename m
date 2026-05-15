@@ -1,58 +1,84 @@
-Return-Path: <netdev+bounces-288216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288217-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wNXrFNvQBmqKoAIAu9opvQ
-	(envelope-from <netdev+bounces-288216-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:52:59 +0200
+	id oMrzNwPUBmqKoAIAu9opvQ
+	(envelope-from <netdev+bounces-288217-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:06:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A561A54AD55
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:52:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF2C54B07E
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8650C302D115
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:50:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 381EE30B019B
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2FE3F54B9;
-	Fri, 15 May 2026 07:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC463FAE0E;
+	Fri, 15 May 2026 08:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BMXDL2Vi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LDUWpdbk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8BD3F54A1
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 07:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1F63B8D48
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 08:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778831426; cv=none; b=HpWoWkaAl90nKnIkj9Y5BPVKYvq9zwYT/NLstutN9wq7xiURa+41mG+St+1TSf6TAzdDA5qjB1T9X5Xi0jyLy9WpK5hz4u3hEInfZ6vtn1bzVRwbAsK5h0OpDYLVBOg05eAmqCLqvAJ+CkgSwWnr5MqeZI6rE7UfjRM3/kOKOeo=
+	t=1778832031; cv=none; b=eXxVf7jojhNdvN+01wocok/JgxTdycpsU/v3c6eRqEOIt8zNL4CaFb97xm7XJ2pZCeJTmg8PPfyPrtr1PQwYBZF7vJDKUuoj5tRRZFZ5Ze8M9HUf90rl2qD25FC1TzPNMAG4xN8fZolxkmyPGtgRmMLL412IsDcNcf4nfjMZ3iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778831426; c=relaxed/simple;
-	bh=PENMvWMvNACL7RAFZtBK6domS7ADeuBRSFkjDQB8gnA=;
+	s=arc-20240116; t=1778832031; c=relaxed/simple;
+	bh=lYTXQrRnn3pTeKP0KarraCZ6ditW7PaLIGVHyzGhWCo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qa6opgLRKiBriA40ebuhrg8scNYaf59pL6aTyuipkLhwgJ8UFNCQ1602g/NUcM+eErR1sEj7oeQvO2oc41aqBeWM2qWS+aVpS7I7ZvSkWBCr5L4BIPAdeQZfCXKEArlawVEM35tQOKY0oc6jAeXyyIJqod+/v8LEDlkv91Cprqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BMXDL2Vi; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id A3DE84E42CAC;
-	Fri, 15 May 2026 07:50:22 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6EDB1606FD;
-	Fri, 15 May 2026 07:50:22 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 50F0811AF8528;
-	Fri, 15 May 2026 09:50:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778831417; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=BSP30ygM+2/LxhRL2CvomgSUsHTxg8hPXBeS5QdMJVM=;
-	b=BMXDL2Virb7K5qQaFVit34KGHcYDVSRu7PEV1qZ82XMOBfPhKG75gGRIU72XbxzSiZHyZN
-	GaGsfF/6DgG4hvkKfc2H9NsghlU59oNKjN+PnjexMHBL8k1kt8fmFrhSbWR6St7R30zLUW
-	ISDqM4MRLnLHK3R9YpIbIkr/Ll/NDIF5xaE+oGLjdNQ7hsVHrcr/p4pMoe1j0nNo8hgx6m
-	6Dk8DEV4InXyqXU9poKXehelsSGYpnOhzC8sMOM4k7cDhN3gMEe9oNsPXCmrOsZoO7F1bm
-	Nxb6hHAMByhzqqKZ8M5gR4iAWyzXYJvy7hUBVvtsmThcJOZCiMhY5KDnvT4VhA==
-Message-ID: <7e173325-0391-45af-a4c4-45bba216b637@bootlin.com>
-Date: Fri, 15 May 2026 09:50:13 +0200
+	 In-Reply-To:Content-Type; b=dQcYQuk8S63nsxcoJQnSUxBI9uLMOz3WRhqc7FqvslzZslnSPpiSHH7NWbX6nlIdwmf9Z4CFbTMYQtbiAjNSHf6+zK32eRhC8Tz+E+oOBrWV+sGKHr/ZwUfvuQXq6m4uiwr9eQ5rR3WSEGpOkYfmp4aL/KX0WnWY8W3RLPWk1ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LDUWpdbk; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-bd11a3729e8so757885566b.0
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:00:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778832028; x=1779436828; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lYTXQrRnn3pTeKP0KarraCZ6ditW7PaLIGVHyzGhWCo=;
+        b=LDUWpdbkGDwuo+JA0/qPmMUcT1+o9Fq93WvytNkz/3sxPoxHDl91IBdr2EcHt17Rdh
+         1kkjkWadDlKf+N3xyFAmatdCSXya7XEnok4zUXnjVrpEoIkDt7Rl2Msb6BIP0vPbUnau
+         VTNpGUTd+LXqCZ2rqMuN3EZ7u0YPBa/vVAx4itPHDk6gqILwJTHvRvd7N55C//QjLmj3
+         10x4mdaet/M5PYPGB/O1nZ9TT/N/Tv+OUCewxHAio7JjSIdkZMJM2ypTRQWJitwgJlO3
+         cPBlN36wCM6MyNLDztTyJzBcbLXFxMp4WsNMXmwy59EyuSU3D9QjFd1AhQ11ZpwXRnwg
+         nuUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778832028; x=1779436828;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lYTXQrRnn3pTeKP0KarraCZ6ditW7PaLIGVHyzGhWCo=;
+        b=FqkdatA7dEvXnN3Y3ROoKKW/ASNAGE+vxoM+Ps1POVqnDJSZaQZ+NF3Vq78ydZgJEt
+         Db9LrMed9IWATWOd1d4614Ej11ozJSb+Dpc0TzYfDqtRAhKF/zr5WRsnkHmeldpk+lXu
+         hLegRY7ayMjUBqD0SCcxJOEkjs38VBzoz0uvl33L5xM0xIA2JVnXOk5iedrhF5NcmnUv
+         TF8D5eC/nm8ZWfHZee2InJw0FccfjFez4OLW3FeldvPM+9YSbDYFlFxHl5kt0ZD3RwY/
+         RWOIZ5tuTSCqRd41Bs/O6/wvt6Ct8f2ZuPHI/PJC831spM91BA+BC3mEPx+e1/ANMKn4
+         TPeQ==
+X-Gm-Message-State: AOJu0Yx/BcfVoiFG4bhwt16B0krNYsmo/IuveCuFdBk3s+V4AfXSYJFC
+	0K38Tv6AqbQ8a/N7w+0GoM9QJ38C4vs1tn2/80hkvFsU1fIbaZ/KVtuu
+X-Gm-Gg: Acq92OHSgY0C6WNgstM++CE5dMyVH+TvVNOhJ+dlYaaluFen53e+6JP9IjmkDClWcE8
+	2kI0qq5EO1fQ8wUQh6hLNhaghzNPlqZmT/y/Au9sCRXRNS+U0HgS+PgscGI4zNvKfff+27xExFI
+	L2RMIu9c4RKG8XagoI3m10LNeDeWT+zPMzwOBa4ILJMyuJndVUOv0oR6Z6/AYJPLTvgtvSOvoy4
+	sWr70w1NfJQZlVZuo3CgwpJWl9ppsSxHLFapW1OC3T+aODSlv7wT4k0sycI/c+pz9a0WqO6OhK0
+	d5azAf6OFWfQh9W6l9PL+zd/HIM7zOUMmRmX8QUimW8KxlIDGTGgiOAANCVaWzgIuav/d6V8MX8
+	+7/23KrGrbtjoaBxNUfqQhq7YU4KAIctMomZhGexDCAizY0Tx3oz1oWcUuC+FuIun3SqMHCIfjr
+	bAC8CEoFI+C3FhL5fpuJj1/4s+go1f6H5Lem5eRyHnX3ffNnRfz0ttU+iM8QWotaPAxHOp1pZxK
+	d704/jDbiL4ytJ9261Wv1F0uP1YEsu8Rjim
+X-Received: by 2002:a17:907:6b0d:b0:bd3:2e95:7778 with SMTP id a640c23a62f3a-bd517a8865cmr130887866b.45.1778832027729;
+        Fri, 15 May 2026 01:00:27 -0700 (PDT)
+Received: from ?IPV6:2001:9e8:f130:7401:896b:ff64:44fa:9150? ([2001:9e8:f130:7401:896b:ff64:44fa:9150])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4eac613sm185085366b.56.2026.05.15.01.00.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 May 2026 01:00:27 -0700 (PDT)
+Message-ID: <445c5889-20d2-4e24-b539-c38603d8c64d@gmail.com>
+Date: Fri, 15 May 2026 10:00:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,126 +86,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 13/15] net: dsa: microchip: bypass dev_ops for
- port_setup()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux@armlinux.org.uk, richardcochran@gmail.com,
- pascal.eberhard@se.com, miquel.raynal@bootlin.com,
- thomas.petazzoni@bootlin.com, tristram.ha@microchip.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260512-clean-ksz-2nd-series-v1-13-c00f6ce037fa@bootlin.com>
- <20260515011513.1270901-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v7 2/2] net: sfp: extend SMBus support
 Content-Language: en-US
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-In-Reply-To: <20260515011513.1270901-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+References: <20260507093301.1144740-1-jelonek.jonas@gmail.com>
+ <20260507093301.1144740-3-jelonek.jonas@gmail.com>
+ <a9f99a01-4ee2-4d46-a512-8e920a0e7ead@bootlin.com>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <a9f99a01-4ee2-4d46-a512-8e920a0e7ead@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: A561A54AD55
+X-Rspamd-Queue-Id: 7DF2C54B07E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,se.com,bootlin.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-288216-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288217-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_TO(0.00)[bootlin.com,armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hi,
+Hi Maxime,
 
-On 5/15/26 3:15 AM, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: dsa: microchip: bypass dev_ops for port_setup()
-> 
-> This commit removes an indirection layer for KSZ switches by connecting
-> the port_setup operations directly to dsa_switch_ops, bypassing the
-> ksz_dev_ops callback mechanism.
-> 
->> diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
->> index 7385aa4e788a1..2f63a3a7d6ceb 100644
->> --- a/drivers/net/dsa/microchip/ksz9477.c
->> +++ b/drivers/net/dsa/microchip/ksz9477.c
-> [ ... ]
->> @@ -1309,6 +1309,23 @@ static void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
->>   	ksz_pwrite8(dev, port, regs[REG_PORT_PME_CTRL], 0);
->>   }
->>   
->> +int ksz9477_dsa_port_setup(struct dsa_switch *ds, int port)
->> +{
->> +	struct ksz_device *dev = ds->priv;
->> +	int ret;
->> +
->> +	if (!dsa_is_user_port(ds, port))
->> +		return 0;
->> +
->> +	ksz9477_port_setup(dev, port, false);
->> +
->> +	ret = ksz9477_set_default_prio_queue_mapping(dev, port);
->> +	if (ret)
->> +		return ret;
->> +
->> +	return ksz_dcb_init_port(dev, port);
->> +};
-> 
-> This isn't a bug, but there's a stray semicolon at the end of the function definition.
-> 
+On 15.05.26 09:33, Maxime Chevallier wrote:
+> Hi Jonas,
+>
+> [...]
+> I gave this a test and it seems to work fine with all modules I have :)
+>
+> I tested on both boards that have single-byte smbus, and ones with a real i2c controller. I had to hack around in the i2c controller to pretend it only supported smbus, that did the trick.
 
-Good catch.
+Happy to hear that, thanks for the testing effort :)
 
-> [ ... ]
->> diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
->> index ecb072cd99819..aff0c2735c307 100644
->> --- a/drivers/net/dsa/microchip/lan937x_main.c
->> +++ b/drivers/net/dsa/microchip/lan937x_main.c
-> [ ... ]
->> @@ -823,7 +822,7 @@ const struct dsa_switch_ops lan937x_switch_ops = {
->>   	.phy_read		= ksz_phy_read16,
->>   	.phy_write		= ksz_phy_write16,
->>   	.phylink_get_caps	= lan937x_phylink_get_caps,
->> -	.port_setup		= ksz_port_setup,
->> +	.port_setup		= ksz9477_dsa_port_setup,
-> 
-> Is it intentional to use ksz9477_dsa_port_setup() for LAN937x switches here?
-> 
-> Previously, the shared ksz_port_setup() dynamically dispatched the
-> initialization via dev->dev_ops->port_setup(), which correctly resolved to
-> lan937x_port_setup() for LAN937x devices.
-> 
-> Since the new ksz9477_dsa_port_setup() function explicitly hardcodes a call
-> to ksz9477_port_setup(), won't this cause LAN937x ports to skip their
-> specific initialization logic and instead receive incorrect register
-> configurations meant for KSZ9477 hardware?
+>
+> I'm unsure if you're going to followup with the sashiko review on this particular patch, it does seem to raise a valid point. I'll followup with tested-by/reviewed-by on the next iteration :)
+>
 
-True, I'll fix this in next iteration
+Yes, that's a valid point. I'll provide a follow up where this is fixed.
 
+> Thanks for this work :)
+>
+> Maxime
+>
+> [...]
 
-Best regards,
-Bastien
-
+Regards,
+Jonas Jelonek
 
