@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-288467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288468-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cJtlKk6QB2rQ8wIAu9opvQ
-	(envelope-from <netdev+bounces-288467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:29:50 +0200
+	id 4IvzCVyQB2rQ8wIAu9opvQ
+	(envelope-from <netdev+bounces-288468-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:30:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220895581F6
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:29:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AFA6C558204
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 23:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1DA03301CC69
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 21:29:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 989943020E97
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 21:29:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C28405C57;
-	Fri, 15 May 2026 21:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A98405C54;
+	Fri, 15 May 2026 21:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="egY/bUyc"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aPY9GwzE"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012052.outbound.protection.outlook.com [40.107.209.52])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010066.outbound.protection.outlook.com [40.93.198.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB49405C54
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 21:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940FC405C59
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 21:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.66
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778880567; cv=fail; b=Ns+wJg7fj+ihltu3uRHAlwjua/ql+mMZuBEwCLvyAJuRDg8StVfbO/oRIX+sAoyNs+El2DJkiBKrWJeo9lTCAFx605OKIGU32hjLPDsmZKcOFjfR9lmdBSuPmGJeC589XzIE2SNZLwk21Al3c9DtRPuQ3iIDBOH01omCk+4akJo=
+	t=1778880568; cv=fail; b=j0apVF+wCWLzTn137tlC405+SSkGthrOj4cWv/LXVcFLZJVWAByQG9z8UAyEJS6aLefyov9tkwzrMADp1TvvL5CO8HrGOvrqVf075WKAhI+WT9OFtvimBWJH66ojxgdb2zQsp1PvPsydalJEwdrWGLE8EUU5ey2mxzRH1qRXE8M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778880567; c=relaxed/simple;
-	bh=udW24RNxyENlmL9rYR+pCSw1jyL2CKmGGaQFWCAOUKQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SF6ilErIYTfVg+UIHAoXmbfzkLquXtalH4Lm8Tc1eIA/7IuimHBFgScs8fiHEzHbNBTR86mRafOp28Ec/rkgR6hA38qMXa46BZUVwPYi8jyhR67aRHRX4sFWs/ahpaj78Vfij5UjCaKC7LP23TyZhigpG/RZq5MaTpSMjSgezw8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=egY/bUyc; arc=fail smtp.client-ip=40.107.209.52
+	s=arc-20240116; t=1778880568; c=relaxed/simple;
+	bh=HHCxBgmeguBfjtvpiFLExulwuDXll3l/LwgNsESYs7s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DGYCP+b/anfqunY7sKXF4HxQjYXQcPAjzIzBsDFpM4aomgrYimftri59qcO0OM0Mu9pnD2Z5zwTDOxgt7B6UiB9pjyuWC7OXl4OeNO4SeHwJmCUDvKkv0AMXRCVsGayQd46qc1Ht22mnsPGlLfgOTGOf82XfxxIPPknHqJ3pHwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=aPY9GwzE; arc=fail smtp.client-ip=40.93.198.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gY2ezuOHsNGApsBiKsllWqZs0hv/FzFr1XhUksIlc/e18LBHPpzL9QdexhrAbpE6c2/crbQXvs7eLS3hLH7TMmcg+DPmeATvhrgSre1bpDahJsFs6P1SRir8/iO7av5+85/tISnYbHLCC4o+0A33K7cup+nGJmx60cTzNba/fUr1nJqgiQlrlD0kIY/knbP8+pammLDHHcXBShhCNRvKOv457uoYxBw4VbD669CktFRNwDVJeEOlBOlqi9LooBpcE1DpllF2Z1rawqIvio5ETBk5dWdnLzvokju/fDGDQt4WBU50SM1UH9He+McPQbIhvFXsFcl89t4oCXmTJ1nnvQ==
+ b=OyAeiS57nYsMtSYWEW7i7N3ZrczGj0HEcJuJ06Vcc2uOD9Z3EP1uS+hXHzYuvHjNibXDY2pemHrfi92ZvLahkIqwqDrla4rAy71RI17bZcKWc2cnNP8ukmQneRCbI1kSLLZkqatkzjybiwSpJ9uCABFPoNSioMXUz7fMqtZdsLvvRiCGWidxy+Q7iHeB4p3XRbbvRRZ62jVlqcTkP/R3HtGFdqeZqTf7Z4dKELH127xbGb7V2WHukvRKmJJLH39hL5yjQMR0DoPhdIuls0jdiItboFrVBSqC06r6EA0lt6S27wJh2aSiNW0tz/e+9ilxhfpIltTlLI5D6jIxy7jf4g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FLgo/Sk3m/ndBNV2rv2yWGkgg69vVqEPegRN4pl18KQ=;
- b=obChxif9d6QoJjOkvUmGkF5+7dIfa4lwqx0+Zdc9C438b5g/q9yobLLFXgAzZwkbEqazhFW1eqJj4iCW8Yl5TmyRm4bGXMZO+sY8mN2NqBfcgXW8x+8XUmLW79+dBxMxz1zBCkdJdrdPHNqghap+3+sjrz+GR7N+ns/GIDWjxZ5B8fU4aFXOzYvokOiHhQYyPy1f2G4poX9AfWygHY+5ezltj7/vTxwxGro7UVl2ItRnd9rUPiLOzOb4nts8VebUUsiby6P9TjpzmDzEBAO9jGfyZ+auoNv2AwyEo4/3yZuzvLQnAZ3FMXj7jplv/xxU+DFInLyT/Z+gcYblr6FZzA==
+ bh=Nqjjp9FDR2jG+/rinsgPG+B5DE7kS4QSEFS3CoP/PEs=;
+ b=ONaOb2t5pOs7cevBDuMXdl//vXGwwdciHJUBzCRe0XIp393Dbu/8kUu+oM5XSbPYkjGzsHwsq3TCZxWzLZ0+SVvDhHdkmQnnODGL2Yt1mIcbfwE4vMwOd99o3P/bCZ3dyGrxZCBwyXQpAyW802mrRSyWZ3aWX/QvlIC8aPUSbi0fz37bzTsHXu6YJsJ2vtBURt82S/GafmvxlSY0yyWGWK7APwti+NmjhkviRH6E8AXFCxNyU2oVvvT6sf4KKpKsP7AuA7LNM7bViwqlHMryNJmLhQa1OCqv/+w1D3HTStBqq7aO5OXwGJseUEJiiiPKv+R5Kaa2qtDuvEaFGG7Xkg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FLgo/Sk3m/ndBNV2rv2yWGkgg69vVqEPegRN4pl18KQ=;
- b=egY/bUycVpU4A/3milQHJ29StLPn7Pxzo/NqIKm/sfH9ok6RnyvdVNRz6p3voNlkUD8WqwOLtRwC8s0lNJDy928mO+OacDDS9+k/XOSAmSvZOl1pgCrasa4Z20KRrKYcuIx+zJbHi4tGTyf9gufFvqt7jc8+Sgx84kBDIsHCJtw=
-Received: from SN6PR2101CA0021.namprd21.prod.outlook.com
- (2603:10b6:805:106::31) by BL1PR12MB5897.namprd12.prod.outlook.com
- (2603:10b6:208:395::14) with Microsoft SMTP Server (version=TLS1_2,
+ bh=Nqjjp9FDR2jG+/rinsgPG+B5DE7kS4QSEFS3CoP/PEs=;
+ b=aPY9GwzEt/tBYBW1qQWeOnii4HI/DMzv6JZhIhx6AtP0TOUaLUbdEdM1RwpNNQfnYFnnGvA4BdMyqj3AXE7J6W7MckluwJ36vdnzOK819TCyPYhbhuR90TSsSp0ru8gCxdPgxzrblk0tB5tw3BZ9qHjq9tIp17Lr5aC1Wnky/Z8=
+Received: from SA0PR11CA0026.namprd11.prod.outlook.com (2603:10b6:806:d3::31)
+ by PH7PR12MB5926.namprd12.prod.outlook.com (2603:10b6:510:1d9::8) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.19; Fri, 15 May
- 2026 21:29:20 +0000
-Received: from SA2PEPF00003AE6.namprd02.prod.outlook.com
- (2603:10b6:805:106:cafe::a8) by SN6PR2101CA0021.outlook.office365.com
- (2603:10b6:805:106::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.8 via Frontend Transport; Fri, 15
- May 2026 21:29:20 +0000
+ 2026 21:29:22 +0000
+Received: from SA2PEPF00003AE4.namprd02.prod.outlook.com
+ (2603:10b6:806:d3:cafe::1) by SA0PR11CA0026.outlook.office365.com
+ (2603:10b6:806:d3::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9913.13 via Frontend Transport; Fri,
+ 15 May 2026 21:29:21 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,21 +65,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SA2PEPF00003AE6.mail.protection.outlook.com (10.167.248.6) with Microsoft
+ SA2PEPF00003AE4.mail.protection.outlook.com (10.167.248.4) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.13 via Frontend Transport; Fri, 15 May 2026 21:29:20 +0000
+ 15.21.25.13 via Frontend Transport; Fri, 15 May 2026 21:29:21 +0000
 Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Fri, 15 May
- 2026 16:29:18 -0500
+ 2026 16:29:19 -0500
 From: "Nikhil P. Rao" <nikhil.rao@amd.com>
 To: <netdev@vger.kernel.org>
 CC: <brett.creeley@amd.com>, <eric.joyner@amd.com>, <andrew+netdev@lunn.ch>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>
-Subject: [PATCH net] pds_core: fix potential stack info leak in firmware version reporting
-Date: Fri, 15 May 2026 21:29:06 +0000
-Message-ID: <20260515212907.998028-2-nikhil.rao@amd.com>
+Subject: [PATCH net] pds_core: fix debugfs_lookup dentry leak and error handling
+Date: Fri, 15 May 2026 21:29:07 +0000
+Message-ID: <20260515212907.998028-3-nikhil.rao@amd.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -93,31 +93,31 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE6:EE_|BL1PR12MB5897:EE_
-X-MS-Office365-Filtering-Correlation-Id: bb8d91d2-2fe1-4c30-f25f-08deb2c906a0
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE4:EE_|PH7PR12MB5926:EE_
+X-MS-Office365-Filtering-Correlation-Id: 810191f5-b169-4f1d-f541-08deb2c90746
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700016|376014|18002099003|56012099003|11063799003;
+	BCL:0;ARA:13230040|36860700016|82310400026|376014|1800799024|18002099003|56012099003|11063799003;
 X-Microsoft-Antispam-Message-Info:
-	TmIfajVIPI2q0a6v/KMt60ZHa5fj20MZezLq+PaEujqV90g34YHZkqmh+pEFIsqZNjE+etAQe0aqYONo4tdGAC3++PzwhxaXsLWVYn4FizAAEmFbBnuinT7Khk1hkate20nI57CihBKdMXGSbZEaTPvgrWgojlKb9RcpWiorMOl5yxdzIQ30ywwXR46tV2EZjWnqE2RGh3DswhbVaHHEFijGxrWB4M46nmXynlY6Kw56s3teVDlQmrt+yUMFIv+XasI6giXwhEoplRlIvZSwaBiMdDEumqk7fldrBEDFDW/66MwpOu8hfZnPyoWgGVZajf6smC4HLPn/gTmTSL7u+0gHe/JiEr0KfYxBd2nRCN696X/ddx1Cr2iup2Oa95pRX3TJfdj4GgJQHKf40CpFva4Onogjwc89WVrpmiAImXyL31cpX5eaddfXei/tD9EIncjWqRDDpbfc8E8cmsoYBuTlWOzWqYK74ZUdqWnTPmLXgmN9hln792+gigRHyfcG8oDSuTtmqLOCea4t5TSIV52K6oplPmhdsFs1CQRRSaPz+5EWFc/kNE0xx2GTwyshGqaXXZlBF4KIHNRIiYnVUjZbvvWod4o6Go5e8ZINQjsKtwyGYYrVYKSnNFuRPOCpVEHNKnop84SO+L33wbXFiLLmjtXoEdKrYzwic1MPcpLbBtVzomcvOB+jtI4yXmOsHAnz6KpG29VqQPwzaLGU3K9NkuusjsV+qpfqpeMtMHM=
+	TKoUa+YYwtARk7jGEeUItzY7nJphMb6nbp92NZNroJF0LEKwi0IiN1gsbZMsyOi0dFjZfzvIdE+OQxhAgBjhgEEn2Ggy4VlofSxRZZzpFegoif8gagGS+wNx/Xx838rf/d64ZV/WGWzRJgbEql7rZnNDCKUAb8S+nrSHYoqgutk0wRrnurc/wxdVvva5I+o8SS+UylmdjwRuL3kO+FRAcc36+voLFGIsYs2gMY/zAQyUgUxd/0bO6L5EPT5KgIwxr4Aai5oqrEVwjYxsMV6vYxKfBwFF8VJ5249T9n11VfXjlD3QLz1hcunAMuwqZGFGw//8ev17WeHmQCUyuHW4HbwIHTBh64IcaSMWbamw2d22h5czMY9GxCdvEJirXF4lO8G28O0jDSLZXKzzlHKYDsAKYOiuxRLRB5XDcUMR9r3XdIjJapnvH2qzWWJnNYI+bxLJB/24+Ur4S//Y/bkdFBQBMvyRN0ByAxvqVy2jNGOrCDwt5aIEXdITwwpkubXC1AJFoz+0MpFKEAy8BWzJVj1Ux+cCxC7bikDswqWQklfkEtTZQmi8vWP9EOOggVipjdGKXjgMJAXoVvRGge+3oWy5f9dlb6wUT492p9od8HEOxOuvMKaM2JMg0ZBb0eENB85Bjo9xBd6U6VG8SPvSq/8G54kdXH4be0n2PPW7tA086/Z3fnLbyOHcsAqvZq0LrD7T8w0kN/h7E98Z41OwrDRMq1PZbU4YEgiXEXyXrk4=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700016)(376014)(18002099003)(56012099003)(11063799003);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(376014)(1800799024)(18002099003)(56012099003)(11063799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	erSBGwoA2932b7bEiME6MOhkQqzKp+BYSH1fr+8+BEj2WvNEU9686Jul3j+uywzS9N/wrcue9mFGAoVgbYFcX8sEZXXxbJvoHU2frw7h1HbpfSSMuglIowQPSf+n3PWIpeYSVsK2sfoe9JZAftr3ZLst1qfwTxo95T5l1XrIEBTloWClxlXQ/9MCxy6txmuqjXw+0ZwPUEV4t0+4voECDpbsIBAJxLbXtYiQ0VpcwHBysJEI+GDvy3NegKHzJNjYJTKS87508YzHTE2PcOgAQenjuko67FZcnUbvW/DY+PkAfSQ+GOcCveFUfNp0fCtFOC9x8RHdWxkHkEqXOI2YAiX7v3sDNcUipAcGKxMOQ69X3CKY/+9/mSWaH6chSvmLV++3DgiVaFjE+8SDJKfr1mW1UqZDlYF6XSK8ddhzpbkdmUHxTc54YhC/MnNV9qTi
+	IWHemzecVUSUUGSE9WEQRrBtlFdVv8ctiv4JOcpeV+j0Lotm1Z0MeXMcHL1MQS4wElgRt3vUbnUC1umERtnXJVZpXaEH/s3mTGe2df27h9wGOKTP4kXhv7NrEFMgAIlTcJpFSSY/uWKBZtdwj+lR3Hx+2xpYeJ7BLdu3hDhGTJC4tVNztelErwa9yOOvMMekj/uWC0jnMM4olbnHVeaooSaxjaFWPTw0Gvy0hYgbiGPkylXnGsei7EUwH1D+ptqIMTr3WIHBI8ujQiLbi0Oh4/r8Y2YGsnGktBmJY1tPFFw1QmuOJQq/Tct4mfqXshJ1JJd0evnGNSYhw5BO6twzweZ11ZeteXDyqy7N27CrnEh8TQObQuFdLqGgnNEO+tk3BS4MQNV13ElrnBITemLTVsAicp3zh8mE9QN6zeqO4N76B15umMD3uTA1XTdZr2J/
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2026 21:29:20.1901
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2026 21:29:21.2769
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb8d91d2-2fe1-4c30-f25f-08deb2c906a0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 810191f5-b169-4f1d-f541-08deb2c90746
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003AE6.namprd02.prod.outlook.com
+	SA2PEPF00003AE4.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5897
-X-Rspamd-Queue-Id: 220895581F6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5926
+X-Rspamd-Queue-Id: AFA6C558204
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -133,7 +133,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[amd.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288467-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288468-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:email,amd.com:mid,amd.com:dkim];
 	MIME_TRACE(0.00)[0:+];
@@ -148,44 +148,41 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-The fw_version field in pds_core_fw_name_info is a fixed 32-byte array
-that may not be null-terminated if firmware writes exactly 32
-characters. When passed to devlink_info_version_stored_put(), this
-could cause a read beyond the array boundary, potentially leaking
-stack contents to userspace or causing a crash if the read crosses
-into an unmapped page.
+debugfs_lookup() returns a dentry with an elevated reference count that
+must be released with dput(). The current code discards the returned
+dentry without calling dput(), causing a reference leak on every
+firmware reset recovery.
 
-Null-terminate the firmware version string in place before passing it
-to the devlink API.
+Additionally, when CONFIG_DEBUG_FS is disabled, debugfs_lookup()
+returns ERR_PTR(-ENODEV), not NULL. The current check passes for error
+pointers and would call dput() on an invalid pointer, causing a crash.
 
-Fixes: 45d76f492938 ("pds_core: set up device and adminq")
-Assisted-by: Claude:claude-opus-4
+Fixes: bc90fbe0c318 ("pds_core: Rework teardown/setup flow to be more common")
 Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
 ---
- drivers/net/ethernet/amd/pds_core/devlink.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/amd/pds_core/debugfs.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
-index b576be626a29..3f0e56b951bf 100644
---- a/drivers/net/ethernet/amd/pds_core/devlink.c
-+++ b/drivers/net/ethernet/amd/pds_core/devlink.c
-@@ -122,12 +122,14 @@ int pdsc_dl_info_get(struct devlink *dl, struct devlink_info_req *req,
+diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
+index 04c5e3abd8d7..810a0cd9bcac 100644
+--- a/drivers/net/ethernet/amd/pds_core/debugfs.c
++++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
+@@ -64,9 +64,14 @@ DEFINE_SHOW_ATTRIBUTE(identity);
  
- 	listlen = min(fw_list.num_fw_slots, ARRAY_SIZE(fw_list.fw_names));
- 	for (i = 0; i < listlen; i++) {
-+		char *fw_ver = fw_list.fw_names[i].fw_version;
+ void pdsc_debugfs_add_ident(struct pdsc *pdsc)
+ {
++	struct dentry *dentry;
 +
- 		if (i < ARRAY_SIZE(fw_slotnames))
- 			strscpy(buf, fw_slotnames[i], sizeof(buf));
- 		else
- 			snprintf(buf, sizeof(buf), "fw.slot_%d", i);
--		err = devlink_info_version_stored_put(req, buf,
--						      fw_list.fw_names[i].fw_version);
-+		fw_ver[sizeof(fw_list.fw_names[i].fw_version) - 1] = '\0';
-+		err = devlink_info_version_stored_put(req, buf, fw_ver);
- 		if (err)
- 			return err;
- 	}
+ 	/* This file will already exist in the reset flow */
+-	if (debugfs_lookup("identity", pdsc->dentry))
++	dentry = debugfs_lookup("identity", pdsc->dentry);
++	if (!IS_ERR_OR_NULL(dentry)) {
++		dput(dentry);
+ 		return;
++	}
+ 
+ 	debugfs_create_file("identity", 0400, pdsc->dentry,
+ 			    pdsc, &identity_fops);
 -- 
 2.43.0
 
