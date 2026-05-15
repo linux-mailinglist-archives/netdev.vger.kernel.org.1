@@ -1,169 +1,153 @@
-Return-Path: <netdev+bounces-288313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288314-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EYcGxgyB2qQswIAu9opvQ
-	(envelope-from <netdev+bounces-288313-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:47:52 +0200
+	id chU/KS0dB2omsAIAu9opvQ
+	(envelope-from <netdev+bounces-288314-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 15:18:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C758551A6D
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:47:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC6FE55056B
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 15:18:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9D8AB30C93D8
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 13:08:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41344300EA86
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 13:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628B52868A7;
-	Fri, 15 May 2026 13:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7C5318B96;
+	Fri, 15 May 2026 13:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b="ZK96z2wW";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b="FUnauE+I"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p+j2BJgh"
 X-Original-To: netdev@vger.kernel.org
-Received: from acj35aaf123.lhr1.oracleemaildelivery.com (acj35aaf123.lhr1.oracleemaildelivery.com [130.35.116.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A576530674B
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 13:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.35.116.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99D530B50F;
+	Fri, 15 May 2026 13:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778850533; cv=none; b=VubqHCSw0BTi0RUM02MnfWYnBbofs8iQPJ3WHxXt/br676FinZQj2s4L8Pzz0NA1qAHgGRPH76sssiIx4UX3m6p+Ykwq0MWfSfCKCjr9zD35jzn/7PF9f/BY2tVadEcQopUpUEMilb/eH3Z5L4W19UOc+DV1R5aRSedvZqAyIqo=
+	t=1778850753; cv=none; b=r5s0/FmkhU/yNXt+mGP2O8l4hHucpSknQJz22tJYYNjxio9oeX8tk6jYglN6pVjsH63VBOlJ8/Ct5o8mlfCxw8ORmSZdjh4yiAEhvZK1f6Xj1oQyEs3PiFUuQJdjSnbbnNfUSbWW3IPoyWSuUQqUtEQal914iNrUF9LXVnV64pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778850533; c=relaxed/simple;
-	bh=fhyHfyW5NgKKHtnkNTA8/XP0rmI/Np861eMFIdMbxAE=;
-	h=From:To:Cc:Subject:Date:Message-id:In-reply-to:References:
-	 MIME-version:Content-type; b=oUDWY3FB/xDWoX3Xq3OGvYl6OsYlGPTeVmXE/gMgKxMaSFpToTcuzsuy5jkPyrXnsSmDo8pySrKUgLRMqlv5ql9RU/yXhhCE1G7MdOYfORNw9WObJbpIY7G7gKiXDKPuzSoyLujjNSYiDJ2WFmi7Fhg7jbafjOf6Fhj4KjTHlDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com; dkim=pass (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b=ZK96z2wW; dkim=pass (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b=FUnauE+I; arc=none smtp.client-ip=130.35.116.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=oracle-uk-012026;
- d=raczylo.com;
- h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
- bh=WmCkvmN6o6bO9QADm6W/QC4PRSk13s/99dA2BWd17CM=;
- b=ZK96z2wWLtcgsms7cW9HgLYLPhYwqbfZ+L4Hox6lZXc3uYpGVv49ni1N0aVVJGKJd1ivE6DTLJHE
-   fWX/GsYz8GsC7FYU6V6RaDivdQt6/rf+Q6V638tYsVcOnue9m84od18porbpCMnLo2EsKTtdTdxp
-   phGyEFsnhyj6LSHA4z0j58MiFKqDhh200Lpk04vZpyVkIqzA1wqnBV0C3QOwxutYEr8WBRr8eWKT
-   Z93b0R6BymLoA3UCssj3HHL3+OQwmQOiFhc+ycUWsl8fOJDWlMi9h/Vk1GZSjNlRJZnzSeO1b52q
-   ApQMdJOQsNaS9qnyIpy6l/9tSe9ReiWrWRKqBw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=prod-lhr-20191104;
- d=lhr1.rp.oracleemaildelivery.com;
- h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
- bh=WmCkvmN6o6bO9QADm6W/QC4PRSk13s/99dA2BWd17CM=;
- b=FUnauE+IcHzKNv1NWpI3gInAWC307+jB9iEcl4VeNd0BwkCtzeD5MVjd3kccUG9yuS1CY527t8G1
-   IWAF0bNABu1BOTyLuFCQj8XPRmpqqxroLurzuWe0x64/bC5QjsdtluWKguE9KXwTBWtNJR1jgYYo
-   GoNoOc+misW24uEoLxUPJJdGxBI5C5TjLYpuOT6K4HgtJCkJxtSfHhe7vpiGOf/aaX1LsIt3l5eT
-   rwJVWdG/KkW+ZxFx619oqMyGXpmI1eHy479vi14IjNnRsBQACzl/gbxeHap0aDJfRjZmu6tctsph
-   aBLd4LvdSycPpV+VX4m+QoeYQE7RMf2B/HpPSw==
-Received: by omta-ad2-fd1-1401-uk-london-1.omtaad2.vcndplhr.oraclevcn.com
- (Oracle Communications Messaging Server 8.1.0.1.20260212 64bit (built Feb 12
- 2026))
- with ESMTPS id <0TF21VYGOXUQAXA0@omta-ad2-fd1-1401-uk-london-1.omtaad2.vcndplhr.oraclevcn.com> for
- netdev@vger.kernel.org; Fri, 15 May 2026 13:08:50 +0000 (GMT)
-List-Unsubscribe-Post: List-Unsubscribe=One-Click
-From: Lukasz Raczylo <lukasz@raczylo.com>
-To: netdev@vger.kernel.org
-Cc: Theo Lebrun <theo.lebrun@bootlin.com>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,	linux-rpi-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v2 3/3] net: macb: add TX stall watchdog to
- recover from lost TCOMP interrupts
-Date: Fri, 15 May 2026 14:08:49 +0100
-Message-id: <20260515130849.920-1-lukasz@raczylo.com>
-X-Mailer: git-send-email 2.54.0
-In-reply-to: <20260514215459.36109-4-lukasz@raczylo.com>
-References: <20260514215459.36109-1-lukasz@raczylo.com>
- <20260514215459.36109-4-lukasz@raczylo.com>
+	s=arc-20240116; t=1778850753; c=relaxed/simple;
+	bh=q30lxFmDv4dNqul36sBtoF14JZ2WcFMM69V4BB/vstk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y9UXeMHnMiQ9h8i0mNqbCbpJUotwQFmTw1mZAbBBBmW0CdYcv7fwNvjSx3YABmk7PPpRhoJS1jvvSnl+ka1jnpyWV0L6irRkq4QuSEq66sJ6msKzn1NCVyZUxMAjOlGbg9LMxilqtab5oH+sdG/j/VDhKLIz3ME0yXydNFCkQfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=p+j2BJgh; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Q85THMGJzjLyW44YEGjlAlMDf7fpPuKF9ngHPGJsQPQ=; b=p+j2BJghM/qNsf62mTDKoYjDeA
+	oCt0vR04TXhe5qhtwSmzCbTufeRvjWfAD3yyjq4Ng73I5ZTRJW/8qnvgEahNND2K++pw3Rcyaa6JZ
+	o7gD6FY8ksWS0cxq9r6QHVAEAcvR65aKzDkef0vdBgnoCZlb5gOxxZrmBRgVd3zviRkU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wNsKy-003499-Fn; Fri, 15 May 2026 15:12:20 +0200
+Date: Fri, 15 May 2026 15:12:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Frank Wunderlich <frank.wunderlich@linux.dev>
+Subject: Re: [PATCH net-next v10 6/9] net: phy: phy_port: Store information
+ about a MII port's vacant state
+Message-ID: <d7086094-9f8b-4d18-92ae-e278b4e67658@lunn.ch>
+References: <20260513130521.1064094-1-maxime.chevallier@bootlin.com>
+ <20260513130521.1064094-7-maxime.chevallier@bootlin.com>
+ <97cd33a0-ee74-4f64-b11a-bb5b88bce79a@lunn.ch>
+ <c68f3abd-7a3d-4d37-9589-02433bbd5c5c@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-Content-transfer-encoding: 8bit
-Reporting-Meta:
- AAFF3HPCkK227CD7Se5cCyOO/blLikgODObmwE6SfhbsjUFD20BWLFJliQfsfrvY
- BFb1EX9GcB+16PC4cMFuM4XkUsoI59cMbEc0dTguTmLh8AztN1yrID+AhpyrA/6E
- oPw85TvWYEiAfAkoBNIvtKaV7qx0LP+FR8DKM1j0BK1QpthmUcjS4BDqu3rjixHj
- J1Z6d3jrYjIqUkOFqmOhWHv/562DrGjmqiLO5+29OxYrL3hVQOkFxFRt/w8cDfWH
- CYtJjeNaD01vIzwy0bxLZWFpkmwjnFbf3EsKdqpQfiqzWkdkNRAuuokBLC+MwCoC
- 56xJY+PEVnOzRE10ZDMLFJBRtYVz6FORJJKr53YcmZTs72zpl+6liOBNR39QAIcq
- Ns6rjggMJiaEukv73k3q/SdikVn2X2QeM01k+fuBG3rYJVnyjlUKySv7o0c/nj8=
-X-Rspamd-Queue-Id: 6C758551A6D
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c68f3abd-7a3d-4d37-9589-02433bbd5c5c@bootlin.com>
+X-Rspamd-Queue-Id: EC6FE55056B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.04 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[raczylo.com : SPF not aligned (relaxed),reject];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_DKIM_REJECT(1.00)[raczylo.com:s=oracle-uk-012026,lhr1.rp.oracleemaildelivery.com:s=prod-lhr-20191104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-288313-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288314-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	GREYLIST(0.00)[pass,body];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz@raczylo.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[raczylo.com:-,lhr1.rp.oracleemaildelivery.com:-];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_SPAM(0.00)[0.885];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-self NACK
+On Fri, May 15, 2026 at 09:22:29AM +0200, Maxime Chevallier wrote:
+> Hi Andrew,
+> 
+> On 5/14/26 15:58, Andrew Lunn wrote:
+> > > We have information about what MII they can handle, however we don't
+> > > store anything about whether they are currently connected to an SFP
+> > > module or not. As phy_port aims at listing the front-facing ports, let's
+> > > store an "vacant" bit to know whether or not a MII port is currently
+> > > vacant (i.e. there's no module in the SFP cage), or not (i.e.
+> > > there's an SFP module).
+> > 
+> > vacant == False actually means a bit more than there is a module in
+> > the cage. It also means that, so far, we have not had any errors
+> > trying to use the module. If there is an error, we might have a module
+> > physically in the cage, but vacant == True.
+> 
+> This is a good point. Even with an error, we should have vacant = false.
+> 
+> TBH I'm unsure how to name this, vacant may not be the best word there, but
+> I'm struggling to find a better term.
+> 
+> maybe "empty" ?
 
-This patch references netdev_warn_ratelimited(), which does not exist
-in mainline net-next or in raspberrypi/linux rpi-6.18.y -- no
-netdev_*_ratelimited() helper is defined.  I confused it with the
-existing net_warn_ratelimited() / pr_warn_ratelimited() /
-dev_warn_ratelimited() family while authoring v2.  The result fails
-to build with implicit-function-declaration on every kernel that
-includes <linux/netdevice.h>.
+My comment is really about, what do we mean by vacant/empty?
 
-The bug was caught by John Laur via an independent build test on the
-Talos Linux Pi 5 build and reported at:
+Is it simply about there physically being a module in the cage, or is
+it also about being able to drive that module? If it is just about
+there being a module in the cage, then vacant/empty is good. If we
+also want to say that we have been able to read out the EEPROM and
+determined the module will work in combination with the PCS and MAC,
+then i would probably use a different name. "usable", "compatible"?
 
-  https://github.com/siderolabs/sbc-raspberrypi/issues/91#issuecomment-4456874307
+Either way, i think the code either needs simplifying, or made more
+complex.
 
-I incorrectly tried to address this by sending a standalone fix-up
-patch to netdev as:
-
-  https://lore.kernel.org/netdev/20260515095336.92237-1-lukasz@raczylo.com/T/
-
-Andrew Lunn pointed out that this is not the correct workflow on
-netdev -- the right thing to do is self-NACK the broken patch on the
-original thread, wait 24 hours, and resend the whole series as v3.
-Apologies for the noise; this reply is that self-NACK.
-
-Patches 1/3 and 2/3 do not reference netdev_warn_ratelimited() and
-are unaffected by this build break; their content stands.  In v3:
-
-  * 3/3 will use `if (printk_ratelimit()) netdev_warn(...)` in place
-    of the non-existent netdev_warn_ratelimited(), matching the
-    semantics intended in v2 (bounded log noise, retains the netdev
-    prefix in the message).
-  * The standalone fix-up patch above (Message-ID
-    <20260515095336.92237-1-lukasz@raczylo.com>) should be considered
-    withdrawn -- v3 supersedes it.
-  * Cover letter will carry a changelog noting the v2->v3 delta and
-    this self-NACK.
-
-I will send v3 no earlier than 24 hours from this message, per
-Andrew's guidance and standard netdev practice.
-
-Signed-off-by: Lukasz Raczylo <lukasz@raczylo.com>
+	Andrew
 
