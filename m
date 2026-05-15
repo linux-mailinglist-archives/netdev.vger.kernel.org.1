@@ -1,284 +1,193 @@
-Return-Path: <netdev+bounces-288227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288228-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mEs/N6HaBmrsoQIAu9opvQ
-	(envelope-from <netdev+bounces-288227-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:34:41 +0200
+	id 8BLRIWraBmrsoQIAu9opvQ
+	(envelope-from <netdev+bounces-288228-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:33:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8988054B636
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:34:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4882154B5D1
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:33:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 425FD309C277
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:30:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A582D3005AB1
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E25B40626A;
-	Fri, 15 May 2026 08:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFCD3FFADF;
+	Fri, 15 May 2026 08:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AGr/MaE3";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PmxdUbc5"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="dZBfiV8m"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A7B3E3DAF
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 08:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BA4378D8D;
+	Fri, 15 May 2026 08:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778833807; cv=none; b=uLr1+ytJOL87dX2g4Hw0+5PF+1tIMLeqmrq4ZBlUtaMWo921OiQfBtLyyAY2pEzjisGj5v7AgU4FdcdhyyXzLiDp6TCfV4IgJ717qJyhYH29Sx3KPtb0wQdmzyTexiC0/EMYrcHvmlW+/oDMLgdMEG7eB1QdK6DPFZIxWvFtSYU=
+	t=1778834020; cv=none; b=cJ5veb7m2ECCPrbW9LALDQLBf8qbCzoXLaTThdkVHkaqIiQGjcV7r4XGoV8IY7qOXd7IFnMRTZzS54HRIQNsviIU40JxR07haT78AwxatYOuN+nBqqCFXfRLWea3FuRtNYOy7Qi1LtFsr86DV4/EE6aSu2Vxk2b/yuNLiiQwmJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778833807; c=relaxed/simple;
-	bh=EQ7IwlxGHE0J1foFsB+9uj3saln4eg27mwKY3T8VjcA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aX2zNBrDeJfUIaS99T+wJRW5jcqC3RGYa5SwL1UIPE+Tyurf1m9Cd/dowclnRJ/+JcvAkrs+aMZJaPPYDvwoa7AWuSBL7JJuPEEhRTTJre9XS+tutPb9bwGwqj6q445+q+f2fNw43Re9YxttAnjjl2IunDrDlT4PYLwZ+LACNHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AGr/MaE3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PmxdUbc5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778833805;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=muOsFm1ckUowqiVN5FPZIYRSKzSTI/TAawbrF7fG7TI=;
-	b=AGr/MaE3pFzgwFyh0NsHByGGQl5Mr92JCoIYHGWZfoto0DH4V9INPCo1rTC9BgD/wcD8eF
-	uDJGcT8U6flHSr/QYwCGTg73EZ5IO6H0XC6Bwp6W0nnv6lpQiDtI/EesOfhPPoK74DIx6C
-	YxzqDshkEWSOI6w3PMDGE9vqyyWYUwg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-2Awt3KjwOoOEAm_utyvCZA-1; Fri, 15 May 2026 04:30:03 -0400
-X-MC-Unique: 2Awt3KjwOoOEAm_utyvCZA-1
-X-Mimecast-MFC-AGG-ID: 2Awt3KjwOoOEAm_utyvCZA_1778833802
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-44dad1b938fso5290484f8f.1
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:30:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778833802; x=1779438602; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=muOsFm1ckUowqiVN5FPZIYRSKzSTI/TAawbrF7fG7TI=;
-        b=PmxdUbc5CflJjPmqKIUV8ucavZ1sGzkpV000ZVWk7ucG2NRsviLfUl/umTc+KRKyYT
-         bpzb1mzwERikfW+FwEXSOTibPcDEufQVEv6+HBN8AL00HHH9inBH32oLMbZnsIKIFYVz
-         z8qhVJa5Sb+toM8JrtYbCv+SqliHzYE3Ur4SW43+gj2ZW/k3j9JM9nNlKT9l+38CNdJC
-         jy2eQS4cBPYWt0pIWcG7/holM87B53LguOQkXUOPvcC+NFPC/pr07gamW13aRtPi21tg
-         /6B8vkj7t0l0qmfburX7MU61QpPdpVFj+re6EerJi4O1DG7HczsOl0Psp4+FLgiY68fy
-         3noQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778833802; x=1779438602;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=muOsFm1ckUowqiVN5FPZIYRSKzSTI/TAawbrF7fG7TI=;
-        b=q6o+dVivecqUO0kwpdm/rkdzWGwaZaJCPX8wR6o5JbxLrkSvxn71bTDMP9pnBJB61D
-         WnkVyhPnDPvMC7t4l+LnCpvr/8YsP5dYBkaaaoLvcFcEN4JF8Tpb95+QYL9S2qEZs3YI
-         IhOTEV9JVJAEIje+SIl5HVhuRgZMOvIaCQxPN5vnwprk6fxE1rhGzrW7C/9gObp3Ut/C
-         CzsB2VMgKL0QzO71aaaz3y3qzstQtF2z0fZNXTOXZORBBUkXqseVdv97L9lMNqQOYrMB
-         BhsG8k7TfP+dndnH3ze5AaQmKfuOrf0pRv3j3vEOLy5IyK15M5tJJIPfJb4BHNJKnOfc
-         e32Q==
-X-Gm-Message-State: AOJu0YwL8UMneTPgDb0qH/EMAi7E6aVywprHzBYjwtXoKgD7mgDTF6uK
-	ULq99gTAR5gMuJ306+JQP6fgJueG29PcwerT3d6NFkhtiaL1vvFcf3890ML9DES+yUif8HVPjHS
-	V7EmWxiYwW+Xbo05L+CcEllJzKvWuScHth6DGRWePk/SxEa7J2TnTOdBq/w==
-X-Gm-Gg: Acq92OHVZJjqDRfq7smC6QlUoI6doU8GLc3brjabtn0XSrcEzmReNxQdRXsE9JXIVkx
-	B+ckOmXEw+N8K6pT22XPdXQyik+r3RgpF1Kx5pjeV7emmt2FUW86DHGdPhqkwyiJp1pN+XLpTGY
-	3zXS7HS1YZOOONQvS4vBfn8jGLxt1YHfE2IQeqVuJInRtfXjSfZ5TnqRuzbhrn49e31d+m1JvKY
-	UEGpj759MbiD8ChjCwjzZABnRPF+VysNLVjT0rDla+f9TogIgYdtZstKixIgkpYsMkCDV9SPbhn
-	aV4AVz+gJdSGodZ8ZHIG4fk2rvlorQ7XUkp+nT50tTPpcg8HQPkRHWlzjzYjfuyA8BYQLmccf5w
-	G06XIujEpNJzPAAsmX2f2KecOwDiXO4zFuC03htXm0lCeeRkCUCg62uRR0GfH9MPfErWSqEw+4Q
-	==
-X-Received: by 2002:a05:600c:a11c:b0:48a:5970:2003 with SMTP id 5b1f17b1804b1-48fe5fd483amr29432215e9.3.1778833800741;
-        Fri, 15 May 2026 01:30:00 -0700 (PDT)
-X-Received: by 2002:a05:600c:a11c:b0:48a:5970:2003 with SMTP id 5b1f17b1804b1-48fe5fd483amr29431715e9.3.1778833800267;
-        Fri, 15 May 2026 01:30:00 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-16-204-231.retail.telecomitalia.it. [87.16.204.231])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0fe2464sm13729817f8f.32.2026.05.15.01.29.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 01:29:59 -0700 (PDT)
-Date: Fri, 15 May 2026 10:29:55 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, 
-	virtualization@lists.linux.dev, Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net v3 1/2] vsock/virtio: reset connection on receiving
- queue overflow
-Message-ID: <agbWNqhzvEHVBvC2@sgarzare-redhat>
-References: <20260513105417.56761-1-sgarzare@redhat.com>
- <20260513105417.56761-2-sgarzare@redhat.com>
- <agXh36gUe1K6__Bk@sgarzare-redhat>
- <20260514111513-mutt-send-email-mst@kernel.org>
- <CAGxU2F4qWcQTmXnH74V8xZKADLiEMUmCc0+ktW5fZOXdTP4Bdw@mail.gmail.com>
- <20260514134347-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1778834020; c=relaxed/simple;
+	bh=0cISody7YAb2PZkhZH2Ka6q/ZFFj+dTiPt+pQU9bT+M=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GMwRXCtjpVVddZkAKEEZ7ru2Kv1DpJWrfNlNSGeZ3qRnaH6TawOoNCTzWyPvjidYCPbMNjIe+aALhNfO8ip+DhfGLzxuw6iCWf738BgNEs1PD5EygR5WkcirnuMnK4dRWLETR8yb3IvgqvhvktSFJzaurPe4Rhk+ndjNdx9R/Sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=dZBfiV8m; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=tpou6ki3jAJXp90TqJk59yYkaVlW8JK+YsrVKfCVQ98=; b=dZBfiV8m4wwLpm0OL3+VFovqaK
+	EwnJpucTVmDT4I1Ja2i/EoDENWhB4dPFZF9mGnNMlwFTEjtV1dPnL05oNsxF7otqEHJn2UlVEcxND
+	kOZzSWqLxLD6eMg/2LPj1nMbJFY5hb0fOqwl8xaAP55HWSSJQWrTy1jPhU95VmTz18YBtILIUnvru
+	W8UprivhZbs5FK3JPbxnXHxTgLClu3Gsghpu8TLFOSObmqc17xKW6RPCbxk1hcpAjTgdi85AyXiNE
+	aWgVoiPsizfgO/KF9MotInjJhty7PcBTZw0IyG6bHyP+zcH3NAW7TK6tDjOGgjJfn0P57ba0ApKo3
+	nHoiFvaA==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wNnyy-004b97-17;
+	Fri, 15 May 2026 08:33:21 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v2 0/7] net: convert
+ atm/xdp/af_iucv/l2tp_ppp/rxrpc/tipc to getsockopt_iter
+Date: Fri, 15 May 2026 01:32:24 -0700
+Message-Id: <20260515-getsock_four-v2-0-0d8eed952627@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260514134347-mutt-send-email-mst@kernel.org>
-X-Rspamd-Queue-Id: 8988054B636
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIABjaBmoC/22NwQ6DIBAFf4XsWRrEgomn/kdjGsRFt02gASQ2x
+ n9vtNee37yZDRJGwgQd2yBioUTBQ8dkxcDOxk/IaYSOgRRSC1U3fMKcgn09XFgiF7pBbVp5VUp
+ BxeAd0dF66u7gMXOPa4b+t6RleKLNh+1gZ0o5xM9ZLvX5+B8pNRfcYesEtko7Y28jDmT8JcQJ+
+ n3fv2HpArrFAAAA
+X-Change-ID: 20260513-getsock_four-063e6a724555
+To: Chas Williams <3chas3@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Magnus Karlsson <magnus.karlsson@intel.com>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, Jon Maloy <jmaloy@redhat.com>, 
+ Alexandra Winter <wintera@linux.ibm.com>, 
+ Thorsten Winkler <twinkler@linux.ibm.com>, 
+ James Chapman <jchapman@katalix.com>, David Howells <dhowells@redhat.com>, 
+ Marc Dionne <marc.dionne@auristor.com>, 
+ David Heidelberg <david+nfc@ixit.cz>, Samuel Ortiz <sameo@linux.intel.com>
+Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+ tipc-discussion@lists.sourceforge.net, linux-s390@vger.kernel.org, 
+ linux-afs@lists.infradead.org, oe-linux-nfc@lists.linux.dev, 
+ Breno Leitao <leitao@debian.org>, kernel-team@meta.com
+X-Mailer: b4 0.16-dev-d5d98
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2195; i=leitao@debian.org;
+ h=from:subject:message-id; bh=0cISody7YAb2PZkhZH2Ka6q/ZFFj+dTiPt+pQU9bT+M=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqBtpJ1ql6+kWh2Sk7mRqFW0RJgA5fXYWF+7RiV
+ oQ9N0uRQjqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCagbaSQAKCRA1o5Of/Hh3
+ bdnCD/9F/kItVPDT/aJ3OibaUFifLnSO9z8CWVnyrIWgmI1vKVxPeAEJTpEsRTyzb5htGsJA828
+ sFmprgPgwVcqugpUt94rY9VLGD8lKU66g7Bc2q/QhJKj/28jbleKzbaFiwiAsDbo6K3rjjOuryy
+ 6BHWrbVkfpIEcGzNOcTztluIUCOIsnQznLtoyi7gigzZlRL7xyz6alXeX/NrCZsJ64YHBCnyHC1
+ SkUksQtC8RP42aOMNCCp2OxKhDK2Q3+a/+xdWKMwYGqvvcqw5+J6I+hsrlvi9xkQ+qyvopmbhFj
+ +21KMSBL88ZyNW9njp1C1g/PeUXEATp8vCCa8wR/EtBoI1GZHtt4Q3Pv0DvZ6HOtaHz3w8nKI21
+ EXa5PWwt6TlTgyCM17iyRyA4NsbDLtLQeQyR9RaWlzI+b6ivu0aC0VjPUaYivIEFLsycO0ZS8Kz
+ Us6cTemOwHghAT5B5ckXlCJAMDnN3505SpIEbDFb/J3mzMnohRNZ+upfklH9txv4firm9gk6NVa
+ /JA054zSgAjBQXrQgHnM3LSOJGDPJVfUJOUEPyGEg+dyL+X7ljII2MopupJcSDZp+6woon+5d0t
+ 6jC+yCpkuljNAzqPUJdiNYumbW1J93DvERms0/MDgMGO+UQ5ACCCBfBWpUlEUdRHeTwMxhSzJjV
+ SuY+Bgq/jwXdP6g==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
+X-Rspamd-Queue-Id: 4882154B5D1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288227-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288228-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,intel.com,fomichev.me,iogearbox.net,linux.ibm.com,katalix.com,auristor.com,ixit.cz,linux.intel.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu, May 14, 2026 at 01:44:53PM -0400, Michael S. Tsirkin wrote:
->On Thu, May 14, 2026 at 06:45:00PM +0200, Stefano Garzarella wrote:
->> On Thu, 14 May 2026 at 17:16, Michael S. Tsirkin <mst@redhat.com> wrote:
->> >
->> > On Thu, May 14, 2026 at 04:57:16PM +0200, Stefano Garzarella wrote:
->> > > On Wed, May 13, 2026 at 12:54:16PM +0200, Stefano Garzarella wrote:
->> > > > From: Stefano Garzarella <sgarzare@redhat.com>
->> > > >
->> > > > When there is no more space to queue an incoming packet, the packet is
->> > > > silently dropped. This causes data loss without any notification to
->> > > > either peer, since there is no retransmission.
->> > > >
->> > > > Under normal circumstances, this should never happen. However, it could
->> > > > happen if the other peer doesn't respect the credit, or if the skb
->> > > > overhead, which we recently began to take into account with commit
->> > > > 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue"),
->> > > > is too high.
->> > > >
->> > > > Fix this by resetting the connection and setting the local socket error
->> > > > to ENOBUFS when virtio_transport_recv_enqueue() can no longer queue a
->> > > > packet, so both peers are explicitly notified of the failure rather than
->> > > > silently losing data.
->> > > >
->> > > > Fixes: ae6fcfbf5f03 ("vsock/virtio: discard packets if credit is not respected")
->> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> > > > ---
->> > > > net/vmw_vsock/virtio_transport_common.c | 19 ++++++++++++++-----
->> > > > 1 file changed, 14 insertions(+), 5 deletions(-)
->> > > >
->> > > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> > > > index 989cc252d3d3..4a4ac69d1ad1 100644
->> > > > --- a/net/vmw_vsock/virtio_transport_common.c
->> > > > +++ b/net/vmw_vsock/virtio_transport_common.c
->> > > > @@ -1350,7 +1350,7 @@ virtio_transport_recv_connecting(struct sock *sk,
->> > > >     return err;
->> > > > }
->> > > >
->> > > > -static void
->> > > > +static bool
->> > > > virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->> > > >                           struct sk_buff *skb)
->> > > > {
->> > > > @@ -1365,10 +1365,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->> > > >     spin_lock_bh(&vvs->rx_lock);
->> > > >
->> > > >     can_enqueue = virtio_transport_inc_rx_pkt(vvs, len);
->> > > > -   if (!can_enqueue) {
->> > > > -           free_pkt = true;
->> > > > +   if (!can_enqueue)
->> > > >             goto out;
->> > > > -   }
->> > > >
->> > > >     if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)
->> > > >             vvs->msg_count++;
->> > > > @@ -1408,6 +1406,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->> > > >     spin_unlock_bh(&vvs->rx_lock);
->> > > >     if (free_pkt)
->> > > >             kfree_skb(skb);
->> > > > +
->> > > > +   return can_enqueue;
->> > > > }
->> > > >
->> > > > static int
->> > > > @@ -1420,7 +1420,16 @@ virtio_transport_recv_connected(struct sock *sk,
->> > > >
->> > > >     switch (le16_to_cpu(hdr->op)) {
->> > > >     case VIRTIO_VSOCK_OP_RW:
->> > > > -           virtio_transport_recv_enqueue(vsk, skb);
->> > > > +           if (!virtio_transport_recv_enqueue(vsk, skb)) {
->> > > > +                   /* There is no more space to queue the packet, so let's
->> > > > +                    * close the connection; otherwise, we'll lose data.
->> > > > +                    */
->> > > > +                   (void)virtio_transport_reset(vsk, skb);
->> > > > +                   sk->sk_state = TCP_CLOSE;
->> > > > +                   sk->sk_err = ENOBUFS;
->> > > > +                   sk_error_report(sk);
->> > >
->> > > sashiko reported some issues related to setting TCP_CLOSE state and not
->> > > removing the socket from the connect table:
->> > > https://sashiko.dev/#/patchset/20260513105417.56761-1-sgarzare%40redhat.com
->> > >
->> > > I'll change this by calling virtio_transport_do_close() and
->> > > vsock_remove_sock() in the next version.
->> > >
->> > > Stefano
->> > >
->> > > > +                   break;
->> > > > +           }
->> > > >             vsock_data_ready(sk);
->> > > >             return err;
->> > > >     case VIRTIO_VSOCK_OP_CREDIT_REQUEST:
->> > > > --
->> > > > 2.54.0
->> > > >
->> >
->> >
->> > And so the bag of hacks grows. I feel this is energy not well spent.
->> > Please, let us fix this properly *first*. And then worry about how to
->> > backport.  Maybe it will not be so terrible to backport after all.
->> >
->>
->> TBH I don't think this is an hack, but an issue we should fix in any case.
->> Regarding the second patch, I see your point, but it's a big change
->> that worries me. I'd like some more time to fix it properly without
->> rushing. Staying calm without realizing that userspace is broken like
->> we are now without this series :-(
->>
->> That said, evaluating further, I think we have a similar issue also
->> with STREAM on the host side where the skb usually doesn't free space,
->> so we need a merge strategy also there.
->>
->> So, I'd like to have time to fix both definitely. If you have time and
->> want to go ahead, please do.
->>
->> Thanks,
->> Stefano
->
->Well my patch was a start, we just need a strategy how to avoid copying
->everything, right?
+This series continues the conversion of the remaining proto_ops getsockopt
+callbacks to the new getsockopt_iter callback introduced in commit 67fab22a7adc
+("net: add getsockopt_iter callback to proto_ops").
 
-Yep, and then there's the question of how to handle EOM without a 
-payload, but I think that's a special case. In theory, we don't support 
-sending it, but I'm not sure if POSIX allows it or not.
+The new callback takes a sockopt_t — a type-safe wrapper around iov_iter
+plus an optlen field — instead of raw __user pointers. This:
 
-That said, is it okay if I send a v4 of this series?
+    - Replaces (char __user *optval, int __user *optlen) with sockopt_t *opt
+    - Reads the input buffer size from opt->optlen instead of get_user()
+    - Writes the option value via copy_to_iter() instead of copy_to_user()
+    - Reports the returned length via opt->optlen instead of put_user(),
+      independently of the bytes copied through the iter
 
-(I'm not sure if I'll be able to work on the merging next week)
+Each conversion is a behaviour-preserving and code-style-preserving refactor;
+no big changes being introduced, even when the code looks weird.
 
-Stefano
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v2:
+- Fix a issue reported by sashiko, where I was using "long int" instead
+  of "int" for a value.
+- Nit from Stanislav
+- Added an additional patch to make the af_iucv SO_MSGSIZE similar to
+  its partners.
+- Link to v1: https://patch.msgid.link/20260513-getsock_four-v1-0-fe7f0e756fac@debian.org
+
+---
+Breno Leitao (7):
+      af_iucv: take socket lock around SO_MSGSIZE getsockopt
+      af_iucv: convert to getsockopt_iter
+      atm: convert to getsockopt_iter
+      xdp: convert to getsockopt_iter
+      l2tp: ppp: convert to getsockopt_iter
+      rxrpc: convert to getsockopt_iter
+      tipc: convert to getsockopt_iter
+
+ net/atm/common.c     | 18 +++++++++++-------
+ net/atm/common.h     |  2 +-
+ net/atm/pvc.c        |  6 +++---
+ net/atm/svc.c        | 15 +++++++--------
+ net/iucv/af_iucv.c   | 16 ++++++++--------
+ net/l2tp/l2tp_ppp.c  | 20 +++++++-------------
+ net/rxrpc/af_rxrpc.c | 16 +++++++++-------
+ net/tipc/socket.c    | 31 ++++++++++++++++---------------
+ net/xdp/xsk.c        | 24 +++++++++++-------------
+ 9 files changed, 73 insertions(+), 75 deletions(-)
+---
+base-commit: afb06186b0a5f3ff659cfd97421660c95bbde3be
+change-id: 20260513-getsock_four-063e6a724555
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
