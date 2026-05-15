@@ -1,88 +1,93 @@
-Return-Path: <netdev+bounces-288405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288406-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEraL7djB2q90wIAu9opvQ
-	(envelope-from <netdev+bounces-288405-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:19:35 +0200
+	id iCzVAgNdB2pa0QIAu9opvQ
+	(envelope-from <netdev+bounces-288406-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:50:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28FB65560EE
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:19:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F181F5559E5
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:50:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 273E031C1CE7
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 17:42:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 415353010629
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 17:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E333F39F3;
-	Fri, 15 May 2026 17:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346783F99E6;
+	Fri, 15 May 2026 17:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VIe3aPCn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0uefKaQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CE73F39F5
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 17:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35E83F927B
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 17:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778866850; cv=none; b=qokzfUomWF1ZQgHmPwJeUHEoUIA2RZKeQBvgSBEieGDdaoQ4rXshfN1V0CZmQ92vE3vuspIgksq03UmGsH/+oOj0gs7dsk0I3xWMcanXe5ylLg6hhGQR6fXCFg1gtSvlTwP00TP3TIbgxUOwdOydOWiDF8lfoh362Qd5ve6o5Ck=
+	t=1778867379; cv=none; b=ClXDcZ6NYoWxAHgeK+q97gXHoGV4XteLCCmtaPG4OVuhbln6852oeqlcKSR6jr0xlcrxyQSpxryPcxW8nxp4Cw+n2El5yJJnsmz4BKBAust9bpCDp9mQD5ib09lwvjiHVbfCIf+O45QsC7IfIavmTJ8Cq9hZvxNTFbv7W6ru54w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778866850; c=relaxed/simple;
-	bh=sRDA+CjgrGJ0MlgHuTRNrkyxOYcG8ReDzd+EHyI7WCo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g9RV1upzISeO7ehKOGBHeuUf3Zarv9oj/AbbNi8W+O5fJ1KaYVRuX+1O+TJxqfxyd8Xbl1JP8Vs8FdZORBW4J+XY7Zj+BN03wHE4iPS3dJMzQQ07RA/J5Yjr/OMd3S6px2GgHEKpsUQblzi8GoLTdARoFZcFkJClXWrXibFL8mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VIe3aPCn; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1778867379; c=relaxed/simple;
+	bh=n8hKA9fd50zwkFyvAUCn9W6bPFhlF0gqW0JyBAOKqLE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jDIAeI9rUaCMn1UApdGlQPlRbr+VR8wYmc71OxlVSNDeZiYrCU/z1Cwi0Io7sTiZDXuxFp9HDB+5yj9JMALpRCN6j2E7Oblle0bKfpTm9M4VTDxrWpAOMXeAqisqAxE8iWvEaR3MJVmVrhr+8sJgCYfXEZa7gPEyGkQqZ3Qy81U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X0uefKaQ; arc=none smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48e8132c6d0so533845e9.1
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 10:40:48 -0700 (PDT)
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-36627a0ea23so29238a91.0
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 10:49:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778866847; x=1779471647; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778867372; x=1779472172; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IAVHRa/Uf1SiF1TksKJAl/zTvj0QOoaVUWhWO9iNGk4=;
-        b=VIe3aPCn+MHWEVLGVmbIw1zWk5Lg9YuRHYygw9+fGHa/2IzchXVPd+HifHa/0bcdn2
-         1+MsD8z7VHg3EdbCI0eNmtiyfnTqfpGOTvbBT5NPB1miJI99rEjqp9R3VY2Z24QdDexW
-         DUairz3oE5IH4q0sJhZhmsL/55lj0cCRHVr7UAcXs1Pe0BTwT7y8GrUCnyv56fGfde/4
-         6d0p5qtl5qTm3WQhx20nZtNCLP/kRApysaLq6BqJsgWdj6K6nFZF/tmUoXKvJmZxc/C6
-         4f9wVwISA3eZqJ2WX+6zNqpBmBsQrTIfI4C+FRdeDSw9vm+R4mVnAONMn9ShDoGWX71Q
-         oAtw==
+        bh=m2CJVztQXwsHUVVggJXbRvkco3+hfSWRzHs07/SAV6U=;
+        b=X0uefKaQS8noWuflWqio0JvxdTC1AQPPr9Hu9BU9NhBjgGIXe5/4CSiJxVev6/ukx3
+         u0LyahZ4cw67DceG8lv38d7HJboEA51+rZ3JlwuWPCOabSlConGCK1V3q8jVHHgtoI7I
+         teSpcHSJmlZ8H4cL8hthxjMqqcvHVdgEMAXdWg5qWXGKroAXFwJUMrZCG8sut1tMm425
+         6rh3r6wVjSwhKRKkyy1PNfF1ecNOs35+NQG5p3IPhpHINMb6IQceSYOwZASN2mh+87H7
+         h3EJ/e1WIvuIRCX9Ia6WtS1N+fn3ppJluo+4V/y5/Dh3YQ5Y9Co/75gPw807gU18wqyZ
+         qQCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778866847; x=1779471647;
+        d=1e100.net; s=20251104; t=1778867372; x=1779472172;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IAVHRa/Uf1SiF1TksKJAl/zTvj0QOoaVUWhWO9iNGk4=;
-        b=kltQTMt0lPhoBTuevmqPR9+HWDg5Pu0DjyVfhX0Pvn5Q2Yr5p+VB0B55rYEdt66rfD
-         Rnflk66xScU0nDE9SeyQpkR6uVuy+8iFAOIdUrsK3+arIaCGpSzaosWPI5fK+twSQzmX
-         DQWGWJ7DfnBRazx4PUiz2rrja3YxJ+2dt4P/vKHpUg66rQiQUgWKUbbJXH3IYb+AYNQy
-         A09QnoPnBDHruru8JFXWVFKjDvGAW70zad5DBV0SavglKgVtvV7HmAr8VJd7iXBoRiad
-         jREt9rEBkvS6R7/uz5JcDWq57tuatnvU6/Bt/7v4H3sYDkSFz2cQ9p1lCkiR5rDNaRVg
-         ze/A==
-X-Gm-Message-State: AOJu0YxQQjabcbcn15pR/yGcdCmaz0Sv5PN4M+xda3WS7FoH2u1tnWO2
-	FD/r6sQ49jKljspQIme6PHlIn4yp1xl4vA2f2BsPozfCANY0R7cqBBsHAdrr4pcm
-X-Gm-Gg: Acq92OG0x4Pajpc4qOI83IHTluSntWPO37/Glk3VEofdCC5cS0u7g30NfEDHqCRmbBB
-	MbpYIhmBFVG0SR/5AM689eer3uvyUyDcabIj5czR+6IGWCC+0LpjfB36C8r7037iJXrgMZnBXou
-	IDTvZaA7T0WHHR015KL5pBjXTSxQj/bCuxd8uxNrUmX1bLWzKqaBzmqUrkPdMRMVZWDUtRRs8bZ
-	m+JN8wXfpI/MV7OiltWW0V0rlxY/rKBIAG56KZ0ING10n21AbhIsdHtDT2ekb9FWL9UmkH4wr3S
-	4Gw0rNITMNc6g8KGtcZR/MMEYnNJm8HX2/pi9+C1fc0dxf8ULN1ojoCZIyLQTSQSmAsdkF4F8gU
-	b7A2wkXlBz1nNzWo2DNDr9Zj/wKu50R2pSBFsSAtTiIKgWcmX7UEBXxcZqaANmuB7mR/f+X+5Xo
-	NfWVKt3vn3RKN2YRJJgNg+ThzVAFSZvQflNjJhwFQMDXVy19gJ6LIyHkM=
-X-Received: by 2002:a05:600c:8b56:b0:48e:7f1c:8776 with SMTP id 5b1f17b1804b1-48fe6514c83mr77911265e9.25.1778866846764;
-        Fri, 15 May 2026 10:40:46 -0700 (PDT)
-Received: from localhost.localdomain ([87.236.194.191])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a1aeafsm16094402f8f.23.2026.05.15.10.40.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 10:40:46 -0700 (PDT)
-From: Petr Wozniak <petr.wozniak@gmail.com>
-To: netdev@vger.kernel.org
-Cc: bjorn@mork.no,
-	andrew@lunn.ch,
-	linux-phy@lists.infradead.org,
-	Petr Wozniak <petr.wozniak@gmail.com>
-Subject: [PATCH v3] net: phy: sfp: probe for RollBall I2C-to-MDIO bridge in mdio-i2c
-Date: Fri, 15 May 2026 19:40:44 +0200
-Message-ID: <20260515174044.26036-1-petr.wozniak@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        bh=m2CJVztQXwsHUVVggJXbRvkco3+hfSWRzHs07/SAV6U=;
+        b=TIP08UR9RjI88R46Dv7oNrxfNDvIF3G627G8pNkmRY8MUp3MdecntA6Logz+9y1Ybk
+         MSvkFJ56olD0kWnxkBFddstsPnv/uCi0Np+BZ0pmxIAQ3zrXuhPtgrRzckIh6sPVXtz5
+         ebgp4HhNazJjCq3E/bIJsaP4XpMRoCSwozgqvOdxzENq0ludaviPPO2C1qW+AlwvnC5i
+         naKE5Mb16k+gnN7Ii7RWoGgu6I1YK5XJLxSySxjL91KEMOwyvFR18iO8d8M4OqUFlxvX
+         04EHQO42FgY8cRZzagJPGslrYUw/phD9lJrQcl9Mpoh21CtjMI8dCCDVTDORB4Id2Vou
+         2ZzA==
+X-Forwarded-Encrypted: i=1; AFNElJ91ETab9vkRTn1fhELzjy9jx7K1+3x4d7Qq26OdxC8omhGGwVcY2QQoUyJ3wWTKTHxD0bB41hw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtNZUxxLSWNSnJ2lRyunUjFemV9ipolU97sz3dbmdE/Evhlfj7
+	O2VKM9p2vTC0lln5Ztc+GjwG4w2BjNB/3vNjGd/ytmGNrCXWOW59BfFV
+X-Gm-Gg: Acq92OF4VP7s49Uzcn0dWaSfrMZ+w7wMAA84To0kquU7365RbSuXykCvqB0l4+Bg+/m
+	GkGYn2le6xBlfpMFpnrTH5AX+l+qVilOqqyfh6IwtfFxQ1ZcLcvm6y11fehigus6YD+FHpRX0FD
+	mopYVM/EuZt35tJDNl2EHDPUqNnr47p6ixr13nfX4tNawR+C2AT2twvCccWA3d1K/1tIaULT6hd
+	rsJoQREkb5b0CI/coehwKjB7Az8d1fv4QwHHACzNzEClTZAah13HobmtFIbEiGOLu24q+sYbjno
+	bc+Jj6j15hOCPFV6gpALxEU4rGjWxrpABBx7KaZ5dfaPosAAl7lJzDwXwpHI1YSPKG+5IBQfifQ
+	zffr83BiU/AQGyVuMt18cr6Z1TpRi/5xUVbovEK57EXoLOy4eAIQtO3oK4ox5vRAwMLCI87R7UX
+	kbxLNiCcae86s1/gPEJ44eet9AsiH1yvCMD0dpEv9Julz1Xzc62/02jPZZpIlcJSuBsXA=
+X-Received: by 2002:a17:90b:314a:b0:366:3517:1a95 with SMTP id 98e67ed59e1d1-3695173c0cfmr4880885a91.0.1778867372370;
+        Fri, 15 May 2026 10:49:32 -0700 (PDT)
+Received: from localhost.localdomain ([171.76.81.73])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3695157d963sm3193664a91.6.2026.05.15.10.49.28
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 15 May 2026 10:49:32 -0700 (PDT)
+From: Kartik Nair <contact.kartikn@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+628f93722c08dc5aabe0@syzkaller.appspotmail.com,
+	Kartik Nair <contact.kartikn@gmail.com>
+Subject: [PATCH] net/llc: fix UBSAN array-index-out-of-bounds in llc_conn_state_process
+Date: Fri, 15 May 2026 23:19:04 +0530
+Message-Id: <20260515174904.28575-1-contact.kartikn@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,193 +95,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 28FB65560EE
+X-Rspamd-Queue-Id: F181F5559E5
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[mork.no,lunn.ch,lists.infradead.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288405-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288406-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,syzkaller.appspotmail.com,gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[contactkartikn@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev,628f93722c08dc5aabe0];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,syzkaller.appspot.com:url]
 X-Rspamd-Action: no action
 
-The "OEM"/"SFP-10G-T" quirk entry in sfp_fixup_rollball_cc()
-unconditionally forces MDIO_I2C_ROLLBALL for all modules matching that
-vendor/part-number combination.  This works for modules that genuinely
-implement a RollBall I2C-to-MDIO bridge, but silently breaks modules
-that share the same EEPROM strings without having such a bridge.
+When a timer fires while the socket is owned by a user, the timer event
+is deferred to the backlog via __sk_add_backlog(). By the time the
+backlog drains, llc->state may have been set to LLC_CONN_OUT_OF_SVC (0)
+by socket teardown. llc_conn_state_process() then calls llc_conn_service()
+which computes llc_offset_table[state - 1] = llc_offset_table[-1],
+triggering UBSAN array-index-out-of-bounds.
 
-The Realtek RTL8261BE-CG is one such module: a pure copper 10G SFP+
-media converter with no I2C-to-MDIO bridge.  Its EEPROM reports
-vendor="OEM", part="SFP-10G-T-I", and -- critically -- Vendor OUI
-00:00:00, making OUI-based differentiation impossible.  With
-MDIO_I2C_ROLLBALL the kernel stalls waiting for a PHY that never
-appears:
+llc_process_tmr_ev() already guards against LLC_CONN_OUT_OF_SVC for the
+direct path, but this guard is bypassed when sock_owned_by_user() is true
+and the event is queued to the backlog. By the time the backlog drains,
+teardown may have set state to 0.
 
-  sfp sfp2: probing phy device through the [MDIO_I2C_ROLLBALL] protocol
+The direct path already handles this case, so the same check belongs
+in the consumer too.
 
-Move the probe into i2c_mii_init_rollball() in mdio-i2c.c, where the
-RollBall protocol constants are already defined.  After sending the
-unlock password, issue a CMD_READ and wait ~70 ms for CMD_DONE.  A
-genuine RollBall bridge asserts CMD_DONE within that window; modules
-without a bridge never do, so i2c_mii_init_rollball() returns -ENODEV.
-sfp_i2c_mdiobus_create() treats -ENODEV as no PHY and falls back to
-MDIO_I2C_NONE without creating an MDIO bus.
-
-Add "OEM"/"SFP-10G-T-I" to the quirk table so RTL8261BE modules enter
-the probe path; genuine RollBall modules continue to work as before.
-
-Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
-Tested-by: Petr Wozniak <petr.wozniak@gmail.com>
+Reported-by: syzbot+628f93722c08dc5aabe0@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=628f93722c08dc5aabe0
+Signed-off-by: Kartik Nair <contact.kartikn@gmail.com>
 ---
+ net/llc/llc_conn.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Targeting: net-next
-
-Changes since v2:
-  - Compile-tested and hardware-tested on BPI-R4 (MT7988A, 6.12.87)
-  - RTL8261BE (OEM/SFP-10G-T-I): probes MDIO_I2C_NONE, link Up 10Gbps
-  - Genuine RollBall (OEM/SFP-10G-T): bridge detected, link Up 10Gbps
-
- drivers/net/mdio/mdio-i2c.c | 59 +++++++++++++++++++++++++++++++++----
- drivers/net/phy/sfp.c       |  8 ++++-
- 2 files changed, 60 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/mdio/mdio-i2c.c b/drivers/net/mdio/mdio-i2c.c
-index da2001e..1973fda 100644
---- a/drivers/net/mdio/mdio-i2c.c
-+++ b/drivers/net/mdio/mdio-i2c.c
-@@ -352,6 +352,52 @@ static int i2c_mii_write_rollball(struct mii_bus *bus, int phy_id, int devad,
- 	return 0;
- }
+diff --git a/net/llc/llc_conn.c b/net/llc/llc_conn.c
+index 1bd6c5f56c52..1fe666b7ec1f 100644
+--- a/net/llc/llc_conn.c
++++ b/net/llc/llc_conn.c
+@@ -65,6 +65,11 @@ int llc_conn_state_process(struct sock *sk, struct sk_buff *skb)
+ 	struct llc_sock *llc = llc_sk(skb->sk);
+ 	struct llc_conn_state_ev *ev = llc_conn_ev(skb);
  
-+/*
-+ * Probe for a RollBall I2C-to-MDIO bridge by issuing CMD_READ and waiting
-+ * ~70 ms for CMD_DONE.  Genuine RollBall bridges respond within that window.
-+ * Modules that share the same EEPROM vendor/part strings but have no bridge
-+ * (e.g. RTL8261BE pure copper media converter) never assert CMD_DONE, so
-+ * -ENODEV is returned for them.
-+ */
-+static int i2c_mii_probe_rollball(struct i2c_adapter *i2c)
-+{
-+	u8 data_buf[] = { ROLLBALL_DATA_ADDR, 0x01, 0x00, 0x00 };
-+	u8 cmd_buf[]  = { ROLLBALL_CMD_ADDR, ROLLBALL_CMD_READ };
-+	u8 cmd_addr   = ROLLBALL_CMD_ADDR, result;
-+	struct i2c_msg msgs[2];
-+	int ret;
-+
-+	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[0].flags = 0;
-+	msgs[0].len   = sizeof(data_buf);
-+	msgs[0].buf   = data_buf;
-+	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[1].flags = 0;
-+	msgs[1].len   = sizeof(cmd_buf);
-+	msgs[1].buf   = cmd_buf;
-+
-+	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-+	if (ret)
-+		return ret;
-+
-+	msleep(70);
-+
-+	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[0].flags = 0;
-+	msgs[0].len   = 1;
-+	msgs[0].buf   = &cmd_addr;
-+	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[1].flags = I2C_M_RD;
-+	msgs[1].len   = 1;
-+	msgs[1].buf   = &result;
-+
-+	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-+	if (ret)
-+		return ret;
-+
-+	return result == ROLLBALL_CMD_DONE ? 0 : -ENODEV;
-+}
-+
- static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
- {
- 	struct i2c_msg msg;
-@@ -372,10 +418,10 @@ static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
- 	ret = i2c_transfer(i2c, &msg, 1);
- 	if (ret < 0)
- 		return ret;
--	else if (ret != 1)
-+	if (ret != 1)
- 		return -EIO;
--	else
--		return 0;
-+
-+	return i2c_mii_probe_rollball(i2c);
- }
- 
- struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
-@@ -399,9 +445,10 @@ struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
- 	case MDIO_I2C_ROLLBALL:
- 		ret = i2c_mii_init_rollball(i2c);
- 		if (ret < 0) {
--			dev_err(parent,
--				"Cannot initialize RollBall MDIO I2C protocol: %d\n",
--				ret);
-+			if (ret != -ENODEV)
-+				dev_err(parent,
-+					"Cannot initialize RollBall MDIO I2C protocol: %d\n",
-+					ret);
- 			mdiobus_free(mii);
- 			return ERR_PTR(ret);
- 		}
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 218c775..ce745b6 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -599,7 +599,8 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	SFP_QUIRK_S("TP-LINK", "TL-SM410U", sfp_quirk_oem_2_5g),
- 
- 	SFP_QUIRK_F("ETU", "ESP-T5-R", sfp_fixup_rollball_cc),
--	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
-+	SFP_QUIRK_F("OEM", "SFP-10G-T-I", sfp_fixup_rollball),
-+	SFP_QUIRK_F("OEM", "SFP-10G-T",   sfp_fixup_rollball_cc),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
-@@ -802,6 +803,11 @@ static int sfp_i2c_mdiobus_create(struct sfp *sfp)
- 	int ret;
- 
- 	i2c_mii = mdio_i2c_alloc(sfp->dev, sfp->i2c, sfp->mdio_protocol);
-+	if (PTR_ERR_OR_ZERO(i2c_mii) == -ENODEV) {
-+		/* RollBall probe found no bridge: no PHY on this module */
-+		sfp->mdio_protocol = MDIO_I2C_NONE;
-+		return 0;
++	if (unlikely(llc->state == LLC_CONN_OUT_OF_SVC)) {
++		kfree_skb(skb);
++		return -ENOTCONN;
 +	}
- 	if (IS_ERR(i2c_mii))
- 		return PTR_ERR(i2c_mii);
- 
++
+ 	ev->ind_prim = ev->cfm_prim = 0;
+ 	/*
+ 	 * Send event to state machine
 -- 
-2.51.0
+2.39.5 (Apple Git-154)
 
 
