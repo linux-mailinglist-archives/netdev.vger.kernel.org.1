@@ -1,75 +1,72 @@
-Return-Path: <netdev+bounces-288148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKejNyV6BmqFkAIAu9opvQ
-	(envelope-from <netdev+bounces-288148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:43:01 +0200
+	id CERaIod6BmqFkAIAu9opvQ
+	(envelope-from <netdev+bounces-288149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:44:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 646335487CA
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:43:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 071865487EF
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:44:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D496B3077564
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:41:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A6F3A306C4FA
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3748936EAA2;
-	Fri, 15 May 2026 01:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F09936EAA2;
+	Fri, 15 May 2026 01:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvTtLbjY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SDoIrxHd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E2B36BCC2;
-	Fri, 15 May 2026 01:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9BB34CFC7;
+	Fri, 15 May 2026 01:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778809269; cv=none; b=PYumal3nVgydo5PYWNFwVLXNTm+/xaXUAMtko+QbjiJ/NwzxLt/mAyfDhWFKgYLtu5yEadYBJQqrwGUeTPQcC0eq07o78WdwRmDYCNdr5dZYQGe3XzHdi98BVSCR/AxrLDsAgEMsHB2rkmruIK7lbCcRG6rUGNYLdep8SyS1yyM=
+	t=1778809381; cv=none; b=u42jcjmxesYhZSjbiNWFSIlw90S/swbS0C7qFvvCNc/sF50mHaXWExkiN3nWdvqslwjGhFzkwRtSQ0pR07X/1J0tvYpOO/DvrJbZnEaFnGjdjI4wUlhFHrGp06RnvOwBPFQV9k7vyLbofi54HCpumzmODjNas3PtMrcHNwwD5yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778809269; c=relaxed/simple;
-	bh=F/Xyogd7TdbHFNyzzTlI80ozu2yO0hrkvNATJNh3EEc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hKSBxDTwg94/DFKfO93VpKgVOgAmAL2pSBCogFc8uLGIINdwjP1XWERTzAg4LBRf/+Jq2UTUdCimdQackur9cLi3oW5L3ARgVKfrN1viVSkZmbyaezCtRIxC401Gydk6b8w/4F5bHFrN6htuv6ZlkalT+Inyo5S88cNcfUUdi/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvTtLbjY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4B02C2BCB3;
-	Fri, 15 May 2026 01:41:08 +0000 (UTC)
+	s=arc-20240116; t=1778809381; c=relaxed/simple;
+	bh=M7O/RNkIv1ZToATfgpVawi9acQM43wQ1QWz9tPxAxOs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=egUTtqVH0jVOSkts9ZdrXr/xM21hIxMtE4CTMCdHN2ZnF1FiQU5jND2BCDHfiLGaHnAGbsM2GAHjkyhPH9NUwu0PUr8A/KqMGii8E2RxbPDrquxAyLjRKoWKdJ/rrcUw/w7Jln/TYFt79Z8cHUb1NQyt/WiGFxCk8qzZYihLDBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SDoIrxHd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A864C2BCB3;
+	Fri, 15 May 2026 01:43:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778809268;
-	bh=F/Xyogd7TdbHFNyzzTlI80ozu2yO0hrkvNATJNh3EEc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uvTtLbjYpROnf9NsJaPSupXfqiLwyNyckbWsnfJ5Bapx0rNb15xdYllyCrEszCGlL
-	 unjb6aTLFA8rYg4WrGfQgDShK0+bsP/azTSqc7Nv1HdPErb8qe0i9aA7FuD08gmJWc
-	 J8d8CBSEvj/i57J1eAP4kCXjVU2NooPQPdWCbA5VZaSTHyeRcoeh4+VHJahCFAY99l
-	 ShWYwSZ8N11YDsjGibwGZJkmnS/UMtJJrp3p/mqf1jG/8JoAcwk6mhRnwCkck4mm1W
-	 6IGg37msi6ThOP4pq5A5Cclwj/nR1AzUy1+5ea7dNQWSViu1OttFOkvQcfawxc1iHg
-	 8HanyLO6SHpZw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7183339E4DB8;
-	Fri, 15 May 2026 01:40:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1778809380;
+	bh=M7O/RNkIv1ZToATfgpVawi9acQM43wQ1QWz9tPxAxOs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SDoIrxHdB20tuaH89MWvlBkqcieAJeNNYSe6BjV9JXUvd1W9zJoJnvKz3786P/eL9
+	 ljIO9d3RMrTpDSOKX5ImrPaPhKMDP+csA7v05CILX//RlpAiw4Qq/SZZwTKA5/ZNPj
+	 yI07fYFChsTgdUXysv51e7W+k6OFcLdBYCgPSoY3tbKTQ6TSGQEku3+BdP//R/bpct
+	 PARFYxVg5Uxlu4myi7yzIso+yJ3IyL7dITG3+q/XzWQeJ7lE2cFtaYbKWTO0CtpVj9
+	 X/yRl2KwP35n68QaQh/tzbRm2wVccG8J6wpP608UJtkYJZpLDDVzmCGCWNlhb5gwn+
+	 VTj4Eh4u7Pnkg==
+Date: Thu, 14 May 2026 18:42:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yuho Choi <dbgh9129@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] ipv6: route: Unregister netdevice notifier on BPF
+ init failure
+Message-ID: <20260514184259.3a852f9e@kernel.org>
+In-Reply-To: <20260514002218.677943-1-dbgh9129@gmail.com>
+References: <20260514002218.677943-1-dbgh9129@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: usb: usbnet: use proper ep number macros
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177880921329.156468.16729351420271370966.git-patchwork-notify@kernel.org>
-Date: Fri, 15 May 2026 01:40:13 +0000
-References: <20260513132916.39896-1-oneukum@suse.com>
-In-Reply-To: <20260513132916.39896-1-oneukum@suse.com>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Rspamd-Queue-Id: 646335487CA
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 071865487EF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
@@ -77,49 +74,67 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288149-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288148-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 13 May 2026 15:29:16 +0200 you wrote:
-> We have macros to retrieve endpoint numbers now.
-> Use them.
+On Wed, 13 May 2026 20:22:18 -0400 Yuho Choi wrote:
+> ip6_route_init() registers ip6_route_dev_notifier before registering the
+> IPv6 route BPF iterator target. If bpf_iter_register() fails, the error
+> path jumps to out_register_late_subsys and unwinds the RTNL handlers and
+> late pernet subsystem, but leaves the netdevice notifier registered.
 > 
-> Signed-off-by: Oliver Neukum <oneukum@suse.com>
-> ---
->  drivers/net/usb/usbnet.c | 10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
+> Add a separate unwind label for the BPF iterator failure path so the
+> netdevice notifier is unregistered before continuing with the existing
+> cleanup.
+> 
+> Fixes: 138d0be35b14 ("net: bpf: Add netlink and ipv6_route bpf_iter targets")
+> Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
 
-Here is the summary with links:
-  - [net-next] net: usb: usbnet: use proper ep number macros
-    https://git.kernel.org/netdev/net-next/c/822d4a8e390a
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index cb521700cee7..4333e11dc9c5 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -6925,7 +6925,7 @@ int __init ip6_route_init(void)
+>  #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
+>  	ret = bpf_iter_register();
+>  	if (ret)
+> -		goto out_register_late_subsys;
+> +		goto out_register_notifier;
+>  #endif
+>  #endif
+>  
+> @@ -6939,6 +6939,12 @@ int __init ip6_route_init(void)
+>  out:
+>  	return ret;
+>  
+> +#if IS_BUILTIN(CONFIG_IPV6)
 
-You are awesome, thank you!
+Why this check?
+
+> +#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
+> +out_register_notifier:
+> +	unregister_netdevice_notifier(&ip6_route_dev_notifier);
+> +#endif
+> +#endif
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
