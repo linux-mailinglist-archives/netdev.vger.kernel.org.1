@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-288203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288204-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMK4KMXJBmrynwIAu9opvQ
-	(envelope-from <netdev+bounces-288203-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:22:45 +0200
+	id iPKzFwHKBmrynwIAu9opvQ
+	(envelope-from <netdev+bounces-288204-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:23:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2374654A7CF
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:22:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB3A54A7F9
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1AC7130A0FFE
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:15:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6ABCB30ACB20
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 07:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9437B3E3DB6;
-	Fri, 15 May 2026 07:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664A93E51C6;
+	Fri, 15 May 2026 07:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W27fIjDY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S9vPMdI6"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4203E558A
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 07:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39083E5EDD
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 07:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778829317; cv=none; b=sU8gCKoI4uEoBidt1bacam8MplKxPviYwpVFbdPij7VyMPD0s2sfx0b80+YWMSIP8E9Q0PcKdboghx+Qbxtghy+tJb9GvP188H+L0stKAPUKOf6c2oxkCtyAsqEV/j91gbUGIiaWpY012Jp7/CXEnQQpB1nC+0Zd5Bb61Wq+7JU=
+	t=1778829322; cv=none; b=jR6nC/t7bZ6ncVVWkvElQroWfw2OCq/K0CAWLiKEuti7cB8BQNG8HntnPP1UfThaACgSLHDtvncpKDzz7cqbSm4Czt5QvH1f/KLQeFMnLPptdoT2S6S4+rtW1ZsC5RTG7wOEVXQkpvD8C8ToyrabPEdDkcmmWmmMfdej7j1n7b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778829317; c=relaxed/simple;
-	bh=y6Bzb9etlG78l2NqztoQN6BbGaDS/+gd+9oPK48n85c=;
+	s=arc-20240116; t=1778829322; c=relaxed/simple;
+	bh=Mqeo7wSQ9cvujMQ58+fSENQkR7cydw5nHM5UQoNm3Hs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WxgBdEMApgC/quly/QX/Afe2gh0UF0eut++kA4vA5YCUvtqykYgNtHqCKiG/iIa/rvfb7TEy9welpOlyFQaSix6jpblrEi7M+9KjbNUvqQypje4xNXLAgL8ejfrhMTwNEkeRckZit6as1gyBGsKGGwf5CqfTlrC/OTb9xwFvKUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W27fIjDY; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=eXRQK3CC8tMyp1IJdEOY3CuxJMDFkL/GQQFr62mMpPEAffskWk65jMIxJtBiDAcA1P5S79esOv+EvgvWfhbx5tbBJ+Lrj+Ytwne2S39NDrkZHyIBpBbSUqRo99GvFQWRIoWcQz+Incf7MjZFwTI89U0H3R/aJdAgtW6iipiYciM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S9vPMdI6; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-365fc4636bbso17965694a91.2
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 00:15:15 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-369467ab5bfso1158970a91.0
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 00:15:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778829315; x=1779434115; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1778829319; x=1779434119; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=J7ZlPkIkqmKvNasnPRGcDgLQoUl4ateLXAilwoiwRQE=;
-        b=W27fIjDY0dDxlWSkgCQz1LRdMQuTVbtSLS6J8+ojLLs+pyruFaMTw5b++/0H7SQyY+
-         iUhPGWrdby9ZfPKzIZxW4+6hR3JacewlIq/I6fyRQXbpNLiYHgeFz4JeeegyESyane8U
-         75EdRWAIIC5OiOFz7tqHVyBd3do9WqZkwN5Z6O7LRTn8+LYu2tcnGp1G5elZET92GzVa
-         Da3nutNakFnh/eL6s2yzZUCNjaIEARq/iPf8BEicdVRd9FH/5bu2UuqHnt/ajAlN++L8
-         mjP1am+VjPbcPBiFCm49gMXCmZbx/d9PyYdQATZvDTiwKlHhNFifW8VYhUMZS6ApKos2
-         y7ng==
+        bh=b3RlI8YNokBP9FYY4cx+xESI8OetO8LQ784NhfGUE9E=;
+        b=S9vPMdI6vSCS+K/V4XWlsDip5fbD5OfCPU+ugohnoOo8A6tHTW7kKSxxdoJIK2r8wy
+         t0iDOUzqnfNlQh0y3D24hKNnZTKetB41AqGVZFuz+IUlRdcnmK+Geglnv+3JOrWEn+dM
+         DetHKi+AG9wq8CfAr4a3xBh1quad7SPnISyG4yr/X8bCFW2mFEMcK2ylvMmUlcw/u37z
+         /GJX82SqfMFqtIdm1CZnXydHZbg3uTZArVCultcmCR/296Q0wYw5QqrL9hdfcMehPOZ+
+         seT0EqjpZHCSB8G+kloczHfLTMgTcr49LkjSlreTsNeOEXp5ZJwz0XQ82QTNT82RqHvH
+         68Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778829315; x=1779434115;
+        d=1e100.net; s=20251104; t=1778829319; x=1779434119;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=J7ZlPkIkqmKvNasnPRGcDgLQoUl4ateLXAilwoiwRQE=;
-        b=SAfOMjgAubQWVAGYRqdWJjq/G6un+wSazBSi8la3dkK6xQ/cjbCiBXA+TvxXUTXPNs
-         62J4zZ14edS0hjFZsm9hHdhT4CdOHDlK2lyRcEGgVR8hwHCAdY0PbT2EdlgfjoiM9JVT
-         B9ESk6Px6VG/iOoUy7YpP0ZxyIx2w3c1nRG0vCxeGx8cx3KxX8kMVK9sNAMO4Ve551uZ
-         r+FNfRIwXyQVmK7DlZiLJ9wDq15gXg4tb4/toztsNt7BviCMvqCkzcRrk2XW7NmF3+F2
-         Q6t79MCvEfcpYfyYGLoO53TYRgNvlNfaaR87dfz7xw8ZHCUfU/N0x03qH/Nl5tr1xRiK
-         RUhg==
-X-Forwarded-Encrypted: i=1; AFNElJ9Kc2fEqmfMlWkMT/Sm0edKPzOWSl/p3QBbybym4BUdmR6lnOcU9OIvs0PI0/9t7QO8EXB8ZR0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrL2a6z9h3nEe3BHSonjsIEXqtkipifhK2grMkgnh3hN2qkH8D
-	yclz0c+kOSTJn90hrWwr7nyjZ3ZFirbsLdH/0Yva5sg4fHQAoAfgFZQGWntdzX8Cm43wBnG1i8b
-	0+y7/Xoclzf4E/NUNWmYJYiKp0Q==
-X-Received: from pgbcs6.prod.google.com ([2002:a05:6a02:4186:b0:c7e:68a1:910c])
+        bh=b3RlI8YNokBP9FYY4cx+xESI8OetO8LQ784NhfGUE9E=;
+        b=NI8rBNw6IjgQ8r4Wf+8moIo+uD7a44XtDzIIG9fOdONxXVO7JA9QWYEZR5COclMnNc
+         rV9zFyBdX3rpqIYKm4W26L2/YGLV8mNdvTdRo0DYk0bNihOE7QtJV17vb9P8RD95HgDR
+         hz9i+feY3z7bNQqXDeYB/Z0rs5LNluwSvDC7TbFXwo/3MxWEyO58hxj7RX4n/Zj2hoaN
+         +Fou1hCaMdRQg0wbSjSUgbh7yrWqjEvkICGTuP3HUP9onH4XdKkRx8nR07KyjLXjjPxw
+         fsj4Nma7MZl9eCr84yPFUz01eG/WToS3N8vf6ZAk65iuMtWcvh5oKy4VRRceTvO6n6V8
+         DP9w==
+X-Forwarded-Encrypted: i=1; AFNElJ+C0MjtmKbxupESIblq+SmXlEdxMvIZnrlzK2yWpFp4rVhFSncoz6Zp7FxWdZAykexQQagyjzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKjSSwZYQrMc5C+3xiEcdRT8u/8uRvoT6IVXPuK53fGPPklq4Z
+	WMQ69/8ooycOistnTi6YNKLdO/yDuMD23qdTlCbosddUA1nnZ76DbA//s+cRTe8RSRrws/5YGzo
+	iWRpM8hhpgR0s2GT0LmmoG5Fwng==
+X-Received: from pfbdu16.prod.google.com ([2002:a05:6a00:2b50:b0:82f:9778:a429])
  (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:6d9e:b0:398:bbd6:80b9 with SMTP id adf61e73a8af0-3b22eb994ecmr3197634637.23.1778829314381;
- Fri, 15 May 2026 00:15:14 -0700 (PDT)
-Date: Fri, 15 May 2026 16:15:03 +0900
+ 2002:a05:6a00:90a9:b0:837:e9cc:d470 with SMTP id d2e1a72fcca58-83f33c9ec67mr3222990b3a.20.1778829318594;
+ Fri, 15 May 2026 00:15:18 -0700 (PDT)
+Date: Fri, 15 May 2026 16:15:04 +0900
 In-Reply-To: <20260515071504.2054786-1-yuyanghuang@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -78,9 +78,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260515071504.2054786-1-yuyanghuang@google.com>
 X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260515071504.2054786-2-yuyanghuang@google.com>
-Subject: [PATCH bpf-next 1/2] bpf: align syscall writeback behavior with
- caller-declared size
+Message-ID: <20260515071504.2054786-3-yuyanghuang@google.com>
+Subject: [PATCH bpf-next 2/2] selftests/bpf: Add verification for
+ BPF_PROG_QUERY attr size boundaries
 From: Yuyang Huang <yuyanghuang@google.com>
 To: Yuyang Huang <yuyanghuang@google.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, 
@@ -96,7 +96,7 @@ Cc: "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>
 	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 2374654A7CF
+X-Rspamd-Queue-Id: CAB3A54A7F9
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -104,12 +104,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288203-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288204-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -122,428 +122,128 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,lunn.ch,iogearbox.net,gmail.com,google.com,linux.dev,blackwall.org,redhat.com,fomichev.me,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The bpf(cmd, attr, size) syscall copies up to 'size' bytes on input, but
-several commands write outputs back to userspace unconditionally. Because
-copy_to_user() does not fault on adjacent mapped memory, a short userspace
-buffer results in out-of-bounds writes, potentially overwriting adjacent
-userspace memory.
-
-Address this by introducing two policies based on field type:
-
-1) Mandatory fields (original ABI): Return -EINVAL in __sys_bpf() if the
-   buffer size does not cover them. This hardens the syscall front-gate
-   for the following commands:
-   - BPF_PROG_QUERY (min size: query.prog_cnt)
-   - BPF_PROG_TEST_RUN (min size: test.duration)
-   - BPF_*_GET_NEXT_ID (min size: next_id)
-   - BPF_OBJ_GET_INFO_BY_FD (min size: info.info_len)
-   - BPF_TASK_FD_QUERY (minimum size: task_fd_query.probe_addr)
-   - BPF_MAP_*_BATCH (min size: batch.flags)
-
-2) Optional fields (later revisions): Skip writeback if the buffer size
-   does not cover the field. This is applied to BPF_PROG_QUERY's
-   'query.revision'. Older userspace passing a smaller size (e.g., 40
-   bytes) will have the write safely skipped. This size-gating pattern
-   mirrors the existing precedent used for 'log_true_size' (verifier.c)
-   and 'btf_log_true_size' (btf.c).
-
-To support this, the user-declared 'size' is plumbed from __sys_bpf()
-through the query dispatchers (cgroup, tcx, netkit) to the underlying
-writeback helpers in cgroup.c and mprog.c.
+Add a new selftest to verify that the BPF syscall (specifically
+BPF_PROG_QUERY) correctly respects the caller-declared attribute
+size boundaries:
+- Optional output fields (like query.revision) are not written if the
+  caller-declared size ends before them.
+- Calls with a size below the mandatory minimum return -EINVAL.
+- Full-size calls still receive the optional fields normally.
 
 Cc: Maciej =C5=BBenczykowski <maze@google.com>
 Cc: Lorenzo Colitti <lorenzo@google.com>
 Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
 Link: https://lore.kernel.org/r/CANP3RGfZTXM_u=3DE_atoomPZXutoQJ02nOMkCCR-Y=
 BZbOm2suWA@mail.gmail.com
----
- drivers/net/netkit.c       |  5 +++--
- include/linux/bpf-cgroup.h |  5 +++--
- include/linux/bpf_mprog.h  |  4 ++--
- include/net/netkit.h       |  6 ++++--
- include/net/tcx.h          |  5 +++--
- kernel/bpf/cgroup.c        | 13 +++++++------
- kernel/bpf/mprog.c         |  5 +++--
- kernel/bpf/syscall.c       | 34 +++++++++++++++++++++++++++++-----
- kernel/bpf/tcx.c           |  5 +++--
- 9 files changed, 57 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index 5e2eecc3165d..680607d6e039 100644
---- a/drivers/net/netkit.c
-+++ b/drivers/net/netkit.c
-@@ -813,7 +813,8 @@ int netkit_prog_detach(const union bpf_attr *attr, stru=
-ct bpf_prog *prog)
- 	return ret;
- }
-=20
--int netkit_prog_query(const union bpf_attr *attr, union bpf_attr __user *u=
-attr)
-+int netkit_prog_query(const union bpf_attr *attr, union bpf_attr __user *u=
-attr,
-+		      u32 uattr_size)
- {
- 	struct net_device *dev;
- 	int ret;
-@@ -826,7 +827,7 @@ int netkit_prog_query(const union bpf_attr *attr, union=
- bpf_attr __user *uattr)
- 		ret =3D PTR_ERR(dev);
- 		goto out;
- 	}
--	ret =3D bpf_mprog_query(attr, uattr, netkit_entry_fetch(dev, false));
-+	ret =3D bpf_mprog_query(attr, uattr, uattr_size, netkit_entry_fetch(dev, =
-false));
- out:
- 	rtnl_unlock();
- 	return ret;
-diff --git a/include/linux/bpf-cgroup.h b/include/linux/bpf-cgroup.h
-index b2e79c2b41d5..4d0cc65976a1 100644
---- a/include/linux/bpf-cgroup.h
-+++ b/include/linux/bpf-cgroup.h
-@@ -421,7 +421,7 @@ int cgroup_bpf_prog_detach(const union bpf_attr *attr,
- 			   enum bpf_prog_type ptype);
- int cgroup_bpf_link_attach(const union bpf_attr *attr, struct bpf_prog *pr=
-og);
- int cgroup_bpf_prog_query(const union bpf_attr *attr,
--			  union bpf_attr __user *uattr);
-+			  union bpf_attr __user *uattr, u32 uattr_size);
-=20
- const struct bpf_func_proto *
- cgroup_common_func_proto(enum bpf_func_id func_id, const struct bpf_prog *=
-prog);
-@@ -452,7 +452,8 @@ static inline int cgroup_bpf_link_attach(const union bp=
-f_attr *attr,
- }
-=20
- static inline int cgroup_bpf_prog_query(const union bpf_attr *attr,
--					union bpf_attr __user *uattr)
-+					union bpf_attr __user *uattr,
-+					u32 uattr_size)
- {
- 	return -EINVAL;
- }
-diff --git a/include/linux/bpf_mprog.h b/include/linux/bpf_mprog.h
-index 0b9f4caeeb0a..fa479ace854a 100644
---- a/include/linux/bpf_mprog.h
-+++ b/include/linux/bpf_mprog.h
-@@ -72,7 +72,7 @@
-  *   // bpf_mprog user-side lock
-  *   // fetch active @entry from attach location
-  *   [...]
-- *   ret =3D bpf_mprog_query(attr, uattr, entry);
-+ *   ret =3D bpf_mprog_query(attr, uattr, uattr_size, entry);
-  *   // bpf_mprog user-side unlock
-  *
-  *  Data/fast path:
-@@ -329,7 +329,7 @@ int bpf_mprog_detach(struct bpf_mprog_entry *entry,
- 		     u32 flags, u32 id_or_fd, u64 revision);
-=20
- int bpf_mprog_query(const union bpf_attr *attr, union bpf_attr __user *uat=
-tr,
--		    struct bpf_mprog_entry *entry);
-+		    u32 uattr_size, struct bpf_mprog_entry *entry);
-=20
- static inline bool bpf_mprog_supported(enum bpf_prog_type type)
- {
-diff --git a/include/net/netkit.h b/include/net/netkit.h
-index 9ec0163739f4..fe209d1f9a64 100644
---- a/include/net/netkit.h
-+++ b/include/net/netkit.h
-@@ -9,7 +9,8 @@
- int netkit_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog);
- int netkit_link_attach(const union bpf_attr *attr, struct bpf_prog *prog);
- int netkit_prog_detach(const union bpf_attr *attr, struct bpf_prog *prog);
--int netkit_prog_query(const union bpf_attr *attr, union bpf_attr __user *u=
-attr);
-+int netkit_prog_query(const union bpf_attr *attr, union bpf_attr __user *u=
-attr,
-+		      u32 uattr_size);
- INDIRECT_CALLABLE_DECLARE(struct net_device *netkit_peer_dev(struct net_de=
-vice *dev));
- #else
- static inline int netkit_prog_attach(const union bpf_attr *attr,
-@@ -31,7 +32,8 @@ static inline int netkit_prog_detach(const union bpf_attr=
- *attr,
- }
-=20
- static inline int netkit_prog_query(const union bpf_attr *attr,
--				    union bpf_attr __user *uattr)
-+				    union bpf_attr __user *uattr,
-+				    u32 uattr_size)
- {
- 	return -EINVAL;
- }
-diff --git a/include/net/tcx.h b/include/net/tcx.h
-index 23a61af13547..610626b39676 100644
---- a/include/net/tcx.h
-+++ b/include/net/tcx.h
-@@ -166,7 +166,7 @@ int tcx_prog_detach(const union bpf_attr *attr, struct =
-bpf_prog *prog);
- void tcx_uninstall(struct net_device *dev, bool ingress);
-=20
- int tcx_prog_query(const union bpf_attr *attr,
--		   union bpf_attr __user *uattr);
-+		   union bpf_attr __user *uattr, u32 uattr_size);
-=20
- static inline void dev_tcx_uninstall(struct net_device *dev)
- {
-@@ -194,7 +194,8 @@ static inline int tcx_prog_detach(const union bpf_attr =
-*attr,
- }
-=20
- static inline int tcx_prog_query(const union bpf_attr *attr,
--				 union bpf_attr __user *uattr)
-+				 union bpf_attr __user *uattr,
-+				 u32 uattr_size)
- {
- 	return -EINVAL;
- }
-diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
-index 876f6a81a9b6..2c2bdaa86aa7 100644
---- a/kernel/bpf/cgroup.c
-+++ b/kernel/bpf/cgroup.c
-@@ -1208,7 +1208,7 @@ static int cgroup_bpf_detach(struct cgroup *cgrp, str=
-uct bpf_prog *prog,
-=20
- /* Must be called with cgroup_mutex held to avoid races. */
- static int __cgroup_bpf_query(struct cgroup *cgrp, const union bpf_attr *a=
-ttr,
--			      union bpf_attr __user *uattr)
-+			      union bpf_attr __user *uattr, u32 uattr_size)
- {
- 	__u32 __user *prog_attach_flags =3D u64_to_user_ptr(attr->query.prog_atta=
-ch_flags);
- 	bool effective_query =3D attr->query.query_flags & BPF_F_QUERY_EFFECTIVE;
-@@ -1259,7 +1259,8 @@ static int __cgroup_bpf_query(struct cgroup *cgrp, co=
-nst union bpf_attr *attr,
- 		return -EFAULT;
- 	if (!effective_query && from_atype =3D=3D to_atype)
- 		revision =3D cgrp->bpf.revisions[from_atype];
--	if (copy_to_user(&uattr->query.revision, &revision, sizeof(revision)))
-+	if (uattr_size >=3D offsetofend(union bpf_attr, query.revision) &&
-+	    copy_to_user(&uattr->query.revision, &revision, sizeof(revision)))
- 		return -EFAULT;
- 	if (attr->query.prog_cnt =3D=3D 0 || !prog_ids || !total_cnt)
- 		/* return early if user requested only program count + flags */
-@@ -1312,12 +1313,12 @@ static int __cgroup_bpf_query(struct cgroup *cgrp, =
-const union bpf_attr *attr,
- }
-=20
- static int cgroup_bpf_query(struct cgroup *cgrp, const union bpf_attr *att=
-r,
--			    union bpf_attr __user *uattr)
-+			    union bpf_attr __user *uattr, u32 uattr_size)
- {
- 	int ret;
-=20
- 	cgroup_lock();
--	ret =3D __cgroup_bpf_query(cgrp, attr, uattr);
-+	ret =3D __cgroup_bpf_query(cgrp, attr, uattr, uattr_size);
- 	cgroup_unlock();
- 	return ret;
- }
-@@ -1520,7 +1521,7 @@ int cgroup_bpf_link_attach(const union bpf_attr *attr=
-, struct bpf_prog *prog)
- }
-=20
- int cgroup_bpf_prog_query(const union bpf_attr *attr,
--			  union bpf_attr __user *uattr)
-+			  union bpf_attr __user *uattr, u32 uattr_size)
- {
- 	struct cgroup *cgrp;
- 	int ret;
-@@ -1529,7 +1530,7 @@ int cgroup_bpf_prog_query(const union bpf_attr *attr,
- 	if (IS_ERR(cgrp))
- 		return PTR_ERR(cgrp);
-=20
--	ret =3D cgroup_bpf_query(cgrp, attr, uattr);
-+	ret =3D cgroup_bpf_query(cgrp, attr, uattr, uattr_size);
-=20
- 	cgroup_put(cgrp);
- 	return ret;
-diff --git a/kernel/bpf/mprog.c b/kernel/bpf/mprog.c
-index 1394168062e8..822d9c4c0db4 100644
---- a/kernel/bpf/mprog.c
-+++ b/kernel/bpf/mprog.c
-@@ -393,7 +393,7 @@ int bpf_mprog_detach(struct bpf_mprog_entry *entry,
- }
-=20
- int bpf_mprog_query(const union bpf_attr *attr, union bpf_attr __user *uat=
-tr,
--		    struct bpf_mprog_entry *entry)
-+		    u32 uattr_size, struct bpf_mprog_entry *entry)
- {
- 	u32 __user *uprog_flags, *ulink_flags;
- 	u32 __user *uprog_id, *ulink_id;
-@@ -413,7 +413,8 @@ int bpf_mprog_query(const union bpf_attr *attr, union b=
-pf_attr __user *uattr,
- 	}
- 	if (copy_to_user(&uattr->query.attach_flags, &flags, sizeof(flags)))
- 		return -EFAULT;
--	if (copy_to_user(&uattr->query.revision, &revision, sizeof(revision)))
-+	if (uattr_size >=3D offsetofend(union bpf_attr, query.revision) &&
-+	    copy_to_user(&uattr->query.revision, &revision, sizeof(revision)))
- 		return -EFAULT;
- 	if (copy_to_user(&uattr->query.count, &count, sizeof(count)))
- 		return -EFAULT;
-diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-index a3c0214ca934..a46b0510d9e2 100644
---- a/kernel/bpf/syscall.c
-+++ b/kernel/bpf/syscall.c
-@@ -4654,7 +4654,7 @@ static int bpf_prog_detach(const union bpf_attr *attr=
-)
- #define BPF_PROG_QUERY_LAST_FIELD query.revision
-=20
- static int bpf_prog_query(const union bpf_attr *attr,
--			  union bpf_attr __user *uattr)
-+			  union bpf_attr __user *uattr, u32 uattr_size)
- {
- 	if (!bpf_net_capable())
- 		return -EPERM;
-@@ -4693,7 +4693,7 @@ static int bpf_prog_query(const union bpf_attr *attr,
- 	case BPF_CGROUP_GETSOCKOPT:
- 	case BPF_CGROUP_SETSOCKOPT:
- 	case BPF_LSM_CGROUP:
--		return cgroup_bpf_prog_query(attr, uattr);
-+		return cgroup_bpf_prog_query(attr, uattr, uattr_size);
- 	case BPF_LIRC_MODE2:
- 		return lirc_prog_query(attr, uattr);
- 	case BPF_FLOW_DISSECTOR:
-@@ -4706,10 +4706,10 @@ static int bpf_prog_query(const union bpf_attr *att=
-r,
- 		return sock_map_bpf_prog_query(attr, uattr);
- 	case BPF_TCX_INGRESS:
- 	case BPF_TCX_EGRESS:
--		return tcx_prog_query(attr, uattr);
-+		return tcx_prog_query(attr, uattr, uattr_size);
- 	case BPF_NETKIT_PRIMARY:
- 	case BPF_NETKIT_PEER:
--		return netkit_prog_query(attr, uattr);
-+		return netkit_prog_query(attr, uattr, uattr_size);
- 	default:
- 		return -EINVAL;
- 	}
-@@ -6260,20 +6260,30 @@ static int __sys_bpf(enum bpf_cmd cmd, bpfptr_t uat=
-tr, unsigned int size)
- 		err =3D bpf_prog_detach(&attr);
- 		break;
- 	case BPF_PROG_QUERY:
--		err =3D bpf_prog_query(&attr, uattr.user);
-+		if (size < offsetofend(union bpf_attr, query.prog_cnt))
-+			return -EINVAL;
-+		err =3D bpf_prog_query(&attr, uattr.user, size);
- 		break;
- 	case BPF_PROG_TEST_RUN:
-+		if (size < offsetofend(union bpf_attr, test.duration))
-+			return -EINVAL;
- 		err =3D bpf_prog_test_run(&attr, uattr.user);
- 		break;
- 	case BPF_PROG_GET_NEXT_ID:
-+		if (size < offsetofend(union bpf_attr, next_id))
-+			return -EINVAL;
- 		err =3D bpf_obj_get_next_id(&attr, uattr.user,
- 					  &prog_idr, &prog_idr_lock);
- 		break;
- 	case BPF_MAP_GET_NEXT_ID:
-+		if (size < offsetofend(union bpf_attr, next_id))
-+			return -EINVAL;
- 		err =3D bpf_obj_get_next_id(&attr, uattr.user,
- 					  &map_idr, &map_idr_lock);
- 		break;
- 	case BPF_BTF_GET_NEXT_ID:
-+		if (size < offsetofend(union bpf_attr, next_id))
-+			return -EINVAL;
- 		err =3D bpf_obj_get_next_id(&attr, uattr.user,
- 					  &btf_idr, &btf_idr_lock);
- 		break;
-@@ -6284,6 +6294,8 @@ static int __sys_bpf(enum bpf_cmd cmd, bpfptr_t uattr=
-, unsigned int size)
- 		err =3D bpf_map_get_fd_by_id(&attr);
- 		break;
- 	case BPF_OBJ_GET_INFO_BY_FD:
-+		if (size < offsetofend(union bpf_attr, info.info_len))
-+			return -EINVAL;
- 		err =3D bpf_obj_get_info_by_fd(&attr, uattr.user);
- 		break;
- 	case BPF_RAW_TRACEPOINT_OPEN:
-@@ -6296,22 +6308,32 @@ static int __sys_bpf(enum bpf_cmd cmd, bpfptr_t uat=
-tr, unsigned int size)
- 		err =3D bpf_btf_get_fd_by_id(&attr);
- 		break;
- 	case BPF_TASK_FD_QUERY:
-+		if (size < offsetofend(union bpf_attr, task_fd_query.probe_addr))
-+			return -EINVAL;
- 		err =3D bpf_task_fd_query(&attr, uattr.user);
- 		break;
- 	case BPF_MAP_LOOKUP_AND_DELETE_ELEM:
- 		err =3D map_lookup_and_delete_elem(&attr);
- 		break;
- 	case BPF_MAP_LOOKUP_BATCH:
-+		if (size < offsetofend(union bpf_attr, batch.flags))
-+			return -EINVAL;
- 		err =3D bpf_map_do_batch(&attr, uattr.user, BPF_MAP_LOOKUP_BATCH);
- 		break;
- 	case BPF_MAP_LOOKUP_AND_DELETE_BATCH:
-+		if (size < offsetofend(union bpf_attr, batch.flags))
-+			return -EINVAL;
- 		err =3D bpf_map_do_batch(&attr, uattr.user,
- 				       BPF_MAP_LOOKUP_AND_DELETE_BATCH);
- 		break;
- 	case BPF_MAP_UPDATE_BATCH:
-+		if (size < offsetofend(union bpf_attr, batch.flags))
-+			return -EINVAL;
- 		err =3D bpf_map_do_batch(&attr, uattr.user, BPF_MAP_UPDATE_BATCH);
- 		break;
- 	case BPF_MAP_DELETE_BATCH:
-+		if (size < offsetofend(union bpf_attr, batch.flags))
-+			return -EINVAL;
- 		err =3D bpf_map_do_batch(&attr, uattr.user, BPF_MAP_DELETE_BATCH);
- 		break;
- 	case BPF_LINK_CREATE:
-@@ -6324,6 +6346,8 @@ static int __sys_bpf(enum bpf_cmd cmd, bpfptr_t uattr=
-, unsigned int size)
- 		err =3D bpf_link_get_fd_by_id(&attr);
- 		break;
- 	case BPF_LINK_GET_NEXT_ID:
-+		if (size < offsetofend(union bpf_attr, next_id))
-+			return -EINVAL;
- 		err =3D bpf_obj_get_next_id(&attr, uattr.user,
- 					  &link_idr, &link_idr_lock);
- 		break;
-diff --git a/kernel/bpf/tcx.c b/kernel/bpf/tcx.c
-index 02db0113b8e7..2a91f6075511 100644
---- a/kernel/bpf/tcx.c
-+++ b/kernel/bpf/tcx.c
-@@ -119,7 +119,8 @@ void tcx_uninstall(struct net_device *dev, bool ingress=
-)
- 		tcx_entry_free(entry);
- }
-=20
--int tcx_prog_query(const union bpf_attr *attr, union bpf_attr __user *uatt=
-r)
-+int tcx_prog_query(const union bpf_attr *attr, union bpf_attr __user *uatt=
-r,
-+		   u32 uattr_size)
- {
- 	bool ingress =3D attr->query.attach_type =3D=3D BPF_TCX_INGRESS;
- 	struct net *net =3D current->nsproxy->net_ns;
-@@ -132,7 +133,7 @@ int tcx_prog_query(const union bpf_attr *attr, union bp=
-f_attr __user *uattr)
- 		ret =3D -ENODEV;
- 		goto out;
- 	}
--	ret =3D bpf_mprog_query(attr, uattr, tcx_entry_fetch(dev, ingress));
-+	ret =3D bpf_mprog_query(attr, uattr, uattr_size, tcx_entry_fetch(dev, ing=
-ress));
- out:
- 	rtnl_unlock();
- 	return ret;
+Tested with virtme-ng:
+# ./test_progs -t bpf_attr_size
+#17/1    bpf_attr_size/query_size_boundaries:OK
+#17/2    bpf_attr_size/query_mandatory_too_short_einval:OK
+#17      bpf_attr_size:OK
+Summary: 1/2 PASSED, 0 SKIPPED, 0 FAILED
+---
+ .../selftests/bpf/prog_tests/bpf_attr_size.c  | 84 +++++++++++++++++++
+ 1 file changed, 84 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bpf_attr_size.c
+
+diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_attr_size.c b/tools=
+/testing/selftests/bpf/prog_tests/bpf_attr_size.c
+new file mode 100644
+index 000000000000..65fd717782de
+--- /dev/null
++++ b/tools/testing/selftests/bpf/prog_tests/bpf_attr_size.c
+@@ -0,0 +1,84 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2026 Google LLC */
++#include <linux/bpf.h>
++#include <unistd.h>
++#include <sys/syscall.h>
++#include <test_progs.h>
++#include "test_tc_link.skel.h"
++#include "tc_helpers.h"
++
++#define OLD_QUERY_SIZE		offsetofend(union bpf_attr, query.prog_cnt)
++#define FULL_QUERY_SIZE		offsetofend(union bpf_attr, query.revision)
++#define SHORT_QUERY_SIZE	offsetofend(union bpf_attr, query.attach_type)
++
++static void test_query_size_boundaries(void)
++{
++	LIBBPF_OPTS(bpf_prog_attach_opts, opta);
++	LIBBPF_OPTS(bpf_prog_detach_opts, optd);
++	struct test_tc_link *skel;
++	union bpf_attr attr;
++	int fd, err;
++
++	skel =3D test_tc_link__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "skel_load"))
++		return;
++
++	fd =3D bpf_program__fd(skel->progs.tc1);
++
++	err =3D bpf_prog_attach_opts(fd, loopback, BPF_TCX_INGRESS, &opta);
++	if (!ASSERT_OK(err, "prog_attach"))
++		goto cleanup;
++
++	/* 1. Old size: revision must not be written */
++	memset(&attr, 0, sizeof(attr));
++	attr.query.target_ifindex =3D loopback;
++	attr.query.attach_type =3D BPF_TCX_INGRESS;
++
++	err =3D syscall(__NR_bpf, BPF_PROG_QUERY, &attr, OLD_QUERY_SIZE);
++	if (!ASSERT_OK(err, "query_old_size"))
++		goto detach;
++
++	ASSERT_EQ(attr.query.prog_cnt, 1, "prog_cnt_written");
++	ASSERT_EQ(attr.query.revision, 0, "revision_not_written");
++
++	/* 2. Full size: revision must be written normally */
++	memset(&attr, 0, sizeof(attr));
++	attr.query.target_ifindex =3D loopback;
++	attr.query.attach_type =3D BPF_TCX_INGRESS;
++
++	err =3D syscall(__NR_bpf, BPF_PROG_QUERY, &attr, FULL_QUERY_SIZE);
++	if (!ASSERT_OK(err, "query_full_size"))
++		goto detach;
++
++	ASSERT_EQ(attr.query.prog_cnt, 1, "prog_cnt_written");
++	ASSERT_GT(attr.query.revision, 0, "revision_written");
++
++detach:
++	err =3D bpf_prog_detach_opts(fd, loopback, BPF_TCX_INGRESS, &optd);
++	ASSERT_OK(err, "prog_detach");
++cleanup:
++	test_tc_link__destroy(skel);
++}
++
++static void test_query_mandatory_too_short_einval(void)
++{
++	union bpf_attr attr;
++	int err;
++
++	/* Below minimum size: must return -EINVAL */
++	memset(&attr, 0, sizeof(attr));
++	attr.query.target_ifindex =3D loopback;
++	attr.query.attach_type =3D BPF_TCX_INGRESS;
++
++	err =3D syscall(__NR_bpf, BPF_PROG_QUERY, &attr, SHORT_QUERY_SIZE);
++	ASSERT_EQ(err, -1, "query_too_short_fails");
++	ASSERT_EQ(errno, EINVAL, "query_too_short_einval");
++}
++
++void test_bpf_attr_size(void)
++{
++	if (test__start_subtest("query_size_boundaries"))
++		test_query_size_boundaries();
++	if (test__start_subtest("query_mandatory_too_short_einval"))
++		test_query_mandatory_too_short_einval();
++}
 --=20
 2.54.0.563.g4f69b47b94-goog
 
