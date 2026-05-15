@@ -1,128 +1,121 @@
-Return-Path: <netdev+bounces-288247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288248-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Jy0C97iBmrVogIAu9opvQ
-	(envelope-from <netdev+bounces-288247-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 11:09:50 +0200
+	id oC7UAk7kBmoHowIAu9opvQ
+	(envelope-from <netdev+bounces-288248-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 11:15:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8147054C0F1
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 11:09:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E19954C346
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 11:15:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA8DC3164F57
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:41:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 579FA30C314D
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC0F413236;
-	Fri, 15 May 2026 08:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F8C25B0BD;
+	Fri, 15 May 2026 08:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="is7nxtqS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IZFSFzh+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F03407585
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 08:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7ADB37C901
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 08:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778834402; cv=pass; b=EyH/2fHF5XDSWRp6NpPBtL0I0cWPfTBwAI23NAS7WM6x7ISMjVEo+kEBKgSGLnLQf/APQtGyMnTD4+e3nDTCSmaTVpznVAlV2FH9GBfgdrTIw20I2h5pI8gHBG5eYC3h/dDWc6wZWO4fPkf5PcSozlQMFyinAx9zTdjyopp9sYI=
+	t=1778834900; cv=pass; b=qOS2FXCYN+rIFwal9F4FULyDQ/5LrzdcS5WqLDUNlvChPZLHYHu3ptIha70PCjZ/G1pBioMSkmRVuC/rp06BlMiESAMxNv29DLef/6bUEYM2Exg1Pj1hbYfPtXVBYphjyzii//mQttgEOGFmJzVE66VFwPY8coVGYI+attgIe+g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778834402; c=relaxed/simple;
-	bh=1lcRrzpWt3IYTyxqjcwZ50t5ZeMwNrUNQTJrko/WnXY=;
+	s=arc-20240116; t=1778834900; c=relaxed/simple;
+	bh=BuSU6X06PGkDc7RLhuBIQoLj+CZbz6reI7X5a6W85Kw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P0/fQQvVLPw1MLT0O8n0eDh7s3wxxKGTD6TsrnecaUWZ+aCZ6Pnsgg9CbeiQvRhdkZq/ftc4zeQJPHkr9iI22tvMXgBTiDvJzFu09xLzsuaBZLdKy6rMDvnfBfY11PyPpSYYTsD5xVCrdaPG88PZ79eoK7fH+OIU2uzV88LrBxc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=is7nxtqS; arc=pass smtp.client-ip=74.125.82.177
+	 To:Cc:Content-Type; b=NiJKA7rWpbbsjdKWE4jxB2iDSc/ABcAHrx8ZIkNKwdWmFMu+mM3atUS3It57YXAkV5DWpdFDtAzIUFj9NQ1BhKewsQawaDFV5T8D/tJiYWYuk0iu9Bhchg0H8s8WBgX20FOnMBGzqr1arjJsHs6bhyGHEejCg5Y1Tt+G9cspMnA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IZFSFzh+; arc=pass smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-2f0d3e07e30so21214020eec.0
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:40:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778834401; cv=none;
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488b0046078so72054025e9.1
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:48:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778834895; cv=none;
         d=google.com; s=arc-20240605;
-        b=NgaA7Ia/xAiPXbZl4l/i/X11MScay9xs/C2QAnDeiMzE8nVwTn/uhKgoJHR6n3bL2t
-         Cn2O+VZJDmL0TC8KJY23wHccEXZHL2FlKA6gkdPaa3F6aDguIvpMDYxLBZJfvK5uEhPy
-         dGuKnGejQRzAOWSIFJIQNUQKvJ1/JiLZSoNwPomv6J/n/LteymN+5sfQ7q0xY8RbpcRJ
-         64pdYfzZqGbuex5Aq9NH7NLkCGaCab8QvGEq8PXXZxg3fiU05DmxVFy6RH5sSVXc2pRG
-         IekQVIdg3Ep569sm0eI1cYGYQJL8hRf6NJly5LIOjEaZi1r9mPhC6bVu/uS5eHRC0/4Q
-         txDw==
+        b=bNK5DEy4HAqDhwePUp7DPZCEH3AfoZ4kqUapJpsEr4Z/al0KB9zTGOZVFWA5ZrD3Ag
+         dmo/IvSHz4EX9MVup58rQn/oLumJQZtuRKJgDLxv7Y1OGhHSlzCW84rXPtFtqEvOZ5+X
+         8/zJ6CjBAKj6tl/yCay+TGaoR6817EQRBtTsabOi0WYZI0Xs2f21AUZxsRkM4LU89ylu
+         sOp07zWplLrOT8WG5mC5WXpO2q5Kpu0js5wy7eivJITPhmw3jQ0lthqMh8/hVKLanDBY
+         dCMIMcTkKFc/eCT4HcBCSCAMhLA0skq3z/8wkezaOoGdA0sJ/k1+5WN2ey7zLlXHQL5T
+         f4ZQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=V9o04x0HaWnrCGllcDop+2XHXFTs0K8A0nGkD2mPC7Y=;
-        fh=L6IXawrfgZsWrJgVbeOurzAl5WJwt5EbPYj83BeOpSE=;
-        b=Ocq5a+EmAmRBYuZ+vrkNngAbhH9fMY+4EtpICZB4R7JLkiYqx3uCL42VKXOMpVBd4j
-         i2Gi8CwLiJJzyLVFrn+kYHRZVLgnu1J2dw2kfrLGROomiMZ6Tvu3y8HpnyiPtW/S9CYM
-         IqFpGXLTY9g8FvfxbBUz6I0KJVE7UMMoT7nfQiS86YeMsh52HD1Sz2JpUbp1LCEgg2rw
-         7gCBvFcKzlIeqij/cKcEyjCVaXixo+MCxcMu96L4GnhFp+NYTjs8cRgenM3/erSwSI/1
-         5XjRyMBWzZE1RJCl+/2SLjN5K6IjYudZQrXa1KBgw0GrYKoha8jA/ZB/ghwaw8UtF3oy
-         OsUw==;
+        bh=80BVIdhlJiwVpXQGwMap7k4sOsggi2mdyxhI5ibVJF4=;
+        fh=GitwFcnIBMXVk4fkH65a4P+xpF6bjq6kjmNdGDs7joo=;
+        b=JGAqlk+GLQcOrmJ3vV2RZVAlEY/dZAjUlSWMIRvAazMx1XgOZU+e9WCO1Lh8KX48Az
+         ROTmcDjL/f7CEwRzCouzy1gVeHBl1dobTS8ciMqwUko8rnlCLQrU5LFHBzSD2QIuZWh/
+         pg4PofHFOXDDyiI07nppZDf1NMvjMnN2L80NGF8lTB+HXdukwPcE8l6Qrx3AsbBJ25ln
+         +3B6QcYUSUycbICXOFyFosdjnoKSei/uPrWu5xE4adv7o0Q+nKCsG8MFhaJNwgV4CQBV
+         FJZ2wcAVyl1QC8hoS5ZUzFOjoOm4XRNoxfgbQ07NlxvGQKVR0Ke82LvOBFR66zoQa1Y1
+         qikQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778834401; x=1779439201; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778834895; x=1779439695; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V9o04x0HaWnrCGllcDop+2XHXFTs0K8A0nGkD2mPC7Y=;
-        b=is7nxtqSJzzSE1pIDEQia6X3GSzhFzuBSbS/XUZb/kHd9ERKtuHxKogbrcbJ5GUkNb
-         27AYr1G27EkQ/WlQHWkPcWk2sgv7RHeoHkgM+jgiesZPmndMf74tJLUystiYEsPOZzKD
-         qrwZhTSICUW9/gXkg6p1bOgYxNGHV92nIorQQcCQWMBs1/nZhbrAiTrh2aNY+vM1rw6G
-         h8t0tOp3nMEY5qcXy1+28v2lA+/X2h4SOFTWUc0ML8oTxj5RFr4AOr6hkQDAXy9a4xgo
-         B2GTvjziYm5MskgdWfnkp8O3gC+dXWdS72lkrkG0+s+MeyOr1XEWdqzofVqak63doJda
-         qAqw==
+        bh=80BVIdhlJiwVpXQGwMap7k4sOsggi2mdyxhI5ibVJF4=;
+        b=IZFSFzh+NJVZan8eZzAKuj27YM6i2FcyLNImEJ2Uh/afCJfLe9mbfdb0lcJuM0gfjn
+         IBNe/LS8rOIGEL/zTuJQofXgb1BnP/pvGzghjrAnyCiRznAIeugXGUEd+j6UjMAcJ6ce
+         CxRy3trSLI7ATW7HUdYW8Va+w3XKfU/jt+75p2ZGbeW3iZ+hbA0946+3zAbDu58EgN+E
+         Ml7BEiBOz0oE2Nbf1Jof1ndzs3UT/F6+2KN6+EpegOixaeC0FXEYps+/jltKASwYRFJF
+         1naWLQ8/KoRjlYRXhjZatTPzQSDevDmdkk3CRz4Dg4REwbkSMAEsmZZjMs8nkub1s1Vj
+         S5pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778834401; x=1779439201;
+        d=1e100.net; s=20251104; t=1778834895; x=1779439695;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=V9o04x0HaWnrCGllcDop+2XHXFTs0K8A0nGkD2mPC7Y=;
-        b=CylfOYRuQ7VUHg4b6GwcVymjpqrhb3uR9JADKC6Im/eA85iB8TWssb0+LIQh5gb0P8
-         ZRP5KpxdLci5DqfxSHjNXo33b2C5eGamyQQS82kytax/SA8vsg82GpYDIhd7FAbkKXXe
-         Fk3BJ8oPe/4l30Atq4qmEEtiFJ53Drhu4qij7LcbAgoSViyyKQ+aLgRZfgzXfCyP8bNx
-         GvXl/YJO8t5/QziS+oW+aG675AebJhPOZ71mbEqUADjsy4d5Rrpjk9snihqkRhIS7/UT
-         qwkBxuaw9Pt9hj2srJHRYb7UN3YumH4j0TsnOv3SlAJkZdD0GJI3CUXLqLPg5vckbRgB
-         1GSA==
-X-Forwarded-Encrypted: i=1; AFNElJ9JFKFnSMEID02uMj7w7G0WFR0X5nFleQ6sb+O77w3Aul58Y+RZsG8HnGo6P4ZY9t+dGlJfuA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpfKo4IghHnxSCvwC9Tc1V5Bbqo+5RT9TSkGOwVxppJyG49MLx
-	VkAaoevQnPBF85VIiCeJ+xnAf9bAEFlxHwX7URVqVh2ejEC9WkbGTaN6sOBSCD+U7pesln8Cmev
-	pw6WhQiRJ1K1NdwiIsenXft6wnfTpDGE=
-X-Gm-Gg: Acq92OF5Q3GSYMMTotmSN9THgUVYrGPc24OQjuY6gvTh+DD1tDzsO6gGCzJsBlTnxMF
-	4D//RKl9F3/YUwXf1e+j59nBwpjDX0KcTqz6OLM5HzJ8FIYwdg3pnQispTuc7wkoGnkG5f2tRBH
-	g6UahGZn7WutPHfenPSJ8cxx4pkDGyrNra7uTE7+BJLI6kDU/YTjBteL8U0eUcVX4B5CL/RpiPi
-	4OFGAOqzgAI6rbq00TZCBw9nmh8lfu8vdpAizgUxZQWvTKyZPkt43NU/cZK3xDddCbjGrhAc6AQ
-	1gUcW5DtdRYZepSdvYo=
-X-Received: by 2002:a05:7300:a504:b0:2e5:8ec2:82c9 with SMTP id
- 5a478bee46e88-303986a15f3mr1535796eec.26.1778834400799; Fri, 15 May 2026
- 01:40:00 -0700 (PDT)
+        bh=80BVIdhlJiwVpXQGwMap7k4sOsggi2mdyxhI5ibVJF4=;
+        b=pIlY87zjRw+6OJwWWxYFuxtDZkJVcHPjyoqzfMDn5TINRd14VCv4xA14T5R6zhps+y
+         kmQBCHkj8vNd29u0VMMvERTh7kBK+gtO+9S0lP1hLVjH65BtuidhwPenC7wB5GAxuQkC
+         65arQnCYA9Gc1aWSlwOy8lDFpiMc3Gka7WGlI+cdFN7oZoNxGUo6xyUXH0mtbXjQ/if5
+         nNrebc2DYMp0GR94Tl491J03H7uSSI6zFexabk2HdDuK82LEF0WOAd1dyXVzLiAMI4nd
+         ghQqMaOT+CUEuDZdg3N99VHYlS7DIjjdY080kgBoKF0JxLcS4EkMU2szrwLy/ii+wwY4
+         F+jQ==
+X-Gm-Message-State: AOJu0YyOlYjvCGCJ1mpaIoEWQYvJ2wy0ljD0FN2K1GXypYQWwWX20pwQ
+	V4EwwCvlYP7/vxm4QyNM/Ji2luWIXcyo12aEBqDl83sQNdKgrY1jAmo76S77i3mkEpux19W3RSl
+	CP6uOjY2GOVU0+1nqUx3UdeJQZoiG/Po=
+X-Gm-Gg: Acq92OGsMkwIT8ntLF7DTmHOALm+WwlI32xain1xCt5jH2dhXC18d44Cu26tetyvSB6
+	rlg4G3cCmtlnaW8DkplQik+vOZ6MmAiYHo3htHakLdv36TGY0iF7ow3W9AGvucyETzGqq9t+p6m
+	9iSIbvEiqQsdNIMZGY/NuajLlzFH9RgHcWRj5zQ4EZcKhgY309DES9mESuxbNzwO32p2LKf5fE5
+	14huY1izecvCuFwPmxYIak8cjvfIGZtbYCdI1VzzEL2jfe1wl48LsudIq7VeALMZzAwf5KptCCK
+	Zh+1/nQ=
+X-Received: by 2002:a05:600c:a30a:b0:48a:568f:ae8a with SMTP id
+ 5b1f17b1804b1-48fe5fda35fmr31749305e9.8.1778834894273; Fri, 15 May 2026
+ 01:48:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260511135703.62470-1-clamor95@gmail.com> <20260511135703.62470-4-clamor95@gmail.com>
- <20260515-precious-ginger-lori-d1fde7@quoll>
-In-Reply-To: <20260515-precious-ginger-lori-d1fde7@quoll>
-From: Svyatoslav Ryhel <clamor95@gmail.com>
-Date: Fri, 15 May 2026 11:39:49 +0300
-X-Gm-Features: AVHnY4LhmWA2BwD0V1_j_6xstdiR56JxjkYZue9zoJ3Q1jLukX8MObrLmKvfP2I
-Message-ID: <CAPVz0n3mvBLracMWGNuJ8kKUvAVZ+JRTJVkZGyq5MkuSobd8NQ@mail.gmail.com>
-Subject: Re: [PATCH v1 3/6] dt-bindings: net: Document Infineon/Intel XMM6260 modem
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Vinod Koul <vkoul@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Thierry Reding <thierry.reding@kernel.org>, Jonathan Hunter <jonathanh@nvidia.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Peter Chen <peter.chen@kernel.org>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org, 
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org
+References: <20260513121240.2590767-1-houminxi@gmail.com> <f7tzf21noy8.fsf@redhat.com>
+In-Reply-To: <f7tzf21noy8.fsf@redhat.com>
+From: =?UTF-8?B?5L6v5pWP54aZ?= <houminxi@gmail.com>
+Date: Fri, 15 May 2026 16:47:47 +0800
+X-Gm-Features: AVHnY4I1GuGaSSmMujdoxWL-IyKXw_JETbROO8KstmjQW9j-pAJcDpAKNH8MHwo
+Message-ID: <CAJ0BgHcq9Qs__f53kcNzG1+qYXvHP2_q1+mk8=z1Fo3TNY9W8g@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/5] selftests: openvswitch: pylint cleanup for ovs-dpctl.py
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	echaudro@redhat.com, i.maximets@ovn.org, i.maximets@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, shuah@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 8147054C0F1
+X-Rspamd-Queue-Id: 9E19954C346
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
@@ -131,57 +124,106 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288247-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288248-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[clamor95@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,ovs-dpctl.py:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-=D0=BF=D1=82, 15 =D1=82=D1=80=D0=B0=D0=B2. 2026=E2=80=AF=D1=80. =D0=BE 11:1=
-8 Krzysztof Kozlowski <krzk@kernel.org> =D0=BF=D0=B8=D1=88=D0=B5:
->
-> On Mon, May 11, 2026 at 04:56:58PM +0300, Svyatoslav Ryhel wrote:
-> > +  ap-wake-gpios:
-> > +    description: GPIO connected to the EINT3 pin
-> > +    maxItems: 1
-> > +
-> > +  cp-wake-gpios:
-> > +    description: GPIO connected to the EINT2 pin
-> > +    maxItems: 1
-> > +
-> > +  phys:
-> > +    maxItems: 1
-> > +
-> > +  vbat-supply:
-> > +    description: Supply connected to the VBAT lines.
->
-> This should be rather name of the pin on this device, not the provider
-> name. VBAT suggests the latter. Please double check.
->
+Hello Aaron
 
-There is no documentation on this device from Infineon, I have used
-schematics of the P895 where this modem is used. According to it power
-supply is connected to pin with name VBAT (and yes, I am not mixing it
-up since supplies have different names)
+Thanks for the suggestion, Aaron.  I dug into this a bit and I think
+it's worth doing.
 
-> Rest looks fine, with respect to Sashiko comment on description:
+The good news is that 3 of 4 OVS families already have ynl specs
+in-tree (ovs_datapath, ovs_flow, ovs_vport).  The flow spec is pretty
+thorough -- covers all the key/action/tunnel nested attrs.  pyynl
+handles genetlink, dump, and nested encode/decode, so the library side
+looks solid.  There's even an OVS C sample under tools/net/ynl/samples/.
+
+Gaps I found:
+
+  - No ovs_packet.yaml spec.  We'd need to write one for upcall
+    handling (MISS/ACTION/EXECUTE).  Shouldn't be too bad, maybe
+    100 lines based on the other specs.
+
+  - The existing specs are missing a few operation defs (flow DEL/SET,
+    vport SET, datapath SET).  Small additions.
+
+  - ovs-dpctl.py also uses pyroute2.iproute for tunnel interface
+    creation and NDB for interface lookup.  Those aren't OVS netlink,
+    so we'd either keep a minimal pyroute2 dep for just that or
+    shell out to `ip`.
+
+  - The ODP string parser (~1500 lines for flow key/action encoding)
+    is orthogonal to the netlink wire format, so that stays regardless.
+
+I think the natural order would be: start with datapath ops (simplest,
+spec already complete), then vport, then flow (bulk of the work), then
+packet/upcall after writing the spec.  The f-string fixes from my
+current series still apply.
+
+Minxi
+
+Aaron Conole <aconole@redhat.com> =E4=BA=8E2026=E5=B9=B45=E6=9C=8815=E6=97=
+=A5=E5=91=A8=E4=BA=94 14:53=E5=86=99=E9=81=93=EF=BC=9A
 >
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+> Minxi Hou <houminxi@gmail.com> writes:
 >
-> Best regards,
-> Krzysztof
+> > This series cleans up all pylint warnings in ovs-dpctl.py,
+> > bringing the score from 7.62/10 to 10.00/10.
+> >
+> > This series applies on top of:
+> >   [PATCH net-next v10 1/2] selftests: openvswitch: add vlan() and
+> >   encap() flow string parsing
+> >   https://lore.kernel.org/netdev/20260512070841.1183581-2-houminxi@gmai=
+l.com/
+> >
+> > Patch 1 converts 86 %-format strings to f-strings.
+> > Patch 2 fixes misc warnings (unused import, bare except, unused
+> > variables, redundant expressions).
+> > Patch 3 renames classes to PascalCase and variables to snake_case.
+> > Patch 4 adds one-line docstrings to all definitions.
+> > Patch 5 suppresses complexity warnings from pyroute2 constraints.
+> >
+> > Tested with vng on x86_64, all OVS selftests pass.
+> >
+> > Minxi Hou (5):
+> >   selftests: openvswitch: convert %-formatting to f-strings
+> >   selftests: openvswitch: fix misc pylint warnings in ovs-dpctl.py
+> >   selftests: openvswitch: rename classes and variables in ovs-dpctl.py
+> >   selftests: openvswitch: add missing docstrings in ovs-dpctl.py
+> >   selftests: openvswitch: suppress pylint complexity warnings
+> >
+> >  .../selftests/net/openvswitch/ovs-dpctl.py    | 794 ++++++++++--------
+> >  1 file changed, 428 insertions(+), 366 deletions(-)
+>
+> Thinking about this series, it might be better to go a bit further and
+> just drop the pyroute2 in favor of using ynl to generate the netlink
+> encode/decode.  The value that ovs-dpctl.py brings is the ability to
+> interoperate with the ovs-vswitchd odp encoding.  That we are using
+> pyroute2 to do the actual 'wire' format of netlink is incidental.
+>
+> Some of the work would still be needed (I think some of the f-string
+> adjustments) but that would allow trimming a good chunk of the code and
+> let us just rely on the in-tree ynl rather than pyroute2 dependency.
+>
+> WDYT?  Ilya and I can work with you offline if you are interested in
+> pursuing this approach.  I think it should make the overall code much
+> better to work with, too.
 >
 
