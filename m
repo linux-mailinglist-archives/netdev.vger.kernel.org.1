@@ -1,361 +1,508 @@
-Return-Path: <netdev+bounces-288407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qA5eBKdmB2p11wIAu9opvQ
-	(envelope-from <netdev+bounces-288407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:32:07 +0200
+	id QNEpEFtmB2oF1wIAu9opvQ
+	(envelope-from <netdev+bounces-288408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:30:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE2655642E
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:32:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACEE75563CA
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2D668305B2C8
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 17:59:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5FDAE312280D
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:02:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6FB3F9A02;
-	Fri, 15 May 2026 17:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B423FDBF1;
+	Fri, 15 May 2026 18:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="qVh7ugvm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NT7YuBSg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3C53F99F8
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 17:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894583F9A18;
+	Fri, 15 May 2026 18:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778867976; cv=none; b=UOhjG8Ew7RWESDSeVZ1hHUdYnuaFN8eNMWC40bJqg+6bEtvnJw4i8Ybivm8LWdMKwh7Nrc7y/5xePlnEhfy6OXtqZ2u2PjagrZR2MytrPPqoR+oiFLIlGPnLJxvFwxtCNR6DcUdB53lB8y1RB5gRC+eRd2VTNsTvzUsLZJ2n/nA=
+	t=1778868126; cv=none; b=GV1PpY6NQKp0SsRjWQF4K/4fZiB/cKbez86PFc52Eexka9u8y8pgBLHDsTErbbO/vQzfvfxGmHsEP9D63NxZPoSI2yvc6mAjUPj+6lnHfWNjq7gBKc7oxIsjsihAXzwBixLWEcW9gh/MUbqcqGdCCR+hO9hBeuyqC8QFwWybdT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778867976; c=relaxed/simple;
-	bh=4ZM/T/Iol4GdBJ3vAdj/xlPSEBECPVnDvDzu8h7m9FQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mABKZqJTAkCo6BkvHfa3elDzKIGomM57PjZ6Ej4iHieJz+Lgj44SnafxjefqK2s7Eo2v+yUvN3VTdurRJ1qA9D/RUUh9iRRbyGnQy7nvLOkhxje41J/R+imLA+dCBYK6G9qucrLHi1zyJtIacWC5JgR6piSNdLxSqXVTi/taujo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=qVh7ugvm; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8b3d6b215cfso490796d6.3
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 10:59:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778867972; x=1779472772; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d8SB7g/SQE94W836Nonq8Wq3k7Nj7c32M69MG7wU2+o=;
-        b=qVh7ugvmRPA8oUMn5B7aXPu//lBgoxkU+3CwDEXgSDMYUalqHGG/1XK3IbP5KUPikc
-         d/1H867qtVCJ60jgRjrgnXJNtf/PIk0OlnHz6Cs4+NYvh5SA/hU7Wr1qR0XbJl1TnNG8
-         tFVsSwteK9QKyqljdA6Go6NBSe+i5WHMVUImzeR4rnOIpgEEmdA33eLOrgyIfkcjKQsl
-         wIyW69xAs/j3mlBoDiOxd7c9AbI0xsj/eRsw4/eQJl/JOG0c8xon1u66cNYaYOBv3Pby
-         CVeh6W0l4CqSbHYDvBZl9DWxa2rARflP4HbiJhTLYIWVKg/l3RhDcHAABTgueqYYVLLZ
-         Vskg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778867972; x=1779472772;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d8SB7g/SQE94W836Nonq8Wq3k7Nj7c32M69MG7wU2+o=;
-        b=jkUCLgXYpd9qSkTFBCfxeBrmfWO8DVxGsB/W6PAxjwkFb0jmKHxPJn+m2xBHybLZ5x
-         5WNpFS7tNP8ZShKZm4fxYHV+JNZaZYVLRQ2yZU+lO21mSVcDMyD8lFBnSaWzLCreP0cA
-         xG7CEQEZ/HY4ly+cryOvaHtyBCegbunWyWVDdHFUbH7zZyxClRAMCcMQ1QTcKENw+QT/
-         nMIZYUKHb/QCcdn/CV1UBho/QqqFicG3sBRY/JljvglvZQQIkYPZ1lexCEEVmfHFn0Wf
-         ONpSgoI8zp00WlqA8Yhh3b9rOWnvYBOyMr/seAMc+Y64btrIfw/QhdtjxUFd2oDOR3IG
-         DFsw==
-X-Forwarded-Encrypted: i=1; AFNElJ9jcWz+hv/Q2a9/NFlqNOlAYcwb19JkbJ1mm0s+cdtOHicVrfVQ8EzHxRFIRg0B4cPYgyILcxA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBZf1YbZijHy6Mcmu8NSF/vK3YaP23oBzRe6L71D0JPHHc0WJt
-	TV89vrTRE0pNh+qQDtcRGlAdzsHiSGF8YTsw+53qDyjOuu6/Ke2vn64APU/xMPInW6s=
-X-Gm-Gg: Acq92OGiRDW/EcCgDjSm8PkFRQf83YVkTP1EJ9EsfHxs1VR2plePLGvbdOcJ7hNiMRh
-	K5lcNBFaOyrP+Hg0picQ6YGnmPwEvJ4uhp/y1t03dR794x+PwEC6lzseIZIIHM6WaRtkSl6KtsM
-	5UPkS2zZ1pke1vxJVcU/raBzmGVlE7oPUDz05vzbDH8L+M9+OTjKPPEwIVWVdAAyRS6++D2wsCb
-	SJaF2F70WVs7yhlTouk6d2kXgTpZ2/TogQEkN8dxcy2BsVdNTx9JJ6Sz3e/7fKAFgUtcFeyKZc2
-	SQfCFejm1HUY2zmJeIqlIkmrNkdyeGhpa2vRPj+kQs1kPjVtKDnvIiox7Lz6Ir3p4UuPtZcAqwj
-	6OH6wGqkd4SaNiReOOdVs7C6EdXQADhhtj8DErIACutj3I6Q0IAIE2Y7Ce9aXejpoKj7gH/+afH
-	p3IC4Lm9ZH7AafnhfDQq8GJnOhPJPDjGgwIKGT1CozSITHssZuOnFIsXUdrmSKNwI=
-X-Received: by 2002:a05:6214:5541:b0:8be:143c:955f with SMTP id 6a1803df08f44-8ca0f710315mr86073156d6.49.1778867972151;
-        Fri, 15 May 2026 10:59:32 -0700 (PDT)
-Received: from [172.22.22.28] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8c90bf6720asm62107926d6.39.2026.05.15.10.59.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 May 2026 10:59:31 -0700 (PDT)
-Message-ID: <2414c9e9-0672-417a-a3d1-993bd06d62db@riscstar.com>
-Date: Fri, 15 May 2026 12:59:27 -0500
+	s=arc-20240116; t=1778868126; c=relaxed/simple;
+	bh=hRnoDvAySctmBMs8tnjE7No1NatjPvyW4KfMgZaPkZU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BY89sM4SeJ7edDAURUqces+Wjop2TSaRV8xIQFxtgudZSUMiUsv/Cv2qdZoe+zIS1MeOq1CmB89u+zSsN7OuT1pSyPDYVUcUkvLYG/NuUHxM2aFy23QHIDfODVbUV3oazWTvoQfYeyUaVGWM68ul9wShxs4h740m6NG8k3nBY68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NT7YuBSg; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778868124; x=1810404124;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hRnoDvAySctmBMs8tnjE7No1NatjPvyW4KfMgZaPkZU=;
+  b=NT7YuBSg5w0KTxIHrSr214L8PzMBC8P70JQTiuyOxahPRfs6n5hbhfM/
+   ZsijbAzYY1YTKW50TDjUxw0JiAoFmYpb1j/L+NvnRLM+LqKtcJZVNeUVz
+   C0Z0/0x6JyAi1bwrv9hp8D1+vj4smVfdFDwyPn6D8NLzZphwdH7DFYmZI
+   YF+BkLcUAR0hcKja5ro3LUTnzxxuAUGE3amj7TGlkCveB54WrX/lSBaVk
+   I587JvJo+YZBI7sLGdQqCTd7EBRMroFnPz9FklCIx5eGSHFPxhhjZnSbv
+   YzJxgUi6qOBRTE4sOR9QLMk9OZzNFBbeHjm6XE8AevpSZ335bj2TcS9/m
+   w==;
+X-CSE-ConnectionGUID: p4u9r0qbSkSQH0r5FGVC7w==
+X-CSE-MsgGUID: BlJNw5WkTWSM8CBfecl9gw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11787"; a="83443339"
+X-IronPort-AV: E=Sophos;i="6.23,236,1770624000"; 
+   d="scan'208";a="83443339"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2026 11:02:04 -0700
+X-CSE-ConnectionGUID: AIqy9BIVRlKusO6DkR8VaA==
+X-CSE-MsgGUID: 6mVg1JhcQTyjhLJxblj75A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,236,1770624000"; 
+   d="scan'208";a="237892195"
+Received: from lkp-server02.sh.intel.com (HELO 7a33ad3e7d27) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 15 May 2026 11:02:01 -0700
+Received: from kbuild by 7a33ad3e7d27 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wNwr1-000000002Th-1ypM;
+	Fri, 15 May 2026 18:01:53 +0000
+Date: Sat, 16 May 2026 02:01:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	David Yang <mmyangfl@gmail.com>,
+	hong son Nguyen <hongson.hn@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: yt921x: Add ACL support
+Message-ID: <202605160119.Kvm2K6nN-lkp@intel.com>
+References: <20260514192140.3468543-1-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/12] net: enable TC956x support
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
- rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
- brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org
-Cc: daniel@riscstar.com, mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
- alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com,
- chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com,
- john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com,
- matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
- prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
- rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
- weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260501155421.3329862-1-elder@riscstar.com>
-Content-Language: en-US
-From: Alex Elder <elder@riscstar.com>
-In-Reply-To: <20260501155421.3329862-1-elder@riscstar.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 9CE2655642E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260514192140.3468543-1-mmyangfl@gmail.com>
+X-Rspamd-Queue-Id: ACEE75563CA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,kernel.org,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288407-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
+	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,lunn.ch,google.com,kernel.org,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-288408-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[elder@riscstar.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[riscstar.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,riscstar-com.20251104.gappssmtp.com:dkim]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim,01.org:url]
 X-Rspamd-Action: no action
 
-On 5/1/26 10:54 AM, Alex Elder wrote:
-> This series introduces stmmac driver support for the Toshiba TC9564
-> (also known as Qualcomm QPS615).  This is an Ethernet-AVB/TSN bridge IC
-> that provides a high-speed connection between a host SoC and Ethernet
-> devices on a network.  It incorporates a PCIe switch, and implements
-> two 10 Gbps capable Ethernet MACs (along with other IP blocks), and
-> is essentially a small and highly-specialized SoC.  The TC9564 is a
-> member of a family of similar chips, and the driver code uses "tc956x"
-> to reflect this.
+Hi David,
 
-I'm writing now to just state what the plan is for version 2
-of this series.  I had hoped to get something out this week,
-but it won't be available today, so I wanted to at least let
-people know what to expect.
+kernel test robot noticed the following build warnings:
 
-First, we received a great deal of really good feedback on
-this series.  I/we sincerely appreciate it, and have already
-addressed almost all of the suggestions people have made.
+[auto build test WARNING on net-next/main]
 
-Andrew Lunn asked a number of questions about the way that
-the TC956x device is represented, and in particular questioned
-whether having the GPIO controller as a device subordinate to
-a PCIe function even made sense.  This led to some additional
-discussion, including some offline work exploring what other
-options might be reasonable.
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Yang/net-dsa-yt921x-Add-ACL-support/20260515-143825
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260514192140.3468543-1-mmyangfl%40gmail.com
+patch subject: [PATCH net-next] net: dsa: yt921x: Add ACL support
+config: sparc64-allmodconfig (https://download.01.org/0day-ci/archive/20260516/202605160119.Kvm2K6nN-lkp@intel.com/config)
+compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project 5bac06718f502014fade905512f1d26d578a18f3)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260516/202605160119.Kvm2K6nN-lkp@intel.com/reproduce)
 
-The plan for version 2 is to submit it fairly soon, to include
-updates that address *most* of the feedback received so far.
-(I have sent e-mail with clear confirmation of what we intend
-to do--and these changes would be incorporated in version 2).
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202605160119.Kvm2K6nN-lkp@intel.com/
 
-However, because there remain other outstanding issues,
-including "big picture" questions about how to represent the
-hardware, the series will be sent as RFC.
+All warnings (new ones prefixed by >>):
 
-This will allow others to see the changes we made based on
-feedback, but also makes it clear there is more work that
-needs to be done before we're confident in our final proposal.
+>> drivers/net/dsa/yt921x.c:1821:29: warning: result of comparison of constant -1 with expression of type 'u8' (aka 'unsigned char') is always false [-Wtautological-constant-out-of-range-compare]
+    1821 |                         if (match.mask->ip_proto == ~0)
+         |                             ~~~~~~~~~~~~~~~~~~~~ ^  ~~
+   1 warning generated.
 
-					-Alex
 
-> TC956x chips incorporate a PCIe gen 3 switch, with one upstream and
-> three downstream ports.  Its PCIe functionality is already supported
-> upstream, including a power control driver that performs some early
-> configuration of the PCI ports ("pci-pwrctrl-tc9563.c").
-> 
-> One of the PCIe switch's downstream ports has an internal PCIe endpoint,
-> which implements two PCIe functions, each of which has an Ethernet MAC
-> (eMAC) subsystem. The eMAC is composed of a Synopsis Designware XGMAC
-> combined with an XPCS and PMA.  Each MAC is capable of operating at
-> 10M/100M/1G/2.5G/5Gps and 10Gps.  The initial target platform is the
-> Qualcomm RB3gen2, which supports a 10Gbps Marvell PHY on port A, and
-> a 2.5Gbps Qualcomm PHY on port B.  (The Marvell PHY is not populated on
-> all RB3gen2 boards, and only 2.5 Gbps support is included initially.)
-> 
-> TC956x chips also implement several other blocks of functionality,
-> including a GPIO controller, interrupt controllers (MSIGEN), I2C
-> and SPI, a UART, and an Arm Cortex M3 CPU with 128KB SRAM.  The GPIO
-> interface exposes several lines to manage external resets.  The
-> interrupt controllers are used internally by the MAC functions.  The
-> UART, SPI, microcontroller, and SRAM are currently unused.
-> 
->                ----------------------------------
->                |              Host              |
->                ------+...+----------+........+---
->                      |i2c|          |  PCIe  |
->      ----------------+...+----------+........+------
->      | TC956x        |I2C|          |upstream|     |
->      |               -----        --+--------+---  |
->      |  -----  ------  -------    | PCIe switch |  |
->      |  |SPI|  |GPIO|  |reset|    |             |  |
->      |  -----  ------  |clock|    | DS3 DS2 DS1 |  |
->      |                 -------    ---++--++--++--  |
->      |  -----  ------     downstream//    \\  \\   |  downstream
->      |  |MCU|  |SRAM|    /==========/      \\  \===== PCIe port 1
->      |  -----  ------   //PCIe port 3       \\     |
->      |                  ||                   \======= downstream
->      |  ----+-----------++-----------+----         |  PCIe port 2
->      |  | M | internal PCIe endpoint | M |         |
->      |  | S |------------------------| S |  ------ |
->      |  | I |   PCIe   |  |   PCIe   | I |  |UART| |
->      |  | G |function 0|  |function 1| G |  ------ |
->      |  | E |----++----|  |----++----| E |         |
->      |  | N |  eMAC 0  |  |  eMAC 1  | N |         |
->      --------+.......+------+.....+-----------------
->              |USXGMII|      |SGMII|
->            --+.......+--  --+.....+--
->            |  ARQ113C  |  | QEP8121 |
->            |    PHY    |  |   PHY   |
->            -------------  -----------
-> 
-> The primary objective for this series is to support the Ethernet
-> functionality provided by the TC956x.  The code providing this
-> support has been structured into three distinct modules.
->    - A driver for the GPIO controller
->    - Code enabling the TC956x-specific eMAC/MSIGEN hardware
->    - A "chip" driver, associated with the PCIe functions
-> 
-> The GPIO driver is implemented separately because in some hardware
-> configurations, these GPIO lines are used to manage resets for
-> external Ethernet PHYs.  We describe these PHYs via devicetree,
-> where the GPIO-based reset signals are defined using phandles.
-> 
-> The code for the eMAC/MSIGEN consists of a new source file that
-> populates hardware-specific details about the two MACs, and integrates
-> with the existing stmmac driver.  This also required implementing some
-> enhancements to the core stmmac driver, described further below.
-> 
-> To manage the common functionality (including configuring address
-> translation and controlling internal reset and clock signals), a
-> "chip" driver is implemented.  This chip driver is associated with
-> the PCIe function *itself*, not the eMAC associated with the function.
-> 
-> The driver binds to the internal PCI functions 0 and 1, and creates
-> a shared data structure describing the common chip elements the two
-> driver instances share.  Three auxiliary bus devices are created to
-> represent the GPIO controller and the two Synopsys MAC controllers.
-> 
-> The driver instance for PCIe function 0 has responsibility for
-> controlling the common chip functionality--creating the GPIO
-> controller auxiliary device, configuring address translation
-> between PCIe address space and internal addresses, and controlling
-> clocks and resets.  It creates a data structure--shared via its
-> platform data pointer with PCIe function 1--to represent shared
-> "chip" information.  In addition, PCIe function 0 creates an
-> auxiliary device to represent its attached eMAC.  It allocates
-> IRQs and maps BAR address ranges for use by the stmmac driver,
-> passing them in a structure via the auxiliary device's platform
-> data.
-> 
-> PCIe function 1 defers probing until after PCIe function 0 has
-> created the shared data structure.  After that its only job is
-> to set up IRQs and mapped memory and create the eMAC1 auxiliary
-> device.
-> 
-> The version of the Synopsys MAC IP is 3.01, which is largely compatible
-> with version 2.20.  The core stmmac driver required several changes to
-> enable support for the TC956x.
->    - A change to dwxgmac2 support changes the interrupt mode when
->      multi_msi_en is enabled.
->    - While most support for version 3.01 simply uses the 2.20 code,
->      an erratum related to the RX ring length is implemented for
->      3.01 DMA operations.
->    - Having the PCIe device be separate from an auxiliarly device
->      implementing the eMAC required allowing a distinct DMA device
->      to be maintained for an stmmac interface.
-> 
-> In addition:
->    - A new source file provides memory-mapped access to XPCS using
->      regmap.  The alignment of the TC956x MDIO registers aren't
->      suitable for using simple MMIO.
->    - Two additional XPCS changes are implemented that provides
->      support for the XPCS as implemented in the TC956x.
-> 
-> This series is available here:
->    https://github.com/riscstar/linux/tree/tc956x/stmmac-v1
-> 
-> 					-Alex (and Daniel)
-> 
-> Alex Elder (3):
->    net: stmmac: dma: create a separate dma_device pointer
->    gpio: tc956x: add TC956x/QPS615 support
->    misc: tc956x_pci: add TC956x/QPS615 support
-> 
-> Daniel Thompson (9):
->    net: pcs: pcs-xpcs-regmap: support XPCS memory-mapped MDIO bus via
->      regmap
->    net: pcs: pcs-xpcs: select operating mode for 10G-baseR capable PCS
->    net: pcs: pcs-xpcs: Preserve BMCR_ANENBLE during link up
->    net: stmmac: dwxgmac2: Add multi MSI interrupt mode
->    net: stmmac: dwxgmac2: Add XGMAC 3.01a support
->    net: stmmac: dwxgmac2: export symbols for XGMAC 3.01a DMA
->    dt-bindings: net: toshiba,tc965x-dwmac: add TC956x Ethernet bridge
->    net: stmmac: tc956x: add TC956x/QPS615 support
->    arm64: dts: qcom: qcs6490-rb3gen2: enable TC9564 with a single QCS8081
->      phy
-> 
->   .../bindings/net/toshiba,tc956x-dwmac.yaml    | 111 +++
->   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts  |  45 +-
->   drivers/gpio/Kconfig                          |  11 +
->   drivers/gpio/Makefile                         |   1 +
->   drivers/gpio/gpio-tc956x.c                    | 209 +++++
->   drivers/misc/Kconfig                          |  10 +
->   drivers/misc/Makefile                         |   1 +
->   drivers/misc/tc956x_pci.c                     | 667 +++++++++++++++
->   drivers/net/ethernet/stmicro/stmmac/Kconfig   |  13 +
->   drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +
->   .../net/ethernet/stmicro/stmmac/chain_mode.c  |  12 +-
->   .../ethernet/stmicro/stmmac/dwmac-tc956x.c    | 791 ++++++++++++++++++
->   .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  12 +
->   .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |   1 +
->   .../ethernet/stmicro/stmmac/dwxgmac2_descs.c  |   1 +
->   .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  78 +-
->   .../net/ethernet/stmicro/stmmac/ring_mode.c   |  12 +-
->   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   1 +
->   .../net/ethernet/stmicro/stmmac/stmmac_main.c |  59 +-
->   .../net/ethernet/stmicro/stmmac/stmmac_xdp.c  |   2 +-
->   drivers/net/pcs/Makefile                      |   4 +-
->   drivers/net/pcs/pcs-xpcs-regmap.c             | 203 +++++
->   drivers/net/pcs/pcs-xpcs.c                    |  43 +-
->   include/linux/pcs/pcs-xpcs-regmap.h           |  20 +
->   include/linux/stmmac.h                        |   1 +
->   include/soc/toshiba/tc956x-dwmac.h            |  84 ++
->   26 files changed, 2341 insertions(+), 53 deletions(-)
->   create mode 100644 Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
->   create mode 100644 drivers/gpio/gpio-tc956x.c
->   create mode 100644 drivers/misc/tc956x_pci.c
->   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-tc956x.c
->   create mode 100644 drivers/net/pcs/pcs-xpcs-regmap.c
->   create mode 100644 include/linux/pcs/pcs-xpcs-regmap.h
->   create mode 100644 include/soc/toshiba/tc956x-dwmac.h
-> 
-> 
-> base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+vim +1821 drivers/net/dsa/yt921x.c
 
+  1581	
+  1582	static int
+  1583	yt921x_acl_rule_ext_parse_flow_entries(struct yt921x_acl_rule_ext *ruleext,
+  1584					       const struct flow_cls_offload *cls)
+  1585	{
+  1586		const struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
+  1587		struct yt921x_acl_entry *entries = ruleext->r.entries;
+  1588		struct netlink_ext_ack *extack = cls->common.extack;
+  1589		const struct flow_dissector *dissector;
+  1590		struct yt921x_acl_entry *entry;
+  1591		unsigned int size = 0;
+  1592		bool want_dport;
+  1593		bool want_sport;
+  1594	
+  1595		/* Incomplete and probably won't, since it supports custom u32 filters.
+  1596		 * New adapters are welcome.
+  1597		 */
+  1598		dissector = rule->match.dissector;
+  1599		if (dissector->used_keys &
+  1600		    ~(BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
+  1601		      BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
+  1602		      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
+  1603		      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
+  1604		      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS) |
+  1605		      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS_RANGE) |
+  1606		      BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
+  1607		      BIT_ULL(FLOW_DISSECTOR_KEY_IP) |
+  1608		      BIT_ULL(FLOW_DISSECTOR_KEY_TCP))) {
+  1609			NL_SET_ERR_MSG_MOD(extack, "Unsupported keys used");
+  1610			return -EOPNOTSUPP;
+  1611		}
+  1612	
+  1613		/* Entries */
+  1614		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
+  1615			struct flow_match_ipv4_addrs match;
+  1616			bool want_dst;
+  1617			bool want_src;
+  1618	
+  1619			flow_rule_match_ipv4_addrs(rule, &match);
+  1620	
+  1621			want_dst = !!match.mask->dst;
+  1622			want_src = !!match.mask->src;
+  1623	
+  1624			if (want_dst) {
+  1625				entry = yt921x_acl_entries_find(entries, &size,
+  1626								YT921X_ACL_TYPE_IPV4_DA);
+  1627				if (!entry)
+  1628					goto err;
+  1629	
+  1630				entry->key[0] |= ntohl(match.key->dst);
+  1631				entry->mask[0] |= ntohl(match.mask->dst);
+  1632			}
+  1633			if (want_src) {
+  1634				entry = yt921x_acl_entries_find(entries, &size,
+  1635								YT921X_ACL_TYPE_IPV4_SA);
+  1636				if (!entry)
+  1637					goto err;
+  1638	
+  1639				entry->key[0] |= ntohl(match.key->src);
+  1640				entry->mask[0] |= ntohl(match.mask->src);
+  1641			}
+  1642		}
+  1643	
+  1644		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV6_ADDRS)) {
+  1645			struct flow_match_ipv6_addrs match;
+  1646			bool want_dst;
+  1647			bool want_src;
+  1648	
+  1649			flow_rule_match_ipv6_addrs(rule, &match);
+  1650	
+  1651			want_dst = !!match.mask->dst.s6_addr32[0] ||
+  1652				   !!match.mask->dst.s6_addr32[1] ||
+  1653				   !!match.mask->dst.s6_addr32[2] ||
+  1654				   !!match.mask->dst.s6_addr32[3];
+  1655			want_src = !!match.mask->src.s6_addr32[0] ||
+  1656				   !!match.mask->src.s6_addr32[1] ||
+  1657				   !!match.mask->src.s6_addr32[2] ||
+  1658				   !!match.mask->src.s6_addr32[3];
+  1659	
+  1660			if (want_dst)
+  1661				for (unsigned int i = 0; i < 4; i++) {
+  1662					entry = yt921x_acl_entries_find(entries, &size,
+  1663									YT921X_ACL_TYPE_IPV6_DA0 + i);
+  1664					if (!entry)
+  1665						goto err;
+  1666	
+  1667					entry->key[0] |= ntohl(match.key->dst.s6_addr32[i]);
+  1668					entry->mask[0] |= ntohl(match.mask->dst.s6_addr32[i]);
+  1669				}
+  1670			if (want_src)
+  1671				for (unsigned int i = 0; i < 4; i++) {
+  1672					entry = yt921x_acl_entries_find(entries, &size,
+  1673									YT921X_ACL_TYPE_IPV6_SA0 + i);
+  1674					if (!entry)
+  1675						goto err;
+  1676	
+  1677					entry->key[0] |= ntohl(match.key->src.s6_addr32[i]);
+  1678					entry->mask[0] |= ntohl(match.mask->src.s6_addr32[i]);
+  1679				}
+  1680		}
+  1681	
+  1682		want_dport = false;
+  1683		want_sport = false;
+  1684		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS)) {
+  1685			struct flow_match_ports match;
+  1686	
+  1687			entry = yt921x_acl_entries_find(entries, &size,
+  1688							YT921X_ACL_TYPE_L4);
+  1689			if (!entry)
+  1690				goto err;
+  1691	
+  1692			flow_rule_match_ports(rule, &match);
+  1693	
+  1694			want_dport = !!match.mask->dst;
+  1695			want_sport = !!match.mask->src;
+  1696	
+  1697			entry->key[0] |= (ntohs(match.key->dst) << 16) |
+  1698					 ntohs(match.key->src);
+  1699			entry->mask[0] |= (ntohs(match.mask->dst) << 16) |
+  1700					  ntohs(match.mask->src);
+  1701		}
+  1702	
+  1703		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS_RANGE)) {
+  1704			struct flow_match_ports_range match;
+  1705	
+  1706			entry = yt921x_acl_entries_find(entries, &size,
+  1707							YT921X_ACL_TYPE_L4);
+  1708			if (!entry)
+  1709				goto err;
+  1710	
+  1711			flow_rule_match_ports_range(rule, &match);
+  1712	
+  1713			if ((want_dport && !!match.mask->tp.dst) ||
+  1714			    (want_sport && !!match.mask->tp.src)) {
+  1715				NL_SET_ERR_MSG_MOD(extack,
+  1716						   "Ports and ports range are mutually exclusive");
+  1717				return -EINVAL;
+  1718			}
+  1719	
+  1720			entry->key[0] |= (ntohs(match.key->tp_min.dst) << 16) |
+  1721					 ntohs(match.key->tp_min.src);
+  1722			if (match.mask->tp.dst)
+  1723				entry->key[1] |= YT921X_ACL_KEYb_L4_DPORT_RANGE_EN;
+  1724			if (match.mask->tp.src)
+  1725				entry->key[1] |= YT921X_ACL_KEYb_L4_SPORT_RANGE_EN;
+  1726			entry->mask[0] |= (ntohs(match.mask->tp_max.dst) << 16) |
+  1727					  ntohs(match.mask->tp_max.src);
+  1728		}
+  1729	
+  1730		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
+  1731			struct flow_match_eth_addrs match;
+  1732			bool want_dst;
+  1733			bool want_src;
+  1734	
+  1735			flow_rule_match_eth_addrs(rule, &match);
+  1736	
+  1737			want_dst = !is_zero_ether_addr(match.mask->dst);
+  1738			want_src = !is_zero_ether_addr(match.mask->src);
+  1739	
+  1740			if (want_dst) {
+  1741				entry = yt921x_acl_entries_find(entries, &size,
+  1742								YT921X_ACL_TYPE_MAC_DA0);
+  1743				if (!entry)
+  1744					goto err;
+  1745	
+  1746				entry->key[0] |= ethaddr_hi4_to_u32(match.key->dst);
+  1747				entry->mask[0] |= ethaddr_hi4_to_u32(match.mask->dst);
+  1748			}
+  1749			if (want_src) {
+  1750				entry = yt921x_acl_entries_find(entries, &size,
+  1751								YT921X_ACL_TYPE_MAC_SA0);
+  1752				if (!entry)
+  1753					goto err;
+  1754	
+  1755				entry->key[0] |= ethaddr_hi4_to_u32(match.key->src);
+  1756				entry->mask[0] |= ethaddr_hi4_to_u32(match.mask->src);
+  1757			}
+  1758			if (want_src || want_dst) {
+  1759				entry = yt921x_acl_entries_find(entries, &size,
+  1760								YT921X_ACL_TYPE_MAC_DA1_SA1);
+  1761				if (!entry)
+  1762					goto err;
+  1763	
+  1764				entry->key[0] |= (ethaddr_lo2_to_u32(match.key->dst) << 16) |
+  1765						 ethaddr_lo2_to_u32(match.key->src);
+  1766				entry->mask[0] |= (ethaddr_lo2_to_u32(match.mask->dst) << 16) |
+  1767						  ethaddr_lo2_to_u32(match.mask->src);
+  1768			}
+  1769		}
+  1770	
+  1771		/* Entries + Misc */
+  1772		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
+  1773			struct flow_match_basic match;
+  1774	
+  1775			flow_rule_match_basic(rule, &match);
+  1776	
+  1777			if (match.mask->n_proto) {
+  1778				enum yt921x_l3_type type = YT921X_L3_TYPE_OTHER;
+  1779	
+  1780				if (match.mask->n_proto == htons(~0))
+  1781					switch (match.key->n_proto) {
+  1782					case htons(ETH_P_IP):
+  1783						type = YT921X_L3_TYPE_IPV4;
+  1784						break;
+  1785					case htons(ETH_P_IPV6):
+  1786						type = YT921X_L3_TYPE_IPV6;
+  1787						break;
+  1788					case htons(ETH_P_ARP):
+  1789						type = YT921X_L3_TYPE_ARP;
+  1790						break;
+  1791					case htons(ETH_P_LLDP):
+  1792						type = YT921X_L3_TYPE_LLDP;
+  1793						break;
+  1794					case htons(ETH_P_PAE):
+  1795						type = YT921X_L3_TYPE_PAE;
+  1796						break;
+  1797					case htons(ETH_P_CFM):
+  1798						type = YT921X_L3_TYPE_ERP;
+  1799						break;
+  1800					}
+  1801	
+  1802				if (type != YT921X_L3_TYPE_OTHER) {
+  1803					size = yt921x_acl_entries_set_l3_type(entries,
+  1804									      size,
+  1805									      type);
+  1806					if (!size)
+  1807						goto err;
+  1808				} else {
+  1809					entry = yt921x_acl_entries_find(entries, &size,
+  1810									YT921X_ACL_TYPE_ETHERTYPE);
+  1811					if (!entry)
+  1812						goto err;
+  1813	
+  1814					entry->key[0] |= ntohs(match.key->n_proto);
+  1815					entry->mask[0] |= ntohs(match.mask->n_proto);
+  1816				}
+  1817			}
+  1818			if (match.mask->ip_proto) {
+  1819				enum yt921x_l4_type type = YT921X_L4_TYPE_OTHER;
+  1820	
+> 1821				if (match.mask->ip_proto == ~0)
+  1822					switch (match.key->ip_proto) {
+  1823					case IPPROTO_TCP:
+  1824						type = YT921X_L4_TYPE_TCP;
+  1825						break;
+  1826					case IPPROTO_UDP:
+  1827						type = YT921X_L4_TYPE_UDP;
+  1828						break;
+  1829					case IPPROTO_UDPLITE:
+  1830						type = YT921X_L4_TYPE_UDPLITE;
+  1831						break;
+  1832					case IPPROTO_ICMP:
+  1833						type = YT921X_L4_TYPE_ICMP;
+  1834						break;
+  1835					case IPPROTO_IGMP:
+  1836						type = YT921X_L4_TYPE_IGMP;
+  1837						break;
+  1838					}
+  1839	
+  1840				if (type != YT921X_L4_TYPE_OTHER) {
+  1841					size = yt921x_acl_entries_set_l4_type(entries,
+  1842									      size,
+  1843									      type);
+  1844					if (!size)
+  1845						goto err;
+  1846				} else {
+  1847					entry = yt921x_acl_entries_find(entries, &size,
+  1848									YT921X_ACL_TYPE_MISC);
+  1849					if (!entry)
+  1850						goto err;
+  1851	
+  1852					entry->key[0] |= YT921X_ACL_BINa_MISC_IP_PROTO(match.key->ip_proto);
+  1853					entry->mask[0] |= YT921X_ACL_BINa_MISC_IP_PROTO(match.mask->ip_proto);
+  1854				}
+  1855			}
+  1856		}
+  1857	
+  1858		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
+  1859			u32 supp_flags = FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG;
+  1860			struct flow_match_control match;
+  1861	
+  1862			flow_rule_match_control(rule, &match);
+  1863			if (!flow_rule_is_supp_control_flags(supp_flags,
+  1864							     match.mask->flags, extack))
+  1865				return -EOPNOTSUPP;
+  1866	
+  1867			if (match.mask->flags & FLOW_DIS_FIRST_FRAG) {
+  1868				bool set = match.key->flags & FLOW_DIS_FIRST_FRAG;
+  1869	
+  1870				size = yt921x_acl_entries_set_first_frag(entries, size,
+  1871									 set);
+  1872				if (!size)
+  1873					goto err;
+  1874			}
+  1875			if (match.mask->flags & FLOW_DIS_IS_FRAGMENT) {
+  1876				bool set = match.key->flags & FLOW_DIS_IS_FRAGMENT;
+  1877	
+  1878				size = yt921x_acl_entries_set_is_fragment(entries, size,
+  1879									  set);
+  1880				if (!size)
+  1881					goto err;
+  1882			}
+  1883		}
+  1884	
+  1885		/* Misc only */
+  1886		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IP)) {
+  1887			struct flow_match_ip match;
+  1888	
+  1889			flow_rule_match_ip(rule, &match);
+  1890			if (match.mask->ttl)
+  1891				return -EOPNOTSUPP;
+  1892	
+  1893			if (match.mask->tos) {
+  1894				entry = yt921x_acl_entries_find(entries, &size,
+  1895								YT921X_ACL_TYPE_MISC);
+  1896				if (!entry)
+  1897					goto err;
+  1898	
+  1899				entry->key[0] |= YT921X_ACL_BINa_MISC_TOS(match.key->tos);
+  1900				entry->mask[0] |= YT921X_ACL_BINa_MISC_TOS(match.mask->tos);
+  1901			}
+  1902		}
+  1903	
+  1904		if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_TCP)) {
+  1905			struct flow_match_tcp match;
+  1906	
+  1907			flow_rule_match_tcp(rule, &match);
+  1908	
+  1909			if (match.mask->flags) {
+  1910				entry = yt921x_acl_entries_find(entries, &size,
+  1911								YT921X_ACL_TYPE_MISC);
+  1912				if (!entry)
+  1913					goto err;
+  1914	
+  1915				entry->key[0] |= YT921X_ACL_BINa_MISC_TCP_FLAGS(ntohs(match.key->flags));
+  1916				entry->mask[0] |= YT921X_ACL_BINa_MISC_TCP_FLAGS(ntohs(match.mask->flags));
+  1917			}
+  1918		}
+  1919	
+  1920		if (!size) {
+  1921			NL_SET_ERR_MSG_MOD(extack, "Empty rule generated, this should not happen");
+  1922			return -EOPNOTSUPP;
+  1923		}
+  1924	
+  1925		ruleext->r.mask = (1 << size) - 1;
+  1926		return 0;
+  1927	
+  1928	err:
+  1929		NL_SET_ERR_MSG_MOD(extack, "Rule too complex");
+  1930		return -EOPNOTSUPP;
+  1931	}
+  1932	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
