@@ -1,64 +1,53 @@
-Return-Path: <netdev+bounces-288141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288142-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MN0vGJd2BmoUkAIAu9opvQ
-	(envelope-from <netdev+bounces-288141-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:27:51 +0200
+	id kOAdF1p3BmoUkAIAu9opvQ
+	(envelope-from <netdev+bounces-288142-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:31:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C53FE54866E
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:27:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9245486BB
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 03:31:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 98F033020128
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:27:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 56CB93003722
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 01:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B53236A030;
-	Fri, 15 May 2026 01:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C749366DB9;
+	Fri, 15 May 2026 01:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pX0xqlxY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FvmOS1+n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB4636998B
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1C726B764
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778808468; cv=none; b=uMHBfXqRUsnxZsN7QAsASroBDcRGlTFbuPdfEVr/L7JQ+dwKNRdhWtCFCtjLVyOQTM4Pyn/c/ZKVQXS/QcABtr87vKi548lJR3h5hNqTEvdtyhaU+YKadSli4I1WJZlNhUVpaupHuwRLgAs3UoURGKQWS+8O9n6OsVn9pUEw1SE=
+	t=1778808660; cv=none; b=h47QOGrYxLN3uEoJiuiS6ZHAFgEgwMc82C9INeAz0BgW9mzy2T7KSBRpKRkHUtGjIXzWyI5aps2k88MXqnKHJaSmQtEAMCrbiICQAIiRT0E05X99rzMiA67B1PlLXJrnDesYKqS5LgXKgpnkDxpgOaYIR8/aFZy2TIG8wOoOiJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778808468; c=relaxed/simple;
-	bh=laAiDd+4bIuBswpD5YLWOIs2SKZzZdoLOUYi+ya4M94=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IVYAYq7KKn/wa8i1kGOJsAd06qYp7pgdPT25UE4avY2Whz5jOJ7AENQ62ykdfS/rK1zpBZIdAlZlQn1KnZUT9Dtms9UqVVq6nqvx5FwW4ZIh7wzLpv1694wXQtPlaPxSiHfizHyW57nlfq8lahXPXJ144LsfH2c8nmHOyt6pWps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pX0xqlxY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D137C2BCC6;
-	Fri, 15 May 2026 01:27:48 +0000 (UTC)
+	s=arc-20240116; t=1778808660; c=relaxed/simple;
+	bh=Nx8maYqKXC8dWzmTl3pxSQ6SP9oGIOi9zqWVNidoWYk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kaSsBTdlH3wrZ1BlqzWNqW3inEJcDRCJ10ahilT4iS4sKiPIc+J6ytMwz4N3fSWQwp/K+i3owyuBmknYzqZuflgjwX3YPMElLR66e92o9JCc9WnV0sVdj+7ZbiY6rMNHxIZf9Uz2oR+XYlYjUZFHGs/81G2OiW4TmgF3XjEurpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FvmOS1+n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7848EC2BCB3;
+	Fri, 15 May 2026 01:31:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778808468;
-	bh=laAiDd+4bIuBswpD5YLWOIs2SKZzZdoLOUYi+ya4M94=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pX0xqlxYBHWcVYxMerVSLVqgLQik2cJodVp95nLN9lMmDMrXAtXh+A2HDVb1OM0da
-	 6kFCMCsfOEqeUD10pDZeb0HBrHPXbaOaJgGVnR+8emZ14KeUNIxYggwueeyHnP43HN
-	 Bg/dZshCqFkWRqnGhZrxjxFPcxygVYHEUqZYoRKiqdh+2EQxCVbc+DVnlr/w5pRI71
-	 tflGzprJ725lcV+x937IPBRrtCZuDtztlgnjWwleztpReIYIl1maz6N9ILTGYhcJTI
-	 cPcIERNcr4oSEUYTk2XBNNS3L2SiUxRY8TBsXRxdjhzp0E9CM/mLh5W7G0Kxhif4FW
-	 bUWp3B7pB/a0A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: eric.joyner@amd.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	brett.creeley@amd.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v3 2/5] ionic: Get "link_down_count" ext link stat from firmware
-Date: Thu, 14 May 2026 18:27:47 -0700
-Message-ID: <20260515012747.1292575-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260512224421.25236-3-eric.joyner@amd.com>
-References: <20260512224421.25236-3-eric.joyner@amd.com>
+	s=k20201202; t=1778808660;
+	bh=Nx8maYqKXC8dWzmTl3pxSQ6SP9oGIOi9zqWVNidoWYk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FvmOS1+nFPtpElgSiv1e1liUCJEL1NtypM1uM3xUXuGftK7Vkntu3NA1zzjYWipwZ
+	 GhqbS5MDjue0Rnszs0SaIefMwzl+q2KOkpkpf04oCRz8nLGsqO7N02NWn7pcrQdtSx
+	 /up8hCR68u/M2bKVq450HLoGbuinBixSndDbzXkwfF8NLGy8tLFg0ZT13CgUz9AEbv
+	 cambuUhgAMch4GhxDO11ZHaqyycK946mudQR6l0fdyWqJ6s2KJgrNx3FlZWDvRuqG8
+	 u6T1HmWmuEXggmRDiF7yVp5MMHEeCsjuBSUZyzBY+NK7t5w1rHxlrWJVSSWIaE371E
+	 yTPmf7wgL6quQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD0839E8A42;
+	Fri, 15 May 2026 01:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,134 +55,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C53FE54866E
+Subject: Re: [PATCH net] tls: Preserve sk_err across recvmsg() when data has
+ been
+ copied
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177880860505.154016.6069051548145813677.git-patchwork-notify@kernel.org>
+Date: Fri, 15 May 2026 01:30:05 +0000
+References: <20260513125825.205189-1-cel@kernel.org>
+In-Reply-To: <20260513125825.205189-1-cel@kernel.org>
+To: Chuck Lever <cel@kernel.org>
+Cc: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, netdev@vger.kernel.org, chuck.lever@oracle.com
+X-Rspamd-Queue-Id: 5E9245486BB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com,vger.kernel.org,oracle.com];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-288142-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288141-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-ionic: Get "link_down_count" ext link stat from firmware
+Hello:
 
-This patch replaces the driver-side link_down_count counter on
-struct ionic_lif with a value read directly from the firmware's
-DMA-updated struct ionic_port_status.link_down_count, exposed via
-ethtool_link_ext_stats.link_down_events in ionic_get_link_ext_stats().
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-> index 78a802eb159f..cc2b294910f6 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-> @@ -115,9 +115,16 @@ static void ionic_get_link_ext_stats(struct net_device *netdev,
->  				     struct ethtool_link_ext_stats *stats)
->  {
->  	struct ionic_lif *lif = netdev_priv(netdev);
-> +	struct ionic *ionic = lif->ionic;
-> +
-> +	if (!ionic->idev.port_info) {
-> +		netdev_err(netdev, "port_info not initialized\n");
-> +		return;
-> +	}
+On Wed, 13 May 2026 08:58:25 -0400 you wrote:
+> From: Chuck Lever <chuck.lever@oracle.com>
+> 
+> The sk_err check in tls_rx_rec_wait() consumes the error via
+> sock_error(), which clears sk_err atomically. When the caller
+> (tls_sw_recvmsg, tls_sw_splice_read, or tls_sw_read_sock) already
+> has bytes copied to userspace, it returns those bytes and discards
+> the error from this call. sk_err is now zero on the socket, so the
+> next read syscall observes only RCV_SHUTDOWN and reports a clean
+> EOF instead of the actual error (typically -ECONNRESET).
+> 
+> [...]
 
-[Low]
-Should this NULL check sit inside the is_physfn branch below? The
-port_info pointer is only dereferenced on the PF path, so a VF calling
-ethtool on link ext stats will now log a netdev_err even though the VF
-path never reads port_info.
+Here is the summary with links:
+  - [net] tls: Preserve sk_err across recvmsg() when data has been copied
+    https://git.kernel.org/netdev/net/c/f508262ae9f2
 
-The message is also unrate-limited and reachable from userspace via
-ethtool. port_info is freed and set to NULL in ionic_port_reset() and
-reallocated in ionic_port_init() on FW reset / FLR / PCI error recovery
-paths (ionic_reset_prepare()/ionic_reset_done() in ionic_bus_pci.c, and
-ionic_restart_lif() in ionic_lif.c), so any ethtool query during that
-transient window will emit a kernel log line where the previous code
-silently did nothing.
-
->  
-> -	if (lif->ionic->pdev->is_physfn)
-> -		stats->link_down_events = lif->link_down_count;
-> +	if (ionic->pdev->is_physfn)
-> +		stats->link_down_events =
-> +		    le16_to_cpu(ionic->idev.port_info->status.link_down_count);
->  }
-
-[Medium]
-The firmware-supplied link_down_count is a __le16 in struct
-ionic_port_status (ionic_if.h), so the value saturates at 65,535. The
-previous lif->link_down_count was an unsigned int (32-bit), and the
-ethtool field stats->link_down_events is u64 and treated as monotonic
-by userspace consumers (per the comment on struct
-ethtool_link_ext_stats in include/linux/ethtool.h).
-
-Without driver-side rollover detection that accumulates the carry into
-a wider counter, after 65,536 link bounces the reported value will
-appear to go backward to a small number. Should the driver detect a
-firmware value smaller than the previously-read value and fold the
-delta into a 32/64-bit running tally before assigning to
-stats->link_down_events?
-
-[Medium]
-Does this change make link_down_events non-persistent across firmware
-resets? port_info lives in DMA-coherent memory that
-ionic_port_reset() frees and clears:
-
-drivers/net/ethernet/pensando/ionic/ionic_main.c:ionic_port_reset() {
-    ...
-    dma_free_coherent(...);
-    idev->port_info = NULL;
-    ...
-}
-
-and ionic_port_init() reallocates a fresh zeroed page. These are
-called from the FLR / PCI error recovery path
-(ionic_reset_prepare()/ionic_reset_done() in ionic_bus_pci.c) and from
-ionic_restart_lif() in ionic_lif.c, so FW-reset events that previously
-left the driver-resident counter untouched will now zero this stat.
-
-The commit message does not mention this behavioral change. Should the
-driver snapshot the firmware value before each reset and accumulate it
-across reset boundaries to keep the ethtool counter monotonic?
-
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-> index 637e635bbf03..eb7e552bc12e 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-> @@ -179,7 +179,6 @@ static void ionic_link_status_check(struct ionic_lif *lif)
->  		}
->  	} else {
->  		if (netif_carrier_ok(netdev)) {
-> -			lif->link_down_count++;
->  			netdev_info(netdev, "Link down\n");
->  			netif_carrier_off(netdev);
->  		}
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
