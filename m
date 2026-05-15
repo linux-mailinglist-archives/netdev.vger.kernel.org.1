@@ -1,181 +1,233 @@
-Return-Path: <netdev+bounces-288236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288237-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKJPGF3bBmoxogIAu9opvQ
-	(envelope-from <netdev+bounces-288236-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:37:49 +0200
+	id 6IhvEMzbBmoxogIAu9opvQ
+	(envelope-from <netdev+bounces-288237-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:39:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0851054B766
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:37:48 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0E554B83B
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:39:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AEF64303E404
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:35:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C7B3F303B806
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 705A52B9A4;
-	Fri, 15 May 2026 08:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50777402B9D;
+	Fri, 15 May 2026 08:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ca4hlb5P";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VLtsEzkq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6af3o+k"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23F14014BA
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 08:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778834104; cv=none; b=IHLdi+ABGt5rxX8MRfykF68C4Q9FROtrzMMq5Ig2vIVTFIGGjGU57q1gVh8x+12YWe91IVZuroY0PCuD3MNeebAktk+CYhZVc3knQN4XTXe8gbqGg+mmLVo+oJJ/Z7C/p5cW9p+o7/kJRGYFiA16DOSH+yN0OqoOt3e+QeOfIMg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778834104; c=relaxed/simple;
-	bh=J+YfgonHj3/xD9IJ4zrqETVg7kXEqUkH6/d/z1scO9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DemEwBO28Y2+1CxHPUJtkvbZ3fHM3BqfhYzkKqGipnJD3YxhGnnMeQZ4dprcp29vx+WKB0UpfaTTOClLbxUKeFE7f8nTZ7nVadvNs8moA4tRA3IsfinijU/aODtIies+gvfINoQyQ2+1xiI0Er13NcC9hAqrM6wZCMC8OHZIIF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ca4hlb5P; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VLtsEzkq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778834101;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f4ozBn+0rPODjqtQvXUj7u7B9iwrcNai0ZrheJfjpbE=;
-	b=ca4hlb5PRPzPB5/G7rDKmsxGdInHmtV9IlmeBksFvy9cLErpCYPfvZLYTj5h11hzhf1Unz
-	fsWwnqebVV02bWf9UH6QwWMN0b5A8DiG5kwdORRoUFchL6F7sReLsQhyLVaJsi15mBJCIJ
-	vEJGtZssIvLCHqiRO/n/5YvqhXBZ4FE=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-367-2EPnV_SdMpO4EnrVix-EjQ-1; Fri, 15 May 2026 04:34:59 -0400
-X-MC-Unique: 2EPnV_SdMpO4EnrVix-EjQ-1
-X-Mimecast-MFC-AGG-ID: 2EPnV_SdMpO4EnrVix-EjQ_1778834098
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-bcdbb46dce2so674970166b.1
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:34:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7217A346FA6
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 08:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778834269; cv=pass; b=ERRtMDyu6A47zYzWLnijJSmQSk2T9P7CDTQdZ2Vp2PY9/w6Ouai7loVwiNLOqB8hskakK3gbbKCd/c9OyCs4c2AOENCJC11AJSy3txKg6X957PoU1Uhw7EeuH7yCDOa6c9DPb6Z2EuzTEUc4SKNY0/rMHzEZb63zf32H2TMusEM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778834269; c=relaxed/simple;
+	bh=unrCV9BlS+NT2H9YcNFBIBdPF5SnAoNci8LrnilLGqE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p9oOMgTd2MsBxwZ6dpuC1vnlFP03ledJmxfwckUeHblxCnzn2fM3PBD7FoxT6JoIBYE2gO+q1d0jstB2+Qf3igOyZk3QeWZWiyxKS4o/8GQGv/S3lT58FuGiVfnKm0vABkuh6OMzgaeYpb+S5sJFuCiZeTwYDUhCuAlIr5pVHxU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6af3o+k; arc=pass smtp.client-ip=74.125.82.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-30246cfd41aso3784045eec.1
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 01:37:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778834266; cv=none;
+        d=google.com; s=arc-20240605;
+        b=g8qAvd3q1d2VIMtbDk8aOZMnoF6NvKxlRcbySIAZXRlddpmrPydZvZc87rWZe6iaxh
+         FTSMpDA6gEj/vWWSNI4V5SuFxJPuTx9c3zVD8Ok1HQRblqji7Qrq8EQ1y3tmifGJFkRj
+         kfGLbB1/VOir+L4l/FrVPmMRFKj4KLluexIeiujCPX/GNiza6rC+LMj77SWqlZp5oJWt
+         v5rmR+NLlbV7NkLKeKX8lTe3gxyRLw3FWdi2aLjuwvFJvh/amKLyH9kDlXFRDPkaIQ3v
+         5M04PyoKJH5b0lSVCB70yk3WOjRY5v/hclk7mOBR+hpEumC7NF1IphhvTTvKIhB+oubl
+         5trw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Me5hEq/uVA2vry/WusH3UXPaCOwfFKJKOpGLMOeOsm4=;
+        fh=lT+vLTziEnqFn+3Bb5g/xccxDHliMDO9A/H10eoB4D0=;
+        b=H9hLzEvg5RLYzC3hkfwvHwlq0g0O9naBx1WYh0++m+G0cW4xzKfYHcfT2OU8XRV2LO
+         PhLS/ETWgdoXu2fiRBxi2YSBgggtI9gAJcYWBZcX5tVDzTZi6frr6ZHurgDlUw2r17rQ
+         Hn/DjoZnfxbPafVlhbaw6OOrAPNrlVg+7oy+yjuE5ajPganzIEl4iuZVYf1oBuf3Z9g9
+         a/3G+LNEVNzq7dm2qndvzn2V2lK0sLVM4j+ZEr4kQQyrYGvXs2AQVB556pJ8YgioWDsE
+         /z45xnOTJYggb5KA+4BdRs8pywCfq3JT5EYloKQTNI+RD3HzLORuw6yxYPNOLg/98M26
+         Z+WQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778834098; x=1779438898; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=f4ozBn+0rPODjqtQvXUj7u7B9iwrcNai0ZrheJfjpbE=;
-        b=VLtsEzkqUahlpDqmOI75ub/q4K1F9qxpO0lkn6QFZc8Ee1Mn9eVbGZy/tUTEwcpsIq
-         s2at3UUk/tCyKN5n8XrZM/d8qIkVH9orKe+CM6cUXwyf1DCSyfFQuEM8OvqDL9d+hChv
-         lkWF7FIGSpMd8qmeNL4x+PecefWhPqzM9e2Nc7rvN4CllJIsnqY9vRvJuAhtc5DFBJtm
-         zxxOvWWTycvaz8821QjSvF0c0JgBy93q0yBIrJseiuB00+3H6MaMdn6JVHMY5RA6yUlx
-         efopwLmCVlYOj02Fs8gkRYjD0d8ThekJ89taexyE5Z8EDxNFYruMpTsNhUAIeL/DdyWX
-         mikQ==
+        d=gmail.com; s=20251104; t=1778834266; x=1779439066; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Me5hEq/uVA2vry/WusH3UXPaCOwfFKJKOpGLMOeOsm4=;
+        b=J6af3o+kBsvRvTtp5InCk67+NlrHIgODsJqzwPQ4eeD/BCnyKtt777pgo+ofAPURgL
+         HzF6jMMLQnZwqvEoSifIHHtDcnqLkg6tfXFJUMNbt9wOlNkvosQUL6rDxtj5EHMRtLiW
+         ZSCWHveKvVYdi/LPIbok9bDg3toxM2bFzpJqtF51ebmOrU+3nQM18F81oojcUr+8CwcR
+         NKVd7SskLjzvNNJ5ePGlIbeneLV81gyGLhDuLs0MTDHogUxdE/GLW6nkBHrybnLzlgy9
+         HPz0FxaBnNMkD7G/1UMHm15/7xFBqsuWpGyGV03ic1+IxCMQw46To/ZPmsY8SN2Xg4oJ
+         RrYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778834098; x=1779438898;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f4ozBn+0rPODjqtQvXUj7u7B9iwrcNai0ZrheJfjpbE=;
-        b=OVDfGghJLPSENOcAN1ZVOaNq4BhYs+q5CpjdfO57yqYPB+Zk6y3/698GB1yIBM3/Yf
-         h6LmSGh7bpIWcFG1jh5rABVEienU6CCJFvuSsaOGzfSkBoI8Z6nROyoJK17+9jIW6XdQ
-         uTG5e3BcxjNrS3jEnB9OZns5PDV9DJx4yWVQPuyE9PqP6twy6KhRGk/3kHb2VyEKN1rP
-         BHgGuhJtCjMEfTBCoDsUehcmJcluOGqSZYotxZ8goewRpXwdg0H7IJD1RmmL76wPAju1
-         NFqWsQtt2EAQlG+f9BBz3Q3reXgqepGNEHCM4ifmzX5prOAms7T9hIclbguAhiZSrT0L
-         knMw==
-X-Gm-Message-State: AOJu0Yz91xZwpR8oV4pgs3QAXlXySmVfaO4czMRG8tdrwRtpnT7rMUKc
-	K5ivW1wYDbKbJXK53kxBkW9wESVCETHf32WnqzNmWh0xhscar/4BWMulqrq1pt/o9FuG62YcfKa
-	AWh59eynMiUyBs5uz95XLHo8/o6r4XnjCpkw+n6SWwffguM5VzkOh1hjxEA==
-X-Gm-Gg: Acq92OFbAar3C+UvwSdLP9JulYvbhmb9spDeIYVIikuoy8hOVJp2WFYxTzgAlTY+2pb
-	x8cm0vb36htE6LZB4fOaRLG4WKCL7iRUuTtI+ylTEPMISdIKlQ3DM8rauGZL5xdZ6jMPd+HZCiF
-	oDzcMPrb4w+UFG2M/ohqSIv2hjyVh1EVowcUollju+Fdwx21GhYBnVo+RPpNnwhzyDtCn0fUwj0
-	7Nsc5dvFGHc+L3/M+GBegNhpcH6oyDMJQgia2iBcp7Jr/LW7sZZVUcFblXtnHbgEvPv/t3iLgbD
-	//M7cWexQ9kh/CaGu1jMT0EFp/ywHDR+HNV/K7CFAMjcrjMEP05RYU9mJZS8ZBU1ZyruMN6S9ro
-	ZK2ToVXjHxdOjw/GxWmvCX9YL6om6+UslHrM2ddTOh/ZWed3SZwkx1mnGnOXvfsweRqY5XA==
-X-Received: by 2002:a17:907:1b27:b0:bd4:e62e:d399 with SMTP id a640c23a62f3a-bd51797a024mr149535166b.26.1778834098189;
-        Fri, 15 May 2026 01:34:58 -0700 (PDT)
-X-Received: by 2002:a17:907:1b27:b0:bd4:e62e:d399 with SMTP id a640c23a62f3a-bd51797a024mr149533466b.26.1778834097666;
-        Fri, 15 May 2026 01:34:57 -0700 (PDT)
-Received: from [172.16.2.95] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4bce1a4sm193291466b.5.2026.05.15.01.34.56
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 May 2026 01:34:57 -0700 (PDT)
-From: Eelco Chaudron <echaudro@redhat.com>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, Aaron Conole <aconole@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, dev@openvswitch.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] openvswitch: vport: fix race between linking and
- the device notifier
-Date: Fri, 15 May 2026 10:34:56 +0200
-X-Mailer: MailMate (2.0r6292)
-Message-ID: <6181DD15-23BD-4236-9A91-9152BB437183@redhat.com>
-In-Reply-To: <20260514184702.2461435-1-i.maximets@ovn.org>
-References: <20260514184702.2461435-1-i.maximets@ovn.org>
+        d=1e100.net; s=20251104; t=1778834266; x=1779439066;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Me5hEq/uVA2vry/WusH3UXPaCOwfFKJKOpGLMOeOsm4=;
+        b=YUti6WzTtlOFZuZm8wXNwPnAijyjrEHZwIqoMNkGu1b7OroTFZfBjHKhzSsgSvAv2F
+         SmH9xqwAxkM2kdctpgzNqYPOMLvYWEL0V+iYMHaxlKr04EhOHhznWX7ZLTyuBbOvtMzX
+         fCczD2c8MxVeq0bPJ2TSXBkZ8p0mPDn9IyxU63Ts+6Rz3y5LJsWe7ua9fl3W3GfAHYMl
+         BxPO5VzVEXjq37UhKY4Fr9khn8cixXUT1tWDmSS58FrbzybKFOPh4Tu/dogJRGBCXUzD
+         RuQI7q/IfwWunscIWbOl0mfuuIfBvDRZOAZZsNf3zWN23IvK9GR9K9wT7KbvJRuqmOXi
+         RJyQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8rTEI60tarBedpkrV/YE1BA8sQZTU6rqlfrfqLVwOxcKimEu4NWIIi8Fv1qXS/tZlGG/Gk8Ig=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxelM2ClZo9Xsn1a/gFoElxiekOmeDtHVA7DnDQYrGYi9hnSVjs
+	f1qHLASzGd/MHwIxsey1WH1TG5kuwZxozZISj39++6o+WwZuVnerbqoVGEzpH+A0Ftf48CLCwoH
+	M3Wnltr009LAH8ONRGI1IqpqIHXxderU=
+X-Gm-Gg: Acq92OFA2NoMcjj7FjaCW6C9dUgR6jqgmb1vtN9xFZRcD1Unq/ujaCY/BubNlyI9WMY
+	nLduFJiDtthX6OvyHW7duXSehpgsDGnSBR8VYJGzoPOyfXHx6tkkzDNV7oUQTcTBtIXlr0ssVRx
+	ChAIedV5oMxFAva7br62StfIjyTbuzRoR3/vSWWf1WSjvoQSNlI27yAJ+M3IErGhNFjZYqDiyVj
+	BTxQomqt0V1BmiiZ0Y1LicPIwRAabh40893AQHPrDbApoDYh58DPT1cBdKIDQ2BTXa22Si7Ps6c
+	PoVGYT5Z
+X-Received: by 2002:a05:7300:fb83:b0:2ed:ff78:2c12 with SMTP id
+ 5a478bee46e88-303986b7f00mr1545456eec.34.1778834265492; Fri, 15 May 2026
+ 01:37:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 0851054B766
+References: <20260511135703.62470-1-clamor95@gmail.com> <20260511135703.62470-6-clamor95@gmail.com>
+ <20260515-utopian-malamute-of-patience-367e8e@quoll>
+In-Reply-To: <20260515-utopian-malamute-of-patience-367e8e@quoll>
+From: Svyatoslav Ryhel <clamor95@gmail.com>
+Date: Fri, 15 May 2026 11:37:34 +0300
+X-Gm-Features: AVHnY4LfeFEmg-csCdRMVtN73Y-dqI06XuWSB80BMJnQTmRPDx1qbsh-tCMg8j0
+Message-ID: <CAPVz0n2wrAdU0JKx7eb7uosCcoGayqNchK591VPph-5_nBAMXg@mail.gmail.com>
+Subject: Re: [PATCH v1 5/6] dt-bindings: phy: tegra: Document Nvidia Tegra
+ XMM6260 PHY
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Thierry Reding <thierry.reding@kernel.org>, Jonathan Hunter <jonathanh@nvidia.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Peter Chen <peter.chen@kernel.org>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: EB0E554B83B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[echaudro@redhat.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-288236-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288237-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[clamor95@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devicetree.org:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-
-
-On 14 May 2026, at 20:46, Ilya Maximets wrote:
-
-> Sashiko reports that it is technically possible that we got the device
-> reference, but by the time we're linking it to the OVS datapath, it
-> may be already in the process of being deleted.  In this case if the
-> notifier wins the race for RTNL, it will see that the device is not
-> yet in the OVS datapath (ovs_netdev_get_vport() will fail in the
-> dp_device_event()) and will do nothing.  Then the ovs_netdev_link()
-> will take the RTNL and link the unregistering device to OVS datapath.
+=D0=BF=D1=82, 15 =D1=82=D1=80=D0=B0=D0=B2. 2026=E2=80=AF=D1=80. =D0=BE 11:2=
+0 Krzysztof Kozlowski <krzk@kernel.org> =D0=BF=D0=B8=D1=88=D0=B5:
 >
-> Eventually, netdev_wait_allrefs_any() will re-broadcast the event and
-> the device will be properly detached, but it will take at least a
-> second before that happens, so it's not something we should rely on.
+> On Mon, May 11, 2026 at 04:57:00PM +0300, Svyatoslav Ryhel wrote:
+> > Document the XMM6260 PHY used by various devices based on the Nvidia Te=
+gra
+> > SoC, describing its usage
+> >
+> > Signed-off-by: Svyatoslav Ryhel <clamor95@gmail.com>
+> > ---
+> >  .../bindings/phy/nvidia,tegra-xmm6260.yaml    | 58 +++++++++++++++++++
+> >  1 file changed, 58 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/phy/nvidia,tegra-=
+xmm6260.yaml
+> >
+> > diff --git a/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm6260=
+.yaml b/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm6260.yaml
+> > new file mode 100644
+> > index 000000000000..0346433c9772
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm6260.yaml
+> > @@ -0,0 +1,58 @@
+> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/phy/nvidia,tegra-xmm6260.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Nvidia Tegra PHY for XMM6260 modem
 >
-> Let's avoid linking the non-registered device in the first place.
+> XMM6260 is Infineon modem, so any combination with nvidia,tegra is very
+> confusing.
 >
-> Note: As per documentation, RTNL doesn't protect the reg_state, but
-> it actually does for all the state transitions we care about here,
-> so it should not be necessary to use READ_ONCE or taking the instance
-> lock.  We can still do that, but we have a few more places even in
-> this file where the reg_state is accessed without those while under
-> RTNL, and many more places like this across the kernel code, so it
-> might make more sense to change all of them in a more centralized
-> fashion in the future, if necessary.
+
+May you please suggest how to adjust the name then? Thank you.
+
+> > +
+> > +description:
+> > +  A hardware configuration used in Tegra SoCs to provide proper intera=
+ction
+> > +  between the application processor and the modem, as well as control =
+over
+> > +  one of the SoC's USB lines for the modem.
+> > +
+> > +maintainers:
+> > +  - Svyatoslav Ryhel <clamor95@gmail.com>
+> > +
+> > +properties:
+> > +  compatible:
+> > +    const: nvidia,tegra-xmm6260
 >
-> Fixes: ccb1352e76cf ("net: Add Open vSwitch kernel components.")
-> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+> Also here.
+>
+> What sort of phy is this? So far looks more like a software construct.
+>
 
-Changes look good to me.
+Infineon XMM6260 does not work as an ordinary USB modem, it is a
+standalone CPU which just exposes itself to AP via USB. In order to do
+so, it has to have control over a USB bus of AP which is dedicated to
+it. In case of Tegra - XMM6260 interaction it looks like this: second
+Tegra USB controller is set into HSIC mode and is dedicated solely to
+the modem, modem controls this USB bus. Then the main XMM6260 driver
+performs power and init sequence and once it is ready it calls phy to
+register controller. Phy has its own supply, controls USB controller
+de/register and using enable GPIO sends signal to modem to proceed.
+Additionally, since some XMM626 versions have a few steps to setup
+exposing different USB devices, phy handles controller reinit for each
+step. If treat XMM6260 as an simple USB modem it will never init.
 
-Acked-by: Eelco Chaudron <echaudro@redhat.com>
+One more benefit of having PHY is that modem driver itself is generic
+and PHY handles SoC specific configurations required by the modem.
+Since this modem was used on a variety of different SoC's (Exynos and
+OMAP for example) they can reuse modem's driver and provide only PHY
+which handles modem interactions with the USB bus.
 
+> Best regards,
+> Krzysztof
+>
 
