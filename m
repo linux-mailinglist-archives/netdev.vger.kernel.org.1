@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-288419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288421-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KEo9FHZmB2oF1wIAu9opvQ
-	(envelope-from <netdev+bounces-288419-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:31:18 +0200
+	id oFhVFgNnB2ps1wIAu9opvQ
+	(envelope-from <netdev+bounces-288421-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:33:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6A515563E0
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:31:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A57CB556492
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 20:33:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D516A30D9ED0
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:25:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5077930E455C
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:25:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58193E16BE;
-	Fri, 15 May 2026 18:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3553EEAC6;
+	Fri, 15 May 2026 18:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NxNDIPWt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PZIBoUWx"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506804F799D
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 18:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144D73E16A2;
+	Fri, 15 May 2026 18:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778869473; cv=none; b=ECa/mtq1iiUtm650Dxai0XGpROGWlm/Hy9eJVkUi1q6mUCf9xlIGUcu/fCYnY/MumYJStAIpSLFK/44SqQM6z9Zm3e+b24zFzjEQZq/h1zqkL4W44D8XhpsrU05NGzs04y/wQhPbB5FU9sQiwPH47M/V+PRadIRkT2jE/v47pG4=
+	t=1778869474; cv=none; b=ZyD+vVL9aMEZUymyEBp+DZSTj738HVlly7V+TfHh4X6ebqdeKfPhdiwHY1EOJD0cH5cDOVlfHnUmRSO3ehxzdBzdVl0XDu4LM9Iitgm/ykPiqMwvir0N02l0YeGs4p7fGT01TWBQymsqPGYZaKYHjDRsMum40I1cLz80bgN1AfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778869473; c=relaxed/simple;
-	bh=alAtIcDGq8AoCEBcSFMBrfnxk9+5oc2dmtoR9mus5Dk=;
+	s=arc-20240116; t=1778869474; c=relaxed/simple;
+	bh=BqF3ekoFBJIxN9w40qQQ+V8dAt8jGYkSVHl6tfrrPM8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mvIQXvpDL0D15c7An3DjNC+1CNJRlFJnZqheaIuW17yqvTQTNMXxuMoGPc+2nVVZENrwwo7JChhU4r8JNGAX/D6C1cGUxwzTGiYRUSai3yMxZZi/iSsIaRFFw01DyiDgeLAJPdcpxUhqpMbRUo2PQ/Ev2w61udzqLswJwglWh6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NxNDIPWt; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=tRDY3ziiBm4AoFU2pmB/Iow7nXY8n21wtJMvMEZLURXID3kD5CqkjSuLgpSEmV+O7G8qbHPzRhwdKvOt3H/xA3D+AjoAwB+sRZIivdN2y24raD0rWm25saPjt1iDBygJ7ShXDLMTi6ibGdUszyrTx4KGSFII+qrRl2XaMCRhK0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PZIBoUWx; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778869472; x=1810405472;
+  t=1778869473; x=1810405473;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=alAtIcDGq8AoCEBcSFMBrfnxk9+5oc2dmtoR9mus5Dk=;
-  b=NxNDIPWtToYZM4lXRoROr6Nd7aWvXkehYLXt3zAAiEsOxiUcaFmxZ/s9
-   efnTZUrM0iJONIzIGUoE9Qic1NKo3LfAkCsjjdneaSpfe+KpitQmePpk2
-   qwxW9XxER/sG3rqfyFlmT5l7PdwoqlPA+iR9yFKw7PYPkq5thTjI3Q/ak
-   aPucIv0jy0bFMd51eKGBrmO13H07ykuZVF8vQaAqmJbcBdrIi0R7CLuYD
-   Fslh0JASDc44opEPxCqOMFqbQaqh1Ija6IEd1dMaNSMtA1pGQzyyswgjO
-   p803CbbMGJC88XX4/CFSb34zZcVFC1PbRHmKjF/pO2bX7C0DMvK2ZeKFG
+  bh=BqF3ekoFBJIxN9w40qQQ+V8dAt8jGYkSVHl6tfrrPM8=;
+  b=PZIBoUWx8tKBpJo6Db7ogVzGyKQXaiWPfPx4drlZ3XhINTdw6q4sp10l
+   MqmLwd7dZfHrrRG0vMJWTDZGghmqlj+ycAnpM4cG2zLKj6N2bly4RoWfG
+   QEYblDLxyMNWJlYkpVjfY3bsytwnKyKodGrbmZPpE2n1qPAaK366KU/Gk
+   rbTTZsAUTIJuYLUNhtAwCClUGBjYF4TmmDZvFQVwsnkHPkHFOCObU3rK1
+   2f0C0KVL3MGoxigCXafgeOpMTbD+PYHarX+7/OdfVD2Xm+FWl1N8caKbU
+   nwuD+/XyyjC7DsH5alvFlTWOZtvmd+CPEp6phWI538bCxvr6r0IqRE/hK
    Q==;
-X-CSE-ConnectionGUID: wedFNbYZQCK0bYwPW1kT7Q==
-X-CSE-MsgGUID: PKx3Ma0aTDyZXD/obZL6rQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11787"; a="83701175"
+X-CSE-ConnectionGUID: TB2alXqGQYKEmwK6zeXQxQ==
+X-CSE-MsgGUID: DxUFIMdfQGKBpyOWN4xrbA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11787"; a="83701185"
 X-IronPort-AV: E=Sophos;i="6.23,236,1770624000"; 
-   d="scan'208";a="83701175"
+   d="scan'208";a="83701185"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
   by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2026 11:24:27 -0700
-X-CSE-ConnectionGUID: bwItMD6zThiGdtG3E0MpVA==
-X-CSE-MsgGUID: 5WLWAEk3T9GGBqs9YdWJdA==
+X-CSE-ConnectionGUID: Dn+j99agQsKV+sD6RlvQJQ==
+X-CSE-MsgGUID: +cH8+Y6nSxOn3cKL/ko18Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,236,1770624000"; 
-   d="scan'208";a="238647457"
+   d="scan'208";a="238647460"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa008.jf.intel.com with ESMTP; 15 May 2026 11:24:27 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -71,17 +71,16 @@ To: davem@davemloft.net,
 Cc: Kohei Enju <kohei@enjuk.jp>,
 	anthony.l.nguyen@intel.com,
 	dima.ruinskiy@intel.com,
-	chwee.lin.choong@intel.com,
 	faizal.abdul.rahim@linux.intel.com,
-	vladimir.oltean@nxp.com,
-	vinicius.gomes@intel.com,
-	horms@kernel.org,
+	chwee.lin.choong@intel.com,
 	kohei.enju@gmail.com,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	vladimir.oltean@nxp.com,
+	stable@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
 	Avigail Dahan <avigailx.dahan@intel.com>
-Subject: [PATCH net 08/10] igc: set tx buffer type for SMD frames
-Date: Fri, 15 May 2026 11:24:15 -0700
-Message-ID: <20260515182419.1597859-9-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 09/10] igc: fix potential skb leak in igc_fpe_xmit_smd_frame()
+Date: Fri, 15 May 2026 11:24:16 -0700
+Message-ID: <20260515182419.1597859-10-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260515182419.1597859-1-anthony.l.nguyen@intel.com>
 References: <20260515182419.1597859-1-anthony.l.nguyen@intel.com>
@@ -92,7 +91,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A6A515563E0
+X-Rspamd-Queue-Id: A57CB556492
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -105,10 +104,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[enjuk.jp,intel.com,linux.intel.com,nxp.com,kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[enjuk.jp,intel.com,linux.intel.com,gmail.com,nxp.com,vger.kernel.org,kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-288419-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288421-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -119,44 +118,64 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim,enjuk.jp:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,enjuk.jp:email,intel.com:email,intel.com:mid,intel.com:dkim]
 X-Rspamd-Action: no action
 
 From: Kohei Enju <kohei@enjuk.jp>
 
-Sashiko pointed out that igc_fpe_init_smd_frame() initializes
-igc_tx_buffer fields for an SMD skb, but does not set the buffer type:
-https://sashiko.dev/#/patchset/20260415025226.114115-1-kohei%40enjuk.jp
+When igc_fpe_init_tx_descriptor() fails, no one takes care of an
+allocated skb, leaking it. [1]
+Use dev_kfree_skb_any() on failure.
 
-Since igc_tx_buffer entries are reused, a stale XDP or XSK type can
-remain and make TX completion use the wrong cleanup path.
+Tested on an I226 adapter with the following command, while injecting
+faults in igc_fpe_init_tx_descriptor() to trigger the error path.
+ # ethtool --set-mm $DEV verify-enabled on tx-enabled on pmac-enabled on
 
-Set the buffer type to IGC_TX_BUFFER_TYPE_SKB.
+[1]
+unreferenced object 0xffff888113c6cdc0 (size 224):
+...
+  backtrace (crc be3d3fda):
+    kmem_cache_alloc_node_noprof+0x3b1/0x410
+    __alloc_skb+0xde/0x830
+    igc_fpe_xmit_smd_frame.isra.0+0xad/0x1b0
+    igc_fpe_send_mpacket+0x37/0x90
+    ethtool_mmsv_verify_timer+0x15e/0x300
 
+Cc: stable@vger.kernel.org
 Fixes: 5422570c0010 ("igc: add support for frame preemption verification")
 Signed-off-by: Kohei Enju <kohei@enjuk.jp>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_tsn.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/intel/igc/igc_tsn.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 8a110145bfee..725ba253165c 100644
+index 725ba253165c..52de2bcbadbe 100644
 --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
 +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -34,6 +34,7 @@ static int igc_fpe_init_smd_frame(struct igc_ring *ring,
- 		return -ENOMEM;
- 	}
+@@ -110,10 +110,16 @@ static int igc_fpe_xmit_smd_frame(struct igc_adapter *adapter,
+ 	__netif_tx_lock(nq, cpu);
  
-+	buffer->type = IGC_TX_BUFFER_TYPE_SKB;
- 	buffer->skb = skb;
- 	buffer->protocol = 0;
- 	buffer->bytecount = skb->len;
+ 	err = igc_fpe_init_tx_descriptor(ring, skb, type);
+-	igc_flush_tx_descriptors(ring);
++	if (err)
++		goto err_free_skb_any;
+ 
++	igc_flush_tx_descriptors(ring);
+ 	__netif_tx_unlock(nq);
++	return 0;
+ 
++err_free_skb_any:
++	__netif_tx_unlock(nq);
++	dev_kfree_skb_any(skb);
+ 	return err;
+ }
+ 
 -- 
 2.47.1
 
