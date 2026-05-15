@@ -1,286 +1,186 @@
-Return-Path: <netdev+bounces-288360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKG1MZNOB2rBxgIAu9opvQ
-	(envelope-from <netdev+bounces-288360-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:49:23 +0200
+	id oEMfKiZYB2pmzgIAu9opvQ
+	(envelope-from <netdev+bounces-288361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:30:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80AA8553F90
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 18:49:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA7A555208
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:30:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4ECC4334C810
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:21:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 857083364F33
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C16A3FBB7E;
-	Fri, 15 May 2026 16:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0953F6C56;
+	Fri, 15 May 2026 16:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VyQwKX3C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZsQkFL2X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC553FBB66
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 16:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1AB3E00A3
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 16:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778861920; cv=none; b=ZS04iVxJMrH1zRfqI3Qqgsmn7lpKtTPVDbot9BpqUNCfWJ9dgW+HSM91rT9uMa3TNNzyqexngpW0A3Qu9OXWVdfRrKbvsq7nl0NIy3cdU93fMfB0aePLZ2hiWMFBpj6nuCzhHcrY//Xj8OLRYg4QTkx84gHcAGKGfxMWgNmYSkQ=
+	t=1778862095; cv=none; b=rjQxdOs/EGJAYPsCwk10nxehX3IcOxqUL9USRTT/N5yjgvoAsjEVMrUHMaZb3M6A3dRSGd14FJi2qdZg0uacxqO7kZGGCsQkF2u2ZN4JdTCGAc4UHaHMO0AMAG++fa+WijtbhJHH9Qj5xH9Y24VSRFxunMrbJDASwc1lOdeAh90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778861920; c=relaxed/simple;
-	bh=7661PnX5ar30DmK9RYPqrmIl5SLmNk8IKrGpXiqOTtI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cDzeWKu2ZcZdqlCqyE64TE744yrNkwCgf1mjXuoMPlQza9eymuBAqnkHgoHWlpxw064dlMGQ2ka1ZiJw2UG1UYUabBKojQnlleZRkn7grFuS20Bhh+uxq5y4Trx2H3UXTsIrSp7S6X79g7szLIjv8X+Lj8YdupmO8UQNxwell7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VyQwKX3C; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43d7e23defbso5537970f8f.0
-        for <netdev@vger.kernel.org>; Fri, 15 May 2026 09:18:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778861917; x=1779466717; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tmR8La+e76BqsIVrUChJEpw5jXSOx7pQ44UqgPaW+Ic=;
-        b=VyQwKX3CQNpSyT6EhbDhowIWEHr8e4EdfEQerZaYvpUV3IS+fW5VR+JGZM2sqacvVU
-         FhSvm8hmlIY7M0xS4A68D8C6eVq7dUtkHRg0Iouv+nCR9HETYVkFwki00QZghC9vZOuM
-         4OVt4Zv4ad4H0TKUtCxe+McVWwB4sr4c6isaRv0bR1LCRS7eMx2jlpqWAaxAYUyoK6Gm
-         0WVgVLSxKQwfRRN/c+8qbWtuwLxwvqbf3IzY5KzbjR8/W37i4h1gYGhM6HWW1KCelyHb
-         QYKkZV2jT4zwwT51P4mlc/bvXeasRcASmJ6iE917bPmgiDoDv8fVP+CzP61kmh9sUgp4
-         6Y/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778861917; x=1779466717;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tmR8La+e76BqsIVrUChJEpw5jXSOx7pQ44UqgPaW+Ic=;
-        b=S33JGlF0gzqfo79ViXm65sybYXafe4Kbyv7d3pOUIzqz/MtRoXsWgSav+CV+xl+79y
-         P/1N7cHS1Vm0XTfJD1FWLJQkqLRx0SwKQtfwcztoN1zbavPVRD2NamR5/uLJvoI/w8CU
-         +W1lkf+Hh0oOvIrFxqqjIsuEaIre0IgNBqMDm7O29MrMszP0px1t9C+a72AtZYMH6QE7
-         qEGk/n/Miza2+UARKXMlpSv+GmDfjahnE16Xknv4S86awQ9SUpO4XTOrx9hMBqgPpTxN
-         ybKE9xvN2siE68WnmyLFWpAKVfVa5j1hvTBOUvNEisyPif4F481+LZewtZwjTFOeAUNf
-         ZDEw==
-X-Gm-Message-State: AOJu0YwanT982G5mr5itmsZ2X1S8oGSyzWrgMRD3GJmioCdfamA0CNkA
-	Mrft6/T5XU9CXJrZDxJp0nYZF6arGxlqaFhYxcCl1msx72jEA3cDbBymjsxqE2IM
-X-Gm-Gg: Acq92OGsoAW1pVWhS7kpOCw+vDyF4AGCTuSWJntYH0gAspXRc/VP92RzcFT3ISakjDU
-	wXCBhL0rShd6WKR5IKKDirmspgciW5Xn6ZIvkIyX/9RY+0KHSJml7puBheT6mujTNl8z01zIbYl
-	wCB6Pbq4ziDfvmQ0XB8GTgUWBIO9vA/FVxE7GbZ7PiE9rKej/OZVp3YwX6100XoTgag60Zu0xow
-	0LT6rGowC1yHaylylQGhpNnfm6jeOgzrhLua8ao7rvB9uNlKmteMPiEbI85D7IiyPPGZYNiZjsS
-	IvYuCXeFW0EZo0Sj+eFVDTlRXjRLD0PhNEc3KgSFsv+Cy+y79y5wupaUJpQqJOexqsgWq3m2Jtw
-	0SCM2PXDYHs8/kXDf1Zex9YwND9+MH8LC7Pb4skiIv7xXCiS0kpyT68ZCHCjODm86vRintW2cja
-	yDcUxLFGblRqexDAzqarF6ek0d7kxY+hBete6c5MvKzExPkqz0XfnnnqmPx8ap+zLmlA==
-X-Received: by 2002:a5d:5f90:0:b0:43d:300b:2285 with SMTP id ffacd0b85a97d-45e5c5be273mr6552925f8f.11.1778861916929;
-        Fri, 15 May 2026 09:18:36 -0700 (PDT)
-Received: from localhost.localdomain ([87.236.194.191])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9ec3b18fsm15063653f8f.11.2026.05.15.09.18.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 09:18:36 -0700 (PDT)
-From: Petr Wozniak <petr.wozniak@gmail.com>
-To: netdev@vger.kernel.org
-Cc: bjorn@mork.no,
-	andrew@lunn.ch,
-	linux-phy@lists.infradead.org,
-	Petr Wozniak <petr.wozniak@gmail.com>
-Subject: [PATCH] net: phy: sfp: probe for RollBall I2C-to-MDIO bridge in mdio-i2c
-Date: Fri, 15 May 2026 18:18:34 +0200
-Message-ID: <20260515161834.23628-1-petr.wozniak@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260515115527.17241-1-petr.wozniak@gmail.com>
-References: <20260515115527.17241-1-petr.wozniak@gmail.com>
+	s=arc-20240116; t=1778862095; c=relaxed/simple;
+	bh=VaLnYsZ5jUTj/7eXesrqYg9o6HiF7DOwNnzsogKf/3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q3mZbomunCu0zdYJvXAskC7ZGkGWKda/0Ptip3ot1aKPmyjHra/yy+Afva35IQXXTPPEWZt7WOtvemSzAdaUPA2S2h1Od209CuwOP5bIMYoBhozz/LSTY0nguZzrZIkS2WaEnqfwWVqZa9veOSzLbaHqd2Di7tZZST/7bSimORI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZsQkFL2X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78525C2BCB0;
+	Fri, 15 May 2026 16:21:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778862094;
+	bh=VaLnYsZ5jUTj/7eXesrqYg9o6HiF7DOwNnzsogKf/3U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZsQkFL2XrcdsPySWMm/2bZcc8c+jL+wlftQ4S+isnHHkNcTMgJqXUB0+undHXT111
+	 YwYkrxWp9OiUQHoMU0/QnqBAv2coM++RSk1/CB8zo4f89nhyQZc6kycKVtc2bXeh9I
+	 VdsDXWNSjvIdxlvMaVrRja5h82fjxyXLiBjp1h/q7emyQ0oG2wyDPcxLI8m2sOI2P0
+	 jwGjQT5bIkk8W4BBiRE6oXHPXo0brHu0al3R7mwshOTWVlEqsMFdNG7J5fcVj8gYcq
+	 wlsDG8/Nb4NYJ18YBPVY/3mx4TUWXVsV/IYxRo96yCdV8I7J5B7UFkk2HF0L6JTWAr
+	 KMCXQS3tuaYcA==
+Date: Fri, 15 May 2026 17:21:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+	"Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Subject: Re: [PATCH iwl-net v2] ice: support SBQ posted writes with
+ non-posted support for CGU
+Message-ID: <20260515162130.GA227382@horms.kernel.org>
+References: <20260508102247.826375-1-przemyslaw.korba@intel.com>
+ <20260512092740.290008-2-horms@kernel.org>
+ <PH0PR11MB4904E65A7FAA26DD5B6EFBE994072@PH0PR11MB4904.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 80AA8553F90
+In-Reply-To: <PH0PR11MB4904E65A7FAA26DD5B6EFBE994072@PH0PR11MB4904.namprd11.prod.outlook.com>
+X-Rspamd-Queue-Id: 1DA7A555208
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[mork.no,lunn.ch,lists.infradead.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288360-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288361-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url,horms.kernel.org:mid,osuosl.org:email]
 X-Rspamd-Action: no action
 
-The "OEM"/"SFP-10G-T" quirk entry in sfp_fixup_rollball_cc()
-unconditionally forces MDIO_I2C_ROLLBALL for all modules matching that
-vendor/part-number combination.  This works for modules that genuinely
-implement a RollBall I2C-to-MDIO bridge, but silently breaks modules
-that share the same EEPROM strings without having such a bridge.
+On Thu, May 14, 2026 at 11:58:20AM +0000, Korba, Przemyslaw wrote:
+> 
+> 
+> 
+> > -----Original Message-----
+> > From: Simon Horman <horms@kernel.org>
+> > Sent: Tuesday, May 12, 2026 11:28 AM
+> > To: Korba, Przemyslaw <przemyslaw.korba@intel.com>
+> > Cc: 'Simon Horman' <horms@kernel.org>; intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Nguyen, Anthony L
+> > <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Loktionov, Aleksandr <aleksandr.loktionov@intel.com>;
+> > Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>
+> > Subject: Re: [PATCH iwl-net v2] ice: support SBQ posted writes with non-posted support for CGU
+> > 
+> > From: 'Simon Horman' <horms@kernel.org>
+> > 
+> > This is an AI-generated review of your patch. The human sending this
+> > email has considered the AI review valid, or at least plausible.
+> > Full review at: https://sashiko.dev
+> > ---
+> > ice: support SBQ posted writes with non-posted support for CGU
+> > 
+> > This commit introduces non-posted SBQ writes while allowing posted writes
+> > to skip completion waits. It also adds an SBQ flush by reading address 0
+> > from PHY 0 before issuing a SYNC command to ensure writes are completed.
+> > 
+> > > diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+> > > index 24fb7a3e14d63..ec4c85ad12e4d 100644
+> > > --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+> > > +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+> > > @@ -352,6 +352,17 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
+> > >  static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
+> > >  {
+> > >  	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
+> > > +	struct ice_sbq_msg_input msg = {
+> > > +		.dest_dev = ice_sbq_dev_phy_0,
+> > > +		.opcode = ice_sbq_msg_rd,
+> > > +	};
+> > > +	int err;
+> > > +
+> > > +	if (hw->mac_type != ICE_MAC_E810) {
+> > > +		err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
+> > > +		if (err)
+> > > +			dev_warn(ice_hw_to_dev(hw), "Failed to flush SBQ: %d\n", err);
+> > > +	}
+> > 
+> > [ ... ]
+> > 
+> > > @@ -4469,15 +4482,15 @@ static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
+> > >   */
+> > >  static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
+> > >  {
+> > > -	struct ice_sbq_msg_input msg = {0};
+> > > +	struct ice_sbq_msg_input msg = {
+> > > +		.dest_dev = ice_sbq_dev_phy_0,
+> > > +		.opcode = ice_sbq_msg_wr_p,
+> > > +		.msg_addr_low = lower_16_bits(addr),
+> > > +		.msg_addr_high = upper_16_bits(addr),
+> > > +		.data = val
+> > > +	};
+> > 
+> > Since ice_write_phy_reg_e810() is updated to use the posted write opcode
+> > (ice_sbq_msg_wr_p), it will skip the completion wait and return immediately.
+> > 
+> > If the SBQ flush in ice_ptp_exec_tmr_cmd() explicitly skips E810 devices
+> > via the check for hw->mac_type != ICE_MAC_E810, does this leave E810 PHY
+> > writes entirely asynchronous and unguarded?
+> > 
+> > Could this lead to a race condition where the writes have not actually
+> > completed before the SYNC_EXEC_CMD is executed?
+> 
+> Hi, thanks for review! 
+> With E810 only opcode 0x01 for writing is supported.
+> On E810, the FW always sends completion responses for opcode 0x01, so the driver waits for each write to complete.
+> On newer E8XX devices, opcode 0x01 is truly posted (no completion response), which is why the SBQ flush is needed before SYNC_EXEC_CMD.
+> Since E810 writes are synchronous (driver waits for completion), flushing SBQ is unnecessary - all writes are already complete when the function returns.
+> I can add comments explaining that, or make it a bit clearer in the code if you'd like 😊
 
-The Realtek RTL8261BE-CG is one such module: a pure copper 10G SFP+
-media converter with no I2C-to-MDIO bridge.  Its EEPROM reports
-vendor="OEM", part="SFP-10G-T-I", and -- critically -- Vendor OUI
-00:00:00, making OUI-based differentiation impossible.  With
-MDIO_I2C_ROLLBALL the kernel stalls waiting for a PHY that never
-appears:
+Sorry, there was supposed to be some extra text along the lines of seeking
+clarification.
 
-  sfp sfp2: probing phy device through the [MDIO_I2C_ROLLBALL] protocol
-
-Move the probe into i2c_mii_init_rollball() in mdio-i2c.c, where the
-RollBall protocol constants are already defined.  After sending the
-unlock password, issue a CMD_READ and wait ~70 ms for CMD_DONE.  A
-genuine RollBall bridge asserts CMD_DONE within that window; modules
-without a bridge never do, so i2c_mii_init_rollball() returns -ENODEV.
-sfp_i2c_mdiobus_create() treats -ENODEV as no PHY and falls back to
-MDIO_I2C_NONE without creating an MDIO bus.
-
-Add "OEM"/"SFP-10G-T-I" to the quirk table so RTL8261BE modules enter
-the probe path; genuine RollBall modules continue to work as before.
-
-Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
----
-
-Changes since v1:
-  - Moved probe from sfp.c into i2c_mii_probe_rollball() in mdio-i2c.c;
-    all RollBall protocol logic now lives in one place.
-  - Removed duplicated #define constants from sfp.c.
-  - sfp_i2c_mdiobus_create() handles -ENODEV from mdio_i2c_alloc()
-    and falls back to MDIO_I2C_NONE instead of failing the module probe.
-  - OEM/SFP-10G-T-I uses sfp_fixup_rollball (no CC byte correction
-    needed for a media converter).
- drivers/net/mdio/mdio-i2c.c | 59 +++++++++++++++++++++++++++++++++----
- drivers/net/phy/sfp.c       |  8 ++++-
- 2 files changed, 60 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/mdio/mdio-i2c.c b/drivers/net/mdio/mdio-i2c.c
-index da2001e..1973fda 100644
---- a/drivers/net/mdio/mdio-i2c.c
-+++ b/drivers/net/mdio/mdio-i2c.c
-@@ -352,6 +352,52 @@ static int i2c_mii_write_rollball(struct mii_bus *bus, int phy_id, int devad,
- 	return 0;
- }
- 
-+/*
-+ * Probe for a RollBall I2C-to-MDIO bridge by issuing CMD_READ and waiting
-+ * ~70 ms for CMD_DONE.  Genuine RollBall bridges respond within that window.
-+ * Modules that share the same EEPROM vendor/part strings but have no bridge
-+ * (e.g. RTL8261BE pure copper media converter) never assert CMD_DONE, so
-+ * -ENODEV is returned for them.
-+ */
-+static int i2c_mii_probe_rollball(struct i2c_adapter *i2c)
-+{
-+	u8 data_buf[] = { ROLLBALL_DATA_ADDR, 0x01, 0x00, 0x00 };
-+	u8 cmd_buf[]  = { ROLLBALL_CMD_ADDR, ROLLBALL_CMD_READ };
-+	u8 cmd_addr   = ROLLBALL_CMD_ADDR, result;
-+	struct i2c_msg msgs[2];
-+	int ret;
-+
-+	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[0].flags = 0;
-+	msgs[0].len   = sizeof(data_buf);
-+	msgs[0].buf   = data_buf;
-+	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[1].flags = 0;
-+	msgs[1].len   = sizeof(cmd_buf);
-+	msgs[1].buf   = cmd_buf;
-+
-+	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-+	if (ret)
-+		return ret;
-+
-+	msleep(70);
-+
-+	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[0].flags = 0;
-+	msgs[0].len   = 1;
-+	msgs[0].buf   = &cmd_addr;
-+	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[1].flags = I2C_M_RD;
-+	msgs[1].len   = 1;
-+	msgs[1].buf   = &result;
-+
-+	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-+	if (ret)
-+		return ret;
-+
-+	return result == ROLLBALL_CMD_DONE ? 0 : -ENODEV;
-+}
-+
- static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
- {
- 	struct i2c_msg msg;
-@@ -372,10 +418,10 @@ static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
- 	ret = i2c_transfer(i2c, &msg, 1);
- 	if (ret < 0)
- 		return ret;
--	else if (ret != 1)
-+	if (ret != 1)
- 		return -EIO;
--	else
--		return 0;
-+
-+	return i2c_mii_probe_rollball(i2c);
- }
- 
- struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
-@@ -399,9 +445,10 @@ struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
- 	case MDIO_I2C_ROLLBALL:
- 		ret = i2c_mii_init_rollball(i2c);
- 		if (ret < 0) {
--			dev_err(parent,
--				"Cannot initialize RollBall MDIO I2C protocol: %d\n",
--				ret);
-+			if (ret != -ENODEV)
-+				dev_err(parent,
-+					"Cannot initialize RollBall MDIO I2C protocol: %d\n",
-+					ret);
- 			mdiobus_free(mii);
- 			return ERR_PTR(ret);
- 		}
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 218c775..ce745b6 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -599,7 +599,8 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	SFP_QUIRK_S("TP-LINK", "TL-SM410U", sfp_quirk_oem_2_5g),
- 
- 	SFP_QUIRK_F("ETU", "ESP-T5-R", sfp_fixup_rollball_cc),
--	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
-+	SFP_QUIRK_F("OEM", "SFP-10G-T-I", sfp_fixup_rollball),
-+	SFP_QUIRK_F("OEM", "SFP-10G-T",   sfp_fixup_rollball_cc),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
-@@ -802,6 +803,11 @@ static int sfp_i2c_mdiobus_create(struct sfp *sfp)
- 	int ret;
- 
- 	i2c_mii = mdio_i2c_alloc(sfp->dev, sfp->i2c, sfp->mdio_protocol);
-+	if (PTR_ERR_OR_ZERO(i2c_mii) == -ENODEV) {
-+		/* RollBall probe found no bridge: no PHY on this module */
-+		sfp->mdio_protocol = MDIO_I2C_NONE;
-+		return 0;
-+	}
- 	if (IS_ERR(i2c_mii))
- 		return PTR_ERR(i2c_mii);
- 
--- 
-2.51.0
-
+Yes, I think it would be good to add a comment or something to
+the commit message about this.
 
