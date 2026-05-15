@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-288265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288267-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MC3WCOXwBmp+pAIAu9opvQ
-	(envelope-from <netdev+bounces-288265-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:09:41 +0200
+	id kAhlEYjzBmohpQIAu9opvQ
+	(envelope-from <netdev+bounces-288267-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:20:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC37F54D10E
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:09:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C6D154D397
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F4B530ECA66
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:56:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C41331BA663
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E0044BC92;
-	Fri, 15 May 2026 09:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E8444CACB;
+	Fri, 15 May 2026 09:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="V01Z0WQM"
+	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="b/P/WA5h"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B3F449EC3
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 09:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0BA44A73E
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 09:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778838960; cv=none; b=LQh5qn+0lqroPgCMWVak8nZORD8J6lhDK+jrLi6zYPBsI1z/8NmdoNQdVRiCwh9Cs0V7oCicWSs3FKl3nUDOJR3uN6FWkdmCa6E+Qahl/9HCT4cGOdPjNncLvVM7nW4fmt4wZcUW7GnpJK8wj3DrzwMtA9oocNL0ixYGQih8Ycw=
+	t=1778838961; cv=none; b=Ut0rVOyxN1Cz8O3YVb5WOOu+E3c8VcGtfBEuBhSgaNQp5FCG2Pva8MpjLTKCn+06Rg+Pt7SZ51PV3oNxfvP6AwBwRiIPXlj70FrkPt0JvTtfBU1NWCGYT7vSjO7Wj88XeKEM+BbVgQGMIw6OcLmeDf10pJNpK0l2k5DXsfHBkEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778838960; c=relaxed/simple;
-	bh=0RJpjeXAAqwOp158cpiKzcEZ6wuDa5+Kv/77ZYm95f8=;
+	s=arc-20240116; t=1778838961; c=relaxed/simple;
+	bh=XCQRyRU02uiAirdw9ArZr9s5/BX3a14e6N07R5kjeIs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CxtvPkbS9GwnG0mdFrKzTo/u4Kon4zgzF0vZtLFeCO1pPwzAIOk2IYXZLPtTUk7M1PKzA8Cm1MQ+5zfNBC1Q4z33IMHlWRNZGJg1g0J5wtwskYxMEdaYSDiGTeZRY9X4G26fJfxrlu2zGXL6drAPM22S4jAwi83vV/YGNn8ZoVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=V01Z0WQM; arc=none smtp.client-ip=23.88.38.48
+	 MIME-Version; b=u8FWx9Z5IJFpRkLgG23jOFYvXkchaPz6E3T126RRF6ZJxNO+97Ra3oSNqpXjwt0DGw9Fbu6QaeSQiAyYwEbH/AtpILEvfjpn9yw8D5tdJmFgjTH/ybab4i473BGJbOOke+KgIlcC3XXVB7qR9MeR5KRlm/EZO469wAOHGBvBf74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=b/P/WA5h; arc=none smtp.client-ip=23.88.38.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1778838949;
+	s=09092022; t=1778838950;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5vHw8qJWEIvBilfY5fBWVPvS5Ezs8Kaj2eIYWlXyjaw=;
-	b=V01Z0WQMZR6jNOF1A9Ewe9eDDyqrr14hrivvqZKqu6LlMwhC3AqUmjHB2yXRGPanhotjCu
-	66pmmFGXzg7Q1neib2JTWsz46uVSquplZFvM/LRbD/U/T6z/ye0nzngtGhNFihKweDwgz6
-	KUK+GV6BM/cOhwWGpzjkztrar6Fih1PQsIzKYHO5+/M/LwBSsJyGQ4fuyTgrl4adKlQR//
-	bv74AxTINZYpEpNoyvQN/i9n2U2BcHJATyxEPv0W+/h3NHECCvijcTi3Xnu/vP74cYYX9l
-	FxJmBuaQ2zNuzO7ZN5ZWcQ/RvZ35ov+HBblssyE4/IJIEfogUwuAuds0wS1rNA==
+	bh=q/qkFKT8Qr7l15xFxytFFUVwsMDuYQMQoM7YNKCJOr8=;
+	b=b/P/WA5hCs7nMi+QKuSlg4ffP2GRtM0t+oyAbQe5gjVUvZk13tSXWlvxH7Gb1jAB7ng0WR
+	3reWJ8lkEZh893acthADvWJ2CHznddReHOcV03oCKCukXXRoDDZ7BQGTKNhjMQA4M6QFV0
+	k6SFjDpyL6lQXXPAlMGqKVpYDcS6Old9uHTp91v9t9JZX+ur9Sxdf8/JnHe9vmmso5317v
+	kPxFvSUAEPXCqWitibmzf0BCReeD8MLJACBfwwNuxF4r3fLbQhWBWBtuNjrM6dvrFFOcy+
+	hyS4FjywW7TthNZ1nn0mDiEdL4zklbpBAZfeJO/EsLQpMUiif67vbYq+aV4qrg==
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -57,9 +57,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Sven Eckelmann <sven@narfation.org>,
 	stable@kernel.org,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 03/14] batman-adv: tt: reject oversized local TVLV buffers
-Date: Fri, 15 May 2026 11:55:28 +0200
-Message-ID: <20260515095540.325586-4-sw@simonwunderlich.de>
+Subject: [PATCH net 04/14] batman-adv: tt: fix negative tt_buff_len
+Date: Fri, 15 May 2026 11:55:29 +0200
+Message-ID: <20260515095540.325586-5-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260515095540.325586-1-sw@simonwunderlich.de>
 References: <20260515095540.325586-1-sw@simonwunderlich.de>
@@ -70,7 +70,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AC37F54D10E
+X-Rspamd-Queue-Id: 9C6D154D397
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -78,16 +78,16 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
 	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288265-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288267-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
@@ -101,55 +101,40 @@ X-Rspamd-Action: no action
 
 From: Sven Eckelmann <sven@narfation.org>
 
-The commit 3a359bf5c61d ("batman-adv: reject oversized global TT response
-buffers") added a check to ensure that a global return buffer size can be
-stored in an u16. The same buffer handling also exists for the local data
-buffer but was not touched.
+batadv_orig_node::tt_buff_len was declared as s16, but the field is never
+intended to hold a negative value. When a value greater than 32767 is
+assigned, it wraps to a negative signed integer.
 
-A similar check should be also be in place for the local TVLV buffer. It
-doesn't have the similar attack surface because it is only generated from
-locally discovered MAC addresses but the dynamic nature could still cause
-temporarily to large buffers.
+In batadv_send_other_tt_response(), tt_buff_len is temporarily widened to
+s32. The incorrectly negative s16 value propagates into the s32, causing
+batadv_tt_prepare_tvlv_global_data() to allocate a full sized buffer but
+populates only a small portion of it with the collected changeset. All
+remaining bits are kept uninitialized.
+
+Using an u16 avoids this type confusion and ensures that no (negative) sign
+extension is performed in batadv_send_other_tt_response().
 
 Cc: stable@kernel.org
-Fixes: 7ea7b4a14275 ("batman-adv: make the TT CRC logic VLAN specific")
+Fixes: a73105b8d4c7 ("batman-adv: improved client announcement mechanism")
 Signed-off-by: Sven Eckelmann <sven@narfation.org>
 Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 ---
- net/batman-adv/translation-table.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ net/batman-adv/types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
-index 05cddcf994f65..06548dae1039d 100644
---- a/net/batman-adv/translation-table.c
-+++ b/net/batman-adv/translation-table.c
-@@ -877,12 +877,12 @@ batadv_tt_prepare_tvlv_local_data(struct batadv_priv *bat_priv,
- {
- 	struct batadv_tvlv_tt_vlan_data *tt_vlan;
- 	struct batadv_meshif_vlan *vlan;
-+	size_t change_offset;
- 	u16 num_vlan = 0;
- 	u16 vlan_entries = 0;
- 	u16 total_entries = 0;
- 	u16 tvlv_len;
- 	u8 *tt_change_ptr;
--	int change_offset;
+diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
+index b9c0b77791226..888f337a194bf 100644
+--- a/net/batman-adv/types.h
++++ b/net/batman-adv/types.h
+@@ -452,7 +452,7 @@ struct batadv_orig_node {
+ 	 * @tt_buff_len: length of the last tt changeset this node received
+ 	 *  from the orig node
+ 	 */
+-	s16 tt_buff_len;
++	u16 tt_buff_len;
  
- 	spin_lock_bh(&bat_priv->meshif_vlan_list_lock);
- 	hlist_for_each_entry(vlan, &bat_priv->meshif_vlan_list, list) {
-@@ -900,8 +900,10 @@ batadv_tt_prepare_tvlv_local_data(struct batadv_priv *bat_priv,
- 	if (*tt_len < 0)
- 		*tt_len = batadv_tt_len(total_entries);
- 
--	tvlv_len = *tt_len;
--	tvlv_len += change_offset;
-+	if (check_add_overflow(*tt_len, change_offset, &tvlv_len)) {
-+		tvlv_len = 0;
-+		goto out;
-+	}
- 
- 	*tt_data = kmalloc(tvlv_len, GFP_ATOMIC);
- 	if (!*tt_data) {
+ 	/** @tt_buff_lock: lock that protects tt_buff and tt_buff_len */
+ 	spinlock_t tt_buff_lock;
 -- 
 2.47.3
 
