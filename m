@@ -1,218 +1,277 @@
-Return-Path: <netdev+bounces-288381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288382-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cF36BfhbB2oO0QIAu9opvQ
-	(envelope-from <netdev+bounces-288381-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:46:32 +0200
+	id aG8vKylSB2qnyQIAu9opvQ
+	(envelope-from <netdev+bounces-288382-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:04:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8F3E555888
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:46:31 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5C76554652
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 19:04:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C38330E5CD6
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:44:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BEB513055856
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 16:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F31C33A9F5;
-	Fri, 15 May 2026 16:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D54F4C040D;
+	Fri, 15 May 2026 16:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b="VagrKD3K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5rx6qwb"
 X-Original-To: netdev@vger.kernel.org
-Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.151.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324F9318EDA
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 16:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.151.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0A34C6EF9
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 16:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778863466; cv=none; b=iT9FF5Fp+0AmsAhm/3GBC/bsbXWdzhRR4c/3wBcLxS4LfYBp1Qa8QnpohuAOKZU5AwwhC7OiPcebcuRQwzozX/zvUBBv5TTX9P2n5kWi8BS+7UgDEYcAyLOMCpBgIQcklVJuNzylEqqTHjVwS2K/57P525uBHXUxFffEQNSgX4g=
+	t=1778863974; cv=none; b=WFPp//kDB3KyPnY3hq6GBzW2Ol/mMJ9BkdQvJNzgC1L7DIAbS2ZymRZ7oTCeIWmDXU8LTAh7AF3xiVhtDA3YBE7RmLMIEAfj43xPjJrgbJkPdPIpPlkjibRSeii+4UpZTJ5+gdzf1FJoS1ZRoBHjzzEWj5zD06KzxyVtuhHBky0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778863466; c=relaxed/simple;
-	bh=nTA4w9903T4QV1b2oITcgF93kRRuEVxuKsctIgyhtg8=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=MVPk8E7rNv/cPdkPfiPs52vkepbtKbc3diLalbrtn8vWzeViX677ZAmc1sbplwISUSIGE7IODNnu3P/Z4UOWxoYI3Ods0sxF4oVfySpTX6exVROHL8UmxwRBKRYIjh7cHEtEQBhKSvLoiLevn05f0vKnkZjrL8sWXKwEtJOZi+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=VagrKD3K; arc=none smtp.client-ip=170.10.151.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onsemi.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
-	s=mimecast20250127; t=1778863459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nTA4w9903T4QV1b2oITcgF93kRRuEVxuKsctIgyhtg8=;
-	b=VagrKD3KlMzgX6ONDlfvGiQVYB4SAoQkhyOG1SZMRZGm7fUcy2yuoUR6gDnSa40PxGidsY
-	Av5tato5dj1Qq0lrsvYk0HOi2tzPUKQT3r5NHgonL3xkzGGeaA4nquMpG1/VEjXzLZwGXl
-	kvwY3Thag0B1uIF/rzxGAEAKAzvENIDEsFqWgpewcJLIQH6QysjcA8NEZcqj6W7xiJ6iaH
-	u+dRalVk1PzUV0LRyyQNUshTjZJymLOwYZYSnzADrrlPVV3HRwHqTLkf/itSsRK0oDE+b1
-	Busseo+01yGpnbax6KMe2cI2KDW7FpRlmkYAYdcHa9BopPUAi5dAew+zHhWmNA==
-Received: from BL0PR03CU003.outbound.protection.outlook.com
- (mail-eastusazon11012065.outbound.protection.outlook.com [52.101.53.65]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id usb-mta-59-xoZIy9a5OaWNRsiePGCeeQ-2; Fri,
- 15 May 2026 09:44:15 -0700
-X-MC-Unique: xoZIy9a5OaWNRsiePGCeeQ-2
-X-Mimecast-MFC-AGG-ID: xoZIy9a5OaWNRsiePGCeeQ_1778863451
-Received: from CY8PR02MB9249.namprd02.prod.outlook.com (2603:10b6:930:9c::17)
- by SA1PR02MB8349.namprd02.prod.outlook.com (2603:10b6:806:1f6::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.19; Fri, 15 May
- 2026 16:44:08 +0000
-Received: from CY8PR02MB9249.namprd02.prod.outlook.com
- ([fe80::e437:4ba8:6506:4cda]) by CY8PR02MB9249.namprd02.prod.outlook.com
- ([fe80::e437:4ba8:6506:4cda%3]) with mapi id 15.20.9913.009; Fri, 15 May 2026
- 16:44:08 +0000
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-	"parthiban.veerasooran@microchip.com" <parthiban.veerasooran@microchip.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net 2/2] dt-bindings: net: updated interrupt type to be
- active low, level triggered
-Thread-Topic: [PATCH net 2/2] dt-bindings: net: updated interrupt type to be
- active low, level triggered
-Thread-Index: AdzkhZbrD+M8KZwKQJ6/PvOKyavj8wAAIF0AAACm2bA=
-Date: Fri, 15 May 2026 16:44:08 +0000
-Message-ID: <CY8PR02MB9249EC5981F40410B056D7FE83042@CY8PR02MB9249.namprd02.prod.outlook.com>
-References: <CY8PR02MB924916514D414B698DEB9A1883042@CY8PR02MB9249.namprd02.prod.outlook.com>
- <ab821805-49dd-4b55-a77d-0f25e0247bff@kernel.org>
-In-Reply-To: <ab821805-49dd-4b55-a77d-0f25e0247bff@kernel.org>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR02MB9249:EE_|SA1PR02MB8349:EE_
-x-ms-office365-filtering-correlation-id: 71ae9901-ef1e-415a-3d5a-08deb2a12f38
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700021|921020|4143699003|11063799003|18002099003|56012099003|22082099003
-x-microsoft-antispam-message-info: 6L7zrkv8Ao0cg21NLVDxFGxgfWFwHJDO8thThOOUtT2ouG/dfogvpLIEqX4btf9T/Q2TLKdG0pQPnGNVXxjjVWTGNYhBPcIa69H1p3stVO6f+ZQq9U/eix9+bvuAKpBudVPdsJiDITfgIqC/HAN0+SQrxKvSMC/YIDXC01QKxPp02w2XjOSBuTDBB5lylr868/Aq0m5ss/Si5eBBSWAA7y7uaHhFtkCfBQwKatvAcZZjpbsHMgtT/3OwVjEpOu0bXFPJpCwnf8wytjcd57b7iqNzp3lYIx1eHTaTB7jiN8UWlYepAs2/RauwXvZl6UfZUSemu93wQ9xKaNaNNEd9GoUrWawN0l09LVOU3zFj3k1l4JdrXdTA30QZER3zMFuWfcTADBdAf3YV5BnhSqzngKmejjdEYmgP/WAhhDPJ5n3GABVFo8/hXveRM7CpcWIPq0+dIQ3X8ewDJPTrqAvAYUzViAyicQXUo3oY2Sp1v3xtuY2bmmpfZlGTAjLw49skNa4BIusyy73/d5cG+3Tb7brxMYBHzIvolqtZl6XiDr0EVthUnkEN3WGX2PEdKEVxpZdM6ZpoUwnMcY23NY+vsfQ3AwyEG0KKSgVzYFBYl6kJq+UH1V75/v8DnOky86jgdDIUFieF1/GE2pLJczGVkb7ZxWycTWN26ul6BnoQa+NNziD/QriGZUVwfwdwz3/Ysk0lkI0GJTFHyKTBL5HXmkjhiJpy9qg6gOJAJu/ElLdP3RHNkJWoipy9/UCXVfqEYclgegAff/jo88rTpYRR6w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700021)(921020)(4143699003)(11063799003)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UENMT1haOVZvRmI1WWVUWS9Ja1A0eVk3RHRtTWEvQnpNT0F1dTdncklPVTRy?=
- =?utf-8?B?NXhrS3dZeVVzbHl2Mys2Q3JpL3Ewa2dXNW1DN0xXeGEzWUM4QzJQSkVNSTNw?=
- =?utf-8?B?anh1VExuaSs5Z1poKzZ3VUFBaUFFakFqYVNCL3lyTzVCSFhBZFdNTmloR2VX?=
- =?utf-8?B?YnBRaDZHNlcvaGtWaVRsNjFoREFMVmpCY1BKRk9LWC9RZ3NTYkNkSUFBTmZ2?=
- =?utf-8?B?YlcrTHZUVGF2R3dMeGxpNWpiQzFpamxyU1pWS0JrcEMxMWp5ZG10cGMrUTdu?=
- =?utf-8?B?WnpHWkViQytFL0VEMjV3RFZkcW5mMFp5Uk1rRVpkbU5jUXp1QWtBRTg2Wi83?=
- =?utf-8?B?d2pxQjZmMUJ2WG9NQS9KamkrSXFmRm9SeEFiY0svVlh4cUFHS21qR0prTGNJ?=
- =?utf-8?B?RG5jU2NFazVUb1Npeks0RUxJbXpoWXpRNFFHQUVxZXcwdG9IMmhlMHV2elBH?=
- =?utf-8?B?ckFaRzloRWhBeWkrSlVqTk1yRUN4WnhlNVZ3MjBJSkFWUlIwR3VuU3F5QTYv?=
- =?utf-8?B?ekxGOTFhQVlVNVZsWGI5RUFzRDYzNDd4Q0t1RmZLNlgvMXJWZzBJWUU1VVhX?=
- =?utf-8?B?NFJHYWZoWkplRDY2clpBYmdIN3BReG00STJxdWROQ3E2SGpXeExZVzFlK2x6?=
- =?utf-8?B?QnJ3TGlxZkx4dVVSUTU3bFFnZmllNm9hdnppOE1lYzBHUTA3N001R3RSNmh4?=
- =?utf-8?B?cTc4bVJJVXgyWFpycEhPdndBU1BhNmJoUHp3WFB4VUNwb0F3ZFFST050bEtz?=
- =?utf-8?B?Y0p4UUJvNE5uZmJoUG9wd0w1czA1T1l6QW9ZdmNJNEVsa2ZBeDlkUVUzOG1q?=
- =?utf-8?B?LzFpOWpmK0hOZ0xsVXFuWHVNOE5MMzN5ZVVlUVlPNlFERWhNdFE5MmF5eVFF?=
- =?utf-8?B?ZjdCbHpOcjhQQTdyUW5kakRkT25US0lxZFVJdGtxSzFpYlhKK0tGa1Z1b2hV?=
- =?utf-8?B?cjZmV3RwZUtuenorQjRMYlhvcFJvZDQwRVl6cjdkaVdKQmhpbnpSOFZuL3Jw?=
- =?utf-8?B?dnlPMXBrMkRSNWRSWUl0UlBldlFBbUpoUVdhSTAra2c5K3FDOW9UNHNqSFNj?=
- =?utf-8?B?UWh1bnh1TjRnbGJ0VWttQTAxcmJEamJ0Y1lnRmxFQnZZQ1pRR0p5amdvc0lB?=
- =?utf-8?B?by9HbE1ZQmJiMU9INkhOeTlNT210THdjN0JOdXFBUXlHY0Mxc2hGcC81WXFV?=
- =?utf-8?B?WlA3VDhBd1BxdS9mbkprTDcwUEErdEE1ejZVSXY2ZnhYMWt3cFk3UDI2YldD?=
- =?utf-8?B?bXIzSUFyczJFc0hOby9ZR0NNb1N4aUZGYksydGtRbkNBUXp3RTVBZ3l6YVd2?=
- =?utf-8?B?eFN1Qjg0TU9XWEpYdTlTNTlrc0FkK0FuL3R4dXIwK081NlZGYlVRYmNQVStu?=
- =?utf-8?B?cUQ5UVF2S2ZZQU5OeHVLTTlKSVI5b095amcxUFNXWXZYcjdXNFBQSjhHQThD?=
- =?utf-8?B?d25iTVJ1bzcwWmRKWk9DZXBLMW9naTZRNm96V0d5UDBqcmxqL1ZxYVJ2VEpx?=
- =?utf-8?B?b08wUTZMWEZDcklTdG8vZTJKS0JoTHNTamRCbTY3azJyV1lBNWdxSmVITHZG?=
- =?utf-8?B?MytwTTRYR05ncE9GY1dMWXcwTHE1VnJUTHNWT1lqNGRJUUl0UHNwVkMyRDJo?=
- =?utf-8?B?SGhnVGQzcGxnSDFkUHZZTzFxcFpWS3NqUFIvVjFoMUVLaXErVHhNUHd0dHNz?=
- =?utf-8?B?SGI1NWIwUDFIL2ZDMU1sUkZTMitjNnFvQVR3dUcvS1U3YTY2NUhmdGVvRURZ?=
- =?utf-8?B?Z1htTWV6WER3VzVRQ2lzRUxUaGJxam8vUGJoWEFPN1o4aXRneUwrMmR1RDcx?=
- =?utf-8?B?TXl1QnpyNW5RUi9KSm1FY2NQVCtnVjRrY1RQdHRwaDZVZzRIRjhURmVpUi92?=
- =?utf-8?B?TU1KbXhXOHBIQThZVzhPajg3dUhwejhHM2cvaXc1czdrSElBakM2VDl2WEJE?=
- =?utf-8?B?Yld1TDE1SlY2ZHlKNmlzcE9CbjMxNFNYbk1XUnpFcWlCd2wzekhjTkpCdTN5?=
- =?utf-8?B?V0JVMHBUVDJSa3pkVk4ybUlDY1N2SGltNWU4L0ltdnMwazFjU09NOEVNZ3Z6?=
- =?utf-8?B?ODdaelllTWhRbW1DaERGRjlXYThmbC9kSnNDa0dpZStGQ2tlc3lTbG1INDh5?=
- =?utf-8?B?MHF6UXVNUm53MVVwT2JXZjZjVjZLWTlzNjkxcHJ2b1duMFNOTkExRTB1Tmdj?=
- =?utf-8?B?UkZOYnpPb0Qyajh0UWV5ZE8wT3lQRXNzQ3NFd0QrSUhLTFByeCtWckpNc2lz?=
- =?utf-8?B?cTE2ZVRmakdJREhPNGk5L205ZXhjeHZHcmlLUTV2T09DWWQ3UmFFL2tpK3Q5?=
- =?utf-8?B?NnVwNjRQcTZHLzc2QThVN2paTEZaWkRKQzNMdCtPckhPS25FYTV5MDBYcms0?=
- =?utf-8?Q?OEa52OBx88qicYT4=3D?=
+	s=arc-20240116; t=1778863974; c=relaxed/simple;
+	bh=jqy6pie5NKXVd5lptsDRlT9orMAig9Xp/4v49EmxTXs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uOj8fDD9j3ykvWqQvk5eoVQMZffzurdgK6tU8wIkioXdVo99f/7TiNBwJVMO3GJlLrztrCmaweqPFNeeGvH+wX3qqROntMmLlwyoYr1UyqXcmxZatXLyOcWIrssWcGHbQZXEiYS2PYguJ7yCC2+hqGMfztCPR3gkBf6yI1BNCPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D5rx6qwb; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8379e010b01so15362b3a.1
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 09:52:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778863972; x=1779468772; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YEaTPZsnfnlCqQjTdEY5h+UhTgui6HNvvTL5mus4tlk=;
+        b=D5rx6qwbyGd+Od+A/n3rbVVHyj8d9Qt8JsPs8r/rKcnVtU6G+7/R0JAa20m6CkQ6nn
+         0jqNxpBZtK2rJ31MwTP/ytzj8EuZtrVBWkofe335zA7UN1ZoONylFFs9ax+p3P8gFUEG
+         y351laZBJjPXdQGYQ3ZgYPVxGDYyJgeL6CIa9WdQzi3ZXa8fcCm+lzOTRDUlkcMAEwK+
+         JmfRFi+cAm+YbwkPTaEr+ihzM9JWsj70km7/XoKKhXCrQJ4vkKrcEc+rri4vS7LlbJXP
+         bFI4gNTUIanh5mxMle3ljaTkMDpL/jdyGi5pvnecOz6iTvWLI8bA6g8QJIHerCt+KIaK
+         FExQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778863972; x=1779468772;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YEaTPZsnfnlCqQjTdEY5h+UhTgui6HNvvTL5mus4tlk=;
+        b=lX8F1WW7qNoJnUS51tkHDlzg3XH+lV8wdbN7Lui4Z65j1HFCgVBpVGVxNmq20ynYXY
+         j0EsqT6qRj6lOJfHVWYJIanHhD6Cr3DkNz/NKqVAJt1lSzCh8y+OPGi/qJYjJrmCu1Iv
+         oTQc1CTaQa+tPOslX8aqfxh4K2di3x9F1dWK0J6CerzdVTBTjK9p0EArsFG9jfu6UyDv
+         PEpaASPPExMvgfdkIAMkkEtPSBiZMZAFiKK+rPU/mQkSg7jDcyXNWH1G3XkXmpgxF05H
+         B+3ENTGFyDTcQQrR0svlSUyqsP6Nbnr3HRw9i2a2ioFU9hu9xWc3m8W/u49LiFwEFJhr
+         MtXQ==
+X-Gm-Message-State: AOJu0YwexWNaapZou5xT0XkP9TvIssWlNhH2R7CXxwMH7l4yYZnanIRQ
+	DR8Ju4ywA7skREoJ3LVXnc5b42bTAz5nW1X/IlvQ03bF9aYm++PEOeiJH79NlA==
+X-Gm-Gg: Acq92OGVXd1g7wlxsrMcnIZSdLZ/vLmPTLeETMfLagEHzrspuYiFJXV2opdu9Xlx4Qd
+	YIvfjHS9sI15v77olypN3RX6rbYOJk8YaWlMzjg3jOZV9v83zJxkxz3ehKGZ1UwK8MVZI3BlskP
+	YKmqXe+dH5LYrUWNV0bjlQY2Dfi5LLACbTWh/+AbA3zPzcVH/ee+eDvz4zooCEM8iMqCb7GVqFk
+	hoH4K7/CUTgDE4Q9iEDxes5p1bSuW0H4CWDbFIGpMDRsfyyI3yM/rC0K88oZgui+fsMmONvkolH
+	Fa6egeZr/glt1ONRN+GAMTR5wY/cDVGAxomA4MGB4N3rZazkKl7noQAI7WRpTmt8l1wGHKr0Cq3
+	7o9vLrgh+gpz/WnNygIf2crPqO75hDoK++s0Gi/0XATgIRnltoqsW/KcdTQ9fUzCLzBGqQ72CiP
+	KYP8zh29fEYsLOFhMYwv0wRqOXL/0N9uELKCISNWbOzokyUj8wEWB7pSjDIyZC8r0e7TmivI0Ct
+	Hynf63GZ+fMX8911F2gTxfO9isqlW+lMaETFxwScbP3/dYPZZZP6jUic5cHkbBhLA2mQWnzIf3P
+	VmeSqAXhNKQBXA==
+X-Received: by 2002:a05:6a00:39a8:b0:82f:7252:38cf with SMTP id d2e1a72fcca58-83f33cc34bcmr5166201b3a.16.1778863972003;
+        Fri, 15 May 2026 09:52:52 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-83f19c78844sm6087063b3a.47.2026.05.15.09.52.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 09:52:51 -0700 (PDT)
+Message-ID: <922f2ade4ee5f10e5645e3b1a194d024b88f0d76.camel@gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] net: pcs: xpcs: Add hooks for xpcs
+ configuration of rsfec
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: mike.marciniszyn@gmail.com, Alexander Duyck <alexanderduyck@fb.com>, 
+ Jakub Kicinski	 <kuba@kernel.org>, kernel-team@meta.com, Andrew Lunn
+ <andrew+netdev@lunn.ch>,  "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Kees
+ Cook <kees@kernel.org>,  Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Fri, 15 May 2026 09:52:49 -0700
+In-Reply-To: <20260511182604.1338-2-mike.marciniszyn@gmail.com>
+References: <20260511182604.1338-1-mike.marciniszyn@gmail.com>
+	 <20260511182604.1338-2-mike.marciniszyn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: xpVDtXLMWmcxjRHr2R0XYmW1vbq5Saz2iGVjQkzskgOoCEcR44IsvPSRJ40lspob2JiLA8si/riC2NxjgL+nJqxlTQ4RfUPDRobFcPFdpEWl0skRJaAaBsmsX8bEi8KhjtpXtaXE6A1bS3yfd//nItvdaDxzXLXsPSVkDqjxZH2FoBNLGvmLKr3653mza+1e/htpHQWNwNZUB3IazgROD0z6+g1iI3TmLQ0L0K70e75ZNOs6Sp9FEe4MXEIk2Rso62bjYdHrU2peavr0Tmxb5veF29XucUImW2ECorkG+YD/TYLaNX5HoIewDL8fmrm8yEoMi1iW8kjVS6BUcY5lbQ==
-X-OriginatorOrg: onsemi.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9249.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71ae9901-ef1e-415a-3d5a-08deb2a12f38
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2026 16:44:08.4409
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BRNU07iOlOKNM7+mjCFyozQLf/pIAw1ave9drOiGclcGyGFtbzgXA01tGOqPjYRu4yUYgA/MSM49ZcX71BCC/GBrpzzroP+53KvlxK4q2Bk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR02MB8349
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: TNPFSirNkNH-lXltGzgwGzRB3nQtfXkS3zZx7tMj3tg_1778863451
-X-Mimecast-Originator: onsemi.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Rspamd-Queue-Id: A8F3E555888
+X-Rspamd-Queue-Id: B5C76554652
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.44 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
-	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288381-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288382-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[onsemi.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-0.963];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[CY8PR02MB9249.namprd02.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,onsemi.com:dkim]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fb.com:email]
 X-Rspamd-Action: no action
 
-PiANCj4gDQo+IFRoaXMgTWVzc2FnZSBJcyBGcm9tIGFuIEV4dGVybmFsIFNlbmRlcg0KPiBUaGlz
-IG1lc3NhZ2UgY2FtZSBmcm9tIG91dHNpZGUgeW91ciBvcmdhbml6YXRpb24uDQo+IA0KPiBPbiAx
-NS8wNS8yMDI2IDE4OjEzLCBTZWx2YW1hbmkgUmFqYWdvcGFsIHdyb3RlOg0KPiA+IEFjY29yZGlu
-ZyB0byBPUEVOIEFsbGlhbmNlIDEwQkFTRS1UMXggTUFDUEhZIFNlcmlhbCBJbnRlcmZhY2UgKFRD
-NikNCj4gPiBzcGVjaWZpY2F0aW9uLCBpbnRlcnJ1cHQgdHlwZSBpcyBhY3RpdmUgbG93LCBsZXZl
-bCB0cmlnZ2VyZWQgaW50ZXJydXB0Lg0KPiA+DQo+ID4gRml4ZXM6IGFjNDliOTUwYmVhOSAoImR0
-LWJpbmRpbmdzOiBuZXQ6IGFkZCBNaWNyb2NoaXAncyBMQU44NjVYIDEwQkFTRS1UMVMNCj4gTUFD
-UEhZIikNCj4gDQo+IERyb3AsIHRoZXJlIGlzIG5vIGJ1ZyBoZXJlLiBUaGF0IGlzIG9ubHkgYW4g
-ZXhhbXBsZS4gT3RoZXJ3aXNlIGV4cGxhaW4NCj4gaG93IGRvZXMgdGhpcyBidWcgYWZmZWN0IGFu
-eXRoaW5nLg0KDQpDb3VwbGUgb2YgcmVhc29uczoNCjEpIEFncmVlLiBUaGlzIGlzIGp1c3QgYW4g
-ZXhhbXBsZS4gVGhlIHJlYXNvbiBJIGNoYW5nZWQgdGhlIFlBTUwgZmlsZSBpcywgZHVlIHRvIHRo
-ZSBjaGFuZ2UgaW4gY29ycmVzcG9uZGluZyB0aGUgc291cmNlIGNvZGUgY2hhbmdlIHBhdGNoIDEv
-Mi4gSSB0aG91Z2h0IHRoaXMgZW50cnkgc2hvdWxkIG1hdGNoIHdpdGggd2hhdCBpcyB1c2VkIGlu
-IHRoZSBzb3VyY2UgY29kZS4NCjIpIFdlIGhhdmUgb3VyIG93biBUQzYgY29tcGxpYW50IGRyaXZl
-ciB0aGF0IGlzIHVuZGVyIHJldmlldyBuZXQtbmV4dCByZXBvIHRoYXQgaXMgZ29pbmcgdG8gaGF2
-ZSB0aGVzZSBjaGFuZ2VzLiBXZSB3ZXJlIHRvbGQgdG8gc3VibWl0IHRoZSBmaXhlcyAoc3BlY2lm
-aWNhbGx5IHBhdGNoIDEvMikgdG8gdGhlIGV4aXN0aW5nIGNvZGUgaW4gbmV0IHJlcG8sIG5vdCBu
-ZXQtbmV4dCByZXBvLg0KDQo+IA0KPiBBbHNvLCBkaWQgeW91IGNvbnNpZGVyIHRoZSBib2FyZCBs
-YXlvdXQ/DQoNCkkgYmVsaWV2ZSBzdGFuZGFyZCAoT1BFTiBBbGxpYW5jZSkgY2FsbHMgZm9yIGFj
-dGl2ZSBsb3csIGxldmVsIHRyaWdnZXJlZCBpbnRlcnJ1cHQuIFRoYXQgaXMgdGhlIHJlYXNvbiBm
-b3IgdGhlc2UgdHdvIHBhdGNoZXMuIA0KQlRXLCBKdXN0IHNhdyBBbmRyZXcncyByZXNwb25zZSBv
-biB0aGlzLg0KDQo+IA0KPiBCZXN0IHJlZ2FyZHMsDQo+IEtyenlzenRvZg0KDQo=
+On Mon, 2026-05-11 at 14:26 -0400, mike.marciniszyn@gmail.com wrote:
+> From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+>=20
+> The DW PCS IP data sheet calls out the need to populate
+> these vendor registers when operating at speeds above 10Gbps.
+> This change enables the correct FEC settings to enable RS-FEC
+> encoding on the link which is the standard used for most links
+> at these higher speeds.
+>=20
+> Note that the overwriting of the MDIO_PMA_RSFEC_CTRL register
+> is intentional and consistent DW PCS IP requirements.
+>=20
+> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+> Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
+> ---
+> v2:
+>   - Allow mdiobus probing for addr 0 and addr 1
+>   - Add xpcs_find* helpers based on phy_find* to avoid hardcoded addresse=
+s
+>   - Remove xpcs_bus write and use mdiodev_c45_write instead
+>   - Address comment on use of MDIO_PMA_RSFEC_CTRL
+> v1: https://lore.kernel.org/all/20260506190904.4029-2-mike.marciniszyn@gm=
+ail.com/
+>=20
+>  drivers/net/ethernet/meta/fbnic/fbnmdiodev_c45_writeic_mdio.c |   3 +-
+>  drivers/net/pcs/pcs-xpcs.c                   | 105 +++++++++++++++++++
+>  drivers/net/pcs/pcs-xpcs.h                   |   6 ++
+>  include/uapi/linux/mdio.h                    |   3 +
+>  4 files changed, 115 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c b/drivers/net/e=
+thernet/meta/fbnic/fbnic_mdio.c
+> index fe3a4ce88413..e29534dd1e0c 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+> @@ -263,8 +263,7 @@ int fbnic_mdiobus_create(struct fbnic_dev *fbd)
+>  	bus->read_c45 =3D &fbnic_mdio_read_c45;
+>  	bus->write_c45 =3D &fbnic_mdio_write_c45;
+> =20
+> -	/* Disable PHY auto probing. We will add PCS manually */
+> -	bus->phy_mask =3D ~0;
+> +	bus->phy_mask =3D GENMASK(31, 2);
+> =20
+>  	bus->parent =3D fbd->dev;
+>  	bus->priv =3D fbd;
 
+Why are you messing with the PHY autoprobing mask? That doesn't make
+sense to add to this patch. The side effect is that it is going to
+expose a phydev that won't be used as we access the PMD direcly.
+
+[...]
+
+> +static struct mdio_device *xpcs_find_first_mdev(struct dw_xpcs *xpcs)
+> +{
+> +	struct phy_device *p =3D phy_find_first(xpcs->mdiodev->bus);
+> +
+> +	if (!p)
+> +		return NULL;
+> +	return &p->mdio;
+> +}
+> +
+> +static struct mdio_device *
+> +xpcs_find_next_mdev(struct dw_xpcs *xpcs, struct mdio_device *mdev)
+> +{
+> +	struct phy_device *p =3D container_of(mdev, struct phy_device, mdio), *=
+n;
+> +
+> +	n =3D phy_find_next(xpcs->mdiodev->bus, p);
+> +	if (!n)
+> +		return NULL;
+> +	return &n->mdio;
+> +}
+> +
+
+Okay, the use of these functions explains the issue. You shouldn't be
+using phy_find_next. You know the bus will be located on mdio.addr + 1.
+You should not need to have a phy_device assigned for each of the PMA
+devices.
+
+The general idea is you have mdio_devices you shouldn't be trying to
+use the phy_device functions in the PCS driver.
+
+> +static int
+> +xpcs_config_rsfec_pma(struct dw_xpcs *xpcs, const struct pma_pcs_values =
+*v)
+> +{
+> +	struct mdio_device *mdev;
+> +	int ret =3D 0, i, pma_mmd;
+> +
+> +	pma_mmd =3D xpcs_get_pma_mmd(xpcs);
+> +	if (pma_mmd < 1)
+> +		return pma_mmd;
+> +
+> +	mdev =3D xpcs_find_first_mdev(xpcs);
+> +	if (!mdev)
+> +		return -ENODEV;
+> +
+
+There shouldn't be any need for a special for this. You already have
+the capabilities to write to the devices you need to write to.
+
+The only things you need to change would be to access the nearest PMA
+to the PCS as that is the one that holds the RSFEC configuration. For
+that you just need to know what devices are already enabled and you can
+access them.
+
+> +	for (i =3D 0; mdev && ret >=3D 0 && i < v->lanes;
+> +	     i++, mdev =3D xpcs_find_next_mdev(xpcs, mdev)) {
+> +		ret =3D mdiodev_c45_write(mdev, pma_mmd, MDIO_PMA_RSFEC_CTRL,
+> +					v->rsfec_ctrl);
+> +	}
+
+You don't need this "find next" logic. It is just the device on the
+adjacent bus. Also I am not sure we even need the loop logic since
+there are only 2 devices you have to configure as currently only 2
+lanes are supported.
+
+[...]
+
+> diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
+> index b2541c948fc1..5219c877b2cf 100644
+> --- a/include/uapi/linux/mdio.h
+> +++ b/include/uapi/linux/mdio.h
+> @@ -317,6 +317,9 @@
+>  #define MDIO_PMA_10GBR_FECABLE_ABLE	0x0001	/* FEC ability */
+>  #define MDIO_PMA_10GBR_FECABLE_ERRABLE	0x0002	/* FEC error indic. abilit=
+y */
+> =20
+> +/* RSFEC PMA Control register */
+> +#define MDIO_PMA_RSFEC_CTRL_4LANE_PMD	BIT(3)
+> +
+>  /* PMA 10GBASE-R Fast Retrain status and control register. */
+>  #define MDIO_PMA_10GBR_FSRT_ENABLE	0x0001	/* Fast retrain enable */
+> =20
+
+The AI review complaint about this bit seems to be based on an outdated
+version of the IEEE specification.
+
+This is called out in 9802.3-2022 as "Four lane PMD indication" so
+perhaps sashiko needs to be updated.
 
