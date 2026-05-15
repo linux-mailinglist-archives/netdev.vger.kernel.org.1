@@ -1,45 +1,50 @@
-Return-Path: <netdev+bounces-288276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4P95KIz0Bmo4pgIAu9opvQ
-	(envelope-from <netdev+bounces-288276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:25:16 +0200
+	id wNnvLwf1Bmo4pgIAu9opvQ
+	(envelope-from <netdev+bounces-288277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:27:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BF3154D4A3
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:25:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BE8654D4EF
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 12:27:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BC3613150826
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 09:57:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2451C301225A
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 10:04:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914D5466B5E;
-	Fri, 15 May 2026 09:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54BEB439004;
+	Fri, 15 May 2026 10:04:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774D343E4AE;
-	Fri, 15 May 2026 09:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620583AD514;
+	Fri, 15 May 2026 10:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778838972; cv=none; b=Nq3sK0VgM2bpXQMME63JTOdwg1CMWD4Pz3gkRI0P/glQyriSK6qKINDtqVDlAfkn8Xg8N6+Krg8wgDEn/dTywr0FOe9ZQcm26xQkFsKwvo8EepNjgYiLbo1UQ7sr4VPtRX8kUq9UjCQvr4+k1NZuTJNoemEVQXak5C2wEZHb208=
+	t=1778839467; cv=none; b=VHMQUDK3KJiHoq20vUP61Pw+OKWO3Hlhi0BV+//2+cfU0vONxAvX7tgS71WkDHsWlHJaUwS1VoU0G8so340wCGA4vTBrm0VsBelMQkwA8IPadiC+rBQtM6mpCGodRFaGtWfOPxuYcdGMzCMzrGyJ2bf+Bk2Yf8g4/3A3mneG+vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778838972; c=relaxed/simple;
-	bh=UGCagGDoyi3bkk5Q504DGiKrb4e0/4S3z32wD3DgJug=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T4Vj/2uIRGJyfs0CMQBIww3Xk8trorqngZ6ED4g91hKgoYasXVwfXDQuNjwYRPztbM/EjUUol01V7YLVtS8X1q8qWcFkEB5a2n1FpSfN7lAJ+O5kY67W4plWFGxkUC7FtPotjD1DN3EY1dqdOX8pvYzr3ownDWK3jURWrloOMJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB2BC2BCB0;
-	Fri, 15 May 2026 09:56:11 +0000 (UTC)
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2] [net-next] dibs: Improve DIBS prompts and help texts
-Date: Fri, 15 May 2026 11:56:02 +0200
-Message-ID: <9093259c43e5d1996965d1522562444419196a19.1778838921.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1778839467; c=relaxed/simple;
+	bh=u652Chsnsi/k6W9YlM0FwQSKUPm8kgRHazuxH37ZCEA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ufBW4+SpAV/AmxX0LpUZZN/0pRRQU/UJl8eADau6uaTK651GJGtrMSBlHU1KfoGFSNXPTMdWVRxm7HbSMfMmq0bHjGtNjtbeWRbLdWoqteQGtKAAFvs6DXLoI+a3KEuqwAkhaxdNTsDN3rsj7djxoWne0WZKQW6d0WkVet28Pn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 5783C6092A; Fri, 15 May 2026 12:04:23 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netfilter-devel@vger.kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Michael Bommarito <michael.bommarito@gmail.com>,
+	Qi Tang <tpluszz77@gmail.com>
+Subject: [RFC] netfilter: disable payload mangling in userns
+Date: Fri, 15 May 2026 12:04:11 +0200
+Message-ID: <20260515100411.3141-1-fw@strlen.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,84 +52,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1BF3154D4A3
+X-Rspamd-Queue-Id: 0BE8654D4EF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288276-lists,netdev=lfdr.de,renesas];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288277-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,strlen.de,gondor.apana.org.au,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[glider.be];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@glider.be,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-0.984];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.923];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	TAGGED_RCPT(0.00)[netdev];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-The Kconfig prompts for the DIBS options read:
+Several parts of network stack rely on iph->ihl validation
+done by network stack before PRE_ROUTING.
 
-    DIBS support (DIBS) [N/m/y/?]
-      intra-OS shortcut with dibs loopback (DIBS_LO) [N/y/?]
+Disable this feature for user namespaces for now.
 
-Clarify the DIBS prompt by expanding the acronym.
-Capitalize the first character of the DIBS_LO prompt.
-While at it, join the first two lines of the DIBS help text into a real
-sentence.
+This could be relaxed later.  Example:
+ - allow userns only for ingress hook.
+ - allow userns write if base is transport header
+ - allow userns write if base is linklayer and offset
+   below network header offset
+ - allow userns write for ipv4 if offset+len match saddr/daddr
+ - allow userns write for ipv6 if offset+len match saddr/daddr
+ ... etc.
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+tcp option handling might be safe even for LOCAL_IN, as LOCAL_IN gets
+invoked before tcp stack, but this turns it off too.
+optstrip remains enabled, see no problem with that one.
+
+I don't think these are the only means to alter packets, but these
+appear to be relatively prominent.
+
+Another option would be to restrict this generally, however, this
+is harder to do for nfqueue.  For nftables we know where the
+modification happens and can even reject a subset from netlink path
+directly.  But for nfqueue, we'd need to 'revalidate' at least
+ip/ipv6 header for ipv4/ipv6 families.  Bridge path might be okay with
+arbitray header modifications.
+
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Qi Tang <tpluszz77@gmail.com>
+Signed-off-by: Florian Westphal <fw@strlen.de>
 ---
-v2:
-  - Drop changing dibs to all caps, which was completely wrong for the
-    module name,
-  - Target "net-next" instead of "net".
----
- drivers/dibs/Kconfig | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ net/netfilter/nfnetlink_queue.c | 3 +++
+ net/netfilter/nft_exthdr.c      | 3 +++
+ net/netfilter/nft_payload.c     | 3 +++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/drivers/dibs/Kconfig b/drivers/dibs/Kconfig
-index 5dc347b9b2350667..8f41e562210044df 100644
---- a/drivers/dibs/Kconfig
-+++ b/drivers/dibs/Kconfig
-@@ -1,18 +1,18 @@
- # SPDX-License-Identifier: GPL-2.0
- config DIBS
--	tristate "DIBS support"
-+	tristate "Direct Internal Buffer Sharing support"
- 	default n
- 	help
--	  Direct Internal Buffer Sharing (DIBS)
--	  A communication method that uses common physical (internal) memory
--	  for synchronous direct access into a remote buffer.
-+	  Direct Internal Buffer Sharing (DIBS) is a communication method that
-+	  uses common physical (internal) memory for synchronous direct access
-+	  into a remote buffer.
+diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
+index 58304fd1f70f..e1e1d11fdf04 100644
+--- a/net/netfilter/nfnetlink_queue.c
++++ b/net/netfilter/nfnetlink_queue.c
+@@ -1141,6 +1141,9 @@ nfqnl_mangle(void *data, unsigned int data_len, struct nf_queue_entry *e, int di
+ {
+ 	struct sk_buff *nskb;
  
- 	  Select this option to provide the abstraction layer between
- 	  dibs devices and dibs clients like the SMC protocol.
- 	  The module name is dibs.
++	if (e->state.net->user_ns != &init_user_ns)
++		return -EPERM;
++
+ 	if (diff < 0) {
+ 		unsigned int min_len = skb_transport_offset(e->skb);
  
- config DIBS_LO
--	bool "intra-OS shortcut with dibs loopback"
-+	bool "Intra-OS shortcut with dibs loopback"
- 	depends on DIBS
- 	default n
- 	help
+diff --git a/net/netfilter/nft_exthdr.c b/net/netfilter/nft_exthdr.c
+index e6a07c0df207..577a15383e98 100644
+--- a/net/netfilter/nft_exthdr.c
++++ b/net/netfilter/nft_exthdr.c
+@@ -551,6 +551,9 @@ static int nft_exthdr_tcp_set_init(const struct nft_ctx *ctx,
+ 	u32 offset, len, flags = 0, op = NFT_EXTHDR_OP_IPV6;
+ 	int err;
+ 
++	if (ctx->net->user_ns != &init_user_ns)
++		return -EPERM;
++
+ 	if (!tb[NFTA_EXTHDR_SREG] ||
+ 	    !tb[NFTA_EXTHDR_TYPE] ||
+ 	    !tb[NFTA_EXTHDR_OFFSET] ||
+diff --git a/net/netfilter/nft_payload.c b/net/netfilter/nft_payload.c
+index 01e13e5255a9..484a5490832e 100644
+--- a/net/netfilter/nft_payload.c
++++ b/net/netfilter/nft_payload.c
+@@ -917,6 +917,9 @@ static int nft_payload_set_init(const struct nft_ctx *ctx,
+ 	struct nft_payload_set *priv = nft_expr_priv(expr);
+ 	int err;
+ 
++	if (ctx->net->user_ns != &init_user_ns)
++		return -EPERM;
++
+ 	priv->base        = ntohl(nla_get_be32(tb[NFTA_PAYLOAD_BASE]));
+ 	priv->len         = ntohl(nla_get_be32(tb[NFTA_PAYLOAD_LEN]));
+ 
 -- 
-2.43.0
+2.53.0
 
 
