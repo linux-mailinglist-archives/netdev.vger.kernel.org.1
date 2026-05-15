@@ -1,206 +1,191 @@
-Return-Path: <netdev+bounces-288154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AGOMGoqBBmrnkAIAu9opvQ
-	(envelope-from <netdev+bounces-288154-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:14:34 +0200
+	id WAbPJweCBmrnkAIAu9opvQ
+	(envelope-from <netdev+bounces-288155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:16:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBBB4548AB2
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:14:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0272548AE1
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 04:16:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B987B3023BC6
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 02:14:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7516F3065700
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 02:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01241390222;
-	Fri, 15 May 2026 02:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8813A3B994A;
+	Fri, 15 May 2026 02:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="kxun+qJe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013048.outbound.protection.outlook.com [40.107.159.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB934387363;
-	Fri, 15 May 2026 02:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778811269; cv=none; b=H6bK5rQeK2kl5oHSLRxyHT1jGf5cnhSqd84Qj5pStwpgkBeqz3HzjdwYMw44hxddd6AM/r/+n2Zp4X5iBdfT07ZtilDFuO9uGX16OX8qBbkbZY/e89ZHci/MuGXsJkK6+JyyFNFb1ZgC04ezNd94e8UaSxAYsXLswTGpRYdiiy4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778811269; c=relaxed/simple;
-	bh=5frOUZ5UqGVTaqdCTNubY/Zpz6V9myJkFEzJbKyGWcs=;
-	h=Message-ID:Date:Mime-Version:From:To:Cc:Subject:Content-Type; b=jkT/VwAU7vE8QWxVHlzVhQsPEsMmkdeJiSc/9N56QSITnzLfKV730W7ULNL35C8Tp8J6XgqEbIt9x2y/jXxkgcP0V5NwJvOi5i7LAQYE7WEJOsZG8fKV31f9D2QtE15x5ZMjhm9UBbdYQ7gegKs9yfW+KpNys8+aq1Ty73UprEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4gGrNn1P7Bz4xQXS;
-	Fri, 15 May 2026 10:14:17 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.99.176])
-	by mse-fl1.zte.com.cn with SMTP id 64F2E70E088146;
-	Fri, 15 May 2026 10:14:07 +0800 (+08)
-	(envelope-from qiu.yutan@zte.com.cn)
-Received: from mapi (xaxapp04[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Fri, 15 May 2026 10:14:08 +0800 (CST)
-X-Zmail-TransId: 2afb6a06817063d-ed5aa
-X-Mailer: Zmail v1.0
-Message-ID: <20260515101408635T6_cWDYOWVYQleZjRtUS1@zte.com.cn>
-Date: Fri, 15 May 2026 10:14:08 +0800 (CST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDBC3B841C;
+	Fri, 15 May 2026 02:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778811344; cv=fail; b=Sexq45W4+2rM2PEkOeqUCNKLb8Vl1z4tbVOkzFfkzYuEbYRPj3DuK5t9np0Ydm7ZFBUuH7hfbBqDFyEpC3immuMySQrswGNyR0aN7MOhY7r0qZWlDBWva2bu1rvyOWYK8zYFrtLqfi+owFlkv7mF6nPr5WVExXGEjl7qtQVsd8U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778811344; c=relaxed/simple;
+	bh=0iqLO8MU5RsqZU6n185uffguoF0u6ewGv41SM4a6Lxs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DCuj+/4l79i/3QN1JJ91euACiouRNHEyqq5JfBR9Y8sExrWrSrihPVSvQ76zq04MPWn5xCvibvS1TqpBOfvhaucE2TLO9cs9Wb1/noog+Qv/6L/bo76t1EOUJrhwAFNBnUZKIz1c2FFrU9mkjukL3e9lZRCnEHCBsB/AkL85pd0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=kxun+qJe; arc=fail smtp.client-ip=40.107.159.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ku0rrDmTPQER9zTZ3cNCfeHQKZ91dllajaHmfSUnzkMcIh3SLFBifuW3S4FpLFf5QKAT7iCezHWb92vg+ZbTuei4h5R/BL53Z7SN2unqNlAm7+tBjQ0lgGZG6xbNoxmc9gLsJdPvxaGZXnYgsqt9Z3WwpYW8pWbDuglfv5uJtucDOEwkOm//AOm5SILwE/GyuDUjBMAzk2gexx5rmso/AFgBZ6Zbes/k/94LOToq2AvH6JJ11SiD2x9FvBteFD19MCS8UmSe2ZJwcmlDAuthXGVbZ5T5PFHAFu4Hp51t6urXGIZC5I+kmwLPGbtkk+DnaF5wKr9ODUa0ArAWvz6fkw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K2171cLCZGoVkUbTfm0oB0VhJ23AittkgWVlQV0tw2I=;
+ b=dV5sc+gmsbojc3GRQViHqZFvXZ+WPLGH1myOUSlT3/BfJkwb3X2lRAOX+RxpgVbxyIgxjqgQ1unT8ckFBSTNJ5tuMMhBESg6YiDYB2+FkZpAGMqMcN7Er6kmu91DXxG2DF7F6v2VUTwc6OHGcc3GL7CqYy1cMCx4n/M4mml3jNXUBojfML5Iphcz4iTKo0XKNWK9neb3ViQhw+r6RZkq+juqbln8fMPHHgwMrkVihmd1WXrvYfREutblb06dspf6FM97gs8HTzt5J7oDd6n74fsRwoCOPNcvmD3EkqOSADDdM0yApNLcheuFVsOJh25WzBg7NAJLVcy6SrPPf+0KcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K2171cLCZGoVkUbTfm0oB0VhJ23AittkgWVlQV0tw2I=;
+ b=kxun+qJeP496I5PEQ8nBf6TEQltnXWoa8Yieuiol4k7B6t9MrBPmfhKnLtnTAe6kI50PBVmC3Q2muIwh34N6e9afuxTOnJ0miC2wr0pT+uOi/ou3+erEFaM5RNTqW6UXAkw+5KmqlOA5el6lGdrufD80AA7xgIquuTN6c8FjQDATeevRlT0sGD50rchB9F1Nyx67X78AT/Ap7MC/ztlJNqQe1K1o58xKKO4YLSN7BmLdaB3yTCFSovGsR50R5/peMuQvvLURrmIi0q+o3V3mPlrPTQpyhVJiD76oKUKBAPWwHzVohF13RsHTgjnHaJ+WJFpWz1kFdF8WjOJKXEnh9Q==
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by GV2PR04MB12607.eurprd04.prod.outlook.com (2603:10a6:150:366::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Fri, 15 May
+ 2026 02:15:38 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9913.009; Fri, 15 May 2026
+ 02:15:38 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "catalin.horghidan@nxp.com"
+	<catalin.horghidan@nxp.com>
+Subject: RE: [PATCH net 1/6] net: enetc: validate VF primary MAC address
+ before configuration
+Thread-Topic: [PATCH net 1/6] net: enetc: validate VF primary MAC address
+ before configuration
+Thread-Index: AQHc4sc1mZ05bNCMQkSf6MPOYD33ULYOWptA
+Date: Fri, 15 May 2026 02:15:38 +0000
+Message-ID:
+ <DBBPR04MB750086F8025E47A09DD46CF788042@DBBPR04MB7500.eurprd04.prod.outlook.com>
+References: <20260513103021.2190593-1-wei.fang@nxp.com>
+ <20260513103021.2190593-2-wei.fang@nxp.com>
+In-Reply-To: <20260513103021.2190593-2-wei.fang@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DBBPR04MB7500:EE_|GV2PR04MB12607:EE_
+x-ms-office365-filtering-correlation-id: d6db56d4-cffa-469d-6541-08deb227db4f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|19092799006|1800799024|376014|366016|4143699003|38070700021|18002099003|22082099003|11063799003|56012099003;
+x-microsoft-antispam-message-info:
+ 9vrelbyUZ34wgUYbE5FA3+07K6LnZmKNCgUOM4BT8BsjfDmXKh/8POojWqDKwYkLpHs9Uam/XllSLOD3AZm0jEfenUBPHJWyaatD5fZ9GCIn1SDwwIs4TRiB4/yyg/rUdG3/Uzg8R2xx/ECymyHOKWQni6VdHo6wfjYv6qPaJLboGAlbuav76GjaPNU9AEbZCodQbDikg99qP2HEchP4Gyxw8sKsWt6qQIWXlzornvkHKbmNLURb+eyxwSZj3+wmtENDfuSOmZVH+IYjyNN5/6j7okPsqacis/6z/SSU6Yy78dY7sqQJQ7WQqJThyGdLrm8jltpsE3E7Ta9GI33G3PsOWJYxiQOmTVNVYmpB6y+npTttWLfCtxbUYcDN3ilz76osBh/5S4MVas4lp2RAYAAnQN8IwPL9jhr03GjK2VLpuwiB2gFKHitiy34xt9hGc6AG6HYFoJUjo+g7n6IWNcYbtzdXe1g3DUV3MrTrBPuNdog8qZC5nVUwCfix2+xLFGgao+NqDwnY9nPV4XH3TEbP2MsR5fz91qAj5ywKbDAYRXG4cGG66ShX3QGMVOLGtdw2QHkS3t9+T1Q0PPuifUiUZW4G0O6YPzHw+hY5ESWL++oYQ1uJIbv34nHJY39l/Z6ygye2ilF5VO264udJy1uCk26wIllo/mhS/+ddddXnGQ43KBmS7uq4iLGNBidR9PQ/e6zGpgl9rew/GRqIbxzcxBBfopsdypedIWS7LiAEj5BYOkRVkRTax7dD0Fue
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(376014)(366016)(4143699003)(38070700021)(18002099003)(22082099003)(11063799003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?kOTSBOwX1mhVKut+XWhtT0xbYAQfxdw3ijsOHXzeLlKawDG95XB+DisDc6Uw?=
+ =?us-ascii?Q?wKD9MR9Y+D631sCOJYl6PXf+g5EB+9sevTWnFwQSxkyWaDvDlglfMr7CpcQG?=
+ =?us-ascii?Q?G3FYHB8fmiPxg6ntLk5DHOlelr5W2O0cuT/10k1o94wi1eeo9aFo2UBp2zUU?=
+ =?us-ascii?Q?I+CJ/vUlJuxOytgWvlFOMeF1epT/ZCFJR54WrT0kqsoS0jFW3noIpxSFpdeN?=
+ =?us-ascii?Q?cm2K/zVSOeXiezoSNcPdCRouf3RHHZpP6mr3yKq5tFhfkDqHWfDvDY0gkvHw?=
+ =?us-ascii?Q?sKth9e6p24ojzyVjn4bHy720KguaOsMUNQlVpstRewVgeLDJmf9rp/iLtryJ?=
+ =?us-ascii?Q?upwm0y3JQptu7jpjxEceFqa7FMpIClX8r+2u2v8w5EMvGZn96Qxqq9lm1U9Y?=
+ =?us-ascii?Q?huc/HY5T9MO1w0qcqrrjhW4j5pmcWHSgw3ytv4hGj7BzBD72O5h2FVVtF0dt?=
+ =?us-ascii?Q?/q1Qpu3p0rsN0FTlDgr74LhB6aIUU9LoFwSczsnh1FnGuQI3zTeWQHmOuSbQ?=
+ =?us-ascii?Q?QPurEy1CjwEyrw/+K1A0C1Ft/0x3WHBE3z4cS4QIKsxLn33avYSNLZ38U/9t?=
+ =?us-ascii?Q?7OEyHQtIXyspXiBvqKs+BGN9kP+61eW31mcFS3Pngib+v+CFQglbroSDRVd9?=
+ =?us-ascii?Q?UzoJQ8bIDTHePIqE3k8nm950WvpONOYXjJ2fSnJUqg/4ne2toLGMsJGdohSb?=
+ =?us-ascii?Q?JgM88SCPATYRxb4+DYkVhm5YXQL/8S3qSVazK1RE4H54i3OWgEPejECdGHVv?=
+ =?us-ascii?Q?A9wiOWjVSf1BRLiIu+JbQ+ljiapLRNwcMsIPf0FWPdAh0cOkHD49tb70mnKL?=
+ =?us-ascii?Q?Y+GFRMjxE36cG4fq9ooBmVVVHwzYouETYwnvMbNIgjwyT/3XUi42srEqLkyi?=
+ =?us-ascii?Q?MdY3PdbvC74zIpolEftI6fpPJN539sABdHLkMGs5udkwDQGp9ONo+hS34aLm?=
+ =?us-ascii?Q?fBX/7NAcbEHWMCs634VjhLo6QvYsWxXhGeQD/Euf523ZzV9w0fBmHOEcvBoa?=
+ =?us-ascii?Q?eq18CUbb1ZqZuN7eKsTrExiPZXgcbyiWCU1eGUtNaG79kLrOrEnZ2F30+F31?=
+ =?us-ascii?Q?Uu/3tvgVmn66f8DysGzz6WX8Fw7cMfEyzA3CnjUCMdNeAaOxtQt0+Jm33pO7?=
+ =?us-ascii?Q?F+LWa+23zQpWe3bw43iVfDCoOWBiQd8imH6Q/Y1DUe3jnUgwx4Ko/dbRkcGX?=
+ =?us-ascii?Q?LiDUvpOUdYVJlKe0XvpDt9xnK5/LgzP0kMV88VDxrrskO0Hxe8C1tYy5rDPX?=
+ =?us-ascii?Q?QV78De+LKDBp/yEHbPbA0IQ8WZMPLvg+TNa5dQvvpjsgBJ7QPhBaikgxCjs1?=
+ =?us-ascii?Q?Lt/H6JwaaeIBtQYiqUDU02v7SC0gyFQDDad+KqpPU4AeT94XiPz6gKMn4CkF?=
+ =?us-ascii?Q?Y4DXMUq934Wu/jhw0rCDIQS4a6moPFlj+MU3TibJqLo/W8HCYcEjwey+LOHH?=
+ =?us-ascii?Q?xo/nd4vQJt/HJNRld/u9bqz2/a7Nqgel0i9v68KvpCzbOJqUzjOOlKEPMD91?=
+ =?us-ascii?Q?Bf+zv2EqJ4dwZOMvgF4YUMkxe+IBrFwyUsV/OoPjs3YRSOSTNrycmL8C3l/6?=
+ =?us-ascii?Q?/WjwWzqd8Y7Y4VfJT2Yh2DA1Yu+A+nS6YtldqhHeguw3x7KWJZz/opzzWAn9?=
+ =?us-ascii?Q?UwLnhouFYhWQXFX+eT9vJgmXsN1UDZTCcVgfg6W11RdeRDu2YYIdWVCqtKDb?=
+ =?us-ascii?Q?byF9Nz+Cybtz01CXl8tse0fY5QAnDonu8zIUZ8Qcy873X8aC?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <qiu.yutan@zte.com.cn>
-To: <davem@davemloft.net>, <kuba@kernel.org>
-Cc: <dsahern@kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <horms@kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yang.chuan1@zte.com.cn>,
-        <huang.jian@zte.com.cn>, <zhou.shizhen@zte.com.cn>,
-        <zhang.dongyu1@zte.com.cn>, <ye.guojin@zte.com.cn>,
-        <yang.wei20@zte.com.cn>, <zhang.lin16@zte.com.cn>,
-        <li.hao40@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0XSBuZXQ6IG5laWdoOiBSZW5hbWUgTkVJR0hfVkFSX0lOVEVSVkFMX1BST0JFX1RJTUVfTVMgdG8gTkVJR0hfVkFSX0lOVEVSVkFMX1BST0JFX1RJTUU=?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 64F2E70E088146
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: qiu.yutan@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.132 unknown Fri, 15 May 2026 10:14:17 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6A068179.000/4gGrNn1P7Bz4xQXS
-X-Rspamd-Queue-Id: EBBB4548AB2
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6db56d4-cffa-469d-6541-08deb227db4f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2026 02:15:38.5942
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yyT1VlLpTSp/jIM6wURooLlS1B7+ZcUeB0lpV1L+NF/wtE2gTjKUAVY+TKeNSvBU/CFfmvwaibjndjWpZbYQCA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR04MB12607
+X-Rspamd-Queue-Id: F0272548AE1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.64 / 15.00];
-	SUBJ_EXCESS_BASE64(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288154-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[qiu.yutan@zte.com.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288155-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim,DBBPR04MB7500.eurprd04.prod.outlook.com:mid]
 X-Rspamd-Action: no action
 
-From: Qiu Yutan <qiu.yutan@zte.com.cn>
+>  	addr =3D cmd->mac.sa_data;
+> +	if (!is_valid_ether_addr(addr)) {
+> +		dev_warn_ratelimited(dev, "VF%d attempted to set invalid MAC",
+> +				     vf_id);
 
-During the initialization of arp_tbl, the enumeration constant name
-NEIGH_VAR_INTERVAL_PROBE_TIME_MS in the statement
-arp_tbl.parms.data[NEIGH_VAR_INTERVAL_PROBE_TIME_MS] = 5*HZ does not
-align with its actual meaning (jiffies).
+Sashiko reported that the string was missing a newline character '\n' at
+the end.
 
-Using NEIGH_VAR_INTERVAL_PROBE_TIME is a better naming choice.
+I will fix this issue in v2.
 
-Fixes: bf48c3fae6d7 ("Merge branch 'net-neigh-introduce-interval_probe_time-for-periodic-probe'")
-Signed-off-by: Qiu Yutan <qiu.yutan@zte.com.cn>
----
- include/net/neighbour.h | 2 +-
- net/core/neighbour.c    | 8 ++++----
- net/ipv4/arp.c          | 2 +-
- net/ipv6/ndisc.c        | 2 +-
- 4 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index 2dfee6d4258a..f317e910ec3c 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -49,7 +49,7 @@ enum {
- 	NEIGH_VAR_RETRANS_TIME,
- 	NEIGH_VAR_BASE_REACHABLE_TIME,
- 	NEIGH_VAR_DELAY_PROBE_TIME,
--	NEIGH_VAR_INTERVAL_PROBE_TIME_MS,
-+	NEIGH_VAR_INTERVAL_PROBE_TIME,
- 	NEIGH_VAR_GC_STALETIME,
- 	NEIGH_VAR_QUEUE_LEN_BYTES,
- 	NEIGH_VAR_PROXY_QLEN,
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 9e12524b67fa..912e6ca3b26e 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -1670,7 +1670,7 @@ static void neigh_managed_work(struct work_struct *work)
- 	list_for_each_entry(neigh, &tbl->managed_list, managed_list)
- 		neigh_event_send_probe(neigh, NULL, false);
- 	queue_delayed_work(system_power_efficient_wq, &tbl->managed_work,
--			   NEIGH_VAR(&tbl->parms, INTERVAL_PROBE_TIME_MS));
-+			   NEIGH_VAR(&tbl->parms, INTERVAL_PROBE_TIME));
- 	spin_unlock_bh(&tbl->lock);
- }
-
-@@ -2235,7 +2235,7 @@ static int neightbl_fill_parms(struct sk_buff *skb, struct neigh_parms *parms)
- 	    nla_put_msecs(skb, NDTPA_LOCKTIME,
- 			  NEIGH_VAR(parms, LOCKTIME), NDTPA_PAD) ||
- 	    nla_put_msecs(skb, NDTPA_INTERVAL_PROBE_TIME_MS,
--			  NEIGH_VAR(parms, INTERVAL_PROBE_TIME_MS), NDTPA_PAD))
-+			  NEIGH_VAR(parms, INTERVAL_PROBE_TIME), NDTPA_PAD))
- 		goto nla_put_failure;
- 	return nla_nest_end(skb, nest);
-
-@@ -2508,7 +2508,7 @@ static int neightbl_set(struct sk_buff *skb, struct nlmsghdr *nlh,
- 				call_netevent_notifiers(NETEVENT_DELAY_PROBE_TIME_UPDATE, p);
- 				break;
- 			case NDTPA_INTERVAL_PROBE_TIME_MS:
--				NEIGH_VAR_SET(p, INTERVAL_PROBE_TIME_MS,
-+				NEIGH_VAR_SET(p, INTERVAL_PROBE_TIME,
- 					      nla_get_msecs(tbp[i]));
- 				break;
- 			case NDTPA_RETRANS_TIME:
-@@ -3804,7 +3804,7 @@ static struct neigh_sysctl_table {
- 		NEIGH_SYSCTL_USERHZ_JIFFIES_ENTRY(RETRANS_TIME, "retrans_time"),
- 		NEIGH_SYSCTL_JIFFIES_ENTRY(BASE_REACHABLE_TIME, "base_reachable_time"),
- 		NEIGH_SYSCTL_JIFFIES_ENTRY(DELAY_PROBE_TIME, "delay_first_probe_time"),
--		NEIGH_SYSCTL_MS_JIFFIES_POSITIVE_ENTRY(INTERVAL_PROBE_TIME_MS,
-+		NEIGH_SYSCTL_MS_JIFFIES_POSITIVE_ENTRY(INTERVAL_PROBE_TIME,
- 						       "interval_probe_time_ms"),
- 		NEIGH_SYSCTL_JIFFIES_ENTRY(GC_STALETIME, "gc_stale_time"),
- 		NEIGH_SYSCTL_ZERO_INTMAX_ENTRY(QUEUE_LEN_BYTES, "unres_qlen_bytes"),
-diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-index 51d70180e1cc..601b98185cf5 100644
---- a/net/ipv4/arp.c
-+++ b/net/ipv4/arp.c
-@@ -169,7 +169,7 @@ struct neigh_table arp_tbl = {
- 			[NEIGH_VAR_RETRANS_TIME] = 1 * HZ,
- 			[NEIGH_VAR_BASE_REACHABLE_TIME] = 30 * HZ,
- 			[NEIGH_VAR_DELAY_PROBE_TIME] = 5 * HZ,
--			[NEIGH_VAR_INTERVAL_PROBE_TIME_MS] = 5 * HZ,
-+			[NEIGH_VAR_INTERVAL_PROBE_TIME] = 5 * HZ,
- 			[NEIGH_VAR_GC_STALETIME] = 60 * HZ,
- 			[NEIGH_VAR_QUEUE_LEN_BYTES] = SK_WMEM_DEFAULT,
- 			[NEIGH_VAR_PROXY_QLEN] = 64,
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index e7ad13c5bd26..ca7df107e3bf 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -128,7 +128,7 @@ struct neigh_table nd_tbl = {
- 			[NEIGH_VAR_RETRANS_TIME] = ND_RETRANS_TIMER,
- 			[NEIGH_VAR_BASE_REACHABLE_TIME] = ND_REACHABLE_TIME,
- 			[NEIGH_VAR_DELAY_PROBE_TIME] = 5 * HZ,
--			[NEIGH_VAR_INTERVAL_PROBE_TIME_MS] = 5 * HZ,
-+			[NEIGH_VAR_INTERVAL_PROBE_TIME] = 5 * HZ,
- 			[NEIGH_VAR_GC_STALETIME] = 60 * HZ,
- 			[NEIGH_VAR_QUEUE_LEN_BYTES] = SK_WMEM_DEFAULT,
- 			[NEIGH_VAR_PROXY_QLEN] = 64,
--- 
-2.25.1
+--
+pw-bot: cr
 
