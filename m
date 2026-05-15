@@ -1,170 +1,283 @@
-Return-Path: <netdev+bounces-288191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288192-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FrUOGS8BmpAnQIAu9opvQ
-	(envelope-from <netdev+bounces-288191-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:25:40 +0200
+	id GG5LGhK9BmqMnQIAu9opvQ
+	(envelope-from <netdev+bounces-288192-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:28:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62BB1549F84
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:25:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA36E549FE6
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 08:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E47AE3016261
-	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:25:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8207A301C586
+	for <lists+netdev@lfdr.de>; Fri, 15 May 2026 06:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B267D36F90E;
-	Fri, 15 May 2026 06:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B3A1EA7DB;
+	Fri, 15 May 2026 06:26:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQ49ZISy"
+	dkim=pass (2048-bit key) header.d=kerneltoast.com header.i=@kerneltoast.com header.b="LjIPuWvj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126E7379C31
-	for <netdev@vger.kernel.org>; Fri, 15 May 2026 06:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A3334F241
+	for <netdev@vger.kernel.org>; Fri, 15 May 2026 06:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778826331; cv=none; b=kVmsutJRJ2bTOwvTVd+8W0P38IdghoXH6rva+psWP+ayx4pRkwtDI1cfZdLenr0YQwQevacfv09iWrf2gOaFCxx6jJ2E7KkrWxwkw5/kllucbYhbkxLAPfDbv7GOk0kG1cJ2pr95yufnIOkiLaC8VKMbBiGk5OFIEru0BgkNNuw=
+	t=1778826397; cv=none; b=KgQo0sxdd8J3Rgdmb9t6ZWZ+vFr/HhHXEoYQ1am5s9UAWOSrAovUdAFBa3nKulyG8+UQqBOy6bMiMEI9X2koXnLfWGAJdvUHMjMmHHHDSWPfBaGTiVCHemQT/pAb8NoGRuQXrNLIgukBeHTJ3tZa9CYmvDFRGePwfo02W8JCvFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778826331; c=relaxed/simple;
-	bh=zdMaYaIF/WCaUO1A22gCU0P+PgdUjBhJZEz17jz2Bt8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YOQYCKOVvw8FvztAY+7xoPqYHUrJg8E8wqL7McDKee6JDggsBn7pjPubT2rNczdS2CxyrmNQd+WvwEBErdBcoN+/7GR9EXfd5bMGS6Xsc/pssrVSObwqbgCjY6Y24Uh0BqCVz9V4h50tyV9XPwc3gh21ncNO66I+R3s0dfIAleM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQ49ZISy; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488ff90d6c7so76477495e9.2
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 23:25:29 -0700 (PDT)
+	s=arc-20240116; t=1778826397; c=relaxed/simple;
+	bh=HrWB17ptc2l34u6C2LeHIZMPkj0pJCVkd4NnaBC3fpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FT7mTpxpRpXz9qq6UDt/A70STdYP8hQY0JfUjYIgeLfhGDRnM5jWhUO0aFZ3KeS3C/Xd7Ein/5PLgwYXzZGP8zYvNj1iTvXmmFcJIcmgXpcTT0pZfsKSwKsoWuDa1s/VP9TG1oYbE6I+GAnD3Gc5RfRjNCr5fo0AK0djfmfmrSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kerneltoast.com; spf=pass smtp.mailfrom=kerneltoast.com; dkim=pass (2048-bit key) header.d=kerneltoast.com header.i=@kerneltoast.com header.b=LjIPuWvj; arc=none smtp.client-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kerneltoast.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kerneltoast.com
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2f7020a928eso12455153eec.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 23:26:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778826328; x=1779431128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R1gkR6dt+RMCWBmuIuEthasGqBXKYWjHEwzJZ2BcFqc=;
-        b=gQ49ZISyin+W8yjszGpFSi7ZaUKdSAvM0tNvvdRwICjjvTSEFZTSWMUMuaG50FB22o
-         lXpzYamlmkvSZjUSaESGg7LswCiqg5VtdQHB1rcLNZ/SYniUmSVlK0XY4PnzIzcUjZO1
-         z0v/KYppWaGYUsTGsmLQBpNQpGfjT/NrKwgHPXzoIVijd/vrEomX1vc9FeQBbjywU/76
-         VdgaQHICSOUuDPEwcs+YMp7JWS2fENdnum+FdoVuVVg9KWwMlKPY7rj2EXNNkjoscXUf
-         wVtxDViEx1yiP93S1OAPGAoUdU2xdPFkmP42ft8MROjzL7DsXY6rQ4LVJLdprtOc0Bjv
-         GQKg==
+        d=kerneltoast.com; s=google; t=1778826394; x=1779431194; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cLhwzsZNHFhkVlDVAnP1ibUwhUPkO6DQUuy/XcbYiRg=;
+        b=LjIPuWvjdz+rIdf8ASDrVPPRDdH+AZfNZdcRnekEvbbgLT0g8kvoKi0e4mu5CeSRtb
+         rjw2IAQWwEFhg213If2eh1JwEYURDeLwVo86H4oM7godvvRO+/T7cEx1Jm1IX8N6vDbS
+         xnruFnJ4qOufJBDNbpCi9ZqbF0/aO1bGjIClZkc1bDrE/GxN8wArrjiTZz7lOP4bgc/M
+         vK3JzWrVgEHwzNC0Id/0Bt+aiUJKzGZ4mAmGMsD8zphPGxg32jVJPtYMT94veUCxyJAn
+         TKS/zI3w9O2RCZwak20JPnWSsvcsAwn6OngwZJxCWymZLs7H9xoLQT+2ONZhfn8+ozuV
+         +d6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778826328; x=1779431128;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R1gkR6dt+RMCWBmuIuEthasGqBXKYWjHEwzJZ2BcFqc=;
-        b=YSijGxL77Qp9DswPOW0rGDt65FpNkwx6jo8SlnoFWSKtcWTFum8m28wpGwKbamx65V
-         k4aGaf8+vOBBzLWxxYsw09BOgUTPl4iPgmpEUF71RYftB2NgrvGJLCEk6jsu9Di/xfwI
-         W4mDnBHOeBmDao0/ttfOfLWIgamF1iWMd+9CfseVo+c9MzFnBro8k8Mnm2tqJPKv+MvB
-         XWBGAY+0es0AIZgC10FXJfWNyX1oFX30/4UJbULjPG+jYsGahbKC9FQlfEQHYcsoW9xl
-         Nk8WyzYCDfVQPgeTrTdDSTwnGUEU0IgnGGitd8Gq7y7uPetUqy1qb00ol3h4QCP09CSY
-         sung==
-X-Gm-Message-State: AOJu0Yyd+MoUGhphvaIfHsTF/tDcHYxW+zsxqLvERlQ68YcYT2Omj7uN
-	14/ejtxw34yhdRMLN0+zsxT8xeLilqpPwREcnalwdLAL46jPOop4Z/eM9hyERsO5
-X-Gm-Gg: Acq92OEFFEZqPBqjV2zViu2uQ6wcFN1NqjtLh9wE5QZbkIRK+cVthXClhBLosOwUUGr
-	6SxZ8qGwr0M8mx6p82zu+1RUMxL8tl9HSpWiGQ5rTAVBbmcxiuh0yx9HTOCTBzQWGYvdnUxWrVR
-	pa5KjLPyzlbfsvMxfuIDVyXzyYDCPEIswAlYka0awgTDoIOkx2yByKbPangaGi5SzWJXO2FlDcl
-	o8+lAuMWKT11+pPYWjcXIWVTwlEJRQ2trMoPcf/lUwDSYiJXnKQavwqKrU7izD8OUjZ1ttgw0tq
-	M7tzVLdeTw8nLk70cF6QeIcE7+3A2BE+U4tXVsVovX9UQEbJvR6CcqgM61xO2tj2W6P2mgk+Dd0
-	0qjgxL09hbcRadF12qCtThT2hJZ+V8gbiwksgl3uup9K9+EaW7ueZaiynGy5gElpDMz29MthfGu
-	lO7mtHgs35GDLuV4Anw/fZYWCCzDU7b6Tw6aJNnQ1hBKmGg2r4ohoNf+sQRl7M+fshfuQLfyO8T
-	55H8PMsIjilGhL/VUc47g==
-X-Received: by 2002:a05:600c:3f0f:b0:48f:99a9:bbcc with SMTP id 5b1f17b1804b1-48fe60ecb9cmr29688155e9.10.1778826328398;
-        Thu, 14 May 2026 23:25:28 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a17ec2sm11016277f8f.24.2026.05.14.23.25.27
+        d=1e100.net; s=20251104; t=1778826394; x=1779431194;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cLhwzsZNHFhkVlDVAnP1ibUwhUPkO6DQUuy/XcbYiRg=;
+        b=GZ9o74/8dDpmKlLinDKEkHdgIbBMgC1QdcHxRW7LR7a4SRhdDMMpBBaNT6SB/bZh9M
+         EzoL08+YOHcdYo7N/e3Agv4ttwxBCs+XKMfrWiZFnRooawfUdu7rEydTYu2SAR6IInp9
+         Rs4xynmUONacC9o6gzmViUB+KC292QF1/DhRgPjtAJRdDp2NqbT+j99OWMpF1AQ83f2e
+         JVP/nyOAySIeazUJXExAVGQDydtgMKCqI//hXF//JFTvhYIJe6N9f+rSZD2Jc7CaDPBJ
+         AfgiI6idp6l0qGakjPp5e04z3JwPcQIbUOiRS5osEYiG0SvKPUna6FYIfs1fkJ1xMqJs
+         HHFQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+rbuap7/CKEsoQGhfK3Z6OoJz3uCFjHvvojcVzpmZEegvYA5QL2JDAmEeT4HiD5xJHy+saqro=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpML/zS5BOiztNL9lRR53ygAz92lYmlbljcX2RVeSUsJzl/jZE
+	+fLOjF7WcHM5TyYJsobQw/bh21H2HtnMvgoC8gj4GJvSI2n3VkFLfndyDRcTb1L/MnuE
+X-Gm-Gg: Acq92OH0CWCTtgoJvJjNtjEBDlNHMz6WFX53G6bUzHmx3AG/bDqJOa8IH2qYzohE9Pj
+	3pH2/TEjMA1+JREsgFYvuP6EFWztriQIuUGApcJ6DOUxUjGzNm5T81PGitwH4oM9C5tbiK1J1fX
+	TxfKUTM7HbvV01uZMBpTVeUUF8Yoa8xGEyL7WL/pTqz7a3VgCkgVOCYrsRuXKs0GUvjQVaG1qyh
+	IKvCn/EG127oU8kiJwpwkitIJOb2cqC3MPDrNxDlAqiioAYbyM/Luje3DbYYmiIqCLEENP3Xs2P
+	AgopsHHKphOQ3Rf2uJ/OJszna0jzuk+zYUWDXNlI4k19fSWP3JXAzKnHsIijdRs7sdvcl05Psbi
+	xBDOnhlcnSG6RwC49JyAsB7Gz1sMGCqgjTRl85DbLj1SshGXyJFDFzvM40kumYWs94vxjzCj2Cb
+	55QlHB8cd1LzZ5MCvkdVXyaxwvbfrVBuRurPRY
+X-Received: by 2002:a05:7300:fb83:b0:2de:cc07:e8b with SMTP id 5a478bee46e88-3039818afa7mr1296743eec.1.1778826394381;
+        Thu, 14 May 2026 23:26:34 -0700 (PDT)
+Received: from sultan-box ([142.147.89.218])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30296dcc464sm6242366eec.14.2026.05.14.23.26.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 23:25:27 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>,
-	stable@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] Bluetooth: ISO: drop ISO_END frames received without prior ISO_START
-Date: Fri, 15 May 2026 07:25:25 +0100
-Message-ID: <20260515062525.57603-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Thu, 14 May 2026 23:26:33 -0700 (PDT)
+Date: Thu, 14 May 2026 23:26:28 -0700
+From: Sultan Alsawaf <sultan@kerneltoast.com>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, kerneljasonxing@gmail.com,
+	kuniyu@google.com, mhal@rbox.co, jiayuan.chen@linux.dev,
+	steffen.klassert@secunet.com, ben@decadent.org.uk,
+	herbert@gondor.apana.org.au, dsahern@kernel.org, sd@queasysnail.net,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v4] net: skbuff: propagate shared-frag marker through
+ frag-transfer helpers
+Message-ID: <aga8lH0sgneYCCgY@sultan-box>
+References: <aga1VyHpHaUhnGZa@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 62BB1549F84
+Content-Type: multipart/mixed; boundary="kZH1xBYXsb9CWdLM"
+Content-Disposition: inline
+In-Reply-To: <aga1VyHpHaUhnGZa@v4bel>
+X-Rspamd-Queue-Id: DA36E549FE6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kerneltoast.com,reject];
+	R_DKIM_ALLOW(-0.20)[kerneltoast.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,holtmann.org];
-	TAGGED_FROM(0.00)[bounces-288191-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288192-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rbox.co,linux.dev,secunet.com,decadent.org.uk,gondor.apana.org.au,queasysnail.net,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[sultan@kerneltoast.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kerneltoast.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,kerneltoast.com:dkim]
 X-Rspamd-Action: no action
 
-ISO data PDUs carry a packet-boundary flag indicating START, CONT, END
-or SINGLE. The ISO_CONT branch of iso_recv() guards against a missing
-ISO_START by checking conn->rx_len before touching conn->rx_skb, but
-ISO_END does not.
 
-If a peer sends an ISO_END as the first packet on a fresh ISO
-connection, conn->rx_skb is still NULL and conn->rx_len is zero, so
-skb_put(conn->rx_skb, ...) dereferences NULL and oopses. For BIS,
-where receivers sync to a broadcaster without pairing, any broadcaster
-on the air can trigger this.
+--kZH1xBYXsb9CWdLM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Mirror the ISO_CONT check at the top of ISO_END so a stray end fragment
-is logged and dropped instead of crashing the host.
+On Fri, May 15, 2026 at 02:55:35PM +0900, Hyunwoo Kim wrote:
+> Changes in v4:
+> - Include the tcp_clone_payload() propagation suggested by Sabrina.
+> - Drop the skb_try_coalesce() change; addressed by commit f84eca581739.
+> - v3: https://lore.kernel.org/all/agW4vC0r8QOUKtRT@v4bel/
+> 
+> Changes in v3:
+> - Include the skb_gro_receive() audit patch suggested by Sultan
+> - v2: https://lore.kernel.org/all/agToIEDI4TaTNLRb@v4bel/
+> 
+> Changes in v2:
+> - Also propagate SHARED_FRAG in skb_try_coalesce() and skb_shift()
+> - v1: https://lore.kernel.org/all/agRfuVOeMI5pbHhY@v4bel/
 
-Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- net/bluetooth/iso.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Hi Hyunwoo,
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 7cb2864fe872..b971281f0a2b 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2593,6 +2593,11 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
- 		break;
- 
- 	case ISO_END:
-+		if (!conn->rx_len) {
-+			BT_ERR("Unexpected end frame (len %d)", skb->len);
-+			goto drop;
-+		}
-+
- 		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
- 					  skb->len);
- 		conn->rx_len -= skb->len;
--- 
-2.53.0
+Per your ask to me to use AI for exploring relevant paths [1], I've attached my
+findings from a pretty thorough day of hunting for these with Claude.
 
+None of the findings appear to be currently exploitable.
+
+Please let me know if you have any questions, and I hope you find this helpful.
+
+[1] https://lore.kernel.org/all/agWUdie1xBvBu22I@v4bel/
+
+Thanks,
+Sultan
+
+--kZH1xBYXsb9CWdLM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=shared-frag-audit.txt
+
+Line numbers below are against netdev commit 5db89c99566fc ("net: ifb: report
+ethtool stats over num_tx_queues").
+
+We audited the netdev tree for remaining sites where frag descriptors are
+transferred between skbs without propagating SKBFL_SHARED_FRAG.  Hyunwoo Kim's
+v4 fix covers __pskb_copy_fclone, skb_shift, skb_gro_receive,
+skb_gro_receive_list, and tcp_clone_payload; the standalone f84eca5817390
+covers skb_try_coalesce.  Several other sites in newer code have the same class
+of bug.
+
+None of these are currently reachable for page-cache corruption, since each one
+is blocked by independent guards (cloned skbs, TX-only paths, or data copying).
+They should still be fixed for defense-in-depth: skb_copy_header() doesn't
+propagate shinfo->flags, so every frag-transfer helper that allocates new
+shinfo needs its own propagation line.  This guarantees the bug class will
+recur whenever someone writes a new helper without realizing it.
+
+--- Findings ---
+
+1. unix_stream_sendmsg() -- net/unix/af_unix.c:2461
+
+   Calls skb_splice_from_iter() with MSG_SPLICE_PAGES but never sets
+   SKBFL_SHARED_FRAG.  It's the only skb_splice_from_iter() caller that
+   doesn't do so; compare with tcp_sendmsg_locked() at tcp.c:1371,
+   ip_append_data() at ip_output.c:1237, and ip6_append_data() at
+   ip6_output.c:1801.
+
+   Not reachable since AF_UNIX skbs don't enter the network stack.  When
+   forwarded via splice (unix -> pipe -> tcp), the destination protocol's
+   sendmsg sets the flag independently.
+
+   Fix: add the same flag-set after skb_splice_from_iter(), matching the TCP
+   pattern.
+
+2. iptfs_consume_frags() -- net/xfrm/xfrm_iptfs.c:2152
+
+   memcpy() of the frag array plus iptfs_skb_head_to_frag() conversion.  Zero
+   references to SKBFL_SHARED_FRAG in the entire 2700-line file.
+
+   Not reachable due to three independent guards: the fragmentation path copies
+   data into linear via skb_copy_seq_read() + skb_put() (no page-cache frag
+   references in the result), the share_ok guard blocks aggregation for TCP
+   skbs (since tcp_stream_alloc_skb() uses alloc_skb_fclone() which doesn't
+   set head_frag), and simple aggregation fails because the base skb is a TCP
+   clone.
+
+3. iptfs_skb_add_frags() -- net/xfrm/xfrm_iptfs.c:458
+
+   *tofrag = *frag + __skb_frag_ref() without flag propagation.  The frag walk
+   struct doesn't carry source flags.
+
+   RX path frags come from NIC RX buffers (not page cache).  TX path has the
+   same guards as iptfs_consume_frags().
+
+4. tcp_clone_payload() -- net/ipv4/tcp_output.c:2607
+   **Now fixed in v4** (suggested by Sabrina Dubroca).
+
+   skb_frag_page_copy() / skb_frag_off_copy() / skb_frag_size_set() +
+   skb_frag_ref() from write-queue skbs to a new MTU probe skb.  No flag
+   propagation.
+
+   TX-only (called by tcp_mtu_probe()).  The probe skb goes to
+   tcp_transmit_skb() which clones it before sending.  Can't reach ESP input.
+
+5. skb_zerocopy() -- net/core/skbuff.c:3843
+
+   Frag descriptor assignment + skb_frag_ref().  Calls skb_zerocopy_clone()
+   which handles the zerocopy uarg but not SKBFL_SHARED_FRAG.
+
+   All callers (nfnetlink_queue, openvswitch) send the copy to userspace via
+   netlink.  The original skb continues through the stack with its flags
+   intact.
+
+6. chcr_ktls_copy_record_in_skb() -- drivers/.../chcr_ktls.c:1654
+
+   Frag descriptor assignment from TLS record + __skb_frag_ref().  No flag
+   propagation.
+
+   TX-only, hardware-specific (Chelsio T6 kTLS offload).
+
+7. esp_output_head() -- net/ipv4/esp4.c:426
+
+   The output-side skip_cow checks !skb_cloned() but never checks
+   !skb_has_shared_frag().  Compare with esp_input() at line 877 which does
+   check it (CVE-2026-43284).  The first skip_cow path (tailen <=
+   skb_tailroom) keeps inplace=true, so AEAD encrypt would write ciphertext
+   over source SG entries including frag pages.
+
+   Not reachable in practice: kretprobe tracing on a booted 7.1.0-rc3 kernel
+   confirmed esp_output_head() always returns nfrags >= 2 (the inplace=false
+   second branch), never nfrags=1.  For paged skbs from splice, the tailroom
+   is insufficient for the ESP trailer.  The inplace=false path allocates
+   separate output pages, so frag data is only read as source, never written.
+
+   esp_output_head() should still add the !skb_has_shared_frag() check to
+   match esp_input(), since a future change to skb allocation sizing could
+   make the first skip_cow path reachable.
+
+--- Root cause ---
+
+skb_copy_header() copies gso_size / gso_segs / gso_type from old shinfo to
+new, but it never copies shinfo->flags.  As a result, every frag-transfer
+helper that allocates new shinfo needs its own explicit flag propagation.  This
+is easy to miss when writing new helpers, which is how we ended up with seven
+independent instances of the same bug.
+
+A potential long-term fix would be to propagate SKBFL_SHARED_FRAG (and
+SKBFL_PURE_ZEROCOPY) inside skb_copy_header() itself, matching how skb_split()
+already handles both flags.  This would eliminate the bug class at the source
+rather than playing whack-a-mole with each new helper.
+
+--kZH1xBYXsb9CWdLM--
 
