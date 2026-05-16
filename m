@@ -1,51 +1,83 @@
-Return-Path: <netdev+bounces-288667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mGFyIOLhCGoN9wMAu9opvQ
-	(envelope-from <netdev+bounces-288667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 23:30:10 +0200
+	id cOF9K5zqCGpD/QMAu9opvQ
+	(envelope-from <netdev+bounces-288668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 00:07:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBCAF55DE89
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 23:30:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2098F55E0A2
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 00:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F896301016A
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 21:30:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EC2263012CF6
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 22:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7939B383C92;
-	Sat, 16 May 2026 21:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92FE38656D;
+	Sat, 16 May 2026 22:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SqC6Eq1k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9UQHZ05"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548192F7EF8;
-	Sat, 16 May 2026 21:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C201337B03F
+	for <netdev@vger.kernel.org>; Sat, 16 May 2026 22:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778967007; cv=none; b=aHo4DkoKQWdKZYxF7wNK+8Qd8Q7qLWFQBZxCgxyL4uoz7W5AYAo4HY0v2yDH0p6+BQMTZRPJQGa/lcHHpX2N4Hk+9vXOynQ6s7sSTikKb01bMHyZX+tTKMwwb/Ouw+884XzRa9JmnxUx4KtEA36Ny0a+d3mleJx9AteDa4whx9o=
+	t=1778969240; cv=none; b=R6tc+jldnm1Cti9kn9skgvN4qDvX9ciIIdjCDySwH/LGXHLAG0ezg1BXO0Z0tJk04AMj8V3axHA5FjO4OrCy6+hpm3fCbNl2qMtmBudqpmTmfI1VEqkY/vgJxOqdVIKKXkHUV515Wslu6PNKl3gNiOGGT4xkk1Zav008PQLEqSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778967007; c=relaxed/simple;
-	bh=/nN2zST9toENEy25LiNPDdtTv54/n7y/8h1fvQB5cvE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nNQfXmJrK/ehiT39g+KGXAa3ru0uvs5Ex+YJX0utc9+NMMTXtfg7WRi4XMdjZ8M32ig8rNJR6lhKrNvCReix2EYk/0fEio+clBb0qTgUTFmBJBOcHYL7/Z+emrIEv/Q+zEhl+hQ1NMk41F/99xcFAfnJpiLjWvGGnFGyxzd9IT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SqC6Eq1k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B11C19425;
-	Sat, 16 May 2026 21:30:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778967007;
-	bh=/nN2zST9toENEy25LiNPDdtTv54/n7y/8h1fvQB5cvE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SqC6Eq1kPctumGuVgZ5tFRAbmJ7DoMSPUFz40HZptDpMarUcRKjReZ5Cl91abEi/+
-	 CcR7oNRK0bv4wrmsK1zGwGp4M0Q8bgcvuCNDFUmtM7dql72287IvnAmvzhNxBOayKu
-	 c91Cdm0J2tpOFC6RIi1AhXv2eIiTwT7+Rkt+R99uRBqpzScYPhFOjsaIO7+XoggFJo
-	 DtI6EhmPtOKCbrrfR3K+RZVOvJW+NFxYhEhRTZCH+nzyfDtltf0Vl3tkTgriQwfDgc
-	 id/NgtVm/hqie3S1mHXTtTq09gXWFw1atMC7lAcjeh0PpNhkjrfronICkGvAshQ5dF
-	 pir30BdmUo+jA==
-Message-ID: <afc61e48-5380-4764-8144-db69e4dc728b@kernel.org>
-Date: Sat, 16 May 2026 23:30:03 +0200
+	s=arc-20240116; t=1778969240; c=relaxed/simple;
+	bh=v5WMsobLP3+7NvnMSKh4MkZkRDlzzHlGVopThjLS3fg=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=GWtToyE2sXzFIGejPttVKJHa3Do/oNGBeHPRym5WWRMVr1sIRCoS/vIkWk/D+8/5fnjbcXVdjEibCacOo4wJG0r2/2sXKNBYVZ8vUvKISsZPSoY7VZQYPRlEsLv4h5Ut/m+3lThDqtWptp2wrP3J2KIwus7jUbMn46gOfJR9CVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9UQHZ05; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48e82c23840so6370185e9.3
+        for <netdev@vger.kernel.org>; Sat, 16 May 2026 15:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778969237; x=1779574037; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xlIBwqbdv6cuvPd/rpAHCKGTYDcTOu7bp7HgOAVWHN8=;
+        b=H9UQHZ05IJOpx57kOK5J/EdwnsiJX1SjKxUxyX4CqAB1NCw1W6GHxjBak3lAUQvkul
+         y8wO6lHn+lcbPLdcLpNMH63ktPwaThAHurWpMsZ98SUX17256JeuaWkjbZiYNTQUVRyF
+         jFRV3XdddF7YGWq7+jGbSwUnJA7AJXAl9wn0RA0I7uqjBqWIYTKG95Wc6NQKuunB3qCN
+         +/q/GMHDuQikQ/YovsojDQa2kGWhgfCohqEFT4JW+h9NGwkzY0CvOLwSKFqGbUCCy0kJ
+         s7tmyl2HzmcuvZmXy+KVpwFWvOBdXSGWzsbEWWi8ttAIzNRMBWeZPFZPbrOFxlfwDj5X
+         nDPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778969237; x=1779574037;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xlIBwqbdv6cuvPd/rpAHCKGTYDcTOu7bp7HgOAVWHN8=;
+        b=Zp2+GyQtAGYqr8UIrxv8JgaGpikLT9/OruuIlZmr4NAmU/b+XAyu9oL3vC1B6p7Mr7
+         UmlWbBwWkCH0sqkMdqRh2BZ+I/l5YC2lzpLW5IjxENSQuAJn/9k8uamCR4EYedakvl8S
+         wK7RVTrxFzm9cQhRK1mo3W1+cSyGCzT63TjZmgXd02BQd+PJc3l568Ltaq0Mo8Mr3ypD
+         9yRKWYe8RL2DtH8KuAityAEfJYrr7BzvpjuHc9+l3dutbZjAwc9vOabGN5llzT/B1fkN
+         MzNB1hW1y2ARB34mJ6xH7oVA3JJ6wE3H3bwIN9HCZwWcGmxC0gkX87KfbkkEnum0Qc8b
+         s66Q==
+X-Gm-Message-State: AOJu0YwV3neEzP+iykQGcFpK4+lva1vp/+BOffd9HcBikWPM8na/vRDy
+	A0IRfA0ZWU4N4HyyUlP8Myd3QnL/NUqy5nXHRhhfs95D1NzwtVr2R8bV
+X-Gm-Gg: Acq92OEoKzhqr3KDHmLVDkTds7gxJ8x/yOmK1J8VAZvwF8gyFRjDIupmWhgNcpoyiu4
+	WXu7PoQDR2OFjDpk4+A3Gk/SWPQuWuVkvkp+byXQnQm1ccCfnJnhKFWbv0k+MTOMAFS4OWerNT1
+	hrdfLuz8Y4oU16PjXfZNc1GBRoq6KiJ80ijjZFf9RemWY1N62/jERV8/eS8dONaofiCz+7x1eXz
+	Mky7ujSkGnKwJWNqZ9l0Naef0bnhgPaM9aDsOM7KIEXAf8kxJZp3fZ60naYiMEuXBmU41JfOQau
+	cdd7hNi6vsoQay5BRKX7e0kXrUOkx6hrCmqmxiuM/yJyqxZ1mA3PY+ZDFjhKrP5oTYm8UZLx7zL
+	9tuicxJLgUlLO4wvpjnQuAGMtUdJnuTctYfNtgZlSofnZm/Sr8D6/lg1I5EPCwrsvtcVEuLPDLD
+	EiUKjFhaO4GvyHSoam9t0o8T1TEGuP+9UwdCKw6O+4V8lXx33odnFjyjAzXnhX9eIn1LbX4aOy6
+	4FdOu0tCSBrUIbiEQGldxTg/n9tvgMFLKtPD3aMvlkNZw3Ziv/t3bMyQyVKqSk=
+X-Received: by 2002:a05:600c:4fc9:b0:48d:366:b962 with SMTP id 5b1f17b1804b1-48fe60e368amr114162145e9.6.1778969236869;
+        Sat, 16 May 2026 15:07:16 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f2c:8500:bde1:c576:18ad:a53? (p200300ea8f2c8500bde1c57618ad0a53.dip0.t-ipconnect.de. [2003:ea:8f2c:8500:bde1:c576:18ad:a53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe537c788sm144690005e9.12.2026.05.16.15.07.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 May 2026 15:07:16 -0700 (PDT)
+Message-ID: <841ca1ee-fc93-4735-b006-88735132e064@gmail.com>
+Date: Sun, 17 May 2026 00:07:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,114 +85,441 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/llc: fix UBSAN array-index-out-of-bounds in
- llc_conn_state_process
-To: Kartik Nair <contact.kartikn@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+628f93722c08dc5aabe0@syzkaller.appspotmail.com
-References: <20260515174904.28575-1-contact.kartikn@gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [Patch net-next v3 1/7] r8169: add support for multi irqs
+To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260513115543.1730-1-javen_xu@realsil.com.cn>
+ <20260513115543.1730-2-javen_xu@realsil.com.cn>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260515174904.28575-1-contact.kartikn@gmail.com>
+In-Reply-To: <20260513115543.1730-2-javen_xu@realsil.com.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: DBCAF55DE89
+X-Rspamd-Queue-Id: 2098F55E0A2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288667-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288668-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,628f93722c08dc5aabe0];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 15/05/2026 19:49, Kartik Nair wrote:
-> When a timer fires while the socket is owned by a user, the timer event
-> is deferred to the backlog via __sk_add_backlog(). By the time the
-> backlog drains, llc->state may have been set to LLC_CONN_OUT_OF_SVC (0)
-> by socket teardown. llc_conn_state_process() then calls llc_conn_service()
-> which computes llc_offset_table[state - 1] = llc_offset_table[-1],
-> triggering UBSAN array-index-out-of-bounds.
+On 13.05.2026 13:55, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
 > 
-> llc_process_tmr_ev() already guards against LLC_CONN_OUT_OF_SVC for the
-> direct path, but this guard is bypassed when sock_owned_by_user() is true
-> and the event is queued to the backlog. By the time the backlog drains,
-> teardown may have set state to 0.
+> RSS uses multi rx queues to receive packets, and each rx queue needs one
+> irq and napi. So this patch adds support for multi irqs and napi here.
 > 
-> The direct path already handles this case, so the same check belongs
-> in the consumer too.
+> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+> ---
+> Changes in v2:
+>  - remove some unused definitions, such as index, name in rtl8169_irq
+>  - remove array imr and isr
+>  - remove min_irq_nvecs and max_irq_nvecs, replaced with help function
+>    get_min_irq_nvecs and get_max_irq_nvecs
+>  - alloc irq by flags, instead of PCI_IRQ_ALL_TYPES
+> 
+> Changes in v3:
+>  - add enum rtl_isr_version to replace macro definition
+>  - remove struct rtl8169_napi, use napi_struct array instead and alloc
+>    memory for this array dynamically
+>  - remove struct rtl8169_irq
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 146 +++++++++++++++++++---
+>  1 file changed, 127 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 791277e750ba..e4fc84c97c1e 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -77,6 +77,7 @@
+>  #define R8169_RX_RING_BYTES	(NUM_RX_DESC * sizeof(struct RxDesc))
+>  #define R8169_TX_STOP_THRS	(MAX_SKB_FRAGS + 1)
+>  #define R8169_TX_START_THRS	(2 * R8169_TX_STOP_THRS)
+> +#define R8169_MAX_MSIX_VEC	32
+>  
+>  #define OCP_STD_PHY_BASE	0xa400
+>  
+> @@ -435,6 +436,8 @@ enum rtl8125_registers {
+>  #define INT_CFG0_CLKREQEN		BIT(3)
+>  	IntrMask_8125		= 0x38,
+>  	IntrStatus_8125		= 0x3c,
+> +	INTR_VEC_MAP_MASK	= 0x800,
+> +	INTR_VEC_MAP_STATUS	= 0x802,
+>  	INT_CFG1_8125		= 0x7a,
+>  	LEDSEL2			= 0x84,
+>  	LEDSEL1			= 0x86,
+> @@ -578,6 +581,11 @@ enum rtl_register_content {
+>  	MagicPacket_v2	= (1 << 16),	/* Wake up when receives a Magic Packet */
+>  };
+>  
+> +enum rtl_isr_version {
+> +	RTL_ISR_VER_DEFAULT = 0,
+> +	RTL_ISR_VER_8127,
+> +};
+> +
+>  enum rtl_desc_bit {
+>  	/* First doubleword. */
+>  	DescOwn		= (1 << 31), /* Descriptor is owned by NIC */
+> @@ -733,7 +741,6 @@ struct rtl8169_private {
+>  	struct pci_dev *pci_dev;
+>  	struct net_device *dev;
+>  	struct phy_device *phydev;
+> -	struct napi_struct napi;
+>  	enum mac_version mac_version;
+>  	enum rtl_dash_type dash_type;
+>  	u32 cur_rx; /* Index into the Rx descriptor buffer of next Rx pkt. */
+> @@ -745,9 +752,16 @@ struct rtl8169_private {
+>  	dma_addr_t RxPhyAddr;
+>  	struct page *Rx_databuff[NUM_RX_DESC];	/* Rx data buffers */
+>  	struct ring_info tx_skb[NUM_TX_DESC];	/* Tx data buffers */
+> +	struct napi_struct *rtl8169_napi;
+> +	unsigned int num_rx_rings;
+>  	u16 cp_cmd;
+>  	u16 tx_lpi_timer;
+>  	u32 irq_mask;
+> +	u16 hw_supp_num_rx_queues;
 
-Considering you sent similarly complex patches to MM, WiFi, accel and
-now to NFC, I am sure you are using LLM without disclosing it.
+Sized types should only be used if the value directly represents
+a register value. Why not simply use unsigned int here?
 
-Please explain with your own words what is the "direct path"?
+> +	enum rtl_isr_version hw_supp_isr_ver;
+> +	enum rtl_isr_version hw_curr_isr_ver;
+> +	u8 irq_nvecs;
+> +	bool recheck_desc_ownbit;
 
-Best regards,
-Krzysztof
+Can't this flag be moved to, and handled the same as,
+the following bool xxx:1 flags?
+
+>  	int irq;
+>  	struct clk *clk;
+>  
+> @@ -763,6 +777,8 @@ struct rtl8169_private {
+>  	unsigned aspm_manageable:1;
+>  	unsigned dash_enabled:1;
+>  	bool sfp_mode:1;
+> +	bool rss_support:1;
+> +	bool rss_enable:1;
+>  	dma_addr_t counters_phys_addr;
+>  	struct rtl8169_counters *counters;
+>  	struct rtl8169_tc_offsets tc_offset;
+> @@ -2680,6 +2696,21 @@ static void rtl_hw_reset(struct rtl8169_private *tp)
+>  	rtl_loop_wait_low(tp, &rtl_chipcmd_cond, 100, 100);
+>  }
+>  
+> +static void rtl_software_parameter_initialize(struct rtl8169_private *tp)
+> +{
+> +	tp->num_rx_rings = 1;
+> +
+> +	switch (tp->mac_version) {
+> +	case RTL_GIGA_MAC_VER_80:
+> +		tp->hw_supp_isr_ver = RTL_ISR_VER_8127;
+> +		break;
+> +	default:
+> +		tp->hw_supp_isr_ver = RTL_ISR_VER_DEFAULT;
+> +		break;
+> +	}
+> +	tp->hw_curr_isr_ver = tp->hw_supp_isr_ver;
+
+I don't see hw_supp_isr_ver used anywhere else, so do we need to store it?
+
+> +}
+> +
+>  static void rtl_request_firmware(struct rtl8169_private *tp)
+>  {
+>  	struct rtl_fw *rtl_fw;
+> @@ -4266,9 +4297,21 @@ static void rtl8169_tx_clear(struct rtl8169_private *tp)
+>  	netdev_reset_queue(tp->dev);
+>  }
+>  
+> +static void rtl8169_napi_disable(struct rtl8169_private *tp)
+> +{
+> +	for (int i = 0; i < tp->irq_nvecs; i++)
+> +		napi_disable(&tp->rtl8169_napi[i]);
+> +}
+> +
+> +static void rtl8169_napi_enable(struct rtl8169_private *tp)
+> +{
+> +	for (int i = 0; i < tp->irq_nvecs; i++)
+> +		napi_enable(&tp->rtl8169_napi[i]);
+> +}
+> +
+>  static void rtl8169_cleanup(struct rtl8169_private *tp)
+>  {
+> -	napi_disable(&tp->napi);
+> +	rtl8169_napi_disable(tp);
+>  
+>  	/* Give a racing hard_start_xmit a few cycles to complete. */
+>  	synchronize_net();
+> @@ -4314,7 +4357,7 @@ static void rtl_reset_work(struct rtl8169_private *tp)
+>  	for (i = 0; i < NUM_RX_DESC; i++)
+>  		rtl8169_mark_to_asic(tp->RxDescArray + i);
+>  
+> -	napi_enable(&tp->napi);
+> +	rtl8169_napi_enable(tp);
+>  	rtl_hw_start(tp);
+>  }
+>  
+> @@ -4820,7 +4863,7 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
+>  			goto release_descriptor;
+>  		}
+>  
+> -		skb = napi_alloc_skb(&tp->napi, pkt_size);
+> +		skb = napi_alloc_skb(&tp->rtl8169_napi[0], pkt_size);
+>  		if (unlikely(!skb)) {
+>  			dev->stats.rx_dropped++;
+>  			goto release_descriptor;
+> @@ -4844,7 +4887,7 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
+>  		if (skb->pkt_type == PACKET_MULTICAST)
+>  			dev->stats.multicast++;
+>  
+> -		napi_gro_receive(&tp->napi, skb);
+> +		napi_gro_receive(&tp->rtl8169_napi[0], skb);
+>  
+>  		dev_sw_netstats_rx_add(dev, pkt_size);
+>  release_descriptor:
+> @@ -4856,7 +4899,8 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
+>  
+>  static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
+>  {
+> -	struct rtl8169_private *tp = dev_instance;
+> +	struct napi_struct *napi = dev_instance;
+> +	struct rtl8169_private *tp = netdev_priv(napi->dev);
+
+Revers xmas tree
+
+>  	u32 status = rtl_get_events(tp);
+>  
+>  	if ((status & 0xffff) == 0xffff || !(status & tp->irq_mask))
+> @@ -4873,13 +4917,41 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
+>  		phy_mac_interrupt(tp->phydev);
+>  
+>  	rtl_irq_disable(tp);
+> -	napi_schedule(&tp->napi);
+> +	napi_schedule(napi);
+>  out:
+>  	rtl_ack_events(tp, status);
+>  
+>  	return IRQ_HANDLED;
+>  }
+>  
+> +static void rtl8169_free_irq(struct rtl8169_private *tp)
+> +{
+> +	for (int i = 0; i < tp->irq_nvecs; i++) {
+> +		struct napi_struct *napi = &tp->rtl8169_napi[i];
+> +
+> +		pci_free_irq(tp->pci_dev, i, napi);
+> +	}
+> +}
+> +
+> +static int rtl8169_request_irq(struct rtl8169_private *tp)
+> +{
+> +	struct net_device *dev = tp->dev;
+> +	struct napi_struct *napi;
+> +	int rc = 0;
+> +
+> +	for (int i = 0; i < tp->irq_nvecs; i++) {
+> +		napi = &tp->rtl8169_napi[i];
+> +		rc = pci_request_irq(tp->pci_dev, i, rtl8169_interrupt,
+> +				     NULL, napi, "%s-%d", dev->name, i);
+> +		if (rc)
+> +			break;
+> +	}
+> +
+> +	if (rc)
+> +		rtl8169_free_irq(tp);
+> +	return rc;
+> +}
+> +
+>  static void rtl_task(struct work_struct *work)
+>  {
+>  	struct rtl8169_private *tp =
+> @@ -4914,9 +4986,9 @@ static void rtl_task(struct work_struct *work)
+>  
+>  static int rtl8169_poll(struct napi_struct *napi, int budget)
+>  {
+> -	struct rtl8169_private *tp = container_of(napi, struct rtl8169_private, napi);
+> -	struct net_device *dev = tp->dev;
+> -	int work_done;
+> +	struct net_device *dev = napi->dev;
+> +	struct rtl8169_private *tp = netdev_priv(dev);
+
+Reverse xmas tree
+
+> +	int work_done = 0;
+>  
+>  	rtl_tx(dev, tp, budget);
+>  
+> @@ -5035,7 +5107,7 @@ static void rtl8169_up(struct rtl8169_private *tp)
+>  	phy_init_hw(tp->phydev);
+>  	phy_resume(tp->phydev);
+>  	rtl8169_init_phy(tp);
+> -	napi_enable(&tp->napi);
+> +	rtl8169_napi_enable(tp);
+>  	enable_work(&tp->wk.work);
+>  	rtl_reset_work(tp);
+>  
+> @@ -5053,7 +5125,7 @@ static int rtl8169_close(struct net_device *dev)
+>  	rtl8169_down(tp);
+>  	rtl8169_rx_clear(tp);
+>  
+> -	free_irq(tp->irq, tp);
+> +	rtl8169_free_irq(tp);
+>  
+>  	phy_disconnect(tp->phydev);
+>  
+> @@ -5082,7 +5154,6 @@ static int rtl_open(struct net_device *dev)
+>  {
+>  	struct rtl8169_private *tp = netdev_priv(dev);
+>  	struct pci_dev *pdev = tp->pci_dev;
+> -	unsigned long irqflags;
+>  	int retval = -ENOMEM;
+>  
+>  	pm_runtime_get_sync(&pdev->dev);
+> @@ -5107,8 +5178,7 @@ static int rtl_open(struct net_device *dev)
+>  
+>  	rtl_request_firmware(tp);
+>  
+> -	irqflags = pci_dev_msi_enabled(pdev) ? IRQF_NO_THREAD : IRQF_SHARED;
+> -	retval = request_irq(tp->irq, rtl8169_interrupt, irqflags, dev->name, tp);
+> +	retval = rtl8169_request_irq(tp);
+>  	if (retval < 0)
+>  		goto err_release_fw_2;
+>  
+> @@ -5125,7 +5195,7 @@ static int rtl_open(struct net_device *dev)
+>  	return retval;
+>  
+>  err_free_irq:
+> -	free_irq(tp->irq, tp);
+> +	rtl8169_free_irq(tp);
+>  err_release_fw_2:
+>  	rtl_release_firmware(tp);
+>  	rtl8169_rx_clear(tp);
+> @@ -5328,7 +5398,9 @@ static void rtl_set_irq_mask(struct rtl8169_private *tp)
+>  
+>  static int rtl_alloc_irq(struct rtl8169_private *tp)
+>  {
+> +	struct pci_dev *pdev = tp->pci_dev;
+>  	unsigned int flags;
+> +	int nvecs;
+>  
+>  	switch (tp->mac_version) {
+>  	case RTL_GIGA_MAC_VER_02 ... RTL_GIGA_MAC_VER_06:
+> @@ -5344,7 +5416,14 @@ static int rtl_alloc_irq(struct rtl8169_private *tp)
+>  		break;
+>  	}
+>  
+> -	return pci_alloc_irq_vectors(tp->pci_dev, 1, 1, flags);
+> +	nvecs = pci_alloc_irq_vectors(pdev, 1, 1, flags);
+> +
+> +	if (nvecs < 0)
+> +		return nvecs;
+> +
+> +	tp->irq_nvecs = nvecs;
+> +
+> +	return 0;
+>  }
+>  
+>  static void rtl_read_mac_address(struct rtl8169_private *tp,
+> @@ -5539,6 +5618,17 @@ static void rtl_hw_initialize(struct rtl8169_private *tp)
+>  	}
+>  }
+>  
+> +static int rtl8169_set_real_num_queue(struct rtl8169_private *tp)
+> +{
+> +	int retval;
+
+Sometimes you use retval, sometimes rc. This driver typically uses ret.
+
+> +
+> +	retval = netif_set_real_num_tx_queues(tp->dev, 1);
+> +	if (retval < 0)
+> +		return retval;
+> +
+> +	return netif_set_real_num_rx_queues(tp->dev, tp->num_rx_rings);
+> +}
+> +
+>  static int rtl_jumbo_max(struct rtl8169_private *tp)
+>  {
+>  	/* Non-GBit versions don't support jumbo frames */
+> @@ -5599,6 +5689,12 @@ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
+>  	return false;
+>  }
+>  
+> +static void r8169_init_napi(struct rtl8169_private *tp)
+> +{
+> +	for (int i = 0; i < tp->irq_nvecs; i++)
+> +		netif_napi_add(tp->dev, &tp->rtl8169_napi[i], rtl8169_poll);
+> +}
+> +
+>  static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  {
+>  	const struct rtl_chip_info *chip;
+> @@ -5703,11 +5799,16 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  
+>  	rtl_hw_reset(tp);
+>  
+> +	rtl_software_parameter_initialize(tp);
+> +
+>  	rc = rtl_alloc_irq(tp);
+>  	if (rc < 0)
+>  		return dev_err_probe(&pdev->dev, rc, "Can't allocate interrupt\n");
+>  
+> -	tp->irq = pci_irq_vector(pdev, 0);
+> +	tp->rtl8169_napi = devm_kcalloc(&pdev->dev, tp->irq_nvecs,
+> +					sizeof(struct napi_struct), GFP_KERNEL);
+> +	if (!tp->rtl8169_napi)
+> +		return -ENOMEM;
+>  
+>  	INIT_WORK(&tp->wk.work, rtl_task);
+>  	disable_work(&tp->wk.work);
+> @@ -5716,7 +5817,10 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  
+>  	dev->ethtool_ops = &rtl8169_ethtool_ops;
+>  
+> -	netif_napi_add(dev, &tp->napi, rtl8169_poll);
+> +	if (!tp->rss_support)
+> +		netif_napi_add(dev, &tp->rtl8169_napi[0], rtl8169_poll);
+> +	else
+> +		r8169_init_napi(tp);
+>  
+>  	dev->hw_features = NETIF_F_IP_CSUM | NETIF_F_RXCSUM |
+>  			   NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX;
+> @@ -5778,6 +5882,10 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	if (jumbo_max)
+>  		dev->max_mtu = jumbo_max;
+>  
+> +	rc = rtl8169_set_real_num_queue(tp);
+> +	if (rc < 0)
+> +		return dev_err_probe(&pdev->dev, rc, "set tx/rx num failure\n");
+> +
+>  	rtl_set_irq_mask(tp);
+>  
+>  	tp->counters = dmam_alloc_coherent (&pdev->dev, sizeof(*tp->counters),
+
 
