@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-288633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288634-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eUP0OC13CGpOqwMAu9opvQ
-	(envelope-from <netdev+bounces-288633-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 15:54:53 +0200
+	id YBl9LEF3CGpOqwMAu9opvQ
+	(envelope-from <netdev+bounces-288634-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 15:55:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30E5D55BF75
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 15:54:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D43B55BF8B
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 15:55:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E01B33008A55
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 13:54:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3AE5930103B6
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 13:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5274E3E2752;
-	Sat, 16 May 2026 13:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A23C3E2AB6;
+	Sat, 16 May 2026 13:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YvmT7tZW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lOSKGSXT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D4B2580CF
-	for <netdev@vger.kernel.org>; Sat, 16 May 2026 13:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CC83D567E
+	for <netdev@vger.kernel.org>; Sat, 16 May 2026 13:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778939690; cv=none; b=ScNKG5WEEfVwOUpawxPyE8CpJqWALTVE4BRO8jmWXTriViqQ2XNDH0JiMqmtzlQ3P0xxCPx2/FkGzukFfZy0XhEZGI2gLb8pPtfX8sTSm3wlyIfYGmHMyOZmRTpebqBFHrQ1MISnwHxvU2iXgPLE0bOOeOgPPrrgz4btUj967aQ=
+	t=1778939691; cv=none; b=IPfFSs/Jl2WbY6BaN6JJxzH4V0t8r6uEab6phanmreEc+B23w2eRx4hF6TtRd2CBL+j/t5X6udD4FmDtma7j5VAh/3exhaWZM/lomJAkjDaD/SHWrX0ZxAtEGVBtp3f+M9d7RYmkHEBV74fMZiPQ2G6Q8W0bBzR9bjmwgtLnxtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778939690; c=relaxed/simple;
-	bh=oAd8+u9veKXMSzawomfdaIEz00uqz+8Kr29J7YGDexM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cCeFrGasEwJr8NZIA2QOWHI8vCnn78jND0GPTxOq+57aK/9Uo4Vn0ZxfgWX6y0wegIKRcNu7YJCxUcrfMJf+NhFY21mGzR+GnIvRNpGDhUekoOdRNgJM/okwD6N5n30x7r2Z+xBMRZq23ZJ89XjUDnYFYytl9mTenwmpc5CegDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YvmT7tZW; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1778939691; c=relaxed/simple;
+	bh=VpoQujZ9GQMnf5nQHTEp2Qyqm03Jlz6XjLvYPy3uE5A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=blIGvd2Kp6IpyG1993i/9qMBUeBZ5H/eQEmjfcKjgj/zJMyF5AneRDehAsBAJHXYKJtoTphWaPp9zVH+Uc9n1KjBPIgzpHioN9NcWEH6vLRptfQ4wT3q9zT4n37Njvfi5Lf20BhLw/X+rio8rSRhuKWkXcBOBIn5uIb5MDgijZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lOSKGSXT; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4891c0620bcso3793455e9.1
-        for <netdev@vger.kernel.org>; Sat, 16 May 2026 06:54:48 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-48d102471a4so5362345e9.2
+        for <netdev@vger.kernel.org>; Sat, 16 May 2026 06:54:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778939687; x=1779544487; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9IW/+7uckKhQmoH+ll6/6XySLsCP/Qj0il6Jj7grGd0=;
-        b=YvmT7tZWsAm4kXzMyKF5SLdTMIq55kT5GsGj2N7Uk/8H0qRL0gXSqkKae6g4rTuEQb
-         hQjmsow+Qbe+XJJVVK1EdBu4cKlszmscp/ML+oQlRLrT1bkNwe4A9x4iUUCMQB0u8rJy
-         GMZ1xMMFIprpn4PKTq8idjl45qmEG9ZVCwID4N9UAfOE9/5mfxNI524fO8wQkES/53Hp
-         Jbk9LUnD2q5xRVQhNMZMtcK7WAidl1uZfceZiM+sK7BR8pOKJ1GQfAAhpbxGxFj0SXzO
-         A0VFYOWGiOECZ+w4xifK19xEmO9d5Kwuat0H06R+4BEubnrQ6sHyY/RT2VIM/+8TM3So
-         wh/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778939687; x=1779544487;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778939688; x=1779544488; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9IW/+7uckKhQmoH+ll6/6XySLsCP/Qj0il6Jj7grGd0=;
-        b=RKQ0/9Su4FtLmeWZTqtUYMXKaOGx2tj7Rto10vKESnS6s82Qq+T2OJG2r2aJihg6tz
-         KtBfAbM2w02xDVlcnmPD57LdNoCcpUcQkQ3lLVTZN1Oh6e7rU18Ht1AATaHrXiErWacd
-         id7hH6ayTEpDqT72NP/1fSD4YjUc+UPFaQtOCkSfetyMM5ND0UUkjMagZG8H9+DuVJSs
-         RdVdcQRemCr7bhC/rJg6N/RhBOeY5iSc8nUX+Pr0xD6oDJ4F7S1U8Oyr8wdJ59khvOFP
-         gpYTdyvWIWDdwphfKMzhsVnd358kU0EUcoOfWSeJeatuRsQ9ZkJm/H36Li9VmkWgeHdO
-         9dRw==
-X-Gm-Message-State: AOJu0YyToAlQooBErszQhMFf17au5uFXXEJw4bUtHBlbdspnvrDG9+zq
-	RpC4r1TA/dLQZkZdYKUpCmd1rzsdt82FomQ1hVRLGfeXDIsQMd36wQ70
-X-Gm-Gg: Acq92OF1Bzw/IQND9DDjzllsqrvag89wyPwDR/119P2N7rxlktNYTuwy9YdJweiI22z
-	5OLz4btAHRkLPhH7mxd2eANVBrftoCHK+sdvvFGVIRNloyHifxaF87AO1SKf9DVEBibPuHECdex
-	OEeOCmGU7LR2+sjPrJSdbpJzvKKIsVllxP5UY7vOhyinrl6cifDrwk47K1hMoEUeMO+vc6ukuAT
-	PVP8SziKQKYHsn+VOqodUBPinFJSatNuNXt6GPp6d8DsRg8EZWKRBIjXIwtdffGEH7ooVL0Rz4C
-	J6AQwKC6qE9FCbXFElILPVWXEzzl4TAGd4GTEJjxp5XMsNvUv3MYXgE62kwILApcrRKf906G1da
-	8tdIibLMKqONrmZNCthQhYt+SosVny4vf/0v50pSihAggo8eZyHj/C4iQ+V50npnqcLV4b5M3rb
-	W5P2NaNPjrLv8g/PECbH3+xjM28g==
-X-Received: by 2002:a05:600c:3e07:b0:48f:d1c0:721e with SMTP id 5b1f17b1804b1-48fe60d7823mr118973705e9.12.1778939686924;
-        Sat, 16 May 2026 06:54:46 -0700 (PDT)
+        bh=dIrvNnWJICom0gFogZEpaj6AR2Yk4bcfuHPYqmXxhME=;
+        b=lOSKGSXT2SXGXiLWWQI/9SlV6wS+20MbZt3iKHpOFZbM04s9URdNu5GlXYVZFqLUYd
+         3GgsEf3zzmPdxH/NCDu3HqSYAx4F/q48JhzUT1/8U2rZ3bMB+ppStkh7A2SkzrsgxKHf
+         jfSfJhcsdVPOWQBE90u2geodLM0MJXpwgCd02ZpUyNXZ07lKoyJuvnG9wU76syhqm9Ik
+         CLgFR4Bh5BBRaS4WPtV6Zd2/TdEAmF9N7jeh5CXrh5y6vAT6cpE7R/hShYH5CNL7fQbi
+         Xlry6e3SqiekDHB1gDefJb2B2PFs2RsNz0SnX7JguQpaebR6AYhcwe5jx/EMpKD1G5fp
+         cgyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778939688; x=1779544488;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dIrvNnWJICom0gFogZEpaj6AR2Yk4bcfuHPYqmXxhME=;
+        b=boNdsLaFlLoy2wImWd7J9CRQsMAc6Iajts3xDbjEjWrxRxs73QEArd3w+g/gaUH7e5
+         SkdR400lIroiashTlpBPmF+6U9GX1WurwPTvvIKZHZf/hQppCrx8bR+9JzkaslgJyUQI
+         sb30cj9fwyipS6x4HGqD9yDRqYZhTkPk2IEiW5Tts7rQ7P4+ySnbS7KlqQ9r77SM/Bke
+         r20Wbcp7ktmJKseem8MKMGPN+x29eacU7xEQEEknaguns6tUentp/1wMHQABiN/qGlrO
+         I3gnvc8gImHMijBM8drhPgiKch+6dUFcmFNQpsq8mCPOk8ZxJfGywxe2IWpL7m3w980y
+         t5+Q==
+X-Gm-Message-State: AOJu0YzVpagab1LO+k97STyGVwLI+ceUB9pp28gvsZALZX9d5miBRBoD
+	5UUBggkyFQRhpJZay5eJsoZPLWLA1S5xkLhk7HVcDBWdi+4sxSyuVP0e
+X-Gm-Gg: Acq92OGZrE2+tMnj1GgvLOL5FuQFkI8s9k4PiieUTSSPeloDr1aeyj/Vfe5+TjsutvZ
+	bATy07DRlV3gHEYHxTlxoSx9mogoOFMqThQ8yBoWs5YrXsnq3cIwV57GbePK9dc78BUJzf03pkB
+	kkEVE9CUn/H13/kYAQnt09tCHaHXlGMbvQ8WsjnyJsxvjn/wvDUaZeyqji1eNVCPtLPB22yOqq3
+	4+5h9AKNfcosgis6H9eburSOXtg4UFJCmyodZhZew2eYL2QyKtGyH/rGPYw2CTFrmMCkelplsXU
+	4cpW8szhWrwqZ2gLuUTB70gaACK1mzYOBYq+uyn1SpD7xQsDV1Yiz/0N66ddDZ5vFdcZx1N0Kl+
+	/jTqoKbPJhhGm6jwSjze757qxhZyLF9CSX/8TAeqIu6vvIM7HWg89r7h7Fj6F7VKIkaX/sO64UU
+	azR5Q0VXAl0jqC5QxDnl6yWWeEdg==
+X-Received: by 2002:a05:600c:4685:b0:48e:5d91:cfe3 with SMTP id 5b1f17b1804b1-48fe5fd494dmr113773895e9.1.1778939687859;
+        Sat, 16 May 2026 06:54:47 -0700 (PDT)
 Received: from builder ([2001:9e8:f136:a916:be24:11ff:fe30:5d85])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe537c788sm123360645e9.12.2026.05.16.06.54.46
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe537c788sm123360645e9.12.2026.05.16.06.54.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 May 2026 06:54:46 -0700 (PDT)
+        Sat, 16 May 2026 06:54:47 -0700 (PDT)
 From: Jonas Jelonek <jelonek.jonas@gmail.com>
 To: Russell King <linux@armlinux.org.uk>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -87,10 +89,12 @@ Cc: netdev@vger.kernel.org,
 	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
 	Simon Horman <horms@kernel.org>,
 	Jonas Jelonek <jelonek.jonas@gmail.com>
-Subject: [PATCH net-next v8 0/2] net: sfp: extend SMBus support
-Date: Sat, 16 May 2026 13:54:40 +0000
-Message-ID: <20260516135442.2234729-1-jelonek.jonas@gmail.com>
+Subject: [PATCH net-next v8 1/2] net: sfp: apply I2C adapter quirks to limit block size
+Date: Sat, 16 May 2026 13:54:41 +0000
+Message-ID: <20260516135442.2234729-2-jelonek.jonas@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260516135442.2234729-1-jelonek.jonas@gmail.com>
+References: <20260516135442.2234729-1-jelonek.jonas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,14 +102,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 30E5D55BF75
+X-Rspamd-Queue-Id: 3D43B55BF8B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -113,12 +117,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-288633-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288634-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,mork.no,kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -133,98 +137,61 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Today, the SFP driver only drives I2C adapters that advertise full
-I2C_FUNC_I2C, or SMBus-only adapters via single-byte transfers (with
-hwmon disabled). Several SoCs ship I2C/SMBus-only controllers that
-support more than just byte access -- e.g. word and I2C block -- and
-have SFP cages wired to them. Today, those adapters either work
-poorly or not at all.
+The SFP driver assumes all I2C adapters support reading and writing the
+pre-defined block size SFP_EEPROM_BLOCK_SIZE of 16 bytes. This constant
+was probably chosen based on good guesses and known limitations of a
+range of I2C adapters and SFP modules.
 
-This series teaches the SFP driver to use the larger SMBus access
-modes when the adapter advertises them, and along the way starts
-honoring i2c_adapter quirks on read/write length so adapters that
-cap below the SFP block size are handled correctly. Patch 1 is a
-small prep doing only the quirks handling; patch 2 extends the
-SMBus path itself.
+However, I2C adapters may even support less and usually need to specify
+this via I2C quirks. Theoretically, such an adapter may provide full
+functionality but only support a read and write length of e.g. 8 bytes.
+Currently, the SFP driver doesn't account for that.
 
-Capability matrix supported by patch 2:
-  - BYTE only:                   single-byte access (unchanged).
-  - BYTE + WORD:                 word for >=2-byte chunks, byte tail.
-  - I2C_BLOCK present:           block as the universal transport.
-  - WORD only (no BYTE/BLOCK):   accepted with WARN_ONCE; works for
-                                 even-length transfers, odd-length
-                                 transfers will error at xfer time.
+Add handling for I2C quirks in SFP I2C configuration taking the fields
+max_read_len and max_write_len in struct i2c_adapter_quirks into account
+to further limit the maximum block size if needed.
 
-Adapters with asymmetric R/W capabilities (e.g. only READ_I2C_BLOCK
-without WRITE_I2C_BLOCK) remain functionally correct but use the
-worse-supported direction's max for both directions, since
-i2c_max_block_size is a single field. No mainline I2C driver was
-seen advertising such asymmetry; per-direction sizes can be added
-later if needed.
-
+Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
 ---
-v7 -> v8:
-  - avoid leaking uninitialized memory on short reads by
-    zero-initializing i2c_smbus_data variable (Simon)
-  - theoretical issue without practical impact raised at [1]
-    not addressed but acknowledged at [2]
-v7: https://lore.kernel.org/netdev/20260507093301.1144740-1-jelonek.jonas@gmail.com/ 
+ drivers/net/phy/sfp.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-v6 -> v7:
-  - use i2c_block_size instead of i2c_max_block_size (Maxime)
-  - move WARN_ONCE into 'else if ()' (Maxime)
-  - reword comments
-  - included Maxime's Reviewed-by for patch 1
-v6: https://lore.kernel.org/netdev/20260505200647.1125311-1-jelonek.jonas@gmail.com/
-
-v5 -> v6:
-  - Split adapter-quirks handling into a separate prep patch (1/2).
-  - Use I2C_SMBUS_I2C_BLOCK_DATA in the block-write branch (was
-    I2C_SMBUS_WORD_DATA), so block writes actually transfer this_len
-    bytes (also flagged by Jakub's AI bot review).
-  - In sfp_smbus_read/write, check i2c_smbus_xfer() return before
-    copying smbus_data into the caller's buffer.
-  - Use I2C_BLOCK as the universal transport when available (carries
-    any length 1..32); drop the this_len > 2 guard on the block
-    branches.
-  - Broaden the SMBus gate to also accept BLOCK-only adapters
-    (Russell).
-  - Accept word-only adapters with WARN_ONCE rather than rejecting
-    them (Andrew).
-  - Add a short comment in sfp_i2c_configure() explaining the access
-    hierarchy (Maxime).
-  - Use the all-bits-set form via i2c_check_functionality() for the
-    composite I2C_FUNC_SMBUS_* checks (Russell).
-v5: https://lore.kernel.org/netdev/20260116113105.244592-1-jelonek.jonas@gmail.com/
-
-v4 -> v5:
-  - made a more general approach, also covering word access
-v4: https://lore.kernel.org/netdev/20260109101321.2804-1-jelonek.jonas@gmail.com/
-
-v3 -> v4:
-  - fix formal issues
-v3: https://lore.kernel.org/netdev/20260105161242.578487-1-jelonek.jonas@gmail.com/
-
-v2 -> v3:
-  - fix previous attempt of v2 to fix return value
-v2: https://lore.kernel.org/netdev/20260105154653.575397-1-jelonek.jonas@gmail.com/
-
-v1 -> v2:
-  - return number of written bytes instead of zero
-v1: https://lore.kernel.org/netdev/20251228213331.472887-1-jelonek.jonas@gmail.com/
-
-[1] https://lore.kernel.org/netdev/20260510164726.1401317-1-horms@kernel.org/
-[2] https://lore.kernel.org/netdev/5129a58d-8852-4395-85e1-8991934810b8@gmail.com/
----
-Jonas Jelonek (2):
-  net: sfp: apply I2C adapter quirks to limit block size
-  net: sfp: extend SMBus support
-
- drivers/net/phy/sfp.c | 146 +++++++++++++++++++++++++++++++++---------
- 1 file changed, 117 insertions(+), 29 deletions(-)
-
-
-base-commit: 822d4a8e390a08ccfaf2abb347ae670b230b196f
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index bd970f753beb..e58e29a1e8d2 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -807,21 +807,29 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
+ 
+ static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
+ {
++	size_t max_block_size;
++
+ 	sfp->i2c = i2c;
+ 
+ 	if (i2c_check_functionality(i2c, I2C_FUNC_I2C)) {
+ 		sfp->read = sfp_i2c_read;
+ 		sfp->write = sfp_i2c_write;
+-		sfp->i2c_max_block_size = SFP_EEPROM_BLOCK_SIZE;
++		max_block_size = SFP_EEPROM_BLOCK_SIZE;
+ 	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA)) {
+ 		sfp->read = sfp_smbus_byte_read;
+ 		sfp->write = sfp_smbus_byte_write;
+-		sfp->i2c_max_block_size = 1;
++		max_block_size = 1;
+ 	} else {
+ 		sfp->i2c = NULL;
+ 		return -EINVAL;
+ 	}
+ 
++	if (i2c->quirks && i2c->quirks->max_read_len)
++		max_block_size = min(max_block_size, i2c->quirks->max_read_len);
++	if (i2c->quirks && i2c->quirks->max_write_len)
++		max_block_size = min(max_block_size, i2c->quirks->max_write_len);
++
++	sfp->i2c_max_block_size = max_block_size;
+ 	return 0;
+ }
+ 
 -- 
 2.51.0
 
