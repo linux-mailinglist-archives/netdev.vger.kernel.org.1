@@ -1,200 +1,178 @@
-Return-Path: <netdev+bounces-288664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288665-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id W5D2InvNCGrg5wMAu9opvQ
-	(envelope-from <netdev+bounces-288664-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 22:03:07 +0200
+	id eOMCHzjVCGpJ7QMAu9opvQ
+	(envelope-from <netdev+bounces-288665-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 22:36:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 954E255D9D0
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 22:03:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5B1B55DB21
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 22:36:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FB21300CE4F
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 20:03:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8220630107F1
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 20:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59AD42FFF99;
-	Sat, 16 May 2026 20:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0176935E1D9;
+	Sat, 16 May 2026 20:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lCYhNtqU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXZK1rpK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C494248166;
-	Sat, 16 May 2026 20:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778961783; cv=none; b=ZX51dUB304Yx52L4D0IIzFLeiSO1pwgD5vpAiqCeK5fazYNYd4PgLbrzXDO0I3dw873ETj+QWHVw5MP4ccLiTWzImu4RUM/CRq20ZpzxgpJTMMxpjT4TYdd4c2gahzOV435dT0t5QDwo88WLO1b800csIMlyCBAMFkR5T2cEikk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778961783; c=relaxed/simple;
-	bh=PN9uZdwK+CxAxLvRlU7rBUAIwFyUXnoGDiuWJmFDlxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gJAEdbSosJI6iVjVWAoW57Z0u+nnDtF8yyrSCi7ia42xuR61bgBJ7qDlod2bPkaeV/U31LCh5Nn5ain4+5NPNfOzYGMgYh4Xe5sQPwxZ3jwUR3k9Mqf3/S8DbbR7Sc6G/DQs2Aq5zMWMDGVjQrI40FlMiNSX7T+E0UVOSARrkwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lCYhNtqU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZmITtLTZpI66hIzuP6HmbpRfvOldnPVLLVQuNKN6VdI=; b=lCYhNtqU8eB6kZwreSs3lkU9Sv
-	7OnOqVXwLcl2mgIWTQbCTM9DtKcGwYEHRfeJ9c6ph4uiERCpbGmOQ1vPAxJvFHCoLPrTa7Pg/LYf1
-	00z8JX0m266U+dNIzMq/sBBUnuPIYebSflbRuMPNohZaRTacqx6J00VmlTceoyF86KYY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wOLDm-003GIE-Tk; Sat, 16 May 2026 22:02:50 +0200
-Date: Sat, 16 May 2026 22:02:50 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: David Carlier <devnexen@gmail.com>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev, razor@blackwall.org
-Subject: Re: [RFC net-next 1/1] net: tpmr: add Two-Port MAC Relay driver
-Message-ID: <1f611710-005d-48bd-8425-a1532ca95a21@lunn.ch>
-References: <20260516050858.23858-1-devnexen@gmail.com>
- <20260516050858.23858-2-devnexen@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC848305691
+	for <netdev@vger.kernel.org>; Sat, 16 May 2026 20:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778963743; cv=pass; b=jzkma7poY0qe2DdL5M33gXUmZ3sadv71ROfrxfquNozDY8yMvVvGDp1BHNkW7fzeh4v3Inglk0E+Ur1WYTa6rw5qFHdckp+3IbFej5t9LVbV90aygxIyR69Z9vI6/5r+mLPhgC3M9eTv9Sc+fOv9psOf8gJq5WMSpUhfsMDNPrE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778963743; c=relaxed/simple;
+	bh=QDKONued7/xd2RqstwrJGKmy0uPXkNmeq8jOp4roBKU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EoSJi8TT12aybj/J/rYettDDlOfb6nZu8U96cG9RrFj12oAP4yrMiz837kzsMuTkPtfP8KrDI+Ct+KsqLZ5pdT0Ml7ewZ/9BTJvnvtn83IDciu7/qfGGbROs/Xkk08ivyk1B5JS1zbv/oH+DEikk9Sr1SdsYN+LBa31jWV585Vk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iXZK1rpK; arc=pass smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-40ef10ec84cso863903fac.2
+        for <netdev@vger.kernel.org>; Sat, 16 May 2026 13:35:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778963741; cv=none;
+        d=google.com; s=arc-20240605;
+        b=M59s+ckVBzipbwvEjQ9vnb0qislZHA8+Mq9Pt1GZ9QbgYJ8jo1iwAtr3n0OGx8arVu
+         LDezUV87iVgIQpPeHQwlukzlrx/UaFtaqfjzgWNr/rKdvnRxRMOPp77yAJItYh4g/XBF
+         rjZlsALxqbMPwmB5FTmBGkggeUSvpNEHWeESDIRNT6MJPXl3ZF/dfUIhM2IPlHIh8fCv
+         csp8VTIOeLuoULBlyXATE6Md7gHP7jGjpjtB7cnBZGzWuyxINYc7l6r4pJOAcwWi+X4n
+         d5viEoiMs0ItL+BQk5MPlqtHbUBvxHj4psyb7qFzANBv0DPldLsIJR/jXfYALLo34uEZ
+         jmnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HHLDSY42IzpgtERPSbX/qbfMGmcCVU2Ad0Vzt2eV/jw=;
+        fh=BJSEeeGGwg0gZ/wsFO4vdmr/s0B9/nuUAUgNLymGya0=;
+        b=P4Qqp2OlkuYc7lmv2+1Y8yLhQAJdqqZlZeo/KMiQ9zAKiZhQb+zyQ81DXM8AhCErch
+         kLzt0XDcNa49DNv9uQOQtACFNbOl/CdbrYXBpS32Dcih8W/lUYiryi/ZOwxFykTMTB+K
+         1qF70zoIpfKF9hzY3sYNdCV0osEl54qBxW1R9CdV2Oq4WiF2l0JcifRiKExCz11P2ipa
+         H+pEgFi63lqPdeOl2Q+mEWYijJ0XUrxBLtaYhnazI7dJ/92kQV/IS/tnyd24z0o9DyJQ
+         bNcpN1pmN+Q/5/IqwiJTFEV8WrgzoScUkTygZ4t+7gAWoVadaXj4KHDAyTEv3/mYBPwP
+         DAXw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778963741; x=1779568541; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HHLDSY42IzpgtERPSbX/qbfMGmcCVU2Ad0Vzt2eV/jw=;
+        b=iXZK1rpKD9y9BWj5Mq/FQeFHkEp0DkDHftcgDcNPW62IqusLNfaSgJzlaZAEyoyJry
+         pnVJZir2PenEmdS0NOYTA6nS8mSPVagx2oLF7GgpZ4Tw7edz+M9JT7iezXVZQIH4EYIe
+         XTGwYAU2AY3cia6k5OjOcZRMBcW+nY1aa9cOCChXwdZepbFCIAy1bbSIj/hi4KpKhZ9i
+         rEbAF5gvlrzw+P5pjhukSDCbM1XAGZA5jzHLmeYDPoFgqQkdnlkxyn71A4ZyhlIF6Aek
+         Ye6BYWVRZfLGDxk7ubZuAwvlGT8+b4bLipZ80j5Qrd7lH/t3UUv6Vu/3vfXZWTnRtxcD
+         Bo6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778963741; x=1779568541;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HHLDSY42IzpgtERPSbX/qbfMGmcCVU2Ad0Vzt2eV/jw=;
+        b=keL3RS6Y1plOrdwGc3VvCyka+OQCXleypIxXti6KSQMTIOb4pfs8X5WsfvGSbx/6La
+         TzQ0I3BZV+gELAeGs6Km+r1JOvZIKNfoDGK9ev+2OYaPVYdFTISqrLBFp5tYoulDAruw
+         ejwvHwBQWqryss4nRzZGUHvB0qgMi3Vlslw93OjdwIScNu8Jn0XtNyz+yO/GfaXbthSD
+         HNB3+snPDWI1D210vN6wZPOJlC1rEGHofxoL2MwUaUzRnzAxJb+qIbH7Bg64rSy6T9Eb
+         lUksckQVst1UJuYBSjXeCSI7qnQciqHzxvv3PJkNpFIMxE9l2c0QZWpIM342aKZK4Mde
+         6XcA==
+X-Gm-Message-State: AOJu0YxW3w+DZiekDSFdpQBIRcRTZPoBFL7HQ/bvUyHlJFRPICoVOxwP
+	s5/hGvM0T6t3Vmn1SDUeZWbdD97TarnzYb3fIlHJkoBvTKr6rtKHg95VTF2S/+qg5kq8n2LOpgE
+	JQGK09zXliywv1SV0CJnyMsr33g7hwJ5Y8XWEHI0=
+X-Gm-Gg: Acq92OE0ZB8Zrh16rERe5zbNPmMo71rq5AhJRmFfvYVhLUkBT/faP+y0h/zG7WMjQfv
+	YlL+w73qS1ZA0fIM4lBLNdm1nnpVxfgHxtTmPzKgyyQZHwt1hovc2rCmU388tbmAXNEq/RvT3v5
+	5oZv4XxbCzB/jtcNDxxy41Awvb1zxf/js7kuTNWWlHaqMh+b3MjEIINyv4X0HwU9wyqba/lZLL/
+	G/Rj6XElFDfDA0XmepqTMpGJi8seIHJkFgD+iIffoyRUEzTgcQBvl8hPiIR/ciGlG0HZfj8K5S8
+	wONtn8d6XaJnLmKbTEtDMTNLEk1yjl8rz95URw==
+X-Received: by 2002:a05:6870:440d:b0:42c:127b:a973 with SMTP id
+ 586e51a60fabf-43a2d8f308cmr6097007fac.7.1778963741602; Sat, 16 May 2026
+ 13:35:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20260516050858.23858-1-devnexen@gmail.com> <20260516050858.23858-2-devnexen@gmail.com>
 In-Reply-To: <20260516050858.23858-2-devnexen@gmail.com>
-X-Rspamd-Queue-Id: 954E255D9D0
+From: David CARLIER <devnexen@gmail.com>
+Date: Sat, 16 May 2026 21:35:29 +0100
+X-Gm-Features: AVHnY4LUIoOncuwcab_LTMexQNoMCkZUK0QYYQEBIYnfrnDkO_0bRquj4-gjFnw
+Message-ID: <CA+XhMqwo3KqfhPPjU25GPVD5o+c=yKByr_Yqo6AL291mn=5APA@mail.gmail.com>
+Subject: Re: [RFC net-next 1/1] net: tpmr: add Two-Port MAC Relay driver
+To: netdev@vger.kernel.org
+Cc: bridge@lists.linux.dev, razor@blackwall.org, andrew@lunn.ch
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: D5B1B55DB21
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288664-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288665-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-> +static bool tpmr_should_relay_reserved(const u8 *dst)
-> +{
-> +	static const u8 prefix[5] = { 0x01, 0x80, 0xc2, 0x00, 0x00 };
-> +
-> +	if (memcmp(dst, prefix, sizeof(prefix)) != 0)
-> +		return true;
-> +
-> +	return dst[5] != 0x01;
+> Ah, you already have it here. I still think this can be optimized.
 
-I would assume the traffic is mostly unicast, with only a few
-multicast thrown in. So would it not make sense to first test for
-multicast?  Only if it is multicast do you need to look deeper into
-the address?
+  Fair =E2=80=94 the helper still memcmp's five bytes for every multicast f=
+rame,
+  even plain IPv6 ND or IPv4 mcast. I'll fold the check into the caller
+  with unlikely(), and gate the inner test on the 01:80:c2:00:00 OUI so
+  ordinary multicast falls through with a single compare.
 
-Also, is_multicast_ether_addr() exists.
+  > This seems to assume that tpmr->ports[0] is filled first.
 
-> +	eh = eth_hdr(skb);
-> +	if (is_multicast_ether_addr(eh->h_dest) &&
-> +	    !tpmr_should_relay_reserved(eh->h_dest))
-> +		return RX_HANDLER_PASS;
+  You're right, that's broken =E2=80=94 after a detach, ports[0].slot is st=
+ale.
+  I'll iterate ports[] to find the surviving member instead of trusting
+  positional order. The del path is already slot-agnostic.
 
-Ah, you already have it here. I still think this can be optimized.
+  > Maybe you also want to act on NETDEV_PRECHANGEMTU and reject it?
 
-> +	/* Enforce MTU consistency between the two members. */
-> +	if (tpmr->n_ports == 1) {
-> +		struct net_device *first;
-> +
-> +		first = rtnl_dereference(tpmr->ports[tpmr->ports[0].slot].dev);
-> +		if (first && first->mtu != slave_dev->mtu) {
-> +			NL_SET_ERR_MSG(extack,
-> +				       "Member MTU must match the other member's");
-> +			return -EINVAL;
-> +		}
-> +	}
+  Good catch, nothing stops a member MTU change from desyncing the pair
+  today. I'll reject in NETDEV_PRECHANGEMTU.
 
-This seems to assume that tpmr->ports[0] is filled first. But what
-about:
+  > Driver version is meaningless
 
-ip link eth0 set master tpmr0
-ip link eth1 set master tpmr0
-ip link eth0 set nomaster
-ip link eth42 set master tpmr0
+  Will drop.
 
-> +static int tpmr_del_slave(struct net_device *dev, struct net_device *slave_dev)
-> +{
-> +	struct tpmr_priv *tpmr = netdev_priv(dev);
-> +	struct tpmr_port *port = NULL;
-> +	unsigned int slot;
-> +
-> +	ASSERT_RTNL();
-> +
-> +	for (slot = 0; slot < TPMR_MAX_PORTS; slot++) {
-> +		if (rtnl_dereference(tpmr->ports[slot].dev) == slave_dev) {
-> +			port = &tpmr->ports[slot];
-> +			break;
-> +		}
-> +	}
+  > I also wounder if this is the correct home
 
-For the above to work, there needs to be some juggling here.
+  I went back and forth on that. Landed on drivers/net/ because TPMR is
+  structurally closer to veth/macvlan/bonding than to bridge or
+  openvswitch =E2=80=94 no FDB, no port state, ~400 LOC. Happy to move it i=
+f
+  you'd prefer net/tpmr/, but my preference is to keep it here.
 
-> +static int tpmr_device_event(struct notifier_block *nb,
-> +			     unsigned long event, void *ptr)
-> +{
-> +	struct net_device *slave_dev = netdev_notifier_info_to_dev(ptr);
-> +	struct net_device *master;
-> +	struct tpmr_priv *tpmr;
-> +
-> +	if (slave_dev->reg_state == NETREG_REGISTERED) {
-> +		master = netdev_master_upper_dev_get(slave_dev);
-> +		if (!master || master->rtnl_link_ops != &tpmr_link_ops)
-> +			return NOTIFY_DONE;
-> +	} else {
-> +		return NOTIFY_DONE;
-> +	}
-> +
-> +	tpmr = netdev_priv(master);
-> +
-> +	switch (event) {
-> +	case NETDEV_CHANGE:
-> +	case NETDEV_UP:
-> +	case NETDEV_DOWN:
-> +		tpmr_update_carrier(tpmr);
-> +		break;
-> +	case NETDEV_UNREGISTER:
-> +		tpmr_del_slave(master, slave_dev);
-> +		break;
-> +	}
-> +	return NOTIFY_DONE;
+  Thanks for the review.
 
-Maybe you also want to act on NETDEV_PRECHANGEMTU and reject it?
-
-> +static void tpmr_get_drvinfo(struct net_device *dev,
-> +			     struct ethtool_drvinfo *drvinfo)
-> +{
-> +	strscpy(drvinfo->driver, TPMR_DRV_NAME, sizeof(drvinfo->driver));
-> +	strscpy(drvinfo->version, TPMR_DRV_VERSION, sizeof(drvinfo->version));
-
-Driver version is meaningless because it never changes. Please leave
-it empty, and the core will fill it with the kernel version.
-
-I also wounder if this is the correct home, or if it should be in net,
-next to bridge? I don't know...
-
-Andrew
+Cheers.
 
