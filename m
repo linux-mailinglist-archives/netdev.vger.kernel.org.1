@@ -1,74 +1,53 @@
-Return-Path: <netdev+bounces-288551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wMqKIdbFB2pyIAMAu9opvQ
-	(envelope-from <netdev+bounces-288551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 03:18:14 +0200
+	id Ami9BZzIB2qHIgMAu9opvQ
+	(envelope-from <netdev+bounces-288552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 03:30:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27522559BA8
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 03:18:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805BC559C6D
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 03:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0CF85300E162
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 01:17:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 58498300B9AE
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 01:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B8F238C36;
-	Sat, 16 May 2026 01:17:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1198218845;
+	Sat, 16 May 2026 01:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ktroCvJU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhRZUOl0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480E622D7A1;
-	Sat, 16 May 2026 01:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7C57E0E8;
+	Sat, 16 May 2026 01:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778894251; cv=none; b=SNDYeNvhu1qSttwrhNsGwQF+RJ0Ugy2Tjees7Fihw0d5sdMHKeCcj5wNoXvnrXBZJ8/mAniNTGBikHaS2aYhMNvk5VNt58JaZ4GzObxx3PtJo9IFsbvw1euRwG0wYiNHuzY4Lqw0h7uEErL7UIYnBTNNmyImNfQ3U9O9vEJuNaY=
+	t=1778894999; cv=none; b=asUpmasRITejC9l9w+zjtonz3kSv/kCLOgPcyFLv0PSpCD+0KKHNm2JGo2XXRgM3v1hNsuFFEjVRFKcUnnQoiRC+IwUXrOWUE7xaPnDLAbmzh/IolZEy0quvb7rwJw9XMQ329i0cldjCb5BKwmfSRsbBxxzdPrtAV4h/9G/dpt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778894251; c=relaxed/simple;
-	bh=vqb4ZaYQMmZhkOs6tnUeA/Kf3Oyzbjn5GJjDqFFFshs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iT9n4+0YLaURSXfYOp1/v3xUjg9FXIbmJSaH2umKSl7hetOOV7B31WT4kGe4R1OD8/fSobLT/RByGq5Q50dEahDAMlZ57S43BhJIfx1400lx2YTzW0mMTjNQAltXPw9v0XYwnJ/Rh8H286xTfJC9tBT1qaIrnRnpC/fyX3PEwWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ktroCvJU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A252C2BCB0;
-	Sat, 16 May 2026 01:17:26 +0000 (UTC)
+	s=arc-20240116; t=1778894999; c=relaxed/simple;
+	bh=iUACppQ5PGr72bnwhiXqkoF8CjKsiqAvUhNVwuY4HqQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MPc8OMo6nHfX3KAn5bUQMTuq131nj0Qmi1lWSdpavsGUe/7NnN2CRtGoFH/cfVSY3AXRDbIhxpNvE0W62tEti0sa3NHPk8cszH3ctIQu+/UhhmVYQdF9uAZZZEX6mSpiPJPT9sv6j00awdg59T1n1ogWCW+dPxykgZ+bzcDAF8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhRZUOl0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CCEDC2BCB0;
+	Sat, 16 May 2026 01:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778894246;
-	bh=vqb4ZaYQMmZhkOs6tnUeA/Kf3Oyzbjn5GJjDqFFFshs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ktroCvJU6D57PDwDQLq18RTS9++FjObYgRd4TF3y5homw34kztyJtZyUG1L36wfBQ
-	 qXPjhXoI15exDOyy587dV1+aKFnSCRFbjeFHJUSekbghRXTMoXsC6Zz2Ee1pJ5wLH3
-	 T2ORYFvE9EWUDAA1gCpHYtTX8cGqoBjJWGNbQpD5zDSX9NAjp0bMSlKSPTCyqeS10v
-	 LECKguAZUbzU3cQ0HlppYpi7rezFxnCmw8JQyTSlNO7EwwMKwGLN108QHtD5+R2xAd
-	 5vGGX4khDry5X0qeoheaFRAcPxcAdO9Ndx4GoMZ2BJmtaPo/rbb3vE/557ujsn34nM
-	 g2bVkC6Xo8TrQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: illusion.wang@nebula-matrix.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	dimon.zhao@nebula-matrix.com,
-	alvin.wang@nebula-matrix.com,
-	sam.chen@nebula-matrix.com,
-	netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	corbet@lwn.net,
-	horms@kernel.org,
-	linux-doc@vger.kernel.org,
-	pabeni@redhat.com,
-	vadim.fedorenko@linux.dev,
-	lukas.bulwahn@redhat.com,
-	edumazet@google.com,
-	enelsonmoore@gmail.com,
-	skhan@linuxfoundation.org,
-	hkallweit1@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v14 net-next 11/11] net/nebula-matrix: add common dev start/stop operation
-Date: Fri, 15 May 2026 18:17:25 -0700
-Message-ID: <20260516011725.1864115-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260513011649.4404-12-illusion.wang@nebula-matrix.com>
-References: <20260513011649.4404-12-illusion.wang@nebula-matrix.com>
+	s=k20201202; t=1778894999;
+	bh=iUACppQ5PGr72bnwhiXqkoF8CjKsiqAvUhNVwuY4HqQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YhRZUOl0TVjmnFtUbTXLFj/BKRAmukmbAjK+KH/KkRb+JUL8T3M41O3NZM6dEl6nA
+	 b5qQLrohbvw63VFbKbunAnlQAeTRoUmJBoxfqRJwuzChrZCZmDnZeuRhDWO0E+AD5o
+	 trxUqv47Soxr7p1zS/Bno6cWg/7qdvMBYx/my2Q2lj+fHeyu9Qlf4PxXJnhGThCoH8
+	 Nq+VEvTcpUNhIn+CPUqaqw6e1QI/eKZFsPT7q2x/A+3xbEA2GmioajZT4pzjaKlK9+
+	 modBkALVR91OnIIjlEl67hCmKvSRmMBkPgC0FkamFPvq6UM4FMvm3ri6V4PvVkSfRn
+	 wK9AxafY07lgQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0BFF3930A23;
+	Sat, 16 May 2026 01:30:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,145 +55,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 27522559BA8
+Subject: Re: [PATCH net v5] ipv6: addrconf: bail out of dad_failure when state
+ is
+ no longer POSTDAD
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177889501264.218220.12063160525349190248.git-patchwork-notify@kernel.org>
+Date: Sat, 16 May 2026 01:30:12 +0000
+References: <20260513025509.3776405-1-lilinmao@kylinos.cn>
+In-Reply-To: <20260513025509.3776405-1-lilinmao@kylinos.cn>
+To: Linmao Li <lilinmao@kylinos.cn>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, dsahern@kernel.org, horms@kernel.org,
+ stephen@networkplumber.org, hannes@stressinduktion.org, sd@queasysnail.net,
+ idosch@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Rspamd-Queue-Id: 805BC559C6D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-288551-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288552-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net/nebula-matrix: add common dev start/stop operation
+Hello:
 
-This patch sets up common device start and stop operations. It configures the
-MSI-X map table, allocates and enables MSI-X vectors, and registers the
-mailbox ISR.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-> index 9b7f4598fccc3..c7e632a16b40c 100644
-> --- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-[ ... ]
-> @@ -79,6 +259,14 @@ static void nbl_dev_clean_mailbox_task(struct work_struct *work)
->  				      NBL_CHAN_TYPE_MAILBOX);
->  }
->  
-> +static int nbl_dev_clean_mailbox_schedule(struct nbl_dev_mgt *dev_mgt)
-> +{
-> +	struct nbl_dev_common *common_dev = dev_mgt->common_dev;
-> +
-> +	nbl_common_queue_work(&common_dev->clean_mbx_task);
-> +	return 0;
-> +}
-> +
->  /* ----------  Dev init process  ---------- */
->  static int nbl_dev_setup_common_dev(struct nbl_adapter *adapter)
->  {
+On Wed, 13 May 2026 10:55:09 +0800 you wrote:
+> addrconf_dad_failure() transitions ifp->state from DAD to POSTDAD
+> via addrconf_dad_end(), which drops ifp->lock on return.  The lock
+> is re-acquired after net_info_ratelimited().  A concurrent
+> ipv6_del_addr() can take the lock in that window, set ifp->state
+> to DEAD and run list_del_rcu(&ifp->if_list).
+> 
+> addrconf_dad_failure() then overwrites DEAD with ERRDAD at errdad:
+> and schedules a new dad_work.  The work calls ipv6_del_addr()
+> again, hitting the already-poisoned list entry:
+> 
+> [...]
 
-Looking at nbl_dev_setup_common_dev() in the same file:
+Here is the summary with links:
+  - [net,v5] ipv6: addrconf: bail out of dad_failure when state is no longer POSTDAD
+    https://git.kernel.org/netdev/net-next/c/627ac78f2741
 
-nbl_dev_setup_common_dev() {
-        ...
-        ret = nbl_dev_setup_chan_queue(dev_mgt, NBL_CHAN_TYPE_MAILBOX);
-        if (ret)
-                return ret;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-        INIT_WORK(&common_dev->clean_mbx_task, nbl_dev_clean_mailbox_task);
-        common->vsi_id = disp_ops->get_vsi_id(priv, NBL_VSI_DATA);
-        if (common->vsi_id == U32_MAX)
-                return -ENOENT;
-        ...
-}
 
-If operations like disp_ops->get_vsi_id() or disp_ops->get_eth_id() fail,
-the function returns the error directly. Could this leak the mailbox queue
-resources allocated by nbl_dev_setup_chan_queue() on these initialization
-error paths? 
-
-Since dev_mgt->common_dev is only assigned at the end of the setup function,
-it appears the caller nbl_dev_init() cannot clean this up either.
-
-[ ... ]
-> @@ -220,9 +408,41 @@ void nbl_dev_remove(struct nbl_adapter *adapter)
->  /* ----------  Dev start process  ---------- */
->  int nbl_dev_start(struct nbl_adapter *adapter)
->  {
-> +	struct nbl_dev_mgt *dev_mgt = adapter->core.dev_mgt;
-> +	int ret;
-> +
-> +	ret = nbl_dev_configure_msix_map(dev_mgt);
-> +	if (ret)
-> +		goto config_msix_map_err;
-> +
-> +	ret = nbl_dev_init_interrupt_scheme(dev_mgt);
-> +	if (ret)
-> +		goto init_interrupt_scheme_err;
-> +	ret = nbl_dev_request_mailbox_irq(dev_mgt);
-> +	if (ret)
-> +		goto mailbox_request_irq_err;
-> +	ret = nbl_dev_enable_mailbox_irq(dev_mgt);
-> +	if (ret)
-> +		goto enable_mailbox_irq_err;
-> +
->  	return 0;
-> +enable_mailbox_irq_err:
-> +	nbl_dev_disable_mailbox_irq(dev_mgt);
-> +	nbl_dev_free_mailbox_irq(dev_mgt);
-> +mailbox_request_irq_err:
-> +	nbl_dev_clear_interrupt_scheme(dev_mgt);
-> +init_interrupt_scheme_err:
-> +	nbl_dev_destroy_msix_map(dev_mgt);
-> +config_msix_map_err:
-> +	return ret;
->  }
->  
->  void nbl_dev_stop(struct nbl_adapter *adapter)
->  {
-> +	struct nbl_dev_mgt *dev_mgt = adapter->core.dev_mgt;
-> +
-> +	nbl_dev_disable_mailbox_irq(dev_mgt);
-> +	nbl_dev_free_mailbox_irq(dev_mgt);
-> +	nbl_dev_clear_interrupt_scheme(dev_mgt);
-> +	nbl_dev_destroy_msix_map(dev_mgt);
->  }
-
-When nbl_dev_stop() is called, or when nbl_dev_start() takes the error path
-after enabling the mailbox IRQ, the driver disables and frees the interrupt,
-but does not cancel clean_mbx_task.
-
-If an interrupt fires just before the IRQ is disabled, the work remains
-queued on wq_mgt->ctrl_dev_wq and will execute asynchronously.
-
-Could this lead to a memory access issue if devres frees the common_dev
-memory when the device unbinds? Is it necessary to call cancel_work_sync()
-here to ensure any pending work is flushed or cancelled before the structure
-is destroyed?
 
