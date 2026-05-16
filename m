@@ -1,286 +1,216 @@
-Return-Path: <netdev+bounces-288589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Of3HXEHCGqVVgMAu9opvQ
-	(envelope-from <netdev+bounces-288589-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:58:09 +0200
+	id II7nMqoICGqVVgMAu9opvQ
+	(envelope-from <netdev+bounces-288590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 08:03:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB7155A632
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:58:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF1E55A6B5
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 08:03:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C612B3008D01
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 05:57:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 148BC302D505
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 06:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4E435A395;
-	Sat, 16 May 2026 05:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE0B37186F;
+	Sat, 16 May 2026 06:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5dRy+mt"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HKps4QbF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011059.outbound.protection.outlook.com [40.107.208.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2928C175A7B;
-	Sat, 16 May 2026 05:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778911075; cv=none; b=U4ti+p4ltTpvZ+F/mRSjIkRTV0hjXmhrBr0aFxdM8kRuQ+I9xi5tAw9zcQeySj2wn4RROpii52fz6GXpCqEB3zIfJtktP4rci/SE/2FpX02Y4Tm7d5XKmykUkD17JZvueaOLuK2ASd5jLwuNBdk5l6pYPhO/Ct/CnfCTEqsRIqU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778911075; c=relaxed/simple;
-	bh=TXblOyw4xqTUZlj938ntGPUamqR6+B49eQEtuY69Iu8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EnWOgGg6wvllCFe7LbcojhXV8EsUtqGK+dvsc0I7AL9aunBxFrqghQv3a4SPHuAn/0YnVsIQkab0UctgbBoKphGRuYGoi3ssr+8zLKctOLJOjkv0u5Eph2v59ONvNUayIedrCeUQ4WMN17c8sAQICM0kcMK4ir08YXlvKyyHfSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5dRy+mt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67C15C2BCB7;
-	Sat, 16 May 2026 05:57:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778911074;
-	bh=TXblOyw4xqTUZlj938ntGPUamqR6+B49eQEtuY69Iu8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=D5dRy+mt+MrpEqdrOPhMZFtPAs/klM6nmCFzj7PqTmBLirOel76jS/jKDKyUzFhpa
-	 PRKK+lcbIY/Sp95YMIah7ietSYEK2XUx3h7trZqL2hH/N/dFY/3M3hZUTQl7EsNDis
-	 euQnD7wTuUr8rjaRIFged+Sps2bbpJCh9E2aHH3GDhbBGFdcHuIBjHJuYNJU40plFz
-	 aiXRZhZcwufNS2c/stNee71g3lDc+KeZBIbwr0ytODJDWiPZCijGFhEw1WCzsV2k52
-	 9dj37T3JpQDr/MTDZLoujtlvdvjMZ933/kmK8e0910Q+9zrUOUN6G8k2FbW5qsAOYK
-	 8PNTOpsGFjw4w==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sat, 16 May 2026 07:57:12 +0200
-Subject: [PATCH net-next v7 10/10] net: airoha: Support multiple LAN/WAN
- interfaces for hw MAC address configuration
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965DA36F428;
+	Sat, 16 May 2026 06:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778911238; cv=fail; b=qPdhMwRpRUHc6YmAzkpjrKb/TcDasFXcWnK9cOWb0aMZGaJz9cmcd+1+V9Yd0wUlqv20uiBiWU6gSEWJ93/XhoCswaNoXn107En6uVO7OyxTbIcdo0Glws79bqM2uk3EJzeozCi8dRz37XUz2s1bEFHjBfWv8XqVvjLYk+4SlC8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778911238; c=relaxed/simple;
+	bh=hqGg82ATcMXgWIvJl26OSnKWdgEqbA1d2dhdLsYapOk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Cr/humDS/TEnsDYIiFObNBOa7WLvQ4vH0jYHgNyiMOvEwFehqpc+c7U5Oun6SfWHAjcmTAzTfvKONTHbYkuhZRNk+OxpbuLTzGlIjuYPp/CwSnHXoPW5EXD+YoMeIZI8GpMXYfMJjdDshGE1K9a/GHdUOWVTQoVJga/1f+cyBkw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HKps4QbF; arc=fail smtp.client-ip=40.107.208.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HnB1jXgz6DF1hbrU1Y12Ait4vhfBK4lZjpVzaZd5L/0NDe3iU/5e2zwxmqB7Xo4xGkz371qvzIT762RAI+CxsZq+illESNi9CRmQBTCEvTjbvuEz3e+YaCEMugP8ylWE0hrLeWpkYvYjuEso21eOqbmTsSRxcl5mu13ZXzGgMLTqVtlPSN/8nREaSKTthf8MuDwG9nNfRlHBVOqBFGCSaenbpd9lskh6t8zGx1jdZKEFJ6zzujUVgsa86vgISB3VuE+GOc0Fd7khkpDCG4GANS6OAqt3sNabJTsiipR+px3Z2/uPwUzGnpRnu910u1g1oD+n6bWasGrGB8Lcuj7APg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=l0KzzQByiotypry5qOwhJmavKSNzz6Lmwq5dTYwLO1o=;
+ b=ZxZTN3n9wpIprQr0kB82umc1iGQuAzPl1SasqzDzkUNm8/v8iNdnFlzlUXQNLve981gM+PRaPHxC8HzoY/GYe4iSCvpI0sMOLgXW1H5nzvMtLOskh7KnDaLug80eFJ+sMds1o/1Rza//iUC8BiKZpDOpBWgWjx7b1E+LF7EkzuL39BQzmht2RGufaQpdNkDWbE7oiRI/PE/WbCowU2lbOQbHvwjpLaGWqrJu0YCoVQRO3NxNuBNbR9uo9H9KfP2HzWeGWQ88CCmjCOWpwUADxDPatSWu0B+bzM/bDnghqYdo6PRmRfBTWx+t2zqnqfHv3aeesD1wFpBS6Fa2IxhN9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l0KzzQByiotypry5qOwhJmavKSNzz6Lmwq5dTYwLO1o=;
+ b=HKps4QbF0JjUeCML/LxY/2DPbUScAJf7uvD9WYAqjcfcg2IZJYalZiGu5PDAlngDatawbA2/QzJzoCZrpLwkDiEvkwNZ7AvPn0FMYxsD/mAhoR8n5xm7ZMb8BwV19pVl3C21oAhaPkG632vmG1pI/ifHgZ0tTHN/Rm0L2iyBdKk=
+Received: from SJ0PR03CA0242.namprd03.prod.outlook.com (2603:10b6:a03:3a0::7)
+ by IA3PR10MB8733.namprd10.prod.outlook.com (2603:10b6:208:574::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.13; Sat, 16 May
+ 2026 06:00:33 +0000
+Received: from CO1PEPF000066E8.namprd05.prod.outlook.com
+ (2603:10b6:a03:3a0:cafe::a) by SJ0PR03CA0242.outlook.office365.com
+ (2603:10b6:a03:3a0::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9913.14 via Frontend Transport; Sat,
+ 16 May 2026 06:00:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ CO1PEPF000066E8.mail.protection.outlook.com (10.167.249.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.25.13 via Frontend Transport; Sat, 16 May 2026 06:00:32 +0000
+Received: from DLEE205.ent.ti.com (157.170.170.85) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Sat, 16 May
+ 2026 01:00:31 -0500
+Received: from DLEE211.ent.ti.com (157.170.170.113) by DLEE205.ent.ti.com
+ (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Sat, 16 May
+ 2026 01:00:30 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE211.ent.ti.com
+ (157.170.170.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
+ Transport; Sat, 16 May 2026 01:00:30 -0500
+Received: from [10.249.131.252] ([10.249.131.252])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 64G60QUS1159679;
+	Sat, 16 May 2026 01:00:27 -0500
+Message-ID: <5961b474-245c-42b9-98df-5b0f893d1d0d@ti.com>
+Date: Sat, 16 May 2026 11:30:25 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: ti: am65-cpsw-nuss: remove dead vid check
+ in slave_add_vid()
+To: Alexander Vassilevski <oss@vassilevski.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Roger Quadros <rogerq@kernel.org>
+CC: Dan Carpenter <dan.carpenter@linaro.org>, Chintan Vankar
+	<c-vankar@ti.com>, <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
+	<s-vadapalli@ti.com>
+References: <20260515225715.3641804-1-oss@vassilevski.com>
+Content-Language: en-US
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+In-Reply-To: <20260515225715.3641804-1-oss@vassilevski.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260516-airoha-eth-multi-serdes-v7-10-99e0093303e2@kernel.org>
-References: <20260516-airoha-eth-multi-serdes-v7-0-99e0093303e2@kernel.org>
-In-Reply-To: <20260516-airoha-eth-multi-serdes-v7-0-99e0093303e2@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, 
- Benjamin Larsson <benjamin.larsson@genexis.eu>, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- Madhur Agrawal <madhur.agrawal@airoha.com>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 9BB7155A632
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000066E8:EE_|IA3PR10MB8733:EE_
+X-MS-Office365-Filtering-Correlation-Id: f942e469-b996-4095-ee0c-08deb31070d0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700016|7416014|1800799024|82310400026|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	rLhRK3Zed1GCSf+CkAAwapvBadjVu66fn4Vrm1ZFmejhRO6xIiDi2hMFf/hKu0Dy2CKm4J0TPyEvi2AAnLXbmFLVZ83kmx9yJV/IUXl3uuV75d49HHpvAqp+wO4l/b0m6WE5RRlu/DaX2/8Ek9caounfZY+2rqlmfuNJAq8kL2zHTJP19rzARLVYjHVIMsWBuYfsM2+qZc1XuhOWryDsigtiYdTPeJgvF/MO4+TF1zwWJgiWbBs3gMcWUljv2pU9uTmQinhse+ZbvFXZ1ZIvLwtRNFI4++SYSY1a6JcahayJbFLMWkYNjM6cXOJNV50vUmud6x8XiAhOFhrZYtaPIJdgDiv0K5MTqkVLpksxDzkiZSArAJBC4bFCb7UK7iXM1OGHnohdU8kdWQiGxSfJPLQM8pUZGozTU+4CVt0IvqEyP5OC5bbPA4iD88dHXZTjutJpMWbtU5YfuK38mfeT3TOTVZrs6qdMDZCbUtEincTC5JWhJQxsXOa9Zu6aEjyvkgniCpSILzTY6rtrkDtAXw1Z0w6HBaANUQO82LUcz9Q99gU7Cd3rb86V+JuSFVJTJ4TtTg+ZhUTYowH0FOeTQzpj7OSojZ1frX5zY4EEbf4uqaoF02AOspYBM7aZcW6Uf1LPxFVf6fiTuSHlGrdzOYY46ZAtmKSHUvAUKqny4mkahVy3VslNuhsE6NfBx4zwDMQ7JzRE5IkWJii6bB3ZVb85YdT/rNYVSKiIM8R5QhQ=
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700016)(7416014)(1800799024)(82310400026)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	X4PP1we1/23Lumt/6XOfdVasd9kSs8RNpGpdoyZq2IKtddt/Gt7lqj3Ne84bX8VAB32KLen61hbGwJNTS/PsDtokyxnBufRXHoEV0st6J+N22zg4xAg9SxTf7HxqQ5DFbSK7awQ0c4+XofQtCD2gh30PrLGADkgwdrNQ7Eg6owqMlRYt1echmLFdSlvoTApiUldfhbqc1WdhcxmUv/GSWLUZ+ZvoXk41eM0oKnCr9lFIHPL9hKrw9gvx5SYhcXkhSQtF8NTrC1J1tTqCRjbgTbI4NfLOzL7M93YGor94iHbrJ1Nm2t4zZqDkzLNzhzwAhwd+8vY8wWS9gyKuzpH3kgXF/7ZOTvG02B6yRi79bmIw9zfbouAC33KDJb2Kda92LMM6uS6BL8n/+R7uwOKVNR4+ODdGEwa9VINzuuVitNyK0WNvM3o8+5zfkctWaTar
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2026 06:00:32.5412
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f942e469-b996-4095-ee0c-08deb31070d0
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000066E8.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR10MB8733
+X-Rspamd-Queue-Id: 2EF1E55A6B5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288589-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-288590-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[s-vadapalli@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,airoha.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-The EN7581 and AN7583 SoCs provide registers to configure hardware LAN/WAN
-MAC addresses, used to determine whether received traffic is destined for
-this host or should be forwarded to another device.
-The SoC hardware design assumes all interfaces configured as LAN (or WAN)
-share a common upper MAC address, which is programmed into the
-REG_FE_{LAN,WAN}_MAC_H register. The lower bytes of 'local' addresses can
-be expressed as a range via the REG_FE_MAC_LMIN and REG_FE_MAC_LMAX
-registers.
-Previously, only a single interface was considered when programming these
-registers. Extend the logic to derive the correct minimum and maximum
-values for REG_FE_MAC_LMIN/REG_FE_MAC_LMAX when two or more interfaces are
-configured as LAN or WAN.
+On 16/05/26 4:27 AM, Alexander Vassilevski wrote:
+> am65_cpsw_nuss_ndo_slave_add_vid() returns early at the top with:
+> 
+>      if (!netif_running(ndev) || !vid)
+>          return 0;
+> 
+> so vid is guaranteed to be non-zero in the rest of the function. The
+> subsequent
+> 
+>      if (!vid)
+>          unreg_mcast = port_mask;
+> 
+> is therefore unreachable. unreg_mcast stays at its initialized value of
+> zero and is passed as the unreg_mcast argument to
+> cpsw_ale_vlan_add_modify().
+> 
+> Drop the dead branch. No functional change.
+> 
+> Found by Smatch.
+> 
+> Fixes: 7bcffde02152 ("net: ethernet: ti: am65-cpsw-nuss: restore vlan configuration while down/up")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/kernel-janitors/aS_lhMwppbDHoEcX@stanley.mountain/
+> Signed-off-by: Alexander Vassilevski <oss@vassilevski.com>
 
-Tested-by: Madhur Agrawal <madhur.agrawal@airoha.com>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 77 +++++++++++++++++++++++++++-----
- drivers/net/ethernet/airoha/airoha_eth.h |  2 +-
- drivers/net/ethernet/airoha/airoha_ppe.c |  4 +-
- 3 files changed, 68 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 0540a73b2997..4e9843acc714 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -71,20 +71,69 @@ static void airoha_qdma_irq_disable(struct airoha_irq_bank *irq_bank,
- 	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
- }
- 
--static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *addr)
-+static int airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *addr)
- {
-+	u8 ref_addr[ETH_ALEN] __aligned(2);
- 	struct airoha_eth *eth = dev->eth;
--	u32 val, reg;
-+	u32 reg, val, lmin, lmax;
-+	int i;
-+
-+	eth_zero_addr(ref_addr);
-+	lmin = (addr[3] << 16) | (addr[4] << 8) | addr[5];
-+	lmax = lmin;
-+
-+	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
-+		struct airoha_gdm_port *port = eth->ports[i];
-+		int j;
-+
-+		if (!port)
-+			continue;
-+
-+		for (j = 0; j < ARRAY_SIZE(port->devs); j++) {
-+			struct airoha_gdm_dev *iter_dev;
-+			struct net_device *netdev;
-+
-+			iter_dev = port->devs[j];
-+			if (!iter_dev || iter_dev == dev)
-+				continue;
-+
-+			if (airoha_is_lan_gdm_dev(iter_dev) !=
-+			    airoha_is_lan_gdm_dev(dev))
-+				continue;
-+
-+			netdev = iter_dev->dev;
-+			if (netdev->reg_state != NETREG_REGISTERED)
-+				continue;
-+
-+			ether_addr_copy(ref_addr, netdev->dev_addr);
-+			val = (netdev->dev_addr[3] << 16) |
-+			      (netdev->dev_addr[4] << 8) | netdev->dev_addr[5];
-+			if (val < lmin)
-+				lmin = val;
-+			if (val > lmax)
-+				lmax = val;
-+		}
-+	}
-+
-+	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3)) {
-+		/* According to the HW design, hw mac address MS bits
-+		 * must be the same for each net_device with the same
-+		 * LAN/WAN configuration.
-+		 */
-+		netdev_err(dev->dev, "wrong mac addr for shared GDM port\n");
-+		return -EINVAL;
-+	}
- 
- 	reg = airoha_is_lan_gdm_dev(dev) ? REG_FE_LAN_MAC_H : REG_FE_WAN_MAC_H;
- 	val = (addr[0] << 16) | (addr[1] << 8) | addr[2];
- 	airoha_fe_wr(eth, reg, val);
- 
--	val = (addr[3] << 16) | (addr[4] << 8) | addr[5];
--	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), val);
--	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), val);
-+	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), lmin);
-+	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), lmax);
- 
--	airoha_ppe_init_upd_mem(dev);
-+	airoha_ppe_init_upd_mem(dev, addr);
-+
-+	return 0;
- }
- 
- static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
-@@ -1814,13 +1863,18 @@ static int airoha_dev_stop(struct net_device *netdev)
- static int airoha_dev_set_macaddr(struct net_device *netdev, void *p)
- {
- 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
-+	struct sockaddr *addr = p;
- 	int err;
- 
--	err = eth_mac_addr(netdev, p);
-+	err = eth_prepare_mac_addr_change(netdev, p);
- 	if (err)
- 		return err;
- 
--	airoha_set_macaddr(dev, netdev->dev_addr);
-+	err = airoha_set_macaddr(dev, addr->sa_data);
-+	if (err)
-+		return err;
-+
-+	eth_commit_mac_addr_change(netdev, p);
- 
- 	return 0;
- }
-@@ -1925,6 +1979,7 @@ static int airoha_dev_init(struct net_device *netdev)
- {
- 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
- 	struct airoha_gdm_port *port = dev->port;
-+	int err;
- 
- 	switch (port->id) {
- 	case AIROHA_GDM3_IDX:
-@@ -1949,12 +2004,12 @@ static int airoha_dev_init(struct net_device *netdev)
- 	}
- 
- 	airoha_dev_set_qdma(dev);
--	airoha_set_macaddr(dev, netdev->dev_addr);
-+	err = airoha_set_macaddr(dev, netdev->dev_addr);
-+	if (err)
-+		return err;
- 
- 	if (!airoha_is_lan_gdm_dev(dev) &&
- 	    (port->id == AIROHA_GDM3_IDX || port->id == AIROHA_GDM4_IDX)) {
--		int err;
--
- 		err = airoha_set_gdm2_loopback(dev);
- 		if (err)
- 			return err;
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index a2241520f2e2..364ca76eb3a6 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -684,7 +684,7 @@ void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
- int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data);
- int airoha_ppe_init(struct airoha_eth *eth);
- void airoha_ppe_deinit(struct airoha_eth *eth);
--void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev);
-+void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev, const u8 *addr);
- u32 airoha_ppe_get_total_num_entries(struct airoha_ppe *ppe);
- struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
- 						  u32 hash);
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 194cd50b2c74..531ce33528b9 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -1482,12 +1482,10 @@ void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
- 	airoha_ppe_foe_insert_entry(ppe, skb, hash, rx_wlan);
- }
- 
--void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev)
-+void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev, const u8 *addr)
- {
- 	struct airoha_gdm_port *port = dev->port;
--	struct net_device *netdev = dev->dev;
- 	struct airoha_eth *eth = dev->eth;
--	const u8 *addr = netdev->dev_addr;
- 	u32 val;
- 
- 	val = (addr[2] << 24) | (addr[3] << 16) | (addr[4] << 8) | addr[5];
+Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
 
--- 
-2.54.0
+
+> ---
+>   drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 --
+>   1 file changed, 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index 7ac75fc8cd..77f59996a0 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -316,8 +316,6 @@ static int am65_cpsw_nuss_ndo_slave_add_vid(struct net_device *ndev,
+>   		return ret;
+>   
+>   	port_mask = BIT(port->port_id) | ALE_PORT_HOST;
+> -	if (!vid)
+> -		unreg_mcast = port_mask;
+>   	dev_info(common->dev, "Adding vlan %d to vlan filter\n", vid);
+>   	ret = cpsw_ale_vlan_add_modify(common->ale, vid, port_mask,
+>   				       unreg_mcast, port_mask, 0);
 
 
