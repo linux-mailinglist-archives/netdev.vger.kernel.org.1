@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-288562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mI/RARHbB2oALwMAu9opvQ
-	(envelope-from <netdev+bounces-288562-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 04:48:49 +0200
+	id 8NQtMOXoB2pFOQMAu9opvQ
+	(envelope-from <netdev+bounces-288563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 05:47:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651DB559F3D
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 04:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 254BC55A0E6
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 05:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3CFEE304DEBF
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 02:44:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3DD4F300678F
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 03:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D55D2BE057;
-	Sat, 16 May 2026 02:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F5A2701CB;
+	Sat, 16 May 2026 03:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="d9+62y7k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ljigUycJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013067.outbound.protection.outlook.com [40.93.196.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45E129898B;
-	Sat, 16 May 2026 02:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778899471; cv=fail; b=SB39ZOfx0NL1E9GvomhYO/JSljLAC4h096rHqi5EgmFaOEj4w+URhFrzcSH5tR/76aw3gt3EuRa3043a9FC6DmRZ+/oTuh7QOwdXU+nSGH7otmx1aWMpLb1aFeFgMuMnNCzlvukm4ve+zK4GrVHEMJy92U2zivsnxZmDOkY5VrQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778899471; c=relaxed/simple;
-	bh=WG1zdlA3s8xLJwiRovbsWehXKIBAlS/DRtALdCp/Ofg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=TWu+iGC5SIvAfKDxITOOkqnbBVWmMfBDIrPklRjoxJG1IoMDNEGoZ3m4/hKf7tpID3An07Bx26kT0wHGd9TJvDrmMybxkRRQjV+lvw6SfUZpAqxE06D8we4UQyZHMFqtZJ5d6tEH0cni+oEgB6F51OZqmqOmXVRwT5vhhnKeTdY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=d9+62y7k; arc=fail smtp.client-ip=40.93.196.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QzyuHmhjoXgjP0wq5XWqPhqy6ZWWy7CDh0FqjUTvjIWcb9ZGON5QM8sZm3/J6LBNBe1H9gH/gJ48ADiLFF4BnEZpjsYTzI9lhvzNu5fDRHaEoIShwkTAZXeRrEHSAn4Hc4kogpSN+f+CrB/rE2HKCok19I4OxdpSbTrw2gBYlc44Mpm2X4ZfH8O7PyI59mmMVQ8QnhqpBxjb6NDpPvukJkQ0QjXs5O8mlw/nDVViuxpAHD4CcQlFljDlUQSsnYr0aqZTUHrVOQixBVAIWfNqPOWDScX4FacE8zAlSD7TDgQPw6j57e0cirAnMhkL8XbyWLNTdTG8cywmyhYzOQGjOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XiTsp7yPIz+LnTFiL9fToEQG8KEKg8MEpnPMJ3LUIm4=;
- b=iYMGxyLuwordlAJ5JodFGTmUiPa8ungO2UbD7BiHOHRUEl83PXKTw9gmIEHqBW/qK5OynCwoW8nJabBAG0C5nqtLuq2qG9m+saRxDYpeHs6yYHd7TPMz1zmxE8K5JvBnCP0aIfss0P/X/P/PFhX+lw8G6TUQhc5Q4ApG/JCbnmunddG4Ea3xEYP45s/p61RddYslzEUDfdbFD4oNYz/FCOsR5J+ISWKlpcoB5miJEzklIbUeWQu9fi0fzwgbbkHIHeM7yI/kZoTR+Uxief9ixDjCGSpy29AigFgSGj+77AI6becAUrVSd+v5adL9tTlDfz9sQI85tuUyqw/IfMFfAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XiTsp7yPIz+LnTFiL9fToEQG8KEKg8MEpnPMJ3LUIm4=;
- b=d9+62y7kDrO5y7eqS7gxmdevbr1rjJWlOVp7t+ifN4Ge2vcQrqp3h6wnbI1HOyVMIseQUHTW0DAmF0CE2dFHT1w5N5Xzh7cX9WVnorqiNbpVOq/o1ReIsxTwu2rZezvL8vZ16bofPiXz/daYqtLULyFxxPR9yQu0oZo62yNyqio=
-Received: from BN9PR03CA0227.namprd03.prod.outlook.com (2603:10b6:408:f8::22)
- by SN7PR12MB7812.namprd12.prod.outlook.com (2603:10b6:806:329::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.18; Sat, 16 May
- 2026 02:44:17 +0000
-Received: from BN1PEPF0000468A.namprd05.prod.outlook.com
- (2603:10b6:408:f8:cafe::b5) by BN9PR03CA0227.outlook.office365.com
- (2603:10b6:408:f8::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9913.14 via Frontend Transport; Sat,
- 16 May 2026 02:44:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BN1PEPF0000468A.mail.protection.outlook.com (10.167.243.135) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.13 via Frontend Transport; Sat, 16 May 2026 02:44:17 +0000
-Received: from [127.0.1.1] (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Fri, 15 May
- 2026 21:44:16 -0500
-From: "Nikhil P. Rao" <nikhil.rao@amd.com>
-Date: Sat, 16 May 2026 02:42:40 +0000
-Subject: [PATCH net-next v2 6/6] pds_core: add debugfs support for host
- backed memory
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD2F2236EE
+	for <netdev@vger.kernel.org>; Sat, 16 May 2026 03:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778903224; cv=none; b=nYo3tK7WCGolxOWQMujBxx1bzGzkLPAXrkhYcMkPmWLV3nMX1xetBnorYOGZS4l1CsTANqrUDmE7soAlSqrZLCasAr2MQXSh1T6vMrDs+llCtGWu2c9eoOzNo107XKI2JN3esRARJWcRKjWFN79YvX00onPfTSTWCLHHj+aHUcQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778903224; c=relaxed/simple;
+	bh=dsCddicPNz2vMoYz+r1VIeAagSjjACfz09Hzlv+yBO0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lox3kcbQK8IUeTYGmE7gFaYII1QMjfnUbj0dnaWjiX9bxhJJuqslQFOu68av+biRLFjaqQmBqDGQnyQr2A7wMsYdkGrEVMe0SrqbArqtbalp60xjUUgSxIHYt7GhruZfGVz3alIpVW1UhjXHZi4AGgK+niwr/gjYE3DtN8A46ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ljigUycJ; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8b8e98fd885so8590966d6.0
+        for <netdev@vger.kernel.org>; Fri, 15 May 2026 20:47:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778903222; x=1779508022; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X8WxhXuzauTUduVu+D8SXd21yI5sRtCuuFQxDxD9C2c=;
+        b=ljigUycJg3mChpm66P5Cyrmrom5DAqd/un2WFq7SsN74KaDJ5jpaA3nO+SqrQCOICr
+         yQBwA5dpY+capjwwTaVqLSMHbeOHeClzaSynnHmnw/bVdM7tpu8PCCWCWfX02oDo1z8w
+         2awwYjT+DjbWZVEF6A2FRe4/W+4biYc4BB9ylu9vnmAC2p/AeOBBCBVO89hgTkN18Im4
+         uJ5q7nCNVZnMzBmnX4acjvpaU6Vcf2MS9XtkSkBL+gHcHnrgI1T9oGnJUWaFfMSWF19h
+         3HU/9+Xyq9g7XwSSragVSC0EXVIUREi3aZi8r95w63g4yuqHBMoj2YU0Yn+ZNNg6SSVc
+         30PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778903222; x=1779508022;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X8WxhXuzauTUduVu+D8SXd21yI5sRtCuuFQxDxD9C2c=;
+        b=gIYJ64kewQotCZBCLzct7dNWCUaan/aIs2eafOBkVbkxzyhyAzZcmevRy2SO5BqpDQ
+         rpeBGxFjtw0DeR0TMNuZPDY1k+fh3J1OtuYEce6WNPSrHn/MjfPl7lrJlF13iqZCPQc+
+         osdH7nSZ+hBjhC+JKP8nph2486N0HAkeDCjUunSbI6df4+JpkqBTvkFwPmfKjt5Gziz8
+         IMs82tS/WmAb4t5Aw4q/GKMyAlWkITHICbdZzcLptmcV2qcHfm5cu425Zn1y+1xToFfZ
+         waV2ueku08q56vXaDR2vPq46raATouFmbw3bRPnQh58LC1bvHGRxsLBi0oDdRFLhqqZF
+         Fn0Q==
+X-Gm-Message-State: AOJu0YwKni5P1GnBHjWdfuuhADRllLuBcm/D/EXWa2bKiWODzK1LfpUy
+	hN5AjF4D1kIsu2Pgq4ZFGzfCjzP+WrmUVVqZhzrLjdx3WUCQaMErpZF/
+X-Gm-Gg: Acq92OGSUwE77WAFfHl3k7860V3leYgqqN8Dfk/7lid0PUkhj0YJ2lf0wtbZrfvpyeP
+	AfCQJXMONfO871+8JWVxdUy9T/hREjpNyeg9eEc2Ja1ZFwhun8Mhv+QM8umtIjUsbeG7GiW5ygF
+	81/zCliw/yDQmkq2TVCRW2pLUpZPFQU0wybXA7s3JekBOZneO4dLJDWvySDe2DNA4P5inp0M9IZ
+	RZuSn8JD+MDHcD5HBtf8hSw46XJvMKA720X4863LrzLhN8C9W3P6vJY7R8zQcKqCL1T+O4JBbMt
+	GMe3GBCY33Jl9x4b/HO7dzdA/Klx7K40dE85dt8iHbCavuK3ORqJePmGRTH5Af/oB1NWjX3oUnj
+	KeV/+rCESr3puChHhASBcd0pud/tKlejroLJeHKnthP+z6DF7R+BjwRhej+H//7Q2LZ2PNSlHsv
+	IQ9bRPjjFx8ouKnVFlEyM9ER20JEkzeU9i5BN+qLaj0ox1nIzyWg==
+X-Received: by 2002:ad4:4eeb:0:b0:89c:d424:aceb with SMTP id 6a1803df08f44-8ca0f6d639dmr114801256d6.31.1778903221858;
+        Fri, 15 May 2026 20:47:01 -0700 (PDT)
+Received: from tresc054937.tre-sc.gov.br ([187.65.210.13])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8c908d1d2e7sm70874546d6.16.2026.05.15.20.46.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 20:47:00 -0700 (PDT)
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Subject: [net-next PATCH v4 0/8] net: dsa: realtek: rtl8365mb: bridge
+ offloading and VLAN support
+Date: Sat, 16 May 2026 00:46:16 -0300
+Message-Id: <20260516-realtek_forward-v4-0-8b6d6a1eefdc@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,160 +85,192 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20260516-upstream_v2_clean-v2-6-7e0d66bf4020@amd.com>
-References: <20260516-upstream_v2_clean-v2-0-7e0d66bf4020@amd.com>
-In-Reply-To: <20260516-upstream_v2_clean-v2-0-7e0d66bf4020@amd.com>
-To: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Eric Joyner
-	<eric.joyner@amd.com>, "Nikhil P. Rao" <nikhil.rao@amd.com>, Vamsi Atluri
-	<Vamsi.Atluri@amd.com>
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAIjoB2oC/2XOTQ6CMBAF4KuQrq1pO6WgK+9hjGnLAI38mEIqh
+ nB3G1xIZPny8r2ZmQzoHQ7knMzEY3CD67sY5CEhttZdhdQVMRPBhGIggHrUzYiPe9n7l/YF5UZ
+ b0FlmlZIkqqfH0k3r4pV0ONIOp5HcYlO7Yez9ez0V+Np/V4HvVgOnjEpZGgWxNxleqla75mj7d
+ t0K4udTtv8qiOgLpiQKwQyc+L+HrVd7D9HzIs9sWuapBrP1y7J8ACiaSj84AQAA
+X-Change-ID: 20260323-realtek_forward-1bac3a77c664
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Linus Walleij <linusw@kernel.org>, 
+ =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+ Yury Norov <yury.norov@gmail.com>, 
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
+ Abdulkader Alrezej <abdulkader.alrezej@gmail.com>, 
+ Mieczyslaw Nalewaj <namiltd@yahoo.com>, Yury Norov <ynorov@nvidia.com>
 X-Mailer: b4 0.15.2
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF0000468A:EE_|SN7PR12MB7812:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2b24e2ce-68b8-4b00-6a5c-08deb2f50649
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700016|56012099003|22082099003|18002099003|11063799003;
-X-Microsoft-Antispam-Message-Info:
-	clvJptVaskTEpVU6jl8KVXpksNRNmRaVQlhr8yqfZFo3rieFLpO+fY+P8NlCEPd0OHBtt9cckSqSJgSzMgEWL0/9wNnuEop6+mL9oj84FpzePCnaH1dELAhJw4mCSy1K9BsdQaY0BQi3XZ0ddrB9z6+Bs8qowqwRl/zpiNhAzf9sajsaF+UnuhRaRu2WOfuDH7w0qm/Ny/YKpVn2/YjB4OSRvTLzX08/esMWeGXZvtWGtrdf69YGD7KcYXIgjRBbG7aB6Ez++u2EIF8M9suTMiz2AUnoOSoz7doCITyxxiehw5m706gnFUgWfOtFyxrBcG8ilMrhW17vyWJBqtJsHLiMOU8ZtflRdT8qpbKZvv0GO8KvmCXEK7PB1FCEUQYKGojdVLD89+ggDPKcmzitpxbqfNfsmOeRMVIxKAtNgSe2iBc9vCoCSGCG59pH3jaeKXIRZca/TiF5w48pMGp8TxX6LxUjyFnsT42RV9mLa9yWNQDo0vyxK4uJu4/pZ2m8CyvQ9zEuiJ5TqiM/t34iZ1oDGPDXU37WNQHspEx3Bq0P1FLO3miO5g72JmDH6u2HLfuK2oHmrWR5G0ei1bwDbAZV+fBK4b4/dXUVxsC/jLCAu35lAzr9Tz8q9beDoFobbIUpFZXVmBGay5yjcBEoMN/GUDEaj3Cgjen5Mh0dGRdpFvekr0YRCCAfiZ4xsvm4CRm9QmXBrn/nFtLdMR6FjCwfHM3jCk8/YqZaJ13Zs8A=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700016)(56012099003)(22082099003)(18002099003)(11063799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	LPDezWPS9L5ulk2GJXU0H7CF4aFmfW5q+x+nAUD1lecXPxg1vk/gSqKVIpf+HZZS3ctTuybpX1VbnE+auaOTeeV1ciP/WKQD99lKK37SoZxtdVIAMh4oyXemL3jcc8kslwl0/DLpriPgu58OHlBKYjrYfePMx3JfmV9ghPe/tpjvQ2v8kJnfYLRHZTSuPWoCHQtp8lT3QLfAR4vf8Vcv6wbdPmTGq/Zk/Xc4NsCTsveAaPq9t4kd7YIzzxKkHIK21mOcB5AsP1GWSqkmQ1wU9Nc+N6MU2dv6lAVNYdIm+Tsr4WJPzHlW7t26fzSxXsmAhA4UQ6AvAnfSQLRtcoPPO91/JAuK0Htgb+Gfb3mrcMm95fxt3RWshdjAdLBfriw8F3ONnq5E+zCVmJPsRipK0XAY/QMkFYpkDF1w7flRDfrD3d/ifM8aqg7C1jQSt6JK
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2026 02:44:17.4990
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b24e2ce-68b8-4b00-6a5c-08deb2f50649
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF0000468A.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7812
-X-Rspamd-Queue-Id: 651DB559F3D
+X-Rspamd-Queue-Id: 254BC55A0E6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288562-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:email,amd.com:mid,amd.com:dkim];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288563-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,yahoo.com,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bang-olufsen.dk:email,msgid.link:url,lunn.ch:email]
 X-Rspamd-Action: no action
 
-From: Vamsi Atluri <Vamsi.Atluri@amd.com>
+This series introduces bridge offloading, FDB management, and VLAN support
+for the Realtek rtl8365mb DSA switch driver. The primary goal is to
+enable hardware frame forwarding between bridge ports, reducing CPU
+overhead and providing advanced features like VLAN and FDB isolation.
 
-Add debugfs file to display host memory allocations including tag,
-size, order, and physical address for each memory request.
+Some of these patches are based on original work by Alvin Šipraga,
+subsequently adapted and updated for the current net-next state.
 
-Signed-off-by: Vamsi Atluri <Vamsi.Atluri@amd.com>
 ---
- drivers/net/ethernet/amd/pds_core/debugfs.c | 50 +++++++++++++++++++++++++++++
- drivers/net/ethernet/amd/pds_core/main.c    |  2 ++
- 2 files changed, 52 insertions(+)
+I attempted to reach Alvin for review of the final version but was
+unable to establish contact. Any regressions in this version are my
+responsibility.
 
-diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
-index 04c5e3abd8d7..058071f6f17e 100644
---- a/drivers/net/ethernet/amd/pds_core/debugfs.c
-+++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
-@@ -173,3 +173,53 @@ void pdsc_debugfs_del_qcq(struct pdsc_qcq *qcq)
- 	debugfs_remove_recursive(qcq->dentry);
- 	qcq->dentry = NULL;
- }
-+
-+static int host_mem_show(struct seq_file *seq, void *v)
-+{
-+	struct pdsc *pdsc = seq->private;
-+	struct pdsc_host_mem *hm;
-+	int i;
-+
-+	if (!pdsc->host_mem_reqs || pdsc->num_host_mem_reqs == 0) {
-+		seq_puts(seq, "No host memory allocated\n");
-+		return 0;
-+	}
-+
-+	seq_printf(seq, "Host memory requests: %d\n\n",
-+		   pdsc->num_host_mem_reqs);
-+	seq_puts(seq, "Tag    Size         Order  PA\n");
-+	seq_puts(seq, "---    ----         -----  --\n");
-+
-+	for (i = 0; i < pdsc->num_host_mem_reqs; i++) {
-+		hm = &pdsc->host_mem_reqs[i];
-+
-+		if (!hm->pg)
-+			continue;
-+
-+		seq_printf(seq, "%-6d %-12u %-6d 0x%llx\n",
-+			   hm->tag, hm->size, hm->order,
-+			   (unsigned long long)hm->pa);
-+	}
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(host_mem);
-+
-+void pdsc_debugfs_add_host_mem(struct pdsc *pdsc)
-+{
-+	struct dentry *dentry;
-+
-+	if (!(pdsc->dev_ident.capabilities &
-+	     cpu_to_le64(PDS_CORE_DEV_CAP_HOST_MEM)))
-+		return;
-+
-+	/* Check if file already exists (e.g., during reset recovery) */
-+	dentry = debugfs_lookup("host_mem", pdsc->dentry);
-+	if (!IS_ERR_OR_NULL(dentry)) {
-+		dput(dentry);
-+		return;
-+	}
-+
-+	debugfs_create_file("host_mem", 0400, pdsc->dentry,
-+			    pdsc, &host_mem_fops);
-+}
-diff --git a/drivers/net/ethernet/amd/pds_core/main.c b/drivers/net/ethernet/amd/pds_core/main.c
-index 58b4d77f6eca..aa7b5ce6f623 100644
---- a/drivers/net/ethernet/amd/pds_core/main.c
-+++ b/drivers/net/ethernet/amd/pds_core/main.c
-@@ -266,6 +266,8 @@ static int pdsc_init_pf(struct pdsc *pdsc)
- 
- 	mutex_unlock(&pdsc->config_lock);
- 
-+	pdsc_debugfs_add_host_mem(pdsc);
-+
- 	err = pdsc_auxbus_dev_add(pdsc, pdsc, PDS_DEV_TYPE_FWCTL, &pdsc->padev);
- 	if (err)
- 		goto err_out_stop;
+Changes in v4:
+* General:
+ - fixed comments/kdoc wording identified by Sashiko.
+* Patch 1 (err_prt):
+ - added missing %pe/ERR_PTR conversion identified by Sashiko.
+* Patch 2 (dsa macros):
+ - reorganize port setup initialization, collecting ports in upports_mask
+   and downports_mask.
+ - include a fail fast during setup if DSA links ports are detected.
+* Patch 4 (table):
+ - added missing return value check for regmap_bulk_read in table access
+   (spotted by Sashiko).
+* Patch 5 (vlan):
+ - added undo steps to rtl8365mb_port_vlan_filtering (noticed by
+   Sashiko).
+ - removed residual double max packet configuation (noticed by Sashiko).
+ - added meteridx and policing_en to rtl8365mb_vlan_mc_read, although
+   always written as zero in rtl8365mb_vlan_mc_write() (noticed by
+   Sashiko).
+ - explicitly comment that VlanMC[0] uses EVID==0 (Sashiko was worried).
+ - always undo previous PVID setting before applying a new one. It might
+   exhaust VlanMC entries if the user keeps changing PVID without removing
+   the port from the previous PVID VLAN (bug detected by Sashiko).
+ - Fixed a bug where a missing VLAN MC entry during PVID assignment would
+   return success instead of an error (reportd by Sashiko).
+* Patch 6 (bridge join/leave):
+ - Added error unwinding path (undo isolation and EFID) in
+   rtl83xx_port_bridge_join (noticed by Sashiko).
+* Patch 7 (FDB support):
+ - added RTL8365MB_L2_ENTRY_SIZE macro.
+ - fixed RTL8365MB_L2_FLUSH_CTRL2_TYPE_BOTH definition (noticed by
+   Sashiko).
+ - removed the union in rtl8365mb_l2_uc_key. Each field is independent
+   now (bug detected by by Sashiko).
+ - fixed mc->member calculation. Now it uses bitfield to rebuild the
+   value (bug detected by Sashiko).
+ - return mdb_del without errors if entry is missing.
+ - improve debug messages for l2 operations.
+ - added comment about ds->assisted_learning_on_cpu_port and
+   fdb_isolation in the commit message (asked by Sashiko)
+ - renamed some _MASK macros to _MSK to reduce the name length.
+ ** rtl83xx_port_fdb_dump fixes:
+  - initialize entry as null (noticed by Sashiko)
+  - check return of cb() (bugfix reported by Sashiko)
+  - fix address overflow (noticed by Sashiko)
+- Link to v3: https://patch.msgid.link/20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com
 
--- 
-2.43.0
+Changes in v3:
+- Fixed kernel-doc warnings
+- Removed unnecessary defensive checks
+- Link to v2: https://patch.msgid.link/20260503-realtek_forward-v2-0-d064e220b391@gmail.com
+
+Changes in v2:
+- added patch to use ERR_PTR()
+- dropped bitfield patch. Use FIELD_PREP instead. Suggested by Yury
+  Norov
+- tag_rtl8_4 patches were submitted on its own series (already accepted)
+- dropped rtl8365mb_vlan_mc_port_{add,del}(). rtl8365mb_vlan_mc_port_set
+  is now called directly from PVID methods.
+- reordered methods in rtl8365mb_vlan.c
+- use dsa_switch_for_each_user_port() instead of simple for in bridge
+  port join/leave
+- PVID check now uses dsa_switch_for_each_available_port instead of
+  dsa_switch_for_each_port
+- set EFID of user ports to 0 at setup(), although it is the expected
+  state after reset
+- STP patch was dropped and replaced by a more extensive one that
+  disables all ports (including unused ones) before setting CPU and user
+  ports. It also extended the CPU port isolation to include all user
+  ports.
+- refactored bridge, FDB, and MDB port operations into the common
+  rtl83xx module, introducing new realtek_ops callbacks to abstract the
+  hardware access
+- Collected Reviewed-by and Suggested-by tags
+- Link to v1:
+  https://patch.msgid.link/20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com
+
+To: Linus Walleij <linusw@kernel.org>
+To: Alvin Šipraga <alsi@bang-olufsen.dk>
+To: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+Alvin Šipraga (6):
+      net: dsa: realtek: rtl8365mb: prepare for multiple source files
+      net: dsa: realtek: rtl8365mb: add table lookup interface
+      net: dsa: realtek: rtl8365mb: add VLAN support
+      net: dsa: realtek: rtl8365mb: add port_bridge_{join,leave}
+      net: dsa: realtek: rtl8365mb: add FDB support
+      net: dsa: realtek: rtl8365mb: add bridge port flags
+
+Luiz Angelo Daros de Luca (2):
+      net: dsa: realtek: rtl8365mb: use ERR_PTR
+      net: dsa: realtek: rtl8365mb: use dsa helpers for port iteration
+
+ drivers/net/dsa/realtek/Makefile                   |   4 +
+ drivers/net/dsa/realtek/realtek.h                  |  42 ++
+ drivers/net/dsa/realtek/rtl8365mb_l2.c             | 554 ++++++++++++++
+ drivers/net/dsa/realtek/rtl8365mb_l2.h             |  32 +
+ .../dsa/realtek/{rtl8365mb.c => rtl8365mb_main.c}  | 589 +++++++++++++--
+ drivers/net/dsa/realtek/rtl8365mb_table.c          | 216 ++++++
+ drivers/net/dsa/realtek/rtl8365mb_table.h          | 132 ++++
+ drivers/net/dsa/realtek/rtl8365mb_vlan.c           | 813 +++++++++++++++++++++
+ drivers/net/dsa/realtek/rtl8365mb_vlan.h           |  25 +
+ drivers/net/dsa/realtek/rtl83xx.c                  | 536 ++++++++++++++
+ drivers/net/dsa/realtek/rtl83xx.h                  |  27 +
+ 11 files changed, 2900 insertions(+), 70 deletions(-)
+---
+base-commit: edf4bee4215a173c0534d1851d7523d827149f9e
+change-id: 20260323-realtek_forward-1bac3a77c664
+
+Best regards,
+--  
+Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
 
