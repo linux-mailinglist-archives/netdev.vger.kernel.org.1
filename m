@@ -1,311 +1,217 @@
-Return-Path: <netdev+bounces-288614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288628-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aIhdNMxaCGphkwMAu9opvQ
-	(envelope-from <netdev+bounces-288614-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 13:53:48 +0200
+	id UJq8CP9dCGpglQMAu9opvQ
+	(envelope-from <netdev+bounces-288628-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 14:07:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 608CA55B8E2
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 13:53:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E84455BA53
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 14:07:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C79BD3014C2F
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 11:53:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8F2FE3012CBF
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 12:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2632E3DDDB9;
-	Sat, 16 May 2026 11:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015463D567E;
+	Sat, 16 May 2026 12:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TTwzhsR5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1gUesYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD933D669E
-	for <netdev@vger.kernel.org>; Sat, 16 May 2026 11:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C629F37418A;
+	Sat, 16 May 2026 12:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778932416; cv=none; b=Me20hQVfhNmwCQbVC3Z/RkjvO9oaCXKlkcagQQOSvpIzrT7rLLlI7OwZnybOUstuMf8oebbXrKjL0ieh1/M0RdYjlyTZdfMsneMIGL4/RjZtl17Wom8+UBrfPFcbPxZY8mqW1cYMO5pJhlBnzoK3HTTUk4o+2O9Q7jgpXKO5IZs=
+	t=1778933244; cv=none; b=KR9Hjz8FttPRtbkc2F2l3GwFZAH92eM80NVDdwLIQk/AtzV0T3c90mlYD90adSZxaXTkanTEmRLvXf0mAU/xvisL1GimL3wZesfq2x/rwFSAv0Y6sJIAzUEXwVr1Cv7PkHcYIrqsuMqbKIljJtSDb6SyglGTCwjkwD60j3VNObs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778932416; c=relaxed/simple;
-	bh=F7j14MGWg5MpaTs46ixVgM5+KDomqLpuWcEipt69nvI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QZLRr/LFjDz/KPQYhvQ35AKcAbnA8lKkEUP7WpO5l0myQ1s09K0wXOGal4pMlijUSt0K3nJkwKTGimqy1+13adjc8LA51TFZkCBaWbEZMGBUzapvGF8pjlGKjQIdiTuuZRcZroZ91O+X1ZV58D6qTu3Kyj7+lrqAybpIGf/nAmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TTwzhsR5; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43d76dd4ee8so506976f8f.2
-        for <netdev@vger.kernel.org>; Sat, 16 May 2026 04:53:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778932412; x=1779537212; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GMsYPxsGdmOZu2bUf9upWSruFK/hZRv7KGPN8jXsIdE=;
-        b=TTwzhsR5nBzuTE33a4WAvIiwr/EV+I1TVkybF8WTUoYUierI7qMv6v9zrehsSQ6eIS
-         d5J7nnW80F8TPiYRlB5IG4XsvHMyNuAK4pL00yBRNxIrAtHgkCK0foHx1jqkDCKmQ9Fd
-         O7faNAbFNfs/TBuMmiIfnSixME52ODqs2ofPDOSn645g0Mn9fnUV+qkNlilsig2TMYC+
-         VpXjTRaJXZKGPkEntwW+XZGUYb7x0UESFJlrCY0jdA74Kvt/qZ0EpHz5e+RNp3Ec5cMW
-         ZIiS7nf/w0Ks9GI2EsN9wn8Hbr7UBgOslrM7Yfyh1qTf/IYHk6lAP0pKdgklS7VlZ3di
-         u9kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778932412; x=1779537212;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GMsYPxsGdmOZu2bUf9upWSruFK/hZRv7KGPN8jXsIdE=;
-        b=YoHEsmSHrm+Gf4uFpxk7Gw5BtChtCsOzxC4DkYsV6C0xzBJTEJ5AZ29R5PHwfyQH+2
-         ndv84t0ktVKFTwrEBZD4ELLs0jz4GY+4ZxKkgGYc9yB7+EIsDVY0q5cbiVG1LeNp1krB
-         zWYGKmtDBYMn5z+8/R0hq99vG/2ACh2buB55deb66CnCHeLAK20c3C6DOAnNtK0A7Mtt
-         U4/Jm+snNhaghByuHeGtiIYjsrk3k6z9nIw+W+8jfPpamH68qA3OhYRnRA/BgiPHOaGQ
-         1sBdgtbvcrKdobKxkFjghIPE6kI4K7Ho8L3KOaE3FE2iill0Nr/b81iXLhSNFB7lXo80
-         fWOg==
-X-Gm-Message-State: AOJu0YxAMX2sxDe9s3ESvaYpJHfQIIKVdMieWuZ9nwkk+DOe2Vl6d7Z1
-	zqEANRoCyYs5ap2kEjXuTy69jBGT76T69g6cGcHNGJaYxVtS8KG/zp5o
-X-Gm-Gg: Acq92OHA/L5nxCviDdB1lA45lR+UDTVSUYYUdyksQxfaaG0regC2g0Yr0HzK/IkkI0N
-	PU7JHMok6mEZrFxtnbEdazr5Q1drYQSh7TuFkjal8U5III3S8zHON30vtujkH+9fRqAD7AJNpY0
-	6FF5qnkYK4vUfSssSVnBu7LKanAigZ+gd1JSVWBtDzToxJWxSjwcy97Zwp5vp4yyg5SGEFzhf7T
-	HtzljW1SJVNCnZRfKfiED54DaSKDuolxDpuhPtYnVWnp5pi0ztByrDFKuAyvZ94X2d6FPAHgcC2
-	hlcvsciy64w3RVx7yY8ER5dX177jND3D5ux7htqchfWk9OfF+FedQHM1B+hBMqy3l4oN2NHBDRu
-	Y6b8gfs4fRJjAeUnf79oAWiLPpYQhPcZzl3K/dkP6K9i3vS5z/CbmtKa/YN/rdfMP4rekpDd2YU
-	RSbILNuUE+yr+DTTfCTxmU3dpp+bxD9SPzYfPxzIynJkSA6iCZit+mNFdKXiZh
-X-Received: by 2002:a05:6000:288e:b0:45d:7bf0:c7d3 with SMTP id ffacd0b85a97d-45e5c37122emr10808299f8f.19.1778932411691;
-        Sat, 16 May 2026 04:53:31 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da15a6454sm22250671f8f.34.2026.05.16.04.53.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 May 2026 04:53:31 -0700 (PDT)
-Date: Sat, 16 May 2026 12:53:29 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Arseniy Krasnov
- <avkrasnov@salutedevices.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- kvm@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- virtualization@lists.linux.dev, "David S. Miller" <davem@davemloft.net>,
- Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org, Maher
- Azzouzi <maherazz04@gmail.com>
-Subject: Re: [PATCH net] vsock/virtio: fix zerocopy completion for multi-skb
- sends
-Message-ID: <20260516125329.7b699c6f@pumpkin>
-In-Reply-To: <20260514092948.268720-1-sgarzare@redhat.com>
-References: <20260514092948.268720-1-sgarzare@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1778933244; c=relaxed/simple;
+	bh=di2Nx7xIU2JWNo5WwYBFMHkUwxrrucvWso4uehXJl2E=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=t4MtsHp2DzjbR4BZF9wJaa7yLWE5oDV8nEJIddfs/ZX0/3n/Bkiowram7yWaIbJ08eU4zg0jrjyFRVjOiBj1HW6tKVyzvQXa9kDpCSb002NneNcIlqCtAz34B1K72ToNzuCJofks1cuiLgk6WsuMfWZb7JaAyFb4BeBG0FMrNCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1gUesYh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5B491C19425;
+	Sat, 16 May 2026 12:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778933244;
+	bh=di2Nx7xIU2JWNo5WwYBFMHkUwxrrucvWso4uehXJl2E=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=O1gUesYhuiSxvo6Md8M61qX41NRYZ1D6yQf2JxV0EJ3kIESriwLqjC1ULsVPio/GD
+	 fSHBxoM/44goSB3KsnYC4bFxpHPvSPMonE11nkDvbAxbldA0l3Ap59PSwNbLthkbTn
+	 gjV4MsQl3AmUkVXtPV7Y6nUbmaSIqV/Kk24f9qsscDkd3mqMTRcDKeuq+oYyXTly3D
+	 KQV1NiXErQE5/B47urAJ1AyCfMrrJwBFxTJzZFHzDWsnks4cgezkOmee7cMuhRBISJ
+	 I42dQhubIb8I0TrTORh/wlcrysRT7dGarIUoSpO7maZJKuIky8UsKItUwNvKJWWp+F
+	 jMIrR2CYfx5pw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CBCCD4F3C;
+	Sat, 16 May 2026 12:07:24 +0000 (UTC)
+From: Carl Lee via B4 Relay <devnull+carl.lee.amd.com@kernel.org>
+Date: Sat, 16 May 2026 19:55:18 +0800
+Subject: [PATCH v3] nfc: nxp-nci: i2c: use rising-edge IRQ on ACPI systems
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 608CA55B8E2
+Message-Id: <20260516-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v3-1-37ba4b6e9086@amd.com>
+X-B4-Tracking: v=1; b=H4sIACVbCGoC/52NzQ6CMBAGX4X07Jp2W0E9+R7GQ+0PbISChRAM4
+ d0tXPSqx9nsNzOz3kVyPTtnM4tupJ7akEDuMmYqHUoHZBMz5JhzKQQEbyBMHQRDQGggun5oY3q
+ LTxgilaWL4HVd37V5gLH6pPAguck5S8ouOk/TlrveEle0jl9bfRTr9c/QKEDAySEvhFJC2OKiG
+ 7s3bcPWzIjfavxRjUktc5Tq6AuvJf+ol2V5AyxLRqVBAQAA
+X-Change-ID: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Carl Lee <carl.lee@amd.com>, krzk@kernel.org, carl.lee@amd.com, 
+ peter.shen@amd.com, colin.huang2@amd.com, kuba@kernel.org, david@ixit.cz, 
+ luca.stefani.ge1@gmail.com, brgl@kernel.org, mpearson@squebb.ca
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1778932520; l=3257;
+ i=carl.lee@amd.com; s=20260203; h=from:subject:message-id;
+ bh=AMSt9loXPyaoOpf5Py15SrUAJJFo8zGMLjoVxukd9fM=;
+ b=e8EQLMWG6SkcKINegth5pIbCvRerCIZ38zgG62J9x+VNmzI8PCoOO/6oiL+tPg0EpWcZkk0Nm
+ DACZRtwbQc7BCNz+cmTy412m4yDEbV7F+7D9KVfqmuIGFDlula/QlE3
+X-Developer-Key: i=carl.lee@amd.com; a=ed25519;
+ pk=pyq7QaQvoxMg806KVkRwpCbiah+7ncWr4MBpK1AEyjA=
+X-Endpoint-Received: by B4 Relay for carl.lee@amd.com/20260203 with
+ auth_id=623
+X-Original-From: Carl Lee <carl.lee@amd.com>
+Reply-To: carl.lee@amd.com
+X-Rspamd-Queue-Id: 8E84455BA53
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288614-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,salutedevices.com,google.com,linux.alibaba.com,lists.linux.dev,davemloft.net,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-288628-lists,netdev=lfdr.de,carl.lee.amd.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[amd.com,kernel.org,ixit.cz,gmail.com,squebb.ca];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	HAS_REPLYTO(0.00)[carl.lee@amd.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,squebb.ca:email]
 X-Rspamd-Action: no action
 
-On Thu, 14 May 2026 11:29:48 +0200
-Stefano Garzarella <sgarzare@redhat.com> wrote:
+From: Carl Lee <carl.lee@amd.com>
 
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> When a large message is fragmented into multiple skbs, the zerocopy
-> uarg is only allocated and attached to the last skb in the loop.
-> Non-final skbs carry pinned user pages with no completion tracking,
-> so the kernel has no way to notify userspace when those pages are safe
-> to reuse. If the loop breaks early the uarg is never allocated at all,
-> leaking pinned pages with no completion notification.
-> 
-> Fix this by following the approach used by TCP: allocate the zerocopy
-> uarg (if not provided by the caller) before the send loop and attach
-> it to every skb via skb_zcopy_set(), which takes a reference per skb.
-> Each skb's completion properly decrements the refcount, and the
-> notification only fires after the last skb is freed.
-> On failure, if no data was sent, the uarg is cleanly aborted via
-> net_zcopy_put_abort().
-> 
-> This issue was initially discovered by sashiko while reviewing commit
-> 1cb36e252211 ("vsock/virtio: fix MSG_ZEROCOPY pinned-pages accounting")
-> but was pre-existing.
-> 
-> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-> Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> Closes: https://sashiko.dev/#/patchset/20260420132051.217589-1-sgarzare%40redhat.com
-> Reported-by: Maher Azzouzi <maherazz04@gmail.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 83 ++++++++++---------------
->  1 file changed, 34 insertions(+), 49 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 989cc252d3d3..1e3409d28164 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -70,34 +70,6 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
->  	return true;
->  }
->  
-> -static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
-> -					   struct sk_buff *skb,
-> -					   struct msghdr *msg,
-> -					   size_t pkt_len,
-> -					   bool zerocopy)
-> -{
-> -	struct ubuf_info *uarg;
-> -
-> -	if (msg->msg_ubuf) {
-> -		uarg = msg->msg_ubuf;
-> -		net_zcopy_get(uarg);
-> -	} else {
-> -		struct ubuf_info_msgzc *uarg_zc;
-> -
-> -		uarg = msg_zerocopy_realloc(sk_vsock(vsk),
-> -					    pkt_len, NULL, false);
-> -		if (!uarg)
-> -			return -1;
-> -
-> -		uarg_zc = uarg_to_msgzc(uarg);
-> -		uarg_zc->zerocopy = zerocopy ? 1 : 0;
-> -	}
-> -
-> -	skb_zcopy_init(skb, uarg);
-> -
-> -	return 0;
-> -}
-> -
->  static int virtio_transport_fill_skb(struct sk_buff *skb,
->  				     struct virtio_vsock_pkt_info *info,
->  				     size_t len,
-> @@ -317,8 +289,10 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  	u32 src_cid, src_port, dst_cid, dst_port;
->  	const struct virtio_transport *t_ops;
->  	struct virtio_vsock_sock *vvs;
-> +	struct ubuf_info *uarg = NULL;
->  	u32 pkt_len = info->pkt_len;
->  	bool can_zcopy = false;
-> +	bool have_uref = false;
->  	u32 rest_len;
->  	int ret;
->  
-> @@ -360,6 +334,25 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  		if (can_zcopy)
->  			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
->  					    (MAX_SKB_FRAGS * PAGE_SIZE));
-> +
-> +		if (info->msg->msg_flags & MSG_ZEROCOPY &&
-> +		    info->op == VIRTIO_VSOCK_OP_RW) {
-> +			uarg = info->msg->msg_ubuf;
-> +
-> +			if (!uarg) {
-> +				uarg = msg_zerocopy_realloc(sk_vsock(vsk),
-> +							    pkt_len, NULL, false);
-> +				if (!uarg) {
-> +					virtio_transport_put_credit(vvs, pkt_len);
-> +					return -ENOMEM;
-> +				}
-> +
-> +				if (!can_zcopy)
-> +					uarg_to_msgzc(uarg)->zerocopy = 0;
-> +
-> +				have_uref = true;
-> +			}
-> +		}
+Some ACPI-based platforms report incorrect IRQ trigger types (e.g.
+IRQF_TRIGGER_HIGH), which can lead to interrupt storms.
 
-Surely that block should only be done if can_zcopy is true?
-And shouldn't something unset it if info->op != VIRTIO_VSOCK_OP_RW ?
-If the msg_zerocopy_realloc() fails then can't you just set can_zcopy to false.
+Use the historically working rising-edge trigger on ACPI systems to
+avoid this regression.
 
-It info->msg->msg_buf is already set then I think you have to disable zero-copy.
-The caller has already requested a callback - and you can't add another.
+Device Tree-based systems continue to use the firmware-provided
+trigger type.
 
-In any case by the end of this can_zcopy and have_uref are really the same flag.
+Signed-off-by: Carl Lee <carl.lee@amd.com>
+---
+Some ACPI-based platforms report incorrect IRQ trigger types,
+which can lead to interrupt storms.
 
->  	}
->  
->  	rest_len = pkt_len;
-> @@ -378,27 +371,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  			break;
->  		}
->  
-> -		/* We process buffer part by part, allocating skb on
-> -		 * each iteration. If this is last skb for this buffer
-> -		 * and MSG_ZEROCOPY mode is in use - we must allocate
-> -		 * completion for the current syscall.
-> -		 *
-> -		 * Pass pkt_len because msg iter is already consumed
-> -		 * by virtio_transport_fill_skb(), so iter->count
-> -		 * can not be used for RLIMIT_MEMLOCK pinned-pages
-> -		 * accounting done by msg_zerocopy_realloc().
-> -		 */
-> -		if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
-> -		    skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
-> -			if (virtio_transport_init_zcopy_skb(vsk, skb,
-> -							    info->msg,
-> -							    pkt_len,
-> -							    can_zcopy)) {
-> -				kfree_skb(skb);
-> -				ret = -ENOMEM;
-> -				break;
-> -			}
-> -		}
-> +		skb_zcopy_set(skb, uarg, NULL);
->  
->  		virtio_transport_inc_tx_pkt(vvs, skb);
->  
-> @@ -422,6 +395,18 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  
->  	virtio_transport_put_credit(vvs, rest_len);
->  
-> +	/* msg_zerocopy_realloc() initializes the ubuf_info refcnt to 1.
-> +	 * skb_zcopy_set() increases it for each skb, so we can drop that
-                                                            ^ must
+Use rising-edge IRQ on ACPI systems to avoid this regression,
+while keeping firmware-provided trigger types on non-ACPI systems.
 
-> +	 * initial reference to keep it balanced.
-> +	 */
-> +	if (have_uref) {
-> +		if (rest_len == pkt_len)
-> +			/* No data sent, abort the notification. */
-> +			net_zcopy_put_abort(uarg, true);
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: krzk@kernel.org
+Cc: carl.lee@amd.com
+Cc: peter.shen@amd.com
+Cc: colin.huang2@amd.com
+Cc: kuba@kernel.org
+Cc: david@ixit.cz
+Cc: luca.stefani.ge1@gmail.com
+Cc: brgl@kernel.org
+Cc: mpearson@squebb.ca
+---
+Changes in v3:
+- Use rising-edge IRQ on ACPI systems to avoid interrupt storms
+- Keep using firmware-provided trigger type on non-ACPI systems
+- Refine commit message to focus on regression on ACPI platforms
+- Link to v2: https://lore.kernel.org/r/20260312-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v2-1-362348f7fa30@amd.com
 
-Is it worth optimising for the 'nothing sent' case ?
+Changes in v2:
+- Add missing <linux/irq.h> include for irq_get_trigger_type().
+- Link to v1: https://lore.kernel.org/r/20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v1-1-9e20714411d7@amd.com
+---
+ drivers/nfc/nxp-nci/i2c.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
--- David
+diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
+index 6a5ce8ff91f0..266dc231c47d 100644
+--- a/drivers/nfc/nxp-nci/i2c.c
++++ b/drivers/nfc/nxp-nci/i2c.c
+@@ -16,6 +16,7 @@
+ #include <linux/delay.h>
+ #include <linux/i2c.h>
+ #include <linux/interrupt.h>
++#include <linux/irq.h>
+ #include <linux/module.h>
+ #include <linux/nfc.h>
+ #include <linux/gpio/consumer.h>
+@@ -267,6 +268,7 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
+ {
+ 	struct device *dev = &client->dev;
+ 	struct nxp_nci_i2c_phy *phy;
++	unsigned long irqflags;
+ 	int r;
+ 
+ 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+@@ -303,9 +305,26 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
+ 	if (r < 0)
+ 		return r;
+ 
++	/*
++	 * ACPI platforms may report incorrect IRQ trigger types
++	 * (e.g. level-high), which can lead to interrupt storms.
++	 *
++	 * Use the historically stable rising-edge trigger for ACPI devices.
++	 *
++	 * On non-ACPI systems (e.g. Device Tree), prefer the firmware-
++	 * provided trigger type, falling back to rising-edge if not set.
++	 */
++	if (ACPI_COMPANION(dev)) {
++		irqflags = IRQF_TRIGGER_RISING;
++	} else {
++		irqflags = irq_get_trigger_type(client->irq);
++		if (!irqflags)
++			irqflags = IRQF_TRIGGER_RISING;
++	}
++
+ 	r = request_threaded_irq(client->irq, NULL,
+ 				 nxp_nci_i2c_irq_thread_fn,
+-				 IRQF_ONESHOT,
++				 irqflags | IRQF_ONESHOT,
+ 				 NXP_NCI_I2C_DRIVER_NAME, phy);
+ 	if (r < 0)
+ 		nfc_err(&client->dev, "Unable to register IRQ handler\n");
 
-> +		else
-> +			net_zcopy_put(uarg);
-> +	}
-> +
->  	/* Return number of bytes, if any data has been sent. */
->  	if (rest_len != pkt_len)
->  		ret = pkt_len - rest_len;
+---
+base-commit: 7109a2155340cc7b21f27e832ece6df03592f2e8
+change-id: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
+
+Best regards,
+-- 
+Carl Lee <carl.lee@amd.com>
+
 
 
