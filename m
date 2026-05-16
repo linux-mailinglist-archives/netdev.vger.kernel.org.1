@@ -1,134 +1,167 @@
-Return-Path: <netdev+bounces-288576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288577-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id d3dsJO7+B2oCUQMAu9opvQ
-	(envelope-from <netdev+bounces-288576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:21:50 +0200
+	id JZ8OMaYDCGqRVAMAu9opvQ
+	(envelope-from <netdev+bounces-288577-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:41:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F8E655A454
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:21:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 233A655A53D
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 782BE300788C
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 05:21:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A96830125D7
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 05:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9835B282F31;
-	Sat, 16 May 2026 05:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1ED3161AB;
+	Sat, 16 May 2026 05:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="l6Yfmwuq"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="1QAE0D7b"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2385425D527;
-	Sat, 16 May 2026 05:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3928E2D1913;
+	Sat, 16 May 2026 05:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778908907; cv=none; b=cSKzfWuvt0yn39FbtvK2i3AD0FIWLfs4XEKnHAtsKIAdM64YISXXrCBjxiqvSOlaR309Qvz3QLzUJznz331UhBleXHf/Uq2F/ZxZixUM3TK4Cw4Osn9B6QPT40qdwpxlph7/dd7EH9IyuKxUZWJx1qsOluXe4Rmp3upCY6c068I=
+	t=1778910114; cv=none; b=OXqdRXkBc/pD96wMHrm8CdDJGHgLzOpsxhTUu5ADURS0rvNhwtLPcfWMBV8JKugujxzhpXFemTzP2hRRyv7maLeyhGCVUG7+ACg0T/D94jD9lS9PFwS9l8x4zcP2xJLznNWxB3GhgTTIVq8x4XegQzWPRZxR1MzoyF09yGm6yIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778908907; c=relaxed/simple;
-	bh=7YCan+YdCQL7Po5x92ZUlFEKUag/P+YkjqJZ4aopJjs=;
+	s=arc-20240116; t=1778910114; c=relaxed/simple;
+	bh=WJzd1PcwZiCHxaN5z/EFhC71qMLZlK/JY9XnalfqhmI=;
 	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=YNlQTcfdU8kKmUq/JCyoB1YAVyOG6/lpN1kYS5ciP/1w0/MaSuLGjgK7VnxC+7vL3J0TtKAmsKLcJVoQLEHcDeeuSE8aWVRwvf6lFUgmBDCqHzQvr4LtQTYp7Kw0HLqH6rj3kCxPnsgQPabTh/QY++BODLmDvV82wgxFnJU9yP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=l6Yfmwuq; arc=none smtp.client-ip=194.13.80.246
+	 Message-ID:Content-Type; b=MwEdN2N44HWjHZP3EkQvugbvpbPVAO8hCfsOk3b0BA6rwXnUdvyapkkwzTb/ESAmgpefPBTQizAyM2RYSjgJYmwpSHXWdQYEF1N9yzGAA+tDlIydcbqa6oyFzHWcEPDtvHWfR+QhGE1E36mOKMeTB/l3BhcviOt+9mPOMDoBucg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=1QAE0D7b; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D1FCAA0387;
-	Sat, 16 May 2026 07:21:41 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9C0C7A3A42;
+	Sat, 16 May 2026 07:41:47 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1778908903; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1778910109; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=bQol4ULV4fOwkE0qcMCv/ZNRjXNX1V25I7d9Q9P6Voc=;
-	b=l6Yfmwuqov5bobFnyHIFOyrMyODzR8KujgEYX9LkAayptEMed0OW/3n9x8uoOSQifW8TC+
-	/lNizyEQgysW0xTynp6zL/r097SuqScnwQw+/fhnjoWK0UWgUX0YnbcTvg/xuyvnhp27mg
-	1sdD2ohak0DMiRRrvqq4CuLZi/9e/AM/r/Ja4ysVhTepZA3JFyL96/fM/nNt4onkGrwoQ7
-	jJ1UNh+q+9KFhTkln0LnMJAgLjLd5sTpKxzz6S4ZmzVCoiGbKMc18Co7RH1p8yNVfsS5bA
-	OOE1EwvWrezgtGnsH9jpC36W59OiarrYnd52GMthZ0ytUeK8i6gm9Yq2zgDsrw==
+	bh=sn0vD4w5rGnhC29ssAWiOKrVgaxGD18MsQSfOpiU5Zk=;
+	b=1QAE0D7byiGBUR3XRU3xzWQNfe5aK/hrX18jP8A8Qp1P5oqUmEJOaKNTNn9o3TJU7ve7Id
+	l23NHN5H7VIRpmLSjzdOSDhdk4PuZLZNX0AI12IzB1N+JF6EBqKvDe4qYoq/MSCRc/YUY+
+	SJq0/IYUQ8lt0yBk29V0gQc36CkdBvlDC1OfSw3NihX2Z7z9TpRP9Npwzwh4oKLniNJf8Z
+	5vpvhdeOVur+ZPMts0Ac5xbMXWdLRrgYIvEfd3x5LPa3ZPxCvT1tWEtuoKuVZFYu5JAm2k
+	XkWe/ObHgu+zNdYjI1o2JzPNbdLAPvZbYdjBKeBIIeJSYPDqhEDvc/D7OpDMGw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sat, 16 May 2026 07:21:41 +0200
+Date: Sat, 16 May 2026 07:41:47 +0200
 From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Oleksij Rempel
- <o.rempel@pengutronix.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: honor eee_disabled_modes in phy_support_eee()
-In-Reply-To: <20260516-devel-phy-support-eee-fix-v1-1-59debc00eda0@tipi-net.de>
-References: <20260516-devel-phy-support-eee-fix-v1-1-59debc00eda0@tipi-net.de>
-Message-ID: <7a4e0d4b27bf662034f7eb57de8e9ece@tipi-net.de>
+To: Marco Crivellari <marco.crivellari@suse.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Tejun Heo
+ <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, Frederic Weisbecker
+ <frederic@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Michal Hocko <mhocko@suse.com>, Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [RFC PATCH net-next] net: macb: Move delayed work on
+ system_dfl_wq
+In-Reply-To: <20260515152721.344380-1-marco.crivellari@suse.com>
+References: <20260515152721.344380-1-marco.crivellari@suse.com>
+Message-ID: <790e1a195d6bb5732bb061b4c5ac73a8@tipi-net.de>
 X-Sender: nb@tipi-net.de
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
 X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 2F8E655A454
+X-Rspamd-Queue-Id: 233A655A53D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288577-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de];
-	TAGGED_FROM(0.00)[bounces-288576-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[tipi-net.de];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,linutronix.de,suse.com,microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,redhat.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:email,tipi-net.de:mid,tipi-net.de:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email]
 X-Rspamd-Action: no action
 
-On 16.5.2026 06:51, Nicolai Buchwitz wrote:
-> phy_support_eee() copies supported_eee into advertising_eee
-> unconditionally, overwriting any filtering applied during phy_probe()
-> based on DT eee-broken-* properties or driver-populated
-> eee_disabled_modes. MAC drivers that call phy_support_eee() after
-> probe (e.g. bcmgenet, fec, lan743x, lan78xx, r8169) then cause the PHY
-> to advertise EEE for modes the user marked as broken.
+On 15.5.2026 17:27, Marco Crivellari wrote:
+> Currently the code enqueue work items using {queue|mod}_delayed_work(),
+> using system_wq, which will be deprecated soon and replaced by
+> system_percpu_wq.
 > 
-> The symptom is that ethtool --show-eee on the local interface reports
-> "not supported" (supported & ~eee_disabled_modes is empty) while the
-> link partner sees EEE negotiated and active.
+>    commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and 
+> system_dfl_wq")
 > 
-> phy_probe() already filters advertising_eee via eee_disabled_modes
-> after calling of_set_phy_eee_broken(). Apply the same mask in
-> phy_support_eee() so the filtering survives the copy.
+> The function(s) mentioned earlier, end up calling 
+> __queue_delayed_work(),
+> which set a global timer that could fire anywhere, enqueuing the work
+> where the timer fired.
 > 
-> Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC 
-> support EEE")
-> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+> Unbound works could benefit from scheduler task placement, to optimize
+> performance and power consumption.
+> 
+> Since the workqueue work doesn't rely on per-cpu variables, there is no
+> obvious reason that justify the use of a per-cpu workqueue. So change
+> system_wq with system_dfl_wq so that the work may benefit from
+> scheduler task placement.
+> 
+> Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 > ---
+>  drivers/net/ethernet/cadence/macb_main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c 
+> b/drivers/net/ethernet/cadence/macb_main.c
+> index a12aa21244e8..42328b5ca403 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -672,7 +672,7 @@ static void macb_tx_lpi_work_fn(struct work_struct 
+> *work)
+>  static void macb_tx_lpi_schedule(struct macb *bp)
+>  {
+>  	if (bp->eee_active)
+> -		mod_delayed_work(system_wq, &bp->tx_lpi_work,
+> +		mod_delayed_work(system_dfl_wq, &bp->tx_lpi_work,
+>  				 usecs_to_jiffies(bp->tx_lpi_timer));
+>  }
+> 
+> @@ -724,7 +724,7 @@ static int macb_mac_enable_tx_lpi(struct 
+> phylink_config *config, u32 timer,
+>  	/* Defer initial LPI entry by 1 second after link-up per
+>  	 * IEEE 802.3az section 22.7a.
+>  	 */
+> -	mod_delayed_work(system_wq, &bp->tx_lpi_work, 
+> msecs_to_jiffies(1000));
+> +	mod_delayed_work(system_dfl_wq, &bp->tx_lpi_work, 
+> msecs_to_jiffies(1000));
+> 
+>  	return 0;
+>  }
 
-> [...]
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-
-Sorry for the noise, this patch is missing the net prefix in the 
-subject. Will resend as v2 with the correct prefix tomorrow. Still 
-learning b4...
-
-Have a nice weekend,
+Thanks
 Nicolai
 
