@@ -1,89 +1,80 @@
-Return-Path: <netdev+bounces-288605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288608-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJQZI9dCCGqugwMAu9opvQ
-	(envelope-from <netdev+bounces-288605-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 12:11:35 +0200
+	id uLC7OtNFCGq8hQMAu9opvQ
+	(envelope-from <netdev+bounces-288608-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 12:24:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F0D255B0FC
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 12:11:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06D855B200
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 12:24:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6C7BA30158A8
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 10:11:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E68063004D28
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 10:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DAB3D3D1B;
-	Sat, 16 May 2026 10:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB0C3D3CEF;
+	Sat, 16 May 2026 10:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AlFd48VZ"
+	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="lFgeuMo1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szelinsky.de (szelinsky.de [85.214.127.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6213D3CFD
-	for <netdev@vger.kernel.org>; Sat, 16 May 2026 10:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95323C7DF1;
+	Sat, 16 May 2026 10:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778926279; cv=none; b=ZgeaQF/l8NBMplBoEallUkGcPmh6YnwzES8fEbgRklLhgfh3GJOVJfjVsG1UJwZu+OMUMZc6JTjlPJa8u7oduNGnKrxsZUcrnYl37BOgvbjzKa24uOe7URf178us69Y8UGhIuBvktRECu7QIQt+4lFAQVALqqvNRP3AOnvQPJ0U=
+	t=1778927052; cv=none; b=p8j9cO1pMixjLR2X6gTSjxyBD2istgCUcZsuYuSkGSM7cJAyLAoemC20pTbQkkDyG20fTzsvkNgwEdg88Zth8KQv9vaUNuNHHF5nlwB+23NA1urmxmU9mzckw+Jup+CQdGhEnBJkje2E8ggd2Xqav/0JZl31J8ITP4mmac72Zds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778926279; c=relaxed/simple;
-	bh=dE8POE0bLkDMBzJNszM4qPWzNSebDVGVkxt36GC39Cg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K+Svzj0N3g8aSRjkCA/OOUOG1mg02fFRhfHsyQ6DV0G2ibRPj5rEi1R/d0UWc6cnw+lLHN7E3ULgqS0CL5LhJ3jeLTfMKJG6ckLWQlli/JpIdzl1N5muQACxOvtu4xhQ5IanfaUDm/1SZUnDneCFPij4G/xeOqG6FZ1lWVy1PuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AlFd48VZ; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82f8b60e485so328562b3a.0
-        for <netdev@vger.kernel.org>; Sat, 16 May 2026 03:11:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778926274; x=1779531074; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ndeekLfeYvEssA5jUCUkuBnAMWw5z8aFBinbqqlOzUY=;
-        b=AlFd48VZcuG00dQ4nd724xhJ1skOf7gV4LHJUj3OC6vO2HBBTLM2uDNRFBRuxlLa4C
-         +MRlIDcQsERuf3+4LHjZLs4owMxaavQ2EcYQ4qJb6HhMbC43EEsHacGr4YLv/epuE6Xc
-         CWhaDmDfhuwFHQ0tlurCt7J6zuVQJs+yBv7VO/qNfiSZdWDQXlhF1hORR5jTRBYaMFJm
-         LvpzPLKaLUStEmIzQQNMhX3rlv1GGHBd+Hw/WYwVxxOmao+4eGKSbwCRJqgXa9iRgfN5
-         UES5r1zSyqZxFkMtXePpmoecLn7ck375mmIH+92MEWiOlme7fDbMVoXBt3pMQifGjeu1
-         lJdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778926274; x=1779531074;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ndeekLfeYvEssA5jUCUkuBnAMWw5z8aFBinbqqlOzUY=;
-        b=FKRNUv5jHJL/HhZIHXzMeQnW3O2LlfEDlOMWeX1WUDotlWF18t//3bM3BzKdAckx6y
-         wmbpqVNLjB1b69RZsqB8OVtDeB8QFy05glmKb/PLGtu/UifCeXdrNuUPjKQTS//AstaV
-         vnraHwxzs+ZZ3ZCoz/xllQStO8vhE089qvFDUTh41JSMp8cICOreMKIRCZTD9t9DAzVQ
-         lbWFluyRGhhfVOv2g6ey9MZASNkfLM6p7yLw1gCSFHCDw0l6MRn85nZwm9oImXHivK5m
-         zWXJMhdgG2vL0TYeJujRAsnuAwzABxbq4sWSJPsLA581Pa/344cRzgAmU7YMxURTx8/p
-         HIbQ==
-X-Gm-Message-State: AOJu0YzMM9BiuOAHDFeUmcKVPvQQepREd+mHK8/EfTWhitx4LkaNqvH2
-	pB1cV2BhP8iUor3znYStfyfy0pz6qC5N2TGPweQ4CLXBWyKjGM58KhGd0szJ5vrW
-X-Gm-Gg: Acq92OHcSF/1QxTWU7ecIUY9nwWc+49EBQ31PNjw1E0thuYfwYQf3Y6hrfEatpFzgB3
-	rYk32bcPY3dTtKqhNVeRob/oU+qQgb+3wxX45h8QasnnKfKjZSQOWzFBJ8qa/0SMktfMWnyu0rh
-	LEF+gXMGtwJrRtjFyJASiqEzjhGtdML4i+TA852v6ohqkwLakBfZFKYR0QNJRtBuUtEZgWLi8Ww
-	rlwtaxGoRZGbkFWCju83ST/TZihd4vwCHHGG0aThwOq4Uuokar8AwhodGXhgUh9z7HmTvF5n0ZT
-	bfebIUQ7xjtCSjlau6jjNzq+MmSNya4TeAK/6vrLNLsaordEE+cofI1Iu5prub65WLvofrsEilG
-	TyGmiXvUGl0Ow148VQiYquPvuHabB4pLfc3CUHQplKcszDbzh4tcO2AFA6T4rmdKFqidcTAEQtf
-	EM5hDIimMONr0UEzeIFMr92lQOx47psn3nxvmOse81Li0a8F4l0m4PKxTBN0VBcozXW3ICMQ==
-X-Received: by 2002:a05:6a00:2793:b0:83e:26b:528c with SMTP id d2e1a72fcca58-83f33d26f67mr7608430b3a.28.1778926274481;
-        Sat, 16 May 2026 03:11:14 -0700 (PDT)
-Received: from r912.tailbb6e1e.ts.net ([160.30.85.32])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f1966471dsm8715506b3a.6.2026.05.16.03.11.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 May 2026 03:11:13 -0700 (PDT)
-From: Avinash Duduskar <avinash.duduskar@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: socket: clean up __sys_accept4 comment
-Date: Sat, 16 May 2026 15:41:09 +0530
-Message-ID: <20260516101109.479042-1-avinash.duduskar@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1778927052; c=relaxed/simple;
+	bh=bdN0NT6/HcYgI/x4qjaeluTgxOtZ+qYb36w6gMUlXR8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gFdO8sKaQsl4F5aRsIjFpjGF3JgVIjeg98c/mKBH7cKz5XkDndZVpl7fQ5PbnLb15ODs50X3S6s9C5zYEIqylVsQfvvd9egRMZrld0RBogbURZdMuF99Of6LjP03bTNZVOkq/jAe3JsYef6hEjYjFHa5VPUZBpWdPd3zLEqzSgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=lFgeuMo1; arc=none smtp.client-ip=85.214.127.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
+Received: from localhost (localhost [127.0.0.1])
+	by szelinsky.de (Postfix) with ESMTP id 529CDE83300;
+	Sat, 16 May 2026 12:17:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
+	s=mail; t=1778926664;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xQxE5eeNi+FgzpQyikK/9wb1gzBGDwcK1LlAPy0UyIo=;
+	b=lFgeuMo1K1pAxBJ2oR7LoPSr7PvIuSayWS9JSK1hr3Z87k5OoIx53LwcwZvmnSxORpMM/v
+	wZ2i46cdxJ+W4awMI+KwulKLD70Un8aMhKfEdaRXQ3Am4L1h88iF8jw9zmcwuZLXC4UHsq
+	ZlmwO/IhNTQjIHkZgDzhtDGOE5IMS8cw+yEc79KEabi6u7wZrVnyDg5nY7VsjU12WcyBZi
+	e713O6gsHAYn9R+rS6ZhnuRq3TnkMjGtLLF2pCBDB8qEsGxfH9vRVpE76teUogFhhMQk1W
+	N+/iHWHDCM1FPT9y9dODyV/JJY1Pl5nrhsfFm2ZEvcAcETj0C5RVwztUMGk6Fg==
+X-Virus-Scanned: Debian amavis at szelinsky.de
+Received: from szelinsky.de ([127.0.0.1])
+ by localhost (szelinsky.de [127.0.0.1]) (amavis, port 10025) with ESMTP
+ id ZRLkrymdl950; Sat, 16 May 2026 12:17:43 +0200 (CEST)
+Received: from p14sgen5.fritz.box (p578439b8.dip0.t-ipconnect.de [87.132.57.184])
+	by szelinsky.de (Postfix) with ESMTPSA;
+	Sat, 16 May 2026 12:17:43 +0200 (CEST)
+From: Carlo Szelinsky <github@szelinsky.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org,
+	Carlo Szelinsky <github@szelinsky.de>
+Subject: Re: [PATCH net-next v5 1/2] net: pse-pd: add devm_pse_poll_helper()
+Date: Sat, 16 May 2026 12:17:20 +0200
+Message-ID: <20260516101720.1686465-1-github@szelinsky.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260505015757.831372-1-kuba@kernel.org>
+References: <20260505015757.831372-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,68 +82,132 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0F0D255B0FC
+X-Rspamd-Queue-Id: F06D855B200
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-288608-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-288605-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[szelinsky.de:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[avinashduduskar@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-Fix a typo and a redundant phrase in the block comment above
-__sys_accept4(): "thats" -> "that's", and drop the trailing
-"to recvmsg" that repeats the recvmsg() reference earlier in
-the same sentence.
+Hi Jakub,
 
-No functional change.
+Thanks for sending the AI review. I checked the code again... both
+points are real, but one of them looks to me like more theory than practice.
+Out of curiosity, what prompt do you use for these reviews, so I can use it 
+before sending the next version? Replying inline:
 
-Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
----
- net/socket.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Mon, 4 May 2026 18:57:57 -0700 Jakub Kicinski wrote:
+> > @@ -1118,6 +1125,8 @@ void pse_controller_unregister(struct pse_controller_dev *pcdev)
+> >  	pse_release_pis(pcdev);
+> >  	if (pcdev->irq)
+> >  		disable_irq(pcdev->irq);
+> > +	if (pcdev->polling)
+> > +		cancel_delayed_work_sync(&pcdev->poll_work);
+>
+> Because pse_release_pis() executes kfree(pcdev->pi) before the delayed work
+> is cancelled, can pse_poll_worker() run concurrently and access the freed
+> pcdev->pi array inside pse_handle_events() before the cancellation completes?
 
-diff --git a/net/socket.c b/net/socket.c
-index 22a412fdec07..eec5ed08ca00 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -2089,8 +2089,8 @@ static int __sys_accept4_file(struct file *file, struct sockaddr __user *upeer_s
-  *	we open the socket then return an error.
-  *
-  *	1003.1g adds the ability to recvmsg() to query connection pending
-- *	status to recvmsg. We need to add that support in a way thats
-- *	clean when we restructure accept also.
-+ *	status. We need to add that support in a way that's clean when
-+ *	we restructure accept also.
-  */
- 
- int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
+Yes, seems like a real bug. The IRQ thread and the poll worker can still run
+after pse_release_pis() frees pcdev->pi, and both end up in
+pse_handle_events() touching pcdev->pi[i]. We need to stop them
+first. v6 will reorder pse_controller_unregister() to:
 
-base-commit: 627ac78f2741e2ebd2225e2e953b6964a8a9182f
--- 
-2.54.0
+	if (pcdev->irq)
+		disable_irq(pcdev->irq);
+	if (pcdev->polling)
+		cancel_delayed_work_sync(&pcdev->poll_work);
+	cancel_work_sync(&pcdev->ntf_work);
+	pse_release_pis(pcdev);
 
+The IRQ side seem to be already broken before this patch. I went
+through the git log:
+
+* fc0e6db30941 ("net: pse-pd: Add support for reporting events")
+  added pse_isr but never called disable_irq() in unregister at all.
+* ffef61d6d273 ("net: pse-pd: Add support for budget evaluation
+  strategies") added the disable_irq() call, but put it in the
+  wrong place (after pse_release_pis()).
+
+What do you suggest to do, I could imagine: ... 
+
+1) Send the fix as a standalone "Fixes:" patch to net first,
+   then rebase v6 on top once it lands? Or fold it into v6 as
+   patch 1/3? My vote is standalone since the fix stands on its
+   own, but up to you.
+
+2) Which commit for the Fixes: tag? I'd pick ffef61d6d273
+   (that's where the broken order came from), but fc0e6db30941
+   also works (no protection at all back then). wdyt?
+
+> > +int devm_pse_poll_helper(struct pse_controller_dev *pcdev,
+> > +			 const struct pse_irq_desc *d)
+> > +{
+> [...]
+> > +	queue_delayed_work(system_freezable_wq, &pcdev->poll_work,
+> > +			   msecs_to_jiffies(pcdev->poll_interval_ms));
+>
+> Since memory is allocated with devm_ helpers but no devm cleanup action is
+> registered to cancel the delayed work, what happens if a driver's probe
+> function encounters an error after calling this helper? [...]
+>
+> The commit message mentions that drivers typically set up the helper before
+> registering the controller. If queue_delayed_work() schedules the worker
+> to run before devm_pse_controller_register() completes, will
+> pse_poll_worker() attempt to acquire pcdev->lock and push events into
+> pcdev->ntf_fifo before they are initialized?
+
+The probe-failure case is a real bug. If probe fails between this
+helper and devm_pse_controller_register(), the work stays queued
+and fires later on a pcdev whose devres memory is gone. UAF.
+
+The "worker fires before mutex/kfifo are ready" case is real in
+theory, but I don't think you can actually hit it?! Default
+poll_interval_ms is 1000 ms, so pse_controller_register() would
+need to take over a second to lose the race. Worth fixing to keep
+the code clean, but not urgent or?
+
+Same fix for both: move queue_delayed_work() out of the helper.
+The helper just allocates the state and does INIT_DELAYED_WORK.
+pse_controller_register() then arms the work as the very last
+step on success, gated on pcdev->polling. So the work only ever
+runs when everything is set up AND register has succeeded.
+
+Should I fix both in v6, or just the probe-failure leak? One
+change covers both, so I would suggest to do both. wdyt?
+
+So the steps for v6 [1/2] could be:
+* standalone "Fixes:" patch reordering pse_controller_unregister()
+  (sent to net first, unless you suggest to fold it in)
+* move queue_delayed_work() into pse_controller_register()
+
+Do you have any other feedback, do I miss anything ?
+
+Cheers,
+Carlo
 
