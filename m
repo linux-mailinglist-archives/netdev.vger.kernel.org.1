@@ -1,301 +1,222 @@
-Return-Path: <netdev+bounces-288672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CBW5EPnqCGpD/QMAu9opvQ
-	(envelope-from <netdev+bounces-288672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 00:08:57 +0200
+	id sCcuGLTrCGpD/QMAu9opvQ
+	(envelope-from <netdev+bounces-288673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 00:12:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA8B055E0DF
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 00:08:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6002455E111
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 00:12:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 263003013B7E
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 22:07:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C08383003BC8
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 22:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373E5388E61;
-	Sat, 16 May 2026 22:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5735538B12D;
+	Sat, 16 May 2026 22:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="br3+k/Ik"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9w5ZlcZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C0D38B14C
-	for <netdev@vger.kernel.org>; Sat, 16 May 2026 22:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778969255; cv=none; b=IrH+IXupPTYCLTDPSSLt87vXyvQPuHYZgdWiM8AiWinQpmlnthyo+04+Rr76dzpqWGhAsTVnrU1CdQTAkm7CCD1UmK8gh9vjfQ18g3CY/rzFkZhYSxJj/IU3xqQ+V0onhvR0qaGd280+VMMp7D+BQB/McveJzBiVp+VImI+RlnQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778969255; c=relaxed/simple;
-	bh=moQtC3wsesbiFuZLWdkWCEAAj7TKhK0xPTuk8lP2cMk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=mEwXpcMCc49IudR5QjKrtTgCpArsQ4QtKSxFEVmnrnp76TDNaqoPw1LkCKHHgx+1RCpX4VwPEzw2txy9j+VDJ62r2mkL9G8PclV6O+dd826maXcn+7kLS3cGNjAiIPLFu7v9+pH/7hhvCqPfTS0358jIgvewX+k+tnrLUPi+p9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=br3+k/Ik; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C42389469
+	for <netdev@vger.kernel.org>; Sat, 16 May 2026 22:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778969515; cv=pass; b=T3nwX11FT0NNBKVndGRhngTZ4elauCz2wApyBYhSikXQBXeLPyUJJ2LEj7Dbe3oSLOt5flYFbmthc1h7zYQ9BK921R+R4nw46ATw5LG3zIHucOa59n6qoZBW5IzcwkxKDGKIFEb5UAQ/vIfqVMKUJYyIiFECKTSVuSpWNS3pRtc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778969515; c=relaxed/simple;
+	bh=cnJK7hPTmkgkJZ4VYPugj1Q0LxboZQLhwA40hNOOokM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HyLHVIu9yk6BGheeFRszJlmNLTCqn0lImYWXmI1oO1lwozLh42Wc26xxjRt3yVIabr8Psef74kgsq2bUU0KbpeoQIV4eo/yXnCvp8ZQKOPSvwlugIoUVrjls9Z1tWqOhGlLpt1jq6mZPP/8BAv2pIISjR1sySwlxMap8GgJsbWU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9w5ZlcZ; arc=pass smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48d102471a4so6829045e9.2
-        for <netdev@vger.kernel.org>; Sat, 16 May 2026 15:07:33 -0700 (PDT)
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7dccb8644c4so628973a34.0
+        for <netdev@vger.kernel.org>; Sat, 16 May 2026 15:11:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778969511; cv=none;
+        d=google.com; s=arc-20240605;
+        b=AfCB3D6o5L4lFLNivkcUj2ho0wF5lQeFDBUdd5g5Bt0Yrfb/gAxQztRzuhBwz3r6Nf
+         HFaDigYxIpsX7mNm5s4hGrEV3XefCnRlaL/wpAMFdplVT01I0bVbagJvvsnbiJo1EOgn
+         VJB8zIcGfmswPvCXzYqaaom4dsp8kB9khG2os/4BgBPF3tQI+g7zgZTnINstXxhgUaFG
+         HsnSSbZCE3ErDzkfuwpAFEivH8RRhHe4RKz1WmHcAWRyJZSmzKMcR50Hv8j73BlfK0hu
+         9w4+pcTeUMmQEowdZGPRGS2Xg0BeCCR2gty95IqM2bs5swzZQ1wqTHZvg62qHk2Vt55M
+         Lr4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cnJK7hPTmkgkJZ4VYPugj1Q0LxboZQLhwA40hNOOokM=;
+        fh=9MR6mvH3V3W++GQTqU074lGLHVDHPmZSlUu55UgxTkY=;
+        b=RwC1u2QQB7EFjtId3J53pN2lL1rX5HQ+GiJvordbekHBV1TPkTfj+wQ546bUhdZJuG
+         KD//Bc+kwllBv0PoZ6jm2WwUl6qnfdnxrBLduLMwtfNz2bybZvj2AppL7rYxPgmTBQ12
+         JappGKif3mCArD1UF1x/fXCxXizf/hNnwhgjZ/qAydOA+lYc5I4kDW85Kkk7xwqBQyrP
+         rz5it+SUOGchJ/ipsXmSJcZNx41Ezx2UME2Pv+lnRBS+t+mEIO5afxuBzedmH7hkqbJA
+         6dk6zS5PoWOVRrsGtX3vVrJXdsYw/HHExOvbSDvuKkBBTaaZawkBFDxRn0ym3qD7o0Rh
+         QSbg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778969252; x=1779574052; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+wKhZSb9cCkHmBev0VWOG/+bjDaCYCIRmW5W59h5f4Q=;
-        b=br3+k/Ik/Gd8WkwLhB8gE75CRjZhboUaP6xfiemicutMlm49pEKT8vln4p+p9mAbwp
-         HLZTJgd76uysRxmuraN3LAtyxiJPXZiCLAa5t9OX9ATXrab88Ca8bH1k7oSbsvSmx8u8
-         CbdyNszmoWK9CqmqitAJfEvippoy28vxRncie3nFvQcaQbpEOfvUYOVYtTVEMYBZlrU4
-         iRzD/ISLb7h67Hq5UyW9WcRNWWVqYg2SRUTCpMvgBh5tIRpdOa7UyEdKFgJV4udeww84
-         KtbM6iuGH++fzvi9bCgCIEKUDmGoUuttsADvjxIwEgxHHncAltiJH4+N9d6RihrmD6l0
-         gKpQ==
+        d=gmail.com; s=20251104; t=1778969511; x=1779574311; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cnJK7hPTmkgkJZ4VYPugj1Q0LxboZQLhwA40hNOOokM=;
+        b=a9w5ZlcZOPp792MXsUyaTY+CYC534mQZvkdkhyafLmCaY6wS1N+ZB/N4YpNxcGthL9
+         WE0weftYvcv6En+ilYJkIAvPLsRxx9VYS+MBdMjXfs0F3kEu76+Bhgfj3v8hetMy0xnV
+         /ZKTvs87uvlxHCnN66DX+o/queRkgC5XFCKZYTYxc6dxzDW0jL6yO+robfnJ82u0yQ4F
+         YSJHWzNKEVOaAOZ98mHngwcz+yoYafTGs3z6ldDVcFf2n1Nv+1C16zV2JGsQ8jGb6NWz
+         sFggLzXCB6Mlaur/hnZrRQguIZC28C4z8Pboa0p+bzhpPjyIqqQC/RmqIy1EWdYHNUoY
+         PpXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778969252; x=1779574052;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+wKhZSb9cCkHmBev0VWOG/+bjDaCYCIRmW5W59h5f4Q=;
-        b=KNy6OLU2WHdX6Php9j7+nXfINLYKR42exXlEZNJeJMn7ZKheku5OC42pWQ3GU71c0K
-         RdYyqeuk9hJa1ZYaVpCWlgA7bpLB8a219yrTsFdyh8GDOFtTilCtsfJG9bAPARFURvQ2
-         wB1P7bfpDxM7X76AOnp9FP9qFd7FdjXYn2bpx0f8jZe9RuWf4NSr4PqpTaUdFrU1ijGX
-         B/qJ/2E+aZl150BjLAK/atpRR8EMnz/7C+J1u4R32KipKm5JjmA8GExuIEq7lqlKB0Bd
-         leC+66Hvaieg5QPtbiYYjNCw2jcBA04uaeisDx6g+U/doVBi8M8wGJv5aq+Qh4d3QcWb
-         gAig==
-X-Gm-Message-State: AOJu0YzLgtOnhzjAoMWrYz7Wnj3MI/2/VSG63VB2pCEpBsXiQVaSouGn
-	fv/KFSVmBqt6PbnYQZbwYGjnuCQJYGFrRVKAqlovmlXbHGcOmcRlwRB1
-X-Gm-Gg: Acq92OG7bGdal6KbZF1lZZjYAa8B5FsMztaPmWdAnbGLDH9/Afw/FIktQv2TDPWtAma
-	CwW4JZOu/bY/osBvt0Ev7FcBuYrcpIYXc3/Y/k1Q7HH208NqtaT6RgvecLJTZFV24Go14RV4FPg
-	WPtej0Wii9qeYf6seNJ7iXMzsmuTlt3Qoz01EHirvfgZKMsyn7VIsQcl7ZtKcRK3VSzcEsPHaow
-	llMJ8oGkPoyZBfi5el00Ge3YmikNoygr0SHq7gv8Z7UH/YkwudJsFrKoG/FVLV5H3lbUn4q+nC/
-	qzyFmdBn8QZHU5bhcTw7ywK5QwFE9zisL+UbjvpK07sfqKQgEVg+ObepSWg/Wf5BB7WfknZh54m
-	RU9zcjFtrLj5G1OhfGFRQI628rLOalrxdiSYQmHwcrTttxwVo4HrJzPTMJC2rO9cxW+67fK7TzK
-	sHC+4lOOoVjGTeEF8/+iSuBQg9CTuAVhMYkAgfTuHVj+yFID1lfCzX3bo7+MyyNIOf2yCPKBTN5
-	Ei6YqcnV+0zjyKJmQyOmj081GQDsQRW5eLNHOf4ohX0BqRH6uvpGYohlLy0siQBlU39CgcxVA==
-X-Received: by 2002:a05:600c:2d09:b0:48f:e1ac:c96d with SMTP id 5b1f17b1804b1-48fe61f2bcemr72856845e9.20.1778969251736;
-        Sat, 16 May 2026 15:07:31 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f2c:8500:bde1:c576:18ad:a53? (p200300ea8f2c8500bde1c57618ad0a53.dip0.t-ipconnect.de. [2003:ea:8f2c:8500:bde1:c576:18ad:a53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe537c788sm144690005e9.12.2026.05.16.15.07.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 May 2026 15:07:31 -0700 (PDT)
-Message-ID: <172ed6a7-4e20-4fcf-a192-b8d3116b7d9b@gmail.com>
-Date: Sun, 17 May 2026 00:07:30 +0200
+        d=1e100.net; s=20251104; t=1778969511; x=1779574311;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cnJK7hPTmkgkJZ4VYPugj1Q0LxboZQLhwA40hNOOokM=;
+        b=acbaQkeV7iodhIBulxTQqKG6tpM8nzY4eKz3LNIzNU05Ttt4D1Sr/rZZQAxVdMEoN/
+         sGpQYTpAwpNotJ7Z8X9Xn6WPYJuOuzC1op/EYlSxJBJ8o6THZNMlRgWzh+uQK4mamMmA
+         bqjF59Fs+bO6LPz89GINRwuHmvjfpc+F3VFR6lN9Yqj6m6nMfSFNZiJdpeVssMPN3skL
+         LjfrcLECFhBOD/LHWe3gXA9RXskpKRMeBh/Paeix87R5/hErdmUeau9iAs59Y/7oDfM9
+         gPMKrbr8PI1dDZDmVTeoVPL5+H/lz7TN+4uVw29NqeX05X6yC1MWfSvCgKrhny7kNEVV
+         nxSA==
+X-Forwarded-Encrypted: i=1; AFNElJ/3mer5Gbdl0vaW90hQK/PkngBhu146oOCxumZTU31D4ddCEHPHL40m4BUY/EqM9qzNiKF6BUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRi051tuQM+hh2Beh/5V0T5XRNYNvc//cvZ2+XlkZaHxtT6MJk
+	EVEejL1tKjFo/+Kmun0otpiq36Ze9x/U6P8FiTjZehFLEgP4X75slZnTMs6RBjwTiABHORWFBQk
+	EdYth+76298GxRTGTRrnLomiPFE1s6Ek=
+X-Gm-Gg: Acq92OE8D/mxg3Xjq4q+n0RIR4qZtMwnEq2wTPGuXZy3/BWzvEccu6heUN7blSCkhzk
+	+MijHCxaArsM4fJXb+Aqglm+K/0RXfpC2TlIG7/nyUobYEZXARycmYQEMv3/TN86BZjofPnoFe7
+	rbEkYue8vbiTMEd6CJpVieVKEU5nMW2sCUfWwhZMdXnkcdZiQLogAyXi+yp36RAc40Q42Ap+uGd
+	NG1T6+mefX+mDOhZrvWIaJTiOza8popwMIlq5vwVJma0csfFpOKiMLuNyFyqSEP0nXpq6Dpmfkx
+	xqXftw==
+X-Received: by 2002:a05:6830:6183:b0:7d7:bf59:16df with SMTP id
+ 46e09a7af769-7e4f2bdad0dmr6831364a34.17.1778969511382; Sat, 16 May 2026
+ 15:11:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [Patch net-next v3 7/7] r8169: add support for ethtool
-To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260513115543.1730-1-javen_xu@realsil.com.cn>
- <20260513115543.1730-8-javen_xu@realsil.com.cn>
-Content-Language: en-US
-In-Reply-To: <20260513115543.1730-8-javen_xu@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: AA8B055E0DF
+References: <20260515174904.28575-1-contact.kartikn@gmail.com>
+ <afc61e48-5380-4764-8144-db69e4dc728b@kernel.org> <CAEqOmmXLT+mdv9ziirkeYF0cOq07veoFyxOMhw=D01-qD+icvg@mail.gmail.com>
+In-Reply-To: <CAEqOmmXLT+mdv9ziirkeYF0cOq07veoFyxOMhw=D01-qD+icvg@mail.gmail.com>
+From: Kartik Nair <contact.kartikn@gmail.com>
+Date: Sun, 17 May 2026 03:41:39 +0530
+X-Gm-Features: AVHnY4INoQJV1aBYN6-0jzSGu_PNz3veVm540O4HGcN743YMvi17d9WPa95jp1M
+Message-ID: <CAEqOmmViMN0h+PCTd1_1sGGozc3RqMK_Nj=ABArKTwWMy8XXhw@mail.gmail.com>
+Subject: Re: [PATCH] net/llc: fix UBSAN array-index-out-of-bounds in llc_conn_state_process
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	syzbot+628f93722c08dc5aabe0@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 6002455E111
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288672-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288673-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.994];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FROM_NEQ_ENVFROM(0.00)[contactkartikn@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,628f93722c08dc5aabe0];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On 13.05.2026 13:55, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
-> 
-> This patch add support for changing rx queues by ethtool. We can set rx
-> 1, 2, 4, 8 by ethtool -L eth1 rx num.
-> 
-> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
-> ---
-> Changes in v2:
->  - no changes
-> 
-> Changes in v3:
->  - no changes
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 126 ++++++++++++++++++++++
->  1 file changed, 126 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index f654e98e47be..ae64955e47d4 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -6269,6 +6269,130 @@ static void r8169_init_napi(struct rtl8169_private *tp)
->  	}
->  }
->  
-> +static void rtl8169_get_channels(struct net_device *dev,
-> +				 struct ethtool_channels *ch)
-> +{
-> +	struct rtl8169_private *tp = netdev_priv(dev);
-> +
-> +	ch->max_rx = tp->hw_supp_num_rx_queues;
-> +	ch->max_tx = 1;
-> +	ch->max_other = 0;
-> +	ch->max_combined = 0;
+Sure, by "direct path," I just meant the execution flow when
+the socket isn't locked by the user (!sock_owned_by_user()).
 
-The struct comes zero-initialized, so explicitly setting zero
-values shouldn't be needed.
+In that case, llc_process_tmr_ev() immediately calls
+llc_conn_state_process(). Right before making that call, it
+checks if the state is LLC_CONN_OUT_OF_SVC and bails out if
+it is. That's the path that is already safe.
 
-> +
-> +	ch->rx_count = tp->num_rx_rings;
-> +	ch->tx_count = 1;
-> +	ch->other_count = 0;
-> +	ch->combined_count = 0;
-> +}
-> +
-> +static int rtl8169_realloc_rx(struct rtl8169_private *tp,
-> +			      struct rtl8169_rx_ring *new_rx,
-> +			      int new_count)
-> +{
-> +	int i, ret;
-> +
-> +	for (i = 0; i < new_count; i++) {
-> +		struct rtl8169_rx_ring *ring = &new_rx[i];
-> +
-> +		ring->rx_desc_array = dma_alloc_coherent(&tp->pci_dev->dev,
-> +							 R8169_RX_RING_BYTES,
-> +							 &ring->rx_phy_addr,
-> +							 GFP_KERNEL);
-> +		if (!ring->rx_desc_array) {
-> +			ret = -ENOMEM;
-> +			goto err_free;
-> +		}
-> +
-> +		memset(ring->rx_databuff, 0, sizeof(ring->rx_databuff));
-> +		ret = rtl8169_rx_fill(tp, ring);
-> +		if (ret) {
-> +			dma_free_coherent(&tp->pci_dev->dev, R8169_RX_RING_BYTES,
-> +					  ring->rx_desc_array, ring->rx_phy_addr);
-> +			goto err_free;
-> +		}
-> +	}
-> +	return 0;
-> +
-> +err_free:
-> +	while (--i >= 0) {
-> +		rtl8169_rx_clear(tp, &new_rx[i]);
-> +		dma_free_coherent(&tp->pci_dev->dev, R8169_RX_RING_BYTES,
-> +				  new_rx[i].rx_desc_array, new_rx[i].rx_phy_addr);
-> +	}
-> +	return ret;
-> +}
-> +
-> +static int rtl8169_set_channels(struct net_device *dev,
-> +				struct ethtool_channels *ch)
-> +{
-> +	struct rtl8169_private *tp = netdev_priv(dev);
-> +	bool if_running = netif_running(dev);
-> +	struct rtl8169_rx_ring *new_rx;
-> +	u8 old_tx_desc_type = tp->init_rx_desc_type;
-> +	u8 new_desc_type;
-> +	bool new_rss_enable;
-> +	int i, ret;
-> +
-> +	if (!tp->rss_support && (ch->rx_count > 1 || ch->tx_count > 1)) {
-> +		netdev_warn(dev, "This chip does not support multiple channels/RSS.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	if (!(tp->features & RTL_VEC_MAP_ENABLE))
-> +		return -EINVAL;
-> +
-> +	new_rss_enable = (ch->rx_count > 1 && tp->rss_support);
-> +	new_desc_type = new_rss_enable ? RX_DESC_RING_TYPE_RSS : RX_DESC_RING_TYPE_DEFAULT;
-> +	tp->init_rx_desc_type = new_desc_type;
-> +
-> +	if (!if_running) {
-> +		tp->num_rx_rings = ch->rx_count;
-> +		tp->rss_enable = new_rss_enable;
-> +		return 0;
-> +	}
-> +
-> +	new_rx = kcalloc(R8169_MAX_RX_QUEUES, sizeof(*new_rx), GFP_KERNEL);
+The issue is with the backlog path. When the socket is busy,
+the skb gets queued, but by the time the backlog drains and
+finally calls llc_conn_state_process(), the state might have
+changed to 0 via a teardown. Since there's no re-check there,
+we end up hitting llc_offset_table[-1] and triggering UBSAN.
 
-Better use the new _obj allocators, like kzalloc_objs here.
+Putting the check right at the entry of llc_conn_state_process()
+fixes it for both paths.
 
-> +	if (!new_rx)
-> +		return -ENOMEM;
-> +
-> +	ret = rtl8169_realloc_rx(tp, new_rx, ch->rx_count);
-> +	if (ret) {
-> +		kfree(new_rx);
-> +		tp->init_rx_desc_type = old_tx_desc_type;
-> +		return ret;
-> +	}
-> +
-> +	netif_stop_queue(dev);
-> +	rtl8169_down(tp);
-> +
-> +	for (i = 0; i < tp->num_rx_rings; i++)
-> +		rtl8169_rx_clear(tp, &tp->rx_ring[i]);
-> +	rtl8169_free_rx_desc(tp);
-> +
-> +	tp->num_rx_rings = ch->rx_count;
-> +	tp->rss_enable = new_rss_enable;
-> +
-> +	memset(tp->rx_ring, 0, sizeof(tp->rx_ring));
-> +	memcpy(tp->rx_ring, new_rx, sizeof(*new_rx) * ch->rx_count);
-> +
-> +	for (i = 0; i < tp->rss_data->hw_supp_indir_tbl_entries; i++) {
-> +		if (tp->rss_enable)
-> +			tp->rss_data->rss_indir_tbl[i] =
-> +				ethtool_rxfh_indir_default(i, tp->num_rx_rings);
-> +		else
-> +			tp->rss_data->rss_indir_tbl[i] = 0;
-> +	}
-> +
-> +	rtl_set_irq_mask(tp);
-> +
-> +	rtl8169_up(tp);
-> +	netif_start_queue(dev);
-> +
-> +	kfree(new_rx);
-> +
-> +	return 0;
-> +}
-> +
->  static const struct ethtool_ops rtl8169_ethtool_ops = {
->  	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
->  				     ETHTOOL_COALESCE_MAX_FRAMES,
-> @@ -6287,6 +6411,8 @@ static const struct ethtool_ops rtl8169_ethtool_ops = {
->  	.nway_reset		= phy_ethtool_nway_reset,
->  	.get_eee		= rtl8169_get_eee,
->  	.set_eee		= rtl8169_set_eee,
-> +	.get_channels		= rtl8169_get_channels,
-> +	.set_channels		= rtl8169_set_channels,
->  	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
->  	.set_link_ksettings	= rtl8169_set_link_ksettings,
->  	.get_ringparam		= rtl8169_get_ringparam,
+Kartik
 
+On Sun, May 17, 2026 at 3:30=E2=80=AFAM Kartik Nair <contact.kartikn@gmail.=
+com> wrote:
+>
+> Sure, by "direct path," I just meant the execution flow when
+> the socket isn't locked by the user (!sock_owned_by_user()).
+>
+> In that case, llc_process_tmr_ev() immediately calls
+> llc_conn_state_process(). Right before making that call, it
+> checks if the state is LLC_CONN_OUT_OF_SVC and bails out if
+> it is. That's the path that is already safe.
+>
+> The issue is with the backlog path. When the socket is busy,
+> the skb gets queued, but by the time the backlog drains and
+> finally calls llc_conn_state_process(), the state might have
+> changed to 0 via a teardown. Since there's no re-check there,
+> we end up hitting llc_offset_table[-1] and triggering UBSAN.
+>
+> Putting the check right at the entry of llc_conn_state_process()
+> fixes it for both paths.
+>
+> Kartik
+>
+> On Sun, May 17, 2026 at 3:00=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.=
+org> wrote:
+>>
+>> On 15/05/2026 19:49, Kartik Nair wrote:
+>> > When a timer fires while the socket is owned by a user, the timer even=
+t
+>> > is deferred to the backlog via __sk_add_backlog(). By the time the
+>> > backlog drains, llc->state may have been set to LLC_CONN_OUT_OF_SVC (0=
+)
+>> > by socket teardown. llc_conn_state_process() then calls llc_conn_servi=
+ce()
+>> > which computes llc_offset_table[state - 1] =3D llc_offset_table[-1],
+>> > triggering UBSAN array-index-out-of-bounds.
+>> >
+>> > llc_process_tmr_ev() already guards against LLC_CONN_OUT_OF_SVC for th=
+e
+>> > direct path, but this guard is bypassed when sock_owned_by_user() is t=
+rue
+>> > and the event is queued to the backlog. By the time the backlog drains=
+,
+>> > teardown may have set state to 0.
+>> >
+>> > The direct path already handles this case, so the same check belongs
+>> > in the consumer too.
+>>
+>> Considering you sent similarly complex patches to MM, WiFi, accel and
+>> now to NFC, I am sure you are using LLM without disclosing it.
+>>
+>> Please explain with your own words what is the "direct path"?
+>>
+>> Best regards,
+>> Krzysztof
 
