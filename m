@@ -1,178 +1,149 @@
-Return-Path: <netdev+bounces-288595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288596-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHzxDqoWCGorYwMAu9opvQ
-	(envelope-from <netdev+bounces-288595-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 09:03:06 +0200
+	id aCR7Fi8kCGoVbQMAu9opvQ
+	(envelope-from <netdev+bounces-288596-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 10:00:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6C455A8CC
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 09:03:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B184955AAE0
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 10:00:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7EA713018ADE
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:02:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 555963010C32
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 08:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F844371887;
-	Sat, 16 May 2026 07:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D861EF09B;
+	Sat, 16 May 2026 08:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GkCWD3sm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DPIqoM9N";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GkCWD3sm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DPIqoM9N"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="byGTGqWS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2614935E1CD
-	for <netdev@vger.kernel.org>; Sat, 16 May 2026 07:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4365464D
+	for <netdev@vger.kernel.org>; Sat, 16 May 2026 08:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778914961; cv=none; b=lbPozncSLstQm9qY8if3DxzB1HUz/k21uIfnmP5k3rSE2q88uFrNFvKWKF8pbhnVLx78MnV7aIbY82NkOEgPQrECA6UYlZ917SaLJplSOiQ+BR0Sv340YTW+nYYgpws3rlsrYzWkFbBSEpeZLzq+C3C5/eiHBktvqT4t52RyZDw=
+	t=1778918444; cv=none; b=j8FGdYR9ZnHad3e5Iqn+JqMEd8C0OmddpaVU3cWDQhLUWGBRfNaJYcbj4hk+oTdVGDlEt91+PwDmK437EJ40Cgj4VEo8hq1ni37owkH5BYno67VLrFhxkXtaxSeSau5YgnQJaOJl5DwOcmR72f5ozNcenBwOftkIH6kHQ34RLYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778914961; c=relaxed/simple;
-	bh=tMMZNlzAyJhWGPORawbViec/lbgCUwgopIP8U5sACYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZqqX0TUu0DwHragZk3KuaECw21I0eRTY8x6ZE7rH0ek5pBqpEOh5xPckQTtAcBvrjvF72cXpsn5NCwIYQj/BYq3h1BaMM+pI1vuwvZ+vocuXNdBowm2HSdN+4Un32lt90fgbAnMmPID8cQ8g95tVpwwDWiyq3FDmDmnM86sDnFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GkCWD3sm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DPIqoM9N; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GkCWD3sm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DPIqoM9N; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1778918444; c=relaxed/simple;
+	bh=fEJlSVqmc2bxmMRH1wo4GpfJhyejMCa3YUjgPLoTRS0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bKDJbive/Tp9EnCqpCjqjnQpmjqFAggkvWKS0Dh9BxMT0Daj2zM+/IjoX2Ak+el+CKv9LoH3jNyWazqEj+BdQhqxiPGMhVC+BlAMd/jLap63vCGs3IUFasiJmL2FOXBgqWcNu6kkdZfMv2B+W17xHc0hbsbH6W5GpyVn8XaDYdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=byGTGqWS; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id C70FE2084C;
+	Sat, 16 May 2026 10:00:33 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QLBrr_rtFD2g; Sat, 16 May 2026 10:00:32 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B1B25618B2;
-	Sat, 16 May 2026 07:02:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778914956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fx1HImtpNbf9r3+ZuscqsV8lfMcF7aUDitALcVW1KCU=;
-	b=GkCWD3smq2JUjVeH4m9BungaGkxVsmfqMzqxrlXizkYIFIMbiChlvVDgAjZ6oHxSzDnI2J
-	o2xwrL1acR7zMg/0ky2YPZWNk9xYox3plDxOZBXNK0YcsmS+UOBqTVp4DSKO8A5jM6m8Lp
-	Iz9p47s37NvxwdWrR5jo5BGSFnGPb9c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778914956;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fx1HImtpNbf9r3+ZuscqsV8lfMcF7aUDitALcVW1KCU=;
-	b=DPIqoM9NAv/DHCfeAvUQ0fLyVMsRc1ylU97Fbh2HJFC0S9x8iSRAeysSpMyf6fhKSpNr7A
-	Gl7+aN4LT6NrVoDg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778914956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fx1HImtpNbf9r3+ZuscqsV8lfMcF7aUDitALcVW1KCU=;
-	b=GkCWD3smq2JUjVeH4m9BungaGkxVsmfqMzqxrlXizkYIFIMbiChlvVDgAjZ6oHxSzDnI2J
-	o2xwrL1acR7zMg/0ky2YPZWNk9xYox3plDxOZBXNK0YcsmS+UOBqTVp4DSKO8A5jM6m8Lp
-	Iz9p47s37NvxwdWrR5jo5BGSFnGPb9c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778914956;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fx1HImtpNbf9r3+ZuscqsV8lfMcF7aUDitALcVW1KCU=;
-	b=DPIqoM9NAv/DHCfeAvUQ0fLyVMsRc1ylU97Fbh2HJFC0S9x8iSRAeysSpMyf6fhKSpNr7A
-	Gl7+aN4LT6NrVoDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CA076593A8;
-	Sat, 16 May 2026 07:02:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id v4gCKosWCGotawAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Sat, 16 May 2026 07:02:35 +0000
-Message-ID: <f5cae72f-93c7-41d7-b7db-2b60281afb72@suse.de>
-Date: Sat, 16 May 2026 09:02:27 +0200
+	by mx1.secunet.com (Postfix) with ESMTPS id AF74A20842;
+	Sat, 16 May 2026 10:00:32 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com AF74A20842
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1778918432;
+	bh=AjUji4Hir1wf22CgD2Vpbu3WokYpV9JLA78Z7DZ4AJc=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=byGTGqWSE6N0fyOxrdK13aMlstGUhiAmd07OhfTeQjf4WQYvGrWeExyR7hlD1lc/l
+	 wztNriL6JZXJvQFP7Aev8R8egHxuKfi9EBnt9qxIoqBhRpC8gne2tlX0BsNJYz5QSy
+	 LjE3XpNniIUDlljqovSaEuYe1CqNlcUsosh2ESc34mEA6ZxHevY7sdFXZMhs2ZWlFB
+	 VMKpn6WApskNIVkvoMUaLv7uir3x1LwYEPYRYO56Oxa+bJ2m6M9Tn0FFkWfcUb0EXu
+	 R+FbHJ6l7xC0QJclxKWCpcg5MgTwtfkg5AtwePgD+X01hQvn+2XEmhpoJ4HvB/znZZ
+	 WDWFv0kQKbQ4Q==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Sat, 16 May
+ 2026 10:00:32 +0200
+Received: (nullmailer pid 497082 invoked by uid 1000);
+	Sat, 16 May 2026 08:00:31 -0000
+Date: Sat, 16 May 2026 10:00:31 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Ahern <dsahern@kernel.org>
+CC: <herbert@gondor.apana.org.au>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, David Ahern
+	<dahern@nvidia.com>, Leo Lin <leo@depthfirst.com>
+Subject: Re: [PATCH net] xfrm: Check for underflow in xfrm_state_mtu
+Message-ID: <aggkH0ZYWgIDoJFJ@secunet.com>
+References: <20260513164918.33145-1-dsahern@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3 net-next v4] selftests: net: add test for IPv4 devconf
- netlink notifications
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- horms@kernel.org, pabeni@redhat.com, edumazet@google.com,
- dsahern@kernel.org, davem@davemloft.net
-References: <20260510081528.5257-1-fmancera@suse.de>
- <20260510081528.5257-3-fmancera@suse.de> <20260513193544.47970cb8@kernel.org>
- <bd560c89-c71f-4ef5-a0fd-5ea096a0f767@suse.de>
- <20260514162429.366b94c9@kernel.org>
- <f528360c-18b3-46e5-8ba8-88f921203716@suse.de>
- <20260515181623.5a44140e@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260515181623.5a44140e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Rspamd-Queue-Id: CC6C455A8CC
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260513164918.33145-1-dsahern@kernel.org>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Rspamd-Queue-Id: B184955AAE0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	TAGGED_FROM(0.00)[bounces-288596-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288595-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,depthfirst.com:email];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On 5/16/26 3:16 AM, Jakub Kicinski wrote:
-> On Fri, 15 May 2026 10:02:50 +0200 Fernando Fernandez Mancera wrote:
->>>> No, AFAIU, iproute2 does not expose devconf settings. The main user of
->>>> IFLA_INET_CONF are netlink libraries and other userspace tools that
->>>> heavily rely on netlink operations like NetworkManager, nmstate, nispor,
->>>> rust-netlink..
->>>
->>> Isn't this ip netconf ?
->>>    
->>
->> Oh sorry, I should have clarified it. ip netconf only shows/query them
->> but it cannot set them AFAICS.
->>
->> Usage: ip netconf show [ dev STRING ]
+On Wed, May 13, 2026 at 10:49:14AM -0600, David Ahern wrote:
+> From: David Ahern <dahern@nvidia.com>
 > 
-> Oh, fun. anyway, you gotta find a better way. Or just give up on the
-> selftest, the YNL hack is too ugly to live
+> Leo Lin reported OOB write issue in esp component:
 > 
+>   xfrm_state_mtu() returns u32 but performs its arithmetic in unsigned
+>   modulo-2^32 space using an attacker-influenced "header_len + authsize +
+>   net_adj" subtracted from a small "mtu" argument. A nobody user can
+>   install an IPv4 ESP tunnel SA with a large authentication key
+>   (XFRMA_ALG_AUTH_TRUNC, e.g. hmac(sha512), 64-byte key, 64-byte trunc),
+>   configure a small interface MTU (68 bytes), and set XFRMA_TFCPAD to a
+>   large value. When a single UDP datagram is then sent through the
+>   tunnel, xfrm_state_mtu() underflows to a near-2^32 value, and
+>   esp_output() consumes it as a signed int via:
+> 
+>         padto      = min(x->tfcpad, xfrm_state_mtu(x, mtu_cached))
+>         esp.tfclen = padto - skb->len   (assigned to int)
+> 
+>   esp.tfclen ends up negative (e.g. -207). It is sign-extended to size_t
+>   when passed to memset() inside esp_output_fill_trailer(), producing a
+>   ~16 EB write of zeroes at skb_tail_pointer(skb). KASAN logs it as
+>   "Write of size 18446744073709551537 at addr ffff888...".
+> 
+> Check for underflow and return 1. This causes the sendmsg attempt to
+> fail with ENETUNREACH.
+> 
+> Fixes: c5c252389374 ("[XFRM]: Optimize MTU calculation")
+> Reported-by: Leo Lin <leo@depthfirst.com>
+> Assisted-by: Codex:26.506.31004
+> Signed-off-by: David Ahern <dahern@nvidia.com>
 
-Fair, let me see what I can do. Otherwise, Paolo as you requested the 
-selftest, would it be acceptable for you to drop it given the situation? 
-I looking for alternatives anyway :-)
-
-Thanks!
-Fernando.
+Applied, thanks a lot David!
 
