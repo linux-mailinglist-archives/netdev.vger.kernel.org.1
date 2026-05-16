@@ -1,122 +1,178 @@
-Return-Path: <netdev+bounces-288594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288595-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QC+vE24WCGorYwMAu9opvQ
-	(envelope-from <netdev+bounces-288594-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 09:02:06 +0200
+	id OHzxDqoWCGorYwMAu9opvQ
+	(envelope-from <netdev+bounces-288595-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 09:03:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B9FD55A8AF
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 09:02:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC6C455A8CC
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 09:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D0BCC3013D55
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:02:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EA713018ADE
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 07:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902D2305674;
-	Sat, 16 May 2026 07:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F844371887;
+	Sat, 16 May 2026 07:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GkCWD3sm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DPIqoM9N";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GkCWD3sm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DPIqoM9N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB6B28469A
-	for <netdev@vger.kernel.org>; Sat, 16 May 2026 07:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2614935E1CD
+	for <netdev@vger.kernel.org>; Sat, 16 May 2026 07:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778914923; cv=none; b=hYBKT5ZtDxO3TQXrWZQsg+YUiSi1dBHLNnfgLOS1t8BXsrfB5+E5/oeEcl7GP81wDImCy4j/q7PMGvt9Y7ArSKdnBmBpTu5Goojcs8sJF8PnZQ8xJe418z9V1BM/56+IMDzkX3P43Rc6NwNqACIBGBfgx4KECtTYLgrVOEZk9yQ=
+	t=1778914961; cv=none; b=lbPozncSLstQm9qY8if3DxzB1HUz/k21uIfnmP5k3rSE2q88uFrNFvKWKF8pbhnVLx78MnV7aIbY82NkOEgPQrECA6UYlZ917SaLJplSOiQ+BR0Sv340YTW+nYYgpws3rlsrYzWkFbBSEpeZLzq+C3C5/eiHBktvqT4t52RyZDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778914923; c=relaxed/simple;
-	bh=Ho6piJ/gm3gK9gM2XT0JsD8hlZ2ZA+Gfocwk5xOK9Qc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=HroHg3eC0YIRsXPu0Hn5JcWWbdUBKRW1aGSqLXSN5w1tp+j6abVcJZBGdyCHOaTf4r0T2zJSM7wSo+bkAB1n7GH4roVAiCuiUSQubhWENcuE0/PKiBUVDwTrG2SNOs6fj6QS58BvCRZNC691RcsjrHeqTTBiFmjwEnLd5ubeJK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-6853c2438b9so738487eaf.3
-        for <netdev@vger.kernel.org>; Sat, 16 May 2026 00:02:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778914921; x=1779519721;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iGYAY586adhJBQi99xwORuBeXunQTFFsqPhqsTYWim8=;
-        b=F6nNdpr77l+mfjDB5NSRCJhJWQPqiKJPOGic4zE0JgnSjdtUJ/JgZ7YGyLLL8FaRNE
-         LrR7/8fuYEMBif8OJKxifNEqQYeL+mqfJNzumqqI90Hp6BnK3sX4XklpPOoCGAMryulb
-         AHzs/hcSOP93JN5YliETtY4IWm9dhNIJFU0H01VdidKOQEkPv/4OpuQFSS3oFGFVCrwO
-         C1axA16kD/cVnZBfpvmIuC3pGAsb+GcJasLHHvAaUZlTsqn0p+YZldv9NuD6NuSHTEiN
-         97doJgITLRAUJ67vjYV/1ZqK21lLSs/CVQ32bfol+nOWhoh41V+7ZOsOOyDBDX11KQbD
-         PSEw==
-X-Forwarded-Encrypted: i=1; AFNElJ8KLZjG5B6ANP8+x5metyJfx2yFM95eR2fl/WFVXRClZRqkuVOAaFcavJ5A08wJzEqPW0lgk0c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMrgbrZUV0RTy59/EwnJ/ohdXHl/tZGT9/U7QJJYXRkQQxw0hC
-	jQv3E1ijIkG2bkRxoYrx9JuL603abEn0MHry9rlTSv9j5Acc2J/vpr2YhzDMvFlMKcK7OWtBFzC
-	8HbBO0fDHkipsVcUmZqsad9a8TWl7Z/5GEAfBqdwnEFVsX1qhEm97X+qJdS4=
+	s=arc-20240116; t=1778914961; c=relaxed/simple;
+	bh=tMMZNlzAyJhWGPORawbViec/lbgCUwgopIP8U5sACYE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZqqX0TUu0DwHragZk3KuaECw21I0eRTY8x6ZE7rH0ek5pBqpEOh5xPckQTtAcBvrjvF72cXpsn5NCwIYQj/BYq3h1BaMM+pI1vuwvZ+vocuXNdBowm2HSdN+4Un32lt90fgbAnMmPID8cQ8g95tVpwwDWiyq3FDmDmnM86sDnFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GkCWD3sm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DPIqoM9N; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GkCWD3sm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DPIqoM9N; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B1B25618B2;
+	Sat, 16 May 2026 07:02:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1778914956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fx1HImtpNbf9r3+ZuscqsV8lfMcF7aUDitALcVW1KCU=;
+	b=GkCWD3smq2JUjVeH4m9BungaGkxVsmfqMzqxrlXizkYIFIMbiChlvVDgAjZ6oHxSzDnI2J
+	o2xwrL1acR7zMg/0ky2YPZWNk9xYox3plDxOZBXNK0YcsmS+UOBqTVp4DSKO8A5jM6m8Lp
+	Iz9p47s37NvxwdWrR5jo5BGSFnGPb9c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1778914956;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fx1HImtpNbf9r3+ZuscqsV8lfMcF7aUDitALcVW1KCU=;
+	b=DPIqoM9NAv/DHCfeAvUQ0fLyVMsRc1ylU97Fbh2HJFC0S9x8iSRAeysSpMyf6fhKSpNr7A
+	Gl7+aN4LT6NrVoDg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1778914956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fx1HImtpNbf9r3+ZuscqsV8lfMcF7aUDitALcVW1KCU=;
+	b=GkCWD3smq2JUjVeH4m9BungaGkxVsmfqMzqxrlXizkYIFIMbiChlvVDgAjZ6oHxSzDnI2J
+	o2xwrL1acR7zMg/0ky2YPZWNk9xYox3plDxOZBXNK0YcsmS+UOBqTVp4DSKO8A5jM6m8Lp
+	Iz9p47s37NvxwdWrR5jo5BGSFnGPb9c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1778914956;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fx1HImtpNbf9r3+ZuscqsV8lfMcF7aUDitALcVW1KCU=;
+	b=DPIqoM9NAv/DHCfeAvUQ0fLyVMsRc1ylU97Fbh2HJFC0S9x8iSRAeysSpMyf6fhKSpNr7A
+	Gl7+aN4LT6NrVoDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CA076593A8;
+	Sat, 16 May 2026 07:02:35 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id v4gCKosWCGotawAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sat, 16 May 2026 07:02:35 +0000
+Message-ID: <f5cae72f-93c7-41d7-b7db-2b60281afb72@suse.de>
+Date: Sat, 16 May 2026 09:02:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:190a:b0:696:6f1f:3ee6 with SMTP id
- 006d021491bc7-69c9bfe8963mr4626966eaf.53.1778914921213; Sat, 16 May 2026
- 00:02:01 -0700 (PDT)
-Date: Sat, 16 May 2026 00:02:01 -0700
-In-Reply-To: <529b2910-24cd-45e0-9e98-0eb3085a6bc1@linux.dev>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a081669.050a0220.f80e4.0002.GAE@google.com>
-Subject: Re: [syzbot] [rdma] general protection fault in kernel_sock_shutdown (4)
-From: syzbot <syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, arjan@linux.intel.com, davem@davemloft.net, 
-	dsahern@kernel.org, edumazet@google.com, hdanton@sina.com, horms@kernel.org, 
-	jgg@ziepe.ca, kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com, 
-	leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	yanjun.zhu@linux.dev, zyjzyj2000@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 9B9FD55A8AF
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3 net-next v4] selftests: net: add test for IPv4 devconf
+ netlink notifications
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ horms@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ dsahern@kernel.org, davem@davemloft.net
+References: <20260510081528.5257-1-fmancera@suse.de>
+ <20260510081528.5257-3-fmancera@suse.de> <20260513193544.47970cb8@kernel.org>
+ <bd560c89-c71f-4ef5-a0fd-5ea096a0f767@suse.de>
+ <20260514162429.366b94c9@kernel.org>
+ <f528360c-18b3-46e5-8ba8-88f921203716@suse.de>
+ <20260515181623.5a44140e@kernel.org>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260515181623.5a44140e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Rspamd-Queue-Id: CC6C455A8CC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=eeba87c808be946b];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288594-lists,netdev=lfdr.de,d8f76778263ab65c2b21];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,gmail.com,vger.kernel.org,redhat.com,googlegroups.com,linux.dev];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288595-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello,
+On 5/16/26 3:16 AM, Jakub Kicinski wrote:
+> On Fri, 15 May 2026 10:02:50 +0200 Fernando Fernandez Mancera wrote:
+>>>> No, AFAIU, iproute2 does not expose devconf settings. The main user of
+>>>> IFLA_INET_CONF are netlink libraries and other userspace tools that
+>>>> heavily rely on netlink operations like NetworkManager, nmstate, nispor,
+>>>> rust-netlink..
+>>>
+>>> Isn't this ip netconf ?
+>>>    
+>>
+>> Oh sorry, I should have clarified it. ip netconf only shows/query them
+>> but it cannot set them AFAICS.
+>>
+>> Usage: ip netconf show [ dev STRING ]
+> 
+> Oh, fun. anyway, you gotta find a better way. Or just give up on the
+> selftest, the YNL hack is too ugly to live
+> 
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-lost connection to test machine
+Fair, let me see what I can do. Otherwise, Paolo as you requested the 
+selftest, would it be acceptable for you to drop it given the situation? 
+I looking for alternatives anyway :-)
 
-
-
-Tested on:
-
-commit:         bb9ed28b RDMA/rxe: Fix null-ptr-deref in kernel_sock_s..
-git tree:       https://github.com/zhuyj/linux null-ptr-deref_kernel_sock_shutdown
-console output: https://syzkaller.appspot.com/x/log.txt?x=16617cc8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=eeba87c808be946b
-dashboard link: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-
-Note: no patches were applied.
+Thanks!
+Fernando.
 
