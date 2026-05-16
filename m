@@ -1,67 +1,93 @@
-Return-Path: <netdev+bounces-288627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sC1oI0BcCGrAkwMAu9opvQ
-	(envelope-from <netdev+bounces-288627-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 14:00:00 +0200
+	id 4IuSLtxlCGromgMAu9opvQ
+	(envelope-from <netdev+bounces-288629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 14:41:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0475C55B9EC
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 13:59:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B45E55BD0E
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 14:40:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3745C304A658
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 11:57:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 91E1F3010276
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 12:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0D63E024F;
-	Sat, 16 May 2026 11:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923453D3D09;
+	Sat, 16 May 2026 12:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="evR4PXHq"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="TmbCC9B1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A345F3E0228;
-	Sat, 16 May 2026 11:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B12D30648A;
+	Sat, 16 May 2026 12:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778932610; cv=none; b=DrglpSf9p/eat2HskdczTAmMTRDk1h2LF6q21e6aGfMBFlXMrSBFjsfA9qtmWBIEZPiDtLj06M+He6nws19pVMJr1zIisOwLmle7/WqnWNk1noJLsXsdnGAzVn6B/ZN0ZdJ2QcPfwC4r60yJrhM2ZhGiN/M9uBz5ztnXamh1MB4=
+	t=1778935257; cv=none; b=pbNpoW/bCltogNopsKgQNjdnt0cGIbqxjcH7LX5dUETgvRdXP53rUe3oXQrcdWjlaR0oodOHS9y8xG9ahKoGJCX8Mugpao71rJghoOdXvqDf/nWtpVVDX0fYtdE7gjZEna1a/tnpTlcfF+mYDDyFUW7hjkjxE+rOyF8cWpioV38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778932610; c=relaxed/simple;
-	bh=/mCwhYllecjs8nxYKsXlYlbNilMQRl4qLivhwgvteEs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sT1gN/Qcy/NZ+IdTMLT7aRCkbaFCO+R4bm3uNoI/B02S2AX2DjqcWRs/QOA/5LHTMMLwa+WNpoSkWdknv3lrG8MRfC2yMDO6dCB+pY1E9akAckt0eguhSYVllRSSJHVJ13NEsy7VNiqLsB/rKLuR0mDO4D5lXBxF0L9WmvLcYHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=evR4PXHq; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 9960D601A2;
-	Sat, 16 May 2026 13:56:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1778932607;
-	bh=gVHsNnzVjJ5CQ6vEFP7KwWXCZ1KRueCIiThEVTDS+9U=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=evR4PXHqiCx3fYjbVH0YKmiOxDO98AfpwzkEj1LTfR2nP3vplIEohq3hyfFVdn/7/
-	 HfwoFklSjX4mj9bLVuk/9Pf+LCIdTm29EPHZwvn3Yh9ajG6AOJWJj3+kV4VvQF951b
-	 rrQSxZzjNvZSbXO+3ZBmWyIqoZp+JBiPxX99hwFnGxGH3i4iDRqGg8snisMxF/J09J
-	 UeXgVPAZHPw6kaRzfWpHQ4nH2nw6DclaFxs3nH9eCqiot4EndJSZjaKVpRY/w8kky5
-	 bZjWjiAnrtGOmVDOp4iv8cP1hUJ0OBwtz4MsjLGUvc1xK0nO7GOlmuYhDjzyZpqqNx
-	 Cl6xkOx/SFT2g==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	s=arc-20240116; t=1778935257; c=relaxed/simple;
+	bh=Vo5Z/L1Sas/37lmOMcWft35zXgLqFdtzmshl5IH4lm4=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=V/Z6PA+Z2/SFkvgwENtNJYCbcsEwn+FV3SBgnRn/ejQ38CBTQ8Px/zK71LYU63QtO2z7zeM6k/l1o16jMBhlY6lLfuLI8+tDoEz4KXJOeejLUIPHkez43x20VoCjJ0SELw9b0LpoauRNWLM5iohAROQTbblEmupmq6/AM4yDR9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=TmbCC9B1; arc=none smtp.client-ip=43.163.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1778935245; bh=4r1Zzi9wwhOJMeUIJBhxhb4qj0sTJbM5a/Qno3kXbgs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=TmbCC9B1/dXbG446fXxez6yBlW/6Vy1YppixCLtA3p0KjKb4T4PgP7iZnsLr24L+p
+	 v90ugzZabBymkyo49n7HcCbsNgLCmvi6nVbgcszotezsdeFxVArcw0/Adxx5o/6sMX
+	 mt/iDNahi/S+6ydX6zjMbbE1Z/oRQ4SwU3ijP3Dw=
+Received: from lxu-ped-host.. ([111.198.231.89])
+	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
+	id A261E408; Sat, 16 May 2026 20:40:38 +0800
+X-QQ-mid: xmsmtpt1778935238td8938n2x
+Message-ID: <tencent_0106C0D2EA464109986EE86EF40CB5E7D406@qq.com>
+X-QQ-XMAILINFO: NnYhxYSyuBnLJQzDT4rpHk3NSGAMaog6L8ccJhGUHTDim9aOeeRfUup7MlJ0o2
+	 7G52pC20CBUtZU8xeIU3+E0Fsuq4BcYoksTUDD6kqR03xje6Cf0hdCGf8FE8zWU8mpJFRZJSEme2
+	 DISTv6mf4YhYT6Tsw7QEMOV68U6Yyj2IDTsXCWJBQGYQ+UWY14z7m8HZPuKu3g01ivcGS+CpD5ae
+	 w7rzaDSQHDcZ5pPZai+D1xEn6RlZ6q3g6FE19YnQqIQkF1vKVS/KkmIxohKPflN6zaM1LRNOOPrR
+	 Y9kONH7Cwnj34orKrud7PHTOu3VUExMGt8/jZDLvh8sADqXfwofOOCOqNNK6ACv9Dz3JeNmCSYhy
+	 VUc4g27dfguwav7WhFrjLrHTgovICd6pTYxjaWXxk9ag66c6NonzY4+jFi9TZz0e5dDY3557xyoz
+	 mgoKbN1jkkSyLH7m0C/gK/yF9SMsiYjsvgDBafZN5rXK5iQve5elIiB2vflJA4diluw+1YBfa/bC
+	 qnC6N2cxsJuuXTOcdpWePYvU90tPFl/SkJY3tTvlXHRyPn4ZELhhQ1mo8PCZ9OOuoHsYtu0Gjqw6
+	 PJGBQMbEr8WlIWY8jyP9iXfhsZs1KWkl4tcukyFrYuLqQD0YRjAuvzVBynLRxz+6xGPL4Y568uqC
+	 vTggwTUogekDgSoEfD+LXgcoNFQwiBuqVb1x+jMIt2CzC7AetB+Re5WFpb9Ml9eeqCGMwHTziyC4
+	 FF21BDjxmNOsJGRvGxX0hBxk2Sq5ESKxzbbe+tcynUqfXl/CDKVSPrHdKQwQW0CaFFKKkWiPUKXI
+	 OwZu39WzMMeUXEuBDHiHVy4tLMUntkG0axNAq+hp4FhErBdJ1uuETFxuy9lilbGQh7PciiApURG+
+	 jspRIKBerHNTiesApK5RBlhoczdFdT6ufUOYeq8IzN3upEodpHX4q7mYfue8lsTAvNmdQsYeTsv4
+	 slhUS2kpTpDUOzpnOg2ocokA9z4PMchr/hWrgB9JUCRf6QNcZG0ET2pTOCJ/eOnI67mr4g+pT8uQ
+	 PO8ZkkU9YsE+cP7TCsFQ6RntxndStJOVrlSprCXZpvf0o8cPJl
+X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
+From: Edward Adam Davis <eadavis@qq.com>
+To: jgg@ziepe.ca
+Cc: akpm@linux-foundation.org,
+	arjan@linux.intel.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	eadavis@qq.com,
 	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net 12/12] netfilter: nf_queue: hold bridge skb->dev while queued
-Date: Sat, 16 May 2026 13:56:27 +0200
-Message-ID: <20260516115627.967773-13-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260516115627.967773-1-pablo@netfilter.org>
-References: <20260516115627.967773-1-pablo@netfilter.org>
+	hdanton@sina.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	kuniyu@google.com,
+	leon@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	yanjun.zhu@linux.dev,
+	zyjzyj2000@gmail.com
+Subject: Re: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
+Date: Sat, 16 May 2026 20:40:38 +0800
+X-OQ-MSGID: <20260516124037.428461-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260514141409.GA7702@ziepe.ca>
+References: <20260514141409.GA7702@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,126 +95,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0475C55B9EC
+X-Rspamd-Queue-Id: 2B45E55BD0E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	DMARC_NA(0.00)[netfilter.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288627-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288629-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,qq.com,google.com,sina.com,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,linux.dev,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qq.com:+];
 	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:email,netfilter.org:mid,netfilter.org:dkim,state.in:url,lzu.edu.cn:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	FREEMAIL_FROM(0.00)[qq.com];
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: Haoze Xie <royenheart@gmail.com>
+On Thu, 14 May 2026 11:14:09 -0300, Jason Gunthorpe wrote:
+> On Thu, May 14, 2026 at 07:58:18AM -0600, David Ahern wrote:
+> > On 5/14/26 5:50 AM, Jason Gunthorpe wrote:
+> > > On Thu, May 14, 2026 at 03:31:22PM +0800, Edward Adam Davis wrote:
+> > >> On Wed, 13 May 2026 20:46:55 -0300, Jason Gunthorpe wrote:
+> > >>> On Wed, May 13, 2026 at 02:17:28PM -0400, Leon Romanovsky wrote:
+> > >>>>
+> > >>>> On Thu, 07 May 2026 20:50:10 +0800, Edward Adam Davis wrote:
+> > >>>>> We must serialize calls to nldev_dellink() or risk a crash as syzbot
+> > >>>>> reported:
+> > >>>>>
+> > >>>>> Call Trace:
+> > >>>>>  udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
+> > >>>>>  rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
+> > >>>>>  rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
+> > >>>>>  rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
+> > >>>>>  rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
+> > >>>>>
+> > >>>>> [...]
+> > >>>>
+> > >>>> Applied, thanks!
+> > >>>>
+> > >>>> [1/1] RDMA/nldev: add mutual exclusion in nldev_dellink()
+> > >>>>       https://git.kernel.org/rdma/rdma/c/0b28000b64f40d
+> > >>>
+> > >>> This seems like a rxe bug, I would have expected the lock to be inside
+> > >>> rxe to protect its racy implementation of rxe_net_del(), which looks
+> > >>> like it is possibly also triggered by NETDEV_UNREGISTER...
+> > >> No, it was triggered by RDMA_NLDEV_CMD_DELLINK, you can see the "call trace".
+> >
+> > Not that Jason's point. Code wise
+> >
+> > rxe_dellink -> rxe_net_del
+> >
+> > netdev NETDEV_UNREGISTER:
+> >  rxe_notify -> rxe_net_del
+> >
+> > both can lead to the same problem
+> >
+> > >>>
+> > >>> ie it should not change nldev_dellink().
+> > >> While this could be fixed within RXE, the same issue affects all other
+> > >> RXE-like submodules when they subsequently support the "dellink" interface,
+> > >> therefore, handling this within nldev_dellink() is relatively more appropriate.
+> > >
+> > > Why would other modules have an issue? The problem is rxe's racey
+> > > refcounting scheme for its lazy socket creation. There is nothing
+> > > wrong with nldev, and now you've created some nasty BKL in the nldev
+> > > code to fix rxe while ignoring its other races.
+> >
+> > +1
+> 
+> Edward, please come with a fixup on top of this since it was already
+> applied
+OK.
 
-br_pass_frame_up() rewrites skb->dev from the ingress port to the bridge
-master before queueing bridge LOCAL_IN packets. NFQUEUE only holds
-references on state.in/out and bridge physdevs, so a queued bridge
-packet can retain a freed bridge master in skb->dev until reinjection.
-
-When the verdict is reinjected later, br_netif_receive_skb() re-enters
-the receive path with skb->dev still pointing at the freed bridge master,
-triggering a use-after-free.
-
-Store skb->dev in the queue entry, hold a reference on it for the queue
-lifetime, and use the saved device when dropping queued packets during
-NETDEV_DOWN handling.
-
-Fixes: ac2863445686 ("netfilter: bridge: add nf_afinfo to enable queuing to userspace")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Haoze Xie <royenheart@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/net/netfilter/nf_queue.h | 1 +
- net/netfilter/nf_queue.c         | 4 +++-
- net/netfilter/nfnetlink_queue.c  | 2 ++
- 3 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/include/net/netfilter/nf_queue.h b/include/net/netfilter/nf_queue.h
-index d17035d14d96..3978c3174cdb 100644
---- a/include/net/netfilter/nf_queue.h
-+++ b/include/net/netfilter/nf_queue.h
-@@ -14,6 +14,7 @@ struct nf_queue_entry {
- 	struct list_head	list;
- 	struct rhash_head	hash_node;
- 	struct sk_buff		*skb;
-+	struct net_device	*skb_dev;
- 	unsigned int		id;
- 	unsigned int		hook_index;	/* index in hook_entries->hook[] */
- #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
-diff --git a/net/netfilter/nf_queue.c b/net/netfilter/nf_queue.c
-index a6c81c04b3a5..57b450024a99 100644
---- a/net/netfilter/nf_queue.c
-+++ b/net/netfilter/nf_queue.c
-@@ -61,6 +61,7 @@ static void nf_queue_entry_release_refs(struct nf_queue_entry *entry)
- 	struct nf_hook_state *state = &entry->state;
- 
- 	/* Release those devices we held, or Alexey will kill me. */
-+	dev_put(entry->skb_dev);
- 	dev_put(state->in);
- 	dev_put(state->out);
- 	if (state->sk)
-@@ -102,6 +103,7 @@ bool nf_queue_entry_get_refs(struct nf_queue_entry *entry)
- 	if (state->sk && !refcount_inc_not_zero(&state->sk->sk_refcnt))
- 		return false;
- 
-+	dev_hold(entry->skb_dev);
- 	dev_hold(state->in);
- 	dev_hold(state->out);
- 
-@@ -202,11 +204,11 @@ static int __nf_queue(struct sk_buff *skb, const struct nf_hook_state *state,
- 
- 	*entry = (struct nf_queue_entry) {
- 		.skb	= skb,
-+		.skb_dev = skb->dev,
- 		.state	= *state,
- 		.hook_index = index,
- 		.size	= sizeof(*entry) + route_key_size,
- 	};
--
- 	__nf_queue_entry_init_physdevs(entry);
- 
- 	if (!nf_queue_entry_get_refs(entry)) {
-diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
-index 58304fd1f70f..984a0eb9e149 100644
---- a/net/netfilter/nfnetlink_queue.c
-+++ b/net/netfilter/nfnetlink_queue.c
-@@ -1212,6 +1212,8 @@ dev_cmp(struct nf_queue_entry *entry, unsigned long ifindex)
- 	if (physinif == ifindex || physoutif == ifindex)
- 		return 1;
- #endif
-+	if (entry->skb_dev && entry->skb_dev->ifindex == ifindex)
-+		return 1;
- 	if (entry->state.in)
- 		if (entry->state.in->ifindex == ifindex)
- 			return 1;
--- 
-2.47.3
+Edward
 
 
