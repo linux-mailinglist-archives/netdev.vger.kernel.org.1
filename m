@@ -1,203 +1,137 @@
-Return-Path: <netdev+bounces-288638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6P7MGfl/CGo/sgMAu9opvQ
-	(envelope-from <netdev+bounces-288638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 16:32:25 +0200
+	id CLmwBvCBCGo2tAMAu9opvQ
+	(envelope-from <netdev+bounces-288639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 16:40:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C5155C14D
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 16:32:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF9155C20B
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 16:40:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 812253019169
-	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 14:32:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A2CA43007356
+	for <lists+netdev@lfdr.de>; Sat, 16 May 2026 14:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB53E1DED5C;
-	Sat, 16 May 2026 14:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860823E1696;
+	Sat, 16 May 2026 14:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R41GbAip"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xOsOfCF2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74582C375A
-	for <netdev@vger.kernel.org>; Sat, 16 May 2026 14:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571393E2ABE;
+	Sat, 16 May 2026 14:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778941927; cv=none; b=CAsL2XHqsZaOhOLGjK/i6NQdBcj2xmadXVPm+iaOTyfFaQgDM14oyvlwbeqFOMiS0C6IWPYg7Ook45ihPasjavKNElEPZEql4bvlurPoSeO/8JeQaOnc21vQ08pjDKz5wyku8WhDsHjp6htEhKjeC79FYYaKRQ/ndLV6f3VPNUs=
+	t=1778942444; cv=none; b=WZSZ5EeOCrccDcZ5i9lMNgjDFUBh2gjYWK3nHVvatXRceGTPKJXs1NGaCNIKE0MF91MF+dLU7V8k29pIyjUtNuU9QjrbNtaw399iSLhDktdwIfYp/lmGq9PRzTIhKdJpI+mRwZIEZm1YqOLCmCGa8txhwgl7erDTtBudN3k6vyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778941927; c=relaxed/simple;
-	bh=gUw7/It+XjAMDtvU2RcfFQF8ZA+xBALOy25IMlln9lk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NWmHMLvxbfZB7M/fRe95HSX+rxojBPRwZ4dWMmYw6yE9HdWZQl4pUbwO6ZaKUAHIfMI5JLP+bFtRQdBFVZefK9T2EXNMyG99NjYcAPoTIMDYXur3GzAkB4Dj63HTvuXyXTfJBeLJs1KBNu26U0hSP2JXmitmJgTEpNq46ohF3Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R41GbAip; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <39e752db-f34c-4070-b4c8-974fb76ee7f9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778941913;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TBh1X8F3RQc/zJUrw/MBwchNio7gpTK5UokEqojPi08=;
-	b=R41GbAipQCWXqZor4Z0Lp3qlMFDeDvTcfkkezALES+AifCjP1A24Nnvw/cwInwOJSHXXu/
-	Lxr9pS39zoRxx+z+IdGNlojIz4Si1V8pREmWHyEIAF5Hgan0mH//YXugiSLaKLp8bqdFlp
-	h2PghRx+oYKT6EqMxhdMZbNRg2VOIuA=
-Date: Sat, 16 May 2026 07:31:38 -0700
+	s=arc-20240116; t=1778942444; c=relaxed/simple;
+	bh=AyofXCFE6jBNxym9ihjfxFz6RLsIaid4691EcS6ps80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YzusPn69socLDSes848DN1CeUqnw6GoRiTJEsR9rkT0S7XbT2g80FET6EfN3QT4484GCa1x+E/I2LDLR0XIb+Kc/4WP4fZclNqAkKFIxvqxliFunBjACNSW95hmDkrCbbJYdczAN9kcgOlAtSIl3QllncirAX5q15rXk9tzaR9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xOsOfCF2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nX8W65VuJAoSGN+OaiKWzI/OENqI9wC5+iFOehOGmWU=; b=xOsOfCF22B9Kta59doy4bCtfME
+	FSuzr7GsSQDKmTBPw2jWi0tjY24twSa1V0eipnDWh5nJHQt0UptH8GgUaigo+9mOdGjV1jFrp3BJO
+	xh+jaTcdAO9UQydYDn91AUKNy//2wm4cuuqseAIRxuszXIPou0eY4hUx02JM9dpzP56o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wOGBl-003EGG-Jv; Sat, 16 May 2026 16:40:25 +0200
+Date: Sat, 16 May 2026 16:40:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: honor eee_disabled_modes in phy_support_eee()
+Message-ID: <c18fa685-0ff6-4783-a26e-aa375df1ed71@lunn.ch>
+References: <20260516-devel-phy-support-eee-fix-v1-1-59debc00eda0@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RDMA v2] RDMA/rxe: add mutual exclusion in rxe_net_del()
-To: Edward Adam Davis <eadavis@qq.com>,
- "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>
-Cc: akpm@linux-foundation.org, arjan@linux.intel.com, davem@davemloft.net,
- dsahern@kernel.org, edumazet@google.com, hdanton@sina.com, horms@kernel.org,
- jgg@ziepe.ca, kuba@kernel.org, kuniyu@google.com, leon@kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com
-References: <tencent_0106C0D2EA464109986EE86EF40CB5E7D406@qq.com>
- <tencent_330636464A367423778966A63DD1360E9609@qq.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <tencent_330636464A367423778966A63DD1360E9609@qq.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: E6C5155C14D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260516-devel-phy-support-eee-fix-v1-1-59debc00eda0@tipi-net.de>
+X-Rspamd-Queue-Id: 6AF9155C20B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288638-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[qq.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288639-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qq.com:email,syzkaller.appspot.com:url,linux.dev:mid,linux.dev:dkim]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-在 2026/5/16 7:00, Edward Adam Davis 写道:
-> We must serialize calls to rxe_net_del() or risk a crash as syzbot
-> reported:
+On Sat, May 16, 2026 at 06:51:02AM +0200, Nicolai Buchwitz wrote:
+> phy_support_eee() copies supported_eee into advertising_eee
+> unconditionally, overwriting any filtering applied during phy_probe()
+> based on DT eee-broken-* properties or driver-populated
+> eee_disabled_modes. MAC drivers that call phy_support_eee() after
+> probe (e.g. bcmgenet, fec, lan743x, lan78xx, r8169) then cause the PHY
+> to advertise EEE for modes the user marked as broken.
 > 
-> KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-> Call Trace:
->   udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
->   rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
->   rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
->   rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
->   rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
+> The symptom is that ethtool --show-eee on the local interface reports
+> "not supported" (supported & ~eee_disabled_modes is empty) while the
+> link partner sees EEE negotiated and active.
 > 
-> Jason Gunthorpe suggest placing the lock within rxe to protect its racy
-> implementation of rxe_net_del(), which looks like it is possibly also
-> triggered by NETDEV_UNREGISTER.
-> 
-> The patch addressing this issue in nldev_dellink() has already been
-> applied(0b28000b64f4); however, since the fix has now been relocated
-> to rxe, the corresponding remedial code in nldev has been removed.
-> 
-> Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and destruction per net namespace")
-> Fixes: 0b28000b64f4 ("RDMA/nldev: Add mutual exclusion in nldev_dellink()")
-> Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> ---
-> v1 -> v2: serialize calls to rxe net del
+> phy_probe() already filters advertising_eee via eee_disabled_modes
+> after calling of_set_phy_eee_broken(). Apply the same mask in
+> phy_support_eee() so the filtering survives the copy.
 
-I looked through the commit. I am not sure if this commit should be sent 
-to syzbot to verify.
+I don't think this not the full fix.
 
-Zhu Yanjun
+of_set_phy_eee_broken() sets phydev->eee_disabled_modes.
 
-> 
->   drivers/infiniband/core/nldev.c     | 4 ----
->   drivers/infiniband/sw/rxe/rxe_net.c | 7 ++++++-
->   2 files changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
-> index 3cb3cb7629fe..96c745d5bac4 100644
-> --- a/drivers/infiniband/core/nldev.c
-> +++ b/drivers/infiniband/core/nldev.c
-> @@ -1816,8 +1816,6 @@ static int nldev_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
->   	return err;
->   }
->   
-> -static DEFINE_MUTEX(nldev_dellink_mutex);
-> -
->   static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
->   			  struct netlink_ext_ack *extack)
->   {
-> @@ -1848,9 +1846,7 @@ static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
->   	 * implicitly scoped to the driver supporting dynamic link deletion like RXE.
->   	 */
->   	if (device->link_ops && device->link_ops->dellink) {
-> -		mutex_lock(&nldev_dellink_mutex);
->   		err = device->link_ops->dellink(device);
-> -		mutex_unlock(&nldev_dellink_mutex);
->   		if (err)
->   			return err;
->   	}
-> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
-> index 50a2cb5405e2..92847e955ca2 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_net.c
-> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
-> @@ -642,6 +642,8 @@ static void rxe_sock_put(struct sock *sk,
->   	}
->   }
->   
-> +static DEFINE_MUTEX(rxe_net_del_mutex);
-> +
->   void rxe_net_del(struct ib_device *dev)
->   {
->   	struct rxe_dev *rxe = container_of(dev, struct rxe_dev, ib_dev);
-> @@ -649,9 +651,10 @@ void rxe_net_del(struct ib_device *dev)
->   	struct sock *sk;
->   	struct net *net;
->   
-> +	mutex_lock(&rxe_net_del_mutex);
->   	ndev = rxe_ib_device_get_netdev(&rxe->ib_dev);
->   	if (!ndev)
-> -		return;
-> +		goto out;
->   
->   	net = dev_net(ndev);
->   
-> @@ -664,6 +667,8 @@ void rxe_net_del(struct ib_device *dev)
->   		rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
->   
->   	dev_put(ndev);
-> +out:
-> +	mutex_unlock(&rxe_net_del_mutex);
->   }
->   
->   static void rxe_port_event(struct rxe_dev *rxe,
+genphy_c45_ethtool_get_eee() masks supported_eee with this when
+reporting to user space what is supported.
 
+genphy_c45_ethtool_set_eee() will also mask what user space passes in,
+if it is not empty. However, if nothing is passed in,
+phy_advertise_eee_all() is used, and that does not make use of
+phydev->eee_disabled_modes, which i think it should.
+
+So while your fix seems correct, i don't think on its own, it is
+sufficient. Whenever phydev->supported_eee is used, we need to review
+the code and see if it should be masked by phydev->eee_disabled_modes.
+
+    Andrew
+
+---
+pw-bot: cr
 
