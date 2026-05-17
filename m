@@ -1,548 +1,315 @@
-Return-Path: <netdev+bounces-288676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id RkxNH28jCWpmKwQAu9opvQ
-	(envelope-from <netdev+bounces-288676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:09:51 +0200
+	id iLQvDM4kCWpNLAQAu9opvQ
+	(envelope-from <netdev+bounces-288677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:15:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133B755EFED
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:09:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A7DC55F017
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:15:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C176F300646D
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 02:09:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 789B43007B0F
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 02:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28B63101BC;
-	Sun, 17 May 2026 02:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A985F31E857;
+	Sun, 17 May 2026 02:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P8vKpF3q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mpAwFuKi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CEB23C8C7
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 02:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDFF155757
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 02:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778983785; cv=pass; b=BYCCE+oBYE+8mvwABMPMl2XDodkWphL3uzC/nDo9+qwiITJK5W4Jf/spd/iJA5wb8FfD1YddscttzVjfFY+HxIt0Ai6SNmaBj7dCLPKVIlwJll687reSHZl21DhUwyb+VS9E1J8a9lahHAcdULZUEA4wF8//NiUxsb2MX2NdGMo=
+	t=1778984128; cv=pass; b=LG1+/Ki+QkEaUMf1mhHQOyApjL3EuDj3RtOXzFMUHPlDc0Umv2pUq8VwW0GIj2UoPVV+6IAq5GeZh9NWyXXui4mYWQJ/BRT6hlX97nJYcYrKI/Aid1KBe/6IzCuQZCJ7Y5kfvgXoYeLcRD4P2j1DkoYWtV4pgkLGqRIKjtFuF0A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778983785; c=relaxed/simple;
-	bh=wCr4N8mYfYoIPWB9C8PT2ELm8Fckx0JWQsBfxrIsZoc=;
+	s=arc-20240116; t=1778984128; c=relaxed/simple;
+	bh=s4aBkOwe/bEHdXcFLk9eHUTCRUaU0m6NZrnmTx8tBpc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VNKy2S6hp1SWYNi8QCzBH4oT9T5vtgIVbUuBGPctevNr5ZEBM9FsZECX6NdOoPGxstgzM0/f7NypNT8XPwMu7TXzAmXRpBBp0OVQV+VrV6jzR1VFswpX4mH6fgQ5ASJemcmErW8dSeJqW8t2JlIpiYZ5zbP8KU9MIV9f52FFslg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P8vKpF3q; arc=pass smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5a877510541so1394024e87.2
-        for <netdev@vger.kernel.org>; Sat, 16 May 2026 19:09:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778983782; cv=none;
+	 To:Cc:Content-Type; b=sQtKJbKy+gPUDF/my3tKXRW4VoJ+b4sE/sVU48gYmI8eN5hXHxMfM1hBBo0Qz2jql6LmsqZRDYulUjDasBAXuB6A3GVDMqnATqPSSt33UHbcDC7LlSdmnPoWeQ/SBpO5b3065ds0J1Ef4Wu9XLdEsEwSEZ5viHV1ABWSltraRzs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mpAwFuKi; arc=pass smtp.client-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-132c338a537so1416324c88.0
+        for <netdev@vger.kernel.org>; Sat, 16 May 2026 19:15:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778984125; cv=none;
         d=google.com; s=arc-20240605;
-        b=Dj3lgE5/qcxn8r/sroIKpmCheLE6ndPiMSTorSKxYhPDPR15e2HeNUhvCOb7SsRwkE
-         GkeY/2jw9539eMYxVXCLwYmj8wH9r5oSSe6nuS1IczIg8SqqqsiF6LmulYRM0zqVZS/Z
-         6HkDrstNOAnkDlNQchuujJF39/e1OD/LB9zuVbB7VyrnSr/GgpYpfcBcp5jhn6+Wu8Iz
-         K5/CBELr5HIsw74zVksWzL/CZs2iNTZI0RfK1SCvFIdrPFW0WOfD6q7yTw/F1Ixwe/cE
-         wXtL4dZdh39HgH9aI9+2rW35gU1V/EF6hf+oFp5Us91w52qf+9GwYoQ4qkG8QD5PBb+x
-         AEIw==
+        b=WoPCZJUYaBFpZBMIlTM811vMkUiAdzh4JJ+BVrT9qSho8Ut6aXVgHXd4g6ZSaFz/x/
+         Dg1zqBcEZ/+ltZ5a392mVLvh3CIFkVJ/ZWKoruiOkpINH8ihVp/YDh3fOvGzpPxp0cYs
+         l0KPPWRhJ9sXZsbL0PW/gBzfZG3+lB7r/afMTbSPI3Qbadyix70+eOEQ71YWGc/9KHuW
+         owqLWaDeWarcGzmwd9EGLkcmGPOwNxT06N68TwbZzKpZitNFqHqeBfyLryqmcZhvhv3x
+         mwsJMfTpKGhkjdYwVJ6+P9P9dYr9k5mle1xEyRC6zB0HBpQfFlFBcLV4dOFfaDpQIUM8
+         ofOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=nO3j0t9MiAa/cJqnzOkw+Q9w6M93B+L1CjXXR/zt8LU=;
-        fh=h1DMvjMTv62eitf7lTKSJFH8UTrrV8tCPNxrxYZqLUU=;
-        b=hUi2ApXdlDRtNGd60Nv8SE1BWpGpzgFEYQcyriyd58vY0xmQHCeF+hmi1x++s8pVXh
-         BSHRUp0XHfb2GSlhwrvinV+hbrCKy+O/XeJ3rQFfO949ShNIrSbqhFtM8mRXFCHPA0pX
-         MTip/XpSy4hNd1RPn0pamlrQcW7aW88oFxG+1FuPnqNe9dRBbBgQ7fhLUgWUCZ58O752
-         RTXYwc52NnNHA2W5wqNuFfE3rhfn8tDcg0IZ38BLQ3LZwR1XycyYjN6He5SdR07VM7pA
-         3szovxUcbfTA8qpLx9RyXVp4u5LoNEtFkEcymzv4gCId35+X4v+GfxwmXYYhmj7YK4Z5
-         GZpg==;
+        bh=gvxpVRNFP1DdRYSBauluNbrj8hxlaOMbOPtS5FXUigM=;
+        fh=m5S2GNen6C9s4X/WpfSgt6ZhIztnCgnc9OlqDkrueeI=;
+        b=JJo5NdSD5IwqtkajvTWD9P85QmSdRieVDjyi6CZ3lWfSElfe43OYZOyT6H0KTnEZo0
+         se2R0PSibMXTX28NYm1BMlwSzwVAxmFyr1sjAIQ/CCjUaHBZUKeVkE8p3gJ4AXcOHu5d
+         vUlioLEUD/fuPj7r5u+gZkz42/BuRWP0droG6UsVJL9oMPSjyA3rY1mG0BfON+9/uyvQ
+         0QVGd+IrJQIFyZg+hA15CbUTOPHXgDksH+zRfizoD4TY0airn10zTzZIfnU8cjIb861b
+         WCrdnoMeXIZBdgsTh2J5uTnYlxCxWPHlpfi7lrWpANW15j23JosylIxb0YF2ZayNpgn7
+         /FIw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778983782; x=1779588582; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1778984125; x=1779588925; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nO3j0t9MiAa/cJqnzOkw+Q9w6M93B+L1CjXXR/zt8LU=;
-        b=P8vKpF3qvGMznU1qwNMFV/H6wcMlIyX9Fito7HiMvppEbz9rekeFtBLdoGIUQER8IM
-         J9v0/LcpK8SFCtoFgE4wVZj7+w6z2ibEePI3Ihz72hmBUTFeVfTp9AgOdXRm3jZ5xJxA
-         Kb9mc/4tkrH4CeUvy0tFU4K7E2ZpGYzHyOxCnPUtD8NM1z23CmxE91E1d2tNtIrqI59H
-         Kp4YAkT/9UNBcjuEeyJE2cue6rRF+UjVKRrVropuaPHlm8l4qlyIM4p5nlxOEAQ/FWi/
-         X/Si4hBtZn8sV1dGkaIg/G+aItKTV8Rbbtgw/MI6S67aPp8B3vHvtlPfwxhAKUz7VPxe
-         A8AA==
+        bh=gvxpVRNFP1DdRYSBauluNbrj8hxlaOMbOPtS5FXUigM=;
+        b=mpAwFuKiqnMhR8XJYkdULIrhRm+7RaWr7uvcdq2gbp2EcpFYmTWx/pbSkIxK18nJFj
+         HHWqHJfe+o0NygFBU3xP6CwHdGVUsI0mBYxYbNPzCQpmf3BvN3opU4+KWkaPAF2tsIP5
+         YRQAl+tFETysS1an887/o3TDu/qMTBXp2/3qdKR+/FQagUDKXTeHLZ2KnVYUgNYZSDS7
+         m1giilCC7KODnpXVuJhWV1+tnetQEeQVHxIHcrDkI38wdb125SQBQD6G9uqs54FkB1j+
+         L83eAftiYgd9JhL/E2hK6kmHdDNdo2kuPrs2N8gBZhp1WnK6TuSNsgkEKDckdydPV2UO
+         +jNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778983782; x=1779588582;
+        d=1e100.net; s=20251104; t=1778984125; x=1779588925;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=nO3j0t9MiAa/cJqnzOkw+Q9w6M93B+L1CjXXR/zt8LU=;
-        b=ZI3wUFnLN6uKuJhnlIdY6GWCep5THw2jJ7dC6dg5ZtSo6x1zDFop/JsEQRI8RYN11c
-         3XWnMpk202pgtIdQbIbG3M8pHy5nX9BKwRHsyRwXro3b3LwoTsNkJU6+A24WluJvYobq
-         ivC/1Me1+mDoOBsk6rxDbgv8H40zwtkBuP/HfcmxZOWSCwa4+2MvHg6Y7GrryFSijC9g
-         2365DQz9NYQQ4xLnLiO8vfUhZPjCzXanr9rxf7Mv38coDfx49L8c2+JHRqd1woExa/S/
-         R+aZtXWhsjiTrzqU9V9fIRJmdbQI9uzpKfbokgP514W1LtsftKX0Ts9LqSNMw8VbPHUk
-         0qeQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9Xg6/7+RcM6oFjzQUmvwdfxirjnmi6XioUyx/xiW5jffBja17dv3gBTzcsDyUFrfXE3vtYnT0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6dvNhukYCnQDAIw+b0G+MTqII28FB9amH0GjZqxZgeZFQbMxJ
-	ZuKkfeSQUBx7/E1g5kKRuGp4v2z0HGb6DYgi33Qr/AKrotU0+NFIEJkUvBleJWCcKrJA9CBGChM
-	ENhwV71NX8jMYgUBek/f94z3Rf2pZWrc=
-X-Gm-Gg: Acq92OF37CdUPXfmRWNDp2lHWufzYihnkqldDuSrxaFiLF7TM3109iNSN/Kk1LSumTR
-	HVzliTduggtzmzDGbR5v+witdYljeavgd3PxBSmL5m++QVN9f7Dt8ToFR0+GZCAKj38JsOOQwB2
-	lZ/5hN2eomFE4/oy7vgpyDvO74SQ1GWj94deZb5VLZsfc6W9HGj2KRcee4MMLGL/7qHbFZ+KGWM
-	RW7tmCEUaOL2xTWPAfhvj4tHkVhn63eJNQJ9+cpFQIZRZXaJolTtrId+5c7hG+vb1EAaBcMzKZC
-	vfzG0kj++OPEq9yGlMZdwJEbuvyGCIfrntdZbijbbggSw92zTA==
-X-Received: by 2002:a05:6512:128a:b0:5a8:6c7b:f9d7 with SMTP id
- 2adb3069b0e04-5aa0e769eecmr2807294e87.41.1778983781501; Sat, 16 May 2026
- 19:09:41 -0700 (PDT)
+        bh=gvxpVRNFP1DdRYSBauluNbrj8hxlaOMbOPtS5FXUigM=;
+        b=Suyo7rnOK4comhHt7uw3PnkwUEebpyUlyFHRqKFz+mXszCcarWySF+BPdD0c7g+RgV
+         Bd1IpITvOd6Nte/ugmPYwHHVawgNBI/lxKhTnzhSWUkmFeCNEZVz8iSZEbaOUvbBQZ4y
+         kwUjmgCWAbZBL8E01egLn3mYI01ge/ttfFNl805nfX5cXXOefFzJ30x8rkn/7+96hMdG
+         ezm/k34VEOJLUFVGEDBFvt9WVhPW6yl0NloAIVH7nnKFgBfthp6ZlNiC8bpcxA2GL3ny
+         cwMac1jDK+IH2Vmy6xQ/qXYw+tgpUeOn6J3sFrmY8d0p1rf2aFTeakwSA9Yd0J+EMoEd
+         A1GA==
+X-Forwarded-Encrypted: i=1; AFNElJ+1Hqwra3UnUnkGRTeaytc56RLt2EPRLYOE690sCx3LGgaVJFdUNSsPMNQFA+nB6TUNxwYnTlw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaaIgBlWvCiDCreRN9UNs4tzXG+TAVNsYjPXevpAp4zQjDpzln
+	OgRVbaQlaUyZg0v1rzIk3l8FbF5a8axRL3kcmBMYV0X5FhqVwIEf6iXm7x2hiWwSrmYXMEUuj0+
+	ddL6DLMNnUhsbpAhvpeo6tUwM2jFpne4nsZ8b6d7l
+X-Gm-Gg: Acq92OFR246OSTQnenhI5YoV25zS0RO72kKuMviyB7aaX4ssWtdxv5Pj5ythP4iz6ye
+	84qR0C5P8GdTEQc+12hzKaK3/fhXQfi2rb6g2Qsyp4xc9bkpgOC/5pwVF5qPPANEKWBPkaEv2T3
+	AVzz0P7laWDaZsXXXmG9xB7zv0ZbXZh0nWk5nMzze3WgbkTwmWNbul8tu/7gH51m6xBYS5Q747Z
+	XdguSWyUZFLcpKMeOhYStyf5oe/lgBNvFCSWxWDwGC4u7fOHx1xzVt6f68BDdkUsIX+bFe5X+/i
+	AG+MxZbsGMVr30a57opoAprcdC1BBHGVI7zz5lSG6KGe9okh0UV2A/iUXe3TqOpxcQnqQooGNri
+	ndBIivlN1AgG7I4Gzsiyj+DbUKYXaqNk=
+X-Received: by 2002:a05:7022:426:b0:133:39b9:9720 with SMTP id
+ a92af1059eb24-134fffa3c72mr4307593c88.16.1778984124131; Sat, 16 May 2026
+ 19:15:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260515123018.80147-1-kerneljasonxing@gmail.com> <agdRCYgpmVKkrQFB@boxer>
-In-Reply-To: <agdRCYgpmVKkrQFB@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 17 May 2026 10:09:04 +0800
-X-Gm-Features: AVHnY4L8iEfTvBrUVUtHlcv0-8kRC6326SHOWRCABLdtZk3dSp_FwiYWdc9NopI
-Message-ID: <CAL+tcoBqr2Hb_Lkprp5brxLeVnr0fQDY=sUKEVdD-CcowZ7BRQ@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/5] xsk: fix meta and publish of cq issues
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <tencent_0106C0D2EA464109986EE86EF40CB5E7D406@qq.com>
+ <tencent_330636464A367423778966A63DD1360E9609@qq.com> <13bc2e56-ea61-4cde-896f-c10636b29e9d@linux.dev>
+In-Reply-To: <13bc2e56-ea61-4cde-896f-c10636b29e9d@linux.dev>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sat, 16 May 2026 19:15:12 -0700
+X-Gm-Features: AVHnY4K3feYplgIFcIrl5ySgvS6ZwJ9OXyz1asrE5oS9XWtIIXfR4EDtj2LbnTw
+Message-ID: <CAAVpQUB6eRRRpapTxXmidO4ADtFc-ZBA+zwfPFb4dyX55UD4JQ@mail.gmail.com>
+Subject: Re: [PATCH RDMA v2] RDMA/rxe: add mutual exclusion in rxe_net_del()
+To: "Yanjun.Zhu" <yanjun.zhu@linux.dev>
+Cc: Edward Adam Davis <eadavis@qq.com>, akpm@linux-foundation.org, arjan@linux.intel.com, 
+	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	hdanton@sina.com, horms@kernel.org, jgg@ziepe.ca, kuba@kernel.org, 
+	leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 133B755EFED
+X-Rspamd-Queue-Id: 6A7DC55F017
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288676-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288677-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch,vger.kernel.org,tencent.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[qq.com,linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tencent.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,mail.gmail.com:mid,syzkaller.appspot.com:url,qq.com:email,linux.dev:email]
 X-Rspamd-Action: no action
 
-On Sat, May 16, 2026 at 1:00=E2=80=AFAM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
+On Sat, May 16, 2026 at 4:40=E2=80=AFPM Yanjun.Zhu <yanjun.zhu@linux.dev> w=
+rote:
 >
-> On Fri, May 15, 2026 at 08:30:13PM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
+>
+> On 5/16/26 7:00 AM, Edward Adam Davis wrote:
+> > We must serialize calls to rxe_net_del() or risk a crash as syzbot
+> > reported:
 > >
-> > The series is the product of previous review from sashiko[1].
+> > KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
+> > Call Trace:
+> >   udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
+> >   rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inlin=
+e]
+> >   rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
+> >   rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
+> >   rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
 > >
-> > 1) META
-> > patch 1: address TOCTOU around metadata.
+> > Jason Gunthorpe suggest placing the lock within rxe to protect its racy
+> > implementation of rxe_net_del(), which looks like it is possibly also
+> > triggered by NETDEV_UNREGISTER.
 > >
-> > 2) PUBLISH of CQ
-> > patch 2: make sure xsk_addr->addrs[] can be published to cq when
-> >          overflow occurs.
-> > patch 3: keep cleaning up the continuation descs (more than 17) and
-> >          publish its address when overflow occurs.
-> > patch 4: like patch 3, but only handles the invalid descs cases.
+> > The patch addressing this issue in nldev_dellink() has already been
+> > applied(0b28000b64f4); however, since the fix has now been relocated
+> > to rxe, the corresponding remedial code in nldev has been removed.
 > >
-> > [1]: https://lore.kernel.org/all/20260502200722.53960-1-kerneljasonxing=
-@gmail.com/
-> >
+> > Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and destruct=
+ion per net namespace")
+> > Fixes: 0b28000b64f4 ("RDMA/nldev: Add mutual exclusion in nldev_dellink=
+()")
+> > Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=3Dd8f76778263ab65c2b21
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 > > ---
-> > V2
-> > Link: https://lore.kernel.org/all/20260510012310.88570-1-kerneljasonxin=
-g@gmail.com/
-> > 1. adjust selftests (Jakub)
-> > 2. add READ_ONCE in patch 1 (Stan)
+> > v1 -> v2: serialize calls to rxe net del
 > >
+> >   drivers/infiniband/core/nldev.c     | 4 ----
+> >   drivers/infiniband/sw/rxe/rxe_net.c | 7 ++++++-
+> >   2 files changed, 6 insertions(+), 5 deletions(-)
 > >
-> > Jason Xing (5):
-> >   xsk: cache csum_start/csum_offset to fix TOCTOU in xsk_skb_metadata()
-> >   xsk: fix buffer leak in xsk_drop_skb() for AF_XDP multi-buffer Tx
-> >   xsk: drain continuation descs after overflow in xsk_build_skb()
-> >   xsk: drain continuation descs on invalid descriptor in
-> >     __xsk_generic_xmit()
-> >   selftests/xsk: fix multi-buffer invalid desc tests for drain_cont
+> > diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/=
+nldev.c
+> > index 3cb3cb7629fe..96c745d5bac4 100644
+> > --- a/drivers/infiniband/core/nldev.c
+> > +++ b/drivers/infiniband/core/nldev.c
+> > @@ -1816,8 +1816,6 @@ static int nldev_newlink(struct sk_buff *skb, str=
+uct nlmsghdr *nlh,
+> >       return err;
+> >   }
 > >
-> >  include/net/xdp_sock.h                        |  1 +
-> >  net/xdp/xsk.c                                 | 48 +++++++++++++++----
-> >  .../selftests/bpf/prog_tests/test_xsk.c       | 45 +++++++++--------
-> >  3 files changed, 64 insertions(+), 30 deletions(-)
+> > -static DEFINE_MUTEX(nldev_dellink_mutex);
+> > -
+> >   static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
+> >                         struct netlink_ext_ack *extack)
+> >   {
+> > @@ -1848,9 +1846,7 @@ static int nldev_dellink(struct sk_buff *skb, str=
+uct nlmsghdr *nlh,
+> >        * implicitly scoped to the driver supporting dynamic link deleti=
+on like RXE.
+> >        */
+> >       if (device->link_ops && device->link_ops->dellink) {
+> > -             mutex_lock(&nldev_dellink_mutex);
+> >               err =3D device->link_ops->dellink(device);
+> > -             mutex_unlock(&nldev_dellink_mutex);
+> >               if (err)
+> >                       return err;
+> >       }
+> > diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/s=
+w/rxe/rxe_net.c
+> > index 50a2cb5405e2..92847e955ca2 100644
+> > --- a/drivers/infiniband/sw/rxe/rxe_net.c
+> > +++ b/drivers/infiniband/sw/rxe/rxe_net.c
+> > @@ -642,6 +642,8 @@ static void rxe_sock_put(struct sock *sk,
+> >       }
+> >   }
+> >
+> I read this commit carefully. There are two paths that can invoke
+> rxe_net_del().
 >
-> this adds regression to xskxceiver runs on real hw (ice on my side):
+> One is through the rdma link del xxx command, while the other is through
+> the netdevice notification chain.
 >
-> PREREQUISITES: [ PASS ]
-> 1..108
-> ok 1 PASS: SKB SEND_RECEIVE
-> ok 2 PASS: SKB SEND_RECEIVE_2K_FRAME
-> ok 3 PASS: SKB SEND_RECEIVE_SINGLE_PKT
-> ok 4 PASS: SKB POLL_RX
-> ok 5 PASS: SKB POLL_TX
-> ok 6 PASS: SKB POLL_RXQ_FULL
-> ok 7 PASS: SKB POLL_TXQ_FULL
-> ok 8 PASS: SKB ALIGNED_INV_DESC
-> ok 9 PASS: SKB ALIGNED_INV_DESC_2K_FRAME_SIZE
-> ok 10 PASS: SKB UMEM_HEADROOM
-> ok 11 PASS: SKB BIDIRECTIONAL
-> ok 12 PASS: SKB STAT_RX_DROPPED
-> ok 13 PASS: SKB STAT_TX_INVALID
-> ok 14 PASS: SKB STAT_RX_FULL
-> ok 15 PASS: SKB STAT_FILL_EMPTY
-> ok 16 PASS: SKB XDP_PROG_CLEANUP
-> ok 17 PASS: SKB XDP_DROP_HALF
-> ok 18 PASS: SKB XDP_SHARED_UMEM
-> ok 19 PASS: SKB XDP_METADATA_COPY
-> ok 20 PASS: SKB XDP_METADATA_COPY_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 21 FAIL: SKB ALIGNED_INV_DESC_MULTI_BUFF
-> ok 22 PASS: SKB TOO_MANY_FRAGS
-> ok 23 PASS: SKB XDP_ADJUST_TAIL_SHRINK
-> ok 24 PASS: SKB TX_QUEUE_CONSUMER
-> ok 25 PASS: SKB XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF
-> ok 26 # SKIP SKIP: SKB XDP_ADJUST_TAIL_GROW
-> ok 27 # SKIP SKIP: SKB XDP_ADJUST_TAIL_GROW_MULTI_BUFF
-> ok 28 PASS: SKB SEND_RECEIVE_9K_PACKETS
-> ok 29 PASS: SKB SEND_RECEIVE_UNALIGNED
-> ok 30 PASS: SKB UNALIGNED_INV_DESC
-> ok 31 PASS: SKB UNALIGNED_INV_DESC_4001_FRAME_SIZE
-> ok 32 PASS: SKB SEND_RECEIVE_UNALIGNED_9K_PACKETS
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 33 FAIL: SKB UNALIGNED_INV_DESC_MULTI_BUFF
-> ok 34 PASS: SKB HW_SW_MIN_RING_SIZE
-> ok 35 PASS: SKB HW_SW_MAX_RING_SIZE
-> ok 36 PASS: SKB TEARDOWN
-> ok 37 PASS: DRV SEND_RECEIVE
-> ok 38 PASS: DRV SEND_RECEIVE_2K_FRAME
-> ok 39 PASS: DRV SEND_RECEIVE_SINGLE_PKT
-> ok 40 PASS: DRV POLL_RX
-> ok 41 PASS: DRV POLL_TX
-> ok 42 PASS: DRV POLL_RXQ_FULL
-> ok 43 PASS: DRV POLL_TXQ_FULL
-> ok 44 PASS: DRV ALIGNED_INV_DESC
-> ok 45 PASS: DRV ALIGNED_INV_DESC_2K_FRAME_SIZE
-> ok 46 PASS: DRV UMEM_HEADROOM
-> ok 47 PASS: DRV BIDIRECTIONAL
-> ok 48 PASS: DRV STAT_RX_DROPPED
-> ok 49 PASS: DRV STAT_TX_INVALID
-> ok 50 PASS: DRV STAT_RX_FULL
-> ok 51 PASS: DRV STAT_FILL_EMPTY
-> ok 52 PASS: DRV XDP_PROG_CLEANUP
-> ok 53 PASS: DRV XDP_DROP_HALF
-> ok 54 PASS: DRV XDP_SHARED_UMEM
-> ok 55 PASS: DRV XDP_METADATA_COPY
-> ok 56 PASS: DRV XDP_METADATA_COPY_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 57 FAIL: DRV ALIGNED_INV_DESC_MULTI_BUFF
-> ok 58 PASS: DRV TOO_MANY_FRAGS
-> ok 59 PASS: DRV XDP_ADJUST_TAIL_SHRINK
-> ok 60 PASS: DRV TX_QUEUE_CONSUMER
-> ok 61 PASS: DRV XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF
-> ok 62 PASS: DRV XDP_ADJUST_TAIL_GROW
-> ok 63 PASS: DRV XDP_ADJUST_TAIL_GROW_MULTI_BUFF
-> ok 64 PASS: DRV SEND_RECEIVE_9K_PACKETS
-> ok 65 PASS: DRV SEND_RECEIVE_UNALIGNED
-> ok 66 PASS: DRV UNALIGNED_INV_DESC
-> ok 67 PASS: DRV UNALIGNED_INV_DESC_4001_FRAME_SIZE
-> ok 68 PASS: DRV SEND_RECEIVE_UNALIGNED_9K_PACKETS
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 69 FAIL: DRV UNALIGNED_INV_DESC_MULTI_BUFF
-> ok 70 PASS: DRV HW_SW_MIN_RING_SIZE
-> ok 71 PASS: DRV HW_SW_MAX_RING_SIZE
-> ok 72 PASS: DRV TEARDOWN
-> ok 73 PASS: ZC SEND_RECEIVE
-> ok 74 PASS: ZC SEND_RECEIVE_2K_FRAME
-> ok 75 PASS: ZC SEND_RECEIVE_SINGLE_PKT
-> ok 76 PASS: ZC POLL_RX
-> ok 77 PASS: ZC POLL_TX
-> ok 78 PASS: ZC POLL_RXQ_FULL
-> ok 79 PASS: ZC POLL_TXQ_FULL
-> ok 80 PASS: ZC ALIGNED_INV_DESC
-> ok 81 PASS: ZC ALIGNED_INV_DESC_2K_FRAME_SIZE
-> ok 82 PASS: ZC UMEM_HEADROOM
-> ok 83 PASS: ZC BIDIRECTIONAL
-> # Can not run RX_DROPPED test for ZC mode
-> ok 84 # SKIP SKIP: ZC STAT_RX_DROPPED
-> ok 85 PASS: ZC STAT_TX_INVALID
-> ok 86 PASS: ZC STAT_RX_FULL
-> ok 87 PASS: ZC STAT_FILL_EMPTY
-> ok 88 PASS: ZC XDP_PROG_CLEANUP
-> ok 89 PASS: ZC XDP_DROP_HALF
-> ok 90 PASS: ZC XDP_SHARED_UMEM
-> ok 91 PASS: ZC XDP_METADATA_COPY
-> ok 92 PASS: ZC XDP_METADATA_COPY_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 93 FAIL: ZC ALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [11], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> ---------------------------------------
-> not ok 94 FAIL: ZC TOO_MANY_FRAGS
-> ok 95 PASS: ZC XDP_ADJUST_TAIL_SHRINK
-> # Can not run TX_QUEUE_CONSUMER test for ZC mode
-> ok 96 # SKIP SKIP: ZC TX_QUEUE_CONSUMER
-> ok 97 PASS: ZC XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF
-> ok 98 PASS: ZC XDP_ADJUST_TAIL_GROW
-> ok 99 PASS: ZC XDP_ADJUST_TAIL_GROW_MULTI_BUFF
-> ok 100 PASS: ZC SEND_RECEIVE_9K_PACKETS
-> ok 101 PASS: ZC SEND_RECEIVE_UNALIGNED
-> ok 102 PASS: ZC UNALIGNED_INV_DESC
-> ok 103 PASS: ZC UNALIGNED_INV_DESC_4001_FRAME_SIZE
-> ok 104 PASS: ZC SEND_RECEIVE_UNALIGNED_9K_PACKETS
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 105 FAIL: ZC UNALIGNED_INV_DESC_MULTI_BUFF
-> ok 106 PASS: ZC HW_SW_MIN_RING_SIZE
-> ok 107 PASS: ZC HW_SW_MAX_RING_SIZE
-> ok 108 PASS: ZC TEARDOWN
-> # 4 skipped test(s) detected. Consider enabling relevant config options t=
-o improve coverage.
-> # Totals: pass:97 fail:7 xfail:0 xpass:0 skip:4 error:0
-> XSK_SELFTESTS_ens785f0np0_SOFTIRQ: [ FAIL ]
-> 1..108
-> ok 1 PASS: SKB BUSY-POLL SEND_RECEIVE
-> ok 2 PASS: SKB BUSY-POLL SEND_RECEIVE_2K_FRAME
-> ok 3 PASS: SKB BUSY-POLL SEND_RECEIVE_SINGLE_PKT
-> ok 4 PASS: SKB BUSY-POLL POLL_RX
-> ok 5 PASS: SKB BUSY-POLL POLL_TX
-> ok 6 PASS: SKB BUSY-POLL POLL_RXQ_FULL
-> ok 7 PASS: SKB BUSY-POLL POLL_TXQ_FULL
-> ok 8 PASS: SKB BUSY-POLL ALIGNED_INV_DESC
-> ok 9 PASS: SKB BUSY-POLL ALIGNED_INV_DESC_2K_FRAME_SIZE
-> ok 10 PASS: SKB BUSY-POLL UMEM_HEADROOM
-> ok 11 PASS: SKB BUSY-POLL BIDIRECTIONAL
-> ok 12 PASS: SKB BUSY-POLL STAT_RX_DROPPED
-> ok 13 PASS: SKB BUSY-POLL STAT_TX_INVALID
-> ok 14 PASS: SKB BUSY-POLL STAT_RX_FULL
-> ok 15 PASS: SKB BUSY-POLL STAT_FILL_EMPTY
-> ok 16 PASS: SKB BUSY-POLL XDP_PROG_CLEANUP
-> ok 17 PASS: SKB BUSY-POLL XDP_DROP_HALF
-> ok 18 PASS: SKB BUSY-POLL XDP_SHARED_UMEM
-> ok 19 PASS: SKB BUSY-POLL XDP_METADATA_COPY
-> ok 20 PASS: SKB BUSY-POLL XDP_METADATA_COPY_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 21 FAIL: SKB BUSY-POLL ALIGNED_INV_DESC_MULTI_BUFF
-> ok 22 PASS: SKB BUSY-POLL TOO_MANY_FRAGS
-> ok 23 PASS: SKB BUSY-POLL XDP_ADJUST_TAIL_SHRINK
-> ok 24 PASS: SKB BUSY-POLL TX_QUEUE_CONSUMER
-> ok 25 PASS: SKB BUSY-POLL XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF
-> ok 26 # SKIP SKIP: SKB BUSY-POLL XDP_ADJUST_TAIL_GROW
-> ok 27 # SKIP SKIP: SKB BUSY-POLL XDP_ADJUST_TAIL_GROW_MULTI_BUFF
-> ok 28 PASS: SKB BUSY-POLL SEND_RECEIVE_9K_PACKETS
-> ok 29 PASS: SKB BUSY-POLL SEND_RECEIVE_UNALIGNED
-> ok 30 PASS: SKB BUSY-POLL UNALIGNED_INV_DESC
-> ok 31 PASS: SKB BUSY-POLL UNALIGNED_INV_DESC_4001_FRAME_SIZE
-> ok 32 PASS: SKB BUSY-POLL SEND_RECEIVE_UNALIGNED_9K_PACKETS
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 33 FAIL: SKB BUSY-POLL UNALIGNED_INV_DESC_MULTI_BUFF
-> ok 34 PASS: SKB BUSY-POLL HW_SW_MIN_RING_SIZE
-> ok 35 PASS: SKB BUSY-POLL HW_SW_MAX_RING_SIZE
-> ok 36 PASS: SKB BUSY-POLL TEARDOWN
-> ok 37 PASS: DRV BUSY-POLL SEND_RECEIVE
-> ok 38 PASS: DRV BUSY-POLL SEND_RECEIVE_2K_FRAME
-> ok 39 PASS: DRV BUSY-POLL SEND_RECEIVE_SINGLE_PKT
-> ok 40 PASS: DRV BUSY-POLL POLL_RX
-> ok 41 PASS: DRV BUSY-POLL POLL_TX
-> ok 42 PASS: DRV BUSY-POLL POLL_RXQ_FULL
-> ok 43 PASS: DRV BUSY-POLL POLL_TXQ_FULL
-> ok 44 PASS: DRV BUSY-POLL ALIGNED_INV_DESC
-> ok 45 PASS: DRV BUSY-POLL ALIGNED_INV_DESC_2K_FRAME_SIZE
-> ok 46 PASS: DRV BUSY-POLL UMEM_HEADROOM
-> ok 47 PASS: DRV BUSY-POLL BIDIRECTIONAL
-> ok 48 PASS: DRV BUSY-POLL STAT_RX_DROPPED
-> ok 49 PASS: DRV BUSY-POLL STAT_TX_INVALID
-> ok 50 PASS: DRV BUSY-POLL STAT_RX_FULL
-> ok 51 PASS: DRV BUSY-POLL STAT_FILL_EMPTY
-> ok 52 PASS: DRV BUSY-POLL XDP_PROG_CLEANUP
-> ok 53 PASS: DRV BUSY-POLL XDP_DROP_HALF
-> ok 54 PASS: DRV BUSY-POLL XDP_SHARED_UMEM
-> ok 55 PASS: DRV BUSY-POLL XDP_METADATA_COPY
-> ok 56 PASS: DRV BUSY-POLL XDP_METADATA_COPY_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 57 FAIL: DRV BUSY-POLL ALIGNED_INV_DESC_MULTI_BUFF
-> ok 58 PASS: DRV BUSY-POLL TOO_MANY_FRAGS
-> ok 59 PASS: DRV BUSY-POLL XDP_ADJUST_TAIL_SHRINK
-> ok 60 PASS: DRV BUSY-POLL TX_QUEUE_CONSUMER
-> ok 61 PASS: DRV BUSY-POLL XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF
-> ok 62 PASS: DRV BUSY-POLL XDP_ADJUST_TAIL_GROW
-> ok 63 PASS: DRV BUSY-POLL XDP_ADJUST_TAIL_GROW_MULTI_BUFF
-> ok 64 PASS: DRV BUSY-POLL SEND_RECEIVE_9K_PACKETS
-> ok 65 PASS: DRV BUSY-POLL SEND_RECEIVE_UNALIGNED
-> ok 66 PASS: DRV BUSY-POLL UNALIGNED_INV_DESC
-> ok 67 PASS: DRV BUSY-POLL UNALIGNED_INV_DESC_4001_FRAME_SIZE
-> ok 68 PASS: DRV BUSY-POLL SEND_RECEIVE_UNALIGNED_9K_PACKETS
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 69 FAIL: DRV BUSY-POLL UNALIGNED_INV_DESC_MULTI_BUFF
-> ok 70 PASS: DRV BUSY-POLL HW_SW_MIN_RING_SIZE
-> ok 71 PASS: DRV BUSY-POLL HW_SW_MAX_RING_SIZE
-> ok 72 PASS: DRV BUSY-POLL TEARDOWN
-> ok 73 PASS: ZC BUSY-POLL SEND_RECEIVE
-> ok 74 PASS: ZC BUSY-POLL SEND_RECEIVE_2K_FRAME
-> ok 75 PASS: ZC BUSY-POLL SEND_RECEIVE_SINGLE_PKT
-> ok 76 PASS: ZC BUSY-POLL POLL_RX
-> ok 77 PASS: ZC BUSY-POLL POLL_TX
-> ok 78 PASS: ZC BUSY-POLL POLL_RXQ_FULL
-> ok 79 PASS: ZC BUSY-POLL POLL_TXQ_FULL
-> ok 80 PASS: ZC BUSY-POLL ALIGNED_INV_DESC
-> ok 81 PASS: ZC BUSY-POLL ALIGNED_INV_DESC_2K_FRAME_SIZE
-> ok 82 PASS: ZC BUSY-POLL UMEM_HEADROOM
-> ok 83 PASS: ZC BUSY-POLL BIDIRECTIONAL
-> # Can not run RX_DROPPED test for ZC mode
-> ok 84 # SKIP SKIP: ZC BUSY-POLL STAT_RX_DROPPED
-> ok 85 PASS: ZC BUSY-POLL STAT_TX_INVALID
-> ok 86 PASS: ZC BUSY-POLL STAT_RX_FULL
-> ok 87 PASS: ZC BUSY-POLL STAT_FILL_EMPTY
-> ok 88 PASS: ZC BUSY-POLL XDP_PROG_CLEANUP
-> ok 89 PASS: ZC BUSY-POLL XDP_DROP_HALF
-> ok 90 PASS: ZC BUSY-POLL XDP_SHARED_UMEM
-> ok 91 PASS: ZC BUSY-POLL XDP_METADATA_COPY
-> ok 92 PASS: ZC BUSY-POLL XDP_METADATA_COPY_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 93 FAIL: ZC BUSY-POLL ALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [11], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> ---------------------------------------
-> not ok 94 FAIL: ZC BUSY-POLL TOO_MANY_FRAGS
-> ok 95 PASS: ZC BUSY-POLL XDP_ADJUST_TAIL_SHRINK
-> # Can not run TX_QUEUE_CONSUMER test for ZC mode
-> ok 96 # SKIP SKIP: ZC BUSY-POLL TX_QUEUE_CONSUMER
-> ok 97 PASS: ZC BUSY-POLL XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF
-> ok 98 PASS: ZC BUSY-POLL XDP_ADJUST_TAIL_GROW
-> ok 99 PASS: ZC BUSY-POLL XDP_ADJUST_TAIL_GROW_MULTI_BUFF
-> ok 100 PASS: ZC BUSY-POLL SEND_RECEIVE_9K_PACKETS
-> ok 101 PASS: ZC BUSY-POLL SEND_RECEIVE_UNALIGNED
-> ok 102 PASS: ZC BUSY-POLL UNALIGNED_INV_DESC
-> ok 103 PASS: ZC BUSY-POLL UNALIGNED_INV_DESC_4001_FRAME_SIZE
-> ok 104 PASS: ZC BUSY-POLL SEND_RECEIVE_UNALIGNED_9K_PACKETS
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 105 FAIL: ZC BUSY-POLL UNALIGNED_INV_DESC_MULTI_BUFF
-> ok 106 PASS: ZC BUSY-POLL HW_SW_MIN_RING_SIZE
-> ok 107 PASS: ZC BUSY-POLL HW_SW_MAX_RING_SIZE
-> ok 108 PASS: ZC BUSY-POLL TEARDOWN
-> # 4 skipped test(s) detected. Consider enabling relevant config options t=
-o improve coverage.
-> # Totals: pass:97 fail:7 xfail:0 xpass:0 skip:4 error:0
-> XSK_SELFTESTS_ens785f0np0_BUSY_POLL: [ FAIL ]
+> In the netdevice notification chain path, rtnl_lock is already held, and
+> rxe_net_del() is called under that lock.
 >
-> Summary:
-> XSK_SELFTESTS_ens785f0np0_SOFTIRQ: [ FAIL ]
-> XSK_SELFTESTS_ens785f0np0_BUSY_POLL: [ FAIL ]
+> However, in the rdma link del xxx path, no rtnl_lock is taken.
+>
+> Because of this, I would like to use the existing rtnl_lock to serialize
+> calls to rxe_net_del().
 
-Thanks for the test. I spent some time finally configuring the env in
-my machine with ixgbe driver.
+-1 for this.
 
-Some of the failures are probably caused because of lack of patch 5 in
-your setup? The rest is caused/breaked by patch 3 which was stated by
-Stan. I fixed that in the next version.
+It's a global mutex and heavily contended because many
+components use it without much care.  We are working
+to reduce the RTNL pressure for years by converting such
+users with a dedicated lock or per-netns RTNL mutex.
 
-Thanks,
-Jason
+RTNL is not needed here at all, so please use a dedicated lock.
+
+
+>
+> My proposed commit is shown below. I am not sure whether it fully
+> resolves the problem.
+>
+> diff --git a/drivers/infiniband/sw/rxe/rxe.c
+> b/drivers/infiniband/sw/rxe/rxe.c
+> index b0714f9abe3d..84266dc416c4 100644
+> --- a/drivers/infiniband/sw/rxe/rxe.c
+> +++ b/drivers/infiniband/sw/rxe/rxe.c
+> @@ -251,7 +251,9 @@ static int rxe_newlink(const char *ibdev_name,
+> struct net_device *ndev)
+>
+>   static int rxe_dellink(struct ib_device *dev)
+>   {
+> +       rtnl_lock();
+>          rxe_net_del(dev);
+> +       rtnl_unlock();
+>
+>          return 0;
+>   }
+> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c
+> b/drivers/infiniband/sw/rxe/rxe_net.c
+> index 50a2cb5405e2..ac53ea73996d 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_net.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
+> @@ -649,6 +649,8 @@ void rxe_net_del(struct ib_device *dev)
+>          struct sock *sk;
+>          struct net *net;
+>
+> +       ASSERT_RTNL();
+> +
+>          ndev =3D rxe_ib_device_get_netdev(&rxe->ib_dev);
+>          if (!ndev)
+>                  return;
+>
+> Zhu Yanjun
+>
+> > +static DEFINE_MUTEX(rxe_net_del_mutex);
+> > +
+> >   void rxe_net_del(struct ib_device *dev)
+> >   {
+> >       struct rxe_dev *rxe =3D container_of(dev, struct rxe_dev, ib_dev)=
+;
+> > @@ -649,9 +651,10 @@ void rxe_net_del(struct ib_device *dev)
+> >       struct sock *sk;
+> >       struct net *net;
+> >
+> > +     mutex_lock(&rxe_net_del_mutex);
+> >       ndev =3D rxe_ib_device_get_netdev(&rxe->ib_dev);
+> >       if (!ndev)
+> > -             return;
+> > +             goto out;
+> >
+> >       net =3D dev_net(ndev);
+> >
+> > @@ -664,6 +667,8 @@ void rxe_net_del(struct ib_device *dev)
+> >               rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
+> >
+> >       dev_put(ndev);
+> > +out:
+> > +     mutex_unlock(&rxe_net_del_mutex);
+> >   }
+> >
+> >   static void rxe_port_event(struct rxe_dev *rxe,
 
