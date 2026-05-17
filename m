@@ -1,206 +1,242 @@
-Return-Path: <netdev+bounces-288786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 77WsKd5ECmprygQAu9opvQ
-	(envelope-from <netdev+bounces-288786-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:44:46 +0200
+	id qbS3LTVPCmokzgQAu9opvQ
+	(envelope-from <netdev+bounces-288787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:28:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF3BA564344
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:44:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 233055645C5
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:28:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44CE330067A8
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 22:44:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E575530094D8
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 23:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E86F330B28;
-	Sun, 17 May 2026 22:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875FB30C157;
+	Sun, 17 May 2026 23:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="mZqUhPq4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJObiiNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D9F302753
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779057882; cv=none; b=YrrSbbCSlj3YON/96kmmuFHYMqv+Nqq7TOwRs1Ns/V3H0KOmvTgvz96f68QvVc0Q30T24Z/69fE1M9YrbpKUchBRAqWFQk7xP13yxyp5uCKwxgA73Yd1IFULK2R4b4FS+pUYQ9vF4AEXSm2ai4IjI+m026DS44UIShJYv0duHeY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779057882; c=relaxed/simple;
-	bh=02wpFiJeH5kYYp1HHxt4KWdt6ETCTBYwpOzaF81A0dY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYGU8oH/SFIcWhd6G2J0f+mDBRY5rwQVxiBGSplJryA+vdTzzvdBjqVajZoHfrBpkRL1vF2B7Rj4ZYxaJHSJTLgAVPwIz9Pfy+TMxzrDUa22I6NzyMOVvhT4IJ59u3TzTXpR5R4chlDKg+6fGvQfQ9dwfhVIX8JpVu/+Lh9ymZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=mZqUhPq4; arc=none smtp.client-ip=74.125.82.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-2f36da5c8fbso1290970eec.0
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 15:44:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FEC171B1
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 23:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779060529; cv=pass; b=WWDUNa17cQSs6vbzfWQQ4Wfihzuz31zs2FbRhvGuR6Uu/0BOen++pkLRCrBJIAAexgMKoG9m1FWj8L7fHjkG3cfR3/zkywPsLeWeqLse7gRxe1CxTDvMclwJQE3GAfOLci0nnS9BoJC3ezNQmPeE3L39MMZVUPJaIU7sX/azRZk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779060529; c=relaxed/simple;
+	bh=m6bgQW4Zf8MXt1wfbHMNC+QaLmkOQvqE09zCrI53oZI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r9t6CFTrhG64gPYCOKq8EyzVDj2QaN3MYwbiv+BCTwrLvqYJJN8cOI/8txUVqKy6+eU/Bi1e58LNiRQ/LH+zo8lIvXX4w3wU4scvNNDJgeoOSTX5YdaZv+Z/ZukMik5swioazVx6VkF7ekdGHmdwkWMVExoXlWTH3orsrzZPvE0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJObiiNe; arc=pass smtp.client-ip=74.125.82.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-135200bc7d2so4456829c88.0
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 16:28:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779060527; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Z+9Dgss709HzUbrLOVX+V4O+1xXz6mH9L1IwL7sYyAhWGhwfx5Ggbq/8gPN9gRgys2
+         +UUT3IdG0xNC5AUE5JXMcKbAJt4f6Hv2i30/oaKrmvC8Vqbjj1P7zdnJ5/qsbezntKYy
+         M2pPHaABnRX07W2ExF9utYyZQxhzAFNz9afeQJP+TctI5hIRev5d87wX0NLn/6PCwSJU
+         hTSCFltN4yz5fIkHl7brRwSLGQLE5OjTsPGX9V1QiuBnNQ3P3VhjRPi/b02zlUnG7miZ
+         zkp7zjYvKoaH6LIvpHwKnQvVfSy0FcOj1IDVycUGUJAMjVG+NpozK0mdLwrKLDL8DzUg
+         hKYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Rnjcwh3aBXAGcoUKmcFWo1+pBa0cvkHlTiGofoh+fLM=;
+        fh=n77jcvc4Wj1RUUEEgR9rJfh5dMYtY6YnanFqVbrbt8A=;
+        b=AWp10WuhIogo9JVXEIsHEQDJYUrlGtfimfnBD7JiTZO8ryjr0BpiRfm6ga50hYSp6O
+         zYiH3MS6xjE5hqNozCzIQ7PUHXWnRLfhOL1NQ+pHXGzJptzI+oetTJI79PCrDHB32gNj
+         J6ZM1h9bqIKrdsZh6MGaYPnwAwpM78vSaHlDFQCJ/iri17VEGXzuMR5psYPa0z/Y2ZXP
+         Zu+1zJuRbiGyPG7Miw9l3S6XFlOPUAkNVlYS4KN31M2D23eNj0G/vX65eQM7hgWTRAMO
+         K5AeCfv3R7vDOL8oN1Uk6rPvDS26Ce2vEzFEBnZGCwkC6e1RWEg8ynYLyySvpGjEOLk5
+         PCVQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1779057880; x=1779662680; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=F1ayTVD/Q0qC/3pKC3zpho9UU3KuxGY9jFZpz9NhE6s=;
-        b=mZqUhPq4pCfwO0SanWsbepaNOm5r1hMImeVvoj7igIUVOf6G3cFmHFe52QeDWatZ6c
-         0kzd74C5BYtk6gxkn/LDn8fhP39h3+TnZ/tvRXJ0/2Q4now/5ZewBYFKSrrue/nzS7/5
-         B0QQHPlWx6CPZqVwyCFlV68nm0Wh3QZXcvYpCwa+bpJRFuu1box9OQZdUXj6mEhee9Dm
-         72b/NgqSDbmxGLDxWvkQ/xKalzfmq17b7cvnCq6xMiPsYwK6jewWDm7nHCgn1MwVzITv
-         QsbrAw3fGX5wzV8slHQyjtBWO1cqOJWLaaHtFHm1BYPn4KzCqRm0n2v+TF493zEsNaRt
-         fPBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779057880; x=1779662680;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1779060527; x=1779665327; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F1ayTVD/Q0qC/3pKC3zpho9UU3KuxGY9jFZpz9NhE6s=;
-        b=bLrvNbNlmjZH4+8fEujFAYy6W5jp7txNffm5Dl3BW01LFOGcTedjsPeH1Y9ItLQWQK
-         HiCH+b9/r+/fMmhPO1ELyuQ5QmGCFn3DVAiAeULkyi/I1X3L1hS+05Cqwn/2NknDE1OU
-         A1J5YZROw8wxaswzz2ED4Rj6vGDPnAYc3By+kcGc9tXQ4Qs0J22/wyuSBj5q3ud2fP3v
-         +TH+bmtRVdS3afACGwxYgtKHJtzgnhbIdknSRfmYU2Bn+HOp34pvJLleS7pE+8KF2k+6
-         deuRHCZ+wea3yPfS7CO7knmaF3R7Mp0RG6g6B4UpMs3U5LMID5LxbXXbKGkEnXN6OWYb
-         0gOA==
-X-Gm-Message-State: AOJu0YwDHx8bTyrZZ203Ug5dcUqlc7/7GWcG94X7C6SiXyFaQQbLZpGC
-	ZMtROKAomVzZikgSqAHvKvgx1SznbmWpklJdAMas4MBHGZar6mEI9siVfkT41fFwsmuiUI871R5
-	we+WNNWk=
-X-Gm-Gg: Acq92OED5gLdMd6nO4gk5f4qyViIvIyOrwRHAlKrMRc09Oru7oRgSPTMyqL8djdRHma
-	xFQUXC7yGiXlrbSRX97YQbZnwQwNdLvSZ+ebecm492pbi+iu4TnrK5Fe8B08hA2k6Y3dihpwyXc
-	S2g8WkDqnTWY6BKasWCoGphN6IoahisWhKQwdEiOf+vz4zhFLdXMoVWrJgAcYswKsGcGgP4rmKR
-	zB8fgjF8oxQOTL9MVALbP7uWvsl9HcgxvfsD1LB3ka04owtSt2Dny9+h7T/bfOL7FzRPFhsNWsz
-	WEAg/m2c3QuMbEKsq0I+tXW7x0pYtvwdlk8+T0+RKbfXyq7B2v7+d1Lu0DGoBqnwczbfqHU3Gh9
-	e2YL1nhIIguvq4/no217nAPRc+d+2ViTNCIm7OwmzTypIN+M8NTaf+ZhRrofYrl2ZZX2O0A9yh1
-	YXLNVYC2VdLxh7BJMAiWrQ9hDLnOof1N24
-X-Received: by 2002:a05:7300:cb15:b0:2da:44ac:6d17 with SMTP id 5a478bee46e88-30398655327mr6426971eec.17.1779057880321;
-        Sun, 17 May 2026 15:44:40 -0700 (PDT)
-Received: from phoenix.lan ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302973bc9d4sm12280249eec.23.2026.05.17.15.44.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 15:44:39 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Christian Iacobellis <Ciacobellis@agea.com.ar>
-Subject: [PATCH iproute2-next] routel: handle errors from ip command
-Date: Sun, 17 May 2026 15:44:37 -0700
-Message-ID: <20260517224437.164919-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.53.0
+        bh=Rnjcwh3aBXAGcoUKmcFWo1+pBa0cvkHlTiGofoh+fLM=;
+        b=IJObiiNeQVmyQ4i+ARUgXwH0aNUqN6QLS9zvqoUkQNcWtRHWuHOPKfKpEWaD8ocyV3
+         sml47GtI1MnBdS/VVo1wD59t+Ayb3kxkMTW+qW7gFhPRvE5RXiMfZqjUe5jS5DFGVAcK
+         GMX3njpH/a6RMOCRZKd4RDz6Qh9BzsEfs63mMkrNaKrn2tMV2jMnFJ6lTueaaRiDTKcj
+         fiNXW07pMxBADDJr7diaHvUufjRRaVIiCfBpL6Lumql8VY0XnSWJtBN1wpLBuZZfUQdm
+         htyc1mMpaia40bz4NOc9ez6d6gys9OOJSmvwgDZRvf6QJzlgWLsajNygsUX+svNErmkA
+         6Cqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779060527; x=1779665327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Rnjcwh3aBXAGcoUKmcFWo1+pBa0cvkHlTiGofoh+fLM=;
+        b=rwhlq+97fbFI/VYl1udA/1oVpq1efflpCgpqBQx7lwGx53KBh7mEk833jMcAfofo4j
+         s+wTLUxKrjCpMnTpEpJcW5i5/8bfTvbgN5Fu296A/ko4Nq1Q4QPaIbmL42da1Mr1EEBT
+         otfk994zzN/NL4N1H5Fi1s6p1kN50oCQ/ftASoPtzC+55+ao96aCPQQBprY7MvRm5fhd
+         3M9U4KG8iXKYj+YNf2m51XvGE9lO1GyPhku4dPfniL1QdSszQl37gT+jN4ii4IReiBiQ
+         gdibsGr5AxhPRKjkCTZ513hH9uFsmkUGwPWDeD6dNYCn+fTLeWgl5IpqRmyJ85w8K4G7
+         /d7Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9q7vGpwEaS9g++FoydNiTjQaudDPHGJjTp67K5mp0fsowlabxUSFvr3CtFnqUnTSJ6/LOe3+8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjS3Ebss1tG0988ZvpKzjMI+4+euWrDjcAcuMaESxeBljmeQB0
+	ksH8Ntn2CWa+s3jTjZHbyiXKuWJsKEoEdt+aI7dmty2RLEQOTNGpec3Zm1xRzciXXHf3i7EFAMh
+	NLYlNqXudjBU5Vui/2AyaRftJg24sxcZrulsl+Pa0
+X-Gm-Gg: Acq92OGnTyNPz1OesTrkiBhRSub4Od1HlBiRFM1o7Rw4cVsSpXgpAq6CjRkdkDAzNc7
+	G4ClQgLt/oCTjWGSfbFQwTOKbPl82NXAisPP4wb0NJ8CjYqufxLT90UORwM8emkz9kHz1s5qh/O
+	7jXIj38YeYp66/ZFY0LMnk52+n8QCmKYU6+gstCG4X5OaHrSLQ+OJ9kpHL4N2Y7Dj7hIzq0lSlo
+	V66wAO2OkeJMGV+RnULFlOD5zJAxFza1E8vSdI3OI8NUE9On+rhy0xAW6TT7MEd1k9D/wIKrO6n
+	tBawW5WGoT+NiQXF/qfkMXc/RzqnZrtV+1syiugh5cm/jjZ5zmhsWbRhm+sY3eF8RYtiCcP5MP+
+	uTFk6nSTbVvW+s6zXaSBfm+7B5g/E0Gq26pvKOkFKyg==
+X-Received: by 2002:a05:7022:41a7:b0:134:def6:e70b with SMTP id
+ a92af1059eb24-1350451e322mr5774300c88.6.1779060526553; Sun, 17 May 2026
+ 16:28:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: DF3BA564344
+References: <20260508073355.3916746-1-kuniyu@google.com> <20260508073355.3916746-6-kuniyu@google.com>
+ <87ik8ujfa1.fsf@all.your.base.are.belong.to.us>
+In-Reply-To: <87ik8ujfa1.fsf@all.your.base.are.belong.to.us>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sun, 17 May 2026 16:28:34 -0700
+X-Gm-Features: AVHnY4Ig7UxTlQzaKGRM04g04YbMYBZZ4r4oVDiLULEpxp4tTBPeWfll-rBxudw
+Message-ID: <CAAVpQUDKx=07Rhz279oFOD3dw6PvuOP4mVmvQKDjPFOHZXimfw@mail.gmail.com>
+Subject: Re: [PATCH v1 bpf-next 5/8] bpf: tcp: Add kfunc to adjust sk->sk_rcvlowat.
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Tenzin Ukyab <ukyab@berkeley.edu>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 233055645C5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288786-lists,netdev=lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288787-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,networkplumber.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber-org.20251104.gappssmtp.com:dkim,subprocess.run:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-When ip exits non-zero, routel crashed with a JSONDecodeError traceback
-on top of ip's own diagnostic. Use subprocess.run with check=True,
-propagate ip's exit status, handle a missing ip binary, and wrap the
-JSON parse so malformed output gives a clean message.
+On Mon, May 11, 2026 at 5:34=E2=80=AFAM Bj=C3=B6rn T=C3=B6pel <bjorn@kernel=
+.org> wrote:
+>
+> Kuniyuki Iwashima <kuniyu@google.com> writes:
+>
+> > We will invoke BPF SOCK_OPS prog with BPF_SOCK_OPS_RCVLOWAT_CB
+> > to adjust sk->sk_rcvlowat when
+> >
+> >   1. TCP stack enqueues skb to sk->sk_receive_queue
+> >   2. TCP recvmsg() completes
+> >
+> > Let's provide a kfunc to set sk->sk_rcvlowat.
+> >
+> > Negative values are clamped to INT_MAX, consistent with SO_RCVLOWAT.
+> >
+> > The wakeup flag is determined based on bpf_sock_ops_kern.skb:
+> >
+> >   * For the enqueue hook, skb is always non-NULL, and wakeup is
+> >     set to false because
+> >
+> >     * tcp_data_ready() is always called after the hooks in
+> >        tcp_queue_rcv() and tcp_ofo_queue().
+> >
+> >     * when tcp_fastopen_add_skb() is called for TFO SYN,
+> >        the socket is not yet accept()ed, and when called
+> >        for TFO SYN+ACK, the socket is woken up by
+> >        sk->sk_state_change() anyway.
+> >
+> >   * For the recvmsg() hook, skb is always NULL, and wakeup is set
+> >     to true because tcp_data_ready() is not called in the path.
+> >
+> > An alternative would be to support bpf_setsockopt() by adding
+> > BPF_SOCK_OPS_RCVLOWAT_CB to is_locked_tcp_sock_ops().
+> >
+> > However, that approach involves excessive conditionals and an
+> > unnecessary memcpy(), costs we do not want to pay for every skb
+> > in the TCP fast path.
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > ---
+> >  net/core/filter.c | 17 +++++++++++++++++
+> >  1 file changed, 17 insertions(+)
+> >
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 94d07a15b2ab..9c4cd27c6d4e 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -12346,6 +12346,22 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct=
+ __sk_buff *s, struct sock *sk,
+> >  #endif
+> >  }
+> >
+> > +__bpf_kfunc int bpf_sock_ops_tcp_set_rcvlowat(struct bpf_sock_ops_kern=
+ *skops,
+> > +                                           int rcvlowat)
+> > +{
+> > +#ifdef CONFIG_INET
+> > +     if (skops->op !=3D BPF_SOCK_OPS_RCVLOWAT_CB)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     if (rcvlowat < 0)
+> > +             rcvlowat =3D INT_MAX;
+> > +
+> > +     return __tcp_set_rcvlowat(skops->sk, rcvlowat, !skops->skb);
+> > +#else
+> > +     return -EOPNOTSUPP;
+> > +#endif
+> > +}
+> > +
+>
+> (Nice work BTW! I played a bit with this, but took a sockmap/stream
+> parser approach instead -- this is much nicer!)
 
-While here, send diagnostics to stderr and drop the assert-as-control-
-flow (stripped under python -O).
+If you want to play with multiple sockets, sockmap is the right
+choice, if not, it's slow and kills zerocopy.
 
-Fixes: 6d676ad93408 ("ip: rewrite routel in python")
-Reported-by: Christian Iacobellis <Ciacobellis@agea.com.ar>
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- ip/routel | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+>
+> Curious if we can get into a situation that commit fcf4692fa39e ("mptcp:
+> prevent BPF accessing lowat from a subflow socket.") fixed?
+>
+> IOW, we can construct a program that enables autolowat on MPTCP
+> subflows, right? If so, do we need a similar check (or checking for
+> subflows) in the kfunc?
 
-diff --git a/ip/routel b/ip/routel
-index 09a90126..51b02d21 100755
---- a/ip/routel
-+++ b/ip/routel
-@@ -13,7 +13,8 @@ import subprocess
- 
- def usage():
-     '''Print usage and exit'''
--    print("Usage: {} [tablenr [raw ip args...]]".format(sys.argv[0]))
-+    print("Usage: {} [tablenr [raw ip args...]]".format(sys.argv[0]),
-+          file=sys.stderr)
-     sys.exit(64)
- 
- 
-@@ -23,7 +24,7 @@ def main():
-     try:
-         opts, args = getopt.getopt(sys.argv[1:], "h46f:", ["help", "family="])
-     except getopt.GetoptError as err:
--        print(err)
-+        print(err, file=sys.stderr)
-         usage()
- 
-     for opt, arg in opts:
-@@ -36,14 +37,29 @@ def main():
-         elif opt in ["-f", "--family"]:
-             family = arg
-         else:
--            assert False, "unhandled option"
-+            raise RuntimeError("unhandled option " + opt)
- 
-     if not args:
-         args = ['0']
- 
-     cmd = ['ip', '-f', family, '-j', 'route', 'list', 'table'] + args
--    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
--    tbl = json.load(process.stdout)
-+    try:
-+        result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
-+    except FileNotFoundError:
-+        print("{}: ip: command not found".format(sys.argv[0]),
-+              file=sys.stderr)
-+        sys.exit(1)
-+    except subprocess.CalledProcessError as err:
-+        # ip has already written its own diagnostic to stderr
-+        sys.exit(err.returncode)
-+
-+    try:
-+        tbl = json.loads(result.stdout)
-+    except json.JSONDecodeError as err:
-+        print("{}: cannot parse ip output: {}".format(sys.argv[0], err),
-+              file=sys.stderr)
-+        sys.exit(1)
-+
-     if family == 'inet':
-         fmt = '{:15} {:15} {:15} {:8} {:8}{:<16} {}'
-     else:
-@@ -54,7 +70,7 @@ def main():
-     print(fmt.format(*map(lambda x: x.capitalize(), keys)))
- 
-     for record in tbl:
--        fields = [record[k] if k in record else '' for k in keys]
-+        fields = [record.get(k, '') for k in keys]
-         print(fmt.format(*fields))
- 
- 
--- 
-2.53.0
+Good point.  I'll rather drop support for MPTCP for now.
+If needed, they can extend kfunc to call the mptcp-specific
+rcvlowat function.
 
+Thanks
 
