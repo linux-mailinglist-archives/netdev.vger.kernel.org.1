@@ -1,131 +1,165 @@
-Return-Path: <netdev+bounces-288749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288750-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id pT5gKw7aCWr/sgQAu9opvQ
-	(envelope-from <netdev+bounces-288749-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:09:02 +0200
+	id mPRSAtLbCWqZswQAu9opvQ
+	(envelope-from <netdev+bounces-288750-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:16:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23052561E5A
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:09:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7580D561F43
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EFA3A3009B20
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 15:09:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 718D63009F90
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 15:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0148F35E1CE;
-	Sun, 17 May 2026 15:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120E53B0ADB;
+	Sun, 17 May 2026 15:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BLDrEVGr"
+	dkim=pass (1024-bit key) header.d=vassilevski.com header.i=@vassilevski.com header.b="LxPlL6Nz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from mail-244108.protonmail.ch (mail-244108.protonmail.ch [109.224.244.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C2F329C57;
-	Sun, 17 May 2026 15:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157132C21F1;
+	Sun, 17 May 2026 15:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779030537; cv=none; b=BPWY7Vzzs3O7Nr2yioEqw+lYRvgzIySvcXN5avB+2miM8EKwZT5y2mgJFMhT4QVixlGzqgs0awyWUqMZgMC7oVcRbWl1hWXPkPcUmhC5YKtyCDI3vGTqG98kMB9kzFiOkewwePwLrSVk+WrkiT3Arh8nzjXB9za+3a3f3Sc00hU=
+	t=1779030988; cv=none; b=cPHHz2nUPyBj2+zNogtq0qjfUtRAaSI+mj4e7Q2wbNE1qaRN0dDzkTPyhD2PjGnavqMUzdJrM45L0XdUBzr7sfzn0dqQcxM13QouLrtvICmsGI16ibGVB+8ajWrzJIFYQVv4ViCo/2lONaqSGV8xz2d9ilzppzY4lb4Wl1TGamg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779030537; c=relaxed/simple;
-	bh=WbC5V1eLmSjbNKzONoDR6pDca6tg+TweoUUxx61qfuI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UCqnJWLNlJRPPwEROriyeCfaEdY/CWkiFxzzWm3rR1nYAXqge88BzhINzN7g7g+2bkRpT6TqAFoDCXaonw80U2Hi4Y1zQYIJ3rHtHCowwWioWZ5G5HwGrl0cqmQQOIZkrUg01RS0rL3akAyBRFycf2Ruvrvi3cJ4cVNWfmISWJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BLDrEVGr; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1779030526; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=6qqHubNw6Ffthb2a69vjor3nIUJMVYWSf99a0QRVW3o=;
-	b=BLDrEVGrEvYV8Qk83z2VvTgT/CKepuKPxRtC79hELCLjcZVuXGZlXFqqNB8h/fy3Rt0CfC77BbPSDOV+A7dTmPTke+Z+PHjm7aV9Y5kt2PV/AKqPQhHcBsx+I+9i+Q2SHMPiL2fDPeaufI6rEDAOLNBqs1eyuqncXnxILf3HXvY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R261e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0X31y.BW_1779030524;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X31y.BW_1779030524 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sun, 17 May 2026 23:08:45 +0800
-Date: Sun, 17 May 2026 23:08:44 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Leon Romanovsky <leon@kernel.org>, Xiang Mei <xmei5@asu.edu>,
-	alibuda@linux.alibaba.com
-Cc: netdev@vger.kernel.org, wenjia@linux.ibm.com, sidraya@linux.ibm.com,
-	tonylu@linux.alibaba.com, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, bestswngs@gmail.com
-Subject: Re: [PATCH net] net/smc: avoid NULL deref of conn->lnk in
- smc_msg_event tracepoint
-Message-ID: <agnZ_G9_9jZFS2An@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20260510222640.1230720-1-xmei5@asu.edu>
- <20260517084513.GA33515@unreal>
+	s=arc-20240116; t=1779030988; c=relaxed/simple;
+	bh=iKoWjFoumDzU83662ZU2qlYoicofSlY+S6AkomCAcWc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XhBqNuBPqgtX6w18LD4PA1ehJY4rGYfO2YiOOtsVAIUcXEFVnRL4779/7u1RhqLGrO5Ao1qjeP0BFuvUQ8tBx+EyLPfRc1RLdB1sipXcBYfWJH4ckkZXIgPg00yA+IbC3ntLi5+6ezTHCLsY7y8wtg19LMBjBcewfvbHJhfaUyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vassilevski.com; spf=pass smtp.mailfrom=vassilevski.com; dkim=pass (1024-bit key) header.d=vassilevski.com header.i=@vassilevski.com header.b=LxPlL6Nz; arc=none smtp.client-ip=109.224.244.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vassilevski.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vassilevski.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vassilevski.com;
+	s=protonmail; t=1779030983; x=1779290183;
+	bh=nTuZeJsw+iCXzqp0R7o7Vg2ADgoYOa361E1gmqMhiNQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:From:To:
+	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=LxPlL6NzxUvGQWEUh3ho0zlX9qqMCJ7wCObFMzYmhR1d7VDgnNxAAgQ10UcQaSoIW
+	 PDhICQQJ9Ov1B6wNlclHx1C8kYBMGCZntfYSLRVI3gwOTU7G3WCfOPbvfWl+Eou/Hj
+	 /VrOq3JnF9y67RDmWfTR2ZPEKR6Xf7O731e841UU=
+X-Pm-Submission-Id: 4gJPf65WVsz2Scpx
+From: Alexander Vassilevski <oss@vassilevski.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Alexander Vassilevski <oss@vassilevski.com>
+Subject: [PATCH v2] net: ethernet: ti: am65-cpsw-nuss: remove dead vid check in slave_add_vid()
+Date: Sun, 17 May 2026 08:16:11 -0700
+Message-ID: <20260517151611.393789-1-oss@vassilevski.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260515225715.3641804-1-oss@vassilevski.com>
+References: <20260515225715.3641804-1-oss@vassilevski.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260517084513.GA33515@unreal>
-X-Rspamd-Queue-Id: 23052561E5A
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 7580D561F43
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[vassilevski.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[vassilevski.com:s=protonmail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linux.ibm.com,linux.alibaba.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-288749-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288750-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linaro.org,ti.com,wanadoo.fr,vger.kernel.org,vassilevski.com];
+	DKIM_TRACE(0.00)[vassilevski.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
+	FROM_NEQ_ENVFROM(0.00)[oss@vassilevski.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:email,linaro.org:email]
 X-Rspamd-Action: no action
 
-On 2026-05-17 11:45:13, Leon Romanovsky wrote:
->On Sun, May 10, 2026 at 03:26:40PM -0700, Xiang Mei wrote:
->> The smc_msg_event tracepoint class, shared by smc_tx_sendmsg and
->> smc_rx_recvmsg, unconditionally dereferences smc->conn.lnk:
->> 
->> 	__string(name, smc->conn.lnk->ibname)
->
->My comment is not directly related to this patch, but it was triggered
->while reviewing it. The ibname should not be cached, as users can rename
->it through rdmatool or udev.
->
->For example, this function is racy:
->   552 static int smc_nl_handle_smcr_dev(struct smc_ib_device *smcibdev,
->   553                                   struct sk_buff *skb,
->   554                                   struct netlink_callback *cb)
->   555 {
->   ...
->   582         snprintf(smc_ibname, sizeof(smc_ibname), "%s", smcibdev->ibdev->name);
->
->Thanks
+am65_cpsw_nuss_ndo_slave_add_vid() returns early at the top with:
 
-Hi, Leon
+    if (!netif_running(ndev) || !vid)
+        return 0;
 
-OK, I'll submit a patch removing all the ibvdev->name in SMC.
+so vid is guaranteed to be non-zero in the rest of the function. The
+subsequent
 
-Best regards,
-Dust
+    if (!vid)
+        unreg_mcast = port_mask;
+
+is therefore unreachable. Drop the dead branch.
+
+With that branch gone, unreg_mcast is only ever its initializer value
+of zero, so drop the variable and pass 0 directly to
+cpsw_ale_vlan_add_modify().
+
+No functional change.
+
+Found by Smatch.
+
+Fixes: 7bcffde02152 ("net: ethernet: ti: am65-cpsw-nuss: restore vlan configuration while down/up")
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/kernel-janitors/aS_lhMwppbDHoEcX@stanley.mountain/
+Suggested-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+Signed-off-by: Alexander Vassilevski <oss@vassilevski.com>
+---
+I agree, Christophe.
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 77f59996a0..434a310808 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -302,7 +302,7 @@ static int am65_cpsw_nuss_ndo_slave_add_vid(struct net_device *ndev,
+ {
+ 	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
+ 	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+-	u32 port_mask, unreg_mcast = 0;
++	u32 port_mask;
+ 	int ret;
+ 
+ 	if (!common->is_emac_mode)
+@@ -318,7 +318,7 @@ static int am65_cpsw_nuss_ndo_slave_add_vid(struct net_device *ndev,
+ 	port_mask = BIT(port->port_id) | ALE_PORT_HOST;
+ 	dev_info(common->dev, "Adding vlan %d to vlan filter\n", vid);
+ 	ret = cpsw_ale_vlan_add_modify(common->ale, vid, port_mask,
+-				       unreg_mcast, port_mask, 0);
++				       0, port_mask, 0);
+ 
+ 	pm_runtime_put(common->dev);
+ 	return ret;
+-- 
+2.43.0
 
 
