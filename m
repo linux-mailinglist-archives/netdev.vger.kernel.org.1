@@ -1,366 +1,178 @@
-Return-Path: <netdev+bounces-288679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iByoA981CWrBNgQAu9opvQ
-	(envelope-from <netdev+bounces-288679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 05:28:31 +0200
+	id 8IvfA8w3CWohOQQAu9opvQ
+	(envelope-from <netdev+bounces-288680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 05:36:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F17D55F1C8
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 05:28:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A74655F1FE
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 05:36:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BED09301026B
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 03:28:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 13590300D173
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 03:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195892C0323;
-	Sun, 17 May 2026 03:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822AD280037;
+	Sun, 17 May 2026 03:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RKvstPBj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZlDspdIL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DDE70830
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 03:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F26B405C55
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 03:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778988507; cv=none; b=VCb3dpeTFzpVsElY5FP2HWC73G2RgKDiHFlzjzYvGmhQUKPC2sj1IdtpUp/ZioPLxAshcIWue4NHHKHYTmYqsah/+5qBtTm9mtryWIlrD/FZYnlGLMsof8uBsI5L+fSLIKvBOCqZOk6ObyJO2AmFd5yplQCmVt63uXU2ozDX9+U=
+	t=1778989001; cv=none; b=pav4R5fCA8U9BGZsJfNzwaWrK7eQPrRYoIrxTiymwmuBooBJBXDAxiU3Z0lxB8DGLGlQW5VGsUzP6+ahQdda5iUBSEUrx3kIefeq0L5A1tXOqs9MveQ3NAfq89+TrTK0sQ5mrR0MUrqD3f3UXfPL4Ch33Tes57rL0V6L82tPk2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778988507; c=relaxed/simple;
-	bh=GTnxUum3geF8r3cTA5Fys4lc9zubykXN/3Q9GM7bHZQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GTeYimzd68KmL1Oz6m3fUZUAUYzg3bmmSj6Ulgnix7md2SaAjVm70xFboS2jetslOF7Qk2n7/XYl9NIAa9NxtLoZT57+4oN3fI2RNSvGFnF7mUnOckPVrEC8ICZI+5LJeJWeafQGwnzkF9Oyh3Kvs2HLNTAc6F1hkPiYvjvgC1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RKvstPBj; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <1dbc6a9d-4933-4123-90d2-a2735f9d8f58@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778988492;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=azqQU+DGwZctWYveotI09InaMqZf929Gl8I+gPfhahY=;
-	b=RKvstPBjURmV6HdcJ67yff0oqXXO1W+vuc886SLPwdlyThWbBovmQ/u8df+lZko/bq36QG
-	H4nIFVs1AR0Qq4xRbIrKt5zt6MfQYy0p996gcKws8ayEL9Bs00XhUi4xHZBosRUfp7Egvj
-	9MVTrTDSWst9ovYDiON/dH7v0VO8fzg=
-Date: Sat, 16 May 2026 20:27:54 -0700
+	s=arc-20240116; t=1778989001; c=relaxed/simple;
+	bh=whH7887zyQvZA11L50ur5qZC+bE5FTEbc1kM9w0jpA8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uzsJCp+4QlGowl4Dfb4NEJV0BE4dGQBwjoqwKBwvd9rQrniHGlO8+WY4gAuPedhlSsERo9CvYS/ueLZPISwah0ATmHkS7TiCcB450zkHN1sCp7sbgr4OZm8GAkkqUUZ9obTpL0JDsPcqSk6PwKMbf4BbE4QRwEpM9Na9KV5E33M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZlDspdIL; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c6dd5b01e14so466408a12.0
+        for <netdev@vger.kernel.org>; Sat, 16 May 2026 20:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778989000; x=1779593800; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+qhnPe16QutqxQXlzcsyVZTSBMTfqcLNuKVINp5gDU=;
+        b=ZlDspdILyR3kihlV4kcu9KEnbdLBUEPrVvvoelPHIKUesT2OD5l0bNNugkZnVcbjFC
+         bEEeTmVNayhXoxYQKt56k50KnaDBL0DldKGW7a8m3Ak+1CHg5CWwIb3T8hOVbRsjkBPb
+         0htWgILvKZhIuW5b1mSZBo4KOy/rnewIcuMDR6+Hws0purVv+HyPlbayEGe4XQs7OTlW
+         Rv7t9nE0q2LMIGbjwg6Aa9uuHTyhs5K8QfIZpxOvAOTN2llQDjI6T4DuJnOBpTYopMbH
+         JS/9g9NqRg/HjIubIAmj1UlXFPiofAQNq4AcCjMjit8MZMmAlIOd5z/VChRL5XDHR80l
+         Njsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778989000; x=1779593800;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D+qhnPe16QutqxQXlzcsyVZTSBMTfqcLNuKVINp5gDU=;
+        b=OI5hYojnUTm6CORKOV8QfKGcizWVtCIzLV0mEYOVLHXLrLkmrAOCb0vSbFoLiCkWLt
+         +s2uTs603yUPw7+Mcapm32zpMSy+GcnBmihYWe3sGWXCCk9nznfolCuw6NXhLkc2aSj1
+         8YFL1WkTlU5byHoGmR8poUf300gaP4dniuoIVdeCCbzyNoTXP/Fxpkm4UfZw/1fa/q/P
+         LhoSePC449CID738UnWMNv1BfGWOrIo3ap/7Zohty1Pt87oWLpR/Z5nCTlknhAOVZXqv
+         rbT7E9kQisx5r8pUhB75IzrJ7nMpigy9+oYMdarDVt6CRejbUFnIK7SDDDogB/IT3YT7
+         3/Yg==
+X-Gm-Message-State: AOJu0YzGeEl2WAb90UegcvaNbsFwy2d6UAKbABkp0bRGIz3Y5SoKaETZ
+	AzWw2HEiLxlp4Ivycsow8eMksOZZwaP5GKkLRxgZ/RzvGC0tRy0IU0Xdl2PfLw==
+X-Gm-Gg: Acq92OHfoYywcjLzrEVvBRKaEJYkXsk7x7Plk4xwI1+kmnGbqokNBzPP4DOob1iGrJt
+	fRlHrInU74JqCQd6T8G4BjwFkIoa8bom4jYwwNrqm8KNcrHPoWYcofopJY3QpLe8PdkF9qqOuFK
+	MECUp8+tGY8HQV6MGf4nXJu7LSaQ/a1x7b62OQrQd5AeQztHabaA/d4IQku2CrQ0ReFwk4it8g3
+	H6VR/7YtN0fGt+LqpC49H4oy5yQMrMJHCe7OXZfqWTcWDrE+RjsiOGqEjd5LJWuJb6aH4pMucSv
+	ZXjjCmZbHUeKS+gyQu8VMePxMXiBHxyI5NO212jjyaNw/f3HZw7FZoFVAVpNmI4N2ATop36HIiL
+	En8aAh4Ui5rqLxV2JXi5Rmoy+aAwz1auZG91wECkrISFYqAH6wg8LltAjC88EuCELg3ihzc367Y
+	KE4ISQD6NdZ4lggnZ4X859QEL+rHvHZlOsUCXYaaBmP5rlqW7TSpQ1UIdzF8U1ZrfXsJYwUyA+3
+	pTvtrE5XrQYk4biqv/S7O2FUpT5rW65ITo=
+X-Received: by 2002:a05:6a00:3925:b0:838:29b3:9ed1 with SMTP id d2e1a72fcca58-83f33df85ecmr10195406b3a.41.1778988999295;
+        Sat, 16 May 2026 20:36:39 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f196647aasm9794224b3a.5.2026.05.16.20.36.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 May 2026 20:36:38 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: ibm: emac: Clear MAL descriptors without memset
+Date: Sat, 16 May 2026 20:36:21 -0700
+Message-ID: <20260517033621.1839397-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RDMA v2] RDMA/rxe: add mutual exclusion in rxe_net_del()
-To: Kuniyuki Iwashima <kuniyu@google.com>, "Yanjun.Zhu" <yanjun.zhu@linux.dev>
-Cc: Edward Adam Davis <eadavis@qq.com>, akpm@linux-foundation.org,
- arjan@linux.intel.com, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, hdanton@sina.com, horms@kernel.org, jgg@ziepe.ca,
- kuba@kernel.org, leon@kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com
-References: <tencent_0106C0D2EA464109986EE86EF40CB5E7D406@qq.com>
- <tencent_330636464A367423778966A63DD1360E9609@qq.com>
- <13bc2e56-ea61-4cde-896f-c10636b29e9d@linux.dev>
- <CAAVpQUB6eRRRpapTxXmidO4ADtFc-ZBA+zwfPFb4dyX55UD4JQ@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <CAAVpQUB6eRRRpapTxXmidO4ADtFc-ZBA+zwfPFb4dyX55UD4JQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 6F17D55F1C8
+X-Rspamd-Queue-Id: 6A74655F1FE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288679-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[qq.com,linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288680-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qq.com:email,linux.dev:email,linux.dev:mid,linux.dev:dkim,syzkaller.appspot.com:url,appspotmail.com:email]
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+Clear MAL descriptor rings with explicit field stores instead of
+memset().  The descriptor rings are carved from MAL coherent DMA memory,
+which may be mapped uncached on 32-bit powerpc.  The optimized memset()
+path can use dcbz there and trigger an alignment warning.
 
-在 2026/5/16 19:15, Kuniyuki Iwashima 写道:
-> On Sat, May 16, 2026 at 4:40 PM Yanjun.Zhu <yanjun.zhu@linux.dev> wrote:
->>
->> On 5/16/26 7:00 AM, Edward Adam Davis wrote:
->>> We must serialize calls to rxe_net_del() or risk a crash as syzbot
->>> reported:
->>>
->>> KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
->>> Call Trace:
->>>    udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
->>>    rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
->>>    rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
->>>    rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
->>>    rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
->>>
->>> Jason Gunthorpe suggest placing the lock within rxe to protect its racy
->>> implementation of rxe_net_del(), which looks like it is possibly also
->>> triggered by NETDEV_UNREGISTER.
->>>
->>> The patch addressing this issue in nldev_dellink() has already been
->>> applied(0b28000b64f4); however, since the fix has now been relocated
->>> to rxe, the corresponding remedial code in nldev has been removed.
->>>
->>> Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and destruction per net namespace")
->>> Fixes: 0b28000b64f4 ("RDMA/nldev: Add mutual exclusion in nldev_dellink()")
->>> Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
->>> Closes: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
->>> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
->>> ---
->>> v1 -> v2: serialize calls to rxe net del
->>>
->>>    drivers/infiniband/core/nldev.c     | 4 ----
->>>    drivers/infiniband/sw/rxe/rxe_net.c | 7 ++++++-
->>>    2 files changed, 6 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
->>> index 3cb3cb7629fe..96c745d5bac4 100644
->>> --- a/drivers/infiniband/core/nldev.c
->>> +++ b/drivers/infiniband/core/nldev.c
->>> @@ -1816,8 +1816,6 @@ static int nldev_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
->>>        return err;
->>>    }
->>>
->>> -static DEFINE_MUTEX(nldev_dellink_mutex);
->>> -
->>>    static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
->>>                          struct netlink_ext_ack *extack)
->>>    {
->>> @@ -1848,9 +1846,7 @@ static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
->>>         * implicitly scoped to the driver supporting dynamic link deletion like RXE.
->>>         */
->>>        if (device->link_ops && device->link_ops->dellink) {
->>> -             mutex_lock(&nldev_dellink_mutex);
->>>                err = device->link_ops->dellink(device);
->>> -             mutex_unlock(&nldev_dellink_mutex);
->>>                if (err)
->>>                        return err;
->>>        }
->>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
->>> index 50a2cb5405e2..92847e955ca2 100644
->>> --- a/drivers/infiniband/sw/rxe/rxe_net.c
->>> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
->>> @@ -642,6 +642,8 @@ static void rxe_sock_put(struct sock *sk,
->>>        }
->>>    }
->>>
->> I read this commit carefully. There are two paths that can invoke
->> rxe_net_del().
->>
->> One is through the rdma link del xxx command, while the other is through
->> the netdevice notification chain.
->>
->> In the netdevice notification chain path, rtnl_lock is already held, and
->> rxe_net_del() is called under that lock.
->>
->> However, in the rdma link del xxx path, no rtnl_lock is taken.
->>
->> Because of this, I would like to use the existing rtnl_lock to serialize
->> calls to rxe_net_del().
-> -1 for this.
->
-> It's a global mutex and heavily contended because many
-> components use it without much care.  We are working
-> to reduce the RTNL pressure for years by converting such
-> users with a dedicated lock or per-netns RTNL mutex.
->
-> RTNL is not needed here at all, so please use a dedicated lock.
+The skb tracking arrays remain ordinary CPU memory and still use memset().
 
-Thanks a lot for your review. I think the following commit can fix this 
-problem.
-
-Please review.
-
- From 80525f5b7fb0af18b9759cbde0237aabb76158cc Mon Sep 17 00:00:00 2001
-
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-Date: Sat, 16 May 2026 22:27:35 +0200
-Subject: [PATCH 1/1] RDMA/rxe: Fix Use-After-Free problem in rxe_net_del
-
-syzbot reported a general protection fault (KASAN: null-ptr-deref) in
-kernel_sock_shutdown() called during the software RoCE (rxe) link
-deletion path (rxe_dellink -> rxe_net_del).
-
-The root cause is a TOCTOU (Time-of-Check to Time-of-Use) race condition
-in rxe_net_del(). Previously, the function fetched the socket pointer
-via rxe_ns_pernet_sk4/6() outside the critical section, and then
-acquired the lock to release it via rxe_sock_put().
-
-In a highly concurrent teardown environment, another thread could close
-and clear the pernet socket after it was fetched but before the lock
-was acquired. This causes rxe_sock_put() to operate on a dangling or
-already cleared socket pointer, leading to a NULL pointer dereference
-when kernel_sock_shutdown() attempts to access sock->sk.
-
-Fix this by introducing a dedicated, per-device mutex 'release_lock'
-and extending its scope. The socket pointers are now fetched, checked,
-and released entirely within the same locked critical section. This
-ensures the atomicity of the socket lookup and teardown sequence.
-
-Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
-Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and 
-destruction per net namespace")
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+Assisted-by: Codex:GPT-5.5
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
-  drivers/infiniband/sw/rxe/rxe.c       | 2 ++
-  drivers/infiniband/sw/rxe/rxe_net.c   | 4 ++++
-  drivers/infiniband/sw/rxe/rxe_verbs.h | 1 +
-  3 files changed, 7 insertions(+)
+ drivers/net/ethernet/ibm/emac/core.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/infiniband/sw/rxe/rxe.c 
-b/drivers/infiniband/sw/rxe/rxe.c
-index b0714f9abe3d..46967ecdaf7d 100644
---- a/drivers/infiniband/sw/rxe/rxe.c
-+++ b/drivers/infiniband/sw/rxe/rxe.c
-@@ -34,6 +34,7 @@ void rxe_dealloc(struct ib_device *ib_dev)
-         WARN_ON(!RB_EMPTY_ROOT(&rxe->mcg_tree));
-
-         mutex_destroy(&rxe->usdev_lock);
-+       mutex_destroy(&rxe->release_lock);
-  }
-
-  static const struct ib_device_ops rxe_ib_dev_odp_ops = {
-@@ -186,6 +187,7 @@ static void rxe_init(struct rxe_dev *rxe, struct 
-net_device *ndev)
-         rxe->mcg_tree = RB_ROOT;
-
-         mutex_init(&rxe->usdev_lock);
-+       mutex_init(&rxe->release_lock);
-  }
-
-  void rxe_set_mtu(struct rxe_dev *rxe, unsigned int ndev_mtu)
-diff --git a/drivers/infiniband/sw/rxe/rxe_net.c 
-b/drivers/infiniband/sw/rxe/rxe_net.c
-index 50a2cb5405e2..c3b188538540 100644
---- a/drivers/infiniband/sw/rxe/rxe_net.c
-+++ b/drivers/infiniband/sw/rxe/rxe_net.c
-@@ -655,6 +655,8 @@ void rxe_net_del(struct ib_device *dev)
-
-         net = dev_net(ndev);
-
-+       mutex_lock(&rxe->release_lock);
+diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
+index 1fd7cb50c568..7ab5c944f5de 100644
+--- a/drivers/net/ethernet/ibm/emac/core.c
++++ b/drivers/net/ethernet/ibm/emac/core.c
+@@ -1161,6 +1161,17 @@ static void emac_clean_rx_ring(struct emac_instance *dev)
+ 	}
+ }
+ 
++static void emac_clear_mal_desc(struct mal_descriptor *desc, int count)
++{
++	int i;
 +
-         sk = rxe_ns_pernet_sk4(net);
-         if (sk)
-                 rxe_sock_put(sk, rxe_ns_pernet_set_sk4, net);
-@@ -663,6 +665,8 @@ void rxe_net_del(struct ib_device *dev)
-         if (sk)
-                 rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
-
-+       mutex_unlock(&rxe->release_lock);
++	for (i = 0; i < count; i++) {
++		desc[i].ctrl = 0;
++		desc[i].data_len = 0;
++		desc[i].data_ptr = 0;
++	}
++}
 +
-         dev_put(ndev);
-  }
-
-diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.h 
-b/drivers/infiniband/sw/rxe/rxe_verbs.h
-index d92f80d16f78..3f54aa0a4356 100644
---- a/drivers/infiniband/sw/rxe/rxe_verbs.h
-+++ b/drivers/infiniband/sw/rxe/rxe_verbs.h
-@@ -422,6 +422,7 @@ struct rxe_dev {
-         int                     max_ucontext;
-         int                     max_inline_data;
-         struct mutex            usdev_lock;
-+       struct mutex            release_lock;
-
-         char                    raw_gid[ETH_ALEN];
-
---
-2.43.0
-
->
->> My proposed commit is shown below. I am not sure whether it fully
->> resolves the problem.
->>
->> diff --git a/drivers/infiniband/sw/rxe/rxe.c
->> b/drivers/infiniband/sw/rxe/rxe.c
->> index b0714f9abe3d..84266dc416c4 100644
->> --- a/drivers/infiniband/sw/rxe/rxe.c
->> +++ b/drivers/infiniband/sw/rxe/rxe.c
->> @@ -251,7 +251,9 @@ static int rxe_newlink(const char *ibdev_name,
->> struct net_device *ndev)
->>
->>    static int rxe_dellink(struct ib_device *dev)
->>    {
->> +       rtnl_lock();
->>           rxe_net_del(dev);
->> +       rtnl_unlock();
->>
->>           return 0;
->>    }
->> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c
->> b/drivers/infiniband/sw/rxe/rxe_net.c
->> index 50a2cb5405e2..ac53ea73996d 100644
->> --- a/drivers/infiniband/sw/rxe/rxe_net.c
->> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
->> @@ -649,6 +649,8 @@ void rxe_net_del(struct ib_device *dev)
->>           struct sock *sk;
->>           struct net *net;
->>
->> +       ASSERT_RTNL();
->> +
->>           ndev = rxe_ib_device_get_netdev(&rxe->ib_dev);
->>           if (!ndev)
->>                   return;
->>
->> Zhu Yanjun
->>
->>> +static DEFINE_MUTEX(rxe_net_del_mutex);
->>> +
->>>    void rxe_net_del(struct ib_device *dev)
->>>    {
->>>        struct rxe_dev *rxe = container_of(dev, struct rxe_dev, ib_dev);
->>> @@ -649,9 +651,10 @@ void rxe_net_del(struct ib_device *dev)
->>>        struct sock *sk;
->>>        struct net *net;
->>>
->>> +     mutex_lock(&rxe_net_del_mutex);
->>>        ndev = rxe_ib_device_get_netdev(&rxe->ib_dev);
->>>        if (!ndev)
->>> -             return;
->>> +             goto out;
->>>
->>>        net = dev_net(ndev);
->>>
->>> @@ -664,6 +667,8 @@ void rxe_net_del(struct ib_device *dev)
->>>                rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
->>>
->>>        dev_put(ndev);
->>> +out:
->>> +     mutex_unlock(&rxe_net_del_mutex);
->>>    }
->>>
->>>    static void rxe_port_event(struct rxe_dev *rxe,
-
+ static int
+ __emac_prepare_rx_skb(struct sk_buff *skb, struct emac_instance *dev, int slot)
+ {
+@@ -3121,8 +3132,8 @@ static int emac_probe(struct platform_device *ofdev)
+ 	DBG(dev, "rx_desc %p" NL, dev->rx_desc);
+ 
+ 	/* Clean rings */
+-	memset(dev->tx_desc, 0, NUM_TX_BUFF * sizeof(struct mal_descriptor));
+-	memset(dev->rx_desc, 0, NUM_RX_BUFF * sizeof(struct mal_descriptor));
++	emac_clear_mal_desc(dev->tx_desc, NUM_TX_BUFF);
++	emac_clear_mal_desc(dev->rx_desc, NUM_RX_BUFF);
+ 	memset(dev->tx_skb, 0, NUM_TX_BUFF * sizeof(struct sk_buff *));
+ 	memset(dev->rx_skb, 0, NUM_RX_BUFF * sizeof(struct sk_buff *));
+ 
 -- 
-Best Regards,
-Yanjun.Zhu
+2.54.0
 
 
