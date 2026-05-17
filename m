@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-288704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288705-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKzOELd9CWqVcQQAu9opvQ
-	(envelope-from <netdev+bounces-288704-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:35:03 +0200
+	id IGbjGOV9CWqVcQQAu9opvQ
+	(envelope-from <netdev+bounces-288705-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:35:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AB5255FFE2
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:35:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC0A055FFF0
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:35:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E5CF5300A119
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:34:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7CE01300CC25
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90EC3346795;
-	Sun, 17 May 2026 08:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562C13469E0;
+	Sun, 17 May 2026 08:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cytnjjUS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gqF4JxpN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFCE346784
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 08:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089C333F8C6
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 08:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779006863; cv=none; b=KeGiZZO7gTKX3XG8J9vSdImo7uxqItuRvZd3xvVqfnHNaRvK6TF0/1P11g2aNxpQGAuX8ctpUXfrwPSvdlIjhOdnC3DXqkYJORjzvgOtwiAROhcCFX/aTej3VzOT0XC2YCPtirNZ+HUDvqgVSu6SyWLX63pqTJf5N3LjqMCKlXM=
+	t=1779006869; cv=none; b=i2AvBgYR/5c2cMFIDuhnps8WOG31Vj2TU6KXibPYh+AyWb903wW/S3ffqMnFnsZ9UceVBLnjaWFm8hDKulavORR3nfp5WbNoauIX3DYD9Ar4/QJ48KfrCQcepxFoa/buEPpEARER9pSR7OVdsZMYDunywdCe25uACnyxCLfewqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779006863; c=relaxed/simple;
-	bh=feLLfQFvpoIClWFfZ2Qy7Vj9jKgNx4+zS4dEVQfjxm4=;
+	s=arc-20240116; t=1779006869; c=relaxed/simple;
+	bh=tNu1q+k3kNpMkU+h1HzMzpn06Pa3jAV0Kk3zKRy+wQ0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UvelTknAZkVV+DvK/N9HIu4REu/H8t4xT9cZco/GD36U1q6AcwinDJ4m3EVRtXGhBxat5OSunpXAivHtSB5/jOcEmGyW3dxb2IAhsHdIK6BqOn64ahsq78HylRWeKNMmFC7+ebNttBrm0gslYvsx1WlBQn9GbwJKMQefaYGwlgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cytnjjUS; arc=none smtp.client-ip=209.85.167.174
+	 MIME-Version; b=YuLyZ31KGHvnYDUNK5njJwd6EwwIL8m5hz71/3jNscAFz7z9whB83CPN7bMUh0nYOwFqNOPOSUrE7XQP5xiS8NtcQGlADFxW2cbKmHC9KmgF0Ht3PspMlUkSbUqbGNtZIbpCamGEy6z/TZPD5ilPHS4zhFHbm0g6eDrcrhdmL9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gqF4JxpN; arc=none smtp.client-ip=209.85.210.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-47c6f914617so585749b6e.1
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 01:34:21 -0700 (PDT)
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7dea20cf21aso1504270a34.1
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 01:34:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779006861; x=1779611661; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779006866; x=1779611666; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SeQkqDrAPMYn0zYuhzYdu377fHXEuEM6zjwZuagDHgQ=;
-        b=cytnjjUSyuvVimvJfns9Vm9BOHOOdLMU7BAQ2VPWiQhlVatdZVbfO7y+9KVaefuykJ
-         Wg1xGjeUvazdQiEmNUohd/i3mUwxLkPYTtUcZuTK0I1oUqoBMOjEm6GD5n0Tjymm7IC6
-         rMpH5DuLTd4Q49TVZKNWzR6o7hlucv1nzc+Be6KdIQoUvnTDt2Fah5Om00vnFd3fE0j0
-         eS7JjVLmsNMU9lvItA2ffVXmHwrrWn6zmn7hC0E+78TUhxIdVnOEgf8polOXCGue1NxR
-         Z9BP4hsNw+ZQgfSqZsdXJg6vvYaEfuHXiQ4T/Tx0uigA3IdBzhPB79gtpgipKscyv0HL
-         30Bg==
+        bh=EQ7T24h6C2KWf71uTZiV7KRUU4xs5Ab9gDHIZEPT4Og=;
+        b=gqF4JxpN36FjilYHp0SjM6NYMkiXSw89XN9OVqWr30PVMqx/w/Y2ymiQ7hFGl8TsIq
+         Gmjm4HtLzR54WDdTDFdpLizIKX83b5HxRl6Sxz0f7h1/fAlVe+wWPMkz+8UMoAiEktIe
+         Wu91znXqkErvKj/dTN7/fHyPoeQsP95Bh7nOSaUTniEAH/+gZdj0+8B8Qt05+D/pFpDq
+         +tnxYnqAEORqVHZbHB0hWiz7FmQBynLdSDGYF14mjaY18hBbZDIRI8qgmIpUJhqyFjYA
+         hw00JV5IX3F80cFPzpjRXjURtP3S7pLwD9/dVR/kGgRT/ZHUsRWjfQM8yiB5tuRH1uDj
+         IniA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779006861; x=1779611661;
+        d=1e100.net; s=20251104; t=1779006866; x=1779611666;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=SeQkqDrAPMYn0zYuhzYdu377fHXEuEM6zjwZuagDHgQ=;
-        b=ftrdJehaXfr1KTJD/+0Pwn/wHckszZqm78C0z8Ilplqv2GOkh75pA2cNyrIjgY8Awy
-         NRxd3D9VPjuJ98iDETIcITKBRdzal+sGsuDLC6wEtm30K2nprMTt/0KahhI0Yl9LZ3ni
-         Xy18lW30yPgCnnBJ41ys9yHZm02iTT0c3jSqtgPj/WRh1+qk9Ly0fkBMLRPRsdaA4rLH
-         aYWJ1/fCmQDCKkgnOwg5V1l9WPcKeuVKSTx9uCLVQu4uM6z1goeoLqcKn1FJjsAjarOj
-         Pl/XXhuyeT6UJQ0tnaSIziRAuAp8bcwLXzE77CO7T94pwbdLFR28Yp8cY043JjASrGEL
-         6fBA==
-X-Gm-Message-State: AOJu0YzZW6oxd7dZ8feMYyr2fN4lmShJ7IRhGTvk2shvMP1JSPltYZER
-	Lgu1frCeMTUcvNSqV2+7meG102QvELobRRgyCFqyFwLEI37ySBzjD11kapJK9DW+RZQ=
-X-Gm-Gg: Acq92OEj1dZTpiGX8YHKyr4NIDeHP79LC1C2JmzRrwFxf3tmMRewq2ENYPkkqCFgdKV
-	HhzhegjEzQajqgwLPe0ltufZo2svMN8WQq/OLbcRV+blOFBiAbwtvrQOo8gm4VFkKKZHKVaaZZY
-	rh/XfnVEwnHb6S5iFz1zextjbalZM6ZjkgAqbm910N+TWSudLORisoyY673X+/wDMf6iP7Je63b
-	sfjz9HHOapNYPV5tVhnoTDvpzel8NrxlL1Jq0AQK/8JLRQ8nKsZqVtJYc3kcFvFghqQxTfdsbTt
-	kI5DdtwrNRCR9cy9Pw2TTK+UWeU8qVpsfAxqpQqB1PQwI1Rb5+NS3lwN3AtpWJp5+f93NRrFtpp
-	7/MRfOwOA4xFVCnGWwaqAcEF7hXfyyRmkiBX0Ay+uo3d8a9F/2WnuNjvHmyz4+doV1p7ZRnciie
-	Bak8aMDG/fRMKYPvM=
-X-Received: by 2002:a05:6808:e412:b0:467:ee:7a2f with SMTP id 5614622812f47-482e577d4f5mr5216362b6e.28.1779006860619;
-        Sun, 17 May 2026 01:34:20 -0700 (PDT)
+        bh=EQ7T24h6C2KWf71uTZiV7KRUU4xs5Ab9gDHIZEPT4Og=;
+        b=TvbCu4QVk64mdg4tGvbVNbz9w1YpS0RVGqh96pceJA7mQcpd9h1x2x2/pEfMxcK5cm
+         DJyoQABv9svfeEksxAN1EAa4RR7JPX6LzgVaMkFECZUrlHjIU0j70LSZrYQMf8wSYkff
+         tz71NggQpKJ4U/0bO88diS8MXu4JcJcSI2TYxA8oQFNx/odZR452c+3WmUDxagAuD+Xx
+         XnVXpTG9WJssjm0a02LdsQVh0mMNMAlLAVniUHjtBaB6g31bQRfDBAW1gAX3Szaw9+oa
+         ZvrFfGJP6L4FeMkhnEidZrHscMrZu75ruYPsQmB5sLjF+keN9lrQmvZ2a+yuyCw59kVH
+         xMEw==
+X-Gm-Message-State: AOJu0YwVBPd+VpKtOxQ97p/tEgzCZZdRVA/q2dIlGCjftfvn57FOgTkR
+	dRMbafNitxNzNkWozYBzKN+5G3DG4vWy1XwNYIdLqObGLsul3LQHDxXYEr+nluM1Irk=
+X-Gm-Gg: Acq92OEXI6HajExYhIIyoSrO6U5B1NlR1ZRXEIO754DRJaH3wWPXZK5a8hD7swW+Q6M
+	lPOscBx1/47Vf3/MmtaaZiXS0qTQJcv/rpsby4GlFO8oI++Hiq5AYY7JTB/yRmiLTGT7z548B5/
+	6rXDq8a7Ta0T2BDLMurDQIYQN0T1wdkg2qDxvG95kF1mbvdTVrezTC9JvBAGdY3xCuxZpqYHPZf
+	GUr7a2UODskOMo5bwabUZtfkRqTCFnnEMQeL238B5O/Zffr7tQYsMqDe3LYiZ//RIi0Ek2D3vLJ
+	bJENoIMv7br6nGb3b3wg6bQz4sZyEeu8ugFWoAMZ0k+/g1DPb+JyydpDUi+Dm1gAUVOXD/P3GNY
+	OtxCHZJ/n/kqFPY2/1pBPo1aSvdm0LF7Tz3yRsbtZlawovZcy+HTMJ2we/Y/lZMcDt0L4AJbnHt
+	uYEg8eauahSbrA9uoPA6OiNv5DiA==
+X-Received: by 2002:a05:6830:2801:b0:7dc:cd0b:58bc with SMTP id 46e09a7af769-7e4ea04a33fmr7512068a34.7.1779006866584;
+        Sun, 17 May 2026 01:34:26 -0700 (PDT)
 Received: from houminxi ([72.244.37.221])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e55bbd0bd6sm5345191a34.13.2026.05.17.01.34.14
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e55bbd0bd6sm5345191a34.13.2026.05.17.01.34.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 01:34:19 -0700 (PDT)
+        Sun, 17 May 2026 01:34:25 -0700 (PDT)
 From: Minxi Hou <houminxi@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Donald Hunter <donald.hunter@gmail.com>,
@@ -86,9 +86,9 @@ Cc: Donald Hunter <donald.hunter@gmail.com>,
 	Aaron Conole <aconole@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH 1/2] netlink: specs: add OVS packet family specification
-Date: Sun, 17 May 2026 16:33:57 +0800
-Message-ID: <20260517083358.2088599-2-houminxi@gmail.com>
+Subject: [PATCH 2/2] tools: ynl: add unicast notification receive support
+Date: Sun, 17 May 2026 16:33:58 +0800
+Message-ID: <20260517083358.2088599-3-houminxi@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260517083358.2088599-1-houminxi@gmail.com>
 References: <20260517083358.2088599-1-houminxi@gmail.com>
@@ -99,7 +99,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9AB5255FFE2
+X-Rspamd-Queue-Id: CC0A055FFF0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -115,7 +115,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288704-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288705-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
@@ -133,170 +133,37 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Add YAML netlink spec for the OVS_PACKET_FAMILY (ovs_packet).
-This completes the set of OVS genetlink family specs (ovs_datapath,
-ovs_flow, ovs_vport already exist).
+Add ntf_listen() method to YnlFamily for binding the netlink
+socket without joining a multicast group. This enables receiving
+unicast notifications through the existing poll_ntf/check_ntf
+path.
 
-The spec defines three operations: MISS (event), ACTION (event),
-and EXECUTE (do). MISS and ACTION are kernel-to-userspace upcalls
-sent via genlmsg_unicast(); EXECUTE is the only registered genl
-operation.
-
-Key, actions, and egress-tun-key attributes are typed as binary
-rather than nest because the nested attribute definitions belong
-to the ovs_flow spec and cross-spec references are not supported
-by the YNL framework.
+The OVS packet family sends MISS and ACTION upcalls via
+genlmsg_unicast() to a per-vport PID rather than through a
+multicast group. The existing ntf_subscribe() couples bind()
+with setsockopt(ADD_MEMBERSHIP), which does not fit the unicast
+case. ntf_listen() provides the bind-only alternative.
 
 Signed-off-by: Minxi Hou <houminxi@gmail.com>
 ---
- Documentation/netlink/specs/ovs_packet.yaml | 138 ++++++++++++++++++++
- 1 file changed, 138 insertions(+)
- create mode 100644 Documentation/netlink/specs/ovs_packet.yaml
+ tools/net/ynl/pyynl/lib/ynl.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ovs_packet.yaml b/Documentation/netlink/specs/ovs_packet.yaml
-new file mode 100644
-index 000000000000..7ef14b68df4e
---- /dev/null
-+++ b/Documentation/netlink/specs/ovs_packet.yaml
-@@ -0,0 +1,138 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
+index f63c6f828735..8f526c683f99 100644
+--- a/tools/net/ynl/pyynl/lib/ynl.py
++++ b/tools/net/ynl/pyynl/lib/ynl.py
+@@ -748,6 +748,10 @@ class YnlFamily(SpecFamily):
+         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
+                              mcast_id)
+ 
++    def ntf_listen(self):
++        """Bind socket for receiving unicast notifications."""
++        self.sock.bind((0, 0))
 +
-+name: ovs_packet
-+version: 1
-+protocol: genetlink-legacy
-+uapi-header: linux/openvswitch.h
-+
-+doc: |
-+  OVS packet execution over generic netlink.
-+
-+  Only OVS_PACKET_CMD_EXECUTE is exposed as a genl operation.
-+  OVS_PACKET_CMD_MISS and OVS_PACKET_CMD_ACTION are kernel-to-userspace
-+  upcalls sent via genlmsg_unicast() to the vport's upcall_pid and have
-+  no associated genl_ops or multicast group.
-+
-+  Several attributes in the attribute set (userdata, egress-tun-key, len)
-+  exist for the upcall path and are not used by the EXECUTE operation.
-+  For EXECUTE, packet, key, and actions are mandatory (kernel returns
-+  -EINVAL without them).
-+
-+definitions:
-+  -
-+    name: ovs-header
-+    type: struct
-+    members:
-+      -
-+        name: dp-ifindex
-+        type: u32
-+
-+attribute-sets:
-+  -
-+    name: packet
-+    name-prefix: ovs-packet-attr-
-+    enum-name: ovs-packet-attrs
-+    attributes:
-+      -
-+        name: packet
-+        type: binary
-+        doc: Packet data, from the start of the Ethernet header.
-+        checks:
-+          min-len: 14
-+      -
-+        name: key
-+        type: binary
-+        doc: |
-+          Nested OVS_KEY_ATTR_* attributes, extracted flow key.
-+          Defined as binary because the key attribute-set belongs to the
-+          ovs_flow family spec; cross-spec references are not supported.
-+      -
-+        name: actions
-+        type: binary
-+        doc: |
-+          Nested OVS_ACTION_ATTR_* attributes.
-+          Defined as binary for the same reason as key.
-+      -
-+        name: userdata
-+        type: binary
-+        doc: Opaque userspace cookie from OVS_USERSPACE_ATTR_USERDATA.
-+      -
-+        name: egress-tun-key
-+        type: binary
-+        doc: Nested OVS_TUNNEL_KEY_ATTR_* for output tunnel metadata.
-+      -
-+        name: unused1
-+        type: unused
-+      -
-+        name: unused2
-+        type: unused
-+      -
-+        name: probe
-+        type: flag
-+        doc: Packet operation is a feature probe, error logging suppressed.
-+      -
-+        name: mru
-+        type: u16
-+        doc: Maximum received IP fragment size.
-+      -
-+        name: len
-+        type: u32
-+        doc: Packet size before truncation.
-+      -
-+        name: hash
-+        type: u64
-+        doc: Packet hash, low 32 bits are skb hash, upper bits are flags.
-+      -
-+        name: upcall-pid
-+        type: u32
-+        doc: Netlink PID to use for upcalls during EXECUTE processing.
-+
-+operations:
-+  fixed-header: ovs-header
-+  name-prefix: ovs-packet-cmd-
-+  list:
-+    -
-+      name: miss
-+      doc: Notify userspace of a flow table miss for a received packet.
-+      value: 1
-+      attribute-set: packet
-+      event:
-+        attributes:
-+          - packet
-+          - key
-+          - userdata
-+          - actions
-+          - egress-tun-key
-+          - mru
-+          - len
-+          - hash
-+    -
-+      name: action
-+      doc: Notify userspace as requested by an OVS_ACTION_ATTR_USERSPACE action.
-+      value: 2
-+      attribute-set: packet
-+      event:
-+        attributes:
-+          - packet
-+          - key
-+          - userdata
-+          - actions
-+          - egress-tun-key
-+          - mru
-+          - len
-+          - hash
-+    -
-+      name: execute
-+      doc: Apply actions to a packet.
-+      value: 3
-+      attribute-set: packet
-+      do:
-+        request:
-+          attributes:
-+            - packet
-+            - key
-+            - actions
-+            - probe
-+            - mru
-+            - hash
-+            - upcall-pid
+     def set_recv_dbg(self, enabled):
+         self._recv_dbg = enabled
+ 
 -- 
 2.53.0
 
