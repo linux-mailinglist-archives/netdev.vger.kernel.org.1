@@ -1,150 +1,181 @@
-Return-Path: <netdev+bounces-288758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288759-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eIQUMET6CWrivgQAu9opvQ
-	(envelope-from <netdev+bounces-288758-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 19:26:28 +0200
+	id qCNFEsr9CWqqvwQAu9opvQ
+	(envelope-from <netdev+bounces-288759-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 19:41:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBAF56283B
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 19:26:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6D46562B1B
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 19:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3AE4300651D
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:26:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 060A9300FED2
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7C93C584B;
-	Sun, 17 May 2026 17:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F99355F22;
+	Sun, 17 May 2026 17:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7W4X1Qe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H60X56wj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76383BE645;
-	Sun, 17 May 2026 17:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779038785; cv=none; b=odaaZfbweVCdFCN7uUHon1yUtDyCFOi4Hn8QpTGeP6FZ+Is6ESFbgQPKxwdnY8iWNLZcaXi9/3VZMTA0EFDk+Yt5wktMAZbMmGKPQ1qJILUXUA+YVRwlYLhwvJ4u9rSZbwcPgnEKVFYZviAqnrznRcXlz4MEjAB0EaLzbJxDerk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779038785; c=relaxed/simple;
-	bh=HIHlJVY+X/4zYUaiWh6XBt5tiLGu6dLW0o8MzgbGmBM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i8YpBGf6JtuLvH5NLOsx0mpCeld8FA1maji0Bm1Bd1niSJNlEEFem1MgSkGxdeqkiyViL5ottQEK3KkAz4xBzvd5tIw6R8fJc/TNlSNtKGMX1DjLADj9IgTF2EiiiSlG7GTzWrY8Ut9V5tJAZOj17YcJzf5PfbGKHMdguGGl7rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7W4X1Qe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 018B0C2BCB0;
-	Sun, 17 May 2026 17:26:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779038785;
-	bh=HIHlJVY+X/4zYUaiWh6XBt5tiLGu6dLW0o8MzgbGmBM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=p7W4X1QeCLlOrnNrSAjbPbsPx0GhpcleYJ/uoVC02U7BlwYVB7eyKduo6DGk+fH+l
-	 tnj0Bn37t5JAMWqmYRl14/trjz+ykibsz+kyQ2petauXXTa1CVLZdmf2o0ANvBm/dC
-	 /50Vnubnrfp4b8KCFEYPTgYvPmlB1URSOYTp3kE/Jr4ouP6flNx54uBkxTzdvhkbV4
-	 ENbES8NjSWQMiVuLHflJ+O3cyvojYMC2QSneCnSFXyT1GoLT8IOY303okFhCvVbZcb
-	 mTF50ApIJxEM2FuL+G1gIzXNQgI3+8yE2HC759UlNms8+uh/ErAa5FW1g6b1174QOH
-	 4a54NdF/udUEA==
-Message-ID: <b978603c-4878-4eee-adc1-290e905fe768@kernel.org>
-Date: Sun, 17 May 2026 19:26:21 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670BF34F49F
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 17:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779039479; cv=pass; b=KHO7y6mONp/2XOnj8bbk+vxvXqM9p7YUGo78/vI88lOAmJOaE6y+VAtmGtH+l0oO7ZnYtVf0TTer0WU9aGGz2jZsWHzxYz7/jYI2gtUMVI5MSawUkmk95Zef25yS2k6o60zIv3+AgW32RBog8yw2KxfT3veS9e/irGuMT8+18OQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779039479; c=relaxed/simple;
+	bh=YZ5Ke/sEGFabuzBfVldOLJOcizsrW/Nl7bivRjdo/zU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Uf5+6fklcY8SBnyl6GzfEB8ddcPKtuqGRdpPrVSciyDB4cCCyzsVUCsPfNB5EmXnG3QYR34HpPjUS5XXX8slXAZN54iN/lAD4V8lsvxRePXcJs52bofbC/o1bqfJ7D4IDtl9Mug82ENGL9UFvjFwV+/uCwh3j3I5k5TNSJXyiB8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H60X56wj; arc=pass smtp.client-ip=209.85.160.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-40ea36b56b7so1243076fac.3
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 10:37:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779039477; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Au0Io33nYlhCH/ONQfn66Am4d+kohIGUkPCT7RL9l3918LYa1IUSRo4DKisfDJgcYu
+         kRJN/tDHRC8BU/atUD/38wUzur9+Erb+SRTHT/bdlfizbCMlp3h2ldqJUr4Swm020TEr
+         3krGU83sSsIwxX7GXgOx4wlVV2Gyr8bnyY1FmXog/NubXNZwfAvEoKFNgMMgeVgziIP3
+         qgTxPiX31OSrlCaqdhgEMwpdnDGFylqB9jD4a4tqNOe3t3BZ07EEWOaMM/st+tSYzRUC
+         9SBVYv8OggXDqwyaeWanCBMi+icw9GsH6AKcgTg9VuHYUf78pwS6ExjriR5FujcC4yQT
+         miqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=tlVlaFBAIkcv0HbZfkTnOaqrfVsvTeI+ScRy+0SZE24=;
+        fh=Iqnbhir0Sncs9rKNH1rME+QBScsuavQT7RGtJVIeAzY=;
+        b=cgwTrOquyr40ysivNj7WbrjnjOxZGJEMm6dqzrMW74SE7ptKOoad/mKaUPlfumTVci
+         yr/5BM1wt3gabcU9z9kfPQQyIWN8XZ2J5kEW9B/AmQ9IhLAvjaGdOfsladnAGjEbs4V5
+         pd9CqBStX52ELi7jUKZfJoMdELdlj6usSs9nTa66SjEEfKpiZqFNKA0C9DisyhodLEWx
+         wo31QCGasi/j3UvfVWtL8QC4oEekiLC0dK1eEz+rHng+16Utt8Lkc79DWBfhRa+b0zuY
+         T8O6PlPErhXF3jKzciZs76jUkDMahwkqLD38UqJMXU5JmuZNfgEQOOGQOrLWnSPttzY7
+         KbqA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779039477; x=1779644277; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tlVlaFBAIkcv0HbZfkTnOaqrfVsvTeI+ScRy+0SZE24=;
+        b=H60X56wjblRPR2uyKkg+bp/AE+VJV/2yl6eKZm/pTQCfOHpqjxI6RGghlkCGoY1T4o
+         qPS0LUmH5omRZOdkkFHeCHbvO97aDj4mQCkWK0X8LKhpUmggrM54jZhzgmWvI2J+kpQG
+         kKlOgO5yp1MtvfIiEBBPtFbIIRqJ28QMYPWGMpKFYPMzreH6rTBEZMr56CBugGKyDZwB
+         owJPxDbed2svykV8f8LpyKmiW7+XvhNXRSqqPf4jgKRL327xblgk4pS/IFC+yLYKHGMn
+         Oi4pX3Vk6cpu6o2CK/+BuwnpOAv+hJ6DYqhyoVQh7GtskDC4rcVzHaPEsB41RvOhB1kj
+         ZM1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779039477; x=1779644277;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tlVlaFBAIkcv0HbZfkTnOaqrfVsvTeI+ScRy+0SZE24=;
+        b=XOLiUy6PSu7BgGakZp+OyrpmmotdjhqkQm9q/xkJ1nacwLfW3lRrpjEBEUbJEZ+Rrw
+         59QH8B6BMR/VStnQB3qiJ6rvoaRN80PfVtt3zHywSDTj4sUWvh375H0iqHwy+MZ8R0lW
+         lfwPTrflQ+JtS0jftjCGgZeMSLsapTghLYwKX21h88/Pv2AMsgr4Ji6gT6s+eQWQm9ak
+         ptb2Pm+iDl9YiNOzDDC9560kNcZVtKXuV3xjoimIj1dPCCT+M2oHk6+YI5OxU+gxIjsB
+         VfHUQdi5742sbCzZGnFv+d3pwvlWmtUvICzfIB8ySipeB3dQrI3QdlT2Ypp14ZC91R8q
+         LvYw==
+X-Gm-Message-State: AOJu0YyqAWsR+X7O66osIphLRA/Ya/uGyvHjpG0bV6tNO3ph/wapQl1F
+	T8P43vRiUGdGJClAR6nlvPM0yhooS6gUunn3Fkfz/ngpY4N1rP0MrwlSo26FsiCd9g7Du1WF0TN
+	IvTaDOICMOJctk22PN7amfzDnwvO0ePH/wORgko8=
+X-Gm-Gg: Acq92OHjs5e52gIIWZwO0AgSn35s/XiAUMPjS+bTSx78P+FDomXIBLIb55rH9rtX3xb
+	0+TvYOLVWpNY8vOSgHg0SExyOfcWtbwuN9mqoD/Clys/PDfPlLEAzL+lcrVWcjYidVYuWGNfXFh
+	6AM5iG20m86ZOeWzlUmMTsj2/0c+ZMVlBSwWLLV4xFNjjeOa/7sNPhqD0P+zxirqBFRqIiVD3it
+	OsM/+YuAvhBNfxavdXBOQOIwnFM6D+YPrhPH12FQPuY1dEBgYoE/oEiD1rg52JmNmAQrWFfAbeZ
+	ESW5asHatpCcObFiTnQPe5BLre8VjSSIiqUdSw==
+X-Received: by 2002:a05:6870:6b86:b0:435:51a3:7139 with SMTP id
+ 586e51a60fabf-43a2da2c0e5mr7428036fac.13.1779039477364; Sun, 17 May 2026
+ 10:37:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] can: peak_usb: validate URB length in
- pcan_usb_fd_decode_buf()
-To: Berkant Koc <me@berkoc.com>, Marc Kleine-Budde <mkl@pengutronix.de>,
- Stephane Grosjean <stephane.grosjean@hms-networks.com>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@pengutronix.de
-References: <20260517-can-usb-fix-cover@berkoc.com>
- <20260517-can-usb-fix-1@berkoc.com>
-From: Vincent Mailhol <mailhol@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=mailhol@kernel.org; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
- fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
- F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
- 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
- YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
- dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
- zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <20260517-can-usb-fix-1@berkoc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 3BBAF56283B
+References: <20260517041306.24841-1-devnexen@gmail.com> <agnF8KScbKxtUite@penguin>
+In-Reply-To: <agnF8KScbKxtUite@penguin>
+From: David CARLIER <devnexen@gmail.com>
+Date: Sun, 17 May 2026 18:37:46 +0100
+X-Gm-Features: AVHnY4KT-anqkYPAowTH1z-aktUBhVHv9a9ooTXMQP-FAwDVJGuu25829Ys9ZHM
+Message-ID: <CA+XhMqzrQfN2qmyfCyO1J+u0865cUDfkGrexW+h4dXS39CokeQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] net: tpmr: add Two-Port MAC Relay driver
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, bridge@lists.linux.dev, andrew@lunn.ch, 
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: A6D46562B1B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SEM_URIBL_FRESH15(3.00)[berkoc.com:email];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	TAGGED_FROM(0.00)[bounces-288758-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288759-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mailhol@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.905];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c04:e001:36c::/64:c];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On 17/05/2026 at 15:55, Berkant Koc wrote:
-> pcan_usb_fd_decode_buf() walks records inside the bulk-in URB by reading
-> the 12-byte struct pucan_msg header from the front of each record. The
-> existing loop only verifies that msg_ptr is below msg_end before
-> dereferencing rx_msg->size and rx_msg->type, which means a short URB
-> that contains between 1 and 11 bytes of payload causes a two-byte
-> out-of-bounds read of the rx_msg->size and rx_msg->type fields. The
-> fragment check that follows compares the announced size against msg_end
-> but lands after the header has already been read.
-> 
-> A malicious USB device that pretends to be a PEAK-System PCAN-USB-FD
-> adapter (USB IDs 0c72:0012, 0c72:0014, 0c72:0016) can keep returning
-> short bulk-in URBs and trigger this read on every poll cycle, leaking
-> adjacent slab content via the dispatched decode paths or simply
-> producing a KASAN slab-out-of-bounds report.
-> 
-> Apply the pattern from commit 6fe9f3279f7d ("can: gs_usb: gs_usb_receive_bulk_callback(): check actual_length before accessing header"):
-> require that at least sizeof(struct pucan_msg) bytes remain before each
-> iteration, and reject records whose announced size is smaller than the
-> header itself.
-> 
-> Identified by static analysis.
+Hi !
 
-Could you name which tool you used? Otherwise, this sentence adds little
-value to the report.
+> Please give people more time to review the proposed RFCs before
+  > sending v1. Also you specifically asked bridge maintainers to comment
+  > and did not wait for us to do so.
 
-> No KASAN trip available without specific PEAK CAN-FD hardware.
-> 
-> Fixes: 0a25e1f4f185 ("can: peak_usb: add support for PEAK new CANFD USB adapters")
-> Cc: stable@vger.kernel.org # 4.0+
-> Signed-off-by: Berkant Koc <me@berkoc.com>
+  Fair point. I jumped to v1 too quickly. I CC'd the bridge list and you
+  specifically, then turned around v1 inside a day on the strength of one
+  review. I should have waited; sorry for the noise.
 
-The code itself is OK. Not withstanding of above comment:
+  > First, I'd like to ask: could you please elaborate why bridge's
+  > group_fwd_mask isn't working out for you?
 
-Reviewed-by: Vincent Mailhol <mailhol@kernel.org>
+  Honest answer: I should have tested that configuration before posting,
+  and I didn't. Let me actually run a 2-port bridge with group_fwd_mask
+  set, no_learning, stp_state 0, vlan_filtering 0, and see where it
+  falls short of a TPMR =E2=80=94 if it falls short at all. The places I'd =
+expect
+  to differ are PAUSE handling, multicast outside the 01:80:c2:00:00:0x
+  range, and carrier semantics, but I haven't proven any of that with
+  real traffic.
 
+  If the bridge configuration covers everything materially, dropping
+  this driver is the right call =E2=80=94 400 LOC duplicating existing
+  functionality isn't worth it. If there's a concrete gap, I'd rather
+  close it inside the bridge than maintain a parallel driver.
 
-Yours sincerely,
-Vincent Mailhol
+  > Second, what else did you try and how exactly did you try it?
 
+  Same admission. tc mirred, cls_bpf, nftables, XDP_REDIRECT are all on
+  the table and I haven't evaluated any of them seriously against the
+  use case. Let me come back with measurements instead of arguing in
+  the abstract.
+
+  Please consider v1 parked until then. Thanks for the pushback.
+
+  David
 
