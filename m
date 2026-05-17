@@ -1,305 +1,215 @@
-Return-Path: <netdev+bounces-288690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288691-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHlvGVJhCWpOXgQAu9opvQ
-	(envelope-from <netdev+bounces-288690-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:33:54 +0200
+	id JGWIIR9jCWqHXwQAu9opvQ
+	(envelope-from <netdev+bounces-288691-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:41:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C41455F85E
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:33:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D53A555F8C4
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:41:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7817830054D5
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 06:33:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 15272300B9CF
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 06:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046FE2DFA2F;
-	Sun, 17 May 2026 06:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706422E8B9B;
+	Sun, 17 May 2026 06:41:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFPVz0CT"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AXVfzFp8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010029.outbound.protection.outlook.com [52.101.193.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819F42853F8
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 06:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778999630; cv=none; b=qB+63b4mfcyfV0rdx6KdQPDq4M0ZU2gLq/WkA14bsHqbWQGBq193sLQew/E2Fh2N+s3mKyRy4jz7gPfPhiiyYq1O1Br73nOn1OSAJZfDoiWdbdBePO3uwwc913k045Vu83oI7bNHcvgYdc3lxt2/rtM21hBUWzv9WhGkuVlEiRI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778999630; c=relaxed/simple;
-	bh=SfJL8LPr6GDe/OJHPFWr3tFTOY3oYhXDoBP3xAEQFZ8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OvYGt39XNQes17CElsRoCDJa7YGhsMbtHDRupL+B0wek8vm/uTtVQUqHA8taTjFxBtT0zywGI9AFQRMRWf6OMeF2wIgXt018frJjMnDUg6E0x9vTClhYzgXejWGek9+ZKDhAL35kXpLd+980jCozkkIFQxoa0NgzgzeQvxMqi+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFPVz0CT; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2bd80b3aa13so7268765ad.0
-        for <netdev@vger.kernel.org>; Sat, 16 May 2026 23:33:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778999629; x=1779604429; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hIm5luJhGoab49QPoC2ghLiKrO+q0wci/8m1qO+0CIs=;
-        b=LFPVz0CTnabNV70QkHAtoy44q6rQUs49dTNMFBysffpLfi2vOyf1eOp3jbwx0kCYx+
-         G5lfjak2NYhbubdCBczPUfh0UWdLyee8PWNVtGjn7x6PaElKoLcYzTlBZG8kfw1XCzNt
-         vwmXjOYzbcBa5bzxxNkcG6E1mQQHW0Oe79xigVIH5l9NpICRSBf9y7ToHlOcUJ6J/7dK
-         gcUCNGz8teQUy2P2loek+IKezPOB9snEKEuvMWlnhQfaYxyg0B3tuMOvWs+alkJUrCco
-         9hOexUpwnuMMuW3LPPldSZr1+LRyNq1sKktZo1AdCPMxL1knTKIfyqiRt4Kl0zdOE8vO
-         OKVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778999629; x=1779604429;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hIm5luJhGoab49QPoC2ghLiKrO+q0wci/8m1qO+0CIs=;
-        b=DWN69k5EykYYRt33FaiA4URMhbRnaxWHAf69X0adUwZSfPAThlMprO99jVta24g70Q
-         B4oEB+zwz/wFY9TRuVu4iCypSBaEGXN5VyM71d57QlerQTxwDDCUHByCpKucPyNpAl0K
-         gtR1bgr6chzRMUQfLTCZQXCWJk9UNFTO70Y+oAjjYoPeWtX0qko5PLLLncvlujG2xRTQ
-         rd6WvPItdXO98Hqw7gmAVhkke5wr1vYLu2ar2ezb3WA7ie9J3wWLFRl3Ht41pci/bPtu
-         z1DV7yqMY3ut+qxWPL+Px4tfZuAxfHqEd4LTb+U9Do3UP3S2GmChkd5bkC6RwgGR2nRf
-         o6ug==
-X-Forwarded-Encrypted: i=1; AFNElJ++53LaLIylmT3TA28+fkMy0vtB+zEXJ9jlME4wLqdnwdN6Di7QdlHVx32Yp3m/3Tmtq/bwHS4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8D3cELfFe+yxxBDgEpxA5PgdLdCX8GR/q2b94cSZuqY8FNOdU
-	QlWC3uMLfRIBNs9RiACcpCTMqW2NEfXPqODNWo4v0Dtz/h2qJWpOmxQg
-X-Gm-Gg: Acq92OEZdmm4qnphighfT9uTEdpNks9GtbLEjM9zzuv6QnqWYf9A4Msv8/TRIf5mgba
-	SyEfV9cmrvlNyayTPKPlYmNvexghPBW4lDFT0+EImbMnm5hbVEbrMqk873RWjF+c/cMTz4mgpXG
-	IEEBO+3JQDy8rTC8K2Ku5ot4ZrsD+vDwo4lg3oOKgZMVqzsfnCojqf2UC2+SntXATj0Ywx2iCbG
-	MJsNQ8KpysUYmJsjGgLV6qJQd3+CuFAN28DP9SeVYlP0yH2nGVrWapzETd/8lsfVG3G/B2Xk2yn
-	UyZApJNHfIHQikPEvIY/hzc5r14fk9oqdJScd9CpmPfR6Qlj+m/VaZOKY1YIk7zKZADtS/MDFeJ
-	DMETGmgB2zwgc1SgNsthQWCWvQnqSqEnM06S9IhA62F/HTsX1RHZsk/pf+Z0tyB47L9RMXup74r
-	2p+6Y49vlkWuR2LGlrym/8wRuAYzcndaYiz+mIlez35WPFtz8lIxJBvAl1KUntNKXfK94JrFF3k
-	RKkfDruNKOmff+TjAb2x4+tzPqhGEc=
-X-Received: by 2002:a17:903:950:b0:2bd:a3c5:6d96 with SMTP id d9443c01a7336-2bda3c56ef9mr55165785ad.14.1778999628794;
-        Sat, 16 May 2026 23:33:48 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([2408:8207:1923:2c20:78ef:13e7:10c0:51d5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5bd5f2cesm111625115ad.14.2026.05.16.23.33.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 May 2026 23:33:48 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net v3 5/5] selftests/xsk: drain CQ to wait for TX completion
-Date: Sun, 17 May 2026 14:33:11 +0800
-Message-Id: <20260517063311.28921-6-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260517063311.28921-1-kerneljasonxing@gmail.com>
-References: <20260517063311.28921-1-kerneljasonxing@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07681A724C
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 06:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.29
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779000092; cv=fail; b=DkbhdNTUb2moKvQCFXQWMIBNm8IgZRIREuw4vcW4Jx8BpOFFXQVTBn6Ntmu4wjc3WrWkmp5nCpLtSc2ZmjHtbB2VduX9ndlQOR9DdqBeEh21tsIVTPG2FUwzA+0VeW71vWtt8wnIfl8rW8mMimranegmm13ETyqfV9Vr6v1c2aQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779000092; c=relaxed/simple;
+	bh=HIw8Od6sYoUHpCtymUsb8vrw3WwpflJzPt9EXe7JXS8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=dhK+Zm5v7khbASxTgpuCzuq2SkTxMiwPMULipBbQyKYCCFZ+4SoYZBsAHpWPivbfZigpgshU5NV5O39nD1DqXVIvtiPedAzpJKuYMekKmxNzTF0DGVxUgFZJJZNaDAY2B8r67aLAnyRC2TbKFw6lvBhEWKkH6mHR2Yo8KTpZLMg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AXVfzFp8; arc=fail smtp.client-ip=52.101.193.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kN3jFGYaF0Q9FCosZ24Ha30HCQpmxbSyrYbju2iCege3lmePdd0vUzDtlFoJC2tZOXqRxoNXYGrl0naJZGRTLhd64E4oAArH5d8JDUsiX0d1DjJ6GHMmDosudWOUdJq0mQxYoj1XKLc4uRWwLQgk1Jkcd80vfontG5CO+357IjJqZMnw24LFNvpH68dbm8x7WiHIolbriqqM26dli9FFW55cGAuZGQBojSAoj4mmr7DdLQiEpFZzwxay9jEm+7a+P1eixPOtOb39E/pvgxIDeJFzh75EpEeYJHeL4AGseMsxJoPahaBnGKvt6pBAITtqJNbgAhek7Px2kbCaOuvupw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OikvRQjD7HJPAyQVTs+0ncGIz/wdZjL7iH48qrL+7yc=;
+ b=YL66ae1Hv71NOND0lpLufXx2dxKIhpiK9Bd8Ao+LDoakfgSgoEVKNGod0KmNaNpFi3JWfIj3PtklUn0RB2puaWyfETrYh9zjFrpp3m9gxhAEhM3HhWFkW7nIFVutMul4XHZ9ky6fthoD8M9E1UdwNoVe/SBG3tH0f0zWNhW5FIcUnM71LFLmPEFOsdURUwCT2swlaPoOuErt/TPQWOwpzmg3YPKqv8PcWTK2p76Vp48+QkAHSOfB9uuvxQvgm0drca3fHzaMP8RM7kIXiVpZWmIDJj2ZMGnUgdZrEvN4ps6Mv+/8y4TmZijlOleHaZCKy1lBVo5nE/W0OU0UH95UQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OikvRQjD7HJPAyQVTs+0ncGIz/wdZjL7iH48qrL+7yc=;
+ b=AXVfzFp8SsUzd1SVfY4D3Bd7H1vvGiDabBAB+K1uXfgRX4ceijzgZxI4PnTvM+D04fk9kYORDUmIvtRfcf5zHx+SdLRrPeRUgvgPS6db0dn5Vvfce+VOZObDbPdiuPM/99GpARUAnaTizinUPvF5m7ZDNrlDsbU64ihA3VuwdvGWlCHQp8r3Kq5iVMRvv/e6zahiK7KuiPQ4qglFpBpHI2bCquavNj1MhvSQOGS7AmMIVR4AVI320kFf5/B2Le9NydvsgULsz0bnOZOsTfTqm4d/r03wGFY4gwNIunp8lUH/u1nlGMcE06CXDkBJ04TOGsgFbhUwA0cgC+5DbuBqqQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
+ by SA1PR12MB7271.namprd12.prod.outlook.com (2603:10b6:806:2b8::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.21; Sun, 17 May
+ 2026 06:41:25 +0000
+Received: from DM4PR12MB5248.namprd12.prod.outlook.com
+ ([fe80::92d8:797b:4db0:d385]) by DM4PR12MB5248.namprd12.prod.outlook.com
+ ([fe80::92d8:797b:4db0:d385%4]) with mapi id 15.21.0025.022; Sun, 17 May 2026
+ 06:41:25 +0000
+Message-ID: <58b42cf7-d18e-482c-b4e5-695dd490b40f@nvidia.com>
+Date: Sun, 17 May 2026 09:41:19 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] udp: Fix UDP length on last GSO_PARTIAL segment
+To: Alice Mikityanska <alice.kernel@fastmail.im>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>,
+ Matthew Schwartz <matthew.schwartz@linux.dev>
+References: <20260513074349.2152146-1-gal@nvidia.com>
+ <f75c1cf5-b5ad-47db-952f-faad9f0a33ed@app.fastmail.com>
+ <f356add6-e173-4020-a8af-8cc70aec955d@nvidia.com>
+ <ea0d0e1c-bfc2-4271-94d7-3bec2f2e85a3@app.fastmail.com>
+ <c129979f-7494-433c-92c4-6d4290add4d9@nvidia.com>
+ <23e6e0f4-29ee-4f86-b02d-8c8d881c51f7@app.fastmail.com>
+ <c4279000-dd9a-4e59-ae0d-6dcc5c7b03a2@nvidia.com>
+ <6702f4e4-cc0d-42ed-b11e-ba272018750a@app.fastmail.com>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <6702f4e4-cc0d-42ed-b11e-ba272018750a@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0059.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:93::13) To DM4PR12MB5248.namprd12.prod.outlook.com
+ (2603:10b6:5:39c::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2C41455F85E
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5248:EE_|SA1PR12MB7271:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5c5edf1d-852e-4d84-b787-08deb3df510f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|22082099003|56012099003|18002099003|11063799003|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	9i3RrcjL+p1clLD3KxpsI12ZZHgrYvRs13Ub3rMaxpqAFEqqM3XXT75aD8W5ym04k8Ry1Ag5a7cZNHiTlxJvYEBqgI4EWwEGZnmIAMzCQhFgjc9GzNKv1jnDCTXgF2H2PeOrL2Vzr4aprnjadG/4RmdWIz+doXNYrtXJXuLUzuNGnDnP7NMpIATNDhzc/nA/zA8cgq8JPH0VoLkFBZokyHqMCEFDwEQwQa/pwWqpZ204b1Adf1jI1p0x+CgsgdIkdeix5dUL9lkMm+Ir82sCf/6G5HRZcgoUxgCDbNI4pjrqzAt2XnOGaMtV/ugbQAS7q3SigaHz29itlUiJ+OOMTGLjnswbLVWUJWAnyUyncFW1W29stB+fJ3rPsxq3E/FRDjcSB81UhS/7FyCzPh5VQ6t7L2GqvLyQYTi3g3euHII0FFTf09v4s/xpEsqkiLab8XDyLDM2AZXtqQ0GipOntgc3SO3u0u0vWJX56K1aRqzi5bx6+cn7p36qqVcc78BWBgFlCT9uA5dxF8GFXwN1ICRbjYiNAqyeNJQ1ENjNj6V7LEMfOpVkgzuIgzX3aiZWtqBts/STulIPAQjKLmB77ns2qyoXRKj10TyGjVTFOlt5jLidiz3E6Nm+MWAxkQFPFLvpsYcsq92b5ZsN+P5m5+mYTOTXBagD8zx+TlRJiSjemHtTDvdEFpMbUTyznKJ3
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5248.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(22082099003)(56012099003)(18002099003)(11063799003)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RXo0TEF2VmhPcEFkaXJqSXJLRGU3M2J5MllNOEIrMTRxZ2NFakdyZ3doTmFL?=
+ =?utf-8?B?UXloUDlLd05nc2JRa05SdHlub0FFY2J0eFZwYStWLzN3czEyd0VPclRRaVNh?=
+ =?utf-8?B?U2oyOE1wNHBBMzI2T3pMRmRJeDRRcTFWZ3hGOS8wMnp1bjBJOUpUemJBbmNS?=
+ =?utf-8?B?MHhna2I4by9laXh6NEtHSWxuQ0Nob3lPWkpPVGo5VWl4RGxDRnIzc0RxYW12?=
+ =?utf-8?B?MVhNMWNHSG5kenFYa1FyWXRCam02WHg2eFNUZ3ZyNldURHg5RmZtdkJySFBX?=
+ =?utf-8?B?S1ZURm04ZEd0RUV0d0hZZ3g1b3R1bVkvODlDK3hlZWd5S2tlZzJ2Znc4ZDlp?=
+ =?utf-8?B?aUd5ZXQwV29XOTduOFhQZ2grUWl6SXN6dWpkUTlUNXc0YlJBR3BTc2J0VC91?=
+ =?utf-8?B?ZnV5ZmR1Z0tpOWJNVnNsaU1vMUpIOGcwbHdnU2FCK09NZDYzNFhmVXRwZ1pp?=
+ =?utf-8?B?OHpJVUZMOU5mSk9HdnY5ZDJLQkpDK0VPbkZBMStTQksxTmVibzBselE5VlVu?=
+ =?utf-8?B?ekF0djUwWmcxQTZBTnd3NC9WaHpXbEluRkxzeHJTOXhWbXJXaVhDRXFLaERQ?=
+ =?utf-8?B?aDR3WWtDQ3lEb2s4SHgyRGFzOXYrdXBmYmJqNzYxOWExSy9WZythNm5zeFRj?=
+ =?utf-8?B?N3lGb2hNemdydGRWa2xJTVNrZU1LVkVpejhxTjJwYnl4YlJOQXpubWRpZnpB?=
+ =?utf-8?B?TDBraGZGME9YSCtTcXNJdXh1bXhlT3NSWXJCOGRtMlhod2MvMjRMOXVJc1pB?=
+ =?utf-8?B?ZjFYSlJ3K1U2TVhOaElYbFZaME52Q1VnblA3Y1MxRzJLQ2ZzM0dTeWFJaTNL?=
+ =?utf-8?B?ekcrMEN1bHV0TVVveUFVcDhOeFNYd3dIUnJIVndOTWhTck9wWHArVXZiZlBy?=
+ =?utf-8?B?ejVjWFROcWZKT2NJM0plZUx0Wkx4WFM4MWgrYTZCd2N3T0doUnV0TldPVHJH?=
+ =?utf-8?B?cUQ3cEI0aVZOSU5la0pHcUUzY3U2UEFmSmI5Vmhqb1l3TlJXa2lFL1UxdG5z?=
+ =?utf-8?B?VmlLdGtacWFiRHZIQUN3LzlnSWNEUHVrakhHSGZLQm5wNnNRUFFrQU1Semx4?=
+ =?utf-8?B?YStiU0ZwdHBQNnZxUWZ6cVVuZUZzM2FDMkFhN3FWU2RyTFZLNkRGVTlUUS9o?=
+ =?utf-8?B?cnpZYVVOdnRiSHJuWlBCRDQ5alFISUhPQVI2S2Q4Ny9sK2NQVFZXZHJ1TXJN?=
+ =?utf-8?B?RXRaQ08rRC9NV0RTWUpSOVBwRVB1NGlDaFpWM2QxbXJ0TUZLcU8ydkJnNzdU?=
+ =?utf-8?B?dGhrYjZWb1VYaFAxa09MUXpYcVBxbkJyQ1Fiak4rbzhZVi9lQ2RsdjUwVDIv?=
+ =?utf-8?B?ZUFGVFc0cGlBazV3SVN0QXdKcWlaallFTWFjUWtRcHI4UVVNZEtrSWh5Vjc0?=
+ =?utf-8?B?a2lnUVJSaWNXaVNWbFpFYURCaTlWZ0xnUVd1NC9sL2drYmNaOEtKOUh0dXdB?=
+ =?utf-8?B?WnFvc0UzeW1ZWkFnL0lhckErK1BIdlhTNWpZaytrNkQvQU1reW1qL0JFejBr?=
+ =?utf-8?B?dkNOem5UdmN6aDR1WmV0SkxjWGZkSDVjNWRnYzJhUXduOHR5eml4YXlBcjZF?=
+ =?utf-8?B?SmpjcnU3ZVFhZTA3UjkwdVNkS2dlVHlwRVZxOSsvRUh4aVAwNVR5eUZ2NU1V?=
+ =?utf-8?B?ODNncERJK3IzSHowSzRtU3pKNUIxejF1Mk9nZ1FoL1lweFNiVDFhWEt1Y3l5?=
+ =?utf-8?B?aDJxZ29sOWlFMTVpYkFxYTk5czh3RTNxSHl3UGhXd3BGUW9Kc1JoQVltRWxp?=
+ =?utf-8?B?OElnb0VnaWhzNXhnMGRBRGJ0ZzBqdm1MbnIyb3ByOHc0eVNLWmZ6K1RuemtY?=
+ =?utf-8?B?MUN6Vk5BUVgxWFEzSW10RHdOZElaL0l2WXB6TDFXN1oxckc5Z1lYWk9PVnpj?=
+ =?utf-8?B?bGNnMkM5U2liUDhmY0hVNXVEVzZPK2trcUREaXgwcGNDK0wxRHRFWWIrQnNZ?=
+ =?utf-8?B?d1lPU3JZQ3V3RWcwQ2Z5REtEOUJIWUhMRzlUMGlYSksycHlVTm1xc29mdXNL?=
+ =?utf-8?B?VTE4eVdnd01Pcm5iYjlTMzd6RkZsMnNIU05CSXJ4Nm9USVhNYTRZWXVwOEh5?=
+ =?utf-8?B?bkxOU29TT2JuV3pZWW5BNFlvM0p2OUo5VGNTMTRPc2xqK1hPQnJzNkdKVkRN?=
+ =?utf-8?B?ZksxdEc5L1ZBZE15MHZGbzkrSFpCRWdBUjNhcFRjbUt4T2gxR2JNU2xJSG1v?=
+ =?utf-8?B?bTgvWG84MjZ1d1JiRE04OTBiM1grZG1DdUI1WnVyeHBnOVN3R1p6U0dzWCtQ?=
+ =?utf-8?B?YmF4VnFueitFMExpakZydW5PNnBLdStQUWd2emZpMHNzSHE2VWlqMkYxOFp6?=
+ =?utf-8?Q?DTRtzxX3a1TBOUvyRF?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c5edf1d-852e-4d84-b787-08deb3df510f
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5248.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2026 06:41:25.3395
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jNR22yi8wv4czu/V+BxSVOL6kCNv/HarhtaX6QN1Y0jH7KF5C0bDfED+qYSAZpkc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7271
+X-Rspamd-Queue-Id: D53A555F8C4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-288690-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288691-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_TO(0.00)[fastmail.im,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tencent.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim]
 X-Rspamd-Action: no action
 
-From: Jason Xing <kernelxing@tencent.com>
+On 14/05/2026 17:45, Alice Mikityanska wrote:
+> I can put it like this:
+> 
+> udp: gso: Fix handling checksum in __udp_gso_segment
+> 
+> The cited commit started using msslen for uh->len, but still uses newlen
+> to adjust uh->check. Although the checksum is ignored in most cases due
+> to the hardware offload, __udp_gso_segment attempts to maintain the
+> correct one. Fix uh->check and adjust it by the right value.
+> 
+> Additionally, after the fix, newlen becomes assigned and unused before
+> the loop. The code can be simplified a bit if mss adjustment is dropped,
+> so that newlen becomes equal to msslen before the loop, and msslen can
+> be also dropped, saving a few lines of code.
+> 
+> This brings us back to one variable, drops an unneeded arithmetic for
+> mss, and fixes the UDP checksum.
+> 
+> Fixes: b10b446ce7ad ("udp: gso: Use single MSS length in UDP header for GSO_PARTIAL")
+> Signed-off-by: Alice Mikityanska <alice@isovalent.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-After the kernel xsk drain_cont patches, dropped multi-buffer
-descriptors get their buffer addresses published to the completion
-queue (CQ) via the skb destructor instead of being cancelled. As a
-result, the CQ entries observed by user space no longer match the
-software-side accounting based on valid_frags only:
-__send_pkts() bumps xsk->outstanding_tx by valid_frags, while
-complete_pkts() decrements it by every CQ entry it consumes,
-including those produced by drops/drains. This makes
-outstanding_tx underflow and causes wait_for_tx_completion() to
-exit while valid descriptors are still sitting in the TX ring,
-which in turn makes receive_pkts() time out for the
-ALIGNED_INV_DESC_MULTI_BUFF, UNALIGNED_INV_DESC_MULTI_BUFF and
-TOO_MANY_FRAGS subtests.
+Thanks Alice!
 
-Fix this with two changes to the TX completion path:
-- complete_pkts(): tolerate extra CQ completions by clamping
-  outstanding_tx to zero instead of failing.
-- wait_for_tx_completion(): after the outstanding_tx loop finishes,
-  add a drain loop that kicks TX and consumes remaining CQ entries.
-  After the drain loop exits, do a short usleep and one final
-  complete_pkts() call so that real hardware (e.g. ice) has enough
-  time to post late CQ entries before we conclude the ring is
-  fully drained.
-
-Adjust the multi-buffer invalid-desc tests so that the last
-descriptor of every invalid packet has XDP_PKT_CONTD cleared.
-Without this, the kernel drain_cont logic would consume
-descriptors past the packet boundary and eat into the next valid
-packet, breaking pkt_nb validation. Concretely:
-- XSK_DESC__INVALID_OPTION is changed from 0xffff to 0xfffe so it
-  no longer asserts the XDP_PKT_CONTD bit (bit 0).
-- testapp_invalid_desc_mb() clears XDP_PKT_CONTD on the trailing
-  descriptor of the invalid-address and invalid-length packets.
-- testapp_too_many_frags() appends one extra terminating
-  descriptor so the over-sized invalid packet ends with
-  XDP_PKT_CONTD cleared, preventing the drain from spilling into
-  the trailing sync packet.
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- .../selftests/bpf/prog_tests/test_xsk.c       | 48 +++++++++++--------
- 1 file changed, 27 insertions(+), 21 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_xsk.c b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-index 7950c504ed28..1f196c8ebc73 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-@@ -31,7 +31,7 @@
- #define POLL_TMOUT			1000
- #define THREAD_TMOUT			3
- #define UMEM_HEADROOM_TEST_SIZE		128
--#define XSK_DESC__INVALID_OPTION	(0xffff)
-+#define XSK_DESC__INVALID_OPTION	(0xfffe)
- #define XSK_UMEM__INVALID_FRAME_SIZE	(MAX_ETH_JUMBO_SIZE + 1)
- #define XSK_UMEM__LARGE_FRAME_SIZE	(3 * 1024)
- #define XSK_UMEM__MAX_FRAME_SIZE	(4 * 1024)
-@@ -950,17 +950,11 @@ static int complete_pkts(struct xsk_socket_info *xsk, int batch_size)
- 
- 	rcvd = xsk_ring_cons__peek(&xsk->umem->cq, batch_size, &idx);
- 	if (rcvd) {
--		if (rcvd > xsk->outstanding_tx) {
--			u64 addr = *xsk_ring_cons__comp_addr(&xsk->umem->cq, idx + rcvd - 1);
--
--			ksft_print_msg("[%s] Too many packets completed\n", __func__);
--			ksft_print_msg("Last completion address: %llx\n",
--				       (unsigned long long)addr);
--			return TEST_FAILURE;
--		}
--
- 		xsk_ring_cons__release(&xsk->umem->cq, rcvd);
--		xsk->outstanding_tx -= rcvd;
-+		if (rcvd > xsk->outstanding_tx)
-+			xsk->outstanding_tx = 0;
-+		else
-+			xsk->outstanding_tx -= rcvd;
- 	}
- 
- 	return TEST_PASS;
-@@ -1274,6 +1268,8 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, b
- static int wait_for_tx_completion(struct xsk_socket_info *xsk)
- {
- 	struct timeval tv_end, tv_now, tv_timeout = {THREAD_TMOUT, 0};
-+	unsigned int rcvd;
-+	u32 idx;
- 	int ret;
- 
- 	ret = gettimeofday(&tv_now, NULL);
-@@ -1293,6 +1289,17 @@ static int wait_for_tx_completion(struct xsk_socket_info *xsk)
- 		complete_pkts(xsk, xsk->batch_size);
- 	}
- 
-+	do {
-+		if (xsk_ring_prod__needs_wakeup(&xsk->tx))
-+			kick_tx(xsk);
-+		rcvd = xsk_ring_cons__peek(&xsk->umem->cq, xsk->batch_size, &idx);
-+		if (rcvd)
-+			xsk_ring_cons__release(&xsk->umem->cq, rcvd);
-+	} while (rcvd);
-+
-+	usleep(100);
-+	complete_pkts(xsk, xsk->batch_size);
-+
- 	return TEST_PASS;
- }
- 
-@@ -2075,10 +2082,10 @@ int testapp_invalid_desc_mb(struct test_spec *test)
- 		{0, 0, 0, false, 0},
- 		/* Invalid address in the second frame */
- 		{0, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
--		{umem_size, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
-+		{umem_size, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, 0},
- 		/* Invalid len in the middle */
- 		{0, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
--		{0, XSK_UMEM__INVALID_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
-+		{0, XSK_UMEM__INVALID_FRAME_SIZE, 0, false, 0},
- 		/* Invalid options in the middle */
- 		{0, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
- 		{0, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XSK_DESC__INVALID_OPTION},
-@@ -2229,7 +2236,7 @@ int testapp_too_many_frags(struct test_spec *test)
- 		max_frags += 1;
- 	}
- 
--	pkts = calloc(2 * max_frags + 2, sizeof(struct pkt));
-+	pkts = calloc(2 * max_frags + 3, sizeof(struct pkt));
- 	if (!pkts)
- 		return TEST_FAILURE;
- 
-@@ -2247,20 +2254,19 @@ int testapp_too_many_frags(struct test_spec *test)
- 	}
- 	pkts[max_frags].options = 0;
- 
--	/* An invalid packet with the max amount of frags but signals packet
--	 * continues on the last frag
--	 */
--	for (i = max_frags + 1; i < 2 * max_frags + 1; i++) {
-+	/* An invalid packet with too many frags */
-+	for (i = max_frags + 1; i < 2 * max_frags + 2; i++) {
- 		pkts[i].len = MIN_PKT_SIZE;
- 		pkts[i].options = XDP_PKT_CONTD;
- 		pkts[i].valid = false;
- 	}
-+	pkts[2 * max_frags + 1].options = 0;
- 
- 	/* Valid packet for synch */
--	pkts[2 * max_frags + 1].len = MIN_PKT_SIZE;
--	pkts[2 * max_frags + 1].valid = true;
-+	pkts[2 * max_frags + 2].len = MIN_PKT_SIZE;
-+	pkts[2 * max_frags + 2].valid = true;
- 
--	if (pkt_stream_generate_custom(test, pkts, 2 * max_frags + 2)) {
-+	if (pkt_stream_generate_custom(test, pkts, 2 * max_frags + 3)) {
- 		free(pkts);
- 		return TEST_FAILURE;
- 	}
--- 
-2.43.7
-
+I will take this and submit both fixes.
 
