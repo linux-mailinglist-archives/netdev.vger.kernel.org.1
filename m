@@ -1,404 +1,192 @@
-Return-Path: <netdev+bounces-288729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288730-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Ca8lJLexCWo4lgQAu9opvQ
-	(envelope-from <netdev+bounces-288729-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:16:55 +0200
+	id Bo5+JOuxCWpklgQAu9opvQ
+	(envelope-from <netdev+bounces-288730-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:17:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF34A560E86
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:16:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D43560EA4
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:17:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 647DC3009F00
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:16:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 59D12300492A
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C0C2BD030;
-	Sun, 17 May 2026 12:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNDIW61B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432FF31578E;
+	Sun, 17 May 2026 12:17:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A428A405C4B
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 12:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C204C305691;
+	Sun, 17 May 2026 12:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779020211; cv=none; b=kni2WfGobogerxu+50s9a/j/d5C8bvd76Hi+ef/CpgISoEov4PM45H/xVDgZI1MxHk8K1+DMa2dZpq5NZ3Eytfmq0zYsIALFEHbQLEAt74FpkGommYT5Pbc8pEfqhYYOHmzBRpjNK/FEuM4QLxrwzep6+JL0Myptoxfb1Qi+pyM=
+	t=1779020264; cv=none; b=gdEU25VmyGP1PCV/poJrjWonxCgFCjHXyZPSlB0aOvHWlnh/cV/sKT1+XtuVSsfLzcMJmdN6Gf/Y1g6AL7XXQCVbs4WRYvABgxcGzf8252XL8J3qsOdudKIdf58RYda7jI8/JQwjO97B2il+0PO0Ti83EHbmp8ICAMS+cF81CFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779020211; c=relaxed/simple;
-	bh=ZkRvU0jLzvplU5bZY41Zz/7ytph4SzqDCErIdtmXOM4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zl9AgysNd8jiTURZfiMBz9PVtl/AapI2zdmiNRXcxfscqTrsTc/Gr6HB3uKNT5nls/lnFRbLmuKqq41/ee65nD6OhFjpq3hXNteUgCx/zHODuT1EZ5AjnV8i9PqFx/Hh8bXE2w0RQ5Tth5HshA5Jftg3sA4aMoNEwSrokobl1AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNDIW61B; arc=none smtp.client-ip=209.85.214.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2bc763e2ba8so5566025ad.3
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 05:16:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779020209; x=1779625009; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yjlRY4tntfwtwjxbRp3yBR4txk5DfmJk/3uX12iiOEM=;
-        b=kNDIW61BGQKGPKSmPsNxKtGZA+f72Td+DgmTSJw3IcinSNaE3vuN8KpmT+kpGVkkX8
-         iCM7olURrfZh27g2PgGFn2WBX7pg+A7swZ0U7Vle+orHmpX4HTLRcNvTkYJE/JN1U2fg
-         uFZkbQFi8h3bQYAJaSu43G4i7q25N1F4Hu5RsOkpx1vbsksEJP3UDMTOw6SUCBYUfMou
-         MRl9MjNFEpZnJ+JL7ZQfO91fr840CErcLfvmt/+XWU52SkVm1eQOoMfZ+1gNbcxQLyJQ
-         xPVMKtnEtTc+7kF8DoW/z0VMMP64bRhJcGwS+TofnYGbdlYn6QMItyEb8wbVUls9RKIn
-         txXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779020209; x=1779625009;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yjlRY4tntfwtwjxbRp3yBR4txk5DfmJk/3uX12iiOEM=;
-        b=Bs1vJakRVhDEF5Td2bs8eIXnye486lV4U+KqF60IRCr7FGT5aA2/cyZYwHNLABdSzO
-         ACx/1uYcmAf7EAvPU1elNKNa1CTw01DeqcvB94F6i/yu5MwbSgYegfURu1G9PE9FLfGg
-         KMOpTwuKUeup9wtU62wcd6RNVyfEpz2kXERURgDBuCY46lXd+Kn15IcjlMjip+Qe+jgz
-         Qt0xuRTp+Nq2JeEUCwPQ3OB97dzWPafsXG/6RhwUzs2LAFFe/vYfp8F3HIB3oZjN8WBE
-         oD2COJ7ebJmDCAYJrnJz5H7WH/3zshAtH7NFxbWNTzIx+rba6Zj1dXHeq3LaXYKAhdR6
-         dThA==
-X-Forwarded-Encrypted: i=1; AFNElJ/p4P4dSDp4rzSOKz9n96ijidAFefrZhp80cQR6VteTTcvN5W4h4D27TTdvlf7Ivkx+qTLAYI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZcChJeCz17TWzk7//chLeXQRaPymp0W00D3ne22rc8hYBDO+P
-	YS4vNIe2WrNj4uon+k98J3YTZ0MP79ELTrE+MgmJbQ6gsrGf+aqOupOP
-X-Gm-Gg: Acq92OHwCosGZMpaxXxGvi7SRvqGmhz1b9uu6D+NVZMCdBVW9ZIfGDkyMdRyOVfM/V9
-	bD3HWmXl1+/Jbc9d2JyVYGYhI9xEAdzh3E4J6uXmUSFL2K4nBMCGK/c5i5a8QTL8pkJ5jZwLE6P
-	yjM7xQXKKNWC8k+aiybJSD4e/YvK9bgNB2+VIzZotPJifI5HGaiWyHxiCnD9dCMKUxp2QNv8L9V
-	Db8/NAyXdXl8dAMNH0x/muXxWC6FkgY2tyIpo8GLEw/OkqWaXWxi1zoJ05z5tGCbeqUNk+l+hq3
-	dMZDjIgm5UqsSQMFKJDWbGAw0qw4OgjimJ7UnoRzBC/vNTXjJpsgZL7saRp5CKDXxG1LuE0+FgE
-	G22wJRS6uOOhE37RQ5V0kTyzP3U0KfOb5BRwevQyevfNj83CmtMif7Yae8SZszNxnX2xjiaBA9w
-	oGajnco58HJmVk08adrEtqrWjlE7FSsQI=
-X-Received: by 2002:a17:902:b60a:b0:2bc:b366:4731 with SMTP id d9443c01a7336-2bd7e9b8086mr82854435ad.31.1779020208698;
-        Sun, 17 May 2026 05:16:48 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5c05ffbesm121124815ad.27.2026.05.17.05.16.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 05:16:48 -0700 (PDT)
-From: Zhang Cen <rollkingzzc@gmail.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Jakub Sitnicki <jakub@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zerocling0077@gmail.com,
-	2045gemini@gmail.com,
-	Zhang Cen <rollkingzzc@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] bpf, sockmap: keep sk_msg copy state in sync
-Date: Sun, 17 May 2026 20:16:26 +0800
-Message-Id: <20260517121626.406516-1-rollkingzzc@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1779020264; c=relaxed/simple;
+	bh=afeVXxMLu9PA/RifFsGXDf3B7y8laAam881xtqAvz40=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=gnkieHgNg9hqlazRv6JtOyg/IgBk+fbGn9OCzLYile0b2pcZIjoQAm7LJRvI/I+0gxFU1HyhLFABLkWqUgjszmJWjBgK4VQFloSVlxA3Fls69sbfn9kFv3HkcXIw9168a3+QsSSKZMesL37gksUJuEIt9/YbrWQlKWwPsaKJ2VQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64HCHJi3038911;
+	Sun, 17 May 2026 21:17:19 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64HCHJGc038908
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 17 May 2026 21:17:19 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <c109e9fc-3fb7-4a48-a0bd-a4d7663e7342@I-love.SAKURA.ne.jp>
+Date: Sun, 17 May 2026 21:17:19 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: EF34A560E86
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Robin van der Gracht <robin@protonic.nl>,
+        Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+        Oliver Hartkopp <socketcan@hartkopp.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH net] can: j1939: use netdevice_tracker for j1939_priv tracking
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav303.rs.sakura.ne.jp
+X-Virus-Status: clean
+X-Rspamd-Queue-Id: 97D43560EA4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288729-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,cloudflare.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rollkingzzc@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-288730-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-SK_MSG uses msg->sg.copy as per-scatterlist-entry provenance. Entries
-with this bit set are copied before data/data_end are exposed to SK_MSG
-BPF programs for direct packet access.
+syzbot is still reporting
 
-bpf_msg_pull_data(), bpf_msg_push_data() and bpf_msg_pop_data() rewrite
-the sk_msg scatterlist ring by collapsing, splitting and shifting
-entries. These operations move msg->sg.data[] entries, but the parallel
-copy bitmap can be left behind or stale in slots that no longer contain
-the original entry. A copied entry can therefore later occupy a slot whose
-copy bit is clear and be exposed as directly writable packet data.
+  unregister_netdevice: waiting for vcan0 to become free. Usage count = 2
 
-Keep msg->sg.copy synchronized with scatterlist entry moves, preserve the
-copy bit when an entry is split, clear it when a helper replaces an entry
-with a private page, and clear every slot vacated by pull-data
-compaction.
+problem. A debug printk() patch in linux-next-20260508 identified that
+there is dev_hold()/dev_put() imbalance in j1939_priv management.
 
-Fixes: 015632bb30da ("bpf: sk_msg program helper bpf_sk_msg_pull_data")
-Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
-Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
-Cc: stable@vger.kernel.org
-Co-developed-by: Han Guidong <2045gemini@gmail.com>
-Signed-off-by: Han Guidong <2045gemini@gmail.com>
-Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
+  Call trace for vcan0[26] +4 at
+       __dev_hold include/linux/netdevice.h:4470 [inline]
+       netdev_hold include/linux/netdevice.h:4513 [inline]
+       dev_hold include/linux/netdevice.h:4536 [inline]
+       j1939_priv_create net/can/j1939/main.c:140 [inline]
+       j1939_netdev_start+0x36b/0xc10 net/can/j1939/main.c:268
+       j1939_sk_bind+0x853/0xb30 net/can/j1939/socket.c:506
+       __sys_bind_socket net/socket.c:1948 [inline]
+       __sys_bind+0x2e9/0x410 net/socket.c:1979
+
+  Call trace for vcan0[28] -3 at
+       __dev_put include/linux/netdevice.h:4456 [inline]
+       netdev_put include/linux/netdevice.h:4523 [inline]
+       dev_put include/linux/netdevice.h:4548 [inline]
+       __j1939_priv_release net/can/j1939/main.c:166 [inline]
+       kref_put include/linux/kref.h:65 [inline]
+       j1939_priv_put+0x128/0x270 net/can/j1939/main.c:172
+       j1939_sk_sock_destruct+0x52/0x90 net/can/j1939/socket.c:388
+       __sk_destruct+0x8d/0x9d0 net/core/sock.c:2352
+       rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+       rcu_core kernel/rcu/tree.c:2869 [inline]
+       rcu_cpu_kthread+0x99e/0x1470 kernel/rcu/tree.c:2957
+       smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+       kthread+0x388/0x470 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+For further investigation using upstream kernels, enable netdevice_tracker
+in j1939_priv management.
+
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 ---
-v2:
-Sashiko-bot pointed out that bpf_msg_pull_data() could leave stale copy
-bits on collapsed tail entries.
+ net/can/j1939/j1939-priv.h | 1 +
+ net/can/j1939/main.c       | 8 ++++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-Clear msg->sg.copy for every entry consumed by bpf_msg_pull_data()
-before compacting the scatterlist ring.
-
-While researching recent page cache bugs, we discovered this bug.
-We confirmed it allows overwriting the page cache of read-only files
-via splice(). We haven't attempted to write an exploit, but the
-corruption primitive is verified. PoC available upon request.
-Recommend fixing ASAP.
----
- net/core/filter.c | 66 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 64 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 9590877b0714f..018c30a0d71fb 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2654,6 +2654,27 @@ static void sk_msg_reset_curr(struct sk_msg *msg)
- 	}
+diff --git a/net/can/j1939/j1939-priv.h b/net/can/j1939/j1939-priv.h
+index 81f58924b4ac..e92beb24b50b 100644
+--- a/net/can/j1939/j1939-priv.h
++++ b/net/can/j1939/j1939-priv.h
+@@ -60,6 +60,7 @@ struct j1939_priv {
+ 	rwlock_t lock;
+ 
+ 	struct net_device *ndev;
++	netdevice_tracker dev_tracker;
+ 
+ 	/* list of 256 ecu ptrs, that cache the claimed addresses.
+ 	 * also protected by the above lock
+diff --git a/net/can/j1939/main.c b/net/can/j1939/main.c
+index 9937c04241bc..5e5e6c228f22 100644
+--- a/net/can/j1939/main.c
++++ b/net/can/j1939/main.c
+@@ -137,7 +137,7 @@ static struct j1939_priv *j1939_priv_create(struct net_device *ndev)
+ 	priv->ndev = ndev;
+ 	kref_init(&priv->kref);
+ 	kref_init(&priv->rx_kref);
+-	dev_hold(ndev);
++	netdev_hold(ndev, &priv->dev_tracker, GFP_KERNEL);
+ 
+ 	netdev_dbg(priv->ndev, "%s : 0x%p\n", __func__, priv);
+ 
+@@ -163,7 +163,7 @@ static void __j1939_priv_release(struct kref *kref)
+ 	WARN_ON_ONCE(!list_empty(&priv->ecus));
+ 	WARN_ON_ONCE(!list_empty(&priv->j1939_socks));
+ 
+-	dev_put(ndev);
++	netdev_put(ndev, &priv->dev_tracker);
+ 	kfree(priv);
  }
  
-+static bool sk_msg_elem_is_copy(const struct sk_msg *msg, u32 i)
-+{
-+	return test_bit(i, msg->sg.copy);
-+}
-+
-+static void sk_msg_set_elem_copy(struct sk_msg *msg, u32 i, bool copy)
-+{
-+	if (copy)
-+		__set_bit(i, msg->sg.copy);
-+	else
-+		__clear_bit(i, msg->sg.copy);
-+}
-+
-+static void sk_msg_clear_copy_range(struct sk_msg *msg, u32 start, u32 end)
-+{
-+	while (start != end) {
-+		__clear_bit(start, msg->sg.copy);
-+		sk_msg_iter_var_next(start);
-+	}
-+}
-+
- static const struct bpf_func_proto bpf_msg_cork_bytes_proto = {
- 	.func           = bpf_msg_cork_bytes,
- 	.gpl_only       = false,
-@@ -2738,6 +2759,7 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
- 	} while (i != last_sge);
- 
- 	sg_set_page(&msg->sg.data[first_sge], page, copy, 0);
-+	sk_msg_set_elem_copy(msg, first_sge, false);
- 
- 	/* To repair sg ring we need to shift entries. If we only
- 	 * had a single entry though we can just replace it and
-@@ -2747,13 +2769,20 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
- 	shift = last_sge > first_sge ?
- 		last_sge - first_sge - 1 :
- 		NR_MSG_FRAG_IDS - first_sge + last_sge - 1;
--	if (!shift)
-+	if (!shift) {
-+		sk_msg_set_elem_copy(msg, msg->sg.end, false);
- 		goto out;
-+	}
-+
-+	i = first_sge;
-+	sk_msg_iter_var_next(i);
-+	sk_msg_clear_copy_range(msg, i, last_sge);
- 
- 	i = first_sge;
- 	sk_msg_iter_var_next(i);
- 	do {
- 		u32 move_from;
-+		bool move_copy;
- 
- 		if (i + shift >= NR_MSG_FRAG_IDS)
- 			move_from = i + shift - NR_MSG_FRAG_IDS;
-@@ -2762,16 +2791,20 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
- 		if (move_from == msg->sg.end)
- 			break;
- 
-+		move_copy = sk_msg_elem_is_copy(msg, move_from);
- 		msg->sg.data[i] = msg->sg.data[move_from];
-+		sk_msg_set_elem_copy(msg, i, move_copy);
- 		msg->sg.data[move_from].length = 0;
- 		msg->sg.data[move_from].page_link = 0;
- 		msg->sg.data[move_from].offset = 0;
-+		sk_msg_set_elem_copy(msg, move_from, false);
- 		sk_msg_iter_var_next(i);
- 	} while (1);
- 
- 	msg->sg.end = msg->sg.end - shift > msg->sg.end ?
- 		      msg->sg.end - shift + NR_MSG_FRAG_IDS :
- 		      msg->sg.end - shift;
-+	sk_msg_set_elem_copy(msg, msg->sg.end, false);
- out:
- 	sk_msg_reset_curr(msg);
- 	msg->data = sg_virt(&msg->sg.data[first_sge]) + start - offset;
-@@ -2794,6 +2827,8 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- {
- 	struct scatterlist sge, nsge, nnsge, rsge = {0}, *psge;
- 	u32 new, i = 0, l = 0, space, copy = 0, offset = 0;
-+	bool sge_copy = false, nsge_copy = false, nnsge_copy = false;
-+	bool rsge_copy = false;
- 	u8 *raw, *to, *from;
- 	struct page *page;
- 
-@@ -2866,6 +2901,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 			sk_msg_iter_var_prev(i);
- 		psge = sk_msg_elem(msg, i);
- 		rsge = sk_msg_elem_cpy(msg, i);
-+		rsge_copy = sk_msg_elem_is_copy(msg, i);
- 
- 		psge->length = start - offset;
- 		rsge.length -= psge->length;
-@@ -2891,23 +2927,31 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 	/* Shift one or two slots as needed */
- 	sge = sk_msg_elem_cpy(msg, new);
- 	sg_unmark_end(&sge);
-+	sge_copy = sk_msg_elem_is_copy(msg, new);
- 
- 	nsge = sk_msg_elem_cpy(msg, i);
-+	nsge_copy = sk_msg_elem_is_copy(msg, i);
- 	if (rsge.length) {
- 		sk_msg_iter_var_next(i);
- 		nnsge = sk_msg_elem_cpy(msg, i);
-+		nnsge_copy = sk_msg_elem_is_copy(msg, i);
- 		sk_msg_iter_next(msg, end);
+@@ -281,7 +281,7 @@ struct j1939_priv *j1939_netdev_start(struct net_device *ndev)
+ 		 */
+ 		kref_get(&priv_new->rx_kref);
+ 		mutex_unlock(&j1939_netdev_lock);
+-		dev_put(ndev);
++		netdev_put(ndev, &priv->dev_tracker);
+ 		kfree(priv);
+ 		return priv_new;
  	}
+@@ -298,7 +298,7 @@ struct j1939_priv *j1939_netdev_start(struct net_device *ndev)
+ 	j1939_priv_set(ndev, NULL);
+ 	mutex_unlock(&j1939_netdev_lock);
  
- 	while (i != msg->sg.end) {
- 		msg->sg.data[i] = sge;
-+		sk_msg_set_elem_copy(msg, i, sge_copy);
- 		sge = nsge;
-+		sge_copy = nsge_copy;
- 		sk_msg_iter_var_next(i);
- 		if (rsge.length) {
- 			nsge = nnsge;
-+			nsge_copy = nnsge_copy;
- 			nnsge = sk_msg_elem_cpy(msg, i);
-+			nnsge_copy = sk_msg_elem_is_copy(msg, i);
- 		} else {
- 			nsge = sk_msg_elem_cpy(msg, i);
-+			nsge_copy = sk_msg_elem_is_copy(msg, i);
- 		}
- 	}
+-	dev_put(ndev);
++	netdev_put(ndev, &priv->dev_tracker);
+ 	kfree(priv);
  
-@@ -2915,13 +2959,15 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 	/* Place newly allocated data buffer */
- 	sk_mem_charge(msg->sk, len);
- 	msg->sg.size += len;
--	__clear_bit(new, msg->sg.copy);
-+	sk_msg_set_elem_copy(msg, new, false);
- 	sg_set_page(&msg->sg.data[new], page, len + copy, 0);
- 	if (rsge.length) {
- 		get_page(sg_page(&rsge));
- 		sk_msg_iter_var_next(new);
- 		msg->sg.data[new] = rsge;
-+		sk_msg_set_elem_copy(msg, new, rsge_copy);
- 	}
-+	sk_msg_set_elem_copy(msg, msg->sg.end, false);
- 
- 	sk_msg_reset_curr(msg);
- 	sk_msg_compute_data_pointers(msg);
-@@ -2945,29 +2991,41 @@ static void sk_msg_shift_left(struct sk_msg *msg, int i)
- 
- 	put_page(sg_page(sge));
- 	do {
-+		bool copy;
-+
- 		prev = i;
- 		sk_msg_iter_var_next(i);
-+		copy = sk_msg_elem_is_copy(msg, i);
- 		msg->sg.data[prev] = msg->sg.data[i];
-+		sk_msg_set_elem_copy(msg, prev, copy);
- 	} while (i != msg->sg.end);
- 
- 	sk_msg_iter_prev(msg, end);
-+	sk_msg_set_elem_copy(msg, msg->sg.end, false);
- }
- 
- static void sk_msg_shift_right(struct sk_msg *msg, int i)
- {
- 	struct scatterlist tmp, sge;
-+	bool tmp_copy, sge_copy;
- 
- 	sk_msg_iter_next(msg, end);
- 	sge = sk_msg_elem_cpy(msg, i);
-+	sge_copy = sk_msg_elem_is_copy(msg, i);
- 	sk_msg_iter_var_next(i);
- 	tmp = sk_msg_elem_cpy(msg, i);
-+	tmp_copy = sk_msg_elem_is_copy(msg, i);
- 
- 	while (i != msg->sg.end) {
- 		msg->sg.data[i] = sge;
-+		sk_msg_set_elem_copy(msg, i, sge_copy);
- 		sk_msg_iter_var_next(i);
- 		sge = tmp;
-+		sge_copy = tmp_copy;
- 		tmp = sk_msg_elem_cpy(msg, i);
-+		tmp_copy = sk_msg_elem_is_copy(msg, i);
- 	}
-+	sk_msg_set_elem_copy(msg, msg->sg.end, false);
- }
- 
- BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
-@@ -3024,8 +3082,10 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
- 	 */
- 	if (start != offset) {
- 		struct scatterlist *nsge, *sge = sk_msg_elem(msg, i);
-+		u32 sge_idx = i;
- 		int a = start - offset;
- 		int b = sge->length - pop - a;
-+		bool sge_copy = sk_msg_elem_is_copy(msg, sge_idx);
- 
- 		sk_msg_iter_var_next(i);
- 
-@@ -3038,6 +3098,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
- 				sg_set_page(nsge,
- 					    sg_page(sge),
- 					    b, sge->offset + pop + a);
-+				sk_msg_set_elem_copy(msg, i, sge_copy);
- 			} else {
- 				struct page *page, *orig;
- 				u8 *to, *from;
-@@ -3054,6 +3115,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
- 				memcpy(to, from, a);
- 				memcpy(to + a, from + a + pop, b);
- 				sg_set_page(sge, page, a + b, 0);
-+				sk_msg_set_elem_copy(msg, sge_idx, false);
- 				put_page(orig);
- 			}
- 			pop = 0;
+ 	return ERR_PTR(ret);
 -- 
-2.43.0
+2.54.0
+
 
