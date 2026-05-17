@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-288743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288744-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QPMGB13QCWreqgQAu9opvQ
-	(envelope-from <netdev+bounces-288743-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:27:41 +0200
+	id 6LnfNw3VCWpRrwQAu9opvQ
+	(envelope-from <netdev+bounces-288744-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:47:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FBD3561A8E
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:27:40 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81196561BC4
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:47:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 84FEC3004599
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:27:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B96423003340
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EA13BB10D;
-	Sun, 17 May 2026 14:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E24255F28;
+	Sun, 17 May 2026 14:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xmky4gjO"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SkoVtGwZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1839B3BB13B
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 14:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD90F2AEE1;
+	Sun, 17 May 2026 14:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779028057; cv=none; b=cB34/6H4vc4ipJ9HtoHqFOz/XNH4sMQR1ljC+tPsP3Z/X2bQNGRoaX7uls1gcJ/Kup1BAsy0sacK05jQM+CNa3iauHHz+ruqxzzcXamYbfP88Rn8gGvZe/UT0VgjPRabGFk65z1Jl1wA5tt1nauYNuiLkrSoI0wYxPzjXfItS64=
+	t=1779029259; cv=none; b=JTjgthrVxtjnXzuuxRdCFuwixiTa7gE+OI7mVoI/O9wFpAm4HxPRaPN9/AoieugqhJgyopKmKsPvKfhnj3PqkRTHy2M1AzlnGcJv7i0cPTpX6QnjdT75TJXeVFznyr/xmr5GWEs3icu8UTq69cD2NHaD1shEdHzJkHsgzlI0OGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779028057; c=relaxed/simple;
-	bh=4XSBxYxqISLsV6Spf98OGBDaeYRctTVPveYwKgI8UHs=;
-	h=To:cc:Subject:MIME-Version:Content-Type:From:Date:Message-ID; b=n4z0ZHiT9k4QyABNRpMD6I7I/mawHY6sIlOJNUg+4iRr0aKQH8trqijjCWMnvoX6y25spv2UPEgMIKtWYno8Hk380nFYjwtQ0LRiffDVJIiwWUuRyShMklngAcTmj4eN5sgberesyMq3Nmcl243X1IOfs+QyygUWECZ6RT2lzgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xmky4gjO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779028042;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=LavLM0+8mYsFB9TAKaulpbSa6g77ESdqNgfKK8jSpI0=;
-	b=Xmky4gjOTyP8L2Ne9NXqfgZ+ClL+Vf03RNUMs9xs4YfJjHVGOZ+pScJzEIYK4aEn4gWCYH
-	GWdKGjUroF7LHQVJf4ZMqudnBltCQcEgkjE6fRkp3MPbiMV2w7IQBlE3TzW1dG/HMkq5fv
-	FgsnGauB4cS/ncmlRWJa7vRj04JKN9U=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-67-3HtegX92MsSc8txN4rvGOg-1; Sun,
- 17 May 2026 10:27:19 -0400
-X-MC-Unique: 3HtegX92MsSc8txN4rvGOg-1
-X-Mimecast-MFC-AGG-ID: 3HtegX92MsSc8txN4rvGOg_1779028037
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB15E180044D;
-	Sun, 17 May 2026 14:27:16 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.48.33])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 63FF330001A2;
-	Sun, 17 May 2026 14:27:12 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com, Michael Bommarito <michael.bommarito@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Jeffrey Altman <jaltman@auristor.com>,
-    Eric Dumazet <edumazet@google.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
-    stable@kernel.org, linux-kernel@kernel.org
-Subject: [PATCH] rxrpc: Fix the ACK parser to extract the SACK table for parsing
+	s=arc-20240116; t=1779029259; c=relaxed/simple;
+	bh=BEHpKpEd77lX+9kQfr2vCFUzYxbfYYT1hRmevbFKGBc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o/aL6BBEGZIZluhb6UEwxl2lc7uQx/PvQ6F7JYEJwin/pAYIQ+/ReQuTRT8bVzMcQ5Eolb3+osJpXYCWMXjzHbBz1EQDkSQLR4Ru7t/udHOtu6DtSS/bMHP1OvjrYR9UV0u0CW5FIEN/rdwvMvzNlLfVfgsfJOO+PXsdnIsr/gQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SkoVtGwZ; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64HCUYVj3942766;
+	Sun, 17 May 2026 07:47:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=9Sqe34V2S2Yc63YS3YZ9XqZNc
+	rQWj2QL1bYPuKbJRqk=; b=SkoVtGwZKBkpJyMssUSTJxIz/9UZ+7PqkuP6YGI0f
+	kthDjfe5Q9cmVLwSJTIMDK9w49WEa4s4J3D0rq1fYPtOo8vmZrsjC22dcBezclKQ
+	JTC6NrNinh1DeI2caTidpUK1jn15cMdfbOAGybUCxjrmBpPFuIl8WxbH0Bx6V5Ci
+	MxoZ7Vc/ebCzf+tfneumh1UVy88YeSglndhi+Z8P1h5h4iqoWbOKitEPf8Fez8BL
+	yUe8Uzqy2FSnOg51z4Cur0vuvjTJwIxz4xra28QFREtjltLtudhBLxegSUe5R18y
+	NVrx9H3ylJjT4z1fdYADHgrlku89Jj7/mqBvXYwLRtFjg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e6nxkj92h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 17 May 2026 07:47:14 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 17 May 2026 07:47:14 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sun, 17 May 2026 07:47:14 -0700
+Received: from kernel-ep2 (unknown [10.29.36.53])
+	by maili.marvell.com (Postfix) with SMTP id 8FF945E6868;
+	Sun, 17 May 2026 07:47:10 -0700 (PDT)
+Date: Sun, 17 May 2026 20:17:09 +0530
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <bbhushan2@marvell.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Linu Cherian
+	<lcherian@marvell.com>
+Subject: Re: [net-next PATCH v5 2/4] octeontx2-af: npa: cn20k: Add DPC support
+Message-ID: <20260517144709.GB1632721@kernel-ep2>
+References: <1777879921-15542-1-git-send-email-sbhatta@marvell.com>
+ <1777879921-15542-3-git-send-email-sbhatta@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,143 +79,400 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3794759.1779027814.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-From: David Howells <dhowells@redhat.com>
-Date: Sun, 17 May 2026 15:27:10 +0100
-Message-ID: <3794930.1779028030@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Rspamd-Queue-Id: 8FBD3561A8E
+Content-Disposition: inline
+In-Reply-To: <1777879921-15542-3-git-send-email-sbhatta@marvell.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE3MDE1OSBTYWx0ZWRfX8bJvH1bMwJBd
+ S566uvQzFDCupNtUL57VdTMBe4PXqAsAnZKGADl0kgo0v+1wvIZQhXwKDM1bW3ZPkafOwhYM3+t
+ nTlBGbgzUPwPkhzlNbxUo2mHiLPT1BxpwSwpX5+cO44p04KEoysfO6+gsopy1Qa7Ne7wVmKT2j3
+ g7VzxMle7nHXY0erNG0ySWVVZcJ+nLs8TfKL0iMpWdyPN0PxmLG4FkibnPAB6laN+L4WqIVdg0R
+ JKIoV6NZ+xBaMSs4+ZKKnSZpzlLUVY9ZobfEiyuz8ukpZ67ClLvSVI5BCzmKHyhU8j3Skoem1mx
+ LTFoPzrZWWu+dpp8s+F0PJzr/xmNJwviryN2723DLAF6qzg+Xn8MpVJ+mQ+CnrEbZB7ncWE3w1Z
+ MHetvQih8m350cJFLODRy3uk/7Rnw2iImwUIEL02UHHFeEuDpQ7UcLENtSHPR7LDSMg41Pdw6CB
+ 6dtD5lLg0gMVw+gxZ7g==
+X-Proofpoint-GUID: fCP6L-WO5n4ieAT9MbnWySShlv_qSEDR
+X-Proofpoint-ORIG-GUID: fCP6L-WO5n4ieAT9MbnWySShlv_qSEDR
+X-Authority-Analysis: v=2.4 cv=NbPWEWD4 c=1 sm=1 tr=0 ts=6a09d4f2 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8
+ a=sWBrz1kr2qppWN3KPtEA:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-17_03,2026-05-15_01,2025-10-01_01
+X-Rspamd-Queue-Id: 81196561BC4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,auristor.com,google.com,davemloft.net,kernel.org,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-288743-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288744-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:email,marvell.com:dkim];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:email,auristor.com:email]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-    =
+On 2026-05-04 at 13:01:59, Subbaraya Sundeep (sbhatta@marvell.com) wrote:
+> From: Linu Cherian <lcherian@marvell.com>
+> 
+> CN20k introduces 32 diagnostic and performance
+> counters that are shared across all NPA LFs.
+> 
+> Counters being shared, each PF driver need to request
+> for a counter with the required configuration to the AF,
+> so that a counter can be allocated and mapped to the
+> respective LF with the requested configuration.
+> 
+> Add new mbox messages, npa_dpc_alloc/free to handle this.
+> 
+> Also ensure all the LF to DPC counter mappings are cleared
+> at the time of LF free/teardown.
+> 
+> Signed-off-by: Linu Cherian <lcherian@marvell.com>
+> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> ---
+>  .../ethernet/marvell/octeontx2/af/cn20k/api.h |   6 +
+>  .../ethernet/marvell/octeontx2/af/cn20k/npa.c | 129 ++++++++++++++++++
+>  .../ethernet/marvell/octeontx2/af/cn20k/reg.h |   7 +
+>  .../net/ethernet/marvell/octeontx2/af/mbox.h  |  19 +++
+>  .../net/ethernet/marvell/octeontx2/af/rvu.h   |   3 +
+>  .../ethernet/marvell/octeontx2/af/rvu_npa.c   |  14 +-
+>  6 files changed, 177 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
+> index 4285b5d6a6a2..b13e7628f767 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
+> @@ -29,4 +29,10 @@ int cn20k_mbox_setup(struct otx2_mbox *mbox, struct pci_dev *pdev,
+>  		     void *reg_base, int direction, int ndevs);
+>  void cn20k_rvu_enable_afvf_intr(struct rvu *rvu, int vfs);
+>  void cn20k_rvu_disable_afvf_intr(struct rvu *rvu, int vfs);
+> +
+> +int npa_cn20k_dpc_alloc(struct rvu *rvu, struct npa_cn20k_dpc_alloc_req *req,
+> +			struct npa_cn20k_dpc_alloc_rsp *rsp);
+> +int npa_cn20k_dpc_free(struct rvu *rvu, struct npa_cn20k_dpc_free_req *req);
+> +void npa_cn20k_dpc_free_all(struct rvu *rvu, u16 pcifunc);
+> +
+>  #endif /* CN20K_API_H */
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
+> index c963f43dc7b0..24a710f4f5fc 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
+> @@ -8,6 +8,8 @@
+>  #include <linux/module.h>
+>  #include <linux/pci.h>
+>  
+> +#include "cn20k/api.h"
+> +#include "cn20k/reg.h"
+>  #include "struct.h"
+>  #include "../rvu.h"
+>  
+> @@ -46,3 +48,130 @@ int rvu_npa_halo_hwctx_disable(struct npa_aq_enq_req *req)
+>  
+>  	return 0;
+>  }
+> +
+> +int npa_cn20k_dpc_alloc(struct rvu *rvu, struct npa_cn20k_dpc_alloc_req *req,
+> +			struct npa_cn20k_dpc_alloc_rsp *rsp)
+> +{
+> +	struct rvu_hwinfo *hw = rvu->hw;
+> +	u16 pcifunc = req->hdr.pcifunc;
+> +	int cntr, lf, blkaddr, ridx;
+> +	struct rvu_block *block;
+> +	struct rvu_pfvf *pfvf;
+> +	u64 val, lfmask;
+> +
+> +	pfvf = rvu_get_pfvf(rvu, pcifunc);
+> +
+> +	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPA, 0);
+> +	if (!pfvf->npalf || blkaddr < 0)
+> +		return NPA_AF_ERR_AF_LF_INVALID;
+> +
+> +	block = &hw->block[blkaddr];
+> +	lf = rvu_get_lf(rvu, block, pcifunc, 0);
+> +	if (lf < 0)
+> +		return NPA_AF_ERR_AF_LF_INVALID;
+> +
+> +	mutex_lock(&rvu->rsrc_lock);
+> +
+> +	/* allocate a new counter */
+> +	cntr = rvu_alloc_rsrc(&rvu->npa_dpc);
+Is there a mechanism to prevent a single VF from exhausting all 32 shared
+counters? Without quotas, a misconfigured or malicious VF could repeatedly
+request counters until the pool is empty, starving the PF and other VFs.
 
-Fix modification of the received skbuff in rxrpc_input_soft_acks() and a
-potential incorrect access of the buffer in a fragmented UDP packet (the
-packet would probably have to be deliberately pre-generated as fragmented)
-when AF_RXRPC tries to extract the contents of the SACK table by copying
-out the contents of the SACK table into a buffer before attempting to pars=
-e
-it.
+[Sundeep] No. There is no support of Quotas in AF driver. It is up
+to PFs/VFs to allocate the resources as per their need.
+ 
+> +	if (cntr < 0) {
+> +		mutex_unlock(&rvu->rsrc_lock);
+> +		return cntr;
+> +	}
+> +
+> +	rsp->cntr_id = cntr;
+> +
+> +	/* DPC counter config */
+> +	rvu_write64(rvu, blkaddr, NPA_AF_DPCX_CFG(cntr), req->dpc_conf);
+> +
+> +	/* 0 to 63 lfs -> idx 0, 64 - 127 lfs -> idx 1 */
+> +	ridx = lf >> 6;
+> +	lfmask = BIT_ULL(ridx ? lf - NPA_DPC_LFS_PER_REG : lf);
+What happens here and in npa_cn20k_dpc_free() if lf is 128 or greater? If
+lf >= 128, ridx becomes >= 2, and the shift amount (lf - 64) will be 64 or
+more. This would result in undefined behavior when using BIT_ULL() since the
+shift exceeds 63.
 
-AF_RXRPC assumes that it can just call skb_condense() and then validly
-access the SACK table from skb->data and that it will be a flat buffer -
-but skb_condense() can silently fail to do anything under some
-circumstances.
+[Sundeep] Max LFs supported are 128 only so lf is 0 to 127.
+> +
+> +	ridx = 2 * cntr + ridx;
+> +	/* Give permission for LF access */
+> +	val = rvu_read64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx));
+> +	val |= lfmask;
+> +	rvu_write64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx), val);
+Does the hardware guarantee that the other PERMITX register for this counter
+is clear? Since this only sets bits in one of the PERMITX registers without
+clearing the other, stale state from a prior kexec could remain. This might
+grant unauthorized LFs access to the counter or cause issues when freeing.
 
-Note that whilst rxrpc_input_soft_acks() should be able to parse extended
-ACKs, the rest of AF_RXRPC doesn't currently support that.
+[Sundeep] Only one NPA LF per PF/VF and one LF bit in PERMITX
+registers and we do not assign same counter for two LFs.
 
-Further, there's then no need to call skb_condense() in rxrpc_input_ack(),
-so don't.
+> +
+> +	mutex_unlock(&rvu->rsrc_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +int rvu_mbox_handler_npa_cn20k_dpc_alloc(struct rvu *rvu,
+> +					 struct npa_cn20k_dpc_alloc_req *req,
+> +					 struct npa_cn20k_dpc_alloc_rsp *rsp)
+> +{
+> +	return npa_cn20k_dpc_alloc(rvu, req, rsp);
+> +}
+Is it possible for VFs on older platforms to trigger this handler? Without an
+is_cn20k() check, it appears VFs on older chips could send this message and
+cause the driver to read or write CN20K-specific registers, potentially
+accessing undefined MMIO space.
 
-Fixes: d57a3a151660 ("rxrpc: Save last ACK's SACK table rather than markin=
-g txbufs")
-Reported-by: Michael Bommarito <michael.bommarito@gmail.com>
-Link: https://lore.kernel.org/r/20260513180907.2061972-1-michael.bommarito=
-@gmail.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jeffrey Altman <jaltman@auristor.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-cc: stable@kernel.org
----
- input.c |   22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+[Sundeep] No not possible.
 
-diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
-index 24aceb183c2c..0c15ebf19eae 100644
---- a/net/rxrpc/input.c
-+++ b/net/rxrpc/input.c
-@@ -963,21 +963,34 @@ static void rxrpc_input_soft_acks(struct rxrpc_call =
-*call,
- 	struct rxrpc_skb_priv *sp =3D rxrpc_skb(skb);
- 	struct rxrpc_txqueue *tq =3D call->tx_queue;
- 	unsigned long extracted =3D ~0UL;
--	unsigned int nr =3D 0;
-+	unsigned int nr =3D 0, nsack;
- 	rxrpc_seq_t seq =3D call->acks_hard_ack + 1;
- 	rxrpc_seq_t lowest_nak =3D seq + sp->ack.nr_acks;
--	u8 *acks =3D skb->data + sizeof(struct rxrpc_wire_header) + sizeof(struc=
-t rxrpc_ackpacket);
-+	u8 sack[256] __aligned(sizeof(unsigned long));
-+	u8 *acks =3D sack;
- =
+Thanks,
+Sundeep
 
- 	_enter("%x,%x,%u", tq->qbase, seq, sp->ack.nr_acks);
- =
-
- 	while (after(seq, tq->qbase + RXRPC_NR_TXQUEUE - 1))
- 		tq =3D tq->next;
- =
-
-+	/* Extract an individual SACK table.  A normal SACK table is up to 255
-+	 * bytes with 1 ACK flag per byte, but an extended SACK table can be up
-+	 * to 256 bytes with up to 8 ACK/NACK flags per byte.  The ACK flags go
-+	 * across all bit 0's then all bit 1's, then all bit 2's, ...
-+	 */
-+	memset(sack, 0, sizeof(sack));
-+	nsack =3D umin(sp->ack.nr_acks, 256);
-+	if (skb_copy_bits(skb,
-+			  sizeof(struct rxrpc_wire_header) + sizeof(struct rxrpc_ackpacket),
-+			  sack, nsack) < 0)
-+		return;
-+
- 	for (unsigned int i =3D 0; i < sp->ack.nr_acks; i++) {
- 		/* Decant ACKs until we hit a txqueue boundary. */
- 		shiftr_adv_rotr(acks, extracted);
- 		if (i =3D=3D 256) {
--			acks -=3D i;
-+			acks =3D sack;
- 			i =3D 0;
- 		}
- 		seq++;
-@@ -1117,9 +1130,6 @@ static void rxrpc_input_ack(struct rxrpc_call *call,=
- struct sk_buff *skb)
- 	    skb_copy_bits(skb, ioffset, &trailer, sizeof(trailer)) < 0)
- 		return rxrpc_proto_abort(call, 0, rxrpc_badmsg_short_ack_trailer);
- =
-
--	if (nr_acks > 0)
--		skb_condense(skb);
--
- 	call->acks_latest_ts =3D ktime_get_real();
- 	call->acks_hard_ack =3D hard_ack;
- 	call->acks_prev_seq =3D prev_pkt;
-
+> +
+> +int npa_cn20k_dpc_free(struct rvu *rvu, struct npa_cn20k_dpc_free_req *req)
+> +{
+> +	struct rvu_hwinfo *hw = rvu->hw;
+> +	u16 pcifunc = req->hdr.pcifunc;
+> +	int cntr, lf, blkaddr, ridx;
+> +	struct rvu_block *block;
+> +	struct rvu_pfvf *pfvf;
+> +	u64 val, lfmask;
+> +
+> +	pfvf = rvu_get_pfvf(rvu, pcifunc);
+> +
+> +	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPA, 0);
+> +	if (!pfvf->npalf || blkaddr < 0)
+> +		return NPA_AF_ERR_AF_LF_INVALID;
+> +
+> +	block = &hw->block[blkaddr];
+> +	lf = rvu_get_lf(rvu, block, pcifunc, 0);
+> +	if (lf < 0)
+> +		return NPA_AF_ERR_AF_LF_INVALID;
+> +
+> +	if (req->cntr_id >= NPA_DPC_MAX)
+> +		return NPA_AF_ERR_PARAM;
+> +
+> +	mutex_lock(&rvu->rsrc_lock);
+> +
+> +	/* 0 to 63 lfs -> idx 0, 64 - 127 lfs -> idx 1 */
+> +	ridx = lf >> 6;
+> +	lfmask = BIT_ULL(ridx ? lf - NPA_DPC_LFS_PER_REG : lf);
+> +	cntr = req->cntr_id;
+> +
+> +	ridx = 2 * cntr + ridx;
+> +
+> +	val = rvu_read64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx));
+> +	/* Check if the counter is allotted to this LF */
+> +	if (!(val & lfmask)) {
+> +		mutex_unlock(&rvu->rsrc_lock);
+> +		return 0;
+> +	}
+> +
+> +	/* Revert permission */
+> +	val &= ~lfmask;
+> +	rvu_write64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx), val);
+> +
+> +	/* Free this counter */
+> +	rvu_free_rsrc(&rvu->npa_dpc, req->cntr_id);
+> +
+> +	mutex_unlock(&rvu->rsrc_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +void npa_cn20k_dpc_free_all(struct rvu *rvu, u16 pcifunc)
+> +{
+> +	struct npa_cn20k_dpc_free_req req;
+> +	int i;
+> +
+> +	req.hdr.pcifunc = pcifunc;
+> +	for (i = 0; i < NPA_DPC_MAX; i++) {
+> +		req.cntr_id = i;
+> +		npa_cn20k_dpc_free(rvu, &req);
+> +	}
+> +}
+> +
+> +int rvu_mbox_handler_npa_cn20k_dpc_free(struct rvu *rvu,
+> +					struct npa_cn20k_dpc_free_req *req,
+> +					struct msg_rsp *rsp)
+> +{
+> +	return npa_cn20k_dpc_free(rvu, req);
+> +}
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
+> index 8bfaa507ee50..9b49e376878e 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
+> @@ -143,4 +143,11 @@
+>  	offset = (0xb000000ull | (a) << 4 | (b) << 20);		\
+>  	offset; })
+>  
+> +/* NPA Registers */
+> +#define NPA_AF_DPCX_CFG(a)		(0x800 | (a) << 6)
+> +#define NPA_AF_DPC_PERMITX(a)		(0x1000 | (a) << 3)
+> +
+> +#define NPA_DPC_MAX			32
+> +#define NPA_DPC_LFS_PER_REG		64
+> +
+>  #endif /* RVU_MBOX_REG_H */
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> index 4a97bd93d882..b29ec26b66b7 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> @@ -213,6 +213,10 @@ M(NPA_AQ_ENQ,		0x402, npa_aq_enq, npa_aq_enq_req, npa_aq_enq_rsp)   \
+>  M(NPA_HWCTX_DISABLE,	0x403, npa_hwctx_disable, hwctx_disable_req, msg_rsp)\
+>  M(NPA_CN20K_AQ_ENQ,	0x404, npa_cn20k_aq_enq, npa_cn20k_aq_enq_req,	\
+>  				npa_cn20k_aq_enq_rsp)			\
+> +M(NPA_CN20K_DPC_ALLOC,	0x405, npa_cn20k_dpc_alloc, npa_cn20k_dpc_alloc_req, \
+> +				npa_cn20k_dpc_alloc_rsp)		\
+> +M(NPA_CN20K_DPC_FREE,	0x406, npa_cn20k_dpc_free, npa_cn20k_dpc_free_req, \
+> +				msg_rsp)				\
+>  /* SSO/SSOW mbox IDs (range 0x600 - 0x7FF) */				\
+>  /* TIM mbox IDs (range 0x800 - 0x9FF) */				\
+>  /* CPT mbox IDs (range 0xA00 - 0xBFF) */				\
+> @@ -910,6 +914,21 @@ struct npa_cn20k_aq_enq_rsp {
+>  	};
+>  };
+>  
+> +struct npa_cn20k_dpc_alloc_req {
+> +	struct mbox_msghdr hdr;
+> +	u16 dpc_conf;
+> +};
+> +
+> +struct npa_cn20k_dpc_alloc_rsp {
+> +	struct mbox_msghdr hdr;
+> +	u8 cntr_id;
+> +};
+> +
+> +struct npa_cn20k_dpc_free_req {
+> +	struct mbox_msghdr hdr;
+> +	u8 cntr_id;
+> +};
+> +
+>  /* Disable all contexts of type 'ctype' */
+>  struct hwctx_disable_req {
+>  	struct mbox_msghdr hdr;
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+> index 36a71d32b894..0299fa1bd3bc 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+> @@ -663,6 +663,9 @@ struct rvu {
+>  	/* CPT interrupt lock */
+>  	spinlock_t		cpt_intr_lock;
+>  
+> +	/* NPA */
+> +	struct rsrc_bmap	npa_dpc;
+> +
+>  	struct mutex		mbox_lock; /* Serialize mbox up and down msgs */
+>  	u16			rep_pcifunc;
+>  	bool			altaf_ready;
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
+> index 809386c6bcba..f7916ac79c69 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
+> @@ -8,6 +8,8 @@
+>  #include <linux/module.h>
+>  #include <linux/pci.h>
+>  
+> +#include "cn20k/api.h"
+> +#include "cn20k/reg.h"
+>  #include "rvu_struct.h"
+>  #include "rvu_reg.h"
+>  #include "rvu.h"
+> @@ -504,6 +506,8 @@ int rvu_mbox_handler_npa_lf_free(struct rvu *rvu, struct msg_req *req,
+>  		return NPA_AF_ERR_LF_RESET;
+>  	}
+>  
+> +	if (is_cn20k(rvu->pdev))
+> +		npa_cn20k_dpc_free_all(rvu, pcifunc);
+>  	npa_ctx_free(rvu, pfvf);
+>  
+>  	return 0;
+> @@ -569,12 +573,17 @@ static int npa_aq_init(struct rvu *rvu, struct rvu_block *block)
+>  int rvu_npa_init(struct rvu *rvu)
+>  {
+>  	struct rvu_hwinfo *hw = rvu->hw;
+> -	int blkaddr;
+> +	int err, blkaddr;
+>  
+>  	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPA, 0);
+>  	if (blkaddr < 0)
+>  		return 0;
+>  
+> +	rvu->npa_dpc.max = NPA_DPC_MAX;
+> +	err = rvu_alloc_bitmap(&rvu->npa_dpc);
+> +	if (err)
+> +		return err;
+> +
+>  	/* Initialize admin queue */
+>  	return npa_aq_init(rvu, &hw->block[blkaddr]);
+>  }
+> @@ -591,6 +600,7 @@ void rvu_npa_freemem(struct rvu *rvu)
+>  
+>  	block = &hw->block[blkaddr];
+>  	rvu_aq_free(rvu, block->aq);
+> +	kfree(rvu->npa_dpc.bmap);
+>  }
+>  
+>  void rvu_npa_lf_teardown(struct rvu *rvu, u16 pcifunc, int npalf)
+> @@ -611,6 +621,8 @@ void rvu_npa_lf_teardown(struct rvu *rvu, u16 pcifunc, int npalf)
+>  	ctx_req.ctype = NPA_AQ_CTYPE_HALO;
+>  	npa_lf_hwctx_disable(rvu, &ctx_req);
+>  
+> +	if (is_cn20k(rvu->pdev))
+> +		npa_cn20k_dpc_free_all(rvu, pcifunc);
+>  	npa_ctx_free(rvu, pfvf);
+>  }
+>  
+> -- 
+> 2.48.1
+> 
 
