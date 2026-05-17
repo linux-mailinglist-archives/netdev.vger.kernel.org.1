@@ -1,146 +1,158 @@
-Return-Path: <netdev+bounces-288751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288752-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id VZ1EA1zeCWrJtQQAu9opvQ
-	(envelope-from <netdev+bounces-288751-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:27:24 +0200
+	id /mGnFKrfCWqctgQAu9opvQ
+	(envelope-from <netdev+bounces-288752-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:32:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F02561FA9
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:27:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 340B0561FCD
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:32:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7E070300B871
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 15:27:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F1F71300292A
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 15:32:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A8B3B0ADB;
-	Sun, 17 May 2026 15:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2DA327C09;
+	Sun, 17 May 2026 15:32:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="S9USXKTK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SajrVGvr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B40F30F957
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 15:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95A1311973
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 15:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779031638; cv=none; b=pAQPvpPVj9t7Od579dBAVWSt9Nps0kX/NNCdQuRyPpKof4da0sHwzOXEjupDXGcS7Ot2wmfRZQgAQCpBIyApo34/pUScnFYPp+yCNxa7OIAy9/YJKwc+LnUHX35EL1W8qcKh6lCks0ESnIvRKhkPugxSGkidgfeW6WojHI6gRvc=
+	t=1779031971; cv=none; b=YGlmnK3kLjokK03qhGbD3Qt3hu0ilbMCAS69vELH37kCDVphoNjdt0ZcGAMV2z5pdUkjBejCfEABv90hMCwjzRftPY5zAh4PnK96ccog1BD3PzJOf48kBS+8AjeoxGim2pVEQMO5VX82Xn1qabK3KamHUURZ6gM2VFHiJFUxclg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779031638; c=relaxed/simple;
-	bh=Xh9w9nnQ1BXjz1e2nRhzF9/3vI3dy5RtCDo1eM+23w0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oIlJF/rFCV687oM4rNNwaIqO/LhZmB/goyFjctXc4wUBt/a838rEC3sgaJbLIG8pITl1rTqjZ1cEDb38hLHA7mzzHDJeth9winHoom192v/AvEj30xKXLIJzE/94R3gsvNC6oeU8gc7+YFZtmEujLJedFKjLkTnig5oULZfQYjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=S9USXKTK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=nNHIlg0KhKM8vz2t70ndpkgpiFMwt72VAtSNvRBC8kE=; b=S9
-	USXKTKCHtdG1RANCBNUpAltXHZApKjpRZ8rL1+ZT+TNPS5XbHBAGvITjhv0M9fuY6rWwVdm/0UlAI
-	elVYCAYbQmB6GU79r4x6SoFqM2TN4YRhaU/5XqsfHDTMeI72FDNmv1oCB0Jk9m72Q1J4mKL8WOgNi
-	g2vQYyZCMui2jBY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wOdOK-003L7h-IV; Sun, 17 May 2026 17:26:56 +0200
-Date: Sun, 17 May 2026 17:26:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Markus Stockhausen <markus.stockhausen@gmx.de>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
-	daniel@makrotopia.org
-Subject: Re: [PATCH] net: mdio: Add Realtek Otto MDIO driver
-Message-ID: <da228153-65b0-4b21-b62c-1562394ca95a@lunn.ch>
-References: <20260517111530.220017-1-markus.stockhausen@gmx.de>
+	s=arc-20240116; t=1779031971; c=relaxed/simple;
+	bh=nIkhANwfUYNk2cvMxwiDTqwmsh3YjN8mg0957jUG1dI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hflN7wqplvnhqkfp78dAHXuxjs2b0owHKNLVlgGwHsRYWmyPuKIqqbFygI1eDcDG3H50F/wj5ZLqKGl0lcXwYw94IYTfo+fXJ5gDX6HEhMoKX1EnAfukzX9n/iQHmigNIXtyg5UVTbM7l2wmthKJQnGVX//iXhq338RfmzglVG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SajrVGvr; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48984d29fe3so15362795e9.0
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 08:32:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779031968; x=1779636768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1K7luyMFctbC2xxMMOief5UX3f4LZLtzL3tSnkI5JFM=;
+        b=SajrVGvrdmRL+zhorNnVx5YqpSt7jVdkJkhNivWoaWHIhoovKeQs+bB2q7y12OflK/
+         Xv8qrpw4ehRdKG3xVaQ9Yr92SbNIr0Y2V4mE0DGU1RefLBocmrGkeYO7onL1X44G/EDJ
+         zm+c+v/5rr/KWUutXTSvgINl0cKmQRh7wClkXznbfutVy2ir0Xn3xql2tqFzifH5FtQw
+         iV0pL/DqAXxXv6tTi21hFJjBj+eUjVewVs41wLI1HCqReTLKJwEItoGCuiHbQg7/+EQl
+         IkjTdcSpXY53GpUr4S4WC8LaXYZ5Ox9ANxlG87/TQPivgk6qWbJV/hRvNWPjEOQBEyHd
+         k6Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779031968; x=1779636768;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1K7luyMFctbC2xxMMOief5UX3f4LZLtzL3tSnkI5JFM=;
+        b=NCGO0e3qk53jM/SpSARC6lRIEXYD+4IXKV46Sk3iiKRPHRvxoG7H2Qboe7yCE9iGQe
+         Za+lTMVi0unr1cszdUry1YepmwFrsfXR7+40wf9/vYICjpJns+Q6oT7KVpU3/htkRL57
+         DhPlBAbQZrBuLH0ekWeKjl1A5QCQwCodSVDSBdkxA72ZA7ZIkZU7woi6PE7l65a9Hrlc
+         4OTm8OoXHGhOrKaZvGr3kp3yMJB727acIrrs49e3FJhSezJpRb5jb1YMjiqm0CQDY6Kr
+         yk9gKt3qDb0DaTfeLaUDEmFyYCVAnlTZUC+RUYll18p7jcojDcBSDWxfxg9vmpvc6DBp
+         aKVg==
+X-Gm-Message-State: AOJu0YyyKE+8dHBCKw1H+ljfpqN2XtJnqiMKhp12fuh5HWhJ0xCq8a1j
+	5dPph8e+eClOe6UuQivksZCitQpMVGB9oMluR8et/LfHbvuxtEkkHAc=
+X-Gm-Gg: Acq92OEbShAJr9Le4EqfECkbsOUcNp/llKI7vy8TdgELtJBoAF4XLU8yP+c98grP6wq
+	tawGxmrQ98OBu1gUFxrmHdSMM9jtCh5DANXg+f0u0TrPZmxS1DbaH2vdFdt72b64J7vjV/V5L5J
+	EsC4JMvjAoiked5IBrLmZtmv4OvrpLdos8mlDkpsHn6aixHWZDNiXvI6/ei0cmxTQqN4lR4Grjp
+	AZEIonfGe9QyCxARE7uhQD4YRGIvIi3qHdik90qVoafiVMzIC20L0sMrCpGE5P6vL+6Fo2agPxF
+	IbHVg6sv6/JWwLIXczQDaPeH1kQbkpjgXmEiBlrUg3fqakn4NPEjOQGP8VDKY6GfTfLS6NsWxgQ
+	qE5Oz78MY42BHH7jlQsRCTqP0NXfaQpSd0aifzcMN+vAC9Hhz0JGJ2TfDjiUArVGk3ZCv0YE87/
+	69OA3yoIfmLPF3bx5PJZCblSqWD4d+ZqQYtaEkGzkd4Mq2JYDIxROFAXk17EQ52tC39X/Xz4+YQ
+	yq+ux9Hlg==
+X-Received: by 2002:a05:600c:6098:b0:48f:d1b8:9ab1 with SMTP id 5b1f17b1804b1-48fe60ecc51mr191555265e9.9.1779031967646;
+        Sun, 17 May 2026 08:32:47 -0700 (PDT)
+Received: from kestro-laptop-linux.kestro.home (94-224-231-213.access.telenet.be. [94.224.231.213])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48feab290e1sm95307395e9.2.2026.05.17.08.32.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 08:32:47 -0700 (PDT)
+From: Jan Volckaert <janvolck@gmail.com>
+To: bjorn@mork.no,
+	johan@kernel.org,
+	gregkh@linuxfoundation.org
+Cc: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jan Volckaert <janvolck@gmail.com>
+Subject: [PATCH v2 0/2] USB: add MeiG SRM813Q IDs in qmi_wwan and option
+Date: Sun, 17 May 2026 17:32:35 +0200
+Message-ID: <20260517153237.55995-1-janvolck@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <af3nDLa1A1JcTftq@hovoldconsulting.com>
+References: <af3nDLa1A1JcTftq@hovoldconsulting.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20260517111530.220017-1-markus.stockhausen@gmx.de>
-X-Rspamd-Queue-Id: B9F02561FA9
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 340B0561FCD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288751-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmx.de];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288752-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[janvolck@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-> There are a few issues left that will fixed in the next weeks. So
-> slowly it boils down to the question, how to best submit all of this
-> to upstream.
+Add MeiG SRM813Q support by adding USB IDs to:
+- qmi_wwan for the network interface
+- option for serial interfaces
 
-Lots of small patches which slowly transform the Mainline version
-towards the downstream version.
+Split into two patches so each change goes through its respective
+maintainer tree (net and usb-serial).
 
-> +static inline struct rtmd_ctrl *rtmd_ctrl_from_bus(struct mii_bus *bus)
-> +{
-> +	return ((struct rtmd_chan *)bus->priv)->ctrl;
-> +}
+Jan Volckaert (2):
+  NET: usb: qmi_wwan: add MeiG SRM813Q
+  USB: serial: option: add MeiG SRM813Q
 
-No inline functions in .c files, let the compiler decide.
+ drivers/net/usb/qmi_wwan.c  | 2 ++
+ drivers/usb/serial/option.c | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
-=00> +static int rtmd_read_c45(struct mii_bus *bus, int phy, int devnum, in=
-t regnum)
-> +{
-> +	struct rtmd_ctrl *ctrl =3D rtmd_ctrl_from_bus(bus);
-> +	int ret, pn, val =3D 0;
-> +
-> +	pn =3D rtmd_phy_to_port(bus, phy);
-> +	if (pn < 0)
-> +		return -ENOENT;
-> +
-> +	guard(mutex)(&ctrl->lock);
+---
+v2:
+- Thanks to Johan Hovold for the review and guidance.
+- split original submission into two patches per maintainer request
+- Link: https://lore.kernel.org/all/af3nDLa1A1JcTftq@hovoldconsulting.com/#r
 
-Netdev does not like these sort of magical guard() locks.=20
 
-> +	ret =3D (*ctrl->cfg->read_c45)(bus, pn, devnum, regnum, &val);
-> +	dev_dbg(&bus->dev, "rd_MMD(phy=3D0x%02x, dev=3D0x%04x, reg=3D0x%04x) =
-=3D 0x%04x, ret =3D %d\n",
-> +		phy, devnum, regnum, val, ret);
-> +
-> +	return ret ? ret : val;
+base-commit: 917719c412c48687d4a176965d1fa35320ec457c
+-- 
+2.43.0
 
-Does the dev_dbg() need the lock? What about the return statement?
-That is the downside of guard(), it generally covers more than what is
-needed. It makes it harder to change this code in the future because
-it is not clear what actually needs the lock and what does not.
-
-There is a comment about this in the netdev FAQ:
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-	Andrew
 
