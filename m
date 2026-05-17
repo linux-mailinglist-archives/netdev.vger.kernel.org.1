@@ -1,170 +1,319 @@
-Return-Path: <netdev+bounces-288742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288739-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMQvIwHQCWreqgQAu9opvQ
-	(envelope-from <netdev+bounces-288742-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:26:09 +0200
+	id YMYcJnXMCWq2qAQAu9opvQ
+	(envelope-from <netdev+bounces-288739-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:11:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0699F561A00
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:26:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06FC0561811
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:11:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 091E53018288
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:16:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E816F300CC0D
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91EA53B6BF5;
-	Sun, 17 May 2026 14:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F762F8EA1;
+	Sun, 17 May 2026 14:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkoc.com header.i=@berkoc.com header.b="TYXaWNv2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uh2YlwOM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-03.1984.is (mail-03.1984.is [93.95.224.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9EE3B6BFA;
-	Sun, 17 May 2026 14:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.95.224.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B122E1F02
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 14:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779027383; cv=none; b=uLsLBcIZKr0F2/kfirQXj3rKUka5PTeE1u1sTkiw/AbX/2f8gKhqw+osCChtPQ+oq5a8t59BplkYTie43791P8k3WULqUupZc3JowFxP8TwQRdFOUYcVx6s84ZWiNyDOUAgRp6v5VSHl+SncprCmgF67rjKXfI8CZUJsQPXD2nM=
+	t=1779027055; cv=none; b=QHE5cmeG56NCc2fEsDpyuwWbrYz06wwXIq/PNEtvVhPtFl00mOF8TzfNcb9NG7rE9rKwinxZCDm8K78XlvlO0Mhz8sqxgR9azbNDsLT2z2X48RaRJTHVDbGdZuN+kAHH/8Ushi1q03Rj1iHYGgFfVpiICi2sMb9+sgnQzj8h35Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779027383; c=relaxed/simple;
-	bh=E+5rE7WnzKpZKHrWJx0IS9bEifvlfmUUp8PYIDd6u1Q=;
+	s=arc-20240116; t=1779027055; c=relaxed/simple;
+	bh=xI8rlXdpV89cG2LXZuV2WflqErvHETEclNBHEngVwPQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IsUkisnV1KNM08irSJjffZXwD4wB/qGoGbIdhIvza7Ml8V58Amt33KokcnWT3Jc988sHXDbiR2Gd7lqSU+a+WwYcMun/DY2AZbIpEX5M8CgqP7YkdBkf44qduaTgFGBtjZ2RgC2WJ9fnQeazPVyU+z+FfCgRtWeHLqWSN/7pGtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=berkoc.com; spf=pass smtp.mailfrom=berkoc.com; dkim=pass (2048-bit key) header.d=berkoc.com header.i=@berkoc.com header.b=TYXaWNv2; arc=none smtp.client-ip=93.95.224.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=berkoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=berkoc.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=berkoc.com;
-	s=1984; h=Content-Transfer-Encoding:Content-Type:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=ZZu/4zOYpHfrXMZxN3vf1rOOegDar5F3Gvvj7NThVoQ=; b=TYXaWNv2rFphn3xJ7Qhr9837d9
-	lWcpOToa9FKwo6AL0LKblbXmN5n7PtjmgX53IkGUWP1dIk3nhkEQ2dBMtnTgIsuGYeAzCJorPl2an
-	K4fjuFYXBm5fnARmhcenYjC6Tp3c+WDsTcI7cvRJ5dFP1zzxHWb1InZJGtLh2WtA8uiTmklXnWSK2
-	ZUFYCg8ykx/bnSMQJ9rNCTKgd74ylgTVai9cw8vpitLY8wF7RVhGvCWseaf0gBc2En9FoJ+3f5FTj
-	ecIEn7vI9QUdmW4ffPwXeB087pkYGBPIyc/9Juv1HQuqEZkwJv24OUPvPK43i4rRaZz/tRy0r/I89
-	6GBJQqXA==;
-Received: from localhost
-	by mail-03.1984.is with utf8esmtp (Exim 4.96)
-	(envelope-from <me@berkoc.com>)
-	id 1wOcHk-00HFZk-1H;
-	Sun, 17 May 2026 14:16:05 +0000
-From: Berkant Koc <me@berkoc.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
- Vincent Mailhol <mailhol@kernel.org>,
- Stephane Grosjean <stephane.grosjean@hms-networks.com>
-Cc: linux-can@vger.kernel.org,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- kernel@pengutronix.de
-Subject: [PATCH 2/2] can: peak_usb: validate URB length in pcan_usb_pro_decode_buf()
-Date: Sun, 17 May 2026 15:55:02 +0200
-Message-ID: <20260517-can-usb-fix-2@berkoc.com>
-In-Reply-To: <20260517-can-usb-fix-cover@berkoc.com>
-References: <20260517-can-usb-fix-cover@berkoc.com>
+	 MIME-Version; b=aScNW3IKFxlWN7XRpnFnVH1fbmrNno/bALqiEJwjFTXKjr/CpJ8uKn30+wwy0PVyn9ViEl9IRQDGPRzyYanlH2SPvKsnymZOyyTTVnrvKKKYg6GM9oAHthSQvvl8dPKjBUdY8uWAuL8ABJc5OiC3Tso0IPsbwQmtA4q+9d10UYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uh2YlwOM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93335C2BCB0;
+	Sun, 17 May 2026 14:10:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779027054;
+	bh=xI8rlXdpV89cG2LXZuV2WflqErvHETEclNBHEngVwPQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uh2YlwOM65S8ZEw9HtGrEtR+VHqfvU+YL35oBGp64AVfsJUfW4Tx0UwSKF1HdGaqk
+	 AWksiI3qJHN5f2AHX3v2MCRMVwhpYiMaLgpxBkT3ZRH7xd8kk1TqczQORFszsWvZGd
+	 ZYlvT0h28rDdnoNBkCHEcwwMVhz2eaZtThMoPatAMGJRNoq58/hJu71T/O5sGPFyJc
+	 VjFD59H2sMIsAH7uYr6ZSuNph5WJpjM3HShzEitEE7EgOGroYXq9S/O/JA3CKmSCej
+	 tl71JpI513YO8dUNJvCIHqYMZWQrT45CNoSnJ7EVKLdqdjSt/Ebu2FldDQaN2P8aUN
+	 q9n2L8Nxilkmw==
+From: Simon Horman <horms@kernel.org>
+To: maciek@machnikowski.net
+Cc: 'Simon Horman' <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	richardcochran@gmail.com,
+	milena.olech@intel.com,
+	willemdebruijn.kernel@gmail.com,
+	andrew@lunn.ch,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH v6 net-next 2/3] netdevsim: Implement basic ptp support
+Date: Sun, 17 May 2026 15:07:45 +0100
+Message-ID: <20260517140744.330136-2-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260513094520.325693-3-maciek@machnikowski.net>
+References: <20260513094520.325693-3-maciek@machnikowski.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -0.0 (/)
-X-Authenticated-User: me@berkoc.com
-X-Sender-Address: me@berkoc.com
-X-Rspamd-Queue-Id: 0699F561A00
+X-Rspamd-Queue-Id: 06FC0561811
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [5.84 / 15.00];
-	SEM_URIBL_FRESH15(3.00)[berkoc.com:email];
-	DMARC_POLICY_REJECT(2.00)[berkoc.com : SPF not aligned (strict),reject];
-	R_DKIM_REJECT(1.00)[berkoc.com:s=1984];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,intel.com,lunn.ch,linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	GREYLIST(0.00)[pass,body];
-	TAGGED_FROM(0.00)[bounces-288742-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[berkoc.com:-];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288739-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[me@berkoc.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.963];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Action: no action
 
-pcan_usb_pro_decode_buf() walks variable-sized records inside the
-bulk-in URB. Each iteration reads pr->data_type (the first byte of the
-record) and indexes pcan_usb_pro_sizeof_rec[] with it before checking
-that the announced record length fits within msg_end. When the URB
-length exactly equals PCAN_USBPRO_MSG_HEADER_LEN (4 bytes),
-pcan_msg_init() returns a rec_ptr that already equals msg_end while the
-on-wire rec_cnt field can still be non-zero. The first iteration then
-reads pr->data_type one byte past the URB buffer.
+From: 'Simon Horman' <horms@kernel.org>
 
-A malicious USB device that pretends to be a PEAK-System PCAN-USB-Pro
-adapter (USB IDs 0c72:000c..0c72:0014 across the Pro and Pro-FD line)
-can keep returning short bulk-in URBs and trigger this read on every
-poll cycle, leaking one byte of adjacent slab content into the
-dispatch table lookup or producing a KASAN slab-out-of-bounds report.
-
-Apply the pattern from commit 6fe9f3279f7d ("can: gs_usb: gs_usb_receive_bulk_callback(): check actual_length before accessing header"):
-verify that at least one byte remains before dereferencing the record
-header.
-
-Identified by static analysis. No KASAN trip available without specific
-PEAK CAN-USB-Pro hardware.
-
-Fixes: d8a199355f8f ("can: usb: PEAK-System Technik PCAN-USB Pro specific part")
-Cc: stable@vger.kernel.org # 3.4+
-Signed-off-by: Berkant Koc <me@berkoc.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- drivers/net/can/usb/peak_usb/pcan_usb_pro.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+netdevsim: Implement basic ptp support
 
-diff --git a/drivers/net/can/usb/peak_usb/pcan_usb_pro.c b/drivers/net/can/usb/peak_usb/pcan_usb_pro.c
-index 4bfa8d0fbb32..f7b0304f7c37 100644
---- a/drivers/net/can/usb/peak_usb/pcan_usb_pro.c
-+++ b/drivers/net/can/usb/peak_usb/pcan_usb_pro.c
-@@ -715,8 +715,19 @@ static int pcan_usb_pro_decode_buf(struct peak_usb_device *dev, struct urb *urb)
- 	msg_end = urb->transfer_buffer + urb->actual_length;
- 	rec_cnt = le16_to_cpu(*usb_msg.u.rec_cnt_rd);
- 	for (; rec_cnt > 0; rec_cnt--) {
--		union pcan_usb_pro_rec *pr = (union pcan_usb_pro_rec *)rec_ptr;
--		u16 sizeof_rec = pcan_usb_pro_sizeof_rec[pr->data_type];
-+		union pcan_usb_pro_rec *pr;
-+		u16 sizeof_rec;
-+
-+		/* make sure data_type is readable before dereferencing it */
-+		if (rec_ptr >= msg_end) {
-+			netdev_err(netdev,
-+				   "got frag rec: should inc usb rx buf size\n");
-+			err = -EBADMSG;
-+			break;
-+		}
-+
-+		pr = (union pcan_usb_pro_rec *)rec_ptr;
-+		sizeof_rec = pcan_usb_pro_sizeof_rec[pr->data_type];
- 
- 		if (!sizeof_rec) {
- 			netdev_err(netdev,
--- 
-2.47.3
+This patch wires two ptp_mock clocks into netdevsim, implements
+ndo_hwtstamp_get/set, and samples PHC timestamps from nsim_start_xmit()
+to attach TX/RX hardware timestamps to forwarded skbs.
 
+> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
+> index 36a201533aae..5b709033cc5f 100644
+> --- a/drivers/net/netdevsim/ethtool.c
+> +++ b/drivers/net/netdevsim/ethtool.c
+
+[ ... ]
+
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index a750768912b5..5caf60e73941 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -122,7 +124,11 @@ static int nsim_forward_skb(struct net_device *tx_dev,
+>
+>  static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  {
+> +	struct skb_shared_hwtstamps shhwtstamps = {};
+>  	struct netdevsim *ns = netdev_priv(dev);
+> +	struct ptp_clock_info *ptp_info;
+> +	struct timespec64 tx_ts, rx_ts;
+> +	struct sk_buff *skb_orig = skb;
+>  	struct skb_ext *psp_ext = NULL;
+>  	struct net_device *peer_dev;
+>  	unsigned int len = skb->len;
+> @@ -164,6 +170,36 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  		skb_linearize(skb);
+>
+>  	skb_tx_timestamp(skb);
+> +
+> +	/* Generate RX timestamp using the peer's PHC if RX timestamping is enabled */
+> +	if (peer_ns->tstamp_config.rx_filter != HWTSTAMP_FILTER_NONE) {
+> +		ptp_info = mock_phc_get_ptp_info(peer_ns->phc);
+> +		ptp_info->gettime64(ptp_info, &rx_ts);
+> +	}
+
+[High]
+Can the value of peer_ns->tstamp_config.rx_filter change between this
+read and the second read further down that gates the write to
+skb_hwtstamps(skb)->hwtstamp?
+
+nsim_set_ts_config() updates ns->tstamp_config from its own ndo
+context with no lock or barrier shared with nsim_start_xmit(). If a
+concurrent ndo_hwtstamp_set on the peer flips rx_filter from
+HWTSTAMP_FILTER_NONE to HWTSTAMP_FILTER_ALL between the two reads,
+the first branch is skipped (rx_ts remains uninitialized on the
+xmit stack) and the second branch executes:
+
+    if (peer_ns->tstamp_config.rx_filter != HWTSTAMP_FILTER_NONE)
+        skb_hwtstamps(skb)->hwtstamp = timespec64_to_ktime(rx_ts);
+
+Eight bytes of uninitialized stack are then placed into
+skb_hwtstamps and forwarded to the peer, where they are delivered
+to userspace via SO_TIMESTAMPING ancillary data.
+
+Would caching the decision in a local boolean alongside rx_ts (only
+true on the path that actually called gettime64) and reading the
+config field once via READ_ONCE or a lock close this?
+
+> +
+> +	/* If TX hardware timestamping is enabled, generate and attach a TX timestamp */
+> +	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP &&
+> +	    peer_ns->tstamp_config.tx_type == HWTSTAMP_TX_ON) {
+> +		ptp_info = mock_phc_get_ptp_info(ns->phc);
+> +		ptp_info->gettime64(ptp_info, &tx_ts);
+
+[High]
+Should the predicate consult ns->tstamp_config.tx_type rather than
+peer_ns->tstamp_config.tx_type?
+
+The standard ndo_hwtstamp_set contract is that enabling
+HWTSTAMP_TX_ON on a device controls TX timestamping for transmits
+from that device. As written, configuring HWTSTAMP_TX_ON on the
+local netdevsim has no effect on its own transmits, and ptp4l
+running on the local end would never see SCM_TSTAMP_SND completions
+unless the operator also configures the peer, which contradicts the
+commit message statement that this "enables running ptp4l on
+netdevsim adapters".
+
+There is also a NULL dereference path on VFs. nsim_vf_netdev_ops
+shares nsim_start_xmit but does not install ndo_hwtstamp_set, and
+nsim_init_netdevsim_vf() never assigns ns->phc, so a VF has
+ns->phc == NULL. If a VF is peered with a PF that has tx_type set
+to HWTSTAMP_TX_ON, an unprivileged sender on the VF with
+SOF_TIMESTAMPING_TX_HARDWARE reaches:
+
+    ptp_info = mock_phc_get_ptp_info(ns->phc);
+    ptp_info->gettime64(ptp_info, &tx_ts);
+
+with ns->phc == NULL. Since info is the first field of struct
+mock_phc, mock_phc_get_ptp_info(NULL) returns NULL and gettime64
+dereferences a NULL function pointer.
+
+Switching the predicate to ns->tstamp_config.tx_type also closes
+the NULL deref because nsim_set_ts_config() returns -EOPNOTSUPP
+when ns->phc is NULL, so tx_type==HWTSTAMP_TX_ON implies a non-NULL
+phc on the local device.
+
+> +
+> +		/* Create a copy of the SKB to forward to peer and prevent
+> +		 * from reporting incorrect TX timestamp when skb_hwtstamps is set.
+> +		 */
+> +		skb = skb_copy(skb_orig, GFP_ATOMIC);
+> +		if (skb) {
+> +			shhwtstamps.hwtstamp = timespec64_to_ktime(tx_ts);
+> +			skb_tstamp_tx(skb_orig, &shhwtstamps);
+> +			consume_skb(skb_orig);
+> +		} else {
+> +			skb = skb_orig;
+> +		}
+> +	}
+
+[Medium]
+What happens to the freshly sampled tx_ts if skb_copy() fails under
+memory pressure?
+
+In the else branch skb_tstamp_tx() is never called, so no
+SCM_TSTAMP_SND completion is delivered to the application's error
+queue. There is no counter increment, no warning, and no fallback
+path that delivers the timestamp without the copy. ptp4l would see
+phantom TX-timestamp losses with no diagnostic. Could the timestamp
+be reported even on the allocation-failure path?
+
+[Low]
+Is the temporal ordering of the two PHC samples intentional?
+
+rx_ts is sampled from peer_ns->phc before tx_ts is sampled from
+ns->phc, but on a real link RX time follows TX time. With both
+PHCs free-running, ptp4l can observe negative path delays for the
+same packet, which can confuse the protocol's filter and one-way
+delay computation. Would sampling tx_ts first (and optionally
+adding a small simulated propagation delay before the rx sample)
+be a better fit for the stated goal of running ptp4l on
+netdevsim?
+
+> +
+> +	/* set the rx timestamp to the skb */
+> +	if (peer_ns->tstamp_config.rx_filter != HWTSTAMP_FILTER_NONE)
+> +		skb_hwtstamps(skb)->hwtstamp = timespec64_to_ktime(rx_ts);
+> +
+>  	if (unlikely(nsim_forward_skb(dev, peer_dev,
+>  				      skb, rq, psp_ext) == NET_RX_DROP))
+>  		goto out_drop_cnt;
+> @@ -185,6 +221,59 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	return NETDEV_TX_OK;
+>  }
+>
+> +static int nsim_set_ts_config(struct net_device *netdev,
+> +			      struct kernel_hwtstamp_config *config,
+> +			      struct netlink_ext_ack *extack)
+> +{
+> +	struct netdevsim *ns = netdev_priv(netdev);
+> +
+> +	if (!ns->phc)
+> +		return -EOPNOTSUPP;
+> +
+> +	switch (config->tx_type) {
+> +	case HWTSTAMP_TX_OFF:
+> +		ns->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
+> +		break;
+> +	case HWTSTAMP_TX_ON:
+> +		ns->tstamp_config.tx_type = HWTSTAMP_TX_ON;
+> +		break;
+> +	default:
+> +		return -ERANGE;
+> +	}
+> +
+> +	switch (config->rx_filter) {
+> +	case HWTSTAMP_FILTER_NONE:
+> +		ns->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
+> +		break;
+> +	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
+> +	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+> +	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+> +	case HWTSTAMP_FILTER_PTP_V2_EVENT:
+> +	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+> +	case HWTSTAMP_FILTER_PTP_V2_SYNC:
+> +	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+> +	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+> +	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
+> +	case HWTSTAMP_FILTER_NTP_ALL:
+> +	case HWTSTAMP_FILTER_ALL:
+> +		ns->tstamp_config.rx_filter = HWTSTAMP_FILTER_ALL;
+> +		break;
+> +	default:
+> +		return -ERANGE;
+> +	}
+> +
+> +	return 0;
+> +}
+
+[Medium]
+Should the coerced rx_filter value also be written back into the
+caller's *config?
+
+dev_set_hwtstamp() in net/core/dev_ioctl.c copies the
+kernel_hwtstamp_config back to userspace after a successful
+ndo_hwtstamp_set, and Documentation/networking/timestamping.rst
+asks drivers to indicate when they timestamp more than requested.
+Here the PTP_V1_*, PTP_V2_*, and NTP_ALL cases are all internally
+mapped to HWTSTAMP_FILTER_ALL but config->rx_filter is left at the
+caller's original value, so userspace cannot detect the widening.
+Other drivers (mlx5e, igb, stmmac) write the coerced filter back
+into config->rx_filter for this reason.
+
+[ ... ]
 
