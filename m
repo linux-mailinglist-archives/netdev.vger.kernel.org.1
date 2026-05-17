@@ -1,165 +1,146 @@
-Return-Path: <netdev+bounces-288750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPRSAtLbCWqZswQAu9opvQ
-	(envelope-from <netdev+bounces-288750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:16:34 +0200
+	id VZ1EA1zeCWrJtQQAu9opvQ
+	(envelope-from <netdev+bounces-288751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:27:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7580D561F43
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:16:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9F02561FA9
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 17:27:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 718D63009F90
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 15:16:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E070300B871
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 15:27:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120E53B0ADB;
-	Sun, 17 May 2026 15:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A8B3B0ADB;
+	Sun, 17 May 2026 15:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vassilevski.com header.i=@vassilevski.com header.b="LxPlL6Nz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="S9USXKTK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-244108.protonmail.ch (mail-244108.protonmail.ch [109.224.244.108])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157132C21F1;
-	Sun, 17 May 2026 15:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B40F30F957
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 15:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779030988; cv=none; b=cPHHz2nUPyBj2+zNogtq0qjfUtRAaSI+mj4e7Q2wbNE1qaRN0dDzkTPyhD2PjGnavqMUzdJrM45L0XdUBzr7sfzn0dqQcxM13QouLrtvICmsGI16ibGVB+8ajWrzJIFYQVv4ViCo/2lONaqSGV8xz2d9ilzppzY4lb4Wl1TGamg=
+	t=1779031638; cv=none; b=pAQPvpPVj9t7Od579dBAVWSt9Nps0kX/NNCdQuRyPpKof4da0sHwzOXEjupDXGcS7Ot2wmfRZQgAQCpBIyApo34/pUScnFYPp+yCNxa7OIAy9/YJKwc+LnUHX35EL1W8qcKh6lCks0ESnIvRKhkPugxSGkidgfeW6WojHI6gRvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779030988; c=relaxed/simple;
-	bh=iKoWjFoumDzU83662ZU2qlYoicofSlY+S6AkomCAcWc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XhBqNuBPqgtX6w18LD4PA1ehJY4rGYfO2YiOOtsVAIUcXEFVnRL4779/7u1RhqLGrO5Ao1qjeP0BFuvUQ8tBx+EyLPfRc1RLdB1sipXcBYfWJH4ckkZXIgPg00yA+IbC3ntLi5+6ezTHCLsY7y8wtg19LMBjBcewfvbHJhfaUyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vassilevski.com; spf=pass smtp.mailfrom=vassilevski.com; dkim=pass (1024-bit key) header.d=vassilevski.com header.i=@vassilevski.com header.b=LxPlL6Nz; arc=none smtp.client-ip=109.224.244.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vassilevski.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vassilevski.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vassilevski.com;
-	s=protonmail; t=1779030983; x=1779290183;
-	bh=nTuZeJsw+iCXzqp0R7o7Vg2ADgoYOa361E1gmqMhiNQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:From:To:
-	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=LxPlL6NzxUvGQWEUh3ho0zlX9qqMCJ7wCObFMzYmhR1d7VDgnNxAAgQ10UcQaSoIW
-	 PDhICQQJ9Ov1B6wNlclHx1C8kYBMGCZntfYSLRVI3gwOTU7G3WCfOPbvfWl+Eou/Hj
-	 /VrOq3JnF9y67RDmWfTR2ZPEKR6Xf7O731e841UU=
-X-Pm-Submission-Id: 4gJPf65WVsz2Scpx
-From: Alexander Vassilevski <oss@vassilevski.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Chintan Vankar <c-vankar@ti.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	netdev@vger.kernel.org,
-	linux-omap@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Alexander Vassilevski <oss@vassilevski.com>
-Subject: [PATCH v2] net: ethernet: ti: am65-cpsw-nuss: remove dead vid check in slave_add_vid()
-Date: Sun, 17 May 2026 08:16:11 -0700
-Message-ID: <20260517151611.393789-1-oss@vassilevski.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260515225715.3641804-1-oss@vassilevski.com>
-References: <20260515225715.3641804-1-oss@vassilevski.com>
+	s=arc-20240116; t=1779031638; c=relaxed/simple;
+	bh=Xh9w9nnQ1BXjz1e2nRhzF9/3vI3dy5RtCDo1eM+23w0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oIlJF/rFCV687oM4rNNwaIqO/LhZmB/goyFjctXc4wUBt/a838rEC3sgaJbLIG8pITl1rTqjZ1cEDb38hLHA7mzzHDJeth9winHoom192v/AvEj30xKXLIJzE/94R3gsvNC6oeU8gc7+YFZtmEujLJedFKjLkTnig5oULZfQYjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=S9USXKTK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=nNHIlg0KhKM8vz2t70ndpkgpiFMwt72VAtSNvRBC8kE=; b=S9
+	USXKTKCHtdG1RANCBNUpAltXHZApKjpRZ8rL1+ZT+TNPS5XbHBAGvITjhv0M9fuY6rWwVdm/0UlAI
+	elVYCAYbQmB6GU79r4x6SoFqM2TN4YRhaU/5XqsfHDTMeI72FDNmv1oCB0Jk9m72Q1J4mKL8WOgNi
+	g2vQYyZCMui2jBY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wOdOK-003L7h-IV; Sun, 17 May 2026 17:26:56 +0200
+Date: Sun, 17 May 2026 17:26:56 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Markus Stockhausen <markus.stockhausen@gmx.de>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
+	daniel@makrotopia.org
+Subject: Re: [PATCH] net: mdio: Add Realtek Otto MDIO driver
+Message-ID: <da228153-65b0-4b21-b62c-1562394ca95a@lunn.ch>
+References: <20260517111530.220017-1-markus.stockhausen@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7580D561F43
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20260517111530.220017-1-markus.stockhausen@gmx.de>
+X-Rspamd-Queue-Id: B9F02561FA9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[vassilevski.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[vassilevski.com:s=protonmail];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288750-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linaro.org,ti.com,wanadoo.fr,vger.kernel.org,vassilevski.com];
-	DKIM_TRACE(0.00)[vassilevski.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oss@vassilevski.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288751-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmx.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:email,linaro.org:email]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
 X-Rspamd-Action: no action
 
-am65_cpsw_nuss_ndo_slave_add_vid() returns early at the top with:
+> There are a few issues left that will fixed in the next weeks. So
+> slowly it boils down to the question, how to best submit all of this
+> to upstream.
 
-    if (!netif_running(ndev) || !vid)
-        return 0;
+Lots of small patches which slowly transform the Mainline version
+towards the downstream version.
 
-so vid is guaranteed to be non-zero in the rest of the function. The
-subsequent
+> +static inline struct rtmd_ctrl *rtmd_ctrl_from_bus(struct mii_bus *bus)
+> +{
+> +	return ((struct rtmd_chan *)bus->priv)->ctrl;
+> +}
 
-    if (!vid)
-        unreg_mcast = port_mask;
+No inline functions in .c files, let the compiler decide.
 
-is therefore unreachable. Drop the dead branch.
+=00> +static int rtmd_read_c45(struct mii_bus *bus, int phy, int devnum, in=
+t regnum)
+> +{
+> +	struct rtmd_ctrl *ctrl =3D rtmd_ctrl_from_bus(bus);
+> +	int ret, pn, val =3D 0;
+> +
+> +	pn =3D rtmd_phy_to_port(bus, phy);
+> +	if (pn < 0)
+> +		return -ENOENT;
+> +
+> +	guard(mutex)(&ctrl->lock);
 
-With that branch gone, unreg_mcast is only ever its initializer value
-of zero, so drop the variable and pass 0 directly to
-cpsw_ale_vlan_add_modify().
+Netdev does not like these sort of magical guard() locks.=20
 
-No functional change.
+> +	ret =3D (*ctrl->cfg->read_c45)(bus, pn, devnum, regnum, &val);
+> +	dev_dbg(&bus->dev, "rd_MMD(phy=3D0x%02x, dev=3D0x%04x, reg=3D0x%04x) =
+=3D 0x%04x, ret =3D %d\n",
+> +		phy, devnum, regnum, val, ret);
+> +
+> +	return ret ? ret : val;
 
-Found by Smatch.
+Does the dev_dbg() need the lock? What about the return statement?
+That is the downside of guard(), it generally covers more than what is
+needed. It makes it harder to change this code in the future because
+it is not clear what actually needs the lock and what does not.
 
-Fixes: 7bcffde02152 ("net: ethernet: ti: am65-cpsw-nuss: restore vlan configuration while down/up")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/kernel-janitors/aS_lhMwppbDHoEcX@stanley.mountain/
-Suggested-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-Signed-off-by: Alexander Vassilevski <oss@vassilevski.com>
----
-I agree, Christophe.
+There is a comment about this in the netdev FAQ:
 
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 77f59996a0..434a310808 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -302,7 +302,7 @@ static int am65_cpsw_nuss_ndo_slave_add_vid(struct net_device *ndev,
- {
- 	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
- 	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
--	u32 port_mask, unreg_mcast = 0;
-+	u32 port_mask;
- 	int ret;
- 
- 	if (!common->is_emac_mode)
-@@ -318,7 +318,7 @@ static int am65_cpsw_nuss_ndo_slave_add_vid(struct net_device *ndev,
- 	port_mask = BIT(port->port_id) | ALE_PORT_HOST;
- 	dev_info(common->dev, "Adding vlan %d to vlan filter\n", vid);
- 	ret = cpsw_ale_vlan_add_modify(common->ale, vid, port_mask,
--				       unreg_mcast, port_mask, 0);
-+				       0, port_mask, 0);
- 
- 	pm_runtime_put(common->dev);
- 	return ret;
--- 
-2.43.0
-
+	Andrew
 
