@@ -1,243 +1,163 @@
-Return-Path: <netdev+bounces-288782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288783-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6enrEm8/CmqbyAQAu9opvQ
-	(envelope-from <netdev+bounces-288782-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:21:35 +0200
+	id WO5+NZ8/CmqbyAQAu9opvQ
+	(envelope-from <netdev+bounces-288783-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:22:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7254564282
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:21:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EECE5642A0
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 111D13001323
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 22:21:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A04C63026C15
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 22:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329173D47A1;
-	Sun, 17 May 2026 22:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0303F32F757;
+	Sun, 17 May 2026 22:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dJGnA0hz"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="GNwZA6zQ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HmOku9ew"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B964B3043DE
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF0B3D47DC
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779056490; cv=none; b=B3+eeGLfA5aIFLqlRNkC9+KG2QtZlC04URQmggDwtrJLqHN8T7s4IDwVtGj0Kn4SPAsrvt82fwVpnWEOX9/xgL8u9/GbBSsADjQDxunE7lu1JC1Sf0GKhGfqt2kXCb+l44R2ZIhMGLwP0GIrjYCbZw1CDUDp3uURDRyCTlrQRB0=
+	t=1779056505; cv=none; b=ROyDRWWHR5iU+tVBrSg4SKqq6jtcL6hmUyAG3rKeZN/DymoD8ccVekenHWMJJ5FglP6AOrxXm8778RqfR+Kv6GtEbJNgbf4v68lyIXfjogvumLTfNiSbOp3Zr5Ul29w8lDa9l9+Il7TfWtkAyfDjEAyuyYK+BFCZx533QlnK1P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779056490; c=relaxed/simple;
-	bh=Nkdh/o+NdvEDXczKo7JSi5D+SMLbhUf2r08VjQQK1u8=;
+	s=arc-20240116; t=1779056505; c=relaxed/simple;
+	bh=1awk/lQ4lWkOa0EChlDQlo+wkTI9IajS9yTS79CR+oo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZSzbkuzITb0hR7sOdus4GNGD3V2FYnhzeK3UxQSf3/VM/Du4e7nKtzQIrxVzhkdBWKnDxVUhUnDOWIPgl8Iv5/lVtG7qiZxMrwm6FDNSjrSOzE2vQKu1ca9KFDdlAxMu5fo0D2WBw0FL3J8GRkndX1NcXUhPs+EGfUQZVvrxRxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dJGnA0hz; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4585a116a4aso1260249f8f.3
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 15:21:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779056486; x=1779661286; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jRXKAgR6mEIDdOY7jCBs+jQiL9+n0WTtYZp0RJAX6B0=;
-        b=dJGnA0hzcwA21mytuA1t2RaR1bFa9b2pQBy4dD3hIWomjLekUFiTIZ9PWC14nGWxCc
-         CaU7mkpSL0XJfABX+H+XdmVqIC7wOte88Ydy9t6VSzQrih2gf1A+Pfkj73/+UXcJ5keT
-         c9xhp2RyG9C9+p5TqCdtc2bO/tMNSG2AFDDMTMFTeq5mtKT2M3bgQpe3TVicipeNn6NJ
-         bkrfGBmB8YWqojaObo0yg4Q3GKC8pdSXtGTcpkhYDBpWy4Ur9ttRrBVF01zcitDYMfpI
-         WBz2kqvMSl0Irp87OL2/py18HXrE+7B8HvMgzeo6PbdB729d94+l18ZPqIcd7aLmcfl6
-         PJ3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779056486; x=1779661286;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jRXKAgR6mEIDdOY7jCBs+jQiL9+n0WTtYZp0RJAX6B0=;
-        b=DXXQrCBFL4d9OxcpXWgab86HUyINJqqE9spLldvxgnlSSHSmnI5yr9DStOXxxzEtNx
-         AZYtwlNKSaIa1eWDkW2koZGHnFThKto9Nb/8xAhCGxCe8Q6FkPtvYkCGuWLAoFCLVrC7
-         7okfcJFsnP9m1ew4TZd/yLesFh0WFxju6z5MGffbOaO4n6wWbDDYrArz/1tkxEFP0kng
-         um/5mqjayntB5FrHZvj/F4I9hiTUXz0MaVQclut74W8t75dq1Uh1Ia0sedOAHoJgZ2L4
-         y5S5ROMFO3jkfCm8szfIWYTUtxz5KZ8l+sFVIsoMX7zr5xblFAHgww90rXdlfKJZR5/1
-         VBMA==
-X-Forwarded-Encrypted: i=1; AFNElJ+6BfXw4qYMzvyCKNEzIHZ01jKopRsL612KtyvliuK9MLg2fi0V2AJsROJZHHLQM02xyDcOqvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqqKOEZJis4BYlvc93buAxF6/dlSWJaQE9vyKpvs+Da/ErC2Cp
-	K5qPV40cDSwPkh1zxyEOU6Z0URTdPzIqy79EglVUy1MOTht1a50AARpZ
-X-Gm-Gg: Acq92OFHDbhmjFL+xs59JFEkybbEQO8ZDqey5tS+OlNVzR+K/vlZdjxcyrLu2ybwe3o
-	/7U75YZzgpAteyqoMCHIRY4KMkRZHY6bTtGA/Rq2iSV17fL0B/TmgiGWK62B1VwCkmVEMbk9Onv
-	zcJSoyhun60+NilRdu0ZhocLPeMEtWEo7LcQBTwwbi8qL9lyZ2ofoZDhB73VezNam9IkeO1uU8F
-	k7WOFcMlxfblP3AhcMZYCDGaJvkBhfhJAbbM5khowhZRhS/nYwPFpD9rJ6vTu7Yvo3avCag37j8
-	CHiBI3K1DlBSE3A2r9CjA+zBfyEJgrA9OM4PtxofWxJBxqduOOSFd9WgbZpVs9nMalDn1ux0X/n
-	IpOVBn6IbZPrsH/Ozesjnds8hLIEX9N22rj622yUILZXneVFLDzdWoQRtifyT8WO0yDo9+zCkNG
-	RXcxIRdiDseYaxLBNIHWTl2rRMbIc=
-X-Received: by 2002:a05:6000:1a8e:b0:441:202e:3d2d with SMTP id ffacd0b85a97d-45e5c59a3fbmr18364490f8f.19.1779056485427;
-        Sun, 17 May 2026 15:21:25 -0700 (PDT)
-Received: from grain.localdomain ([212.46.38.55])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9ec3acf7sm32072217f8f.12.2026.05.17.15.21.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 15:21:24 -0700 (PDT)
-Received: by grain.localdomain (Postfix, from userid 1000)
-	id DD7CD5A005B; Mon, 18 May 2026 01:21:21 +0300 (MSK)
-Date: Mon, 18 May 2026 01:21:21 +0300
-From: Cyrill Gorcunov <gorcunov@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
-Subject: [PATCH v2] ice: Fix wrong dsn read in ice_adapter_put
-Message-ID: <ago_YTTWiZs6G8_5@grain>
-References: <agQ_xZUp3Sq905O_@grain>
- <20260517125307.287246-1-horms@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y2PRvCtb/KBZuG5jZjfBgFmEQE1VLqhkBb+tQ+MFp9swb/BsWtEjKvBvy7iRAup2wgpZSXtS9+c9CxXFyBD3Nr1JzHIZHECAquT4Qptw57S1eoY2oZAcSKVqxL9EjzuFWYElmBymGcpVUIwKPIjAtBEuGjioOtDwDNgBJ/Tqa3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=GNwZA6zQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HmOku9ew; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 6EDD0140002F;
+	Sun, 17 May 2026 18:21:39 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Sun, 17 May 2026 18:21:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1779056499; x=
+	1779142899; bh=+cEJ3kbqFxWztaXHBLGBfF2YVqchsnkIgKIuuEf9j0o=; b=G
+	NwZA6zQPTGnK4pYU33fdSbcpfxiBr7IbgExni1MyCF1jOU+Fvb14pUq5JLk2zPRt
+	mD4Eg6EtocM9tRctPT5zJJVfPZ/frRXl4fnPRQfVQL1+dGlCHRDTWGVeQ11zD+IZ
+	U+KvDOlMJ0k9ftAAtp1YpilGbUPfKLsk0xYDRxgqB3+gPU573Oe8CL9jZvuYoHWn
+	W4WJ9xMcmpDeGyLSjkH3v2uryjnyoYwinr43crq8+js9f5gBUBUNPVf9HYUKXn+b
+	mblvPtzBFPSQJ7TCVs2eN/DuEcUjDNqr3N1eLbx65pK1oPghDUfZy0gW7cEIdHlp
+	944wyd/wzhiIUu0hUAS/g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1779056499; x=1779142899; bh=+cEJ3kbqFxWztaXHBLGBfF2YVqchsnkIgKI
+	uuEf9j0o=; b=HmOku9ewkxXfILJpaa2UUobwOks4RsAyrhsFN4cAkBN3GfxHL5E
+	H8vonWPW6ZeHfnqc+no2rktkx37RwwJI93g8N1wukVkOJbNwF732pWerf6owUdPD
+	ZSV8wxCw0+yoT7l4scHFLoS3Zn5j+4hI+BJf4H2GGkvci8EXcIeQHlIwTAgkPeOJ
+	GISOM/sZ4omcrcMkrEN2eXh4rCwFEZUDL2dpT6lfy/pR28Bs32J+P852ZD7ACp84
+	W+paN1uG8q770n4XPM0HB5z99mLNfHN2i2PaDzWQk4kjhzUY8ZNCqrRC/FqQuAeO
+	L8E4T+r3BknzqFWl5gxHS6wPTms0Tz+qXdQ==
+X-ME-Sender: <xms:cj8Kaj1WS2pnRWNRbzrAab7ch1CURp5TDHb2-lqjBaF4mXRxPisLMg>
+    <xme:cj8Kat7w-xT6tTrycow6QM4Ka_IhhP98wprHQ93WmfTAX3iDDFdYjxe8eiJmaFRWC
+    Cedo0xUCs3oVb-q17BfHxNwfs2D6q8ZiCt0QCrGJU1ivn8cVwP7QK4>
+X-ME-Received: <xmr:cj8KavQ7pqJOL29pCdbXZcrbPvd5q7hjsInoW0UPacdQDEsgoVa6ti-77Rg0qoS0XIVQ2rV7p8POdO-GXG3rBOs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddufeejudejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhjvghthhifrghnihesphhurhgvshhtoh
+    hrrghgvgdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehsrggvvggumhesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
+    epthgrrhhiqhhtsehnvhhiughirgdrtghomhdprhgtphhtthhopehmsghlohgthhesnhhv
+    ihguihgrrdgtohhmpdhrtghpthhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprh
+    gtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphht
+    thhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvh
+    gvmhhlohhfthdrnhgvth
+X-ME-Proxy: <xmx:cj8KaiX8Qqqg84VGik6ksxoUBkeTddqxLF9k8MR_0EOBdc1uRaDyBQ>
+    <xmx:cj8KakEwtXvKTc8sEtNu0lNGzGEsY7yPJhIG1N8wmpMX9JboP6HD7Q>
+    <xmx:cj8KalfDanpmQXGXqR0UppPkT9GX-3l24Yx2i2cUS-nJi2J-v_VXfw>
+    <xmx:cj8KatpjwlowEzshxVMWnOuiktb74zJGLhkh6R7T9IsDjHo4fva34Q>
+    <xmx:cz8KajpCWdwg3arLlhyYW9Z5IF6i-lGQkXUIIxgmn1_Gl6p36r9rwUoQ>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 17 May 2026 18:21:38 -0400 (EDT)
+Date: Mon, 18 May 2026 00:21:36 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Rishikesh Jethwani <rjethwani@purestorage.com>
+Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
+	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	edumazet@google.com, leon@kernel.org
+Subject: Re: [PATCH net-next v14 0/9] tls: Add TLS 1.3 hardware offload
+ support
+Message-ID: <ago_cBXRSsqTpkYk@krikkit>
+References: <20260515212715.3151307-1-rjethwani@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260517125307.287246-1-horms@kernel.org>
-User-Agent: Mutt/2.3.1 (2026-03-20)
-X-Rspamd-Queue-Id: C7254564282
+In-Reply-To: <20260515212715.3151307-1-rjethwani@purestorage.com>
+X-Rspamd-Queue-Id: 3EECE5642A0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-288783-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288782-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,redhat.com,google.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gorcunov@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Sun, May 17, 2026 at 01:53:07PM +0100, Simon Horman wrote:
-...
-> >  void ice_adapter_put(struct pci_dev *pdev)
-> >  {
-> > +	const struct ice_pf *pf = pci_get_drvdata(pdev);
-> > +	unsigned long index = pf->adapter->index;
+2026-05-15, 15:27:06 -0600, Rishikesh Jethwani wrote:
+> Hi all,
 > 
-> Is it possible for pf->adapter to be NULL here if the device was probed in
-> firmware recovery mode?
-> 
-> If the device enters firmware recovery mode during ice_probe(), the driver
-> calls ice_probe_recovery_mode() and skips the ice_adapter_get() allocation.
-> If the device is subsequently unplugged, the memory-mapped read for the
-> firmware state register might return 0.
-> 
-> This would cause ice_is_recovery_mode() to evaluate to false in ice_remove(),
-> allowing the normal teardown sequence to proceed and call ice_adapter_put().
-> Would the unconditional dereference of pf->adapter->index then cause a NULL
-> pointer dereference?
+> This series adds TLS 1.3 hardware offload support including KeyUpdate
+> (rekey) and a selftest for validation.
 
-If we're in recovery mode the ice_remove will not reach ice_adapter_put,
-instead it will stop service work and just deinit devlink interface, no?
+I know I've been a bit slow in responding to your description of what
+the NICs are doing, the past weeks have been "kind of" busy. I'm
+planning to get back to this topic as soon as I get a good chunk of
+uninterrupted time to think about it.
 
-> Also, does this implicit cast to unsigned long bypass the XOR folding used
-> during insertion on 32-bit architectures?
-> 
-> The ice_adapters XArray is keyed by an unsigned long index. During insertion
-> in ice_adapter_get(), the index is computed using ice_adapter_xa_index(pdev).
-> On 32-bit architectures, this helper explicitly applies a bitwise XOR fold
-> to the 64-bit Device Serial Number:
-> 
-> (u32)index ^ (u32)(index >> 32)
-> 
-> Since pf->adapter->index is a 64-bit value, assigning it directly to a
-> 32-bit unsigned long implicitly truncates the upper 32 bits, omitting the
-> XOR operation.
-> 
-> Because the lookup index would differ from the insertion index, xa_load()
-> might fail to find the adapter. Would this trigger the WARN_ON and return
-> early, permanently leaking the adapter memory?
+But with this repost, the discussion is going to be split between 2
+threads. It's better to wait until the discussions are concluded on
+one version before resending.
 
-That's the good point but it seems the problem is deeper -- the xor doesn't
-prevent from index collision which may lead to wrong assumption with shared
-clocks as far as I can tell (and this will cause warn-on-once in ice_adapter_get
-with unpredictable state of adapter in further work). So it looks that xoring
-index on 32bit archs is just broken.
-
-Still point is correct (i've been working with this adapters on 64bit archs
-only so didn't get this issue). Here is an updated version.
----
-From: Cyrill Gorcunov <gorcunov@gmail.com>
-Subject: [PATCH v2] ice: Fix wrong dsn read in ice_adapter_put
-
-When registering an adapter instance, we read the PCI configuration
-space to fetch the DSN and generate an adapter index for lookups.
-
-However, if the adapter has been physically unplugged, the PCI space
-is no longer accessible. Reading it returns a zero value, which results
-in either an incorrect adapter instance being put or the proper instance
-not being put at all. To fix this, we will use the previously known
-index instead.
-
-Signed-off-by: Cyrill Gorcunov <gorcunov@gmail.com>
----
- drivers/net/ethernet/intel/ice/ice_adapter.c |   16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
-
-Index: linux-tip.git/drivers/net/ethernet/intel/ice/ice_adapter.c
-===================================================================
---- linux-tip.git.orig/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ linux-tip.git/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -40,10 +40,8 @@ static u64 ice_adapter_index(struct pci_
- 	}
- }
- 
--static unsigned long ice_adapter_xa_index(struct pci_dev *pdev)
-+static unsigned long xa_index_mangle(u64 index)
- {
--	u64 index = ice_adapter_index(pdev);
--
- #if BITS_PER_LONG == 64
- 	return index;
- #else
-@@ -51,6 +49,12 @@ static unsigned long ice_adapter_xa_inde
- #endif
- }
- 
-+static unsigned long ice_adapter_xa_index(struct pci_dev *pdev)
-+{
-+	u64 index = ice_adapter_index(pdev);
-+	return xa_index_mangle(index);
-+}
-+
- static struct ice_adapter *ice_adapter_new(struct pci_dev *pdev)
- {
- 	struct ice_adapter *adapter;
-@@ -130,13 +134,13 @@ struct ice_adapter *ice_adapter_get(stru
-  */
- void ice_adapter_put(struct pci_dev *pdev)
- {
-+	const struct ice_pf *pf = pci_get_drvdata(pdev);
-+	unsigned long index = xa_index_mangle(pf->adapter->index);
- 	struct ice_adapter *adapter;
--	unsigned long index;
- 
--	index = ice_adapter_xa_index(pdev);
- 	scoped_guard(mutex, &ice_adapters_mutex) {
- 		adapter = xa_load(&ice_adapters, index);
--		if (WARN_ON(!adapter))
-+		if (WARN_ON(!adapter || adapter != pf->adapter))
- 			return;
- 		if (!refcount_dec_and_test(&adapter->refcount))
- 			return;
+-- 
+Sabrina
 
