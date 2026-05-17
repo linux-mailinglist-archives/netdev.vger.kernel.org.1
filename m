@@ -1,136 +1,185 @@
-Return-Path: <netdev+bounces-288779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288780-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BdKJs0sCmqUxQQAu9opvQ
-	(envelope-from <netdev+bounces-288779-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 23:02:05 +0200
+	id ONI2D4c2CmrQxgQAu9opvQ
+	(envelope-from <netdev+bounces-288780-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 23:43:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1F1563E56
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 23:02:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D449A56411B
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 23:43:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6D4BD300443F
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 21:01:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A89DF301B71A
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 21:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026A7313552;
-	Sun, 17 May 2026 21:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B46322527;
+	Sun, 17 May 2026 21:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="g7tWDi06"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWaBxjQP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585F5310785;
-	Sun, 17 May 2026 21:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63D531F9A8
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 21:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779051707; cv=none; b=pCBIlQNWL45Ij8+VNvcw9EWtuJB4Fm/q1k2YYuzI3AJkgbXEXNgo76Gh3yIbqxqQWLj0yc4lcJu0m/dzbeysrqL4PGM6r94IRcUdzP5ZJXMvx+AH8m7KjeuyQkuvmpp04zVSv9tLjAF77W/KGHocwa2Y0/RGgz0aym8U9pwQeeo=
+	t=1779054202; cv=none; b=u+H8ZicPiJ2fKOyzjAPlzhV4lTWketJRvJFY6BfXJohN6zBss2OnDi9WXCVgm+/BSdaVEwZCUSkNtA0nNu4S4lY5pPVH4QOFFDUyhkph+pDatpCkWm60NjKvtXLTJwBFstonTeXbLqRIzn/yCh7Rq4rrnNpEOBHAyyWxwD9G8io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779051707; c=relaxed/simple;
-	bh=zYOKqXUVsTIdaSzWdZPQYqVTG4D+zpixB2jjPdfr+4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PPgpDNpYNGyuWHV2JZ7w4GKZcsGTykR0TuI6T/QrBY2faFQ/ktzg35edyIJ6dSLXPHa63E5xdglm7yvOiMhGLq86POQx1MBKFx6ZMopycvkVBtDNRWPO4h3XPmCKu5444gv011GIdxiKyumBPLKgPhFPceANyDV9yQQ7VGfVR6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=g7tWDi06; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=kD9WaT7LsOXwx3sJohzw9Q5hbHB01HbTUMrgACPB4m4=; b=g7
-	tWDi06DL7X6WwF5Ic3FM2gcis0NemQ0qyT2X5KFcMTBnCPfv91VDS+oKFnCIJLdE2DLwdy/OYZ/t8
-	NwXoaZ5fgllxn1fCSjd4xGzQto400LwqjSvMIaZiQxtstxeAbQclCj6+pLw/+vo6YLviooji61FZu
-	66RdjU68DHrwC+M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wOicD-003Mvv-Hj; Sun, 17 May 2026 23:01:37 +0200
-Date: Sun, 17 May 2026 23:01:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1779054202; c=relaxed/simple;
+	bh=x2SnDPx6H1QagNxCIExQTM0vo6QvPDaPGnXJCvJjNMs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KRrlF2NXRWf4qyCvRlnrCtcpWdGXbA5fmaQZwbGCX9YoRVLJ5HrQT4sloKo9qk0aUh8CXd+4VRQIdISuu/N4a4ekT9v81jGrcoIG6hC6xSetOvxFdn2cctLVltxZOZZi7TnbZ8P0AYPYm86rm0PctPMX2khL0ZioG6f7gWJ8rzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWaBxjQP; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2bc85eda6b6so6683475ad.1
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 14:43:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779054200; x=1779659000; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QTe3wQNFzUmJo4OqUtxIUOB0CH2AbajczwxLdZTke8s=;
+        b=hWaBxjQPSsTxT0ov4+m9HsfmhD25+HxsIeCWXohqy7DMFN4VTLfQ8650WtX3SQ8ta9
+         OP9aB+qZAZ+RFd5xG2dkMkvVcmN4ZZvbBgSetwGv8YwwFaeEI+Mr8K3JTb5ES3hBJxkW
+         rnLXwR3mHnZjVkVN1v6QrzuM0HT3hC676mIIUzB27qShHVoi7rp3RgJ3IQdHKyNfMo9F
+         yAj0Lq9X0X7jv0Y5Uq/zEJVewsiNDi/ALPXDO8EWGIr9trAddbefTCbtr+FTQBReSva7
+         VHt6lM5q2u4kKgnAgNYN5bW5SMK6LIv5vtSX0q6tO7ZOOBCv1QR4it5IByQZMiszjYUF
+         f8ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779054200; x=1779659000;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QTe3wQNFzUmJo4OqUtxIUOB0CH2AbajczwxLdZTke8s=;
+        b=KoW0TvpfgwcxEJez1xmb/13lE++vNPtvg6+jcy5PV4IcBQ1nnNMeOthifdkk8tztey
+         ryU4yYtLCbRWqcfJ8hoDPJ7VPYuyEg6oswnFnUlSAYNrbvuEL5saVvo6IvZUactszCbU
+         fS0rgplRsyxT+E6uFDAP7onFLREnz9n/00ZVcDg9/wEWFtdJUUKAhctRiMWvScmZfqdP
+         EFa16wKemOSsWlWRMf6trWJOcMK0DqBAuQV4Iw5s0045FqqEqpFV2hAzaEvxEQBW2U8D
+         RfKDwccSqW8mBryrzSOCVUk+Qabvv0JbJQxoBrV5+5DmCIDV1LqSusNzanBF+Gs1iiJS
+         WYrw==
+X-Gm-Message-State: AOJu0YxJV2HbEClE8yMD/0WNdg3jcHJjyuYVq+Vfe2kn8xf8Mz9vjiHr
+	/KuWvaQWATDugvfThRWWL0VtIIuJV9/k10HuC6GukzxipWI7kM9VMECn6ATDig==
+X-Gm-Gg: Acq92OE4jkWN5QvkDOeBxoVHYHg8KWpa2qcVGG+xar6Niqg3vVrvUk/D7tvxtI0eAVj
+	eXBmsFJJAcm7WnNZs43WEuDPDuXs3ZJEptkwqCWNKpcFT+pw7AYn04XZw6x39M5KK+cGxu7LUP5
+	I4M8uqyV5Jd3WmYEuGFvxZ5QRohjJXRsFkWnb6NxvG5IIrcgcDHKnbPJQ5M3z+2ayjUoFH4+1RK
+	8m0SlFQ9BnABHMEac4t6fz822gN2Q5I/ZzCTTa6iVAeo8PTniWJqCFkhG8L5zfAIiOD3n1oAa2p
+	55L7Ll4tDvhRA3mdomtywPWVjBr7pgG86tH4y8dKwvrUkk1+kdx1tFtY4Tr9uvw3iYCXuemXXqb
+	mx1qMaZe8t4RFWklkq6+c7DvX5Rc1VD+owZ2LsSe8B+aZC/zDL4nIjgLsG1OXQplE5kPbcqRCOT
+	KfKStmgR9FaVRCWSUn5AEbHt8ngl+WbjRVOWlyQgN+di3vCOTza6XAaJK5V7wsYA9klSMEBIzgV
+	HvXgySV0FCXSzzTbkYxLwR+04y9mmpvjQ4=
+X-Received: by 2002:a17:903:3c28:b0:2ba:bfb5:9cc with SMTP id d9443c01a7336-2bd7e8d3b9fmr141367515ad.26.1779054199825;
+        Sun, 17 May 2026 14:43:19 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5cfe6512sm128545545ad.52.2026.05.17.14.43.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 14:43:19 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Chris Snook <chris.snook@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:FREESCALE QUICC ENGINE UCC ETHERNET DRIVER" <linuxppc-dev@lists.ozlabs.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: ucc_geth: Batch RX packets before stack
- handoff
-Message-ID: <ad7c3caf-7947-49c0-ad43-22085f9bb9ef@lunn.ch>
-References: <20260517192856.3925-1-rosenp@gmail.com>
- <5ac9f5ca-4706-4617-a5fd-d3e6dd3b254a@lunn.ch>
- <CAKxU2N_SygFAKQuhwnZG7SP7jiRdkmwS_R+VwHap33UUfbQmAg@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: ag71xx: Unmap TX DMA buffers on completion
+Date: Sun, 17 May 2026 14:43:02 -0700
+Message-ID: <20260517214302.1450433-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKxU2N_SygFAKQuhwnZG7SP7jiRdkmwS_R+VwHap33UUfbQmAg@mail.gmail.com>
-X-Rspamd-Queue-Id: 8B1F1563E56
+X-Rspamd-Queue-Id: D449A56411B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288779-lists,netdev=lfdr.de];
-	URIBL_MULTI_FAIL(0.00)[sin.lore.kernel.org:server fail,lunn.ch:server fail];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_FROM(0.00)[bounces-288780-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,lunn.ch:mid,lunn.ch:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Sun, May 17, 2026 at 01:44:40PM -0700, Rosen Penev wrote:
-> On Sun, May 17, 2026 at 1:24 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Sun, May 17, 2026 at 12:28:56PM -0700, Rosen Penev wrote:
-> > > Collect received skbs on a local list during RX polling and pass the
-> > > completed batch to netif_receive_skb_list(). This lets the networking
-> > > stack process packets from a poll cycle in bulk instead of handing each
-> > > skb up individually.
-> >
-> > So my first through was, why is the core not doing this? The core NAPI
-> > poll code can initialise the list. netif_receive_skb() withing the
-> > driver poll would see there is a list and append to it. And when the
-> > poll finished the NAPI core would pass the list up the stack? Maybe
-> > this already exists and this driver is just using the wrong API?
-> I do not know. I know several drivers are already using
-> netif_receive_skb_list, some even which support hardware checksumming.
-> See 0a25d92c6f4facaf2852f1aac4cebfe01dd57a91
-> 
-> The core seems to use netif_receive_skb_list_internal. I do not know
-> the details.
-> 
-> Anyway, the performance difference is real.
+Store the DMA address used for each transmitted skb and unmap it when
+the skb is completed or cleaned from the TX ring.
 
-I'm not disagreeing with that. But can a similar performance
-difference be made for all drivers by doing this is the core?
+This keeps the streaming DMA mapping lifetime paired with the skb
+lifetime on both normal completion and shutdown cleanup paths.
 
-That is the interesting question.
+Assisted-by: Codex:GPT-5.5
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/atheros/ag71xx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-     Andrew
+diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+index ac4eadb9190a..50136d6ccda6 100644
+--- a/drivers/net/ethernet/atheros/ag71xx.c
++++ b/drivers/net/ethernet/atheros/ag71xx.c
+@@ -305,6 +305,7 @@ struct ag71xx_buf {
+ 	union {
+ 		struct {
+ 			struct sk_buff *skb;
++			dma_addr_t dma_addr;
+ 			unsigned int len;
+ 		} tx;
+ 		struct {
+@@ -805,6 +806,8 @@ static int ag71xx_tx_packets(struct ag71xx *ag, bool flush, int budget)
+ 		if (!skb)
+ 			continue;
+ 
++		dma_unmap_single(&ag->pdev->dev, ring->buf[i].tx.dma_addr,
++				 ring->buf[i].tx.len, DMA_TO_DEVICE);
+ 		napi_consume_skb(skb, budget);
+ 		ring->buf[i].tx.skb = NULL;
+ 
+@@ -1133,6 +1136,9 @@ static void ag71xx_ring_tx_clean(struct ag71xx *ag)
+ 		}
+ 
+ 		if (ring->buf[i].tx.skb) {
++			dma_unmap_single(&ag->pdev->dev,
++					 ring->buf[i].tx.dma_addr,
++					 ring->buf[i].tx.len, DMA_TO_DEVICE);
+ 			bytes_compl += ring->buf[i].tx.len;
+ 			pkts_compl++;
+ 			dev_kfree_skb_any(ring->buf[i].tx.skb);
+@@ -1531,6 +1537,7 @@ static netdev_tx_t ag71xx_hard_start_xmit(struct sk_buff *skb,
+ 		goto err_drop_unmap;
+ 
+ 	i = (ring->curr + n - 1) & ring_mask;
++	ring->buf[i].tx.dma_addr = dma_addr;
+ 	ring->buf[i].tx.len = skb->len;
+ 	ring->buf[i].tx.skb = skb;
+ 
+-- 
+2.54.0
+
 
