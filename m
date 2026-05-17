@@ -1,387 +1,166 @@
-Return-Path: <netdev+bounces-288682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288683-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IIQINlECWqzSgQAu9opvQ
-	(envelope-from <netdev+bounces-288682-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 06:32:25 +0200
+	id eLJCLtNVCWp+VgQAu9opvQ
+	(envelope-from <netdev+bounces-288683-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 07:44:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF9A55F33F
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 06:32:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69EB755F542
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 07:44:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 95FB5301179D
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:32:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D3BF300E712
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 05:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4316733260E;
-	Sun, 17 May 2026 04:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5189330DD2A;
+	Sun, 17 May 2026 05:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mduEXD+j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jAkToqma"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581393176EF
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 04:32:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269282F8E9A;
+	Sun, 17 May 2026 05:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778992343; cv=none; b=PbuzBfItl86zI+DzVlfrWxEysH3AURCGTQOuYSvojGD3lrNZN/6Ebgq2mgdvHvwrNplmFcS/3eDjnUequXw0BnpY+gx2lccN8HchhaF8qesJWHEDxVdURu35NmVVGS/Jaq47Rbh7tNqn5H7FqdedFS7ISNQFL2R/Q3+/yKafPes=
+	t=1778996669; cv=none; b=jBWiguSCYoo273grD+FZa7jvfuZhvEfk17qEeegbRgT+5pJS8P1yGW/JSHhYBUEQ8qVrLSdlqck0u4I5P+udjItpb/AOEYQZ8QGI65uBzr9lgfa0xTI+Gysg9GeWNnBdxOot8tsDynPVAoXm5ocFogz5lUA79vqxymYL+B1foVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778992343; c=relaxed/simple;
-	bh=YwJzqq3bvyUvu0Bz6tGPEQ8Io17vl9ejCAS55kqSTe4=;
+	s=arc-20240116; t=1778996669; c=relaxed/simple;
+	bh=oop5U7nxXVqwQe95Zs308MFuJ638RAQq24XeUN6RnPs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m6oXaPPb0J+COs9jHAm6ENJWdrOChT+t1gWWKMiU7t3AIXn01o2oH5y5CCcaPIFL1+e+3JW5093L7naA8KFTZjh3kAyFbEQWM1Epzn321PrjGADnIsWItHXGrRrKx3aM7OcKfo1r4CKchYhC8ULeiLvwldCF8pSnKOf6uuh5ekk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mduEXD+j; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0ed07dc7-b303-4577-8c07-06fc536ab1ca@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778992327;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4ZfaUHnsu6dpLXBP1XrGyGURasC65yr4T94tkiPouRc=;
-	b=mduEXD+jsmlu/KezQqsHGu+WmCTsWsNGLhzQ3z9xshrJzgq0ZosbwJsQffRPJCRbQuCA3I
-	DSmKt4yidJANKvuXS3twcppja6nwmfiHl5b2SjIXgrBfQV+1P+fGHgtRxlYqbGGXKEAD/i
-	MdaSiu8HmmCzFzRPp74flII5E3ilsSo=
-Date: Sat, 16 May 2026 21:31:59 -0700
+	 In-Reply-To:Content-Type; b=AuR+J1p74aECLSqGdaq+NfVJDjSgV7C1u36R7EYJ+HUsmgoHWTWYZFN+pGJHrl4REKp9nsFe2ZQYFPBaFvITNSmC78ahft9JMmE53VNDfpxDyOborv34VLgIAe6f7w0kU4XPEq2Q/jSnoFtR8w9SoqPwtjhMTDRI8Iv4rzLih1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jAkToqma; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD311C2BCB0;
+	Sun, 17 May 2026 05:44:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778996668;
+	bh=oop5U7nxXVqwQe95Zs308MFuJ638RAQq24XeUN6RnPs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jAkToqmaJdtO8bnAbnIlATUeSd2QAuhkksTrABi1AAv4y7NFvwVi2qdMm2UHKTym2
+	 lzIF45PFX1gxAIkRBfLvCLg40yi7KJAe7vJzNcaO3+sJ5EZ8ToM4oj5j466WDgnm59
+	 Qe80+WbO6RIBDNwthdfR08Pt3PmR4WCqBv0FsDFRTaK/CB6HDou306MpyAtrQ75PoX
+	 E9c6e9WtmLESArkTpak9DIosXvd2GVMuA2nlCK/dQLtH1/sacMtQ4jjLeJAffPUFh1
+	 +fGSrvG5uPuKNTfSUe+76Aow5m/ug4zBkvh9ncZB7R0ui1tNjwj9jiKI5iBgMB02QU
+	 u+8g6SLdKjOHQ==
+Message-ID: <f5a568c9-f786-40d5-8faf-c41bbebccbff@kernel.org>
+Date: Sun, 17 May 2026 15:44:15 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RDMA v2] RDMA/rxe: add mutual exclusion in rxe_net_del()
-To: Kuniyuki Iwashima <kuniyu@google.com>,
- "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>
-Cc: Edward Adam Davis <eadavis@qq.com>, akpm@linux-foundation.org,
- arjan@linux.intel.com, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, hdanton@sina.com, horms@kernel.org, jgg@ziepe.ca,
- kuba@kernel.org, leon@kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com
-References: <tencent_0106C0D2EA464109986EE86EF40CB5E7D406@qq.com>
- <tencent_330636464A367423778966A63DD1360E9609@qq.com>
- <13bc2e56-ea61-4cde-896f-c10636b29e9d@linux.dev>
- <CAAVpQUB6eRRRpapTxXmidO4ADtFc-ZBA+zwfPFb4dyX55UD4JQ@mail.gmail.com>
- <1dbc6a9d-4933-4123-90d2-a2735f9d8f58@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <1dbc6a9d-4933-4123-90d2-a2735f9d8f58@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: EBF9A55F33F
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net v2 6/6] selftests: mptcp: drop nanoseconds width
+ specifier
+Content-Language: fr
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+References: <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-0-701e96419f2f@kernel.org>
+ <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-6-701e96419f2f@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-6-701e96419f2f@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 69EB755F542
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288682-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288683-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[qq.com,linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qq.com:email,linux.dev:email,linux.dev:mid,linux.dev:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-在 2026/5/16 20:27, Zhu Yanjun 写道:
-> 
-> 在 2026/5/16 19:15, Kuniyuki Iwashima 写道:
->> On Sat, May 16, 2026 at 4:40 PM Yanjun.Zhu <yanjun.zhu@linux.dev> wrote:
->>>
->>> On 5/16/26 7:00 AM, Edward Adam Davis wrote:
->>>> We must serialize calls to rxe_net_del() or risk a crash as syzbot
->>>> reported:
->>>>
->>>> KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
->>>> Call Trace:
->>>>    udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
->>>>    rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 
->>>> [inline]
->>>>    rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
->>>>    rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
->>>>    rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
->>>>
->>>> Jason Gunthorpe suggest placing the lock within rxe to protect its racy
->>>> implementation of rxe_net_del(), which looks like it is possibly also
->>>> triggered by NETDEV_UNREGISTER.
->>>>
->>>> The patch addressing this issue in nldev_dellink() has already been
->>>> applied(0b28000b64f4); however, since the fix has now been relocated
->>>> to rxe, the corresponding remedial code in nldev has been removed.
->>>>
->>>> Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and 
->>>> destruction per net namespace")
->>>> Fixes: 0b28000b64f4 ("RDMA/nldev: Add mutual exclusion in 
->>>> nldev_dellink()")
->>>> Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
->>>> Closes: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
->>>> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
->>>> ---
->>>> v1 -> v2: serialize calls to rxe net del
->>>>
->>>>    drivers/infiniband/core/nldev.c     | 4 ----
->>>>    drivers/infiniband/sw/rxe/rxe_net.c | 7 ++++++-
->>>>    2 files changed, 6 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/ 
->>>> core/nldev.c
->>>> index 3cb3cb7629fe..96c745d5bac4 100644
->>>> --- a/drivers/infiniband/core/nldev.c
->>>> +++ b/drivers/infiniband/core/nldev.c
->>>> @@ -1816,8 +1816,6 @@ static int nldev_newlink(struct sk_buff *skb, 
->>>> struct nlmsghdr *nlh,
->>>>        return err;
->>>>    }
->>>>
->>>> -static DEFINE_MUTEX(nldev_dellink_mutex);
->>>> -
->>>>    static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
->>>>                          struct netlink_ext_ack *extack)
->>>>    {
->>>> @@ -1848,9 +1846,7 @@ static int nldev_dellink(struct sk_buff *skb, 
->>>> struct nlmsghdr *nlh,
->>>>         * implicitly scoped to the driver supporting dynamic link 
->>>> deletion like RXE.
->>>>         */
->>>>        if (device->link_ops && device->link_ops->dellink) {
->>>> -             mutex_lock(&nldev_dellink_mutex);
->>>>                err = device->link_ops->dellink(device);
->>>> -             mutex_unlock(&nldev_dellink_mutex);
->>>>                if (err)
->>>>                        return err;
->>>>        }
->>>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/ 
->>>> infiniband/sw/rxe/rxe_net.c
->>>> index 50a2cb5405e2..92847e955ca2 100644
->>>> --- a/drivers/infiniband/sw/rxe/rxe_net.c
->>>> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
->>>> @@ -642,6 +642,8 @@ static void rxe_sock_put(struct sock *sk,
->>>>        }
->>>>    }
->>>>
->>> I read this commit carefully. There are two paths that can invoke
->>> rxe_net_del().
->>>
->>> One is through the rdma link del xxx command, while the other is through
->>> the netdevice notification chain.
->>>
->>> In the netdevice notification chain path, rtnl_lock is already held, and
->>> rxe_net_del() is called under that lock.
->>>
->>> However, in the rdma link del xxx path, no rtnl_lock is taken.
->>>
->>> Because of this, I would like to use the existing rtnl_lock to serialize
->>> calls to rxe_net_del().
->> -1 for this.
->>
->> It's a global mutex and heavily contended because many
->> components use it without much care.  We are working
->> to reduce the RTNL pressure for years by converting such
->> users with a dedicated lock or per-netns RTNL mutex.
->>
->> RTNL is not needed here at all, so please use a dedicated lock.
-> 
-> Thanks a lot for your review. I think the following commit can fix this 
-> problem.
-> 
-> Please review.
+Hello,
 
-The root cause is clear. If no one disagrees with this commit, I will 
-send out the official patch.
+On 15/05/2026 06:27, Matthieu Baerts (NGI0) wrote:
+> Using the format specifier +%s%3N with GNU date is honoured, and only
+> prints 3 digits of the nanoseconds portion of the seconds since epoch,
+> which corresponds to the milliseconds.
+> 
+> The uutils implementation of date currently does not honour this, and
+> always prints all 9 digits. This is a known issue [1], but can be worked
+> around by adapting this test to use nanoseconds instead of microseconds,
 
-In the latest revision, I will move the mutex lock into the network 
-namespace.
+Sashiko noticed that I wrote microseconds instead of milliseconds. Do I
+need to send a v3 just to fix this typo?
 
-I think we have discussed this problem thoroughly, and we all understand 
-the root cause now.
-
-Zhu Yanjun
-
-> 
->  From 80525f5b7fb0af18b9759cbde0237aabb76158cc Mon Sep 17 00:00:00 2001
-> 
-> From: Zhu Yanjun <yanjun.zhu@linux.dev>
-> Date: Sat, 16 May 2026 22:27:35 +0200
-> Subject: [PATCH 1/1] RDMA/rxe: Fix Use-After-Free problem in rxe_net_del
-> 
-> syzbot reported a general protection fault (KASAN: null-ptr-deref) in
-> kernel_sock_shutdown() called during the software RoCE (rxe) link
-> deletion path (rxe_dellink -> rxe_net_del).
-> 
-> The root cause is a TOCTOU (Time-of-Check to Time-of-Use) race condition
-> in rxe_net_del(). Previously, the function fetched the socket pointer
-> via rxe_ns_pernet_sk4/6() outside the critical section, and then
-> acquired the lock to release it via rxe_sock_put().
-> 
-> In a highly concurrent teardown environment, another thread could close
-> and clear the pernet socket after it was fetched but before the lock
-> was acquired. This causes rxe_sock_put() to operate on a dangling or
-> already cleared socket pointer, leading to a NULL pointer dereference
-> when kernel_sock_shutdown() attempts to access sock->sk.
-> 
-> Fix this by introducing a dedicated, per-device mutex 'release_lock'
-> and extending its scope. The socket pointers are now fetched, checked,
-> and released entirely within the same locked critical section. This
-> ensures the atomicity of the socket lookup and teardown sequence.
-> 
-> Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
-> Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and 
-> destruction per net namespace")
-> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-> ---
->   drivers/infiniband/sw/rxe/rxe.c       | 2 ++
->   drivers/infiniband/sw/rxe/rxe_net.c   | 4 ++++
->   drivers/infiniband/sw/rxe/rxe_verbs.h | 1 +
->   3 files changed, 7 insertions(+)
-> 
-> diff --git a/drivers/infiniband/sw/rxe/rxe.c b/drivers/infiniband/sw/ 
-> rxe/rxe.c
-> index b0714f9abe3d..46967ecdaf7d 100644
-> --- a/drivers/infiniband/sw/rxe/rxe.c
-> +++ b/drivers/infiniband/sw/rxe/rxe.c
-> @@ -34,6 +34,7 @@ void rxe_dealloc(struct ib_device *ib_dev)
->          WARN_ON(!RB_EMPTY_ROOT(&rxe->mcg_tree));
-> 
->          mutex_destroy(&rxe->usdev_lock);
-> +       mutex_destroy(&rxe->release_lock);
->   }
-> 
->   static const struct ib_device_ops rxe_ib_dev_odp_ops = {
-> @@ -186,6 +187,7 @@ static void rxe_init(struct rxe_dev *rxe, struct 
-> net_device *ndev)
->          rxe->mcg_tree = RB_ROOT;
-> 
->          mutex_init(&rxe->usdev_lock);
-> +       mutex_init(&rxe->release_lock);
->   }
-> 
->   void rxe_set_mtu(struct rxe_dev *rxe, unsigned int ndev_mtu)
-> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/ 
-> sw/rxe/rxe_net.c
-> index 50a2cb5405e2..c3b188538540 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_net.c
-> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
-> @@ -655,6 +655,8 @@ void rxe_net_del(struct ib_device *dev)
-> 
->          net = dev_net(ndev);
-> 
-> +       mutex_lock(&rxe->release_lock);
-> +
->          sk = rxe_ns_pernet_sk4(net);
->          if (sk)
->                  rxe_sock_put(sk, rxe_ns_pernet_set_sk4, net);
-> @@ -663,6 +665,8 @@ void rxe_net_del(struct ib_device *dev)
->          if (sk)
->                  rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
-> 
-> +       mutex_unlock(&rxe->release_lock);
-> +
->          dev_put(ndev);
->   }
-> 
-> diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.h b/drivers/infiniband/ 
-> sw/rxe/rxe_verbs.h
-> index d92f80d16f78..3f54aa0a4356 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_verbs.h
-> +++ b/drivers/infiniband/sw/rxe/rxe_verbs.h
-> @@ -422,6 +422,7 @@ struct rxe_dev {
->          int                     max_ucontext;
->          int                     max_inline_data;
->          struct mutex            usdev_lock;
-> +       struct mutex            release_lock;
-> 
->          char                    raw_gid[ETH_ALEN];
-> 
-> -- 
-> 2.43.0
-> 
->>
->>> My proposed commit is shown below. I am not sure whether it fully
->>> resolves the problem.
->>>
->>> diff --git a/drivers/infiniband/sw/rxe/rxe.c
->>> b/drivers/infiniband/sw/rxe/rxe.c
->>> index b0714f9abe3d..84266dc416c4 100644
->>> --- a/drivers/infiniband/sw/rxe/rxe.c
->>> +++ b/drivers/infiniband/sw/rxe/rxe.c
->>> @@ -251,7 +251,9 @@ static int rxe_newlink(const char *ibdev_name,
->>> struct net_device *ndev)
->>>
->>>    static int rxe_dellink(struct ib_device *dev)
->>>    {
->>> +       rtnl_lock();
->>>           rxe_net_del(dev);
->>> +       rtnl_unlock();
->>>
->>>           return 0;
->>>    }
->>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c
->>> b/drivers/infiniband/sw/rxe/rxe_net.c
->>> index 50a2cb5405e2..ac53ea73996d 100644
->>> --- a/drivers/infiniband/sw/rxe/rxe_net.c
->>> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
->>> @@ -649,6 +649,8 @@ void rxe_net_del(struct ib_device *dev)
->>>           struct sock *sk;
->>>           struct net *net;
->>>
->>> +       ASSERT_RTNL();
->>> +
->>>           ndev = rxe_ib_device_get_netdev(&rxe->ib_dev);
->>>           if (!ndev)
->>>                   return;
->>>
->>> Zhu Yanjun
->>>
->>>> +static DEFINE_MUTEX(rxe_net_del_mutex);
->>>> +
->>>>    void rxe_net_del(struct ib_device *dev)
->>>>    {
->>>>        struct rxe_dev *rxe = container_of(dev, struct rxe_dev, ib_dev);
->>>> @@ -649,9 +651,10 @@ void rxe_net_del(struct ib_device *dev)
->>>>        struct sock *sk;
->>>>        struct net *net;
->>>>
->>>> +     mutex_lock(&rxe_net_del_mutex);
->>>>        ndev = rxe_ib_device_get_netdev(&rxe->ib_dev);
->>>>        if (!ndev)
->>>> -             return;
->>>> +             goto out;
->>>>
->>>>        net = dev_net(ndev);
->>>>
->>>> @@ -664,6 +667,8 @@ void rxe_net_del(struct ib_device *dev)
->>>>                rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
->>>>
->>>>        dev_put(ndev);
->>>> +out:
->>>> +     mutex_unlock(&rxe_net_del_mutex);
->>>>    }
->>>>
->>>>    static void rxe_port_event(struct rxe_dev *rxe,
-> 
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
