@@ -1,153 +1,117 @@
-Return-Path: <netdev+bounces-288713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id rHjANg2XCWqXgwQAu9opvQ
-	(envelope-from <netdev+bounces-288713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:23:09 +0200
+	id kNPlOJKXCWqXgwQAu9opvQ
+	(envelope-from <netdev+bounces-288714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:25:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFBFE560746
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:23:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A89C56075E
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 226B6300340B
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:23:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FD553009B28
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A51E2E282B;
-	Sun, 17 May 2026 10:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D2E31619B;
+	Sun, 17 May 2026 10:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rj+SMoP1"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CCA33987
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 10:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFB1224AF1
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 10:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779013385; cv=none; b=HPTttugOtqcCRXyhVItaCrDZqAjSlFjocJFqNLOw9tN1utQiJPJ7/OU2aEYn2iN8pDYaULzE6g5ZjUf+FjmOkEIvUxDB0+cNhcCfMeHb/KRlpjFrtsltcGD6Wx+NZ5r899RTJlGdZ3kfqeQ6LFW/Iww6+w4It1J3Agt5Bn6XG7Q=
+	t=1779013519; cv=none; b=ch8v0aB9V+h9gSOJTjTMqXwaxyUSteTpd9WtSK9EYQQkXpzmlUMKWAQw5+NBsuRoF3zrlGwiY5msY1t5fRkPB/Z5r5HMUUpM+SnrTuJ8njcQ30ZbBwq7UVnPy6eThsUE738UPRhbcRaUf5+WjD04hl2KEr33zqCtpmKLnkWsywg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779013385; c=relaxed/simple;
-	bh=mj9YtOGBFCLAwR84LyZc2W3EIeUpfl7PXa5rDaE6sFk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=hubGJQRtfikUuo78xELsr7X++7/eapy4GPsic0aimv73iKT9KMAx/yjNFgZQ0+QhXsCw+q8aMyQFPKDNXQ3WWt6l1TNYKT8i+UswgCLDI1MR3czCdgwm/YYkg34oqDHRcc5rmliYb17XnSscRelP7dRQ0ivUq3nUUzssChtHJEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64HAMcT6011120;
-	Sun, 17 May 2026 19:22:38 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64HAMc7M011117
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 17 May 2026 19:22:38 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <ae6348a3-9cff-4a65-8ad3-ceeca938d4d3@I-love.SAKURA.ne.jp>
-Date: Sun, 17 May 2026 19:22:38 +0900
+	s=arc-20240116; t=1779013519; c=relaxed/simple;
+	bh=8D9fs/PRk1JXXmpJR1ypWxBztd3OCrUpyzGGXF4Cqfw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CyuBLaJN6dHvv7VP2dhaYFuO5HuaTEu2A0oXLbsQCxUCWr0YqSArMnoLXXYzKjaVySZ1nJ6UHyVh2KGDaqpLHg79vTB1TTXxy6Ryr4exxzQogR236K7JG6/cWR56rH4PiD6MKQOAS6/AX2Qe7FXzdt6Bo2/G8Zl6cx8LgLyaHs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rj+SMoP1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B2BBC2BCB0;
+	Sun, 17 May 2026 10:25:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779013519;
+	bh=8D9fs/PRk1JXXmpJR1ypWxBztd3OCrUpyzGGXF4Cqfw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rj+SMoP1rgaa2ACXValosTDUUUhc+/XLyeQmxx1aqcFbMH17as72kjO9MZ4OOwRhv
+	 NwP3E+jJQnD3nmKarRVk9guZ46EGjavEDR5abug7ALbsVJ9LfMBqXW77yr1HJfPr1R
+	 IadiPsXmf1PAblH0IP5KsWTYkNJEaXytDbspFZLzega2meiTtJRXr84a7P17/gSqax
+	 IhkGUYk3RQmXpdZDReCq1UHTRUlI7KP0rfmK/wP2Wv8BZVNSLzAt6QJxexvL5HT0pN
+	 zHKScZ2DA/3s6z862BmmjMO/B4F5oHwmPjsktY+sIl1fbVHV9sFAHa9tBpB1wMu0WX
+	 4AukxFBvWql3A==
+Date: Sun, 17 May 2026 11:25:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	Piotr Skajewski <piotrx.skajewski@intel.com>
+Subject: Re: [PATCH iwl-next v2 3/8] ixgbe: prevent adding duplicate FDIR
+ perfect filter rules
+Message-ID: <20260517102515.GA98116@horms.kernel.org>
+References: <20260512140904.4105236-1-aleksandr.loktionov@intel.com>
+ <20260512140904.4105236-4-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: neighbour: reject neighbor creation on IFF_NOARP
- devices
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Network Development <netdev@vger.kernel.org>
-References: <98be20ee-c914-4c93-b4bd-d04ddcc349cf@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-In-Reply-To: <98be20ee-c914-4c93-b4bd-d04ddcc349cf@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav405.rs.sakura.ne.jp
-X-Rspamd-Queue-Id: AFBFE560746
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260512140904.4105236-4-aleksandr.loktionov@intel.com>
+X-Rspamd-Queue-Id: 4A89C56075E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288713-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[i-love.sakura.ne.jp];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288714-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,I-love.SAKURA.ne.jp:mid]
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Sorry, please ignore this patch, for it turned out that this analysis was wrong.
+On Tue, May 12, 2026 at 04:08:59PM +0200, Aleksandr Loktionov wrote:
+> From: Piotr Skajewski <piotrx.skajewski@intel.com>
+> 
+> When the same flow specification is added twice (same 5-tuple with
+> different sw_idx values), ixgbe_add_ethtool_fdir_entry() silently
+> programs the duplicate into hardware using a second FDIR table slot.
+> This wastes a scarce FDIR entry and can cause confusing behaviour
+> when deleting rules.
+> 
+> Add a helper ixgbe_match_ethtool_fdir_entry() that walks the in-kernel
+> filter list before programming hardware.  If an entry with an
+> identical filter (excluding the sw_idx) already exists, the new add
+> request is rejected with -EEXIST.
+> 
+> Signed-off-by: Piotr Skajewski <piotrx.skajewski@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-On 2026/05/16 0:05, Tetsuo Handa wrote:
-> syzbot is reporting
-> 
->   unregister_netdevice: waiting for vcan0 to become free. Usage count = 2
-> 
-> problem.
-> 
-> I asked AI Mode in Google Search to analyze a log from my debug printk()
-> patch in linux-next-20260508. It performed a meticulous trace of
-> __dev_hold() and __dev_put() frequency, and identified that a reference
-> acquired via ___neigh_create() remains unreleased at the end of the device
-> unregistration timeline.
-> 
->   Call trace for vcan0[24] +1 at
->        __dev_hold include/linux/netdevice.h:4470 [inline]
->        netdev_hold include/linux/netdevice.h:4513 [inline]
->        ___neigh_create+0xcb3/0x2360 net/core/neighbour.c:664
->        neigh_add+0xc51/0xf70 net/core/neighbour.c:2136
->        rtnetlink_rcv_msg+0x77e/0xbe0 net/core/rtnetlink.c:7005
->        netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2551
->        netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
->        netlink_unicast+0x780/0x920 net/netlink/af_netlink.c:1345
->        netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
->        sock_sendmsg_nosec+0x112/0x150 net/socket.c:797
-> 
-The reference that is leaking is [26].
-
-Call trace for vcan0[26] +4 at
-     __dev_hold include/linux/netdevice.h:4470 [inline]
-     netdev_hold include/linux/netdevice.h:4513 [inline]
-     dev_hold include/linux/netdevice.h:4536 [inline]
-     j1939_priv_create net/can/j1939/main.c:140 [inline]
-     j1939_netdev_start+0x36b/0xc10 net/can/j1939/main.c:268
-     j1939_sk_bind+0x853/0xb30 net/can/j1939/socket.c:506
-     __sys_bind_socket net/socket.c:1948 [inline]
-     __sys_bind+0x2e9/0x410 net/socket.c:1979
-
-Call trace for vcan0[28] -3 at
-     __dev_put include/linux/netdevice.h:4456 [inline]
-     netdev_put include/linux/netdevice.h:4523 [inline]
-     dev_put include/linux/netdevice.h:4548 [inline]
-     __j1939_priv_release net/can/j1939/main.c:166 [inline]
-     kref_put include/linux/kref.h:65 [inline]
-     j1939_priv_put+0x128/0x270 net/can/j1939/main.c:172
-     j1939_sk_sock_destruct+0x52/0x90 net/can/j1939/socket.c:388
-     __sk_destruct+0x8d/0x9d0 net/core/sock.c:2352
-     rcu_do_batch kernel/rcu/tree.c:2617 [inline]
-     rcu_core kernel/rcu/tree.c:2869 [inline]
-     rcu_cpu_kthread+0x99e/0x1470 kernel/rcu/tree.c:2957
-     smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
-     kthread+0x388/0x470 kernel/kthread.c:436
-     ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-     ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
