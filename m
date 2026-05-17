@@ -1,211 +1,146 @@
-Return-Path: <netdev+bounces-288736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288740-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NhmDQnGCWpYpAQAu9opvQ
-	(envelope-from <netdev+bounces-288736-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 15:43:37 +0200
+	id IMTmB6LNCWq2qAQAu9opvQ
+	(envelope-from <netdev+bounces-288740-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:16:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9A3561401
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 15:43:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E505A5618F6
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E19D3009B33
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 13:43:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 496DB300460D
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:16:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481ED3B47D7;
-	Sun, 17 May 2026 13:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5483B7B98;
+	Sun, 17 May 2026 14:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="RfHiPhhn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkoc.com header.i=@berkoc.com header.b="iGPL7977"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-01.1984.is (mail-01.1984.is [185.112.145.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8474337CD40
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 13:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EA53B4EBD;
+	Sun, 17 May 2026 14:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.112.145.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779025399; cv=none; b=Yw1nkyhMzQeUZaGyJ/9iHz/d3KrLVB4d4UVF+/mYZ0g767oZ2DqHIjTJSlwsVYnzJzHxvlHS9oqVodG4wFRQUmL6RwNfRvyvB29TbOjaYrMK7vJDP9Y1WLe6lF3cUeJJx3yr1SzDp/16AWM8wKmQx0R4BHY0m5Um/GB5efu1FUA=
+	t=1779027358; cv=none; b=kdLV4gUeYw6oOnpYu0cDRkclo1eey4IS4/WNYfo2ho5J4f0RHlSzhYRqbsXWgt1PfhgJhjXEeZ33qaXynP+ZW4VX/6ouauKNgByFIQm8O1azbTUwC5TCCHUpzthW5mxkodgqhX45ZWK++ajjs4KVJqX8H5OZTKd20icYOsZDTk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779025399; c=relaxed/simple;
-	bh=sMLXXNEtNM9byc9cxRPZeXDbmGRBMfUm3b7miLj3Ocs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N+8Haq9uAPJ+ZTfZ1T5zxu5THAzzrP7X/ubyZj2gysUJcmJI9AkU1t0s1t5fH92Dk7vsTcj8/9CmCvd7KsD/7/PY219TVXSH1qpo4i38Q9KCMHNLUaRCzgx8eQUkVeH4zeBQ3IAytO0cwHe1jIUVL1la3xcYoEENBlZ9rwH3mnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=RfHiPhhn; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488ad135063so8477155e9.0
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 06:43:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1779025396; x=1779630196; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+HArGPzJ3JrxUqYbJRCQTeZdStWSHyJjxqFBR8YJCaA=;
-        b=RfHiPhhn5+zzdES6i5no8nNOpmLntxv+Vc16dvCSH4gB4lCYaiqUKcGXllPsA2IG7N
-         sGD1GG13JZ/bvoNY1RTPMh/0JvV7jVjoZn/Vo40b6EYYRjY8f431NI4Sr9euwyBOrevF
-         gxh4xz1YcUeHHGFabHwyncM5+oDEPYtav/Agfms3zwQdkitbSrc8o9ily7zo+je0/Rbn
-         M28N0UDC0FCr/ZaY8NsajRM1bR7CZAfw4n3XlMCGPs1xs9RkpjUaseIJF7Pk0XC5FyTf
-         TJsaoprHvjkFknof9xIR1Ajpq0vkOI3oIebG2J1BL1lPaozlc+w9eMI/egMvaf4Fs2mG
-         qFwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779025396; x=1779630196;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+HArGPzJ3JrxUqYbJRCQTeZdStWSHyJjxqFBR8YJCaA=;
-        b=hktAUaXGmNPk/9RjtBwpK8z/GcNvnRN2aC+vNZUt92PzY+z3QrBK4FqkXDqg6OfsLl
-         YMLCeSuFbU4pdAeM7nPPzpOQi4AgahraYR6p/0HJqy0xhIrEJIc4MwrzAKVLtXQm8PC+
-         PKePB0mxVd1/QFVyndbpJNoqGLL44WT0Cj7MyaS4PIalm2ONRAgqcNbCjf8AfmNWruop
-         9ls3A9Pum3afwXI7z8OMTvGXgrZ2C3TCE6sRrfp0p2Fz/BHhtxU0twaAMdDeGEid26Zj
-         9VIDyLWDoEKAhU3paqp4fA8X2Vau1t7M+ihBsEtkVRjLKZ0IKx7f6OraVAeU6OfN9onV
-         nfjQ==
-X-Gm-Message-State: AOJu0YwPUXul/ajM+1ALcD8K5oeIIATXPKbmpX+WHzLF1JnModxICFy+
-	tRHGk+4Blm7yTZlGYwykKtJT2NFvjh5n1X+2rjoyMUBZxN3aiMsraAONOAnAJenvJ0g=
-X-Gm-Gg: Acq92OFaIHZI36y0p4lHVcFFFOYz8qqQD2adLcgCA+8DHdeXsAgWSuRneNhl4wFDyK3
-	cCNfbTRah/pTKH7wO+9s8Y3z8rG5C3Ln12LbBR0NWLXsqRQK60I6M6OO0C0B7X57gYK3RvKZB9I
-	PZDIZxXjiHAZJtSqWIXdrOQX5qN1tm9PcSaJFLKfkfCKiTL0p4WPK80WKhg7iwLKWZgDCwi8HyG
-	dbZgwoN0S3gvTQq+iYpIKITz36nwtX/NZgOr+cR9merepaIDY30BkAhDvNR51cE6I+e6wo5nnVW
-	dnrRZ/1awH5vui6Z3YF+X633QNBDTyNyJeKG7JT2jY9RWXYqPxx/fyrrhepOFs2RG/6iLO1fbXz
-	GUTJyqYdqV0+wJJtKRQxA3TadU0ZPURMzytzlUrHyDc945VwAa6RAC/Q9TCljhzavnVd5HBMUPp
-	k/girWS/842MfRf2DllmDW3uX03Q3v0Yc+7LbeoLb2zCdei11BgnF/NdguKg==
-X-Received: by 2002:a05:600c:3f0f:b0:48f:99a9:bbcc with SMTP id 5b1f17b1804b1-48fe60ecb9cmr152488335e9.10.1779025395675;
-        Sun, 17 May 2026 06:43:15 -0700 (PDT)
-Received: from localhost (176.111.181.159.kyiv.nat.volia.net. [176.111.181.159])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9ed30110sm32700649f8f.13.2026.05.17.06.43.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 06:43:15 -0700 (PDT)
-Date: Sun, 17 May 2026 16:43:12 +0300
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: David Carlier <devnexen@gmail.com>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev, andrew@lunn.ch,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	horms@kernel.org
-Subject: Re: [PATCH net-next v1] net: tpmr: add Two-Port MAC Relay driver
-Message-ID: <agnF8KScbKxtUite@penguin>
-References: <20260517041306.24841-1-devnexen@gmail.com>
+	s=arc-20240116; t=1779027358; c=relaxed/simple;
+	bh=Qga+mtvz86YHLopOaANdVdDeOH1iglUFDZnSQM3MKCM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VUCnVq5YQjRM818/634H19b+EyDtLoZ0Lf85sRS4TFuYIK9dwXZeWA8LqY97cIpSsvVZ36/EjHJNlBFPTzDM5P48fGmXisSXos9j16w+cCBOe2I2hh2OpKkGV171j6ku/ZmUj14stvPRQxLGiNMqUH7p1t/XyecNmujj8sTg2Y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=berkoc.com; spf=pass smtp.mailfrom=berkoc.com; dkim=pass (2048-bit key) header.d=berkoc.com header.i=@berkoc.com header.b=iGPL7977; arc=none smtp.client-ip=185.112.145.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=berkoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=berkoc.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=berkoc.com;
+	s=1984; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date
+	:Subject:Cc:To:From:Sender:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ROYjdED/XPcRufNK0R//jz4sQ/Lqx1XU3qMXN4nQjJ0=; b=iGPL7977BgnMDW+CgbK0wpi67E
+	Bi1gwBiCxmhTTRlHW+cBi+Q2zl7sl+HE7WhZunYyHaD8QIGa8IKAPgxnMxJ1G1fJrVAAwtgXl4yIP
+	TitoRltX79BofRzR6eQZNkr0EXBiFRAvRf52UBrcP7C+zflarAS1l3B8Yvg154kl+mIqMH1ngCn41
+	4ZdKeJcAl1QTwRZ+EWLJYByaAVoMAK+zIB7qrGJN3N4wRtSLGNP1IeSFP+JhQZwmPQAqZicKyiOug
+	sGySRwZV/J0T7A9jYcnEOMLY08qLkdSz2gDZluAF4Rc5ZIZcwOAuM/vn6pRyCCGgc7Ro27a5NY7Jg
+	zS9BIjwg==;
+Received: from localhost
+	by mail-01.1984.is with utf8esmtp (Exim 4.96)
+	(envelope-from <me@berkoc.com>)
+	id 1wOcHR-00GB0n-34;
+	Sun, 17 May 2026 14:15:46 +0000
+From: Berkant Koc <me@berkoc.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol@kernel.org>,
+ Stephane Grosjean <stephane.grosjean@hms-networks.com>
+Cc: linux-can@vger.kernel.org,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ kernel@pengutronix.de
+Subject: [PATCH 0/2] can: usb: validate URB length in PEAK-USB rx callbacks
+Date: Sun, 17 May 2026 15:55:00 +0200
+Message-ID: <20260517-can-usb-fix-cover@berkoc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260517041306.24841-1-devnexen@gmail.com>
-X-Rspamd-Queue-Id: BA9A3561401
+X-Spam-Score: -0.0 (/)
+X-Authenticated-User: me@berkoc.com
+X-Sender-Address: me@berkoc.com
+X-Rspamd-Queue-Id: E505A5618F6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[berkoc.com : SPF not aligned (strict),reject];
+	R_DKIM_REJECT(1.00)[berkoc.com:s=1984];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[me@berkoc.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288740-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DMARC_NA(0.00)[blackwall.org];
-	TAGGED_FROM(0.00)[bounces-288736-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[berkoc.com:-];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.964];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,blackwall.org:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[berkoc.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Sun, May 17, 2026 at 05:13:06AM +0100, David Carlier wrote:
-> Add a driver implementing the Two-Port MAC Relay as defined by IEEE
-> 802.1Q-2014 §6.7.1. A TPMR is a minimal L2 relay between exactly two
-> member ports: no FDB, no MAC learning, no STP, and -- by
-> specification -- it forwards most of the 01:80:C2:00:00:0X reserved
-> group address range that a regular bridge would consume. This makes
-> it suitable as a bump-in-the-wire element that is transparent to the
-> control plane on both sides (LACP, LLDP, EAPOL, and so on continue
-> to reach the far end as if the relay were not present).
-> 
-> The driver is created with "ip link add type tpmr" and slaves are
-> attached through ndo_add_slave, with a hard cap of two members.
-> Forwarding is implemented as an rx_handler: a frame arriving on one
-> slave is sent out the other via dev_queue_xmit(), with no FDB
-> lookup. The IEEE-permitted subset of reserved multicasts is relayed;
-> the remainder is delivered to the host stack via RX_HANDLER_PASS,
-> preserving today's behaviour for protocols that genuinely target the
-> local machine. Only 01:80:C2:00:00:01 (IEEE 802.3x PAUSE) is
-> terminated, as required by the MAC layer.
-> 
-> The master's carrier follows the logical AND of both slaves'
-> carriers, propagated via a netdev notifier. Both slaves enter
-> IFF_PROMISC on enslave (and the refcount is balanced on detach) so
-> the relay sees all unicast on the wire. rx_handler_register()
-> provides exclusivity for free: a netdevice that is already a member
-> of a bridge, bond, team, or macvlan is rejected with -EBUSY at
-> enslave time.
-> 
-> MTU consistency is enforced at enslave: a second slave whose MTU
-> differs from the first is rejected. Subsequent member MTU changes
-> are blocked via NETDEV_PRECHANGEMTU; to change a member's MTU,
-> detach it first.
-> 
-> Inspired by OpenBSD's tpmr(4) (David Gwynne, 2019), reimplemented
-> against Linux's rx_handler / rtnl_link_ops infrastructure.
-> 
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> ---
-> 
-> v1 (from RFC, addressing Andrew Lunn review):
->   - Inline reserved-address check; only PAUSE is passed up,
->     gated on is_multicast_ether_addr() + unlikely().
->   - Fix MTU check that assumed ports[0] is always the
->     surviving slot after a detach-then-add sequence;
->     iterate ports[] to find the populated entry instead.
->   - Reject member MTU changes via NETDEV_PRECHANGEMTU.
->   - Drop driver version string; let ethtool core fill it.
->   - Keep driver in drivers/net/ (precedent: veth, bonding,
->     macvlan).
-> RFC: https://lore.kernel.org/netdev/20260516050858.23858-2-devnexen@gmail.com/
-> 
- 
-Hi David,
-Please give people more time to review the proposed RFCs before sending v1.
-Also you specifically asked bridge maintainers to comment and did not
-wait for us to do so.
+This series mirrors the two gs_usb hardening fixes that landed in 6.18
+(commits 6fe9f3279f7d and 395d988f9386) for the two PEAK-System USB
+drivers that share the same "walk records inside the bulk-in URB"
+pattern: pcan_usb_fd.c and pcan_usb_pro.c. Both decode loops read the
+on-wire record header before validating that the URB actually contains
+that header, allowing a malicious USB device that emulates a PEAK CAN
+adapter to trigger a short read of one or two bytes past the URB
+buffer on every poll cycle.
 
-Now to the point - I don't think this device is needed at all, this task can
-be accomplished in multiple ways with what we currently have, there is no 
-need to add another software device for something so simple.
+Patch 1 adds a sizeof(struct pucan_msg) check at the top of the
+pcan_usb_fd_decode_buf() loop and rejects records whose announced size
+is smaller than the header itself.
 
-First, I'd like to ask: could you please elaborate why bridge's group_fwd_mask
-isn't working out for you? How exactly are you trying to use it?
-It was added for this purpose, to forward link-local frames and should be
-able to do the same as what you're describing. If there is a problem I'd
-rather we fix it or extend the bridge if something's missing instead of
-adding so much new code that we'll have to maintain forever.
+Patch 2 adds a one-byte check before reading pr->data_type in
+pcan_usb_pro_decode_buf(), which is the field used to index the
+record-size table.
 
-Second, what else did you try and how exactly did you try it?
+Both fixes are static-analysis-identified mirrors of the gs_usb
+precedent. I did not have access to a PCAN-USB-FD or PCAN-USB-Pro
+adapter and therefore no live KASAN trip is attached, but the trigger
+condition (URB actual_length below the per-record header size) is
+identical to the gs_usb case that Marc Kleine-Budde fixed in November.
 
-Examples of a few ways to solve this:
- - tc: why dismiss mirred so fast, it can do the same combined with some matching?
-       Did you check mirred redirect?
-       cls_bpf/ebpf - definitely can do it as well
- - nftables: should be able to solve it, too
- - XDP: I wouldn't dismiss it because network managers cannot control it,
-        all modern network managers support custom scripts in some form
-        where you can load your custom XDP program and solve the problem
+A third candidate file, drivers/net/can/usb/usb_8dev.c, was reviewed
+for the same pattern but already validates "pos + sizeof(struct
+usb_8dev_rx_msg) > urb->actual_length" at the top of its loop and uses
+a fixed-size record, so no patch is included for it.
 
-Cheers,
- Nik
+Note: a concurrent series by James Gao (msgid <TYCPR01MB856782BAA657447E5EDDDC1FF0062>) hardens different sites in pcan_usb_pro.c (handle_canmsg + handle_error); the hunks in patch 2/2 here do not overlap.
+
+Berkant Koc (2):
+  can: peak_usb: validate URB length in pcan_usb_fd_decode_buf()
+  can: peak_usb: validate URB length in pcan_usb_pro_decode_buf()
+
+ drivers/net/can/usb/peak_usb/pcan_usb_fd.c  |  7 ++++---
+ drivers/net/can/usb/peak_usb/pcan_usb_pro.c | 15 +++++++++++++--
+ 2 files changed, 17 insertions(+), 5 deletions(-)
+
+-- 
+2.47.3
 
