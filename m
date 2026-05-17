@@ -1,315 +1,171 @@
-Return-Path: <netdev+bounces-288677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLQvDM4kCWpNLAQAu9opvQ
-	(envelope-from <netdev+bounces-288677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:15:42 +0200
+	id UDpJCUQsCWrIMAQAu9opvQ
+	(envelope-from <netdev+bounces-288678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:47:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A7DC55F017
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:15:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9645455F0D5
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 04:47:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 789B43007B0F
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 02:15:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 970B33006F34
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 02:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A985F31E857;
-	Sun, 17 May 2026 02:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494103264FA;
+	Sun, 17 May 2026 02:47:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mpAwFuKi"
+	dkim=pass (2048-bit key) header.d=juliahub.com header.i=@juliahub.com header.b="HCrQ4ucG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDFF155757
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 02:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A0E3033DF
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 02:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778984128; cv=pass; b=LG1+/Ki+QkEaUMf1mhHQOyApjL3EuDj3RtOXzFMUHPlDc0Umv2pUq8VwW0GIj2UoPVV+6IAq5GeZh9NWyXXui4mYWQJ/BRT6hlX97nJYcYrKI/Aid1KBe/6IzCuQZCJ7Y5kfvgXoYeLcRD4P2j1DkoYWtV4pgkLGqRIKjtFuF0A=
+	t=1778986048; cv=pass; b=hvIqaXoWC/k73Mez2Dazl5/hb46EC078EXeYI+gYBrUFf2jKh+p5CZ7Wo40+Ior8sMOfO80gqBsquuxEYM1UK8AlDUW4P5PoM3jFeYblfvfDnnIFmOGKMMBznaWGAu5aZRGVitKZ/bmrEs8PhQJh4/ssoHrxFKWYXgNa56loyZM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778984128; c=relaxed/simple;
-	bh=s4aBkOwe/bEHdXcFLk9eHUTCRUaU0m6NZrnmTx8tBpc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sQtKJbKy+gPUDF/my3tKXRW4VoJ+b4sE/sVU48gYmI8eN5hXHxMfM1hBBo0Qz2jql6LmsqZRDYulUjDasBAXuB6A3GVDMqnATqPSSt33UHbcDC7LlSdmnPoWeQ/SBpO5b3065ds0J1Ef4Wu9XLdEsEwSEZ5viHV1ABWSltraRzs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mpAwFuKi; arc=pass smtp.client-ip=74.125.82.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-132c338a537so1416324c88.0
-        for <netdev@vger.kernel.org>; Sat, 16 May 2026 19:15:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778984125; cv=none;
+	s=arc-20240116; t=1778986048; c=relaxed/simple;
+	bh=NwBVwC/nBelyZLNFGRaOuxPA+RbK8oY+0phP6GfPT5w=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=sOZ0uSuI1wLZFHcaRJp1gHcbdR8TYEsvqdN2RbsxFqJ/gtW8XRObBNSHB8z5atiMTI2jsxyCVP9e4Pj7bb3tQVPuX6dpefVSqRKlI+l+b5SxRILa79Ni+zsNdDdUtBq8Z3EVX5CTJcBPhEDuHZ6g88nvSzO9JQ0P8fceWi1lF2M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=juliahub.com; spf=pass smtp.mailfrom=juliahub.com; dkim=pass (2048-bit key) header.d=juliahub.com header.i=@juliahub.com header.b=HCrQ4ucG; arc=pass smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=juliahub.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=juliahub.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8b3fe2f19a4so14589206d6.2
+        for <netdev@vger.kernel.org>; Sat, 16 May 2026 19:47:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778986045; cv=none;
         d=google.com; s=arc-20240605;
-        b=WoPCZJUYaBFpZBMIlTM811vMkUiAdzh4JJ+BVrT9qSho8Ut6aXVgHXd4g6ZSaFz/x/
-         Dg1zqBcEZ/+ltZ5a392mVLvh3CIFkVJ/ZWKoruiOkpINH8ihVp/YDh3fOvGzpPxp0cYs
-         l0KPPWRhJ9sXZsbL0PW/gBzfZG3+lB7r/afMTbSPI3Qbadyix70+eOEQ71YWGc/9KHuW
-         owqLWaDeWarcGzmwd9EGLkcmGPOwNxT06N68TwbZzKpZitNFqHqeBfyLryqmcZhvhv3x
-         mwsJMfTpKGhkjdYwVJ6+P9P9dYr9k5mle1xEyRC6zB0HBpQfFlFBcLV4dOFfaDpQIUM8
-         ofOw==
+        b=LOBr4kOerUTUK4uZEqCXA3GI+mAv1s6WMXdZM32bhe0yyHNmttFj2IXzUrt2TBxBx1
+         fTuptHQJDu2gHXzZURr5bCNoV5QJnLdsy5/aQ1SKF8VqK1Sz2JjIRzKaro63z6pBcqNF
+         VIIz9KW3k4EWCAVrbJPiOJ4p4ohnEDkBOJUEu/mQi0LjrjFvCqWV8FxwM656jUBM8THt
+         wI/gH8RCFblr4iI1Y/fSzppoTW1INzeAtV7f5Yrnpbashw0Izs9nVJOh3QKFgQn9mjdV
+         lZLb6ot8t3A2s/rsiRbIprrhDHBu/veFSeIpjS9ZO2CVuItKL1ZI3IyW7epIixOKg5O3
+         tQpA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gvxpVRNFP1DdRYSBauluNbrj8hxlaOMbOPtS5FXUigM=;
-        fh=m5S2GNen6C9s4X/WpfSgt6ZhIztnCgnc9OlqDkrueeI=;
-        b=JJo5NdSD5IwqtkajvTWD9P85QmSdRieVDjyi6CZ3lWfSElfe43OYZOyT6H0KTnEZo0
-         se2R0PSibMXTX28NYm1BMlwSzwVAxmFyr1sjAIQ/CCjUaHBZUKeVkE8p3gJ4AXcOHu5d
-         vUlioLEUD/fuPj7r5u+gZkz42/BuRWP0droG6UsVJL9oMPSjyA3rY1mG0BfON+9/uyvQ
-         0QVGd+IrJQIFyZg+hA15CbUTOPHXgDksH+zRfizoD4TY0airn10zTzZIfnU8cjIb861b
-         WCrdnoMeXIZBdgsTh2J5uTnYlxCxWPHlpfi7lrWpANW15j23JosylIxb0YF2ZayNpgn7
-         /FIw==;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=GrCYpS1Kg2cJiBGT7t++xWTLkLpRUruScHyKB43nglE=;
+        fh=gbAOgCEkbfTf3YT9FMHl1+nYYtyyC4ryU+XI5vFS+3c=;
+        b=Rotc/BnIx+hb6M3oJT2xtrpM7HIAvciLJIPlT+78CCFu8eYPOCIVWlbxfBOt3lTyJe
+         m8L6H6iqdfprj/66oaM4FV3U+rHY8dzfWho+yvfeqNzCojsoZ+EcyD2yqQIIRz9uGMNs
+         vMKChvW5vGgpKeSDCOy1qi4XJFp18aQGvqQaa3aJlcTlV59ctl+Wmpr1o20IhqUK4gj+
+         hW3IW/BKipdx/kfL2rKh4maHQSv0YKnDiFPY7mMeJSgNeXQ+DEqskbu1A6/7N1JWE+Gf
+         f0sHDplRR9ZyIyZlW+dEACT64mRxl8w/LpBFE+zecE/Io1iflJLxOxhInCHF184/hoA9
+         fbsQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778984125; x=1779588925; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gvxpVRNFP1DdRYSBauluNbrj8hxlaOMbOPtS5FXUigM=;
-        b=mpAwFuKiqnMhR8XJYkdULIrhRm+7RaWr7uvcdq2gbp2EcpFYmTWx/pbSkIxK18nJFj
-         HHWqHJfe+o0NygFBU3xP6CwHdGVUsI0mBYxYbNPzCQpmf3BvN3opU4+KWkaPAF2tsIP5
-         YRQAl+tFETysS1an887/o3TDu/qMTBXp2/3qdKR+/FQagUDKXTeHLZ2KnVYUgNYZSDS7
-         m1giilCC7KODnpXVuJhWV1+tnetQEeQVHxIHcrDkI38wdb125SQBQD6G9uqs54FkB1j+
-         L83eAftiYgd9JhL/E2hK6kmHdDNdo2kuPrs2N8gBZhp1WnK6TuSNsgkEKDckdydPV2UO
-         +jNA==
+        d=juliahub.com; s=google; t=1778986045; x=1779590845; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GrCYpS1Kg2cJiBGT7t++xWTLkLpRUruScHyKB43nglE=;
+        b=HCrQ4ucGXG4fzmWC+Iex8/FbINKaazXsEWH8F6KOEf8ffuKRAPzabV4OW2R93eRbXi
+         sOOMLg/kjBTUo5VWJ5rPoCU/thRX7JlRX3YeNNnzRwtWYuhaTjvsipP7merlHqpV/mn0
+         2Kwnktjh8MlQD/kBOpNZaMT/B+TUFBb99EoqxOKDFDxHDG2wmXNqWSPfIS4Bd0JLkOYo
+         sza5Zx1l9Gt2qDW7MnqEnkK/x6GsmH56plUSx3cnoEqujqjBd0aXp8SoU/h2hCSVSeOa
+         luIV051BmnkCPCeQn4E8byK7Ly2oVLHM5NzEV9Dy/VZn4HFKlWLw5vHWJs9b0MRamfGt
+         DudA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778984125; x=1779588925;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gvxpVRNFP1DdRYSBauluNbrj8hxlaOMbOPtS5FXUigM=;
-        b=Suyo7rnOK4comhHt7uw3PnkwUEebpyUlyFHRqKFz+mXszCcarWySF+BPdD0c7g+RgV
-         Bd1IpITvOd6Nte/ugmPYwHHVawgNBI/lxKhTnzhSWUkmFeCNEZVz8iSZEbaOUvbBQZ4y
-         kwUjmgCWAbZBL8E01egLn3mYI01ge/ttfFNl805nfX5cXXOefFzJ30x8rkn/7+96hMdG
-         ezm/k34VEOJLUFVGEDBFvt9WVhPW6yl0NloAIVH7nnKFgBfthp6ZlNiC8bpcxA2GL3ny
-         cwMac1jDK+IH2Vmy6xQ/qXYw+tgpUeOn6J3sFrmY8d0p1rf2aFTeakwSA9Yd0J+EMoEd
-         A1GA==
-X-Forwarded-Encrypted: i=1; AFNElJ+1Hqwra3UnUnkGRTeaytc56RLt2EPRLYOE690sCx3LGgaVJFdUNSsPMNQFA+nB6TUNxwYnTlw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaaIgBlWvCiDCreRN9UNs4tzXG+TAVNsYjPXevpAp4zQjDpzln
-	OgRVbaQlaUyZg0v1rzIk3l8FbF5a8axRL3kcmBMYV0X5FhqVwIEf6iXm7x2hiWwSrmYXMEUuj0+
-	ddL6DLMNnUhsbpAhvpeo6tUwM2jFpne4nsZ8b6d7l
-X-Gm-Gg: Acq92OFR246OSTQnenhI5YoV25zS0RO72kKuMviyB7aaX4ssWtdxv5Pj5ythP4iz6ye
-	84qR0C5P8GdTEQc+12hzKaK3/fhXQfi2rb6g2Qsyp4xc9bkpgOC/5pwVF5qPPANEKWBPkaEv2T3
-	AVzz0P7laWDaZsXXXmG9xB7zv0ZbXZh0nWk5nMzze3WgbkTwmWNbul8tu/7gH51m6xBYS5Q747Z
-	XdguSWyUZFLcpKMeOhYStyf5oe/lgBNvFCSWxWDwGC4u7fOHx1xzVt6f68BDdkUsIX+bFe5X+/i
-	AG+MxZbsGMVr30a57opoAprcdC1BBHGVI7zz5lSG6KGe9okh0UV2A/iUXe3TqOpxcQnqQooGNri
-	ndBIivlN1AgG7I4Gzsiyj+DbUKYXaqNk=
-X-Received: by 2002:a05:7022:426:b0:133:39b9:9720 with SMTP id
- a92af1059eb24-134fffa3c72mr4307593c88.16.1778984124131; Sat, 16 May 2026
- 19:15:24 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778986045; x=1779590845;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GrCYpS1Kg2cJiBGT7t++xWTLkLpRUruScHyKB43nglE=;
+        b=ncNrePflpC+YpdOjoavmR/fh3V/iCdRVz0QGrJvNtjEAVU0rUzkpJKztFjqUqnSCHb
+         9qrU9fRk3KccAu19YvaKR2AqYCEhdbiJYKUlCBzUQI+j/dpwCfOwSy5x8W9a3m34LaKC
+         kD6IAi83zWglz6K81ii525XihdTCWPnaIQ7yQjWpwXzG6gi8bQPQetcgWDP5lOsLnThW
+         OHiMqF5HvKLJt4cZ9sdmjN81bRcXigbuvrhEKjqQYDqYM73wzpt+EJNBViRbOlq/RmEF
+         oJJTsNDmSwEBZrDrubNNHqA6fyLf+sP4cIS7rAIV/MKZIUxocnW7cUbvj13gBr/sW50q
+         BpVg==
+X-Gm-Message-State: AOJu0YxgeGq6x0xPjUaS5SxvIFLlk0HtKGy3fts+jRtKW2jhVtFVuwPa
+	SoNCEZLsOm4hpoS8g83PRG1P9c0pYlUVgBjJfYQma7nJ2UzYul22HW8N2FcKrU2kk8S2c1EG2ko
+	1coqPqULoaN9oRcyDZ22jjOJPKeFUCZzbrNRQeC8yIraiz5owxAYCCeA=
+X-Gm-Gg: Acq92OEAtA3kOG3Jo8lL7iTM2krJTqbHdtyuIru4Fx2W5ZEyjeg/ursgVk2FfpEQqBp
+	38uNDgMXVNmVAv2T9jAwsJ0AFAff5Q7kbS0egfKqrETk/TISMiIRdlYtcEPvNN1ku8jjMOjxuvR
+	l9SLd9vCGDZcGKYy+W7bdne1V2Lauhi8tadWz04/bhZt/C3HT3Fs0bojcPCc7q37kOOcAKOO4+X
+	xVk/v2/6pMU/AXCOSxOvkq8YT/9D1Xspv2hUAUPJ6EI3yd3OPAw2d+PD7TKfjPQukdPqDeTPcBm
+	pqWCkyNThwtwbFvvKMlqyM9FM3xPcqBvPXCBPR0=
+X-Received: by 2002:a05:6214:4d0a:b0:89f:2fa:a9bb with SMTP id
+ 6a1803df08f44-8ca0f601d65mr144415516d6.9.1778986045426; Sat, 16 May 2026
+ 19:47:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <tencent_0106C0D2EA464109986EE86EF40CB5E7D406@qq.com>
- <tencent_330636464A367423778966A63DD1360E9609@qq.com> <13bc2e56-ea61-4cde-896f-c10636b29e9d@linux.dev>
-In-Reply-To: <13bc2e56-ea61-4cde-896f-c10636b29e9d@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Sat, 16 May 2026 19:15:12 -0700
-X-Gm-Features: AVHnY4K3feYplgIFcIrl5ySgvS6ZwJ9OXyz1asrE5oS9XWtIIXfR4EDtj2LbnTw
-Message-ID: <CAAVpQUB6eRRRpapTxXmidO4ADtFc-ZBA+zwfPFb4dyX55UD4JQ@mail.gmail.com>
-Subject: Re: [PATCH RDMA v2] RDMA/rxe: add mutual exclusion in rxe_net_del()
-To: "Yanjun.Zhu" <yanjun.zhu@linux.dev>
-Cc: Edward Adam Davis <eadavis@qq.com>, akpm@linux-foundation.org, arjan@linux.intel.com, 
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	hdanton@sina.com, horms@kernel.org, jgg@ziepe.ca, kuba@kernel.org, 
-	leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com
+From: Keno Fischer <keno@juliahub.com>
+Date: Sat, 16 May 2026 22:46:49 -0400
+X-Gm-Features: AVHnY4L8EDHuD63E-Mxs3sfDoj0VJhXAuhAcDTlcw9J3gvSmNJzPVsn9PCPwujM
+Message-ID: <CABV8kRzn=oewDQcv-_-WzktpxAuLBPiTgMdfcpyOYAnz=0kiDA@mail.gmail.com>
+Subject: [BUG] mlxsw: Driver/Firmware disagreement about max headroom size
+To: netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, mlxsw@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 6A7DC55F017
+X-Rspamd-Queue-Id: 9645455F0D5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[juliahub.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[juliahub.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288677-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288678-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[qq.com,linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	DKIM_TRACE(0.00)[juliahub.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,mail.gmail.com:mid,syzkaller.appspot.com:url,qq.com:email,linux.dev:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[keno@juliahub.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Sat, May 16, 2026 at 4:40=E2=80=AFPM Yanjun.Zhu <yanjun.zhu@linux.dev> w=
-rote:
->
->
-> On 5/16/26 7:00 AM, Edward Adam Davis wrote:
-> > We must serialize calls to rxe_net_del() or risk a crash as syzbot
-> > reported:
-> >
-> > KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-> > Call Trace:
-> >   udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
-> >   rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inlin=
-e]
-> >   rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
-> >   rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
-> >   rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
-> >
-> > Jason Gunthorpe suggest placing the lock within rxe to protect its racy
-> > implementation of rxe_net_del(), which looks like it is possibly also
-> > triggered by NETDEV_UNREGISTER.
-> >
-> > The patch addressing this issue in nldev_dellink() has already been
-> > applied(0b28000b64f4); however, since the fix has now been relocated
-> > to rxe, the corresponding remedial code in nldev has been removed.
-> >
-> > Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and destruct=
-ion per net namespace")
-> > Fixes: 0b28000b64f4 ("RDMA/nldev: Add mutual exclusion in nldev_dellink=
-()")
-> > Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=3Dd8f76778263ab65c2b21
-> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> > ---
-> > v1 -> v2: serialize calls to rxe net del
-> >
-> >   drivers/infiniband/core/nldev.c     | 4 ----
-> >   drivers/infiniband/sw/rxe/rxe_net.c | 7 ++++++-
-> >   2 files changed, 6 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/=
-nldev.c
-> > index 3cb3cb7629fe..96c745d5bac4 100644
-> > --- a/drivers/infiniband/core/nldev.c
-> > +++ b/drivers/infiniband/core/nldev.c
-> > @@ -1816,8 +1816,6 @@ static int nldev_newlink(struct sk_buff *skb, str=
-uct nlmsghdr *nlh,
-> >       return err;
-> >   }
-> >
-> > -static DEFINE_MUTEX(nldev_dellink_mutex);
-> > -
-> >   static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
-> >                         struct netlink_ext_ack *extack)
-> >   {
-> > @@ -1848,9 +1846,7 @@ static int nldev_dellink(struct sk_buff *skb, str=
-uct nlmsghdr *nlh,
-> >        * implicitly scoped to the driver supporting dynamic link deleti=
-on like RXE.
-> >        */
-> >       if (device->link_ops && device->link_ops->dellink) {
-> > -             mutex_lock(&nldev_dellink_mutex);
-> >               err =3D device->link_ops->dellink(device);
-> > -             mutex_unlock(&nldev_dellink_mutex);
-> >               if (err)
-> >                       return err;
-> >       }
-> > diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/s=
-w/rxe/rxe_net.c
-> > index 50a2cb5405e2..92847e955ca2 100644
-> > --- a/drivers/infiniband/sw/rxe/rxe_net.c
-> > +++ b/drivers/infiniband/sw/rxe/rxe_net.c
-> > @@ -642,6 +642,8 @@ static void rxe_sock_put(struct sock *sk,
-> >       }
-> >   }
-> >
-> I read this commit carefully. There are two paths that can invoke
-> rxe_net_del().
->
-> One is through the rdma link del xxx command, while the other is through
-> the netdevice notification chain.
->
-> In the netdevice notification chain path, rtnl_lock is already held, and
-> rxe_net_del() is called under that lock.
->
-> However, in the rdma link del xxx path, no rtnl_lock is taken.
->
-> Because of this, I would like to use the existing rtnl_lock to serialize
-> calls to rxe_net_del().
+Hello mlxsw maintainers,
 
--1 for this.
+I don't think this bug is particularly consequential, but there appears to be a
+disagreement between the driver and the firmware regarding the proper max
+headroom size. On my SN3800, I see the following:
 
-It's a global mutex and heavily contended because many
-components use it without much care.  We are working
-to reduce the RTNL pressure for years by converting such
-users with a dedicated lock or per-netns RTNL mutex.
+ ```
+$ tc qdisc replace dev swp1 root handle 1: prio bands 8 priomap 0 1 2 3 4 5 6 7
+$ tc qdisc replace dev swp2 root handle 1: prio bands 8 priomap 0 1 2 3 4 5 6 7
+$ dcb buffer set dev swp1 \
+      buffer-size all:0 0:1219K \
+      prio-buffer 0:0 1:0 2:0 3:0 4:0 5:0 6:0 7:0
+Attribute write: No buffer space available
+$ dcb buffer set dev swp2 \
+      buffer-size all:0 0:1219K \
+      prio-buffer 0:0 1:0 2:0 3:0 4:0 5:0 6:0 7:0
+[78711.680961] mlxsw_spectrum2 0000:07:00.0: EMAD reg access failed
+(tid=43b7c51f003ef26e,reg_id=500c(pbmc),type=write,status=7(bad
+parameter))
+Attribute write: I/O error
+```
 
-RTNL is not needed here at all, so please use a dedicated lock.
+I don't know why this differs between the two switch ports, but since
+the driver goes through a lot of effort to calculate the max value
+and return a nice error (as shown in the first command), it seems
+like a bug that it wouldn't do so on the second port.
 
+As an aside, as a novice to this area, it wasn't clear to me from the
+docs (https://github.com/Mellanox/mlxsw/wiki/Quality-of-Service),
+whether the headroom buffer is a separate piece of memory or
+whether it steals part of the shared buffer memory space, which
+is what prompted me to just try various values here. It also wasn't
+clear to me whether the headroom config did anything for lossy PGs.
+Hope my naive view can help improve the page :).
 
->
-> My proposed commit is shown below. I am not sure whether it fully
-> resolves the problem.
->
-> diff --git a/drivers/infiniband/sw/rxe/rxe.c
-> b/drivers/infiniband/sw/rxe/rxe.c
-> index b0714f9abe3d..84266dc416c4 100644
-> --- a/drivers/infiniband/sw/rxe/rxe.c
-> +++ b/drivers/infiniband/sw/rxe/rxe.c
-> @@ -251,7 +251,9 @@ static int rxe_newlink(const char *ibdev_name,
-> struct net_device *ndev)
->
->   static int rxe_dellink(struct ib_device *dev)
->   {
-> +       rtnl_lock();
->          rxe_net_del(dev);
-> +       rtnl_unlock();
->
->          return 0;
->   }
-> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c
-> b/drivers/infiniband/sw/rxe/rxe_net.c
-> index 50a2cb5405e2..ac53ea73996d 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_net.c
-> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
-> @@ -649,6 +649,8 @@ void rxe_net_del(struct ib_device *dev)
->          struct sock *sk;
->          struct net *net;
->
-> +       ASSERT_RTNL();
-> +
->          ndev =3D rxe_ib_device_get_netdev(&rxe->ib_dev);
->          if (!ndev)
->                  return;
->
-> Zhu Yanjun
->
-> > +static DEFINE_MUTEX(rxe_net_del_mutex);
-> > +
-> >   void rxe_net_del(struct ib_device *dev)
-> >   {
-> >       struct rxe_dev *rxe =3D container_of(dev, struct rxe_dev, ib_dev)=
-;
-> > @@ -649,9 +651,10 @@ void rxe_net_del(struct ib_device *dev)
-> >       struct sock *sk;
-> >       struct net *net;
-> >
-> > +     mutex_lock(&rxe_net_del_mutex);
-> >       ndev =3D rxe_ib_device_get_netdev(&rxe->ib_dev);
-> >       if (!ndev)
-> > -             return;
-> > +             goto out;
-> >
-> >       net =3D dev_net(ndev);
-> >
-> > @@ -664,6 +667,8 @@ void rxe_net_del(struct ib_device *dev)
-> >               rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
-> >
-> >       dev_put(ndev);
-> > +out:
-> > +     mutex_unlock(&rxe_net_del_mutex);
-> >   }
-> >
-> >   static void rxe_port_event(struct rxe_dev *rxe,
+Thanks,
+Keno
 
