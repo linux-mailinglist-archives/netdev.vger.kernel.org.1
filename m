@@ -1,231 +1,153 @@
-Return-Path: <netdev+bounces-288712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id H+tZMBeRCWrIfwQAu9opvQ
-	(envelope-from <netdev+bounces-288712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 11:57:43 +0200
+	id rHjANg2XCWqXgwQAu9opvQ
+	(envelope-from <netdev+bounces-288713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:23:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4238056058A
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 11:57:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFBFE560746
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:23:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E19803007F68
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 09:57:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 226B6300340B
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32DE73559D6;
-	Sun, 17 May 2026 09:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A51E2E282B;
+	Sun, 17 May 2026 10:23:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874BF34F498
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 09:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CCA33987
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 10:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779011861; cv=none; b=o4VvrXNbtpMKP1bLlv+CViKY46sYPu0vXMBaby0v0JapGjSIOvML4iiLd4V6CaemYLXDO9y7bEyVUhKBlT1zII3dhDbu76o5NaBOKv3dUn0Uu6kubioFYf8flW6bhKNqniAK28VLIpYqe6bIHIrH258qn3TbGyOEamh7Bf/t6ow=
+	t=1779013385; cv=none; b=HPTttugOtqcCRXyhVItaCrDZqAjSlFjocJFqNLOw9tN1utQiJPJ7/OU2aEYn2iN8pDYaULzE6g5ZjUf+FjmOkEIvUxDB0+cNhcCfMeHb/KRlpjFrtsltcGD6Wx+NZ5r899RTJlGdZ3kfqeQ6LFW/Iww6+w4It1J3Agt5Bn6XG7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779011861; c=relaxed/simple;
-	bh=9yxTgSmcxMcQF7W/Zfd9dDhpHTGFsYq+RF8Gcosneng=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YagRQ/rDjuCcFeWXa4SEnY87fbkgK3Wp5W6mgdm5IzYaW8G/qmmQDIygYdLXzvEtggR5bgEhL6O/Lkm9PGvsb9fQLNAO+xQtjXn90IvtePOLo4Cv4YexzQWdKIb8co94t+b1NrvIRjW1FuYQpFfVwtA0X0c5lmYTUWkuAcMowpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wOYFS-0006Jt-Pd; Sun, 17 May 2026 11:57:26 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wOYFR-000PHi-1w;
-	Sun, 17 May 2026 11:57:26 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wOYFS-0000000CTNw-0CKx;
-	Sun, 17 May 2026 11:57:26 +0200
-Date: Sun, 17 May 2026 11:57:26 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Carlo Szelinsky <github@szelinsky.de>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org
-Subject: Re: [PATCH net-next v5 1/2] net: pse-pd: add devm_pse_poll_helper()
-Message-ID: <agmRBryQW3PkcJMJ@pengutronix.de>
-References: <20260505015757.831372-1-kuba@kernel.org>
- <20260516101720.1686465-1-github@szelinsky.de>
+	s=arc-20240116; t=1779013385; c=relaxed/simple;
+	bh=mj9YtOGBFCLAwR84LyZc2W3EIeUpfl7PXa5rDaE6sFk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=hubGJQRtfikUuo78xELsr7X++7/eapy4GPsic0aimv73iKT9KMAx/yjNFgZQ0+QhXsCw+q8aMyQFPKDNXQ3WWt6l1TNYKT8i+UswgCLDI1MR3czCdgwm/YYkg34oqDHRcc5rmliYb17XnSscRelP7dRQ0ivUq3nUUzssChtHJEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64HAMcT6011120;
+	Sun, 17 May 2026 19:22:38 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64HAMc7M011117
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 17 May 2026 19:22:38 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <ae6348a3-9cff-4a65-8ad3-ceeca938d4d3@I-love.SAKURA.ne.jp>
+Date: Sun, 17 May 2026 19:22:38 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260516101720.1686465-1-github@szelinsky.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 4238056058A
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: neighbour: reject neighbor creation on IFF_NOARP
+ devices
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+References: <98be20ee-c914-4c93-b4bd-d04ddcc349cf@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <98be20ee-c914-4c93-b4bd-d04ddcc349cf@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav405.rs.sakura.ne.jp
+X-Rspamd-Queue-Id: AFBFE560746
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-288712-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288713-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DMARC_NA(0.00)[pengutronix.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:url,pengutronix.de:mid]
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,I-love.SAKURA.ne.jp:mid]
 X-Rspamd-Action: no action
 
-On Sat, May 16, 2026 at 12:17:20PM +0200, Carlo Szelinsky wrote:
-> Hi Jakub,
+Sorry, please ignore this patch, for it turned out that this analysis was wrong.
+
+On 2026/05/16 0:05, Tetsuo Handa wrote:
+> syzbot is reporting
 > 
-> Thanks for sending the AI review. I checked the code again... both
-> points are real, but one of them looks to me like more theory than practice.
-> Out of curiosity, what prompt do you use for these reviews, so I can use it 
-> before sending the next version?
-
-Sashiko is using https://github.com/masoncl/review-prompts
-
-I personally run pre-review with opencode + review-prompts +
- gemini-3.1-pro-preview-customtools / or claude-sonnet-4-5
-
-After installing review-prompts to opencode config the review can be
-done with "/kreview commit_id"
-
-But sashiko still finds things, i do not know what is the difference.
-
-> Replying inline:
+>   unregister_netdevice: waiting for vcan0 to become free. Usage count = 2
 > 
-> On Mon, 4 May 2026 18:57:57 -0700 Jakub Kicinski wrote:
-> > > @@ -1118,6 +1125,8 @@ void pse_controller_unregister(struct pse_controller_dev *pcdev)
-> > >  	pse_release_pis(pcdev);
-> > >  	if (pcdev->irq)
-> > >  		disable_irq(pcdev->irq);
-> > > +	if (pcdev->polling)
-> > > +		cancel_delayed_work_sync(&pcdev->poll_work);
-> >
-> > Because pse_release_pis() executes kfree(pcdev->pi) before the delayed work
-> > is cancelled, can pse_poll_worker() run concurrently and access the freed
-> > pcdev->pi array inside pse_handle_events() before the cancellation completes?
+> problem.
 > 
-> Yes, seems like a real bug. The IRQ thread and the poll worker can still run
-> after pse_release_pis() frees pcdev->pi, and both end up in
-> pse_handle_events() touching pcdev->pi[i]. We need to stop them
-> first. v6 will reorder pse_controller_unregister() to:
+> I asked AI Mode in Google Search to analyze a log from my debug printk()
+> patch in linux-next-20260508. It performed a meticulous trace of
+> __dev_hold() and __dev_put() frequency, and identified that a reference
+> acquired via ___neigh_create() remains unreleased at the end of the device
+> unregistration timeline.
 > 
-> 	if (pcdev->irq)
-> 		disable_irq(pcdev->irq);
-> 	if (pcdev->polling)
-> 		cancel_delayed_work_sync(&pcdev->poll_work);
-> 	cancel_work_sync(&pcdev->ntf_work);
-> 	pse_release_pis(pcdev);
+>   Call trace for vcan0[24] +1 at
+>        __dev_hold include/linux/netdevice.h:4470 [inline]
+>        netdev_hold include/linux/netdevice.h:4513 [inline]
+>        ___neigh_create+0xcb3/0x2360 net/core/neighbour.c:664
+>        neigh_add+0xc51/0xf70 net/core/neighbour.c:2136
+>        rtnetlink_rcv_msg+0x77e/0xbe0 net/core/rtnetlink.c:7005
+>        netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2551
+>        netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+>        netlink_unicast+0x780/0x920 net/netlink/af_netlink.c:1345
+>        netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
+>        sock_sendmsg_nosec+0x112/0x150 net/socket.c:797
 > 
-> The IRQ side seem to be already broken before this patch. I went
-> through the git log:
-> 
-> * fc0e6db30941 ("net: pse-pd: Add support for reporting events")
->   added pse_isr but never called disable_irq() in unregister at all.
-> * ffef61d6d273 ("net: pse-pd: Add support for budget evaluation
->   strategies") added the disable_irq() call, but put it in the
->   wrong place (after pse_release_pis()).
-> 
-> What do you suggest to do, I could imagine: ... 
-> 
-> 1) Send the fix as a standalone "Fixes:" patch to net first,
->    then rebase v6 on top once it lands? Or fold it into v6 as
->    patch 1/3? My vote is standalone since the fix stands on its
->    own, but up to you.
+The reference that is leaking is [26].
 
-Yes, please send the fix to stable. In this case you will need to wait
-until net-next includes stable fixes.
+Call trace for vcan0[26] +4 at
+     __dev_hold include/linux/netdevice.h:4470 [inline]
+     netdev_hold include/linux/netdevice.h:4513 [inline]
+     dev_hold include/linux/netdevice.h:4536 [inline]
+     j1939_priv_create net/can/j1939/main.c:140 [inline]
+     j1939_netdev_start+0x36b/0xc10 net/can/j1939/main.c:268
+     j1939_sk_bind+0x853/0xb30 net/can/j1939/socket.c:506
+     __sys_bind_socket net/socket.c:1948 [inline]
+     __sys_bind+0x2e9/0x410 net/socket.c:1979
 
-> 2) Which commit for the Fixes: tag? I'd pick ffef61d6d273
->    (that's where the broken order came from), but fc0e6db30941
->    also works (no protection at all back then). wdyt?
+Call trace for vcan0[28] -3 at
+     __dev_put include/linux/netdevice.h:4456 [inline]
+     netdev_put include/linux/netdevice.h:4523 [inline]
+     dev_put include/linux/netdevice.h:4548 [inline]
+     __j1939_priv_release net/can/j1939/main.c:166 [inline]
+     kref_put include/linux/kref.h:65 [inline]
+     j1939_priv_put+0x128/0x270 net/can/j1939/main.c:172
+     j1939_sk_sock_destruct+0x52/0x90 net/can/j1939/socket.c:388
+     __sk_destruct+0x8d/0x9d0 net/core/sock.c:2352
+     rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+     rcu_core kernel/rcu/tree.c:2869 [inline]
+     rcu_cpu_kthread+0x99e/0x1470 kernel/rcu/tree.c:2957
+     smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+     kthread+0x388/0x470 kernel/kthread.c:436
+     ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+     ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-If it is introduce by ffef61d6d273, then use this for Fixes.
-
-> > > +int devm_pse_poll_helper(struct pse_controller_dev *pcdev,
-> > > +			 const struct pse_irq_desc *d)
-> > > +{
-> > [...]
-> > > +	queue_delayed_work(system_freezable_wq, &pcdev->poll_work,
-> > > +			   msecs_to_jiffies(pcdev->poll_interval_ms));
-> >
-> > Since memory is allocated with devm_ helpers but no devm cleanup action is
-> > registered to cancel the delayed work, what happens if a driver's probe
-> > function encounters an error after calling this helper? [...]
-> >
-> > The commit message mentions that drivers typically set up the helper before
-> > registering the controller. If queue_delayed_work() schedules the worker
-> > to run before devm_pse_controller_register() completes, will
-> > pse_poll_worker() attempt to acquire pcdev->lock and push events into
-> > pcdev->ntf_fifo before they are initialized?
-> 
-> The probe-failure case is a real bug. If probe fails between this
-> helper and devm_pse_controller_register(), the work stays queued
-> and fires later on a pcdev whose devres memory is gone. UAF.
-> 
-> The "worker fires before mutex/kfifo are ready" case is real in
-> theory, but I don't think you can actually hit it?! Default
-> poll_interval_ms is 1000 ms, so pse_controller_register() would
-> need to take over a second to lose the race. Worth fixing to keep
-> the code clean, but not urgent or?
-
-The probe() is a process and can be outscheduled by any high prio process
-at any time. May be on a single core SoC with pse-pd core build
-as module and squashfs root it will make the boot load heavy enough
-to reproduce it?
-
-> Same fix for both: move queue_delayed_work() out of the helper.
-> The helper just allocates the state and does INIT_DELAYED_WORK.
-> pse_controller_register() then arms the work as the very last
-> step on success, gated on pcdev->polling. So the work only ever
-> runs when everything is set up AND register has succeeded.
-
-Sounds good.
-
-> Should I fix both in v6, or just the probe-failure leak? One
-> change covers both, so I would suggest to do both. wdyt?
-
-Fixes for pre-existing bugs to net, new bugs to net-next :) 
-
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
