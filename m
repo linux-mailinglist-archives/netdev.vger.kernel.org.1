@@ -1,60 +1,68 @@
-Return-Path: <netdev+bounces-288714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kNPlOJKXCWqXgwQAu9opvQ
-	(envelope-from <netdev+bounces-288714-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:25:22 +0200
+	id wMIgJduYCWqqhAQAu9opvQ
+	(envelope-from <netdev+bounces-288715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:30:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A89C56075E
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:25:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19BEF560787
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6FD553009B28
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:25:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1C20230082AC
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D2E31619B;
-	Sun, 17 May 2026 10:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBD129D264;
+	Sun, 17 May 2026 10:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rj+SMoP1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g0wT50jn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFB1224AF1
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 10:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A16F3C465;
+	Sun, 17 May 2026 10:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779013519; cv=none; b=ch8v0aB9V+h9gSOJTjTMqXwaxyUSteTpd9WtSK9EYQQkXpzmlUMKWAQw5+NBsuRoF3zrlGwiY5msY1t5fRkPB/Z5r5HMUUpM+SnrTuJ8njcQ30ZbBwq7UVnPy6eThsUE738UPRhbcRaUf5+WjD04hl2KEr33zqCtpmKLnkWsywg=
+	t=1779013849; cv=none; b=dJkrpCB4ssC6b1498AuWYNrBsoRtFziZV4n7JeEkSYxhUBy2amUbvthYsWmwgyXmk2OQq+BWa4GGbZJr5/uRHPW3k/JgOLj7h8hXtABLe0YV6w49YeUhygJkUhG4olC/PoKcSDDKTJVVSSUYJxUWKKuNx813BhyVRpXRAk2s1k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779013519; c=relaxed/simple;
-	bh=8D9fs/PRk1JXXmpJR1ypWxBztd3OCrUpyzGGXF4Cqfw=;
+	s=arc-20240116; t=1779013849; c=relaxed/simple;
+	bh=oKB4vZkKMB1iY1/10UVgDNZcxKd+ie6puFVXHVtNU/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CyuBLaJN6dHvv7VP2dhaYFuO5HuaTEu2A0oXLbsQCxUCWr0YqSArMnoLXXYzKjaVySZ1nJ6UHyVh2KGDaqpLHg79vTB1TTXxy6Ryr4exxzQogR236K7JG6/cWR56rH4PiD6MKQOAS6/AX2Qe7FXzdt6Bo2/G8Zl6cx8LgLyaHs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rj+SMoP1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B2BBC2BCB0;
-	Sun, 17 May 2026 10:25:18 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=d2lBdkaDksqalWN+TxElgMItzbPkjVrJaimodOvLjbxzcO48O23keLHI2/Sd2FmV/GJlSReHSXRBvZkojJS0pLJuaBEU80q6KMamdqw/TI9INS2+pZzJW9QbUtsGznajn0VS+gQxVsxNoUdgJxESHmVN7Dm3tg9H4tUj8u6859E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g0wT50jn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAA73C2BCB0;
+	Sun, 17 May 2026 10:30:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779013519;
-	bh=8D9fs/PRk1JXXmpJR1ypWxBztd3OCrUpyzGGXF4Cqfw=;
+	s=k20201202; t=1779013848;
+	bh=oKB4vZkKMB1iY1/10UVgDNZcxKd+ie6puFVXHVtNU/E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rj+SMoP1rgaa2ACXValosTDUUUhc+/XLyeQmxx1aqcFbMH17as72kjO9MZ4OOwRhv
-	 NwP3E+jJQnD3nmKarRVk9guZ46EGjavEDR5abug7ALbsVJ9LfMBqXW77yr1HJfPr1R
-	 IadiPsXmf1PAblH0IP5KsWTYkNJEaXytDbspFZLzega2meiTtJRXr84a7P17/gSqax
-	 IhkGUYk3RQmXpdZDReCq1UHTRUlI7KP0rfmK/wP2Wv8BZVNSLzAt6QJxexvL5HT0pN
-	 zHKScZ2DA/3s6z862BmmjMO/B4F5oHwmPjsktY+sIl1fbVHV9sFAHa9tBpB1wMu0WX
-	 4AukxFBvWql3A==
-Date: Sun, 17 May 2026 11:25:15 +0100
+	b=g0wT50jnfaVQBbzO+xoyYyLOQl4dDjwSyZLd7hHJUCot6si+daFBUL3+SACrsqY43
+	 RFmcEMDQiu/QQyonJCIJI5kXaedKvoHYZOfpDECqLZ9vpROiHpjEpXJYsT65hF5Abp
+	 XxY43BPJDRTD0XWXoeBNXhKGE/VIaovIOC7DesCqsR0yRcqoAnV/rjT7nyL0NoWK8g
+	 gQt2vkVtZv3vxrcAHxyvDeZK/ucck1TJMfy+qMGdl95o4Hj/bcR5lka8uYSx9dU7tr
+	 XodhGyrESKY9o0pFfrE1eJrLf7BfIyA1iza+GbIpbZXEu6rApSYzqiRv28vqvkcUTR
+	 tJSq6T2+bIAxg==
+Date: Sun, 17 May 2026 11:30:42 +0100
 From: Simon Horman <horms@kernel.org>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Piotr Skajewski <piotrx.skajewski@intel.com>
-Subject: Re: [PATCH iwl-next v2 3/8] ixgbe: prevent adding duplicate FDIR
- perfect filter rules
-Message-ID: <20260517102515.GA98116@horms.kernel.org>
-References: <20260512140904.4105236-1-aleksandr.loktionov@intel.com>
- <20260512140904.4105236-4-aleksandr.loktionov@intel.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@mellanox.com>,
+	Maxim Mikityanskiy <maxtram95@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Saeed Mahameed <saeedm@mellanox.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Paul Saab <ps@meta.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>, Paul Saab <ps@mu.org>
+Subject: Re: [PATCH net] net/mlx5e: xsk: Fix unlocked writing to ICOSQ
+Message-ID: <20260517103042.GB98116@horms.kernel.org>
+References: <20260513064613.334602-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,54 +71,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260512140904.4105236-4-aleksandr.loktionov@intel.com>
-X-Rspamd-Queue-Id: 4A89C56075E
+In-Reply-To: <20260513064613.334602-1-tariqt@nvidia.com>
+X-Rspamd-Queue-Id: 19BEF560787
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-288715-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288714-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,nvidia.com,mellanox.com,gmail.com,iogearbox.net,vger.kernel.org,meta.com,mu.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,mu.org:email]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 04:08:59PM +0200, Aleksandr Loktionov wrote:
-> From: Piotr Skajewski <piotrx.skajewski@intel.com>
+On Wed, May 13, 2026 at 09:46:13AM +0300, Tariq Toukan wrote:
+> From: Dragos Tatulea <dtatulea@nvidia.com>
 > 
-> When the same flow specification is added twice (same 5-tuple with
-> different sw_idx values), ixgbe_add_ethtool_fdir_entry() silently
-> programs the duplicate into hardware using a second FDIR table slot.
-> This wastes a scarce FDIR entry and can cause confusing behaviour
-> when deleting rules.
+> During napi poll, when the affinity changes and there's still XSK work
+> to be done, we trigger an ICOSQ interrupt on the new CPU. However, this
+> triggering on the ICOSQ is done unprotected.
 > 
-> Add a helper ixgbe_match_ethtool_fdir_entry() that walks the in-kernel
-> filter list before programming hardware.  If an entry with an
-> identical filter (excluding the sw_idx) already exists, the new add
-> request is rejected with -EEXIST.
+> There are 2 such races:
 > 
-> Signed-off-by: Piotr Skajewski <piotrx.skajewski@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> A) mlx5e_trigger_irq() is called while mlx5e_xsk_alloc_rx_mpwqe() is
+> running from a different CPU due to affinity change. This can happen
+> because IRQ triggering is done after napi_complete_done(). At this point
+> the NAPI can be scheduled on a different CPU. Like this:
+> 
+>   CPU A (old affinity, NAPI tail)    CPU B (new affinity, fresh NAPI)
+>   -------------------------------    --------------------------------
+>   napi_complete_done()  clears SCHED
+>   mlx5e_cq_arm(...)
+>                                      napi_schedule_prep() sets SCHED
+>                                      mlx5e_napi_poll()
+>                                        mlx5e_xsk_alloc_rx_mpwqe()
+>                                          mlx5e_icosq_sync_lock() // noop
+>                                          memcpy 640 B UMR body
+>                                          advance sq->pc by 10
+>   mlx5e_trigger_irq(&c->icosq)
+>     wqe_info[pi] = {NOP, 1}
+>     mlx5e_post_nop() advances sq->pc
+> 
+> B) mlx5e_trigger_irq() is called on the ICOSQ when
+> mlx5e_trigger_napi_icosq() is running.
+> 
+> The obvious fix would be to lock the ICOSQ. But ICOSQ has an optimized
+> locking scheme that doesn't work for this scenario. Kick the async ICOSQ
+> instead which is always locked.
+
+...
+
+> Fixes: db05815b36cb ("net/mlx5e: Add XSK zero-copy support")
+> Reported-by: Paul Saab <ps@mu.org>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
