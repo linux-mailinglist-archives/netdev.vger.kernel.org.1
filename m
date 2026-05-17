@@ -1,247 +1,192 @@
-Return-Path: <netdev+bounces-288771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AJYcDEsVCmrgwgQAu9opvQ
-	(envelope-from <netdev+bounces-288771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 21:21:47 +0200
+	id 8K7IM0sYCmr8wgQAu9opvQ
+	(envelope-from <netdev+bounces-288772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 21:34:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD52B563817
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 21:21:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E6C8563924
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 21:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 44E9B3014404
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 19:21:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3DE13037421
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 19:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCCFC309F00;
-	Sun, 17 May 2026 19:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C57F3C3C0C;
+	Sun, 17 May 2026 19:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qc+vGuQO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SStaHulQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9E9302742
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 19:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779045697; cv=pass; b=WTUa/K2Jzi/2jmE00V6FidK/TjwhshKhz23ndFTjoZjb7Lk4ROR1zRdPV2hXFUSFfHnn+yxfH75qM4hYXVAAAGCs4VNxjULA2zwLTgjBRYkhrPRCgrCH0qHXcekkjIRV0/Drh+F9RW1QlrgLIaJVCr6BL229hRACGM9YBptxnIk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779045697; c=relaxed/simple;
-	bh=1v/XXWFyX1CrqrfCcNCeDqucdVkXIMDW9YfLgDAaYcM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hvFiBq0mXcsn16Js6ioULVIEoDN1jdge2evNB4+6y9P3h3YfCD0JNIxFmhfAvkprEzKaZB6iSZBYhkmgYGf6Yz3pn5ANwJdCObmrrmsNnaugnlaBZTP13PO15wwxjWcu+OB3Q09TClCOk0QegB77kblnZvZ+J+gdm2LHXtUtrDs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qc+vGuQO; arc=pass smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-12c88e5f4aeso641655c88.0
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 12:21:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779045694; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZexkQf8joKzC+5EI0uVowBU6fJHcWxkJkJy6h3f8dF/HepiXPnaTGEExK1ljOaORtJ
-         fDQkNYKh7XdhBG8P0H53SsRjasa/SBmVZ8pRl9X7PhNwLtfoE6xzTcT5/Ks+K5q4d0x1
-         atl5Zfe7uXPENAWy47vQTS7WL7nv8s3azpMfxbjabHpgGrP53VtDSz0txXBgLlp24/od
-         2XmB07PoFT73/WR6R228+vtNJDsf2RlWdTEzx7Toco/WAIzKWz3KvUs9Q0EfMoy9M66r
-         el66gAoW6ncVoWzbYMstJGCTIqvSDg5d7a35zVVvW21btSMft51M9bGiKtT5fqJyR7AF
-         uCqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=T/H79crIpuSG0oi0/XtyKYx+m0KERxP5FdagFIM7P28=;
-        fh=ova7dxVoHcqTOIjku7XfzWaN3H0H3OyU6pN8GYNCTsc=;
-        b=kQF1xemGR+SSJH3xtI/aQTw7eFagq+2qhUIUg+9LvkO3SohdwpmL7ndktkn0oF1COg
-         BP2CcnQEUEElRltLKzcuf2FRInQv6ZQrpfY+kQDJPcVVx3twOuwCAA6NkYa+h+wRieJ5
-         GkmgHzED+WsQoG0KNR66tLYjJtzdAu+dl4w5xfpb8ApLfr825aJpyKtuBW2XxSig7jMP
-         AFePtfJakDUhwKDxZrVOZ0L9kKAxtnTq+ZMpeHsc2MD3s9jOx7Sk1NAjDjtssyTbRM/+
-         LKjUC+Tpu1QZKT8zvy4DHY2K9c6UEzBsbkMO2qUAmpKdbzNCSo2wFmkDd9EowB0vNqKC
-         BjDg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0283333FE36
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 19:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779046157; cv=none; b=TPFrB2Npk9PE49tcQb6GUjMVuUO5+xNFK8OChoi0sBHprwZ/ZvvPgSympeaXOKgcFe7Sxr0Ldi2wGmZx23tNIfo4ZTqzOMQBIobKNsaNzmRRhx//Dm/4MVyRwZe6AJKg3FzxuF1vr/BokpIKP+1iCdW3G8Yaijdb0+xtcoVRZXs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779046157; c=relaxed/simple;
+	bh=XMaBu37baw6KIwcyker2TZ4by6S6i/usQ/CcByiJLjg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LjIEwPCcFaHUqacaeghlQaKgKYBFJv6WgshLRSXAyRhHHapScgHEkricgC7PQ77F+39i/r1C/JlxBb7F9C+v4yScGb88FE5C0h2KVXjHRYykYiW8xGiK4rC3ahRJPFnbRt9FhRX8dvCsGb/7lUnoPD+4abl2ArXy0KdQjmJG/wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SStaHulQ; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3697421c2a8so554673a91.1
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 12:29:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779045694; x=1779650494; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T/H79crIpuSG0oi0/XtyKYx+m0KERxP5FdagFIM7P28=;
-        b=qc+vGuQOWP9Prkuk4uvVJs2FeLMDAJobrq7kCCd53I1nGQFiHME0CKBj+1D6cygKiD
-         Xp71H5z0FQg8QEC2zbSz3M3YjQRyQ+d2mPILxItGMA225HAaYqN0gAjYpXtr8Kz8qYOJ
-         ozrueSpBEhMgfS7XFWLFWpgej1+XhglwssbQft9yKypf83rxZvjxc9gAz9dvBRwE+KtW
-         Cu/6gLzYcdBNieNSkkXcqZ+yDHkUgfXH/OVag4wpu1ytF8TeXuRAh2VpasuFB4Y9CxtA
-         QrgAy3of9EzCHEL3ULx3PuuJqlKAQIVRxwMy6LsPd6ojX+xGSb82kOdBKyU2oef31rX5
-         ZxQA==
+        d=gmail.com; s=20251104; t=1779046155; x=1779650955; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MBYyQ0ZMS6FoSccvFn3m6zDlGuyQLI5sKd09gEPumuQ=;
+        b=SStaHulQg0B/ka6SbV6mhR9S5f/wsRCmY6kdbF7PNUKJAnQY0wW5LBBZKy5EC64gt5
+         vo8ZdpItmTKNuLC+US9H1yMgAjO1lpQKDzrnbbP2RyOtEpNaIXfm3VXOjmkO/I223D19
+         NFDb31/4QOOgD/atAIXvQSsFpJd+B4/w9wAcMwvlNipb0Tqk5hWEhf4yMyZf9FfnInkQ
+         CxDRUKxbVhZ0yV+oBKMDwhk2ExGrw09DSg307FLZg2/DwziOvkpwTmHJMOmBujb3BByl
+         8Q+kdKf/W/TJWBuXeyOHIvC7YAOXP8/DGdD282JsfuriCTIUVHiSvV58tXcbPNEPms1m
+         Iq4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779045694; x=1779650494;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=T/H79crIpuSG0oi0/XtyKYx+m0KERxP5FdagFIM7P28=;
-        b=e5I+IAMt4dhXrz95mcgnVTWbYFdhC12mPp6msmcyi0Y14EUXgBT1tk8hPOaKya8XVi
-         Vqj1EzEmwNl+HDGeLsVXI22nhorA3YjTVOa/uf5BEri3RyBqvFpzZNVUGuSUpmWRfGeo
-         Bobk6ceZgzZ/Qjw6aiQjU6gHFnhmgF0JvoRJJ/6elufFiKbqDgVioJH7qTKdsDY7ln+1
-         h8wVtOVlEuvMdSiuO8SHqQKd1/kfUKiMhquFQSgfNCWHpB4c524ULOJkjRnmzX/49aiK
-         vNQL6uCOlzxAL3pxpa5oXCg7gX7E1snh085mMfiuR28xYTJFZceG3mVKarskhRwEuSXH
-         OlQg==
-X-Forwarded-Encrypted: i=1; AFNElJ/mcB7fjvTOq9F+egP0RtcWM+KsFihptqyP5DsDAYfb/iNYlMe8r46aGqVhLD0UKTM4e3chGUQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEeAjgwjJhoMg8UxLQDrAxmpLUgH+l+1TPf88pSFyFkAzuJlEh
-	qJbTKAzg9/79AmtxfZ4L56OVOyqz9XlXoI9HBf1vqtJ/EYmr7qT2X5I/hOeCUwrvPv60PzheJKq
-	5gVhQWkFFSSQuh1AVhAqNJoNpCS6cwbKRMquVUEuw
-X-Gm-Gg: Acq92OF/Jh2YRykwNfXv0mj8Va6ogV/V+tPGWIPwPXwpTPXxhe4KvaFqqZdGaajg7rj
-	v4wd5Z4CPkuNtkwYwsk0+3HqYz6lfvODkause/J+UD9abhvF9Scq5vYfdV88qj28yWCmoFRI0u6
-	m6ElCvup52bolLY6qCGUq3IuCjIer4Z4EDANVwjbVy4CZEcncdxBducZFo8jhAuH6muCaYq5R2y
-	bh7eV20eqbEfL/tZr16eMYRVXAQW+ZcVxWznM1Vl2K1JX3BIzuy9K353Bqk1WrT1VhI72wRY4qx
-	5yDa1US5oaLvsXiDYsKuBmL8iSKUEKzIWxt9xLZcVND9J9IRtgkg0kCvkqSaquH/4oGhv4iNTB4
-	nyvKFdTPeDzCigZwztWjUF9cDvVcCnGg=
-X-Received: by 2002:a05:7022:128d:b0:12d:b8e5:5e2 with SMTP id
- a92af1059eb24-134c8d4f477mr7482953c88.23.1779045693291; Sun, 17 May 2026
- 12:21:33 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779046155; x=1779650955;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MBYyQ0ZMS6FoSccvFn3m6zDlGuyQLI5sKd09gEPumuQ=;
+        b=sF1lVBqk+Ay4Svmwtmrg/nCXOBEkDfbyv9jDzUFL/AqmIfR8TLXm9y1mE/0k/8G1em
+         uNzkqoZC+93B6N4FUFoINjT/3XNHbzvekwD7kRSOrxCsulgEYbtn1A0Z1q0ef9BzcKi4
+         Eh9dgTzRs9sj+YE9HxQm/cAECXGqorMMdYWMzDuCbU9nDCbfxR+SQuBmWsa7u28ZoWsg
+         jwnCT9vja8DNHwFVea9irantA2DSuKlDqdXr6odZxup+pS4Z4VODZ5inlxcUXAgV0Bwb
+         ZpTfB/TaAHuQnK/5Nb/0Q7OiZzHOQVsFpTYCrHe6R94t2Yn9nFXNfh6jKrW7lbkKDcxr
+         JD1g==
+X-Gm-Message-State: AOJu0YzuBl/v6J2z0UKLQ65JPP3Z6OyNyHhCFu2XI+hTsAPc7eB7KqdO
+	FqHQTP42DrJilDng7Y9q33/CaRzAcxL3H8fmsijJnUTXP5OAJsxWAV+yX1FzNg==
+X-Gm-Gg: Acq92OGCP8bVL9wQISr/8IYWMOvlIKCHQFZ1zA7YURH3WIAK1DkiB6ASsjR3is6jvnv
+	a8lqfAqdvJpoNhKkiXJ2E/HVh1cPgWb7NC8nw70YsbU8/hB2+0L5p0+QN+m6jFmt4nZUWlYyzdu
+	EHB7qykL6SknbKYS1UCUmVReXWwATpNPFnwaC6fjf9GkplEFubn8meLXMFSLe6/qxg9D9ePfVtj
+	GKxaB8auec63EVxBtLrxfnLd2OtfQiRzaMwezFrg/ksuPwb2Yp1F+kqV+xb+mWcn7QU1E6jD4ny
+	wgsoesKx0kDmmJMIf/WlFTntX68NTf8tlZBWl1iJuQE649AnNFU1OM7zLYz48U4nGlPdiOQegoB
+	P0lvuUvCEtP1NJrFxEejqOvgDufiunugxuIXHWwLOimm0KpPnLO1hIib1sW/fy4TpwAHWLYqAH0
+	ntkRJcoQy1rquwP7NFAJWockJhrfwu9ZxOIJhuahTutgHWGTbqQuT4NExxYUArJSeyUadlk54Op
+	Wcr2QolH17P2BSAAxctrZkSZS/R3xqLhOdCN+NTR5W0Cw==
+X-Received: by 2002:a17:90b:5648:b0:35e:27ec:de0 with SMTP id 98e67ed59e1d1-36951b971e2mr11019754a91.13.1779046154970;
+        Sun, 17 May 2026 12:29:14 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-369572061b8sm3268188a91.3.2026.05.17.12.29.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 12:29:14 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linuxppc-dev@lists.ozlabs.org (open list:FREESCALE QUICC ENGINE UCC ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: ucc_geth: Batch RX packets before stack handoff
+Date: Sun, 17 May 2026 12:28:56 -0700
+Message-ID: <20260517192856.3925-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260515-unix-recv-wait-v1-0-76adb5f063d5@google.com> <20260515-unix-recv-wait-v1-1-76adb5f063d5@google.com>
-In-Reply-To: <20260515-unix-recv-wait-v1-1-76adb5f063d5@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Sun, 17 May 2026 12:21:22 -0700
-X-Gm-Features: AVHnY4JBNg0xjLVUNScPxVzZN0nh0saT-xFzCCVwtR1do4uoeNLyD5M3cMYb7hI
-Message-ID: <CAAVpQUDJa0=h+iFqr6ZEJ72b5nYTX3Ay-Vbkk0-7Y-KZB_3SBg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] af_unix: Fix UAF read of tail->len in unix_stream_data_wait()
-To: Jann Horn <jannh@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Hannes Frederic Sowa <hannes@stressinduktion.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: DD52B563817
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 3E6C8563924
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288771-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288772-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Fri, May 15, 2026 at 11:54=E2=80=AFAM Jann Horn <jannh@google.com> wrote=
-:
->
-> unix_stream_data_wait() does skb_peek_tail(&sk->sk_receive_queue) without
-> holding any lock that prevents SKBs on that queue from being dequeued and
-> freed.
-> This has been the case since commit 79f632c71bea ("unix/stream: fix
-> peeking with an offset larger than data in queue").
-> The first consequence of this is that the pointer comparison
-> `tail !=3D last` can be false even if `last` semantically refers to an
-> already-freed SKB while `tail` is a new SKB allocated at the same address=
-;
-> which can cause unix_stream_data_wait() to wrongly keep blocking after ne=
-w
-> data has arrived, but only in a weird scenario where a peeking recv() and
-> a normal recv() on the same socket are racing, which is probably not a
-> real problem.
->
-> But since commit 2b514574f7e8 ("net: af_unix: implement splice for stream
-> af_unix sockets"), `tail` is actually dereferenced, which can cause UAF i=
-n
-> the following race scenario (where test_setup() runs single-threaded,
-> and afterwards, test_thread1() and test_thread2() run concurrently in
-> two threads:
-> ```
-> static int socks[2];
-> void test_setup(void) {
->   socketpair(AF_UNIX, SOCK_STREAM, 0, socks);
->   send(socks[1], "A", 1, 0);
->   int peekoff =3D 1;
->   setsockopt(socks[0], SOL_SOCKET, SO_PEEK_OFF, &peekoff, sizeof(peekoff)=
-);
-> }
-> void test_thread1(void) {
->   char dummy;
->   recv(socks[0], &dummy, 1, MSG_PEEK);
-> }
-> void test_thread2(void) {
->   char dummy;
->   recv(socks[0], &dummy, 1, 0);
->   shutdown(socks[1], SHUT_WR);
-> }
-> ```
->
-> when racing like this:
-> ```
-> thread1                       thread2
-> unix_stream_read_generic
->   mutex_lock(&u->iolock)
->   skb_peek(&sk->sk_receive_queue)
->   skb_peek_next(skb, &sk->sk_receive_queue)
->   mutex_unlock(&u->iolock)
->                               unix_stream_read_generic
->                                 unix_state_lock(sk)
->                                 skb_peek(&sk->sk_receive_queue)
->                                 unix_state_unlock(sk)
->   unix_stream_data_wait
->     unix_state_lock(sk)
->     tail =3D skb_peek_tail(&sk->sk_receive_queue)
->                                 spin_lock(&sk->sk_receive_queue.lock)
->                                 __skb_unlink(skb, &sk->sk_receive_queue)
->                                 spin_unlock(&sk->sk_receive_queue.lock)
->                                 consume_skb(skb) [frees the SKB]
->     `tail !=3D last`: false
->     `tail`: true
->     `tail->len !=3D last_len` ***UAF***
-> ```
->
-> Fix the UAF by removing the read of tail->len; checking tail->len would
-> only make sense if SKBs in the receive queue of a UNIX socket could grow,
-> which AFAIK is not supposed to happen.
+Collect received skbs on a local list during RX polling and pass the
+completed batch to netif_receive_skb_list(). This lets the networking
+stack process packets from a poll cycle in bulk instead of handing each
+skb up individually.
 
-I posted the same patch 2 years ago (and forgot to respin),
-which has the historical context.
-https://lore.kernel.org/netdev/20240530164256.40223-1-kuniyu@amazon.com/
+Speedup tested with bidirectional iperf3.
 
----8<---
-When commit 869e7c62486e ("net: af_unix: implement stream sendpage
-support") added sendpage() support, data could be appended to the last
-skb in the receiver's queue.
+Before:
 
-That's why we needed to check if the length of the last skb was changed
-while waiting for new data in unix_stream_data_wait().
+[ ID][Role] Interval           Transfer     Bitrate         Retr
+[  5][TX-C]   0.00-10.00  sec   490 MBytes   411 Mbits/sec                  sender
+[  5][TX-C]   0.00-10.01  sec   488 MBytes   409 Mbits/sec                  receiver
+[  7][RX-C]   0.00-10.00  sec   176 MBytes   147 Mbits/sec  167            sender
+[  7][RX-C]   0.00-10.01  sec   175 MBytes   146 Mbits/sec                  receiver
 
-However, commit a0dbf5f818f9 ("af_unix: Support MSG_SPLICE_PAGES") and
-commit 57d44a354a43 ("unix: Convert unix_stream_sendpage() to use
-MSG_SPLICE_PAGES") refactored sendmsg(), and now data is always added
-to a new skb.
----8<---
+After:
 
+[ ID][Role] Interval           Transfer     Bitrate         Retr
+[  5][TX-C]   0.00-10.00  sec   502 MBytes   421 Mbits/sec                  sender
+[  5][TX-C]   0.00-10.01  sec   501 MBytes   420 Mbits/sec                  receiver
+[  7][RX-C]   0.00-10.00  sec   212 MBytes   178 Mbits/sec  148            sender
+[  7][RX-C]   0.00-10.01  sec   211 MBytes   177 Mbits/sec                  receiver
 
->
-> Fixes: 2b514574f7e8 ("net: af_unix: implement splice for stream af_unix s=
-ockets")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jann Horn <jannh@google.com>
+Assisted-by: Codex:GPT-5.5
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/freescale/ucc_geth.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Can you post this patch separately to net.git by specifying
-[PATCH net v2] in Subject ?
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+index 7af4b5e3f38e..bce1079fc06a 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -2894,6 +2894,7 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+ 	u32 bd_status;
+ 	u8 *bdBuffer;
+ 	struct net_device *dev;
++	LIST_HEAD(rx_list);
+ 
+ 	ugeth_vdbg("%s: IN", __func__);
+ 
+@@ -2934,7 +2935,7 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+ 
+ 			dev->stats.rx_bytes += length;
+ 			/* Send the packet up the stack */
+-			netif_receive_skb(skb);
++			list_add_tail(&skb->list, &rx_list);
+ 		}
+ 
+ 		skb = get_new_skb(ugeth, bd);
+@@ -2960,6 +2961,8 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+ 		bd_status = in_be32((u32 __iomem *)bd);
+ 	}
+ 
++	netif_receive_skb_list(&rx_list);
++
+ 	ugeth->rxBd[rxQ] = bd;
+ 	return howmany;
+ }
+-- 
+2.54.0
 
-The later patches are net-next material.
 
