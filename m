@@ -1,157 +1,160 @@
-Return-Path: <netdev+bounces-288695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288698-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SBxMDqdoCWouYwQAu9opvQ
-	(envelope-from <netdev+bounces-288695-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 09:05:11 +0200
+	id oG1zBih6CWprbwQAu9opvQ
+	(envelope-from <netdev+bounces-288698-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:19:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E7F555F97A
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 09:05:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A289855FEFA
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B73093009CE3
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 07:05:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7EA6330054E7
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A93A30596F;
-	Sun, 17 May 2026 07:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5E32750FB;
+	Sun, 17 May 2026 08:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="a8dBa3UY"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="mYsmm/8s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C331D2FE56F;
-	Sun, 17 May 2026 07:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE26F625
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 08:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779001507; cv=none; b=Si0a2u4WSBelYTiqIwLjKgP/7+LlMHee96/MSlxOf9UfhwNmwvP0ojBMfTozifbh87NZYUPHYLPvrPeS0f7hmHZIIe9RjtOslS6CeQSjaTwZ7xL4yYiZsc/fTKkgR8m5PvFXWc2/8yyCmz7p8j8VXbWRO+9+ALRW3DLnsg20Uow=
+	t=1779005988; cv=none; b=LuiJc/mJhm5UMRoEx7vr0J0JtDJJVslhMYNA4T3a4ZWUG/ZXkTo9HyzaWzuYJ8E/RfJ40zyB0hhUf2q/lc9AhWcUwGl5ksEyu4mxy+xwvEssFhNmFMNnMn3hKG56UUm5SCPRL+AjxTABQvoxMxGaP03OHFjS6eHXxBUdLRRl0Uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779001507; c=relaxed/simple;
-	bh=DWQ5ZaUVofMOuDdmYgrDHa0mOV3/SOqI62+qZdxC5wU=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=EamuvSmdqbNZ6jWEfQg/9XXA5V3Lts9R6inHL1OEHTnJwPQ2Ql2FD9NBlTg76JKXFhUA6IuIbSRpt6kymrJGbcsx/XAOZHtq1uAU87k0QozH80u2Koy2XPKN87eyE0DgpXdLsYd0hPLd5VcgsJkbNO7v4p8qM2O68IPWT4X3hRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=a8dBa3UY; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B6AD1A03A9;
-	Sun, 17 May 2026 09:04:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1779001494; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=pFeBYRizKV6K71+3q3fTFs33sI9qE9UPh7FEnkLXwcs=;
-	b=a8dBa3UY7384Sd7z/2YJaRaRnmrBuKG5EECzv103lf8ic9ORM8Rqj2NyH7Pxk0tDFXZXZX
-	TpPymTX2D5YgTTlomyoMrp2wUiklMzf/8g1SEObuk7Q8ookoHMzoeeJeys8MFkmPlEkTR6
-	GvY0GzXMNj5m9u1m9cVy/uKj/jiScx5A1Kdjeg+sX3oJd3DdlO7XkaoNimMWQLBNqKAMy0
-	eNj2KGXth2AFfURJ8aqiUZKkPoOeUUfONg9mq4gqNy/hj0e99J2jB5sxgABq1VHrqmbNxd
-	qu+lH7gcwmQKK8w+7OUwlq42D2qYM9psSYfPc8fnxBjfigFMHwqmaIPrBZSS8w==
-Date: Sun, 17 May 2026 09:04:51 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: honor eee_disabled_modes in phy_support_eee()
-User-Agent: Thunderbird for Android
-In-Reply-To: <c18fa685-0ff6-4783-a26e-aa375df1ed71@lunn.ch>
-References: <20260516-devel-phy-support-eee-fix-v1-1-59debc00eda0@tipi-net.de> <c18fa685-0ff6-4783-a26e-aa375df1ed71@lunn.ch>
-Message-ID: <4F3CE9FF-E600-4122-8864-8A072C1D225E@tipi-net.de>
+	s=arc-20240116; t=1779005988; c=relaxed/simple;
+	bh=N6fWHb5p4zbzpCZQr8P3lN6oCjeNwsq8Y9bOXKi6He0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jNLBd17Fm+KeRJO+1P9diR/Ksiju30EJrhZ30F3Y0aVWah4WRiTBEHD95NMmXkaaKjZVKvuUcQ/wwWxqKdIzHdmBDdnmVSzpMFVd+lu0QeCrzcXnf+OpYoLY7wDVjYXR+p8VYeelJC/dhXrUdxMRI0Kf0kj37zoCp/l5STyqS3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=mYsmm/8s; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso7761125e9.2
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 01:19:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1779005983; x=1779610783; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3lI0Ih1lcIED5pPJyT9mHyteKDm9V9TUdfoTG0MsY6E=;
+        b=mYsmm/8sKTm5ZArj37TNCDtkIBBFulKo+SF9QZ3oG+gJCLTJRb1qNGheahMGtUixQB
+         fbN2wByLtcV8YukRy8+eDcN3KZkUoQqlNo68nht6tDaVLp+czfqRx24Dq7Vu79P5FwL1
+         dHNwVnCWjyjOfOOMe7v0scw4TbK7zdmNCpfN6GncGu6qPh9cNcTd+10qBCnjxsim61Es
+         R2Fi9W6TQZfuKsg9Tl+ejpnzDJoh+u9A+LCAqQLYDN7C8AO4jMcxWtoo3SqNvNXQwgX5
+         zlKXONLDsdGGVd66ABc7Dpwol7YyGyFV/KCOEPIB2YDrEPv1u6N94aG7KQatMHVbvKfJ
+         yzlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779005983; x=1779610783;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3lI0Ih1lcIED5pPJyT9mHyteKDm9V9TUdfoTG0MsY6E=;
+        b=XyjyUtrLXgPIARYXih1PT5L8DPcO3vQN6opGvhpDUzrwHBvobM6W/yrXF4zpqOuYyd
+         J8ywy+ynlYwkBRPFYtL1RLFl90BFGml34bghzIAA2J+XaVDgt8/hABEaDj0LpVvVOqf2
+         yTAHWj+uwCURMUT+HYv61wZ7xGqqhxVH7ddlRs6wm7RUOHIiHdg8pdBJfR88a8b5OVYD
+         Nyq/dPFbG+K10/WkPxKvz9XmQ5+ITpfuRt0SpZzeqMMYe2QqWsYLKxAC/bIrBo0bXwjA
+         5lUt9Ju3V1TZckPTElgMOTsHNb1Qe553gC0HcutTKIEmvEq4wqjCJwtmwU7Ecdez0B1r
+         3kSw==
+X-Gm-Message-State: AOJu0YyCHECmdfZQMYz+jZRJJTpzhvmHtg2SetDKU9Zwx+C/h7blij4h
+	DKOWLlzWXBfqSuWrn+CenT+Y2ddOmXo6+b9dV/Ml4arVLDBYkE60CA8ZIerpwppaAEw=
+X-Gm-Gg: Acq92OGwMoAecKMJV16O5AIus5Tq+ALMwNbcKln2ecgICgmSMMTo7FLQv0r6LEmBDPT
+	40jUp5QgAG4junMFtByjQML/zJJDjLzY5xuFESIUA/0sTCJvXwVKa1SXcu1PA2M2Xvjlm6mFPFN
+	FBH274rEKmo7//eElU/YSrhokSeMaH9ZFvBqV8Rlj+ysHGaWoAVKKsLLg84E2deSCXgNmMFY+5X
+	MxiU/m2k5hiq5EbJ42OUEEeNEjJzo8RYzyc85ccUofeoqqiv7dp5/8V8h17l/OY4ZB8jBDBkhQH
+	iflPZI9XBoqyv6fKDkVfd5uShJKPLnRB9sC7/MIDr5MRyi+g8XLlE+y3yKUnu7XrTbiwbuANUH6
+	7VNbQwsFNDR1P0jN1o5pxhGQkCS4BFaIS3/JRcsDZsF0NukkRqMQvMMj0r4lALwCJBZSC6EcoDa
+	9I7pZZhoTo4CXeSO7iDkgKo9Wj9I7WW3Thk6ibSoi1Qv0=
+X-Received: by 2002:a05:600c:34cc:b0:48f:d1c0:5cd3 with SMTP id 5b1f17b1804b1-48fe60d868cmr160709295e9.13.1779005982649;
+        Sun, 17 May 2026 01:19:42 -0700 (PDT)
+Received: from FV6GYCPJ69 ([2001:1ae9:6084:ab00:7168:3127:200b:5d86])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48feab2896bsm57663675e9.4.2026.05.17.01.19.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 01:19:41 -0700 (PDT)
+Date: Sun, 17 May 2026 10:19:39 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Michal Schmidt <mschmidt@redhat.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Pasi Vaananen <pvaanane@redhat.com>, 
+	Petr Oros <poros@redhat.com>, Prathosh Satish <Prathosh.Satish@microchip.com>, 
+	Simon Horman <horms@kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
+Message-ID: <agl6B8gojgnsjVhr@FV6GYCPJ69>
+References: <20260516175744.26749-1-ivecera@redhat.com>
+ <20260516175744.26749-2-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 8E7F555F97A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260516175744.26749-2-ivecera@redhat.com>
+X-Rspamd-Queue-Id: A289855FEFA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.65 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288698-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288695-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de,vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,davemloft.net,gmail.com,google.com,kernel.org,redhat.com,microchip.com,linux.dev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email]
 X-Rspamd-Action: no action
 
-Hi Andrew
-
-On May 16, 2026 4:40:25 PM GMT+02:00, Andrew Lunn <andrew@lunn=2Ech> wrote=
-:
->On Sat, May 16, 2026 at 06:51:02AM +0200, Nicolai Buchwitz wrote:
->> phy_support_eee() copies supported_eee into advertising_eee
->> unconditionally, overwriting any filtering applied during phy_probe()
->> based on DT eee-broken-* properties or driver-populated
->> eee_disabled_modes=2E MAC drivers that call phy_support_eee() after
->> probe (e=2Eg=2E bcmgenet, fec, lan743x, lan78xx, r8169) then cause the =
-PHY
->> to advertise EEE for modes the user marked as broken=2E
->>=20
->> The symptom is that ethtool --show-eee on the local interface reports
->> "not supported" (supported & ~eee_disabled_modes is empty) while the
->> link partner sees EEE negotiated and active=2E
->>=20
->> phy_probe() already filters advertising_eee via eee_disabled_modes
->> after calling of_set_phy_eee_broken()=2E Apply the same mask in
->> phy_support_eee() so the filtering survives the copy=2E
+Sat, May 16, 2026 at 07:57:43PM +0200, ivecera@redhat.com wrote:
+>Add DPLL_PIN_TYPE_INT_NCO pin type for virtual pins representing
+>the NCO mode of a DPLL. When connected as a DPLL input, the DPLL
+>enters NCO mode where the output frequency is adjusted by the host
+>via the PTP clock interface.
 >
->I don't think this not the full fix=2E
-
-You're right, this only fixes the initial behavior on boot=2E
-
->
->of_set_phy_eee_broken() sets phydev->eee_disabled_modes=2E
->
->genphy_c45_ethtool_get_eee() masks supported_eee with this when
->reporting to user space what is supported=2E
->
->genphy_c45_ethtool_set_eee() will also mask what user space passes in,
->if it is not empty=2E However, if nothing is passed in,
->phy_advertise_eee_all() is used, and that does not make use of
->phydev->eee_disabled_modes, which i think it should=2E
-
-Agree, will fix this in v2=2E
-
->
->So while your fix seems correct, i don't think on its own, it is
->sufficient=2E Whenever phydev->supported_eee is used, we need to review
->the code and see if it should be masked by phydev->eee_disabled_modes=2E
-
-I will have a look and try to catch all scenarios=2E
-
->
->    Andrew
+>Update the fractional-frequency-offset and fractional-frequency-
+>offset-ppt attribute documentation to note that for INT_NCO pins
+>these attributes represent the DPLL's current output frequency
+>offset from its nominal frequency.
 >
 >---
->pw-bot: cr
+>v2:
+>  - Clarify int-nco pin type documentation to describe frequency
+>    control via the PTP clock interface instead of generic "controlled
+>    by the host".
+>  - Tighten FFO attribute documentation for INT_NCO pins to describe
+>    the DPLL's output frequency offset from nominal frequency.
+>  - Mention both fractional-frequency-offset (PPM) and
+>    fractional-frequency-offset-ppt attributes in the commit message.
+>
+>Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-Thanks
-Nicolai
+Like it!
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
