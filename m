@@ -1,191 +1,188 @@
-Return-Path: <netdev+bounces-288684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288685-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eF1rLU5XCWpQVwQAu9opvQ
-	(envelope-from <netdev+bounces-288684-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 07:51:10 +0200
+	id UE3MBDlhCWpOXgQAu9opvQ
+	(envelope-from <netdev+bounces-288685-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:33:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DDBE55F575
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 07:51:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A86DE55F82F
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 08:33:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 395193006685
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 05:51:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 72A6130054E9
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 06:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D69F32E7162;
-	Sun, 17 May 2026 05:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618922D3A69;
+	Sun, 17 May 2026 06:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dzdgvaWQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPygyvdB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE77C73463;
-	Sun, 17 May 2026 05:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200C92D8771
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 06:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778997065; cv=none; b=bNi6Fv36ssseN0h7Lxj4C308ili/DQurMQku26MbxmVzUG8stJArcbfoU3DXUMsjZuxCFohXivdKi0hu4m1eQhaNWbmu3mygr0rt0PLpf+8pMMsLVT3Ilfl2B0kUWAVgfoYbqhwgw4FDGU1ksfQcbNXKa+x8AziW+ITzjHZfT1g=
+	t=1778999606; cv=none; b=YIwtoSPkw7krEQJA7hOATkx9JZKt+6TSZfchbB5vthNQ5fIVi546ZPMeWcmoX+6wBpXx0T3/8kcp1LzVOB0e+PIFV+LFDsHUsnTpHNFKn/0YuB05LdMrw2k3Vw9KCkRNvIs6bo6ie03jWR9ie6hdIDjKKhurwYOoIZcDlrwHaLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778997065; c=relaxed/simple;
-	bh=GfVo+wMcHFCWeSLaasazUP9yqDMCJT2bcGpLDxj8XgI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S5lfw922hE9kZIlLlO2fVCmQJCZ7wpJHE6NnC2JfgSHkBtQ6SpEdR8zeQUEvSJNKIXuPGig1m0CBeuS6/fWiCGmpzcMVGYfCyxNqThCK+CBpS87S7U5oMlS68YbiCok7ivWPbUXnpX8M94jLwqCQ+6+g4v801IW9nX1FEJxOwd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dzdgvaWQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FC57C2BCB0;
-	Sun, 17 May 2026 05:51:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778997065;
-	bh=GfVo+wMcHFCWeSLaasazUP9yqDMCJT2bcGpLDxj8XgI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dzdgvaWQEtIpSc767EbmghV7oM5bpUIB1xp2jBMAjIQ4vtPQexPHnoXjNr4DL2QQz
-	 fa9EROOQ799zX9OD2bIDxslfxLgZWOdNKm/otYtNodib6H3WKAHu7pvuCwpkC6G5dK
-	 2lQaPy1GtKi+cwpDqAbmeD40E8v8EioPhBg/XXd56gtWDc0tl6WWhDp7sBh1eO2e03
-	 CEAZgRsrZJHvwvwcqcfRCmTnzMtfiS0EXH+Cf5Ay4DT9GDroI3AaiBeVer+bQTaTKX
-	 vzpZ9eVkrnLVjq0DIupMhiwjGZTjCAm356O8fS1H/GDem7yx7J7k40NT/QUJC27yeu
-	 TA8X9c74yd+tA==
-Message-ID: <85b89125-57f2-43ab-a834-4dca56881e26@kernel.org>
-Date: Sun, 17 May 2026 15:50:56 +1000
+	s=arc-20240116; t=1778999606; c=relaxed/simple;
+	bh=Iembz5WZriJohL290gtclVjvHwhKD+3xwyU6eomHFpk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o7Y34cpqKFeqz0p/ustmTbn1c4oqSTPQeBJfbcsPS9MbljpyQDgjw2Y8T5v5wufPlBp0o8ioWM7zUY4+0NRpishVwbtsA+zi0i0J3CalXLJUjJ0QRpuBUkfP4lLtgZj8z9bBycOaPTy4JJ/6XbZL6DtBLTEorzng0hrWmxKCRKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPygyvdB; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2bd266f6fc0so5651025ad.2
+        for <netdev@vger.kernel.org>; Sat, 16 May 2026 23:33:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778999604; x=1779604404; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vfn1wnsws3qKZ05OCo0NYpyEDF6wFwNBCzjnVjoFnoc=;
+        b=jPygyvdB9RhtK8NFZ60B83kyCs0F1KmQ1VsPwROEQlVOfPO7zkzOjEcP4o9Hj+geU/
+         ft7WSdmcPqqjcR96JgnVT3qUB3mnRAjNXP53ScG4DtsC8f5ptXXT2Un2VHAjcityO4e1
+         FGFvSF7Gr43BXKnsH6Rv4oge8JXajq7RB3JFH2BrW7tRAgb5dZ6XjwKBM7pscLOhWDus
+         UNnHdnsIn4j6JX0T6eDEMn8uR6Vf4cP8rr8Wj3CrIGBhytSK0MrPysQ7PvWmehS680uJ
+         3TcYDpwaZHKGF4ZkJkKVQK4lk8QfTEmOegZQpdYBVjR0ZwBZiPwkZu7m/M6pFKYoTPsN
+         uz5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778999604; x=1779604404;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vfn1wnsws3qKZ05OCo0NYpyEDF6wFwNBCzjnVjoFnoc=;
+        b=AAWOJJMdTUKjqSoi80Kwx0YLECtAb76YPqnji1K/NwKYGjhR38M//dEP3UPqZeNiIn
+         9DT/6JzXKsshGHUYlcrHipCzdA6agfbxbkSYoi+ySTFA00l8NVFLRJIS9TbGpdSC58hY
+         ye1nPAO7ymZR9+5NvQoM5XXZek1gpiKd3JaC14ng/dOghuTzy4B6gCTRuLWf7hgGg7Me
+         TzzK2xNzXk1emuSQBHrI9tjwVb4lUuyHAx1KbXs/DnhIxJK6gu/v80JXzg468vD7PM0g
+         WZ/4IOJ4JHXHtctyKit4nInKHN4zBFxrWoQjaaUsALz1PSPktf5f2NZun2ljMxU9Uxl3
+         UdJg==
+X-Forwarded-Encrypted: i=1; AFNElJ9o2dGFuJqqKFBTMNQ2qqqzDv+iPphhc7Ln4IYvRrrSVYLOOAvMYLeCPa25yq84R5fYTZPzLhk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXZYBfFR3j2E8JDo6llmPY2AmtvVL+baYne9yD0OZCsFnLMNtK
+	H2mZrStraRctTJPJSkN2NqYCHX0CE2wNZvTY3rn0jcKJDncE4rgkWzzM
+X-Gm-Gg: Acq92OHBgUaPlzwRvn1KEUfBsz0uL5q+Or1jPmJNRq6hz3xOHqQkh6wvx2OakfGTLXf
+	lIkqV54OdmSrurp5yf0zXu8zJ/S5Y1egfVYwnd09koO6R8zg2csEzmb1egLCuocNLu7v2K56Gs0
+	n1YBc2cZ5lo1pgx1GFIMOMa5G2RxbHajXo6Snc+rgzqyUtDN/I/2L/EtfKuA4zHMnwtnADhG0iw
+	F1Y6ibbrTsdM0A3nYfn4jMuZ+tTgS4b0lkP64Po8JgVcJiYZBw7387XAUyxjeQk5FqtXe+ZEZDg
+	Eo8v3aGk7gnPonrLxD+CDji+jzI9ZFuREYndx7InfqGf0IL4haElJcE7xPQucZii01smIj2M2fN
+	DT3F+Ll6rJjuj9su6nIA5zKf3ijlq00uM53e7UDj6QZThqDAenH8ePyIUJxkuQ9Omz3Cds1KsoB
+	l/BFPBu87vOGLfPEmyPd4rDTmGsG1Ba4EoMcJLmYKe1u6KLX5sEvDZAwKaiC25VyjdoBbry5BUj
+	AJcjMxq3tG6QWvcexBQJp7hotg+5Hc=
+X-Received: by 2002:a17:903:24d:b0:2bd:9803:9308 with SMTP id d9443c01a7336-2bd98039479mr77245475ad.36.1778999604411;
+        Sat, 16 May 2026 23:33:24 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([2408:8207:1923:2c20:78ef:13e7:10c0:51d5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5bd5f2cesm111625115ad.14.2026.05.16.23.33.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 May 2026 23:33:23 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	horms@kernel.org,
+	andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net v3 0/5] xsk: fix meta and publish of cq issues
+Date: Sun, 17 May 2026 14:33:06 +0800
+Message-Id: <20260517063311.28921-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v2 2/6] mptcp: pm: fix ADD_ADDR timer infinite retry
- on option space insufficient
-Content-Language: fr
-To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Li Xiasong <lixiasong1@huawei.com>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Eric Dumazet <edumaze@google.com>, stable@vger.kernel.org,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-References: <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-0-701e96419f2f@kernel.org>
- <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-2-701e96419f2f@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260515-net-mptcp-misc-fixes-7-1-rc4-v2-2-701e96419f2f@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 5DDBE55F575
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A86DE55F82F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288684-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288685-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,huawei.com:email,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tencent.com:email]
 X-Rspamd-Action: no action
 
-Hello,
+From: Jason Xing <kernelxing@tencent.com>
 
-On 15/05/2026 06:27, Matthieu Baerts (NGI0) wrote:
-> From: Li Xiasong <lixiasong1@huawei.com>
-> 
-> When TCP option space is insufficient (e.g., when sending ADD_ADDR with an
-> IPv6 address and port while tcp_timestamps is enabled), the original code
-> jumped to out_unlock without clearing the addr_signal flag. This caused
-> mptcp_pm_add_timer to keep rescheduling indefinitely, not sending ADD_ADDR,
-> preventing subsequent addresses in the endpoint list from being announced.
+The series is the product of previous review from sashiko[1].
 
-(...)
+1) META
+patch 1: address TOCTOU around metadata.
 
-> diff --git a/net/mptcp/pm.c b/net/mptcp/pm.c
-> index 3c152bf66cd5..3e770c7407e1 100644
-> --- a/net/mptcp/pm.c
-> +++ b/net/mptcp/pm.c
+2) PUBLISH of CQ
+patch 2: make sure xsk_addr->addrs[] can be published to cq when
+         overflow occurs.
+patch 3: keep cleaning up the continuation descs (more than 17) and
+         publish its address when overflow occurs.
+patch 4: like patch 3, but only handles the invalid descs cases.
 
-(...)
+[1]: https://lore.kernel.org/all/20260502200722.53960-1-kerneljasonxing@gmail.com/
 
-> @@ -414,8 +420,12 @@ mptcp_pm_del_add_timer(struct mptcp_sock *msk,
->  	/* Note: entry might have been removed by another thread.
->  	 * We hold rcu_read_lock() to ensure it is not freed under us.
->  	 */
-> -	if (stop_timer)
-> -		sk_stop_timer_sync(sk, &entry->add_timer);
-FYI, sashiko found a pre-existing issue here, but I guess that's not
-blocking this series.
+---
+V3
+Link: https://lore.kernel.org/all/20260515123018.80147-1-kerneljasonxing@gmail.com/
+1. avoid breaking previous usage of sendto, and siliently handle
+overflow case (Stan, sashiko)
+2. add one particular exception process in patch 4 (sashiko)
+3. adjust the selftest to make sure it passes in either virutal or
+physical machines, which includes add usleep to support physical machine.
 
-https://sashiko.dev/#/patchset/20260515-net-mptcp-misc-fixes-7-1-rc4-v2-0-701e96419f2f%40kernel.org
+V2
+Link: https://lore.kernel.org/all/20260510012310.88570-1-kerneljasonxing@gmail.com/
+1. adjust selftests (Jakub)
+2. add READ_ONCE in patch 1 (Stan)
 
-@Li: just to know what I do with this pre-existing issue, do you plan to
-look at it?
+Jason Xing (5):
+  xsk: cache csum_start/csum_offset to fix TOCTOU in xsk_skb_metadata()
+  xsk: fix buffer leak in xsk_drop_skb() for AF_XDP multi-buffer Tx
+  xsk: drain continuation descs after overflow in xsk_build_skb()
+  xsk: drain continuation descs on invalid descriptor in
+    __xsk_generic_xmit()
+  selftests/xsk: drain CQ to wait for TX completion
 
-Just in case, I just opened:
+ include/net/xdp_sock.h                        |  1 +
+ net/xdp/xsk.c                                 | 44 +++++++++++++----
+ .../selftests/bpf/prog_tests/test_xsk.c       | 48 +++++++++++--------
+ 3 files changed, 63 insertions(+), 30 deletions(-)
 
-  https://github.com/multipath-tcp/mptcp_net-next/issues/623
-
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
+2.43.7
 
 
