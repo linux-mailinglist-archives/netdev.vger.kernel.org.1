@@ -1,138 +1,266 @@
-Return-Path: <netdev+bounces-288716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288717-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEsGOvmaCWpHhQQAu9opvQ
-	(envelope-from <netdev+bounces-288716-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:39:53 +0200
+	id iKX/CeqiCWpdigQAu9opvQ
+	(envelope-from <netdev+bounces-288717-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 13:13:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D02456087E
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:39:53 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C735560ABF
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 13:13:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D2583008213
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 10:39:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 55BDC3002F78
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 11:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B1535AC09;
-	Sun, 17 May 2026 10:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6A835C1BD;
+	Sun, 17 May 2026 11:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3oa5ImF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4ubqSHz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D6626F29C
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 10:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B382D8DC3
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 11:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779014391; cv=none; b=T6GS6ywLLKb30WPpNsHud4PYiN/GKGen0tTm31t0AH0EExc7f9N4EtKeJBu2MOw/0lqzijwAvRu/EGV5ar0Z2nucGvrNG+9kjxBTHAkmRmH/cTWVF/TOkbh3UAaP+ORR0gW2n7uP50ru+4zIUmeKk422YWj7myQdmSr9OAGhL7E=
+	t=1779016416; cv=none; b=Mu8kIEoWuY3FeCtDCsWNVVBy5epO0LUbIuHAm6wqo6DQP3T1DsL23BROLrUs1C5xl+j7nrg29RPWs16iWadCkphftNJZhq/NWQ/IwgxXVdo4dw7mH5GYrhyiUMsMmcyqtlJirlz9SVVQN2a681cOVFFm8AKjqvxgasPJG+CNztw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779014391; c=relaxed/simple;
-	bh=RZMuf80XDxHSbxPVmLIh9UA96dyig3RFRvrfEn1evGg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n/HwlTalOKZtyOhDHH9LeswQu7Iu0Va0BpPANXI3pzCusvELyHa6c+Qh35NWGG5q0HMuVfhmLDxM60JZEnrkcJ92yt/4XzuNHtEluzpTnB0b9vUolCCjYkeVTTcvXLxP9fct5GpJ0KPnRZ/D3MwFSOmDZje6/Y7r9esAvlLxzWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3oa5ImF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66F6EC2BCFF
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 10:39:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779014391;
-	bh=RZMuf80XDxHSbxPVmLIh9UA96dyig3RFRvrfEn1evGg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=m3oa5ImF5ltPyjbkueQya//wdm7MCFWRbZArrw30aahjjNXo/ET/kpU3Dyi/1F/Ae
-	 X78kmGwnozL2KxAcHk+r+OIexTqg5A2o0SIhnOTgrLxqlyoFl6aParnGr1hFaxIm7X
-	 4ckH1ikB4dQV7Yf2Sa+5tpN4/Dxtu/uiTHoWY71+VfAWC2v0tJFy7dxw1RPquX8Wkt
-	 2kKwhIVOUNmp6r1oAQDOqc2I1FoJ0BAjIjhNOU/zfY3jVvwj9434IOYVNpH6WECdLp
-	 M5OB2DZfW1YK3InnxCi5QrJNpCssSswj4HNC6s3Hb7u6Zw4I44kZsQUjqFM2jHqw9f
-	 oK139BZU+9Xgw==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5a4113ab355so1687749e87.1
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 03:39:51 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ/oQcm1/QQqBbLDA3hf5KnmDz/dp6HuTcDnHUvNNMzzEHSiNeLez71GjI0nBoRARETLDPVlK6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZb1dJPkn6nyl6RcDJ4R+EN914mxo/XJs0FcoKDJs4///kTikA
-	QFLGXBZP34VjM5Gz3v6sxKVM/kkIqWIhm0bG/uxB4Xqsc5Jg3AQP7iLmS+QF5PYXxsQGn3DTVvw
-	dV2F4pNHbUX7/Sfz1eKvKTHdH89SpKFg=
-X-Received: by 2002:a05:6512:1452:10b0:5aa:f41:328d with SMTP id
- 2adb3069b0e04-5aa0f41334bmr1865660e87.10.1779014390067; Sun, 17 May 2026
- 03:39:50 -0700 (PDT)
+	s=arc-20240116; t=1779016416; c=relaxed/simple;
+	bh=CkxPU9HMSAxjzXvdPzgS6n1OakeS4AGDFkQ7bV+qml4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p4FAFBke68pd3hs2Sj2UOdFuRYCX9TpgeOkNTp1xrG4pi1P13zLUC6KXrOiafJQBhKekDxaVQRkPE3+KuZwlx4SincGEGCwUwlae6eZIVSWnPUyvHMNI+gW7pD7HCCZD07aca4/j6B48rkxo04pHyiVd1Lp5dMRtkFysVBCii58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D4ubqSHz; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso8373825e9.2
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 04:13:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779016413; x=1779621213; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Hq4bWdD9APUqfcF0QdwConc0D+0mUZE86sUdlR/xO8=;
+        b=D4ubqSHzOEKcu4yTYsYUpAnF/e1R9Jlnfov2zQgiq0eUfpUMlqqvGoMljQ511t15Ww
+         K5bIQG01aPjWGldLTL6ts/TdyaLPfrI9aNR1BaNa0OVWvsa8/zcKRd4Cu04cd17wezGa
+         CDL62rYUHZg7ISS2nhB4ZVXuBsbYIQn1748wNCcR86eFV9Luk6qaBafO6hAtT+TZtiGZ
+         Ubd+b08cPjE1rKoqLlBJ0XNmySRR5ZIWw8oLat2EjcwzrUNUoLZakGDUonDr00fuUu0H
+         SVzWd1Hx+vWmcpYZsFJ6a8XwqxMlXx7yuv74m++mco06qE0p6+EmQZqXtjQUhta8ZBRm
+         wDgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779016413; x=1779621213;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Hq4bWdD9APUqfcF0QdwConc0D+0mUZE86sUdlR/xO8=;
+        b=Qy408EfDGFvg72hJDnNZiIwP8Y0IuHRhCluur5xEAB4b3rZ/39lhUdHHEVzSRqVNaK
+         5Q/a5zYmsYBwNQ0QAPMUlaEILPvuqDI9WH6Hv5EFfmoHU5nPm2I8usRocuGBskhcUMCH
+         1r1iohDzinU7JTgCIBeuuo5jpU3To8t60csfkKrUvQfZNAUmc/+GRQ8YbFsBNtioa7ey
+         KE3eBpDgdo/KtRX7Kno860rh2ADHtDoIZT9YYRp/MtabX4qxwjPE+i2I45GW/y8mqQj2
+         DZgm3dcAuerKj9I9PBr2kmlH6JvwzqieJPL5Hwv9MxDB7+H90kWcjaKpTgQOwhQEtx5W
+         HPIw==
+X-Gm-Message-State: AOJu0Yxha+91gMOFIV8Bu7qTZjwm+tQZPKsCZr9KhsE7TM08i8fstlZk
+	21qqIZGRzx3EHo0p0SqQwkquMc7OvyHoTtNmj9V05yNkRAyitTdB5L2ca5wVBQPe
+X-Gm-Gg: Acq92OGEPHgwAcctpgW9Tb7lr6xs3pWEA+AcWPiJcttVNa3xY4YdyErQ3qJzntlH9Fo
+	8Bk+PdCOFXLPfuHfZtQrfaiGlNABgqqrTER3YUns2Jy5wP0G510GDO4etNW3i+93wVKoOSuP0GW
+	sjtcpvRjpki0k0SOpmRwmpm1qSMjQ6xA9CqyUJIEw2av9zNAx9eKzuYsSujPYXscfbNJs22aPLC
+	63WkdWan6DX3751vj5mlS11nKZCzEkjtnawiVh1TzRxsbAhdoLA1c1zIZq8UgvjMv7YhEUTIqrp
+	Nyg+YykPZaWE3NrPOcQF6HKqh03+KkCeeGgn37d4/RcnbORZXsWaEdBp17xj7RKfAmqbpu1ki8D
+	Nt3pWAm9d911FAKM5Ya2iqqMrcMQgngDJI80cyf6T/fq0L1gQz4+m2rxCIebG4lJzKOCjf+enAo
+	bO7qr2nri6WfRz30HBC0/zZ0aurXCG2mEUx1z9aefFHHzXm2hCyaFWRpWnfov4sNjg28UmwrrkA
+	a6gGtI=
+X-Received: by 2002:a05:600c:4e87:b0:48a:93d2:60d2 with SMTP id 5b1f17b1804b1-48fe59ab8c8mr164353235e9.0.1779016412523;
+        Sun, 17 May 2026 04:13:32 -0700 (PDT)
+Received: from localhost.localdomain ([2a01:827:3b28:500:b184:4b99:e746:532b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48feab2a23dsm57757125e9.5.2026.05.17.04.13.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 04:13:31 -0700 (PDT)
+From: Alessandro Schino <7991aleschino@gmail.com>
+To: netdev@vger.kernel.org
+Cc: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	e521588 <alessandro.schino@sbb.ch>,
+	Alessandro Schino <7991aleschino@gmail.com>
+Subject: [PATCH] esp: fix page frag reference leak on skb_to_sgvec failure
+Date: Sun, 17 May 2026 13:13:06 +0200
+Message-ID: <20260517111306.1881-1-7991aleschino@gmail.com>
+X-Mailer: git-send-email 2.41.0.windows.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260516-ks8995-to-ksz8-v1-0-70d0ef4aa5f4@kernel.org>
- <20260516-ks8995-to-ksz8-v1-2-70d0ef4aa5f4@kernel.org> <570e6488-6320-4cbc-8d48-5438b4073d8b@kernel.org>
-In-Reply-To: <570e6488-6320-4cbc-8d48-5438b4073d8b@kernel.org>
-From: Linus Walleij <linusw@kernel.org>
-Date: Sun, 17 May 2026 12:39:37 +0200
-X-Gmail-Original-Message-ID: <CAD++jLnCQZtcCX6Yy8G0c5VprQP1UozqDd+6ppiStuHsdCN6og@mail.gmail.com>
-X-Gm-Features: AVHnY4J8_nKN5in9STpMywwF6jSGuuV9EuyKQ0oAM4wVbiTzYv_Mz9cwlRuy0WM
-Message-ID: <CAD++jLnCQZtcCX6Yy8G0c5VprQP1UozqDd+6ppiStuHsdCN6og@mail.gmail.com>
-Subject: Re: [PATCH 2/5] dt-bindings: net: dsa: microchip: Add KSZ8995XA
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, 
-	Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 8D02456087E
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 3C735560ABF
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288716-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,armlinux.org.uk,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,vger.kernel.org,sbb.ch,gmail.com];
+	TAGGED_FROM(0.00)[bounces-288717-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[7991aleschino@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sbb.ch:email]
 X-Rspamd-Action: no action
 
-On Sun, May 17, 2026 at 10:42=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.o=
-rg> wrote:
-> On 16/05/2026 01:16, Linus Walleij wrote:
-> > The KSZ8995XA is just like the KSZ8795 and KSZ8864 a Micrel
-> > product. It was renamed from KS8995XA to KSZ8995XA at some point,
-> > but it has the same properties as the KS8995XA.
->
-> This is a bit unfortunate sentence, because it strongly suggests devices
-> are compatible, but you do not express any compatibility. Driver looks
-> handling them in incompatible way, so it is odd to see "it is just like".
+From: e521588 <alessandro.schino@sbb.ch>
 
-Hm, they are compatible. The driver should handle KS8995XA and KSZ8995XA
-the same way, the only thing that is funky in the driver is that since ther=
-e
-is (unfortunately) an old "micrel,ks8995" (no suffixes) binding, which is
-actually the KS8995XA, we need to treat that as the XA binding as well.
+In esp_output_tail(), when esp->inplace is false, the old skb page frags
+are replaced with a new page from the xfrm page_frag cache. The source
+scatterlist (sg) is built from the old frags before the replacement, and
+esp_ssg_unref() is responsible for releasing the old page references
+after the crypto operation completes.
 
-I should probably patch it deprecated.
+However, if the second skb_to_sgvec() call (which builds the destination
+scatterlist from the new page) fails, the code jumps to error_free which
+only calls kfree(tmp). The old page frag references captured in the
+source scatterlist are never released:
 
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+  1. sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
+  2. nr_frags is set to 1 and frag[0] is replaced with the new page
+  3. Second skb_to_sgvec() fails -> goto error_free
+  4. kfree(tmp) frees the sg[] memory but old frags are not unref'd
+  5. kfree_skb() only releases frag[0] (the new page), not the old ones
 
-Thanks!
+Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+unconditionally unrefs the source scatterlist frags without checking
+req->src and req->dst, since those fields are not yet initialized by
+aead_request_set_crypt() at the point of the error. Existing callers
+pass false to preserve the original behavior.
 
-Yours,
-Linus Walleij
+The same issue exists in both esp4 and esp6 as the code is identical.
+
+Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+
+Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
+---
+ net/ipv4/esp4.c | 10 +++++-----
+ net/ipv6/esp6.c | 10 +++++-----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 5c4b162c1bb5..8314d7bddcb7 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -96,7 +96,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+ 			     __alignof__(struct scatterlist));
+ }
+ 
+-static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
++static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
+ {
+ 	struct crypto_aead *aead = x->data;
+ 	int extralen = 0;
+@@ -113,7 +113,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+ 	/* Unref skb_frag_pages in the src scatterlist if necessary.
+ 	 * Skip the first sg which comes from skb->data.
+ 	 */
+-	if (req->src != req->dst)
++	if (already_unref || req->src != req->dst)
+ 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+ 			skb_page_unref(page_to_netmem(sg_page(sg)),
+ 				       skb->pp_recycle);
+@@ -220,7 +220,7 @@ static void esp_output_done(void *data, int err)
+ 	}
+ 
+ 	tmp = ESP_SKB_CB(skb)->tmp;
+-	esp_ssg_unref(x, tmp, skb);
++	esp_ssg_unref(x, tmp, skb, false);
+ 	kfree(tmp);
+ 
+ 	if (xo && (xo->flags & XFRM_DEV_RESUME)) {
+@@ -570,7 +570,7 @@ int esp_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
+ 			           (unsigned char *)esph - skb->data,
+ 			           assoclen + ivlen + esp->clen + alen);
+ 		if (unlikely(err < 0)) {
+-			esp_ssg_unref(x, tmp, skb);
++			esp_ssg_unref(x, tmp, skb, true);
+ 			goto error_free;
+ 		}
+ 	}
+@@ -604,7 +604,7 @@ int esp_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
+ 	}
+ 
+ 	if (sg != dsg)
+-		esp_ssg_unref(x, tmp, skb);
++		esp_ssg_unref(x, tmp, skb, false);
+ 
+ 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
+ 		err = esp_output_tail_tcp(x, skb);
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 9166e1da3615..9d0c4957ac62 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -113,7 +113,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+ 			     __alignof__(struct scatterlist));
+ }
+ 
+-static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
++static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
+ {
+ 	struct crypto_aead *aead = x->data;
+ 	int extralen = 0;
+@@ -130,7 +130,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+ 	/* Unref skb_frag_pages in the src scatterlist if necessary.
+ 	 * Skip the first sg which comes from skb->data.
+ 	 */
+-	if (req->src != req->dst)
++	if (already_unref || req->src != req->dst)
+ 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+ 			skb_page_unref(page_to_netmem(sg_page(sg)),
+ 				       skb->pp_recycle);
+@@ -254,7 +254,7 @@ static void esp_output_done(void *data, int err)
+ 	}
+ 
+ 	tmp = ESP_SKB_CB(skb)->tmp;
+-	esp_ssg_unref(x, tmp, skb);
++	esp_ssg_unref(x, tmp, skb, false);
+ 	kfree(tmp);
+ 
+ 	esp_output_encap_csum(skb);
+@@ -601,7 +601,7 @@ int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
+ 			           (unsigned char *)esph - skb->data,
+ 			           assoclen + ivlen + esp->clen + alen);
+ 		if (unlikely(err < 0)) {
+-			esp_ssg_unref(x, tmp, skb);
++			esp_ssg_unref(x, tmp, skb, true);
+ 			goto error_free;
+ 		}
+ 	}
+@@ -636,7 +636,7 @@ int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
+ 	}
+ 
+ 	if (sg != dsg)
+-		esp_ssg_unref(x, tmp, skb);
++		esp_ssg_unref(x, tmp, skb, false);
+ 
+ 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
+ 		err = esp_output_tail_tcp(x, skb);
+-- 
+2.41.0.windows.3
+
 
