@@ -1,92 +1,70 @@
-Return-Path: <netdev+bounces-288780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288781-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONI2D4c2CmrQxgQAu9opvQ
-	(envelope-from <netdev+bounces-288780-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 23:43:35 +0200
+	id eLMJNF88CmrtxwQAu9opvQ
+	(envelope-from <netdev+bounces-288781-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:08:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D449A56411B
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 23:43:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D999564232
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A89DF301B71A
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 21:43:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C582430031C3
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 22:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B46322527;
-	Sun, 17 May 2026 21:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE6D33D503;
+	Sun, 17 May 2026 22:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWaBxjQP"
+	dkim=pass (1024-bit key) header.d=vassilevski.com header.i=@vassilevski.com header.b="ng+CYJnH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-244107.protonmail.ch (mail-244107.protonmail.ch [109.224.244.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63D531F9A8
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 21:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E8F33E374
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:08:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779054202; cv=none; b=u+H8ZicPiJ2fKOyzjAPlzhV4lTWketJRvJFY6BfXJohN6zBss2OnDi9WXCVgm+/BSdaVEwZCUSkNtA0nNu4S4lY5pPVH4QOFFDUyhkph+pDatpCkWm60NjKvtXLTJwBFstonTeXbLqRIzn/yCh7Rq4rrnNpEOBHAyyWxwD9G8io=
+	t=1779055707; cv=none; b=Q3mLEGIwYvQZvkROwhb6kKtnZ/je4AyX2GjtWE4zXdvDpssk5GR4rtMY/3+F0QQWnGI5sc5MpX4UtEwvyl4OszpRHtX7Jm9+tyua+XzX4vS7t+OISYh6jAzoK3PTTNGtTIZS4I06mugz3IyTPjBsgtikfAe5rEkENUCMxwt8zLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779054202; c=relaxed/simple;
-	bh=x2SnDPx6H1QagNxCIExQTM0vo6QvPDaPGnXJCvJjNMs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KRrlF2NXRWf4qyCvRlnrCtcpWdGXbA5fmaQZwbGCX9YoRVLJ5HrQT4sloKo9qk0aUh8CXd+4VRQIdISuu/N4a4ekT9v81jGrcoIG6hC6xSetOvxFdn2cctLVltxZOZZi7TnbZ8P0AYPYm86rm0PctPMX2khL0ZioG6f7gWJ8rzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWaBxjQP; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2bc85eda6b6so6683475ad.1
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 14:43:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779054200; x=1779659000; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QTe3wQNFzUmJo4OqUtxIUOB0CH2AbajczwxLdZTke8s=;
-        b=hWaBxjQPSsTxT0ov4+m9HsfmhD25+HxsIeCWXohqy7DMFN4VTLfQ8650WtX3SQ8ta9
-         OP9aB+qZAZ+RFd5xG2dkMkvVcmN4ZZvbBgSetwGv8YwwFaeEI+Mr8K3JTb5ES3hBJxkW
-         rnLXwR3mHnZjVkVN1v6QrzuM0HT3hC676mIIUzB27qShHVoi7rp3RgJ3IQdHKyNfMo9F
-         yAj0Lq9X0X7jv0Y5Uq/zEJVewsiNDi/ALPXDO8EWGIr9trAddbefTCbtr+FTQBReSva7
-         VHt6lM5q2u4kKgnAgNYN5bW5SMK6LIv5vtSX0q6tO7ZOOBCv1QR4it5IByQZMiszjYUF
-         f8ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779054200; x=1779659000;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QTe3wQNFzUmJo4OqUtxIUOB0CH2AbajczwxLdZTke8s=;
-        b=KoW0TvpfgwcxEJez1xmb/13lE++vNPtvg6+jcy5PV4IcBQ1nnNMeOthifdkk8tztey
-         ryU4yYtLCbRWqcfJ8hoDPJ7VPYuyEg6oswnFnUlSAYNrbvuEL5saVvo6IvZUactszCbU
-         fS0rgplRsyxT+E6uFDAP7onFLREnz9n/00ZVcDg9/wEWFtdJUUKAhctRiMWvScmZfqdP
-         EFa16wKemOSsWlWRMf6trWJOcMK0DqBAuQV4Iw5s0045FqqEqpFV2hAzaEvxEQBW2U8D
-         RfKDwccSqW8mBryrzSOCVUk+Qabvv0JbJQxoBrV5+5DmCIDV1LqSusNzanBF+Gs1iiJS
-         WYrw==
-X-Gm-Message-State: AOJu0YxJV2HbEClE8yMD/0WNdg3jcHJjyuYVq+Vfe2kn8xf8Mz9vjiHr
-	/KuWvaQWATDugvfThRWWL0VtIIuJV9/k10HuC6GukzxipWI7kM9VMECn6ATDig==
-X-Gm-Gg: Acq92OE4jkWN5QvkDOeBxoVHYHg8KWpa2qcVGG+xar6Niqg3vVrvUk/D7tvxtI0eAVj
-	eXBmsFJJAcm7WnNZs43WEuDPDuXs3ZJEptkwqCWNKpcFT+pw7AYn04XZw6x39M5KK+cGxu7LUP5
-	I4M8uqyV5Jd3WmYEuGFvxZ5QRohjJXRsFkWnb6NxvG5IIrcgcDHKnbPJQ5M3z+2ayjUoFH4+1RK
-	8m0SlFQ9BnABHMEac4t6fz822gN2Q5I/ZzCTTa6iVAeo8PTniWJqCFkhG8L5zfAIiOD3n1oAa2p
-	55L7Ll4tDvhRA3mdomtywPWVjBr7pgG86tH4y8dKwvrUkk1+kdx1tFtY4Tr9uvw3iYCXuemXXqb
-	mx1qMaZe8t4RFWklkq6+c7DvX5Rc1VD+owZ2LsSe8B+aZC/zDL4nIjgLsG1OXQplE5kPbcqRCOT
-	KfKStmgR9FaVRCWSUn5AEbHt8ngl+WbjRVOWlyQgN+di3vCOTza6XAaJK5V7wsYA9klSMEBIzgV
-	HvXgySV0FCXSzzTbkYxLwR+04y9mmpvjQ4=
-X-Received: by 2002:a17:903:3c28:b0:2ba:bfb5:9cc with SMTP id d9443c01a7336-2bd7e8d3b9fmr141367515ad.26.1779054199825;
-        Sun, 17 May 2026 14:43:19 -0700 (PDT)
-Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5cfe6512sm128545545ad.52.2026.05.17.14.43.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 14:43:19 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Chris Snook <chris.snook@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1779055707; c=relaxed/simple;
+	bh=fUybwcI3Qhke5NXaKBUawwSoKSsPvAZQEP8Mu2rHLMw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hfGgbR87gVByQl3ClIfIkY2Jjhx6mw46x2PdBWau0Y87xLD1Gaev+5egornR/1pOj2vW521Rq0l9sKA4qbOKbRNqrkaQAnQnCvXgcOGWpxkI/F8BtciXm5xcx+JWn74LyRf90/0U8X/VAplS11Obt52Il+MfHx7w3kd1ZlWBwl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vassilevski.com; spf=pass smtp.mailfrom=vassilevski.com; dkim=pass (1024-bit key) header.d=vassilevski.com header.i=@vassilevski.com header.b=ng+CYJnH; arc=none smtp.client-ip=109.224.244.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vassilevski.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vassilevski.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vassilevski.com;
+	s=protonmail; t=1779055700; x=1779314900;
+	bh=yhuZ9PVMA1JtklmBBJx+69LxSoJx/lc5QUYBdIOwS+U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:From:To:
+	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=ng+CYJnH8WXaw4H6LNkwfzjby/h9V45sGAnjlZUgqj9ZOK+ifVeIJjbfAOffGtGDS
+	 +Xt5YwHiFuyOSypMB9V69Vb6gT9WMSYsp69tdxo4fLEPghAcU1EzQN9E70FK2jZK4z
+	 diXD9mlFzfi/9v0tpfh9lrshZQPtJ1z20kDyb8cM=
+X-Pm-Submission-Id: 4gJZnR1YTKz1DDXY
+From: Alexander Vassilevski <oss@vassilevski.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: ag71xx: Unmap TX DMA buffers on completion
-Date: Sun, 17 May 2026 14:43:02 -0700
-Message-ID: <20260517214302.1450433-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Alexander Vassilevski <oss@vassilevski.com>
+Subject: [PATCH v3] net: ethernet: ti: am65-cpsw-nuss: remove dead vid check in slave_add_vid()
+Date: Sun, 17 May 2026 15:07:57 -0700
+Message-ID: <20260517220757.2679458-1-oss@vassilevski.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260515225715.3641804-1-oss@vassilevski.com>
+References: <20260515225715.3641804-1-oss@vassilevski.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,92 +72,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D449A56411B
+X-Rspamd-Queue-Id: 4D999564232
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[vassilevski.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[vassilevski.com:s=protonmail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288780-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288781-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linaro.org,ti.com,wanadoo.fr,vger.kernel.org,vassilevski.com];
+	DKIM_TRACE(0.00)[vassilevski.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[oss@vassilevski.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ti.com:email,vassilevski.com:email,vassilevski.com:mid,vassilevski.com:dkim]
 X-Rspamd-Action: no action
 
-Store the DMA address used for each transmitted skb and unmap it when
-the skb is completed or cleaned from the TX ring.
+am65_cpsw_nuss_ndo_slave_add_vid() returns early at the top with:
 
-This keeps the streaming DMA mapping lifetime paired with the skb
-lifetime on both normal completion and shutdown cleanup paths.
+     if (!netif_running(ndev) || !vid)
+         return 0;
 
-Assisted-by: Codex:GPT-5.5
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+so vid is guaranteed to be non-zero in the rest of the function. The
+subsequent
+
+     if (!vid)
+         unreg_mcast = port_mask;
+
+is therefore unreachable. Drop the dead branch.
+
+With that branch gone, unreg_mcast is only ever its initializer value
+of zero, so drop the variable and pass 0 directly to
+cpsw_ale_vlan_add_modify().
+
+No functional change.
+
+Found by Smatch.
+
+Fixes: 7bcffde02152 ("net: ethernet: ti: am65-cpsw-nuss: restore vlan configuration while down/up")
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/kernel-janitors/aS_lhMwppbDHoEcX@stanley.mountain/
+Signed-off-by: Alexander Vassilevski <oss@vassilevski.com>
+Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
 ---
- drivers/net/ethernet/atheros/ag71xx.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Changes in v3:
+  - Combine v1 and v2 into a single cumulative patch
+  Link to v2: https://lore.kernel.org/kernel-janitors/20260517151611.393789-1-oss@vassilevski.com/
 
-diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index ac4eadb9190a..50136d6ccda6 100644
---- a/drivers/net/ethernet/atheros/ag71xx.c
-+++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -305,6 +305,7 @@ struct ag71xx_buf {
- 	union {
- 		struct {
- 			struct sk_buff *skb;
-+			dma_addr_t dma_addr;
- 			unsigned int len;
- 		} tx;
- 		struct {
-@@ -805,6 +806,8 @@ static int ag71xx_tx_packets(struct ag71xx *ag, bool flush, int budget)
- 		if (!skb)
- 			continue;
+Changes in v2:
+  - Also drop the now-unused unreg_mcast variable; pass 0 directly to
+    cpsw_ale_vlan_add_modify()
+  Link to v1: https://lore.kernel.org/kernel-janitors/20260515225715.3641804-1-oss@vassilevski.com/
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 7ac75fc8cd..434a310808 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -302,7 +302,7 @@ static int am65_cpsw_nuss_ndo_slave_add_vid(struct net_device *ndev,
+ {
+ 	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
+ 	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+-	u32 port_mask, unreg_mcast = 0;
++	u32 port_mask;
+ 	int ret;
  
-+		dma_unmap_single(&ag->pdev->dev, ring->buf[i].tx.dma_addr,
-+				 ring->buf[i].tx.len, DMA_TO_DEVICE);
- 		napi_consume_skb(skb, budget);
- 		ring->buf[i].tx.skb = NULL;
+ 	if (!common->is_emac_mode)
+@@ -316,11 +316,9 @@ static int am65_cpsw_nuss_ndo_slave_add_vid(struct net_device *ndev,
+ 		return ret;
  
-@@ -1133,6 +1136,9 @@ static void ag71xx_ring_tx_clean(struct ag71xx *ag)
- 		}
+ 	port_mask = BIT(port->port_id) | ALE_PORT_HOST;
+-	if (!vid)
+-		unreg_mcast = port_mask;
+ 	dev_info(common->dev, "Adding vlan %d to vlan filter\n", vid);
+ 	ret = cpsw_ale_vlan_add_modify(common->ale, vid, port_mask,
+-				       unreg_mcast, port_mask, 0);
++				       0, port_mask, 0);
  
- 		if (ring->buf[i].tx.skb) {
-+			dma_unmap_single(&ag->pdev->dev,
-+					 ring->buf[i].tx.dma_addr,
-+					 ring->buf[i].tx.len, DMA_TO_DEVICE);
- 			bytes_compl += ring->buf[i].tx.len;
- 			pkts_compl++;
- 			dev_kfree_skb_any(ring->buf[i].tx.skb);
-@@ -1531,6 +1537,7 @@ static netdev_tx_t ag71xx_hard_start_xmit(struct sk_buff *skb,
- 		goto err_drop_unmap;
- 
- 	i = (ring->curr + n - 1) & ring_mask;
-+	ring->buf[i].tx.dma_addr = dma_addr;
- 	ring->buf[i].tx.len = skb->len;
- 	ring->buf[i].tx.skb = skb;
- 
+ 	pm_runtime_put(common->dev);
+ 	return ret;
+
+base-commit: e98d21c170b01ddef366f023bbfcf6b31509fa83
 -- 
-2.54.0
+2.43.0
 
 
