@@ -1,145 +1,221 @@
-Return-Path: <netdev+bounces-288738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288743-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBskCF7MCWq2qAQAu9opvQ
-	(envelope-from <netdev+bounces-288738-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:10:38 +0200
+	id QPMGB13QCWreqgQAu9opvQ
+	(envelope-from <netdev+bounces-288743-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:27:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D47561803
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:10:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FBD3561A8E
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 16:27:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 01E7E30097C2
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:10:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 84FEC3004599
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5152F8EA1;
-	Sun, 17 May 2026 14:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EA13BB10D;
+	Sun, 17 May 2026 14:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="SM2tG9gC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xmky4gjO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF202D46CE
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 14:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1839B3BB13B
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 14:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779027032; cv=none; b=GxMcN+xzbZ+CbCz8t0FxDBCVSNs/sHvbypZXcPuG44tIhDOv2xoWGUtzDvE6A7+cAR7zAbZEYiFFCyFG3uBg5QqxgDaiGchasjP8i6yd0MrOuGcSP2N62CfXy5i6J0h0RJY/CBxzbb1lTvFzZdRTH7iStoI78Ddb9LbaGxQIedY=
+	t=1779028057; cv=none; b=cB34/6H4vc4ipJ9HtoHqFOz/XNH4sMQR1ljC+tPsP3Z/X2bQNGRoaX7uls1gcJ/Kup1BAsy0sacK05jQM+CNa3iauHHz+ruqxzzcXamYbfP88Rn8gGvZe/UT0VgjPRabGFk65z1Jl1wA5tt1nauYNuiLkrSoI0wYxPzjXfItS64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779027032; c=relaxed/simple;
-	bh=OFg7gaIIJENLADZC81W1MxkKRviL+wIHPBMCeJeFUYU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gPf6C57hYVGG7Gy0gpsBdr3AvlZzhT9xQ6ZAEOtd0IF577W5g7VkAjb0RntH8aMcNSlMO3T46MV9qYWtWVWnMoFWtkisArOnGYY1DB1YZHChD4W9KIQ2/vVWxV7dpAdn0EH2d7WMbI2SWqLMeewyDG9xhWmUjiNHJVuD643CLTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=SM2tG9gC; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48e82c23840so8689275e9.3
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 07:10:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1779027020; x=1779631820; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w6GwYArnaeioyDwurWj9r+Vzo/oXg0IJMt1SOHyO9K8=;
-        b=SM2tG9gCr3cA/BEhJcCWWa2RHhlby8RYt6zm0MAjna1a7HyjRe3WoPhY7adXA4Kryi
-         J3esYWriGhUKTSIKm+F8uXobkfnJl23eaf+qgYS0B//PXDPQbjZHtZ/CaIstO4r8KLBg
-         CuRmXEG9TdN+J2EM7fsNtyy5mKFtrhgWtJ1Es5P01F+T/p0fbnYra7xfeTYm9kAGWQAY
-         eF7ykb7ZZ0zhcCXB/b4rViwYFoerE39N+TFD7FqZoPKFTxlg0Lh4T/CtgeZqiuu63j00
-         CrjCcY4zWRkYnhB0IeO6n6oEgGqL7qp/iMWDry1Z2E3+psDNn6cTMDdD7w6+dVntcsx+
-         M95g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779027020; x=1779631820;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w6GwYArnaeioyDwurWj9r+Vzo/oXg0IJMt1SOHyO9K8=;
-        b=ip2KFqQfaSJvobVlBmI+HJm8STGKcqizAQKeKvv9WrBHd6iDMKpNJywEGu90MqwMgm
-         UNUlOnoc4gmo4LUqN4Vr/N1Xd8lLfQu4BUXK0MIayzz9xJxEFu8HTV6NNeb+Xj8aadqi
-         s35fUrT1PT96YYAnfO/1HblOvh2zaNTRlnnc4em+JfY0b0BFwLXi+rSVXFhyMlMHFnWg
-         QQKOwcSxYTpeJGYdQoSNUCnxpmnc4jUqhdPhcuU4clC9nm5CYBbN/TjVUQJsE28RT4hS
-         L3cL5m3nI1DJVmSuVZB6KGGtMru1tM6e2gIMFl3r4BrKHaU+nNrAXfaXjUPCn81S0t+w
-         1gZw==
-X-Gm-Message-State: AOJu0YwznFR8kgLvnA4sKk25Z3oW5wb72x5HZh69Ccc+b0AED4YUFfOC
-	g4DUSl6Jl2fkzXZFpCX3kwSxkS7yuhHqPkI1Qlu+4HBu7i1sKRzXPoeXsIm2ttQyNPQ=
-X-Gm-Gg: Acq92OHaHHrvEh8W40yAUr2JtEh6V9w+cQCyKl/SUIqINnVFLSoK7RBy/1/HWXTVNmK
-	Rb9plZ9K+FGIVB5jd1MAA/J6soRzfAE0cRH+M8wGEaExiCSW2+v9ItzLoE81TVy4xnkp/jJD2zW
-	XBcoHWUvL8pgptw+Mjpqx83OzsQdII8NZcuneqZbqUhrJfl7rh0yd4EFDSISSUu7gqS6CbJxtK2
-	7rpuHqB+whZ+m3gP/V+DR20Lj271+fDf0y3LsjhwpQPcJtro60PVgg+Vzm6QsTq0NEza6NKT45a
-	sBVjjTxEppZr1CXv2L9tBcKpJxiw0R3N6izpTNFNsIL3Ma4Gy38THFVHvor02BkjYvN4vXHIALe
-	QzgEGpnHtFali7PlifsKz9KMnHwKdTnkSnixHQo4w+ky/c0Wlw5us7JOIQScJwSfLrk6t3CShqa
-	N/ZE64dU6wPRdF+sgZsloQCW8rKCQ97FlhEhUW9QebXf+wa9WnW2Nmd9fB9g==
-X-Received: by 2002:a05:600c:6383:b0:489:1c1f:35f9 with SMTP id 5b1f17b1804b1-48fe60ea4ebmr169793665e9.9.1779027020119;
-        Sun, 17 May 2026 07:10:20 -0700 (PDT)
-Received: from localhost (176.111.181.159.kyiv.nat.volia.net. [176.111.181.159])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48feab26ed9sm87218235e9.2.2026.05.17.07.10.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 07:10:19 -0700 (PDT)
-Date: Sun, 17 May 2026 17:10:17 +0300
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, stephen@networkplumber.org,
-	petrm@nvidia.com, idosch@nvidia.com
-Subject: Re: [PATCH iproute2-next 2/2] bridge: vlan: Add support for
- neigh_forward_grat
-Message-ID: <agnMSaZF3eNRcbFl@penguin>
-References: <20260517082501.899009-1-danieller@nvidia.com>
- <20260517082501.899009-3-danieller@nvidia.com>
+	s=arc-20240116; t=1779028057; c=relaxed/simple;
+	bh=4XSBxYxqISLsV6Spf98OGBDaeYRctTVPveYwKgI8UHs=;
+	h=To:cc:Subject:MIME-Version:Content-Type:From:Date:Message-ID; b=n4z0ZHiT9k4QyABNRpMD6I7I/mawHY6sIlOJNUg+4iRr0aKQH8trqijjCWMnvoX6y25spv2UPEgMIKtWYno8Hk380nFYjwtQ0LRiffDVJIiwWUuRyShMklngAcTmj4eN5sgberesyMq3Nmcl243X1IOfs+QyygUWECZ6RT2lzgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xmky4gjO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779028042;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LavLM0+8mYsFB9TAKaulpbSa6g77ESdqNgfKK8jSpI0=;
+	b=Xmky4gjOTyP8L2Ne9NXqfgZ+ClL+Vf03RNUMs9xs4YfJjHVGOZ+pScJzEIYK4aEn4gWCYH
+	GWdKGjUroF7LHQVJf4ZMqudnBltCQcEgkjE6fRkp3MPbiMV2w7IQBlE3TzW1dG/HMkq5fv
+	FgsnGauB4cS/ncmlRWJa7vRj04JKN9U=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-67-3HtegX92MsSc8txN4rvGOg-1; Sun,
+ 17 May 2026 10:27:19 -0400
+X-MC-Unique: 3HtegX92MsSc8txN4rvGOg-1
+X-Mimecast-MFC-AGG-ID: 3HtegX92MsSc8txN4rvGOg_1779028037
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB15E180044D;
+	Sun, 17 May 2026 14:27:16 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.33])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 63FF330001A2;
+	Sun, 17 May 2026 14:27:12 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com, Michael Bommarito <michael.bommarito@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jeffrey Altman <jaltman@auristor.com>,
+    Eric Dumazet <edumazet@google.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    stable@kernel.org, linux-kernel@kernel.org
+Subject: [PATCH] rxrpc: Fix the ACK parser to extract the SACK table for parsing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260517082501.899009-3-danieller@nvidia.com>
-X-Rspamd-Queue-Id: 70D47561803
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3794759.1779027814.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+From: David Howells <dhowells@redhat.com>
+Date: Sun, 17 May 2026 15:27:10 +0100
+Message-ID: <3794930.1779028030@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Rspamd-Queue-Id: 8FBD3561A8E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
-	TAGGED_FROM(0.00)[bounces-288738-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,auristor.com,google.com,davemloft.net,kernel.org,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-288743-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,blackwall.org:email,blackwall.org:dkim]
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:email,auristor.com:email]
 X-Rspamd-Action: no action
 
-On Sun, May 17, 2026 at 11:25:01AM +0300, Danielle Ratson wrote:
-> Add support for controlling gratuitous ARP and unsolicited NA
-> forwarding at the per-VLAN level via the neigh_forward_grat option.
-> 
-> This allows configuring the option via:
-> $ bridge vlan set dev <port> vid <vlan> neigh_forward_grat {on|off}
-> 
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-> ---
->  bridge/vlan.c     | 18 ++++++++++++++++++
->  man/man8/bridge.8 | 15 ++++++++++++++-
->  2 files changed, 32 insertions(+), 1 deletion(-)
-> 
- 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+    =
+
+Fix modification of the received skbuff in rxrpc_input_soft_acks() and a
+potential incorrect access of the buffer in a fragmented UDP packet (the
+packet would probably have to be deliberately pre-generated as fragmented)
+when AF_RXRPC tries to extract the contents of the SACK table by copying
+out the contents of the SACK table into a buffer before attempting to pars=
+e
+it.
+
+AF_RXRPC assumes that it can just call skb_condense() and then validly
+access the SACK table from skb->data and that it will be a flat buffer -
+but skb_condense() can silently fail to do anything under some
+circumstances.
+
+Note that whilst rxrpc_input_soft_acks() should be able to parse extended
+ACKs, the rest of AF_RXRPC doesn't currently support that.
+
+Further, there's then no need to call skb_condense() in rxrpc_input_ack(),
+so don't.
+
+Fixes: d57a3a151660 ("rxrpc: Save last ACK's SACK table rather than markin=
+g txbufs")
+Reported-by: Michael Bommarito <michael.bommarito@gmail.com>
+Link: https://lore.kernel.org/r/20260513180907.2061972-1-michael.bommarito=
+@gmail.com
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jeffrey Altman <jaltman@auristor.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+cc: stable@kernel.org
+---
+ input.c |   22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+index 24aceb183c2c..0c15ebf19eae 100644
+--- a/net/rxrpc/input.c
++++ b/net/rxrpc/input.c
+@@ -963,21 +963,34 @@ static void rxrpc_input_soft_acks(struct rxrpc_call =
+*call,
+ 	struct rxrpc_skb_priv *sp =3D rxrpc_skb(skb);
+ 	struct rxrpc_txqueue *tq =3D call->tx_queue;
+ 	unsigned long extracted =3D ~0UL;
+-	unsigned int nr =3D 0;
++	unsigned int nr =3D 0, nsack;
+ 	rxrpc_seq_t seq =3D call->acks_hard_ack + 1;
+ 	rxrpc_seq_t lowest_nak =3D seq + sp->ack.nr_acks;
+-	u8 *acks =3D skb->data + sizeof(struct rxrpc_wire_header) + sizeof(struc=
+t rxrpc_ackpacket);
++	u8 sack[256] __aligned(sizeof(unsigned long));
++	u8 *acks =3D sack;
+ =
+
+ 	_enter("%x,%x,%u", tq->qbase, seq, sp->ack.nr_acks);
+ =
+
+ 	while (after(seq, tq->qbase + RXRPC_NR_TXQUEUE - 1))
+ 		tq =3D tq->next;
+ =
+
++	/* Extract an individual SACK table.  A normal SACK table is up to 255
++	 * bytes with 1 ACK flag per byte, but an extended SACK table can be up
++	 * to 256 bytes with up to 8 ACK/NACK flags per byte.  The ACK flags go
++	 * across all bit 0's then all bit 1's, then all bit 2's, ...
++	 */
++	memset(sack, 0, sizeof(sack));
++	nsack =3D umin(sp->ack.nr_acks, 256);
++	if (skb_copy_bits(skb,
++			  sizeof(struct rxrpc_wire_header) + sizeof(struct rxrpc_ackpacket),
++			  sack, nsack) < 0)
++		return;
++
+ 	for (unsigned int i =3D 0; i < sp->ack.nr_acks; i++) {
+ 		/* Decant ACKs until we hit a txqueue boundary. */
+ 		shiftr_adv_rotr(acks, extracted);
+ 		if (i =3D=3D 256) {
+-			acks -=3D i;
++			acks =3D sack;
+ 			i =3D 0;
+ 		}
+ 		seq++;
+@@ -1117,9 +1130,6 @@ static void rxrpc_input_ack(struct rxrpc_call *call,=
+ struct sk_buff *skb)
+ 	    skb_copy_bits(skb, ioffset, &trailer, sizeof(trailer)) < 0)
+ 		return rxrpc_proto_abort(call, 0, rxrpc_badmsg_short_ack_trailer);
+ =
+
+-	if (nr_acks > 0)
+-		skb_condense(skb);
+-
+ 	call->acks_latest_ts =3D ktime_get_real();
+ 	call->acks_hard_ack =3D hard_ack;
+ 	call->acks_prev_seq =3D prev_pkt;
+
 
