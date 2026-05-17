@@ -1,240 +1,404 @@
-Return-Path: <netdev+bounces-288728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mKlJEKawCWqElQQAu9opvQ
-	(envelope-from <netdev+bounces-288728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:12:22 +0200
+	id Ca8lJLexCWo4lgQAu9opvQ
+	(envelope-from <netdev+bounces-288729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:16:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0C23560E44
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:12:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF34A560E86
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 14:16:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 51CDA300694D
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:12:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 647DC3009F00
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 12:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B25A35DA69;
-	Sun, 17 May 2026 12:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C0C2BD030;
+	Sun, 17 May 2026 12:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Jj+P09Yd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNDIW61B"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010051.outbound.protection.outlook.com [52.101.56.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4291A682B
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 12:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779019938; cv=fail; b=ZnEk3qwFv73IGMcSos+gfsIt0CsiAH34KSVxFfOhOguoLbK/zZX516JHZKVgO2wo+AR07dj7EcSKjUrTbhRsh802lEjcYVAt+xnov8gWzfCSzRIKmpCNMD8E0cGhVuF6Ir18k0cQqhcHIZ6MwA3Ws3kcMDY97vqV5AAC5bo1l6M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779019938; c=relaxed/simple;
-	bh=KPSYGG8UnUzou1ZJu4pwc49y1mzvq3hjTxdaleUuMiM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=D27tanPPYkuVNB5frrZ7g384XJNRsK/3WIJBmcYrE1M5B57gSkYt38JAXyg+J/BKiEOw88OWMWQYvc18gGoQKfgFjO2UWwa/lv+oPrK0CzvISSTxUTsYKKqVFaYle6Hz5jRPokStAHg/bh/cy3cyb7Fy9ZCIlpzr3SisoBjf+fg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Jj+P09Yd; arc=fail smtp.client-ip=52.101.56.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Er7M0UNKYKRZenroZgopnAYnsM0ou8obdiefNbpshfCli+ilICP0cf9BdFdwCITiIdYXcwhDpu2l31Km6MMlhmi8v4cuICv9Tq6FVUAohdEz4k1EvEZ169bIxMOxcCEq9sJidB9v6h91URtgtyEqd+582QtyelJmRKRurPy4tDRpEefh7jeEigKQREV4QreOSGSCd2E34iVEax1BT9eyUzytNc0jWUqeBLgrHr3+a6dgqen0LoNAxkx8pJLG8BN2Hcg1uiB9Te5ob9uhcKfFND6dKS97dd3ByTBxAtN+G2HUK4wtyIeak0kGu68MzavfTb2B4SkenqQEWzDSDMYuPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Eoqj0cggd4yH2OHyU3oT4MiHfYwl9voiaKN1nEjW6RQ=;
- b=eGi7lOhay1yyLOa6jH46bt4jH0DOvvKy84+bSo23Y3hU5GtWXAkwzdRsE1zL4YJgEVzXkuo/Dl6IY0N9pnRt88b97IMJieZEGYPZzGno3B8qzCw+ANjBpRn3+/dCgCOwTNnOVPeEumnZUuKIuA+htSjeU9QcroFZxDWYYdSU2jExi1VYfh3rmQ/35hS7A87G7Bbdqq1PRZHrshPwC55jGg8N9CgxGymTAaV4FyT3dHMbuBi3Q9rvQG8OumLdqqJJdzL6Om2HuBtmLU1Zryd8elw9L+nxPQc19Ja/0uAc69eN+NxzmFvtxhUQLNL+/uekMdhYqQkXCAUs6wx/7fluHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Eoqj0cggd4yH2OHyU3oT4MiHfYwl9voiaKN1nEjW6RQ=;
- b=Jj+P09Yd4gP4tItDScKtW5yCURENQOntOgN/uXZYIbAbcse+yGs0JecFRnhRZNLI43wug8ox+4yxVT86MDyN+bXtVEyhZiJXYWoBvH6MWJUlxN3fLTf5kD0Rgg2pbw/VGb4TLIfmfFpP1a7PcvpLmBFXePmu/Sojw/M7fV5rWoi9PwEMBpYU5T8x/nAWdXv2MgvalAoHH3YEgO50cBhQeuZxrb38zM6tgcQ+RpaLMGDjH2hrDOmWdRIclT3eeTFtOcr71FO3bwqmzEJyx3hu/1/tNUeNZz1ITThkw9+QchXEzyCsxWKRSyKZ4hehIv2wBhcd7OiNBqGutNxquxNAaA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by LV8PR12MB9112.namprd12.prod.outlook.com (2603:10b6:408:184::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.22; Sun, 17 May
- 2026 12:12:14 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0025.020; Sun, 17 May 2026
- 12:12:14 +0000
-From: Ido Schimmel <idosch@nvidia.com>
-To: netdev@vger.kernel.org,
-	bridge@lists.linux-foundation.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	razor@blackwall.org,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	yongwang@nvidia.com,
-	aroulin@nvidia.com,
-	petrm@nvidia.com,
-	tglx@kernel.org,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net 2/2] selftests: bridge_vlan_mcast: Test toggling of multicast snooping
-Date: Sun, 17 May 2026 15:11:22 +0300
-Message-ID: <20260517121122.188333-3-idosch@nvidia.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260517121122.188333-1-idosch@nvidia.com>
-References: <20260517121122.188333-1-idosch@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TL0P290CA0008.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::19) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A428A405C4B
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 12:16:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779020211; cv=none; b=kni2WfGobogerxu+50s9a/j/d5C8bvd76Hi+ef/CpgISoEov4PM45H/xVDgZI1MxHk8K1+DMa2dZpq5NZ3Eytfmq0zYsIALFEHbQLEAt74FpkGommYT5Pbc8pEfqhYYOHmzBRpjNK/FEuM4QLxrwzep6+JL0Myptoxfb1Qi+pyM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779020211; c=relaxed/simple;
+	bh=ZkRvU0jLzvplU5bZY41Zz/7ytph4SzqDCErIdtmXOM4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zl9AgysNd8jiTURZfiMBz9PVtl/AapI2zdmiNRXcxfscqTrsTc/Gr6HB3uKNT5nls/lnFRbLmuKqq41/ee65nD6OhFjpq3hXNteUgCx/zHODuT1EZ5AjnV8i9PqFx/Hh8bXE2w0RQ5Tth5HshA5Jftg3sA4aMoNEwSrokobl1AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNDIW61B; arc=none smtp.client-ip=209.85.214.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2bc763e2ba8so5566025ad.3
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 05:16:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779020209; x=1779625009; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yjlRY4tntfwtwjxbRp3yBR4txk5DfmJk/3uX12iiOEM=;
+        b=kNDIW61BGQKGPKSmPsNxKtGZA+f72Td+DgmTSJw3IcinSNaE3vuN8KpmT+kpGVkkX8
+         iCM7olURrfZh27g2PgGFn2WBX7pg+A7swZ0U7Vle+orHmpX4HTLRcNvTkYJE/JN1U2fg
+         uFZkbQFi8h3bQYAJaSu43G4i7q25N1F4Hu5RsOkpx1vbsksEJP3UDMTOw6SUCBYUfMou
+         MRl9MjNFEpZnJ+JL7ZQfO91fr840CErcLfvmt/+XWU52SkVm1eQOoMfZ+1gNbcxQLyJQ
+         xPVMKtnEtTc+7kF8DoW/z0VMMP64bRhJcGwS+TofnYGbdlYn6QMItyEb8wbVUls9RKIn
+         txXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779020209; x=1779625009;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yjlRY4tntfwtwjxbRp3yBR4txk5DfmJk/3uX12iiOEM=;
+        b=Bs1vJakRVhDEF5Td2bs8eIXnye486lV4U+KqF60IRCr7FGT5aA2/cyZYwHNLABdSzO
+         ACx/1uYcmAf7EAvPU1elNKNa1CTw01DeqcvB94F6i/yu5MwbSgYegfURu1G9PE9FLfGg
+         KMOpTwuKUeup9wtU62wcd6RNVyfEpz2kXERURgDBuCY46lXd+Kn15IcjlMjip+Qe+jgz
+         Qt0xuRTp+Nq2JeEUCwPQ3OB97dzWPafsXG/6RhwUzs2LAFFe/vYfp8F3HIB3oZjN8WBE
+         oD2COJ7ebJmDCAYJrnJz5H7WH/3zshAtH7NFxbWNTzIx+rba6Zj1dXHeq3LaXYKAhdR6
+         dThA==
+X-Forwarded-Encrypted: i=1; AFNElJ/p4P4dSDp4rzSOKz9n96ijidAFefrZhp80cQR6VteTTcvN5W4h4D27TTdvlf7Ivkx+qTLAYI8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZcChJeCz17TWzk7//chLeXQRaPymp0W00D3ne22rc8hYBDO+P
+	YS4vNIe2WrNj4uon+k98J3YTZ0MP79ELTrE+MgmJbQ6gsrGf+aqOupOP
+X-Gm-Gg: Acq92OHwCosGZMpaxXxGvi7SRvqGmhz1b9uu6D+NVZMCdBVW9ZIfGDkyMdRyOVfM/V9
+	bD3HWmXl1+/Jbc9d2JyVYGYhI9xEAdzh3E4J6uXmUSFL2K4nBMCGK/c5i5a8QTL8pkJ5jZwLE6P
+	yjM7xQXKKNWC8k+aiybJSD4e/YvK9bgNB2+VIzZotPJifI5HGaiWyHxiCnD9dCMKUxp2QNv8L9V
+	Db8/NAyXdXl8dAMNH0x/muXxWC6FkgY2tyIpo8GLEw/OkqWaXWxi1zoJ05z5tGCbeqUNk+l+hq3
+	dMZDjIgm5UqsSQMFKJDWbGAw0qw4OgjimJ7UnoRzBC/vNTXjJpsgZL7saRp5CKDXxG1LuE0+FgE
+	G22wJRS6uOOhE37RQ5V0kTyzP3U0KfOb5BRwevQyevfNj83CmtMif7Yae8SZszNxnX2xjiaBA9w
+	oGajnco58HJmVk08adrEtqrWjlE7FSsQI=
+X-Received: by 2002:a17:902:b60a:b0:2bc:b366:4731 with SMTP id d9443c01a7336-2bd7e9b8086mr82854435ad.31.1779020208698;
+        Sun, 17 May 2026 05:16:48 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5c05ffbesm121124815ad.27.2026.05.17.05.16.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 05:16:48 -0700 (PDT)
+From: Zhang Cen <rollkingzzc@gmail.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Jakub Sitnicki <jakub@cloudflare.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zerocling0077@gmail.com,
+	2045gemini@gmail.com,
+	Zhang Cen <rollkingzzc@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] bpf, sockmap: keep sk_msg copy state in sync
+Date: Sun, 17 May 2026 20:16:26 +0800
+Message-Id: <20260517121626.406516-1-rollkingzzc@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|LV8PR12MB9112:EE_
-X-MS-Office365-Filtering-Correlation-Id: fcaca7e1-ef6e-4ccf-a2f3-08deb40d87ac
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|18002099003|22082099003|56012099003|11063799003;
-X-Microsoft-Antispam-Message-Info:
-	8t9o2McsWa143sMFYelXEYfRLvXWEE8uc/LAdbBdu6erVRc5eJSK+dO4zyNWHkC6+ra/8xBGr+6VkbFnjIs1R1jVT54ZC+OWE+p0sYyyGIFfnmELV8hRqQ6ReNMNuu8ku9nbMBcQ94xzt7Rv3BnSoDeNiknQKZbh84JzFMAtgW8wGdEupVtfOxQt75ACUCAX6LeQdHtKPw3v419Hdd2oToMPAsnHCGrWMF91m2Yi9kl+7+0U4Urm/0YOCZE/y7jOR/m//sXnrbx8xxVSZbbssnyCcNweF9KDfxaqmJq7BF9tuDrmrjgaRW/TIQnHphklKMprcsVxtu5jKqhqOy5JE/R/QgaZ0c2rO+F3ZFeoI5oIw0RZjtEUE0CdOsZ8rdE2bZHne8mN12B9zIiOZgGuSJFK78oH9oWitSoyV5wezdLeC5dUaCudJLuVrEvS2L4mCypcM6Mh1jQ7oFHOgoZvxM4o4zjJajodocG3GjiUv0pE+dKrrWmMlXbbvS3sDj9Ik7KPC6LdZT6kGkvcbyNXom4UdmrYr1UQWKby3YrStQtAgDNLWFu+9GQugP1ConsWYqaR8JeHFzUfrSs1qmb7V9MYMhyHzn20Y3+L6nZUia+BjVmKocc3v6bj8VmmZPQf5yfjHAnhnvV6YM3MqUvKd1bi5N5wuJmO5U56cZ0Y1n8H17jVWbO9Cc9tmvbm+r75
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(18002099003)(22082099003)(56012099003)(11063799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?bVhexOCN/l05+SHizsHbKN01zTg/8wHmklgGY8n4WbHZ2lQK9ABGT7siSC2p?=
- =?us-ascii?Q?K+C/GDnTFmTxzfXMHQF94QF8pZRCYdJ1QOcKCnqf20AbBTDoyUa3WQPqnNhd?=
- =?us-ascii?Q?zGLaA6lEB2lnXv43yw3R3KxzR+9rXPtSdjjxzqNoKKV1NTTZE1SYrynPdxz7?=
- =?us-ascii?Q?SBWHCim23e8XmY1QnyXFsezYMV3YD5i4T1Z4DJVDtQ8rLutdMQqAbHV18MLc?=
- =?us-ascii?Q?vncDXoQYWJydtF2I0pRKHjqC6qZ3yGpkcOm7UOwmtseM21zRgGI+NtxfJ/Y7?=
- =?us-ascii?Q?Rb0+e9chdH/AQdZD3ZndQrq3p3NfGErSHJqSC1e6m+kddvgqrI++IoqsJLbm?=
- =?us-ascii?Q?E/+XaRv27s5d+HVYsRhdd9kaCuNz/SV4U4yYtGfLNxo4lgvcqLGkJS00FABT?=
- =?us-ascii?Q?nrxKFohr9fG31D3458tjCan4RFahCNiHcS3dFTJCixz65RNYI2K0fiVeNvKH?=
- =?us-ascii?Q?VKyevYgqCTA86LE3DjX8LLn463Btw9q98T+pgL6rtCqPSY7KkOKiNbZ4n2oI?=
- =?us-ascii?Q?uLdF899kTtypLyXuguyn/9iglxZ8MVmyOmQE3Jo+JV6A67iXwPgZJbPsrsg8?=
- =?us-ascii?Q?1N/f6ZKn0GAeH0qphTE7MUPHuYt9uDgLyP36ywAb0nB5Tu5hU5ArdBPq+tfD?=
- =?us-ascii?Q?O41kCf5IEK5ietZjWJnc3FysyBmPUkDvyLbPGDFLmJV2ZleQH+1/O4tBAHUY?=
- =?us-ascii?Q?YH19HxZgMwSEDeWHPZiBNBVbRuvbH6A/toEyBekvHRBboKGdI2CBQRlrMc9v?=
- =?us-ascii?Q?x0UzWyDwHE2ar2Ss+h6R30SrJzaNpoRcRpO8YioDzYSi/4+QZ2jm+9o1Euhs?=
- =?us-ascii?Q?m4MhFYkDR48jYXpGKA5zN+FAzYHCu5ePl7YLYTehfFzg7CG3Y/BOpkqnmbg6?=
- =?us-ascii?Q?ZNBBYlCtiHIQ/I/uWlqLmf+1swTfrFJsXx26h+GFX+s+QB0g5hsBkQKliOI7?=
- =?us-ascii?Q?IWvqWGDU/lZKWkOhl5QXPTe3mbmre8w4V2An4kXD7ZBWDk9s2WXGKsHaOXMl?=
- =?us-ascii?Q?iw+9B6H1RQdXekQ3+Zmum32E0m83K3GNXhojh0m6HpYAGoFDqSfg4IROFgiw?=
- =?us-ascii?Q?03Lw9E/K3Ts3h/qv5G1GkNiOxRdfw+dvVZvEBVCn8oVimaYBKFNxhGEU6WoR?=
- =?us-ascii?Q?oL1JiyCZV67f8oFbBDD9XSA6p/lkGMkWcQm6S/1886wHhQMJHT2jCIMTNsQm?=
- =?us-ascii?Q?8bvlIkddyMQCRSYR9usXs2QcieWIr7zarvsDjHsAp7gA+Zg+1UtuGiwN/0Ow?=
- =?us-ascii?Q?gxKe+yPPnfQIH/Wi5fMpguBbd9VqjJOvUkFrIddBR2n0wi2UkEUMPJEUy3ZE?=
- =?us-ascii?Q?zlCzXrMCJhBjCKIdSDARfreOUkghVZEmU4VGz/dMsayWgFQG1Av0WUGGWXp6?=
- =?us-ascii?Q?cUfoYElzJbEfwI8cppWU9HsP+5/uNhbGBoUJdj5ZyJlReEknO9LCc00yusA9?=
- =?us-ascii?Q?OU8F1+F1Rmqn4ETRsnD+1viTJdx8m9mOfSiVysXBHzSceousGPD3VPHAt45p?=
- =?us-ascii?Q?n+N1GQHUYC/XmD5NQ/P/PuLUmh17O1ZS1+bGwoEPmaqYeTBx7SmzqwmQoSK/?=
- =?us-ascii?Q?3nNjGvNbykMc/HnRoJ0pyVbN36AwLgK9KlFhK8d3ljnGBY4Tos9wWDYOqBBl?=
- =?us-ascii?Q?/biApF9RDj+z89sNdC6x+Oi5cF9YVfjhc2C6whuWCgzTkuz8+VfbB+HtDwP5?=
- =?us-ascii?Q?2EEEAvRPqQl5LXE4z7po9XweeubOaZy+Yrt3cwJ80AfHAxY9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fcaca7e1-ef6e-4ccf-a2f3-08deb40d87ac
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2026 12:12:13.9465
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F28b5hhg9FApCbr+hIignVwiZwD+Oa9oW4N6RSi5rnedxazm7NIJf/jas9RMoTCgz3qzqbX2SEfZURHgOuHpkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9112
-X-Rspamd-Queue-Id: A0C23560E44
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: EF34A560E86
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288728-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288729-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,cloudflare.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rollkingzzc@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Test toggling of multicast snooping when per-VLAN multicast snooping is
-enabled. The test always passes, but without "bridge: mcast: Fix
-possible use-after-free when removing a bridge port" it results in a
-splat.
+SK_MSG uses msg->sg.copy as per-scatterlist-entry provenance. Entries
+with this bit set are copied before data/data_end are exposed to SK_MSG
+BPF programs for direct packet access.
 
-Acked-by: Nikolay Aleksandrov <nikolay@nvidia.com>
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+bpf_msg_pull_data(), bpf_msg_push_data() and bpf_msg_pop_data() rewrite
+the sk_msg scatterlist ring by collapsing, splitting and shifting
+entries. These operations move msg->sg.data[] entries, but the parallel
+copy bitmap can be left behind or stale in slots that no longer contain
+the original entry. A copied entry can therefore later occupy a slot whose
+copy bit is clear and be exposed as directly writable packet data.
+
+Keep msg->sg.copy synchronized with scatterlist entry moves, preserve the
+copy bit when an entry is split, clear it when a helper replaces an entry
+with a private page, and clear every slot vacated by pull-data
+compaction.
+
+Fixes: 015632bb30da ("bpf: sk_msg program helper bpf_sk_msg_pull_data")
+Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
+Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
+Cc: stable@vger.kernel.org
+Co-developed-by: Han Guidong <2045gemini@gmail.com>
+Signed-off-by: Han Guidong <2045gemini@gmail.com>
+Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
 ---
- .../net/forwarding/bridge_vlan_mcast.sh       | 30 ++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+v2:
+Sashiko-bot pointed out that bpf_msg_pull_data() could leave stale copy
+bits on collapsed tail entries.
 
-diff --git a/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh b/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-index e8031f68200a..ebdb4c790a5d 100755
---- a/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-+++ b/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-@@ -4,7 +4,7 @@
- ALL_TESTS="vlmc_control_test vlmc_querier_test vlmc_igmp_mld_version_test \
- 	   vlmc_last_member_test vlmc_startup_query_test vlmc_membership_test \
- 	   vlmc_querier_intvl_test vlmc_query_intvl_test vlmc_query_response_intvl_test \
--	   vlmc_router_port_test vlmc_filtering_test"
-+	   vlmc_router_port_test vlmc_filtering_test vlmc_mcast_toggle_test"
- NUM_NETIFS=4
- CHECK_TC="yes"
- TEST_GROUP="239.10.10.10"
-@@ -537,6 +537,34 @@ vlmc_filtering_test()
- 	log_test "Disable multicast vlan snooping when vlan filtering is disabled"
+Clear msg->sg.copy for every entry consumed by bpf_msg_pull_data()
+before compacting the scatterlist ring.
+
+While researching recent page cache bugs, we discovered this bug.
+We confirmed it allows overwriting the page cache of read-only files
+via splice(). We haven't attempted to write an exploit, but the
+corruption primitive is verified. PoC available upon request.
+Recommend fixing ASAP.
+---
+ net/core/filter.c | 66 +++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 64 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 9590877b0714f..018c30a0d71fb 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2654,6 +2654,27 @@ static void sk_msg_reset_curr(struct sk_msg *msg)
+ 	}
  }
  
-+vlmc_mcast_toggle_test()
++static bool sk_msg_elem_is_copy(const struct sk_msg *msg, u32 i)
 +{
-+	RET=0
-+
-+	ip link add name br1-mcast up type bridge mcast_snooping 1 mcast_querier 1 vlan_filtering 1
-+	ip link add name dummy1-mcast up master br1-mcast type dummy
-+
-+	# Enabling per-VLAN multicast snooping should disable the per-port
-+	# multicast context on "dummy1-mcast".
-+	ip link set dev br1-mcast type bridge mcast_vlan_snooping 1
-+
-+	# Toggling multicast snooping on the bridge should not affect the
-+	# per-port multicast context on "dummy1-mcast" given that per-VLAN
-+	# multicast snooping is enabled.
-+	ip link set dev br1-mcast type bridge mcast_snooping 0
-+	ip link set dev br1-mcast type bridge mcast_snooping 1
-+
-+	# If both the per-port and per-{port, VLAN} multicast contexts are
-+	# enabled on "dummy1-mcast", removing it from the bridge will result
-+	# in a splat.
-+	ip link set dev dummy1-mcast nomaster
-+
-+	log_test "Toggling mcast snooping with per-VLAN mcast snooping enabled"
-+
-+	ip link del dev dummy1-mcast
-+	ip link del dev br1-mcast
++	return test_bit(i, msg->sg.copy);
 +}
 +
- trap cleanup EXIT
++static void sk_msg_set_elem_copy(struct sk_msg *msg, u32 i, bool copy)
++{
++	if (copy)
++		__set_bit(i, msg->sg.copy);
++	else
++		__clear_bit(i, msg->sg.copy);
++}
++
++static void sk_msg_clear_copy_range(struct sk_msg *msg, u32 start, u32 end)
++{
++	while (start != end) {
++		__clear_bit(start, msg->sg.copy);
++		sk_msg_iter_var_next(start);
++	}
++}
++
+ static const struct bpf_func_proto bpf_msg_cork_bytes_proto = {
+ 	.func           = bpf_msg_cork_bytes,
+ 	.gpl_only       = false,
+@@ -2738,6 +2759,7 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
+ 	} while (i != last_sge);
  
- setup_prepare
+ 	sg_set_page(&msg->sg.data[first_sge], page, copy, 0);
++	sk_msg_set_elem_copy(msg, first_sge, false);
+ 
+ 	/* To repair sg ring we need to shift entries. If we only
+ 	 * had a single entry though we can just replace it and
+@@ -2747,13 +2769,20 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
+ 	shift = last_sge > first_sge ?
+ 		last_sge - first_sge - 1 :
+ 		NR_MSG_FRAG_IDS - first_sge + last_sge - 1;
+-	if (!shift)
++	if (!shift) {
++		sk_msg_set_elem_copy(msg, msg->sg.end, false);
+ 		goto out;
++	}
++
++	i = first_sge;
++	sk_msg_iter_var_next(i);
++	sk_msg_clear_copy_range(msg, i, last_sge);
+ 
+ 	i = first_sge;
+ 	sk_msg_iter_var_next(i);
+ 	do {
+ 		u32 move_from;
++		bool move_copy;
+ 
+ 		if (i + shift >= NR_MSG_FRAG_IDS)
+ 			move_from = i + shift - NR_MSG_FRAG_IDS;
+@@ -2762,16 +2791,20 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
+ 		if (move_from == msg->sg.end)
+ 			break;
+ 
++		move_copy = sk_msg_elem_is_copy(msg, move_from);
+ 		msg->sg.data[i] = msg->sg.data[move_from];
++		sk_msg_set_elem_copy(msg, i, move_copy);
+ 		msg->sg.data[move_from].length = 0;
+ 		msg->sg.data[move_from].page_link = 0;
+ 		msg->sg.data[move_from].offset = 0;
++		sk_msg_set_elem_copy(msg, move_from, false);
+ 		sk_msg_iter_var_next(i);
+ 	} while (1);
+ 
+ 	msg->sg.end = msg->sg.end - shift > msg->sg.end ?
+ 		      msg->sg.end - shift + NR_MSG_FRAG_IDS :
+ 		      msg->sg.end - shift;
++	sk_msg_set_elem_copy(msg, msg->sg.end, false);
+ out:
+ 	sk_msg_reset_curr(msg);
+ 	msg->data = sg_virt(&msg->sg.data[first_sge]) + start - offset;
+@@ -2794,6 +2827,8 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ {
+ 	struct scatterlist sge, nsge, nnsge, rsge = {0}, *psge;
+ 	u32 new, i = 0, l = 0, space, copy = 0, offset = 0;
++	bool sge_copy = false, nsge_copy = false, nnsge_copy = false;
++	bool rsge_copy = false;
+ 	u8 *raw, *to, *from;
+ 	struct page *page;
+ 
+@@ -2866,6 +2901,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 			sk_msg_iter_var_prev(i);
+ 		psge = sk_msg_elem(msg, i);
+ 		rsge = sk_msg_elem_cpy(msg, i);
++		rsge_copy = sk_msg_elem_is_copy(msg, i);
+ 
+ 		psge->length = start - offset;
+ 		rsge.length -= psge->length;
+@@ -2891,23 +2927,31 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 	/* Shift one or two slots as needed */
+ 	sge = sk_msg_elem_cpy(msg, new);
+ 	sg_unmark_end(&sge);
++	sge_copy = sk_msg_elem_is_copy(msg, new);
+ 
+ 	nsge = sk_msg_elem_cpy(msg, i);
++	nsge_copy = sk_msg_elem_is_copy(msg, i);
+ 	if (rsge.length) {
+ 		sk_msg_iter_var_next(i);
+ 		nnsge = sk_msg_elem_cpy(msg, i);
++		nnsge_copy = sk_msg_elem_is_copy(msg, i);
+ 		sk_msg_iter_next(msg, end);
+ 	}
+ 
+ 	while (i != msg->sg.end) {
+ 		msg->sg.data[i] = sge;
++		sk_msg_set_elem_copy(msg, i, sge_copy);
+ 		sge = nsge;
++		sge_copy = nsge_copy;
+ 		sk_msg_iter_var_next(i);
+ 		if (rsge.length) {
+ 			nsge = nnsge;
++			nsge_copy = nnsge_copy;
+ 			nnsge = sk_msg_elem_cpy(msg, i);
++			nnsge_copy = sk_msg_elem_is_copy(msg, i);
+ 		} else {
+ 			nsge = sk_msg_elem_cpy(msg, i);
++			nsge_copy = sk_msg_elem_is_copy(msg, i);
+ 		}
+ 	}
+ 
+@@ -2915,13 +2959,15 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 	/* Place newly allocated data buffer */
+ 	sk_mem_charge(msg->sk, len);
+ 	msg->sg.size += len;
+-	__clear_bit(new, msg->sg.copy);
++	sk_msg_set_elem_copy(msg, new, false);
+ 	sg_set_page(&msg->sg.data[new], page, len + copy, 0);
+ 	if (rsge.length) {
+ 		get_page(sg_page(&rsge));
+ 		sk_msg_iter_var_next(new);
+ 		msg->sg.data[new] = rsge;
++		sk_msg_set_elem_copy(msg, new, rsge_copy);
+ 	}
++	sk_msg_set_elem_copy(msg, msg->sg.end, false);
+ 
+ 	sk_msg_reset_curr(msg);
+ 	sk_msg_compute_data_pointers(msg);
+@@ -2945,29 +2991,41 @@ static void sk_msg_shift_left(struct sk_msg *msg, int i)
+ 
+ 	put_page(sg_page(sge));
+ 	do {
++		bool copy;
++
+ 		prev = i;
+ 		sk_msg_iter_var_next(i);
++		copy = sk_msg_elem_is_copy(msg, i);
+ 		msg->sg.data[prev] = msg->sg.data[i];
++		sk_msg_set_elem_copy(msg, prev, copy);
+ 	} while (i != msg->sg.end);
+ 
+ 	sk_msg_iter_prev(msg, end);
++	sk_msg_set_elem_copy(msg, msg->sg.end, false);
+ }
+ 
+ static void sk_msg_shift_right(struct sk_msg *msg, int i)
+ {
+ 	struct scatterlist tmp, sge;
++	bool tmp_copy, sge_copy;
+ 
+ 	sk_msg_iter_next(msg, end);
+ 	sge = sk_msg_elem_cpy(msg, i);
++	sge_copy = sk_msg_elem_is_copy(msg, i);
+ 	sk_msg_iter_var_next(i);
+ 	tmp = sk_msg_elem_cpy(msg, i);
++	tmp_copy = sk_msg_elem_is_copy(msg, i);
+ 
+ 	while (i != msg->sg.end) {
+ 		msg->sg.data[i] = sge;
++		sk_msg_set_elem_copy(msg, i, sge_copy);
+ 		sk_msg_iter_var_next(i);
+ 		sge = tmp;
++		sge_copy = tmp_copy;
+ 		tmp = sk_msg_elem_cpy(msg, i);
++		tmp_copy = sk_msg_elem_is_copy(msg, i);
+ 	}
++	sk_msg_set_elem_copy(msg, msg->sg.end, false);
+ }
+ 
+ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+@@ -3024,8 +3082,10 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 	 */
+ 	if (start != offset) {
+ 		struct scatterlist *nsge, *sge = sk_msg_elem(msg, i);
++		u32 sge_idx = i;
+ 		int a = start - offset;
+ 		int b = sge->length - pop - a;
++		bool sge_copy = sk_msg_elem_is_copy(msg, sge_idx);
+ 
+ 		sk_msg_iter_var_next(i);
+ 
+@@ -3038,6 +3098,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 				sg_set_page(nsge,
+ 					    sg_page(sge),
+ 					    b, sge->offset + pop + a);
++				sk_msg_set_elem_copy(msg, i, sge_copy);
+ 			} else {
+ 				struct page *page, *orig;
+ 				u8 *to, *from;
+@@ -3054,6 +3115,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 				memcpy(to, from, a);
+ 				memcpy(to + a, from + a + pop, b);
+ 				sg_set_page(sge, page, a + b, 0);
++				sk_msg_set_elem_copy(msg, sge_idx, false);
+ 				put_page(orig);
+ 			}
+ 			pop = 0;
 -- 
-2.54.0
-
+2.43.0
 
