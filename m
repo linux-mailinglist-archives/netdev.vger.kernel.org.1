@@ -1,53 +1,87 @@
-Return-Path: <netdev+bounces-288785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288786-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKY5JL5DCmqyyQQAu9opvQ
-	(envelope-from <netdev+bounces-288785-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:39:58 +0200
+	id 77WsKd5ECmprygQAu9opvQ
+	(envelope-from <netdev+bounces-288786-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:44:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112A3564313
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:39:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF3BA564344
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 712453006F08
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 22:39:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 44CE330067A8
+	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 22:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1242A3C0617;
-	Sun, 17 May 2026 22:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E86F330B28;
+	Sun, 17 May 2026 22:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc6s6Az9"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="mZqUhPq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43282F7F19
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D9F302753
+	for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779057594; cv=none; b=ClNXzNog3mUsCz+cXxg3G8WN2q9rbur+is25r8FjYNfEKFP4UbdCHryMnbmmNzG4Ni/M8KtIAd56oOIHCnDt4RLh+6QYSgxwFf1s2c3ciJ46zusGHIhNPr7T5yfLpVusjpNPmIqqR7HLj3uTiuvFBygOm3YUL3MnT2AaGpt34L0=
+	t=1779057882; cv=none; b=YrrSbbCSlj3YON/96kmmuFHYMqv+Nqq7TOwRs1Ns/V3H0KOmvTgvz96f68QvVc0Q30T24Z/69fE1M9YrbpKUchBRAqWFQk7xP13yxyp5uCKwxgA73Yd1IFULK2R4b4FS+pUYQ9vF4AEXSm2ai4IjI+m026DS44UIShJYv0duHeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779057594; c=relaxed/simple;
-	bh=R0Iv+fBFrWEXjMq5mik6ej8jbc+LV+EAnntgfouQrsI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=M1mZcn5C5rSOTUF2GW6IpWVGfffET5l/tEC9mqAfQZTZCmbp+YF8qMFgzahUzEWuc4ayXcl9pVPzhpAk3bFZEZfc1oIX9bawxid5e0kmRrPBFt6WeUgh0YFka6wzPfOOxj5lkG6yn7U866TCehf/rbxYi0M5cn9Ch/wvY0UgtsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc6s6Az9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69C21C2BCB0;
-	Sun, 17 May 2026 22:39:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779057593;
-	bh=R0Iv+fBFrWEXjMq5mik6ej8jbc+LV+EAnntgfouQrsI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Uc6s6Az9SFHfk/QW85pbnZhy+9zXiV3iDiwuh/DwtmaPAHbZYda9aBLiHFyn+pCJn
-	 hOwlhdOD8NskP2RIduhwWzgLaCr5zYWdC5Esxvu3YuihNVwis50I0bYXrB+Rs824rj
-	 QkXw1Dm1CNfPCVniLHrrAuGVbC073bfCu/DjN9PxMHCe/S2tANj00ItwXmH59f+l5t
-	 6BAtOOLrMJhm+uDR02NrjIgPr2QifNEYoLDPVuloBpR5tTyvufPpmGizzkM7qn1WSK
-	 uApAVXedKrH3HhshFJnK2viQjgXRevfYbY5UhzmgJw4LNXdUmVRagtOjL8t9QWdIQ4
-	 ZFldJeW6Tb7zA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939C23930B8B;
-	Sun, 17 May 2026 22:40:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1779057882; c=relaxed/simple;
+	bh=02wpFiJeH5kYYp1HHxt4KWdt6ETCTBYwpOzaF81A0dY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYGU8oH/SFIcWhd6G2J0f+mDBRY5rwQVxiBGSplJryA+vdTzzvdBjqVajZoHfrBpkRL1vF2B7Rj4ZYxaJHSJTLgAVPwIz9Pfy+TMxzrDUa22I6NzyMOVvhT4IJ59u3TzTXpR5R4chlDKg+6fGvQfQ9dwfhVIX8JpVu/+Lh9ymZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=mZqUhPq4; arc=none smtp.client-ip=74.125.82.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-2f36da5c8fbso1290970eec.0
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 15:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1779057880; x=1779662680; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=F1ayTVD/Q0qC/3pKC3zpho9UU3KuxGY9jFZpz9NhE6s=;
+        b=mZqUhPq4pCfwO0SanWsbepaNOm5r1hMImeVvoj7igIUVOf6G3cFmHFe52QeDWatZ6c
+         0kzd74C5BYtk6gxkn/LDn8fhP39h3+TnZ/tvRXJ0/2Q4now/5ZewBYFKSrrue/nzS7/5
+         B0QQHPlWx6CPZqVwyCFlV68nm0Wh3QZXcvYpCwa+bpJRFuu1box9OQZdUXj6mEhee9Dm
+         72b/NgqSDbmxGLDxWvkQ/xKalzfmq17b7cvnCq6xMiPsYwK6jewWDm7nHCgn1MwVzITv
+         QsbrAw3fGX5wzV8slHQyjtBWO1cqOJWLaaHtFHm1BYPn4KzCqRm0n2v+TF493zEsNaRt
+         fPBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779057880; x=1779662680;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F1ayTVD/Q0qC/3pKC3zpho9UU3KuxGY9jFZpz9NhE6s=;
+        b=bLrvNbNlmjZH4+8fEujFAYy6W5jp7txNffm5Dl3BW01LFOGcTedjsPeH1Y9ItLQWQK
+         HiCH+b9/r+/fMmhPO1ELyuQ5QmGCFn3DVAiAeULkyi/I1X3L1hS+05Cqwn/2NknDE1OU
+         A1J5YZROw8wxaswzz2ED4Rj6vGDPnAYc3By+kcGc9tXQ4Qs0J22/wyuSBj5q3ud2fP3v
+         +TH+bmtRVdS3afACGwxYgtKHJtzgnhbIdknSRfmYU2Bn+HOp34pvJLleS7pE+8KF2k+6
+         deuRHCZ+wea3yPfS7CO7knmaF3R7Mp0RG6g6B4UpMs3U5LMID5LxbXXbKGkEnXN6OWYb
+         0gOA==
+X-Gm-Message-State: AOJu0YwDHx8bTyrZZ203Ug5dcUqlc7/7GWcG94X7C6SiXyFaQQbLZpGC
+	ZMtROKAomVzZikgSqAHvKvgx1SznbmWpklJdAMas4MBHGZar6mEI9siVfkT41fFwsmuiUI871R5
+	we+WNNWk=
+X-Gm-Gg: Acq92OED5gLdMd6nO4gk5f4qyViIvIyOrwRHAlKrMRc09Oru7oRgSPTMyqL8djdRHma
+	xFQUXC7yGiXlrbSRX97YQbZnwQwNdLvSZ+ebecm492pbi+iu4TnrK5Fe8B08hA2k6Y3dihpwyXc
+	S2g8WkDqnTWY6BKasWCoGphN6IoahisWhKQwdEiOf+vz4zhFLdXMoVWrJgAcYswKsGcGgP4rmKR
+	zB8fgjF8oxQOTL9MVALbP7uWvsl9HcgxvfsD1LB3ka04owtSt2Dny9+h7T/bfOL7FzRPFhsNWsz
+	WEAg/m2c3QuMbEKsq0I+tXW7x0pYtvwdlk8+T0+RKbfXyq7B2v7+d1Lu0DGoBqnwczbfqHU3Gh9
+	e2YL1nhIIguvq4/no217nAPRc+d+2ViTNCIm7OwmzTypIN+M8NTaf+ZhRrofYrl2ZZX2O0A9yh1
+	YXLNVYC2VdLxh7BJMAiWrQ9hDLnOof1N24
+X-Received: by 2002:a05:7300:cb15:b0:2da:44ac:6d17 with SMTP id 5a478bee46e88-30398655327mr6426971eec.17.1779057880321;
+        Sun, 17 May 2026 15:44:40 -0700 (PDT)
+Received: from phoenix.lan ([104.202.41.210])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302973bc9d4sm12280249eec.23.2026.05.17.15.44.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 15:44:39 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Christian Iacobellis <Ciacobellis@agea.com.ar>
+Subject: [PATCH iproute2-next] routel: handle errors from ip command
+Date: Sun, 17 May 2026 15:44:37 -0700
+Message-ID: <20260517224437.164919-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,78 +89,118 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next 1/2] dpll: align help and man notation with
- actual option parsing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177905760539.1131623.3707450063145275135.git-patchwork-notify@kernel.org>
-Date: Sun, 17 May 2026 22:40:05 +0000
-References: <20260512135225.167158-1-poros@redhat.com>
-In-Reply-To: <20260512135225.167158-1-poros@redhat.com>
-To: Petr Oros <poros@redhat.com>
-Cc: netdev@vger.kernel.org, ivecera@redhat.com, dsahern@kernel.org,
- stephen@networkplumber.org, vgrinber@redhat.com
-X-Rspamd-Queue-Id: 112A3564313
+X-Rspamd-Queue-Id: DF3BA564344
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288785-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288786-lists,netdev=lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,networkplumber.org:email]
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,networkplumber.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber-org.20251104.gappssmtp.com:dkim,subprocess.run:url]
 X-Rspamd-Action: no action
 
-Hello:
+When ip exits non-zero, routel crashed with a JSONDecodeError traceback
+on top of ip's own diagnostic. Use subprocess.run with check=True,
+propagate ip's exit status, handle a missing ip binary, and wrap the
+JSON parse so malformed output gives a clean message.
 
-This series was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+While here, send diagnostics to stderr and drop the assert-as-control-
+flow (stripped under python -O).
 
-On Tue, 12 May 2026 15:52:24 +0200 you wrote:
-> dpll uses getopt_long(), which only accepts long options with the
-> "--" prefix.  The iproute2-wide "-X[name]" shorthand used in the
-> help text and man page implies a single-dash long form
-> (e.g. -Version, -json, -pretty) that getopt_long does not parse;
-> only -V/--Version, -j/--json and -p/--pretty actually work.
-> 
-> Replace the misleading shorthand with explicit "-V | --Version"
-> style so the documented forms match what the parser accepts, and
-> drop the redundant second usage line in help() that listed only a
-> subset of the options and implied dpll could be invoked without an
-> OBJECT.  No functional change.
-> 
-> [...]
+Fixes: 6d676ad93408 ("ip: rewrite routel in python")
+Reported-by: Christian Iacobellis <Ciacobellis@agea.com.ar>
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ ip/routel | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
-Here is the summary with links:
-  - [iproute2-next,1/2] dpll: align help and man notation with actual option parsing
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=62d47c2dbc0e
-  - [iproute2-next,2/2] dpll: monitor: add -t/--timestamp and --tshort options
-    (no matching commit)
-
-You are awesome, thank you!
+diff --git a/ip/routel b/ip/routel
+index 09a90126..51b02d21 100755
+--- a/ip/routel
++++ b/ip/routel
+@@ -13,7 +13,8 @@ import subprocess
+ 
+ def usage():
+     '''Print usage and exit'''
+-    print("Usage: {} [tablenr [raw ip args...]]".format(sys.argv[0]))
++    print("Usage: {} [tablenr [raw ip args...]]".format(sys.argv[0]),
++          file=sys.stderr)
+     sys.exit(64)
+ 
+ 
+@@ -23,7 +24,7 @@ def main():
+     try:
+         opts, args = getopt.getopt(sys.argv[1:], "h46f:", ["help", "family="])
+     except getopt.GetoptError as err:
+-        print(err)
++        print(err, file=sys.stderr)
+         usage()
+ 
+     for opt, arg in opts:
+@@ -36,14 +37,29 @@ def main():
+         elif opt in ["-f", "--family"]:
+             family = arg
+         else:
+-            assert False, "unhandled option"
++            raise RuntimeError("unhandled option " + opt)
+ 
+     if not args:
+         args = ['0']
+ 
+     cmd = ['ip', '-f', family, '-j', 'route', 'list', 'table'] + args
+-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+-    tbl = json.load(process.stdout)
++    try:
++        result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
++    except FileNotFoundError:
++        print("{}: ip: command not found".format(sys.argv[0]),
++              file=sys.stderr)
++        sys.exit(1)
++    except subprocess.CalledProcessError as err:
++        # ip has already written its own diagnostic to stderr
++        sys.exit(err.returncode)
++
++    try:
++        tbl = json.loads(result.stdout)
++    except json.JSONDecodeError as err:
++        print("{}: cannot parse ip output: {}".format(sys.argv[0], err),
++              file=sys.stderr)
++        sys.exit(1)
++
+     if family == 'inet':
+         fmt = '{:15} {:15} {:15} {:8} {:8}{:<16} {}'
+     else:
+@@ -54,7 +70,7 @@ def main():
+     print(fmt.format(*map(lambda x: x.capitalize(), keys)))
+ 
+     for record in tbl:
+-        fields = [record[k] if k in record else '' for k in keys]
++        fields = [record.get(k, '') for k in keys]
+         print(fmt.format(*fields))
+ 
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.53.0
 
 
