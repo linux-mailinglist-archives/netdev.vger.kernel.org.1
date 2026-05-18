@@ -1,298 +1,280 @@
-Return-Path: <netdev+bounces-289073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KIbTIzgVC2o5/wQAu9opvQ
-	(envelope-from <netdev+bounces-289073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:33:44 +0200
+	id uO5xFOIVC2o5/wQAu9opvQ
+	(envelope-from <netdev+bounces-289074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:36:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A83456DB02
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:33:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6DF356DBD6
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6B8F13016D31
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 13:33:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A14203005D12
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 13:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B950481A93;
-	Mon, 18 May 2026 13:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="K9ypW/vP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C51A481A80;
+	Mon, 18 May 2026 13:34:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE586DCE1
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 13:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A524740FD80
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 13:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779111203; cv=none; b=MM/ELcG/6pEmOBZqydFbaZVjYZKVKIZyQNr+ytRDS/72JARIwCznk2GXK/LCFpAKhopxNaKAh+JteGmE2fOAu71Cvfc/ctxGby00FesokexHvhhlAhduEcKBvawY16+NGDBy1CH4DWlLXxKOXbyx0z01+iqWYZTMqJYgPqpEGd4=
+	t=1779111269; cv=none; b=jd+q4N4NwbiRZbAs+t7cAVAgCXWMHJCyRUVIGxQLwgik13lkyeFwKWqWDqIOUf2ezRsS5NEDJiiUzf8TZ4M7EXTm8Dn4kuQWzoXNOIa7YvR19AYfsercJ2c8LMBuvBAV2CBgT1reEyWKMd8CXkraxD+uxjWodY/IbgOdf5KBlN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779111203; c=relaxed/simple;
-	bh=q+NL498EPwlLrfBIQdB3BECdx05b64cjxCXzpG0xTJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sWNN5KGUTWae51j70FTXa5REQnFLGZl1+gvAlWcpFMdIGyFyzdE+qeLgIy0Y8mIZo90JnvqDMtFh9i8wwzpv2GsMcb+FQ40+xGe8B2OQ/5j0L1BnMUfxUJNU5jwseCRO/OTt2ugjKTV39mU0pvFoueRZvUkrXTpkfTsNOB6md1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=K9ypW/vP; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-44509921fbcso1332401f8f.3
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 06:33:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1779111198; x=1779715998; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BwVMqQgkml/57c5J8ItJqxnkkdNf36+YjPY4g30oVbw=;
-        b=K9ypW/vPEm9WqgHZl5wgy2AW2uUV4yXgFdMLe9heFd970EZZXnrrSMnNj+wRJYifbM
-         8glk9iOKdEsfCWo6DcTo0GUf6TRBJ9KTLkCnoEOsW3z1JXUSPuqRjuP254HXJG2XMW09
-         S50BfKTO61KnpUfVJoYIPM8Sv0aVrll9JlWbVH+u4CgFxYfD6edSA5UNITczMs9rbUGN
-         X12VDZfoAnRMt1eCHm+40w+Z3dx+uaBuI3R0wbtx5ezRuC8OupJKhnpywQ7jVakXjlXK
-         Tjl9k7NS9Zm21rVm5QE7aKoBQXIiazayCRVGYWCZj65T+kXI2SlHmsKl2LA2RIgcyte+
-         8vNw==
+	s=arc-20240116; t=1779111269; c=relaxed/simple;
+	bh=Pn2mFhL6CaBTMy3GCk0GmhF0mTYoLWDtdZGpW5U6iXA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hytyHfpBYG4E5Ks9iApQgTdBAM184QUZVxMBKErNJTjajUa64TkaqkBce5Yh0axUCMIGaY7I0Kp8/ydgOs7pNF+pbgI2/LVOHjRSLo1vBFuE8H1hRbPhgTQAuah0UyBqbK3mGmgNl7OwKZ2fjciCYvsLPtnHo3S/UuBMAPJI/GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-4398773e510so2145610fac.3
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 06:34:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779111198; x=1779715998;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BwVMqQgkml/57c5J8ItJqxnkkdNf36+YjPY4g30oVbw=;
-        b=ec8ANQj+QPeItrrnmyRWEOG8DqofrjiTB8MxOkxgey5BBcLIQj7RZtGFl+p+ONJ16m
-         yz7zxhScwL0R4RKIz/dYQAuXR615ZgkwtO79SEZVJM2QcYT0A9BqNumOdM56fkcBOiY2
-         tO+2pZG5ylwjP7eoSWVhfJEmdNAUYsC92xplFnx3kc9WtZGIwPORge4laZf9Va0xwOev
-         hSEUyGK/fIheyWjrjnxxsR7g/gPCEjGWCbXLP/61zA+o8TNilkWI3S+ZyW4PCZ5aVaHW
-         tQg6MkaPIbHhls9XsipWKPdEzRyB6j8RoT+nRAXH8mRCXuLoNc7jttNPHUfchVnHf8+A
-         lGjw==
-X-Gm-Message-State: AOJu0YzEZpde3IDjoO5EPYgcDKe/g4Son/u0AlFJbvCFhJbaNWOPQn5v
-	Ukm5Az3R0I+3hgDhDQYWhUwqx3n8tOTrtz6zDciJiE5Xnu3P8D0akuHUe17RSWdStZlLUrlTqNj
-	SeM3M
-X-Gm-Gg: Acq92OFl3ux0JuJH6seNy6JHgrYGgrBHpFt/fHLE9fDY8uBHZQuZ9MPibfKfolq0DsN
-	ocRsUdFbff7kKK535cq6tSO95o/1H+cV+JGakvQmw3oR0bQFjx8lnp/fV/UUdGMZxRf/iuVmq6O
-	evuLJ7Ti305E4zupq/nXn68VdXQQMTyE6o7HE8qc/2fj8A4mbh9ew0f7ujq+c8YVChCgW0RrKWf
-	iSTT27k8H07HfVY7SR2u5z7pndPm5c94Qof80wTDFpaMHpD5tZ6i6Hy9La86+LKCSw3kgJgt104
-	y7psiaEuGnvJa8CFb+1lwNQT0X9bfMWP9Wt5Y4jWV0ZqyYci5aTJAXOL/YVUi/9mIjsGZRCjBIk
-	vIOAhc4OLwqXN30wJNBXAAYS3GQDvBPVTaVi2YL6B9uiFWoZBqZ5ANoax2oxli6a9vsFayIkknh
-	u/afSLPhzw53vtZSgYeECC0zu8vXG5Q0Jo88iybcOGPw9gC3Se8j4I4jHw9d40UkD8529vpQqHf
-	dB6XByd7f1a9w==
-X-Received: by 2002:a05:600c:3f0f:b0:48f:99a9:bbcc with SMTP id 5b1f17b1804b1-48fe60ecb9cmr214543795e9.10.1779111197564;
-        Mon, 18 May 2026 06:33:17 -0700 (PDT)
-Received: from localhost (p200300f65f47db04e77777300859e43d.dip0.t-ipconnect.de. [2003:f6:5f47:db04:e777:7730:859:e43d])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-48fe537c788sm243844645e9.12.2026.05.18.06.33.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 06:33:17 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: netdev@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Ian Ray <ian.ray@gehealthcare.com>,
-	Carl Lee <carl.lee@amd.com>,
-	Tomasz Unger <tomasz.unger@yahoo.pl>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] nfc: Use named initializers for struct i2c_device_id
-Date: Mon, 18 May 2026 15:33:11 +0200
-Message-ID: <20260518133311.644160-2-u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
+        d=1e100.net; s=20251104; t=1779111266; x=1779716066;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qJ8tWaye7oXuGI3Og5Cutpuk+MQQBLH3Fypi3gFwBF8=;
+        b=cFaC1q6O+l+TkYOx8gS0LUuHNP5efnZ/tVXaiSt1BcY6L2IgsdBzN7qbHO8PYu73CP
+         QKr/3numnvFu5mIafi2CAE4cCLgtDXo6EDnjznuxHPspNjV0Rfn69KB2jgHee6DuhQ8A
+         torxI1Ryxe6LW2w5F7644vqfDfdjyRjRsNkw1t/4ucJWzLmSdJby0ZXzuVIV5OVXIV1w
+         oGTTORuMIx0olb6SoJCabsCEei0MUHhV+gOYipsBZtwLxcMuyv6qwhvvrtqDvEKkjvX1
+         n0SqXhRG15+uDY2ZjjSeBpVueoFUBbb+3Oj5+5PJLaJHd58ZOk7Oifm/SOFx/EbtnaH3
+         Yw6w==
+X-Forwarded-Encrypted: i=1; AFNElJ9HOTxIRCubKKrZUZEHCcvEwo19R63VWPDuM2VsJeO0Q0Nah2QTF5zZhmyx0bMYr2As6Yyfubw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSzrNiI7TbYc7ls5XaDGHNDZEirsT5GnfxyPW2ILTjeML96FYC
+	GxqB0I2ylUG0z5HCZcCrRRCJefCsXJIKVxJep+ltpIEA7KYpD5O0mfUqv6UQV4+ACTnqmyecZa0
+	ZYuWP0gdzyzbv+X5e973xENstvwmoh8LSbxfgpuiTdys2pvulrQwP6X8Q4H0=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5358; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=q+NL498EPwlLrfBIQdB3BECdx05b64cjxCXzpG0xTJ0=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqCxUXThEW6Nq13Oz81FfCrtatidoB3q7GafQ65 dmkO2+lBbKJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCagsVFwAKCRCPgPtYfRL+ TqsiB/0XWNdPHkDty7XNjYW9I9f5kgKbFADXrVc3AqBxY4nfHJkTfPVX5o+CQEJ+NfEmvfNWvHl A0/Zx5xQvJmJmSuUgviIT0/4p2QbOh2MMARHD2dflqWmjEbdaObReOp2AiXx1ZZno4TcWuq3/Bs cQKq59gTy5CwtGmz+DYEwStMmOW3FdXAH8dGU7dfyz88KRLZgSgdPj47P0dIvvuSGWfT1ZZ7i2d RJVDDGam3ovd4yNKjrLnaWLEZY6L+hzu9mccMFJLLb4d7fvtT7AYuGhsAFg4mrE30iLTMmmRQSt PfRJemSMacCnxWEVZ0Z7OwuHEgFPFyGvmG2+b5wU1VzKbqpD
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6A83456DB02
-X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Received: by 2002:a05:6820:3103:b0:696:6440:9e2a with SMTP id
+ 006d021491bc7-69c9437a8fdmr8773023eaf.29.1779111266594; Mon, 18 May 2026
+ 06:34:26 -0700 (PDT)
+Date: Mon, 18 May 2026 06:34:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a0b1562.050a0220.67a24.012e.GAE@google.com>
+Subject: [syzbot] [net?] INFO: task hung in svc_listen (2)
+From: syzbot <syzbot+3febffd6d2ea432770c6@syzkaller.appspotmail.com>
+To: 3chas3@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-atm-general@lists.sourceforge.net, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[baylibre-com.20251104.gappssmtp.com:s=20251104];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289073-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	FREEMAIL_CC(0.00)[kernel.org,linux.intel.com,gehealthcare.com,amd.com,yahoo.pl,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,lists.sourceforge.net,vger.kernel.org,redhat.com,googlegroups.com];
+	TAGGED_FROM(0.00)[bounces-289074-lists,netdev=lfdr.de,3febffd6d2ea432770c6];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,goo.gl:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,googlegroups.com:email,appspotmail.com:email,storage.googleapis.com:url];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre-com.20251104.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RBL_SENDERSCORE_REPUT_BLOCKED(0.00)[172.234.253.10:from];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre-com.20251104.gappssmtp.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,baylibre.com:email,baylibre.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: A6DF356DBD6
 X-Rspamd-Action: no action
+X-Rspamd-Server: lfdr
 
-While being less compact, using named initializers allows to more easily
-see which members of the structs are assigned which value without having
-to lookup the declaration of the struct. And it's also more robust
-against changes to the struct definition.
-
-While touching all these arrays, unify usage of whitespace in the list
-terminator.
-
-This patch doesn't modify the compiled arrays, only their representation
-in source form benefits. The former was confirmed with x86 and arm64
-builds.
-
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
----
 Hello,
 
-this patch is part of a bigger quest to use named initializers for
-mainly struct i2c_device_id::driver_data to be able to modify
-i2c_device_id. See e.g.
-https://lore.kernel.org/all/20260518111203.639603-2-u.kleine-koenig@baylibre.com/
-for the details.
+syzbot found the following issue on:
 
-This patch here isn't critical for this quest, as no driver makes use of
-.driver_data, so apart from the better readability this is only about
-consistency with other subsystems.
+HEAD commit:    aaec7096f996 net: hsr: defer node table free until after R..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=10fe2536580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0
+dashboard link: https://syzkaller.appspot.com/bug?extid=3febffd6d2ea432770c6
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10bdd02e580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13a5e02e580000
 
-According to MAINTAINERS the nfc subsystem is orphaned, so I hope
-someone feels responsible to pick up this patch.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2e91c83cade4/disk-aaec7096.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8ec0ff6fa021/vmlinux-aaec7096.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b593c2df20a5/bzImage-aaec7096.xz
 
-Best regards
-Uwe
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3febffd6d2ea432770c6@syzkaller.appspotmail.com
 
- drivers/nfc/microread/i2c.c | 2 +-
- drivers/nfc/nfcmrvl/i2c.c   | 4 ++--
- drivers/nfc/nxp-nci/i2c.c   | 4 ++--
- drivers/nfc/pn533/i2c.c     | 4 ++--
- drivers/nfc/pn544/i2c.c     | 4 ++--
- drivers/nfc/s3fwrn5/i2c.c   | 4 ++--
- drivers/nfc/st-nci/i2c.c    | 4 ++--
- drivers/nfc/st21nfca/i2c.c  | 4 ++--
- 8 files changed, 15 insertions(+), 15 deletions(-)
+INFO: task syz.4.342:7421 blocked for more than 143 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.4.342       state:D stack:27032 pid:7421  tgid:7420  ppid:5800   task_flags:0x400140 flags:0x00080002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5388 [inline]
+ __schedule+0x1821/0x5740 kernel/sched/core.c:7189
+ __schedule_loop kernel/sched/core.c:7268 [inline]
+ schedule+0x164/0x360 kernel/sched/core.c:7283
+ svc_listen+0x2c3/0x500 net/atm/svc.c:311
+ __sys_listen_socket net/socket.c:1987 [inline]
+ __sys_listen net/socket.c:2002 [inline]
+ __do_sys_listen net/socket.c:2007 [inline]
+ __se_sys_listen net/socket.c:2005 [inline]
+ __x64_sys_listen+0x1c7/0x240 net/socket.c:2005
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fa947d9ce59
+RSP: 002b:00007fa948b90028 EFLAGS: 00000246 ORIG_RAX: 0000000000000032
+RAX: ffffffffffffffda RBX: 00007fa948015fa0 RCX: 00007fa947d9ce59
+RDX: 0000000000000000 RSI: 0000000000000081 RDI: 0000000000000004
+RBP: 00007fa947e32d6f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fa948016038 R14: 00007fa948015fa0 R15: 00007ffdf1c6c548
+ </TASK>
 
-diff --git a/drivers/nfc/microread/i2c.c b/drivers/nfc/microread/i2c.c
-index f00cff7f9693..f45e883b8730 100644
---- a/drivers/nfc/microread/i2c.c
-+++ b/drivers/nfc/microread/i2c.c
-@@ -276,7 +276,7 @@ static void microread_i2c_remove(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id microread_i2c_id[] = {
--	{ MICROREAD_I2C_DRIVER_NAME },
-+	{ .name = MICROREAD_I2C_DRIVER_NAME },
- 	{ }
- };
- MODULE_DEVICE_TABLE(i2c, microread_i2c_id);
-diff --git a/drivers/nfc/nfcmrvl/i2c.c b/drivers/nfc/nfcmrvl/i2c.c
-index 39ecf2aeda80..66877a7d03f2 100644
---- a/drivers/nfc/nfcmrvl/i2c.c
-+++ b/drivers/nfc/nfcmrvl/i2c.c
-@@ -252,8 +252,8 @@ static const struct of_device_id of_nfcmrvl_i2c_match[] __maybe_unused = {
- MODULE_DEVICE_TABLE(of, of_nfcmrvl_i2c_match);
- 
- static const struct i2c_device_id nfcmrvl_i2c_id_table[] = {
--	{ "nfcmrvl_i2c" },
--	{}
-+	{ .name = "nfcmrvl_i2c" },
-+	{ }
- };
- MODULE_DEVICE_TABLE(i2c, nfcmrvl_i2c_id_table);
- 
-diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
-index b3d34433bd14..19b019e3557f 100644
---- a/drivers/nfc/nxp-nci/i2c.c
-+++ b/drivers/nfc/nxp-nci/i2c.c
-@@ -322,8 +322,8 @@ static void nxp_nci_i2c_remove(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id nxp_nci_i2c_id_table[] = {
--	{ "nxp-nci_i2c" },
--	{}
-+	{ .name = "nxp-nci_i2c" },
-+	{ }
- };
- MODULE_DEVICE_TABLE(i2c, nxp_nci_i2c_id_table);
- 
-diff --git a/drivers/nfc/pn533/i2c.c b/drivers/nfc/pn533/i2c.c
-index 132c050a365d..94aca9119f0f 100644
---- a/drivers/nfc/pn533/i2c.c
-+++ b/drivers/nfc/pn533/i2c.c
-@@ -249,8 +249,8 @@ static const struct of_device_id of_pn533_i2c_match[] __maybe_unused = {
- MODULE_DEVICE_TABLE(of, of_pn533_i2c_match);
- 
- static const struct i2c_device_id pn533_i2c_id_table[] = {
--	{ PN533_I2C_DRIVER_NAME },
--	{}
-+	{ .name = PN533_I2C_DRIVER_NAME },
-+	{ }
- };
- MODULE_DEVICE_TABLE(i2c, pn533_i2c_id_table);
- 
-diff --git a/drivers/nfc/pn544/i2c.c b/drivers/nfc/pn544/i2c.c
-index b31b5bef7187..dcfa96bd4345 100644
---- a/drivers/nfc/pn544/i2c.c
-+++ b/drivers/nfc/pn544/i2c.c
-@@ -44,8 +44,8 @@
- 					 PN544_HCI_I2C_LLC_MAX_PAYLOAD)
- 
- static const struct i2c_device_id pn544_hci_i2c_id_table[] = {
--	{ "pn544" },
--	{}
-+	{ .name = "pn544" },
-+	{ }
- };
- 
- MODULE_DEVICE_TABLE(i2c, pn544_hci_i2c_id_table);
-diff --git a/drivers/nfc/s3fwrn5/i2c.c b/drivers/nfc/s3fwrn5/i2c.c
-index 91b8d1445efd..e9a34d27a369 100644
---- a/drivers/nfc/s3fwrn5/i2c.c
-+++ b/drivers/nfc/s3fwrn5/i2c.c
-@@ -205,8 +205,8 @@ static void s3fwrn5_i2c_remove(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id s3fwrn5_i2c_id_table[] = {
--	{ S3FWRN5_I2C_DRIVER_NAME },
--	{}
-+	{ .name = S3FWRN5_I2C_DRIVER_NAME },
-+	{ }
- };
- MODULE_DEVICE_TABLE(i2c, s3fwrn5_i2c_id_table);
- 
-diff --git a/drivers/nfc/st-nci/i2c.c b/drivers/nfc/st-nci/i2c.c
-index 416770adbeba..9ae839a6f5cc 100644
---- a/drivers/nfc/st-nci/i2c.c
-+++ b/drivers/nfc/st-nci/i2c.c
-@@ -257,8 +257,8 @@ static void st_nci_i2c_remove(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id st_nci_i2c_id_table[] = {
--	{ ST_NCI_DRIVER_NAME },
--	{}
-+	{ .name = ST_NCI_DRIVER_NAME },
-+	{ }
- };
- MODULE_DEVICE_TABLE(i2c, st_nci_i2c_id_table);
- 
-diff --git a/drivers/nfc/st21nfca/i2c.c b/drivers/nfc/st21nfca/i2c.c
-index 6d7861383806..aa5f4922b6b0 100644
---- a/drivers/nfc/st21nfca/i2c.c
-+++ b/drivers/nfc/st21nfca/i2c.c
-@@ -572,8 +572,8 @@ static void st21nfca_hci_i2c_remove(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id st21nfca_hci_i2c_id_table[] = {
--	{ ST21NFCA_HCI_DRIVER_NAME },
--	{}
-+	{ .name = ST21NFCA_HCI_DRIVER_NAME },
-+	{ }
- };
- MODULE_DEVICE_TABLE(i2c, st21nfca_hci_i2c_id_table);
- 
+Showing all locks held in the system:
+1 lock held by khungtaskd/31:
+ #0: ffffffff8e95cda0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #0: ffffffff8e95cda0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+ #0: ffffffff8e95cda0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6775
+6 locks held by kworker/u8:3/48:
+5 locks held by kworker/u8:7/153:
+ #0: ffff8880b873aea0 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x31/0x150 kernel/sched/core.c:652
+ #1: ffff8880b8724588 (psi_seq){-.-.}-{0:0}, at: psi_task_switch+0x53/0x880 kernel/sched/psi.c:933
+ #2: ffff8880b8726118 (&base->lock){-.-.}-{2:2}, at: __mod_timer+0x8ee/0xf30 kernel/time/timer.c:1117
+ #3: ffffffff9a6b8cf0 (&obj_hash[i].lock){-.-.}-{2:2}, at: debug_object_activate+0x83/0x580 lib/debugobjects.c:835
+ #4: ffffffff8e95cda0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #4: ffffffff8e95cda0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+ #4: ffffffff8e95cda0 (rcu_read_lock){....}-{1:3}, at: class_rcu_constructor include/linux/rcupdate.h:1181 [inline]
+ #4: ffffffff8e95cda0 (rcu_read_lock){....}-{1:3}, at: unwind_next_frame+0xa6/0x2550 arch/x86/kernel/unwind_orc.c:495
+8 locks held by kworker/u8:9/3273:
+2 locks held by getty/5386:
+ #0: ffff888032a2e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc900032332e8 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x45c/0x13a0 drivers/tty/n_tty.c:2211
+1 lock held by syz.4.342/7421:
+ #0: ffff8880349b6260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
+ #0: ffff8880349b6260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: svc_listen+0x13f/0x500 net/atm/svc.c:295
+1 lock held by syz.1.414/7744:
+ #0: ffff8880222c7260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
+ #0: ffff8880222c7260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: svc_listen+0x13f/0x500 net/atm/svc.c:295
+1 lock held by syz.3.611/8709:
+ #0: ffff88807cccf260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
+ #0: ffff88807cccf260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: svc_listen+0x13f/0x500 net/atm/svc.c:295
+1 lock held by syz.6.637/8830:
+ #0: ffff88801bbae260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
+ #0: ffff88801bbae260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: svc_listen+0x13f/0x500 net/atm/svc.c:295
+1 lock held by syz.0.742/9319:
+ #0: ffff88802a79a260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
+ #0: ffff88802a79a260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: svc_listen+0x13f/0x500 net/atm/svc.c:295
+1 lock held by syz.9.990/10528:
+ #0: ffff8880352ba260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
+ #0: ffff8880352ba260 (sk_lock-AF_ATMSVC){+.+.}-{0:0}, at: svc_listen+0x13f/0x500 net/atm/svc.c:295
+2 locks held by syz.2.1305/11970:
+ #0: ffffffff8fdc1568 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x4f7/0x730 net/core/net_namespace.c:575
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: ops_exit_rtnl_list net/core/net_namespace.c:173 [inline]
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: ops_undo_list+0x2a4/0x940 net/core/net_namespace.c:248
+2 locks held by syz.7.1304/11974:
+ #0: ffffffff8fdc1568 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x4f7/0x730 net/core/net_namespace.c:575
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: ops_exit_rtnl_list net/core/net_namespace.c:173 [inline]
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: ops_undo_list+0x2a4/0x940 net/core/net_namespace.c:248
+2 locks held by syz.8.1307/11978:
+ #0: ffffffff8fdc1568 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x4f7/0x730 net/core/net_namespace.c:575
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: ops_exit_rtnl_list net/core/net_namespace.c:173 [inline]
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: ops_undo_list+0x2a4/0x940 net/core/net_namespace.c:248
+2 locks held by syz.5.1308/11983:
+ #0: ffffffff8fdc1568 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x4f7/0x730 net/core/net_namespace.c:575
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: ip_tunnel_init_net+0x2d7/0x840 net/ipv4/ip_tunnel.c:1146
+2 locks held by syz.4.1309/11988:
+ #0: ffffffff8fdc1568 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x4f7/0x730 net/core/net_namespace.c:575
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
+ #1: ffffffff8fdd0240 (rtnl_mutex){+.+.}-{4:4}, at: register_netdevice_notifier_net+0x1a/0xa0 net/core/dev.c:2102
 
-base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
--- 
-2.47.3
+=============================================
 
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 31 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x274/0x2d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x17a/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
+ __sys_info lib/sys_info.c:157 [inline]
+ sys_info+0x135/0x170 lib/sys_info.c:165
+ check_hung_uninterruptible_tasks kernel/hung_task.c:353 [inline]
+ watchdog+0xfd3/0x1030 kernel/hung_task.c:561
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:63
+Code: 9b 7d 02 e9 93 f7 02 00 cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d d3 91 20 00 fb f4 <c3> cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc 90 90 90 90 90
+RSP: 0018:ffffc90000197e20 EFLAGS: 00000246
+RAX: 00000000001162af RBX: ffffffff819a958a RCX: 0000000080000001
+RDX: 0000000000000001 RSI: ffffffff8dfa6c27 RDI: ffffffff8c28af60
+RBP: ffffc90000197f10 R08: ffff8880b87339db R09: 1ffff110170e673b
+R10: dffffc0000000000 R11: ffffed10170e673c R12: 0000000000000001
+R13: 1ffff11003b5b000 R14: 0000000000000001 R15: 1ffff11003b5b000
+FS:  0000000000000000(0000) GS:ffff88812538a000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b34a24224 CR3: 0000000078488000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ arch_safe_halt arch/x86/kernel/process.c:766 [inline]
+ default_idle+0x9/0x20 arch/x86/kernel/process.c:767
+ default_idle_call+0x72/0xb0 kernel/sched/idle.c:122
+ cpuidle_idle_call kernel/sched/idle.c:199 [inline]
+ do_idle+0x36a/0x5f0 kernel/sched/idle.c:352
+ cpu_startup_entry+0x43/0x60 kernel/sched/idle.c:451
+ start_secondary+0x101/0x110 arch/x86/kernel/smpboot.c:312
+ common_startup_64+0x13e/0x147
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
