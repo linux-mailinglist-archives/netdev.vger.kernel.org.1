@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-288915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288916-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ID9jJP7NCmq18QQAu9opvQ
-	(envelope-from <netdev+bounces-288915-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:29:50 +0200
+	id EENGOYPPCmru8QQAu9opvQ
+	(envelope-from <netdev+bounces-288916-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:36:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02267568C7B
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:29:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E1C568ED2
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:36:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CD78D307BDB8
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:23:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 179063043ECE
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7833E277C;
-	Mon, 18 May 2026 08:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9AFB3E2AD0;
+	Mon, 18 May 2026 08:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Bt26xTS3"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="L0hzpxGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013053.outbound.protection.outlook.com [40.107.159.53])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013054.outbound.protection.outlook.com [52.101.72.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257523E1D14;
-	Mon, 18 May 2026 08:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204313E2749;
+	Mon, 18 May 2026 08:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779092581; cv=fail; b=XLQ6wFbjl0RhlaNx1wCMVjKul5Cr46WCc1d7t3UhdaHG1A7A2wckmgZ9hAvFBudv3ad8LnetHiyUMCMIKyLYgF5DbCDnWYecYmYPuE4u3h13bQ4fOUeMOrnaGbzEE4L9TBhYPl1dEnFYwN07fIa4LnAGIyj59XH1oSf30kURh1M=
+	t=1779092591; cv=fail; b=lcB2lmtLZPcBaOnOgGjU7QWsvynFnMTfLjJIIlDkqItnUoflDTGnWkj7X/g0fDtmVFWDEETuW+a7R/EX8BH3iRQCzhwF2L8GmY5/RrToFQAMzX/xKyisEU3NpK0YcK0/cF+EMPl6et19sSTmfmJcFxSau57g3KTy+MX2xl/+mSI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779092581; c=relaxed/simple;
-	bh=OyPXbG52WBg84pCeJobLritIIeyJGfjrW/hKuqChuQU=;
+	s=arc-20240116; t=1779092591; c=relaxed/simple;
+	bh=qofjg96qvOm1LXo7XQ2FTBkd2dFveB6f/KC0JAcU6+g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gMnRzaH+FsUGBwk3yQaaWmsoyjAuW9GqyMO/bBamIxvgw1flLJrhpg1rD1mDhBtDH/O6reHzl1UbwKPkWtbnELlYleqbLvElh/Gu68TJdW4oMG/2pVENI7UK7kfpIEMpBT1jT4ReicWjFa+XHa6KlmkiRcBeCHMJe6Dnm3US/VI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Bt26xTS3; arc=fail smtp.client-ip=40.107.159.53
+	 Content-Type:MIME-Version; b=Iss42+jxB6GwxWxPg0ynAZYFzyiLeKsQTWCwkSghTZV2ogufgqS1QMjNixbXTzl9j0v3iDqUZmexkhhd7i8BPYFLNSRnXk7tKTPLNkeQW+4Z+XmYusXU85kKiDe5rzycWcPrrnDWOy0LF7OSEmkXcdopPK78f6nQyWMg/e0s3cU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=L0hzpxGn; arc=fail smtp.client-ip=52.101.72.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KDC2p58OW9UF42LyVUx/mjRcnNIT1KONz9KFVJyu0vlAUukuUf71P9m99rt+K4UBZeOIagHnjTolRzs3dB4YDOg75EDTZrhBtaXE/07lwee4wZ7brpqrjAKTmq7c3nw6k2IDRNy9T8P7anKF9tRdxsoUU0SqPrE7wz4yzQJMgKYHe5RSbGMn5C6dGA8DWUWjXYQZWO7hROogn82Zv39HxDUf/B5eOZK2ov+iHLJam9QNYpCxCcNtId8ec+/JHsssTUxJIugxM5z9/7ADAnP6dbnXLBEFPFbo10Db/sWkejP0l5Sdd83AlGiPSTkc8xhvkpasWXchJU+z+T22XGZLjA==
+ b=hgHruWpo8T49nfD9Svr6Uhc7QYys401r/tzU5QEEtIib1rI8Mc8pqLH+BlaZXwUrYH703lL+mRN5xcJAjJhTkY28hGdjkswxJEw0Zh4leBZQFp8k3cDr5aRBhIpctW6EBqiZN+2dvBGUy36LgG617T9WnmC2zz/czS2z1rlieXwQcpduKDu4YifTWHe2UXCFpeemfLZ697GyTEb46IMicdgKtP6aKm6CLaz/oRBbToZvyXvH6CAZYB5v5TkQeZ24jMZc+IT0KDP7pLjLQyufle3BQmf/t82PHCkGgJ2YWBv36TRn+ODeLJPzhopY09PTT9FLXgErG7vZltFjHguBYA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V3voDZ0BuJ9tq1vIoWPDfpf+3DqJH36ktgseQNif49Q=;
- b=Tf98lgSH9hJ0El7JL7FIDQ9Bue+VIDmeoPF0nhqCU0MkdxIpGZmiFXY9X2bmnR24kg5EpecKLaL2Eiq9v00TI6XU04/XkDs7AXIdT7vfPXNAcnsfNLl6iC7Y96X4atWbbClIbNYD0YPvLPzkioPlOcVN44eqODyEcCXmc7OmCLJsB/qNzzUFQVF1s1hVQXkuA6crJSjVN00WGa3n1HHEbhvv0ZVIAzUoV4Oq95lIllzIJ8wVdg67OvXQTiaWj9fWDSa4Bg08XnM8KoD2hd/KrMmAa0h5g6Ir5wK4evmlfW2jfXxoqMC1lpXkog+d1riylrELq4JhflD8Z6EA+FU0dw==
+ bh=+OkTituhj851UTH98eKeCkJCczBoTU+PcRf+naGINh0=;
+ b=C3evI6QXC4vgD6HYiXGw9pdEH2IWMYJ8HdUekrb68kirH8cdV/TwjpoJTSFVxf0LRMVJ2n7W7KBAvI+ZaxyEbgJkLTtNOAqWdYlA0IWoaxHElpz8e4+RzSJz8ue+NK6Jzb2Tnh0Ja577f70ASwuSswqSaEdHpm+TvLrslkFknWI6ddp5kUs7x/bMGHysZ6a5G0h+7IsN81DJ3Hpq5poFSl4bAqHSXKexonYkA9ruzVe0DRvR3oU59BlieYMWG5vKFHj7tjOUKu/6AQfHFwT9Q3dJbIrwdIHJ91cC/6PuKKzvn3usrCwpK5DRK/I1bpRHQhSkKmAFwedjm5X4FHk3Aw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V3voDZ0BuJ9tq1vIoWPDfpf+3DqJH36ktgseQNif49Q=;
- b=Bt26xTS3MiCtCU+BttZpR/dupEBs5hm9ZksU3bFW95CZr2lruNdaQy0Zj917eTjnZv3+pF6hG2XRE/wIu1ZfpmnnLbDuwV4BsKsnLyRJteb+6bTweNrmWRZGJi3O5Wp3DqI58v7zrZrQoq+Tm/eW30LScuDBI0SwZHOGjjHVjJasVFX4IY1dPG3L0ZsJXYBwCzN+gDk3QFhrMcK6PVZmNp4I1eaTSvZtdxUOfMeHpPEwCpY/tAoJ3Cb4MIPI+qww+tjoeZ+STy8DmU1/tv3GoAyAjY3wX1ixD5GoBZWG6NhbHH+5LWN3PD6/BEgeMNwXmDsknU6n1fyHViqTSM0KDw==
+ bh=+OkTituhj851UTH98eKeCkJCczBoTU+PcRf+naGINh0=;
+ b=L0hzpxGn1T2N+ALPyo0sn6eYEl+L+C6VAqbAzZp3bPIZFU6xCz6QTrYY5iTCQGLvB5KfC2FrCN0FwCKUcjyFPUZdmKnaVttjNjkliV+G0Jr+iDEcClFSoK7zwouoNMLOE+xWrAnH5X5dWxpdC9uImHiDhTL2jsFnWvM+7b8mJrH1VWZn18j4bNIN5OBWAxVIH1lbi4fL7r9qisWyPN1xBnBmg+2XmlDecEClcwWJ2lrFv9+YC4Y50o4f+a3NoInpXDLROyJD8SJsFXI+GKqDV8gqkYJWaY4dEYpmIgIlyKkzrcvv3WeoEbpOgyG4OT/d2Rvs003/XkiWT1QW2JxRLQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
  by AM9PR04MB7713.eurprd04.prod.outlook.com (2603:10a6:20b:2d4::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.21; Mon, 18 May
- 2026 08:22:55 +0000
+ 2026 08:23:06 +0000
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9913.009; Mon, 18 May 2026
- 08:22:55 +0000
+ 08:23:06 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -85,9 +85,9 @@ Cc: netdev@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-arm-kernel@lists.infradead.org,
 	imx@lists.linux.dev
-Subject: [PATCH v8 net-next 02/15] dt-bindings: net: dsa: add NETC switch
-Date: Mon, 18 May 2026 16:24:53 +0800
-Message-Id: <20260518082506.1318236-3-wei.fang@nxp.com>
+Subject: [PATCH v8 net-next 03/15] net: enetc: add pre-boot initialization for i.MX94 switch
+Date: Mon, 18 May 2026 16:24:54 +0800
+Message-Id: <20260518082506.1318236-4-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260518082506.1318236-1-wei.fang@nxp.com>
 References: <20260518082506.1318236-1-wei.fang@nxp.com>
@@ -103,59 +103,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|AM9PR04MB7713:EE_
-X-MS-Office365-Filtering-Correlation-Id: 73c55c18-6a9d-41d1-9799-08deb4b6a97a
+X-MS-Office365-Filtering-Correlation-Id: b89cfda7-fac6-4328-fb6a-08deb4b6afe1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|19092799006|366016|38350700014|921020|18002099003|56012099003|22082099003|3023799003|11063799003;
 X-Microsoft-Antispam-Message-Info:
-	8esSNVk2kVtnmdYuqAvfHPVePDagEZCuP/536ramnMjbHR9J/O5iLN5zjBDzbboNLZGYAxCNhw6v7LK6YRNc7VAP+knWKVL1O8NE03ocanU9LRWRa8ILws1gknDtnZLcr1o+4ovhXg7xL76zLiLaFEVe6gRFa5qNgILHx+l1WnVBF7yGOhfu0vFR99O6SseuyaxOzDL7BA4weMQ7ave+Z4rAjme0a9ezxqpPGcYQBJmASjDKJs+XwUac0mEm6pmkrDGGcCLDUVwkdIMkgITcjzMyK6t4QvGtP6SDuz9ypiPsbajiVesTvQtFVtUf6vASritn1RQwpDknMmRE+GQGAoi7RYrhJ9H9uIwd+2N+rCnwAnZVdGkK3hq1ZpUlHSvHvjUMYLHag6b/l1IvfBJwzOUD0cIoaXZwTiJjxf1B8yM7PYtAghL8q+FQyo9KPvD6sS06eM/NdwjBAGOIaKCcg10uOB3xjtVM+L47Q7KGz/bbRE7egO3Pp+APYiMHf6mKON5gNHwvhaftwTbFzLhDABKS5Vh99VAlTmfYtqt9X5pwjkThHZMixt/lkD0FWe9TcngOQPtCDRsYXvtPWsqsOMg/Ymi1zdp+XfniDclMS6OUsNteOT/CintjitM+DRMEnPWMDZFhsfd+RiRW+WWteX58UrQl53by0ey6BjAHLR8Q99NzrM8XR6aVOeMkf1eBEJhyJVxl7uJkhSj/Vvo79A==
+	as60KQhfKIc9AdKs/AXcDyThi94gF/GBL/djEo3Fu9EOYIefPXI7PP7EnZff9syvbaT4RN93FBBYv0XXBATtYJ3Qxl/duxmHY/kcteW7/NfIAi3iw3aGu7v4Sm3Zh7BNtqvNUyRO9pCUzSfBRb8BajigDQA4/5FxqiIeWiu2CVmWN7Zec6qYtz3qd/6U6JVRlaiRUbykf4kjDEI4ih15k61pVsRlZWav01+/OtEMy9LmGwYJ2nj0tOojJ26P9VTJZz+5m1VjCgcp/Bwpz/d/oUP1BEPgKEju4NI51Wp+opaDaM7QJzjsAyiK9ahzWHu+RLK0S1MEK9CtvzoCcSVOmK1LSxfqDLPXb2teSFoTxB6NPa8Z20cm63aP7oOrd85pzdeb/UP/6o/RH88gEojB6EqkrPYNoU/GvlB70n645ImpBtH7ZkFE4ZDyRsQBQS0aPnQAybFGSpIQqTiLDAcY3H2sZAgGCdGJBtjX6ZyykzhLa37flydrWla8UmG0NraS5aCvFN8jPvuRbqD6hYkP4WTcsYpKEBvhpK2x2fLMZ+cYr1DecsRlOdxjqEafHLk8olELrOCK5t6GLE3iWikeYHnQG1ZLpF11VgYZQvPmNn6W8Qm2DDcz/6oTSV3CAL1/eYhbWJpmpEDWcQFZiRaSUtBUICYP72xXhRaTCuQS7ZK1rmx+xU2C1WDukGEj+4x23IgSN9805d9VXC6MPlyQ0wj3yZteOqFraO/EuFGdejXLYoHnIK6zVyRNt17iIykDPipzsJJXbnnEQsRxwpec9Q==
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(19092799006)(366016)(38350700014)(921020)(18002099003)(56012099003)(22082099003)(3023799003)(11063799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?gsmIy/+UIA7k79MJKugKhZyUQ2kzsQkPxh1pCyv5bnRvJRIFOTT8GODzJVi1?=
- =?us-ascii?Q?xl6hbkuVnZyjL16otzS7CecDmTfxAbZsvgjet0S7gRbvOzrXpLjva0+LIZRP?=
- =?us-ascii?Q?slBLHq0K7ygwOsgrvpnl81cNEYn6jQ1RlQaZSlxiexxB7KKJ7KbFFqUlvo3P?=
- =?us-ascii?Q?N2rmkb21klbskXCGypH6WYsUWpUIS3rLCC9JbaKTxnTet27FahDVuydRHw2b?=
- =?us-ascii?Q?BaOQL9/g53ZC5mv1KIivlgJULaenKJ/aczmwm7TXEPZGHdQ6ESw083t8DH02?=
- =?us-ascii?Q?YPg/LpBtfk95wsKx829BGwif3Ytsw1OKDpiFxWb1XZHOxl6tAtz+HxlWce3E?=
- =?us-ascii?Q?92PfVgLByPvLxLpilmHUrwkFWn1N9lI2XRsc0c3RQwfSeazo6Hp5qpKyAFWa?=
- =?us-ascii?Q?PyfiQ1oj4zZmP7s5s78rGuHetbnTyE7M1QEi5GLrgRxWn4zNfRWtWOgKKvR4?=
- =?us-ascii?Q?G7TP0niYEdNcevxm5Ceu4jHu9XI2Q+ijUu5acZaQgf5yg+PC/bcDN5Uvtj45?=
- =?us-ascii?Q?lmRiMqn6DhsbMtEQLRJqtKvn5OnxQhmloeh843Fvzq86gSQ+Rw0fpH9AIeDJ?=
- =?us-ascii?Q?LrCfTPMKCYlvymx/hMrdVl42oKLTj0Abo2xYKHIihuMbBOmOeeqUjhFdAl8i?=
- =?us-ascii?Q?sgrY4otcFfvedUpFWlgl/RYBAsJgjpS7C9pVcCV/6i+sDEMs08ZUfaLeJsK9?=
- =?us-ascii?Q?SsKzySNQzBVj6QBsxg2pvCTddwxvqN0s7Zm66OJadovHWWExaTiELHsZrc0M?=
- =?us-ascii?Q?yORWY9CQwHWgsm27nVar5gXbOZxfp2w8V9QkG1IHeTyWYfiIzGX5oUjhXmal?=
- =?us-ascii?Q?MeUIT3+aHvZOLWeCP6bZMgMoh7zvAMLCVxAkn+42EK+vzJweisAfeosE0egX?=
- =?us-ascii?Q?Bd8N6s/6XK+Tox1/wjPPS02OxMOQjaafbNVxPcBmB1fVSAsJrJfVPkCoGp72?=
- =?us-ascii?Q?OQHrjKatKjDjPojUaU96Zxopvm5xGenqPDZ2tD2MzSAepkl4Ely4XUtHxQ1h?=
- =?us-ascii?Q?lv5x5D9/kc2Q5tA4A5gQte0+doNwbrTdgpH1zATLWAfRlPnagu+N3RiN2pls?=
- =?us-ascii?Q?hc6lK28JE6T8Uy0Hn5LSxqpeM+cAkUTy5NcXWrNfBEQ06/VhICmXEAXvXoSC?=
- =?us-ascii?Q?GqVC+FBUPGo5XKYXrnGujuc7fV8WfD0hg/bs6p88yt4Hi0jECGIfL9g5O17F?=
- =?us-ascii?Q?jda+Qw0HZulRKkkgK4HY3ohRNUw4RkF7CUDg/758ptRGZARvq9TKrNMG5W0o?=
- =?us-ascii?Q?QooHaZT5vILdPUxy7vMvlIHC/jd+uPouQU6m/g68iJni/VuTEHkX80nxrQ02?=
- =?us-ascii?Q?U79wx5Q2P2yIDXQ2slxqkNGocBVJnNxlHSwrIQL1/384bXK10No3qikPHg/z?=
- =?us-ascii?Q?a57cl9brSvExdDBHTc6gHFSJTPC82wtBTKNvKrSMepp7uuF9ZH3nvnexfiTY?=
- =?us-ascii?Q?y+MYsDBz82TZ+2WR3MkDjZCCVh33RSevVaAZ66xUhewikte7SugAg3AEh+EY?=
- =?us-ascii?Q?uNbAqGjZx+kLS9ILZx5C3Be/gj8ThkwUjf4h/WTyrDbiDLrhJo06IiZuDJg/?=
- =?us-ascii?Q?Q5W7jbyRoTsJAHj4tmTfVS/YWQesjwZb8WtIVJgDPg3XZoxMA46oGAzETHSG?=
- =?us-ascii?Q?vNtaBpIOARMwqzEUSz1fF0NSa2B3BWLVdNIwr98kKfwELvL16fvrown+KBeZ?=
- =?us-ascii?Q?8hzQx9y27zMNJ1qidDZCmLN3gV7WEflc/xhIKIbmjuzb5LqzuEsijMc8Dmgh?=
- =?us-ascii?Q?40ACrp8Xqg=3D=3D?=
+	=?us-ascii?Q?bY5dyUTtAqBkNHGjAyUMCXa5f+k3d7kT4LE3z/slFa7qQbdCuvomigPa46kR?=
+ =?us-ascii?Q?lz68F1JdYqPMxdLPtuSCosDTK92DYf8WXpE+O2hNMjnM9njVX25NNElwV5GH?=
+ =?us-ascii?Q?Rv4V4XRzumw9+wg0IzQMpHHnx6CbymXBeR8OeQsz1uL6+NyIlwNCLsVlh/HN?=
+ =?us-ascii?Q?YcxvnZuQR1RGW820ds7a2KTzXrHHd5YoXA92fY767I5zL3vLOYbTkmmD0yj7?=
+ =?us-ascii?Q?CtokbfwEyVRVxhUWNQQeHxilL9ows2su+TWeQOSVbrAoe1cA+SD4QHgOTvak?=
+ =?us-ascii?Q?BiObapOqliOS0QUuEeAaD0BKtdhYmKOxxKr/6I8qNj+R3QuciPaJNE4LwFmd?=
+ =?us-ascii?Q?CWv2W0RktYV7id23RkpH141s1XaV+f1ik63XO7YRsC489yU7UdcTCPaQC58h?=
+ =?us-ascii?Q?gBK2Aoz8fGL5bwa3xj2TnTzH82jVIRCrCN7JpIxVkX89KWC/uaFnf5TQTfZ4?=
+ =?us-ascii?Q?MthErxstjk6gfocn8B2Ht7ZYd1GKe8z+HudqB6roFAFFvVcuS6kU5IFKhERk?=
+ =?us-ascii?Q?dfX1AnL773NdbNjoHItv/TgXxp76Tcr3pHMoJnzjd0pf6WKeXIHRLjwmLdA/?=
+ =?us-ascii?Q?gvhRni7JsctYg+OpD31+4b+4vOat1Cz4aXlDWQfK+NKYiwlkkPaYKitxbiqO?=
+ =?us-ascii?Q?OTDSMfaCUiq8qEocTyXXHYWJId4WZrk+xvWvhGLOzY+mDm1hSb8B7CBC5DJ/?=
+ =?us-ascii?Q?2DMPVLkU5cEoq5BUUqhBcdSO0VgaSjvcVJTfsmfVkxYjfSSpTS4yO0nNz3+D?=
+ =?us-ascii?Q?7tDFM1EiUwpZ3Rtwxmww6KheQ//EoZKS3stpWriAC9pTAP0G3QjBDyqrhwvI?=
+ =?us-ascii?Q?qhmS9M2Wm7pCQV2TIWN5uLKMFwVdH9DdxAo4WugRLsgMdy8GeRLXBTouEQ4N?=
+ =?us-ascii?Q?99C7L4sJWI2cbNXefyilYEew5PmCPdlK9EalrSCpaWr5BdCqNIYOkLvSS0Mo?=
+ =?us-ascii?Q?JsipOh9iqTVmtp2jE9HXukQiFPjJAIBmaDmlCaCTZfPhub4LIqYb14FJ3el7?=
+ =?us-ascii?Q?W1OJ3z1c4KSVm8aiK9gIWGEE5R0PMbuMJIrYFvfo9Sal9Fx60MX1snt30wKY?=
+ =?us-ascii?Q?BF5k4j8jbEBVTW8O8h22D1KO5FNc9rwfS535l0INujWYql9JCIgdJ4LoxX3o?=
+ =?us-ascii?Q?2tj44yHYarCqjPk4i5i7Yj+mrodUlrWUoGT5dMv7+0o3ptbENVr62XyopCYD?=
+ =?us-ascii?Q?XJUT1MwgQdVxz/8P6p/a6/SNLrL56KaJsMYpuhb0lnE9t0o5xDj/w50qBdr/?=
+ =?us-ascii?Q?CNtfdRpL7ZcXCeeMRMFBvpXP4leSGZkJn3H3bOp6lrsBDooaRutPNwRJHUNo?=
+ =?us-ascii?Q?PZRYsDMfPi41uGXKZOJSLrR//rnj4Mfc5fw+SRNTc/Pcwwg4w7LVWT7rmIea?=
+ =?us-ascii?Q?8mwbHD2hUc/H+h5A4Z5pSddfSyPsL4/Yhs2jBShZH0YwokosLXTjlpB0NIXF?=
+ =?us-ascii?Q?0Z8QNLOzREE1lLKiKCZsO9hTrrDLxh5ApAyX9SmI8JVTnX7kwCIewlZbot0z?=
+ =?us-ascii?Q?zOKyzs9gwgxW0UTS5snWx0BCD5U3IhWpKMllloE/1BaYRFo+OHcNOuj9oVzX?=
+ =?us-ascii?Q?RIFzlA5eFoq70/iE4SVIthGD2Yinrg3RRXxR1o0bKnWGhVHtciQQJFWFIuLz?=
+ =?us-ascii?Q?Z8eWQFcXfTKCR29BFj1lsfQg+Zq+FtBWOTBXwdS6uhQ6DVqLcKQHVJj8fWVn?=
+ =?us-ascii?Q?0bk/e4gnOlQ4uljgfhToEQjyZW8GnwL9Be/LjS/98kiBASwHPllYe4rQ98rq?=
+ =?us-ascii?Q?475p2alOzg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73c55c18-6a9d-41d1-9799-08deb4b6a97a
+X-MS-Exchange-CrossTenant-Network-Message-Id: b89cfda7-fac6-4328-fb6a-08deb4b6afe1
 X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 08:22:55.6505
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 08:23:06.3672
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OFbonSByiE8f/OaakmUASXl4QPQfBYMrqEdPCQjybPyKwLoFly7W0XvQFZRF9rVb2cAt65d/S7snmrDUhnFnng==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 85IY7QE7Gn8fDxRfQPfD5ebFwB8AG5GOGu9o+YnHFPmQNxkmNm164XonE8hQVpLtihTZWyfctumuLHiiyMy6IA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7713
-X-Rspamd-Queue-Id: 02267568C7B
+X-Rspamd-Queue-Id: 12E1C568ED2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -163,184 +163,286 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288916-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,bootlin.com];
-	TAGGED_FROM(0.00)[bounces-288915-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[25];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:mid,nxp.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Add bindings for NETC switch. This switch is a PCIe function of NETC IP,
-it supports advanced QoS with 8 traffic classes and 4 drop resilience
-levels, and a full range of TSN standards capabilities. The switch CPU
-port connects to an internal ENETC port, which is also a PCIe function
-of NETC IP. So these two ports use a light-weight "pseudo MAC" instead
-of a back-to-back MAC, because the "pseudo MAC" provides the delineation
-between switch and ENETC, this translates to lower power (less logic and
-memory) and lower delay (as there is no serialization delay across this
-link).
+Before probing the NETC switch driver, some pre-initialization needs to
+be set in NETCMIX and IERB to ensure that the switch can work properly.
+For example, i.MX94 NETC switch has three external ports and each port
+is bound to a link. And each link needs to be configured so that it can
+work properly, such as I/O variant and MII protocol.
+
+In addition, the switch port 2 (MAC 2) and ENETC 0 (MAC 3) share the same
+parallel interface, they cannot be used at the same time due to the SoC
+constraint. And the MAC selection is controlled by the mac2_mac3_sel bit
+of EXT_PIN_CONTROL register. Currently, the interface is set for ENETC 0
+by default unless the switch port 2 is enabled in the DT node.
+
+Like ENETC, each external port of the NETC switch can manage its external
+PHY through its port MDIO registers. And the port can only access its own
+external PHY by setting the PHY address to the LaBCR[MDIO_PHYAD_PRTAD].
+If the accessed PHY address is not equal to LaBCR[MDIO_PHYAD_PRTAD], then
+the MDIO access initiated by port MDIO will be invalid.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- .../bindings/net/dsa/nxp,netc-switch.yaml     | 131 ++++++++++++++++++
- 1 file changed, 131 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
+ .../ethernet/freescale/enetc/netc_blk_ctrl.c  | 185 +++++++++++++++---
+ 1 file changed, 163 insertions(+), 22 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml b/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
-new file mode 100644
-index 000000000000..1b35e4cbd049
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
-@@ -0,0 +1,131 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/dsa/nxp,netc-switch.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c b/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
+index 92a0f824dae7..c7eb0234c785 100644
+--- a/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
++++ b/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
+@@ -261,40 +261,108 @@ static int imx94_link_config(struct netc_blk_ctrl *priv,
+ }
+ 
+ static int imx94_enetc_link_config(struct netc_blk_ctrl *priv,
+-				   struct device_node *np)
++				   struct device_node *np,
++				   bool *enetc0_en)
+ {
+ 	int link_id = imx94_enetc_get_link_id(np);
+ 
+ 	if (link_id < 0)
+ 		return link_id;
+ 
++	if (link_id == IMX94_ENETC0_LINK && of_device_is_available(np))
++		*enetc0_en = true;
 +
-+title: NETC Switch family
+ 	return imx94_link_config(priv, np, link_id);
+ }
+ 
++static int imx94_switch_link_config(struct netc_blk_ctrl *priv,
++				    struct device_node *np,
++				    bool *swp2_en)
++{
++	struct device_node *ports;
++	u32 port_id;
++	int err = 0;
 +
-+description: >
-+  The NETC presents itself as a multi-function PCIe Root Complex Integrated
-+  Endpoint (RCiEP) and provides full 802.1Q Ethernet switch functionality,
-+  advanced QoS with 8 traffic classes and 4 drop resilience levels, and a
-+  full range of TSN standards capabilities.
++	ports = of_get_child_by_name(np, "ethernet-ports");
++	if (!ports)
++		return -ENODEV;
 +
-+  The CPU port of the switch connects to an internal ENETC. The switch and
-+  the internal ENETC are fully integrated into the NETC IP, a back-to-back
-+  MAC is not required. Instead, a light-weight "pseudo MAC" provides the
-+  delineation between the switch and ENETC. This translates to lower power
-+  (less logic and memory) and lower delay (as there is no serialization
-+  delay across this link).
++	/* The switch may be owned by a guest OS, in this case, the switch
++	 * node in the host OS will be disabled, but we still hope that the
++	 * host OS could do some configurations for the switch, as the
++	 * netc_blk_ctrl is owned by host OS. So of_device_is_available()
++	 * is not needed here.
++	 */
++	for_each_available_child_of_node_scoped(ports, child) {
++		if (of_property_read_u32(child, "reg", &port_id) < 0) {
++			err = -ENODEV;
++			goto end;
++		}
 +
-+maintainers:
-+  - Wei Fang <wei.fang@nxp.com>
++		switch (port_id) {
++		case 0 ... 2: /* External ports */
++			err = imx94_link_config(priv, child, port_id);
++			if (err)
++				goto end;
 +
-+properties:
-+  compatible:
-+    enum:
-+      - pci1131,eef2
++			if (port_id == 2)
++				*swp2_en = true;
 +
-+  reg:
-+    maxItems: 1
++			break;
++		case 3: /* CPU port */
++			break;
++		default:
++			err = -EINVAL;
++			goto end;
++		}
++	}
 +
-+  dsa,member:
-+    description: >
-+      The property indicates DSA cluster and switch index. For NETC switch,
-+      the valid range of the switch index is 1 ~ 7, the index is reflected
-+      in the switch tag as an indication of the switch ID where the frame
-+      originated. The value 0 is reserved for ENETC VEPA switch, whose ID
-+      is hardwired to zero.
-+    items:
-+      - true
-+      - minimum: 1
-+        maximum: 7
++end:
++	of_node_put(ports);
 +
-+  ethernet-ports:
-+    type: object
-+    patternProperties:
-+      "^ethernet-port@[0-9a-f]$":
-+        type: object
-+        $ref: dsa-port.yaml#
++	return err;
++}
 +
-+        properties:
-+          clocks:
-+            items:
-+              - description: MAC transmit/receive reference clock.
+ static int imx94_netcmix_init(struct platform_device *pdev)
+ {
+ 	struct netc_blk_ctrl *priv = platform_get_drvdata(pdev);
+ 	struct device_node *np = pdev->dev.of_node;
++	bool enetc0_en = false, swp2_en = false;
+ 	u32 val;
+ 	int err;
+ 
+ 	for_each_child_of_node_scoped(np, child) {
+ 		for_each_child_of_node_scoped(child, gchild) {
+-			if (!of_device_is_compatible(gchild, "pci1131,e101"))
+-				continue;
+-
+-			err = imx94_enetc_link_config(priv, gchild);
+-			if (err)
+-				return err;
++			if (of_device_is_compatible(gchild, "pci1131,e101")) {
++				err = imx94_enetc_link_config(priv, gchild,
++							      &enetc0_en);
++				if (err)
++					return err;
++			} else if (of_device_is_compatible(gchild,
++							   "pci1131,eef2")) {
++				err = imx94_switch_link_config(priv, gchild,
++							       &swp2_en);
++				if (err)
++					return err;
++			}
+ 		}
+ 	}
+ 
+-	/* ENETC 0 and switch port 2 share the same parallel interface.
+-	 * Currently, the switch is not supported, so this interface is
+-	 * used by ENETC 0 by default.
++	if (enetc0_en && swp2_en) {
++		dev_err(&pdev->dev,
++			"Cannot enable swp2 and enetc0 at the same time\n");
++		return -EINVAL;
++	}
 +
-+          clock-names:
-+            items:
-+              - const: ref
++	/* ENETC 0 and switch port 2 share the same parallel interface, they
++	 * cannot be enabled at the same time. The interface is set for the
++	 * ENETC 0 by default unless the switch port 2 is enabled in the DTS.
+ 	 */
+ 	val = netc_reg_read(priv->netcmix, IMX94_EXT_PIN_CONTROL);
+-	val |= MAC2_MAC3_SEL;
++	if (!swp2_en)
++		val |= MAC2_MAC3_SEL;
++	else
++		val &= ~MAC2_MAC3_SEL;
+ 	netc_reg_write(priv->netcmix, IMX94_EXT_PIN_CONTROL, val);
+ 
+ 	return 0;
+@@ -610,6 +678,78 @@ static int imx94_enetc_mdio_phyaddr_config(struct netc_blk_ctrl *priv,
+ 	return 0;
+ }
+ 
++static int imx94_ierb_enetc_init(struct netc_blk_ctrl *priv,
++				 struct device_node *np,
++				 u32 phy_mask)
++{
++	int err;
 +
-+          mdio:
-+            $ref: /schemas/net/mdio.yaml#
-+            unevaluatedProperties: false
-+            description:
-+              Optional child node for switch port, otherwise use NETC EMDIO.
++	err = imx94_enetc_update_tid(priv, np);
++	if (err)
++		return err;
 +
-+        unevaluatedProperties: false
++	return imx94_enetc_mdio_phyaddr_config(priv, np, phy_mask);
++}
 +
-+required:
-+  - compatible
-+  - reg
-+  - dsa,member
-+  - ethernet-ports
++static int imx94_switch_mdio_phyaddr_config(struct netc_blk_ctrl *priv,
++					    struct device_node *np,
++					    u32 port_id, u32 phy_mask)
++{
++	int addr;
 +
-+allOf:
-+  - $ref: /schemas/pci/pci-device.yaml
-+  - $ref: dsa.yaml#
++	/* The switch has 3 external ports at most */
++	if (port_id > 2)
++		return 0;
 +
-+unevaluatedProperties: false
++	addr = netc_get_phy_addr(np);
++	if (addr < 0) {
++		if (addr == -ENODEV)
++			return 0;
 +
-+examples:
-+  - |
-+    pcie {
-+        #address-cells = <3>;
-+        #size-cells = <2>;
++		return addr;
++	}
 +
-+        ethernet-switch@0,2 {
-+            compatible = "pci1131,eef2";
-+            reg = <0x200 0 0 0 0>;
-+            dsa,member = <0 1>;
-+            pinctrl-names = "default";
-+            pinctrl-0 = <&pinctrl_switch>;
++	if (phy_mask & BIT(addr)) {
++		dev_err(&priv->pdev->dev,
++			"Found same PHY address in EMDIO and switch node\n");
++		return -EINVAL;
++	}
 +
-+            ethernet-ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
++	netc_reg_write(priv->ierb, IERB_LBCR(port_id),
++		       LBCR_MDIO_PHYAD_PRTAD(addr));
 +
-+                ethernet-port@0 {
-+                    reg = <0>;
-+                    phy-handle = <&ethphy0>;
-+                    phy-mode = "mii";
-+                };
++	return 0;
++}
 +
-+                ethernet-port@1 {
-+                    reg = <1>;
-+                    phy-handle = <&ethphy1>;
-+                    phy-mode = "mii";
-+                };
++static int imx94_ierb_switch_init(struct netc_blk_ctrl *priv,
++				  struct device_node *np,
++				  u32 phy_mask)
++{
++	struct device_node *ports;
++	u32 port_id;
++	int err = 0;
 +
-+                ethernet-port@2 {
-+                    reg = <2>;
-+                    clocks = <&scmi_clk 103>;
-+                    clock-names = "ref";
-+                    phy-handle = <&ethphy2>;
-+                    phy-mode = "rgmii-id";
-+                };
++	ports = of_get_child_by_name(np, "ethernet-ports");
++	if (!ports)
++		return -ENODEV;
 +
-+                ethernet-port@3 {
-+                    reg = <3>;
-+                    ethernet = <&enetc3>;
-+                    phy-mode = "internal";
++	for_each_available_child_of_node_scoped(ports, child) {
++		err = of_property_read_u32(child, "reg", &port_id);
++		if (err)
++			goto end;
 +
-+                    fixed-link {
-+                        speed = <2500>;
-+                        full-duplex;
-+                        pause;
-+                    };
-+                };
-+            };
-+        };
-+    };
++		err = imx94_switch_mdio_phyaddr_config(priv, child,
++						       port_id, phy_mask);
++		if (err)
++			goto end;
++	}
++
++end:
++	of_node_put(ports);
++
++	return err;
++}
++
+ static int imx94_ierb_init(struct platform_device *pdev)
+ {
+ 	struct netc_blk_ctrl *priv = platform_get_drvdata(pdev);
+@@ -625,17 +765,18 @@ static int imx94_ierb_init(struct platform_device *pdev)
+ 
+ 	for_each_child_of_node_scoped(np, child) {
+ 		for_each_child_of_node_scoped(child, gchild) {
+-			if (!of_device_is_compatible(gchild, "pci1131,e101"))
+-				continue;
+-
+-			err = imx94_enetc_update_tid(priv, gchild);
+-			if (err)
+-				return err;
+-
+-			err = imx94_enetc_mdio_phyaddr_config(priv, gchild,
+-							      phy_mask);
+-			if (err)
+-				return err;
++			if (of_device_is_compatible(gchild, "pci1131,e101")) {
++				err = imx94_ierb_enetc_init(priv, gchild,
++							    phy_mask);
++				if (err)
++					return err;
++			} else if (of_device_is_compatible(gchild,
++							   "pci1131,eef2")) {
++				err = imx94_ierb_switch_init(priv, gchild,
++							     phy_mask);
++				if (err)
++					return err;
++			}
+ 		}
+ 	}
+ 
 -- 
 2.34.1
 
