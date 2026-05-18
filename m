@@ -1,241 +1,269 @@
-Return-Path: <netdev+bounces-288859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KP6EGPynCmp/5QQAu9opvQ
-	(envelope-from <netdev+bounces-288859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:47:40 +0200
+	id qCCOOjuqCmoK5gQAu9opvQ
+	(envelope-from <netdev+bounces-288860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:57:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C178B566719
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:47:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ECB05667A7
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:57:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A5FA305C608
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:36:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 70169301026E
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68CC3B47E4;
-	Mon, 18 May 2026 05:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078723DCDAB;
+	Mon, 18 May 2026 05:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BwIX724I"
+	dkim=pass (2048-bit key) header.d=juliahub.com header.i=@juliahub.com header.b="B8y1ajx7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33383B4E84;
-	Mon, 18 May 2026 05:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4DA3DCD8D
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 05:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779082583; cv=none; b=F4/Yy9XhshV7CkvASNtNtYxGckr6jw9U82Ryr+UIy1yaBiCBNk9IgqQdSTiHFr+GUBjeQRiqUG/dnt+oQgBSt6zD9MXZmr6/1wzyOjz9EghUatxiJg0h/qWAvc+ALLtVLNrdmZv/cGJXQ9+GZzHjdo6aVv8x+v334+DeaQtQJXU=
+	t=1779083830; cv=none; b=QtS3OC1XLkc7NsogB+9axmfSh2XpEgLUGG4tj3Dy0rmwuNzaqAyGI75fyGBMt0weuTS0vaswsihHaqDGryzXxGaOcGrH6dBpR4fD2Whw2tIEb1AkCk/23NcgtPVyAT70kF/Fb63syqlGH2de8aP35JHC7jG9FeiYOMxNRIj822g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779082583; c=relaxed/simple;
-	bh=6O0R2jTR9rZDQ6+V43jfT5moBn4nIJlWkIanR+PSKoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iRaQjjhMPQ6D3c2jHyHYrOWrc3yY4J8w931F9SNrZYNXmOoF28YmfDSm0KhmLUzZ8B1yaX5eaXdmGOU4Sur5DoPDSsyCxoArLJoEZgo/6d/OxfbCeviarM40ieHXfO2ozZPAwpcjgntfAS1Wo8v0u/MgdQ1A/AwUec4SDaGJOSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=BwIX724I; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
+	s=arc-20240116; t=1779083830; c=relaxed/simple;
+	bh=dZgsj3svlkH/KZ6CkOn0pPVe9UUBaOaXE8i5DZxoDi0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RXBPO6pe0AO7p9DLP0v3liqURcFm5peeBjhDTCFUKDLAkfnzmYLsVe/WDSl7QdxICJfEDcAT+2mYczBpaBSnhni8qAE4//9BbrTpstnxrhzN0JZINKtSbFHDk3WvX6tJchbjRd+HYPUNqfCQAWLV2TJUB+kvX83mMwt3gkdO/xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=juliahub.com; spf=pass smtp.mailfrom=juliahub.com; dkim=pass (2048-bit key) header.d=juliahub.com header.i=@juliahub.com header.b=B8y1ajx7; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=juliahub.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=juliahub.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8bb09239328so18052696d6.3
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:57:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=gibson.dropbear.id.au; s=202602; t=1779082563;
-	bh=hw2gv/6TsP3dThKptCuBS/fQsaP2Z7xDPwtTLr/Mx/w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BwIX724ItkpKIx3F8YJFf73Cuz7TP6J0JEbT+Acobm4jxdOZZ2le9EFqL0GCROW/p
-	 R6bEszzFV+1IG8YHfeh8wuWx33MYHQwaR8cMJtrKXxb3ZY1VusXb6qCeKMyI6GsIzu
-	 bzGgdIQV9buPENmB1Fxcsi+2Y2zl+1KsOh53U00kaHrdr6tHZ6KzZtrMjNwckBR02y
-	 Yq2yGRRhmXsxQTYUhc8gw9KUTnZixRgvnnHy6uLakDurC9FGjaeal0vI9eqIbf1FgS
-	 f3+QKojpje8MTOFnddPLxsH/7aSaMInONuhVmU+ssJOJHhujqxKWsLePY8z8/Y7YBt
-	 +NO+A2LbSZLqw==
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-	id 4gJmkC27Sjz58mB; Mon, 18 May 2026 15:36:03 +1000 (AEST)
-Date: Mon, 18 May 2026 15:32:33 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Stefano Brivio <sbrivio@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Pavel Emelyanov <xemul@scylladb.com>,
-	Laurent Vivier <lvivier@redhat.com>, Jon Maloy <jmaloy@redhat.com>,
-	Dmitry Safonov <dima@arista.com>, Andrei Vagin <avagin@google.com>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Neal Cardwell <ncardwell@google.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH net 1/2] tcp: Don't accept data when socket is in repair
- mode
-Message-ID: <agqkcUNI8Y9x_sz7@zatzit>
-References: <20260517184158.2757505-1-sbrivio@redhat.com>
- <20260517184158.2757505-2-sbrivio@redhat.com>
- <CAAVpQUCiHA=z62udnWLVyv0LeGsAHr+A=_o-8fomHZfJZJO2aQ@mail.gmail.com>
- <20260517215307.13cda56a@elisabeth>
- <CAAVpQUDc5FL2Ab-J3GHCU-LxPAwsZVfo=BG3chun6zRxOPVQtA@mail.gmail.com>
+        d=juliahub.com; s=google; t=1779083821; x=1779688621; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+ulqQPlVV/y7BfD0xL+liiVg74f2HlR/Ki2I9yWqZnA=;
+        b=B8y1ajx7BcjMcnQT7nxrqPDWLgmIox/VUycZcnAX9D3EXjZnh8hGysreEYxa+0OmbB
+         S8AEa+faINs5l0jVpPzFoXrxOgzlJ81TolWRnPFWeBc91EoY+c+SpUCm8W6JpSUsdyre
+         eSH4G/lXgf6Lcup2H/5GJj5hXo1zQ2jamjts+VspSoU5e/BtJ35AlEfUqc+lSc4HVdwG
+         MzP2udak7wpQAGwoJH1PM24BXNc7jnM2/c00LIU8C9vEMVAAjitMYki1nycqegFL4dFM
+         j5+4ADNwfWtYmRuFqsge3SpthNts2VqlFa1q7yExbx7aUYzpjo1R7J3EhjAJfSG9rqhb
+         gjHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779083821; x=1779688621;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+ulqQPlVV/y7BfD0xL+liiVg74f2HlR/Ki2I9yWqZnA=;
+        b=Wv5DA7B4JZZ235ENDpSCaDa4Q92q1eNpwtTUkmDrpm0AcVb8BdiuqN1a/xzAqO629u
+         x9/iiOvgGKHftqPCCrpo1s6Amk2uGGeHWvSWHXxASNnVtmcfDFkpeklrkqVD1M7CbiMu
+         R7O841m5Q5d6E2pwKt4OceSHz+21SF1yEgEIYqvzA++al0ZiAO/4lxfF9V/1Vbw8Tq2Y
+         eOEzTKccF9AVPx8mF7sEPLMzsncpcybqj1xxpiT/hEcgejdRVwtsytu6ud2qG58lALEI
+         DahmcUpHQ723qRimhGa4i2zghJbAc9iAbAoZWH7P6vIvAldGpcKeslyDHIQhe1PV6mRq
+         /VdQ==
+X-Gm-Message-State: AOJu0YwIvE68LhTbOpr7ntjJuiVIbrXlvTxwu2rXNYmc1zGSsjNP38hL
+	mpbhAu1N6ymA55u+VNG/jjE9ZNpmoG5RwCQiVid0nPLAx7gqInQjN6XS9bFg7R7GIixe4BMWlBs
+	MZacn
+X-Gm-Gg: Acq92OHRgYcB4w+LDmUGv2AcjJGdcH6xPn1KXP6vEy4JvkrkFFix7FTxGSfW4oJXr7i
+	zmUbQ4oU+x64hC0ko6ThOhVpbiw9x+ZhXJDNG768iHFVmJsKqqijkvKz7GR22OpdJiaWbuIlz0q
+	UZMzhZssMsqPmiu6DDGtxv5XsPb1u8JqVJJtTNX4Qmag3XyrmvDsBYm/nlWiXHjYIO3mQw5ePkM
+	5VM41jbwxh8dh7ozNuPzXK5uVjKvxUWXcpsmyAAUVIDqH32LNZlKI9hwzm9F1YBqpCaog/jKRln
+	pjFC3CtftWF3JIXb29FO/eah1siUFqpyTQhg9r7pKUSUweLpBMk7iws41dejyS8XAXGWIwTDiGe
+	mz8ILPCAiDNq5+e6sv+CoCPCB7qRdLIl/8mxjVkCxm3HDRtvGFtzYz8uLr1hhaMgk6UbFEtBF5H
+	Iq5Nwor8EDHdIDiDyjvdSKA31xziBIv2HjLw1BhbLOUZdcuArBslrd
+X-Received: by 2002:a05:6214:242b:b0:8bf:87c5:fa21 with SMTP id 6a1803df08f44-8ca0f706530mr255919346d6.49.1779083821544;
+        Sun, 17 May 2026 22:57:01 -0700 (PDT)
+Received: from juliahub.com ([66.31.114.203])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ca36086a61sm45866836d6.4.2026.05.17.22.57.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 22:57:01 -0700 (PDT)
+Date: Mon, 18 May 2026 01:56:59 -0400
+From: Keno Fischer <keno@juliahub.com>
+To: netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] mlxsw: spectrum_dcb: Reject writes owned by an
+ offloaded qdisc
+Message-ID: <agqqK_6PxbvAwsMX@juliahub.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3X8wjBCcNzjYhJjg"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAVpQUDc5FL2Ab-J3GHCU-LxPAwsZVfo=BG3chun6zRxOPVQtA@mail.gmail.com>
-X-Rspamd-Queue-Id: C178B566719
+X-Rspamd-Queue-Id: 6ECB05667A7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-3.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gibson.dropbear.id.au:s=202602];
+	DMARC_POLICY_ALLOW(-0.50)[juliahub.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[juliahub.com:s=google];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[dropbear.id.au];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	TAGGED_FROM(0.00)[bounces-288859-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[juliahub.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@gibson.dropbear.id.au,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gibson.dropbear.id.au:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-288860-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ozlabs.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,gibson.dropbear.id.au:dkim]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[keno@juliahub.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,juliahub.com:email,juliahub.com:mid,juliahub.com:dkim]
 X-Rspamd-Action: no action
 
+Some bits of state in the mlxsw driver can be controlled by two
+mechanisms. The first is the DCB netlink command set (RTM_SETDCB
+and e.g. DCB_ATTR_IEEE_ETS/DCB_ATTR_IEEE_MAXRATE), reachable e.g. from
+the `dcb` userspace utility. The second is via the qdisc framework
+(reachable e.g. from the `tc` userspace utility). Because they touch
+the same bit of state, it is currently possible for the ETS config
+to get out of sync with what the qdisc expects. One hard-to-debug
+consequence is that a config script becomes non-idempotent. E.g.,
+consider
 
---3X8wjBCcNzjYhJjg
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+```
+dcb ets set dev "${port}" prio-tc 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
+tc qdisc replace dev "${port}" root handle 1: prio bands 8 \
+	priomap 0 1 2 3 4 5 6 7
+```
 
-On Sun, May 17, 2026 at 02:01:29PM -0700, Kuniyuki Iwashima wrote:
-> On Sun, May 17, 2026 at 12:53=E2=80=AFPM Stefano Brivio <sbrivio@redhat.c=
-om> wrote:
-> >
-> > On Sun, 17 May 2026 12:05:45 -0700
-> > Kuniyuki Iwashima <kuniyu@google.com> wrote:
-> >
-> > > On Sun, May 17, 2026 at 11:41=E2=80=AFAM Stefano Brivio <sbrivio@redh=
-at.com> wrote:
-> > > >
-> > > > Once a socket enters repair mode (TCP_REPAIR socket option with
-> > > > TCP_REPAIR_ON value), it's possible to dump the receive sequence
-> > > > number (TCP_QUEUE_SEQ) and the contents of the receive queue itself
-> > > > (using TCP_REPAIR_QUEUE to select it).
-> > > >
-> > > > If we receive data after the application fetched the sequence number
-> > > > or saved the contents of the queue, though, the application will now
-> > > > have outdated information, which defeats the whole functionality,
-> > > > because this leads to gaps in sequence and data once they're restor=
-ed
-> > > > by the target instance of the application, resulting in a hanging or
-> > > > otherwise non-functional TCP connection.
-> > > >
-> > > > This type of race condition was discovered in the KubeVirt integrat=
-ion
-> > > > of passt(1), using a remote iperf3 client connected to an iperf3
-> > > > server running in the guest which is being migrated. The setup allo=
-ws
-> > > > traffic to reach the origin node hosting the guest during the
-> > > > migration.
-> > > >
-> > > > If passt dumps sequence number and contents of the queue *before*
-> > > > further data is received and acknowledged to the peer by the kernel,
-> > > > once the TCP data connection is migrated to the target node, the
-> > > > remote client becomes unable to continue sending, because a portion
-> > > > of the data it sent *and received an acknowledgement for* is now lo=
-st.
-> > > >
-> > > > Schematically:
-> > > >
-> > > > 1. client --seq 1:100--> origin host --> passt --> guest --> server
-> > > >
-> > > > 2. client <--ACK: 100-- origin host
-> > > >
-> > > > 3. migration starts,
-> > >
-> > > Here, a netfilter rule or bpf prog must be installed to
-> > > drop packets temporarily until migration completes.
-> >
-> > Thanks for the review.
-> >
-> > I have to say it's rather unexpected to have to work around obvious
-> > kernel issues in userspace: TCP_REPAIR implies that queues are frozen,
-> > and this is handled correctly on the sending side (see
-> > tcp_write_xmit()), but was clearly forgotten on the receiving side.
-> >
-> > TCP_REPAIR also allows to dump queues, not just sequence numbers, so
-> > this really is a bad race condition making the whole functionality
-> > unreliable.
-> >
-> > But anyway, even looking for a practical workaround of the kind you
-> > suggested, I see two issues with it:
-> >
-> > 1. we would still have a race condition, because userspace doesn't have
-> >    a way to synchronise application of nftables rules (or even a BPF
-> >    program) with the effects of TCP_REPAIR.
->=20
-> Note that setsockopt(TCP_REPAIR) is under lock_sock(), so the
-> backlog is always cleared before returning to userspace, and the
-> following getsockopt() will have stable view.
->=20
->=20
-> > We could apply nftables
-> >    rules "a while before" just to be sure, but this is severely going to
-> >    impact migration downtime
->=20
-> So it's "just before", not "a while before".
->=20
->=20
-> >
-> > 2. passt(1) runs unprivileged and uses a very simple helper to set
-> >    TCP_REPAIR on the socket.
->=20
-> I guess it uses userns ?
+Here the user made a mistake and put the priomap in the wrong order.
+The first time this code is run, the `qdisc` specification overwrites
+the `prio-tc` specification. However, the second time this code is run,
+the subsystem sees that the qdisc is identical and does nothing, causing
+the `prio-tc` setting to stick and the final mapping to be different.
+This can be very confusing, since the same config script creates two
+different states.
 
-It does, but it doesn't help.
+I think there's two reasonable ways to fix this. One would be by
+reflecting the ets state changes back into the qdisc, so that the
+qdisc subsystem notices that it's been changed. However, I think it
+is clearer to just forbid the non-qdisc API from trying to make
+changes while the qdisc is offloaded.
 
-> setsockopt(TCP_REPAIR) requires CAP_NET_ADMIN in the
-> userns tied to the socket's netns (in tcp_can_repair_sock()),
-> so you should be able to use netfilter anyway.
+This is similar to the existing check in mlxsw_sp_dcbnl_setbuffer,
+which does essentially the same thing in reverse (buffers are only
+explicitly managed when there is an offloaded qdisc, otherwise
+they're managed explicitly).
 
-The sockets we use TCP_REPAIR on are *outside* the netns/userns - the
-whole point is that we're bridging between the outside world and the
-ns.  So we have no privileges there to use netfilter (and even if we
-did, we couldn't safely use it, since we don't know how else netfilter
-is being used on the host system).
+I hope this saves the next person a few hours of debugging wondering
+why their tc_no_buffer_discard_uc_tc_ counters are going up.
 
---=20
-David Gibson (he or they)	| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you, not the other way
-				| around.
-http://www.ozlabs.org/~dgibson
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Keno Fischer <keno@juliahub.com>
+---
+ .../net/ethernet/mellanox/mlxsw/spectrum.h    |  2 +
+ .../ethernet/mellanox/mlxsw/spectrum_dcb.c    | 10 +++++
+ .../ethernet/mellanox/mlxsw/spectrum_qdisc.c  | 43 +++++++++++++++++++
+ 3 files changed, 55 insertions(+)
 
---3X8wjBCcNzjYhJjg
-Content-Type: application/pgp-signature; name=signature.asc
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
+index b03ff9e044f9..ecf4525c42a4 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
+@@ -1260,6 +1260,8 @@ int mlxsw_sp_setup_tc_block_qevent_early_drop(struct mlxsw_sp_port *mlxsw_sp_por
+ 					      struct flow_block_offload *f);
+ int mlxsw_sp_setup_tc_block_qevent_mark(struct mlxsw_sp_port *mlxsw_sp_port,
+ 					struct flow_block_offload *f);
++bool mlxsw_sp_qdisc_has_prio_ets(struct mlxsw_sp_port *mlxsw_sp_port);
++bool mlxsw_sp_qdisc_has_tbf_subgroup(struct mlxsw_sp_port *mlxsw_sp_port);
+ 
+ /* spectrum_fid.c */
+ struct mlxsw_sp_fid *mlxsw_sp_fid_lookup_by_index(struct mlxsw_sp *mlxsw_sp,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_dcb.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_dcb.c
+index f1ad937405a3..6e689d5de6fa 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_dcb.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_dcb.c
+@@ -151,6 +151,11 @@ static int mlxsw_sp_dcbnl_ieee_setets(struct net_device *dev,
+ 	struct mlxsw_sp_port *mlxsw_sp_port = netdev_priv(dev);
+ 	int err;
+ 
++	if (mlxsw_sp_qdisc_has_prio_ets(mlxsw_sp_port)) {
++		netdev_err(dev, "ETS configuration is controlled by offloaded qdisc\n");
++		return -EBUSY;
++	}
++
+ 	err = mlxsw_sp_port_ets_validate(mlxsw_sp_port, ets);
+ 	if (err)
+ 		return err;
+@@ -450,6 +455,11 @@ static int mlxsw_sp_dcbnl_ieee_setmaxrate(struct net_device *dev,
+ 	struct ieee_maxrate *my_maxrate = mlxsw_sp_port->dcb.maxrate;
+ 	int err, i;
+ 
++	if (mlxsw_sp_qdisc_has_tbf_subgroup(mlxsw_sp_port)) {
++		netdev_err(dev, "maxrate is controlled by offloaded qdisc\n");
++		return -EBUSY;
++	}
++
+ 	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
+ 		err = mlxsw_sp_port_ets_maxrate_set(mlxsw_sp_port,
+ 						    MLXSW_REG_QEEC_HR_SUBGROUP,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_qdisc.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_qdisc.c
+index 73519301b744..c2ce4f3f562e 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_qdisc.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_qdisc.c
+@@ -2316,6 +2316,49 @@ int mlxsw_sp_setup_tc_block_qevent_mark(struct mlxsw_sp_port *mlxsw_sp_port,
+ 					      action_mask);
+ }
+ 
++bool mlxsw_sp_qdisc_has_prio_ets(struct mlxsw_sp_port *mlxsw_sp_port)
++{
++	struct mlxsw_sp_qdisc_state *qdisc_state = mlxsw_sp_port->qdisc;
++	struct mlxsw_sp_qdisc *root_qdisc;
++	bool found;
++
++	mutex_lock(&qdisc_state->lock);
++	root_qdisc = &qdisc_state->root_qdisc;
++	found = root_qdisc->ops &&
++		    (root_qdisc->ops->type == MLXSW_SP_QDISC_PRIO ||
++		     root_qdisc->ops->type == MLXSW_SP_QDISC_ETS);
++	mutex_unlock(&qdisc_state->lock);
++
++	return found;
++}
++
++static struct mlxsw_sp_qdisc *
++mlxsw_sp_qdisc_walk_cb_find_subgroup_tbf(struct mlxsw_sp_qdisc *qdisc,
++					 void *data)
++{
++	struct mlxsw_sp_port *mlxsw_sp_port = (struct mlxsw_sp_port *)data;
++
++	if (qdisc->ops && qdisc->ops->type == MLXSW_SP_QDISC_TBF &&
++	    mlxsw_sp_qdisc_tbf_hr(mlxsw_sp_port, qdisc) ==
++	    MLXSW_REG_QEEC_HR_SUBGROUP)
++		return qdisc;
++	return NULL;
++}
++
++bool mlxsw_sp_qdisc_has_tbf_subgroup(struct mlxsw_sp_port *mlxsw_sp_port)
++{
++	struct mlxsw_sp_qdisc_state *qdisc_state = mlxsw_sp_port->qdisc;
++	bool found;
++
++	mutex_lock(&qdisc_state->lock);
++	found = mlxsw_sp_qdisc_walk(&qdisc_state->root_qdisc,
++				    mlxsw_sp_qdisc_walk_cb_find_subgroup_tbf,
++				    mlxsw_sp_port) != NULL;
++	mutex_unlock(&qdisc_state->lock);
++
++	return found;
++}
++
+ int mlxsw_sp_tc_qdisc_init(struct mlxsw_sp_port *mlxsw_sp_port)
+ {
+ 	struct mlxsw_sp_qdisc_state *qdisc_state;
+-- 
+2.54.0
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmoKpGQACgkQzQJF27ox
-2GcF4Q//enKLHMmzoXrrbkAb5tu22/rJxfCV0tId3sIMAB7R2hjX/PU7z90LiqJu
-SnQptjfzZzUjOsMASC9SIcoBXWNfI9rdKAOW0a62Bwb5l8K70l+wo3Etk5Y2k/pF
-+lVkl2puB6+ztKaXwA5KlSXQP8VvLLF0vViTYYLX8uzFVj2/QdWaucQLI3TmRpCB
-biY2inFL0URutXpqML6orXA/IduT7aYWFPskSmYl6MNxGcvy53O7eJKZQuWmWmzd
-znt78UkXWFiI2ujhNZxGLqqcTr2IG7qohRmeLVGLE0kFrtAZT0+kwQ+tbmRkLBS7
-/fdUleyCSDvntni+SXMjLxoEBra+QfAKs1DhzD7UuYm/p0eS3cPZzCIYSJzB7ELS
-gn6o4kxXvVRDHASdh2ScQ6z++FBMKo68pPcq50ojgFxjfkYdCYm7Rbo7I6deyy0n
-i3+l/Da2EQp3Jo60z9WdK3kMN7LW2RBbQ4UOU+322PCSB00vLhBkIEZQx7ftfeiT
-Vii76NK1bsMTOfJydicX9mqvCCdfpEwDprQu6rfTwTaT85KRynOnaQFMUSBY8wdA
-75cPWuW9wJuhEcd2812yWKUwXYYY+Y+9nusoezOLw+j2Up1RPJiZRBuabNs6wwLo
-wulrf9tzFtrTIVnK973Jo68nAlM2L8f2oXCyo2YNiUjsh0C/ZGo=
-=1Ssk
------END PGP SIGNATURE-----
-
---3X8wjBCcNzjYhJjg--
 
