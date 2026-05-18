@@ -1,495 +1,161 @@
-Return-Path: <netdev+bounces-288938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288939-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wNx8Dk7PCmrv8QQAu9opvQ
-	(envelope-from <netdev+bounces-288938-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:35:26 +0200
+	id WKMTAH7QCmru8QQAu9opvQ
+	(envelope-from <netdev+bounces-288939-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:40:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC8D568E9A
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:35:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B98A56903C
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C843C3068BE0
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:28:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EE5113034F96
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A973E6DED;
-	Mon, 18 May 2026 08:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FEC3E3D90;
+	Mon, 18 May 2026 08:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="isa6YLdj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3gUlZHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010020.outbound.protection.outlook.com [52.101.84.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705093E6DD4;
-	Mon, 18 May 2026 08:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779092720; cv=fail; b=q24cE0BVVHiT5PjENY5CB2gQnbtuEg23NmY3HBztbQZvOP7ws9Fq8x1qVm+NVWtxSj0oTkhtw4wTHn6pSPlU02P+kmDFmw7V+Ra/Dr8Si2EC2WUoE7cZdPef6ZBM4NR6N0yw8vKHOvVue++wPm0fMSBvF9eX86p+qY5kdsFsqnk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779092720; c=relaxed/simple;
-	bh=u6QDpaLXA9j/guMkrkqZF/bng4huQBNE9fb0nwWa6CY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aVQKmqCL/JRR/eNc9alHlQneZ8N8FAfDygj9mfDGYBTeoKSdg51NXl5RpFWn/UJE1/QgiOpYkMmDXSHSGXDcF+L+uoqYmaoMZtRdZVdWPOFwlecIv3KI8kKUUadL+MDFTco1sstEKAtQtPfmkSto0DSm5bCgCSk8ts8Nn7/QjNo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=isa6YLdj; arc=fail smtp.client-ip=52.101.84.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mhhMhhEA10w9Gu0+/R8D+iv1kFUJLg4hyB5mWc6yaGrMaNgFOZ2hVmla2auu6Oh+Kd6yVak9Os/PLJnoQ0PyTfVkeBuhToMtwptW4ZimODxYXne8C4CoBoxDpAyYx68fEmmHHOgvJfhqjavg11o9r6Ht+n5PpqEO06fuYDvcIoJZAgv8jogtpukhp6ma8N+V1TRfemOvzfUEwst9MLZrGMb2mx4TYKa3U7tKm88oEuAqd/U72DiEdYkSs1kIc7nl4hUngI15KqZjrbszCJt06kMSju8jEQx9ELjNgH3NmB3dQ6QRNQ4ckmJVjLW1Dloc9fJWsSgN+bDh/A8BYz6B6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a/mR9nGypa0ce5ElZvZFmoLBXdjnYpOAKwHiE0wdWek=;
- b=P8jKPBypnmMbZBsDNTnDD858B1RGDZrzNrB5fGIC6ipoJOf5QfIcXbDmC4/ioy2Rr8tDEdEUq1YyGihfYN47K6mb7UgVUA0CDHLthM2YLbW0n6c1//gCcPb7H2kgV+axoo9CLyjZh6CMJmwTFbZS/MCD/squwKCK721PiTa75mwOCcgp90egYTxnlCuaq/KXTlL4o8Y8zKV4imoNH9MnTKey9F+kdsO9+HbNrvLg8khTHV/mU2uE3JkiVkRpllnELFipN9GcKaSss00sjpigSrrLSa0RQwlTpnVdfQBo8lxh/9PKeJdiUEZwpEi+aP30y4KTFNs01Qk3K31RAWTbzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a/mR9nGypa0ce5ElZvZFmoLBXdjnYpOAKwHiE0wdWek=;
- b=isa6YLdjpqyJKKDl7W+j28dq1lvuAryZfnLENd2FzQHZ/Vc6a3dinrlzUd1YcTTpGtNBZbofSlNKI1Dh5HvB0xmbH1y8cIp/J9GzOBk+HY+ePeJ7jBNLP+gtH+536wDz38f/2fynILhHLsK3otAGL+Ll+PsjFPY/97dcXNDVsx03Fp1pM1RiXjQEB7vBVHd+IefApVRzAQxw8cctR1Fcw5o0MVdu477jwuRAl0w5/u+uybl7oWFttBgYzp3cb1x+NGlJezBI6ME8LIe15rMlsaxhTwLKU/fp6JY8M96yvoYIxh/X9q31uUVjicp7E0fPE0jwquL3izl4HWSffvUj9A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
- by AM9PR04MB8938.eurprd04.prod.outlook.com (2603:10a6:20b:409::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 18 May
- 2026 08:25:14 +0000
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9913.009; Mon, 18 May 2026
- 08:25:14 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	f.fainelli@gmail.com,
-	frank.li@nxp.com,
-	chleroy@kernel.org,
-	horms@kernel.org,
-	linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org,
-	imx@lists.linux.dev
-Subject: [PATCH v8 net-next 15/15] net: dsa: netc: add support for ethtool private statistics
-Date: Mon, 18 May 2026 16:25:06 +0800
-Message-Id: <20260518082506.1318236-16-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260518082506.1318236-1-wei.fang@nxp.com>
-References: <20260518082506.1318236-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2P153CA0005.APCP153.PROD.OUTLOOK.COM (2603:1096::15) To
- DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF6F3E2777;
+	Mon, 18 May 2026 08:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779092737; cv=none; b=m6vAzfDDunC8jRvUbUKhJQZwO9fwJe7FTfzmaakUqchBri2K+D4kKQZoCsC2Gj2pW0R9KT80IEHY7ZRiqfWaR8I0z3rhuwGBq+wlmJmhNqpca/G1Zxrqn4SLHYL9BPBEBT9UgGhNAaVS0g4MLJPSYQrOMgDAZMJ0ITrME+bA15I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779092737; c=relaxed/simple;
+	bh=dLOm69gQbw+yPFjzKhXWb6owlkPXwo1xmuTC823sFfk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ikWIkhRtk5CEjGY86dkJh8cFokJiH12CYX3mrQ4QRWEaLXGj2avqH5KWAngo62ZYQQT+dmztwMjd89bOSKzQfy94gfwcwGR/ARQrG8N8larWzDRMUJmSWYIJTkAyBekWS76cZi4FM/SWOpNKKdS8Xu6Bz7Ca4yL7p/mUDx2RCwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3gUlZHH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD87C2BCB7;
+	Mon, 18 May 2026 08:25:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779092737;
+	bh=dLOm69gQbw+yPFjzKhXWb6owlkPXwo1xmuTC823sFfk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=k3gUlZHH1ifI6YBRuLpXeTzk2ozQpO3HESBwtwC8zpFiMZPh9iSXOOjoeoAaMFs4J
+	 QFjwSv1Jc7GcoCdpHILGpZi2i/L9xorwzK4mv6pA99xq2ji1nL9rOtSQbSXnMtxlyE
+	 DXZS0rubhcA1vIIdpMaeYak/e1ryZyQZ1R2h3xohGw8dFdHu9kaDY0EjyAcOAilxQO
+	 sX3v1xtJUSkFrPbICsJN9yBLCvVRx+ELYK2mUA959RLZseZ5nLwunVSxfNP2YeHzT3
+	 BvPoKfoH+ulOykGosZ2h13s/VxRtgeb2tSg4XO2smjJB/3q623uNjtTMaTLypKxMel
+	 6dRhI6tdtAE4g==
+Message-ID: <cd33f886-75fb-47b8-b839-97fc6b11743c@kernel.org>
+Date: Mon, 18 May 2026 10:25:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|AM9PR04MB8938:EE_
-X-MS-Office365-Filtering-Correlation-Id: c07cf21a-83df-4343-ee56-08deb4b6fc19
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|52116014|376014|19092799006|1800799024|366016|38350700014|921020|22082099003|56012099003|18002099003|11063799003;
-X-Microsoft-Antispam-Message-Info:
-	TkEw8YeWkXVXrggTIEw/tkvGJ3yOriKmPSynReMlGEMxEwJ/yOHvXkOg1ZUEXwHlMT11/iCCvD82xOGbjM9474pHMmLScU4LgCmA+0/wizOTV18i40CDV7cvDvP1WNTMxmq30eKh+lOAY16v7CK61vEdTj3sDbM2Rw5f0oFnZnycdhQYv6sJhzbSQERYa5gHL2sy1EEgKhmQWaCLFuUz3VkxubJyThV/Gka+c5BCogUONxA1IeFttRjWLTDkjnYu3n4qPxxpyCXYvXvmmCDTjCPIHDi0LLBx2XN5Eeq533uKFili/P3vlQhbWV3PLaZKqZOx4es3fJ0Xrd+xj0Ogi8o5pW/EqvXj0022QQMjEOMjXzYHf3TBwweTFysCT7EUZcdOsl2FqM5U8g/49bL15sD9q8f3DCS0iA3tG8pmXyWHKlMirsK9hprScG+BJgj5b5RN9XbNAkGnjEr2OLhq7XwYdzM5B7le4rnSFlQsHACFTe+KyhGhek/OeIdYldzKowRUJSGotnYVFvNC8mPImUftMiQ/4GLOL2pV5wFSBmc2SzSprHdBrvnDad6lky41qwB64WuPzJ4xP6lI9YtId6Bhg9ulvYhDUmXXjDn7K2/oaVxnJIBQBJRnbi5Rp5Yz0ujQtmYwcjmwzNXzBEnHKzbNZ9ctc0X7FNEye2GE5DVkVHrfyLKZ+hym7pTW54BUvC2cGqJ4XRhhpggQBuMvd+iSBAXvOpj0vY0W9PMot+89FFGFaL8fLXovQ+YWiEWX/eiwe4wo9HW7nrsymz+npw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(52116014)(376014)(19092799006)(1800799024)(366016)(38350700014)(921020)(22082099003)(56012099003)(18002099003)(11063799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Kqh2Zbl/RL9vT1Mu2Qp1mum0+043sMXybgCfEYAmphCuHUTMe+TM0HN0H30w?=
- =?us-ascii?Q?AzbOs262O+G0Yj2Sb0WCM+AE64oJplPFkbE/3Lap24k9rNj4RIeE3qZw+FqF?=
- =?us-ascii?Q?jz2nuIGhLwr9UkSP9sXh19zBbka758AmqNQF2AnNfkI2r0dism5NXEPeo5up?=
- =?us-ascii?Q?dmxqjC/UQfL/vJJ/oU52drwHIAqdRIm3z6ikAma/jmP3BJGXv48BBxnEzA0W?=
- =?us-ascii?Q?UUD1Wkzx9rGwmQg9AaITqEMzEcaAGFeM8IcerQM8z3tOezbo9oEJANGspiRp?=
- =?us-ascii?Q?uPvlJayZiSZS5K44Ckh5VZG5114xlC9vYB5QpAPSWnW1fMHPYg0ddg3hsQ/Z?=
- =?us-ascii?Q?1GamWJZ7khCtrTZdnaIllmuaa/b54ylacIXFYMDFj1/yRgs6yBkcakev4Hgr?=
- =?us-ascii?Q?UTxaQ3x71Gs47+uNNign6tySMfW1lHHd9gzdVAld1jWPe4AAKCvoktIXXLHd?=
- =?us-ascii?Q?Pd3ZN7mGlyYNwMle+Art+KfJrSWIj3BbAU/k6XLUFn8gcz+w0JXA6MZIAYfH?=
- =?us-ascii?Q?Q3FbxgtkwEZT6mQKoLSb8gz/0AWiOJsB+q9qtHg4x8UrevgNPaNINB13ZE/z?=
- =?us-ascii?Q?/z5HBrTR0+qNuU+u4ES8hUfAfMpjFxo7HbU/gAnOeFCBp3gmq6YzOIuVNSrv?=
- =?us-ascii?Q?ZPGEAFoAHyX5DJZsG4TgWOWj91QoBRuFz8iATovWvJoNBBHtSyhDtFvwrVEy?=
- =?us-ascii?Q?2unxgs7yeEdh3rGQdGM2p3MDRBuvW8dEKOTTzUpHexVDXMJM+9VpOLB/L4B5?=
- =?us-ascii?Q?5i/epAtg5IES/pjmS48QAwyt93sbyIDbEfbhveMG5v6SfmZ3b+UokuvqfunC?=
- =?us-ascii?Q?V2Vcp6O9x3sJxeonHgVHka4jZwoUfTGEgsmZ55MrfX0B2pV3jqaKnOkzO3bo?=
- =?us-ascii?Q?6Pa6s3YnsoZCjlxJIOIojkIAsfKT79TPxA/aUkX0CTlEV5fzr7yK1jeH7rTL?=
- =?us-ascii?Q?U+NIenSNQPZYVAKdafzdsLEPXep6u68QoVJ1DB2owkGBma5JZml2RcJuTQQn?=
- =?us-ascii?Q?k6QVa21xP/4Ip57PV00z6SGXtdDVbBlI02rOW9N/2TYBIy+6gkAkalqXNZad?=
- =?us-ascii?Q?Ml9QxHxAfzTXbI3lXOa8P7C8m0BpS7C+PXIPlue7pLF3fBfrCexqxbeBIWeY?=
- =?us-ascii?Q?6DP9K9P5ilCXRgqVyouzn0LMCXfAuXMmlfFquLklNCjnUprAUJ6nLHmkcSIm?=
- =?us-ascii?Q?kQpZljjhdTkXDjOZtjm2gCtVMdK2lMnoefFfpnY8/kBsuGUDkbo2aZ2Bbkqa?=
- =?us-ascii?Q?z7lb6ZuBfC5uBe4ZZa4yW828cOUCeX0B6VeKgRWPdCZ/xakyt26hWQpX4Dri?=
- =?us-ascii?Q?Izq0PisnYVbTSw8lEIXRyeB9ofJKT7re6f72J6P5G1mwO7ykilNhXvUxuANv?=
- =?us-ascii?Q?Ys2dtZvx9sGiY15EJ5qqtBAgb3lqwCweF/KnN1gMHiFAtPbZBBRB7jEnyEvq?=
- =?us-ascii?Q?FKsVL47yF7u0YJcMmQ646c1QaljUURS42I7wkVjugaMS+isEeMD/GoNqIUy4?=
- =?us-ascii?Q?0boH20DVDjJMf316STsC9TT7WtMlVHQodSz1ygUyXnnNhllT8z0k4i8cehwz?=
- =?us-ascii?Q?1Cq516bv16xTXIZifBvrgePBGytWg8fhZaze6DJmoMA+nawcv8PKY59id047?=
- =?us-ascii?Q?1vK8fgxD6sH9sdMKuX0Wx9W5XjqowpQoQCpIXWhOZMCGXyoGY9mfKAWSZ1gU?=
- =?us-ascii?Q?wxiyZMwchqLvPSFK0Iri4H72lOVE+8vlDymvjDHRhkvwWgB4?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c07cf21a-83df-4343-ee56-08deb4b6fc19
-X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 08:25:14.2413
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: r8J8AGx8A1A0+SqFixUe+0UV9mJ/C7zuYNvm0U3W2ThStFPktikrUXYSJ/YYm7WC+8sZliKAdehtbmDsPVcnOw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8938
-X-Rspamd-Queue-Id: BDC8D568E9A
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] can: peak_usb: validate URB length in
+ pcan_usb_fd_decode_buf()
+To: Berkant Koc <me@berkoc.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+ Stephane Grosjean <stephane.grosjean@hms-networks.com>,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel@pengutronix.de, stable@vger.kernel.org
+References: <20260517-can-usb-fix-cover@berkoc.com>
+ <20260517-can-usb-fix-1@berkoc.com>
+ <b978603c-4878-4eee-adc1-290e905fe768@kernel.org>
+ <177906591253.919135.13839066904083701982@berkoc.com>
+From: Vincent Mailhol <mailhol@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=mailhol@kernel.org; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
+ fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
+ F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
+ 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
+ YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
+ dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
+ zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <177906591253.919135.13839066904083701982@berkoc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 8B98A56903C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,bootlin.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288939-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288938-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:mid,nxp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mailhol@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Implement the ethtool private statistics interface to expose additional
-port-level and MAC-level counters that are not covered by the standard
-IEEE 802.3 statistics. The pMAC counters are only reported when the port
-supports Frame Preemption (802.1Qbu/802.3br).
+On 18/05/2026 at 02:58, Berkant Koc wrote:
+> Vincent, fair, my earlier "custom CVE-hunter setup" was too thin.
+> Here's the fuller picture.
+> 
+> Tooling: berkoc-pipeline, a custom RAG framework on Claude Opus 4.7
+> (Anthropic CVP cohort, May 2026). Full agentic stack: multi-tool
+> execution (filesystem, web fetch, code execution), parallel subagent
+> orchestration with adaptive task decomposition, extended-thinking
+> integration, retrieval-augmented context over a file-based semantic
+> knowledge base, MCP-style integration patterns. 7-step pre-disclosure
+> validation gate, manual verification on every finding before submit.
 
-Note that although rtnl_link_stats64 provides some standard statistics
-such as rx octets, rx frame errors, rx dropped packets, and tx packets,
-these are overall port statistics. The NETC switch supports preemption
-on each port, and each port has two MACs (eMAC and pMAC). The driver
-private statistics are used to obtain statistics for each MAC, allowing
-users to perform analysis and debugging.
+Your message doesn't follow the mailing list etiquette:
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/dsa/netc/netc_ethtool.c   | 101 ++++++++++++++++++++++++++
- drivers/net/dsa/netc/netc_main.c      |   3 +
- drivers/net/dsa/netc/netc_switch.h    |   9 +++
- drivers/net/dsa/netc/netc_switch_hw.h |  52 +++++++++++++
- 4 files changed, 165 insertions(+)
+Link: https://subspace.kernel.org/etiquette.html
 
-diff --git a/drivers/net/dsa/netc/netc_ethtool.c b/drivers/net/dsa/netc/netc_ethtool.c
-index ac8940b5a85c..e6028851a6d0 100644
---- a/drivers/net/dsa/netc/netc_ethtool.c
-+++ b/drivers/net/dsa/netc/netc_ethtool.c
-@@ -19,6 +19,50 @@ static const struct ethtool_rmon_hist_range netc_rmon_ranges[] = {
- 	{ }
- };
- 
-+static const struct netc_port_stat netc_port_counters[] = {
-+	{ NETC_PTGSLACR,	"port gate late arrival frames" },
-+	{ NETC_PSDFTCR,	"port SDF transmit frames" },
-+	{ NETC_PSDFDDCR,	"port SDF drop duplicate frames" },
-+	{ NETC_PRXDCR,		"port rx discard frames" },
-+	{ NETC_PRXDCRRR,	"port rx discard read-reset" },
-+	{ NETC_PRXDCRR0,	"port rx discard reason 0" },
-+	{ NETC_PRXDCRR1,	"port rx discard reason 1" },
-+	{ NETC_PTXDCR,		"port tx discard frames" },
-+	{ NETC_BPDCR,		"bridge port discard frames" },
-+};
-+
-+static const struct netc_port_stat netc_emac_counters[] = {
-+	{ NETC_PM_ROCT(0),	"eMAC rx octets" },
-+	{ NETC_PM_RVLAN(0),	"eMAC rx VLAN frames" },
-+	{ NETC_PM_RERR(0),	"eMAC rx frame errors" },
-+	{ NETC_PM_RUCA(0),	"eMAC rx unicast frames" },
-+	{ NETC_PM_RDRP(0),	"eMAC rx dropped packets" },
-+	{ NETC_PM_RPKT(0),	"eMAC rx packets" },
-+	{ NETC_PM_TOCT(0),	"eMAC tx octets" },
-+	{ NETC_PM_TVLAN(0),	"eMAC tx VLAN frames" },
-+	{ NETC_PM_TFCS(0),	"eMAC tx FCS errors" },
-+	{ NETC_PM_TUCA(0),	"eMAC tx unicast frames" },
-+	{ NETC_PM_TPKT(0),	"eMAC tx packets" },
-+	{ NETC_PM_TUND(0),	"eMAC tx undersized packets" },
-+	{ NETC_PM_TIOCT(0),	"eMAC tx invalid octets" },
-+};
-+
-+static const struct netc_port_stat netc_pmac_counters[] = {
-+	{ NETC_PM_ROCT(1),	"pMAC rx octets" },
-+	{ NETC_PM_RVLAN(1),	"pMAC rx VLAN frames" },
-+	{ NETC_PM_RERR(1),	"pMAC rx frame errors" },
-+	{ NETC_PM_RUCA(1),	"pMAC rx unicast frames" },
-+	{ NETC_PM_RDRP(1),	"pMAC rx dropped packets" },
-+	{ NETC_PM_RPKT(1),	"pMAC rx packets" },
-+	{ NETC_PM_TOCT(1),	"pMAC tx octets" },
-+	{ NETC_PM_TVLAN(1),	"pMAC tx VLAN frames" },
-+	{ NETC_PM_TFCS(1),	"pMAC tx FCS errors" },
-+	{ NETC_PM_TUCA(1),	"pMAC tx unicast frames" },
-+	{ NETC_PM_TPKT(1),	"pMAC tx packets" },
-+	{ NETC_PM_TUND(1),	"pMAC tx undersized packets" },
-+	{ NETC_PM_TIOCT(1),	"pMAC tx invalid octets" },
-+};
-+
- static void netc_port_pause_stats(struct netc_port *np, int mac,
- 				  struct ethtool_pause_stats *stats)
- {
-@@ -188,3 +232,60 @@ void netc_port_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 		break;
- 	}
- }
-+
-+int netc_port_get_sset_count(struct dsa_switch *ds, int port, int sset)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int size;
-+
-+	if (sset != ETH_SS_STATS)
-+		return -EOPNOTSUPP;
-+
-+	size = ARRAY_SIZE(netc_port_counters) +
-+	       ARRAY_SIZE(netc_emac_counters);
-+
-+	if (np->caps.pmac)
-+		size += ARRAY_SIZE(netc_pmac_counters);
-+
-+	return size;
-+}
-+
-+void netc_port_get_strings(struct dsa_switch *ds, int port,
-+			   u32 sset, u8 *data)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int i;
-+
-+	if (sset != ETH_SS_STATS)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_port_counters); i++)
-+		ethtool_cpy(&data, netc_port_counters[i].name);
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_emac_counters); i++)
-+		ethtool_cpy(&data, netc_emac_counters[i].name);
-+
-+	if (!np->caps.pmac)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_pmac_counters); i++)
-+		ethtool_cpy(&data, netc_pmac_counters[i].name);
-+}
-+
-+void netc_port_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *data)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_port_counters); i++)
-+		*data++ = netc_port_rd(np, netc_port_counters[i].reg);
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_emac_counters); i++)
-+		*data++ = netc_port_rd64(np, netc_emac_counters[i].reg);
-+
-+	if (!np->caps.pmac)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_pmac_counters); i++)
-+		*data++ = netc_port_rd64(np, netc_pmac_counters[i].reg);
-+}
-diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-index f3ab0c7646da..fa7dd307ce13 100644
---- a/drivers/net/dsa/netc/netc_main.c
-+++ b/drivers/net/dsa/netc/netc_main.c
-@@ -1491,6 +1491,9 @@ static const struct dsa_switch_ops netc_switch_ops = {
- 	.get_rmon_stats			= netc_port_get_rmon_stats,
- 	.get_eth_ctrl_stats		= netc_port_get_eth_ctrl_stats,
- 	.get_eth_mac_stats		= netc_port_get_eth_mac_stats,
-+	.get_sset_count			= netc_port_get_sset_count,
-+	.get_strings			= netc_port_get_strings,
-+	.get_ethtool_stats		= netc_port_get_ethtool_stats,
- };
- 
- static int netc_switch_probe(struct pci_dev *pdev,
-diff --git a/drivers/net/dsa/netc/netc_switch.h b/drivers/net/dsa/netc/netc_switch.h
-index ed83201d128b..4fbd12825b67 100644
---- a/drivers/net/dsa/netc/netc_switch.h
-+++ b/drivers/net/dsa/netc/netc_switch.h
-@@ -94,6 +94,11 @@ struct netc_fdb_entry {
- 	struct hlist_node node;
- };
- 
-+struct netc_port_stat {
-+	int reg;
-+	char name[ETH_GSTRING_LEN] __nonstring;
-+};
-+
- struct netc_switch {
- 	struct pci_dev *pdev;
- 	struct device *dev;
-@@ -160,5 +165,9 @@ void netc_port_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
- 				  struct ethtool_eth_ctrl_stats *ctrl_stats);
- void netc_port_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 				 struct ethtool_eth_mac_stats *mac_stats);
-+int netc_port_get_sset_count(struct dsa_switch *ds, int port, int sset);
-+void netc_port_get_strings(struct dsa_switch *ds, int port,
-+			   u32 sset, u8 *data);
-+void netc_port_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *data);
- 
- #endif
-diff --git a/drivers/net/dsa/netc/netc_switch_hw.h b/drivers/net/dsa/netc/netc_switch_hw.h
-index f4e8ef983c21..1d976882a6cc 100644
---- a/drivers/net/dsa/netc/netc_switch_hw.h
-+++ b/drivers/net/dsa/netc/netc_switch_hw.h
-@@ -98,6 +98,14 @@
- #define  PSR_TX_BUSY			BIT(0)
- #define  PSR_RX_BUSY			BIT(1)
- 
-+#define NETC_PTGSLACR			0x130
-+
-+#define NETC_PRXDCR			0x1c0
-+#define NETC_PRXDCRRR			0x1c4
-+#define NETC_PRXDCRR0			0x1c8
-+#define NETC_PRXDCRR1			0x1cc
-+#define NETC_PTXDCR			0x1e0
-+
- #define NETC_PTCTMSDUR(a)		(0x208 + (a) * 0x20)
- #define  PTCTMSDUR_MAXSDU		GENMASK(15, 0)
- #define  PTCTMSDUR_SDU_TYPE		GENMASK(17, 16)
-@@ -105,6 +113,9 @@
- #define   SDU_TYPE_MPDU			1
- #define   SDU_TYPE_MSDU			2
- 
-+#define NETC_PSDFTCR			0x4c4
-+#define NETC_PSDFDDCR			0x4c8
-+
- #define NETC_BPCR			0x500
- #define  BPCR_DYN_LIMIT			GENMASK(15, 0)
- #define  BPCR_MLO			GENMASK(22, 20)
-@@ -153,6 +164,8 @@ enum netc_stg_stage {
- 	NETC_STG_STATE_FORWARDING,
- };
- 
-+#define NETC_BPDCR			0x580
-+
- /* Definition of Switch ethernet MAC port registers */
- #define NETC_PMAC_OFFSET		0x400
- #define NETC_PM_CMD_CFG(a)		(0x1008 + (a) * 0x400)
-@@ -187,6 +200,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Receive Ethernet Octets Counter */
- #define NETC_PM_REOCT(a)		(0x1100 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive Octets Counter */
-+#define NETC_PM_ROCT(a)			(0x1108 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Alignment Error Counter Register */
- #define NETC_PM_RALN(a)			(0x1110 + (a) * 0x400)
- 
-@@ -199,12 +215,27 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Receive Frame Check Sequence Error Counter */
- #define NETC_PM_RFCS(a)			(0x1128 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive VLAN Frame Counter */
-+#define NETC_PM_RVLAN(a)		(0x1130 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Frame Error Counter */
-+#define NETC_PM_RERR(a)			(0x1138 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Unicast Frame Counter */
-+#define NETC_PM_RUCA(a)			(0x1140 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Multicast Frame Counter */
- #define NETC_PM_RMCA(a)			(0x1148 + (a) * 0x400)
- 
- /* Port MAC 0/1 Receive Broadcast Frame Counter */
- #define NETC_PM_RBCA(a)			(0x1150 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive Dropped Packets Counter */
-+#define NETC_PM_RDRP(a)			(0x1158 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Packets Counter */
-+#define NETC_PM_RPKT(a)			(0x1160 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Undersized Packet Counter */
- #define NETC_PM_RUND(a)			(0x1168 + (a) * 0x400)
- 
-@@ -247,6 +278,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Ethernet Octets Counter */
- #define NETC_PM_TEOCT(a)		(0x1200 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Octets Counter */
-+#define NETC_PM_TOCT(a)			(0x1208 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Excessive Deferral Packet Counter */
- #define NETC_PM_TEDFR(a)		(0x1210 + (a) * 0x400)
- 
-@@ -256,15 +290,30 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Frame Counter */
- #define NETC_PM_TFRM(a)			(0x1220 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Frame Check Sequence Error Counter */
-+#define NETC_PM_TFCS(a)			(0x1228 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Transmit VLAN Frame Counter */
-+#define NETC_PM_TVLAN(a)		(0x1230 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Frame Error Counter */
- #define NETC_PM_TERR(a)			(0x1238 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Unicast Frame Counter */
-+#define NETC_PM_TUCA(a)			(0x1240 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Multicast Frame Counter */
- #define NETC_PM_TMCA(a)			(0x1248 + (a) * 0x400)
- 
- /* Port MAC 0/1 Transmit Broadcast Frame Counter */
- #define NETC_PM_TBCA(a)			(0x1250 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Packets Counter */
-+#define NETC_PM_TPKT(a)			(0x1260 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Transmit Undersized Packet Counter */
-+#define NETC_PM_TUND(a)			(0x1268 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit 64-Octet Packet Counter */
- #define NETC_PM_T64(a)			(0x1270 + (a) * 0x400)
- 
-@@ -304,6 +353,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Excessive Collisions Counter */
- #define NETC_PM_TECOL(a)		(0x12f0 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Invalid Octets Counter */
-+#define NETC_PM_TIOCT(a)		(0x12f8 + (a) * 0x400)
-+
- #define NETC_PEMDIOCR			0x1c00
- #define NETC_EMDIO_BASE			NETC_PEMDIOCR
- 
--- 
-2.34.1
+Relevant part:
 
+  kernel mailing lists exclusively require that all communication is
+  sent as interleaved quoted replies.
+
+Is this answer also AI generated? If yes, please don't directly copy
+paste AI answers to the mailing list. We expect you to add value to
+the AI generated output.
+
+Regardless if this was AI generated or not, take time to familiarize
+yourself with the kernel processes. Reading a couple of the past
+threads in the mailing list is a good way to understand the
+expectations.
+
+> v2 of this patch will include the formal trailer:
+> Assisted-by: Claude:claude-opus-4-7 berkoc-pipeline
+
+Ack. Please use that tag.
+
+> For the peak_usb finding specifically: seeded with reference commit
+> 6fe9f3279f7d ("can: gs_usb: gs_usb_receive_bulk_callback(): check
+> actual_length before accessing header"), scanned drivers/net/can/usb/
+> for the "actual_length verified before header dereference" pattern,
+> candidate sites surfaced by the model, then manual verification with
+> a reproducer harness (synthetic short URB, walk through msg_ptr/msg_end
+> bounds) before the report went out.
+> 
+> Happy to formalise as `Assisted-by: Claude:claude-opus-4-7
+> berkoc-pipeline` trailer in v2 if you'd prefer, or drop the methodology
+> into a follow-up note.
+
+
+Yours sincerely,
+Vincent Mailhol
 
