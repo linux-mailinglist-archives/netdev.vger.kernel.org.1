@@ -1,713 +1,351 @@
-Return-Path: <netdev+bounces-288951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288953-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uDgqF8rZCmoA8wQAu9opvQ
-	(envelope-from <netdev+bounces-288951-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:20:10 +0200
+	id 4Ce7IxnaCmoA8wQAu9opvQ
+	(envelope-from <netdev+bounces-288953-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:21:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A83505698C8
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:20:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2F9B569922
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3EB5C307616A
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 09:13:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E1F2303B4F3
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 09:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6D43E4C6B;
-	Mon, 18 May 2026 09:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B23532B99E;
+	Mon, 18 May 2026 09:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U/i3nGZ0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PId+cVhc";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lo6v6eJn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8644A3E5A2E;
-	Mon, 18 May 2026 09:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779095597; cv=fail; b=jkFfUZW7frDJLtI3GQC/id0GQ4iV9vVKUby1ZF7G6VGVDVJb/lVmynj0btxVQBsq/8tA6/i0ZbTO7Ej/t7NYV76SyvvSQMTLq7APvxL393IqEP+RBNKay3O/liK5PpeY6gIcU4uk5PEdZ3hmwIGG5VmU2pFe1SDGGV3N/bS/BAY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779095597; c=relaxed/simple;
-	bh=zP0mACIY8ZrmI7lyCe2w2ajMkqi3m4L8sUM1wU4jkS4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=fDYvpEIOYtJR/Xfo5Dri8bavbB8EQILqAn7QkAQuhg6lzzKUCtzf25F2kxsYMvpfN6souZUUJOaYG+inDpUq4bxg6UeCeS8kJ3+d0F7lWM2WT9Zeqi7nvt3K8k1OZWXt2k4iAqln+oCJHSWS4Fkd9sJmImnDqh+RNWb5AEgtMFY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U/i3nGZ0; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779095595; x=1810631595;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=zP0mACIY8ZrmI7lyCe2w2ajMkqi3m4L8sUM1wU4jkS4=;
-  b=U/i3nGZ0CoWR3u5S2TeDzq84BPy8svDrXWIh66mVphzc8qLlP70F7hZB
-   JCJL/MXL3poU+NLaTYchjd8USIT5ZAmXTrYgWrPzqryCesZ42eNmZ9B0v
-   uLvWViFwKsadNg0m8jsMY4Sw5sxT8iSlkl7Qzx8TsNheH9xXjWzHEaPX0
-   2pJWMUzRaidmwDA8Q2ZIapp6sL3/C9nMUPywcUexxTX5cjeQCgirZe5ZI
-   DPIxmakQOOc6AoGJYOD5fI8sZRpRQ2tW7DmsQmBy+Cq1O/KwUBQY/6K9d
-   q1dOhx5xQQdnC5FX2qGaJ9mWINuJbjNhz+cSYc87dOntG36Y+h1o6YTqR
-   w==;
-X-CSE-ConnectionGUID: fpDCeDXLSYmA/7la6MA47A==
-X-CSE-MsgGUID: SUACiUC+SOeRLIE2PhY2qg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11789"; a="83796651"
-X-IronPort-AV: E=Sophos;i="6.23,241,1770624000"; 
-   d="scan'208";a="83796651"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2026 02:13:14 -0700
-X-CSE-ConnectionGUID: xjdec7YpSAGQx7tdsfXhSg==
-X-CSE-MsgGUID: szY8eT8dSPGjt/f0cKrCsg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,241,1770624000"; 
-   d="scan'208";a="263154036"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2026 02:13:14 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 18 May 2026 02:13:13 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Mon, 18 May 2026 02:13:13 -0700
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.3) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 18 May 2026 02:13:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ltvlbV1+b1A4+6ndVa1Onk+pzJMexRgrzBTjQ9ofPp5PPIDnXUVFuhoYREdWDInpdIrEz27iW/VGbpoDR4f86wRjPdm4rC43+wfWQSOnOASZsb9QmWqbMqB1N7cJDvm72VEWuuVl1UmfQTgNFkvsTI2nwxrePBAOi3iHqTvcikciD6pJ3aW8UJWGSLnkK6ejnOwclJc8iIf/4SdO48GaA/oU9I9PE89B6JXp/zBexuf2Y4+YaYw/PV+f9+OmXuyEoh7LnPzYqY4zfYkY6bCYlAiAalv6wCZsDimZuJdjBzyfz1nxB0EJkEiM4YH6Zz01HGKkpSfCN5ulDsavht604Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JSoXB6VHSItdHu2a91SilF5isVmx+/qLIteTnxZ/HXY=;
- b=Rg1Ju/NaaNu1mA7H/L9R27vh5dzEnPayLxCouxgmUn3i1aokDmcSVevEriPaqWwX2hF4dlraThTL9sH930Xa9HFcsrZOVtbAQDEVj7gRcJzZKYsOfR7eZd8cQYbvxgD+V/YJJur1jTylc+PYHC2EHdFUkBeIcmrCGWo2OBzjblTUaE7MDQyvzpu/AK9pwkYqtQ8xenXg5yumOiJtEy65bCqQKLFW8P6k4MSBcfEXIJI9rrjHDdjcp6NCQWK+Zoin43vY9Z8W9U9M6QOMWmOsnonhWvwcbAGdKO9rM7ffuxjLYpsIil3rm+NLsJfL1neiJ+ROseBRo9gDO5yWCuAiJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by CH8PR11MB9481.namprd11.prod.outlook.com (2603:10b6:610:2bb::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.22; Mon, 18 May
- 2026 09:13:11 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b%6]) with mapi id 15.21.0025.022; Mon, 18 May 2026
- 09:13:11 +0000
-Date: Mon, 18 May 2026 11:12:58 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
-	<przemyslaw.kitszel@intel.com>, <aleksander.lobakin@intel.com>,
-	<sridhar.samudrala@intel.com>, <anjali.singhai@intel.com>,
-	<michal.swiatkowski@linux.intel.com>, <maciej.fijalkowski@intel.com>,
-	<emil.s.tantilov@intel.com>, <madhu.chittim@intel.com>,
-	<joshua.a.hay@intel.com>, <jacob.e.keller@intel.com>,
-	<jayaprakash.shanmugam@intel.com>, <jiri@resnulli.us>, <horms@kernel.org>,
-	<corbet@lwn.net>, <richardcochran@gmail.com>, <linux-doc@vger.kernel.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Bharath R
-	<Bharath.r@intel.com>
-Subject: Re: [PATCH net-next v3 12/14] ixd: add reset checks and initialize
- the mailbox
-Message-ID: <agrYGjTmafeGxODv@soc-5CG4396X81.clients.intel.com>
-References: <20260515224443.2772147-1-anthony.l.nguyen@intel.com>
- <20260515224443.2772147-13-anthony.l.nguyen@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260515224443.2772147-13-anthony.l.nguyen@intel.com>
-X-ClientProxiedBy: VI1P189CA0013.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:802:2a::26) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5BD3E51E7
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 09:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779095917; cv=none; b=QO5li0SMPqsM4bSP8N39fZ0hkmCNbxuNrzlulcnYnzr/5H/3LKSpaYcZmK1QE6ZwM4e9rIQsxIkUmM1NrzHgtWfs3Z0a6Xl3UTkbmgYDEB0mpg0h9KlfOD+GivdOblWRKNfUeVW6KaaWSNwr900DaTyX5Yf3FaOEOqDSckmMKTU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779095917; c=relaxed/simple;
+	bh=+8/VJhhwAWRz5iKAyGx7YnwI1nUcMidMBg/lFGhMB3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X/BzN8q/mE1+22lgsZ86SxmZ3pBE57TSSAc2RIgHEG1z4fNhmpYBkAMJcTXhtpauER6gXTLgvEkJsimsL5AFDUkIFUijXkhBG8s5PqzJLOX3GYKM1BLH7Szz6fIjTotVehU9WdS2xZ6ULPCcuG+B832yWxS2oH/NN2J/X9n8ZsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PId+cVhc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lo6v6eJn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779095913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EqKUKOs8Xdi2Db46H+lGN1qYJFfdvrNsugQmOuQMj5w=;
+	b=PId+cVhcgwMKOdro6Jy6rhfc+CnHqw3eB5SoHnufgcN15SYlE5KLieI2AxH3zpSD5Lp43+
+	NiZfVcRvhYw7WAP2YwMRtDqWYX1xIyV0G6lvHH14NJZ6lVaHVmS4BCXZfkM21adwK/7orI
+	+tNi95HlxCdNyWmImGWLDhXmPjYdtQg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-377-ERBWZ7IfPz2irv6Slf9jAg-1; Mon, 18 May 2026 05:18:32 -0400
+X-MC-Unique: ERBWZ7IfPz2irv6Slf9jAg-1
+X-Mimecast-MFC-AGG-ID: ERBWZ7IfPz2irv6Slf9jAg_1779095911
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4411a2c034fso2085474f8f.3
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 02:18:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779095910; x=1779700710; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EqKUKOs8Xdi2Db46H+lGN1qYJFfdvrNsugQmOuQMj5w=;
+        b=Lo6v6eJnjKsGJCDjgJ4/yFECN7KuX9gdg4Idj1Nyd+KHH/tpO118ULBLx1d++YlJb8
+         wv8cFjuytScHRSTlYZynKaTl0dDkrP302Hk0dLjpn/lz7lrgza2RikZCcxvKuq1tHolF
+         gDjdNC/xmnjPdE/FUshyz8rYvWJSOKGxQpyRVjanlGB2IapY6gdRMl83+RgFva4hfiE0
+         RJ0Esbg9k17dxZsHUh2djM2MogDPeWy/t7p2HGPmpthcYXJpsOLN5oFd9uMVr0Y4rjDV
+         CwuMrKNJP76gdVf6hdn7SG1iPz8Z9TkFgmUNHsqBoLUISORrVBZTByF9hzOfFMHhoWwI
+         XrWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779095910; x=1779700710;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EqKUKOs8Xdi2Db46H+lGN1qYJFfdvrNsugQmOuQMj5w=;
+        b=Ql4Sr4aXIBejydH0TVxCkUNQYk0gG3iGKFG1B4GNFOD6ZEcHQJhzXb1SXzJH7pQQ37
+         V6UdljhSb/QN101Y1QkDgZBSSXnCMMhy2tkNeJUVlPOo8BQecITN4v3KDd79XJD7iP7V
+         WniptSGle0vlXzIysonZrA4w2FBOgkjqsNRHyipl6oS27EOEDSbLseRH9n0UCqYRvpYZ
+         U38qK9xSsZ3mE8HVcYVOKFr2NofOXrCW3ZNW6CScMoMI9aUmLk+bUoqeaSHoj+VnemkQ
+         gUFbCKiq8Gxa3l2CQXMHxlEQL4A//Gdlhq15ky/CnWunaywoG8uAuGRJONFEiFccUX2U
+         Y1kQ==
+X-Gm-Message-State: AOJu0Yz6y/TO3KYxk1Og78CrtN4SeYc4fJWHfNj0fMqknm6azUddEofk
+	lDEJkEv1hNHm4OIqH2HFTS8bo7EQUH7snGvx0DWcV4jkNXXDpn3e1GnEZgRKcAqESovEe0wXYrj
+	9cFOwd2pb0SNs9DEGjudRG7FUYsy7auqzX/qnb1qISbJpAIG0uAQvpYC95w==
+X-Gm-Gg: Acq92OEMCn0BmBpfS0BuSMeYoMUQrufi9l5uyPPlOcfNHnPucIv/pTOe66s2uzsHjaM
+	+X3EhNxyrCh88JN939zUJ0VVYorxfdVUs/xky7zt/XLvFzt/xaj8Mmb9pfed3JHFQ9g2goxr7ju
+	q5c8CEmOppy6jcf+T9E2cWgU9mZffzTrR31CLipvgBCnFIySXHQugBbCWuUccduieHW+inwVv7L
+	LHjaSlu43daQ3pnlVp7uBfoNDX4MC1/z+qeAHyctdXrigzuat4O9g8dw0p4BopE7LEOqnLkJpdp
+	fnNdoONR2CYavayZVPri4tYN7W4Mfn6QB1amDJsgDzsh/PEaFaVp7r3OGVu3ZFilPMsORKsL7eV
+	k8EmXuDrMiO7yuPd2T2UYdu4bDy9iV1n/P22+xFgVmKm7DbyhfjS/zT+E0EEN6diUc3ks3hmHhQ
+	==
+X-Received: by 2002:a05:600c:35cc:b0:48f:fe2a:107b with SMTP id 5b1f17b1804b1-48ffe2a1125mr137667175e9.7.1779095910534;
+        Mon, 18 May 2026 02:18:30 -0700 (PDT)
+X-Received: by 2002:a05:600c:35cc:b0:48f:fe2a:107b with SMTP id 5b1f17b1804b1-48ffe2a1125mr137666435e9.7.1779095910029;
+        Mon, 18 May 2026 02:18:30 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-16-204-231.retail.telecomitalia.it. [87.16.204.231])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe57944c1sm263396765e9.7.2026.05.18.02.18.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 02:18:29 -0700 (PDT)
+Date: Mon, 18 May 2026 11:18:24 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	virtualization@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+	Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org, 
+	Maher Azzouzi <maherazz04@gmail.com>
+Subject: Re: [PATCH net] vsock/virtio: fix zerocopy completion for multi-skb
+ sends
+Message-ID: <agrXvCtNRlySlwgx@sgarzare-redhat>
+References: <20260514092948.268720-1-sgarzare@redhat.com>
+ <20260516125329.7b699c6f@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|CH8PR11MB9481:EE_
-X-MS-Office365-Filtering-Correlation-Id: d0b96a95-277f-431c-e7a2-08deb4bdaef4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|10070799003|366016|22082099003|3023799003|18002099003|11063799003|56012099003|4143699003;
-X-Microsoft-Antispam-Message-Info: ZbTfolsMdVvwf1A0fSexdKFo8PnqrbyaZ/Jbgt8suEEgN9Mw7dqd1zkOkJQvKZLuVdEKksjDZU5G/RFM1WY6PUkVvqFHQvA+UAx6v9sfkM4Tkk++wjkLLWG2RqVwxAZeFI7kOoolBBUZZI3jKrNzvS9CxNA26LckZIt/IbEh2O+/Lrlf6dDgW254hyf6BlP6MHeYsp6Z2D0QJtkjuLFgFdNFrVxXNTtz47fs/ixoCuhZav/xTS6La07v3QsXFxrHeUbQ6IZRmTXkriBTIaJtjX0EnQLqq6LY13Vwu80eapoky8N4ARlBXDtM0tVnvAge9NQwniFBdkLggnyEn2Yys+BL9dqFIsnj5yU9uMb4cmjOXMOkoOZXFvQC3lESuwCme1aTP+sMnI7vmFgcAIeIB8vL4qpvY0Km5XqVSikjb7SBcMpHAcd2v3iqXkDC20Ae6jARZvMsepiqrAnIaQ9r7fCw+DmP9bF2tFr6tsawXmuTJyQDe2nPGCVoUPAGPvpEnFDsS1exMWFJb72PBUiUK0lh+LlxdCaPbnJIiJcUwFhE/v0WdfcWDhHo66mgo7ZycnlKaepl2o3bxEzexq9lkdHn6dzmq9ME8BmZ9+WJ2zC+dfIVu5aado+JZyTu2gjBES/1Ada3F0L1HAHpYfkzyw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(10070799003)(366016)(22082099003)(3023799003)(18002099003)(11063799003)(56012099003)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?25ErZaYmlI1PPWb6+fC1nXKx+Ps5RzyrIG/lqtB7kkW0K8vnlMC/3snM4MM4?=
- =?us-ascii?Q?7IJsY8wUIDjzPRQcH7aaHjgImJPOHuF+9QDe7gN40SnDSF72oXmH7LZeJDxT?=
- =?us-ascii?Q?QSublXQh6evNj+6H26JCGfpZ/XHG1lyo1C75PqQhzFWMqpcUODE5Uzqi4emy?=
- =?us-ascii?Q?aHPb6idKj9Gi4UfIjMuMKTF+DCjfOFuoZMov+YvcTaby1uqqIABFYyvpDgMF?=
- =?us-ascii?Q?+SrMZIjN30ZA94hmmc6hJIXO8u3rhXCuH2suObkOvsmn/Vf7dgw53uQwUkWE?=
- =?us-ascii?Q?YeASVhkadMII7jXDULzBKBfFLT9WmGzEJDwRGt3EMoYo+8GzXEJRFzHRT5mS?=
- =?us-ascii?Q?ecaKah8GDZ/kZV5xw0hCLUV7TeZo7sGU+dCPjohuLgP9mMwBJHX/eNmvWBTk?=
- =?us-ascii?Q?frYCPaED5jYO5DONKYJnwEND43jxDrD/pHZXvwuYcJnrNpc/u+rmg2rrY8Uf?=
- =?us-ascii?Q?330k5qlnGF8c1M6rFGiNg3gI3T1FxqXuWzd1XXTBDk9J8P8S+sPyydA3vB+a?=
- =?us-ascii?Q?5uvpxlX7fSbGC9yC6IgyDpYmeITL8wYemYxu2VPWGPj5vT9q/q+/SAm4Z4GG?=
- =?us-ascii?Q?pNfqtiBeqXItkXJ/lhbqMChHotaAzBvMq0vQz5YM8oNlgcba1VNjGapuiovJ?=
- =?us-ascii?Q?taBAiWPAq+OphkphV1UflnkytPnayDrt4AcLvmRer6nSvhTyDiIlnEA7Ozhr?=
- =?us-ascii?Q?Jik+PI9OW79/DyIpHeaYd54uTM9UhvJOeIanx6v3QEz0XeE2zpvXbFoUK9k2?=
- =?us-ascii?Q?ZqkeM1lAbnQdCVXabHgPt6xorkW+Vjq7d6dxRhLTHmqYZ6Y6TUBJTMvKwsLE?=
- =?us-ascii?Q?gUEDMGkYbiJrO3hz5ZrtLycwC8ei+8Qg0J6EGgwnKzQXiK4C/BJDTCJzkg0v?=
- =?us-ascii?Q?nti/d7y4wZcmzhUpg/lacAcIiO9zITMAuGsMcTKAkWqe4URziqpNOGZadBzr?=
- =?us-ascii?Q?K6d4oJjdcrV294XkCEV6MDF64B79GG8N+VFPnWjJYNM4mxVa4N/FCtw8h8gE?=
- =?us-ascii?Q?LJJHua5TbT9FzgLa8AReX/SQudLf+OcWFndVMy7afCC7Al4w0Egx5BGq5kXT?=
- =?us-ascii?Q?fhn/zvWy3Oh63tTiCWM/PjlPaMeKnb9cJikeN172B1dj5IR/AFGrA25BB/hP?=
- =?us-ascii?Q?yen4pvm7tEfpQVFqieaMCO+0kCoiH6Z3dp2P+hLiDltyalEU04Iw5s25ORxc?=
- =?us-ascii?Q?LFpYmAcdfCkHFxbFG7bWTGqmrm5YJtR3ny7knuBV+rT091LD8+OItRxAPlUc?=
- =?us-ascii?Q?sOntIxmUkEtYdQ/SaX8gBuzxADUzjuDWZ0P0Fs4ZWscNBInY1ZoDx+uAnyPO?=
- =?us-ascii?Q?lSfzNinlhEk64eFkArb0YJvqP5x2s7HrOgCsFZE9EDKoTvIbptXHQS1da+Id?=
- =?us-ascii?Q?kvv/uJ5zBpne9NQdWVwl0JSZVgNHlTHryzYrJIa7HL1S2x5CyebWC04MHo+l?=
- =?us-ascii?Q?cP5DPmBzkQ6Y9dU5HGoJqX30Quj5qEHX8zY6q9PeR8iaJsdYaFXnvkAU3dwx?=
- =?us-ascii?Q?u/ILecYtSzAdgYV2cSGzEhyJ38FUjZF2WLF7u33AU9DY0h9XeEah4DoWOaqA?=
- =?us-ascii?Q?AxHsalB2azeqxQ/uz71aSF1ZG3tWzYE6cjnF1JNMoprFWpawpUUjP+Lb/ltb?=
- =?us-ascii?Q?4IEh4EuL0dl0Tir+IzNH42almrhdBL7+u1eyCP2Cu1B3D1+4UXSl/pUPxlON?=
- =?us-ascii?Q?NUX5t94s6z9lxQAon+4l+53nmhKkBGtHEecqjoAauha9uVSJNJTFkqsa2EMS?=
- =?us-ascii?Q?PpTJaMYYUDU1JTe6WNloPntTJdfMBhIuTyFKdACi7UWVD4jpOpdXih0+CLkk?=
-X-MS-Exchange-AntiSpam-MessageData-1: e0qY5VMe68tw7gnyJAFAvgEw8baJnipKk8s=
-X-Exchange-RoutingPolicyChecked: UJlto8/OqpzAyFR+JJwqHpXmwPUKK2dX3CDQAvSc40tbFqc0UXf1ISEswdS5i+2k1TlnmiNjxE+9BzzXv0cuzAMwY/kTwgxxdSW58Aiz1ihzakS4N16xZsfuAORIlxIkMiwdf8XuCqk3dO6336mikAqV0BwTRWUEWF6+jftS6SB8k7tq0TmOWqpalXm5e6M7ZtN/VbCgmA3tZdPEKOkxCmeBibHAagGF9/Rh8NzKCePppXsx3UI6V9chwYaAthVlaWfrjnIsE6C94TEpdJLIIoEDgtFvUqsCUZL4mGOhaTEcpZ0Xsxe3bvM8GlvWYIWYdacsimDczbBvAVPrx/IKfA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0b96a95-277f-431c-e7a2-08deb4bdaef4
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 09:13:11.3118
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V+k1bhfr20AYJTW3lS1ckC4QtM0ybPeenpMFoo15AOj0n9Eqpkem2L8zOUAziHOMaWFFS+Aa3rSP6PpL4qZD8fXgs4WdgS95y1Pp24QJHW0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH8PR11MB9481
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: A83505698C8
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260516125329.7b699c6f@pumpkin>
+X-Rspamd-Queue-Id: D2F9B569922
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288951-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,lunn.ch,vger.kernel.org,intel.com,linux.intel.com,resnulli.us,lwn.net,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,soc-5CG4396X81.clients.intel.com:mid];
+	TAGGED_FROM(0.00)[bounces-288953-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,salutedevices.com,google.com,linux.alibaba.com,lists.linux.dev,davemloft.net,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Action: no action
 
-On Fri, May 15, 2026 at 03:44:36PM -0700, Tony Nguyen wrote:
-> From: Larysa Zaremba <larysa.zaremba@intel.com>
-> 
-> At the end of the probe, trigger hard reset, initialize and schedule the
-> after-reset task. If the reset is complete in a pre-determined time,
-> initialize the default mailbox, through which other resources will be
-> negotiated.
+On Sat, May 16, 2026 at 12:53:29PM +0100, David Laight wrote:
+>On Thu, 14 May 2026 11:29:48 +0200
+>Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+>> From: Stefano Garzarella <sgarzare@redhat.com>
+>>
+>> When a large message is fragmented into multiple skbs, the zerocopy
+>> uarg is only allocated and attached to the last skb in the loop.
+>> Non-final skbs carry pinned user pages with no completion tracking,
+>> so the kernel has no way to notify userspace when those pages are safe
+>> to reuse. If the loop breaks early the uarg is never allocated at all,
+>> leaking pinned pages with no completion notification.
+>>
+>> Fix this by following the approach used by TCP: allocate the zerocopy
+>> uarg (if not provided by the caller) before the send loop and attach
+>> it to every skb via skb_zcopy_set(), which takes a reference per skb.
+>> Each skb's completion properly decrements the refcount, and the
+>> notification only fires after the last skb is freed.
+>> On failure, if no data was sent, the uarg is cleanly aborted via
+>> net_zcopy_put_abort().
+>>
+>> This issue was initially discovered by sashiko while reviewing commit
+>> 1cb36e252211 ("vsock/virtio: fix MSG_ZEROCOPY pinned-pages accounting")
+>> but was pre-existing.
+>>
+>> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+>> Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> Closes: https://sashiko.dev/#/patchset/20260420132051.217589-1-sgarzare%40redhat.com
+>> Reported-by: Maher Azzouzi <maherazz04@gmail.com>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>>  net/vmw_vsock/virtio_transport_common.c | 83 ++++++++++---------------
+>>  1 file changed, 34 insertions(+), 49 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> index 989cc252d3d3..1e3409d28164 100644
+>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> @@ -70,34 +70,6 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
+>>  	return true;
+>>  }
+>>
+>> -static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
+>> -					   struct sk_buff *skb,
+>> -					   struct msghdr *msg,
+>> -					   size_t pkt_len,
+>> -					   bool zerocopy)
+>> -{
+>> -	struct ubuf_info *uarg;
+>> -
+>> -	if (msg->msg_ubuf) {
+>> -		uarg = msg->msg_ubuf;
+>> -		net_zcopy_get(uarg);
+>> -	} else {
+>> -		struct ubuf_info_msgzc *uarg_zc;
+>> -
+>> -		uarg = msg_zerocopy_realloc(sk_vsock(vsk),
+>> -					    pkt_len, NULL, false);
+>> -		if (!uarg)
+>> -			return -1;
+>> -
+>> -		uarg_zc = uarg_to_msgzc(uarg);
+>> -		uarg_zc->zerocopy = zerocopy ? 1 : 0;
+>> -	}
+>> -
+>> -	skb_zcopy_init(skb, uarg);
+>> -
+>> -	return 0;
+>> -}
+>> -
+>>  static int virtio_transport_fill_skb(struct sk_buff *skb,
+>>  				     struct virtio_vsock_pkt_info *info,
+>>  				     size_t len,
+>> @@ -317,8 +289,10 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>  	u32 src_cid, src_port, dst_cid, dst_port;
+>>  	const struct virtio_transport *t_ops;
+>>  	struct virtio_vsock_sock *vvs;
+>> +	struct ubuf_info *uarg = NULL;
+>>  	u32 pkt_len = info->pkt_len;
+>>  	bool can_zcopy = false;
+>> +	bool have_uref = false;
+>>  	u32 rest_len;
+>>  	int ret;
+>>
+>> @@ -360,6 +334,25 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>  		if (can_zcopy)
+>>  			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
+>>  					    (MAX_SKB_FRAGS * PAGE_SIZE));
+>> +
+>> +		if (info->msg->msg_flags & MSG_ZEROCOPY &&
+>> +		    info->op == VIRTIO_VSOCK_OP_RW) {
+>> +			uarg = info->msg->msg_ubuf;
+>> +
+>> +			if (!uarg) {
+>> +				uarg = msg_zerocopy_realloc(sk_vsock(vsk),
+>> +							    pkt_len, NULL, false);
+>> +				if (!uarg) {
+>> +					virtio_transport_put_credit(vvs, pkt_len);
+>> +					return -ENOMEM;
+>> +				}
+>> +
+>> +				if (!can_zcopy)
+>> +					uarg_to_msgzc(uarg)->zerocopy = 0;
+>> +
+>> +				have_uref = true;
+>> +			}
+>> +		}
+>
+>Surely that block should only be done if can_zcopy is true?
+>And shouldn't something unset it if info->op != VIRTIO_VSOCK_OP_RW ?
+>If the msg_zerocopy_realloc() fails then can't you just set can_zcopy to false.
+>
+>It info->msg->msg_buf is already set then I think you have to disable zero-copy.
+>The caller has already requested a callback - and you can't add another.
+>
+>In any case by the end of this can_zcopy and have_uref are really the same flag.
 
-Sashiko says [0]:
+I kept the same approach we had before, trying to make as few changes as 
+possible.
 
-"
-Does this teardown sequence properly ensure the hardware is quiescent before
-freeing its DMA memory?
-Looking at ixd_trigger_reset(), it performs a writel(), which is a posted
-write over PCIe.
-The code here does not flush this write with a dummy read, nor does it
-wait for the reset to complete by polling ixd_check_reset_complete().
-Since ixd_deinit_dflt_mbx() immediately proceeds to free the DMA memory
-via libie_ctlq_xn_deinit(), could the hardware continue executing DMA
-operations into the freed memory, potentially causing IOMMU faults or memory
-corruption?
-"
+All these potential issues seem to be pre-existing and should be 
+eventually  addressed in other patches IMHO. This patch one only 
+resolves the main issue of calling `skb_zcopy_set()` for every skb to 
+avoid leaking pages, etc.
 
-Reset flow is consistent with what pre-refactor idpf does, and is the intended 
-way to perform removal.
+@Arseniy can you help on this?
 
-[0] https://sashiko.dev/#/patchset/20260515224443.2772147-1-anthony.l.nguyen%40intel.com
+>
+>>  	}
+>>
+>>  	rest_len = pkt_len;
+>> @@ -378,27 +371,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>  			break;
+>>  		}
+>>
+>> -		/* We process buffer part by part, allocating skb on
+>> -		 * each iteration. If this is last skb for this buffer
+>> -		 * and MSG_ZEROCOPY mode is in use - we must allocate
+>> -		 * completion for the current syscall.
+>> -		 *
+>> -		 * Pass pkt_len because msg iter is already consumed
+>> -		 * by virtio_transport_fill_skb(), so iter->count
+>> -		 * can not be used for RLIMIT_MEMLOCK pinned-pages
+>> -		 * accounting done by msg_zerocopy_realloc().
+>> -		 */
+>> -		if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
+>> -		    skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
+>> -			if (virtio_transport_init_zcopy_skb(vsk, skb,
+>> -							    info->msg,
+>> -							    pkt_len,
+>> -							    can_zcopy)) {
+>> -				kfree_skb(skb);
+>> -				ret = -ENOMEM;
+>> -				break;
+>> -			}
+>> -		}
+>> +		skb_zcopy_set(skb, uarg, NULL);
+>>
+>>  		virtio_transport_inc_tx_pkt(vvs, skb);
+>>
+>> @@ -422,6 +395,18 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>
+>>  	virtio_transport_put_credit(vvs, rest_len);
+>>
+>> +	/* msg_zerocopy_realloc() initializes the ubuf_info refcnt to 1.
+>> +	 * skb_zcopy_set() increases it for each skb, so we can drop that
+>                                                            ^ must
+>
+>> +	 * initial reference to keep it balanced.
+>> +	 */
+>> +	if (have_uref) {
+>> +		if (rest_len == pkt_len)
+>> +			/* No data sent, abort the notification. */
+>> +			net_zcopy_put_abort(uarg, true);
+>
+>Is it worth optimising for the 'nothing sent' case ?
 
-> 
-> Co-developed-by: Amritha Nambiar <amritha.nambiar@intel.com>
-> Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
-> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Tested-by: Bharath R <Bharath.r@intel.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> ---
->  drivers/net/ethernet/intel/ixd/Kconfig        |   1 +
->  drivers/net/ethernet/intel/ixd/Makefile       |   2 +
->  drivers/net/ethernet/intel/ixd/ixd.h          |  28 +++-
->  drivers/net/ethernet/intel/ixd/ixd_dev.c      |  89 +++++++++++
->  drivers/net/ethernet/intel/ixd/ixd_lan_regs.h |  40 +++++
->  drivers/net/ethernet/intel/ixd/ixd_lib.c      | 143 ++++++++++++++++++
->  drivers/net/ethernet/intel/ixd/ixd_main.c     |  32 +++-
->  7 files changed, 326 insertions(+), 9 deletions(-)
->  create mode 100644 drivers/net/ethernet/intel/ixd/ixd_dev.c
->  create mode 100644 drivers/net/ethernet/intel/ixd/ixd_lib.c
-> 
-> diff --git a/drivers/net/ethernet/intel/ixd/Kconfig b/drivers/net/ethernet/intel/ixd/Kconfig
-> index f5594efe292c..24510c50070e 100644
-> --- a/drivers/net/ethernet/intel/ixd/Kconfig
-> +++ b/drivers/net/ethernet/intel/ixd/Kconfig
-> @@ -5,6 +5,7 @@ config IXD
->  	tristate "Intel(R) Control Plane Function Support"
->  	depends on PCI_MSI
->  	select LIBETH
-> +	select LIBIE_CP
->  	select LIBIE_PCI
->  	help
->  	  This driver supports Intel(R) Control Plane PCI Function
-> diff --git a/drivers/net/ethernet/intel/ixd/Makefile b/drivers/net/ethernet/intel/ixd/Makefile
-> index 3849bc240600..164b2c86952f 100644
-> --- a/drivers/net/ethernet/intel/ixd/Makefile
-> +++ b/drivers/net/ethernet/intel/ixd/Makefile
-> @@ -6,3 +6,5 @@
->  obj-$(CONFIG_IXD) += ixd.o
->  
->  ixd-y := ixd_main.o
-> +ixd-y += ixd_dev.o
-> +ixd-y += ixd_lib.o
-> diff --git a/drivers/net/ethernet/intel/ixd/ixd.h b/drivers/net/ethernet/intel/ixd/ixd.h
-> index d813c27941a5..99c44f2aa659 100644
-> --- a/drivers/net/ethernet/intel/ixd/ixd.h
-> +++ b/drivers/net/ethernet/intel/ixd/ixd.h
-> @@ -4,14 +4,25 @@
->  #ifndef _IXD_H_
->  #define _IXD_H_
->  
-> -#include <linux/intel/libie/pci.h>
-> +#include <linux/intel/libie/controlq.h>
->  
->  /**
->   * struct ixd_adapter - Data structure representing a CPF
-> - * @hw: Device access data
-> + * @cp_ctx: Control plane communication context
-> + * @init_task: Delayed initialization after reset
-> + * @xnm: virtchnl transaction manager
-> + * @asq: Send control queue info
-> + * @arq: Receive control queue info
->   */
->  struct ixd_adapter {
-> -	struct libie_mmio_info hw;
-> +	struct libie_ctlq_ctx cp_ctx;
-> +	struct {
-> +		struct delayed_work init_work;
-> +		u8 reset_retries;
-> +	} init_task;
-> +	struct libie_ctlq_xn_manager *xnm;
-> +	struct libie_ctlq_info *asq;
-> +	struct libie_ctlq_info *arq;
->  };
->  
->  /**
-> @@ -22,7 +33,16 @@ struct ixd_adapter {
->   */
->  static inline struct device *ixd_to_dev(struct ixd_adapter *adapter)
->  {
-> -	return &adapter->hw.pdev->dev;
-> +	return &adapter->cp_ctx.mmio_info.pdev->dev;
->  }
->  
-> +void ixd_ctlq_reg_init(struct ixd_adapter *adapter,
-> +		       struct libie_ctlq_reg *ctlq_reg_tx,
-> +		       struct libie_ctlq_reg *ctlq_reg_rx);
-> +void ixd_trigger_reset(struct ixd_adapter *adapter);
-> +bool ixd_check_reset_complete(struct ixd_adapter *adapter);
-> +void ixd_init_task(struct work_struct *work);
-> +int ixd_init_dflt_mbx(struct ixd_adapter *adapter);
-> +void ixd_deinit_dflt_mbx(struct ixd_adapter *adapter);
-> +
->  #endif /* _IXD_H_ */
-> diff --git a/drivers/net/ethernet/intel/ixd/ixd_dev.c b/drivers/net/ethernet/intel/ixd/ixd_dev.c
-> new file mode 100644
-> index 000000000000..cdd5477cc1f4
-> --- /dev/null
-> +++ b/drivers/net/ethernet/intel/ixd/ixd_dev.c
-> @@ -0,0 +1,89 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/* Copyright (C) 2025 Intel Corporation */
-> +
-> +#include "ixd.h"
-> +#include "ixd_lan_regs.h"
-> +
-> +/**
-> + * ixd_ctlq_reg_init - Initialize default mailbox registers
-> + * @adapter: PCI device driver-specific private data
-> + * @ctlq_reg_tx: Transmit queue registers info to be filled
-> + * @ctlq_reg_rx: Receive queue registers info to be filled
-> + */
-> +void ixd_ctlq_reg_init(struct ixd_adapter *adapter,
-> +		       struct libie_ctlq_reg *ctlq_reg_tx,
-> +		       struct libie_ctlq_reg *ctlq_reg_rx)
-> +{
-> +	struct libie_mmio_info *mmio_info = &adapter->cp_ctx.mmio_info;
-> +	*ctlq_reg_tx = (struct libie_ctlq_reg) {
-> +		.head = libie_pci_get_mmio_addr(mmio_info, PF_FW_ATQH),
-> +		.tail = libie_pci_get_mmio_addr(mmio_info, PF_FW_ATQT),
-> +		.len = libie_pci_get_mmio_addr(mmio_info, PF_FW_ATQLEN),
-> +		.addr_high = libie_pci_get_mmio_addr(mmio_info, PF_FW_ATQBAH),
-> +		.addr_low = libie_pci_get_mmio_addr(mmio_info, PF_FW_ATQBAL),
-> +		.len_mask = PF_FW_ATQLEN_ATQLEN_M,
-> +		.len_ena_mask = PF_FW_ATQLEN_ATQENABLE_M,
-> +		.head_mask = PF_FW_ATQH_ATQH_M,
-> +	};
-> +
-> +	*ctlq_reg_rx = (struct libie_ctlq_reg) {
-> +		.head = libie_pci_get_mmio_addr(mmio_info, PF_FW_ARQH),
-> +		.tail = libie_pci_get_mmio_addr(mmio_info, PF_FW_ARQT),
-> +		.len = libie_pci_get_mmio_addr(mmio_info, PF_FW_ARQLEN),
-> +		.addr_high = libie_pci_get_mmio_addr(mmio_info, PF_FW_ARQBAH),
-> +		.addr_low = libie_pci_get_mmio_addr(mmio_info, PF_FW_ARQBAL),
-> +		.len_mask = PF_FW_ARQLEN_ARQLEN_M,
-> +		.len_ena_mask = PF_FW_ARQLEN_ARQENABLE_M,
-> +		.head_mask = PF_FW_ARQH_ARQH_M,
-> +	};
-> +}
-> +
-> +static const struct ixd_reset_reg ixd_reset_reg = {
-> +	.rstat  = PFGEN_RSTAT,
-> +	.rstat_m = PFGEN_RSTAT_PFR_STATE_M,
-> +	.rstat_ok_v = 0b01,
-> +	.rtrigger = PFGEN_CTRL,
-> +	.rtrigger_m = PFGEN_CTRL_PFSWR,
-> +};
-> +
-> +/**
-> + * ixd_trigger_reset - Trigger PFR reset
-> + * @adapter: the device with mapped reset register
-> + */
-> +void ixd_trigger_reset(struct ixd_adapter *adapter)
-> +{
-> +	void __iomem *addr;
-> +	u32 reg_val;
-> +
-> +	addr = libie_pci_get_mmio_addr(&adapter->cp_ctx.mmio_info,
-> +				       ixd_reset_reg.rtrigger);
-> +	reg_val = readl(addr);
-> +	writel(reg_val | ixd_reset_reg.rtrigger_m, addr);
-> +}
-> +
-> +/**
-> + * ixd_check_reset_complete - Check if the PFR reset is completed
-> + * @adapter: CPF being reset
-> + *
-> + * Return: %true if the register read indicates reset has been finished,
-> + *	   %false otherwise
-> + */
-> +bool ixd_check_reset_complete(struct ixd_adapter *adapter)
-> +{
-> +	u32 reg_val, reset_status;
-> +	void __iomem *addr;
-> +
-> +	addr = libie_pci_get_mmio_addr(&adapter->cp_ctx.mmio_info,
-> +				       ixd_reset_reg.rstat);
-> +	reg_val = readl(addr);
-> +	reset_status = reg_val & ixd_reset_reg.rstat_m;
-> +
-> +	/* 0xFFFFFFFF might be read if the other side hasn't cleared
-> +	 * the register for us yet.
-> +	 */
-> +	if (reg_val != GENMASK(31, 0) &&
-> +	    reset_status == ixd_reset_reg.rstat_ok_v)
-> +		return true;
-> +
-> +	return false;
-> +}
-> diff --git a/drivers/net/ethernet/intel/ixd/ixd_lan_regs.h b/drivers/net/ethernet/intel/ixd/ixd_lan_regs.h
-> index fbb88929d0de..58e58c75981b 100644
-> --- a/drivers/net/ethernet/intel/ixd/ixd_lan_regs.h
-> +++ b/drivers/net/ethernet/intel/ixd/ixd_lan_regs.h
-> @@ -11,9 +11,33 @@
->  #define PF_FW_MBX_REG_LEN		4096
->  #define PF_FW_MBX			0x08400000
->  
-> +#define PF_FW_ARQBAL			(PF_FW_MBX)
-> +#define PF_FW_ARQBAH			(PF_FW_MBX + 0x4)
-> +#define PF_FW_ARQLEN			(PF_FW_MBX + 0x8)
-> +#define PF_FW_ARQLEN_ARQLEN_M		GENMASK(12, 0)
-> +#define PF_FW_ARQLEN_ARQENABLE_S	31
-> +#define PF_FW_ARQLEN_ARQENABLE_M	BIT(PF_FW_ARQLEN_ARQENABLE_S)
-> +#define PF_FW_ARQH_ARQH_M		GENMASK(12, 0)
-> +#define PF_FW_ARQH			(PF_FW_MBX + 0xC)
-> +#define PF_FW_ARQT			(PF_FW_MBX + 0x10)
-> +
-> +#define PF_FW_ATQBAL			(PF_FW_MBX + 0x14)
-> +#define PF_FW_ATQBAH			(PF_FW_MBX + 0x18)
-> +#define PF_FW_ATQLEN			(PF_FW_MBX + 0x1C)
-> +#define PF_FW_ATQLEN_ATQLEN_M		GENMASK(9, 0)
-> +#define PF_FW_ATQLEN_ATQENABLE_S	31
-> +#define PF_FW_ATQLEN_ATQENABLE_M	BIT(PF_FW_ATQLEN_ATQENABLE_S)
-> +#define PF_FW_ATQH_ATQH_M		GENMASK(9, 0)
-> +#define PF_FW_ATQH			(PF_FW_MBX + 0x20)
-> +#define PF_FW_ATQT			(PF_FW_MBX + 0x24)
-> +
->  /* Reset registers */
->  #define PFGEN_RTRIG_REG_LEN		2048
->  #define PFGEN_RTRIG			0x08407000	/* Device resets */
-> +#define PFGEN_RSTAT			0x08407008	/* PFR status */
-> +#define PFGEN_RSTAT_PFR_STATE_M		GENMASK(1, 0)
-> +#define PFGEN_CTRL			0x0840700C	/* PFR trigger */
-> +#define PFGEN_CTRL_PFSWR		BIT(0)
->  
->  /**
->   * struct ixd_bar_region - BAR region description
-> @@ -25,4 +49,20 @@ struct ixd_bar_region {
->  	resource_size_t size;
->  };
->  
-> +/**
-> + * struct ixd_reset_reg - structure for reset registers
-> + * @rstat: offset of status in register
-> + * @rstat_m: status mask
-> + * @rstat_ok_v: value that indicates PFR completed status
-> + * @rtrigger: offset of reset trigger in register
-> + * @rtrigger_m: reset trigger mask
-> + */
-> +struct ixd_reset_reg {
-> +	u32	rstat;
-> +	u32	rstat_m;
-> +	u32	rstat_ok_v;
-> +	u32	rtrigger;
-> +	u32	rtrigger_m;
-> +};
-> +
->  #endif /* _IXD_LAN_REGS_H_ */
-> diff --git a/drivers/net/ethernet/intel/ixd/ixd_lib.c b/drivers/net/ethernet/intel/ixd/ixd_lib.c
-> new file mode 100644
-> index 000000000000..afc413d3650f
-> --- /dev/null
-> +++ b/drivers/net/ethernet/intel/ixd/ixd_lib.c
-> @@ -0,0 +1,143 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/* Copyright (C) 2025 Intel Corporation */
-> +
-> +#include "ixd.h"
-> +
-> +#define IXD_DFLT_MBX_Q_LEN 64
-> +
-> +/**
-> + * ixd_init_ctlq_create_info - Initialize control queue info for creation
-> + * @info: destination
-> + * @type: type of the queue to create
-> + * @ctlq_reg: register assigned to the control queue
-> + */
-> +static void ixd_init_ctlq_create_info(struct libie_ctlq_create_info *info,
-> +				      enum virtchnl2_queue_type type,
-> +				      const struct libie_ctlq_reg *ctlq_reg)
-> +{
-> +	*info = (struct libie_ctlq_create_info) {
-> +		.type = type,
-> +		.id = -1,
-> +		.reg = *ctlq_reg,
-> +		.len = IXD_DFLT_MBX_Q_LEN,
-> +	};
-> +}
-> +
-> +/**
-> + * ixd_init_libie_xn_params - Initialize xn transaction manager creation info
-> + * @params: destination
-> + * @adapter: adapter info struct
-> + * @ctlqs: list of the managed queues to create
-> + * @num_queues: length of the queue list
-> + */
-> +static void ixd_init_libie_xn_params(struct libie_ctlq_xn_init_params *params,
-> +				     struct ixd_adapter *adapter,
-> +				      struct libie_ctlq_create_info *ctlqs,
-> +				      uint num_queues)
-> +{
-> +	*params = (struct libie_ctlq_xn_init_params){
-> +		.cctlq_info = ctlqs,
-> +		.ctx = &adapter->cp_ctx,
-> +		.num_qs = num_queues,
-> +	};
-> +}
-> +
-> +/**
-> + * ixd_adapter_fill_dflt_ctlqs - Find default control queues and store them
-> + * @adapter: adapter info struct
-> + */
-> +static void ixd_adapter_fill_dflt_ctlqs(struct ixd_adapter *adapter)
-> +{
-> +	guard(spinlock)(&adapter->cp_ctx.ctlqs_lock);
-> +	struct libie_ctlq_info *cq;
-> +
-> +	list_for_each_entry(cq, &adapter->cp_ctx.ctlqs, list) {
-> +		if (cq->qid != -1)
-> +			continue;
-> +		if (cq->type == LIBIE_CTLQ_TYPE_RX)
-> +			adapter->arq = cq;
-> +		else if (cq->type == LIBIE_CTLQ_TYPE_TX)
-> +			adapter->asq = cq;
-> +	}
-> +}
-> +
-> +/**
-> + * ixd_deinit_dflt_mbx - Deinitialize default mailbox
-> + * @adapter: adapter info struct
-> + */
-> +void ixd_deinit_dflt_mbx(struct ixd_adapter *adapter)
-> +{
-> +	if (adapter->xnm)
-> +		libie_ctlq_xn_deinit(adapter->xnm, &adapter->cp_ctx);
-> +
-> +	adapter->arq = NULL;
-> +	adapter->asq = NULL;
-> +	adapter->xnm = NULL;
-> +}
-> +
-> +/**
-> + * ixd_init_dflt_mbx - Setup default mailbox parameters and make request
-> + * @adapter: adapter info struct
-> + *
-> + * Return: %0 on success, negative errno code on failure
-> + */
-> +int ixd_init_dflt_mbx(struct ixd_adapter *adapter)
-> +{
-> +	struct libie_ctlq_create_info ctlqs_info[2];
-> +	struct libie_ctlq_xn_init_params xn_params;
-> +	struct libie_ctlq_reg ctlq_reg_tx;
-> +	struct libie_ctlq_reg ctlq_reg_rx;
-> +	int err;
-> +
-> +	ixd_ctlq_reg_init(adapter, &ctlq_reg_tx, &ctlq_reg_rx);
-> +	ixd_init_ctlq_create_info(&ctlqs_info[0], LIBIE_CTLQ_TYPE_TX,
-> +				  &ctlq_reg_tx);
-> +	ixd_init_ctlq_create_info(&ctlqs_info[1], LIBIE_CTLQ_TYPE_RX,
-> +				  &ctlq_reg_rx);
-> +	ixd_init_libie_xn_params(&xn_params, adapter, ctlqs_info,
-> +				 ARRAY_SIZE(ctlqs_info));
-> +	err = libie_ctlq_xn_init(&xn_params);
-> +	if (err)
-> +		return err;
-> +	adapter->xnm = xn_params.xnm;
-> +
-> +	ixd_adapter_fill_dflt_ctlqs(adapter);
-> +
-> +	if (!adapter->asq || !adapter->arq) {
-> +		ixd_deinit_dflt_mbx(adapter);
-> +		return -ENOENT;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * ixd_init_task - Initialize after reset
-> + * @work: init work struct
-> + */
-> +void ixd_init_task(struct work_struct *work)
-> +{
-> +	struct ixd_adapter *adapter;
-> +	int err;
-> +
-> +	adapter = container_of(work, struct ixd_adapter,
-> +			       init_task.init_work.work);
-> +
-> +	if (!ixd_check_reset_complete(adapter)) {
-> +		if (++adapter->init_task.reset_retries < 10)
-> +			queue_delayed_work(system_unbound_wq,
-> +					   &adapter->init_task.init_work,
-> +					   msecs_to_jiffies(500));
-> +		else
-> +			dev_err(ixd_to_dev(adapter),
-> +				"Device reset failed. The driver was unable to contact the device's firmware. Check that the FW is running.\n");
-> +		return;
-> +	}
-> +
-> +	adapter->init_task.reset_retries = 0;
-> +	err = ixd_init_dflt_mbx(adapter);
-> +	if (err)
-> +		dev_err(ixd_to_dev(adapter),
-> +			"Failed to initialize the default mailbox: %pe\n",
-> +			ERR_PTR(err));
-> +}
-> diff --git a/drivers/net/ethernet/intel/ixd/ixd_main.c b/drivers/net/ethernet/intel/ixd/ixd_main.c
-> index 75ee53152e61..b4d4000b63ed 100644
-> --- a/drivers/net/ethernet/intel/ixd/ixd_main.c
-> +++ b/drivers/net/ethernet/intel/ixd/ixd_main.c
-> @@ -5,6 +5,7 @@
->  #include "ixd_lan_regs.h"
->  
->  MODULE_DESCRIPTION("Intel(R) Control Plane Function Device Driver");
-> +MODULE_IMPORT_NS("LIBIE_CP");
->  MODULE_IMPORT_NS("LIBIE_PCI");
->  MODULE_LICENSE("GPL");
->  
-> @@ -16,7 +17,13 @@ static void ixd_remove(struct pci_dev *pdev)
->  {
->  	struct ixd_adapter *adapter = pci_get_drvdata(pdev);
->  
-> -	libie_pci_unmap_all_mmio_regions(&adapter->hw);
-> +	/* Do not mix removal with (re)initialization */
-> +	cancel_delayed_work_sync(&adapter->init_task.init_work);
-> +	/* Leave the device clean on exit */
-> +	ixd_trigger_reset(adapter);
-> +	ixd_deinit_dflt_mbx(adapter);
-> +
-> +	libie_pci_unmap_all_mmio_regions(&adapter->cp_ctx.mmio_info);
->  }
->  
->  /**
-> @@ -51,7 +58,7 @@ static int ixd_iomap_regions(struct ixd_adapter *adapter)
->  	};
->  
->  	for (int i = 0; i < ARRAY_SIZE(regions); i++) {
-> -		struct libie_mmio_info *mmio_info = &adapter->hw;
-> +		struct libie_mmio_info *mmio_info = &adapter->cp_ctx.mmio_info;
->  		bool map_ok;
->  
->  		map_ok = libie_pci_map_mmio_region(mmio_info,
-> @@ -81,11 +88,15 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	struct ixd_adapter *adapter;
->  	int err;
->  
-> +	if (WARN_ON(ent->device != IXD_DEV_ID_CPF))
-> +		return -EINVAL;
-> +
->  	adapter = devm_kzalloc(&pdev->dev, sizeof(*adapter), GFP_KERNEL);
->  	if (!adapter)
->  		return -ENOMEM;
-> -	adapter->hw.pdev = pdev;
-> -	INIT_LIST_HEAD(&adapter->hw.mmio_list);
-> +
-> +	adapter->cp_ctx.mmio_info.pdev = pdev;
-> +	INIT_LIST_HEAD(&adapter->cp_ctx.mmio_info.mmio_list);
->  
->  	err = libie_pci_init_dev(pdev);
->  	if (err)
-> @@ -93,7 +104,18 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	pci_set_drvdata(pdev, adapter);
->  
-> -	return ixd_iomap_regions(adapter);
-> +	err = ixd_iomap_regions(adapter);
-> +	if (err)
-> +		return err;
-> +
-> +	INIT_DELAYED_WORK(&adapter->init_task.init_work,
-> +			  ixd_init_task);
-> +
-> +	ixd_trigger_reset(adapter);
-> +	queue_delayed_work(system_unbound_wq, &adapter->init_task.init_work,
-> +			   msecs_to_jiffies(500));
-> +
-> +	return 0;
->  }
->  
->  static const struct pci_device_id ixd_pci_tbl[] = {
-> -- 
-> 2.47.1
-> 
+What do you suggest doing?
+
+I followed what TCP does.
+
+Thanks,
+Stefano
+
+>
+>-- David
+>
+>> +		else
+>> +			net_zcopy_put(uarg);
+>> +	}
+>> +
+>>  	/* Return number of bytes, if any data has been sent. */
+>>  	if (rest_len != pkt_len)
+>>  		ret = pkt_len - rest_len;
+>
+
 
