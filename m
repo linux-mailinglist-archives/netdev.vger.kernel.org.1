@@ -1,188 +1,171 @@
-Return-Path: <netdev+bounces-289140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289138-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EPOuB8pNC2o7FQUAu9opvQ
-	(envelope-from <netdev+bounces-289140-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 19:35:06 +0200
+	id mJ40OjZOC2onFgUAu9opvQ
+	(envelope-from <netdev+bounces-289138-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 19:36:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D96C1571AAD
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 19:35:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AF68571AFD
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 19:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E5C8A3008CAE
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:35:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB763305129D
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B653F5BE5;
-	Mon, 18 May 2026 17:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CE938945C;
+	Mon, 18 May 2026 17:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=flowmailer.net header.i=@flowmailer.net header.b="oOv4FfQQ";
-	dkim=pass (2048-bit key) header.d=siemens-energy.com header.i=schuster.simon@siemens-energy.com header.b="dI1aE97G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCw7nHV/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-135.flowmailer.net (mta-64-135.flowmailer.net [185.136.64.135])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1B5382F28
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 17:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.135
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779125700; cv=none; b=Xl6a5RFmmjf7YxgUOXnF516Nr5V5FVErqctEQ7HzVB9tIp2y3aki7yDNKfRHdyZ1zac/ZePkdOg1PCDz80d6/rDhiOv6Y3vyWbmljBwzNdOYYplKpfrmqeNALIhLVwMhNv+JT7rCi8y4HH4cbmNCAM1OhFH4mpWqiWjBkBpLXtU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779125700; c=relaxed/simple;
-	bh=+rYo9RwlleK8Myvw5KVXSvl5djJdJZXOJbD7irbefyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rZhkSlYdZZq1vlMK72kiuCND1n9uujBE3151KXv+faENmZhb/2pP8UgynGtGwH6SisVGXZIKI0/Sma+ymTbGIK8H0twIlkYfXXiCGg4a6T8dbKYy+X+hb5n3iQ58JQPer/CXEkvfH2XDWuf4O7xsXwg8Eouto4hGVLCi9DczT+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens-energy.com; spf=pass smtp.mailfrom=errorhandling.siemens-energy.com; dkim=pass (1024-bit key) header.d=flowmailer.net header.i=@flowmailer.net header.b=oOv4FfQQ; dkim=pass (2048-bit key) header.d=siemens-energy.com header.i=schuster.simon@siemens-energy.com header.b=dI1aE97G; arc=none smtp.client-ip=185.136.64.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens-energy.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=errorhandling.siemens-energy.com
-Received: by mta-64-135.flowmailer.net with ESMTPSA id 2026051817244613b7141f3c0019fde8
-        for <netdev@vger.kernel.org>;
-        Mon, 18 May 2026 19:24:47 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=s1;
- d=flowmailer.net;
- h=from:from:sender:to:to:cc:cc:subject:subject:content-type:content-type:content-transfer-encoding:References:In-Reply-To:Date:Message-ID:MIME-Version;
- bh=/xBoFD2ZNsbMOTky3B3enP8bn+W9UZXo1Hl2aVCLXos=;
- b=oOv4FfQQlHtS5BCboX78gqtA1vOdIzc2Bde3Q6JtaXyf67I3yyl6ut16FqBNN9+Yj9rq9Z
- nyDRk4mSBg/XXlSyTrgBcXgDhCrmwyDzEj+K3hddaJfeuwolNJkOXXJ8o46GUX+ljc6wR96d
- SFujsYOnihqEglQ5vlocmhDkHNiKg=;
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm3;
- d=siemens-energy.com; i=schuster.simon@siemens-energy.com;
- h=from:from:sender:to:to:cc:cc:subject:subject:content-type:content-type:content-transfer-encoding:References:In-Reply-To:Date:Message-ID:MIME-Version;
- bh=/xBoFD2ZNsbMOTky3B3enP8bn+W9UZXo1Hl2aVCLXos=;
- b=dI1aE97GXW4w7iNDnE322TQwRLqhXPJ7u7OOtHXqPwbH7I8b7QZPUcsZ5dpM3aKOX+wuYT
- LPsjcYlVTxPExZ5kMJNCcDWODnTNTrGp6pV8qtNcwDcVLy69NW0vpvbVMGwrINlSJJ+x3xuE
- 8IjsHXj0AnDwTdczWEYMyN3ZXAMnYVljNLinrYheZqc9sCRB5uWpiqfkBE0KYz9ZVSj4gXWO
- W3XtjKRwxfg4DG16B+5mpyk1TGNVwWG+Fbcs2a0kj3mxu3xIuWEGyaVHCYP7ptwU5BzA0nrO
- 6VN6z+VVxxOzsIQ5H6Xp7Kj7GVjsxvKu6BvSATf/LyzOGeeNKmSh+lOw==;
-Date: Mon, 18 May 2026 19:24:44 +0200
-From: Simon Schuster <schuster.simon@siemens-energy.com>
-To: Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Dinh Nguyen <dinguyen@kernel.org>
-Cc: linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
- workflows@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>,
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
- linux-iio@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
- "linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Daniel Lezcano <daniel.lezcano@kernel.org>, Thomas
- Gleixner <tglx@kernel.org>, Alex Shi <alexs@kernel.org>, Yanteng Si
- <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>, Hu Haowen
- <2023002089@link.tyut.edu.cn>, Kees Cook <kees@kernel.org>, Oleg Nesterov
- <oleg@redhat.com>, Will Deacon <will@kernel.org>, "Aneesh Kumar K.V (Arm)"
- <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Nicholas Piggin <npiggin@gmail.com>, Vinod Koul <vkoul@kernel.org>, Frank
- Li <Frank.Li@kernel.org>, Dave Penkler <dpenkler@gmail.com>, Andi Shyti
- <andi.shyti@kernel.org>, Jonathan Cameron <jic23@kernel.org>, David Lechner
- <dlechner@baylibre.com>, =?ISO-8859-1?Q?Nuno_S=E1?= <nuno.sa@analog.com>,
- Andy Shevchenko <andy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, Krzysztof
- WilczyDski <kwilczynski@kernel.org>, Andreas Oetken
- <andreas.oetken@siemens-energy.com>
-Subject: Re: [PATCH] nios2: remove the architecture
-Message-ID: <20260518172444.zyd47mcagrcwu7wt@dev-vm-schuster>
-References: <20260518042833.272221-1-enelsonmoore@gmail.com>
- <d40b1e80-37fc-4c88-9d7f-dae6458efe6c@app.fastmail.com>
- <20260518105735.GW3126523@noisy.programming.kicks-ass.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E533F5BE5
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 17:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779125604; cv=pass; b=XGFlf2h+UflicLMNOhVm7TEtdCjSU5289f0RFmEyDyACT5X1rjPI/k3US8P1KTkxu3OCmEeExeeOIfHwtw9iUPdCzKOiGdP9EZs2xX8r0e8YXYNfLbdBiaTrLr/W6FuusbrjajbdFDSg5LvDGCVYVMrLsLTiIoJTYLkKPnU+Qjo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779125604; c=relaxed/simple;
+	bh=LsTXmbjvYgS59kR0+//k+OpD4YfD3cLwvD1nVtqBRq4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GVggijPci5SIrFdkm42Q2cyXK0mY1hx6m9dXWEkbelJ/4AnvUfbAPigDg6wFP+9j7rza0UFyKD98fMnE7BaY5jTZkWl6+GDX9JRj6n427A4zRTfpqLgEKks+M7SIV5+cj/Gj70Gf+hHSevfI8znUMbN9mlBL9ZPwclNI8RP51Zg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gCw7nHV/; arc=pass smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48a7fe4f40bso31918985e9.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 10:33:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779125601; cv=none;
+        d=google.com; s=arc-20240605;
+        b=GgmZrY56k1DOxdmZomriPDj+fP8pWjML9hIRDhG4BiTn1kPU+ULuNnWP4R6vBJVIEh
+         FuuULu7M/6gkKVCRSmxYpODyyyUUb4yy4v+X5t66Z1VSoFb1xl020xhKES7RsDqoGCQb
+         e4c3EBr9K/XIpsuzhedEx9cKY2MFzvJMUr56Gvjf1vfT6hnVD6QQRVwy0nFywZW015dl
+         cKkf67ZsIarOMVX/pwc1wnVyPa1iBZKeqK3mRB/oo4fgiP4Mi8SRrgThsCc6Mrfks4z2
+         b3JzW8ndwrc1tkfNfqyxNxd4JTBviLFu3eQX1r18tkxe94tmkK5VPwgy964TJKKG6Xwn
+         ehlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=rjaJpY0MkhhIhfyKnhPGyfPqWCIkOVqOIDgQ5xJDdC4=;
+        fh=T4gNbCD/VIv/Fiiztd/tU4Pw7Vown5sTyLMdQ5uVM3k=;
+        b=J6xcTbIS35JgWDWIB4/CIsAMF/rjodKmx6+jrYNddn6jPU+lnbYLoK3DldfWAR991N
+         30gI7IfZkHxxDAWveOX8K348AgasUNgrbItkN6I0QdaTlbN8jmFnWWqvHy0L3Ly8OTF8
+         mepxB2OvrHAV/X2XqfsbtVBz+81wrKKBOUSZHKQj1HsW3EtesqdNaFutnBb1NlLmZXu2
+         ktzWuAafYlGS+s673D4BbGPpwZ7iA8WpCtzK0yLq+wuH59Kt5bUz6sNLbfqANQxt71jr
+         HISAnHTHhSg/D3Oy17NzKiBv+mrLePgz4w8qlfRMtRiggoOZs1QVqjhRzhU53VprBY1B
+         zRLg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779125601; x=1779730401; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=rjaJpY0MkhhIhfyKnhPGyfPqWCIkOVqOIDgQ5xJDdC4=;
+        b=gCw7nHV/SrpLXpjrtGT7ijQ45U2K4LGaLe9T0ol6f64h4wxTHnTjvJ8nLs7ZaM5V7V
+         iZN5HMy55AkwGxFkPAW5uLUNxlIIlE89MiMpli8c/Wrhe2tsBRxpTqlcU5WDMZX+k+hJ
+         6UEl6u5VEnRsZ13bPy+Y8BfnxrVCK/14NS60OfwEd3W+u2m8apYOJoCMuh8QgYwCj59Q
+         wsmejvVrsgbIv3NBK7Y1naWM/17s8mfvKc20HlPhYBZo8dIW4fBNhG8E8tqIQCiB7Ljr
+         IL7XP9PukV2UJ74XVI4rL/IefYfjflKvwG49yl+/fhNXtIj4I6tn/fkf4fzNUExGDi/A
+         xWug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779125601; x=1779730401;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rjaJpY0MkhhIhfyKnhPGyfPqWCIkOVqOIDgQ5xJDdC4=;
+        b=qDwPST3mDkvaafuQs/ElvC8Lu3qqG45KXjjlP59gVv2rpalQN3CxxTSkcMyvoH6EmM
+         69BOpXMacGP/Ch3/oFTT5QzBd69zvPbUUMOlwQtxGZjmhnXYaGIRW8DblgjGMQFeTgCg
+         dauZKSijyCHLnHDCxzGebMPsDgzxlNM+38ukhs0+uhgZeu6HwGGkvDaYTR5gKM60d1d4
+         lpaneyz3DZUOzCLb5qt7Hkhvqo0953p2pV3XU7WVOTZbpfDf/YP9FsneVVBsRl6JyeJ9
+         vmsKiq4JkrrQCH6+vdqv9DX5yGCL+77co0aDPZB7hZVBY3SUfJRCDVeFyZ3FQWSidEfE
+         aKVw==
+X-Forwarded-Encrypted: i=1; AFNElJ9dYIC4Nhp9kZ4roy9dpMjefiVObYahKE2WUEfd9ZLSHZkvtyXBfAvyjWCxH9z9BgnWOmxpCho=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOM6Fw2IjdutNwY396Uio++47PFEao2MhUBCW0qxPfTIEaOpdt
+	SkY9ho0o4QNQKnBgZbX3vRa9HyMQDJTC8Ko5Ap/KV6wZNod6LFwtP1exQkYXBL0LzW2bmxReZNr
+	zJYzSZ0HNCuSNbo9tkDSYGGqR4Uu15Pgdb+LEGpk=
+X-Gm-Gg: Acq92OGSn/ORJLcaMlKpoi5GXdNWIfPk8Z/WpGlobJLkVQQnA2vYlD3F0sfR7+0NeT6
+	ewNpMkpEWiOYE7ul5Rh+rQ6iZLCFRdry3gholxDOd0AUP3HEIOIJwL3EQ5ZTQ4pGV1pCkEdAN6p
+	0jRH3kn91PEqhFYi7kQ6czQTA7475ZjbqEoXFqHoXjA6G5K/ZgLgXPj5TqVc1P5ppoAO4+eplY7
+	eFNXUaipcz88/ndDFgHay1BIAqn6L0oX5sJTohNkduE0rvHi6pBgUjmZ2RYj4ed8CrNap0/N31F
+	DsYATYiVTkId4c43TR4=
+X-Received: by 2002:a05:600c:138f:b0:488:ae6c:42c6 with SMTP id
+ 5b1f17b1804b1-48ff4f4f44dmr173342185e9.14.1779125601353; Mon, 18 May 2026
+ 10:33:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260518105735.GW3126523@noisy.programming.kicks-ass.net>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[siemens-energy.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[flowmailer.net:s=s1,siemens-energy.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+References: <20260513143904.2497520-1-maoyi.xie@ntu.edu.sg> <20260518101531.473574-2-horms@kernel.org>
+In-Reply-To: <20260518101531.473574-2-horms@kernel.org>
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+Date: Tue, 19 May 2026 01:33:09 +0800
+X-Gm-Features: AVHnY4Ih3y5-5cQ8sTAJKBUKOLhhbW1c_MNepuEQbTw6xT_7_QZ0g98ywqm9uVI
+Message-ID: <CAHPEe=GkDxnVxkOfO4KRt8Z8V46xVSYisN6QrAFA-yr_V5jB0A@mail.gmail.com>
+Subject: Re: [PATCH net v4] rds: filter RDS_INFO_* getsockopt by caller's netns
+To: Simon Horman <horms@kernel.org>
+Cc: achender@kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, praveen.kakkolangara@aumovio.com, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
+	linux-kernel@vger.kernel.org, maoyi.xie@ntu.edu.sg
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289140-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[infradead.org,arndb.de,gmail.com,kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[flowmailer.net:+,siemens-energy.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[schuster.simon@siemens-energy.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lwn.net,linuxfoundation.org,kernel.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,gmail.com,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com,siemens-energy.com];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289138-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,flowmailer.net:dkim]
-X-Rspamd-Queue-Id: D96C1571AAD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 5AF68571AFD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Ethan, Arnd, Peter and Dinh,
+Hi Simon,
 
-On Mon, May 18, 2026 at 11:29:48AM +0200, Arnd Bergmann wrote:
-> We last discussed this a year ago when Simon Schuster mentioned[1]
-> that Siemens Energy is still using NIOS-2 in production and would
-> prefer to have this still included in Linux for at least another
-> few years until the obligation for kernel updates ends.
+Confirmed. net/rds/bind.c writes rs_bound_addr at lines 123,
+138, and 160 without taking rds_sock_lock. The race is real,
+and the len=0 path you described reaches the NULL iter->pages.
 
-First off, thank you, Arnd, for remembering us as this patch series came
-up and also to Dinh for his maintenance of the architecture!
+v5 caps the second pass at cnt in all four handlers
+(rds_sock_info, rds6_sock_info, rds_tcp_tc_info,
+rds6_tcp_tc_info):
 
-Regarding our status in relation to nios2, Arnd's response already gives
-you the gist:
+    unsigned int copied = 0;
+    list_for_each_entry(rs, &rds_sock_list, rs_item) {
+        if (copied >= cnt)
+            break;
+        if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
+            continue;
+        if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
+            continue;
+        ...
+        rds_info_copy(iter, &sinfo, sizeof(sinfo));
+        copied++;
+    }
 
-We are well aware that the architecture was deprecated by Intel and are
-therefore phasing it out in favour of more contemporary hardware.
-I'm also fully aware of the uncertain future of 32-bit architectures as
-a whole [0] and that this fate will come to nios2 sooner or later.
-But as of now, the mainline support is still in very good shape.
+Sent as v5 in a separate mail.
 
-On Mon, May 18, 2026 at 12:57:35PM +0200, Peter Zijlstra wrote:
-> Isn't that what we have LTS branches for?
-
-Unfortunately, as we are an infrastructure provider for civil energy
-infrastructure, the refurbishment cycle is a bit slower than for
-traditional consumer systems. This implies that the traditional LTS
-support duration (max. Dec 2028 as of writing [1]) is rather short, and
-we would be glad if we could keep the architecture in mainline for at
-least 5 years and only then "decay" to LTS.
-
-On Mon, May 18, 2026 at 11:29:48AM +0200, Arnd Bergmann wrote:
-> My feeling is that the maintenance burden of keeping nios2 is
-> relatively low. On the other hand, maintaining it out of tree
-> as a patch set is also something that should not be all that
-> hard if it does get removed.
-
-Judging from the architecture's git history, it seems that it's
-currently mainly touched by treewide refactors, which are extremely
-helpful as we therefore do not have to piece these changes together 
-downstream. In other respects, we try to be good citizens and contribute
-bugfixes as well as required cleanups (such as implementing clone3 [2]
-and fixing its flag behaviour on 32-bit architectures) as they come up.
-
-If desired, we also would be happy to intensify our support regarding
-reviews or testing to share the maintnance burden if it helps to keep
-nios2 in mainline a bit longer.
-
-Best regards,
-Simon
- 
-0: https://lwn.net/Articles/1035727/
-1: https://www.kernel.org/category/releases.html
-2: https://lore.kernel.org/lkml/20250821-nios2-implement-clone3-v1-0-1bb24017376a@siemens-energy.com/
+Thanks,
+Maoyi Xie
 
