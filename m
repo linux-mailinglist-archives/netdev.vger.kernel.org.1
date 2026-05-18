@@ -1,209 +1,227 @@
-Return-Path: <netdev+bounces-289122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289123-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFOjNJ9AC2p5FAUAu9opvQ
-	(envelope-from <netdev+bounces-289122-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:38:55 +0200
+	id UBn9ID9CC2qsFAUAu9opvQ
+	(envelope-from <netdev+bounces-289123-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:45:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A65657109D
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:38:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8596571246
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:45:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5BE3F300145B
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:38:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 564A43038C64
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B35F3F58FE;
-	Mon, 18 May 2026 16:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53AA48A2D1;
+	Mon, 18 May 2026 16:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFJPUjZo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A3829D27D
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21B13750AD;
+	Mon, 18 May 2026 16:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779122333; cv=none; b=iWoi5zwHEV6sywQA44wOeCyVml1pnCJuZplteTcEtBMcctrD5AgJT465dnoalPIt7YH+wMVrdOBas9vjRXWrCS3zpZResCQ7bJltYOAzaZtXH6hUp34UYc7hFEvZ+4YzH0oUzVPrHfWnxEnNzHvWzkVwuDYbLraUtV8qysmqgvA=
+	t=1779122416; cv=none; b=RVH24UHciInluzd3y3hzSOrMh8mpZAUirW7biGF23lx3jj6Ie0iPJ8FqDEu0lu1QDbjBd5QOiUnhkYhPXSsGR0dgCpdUzGZdd+3db6duoFXGTI9l5A+GEEq4M3ZcLLTjou6LJsI1V8rlE4CMTXvqSj20WG2iPFfKEiuqiZEdAuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779122333; c=relaxed/simple;
-	bh=qedkUd7N7k2FRB8LTrOK/8T7E6Xp0LZ72Fm0FvLVo6A=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Q4GDEuO04o6LBbf8W1csekxIqHAjNL8vVRgubzoMgTMwxUk670bFsebZ+D1f26Bltdk5FP0PteRe8qba39Er3D/FA2K6sEAzmraEzQ6JtXfGSuXxJoXS0lBvAv0pc0K88xhcLzoNEtQ+mVpVAC1jZ1Qgev9mdLf8GyPYTmV+ZuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6961163ad6aso5926153eaf.1
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 09:38:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779122331; x=1779727131;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BlFVpo61x9GkBVo4BKRqHxBkP6zX3O/yxotoo5FNXbo=;
-        b=sfvUzJ5dw1yJNCt0B+EziSBeG89TQXSReA0VYQx+oo8q+UW61boOTl5w6sYd6bbRX3
-         OgZZdb1PxK1G5A3QDueIB/HQMZUDKK3EiD4hvctY9Smu0nPvzIOHx67FZz13WrodrZ6F
-         Bu8uSRvygPKcbfkSMnlWgC+PwWrWGiOZIlXZV0kYhzG8xvDa47q6m/OCHaloCH2RZqiu
-         XA+mKs2D8frAAKrwu8FTR95BHeSSGeogAViR730k+WLQBbU60fjzmrbEc8ZS1vvMiv3P
-         F/KdfdKq9I/GrAwzQHKas3hKz6o3hD/usn+neIWH5oq2w85eqCYOcFICsPIDQo5M6bNW
-         Bbdw==
-X-Forwarded-Encrypted: i=1; AFNElJ9kbnXk9W2xsHHMmZfm+Gi1QsFZrX2Rkuj12uVpYgcFImB7GWgEZyzOJfDAnoQWBTr+sYtahYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOzD5SAUoihxJURw/qFLuOnGuYHo7JGwhH4vup6bjlSGIbmR4a
-	ijyvbIBW/XL3CMBOL2j4Y9qklw/qpLddt5vA7Wi6aKaSjcka7a1gNl9I+Xu+XVr9bKSaol5Wlh2
-	8ebe48n5MGbX4BwHJ3xS5H5/Sp38SXr2LKEV/eTVrZ0/heYiaDdf9dPf25X0=
+	s=arc-20240116; t=1779122416; c=relaxed/simple;
+	bh=RWbSGhrUoxks6TUNT0l3dkNYX/kJcbAy1x32QYTlojc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qDp8o9zYDdalRLpQGEALBTHXM0XphuSnsqNEJijpU8hm9Tm0gUnfnnsp56tx9zCqi+ivKBvUfBp035wI3xfJVLpFbWBX6MKG4PQ1PLS29oMruJV9ojlR9TMlVlu0gzJmYWTlWcjvB6Hmt3soxIGiF5JHnhqzg/RbDEUJMxbJbwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFJPUjZo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74D2CC2BCB7;
+	Mon, 18 May 2026 16:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779122416;
+	bh=RWbSGhrUoxks6TUNT0l3dkNYX/kJcbAy1x32QYTlojc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XFJPUjZo3fNGJji9ooyatZr64YtYbDBFkxER8fi7UOmKQGNRVphRXjzZAn4py+f02
+	 J9Ou9jCwZ/wxnXTUEefMmegqPN8zf5khMs8oF9f4HrJXXhRbtXPrQkZSSwqyuEvPfY
+	 u/pu21y+OizjubAkcwZDYItgV5pLX2gtdRMoNEhwxfcd0NHY6Cz42tnyGw7xyPf2SC
+	 rV8DYkdW/BwViTjXxAcEkqcJi6jGJcU6htwuoVtjv9anumHzA+Oo84z7muqsWel7Kw
+	 /boAQaJDbCQI9vUgQ0qAC3LGST7kx4HGYnSns0kmDvmpMa5wwvBXgRbYfPJFrshA3c
+	 lAz+qkVVCqq0A==
+Message-ID: <2942dd24-3b6f-4e88-acb2-67d35ea8938b@kernel.org>
+Date: Mon, 18 May 2026 18:40:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:290a:b0:696:147d:ac0c with SMTP id
- 006d021491bc7-69c9bfaf176mr10441382eaf.42.1779122330844; Mon, 18 May 2026
- 09:38:50 -0700 (PDT)
-Date: Mon, 18 May 2026 09:38:50 -0700
-In-Reply-To: <20260518100134.809042-1-edumazet@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a0b409a.a70a0220.202581.0005.GAE@google.com>
-Subject: [syzbot ci] Re: rtnetlink: RTNL avoidance in rtnl_getlink()
-From: syzbot ci <syzbot+ci0e37b1eaa858ac77@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, eric.dumazet@gmail.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.14 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/6] bpf: enable bpf timestamping rx in TCP layer
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, willemb@google.com, kuniyu@google.com,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, memxor@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, jolsa@kernel.org, john.fastabend@gmail.com,
+ sdf@fomichev.me, Simon Sundberg <Simon.Sundberg@kau.se>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20260518082344.96647-1-kerneljasonxing@gmail.com>
+ <20260518082344.96647-6-kerneljasonxing@gmail.com>
+ <f9606d4b-7ff7-479f-8e73-2e8cc77095fa@kernel.org>
+ <CAL+tcoDRSpVsiCym+DYsGLBGrdEuim7AZqyBTHYzd-OSBki5-Q@mail.gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CAL+tcoDRSpVsiCym+DYsGLBGrdEuim7AZqyBTHYzd-OSBki5-Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-289122-lists,netdev=lfdr.de,ci0e37b1eaa858ac77];
+	TAGGED_FROM(0.00)[bounces-289123-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,kau.se,toke.dk,vger.kernel.org,tencent.com];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,googlesource.com:url,syzbot.org:url]
-X-Rspamd-Queue-Id: 7A65657109D
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,doi.org:url,diva-portal.org:url,tencent.com:email]
+X-Rspamd-Queue-Id: E8596571246
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot ci has tested the following series
-
-[v1] rtnetlink: RTNL avoidance in rtnl_getlink()
-https://lore.kernel.org/all/20260518100134.809042-1-edumazet@google.com
-* [PATCH net-next 1/2] rtnetlink: use nla_nest_end_safe() in rtnl_fill_prop_list()
-* [PATCH net-next 2/2] rtnetlink: do not acquire RTNL for RTM_GETLINK with RTEXT_FILTER_NAME_ONLY
-
-and found the following issue:
-WARNING in rtnl_fill_ifinfo
-
-Full report is available here:
-https://ci.syzbot.org/series/c0efec5e-90ce-4ba2-8383-16d7bc172521
-
-***
-
-WARNING in rtnl_fill_ifinfo
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      627ac78f2741e2ebd2225e2e953b6964a8a9182f
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/9507e45e-17a8-457b-a47d-5229f306e1f1/config
-syz repro: https://ci.syzbot.org/findings/e56b032e-6444-4682-b577-34e22399b7cc/syz_repro
-
-------------[ cut here ]------------
-RTNL: assertion failed at net/core/rtnetlink.c (2071)
-WARNING: net/core/rtnetlink.c:2071 at rtnl_fill_ifinfo+0xc73/0x2770 net/core/rtnetlink.c:2071, CPU#1: syz.1.18/5818
-Modules linked in:
-CPU: 1 UID: 0 PID: 5818 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:rtnl_fill_ifinfo+0xc7f/0x2770 net/core/rtnetlink.c:2071
-Code: 5a 41 f8 45 85 f6 74 2c e8 be 55 41 f8 e9 91 fc ff ff e8 b4 55 41 f8 48 8d 3d 9d af bb 06 48 c7 c6 40 1c de 8c ba 17 08 00 00 <67> 48 0f b9 3a e9 5d f4 ff ff 48 8d 8c 24 00 02 00 00 48 8b 44 24
-RSP: 0018:ffffc90003bcee40 EFLAGS: 00010293
-RAX: ffffffff89846eac RBX: 1ffff92000779dd4 RCX: ffff88816b500000
-RDX: 0000000000000817 RSI: ffffffff8cde1c40 RDI: ffffffff90401e50
-RBP: ffffc90003bcf118 R08: ffffffff8fdd1227 R09: 1ffffffff1fba244
-R10: dffffc0000000000 R11: fffffbfff1fba245 R12: 0000000000000010
-R13: 0000000000000003 R14: 1ffff92000779dd4 R15: ffff88816b898000
-FS:  00007f293800b6c0(0000) GS:ffff8882a927a000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f2937072780 CR3: 000000016a7d4000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- rtnl_getlink+0xce4/0x10d0 net/core/rtnetlink.c:4267
- rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:7042
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2551
- netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
- netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1345
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x972/0x9f0 net/socket.c:2698
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
- __sys_sendmsg net/socket.c:2784 [inline]
- __do_sys_sendmsg net/socket.c:2789 [inline]
- __se_sys_sendmsg net/socket.c:2787 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f293719ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f293800b028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f2937415fa0 RCX: 00007f293719ce59
-RDX: 0000000000000004 RSI: 0000200000000ac0 RDI: 0000000000000003
-RBP: 00007f2937232d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f2937416038 R14: 00007f2937415fa0 R15: 00007ffffb498538
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	5a                   	pop    %rdx
-   1:	41 f8                	rex.B clc
-   3:	45 85 f6             	test   %r14d,%r14d
-   6:	74 2c                	je     0x34
-   8:	e8 be 55 41 f8       	call   0xf84155cb
-   d:	e9 91 fc ff ff       	jmp    0xfffffca3
-  12:	e8 b4 55 41 f8       	call   0xf84155cb
-  17:	48 8d 3d 9d af bb 06 	lea    0x6bbaf9d(%rip),%rdi        # 0x6bbafbb
-  1e:	48 c7 c6 40 1c de 8c 	mov    $0xffffffff8cde1c40,%rsi
-  25:	ba 17 08 00 00       	mov    $0x817,%edx
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	e9 5d f4 ff ff       	jmp    0xfffff491
-  34:	48 8d 8c 24 00 02 00 	lea    0x200(%rsp),%rcx
-  3b:	00
-  3c:	48                   	rex.W
-  3d:	8b                   	.byte 0x8b
-  3e:	44                   	rex.R
-  3f:	24                   	.byte 0x24
 
 
-***
+On 18/05/2026 15.53, Jason Xing wrote:
+> On Mon, May 18, 2026 at 9:01 PM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+>>
+>>
+>>
+>> On 18/05/2026 10.23, Jason Xing wrote:
+>>> From: Jason Xing <kernelxing@tencent.com>
+>>>
+>>> Add two if statements to accurately isolate bpf timestamping and so
+>>> timestamping. They can work respectively.
+>>>
+>>> As to so_timestamping, only add a loose condition via report flags
+>>> to avoid duplicate strict checks that is done in tcp_recv_timestamp()
+>>> and performance impact. If the loose condition is hit,
+>>> tcp_recv_timestamp() is able to handle the exact case and doesn't
+>>> hamper the existing timestamping feature.
+>>>
+>>> Make it work in TCP protocol.
+>>>
+>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>>> ---
+>>>    net/ipv4/tcp.c | 14 ++++++++++++--
+>>>    1 file changed, 12 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+>>> index 21ece4c71612..64c69bb3578a 100644
+>>> --- a/net/ipv4/tcp.c
+>>> +++ b/net/ipv4/tcp.c
+>>> @@ -2949,8 +2949,18 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags)
+>>>        release_sock(sk);
+>>>
+>>>        if ((cmsg_flags | msg->msg_get_inq) && ret >= 0) {
+>>> -             if (cmsg_flags & TCP_CMSG_TS)
+>>> -                     tcp_recv_timestamp(msg, sk, &tss);
+>>> +             if (cmsg_flags & TCP_CMSG_TS) {
+>>> +                     u32 tsflags = READ_ONCE(sk->sk_tsflags);
+>>> +
+>>> +                     if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
+>>> +                         SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_RX_TIMESTAMPING))
+>>> +                             bpf_skops_rx_timestamping(sk, &tss,
+>>> +                                                       BPF_SOCK_OPS_TSTAMP_RCV_CB);
+>>
+>> Does this mean I can enable timestamp reading per cgroup?
+> 
+> Yes, I think so, but I didn't try. One of the natures of sockopt
+> feature is supporting cgroup attach.
+> cgroup_bpf_prog_attach()/cgroup_bpf_link_attach() is probably
+> something that you're looking for.
+> 
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
+Sound good
 
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+> IIUC, you can attach the prog onto the cgroup where all the sockets
+> are set using the bpf timestamping function. So the current impl is
+> cleaner and has better isolation (to filter out those unmatched
+> flows).
+> 
+>>
+>> In Simon's netstacklat[1] tool we are forced process all RX timestamp
+>> (hooking fentry/tcp_recv_timestamp), and then we have a BPF filter[2] on
+>> the cgroup IDs that we are interested in (which is a significant
+>> overhead, as this is deployed at Cloudflare production scale).
+> 
+> I can feel the pain when filtering in this kind of relatively hot
+> path, which is what I'm trying to avoid internally. What I've done in
+> production (to cover those old kernels) is to just let the kernel
+> print the information, that's it, and there is an agent continuously
+> gathering the data, doing the match and computing latency. But it's
+> overall complicated.
+> 
 
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
+I hope you don't mean your internal/old approach was using printk and 
+then analyzing this data.
 
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
+> Many thanks here, I'm always interested in hearing more useful and
+> real requirements and fancy ideas on how to monitor the latency :) Now
+
+Simon Sundberg <Simon.Sundberg@kau.se> have many more fancy ideas on how 
+to monitor the latency.
+The netstacklat tool is part of Simon's PhD thesis:
+- https://doi.org/10.59217/qklv6836
+
+And we even gotten a paper accepted on netstacklat:
+- 
+https://kau.diva-portal.org/smash/record.jsf?pid=diva2%3A2034009&dswid=3032
+
+
+> I'm still struggling to port the internal functions to bpf
+> timestamping.
+> 
+
+Good luck, feel free to get inspired by our netstacklat tool.
+Key point is to let BPF store latency histograms and then let userspace
+periodically consume these - as heatmaps.
+
+We are proposing to add 'netstacklat' as a new libbpf-tools utility
+- https://github.com/iovisor/bcc/issues/5510
+
+
+>>
+>>
+>> [1] https://github.com/xdp-project/bpf-examples/tree/main/netstacklat
+>>
+>> [2]
+>> https://github.com/xdp-project/bpf-examples/blob/main/netstacklat/netstacklat.bpf.c#L484-L488
+>>
+>>
+>>> +                     if (sock_flag(sk, SOCK_RCVTSTAMP) ||
+>>> +                         tsflags & SOF_TIMESTAMPING_SOFTWARE ||
+>>> +                         tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)
+>>> +                             tcp_recv_timestamp(msg, sk, &tss);
+>>> +             }
+>>>                if ((cmsg_flags & TCP_CMSG_INQ) | msg->msg_get_inq) {
+>>>                        msg->msg_inq = tcp_inq_hint(sk);
+>>>                        if (cmsg_flags & TCP_CMSG_INQ)
+>>
+
 
