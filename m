@@ -1,199 +1,332 @@
-Return-Path: <netdev+bounces-289188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289189-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLNlAA2PC2p1IwUAu9opvQ
-	(envelope-from <netdev+bounces-289188-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:13:33 +0200
+	id CFVxNtKRC2ohJgUAu9opvQ
+	(envelope-from <netdev+bounces-289189-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:25:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 586E8574590
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:13:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370985746C6
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6DC1303ADF2
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 22:12:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B99BD3059005
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 22:21:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CAE3A8746;
-	Mon, 18 May 2026 22:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13EA63932FD;
+	Mon, 18 May 2026 22:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oq5onsJH"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XU2ozsEI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f227.google.com (mail-pg1-f227.google.com [209.85.215.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A4B3A7F61;
-	Mon, 18 May 2026 22:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3B12571DD
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 22:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779142358; cv=none; b=neybbxE6nwJq4mXYUkTKlITgAPUgWequ1o3Bi3briZIu9bK8QfC2vQ6PBWdI5nHxS+9XATyaOXjZXIS9uW9bbjPgf66+hTrAkFdPbaknIFm078MKfcLJHPJx2cMtDwNEPR0Elb5LkwFMDI2P8b++Mqt42J9bqJLxO/2M1jcXbOo=
+	t=1779142907; cv=none; b=JOxLr28GBrr/ja68120jRDkvRf4+qBRpb3S3N+HkXaFF17rlPYwU5f6GfClHZ1TV2gA/LkdwDWuLlkqW3iXVSqh1CjYHmAmP7QN5QeuWL80m9pL4MRGHDRolCMzKg+JxxYQHC/QHzsa+MGkN8vYpJ8CBxqZfdBHKBTWCgjPcauU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779142358; c=relaxed/simple;
-	bh=SpNSHREmYK9MboW8xao/l5nmvqGd0LP2u2S/vlfhRZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ccvmZX4BtDa06j8xcJ5E38wd1xYJd6EYBb0a2hUIPKz3/2ZMn4d231pN8zyFGzcW3PDTKPtxXfS9uEZ4UXimFO0NHVx4dfTZrW4UU6hw1CS9kSSnxFUhP+qXJnncqIzVSTNJx5RUJoEN8hkL0IXwgr5rVXq78CC69zRS1WYyHWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oq5onsJH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 526ACC2BCB7;
-	Mon, 18 May 2026 22:12:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779142358;
-	bh=SpNSHREmYK9MboW8xao/l5nmvqGd0LP2u2S/vlfhRZI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Oq5onsJHXHSNhfRbB5G20Ieyw3XwN5NhjZTGriT1nuN9il3gUmGmylT+bTUZQbY7l
-	 xW+G4xeB7CW32ZYztnYNqv/MX82OIN/NLuxEwt11uLbLJz5MUrsposqB3dYeByMNj0
-	 SC0+gUe32tpIFTamWb1pYPw1XxaHhq3G8SfyaludWqHM8z+I/MAMBtSG7NpGXmYn2s
-	 axsRZB+CbBqtKM7LKHK1w5K8/LukCJqkL5ThYfXhnPGqERYbc1sMrJRf6rMx4mIBBB
-	 kbSEJ6LW/b8STaCD9j8K8M5J+9CYTs9v3cP51X4lTCvMv+uSj0PDZSMC9z4/pFin5G
-	 l3jT/YlhuTFVw==
-Date: Tue, 19 May 2026 00:12:36 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: devicetree@vger.kernel.org, robh@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v7 08/10] net: airoha: Do not stop GDM port if
- it is shared
-Message-ID: <aguO1JODHEKFnsyk@lore-desk>
-References: <20260516-airoha-eth-multi-serdes-v7-8-99e0093303e2@kernel.org>
- <20260517055814.DB1F8C2BCB0@smtp.kernel.org>
+	s=arc-20240116; t=1779142907; c=relaxed/simple;
+	bh=bQuaTm1j11ZBAmW3XORT12HXwYxYdS2zUuG6f14DQms=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JxdDe9TwAuF5I8f3gspGyDgzdrbEA+vFw2X/gFSK3AwZAop5Ym/+L/SVntG5Siffyzmw03Qp7/RaiAPZfqa3PDhNBJ7Ac7JAniZ6Xjiiu10MvNd5LItXRlDinvnGZBxMVYv6rdMN30ipgNidVjygxptB/ajXjZBP/qimlTo7Hh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XU2ozsEI; arc=none smtp.client-ip=209.85.215.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f227.google.com with SMTP id 41be03b00d2f7-c82471904fcso1167771a12.2
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 15:21:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779142905; x=1779747705;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6OhyDRu2kLWfZr2SYR+Y1Z+le+TBDgKFYsW1xx3YLNY=;
+        b=fAhmcNKZCtyVoJom2DsA9Uwfo8pGdZAyzkAVH6CmV9hzNnQCHRnaKpsyrbdOVnvkn7
+         XlG1yiVH5LvlkrxB0v5mZxLNC5INUCOUNV8zpiPCWKOyeODFw8x/mUjj5yRS3i6W8zaa
+         5hEHWPxNSJ3rlIU/WkxCYE3Xb8t0boq7ARwNlqrKk/lp/3gkSLOqxKs6ESa8t5g3jZsm
+         NLnLdxYo4Ga8orxxiaEk5do6eNekTS30BEHpb/2lgcQDa4QJAuyVyzu+LlcF4v77P9p8
+         qYUxXJv1an1uKxlBRkpwDy1DW1Um+BqWy5+nN/N06qZON5tsCgTIiAoMHNNXdzSYEdo0
+         FCxw==
+X-Forwarded-Encrypted: i=1; AFNElJ80lWGvKYt1VF1JwdBDy2aMJOclpu9MGnyTuQS66JSxkrT3mSQOi4EPCxEoiKNXiVtf3CbgQQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4SyFrtxY3avRnlzcu/xt+2X1JDsgbW3iBJaO3RNMyYVSxadQz
+	mn2yiXAjF9UtZgH6RHdi/6OtD0MtSF/wEHOd+3v5LMTwBHNjOWXjfiCgPNJlhjkr2QiXk+YDEd9
+	ItH/1fOvrp+oKWJLSQ3YH0w0RZ7xhA5P92mmy+wIu61t9xVl6bhK5nnJ8fMUJTy14T6C+ylt3vG
+	7Wft28il17Auv1OZaafdKp+lbmCwbuo2P6D9VUp5cydT/rRgh9khFnUJ2tW/5oxNpGEeI/et5Cn
+	ys8ijbt59E=
+X-Gm-Gg: Acq92OFu69rwtTbq4Yqqg6PBhpJUAW7KYTkbCcFUWvrX/q5CYIEsnQjGmQ3DofaZzJX
+	3jHcP43eqoMwLglPj7WRbpgjEaVH6NYLaT4J7+Hi4c9DbSqS6d3MMfjurdr0sjZ499EgzNgyIUm
+	4DhyoJFQa3uwLyHfzZPl7I4/hw0QVkdDkLQD4EhF4GXxNEOpBDqbwfuW3n4l4yMLHRmPD79BN0o
+	LJduSBAoOmNQ6AIXQwrUC7RKfC2exZuELYzOX9yBxznBCtGee1dCrpuNmPsjx7KgQ7jEmKLB7LO
+	a2yae6WH+5E9TIQXdrvE2EdT1FM+rfuniugGzU74JFsFVPX4UINkQp4tjHLPcAeUpKcMgUMkuXT
+	X6y1AYE9WcaYC+3adFlZN9/9Byrl4Sy8I66eY7Tc5TsTcmQbwAsO8Quj4IegJhY/cXbbV2RaWvZ
+	qe38GstMSN+XadNg3tu7ncsrOnDT6Z44vGZ9+KBfNcRPXEynGe8RLl0qJy
+X-Received: by 2002:a17:903:3bc7:b0:2b4:6d92:b002 with SMTP id d9443c01a7336-2bd7e9e58aemr195793425ad.37.1779142904641;
+        Mon, 18 May 2026 15:21:44 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-24.dlp.protect.broadcom.com. [144.49.247.24])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2bd5c0650b0sm11671895ad.14.2026.05.18.15.21.44
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 18 May 2026 15:21:44 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-678a5c665b5so3071923a12.1
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 15:21:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1779142902; x=1779747702; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6OhyDRu2kLWfZr2SYR+Y1Z+le+TBDgKFYsW1xx3YLNY=;
+        b=XU2ozsEIa8I9w+8nV7xHeXnBW2Foqfzqogg5Z0WPo+Y71+klcmIkGmen9nsAnULabI
+         GYjZy/7Zno1jXX+vEThSbGI2prK6+n/5IqLZEzG4YODttrmjwOT7lN6JDOPA/wGUbvo2
+         903cDnryHa18pfb5/QiLuJ2I+U+CF5ET4y5nY=
+X-Forwarded-Encrypted: i=1; AFNElJ/caw0MBWp/dnRsKsOlBx82YcXu1q07yLw13HExXt88ad0EDoYwRav6frz11StX8cGv/pCqClM=@vger.kernel.org
+X-Received: by 2002:a05:6402:1947:b0:67f:58b:4968 with SMTP id 4fb4d7f45d1cf-683bd195a41mr7399664a12.24.1779142902321;
+        Mon, 18 May 2026 15:21:42 -0700 (PDT)
+X-Received: by 2002:a05:6402:1947:b0:67f:58b:4968 with SMTP id
+ 4fb4d7f45d1cf-683bd195a41mr7399652a12.24.1779142901961; Mon, 18 May 2026
+ 15:21:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4fI9wqHOzbR04jOR"
-Content-Disposition: inline
-In-Reply-To: <20260517055814.DB1F8C2BCB0@smtp.kernel.org>
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+References: <20260512212105.3488258-16-michael.chan@broadcom.com> <20260516011024.1857806-1-kuba@kernel.org>
+In-Reply-To: <20260516011024.1857806-1-kuba@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Mon, 18 May 2026 15:21:28 -0700
+X-Gm-Features: AVHnY4L99u9T_dnrdNAWZ3FfYEzGjgyePdffKCWytNfmwlycm9ClQb2LDQ9WvnI
+Message-ID: <CACKFLi=DRvf7tu=WWYjpma1JFLgHMTZPH+-w=hVaTA_fbC7dOQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 15/15] bnxt_en: Add kTLS retransmission support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com, 
+	andrew.gospodarek@broadcom.com
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000b8137806521efc0d"
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289188-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289189-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	HAS_ATTACHMENT(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 586E8574590
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 370985746C6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
---4fI9wqHOzbR04jOR
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--000000000000b8137806521efc0d
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On May 17, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
-> - [Medium] Flawed hardware MTU recalculation logic in airoha_dev_change_m=
-tu() for shared GDM ports
-> --
->=20
-> commit 28e02ac4611575e19c4f6eef3fa74c11d4debb6e
-> Author: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> net: airoha: Do not stop GDM port if it is shared
->=20
-> This commit updates the driver to allow multiple devices to share the same
-> GDM port. It stops the port only when no other devices are using it and
-> adjusts the hardware MTU to accommodate all active devices.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 8558790eca644..c70e3ace38e25 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
->=20
+On Fri, May 15, 2026 at 6:10=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+
+> A few questions on the new code below.
+>
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.c
+> > index 89c900db45ba..5697190dc541 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > @@ -499,7 +499,6 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *=
+skb, struct net_device *dev)
+> >
+> >       txq =3D netdev_get_tx_queue(dev, i);
+> >       txr =3D &bp->tx_ring[bp->tx_ring_map[i]];
+> > -     prod =3D txr->tx_prod;
+> >
+> >  #if (MAX_SKB_FRAGS > TX_MAX_FRAGS)
+> >       if (skb_shinfo(skb)->nr_frags > TX_MAX_FRAGS) {
+> > @@ -532,6 +531,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *=
+skb, struct net_device *dev)
+> >       if (unlikely(!skb))
+> >               return NETDEV_TX_OK;
+> >
+> > +     prod =3D txr->tx_prod;
+> >       length =3D skb->len;
+> >       len =3D skb_headlen(skb);
+> >       last_frag =3D skb_shinfo(skb)->nr_frags;
+>
+> [High]
+> What unwinds the presync BDs if a DMA mapping fails later in
+> bnxt_start_xmit()?
+>
+
+The unwind is indeed missing.  The cleanup path (e.g. during TX
+timeout) is also missing the proper accounting for the extra inline
+BDs.  I will fix it in v3.
+
+> [Low]
+> Is the "tx_tls_drop_no_sync" name accurate?  BNXT_KTLS_TX_DROP_NO_SYNC
+> is bumped in bnxt_ktls_tx_ooo() when tls_get_record() returns NULL or a
+> record with num_frags =3D=3D 0, after which -EPROTO is returned and the
+> caller falls back to tls_encrypt_skb() rather than dropping the packet.
+> Would something like "tx_tls_resync_no_record" be more descriptive of
+> what the counter actually counts, given that ethtool -S strings are
+> hard to rename once shipped?
+
+I will go over these counters and make any necessary adjustments.
+
 > [ ... ]
->=20
-> > @@ -1917,13 +1945,18 @@ static void airoha_dev_get_stats64(struct net_d=
-evice *netdev,
-> >  static int airoha_dev_change_mtu(struct net_device *netdev, int mtu)
-> >  {
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > +	u32 cur_len, len =3D ETH_HLEN + mtu + ETH_FCS_LEN;
-> >  	struct airoha_gdm_port *port =3D dev->port;
-> > -	u32 len =3D ETH_HLEN + mtu + ETH_FCS_LEN;
-> >  	struct airoha_eth *eth =3D dev->eth;
-> > =20
-> > -	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(port->id),
-> > -		      GDM_LONG_LEN_MASK,
-> > -		      FIELD_PREP(GDM_LONG_LEN_MASK, len));
-> > +	cur_len =3D airoha_fe_get(eth, REG_GDM_LEN_CFG(port->id),
-> > +				GDM_LONG_LEN_MASK);
-> > +	if (len > cur_len || !port->users ||
-> > +	    (port->users =3D=3D 1 && netif_running(netdev)))
-> > +		airoha_fe_rmw(eth, REG_GDM_LEN_CFG(port->id),
-> > +			      GDM_LONG_LEN_MASK,
-> > +			      FIELD_PREP(GDM_LONG_LEN_MASK, len));
+> > +     if (tls_ctx->prot_info.version =3D=3D TLS_1_2_VERSION) {
+> > +             u32 nonce_bytes =3D tls_ctx->prot_info.iv_size;
+> > +             u32 retrans_off =3D seq - hdr_tcp_seq;
 > > +
->=20
-> The commit message states that the driver must "always set in GDM_LONG_LE=
-N_MASK
-> field of REG_GDM_LEN_CFG register the maximum MTU of all running net_devi=
-ces
-> connected to the same GDM port."
->=20
-> Does this logic successfully recalculate the MTU when the MTU of a running
-> device is decreased while sibling devices are also running? In that scena=
-rio,
-> len > cur_len evaluates to false, which appears to skip the update and le=
-ave
-> the hardware MTU stuck at the previous larger value.
->=20
-> Additionally, if an administratively down device has its MTU increased,
-> len > cur_len can evaluate to true. Does this prematurely increase the
-> hardware MTU, exposing the running sibling devices to larger frames based
-> on a stopped device's configuration?
->=20
-> Would it be more accurate to iterate over the devices to compute the
-> actual maximum MTU of all active devices here, similar to the approach ta=
-ken
-> in airoha_dev_stop()?
+> > +             if (retrans_off > 5 && retrans_off < 5 + nonce_bytes)
+> > +                     nonce_bytes =3D retrans_off - 5;
+> > +             memcpy(pcmd.explicit_nonce, hdr + 5, nonce_bytes);
+> > +     }
+>
+> [High]
+> Can hdr be NULL here?  skb_frag_address_safe() is documented to return
+> NULL when page_address(page) returns NULL, e.g. for highmem pages on
+> 32-bit kernels with CONFIG_HIGHMEM that have not been kmap'd.
 
-ack, I will fix it in v8.
+I think that's right.  For 32-bit highmem, it can be NULL so I need to
+check for NULL.
 
-Regards,
-Lorenzo
+>
+> > +     memcpy(&pcmd.record_seq_num[0], &rec_sn, sizeof(rec_sn));
+>
+> [High]
+> Does this copy the record sequence number with the byte order the NIC
+> expects on big-endian hosts?
 
->=20
-> >  	WRITE_ONCE(netdev->mtu, mtu);
-> > =20
-> >  	return 0;
->=20
-> --=20
-> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260516-airoha-eth-=
-multi-serdes-v7-0-99e0093303e2@kernel.org?part=3D8
+Endian conversion is indeed needed here.
 
---4fI9wqHOzbR04jOR
-Content-Type: application/pgp-signature; name=signature.asc
+> [Low]
+> How is an operator expected to break the OOO counter down by outcome?
+>
 
------BEGIN PGP SIGNATURE-----
+The TX path is not quite complete and some TX counters are deferred to
+future patches.  But I will make them more complete for this patchset
+in v3.  I will also review all the other AI comments and make changes
+for v3.  Thanks.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaguO1AAKCRA6cBh0uS2t
-rMxgAQDiakfXuN/EA6krRVayUEnnJQbuFJCEexGZqaq235AU3AD+Le3t1oYn1xLl
-/VNCiOD0wX6ypPz3JFSR2KHEa4TRxgo=
-=5jbV
------END PGP SIGNATURE-----
+--000000000000b8137806521efc0d
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
---4fI9wqHOzbR04jOR--
+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
+DPVtLUtep/P3evQuAtTQRaKedjamBcUpJ7qUhBuv/Z07LlLIlB/vfNSPWe1V+njTezc8m3VfvNEC
+qEpXasPSfDgfcuUhcPR+7++oUDaTt9iqGFOjwiURxx08pL6ogSuiT41O4Xu7msabnUE6RY0O0xR5
+5UGwbpC1QSmnBq7TAy8oQg/nNw4vowEh3S2lmjdHCOdR270Ygd7jet8WQKa5ia4ZK4QdkS8+5uLt
+rMMRyM3QurndiZZJBipjPvEWJR/+jod8867f3n0CAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUJbO/Fi7RhZHYmATVQf6NlAH2
+qUcwDQYJKoZIhvcNAQELBQADggIBABcLQEF8mPE9o6GHJd52vmHFsKsf8vRmdMEouFxrW+GhXXzg
+2/AqqhXeeFZki82D6/5VAPkeVcgDeGZ43Bv89GHnjh/Vv0iCUGHgClZezpWdKCAXkn698xoh1+Wx
+K/c/SHMqGWfBSVm1ygKAWkmzJLF/rd4vUE0pjvZVBpNSVkjXgc80dTZcs7OvoFnt14UgvjuYe+Ia
+H/ux6819kbi0Tmmj5LwSZW8GXw3zcPmAyEYc0ZDCZk9QckL5yPzMlTAsy0Q+NMVpJ8onLj/mHgTk
+Ev8zt1OUE8MlXZj2+wgVY+az2T8rGmqRU2iOzRlJnc86qVwuwjL9AA9v4R13Yt8zYyA7jL0NiBNP
+WaOSajKBB5Z/4ZVtcvOMILD1+G+CVZX7GUWERT9NRXw/SyIEMU59lFbuvy4zxe3+RbOleCgp3pze
+q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
+2NK++r5/QamlFqYRhsFxSBIvhkh2Q/hD3/zy4j17Yf/FUje5uyg03FblSBOk2WYpRpXEuCpyn5pb
+bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
+R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCD1zwfs
+zQ9dURBQtdsw/Zk44jsC4iL+Wg6nLrah4qggcDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA1MTgyMjIxNDJaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBLfQm4GePRRjdYzGxqAKtsGJILVYdL+GYF8Dg6AcMs
+3h6HjUUUScxHY4e3Xh1qoVYh4156UWWyswvlendYMr/dICoIYGzLjDe+gzZgRYJYSWKRHkaby1vA
+jF1vCLVqr7fuBv+uTcVtgc1BJQHOAMefd/c7AUyCQ8QQx+muRSorl9qv0ZX+AS+du8AWK8l0Xwnj
+0eGoxj+YAgXMbuXubbFRp175lxb3RYRdy2LoDXzjAoXBCqwl8t9HOpyME2lNAm8o2SWgVgXNuGsN
+toDFFZ8F26VF5l/3AMdmpgLM21LZN/LsahrpxNPuX/ZZPQYq1pnKosy0Tj2JAMPdj4aD5PAa
+--000000000000b8137806521efc0d--
 
