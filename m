@@ -1,186 +1,209 @@
-Return-Path: <netdev+bounces-289121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289122-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oPduA2xAC2p4FAUAu9opvQ
-	(envelope-from <netdev+bounces-289121-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:38:04 +0200
+	id mFOjNJ9AC2p5FAUAu9opvQ
+	(envelope-from <netdev+bounces-289122-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:38:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DFDE571080
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:38:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A65657109D
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3914F3005585
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:37:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5BE3F300145B
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4106F48B394;
-	Mon, 18 May 2026 16:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="GTy5Vpzl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B35F3F58FE;
+	Mon, 18 May 2026 16:38:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCDC48AE06
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A3829D27D
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779122271; cv=none; b=d6oHrrMfvfuHG6Wbkr8exql3EzcnQYOHcc/JhdO1PqUeaDNDSGmnE2rdNZxixyIpgyyyhevhWyU4Ps7UV0rhHSnlZSIg4TdwlR3bEuEi4If9DNTR515oGclK3qVB13vltOodnGtkvZQCGJnaMvxw5AabJ7jzrhOn+MrDKW2VTzc=
+	t=1779122333; cv=none; b=iWoi5zwHEV6sywQA44wOeCyVml1pnCJuZplteTcEtBMcctrD5AgJT465dnoalPIt7YH+wMVrdOBas9vjRXWrCS3zpZResCQ7bJltYOAzaZtXH6hUp34UYc7hFEvZ+4YzH0oUzVPrHfWnxEnNzHvWzkVwuDYbLraUtV8qysmqgvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779122271; c=relaxed/simple;
-	bh=CaqRPTgKXyI2XV4PjCcbbusa6uw3fAD79fAQWeD1M6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mDO/o2SPqYRFvWeC/j0Y9CPC3tFl6sLTD76F8J674IH2yaO9JKlxZ2HVXaEirFwA9d1gTFhivD7mQ6wYFoPHK0Qhl6aILcgAxhRk43lNjB8YSrKu+LOw8hKEIjv12hu7kbQiz103fFvlzi2/pRpXd6qMBUOXkOrOYjpX2JQGF1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=GTy5Vpzl; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43fe62837baso1390844f8f.3
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 09:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1779122267; x=1779727067; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bWMCe3ghcYJBdMMLjkrfnvrFFAeOfYLES9EzhhtO5zQ=;
-        b=GTy5VpzlP8Acq99bNuZNx4u0hzLo54Fz5DCJ0CCvKJOQm1PwwGA3kMSx78WU0wNyDA
-         hvjm04HSG6vDQzDeUsCe5FluuTyu6kRqIjHGxdokpPqfjU1NMprli2kRNEiX80pvC5N6
-         eSd1OKVrMXWivL0VA/ayYiPEM1oI9opLqZukGoSxX7rvgdakCkJJnYpC8P1KNtiFrdck
-         tY/Y2vM1VZsUPzwRLGmaQjXTNu+79LHkjE1S7f2TQwezGfExijV2oEDGSh329kdXcqBK
-         zQwqp81/umNLiMZrff3gGrnoofepXZmfJaE0QY7tYtgZ6PHUw8E7YltP26sDynj3tT2f
-         anyQ==
+	s=arc-20240116; t=1779122333; c=relaxed/simple;
+	bh=qedkUd7N7k2FRB8LTrOK/8T7E6Xp0LZ72Fm0FvLVo6A=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=Q4GDEuO04o6LBbf8W1csekxIqHAjNL8vVRgubzoMgTMwxUk670bFsebZ+D1f26Bltdk5FP0PteRe8qba39Er3D/FA2K6sEAzmraEzQ6JtXfGSuXxJoXS0lBvAv0pc0K88xhcLzoNEtQ+mVpVAC1jZ1Qgev9mdLf8GyPYTmV+ZuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6961163ad6aso5926153eaf.1
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 09:38:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779122267; x=1779727067;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bWMCe3ghcYJBdMMLjkrfnvrFFAeOfYLES9EzhhtO5zQ=;
-        b=UUEHrDkefLntnfceDgQH+UCB5Eh8jWVIayTLamyJH3M1eUQovt6VriEFzrI/8QVjiC
-         k82aAY5/hfkfDIPdMWqhkY138pIwigVod4mlQZHbbKX8YqZbaxLGOKaxNczBF45CRwr7
-         NrPXcW+8rGNXiPIt04U1N3XhqV37K2YWdXWcGUc9D5ZXlkNW7+gaxSubYd8nJv9Fz/Tc
-         iz5Lq9iioAHMnTbKL3rUiq5ABhvlQrc6SKtCy0eSQcgBAy74J1Ehgwd1pco1rvCbLqNo
-         tIYpHnnSEGIdpV3RiYzw6SicCEo0isO4s7fABNW1N3gSL+Gklk43FpDfrdZ/HPtQfNVo
-         oZyw==
-X-Forwarded-Encrypted: i=1; AFNElJ/WLjI0Jwr6Yvp8+uiHJJNOrZAv44qCjldfU2LBo/22HOBFAuOaFgj+spOuzyeNZ0pzGCc5Kc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYXx/uVO3k4CdT2QRp2+MVaZCaKVJ1K23Pp8TV6u6lqFZhDAJa
-	g0ZkJ8tVpcAAShqZ3OV17V8exx5yra+ZcJjNHjy0kel+ujd9rizcxWe7lTZBXOsr0A==
-X-Gm-Gg: Acq92OF5nJ6z5+JAo8ssbl6Nae3FHjkIX0rnFsOaPSzpVuI1te/3EBBPdDoq4HH3u4T
-	6OZcmziMDqTbZiu3asx8RoPLjNXabFLBMg8IJpAzKOxQGWKx/DwtBbGZY2mY5g74s9NBTMCFq0A
-	+HBJlsfSsT9QKPfhvVb1I3fMNfd9ZZzeVgaO0we0J5TL8akxvXQK4rtmpXTLisgeuiED4Lo8qF9
-	dfTT6qRVZW6xcZh02RywqgH4H1KEEF57kpCMKtnXLZ2E8h6c9yT6jS7y0eLPorUjFS/Ke80UfFP
-	UQiiR0vvVipKpMTDINSM6+TkdlODpBqPVkuWhVmA8QvoD/yNr2790AsbZbhgn9lqnmb7v7mHDmj
-	Mm7pokOLF+n9GtGswRbptiAB5oUhD81Y2POatefK9CBb1qNS3HRuQVCH7L35+bbV9OQ5MQJbkJq
-	H05ZhdDnO3dcUJ3MyAF0oDyNA=
-X-Received: by 2002:a5d:64e4:0:b0:43e:b0f8:66f1 with SMTP id ffacd0b85a97d-45e5c5aebdcmr26353139f8f.43.1779122267158;
-        Mon, 18 May 2026 09:37:47 -0700 (PDT)
-Received: from [10.83.43.186] ([159.134.255.34])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45e6a135f0csm19940345f8f.27.2026.05.18.09.37.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 09:37:46 -0700 (PDT)
-Message-ID: <df2ec565-c621-4894-826a-29c3a75785be@arista.com>
-Date: Mon, 18 May 2026 17:37:45 +0100
+        d=1e100.net; s=20251104; t=1779122331; x=1779727131;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BlFVpo61x9GkBVo4BKRqHxBkP6zX3O/yxotoo5FNXbo=;
+        b=sfvUzJ5dw1yJNCt0B+EziSBeG89TQXSReA0VYQx+oo8q+UW61boOTl5w6sYd6bbRX3
+         OgZZdb1PxK1G5A3QDueIB/HQMZUDKK3EiD4hvctY9Smu0nPvzIOHx67FZz13WrodrZ6F
+         Bu8uSRvygPKcbfkSMnlWgC+PwWrWGiOZIlXZV0kYhzG8xvDa47q6m/OCHaloCH2RZqiu
+         XA+mKs2D8frAAKrwu8FTR95BHeSSGeogAViR730k+WLQBbU60fjzmrbEc8ZS1vvMiv3P
+         F/KdfdKq9I/GrAwzQHKas3hKz6o3hD/usn+neIWH5oq2w85eqCYOcFICsPIDQo5M6bNW
+         Bbdw==
+X-Forwarded-Encrypted: i=1; AFNElJ9kbnXk9W2xsHHMmZfm+Gi1QsFZrX2Rkuj12uVpYgcFImB7GWgEZyzOJfDAnoQWBTr+sYtahYk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOzD5SAUoihxJURw/qFLuOnGuYHo7JGwhH4vup6bjlSGIbmR4a
+	ijyvbIBW/XL3CMBOL2j4Y9qklw/qpLddt5vA7Wi6aKaSjcka7a1gNl9I+Xu+XVr9bKSaol5Wlh2
+	8ebe48n5MGbX4BwHJ3xS5H5/Sp38SXr2LKEV/eTVrZ0/heYiaDdf9dPf25X0=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] tg3: guard napi_disable and pci_disable_device calls
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: mchan@broadcom.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-kernel@vger.kernel.org
-References: <CAPzpGcTtw+ou+8jid_qE9w96UWt+4KUZXN-aC=44Oqkk=qdERg@mail.gmail.com>
- <CALs4sv3XH1DEB+EXmSjKvPz8Av-53HOrJ+Dc_mjOv+3EnnuV9w@mail.gmail.com>
- <a120c9f5-5818-4335-ac2c-caaf4f6f4fc7@arista.com>
- <CALs4sv2bNZkBvqKwSMOM5CtJG+GM8P6D6PMHWFJUqtNS4xw34A@mail.gmail.com>
-Content-Language: en-US
-From: "Yury M." <yurypm@arista.com>
-In-Reply-To: <CALs4sv2bNZkBvqKwSMOM5CtJG+GM8P6D6PMHWFJUqtNS4xw34A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Received: by 2002:a05:6820:290a:b0:696:147d:ac0c with SMTP id
+ 006d021491bc7-69c9bfaf176mr10441382eaf.42.1779122330844; Mon, 18 May 2026
+ 09:38:50 -0700 (PDT)
+Date: Mon, 18 May 2026 09:38:50 -0700
+In-Reply-To: <20260518100134.809042-1-edumazet@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a0b409a.a70a0220.202581.0005.GAE@google.com>
+Subject: [syzbot ci] Re: rtnetlink: RTNL avoidance in rtnl_getlink()
+From: syzbot ci <syzbot+ci0e37b1eaa858ac77@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, eric.dumazet@gmail.com, 
+	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
-	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[arista.com:+];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-289122-lists,netdev=lfdr.de,ci0e37b1eaa858ac77];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289121-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yurypm@arista.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,arista.com:mid,arista.com:dkim]
-X-Rspamd-Queue-Id: 5DFDE571080
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,googlesource.com:url,syzbot.org:url]
+X-Rspamd-Queue-Id: 7A65657109D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-It looks like your opinion is based on the fact that AER recovery 
-failure is a critical issue after which the system should be considered 
-unstable. But I disagree with that. AER error recovery failure can 
-happen not only because of PCI_ERS_RESULT_NO_AER_DRIVER (arguably 
-considered a buggy or unsupported PCIe bus configuration). There are 
-other AER recovery failure reasons. And until the system is locked by 
-tg3, it has a chance to be recovered, and tg3 should not be a blocker 
-here. I would accept the case where, after AER recovery failure, the tg3 
-device stops working. We can consider it as an unsupported case where 
-manual intervention is required to recover tg3. But in this case, it 
-blocks rtnl_lock.
+syzbot ci has tested the following series
 
-For me, any AER error recovery failure is a legitimate condition in 
-Linux. Maybe we can even consider that the whole bus is in an 
-unexpected/unstable state. But we still should give the software a 
-chance to recover the system. Especially when we are talking about the 
-support of hot-pluggable devices. Insertion or removal of a new PCIe 
-device (without AER recovery support) onto the same bus as the tg3 
-device should not cause an rtnl_lock hang.
+[v1] rtnetlink: RTNL avoidance in rtnl_getlink()
+https://lore.kernel.org/all/20260518100134.809042-1-edumazet@google.com
+* [PATCH net-next 1/2] rtnetlink: use nla_nest_end_safe() in rtnl_fill_prop_list()
+* [PATCH net-next 2/2] rtnetlink: do not acquire RTNL for RTM_GETLINK with RTEXT_FILTER_NAME_ONLY
 
-Sorry, maybe I'm wrong and AER recovery failure is really a critical and 
-unexpected system error.
+and found the following issue:
+WARNING in rtnl_fill_ifinfo
 
-Theoretically, in this particular case, we can try to fix 
-PCI_ERS_RESULT_NO_AER_DRIVER and avoid changes in tg3. But I'm sure that 
-there are other cases where AER recovery can fail and there are many 
-other hot-pluggable devices that can return PCI_ERS_RESULT_NO_AER_DRIVER 
-or cause another type of AER recovery failure. As such, it looks like it 
-is better to handle AER recovery failure in tg3.
+Full report is available here:
+https://ci.syzbot.org/series/c0efec5e-90ce-4ba2-8383-16d7bc172521
 
-Another long-term fix could be to add another AER error handler callback 
-to signal drivers about AER recovery failure.
+***
 
-On 5/18/26 16:43, Pavan Chebbi wrote:
->> To do cleanup on device-stop or error handling is a common approach, and it is not a problem. The problem is that tg3 doesn't track the device status. If a cleanup was performed (napi_disable and pci_disable_device called), tg3 should know that the device is not in an initialized state. When we subsequently try to disable the device, tg3 should not try to cleanup again. That is the problem I'm trying to fix. Frankly speaking, I'm adding a flag which signals that device cleanup was completed during the handling of an AER error, so when tg3 stops/removes the device, it should not perform cleanup again.
-> I understand this. But my view is that you are trying to fix a
-> symptom. The real issue seems to be that you are having some devices
-> in your bus/subtree that don't support AER.
-> Looking at pcie_do_recovery(), the recovery aborts the moment
-> NO_AER_DRIVER is received by the port driver. I would like to think
-> that this is by design.
->
->> Maybe PCI_ERS_RESULT_NO_AER_DRIVER is a rare case in the PCIe world, but I think that in any case, the tg3 driver should correctly handle AER recovery failure. Recovery can fail not only because of the PCI_ERS_RESULT_NO_AER_DRIVER return code. The problem is that a double napi_disable call causes a soft lockup, and not just one driver/device stops functioning—the whole system is affected.
->>
-> Like I said, the tg3 driver does handle the AER sequence correctly.
-> The problem really is the tg3 remove() is facing issues because the
-> PCIe devices' topology is not suitable for AER recovery.
-> The issue a consequence of tg3 suffering a stall during AER because it
-> never recvd slot_reset() and resume().
->
-> I am not sure if we should allow this fix for what I think is a
-> situation arising out of an unsupported topology..
-> I will defer this to Michael or netdev maintainers for their feedback.
+WARNING in rtnl_fill_ifinfo
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      627ac78f2741e2ebd2225e2e953b6964a8a9182f
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/9507e45e-17a8-457b-a47d-5229f306e1f1/config
+syz repro: https://ci.syzbot.org/findings/e56b032e-6444-4682-b577-34e22399b7cc/syz_repro
+
+------------[ cut here ]------------
+RTNL: assertion failed at net/core/rtnetlink.c (2071)
+WARNING: net/core/rtnetlink.c:2071 at rtnl_fill_ifinfo+0xc73/0x2770 net/core/rtnetlink.c:2071, CPU#1: syz.1.18/5818
+Modules linked in:
+CPU: 1 UID: 0 PID: 5818 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:rtnl_fill_ifinfo+0xc7f/0x2770 net/core/rtnetlink.c:2071
+Code: 5a 41 f8 45 85 f6 74 2c e8 be 55 41 f8 e9 91 fc ff ff e8 b4 55 41 f8 48 8d 3d 9d af bb 06 48 c7 c6 40 1c de 8c ba 17 08 00 00 <67> 48 0f b9 3a e9 5d f4 ff ff 48 8d 8c 24 00 02 00 00 48 8b 44 24
+RSP: 0018:ffffc90003bcee40 EFLAGS: 00010293
+RAX: ffffffff89846eac RBX: 1ffff92000779dd4 RCX: ffff88816b500000
+RDX: 0000000000000817 RSI: ffffffff8cde1c40 RDI: ffffffff90401e50
+RBP: ffffc90003bcf118 R08: ffffffff8fdd1227 R09: 1ffffffff1fba244
+R10: dffffc0000000000 R11: fffffbfff1fba245 R12: 0000000000000010
+R13: 0000000000000003 R14: 1ffff92000779dd4 R15: ffff88816b898000
+FS:  00007f293800b6c0(0000) GS:ffff8882a927a000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f2937072780 CR3: 000000016a7d4000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ rtnl_getlink+0xce4/0x10d0 net/core/rtnetlink.c:4267
+ rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:7042
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2551
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2698
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
+ __sys_sendmsg net/socket.c:2784 [inline]
+ __do_sys_sendmsg net/socket.c:2789 [inline]
+ __se_sys_sendmsg net/socket.c:2787 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f293719ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f293800b028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f2937415fa0 RCX: 00007f293719ce59
+RDX: 0000000000000004 RSI: 0000200000000ac0 RDI: 0000000000000003
+RBP: 00007f2937232d6f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f2937416038 R14: 00007f2937415fa0 R15: 00007ffffb498538
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	5a                   	pop    %rdx
+   1:	41 f8                	rex.B clc
+   3:	45 85 f6             	test   %r14d,%r14d
+   6:	74 2c                	je     0x34
+   8:	e8 be 55 41 f8       	call   0xf84155cb
+   d:	e9 91 fc ff ff       	jmp    0xfffffca3
+  12:	e8 b4 55 41 f8       	call   0xf84155cb
+  17:	48 8d 3d 9d af bb 06 	lea    0x6bbaf9d(%rip),%rdi        # 0x6bbafbb
+  1e:	48 c7 c6 40 1c de 8c 	mov    $0xffffffff8cde1c40,%rsi
+  25:	ba 17 08 00 00       	mov    $0x817,%edx
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	e9 5d f4 ff ff       	jmp    0xfffff491
+  34:	48 8d 8c 24 00 02 00 	lea    0x200(%rsp),%rcx
+  3b:	00
+  3c:	48                   	rex.W
+  3d:	8b                   	.byte 0x8b
+  3e:	44                   	rex.R
+  3f:	24                   	.byte 0x24
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
+
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
 
