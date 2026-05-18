@@ -1,193 +1,195 @@
-Return-Path: <netdev+bounces-288861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288862-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uyXmChyxCmpx5wQAu9opvQ
-	(envelope-from <netdev+bounces-288861-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:26:36 +0200
+	id wNDQKsWyCmpx5wQAu9opvQ
+	(envelope-from <netdev+bounces-288862-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:33:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 908E6566AA3
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:26:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27174566B9B
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9D54E3042C47
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 06:23:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E1630302C37F
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 06:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262ED3E121E;
-	Mon, 18 May 2026 06:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6C83DB63C;
+	Mon, 18 May 2026 06:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iLg/Md4u"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jGBKBJfg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010001.outbound.protection.outlook.com [52.101.193.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C130B3E0087
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 06:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779085323; cv=none; b=XFlyChfNtyt/wFA06syQVloTENGX5Dm0HgSjRnDgvjd0ebloG14bnz6WQ2IbUxqHH/CP6Ud6B1p+OHLL1GURNsF1eox6Y3Ln2Xlwu0fP4zOmx+NL/do3V8Z5cbiMZEJfYM7+kNtrF60FUO1f0co6Z2gJtQh4Ap3QG87i/V8GEuM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779085323; c=relaxed/simple;
-	bh=GAxmCVfEfuTYdYwUoDV98+wVYrNUCo+F+B14gf3GO9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MKw2o9VBLZnc0AqOyUHIQB5Di+S/6yfkGUWzaB3LmRp9YbyVCd4YiG94MhDVhKwt6ixxDbpDfs1PH8b+IfBAvfeOuHxz57SyYEeyDmQYUfOkmehIQH8VLGHYCC0IU9+15zJ2r7LJr9jY+DNAV2gVs7EzOfFQdejwo5iG4KX7TfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iLg/Md4u; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779085311;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5dg7sEKaYbYXo9PZMr6ZpjguChM6yU45YbBjm7jsgrk=;
-	b=iLg/Md4uPHJUb6gsaGoIT+GRCNdMGJxqTl8wq5Lq98l8jndy1keI+Siyybx+EPo70naf69
-	VQvBOrhOBl2Jd99VyMHt6CVRif1krQMHBOBHH5RDfUba94vVX9f7FwXiZCN3MycLG/absc
-	/1h5ykezkCqeg9RXLCfYGw1tiW6X16k=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-650-3cKWxSV_Ny6n3wpZqxTRmw-1; Mon,
- 18 May 2026 02:21:47 -0400
-X-MC-Unique: 3cKWxSV_Ny6n3wpZqxTRmw-1
-X-Mimecast-MFC-AGG-ID: 3cKWxSV_Ny6n3wpZqxTRmw_1779085305
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0C33418002C8;
-	Mon, 18 May 2026 06:21:45 +0000 (UTC)
-Received: from griffin (unknown [10.44.32.106])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 14E8D18004A3;
-	Mon, 18 May 2026 06:21:40 +0000 (UTC)
-Date: Mon, 18 May 2026 08:21:38 +0200
-From: Jiri Benc <jbenc@redhat.com>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, Adrian Moreno
- <amorenoz@redhat.com>, Nicolas Dichtel <nicolas.dichtel@6wind.com>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Matteo Perin
- <matteo.perin@canonical.com>
-Subject: Re: [PATCH net 1/5] net: rtnetlink: fix link nsid reported when the
- link is local
-Message-ID: <20260518082138.37522db0@griffin>
-In-Reply-To: <20260515201937.2813983-2-i.maximets@ovn.org>
-References: <20260515201937.2813983-1-i.maximets@ovn.org>
-	<20260515201937.2813983-2-i.maximets@ovn.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E103E2779
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 06:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779085399; cv=fail; b=A0l3NRq9ozvUyfsOlPYku16UCXQStUGbYGImpLbVh2BSUW1oUoRQI5KiM9j1XDO9nU0a3BIu8FeqiK+rCpgZxl9LhSdFsu1NeZLtuEeHXXY1LxjCvVuy7ELOFutv6OyQ8VHKBIggv+4G9HF0XcZId65cxxTdiTF76LmOu+gkJeo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779085399; c=relaxed/simple;
+	bh=LexrSsNeSjMx09JjageeZrNfIRXvuwCdeQLxRGWfAXo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ecRkxK1sKeJlrpkmz6vS9DAs9OTZc84+H8b3DbwBw6o5huFObp8Erg1F5KtoZS5d12jfRovIpzpUfdlyfJJoWHDnus45O88Z+TuB4hFtBCIlyhi6X2hnqM4byPk2r7EhPZyIon5K50S/ie1dJypfYrR6HC+2HxP0dN3CPAcSBTU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=jGBKBJfg; arc=fail smtp.client-ip=52.101.193.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dAExBM14LzoxW0hV9b39PdFdLgL9I5cLGF4OUEKrs2luTyFCYdxqvhgPIAI5Cl1LYcrTulhBnNpzWMvy9x6lv5UkBHJzFoGjG52zzSc7bMeLmanl7wAUwWiFf8IvfeUczX9MBROssPaFJrfCgcHLUPaFv5qDeKfni2wsjatL/wfkc3mtY1Ng0tmfwS9YZTugJ8j5oqxQaAfO+Tceiw3uoESv9+ZLt6mc7zM80bWieGfpkPofi0OVL9fXsMSIPMoSjsxDB2NyHdExI6S2qfr6p0apws61KZitituRk4Jr7XDWRZhJZU7yMPnbSCzuK0vyYGu/5/34pPGa21RQKCHYGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=29yKFUxgMIxkcqS44sFpnxH/O5pJxcXPqneBXQkoX1s=;
+ b=V2rWbUSC2q1+84Y4Q40qT13t2Shx+2CP4BbKraA6X6Fn93PW1whyknkntdn9WK/qKy230tmwnQDLs/zk8oCTFrm8uVyB3UDFlnPgfoG7qRFQ7K8mbmtRoP0A0yZA3r5TWHBxcK8YhuUpUh1qu5sCVX81tqXpibVAHDzImQ/mQ9vxTIPXgO5XAaK7ATgGLuG4EDCxX6zZnWU1tEWv7wi/IPnaO4KubsJJHqKD4uG3EdnaAxKql404pm/h4yw8ioET3v/CpNT3PGupImSM2i7JYiJb2imxFlk8eMf9XVgGpyRqlBNp+FG4tN7bZG5W2CVSrGEVBxxu9uYW1/U5kP9+Pw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=29yKFUxgMIxkcqS44sFpnxH/O5pJxcXPqneBXQkoX1s=;
+ b=jGBKBJfgKvjCL8hG5MtCOIRInRlK9oIjDCFQ3GN+GhzMRYH+KM3MBluBzNvi2tr5aBiHWs4oD+OYdjoURgTrpBF2R9/5fYcFGCCz4alp+ar3qsf7pQDlyREyTN1u+bPzmWmJeKZbY+OqlxeDYi4QncNtexEAPnQKUrTb+wzTx/ogNi5Uzo2ve9uCU528V/40TTwYsGT3onCJgwE2is94iCvJiBxH1sFSgmAHZD11tkgg8CiQYEhE3rdKu7oQjG4HUgTaCwRZf1a73tPvfhLtJ4VZgtVaj0fO0MveG38IZAxe1HOZEgVW+++QMqE+s9cPD/knLVAnWD/7phm4NxllOQ==
+Received: from PH8PR05CA0007.namprd05.prod.outlook.com (2603:10b6:510:2cc::18)
+ by CYXPR12MB9441.namprd12.prod.outlook.com (2603:10b6:930:dc::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Mon, 18 May
+ 2026 06:23:11 +0000
+Received: from CY4PEPF0000EDD1.namprd03.prod.outlook.com
+ (2603:10b6:510:2cc:cafe::3e) by PH8PR05CA0007.outlook.office365.com
+ (2603:10b6:510:2cc::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.13 via Frontend Transport; Mon, 18
+ May 2026 06:23:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000EDD1.mail.protection.outlook.com (10.167.241.197) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.48.11 via Frontend Transport; Mon, 18 May 2026 06:23:09 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 17 May
+ 2026 23:22:55 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 17 May
+ 2026 23:22:54 -0700
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Sun, 17
+ May 2026 23:22:52 -0700
+From: Gal Pressman <gal@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+CC: Simon Horman <horms@kernel.org>, Gal Pressman <gal@nvidia.com>, "Willem de
+ Bruijn" <willemb@google.com>, Dragos Tatulea <dtatulea@nvidia.com>, "Alice
+ Mikityanska" <alice@isovalent.com>
+Subject: [PATCH net v2 0/2] udp: gso: Fix __udp_gso_segment() after GSO_PARTIAL UDP length change
+Date: Mon, 18 May 2026 09:22:48 +0300
+Message-ID: <20260518062250.3019914-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Rspamd-Queue-Id: 908E6566AA3
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD1:EE_|CYXPR12MB9441:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f1eee71-b495-4ae5-f180-08deb4a5ee6e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700016|376014|82310400026|56012099003|18002099003|13003099007|11063799003;
+X-Microsoft-Antispam-Message-Info:
+	zb9cR8wKfdeirM4EsFZeEMKslwdQzXPemQHgTirLiHWbrF2tGhQzlFTosv/Jy82WZaffYBMVumg/FYp3tOmWqhifHxqubil0S0CF92SiWKMvvsq9N7gONaegOpi8vWx0+HmjeJw6V4cuf4/H80Ix2Z5y82tc/SsQFfHGoaStihG0zWX/vhE58VGoblpTJoZMnm8y1ooHAEkwQzDgWyJMi2ociRG9GCLCLg9PfiHm5EmjNNbKqVW4/I/BrEKKWk0guxB/alSlitxPvVgty7tpz/BMa23JDtgGhqCSY25D2ZUG8uh0juZC4cf2hULvax74FMXzKB4Nx9rqvgMLHckw4aeXgR7+mcD20NBOrWOtg5Z9l2Pf2eO+jFPD2MfUCvWBloEy7qmTS8Ch6SfHLdPdfc2jPPvmGl320H3zUwPRhlFeJQGACd31daed6BXILckIZu/SUf554dO3Ha9lwYzY4ORHgSXr+G52pR96fHQ0l2RcJYOVhvfr6PmuxSBo/+HAF6VrezZ8ypV0d3tSNB+nq3Q9QM/BhA6TNWHsRKcQevg+WvDJpdhbWeP+O8yi4d786fH6hm0NQ9BBL4Rtl56REr6bCk81h+QglpjdGHFne8z/4DSTQN76eaaFQJDirfvg0oZTRc+dM0YP5NRafckm3SSQGLjOwKOpf5kMZdwr/hxTuTMhIanyeZcLKufGaCS5ozxDydWBDhnNjq4f4897Cfb2pxOnXt9YJpBViu9oEvE=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(376014)(82310400026)(56012099003)(18002099003)(13003099007)(11063799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	0w5A4tTu7wuaITSnVkenWdJGmbmECJDXjD6LZqHSalHpiQYJCdaLlD0ogHcN3RefCeAOMqFA8CbqqPNwCb8noLxkxHmr/jpcvfkF+z/Hq5xl2xneWMwLmTg538ZL0dcjdbDwyD211l63bp+0lr7Ugs0XPZvHdH6AMjl+CWE9OS4GHhvkEB6JcF7Or3tmihxFOwyiKFvXyswdlYVp9/uZT7C9VajkE3GgcjnpKVMHfrJg0TQ/Sm7fs79f9a4dY8z5dHqIfSsmZYkxwNc1HucV6ckqG6jr0jfa2r8Os3dJc0ZuomoabgY3ySCeF/dv0FzzV1VVMH+jnBtNphT3AqqVDch1uuuByh3Qgd96YiMxmqI4OGwDV1r7rx83Fc43O4ra9mvWYg5GYcMs+BHw6LRa1ZVryoPreTVFXlXrsl7wlzdPW6gi6xJu2BgDTIR3FZDM
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 06:23:09.4844
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f1eee71-b495-4ae5-f180-08deb4a5ee6e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EDD1.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9441
+X-Rspamd-Queue-Id: 27174566B9B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288861-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,6wind.com,canonical.com];
+	TAGGED_FROM(0.00)[bounces-288862-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jbenc@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-Hi Ilya,
+This series fixes two issues introduced by commit b10b446ce7ad ("udp:
+gso: Use single MSS length in UDP header for GSO_PARTIAL"), which
+switched __udp_gso_segment() to write the single MSS length into the UDP
+header for GSO_PARTIAL skbs.
 
-IIRC this was added because Open vSwitch needed it. I'd expect most
-users that need to deal with cross-namespace detection to just switch
-to the given netns prior to issuing RTM_GETLINK; at least, that's what
-I'm doing in the tools I wrote.
+Patch 1 (from Alice) fixes the UDP checksum adjustment in
+__udp_gso_segment().
+The patch adjusts the checksum by the correct delta, and since msslen
+and newlen become equivalent before the loop, drops one of the two
+variables to simplify the code.
 
-On Fri, 15 May 2026 22:19:20 +0200, Ilya Maximets wrote:
-> But this doesn't work for link nsid in cross-namespace RTM_GETLINK
-> requests.  For some reason the code checks if the original device
-> and the link are in the same namespace and not if the querier's
-> namespace is the same as the link's.  So the logic becomes:
-> 
-> - if NSID is not reported, then the link is in the same namespace
->   as the queried device.
-> - if NSID is reported, then the link is not in the same namespace
->   with the queried device.
+Patch 2 handles the case where the last segment of a GSO_PARTIAL skb is
+itself a GSO skb. This happens when the original packet size is an exact
+multiple of MSS, so the post-loop segment is not a remainder skb but a
+full GSO chunk and must also carry the single MSS length in its UDP
+header.
 
-I'm not sure I would call this a bug; the original idea was to use
-IFLA_IF_NETNSID to switch to the point of view of that netns but
-without actually switching to that netns. Hence, the netnsid is
-relative to the caller's netns but otherwise, you get the same reply as
-you would if you switched to that netns. If you think about it that
-way, the current reply is consistent.
+Changelog -
+v1->v2: Took patch #1 from Alice.
+	https://lore.kernel.org/all/20260513074349.2152146-1-gal@nvidia.com/
+	https://lore.kernel.org/all/20260512165648.386518-3-alice.kernel@fastmail.im/
 
-I agree the side effects of the self-referential netnsid are
-unfortunate. But that's an orthogonal problem merely uncovered by
-IFLA_IF_NETNSID, since, as you correctly note, such netnsid can be
-created also by other means. This is (AFAICS correctly) fixed by patch
-3/5.
+Alice Mikityanska (1):
+  udp: gso: Fix handling checksum in __udp_gso_segment
 
-So, I would argue both the old and the proposed behavior are valid.
-I agree that from the point of view you're presenting the proposed
-behavior is easier to use. Double so since you're arguing from the Open
-vSwitch POV.
+Gal Pressman (1):
+  udp: Fix UDP length on last GSO_PARTIAL segment
 
-> 4. A seemingly read-only RTM_GETLINK request for a different namespace
->    allocates a self-referential nsid for the current namespace, which
->    is a little unexpected.
+ net/ipv4/udp_offload.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-I, however, don't agree with this argument. RTM_GETLINK has always
-allocated netnsids, even long before the patch adding IFLA_IF_NETNSID.
-There's nothing special here. You might call the netnsid allocation
-unexpected but it's been part of this since the very beginning.
-
-> A research across open-source projects doesn't show any projects that
-> rely on the things that are being changed.  I couldn't find any
-> project that uses the reported LINK_NSID with cross-namespace requests.
-> And no projects that use cross-namespace requests seem to even parse
-> the reported LINK_NSID.
-
-I trust your research. My main concern would be Open vSwitch breaking
-with the change; I haven't checked but obviously I trust you there even
-more.
-
-> Of course, that doesn't mean there are no such applications, but the
-> current behavior feels like a logical bug that IMO should be fixed,
-> otherwise it's hard to use all-nsid sockets properly.
-
-I don't think it's a bug. It's just a different way to look at the
-interface. I don't have a problem with saying it's more ergonomic and
-better. I don't have a problem with changing the behavior given your
-research. But please resend this patch without calling this a bug and
-without the Fixes: header. Otherwise, it gets a CVE and I don't think
-that's appropriate here. This is not a stable material, this is a
-feature adding a behavior change. You'll get my Acked-by then.
-
-The real fix for the all-nsid problem is patch 3/5.
-
-Thanks!
-
- Jiri
+-- 
+2.52.0
 
 
