@@ -1,214 +1,158 @@
-Return-Path: <netdev+bounces-288855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288856-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GLq1IsWeCmpJ4QQAu9opvQ
-	(envelope-from <netdev+bounces-288855-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:08:21 +0200
+	id oJh7AL+gCmqL4QQAu9opvQ
+	(envelope-from <netdev+bounces-288856-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:16:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F7BE565DD3
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:08:21 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B20D565F72
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:16:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2479530028BC
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:08:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CFDBB3003361
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F30388375;
-	Mon, 18 May 2026 05:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3B9389441;
+	Mon, 18 May 2026 05:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KxptlgZF"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="LkhpJKV/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5E7380FFD
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 05:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779080888; cv=pass; b=WDi9PkET7Y2bwMv3OJCJwjgYfX/6DYKoXjKqujv4x1+mXig8zclGYXqnxg0eFWg8jNixCbgM/hOLH/GlI5el3qEccUP1wGP5ZNb1mgRi7M2Tb8EeSRl0N1L9oq8mHNIfHHBO4Z8Uz8tgLoo1c/g8HAXbWBShnLsYNo7dNjiYMGM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779080888; c=relaxed/simple;
-	bh=Z6E0MXc38WsNUpI9/E+q7zdtFMGyY0/TRIM+ulMUnZU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fCE4oHzLM9l+0WVSX5NwFjd0F1gGViC5sfImEh1Z9iWM49l8/K5z2EagqBp7ASgm6nFcJXCCNeaCXPa4QmNANkpSWdegwIBNOgZ27jqnB1oMDXC19c8BfVSXY8VrACca1NefMnFGhjF6omUoNWKo1qGJTZakPe2Nz1u+tb5MI2E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KxptlgZF; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50e61648f10so10281cf.1
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:08:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779080886; cv=none;
-        d=google.com; s=arc-20240605;
-        b=epbAY/gRE2O81ZfvZRfb6EXZxwodNllO/y1U9RztBRWv9bCWDpk9iyVD/J1eVFaIRC
-         JhIWfHbm2whYXC9ydYMQEtWHHwwZDiDbyjlHSOpOQqwDhPpk9KMKgsb2xzSxXaMdXF4j
-         NA3d3ecAT2nxy2obrC2nG62SnuV/BKw/3Az/X1zmo1i2IR5tW5FH1Tba0azGhPjIDeSg
-         ferRjP7Kb0kpOTHDkfPvhUxM+sgzoaY6XoMnngAWLqJIDONrHNO9g/Hjlsec8pCBzxuN
-         qyv84VbmwL0X8GVP0npRyRlPnY8tDwIGL88cZOfNS/4bkSIiwXFJp0cbGYvRvhLtcAzF
-         pYiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=PgGO0nV6zeGKwarKeI0vOixvX+FJHU5rTim5V0Roj1s=;
-        fh=FQuyizQzaIywsae1/h+SH7arjJQGlwu2TWt/2iEnbLQ=;
-        b=C24uuiiHJsQcbkaR03QDJKhtgGojeUdsaM7Dj8xoFGnYA8LGCnyvsKNO27VqvWgqGe
-         MtCWZt1PwPz0XpH+wLd70FwLwScKEyTNF6TzMdg5C4byjCgMGOuB1p3WkmU+yYkMbH49
-         Fxp6WnWi1zzqt/B1yDe4c83xFtm2wA6LOFY7Mbuotas9Wpq+LyjAXC92fXus6YB0Ktzj
-         6gYQPx90C1iZFnhiJaXY9+LfWEsWVOdRLkwx4vsDDdVleQmH9ODakiSJ62rBcc8owAN4
-         glCMl3alJahi5uuXnD+Fdrbs+U8CQfMWDWU2YqhNKAtmsjCmCSoosLEk0caNaXMQQXqs
-         1g5Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779080886; x=1779685686; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PgGO0nV6zeGKwarKeI0vOixvX+FJHU5rTim5V0Roj1s=;
-        b=KxptlgZF3J2RjP2kA0+rshgJ//Y2dyhyaPxw9rVAq/wVX+Lhg38/L4WQ4iY/gvrpdx
-         J+d38d1vidaLJPcaxvMbSJFjfvNEBtKYztVHn6TDMF4Ckg5ZroP0rdYtTnasZYkjbh9/
-         3aKOk3QW+5LnnhHBez8GExoYXDnYd+2QTqgA5VYUQ8yZwexYjc1vNiFf2rlkrC/fN1wy
-         +kgbafhdmOhHPniJdt4jFPuZPS4kZatJiAZRkangfgH4BBD+DvA/MmB23JTJqu+sAT2h
-         oaDpUOCUii9sE7Arbc3bYmfJOKXMglm8Qkq3HzIZKtoGT03VKCHgYvwSyXm0SK0oINj1
-         7GlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779080886; x=1779685686;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PgGO0nV6zeGKwarKeI0vOixvX+FJHU5rTim5V0Roj1s=;
-        b=IwIzDZifbadgq5kCIJ8YK+bny+g855CA/4uboalRIa8/l/9lCpzYEB1eAX2a8oFdXs
-         YYWN8BT/YmUy1D1hmtsfDyGT/lmFW5k+cv28RntQ1hW/zkUyZqu3ug9/sjIUvwjlkuSn
-         dyTPSgjdzbIswJhrv6/JM+o6Krm/C5YSAWmTy+ffMPUCYYxbkvId9wy1HZWNeUY7Qf0A
-         venhxyB6IFpdPTn0MnroJkPGauh9pbQFZ9bAdL6LlSg17O9aoeu1e6m0/IJAWHGYH5/Z
-         K0OZMAlmemEFy7qxmyJMyF2pQ4vry94YPiGRvyYc6bU+UdW6g5Z0f6iY8bKg8stOiSVq
-         trZA==
-X-Forwarded-Encrypted: i=1; AFNElJ+zjrzHNqCMqwiS/CstToeah5IvBt8+CYmvhRm514HV4US5JmOoL34aOYQoNkfBNmoiem1hlGM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrjLVS2JFi5oWBP9otO2WDMBB6Btz4c9vAYIC8vQdlzA8zOZ38
-	6GGZIQQbo7rODxGjASInwjbLZEWLhPJtba/+ZcibuhuzGQzet46K64C+c6OGMerqxehOiPTvvGK
-	WVZEz1jofEUHO8j/ZEpCmi8sv2whXv+FbEr49Ynol
-X-Gm-Gg: Acq92OFXrnovCkpywyTnnctDkoyoXSrZTXfZPtcozwrPVux+zlQzjex4xBfHJf0Ucx2
-	SbEhsAQkBN5T9rzGWkq+4dKRlOpitTliSI993jugIcEPDYOVJHNyTjUiA6NJi6mGnCFFhQ/0vHY
-	sBbYc83uC6MHr2Li/5UzVI/zi/zZeqYw0GSlQZgQvveeADBLil7Q2vda7DH0yfZHtb3rf4AzVDh
-	jp3dbZaiY6HXBi+MrdfHoJzFARPAzdA2NsmxAOT4wJnzcNJ34gYleBqNKUl9xZba+joUyC3ItGu
-	BUsGYw7RRT/hDkmpdf9mlUDw+98hDb8sPGWrabal1xnBY8Ohstj/FDCXTcyp
-X-Received: by 2002:a05:622a:5d4:b0:516:4f62:85eb with SMTP id
- d75a77b69052e-51679462c6emr13074271cf.22.1779080885212; Sun, 17 May 2026
- 22:08:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8FC31578E
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 05:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779081404; cv=none; b=BVz2/oaOxISLN26X3V7RJcANVSGB2B8JI9EYNqleID6eDP64kvVPIzxF8v4/ACzRrdwte8yV4xZLaQJ6EEL/7QKg3OF4ttCVCMS+abOJbDJKgdtj8bX6qwNl/L2ME4zg+Un2GldR5DwMJmv+/TGjwhgB8iSrGo8C4OQPB0Q4fhM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779081404; c=relaxed/simple;
+	bh=hOCKadUSTf3cQEUxxUGF55QCfpFY88BMmKN6ZyP3iYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IvYD1Wagqddy2gCgfj6/wIwprepaLHc+V0+8cM003rxkjUYJEnxpZQffwusx36Cyf6Eyf5BqfEzm4/AjoGNmpP6UFatkmhiXPdVjiSmYkcr55mgFGCT21dhShLcxdI9jcwmQN9IQrwFG+cnTXSw3jSHnj2ilLLz4CXwPtqkc9M8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=LkhpJKV/; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=cmB9
+	EF7ivBtKGUG96g1Savi2M0luLEIRM5gfPbIQyiA=; b=LkhpJKV/Wfuy6DaJ9+ka
+	qurX96LoHx9xnrs64dm3h4h1ChxQtKZNoOk1dNSBZAFqo5fhxFDQTTcrdBDXVvHZ
+	Z3T66UGyA270vWeM4+o4Ipw5EeX4xU33tlt7+BB9zulum4DKCGQ/wCSgP+xqJWqN
+	iz+vr99tSYZNzpCK6NtDmMGqe4boElRzaeFvQojwYjAaHd4OnZHtGO7GTWBZWwyi
+	KvCgAMQ7FmP4+47jAnWFa9BqcHAMh4KwfGaq3a0X/I63utx4Oibnmxl26ZWLcUlS
+	nyOopuxl2H+WO+W/YxJKcuoKy/kJr+pM0QH4NdnDTSo5LSIjYn6j9fXthjiNbIwP
+	zg==
+Received: (qmail 869130 invoked from network); 18 May 2026 07:16:30 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 18 May 2026 07:16:30 +0200
+X-UD-Smtp-Session: l3s3148p1@Hz5LqhBSRqQujnuR
+Date: Mon, 18 May 2026 07:16:29 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	workflows@vger.kernel.org, linux-arch@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-csky@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Alex Shi <alexs@kernel.org>,
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
+	Hu Haowen <2023002089@link.tyut.edu.cn>,
+	Dinh Nguyen <dinguyen@kernel.org>, Kees Cook <kees@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>, Will Deacon <will@kernel.org>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Nick Piggin <npiggin@gmail.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>,
+	Dave Penkler <dpenkler@gmail.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?utf-8?B?U8Oh?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>
+Subject: Re: [PATCH] nios2: remove the architecture
+Message-ID: <agqgrTBkVGBt_f28@ninjato>
+References: <20260518042833.272221-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260515071504.2054786-1-yuyanghuang@google.com> <CAADnVQ+Mc81ciE+6i4Mvg5h=fRNq6460w0-NAw_bU12oaBWruQ@mail.gmail.com>
-In-Reply-To: <CAADnVQ+Mc81ciE+6i4Mvg5h=fRNq6460w0-NAw_bU12oaBWruQ@mail.gmail.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Mon, 18 May 2026 14:07:29 +0900
-X-Gm-Features: AVHnY4Id0O4-8DzVSPeGl5IFxiRysVVNPFTf9XpoWx4UkzENJhMEoOAWU_Sb_Xw
-Message-ID: <CADXeF1FvFrT4i_=3Z4USRV5XnOzhk92M7ahvcs6LyA9j_tWU9w@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 0/2] bpf: Align syscall writeback behavior with
- user-declared size
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 2F7BE565DD3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260518042833.272221-1-enelsonmoore@gmail.com>
+X-Rspamd-Queue-Id: 9B20D565F72
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[sang-engineering.com:s=k1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288855-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[sang-engineering.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[48];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-288856-lists,netdev=lfdr.de,renesas];
+	DKIM_TRACE(0.00)[sang-engineering.com:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,lunn.ch,iogearbox.net,gmail.com,google.com,linux.dev,blackwall.org,redhat.com,fomichev.me,vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[wsa@sang-engineering.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lwn.net,linuxfoundation.org,kernel.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,gmail.com,infradead.org,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[altera.com:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
->The whole thing sounds like a user space bug.
+On Sun, May 17, 2026 at 09:28:33PM -0700, Ethan Nelson-Moore wrote:
+> The Nios II architecture is a soft-core architecture developed by
+> Altera (since acquired by Intel) and intended to run on their FPGAs.
+> 
+> Licenses for the architecture have not been available for purchase
+> since 2024 [1], and support for it has been removed from GCC 15 [2],
+> Buildroot [3], and QEMU [4].
+> 
+> Given all of these factors, it is time to remove Nios II support from
+> the kernel. The maintainer stated in 2024 that they were planning to do
+> so soon [5], but this did not come to pass.
+> 
+> Remove Nios II support from the kernel and move the former maintainer
+> to CREDITS. Thank you, Dinh Nguyen, for maintaining Nios II support!
+> 
+> References:
+> [1] https://docs.altera.com/v/u/docs/781327/is-discontinuing-ip-ordering-codes-listed-in-pdn2312-for-nios-ii-ip
+> [2] https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=e876acab6cdd84bb2b32c98fc69fb0ba29c81153
+> [3] https://github.com/buildroot/buildroot/commit/6775ccc5a199d574ad70b5f79ec58cce97a07c6f
+> [4] https://github.com/qemu/qemu/commit/6c3014858c4c0024dd0560f08a6eda0f92f658d6
+> [5] https://sourceware.org/pipermail/newlib/2024/021083.html
+> 
+> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 
-Could you please clarify why you consider this a userspace bug?
+Acked-by: Wolfram Sang <wsa+renesas@sang-engineering.com> # for I2C
 
-From our perspective, this is a binary backward compatibility issue.
-An older binary compiled against older UAPI headers has no way of
-knowing about newer fields. If it passes size =3D 40 (the correct size
-at the time), the kernel violates the ABI contract by writing beyond
-that declared size.
-
-> Please demonstrate a case where this issue is seen by using libbpf APIs.
-
-Our old project does not use libbpf; we interface directly with the
-raw BPF syscall.
-
-For example, our Android net_test  suite uses this legacy 40-byte
-Python ctypes struct layout:
-
-  # legacy 40-byte layout (pre-revision field)
-  BpfAttrProgQuery =3D cstruct.Struct(
-    "bpf_attr_prog_query", "=3DIIIIQI4xQ",
-    "target_fd attach_type query_flags attach_flags prog_ids_ptr
-prog_cnt prog_attach_flags"
-  )
-  # Invoked via: syscall(__NR_bpf, BPF_PROG_QUERY, &attr, 40)
-
-As shown in the original discussion thread, without this fix, a newer
-kernel unconditionally writes the optional revision field at offset
-56. Since copy_to_user doesn't fault on adjacent mapped memory, this
-silently corrupts 8 bytes of the caller's heap (corrupting the Python
-interpreter).
-
-This size-gating pattern in this patch should be identical to the
-pattern introduced by commit 47a71c1f9af0 in btf.c.
-
-I am not 100% sure but, it seems running a binary statically linked
-with an older libbpf version (or directly using raw BPF syscalls)
-might face a similar issue? Do we expect those binaries to be broken
-in the newer kernel version?
-
-
-On Mon, May 18, 2026 at 12:30=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Fri, May 15, 2026 at 12:15=E2=80=AFAM Yuyang Huang <yuyanghuang@google=
-.com> wrote:
-> >
-> > The bpf(cmd, attr, size) syscall copies up to 'size' bytes on input, bu=
-t
-> > several commands write outputs back to userspace unconditionally. If th=
-e
-> > caller passes a short buffer, this can lead to out-of-bounds writes,
-> > potentially overwriting adjacent userspace memory.
->
-> The whole thing sounds like a user space bug.
-> Please demonstrate a case where this issue is seen
-> by using libbpf APIs.
 
