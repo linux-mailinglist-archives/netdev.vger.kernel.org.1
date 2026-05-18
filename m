@@ -1,37 +1,38 @@
-Return-Path: <netdev+bounces-288814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288815-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAuZDnh3Cmpe1wQAu9opvQ
-	(envelope-from <netdev+bounces-288814-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 04:20:40 +0200
+	id OM7MBLd3Cmo61wQAu9opvQ
+	(envelope-from <netdev+bounces-288815-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 04:21:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA46C564FFB
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 04:20:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6516556503F
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 04:21:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BEB9A30078B1
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 02:20:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2894B3018AF8
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 02:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBFC33262F;
-	Mon, 18 May 2026 02:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8565A32AAB5;
+	Mon, 18 May 2026 02:21:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA96630F531;
-	Mon, 18 May 2026 02:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36F131F988;
+	Mon, 18 May 2026 02:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779070833; cv=none; b=FHLJq24Rj9QSYUUwvCCgvlunvLRZqORYtUAMttYrpW8L2fOuK2CJh5qEkLUYgGC+9qx3eCMcZptlpHI4nSO54H3GNGqMUAdoHG1d93oR6yYw/SmI4rgcddmIXshzbyNzoxTsTEKAK9URf6sgPQyaUu/Bjk4m7rezupmkQ+9YaKY=
+	t=1779070867; cv=none; b=i7NK9/+4Lye2Fgy3tbk2+9VSGa/j0OzziWrQnxpc5w2aZQSUO9xJEdvOR+298kXKVb3dNJHWLgoaUVUEn0K2XGZTrm+sa4xha/aJY1CldQ+DOHz3C0m02gUtUGZOrdaHI+iqFHVBogPOPdvp1OPVPqOi2qNU//9hTJ71+z1MQ+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779070833; c=relaxed/simple;
-	bh=wNYxcHVaC0JeT2LN2oAb5f3R+9+JjdEwKIBlDCvZ4eU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d5YHrMjONRkkHqGUGHhHWXfTSm3RchtebNW+S/vyR9cphNjcpbuoUF0v5DCaZGPU58r2QKRhWywqmFBPTR+LGb03ZnbdfIwLFJv3fNX5ZzYNXLSAXv4L26uVscCgeSz+gP14OBRt1k+dqrWhN8TUHejoQaTq+p+BDDG5TU72t20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=4.193.249.245
+	s=arc-20240116; t=1779070867; c=relaxed/simple;
+	bh=8wSSop0nuTrl3WI5eKe5CmTNDsY02ZHSlSmRDxigxu8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VgvU4sMl+tDGTDLsRyjPun+3t3sHj5PiYm5LlDi+eD9kaekQ9LZ1ZQWCPnSNG0z6P6iYhIqJ63Y1X0iG5x2F5nMdN7TH0QtWjJmPSAWLVLf80i9hLXVj1rrzodIVM5UE5aFWq86C2uYQ4tmLVEef84dPSdCb2mNsjCiU/Og4ONo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=207.46.229.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
 Received: from E0004057DT.eswin.cn (unknown [10.11.96.26])
-	by app2 (Coremail) with SMTP id TQJkCgBHXaApdwpqD0oaAA--.47720S2;
-	Mon, 18 May 2026 10:19:23 +0800 (CST)
+	by app1 (Coremail) with SMTP id TAJkCgCHG3BqdwpqrU0aAA--.255S2;
+	Mon, 18 May 2026 10:20:27 +0800 (CST)
 From: lizhi2@eswincomputing.com
 To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -55,11 +56,14 @@ Cc: ningyu@eswincomputing.com,
 	pinkesh.vaghela@einfochips.com,
 	pritesh.patel@einfochips.com,
 	weishangjuan@eswincomputing.com,
-	Zhi Li <lizhi2@eswincomputing.com>
-Subject: [PATCH net v2 0/5] net: stmmac: eic7700: fix delay calculation and initialization ordering
-Date: Mon, 18 May 2026 10:19:19 +0800
-Message-ID: <20260518021919.404-1-lizhi2@eswincomputing.com>
+	Zhi Li <lizhi2@eswincomputing.com>,
+	Conor Dooley <conor.dooley@microchip.com>
+Subject: [PATCH net v2 1/5] dt-bindings: ethernet: eswin: add optional TXD and RXD delay register offsets
+Date: Mon, 18 May 2026 10:20:23 +0800
+Message-ID: <20260518022023.427-1-lizhi2@eswincomputing.com>
 X-Mailer: git-send-email 2.52.0.windows.1
+In-Reply-To: <20260518021919.404-1-lizhi2@eswincomputing.com>
+References: <20260518021919.404-1-lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,96 +71,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:TQJkCgBHXaApdwpqD0oaAA--.47720S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFW5Xr1fJF45Xr1kKryfZwb_yoW8AFW8p3
-	93GFWrtr1kJryxJws7JF1vvFWrtan3CF1Y934rG3s7X3s0gas0qw18K3WFgFyUCr4xZF1j
-	yF4UXa98Cas0krJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBq14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:TAJkCgCHG3BqdwpqrU0aAA--.255S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXrW3ZF1DWr1UZr17WFW5Awb_yoW5GF45pa
+	95C3y7GFn5Xr13Wws3J3W09F1fXFs3GFy3Crs7trnrXrn8Xa4YqwsxKw15W3WUCrWxZFy5
+	uFya9a1ru34qkrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBv14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw2
-	8IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4l
-	x2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrw
-	CI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI
-	42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z2
-	80aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRi7KItUUUUU==
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
+	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
+	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
+	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l
+	IxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4
+	A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRuHqcUUUUU=
 X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/
-X-Rspamd-Queue-Id: BA46C564FFB
+X-Rspamd-Queue-Id: 6516556503F
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-288814-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288815-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[eswincomputing.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org];
 	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.977];
+	NEURAL_HAM(-0.00)[-0.978];
 	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,eswincomputing.com:email,eswincomputing.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
 From: Zhi Li <lizhi2@eswincomputing.com>
 
-v1 -> v2:
-  - Update eswin,eic7700-eth.yaml:
-    - Limit the binding changes to adding optional TXD and RXD delay register
-      offsets in eswin,hsp-sp-csr.
-    - Restore the original enum-based definitions for rx-internal-delay-ps
-      and tx-internal-delay-ps.
-    - Keep rx-internal-delay-ps and tx-internal-delay-ps as required
-      properties.
-    - Restore the original example content, with only the additional optional
-      TXD and RXD delay register offsets.
-    - Restore Acked-by from Conor Dooley for the binding change, which was
-      temporarily omitted in v1 during series restructuring and has been
-      reinstated now that the change is stable and properly isolated.
+Document two optional cells in eswin,hsp-sp-csr for the TXD and RXD
+delay control register offsets.
 
-  - Update dwmac-eic7700.c:
-    - Split driver changes into smaller patches based on review feedback to
-      improve reviewability and bisectability.
-    - Keep the existing requirement that rx-internal-delay-ps and
-      tx-internal-delay-ps must be present in the device tree.
-    - Treat TXD/RXD delay register offsets as optional and only program them
-      when provided by device tree.
-    - Remove the previously proposed fix_mac_speed logic.
+These registers are used by the driver to clear any residual delay
+configuration left by the bootloader, ensuring that MAC-side RGMII delay
+settings are applied solely according to the kernel configuration.
 
-  - Link to v1:
-    https://lore.kernel.org/lkml/20260507083037.152-1-lizhi2@eswincomputing.com/
+Add a reference to the EIC7700X SoC Technical Reference Manual for
+background information about the HSP CSR block.
 
-Zhi Li (5):
-  dt-bindings: ethernet: eswin: add optional TXD and RXD delay register
-    offsets
-  net: stmmac: eswin: fix HSP CSR init ordering after clock enable
-  net: stmmac: eswin: clear TXD and RXD delay registers during
-    initialization
-  net: stmmac: eswin: correct RGMII delay granularity to 20 ps
-  net: stmmac: eswin: validate RGMII delay values
+Fixes: 888bd0eca93c ("dt-bindings: ethernet: eswin: Document for EIC7700 SoC")
+Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+---
+ .../devicetree/bindings/net/eswin,eic7700-eth.yaml  | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
- .../bindings/net/eswin,eic7700-eth.yaml       |  13 +-
- .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 126 +++++++++++++-----
- 2 files changed, 101 insertions(+), 38 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+index 91e8cd1db67b..b66ae6300faf 100644
+--- a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
++++ b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+@@ -73,6 +73,15 @@ properties:
+       HSP CSR is to control and get status of different high-speed peripherals
+       (such as Ethernet, USB, SATA, etc.) via register, which can tune
+       board-level's parameters of PHY, etc.
++
++      Additional background information about the High-Speed Subsystem
++      and the HSP CSR block is available in Chapter 10 ("High-Speed Interface")
++      of the EIC7700X SoC Technical Reference Manual, Part 4
++      (EIC7700X_SoC_Technical_Reference_Manual_Part4.pdf). The manual is
++      publicly available at
++      https://github.com/eswincomputing/EIC7700X-SoC-Technical-Reference-Manual/releases
++
++      This reference is provided for background information only.
+     $ref: /schemas/types.yaml#/definitions/phandle-array
+     items:
+       - items:
+@@ -82,6 +91,8 @@ properties:
+           - description: Offset of AXI clock controller Low-Power request
+                          register
+           - description: Offset of register controlling TX/RX clock delay
++          - description: Optional offset of register controlling TXD delay
++          - description: Optional offset of register controlling RXD delay
+ 
+ required:
+   - compatible
+@@ -116,7 +127,7 @@ examples:
+         reset-names = "stmmaceth";
+         rx-internal-delay-ps = <200>;
+         tx-internal-delay-ps = <200>;
+-        eswin,hsp-sp-csr = <&hsp_sp_csr 0x100 0x108 0x118>;
++        eswin,hsp-sp-csr = <&hsp_sp_csr 0x100 0x108 0x118 0x114 0x11c>;
+         snps,axi-config = <&stmmac_axi_setup>;
+         snps,aal;
+         snps,fixed-burst;
 -- 
 2.25.1
 
