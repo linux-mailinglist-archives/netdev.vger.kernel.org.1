@@ -1,221 +1,160 @@
-Return-Path: <netdev+bounces-289173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289175-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uMrzKfR4C2qRIAUAu9opvQ
-	(envelope-from <netdev+bounces-289173-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 22:39:16 +0200
+	id oDqsMuh6C2orIQUAu9opvQ
+	(envelope-from <netdev+bounces-289175-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 22:47:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A6C557377E
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 22:39:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C70957389E
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 22:47:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9596430233D3
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:39:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02AA53014130
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCC43932F7;
-	Mon, 18 May 2026 20:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F69396562;
+	Mon, 18 May 2026 20:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eDVJFcs9"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="hIDL4Pci"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8843F405C33;
-	Mon, 18 May 2026 20:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214DA395DBE
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 20:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779136753; cv=none; b=d0kyscRs5ClJluszXmizsWPCe5K2qqKm+978/yF8JhntAzAeHRbofieSGyOGlDYZ2DHIKrtmwz4LKGVQUFAFCWS33JrAVcm1/Z8DjBp5qAwN8uBtHAX5v+PBfFGHQj0eMgSaZyfdDiF487hTny+UD2qE5LMnAtA7KOm3Ay+LGC4=
+	t=1779137224; cv=none; b=j4QCOzyGhyOBjATd93TXhZHtHpLe4uAuDEO/FPg5FCCbKhVXTxmP1pGIofPNyU1nEtaQ62fZqUTf4MF6FV1m/tj77ipJWTQFAdTsekyjcgVwoh2931+g1JKK3PG36JhdLsw1imU7Al9/M4k4K6LKqa8HYIW+EeyluX6MzFHSC7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779136753; c=relaxed/simple;
-	bh=IBsdB8Nuuwi1MR6kLJwaKONOD3M/Wjoh1pALRTWL4wE=;
+	s=arc-20240116; t=1779137224; c=relaxed/simple;
+	bh=Ju0bBZL4gIhDXt1wxIRcD+B9cM8rwS33tQQtnjcKUwY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UpiftKYaleYaCdn+/kz8SVwQnrG3KNY3cj1KwVuHzgNxhecbXIECcx/dceEezY43ra/wwIAdEXoeWgB2vuZ4tHyjzVnzqIT4OAnvI2uzwzl5WyMEMxxEKWwTyFbdzpiBU8E/x5eD9u71il8D7GiOWkv+BJ7op0ac/C5p4zzKTaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eDVJFcs9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C78E4C2BCC6;
-	Mon, 18 May 2026 20:39:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779136753;
-	bh=IBsdB8Nuuwi1MR6kLJwaKONOD3M/Wjoh1pALRTWL4wE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eDVJFcs9S3dQSeuf2JbHQ1PyqqkxmFvhpEBMwfi1KvUFgGFBjf7XFSNBRO1USUFcv
-	 SouTl7HkQ5Tk8AtVCi/sbtbomdMLCGvKKgGm/EvLjQlJ74klVOkkEGY1vlxS1iNgMh
-	 d8lZ2mj57fRgxjbauXlK9DJPEBsXAyEVbzqWBCNFCNH/9NK9H1u3ggSPKpW2XyW7LF
-	 kL2Uhk0U2DnV3CxFbWR+DRjWV46Ok3wy69dhTcNqxgdycU5dOBW1R6S29LrF5tWRjE
-	 uTmhGVsKxPt6lsZ4mbFxHT54k3EvXX06HypG/Ozn705JhJfGNkCL9/LeKQs29d+OaU
-	 li7m3j7OFAQ2w==
-Date: Mon, 18 May 2026 22:39:10 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: devicetree@vger.kernel.org, robh@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v7 01/10] dt-bindings: net: airoha: Add EN7581
- ethernet-ports properties
-Message-ID: <agt47l8NuOj-Ufr8@lore-desk>
-References: <20260516-airoha-eth-multi-serdes-v7-1-99e0093303e2@kernel.org>
- <20260517055811.EFECEC2BCB3@smtp.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hxeRG7k4hd+k+WJ6piM5mDyXEkmt5JDXpNozcldV85WFixnrMi2aOSL1TwMk8iYncijuop8jrMnhJm0k5ymfZ4vVOI91OjHZuCXjsI6vvE284163ixWC4ZNC1Ei40sbU0PxdD1888ksXR4ckKjJuiHIGlkWI2BaE5SgbXL7fTPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=hIDL4Pci; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=L52K
+	0rxWySw3mD5z7jnwvPV6H6bdzA5sgxRy/hQVyAI=; b=hIDL4Pci78/puo7y9yQi
+	i2QwANMnkO9c+JN2J1AuGPGc7VaJw5mv5oB/Zi5V2NpOtmNWm9XOO1R+IJNZFnZR
+	meEUR+IwLqIIqHU3FlF+jDqISV7XhoIBKJj5YhCwfcISYldprr8eaDDjBG3r5TZw
+	mxP8JHNcHv1dzvI+ZmsQ1fBQiFdtCyshmDbAh204tTJkZb0f6TFW0ExyfM/Kk91P
+	wss0BhGJm15JjnmFgKwqDs+m+p0q5M7k+F6MldfbQ6dnZbJ07U0epn56qjQWMMuA
+	laR67xnGRvGP5v3vFrD1q2AD1KEOA7i38hJabnRO/72MrxDt/qCiKctVFaQbZ1ji
+	mA==
+Received: (qmail 5619 invoked from network); 18 May 2026 22:46:55 +0200
+Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 18 May 2026 22:46:55 +0200
+X-UD-Smtp-Session: l3s3148p1@dIu7qR1SQNMujnuR
+Date: Mon, 18 May 2026 22:46:55 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Simon Schuster <schuster.simon@siemens-energy.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
+	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Dinh Nguyen <dinguyen@kernel.org>, linux-doc@vger.kernel.org,
+	devicetree@vger.kernel.org, workflows@vger.kernel.org,
+	Linux-Arch <linux-arch@vger.kernel.org>, dmaengine@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+	Netdev <netdev@vger.kernel.org>, linux-pci@vger.kernel.org,
+	linux-pwm@vger.kernel.org, linux-hardening@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	"linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Alex Shi <alexs@kernel.org>,
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
+	Hu Haowen <2023002089@link.tyut.edu.cn>,
+	Kees Cook <kees@kernel.org>, Oleg Nesterov <oleg@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Nicholas Piggin <npiggin@gmail.com>, Vinod Koul <vkoul@kernel.org>,
+	Frank Li <Frank.Li@kernel.org>, Dave Penkler <dpenkler@gmail.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?utf-8?B?U8Oh?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof WilczyDski <kwilczynski@kernel.org>,
+	Andreas Oetken <andreas.oetken@siemens-energy.com>
+Subject: Re: [PATCH] nios2: remove the architecture
+Message-ID: <agt6vy3WtjFy9sfU@shikoro>
+References: <20260518042833.272221-1-enelsonmoore@gmail.com>
+ <d40b1e80-37fc-4c88-9d7f-dae6458efe6c@app.fastmail.com>
+ <20260518105735.GW3126523@noisy.programming.kicks-ass.net>
+ <20260518172444.zyd47mcagrcwu7wt@dev-vm-schuster>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="z58LbN+oPyY9Nri3"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260517055811.EFECEC2BCB3@smtp.kernel.org>
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+In-Reply-To: <20260518172444.zyd47mcagrcwu7wt@dev-vm-schuster>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[sang-engineering.com:s=k1];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289173-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[sang-engineering.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289175-lists,netdev=lfdr.de,renesas];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_PROHIBIT(0.00)[0.0.0.4:email,0.0.0.3:email];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[sang-engineering.com:+];
+	RCPT_COUNT_GT_50(0.00)[51];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wsa@sang-engineering.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[infradead.org,arndb.de,gmail.com,kernel.org,vger.kernel.org,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com,siemens-energy.com];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url]
-X-Rspamd-Queue-Id: 0A6C557377E
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sang-engineering.com:dkim]
+X-Rspamd-Queue-Id: 2C70957389E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Simon,
 
---z58LbN+oPyY9Nri3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> downstream. In other respects, we try to be good citizens and contribute
+> bugfixes as well as required cleanups (such as implementing clone3 [2]
+> and fixing its flag behaviour on 32-bit architectures) as they come up.
 
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
-e(s) to consider:
-> - [Medium] Unconditionally requiring `#address-cells` and `#size-cells` f=
-or `ethernet@3` and `ethernet@4` breaks backward compatibility and causes `=
-dtc` warnings.
-> - [Low] The `reg` property in the `airoha,eth-port` node incorrectly uses=
- `maxItems: 5` instead of `maximum: 5`.
-> --
->=20
-> commit f8c9c25c14697c9de91b47f1ea5850c1b33f44a9
-> Author: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> dt-bindings: net: airoha: Add EN7581 ethernet-ports properties
->=20
-> The EN7581 and AN7583 SoCs support connecting multiple external SerDes to=
- GDM3
-> or GDM4 ports via a hw arbiter that manages the traffic in a TDM manner. =
-This
-> commit introduces the ethernet-port property in order to model a given
-> net_device connected via the external arbiter.
->=20
-> > diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.ya=
-ml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > index fbe2ddcdd909c..7144d6da7394b 100644
-> > --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > @@ -130,6 +130,46 @@ patternProperties:
-> >          maximum: 4
-> >          description: GMAC port identifier
-> > =20
-> > +    allOf:
-> > +      - if:
-> > +          properties:
-> > +            reg:
-> > +              contains:
-> > +                items:
-> > +                  - enum:
-> > +                      - 3
-> > +                      - 4
-> > +        then:
-> > +          properties:
-> > +            '#address-cells':
-> > +              const: 1
-> > +
-> > +            '#size-cells':
-> > +              const: 0
-> > +
-> > +          patternProperties:
-> > +            "^ethernet@[0-5]$":
-> > +              type: object
-> > +              unevaluatedProperties: false
-> > +              $ref: ethernet-controller.yaml#
-> > +              description: External ethernet port ID available on the =
-GDM port
-> > +
-> > +              properties:
-> > +                compatible:
-> > +                  const: airoha,eth-port
-> > +
-> > +                reg:
-> > +                  maxItems: 5
->=20
-> Could this maxItems constraint allow the reg array to contain up to 5 ele=
-ments
-> (e.g., reg =3D <0 1 2 3 4>)? Since the parent node enforces #address-cell=
-s =3D <1>
-> and #size-cells =3D <0>, shouldn't this use maximum: 5 instead to restric=
-t the
-> numeric value of a single port ID?
+Well, this is definitely 'good citizen'...
 
-ack, I will fix it in v8.
+> If desired, we also would be happy to intensify our support regarding
+> reviews or testing to share the maintnance burden if it helps to keep
+> nios2 in mainline a bit longer.
 
->=20
-> > +                  description: External ethernet port identifier
-> > +
-> > +              required:
-> > +                - reg
-> > +                - compatible
-> > +
-> > +          required:
-> > +            - "#address-cells"
-> > +            - "#size-cells"
->=20
-> Will unconditionally requiring #address-cells and #size-cells for etherne=
-t@3
-> and ethernet@4 break configurations that don't use the external arbiter?
->=20
-> If a board connects the GDM3 or GDM4 port directly to a PHY without child=
- nodes,
-> it seems these properties would fail schema validation.
->=20
-> Also, if added merely to satisfy dtbs_check, wouldn't dtc emit an
-> avoid_unnecessary_addr_size warning when the node has no children?
+... but given this, you might want to get added in MAINTAINERS as
+reviewer (or even maintainer) for nios2? Besides that your efforts are
+already worth it in my book, it would also ensure you get CCed on
+patches like this. Then, you are not depending on people like Arnd
+putting you in the loop manually.
 
-ack, I will fix it in v8.
+Happy hacking,
 
-Regards,
-Lorenzo
+   Wolfram
 
->=20
-> --=20
-> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260516-airoha-eth-=
-multi-serdes-v7-0-99e0093303e2@kernel.org?part=3D1
-
---z58LbN+oPyY9Nri3
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagt47gAKCRA6cBh0uS2t
-rMrVAP9EyZsTnfyXznRd7nmTwDer3FoKXkXeqfHnIc5wUwqBCgEAphGulHI1Ji5e
-QcSZXkF6lIsgk56KBTjhf2pNY+UG2Ak=
-=wFbV
------END PGP SIGNATURE-----
-
---z58LbN+oPyY9Nri3--
 
