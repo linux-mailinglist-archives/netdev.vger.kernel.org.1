@@ -1,318 +1,313 @@
-Return-Path: <netdev+bounces-288810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288811-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGfCDP9qCmp+1AQAu9opvQ
-	(envelope-from <netdev+bounces-288810-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:27:27 +0200
+	id cS2JGMRrCmqy1AQAu9opvQ
+	(envelope-from <netdev+bounces-288811-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:30:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A84564CF0
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:27:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A85C6564D13
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:30:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9D17830387AC
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:25:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A71A7300AB16
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF96C2853E9;
-	Mon, 18 May 2026 01:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029FA231A23;
+	Mon, 18 May 2026 01:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VEkjKW9G"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QbPTvKY7";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="hiIzrVfA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC87423505E;
-	Mon, 18 May 2026 01:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF94405C49
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779067492; cv=none; b=nYk5zHMmjXH9i9h9tNUv9HLYLL70he73Zh70JOKFoHQ569BiCCgv2lH3JK8GkQ4Rhn1AkY0hXOz01Mn4UbM8PCqmGlPzfuwa9zw65fJUpbf2UWBAcGBbSSla4eAX4F/zm/najsrJ436inPHy1/73Hy2feZPq1vwhW9XfyYQX7Jg=
+	t=1779067840; cv=none; b=esGcSMhquQ4C0TR8yMWmc1aXYz0dUKR4q9YQ5vn+lyZIGZYtuMW5+I5U/XXdqk9Fpguk+m9cmZ/RszSs1cv+LouY0/inaGEV4dXl+tzZfgOWVMY264KQBYqCHqXCWWhmrLxDv1COQGSeLki5DRYQlofc8xICS1EZBQNhSzDCsgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779067492; c=relaxed/simple;
-	bh=z8cVcJiPvYJJnaTNGBSrxNoRWSTYxiMXM2DVRVh7az0=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YPvjny/XfE5/RqgJM0XK7MylsFm1/8sB3GBcibB9vT38tSbt532McupQDcyvB40Ctjwtz0Db4LVXzW2Agyhaq2cZm69zokwtu880Dh0IHz+79BTUI14OB0QBP2Xgfv5xFwatTqTq1nL6dBgQHXsvamrsJU0HtcFs7BsnCNcOZMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VEkjKW9G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32A10C2BCC9;
-	Mon, 18 May 2026 01:24:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779067492;
-	bh=z8cVcJiPvYJJnaTNGBSrxNoRWSTYxiMXM2DVRVh7az0=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=VEkjKW9GQLp2C6Jwu3iSbACic4krPZspa4JQtONb17ciXyFthyLDIQjWODWd0OCu6
-	 kDvKeld4fNEyLQX25KoVVIhXV/1lQe5rVgef1Mtcyb55QAwwPbet2x54mUY1WlWKXQ
-	 SEzUqK2yeHgZEXSoc/LAoTbxplPZWj5SZ2Yx677kIZfhcAETb+g8WV7BteKRUKJp6i
-	 7pjKl8bOg+2XRvp6vQvKoMuMcve1EHciLVNa3Si5Sj/Vol96Wfniz53Wbv7Xxio7+9
-	 /VmAbyYSCKQ7+ho+lEujFqbI4Cduva5m41AJpJ7A4C+T1g1p0Zhoi6EavYJrjmsGKo
-	 BjHE+UO3i6cQg==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	achender@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org
-Subject: [PATCH net-next v3 11/11] selftests: rds: Add ROCE support to run.sh
-Date: Sun, 17 May 2026 18:24:43 -0700
-Message-Id: <20260518012443.2629206-12-achender@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260518012443.2629206-1-achender@kernel.org>
-References: <20260518012443.2629206-1-achender@kernel.org>
+	s=arc-20240116; t=1779067840; c=relaxed/simple;
+	bh=hh9ilvQ9BN0QU368cGXI2oMTeMbGtV3oXAacHwkLfQ0=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=J1a3TCRO6bP0whVqHMNPinMSr1HN6Mqdqd2HP2/76NcMohKX9w4JiI1kpN41M1EQkZRuUDqCX8ZT7qz+FonKtzLvgOJ9oi1zGR6sZ8O9SM0o1182ucN0+EmH6PQjOfugOl4p0q+kQPS4Pulgus29EAmxTjl3PW48Hwyo8qqm2jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QbPTvKY7; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=hiIzrVfA; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64HAOngI3595488
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:30:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=lnF/Ok45gY3a3A0tgLNaHq
+	m862K8e+GRmlIWqlKn4kI=; b=QbPTvKY7cE38U9tlV6EhGAhjZe6l5ZfRdZ9iFt
+	wNamyJ+En7vzPjI94fHCoPwHBI1GNLuctYTyBTWmctv8ehK9a71X19C2SI42rXm4
+	7aHMCfjA6x9RQCjpsAkmwdmyCPs1R7aISj7FknNJlvWDjMpBXQBsNOwxdqWFgMuO
+	If5Lo+s6UNB+NS+86jpg2dbn1O3U8DBYpr8jIAqsJuC5BWWNjZqGarfgV+5Ylhfy
+	7+QYJifU9nd8EIkWNYrirIJTd3cDUaajuLY2hCX80DLQWDpES2d/q9+JO8pzo3se
+	oidCQhZnL5aZsmX+4Iub/WO1FhILt76333BxjxYGMV9PppVw==
+Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e6h0qbyse-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:30:38 +0000 (GMT)
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-30230e64087so2001490eec.0
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 18:30:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1779067837; x=1779672637; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lnF/Ok45gY3a3A0tgLNaHqm862K8e+GRmlIWqlKn4kI=;
+        b=hiIzrVfA+FEKhfLIXw5v5164GNHsTXQENfeBxZYcWlUnWVyCNKOU6qR+qlnLJWXvlj
+         0UXh+ZgYHsCYlPfzW9rq1rUiyk7QY6AJth7W4NEZFDDbP7myPrQ3U+C7UMWA8pUwrZ/U
+         SS5if1XvCsYrjx0ZULCEXL3MUDcWGVCXc69bew1i8kMjbHB5EVQu10CTnmCm7O64kvko
+         fPm8ZVK6Kkr0ZTyP/Q3wv4/Rvbu/rmHnqcam8AdtCKmM7to+I9sYWBb6ocVsxTxndlAY
+         rC/hgm08qoRFY6BryCuzAngs8up+DcZark3gyzIBSMq0yC3WlwigOdnOVXSzk3vnQgC4
+         DO6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779067837; x=1779672637;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lnF/Ok45gY3a3A0tgLNaHqm862K8e+GRmlIWqlKn4kI=;
+        b=nnWeaPARciMekQwqjr3CxzPuP+n74KT9Si6BSBWvuWrUSmfaASHKXuJZRIxWuwjhxv
+         Bx17t7/3fxnTl5Zc3pZqNhipkjgqRR3GlvQynCd+b5Gw8MdlV5fwaARp3xdvDKiXxOeC
+         5B7p+rYh/x0swICGlnjnmmHeAN4gSd3iLDBwiQmS7Tp70Y4QdWogGnbnyuyucNW5ihxe
+         VE5RnoE5I1U+NJw+ZvpNGvbXmLRQZ8wtpB5XGsIggTi5S/f3Ya47NRcqSm7iJhUeMp0n
+         3EMOFohTvoy+puiZnJhunFR/OCQc+8sUn/ahbuMBVPMl9nxDpuXlWEozqFTu1FUePXag
+         O8kQ==
+X-Gm-Message-State: AOJu0YyyfqFY6p8NHIoAaxyxRxx0gLD2Q6sux/nmEkE9QOduiDuU/b2V
+	xCQAA5QgfmHWy7PwnFXZZ3G/w4dW8LwiqyiG7ZKAxFiANzV6RZQjmb0C8uiLL8VUSWVHkmMYZoG
+	CBd2V3ek/ZuQVyPc3fj778E68SLA/ed0LYHkQm6I4+VJLRubj5KV0dDivwPdFk9y48e0=
+X-Gm-Gg: Acq92OFhn0fSHhRvIIHCFYpUywTgnQQe8hibwG5omNFlnx7rP45qMQJHWcMTsY/zy2q
+	okqGnRTUrgCH+89KWSbFcfeF8WqofGycXTGTLrss1/9/n47AHIPdTSrxhObwsyy684x8CKAtTxT
+	ZBMkvQ6TOrFo+zHUNSoCF6qhVsiCzaOZdPZDS5d8eXiejGfkYIXS2EeMrG7QrxKZrkon51xJxxF
+	AiH6B+2WgFI93SRqIrwMSxsS8qi9eIgho7LA21/pwcSSYE4znCeLR85UhtIqjof6Ml5prymzIua
+	ohohhyTQge8I1bNiGEo3a+hQ3A8niVqK/WJFgvQuPDSXOCndGYTeVsfsic9rI3UZipXI1XqaLnH
+	L6YwHJjDiREn+uq+bH3m6sx2Mdkmp6rcbezAqhRUUu/5996EcLQw=
+X-Received: by 2002:a05:7301:5809:b0:2f2:6dde:df50 with SMTP id 5a478bee46e88-3039868cba3mr6241665eec.17.1779067837067;
+        Sun, 17 May 2026 18:30:37 -0700 (PDT)
+X-Received: by 2002:a05:7301:5809:b0:2f2:6dde:df50 with SMTP id 5a478bee46e88-3039868cba3mr6241644eec.17.1779067836440;
+        Sun, 17 May 2026 18:30:36 -0700 (PDT)
+Received: from [10.227.174.152] ([207.213.33.2])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302978b1a79sm12702137eec.28.2026.05.17.18.30.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 May 2026 18:30:36 -0700 (PDT)
+Message-ID: <604ca54c-a94e-4ca4-83e7-4486d7392d71@oss.qualcomm.com>
+Date: Sun, 17 May 2026 18:30:31 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A0A84564CF0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, jiri@resnulli.us, davem@davemloft.net,
+        Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org
+From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+Subject: [PATCH net] net/sched: fix pedit partial COW leading to page cache
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: 0YzvaYQCnm5UW57QbvpJhqVp8x7w3_YT
+X-Proofpoint-GUID: 0YzvaYQCnm5UW57QbvpJhqVp8x7w3_YT
+X-Authority-Analysis: v=2.4 cv=fIMJG5ae c=1 sm=1 tr=0 ts=6a0a6bbe cx=c_pps
+ a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=0UO4LuSLTB0qstzv38KPpQ==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
+ a=EUspDBNiAAAA:8 a=pGLkceISAAAA:8 a=A7XncKjpAAAA:8 a=pxxjg2x1fI-G0sRxPlwA:9
+ a=QEXdDO2ut3YA:10 a=6Ab_bkdmUrQuMsNx7PHu:22 a=R9rPLQDAdC6-Ub70kJmZ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE4MDAxMiBTYWx0ZWRfX2G1lQ5qcgmgz
+ OGK8p4sNnqNcKGm/e8rhFqtLB0m58r0Gsf1jCYsJYEyKgPr6iY9Xa2uLnAGFtL0V6FjzV/iIl8Q
+ wiBUxBpzooZTbE069QOq+QiO/x37UtEZdT0Ld4/+mkTtAwk2v85HpnDDn6IlHmR6BitwdYCTajw
+ DMwqmjglgMlvMQhZ+zmROJYQshmic+bHUxPDCGUtAW3HW1qO3H3ZAgW0RDZLTmJnOQm5xof8hlr
+ 63U+YS4vtcRDccuZgv9yf8/7tdIHfS5ikJm08vHaDOYt4HwQBOWMhTc/ZKEV7QEp6r/+m1TP0ZD
+ kG6nE5GjLEjGfd9iCm5G0Iw4WKC1axd1+KP7tTTpwo752ND6XB4CCZm5Vep3urxDiOlkbrUyGSZ
+ q9yVKoFEkmQWu7CqvY6aNOOthW1lvxO5Br0eCAfkVfgsTGRz7+MxJjL4J1CyX4RoJOYyvLFlQQe
+ iLx5Jyhct+uCiSUvyGg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-17_06,2026-05-15_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 impostorscore=0 spamscore=0 bulkscore=0 phishscore=0
+ priorityscore=1501 adultscore=0 suspectscore=0 lowpriorityscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
+ definitions=main-2605180012
+X-Rspamd-Queue-Id: A85C6564D13
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-288810-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email,qualcomm.com:dkim];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288811-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,run.sh:url,config.sh:url]
+	FROM_NEQ_ENVFROM(0.00)[rajat.gupta@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-This patch adds support for testing rds rdma over ROCE.  A new
--r flag is added to config.sh which enables the required kernel
-configs for rdma.  We also add a -T flag to run.sh, which takes
-a transport option, tcp or rdma.  The rdma option will check to
-ensure the proper configs have been enabled. The flag is then
-passed to test.py, which will run the test over the specified
-transport(s)
+From f12ea6484dbb75d1c13495e921d0595532317f2a Mon Sep 17 00:00:00 2001
+From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+Date: Sun, 17 May 2026 10:11:44 -0700
+Subject: [PATCH net] net/sched: fix pedit partial COW leading to page cache
+ corruption
 
-Signed-off-by: Allison Henderson <achender@kernel.org>
+tcf_pedit_act() computes the COW range for skb_ensure_writable()
+once before the key loop using tcfp_off_max_hint, but the hint does
+not account for the runtime header offset added by typed keys. This
+can leave part of the write region un-COW'd.
+
+Fix by moving skb_ensure_writable() inside the per-key loop where
+the actual write offset is known, and add overflow checking on the
+offset arithmetic. For negative offsets (e.g. Ethernet header edits
+at ingress), use skb_cow() to COW the headroom instead. Guard
+offset_valid() against INT_MIN, where negation is undefined.
+
+Additionally, linearize skbs with shared frags upfront to prevent
+silent data corruption when pedit operates on zero-copy pages
+(e.g. from sendfile).
+
+Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is writable")
+Reported-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+Reported-by: Yiming Qian <yimingqian591@gmail.com>
+Reported-by: Keenan Dong <keenanat2000@gmail.com>
+Reported-by: Han Guidong <2045gemini@gmail.com>
+Reported-by: Zhang Cen <rollkingzzc@gmail.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
 ---
- tools/testing/selftests/net/rds/README.txt | 29 ++++++++----
- tools/testing/selftests/net/rds/config.sh  | 15 +++++-
- tools/testing/selftests/net/rds/run.sh     | 53 +++++++++++++++++++++-
- 3 files changed, 84 insertions(+), 13 deletions(-)
+ net/sched/act_pedit.c | 52 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 39 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/net/rds/README.txt b/tools/testing/selftests/net/rds/README.txt
-index 295dc82c0770f..bac6f15a80d52 100644
---- a/tools/testing/selftests/net/rds/README.txt
-+++ b/tools/testing/selftests/net/rds/README.txt
-@@ -1,18 +1,22 @@
- RDS self-tests
- ==============
+diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+index bc20f08a2..e077a2e82 100644
+--- a/net/sched/act_pedit.c
++++ b/net/sched/act_pedit.c
+@@ -16,6 +16,7 @@
+ #include <linux/ip.h>
+ #include <linux/ipv6.h>
+ #include <linux/slab.h>
++#include <linux/overflow.h>
+ #include <net/ipv6.h>
+ #include <net/netlink.h>
+ #include <net/pkt_sched.h>
+@@ -323,8 +324,10 @@ static bool offset_valid(struct sk_buff *skb, int offset)
+ 	if (offset > 0 && offset > skb->len)
+ 		return false;
  
--These scripts provide a coverage test for RDS-TCP by creating two
--network namespaces and running rds packets between them. A loopback
--network is provisioned with optional probability of packet loss or
--corruption. A workload of 50000 hashes, each 64 characters in size,
--are passed over an RDS socket on this test network. A passing test means
--the RDS-TCP stack was able to recover properly.  The provided config.sh
--can be used to compile the kernel with the necessary gcov options.  The
--kernel may optionally be configured to omit the coverage report as well.
-+These scripts provide a coverage test for RDS-TCP and RDS-RDMA (over
-+RoCE/RXE) by setting up two endpoints and running RDS packets between
-+them. The TCP path creates two network namespaces; the RDMA path uses
-+an RXE (soft RoCE) device backed by a veth pair.  A workload of 50000
-+hashes, each 64 characters in size, is passed over an RDS socket on
-+this test network with an optional probability of packet loss or
-+corruption.  A passing test means the RDS stack was able to recover
-+properly.  The provided config.sh can be used to compile the kernel
-+with the necessary gcov options; pass -r to also enable the kernel
-+configs required for the RDMA transport.  The kernel may optionally be
-+configured to omit the coverage report as well.
+-	if  (offset < 0 && -offset > skb_headroom(skb))
+-		return false;
++	if (offset < 0) {
++		if (offset == INT_MIN || -offset > skb_headroom(skb))
++			return false;
++	}
  
- USAGE:
- 	run.sh [-d logdir] [-l packet_loss] [-c packet_corruption]
- 	       [-u packet_duplicate] [-t timeout]
-+	       [-T tcp|rdma|tcp,rdma]
- 
- OPTIONS:
- 	-d	Log directory.  If set, logs will be stored in the
-@@ -27,6 +31,10 @@ OPTIONS:
- 
- 	-t	Test timeout.  Defaults to tools/testing/selftests/net/rds/settings
- 
-+	-T	Comma-separated list of transports to test.  Accepts
-+		"tcp", "rdma", or "tcp,rdma".  Defaults to "tcp".  Use
-+		config.sh -r to enable required RDMA configs
-+
- ENV VARIABLES:
- 	RDS_LOG_DIR	Log directory.  If set, logs will be stored in
- 			the given dir, or skipped if unset. Log dir
-@@ -48,6 +56,9 @@ EXAMPLE:
-     # Create a suitable gcov enabled .config
-     tools/testing/selftests/net/rds/config.sh -g
- 
-+    # Optionally add RDMA configs (CONFIG_RDS_RDMA, CONFIG_RDMA_RXE)
-+    tools/testing/selftests/net/rds/config.sh -r
-+
-     # Alternatly create a gcov disabled .config
-     tools/testing/selftests/net/rds/config.sh
- 
-@@ -62,5 +73,5 @@ EXAMPLE:
-         "export PYTHONPATH=tools/testing/selftests/net/; \
-          export SUDO_USER=example_user; \
-          export RDS_LOG_DIR=tools/testing/selftests/net/rds/rds_logs; \
--         tools/testing/selftests/net/rds/run.sh"
-+         tools/testing/selftests/net/rds/run.sh -T tcp,rdma"
- 
-diff --git a/tools/testing/selftests/net/rds/config.sh b/tools/testing/selftests/net/rds/config.sh
-index 29a79314dd60f..be0668359a070 100755
---- a/tools/testing/selftests/net/rds/config.sh
-+++ b/tools/testing/selftests/net/rds/config.sh
-@@ -10,7 +10,8 @@ CONF_FILE=""
- FLAGS=()
- 
- GENERATE_GCOV_REPORT=0
--while getopts "gc:" opt; do
-+ENABLE_RDMA=0
-+while getopts "gc:r" opt; do
-   case ${opt} in
-     g)
-       GENERATE_GCOV_REPORT=1
-@@ -18,8 +19,11 @@ while getopts "gc:" opt; do
-     c)
-       CONF_FILE=$OPTARG
-       ;;
-+    r)
-+      ENABLE_RDMA=1
-+      ;;
-     :)
--      echo "USAGE: config.sh [-g] [-c config]"
-+      echo "USAGE: config.sh [-g] [-c config] [-r]"
-       exit 1
-       ;;
-     ?)
-@@ -58,3 +62,10 @@ scripts/config "${FLAGS[@]}" --enable CONFIG_VETH
- # simulate packet loss
- scripts/config "${FLAGS[@]}" --enable CONFIG_NET_SCH_NETEM
- 
-+if [ "$ENABLE_RDMA" -eq 1 ]; then
-+	# enable RDS over InfiniBand / RDMA (rds_rdma test)
-+	scripts/config "${FLAGS[@]}" --enable CONFIG_INFINIBAND
-+	scripts/config "${FLAGS[@]}" --enable CONFIG_INFINIBAND_ADDR_TRANS
-+	scripts/config "${FLAGS[@]}" --enable CONFIG_RDMA_RXE
-+	scripts/config "${FLAGS[@]}" --enable CONFIG_RDS_RDMA
-+fi
-diff --git a/tools/testing/selftests/net/rds/run.sh b/tools/testing/selftests/net/rds/run.sh
-index 424fd57401d88..07af2f927a2a7 100755
---- a/tools/testing/selftests/net/rds/run.sh
-+++ b/tools/testing/selftests/net/rds/run.sh
-@@ -101,6 +101,16 @@ check_conf_enabled() {
- 		exit 4
- 	fi
+ 	return true;
  }
-+
-+check_rdma_conf_enabled() {
-+	if ! grep -x "$1=y" "$kconfig" > /dev/null 2>&1; then
-+		echo "selftests: [SKIP] rdma transport requires $1 enabled"
-+		echo "To enable, run " \
-+		     "tools/testing/selftests/net/rds/config.sh -r and rebuild"
-+		exit 4
-+	fi
-+}
-+
- check_conf_disabled() {
- 	if grep -x "$1=y" "$kconfig" > /dev/null 2>&1; then
- 		echo "selftests: [SKIP] This test requires $1 disabled"
-@@ -117,6 +127,28 @@ check_conf() {
- 	check_conf_disabled CONFIG_MODULES
- }
+@@ -393,17 +396,19 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb,
+ 	struct tcf_pedit_key_ex *tkey_ex;
+ 	struct tcf_pedit_parms *parms;
+ 	struct tc_pedit_key *tkey;
+-	u32 max_offset;
+ 	int i;
  
-+# Check kernel config and host environment for RDS-RDMA support.
-+# Exits with SKIP (4) if the user requested rdma but prerequisites
-+# are not met.
-+check_rdma_conf()
-+{
-+	case "$TRANSPORT" in
-+	  *rdma*) ;;
-+	  *) return ;;
-+	esac
-+
-+	# Kconfig will enforce CONFIG_INFINIBAND_* as dependencies
-+	# of CONFIG_RDMA_RXE
-+	check_rdma_conf_enabled CONFIG_RDMA_RXE
-+	check_rdma_conf_enabled CONFIG_RDS_RDMA
-+
-+	if ! which rdma > /dev/null 2>&1; then
-+		echo "selftests: [SKIP] rdma transport requires the 'rdma'" \
-+		      " tool (iproute2)"
-+		exit 4
-+	fi
-+}
-+
- check_env()
- {
- 	if ! test -d "$obj_dir"; then
-@@ -153,8 +185,10 @@ check_env()
- LOG_DIR="${RDS_LOG_DIR:-}"
- TIMEOUT=$timeout
- GENERATE_GCOV_REPORT=1
-+TRANSPORT=tcp
- FLAGS=()
--while getopts "d:l:c:u:t:" opt; do
-+
-+while getopts "d:l:c:u:t:T:" opt; do
-   case ${opt} in
-     d)
-       LOG_DIR=${OPTARG}
-@@ -171,9 +205,12 @@ while getopts "d:l:c:u:t:" opt; do
-     u)
-       FLAGS+=("-u" "${OPTARG}")
-       ;;
-+    T)
-+      TRANSPORT=${OPTARG}
-+      ;;
-     :)
-       echo "USAGE: run.sh [-d logdir] [-l packet_loss] [-c packet_corruption]" \
--           "[-u packet_duplicate] [-t timeout]"
-+           "[-u packet_duplicate] [-t timeout] [-T tcp|rdma|tcp,rdma]"
-       exit 1
-       ;;
-     ?)
-@@ -183,9 +220,21 @@ while getopts "d:l:c:u:t:" opt; do
-   esac
- done
+ 	parms = rcu_dereference_bh(p->parms);
  
-+# Validate transport tokens
-+IFS=',' read -ra transports <<< "$TRANSPORT"
-+for t in "${transports[@]}"; do
-+    if [ "$t" != "tcp" ] && [ "$t" != "rdma" ]; then
-+        echo "run.sh: unknown transport '$t' (expected tcp or rdma)"
-+        exit 1
-+    fi
-+done
-+
-+FLAGS+=("--transport" "${TRANSPORT}")
-+
- check_env
- check_conf
- check_gcov_conf
-+check_rdma_conf
+-	max_offset = (skb_transport_header_was_set(skb) ?
+-		      skb_transport_offset(skb) :
+-		      skb_network_offset(skb)) +
+-		     parms->tcfp_off_max_hint;
+-	if (skb_ensure_writable(skb, min(skb->len, max_offset)))
+-		goto done;
++	/* If the skb has shared frags the user is likely using zero-copy
++	 * (e.g. sendfile).  Those page frags may point to page-cache pages;
++	 * writing into them would silently corrupt the page cache.
++	 * Linearize so pedit operates on a private copy.
++	 * If you want zero-copy, don't use pedit. 
++	  TL;DR if you want to use ZC, don't use pedit*/
++	if (skb_has_shared_frag(skb)) {
++		if (__skb_linearize(skb))
++			goto bad;
++	}
  
- TRACE_CMD=()
- if [[ -n "$LOG_DIR" ]]; then
+ 	tcf_lastuse_update(&p->tcf_tm);
+ 	tcf_action_update_bstats(&p->common, skb);
+@@ -414,6 +419,7 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb,
+ 	for (i = parms->tcfp_nkeys; i > 0; i--, tkey++) {
+ 		int offset = tkey->off;
+ 		int hoffset = 0;
++		int write_offset, write_len;
+ 		u32 *ptr, hdata;
+ 		u32 val;
+ 		int rc;
+@@ -451,12 +457,32 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb,
+ 			}
+ 		}
+ 
+-		if (!offset_valid(skb, hoffset + offset)) {
+-			pr_info_ratelimited("tc action pedit offset %d out of bounds\n", hoffset + offset);
++		if (unlikely(check_add_overflow(hoffset, offset,
++						&write_offset))) {
++			pr_info_ratelimited("tc action pedit offset overflow\n");
++			goto bad;
++		}
++
++		if (!offset_valid(skb, write_offset)) {
++			pr_info_ratelimited("tc action pedit offset %d out of bounds\n",
++					    write_offset);
+ 			goto bad;
+ 		}
+ 
+-		ptr = skb_header_pointer(skb, hoffset + offset,
++		if (write_offset < 0) {
++			if (skb_cow(skb, -write_offset))
++				goto bad;
++		} else {
++			if (unlikely(check_add_overflow(write_offset,
++							(int)sizeof(hdata),
++							&write_len)))
++				goto bad;
++			if (skb_ensure_writable(skb, min_t(int, skb->len,
++							   write_len)))
++				goto bad;
++		}
++
++		ptr = skb_header_pointer(skb, write_offset,
+ 					 sizeof(hdata), &hdata);
+ 		if (!ptr)
+ 			goto bad;
+@@ -475,7 +501,7 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb,
+ 
+ 		*ptr = ((*ptr & tkey->mask) ^ val);
+ 		if (ptr == &hdata)
+-			skb_store_bits(skb, hoffset + offset, ptr, 4);
++			skb_store_bits(skb, write_offset, ptr, sizeof(hdata));
+ 	}
+ 
+ 	goto done;
 -- 
-2.25.1
+2.51.2.windows.1
 
+Thank you,
+Rajat
 
