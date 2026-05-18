@@ -1,63 +1,73 @@
-Return-Path: <netdev+bounces-289021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289018-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sEDTIucBC2qJ/QQAu9opvQ
-	(envelope-from <netdev+bounces-289021-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:11:19 +0200
+	id yDQcHrcCC2qj/QQAu9opvQ
+	(envelope-from <netdev+bounces-289018-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:14:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 301B256C533
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:11:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7849556C639
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9E4DA30623EF
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:02:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 05CA330ED63B
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769D63FBECA;
-	Mon, 18 May 2026 12:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5491E3F8EAF;
+	Mon, 18 May 2026 11:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="EaV/T4oO"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xvt6Y9FL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B973FBB73;
-	Mon, 18 May 2026 12:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82013F88AC;
+	Mon, 18 May 2026 11:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779105659; cv=none; b=Umkd8zNaCXwtaC0H5ekh7Vypfc9mFN+MjCzooE7G3UDj24STBJs8Km2X8x4uYgLm8127rkbaQKz16oVbnBPaqXHeOF6hFEFmzyBSMl8hRBO1HHf+1PgPXcCHCE33FIGv73F7iO/QhfXqr6+L6OPWL6HmDwej5ZaPXhumeMOu9PU=
+	t=1779105407; cv=none; b=JG9dj1TR4l+KmOkTK1zeqPBK+fMcw2U9qIoCl7C/HsrLqgLPV1iaE3E8E94tvaiUtmSo08aZWei4+yg9a9GVA+8v31pXj3hDpUs4d2J9RAaH3LyyOfzRlppq73+9ja08+EknEHujA4UHYg+p5ErTdA66EwuPyUZEB5r9Mahi7Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779105659; c=relaxed/simple;
-	bh=Dq9L8NgKLAHErwvoe6hqZn8vjQVRLs7Havu3hguUk0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qXPm8ljmWluhN5fTBbL+7nPRRuFw36TjkDxwKRLiOVkhLkfwt1DEBz2yFwPEt+B2QhBU+Hhv+RY92FAiBiyeSaIWQ3Y3uxd2UFsUNb9nwxrUAmxjN4EG5SDNjf85wFm4Ie7B/3a5xFSzuLTMuvWo+TUbIuy7lXymAdI+CGIz+S0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=EaV/T4oO; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 6DE2F6019F;
-	Mon, 18 May 2026 13:53:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1779105202;
-	bh=x5JGP+k+YEoRidDdG4n9aMggxVuZd6ch/QnZI57RP9U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EaV/T4oOIcgBpxPEG2zqU/lpalYB+eYcpwz7wOZeVhUEezP9A4UAXr6gM4OwhyTRt
-	 lUQiirhyxa7re5dGF0WBqcCZwjFEyU1gR4jnF0YwJFXN826Sgc7KG87rkVVPB1JHtO
-	 9T+tskKu0f0tWnWF89QSBiIT5Y0MBbyegI/1vRyAPrFSs61kTn8zVjLOnC+VYIyqFA
-	 JDtIv46mgUgGbkUDf7nkj5DhlLvaGC0BjiTxtTIZNj5jlU/T/kcvIJZ/TKaCAPMHbG
-	 KHgMGX6n0tW8Fz8//SbeWuqLTHVjjCY3Ag4PA2kU1AQ4CpnFoemZocejLtNRNG8Ldt
-	 7u5lmxz7gUsqA==
-Date: Mon, 18 May 2026 13:53:19 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Qi Tang <tpluszz77@gmail.com>, netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org, herbert@gondor.apana.org.au,
-	michael.bommarito@gmail.com, lyutoon@gmail.com
-Subject: Re: [RFC] netfilter: disable payload mangling in userns
-Message-ID: <agr9ry_EKdTfgoaj@chamomile>
-References: <20260515100411.3141-1-fw@strlen.de>
- <20260515114848.1105927-1-tpluszz77@gmail.com>
- <agcWBZNugohelNp6@strlen.de>
+	s=arc-20240116; t=1779105407; c=relaxed/simple;
+	bh=0lRi5TC10tfwVZPqC59MI4zysRNQoBCeqBGlQwSHOrM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MM9/uti1Sq4EyvHPhGjVH24cBxMw9ZbhKtlRpMzh98SRpuSIFKLqh3VV2GaqkI6dUdxmM79wHU8bQurosravVJaNx4kpHzjNSP60KHRERTx2xN3OZlMgJk4KXtOcK/U5v4W6tjzhXkQ35o2innmoZPoGrMUb4RJsiuWd9M8wFDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xvt6Y9FL; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 47EC31A3607;
+	Mon, 18 May 2026 11:56:43 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 141DA5FFA3;
+	Mon, 18 May 2026 11:56:43 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F04C411AF84A3;
+	Mon, 18 May 2026 13:56:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779105402; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=pxpe7iIx2G4tBbQyj/ZO12IXMY9/CrHISr2PmrKBAzU=;
+	b=xvt6Y9FLrhmACZU/qfPnfqfPTSG4UKIrKL6ikRnt29aVnqkLQK6od+RVu0EsMBb0gFcSde
+	4OWaTfsiDyNfqcoEaTguZZIMHTfDhd0/1pishD0kftaME/kwJcTjdM8OaAXXe16focKkP6
+	0OUWBAbLphH8+Pxx7BhrgtCFWk0721oiJLbFkU3PZdoNHrNzkVjE4gvjcgCDswKFnRNF7M
+	JvvhQZwwkyn1Uca723m2nHFampilLTRogkItw+m2kPY8eRHqmxG1VH9hZWzxp6yrV9N0yA
+	ZVwgS7tnYuzjpqTOmoN8NDG9dvMFDVnimhkWemMzVIlrIBUlkWGVKt3rmpmFrQ==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
+Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
+ <stefan@datenfreihafen.org>,  Andrew Lunn <andrew+netdev@lunn.ch>,  "David
+ S . Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
+  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  stable@vger.kernel.org,  Shitalkumar
+ Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Subject: Re: [PATCH wpan] ieee802154: ca8210: fix pointer truncation in
+ kfifo on 64-bit
+In-Reply-To: <20260513153412.1284549-1-shitalkumar.gandhi@cambiumnetworks.com>
+	(Shitalkumar Gandhi's message of "Wed, 13 May 2026 21:04:12 +0530")
+References: <20260513153412.1284549-1-shitalkumar.gandhi@cambiumnetworks.com>
+User-Agent: mu4e 1.12.7; emacs 30.2
+Date: Mon, 18 May 2026 13:56:33 +0200
+Message-ID: <87qzn9szgu.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,89 +75,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <agcWBZNugohelNp6@strlen.de>
-X-Rspamd-Queue-Id: 301B256C533
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 7849556C639
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-289018-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289021-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,gondor.apana.org.au];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,datenfreihafen.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,cambiumnetworks.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[miquel.raynal@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Fri, May 15, 2026 at 02:48:05PM +0200, Florian Westphal wrote:
-> Qi Tang <tpluszz77@gmail.com> wrote:
-> > I agree with the userns block.  I'll keep pushing the five
-> > consumer-side bounds-check patches: root in init userns can
-> > still install the same payload-set rule and trigger the same
-> > OOB at the re-read sites, so the underlying bug fix is still
-> > worth landing.
-> > 
-> > None of the five sites overlap with the relax wishlist (saddr/
-> > daddr, transport, linklayer).  Same class showed up in an
-> > earlier patch:
-> >   https://lore.kernel.org/netdev/20260514035802.1540395-1-tpluszz77@gmail.com/
-> > 
-> > These five are unlikely to be all of them; we think the
-> > consumer side warrants a broader audit.  Thoughts?
-> 
-> I think we have to do both.
-> 
-> For nft_payload/nft_exthdr:
-> 1. Writes from !initial_userns are rejected (rule insert fails).
-> 2. Writes for initial userns get validated at rule add time:
->   - netdev ingress is allowed to alter everything, I think
->   this is early enough to not introduce oddities that can't come
->   from wire / untrusted peer.
->  - bridge is allowed to alter everything: AFAICS there shouldn't
->  be a problem with this, same as with ingress.
->  - inet (ipv4/ip6): Check base (offset is unsigned and relative
->    to ll/network header/transport header/payload
->    - Allow modifications past transport header.
->    - Allow modifications of transport header
->    - Allow network header modifications for a subset of valid
->      offsets/lengths: saddr, daddr, checksum, tos, id, ttl / hl.
->      Reject everything else.
->    - Allow link-layer; but check at from packetpath that
->      offset + len don't write past start of the network header.
->      Else: no-op.
-> 
-> nfqueue is the bigger problem: userspace gives us a whole new
-> packet data blob, not a delta that we should apply at offset x).
+Hi Shitalkumar,
+
+Thanks for the patch!
+
+[...]
+
+> Found via a custom Coccinelle semantic patch hunting for short-byte
+> kfifo I/O on byte-mode kfifos used to shuttle pointers.
 >
-> I think we have to update nfqueue to do rudimentary header revalidation
-> and drop the packet on failure, e.g. at least making sure tot_len is not
-> past skb->len.
+> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device
+> driver")
 
-Agreed, nfqueue has been there for long time and such parser would
-validate the packet is correct from stack POV.
+I don't remember what the net rules are exactly, but this definitely
+should be backported:
 
-But if a new function to validate that the IP header mangling is not
-valid is feasible, then why not simply apply the same sanitization
-from inet hooks to nft_payload/nft_exthdr?
+Cc: stable@vger.kernel.org
 
-That can be a function in net/netfilter/utils.c.
+[...]
+
+> -	if (kfifo_out(&priv->test.up_fifo, &fifo_buffer, 4) !=3D 4) {
+> +	if (kfifo_out(&priv->test.up_fifo, &fifo_buffer, sizeof(fifo_buffer))
+> +	    !=3D sizeof(fifo_buffer)) {
+
+This line becomes unreadable. Can you please use an intermediate
+variable? Something like:
+
+          ret =3D kfifo_out(...);
+          if (ret !=3D sizeof(...)) {
+
+Thanks,
+Miqu=C3=A8l
 
