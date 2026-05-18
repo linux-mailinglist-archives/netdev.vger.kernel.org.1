@@ -1,51 +1,78 @@
-Return-Path: <netdev+bounces-289019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289023-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHCtLNQCC2q3/QQAu9opvQ
-	(envelope-from <netdev+bounces-289019-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:15:16 +0200
+	id QN+qCAIDC2q3/QQAu9opvQ
+	(envelope-from <netdev+bounces-289023-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:16:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C809056C669
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:15:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D46856C69B
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2A3ED306784A
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:57:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 288A2318C8AC
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C2C3F7870;
-	Mon, 18 May 2026 11:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B503FADF5;
+	Mon, 18 May 2026 12:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KuB1KIqg"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hDQCLY98"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12ADD2882C9;
-	Mon, 18 May 2026 11:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C3D3FADFA;
+	Mon, 18 May 2026 12:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779105443; cv=none; b=MBq52wCaGkE11DZUO6pUqAA6MXOqHm3aor2VUF3XEsRomX4KgiilTXjQxvGkQYsIveVLVA5Wdbz/27ptxxYiToiUPLnr24kKfsyW1Lp7uPnroeoknZz6usWay2IbWzhxU/BQ6Up13rwPtjwGC4jGoOFKHrICdn7G0IT7PErzk/Q=
+	t=1779105737; cv=none; b=UBOCqGEOL8i/K6PweAWSKqfOpDDxOKHQLsxCzfnpFWL4UKHj/GQcg7cac4bL7dhMa15/niZU8IOGJQUmiPmB7wQNvm7EWaEBI8BybXpW9ov3tKrlCIKysv6uDLFBCUbdeTzj5Cf5ECMdoN6nER+ii+8RDFzsNqmUsnflQb/M+AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779105443; c=relaxed/simple;
-	bh=6ROGVadPwq5Q7Gz9WoMLBxVIVVNoZyNCKKg3PyKPaaU=;
+	s=arc-20240116; t=1779105737; c=relaxed/simple;
+	bh=+ditw1cbWYXH7v+hikKyKtYDYrFedcNYjhaALpyk80g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=igjtdnXyeOU/uLRG4Q2Zh6rWN7YJlq7azLzCMVi8dQ/QxxQaXtV0odRMIdIymkTUS2JtuGzmDzz/6uEy75Yam2Vq+jMxrFmOtbInyzzof5kVdTIsYnh3Fv3VY7Eo6BSUKevcW39Xsvslk34xDLjozS6T7Lk93j3aWD7k79wUJLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KuB1KIqg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19D26C2BCB8;
-	Mon, 18 May 2026 11:57:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779105443;
-	bh=6ROGVadPwq5Q7Gz9WoMLBxVIVVNoZyNCKKg3PyKPaaU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KuB1KIqghdPy+qvB8a4BGNDu6xNalPP0oV8XWG/e2ciCg80o/WaGbPTsX/hWeK/9k
-	 0EZt2y2sCPEMV0+Jb7JbI0ekQWKUby8jXo3vaamxUr/iUkKkp1tvUSQlkIcPHWlMsx
-	 d5Ibsns/MgWUW9ECqB19gcPet6uFULJo00PyS0Sh8HNKxlz2lewT06uo/TmcSCJjuL
-	 XukqYt/wvKqwFfAnUmoSWe5YmXEypqkmXx18W8/0g0rqJd6KRV26GF+CK6J32ze2gt
-	 2vYG5u2R2kjKz15NPKK50cUQFNBQ0NmDh8Jr7rXHOs9vGQz+2WmbkjxVoZ1cSzGHnE
-	 NzEO2QE/xoqOg==
-Message-ID: <850e3709-2cb1-4a26-8546-745401423696@kernel.org>
-Date: Mon, 18 May 2026 13:57:15 +0200
+	 In-Reply-To:Content-Type; b=OEktVduYsrfY12WLB/i5MJzndRt59MMNdID0yGGfvCQQ9sL3QUBUE+crKhxv2zddRa1jYElbOg4z2JDV9CFby9OCBEorc6bsx4cuPb0uwpXa76Rxs0PWuMKRlximGqPlt3u4xvHDhXEOBce5dSNDb6GLwrP3p3LozRTzgukNKyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hDQCLY98; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64I6pVl53913287;
+	Mon, 18 May 2026 12:00:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=soMsls
+	37LehcwMPbuz9TaCha5/23ZDZWjR1vmrne7qg=; b=hDQCLY98DygvWA78sEhnlx
+	MIsMoOejhXt5J8xrMc4Rvy70DoSwbuEvE4xmar00BKhdYYGGGv+keas8gYthz+CO
+	usr5bsAEl94wsqmeGtmQVysabRF+VW8FAHvWFaqToXi49uNCsu2aHM7awED57TiM
+	r+0FkTbQrhV4EUW0JECBUAQEaIPKf6+VpoU5pa4j8a08l3PEcmV7MhEfNkaNzjeX
+	NG7yLXOe59NQ2PD2L2WKJ/k8EB9hv12X0J9qOJs+NrDJMpP2r4nb9B/1xIY4BMqv
+	28jyxIFveXgpHHv7h1n5V/poKfIBNb9pozY2CAyNRiaiCEqoCII3B8cJPdD8nmZg
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4e6h9xqvwm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 May 2026 12:00:05 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64IBsA6i005957;
+	Mon, 18 May 2026 12:00:04 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4e72wpwwmk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 May 2026 12:00:03 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64IC02QM52363580
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 18 May 2026 12:00:02 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 29B3520075;
+	Mon, 18 May 2026 12:00:02 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9EB6720065;
+	Mon, 18 May 2026 12:00:01 +0000 (GMT)
+Received: from [9.52.217.250] (unknown [9.52.217.250])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 18 May 2026 12:00:01 +0000 (GMT)
+Message-ID: <732d4698-8b36-4803-9c81-ae9865b3f943@linux.ibm.com>
+Date: Mon, 18 May 2026 14:00:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,113 +80,173 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/6] bpf: Add bpf_ktime_get_real_ns() kfunc
-To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- willemb@google.com, kuniyu@google.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
- memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- jolsa@kernel.org, sdf@fomichev.me
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- Jason Xing <kernelxing@tencent.com>, john.fastabend@gmail.com,
- Simon Sundberg <Simon.Sundberg@kau.se>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hy?=
- =?UTF-8?Q?gensen?= <toke@toke.dk>
-References: <20260518082344.96647-1-kerneljasonxing@gmail.com>
- <20260518082344.96647-2-kerneljasonxing@gmail.com>
+Subject: Re: [PATCH net-next v2 1/7] af_iucv: take socket lock around
+ SO_MSGSIZE getsockopt
+To: Stanislav Fomichev <sdf.kernel@gmail.com>,
+        Breno Leitao <leitao@debian.org>
+Cc: Chas Williams <3chas3@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Magnus Karlsson
+ <magnus.karlsson@intel.com>,
+        Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+        Stanislav Fomichev <sdf@fomichev.me>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        James Chapman <jchapman@katalix.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        David Heidelberg
+ <david+nfc@ixit.cz>,
+        Samuel Ortiz <sameo@linux.intel.com>,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, linux-s390@vger.kernel.org,
+        linux-afs@lists.infradead.org, oe-linux-nfc@lists.linux.dev,
+        kernel-team@meta.com
+References: <20260515-getsock_four-v2-0-0d8eed952627@debian.org>
+ <20260515-getsock_four-v2-1-0d8eed952627@debian.org>
+ <ageFn6UV-c-pOPBW@devvm7509.cco0.facebook.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20260518082344.96647-2-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <ageFn6UV-c-pOPBW@devvm7509.cco0.facebook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C809056C669
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE4MDExMiBTYWx0ZWRfX3xunao6xX+5I
+ s6wQoFowRAUi5CnuOdhi4McLg8i2KlSPcqO1ELPSqQgNpPFc8PL8kcysA9y2F/kozRyiNSNx2Sl
+ E6xH9abIKEnkIqUFLq2wUMhw07xzz/MqU9gkrv885jalQejkibSBJmYNtpxP2Uz9C21/0n0UR8h
+ O8Ua7duVPKh7rLv6JAt9vi/2bTqkXUhmbmJLzpIzw2wkNctKNOY4mIf7Z+L5R5+pe3xq0Bfk7Ti
+ qr4qUHXPs68WFi6NPqiiNSU634IQZArcMnh7noc26Iej4pjbieIgb2YQ8NHfd219NZ+10VxnbUf
+ k6cjhVO51c8ouZ2RS6/q0w5I47Pf/n1kP4STK0opkSXpdXIbDlZjEykeqGju3VyatzPL720I/G+
+ IB0dBm8na5z1LtC3QKiRvzVQJ4Gyj92xl4lYH9hFY6CAwqIH7X2EzXGYFqRAZBJ0p9Qixz4YH5y
+ +zAfeeTWJ0aF/rMF3ZA==
+X-Authority-Analysis: v=2.4 cv=BNuDalQG c=1 sm=1 tr=0 ts=6a0aff45 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=xNf9USuDAAAA:8
+ a=OxTNfTo8x2dPQPtXHAQA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: P2k76_u3HpaQjsmgodUOFxpuNHH4zJHj
+X-Proofpoint-GUID: _tEQJNW7Ox_Sa-u3uOE70Qe3g9quvE2c
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-18_03,2026-05-15_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 malwarescore=0 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605180112
+X-Rspamd-Queue-Id: 6D46856C69B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289019-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,fomichev.me];
-	FREEMAIL_CC(0.00)[vger.kernel.org,tencent.com,gmail.com,kau.se,toke.dk];
+	TAGGED_FROM(0.00)[bounces-289023-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,debian.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,intel.com,fomichev.me,iogearbox.net,linux.ibm.com,katalix.com,auristor.com,ixit.cz,linux.intel.com,lists.sourceforge.net,vger.kernel.org,lists.infradead.org,lists.linux.dev,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,nfc];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-On 18/05/2026 10.23, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+
+
+On 15.05.26 22:45, Stanislav Fomichev wrote:
+> On 05/15, Breno Leitao wrote:
+>> Mirror the locking used by the SO_MSGLIMIT case directly above: take
+>> lock_sock() before reading iucv->hs_dev and dereferencing hs_dev->mtu,
+>> and release it afterwards. This keeps the two adjacent getsockopt arms
+>> consistent and matches the lock held by iucv_sock_close() when it
+>> clears hs_dev.
+>>
+>> This is not an exploitable bug. iucv_sock_close() is the only writer
+>> of iucv->hs_dev and only runs from the protocol release callback,
+>> which the socket layer invokes after the last file reference drops.
+>> The getsockopt() syscall holds an fd reference for its entire
+>> duration via fdget()/fdput(), so iucv_sock_close() cannot run
+>> concurrently with the SO_MSGSIZE read on the same socket. There is
+>> no other writer of hs_dev, and the aligned pointer load cannot tear
+>> on any architecture Linux supports, so the existing code cannot
+>> observe a NULL dereference or use-after-free in practice.
+>>
+
+
+Actually iucv_sock_bind() and afiucv_hs_callback_syn() also write hs_dev,
+but iucv_sock_close() is the only instance that clears it to NULL.
+Maybe there is another wording than 'writer'?
+
+
+>> The change is purely defensive: making the locking pattern uniform
+>> across the function avoids surprising the next reader and removes a
+>> foot-gun should the close path ever grow a new caller that does not
+>> hold the fd reference.
+>>
+
+
+Thank you for this in-depth analysis and clear explanation.
+I agree it makes the code more consistent; there should have
+been at least a comment, why locking is not necessary here.
+
+
+>> Note: For the reason above, it doesn't contain a "Fixes" tag, and is
+>> aiming at net-next instead of net.
+>>
+>> Signed-off-by: Breno Leitao <leitao@debian.org>
+>> ---
+>>  net/iucv/af_iucv.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
+>> index 72dfccd4e3d58..3dd11d7a967c8 100644
+>> --- a/net/iucv/af_iucv.c
+>> +++ b/net/iucv/af_iucv.c
+>> @@ -1566,9 +1566,11 @@ static int iucv_sock_getsockopt(struct socket *sock, int level, int optname,
+>>  	case SO_MSGSIZE:
+>>  		if (sk->sk_state == IUCV_OPEN)
+>>  			return -EBADFD;
+>> +		lock_sock(sk);
+>>  		val = (iucv->hs_dev) ? iucv->hs_dev->mtu -
+>>  				sizeof(struct af_iucv_trans_hdr) - ETH_HLEN :
+>>  				0x7fffffff;
+>> +		release_sock(sk);
+>>  		break;
+>>  	default:
+>>  		return -ENOPROTOOPT;
+>>
 > 
-> Currently BPF programs can obtain timestamps via bpf_ktime_get_ns(),
-> which returns CLOCK_MONOTONIC time. However, the skb->tstamp field
-> populated by the network stack uses ktime_get_real() which is in the
-> CLOCK_REALTIME domain.
-> 
-> In the series, kernel reports the software/hardware timestamps through
-> sockopt and then userspace bpf application gets them and calculate the
-> delta only through an unified time unit.
-> 
-> However, prior to this, when a BPF program tries to measure RX packet
-> delay by comparing skb->tstamp with bpf_ktime_get_ns(), the result
-> is incorrect because the two clocks have different epochs.
-> 
-> Introduce a new BPF kfunc bpf_ktime_get_real_ns() that returns the
-> current CLOCK_REALTIME time. This allows BPF programs to perform
-> accurate delay calculations without clock domain mismatch issue.
+> SO_IPRMDATA_MSG also seems to be only reading the value set via setsockopt,
+> so maybe it's ok to just cover the whole switch with lock/unlock? (will
+> mirror what setsockopt does)
 > 
 
-I support adding this helper, because have also hit this issue[1].
-Our ugly workaround is to use the TAI clock and adjust for the current 
-TAI offset.
+I like that idea.
 
-[1] https://github.com/xdp-project/bpf-examples/tree/main/netstacklat
 
-Cc Simon Sundberg <Simon.Sundberg@kau.se>
+Feel free to split this improvement out from your series, if that is more convenient for you.
 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->   kernel/bpf/helpers.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-> index 2bb60200c266..863645d096ef 100644
-> --- a/kernel/bpf/helpers.c
-> +++ b/kernel/bpf/helpers.c
-> @@ -2317,6 +2317,11 @@ void bpf_rb_root_free(const struct btf_field *field, void *rb_root,
->   
->   __bpf_kfunc_start_defs();
->   
-> +__bpf_kfunc u64 bpf_ktime_get_real_ns(void)
-> +{
-> +	return ktime_get_real_fast_ns();
-> +}
-> +
->   /**
->    * bpf_obj_new() - allocate an object described by program BTF
->    * @local_type_id__k: type ID in program BTF
-> @@ -4859,6 +4864,7 @@ BTF_ID_FLAGS(func, bpf_task_work_schedule_resume, KF_IMPLICIT_ARGS)
->   BTF_ID_FLAGS(func, bpf_dynptr_from_file)
->   BTF_ID_FLAGS(func, bpf_dynptr_file_discard)
->   BTF_ID_FLAGS(func, bpf_timer_cancel_async)
-> +BTF_ID_FLAGS(func, bpf_ktime_get_real_ns)
->   BTF_KFUNCS_END(common_btf_ids)
->   
->   static const struct btf_kfunc_id_set common_kfunc_set = {
 
 
