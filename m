@@ -1,53 +1,52 @@
-Return-Path: <netdev+bounces-289145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289146-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMUiBn1aC2oCGAUAu9opvQ
-	(envelope-from <netdev+bounces-289145-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:29:17 +0200
+	id kMaXNIlaC2oCGAUAu9opvQ
+	(envelope-from <netdev+bounces-289146-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:29:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811A057242C
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:29:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E6B572435
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:29:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3A0DA3047042
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:25:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D0C23049670
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D0E389DED;
-	Mon, 18 May 2026 18:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF219387574;
+	Mon, 18 May 2026 18:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="irqI/Qzt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJoAkiEn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5FE3890F0;
-	Mon, 18 May 2026 18:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C15D38A720;
+	Mon, 18 May 2026 18:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779128695; cv=none; b=n5LifMg9qnkTc0p/A4eYxHhmUbY3Csa1k7+hCVVVRqBIhX0iB17gEPgqFuPnNAGjyIHDeXTjlbZzQwBQrTexTQYXLlfnDCpoXMqHA4avdT3Q8c/vJEA4ilRHVz7UTbxUZ+Yqqt2sV+i/1MFKDzfeoPyxIngNYu9bKGIwO7INWcc=
+	t=1779128696; cv=none; b=Lq+tiQI5tXa1bk9gUWTHU/QnKNy7elKj7U0vlCJVs2XS0BP5cnpXR03Gx/vLxkAxBtIcOpgQPUKBFNT0HhDMMrzGUeXN2jASKYdfu253Hpy5f+miv5Ms+ugz6buHGYzs6hHZdgqxhJHaKylHau2KLay8ypzmlUYsdXtQob915Wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779128695; c=relaxed/simple;
-	bh=0YOQDMaHT00FKrFsX3Z/0Ptk2GGsNAdEsx0Aednt3vU=;
+	s=arc-20240116; t=1779128696; c=relaxed/simple;
+	bh=n9SuNozrSOzZhLDAOVkimbEDTCJ3gQowyLTYOZKeHSw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=q61vZP4xCsZD9cdhlY3+9tSzUjb84UYHOfqBbz3InQJ6NEMD5pKQlZ7cMxpha3WLwykPqdvFCuvH6XjVLUlmmCEFe/8F0K28uYW7EtbP0ShVLXvWU81IbZYh0yJzW6X2L6mmdh2T7sh6WPKgxQ+6ReRqPG324lEDFusq+G+nw78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=irqI/Qzt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93329C2BCC9;
-	Mon, 18 May 2026 18:24:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iyhJBxPEJLWVSmKGbGucN3hsUVSNEQvD4p1Mv46lB7xTQTvlU/MT1U/MsZrFXpYs8wJ2KRvmkFExJmejuk3dF4Tpr/KJDxgHSMyAZ7lJYppqXt5pD1YQn4j/dRWrOM7o45RMtiaDlWnDMp8hbo3jMLiZWiVlObYvHeYEZGz59f0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hJoAkiEn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94DCFC2BCC6;
+	Mon, 18 May 2026 18:24:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779128695;
-	bh=0YOQDMaHT00FKrFsX3Z/0Ptk2GGsNAdEsx0Aednt3vU=;
+	s=k20201202; t=1779128696;
+	bh=n9SuNozrSOzZhLDAOVkimbEDTCJ3gQowyLTYOZKeHSw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=irqI/Qztz8OAr2RKRGxuoauBWFUNOZmyNRY9ISirfqlh6+9JkN+/5hl36antDW7z1
-	 O2EMizJc3vfwAig7jMfGGnfeyVZltxtd2pXeYoHZph3Hfi7/lvKIpU07M2fEh4y0zB
-	 9EOo1pf7P7YzHatGLw60xu2ZSgwJM41IPreD2lI9vNqllXVY9JYtBIiYk54lFruIix
-	 bwhvMLQ3WTMVy3fkHy+BmJe6DJKYwYjgutR62up8WYhtMmQ2IGeoHHhm8zetrY00Wh
-	 IcHlneIYhHkoikzK6FrRzg1B8y5D/urvTggDhJ31KYKNVOEz0L13z/seEmVYsSwGGV
-	 +D6Lst6OORp6A==
+	b=hJoAkiEn6GExcXDvdbcsElB5jR96pLT6Yb8xj/fQQqNhDzE82HO/4YIum2mz7MyjA
+	 NK/Uxw5JCe8wCVcxCos0mezSVy+lYL2vYH0UMCT6JG6LYBgO85HTXQskKFv6FItuRb
+	 yef0/whpVL/isvUxGyJwavWhcZpV9aAvrV7hgAw46rXW/FjXA6B6fEtCHyvINcERtN
+	 8Rsz5x1Ys0jDPfnbCxjr4Z0Qv0hymjxg/Nb4VZTtoksHmDhuOlvzk2X6Wy6fsb2Dn4
+	 ppbBZb2rs6sZvLci4B+GtoRDFz6FKX9B9SgmYDt6M7X7A99kkfjJwHZMKwcvbVMdhm
+	 yuFhTJc2X5R2g==
 From: Chuck Lever <cel@kernel.org>
-Date: Mon, 18 May 2026 14:24:28 -0400
-Subject: [PATCH net 1/7] net/handshake: Drain pending requests at net
- namespace exit
+Date: Mon, 18 May 2026 14:24:29 -0400
+Subject: [PATCH net 2/7] nvme-tcp: store negative errno in queue->tls_err
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260518-handshake-file-pin-v1-1-4bbcb7e62fda@oracle.com>
+Message-Id: <20260518-handshake-file-pin-v1-2-4bbcb7e62fda@oracle.com>
 References: <20260518-handshake-file-pin-v1-0-4bbcb7e62fda@oracle.com>
 In-Reply-To: <20260518-handshake-file-pin-v1-0-4bbcb7e62fda@oracle.com>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -66,21 +65,21 @@ Cc: Chris Mason <clm@meta.com>, Christian Brauner <brauner@kernel.org>,
  kernel-tls-handshake@lists.linux.dev, linux-nvme@lists.infradead.org, 
  netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
 X-Mailer: b4 0.16-dev-da966
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3261;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1349;
  i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=2OOqFmnaiOfw920Y/fXorACxTz+mTKmYAHcv24KvEz8=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBqC1l037A5xZFYEOIS4Xr2DLGvlKw+3mxHKJS4O
- QgftrnkcjOJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCagtZdAAKCRAzarMzb2Z/
- lz3rEAC38pQdHEPcs2An+Dv1D2iD2znOAUn74Xwu13/2fvl2dv+klzQDkfFGUtrunNSFipzV5Ux
- GzK6ecKZM640frfVkH6iseOhsweUi4NId6fsMZ0PojZEMxuRy6DnTBbzL2AH65kWr39LtxsnZI4
- azewUAU9IwKNEzNGdnZ7v+pjI2nIsFN2agmsm0LRHS7H4f6G/8c8bv45HVEzHmVYUI1C9X0gZ8Z
- O0LHUAr6DGVj3C3oD0ceRLse02oEqi7ssN+jdeR+k9BaAXX8AUXdKFtIjBUAsKT/JQoAFeyJ3uL
- zNOo1p97TExnqzw+noNM/h2XAGrSd6ekkyDTzZG2zlFDe64HjPRM8FheAe6Ma8qAwPxMexNMjWn
- JJe/eYOs9J/H+Wt/CDWZR1qoQDfD1ZQzOc2cU9DeLl7Ojeg1Slg6/1oA+nCtLZD7M2vxb7J2TWH
- 7Ui74JFamUvJkUJVb14Wgoa+kNF5/14c2/Y78vHURLYloqbdavuNLrVKcLvNwgurwCyYmQgivyQ
- MGxHrOy3SmBodZs/fLm1eqZAY+daMAuPjEdK+sQkZusFLW9Bco7H1uhgaZ22Kqva6alBEKCQXe4
- uyPY+0ZD6NJ4wyrhWM0zVhmOURw8IR6jNSChSoeLJpyx+vTesmd3C3DAThugtb1i2Gmcb75str3
- 1WTX5cR0jxZA3Zw==
+ bh=x/9vqzlpF3pMsoHvTNGwDspyw8WZEQKJLSCQI6ALpEw=;
+ b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBqC1l076OEac041r0mxI+Z5S2sJEJZC22dodIZA
+ QMmHspv5aCJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCagtZdAAKCRAzarMzb2Z/
+ l5wWD/4n0zVSZMdZiMdNLyXMCfqW62f32YzVIVpoKZxkxkVYbaNThbabaytjejyEc/pbv7MqVeD
+ 9kTAuzUgG1Znh/3Lnwa8YFX9JL8XyB1R/lEvTAe5ca3RPb3Gwv2PvrvOsUkRki4XjNm9M2amv93
+ f7ie1VnZUPTar1DxT1VImOAJTLeBbioehA8YWm5J9VepZFkD4vWKk3PGY8p4kt/6UAfisPlaEqv
+ vC9EMVz4xVwnNlOHXZaEXCwO1leedR8rf6LiISDjSosuotjOtqUleKJ/B1Ezf1wadP+6tHRJNs+
+ I7TrSiwyvgkAxaHAKLvVMtTzko6bfCgxJjfonUGK1hG9ClWs+jZKpN0RKXJGsPMVLzLRasDhDQF
+ VgT7D0zxxiEXmgIxj4pQm47vEYFUcCLz1U20Hz93Hsu2dBVb0erkJAcCZ4E9/GyNg3ExuVDh3y6
+ ASkOmvhRfoWsffaTs95luC/bHWRqqkT6j9sCSrm0OV+kVSCHoCRWxl+5hTOxaxTIdj8NXu4Yoqc
+ UsdhcN+RFmzfe/atC88XE/U7x+zU7lGAEBWnVF12djTRtbU6cRqIYV0Gvv5IuLtu40qEBbHNPP4
+ VXhC0zaY1JpF4kj6rPAiccI4rfOoFw4cpWpmsvqgJ6yf37nrpcb2ItPGs8PpxD8drJ/MyJCTHdz
+ NJIWLt657qfVJLg==
 X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
  fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
 X-Spamd-Result: default: False [-2.16 / 15.00];
@@ -103,90 +102,51 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289145-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:mid,oracle.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	TAGGED_FROM(0.00)[bounces-289146-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oracle.com:mid,oracle.com:email];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+]
-X-Rspamd-Queue-Id: 811A057242C
+X-Rspamd-Queue-Id: 68E6B572435
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-The arguments to list_splice_init() in handshake_net_exit() are
-reversed. The call moves the local empty "requests" list onto
-hn->hn_requests, leaving the local list empty, so the subsequent
-drain loop runs zero iterations. Pending handshake requests that
-had not yet been accepted are not torn down when the net namespace
-is destroyed; each one keeps a reference on a socket file and on
-the handshake_req allocation.
+nvme_tcp_tls_done() assigns queue->tls_err in three branches.  The
+ENOKEY lookup failure and the EOPNOTSUPP initializer both store
+negative errnos.  The third branch, reached when the handshake
+layer reports a non-zero status, stores -status.
 
-Pass the source and destination in the documented order
-(list_splice_init(list, head) moves list onto head) so the pending
-list is transferred to the local scratch list and drained through
-handshake_complete().
+The handshake layer delivers status to the consumer callback as a
+negative errno; the other in-tree consumers --
+xs_tls_handshake_done() and the nvmet target callback -- treat
+their status argument that way.  The extra negation in
+nvme_tcp_tls_done() flips the sign, leaving tls_err as a positive
+value (for instance, +EIO), which nvme_tcp_start_tls() then
+returns to its caller.
 
-Fixing the splice direction exposes a list-corruption race. After
-the splice each req->hr_list still has non-empty link pointers,
-threading the stack-local scratch list rather than hn_requests.
-A concurrent handshake_req_cancel() -- for example, from sunrpc's
-TLS timeout on a kernel socket whose netns reference was not
-taken -- finds the request through the rhashtable, calls
-remove_pending(), and sees !list_empty(&req->hr_list).
-__remove_pending_locked() then list_del_init()s an entry off the
-scratch list while the drain iterates, corrupting it. The same
-call arriving after the drain loop has run list_del() on an
-entry hits LIST_POISON instead.
+Drop the extra negation so queue->tls_err uniformly carries a
+negative errno on failure.
 
-Have remove_pending() check HANDSHAKE_F_NET_DRAINING under
-hn_lock and report not-found when drain is in progress. The
-drain has already taken ownership; handshake_complete()'s
-existing test_and_set on HANDSHAKE_F_REQ_COMPLETED still
-arbitrates between drain and cancel for who calls the consumer's
-hp_done. Use list_del_init() rather than list_del() in the drain
-so req->hr_list does not carry LIST_POISON after drain releases
-the entry.
-
-Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for handling handshake requests")
+Fixes: be8e82caa685 ("nvme-tcp: enable TLS handshake upcall")
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- net/handshake/netlink.c | 4 ++--
- net/handshake/request.c | 3 ++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ drivers/nvme/host/tcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
-index b989456fc4c5..a8dd848371ff 100644
---- a/net/handshake/netlink.c
-+++ b/net/handshake/netlink.c
-@@ -204,12 +204,12 @@ static void __net_exit handshake_net_exit(struct net *net)
- 	 */
- 	spin_lock(&hn->hn_lock);
- 	set_bit(HANDSHAKE_F_NET_DRAINING, &hn->hn_flags);
--	list_splice_init(&requests, &hn->hn_requests);
-+	list_splice_init(&hn->hn_requests, &requests);
- 	spin_unlock(&hn->hn_lock);
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index 15d36d6a728e..68a1d7640494 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -1702,7 +1702,7 @@ static void nvme_tcp_tls_done(void *data, int status, key_serial_t pskid)
+ 		qid, pskid, status);
  
- 	while (!list_empty(&requests)) {
- 		req = list_first_entry(&requests, struct handshake_req, hr_list);
--		list_del(&req->hr_list);
-+		list_del_init(&req->hr_list);
- 
- 		/*
- 		 * Requests on this list have not yet been
-diff --git a/net/handshake/request.c b/net/handshake/request.c
-index 2829adbeb149..cebafcc341d2 100644
---- a/net/handshake/request.c
-+++ b/net/handshake/request.c
-@@ -168,7 +168,8 @@ static bool remove_pending(struct handshake_net *hn, struct handshake_req *req)
- 	bool ret = false;
- 
- 	spin_lock(&hn->hn_lock);
--	if (!list_empty(&req->hr_list)) {
-+	if (!test_bit(HANDSHAKE_F_NET_DRAINING, &hn->hn_flags) &&
-+	    !list_empty(&req->hr_list)) {
- 		__remove_pending_locked(hn, req);
- 		ret = true;
+ 	if (status) {
+-		queue->tls_err = -status;
++		queue->tls_err = status;
+ 		goto out_complete;
  	}
+ 
 
 -- 
 2.54.0
