@@ -1,777 +1,214 @@
-Return-Path: <netdev+bounces-289155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289156-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eDSZI8VbC2oCGAUAu9opvQ
-	(envelope-from <netdev+bounces-289155-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:34:45 +0200
+	id oOyWDiJcC2ppGAUAu9opvQ
+	(envelope-from <netdev+bounces-289156-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:36:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32509572549
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:34:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DF485725A5
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D482E301E837
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:34:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8762A30118CA
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F2F38F24B;
-	Mon, 18 May 2026 18:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3572E3397;
+	Mon, 18 May 2026 18:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mz3q6FHk"
 X-Original-To: netdev@vger.kernel.org
-Received: from passt.top (passt.top [88.198.0.164])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8680E38B149;
-	Mon, 18 May 2026 18:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.198.0.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660B434A76E
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 18:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779129270; cv=none; b=pYLNvI+n0q4PKzftXEZdUbaPk3+wpvBjFxAWmJ4JMn4mmrLyIvsdXGHDn0DoBU9bWJgF7dUlvmz9bDPzs9ksSO0++dWbmDbBhZXrvgKoRP9Jt8vtQpXV1WMOi0eoWRH0LfwXYsBBXYOXmK8y0+TctiaEe3wDwOLK2Lu+yT6n88I=
+	t=1779129305; cv=none; b=ZV6B3VtSTOO2tHmr9QiFUNVB0mq1PcgCEfywElSnuU3rtJOPISak74iH7EVYPE+RX07N1SqiXNcMpOxLyJlp+U5Uesrnp7zWT9WKiGPcxnC1J1hzRMZvPMfwCfLQ4QQ7b6m6VVsIo7SW9+G27DMkX5ExCWkNeOB1PPWQdY60tiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779129270; c=relaxed/simple;
-	bh=KVGb+yBaMLmcV/1WYBoHjFKU11MIukwUVmn4M4Y9y/I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c5pZZlr6eAP6eUV1q5YAdA/+k3NrScSS0YSnFdgLzkDN1qLtqJvmivZbG2/AVG13tPeikpwJzdUgd1R/JejM9CSUwiCKq6UykfcXTI5D4fiHN5EAQllUBSDNB0YE8McdL4eP5ycrGhsF22O1CKjuoRc4LAtxUp78jrEbKvfAAEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=passt.top; arc=none smtp.client-ip=88.198.0.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=passt.top
-Received: by passt.top (Postfix, from userid 1000)
-	id 685E05A061D; Mon, 18 May 2026 20:34:24 +0200 (CEST)
-From: Stefano Brivio <sbrivio@redhat.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1779129305; c=relaxed/simple;
+	bh=LuRPaFKS8OgFMkLFrIeH1PJ5pkp7C5RsHRnqAViwGZU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H2nRz4ERmrg40/1PthDuU5ZbPflp+upwkRSJJWku/4tdiSWmptSez/LfJpLfEodvVH4AW9fxMZT+v3ZYGd0G9F/7CRaDzPI4DVPq4aRaCqFq2moiVLeaRa+r+axVdmUzVkXrWBsac9bn3OCzyDtpSVKic7aPKl9NOmxMWlpK1t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mz3q6FHk; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50e5c7eb565so32992141cf.3
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 11:35:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779129303; x=1779734103; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HefdEi5yJeys6v2Xvf3SK5unmpenCeIO1ZUw+aAUkeI=;
+        b=mz3q6FHkhV0VIuGdMGfA1fLS36M+wV0pWJfFDSu1VTxkkoatTGh8wcvglwcjK9Qy1j
+         buBZqnbXndE7qkM39RmqfoNAQ4tTIweTXxO6v1PyD0rv8aWuqnFBtztoe6slXZwq0UCo
+         /yX4NfXa05AHCvQy69F2vMyaZn3tsIY8QcJw09uYEWf5gsfET8zmCQbzSaNmIyjmwyS4
+         Z0XrugnDikHEUaZuBGRisre/WO0qQe6MeYVI5fhLAZ/ty2ILJ4+/yVmc6U/NYVfZebm1
+         fXbD1jJp6sBMm5xEPzBl1P4rbCcyEsT3Z4GxetTGMGeMp/TNuLzfw2gPr/J2toUv4Ank
+         JG8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779129303; x=1779734103;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HefdEi5yJeys6v2Xvf3SK5unmpenCeIO1ZUw+aAUkeI=;
+        b=LGiogWiPfk8P6k1rrao3jvR481gnf/ofeeSDiTPsGI0GAvK7iDCfzTxb9ChgYhd3Mu
+         /vhp59rI8a/CkT/8yoHU6i5kXx2DT12STCpbGr4hWZ1F3DoWszfGkKpXmcUByLRF9Ytv
+         lAWyCMDZeeHIJO0ilvKLmRikUHeEdnmV7W4tdMUZu2MW2vm47KQJNLUwFhTAc9isej59
+         Dyr4x1Yy8lI+QraRwxrJEMJAu6Z5UhySJzKmt27rNqSJdVIHf/gS4/iAnprxUMnbvH81
+         PgNW52EVJSU1JlqiPb9YKwJyzgZMJMayqlRPrCbKxxkYbCs2B8XuZJUhhhz5sVC3FXVH
+         nfSg==
+X-Forwarded-Encrypted: i=1; AFNElJ/4hFxxBx7XTj1zXz93imkApCkoMfd9BHGnpGX6U4DLBppTp+p8upkkmiCMcyQAkevx0WTb0DM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpV5K5Fk6ZB5fh73Y06W7/mqNtfGiLpRoOlPOk3E8MI3W8yGog
+	jW3kIuPA8+a2j/ygL4vtD9Mve5dPeZWBia2JmcrA47Pm5BWMPh6p9nDE
+X-Gm-Gg: Acq92OGUbHPhgx3/AjVekWJ8Zx/rw0Dv8AFVgbpswYvNKj3JdNjnxHStmMi7aS1d5UO
+	pQfQNJNpnEQVfU3qsHhHxiERK+LbkC/FKHG1gzgQ7CfWDTMTdqfQmenkBJTN9mjaIBn88dxvHjY
+	D1tpqXR3cQOSEV/7iLqP2/MKCIo+41d4N5Ms+PMW2S8IU6cwfv6+t5ojLObyQRVqPGCz6/y0J4N
+	TsLzQ9Vqjozqy2yWHtEa1AJV5EPPkT4VNLLk4S4CZO4V/5bDMmtfQXfOwMc44EkDuyBTXODtCeS
+	eEfJPL57/WreJQ3L4cefEVhoO8rwXwR3iQLdAFHVThEPucyBfW2PwKG9eydyZ/SU0LmJuDqOp5S
+	zrIVa0weDiea9S9lukeGGC4jAMRhR6qZPR+AGuwUC9uiyvNxHOZU7oetzv4qLc+3TWvqDcmjDQ0
+	hvBoB8RvY3X/+qIJchfud0w/Ig9bieN/3lgLcRMI9XdJfrfE1w6qaSr5Ssbbw9StPnv0+GTPXPa
+	gndlpN3Yh5//VIqauji
+X-Received: by 2002:a05:622a:19a2:b0:50d:8080:2a7 with SMTP id d75a77b69052e-5165a0d1052mr213761201cf.21.1779129303092;
+        Mon, 18 May 2026 11:35:03 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5168c968930sm50315401cf.0.2026.05.18.11.35.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 11:35:02 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Pavel Emelyanov <xemul@scylladb.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Jon Maloy <jmaloy@redhat.com>,
-	Dmitry Safonov <dima@arista.com>,
-	Andrei Vagin <avagin@google.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
+Cc: James Chapman <jchapman@katalix.com>,
+	Tom Parkin <tparkin@katalix.com>,
 	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net v2 2/2] selftests: Add data path tests for TCP_REPAIR mode
-Date: Mon, 18 May 2026 20:34:24 +0200
-Message-ID: <20260518183424.3144867-3-sbrivio@redhat.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260518183424.3144867-1-sbrivio@redhat.com>
-References: <20260518183424.3144867-1-sbrivio@redhat.com>
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] l2tp: use list_del_rcu in l2tp_session_unhash
+Date: Mon, 18 May 2026 14:34:47 -0400
+Message-ID: <20260518183447.64078-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.54 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[redhat.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289156-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sbrivio@redhat.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,inner.sh:url,run.sh:url];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289155-lists,netdev=lfdr.de];
-	R_DKIM_NA(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 32509572549
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2DF485725A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The new tests check that, once TCP_REPAIR is enabled on a socket:
+An unprivileged local user can pin a host CPU indefinitely in
+l2tp_session_get_by_ifname() by issuing L2TP_CMD_SESSION_GET on
+L2TP_ATTR_IFNAME concurrently with L2TP_CMD_SESSION_CREATE and
+L2TP_CMD_SESSION_DELETE on the same tunnel. All three commands take
+GENL_UNS_ADMIN_PERM, so CAP_NET_ADMIN in the netns user namespace
+suffices; on any host that has l2tp_core loaded the trigger is
+reachable from a standard `unshare -Urn` sandbox.
 
-- additional incoming data queued to it don't increase the sequence
-  number dumped via TCP_QUEUE_SEQ socket option
+l2tp_session_unhash() removes a session from tunnel->session_list
+with list_del_init(), but that list is walked by
+l2tp_session_get_by_ifname() with list_for_each_entry_rcu() under
+rcu_read_lock_bh(). list_del_init() leaves the deleted entry's
+next/prev self-pointing; a reader that has loaded the entry and
+then advances pos->list.next reads &session->list, container_of()s
+back to the same session, and list_for_each_entry_rcu() never
+reaches the list head. The CPU stays in strcmp() inside the
+walker, with BH and preemption disabled, so RCU grace periods on
+the host stall behind it and the wedged thread cannot be killed
+(SIGKILL is delivered on syscall return).
 
-- a connected endpoint will not receive ACK segments after sending
-  more data
+Use list_del_rcu() to match the existing list_add_rcu() in
+l2tp_session_register(); the deleted session remains visible to
+in-flight walkers with consistent next/prev pointers until
+kfree_rcu() in l2tp_session_free() releases it. tunnel->session_list
+has exactly one list_del_init() call site; the list_del_init
+(&session->clist) at l2tp_core.c:533 operates on the per-collision
+list, which is not walked under RCU. list_empty(&session->list) is
+not used anywhere in net/l2tp/ after the unhash point, so dropping
+the post-delete self-init is safe; the fix has no userspace-visible
+behavior change.
 
-These tests are implemented by a client, sending data and commands
-(accept connection, enter repair mode, dump sequences, receive data,
-and exit) describing the test sequence, and a server receiving data
-and implementing those commands.
-
-This way, the client can accurately synchronise repair modes with
-data exchanges.
-
-In order to avoid using loopback connections, where data would be
-immediately acknowledged by the server side without packets being
-actually sent or received, the client resides in a separate network
-namespace ("inner") compared to the server, and a veth interface pair
-connects them.
-
-The tests can be run unprivileged as the outer network and user
-namespaces are also detached as a first step, so that the veth
-interfaces can be created in outer and inner namespaces without
-capabilities.
-
-Signed-off-by: Stefano Brivio <sbrivio@redhat.com>
+Fixes: 89b768ec2dfef ("l2tp: use rcu list add/del when updating lists")
+Cc: stable@vger.kernel.org # 6.11+
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
-v2: No changes
+Distro reachability:
 
- tools/testing/selftests/Makefile              |   1 +
- .../selftests/net/tcp_repair/.gitignore       |   3 +
- .../testing/selftests/net/tcp_repair/Makefile |  23 ++
- .../testing/selftests/net/tcp_repair/client.c | 273 ++++++++++++++++++
- .../testing/selftests/net/tcp_repair/inner.sh |  32 ++
- .../testing/selftests/net/tcp_repair/outer.sh |  44 +++
- tools/testing/selftests/net/tcp_repair/run.sh |  12 +
- .../testing/selftests/net/tcp_repair/server.c | 155 ++++++++++
- tools/testing/selftests/net/tcp_repair/talk.h |  26 ++
- 9 files changed, 569 insertions(+)
- create mode 100644 tools/testing/selftests/net/tcp_repair/.gitignore
- create mode 100644 tools/testing/selftests/net/tcp_repair/Makefile
- create mode 100644 tools/testing/selftests/net/tcp_repair/client.c
- create mode 100755 tools/testing/selftests/net/tcp_repair/inner.sh
- create mode 100755 tools/testing/selftests/net/tcp_repair/outer.sh
- create mode 100755 tools/testing/selftests/net/tcp_repair/run.sh
- create mode 100644 tools/testing/selftests/net/tcp_repair/server.c
- create mode 100644 tools/testing/selftests/net/tcp_repair/talk.h
+l2tp_core / l2tp_netlink autoload via the genl family alias
+net-pf-16-proto-16-family-l2tp on first AF_NETLINK CTRL_CMD_GETFAMILY
+lookup; this autoload does not require CAP_NET_ADMIN. Verified on
+Ubuntu 26.04 dev as uid 1000 with no capabilities: `ip l2tp show
+tunnel` triggers the load.
 
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index 6e59b8f63e41..e119abe5c78e 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -84,6 +84,7 @@ TARGETS += net/packetdrill
- TARGETS += net/ppp
- TARGETS += net/rds
- TARGETS += net/tcp_ao
-+TARGETS += net/tcp_repair
- TARGETS += nolibc
- TARGETS += nsfs
- TARGETS += pci_endpoint
-diff --git a/tools/testing/selftests/net/tcp_repair/.gitignore b/tools/testing/selftests/net/tcp_repair/.gitignore
-new file mode 100644
-index 000000000000..9756c86770b9
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_repair/.gitignore
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+client
-+server
-diff --git a/tools/testing/selftests/net/tcp_repair/Makefile b/tools/testing/selftests/net/tcp_repair/Makefile
-new file mode 100644
-index 000000000000..d01d0a20b6df
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_repair/Makefile
-@@ -0,0 +1,23 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# selftests/net/tcp_repair: TCP_REPAIR connection tests
-+#
-+# Makefile - Build test client and server, declare run.sh entrypoint
-+#
-+# Copyright (c) 2026 Red Hat GmbH
-+#
-+# Author: Stefano Brivio <sbrivio@redhat.com>
-+
-+top_srcdir = ../../../../..
-+
-+CFLAGS += -Wall -Wextra -pedantic
-+
-+TEST_PROGS := \
-+	run.sh
-+
-+TEST_GEN_FILES := \
-+	client \
-+	server \
-+# end of TEST_GEN_FILES
-+
-+include ../../lib.mk
-diff --git a/tools/testing/selftests/net/tcp_repair/client.c b/tools/testing/selftests/net/tcp_repair/client.c
-new file mode 100644
-index 000000000000..b5106bf922b1
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_repair/client.c
-@@ -0,0 +1,273 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+/* selftests/net/tcp_repair: TCP_REPAIR connection tests
-+ *
-+ * client.c - Run list of tests, send commands and data to server
-+ *
-+ * Copyright (c) 2026 Red Hat GmbH
-+ *
-+ * Author: Stefano Brivio <sbrivio@redhat.com>
-+ */
-+
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <sys/socket.h>
-+#include <arpa/inet.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <netdb.h>
-+
-+#include <linux/tcp.h>		/* latest and greatest struct tcp_info, but */
-+#define SOL_TCP		6	/* we can't include netinet/tcp.h as a result */
-+
-+#include "talk.h"
-+
-+/**
-+ * srv() - Send command to server, return received value (not for ACCEPT)
-+ * @ctl:	Control socket
-+ * @op:		Command type
-+ * @arg:	Optional argument (always sent, might be zero)
-+ *
-+ * Return: integer value received by client as response
-+ */
-+int srv(int ctl, enum op op, int arg)
-+{
-+	int cmd[2] = { op, arg }, ret;
-+
-+	send(ctl, cmd, sizeof(cmd), 0);
-+	if (op != ACCEPT)
-+		recv(ctl, &ret, sizeof(ret), 0);
-+
-+	return ret;
-+}
-+
-+/**
-+ * test_seq_slow_path() - Sequence doesn't change after sending one byte
-+ * @ctl:	Control socket
-+ * @data:	Data socket
-+ *
-+ * Return: 0 if the test passes, -1 if it fails
-+ */
-+int test_seq_slow_path(int ctl, int data)
-+{
-+	uint32_t seq1, seq2;
-+
-+	(void)ctl;
-+	(void)data;
-+
-+	srv(ctl, REPAIR, TCP_REPAIR_ON);
-+	seq1 = (uint32_t)srv(ctl, DUMP_RECV_SEQ, 0);
-+
-+	send(data, (char *)("a"), 1, 0);
-+
-+	seq2 = (uint32_t)srv(ctl, DUMP_RECV_SEQ, 0);
-+
-+	if (seq1 != seq2) {
-+		fprintf(stderr, "Sequence changed in repair mode, %u -> %u\n",
-+			seq1, seq2);
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * test_seq_fast_path() - Sequence doesn't change after a large transfer
-+ * @ctl:	Control socket
-+ * @data:	Data socket
-+ *
-+ * Return: 0 if the test passes, -1 if it fails
-+ */
-+int test_seq_fast_path(int ctl, int data)
-+{
-+	char buf[1000] = { 0 };
-+	uint32_t seq1, seq2;
-+	int i;
-+
-+	(void)ctl;
-+	(void)data;
-+
-+	for (i = 0; i < 50; i++) {
-+		send(data, buf, sizeof(buf), 0);
-+		srv(ctl, RECV, sizeof(buf));
-+	}
-+
-+	srv(ctl, REPAIR, TCP_REPAIR_ON);
-+	seq1 = (uint32_t)srv(ctl, DUMP_RECV_SEQ, 0);
-+
-+	fcntl(data, F_SETFL, O_NONBLOCK);
-+	for (i = 0; i < 50; i++)
-+		send(data, buf, sizeof(buf), 0);
-+
-+	seq2 = (uint32_t)srv(ctl, DUMP_RECV_SEQ, 0);
-+
-+	if (seq1 != seq2) {
-+		fprintf(stderr, "Sequence changed in repair mode, %u -> %u\n",
-+			seq1, seq2);
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * test_acked_slow_path() - Our ACK sequence doesn't change after sending byte
-+ * @ctl:	Control socket
-+ * @data:	Data socket
-+ *
-+ * Return: 0 if the test passes, -1 if it fails
-+ */
-+int test_acked_slow_path(int ctl, int data)
-+{
-+	unsigned long acked1, acked2;
-+	struct tcp_info tinfo;
-+	socklen_t sl;
-+
-+	(void)ctl;
-+	(void)data;
-+
-+	srv(ctl, REPAIR, TCP_REPAIR_ON);
-+
-+	sl = sizeof(tinfo);
-+	getsockopt(data, SOL_TCP, TCP_INFO, &tinfo, &sl);
-+	acked1 = tinfo.tcpi_bytes_acked;
-+
-+	send(data, (char *)("a"), 1, 0);
-+
-+	getsockopt(data, SOL_TCP, TCP_INFO, &tinfo, &sl);
-+	acked2 = tinfo.tcpi_bytes_acked;
-+
-+	if (acked1 != acked2) {
-+		fprintf(stderr, "ACK received in repair mode, %lu -> %lu\n",
-+			acked1, acked2);
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * test_acked_fast_path() - Our ACK sequence doesn't change after large transfer
-+ * @ctl:	Control socket
-+ * @data:	Data socket
-+ *
-+ * Return: 0 if the test passes, -1 if it fails
-+ */
-+int test_acked_fast_path(int ctl, int data)
-+{
-+	unsigned long acked1, acked2;
-+	char buf[1000] = { 0 };
-+	struct tcp_info tinfo;
-+	socklen_t sl;
-+	int i;
-+
-+	(void)ctl;
-+	(void)data;
-+
-+	for (i = 0; i < 50; i++) {
-+		send(data, buf, sizeof(buf), 0);
-+		srv(ctl, RECV, sizeof(buf));
-+	}
-+
-+	srv(ctl, REPAIR, TCP_REPAIR_ON);
-+
-+	sl = sizeof(tinfo);
-+	getsockopt(data, SOL_TCP, TCP_INFO, &tinfo, &sl);
-+	acked1 = tinfo.tcpi_bytes_acked;
-+
-+	fcntl(data, F_SETFL, O_NONBLOCK);
-+	for (i = 0; i < 50; i++)
-+		send(data, buf, sizeof(buf), 0);
-+
-+	getsockopt(data, SOL_TCP, TCP_INFO, &tinfo, &sl);
-+	acked2 = tinfo.tcpi_bytes_acked;
-+
-+	if (acked1 != acked2) {
-+		fprintf(stderr, "ACK received in repair mode, %lu -> %lu\n",
-+			acked1, acked2);
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * struct test - List of tests
-+ * @desc:	Test description
-+ * @f:		Function executing the test
-+ */
-+struct {
-+	char *desc;
-+	int (*f)(int ctl, int data);
-+} test[] = {
-+	{
-+		"Sequence freezes in repair mode, slow path TCP input",
-+		test_seq_slow_path,
-+	},
-+	{
-+		"Sequence freezes in repair mode, fast path TCP input",
-+		test_seq_fast_path,
-+	},
-+	{
-+		"No ACKs in repair mode, slow path TCP input",
-+		test_acked_slow_path,
-+	},
-+	{
-+		"No ACKs in repair mode, fast path TCP input",
-+		test_acked_fast_path,
-+	},
-+};
-+
-+/**
-+ * main() - Entry point, connect control socket to server and run list of tests
-+ * @argc:	Argument count, must be 3 (two options)
-+ * @argv:	Options: server address and port
-+ *
-+ * Return: -1 on bad usage, 0 on success, 1 if at least one test fails
-+ */
-+int main(int argc, char **argv)
-+{
-+	struct addrinfo hints = { 0, AF_UNSPEC, SOCK_STREAM, 0, 0,
-+				  NULL, NULL, NULL };
-+	int ctl, data, ret = 0;
-+	struct addrinfo *r;
-+	unsigned i;
-+
-+	if (argc != 3) {
-+		fprintf(stderr, "%s DST_ADDR DST_PORT\n", argv[0]);
-+		return -1;
-+	}
-+
-+	getaddrinfo(argv[1], argv[2], &hints, &r);
-+
-+	ctl = socket(r->ai_family, SOCK_STREAM, IPPROTO_TCP);
-+	setsockopt(ctl, SOL_SOCKET, SO_REUSEADDR, &((int){ 1 }), sizeof(int));
-+	connect(ctl, r->ai_addr, r->ai_addrlen);
-+
-+	for (i = 0; i < sizeof(test) / sizeof(test[0]); i++) {
-+		int rc;
-+
-+		data = socket(r->ai_family, SOCK_STREAM, IPPROTO_TCP);
-+		setsockopt(data, SOL_SOCKET, SO_REUSEADDR,
-+			   &((int){ 1 }), sizeof(int));
-+		srv(ctl, ACCEPT, 0);
-+		connect(data, r->ai_addr, r->ai_addrlen);
-+
-+		rc = test[i].f(ctl, data);
-+
-+		close(data);
-+
-+		if (rc) {
-+			fprintf(stdout, "TEST: %-60s  [FAIL]\n", test[i].desc);
-+			ret = 1;
-+		} else {
-+			fprintf(stdout, "TEST: %-60s  [ OK ]\n", test[i].desc);
-+		}
-+	}
-+
-+	return ret;
-+}
-diff --git a/tools/testing/selftests/net/tcp_repair/inner.sh b/tools/testing/selftests/net/tcp_repair/inner.sh
-new file mode 100755
-index 000000000000..3987dc0514a8
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_repair/inner.sh
-@@ -0,0 +1,32 @@
-+#!/bin/sh -euf
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# selftests/net/tcp_repair: TCP_REPAIR connection tests
-+#
-+# inner.sh - Set up link to outer namespace, run test client in inner namespace
-+#
-+# Copyright (c) 2026 Red Hat GmbH
-+#
-+# Author: Stefano Brivio <sbrivio@redhat.com>
-+
-+ns_inner_dir="${1}"
-+
-+# Tell the parent shell about our PID
-+echo "${$}" > "${ns_inner_dir}/pid"
-+mkdir "${ns_inner_dir}/pid_ready"
-+
-+# Wait for veth to appear
-+while [ -z "$(sed -n '4p' /proc/net/dev)" ]; do
-+	sleep 0.1 || sleep 1
-+done
-+
-+# Set up link to outer namespace
-+ip link set dev veth0 up
-+ip addr add 169.254.2.2 dev veth0
-+ip ro add default dev veth0
-+
-+# Finally run tests
-+set +e
-+./client 169.254.2.1 1024
-+echo "${?}" > "${ns_inner_dir}/result"
-+mkdir "${ns_inner_dir}/result_ready"
-diff --git a/tools/testing/selftests/net/tcp_repair/outer.sh b/tools/testing/selftests/net/tcp_repair/outer.sh
-new file mode 100755
-index 000000000000..17ae1230f0e5
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_repair/outer.sh
-@@ -0,0 +1,44 @@
-+#!/bin/sh -euf
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# selftests/net/tcp_repair: TCP_REPAIR connection tests
-+#
-+# outer.sh - Set up outer namespace, run test server there
-+#
-+# Copyright (c) 2026 Red Hat GmbH
-+#
-+# Author: Stefano Brivio <sbrivio@redhat.com>
-+
-+ns_inner_dir="$(mktemp -d)"
-+
-+cleanup() {
-+	rm -rf "${ns_inner_dir}"
-+}
-+
-+trap cleanup EXIT
-+
-+# Detach inner namespace in a subshell, tests start from there
-+unshare -rUn -- ./inner.sh "${ns_inner_dir}" &
-+
-+# Wait for inner namespace
-+while [ ! -d "${ns_inner_dir}/pid_ready" ]; do
-+	sleep 0.1 || sleep 1
-+done
-+
-+# Set up link to inner namespace
-+ip link add veth0 type veth peer name veth0 netns "$(cat "${ns_inner_dir}/pid")"
-+ip link set dev veth0 up
-+ip addr add 169.254.2.1 dev veth0
-+ip ro add default dev veth0
-+
-+# Run test server
-+./server 1024
-+
-+# Wait for test results
-+while [ ! -d "${ns_inner_dir}/result_ready" ]; do
-+	sleep 0.1 || sleep 1
-+done
-+
-+# Clean up and return results
-+ret="$(cat "${ns_inner_dir}/result")"
-+exit "${ret}"
-diff --git a/tools/testing/selftests/net/tcp_repair/run.sh b/tools/testing/selftests/net/tcp_repair/run.sh
-new file mode 100755
-index 000000000000..f87ff0a8a6f6
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_repair/run.sh
-@@ -0,0 +1,12 @@
-+#!/bin/sh -euf
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# selftests/net/tcp_repair: TCP_REPAIR connection tests
-+#
-+# run.sh - Test entry point: detach outer namespace and run outer.sh in it
-+#
-+# Copyright (c) 2026 Red Hat GmbH
-+#
-+# Author: Stefano Brivio <sbrivio@redhat.com>
-+
-+unshare -rUn -- ./outer.sh
-diff --git a/tools/testing/selftests/net/tcp_repair/server.c b/tools/testing/selftests/net/tcp_repair/server.c
-new file mode 100644
-index 000000000000..256c321320b7
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_repair/server.c
-@@ -0,0 +1,155 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* selftests/net/tcp_repair: TCP_REPAIR connection tests
-+ *
-+ * server.c - Receive commands and data, set TCP_REPAIR options on data socket
-+ *
-+ * Copyright (c) 2026 Red Hat GmbH
-+ *
-+ * Author: Stefano Brivio <sbrivio@redhat.com>
-+ */
-+
-+#include <errno.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <sys/socket.h>
-+#include <arpa/inet.h>
-+
-+#include <linux/tcp.h>		/* needed for TCP_REPAIR constants but */
-+#define SOL_TCP		6	/* we can't include netinet/tcp.h as a result */
-+
-+#include "talk.h"
-+
-+/**
-+ * cmd_accept() - Accept data connection (must be first command in test)
-+ * @unused:	Not used
-+ * @listen:	Listening socket
-+ * @data:	Return value from accept(), set on return
-+ *
-+ * Return: 0
-+ */
-+int cmd_accept(int unused, int listen, int *data)
-+{
-+	(void)unused;
-+
-+	if (*data != -1)
-+		close(*data);
-+
-+	*data = accept(listen, NULL, NULL);
-+
-+	return 0;
-+}
-+
-+/**
-+ * cmd_dump_recv_seq() - Dump receive sequence of data socket
-+ * @unused:	Not used
-+ * @unused2:	Not used
-+ * @data:	File descriptor for data socket
-+ *
-+ * Return: receive sequence of data socket
-+ */
-+int cmd_dump_recv_seq(int unused, int unused2, int *data)
-+{
-+	socklen_t sl;
-+	int v;
-+
-+	(void)unused;
-+	(void)unused2;
-+
-+	v = TCP_RECV_QUEUE;
-+	setsockopt(*data, SOL_TCP, TCP_REPAIR_QUEUE, &v, sizeof(v));
-+
-+	sl = sizeof(v);
-+	getsockopt(*data, SOL_TCP, TCP_QUEUE_SEQ, &v, &sl);
-+	return v;
-+}
-+
-+/**
-+ * cmd_exit() - Exit successfully
-+ * @unused:	Not used
-+ * @unused2:	Not used
-+ * @unused3:	Not used
-+ *
-+ * Return: this function doesn't actually return
-+ */
-+int cmd_exit(int unused, int unused2, int *unused3)
-+{
-+	(void)unused;
-+	(void)unused2;
-+	(void)unused3;
-+
-+	exit(EXIT_SUCCESS);
-+	return 0;
-+}
-+
-+/**
-+ * cmd_recv() - Receive (discard) a given amount of bytes
-+ * @len:	Amount of bytes the client wants us to receive
-+ * @unused:	Not used
-+ * @data:	File descriptor for data socket
-+ *
-+ * Return: return code from recv()
-+ */
-+int cmd_recv(int len, int unused, int *data)
-+{
-+	(void)unused;
-+
-+	return recv(*data, NULL, len, MSG_TRUNC);
-+}
-+
-+/**
-+ * cmd_repair() - Set repair mode to mode supplied by client
-+ * @mode:	Value for socket option provided by the client
-+ * @unused:	Not used
-+ * @data:	File descriptor for data socket
-+ *
-+ * Return: return code from setsockopt()
-+ */
-+int cmd_repair(int mode, int unused, int *data)
-+{
-+	(void)unused;
-+
-+	return setsockopt(*data, SOL_TCP, TCP_REPAIR, &mode, sizeof(mode));
-+}
-+
-+/* List of commands and their handlers */
-+int (*fn[])(int arg, int listen, int *data) = {
-+	[ACCEPT]	= cmd_accept,
-+	[DUMP_RECV_SEQ]	= cmd_dump_recv_seq,
-+	[EXIT]		= cmd_exit,
-+	[RECV]		= cmd_recv,
-+	[REPAIR]	= cmd_repair,
-+};
-+
-+/**
-+ * main() - Entry point, accept control connection and dispatch commands
-+ * @argc:	Argument count, must be 2 (one option)
-+ * @argv:	Options: server port
-+ *
-+ * Return: 0 on success, exit on failure
-+ */
-+int main(int argc, char **argv)
-+{
-+	struct sockaddr_in a = { AF_INET, htons(atoi(argv[1])), { 0 }, { 0 } };
-+	int s, ctl, data = -1, cmd[2];
-+
-+	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-+	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &((int){ 1 }), sizeof(int));
-+
-+	if (argc != 2) {
-+		fprintf(stderr, "%s PORT\n", argv[0]);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	bind(s, (struct sockaddr *)&a, sizeof(a));
-+	listen(s, 0);
-+	ctl = accept(s, NULL, NULL);
-+
-+	while (recv(ctl, cmd, sizeof(cmd), 0) == sizeof(cmd)) {
-+		int ret = fn[cmd[0]](cmd[1], s, &data);
-+		if (cmd[0] != ACCEPT)
-+			send(ctl, &ret, sizeof(ret), 0);
-+	}
-+
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/net/tcp_repair/talk.h b/tools/testing/selftests/net/tcp_repair/talk.h
-new file mode 100644
-index 000000000000..e2fbad7fae07
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_repair/talk.h
-@@ -0,0 +1,26 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+/* selftests/net/tcp_repair: TCP_REPAIR connection tests
-+ *
-+ * talk.h - Communication protocol for client and server
-+ *
-+ * Copyright (c) 2026 Red Hat GmbH
-+ *
-+ * Author: Stefano Brivio <sbrivio@redhat.com>
-+ */
-+
-+/**
-+ * enum op - Server command type (taking optional int argument, returning int)
-+ * @ACCEPT		Accept connection on data socket (doesn't return int)
-+ * @DUMP_RECV_SEQ	Dump receive sequence, return it to the client
-+ * @EXIT		Exit, return 0 to the client
-+ * @RECV		Try receiving given amount of bytes, return received
-+ * @REPAIR		Set repair mode to argument, return setsockopt() value
-+ */
-+enum op {
-+	ACCEPT,
-+	DUMP_RECV_SEQ,
-+	EXIT,
-+	RECV,
-+	REPAIR,
-+};
--- 
-2.43.0
+The userns CAP_NET_ADMIN gate is open to a standard unprivileged user
+on Debian 11/12, Ubuntu 22.04 LTS, Arch, Alpine, and (via
+snap / podman / firejail with a userns-permitting AppArmor profile)
+Ubuntu 23.10+ / 24.04+. RHEL 8/9 and Fedora 31+ blacklist
+l2tp_netlink in /etc/modprobe.d/ by default, so those distros require
+admin enablement before the surface is reachable; once the module is
+loaded (e.g. on a host running xl2tpd, NetworkManager-l2tp, or any
+L2TPv3 VPN endpoint), the gate is open there too.
+
+Reproduced on QEMU/x86_64 (KASAN + LOCKDEP + PROVE_RCU + PREEMPT
+(full), SMP=4) and on bare-metal Ubuntu 7.0.0-14-generic with a
+small create / delete + ifname-get harness. Stock kernel: first
+rcu_preempt self-detected stall at 27 s, recurring every ~80 s,
+8 stalls in a 600 s run; bare metal produced softlockup BUG: CPU
+stuck for 26 s with RIP at l2tp_session_get_by_ifname+0x90 within
+30 s of harness start, and the CPU remained pinned after harness
+exit. Patched kernel under the same harness for 600 s: 282943
+create/delete pairs plus 15381066 getter calls completed with zero
+anomalies. The kernel ships no tools/testing/selftests/net/l2tp/
+binaries and no l2tp KUnit module. Harness source available on
+request.
+
+ net/l2tp/l2tp_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index 157fc23ce4e14..1455f67e01ddb 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1360,7 +1360,7 @@ static void l2tp_session_unhash(struct l2tp_session *session)
+ 		spin_lock_bh(&pn->l2tp_session_idr_lock);
+
+ 		/* Remove from the per-tunnel list */
+-		list_del_init(&session->list);
++		list_del_rcu(&session->list);
+
+ 		/* Remove from per-net IDR */
+ 		if (tunnel->version == L2TP_HDR_VER_3) {
+--
+2.46.0
 
 
