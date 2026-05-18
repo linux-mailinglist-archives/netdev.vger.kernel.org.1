@@ -1,387 +1,260 @@
-Return-Path: <netdev+bounces-289181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289182-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UExQMYCFC2paIwUAu9opvQ
-	(envelope-from <netdev+bounces-289181-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:32:48 +0200
+	id qKq5LzuGC2p1IwUAu9opvQ
+	(envelope-from <netdev+bounces-289182-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:35:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFE87573E86
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:32:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23C9E573F14
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 052A8300A5A3
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 21:32:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5255030075F2
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 21:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCEB39184F;
-	Mon, 18 May 2026 21:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA21E39A046;
+	Mon, 18 May 2026 21:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DK+OiKIi"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AMCmSssC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563E827A91D
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 21:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224B5396D19;
+	Mon, 18 May 2026 21:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779139963; cv=none; b=DkuOmA5Rp4AicgjJP0yEXwTNxxeJwZ6BQHLq1VH4yhDEsZqGYMcpEdNnYwxivr3E9CGn0TBmTYyZFk5Cg0wvWeZKDawxcliSojoZblOP/yQ6V1QkQtBzEgTBA4vBQWbQqqqIMQgyvIZoZmtGhRXbZXl+jG5u3arF9CdUwCFypWQ=
+	t=1779140014; cv=none; b=AznZQNiFmk6nCFImM6pyXk3u4Lx9XF+UHzb/ExA/7llUXq9IdY+3kCf839k99+iA73T/xv8cYLkgXNbhHr2GQEoSgM5z30uTMz/D2PIZuOXJUzimO5HLxGn8RCTmrBrR8rjVi4Inucj1wDQWIamK0NZX3Sw27u8DAsglGo0tC+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779139963; c=relaxed/simple;
-	bh=3aO2yCIwUg/uOsD4q75e/EVR3uTZHduiRHimOrSA678=;
+	s=arc-20240116; t=1779140014; c=relaxed/simple;
+	bh=jm+8XSYDMvSi0eSTW0hiNffY0O5/GrMLm2X7qEh1GeQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sBJkD9DX1mqfD1w8lVbBq1rZIkFXi2INI4cgSZVWt6cLyTu6qnT63XMlgGwzAs03tDhYUSNMx7DhUyENp3ULtPJpuJ1jJRFckydkJlqjvZboE5T/TvyA72UGOXldSsXvXTpz//cJQudyXQECGz3IbvEmq5jpNOIOQ1JAxrpj8s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DK+OiKIi; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-834f1075805so2138976b3a.2
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 14:32:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779139962; x=1779744762; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8XdCdfE4QefmdTL9pvsdi/RQj4TXB83Ld+/w0tbLorI=;
-        b=DK+OiKIiw/EFRHmb2Ir5NLJKuVR+okJ4hzupkR6nU2olcJ67E4ZMc1ygTvmKO4vKoD
-         ljWG57V8XD8681qPYnMuzMcT6wb4HWvqzmVeju3zWQrOfF9VWKNbCQdDqRK6AL6ugJ5s
-         o5tivJjl72zX6v5BejnexT86HagBJuqjkmhEsYoJmxpBABVe5h/YjIdvGy9WiLej8PaI
-         Ca7pP5DDY+3HjllKbql56c2x4HkaabT0K0damBIhks3Jbzr1ux+uY0+OyI5VtQCDzMbF
-         B6Y3cHGD6ngrEgYbOt5KEkbPrW3OPOl0UkqD2SSFYxrNXiRoDhSrtXem6OmN9Wzzkhm5
-         Fhbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779139962; x=1779744762;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8XdCdfE4QefmdTL9pvsdi/RQj4TXB83Ld+/w0tbLorI=;
-        b=ku0ha/AmKTcIRm6JV577v/9jHVzcRnIxo6QGnWSTujoIWNK4Qc3VsqwdQlTC0FXCbB
-         y9h1PK/HMpO0jODGxc1eBEBe1XSbAiDt/G2/IR3lYRahuHt98xLh5PcxyK+FUs397E1e
-         vH89+YItgBjg3K4iRnGxirJBWlC3Xrb7OFMwiClycBEw09SoVlWD8Cq58qetOsRvsz+K
-         VOyLIV8uE0D4EmGpqyYXN8XyfLnMBHmsWs/qfhYmbK1JKo+erK/OEIYoNS+HFhwsnUBu
-         JcRTY9dfMfZCzSd2/8ImTwyUCA+uh1yivlSyJG/fLlGPlqqfD2IQyEH+EQGAoPzIqNyT
-         6QOA==
-X-Forwarded-Encrypted: i=1; AFNElJ/W+Sa8Df2cZMmQGLqK6ocTOglwkfEauD8HS/J2Ae/+dLJiMjorQ+RLdkGwTYcxuTOdePOR7bA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgyQtCG2f0dXZDDFuIMIxphejkAp9AZw5M4b1rNXa/WEkw9QYb
-	H+fQ7iPw/V8ZSoNKXKiRMrMvre4JW82qjOwRIk75XHA7X/Ot8xtfkrAU20Zf5eXY
-X-Gm-Gg: Acq92OEVt5XPtCjboarxIl587J4RDRDxoAY8gKPPDILR0Z91rs3X0VHN8iia4WfjpMJ
-	tRegpGyhf6Z5aBukEd4gAhuFC/3GV9HDNzeUQB3H4l6QgKmMt/CqYPyWo1sH0W8lyl73C0U+nBZ
-	TVUGxXeRklQKq0wYh3zVj3gEq8ExaPB8lhMnerrKfZrdDqvKGW3zDa/6Kmo1fn5OmwO4VEPOWzJ
-	dK1XJDFWjT62iRulwytEETKvpq6Lx56n2FShgocV0yLlJvG2zpLnXHsol6xA1YbFjr8J7hezKel
-	Nf7nwAsifFPQaiFyWqhRdDb0p7LwXe4y8ZzgQFfWtMKvCpSoZQ07O7N7kZhvMHfjYBh79Fisb7Q
-	EdOFbC/0ebHm2JxqvWMxxnOaAQoScuWv08zjs1Z7akfl3wjTDededZ8VH+hzD+db5lhxqVoRc8h
-	hxbCnHS3kY8eV+og/hlVKnZBNpyeNgb5I=
-X-Received: by 2002:a05:6a00:2e9f:b0:83d:446c:2aa4 with SMTP id d2e1a72fcca58-83f33dd346emr17824630b3a.33.1779139961622;
-        Mon, 18 May 2026 14:32:41 -0700 (PDT)
-Received: from john-p8 ([98.97.42.187])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f75c0d232sm4274129b3a.17.2026.05.18.14.32.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 14:32:40 -0700 (PDT)
-Date: Mon, 18 May 2026 14:32:38 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Zhang Cen <rollkingzzc@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, zerocling0077@gmail.com, 
-	2045gemini@gmail.com, stable@vger.kernel.org
-Subject: Re: [PATCH v2] bpf, sockmap: keep sk_msg copy state in sync
-Message-ID: <rclmtymkiaor247n7gwi6ggmpwi2hyu5hicggroopeohspfnyv@7ryrgezzs63q>
-References: <20260517121626.406516-1-rollkingzzc@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UB4vPAipjPLL8W+QRS8qxCZclJ2716/xkEiVLpvBdQU5fM2mMt+Zgs/cvfsclxazuHWsioNaEunQRoTyALQnwI5vjMUm4ATINlOoso+50c7zYeiPTHyFAnW69fFUHzSxVVOAJjLM6+jl39GYVGHSni4+9+uMV7a5uBL1qRHI3KI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AMCmSssC; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 2796120B7166; Mon, 18 May 2026 14:33:26 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2796120B7166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1779140006;
+	bh=OzpN7yYP9aHL5n1nKfsdJpLTuSYn6hCedu5lqH42zIw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AMCmSssCko7dJ3wVbDRNEAWDRlKL/LtcghLRS6ceCmjRe0bHfR+KshONAlQReiXl3
+	 Y7KB9U/oPWzZkmYB8UL7Utt2vLSgAshYCaFf/FBk/vIxP2bUnW+UhwjCDupfHJZxAx
+	 r+eeEiPqyjnVf7fiMLbKq3/fpgX/EXvFNZ5inb4Q=
+Date: Mon, 18 May 2026 14:33:26 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org, jacob.e.keller@intel.com,
+	dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
+	john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
+	yury.norov@gmail.com
+Subject: Re: [PATCH v8 2/2] net: mana: force full-page RX buffers via ethtool
+ private flag
+Message-ID: <aguFpq8+LV+I9oH0@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260508115100.488506-3-dipayanroy@linux.microsoft.com>
+ <20260512022133.856196-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260517121626.406516-1-rollkingzzc@gmail.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <20260512022133.856196-1-kuba@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289181-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289182-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,fomichev.me,cloudflare.com,davemloft.net,google.com,redhat.com,vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johnfastabend@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: CFE87573E86
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,linux.microsoft.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 23C9E573F14
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 17, 2026 at 08:16:26PM +0800, Zhang Cen wrote:
->SK_MSG uses msg->sg.copy as per-scatterlist-entry provenance. Entries
->with this bit set are copied before data/data_end are exposed to SK_MSG
->BPF programs for direct packet access.
->
->bpf_msg_pull_data(), bpf_msg_push_data() and bpf_msg_pop_data() rewrite
->the sk_msg scatterlist ring by collapsing, splitting and shifting
->entries. These operations move msg->sg.data[] entries, but the parallel
->copy bitmap can be left behind or stale in slots that no longer contain
->the original entry. A copied entry can therefore later occupy a slot whose
->copy bit is clear and be exposed as directly writable packet data.
->
->Keep msg->sg.copy synchronized with scatterlist entry moves, preserve the
->copy bit when an entry is split, clear it when a helper replaces an entry
->with a private page, and clear every slot vacated by pull-data
->compaction.
->
->Fixes: 015632bb30da ("bpf: sk_msg program helper bpf_sk_msg_pull_data")
->Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
->Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
->Cc: stable@vger.kernel.org
->Co-developed-by: Han Guidong <2045gemini@gmail.com>
->Signed-off-by: Han Guidong <2045gemini@gmail.com>
->Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
->---
->v2:
->Sashiko-bot pointed out that bpf_msg_pull_data() could leave stale copy
->bits on collapsed tail entries.
->
->Clear msg->sg.copy for every entry consumed by bpf_msg_pull_data()
->before compacting the scatterlist ring.
->
->While researching recent page cache bugs, we discovered this bug.
->We confirmed it allows overwriting the page cache of read-only files
->via splice(). We haven't attempted to write an exploit, but the
->corruption primitive is verified. PoC available upon request.
->Recommend fixing ASAP.
+On Mon, May 11, 2026 at 07:21:33PM -0700, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net: mana: force full-page RX buffers via ethtool private flag
+> 
+> This patch adds an ethtool private flag "full-page-rx" that forces one
+> RX buffer per page, bypassing the page_pool fragment path, to address
+> a 15-20% throughput regression seen on some 4K PAGE_SIZE ARM64
+> platforms under high connection counts.  Toggling the flag triggers
+> mana_detach() + mana_attach() to apply the new RX buffer layout.
+> 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > index a28ca461c135..dfd222de11d0 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> 
+> [ ... ]
+> 
+> > @@ -590,6 +609,88 @@ static int mana_get_link_ksettings(struct net_device *ndev,
+> >  	return 0;
+> >  }
+> >  
+> 
+> [ ... ]
+> 
+> > +static int mana_set_priv_flags(struct net_device *ndev, u32 priv_flags)
+> > +{
+> > +	struct mana_port_context *apc = netdev_priv(ndev);
+> > +	u32 changed = apc->priv_flags ^ priv_flags;
+> > +	u32 old_priv_flags = apc->priv_flags;
+> > +	bool schedule_port_reset = false;
+> > +	int err = 0;
+> > +
+> > +	if (!changed)
+> > +		return 0;
+> > +
+> > +	/* Reject unknown bits */
+> > +	if (priv_flags & ~GENMASK(MANA_PRIV_FLAG_MAX - 1, 0))
+> > +		return -EINVAL;
+> > +
+> > +	if (changed & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF)) {
+> > +		apc->priv_flags = priv_flags;
+> > +
+> > +		if (!apc->port_is_up) {
+> > +			/* Port is down, flag updated to apply on next up
+> > +			 * so just return.
+> > +			 */
+> > +			return 0;
+> > +		}
+> > +
+> > +		/* Pre-allocate buffers to prevent failure in mana_attach
+> > +		 * later
+> > +		 */
+> > +		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
+> > +		if (err) {
+> > +			netdev_err(ndev,
+> > +				   "Insufficient memory for new allocations\n");
+> > +			apc->priv_flags = old_priv_flags;
+> > +			return err;
+> > +		}
+> > +
+> > +		err = mana_detach(ndev, false);
+> > +		if (err) {
+> > +			netdev_err(ndev, "mana_detach failed: %d\n", err);
+> > +			apc->priv_flags = old_priv_flags;
+> > +
+> > +			/* Port is in an inconsistent state. Restore
+> > +			 * 'port_is_up' so that queue reset work handler
+> > +			 * can properly detach and re-attach.
+> > +			 */
+> > +			apc->port_is_up = true;
+> > +			schedule_port_reset = true;
+> > +			goto out;
+> > +		}
+> > +
+> > +		err = mana_attach(ndev);
+> > +		if (err) {
+> > +			netdev_err(ndev, "mana_attach failed: %d\n", err);
+> > +			apc->priv_flags = old_priv_flags;
+> > +
+> > +			/* Restore 'port_is_up' so the reset work handler
+> > +			 * can properly detach/attach. Without this,
+> > +			 * the handler sees port_is_up=false and skips
+> > +			 * queue allocation, leaving the port dead.
+> > +			 */
+> > +			apc->port_is_up = true;
+> > +			schedule_port_reset = true;
+> > +		}
+> > +	}
+> > +
+> > +out:
+> > +	mana_pre_dealloc_rxbufs(apc);
+> > +
+> > +	if (schedule_port_reset)
+> > +		queue_work(apc->ac->per_port_queue_reset_wq,
+> > +			   &apc->queue_reset_work);
+> > +
+> > +	return err;
+> > +}
+> 
+> [High]
+> Can this failure path oops inside the reset work handler?
+> 
+> When mana_attach() fails after mana_detach() has already torn the vport
+> down, apc->tx_qp has been set to NULL by mana_destroy_txq() and apc->rxqs
+> has been cleared by mana_cleanup_port_context().  This code then forces
+> apc->port_is_up back to true and queues apc->queue_reset_work:
+> 
+>     apc->port_is_up = true;
+>     schedule_port_reset = true;
+> 
+> When mana_per_port_queue_reset_work_handler runs it calls
+> mana_detach(ndev, false), which latches port_st_save = port_is_up = true
+> and, because port_st_save is true, invokes mana_dealloc_queues().  The TX
+> drain loop there does:
+> 
+>     txq = &apc->tx_qp[i].txq;
+>     atomic_read(&txq->pending_sends);
+> 
+> with no NULL check on apc->tx_qp, and mana_destroy_vport further down
+> iterates apc->rxqs[rxq_idx] while rxqs is NULL.  Would that produce a
+> NULL pointer dereference in the workqueue worker whenever mana_attach()
+> fails here (for example on an allocation failure in
+> mana_init_port_context or mana_create_txq, or a transient HW command
+> failure in mana_query_vport_cfg / mana_cfg_vport)?
+> 
+> The mana_detach() failure path above (goto out) reaches
+> mana_dealloc_queues() through the same chain and looks to have the same
+> exposure.
+Hi Jakub,
 
-Sorry I missed your v2 so reviewing again.
-
-Important note here on where this actually happens. It will only
-effect users of BPF programs that are making the push/pop/..
-calls. So most/all users should not be impacted. Agree though lets
-fix this.
-
->---
-> net/core/filter.c | 66 +++++++++++++++++++++++++++++++++++++++++++++--
-> 1 file changed, 64 insertions(+), 2 deletions(-)
->
->diff --git a/net/core/filter.c b/net/core/filter.c
->index 9590877b0714f..018c30a0d71fb 100644
->--- a/net/core/filter.c
->+++ b/net/core/filter.c
->@@ -2654,6 +2654,27 @@ static void sk_msg_reset_curr(struct sk_msg *msg)
-> 	}
-> }
->
->+static bool sk_msg_elem_is_copy(const struct sk_msg *msg, u32 i)
->+{
->+	return test_bit(i, msg->sg.copy);
->+}
->+
->+static void sk_msg_set_elem_copy(struct sk_msg *msg, u32 i, bool copy)
->+{
->+	if (copy)
->+		__set_bit(i, msg->sg.copy);
->+	else
->+		__clear_bit(i, msg->sg.copy);
->+}
-
-To make this easier to read I think having a,
-
-static void sk_msg_clear_elem_copy(struct sk_msg *msg, u32 i, bool copy)
-{
-	__clear_bit(i, msg->sg.copy);
-}
-
-is nice to have. Otherwise we get lots of
-
-    sk_msg_clear_elem_copy(..., false) 
-
-Or just direclty call __clear_bit() is also cleaner.
-
->+
->+static void sk_msg_clear_copy_range(struct sk_msg *msg, u32 start, u32 end)
->+{
->+	while (start != end) {
->+		__clear_bit(start, msg->sg.copy);
->+		sk_msg_iter_var_next(start);
->+	}
->+}
->+
-> static const struct bpf_func_proto bpf_msg_cork_bytes_proto = {
-> 	.func           = bpf_msg_cork_bytes,
-> 	.gpl_only       = false,
->@@ -2738,6 +2759,7 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
-> 	} while (i != last_sge);
->
-> 	sg_set_page(&msg->sg.data[first_sge], page, copy, 0);
->+	sk_msg_set_elem_copy(msg, first_sge, false);
->
-> 	/* To repair sg ring we need to shift entries. If we only
-> 	 * had a single entry though we can just replace it and
->@@ -2747,13 +2769,20 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
-> 	shift = last_sge > first_sge ?
-> 		last_sge - first_sge - 1 :
-> 		NR_MSG_FRAG_IDS - first_sge + last_sge - 1;
->-	if (!shift)
->+	if (!shift) {
->+		sk_msg_set_elem_copy(msg, msg->sg.end, false);
-> 		goto out;
->+	}
->+
->+	i = first_sge;
->+	sk_msg_iter_var_next(i);
->+	sk_msg_clear_copy_range(msg, i, last_sge);
->
-> 	i = first_sge;
-> 	sk_msg_iter_var_next(i);
-> 	do {
-> 		u32 move_from;
->+		bool move_copy;
->
-> 		if (i + shift >= NR_MSG_FRAG_IDS)
-> 			move_from = i + shift - NR_MSG_FRAG_IDS;
->@@ -2762,16 +2791,20 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
-> 		if (move_from == msg->sg.end)
-> 			break;
->
->+		move_copy = sk_msg_elem_is_copy(msg, move_from);
-> 		msg->sg.data[i] = msg->sg.data[move_from];
->+		sk_msg_set_elem_copy(msg, i, move_copy);
-
-This is sk_msg_sg_move()?
-
-> 		msg->sg.data[move_from].length = 0;
-> 		msg->sg.data[move_from].page_link = 0;
-> 		msg->sg.data[move_from].offset = 0;
->+		sk_msg_set_elem_copy(msg, move_from, false);
-> 		sk_msg_iter_var_next(i);
-> 	} while (1);
->
-> 	msg->sg.end = msg->sg.end - shift > msg->sg.end ?
-> 		      msg->sg.end - shift + NR_MSG_FRAG_IDS :
-> 		      msg->sg.end - shift;
->+	sk_msg_set_elem_copy(msg, msg->sg.end, false);
-> out:
-> 	sk_msg_reset_curr(msg);
-> 	msg->data = sg_virt(&msg->sg.data[first_sge]) + start - offset;
->@@ -2794,6 +2827,8 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
-> {
-> 	struct scatterlist sge, nsge, nnsge, rsge = {0}, *psge;
-> 	u32 new, i = 0, l = 0, space, copy = 0, offset = 0;
->+	bool sge_copy = false, nsge_copy = false, nnsge_copy = false;
->+	bool rsge_copy = false;
-> 	u8 *raw, *to, *from;
-> 	struct page *page;
->
->@@ -2866,6 +2901,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
-> 			sk_msg_iter_var_prev(i);
-> 		psge = sk_msg_elem(msg, i);
-> 		rsge = sk_msg_elem_cpy(msg, i);
->+		rsge_copy = sk_msg_elem_is_copy(msg, i);
->
-> 		psge->length = start - offset;
-> 		rsge.length -= psge->length;
-
-I think we need another fix here,
-
-	       rsge.offset += start - offset;
-
-Probably carry in another patch. I can do it if you want?
-
->@@ -2891,23 +2927,31 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
-> 	/* Shift one or two slots as needed */
-> 	sge = sk_msg_elem_cpy(msg, new);
-> 	sg_unmark_end(&sge);
->+	sge_copy = sk_msg_elem_is_copy(msg, new);
->
-> 	nsge = sk_msg_elem_cpy(msg, i);
->+	nsge_copy = sk_msg_elem_is_copy(msg, i);
-> 	if (rsge.length) {
-> 		sk_msg_iter_var_next(i);
-> 		nnsge = sk_msg_elem_cpy(msg, i);
->+		nnsge_copy = sk_msg_elem_is_copy(msg, i);
-> 		sk_msg_iter_next(msg, end);
-> 	}
->
-> 	while (i != msg->sg.end) {
-> 		msg->sg.data[i] = sge;
->+		sk_msg_set_elem_copy(msg, i, sge_copy);
-> 		sge = nsge;
->+		sge_copy = nsge_copy;
-> 		sk_msg_iter_var_next(i);
-> 		if (rsge.length) {
-> 			nsge = nnsge;
->+			nsge_copy = nnsge_copy;
-> 			nnsge = sk_msg_elem_cpy(msg, i);
->+			nnsge_copy = sk_msg_elem_is_copy(msg, i);
-> 		} else {
-> 			nsge = sk_msg_elem_cpy(msg, i);
->+			nsge_copy = sk_msg_elem_is_copy(msg, i);
-> 		}
-> 	}
->
->@@ -2915,13 +2959,15 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
-> 	/* Place newly allocated data buffer */
-> 	sk_mem_charge(msg->sk, len);
-> 	msg->sg.size += len;
->-	__clear_bit(new, msg->sg.copy);
->+	sk_msg_set_elem_copy(msg, new, false);
-> 	sg_set_page(&msg->sg.data[new], page, len + copy, 0);
-> 	if (rsge.length) {
-> 		get_page(sg_page(&rsge));
-> 		sk_msg_iter_var_next(new);
-> 		msg->sg.data[new] = rsge;
->+		sk_msg_set_elem_copy(msg, new, rsge_copy);
-> 	}
->+	sk_msg_set_elem_copy(msg, msg->sg.end, false);
->
-> 	sk_msg_reset_curr(msg);
-> 	sk_msg_compute_data_pointers(msg);
->@@ -2945,29 +2991,41 @@ static void sk_msg_shift_left(struct sk_msg *msg, int i)
->
-> 	put_page(sg_page(sge));
-> 	do {
->+		bool copy;
->+
-> 		prev = i;
-> 		sk_msg_iter_var_next(i);
->+		copy = sk_msg_elem_is_copy(msg, i);
-> 		msg->sg.data[prev] = msg->sg.data[i];
->+		sk_msg_set_elem_copy(msg, prev, copy);
-
-sk_msg_sg_move()?
-
-> 	} while (i != msg->sg.end);
->
-> 	sk_msg_iter_prev(msg, end);
->+	sk_msg_set_elem_copy(msg, msg->sg.end, false);
-> }
+Thanks for your comments, I have sent a separate fixes series to the
+net tree that fixes the possible NULL pointer derefernce issue and also
+makes the reset handler safe for the case where it runs after a failed
+attach:
+https://lore.kernel.org/all/20260518194654.735580-1-dipayanroy@linux.microsoft.com/
 
 
-I think this is good with small cleanup. The bot report (need to check 
-again), but I think it was calling out another issue with a different
-fix/patch needed.
+> 
+> For comparison, mana_change_mtu() handles a mana_attach() failure by
+> returning the error without scheduling a reset.  Would a similar
+> treatment here avoid the asynchronous oops, or is there a reason the
+> reset must be scheduled in this specific failure case?
+> -- 
+> pw-bot: cr
 
-Do you want to follow up with the other couple addons or should I?
+The full-page-rx private flag is intended to be driven by a udev rule
+that fires automatically during VM provisioning on affected platforms.
+If there is a transient failure, the VM fails to provision, requiring manual
+intervention.The reset handler retries the attach, giving the port a
+chance to recover to default config autonomously without intervention.
 
-Also please add a test for this so we capture it in selftests.
-
-Thanks!
-John
+Regards
+Dipayaan Roy
 
