@@ -1,124 +1,162 @@
-Return-Path: <netdev+bounces-288912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288920-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0OWxBkLNCmq18QQAu9opvQ
-	(envelope-from <netdev+bounces-288912-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:26:42 +0200
+	id kKscKgbQCmru8QQAu9opvQ
+	(envelope-from <netdev+bounces-288920-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:38:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9431568B54
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:26:40 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9ABD568F8F
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:38:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 60DEA3048C2B
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:21:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 21975300106A
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E130E3E2AD5;
-	Mon, 18 May 2026 08:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32663E3DA2;
+	Mon, 18 May 2026 08:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="XWp3ipDn"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="AiBMlCCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDBF3CDBD1;
-	Mon, 18 May 2026 08:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC743E2773;
+	Mon, 18 May 2026 08:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779092513; cv=none; b=bW1k2VKo2RabqG8oJy3g3U1mlM7A05slOIS9E55YJabJrocKcWvQB1hQW4rWA23ZJvOHFiZ1eG+F5Kpu1OaqLvLtnxOvTkMzp0Fbgd7GeZSGnpZSpXiB5zofZPpjIASpsWhNrUxSO5N0qSvdGTv1PQhc+kRbyIOToB3wxy2BEpg=
+	t=1779092608; cv=none; b=pSt0rQ6bD7K9UW9VzAqtWBJ28U1RkFxf8sbwTTi9zgMJd6tdKMgPe8F2I9bxK9bhLgzVoRYM8rophvx2UEgQ+groxjiW5p8/QERoT+1AIp66CWQBwGSmSfep3zETH9RZN6zqDMcEcWPVzH4Gv3Uk7q+c5JCFEaA7plpBy7saKSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779092513; c=relaxed/simple;
-	bh=jupNb5ZCEfwVnAMPSOKII5vCCxYWEzJYSE1ukKNHy6g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TU60MKTnutB39vCWzJdtUnL9T3D/1XI76WjFZDNyMwuUwj0W7/ckVv4zFQUzJZrsIRC3sGhplsO7nD5FKS/ZJjx1DGklZu8pXXX2ylpRxx3xEXL7Yf9Tt2QP8Qaoh6lTUDVn7uInJZ9+UhMVoG4wRYok+F9YQXnfPdix/G5sDrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=XWp3ipDn; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=KA/m99vVLVVB9er11dPrO69WnBpjru0jJzWipGXXtnQ=; 
-	b=XWp3ipDngmnNKJADyCjvFyMSNrEFjGWq6M4nTDpWWUss4uvMlGaqmf+RLrC+Weu9Jcple5fIitq
-	RiD6ZjYzQBa9CObk3cuyruAdcVXVm7orrSfV+Z0Hk5KaW4PU3jq3+oNBybb4wDLFvk0VbOdtMrLIR
-	uEeXwC2e7TJcUbV2345ICO3vReHAWFXdRI3/AHsQw1xHG86TP89Z+PyxJ9XppHduY9AirBOWalAf+
-	mhdEKpRLLB2TnLMf+84hHOD+n0xkUSLDvm8OrEZLV6C4V2zFwAtRfKVSDufHKUsLm6FirifE0/lGc
-	g09w0rJNa3VUgcwQeWXPDJBKdSlb4yDvEztw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wOtEJ-00F5Sc-1y;
-	Mon, 18 May 2026 16:21:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 18 May 2026 16:21:39 +0800
-Date: Mon, 18 May 2026 16:21:39 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Scott Guo <scott_gzh@163.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	Scott GUO <scottzhguo@tencent.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 0/2] authencesn: Refactor in-place decryption
-Message-ID: <agrME9xLx_XcXsGw@gondor.apana.org.au>
-References: <20260515083645.4024574-1-scott_gzh@163.com>
- <4e9aee15-62e6-4d71-a836-250c5376a8fd@163.com>
- <8aaa00f3-d8e0-4de0-918b-1f025b632eb9@163.com>
- <agp6lDddmDZaoH6L@gondor.apana.org.au>
- <9f625d9d-6820-442e-9527-1b2802309993@163.com>
- <agqEvY4xJYjbZVDI@gondor.apana.org.au>
- <4fb33a60-7e62-4c73-b82a-e990dea7212d@163.com>
+	s=arc-20240116; t=1779092608; c=relaxed/simple;
+	bh=jgcVJB0EgP1hDWQahFq0aOB9HcugnopXHvHUTQ18Dqg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=KzyHwRv+edbHzSpLIINUv+YkROJ5Ezb/MPULRK7qXuacDs1fzPaUq6oZeUnnrnagihyFzCKdbMpzCtJ0e/D4kV8PrlLsIilJo+SwC7TaCYxX+mh1Yr4v8C0SBBfbO2lEveWubsNfLs/2xgxpOxIYew7iek7R2k/ArHKLtINVGDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=AiBMlCCG; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A588EA4F73;
+	Mon, 18 May 2026 10:23:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1779092595; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=CjWmsPSS4ORwpSMmy+dUdT/5+PBgbOXPEVIPfdPtfVE=;
+	b=AiBMlCCG1WOOpGv0g4do7ZdCHTvWnk2x5U5nSzlJlqDRIqAwFXd8t18RzEXrsMyHz7GJq2
+	SHo/o+Fj+DqDF2aJCiPq6Uzn8A5ZE+dbo02zA6fpjYVQyfBh3xUM5LIvLlXaLs66Rfqhot
+	fMoxCm8BfRsWp/VXSHOzxQf+coSx+p4yE9Ft29Mjo+0D7bZ/YgIoijznDIIFG5BglIWU27
+	a0CDcCCTaWqzeRjfopqZjHzTUP1JtzRphf0KCCZk/SMUn3ONeSTXkdVXwKZ8aJ55sI9/xC
+	5fG2RyywyCBgTRtlGIGIos2sMcXnyRLQLI7ZF+PUEbZldW0hI00BeYWuZlIVDw==
+From: Nicolai Buchwitz <nb@tipi-net.de>
+Subject: [PATCH net v2 0/2] net: phy: honor eee_disabled_modes when
+ advertising EEE
+Date: Mon, 18 May 2026 10:23:08 +0200
+Message-Id: <20260518-devel-phy-support-eee-fix-v2-0-05b52626fa68@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4fb33a60-7e62-4c73-b82a-e990dea7212d@163.com>
-X-Rspamd-Queue-Id: D9431568B54
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGzMCmoC/42NQQqDMBREryJ/3V9+pLHYVe9RXFgz1g9FQ5KGi
+ nj3Bk/Q5bxh3mwUERSRbtVGAVmjLnMJ9amiYernF1hdyVRL3Yg1DTtkvNlPK8eP90tIDIBH/bJ
+ rh1Eu0jfWXqnsfUDBh/tBMxJ1BU4a0xLW4y+bo/pDnQ0btq3DcxCB6+We1CsX6dmBun3ffzZUd
+ GnJAAAA
+X-Change-ID: 20260516-devel-phy-support-eee-fix-d9cf040a6557
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Nicolai Buchwitz <nb@tipi-net.de>
+X-Mailer: b4 0.14.2
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: A9ABD568F8F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288912-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de];
+	TAGGED_FROM(0.00)[bounces-288920-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,apana.org.au:email,apana.org.au:url]
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:dkim]
 X-Rspamd-Action: no action
 
-On Mon, May 18, 2026 at 02:48:39PM +0800, Scott Guo wrote:
-> Then the problem comes down to whether ESP will be able to identify all the
-> path and mitigate all of it.
+While debugging why ethtool --show-eee reports "not supported" on a
+Raspberry Pi CM4 with eee-broken-1000t / eee-broken-100tx set on the
+PHY node, I noticed two phylib helpers copy phydev->supported_eee
+into phydev->advertising_eee without applying
+phydev->eee_disabled_modes: phy_support_eee() and
+phy_advertise_eee_all(). That undoes the filtering phy_probe() set
+up after of_set_phy_eee_broken(), so the PHY ends up advertising EEE
+for modes that were marked broken in DT (or by the driver via
+eee_disabled_modes).
 
-Please don't top-post.
+The visible effect on MAC drivers that call phy_support_eee() after
+probe (bcmgenet, fec, lan743x, lan78xx, r8169) is that ethtool on the
+local interface reports "not supported" (because supported is masked
+by eee_disabled_modes and ends up empty), while the link partner
+happily sees EEE negotiated and active.
 
-That's why I suggested a white-list, so only known-to-be safe
-paths use zero-copy.
+Patch 1 fixes phy_support_eee(). Patch 2 fixes phy_advertise_eee_all(),
+which is also reached from genphy_c45_ethtool_set_eee() when user
+space passes an empty advertisement.
 
-> 在 2026/5/18 11:17, Herbert Xu 写道:
->
-> > Alternatively switch from the black-list to a white-list approach
-> > and only allow ESP to do in-place processing of packets from a
-> > source that's known to be writable.
+I went through the other users of supported_eee as suggested by Andrew
+and they look fine:
+
+  - phy_probe() already masks via eee_disabled_modes after
+    of_set_phy_eee_broken().
+  - genphy_c45_ethtool_get_eee() masks supported_eee with
+    eee_disabled_modes when reporting to user space.
+  - genphy_c45_ethtool_set_eee() masks user-supplied adv against
+    eee_disabled_modes, and the empty-adv path is now covered by
+    patch 2.
+  - genphy_c45_read_eee_abilities(), read_eee_cap1/cap2 populate
+    supported_eee from PHY registers (source of truth).
+  - genphy_c45_read_eee_adv(), read_eee_lpa() and write_eee_adv() use
+    supported_eee only to gate which MMD registers to access, not to
+    construct an advertisement.
+
+Changes since v1:
+  - Add patch 2 fixing phy_advertise_eee_all() (Andrew Lunn)
+
+Previous version:
+
+v1: https://lore.kernel.org/netdev/20260516-devel-phy-support-eee-fix-v1-1-59debc00eda0@tipi-net.de/
+---
+Nicolai Buchwitz (2):
+      net: phy: honor eee_disabled_modes in phy_support_eee()
+      net: phy: honor eee_disabled_modes in phy_advertise_eee_all()
+
+ drivers/net/phy/phy_device.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+---
+base-commit: aaec7096f9961eb223b5b149abe9495525c205d9
+change-id: 20260516-devel-phy-support-eee-fix-d9cf040a6557
+
+Best regards,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Nicolai Buchwitz <nb@tipi-net.de>
+
 
