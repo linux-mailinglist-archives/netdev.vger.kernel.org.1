@@ -1,361 +1,332 @@
-Return-Path: <netdev+bounces-288934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288913-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HpmEhvQCmru8QQAu9opvQ
-	(envelope-from <netdev+bounces-288934-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:38:51 +0200
+	id gD6+CobNCmq18QQAu9opvQ
+	(envelope-from <netdev+bounces-288913-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:27:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D176F568FB5
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:38:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97865568BCD
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:27:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 020AA305668B
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:27:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7A9923058E5D
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6AB3EAC68;
-	Mon, 18 May 2026 08:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707FF3E277F;
+	Mon, 18 May 2026 08:22:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QaIabLYr"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="l+efqyhP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012047.outbound.protection.outlook.com [52.101.66.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5CE3E3C6C
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 08:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779092687; cv=none; b=S8M84Q/mrLa46SnfL2+Gy0wFLMFVU9Jy1dC5Ybk/JICAbn+jaPgpUB0SJ7NXrn1RAVWc6gY+wyan8q89qvi6H50r5k86IHY4/6E1k8+w690S2XCUUL9xxLlZV/jOm5ooBsT4ezWeSFs/7yHBSnZQVaev+6zmHI1Gz9TMb9H6hQ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779092687; c=relaxed/simple;
-	bh=YunP5JV5Tn6ACZbMb4h5mvr2CvedpcArCmq2xF3W3go=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V37ZdZniDKe+eNLAmEtitv8ezObSdHbhkuwcLY6XlwEOwf7ZIGSPTUXwo235TXk718xhWfohhdjeWYNKmlbvCrwnnbyTZcVZsR+veqlYW8PhXB7wkxNFBYZrgnjVp3iIAC2u6j3ooh8koYZDAWmO5BMgsCYc0nnetJvky0cpCZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QaIabLYr; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-36974217d4eso989687a91.2
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:24:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779092685; x=1779697485; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+PIwPLcCeOC0NWb/rVd+8epgttcNSCL32RwHPIPB81w=;
-        b=QaIabLYrqZeg6FVkfqG9VSwPTQ86P5dHX2hX1bXgyID7Ss/p2F3syIMv4+BeVtWO2l
-         M7Os1YzEDgojVePNvrpQNVs0vD6a/lspebEDNWJBVN0bl32uSrLs5IPnhWmgWowLuOMG
-         3AzF/8oKmCtrMpiO4IHnYmvlXE7UPiCq2HKHXuaiNwS6OXLOEuAaGwQ5ZjVoua5lwaJZ
-         EuYhnbCjA/NYmO6MsLtSMzyip3x2IQ+b6QUcogb0A1LROnUKDgmwIeu+B5C18FSjSFmI
-         7FJI8UShSR74WLPumo0/GN1JMn170RJZBAveYnWJ2nNpQ4YV16WyXs1+tTUXOyJP04LI
-         jYEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779092685; x=1779697485;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+PIwPLcCeOC0NWb/rVd+8epgttcNSCL32RwHPIPB81w=;
-        b=WgEevxksbPIA0rNgAgl3FeT94vT+tFD+vpXg+zeUFu8gIIyNzuGm+xvRvk6dUo9Sj3
-         GwbkOgckTallewhIsai+OD8rrhO63+LQ5C4M+vb3pzhDaeJhQ1abO/83uZ97W3ObqwDR
-         NeYSraHSfTOpQ3G2oAwEoUADi2rp56xhoHsJi+Rl78IRQRT0jIcZUUeds7m0dHXhrDJ8
-         Yvad56o092BP/roICht/aUbOVefu3USJcMTsmxdp30GavuTRx+zvaREvmRb/5LlAjY2W
-         mW72TKMBo/e+xODGOpjz1Aqxsjd+VITZ7uBjmCpYSqdWVEgeZ50GJlxRxb0klSgEKFDT
-         SrRw==
-X-Gm-Message-State: AOJu0YzAaJtWYupEv10txaYKTrhH7WPGu6M8SLOcxjMPMj2LYqA4s7XC
-	0r3B73Va7oVQZUU6s7ZLcscryR68QcAAdpRp9RDOMHURL63oKlQXFe6K
-X-Gm-Gg: Acq92OHa0ZrNBqsu7oK82ekvk35fpVzJwsMJ1kCImyFOppIFv55i28TAxeWYgJG2HDL
-	15KBOHCN7wVdDrcwLyLlRMuGImBbKEBJiMDNiJrhb6IromN4RVl2Yc1uUkk5v6xO6fYhKfVAvKc
-	zHHolZcv3znqYsSxr5CNToKdsA71+r5mot3OZJEby2a0XOdo83L5fhHcmpd6f2nzfpZ+ceN5Xzv
-	CE1dsCAk5DQYc5ujVaqFSkya5x/E728T1tluQbnZ0eKDibED4Ibfjy/1j7eJqBeSG6EGqWb905P
-	X0PFtkkhCNjfbQcc8Y9s9EPt3VhIPSwRuSNapwhQc7uXHvR3TAiLR62UiZf9YqEEVpFDQmmN6bK
-	YnY/rEzry1fNbw99+k953LFfRI+93Tw64B6+DVnpe6cWU/xGedocY09WSWuRlq8/RAB5qIjoQjO
-	u39oAwzl6ui4TKk0eECdzfzEjs+TpHkxWAGFFc4vApPk/65uk0WyIWcFhb8qUWkzTp0UBBBd34j
-	b+WRgrulerGJYuGN6sTEI1bei+7ZSXYvGWNr8+a
-X-Received: by 2002:a17:90a:c42:b0:369:7421:6d2b with SMTP id 98e67ed59e1d1-3697421b9e8mr4789963a91.19.1779092684697;
-        Mon, 18 May 2026 01:24:44 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-369517ed182sm10382060a91.15.2026.05.18.01.24.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 01:24:43 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EB83E1D14;
+	Mon, 18 May 2026 08:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779092559; cv=fail; b=lcjNUiC/onVT3tlOa8wGsoGBIC6d2dvnARrTF/AL0PzrFSMTRZf/ycmuN2vTXIX3ir8R0+q9rHUI4FCWYB3hCcUSoCSxCeIBtUBujO6MizeCs2DSqHPRckhvW+e66CE+DqT6d94JTNsGKUkW2fOLqcMeS3pFaNUPciwZaNWr+Qg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779092559; c=relaxed/simple;
+	bh=ntHOg9q7WLvJYOLgpv4gJnITVcB6YY8rMQ1o7HHUzzg=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=WVxztDBinVPbUYJWey660aaBYn00PG2iYa+87ap1aKajMm8ahN9k51SUkbjmmxYrzbFzVhPPp+/vX3m2iF6JRYICjXI/v3MT7LgdnmHVFNB2u9NkiXZ99VklhxCl2Y1Zm+XDZ3Qf2CH8PeKkAt8OYjPJYWACwfEU7yAss6T1aYA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=l+efqyhP; arc=fail smtp.client-ip=52.101.66.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sblKV1yTogt64eO5fGMz+j9CDi2n5iS36+PphtHXBEq6eVObXLQDlRrHhEcpWlSAiiiq8R0BCIUFtacQzIQFk/e5IHr6+rvKOckdpEl4If1YdTURdaBGdkGdLpdm+vE4Pt+uLxELnWdPp0FCAc5ySmX6Xt0Q+Jlofp/NWvgfa6rW1JYS6Tbk2B8D/rDho8iodIbaZ0oW0uzjXY22V7BYJDh1k1IWKVd1yp6EgneCdPYqFCaHF+IE+2dT3qR8bFH31LALHzzZncZfyxfThhD7TGLNy0SQpuiZrnYHXByTUQzLz2rVoPPh86kX4+pbUMk8IY+dW719oYbjiCiOcxOCUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u/AwtKtJ1cHYQaBxNYDgUizbz+huTSjEEo9GXTCRbBs=;
+ b=iRdah5FFmQ7uzRe2vWAVoMtMZVW0m0mic/gm3GhYA0CDDstMPh6xCGaJsvP0TwVzeP/kLdDQn/PFjq13FHw6IxYM9P6z81WkyjXIaa4EVpQ0YP4q/SOUheCp2UpEBYp6o0v2DF1NGkzuim0Vuee9eL+q2qv2nzee+4KZw1kyvGOicJutqYhUd9qHFm0eXfwBBSipBOk6n/6Mry6QGLFBDO9DeZIt9ORV4IlmGaJGu4zjuCrktX+pjVZ6VbAIqeJU+FgQu9pbCSoktvSbOM3b3vbf9Phpzym49MgFrK4AMcN8Tg3NC040cqVC6FXMihD19Og2U8erECnRlKkfNkJy3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u/AwtKtJ1cHYQaBxNYDgUizbz+huTSjEEo9GXTCRbBs=;
+ b=l+efqyhP+5uTax/8bR1n6kPPCjlmGLAdt4Nz7soDea/uEf58TR06xqa60WrXVvKqY1pa5kP3pTc80OUuTujgpoC/C0zkJVfXP78lyxNvvGoSO10SOQd44B8NDOjCHOKOZf6QSjEMycCaULLxdEBre51ajxULnxQmaoyFsN8Z18gkvCXEBZYHIlnBxjKi2EQjPeUIoht1ryPiUT2vxxqlNdvONfEXDRgEFVan/N686InyJ55Bh/eTu/HT3A+Ir8eOWMIMrt0dnKxyEoXO9VUDPCiT0SAV5A3btO6yP5AcgaSnqb3cKFCJfG4tynSPCNZFEGiSjLthpk0feCQWwhZPKQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by AM9PR04MB7713.eurprd04.prod.outlook.com (2603:10a6:20b:2d4::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.21; Mon, 18 May
+ 2026 08:22:34 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9913.009; Mon, 18 May 2026
+ 08:22:34 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	f.fainelli@gmail.com,
+	frank.li@nxp.com,
+	chleroy@kernel.org,
 	horms@kernel.org,
-	willemb@google.com,
-	kuniyu@google.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	memxor@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	jolsa@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me
+	linux@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com
 Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 6/6] selftests/bpf: Add RX latency tests for bpf timestamping
-Date: Mon, 18 May 2026 16:23:44 +0800
-Message-Id: <20260518082344.96647-7-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260518082344.96647-1-kerneljasonxing@gmail.com>
-References: <20260518082344.96647-1-kerneljasonxing@gmail.com>
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: [PATCH v8 net-next 00/15] Add preliminary NETC switch support for i.MX94
+Date: Mon, 18 May 2026 16:24:51 +0800
+Message-Id: <20260518082506.1318236-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2P153CA0005.APCP153.PROD.OUTLOOK.COM (2603:1096::15) To
+ DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D176F568FB5
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|AM9PR04MB7713:EE_
+X-MS-Office365-Filtering-Correlation-Id: f7e8e5bc-1b1c-468e-e667-08deb4b69ca3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|19092799006|366016|38350700014|921020|18002099003|56012099003|3023799003|11063799003;
+X-Microsoft-Antispam-Message-Info:
+	zBJvU9npTtjF79fhlTH535n0NMZxjYmPq3rXqWoFfN+Klo0fBDIYGlVIh9DaeVCstdyvAYrkJizn0jy5Ae+q+1szGqT61WBE+qbmd6Y8+UbPHYpyDj/2QtZq1e3V+tV0UNUiGDBWGBtsVFeBG32iTN3SoFsqZI5A8VVBjb+6J3ci3i7vOigKvcloXeKplihSPlRK12jtL5XAPNsA2xyfwCRxDfzmmJwtCr0WWh/dEzZzgHecnIBJ9KfNWdhnxKKbf64Yyy7AV0UFNeLhzN4/QZLT1aeERSTNi9WsUo2lLkfbaywodORHJyB2MSf3Sn2NXVJWBVh+6yeYI73f0w8X90G81i8T5bAOFZ5jX7adVATfTVNLLCR5B+95WXnaJNgqrrYBgXLtRwIFMyHsv21RnkeYXJpnh6RkErMii5GSWKijOetDjfjFU8SrrYQNfFKpGQIAi0mquIa8gbmMKFi/mlCVn2Vh7O8ONdKftPz9PZc7+V4si0Fk4VzOk/OTRrLvmEX63lKrEd/sukYVlMcZp6ljUI0hTPi04LZ3cMvOE36bJcyG/B+x1sIOJAmO75xMJCM8hjlNX1eOIiOBsRyx7pjU9s6fXJ+YduJB5Qr0ZmA+dAp+Lo8si4ohijZBaKoXxefXrTjFnuxT9rIvH5J1V9o/76m9w3HrNwcVd6B4G7HWzR9BurCH+fAK7VZScMQdC6riIyqJaQI8hlQfdu2DnBltSyo7uLBGWPWE43Oe2qmEZdu7FoaOF0mvOWUrhAoOD+qPfWw9emLElc4xtNMbPg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(19092799006)(366016)(38350700014)(921020)(18002099003)(56012099003)(3023799003)(11063799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?bOn5R3UfBuyBlFur35aFvNSKX/4s6/KyywGHolrrIgrNhvP4KyNh1LNHfSyt?=
+ =?us-ascii?Q?KYFnUdUCDWQOMYSzv8YLJn3cPWoIfC6OCcdwEpbA3zXkXKlCklKVAOWp/1iA?=
+ =?us-ascii?Q?rSOL5+JkRMeAB3v1507rVT278iDj5Yh2by+08KCYJb5OGk7HMX3jbcYF+cuK?=
+ =?us-ascii?Q?TPr13g20gzmAnThbYlIh4jPKUmlpa58EyXkZQdUmAutlB98oh2dWud+Iu7zm?=
+ =?us-ascii?Q?lZOtsiz+CXFoMVj4nUdYregLCAqQm35eexSoUChijMeYp4CHjDgo6q8AqIFb?=
+ =?us-ascii?Q?kT/eCdU47+HzMRjCna4Db2bFKignIxuNkC9hau82girueJ2rSDtbvQFyGuF3?=
+ =?us-ascii?Q?ApZM5OKzL5ZGwaFNehW/DGQzj36Fpy80R4cq3ZNGc+NJgjx11xCEsuu2UcZK?=
+ =?us-ascii?Q?uNIgdxiOKQi6dPvlAqK+srprLJZLzdXqBNi+wkBuuJNdhFlL4ihTIjBSK5sP?=
+ =?us-ascii?Q?lu5U50hnMy1P0uOceCow/SuqZk8ftQVAD/VguGd5eoxHKhVSwSDDBg6U32dN?=
+ =?us-ascii?Q?zE3H5TUDyiPKen1uHyct5DoWsUz8XYSxv7OTvcD5yVBD1yT+K7d+RLqBjKoH?=
+ =?us-ascii?Q?mOwYgxkBXr7+e93XQW3FHn1HIngiCK4tBcIkHKU8iNcA53LejpHBdYe2OoEG?=
+ =?us-ascii?Q?HZ6dqKgc4iLVhfq31odaEW6D3zqzEMX6Ldh7aIJ3Dz3bEQJEJvM2lUXQ7smP?=
+ =?us-ascii?Q?cHe/L2eogywnVnxydVA1OxAQWUMoohEGhj3DqiXXDRvXlDW9WHIOkBalNwhk?=
+ =?us-ascii?Q?b6/HZqO2iVFZUBj7HnV9WGTKa+YCuNavHSfOMr2ouwQTjdBHa0zyHgER7RSW?=
+ =?us-ascii?Q?VmJosUeP3JKYqlF+1Yk5A7P2WICKzoCKyytlSEzP17jlbqhB6HIoUQhR7kyr?=
+ =?us-ascii?Q?ndlR/1TVsHziRxXWUaKEs44NYe/oUoNug7Z7zHYuIU+j1FaumcGo55KOI4KK?=
+ =?us-ascii?Q?JnV6sr2erCkzlB8gX2fMLcSdSr5VE38ZhDm/UdVGm1cOuKe8CcldQ1/XDwDd?=
+ =?us-ascii?Q?/z/PwKXJYzXG68txwxjDkxm7C0KmNm2uqf3p2R7TtrR1Usrwm6cN2/PAguJ9?=
+ =?us-ascii?Q?joZ/ewvkUqfPqGFBoklEGjsdIXQPxNUNz6ktAyAMqvYZzwlFEBvCnKRM/28f?=
+ =?us-ascii?Q?b4ijUa6ir9Ob74P/TkdxaFUHM+SA3w1XEDntZNAa5qavSy7voqnDeVBJJ/3I?=
+ =?us-ascii?Q?QsN17uqZTguILrZxuY6U6nl55FnAlJcLNpZ3RUJLO1jo+Kegglv3WFXrhAO5?=
+ =?us-ascii?Q?H5l4DUfDzYRaopmBwfMHyoLvTjLCuZhgWPAn4GGbq5glAeAUpcEoLJQYfMGt?=
+ =?us-ascii?Q?bHCN/80DkfInXKRSPTz7W5mrzJ9wtZRiMjdWpkW/nX7hpyQafJ62QJkdpoh2?=
+ =?us-ascii?Q?95oP0y0vhw8S1Kppt9FndYzHR369YYn280NbLQWv5z1PUzi6MweL2RDousIA?=
+ =?us-ascii?Q?vefi4W6pvItECWvBLFq+bKtTds75GC4BtNwbW8a+3fJWREpsYRY6ZOgs7P4i?=
+ =?us-ascii?Q?6OLAzBg+f6iLWC7p6wlwCmp8aIjYjH/8b6rHfFzzCcUHWrnIo8nTEazq/1KC?=
+ =?us-ascii?Q?sciG045hlIdgmjpwlFwgdumqOlFAMTMljZwhFJnEJLSJYyQzprzeJtz8Ttc7?=
+ =?us-ascii?Q?pr992d2/ahHShnZnl75q9FqA+GEsdpHzpmodQdfre6pNLlkIetnNV5V7NLDQ?=
+ =?us-ascii?Q?iRar7o1hSc3LdfzSOUov+GRMzwAUObSwDttJVG1YB3IkoOe8fwsMGMbW8EO2?=
+ =?us-ascii?Q?XBqg7Dy/8w=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7e8e5bc-1b1c-468e-e667-08deb4b69ca3
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 08:22:34.0891
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MiiVFywOLoM3ywpP1UWvgnI36ktg86hRuIZcm8jlHgasN7Ou7QCPzXzNy3NFn8ZQVCjt6kAOBO4ajm1yGHWBVQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7713
+X-Rspamd-Queue-Id: 97865568BCD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,bootlin.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-288934-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me];
+	TAGGED_FROM(0.00)[bounces-288913-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tencent.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:mid,nxp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: Jason Xing <kernelxing@tencent.com>
+i.MX94 NETC (v4.3) integrates 802.1Q Ethernet switch functionality, the
+switch provides advanced QoS with 8 traffic classes and a full range of
+TSN standards capabilities. It has 3 user ports and 1 CPU port, and the
+CPU port is connected to an internal ENETC through the pseduo link, so
+instead of a back-to-back MAC, the lightweight "pseudo MAC" is used at
+both ends of the pseudo link to transfer Ethernet frames. The pseudo
+link provides a zero-copy interface (no serialization delay) and lower
+power (less logic and memory).
 
-The client sends data, and the server reads it via read(), which
-triggers tcp_recvmsg() internally. And then the computation is done
-in the BPF_SOCK_OPS_TSTAMP_RCV_CB callback. Extend test_tcp() to cover
-the new BPF RX timestamping path.
+Like most Ethernet switches, the NETC switch also supports a proprietary
+switch tag, is used to carry in-band metadata information about frames.
+This in-band metadata information can include the source port from which
+the frame was received, what was the reason why this frame got forwarded
+to the entity, and for the entity to indicate the precise destination
+port of a frame. The NETC switch tag is added to frames after the source
+MAC address. There are three types of switch tags, and each type has 1
+to 4 subtypes, more details are as follows.
 
-One more crucial thing is to add usleep to allow the delay of workqueue
-turning on global time record of each skb in recv path, or else the test
-might fail due to no timestamp in the skb.
+Forward switch tag (Type = 0): Represents forwarded frames.
+  - SubType = 0 - Normal frame processing.
 
-Verify that SO_TIMESTAMPING RX (software) and BPF RX timestamping can
-work simultaneously on the same socket without conflict. When
-enable_socket_timestamping is set, enable SOF_TIMESTAMPING_SOFTWARE |
-SOF_TIMESTAMPING_RX_SOFTWARE on afd and use recvmsg() to verify the
-SCM_TIMESTAMPING cmsg contains a valid software RX timestamp.
+To_Port switch tag (Type = 1): Represents frames that are to be sent to
+a specific switch port.
+  - SubType = 0. No request to perform timestamping.
+  - SubType = 1. Request to perform one-step timestamping.
+  - SubType = 2. Request to perform two-step timestamping.
+  - SubType = 3. Request to perform both one-step timestamping and
+    two-step timestamping.
 
-This exercises the mixed mode where all 4 timestamping paths (SO TX on
-cfd, SO RX on afd, BPF TX on cfd, BPF RX on afd) run together. The
-standalone mode (enable_socket_timestamping=false) keeps only BPF TX
-and BPF RX active using read().
+To_Host switch tag (Type = 2): Represents frames redirected or copied to
+the switch management port.
+  - SubType = 0. Received frames redirected or copied to the switch
+     management port.
+  - SubType = 1. Received frames redirected or copied to the switch
+    management port with captured timestamp at the switch port where
+    the frame was received.
+  - SubType = 2. Transmit timestamp response (two-step timestamping).
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Currently, this patch set supports Forward tag, SubType 0 of To_Port tag
+and SubType 0 of To_Host tag. More tags will be supported in the future.
+
+In addition, the switch supports NETC Table Management Protocol (NTMP),
+some switch functionality is controlled using control messages sent to
+the hardware using BD ring interface with 32B descriptors similar to the
+packet Transmit BD ring used on ENETC. This interface is referred to as
+the command BD ring. This is used to configure functionality where the
+underlying resources may be shared between different entities or being
+too large to configure using direct registers.
+
+For this patch set, we have supported the following tables through the
+command BD ring interface.
+
+FDB Table: It contains forwarding and/or filtering information about MAC
+addresses. The FDB table is used for MAC learning lookups and MAC
+forwarding lookups.
+
+VLAN Filter Table: It contains configuration and control information for
+each VLAN configured on the switch.
+
+Buffer Pool Table: It contains buffer pool configuration and operational
+information. Each entry corresponds to a buffer pool. Currently, we use
+this table to implement flow control feature on each port.
+
+Ingress Port Filter Table: It contains a set of filters each capable of
+classifying incoming traffic using a mix of L2, L3, and L4 parsed and
+arbitrary field data. We use this table to implement host flood support
+to the switch port.
+
+The switch also supports other tables, and we will add more advanced
+features through them in the future.
+
 ---
- .../bpf/prog_tests/net_timestamping.c         | 69 ++++++++++++++++++-
- .../selftests/bpf/progs/net_timestamping.c    | 35 ++++++++++
- 2 files changed, 103 insertions(+), 1 deletion(-)
+v8:
+1. Remove the duplicated 'is' in the help text of NET_DSA_NETC_SWITCH
+2. Replace num_fdb_gmac with htmcapr_num_words
+3. Update NETC_PAUSE_THRESH and related thresholds of buffer pool entry
+4. Remove the read-reset registers from netc_port_counters, and also
+   update the commit message of patch 15
+v7 link: https://lore.kernel.org/imx/20260513030454.1666570-1-wei.fang@nxp.com/
+v6 link: https://lore.kernel.org/imx/20260509102954.4116624-1-wei.fang@nxp.com/
+v5 link: https://lore.kernel.org/imx/20260430024945.3413973-1-wei.fang@nxp.com/
+v4 link: https://lore.kernel.org/imx/20260331113025.1566878-1-wei.fang@nxp.com/
+v3 link: https://lore.kernel.org/imx/20260326062917.3552334-1-wei.fang@nxp.com/
+v2 link: https://lore.kernel.org/imx/20260323060752.1157031-1-wei.fang@nxp.com/
+v1 link: https://lore.kernel.org/imx/20260316094152.1558671-1-wei.fang@nxp.com/
+---
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/net_timestamping.c b/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
-index dbfd87499b6b..3cc52b670e74 100644
---- a/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
-+++ b/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
-@@ -143,11 +143,45 @@ static void test_socket_timestamping(int fd)
- 	SK_TS_ACK = 0;
- }
- 
-+static bool recv_verify_rx_timestamp(int fd, char *buf, int len)
-+{
-+	struct scm_timestamping *tss = NULL;
-+	char ctrl[1024];
-+	struct msghdr msg = {};
-+	struct iovec iov;
-+	struct cmsghdr *cm;
-+	int ret;
-+
-+	iov.iov_base = buf;
-+	iov.iov_len = len;
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = ctrl;
-+	msg.msg_controllen = sizeof(ctrl);
-+
-+	ret = recvmsg(fd, &msg, 0);
-+	if (!ASSERT_EQ(ret, len, "recvmsg from client"))
-+		return false;
-+
-+	for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
-+		if (cm->cmsg_level == SOL_SOCKET &&
-+		    cm->cmsg_type == SCM_TIMESTAMPING) {
-+			tss = (void *)CMSG_DATA(cm);
-+			break;
-+		}
-+	}
-+
-+	ASSERT_TRUE(tss != NULL, "SCM_TIMESTAMPING cmsg present");
-+	ASSERT_TRUE(tss && (tss->ts[0].tv_sec || tss->ts[0].tv_nsec),
-+		    "rx sw timestamp non-zero");
-+	return true;
-+}
-+
- static void test_tcp(int family, bool enable_socket_timestamping)
- {
- 	struct net_timestamping__bss *bss;
- 	char buf[cfg_payload_len];
--	int sfd = -1, cfd = -1;
-+	int sfd = -1, cfd = -1, afd = -1;
- 	unsigned int sock_opt;
- 	struct netns_obj *ns;
- 	int cg_fd;
-@@ -187,7 +221,27 @@ static void test_tcp(int family, bool enable_socket_timestamping)
- 	if (!ASSERT_OK_FD(cfd, "connect_to_fd_server"))
- 		goto out;
- 
-+	afd = accept(sfd, NULL, NULL);
-+	if (!ASSERT_OK_FD(afd, "accept"))
-+		goto out;
-+
-+	/* net_enable_timestamp() defers the static key update via
-+	 * schedule_work() when CONFIG_JUMP_LABEL is set. Give the
-+	 * workqueue a chance to run so that netstamp_needed_key is
-+	 * active and skb->tstamp gets populated in the receive path.
-+	 */
-+	usleep(10000);
-+
- 	if (enable_socket_timestamping) {
-+		unsigned int rx_opt;
-+
-+		rx_opt = SOF_TIMESTAMPING_SOFTWARE |
-+			 SOF_TIMESTAMPING_RX_SOFTWARE;
-+		ret = setsockopt(afd, SOL_SOCKET, SO_TIMESTAMPING,
-+				 (char *)&rx_opt, sizeof(rx_opt));
-+		if (!ASSERT_OK(ret, "setsockopt SO_TIMESTAMPING RX on afd"))
-+			goto out;
-+
- 		sock_opt = SOF_TIMESTAMPING_SOFTWARE |
- 			   SOF_TIMESTAMPING_OPT_ID |
- 			   SOF_TIMESTAMPING_TX_SCHED |
-@@ -207,6 +261,15 @@ static void test_tcp(int family, bool enable_socket_timestamping)
- 	if (!ASSERT_EQ(ret, sizeof(buf), "send to server"))
- 		goto out;
- 
-+	if (enable_socket_timestamping) {
-+		if (!recv_verify_rx_timestamp(afd, buf, sizeof(buf)))
-+			goto out;
-+	} else {
-+		ret = read(afd, buf, sizeof(buf));
-+		if (!ASSERT_EQ(ret, sizeof(buf), "recv from client"))
-+			goto out;
-+	}
-+
- 	if (enable_socket_timestamping)
- 		test_socket_timestamping(cfd);
- 
-@@ -215,8 +278,12 @@ static void test_tcp(int family, bool enable_socket_timestamping)
- 	ASSERT_EQ(bss->nr_sched, 1, "nr_sched");
- 	ASSERT_EQ(bss->nr_txsw, 1, "nr_txsw");
- 	ASSERT_EQ(bss->nr_ack, 1, "nr_ack");
-+	ASSERT_EQ(bss->nr_passive, 1, "nr_passive");
-+	ASSERT_GE(bss->nr_rcv, 1, "nr_rcv");
- 
- out:
-+	if (afd >= 0)
-+		close(afd);
- 	if (sfd >= 0)
- 		close(sfd);
- 	if (cfd >= 0)
-diff --git a/tools/testing/selftests/bpf/progs/net_timestamping.c b/tools/testing/selftests/bpf/progs/net_timestamping.c
-index b4c2f0f2be11..4bbff09db55c 100644
---- a/tools/testing/selftests/bpf/progs/net_timestamping.c
-+++ b/tools/testing/selftests/bpf/progs/net_timestamping.c
-@@ -6,6 +6,8 @@
- #include "bpf_kfuncs.h"
- #include <errno.h>
- 
-+extern u64 bpf_ktime_get_real_ns(void) __ksym;
-+
- __u32 monitored_pid = 0;
- 
- int nr_active;
-@@ -14,6 +16,7 @@ int nr_passive;
- int nr_sched;
- int nr_txsw;
- int nr_ack;
-+int nr_rcv;
- 
- struct sk_stg {
- 	__u64 sendmsg_ns;	/* record ts when sendmsg is called */
-@@ -65,6 +68,22 @@ static int bpf_test_sockopt(void *ctx, const struct sock *sk, int expected)
- 	return 0;
- }
- 
-+static int bpf_test_rx_sockopt(void *ctx, const struct sock *sk, int expected)
-+{
-+	int tmp, new = SK_BPF_CB_RX_TIMESTAMPING;
-+	int opt = SK_BPF_CB_FLAGS;
-+	int level = SOL_SOCKET;
-+
-+	if (bpf_setsockopt(ctx, level, opt, &new, sizeof(new)) != expected)
-+		return 1;
-+
-+	if (bpf_getsockopt(ctx, level, opt, &tmp, sizeof(tmp)) != expected ||
-+	    (!expected && tmp != new))
-+		return 1;
-+
-+	return 0;
-+}
-+
- static bool bpf_test_access_sockopt(void *ctx, const struct sock *sk)
- {
- 	if (bpf_test_sockopt(ctx, sk, -EOPNOTSUPP))
-@@ -224,6 +243,9 @@ int skops_sockopt(struct bpf_sock_ops *skops)
- 	case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
- 		nr_active += !bpf_test_sockopt(skops, sk, 0);
- 		break;
-+	case BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB:
-+		nr_passive += !bpf_test_rx_sockopt(skops, sk, 0);
-+		break;
- 	case BPF_SOCK_OPS_TSTAMP_SENDMSG_CB:
- 		if (bpf_test_delay(skops, sk))
- 			nr_snd += 1;
-@@ -240,6 +262,19 @@ int skops_sockopt(struct bpf_sock_ops *skops)
- 		if (bpf_test_delay(skops, sk))
- 			nr_ack += 1;
- 		break;
-+	case BPF_SOCK_OPS_TSTAMP_RCV_CB: {
-+		u64 sw_tstamp, now, delay;
-+
-+		sw_tstamp = (u64)skops->args[0] | ((u64)skops->args[1] << 32);
-+		if (!sw_tstamp)
-+			break;
-+
-+		now = bpf_ktime_get_real_ns();
-+		delay = now - sw_tstamp;
-+		if (delay < delay_tolerance_nsec)
-+			nr_rcv += 1;
-+		break;
-+	}
- 	}
- 
- 	return 1;
+Wei Fang (15):
+  dt-bindings: net: dsa: update the description of 'dsa,member' property
+  dt-bindings: net: dsa: add NETC switch
+  net: enetc: add pre-boot initialization for i.MX94 switch
+  net: enetc: add basic operations to the FDB table
+  net: enetc: add support for the "Add" operation to VLAN filter table
+  net: enetc: add support for the "Update" operation to buffer pool
+    table
+  net: enetc: add support for "Add" and "Delete" operations to IPFT
+  net: enetc: add multiple command BD rings support
+  net: dsa: add NETC switch tag support
+  net: dsa: netc: introduce NXP NETC switch driver for i.MX94
+  net: dsa: netc: add phylink MAC operations
+  net: dsa: netc: add FDB, STP, MTU, port setup and host flooding
+    support
+  net: dsa: netc: initialize buffer pool table and implement
+    flow-control
+  net: dsa: netc: add support for the standardized counters
+  net: dsa: netc: add support for ethtool private statistics
+
+ .../devicetree/bindings/net/dsa/dsa.yaml      |    6 +-
+ .../bindings/net/dsa/nxp,netc-switch.yaml     |  131 ++
+ MAINTAINERS                                   |   11 +
+ drivers/net/dsa/Kconfig                       |    2 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/netc/Kconfig                  |   15 +
+ drivers/net/dsa/netc/Makefile                 |    3 +
+ drivers/net/dsa/netc/netc_ethtool.c           |  291 +++
+ drivers/net/dsa/netc/netc_main.c              | 1585 +++++++++++++++++
+ drivers/net/dsa/netc/netc_platform.c          |   87 +
+ drivers/net/dsa/netc/netc_switch.h            |  173 ++
+ drivers/net/dsa/netc/netc_switch_hw.h         |  366 ++++
+ .../ethernet/freescale/enetc/netc_blk_ctrl.c  |  185 +-
+ drivers/net/ethernet/freescale/enetc/ntmp.c   |  391 +++-
+ .../ethernet/freescale/enetc/ntmp_private.h   |  122 +-
+ include/linux/dsa/tag_netc.h                  |   14 +
+ include/linux/fsl/netc_global.h               |    6 +
+ include/linux/fsl/ntmp.h                      |  186 +-
+ include/net/dsa.h                             |    2 +
+ include/uapi/linux/if_ether.h                 |    1 +
+ net/dsa/Kconfig                               |   10 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_netc.c                            |  214 +++
+ 23 files changed, 3773 insertions(+), 30 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
+ create mode 100644 drivers/net/dsa/netc/Kconfig
+ create mode 100644 drivers/net/dsa/netc/Makefile
+ create mode 100644 drivers/net/dsa/netc/netc_ethtool.c
+ create mode 100644 drivers/net/dsa/netc/netc_main.c
+ create mode 100644 drivers/net/dsa/netc/netc_platform.c
+ create mode 100644 drivers/net/dsa/netc/netc_switch.h
+ create mode 100644 drivers/net/dsa/netc/netc_switch_hw.h
+ create mode 100644 include/linux/dsa/tag_netc.h
+ create mode 100644 net/dsa/tag_netc.c
+
 -- 
-2.43.7
+2.34.1
 
 
