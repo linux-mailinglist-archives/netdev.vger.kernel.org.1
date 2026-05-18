@@ -1,313 +1,376 @@
-Return-Path: <netdev+bounces-288811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cS2JGMRrCmqy1AQAu9opvQ
-	(envelope-from <netdev+bounces-288811-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:30:44 +0200
+	id iBiEF1RuCmrN1AQAu9opvQ
+	(envelope-from <netdev+bounces-288813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:41:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A85C6564D13
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:30:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C97F6564DD3
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A71A7300AB16
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:30:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C859D3008502
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029FA231A23;
-	Mon, 18 May 2026 01:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06A1231A23;
+	Mon, 18 May 2026 01:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QbPTvKY7";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="hiIzrVfA"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="wtwy4/6+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF94405C49
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874D713C918
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779067840; cv=none; b=esGcSMhquQ4C0TR8yMWmc1aXYz0dUKR4q9YQ5vn+lyZIGZYtuMW5+I5U/XXdqk9Fpguk+m9cmZ/RszSs1cv+LouY0/inaGEV4dXl+tzZfgOWVMY264KQBYqCHqXCWWhmrLxDv1COQGSeLki5DRYQlofc8xICS1EZBQNhSzDCsgI=
+	t=1779068497; cv=none; b=A/WJHvq5pE50aT5OdbC3gEcX/WK5h/Aoo4kaQNcJNBfmQAFYmLTvTcIj8efa/ykB3KF7G7QrGSJfcRk8s72r+tLAhyH/5cInH0ZELgZBYo6Q6XfXFBwUFqdRITq+eu/UZYtaRrAdWZuW95YDZHnrDZB8fZxCaQu3/BLRlGoRgF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779067840; c=relaxed/simple;
-	bh=hh9ilvQ9BN0QU368cGXI2oMTeMbGtV3oXAacHwkLfQ0=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=J1a3TCRO6bP0whVqHMNPinMSr1HN6Mqdqd2HP2/76NcMohKX9w4JiI1kpN41M1EQkZRuUDqCX8ZT7qz+FonKtzLvgOJ9oi1zGR6sZ8O9SM0o1182ucN0+EmH6PQjOfugOl4p0q+kQPS4Pulgus29EAmxTjl3PW48Hwyo8qqm2jE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QbPTvKY7; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=hiIzrVfA; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64HAOngI3595488
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:30:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=lnF/Ok45gY3a3A0tgLNaHq
-	m862K8e+GRmlIWqlKn4kI=; b=QbPTvKY7cE38U9tlV6EhGAhjZe6l5ZfRdZ9iFt
-	wNamyJ+En7vzPjI94fHCoPwHBI1GNLuctYTyBTWmctv8ehK9a71X19C2SI42rXm4
-	7aHMCfjA6x9RQCjpsAkmwdmyCPs1R7aISj7FknNJlvWDjMpBXQBsNOwxdqWFgMuO
-	If5Lo+s6UNB+NS+86jpg2dbn1O3U8DBYpr8jIAqsJuC5BWWNjZqGarfgV+5Ylhfy
-	7+QYJifU9nd8EIkWNYrirIJTd3cDUaajuLY2hCX80DLQWDpES2d/q9+JO8pzo3se
-	oidCQhZnL5aZsmX+4Iub/WO1FhILt76333BxjxYGMV9PppVw==
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e6h0qbyse-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:30:38 +0000 (GMT)
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-30230e64087so2001490eec.0
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 18:30:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1779067837; x=1779672637; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lnF/Ok45gY3a3A0tgLNaHqm862K8e+GRmlIWqlKn4kI=;
-        b=hiIzrVfA+FEKhfLIXw5v5164GNHsTXQENfeBxZYcWlUnWVyCNKOU6qR+qlnLJWXvlj
-         0UXh+ZgYHsCYlPfzW9rq1rUiyk7QY6AJth7W4NEZFDDbP7myPrQ3U+C7UMWA8pUwrZ/U
-         SS5if1XvCsYrjx0ZULCEXL3MUDcWGVCXc69bew1i8kMjbHB5EVQu10CTnmCm7O64kvko
-         fPm8ZVK6Kkr0ZTyP/Q3wv4/Rvbu/rmHnqcam8AdtCKmM7to+I9sYWBb6ocVsxTxndlAY
-         rC/hgm08qoRFY6BryCuzAngs8up+DcZark3gyzIBSMq0yC3WlwigOdnOVXSzk3vnQgC4
-         DO6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779067837; x=1779672637;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lnF/Ok45gY3a3A0tgLNaHqm862K8e+GRmlIWqlKn4kI=;
-        b=nnWeaPARciMekQwqjr3CxzPuP+n74KT9Si6BSBWvuWrUSmfaASHKXuJZRIxWuwjhxv
-         Bx17t7/3fxnTl5Zc3pZqNhipkjgqRR3GlvQynCd+b5Gw8MdlV5fwaARp3xdvDKiXxOeC
-         5B7p+rYh/x0swICGlnjnmmHeAN4gSd3iLDBwiQmS7Tp70Y4QdWogGnbnyuyucNW5ihxe
-         VE5RnoE5I1U+NJw+ZvpNGvbXmLRQZ8wtpB5XGsIggTi5S/f3Ya47NRcqSm7iJhUeMp0n
-         3EMOFohTvoy+puiZnJhunFR/OCQc+8sUn/ahbuMBVPMl9nxDpuXlWEozqFTu1FUePXag
-         O8kQ==
-X-Gm-Message-State: AOJu0YyyfqFY6p8NHIoAaxyxRxx0gLD2Q6sux/nmEkE9QOduiDuU/b2V
-	xCQAA5QgfmHWy7PwnFXZZ3G/w4dW8LwiqyiG7ZKAxFiANzV6RZQjmb0C8uiLL8VUSWVHkmMYZoG
-	CBd2V3ek/ZuQVyPc3fj778E68SLA/ed0LYHkQm6I4+VJLRubj5KV0dDivwPdFk9y48e0=
-X-Gm-Gg: Acq92OFhn0fSHhRvIIHCFYpUywTgnQQe8hibwG5omNFlnx7rP45qMQJHWcMTsY/zy2q
-	okqGnRTUrgCH+89KWSbFcfeF8WqofGycXTGTLrss1/9/n47AHIPdTSrxhObwsyy684x8CKAtTxT
-	ZBMkvQ6TOrFo+zHUNSoCF6qhVsiCzaOZdPZDS5d8eXiejGfkYIXS2EeMrG7QrxKZrkon51xJxxF
-	AiH6B+2WgFI93SRqIrwMSxsS8qi9eIgho7LA21/pwcSSYE4znCeLR85UhtIqjof6Ml5prymzIua
-	ohohhyTQge8I1bNiGEo3a+hQ3A8niVqK/WJFgvQuPDSXOCndGYTeVsfsic9rI3UZipXI1XqaLnH
-	L6YwHJjDiREn+uq+bH3m6sx2Mdkmp6rcbezAqhRUUu/5996EcLQw=
-X-Received: by 2002:a05:7301:5809:b0:2f2:6dde:df50 with SMTP id 5a478bee46e88-3039868cba3mr6241665eec.17.1779067837067;
-        Sun, 17 May 2026 18:30:37 -0700 (PDT)
-X-Received: by 2002:a05:7301:5809:b0:2f2:6dde:df50 with SMTP id 5a478bee46e88-3039868cba3mr6241644eec.17.1779067836440;
-        Sun, 17 May 2026 18:30:36 -0700 (PDT)
-Received: from [10.227.174.152] ([207.213.33.2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302978b1a79sm12702137eec.28.2026.05.17.18.30.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 May 2026 18:30:36 -0700 (PDT)
-Message-ID: <604ca54c-a94e-4ca4-83e7-4486d7392d71@oss.qualcomm.com>
-Date: Sun, 17 May 2026 18:30:31 -0700
+	s=arc-20240116; t=1779068497; c=relaxed/simple;
+	bh=iwXE59wk1nQ9MmUoHeijllavlgWxixgLF7CGvj7mQZ0=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=YHr2B9e+UKXTNqfy9BVlvUTbRVRvJMk+znGsMl6jpwMq3gqC9P8I6wY7/cibonGLTCdrxBanXziqQDdNNrkKcwAvW+NXuYfJq66KwEIbpxh1UwGfAPWzTek4dhGNbCijLC35w6T5QLgQXH9eqfrbMHb+sWIoURaRD59fQRZslDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=wtwy4/6+; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1779068493; h=Message-ID:Subject:Date:From:To;
+	bh=x1uxmUc10JM4qBa34adzzemW5ZYd49t4ye+2F5mK9Fc=;
+	b=wtwy4/6+MBEM1Xh0hqnrzwQbVOBpg5DyFb7Ay3ouJ6Bb7V9poox6FzS0TpURMtEIfm26YBkKlwGa/2HBCQKFFPvyor5YA2tXjX1fR49SAlpOiyF5UHmLCoveeNd+ejRd0O3gMkQ7qpuKLPf6vZ1OI+FG5Bt5Zf8haGrsG3u3q4c=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X32opsP_1779068491;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X32opsP_1779068491 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 18 May 2026 09:41:32 +0800
+Message-ID: <1779068468.870556-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v43 3/8] eea: probe the netdevice and create adminq
+Date: Mon, 18 May 2026 09:41:08 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Dong Yibo <dong100@mucse.com>,
+ Mingyu Wang <25181214217@stu.xidian.edu.cn>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Dust Li <dust.li@linux.alibaba.com>,
+ netdev@vger.kernel.org
+References: <20260514095138.80680-1-xuanzhuo@linux.alibaba.com>
+ <20260514095138.80680-4-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20260514095138.80680-4-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, jiri@resnulli.us, davem@davemloft.net,
-        Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org
-From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-Subject: [PATCH net] net/sched: fix pedit partial COW leading to page cache
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: 0YzvaYQCnm5UW57QbvpJhqVp8x7w3_YT
-X-Proofpoint-GUID: 0YzvaYQCnm5UW57QbvpJhqVp8x7w3_YT
-X-Authority-Analysis: v=2.4 cv=fIMJG5ae c=1 sm=1 tr=0 ts=6a0a6bbe cx=c_pps
- a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=0UO4LuSLTB0qstzv38KPpQ==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
- a=EUspDBNiAAAA:8 a=pGLkceISAAAA:8 a=A7XncKjpAAAA:8 a=pxxjg2x1fI-G0sRxPlwA:9
- a=QEXdDO2ut3YA:10 a=6Ab_bkdmUrQuMsNx7PHu:22 a=R9rPLQDAdC6-Ub70kJmZ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE4MDAxMiBTYWx0ZWRfX2G1lQ5qcgmgz
- OGK8p4sNnqNcKGm/e8rhFqtLB0m58r0Gsf1jCYsJYEyKgPr6iY9Xa2uLnAGFtL0V6FjzV/iIl8Q
- wiBUxBpzooZTbE069QOq+QiO/x37UtEZdT0Ld4/+mkTtAwk2v85HpnDDn6IlHmR6BitwdYCTajw
- DMwqmjglgMlvMQhZ+zmROJYQshmic+bHUxPDCGUtAW3HW1qO3H3ZAgW0RDZLTmJnOQm5xof8hlr
- 63U+YS4vtcRDccuZgv9yf8/7tdIHfS5ikJm08vHaDOYt4HwQBOWMhTc/ZKEV7QEp6r/+m1TP0ZD
- kG6nE5GjLEjGfd9iCm5G0Iw4WKC1axd1+KP7tTTpwo752ND6XB4CCZm5Vep3urxDiOlkbrUyGSZ
- q9yVKoFEkmQWu7CqvY6aNOOthW1lvxO5Br0eCAfkVfgsTGRz7+MxJjL4J1CyX4RoJOYyvLFlQQe
- iLx5Jyhct+uCiSUvyGg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-17_06,2026-05-15_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 impostorscore=0 spamscore=0 bulkscore=0 phishscore=0
- priorityscore=1501 adultscore=0 suspectscore=0 lowpriorityscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
- definitions=main-2605180012
-X-Rspamd-Queue-Id: A85C6564D13
+X-Rspamd-Queue-Id: C97F6564DD3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email,qualcomm.com:dkim];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,stu.xidian.edu.cn,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288811-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288813-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[rajat.gupta@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.alibaba.com:mid,linux.alibaba.com:dkim]
 X-Rspamd-Action: no action
 
-From f12ea6484dbb75d1c13495e921d0595532317f2a Mon Sep 17 00:00:00 2001
-From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-Date: Sun, 17 May 2026 10:11:44 -0700
-Subject: [PATCH net] net/sched: fix pedit partial COW leading to page cache
- corruption
 
-tcf_pedit_act() computes the COW range for skb_ensure_writable()
-once before the key loop using tcfp_off_max_hint, but the hint does
-not account for the runtime header offset added by typed keys. This
-can leave part of the write region un-COW'd.
+Sashiko ai review:
 
-Fix by moving skb_ensure_writable() inside the per-key loop where
-the actual write offset is known, and add overflow checking on the
-offset arithmetic. For negative offsets (e.g. Ethernet header edits
-at ingress), use skb_cow() to COW the headroom instead. Guard
-offset_valid() against INT_MIN, where negation is undefined.
-
-Additionally, linearize skbs with shared frags upfront to prevent
-silent data corruption when pedit operates on zero-copy pages
-(e.g. from sendfile).
-
-Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is writable")
-Reported-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-Reported-by: Yiming Qian <yimingqian591@gmail.com>
-Reported-by: Keenan Dong <keenanat2000@gmail.com>
-Reported-by: Han Guidong <2045gemini@gmail.com>
-Reported-by: Zhang Cen <rollkingzzc@gmail.com>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
----
- net/sched/act_pedit.c | 52 ++++++++++++++++++++++++++++++++-----------
- 1 file changed, 39 insertions(+), 13 deletions(-)
-
-diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-index bc20f08a2..e077a2e82 100644
---- a/net/sched/act_pedit.c
-+++ b/net/sched/act_pedit.c
-@@ -16,6 +16,7 @@
- #include <linux/ip.h>
- #include <linux/ipv6.h>
- #include <linux/slab.h>
-+#include <linux/overflow.h>
- #include <net/ipv6.h>
- #include <net/netlink.h>
- #include <net/pkt_sched.h>
-@@ -323,8 +324,10 @@ static bool offset_valid(struct sk_buff *skb, int offset)
- 	if (offset > 0 && offset > skb->len)
- 		return false;
- 
--	if  (offset < 0 && -offset > skb_headroom(skb))
--		return false;
-+	if (offset < 0) {
-+		if (offset == INT_MIN || -offset > skb_headroom(skb))
-+			return false;
-+	}
- 
- 	return true;
- }
-@@ -393,17 +396,19 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb,
- 	struct tcf_pedit_key_ex *tkey_ex;
- 	struct tcf_pedit_parms *parms;
- 	struct tc_pedit_key *tkey;
--	u32 max_offset;
- 	int i;
- 
- 	parms = rcu_dereference_bh(p->parms);
- 
--	max_offset = (skb_transport_header_was_set(skb) ?
--		      skb_transport_offset(skb) :
--		      skb_network_offset(skb)) +
--		     parms->tcfp_off_max_hint;
--	if (skb_ensure_writable(skb, min(skb->len, max_offset)))
--		goto done;
-+	/* If the skb has shared frags the user is likely using zero-copy
-+	 * (e.g. sendfile).  Those page frags may point to page-cache pages;
-+	 * writing into them would silently corrupt the page cache.
-+	 * Linearize so pedit operates on a private copy.
-+	 * If you want zero-copy, don't use pedit. 
-+	  TL;DR if you want to use ZC, don't use pedit*/
-+	if (skb_has_shared_frag(skb)) {
-+		if (__skb_linearize(skb))
-+			goto bad;
-+	}
- 
- 	tcf_lastuse_update(&p->tcf_tm);
- 	tcf_action_update_bstats(&p->common, skb);
-@@ -414,6 +419,7 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb,
- 	for (i = parms->tcfp_nkeys; i > 0; i--, tkey++) {
- 		int offset = tkey->off;
- 		int hoffset = 0;
-+		int write_offset, write_len;
- 		u32 *ptr, hdata;
- 		u32 val;
- 		int rc;
-@@ -451,12 +457,32 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb,
- 			}
- 		}
- 
--		if (!offset_valid(skb, hoffset + offset)) {
--			pr_info_ratelimited("tc action pedit offset %d out of bounds\n", hoffset + offset);
-+		if (unlikely(check_add_overflow(hoffset, offset,
-+						&write_offset))) {
-+			pr_info_ratelimited("tc action pedit offset overflow\n");
-+			goto bad;
-+		}
-+
-+		if (!offset_valid(skb, write_offset)) {
-+			pr_info_ratelimited("tc action pedit offset %d out of bounds\n",
-+					    write_offset);
- 			goto bad;
- 		}
- 
--		ptr = skb_header_pointer(skb, hoffset + offset,
-+		if (write_offset < 0) {
-+			if (skb_cow(skb, -write_offset))
-+				goto bad;
-+		} else {
-+			if (unlikely(check_add_overflow(write_offset,
-+							(int)sizeof(hdata),
-+							&write_len)))
-+				goto bad;
-+			if (skb_ensure_writable(skb, min_t(int, skb->len,
-+							   write_len)))
-+				goto bad;
-+		}
-+
-+		ptr = skb_header_pointer(skb, write_offset,
- 					 sizeof(hdata), &hdata);
- 		if (!ptr)
- 			goto bad;
-@@ -475,7 +501,7 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb,
- 
- 		*ptr = ((*ptr & tkey->mask) ^ val);
- 		if (ptr == &hdata)
--			skb_store_bits(skb, hoffset + offset, ptr, 4);
-+			skb_store_bits(skb, write_offset, ptr, sizeof(hdata));
- 	}
- 
- 	goto done;
--- 
-2.51.2.windows.1
-
-Thank you,
-Rajat
+commit b9e7d5d9497cc9075fff4db2f0e1c143dbb8d2d8
+Author: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+eea: probe the netdevice and create adminq
+This patch adds the basic driver framework for the Alibaba Elastic
+Ethernet Adapter, creating the netdevice after PCI probe and
+initialising the admin queue used to issue commands to the device.
+A few questions on the code below.
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_adminq.c b/drivers/net/ethernet/alibaba/eea/eea_adminq.c
+> new file mode 100644
+> index 000000000000..dfad1bdbc44d
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_adminq.c
+[ ... ]
+> +static int eea_adminq_submit(struct eea_net *enet, u16 cmd,
+> +			     dma_addr_t req_addr, dma_addr_t res_addr,
+> +			     u32 req_size, u32 res_size, u32 *reply_len)
+> +{
+> +	struct eea_aq_cdesc *cdesc;
+> +	struct eea_aq_desc *desc;
+> +	int ret;
+[ ... ]
+> +	/* Returns 0 on success, or a negative error code on failure. */
+> +	ret = le32_to_cpu(cdesc->status);
+> +
+> +	eea_ering_cq_ack_desc(enet->adminq.ring, 1);
+> +
+> +	if (ret)
+> +		netdev_err(enet->netdev,
+> +			   "adminq exec failed. cmd: %d ret %d\n", cmd, ret);
+> +	else
+> +		*reply_len = le32_to_cpu(cdesc->reply_len);
+> +
+> +	return ret;
+> +}
+The wire protocol header defines:
+  #define EEA_OK     0
+  #define EEA_ERR    0xffffffff
+cdesc->status is a __le32, but it is stored into a signed int here:
+  ret = le32_to_cpu(cdesc->status);
+When the device reports failure (0xffffffff), ret becomes -1, which is
+-EPERM. That value then propagates up through eea_adminq_exec() into
+eea_netdev_init_features() and ultimately out of probe.
+Should the device's protocol-level error be translated to a more
+appropriate kernel errno such as -EIO before being returned to the
+generic layers, given that the wire protocol defines only EEA_OK and
+EEA_ERR rather than a kernel errno space?
+[ ... ]
+> +int eea_create_adminq(struct eea_net *enet, u32 qid)
+> +{
+> +	u32 db_size, q_size, num;
+> +	struct eea_ring *ering;
+> +	struct eea_aq *aq;
+> +	int err = -ENOMEM;
+> +
+> +	num = enet->edev->rx_num + enet->edev->tx_num;
+> +	aq = &enet->adminq;
+> +
+> +	ering = eea_ering_alloc(qid, 64, enet->edev, sizeof(struct eea_aq_desc),
+> +				sizeof(struct eea_aq_cdesc), "adminq");
+> +	if (!ering)
+> +		return -ENOMEM;
+> +
+> +	aq->ring = ering;
+> +
+> +	err = eea_pci_active_aq(ering, qid / 2 + 1);
+> +	if (err)
+> +		goto err;
+> +
+> +	aq->phase = BIT(7);
+> +	aq->num = 0;
+> +
+> +	q_size = sizeof(*aq->q_req_buf) * num;
+> +	db_size = sizeof(*aq->q_res_buf) * num;
+> +
+> +	aq->q_req_size = q_size;
+> +	aq->q_res_size = db_size;
+> +
+> +	err = -ENOMEM;
+> +
+> +	aq->q_req_buf = kzalloc(q_size, GFP_KERNEL);
+> +	if (!aq->q_req_buf)
+> +		goto err;
+> +
+> +	aq->q_res_buf = kzalloc(db_size, GFP_KERNEL);
+> +	if (!aq->q_res_buf)
+> +		goto err;
+> +
+> +	/* Before we set up the AQ, the device remains in an inactive state, so
+> +	 * there will be no DMA operations. If the 'set up AQ' process fails, we
+> +	 * can safely free the DMA-related memory.
+> +	 */
+> +	err = eea_pci_set_aq_up(enet->edev);
+> +	if (err)
+> +		goto err;
+> +
+> +	aq->broken = false;
+> +
+> +	mutex_init(&aq->lock);
+> +
+> +	return 0;
+> +
+> +err:
+> +	eea_destroy_adminq(enet);
+> +	return err;
+> +}
+By the time eea_pci_set_aq_up() is called, eea_pci_active_aq() has
+already programmed the SQ/CQ DMA addresses into the device registers
+and eea_pci_set_aq_up() has signalled EEA_S_OK. If the
+read_poll_timeout() inside eea_pci_set_aq_up() times out, can the
+device be assumed to still be quiescent?
+The err: label here jumps directly to eea_destroy_adminq(), which calls
+eea_ering_free() -> dma_free_coherent() without first calling
+eea_device_reset(). Every other teardown site in this commit resets
+first, for example eea_adminq_destroy_all_q():
+  if (err) {
+      /* The device must be reset before unmapping buffers to avoid
+       * potential DMA writes after the memory is freed.
+       */
+      mutex_lock(&enet->adminq.lock);
+      eea_device_broken(enet);
+      mutex_unlock(&enet->adminq.lock);
+      ...
+  }
+and eea_adminq_submit()'s timeout path (via eea_device_broken()), and
+the err_reset_dev label in eea_net_probe(). Should this err: label
+also call eea_device_reset(enet->edev) before eea_destroy_adminq() to
+avoid a DMA-after-free window into the freed SQ/CQ rings?
+mutex_init(&aq->lock) is called only after the last goto err point,
+and eea_destroy_adminq() never calls mutex_destroy() on it. Should
+eea_destroy_adminq() pair the init with mutex_destroy(), and should
+mutex_init() move earlier so the lock is always initialised on the
+teardown path?
+[ ... ]
+> +void eea_adminq_config_host_info(struct eea_net *enet)
+> +{
+> +	struct device *dev = enet->edev->dma_dev;
+> +	struct eea_aq_host_info_cfg *cfg;
+> +	struct eea_aq_host_info_rep *rep;
+> +	int rc = -ENOMEM;
+[ ... ]
+> +	cfg->os_type            = cpu_to_le16(EEA_OS_LINUX);
+> +	cfg->os_dist            = cpu_to_le16(EEA_OS_DISTRO);
+> +	cfg->drv_type           = cpu_to_le16(EEA_DRV_TYPE);
+> +
+> +	cfg->kern_ver_major     = cpu_to_le16(LINUX_VERSION_MAJOR);
+> +	cfg->kern_ver_minor     = cpu_to_le16(LINUX_VERSION_PATCHLEVEL);
+> +	cfg->kern_ver_sub_minor = cpu_to_le16(LINUX_VERSION_SUBLEVEL);
+> +
+> +	cfg->drv_ver_major      = cpu_to_le16(EEA_VER_MAJOR);
+> +	cfg->drv_ver_minor      = cpu_to_le16(EEA_VER_MINOR);
+> +	cfg->drv_ver_sub_minor  = cpu_to_le16(EEA_VER_SUB_MINOR);
+The driver carries a private version triplet (EEA_VER_MAJOR/MINOR/
+SUB_MINOR = 1.0.0) and reports it to the device. For an upstream
+driver, the canonical version is the kernel version itself; private
+driver version numbers tend to fall out of date and have historically
+been pushed back on by netdev maintainers.
+Could this field be dropped, or derived from the kernel version,
+rather than freezing 1.0.0 into the device-side ABI?
+> +
+> +	cfg->spec_ver_major     = cpu_to_le16(EEA_SPEC_VER_MAJOR);
+> +	cfg->spec_ver_minor     = cpu_to_le16(EEA_SPEC_VER_MINOR);
+> +
+> +	cfg->pci_bdf            = cpu_to_le16(eea_pci_bdf(enet->edev));
+> +	cfg->pci_domain         = cpu_to_le32(eea_pci_domain_nr(enet->edev));
+> +
+> +	strscpy(cfg->os_ver_str, utsname()->release, sizeof(cfg->os_ver_str));
+> +	strscpy(cfg->isa_str, utsname()->machine, sizeof(cfg->isa_str));
+On every probe the driver unconditionally sends utsname()->release,
+utsname()->machine, the full Linux kernel version, os_dist, drv_type,
+the PCI BDF and PCI domain to the device. The kernel release string
+is set by distros and can include build identifiers.
+Could the commit message explain what the firmware does with these
+strings, and is there a reason this needs to be unconditional rather
+than gated on a module parameter or kernel option?
+EEA_OS_DISTRO and EEA_DRV_TYPE are both hardcoded to 0 with no
+documented enumeration of valid values. Together with EEA_OS_LINUX=1,
+these become part of the wire ABI introduced in this commit.
+If these fields are intended to grow (for example to distinguish
+upstream vs out-of-tree builds, or kernel module vs userspace
+consumers), can the meaning of value 0 and the reserved range be
+documented now? If they are not needed, can they be removed before
+firmware ships against this layout?
+> +
+> +	rc = eea_adminq_exec(enet, EEA_AQ_CMD_HOST_INFO,
+> +			     cfg, sizeof(*cfg), rep, sizeof(*rep), NULL);
+[ ... ]
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
+> new file mode 100644
+> index 000000000000..bb8a49f8c6df
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
+[ ... ]
+> +static int eea_netdev_init_features(struct net_device *netdev,
+> +				    struct eea_net *enet,
+> +				    struct eea_device *edev)
+> +{
+> +	struct eea_aq_cfg *cfg;
+> +	int err;
+> +	u32 mtu;
+[ ... ]
+> +	netdev->min_mtu = ETH_MIN_MTU;
+> +
+> +	netdev->mtu = mtu;
+> +
+> +	/* If jumbo frames are already enabled, then the returned MTU will be a
+> +	 * jumbo MTU, and the driver will automatically enable jumbo frame
+> +	 * support by default.
+> +	 */
+> +	netdev->max_mtu = mtu;
+netdev->max_mtu is set to the same value as netdev->mtu, where mtu
+came from cfg->mtu in the device's reply to EEA_AQ_CMD_CFG_QUERY.
+The eea_aq_cfg structure has only a single __le16 mtu field and no
+separate maximum, and the comment above describes mtu as the current
+configured MTU rather than the device-supported maximum.
+With max_mtu == mtu, can a user ever raise the MTU above the value the
+device happened to advertise at probe time via "ip link set dev X
+mtu N"? Should the wire ABI being introduced here grow a separate
+mtu_max field, or should the driver derive a maximum (for example a
+fixed jumbo cap) for max_mtu?
+> +
+> +err_free:
+> +	kfree(cfg);
+> +	return err;
+> +}
+[ ... ]
+> +int eea_net_probe(struct eea_device *edev)
+> +{
+> +	struct eea_net *enet;
+> +	int err = -ENOMEM;
+> +
+> +	enet = eea_netdev_alloc(edev, edev->rx_num);
+> +	if (!enet)
+> +		return -ENOMEM;
+> +
+> +	err = eea_create_adminq(enet, edev->rx_num + edev->tx_num);
+> +	if (err)
+> +		goto err_free_netdev;
+> +
+> +	eea_adminq_config_host_info(enet);
+> +
+> +	err = eea_netdev_init_features(enet->netdev, enet, edev);
+> +	if (err)
+> +		goto err_reset_dev;
+> +
+> +	netdev_dbg(enet->netdev, "eea probe success.\n");
+> +
+> +	/* Queue TX/RX implementation is still in progress. register_netdev is
+> +	 * deferred until these are completed in subsequent commits.
+> +	 */
+> +
+> +	return 0;
+After this commit, eea_net_probe() returns success without calling
+register_netdev(). A bisect that lands exactly on this commit will
+see a probed PCI driver that has consumed IRQs and DMA buffers and
+already issued the HOST_INFO admin command to firmware, but no netdev
+visible to userspace.
+Could this patch be squashed with the later patches that complete the
+TX/RX paths and call register_netdev(), so a bisected kernel either
+has a working interface or no driver activation at all?
+> +
+> +err_reset_dev:
+> +	eea_device_reset(edev);
+> +	eea_destroy_adminq(enet);
+> +
+> +err_free_netdev:
+> +	free_netdev(enet->netdev);
+> +	return err;
+> +}
 
