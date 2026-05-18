@@ -1,310 +1,186 @@
-Return-Path: <netdev+bounces-289120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mF95EQRBC2p5FAUAu9opvQ
-	(envelope-from <netdev+bounces-289120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:40:36 +0200
+	id oPduA2xAC2p4FAUAu9opvQ
+	(envelope-from <netdev+bounces-289121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:38:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A0A5710EB
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:40:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DFDE571080
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:38:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6AD843023366
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:37:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3914F3005585
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACD9480979;
-	Mon, 18 May 2026 16:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4106F48B394;
+	Mon, 18 May 2026 16:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eZuSQ4iU"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="GTy5Vpzl"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011068.outbound.protection.outlook.com [40.107.208.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5D945BD6F
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779122219; cv=fail; b=cBvnrmBt9n1jKwOhlNNgJzKgm3jh1n/VoeNKLRbYNubYffS1yK1a/oegV21ThNkfpnHSPMlNzsr5fp4GtvOr9Me5qQPjdgzP6PyOj24oXfAu8OtL02/Zh+NfsP7j3Nxmkaizox3pv431XpB3iY0G18iHOqb8/fZPwDmdUbfcZ5s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779122219; c=relaxed/simple;
-	bh=ltGVZEUUq2VzKEBldSmA+5+AnUwKlZZFrhcLAT5K8No=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=igsWW2FLyP8HU/Gpw7sCnFx3HZwdKzuq9gPzmgQaPbJDn6Se+H9ViE3mha9faZE029fA/8ztoAEZFlJybcxmwZD4LeMnbMRhKg0yjnGW2cony0NSjg6YL7biqxn4v8zrMJNLPEKGEcAXyTeU1WTpYc78QUIEuwXgVXFK5X/1rYM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eZuSQ4iU; arc=fail smtp.client-ip=40.107.208.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SjveTPDbFH6/oB3LvbRK7yUHepb4UnYY9KQfGYXW7tF4eKzaiKyx939fssxeQeJMhdg3k62tkfc8koZcWoLAKALC+TgxCCT/Eb8oBhht6TUn33AzwdBW6wGtGXWmJyLL1/De3HPEh5UF7k1z8y5W+guPAvLI5a38ERnYGM+vhx8dg183XyLFjomYZMPpZESscVDCOBuCADekQ7PVe2Y7CIv0gqyqc+yryp0C+8+ky/lAZg+mMGOzUCu/bACEAYL5CdJUBokXwqEBlwyokPmYublvHTAiluJ1rX5n9wc+KyQf7AhGFhcLf7ErmUdoNxv2T2Jj84gbK5kQ/7TuvsW4zQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eQDiMIs/bqWuFJYjGGalRi9muoduOi5pg5euWBqnAgc=;
- b=V/KPAu6qsGOFaiVIt5qQS5WyCcmEa1fFFB0Y8VAkkWolVAYwHSASQwkU8AxuH+1TJQMmr05rp/Ey74bXKOD6n+Kg5w+qeRPZM1gzmMzJpRrAKQUW5V+V80aleEwoKNl3EIQhPK6fL2tHtOBJeH4TJffPmhHe8gMraWlaxLxD7q3Mih8fOp0/TQHrwZPaqGhfAGtMC/OuUeWH+5vcWjOclZQPgbSabyjHwEWLkbI7YZJsHArRWDiIKf9TZutk4XgW7F+RVhCbX1+ofklPSn3DxIdHIPdvEQPYXKrrGb4yjB/fpV5C5QqNLF7DB+ijHJdFWGfbOQa1rD5F+OaGmq+gzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eQDiMIs/bqWuFJYjGGalRi9muoduOi5pg5euWBqnAgc=;
- b=eZuSQ4iUTN8FQyaKFZQMXhkTWN96mz8E++CBttrX38v/ChaTYFOEs1ln3AOXuEGQMZd8xhLwYmwBxGsXllvqAu28UmLLo0cmVrHmUI9QrSbnZqVxulySkSuKSjh7j7aWYZrcT6ClT1fTfm50N7iyahwURoEnzbMF+6m5waRRARqPWkeo90vJcPRmqrfOlrIbtoi+SypDTW9UrVUc0ktwNzs3Xd+Y7jahI85o2m2jmJCL0ufNOXDT+9xfvQk9TVfFVgHLD4Xx7qeh38sJvKtxHAf9WzeYZ1z1bKDrLFDzWfFjjXT9q74GEBE0YQt3Y3751oKWJhD15+kM8xMKTDQwRQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB8202.namprd12.prod.outlook.com (2603:10b6:8:e1::13) by
- DM6PR12MB4418.namprd12.prod.outlook.com (2603:10b6:5:28e::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.18; Mon, 18 May 2026 16:36:49 +0000
-Received: from DS7PR12MB8202.namprd12.prod.outlook.com
- ([fe80::38fd:4146:aea:639e]) by DS7PR12MB8202.namprd12.prod.outlook.com
- ([fe80::38fd:4146:aea:639e%6]) with mapi id 15.21.0025.022; Mon, 18 May 2026
- 16:36:49 +0000
-From: Andy Roulin <aroulin@nvidia.com>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	dsahern@kernel.org,
-	bridge@lists.linux.dev,
-	razor@blackwall.org,
-	nikolay@nvidia.com,
-	idosch@nvidia.com,
-	petrm@nvidia.com,
-	danieller@nvidia.com,
-	Andy Roulin <aroulin@nvidia.com>
-Subject: [PATCH iproute2-next] iplink: bridge: add stp_mode support
-Date: Mon, 18 May 2026 09:36:47 -0700
-Message-ID: <20260518163647.1935156-1-aroulin@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SA0PR11CA0059.namprd11.prod.outlook.com
- (2603:10b6:806:d0::34) To DS7PR12MB8202.namprd12.prod.outlook.com
- (2603:10b6:8:e1::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCDC48AE06
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779122271; cv=none; b=d6oHrrMfvfuHG6Wbkr8exql3EzcnQYOHcc/JhdO1PqUeaDNDSGmnE2rdNZxixyIpgyyyhevhWyU4Ps7UV0rhHSnlZSIg4TdwlR3bEuEi4If9DNTR515oGclK3qVB13vltOodnGtkvZQCGJnaMvxw5AabJ7jzrhOn+MrDKW2VTzc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779122271; c=relaxed/simple;
+	bh=CaqRPTgKXyI2XV4PjCcbbusa6uw3fAD79fAQWeD1M6I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mDO/o2SPqYRFvWeC/j0Y9CPC3tFl6sLTD76F8J674IH2yaO9JKlxZ2HVXaEirFwA9d1gTFhivD7mQ6wYFoPHK0Qhl6aILcgAxhRk43lNjB8YSrKu+LOw8hKEIjv12hu7kbQiz103fFvlzi2/pRpXd6qMBUOXkOrOYjpX2JQGF1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=GTy5Vpzl; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43fe62837baso1390844f8f.3
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 09:37:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1779122267; x=1779727067; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bWMCe3ghcYJBdMMLjkrfnvrFFAeOfYLES9EzhhtO5zQ=;
+        b=GTy5VpzlP8Acq99bNuZNx4u0hzLo54Fz5DCJ0CCvKJOQm1PwwGA3kMSx78WU0wNyDA
+         hvjm04HSG6vDQzDeUsCe5FluuTyu6kRqIjHGxdokpPqfjU1NMprli2kRNEiX80pvC5N6
+         eSd1OKVrMXWivL0VA/ayYiPEM1oI9opLqZukGoSxX7rvgdakCkJJnYpC8P1KNtiFrdck
+         tY/Y2vM1VZsUPzwRLGmaQjXTNu+79LHkjE1S7f2TQwezGfExijV2oEDGSh329kdXcqBK
+         zQwqp81/umNLiMZrff3gGrnoofepXZmfJaE0QY7tYtgZ6PHUw8E7YltP26sDynj3tT2f
+         anyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779122267; x=1779727067;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bWMCe3ghcYJBdMMLjkrfnvrFFAeOfYLES9EzhhtO5zQ=;
+        b=UUEHrDkefLntnfceDgQH+UCB5Eh8jWVIayTLamyJH3M1eUQovt6VriEFzrI/8QVjiC
+         k82aAY5/hfkfDIPdMWqhkY138pIwigVod4mlQZHbbKX8YqZbaxLGOKaxNczBF45CRwr7
+         NrPXcW+8rGNXiPIt04U1N3XhqV37K2YWdXWcGUc9D5ZXlkNW7+gaxSubYd8nJv9Fz/Tc
+         iz5Lq9iioAHMnTbKL3rUiq5ABhvlQrc6SKtCy0eSQcgBAy74J1Ehgwd1pco1rvCbLqNo
+         tIYpHnnSEGIdpV3RiYzw6SicCEo0isO4s7fABNW1N3gSL+Gklk43FpDfrdZ/HPtQfNVo
+         oZyw==
+X-Forwarded-Encrypted: i=1; AFNElJ/WLjI0Jwr6Yvp8+uiHJJNOrZAv44qCjldfU2LBo/22HOBFAuOaFgj+spOuzyeNZ0pzGCc5Kc4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYXx/uVO3k4CdT2QRp2+MVaZCaKVJ1K23Pp8TV6u6lqFZhDAJa
+	g0ZkJ8tVpcAAShqZ3OV17V8exx5yra+ZcJjNHjy0kel+ujd9rizcxWe7lTZBXOsr0A==
+X-Gm-Gg: Acq92OF5nJ6z5+JAo8ssbl6Nae3FHjkIX0rnFsOaPSzpVuI1te/3EBBPdDoq4HH3u4T
+	6OZcmziMDqTbZiu3asx8RoPLjNXabFLBMg8IJpAzKOxQGWKx/DwtBbGZY2mY5g74s9NBTMCFq0A
+	+HBJlsfSsT9QKPfhvVb1I3fMNfd9ZZzeVgaO0we0J5TL8akxvXQK4rtmpXTLisgeuiED4Lo8qF9
+	dfTT6qRVZW6xcZh02RywqgH4H1KEEF57kpCMKtnXLZ2E8h6c9yT6jS7y0eLPorUjFS/Ke80UfFP
+	UQiiR0vvVipKpMTDINSM6+TkdlODpBqPVkuWhVmA8QvoD/yNr2790AsbZbhgn9lqnmb7v7mHDmj
+	Mm7pokOLF+n9GtGswRbptiAB5oUhD81Y2POatefK9CBb1qNS3HRuQVCH7L35+bbV9OQ5MQJbkJq
+	H05ZhdDnO3dcUJ3MyAF0oDyNA=
+X-Received: by 2002:a5d:64e4:0:b0:43e:b0f8:66f1 with SMTP id ffacd0b85a97d-45e5c5aebdcmr26353139f8f.43.1779122267158;
+        Mon, 18 May 2026 09:37:47 -0700 (PDT)
+Received: from [10.83.43.186] ([159.134.255.34])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45e6a135f0csm19940345f8f.27.2026.05.18.09.37.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 May 2026 09:37:46 -0700 (PDT)
+Message-ID: <df2ec565-c621-4894-826a-29c3a75785be@arista.com>
+Date: Mon, 18 May 2026 17:37:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB8202:EE_|DM6PR12MB4418:EE_
-X-MS-Office365-Filtering-Correlation-Id: 983db44f-ec65-4ba8-80ad-08deb4fba8b0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|1800799024|18092099006|18002099003|3023799003|56012099003|11063799003;
-X-Microsoft-Antispam-Message-Info:
-	dKV89C2L4xFS9AjT4XG33BkQHSiVQHrFxs/QM3Dk6v/Cnjona2gVBYtXMW0cg9HC8/VVsToll3GPkoet5uNqDOR8x7lMLax9TaC7fX0uKmUY1etniQRzn2E6ESVz7WgzLA2+gqg9dlse11/hMjHnh4rfN4gEXQ8ICScIzIrhWED3SAFZJMrs34ysFQLiqKwJUJZ24DVwGuEPt+2n5RF9D4XfZRtA0y7d5uNlNcFqYvigpFi9U2iwJ/3DFwZ/B1+7LVXUAE9RGX6HVGpgWnPPOYIy4wYjLT+y+YZk8bGjTnszyegqyH2OMfneFgj1obgcaQpqByLHN5a0onqp7zgy4/Zo8+KzZzLNzA+HmAWBZ/ptgJ8W7CUQAp+lBXjHf4eKwxv8F66fpDVHW634yk6O7xWb5bdrsR3k7knpLTok6FlScesXkTgF0H7tkSvEo1EC8XKKOt3jbK8Bbj+iZKtsVEQ+psTHAoHTkiddLUO1NBodVzZu4lthw4DfXWIHEA31E23qpsDGFLQRYR3DJNmRkHU84mVCv6qokz79DVx+J4Jpl8cfk24HgdSWsyNVTttdjYoYUgbcS/AB0+60w+VUA1cLEe31f+2y3a7m7SkFckJT/HkQ1VhVvvmBNSJA6O9/lypnd1AyBAIC7mrjd3Q4BpyMVH3zYPrEKYOUlTw61LDiWOwXA9w7ypOAnxzxou0A5hCRddD4ciTHTTEyIRFzuQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB8202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18092099006)(18002099003)(3023799003)(56012099003)(11063799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SukhyQ9H9AFG1AkspWSERWLebDqeoHE+6DDHCzp1Z6NpK2+JvluvbkdMCK09?=
- =?us-ascii?Q?Sl6emwcWDBI4ZdSoMYngcgZm7zSUFNB1vWDVf838LUjRDiPDcJrHyjrh7AL2?=
- =?us-ascii?Q?3D+wmWq2g8utqj8/8JgDUSAo84sN01R1ljpet2Z6WI5PYXQgt3StO/pfTVa7?=
- =?us-ascii?Q?xcnG1Jqw3i2xIZ8q7HLJa2WJPf5tLDObUHkQlG5F0gUtyUZkqVSKnz2hV/7x?=
- =?us-ascii?Q?aw1sFJm81EdpDoHVM9CInKmbo0cOBFFnhHmuFFGZxurQrqRRs46SMD0/AfDc?=
- =?us-ascii?Q?dXwGgd2xDcUNijJwBWe7o6pq9FXaIqFxRwZWJIkIe+cl+RpUaMtFvCmPjpr/?=
- =?us-ascii?Q?T888BvEclfFKK1nKYG5RY+i032IOgAbGjQVgSi9IlHxrlHBY5srG22OZDc6w?=
- =?us-ascii?Q?7Q0IvVlVMWWA0XcKR9PbQdoe1pIMM8ldBUonLpJT5xZIAi4MihEMk5Um3VpS?=
- =?us-ascii?Q?6+Cf82QbDdyLA9bvezrKfpN7cPPwrrhdVFFHJQtH6sjx4ku+6rXNpKp7oG0z?=
- =?us-ascii?Q?cPOfzkwDM73PGkn2PpoTQGVrFoCfBTVM58TgfDlcnFxi9vpx5wBfGFY/w07q?=
- =?us-ascii?Q?s+nHFjhJw5BxIDHqwiS/nqX8vbYedx/45Rs0NMeEqHo+081vPa6/A+D/ID94?=
- =?us-ascii?Q?U2nFxX69t/vDevGUepUL1LaQwR8nCni1QuI70L8QoWgoR3YLmV1RxEoAbO+M?=
- =?us-ascii?Q?5xGTYnXvna3Cp5Ch9cFBWLo7Go+igtCu0YDOuLx8qOE2vXJhBR2Jb4rf8RWZ?=
- =?us-ascii?Q?2vyHd55JMNhkOHafpFbTSMVCRim8WlKoCJhV/SskaiiuJm83LGjuIVv0biR0?=
- =?us-ascii?Q?cL9bghWxyzthMIfzlYKSqitjuJQt9xiYUmV8ZAndsegqsQcT+JbwOkISiygs?=
- =?us-ascii?Q?YgwDQRFUFEphhjdURuE6pe3ms13EgaqQEZfydz6uFZhQNJ49V1UlDAzI/0Gk?=
- =?us-ascii?Q?Z6dlGW0oOWxdXW3xt1J0G9wB5UfriyOwfonPqVz4cNbI0HXdrFkrRt1I5+J5?=
- =?us-ascii?Q?ur3n9eeFoZRNf2z13oEUNpVcz8gsRr3nkMfIZZAKK8Vx1cdPpeYg62Hs1lQj?=
- =?us-ascii?Q?ZU9+GFsdPk45vJXKi1vueyShzW2VKv7Jr4xbfWlCg7Fjcnq1WsoTP/ZuPo2n?=
- =?us-ascii?Q?mOKmryIUJmpJxNWsGpdH31isNc06p4mO1CvH6mlpsAZKpr0uQed+ryFpKEzP?=
- =?us-ascii?Q?Jz/K0nAtQ9DHCxYk1weiDEYQyQMIyCnB5YHxhK9yHSeVsnS3hURjTYk0+UYO?=
- =?us-ascii?Q?rLMSm3YQwWUKGDkX6uu8UckVy85EepwlmaVGG87pryr+dd2320Q8MHKrjtBr?=
- =?us-ascii?Q?qOCNJczMwPMCqzenGpky+v0/Lohwi3ZFA2tcpBMDtDaoeBuYhekSZOBHgLwv?=
- =?us-ascii?Q?kD8A3Q+vLlrgLslTTm+tGEUMDN1+8avao4xVF5bBywgn7yfdWKPV/2gGFvRA?=
- =?us-ascii?Q?oe9FM/EsYahnOJoA/0uLBq2zBSVyuJTxQD+jFlJA/ia5ZdX2qd4cDMBizFa5?=
- =?us-ascii?Q?TzRtgHGmphsZDq2PnHtsq7JkRz712//xgzkqgKLDVIZ4n9GwlhZAUQSn2sOv?=
- =?us-ascii?Q?86+HYQkUWM3MYYrunFWX8tFU0Pt0KDsvIK7ltgUhTmpxbaSFlA1+V1qRT605?=
- =?us-ascii?Q?XGe7c7AxwcZXNw9/MGD5S61eGQTXjdTxpMBAKAaMoslAwBVRTSKPVMey7CIm?=
- =?us-ascii?Q?gcxDV8hB8b92nYNo3nL5d1+89tJRkD/YK8HoNxzvFUJIQK3qLNIEMbmK660H?=
- =?us-ascii?Q?43bEBPerEA=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 983db44f-ec65-4ba8-80ad-08deb4fba8b0
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB8202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 16:36:49.6069
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: buGTg/yjvG0xz6TuYY3J5VoB6TvfZCBYYDjRNm4k6W3e1lw56wqMEkerSI93DYPggtsEoA6rR+AUSEpfYj6chA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4418
-X-Spamd-Result: default: False [1.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] tg3: guard napi_disable and pci_disable_device calls
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: mchan@broadcom.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-kernel@vger.kernel.org
+References: <CAPzpGcTtw+ou+8jid_qE9w96UWt+4KUZXN-aC=44Oqkk=qdERg@mail.gmail.com>
+ <CALs4sv3XH1DEB+EXmSjKvPz8Av-53HOrJ+Dc_mjOv+3EnnuV9w@mail.gmail.com>
+ <a120c9f5-5818-4335-ac2c-caaf4f6f4fc7@arista.com>
+ <CALs4sv2bNZkBvqKwSMOM5CtJG+GM8P6D6PMHWFJUqtNS4xw34A@mail.gmail.com>
+Content-Language: en-US
+From: "Yury M." <yurypm@arista.com>
+In-Reply-To: <CALs4sv2bNZkBvqKwSMOM5CtJG+GM8P6D6PMHWFJUqtNS4xw34A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
+	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289120-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[arista.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aroulin@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289121-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yurypm@arista.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:mid,nvidia.com:email]
-X-Rspamd-Queue-Id: A1A0A5710EB
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,arista.com:mid,arista.com:dkim]
+X-Rspamd-Queue-Id: 5DFDE571080
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for the IFLA_BR_STP_MODE bridge attribute that allows
-userspace to explicitly select the STP mode:
+It looks like your opinion is based on the fact that AER recovery 
+failure is a critical issue after which the system should be considered 
+unstable. But I disagree with that. AER error recovery failure can 
+happen not only because of PCI_ERS_RESULT_NO_AER_DRIVER (arguably 
+considered a buggy or unsupported PCIe bus configuration). There are 
+other AER recovery failure reasons. And until the system is locked by 
+tg3, it has a chance to be recovered, and tg3 should not be a blocker 
+here. I would accept the case where, after AER recovery failure, the tg3 
+device stops working. We can consider it as an unsupported case where 
+manual intervention is required to recover tg3. But in this case, it 
+blocks rtnl_lock.
 
-  - auto (0): default, try /sbin/bridge-stp helper in init_net
-  - user (1): directly enable userspace STP without the helper,
-    works in any network namespace
-  - kernel (2): directly enable kernel STP without the helper
+For me, any AER error recovery failure is a legitimate condition in 
+Linux. Maybe we can even consider that the whole bus is in an 
+unexpected/unstable state. But we still should give the software a 
+chance to recover the system. Especially when we are talking about the 
+support of hot-pluggable devices. Insertion or removal of a new PCIe 
+device (without AER recovery support) onto the same bus as the tg3 
+device should not cause an rtnl_lock hang.
 
-Both string ("auto", "user", "kernel") and numeric values are accepted
-when setting the attribute. Display uses string names for known values
-with numeric fallback for future extensions.
+Sorry, maybe I'm wrong and AER recovery failure is really a critical and 
+unexpected system error.
 
-Example usage:
-  ip link set br0 type bridge stp_mode user
-  ip link set br0 type bridge stp_state 1
+Theoretically, in this particular case, we can try to fix 
+PCI_ERS_RESULT_NO_AER_DRIVER and avoid changes in tg3. But I'm sure that 
+there are other cases where AER recovery can fail and there are many 
+other hot-pluggable devices that can return PCI_ERS_RESULT_NO_AER_DRIVER 
+or cause another type of AER recovery failure. As such, it looks like it 
+is better to handle AER recovery failure in tg3.
 
-Link: https://lore.kernel.org/netdev/20260405205224.3163000-1-aroulin@nvidia.com/
-Assisted-by: Claude:claude-opus-4-7
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Andy Roulin <aroulin@nvidia.com>
----
- ip/iplink_bridge.c    | 30 ++++++++++++++++++++++++++++++
- man/man8/ip-link.8.in | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
+Another long-term fix could be to add another AER error handler callback 
+to signal drivers about AER recovery failure.
 
-diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-index df3264c3..d15221b2 100644
---- a/ip/iplink_bridge.c
-+++ b/ip/iplink_bridge.c
-@@ -31,6 +31,7 @@ static void print_explain(FILE *f)
- 		"		  [ max_age MAX_AGE ]\n"
- 		"		  [ ageing_time AGEING_TIME ]\n"
- 		"		  [ stp_state STP_STATE ]\n"
-+		"		  [ stp_mode STP_MODE ]\n"
- 		"		  [ mst_enabled MST_ENABLED ]\n"
- 		"		  [ priority PRIORITY ]\n"
- 		"		  [ group_fwd_mask MASK ]\n"
-@@ -67,6 +68,7 @@ static void print_explain(FILE *f)
- 		"		  [ mdb_offload_fail_notification MDB_OFFLOAD_FAIL_NOTIFICATION ]\n"
- 		"\n"
- 		"Where: VLAN_PROTOCOL := { 802.1Q | 802.1ad }\n"
-+		"       STP_MODE := { auto | user | kernel }\n"
- 	);
- }
- 
-@@ -120,6 +122,20 @@ static int bridge_parse_opt(struct link_util *lu, int argc, char **argv,
- 				invarg("invalid stp_state", *argv);
- 
- 			addattr32(n, 1024, IFLA_BR_STP_STATE, val);
-+		} else if (strcmp(*argv, "stp_mode") == 0) {
-+			__u32 stp_mode;
-+
-+			NEXT_ARG();
-+			if (strcmp(*argv, "auto") == 0)
-+				stp_mode = BR_STP_MODE_AUTO;
-+			else if (strcmp(*argv, "user") == 0)
-+				stp_mode = BR_STP_MODE_USER;
-+			else if (strcmp(*argv, "kernel") == 0)
-+				stp_mode = BR_STP_MODE_KERNEL;
-+			else if (get_u32(&stp_mode, *argv, 0))
-+				invarg("invalid stp_mode", *argv);
-+
-+			addattr32(n, 1024, IFLA_BR_STP_MODE, stp_mode);
- 		} else if (matches(*argv, "priority") == 0) {
- 			__u16 prio;
- 
-@@ -512,6 +528,20 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 			   "stp_state %u ",
- 			   rta_getattr_u32(tb[IFLA_BR_STP_STATE]));
- 
-+	if (tb[IFLA_BR_STP_MODE]) {
-+		static const char *stp_modes[] = {
-+			"auto", "user", "kernel"
-+		};
-+		__u32 mode = rta_getattr_u32(tb[IFLA_BR_STP_MODE]);
-+
-+		if (mode < ARRAY_SIZE(stp_modes))
-+			print_string(PRINT_ANY, "stp_mode",
-+				     "stp_mode %s ", stp_modes[mode]);
-+		else
-+			print_uint(PRINT_ANY, "stp_mode",
-+				   "stp_mode %u ", mode);
-+	}
-+
- 	if (tb[IFLA_BR_PRIORITY])
- 		print_uint(PRINT_ANY,
- 			   "priority",
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index ef45fe08..802dd739 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -1719,6 +1719,8 @@ the following additional arguments are supported:
- ] [
- .BI stp_state " STP_STATE "
- ] [
-+.BI stp_mode " STP_MODE "
-+] [
- .BI mst_enabled " MST_ENABLED "
- ] [
- .BI priority " PRIORITY "
-@@ -1828,6 +1830,36 @@ or off
- .RI ( STP_STATE " == 0). "
- for this bridge.
- 
-+.BI stp_mode " STP_MODE "
-+- set the STP mode for this bridge. This controls how the bridge
-+selects between userspace and kernel STP when STP is enabled via
-+.BR stp_state .
-+.I STP_MODE
-+can be one of:
-+.in +8
-+.sp
-+.B auto
-+(default) - invoke the
-+.B /sbin/bridge-stp
-+helper to hand the bridge to a userspace STP daemon. Only attempted in
-+the initial network namespace; in other namespaces this falls back to
-+kernel STP.
-+
-+.B user
-+- directly enable userspace STP without invoking the helper. Works in
-+any network namespace. The caller is responsible for registering the
-+bridge with the userspace STP daemon.
-+
-+.B kernel
-+- directly enable kernel STP without invoking the helper.
-+.in -8
-+
-+Can only be changed while STP is disabled. Both
-+.B stp_mode
-+and
-+.B stp_state
-+can be set in a single command.
-+
- .BI mst_enabled " MST_ENABLED "
- - turn multiple spanning tree (MST) support on
- .RI ( MST_ENABLED " > 0) "
--- 
-2.43.0
-
+On 5/18/26 16:43, Pavan Chebbi wrote:
+>> To do cleanup on device-stop or error handling is a common approach, and it is not a problem. The problem is that tg3 doesn't track the device status. If a cleanup was performed (napi_disable and pci_disable_device called), tg3 should know that the device is not in an initialized state. When we subsequently try to disable the device, tg3 should not try to cleanup again. That is the problem I'm trying to fix. Frankly speaking, I'm adding a flag which signals that device cleanup was completed during the handling of an AER error, so when tg3 stops/removes the device, it should not perform cleanup again.
+> I understand this. But my view is that you are trying to fix a
+> symptom. The real issue seems to be that you are having some devices
+> in your bus/subtree that don't support AER.
+> Looking at pcie_do_recovery(), the recovery aborts the moment
+> NO_AER_DRIVER is received by the port driver. I would like to think
+> that this is by design.
+>
+>> Maybe PCI_ERS_RESULT_NO_AER_DRIVER is a rare case in the PCIe world, but I think that in any case, the tg3 driver should correctly handle AER recovery failure. Recovery can fail not only because of the PCI_ERS_RESULT_NO_AER_DRIVER return code. The problem is that a double napi_disable call causes a soft lockup, and not just one driver/device stops functioning—the whole system is affected.
+>>
+> Like I said, the tg3 driver does handle the AER sequence correctly.
+> The problem really is the tg3 remove() is facing issues because the
+> PCIe devices' topology is not suitable for AER recovery.
+> The issue a consequence of tg3 suffering a stall during AER because it
+> never recvd slot_reset() and resume().
+>
+> I am not sure if we should allow this fix for what I think is a
+> situation arising out of an unsupported topology..
+> I will defer this to Michael or netdev maintainers for their feedback.
 
