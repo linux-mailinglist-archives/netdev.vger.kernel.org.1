@@ -1,351 +1,184 @@
-Return-Path: <netdev+bounces-288969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288970-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGL0LgbeCmpV8wQAu9opvQ
-	(envelope-from <netdev+bounces-288969-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:38:14 +0200
+	id CPW9F9ffCmqR8wQAu9opvQ
+	(envelope-from <netdev+bounces-288970-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:45:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6433F569DB5
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:38:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3689569FFB
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6D08C30183D4
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 09:37:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D44530EF986
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 09:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271F23E7161;
-	Mon, 18 May 2026 09:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105AF3E7BBE;
+	Mon, 18 May 2026 09:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="m05SgRom"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mhA8NNt4"
 X-Original-To: netdev@vger.kernel.org
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013003.outbound.protection.outlook.com [52.101.83.3])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012060.outbound.protection.outlook.com [52.101.53.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D683E7172;
-	Mon, 18 May 2026 09:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56C53E6DFF;
+	Mon, 18 May 2026 09:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.60
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779097003; cv=fail; b=D75X1xS3SVmQzzxr2i2mLNY1WJmyobP0tvXSyFSYVx17YsTg8ubzPmgD+XqYTOw4ER+OMgFfQYXxSr30uIgXRQgyQd2MysWWP7iiIfJ0PpNkltpRtrbYZvxRM+Msr0TKVAI5I0lG1nE7CZSa41n3vT1vXHnxSoaFJ9pyUvECv/8=
+	t=1779097065; cv=fail; b=hXYR87LRdchERo5waFSOLZSLrAss2iTV6kA076wPhf7vUzOqlqj4AYgr0VIb3BOaWev1Dt8eDDLSyz4wDEHdKh1EZ5Deaep6Y0t2j35CpesHAKVzSrqB9P7THChNEAncMAdP/SziXxV9z4PUmEgzJpUH/qkmCp7G3MDdr1/o+oA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779097003; c=relaxed/simple;
-	bh=o0CZsXr/Wd/yIu1r26NVuoSN7WzaVV3TwaG67VnIEjk=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=awcZaJzgsRN9voiVv8c++Pq08nxC5Nd6lNrv6f4pb0fJ4b0Xyv0J8w/EHUaXqt+6+2Dr4yPJXdXUWW5ZdOCpn5lWPbWcDAOnLXVMsr7X50dUYE6AD2Hv6cYgPYBDDAqGDoOpsjd8jU7bYdRINIEi5KlWnwbRvu4fc/p4FMBIGB8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=m05SgRom; arc=fail smtp.client-ip=52.101.83.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+	s=arc-20240116; t=1779097065; c=relaxed/simple;
+	bh=j3L3PAMpDwcWUKzWN9FESX9YmU0QEn1rVt+iFA+9IZA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BLCYtsBxl2ZCTLK4O771YxFUbiTEuhM7o7FWeggIgG34HuSQZSMEiahWvALrKkFMxyGXWGbp02/2rIaSpCUHAKP7cvOoDWW4XwwbJA27EyanUGbg4miR+BXd6Ty/NfySilvU08caRlvX4fUM48UHf8S2UkPRSEWXAsJqNpSVJfA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mhA8NNt4; arc=fail smtp.client-ip=52.101.53.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Awth8sWXNIszZBd0tdl8HAKppZdaEhFU7/8rUnn6gWbv7JVbk1EJx4YvB6qaMmRonQ4A4NCluAYzR/qJckQbQmc1wmJ0BCk/p2N5BH6cr4uTDY6ToX+/cVaabhMqORqt8R16DuOdf5FMAMDFTCZvdj3v0zqYWzMqPY0cZ4bMiZRhu1Je28yd1BLJkh1AHM1Ofye3Y7bmfiaf3/gfM0lfPnICLPyrdYzimSwPWjAaV133bt/Rb1OqJ9T1BTUzXC6mKS43t7T+K3GS4al2gvY3Q31/8YnlMpUqGmdWUdtYQyChSCdSeVNtlxNGg91t0zwhDmlA/ytGJf3fsiC9v0TmwQ==
+ b=AVKsxiWxQl75GOHzmz4URIIKVgAlJ7J7FruvF7Sz1OEOWFhd38cH0ZxIwHPeIhvDyd1nFpolNJZ1RpLWsPjt6xulbHb1ttO/+1qhf/t3T/LlcGKjGml7d5E0sSiQR3jhtygXukztNNZcCY6nKA4y+DZgG+raWLSYvwFK/CKiSgHy4nXOTCeRO8MIs2wwXPjVAkPpYiRp+VDhaElwBj/s3GZTeIupb1sKkaSMOs3zUkz6ZE/G3n11pRkXbF8ElWvQD+szgBexzOecO8a+qUGuMoDjU+yjG0EsGLdBRoIyQ/gMMZrVlKYfHHv2ztOiyNubhu+2RzC30tIcAm9otR1KkQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l3ANBjDiRFANAOwutlfxbjMCt4B/5jUztkk4vhtfhhY=;
- b=KS/6FmPuAO4yowG0ua+pzPYLblIYz+OrA5KQ4DeRgwhTC7hHtga58NennDYxTTRt8meME5hhqqM3QfcfTSF3ASMpZsOj5rC5Wtv/qP130kHopfn3CdXq9cFQVGPeCo9v4HVPZFYSYTOCWvLkgGkYPDMo+5LhDyGuI8/WFdHQDt10anqWh6Y3/9kCxHSldxM75K8et9M+Qpkt3qEepAsYGq6lE4SWGyzsrOoTu6CNNbVpU6PKFg2FFHJNtfvYjg9oRe87GsqrUA2kmNScgg4znqCIa1LTbbCemJaoL/N+SW2tb65+mCjfQRItHoYV5ATnas8yt9vhSsL9Lbx8Dgvx2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
- header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector1;
+ bh=bjg+ORjjHEhY4sxyQ7vMWaBvicT+IclMAv9a3iasPVQ=;
+ b=FNxpBSPfoJyL3Vrb3ilKRpC0aTNXyaRJKvGZi16MDoa0g7ehOQ7nXCULk56xyum4Sh9lxSL2C9mExq7j2814nlxYH7H0HoARJN31Z1PHXEWVAP3E71Nztuun+zek009wsSNAiyU9Q72MH6xWr/SL/jg0HI16NviF+A9ct098hJlLaAz/NcaCJ2MqifROiucH5iNv0V75DeKVGmu33rimALOM326b3/dPjppSTZspq/4FAuHAtVrs7UUCYSU+A5CnPhkwA5ajrDz1tULirPYB/CxWFy8nnP/14HU5WsuE/tafaKacoVHnGVrlc1516gtyCcG9oQFW3YEofpT25+Lzgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l3ANBjDiRFANAOwutlfxbjMCt4B/5jUztkk4vhtfhhY=;
- b=m05SgRomelyl5ImX8hNlcRBATuxinlZwYcZaVmP3koalwZWoGfMSSrQ/7Uw0bpSfVIp0J/sSLTqmc5PAdgwNBCdp9g6+9lg5Dl+athvX+bd0WiDEMulBk8mQdsIpjV+U+7vdlqxX4ehwdqGfS7nHEGjN6YFffZ2T/QLiiiQ/oWQHDfh+oz5QenOpvVsR8qhfJPLvmxpTImwQFWkAQDXYD0vZ2KjtN4dfPloFuaBMgtlZMieuGqx88Fx0i69qwxUpffXhtKW017OEFNIfeWGhVQ7/kD4dMUhWXQGmXk1Fyp+Nyunr6htZFOr1U4WP6RXTdQA37+JCQhiAqtD74f7juw==
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
- by GVXPR07MB10171.eurprd07.prod.outlook.com (2603:10a6:150:215::18) with
+ bh=bjg+ORjjHEhY4sxyQ7vMWaBvicT+IclMAv9a3iasPVQ=;
+ b=mhA8NNt4/kL7cdLkTIKopGPsoVV6CjY9++WDPTcN7fUK+KxNkI+aTsThmhFXx+3Nquv8la01bjNoB/rM4TJPxr+AEpA4ReCiF3y3I3eCBv6oajF5BR4N3a8Ql8VwfMPUeknnYn8X7WLVlSqNWm5I7i1Au7b8MzMSfDohCfxt4xzMyNx/GRrWMBinJKk85E+kIUXtVZW6/0a2PFWyl/+MSn5SMP6XPCgl+x3cWPHK8prd8tQBKkP7nXUWq6WgxIwTpanNBonIlf0XorY/spKolDwErKHMeoeXG6MWk+IvinMoKuPV86hqsWY0THzPNatdJYcCcPocgK1XR5PTjMlBlA==
+Received: from BL1P223CA0014.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:2c4::19)
+ by LV8PR12MB9270.namprd12.prod.outlook.com (2603:10b6:408:205::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.22; Mon, 18 May
- 2026 09:36:35 +0000
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::f708:4bd3:9987:b9e5]) by PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::f708:4bd3:9987:b9e5%4]) with mapi id 15.21.0025.022; Mon, 18 May 2026
- 09:36:35 +0000
-From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-To: Dragos Tatulea <dtatulea@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
-	"linyunsheng@huawei.com" <linyunsheng@huawei.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "parav@nvidia.com" <parav@nvidia.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>, "mst@redhat.com"
-	<mst@redhat.com>, "shenjian15@huawei.com" <shenjian15@huawei.com>,
-	"salil.mehta@huawei.com" <salil.mehta@huawei.com>, "shaojijie@huawei.com"
-	<shaojijie@huawei.com>, "saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>, "mbloch@nvidia.com"
-	<mbloch@nvidia.com>, "leonro@nvidia.com" <leonro@nvidia.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>,
-	"ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
-	<ncardwell@google.com>, "Koen De Schepper (Nokia)"
-	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
-	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
-	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
-	<mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
-	<Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
-Subject: RE: [PATCH v4 net 2/3] net: mlx5e: fix CWR handling in drivers to
- preserve ACE signal
-Thread-Topic: [PATCH v4 net 2/3] net: mlx5e: fix CWR handling in drivers to
- preserve ACE signal
-Thread-Index:
- AQHczn6f0twYI64FckqHOyx2gZ15hbXsSTaAgAByMYCAADgPAIAAKsaAgCZ/ksCAABYygIAAAlLQ
-Date: Mon, 18 May 2026 09:36:35 +0000
-Message-ID:
- <PAXPR07MB7984D1A3B0F22BB917690E21A3032@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20260417152642.71674-1-chia-yu.chang@nokia-bell-labs.com>
- <20260417152642.71674-3-chia-yu.chang@nokia-bell-labs.com>
- <69750ae3-3b0f-41c7-9731-6d49f5f6d319@redhat.com>
- <e5d03a71-cfcd-417b-a3b3-94dbd6600f9d@nvidia.com>
- <e6aa13f1-4284-4ae0-9dda-1a506e729156@redhat.com>
- <8b610e49-ff64-497e-8712-588b2228df02@nvidia.com>
- <PAXPR07MB79846075432AA7F7CAD67006A3032@PAXPR07MB7984.eurprd07.prod.outlook.com>
- <9c324e5b-24a0-40ef-bd00-fb305825d06e@nvidia.com>
-In-Reply-To: <9c324e5b-24a0-40ef-bd00-fb305825d06e@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|GVXPR07MB10171:EE_
-x-ms-office365-filtering-correlation-id: 11f7e3a4-8849-40fe-174e-08deb4c0f3f0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|13003099007|921020|38070700021|4143699003|11063799003|3023799003|22082099003|18002099003|56012099003;
-x-microsoft-antispam-message-info:
- 0xYBqOTpIRy6bzoXxa/BjhNy9LYwbkXvqfor2DCdPa/qbkUFxXRFrvOSTYieA4VZGKlbOocUuuf38J67jiBa6+dxlZ5Ypu6uMDXMCGZkiQ8x4Q2h7yJHe5+2ZDds8mk6x879ZMG4rLZnU7G23ZJ2kVHia8ImA1YuMpNRU9mMtxR/Th+eMKuI6oE43cpWyjkn6vk2/1LzA3Az/u+7FyWo7YFCEtFMxausE7tnuxeeaa9DLU547O0eLX3D3+eHHFh/C4jnxD4aimkMt7vyHqu+MoR4hAjgd5er3Zc4Iu6cQasIzHQ4jlseV40rausciGsFmyZnErWMMntMl3lzG4p5u7x6CuVCGdshFwn71t9t5ydoIu3H4yzjFbI6bDTrpor8LgwmeVwvEWKpk26suWwTrCn8pPV7+28L4EAexqtzs3+e3Zh8u7tzoGf1eawlvlyVsYrYeC1V9F8fTHzmK2bE4fVs+LWIgug5rgNCdzGnxb+fPeTotVsA9NLibqiziY5PZOMfZoeN5kF6KTxPawavkSAz2MGk88IhADY1Wls2/gr3QvLzEL27HW1ysmdK/CmlqZdv89/o+VIzH25SsVry/M0V7ax6aoYTYmC9poJCyUaQotpi7g1pY7uc66wwt8QHjeDPQ4kUHMuXAw0Wwx6/dvdgVR5bPHPbxdyj4gdtrmmoEzPYLLIc2VZht7fxqezZWfaOnxYHZN9uOL6OpE1d9uQZnmLgPQGPrtfTepWYY1K9hamBKAD8VMs7Fy5HwKkYsE8AQ0DgNqe2zHOSNLTWeA==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(13003099007)(921020)(38070700021)(4143699003)(11063799003)(3023799003)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?KgRuroQSXpoOrB16W+PDZZYauaE7hLwqCQLuL3BvSWSScBMg9OM0YwaVpQdy?=
- =?us-ascii?Q?PtoYihviA94SkxZW2WVWgJPM6MfAsIz4WonJq3nCdKONh25fakYAZ16swVC2?=
- =?us-ascii?Q?mBE/8b0JHprwEJ7lzLtUdaBdEcd31WThJgAJBY4mEgTmg/nEGn8xQmg7hgH9?=
- =?us-ascii?Q?1WH894R2cc1MEbVM6UhAB9M9T+6RnzuGqofcnCnrtLWgilCzPQf2ILmCiu44?=
- =?us-ascii?Q?WxucsJuoTg7aaYJSUJo5OSaIw6OxcxAT9LGH3OwJiT2bVvxGWyMhLn1HIDV8?=
- =?us-ascii?Q?28K9OCcfSrF3pqamy19SoxdTvFy3wNGXnwdFwXqWCdvEZlSGBzbpvaCrgn4T?=
- =?us-ascii?Q?BS6jhT7HmwX2NsmjaZjNhdfL0BP+wLeFy/A8GE4wRBkdBzEEycHmy2Pn4XoK?=
- =?us-ascii?Q?cM3OGC4YHBAyuANq3g3OI3nUxVn1fFiNp1KAEQMax6RBDJeaxKZyzZlw6hAQ?=
- =?us-ascii?Q?Av4ZdodjroDuLM+TdpPIL61rPqv0aLFYhVnvhl7pPqIwtLmzhk3DFVGJ2UYw?=
- =?us-ascii?Q?yOQ5BCjUGATpqmZi1vEAbLOT02voBVeCQlGrwRtEALNmDSSqj7INpilbZRFu?=
- =?us-ascii?Q?f4YPsMrCGYPowMoWsFzYGn2BL3fW3lGQYaI55mIcthrX4hgs/Jnv9m45z6nR?=
- =?us-ascii?Q?I0QWM0cTW0oBukcTgZW+orPJaeAo751zJrq0vUJ9oEC6YQ+zmbdG5ZzFBn1W?=
- =?us-ascii?Q?WvNjISdu8Wpek8pp0BLpWwMTWKU0NXkkSCja8p8T6C8warIlLJzXubVbmxbH?=
- =?us-ascii?Q?0fYWOSbh1O701vKsBFoojUj0jeEMPvwZnR+rVQNRs6yGQIy2bpGZy0i9b5pm?=
- =?us-ascii?Q?ysLmzshkkU8+XTlc1dRc7ljWCn8jNbrV765A4WE/Qf9Qc6LvUMXOAEcvGYsg?=
- =?us-ascii?Q?WZqn5tFq79XK/OoUdZ+IGtTms/dpnleVnnB3A7p8yZf8V2+SKlzcEwpza66z?=
- =?us-ascii?Q?UYEgVvSxJkGlMBbW3ecwc9mhD87OC/JBTzWH0ol/kgiYnMHIgTu0ADG1zzrj?=
- =?us-ascii?Q?dsRDS+QgRkY5ttgKfO7feDemY+1tzFfCavEiil+RTeVdaUbLDHP2I87e0f8P?=
- =?us-ascii?Q?GmvJzXI1+o4D7LF3VgFXeklW7xRxguukDeDhWsWKScP+8S02xU1cAJ2KNqLu?=
- =?us-ascii?Q?S+Kdl/24b9RuJYWJHYw2VJypabBfJWS7A8DH+Gz5jKLeoFHPpDovQpHzTl3W?=
- =?us-ascii?Q?DGFsF1+hv7oWToBw1i2F9zf+e+hTjY6Aq2p5/LaRU11t8JBceO8c2L3dPXNb?=
- =?us-ascii?Q?N2FWKSBmlIXj2t0uePL554CbXD1K95Rt2reINXFUmcoRB/Kw0N1swz+kXPnW?=
- =?us-ascii?Q?rQt3dVOwtOH0sgpDXtzxrQgD7wZBaUmBPyT7Gm89bUSn02WPLB5impClcwhS?=
- =?us-ascii?Q?8qIA5j+KpdhMtmCU/mMqbRyC3xUBdTNTBkL57RPsISrBJpWNqj3r6Ht08ZEK?=
- =?us-ascii?Q?OiEoHGgfm3LTvg1tOoxJmytxLyIXCZf2QUQmHxE7pNpC7u+lNL4/ZITBSglC?=
- =?us-ascii?Q?6zUejqA2DCvvCGcPo7PemiZ+yolKBi0WIrfcoxoceFKus1od9MkJ8kUo9KVJ?=
- =?us-ascii?Q?OYTBVwh8ozGtKw2BNj7aplbYoL6OwrRroIfYTBFpIba60HHZXctD1gLBcXJP?=
- =?us-ascii?Q?QLPoerrNzA4aBN/q/VWwRt+DuxtCKVDvxoy0LWfyGU/pHPNFYgI2lCGShk8t?=
- =?us-ascii?Q?h2vCmBuSUOuHvZOV54L+x2OSJmAYJcaWj3RRo3o/QuNihuNVrv5vx6bSlUG2?=
- =?us-ascii?Q?pmJzjSaS/lvPfugzgjTaduQFaQczqWc=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Mon, 18 May
+ 2026 09:37:37 +0000
+Received: from MN1PEPF0000F0E2.namprd04.prod.outlook.com
+ (2603:10b6:208:2c4:cafe::3) by BL1P223CA0014.outlook.office365.com
+ (2603:10b6:208:2c4::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.25.23 via Frontend Transport; Mon, 18
+ May 2026 09:37:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MN1PEPF0000F0E2.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.48.11 via Frontend Transport; Mon, 18 May 2026 09:37:36 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 18 May
+ 2026 02:37:21 -0700
+Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.231.37) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Mon, 18 May 2026 02:37:16 -0700
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, Simon Horman <horms@kernel.org>, Cosmin Ratiu
+	<cratiu@nvidia.com>, Petr Machata <petrm@nvidia.com>, Breno Leitao
+	<leitao@debian.org>, Nimrod Oren <noren@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Willem de Bruijn <willemb@google.com>, Dimitri Daskalakis
+	<dimitri.daskalakis1@gmail.com>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH net-next 0/3] selftests: Use a master ssh connection for remote commands
+Date: Mon, 18 May 2026 12:36:50 +0300
+Message-ID: <20260518093653.551166-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11f7e3a4-8849-40fe-174e-08deb4c0f3f0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 May 2026 09:36:35.2475
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E2:EE_|LV8PR12MB9270:EE_
+X-MS-Office365-Filtering-Correlation-Id: c19b8403-7df5-48e6-6662-08deb4c118ba
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700016|376014|7416014|82310400026|56012099003|18002099003|3023799003|11063799003;
+X-Microsoft-Antispam-Message-Info:
+	FW9fyCGZVkbmnlLIDuxcKnOVFjzZIDuZudePrVVfhUUKRRvxu/0cLKWQHUFw8tkdMXyELhDAXzhCUoSZuWF7yfZWPWMuI48wUFlfWEdT+5X4zQG0WorbqWGpswrfGU3VBiKR+vT2Wez4LqYSasTqkEh8u5J/ep01YwYj2y9fk5J1ZEAIk5/OwQw1VynH+Hfgs6Ip2rjqbyk5n2TMsFTPULi94HbCXYaPHe0RqaYl+XZuS3CjBXupdiZX8Lv13KdVBmxFN5MV5LvMyjYezKPbp/qm2UnbheL64fVKVwkgIkPGTn8ueNRXy9KQ8A00l70Iaz/RPXkeHzeY6aOjo+dZwYWYPGvwWjHMHolu1ObI6JHTJPCKFsqhIz4E4iNWKgpmYR3r3AdbEjUrTi4INKDybTD3lzo24hHsIQq1rrDrt5B+LqrHmBoHGeFgXyCy09CF0fWY99I0WNZNFoK28rI9c8dDFANw5Xzv/vKfV9+vHJMagFdZGYe7839ES9UhvVG3H95q5YH2Uugq+JwEi1DxC4Xj3Dnq0TEEclGQ6heSWDR10z85IeUXQUlxkHGjAiPoZ58OzCk2+hQEDRY4qLRelJPn+FgQRmTd41qXIdST72+vryT/B92PAOpMQ2L/RI8/NBdSD3+WpqAy7keMmJK/VHe0Cy9osfXZ1uw33KPorzPYSRA1ybnHSTrTidfFvWOF6Rq3eWFT0rDCGoSx9A+McoG5US9xB95xnM+1t/7U4Ns=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(376014)(7416014)(82310400026)(56012099003)(18002099003)(3023799003)(11063799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	Hx3GFmzqBmDTZd9zXJ5w1GXKJzsQd6jY7YDS/rJVAPGtN3/Q7y+wDcHEfRHJY+o1epPyBFOd+P4b9Tf+RJKDEqZ0isuo71QJ7esv5C/l36bMTZNS1SH9NG5D2FWWvpCMfOCQJlSA3nn2gKLKsYm/VX4EYDntei5VT8m+op3v4Ful3T4rx1IIdjvCwGeHA8ibeDQouPYWPVh6dz4SeUswqZpNG75XuFq3qRSoImIo6IcvoQSGjBFzad99jc2+0r5vT3UlY6FXpJhihb2WO39ywPZgy15ngpNFNuU2eERAoU3n5BYfYrM8BQAOIVyyEy3w6avBrP9fNNmXjpytZhaXCMqTyJ+T5GPEx32wZSb6gc6sUS8pyYFnm2p0pDuuM6m08g7miAY7exCk0RJuhUJytUQJXgvp/CABNyZR8ZiB0oOJ10TgcIb7kX7DNyji4L+k
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 09:37:36.7895
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aG0aqtJDubN+fNMGGYFlUQzVlx1kIVPK9TTHa5ePIkKxIAhExj4jTccUsHg1ttCdWHhsFwO8DW6yRfs0JDdrVcsUjhx9EDs2/wPhpuR3Ztk1rMf24IuCsbJtVkIrZN1H
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR07MB10171
-X-Rspamd-Queue-Id: 6433F569DB5
+X-MS-Exchange-CrossTenant-Network-Message-Id: c19b8403-7df5-48e6-6662-08deb4c118ba
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E2.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9270
+X-Rspamd-Queue-Id: D3689569FFB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nokia-bell-labs.com,reject];
-	R_DKIM_ALLOW(-0.20)[nokia-bell-labs.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288969-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[nvidia.com,redhat.com,huawei.com,lunn.ch,vger.kernel.org,davemloft.net,google.com,kernel.org,nokia-bell-labs.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,debian.org,gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[nokia-bell-labs.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chia-yu.chang@nokia-bell-labs.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288970-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cratiu@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	REDIRECTOR_URL(0.00)[aka.ms];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
->-----Original Message-----
->From: Dragos Tatulea <dtatulea@nvidia.com>=20
->Sent: Monday, May 18, 2026 11:27 AM
->To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>; Paolo Abeni=
- <pabeni@redhat.com>; linyunsheng@huawei.com; andrew+netdev@lunn.ch; parav@=
-nvidia.com; jasowang@redhat.com; mst@redhat.com; shenjian15@huawei.com; sal=
-il.mehta@huawei.com; shaojijie@huawei.com; saeedm@nvidia.com; tariqt@nvidia=
-.com; mbloch@nvidia.com; leonro@nvidia.com; linux-rdma@vger.kernel.org; net=
-dev@vger.kernel.org; davem@davemloft.net; edumazet@google.com; kuba@kernel.=
-org; horms@kernel.org; ij@kernel.org; ncardwell@google.com; Koen De Scheppe=
-r (Nokia) <koen.de_schepper@nokia-bell-labs.com>; g.white@cablelabs.com; in=
-gemar.s.johansson@ericsson.com; mirja.kuehlewind@ericsson.com; cheshire@app=
-le.com; rs.ietf@gmx.at; Jason_Livingood@comcast.com; vidhi_goel@apple.com
->Subject: Re: [PATCH v4 net 2/3] net: mlx5e: fix CWR handling in drivers to=
- preserve ACE signal
->
->[You don't often get email from dtatulea@nvidia.com. Learn why this is imp=
-ortant at https://aka.ms/LearnAboutSenderIdentification ]
->
->CAUTION: This is an external email. Please be very careful when clicking l=
-inks or opening attachments. See the URL nok.it/ext for additional informat=
-ion.
->
->
->
->On 18.05.26 11:20, Chia-Yu Chang (Nokia) wrote:
->>> -----Original Message-----
->>> From: Dragos Tatulea <dtatulea@nvidia.com>
->>> Sent: Thursday, April 23, 2026 10:13 PM
->>> To: Paolo Abeni <pabeni@redhat.com>; Chia-Yu Chang (Nokia)=20
->>> <chia-yu.chang@nokia-bell-labs.com>; linyunsheng@huawei.com;=20
->>> andrew+netdev@lunn.ch; parav@nvidia.com; jasowang@redhat.com;=20
->>> mst@redhat.com; shenjian15@huawei.com; salil.mehta@huawei.com;=20
->>> shaojijie@huawei.com; saeedm@nvidia.com; tariqt@nvidia.com;=20
->>> mbloch@nvidia.com; leonro@nvidia.com; linux-rdma@vger.kernel.org;=20
->>> netdev@vger.kernel.org; davem@davemloft.net; edumazet@google.com;=20
->>> kuba@kernel.org; horms@kernel.org; ij@kernel.org;=20
->>> ncardwell@google.com; Koen De Schepper (Nokia)=20
->>> <koen.de_schepper@nokia-bell-labs.com>; g.white@cablelabs.com;=20
->>> ingemar.s.johansson@ericsson.com; mirja.kuehlewind@ericsson.com;=20
->>> cheshire@apple.com; rs.ietf@gmx.at; Jason_Livingood@comcast.com;=20
->>> vidhi_goel@apple.com
->>> Subject: Re: [PATCH v4 net 2/3] net: mlx5e: fix CWR handling in=20
->>> drivers to preserve ACE signal
->>>
->>>
->>> CAUTION: This is an external email. Please be very careful when clickin=
-g links or opening attachments. See the URL nok.it/ext for additional infor=
-mation.
->>>
->>>
->>>
->>> On 23.04.26 19:40, Paolo Abeni wrote:
->>>> On 4/23/26 4:19 PM, Dragos Tatulea wrote:
->>>>> On 23.04.26 09:30, Paolo Abeni wrote:
->>>>> [...]
->>>>>>> ---
->>>>>>>  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 4 ++--
->>>>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>>>
->>>>>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
->>>>>>> b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
->>>>>>> index 5b60aa47c75b..9b1c80079532 100644
->>>>>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
->>>>>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
->>>>>>> @@ -1180,7 +1180,7 @@ static void mlx5e_shampo_update_ipv4_tcp_hdr(=
-struct mlx5e_rq *rq, struct iphdr *
->>>>>>>    skb->csum_offset =3D offsetof(struct tcphdr, check);
->>>>>>>
->>>>>>>    if (tcp->cwr)
->>>>>>> -          skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
->>>>>>> +          skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ACCECN;
->>>>>>
->>>>>> Here there is an open question for nVidia:
->>>>>>
->>>>> Sorry for missing this question in v3.
->>>>>
->>>>>> Is the above enough or will later segmentation lead to the wrong=20
->>>>>> results? I think/guess the firmware is (still) aggregating the=20
->>>>>> wire frames using the ECN schema, i.e. the first wire packet has=20
->>>>>> CWR =3D=3D 1, the later CWR=3D=3D0.
->>>>>>
->>>>> For mlx5 HW-GRO a packet with the CWR flag will flush the previous=20
->>>>> GRO session and will not start a GRO session for this packet
->>>>> (napi_gro_receive() will be called on this single segment skb).
->>>>>
->>>>> So this change won't impact the current GRO behavior from the mlx5 dr=
-iver/hw side.
->>>>
->>>> OK, thanks!
->>>>
->>>> For my education: doesn't the above also means that mlx5 will never=20
->>>> build GSO packets with CWR set (and so the above statement should=20
->>>> never be reached)?
->>>>
->>> It does look like it... Thanks for pointing it out! Will be addressed i=
-n a patch.
->>>
->>> Thanks,
->>> Dragos
->>
->> Hi Paolo and Dragos,
->>
->> First, sorry for my late reply and thanks for clarification.
->>
->> The table below is to ensure my understanding of mlx5 is correct.
->>
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
->> |     Packet id     | CWR flag |   Flushing?   |     gso_type    |
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
->> |         0         |     0    |       0       |        0        |
->> |        ...        |     0    |       0       |        0        |
->> |       n - 1       |     0    |       1       |        0        |
->> +-------------------+----------+---------------+-----------------+
->> |         n         |     1    |       1       | SKB_GSO_TCP_ECN |
->> |       n + 1       |     0    |       1       |        0        |
->> +-------------------+----------+---------------+-----------------+
->> |       n + 2       |     1    |       1       | SKB_GSO_TCP_ECN |
->> |       n + 3       |     1    |       1       | SKB_GSO_TCP_ECN |
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
->>
->> Currently, mlx5 will flush GRO session and emit a single packet when the=
- CWR flag is set on the RX.
->>
->> So, this patch (changing gso_type from SKB_GSO_TCP_ECN to SKB_GSO_TCP_AC=
-CECN) seems more for future-proof than a bug fix.
->>
->> I will update the commit message to spcify that (or please suggest other=
- changes needed).
->>
->Hi Chia-Yu,
->
->Based on Paolo's comment, we have a pending patch that completely removes =
-the setting of the gso_type in the HW-GRO path.
->
->Thanks,
->Dragos
+This series switches selftests to run remote ssh commands over an ssh
+master connection, significantly speeding up test execution in most
+environments by avoiding the need to repeatedly authenticate.
 
-Thanks Dragos, could you please put me in cc when submitting that patch?
+The first patch fixes an issue with stdin inheritance, the 2nd patch
+wraps some remote command executions in PTYs to avoid a termination
+issue and the 3rd patch finally converts remote command execution to use
+an ssh master connection. For details, please see individual patches.
 
-Thanks!
-Chia-Yu
+Cosmin Ratiu (3):
+  selftests: Disable stdin for remote commands over ssh
+  selftests: Wrap remote command executions in PTYs
+  selftests: Use a master ssh connection for remote commands
+
+ .../drivers/net/lib/py/remote_netns.py        |  2 +-
+ .../drivers/net/lib/py/remote_ssh.py          | 52 ++++++++++++++++---
+ tools/testing/selftests/net/lib/py/utils.py   |  4 +-
+ 3 files changed, 50 insertions(+), 8 deletions(-)
+
+-- 
+2.53.0
+
 
