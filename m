@@ -1,121 +1,147 @@
-Return-Path: <netdev+bounces-289127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289128-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gCaLKD9DC2qsFAUAu9opvQ
-	(envelope-from <netdev+bounces-289127-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:50:07 +0200
+	id qLKVGT9CC2qsFAUAu9opvQ
+	(envelope-from <netdev+bounces-289128-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:45:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11051571326
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:50:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C8B571245
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:45:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 62946305B58A
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:44:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C71A302E7C1
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABCB48C3E2;
-	Mon, 18 May 2026 16:44:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4D748C3FE;
+	Mon, 18 May 2026 16:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=volta.cloud header.i=@volta.cloud header.b="X3OqSqTv"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="hn8mHaf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [178.154.239.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B913E409DE0;
-	Mon, 18 May 2026 16:44:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4B548C403
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779122677; cv=none; b=aeVcv10rtFVC+u2qnmiQd7x7xAKXT+XRkDgYhIrl6UHCf3UdDL/UKD0JnGqtTHR1CXCqQcygVHgavr8OHraklq0N0XM2ZF/kWErJMHz8V1OwSCGvcDBrztzzfEEOKjkOXnLTyAceQiEL0OanqST89vO7RCWnYiXKUAZaEqAot+E=
+	t=1779122681; cv=none; b=TwiliIFO5iGUlXsHQVTBha0O3dDRw6+6GbMRVJF1LLBtiZL3MKMT3ksCorwX7dDyNJmY4eTS7ZTwgypYs6oQFHBrdypJkzCugVbmIjNB0loF0MpoGuDesNTYT6sQgGTErKIJBSSv5OIR7SuTek2Nz3p3ePa9niGRCYGPdImQdOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779122677; c=relaxed/simple;
-	bh=odvWJL/abgNFeUV3FeS/I9Mjl5v7OKVfWA0y/ihaRl4=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Xr0cfZNsQjkcJ8xRThWduiHiLfe7AoKqlAcbvmTGqRxJ6uJAH2FtLpWyY+FhRv7nfg7t1OE7UpRfsC5hPPveeyIuAsAA/Kd/XSAyMsZW8WCCtkdGM9/p1ckCRfe5FFgQuWd9t06T6f9HDzKPuSn3uwHeM1cKzbBtfPdA385Cy7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volta.cloud; spf=fail smtp.mailfrom=volta.cloud; dkim=pass (1024-bit key) header.d=volta.cloud header.i=@volta.cloud header.b=X3OqSqTv; arc=none smtp.client-ip=178.154.239.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volta.cloud
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=volta.cloud
-Received: from mail-nwsmtp-smtp-production-main-85.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-85.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:2a2c:0:640:49cf:0])
-	by forward102a.mail.yandex.net (Yandex) with ESMTPS id 3A7BDC005E;
-	Mon, 18 May 2026 19:44:27 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-85.iva.yp-c.yandex.net (smtp) with ESMTPSA id MiTxBInRHKo0-B99ZpHGk;
-	Mon, 18 May 2026 19:44:25 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=volta.cloud; s=mail;
-	t=1779122666; bh=4IBrlqOCR7NjKAY0z+aKMBU0gduxXEdD8zMrqkaY3+E=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=X3OqSqTvfJnE0OFvaAdzqoXpwdFlhcgsYekhpeazeOBs+fORd3d72DWD7ezg0h/QH
-	 HUuDMoyHlbChJGYtVqtWwN+f+Wvd++9uLcPRHdeZrp4jIbmWt2MrkMhky7lW7lXskW
-	 W4/OfCdSZrYWy6R80fiM5Ll1sDl92qsEjr7xrbDU=
-Authentication-Results: mail-nwsmtp-smtp-production-main-85.iva.yp-c.yandex.net; dkim=pass header.i=@volta.cloud
-From: Max Makarov <makarov@volta.cloud>
-To: netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Cc: saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org
-Subject: [QUESTION] mlx5: format_select_dw_8_6_ext capability on ConnectX-7
-Date: Tue, 19 May 2026 01:44:22 +0900
-Message-ID: <177912266235.29998.14244693862353385829@volta.cloud>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1779122681; c=relaxed/simple;
+	bh=YE3HoIFb8FxWqSA+l6qK/mJkb4FDgYWDmcyId5B2F2E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AyUO46JM5LttBC9d38UAGn1BPth6Ow7YZIXywSfQDWz7K1FamW9oClOSOV23C/sWlT1LUfZBypE6AUeXcaPZSnmfIsX2elrvOQrvyHJ2GeFLWPXtOKQ6s6514NEa+hq+0xvW9SneECYkof/kXaZi9LeutA19ldINX4P1iP77SDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=hn8mHaf3; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4891c00e7aeso18224475e9.2
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 09:44:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1779122677; x=1779727477; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7UJetEPl8iEmaBxBdu9lhTExkMb01pXnVK0wWC0qPWM=;
+        b=hn8mHaf3nN/G3EfwPa024Vkd8ONlhvOtFgR13hg6s3HBfpKyLg3EiGeajgfqb5LM//
+         F4A1NE5/ifh87TIiq+vXf2rTQ3axPqO3W5i3xjGbeNFKjFxg7eSZ06xODR7nVuICYPEK
+         HrpDkNYU3IbSWSw/peRlcTTqgnKOL/rxmyQ6fQI0NaVe4xbkK+Ozdmn3DOr85h4LQbgl
+         uU8sYFaMxJFZJiELk/y9ddDlI9sWPVgENRvadCts3btR1xF5rD2W5qsCPGgIQhrmehgC
+         WHFyzrmtB5P72wQABnR3Qni5pJRO5xsICPmiuLNrbFBthvZum1/C5Ho+p2OmSgTYB0QS
+         i5YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779122677; x=1779727477;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7UJetEPl8iEmaBxBdu9lhTExkMb01pXnVK0wWC0qPWM=;
+        b=b1n99NIZ8/PXo8/oMPuiRoe3cd8dD4e/UmLq7uFLrmZMRrYHYG9l6FJI3Rafl31iXK
+         dk2F4BCnfUVW9QMqFILwCQFhT3eDwvPyBNr9yuAUxQ/eEihliPwC6RIJdGlf3R2GJz62
+         a8D+wHdho41n/qQ6yEPYwfRh1dSNwQqTCfypwx7gIa1cRNyqRH0sRms7eiRLxS+0mzYK
+         6QZKC48LGC1G8NICvQ5kUJdv/I/dgf5xHTRjNfVpkeKjSvFTy4W9TM+Zk3xr2w6O16o/
+         gn12ZRk4jz/gweilPdmw/9Ylb/iHYOGv5dP7jE4BRApnY3ul4xcCGIwOuSz7VjPQkwR0
+         xeNg==
+X-Forwarded-Encrypted: i=1; AFNElJ9a1gYi1BAbjEMupUr8NhvWjMD0rfQ+Z6mIoZmWM+/v2mtAG9tq4yDltwMyk5OQPZdrALmZxBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz60mGl4BQn/CdlJZt9W0o0lMWlgrNIhdhsHrvsfAl8JQ3dIDkh
+	2vAThPevnWv0oDkQz/Jn5MvAIpDqADyzInOh13hy7D81q4WRc2KddtWRzDn0EbWKIQ==
+X-Gm-Gg: Acq92OFFGCdt9diCZRaGZQWsZ/dKVe0X5/i2IBoDFDNj/tho42BZspYlp8wIhR5lbiW
+	uwQwHrMuIGV/IqoS3Iw1TTvRs5Gc+hXE6mym86GQhumFn10u/2TO/fQYyrvS3XvphMMyDT8oYeS
+	YfVSvxDBCRv3NNgs6Hyq4OjsxIa/WiTH7ogVRsRVGTF2Tytx2WQMh+mdMv60Sp4PUdenVsRlChB
+	k5dbm/se+ZAgtNFy2QnlMZNkHqwPlVAT/qKsU3QuXuS01OrkWuAbQkE7Hjw35bjj6601vIlvZit
+	KL7EeWKQQtIhQUsW4L+n+WCxZNSXfbW+TvlbbUH6SfR7u41UDcgqzMrZ4zZA8p07+PKSGdh7H33
+	2MJx7z2/8+7JTpSO/Trp7wL1Q79VD5W8TJL/2EgB3wzdcQtc7ih20Np+ob/h2KdepQz64wbuDPQ
+	Tq4fL9KjiKd/hT4M/QiZrjE8JFxBNZKD7SMw==
+X-Received: by 2002:a05:600c:870c:b0:490:320:949 with SMTP id 5b1f17b1804b1-490032009f3mr115980855e9.27.1779122676802;
+        Mon, 18 May 2026 09:44:36 -0700 (PDT)
+Received: from [10.83.43.186] ([159.134.255.34])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe6aff4sm86122385e9.25.2026.05.18.09.44.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 May 2026 09:44:36 -0700 (PDT)
+Message-ID: <8ea0f79a-a8b0-4d1e-85dc-6f5b8fd3c135@arista.com>
+Date: Mon, 18 May 2026 17:44:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-2.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] tg3: guard napi_disable and pci_disable_device calls
+To: Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: mchan@broadcom.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-kernel@vger.kernel.org
+References: <CAPzpGcTtw+ou+8jid_qE9w96UWt+4KUZXN-aC=44Oqkk=qdERg@mail.gmail.com>
+ <CALs4sv3XH1DEB+EXmSjKvPz8Av-53HOrJ+Dc_mjOv+3EnnuV9w@mail.gmail.com>
+ <a120c9f5-5818-4335-ac2c-caaf4f6f4fc7@arista.com>
+ <CALs4sv2bNZkBvqKwSMOM5CtJG+GM8P6D6PMHWFJUqtNS4xw34A@mail.gmail.com>
+ <CACKFLikhxsYc6zP2ksV4=_MwZDLC=6Q2rD9CGwEACKOiVgXBhw@mail.gmail.com>
+Content-Language: en-US
+From: "Yury M." <yurypm@arista.com>
+In-Reply-To: <CACKFLikhxsYc6zP2ksV4=_MwZDLC=6Q2rD9CGwEACKOiVgXBhw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[volta.cloud,none];
-	R_DKIM_ALLOW(-0.20)[volta.cloud:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
+	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[volta.cloud:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[arista.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289127-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289128-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[makarov@volta.cloud,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[yurypm@arista.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,volta.cloud:mid,volta.cloud:dkim]
-X-Rspamd-Queue-Id: 11051571326
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,broadcom.com:email,arista.com:mid,arista.com:dkim]
+X-Rspamd-Queue-Id: E4C8B571245
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Yes, mostly this patch is about adding a flag to track the NAPI status 
+to avoid a double release.
 
-Question about the cmd_hca_cap_2.format_select_dw_8_6_ext bit (introduced
-into mlx5_ifc.h in v6.12-rc1).
-
-On all three of our standalone ConnectX-7 SKUs (PSIDs MT_0000000838,
-MT_0000000840, MT_0000000892, firmware 28.48.1000) this bit reads as 0 in
-both GET_CUR and GET_MAX modes. The DPDK code at
-drivers/net/mlx5/hws/mlx5dr_cmd.c reads it without any device-ID
-conditional, so it appears to be exclusively firmware-controlled — yet
-firmware reports 0 across all our CX-7 cards, including the latest
-public release.
-
-This blocks DOCA Flow CT pipe for IPv6 (which requires the 11-DW jumbo
-STE format gated by this bit).
-
-Two questions:
-
-  1. Is the kernel's filter that rejects SET_HCA_CAP for cap_class != 
-     MLX5_CAP_GENERAL intentional? If so, what's the rationale?
-
-  2. From the NVIDIA side: is this capability hardware-fused on standalone
-     CX-7 (BlueField-3 advertises it as 1), or could a future firmware
-     release enable it on CX-7?
-
-Thanks,
-Max Makarov
-Volta Cloud
+On 5/18/26 17:27, Michael Chan wrote:
+> On Mon, May 18, 2026 at 8:43 AM Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
+>
+>> I am not sure if we should allow this fix for what I think is a
+>> situation arising out of an unsupported topology..
+>> I will defer this to Michael or netdev maintainers for their feedback.
+> If the question is about adding a driver flag to keep track of the
+> NAPI state, I think it should be ok.  bnxt has a similar
+> BNXT_STATE_NAPI_DISABLED flag for this purpose.
 
