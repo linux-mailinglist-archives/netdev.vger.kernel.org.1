@@ -1,229 +1,211 @@
-Return-Path: <netdev+bounces-289027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OGDF8QCC2q3/QQAu9opvQ
-	(envelope-from <netdev+bounces-289027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:15:00 +0200
+	id 4P2qEvgEC2qj/QQAu9opvQ
+	(envelope-from <netdev+bounces-289028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:24:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CDE256C653
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:14:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C27B756C931
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A12AC300B1A2
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:14:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 58C6030D5FF8
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C6F3FE34D;
-	Mon, 18 May 2026 12:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5AF3FF1CC;
+	Mon, 18 May 2026 12:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="j0pL599a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U0auKsWR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F01E3FDC10
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 12:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2A9322B6F;
+	Mon, 18 May 2026 12:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779106462; cv=none; b=qV7WxYeGAWIjN9xJSMANdWiZuGP7uYkYp/ZZM1+q4Et7wHP1YpyXeEY9hq61bPs3bRWOoEUrSZFNd70czOzgrQv5amhoxVCUO0dpG6z71FELGPJVBYOrlZUGeNylMfNw+GHPiEwzzlOx7f3oAAVjr1KHgpoJkkMXB7k4OZKxQ64=
+	t=1779106465; cv=none; b=By7ycJjNqd7ZdtxwwLP09QF7HEZl7eT64ETHXHXTyrFgQ0ZOCgcuCc2UvZZDbUTRLPifCOxdIVsqj9IGladDydP2Npx/7u8C0EUD+uOaZCl4RgU9b9Ubi+r6cJi7jFHNknR/AbU6w7LRkfMvXbXLfkyYNSHzRMOHZ6bLngAu1QE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779106462; c=relaxed/simple;
-	bh=/ZLcAi0NAsYNFT9QZfyzBs+pJ4BxC0yxZ/AaaalRjvU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k5YP8odpPJ/qExNCi43ugLTyUk10vJMa3+RlnbKyxfykfPqDhF1WoAL9+h08fFgg4TiWxGzIAwRf2o1FsPpmXH1gdoZO0QdRiZzzPmdtGcX8cD1WIbpLCKX5xogVQvmLdZXRxzmIbY3xngN5LXjTpVUpfSVl1dQJ31bbYktoxyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=j0pL599a; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48fde2f2d61so4251005e9.3
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 05:14:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1779106459; x=1779711259; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5AssGvWsP766p9mHWby5V0TDO49rQ+HM+32Gpbke/no=;
-        b=j0pL599aKnjKCPc3GOaNHeCR1uuaOiAqE2o+j6ayKzDWYiJOP6Qt2PZiShgxd9FNQM
-         jFO7WUlA16MW5kBrGQPOGIRbLqqHE5UK7e2Hlncv7SrtdvZoKHHgGoIxWfCtaZFLLbK5
-         OMBDE0cYrzKpQI4bJ1bx28NTyD+m1H1n3rvM2MLsL3UnvBLtFc0e4QXyOvIrKi+nyQhx
-         0ph5vcIqnYN2tsk51RIG10lOfspoAb42fH19iEqtivmt/xs9S3uHjU9f0BvKRxJonhmd
-         c879QRVzBEUqtUdz2dw69vuwEUnBZetN9dN2gUxRponuCSVzE2/svYMlAdcE5g89Rwxv
-         6Fpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779106459; x=1779711259;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5AssGvWsP766p9mHWby5V0TDO49rQ+HM+32Gpbke/no=;
-        b=qEeTEi2A0eJ7iOdzYQX4YZoeSYHwREq++olX5ZK7lBwwcPWThJzWv1OPFUzAecrz/y
-         dkYNNPsL8st4te6hfqDOo9tVJwidQ+GBA9WteMU4aUUjH3c9JXum3DFf2IsGbRgYjrek
-         8n/vFl8Yd26M9STfHE7opfxZQzaSPf7jGDf7Dhrk+F5kkmGP71MS4Z2t91V1cwGXuL1V
-         dc22euKfQby7O4Pdpt/IVxt7denUHn4YXpf3YGjt7VoGqLMw8nYb3TEgvbLvPOwdP0tK
-         UkLK4rv9l+tuyi2BCqQnnnQMW2+EEjLrzom3pWJ8LdXGfIODJtTz7At2DadbEWL6s8RR
-         g4qQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9ubOW4KUCJGliCTLHw/5OwZ9kPTZ7ruxrY30mk32fDJZqXutf060naQdKBakxOFbYw3EevS1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/Z7aR119AnEvXUiSnMs1Dr3pbBITWeyrngCzdKt5LuJV0bgVY
-	/ueGmaXjT6o4G4htMj3WgZYci8rFQ5L8hT4ZN9FAw5yZB9AZ8CKSJNQ5GVbIjlSBgks=
-X-Gm-Gg: Acq92OFLPK1n6nqIsnkB80bUO11tTPtXFksor7SDvR94ZORBuKHrQJ7kmagtt46GqQp
-	mpGNYpT7Qx7fUtYOHre/0WJMD6ntUL9cNx4nzVvU9krl0zdUxoxspcnuBpdLSzjCDM58eFJwUuT
-	wbykqbriRs1m7QOOxj9z9baJfU8JwLI9AaCZIBDB4B7HuVCIjhe6FZxqCb++pM/0TEmpsfW3ghx
-	WH/nRH7SQ2uilbfOSBENkWzzfRGD1SOBZnfez8UBOGNvzfodZn+BXsILuDs3Hu+SM96o97NZLc4
-	5ucztVd+weF7+AvEjwNV9K2CaJLko4G1aT42Mt0VnHonCm1GqRSNuWj+hFcewo5aWjM7ZyofMaj
-	1/JeJDbOUMd/8U6Lg5ptysgPvGH30Qd2bPqFGeLTTv3U1zktt4ZA2QixswvQuc5yCBOlcvGxfs/
-	TPhMI1Ng79GC7y7REx2pdYO4Lmg6XFOBW9yOXmpClkJHFp4GrIs8OnsxHgSaJYkVkqZXa9/QG5r
-	aGS
-X-Received: by 2002:a05:600c:1d0d:b0:485:c456:5e4f with SMTP id 5b1f17b1804b1-48fe59b071bmr112799545e9.0.1779106458820;
-        Mon, 18 May 2026 05:14:18 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4dac000sm258311125e9.0.2026.05.18.05.14.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 05:14:18 -0700 (PDT)
-Message-ID: <40603dce-f801-42ad-96ec-c8c0a57e5aae@6wind.com>
-Date: Mon, 18 May 2026 14:14:17 +0200
+	s=arc-20240116; t=1779106465; c=relaxed/simple;
+	bh=GNYTfMcpdYqvc5O6r9OZMMFpvN0zVIdv7qdjGK/a46A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DbIc7VZBFGQQ33muej5snZlMA2SsO3t/0qwX2sL2iS7VuBty2uRjouufwEDzLpekL9wWZ7ZQ60coJvHi20XL8J351yRvStAqOjhoP8zM98ildE9ljNA1XwcqPcHz+3KJApx3G+ibDBy0kKlswRcUTHBF2faaB6tA4OD84KODrv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U0auKsWR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2665DC2BCB7;
+	Mon, 18 May 2026 12:14:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779106465;
+	bh=GNYTfMcpdYqvc5O6r9OZMMFpvN0zVIdv7qdjGK/a46A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U0auKsWR6IY5dSn2or0lJLFBvKIhnen8FrW7e70aiBBrFqnjKp5HWAwWjshEbXK9y
+	 bjdtatA1i8duY1hH3i7Iha/fO3EkWu9cN1ef8m8zBNocKK2eN7htVpFliI/ZpBjSVA
+	 iA0a/YR8mqjL1rLeTslcic5VukgHquImcj0pQe2znlVKo0EHuhRh/ybXSPz7kQDpVs
+	 6LRiJ+GpVBHw+2O6iFryXfIeTsHSPu7PtrMS7nKl75sC/RbmOOGPo4DDka0RC7bLlq
+	 OezasHM8gt4CzVFdvM7DbhUgf5q4ORIiTot9m8QUJqR68pgCNjo1GiW9BAGagizcjZ
+	 TNvkzRDadjgbg==
+Date: Mon, 18 May 2026 14:14:23 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Svyatoslav Ryhel <clamor95@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Thierry Reding <thierry.reding@kernel.org>, Jonathan Hunter <jonathanh@nvidia.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Peter Chen <peter.chen@kernel.org>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH v1 5/6] dt-bindings: phy: tegra: Document Nvidia Tegra
+ XMM6260 PHY
+Message-ID: <20260518-mustard-rabbit-of-ecstasy-eed3b6@quoll>
+References: <20260511135703.62470-1-clamor95@gmail.com>
+ <20260511135703.62470-6-clamor95@gmail.com>
+ <20260515-utopian-malamute-of-patience-367e8e@quoll>
+ <CAPVz0n2wrAdU0JKx7eb7uosCcoGayqNchK591VPph-5_nBAMXg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net 3/5] net: netlink: don't set nsid on local
- notifications
-To: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Adrian Moreno <amorenoz@redhat.com>, Jiri Benc <jbenc@redhat.com>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Matteo Perin <matteo.perin@canonical.com>
-References: <20260515201937.2813983-1-i.maximets@ovn.org>
- <20260515201937.2813983-4-i.maximets@ovn.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20260515201937.2813983-4-i.maximets@ovn.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1CDE256C653
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAPVz0n2wrAdU0JKx7eb7uosCcoGayqNchK591VPph-5_nBAMXg@mail.gmail.com>
+X-Rspamd-Queue-Id: C27B756C931
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,canonical.com];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289027-lists,netdev=lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289028-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com]
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Le 15/05/2026 à 22:19, Ilya Maximets a écrit :
-> For notifications with NETLINK_LISTEN_ALL_NSID the expected behavior
-> is the following:
-> 
-> - if NSID is not reported, then the event is local to the listener.
-> - if NSID is reported, then the event is remote, i.e., originated in
->   the provided namespace that is not the same as the listener's.
-> 
-> Userspace applications like ovs-vswitchd expect this behavior.  And
-> ip monitor uses this logic for printing out [nsid current] vs [nsid N].
-> 
-> However, when a self-referential NSID is allocated for a namespace,
-> every local notification starts sending this ID to userspace as part
-> of NETLINK_LISTEN_ALL_NSID CMSG metadata.
-> 
-> This is problematic, because the listener cannot tell if those
-> notifications are local or not anymore without making extra requests
-> to figure out if the provided NSID is local or not.  The listener
-> can also not figure out the local NSID beforehand as it can be
-> allocated at any point in time by other processes.
-> 
-> The value is practically not useful, since it's the namespace's own
-> ID that the application has to obtain from other sources in order to
-> figure out if it's the same or not.  So, for the application it's
-> just an extra busy work with no benefits.  Moreover, applications
-> that do not know about this quirk may be mishandling notifications
-> with NSID set as notifications from remote namespaces while they
-> are actually local.  This is the case with ovs-vswitchd.
-> 
-> Having a self-referential NSID mapping is not something that happens
-> under normal circumstances, but it can be a case in specific
-> environments.  And it can be more common with certain container
-> runtimes like LXC/LXD/Incus that unintentionally trigger allocation
-> of the self-referential NSID via cross-namespace RTM_GETLINK requests.
-It is easy to allocate a self-nsid:
-$ ip netns attach current $$
-$ ip netns set current auto
-$ ip netns list-id
-nsid 0 (iproute2 netns name: current)
+On Fri, May 15, 2026 at 11:37:34AM +0300, Svyatoslav Ryhel wrote:
+> =D0=BF=D1=82, 15 =D1=82=D1=80=D0=B0=D0=B2. 2026=E2=80=AF=D1=80. =D0=BE 11=
+:20 Krzysztof Kozlowski <krzk@kernel.org> =D0=BF=D0=B8=D1=88=D0=B5:
+> >
+> > On Mon, May 11, 2026 at 04:57:00PM +0300, Svyatoslav Ryhel wrote:
+> > > Document the XMM6260 PHY used by various devices based on the Nvidia =
+Tegra
+> > > SoC, describing its usage
+> > >
+> > > Signed-off-by: Svyatoslav Ryhel <clamor95@gmail.com>
+> > > ---
+> > >  .../bindings/phy/nvidia,tegra-xmm6260.yaml    | 58 +++++++++++++++++=
+++
+> > >  1 file changed, 58 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/phy/nvidia,tegr=
+a-xmm6260.yaml
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm62=
+60.yaml b/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm6260.yaml
+> > > new file mode 100644
+> > > index 000000000000..0346433c9772
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/phy/nvidia,tegra-xmm6260.yaml
+> > > @@ -0,0 +1,58 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/phy/nvidia,tegra-xmm6260.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: Nvidia Tegra PHY for XMM6260 modem
+> >
+> > XMM6260 is Infineon modem, so any combination with nvidia,tegra is very
+> > confusing.
+> >
+>=20
+> May you please suggest how to adjust the name then? Thank you.
 
-An application should be prepared to handle this (it is easy for an app to get
-the 'self-nsid' value).
+Depending what is that. Start describing hardware, not driver behavior
+to help in that.
 
-> 
-> A search though open-source projects doesn't reveal any projects
-> that use NETNSA_NSID_NOT_ASSIGNED and rely on metadata to contain
-> self-referential NSIDs.  Quite the opposite, ovs-vswitchd relies
-> on the metadata to not be present to separate local and remote
-> events.  And the 'ip monitor' relies on the metadata to not be present
-> to show '[nsid current]', though this is more like "print 'current'
-> if there is nothing to print" situation, but still can be a little
-> confusing for the user to see an ID for a local event.
+>=20
+> > > +
+> > > +description:
+> > > +  A hardware configuration used in Tegra SoCs to provide proper inte=
+raction
+> > > +  between the application processor and the modem, as well as contro=
+l over
+> > > +  one of the SoC's USB lines for the modem.
+> > > +
+> > > +maintainers:
+> > > +  - Svyatoslav Ryhel <clamor95@gmail.com>
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    const: nvidia,tegra-xmm6260
+> >
+> > Also here.
+> >
+> > What sort of phy is this? So far looks more like a software construct.
+> >
+>=20
+> Infineon XMM6260 does not work as an ordinary USB modem, it is a
+> standalone CPU which just exposes itself to AP via USB. In order to do
+> so, it has to have control over a USB bus of AP which is dedicated to
+> it. In case of Tegra - XMM6260 interaction it looks like this: second
+> Tegra USB controller is set into HSIC mode and is dedicated solely to
+> the modem, modem controls this USB bus. Then the main XMM6260 driver
+> performs power and init sequence and once it is ready it calls phy to
+> register controller. Phy has its own supply, controls USB controller
+> de/register and using enable GPIO sends signal to modem to proceed.
+> Additionally, since some XMM626 versions have a few steps to setup
+> exposing different USB devices, phy handles controller reinit for each
+> step. If treat XMM6260 as an simple USB modem it will never init.
+>=20
+> One more benefit of having PHY is that modem driver itself is generic
+> and PHY handles SoC specific configurations required by the modem.
+> Since this modem was used on a variety of different SoC's (Exynos and
+> OMAP for example) they can reuse modem's driver and provide only PHY
+> which handles modem interactions with the USB bus.
 
-We (6WIND) are using NETLINK_LISTEN_ALL_NSID. Like iproute2, 'current' is
-assumed if there is no nsid, else the corresponding netns is checked (which may
-match the current netns).
+Without any registers here, this is not a PHY but a power sequencing,
+just like we do for other USB or PCI devices.
 
-> 
-> Fixes: 59324cf35aba ("netlink: allow to listen "all" netns")
-> Reported-by: Matteo Perin <matteo.perin@canonical.com>
-> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
-> ---
->  net/netlink/af_netlink.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> index 2aeb0680807d6..607ab4e4ac697 100644
-> --- a/net/netlink/af_netlink.c
-> +++ b/net/netlink/af_netlink.c
-> @@ -1482,9 +1482,11 @@ static void do_one_broadcast(struct sock *sk,
->  		p->skb2 = NULL;
->  		goto out;
->  	}
-> -	NETLINK_CB(p->skb2).nsid = peernet2id(sock_net(sk), p->net);
-> -	if (NETLINK_CB(p->skb2).nsid != NETNSA_NSID_NOT_ASSIGNED)
-> -		NETLINK_CB(p->skb2).nsid_is_set = true;
-> +	if (!net_eq(sock_net(sk), p->net)) {
-> +		NETLINK_CB(p->skb2).nsid = peernet2id(sock_net(sk), p->net);
-> +		if (NETLINK_CB(p->skb2).nsid != NETNSA_NSID_NOT_ASSIGNED)
-> +			NETLINK_CB(p->skb2).nsid_is_set = true;
-> +	}
->  	val = netlink_broadcast_deliver(sk, p->skb2);
->  	if (val < 0) {
->  		netlink_overrun(sk);
+Optionally, it could be part of existing USB phy, when configuring it in
+HSIC mode, but it seems you add here supplies for the modem, not actual
+phy as the phy is undefined.
+
+The problem is that in the patch and explanation you mix driver model
+and driver behavior, so I really don't know what is this hardware. And
+it is not my job to guess, btw. A partial argument/proof why this is not
+a PHY, is that you reference the USB in the node, so phy-provider
+references the phy-consumer. That's reverse. If this is PHY, it's USB's
+HSIC phy, thus this needs to be referenced by USB.
+
+If this is power sequencing, then it can be represented as USB device,
+just like we do for all USB devices, but then it is not PHY and
+phy-cells are not appropriate.
+
+
+Best regards,
+Krzysztof
 
 
