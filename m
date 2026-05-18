@@ -1,247 +1,195 @@
-Return-Path: <netdev+bounces-288788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288789-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WA2/JlZUCmrxzwQAu9opvQ
-	(envelope-from <netdev+bounces-288788-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:50:46 +0200
+	id 2IvTE+pcCmoX0QQAu9opvQ
+	(envelope-from <netdev+bounces-288789-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 02:27:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2957A564701
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:50:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD972564814
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 02:27:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBC4D301E589
-	for <lists+netdev@lfdr.de>; Sun, 17 May 2026 23:50:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C89153009161
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 00:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8486B3603C0;
-	Sun, 17 May 2026 23:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057E817A2F6;
+	Mon, 18 May 2026 00:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zxdie/AY"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="dkJ1BovY";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="cydewFPO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7122C2750E6
-	for <netdev@vger.kernel.org>; Sun, 17 May 2026 23:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D8D625
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 00:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779061806; cv=none; b=KIqNJS8pQkOGaqSjDeftQ07lTXvjMCqG4TJaEdGIAIToCRifwtxWXeE1ZKry6/LnYrvFGDdgjCOKkpg/5CXPLQGNOJoOpy9JluAe0FErk/1wliRsuKDivJwPZJXGMYV79w07MlOdR5sIGbEkV/LbffFFiW9r4eTD9MlZWNwWG6E=
+	t=1779064037; cv=none; b=AyVO1m9RP+YmI+J5N/p7uSR6w6Hp046YVVxqOGd0wW3e6Bsb3Sd92KFCAgagFV8uxIZC7Y0VfTXrqldolT+2E5/xpBnI3v/NscLTjsb1+xhocxMKzWgv3oeuwmT4kn4zvzXUdKq+d8NrLcU6U7U5tWvj7JjC32xvwgZQTSTgXPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779061806; c=relaxed/simple;
-	bh=CnEPR4WvuGalhEU1d6bA9LwifKrg2bPP2TSmKSwG/Dw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nhY0kbkrlZE1tNLeJP2ar+XiXceZram8Fu/kgWuPjOBNTAzmXd8QtQDboOf6fUNfCvTBECTZQoXYI4+52aE4ZpFJ2YghgvNi1mgmszq/3dyThX2rlOfEpHcMFD9fVWy81iYOLi8Y+pyEyEPgi80+Wk5UYo4Vg0f/RiHg6ehG+Vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zxdie/AY; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-9118b952e2bso335226785a.0
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 16:50:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779061803; x=1779666603; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yIXRslS3bbrBf0TjW6A+hsOey38qddDJZpNKTIIzNw8=;
-        b=Zxdie/AY4Vmp5j2w8tMmn0cHPGkJyKimlUUR6lcBSsBMfWfhchYr9Nof+fjdn0ARZL
-         2zF8BmcXlAc2aOWQlvvUG9dNScqbYyYGhfdSoTQ01/YIRmrmfvn4J0GBb8n/dBOmGtUQ
-         F4+/ZuGKF/8KvptY059e4PE3SnrpY1cvgq1YY6s6VY0kXp+QdcjZhBBBiUEbH+MK94SB
-         Ct7+Pj42CKjTLZN3oKorq/89Ngc+v4NArlBuP6mDnJhsAKkDPlBajZf29Btlk9orrTgc
-         NJsO1DxAlo0FUj8NYP/SnoXKTJbYVbPi40EPexqRpbh/RLkrnxvrDT1pohamG/9iO7Ay
-         huBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779061803; x=1779666603;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yIXRslS3bbrBf0TjW6A+hsOey38qddDJZpNKTIIzNw8=;
-        b=LNauUuYyBXY2VxuAtjPlGPmJYqhLgcjYAEUuzjUy9Snu4A/AJDAykIo+m3SQDWxpmG
-         m3ZMXKJtUF3/P9helSQhcd2goxs0+fGjwgmiTIi1vXRosxGtIa2Q834JPXGs1BJmEcKz
-         NYfrwOU0s1IYb1GqtEzTUlbmL0L/HyETE6jTpip9xS2kO2pim+WGpIyPwUbuloxEuGuU
-         em9cYsaB97Un1WR5jPuNc1ju1lFuFzYS94+FSF6JH4UHn58yYUSVYLoaJY+C3gS5tCcQ
-         ZVv1hlHfV8yhhyDp1BRq1fWkiYDS8Gin3myGHD02jc7cUULFdTndKNLNHyWQya2cEL45
-         6hPA==
-X-Forwarded-Encrypted: i=1; AFNElJ8ZOYO3Flu92whG9nSQjG48IuQFJC9kskFP78hY4azURCMFt+tthuS/8qkSmL5Cf/jw11rLv0c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxA7c5q2woFv5MiTWwTVBV8tHb2DRYGXSMcL8Ojh0FTG58sMyph
-	WE2vHglBdrnPVFm6gRQF9LrprInbIPf6GX9KucLgqhtgn9dCmNcnyrVstd5dwufZ
-X-Gm-Gg: Acq92OGRIadvbGy11nQCupqiGR13dTLg+vjJDbk66d/Y2FI24nE3VUzDT5CXMG6pH15
-	zEOsbv3Nv0H6JbVqMVC5irkz/VjQElO0iiM80FNOPoxHRnUb1YrzIuHZNaTerrbK0FIVCU3Bews
-	6q9Evv1edR/HvUDBjhb82fV03WUKTAlOb0/WJhOTFAeDHCdsRiAjcJbGiDhU8aK00lf+5ZYd8NW
-	2dR7p58izr8VpvK1t7PJo4gxw3jAy7H2kO1kEfbxWHx6wn3InGH5FnVGb/KqlqhKbO0n05qmAuT
-	ckMUeviJ+GpGDdS53evp6c1p/N5c4qamVeJWt33wPDmv8Wgov4fr18+dZukXYuvBt+vGZC7Gb0E
-	yM3J9uTWreFruKybBE/TX+meF9wGzEIxd6NyrDtZ8QzFbIGBwBKUpOW0NzCnr/3RHb01DsGyP9f
-	OiV2sNsVgts2uLCLBnt1X11BB9g+LUXR+NT48AACe26Px/ZNdV1GFILePaguoJg9T278Rmj1jIk
-	Cb2WUUjlzEPZZZUri4XcK7ZfaUa7hFwwPGgxFgz9d8=
-X-Received: by 2002:a05:620a:46a9:b0:911:6136:281a with SMTP id af79cd13be357-911cc4bc1b8mr1891279485a.17.1779061803265;
-        Sun, 17 May 2026 16:50:03 -0700 (PDT)
-Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9138a830c89sm502230585a.6.2026.05.17.16.50.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 16:50:02 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	netfilter-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] xfrm: validate IPv4 header length before output transforms
-Date: Sun, 17 May 2026 19:49:55 -0400
-Message-ID: <20260517234955.1276828-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <agae9ph6pzaQJv3E@gondor.apana.org.au>
-References: <agae9ph6pzaQJv3E@gondor.apana.org.au>
+	s=arc-20240116; t=1779064037; c=relaxed/simple;
+	bh=7h2enbGctrQWWXAc7Qk6Pok5+8n4jTaTSAZOOzHdEII=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=oLYslcec3JmnVx3cW8LTPhov6iVm+BS8PGv/ly1SVh2i82w2i6LCgUqpNSzoS9CdkwXPCab6u51ROwbPSYRQt9ZRV+zWURcprc/gyDa0K0gSr5b4uR3j9T7eP1DDFBhzJZe+ao53oG7rQSFEV/nETTZqaeOoSmTNGE/LpJAz9g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=dkJ1BovY; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=cydewFPO; arc=none smtp.client-ip=160.80.4.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 64I0QSdV027107;
+	Mon, 18 May 2026 02:26:34 +0200
+Received: from lubuntu-18.04 (host-95-246-236-184.retail.telecomitalia.it [95.246.236.184])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 5524E120535;
+	Mon, 18 May 2026 02:26:24 +0200 (CEST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1779063984; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q83iHMFkqa+wxFCgKiJIAuLPuVm0wlViXHFr6DmufXw=;
+	b=dkJ1BovYiqaiBrvI2TwyJUOx6Bep7bqUfzcWxp6zUHeEUOqAItSnNonPCpkOkC45UOTFz3
+	hyYEcHnP5Xxk63Dg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1779063984; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q83iHMFkqa+wxFCgKiJIAuLPuVm0wlViXHFr6DmufXw=;
+	b=cydewFPOTaJNlQ1tZ9HcKU+visYBmm9u1J+5POiqhT11XyQ6xHJ2+p5k6fyBvZLyNXidZz
+	OOF0ikpiES9Ed6atwJ/od+FZ/dH6jBkNdIjg7NtvHmGGnMSPIHGX1se0SzMwq78UChfNwH
+	xwEOr00scsf32mY8A16RIeNb0rDUs99h1tnaFvubHXzDFJ0xWKLamJhUZrM3HxpzZ7Obnp
+	wAZX21QxP3ccwlBia0NcrK2hRVfIhU52wIxlucuhp6LTvbBj+lTyTw9JR8HYpdm6/q/8tU
+	xBqNX9F4wjrvjo2U4+3y5/C4VQpsFQLjfMy6Y05AEAQi6tB/ecBv7QktfhoI/g==
+Date: Mon, 18 May 2026 02:26:23 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Justin Iurman <justin.iurman@gmail.com>
+Cc: Weiming Shi <bestswngs@gmail.com>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>,
+        Alexander Aring
+ <alex.aring@gmail.com>, netdev@vger.kernel.org,
+        Xiang Mei <xmei5@asu.edu>, Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCH net] ipv6: rpl: add NULL check for idev in
+ ipv6_rpl_srh_rcv()
+Message-Id: <20260518022623.80d82c9c2184760aecc0f70b@uniroma2.it>
+In-Reply-To: <2e7d302f-a03e-4df3-8e6c-9339166a831e@gmail.com>
+References: <20260515125530.3396293-2-bestswngs@gmail.com>
+	<2e7d302f-a03e-4df3-8e6c-9339166a831e@gmail.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2957A564701
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
+X-Rspamd-Queue-Id: DD972564814
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	URIBL_MULTI_FAIL(0.00)[uniroma2.it:server fail,asu.edu:server fail,sea.lore.kernel.org:server fail];
+	TAGGED_FROM(0.00)[bounces-288789-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,asu.edu,uniroma2.it];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288788-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[uniroma2.it:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[apana.org.au:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The IPv4 output path validates ihl before handing packets to xfrm,
-and raw_send_hdrinc() now rejects IP_HDRINCL packets with ihl < 5.
-xfrm can still see a malformed IPv4 skb after that point, for example
-if a netfilter rule rewrites the packet between the normal IPv4 checks
-and the xfrm output transform.
+On Sun, 17 May 2026 20:58:25 +0200
+Justin Iurman <justin.iurman@gmail.com> wrote:
 
-Do not let xfrm output consumers be the first code to discover that
-malformed header.  xfrm4_transport_output() consumes iph->ihl before
-AH gets control, and the BEET/tunnel path records IPv4 option length
-from iph->ihl before constructing the outer header.
+> On 5/15/26 14:55, Weiming Shi wrote:
+> > ipv6_rpl_srh_rcv() calls __in6_dev_get(skb->dev) and dereferences the
+> > result without a NULL check.  When addrconf_ifdown() concurrently clears
+> > dev->ip6_ptr via RCU_INIT_POINTER(dev->ip6_ptr, NULL), __in6_dev_get()
+> > returns NULL and the subsequent READ_ONCE(idev->cnf.rpl_seg_enabled)
+> > triggers a NULL pointer dereference.
+> > 
+> >   BUG: kernel NULL pointer dereference, address: 0000000000000370
+> >   Oops: Oops: 0000 [#1] SMP NOPTI
+> >   RIP: 0010:ipv6_rthdr_rcv+0x3bf/0xe70
+> >    ipv6_rpl_srh_rcv (net/ipv6/exthdrs.c:504)
+> >    ipv6_rthdr_rcv (net/ipv6/exthdrs.c:691)
+> >    ip6_protocol_deliver_rcu (net/ipv6/ip6_input.c:478)
+> >    ip6_input_finish (net/ipv6/ip6_input.c:532)
+> >    ip6_input (net/ipv6/ip6_input.c:540)
+> > 
+> > Add a NULL check for idev, dropping the packet when the device has no
+> > IPv6 configuration.
+> > 
+> > Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
+> > Reported-by: Xiang Mei <xmei5@asu.edu>
+> > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> > ---
+> >   net/ipv6/exthdrs.c | 4 ++++
+> >   1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+> > index 95558fd6f447..19002e551a03 100644
+> > --- a/net/ipv6/exthdrs.c
+> > +++ b/net/ipv6/exthdrs.c
+> > @@ -498,6 +498,10 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+> >   	u32 r;
+> > 
+> >   	idev = __in6_dev_get(skb->dev);
+> > +	if (!idev) {
+> > +		kfree_skb(skb);
+> > +		return -1;
+> > +	}
+> > 
+> >   	accept_rpl_seg = min(READ_ONCE(net->ipv6.devconf_all->rpl_seg_enabled),
+> >   			     READ_ONCE(idev->cnf.rpl_seg_enabled));
+> > --
+> > 2.43.0
+> 
+> The fix is correct, but this is a duplicate of Andrea's patch (see [1]) 
+> where Eric suggested to use kfree_skb_reason() with 
+> SKB_DROP_REASON_IPV6DISABLED. Based on the above, I don't think this 
+> patch should be accepted.
+> 
+>   [1] 
+> https://lore.kernel.org/netdev/20260428224816.11223-1-andrea.mayer@uniroma2.it/  
 
-Validate IPv4 skbs before xfrm output handles offload/GSO and again
-before each software outer-mode transform.  Warn once for ihl < 5,
-since that means a malformed IPv4 packet was reinjected after the
-normal IP stack checks, and reject the packet before transform code can
-consume the bogus header length.
+Hi Justin, thanks for CC'ing me.
 
-A QEMU regression with an nft payload rule on the IPv4 output hook
-rewriting byte 0 to 0x40 now reaches the WARN_ON_ONCE, drops before
-AH, leaves xfrm packet counters at zero, and exits without a panic.
-A valid AH transport regression with normal ihl=5 UDP still succeeds:
-five sends complete and the xfrm state accounts 75 bytes and five
-packets.
+Yes, the correct approach is the one Eric suggested, which I have
+ready in my v2. I'll send it shortly.
 
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
+Thanks Weiming for independently catching this as well.
 
-Posting this as a follow-up to Herbert's requests in the  existing
-thread.  Patch 1/2 from the original series landed as 915fab69823a1;
-the AH-only hardening did not.  I read the patch-2 comment as asking
-for the defensive guard to live in common xfrm output code rather than
-per-consumer, and this patch is my attempt at that first block.  Happy
-to revise if you'd prefer the validator placed differently (only at
-xfrm_outer_mode_output, only at xfrm_output, gated under a debug
-option, or moved further out to __ip_local_out / xfrm4_extract_output)
-or the WARN_ON_ONCE swapped for a silent counter.
-
- net/xfrm/xfrm_output.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
-
-diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-index cc35c2fcbbe09..02f38eaa68ff6 100644
---- a/net/xfrm/xfrm_output.c
-+++ b/net/xfrm/xfrm_output.c
-@@ -27,6 +27,31 @@
- static int xfrm_output2(struct net *net, struct sock *sk, struct sk_buff *skb);
- static int xfrm_inner_extract_output(struct xfrm_state *x, struct sk_buff *skb);
- 
-+static int xfrm_output_validate_iphdr(struct sk_buff *skb)
-+{
-+	struct iphdr *iph;
-+	unsigned int ihl;
-+
-+	if (skb->protocol != htons(ETH_P_IP))
-+		return 0;
-+
-+	if (unlikely(!pskb_network_may_pull(skb, sizeof(struct iphdr))))
-+		return -EINVAL;
-+
-+	iph = ip_hdr(skb);
-+	if (unlikely(iph->version != 4))
-+		return -EINVAL;
-+
-+	if (WARN_ON_ONCE(iph->ihl < 5))
-+		return -EINVAL;
-+
-+	ihl = ip_hdrlen(skb);
-+	if (unlikely(!pskb_network_may_pull(skb, ihl)))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static int xfrm_skb_check_space(struct sk_buff *skb)
- {
- 	struct dst_entry *dst = skb_dst(skb);
-@@ -459,6 +484,12 @@ static int xfrm6_prepare_output(struct xfrm_state *x, struct sk_buff *skb)
- 
- static int xfrm_outer_mode_output(struct xfrm_state *x, struct sk_buff *skb)
- {
-+	int err;
-+
-+	err = xfrm_output_validate_iphdr(skb);
-+	if (err)
-+		return err;
-+
- 	switch (x->props.mode) {
- 	case XFRM_MODE_BEET:
- 	case XFRM_MODE_TUNNEL:
-@@ -769,6 +800,13 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
- 		break;
- 	}
- 
-+	err = xfrm_output_validate_iphdr(skb);
-+	if (err) {
-+		XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-+		kfree_skb(skb);
-+		return err;
-+	}
-+
- 	if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
- 		if (!xfrm_dev_offload_ok(skb, x)) {
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-
-base-commit: aaec7096f9961eb223b5b149abe9495525c205d9
--- 
-2.53.0
-
+Thanks,
+Andrea
 
