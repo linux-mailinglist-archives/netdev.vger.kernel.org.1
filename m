@@ -1,188 +1,141 @@
-Return-Path: <netdev+bounces-289024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289022-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gDxLOR8DC2q3/QQAu9opvQ
-	(envelope-from <netdev+bounces-289024-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:16:31 +0200
+	id GE/vAzYDC2qj/QQAu9opvQ
+	(envelope-from <netdev+bounces-289022-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:16:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 619A756C6DC
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:16:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AB6256C702
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB4C33040AB6
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:03:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 97AE2308E77E
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3A33FBB78;
-	Mon, 18 May 2026 12:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E8F3FD144;
+	Mon, 18 May 2026 12:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l1tOX1YN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4b9VaJ/R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75633F99EE;
-	Mon, 18 May 2026 12:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C719C3FCB3C;
+	Mon, 18 May 2026 12:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779105759; cv=none; b=Jv9X3sGa8zQC0qGbhZJE+SHVEJISsG0D2ZpydxOtpASmeY0BNGSXhL1Lh4xUe5KjoHoJ0CZLCklbG2AdtkTM7GBEtIwP9rYivqucqEXH7y1IKwd0JkxL9PnlFBGIKj3vkjfOn4A35szPNUHAWyrP7VnN0eko58DIW9Vt6Rz358s=
+	t=1779105669; cv=none; b=Xtr9VTq9uEGPWxhn2Rjc7x++O/x7A2JxfbyAaFt5urJHtgl+8Fg8jRu6o8afxIxFAw8oJFaANxuWL1+NRpUrlN4dyTSAzb+M89dMGfpi+9kPWvM2DD1AQV3yiJQedAfY02fww7DcUlXD621KQda7hGkyrCI64L9lzF6kHtc0XMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779105759; c=relaxed/simple;
-	bh=AcsfbDeU1OToQMyeb/P7qGiSa2E9k82TXw4FrU7IoFE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d6PLRWpfYRbNv9xX7Glw8rJ+9E5AwDB2vAizBtzEkDcWsnx0ul/wmCxytC5Nv2UNvGEa4E8UotZ3UQrpZYzEm8fNmQSouBnItrA/1CHrPFA3i/XdjrFkYykfkOwvGHGJx4RDjRXWLy/cpXtAjH8WOhDmsNFO9bByWB0rpFQgOFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l1tOX1YN; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64IAP8e31410721;
-	Mon, 18 May 2026 12:00:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=FwfDbP
-	gCS62hoLhasMcXlMg0kycZOaaHLXnHQILMxiY=; b=l1tOX1YNrPEH8YVr9cWSW5
-	a43KhDY6TBpcpn0tgxQPlIl8Zq+yNQ7G1mvaGVsAt/YPaiqhCLlsHYozSanaPx4A
-	nTfn2mMcCuR9pDZirQYGi+igMKBEbPtKAc7JTnhPfDGFmrze+d9S34l4Nk1piUKr
-	EGzls29Sqy56wMdDYx0VBXTYP1p7sLj7aTCwYjyleS3XGsyQLfcSHVhTRIqJi8XV
-	y9dRDizB+T8tH6Eh+ObYCVxKAMFxMYc7Hqlq9+BAvZytccPb/GK20Gniz8EcuW3O
-	fyMRGIXJKCBTP0aHuGHKZPD6P3psfFPdApwVmAZDOITA67YW9i4bOv1Vzxb3Oc1Q
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4e6hb87cg0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 May 2026 12:00:07 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64IBsS6Q001383;
-	Mon, 18 May 2026 12:00:06 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4e739vnucr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 May 2026 12:00:06 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64IC045Q30802350
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 May 2026 12:00:04 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7C59520076;
-	Mon, 18 May 2026 12:00:04 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0580220074;
-	Mon, 18 May 2026 12:00:04 +0000 (GMT)
-Received: from [9.52.217.250] (unknown [9.52.217.250])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 18 May 2026 12:00:03 +0000 (GMT)
-Message-ID: <b681c7a4-7e86-4f2d-84c4-d74c9b7fd1aa@linux.ibm.com>
-Date: Mon, 18 May 2026 14:00:03 +0200
+	s=arc-20240116; t=1779105669; c=relaxed/simple;
+	bh=ZfdSCvmJheoZqbSwPXtauVF4UyINGQSXbG9sWcASG0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ut6M34zK610rFZ4ikLvRbmShWRj7wIWSUA6rLPr/1cWHOXvz8lAdMEZdYiPYWx6XA5VJ8NSwp1EiJ2LuHGQ7CNIh7ATVAbFBFC09p+EBzrjmlKzfOj1H/uCDRdvsUDQTSr5mdOZm08ggrD3lc2CUfsjRQeuG3HAtBmzIh3gPjmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4b9VaJ/R; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=b2/B+UK9SKjleTI91bdumxJx4pLws3/L2OWSi73KWpo=; b=4b9VaJ/Rj7jWHjVeoleSI82alV
+	i/fa0OYq2cR/HFqI84ON2qqx6lg+Z52dquD2DheuQgWIk08FqHqbdCeaqMKPwR4URL7aB/wZ06Mco
+	kpXNj5eRS3bab8aGgot0zmNMWt86ifUTQ8cJpFYUILnsOb2unkg/AmbyFxHb31hgVnAQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wOweP-003U3q-Kf; Mon, 18 May 2026 14:00:49 +0200
+Date: Mon, 18 May 2026 14:00:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 8/9] onsemi: s2500: Add driver support for
+ TS2500 MAC-PHY
+Message-ID: <660d68f2-2e4a-4dad-a33b-9cbd1847c04e@lunn.ch>
+References: <CY8PR02MB924948C0BB8611D5A2618D3283382@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <c9b1b559-f72e-46e0-8d71-57ea26f70bb0@lunn.ch>
+ <CY8PR02MB9249BE304350D2FA7C196A6C83032@CY8PR02MB9249.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/7] af_iucv: convert to getsockopt_iter
-To: Breno Leitao <leitao@debian.org>, Chas Williams <3chas3@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Magnus Karlsson
- <magnus.karlsson@intel.com>,
-        Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-        Stanislav Fomichev <sdf@fomichev.me>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        James Chapman <jchapman@katalix.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        David Heidelberg
- <david+nfc@ixit.cz>,
-        Samuel Ortiz <sameo@linux.intel.com>
-Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, linux-s390@vger.kernel.org,
-        linux-afs@lists.infradead.org, oe-linux-nfc@lists.linux.dev,
-        kernel-team@meta.com
-References: <20260515-getsock_four-v2-0-0d8eed952627@debian.org>
- <20260515-getsock_four-v2-2-0d8eed952627@debian.org>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20260515-getsock_four-v2-2-0d8eed952627@debian.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE4MDExMiBTYWx0ZWRfXxO364hcxmHy7
- ECq+ZnVaWD0Q+cndgBeXzUz1pcmq4Csu2HGr3tvCLLU2XOZ5Vcpa/CLL+UeVZOn5yy51MsfO0D/
- XrRu+NTRU/Lg6dzLSZJmpHz+BJ7h8XiLJgGxDB4bhJYDnkL3ZqNt/yZj1v1obTAPFHHTJn2rvDJ
- S2/G1GLchEAyXVg7buqTxVflow8hRZ9NussecOIXJMFJ5gL14xan4f6+hLLts3Hfm3FTFdy+jzZ
- 7JZKICj181I9PCakTQYWXDG6lU6apnoRRlIfqzAQV8ijJpjlYO+maIdFO9duBT8sfZQzYQyKD70
- iq8FkkDJHjp0KzbP/z/ncuiVZozwepHc+GOcVPnGrD6unlxOcZiEvYn4DIwPOQGu5gTLNvbxzDB
- /UpliIhgn/BiOXH/SxTX5j9rYIygLki630sWafnebQG9lGPKMnXm2zhctDCp1AK+yG7v7f8fXNK
- VFjmJ4JGymbk1SZmQjQ==
-X-Proofpoint-GUID: MkDTiJQWGJUKnvKYL8I1CVW44oGdCN6M
-X-Proofpoint-ORIG-GUID: NPjSOBv4uX5Td3VbgCFlVWupi0kAca63
-X-Authority-Analysis: v=2.4 cv=aYBRWxot c=1 sm=1 tr=0 ts=6a0aff47 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=xNf9USuDAAAA:8
- a=VnNF1IyMAAAA:8 a=b_-T3gKLG4GnLt35UJQA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-18_03,2026-05-15_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 adultscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0
- clxscore=1011 spamscore=0 phishscore=0 priorityscore=1501 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605180112
-X-Rspamd-Queue-Id: 619A756C6DC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY8PR02MB9249BE304350D2FA7C196A6C83032@CY8PR02MB9249.namprd02.prod.outlook.com>
+X-Rspamd-Queue-Id: 8AB6256C702
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289024-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[debian.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,intel.com,fomichev.me,iogearbox.net,linux.ibm.com,katalix.com,auristor.com,ixit.cz,linux.intel.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	TAGGED_FROM(0.00)[bounces-289022-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ibm.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,nfc];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
 X-Rspamd-Action: no action
 
-
-
-On 15.05.26 10:32, Breno Leitao wrote:
-> Convert IUCV socket's getsockopt implementation to use the new
-> getsockopt_iter callback with sockopt_t.
+On Mon, May 18, 2026 at 04:03:38AM +0000, Selvamani Rajagopal wrote:
 > 
-> Key changes:
-> - Replace (char __user *optval, int __user *optlen) with sockopt_t *opt
-> - Use opt->optlen for buffer length (input) and returned size (output)
-> - Use copy_to_iter() instead of put_user()/copy_to_user()
 > 
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
+> 
+> > > +static int s2500_hwtstamp_get(struct net_device *ndev,
+> > > + struct kernel_hwtstamp_config *cfg)
+> > > +{
+> > > + struct s2500_info *priv = netdev_priv(ndev);
+> > > +
+> > > + if (!priv->ptp_clock) {
+> > > + cfg->tx_type = 0;
+> > > + cfg->rx_filter = 0;
+> > > + } else {
+> > > + oa_tc6_hwtstamp_get(priv->tc6, cfg);
+> > > + }
+> > > + return 0;
+> > 
+> > What is actually specific to the s2500 here? Your aim should be to put
+> > everything you can into the core.
+> 
+> I agree on this and the next comment as well. Nothing really vendor specific. 
+> 
+> Question is, 
+> 1) Should we add the PTP code in oa_tc6.c? This PTP code add 200+ lines. My preference is to add a new file oa_tc6_ptp.c under the directory where oa_tc6.c resides.
 
-Acked-by: Alexandra Winter <wintera@linux.ibm.com>
+oa_tc6_ptp.c is good. Maybe create a directory oa_tc6 and move the
+code into there. Especially if you need to add a local header which is
+shared by oa_tc6.c and oa_tc6_ptp.c, but is not needed by the drivers.
 
+> 2) If we are adding a new file, should it be under same CONFIG_OA_TC6 or add a new CONFIG_OA_TC6_HW_TIMESTAMP or something similar?
+
+I would not bother with a new symbol. It adds build testing complexity
+having to build with and without it, to test the stubs are correct
+etc.
+
+	Andrew
 
