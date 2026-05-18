@@ -1,132 +1,169 @@
-Return-Path: <netdev+bounces-288869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288870-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wKYyB2y2CmoB6QQAu9opvQ
-	(envelope-from <netdev+bounces-288869-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:49:16 +0200
+	id 4DVBMAS4CmoB6QQAu9opvQ
+	(envelope-from <netdev+bounces-288870-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:56:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FAC2566EFD
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:49:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8557E567047
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D23D330073FC
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 06:49:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7438730182A3
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 06:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3FE305669;
-	Mon, 18 May 2026 06:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4B53DC4D5;
+	Mon, 18 May 2026 06:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Inb9zsWs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBEAy425"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C6B329C57;
-	Mon, 18 May 2026 06:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136D93C5540;
+	Mon, 18 May 2026 06:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779086946; cv=none; b=XIYmb+fwfZz8/2X1YwkPSHreHMNaQ7XLtdQKO/929oOJlMaXpDVLTd55P7xgTum28JiJF5iPvb2Tgj/uRfBkCSFJW8JsBvnZ44XLAg8ovfocTbJPfRoKfrrCOU56HU+5EkcJUb3XHp1uBb48h7lD+R0RVuazbm4HJgL44jzdEGk=
+	t=1779087361; cv=none; b=ERjy8wBKImCuCGxshEPyi259aQUHjCGuGXsjSHOScrg4qwwhrgZ1Hd7UeaKbu+aaJZZwia1xuS//hCT653LVCFroaJ7htaguXxV2vcuVXO2U+uwxu7BlA+v86ywuFg1zcd22V46DPD2C61geR4Kw8TqEEtHCj5XmXXqE0vmbXoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779086946; c=relaxed/simple;
-	bh=5Bwvn3tyJWkXDwcuh8yJbtR5dDmTbHFH6B0/lOnohx4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g5kIk9DZydM8M3xaO12bd5MsKfHNnP0H77P+XrY3TR48fivQHK+AylPoG21RzSM4LK1SdRANK5RaTUpXMb7RVT0WneenaF4GIXNP7i8c5m2pKRcoLqTWqpxicGB590qY8ToE2uHRMPpigHfkGabk6+CXafRWJ679mDRGaeHxGFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Inb9zsWs; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
-	Content-Type; bh=oSzeC+DoQWAdoUQJPBfx930SyUC+lW5/J/zVH9kFj70=;
-	b=Inb9zsWsts0uL1V7x1okYreD8b2Cv1ZdnVAb2JP/7d/D7ZgArK7DohUg9DeBsQ
-	iDC6JIEaesqelgwE5f8IrBP/mmCn9v6XYYuT2xlfUW+ceZu+qHNUs55qZIS4PdH2
-	UrmXRbepXNUGgDg+jgwgxzcd6GLRrVJTRgffTtfj55XGQ=
-Received: from [127.0.0.1] (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgA3HKpItgpqppMoEA--.51388S2;
-	Mon, 18 May 2026 14:48:41 +0800 (CST)
-Message-ID: <4fb33a60-7e62-4c73-b82a-e990dea7212d@163.com>
-Date: Mon, 18 May 2026 14:48:39 +0800
+	s=arc-20240116; t=1779087361; c=relaxed/simple;
+	bh=o7dvWOoDxJoqk2pHywtA9JSXlbLLMaNNcTzFjnfj+Jk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nzyr2yXrYaogmwid2AOD2OqYSFLcQEOiSc2YPcUkdSBYycIp6RgNJTva6uMujVnhV76pHkQ0S4Lv8i5G3HKhuVcBWC7MOPCm+q4KFk8wzIWTwp+ZRxJJJ1/YHBxuqx8CP2eGrVoZanWYpdVQ7LJGRCRlEbQx/rHyNGis6XWAsJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nBEAy425; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E94F3C2BCB7;
+	Mon, 18 May 2026 06:55:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779087360;
+	bh=o7dvWOoDxJoqk2pHywtA9JSXlbLLMaNNcTzFjnfj+Jk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nBEAy425sh60FdXG3PK9Hl5HHmR4JhLGLkssLELCmAl6bLVf2uoZT9DlFjrBdwUOr
+	 iPfrb/zNRGIbEw5MvkdWEHn8q9hpCzXM89p5Eh0zCbZWYKLA5OQFQDbLaGF4DiqNsx
+	 zJKMRlYVC5OMdTqQz0LhOSYUJpWk1ykdqIsnUjH9EeY5aVmMnsIak3HhyAh2Zwj230
+	 XNquFayYEnkmYsxqti+gH/xiwDlCZHDReM+yHYJXq7nqnJbiS2qeiIQytSvEmXNEAw
+	 41STb/iOBY3qwPcjq8FwSnfB1RrgHS3q3+J3DY9cymgBqa5YCBmuBqY6sLXjcMgzsR
+	 3JaQQwY6GZZ2A==
+Date: Mon, 18 May 2026 08:55:58 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: linux-doc@vger.kernel.org, devicetree@vger.kernel.org, 
+	workflows@vger.kernel.org, linux-arch@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-csky@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Daniel Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Alex Shi <alexs@kernel.org>, 
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>, 
+	Hu Haowen <2023002089@link.tyut.edu.cn>, Dinh Nguyen <dinguyen@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Oleg Nesterov <oleg@redhat.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Nick Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>, 
+	Dave Penkler <dpenkler@gmail.com>, Andi Shyti <andi.shyti@kernel.org>, 
+	Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, 
+	Nuno =?utf-8?B?U8Oh?= <nuno.sa@analog.com>, Andy Shevchenko <andy@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>
+Subject: Re: [PATCH] nios2: remove the architecture
+Message-ID: <agq3nMVq5x4SyBAV@monoceros>
+References: <20260518042833.272221-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] authencesn: Refactor in-place decryption
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
- Scott GUO <scottzhguo@tencent.com>, netdev@vger.kernel.org
-References: <20260515083645.4024574-1-scott_gzh@163.com>
- <4e9aee15-62e6-4d71-a836-250c5376a8fd@163.com>
- <8aaa00f3-d8e0-4de0-918b-1f025b632eb9@163.com>
- <agp6lDddmDZaoH6L@gondor.apana.org.au>
- <9f625d9d-6820-442e-9527-1b2802309993@163.com>
- <agqEvY4xJYjbZVDI@gondor.apana.org.au>
-From: Scott Guo <scott_gzh@163.com>
-In-Reply-To: <agqEvY4xJYjbZVDI@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgA3HKpItgpqppMoEA--.51388S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7JF4rAr13ur48CF1kZrW7CFg_yoWkKFg_uF
-	98t34kC39rA3WkXw13tw4vgrZrGr95Wry5Za4Dur17Kr98Xrs8J3WvqFZav3WUCrWfKr98
-	CFsxX347Zw1SvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRRCzt5UUUUU==
-X-CM-SenderInfo: hvfr33hbj2xqqrwthudrp/xtbCwwncemoKtkkeSwAA3m
-X-Rspamd-Queue-Id: 7FAC2566EFD
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="v3mrrmanqdjd4jn4"
+Content-Disposition: inline
+In-Reply-To: <20260518042833.272221-1-enelsonmoore@gmail.com>
+X-Rspamd-Queue-Id: 8557E567047
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-288870-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[163.com];
-	TAGGED_FROM(0.00)[bounces-288869-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[48];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[scott_gzh@163.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[163.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ukleinek@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lwn.net,linuxfoundation.org,kernel.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,gmail.com,infradead.org,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Then the problem comes down to whether ESP will be able to identify all 
-the path and mitigate all of it.
 
-I am also wondering whether this in-place crypto + SG list method would 
-have simular issue with other crypto such as SKCipher. Copy Failed, 
-Dirty Frag and Fragnesia is ultimately an attack that craft specific 
-bytes with encryption and decryption. Attacker would potentially be able 
-to archieve a collision attack on say the record for root in passwd file 
-and use it on any machine where their passwd files are in a simular format.
+--v3mrrmanqdjd4jn4
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] nios2: remove the architecture
+MIME-Version: 1.0
 
-在 2026/5/18 11:17, Herbert Xu 写道:
-> On Mon, May 18, 2026 at 10:55:38AM +0800, Scott Guo wrote:
->> BTW, I am wondering whether we should disable inplace decryption for now? I
->> think that to mitigate vulnerabilities like Fragnesia, maybe something has
->> to be done on the memory side. Maybe something like forcing a pagefault when
->> trying to write to these pages?
-> 
-> I think stopping ESP from putting frags into the dst SG list would
-> be prudent until the whole stack has been audited.
-> 
-> Alternatively switch from the black-list to a white-list approach
-> and only allow ESP to do in-place processing of packets from a
-> source that's known to be writable.
-> 
-> Cheers,
+Hello,
 
+On Sun, May 17, 2026 at 09:28:33PM -0700, Ethan Nelson-Moore wrote:
+> diff --git a/drivers/pwm/Kconfig b/drivers/pwm/Kconfig
+> index 6f3147518376..d8145f369ec3 100644
+> --- a/drivers/pwm/Kconfig
+> +++ b/drivers/pwm/Kconfig
+> @@ -131,7 +131,7 @@ config PWM_ATMEL_TCB
+> =20
+>  config PWM_AXI_PWMGEN
+>  	tristate "Analog Devices AXI PWM generator"
+> -	depends on MICROBLAZE || NIOS2 || ARCH_ZYNQ || ARCH_ZYNQMP || ARCH_INTE=
+L_SOCFPGA || COMPILE_TEST
+> +	depends on MICROBLAZE || ARCH_ZYNQ || ARCH_ZYNQMP || ARCH_INTEL_SOCFPGA=
+ || COMPILE_TEST
+>  	select REGMAP_MMIO
+>  	help
+>  	  This enables support for the Analog Devices AXI PWM generator.
+> diff --git a/include/linux/seqlock.h b/include/linux/seqlock.h
+> index 5a40252b8334..edc8c96d91b6 100644
+
+Acked-by: Uwe Kleine-K=F6nig <ukleinek@kernel.org> # for pwm
+
+Best regards
+Uwe
+
+--v3mrrmanqdjd4jn4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmoKt+8ACgkQj4D7WH0S
+/k6D+wf/c3PPUzT+ilOfvLDq6xQ9mwqwWCSp0mpgj+sKStF3zLW22/Jxh8uQfgJz
+ZxNzeVpp3RcvofNMMm9NFY7fAJ1PB+bqLcKvHzxUCFe5c6VAocZOm+H+6jrnvcGM
+tKehUuFKbRlgdS1XjOXmRn9CuXP4HU7Jm0kFysqDtNt0Zl8gGYQgubZ2Z34XrBIu
+msmr1l3QT1BMbE7uRR5crgqH4HHvMpZqR0RehrX2/c1VY8HWEujhEkufhcMZMrvx
+Vmuf0f4bdeu4oIwwFMXmijr6ySoxRBKluXwjFOMUa8ZqhyhLFSr6lOhX8pXD+rOr
++brUNxnEjv3MpJArRnZswn7AfSGXWw==
+=83W7
+-----END PGP SIGNATURE-----
+
+--v3mrrmanqdjd4jn4--
 
