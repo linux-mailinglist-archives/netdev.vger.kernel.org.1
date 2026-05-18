@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-289125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289126-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KA3FElBC2p5FAUAu9opvQ
-	(envelope-from <netdev+bounces-289125-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:41:45 +0200
+	id gIhqD1JBC2p5FAUAu9opvQ
+	(envelope-from <netdev+bounces-289126-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:41:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E33EB571109
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:41:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5CC571118
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:41:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A0A3D3028F5C
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:40:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 503623016B36
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 16:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F6748B38A;
-	Mon, 18 May 2026 16:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E18C48C3EE;
+	Mon, 18 May 2026 16:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3SyRPWR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HI1dDOuO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 432D9481FC3
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E329248C41D
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779122450; cv=none; b=WkVZGtalChWHv1p3SnQUvHSjhsI0KL9iB3lF0JHjt8vA0qW1wv6JvrNQJ1IbZF5wE9K7J7QoVxp+kT9Ohndtm5O6ySnxr1uheLH7cOqRsxQzPeZfP7baW611h0ubISTIJaaVgR5jlaMdoDcH2OY1Xiby+vkWg68oTZOrX9k2xIA=
+	t=1779122454; cv=none; b=ZgT1NM4sAu5pXk44LguUPhOF9nO66BRB9dNheITaKG3KagrQIU1tjp8++QtF8FcWK6tt5WJnrhEM00iO1DT2qEREPUm616W0zJxyz/IKi/1vXpTQuVBDTUbzGmXfSmbN8cqaa4vFLm+q983X6OG9tpCPZ05p53FryHwi30oeCI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779122450; c=relaxed/simple;
-	bh=6YSVS5kkWuXkdYKSZyYUu6RF0k7wNNZX9nmDxqJjj94=;
+	s=arc-20240116; t=1779122454; c=relaxed/simple;
+	bh=TmJGcAWVQo5UOmOu/tga5NoZgiH9iADZIX64dMCrfWc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=joWtMHLL4AzEBIymyf+fq8cmTxZCrWlcqBQIzKXWaRRYNhS/3yhYm/dSMMx81SWf/Sg+qpUV+unSZ2JqieHABIgp6kRQJFeZgKxTHzuCW489YTBirJ1k0viXf2HKPm2VxQtKok5CGm9TzxTUfOSwUgbzcsujVmvOhqCqdklrBbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3SyRPWR; arc=none smtp.client-ip=209.85.167.178
+	 MIME-Version; b=gJ2ivrcjPk1g1AYo1GxEffg1J5jIeAl2sWcI9TXB/DX918E+MDj1RzsOkHlcwi0rNN0SSNvBttDeccN3A8xrEPpL8Ay6aj8rBWAA1cBLkiSM4keFd1bPkoz995+G5HJMZ0CMilOg/XbGue+zrL5K7BxYSGVA/lVSfMBDetAmW0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HI1dDOuO; arc=none smtp.client-ip=209.85.160.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-4824176bbbeso715967b6e.0
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 09:40:49 -0700 (PDT)
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-40974bf7781so3020037fac.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 09:40:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779122448; x=1779727248; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779122451; x=1779727251; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OVJKiAuHQ5r89pkL74jN+DOLogpMgUXAIknghHQozjo=;
-        b=L3SyRPWRpz8qiQ3BHxX2ObL7W4JKxj7/Lp3QoJnUJISDEAoumACFpe7+EO5/BTIbSy
-         TSd4s3LEaSv4K9CkoKutxZK8Gcfr/iOrpyt6aRsh3qOA9qMKRjs+da64QkpjaUWOpCKj
-         /A171oeTyWx81rNXPyv2vchphRNDZwKggJushD6H77GqIhX1+XVQ4PPmm6BNH4KpKEGS
-         ze3HF4DBzKvInUhmpXRGUIsYhba6gHoqxGVbaxRzK+9ojTS+dT4lKtch6A5K4aI0Ojuw
-         VlDgE9ue9WRdDuoFJRVqBG/iGrlGzQkIXwIBrC4iC+Nr4d/U2YtSc24l83khDjM6q6oy
-         738g==
+        bh=m9rzbyO0L/UEGnlo5xdTOZwQ03g+59F1TZtYxaJ1Kbk=;
+        b=HI1dDOuO9iM29lQ/IF/PhDwjl+HWxNrkpb1TeC6mQM/cub5Nk+TBDQ81jNhbWJDjjt
+         X8MLLqFG/QPKkc2E/un+0TqR4wVGLU+rAXG3brdMfV3Aqft1jP+gAL931UkPdoWympeM
+         C20WWZbM8UL7XM7YtVTU5Ynr24vkwxuij7FepEjlyuO+c53mKzewewQLl1ErOVei7GDp
+         zEo3BITmnZ8cNoYVeVHJG08F/rLh+u1Mn1oCTcM115fhY8MtwIF58t+Nbkmh00vjkizz
+         tEABTbJqhrHcSQkFpGxDwiZvZfLuK5yIbDqEq+fUcZql5jzs51kW3Fy2PZKdkKZNor/J
+         68Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779122448; x=1779727248;
+        d=1e100.net; s=20251104; t=1779122451; x=1779727251;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OVJKiAuHQ5r89pkL74jN+DOLogpMgUXAIknghHQozjo=;
-        b=AxJiP9Lm0XcYcq1/Wx2kSOfEWjzS8iaDbqncCq2E+Pa8SlR44mDA8uoRLCYCicpZQt
-         URHThEeNuq4a4Vz46FYlE2VvoQQltWwRXJ0SENCom4uiUV1DzUl4WvcfatjGExVWV/t5
-         vMNpM8QAU6PPYJhj3890CHF+a7WZ22hJh4+zO3SnDIjePuOtqvtwvDHj/wfhcgz+r+Uv
-         DaN4nLuJJKqKNx0HJvejX73yUGqg/f2liZ5pMwNRSPlOmQHVZIGRfCQPLyV2kP++wAgJ
-         RDtsL4yG91yD+PAw/UiHu9zwDtioOXgsfX7NKccb8wdgs+QloZ0USpn2+neoTuHaDaHt
-         XtZA==
-X-Gm-Message-State: AOJu0YxXhjhFHFO1sxoz4ZYemebufRV5sahxsovKwAcceOezdjK0s2La
-	P0W+/A4UO2eig/BQc0jqWQ3IwSSYC65GBC9bg4bHwKVOH54MHlE/dY2F+dL3UXrf
-X-Gm-Gg: Acq92OEiQLcs488kWwafNATailFs6IdrK5n8ObMQ2Qs2RYWwTaBxhj9S0QXUfA4vXkb
-	EzjhdgiYUp/66+BvVxS4M1sOt5Br+j9vy0QocTDrtxznd5nmX0HMT2pmjSL4bAsWvZt7ifNC2q5
-	cU58ImWQy1eHeNnFglz1MYk/1wa6tFw7ApkVjGIwN/cYSTw/+De6DyhNHYbKTIk7/ZwyIajQtMO
-	5JlABBmIDw7tuYTkWleHI43I4/eLZtIYGe4oPIBidgmeD/Mm8L1FiGI1408M+Tkl65QA5Uomr/u
-	FE1q3TR5NxkApTY8G0IkWGH8xNMwQ9/5wg6seH2xFalakXaNNaAQOe2gHowNQnpBRffhpdTUE5y
-	VCzIYaQ8u87wC0qB6bmULVVUkgWy76g8An1sV4c+A3EBO/hZMxSsnoWo6bWlg9dPio4JD4oM5Q/
-	3EF8Lmn+mm7GHbPeU=
-X-Received: by 2002:a05:6808:3383:b0:466:f57b:2ad2 with SMTP id 5614622812f47-482e57396f4mr9766307b6e.31.1779122448079;
-        Mon, 18 May 2026 09:40:48 -0700 (PDT)
+        bh=m9rzbyO0L/UEGnlo5xdTOZwQ03g+59F1TZtYxaJ1Kbk=;
+        b=gxzkqbpNcPp4la1ee5STdXWJLG5gU3Jwl2JGHa8W4W5+NO8aj0Jf0h09lL1U+H6rBe
+         mmS/PLwyBX5ZZhmP38PgdzX8JQ5YDBmm0byPnaBQu3MHcSjNLCioAAkRq2v1MMQGoFfG
+         5LebPWySfECiCV8GvOmj0b6cJjbGdRLw/UQQ9GUTL9dHvBKLlf6jcI0Q4pz1nPfeZ/rG
+         ZajDBchMHQCdv7xWPIVZHo4V3GNABVOjz4CN2Na6z+KRPB1k/nnoT1U8jIG0oBB2JjEn
+         a6YpV9qOxuS2rCsb5gKRMeuRrq695tWKa8P9rZsfgT+E0fHv2pBYTMKT2XZwkAHrjuU1
+         4gjw==
+X-Gm-Message-State: AOJu0Yydi7iHUlHyJHe6bGlLKd/5HmLCFf64z9s1pwjg31pPLgTDkpUc
+	Lqx2dIvNXOONt00EQey9CHICHu7AD8e3Qj/yNde+p4fXN8rMvPFjGNi+1dfEPEYk
+X-Gm-Gg: Acq92OHxC0EPdCkmQflilnaNgVKOIZ1+2qZEIR0Nknk1jj3DXGn7p29wO46O0ojCnPB
+	aYZB+M5u3ZNmMvrIdL5Zz+6HGsSfnhTUXhDTVYHkZfq/IfOHP2cLaBtDX6c6FjkoDdGLaKxUy9Q
+	0uf3f3D6AZZyWCnvZ6ZVAdelpSmSWJ/+e+SCWGaZnFVubLJRUIFAC/yNbWqdvtZpHNOOZ7SI+5u
+	VEqk8GJ13Q3T/FmLKmkD4FtOgCqOTJwnot7lu7eOxck1qG/kqqE0z8eJkQljxYLQ4FtgojpyR1i
+	279Y3Tx96ZsRu2z9MsOZmSGeZjubhT8tBf09objnPU8TDOTRobvGe48049karptKmWtsPvtMKhb
+	IysAn9e+ZcKTKkzx2d6zMgGoNL+TvWvUc004FUCH7q+6lDjqnCTCQLUmj2ylI1FCb5qkCCHUaf6
+	YknN+7wQ2/77HOkpdhVsWbVCk7wQ==
+X-Received: by 2002:a05:6870:e0c7:b0:42f:eaec:414f with SMTP id 586e51a60fabf-43a2ddebacemr8597301fac.19.1779122451466;
+        Mon, 18 May 2026 09:40:51 -0700 (PDT)
 Received: from houminxi ([72.244.37.221])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43a94fc2cdbsm4593877fac.6.2026.05.18.09.40.44
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43a94fc2cdbsm4593877fac.6.2026.05.18.09.40.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 09:40:47 -0700 (PDT)
+        Mon, 18 May 2026 09:40:51 -0700 (PDT)
 From: Minxi Hou <houminxi@gmail.com>
 To: netdev@vger.kernel.org
 Cc: donald.hunter@gmail.com,
@@ -86,9 +86,9 @@ Cc: donald.hunter@gmail.com,
 	aconole@redhat.com,
 	linux-kernel@vger.kernel.org,
 	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH v2 1/2] netlink: specs: add OVS packet family specification
-Date: Tue, 19 May 2026 00:40:27 +0800
-Message-ID: <20260518164029.439928-2-houminxi@gmail.com>
+Subject: [PATCH v2 2/2] tools: ynl: add unicast notification receive support
+Date: Tue, 19 May 2026 00:40:28 +0800
+Message-ID: <20260518164029.439928-3-houminxi@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260518164029.439928-1-houminxi@gmail.com>
 References: <20260518164029.439928-1-houminxi@gmail.com>
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -113,10 +113,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289125-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289126-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
@@ -127,167 +127,50 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E33EB571109
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 3C5CC571118
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add YAML netlink spec for the OVS_PACKET_FAMILY (ovs_packet).
-This completes the set of OVS genetlink family specs (ovs_datapath,
-ovs_flow, ovs_vport already exist).
+Add ntf_listen() method to YnlFamily for binding the netlink
+socket without joining a multicast group. This enables receiving
+unicast notifications through the existing poll_ntf/check_ntf
+path.
 
-The spec defines three operations: MISS (event), ACTION (event),
-and EXECUTE (do). MISS and ACTION are kernel-to-userspace upcalls
-sent via genlmsg_unicast(); EXECUTE is the only registered genl
-operation.
-
-Key, actions, and egress-tun-key attributes are typed as binary
-rather than nest because the nested attribute definitions belong
-to the ovs_flow spec and cross-spec references are not supported
-by the YNL framework.
+The OVS packet family sends MISS and ACTION upcalls via
+genlmsg_unicast() to a per-vport PID rather than through a
+multicast group. The existing ntf_subscribe() couples bind()
+with setsockopt(ADD_MEMBERSHIP), which does not fit the unicast
+case. ntf_listen() provides the bind-only alternative.
 
 Signed-off-by: Minxi Hou <houminxi@gmail.com>
 ---
- Documentation/netlink/specs/ovs_packet.yaml | 130 ++++++++++++++++++++
- 1 file changed, 130 insertions(+)
- create mode 100644 Documentation/netlink/specs/ovs_packet.yaml
+ tools/net/ynl/pyynl/lib/ynl.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ovs_packet.yaml b/Documentation/netlink/specs/ovs_packet.yaml
-new file mode 100644
-index 000000000000..4c1f06630e4e
---- /dev/null
-+++ b/Documentation/netlink/specs/ovs_packet.yaml
-@@ -0,0 +1,130 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
+index f63c6f828735..04743a79a7a3 100644
+--- a/tools/net/ynl/pyynl/lib/ynl.py
++++ b/tools/net/ynl/pyynl/lib/ynl.py
+@@ -680,6 +680,7 @@ class YnlFamily(SpecFamily):
+     Notification API:
+ 
+       ynl.ntf_subscribe(mcast_name)      -- join a multicast group
++      ynl.ntf_listen()                   -- bind socket for unicast notifications
+       ynl.check_ntf()                    -- drain pending notifications
+       ynl.poll_ntf(duration=None)        -- yield notifications
+ 
+@@ -748,6 +749,10 @@ class YnlFamily(SpecFamily):
+         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
+                              mcast_id)
+ 
++    def ntf_listen(self):
++        """Bind socket for receiving unicast notifications."""
++        self.sock.bind((0, 0))
 +
-+name: ovs_packet
-+version: 1
-+protocol: genetlink-legacy
-+uapi-header: linux/openvswitch.h
-+
-+doc: |
-+  OVS packet execution over generic netlink.
-+
-+  Only OVS_PACKET_CMD_EXECUTE is exposed as a genl operation.
-+  OVS_PACKET_CMD_MISS and OVS_PACKET_CMD_ACTION are kernel-to-userspace
-+  upcalls sent via genlmsg_unicast() to the vport's upcall_pid and have
-+  no associated genl_ops or multicast group.
-+
-+  Several attributes in the attribute set (userdata, egress-tun-key, len)
-+  exist for the upcall path and are not used by the EXECUTE operation.
-+  For EXECUTE, packet, key, and actions are mandatory (kernel returns
-+  -EINVAL without them).
-+
-+definitions:
-+  -
-+    name: ovs-header
-+    type: struct
-+    members:
-+      -
-+        name: dp-ifindex
-+        type: u32
-+
-+attribute-sets:
-+  -
-+    name: packet
-+    name-prefix: ovs-packet-attr-
-+    enum-name: ovs-packet-attr
-+    attributes:
-+      -
-+        name: packet
-+        type: binary
-+        doc: Packet data, from the start of the Ethernet header.
-+        checks:
-+          min-len: 14
-+      -
-+        name: key
-+        type: binary
-+        doc: |
-+          Nested OVS_KEY_ATTR_* attributes, extracted flow key.
-+          Defined as binary because the key attribute-set belongs to the
-+          ovs_flow family spec; cross-spec references are not supported.
-+      -
-+        name: actions
-+        type: binary
-+        doc: |
-+          Nested OVS_ACTION_ATTR_* attributes.
-+          Defined as binary for the same reason as key.
-+      -
-+        name: userdata
-+        type: binary
-+        doc: Opaque userspace cookie from OVS_USERSPACE_ATTR_USERDATA.
-+      -
-+        name: egress-tun-key
-+        type: binary
-+        doc: Nested OVS_TUNNEL_KEY_ATTR_* for output tunnel metadata.
-+      -
-+        name: unused1
-+        type: unused
-+      -
-+        name: unused2
-+        type: unused
-+      -
-+        name: probe
-+        type: flag
-+        doc: Packet operation is a feature probe, error logging suppressed.
-+      -
-+        name: mru
-+        type: u16
-+        doc: Maximum received IP fragment size.
-+      -
-+        name: len
-+        type: u32
-+        doc: Packet size before truncation.
-+      -
-+        name: hash
-+        type: u64
-+        doc: Packet hash, low 32 bits are skb hash, upper bits are flags.
-+      -
-+        name: upcall-pid
-+        type: u32
-+        doc: Netlink PID to use for upcalls during EXECUTE processing.
-+
-+operations:
-+  fixed-header: ovs-header
-+  name-prefix: ovs-packet-cmd-
-+  list:
-+    -
-+      name: miss
-+      doc: Notify userspace of a flow table miss for a received packet.
-+      value: 1
-+      attribute-set: packet
-+      event:
-+        attributes: &event-attrs
-+          - packet
-+          - key
-+          - userdata
-+          - actions
-+          - egress-tun-key
-+          - mru
-+          - len
-+          - hash
-+    -
-+      name: action
-+      doc: Notify userspace as requested by an OVS_ACTION_ATTR_USERSPACE action.
-+      value: 2
-+      attribute-set: packet
-+      event:
-+        attributes: *event-attrs
-+    -
-+      name: execute
-+      doc: Apply actions to a packet.
-+      value: 3
-+      attribute-set: packet
-+      do:
-+        request:
-+          attributes:
-+            - packet
-+            - key
-+            - actions
-+            - probe
-+            - mru
-+            - hash
-+            - upcall-pid
+     def set_recv_dbg(self, enabled):
+         self._recv_dbg = enabled
+ 
 -- 
 2.54.0
 
