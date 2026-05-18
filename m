@@ -1,144 +1,165 @@
-Return-Path: <netdev+bounces-289018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289019-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDQcHrcCC2qj/QQAu9opvQ
-	(envelope-from <netdev+bounces-289018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:14:47 +0200
+	id YHCtLNQCC2q3/QQAu9opvQ
+	(envelope-from <netdev+bounces-289019-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:15:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7849556C639
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:14:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C809056C669
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:15:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 05CA330ED63B
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:56:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2A3ED306784A
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 11:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5491E3F8EAF;
-	Mon, 18 May 2026 11:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C2C3F7870;
+	Mon, 18 May 2026 11:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xvt6Y9FL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KuB1KIqg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82013F88AC;
-	Mon, 18 May 2026 11:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12ADD2882C9;
+	Mon, 18 May 2026 11:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779105407; cv=none; b=JG9dj1TR4l+KmOkTK1zeqPBK+fMcw2U9qIoCl7C/HsrLqgLPV1iaE3E8E94tvaiUtmSo08aZWei4+yg9a9GVA+8v31pXj3hDpUs4d2J9RAaH3LyyOfzRlppq73+9ja08+EknEHujA4UHYg+p5ErTdA66EwuPyUZEB5r9Mahi7Q0=
+	t=1779105443; cv=none; b=MBq52wCaGkE11DZUO6pUqAA6MXOqHm3aor2VUF3XEsRomX4KgiilTXjQxvGkQYsIveVLVA5Wdbz/27ptxxYiToiUPLnr24kKfsyW1Lp7uPnroeoknZz6usWay2IbWzhxU/BQ6Up13rwPtjwGC4jGoOFKHrICdn7G0IT7PErzk/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779105407; c=relaxed/simple;
-	bh=0lRi5TC10tfwVZPqC59MI4zysRNQoBCeqBGlQwSHOrM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MM9/uti1Sq4EyvHPhGjVH24cBxMw9ZbhKtlRpMzh98SRpuSIFKLqh3VV2GaqkI6dUdxmM79wHU8bQurosravVJaNx4kpHzjNSP60KHRERTx2xN3OZlMgJk4KXtOcK/U5v4W6tjzhXkQ35o2innmoZPoGrMUb4RJsiuWd9M8wFDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xvt6Y9FL; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 47EC31A3607;
-	Mon, 18 May 2026 11:56:43 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 141DA5FFA3;
-	Mon, 18 May 2026 11:56:43 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F04C411AF84A3;
-	Mon, 18 May 2026 13:56:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779105402; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=pxpe7iIx2G4tBbQyj/ZO12IXMY9/CrHISr2PmrKBAzU=;
-	b=xvt6Y9FLrhmACZU/qfPnfqfPTSG4UKIrKL6ikRnt29aVnqkLQK6od+RVu0EsMBb0gFcSde
-	4OWaTfsiDyNfqcoEaTguZZIMHTfDhd0/1pishD0kftaME/kwJcTjdM8OaAXXe16focKkP6
-	0OUWBAbLphH8+Pxx7BhrgtCFWk0721oiJLbFkU3PZdoNHrNzkVjE4gvjcgCDswKFnRNF7M
-	JvvhQZwwkyn1Uca723m2nHFampilLTRogkItw+m2kPY8eRHqmxG1VH9hZWzxp6yrV9N0yA
-	ZVwgS7tnYuzjpqTOmoN8NDG9dvMFDVnimhkWemMzVIlrIBUlkWGVKt3rmpmFrQ==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  Andrew Lunn <andrew+netdev@lunn.ch>,  "David
- S . Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
-  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  stable@vger.kernel.org,  Shitalkumar
- Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-Subject: Re: [PATCH wpan] ieee802154: ca8210: fix pointer truncation in
- kfifo on 64-bit
-In-Reply-To: <20260513153412.1284549-1-shitalkumar.gandhi@cambiumnetworks.com>
-	(Shitalkumar Gandhi's message of "Wed, 13 May 2026 21:04:12 +0530")
-References: <20260513153412.1284549-1-shitalkumar.gandhi@cambiumnetworks.com>
-User-Agent: mu4e 1.12.7; emacs 30.2
-Date: Mon, 18 May 2026 13:56:33 +0200
-Message-ID: <87qzn9szgu.fsf@bootlin.com>
+	s=arc-20240116; t=1779105443; c=relaxed/simple;
+	bh=6ROGVadPwq5Q7Gz9WoMLBxVIVVNoZyNCKKg3PyKPaaU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=igjtdnXyeOU/uLRG4Q2Zh6rWN7YJlq7azLzCMVi8dQ/QxxQaXtV0odRMIdIymkTUS2JtuGzmDzz/6uEy75Yam2Vq+jMxrFmOtbInyzzof5kVdTIsYnh3Fv3VY7Eo6BSUKevcW39Xsvslk34xDLjozS6T7Lk93j3aWD7k79wUJLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KuB1KIqg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19D26C2BCB8;
+	Mon, 18 May 2026 11:57:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779105443;
+	bh=6ROGVadPwq5Q7Gz9WoMLBxVIVVNoZyNCKKg3PyKPaaU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KuB1KIqghdPy+qvB8a4BGNDu6xNalPP0oV8XWG/e2ciCg80o/WaGbPTsX/hWeK/9k
+	 0EZt2y2sCPEMV0+Jb7JbI0ekQWKUby8jXo3vaamxUr/iUkKkp1tvUSQlkIcPHWlMsx
+	 d5Ibsns/MgWUW9ECqB19gcPet6uFULJo00PyS0Sh8HNKxlz2lewT06uo/TmcSCJjuL
+	 XukqYt/wvKqwFfAnUmoSWe5YmXEypqkmXx18W8/0g0rqJd6KRV26GF+CK6J32ze2gt
+	 2vYG5u2R2kjKz15NPKK50cUQFNBQ0NmDh8Jr7rXHOs9vGQz+2WmbkjxVoZ1cSzGHnE
+	 NzEO2QE/xoqOg==
+Message-ID: <850e3709-2cb1-4a26-8546-745401423696@kernel.org>
+Date: Mon, 18 May 2026 13:57:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 7849556C639
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/6] bpf: Add bpf_ktime_get_real_ns() kfunc
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ willemb@google.com, kuniyu@google.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
+ memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ jolsa@kernel.org, sdf@fomichev.me
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>, john.fastabend@gmail.com,
+ Simon Sundberg <Simon.Sundberg@kau.se>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hy?=
+ =?UTF-8?Q?gensen?= <toke@toke.dk>
+References: <20260518082344.96647-1-kerneljasonxing@gmail.com>
+ <20260518082344.96647-2-kerneljasonxing@gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20260518082344.96647-2-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: C809056C669
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289018-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289019-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,datenfreihafen.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,cambiumnetworks.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,fomichev.me];
+	FREEMAIL_CC(0.00)[vger.kernel.org,tencent.com,gmail.com,kau.se,toke.dk];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[miquel.raynal@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Hi Shitalkumar,
+On 18/05/2026 10.23, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Currently BPF programs can obtain timestamps via bpf_ktime_get_ns(),
+> which returns CLOCK_MONOTONIC time. However, the skb->tstamp field
+> populated by the network stack uses ktime_get_real() which is in the
+> CLOCK_REALTIME domain.
+> 
+> In the series, kernel reports the software/hardware timestamps through
+> sockopt and then userspace bpf application gets them and calculate the
+> delta only through an unified time unit.
+> 
+> However, prior to this, when a BPF program tries to measure RX packet
+> delay by comparing skb->tstamp with bpf_ktime_get_ns(), the result
+> is incorrect because the two clocks have different epochs.
+> 
+> Introduce a new BPF kfunc bpf_ktime_get_real_ns() that returns the
+> current CLOCK_REALTIME time. This allows BPF programs to perform
+> accurate delay calculations without clock domain mismatch issue.
+> 
 
-Thanks for the patch!
+I support adding this helper, because have also hit this issue[1].
+Our ugly workaround is to use the TAI clock and adjust for the current 
+TAI offset.
 
-[...]
+[1] https://github.com/xdp-project/bpf-examples/tree/main/netstacklat
 
-> Found via a custom Coccinelle semantic patch hunting for short-byte
-> kfifo I/O on byte-mode kfifos used to shuttle pointers.
->
-> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device
-> driver")
+Cc Simon Sundberg <Simon.Sundberg@kau.se>
 
-I don't remember what the net rules are exactly, but this definitely
-should be backported:
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>   kernel/bpf/helpers.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+> index 2bb60200c266..863645d096ef 100644
+> --- a/kernel/bpf/helpers.c
+> +++ b/kernel/bpf/helpers.c
+> @@ -2317,6 +2317,11 @@ void bpf_rb_root_free(const struct btf_field *field, void *rb_root,
+>   
+>   __bpf_kfunc_start_defs();
+>   
+> +__bpf_kfunc u64 bpf_ktime_get_real_ns(void)
+> +{
+> +	return ktime_get_real_fast_ns();
+> +}
+> +
+>   /**
+>    * bpf_obj_new() - allocate an object described by program BTF
+>    * @local_type_id__k: type ID in program BTF
+> @@ -4859,6 +4864,7 @@ BTF_ID_FLAGS(func, bpf_task_work_schedule_resume, KF_IMPLICIT_ARGS)
+>   BTF_ID_FLAGS(func, bpf_dynptr_from_file)
+>   BTF_ID_FLAGS(func, bpf_dynptr_file_discard)
+>   BTF_ID_FLAGS(func, bpf_timer_cancel_async)
+> +BTF_ID_FLAGS(func, bpf_ktime_get_real_ns)
+>   BTF_KFUNCS_END(common_btf_ids)
+>   
+>   static const struct btf_kfunc_id_set common_kfunc_set = {
 
-Cc: stable@vger.kernel.org
-
-[...]
-
-> -	if (kfifo_out(&priv->test.up_fifo, &fifo_buffer, 4) !=3D 4) {
-> +	if (kfifo_out(&priv->test.up_fifo, &fifo_buffer, sizeof(fifo_buffer))
-> +	    !=3D sizeof(fifo_buffer)) {
-
-This line becomes unreadable. Can you please use an intermediate
-variable? Something like:
-
-          ret =3D kfifo_out(...);
-          if (ret !=3D sizeof(...)) {
-
-Thanks,
-Miqu=C3=A8l
 
