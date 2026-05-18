@@ -1,186 +1,297 @@
-Return-Path: <netdev+bounces-288797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288798-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHmTCuRmCmq60wQAu9opvQ
-	(envelope-from <netdev+bounces-288797-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:09:56 +0200
+	id QCdMATBqCmp+1AQAu9opvQ
+	(envelope-from <netdev+bounces-288798-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:24:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70DD9564B32
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:09:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62323564BC8
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B27AC30214C5
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:09:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 35D2D3008885
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED61121ABBB;
-	Mon, 18 May 2026 01:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860571A9B46;
+	Mon, 18 May 2026 01:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LriZBVvr"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TGEdS34i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848031E32D6
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:09:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365DA171CD
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779066564; cv=none; b=FS5Gf3hDOevHpfTgKlUZUq9+tEj0GKLjKx9QD7Yx+aFjSnEi0WUBEf44DJVwv0w0k3nnmeZOa18Dtmouz4HkY8qsQcNv31/DxRPygMjzYS635vOfvxpWudtHxYrcRrOTGcAcMLZdMIj34xt/J8oiq0OYh6JV8QyN+o9CW78cmjA=
+	t=1779067437; cv=none; b=dSv+nsVSiE3K1JwfbD9D5fwTYh/zM/rAaDCaimW71RBqI9UQQNxIswNOfMs4/ZOCvDL1cY/bAvLIT2vzZfRIL2lyss7iSChO41C38rFEVnWKxdOgNCobRPTLjX7HeDhICyb8MvzJy+z/TicdnfS0sdRbtbtjvWaNArNQ4of79YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779066564; c=relaxed/simple;
-	bh=dSZgqHUCwiEcQbQO8mgR/k4hcvwgM6evPWbpjQ7esMg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ML6KtF/kXTMhddA2iE5L4N5EBjMGmPyt3dTlPKcvH1tPmAo9W3toYP7uODA/qYghMpZMUJ6EOpCvrRgT/bXvlwxhADwlmV8iPyaXpxsUp+x/JAPqFvF/exHz7pUkr1cwC8H/yeIVonpV9pH5WTTWqNxSkUwNU8z8vHiBubiENOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LriZBVvr; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2c156c4a9efso1993283eec.1
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 18:09:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779066563; x=1779671363; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pNohQLJ2KnFFjnxtZOvJckZJ/rWE1qh4MqDMJfs/8U8=;
-        b=LriZBVvrvi7QQfgl1VY3GnTSs0HYDjHyHmMbZ42Ixo1hGmYj/YPpkF9YTcQx4RsodR
-         72z5Vo5Boql3ZHnkW96gHHc4zoeXyibUuIXTk2F1cf+OwgSKW8Wlp9ycr+yhin3fL7BG
-         jIpOFRlqxg26OnKMhfymSVn4OMKEgf9ffEB8AUIAgd7kw/2qbEhLv9+PWHy1yHv3N4Sn
-         NCC39CUcmOx81MEggESWpbs11UxVfP6OD7lUTDG9KXGxUOO7cWOdLzv2llpi90cUCd15
-         hhnmlNKl6y0fGeVWSKpwysXIkJUOB56lGbpv/9sW2el+B1m8ENmDwgLRs8Ypd/owZj9U
-         bAHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779066563; x=1779671363;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pNohQLJ2KnFFjnxtZOvJckZJ/rWE1qh4MqDMJfs/8U8=;
-        b=Q4N0+4P26Wwg3pWtkyujT16HFS64x6MaihnveirGfeEgpGfkVS+ehZa28naR4+Ovkr
-         ODmLv7695A1g3MoT0Dl/DV6UbEviXFxVH92sLBWi0RchgYtZfSc6oU5yrxsheMUk9qKD
-         Wq4W1917BQfbHdO+sExXO61ooHZSo+eb2y0wzmnd1lcho6fE1E5q5fK9qi47UaPCpfgm
-         IjcvqcfvOLNKSPuDCLyUTJmDwL6vcPBKC1ZsmlLG+FyBzObLlhgZ3HyAPlkrplA7sQco
-         9Hwd2BPmAdZROktfQzhN+ki/9Xk5f185g8uTLLHOjZcwjr4LYF/mrE9haPbcnaTcrJN+
-         1IhQ==
-X-Gm-Message-State: AOJu0Yzrw7+FlMvD7p7M3KSVxDgTFpddAuCUrCz7ftrLgdlfFzvp2a7U
-	E4LqA09T2gMfQlK5EUnI2mBxs2+1p7rzKD7i7m5F4axw8+aBUOJ3VMPrV+4z/+QMwJw=
-X-Gm-Gg: Acq92OFYMMr6r9vOntHK/HE2/8RoW3gbdWsW5E+zEaMo/hqVHywfr2BqgB0tYeV+HqK
-	opbaU9ekkpEHHyWYWWtQoVJLhV066KdbxhsTwiiCHmAsdEI/q7XjjUXp38lGPSrMoiQq4iPdm5u
-	mrPnn/bNDMVFw1B7Ml/xNS+d2152Hqu5FtGsPGX74Evzzs8bXIYJNtZVR4jLJUgYLZF0uViKhQ1
-	d80sxJwNkqAuLRcHVbcvMtRjy9UTNDRxZ7n5hdKcveOcW44uhNUUez59KC0jegDJTSqYr0y5hNt
-	gX3icS6TCE9khpIwcqBnkaD2DKQhYJVIsK0sT6N7ftPUepoMW3bhUpOLQJoy8fH+suE75LOgBRA
-	PHVjJUaEx6htfEHiwN8pkc3/mNjmnIkIqxSm2dQycVD8f1QkIA0FXp/ffF3MjykY866Jl+XlhuQ
-	yl4HCzP+BBWJjqqVRLbt51zSLAhDo+aVzMR5LFLy5kLgaf6NKb1tNclWS9SEdRjvrzoD9zthxl/
-	bzjxdTU8i4UWagbdQdyv5Q38exKE4oeKc4UNQEYKP6WHL/KFXiZEJpnCyn2K9+PPIrAjylEfg+3
-	ay9Zb+oQGPG4UG3R2w==
-X-Received: by 2002:a05:7022:f9a:b0:132:5d31:dcb4 with SMTP id a92af1059eb24-1350483cd3bmr5204788c88.23.1779066562578;
-        Sun, 17 May 2026 18:09:22 -0700 (PDT)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cb5b3c20sm18891372c88.0.2026.05.17.18.09.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 18:09:22 -0700 (PDT)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH 7/7] net: arcnet: com20020-pci: avoid -Wformat-truncation warning
-Date: Sun, 17 May 2026 18:07:27 -0700
-Message-ID: <20260518010739.80979-8-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260518010739.80979-1-enelsonmoore@gmail.com>
-References: <20260518010739.80979-1-enelsonmoore@gmail.com>
+	s=arc-20240116; t=1779067437; c=relaxed/simple;
+	bh=cOLC6kKXzCGhQRg7IzaGNryAqxZq7ygluHZzkiqiPnc=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=uDHfiS8mo8kNuxLWnAq56LOmoA6aZ5ixNi/lIOcgCzuxIPY6xZZZuv1I7LG0IwdaIbit0BOQQLMwLC0oJJ2W2Lei8MH4P67FMTsmRyC13c5gnZ3GgWfw3norcPBtOsKhavYXDEZ3Z0f64WXDLT+jcQa8yXiJQJNOoxyy69+Qbw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TGEdS34i; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1779067432; h=Message-ID:Subject:Date:From:To;
+	bh=dtbsJkRYzWUCf9kXMKElLH3Ifd9kkSzbKDinBsJhaug=;
+	b=TGEdS34irCTDpU91X6OiBq6kwXOll3pXxTE09v10oqul+5ouByBtEmgg+T6Vy12CIZzZlkuV5YGwJw/6+mz9DgSjnVzC7JA9HODL0FXCc3sfVhvTabJo5GYOnHwKIVyn//RrGh9ILE17P6qE3cFKjIOU5vooBUI5l+q3nsFxEZU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R601e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X32he1N_1779067430;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X32he1N_1779067430 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 18 May 2026 09:23:51 +0800
+Message-ID: <1779067114.669575-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v43 4/8] eea: create/destroy rx,tx queues for netdevice open and stop
+Date: Mon, 18 May 2026 09:18:34 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Dong Yibo <dong100@mucse.com>,
+ Mingyu Wang <25181214217@stu.xidian.edu.cn>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Dust Li <dust.li@linux.alibaba.com>,
+ netdev@vger.kernel.org
+References: <20260514095138.80680-1-xuanzhuo@linux.alibaba.com>
+ <20260514095138.80680-5-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20260514095138.80680-5-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 70DD9564B32
+X-Rspamd-Queue-Id: 62323564BC8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,stu.xidian.edu.cn,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288798-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288797-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-When compiling the com20020-pci driver with W=1, I received the
-following warning:
-
-drivers/net/arcnet/com20020-pci.c:224:71: warning: ‘%d’ directive
-output may be truncated writing between 1 and 11 bytes into a region of
-size between 10 and 11 [-Wformat-truncation=]
- 224 | snprintf(dev->name, sizeof(dev->name), "arc%d-%d", dev->dev_id, i);
-
-In reality, this does not represent a problem, because i is bounded by
-the .devcount field in struct com20020_pci_card_info, which is
-statically defined for each card and very small. Quiet the invalid
-warning by changing the type of i and the .devcount field to be
-narrower.
-
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/arcnet/com20020-pci.c | 3 ++-
- drivers/net/arcnet/com20020.h     | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
-index 98f68cb13a52..f6b5371fcdcf 100644
---- a/drivers/net/arcnet/com20020-pci.c
-+++ b/drivers/net/arcnet/com20020-pci.c
-@@ -127,7 +127,8 @@ static int com20020pci_probe(struct pci_dev *pdev,
- 	struct net_device *dev;
- 	struct arcnet_local *lp;
- 	struct com20020_priv *priv;
--	int i, ioaddr, ret;
-+	int ioaddr, ret;
-+	u8 i;
- 	struct resource *r;
- 
- 	ret = 0;
-diff --git a/drivers/net/arcnet/com20020.h b/drivers/net/arcnet/com20020.h
-index e7aac0e81a13..68f49fdc2c28 100644
---- a/drivers/net/arcnet/com20020.h
-+++ b/drivers/net/arcnet/com20020.h
-@@ -50,7 +50,7 @@ struct com20020_pci_channel_map {
- 
- struct com20020_pci_card_info {
- 	const char *name;
--	int devcount;
-+	u8 devcount;
- 
- 	struct com20020_pci_channel_map chan_map_tbl[PLX_PCI_MAX_CARDS];
- 	struct com20020_pci_channel_map misc_map;
--- 
-2.43.0
-
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
+> index bb8a49f8c6df..cfb18a07e296 100644
+> --- a/drivers/net/ethernet/alibaba/eea/eea_net.c
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
+[ ... ]
+> +/* resources: ring, buffers, irq */
+> +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
+> +{
+> +	struct eea_net_init_ctx ctx_old = {0};
+> +	int err, error;
+> +
+> +	if (!netif_running(enet->netdev) || !enet->started) {
+> +		enet->cfg = ctx->cfg;
+> +		return 0;
+> +	}
+> +
+> +	err = eea_alloc_rxtx_q_mem(ctx);
+> +	if (err) {
+> +		netdev_warn(enet->netdev,
+> +			    "eea reset: alloc q failed. stop reset. err %d\n",
+> +			    err);
+> +		return err;
+> +	}
+> +
+> +	eea_stop_rxtx(enet->netdev);
+> +	eea_hw_unactive_ring(enet);
+> +
+> +	eea_unbind_q_and_cfg(enet, &ctx_old);
+> +	eea_bind_q_and_cfg(enet, ctx);
+> +
+> +	err = eea_update_queues(enet);
+> +	if (err) {
+> +		netdev_err(enet->netdev,
+> +			   "eea reset: set real num queues failed. err %d\n",
+> +			   err);
+> +		goto err_bind_old;
+> +	}
+> +
+> +	err = eea_hw_active_ring(enet);
+> +	if (err) {
+> +		netdev_err(enet->netdev, "eea reset: active new ring. err %d\n",
+> +			   err);
+> +		eea_unbind_q_and_cfg(enet, ctx);
+> +		goto err_free_q;
+> +	}
+On the eea_hw_active_ring() failure branch above, can the netdev be
+left with mismatched cached state?
+The sequence executed by then is:
+    eea_unbind_q_and_cfg(enet, &ctx_old);   /* saves OLD cfg into ctx_old */
+    eea_bind_q_and_cfg(enet, ctx);          /* enet->cfg = ctx->cfg (NEW) */
+    err = eea_update_queues(enet);          /* sets real_num_{rx,tx}_queues
+                                               to NEW values, succeeded */
+    err = eea_hw_active_ring(enet);         /* failed */
+    eea_unbind_q_and_cfg(enet, ctx);
+    goto err_free_q;
+err_free_q then sets enet->started = false but never restores
+enet->cfg or netdev->real_num_{rx,tx}_queues to the old values, and
+eea_unbind_q_and_cfg() only nulls enet->rx / enet->tx without
+reverting cfg.
+Looking at eea_unbind_q_and_cfg():
+    ctx->cfg = enet->cfg;
+    ctx->rx = enet->rx;
+    ctx->tx = enet->tx;
+    enet->rx = NULL;
+    enet->tx = NULL;
+If the user later calls ndo_open, eea_netdev_open() reads enet->cfg
+which still holds the NEW values that the device just rejected. Was
+a rollback to ctx_old intended on this path as well, similar to the
+err_bind_old branch?
+[ ... ]
+> +static void eea_net_ha_reset_remove(struct eea_net *enet,
+> +				    struct eea_device *edev)
+> +{
+[ ... ]
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
+> index fa0eec8af21b..9639f0c5c618 100644
+> --- a/drivers/net/ethernet/alibaba/eea/eea_net.h
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
+[ ... ]
+> +/* rx apis */
+> +void enet_rx_stop(struct eea_net_rx *rx);
+> +void enet_rx_start(struct eea_net_rx *rx);
+Every other symbol in this driver uses the eea_ prefix, but
+enet_rx_start / enet_rx_stop use enet_. Was the inconsistency
+intentional, or should these be renamed to eea_rx_start /
+eea_rx_stop for consistency with the rest of the eea_ namespace?
+> +
+> +void eea_free_rx(struct eea_net_rx *rx, struct eea_net_cfg *cfg);
+> +struct eea_net_rx *eea_alloc_rx(struct eea_net_init_ctx *ctx, u32 idx);
+[ ... ]
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.c b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+> index bef0ebd6bb20..9872e360dd5d 100644
+> --- a/drivers/net/ethernet/alibaba/eea/eea_pci.c
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+[ ... ]
+> +static void eea_ha_handle_reset(struct eea_pci_device *ep_dev)
+> +{
+[ ... ]
+> +	if (reset & EEA_PCI_CAP_RESET_FLAG) {
+> +		dev_warn(&ep_dev->pci_dev->dev, "recv device reset request.\n");
+> +
+> +		pci_dev = ep_dev->pci_dev;
+> +
+> +		/* The pci remove callback may hold this lock. If the
+> +		 * pci remove callback is called, then we can ignore the
+> +		 * ha interrupt.
+> +		 */
+> +		if (mutex_trylock(&edev->ha_lock)) {
+Is the mutex_trylock() with a silent-skip fallback below the right
+pattern here?
+> +			if (edev->status != EEA_PCI_STATUS_DONE) {
+> +				dev_err(&ep_dev->pci_dev->dev, "ha: reset device: pci status is %d. skip it.\n",
+> +					edev->status);
+> +
+> +				mutex_unlock(&edev->ha_lock);
+> +				return;
+> +			}
+> +
+> +			__eea_pci_remove(pci_dev, false);
+> +			err = __eea_pci_probe(pci_dev, ep_dev, false);
+> +			if (err)
+[ ... ]
+> +			mutex_unlock(&edev->ha_lock);
+> +		} else {
+> +			/* Device removal is in progress, so return directly. */
+> +			dev_warn(&ep_dev->pci_dev->dev,
+> +				 "ha device reset: trylock failed.\n");
+> +		}
+> +		return;
+> +	}
+When the trylock fails, the work simply logs a warning and returns
+without rescheduling. The networking subsystem guidance lists this
+specific pattern (trylock with fallback to skip the work entirely) as
+a likely bug, with the narrow exception of work items that retry via
+schedule_work() on failure.
+The trylock also fails for any holder of ha_lock, not only pci
+remove, so a HA reset request that arrives during any concurrent
+holder is dropped silently and the device is left without recovery.
+Would it be more appropriate to either reschedule the work via
+schedule_work() on trylock failure, or to redesign the locking so
+that the remove path coordinates with the worker via cancel/flush
+rather than a shared mutex that the worker must avoid?
+[ ... ]
+> +static int eea_pci_ha_init(struct eea_device *edev, struct pci_dev *pci_dev,
+> +			   bool pci_probe)
+> +{
+[ ... ]
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
+> +static int eea_net_reprobe(struct eea_device *edev)
+> +{
+> +	struct eea_net *enet = edev->enet;
+> +	int err = 0;
+> +
+> +	enet->edev = edev;
+> +
+> +	if (!enet->adminq.ring) {
+> +		err = eea_create_adminq(enet, edev->rx_num + edev->tx_num);
+> +		if (err)
+> +			return err;
+> +	}
+> +
+> +	err = eea_alloc_irq_blks(enet);
+> +	if (err)
+> +		goto err_destroy_aq;
+> +
+> +	rtnl_lock();
+> +
+> +	enet->link_err = 0;
+> +	if (edev->ha_reset_netdev_running &&
+> +	    netif_running(edev->enet->netdev)) {
+> +		err = eea_netdev_open(enet->netdev);
+On the HA reprobe path, can edev->rx_num change relative to the
+value used at original probe?
+eea_pci_setup() re-reads rx_num/tx_num from device registers each
+time, and eea_alloc_irq_blks() sizes enet->irq_blks based on the
+new edev->rx_num:
+    num = enet->edev->rx_num;
+    irq_blks = kvcalloc(num, sizeof(*blk), GFP_KERNEL);
+However, the netdev itself was allocated once with
+alloc_etherdev_mq(..., pairs) using the original count, and
+enet->cfg.rx_ring_num is preserved from the previous probe.
+If the device reports a smaller rx_num after the HA reset,
+eea_bind_q_and_cfg() will iterate enet->cfg.rx_ring_num entries
+(OLD) over enet->irq_blks[] (NEW, smaller):
+    for (i = 0; i < ctx->cfg.rx_ring_num; i++) {
+        blk = &enet->irq_blks[i];
+        ...
+    }
+Should eea_net_reprobe() validate that edev->rx_num and
+edev->tx_num match the values used at the original alloc_etherdev_mq()
+and refuse to reprobe (or reinitialise cfg) if they have changed?
+[ ... ]
 
