@@ -1,84 +1,51 @@
-Return-Path: <netdev+bounces-289100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAc8DgkuC2plEQUAu9opvQ
-	(envelope-from <netdev+bounces-289100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:19:37 +0200
+	id +NUcAdgrC2oNEQUAu9opvQ
+	(envelope-from <netdev+bounces-289101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:10:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 292DE56FC9B
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:19:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD4856FA05
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:10:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F4130303FE2E
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:01:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CECB2300EE9F
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A76433A718;
-	Mon, 18 May 2026 14:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F120B36C59A;
+	Mon, 18 May 2026 15:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="gkcBv69a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hqk94zVp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87672F8E90
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 14:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD52B305693;
+	Mon, 18 May 2026 15:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779116391; cv=none; b=tavUMWwcd8Z+oQg3qc/odfT9OgCh5tdxJDyqtBXFOGP4XUQUTfmHQBVaf/lsv5oPOD0wg4LTOnLEX+yfOi0TkJbi8O7DmOBY6sJD4t/nzF6B5HcCeBbC/z+5DHSiVkSvJzWDuYwxhlJCm+iSnBAqQFkU084iLrz8nd7i1jJxC9A=
+	t=1779116999; cv=none; b=eL2qdPTRYAZzJqfVyupVa0WYMTWFvS0xHOw/9teTQFbuLk1Ny5Kc+C06nrwt+0CAXICgiO5ZeS7tgJxH5xvgQCBUP1sBBCvuHAUt5U9U6hYNRtKpLBcxlKY4VUt73kSIObssQT1cufNuzO6xEgTvmp07ZAozdRjtAstgzXo0IEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779116391; c=relaxed/simple;
-	bh=q5XjFVsg+wspXS1sy3GAW2RwWv7+/Bq5enFbkQl7p2o=;
+	s=arc-20240116; t=1779116999; c=relaxed/simple;
+	bh=vhq8WFv+VF7aappruMpWjWpbdQi7i0jpEjvi8EmEBVs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GHn161YqjctgQMR+x7yu5+P0MBWok6WbjFIgETLBzCF2r3kfJH38xcvBAQbOzFc2z/O2dEdrn5SNFiHWu/F9ucsBCAulAI2pbidD9P0a6ggN2a8mLzlIoxgsBTmQah7hSluFGpaASHNrMHbO4BsXdnDlTqn/tespHT58GVtysUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=gkcBv69a; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48fe7a40e51so2326685e9.0
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 07:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1779116385; x=1779721185; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vEWJGaCfr5moVa77HgCo0qOe0dfMae5hZJol18Jq5qo=;
-        b=gkcBv69aqEtaBfZIhAqzwk6MhCvg9sxndlPNwSU0oSXzwKpw2m/eYtV47Rc8+boIjq
-         9TnUur6JbYwXGCbbLIhWbfGnWDTxGWv2pcnzgbp6qFGc9sXH080s5eWWgiCSP9KDqbNZ
-         m7s2OcPExK77YyUpoHB42qs0YXl1wkFLg+smYHAv9Pjt7VNHy6VNsZuXPGwWcmeAAmXh
-         1VJipWGgVgmX9crrW0ZYz5P0zcSt05srdJw0+l1YgPGI125eKF7lw/irOqnf0H2f+zQx
-         nVBG5+9389LQfbAVWrADJUZEGp3225MzUyVzDTjyDAVkDXrzOwRXgXHpx2JoFJcl8Zg6
-         /Weg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779116386; x=1779721186;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vEWJGaCfr5moVa77HgCo0qOe0dfMae5hZJol18Jq5qo=;
-        b=FgksljfeUtTuL8UP2NnaaRTXj4rGXrRSk39/If4QMiAGbVadd7p6cmEj/+mP01WyNb
-         QoXuxfZvTie9scayPsT0UsDXOcY4fwBCFWwQZYlfuhNvGm7adg+RJpSPKTHXFbt4suBM
-         kvchhCeQOxOzX9Tojad/LE3QnalwmVzCnEXYKdhlJnR2A0nHVV/HNHWMPAKUmwsGC5Nf
-         m9Mdn2CoFyrmRPi/LFYXeWoyFhQ+rlV5zAZplvtInHB4QlpRaXjpnZegTGAwZnMGCTqG
-         hDOObYJ/ltt2BtGc4g5APEQGWz66VjfqAlJoLvV+NKcAqL5oyhBk5FL4f2SA5/HHa6QI
-         aKkQ==
-X-Gm-Message-State: AOJu0YxFL2q4NP86Rb9MrO35ialzgZ000zO+mDtXi9078EHQqpeOuV+b
-	4MjwN2dh8a5kdyhzWxROv2hxuBxkbjUrsBhSpvrnKnkSc8HMQjcCzqFEr0VYKozSLNc=
-X-Gm-Gg: Acq92OFZeJ5tUn4/AaMT9JeUG0ngthZVnnZK31oUFqETeMxYdecy+IJpdXVS9xyx27R
-	gDBycFsnyg1FnNA8kNulPDpnnssPLk0o5AdMrvWRpJgggCLqzAgKEmTGnYlOdSZlNYVdYkc5joX
-	ZD9ALNEz5OpYJ1AATh6mJdRk2CJ1e1rrMsk3pbzOWKeuF5nyTs5axnt1z+GqdHCDvJtNN78c149
-	+//sqY8ENGuRsPwhaOE1k0NvSYP7IYJxDf2LoVeUqBQ9zyMG83fS36IhgmOElAHET04cKFBBf/c
-	+MYVOkWUJBRZNOMFCbXgGqopnh/npbgqUWc6wKH/Ga+APDmFndvYYEGcPcvpSGm2X0kpROGPZl9
-	oZdMPOb1XpgH83A7siar8wWIehn3IK1iHhuv4cSgc7UkT1jXN5GpQqxG1s0RxIpwoLIlRnkY8Jz
-	r/j1Sx+YxOBfYMBSp3P6DkiOzImL0dCDwwndwuNClE/b3VyNtpaetanXWjipkt+CB9H4DW1mXKk
-	HzX
-X-Received: by 2002:a05:600c:4455:b0:489:1fa8:b895 with SMTP id 5b1f17b1804b1-48fe5fcb2dfmr120670715e9.2.1779116385579;
-        Mon, 18 May 2026 07:59:45 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a1a22csm36952961f8f.19.2026.05.18.07.59.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 07:59:45 -0700 (PDT)
-Message-ID: <b88ae398-ead3-4cca-83f3-92f29891b4a1@6wind.com>
-Date: Mon, 18 May 2026 16:59:44 +0200
+	 In-Reply-To:Content-Type; b=RNkj4vF/n5iOKL7dOEjKxaWwdkkMDEm/z72kNb7KgJRiKuBUOI/0EAUOuNvT30x6RaIsI//nzGOFzGYadN372D4rrsJqb8NqP6BD1+0bs4zzBtIXvTX+nAlEMpyTFfFL+lEzT9F6yPi6oWSN1H2zLs7koJLHeTKlgEglKxwtd6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hqk94zVp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BFA3C2BCB7;
+	Mon, 18 May 2026 15:09:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779116999;
+	bh=vhq8WFv+VF7aappruMpWjWpbdQi7i0jpEjvi8EmEBVs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Hqk94zVpVPXxPtnQ5CKjxwZulNqSIh3RePZG7EQWNqgKKQmvNLL0mKyxJmQxrMG8c
+	 s9plksOJ39ayQbqzLCPkb0EWw4/R1j9dt7Ob7liLYuHWJ0Kw2jYl17YPbseHHTNwG0
+	 /T89vnV6H51DFM83FAwh9u0xN8CadOB5gQIMdoslThmXCmwCTGuU05CZEGYTsMfV7l
+	 lIDSp7AD79ZC70/yGedSYTfdm6Dhh/21pEVjejoRUM2odz8oKb2SbIPKh3OUNAZWBy
+	 csGosIpedGOXAe7WpMuXGFlsAtzWZjBLeDc3vrfnfJEKVevFIAjc/eO9+a8tre6d9d
+	 JQsGAdzvY9Qag==
+Message-ID: <c5b5025c-1925-41cc-89ee-3c52a1192f26@kernel.org>
+Date: Mon, 18 May 2026 17:09:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,138 +53,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net 1/5] net: rtnetlink: fix link nsid reported when the
- link is local
-To: Ilya Maximets <i.maximets@ovn.org>, Jiri Benc <jbenc@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Adrian Moreno <amorenoz@redhat.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Matteo Perin <matteo.perin@canonical.com>
-References: <20260515201937.2813983-1-i.maximets@ovn.org>
- <20260515201937.2813983-2-i.maximets@ovn.org>
- <20260518082138.37522db0@griffin>
- <8aa4e92d-0498-4335-b3b1-dabd7e507ed7@ovn.org>
- <5d4467d5-f081-4f7e-ac3c-9134ee8ddc6e@6wind.com>
- <30599c3d-66b5-4787-9ead-53ab716ba338@ovn.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [PATCH net-next] nfc: Use named initializers for struct
+ i2c_device_id
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29?=
+ <u.kleine-koenig@baylibre.com>, netdev@vger.kernel.org,
+ David Heidelberg <david+nfc@ixit.cz>
+Cc: Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Ian Ray <ian.ray@gehealthcare.com>, Carl Lee <carl.lee@amd.com>,
+ Tomasz Unger <tomasz.unger@yahoo.pl>, linux-kernel@vger.kernel.org
+References: <20260518133311.644160-2-u.kleine-koenig@baylibre.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <30599c3d-66b5-4787-9ead-53ab716ba338@ovn.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260518133311.644160-2-u.kleine-koenig@baylibre.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com];
-	TAGGED_FROM(0.00)[bounces-289100-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,linux.intel.com,gehealthcare.com,amd.com,yahoo.pl,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-289101-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com]
-X-Rspamd-Queue-Id: 292DE56FC9B
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 9AD4856FA05
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Le 18/05/2026 à 15:55, Ilya Maximets a écrit :
-> On 5/18/26 2:46 PM, Nicolas Dichtel wrote:
->> Le 18/05/2026 à 14:11, Ilya Maximets a écrit :
->>> On 5/18/26 8:21 AM, Jiri Benc wrote:
->>>> Hi Ilya,
->>>
->>> Hi, Jiri.  Thanks for your thoughts on the matter!
->>>
->>>>
->>>> IIRC this was added because Open vSwitch needed it. I'd expect most
->>>> users that need to deal with cross-namespace detection to just switch
->>>> to the given netns prior to issuing RTM_GETLINK; at least, that's what
->>>> I'm doing in the tools I wrote.
->>>
->>> Yeah, that's also what other projects like FRR are doing.  It's a bit
->>> of a hustle for multi-threaded applications, as AFAIK, there is no way
->>> to just move one thread into a different namespace, so if many threads
->>> are doing something with the network and you suddenly need to check
->>> something in a different namespace, you can't really do that without
->>> pausing all other threads first.  But that's a separate thing, unrelated
->>> to the series.  I'm just ranting. :) 
->> Hmm, not sure to understand. setns() is per thread (see man setns()).
+On 18/05/2026 15:33, Uwe Kleine-König (The Capable Hub) wrote:
+> While being less compact, using named initializers allows to more easily
+> see which members of the structs are assigned which value without having
+> to lookup the declaration of the struct. And it's also more robust
+> against changes to the struct definition.
 > 
-> Hmm, I got my wires crossed here with something else, I suppose.
-> Though CAP_SYS_ADMIN requirement may be an even higher barrier.
+> While touching all these arrays, unify usage of whitespace in the list
+> terminator.
 > 
->>
->>>
->>>>
->>>> On Fri, 15 May 2026 22:19:20 +0200, Ilya Maximets wrote:
->>>>> But this doesn't work for link nsid in cross-namespace RTM_GETLINK
->>>>> requests.  For some reason the code checks if the original device
->>>>> and the link are in the same namespace and not if the querier's
->>>>> namespace is the same as the link's.  So the logic becomes:
->>>>>
->>>>> - if NSID is not reported, then the link is in the same namespace
->>>>>   as the queried device.
->>>>> - if NSID is reported, then the link is not in the same namespace
->>>>>   with the queried device.
->>>>
->>>> I'm not sure I would call this a bug; the original idea was to use
->>>> IFLA_IF_NETNSID to switch to the point of view of that netns but
->>>> without actually switching to that netns. Hence, the netnsid is
->>>> relative to the caller's netns but otherwise, you get the same reply as
->>>> you would if you switched to that netns. If you think about it that
->>>> way, the current reply is consistent.
->>>
->>> It makes some sense, but the fact that all-nsid notification and the
->>> cross-namespace RTM_GETLINK provide different IDs makes it inconsistent
->>> in my brain.  We have:
->>>
->>> 1. nsenter(target) + getlink(local) = target-to-link nsid.
->>> 2. getlink(target) = caller-to-target nsid  + caller-to-link nsid.
->>> 3. all-nsid-notiication = cmsg(caller-to-target nsid) + target-to-link nsid.
->>
->> all-nsid-notification appears before cross-getlink.
->> The goal, for all-nsid-notification, was to be able to receive netlink messages
->> of a subset of netns in one socket. So these messages are provided as-is, ie
->> like if they were sent on a netlink socket opened in the corresponding netns.
->> It's generic, there is no need to patch every subsystem.
->>
->> cross-get*() have been added later. The chosen behavior is friendlier at the
->> cost of patching every subsystem that is supported.
+> This patch doesn't modify the compiled arrays, only their representation
+> in source form benefits. The former was confirmed with x86 and arm64
+> builds.
 > 
-> That's exactly my point.  If we're creating a special patch for a subsystem, we
-> don't need to adhere to the exact structure of the original message, since the
-> data reported changes anyway.
-Sure, but only for this special path then (ie cross-get). My understanding is
-that you are interested by the all-nsid-notification path.
+> Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
 
-> 
-> IMO, not reporting nsid that is the same as the caller's nsid is more friendlier.
-> But that's, again, just a difference in opinion at this point, I'll not insist.
-The problem is changing the netlink API. As you said, a new flag would be needed
-for this.
+You need to refresh your tree to next - you miss David.
 
-Regards,
-Nicolas
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+
+Best regards,
+Krzysztof
 
