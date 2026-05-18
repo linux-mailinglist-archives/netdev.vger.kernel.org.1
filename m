@@ -1,177 +1,210 @@
-Return-Path: <netdev+bounces-289063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289064-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNEPNfQRC2pN/gQAu9opvQ
-	(envelope-from <netdev+bounces-289063-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:19:48 +0200
+	id gEHpIhYSC2pN/gQAu9opvQ
+	(envelope-from <netdev+bounces-289064-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:20:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEECB56D815
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:19:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8114856D824
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 66F60300860C
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 13:05:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4DA583012C73
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 13:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4AC447ECFE;
-	Mon, 18 May 2026 13:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1220D48035B;
+	Mon, 18 May 2026 13:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WBc0oej5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBk7CgWX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2DF3F9F46
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 13:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00AF15B998;
+	Mon, 18 May 2026 13:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779109548; cv=none; b=I4WAYTlRv0Eb1acEEJRfWxFGb3DcMfp7gwmHgCwCyUs7wLpba02c/rmBz0D+Ien02iGxfs2LrGTRYPmuXtTuPRlrhgaCQejhE/SqprXCgK9eJU7x81Yyjk8hxU7oVFeVKI0hznrtKRSZLzqTWSb3u0MpNmAebplO3LZp8EvDyao=
+	t=1779109674; cv=none; b=jDOFyLtsvJaN66fObvb7FE6J/AR1NGzjMTvYC1Y9I7aJnK4vihNXSxOSVdM6pgCFDbra0qqYyqFjJsPAlqNmt0h79ueQ43bDbpSb88N3LUPJ1VU1Melehmr2Mb/91sfeIm6uQILEe9XsvuGAl+Lz3Er0ru5CzKzykvXhv3x+tJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779109548; c=relaxed/simple;
-	bh=Oxc011dx9IlI0zW11M6tGREjMTfmyk7NhCFeYhGQcYs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=txoV33VdrVZC3vxEDEcJSOM5tDZUpP+UCO24KfF9G6EyrYG3fqojLQiCW2gX01FEc23xNd/ez1rz5iDcXhym5pmjDXlfJi4dn8+O5GDtx6OqNPT/licxm1aVfrlAbAZWaQrJQuOUAoJAmTD5epfcXtwKvHlfLs6csDgeLGJoyu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WBc0oej5; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-910b2b92741so313389085a.0
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 06:05:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779109546; x=1779714346; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YF7dGrxO5Wwe0LgMZjGawRFDsoV9mDksxPnlcXl//MA=;
-        b=WBc0oej55q+Z5oQT9LvqhHOvLh3sDEBtd36aT0q7ewPMrC197mYF+qXkXGxiBHkFFP
-         r5C44iDskgxqmmxhEFB2MCn5ZK6B1bIEnSuTyGEhDVMirNpiWhHjwPaEd/EzNUs9UG/8
-         wXpoxswaxZF1B0NLat9MOLe/LOFnQ1cq4T25NczvqnO9OGKqdJY8y9ocPJwaO+/z+miR
-         N48vcVqXlaspj5ZeShETjDnmXNXihK2HiByihq72CHYgIvO7+hgvPMCZKxJ2JGQnF2bD
-         O6d73+aO36iue8KDJmu197BwHKlTvsn90iITluTizfNsVuTEOS5f9nR4KzGvxTVxGDlO
-         J7Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779109546; x=1779714346;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YF7dGrxO5Wwe0LgMZjGawRFDsoV9mDksxPnlcXl//MA=;
-        b=FJr2zRKZo+jUkJJZeQGUwS0HIWgCHnUDTxDjeRsTHiub7NFw2bNwEGdXxzrUilDDJp
-         lgSG33i6qEbjxRdg49Veh63j0JKBA5BZ1qWDYMVwyYzti9UCOtIhDkkebd9rVyxXN7J3
-         EjdwOci1tYzEp/KFbsz/y+QBI2LF7w8XjaQaHH809Q7WMZwnkDSHlAYatotPU8wGPNJA
-         MVdq6Q3+ZEVJOMUnOAacMzcixySo24qfXm3m87klFCU4G7xg75QeSU4Htl+YO7OLjIqD
-         RHTUIx+yTZh/zpfoNKvJWah4D6b0lg7RC1EWa6WEPeV/yWlmRujYfEus8wV81ieMbZQt
-         s8bg==
-X-Forwarded-Encrypted: i=1; AFNElJ8JzUt6POSEi5mRmcKreS/74f8B9+RAy/eK0YzaDYbQ/CrjYa9N6jPAzwVFfmMYMNYWalll87M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0Zwnv1ZkZy3dVPWl38Q9Ex3XgEn9xit5Dj8teoRCaKA9Jcr9p
-	14s5byN40Et37tf6jPE5DGa7YdRM+RNuIxT7p1Q5O2a9+UlvarGC5ItTsUkn15KfYy70LNclJt/
-	ykaGuPdsts/76mA==
-X-Received: from qkbdz10.prod.google.com ([2002:a05:620a:2b8a:b0:90c:b1d1:c6e7])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1996:b0:8cf:d5ca:adf8 with SMTP id af79cd13be357-911d0d517camr1940550485a.29.1779109545473;
- Mon, 18 May 2026 06:05:45 -0700 (PDT)
-Date: Mon, 18 May 2026 13:05:31 +0000
+	s=arc-20240116; t=1779109674; c=relaxed/simple;
+	bh=fmZi/ojNKf5WLkhdT6cGy1Mrh/r5vxk5BkoZKyQyqbQ=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=XoLMiYjMQS2KjeP94FNEV0lUfpBLC3OWaOlzcYNmj/2JM58pX6NwwVowinijHgdU/YzGq9MOwhPDEZaR0Rc0n0+lM4N4y9gi1N9uUpn9xzVAczSj5zCAEynL5B4DBfK8RyzNm0hxeYsipjYV9xjf03btZBK7+raGi62oqsJeomI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBk7CgWX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23F3CC2BCB7;
+	Mon, 18 May 2026 13:07:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779109673;
+	bh=fmZi/ojNKf5WLkhdT6cGy1Mrh/r5vxk5BkoZKyQyqbQ=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=eBk7CgWXgKzzaoygJ+a+8xkv/ofnP0kU5S3guCRhtvxeZigVNGcgJCB/5nEM3OPTf
+	 S1KPnmtAPIkyvQ7ojnq220s2c5VtfwvisqirRj74VgweO46FN5ElRxKLUoih5WWI2x
+	 GJCM3tmXijIUs6GvVLCSUyv2UJ5RmiOX1xqjCG3xpqxvaW4k5YsZFPwF4CDMJ+IXeL
+	 bAAeb1kmqrfl45mxvk5bHOAa9vD/aHB/F4SRTsUNhNihZHH/E9gpb1LbpzU5XQkh8c
+	 v/pJGOB4LPbqbtyjk6FzEhG2KCoqoI9LrznyTRVHpsyw+GMKV0hansWdHe4DRZM1g4
+	 lKMYykSNFWdGQ==
+Content-Type: multipart/mixed; boundary="===============5176383016918948956=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260518130531.1015332-1-edumazet@google.com>
-Subject: [PATCH net] net: bridge: prevent too big nested attributes in br_fill_linkxstats()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+a35f9259d08f907c06e6@syzkaller.appspotmail.com, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: DEECB56D815
+MIME-Version: 1.0
+Message-Id: <92695da279ff66c47eeab8c93562f171982732ad4f420f0057c773efb6c1db8f@mail.kernel.org>
+In-Reply-To: <20260518122842.218522-7-mahe.tardy@gmail.com>
+References: <20260518122842.218522-7-mahe.tardy@gmail.com>
+Subject: Re: [PATCH bpf-next v6 6/6] selftests/bpf: add bpf_icmp_send recursion test
+From: bot+bpf-ci@kernel.org
+To: mahe.tardy@gmail.com,bpf@vger.kernel.org
+Cc: martin.lau@linux.dev,daniel@iogearbox.net,john.fastabend@gmail.com,ast@kernel.org,andrii@kernel.org,yonghong.song@linux.dev,jordan@jrife.io,netdev@vger.kernel.org,netfilter-devel@vger.kernel.org,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,mahe.tardy@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Mon, 18 May 2026 13:07:53 +0000 (UTC)
+X-Rspamd-Queue-Id: 8114856D824
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,syzkaller.appspotmail.com,blackwall.org,nvidia.com];
+	TAGGED_FROM(0.00)[bounces-289064-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,gmail.com,kernel.org,jrife.io,vger.kernel.org,google.com,redhat.com,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289063-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,a35f9259d08f907c06e6];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email,nvidia.com:email]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-After commit ff205bf8c554 ("netlink: add one debug check in nla_nest_end()")
-syzbot found that br_fill_linkxstats() can send corrupted netlink packets.
+--===============5176383016918948956==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Make sure the nested attribute size is bounded.
+> diff --git a/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c b/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
+> index d0ac0502f6df..a9e9806877cf 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
 
-Fixes: a60c090361ea ("bridge: netlink: export per-vlan stats")
-Reported-by: syzbot+a35f9259d08f907c06e6@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6a0b0da3.050a0220.175f0c.0000.GAE@google.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+[ ... ]
+
+> diff --git a/tools/testing/selftests/bpf/progs/icmp_send.c b/tools/testing/selftests/bpf/progs/icmp_send.c
+> index 6e1ba539eeb0..7830334b747a 100644
+> --- a/tools/testing/selftests/bpf/progs/icmp_send.c
+> +++ b/tools/testing/selftests/bpf/progs/icmp_send.c
+> @@ -13,6 +13,9 @@ int unreach_type = 0;
+>  int unreach_code = 0;
+>  int kfunc_ret = -1;
+>
+> +unsigned int rec_count = 0;
+> +int rec_kfunc_rets[] = { -1, -1 };
+> +
+>  SEC("cgroup_skb/egress")
+>  int egress(struct __sk_buff *skb)
+>  {
+> @@ -65,4 +68,32 @@ int egress(struct __sk_buff *skb)
+>  	return SK_DROP;
+>  }
+>
+> +SEC("cgroup_skb/egress")
+> +int recursion(struct __sk_buff *skb)
+> +{
+> +	void *data = (void *)(long)skb->data;
+> +	void *data_end = (void *)(long)skb->data_end;
+> +	struct iphdr *iph;
+> +	int ret;
+> +
+> +	iph = data;
+> +	if ((void *)(iph + 1) > data_end || iph->version != 4)
+> +		return SK_PASS;
+> +
+> +	/* This call will provoke a recursion: the ICMP packet generated by the
+> +	 * kfunc will re-trigger this program since we are in the root cgroup in
+> +	 * which the kernel ICMP socket belongs. However when re-entering the
+> +	 * kfunc, it should return EBUSY.
+> +	 */
+> +	ret = bpf_icmp_send(skb, unreach_type, unreach_code);
+> +	rec_kfunc_rets[rec_count & 1] = ret;
+
+Will this program affect background traffic when running on the system?
+
+The recursion program is attached to the root cgroup and intercepts all
+IPv4 traffic. While v5 changed SK_DROP to SK_PASS to avoid blocking
+traffic, the program still calls bpf_icmp_send() on every IPv4 packet
+without filtering for test-specific traffic.
+
+This means background IPv4 traffic (SSH, DNS, other tests) will trigger
+ICMP Destination Unreachable messages, potentially causing network
+disruption and test races on rec_kfunc_rets and rec_count.
+
+The egress program demonstrates proper filtering by checking for TCP,
+SERVER_IP, and server_port:
+
+SEC("cgroup_skb/egress")
+int egress(struct __sk_buff *skb)
+{
+	void *data = (void *)(long)skb->data;
+	void *data_end = (void *)(long)skb->data_end;
+	struct iphdr *iph;
+	struct ipv6hdr *ip6h;
+	struct tcphdr *tcph;
+
+	iph = data;
+	if ((void *)(iph + 1) > data_end || iph->version != 4)
+		return SK_PASS;
+
+	if (iph->protocol != IPPROTO_TCP)
+		return SK_PASS;
+
+	if (bpf_ntohs(iph->daddr) != SERVER_IP)
+		return SK_PASS;
+
+	tcph = (struct tcphdr *)((void *)iph + sizeof(*iph));
+	if ((void *)(tcph + 1) > data_end)
+		return SK_PASS;
+
+	if (tcph->dest != server_port)
+		return SK_PASS;
+	...
+}
+
+Could the recursion program use similar filtering to explicitly check for
+the test's traffic?
+
+> +	__sync_fetch_and_add(&rec_count, 1);
+> +
+> +	/* Let the first ICMP error message pass */
+> +	if (iph->protocol == IPPROTO_ICMP)
+> +		return SK_PASS;
+> +
+> +	return SK_DROP;
+> +}
+> +
+>  char LICENSE[] SEC("license") = "Dual BSD/GPL";
+
+
 ---
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Ido Schimmel <idosch@nvidia.com>
----
- net/bridge/br_netlink.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 6fd5386a1d646542c184702e13cc2e6c8ee1820d..e15a08a34aeab2429b6c49c5a0ecab9b47582f06 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -1827,6 +1827,7 @@ static int br_fill_linkxstats(struct sk_buff *skb,
- 	struct nlattr *nla __maybe_unused;
- 	struct net_bridge_port *p = NULL;
- 	struct net_bridge_vlan_group *vg;
-+	unsigned int limit = U16_MAX;
- 	struct net_bridge_vlan *v;
- 	struct net_bridge *br;
- 	struct nlattr *nest;
-@@ -1841,6 +1842,7 @@ static int br_fill_linkxstats(struct sk_buff *skb,
- 		p = br_port_get_rtnl(dev);
- 		if (!p)
- 			return 0;
-+		limit -= nla_total_size_64bit(sizeof(p->stp_xstats));
- 		br = p->br;
- 		vg = nbp_vlan_group(p);
- 		break;
-@@ -1855,6 +1857,9 @@ static int br_fill_linkxstats(struct sk_buff *skb,
- 	if (vg) {
- 		u16 pvid;
- 
-+		limit -= nla_total_size(sizeof(struct br_mcast_stats)) +
-+			 nla_total_size_64bit(sizeof(struct br_mcast_stats));
-+
- 		pvid = br_get_pvid(vg);
- 		list_for_each_entry(v, &vg->vlan_list, vlist) {
- 			struct bridge_vlan_xstats vxi;
-@@ -1862,6 +1867,10 @@ static int br_fill_linkxstats(struct sk_buff *skb,
- 
- 			if (++vl_idx < *prividx)
- 				continue;
-+
-+			if (skb_tail_pointer(skb) - (unsigned char *)nest >= limit)
-+				goto nla_put_failure;
-+
- 			memset(&vxi, 0, sizeof(vxi));
- 			vxi.vid = v->vid;
- 			vxi.flags = v->flags;
--- 
-2.54.0.563.g4f69b47b94-goog
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/26034287312
+--===============5176383016918948956==--
 
