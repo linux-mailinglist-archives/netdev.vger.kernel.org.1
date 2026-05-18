@@ -1,213 +1,429 @@
-Return-Path: <netdev+bounces-288836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +KXWDeaCCmqv2AQAu9opvQ
-	(envelope-from <netdev+bounces-288836-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:09:26 +0200
+	id qKDyCpyDCmqv2AQAu9opvQ
+	(envelope-from <netdev+bounces-288838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:12:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB53956552E
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C4B565584
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F4FE3059E2E
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:04:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1A4D3037178
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EB026B973;
-	Mon, 18 May 2026 03:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA5F37E2E2;
+	Mon, 18 May 2026 03:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="WUFo9wRc"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="dnjFNyjY"
 X-Original-To: netdev@vger.kernel.org
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013042.outbound.protection.outlook.com [52.101.83.42])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8573637E2F7;
-	Mon, 18 May 2026 03:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779073429; cv=fail; b=MXJYXmCxbuJf9ybpZzaxdPEEdTn2t/KRxNM///DEKhwufXUOavKTR+LUwN2H6NG3QjUErNTMylH2VKqvjYeDj175cMc7aSr8AQs9s8NPDyXdx3PWYbFSL350YUU7E//mxgVB/6PZ80hDEbl6rMq9VJDzzrJzi/sOdvZZBCQdwrM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779073429; c=relaxed/simple;
-	bh=G7iiO69QxtV4BJMo6xS2hTP3K55zFMfhw2FCeF4gL2U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Yg+ZvLVmH+NgXTHTmnLarzwvGijyHe3h3iB2gPU8NKQPZ5J6ChOlx+JiMkHAocORuFKWxqxbAN8zKy6yQiqTNKlPVT8bLCL7V95X1IQjqlps/e5FH8GF4Cx3Mnaz4B1lS3qo7K6eA9TaYZx8IOc4VTEwe+UoIth/tYCZFFctTl8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=WUFo9wRc; arc=fail smtp.client-ip=52.101.83.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GHUw84BYOXkexmIbc4f347BKV2tIljjuyBcTPOyfw4HLSEE1PjBCer9bPYO+UsRY+BEhKZVgFhElaJu7lIXhcSQN/bUMBjEo1R/16OhfsF4gG60C/BxN4/0f1hm7l31ffxn9iD4PegZuJ5njGzwAGJDhO5fFF/i+Q977O1KjSbeySjrqeyh6LK+zou7N9I8Qs8fH13Jo/OwHmgjxWx7a7MZKx92vtpqD3HH/ZUl7Ig+5X/3eHtf9j/P2GYRvX87omI2RcO6xBOe7yQW7zYLA+ef0+I5t3WaikHkVmFJ2J/mhUQv42tSrSnLUEIrPlm+dB4Xtwe+p8Tlu1su9Ncvs1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wT+18sSbF/UwxHwetvQGHKNFQyZRTTe4VmdC/kIudBc=;
- b=LgtQOgntzhdjfMYJRoxKinXkOqANORfvy8fuvn6KLdeOPMSvjXeioLisgPG94pQ9JTAk+h9FzwZFpxG8Kl4B/vejivhqNw4sKP3Sq2frPGQxNp7e80S8ePgk/kF8EyoWds27IK+vOxOMTd11yWB1eh7MTO/4qp7FqGCCPFVxWxgAN0sVFgMcbp4MIz2PcrtQQ19lgDCPK3U3DCQ9/hbbx3aDv0IbLfcY0uz3uuppo9qUG61cw+amnQ0fOeUSbTtk+jYiUwpyF55KfeN+/Lqy6AcVyjd6UNxXqK9WYBve98CltGtOpfrUhZCcWDks0hg2zV2Owa20AbFsSn/jcLHIBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wT+18sSbF/UwxHwetvQGHKNFQyZRTTe4VmdC/kIudBc=;
- b=WUFo9wRcyuANiu4WlSFEe5ouzoXo0tDxP+syPcOhfPC/e7hH2ppLbDnHSJzngVeBzsGIEsZmaZZPIQ3NMXBHA+rgRaCYUxz4/ydGeMGhdMIQc41i/ueZrjcj8ie+aEOuK8I04VgQy03yfYkGPRzvlNfkgE+KwDJtxsF4STDsNLTL3g4IEvh4kX9HXpEF4N64sqrGxqmF9U7HD8GuPgwtPLGhPGbH2Ea1BN/noCfd98PrHD3T2alihJ1m+Gjbk0pLVDXBUZT+x+bc/JT1K/sND3NjOeUOFSHyd3nQBayR1ne4xcXSP10jU/+J7loOyj9tVmzPqijt2Yo0x4epUMCwww==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
- by PA3PR04MB11180.eurprd04.prod.outlook.com (2603:10a6:102:4b2::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.21; Mon, 18 May
- 2026 03:03:36 +0000
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9913.009; Mon, 18 May 2026
- 03:03:36 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	catalin.horghidan@nxp.com
-Subject: [PATCH v2 net 9/9] net: enetc: avoid VF->PF mailbox timeout during SR-IOV teardown
-Date: Mon, 18 May 2026 11:05:35 +0800
-Message-Id: <20260518030535.1057228-10-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260518030535.1057228-1-wei.fang@nxp.com>
-References: <20260518030535.1057228-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI1PR02CA0037.apcprd02.prod.outlook.com
- (2603:1096:4:1f6::13) To DBBPR04MB7500.eurprd04.prod.outlook.com
- (2603:10a6:10:1f4::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9A034D3BE
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 03:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779073655; cv=none; b=si6LtwFmYB2Kl16ikBmqEV2I7etzfxyyQQylik3aK8uiGL6yu3iJWt465A1p4ABqk0ApqmgQU2uW+cOPea7axtXbAtI0FBKNr1WBGmG5H4xx3kNHPaH/hb0MQCwCyc1GOGVTTUbtDvpVpP+KpslV8y0JPeiLZ5zK91+OXp0+cHA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779073655; c=relaxed/simple;
+	bh=zYGyRtJv9ShMx0ogWfuZBEThGqQ9QCenyQjdFO3jv84=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=W03/IA39DLKV64yRH9KROEEJ8gA5ZD0Spop/eHoLw38sVDwrs8hZ3Dt3NDQUkuxjj+aDt3UZuK2xzFPdxuKqnNUkVqDOjE7grKYwlv93bPdikXOZ+4MObkOLJBOwbn+HSs3WDF6pckr8zfwfwHCH0IC9ZWKNtLZrqH2Mk4s27OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=dnjFNyjY; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1779073645; h=Message-ID:Subject:Date:From:To;
+	bh=FxtN8K6uqF1VvDJERXjP4rHz7DEQoloMbbZvyPxLZSs=;
+	b=dnjFNyjYvtNR8LhBZD3Liks5S6Z+W5nSP0X/nv6YkqujW8kF2BWjuUBLFV3j0/MLL6um7Qmd7F7pKsBZABb5dsfzAO7NwBCZwgLO4Y8UEJfIU/grjMNcIMl6JCVYeeBzVsiHWAudo6M+yrINzfsuVhQ8j/4U9ixQjDhAIa1O9H4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X335UPi_1779073643;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X335UPi_1779073643 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 18 May 2026 11:07:23 +0800
+Message-ID: <1779073615.1247635-12-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v43 1/8] eea: introduce PCI framework
+Date: Mon, 18 May 2026 11:06:55 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Dong Yibo <dong100@mucse.com>,
+ Mingyu Wang <25181214217@stu.xidian.edu.cn>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Dust Li <dust.li@linux.alibaba.com>,
+ netdev@vger.kernel.org
+References: <20260514095138.80680-1-xuanzhuo@linux.alibaba.com>
+ <20260514095138.80680-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20260514095138.80680-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|PA3PR04MB11180:EE_
-X-MS-Office365-Filtering-Correlation-Id: 52cc67fb-f83f-4166-f8d3-08deb48a0dd1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|19092799006|52116014|366016|1800799024|38350700014|22082099003|56012099003|18002099003|11063799003;
-X-Microsoft-Antispam-Message-Info:
-	8WhV7TOOee/d8yfIArF9PWUG3z7Y7ho2lOUzancihK1ulqXbzHn7sziTT5FsHw/GbdTvAhuMXeK8Lg+ROU+n/5rYJeBb/ugJFGZCYbRmdT9vNKhG8TvVO3KVgVrjs9HrSSDIyFJpqGqbI/ru14ss4iw29xYbrYbV9EGS0Kg211zhalsabpVmD/yJa/3SsHKpwd2BTQMt+E6Crq1/YYm4n0w8E9GOt7+EWCQInlQGo4Nc7cqSgt5faPG+uwDh3wOEBdQOA2JXok/2F52YE4w8Kxp0vyzfjbYFe0mVSYL1fKYodDVXzm2ihAWskRMoAQmvYaH1g+sbefykjjZKawBvRl8xvoZKbiNkioaSD7nlZrooew2Dl67KU9xYgQ4CYPeET8kVQAx/tncreOiaAuhhFvJxiUyPD7wqHPTxiWay3p5Mx5bopTymxW2SOFue1aynYU2oDQMr8yRVMO9IUBzZZehosHKvkQ455cuOsxIU/4dYkrrOksHN62KlIomEi0Bb3OENl4favFgPY3lyQszY4bitjhe8ODvc/xPi1H3rMhTOTAYFRMUZ6JnPmChAKRb75B2sveFVSXpsVzpx9hqawPwP8z8k6y3inzHffH6HvDxd+F3mrjc1JzDkFzyUh0JonpnLRBofVjcbJliCUPWVZM1eQmA6eF+p6myu1RhdBaqC/HfYfFEXn+83g6XlPMiNwfYkJddsoQT0+nusCC0CHzdZTo5TKz92T6hzaRq9j2bzxdw8YPb56MyBT7stzUh0
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(52116014)(366016)(1800799024)(38350700014)(22082099003)(56012099003)(18002099003)(11063799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?4CURt4TOTkLuL3jVwEqo/nHd5OsQRDjXZSyLM4Rosk0lApJXLlkBvLuKa8fx?=
- =?us-ascii?Q?fnEE7jNdwABFEDhsRTH/2mmiO+2l6Viq8nctqDuNTD2Z52+bdfm2O1YYxPV2?=
- =?us-ascii?Q?zU/ugiMB6L+ila/SBCuMtoZy6wduWx5Nmy8NGnA+3uxPcFFeX7rE+ZGPGUmM?=
- =?us-ascii?Q?l/JJ4FRIsJVMDo2jyXNl0wdQ2NS5Gtp47B58aAMXcQ8dEHPBmyEJ+nVvIS1t?=
- =?us-ascii?Q?K4TgpfaWQtMXynWdwgEYOiKNCXURHK8EnjfqzEx1TT3KzJT1hF7OjBF8a30x?=
- =?us-ascii?Q?fV9M78xlT7v6QNhJBJmwjAqWdjmhPf4rp5zvZazuUdWPrEDF0+iq0GDkk7yt?=
- =?us-ascii?Q?t21QxY6NvjpI3eL3lb8LmuCRLeoKumJAI9cEniCwRVEcRYaJFK5RNRBIy71s?=
- =?us-ascii?Q?REHGXkgWrqkD4ivoznfyG5YyAeCLu0wU4V/3lPvyLFGx8L4kssLf+9WMW3kt?=
- =?us-ascii?Q?i98UDBW9J+xrNX4/8M4cxkcWprjfoOkSQD3xbHHaQbAwy+USu4Uu30hQnAzH?=
- =?us-ascii?Q?lL8zVGaq4VtnnZL8g+CroYgQTTN/hNBq5XC79cRCOZBPVm8nBSxb1d4H/SBE?=
- =?us-ascii?Q?HOgoB1LVifme7IBsj+Y5909xK6esqhXOj2GkQASFXTYdf6Vwm8Ex14nehrvh?=
- =?us-ascii?Q?DeC2VseX1JedfqZB04KIeGHMIc9IK/lqB43mSUVQ4G1NeJMDGbkuzuEVzoTW?=
- =?us-ascii?Q?6mKyHDhvhyveSvJGJkhNqgVv52OeSYE3Unb5z1fEPgEbYSZdjoFfbf80S9Vf?=
- =?us-ascii?Q?03SzsqincvcfRCWq6CMlRPOFMk7dfm/M6zovSoaUGV4OT7Iez6rFp1tYzx+Z?=
- =?us-ascii?Q?6dXRogHD6ASO6paTmdOcueveftmwIliZgBmAoR8l2aZydyWKhdz5nnbbSyw9?=
- =?us-ascii?Q?Vy1AgbJ47N+lYp194qSVGVO+JimrPoVGml7bkwxwTn4FMTX3q5YiD6h/RBxM?=
- =?us-ascii?Q?1sH1o7TLrc2lImPEJeCwVT/EsV2vYhF3NYhv/fVvjKv4CDpzx97p7LWoNXKR?=
- =?us-ascii?Q?4yzGVV0p0FypzkvDlRLGgHlFM7z2JyJqrqqlAkg1FdaRMCJcVaHJeYQ1ZZ5W?=
- =?us-ascii?Q?dACJfPLHcWkXRsGVyrk320mzYOEek+LqaIT1kZkLnDOxEy51M1AS3PpT0oPy?=
- =?us-ascii?Q?VlVei5YnE4LvMxXLY4Yy3Y2lVgx5nRmUq3MWXPygpBitP2y0hcg77f896J2h?=
- =?us-ascii?Q?YfTejpCPxYqU/j391DVI7d4FTRgBjl5XrZpubXxYV72ssQMm1qYkwFkJ35x+?=
- =?us-ascii?Q?sKME9SvBCULco5PU/eoiWqjtQsuX4Pwho+GqjNQc2xt+u6cjpTflMuTURBbo?=
- =?us-ascii?Q?lYN4pisvPj2arJYVYpsy+lczbqX3Z+jduW+aURA9BMYW9oo2Zl5GYgB6p4r0?=
- =?us-ascii?Q?Hl3fVy9GIXypyG5ytealjBwsfIMBBhYycNuBHBEF5jISSSLsuKdthOagswpt?=
- =?us-ascii?Q?V/MPjhxgaH0+qD5bzCPd9WTPzVlSEc5cb1Drw7yC4tQORY5HYE6DUgvFsrJN?=
- =?us-ascii?Q?RU8P7zZKFVp6jwyApPuzNUAxPWZzOUfOUWpXvd0+qWsFxWYaN+aHB/FOLnCS?=
- =?us-ascii?Q?R0c90dPE+369eY40MlC9wo+VIsyEpWOTVmej4ITiyIK6isEBruDUYPWXuUG+?=
- =?us-ascii?Q?W9rNrQt/3nXk4EsXQCaYWUue8emJYmHgHRscxhX4w8MNebCB1xBMiJ9mtWgj?=
- =?us-ascii?Q?rxOEfcWWGv2Ou4TEa9AzsDDEoEGv0A8tGuCcTIFw/5iNV8fTMLqURCRQMrRg?=
- =?us-ascii?Q?Iq27NCrq+Q=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 52cc67fb-f83f-4166-f8d3-08deb48a0dd1
-X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2026 03:03:36.4937
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /719+SZx3RUjH31LlxnV+txkxbbnRrmN08X5xc06Z3mTI9OR2gistabUIc4aW756rv/G6+JatTuffycbAu7X9Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA3PR04MB11180
-X-Rspamd-Queue-Id: AB53956552E
+X-Rspamd-Queue-Id: 84C4B565584
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-288836-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,stu.xidian.edu.cn,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288838-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:mid,nxp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,linux.alibaba.com:mid,linux.alibaba.com:dkim,alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-During SR-IOV teardown, enetc_msg_psi_free() disables the MR interrupt
-before pci_disable_sriov() removes the VFs. If a VF sends a mailbox
-message during this window, the PF cannot receive it, causing the VF to
-timeout waiting for a reply.
 
-Since the timeout occurs during SR-IOV teardown when the VF is about to
-be removed anyway, it has no functional impact on operation. However,
-more messages will be added in the future, some visible error logs may
-confuse users. So fix it by calling pci_disable_sriov() first to remove
-all VFs, then safely clean up the mailbox resources. This eliminates the
-race window where VFs could send messages to an unresponsive PF.
+From https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260514095138.80680-1-xuanzhuo%40linux.alibaba.com
 
-Fixes: beb74ac878c8 ("enetc: Add vf to pf messaging support")
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc_pf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index 8e11a023d516..3206b3daa1a0 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -563,9 +563,9 @@ static int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
- 	int err;
- 
- 	if (!num_vfs) {
-+		pci_disable_sriov(pdev);
- 		enetc_msg_psi_free(pf);
- 		pf->num_vfs = 0;
--		pci_disable_sriov(pdev);
- 	} else {
- 		pf->num_vfs = num_vfs;
- 
--- 
-2.34.1
-
+commit 46941a5c3a95ebc5ea79193eb1c2ceab7183da1d
+Author: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+eea: introduce PCI framework
+This patch adds a basic PCI driver framework for the Alibaba Elastic
+Ethernet Adapter (EEA), implementing PCI probe, remove, shutdown, the
+device-status handshake helpers, and an MMIO config layout.
+A few questions inline below.
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.c b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+> new file mode 100644
+> index 000000000000..65a0ceb73b35
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+> @@ -0,0 +1,487 @@
+[ ... ]
+> +int eea_device_reset(struct eea_device *edev)
+> +{
+> +	struct eea_pci_device *ep_dev = edev->ep_dev;
+> +	int err;
+> +	u8 val;
+> +
+> +	eea_pci_io_set_status(edev, 0);
+> +
+> +	/* We are no longer waiting for device ack during the shutdown flow. */
+> +	if (ep_dev->shutdown)
+> +		return 0;
+> +
+> +	/* A longer timeout is set here to handle edge cases, though it should
+> +	 * return promptly in most scenarios.
+> +	 *
+> +	 * In our case, all replies are handled by the DPU software, so there is
+> +	 * no race condition between the hardware processes and the register.
+> +	 */
+> +	err = read_poll_timeout(cfg_read8, val, (!val || val == 0xFF), 20,
+> +				EEA_RESET_TIMEOUT_US,
+> +				false, ep_dev->reg, device_status);
+On the shutdown path, ep_dev->shutdown is set to true and eea_device_reset()
+then returns immediately after writing device_status = 0, skipping the
+read_poll_timeout() that would otherwise wait for the device to acknowledge
+the reset:
+eea_pci_shutdown():
+    ep_dev->shutdown = true;
+    /* do net device stop and clear. */
+    eea_device_reset(edev);
+    pci_clear_master(pci_dev);
+After that, eea_pci_shutdown() calls pci_clear_master(), which only clears
+the bus-master enable bit and does not drain in-flight or posted DMA writes.
+Without a flush read of an MMIO register from this function or a synchronous
+device-side ack, is there a guarantee that the device has stopped issuing
+DMA before pci_clear_master() runs?
+On kexec or warm-reboot, can in-flight DMA after eea_pci_shutdown() returns
+land in pages that the next kernel has reused?
+> +
+> +	/* Surprise PCIe Removal */
+> +	if (val == 0xFF)
+> +		return -EINVAL;
+> +
+> +	return err;
+> +}
+> +
+> +int eea_pci_set_aq_up(struct eea_device *edev)
+> +{
+> +	struct eea_pci_device *ep_dev = edev->ep_dev;
+> +	u8 status = eea_pci_io_get_status(edev);
+> +	int err;
+> +	u8 val;
+> +
+> +	eea_pci_io_set_status(edev, status | EEA_S_OK);
+> +
+> +	/* A longer timeout is set here to handle edge cases, though it should
+> +	 * return promptly in most scenarios.
+> +	 *
+> +	 * In our case, all replies are handled by the DPU software, so there is
+> +	 * no race condition between the hardware processes and the register.
+> +	 */
+> +	err = read_poll_timeout(cfg_read8, val,
+> +				val & (EEA_S_OK | EEA_S_FAILED),
+> +				20, EEA_RESET_TIMEOUT_US,
+> +				false, ep_dev->reg, device_status);
+> +
+> +	/* Surprise PCIe Removal */
+> +	if (val == 0xFF)
+> +		return -EINVAL;
+> +
+> +	/* device fail */
+> +	if (val & EEA_S_FAILED)
+> +		return -EINVAL;
+> +
+> +	return err;
+> +}
+Can this handshake actually observe device acknowledgment?
+The driver writes status | EEA_S_OK to device_status, then read_poll_timeout()
+waits for the readback to satisfy (val & (EEA_S_OK | EEA_S_FAILED)).
+read_poll_timeout() with sleep_before_read = false performs the op() once
+before sleeping, so the very first cfg_read8() of device_status will return
+the value that was just written, which already has EEA_S_OK set. The
+condition is met on iteration zero, the 60-second EEA_RESET_TIMEOUT_US never
+elapses, and EEA_S_FAILED never gets a chance to be observed.
+For the device to ever indicate failure, would it need to first clear
+EEA_S_OK and then either re-assert EEA_S_OK on success or set EEA_S_FAILED
+on failure? Or use a separate ack/done bit that is distinct from the
+driver-written request bit? As written, the EEA_S_FAILED check below the
+poll appears unreachable on a healthy bus.
+> +
+> +static int eea_negotiate(struct eea_device *edev)
+> +{
+> +	struct eea_pci_device *ep_dev;
+> +	u32 status;
+> +
+> +	ep_dev = edev->ep_dev;
+> +
+> +	edev->features = 0;
+> +
+> +	cfg_write32(ep_dev->reg, drv_f_idx, 0);
+> +	cfg_write32(ep_dev->reg, drv_f, lower_32_bits(edev->features));
+> +	cfg_write32(ep_dev->reg, drv_f_idx, 1);
+> +	cfg_write32(ep_dev->reg, drv_f, upper_32_bits(edev->features));
+> +
+> +	eea_add_status(edev, EEA_S_FEATURE_DONE);
+> +	status = eea_pci_io_get_status(edev);
+> +
+> +	/* Surprise PCIe Removal */
+> +	if (status == 0xFF)
+> +		return -EINVAL;
+> +
+> +	if (!(status & EEA_S_FEATURE_DONE))
+> +		return -ENODEV;
+> +
+> +	return 0;
+> +}
+Is this status check tautological?
+eea_add_status() reads device_status, ORs in EEA_S_FEATURE_DONE, and writes
+it back. The very next line reads device_status again, so unless the device
+clears the bit before the readback (which there is no synchronisation for),
+the readback will always have EEA_S_FEATURE_DONE set, except in the surprise
+removal case where the value is 0xFF.
+Can this code detect a device that legitimately rejects the offered
+features, given there is no poll, delay, or wait for the device to react?
+The asymmetry with eea_pci_set_aq_up(), which does call read_poll_timeout()
+albeit with the issue noted above, suggests the protocol contract for these
+two transitions is different. Could the expected device-side behaviour for
+EEA_S_FEATURE_DONE be spelled out so reviewers can check the handshake?
+> +
+[ ... ]
+> +static int eea_pci_setup(struct pci_dev *pci_dev, struct eea_pci_device *ep_dev)
+> +{
+> +	int err, n, ret, len;
+> +
+> +	ep_dev->pci_dev = pci_dev;
+> +
+> +	err = pci_enable_device(pci_dev);
+> +	if (err)
+> +		return err;
+> +
+> +	err = pci_request_regions(pci_dev, "EEA");
+> +	if (err)
+> +		goto err_disable_dev;
+[ ... ]
+> +	ep_dev->reg = pci_iomap(pci_dev, 0, 0);
+> +	if (!ep_dev->reg) {
+> +		dev_err(&pci_dev->dev, "Failed to map pci bar!\n");
+> +		err = -ENOMEM;
+> +		goto err_release_regions;
+> +	}
+> +
+> +	err = eea_device_reset(&ep_dev->edev);
+> +	if (err) {
+> +		dev_err(&pci_dev->dev, "Failed to reset device for setup!\n");
+> +		goto err_unmap_reg;
+> +	}
+[ ... ]
+> +	ep_dev->edev.rx_num = cfg_read32(ep_dev->reg, rx_num_max);
+> +	ep_dev->edev.tx_num = cfg_read32(ep_dev->reg, tx_num_max);
+> +
+> +	if (ep_dev->edev.rx_num > EEA_PCI_Q_MAX_NUM ||
+> +	    ep_dev->edev.tx_num > EEA_PCI_Q_MAX_NUM) {
+> +		dev_err(&pci_dev->dev, "Invalid queue num %u %u\n",
+> +			ep_dev->edev.rx_num,
+> +			ep_dev->edev.tx_num);
+> +		err = -EINVAL;
+> +		goto err_clear_master;
+> +	}
+[ ... ]
+> +	/* In our design, the number of hardware interrupts matches the maximum
+> +	 * number of queues. If pci_alloc_irq_vectors failed, return directly.
+> +	 *
+> +	 * 2: adminq, error handle
+> +	 */
+> +	n = ep_dev->edev.rx_num + 2;
+> +	ret = pci_alloc_irq_vectors(ep_dev->pci_dev, n, n, PCI_IRQ_MSIX);
+> +	if (ret != n) {
+> +		err = ret;
+> +		goto err_clear_master;
+> +	}
+The vector count uses rx_num only, but tx_num is also read from the device
+and validated independently against EEA_PCI_Q_MAX_NUM. If a device ever
+advertises tx_num > rx_num, would later patches that bind a TX-queue IRQ at
+an index above rx_num + 1 fail because no vector was allocated?
+Should this be max(rx_num, tx_num) + 2, or should there be an explicit
+invariant rejecting tx_num > rx_num here so that the design assumption from
+the comment is enforced?
+> +
+> +	ep_dev->msix_vec_n = ret;
+> +
+> +	return 0;
+[ ... ]
+> +static int eea_init_device(struct eea_device *edev)
+> +{
+> +	int err;
+> +
+> +	err = eea_device_reset(edev);
+> +	if (err)
+> +		return err;
+> +
+> +	eea_pci_io_set_status(edev, EEA_S_INIT);
+> +
+> +	err = eea_negotiate(edev);
+> +	if (err)
+> +		goto err;
+> +
+> +	/* do net device probe ... */
+> +
+> +	return 0;
+> +err:
+> +	eea_add_status(edev, EEA_S_FAILED);
+> +	return err;
+> +}
+> +
+> +static int __eea_pci_probe(struct pci_dev *pci_dev,
+> +			   struct eea_pci_device *ep_dev)
+> +{
+> +	int err;
+> +
+> +	pci_set_drvdata(pci_dev, ep_dev);
+> +
+> +	err = eea_pci_setup(pci_dev, ep_dev);
+> +	if (err)
+> +		return err;
+> +
+> +	err = eea_init_device(&ep_dev->edev);
+> +	if (err)
+> +		goto err_pci_rel;
+> +
+> +	return 0;
+The probe path calls eea_device_reset() twice in succession:
+__eea_pci_probe()
+  -> eea_pci_setup()
+       -> eea_device_reset()  /* first reset */
+  -> eea_init_device()
+       -> eea_device_reset()  /* second reset */
+EEA_RESET_TIMEOUT_US is 60 seconds, so a misbehaving or slow device can
+stall probe for up to 120 seconds. Is the second reset intentional, and if
+so, could the rationale be added as a comment? Otherwise, would it make
+sense to drop one of them so that probe has only one reset point?
+> +
+> +err_pci_rel:
+> +	eea_pci_release_resource(ep_dev);
+> +	return err;
+> +}
+[ ... ]
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.h b/drivers/net/ethernet/alibaba/eea/eea_pci.h
+> new file mode 100644
+> index 000000000000..746cce4dd68e
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_pci.h
+> @@ -0,0 +1,50 @@
+[ ... ]
+> +struct eea_pci_cap {
+> +	__u8 cap_vndr;
+> +	__u8 cap_next;
+> +	__u8 cap_len;
+> +	__u8 cfg_type;
+> +};
+> +
+> +struct eea_pci_reset_reg {
+> +	struct eea_pci_cap cap;
+> +	__le16 driver;
+> +	__le16 device;
+> +};
+> +
+> +struct eea_pci_device;
+> +
+> +struct eea_device {
+> +	struct eea_pci_device *ep_dev;
+> +	struct device         *dma_dev;
+> +	struct eea_net        *enet;
+> +
+> +	u64 features;
+> +
+> +	u32 rx_num;
+> +	u32 tx_num;
+> +	u32 db_blk_size;
+> +};
+> +
+> +const char *eea_pci_name(struct eea_device *edev);
+> +int eea_pci_domain_nr(struct eea_device *edev);
+> +u16 eea_pci_bdf(struct eea_device *edev);
+> +
+> +int eea_device_reset(struct eea_device *dev);
+> +int eea_pci_set_aq_up(struct eea_device *dev);
+> +
+> +u64 eea_pci_device_ts(struct eea_device *edev);
+> +
+> +void __iomem *eea_pci_db_addr(struct eea_device *edev, u32 off);
+> +#endif
+A number of symbols introduced here have no callers in this commit:
+  eea_pci_name()
+  eea_pci_domain_nr()
+  eea_pci_bdf()
+  eea_pci_set_aq_up()
+  eea_pci_db_addr()
+  eea_pci_device_ts()
+  struct eea_pci_cap
+  struct eea_pci_reset_reg
+struct eea_device also references struct eea_net via the enet field, but
+struct eea_net is not declared anywhere in this commit.
+Because these helpers are non-static, the compiler will not warn about
+unused functions, so the contracts they establish (for example the
+eea_pci_set_aq_up() handshake noted above) cannot be checked against a real
+caller in this patch.
+Could the series be reorganised so that each helper or type is introduced
+together with its first user, per the usual kernel convention?
 
