@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-288802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288803-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eNfgJHtqCmp+1AQAu9opvQ
-	(envelope-from <netdev+bounces-288802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:25:15 +0200
+	id WFQWGp1qCmp+1AQAu9opvQ
+	(envelope-from <netdev+bounces-288803-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:25:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 967B0564C23
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:25:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D55A1564C6F
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:25:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4A5CA300187C
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:24:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D01AF3023066
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 01:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB492459C5;
-	Mon, 18 May 2026 01:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3081B257827;
+	Mon, 18 May 2026 01:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uFRg4HHU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y7oZstat"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCD11FECAB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C78B23A564;
 	Mon, 18 May 2026 01:24:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779067487; cv=none; b=LzP9mxFKfpPGgu2FqvT+Pj8ilJnkvTbZZFHQuZJ1iudcObyQwBzolHWh5SSdEZkigfBlIAEnscYjhH1rMIM6cYzVtXFoiguQjtjWX/qSTvmf5jF9NSrdk4CcAT/NB8jkY0lvMMCOnSXCrqv/taCQz6uSInfJVB8a8OU8AmD9m98=
+	t=1779067488; cv=none; b=TPv+M5EFk1i34shyaRPkNWQ480WZSHS/SPcZBkjgVW4qyq7585/Vu0wftJGdviFitbDJ6yb77GPG8hmu7ryP0WMGBm11Hx6ZKrdtcXNmIBmUXsc+jT+q52X7LUBUSh0jIIHZTxPuEgBG+y/qmtf8PoupuCs9EhSMxNlPSzX/aBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779067487; c=relaxed/simple;
-	bh=tiaNCC2ZPZbHtuseGwHRt3jO0+j10LMHqeNdoW6wzQk=;
+	s=arc-20240116; t=1779067488; c=relaxed/simple;
+	bh=KXhbGx709dHbyVlecT2ABR6CZcd93YZjlz3txdsNrf8=;
 	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BQnyvi8M2uVzmQvPT6WFKApTqDy6be9jwHTKolDoHy0zC/b8K584nWlDMfn6dTSVQrCAQ1QfXFCUtCoq2bajb2ZVZXEHSAZDZ88GErQ+1xoSDShWWSJnVEWO9/aaPE60X0oyoZMHhBiHXzoglUUMInGdJnvpTUpffgVYPj1bdxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uFRg4HHU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C917C2BCF5;
-	Mon, 18 May 2026 01:24:46 +0000 (UTC)
+	 MIME-Version; b=f1qVT8QluJGqdrgLB9MSwNKFMfmPtBYCN24f8CJVdYm8WKjD6Tuiarui1+VUUzCa/GgZK3ECP4QL1Z5868vyhMzIk45BlxGJKIcpYUip3XPaUEfoTVzQh47xGwWi/Ysyoc8TaRfzowZC5GuyIroCugTBoCs2r0KhkrMSkoeuz6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y7oZstat; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36837C2BCB0;
+	Mon, 18 May 2026 01:24:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1779067487;
-	bh=tiaNCC2ZPZbHtuseGwHRt3jO0+j10LMHqeNdoW6wzQk=;
+	bh=KXhbGx709dHbyVlecT2ABR6CZcd93YZjlz3txdsNrf8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=uFRg4HHUP0L3eZZ4hHw0H6iHMbPUqnWoL6eYPVgVrPd2+AnPVPVugwIQixhJ8WFj1
-	 tcEXvgkHisMokOnSytb41Yvtfqw9JkIsAMFqwlLXLnJiFidrzX70OkqITDzshqA96H
-	 yeeSSMDKs+6mVF/yTBaOUguyakC2iQFZfA+nAgeDwRM6iiFxQlC9Nme6OP9iuOXcFC
-	 yPFBM5YiJIO10sRHHYhPucF1fbshWTB7ubwitooKuRmbRTZlFN+f0nHE86f/71j2bO
-	 81kFJiGrBO6EsOSMiBs+JsDyIMjn+jzgJH4aiXUittOXJFhHebn0RaTfAmxPWd/7/k
-	 O8QVModSwLNpA==
+	b=Y7oZstatUlCrr+/E9XDOAgJlnT8pObc1TryUOfnhsUhRDqKaW+Lphs8b7DQ8P+BKJ
+	 U+ZKJKaFGTp+WHmzlF5Bd5S/2geZvE1EN3sGwxcoNd5kyUCSr3a80tJmk8cpnDCnVP
+	 epNwLDec1bCBKtcgql4a6SsO38kRr69P9WajjGj3S41fzB/p1ug4ml6+fZF/SthzAK
+	 0EPuICp9nrarrXA893XO9UHCzz3ykIqsoJkNGB5J9Lg9prD8bhvcssT7GL+SGCylZj
+	 KMocOsprQsAIIzqkclTIniuVSMlb8xmjaSJR0WZgcQzQML5CBkejDVSEGeXNILeeor
+	 xNkiSKnA1RjfQ==
 From: Allison Henderson <achender@kernel.org>
 To: netdev@vger.kernel.org,
 	pabeni@redhat.com,
@@ -54,9 +54,9 @@ To: netdev@vger.kernel.org,
 	achender@kernel.org,
 	linux-kselftest@vger.kernel.org,
 	shuah@kernel.org
-Subject: [PATCH net-next v3 03/11] selftests: rds: Add helper function check_info() in test.py
-Date: Sun, 17 May 2026 18:24:35 -0700
-Message-Id: <20260518012443.2629206-4-achender@kernel.org>
+Subject: [PATCH net-next v3 04/11] selftests: rds: Add helper function send_burst() in test.py
+Date: Sun, 17 May 2026 18:24:36 -0700
+Message-Id: <20260518012443.2629206-5-achender@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260518012443.2629206-1-achender@kernel.org>
 References: <20260518012443.2629206-1-achender@kernel.org>
@@ -67,14 +67,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 967B0564C23
+X-Rspamd-Queue-Id: D55A1564C6F
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-288802-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288803-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -90,96 +90,102 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,test.py:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,test.py:url]
 X-Rspamd-Action: no action
 
-Hoist the page info logic in test.py into a helper function,
-check_info().  This is a preparatory refactoring for the rds over ROCE
+Hoist the send packet logic in test.py into a helper function,
+send_burst().  This is a preparatory refactoring for the rds over ROCE
 series that helps modularize the send/recv logic. Breaking up the logic
 now will help avoid large function pylint errors later.  No functional
 changes are introduced in this patch.
 
 Signed-off-by: Allison Henderson <achender@kernel.org>
 ---
- tools/testing/selftests/net/rds/test.py | 53 +++++++++++++++----------
- 1 file changed, 31 insertions(+), 22 deletions(-)
+ tools/testing/selftests/net/rds/test.py | 50 +++++++++++++------------
+ 1 file changed, 27 insertions(+), 23 deletions(-)
 
 diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
-index 118a5da83c98e..d64af9e662e8c 100755
+index d64af9e662e8c..d6e872af13600 100755
 --- a/tools/testing/selftests/net/rds/test.py
 +++ b/tools/testing/selftests/net/rds/test.py
-@@ -79,6 +79,36 @@ def netns_socket(netns, *sock_args):
+@@ -79,6 +79,31 @@ def netns_socket(netns, *sock_args):
      u1.close()
      return socket.fromfd(fds[0], *sock_args)
  
-+def check_info(socks):
-+    """
-+    Check all rds info pages for errors
++def send_burst(socks, ip_addrs, snd_hashes, nr_sent, nr_total):
++    """Send until blocked or nr_total reached. Return updated nr_sent."""
 +
-+    :param socks: list of sockets to check
-+    """
++    while nr_sent < nr_total:
++        data = hashlib.sha256(
++            f'packet {nr_sent}'.encode('utf-8')).hexdigest().encode('utf-8')
++        # pseudo-random send/receive pattern
++        snd_idx = nr_sent % 2
++        rcv_idx = 1 - (nr_sent % 3) % 2
 +
-+    # the Python socket module doesn't know these
-+    rds_info_first = 10000
-+    rds_info_last = 10017
++        snd = socks[snd_idx]
++        rcv = socks[rcv_idx]
++        try:
++            snd.sendto(data, ip_addrs[rcv_idx])
++        except BlockingIOError:
++            return nr_sent
++        except OSError as e:
++            if e.errno in (errno.ENOBUFS, errno.ECONNRESET, errno.EPIPE):
++                return nr_sent
++            raise
++        snd_hashes.setdefault((snd.fileno(), rcv.fileno()),
++                hashlib.sha256()).update(f'<{data}>'.encode('utf-8'))
++        nr_sent += 1
++    return nr_sent
 +
-+    nr_success = 0
-+    nr_error = 0
-+
-+    for sock in socks:
-+        for optname in range(rds_info_first, rds_info_last + 1):
-+            # Sigh, the Python socket module doesn't allow us to pass
-+            # buffer lengths greater than 1024 for some reason. RDS
-+            # wants multiple pages.
-+            try:
-+                sock.getsockopt(socket.SOL_RDS, optname, 1024)
-+                nr_success = nr_success + 1
-+            except OSError as e:
-+                nr_error = nr_error + 1
-+                if e.errno == errno.ENOSPC:
-+                    # ignore
-+                    pass
-+
-+    ksft_pr(f"getsockopt(): {nr_success}/{nr_error}")
-+
- def stop_pcaps():
-     """Stop tcpdump processes.
+ def check_info(socks):
+     """
+     Check all rds info pages for errors
+@@ -234,10 +259,6 @@ fileno_to_socket = {
  
-@@ -268,28 +298,7 @@ while nr_send < NUM_PACKETS:
+ addr_to_socket = dict(zip(addrs, sockets))
  
- ksft_pr("done", nr_send, nr_recv)
- 
--# the Python socket module doesn't know these
--RDS_INFO_FIRST = 10000
--RDS_INFO_LAST = 10017
+-socket_to_addr = {
+-    s: addr for addr, s in zip(addrs, sockets)
+-}
 -
--nr_success = 0
--nr_error = 0
+ send_hashes = {}
+ recv_hashes = {}
+ 
+@@ -251,27 +272,10 @@ nr_send = 0
+ nr_recv = 0
+ 
+ while nr_send < NUM_PACKETS:
++
+     # Send as much as we can without blocking
+     ksft_pr("sending...", nr_send, nr_recv)
+-    while nr_send < NUM_PACKETS:
+-        send_data = hashlib.sha256(
+-            f'packet {nr_send}'.encode('utf-8')).hexdigest().encode('utf-8')
 -
--for s in sockets:
--    for optname in range(RDS_INFO_FIRST, RDS_INFO_LAST + 1):
--        # Sigh, the Python socket module doesn't allow us to pass
--        # buffer lengths greater than 1024 for some reason. RDS
--        # wants multiple pages.
+-        # pseudo-random send/receive pattern
+-        sender = sockets[nr_send % 2]
+-        receiver = sockets[1 - (nr_send % 3) % 2]
+-
 -        try:
--            s.getsockopt(socket.SOL_RDS, optname, 1024)
--            nr_success = nr_success + 1
+-            sender.sendto(send_data, socket_to_addr[receiver])
+-            send_hashes.setdefault((sender.fileno(), receiver.fileno()),
+-                    hashlib.sha256()).update(f'<{send_data}>'.encode('utf-8'))
+-            nr_send = nr_send + 1
+-        except BlockingIOError:
+-            break
 -        except OSError as e:
--            nr_error = nr_error + 1
--            if e.errno == errno.ENOSPC:
--                # ignore
--                pass
--
--ksft_pr(f"getsockopt(): {nr_success}/{nr_error}")
-+check_info(sockets)
+-            if e.errno in [errno.ENOBUFS, errno.ECONNRESET, errno.EPIPE]:
+-                break
+-            raise
++    nr_send = send_burst(sockets, addrs, send_hashes, nr_send, NUM_PACKETS)
  
- # cancel timeout
- signal.alarm(0)
+     # Receive as much as we can without blocking
+     ksft_pr("receiving...", nr_send, nr_recv)
 -- 
 2.25.1
 
