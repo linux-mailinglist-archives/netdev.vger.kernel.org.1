@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-289199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289200-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id lbrxKfqgC2rrKAUAu9opvQ
-	(envelope-from <netdev+bounces-289199-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:30:02 +0200
+	id aNB7LSekC2qRKQUAu9opvQ
+	(envelope-from <netdev+bounces-289200-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:43:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B4E4574FB3
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:30:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F9F8575197
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 703823013B99
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:30:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1117D303CC09
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232A933067C;
-	Mon, 18 May 2026 23:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35A5331A41;
+	Mon, 18 May 2026 23:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zrd3JVPC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dmp/bm07"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D9029B228;
-	Mon, 18 May 2026 23:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CE8288C2F
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 23:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779146998; cv=none; b=jKEC/WSWiYEyqno21wGZ6+LZa4Q48ItYkZR45u64tdTJ9b5Uv3BuwZywZ6WnnIRNzD1OASzcy+5pwVwqehM50NoWqXc+6pU0pUjTR5gzgGhNE9t6WV/PqFfD8/fcwd4qjJXvFSlrSDJ4Qo5K3/uyvSGCxBT/WtJA0ik+DiuMBBk=
+	t=1779147612; cv=none; b=PYGeOzodfaQD2qPSXPxD2s1Kfew+I4BfDkowR9VvxMmMrXop/IOcz7+ajDkq7dcKcIavbKu+f/TzBpWhpb2RbNsc07bzTwJjR+YwqInQKFLqVnz+syVLdrC/hiYhs9o2QR4IH2Hm/+oRpIlUlmCpb1R67r0FIopQPz2ehIGYgok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779146998; c=relaxed/simple;
-	bh=DacEXxb9B1ymepJcH3QWAXaKhWL1QO6ShTj1d9qy/VY=;
+	s=arc-20240116; t=1779147612; c=relaxed/simple;
+	bh=ZUcdPgcixFOAKhT3lijqWeNjPrGYtWJZJMNizMoeJ7A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=e39GHZsTaBIu9eLwekPWWaUNKJ451E2ZuOHGxAUbhVApCMc/2GRb2ix11hTCue/LPOQ77RdOcdc27QcMSv5+U3tv6fkZ0KesSjZisgfTILHKRxc1QGJE/HY6ppTnneANKHd6ZtocuaLRnDn9EcIaIAqSZ6e9Lyf/vljIwEyRRhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zrd3JVPC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8383BC2BCB7;
-	Mon, 18 May 2026 23:29:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=FkGHGQpnKu8eoaLK4lVTHUlAvU1BlSLhWwjgBkLHm7VVE0YJAv7A79SFCWJhIaTtbraMjBKpUOJdRdsiBJpjjOwgoHWpB9PBMsHOJGf/F1OZjiKRHC932KUXh/qUvK2Zr66JU5owqYZ0+8vuJYluDU0VBVsSoo88vqDdO0lRtFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dmp/bm07; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38880C2BCB7;
+	Mon, 18 May 2026 23:40:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779146997;
-	bh=DacEXxb9B1ymepJcH3QWAXaKhWL1QO6ShTj1d9qy/VY=;
+	s=k20201202; t=1779147612;
+	bh=ZUcdPgcixFOAKhT3lijqWeNjPrGYtWJZJMNizMoeJ7A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Zrd3JVPCbSbb82U89sBkRijdI1axILSwXGClnCx8NoXRGFCNDUOMt7zb6mhQfcCzc
-	 kTnuQGttIlFjSg/tZnzvqFB49TOr9gp+zSCBcp12abCap0RyPhy83croDTPw8Rr/uD
-	 u6ZlicZ5cZN9sS8tGa4yXG6x7ssQiODVW0B7w377Vn0h0pXVH9nPrzX+ID5bV9nUzD
-	 jXVd+0/XzekTtpZjyyuKpQ2qh4wMBKB7LshwaB6ux2UriKtbRyNZT3iA9uNbr/NH0s
-	 JeQ0czc8vnSxNQboNcvyYPZnu7NaTw65cIv5duMgJmsG/ow9Ti5KeW6MzUyqgyVPGg
-	 I1hBPBSK05KtQ==
+	b=Dmp/bm07YRLhTqAxRAj+Uh1WUGzuI3e11R2zXlCSVp/xJb1nuWkjnGAQFDSl7cxqW
+	 FEQpCy1gVlJyOiIMcVuRdjnl3IX4cJ+14TVj1Npjbjr8z5OdKf7uSo9yEvIDyZhlnH
+	 MXlO/NGAV+FtzZRv0O5eD5sbCdr6BIRmV07SKIX5D8hpnJmkfNC+Tl2CJjLazxQs9P
+	 4jsoGnD6muvxJHlxFoc0O/1DlB+M43tDKejGkdmWFUWARzxBpQGHXIKV/O/AS7/9mh
+	 vHuUKwkbMVnceTRlo2PmFMPuA3Vln0gZmTeW2Yx4aQIBOoSabvVk/5nfqoTx5f3Y4t
+	 3Pc3wGPBeP8Eg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198863930CBF;
-	Mon, 18 May 2026 23:30:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0B2D3930CBF;
+	Mon, 18 May 2026 23:40:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,73 +55,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] net/mlx5: frag buffer improvements
+Subject: Re: [PATCH net] net: appletalk: fix NULL pointer dereference in
+ aarp_send_ddp()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177914700897.2009822.15421572826777145558.git-patchwork-notify@kernel.org>
-Date: Mon, 18 May 2026 23:30:08 +0000
-References: <20260514104925.337570-1-tariqt@nvidia.com>
-In-Reply-To: <20260514104925.337570-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- noren@nvidia.com, dtatulea@nvidia.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+ <177914762338.2012201.13609103218137112848.git-patchwork-notify@kernel.org>
+Date: Mon, 18 May 2026 23:40:23 +0000
+References: <20260514123806.3085961-3-bestswngs@gmail.com>
+In-Reply-To: <20260514123806.3085961-3-bestswngs@gmail.com>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, kees@kernel.org, netdev@vger.kernel.org,
+ xmei5@asu.edu
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289199-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-289200-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3B4E4574FB3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0F9F8575197
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 14 May 2026 13:49:23 +0300 you wrote:
-> Hi,
+On Thu, 14 May 2026 05:38:08 -0700 you wrote:
+> aarp_send_ddp() calls atalk_find_dev_addr(dev) in the LocalTalk fast
+> path without checking for NULL. When the device has no AppleTalk
+> interface configured (dev->atalk_ptr == NULL), this leads to a NULL
+> pointer dereference at the at->s_net access.
 > 
-> This series adds observability for mlx5 fragment buffer DMA pools and
-> improves the default NUMA placement policy for fragment buffer
-> allocations.
-> 
-> Patch 1 adds a debugfs interface exposing per-node DMA pool usage
-> statistics for mlx5_frag_buf allocations, helping with debugging and
-> visibility into pool utilization.
+>  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+>  RIP: 0010:aarp_send_ddp (net/appletalk/aarp.c:552 (discriminator 2))
+>  Call Trace:
+>   <TASK>
+>   atalk_sendmsg (net/appletalk/ddp.c:1715)
+>   __sys_sendto (net/socket.c:2265 (discriminator 1))
+>   __x64_sys_sendto (net/socket.c:2272)
+>   do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+>   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net/mlx5: use numa_mem_id() for default frag buf allocations
-    https://git.kernel.org/netdev/net-next/c/0e222299714f
-  - [net-next,2/2] net/mlx5: add debugfs stats for frag buf dma pools
-    https://git.kernel.org/netdev/net-next/c/9fe78db3ad17
+  - [net] net: appletalk: fix NULL pointer dereference in aarp_send_ddp()
+    https://git.kernel.org/netdev/net/c/9e7f36ab5b7b
 
 You are awesome, thank you!
 -- 
