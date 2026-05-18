@@ -1,65 +1,67 @@
-Return-Path: <netdev+bounces-289177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289178-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OA98KCiDC2oZIwUAu9opvQ
-	(envelope-from <netdev+bounces-289177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:22:48 +0200
+	id EPSHCn2DC2oZIwUAu9opvQ
+	(envelope-from <netdev+bounces-289178-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:24:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114B0573C52
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:22:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D840573C9C
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:24:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B2C03022A83
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 21:22:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6E58B30387A6
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 21:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC2A396567;
-	Mon, 18 May 2026 21:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B117398903;
+	Mon, 18 May 2026 21:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsajbWRn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HLmmnmoy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB788328610
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 21:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C6F396D15;
+	Mon, 18 May 2026 21:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779139351; cv=none; b=cNEZsOsY2GcfNvBhRze9TKRXw7VivjDeIidaasSBA1IZDmiVAG9MQ8jgzJfJnMZVh2A/bCC22cd9F029dZu10xEWpNfAOGWRO9mHdQNjb9wrg4EG2oR8bz0gJH770e2YWeOrV/R/IzIBz40vAcLPjOdZlppIeO//CqA7UKS/SR0=
+	t=1779139430; cv=none; b=OoU8fC8d0vLkv1hh6rdQ/s+ISlOtMkmeU40eYXok01UjJlFOBqCyRXOKY3YMSRVlyQQIzon17qd9lBDF+czNcgF6U3Ggh3LM7Ro6kEBjXu4ucqdIx57n6rwaRqF0jXy3J4O3kBvvNzKm2qouJIB4pvpv/ZKo/uqZjm5n04O+oZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779139351; c=relaxed/simple;
-	bh=lBZQeMPr/rfGBQAiz8tolegT5xEZMrDYPzRwOe5vZOE=;
+	s=arc-20240116; t=1779139430; c=relaxed/simple;
+	bh=FuV6u6TGiEJVgFDyOMOd0dpdl0m2x0H0VRsE3KpBVhc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hI0XUJqcBedRSKNl0us0f4xYBAV3inm5t5+H1o+TqsNnJEorZQwYe8DO+TYXD0Thn5kKXYOksVURKoD5ZkA0VpYcGezw+cPhgcXl/7PU0OOPoHhDj8D92G10QBo5btn0nm6ztZhRwLnD01hoU4OHgnczQ0sXRORaFULl7d4TL/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsajbWRn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4767CC2BCB7;
-	Mon, 18 May 2026 21:22:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Q+iJy2FNpnYcMCxO1v/kWCrQ679XClxbWtlAObj/wLnTQ9EI9SX1U3RsN8Ed+0QC88F/3kJDU9wwh7zWmHWZOdm5JXkfFnbo7rx3DQ9CGS9QrYFn/xBurJE3uijQp5pDKD2vGc6p59RmuBn/03cMzSCOg2X8pvAOkmZs9nO2iXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HLmmnmoy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC50CC2BCB7;
+	Mon, 18 May 2026 21:23:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779139351;
-	bh=lBZQeMPr/rfGBQAiz8tolegT5xEZMrDYPzRwOe5vZOE=;
+	s=k20201202; t=1779139429;
+	bh=FuV6u6TGiEJVgFDyOMOd0dpdl0m2x0H0VRsE3KpBVhc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jsajbWRnVxeEey2mcodUUvapkaX94AK+Z42kIwteIUMXQmEF1I5HEFU7MLUMp/9I7
-	 ewVKIEfvzvIbYj6gJulUhBAJkizUrz7DBTLvStePiEHQBV0NNfHaoGYi4+VBgj/nVg
-	 D6dakkJY+dgLp0qTiHTQbk7XJ3D4P8so+L1Z8hwdY0eEj1dDZvBX+zS5kaDzT77L9D
-	 kpsd+bWVlhMHJkycv0aQ5Ez1/KgxRal3IqmCJ3e9Ke7hB9mbqHsn6OwrWwzq32MJDx
-	 WS4oD5KfJKptTyjiYkrpJMorP8pONvyaGYWiVYnJNy9H37cTEA/Fm9yoa3EpLIKNJG
-	 L7FL908zWAvXQ==
-Date: Mon, 18 May 2026 14:22:30 -0700
+	b=HLmmnmoyyKFNMsGo2xiV+5XtcfMN/kmMGqbaOXw/v7MVA6V/GIqESOutuuscSMaTx
+	 5eoLoFkEl7lBtcDG3YjLNGXpXUUKfITb7yD8YvTm1sManxDSv5LTVqGuN/rL5RFfNq
+	 R7YNTxcGp511O/PDPNBStiBaKKdTiJGewoKaGhGWi0OYcXWtcAZtTPhO2yfin4Gn42
+	 ZUQdYMoi+ryR4iq0wa1s7LuV36fFP5EZFMLr8Kcjq5v+D/Hac3Z/m4Nbmra7dRL9qP
+	 jxGRVoe9RkAgdtpPwUiLQpu/PF0x2fBtD8VGMryWO2un/Zirpb7ZB1Yw55KQR9f+8P
+	 Zk4s2ErrpOPIQ==
+Date: Mon, 18 May 2026 14:23:46 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH net v2] net: team: fix NULL pointer dereference in
- team_xmit during mode change
-Message-ID: <20260518142230.4403b3ce@kernel.org>
-In-Reply-To: <agrdjt6CjpJo3AYF@Air.local>
-References: <20260509181825.1523951-2-bestswngs@gmail.com>
-	<20260510082509.1530a1a3@kernel.org>
-	<agCtGqWLK53TWCaS@Air.local>
-	<20260510095937.598c27a6@kernel.org>
-	<agrdjt6CjpJo3AYF@Air.local>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ horms@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ dsahern@kernel.org, davem@davemloft.net
+Subject: Re: [PATCH 3/3 net-next v4] selftests: net: add test for IPv4
+ devconf netlink notifications
+Message-ID: <20260518142346.4c0903de@kernel.org>
+In-Reply-To: <f5cae72f-93c7-41d7-b7db-2b60281afb72@suse.de>
+References: <20260510081528.5257-1-fmancera@suse.de>
+	<20260510081528.5257-3-fmancera@suse.de>
+	<20260513193544.47970cb8@kernel.org>
+	<bd560c89-c71f-4ef5-a0fd-5ea096a0f767@suse.de>
+	<20260514162429.366b94c9@kernel.org>
+	<f528360c-18b3-46e5-8ba8-88f921203716@suse.de>
+	<20260515181623.5a44140e@kernel.org>
+	<f5cae72f-93c7-41d7-b7db-2b60281afb72@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,69 +70,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289177-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289178-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 114B0573C52
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 9D840573C9C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 18 May 2026 17:51:54 +0800 Weiming Shi wrote:
-> On 26-05-10 09:59, Jakub Kicinski wrote:
-> > On Mon, 11 May 2026 00:06:50 +0800 Weiming Shi wrote:  
-> > > The handler function pointer against the mode_priv state it operates
-> > > on.  On setup, init() writes mode_priv, then smp_store_release()
-> > > publishes the real handler - the paired smp_load_acquire() in the
-> > > reader ensures the handler sees that state.  On teardown,
-> > > smp_store_release() publishes the dummy before synchronize_net()
-> > > drains readers, so exit_op() won't tear down state under an
-> > > in-flight reader.  
+On Sat, 16 May 2026 09:02:27 +0200 Fernando Fernandez Mancera wrote:
+> >> Oh sorry, I should have clarified it. ip netconf only shows/query them
+> >> but it cannot set them AFAICS.
+> >>
+> >> Usage: ip netconf show [ dev STRING ]  
 > > 
-> > Still does not make sense to me. You already add sync_net().
-> > And if it's possible to switch from dummy to non-dummy mode
-> > the ordering is inverted.
+> > Oh, fun. anyway, you gotta find a better way. Or just give up on the
+> > selftest, the YNL hack is too ugly to live
 > >   
-> > > Not specific to the bug, just a reproducer detail.  Dropped.
-> > > 
-> > > Sending v3 with the updated changelog shortly.  
-> > 
-> > Please don't rush new versions out.  
 > 
-> Hi Jakub,
-> 
-> Apologies for the late reply and for rushing v3.
-> 
-> I was muddling two things. On teardown synchronize_net() is the protection,
-> the release/acquire is for the setup path where init() writes
-> mode_priv before team_adjust_ops() publishes the handler.
-> 
-> If that makes sense I'll send v4 with the corrected commit message.
+> Fair, let me see what I can do. Otherwise, Paolo as you requested the 
+> selftest, would it be acceptable for you to drop it given the situation? 
+> I looking for alternatives anyway :-)
 
-Can you provide more details for the init() path race?
-What's the sequence of events?
+Maybe extend iproute2 ?
 
