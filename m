@@ -1,161 +1,159 @@
-Return-Path: <netdev+bounces-288939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288941-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WKMTAH7QCmru8QQAu9opvQ
-	(envelope-from <netdev+bounces-288939-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:40:30 +0200
+	id SIILFt/RCmru8QQAu9opvQ
+	(envelope-from <netdev+bounces-288941-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:46:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B98A56903C
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:40:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B95756913B
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:46:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EE5113034F96
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:29:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 411673026EEE
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FEC3E3D90;
-	Mon, 18 May 2026 08:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9381D3D25CC;
+	Mon, 18 May 2026 08:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3gUlZHH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UR03GAan"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF6F3E2777;
-	Mon, 18 May 2026 08:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D763C5540
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 08:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779092737; cv=none; b=m6vAzfDDunC8jRvUbUKhJQZwO9fwJe7FTfzmaakUqchBri2K+D4kKQZoCsC2Gj2pW0R9KT80IEHY7ZRiqfWaR8I0z3rhuwGBq+wlmJmhNqpca/G1Zxrqn4SLHYL9BPBEBT9UgGhNAaVS0g4MLJPSYQrOMgDAZMJ0ITrME+bA15I=
+	t=1779093047; cv=none; b=Ito5671bsmsNvVQMgaSgozKZ8EQHOiL1/k7uXXhYKyp9FN83ibYLBj2KkE8dMxuo6vAEPd/KvPcp1+jBVt1VBoAMsWquuaT+/NcT5BCTTH1mX2IAgQRKfvrm+q/GHiSb/NHJYESwVR6ALvkpEt5DRU4FDSBwAiJ69hPvtRdQqoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779092737; c=relaxed/simple;
-	bh=dLOm69gQbw+yPFjzKhXWb6owlkPXwo1xmuTC823sFfk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ikWIkhRtk5CEjGY86dkJh8cFokJiH12CYX3mrQ4QRWEaLXGj2avqH5KWAngo62ZYQQT+dmztwMjd89bOSKzQfy94gfwcwGR/ARQrG8N8larWzDRMUJmSWYIJTkAyBekWS76cZi4FM/SWOpNKKdS8Xu6Bz7Ca4yL7p/mUDx2RCwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3gUlZHH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD87C2BCB7;
-	Mon, 18 May 2026 08:25:35 +0000 (UTC)
+	s=arc-20240116; t=1779093047; c=relaxed/simple;
+	bh=9z+sp72f1iKw0nPgNMvIodYgBLWziGaRX6/Ms5G3y2s=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G0j+m8q5spSLuXbrSvHmzECRO9V9T4GVdxx6WoIcKjdDf03InSrN0/3e1HmcBqH4/deSzgUzkSgJ5vzWpfiVpy7yGSFg0bJuDeJsiT+LihLssAlCbYvyAMHtXb1jgDKJ3E6dlMBheDAG8azlkx+jtcfl3hRiuEkTPXnK4W/aqOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UR03GAan; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27B3BC2BCFC
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 08:30:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779092737;
-	bh=dLOm69gQbw+yPFjzKhXWb6owlkPXwo1xmuTC823sFfk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=k3gUlZHH1ifI6YBRuLpXeTzk2ozQpO3HESBwtwC8zpFiMZPh9iSXOOjoeoAaMFs4J
-	 QFjwSv1Jc7GcoCdpHILGpZi2i/L9xorwzK4mv6pA99xq2ji1nL9rOtSQbSXnMtxlyE
-	 DXZS0rubhcA1vIIdpMaeYak/e1ryZyQZ1R2h3xohGw8dFdHu9kaDY0EjyAcOAilxQO
-	 sX3v1xtJUSkFrPbICsJN9yBLCvVRx+ELYK2mUA959RLZseZ5nLwunVSxfNP2YeHzT3
-	 BvPoKfoH+ulOykGosZ2h13s/VxRtgeb2tSg4XO2smjJB/3q623uNjtTMaTLypKxMel
-	 6dRhI6tdtAE4g==
-Message-ID: <cd33f886-75fb-47b8-b839-97fc6b11743c@kernel.org>
-Date: Mon, 18 May 2026 10:25:33 +0200
+	s=k20201202; t=1779093047;
+	bh=9z+sp72f1iKw0nPgNMvIodYgBLWziGaRX6/Ms5G3y2s=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
+	b=UR03GAany2qENmnCORdG+I9cu/83k3SV4ewM8k4MEjDzrOIyNxN3y38fIX54QvUAl
+	 8J7PbuK/zuYG6rb9MwQHYWX5F/qnE0o05AIQjyeOSpuIVeWE4fM6/CRGADKSAA0y/1
+	 Rp9Ys/MF9VKgplV/7fWuCDL8QB2dHOSO/VFVWuoaVsb8KHXzElXBEesjwtGPNX2ypm
+	 6BHBO65Z14fRlTmOWByLzJjRqwgIP63nRXxZkBtF7ffRaMOwHyq452y/uUug/pDt3T
+	 JzCD+I+otQYUBl/kJVKBfGfu+Q1CU31n0WrGkcWqQZOP5q/pJP1aThuGtqFps/3dxV
+	 gAq31G6Mu8buQ==
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-38e8292423fso13791891fa.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:30:47 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+FQoRbDPztE3sstK2XpByplV+qmdwgPuui2jPojhCdNOGij/1ckpDke6o+NLgfCTYC91LHTU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBgJuD3UhF6XHbpkUspt1PDVbgcZwHEwzrB22mjO3Jh2WFaq72
+	xExjw30FSE8GvCxfdFzMSbqkCBvpSxpKjJp3zr6tzwxwMs6n0xbvzamKphQKJo4ZB18sS4gdTFc
+	QAZRQJrWlQnFMJ5NCCKLRVIUkanJGuPrRyfp+vrumAg==
+X-Received: by 2002:a2e:8a98:0:b0:393:d706:7bc with SMTP id
+ 38308e7fff4ca-3956193091cmr39789731fa.0.1779093045805; Mon, 18 May 2026
+ 01:30:45 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 18 May 2026 04:30:44 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 18 May 2026 04:30:44 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260516-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v3-1-37ba4b6e9086@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] can: peak_usb: validate URB length in
- pcan_usb_fd_decode_buf()
-To: Berkant Koc <me@berkoc.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
- Stephane Grosjean <stephane.grosjean@hms-networks.com>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@pengutronix.de, stable@vger.kernel.org
-References: <20260517-can-usb-fix-cover@berkoc.com>
- <20260517-can-usb-fix-1@berkoc.com>
- <b978603c-4878-4eee-adc1-290e905fe768@kernel.org>
- <177906591253.919135.13839066904083701982@berkoc.com>
-From: Vincent Mailhol <mailhol@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=mailhol@kernel.org; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
- fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
- F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
- 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
- YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
- dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
- zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <177906591253.919135.13839066904083701982@berkoc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8B98A56903C
+References: <20260516-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v3-1-37ba4b6e9086@amd.com>
+Date: Mon, 18 May 2026 04:30:44 -0400
+X-Gmail-Original-Message-ID: <CAMRc=MfF3Kdz62XWxx_Y=N=bx=PUQ8iDakTYtD_P0gUUsUGKbw@mail.gmail.com>
+X-Gm-Features: AVHnY4K990tPUcDP2ohnS68GYVoXfSGX7h4Ft5lim9vMUAsNmJzLrAp6WoPSPNE
+Message-ID: <CAMRc=MfF3Kdz62XWxx_Y=N=bx=PUQ8iDakTYtD_P0gUUsUGKbw@mail.gmail.com>
+Subject: Re: [PATCH v3] nfc: nxp-nci: i2c: use rising-edge IRQ on ACPI systems
+To: carl.lee@amd.com
+Cc: krzk@kernel.org, peter.shen@amd.com, colin.huang2@amd.com, kuba@kernel.org, 
+	david@ixit.cz, luca.stefani.ge1@gmail.com, brgl@kernel.org, 
+	mpearson@squebb.ca, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Carl Lee via B4 Relay <devnull+carl.lee.amd.com@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 5B95756913B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288939-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-288941-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,amd.com,ixit.cz,gmail.com,squebb.ca,vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,ixit.cz:email,amd.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,squebb.ca:email];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mailhol@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,carl.lee.amd.com];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On 18/05/2026 at 02:58, Berkant Koc wrote:
-> Vincent, fair, my earlier "custom CVE-hunter setup" was too thin.
-> Here's the fuller picture.
-> 
-> Tooling: berkoc-pipeline, a custom RAG framework on Claude Opus 4.7
-> (Anthropic CVP cohort, May 2026). Full agentic stack: multi-tool
-> execution (filesystem, web fetch, code execution), parallel subagent
-> orchestration with adaptive task decomposition, extended-thinking
-> integration, retrieval-augmented context over a file-based semantic
-> knowledge base, MCP-style integration patterns. 7-step pre-disclosure
-> validation gate, manual verification on every finding before submit.
+On Sat, 16 May 2026 13:55:18 +0200, Carl Lee via B4 Relay
+<devnull+carl.lee.amd.com@kernel.org> said:
+> From: Carl Lee <carl.lee@amd.com>
+>
+> Some ACPI-based platforms report incorrect IRQ trigger types (e.g.
+> IRQF_TRIGGER_HIGH), which can lead to interrupt storms.
+>
+> Use the historically working rising-edge trigger on ACPI systems to
+> avoid this regression.
+>
+> Device Tree-based systems continue to use the firmware-provided
+> trigger type.
+>
+> Signed-off-by: Carl Lee <carl.lee@amd.com>
+> ---
+> Some ACPI-based platforms report incorrect IRQ trigger types,
+> which can lead to interrupt storms.
+>
+> Use rising-edge IRQ on ACPI systems to avoid this regression,
+> while keeping firmware-provided trigger types on non-ACPI systems.
+>
+> Cc: netdev@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: krzk@kernel.org
+> Cc: carl.lee@amd.com
+> Cc: peter.shen@amd.com
+> Cc: colin.huang2@amd.com
+> Cc: kuba@kernel.org
+> Cc: david@ixit.cz
+> Cc: luca.stefani.ge1@gmail.com
+> Cc: brgl@kernel.org
+> Cc: mpearson@squebb.ca
+> ---
 
-Your message doesn't follow the mailing list etiquette:
+LGTM!
 
-Link: https://subspace.kernel.org/etiquette.html
+Tested-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
-Relevant part:
+Maybe:
 
-  kernel mailing lists exclusively require that all communication is
-  sent as interleaved quoted replies.
+Fixes: 57be33f85e36 ("nfc: nxp-nci: remove interrupt trigger type")
+Cc: stable@vger.kernel.org # v6.19.y
 
-Is this answer also AI generated? If yes, please don't directly copy
-paste AI answers to the mailing list. We expect you to add value to
-the AI generated output.
+?
 
-Regardless if this was AI generated or not, take time to familiarize
-yourself with the kernel processes. Reading a couple of the past
-threads in the mailing list is a good way to understand the
-expectations.
-
-> v2 of this patch will include the formal trailer:
-> Assisted-by: Claude:claude-opus-4-7 berkoc-pipeline
-
-Ack. Please use that tag.
-
-> For the peak_usb finding specifically: seeded with reference commit
-> 6fe9f3279f7d ("can: gs_usb: gs_usb_receive_bulk_callback(): check
-> actual_length before accessing header"), scanned drivers/net/can/usb/
-> for the "actual_length verified before header dereference" pattern,
-> candidate sites surfaced by the model, then manual verification with
-> a reproducer harness (synthetic short URB, walk through msg_ptr/msg_end
-> bounds) before the report went out.
-> 
-> Happy to formalise as `Assisted-by: Claude:claude-opus-4-7
-> berkoc-pipeline` trailer in v2 if you'd prefer, or drop the methodology
-> into a follow-up note.
-
-
-Yours sincerely,
-Vincent Mailhol
+Bart
 
