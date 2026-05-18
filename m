@@ -1,137 +1,167 @@
-Return-Path: <netdev+bounces-288918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SZ1+GFnOCmrv8QQAu9opvQ
-	(envelope-from <netdev+bounces-288918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:31:21 +0200
+	id 4AKULrfPCmoU8gQAu9opvQ
+	(envelope-from <netdev+bounces-288940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:37:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6FA0568D1B
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:31:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D4B568F1E
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:37:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 29333309852D
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:23:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A7FAA305A368
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 08:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D703E317B;
-	Mon, 18 May 2026 08:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703893E3C49;
+	Mon, 18 May 2026 08:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="VD2FMngE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QC/y0LZl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB393E1701;
-	Mon, 18 May 2026 08:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D723E3C46
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 08:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779092608; cv=none; b=Bi8XAVX9breh9Fj8O72xNTnQ11dBngNmsA+PfAcKpXnuhD/1BChmjneP9lhx8/LIqHxXnbW6bQxdhXlsCk/v+EPatznUa9Y0+r/Bf8hYNFUPw31S3373+4twb39vPhe/xR9DV6i0WEOxwzSXAffkxYVCD2BPSaibcuHD3sXfVc8=
+	t=1779092772; cv=none; b=PPhlYT4+qMHoGEmfMu3zOsU+IPz+odMPSZNT4BY5gkyjW5A5vCMBXBAB1axndoBY4WXuzSI/nZ7zkJB2fjPSZkAlZ8XPc1EFp2RwbwgXGLujFBBzNtuWff6wNjGd8nB3s39UqvXE1DV+1maW7HhNbvDvD9BL9yhSBgnfPz/fVnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779092608; c=relaxed/simple;
-	bh=+I23rzg1W1BdTOa/9Lsj69CcgtRcJ5g9YpKlSMdX6A0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WO3Qif66uvrqf+kBdBFm32C8tL0Ntv+66HgmIrV4+dF0z2qJHfw7YSAXKu5loEIT6s328ey3VZ5vJK6/rYUtsL7FoIJsrJR9AtK8QYl16AMiBksybRVOPc8ip6eqyRFedLT8D0WpDwlbIZE5hLLgeMzTd2AmrkE+vkTjzxS4FEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=VD2FMngE; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D8A7EA4FBD;
-	Mon, 18 May 2026 10:23:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1779092597; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=YP6KhuJNLz/Nd1TE8cEZQYfvR5G/npigCeJLKAe+Aus=;
-	b=VD2FMngEy2ngsv3+p+D3ZGXPH3hnZwgGOGVi4m1/cScOfJQTEYN6ReHMzBi0Mq4vF1+rEB
-	oU+MsZzJqqKz9Touxme7p5N9Yl+hg2qRIC4MYyflKoiD91i1nzHLs5eEFPJmaRx/dvZwMW
-	4u/6SYhy7s1F6K+gko2IwtdH/KjGqfTNP1lOqup644v8z4i+q3mDfh0TYmrv9biGrwh0m6
-	3ceizbvquM7sg5qeO7IqxccWvFMOQd96xqaTpX2AbvECTkLvRHXzajG1NYdUsgJVAfIxnA
-	lUSccBd/d4Jn/I8FyGFpME59+ngwIZ0KDTgF0ZaOJhM9gLBsw5PN9AaQMLNLLA==
-From: Nicolai Buchwitz <nb@tipi-net.de>
-Date: Mon, 18 May 2026 10:23:10 +0200
-Subject: [PATCH net v2 2/2] net: phy: honor eee_disabled_modes in
- phy_advertise_eee_all()
+	s=arc-20240116; t=1779092772; c=relaxed/simple;
+	bh=ZDLOyJOswmo5RlyF6Yu298Y8xMNBbTt2rTJK+rV5gis=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=QrA6iTn1v5e9V2/Q6sEzGurhenztb+yQyDfz10KNQYwW366JYWhjjjVYaQPPkquBYg4XWlA+j6kACFXYp3+53HyqgRWbpIaF+JiVp3gmN7quPY7AF+8aOhshJkN3JRZSZ7iGOUiB2ZnJS2BDv7o+spXahMg+vAH5ZqhTwyGXqSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QC/y0LZl; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so23400605e9.2
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 01:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779092769; x=1779697569; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=If39ClIckMydOmcpj07jcbSov5r81Hv5FFSYom+H+B0=;
+        b=QC/y0LZljriaOuCoOsyw5IhoDRiChN6l6qnvOdAiBljSLh/Mv7m0yMOJsum1Hsb611
+         GzM94S2FHK38LnGWrUMv34AB28LVNrg7RPtRIaPecGH/XBWkfCBPV5eGGxkiyiLLC339
+         W4NooG0Kx6sz6tmKKqvPWtRVAUOOk85nugbVwSAStxBq5h+Yw97wPODsOGTMkVhPU3k1
+         zTN6im/YOhH9Gr1rtp86QwjDWNAgPNYqjQiJE/x6uhArlvYcFllUXG89Wo9JPVOcD+yM
+         MQCyAY6V+sdiphyB1DEuE8c+W8Ot7QwzGydX77WRJbhN6Rz75jTDe9ozPm2s/WLfaKuq
+         9tAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779092769; x=1779697569;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=If39ClIckMydOmcpj07jcbSov5r81Hv5FFSYom+H+B0=;
+        b=myxdprK5ZDkr6CTNRld4ZjzqzCvNPc3MZO89N+ns+PedGNGhfWtHWPiKy8qeEwY+ZJ
+         LoebNs5mdlkGbK96kwsyw+JopvRcaL3VnkoPaCjfmvQZoXt353mJbXI+nL/d9lTKp1CT
+         PmTKg+QMo3tqbWKxTLkaU65RGF0N44ziHN35+46W5Bm8vGZnaXb4UOmtQgF5dXgFuIx9
+         XUDsMBY0rcs2FQFWAThrAVj/FiwItRdYo2XaNiLx9vCfJQjye2pcV2LQkZNyYXvzgtcr
+         zIDQClvRKFzYbwtIM0H2ab66hfsQ1V3X4q7RcnFkvrnOxQUYOfLZ9O8ckqSkaUsDQDPJ
+         bcBg==
+X-Forwarded-Encrypted: i=1; AFNElJ8jbGpBfO3VCbE5bZd+7poDR2CrGWzVFL4X8LCvJEmIBRh8z8c8aoOfiWdvIfzhtXE1FVawG1Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJr/kDiDFeaNrzMQgOsy/nbGc+/cFXWLaeTCTwFveID97cujsn
+	IiJ16I0GmrZFgD2+78VLB1zeeOL+kFlAD7z+Za5TLxhy+ve6+eW/Z7Dq
+X-Gm-Gg: Acq92OG477V7xVxRFGQtIbnvasRGlfiEQl89lmL+K8ZXYPyi8DzCotKr01NYxsj4ayf
+	ByA62F7kXx2RWAJvxlB1fw1l6UHpg6Y2kybxzTPnmjQGov72vBHZJ/DqdQKUiGRLYQVYkeDAhKu
+	4EliI8yTrEzG48MemgfEMvHFc2dQo8vbXIHGcbqVfk3jw8q43qiwBhZFDdOX5SEbHxNrtjdUxRO
+	Jn32bp1CHaUSxwW5O4HbEyeoJgAmB1Nh6VXdpPyUaHkU125v1p52dVRuYlpd+8GGWlWy6xoVAem
+	4VATXRe2hQ0ze1IcKD1isGoftZ43EpEE1HCdzXGK6algSPoDyJX+nAhZakL3mh2gMoZNJhdaZK2
+	H2jZx0wwAQ/xDqPrx61kx4xiMd9y3M6vI4qnEbCbQbsPpPFJ/YuWBNy+FT70H3ks51gZ4xiIVJB
+	A9J6l1QsdJr6ocMI6378e//BDyD/As9yAy8y/KS7qcuMw=
+X-Received: by 2002:a05:600c:8905:b0:48e:5d91:cffb with SMTP id 5b1f17b1804b1-48fe60e7d6emr173167515e9.10.1779092769255;
+        Mon, 18 May 2026 01:26:09 -0700 (PDT)
+Received: from localhost.localdomain ([41.116.1.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9adc2209sm32834085f8f.0.2026.05.18.01.26.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 01:26:08 -0700 (PDT)
+From: =?UTF-8?q?G=C3=BCnther=20Muller?= <gunther.muller2008@gmail.com>
+To: steffen.klassert@secunet.com
+Cc: =?UTF-8?q?G=C3=BCnther=20Muller?= <gunther.muller2008@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] xfrm: fix missing headroom check in xfrm_dev_direct_output
+Date: Mon, 18 May 2026 10:23:30 +0200
+Message-Id: <20260518082330.11483-1-gunther.muller2008@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260518-devel-phy-support-eee-fix-v2-2-05b52626fa68@tipi-net.de>
-References: <20260518-devel-phy-support-eee-fix-v2-0-05b52626fa68@tipi-net.de>
-In-Reply-To: <20260518-devel-phy-support-eee-fix-v2-0-05b52626fa68@tipi-net.de>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Nicolai Buchwitz <nb@tipi-net.de>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: C6FA0568D1B
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 98D4B568F1E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288918-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
+	FREEMAIL_CC(0.00)[gmail.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288940-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[gunthermuller2008@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-phy_advertise_eee_all() copies supported_eee into advertising_eee
-unconditionally, overwriting any filtering applied during phy_probe()
-based on DT eee-broken-* properties or driver-populated
-eee_disabled_modes. genphy_c45_ethtool_set_eee() calls this helper
-when user space passes an empty advertisement, undoing the filtering.
+Ensure the skb has enough headroom for the hardware offload device's
+hard_header_len. If the headroom is insufficient (e.g., when routing
+through certain virtual or tunnel devices), __skb_push() underflows
+skb->data below skb->head, causing silent memory corruption.
 
-Apply the same eee_disabled_modes mask in phy_advertise_eee_all() so
-the filtering survives the copy, matching the pattern in phy_probe()
-and phy_support_eee().
+Fix this by using skb_cow_head() to dynamically expand headroom if
+needed, and switch to the checked skb_push() variant.
 
-Fixes: b64691274f5d ("net: phy: add helper phy_advertise_eee_all")
-Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+Fixes: 5eddd76ec2fd ("xfrm: fix tunnel mode TX datapath in packet offload mode")
+
+Signed-off-by: Günther Muller <gunther.muller2008@gmail.com>
 ---
- drivers/net/phy/phy_device.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/xfrm/xfrm_output.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 83b074bc4a8f716b3e10c8ff57aff7c7abba0236..3370eb822017b264cfc26881b0eade8a49e1530f 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -2877,7 +2877,8 @@ EXPORT_SYMBOL(phy_advertise_supported);
-  */
- void phy_advertise_eee_all(struct phy_device *phydev)
- {
--	linkmode_copy(phydev->advertising_eee, phydev->supported_eee);
-+	linkmode_andnot(phydev->advertising_eee, phydev->supported_eee,
-+			phydev->eee_disabled_modes);
+diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+index cc35c2fcbb..35f974d209 100644
+--- a/net/xfrm/xfrm_output.c
++++ b/net/xfrm/xfrm_output.c
+@@ -649,7 +649,10 @@ static int xfrm_dev_direct_output(struct sock *sk, struct xfrm_state *x,
+ 	 * to netdevice.
+ 	 */
+ 	skb->dev = x->xso.dev;
+-	__skb_push(skb, skb->dev->hard_header_len);
++	err = skb_cow_head(skb, skb->dev->hard_header_len);
++	if (err)
++		return err;
++	skb_push(skb, skb->dev->hard_header_len);
+ 	return dev_queue_xmit(skb);
  }
- EXPORT_SYMBOL_GPL(phy_advertise_eee_all);
  
-
 -- 
-2.51.0
+2.39.5
 
 
