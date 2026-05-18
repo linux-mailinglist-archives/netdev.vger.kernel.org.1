@@ -1,212 +1,238 @@
-Return-Path: <netdev+bounces-289034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kLgHADsGC2rt/QQAu9opvQ
-	(envelope-from <netdev+bounces-289034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:29:47 +0200
+	id SOMaN+QIC2o0/gQAu9opvQ
+	(envelope-from <netdev+bounces-289041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:41:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DE1256CA98
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:29:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0AA56CDDE
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 14:41:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8E23F302E933
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:27:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3025C3036482
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FB940B6EB;
-	Mon, 18 May 2026 12:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C299740FDA7;
+	Mon, 18 May 2026 12:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="ATutRfXn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OXKie+Xz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAB4405849
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 12:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F06B40DFCA
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 12:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779107214; cv=none; b=izzlIteuK51jwKfC1yTWgXgjMMRygB8XqmrPFh110aEA4djm+w8avRrUj1KlFwEddKlin7WiFcoY3NcPA+YOEa+b2YzSxIDcpI18JIHXCnOmZwIVRVKjON9UEwKznD9bXO2ceKbA+mD3omqTynz3RYmqxP59boEtf6OzlDcK03s=
+	t=1779107341; cv=none; b=k3rzYZXWr7sAn7k9tNxL1KeFFt5Iki2Ip4ra/1Fj3PWf5MW6nD4BWVSD7eHH8p9eAjqnRZ2rTX/EnI487I9fr8drpKEIT/MY5hmI+F52ggUzXUGMrERRLJoFzcAEJwGQHkmFESRmCbP22YiTE46PLAgc1wLG1IJEnIy20YIvZW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779107214; c=relaxed/simple;
-	bh=aSTIccs+v3BOXNzJps3pGcZ+OSMa6U+1upRu9QgbhdM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GVXXSb03rqwq/MZzxPkk4cgWoKZ5G+ilXEdy1JiYQOSyJs7QK+l46Y3lQ1dBXilww8uiSKNv1e+Dkyu6nf+JCJQ5EPfG6hC8YXT6Xy0rwmp5hQpG3gV7hGpyPVmBB+Ey789kMRD4vEKLBT6EOhTPjpY6Ox1ti3QQaBp8OqVJReo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=ATutRfXn; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4889d0a9df0so2341375e9.3
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 05:26:52 -0700 (PDT)
+	s=arc-20240116; t=1779107341; c=relaxed/simple;
+	bh=x1/KdkH948uDsLZN+TPq8Fn0u85r+3KGQ7Dz/dF0Pf0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZSkvBbksbua9A55VTTEkp0df3Pnu5iOa/dlhNKzf1gsUs+otvGM1otTeifLWc21+7LCwltccBlzzVREImkOVme8TQHQ8Up2QWhdRZJq8NdWhhP91nyNbMOR02xT/kbdjNqWhPhms7nWqbY1iyUFIEjtJZMw+g4s0e3fL2oA9KYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OXKie+Xz; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-44985f4ab0fso1126725f8f.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 05:28:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1779107211; x=1779712011; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=K7f4p9DDizh5dEM+ARpNcE58XjtZwhJ/w+0XvXwelXk=;
-        b=ATutRfXnY+gIvP820ugX6IERpTKx8wkYMtdmDpqClNp1jpIz9cazMnQ/0394O45yV7
-         5UHgs0yl6y6DAIW2zlEMFhCJX6r/wpI9Ju16EmFYmZnKuDg5OiM2an9iN+66Wp62whKV
-         WL3H1fp6jAAlVk56ZAEyOoYHdjcsRTo9ApEGofBYGN9zY08/203ZDnvfGV9zDhv4ODGC
-         kee1dUSUzG7tdtlaX4pqYgZkzBoCx9P/9h8mV9R/MK49EkBMd6c+DMrkUKn5G3wCeqc3
-         7XUzH3EFmjeK+9VqzsvplyjUIFthwRGctUbORHBHTcxFN7J8Qmsp4yMaBqRo+xrSk2Jb
-         no+Q==
+        d=gmail.com; s=20251104; t=1779107338; x=1779712138; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N5HZfTGxzuF7Lu+NtHZ07U4frd9hqPt9a5u2U3vDU68=;
+        b=OXKie+XzykG2MIXPbyRxBwicE8xV7MoLoYj8NShGo3wuwdKfP3uFUw8qLv7O81N4gF
+         UDwfDq5zbyCIo0jzXnwGJx8gG1ZKFww5mgVPEDrmjmeAj2wyluifTc4p9IcUhYE0d/hQ
+         lQEWoHJyytdxY5+tF1UNjv6A7Vei7C8TkXcXzCKqRsnTGsPjIIuD/mxsHCLY4BstwKcY
+         oS/TXgxQqfWZM5HDDfeNkmx4cF6/hQO10dHA85RD5UbnCSvAbACfrHfSgJ8SSdT9vZoW
+         guFeakJCpUqd8Ah0vpUwpesxIWxJlQipU+rOsyaq1f2Sa/kFQEY1veQHBt76CQDB8PAs
+         KjfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779107211; x=1779712011;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1779107338; x=1779712138;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K7f4p9DDizh5dEM+ARpNcE58XjtZwhJ/w+0XvXwelXk=;
-        b=Vo6z5DD7mJ75c8Ae6onOkSxXldb99RFXiaDgwFV/FOZv8ntkVT3x05yKcSJuAA2ZSo
-         NHcCjRMgNT0SU1DZUPYsXnEJixgFa+utuzzAZiXkrgcYAF9Uo0jHlO6SlZylVnVws7D1
-         RzRkUK6ICojCw5i/scThJTyw/ZpNNmHNOHIcUtotJBVyhPEyAQc9TmkxtlKrIsN9J9UR
-         6Y056Pjnw7apovZ/jjAaTphFJTzVf8hHxwwrWMiadiuW36HkGiMcJ94wKC3IrYv1t+pb
-         6vtVVfflDmCdp5gcD8RmKfuttvDecb6EmoH+4epctHoGp7+1H3UqfC4HqGRcb9tKi02e
-         4/hA==
-X-Gm-Message-State: AOJu0Yxjhmgn/PZf0KXgTBO4tIs978E0A1bxa1eFWswKBAqnvNJEJBmh
-	tjZlvCUcwNAgNdYGkD2wUWAX0h2FYBos/0x2zWN8NKsrYbze0/AEd/ENE3YpgzGnm4Y=
-X-Gm-Gg: Acq92OF7H6T3SH6mnJ5EzTN+WMIIvPvL/HrInq7T6ZcyVvJWM3UuM9YkHLFD/kYz/+7
-	6qQNiGpWFWoOlz6cG6HojXDgvAMtr8UvgEHukjjHzZTuF7vVffi45Uskh13JRW5iMGdC168DbpV
-	xrOGJqu+CheUvCUbATyAJneeydhdb2d+2xrlKdPshYCqy0CcpYYc1OdUvj1yMgiiQmJ1q6ZwnHx
-	ZkmteZ1W6mOm3iDApRZjvNMMjO5s73h3nuPS9UILhDDWdqVrdDlLCHhHZuZJfQOtT+smpx8Velw
-	hVWBXbEcgHnByukNuPjNVefMS6YpEwh3Y8ea/UCQn5eiVnmwIXzMyskxJWT+iwwe/clpGrfmb2o
-	lkB7/TU0rq2xwUacKl2eY4JTUh9Gf8+AZ4wWdpUqSuvp1QX1iMMsLiupZuTO9Qm5l72uA9mufNk
-	C6Toajw3Ut0GvhGiE+6+ftfn/mCZaZiOTKiM/CjJgUfMePWhOPgdf3fozZkWbOQJ556fCtq3dYB
-	9Y/
-X-Received: by 2002:a05:600c:3b07:b0:48e:6db5:76e6 with SMTP id 5b1f17b1804b1-48fe63099c6mr122267235e9.2.1779107211132;
-        Mon, 18 May 2026 05:26:51 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe5cab818sm261195405e9.14.2026.05.18.05.26.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 05:26:50 -0700 (PDT)
-Message-ID: <596094fa-4e41-4ffe-9261-47089ff92f74@6wind.com>
-Date: Mon, 18 May 2026 14:26:50 +0200
+        bh=N5HZfTGxzuF7Lu+NtHZ07U4frd9hqPt9a5u2U3vDU68=;
+        b=gCkeDO1YFWpEKlTte4V122l4EfSpVm6GuTm4JJ66wWfPFWwBGsH/oeToVqhWgafi2d
+         f3i7ifyfHBUznow/qWf579X0CBxWLQ831RqCBll6aLBfxwlS/WJh6vUUNWQAUj4IT49d
+         Jh+XWb7N/WQ/mEJN9/hj45CdPveH2nzgDSOg+DKs81+t2+sXYQ6n2oPO0ELRuDb0cGQW
+         IrRmxEKIo3xS9O2g6uuQ4UmLiUf98OqFFYI2yLx82+gPcAHX6C9fJotkbQusQGoyAV5i
+         SBrk9aIsoHK5eLhowQHX9kXYdOL4Qs0ZtniteVWfG0H2oee4ji+e5MOM7tTLRO03RpZY
+         FKdQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+AY3k/hx+wtQMSaabQCwfDg+tGnuYioRcEeJ/7TyQUTDmWnCbFPmEl8L19PMWgCqrfH56HAa4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymVesHPz5PCmY8A6JwmiIPZyfgMRDAVVESq0u6u8t3CKdd/ENZ
+	Sz8N2/WyXfxrMHoyI2Av5TukIT5OzHTQaqa+YEvgFzucuPrR1O0A9h3y
+X-Gm-Gg: Acq92OFASGUDa93lhl+pLexfbC+R6nh529rA5Jx5bFS160Qf+VSvi5aCPqp5FbDGncB
+	Yn67f7eTJKU0M94jJP7zJUy4vF2MZrTo4wGlGbszNrsqHICttlV9mBc0t8wChJ3hDeeEel45Z/1
+	Do2sRMbq4khsf6E2syVlATDoIxpRN1vfS+7Hia2pCmdBdLZwRirG8J4EO1pA9smLqlb3yyijb0X
+	P3wPg9VISqoLF/Z9k2ifoTvvqJK40gkqUoWYP3aNLBboE4CyWkrnS0Rr4n5KEnfKxrRg4xrXnmu
+	6lLeXQE8hWHa69inmvzfBrUxgJWhZ+aQos1T89Vyv21riHuchMKw0NWmsMTwSWkczXL5glxkWTm
+	4D7BEXEatcJxAUXoZwQNLsFQoUVfcRnLHKh7Hq7bw5wa4KqCOAtl5klYyp7sSYclLt7UV+kCyos
+	YB8GWjvYaCBYvWzZYPjq2k7k2vxFgwt0wScMISZxQtbYTSzWhF
+X-Received: by 2002:a05:600c:6211:b0:48f:e230:72fc with SMTP id 5b1f17b1804b1-48fe663152cmr229712275e9.33.1779107337576;
+        Mon, 18 May 2026 05:28:57 -0700 (PDT)
+Received: from mtardy-friendly-lvh-runner.local ([2600:1900:4010:1a8::])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-48ff2cb4ae0sm104304315e9.0.2026.05.18.05.28.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 05:28:57 -0700 (PDT)
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: bpf@vger.kernel.org
+Cc: martin.lau@linux.dev,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	ast@kernel.org,
+	andrii@kernel.org,
+	yonghong.song@linux.dev,
+	jordan@jrife.io,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Mahe Tardy <mahe.tardy@gmail.com>
+Subject: [PATCH bpf-next v6 0/4] bpf: add icmp_send kfunc
+Date: Mon, 18 May 2026 12:28:36 +0000
+Message-Id: <20260518122842.218522-1-mahe.tardy@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net 1/5] net: rtnetlink: fix link nsid reported when the
- link is local
-To: Jiri Benc <jbenc@redhat.com>, Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Adrian Moreno <amorenoz@redhat.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Matteo Perin <matteo.perin@canonical.com>
-References: <20260515201937.2813983-1-i.maximets@ovn.org>
- <20260515201937.2813983-2-i.maximets@ovn.org>
- <20260518082138.37522db0@griffin>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20260518082138.37522db0@griffin>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7DE1256CA98
+X-Rspamd-Queue-Id: 5D0AA56CDDE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com];
-	DKIM_TRACE(0.00)[6wind.com:+];
 	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-289041-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,gmail.com,kernel.org,jrife.io,vger.kernel.org,google.com,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289034-lists,netdev=lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-Le 18/05/2026 à 08:21, Jiri Benc a écrit :
-> Hi Ilya,
-> 
-> IIRC this was added because Open vSwitch needed it. I'd expect most
-> users that need to deal with cross-namespace detection to just switch
-> to the given netns prior to issuing RTM_GETLINK; at least, that's what
-> I'm doing in the tools I wrote.
-> 
-> On Fri, 15 May 2026 22:19:20 +0200, Ilya Maximets wrote:
->> But this doesn't work for link nsid in cross-namespace RTM_GETLINK
->> requests.  For some reason the code checks if the original device
->> and the link are in the same namespace and not if the querier's
->> namespace is the same as the link's.  So the logic becomes:
->>
->> - if NSID is not reported, then the link is in the same namespace
->>   as the queried device.
->> - if NSID is reported, then the link is not in the same namespace
->>   with the queried device.
+Hello,
 
-I don't agree. The expected behavior is to have a IFLA_LINK_NETNSID if the link
-part is not in the same netns as the netdev, see d37512a277df ("rtnl: add link
-netns id to interface messages")
+This is v6 of adding the icmp_send kfunc, as suggested during LSF/MM/BPF
+2025[^1]. The goal is to allow cgroup_skb programs to actively reject
+east-west traffic, similarly to what is possible to do with netfilter
+reject target.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d37512a277df
+The first step to implement this is using ICMP control messages, with
+the ICMP_DEST_UNREACH type with various code ICMP_NET_UNREACH,
+ICMP_HOST_UNREACH, ICMP_PROT_UNREACH, etc. This is easier to implement
+than a TCP RST reply and will already hint the client TCP stack to abort
+the connection and not retry extensively.
 
-> 
-> I'm not sure I would call this a bug; the original idea was to use
-> IFLA_IF_NETNSID to switch to the point of view of that netns but
-> without actually switching to that netns. Hence, the netnsid is
-> relative to the caller's netns but otherwise, you get the same reply as
-> you would if you switched to that netns. If you think about it that
-> way, the current reply is consistent.
-+1
+Note that this is different than the sock_destroy kfunc, that along
+calls tcp_abort and thus sends a reset, destroying the underlying
+socket.
 
-> 
-> I agree the side effects of the self-referential netnsid are
-> unfortunate. But that's an orthogonal problem merely uncovered by
-> IFLA_IF_NETNSID, since, as you correctly note, such netnsid can be
-> created also by other means. This is (AFAICS correctly) fixed by patch
-> 3/5.
-As said in my other reply, getting the self-nsid of a netns isn't complex. An
-application should be prepared to handle this.
+Caveats of this kfunc design are that a program can call this function N
+times, thus send N ICMP unreach control messages and that the program
+can return from the BPF filter with pass leading to a potential
+confusing situation where the TCP connection was established while the
+client received ICMP_DEST_UNREACH messages.
 
-> 
-> So, I would argue both the old and the proposed behavior are valid.
-> I agree that from the point of view you're presenting the proposed
-> behavior is easier to use. Double so since you're arguing from the Open
-> vSwitch POV.
-> 
->> 4. A seemingly read-only RTM_GETLINK request for a different namespace
->>    allocates a self-referential nsid for the current namespace, which
->>    is a little unexpected.
-> 
-> I, however, don't agree with this argument. RTM_GETLINK has always
-> allocated netnsids, even long before the patch adding IFLA_IF_NETNSID.
-> There's nothing special here. You might call the netnsid allocation
-> unexpected but it's been part of this since the very beginning.
-+1
+Initially this kfunc was named icmp_send_unreach but now the interface
+accepts a type parameter to facilitate future extension to other ICMP
+control message types. Only ICMP_DEST_UNREACH and ICMPV6_DEST_UNREACH
+are currently supported.
 
-> 
->> A research across open-source projects doesn't show any projects that
->> rely on the things that are being changed.  I couldn't find any
->> project that uses the reported LINK_NSID with cross-namespace requests.
->> And no projects that use cross-namespace requests seem to even parse
->> the reported LINK_NSID.
-We (6WIND) are using this behavior. It's part of the netlink API.
+v2 updates:
+- fix a build error from a missing function call rename;
+- avoid changing return line in bpf_kfunc_init;
+- return SK_DROP from the kfunc (similarly to bpf_redirect);
+- check the return value in the selftest.
 
-Regards,
-Nicolas
+v3 update:
+- fix an undefined reference build error.
+
+v4 updates:
+- prevent the kfunc to be called recursively and add a test (thanks to
+  Martin).
+- do not fetch dst route when unnecessary (thanks to Martin).
+- extend the test for IPv6 (thanks to Martin).
+- use SK_DROP in examples and use non blocking sockets for testing
+  (thanks to Martin).
+- test when the kfunc returns -EINVAL (thanks to Jordan).
+- add the kfunc to bpf_kfunc_set_skb as suggested by Alexei.
+- guard the IPv4 parts with IS_ENABLED(CONFIG_INET).
+- fix a wrong initial value for client_fd (thanks to Yonghong).
+- add documentation to the kfunc.
+- to Jordan: I couldn't include <linux/icmp.h> because of redefines from
+  <network_helpers.h>.
+
+v5 updates:
+- kfunc name is now icmp_send and takes the control message type as
+  parameter for future potential extension (daniel)
+- drop the net patches to route packet since now the kfunc is limited to
+  cgroup_skb and tc progs (daniel & martin)
+- linearize skb headers (sashiko)
+- zero SKB control block (sashiko)
+- bind to port 0 instead of fixed port (sashiko)
+- poll to wait for POLLERR event (sashiko)
+- do not use ASSERT_EQ in CMSG_NXTHDR loop (sashiko)
+- fix comment about byte order (sashiko)
+- fix endianness IP address issue (sashiko)
+- add forgotten cleanup_cgroup_environment (sashiko)
+- let packets pass in recursion test (sashiko)
+- clarify evaluation order for recursion test (sashiko)
+
+v6 updates (all from sashiko):
+- bring back the net patches to route packet since tc ingress needs it.
+- rename the ip_route_reply helpers from fetch to fill.
+- call pskb_network_may_pull on the cloned pkt.
+- check explicitly that we received one and only one ICMP err ctrl msg.
+
+[^1]: https://lwn.net/Articles/1022034/
+
+Link to v5: https://lore.kernel.org/bpf/20260515194746.50920-1-mahe.tardy@gmail.com/
+
+Mahe Tardy (6):
+  net: move netfilter nf_reject_fill_skb_dst to core ipv4
+  net: move netfilter nf_reject6_fill_skb_dst to core ipv6
+  bpf: add bpf_icmp_send kfunc
+  selftests/bpf: add bpf_icmp_send kfunc tests
+  selftests/bpf: add bpf_icmp_send kfunc IPv6 tests
+  selftests/bpf: add bpf_icmp_send recursion test
+
+ include/net/ip6_route.h                       |   2 +
+ include/net/route.h                           |   1 +
+ net/core/filter.c                             | 118 ++++++++++
+ net/ipv4/netfilter/nf_reject_ipv4.c           |  19 +-
+ net/ipv4/route.c                              |  15 ++
+ net/ipv6/netfilter/nf_reject_ipv6.c           |  17 +-
+ net/ipv6/route.c                              |  18 ++
+ .../bpf/prog_tests/icmp_send_kfunc.c          | 218 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/icmp_send.c |  99 ++++++++
+ 9 files changed, 474 insertions(+), 33 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/icmp_send.c
+
+--
+2.34.1
+
 
