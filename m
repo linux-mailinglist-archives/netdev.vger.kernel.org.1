@@ -1,133 +1,204 @@
-Return-Path: <netdev+bounces-289184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289185-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OB2RMgyKC2p1IwUAu9opvQ
-	(envelope-from <netdev+bounces-289184-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:52:12 +0200
+	id 2Bm2G7iLC2p1IwUAu9opvQ
+	(envelope-from <netdev+bounces-289185-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:59:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419B85741F0
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:52:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C241B5742CD
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:59:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2300C303B4D1
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 21:52:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 005383040D9A
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 21:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CA539B4BF;
-	Mon, 18 May 2026 21:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3718D39A7E1;
+	Mon, 18 May 2026 21:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="f/5ydR6c"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="RycZE0jy"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.49])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40C437CD4F
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 21:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779141125; cv=none; b=YPWp6KJH0q7thzESu3YkLvBnbFHCer5UgTyzCp7YXOLYecjf8WbyWXAb8MTLBUBACNQpwvahXy731tHQxQUNu2nyr4krCAztAMhxCaCqU1Cu3O3rQBZ8QfTaRoNtK6RM29fGqJLZf2BeEqJWUQe63EagEdOLN/o3EYm5qLy7GQA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779141125; c=relaxed/simple;
-	bh=gY6/Mi2Ph0U2oA9EYrEwYl85g+5AAoZxZfF+0wOynf0=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=eGSUQ7XshER4Ir4NWdxCYx469fA/8j3uR+OdFyAahGdU9vXeF+jdf4qPgnJ+Ggg3aIISybnjhrVlQ3egZpy5ntOiggcnZpjERtnYDBJtmHg1Tp1nFBZsv3io8ZcIiolU591Zmw+Tt3Tzr2K9z8i/u5hY7NU6y9NeD6VertMsy3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=f/5ydR6c; arc=none smtp.client-ip=148.163.129.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-Received: from dispatch1-us1.ppe-hosted.com (ip6-localhost [127.0.0.1])
-	by dispatch1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 562602C5AD8
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 21:52:03 +0000 (UTC)
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 8D0DE70006C;
-	Mon, 18 May 2026 21:51:56 +0000 (UTC)
-Received: from [192.168.100.159] (firewall.candelatech.com [50.251.239.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id 50CE313C2B0;
-	Mon, 18 May 2026 14:51:54 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 50CE313C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1779141114;
-	bh=gY6/Mi2Ph0U2oA9EYrEwYl85g+5AAoZxZfF+0wOynf0=;
-	h=Date:To:Cc:From:Subject:From;
-	b=f/5ydR6cH3VvOmQXk0ME2YSf4UbO9odhik1yP82DsG6Ix4LH3OMNB4oTurQXAD1kI
-	 HWIOWSZQH0HYcu2CZ8Khwz/0pc9mj1LE9UrrVrx2cxeNaRdZvdxj6x5GnflYYz7C4V
-	 XK4Z2Znfeshx6kHxHL/nz6nqvaN/lic2ZvHSc/zw=
-Message-ID: <e89dd0e7-3eaf-6385-7cfa-5f0079fabc96@candelatech.com>
-Date: Mon, 18 May 2026 14:51:53 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7DE37CD4F
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 21:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779141138; cv=pass; b=GixuoOFaB608b7I/49P4qRH78w0GQp+JQrJXVvfn5eMQSO/UrAZ8m/1nNWZpl0xaLs6DGkomVX9H0+udH6cUkH/5Htm4SsCtIyd9LYpu1JWxya5QO37WKKoAtjTpDzYUhmNAR2gfT2nbgzpkZ8jue11L+RFSfDZjydSaWMYi2UA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779141138; c=relaxed/simple;
+	bh=wzYNpsuSJQmOr8UWHB7d8e38qoMl71WGD4cU2BeSqxI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aXPtMAkKSWd6R4pMRJAUdn9ykjMVOr+0nzV6rEENysfjIU+Dhy2Hv1BVJp3L8GSAovJU5uubO9RLUac45MSPWEaCrWVoQ6BzjZ0yo4rhwY9d7b6D1xG4CNH51XIdiyaN9DyhlvP72J4it9djXvkPRB17YZAyTjQVCagTi/HJygE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=RycZE0jy; arc=pass smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-83538fbd0b2so1093268b3a.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 14:52:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779141136; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kA+mLvl3aufFB1g3FRZ0KzD58IiM9WGC382XQGgo/ijXYJ9fP0oJQIrMxhsya4tlyw
+         eCHGy+oAP/Loo2zJUo0iqbENcbajZBMmuN8UiQOPuo9hqBXlwt4/lDxhBl6qqAWNx1iz
+         FY2srTugmOxOWYR22QPx4KlyKI5S/mesN9kJiYogo4U9Tpx7ZmOuGFH9YGD88vKTdnCw
+         UTLhETtK1OFLWi3rS1Xb/GyjBf9MBArp8guQogw5/teq/XR7XZzzGjZ/1OrlVmLezxEi
+         jxM7O6YEPO49OskTO6uup+3eNxrD3aYSXuNaS4hVmb9//NsDId0xpAaaGhi1xDwxXmLs
+         UWdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=5Mh+/rSs4Uwa0gCEh8gW3uU8389fFhJAZ+ROF0d8ftA=;
+        fh=ecB1J+ACQLZAy3pw+CDnqR5q7+DaSVJ4htLuMCvXIcc=;
+        b=hhNiHzb0e1fd+jEWu6NQ6DQ53W+B4sKKEn7iThuRGXGnoGFVo/P73cHJ4ihybJ9fxl
+         w+2/O//bb+JmEofL76xQxZvyny8UYwLY3jEUGVHJGC2m7Ah7wBJOVnfT560f+wvif/sq
+         rFDWb+w5wjtN9FxQs4RqNM3hiptNajsBuhDQ5Wzc1V0AT9tJgV1y7EIyEv6r98HhpT5Q
+         EAidJ3x1W443ChfEy5FKK+fcATFdbx9YVKDPXpa6yXxj88qjV3taTcSdLdrtKGGSPfWo
+         FHlJZypXEEIjyHxhImLP+UFoh6xGe2ve1uuQN0QjFaZNCFDCr7MRWzFH01mRmr4LjSUb
+         rooQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779141136; x=1779745936; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Mh+/rSs4Uwa0gCEh8gW3uU8389fFhJAZ+ROF0d8ftA=;
+        b=RycZE0jy0GB9eQc7hctjGF5x/JnxGDfOggeYScwg30aEVM3LCs0xAzTe3yfoSD54TM
+         DKjQCus/+RcyTiCbIYITwNYj0E5PjTnmuJsYu9pZN2CE6VNOSWb94/pVTAFfm5lIQqbQ
+         4t4MQNkhX/Rr2I7lxFka0mE8TN8+LIUImQ9MmgMH/PxOkkVO2vSo1LLFHlRj9VLTvPOk
+         lKrWVJ39ixbJzOlNdZY11ybli6O4IzRT5thVmPXzGeLupccDH647nALDKvlP6C8vyY9b
+         7r4FSxJHqMf3HYbvflFxLHrRGtw5rHVpJVuMn/6jjUfYjGDLaF6bHkrvULJ2kizn43Bt
+         qXJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779141136; x=1779745936;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5Mh+/rSs4Uwa0gCEh8gW3uU8389fFhJAZ+ROF0d8ftA=;
+        b=k2/LqKFtHiBe6a9a50QAIYwyiX9KHkYc7RwANrsMQsptUZa32GCpr5m8EEr/tQolfA
+         h7ikPblWsGH6mv/kQIfEz0gNyBg2aeskeUyNMZy3Anmb3l6iffEkklhQG+hfn8NFOBaL
+         h4vA5nEaOQRW6IEICppzFZlErdkL7ovzjLvNpcQ2xvZa4KzmvruPnn+pZwLkrB9GaLlQ
+         TZzmzvGExW3omXv12YjqMZMcHcAVcfs7/pUtn8MtDM45wF4ziQRC4TwcLaSWfwhftzW0
+         W96koeN84x2ZhFXuY3AGUtBtAhyBe34DsF0ucue1jn+vjrxB2ZGp36b25y97nABtiPVi
+         h6yg==
+X-Gm-Message-State: AOJu0YyBFCsMkeCrkIYdeH1GPToiCwA0LxI0/r2CDHLazaO64WJaKHu8
+	n9LYoISMVLfA0jpI1jS1Llf2aOXCAZ4ZkSaF9G8h3LqsLE0iJJ01UwN85xZUsVwJSfPr2z0VvXy
+	WhwdJk+WquR1QpSrnYkKZ+bMD7wYMyKfSqYHa9TOG
+X-Gm-Gg: Acq92OGCVOpjCSEI38ZFtKYC1EGNvIRVDQVhzIrvBWIqj8nqR8+UJY818GwGairUpcZ
+	ZxWC1L4KkuPWhL7HWhir0dxLvIVc1NWo5/735vN5h7LlKO5cARvUXoMeyGMTA/dxl1Z/KpQhSAg
+	gKrlfpl1P7EazMM09z94xNW01kq7MhrN4m5XHLEn9Zs3mx5uveK4z9/CsEjvimPG7f4wn2aEQ0O
+	5P679WzLoArAopEU5mhnx0HG+OUnvxjIjDAvfmZ5m0y+xb2XoUARmCDs2lEo45HTC4nC+eoSIRn
+	AIuw72TT1vQbXvm9JSI=
+X-Received: by 2002:a05:6a00:3d08:b0:81e:b2ba:5b3a with SMTP id
+ d2e1a72fcca58-83f33bc7c26mr17251232b3a.8.1779141135976; Mon, 18 May 2026
+ 14:52:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>
-Cc: John-Paul Powers <john-paul.powers@candelatech.com>,
- netdev <netdev@vger.kernel.org>
-From: Ben Greear <greearb@candelatech.com>
-Subject: Using VRF to limit 'ip monitor' and 'iw event' messages
-Organization: Candela Technologies
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MDID: 1779141117-2ktDxU_chO1D
-X-PPE-STACK: {"stack":"us5"}
-X-MDID-O:
- us5;ut7;1779141117;2ktDxU_chO1D;<greearb@candelatech.com>;13ea00862af1a4a136f3e80d149399ed
-X-PPE-TRUSTED: V=1;DIR=OUT;
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[candelatech.com,none];
-	R_DKIM_ALLOW(-0.20)[candelatech.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+References: <20260514144747.527175-1-jhs@mojatatu.com> <CAM0EoMkthnGFtsmJgj5ibwuFjKg5s8dGOAkJSXUtH4FytG=qtg@mail.gmail.com>
+ <3131c62f-b5c2-4f8e-b2a3-ebb844f800ff@redhat.com> <CAM0EoMkiFap7hARrC9eca4FNdpgXndT9767WpO+2Q2HehWusKQ@mail.gmail.com>
+In-Reply-To: <CAM0EoMkiFap7hARrC9eca4FNdpgXndT9767WpO+2Q2HehWusKQ@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 18 May 2026 17:52:05 -0400
+X-Gm-Features: AVHnY4KMQnBe6JADxPUdHBJUTzxxofDu285GxHRWiMQhHF0q9HyY-_yzJvt1Pvs
+Message-ID: <CAM0EoMkTTXEwddn9Kbp+KsX7eoy-Lhhv=8k_Nc+T0o6_tGVckw@mail.gmail.com>
+Subject: Re: [PATCH net v5 0/9] net/sched: Fix packet loops in mirred and netem
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, horms@kernel.org, jiri@resnulli.us, 
+	stephen@networkplumber.org, victor@mojatatu.com, savy@syst3mfailure.io, 
+	will@willsroot.io, xmei5@asu.edu, pctammela@mojatatu.com, kuniyu@google.com, 
+	toke@toke.dk, willemdebruijnkernel@gmail.com, hxzene@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289184-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	TO_DN_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[candelatech.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-289185-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[greearb@candelatech.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,resnulli.us,networkplumber.org,mojatatu.com,syst3mfailure.io,willsroot.io,asu.edu,toke.dk,gmail.com];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 419B85741F0
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: C241B5742CD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello David,
+On Mon, May 18, 2026 at 9:47=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Mon, May 18, 2026 at 4:14=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> >
+> > On 5/15/26 10:26 PM, Jamal Hadi Salim wrote:
+> > > On Thu, May 14, 2026 at 10:48=E2=80=AFAM Jamal Hadi Salim <jhs@mojata=
+tu.com> wrote:
+> > >>
+> > >> This patchset adds a 2-bit per-skb tc_depth counter that travels wit=
+h
+> > >> the packet. The existing per-CPU mirred nest tracking loses state
+> > >> when a packet is deferred through the backlog or moves between CPUs
+> > >> via XPS/RPS. A per-skb field covers both cases.
+> > >>
+> > >> Patch 1 adds the tc_depth field in a padding hole in sk_buff.
+> > >> Patches 2-3 revert the check_netem_in_tree() fix and its tests,
+> > >> which broke legitimate multi-netem configurations.
+> > >> Patch 4 uses tc_depth to stop netem duplicate recursion.
+> > >> Patch 5 uses tc_depth to catch mirred ingress redirect loops.
+> > >> Patch 6 fixes the infinite loop in the mirred egress blockcast case.
+> > >> Patch 7 fixes an skb leak in early return error scenarios in tcf_mir=
+red_act
+> > >> for redirect (caught by Sashiko [1]).
+> > >> Patches 8-9 add mirred and netem test cases.
+> > >>
+> > >> Changes in v5:
+> > >> - Fix issues in patches 6 and 7 found by Sashiko
+> > >> - Set limit (1000) in root qdisc in test 8c17 to avoid flakiness (Pa=
+olo)
+> > >>
+> > >
+> > > Sashiko has found some issues - we'll be sending a v6.
+> >
+> > I'm likely too late here and I haven't looked into the details for this
+> > series, but please be aware that sashiko(gemini) has a tendency to poin=
+t
+> > out pre-existing issues in surrounding code, sometimes hiding quite wel=
+l
+> > the fact that the issue is pre-existing. The general guidance for such
+> > cases is to address the issue(s) separately with follow-ups.
+> >
+>
+> It's asking for something not very complex - so we'll just add it and
+> send for this time. Next time we'll look into doing followup patches.
+>
 
-We are interested in filtering out iw and ip netlink events for processes bound
-to VRFs.
+Ok, unfortunately a2f6ed7b4873 is conflicting in net-next  and the
+testing branches. I can send it if it won't mess things up.
 
-For instance, Chromium starts spewing errors when we try to run it on a system with many
-network interfaces, we guess because it is being confused by all of the other network devices
-going up and down.
+cheers,
+jamal
 
-I think the crux of the problem is to know if a netlink listener socket is bound
-to a VRF or not, and also to know if the generator of the message is bound to
-a particular VRF.
-
-Do you have any suggestions for how we might go about this?  We'll be happy to post
-the resulting patches for consideration to be included upstream.
-
-Thanks,
-Ben
-
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
-
+> cheers,
+> jamal
+> > /P
+> >
 
