@@ -1,260 +1,159 @@
-Return-Path: <netdev+bounces-288981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288983-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPISNMflCmrO9AQAu9opvQ
-	(envelope-from <netdev+bounces-288981-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:11:19 +0200
+	id j2IuEH/mCmoE9QQAu9opvQ
+	(envelope-from <netdev+bounces-288983-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:14:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id F243156A718
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:11:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1611A56A7F4
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 12:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9410A303B386
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:02:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A8A1C3052EF7
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 10:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DD332936C;
-	Mon, 18 May 2026 10:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0865731F9B8;
+	Mon, 18 May 2026 10:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lj4U2Gk0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TD1fL2/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f201.google.com (mail-vk1-f201.google.com [209.85.221.201])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C4031E82A
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 10:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D3131B830
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 10:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779098503; cv=none; b=Ul7RvBHxUHZ99z9357t5aFkSMdyQfxtMvwO412pWO0aNoEuvWxzQRRIfC6OI186IbMxu7b1i8xGTZVGrCmzGwzrDxNy6KIJCFoM1aOItn3H4n1cmTGSQqnsTZaXPh2b9roWXzPlesnjg1lRbOEKm8Z5G+UdA40766DCB6+WhtU0=
+	t=1779098556; cv=none; b=LK03bGf1kV0Tn0FoMFc7kmGbXBnf363m1692He/vT77aEYvrYuZ6uloFk6Rz4vvre86LjM7/jskc2HgGVavtK6gEPfhm6/pswwYjcOx/7rDrL7B6XiXgTYdFEBdZxXWui9OsT/UFwybI0L/2KIeUNBp1ESn9vhmW47QuTf2pLDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779098503; c=relaxed/simple;
-	bh=+4IEKH4TXYQOE9RkQ8CPBajL8OlptaIodiMwMJEfS04=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sHhotynqWWFL7SqzBGMZRU0vvO1vRjK0NOeYJncHnLX5NoT9MHRKOcH/SNnZxbvZT2asp2JEdWT4YRi56ujNuPuqmJmvQQp5xXmbpVoX8mocUizZashhe/5VfP+idlCV7yy6zOMPeAd8Mkuun8qWynnVH5VhYndFhx3tfJWfm9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lj4U2Gk0; arc=none smtp.client-ip=209.85.221.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-vk1-f201.google.com with SMTP id 71dfb90a1353d-5752402f55aso1073194e0c.2
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 03:01:40 -0700 (PDT)
+	s=arc-20240116; t=1779098556; c=relaxed/simple;
+	bh=DjPX0iLJm5HdjauSG8OjNGuHimq1+bp8IrsTjoCD3LE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OX21t4qzJ664T8A9P6Jc/7deLexDwweFRYH14vnUho6lRy5Ogf1DpTI8kORKbqyC39nYykAe9aMnBzH8AS763cx1ntR0s8n1b8Z5b69gIuPY+P4LVAF0/kAKTNJHCrIZA2n6NUZH/fWT8hs9mA4tUr30vZrImLRFB12zLQIxkOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TD1fL2/h; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a8e33556c0so2705243e87.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 03:02:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779098499; x=1779703299; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZKjj/nIpnkj9FtvcO0L8vwOF8zvejZPfy7qESYcgRw=;
-        b=lj4U2Gk0StW6ebDUHSeUiFDu54OiaVfl/joPpo5ULKfu6hwbQ987KA/6EnaXp0h3rF
-         XjlM6rz5bJZWXktGfH/Cghg9uuoiVOfpU9DYGvb9PAmRCkHOd+qwtbiNmgocU3BqqNDv
-         Dxniu3DnKbEM9nA+6IQlGTS4966y+/STF5BMYL+GadgDEIeimSotn9QNdiNlWAVLwPme
-         dW6nFBzyVUcN/IO8b1WVjfvQ1uFuna6WiHa5ZwQgrqCQh+LcL1wvgXTcY5wHkntcylRf
-         FrWxvf1rYOeat6gRc+pqxaen+5juOkLHgOvvfNfoRYLjEFcfEtWsc8XWisy5bKaOLbWb
-         n+0g==
+        d=gmail.com; s=20251104; t=1779098554; x=1779703354; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BN+YMmv9QnScORg4tpVq+mKnF6MQYSJi7uGVyTrlWV4=;
+        b=TD1fL2/h/JDmVytPBKlmEbIzZ/Dpk62bFhV6+2iRmfzfshEjTd/haYYCVdG3UsywdR
+         wrbLuuPsv2v11QawvNstFcr7lXxOXbBaRMGivqCtBbxYbqFxty7PUpwpbvY/x7thvPoM
+         PHHgAxHx0RyioVEcNS9lX9kKZmDguqGHgFL//QSPR8Xi1SK7B5tqO7ibU/OtAXF3BJyw
+         SVrEC25Xo3J2mKyVJYKx1TVY6gqsQnqXHE97HDLbNT2op5JveLnD6yUASETffD2x1nTY
+         10loPMnHIRPWrvKQ473UjiLCbHMuKdoCeoD5Ih1C5mi6ns/XUR6xRsWHeV/qN2u4NYp5
+         coTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779098499; x=1779703299;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZKjj/nIpnkj9FtvcO0L8vwOF8zvejZPfy7qESYcgRw=;
-        b=XCs3EGW5XdRoU0Z7NgFJwsJwanvU0MrmNyr45mCGE85VCEvNSHxpXBOX1UbUwfTsOQ
-         TnjBirENsnz+AvEPs26x7EWGk431GkfsVbs3w+zDBDDJvH7yoaaUH5q79dG/dlhZmIuI
-         tRvVeRuc4WuLOIboJmSO5jPXupyVFCc8i4cbA+JB0LQesKFXUfziCzPy3/iqBpC5L6as
-         DZRoOitHdYyGfqBM537OyiD0WDlpd1UAVaTYC/SWDvb282qOqZshRRxW3ETsVkJlRx9u
-         9dA3ihIRfitIM3OXxIt0q2dUqU9No3J22rxrU+9t0KyghdZY7tVgJ74GIq4FgCDMgTLa
-         khOQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8bS6mJHH8C32N4Tdu0CymjKCEQm0SawWvlDqZ275T/BS6cJX0fZYR2eMAwEW2SANN7+GaLkEU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAMmQcbBHlxiYkr5cQUG4c8JSs96ScXlWNR5h7H8OP4tH61BkG
-	xyj9HOA1hv7t0HDpzgq9UXuyTsKf8a3ZPD43JMftLfqSEIMAquALpQjH6m9h/63zTNLvYYHed5a
-	wrHA03AizZxK9Bg==
-X-Received: from qknqk5.prod.google.com ([2002:a05:620a:8885:b0:910:c453:28])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6122:8f8c:b0:56d:b639:5c0d with SMTP id 71dfb90a1353d-5760c1f3533mr6643161e0c.13.1779098499194;
- Mon, 18 May 2026 03:01:39 -0700 (PDT)
-Date: Mon, 18 May 2026 10:01:34 +0000
-In-Reply-To: <20260518100134.809042-1-edumazet@google.com>
+        d=1e100.net; s=20251104; t=1779098554; x=1779703354;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BN+YMmv9QnScORg4tpVq+mKnF6MQYSJi7uGVyTrlWV4=;
+        b=PdFtlycqFO+C/mYgKrWvGdn4n9g0RSqepHKq05k4tepkAUf7ON4nA/kaGRNFhI7mYA
+         B4bNIB17OEUCt8+MiYzhP4w7B0G4sF+dGDBRaqCBzK/8IAnsaQnhtNxj1PJRtroBN08g
+         bohs6EvXsY/hzPmmbcMUOsbglW3CF1YdkZdlhsaz552xMEAR7BJJZTCCPim3SA68pj/s
+         EZ2lXBKyduOv2TqZ4mPiEWIMV2CrPuICj/fT++DHPcuN2PWCKeeDT2hP3fLNMzjZRpcE
+         VU+J5ImTT8t14cfeXcfKtHjkl2NW2YOjyzUOAO2BsAz/62XqsgRs9IdPcXd+raEYDe3o
+         YcqA==
+X-Gm-Message-State: AOJu0YyqbDM/pqUM38+HFjdgJAWPosullQNbHb2ZL/x5+4Jta3fAAnCN
+	PgQZ+S5vGoRavq6KZeOcZtyfPOT/MdUrMAHnz0OLoEAPuYxLAUD1fxtJ
+X-Gm-Gg: Acq92OGCjIkMn/+jLn+dH5AIzUtxaCfvYw498LnCX622ZkzPLtdiVjLJnpOYNqO4tvv
+	5yyhSmTRk+uwuxYONJL1kUSqO8XMx6jv34s5vnoGr7wB3ufhEphBB2DJo/hUGCVHd24/DeL7JwV
+	t4K0oj60P8pRuPQoCJUO7Ld2sjlCN3qKucWt4yHbcrnMtV8AynF2fY9fHfavxXmn7NkwkGkUV8y
+	TNOMN6PEcNFq1o/XL6vf5UM9x0o5oLQDWV7YTc+JySjSRio3KeSg0PIdDFl3jwfHxz4vs0whPuo
+	ghsMWIT4Dgncrs1d39BKwEQo9O3SZjER6+7DQA1xWUegx71K3WcZgA78h9F1TVLkcGmaSkAQoUL
+	slZne1B65dfWivS9fThkAUF70BTLNc5rKIoD40+K9dI8DSE2dqfVbZuLciayTwhH9T/bDBU0FAf
+	QyDccmO6rCAS+/SNF2QuDfu+3Q
+X-Received: by 2002:a05:6512:3f13:b0:5a4:a85:ba3b with SMTP id 2adb3069b0e04-5aa0e09df5emr3864589e87.19.1779098552997;
+        Mon, 18 May 2026 03:02:32 -0700 (PDT)
+Received: from grain.localdomain ([5.18.255.97])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a91e0ce644sm3193851e87.80.2026.05.18.03.02.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 03:02:32 -0700 (PDT)
+Received: by grain.localdomain (Postfix, from userid 1000)
+	id 373085A005B; Mon, 18 May 2026 13:02:32 +0300 (MSK)
+Date: Mon, 18 May 2026 13:02:32 +0300
+From: Cyrill Gorcunov <gorcunov@gmail.com>
+To: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH v2] ice: Fix wrong dsn read in ice_adapter_put
+Message-ID: <agrjuAlzsV0RqAwU@grain>
+References: <agQ_xZUp3Sq905O_@grain>
+ <20260517125307.287246-1-horms@kernel.org>
+ <ago_YTTWiZs6G8_5@grain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260518100134.809042-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260518100134.809042-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] rtnetlink: do not acquire RTNL for RTM_GETLINK
- with RTEXT_FILTER_NAME_ONLY
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: F243156A718
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ago_YTTWiZs6G8_5@grain>
+User-Agent: Mutt/2.3.1 (2026-03-20)
+X-Rspamd-Queue-Id: 1611A56A7F4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288981-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288983-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gorcunov@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-When RTEXT_FILTER_NAME_ONLY is requested, rtnl_fill_ifinfo()
-is dumping device attributes which do not need RTNL protection.
+On Mon, May 18, 2026 at 01:21:21AM +0300, Cyrill Gorcunov wrote:
+> On Sun, May 17, 2026 at 01:53:07PM +0100, Simon Horman wrote:
+> ...
+> > >  void ice_adapter_put(struct pci_dev *pdev)
+> > >  {
+> > > +	const struct ice_pf *pf = pci_get_drvdata(pdev);
+> > > +	unsigned long index = pf->adapter->index;
+> > 
+> > Is it possible for pf->adapter to be NULL here if the device was probed in
+> > firmware recovery mode?
+> > 
+> > If the device enters firmware recovery mode during ice_probe(), the driver
+> > calls ice_probe_recovery_mode() and skips the ice_adapter_get() allocation.
+> > If the device is subsequently unplugged, the memory-mapped read for the
+> > firmware state register might return 0.
+> > 
+> > This would cause ice_is_recovery_mode() to evaluate to false in ice_remove(),
+> > allowing the normal teardown sequence to proceed and call ice_adapter_put().
+> > Would the unconditional dereference of pf->adapter->index then cause a NULL
+> > pointer dereference?
+> 
+> If we're in recovery mode the ice_remove will not reach ice_adapter_put,
+> instead it will stop service work and just deinit devlink interface, no?
 
-Many shell scripts invoke iproute2 commands specifying a device by
-its name. After this patch, they will no longer add RTNL pressure.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/rtnetlink.c | 70 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 51 insertions(+), 19 deletions(-)
-
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index ae0254f19178735b2805a8189e81a960a49b2858..8fe6260a0feaeea7ba35ddca3c1942f1420aecae 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3468,6 +3468,21 @@ static struct net_device *rtnl_dev_get(struct net *net,
- 	return __dev_get_by_name(net, ifname);
- }
- 
-+static struct net_device *rtnl_dev_get_rcu(struct net *net,
-+					   struct nlattr *tb[])
-+{
-+	char ifname[ALTIFNAMSIZ];
-+
-+	if (tb[IFLA_IFNAME])
-+		nla_strscpy(ifname, tb[IFLA_IFNAME], IFNAMSIZ);
-+	else if (tb[IFLA_ALT_IFNAME])
-+		nla_strscpy(ifname, tb[IFLA_ALT_IFNAME], ALTIFNAMSIZ);
-+	else
-+		return NULL;
-+
-+	return dev_get_by_name_rcu(net, ifname);
-+}
-+
- static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			struct netlink_ext_ack *extack)
- {
-@@ -4187,14 +4202,15 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			struct netlink_ext_ack *extack)
- {
- 	struct net *net = sock_net(skb->sk);
-+	struct nlattr *tb[IFLA_MAX + 1];
-+	netdevice_tracker dev_tracker;
-+	struct net_device *dev = NULL;
- 	struct net *tgt_net = net;
-+	u32 ext_filter_mask = 0;
- 	struct ifinfomsg *ifm;
--	struct nlattr *tb[IFLA_MAX+1];
--	struct net_device *dev = NULL;
- 	struct sk_buff *nskb;
- 	int netnsid = -1;
- 	int err;
--	u32 ext_filter_mask = 0;
- 
- 	err = rtnl_valid_getlink_req(skb, nlh, tb, extack);
- 	if (err < 0)
-@@ -4214,14 +4230,19 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (tb[IFLA_EXT_MASK])
- 		ext_filter_mask = nla_get_u32(tb[IFLA_EXT_MASK]);
- 
--	err = -EINVAL;
- 	ifm = nlmsg_data(nlh);
--	if (ifm->ifi_index > 0)
--		dev = __dev_get_by_index(tgt_net, ifm->ifi_index);
--	else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
--		dev = rtnl_dev_get(tgt_net, tb);
--	else
-+	rcu_read_lock();
-+	if (ifm->ifi_index > 0) {
-+		dev = dev_get_by_index_rcu(tgt_net, ifm->ifi_index);
-+	} else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME]) {
-+		dev = rtnl_dev_get_rcu(tgt_net, tb);
-+	} else {
-+		rcu_read_unlock();
-+		err = -EINVAL;
- 		goto out;
-+	}
-+	netdev_hold(dev, &dev_tracker, GFP_ATOMIC);
-+	rcu_read_unlock();
- 
- 	err = -ENODEV;
- 	if (dev == NULL)
-@@ -4232,25 +4253,35 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (nskb == NULL)
- 		goto out;
- 
--	/* Synchronize the carrier state so we don't report a state
--	 * that we're not actually going to honour immediately; if
--	 * the driver just did a carrier off->on transition, we can
--	 * only TX if link watch work has run, but without this we'd
--	 * already report carrier on, even if it doesn't work yet.
--	 */
--	linkwatch_sync_dev(dev);
-+	if (!(ext_filter_mask & RTEXT_FILTER_NAME_ONLY)) {
-+		rtnl_lock();
-+		/* Synchronize the carrier state so we don't report a state
-+		 * that we're not actually going to honour immediately; if
-+		 * the driver just did a carrier off->on transition, we can
-+		 * only TX if link watch work has run, but without this we'd
-+		 * already report carrier on, even if it doesn't work yet.
-+		 */
-+		linkwatch_sync_dev(dev);
-+	}
- 
- 	err = rtnl_fill_ifinfo(nskb, dev, net,
- 			       RTM_NEWLINK, NETLINK_CB(skb).portid,
- 			       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
- 			       0, NULL, 0, netnsid, GFP_KERNEL);
-+
-+	if (!(ext_filter_mask & RTEXT_FILTER_NAME_ONLY))
-+		rtnl_unlock();
-+
- 	if (err < 0) {
- 		/* -EMSGSIZE implies BUG in if_nlmsg_size */
--		WARN_ON(err == -EMSGSIZE);
-+		WARN_ON_ONCE(err == -EMSGSIZE &&
-+			     !(ext_filter_mask & RTEXT_FILTER_NAME_ONLY));
- 		kfree_skb(nskb);
--	} else
-+	} else {
- 		err = rtnl_unicast(nskb, net, NETLINK_CB(skb).portid);
-+	}
- out:
-+	netdev_put(dev, &dev_tracker);
- 	if (netnsid >= 0)
- 		put_net(tgt_net);
- 
-@@ -7116,7 +7147,8 @@ static const struct rtnl_msg_handler rtnetlink_rtnl_msg_handlers[] __initconst =
- 	{.msgtype = RTM_DELLINK, .doit = rtnl_dellink,
- 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETLINK, .doit = rtnl_getlink,
--	 .dumpit = rtnl_dump_ifinfo, .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
-+	 .dumpit = rtnl_dump_ifinfo,
-+	 .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE | RTNL_FLAG_DOIT_UNLOCKED},
- 	{.msgtype = RTM_SETLINK, .doit = rtnl_setlink,
- 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETADDR, .dumpit = rtnl_dump_all},
--- 
-2.54.0.563.g4f69b47b94-goog
-
+Thinking more I think I got what sashiko meant here: the pullout of the
+adapter when it been in recovery mode already, and reading register state
+is obviously incorrect here too, instead we have to save the state upon
+probing in some flag and use it later. I'll update the patch.
 
