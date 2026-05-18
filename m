@@ -1,222 +1,193 @@
-Return-Path: <netdev+bounces-288857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288858-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iImwEMenCmoi5QQAu9opvQ
-	(envelope-from <netdev+bounces-288857-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:46:47 +0200
+	id GPQqAGSkCmqy4gQAu9opvQ
+	(envelope-from <netdev+bounces-288858-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:32:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943675666E6
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:46:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49785566450
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 07:32:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE12F330C0C6
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:27:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4CDE9301A521
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3AE3A3E68;
-	Mon, 18 May 2026 05:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C463B19D2;
+	Mon, 18 May 2026 05:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="NSoOpmdf"
+	dkim=pass (2048-bit key) header.d=juliahub.com header.i=@juliahub.com header.b="EWEnZj37"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B30C39891D
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 05:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779082002; cv=pass; b=MeyWOVOZ/hcWyvf/xDnpUR5pt/PFFVJnqJwiKl0QQExZNE522b/ZJZcRwsWfzaiAExWoZGrMNb1zk1eiy34iTcjZzDslilCRM6xbAr/5lgRky6Wi+17QBHWQjH7G+hKKnQ7/iUJr73CGu9A/mV4a928JgbF2eBhnNgTfeP2Yeng=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779082002; c=relaxed/simple;
-	bh=6mld/fwCl0781+nplbcVK5Q+Atqveim/XuEkZHQqRYA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pSsZAYQM/fNB+QQVeTobY16Lr5Psq5qAcf9o7Q42pVju9lC1twZuwl13XDNIcxqj7zMCmL9idemNT78QyDcVRzbj0soNnjQ6zLZ9Rw5sMvejyUbYIVEF1lDKz1+zBA/lH5xTxSl4ZcBC4zvUu5qpEOQ9nOGMiU7Un7e53hhFZIQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=NSoOpmdf; arc=pass smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8353c9f24d2so768939b3a.3
-        for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:26:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779081992; cv=none;
-        d=google.com; s=arc-20240605;
-        b=RGn9gYAnW4jTNbL/KdAYgj9jjjBFB8C8mF98sJXPIkWCSVpSyKraumKYjENK8bJP6/
-         DM4vxfYHh18hUI4DORgj/ofJEHXvqIDmoCG6J8sbgOQ+V20kiipAeBaMu2eHgn/W0ak/
-         BDgPtBE/OozcT3Zvx+TGUyWcE4hvfU0AgrtL5p49nsrHGS0LHEuM+ZUy73fOEwXYZ+eJ
-         aOUnSWHWEeVz3tY+rkG4DyEF/LduY+W/YMUgEkDvcXtDBLEjCyJirpaRJHVCfS48g2GR
-         cTPs+V/PVdB25gepGTQXWZ7ZWHTIO/NDfM3jZMbdMw4OlgN/AWmmDgtiUx1ZuZ+hSEsI
-         Ccog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1k7JCzqf21HQ1C00QUFYl3DOKCHggP5kB3fftLNUTDc=;
-        fh=DE1X5eNx5TG1WVnOUxq4D8FRbkcvfrkxOXnYqNNunxs=;
-        b=Ne0rE13YrFlowDs9iohuNaNOFB1Q5YNBOXsW3IwUkwTXR9clKXjdS4M1XcwaiOWXxY
-         Uxm2agVb24yaLIgiMiq/snWdlQkHCLLTNrIqIQfug5yg1G6Cukz/1Fp9y1IpG3UCnWmY
-         TlD4+QpseEH57D5Xpsc9C2siF1tqPQ1BHv5p3LGuthpne0lubZdD2sxtYMpUTPLwOxYu
-         KAjK9MRnTXQWYTHxkyUKK0j1lMxM5fnyv/VLg7DF52gmR8KbT2S+No4jWXdszexhUzDy
-         pGQ9a5QkzsJEWo0F/RbKtILqfYgyf/bEB3/7o7JdMymU1Rv1deLaABe/1xJpkQ38B6Eh
-         Q9xQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C44B3AB26E
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 05:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779082316; cv=none; b=qKP3X1oDiHVzpeoQerFBCPsZTD/cqOIG23A1OqcoHezN6ICIMIn+EfhsRePoMNgl88bJJqehSlM+H9tnMAFlmferU5dEjqDCSSUg8y9+o47ouZvZ+wi5Q5OMIXfBPtMRIE/Q/xruaCOQ7sWTjad4JjncXDk6tJqVGxXEoKGJdH0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779082316; c=relaxed/simple;
+	bh=Ned4ol8vz7Bh1l/p1mUYhTl5oKEAmZypE4u6wrnLdZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=f1Ph7RePk75UMg+vNslAQ6XdVsa71SfFkbCesCdZzNNZIR6+4OzewTu2HXft2re373Grt3N1IcA5bAPjpBvgIMF9+yCqGBPo58+x3gP7yhP9zOPKE6i7gDDizP6y/Wr4Ox0HKrAKqxWfl3IiKXg7+U4eL1TZZy1pGKhGorFGjdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=juliahub.com; spf=pass smtp.mailfrom=juliahub.com; dkim=pass (2048-bit key) header.d=juliahub.com header.i=@juliahub.com header.b=EWEnZj37; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=juliahub.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=juliahub.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-9106ea78cd8so360334385a.3
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 22:31:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1779081992; x=1779686792; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1k7JCzqf21HQ1C00QUFYl3DOKCHggP5kB3fftLNUTDc=;
-        b=NSoOpmdfwayFqmHQKPsw/9vrUhwTmX9yxO/FPGTUQApyXhQNoGQ73AqSFIAYn9GMoA
-         LVG5BV/FsxtaHQvRITGnZWqMoaKlvHsMotPk1VB9XhyIyQC9daAR3OxTbcTSSwkC7Fyw
-         DYDkjttYMbTWlvq21vGa0Sjp4oYbIFTS+5Qinbaxc78yGaLwMpZ/HhwmM0fpr5MTe5AY
-         1eQp1mYvGfYTsrnhpsP7C6fp9vgo2t9tYOoBsyypTsL44uwl9tcNYmSmKg8QwY7lpcN/
-         A0PuClruV7Uz4omIeeCPaMpCp5Ps85LqcMcmyU4vT6+vxEhmJv9RF4j59AjB6Eb7hmZD
-         uhCQ==
+        d=juliahub.com; s=google; t=1779082294; x=1779687094; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YaCqS9VEHADAY4+Ko1Sdf5gqYjwOEBQdqfe6uNonwPQ=;
+        b=EWEnZj37P+dGh9qdL5QCdeRIWmi1qg3dNKetN3BvT8sjOFA2RR8SqDw3eAvachszp5
+         ek0+hMK2W2g8q/bgSrNoe/GfzetpKSOHvjbaxH7IRLkjmOq+KdPRuT4VAil0FfRsBIMb
+         jC5xeLvur3FTN6ygL9l9HFr7THiXx2dZ14Uaqw6AVVenN9lRExKFVORHBErqH23kVgQP
+         6ZoInaQrUZW7j8IPM03Hwg4hofJKG/dkdJJzudUf7IpMiHiGMlBru0zw44MtI8Nd8XUD
+         +Wmao7+A8LRSqLvJJgf5vzMH5N9iiuEJ5lkUJxrnAuA5/oBfCHXCiwPWKB+/ijUFx3nL
+         OQUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779081992; x=1779686792;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1k7JCzqf21HQ1C00QUFYl3DOKCHggP5kB3fftLNUTDc=;
-        b=iFWxfe+kn7Zuba+/RrNVwEMOXDo3yNxvVtH8DQS91AS8yiudStyXj6/lZA8V/pJ+lq
-         +vpn+I9ZUsVNUVg4dlo8BRnM1o0UZTaF80bew9awTv2io4oaXEeniOSc0HcOEVJKzGA8
-         VWx5Ov5TRQQibD65N3q9QHRzAqJwDgifqMHGdtn8DiupJJxY5LAdh91PANLNn4j9lbTo
-         GWasap2Y1UKpHiyp3NSEKifgM0zT95q3a0I7A8UWEgJ7OBpgVEjn8Gw2jvcYg28xukQD
-         uqh1YbnX/Ct7YnP12QKMCAhqF1sRzTVMq4xJJooC+RXFgfaf3ueDtlPt/E2+OQh0dyCN
-         3YCQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8gI7bg8C/Ka/G8+MhWrIjpSBqox7afSFVvMX7cbwXJXnK3Kd+WYgyNKOSU6lTPU1yeOf0DB8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZoyG0hF3EXYdAYUNjsad+xiHwNsMDUcTHG5QldcSWyFLDekYy
-	aazvzYwWdEZGuh9JgCOKgfSMI40MKcQMfyOYbLbZdSZz274KaurlA4V7YRVD0YJlLnFjB3T/uB6
-	pap1EEAJcXImtvaKCW5dTs7QFT7cjuaUuc/ns0jTZ
-X-Gm-Gg: Acq92OEgGPydXk0umHYvTVccqkibYmIDtGBKMtRLxHklnv1Xs4BGtuRDoPRmU6AuraH
-	28okq/XTd9GnlAqVN1nywBNVvRGaaZ1tZ5OPYSMTVabLMEIfc4eF+xZjTTRkpfyiyAPKGpPmFDr
-	+7sOI1zVn1mliTO6tiEmcP6/MhgdeeEie0k+Hklslnt+q3ggJsri47SlY+TlZRXqHR8e7BrY2x3
-	cuqI4/9NGpm/uGg7Euce/J96nS6S3T/7OVF33TArzUqpRL1DLdtQeJypxrnMCtxa8XHpGKM8Ols
-	k0kKN+zJDqG8YlYgow==
-X-Received: by 2002:a05:6a00:4c19:b0:838:af72:fb35 with SMTP id
- d2e1a72fcca58-83f33c32d51mr13485269b3a.10.1779081992086; Sun, 17 May 2026
- 22:26:32 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779082294; x=1779687094;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YaCqS9VEHADAY4+Ko1Sdf5gqYjwOEBQdqfe6uNonwPQ=;
+        b=lLgPuExKT+HUdMkfDsrwl8RP80EsHMeByXLwORi8/ZsWeHwkj60PYvJqzYE9mtUZDj
+         lC3U5pqpAi2i+qOx0onstvsDzmxcgCT7c7VhpA2OJZ+Am5AiXpGUuBRWrDLdKDIO6JYo
+         2/esvNgZiD/XhNbB84F7MFoC2YUpHcYihg0tWf9RbfnANkSjKj/KA0gDCB0S0OgDjpOu
+         oRk7ISR3UnB+1tW5K6yhaWT6s8eDdANXUnVko4UF/9e2ICbpg9cZTXeC2FdjlBFL3+C/
+         ubm9y4nfNZ2gGvRqXngyeD3C74ZGpTi+gEOF5sWZoB/qNQd6blWOJRyx7GC98IS2AQWK
+         MyzQ==
+X-Gm-Message-State: AOJu0YxOdJEX6ZZ3jKYoihQyx+ENEv8T1GivbkxpeCFZl4/9P3JpMZgs
+	jVG8rcU43F8goPjlaUvwdnfgEkH8K/Jo0/DVj3kUknGsjnGfpOhtx4LmUXAoMf/ucP1GBiTd9Q1
+	IAswv
+X-Gm-Gg: Acq92OEAuMw/dOJ4Ipo+Wz9tdi1CRZY949QFDCyZezilgtT6YoFyBRNU0K9UKb/JAA9
+	voNwcFpJMI6wSVCk+VpdA1CdNbrVX/JNUTIByLneSpQXnjvTdADNTRpTnQeHHLhQpvySqLHyhtC
+	HYPdNt7aDzxLTXd2rrIUB5oHDRC/ShsAZs2PNzJQDOgI7bCAecaelQVa+f5IvSnr78r1JFoE7+z
+	ppbc2EyOqMdvsLUoyAJB2rUe0Gq9YXH0+aMyYQ7HmT2TL2IkodzYjXH+NuxLtVGSGUWPxojuPyq
+	hIKUfvhbqJsypcZ0HT3q5h1p0A9gHRD7uXuz/Z+YbSTPnqEb+rAd2wj90ObXaByr5BRni8WrUw3
+	AjP3Q9G4b07S76ZSjlDXFTXfEVHAzJQlXbpmQRfFZQ/uBe/0ov+6Chq1J30Ojz3tvFlK/ZxEoBE
+	QaP1zNzr37wwVV94avU36NEoUYs7ct+j0JHdhzskNN0wBs6nq5KAZc
+X-Received: by 2002:a05:620a:4514:b0:913:7bc8:79b9 with SMTP id af79cd13be357-9137bc88256mr898007585a.22.1779082293918;
+        Sun, 17 May 2026 22:31:33 -0700 (PDT)
+Received: from juliahub.com ([66.31.114.203])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-910ba36e1acsm1381641185a.3.2026.05.17.22.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 22:31:33 -0700 (PDT)
+Date: Mon, 18 May 2026 01:31:31 -0400
+From: Keno Fischer <keno@juliahub.com>
+To: netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] mlxsw: spectrum_ethtool: expose per-PG rx_discards
+Message-ID: <agqkMwgM1PdkyMUR@juliahub.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260511062138.2839584-1-xmei5@asu.edu> <deb3e868-456c-43a6-886f-9d882d23975f@redhat.com>
- <agW4kfDB5JjpPD-r@linux.alibaba.com>
-In-Reply-To: <agW4kfDB5JjpPD-r@linux.alibaba.com>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Sun, 17 May 2026 22:26:20 -0700
-X-Gm-Features: AVHnY4I5pKhATjXOWintNEChLSk7L138mcEGY8bdVrCg4bjT2d8_2rfJtytM1cw
-Message-ID: <CAPpSM+Q+pZkKFv97+1R0kYZud6Mjz-v8qMKP+dg4TO=W=LfauA@mail.gmail.com>
-Subject: Re: [PATCH net] net/smc: reject CHID-0 ACCEPT that matches an empty
- ism_dev slot
-To: dust.li@linux.alibaba.com
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, alibuda@linux.alibaba.com, 
-	sidraya@linux.ibm.com, wenjia@linux.ibm.com, ubraun@linux.ibm.com, 
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, bestswngs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 943675666E6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Rspamd-Queue-Id: 49785566450
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[juliahub.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[juliahub.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,linux.alibaba.com,linux.ibm.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-288857-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[juliahub.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-288858-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[keno@juliahub.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,alibaba.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,juliahub.com:email,juliahub.com:mid,juliahub.com:dkim]
 X-Rspamd-Action: no action
 
-Thanks for the information. I just got back from a trip, and I'll send
-a v2 after checking the UAF issue.
+PPCNT group 0x10 (per-priority counters) carries an rx_discards field at
+offset 0x78. These counters aggregate up into if_in_discards, but don't
+show up anywhere else. Since there are many things that aggregate into
+`if_in_discards`, having these counters helps distinguish what caused
+those discards (in my case they were caused by headroom buffer overruns
+due to inappropriately configured buffer sizes).
 
-On Thu, May 14, 2026 at 4:57=E2=80=AFAM Dust Li <dust.li@linux.alibaba.com>=
- wrote:
->
-> On 2026-05-14 12:19:46, Paolo Abeni wrote:
-> >On 5/11/26 8:21 AM, Xiang Mei wrote:
-> >> On the SMC-D client, slot 0 of ini->ism_dev[]/ini->ism_chid[] is
-> >> reserved for an SMC-Dv1 device. smc_find_ism_v2_device_clnt()
-> >> populates V2 entries starting at index 1, so when no V1 device is
-> >> selected slot 0 is left in its kzalloc()'ed state with ism_dev[0] =3D=
-=3D
-> >> NULL and ism_chid[0] =3D=3D 0.
-> >>
-> >> smc_v2_determine_accepted_chid() then matches the peer's CHID against
-> >> the array starting from index 0 using the CHID alone. A malicious
-> >> peer replying to a SMC-Dv2-only proposal with d1.chid =3D=3D 0 matches
-> >> the empty slot, ini->ism_selected becomes 0, and the subsequent
-> >> ism_dev[0]->lgr_lock dereference in smc_conn_create() faults at
-> >> offsetof(struct smcd_dev, lgr_lock) =3D=3D 0x68:
-> >>
-> >>   BUG: KASAN: null-ptr-deref in _raw_spin_lock_bh+0x79/0xe0
-> >>   Write of size 4 at addr 0000000000000068 by task exploit/144
-> >>   Call Trace:
-> >>    _raw_spin_lock_bh
-> >>    smc_conn_create (net/smc/smc_core.c:1997)
-> >>    __smc_connect (net/smc/af_smc.c:1447)
-> >>    smc_connect (net/smc/af_smc.c:1720)
-> >>    __sys_connect
-> >>    __x64_sys_connect
-> >>    do_syscall_64
-> >>
-> >> Require ism_dev[i] to be non-NULL before accepting a CHID match.
-> >>
-> >> Fixes: a7c9c5f4af7f ("net/smc: CLC accept / confirm V2")
-> >> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> >> Assisted-by: Claude:claude-opus-4-7
-> >> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> >> ---
-> >>  net/smc/af_smc.c | 3 ++-
-> >>  1 file changed, 2 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> >> index 185dbed7de5d..12ea3b6dbc64 100644
-> >> --- a/net/smc/af_smc.c
-> >> +++ b/net/smc/af_smc.c
-> >> @@ -1400,7 +1400,8 @@ smc_v2_determine_accepted_chid(struct smc_clc_ms=
-g_accept_confirm *aclc,
-> >>      int i;
-> >>
-> >>      for (i =3D 0; i < ini->ism_offered_cnt + 1; i++) {
-> >> -            if (ini->ism_chid[i] =3D=3D ntohs(aclc->d1.chid)) {
-> >> +            if (ini->ism_dev[i] &&
-> >> +                ini->ism_chid[i] =3D=3D ntohs(aclc->d1.chid)) {
-> >>                      ini->ism_selected =3D i;
-> >>                      return 0;
-> >>              }
-> >
-> >Patch LGTM, thanks!
-> >
-> >@smc maintainers, please note that sashiko reviews:
-> >
-> >https://sashiko.dev/#/patchset/20260511062138.2839584-1-xmei5%40asu.edu
-> >
-> >pointed to another pre-existing issue in this area you may want to addre=
-ss.
-> >
-> >/P
->
-> I agree. Apologies, I overlooked your comments prior to replying to
-> Xiang Mei's patch.
->
-> Best regards,
-> Dust
+Of note, from emperical testing, these counter are per-"priority group"
+(PG) not per-"switch priority". It's a bit confusing, because the rest
+of these counter are per-"switch priority" and the header file calls
+these "Per Priority Group Counters". However, that should be read as
+"(Per Priority) Group Counters", not "Per (Priority Group) Counters".
+
+I attempted to distinguish this in the counter naming by calling these
+`rx_discards_pg_N` rather than `rx_discards_prio_N` (which is the
+naming scheme of the other counters in this PPCNT group).
+
+I will also note that the mlx5 driver (which already has this counter)
+uses the schme `rx_prioN_discards` (and same for the other counters
+in this group). However, I was unable to determine whether the mlx5
+counters behave the same as the mlxsw counters with respect to PG
+mapping. An attempt to remap to a different PG there did not change
+which counter incremented, but the mlx5 configuration code is quite
+different, so it's possible the remapping needs to be done differently.
+
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Keno Fischer <keno@juliahub.com>
+---
+ drivers/net/ethernet/mellanox/mlxsw/reg.h              | 8 ++++++++
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c | 4 ++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/reg.h b/drivers/net/ethernet/mellanox/mlxsw/reg.h
+index 3bb89045eaf5..01fcbd1c8d01 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/reg.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/reg.h
+@@ -5651,6 +5651,14 @@ MLXSW_ITEM64(reg, ppcnt, tx_pause_duration,
+ MLXSW_ITEM64(reg, ppcnt, tx_pause_transition,
+ 	     MLXSW_REG_PPCNT_COUNTERS_OFFSET + 0x70, 0, 64);
+ 
++/* reg_ppcnt_rx_discards
++ * Per-PG (ingress priority group) drop count.
++ * index slot is the PG, switch priority.
++ * Access: RO
++ */
++MLXSW_ITEM64(reg, ppcnt, rx_discards,
++	     MLXSW_REG_PPCNT_COUNTERS_OFFSET + 0x78, 0, 64);
++
+ /* Ethernet Per Traffic Class Counters */
+ 
+ /* reg_ppcnt_tc_transmit_queue
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
+index 0a8fb9c842d3..7f78b1ef61cc 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
+@@ -542,6 +542,10 @@ static struct mlxsw_sp_port_hw_stats mlxsw_sp_port_hw_prio_stats[] = {
+ 		.str = "tx_pause_duration_prio",
+ 		.getter = mlxsw_reg_ppcnt_tx_pause_duration_get,
+ 	},
++	{
++		.str = "rx_discards_pg",
++		.getter = mlxsw_reg_ppcnt_rx_discards_get,
++	},
+ };
+ 
+ #define MLXSW_SP_PORT_HW_PRIO_STATS_LEN ARRAY_SIZE(mlxsw_sp_port_hw_prio_stats)
+-- 
+2.54.0
+
 
