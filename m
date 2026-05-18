@@ -1,146 +1,173 @@
-Return-Path: <netdev+bounces-289103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289104-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLzXDJ4xC2oZEgUAu9opvQ
-	(envelope-from <netdev+bounces-289103-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:34:54 +0200
+	id SIouCf0yC2qgEgUAu9opvQ
+	(envelope-from <netdev+bounces-289104-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:40:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA3CC570128
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:34:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B335457026F
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 17:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE812306BCCD
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:30:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BB173057749
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 15:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0FC3EFD02;
-	Mon, 18 May 2026 15:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F2F3F54D8;
+	Mon, 18 May 2026 15:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DwZqROts"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tA1IA9X4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE153F076F;
-	Mon, 18 May 2026 15:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E17A2F7F06
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 15:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779118183; cv=none; b=exknd1zBqcU6Ne6V/wzA1Go+FmSdZWGiw7CVS6AY780tlOqy8D16kyfjVg9KfGdB7JM1bWPZo9LumJ84yEWtjWUOKJnf50OqYhsneU7i5eEZWlK6PPFYkZONsoP4R07jOqS9WIQW2XMbqZlzQmzuUUSLdHVNYYAQQZ3AO8o4IrA=
+	t=1779118478; cv=none; b=hlDoI7QwbcSvDSh3GIB4NRhxqQZ6GbyIEbt8cr8d7kCPZKMTvhOalB3axh6gkY7ce51Z4AyDC07tHZj5nI5WLnygGziCZIO4LJ9mqZatXbDG70ezWXjSQTW4r0KflB7mIeUoseXNqQEJw5DEFSZgLx8UeGZfY3aEv6B6vt6NEdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779118183; c=relaxed/simple;
-	bh=sG79W+MkJg5APZjQ0IZO8BppN8H3r5aAnNzI61jDF3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GpvCWr+J1D5vOwsL9P8R+ucqn97HHCe1Fdo4XbTDXNNbP6w0V+Bu5Baq8H9gBN9jiarB6R5zjhXTtd9ESTjr0rRzw8Hwh9UEuuwjeVq5Z7ffbQ+MetDLcovvw1xComT42x7SJEEmE9EE2GaC+AIH7ijGXJcomZH8XpifgKImJsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DwZqROts; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 022C5C2BCB8;
-	Mon, 18 May 2026 15:29:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779118182;
-	bh=sG79W+MkJg5APZjQ0IZO8BppN8H3r5aAnNzI61jDF3c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DwZqROts39mMfmYdvXCT4HPiFfhe7pphuh2eDKH6Wk1FhbfIuLFoJAzIV1w6dNRkv
-	 gS8cb8Xmb9xkOCt1qVIvLGgvmZE6oe/kQRj9Y6tOcK3J7+SZnfUwT+d+1JQHBnsM7k
-	 y3T2EZLmM1+zyp9NgHNPRUHvt0LY1DRZbWBLEBpI5BZTxG52678vBTHhYBIh0DFCr2
-	 oQc7xvwwanHA8iVLjTvBSa4aPqcGU3EOVTPRsiGop7Ajz+J42dwFVmK6swcGn2j3CX
-	 P6VUm6NFcP5DRUG3+5LkZrUBKtbe441Fuid0F7nbIj+YzyFabtEFqfwvMKgxkES4aO
-	 fEdY++PK5+AOg==
-Date: Mon, 18 May 2026 16:29:21 +0100
-From: Jonathan Cameron <jic23@kernel.org>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
- workflows@vger.kernel.org, linux-arch@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
- linux-iio@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
- linux-csky@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
- <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Daniel
- Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Alex Shi <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, Dongliang
- Mu <dzm91@hust.edu.cn>, Hu Haowen <2023002089@link.tyut.edu.cn>, Dinh
- Nguyen <dinguyen@kernel.org>, Kees Cook <kees@kernel.org>, Oleg Nesterov
- <oleg@redhat.com>, Will Deacon <will@kernel.org>, "Aneesh Kumar K.V"
- <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Nick
- Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Vinod
- Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>, Dave Penkler
- <dpenkler@gmail.com>, Andi Shyti <andi.shyti@kernel.org>, David Lechner
- <dlechner@baylibre.com>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy
- Shevchenko <andy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo
- Pieralisi <lpieralisi@kernel.org>, Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?=
- <kwilczynski@kernel.org>
-Subject: Re: [PATCH] nios2: remove the architecture
-Message-ID: <20260518162921.73e7c3aa@jic23-huawei>
-In-Reply-To: <20260518042833.272221-1-enelsonmoore@gmail.com>
-References: <20260518042833.272221-1-enelsonmoore@gmail.com>
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1779118478; c=relaxed/simple;
+	bh=tbBqVl2Rwq+ug/3pxcSsXUY2Omq/LcBl+AADnhVJGJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EGMzSdXaOczI2w+JSPhkIgJUnpXqj0v7Q2jJxeWy+ldtL7xXa4uovMFIU1KZa2lvGhCssYkWWC9pGHrBctqswh8a5dcBRYKAWKhFZLTnckB9hL9K0PL82jGjbWmnFHTNp3QIKpwPa6LJftaCYxT+TAr4o2KYfbpXzAPv4hOIRFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tA1IA9X4; arc=none smtp.client-ip=209.85.128.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-7c307937816so17061147b3.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 08:34:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779118476; x=1779723276; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yQbyMvz6XLiuRTxyqtiLM3EHuxR7kEEq3JV9iEUFgR8=;
+        b=tA1IA9X4xgPK8efiksGsoB8Im0KF2PQUOu2+0Oe+VxGUj4fbZ0cxjWBgPRwVgT5dIm
+         dWQj+f3pq/uQxeuFhtbTPAGXgNyuxFfdo3yo6pphc/0kl0DQwBjbMJRIEPLC8/ukX3A5
+         sWet9IW6xWB1MFtEQpFsF6kxrSTYbyBcOaorUaLa8dlfvuTYZCccmCt4u+do+QjWgd7t
+         j3U0V3aRsTfmrqpCz3ZNIowJRLQBf2vLzGNrDUSASSRu19hNkl8BRpS4+2wzQJBPnPei
+         5e4KqjEx5GFfyrReQuo1s9vWiRiff95nbndkC14jDGzZp6nSO4dMyeJjnoX+b2qFQKLX
+         oHkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779118476; x=1779723276;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yQbyMvz6XLiuRTxyqtiLM3EHuxR7kEEq3JV9iEUFgR8=;
+        b=ZPG3ISk6oJDvgeLYtKzhIaDC2eXuWhAFKmasKsHoUR+sr8ZauL8rz8/v2dxZY7lM3h
+         Oq2k+BqbgHnRKxIa0F9VGSAk1zsF5RME0SU2v+pzFVWRPivX9BJU/Hm9lobb3XW+4/+w
+         NOyerijckvI2+ChNXSsqom+Xu6x8Ni0NUn+S0cwG/MqwOl62Fqn5IJQsyK2yX7Y+/k4N
+         9KwzoK3XwTj0v08MeDKn2cW3Zl+npgyJXFac3azVTwLDCn1w9hrH4rQtOgapQuIYToYK
+         n0xa9ojKtm1LeszcXF1VdNDu0lVmPsWkGIt7GUys3pE1VxeuYO9GK8dhdbqb1FtjNV3B
+         vp7Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/iuz3IKfKf85KFih8AFWCf2BE46B+l04PVGWQPdlOyWGf27Csv7qA0D85/jyevQUzXi6Oi0l0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP7xTu+InkUpW6VdihIjGIoZLUEYCav5PDcglF6kUX0EcFPT/I
+	OzNTuVI5yLsoJYl05x01Z9/I+TZlFoN/Xdu7wnARJjfnQlkOdyD71Z00
+X-Gm-Gg: Acq92OEd4J4+xhpTpGnDcOUk85Zmf+Rkez0fP+9tJyEStRQkRA9eLzzwWoUdaC0H9X5
+	wKEY3EtNKYHiK9VqA7YsvuAB11kMC/wDCe4CHlweJXyeilJZVtXgiOwpd9a5AXn+M7m8YeQ7rIL
+	qJdnYfUJVMM6ZC/kDqoRZJwQaMoKakGNUOk1B7+jJDhTUnhpiT6pLZmmDyifwlC0K7BsocEaW09
+	NKUtrmMlLAzqWkN+DMr3yApbjD9p4lUFkx9KzeO4dYkU/Ss5pN42M8eP7HISLjb3XDy8cjcIAv5
+	CkDU24a9bYEmW4h428TPWgb3EZfvz9AHJNrSifVnYhxEPlBZdoFXhbWU/uD8U0oqbpOJr4mKoMS
+	7ko7EdA0CsDecer9/UM4fE2iW0EMhnY2HuLR6sfJtgoKRtsriUkkOme+uxYzeoor80AdhviBe3X
+	oqfyHJLlSVCdXm7ukkm6uSl7P2uHs=
+X-Received: by 2002:a05:690c:c1a:b0:7b8:bc4e:a54 with SMTP id 00721157ae682-7c95c7edf69mr180168827b3.29.1779118475483;
+        Mon, 18 May 2026 08:34:35 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:5f::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc9bc0eff6sm22692987b3.23.2026.05.18.08.34.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 08:34:35 -0700 (PDT)
+Date: Mon, 18 May 2026 08:34:34 -0700
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, willemb@google.com, kuniyu@google.com, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	jolsa@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next 5/6] bpf: enable bpf timestamping rx in TCP layer
+Message-ID: <agsxE575ri8iLgxM@devvm7509.cco0.facebook.com>
+References: <20260518082344.96647-1-kerneljasonxing@gmail.com>
+ <20260518082344.96647-6-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260518082344.96647-6-kerneljasonxing@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-289103-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289104-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jic23@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lwn.net,linuxfoundation.org,kernel.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,gmail.com,infradead.org,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,vger.kernel.org,tencent.com];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gnu.org:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,altera.com:url,sourceware.org:url]
-X-Rspamd-Queue-Id: CA3CC570128
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,devvm7509.cco0.facebook.com:mid]
+X-Rspamd-Queue-Id: B335457026F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 17 May 2026 21:28:33 -0700
-Ethan Nelson-Moore <enelsonmoore@gmail.com> wrote:
+On 05/18, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Add two if statements to accurately isolate bpf timestamping and so
+> timestamping. They can work respectively.
+> 
+> As to so_timestamping, only add a loose condition via report flags
+> to avoid duplicate strict checks that is done in tcp_recv_timestamp()
+> and performance impact. If the loose condition is hit,
+> tcp_recv_timestamp() is able to handle the exact case and doesn't
+> hamper the existing timestamping feature.
+> 
+> Make it work in TCP protocol.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/ipv4/tcp.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 21ece4c71612..64c69bb3578a 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -2949,8 +2949,18 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags)
+>  	release_sock(sk);
+>  
+>  	if ((cmsg_flags | msg->msg_get_inq) && ret >= 0) {
+> -		if (cmsg_flags & TCP_CMSG_TS)
+> -			tcp_recv_timestamp(msg, sk, &tss);
+> +		if (cmsg_flags & TCP_CMSG_TS) {
+> +			u32 tsflags = READ_ONCE(sk->sk_tsflags);
+> +
+> +			if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
+> +			    SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_RX_TIMESTAMPING))
+> +				bpf_skops_rx_timestamping(sk, &tss,
+> +							  BPF_SOCK_OPS_TSTAMP_RCV_CB);
 
-> The Nios II architecture is a soft-core architecture developed by
-> Altera (since acquired by Intel) and intended to run on their FPGAs.
-> 
-> Licenses for the architecture have not been available for purchase
-> since 2024 [1], and support for it has been removed from GCC 15 [2],
-> Buildroot [3], and QEMU [4].
-> 
-> Given all of these factors, it is time to remove Nios II support from
-> the kernel. The maintainer stated in 2024 that they were planning to do
-> so soon [5], but this did not come to pass.
-> 
-> Remove Nios II support from the kernel and move the former maintainer
-> to CREDITS. Thank you, Dinh Nguyen, for maintaining Nios II support!
-> 
-> References:
-> [1] https://docs.altera.com/v/u/docs/781327/is-discontinuing-ip-ordering-codes-listed-in-pdn2312-for-nios-ii-ip
-> [2] https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=e876acab6cdd84bb2b32c98fc69fb0ba29c81153
-> [3] https://github.com/buildroot/buildroot/commit/6775ccc5a199d574ad70b5f79ec58cce97a07c6f
-> [4] https://github.com/qemu/qemu/commit/6c3014858c4c0024dd0560f08a6eda0f92f658d6
-> [5] https://sourceware.org/pipermail/newlib/2024/021083.html
-> 
-> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-If it goes for IIO trivial changes.
-Acked-by: Jonathan Cameron <jic23@kernel.org>
+What about tcp_zc_finalize_rx_tstamp? Do you not want the rx tstamp for
+tcp rx zc?
 
