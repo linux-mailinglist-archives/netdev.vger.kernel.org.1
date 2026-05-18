@@ -1,121 +1,176 @@
-Return-Path: <netdev+bounces-288839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288841-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULPGF9KECmqv2AQAu9opvQ
-	(envelope-from <netdev+bounces-288839-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:17:38 +0200
+	id 4L3pLMeFCmpg2gQAu9opvQ
+	(envelope-from <netdev+bounces-288841-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:21:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CF4D5655E4
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:17:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326DC56563D
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 05:21:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BBD11300186A
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:17:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A9E68300AEE3
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 03:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0316135E94F;
-	Mon, 18 May 2026 03:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A7737FF4D;
+	Mon, 18 May 2026 03:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="oUCx6MOw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcEMbVA9"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D151E21D590;
-	Mon, 18 May 2026 03:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA4A37F8AD
+	for <netdev@vger.kernel.org>; Mon, 18 May 2026 03:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779074251; cv=none; b=Maxo2ME/MRoglUOpfgSahynnzsPXFYBg5PKfEpdJLaQGdaK4HE7x2ZAAfXB4JS9ZpGOygEDMLm/9hR3LALsMpTt4Y+NQpJGGUSNsn4IZaroFWKtUXRQPXJd0Oaysmxfvy5tVzFzrGu7wMZsuRIJgbMUtJ9fLYGUP2CJmqjRXjC4=
+	t=1779074499; cv=none; b=NDB5eNpcyXkJuYCWHHjC8A3RlAN2hupZfL4bwguzoLjrli4PgGTw9oydMZxX20WvTE/Tl4+Cg4l+WS42y3GurlimzloQdr27vjQ9297lU2HNZUZ+75X93yQB9IPRlnyXht38cANa00GND1Rw6iDrYEpiEgcVdXUvlvABhgZ0udQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779074251; c=relaxed/simple;
-	bh=Ss+YNztn/9Zp8Cxdp8yzFFFtnmzGiwcErDXNDj0L5nA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tAeZ8p9EnYQQxv8uhNAcgcvo/cl2ZMHQVwBbY0McLRxdU+xBFA64CnFwY9IA6gsRmg32apl/bWuqoGGkCFXHXrKvjcxSZlVNQNSXbI7fZ83BlfxBivjIDwZShgvoCoeYHThF0j1BIHlTuAtfpeHk3yh4ZiAUlwZ/6RfQPSBBa4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=oUCx6MOw; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=qkw319F8Mm2LdfyPX+uH9mASPigoSoOkZj56TRwEYyE=; 
-	b=oUCx6MOwVzfxfWFiSVv8MxSmDUzc/bMWixSBdo7FTV3Vl44eeFp7m686Nv7Ad0uy6JMdBW++if2
-	NYCRfex0P1NM7wSy8X3sITeSYxeUvwlEG3gorQcBosySERRgXtTTluQ9Z/iDt+9WDVZzekYnDj36F
-	Pa4w2ieBmZTungU/OyQSqP1JHOj3l2BKFOAJss12iSAHEdV/TlJB7rLfFI1I4vK0RRPhuzv9FIgFL
-	e/gUjyArZX1jBd4FGotKo7eNxlczFzd8Y2BUzDeG/CFSHb8Qxl8YxsVwISzRECWDCsBZz6TfVg3+k
-	sIiGwQG4mD0z0k76neFx9Vpwr4/zXhfs/qOA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wOoTl-00F1h2-15;
-	Mon, 18 May 2026 11:17:18 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 18 May 2026 11:17:17 +0800
-Date: Mon, 18 May 2026 11:17:17 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Scott Guo <scott_gzh@163.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	Scott GUO <scottzhguo@tencent.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 0/2] authencesn: Refactor in-place decryption
-Message-ID: <agqEvY4xJYjbZVDI@gondor.apana.org.au>
-References: <20260515083645.4024574-1-scott_gzh@163.com>
- <4e9aee15-62e6-4d71-a836-250c5376a8fd@163.com>
- <8aaa00f3-d8e0-4de0-918b-1f025b632eb9@163.com>
- <agp6lDddmDZaoH6L@gondor.apana.org.au>
- <9f625d9d-6820-442e-9527-1b2802309993@163.com>
+	s=arc-20240116; t=1779074499; c=relaxed/simple;
+	bh=8bCQ/Iq0u1Lc/T7EX5SaevBnrMvazcgDznT+azAO2vA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=laMeV8prFbJFodZ9TUhK6WfMmbjlFUGHe8BBWc9yyBKcrb5WM+3aq+COi/FESV8kP+H/IRxZFPMpNBtyIJEpFWgb0n2/fHBIsif8Ma2GdLG33B6VSH5opj+TZFpla9COzH0Fv7xJR3BpD80DOcT0CMirU9AAj8pVrvLQnneu6Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OcEMbVA9; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2b9a1896db5so4135205ad.3
+        for <netdev@vger.kernel.org>; Sun, 17 May 2026 20:21:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779074497; x=1779679297; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RAFWkpA8YXLduhYX0RXRsoHuIKAwG9yvc6tBTptmV1U=;
+        b=OcEMbVA9i5Ix8g8UOdkXYaZOmwDXtRS0zUElvzVEiVOA5iXzodmwlm2Du0J2rtXUSG
+         s9whm08U5l6/63IGVll7mxhzjnC0gzmfGnrANzUzHe/68eK4c/nplABqbw5ibSuMpbsg
+         /GhSpDkrllAyRBWQKBODQFjTu/zR87T9enS4HfpSSWuxn9w3wcGJ2eOPFgJSt+hOpLr3
+         lxZ6iSacZ4d0CNg+DZHQdN2GWLk4h2gIRTJivFxV0eJOhLP+mhGzGbu/cWzYfYEHrLWR
+         t2b4M7kgWjsUo7ic1tz5QDI2ggiW48hRNVk0CV5iXuvF6644xz/fS1itatnCydxRPjd+
+         gtcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779074497; x=1779679297;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RAFWkpA8YXLduhYX0RXRsoHuIKAwG9yvc6tBTptmV1U=;
+        b=ijd6cTDwX6YFzYmPCqwwP57DNM9J+tB2tnkwsYO7coZssaH1FaKOZBKUuKjSRNjfRL
+         I6XoNEFpWP4qFFfF9jc3n+WF8b3bs4sI8Mw7GKD6OpQHsEapj/1Z6CsuFkUV69RgBWIO
+         BZPhyxHgWmW88XR9YsHniRFSsnfnXZ98fpKdQ7dzVm0Xo7JVD+NN4gWlc5FPEee1eQYH
+         +bxh+XVKsFIdXV/+dCMgzU9ows1LKLD2m/eaeja8IYkuhb8z0DD3cHGuuuhBrb6t6oQ4
+         EhL2CwmMc+1jdJbZS5rAIJ4i1QWylniqwoebS/5+TS66XMLYkbND/54JFmoc9J2T3pNg
+         5RwQ==
+X-Gm-Message-State: AOJu0Ywy55zub5KkMr6oCkoXuvrD5+TO1OAQAMtCGpr48jitdKctsPRp
+	felDgu4KXnyY78Usiep1PeJ/XJawn4FOEl10qcgGDZ7lZi2oqLP+6Kws5TF4nl/gaCk=
+X-Gm-Gg: Acq92OFTPNGM+RGU4u5B66PW0g/fEjsEg8kmWms/HWKQfBzjsI725WooW3oT/ZTtFy4
+	SHz4fhGjEo9yUkm557Wo62vlGN5JdQFB/Rz81MGN+Dq9E4ST4xs4QoFE1nqhWBzhIRjMV1wvjv8
+	ZpJd0pxO4Ih1135OkwSEQrCsIEAWZP0IOHuFnt9JrU2i/rt88Flc1uGdTR4Jm1h0xvrJ0msgO38
+	kn5mucMpdST8E185wjv8zTVqecsZDhtZzM1hCHKa/4BO3BMVrJ5W9jzGCW26KWbqzMthSE9eh8x
+	n2ibIB+2MIZoNHZyfA2QVElB6CgoE0A0cnNs7907TuUhmTNn6yKA8jY0k+XZIVuPYEdpwBic3SU
+	TurprzhpVXaAXcsjzyb6BgjOBy3hwdJopHMwGdYjhfwLq2RYYzPXXHNqOSMHcxW6BUEFO9k6aPQ
+	veFLqco/B5VyIM4289ycBIVClWWi6LNkiWDi7pKS3AMcW3W3+ExrS3hHZXlMqRwge4r1h8sqYxf
+	N5lOcE0IJDhPz26tnx9p2kdpoR5DHFz2w==
+X-Received: by 2002:a17:903:3c4b:b0:2bd:612b:9124 with SMTP id d9443c01a7336-2bd7e23f084mr76532925ad.0.1779074496732;
+        Sun, 17 May 2026 20:21:36 -0700 (PDT)
+Received: from localhost ([240d:f:a5c:fb00:b9d0:5976:9793:153b])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5cfe6b8fsm136391305ad.46.2026.05.17.20.21.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 20:21:36 -0700 (PDT)
+From: Aaron Esau <aaron1esau@gmail.com>
+To: netdev@vger.kernel.org
+Cc: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	"David S . Miller" <davem@davemloft.net>,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Aaron Esau <aaron1esau@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] xfrm: espintcp: fix sg.size corruption on partial send error
+Date: Mon, 18 May 2026 12:21:09 +0900
+Message-ID: <20260518032109.616327-1-aaron1esau@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9f625d9d-6820-442e-9527-1b2802309993@163.com>
-X-Rspamd-Queue-Id: 4CF4D5655E4
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 326DC56563D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288839-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-288841-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aaron1esau@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,gondor.apana.org.au:mid,gondor.apana.org.au:dkim]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-On Mon, May 18, 2026 at 10:55:38AM +0800, Scott Guo wrote:
-> BTW, I am wondering whether we should disable inplace decryption for now? I
-> think that to mitigate vulnerabilities like Fragnesia, maybe something has
-> to be done on the memory side. Maybe something like forcing a pagefault when
-> trying to write to these pages?
+espintcp_sendskmsg_locked() calls put_page() and sk_mem_uncharge() for
+each scatterlist element it successfully sends, but never decrements
+sg.size. If tcp_sendmsg_locked() then fails partway through, the error
+path advances sg.start past the freed elements while sg.size still
+accounts for them. A subsequent sk_msg_free() in espintcp_close() loops
+until sg.size reaches zero, overshoots sg.end, hits zeroed entries with
+NULL pages, and crashes in put_page().
 
-I think stopping ESP from putting frags into the dst SG list would
-be prudent until the whole stack has been audited.
+Fix this by decrementing sg.size as each element is freed. Also use
+sk_msg_iter_var_next() instead of raw addition for sg.start, so it
+wraps at NR_MSG_FRAG_IDS.
 
-Alternatively switch from the black-list to a white-list approach
-and only allow ESP to do in-place processing of packets from a
-source that's known to be writable.
+Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
+Cc: stable@vger.kernel.org
+Signed-off-by: Aaron Esau <aaron1esau@gmail.com>
+---
+ net/xfrm/espintcp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Cheers,
+diff --git a/net/xfrm/espintcp.c b/net/xfrm/espintcp.c
+index e1b11ab59..6755f6df6 100644
+--- a/net/xfrm/espintcp.c
++++ b/net/xfrm/espintcp.c
+@@ -237,7 +237,8 @@ static int espintcp_sendskmsg_locked(struct sock *sk,
+ 		ret = tcp_sendmsg_locked(sk, &msghdr, size);
+ 		if (ret < 0) {
+ 			emsg->offset = offset - sg->offset;
+-			skmsg->sg.start += done;
++			while (done--)
++				sk_msg_iter_var_next(skmsg->sg.start);
+ 			return ret;
+ 		}
+ 
+@@ -250,6 +251,7 @@ static int espintcp_sendskmsg_locked(struct sock *sk,
+ 		done++;
+ 		put_page(p);
+ 		sk_mem_uncharge(sk, sg->length);
++		skmsg->sg.size -= sg->length;
+ 		sg = sg_next(sg);
+ 	} while (sg);
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.54.0
+
 
