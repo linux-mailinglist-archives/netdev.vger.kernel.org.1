@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-289154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6AOwNoFcC2ppGAUAu9opvQ
-	(envelope-from <netdev+bounces-289154-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:37:53 +0200
+	id eDSZI8VbC2oCGAUAu9opvQ
+	(envelope-from <netdev+bounces-289155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:34:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 919E95725DB
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:37:53 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32509572549
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 20:34:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 707CB3065EBF
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:34:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D482E301E837
+	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 18:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F151034BA42;
-	Mon, 18 May 2026 18:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F2F38F24B;
+	Mon, 18 May 2026 18:34:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from passt.top (passt.top [88.198.0.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FB038B7AA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8680E38B149;
 	Mon, 18 May 2026 18:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.198.0.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779129269; cv=none; b=cZh8qCaaxRR8cfevsH6r/UdwxAyY6KyEq5Ft2G1o+D8MDIIMZeICcaJOKlw2J111wJj2oUBWcX69SsxCi03vXuST3+tys9IsafvLEwZpLaMmq0INqCV17BqqZFdPY44IE2Ae9bX9Nu4V6r0DpmMffG6MWYqH5Wnu/LopbPRaryY=
+	t=1779129270; cv=none; b=pYLNvI+n0q4PKzftXEZdUbaPk3+wpvBjFxAWmJ4JMn4mmrLyIvsdXGHDn0DoBU9bWJgF7dUlvmz9bDPzs9ksSO0++dWbmDbBhZXrvgKoRP9Jt8vtQpXV1WMOi0eoWRH0LfwXYsBBXYOXmK8y0+TctiaEe3wDwOLK2Lu+yT6n88I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779129269; c=relaxed/simple;
-	bh=t81xk1GMOcGxUt+jDZ0yUGChoEIYX6sNI7OC+beV18U=;
+	s=arc-20240116; t=1779129270; c=relaxed/simple;
+	bh=KVGb+yBaMLmcV/1WYBoHjFKU11MIukwUVmn4M4Y9y/I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nffk+JocwUaMb6dr4AlbTwFGN94a1Szvse7iGvtpSnEaNl5EEynnCwxPrpj/Ch2W2IDyYgVZZxazYiMlz6/lOc0jWV1MWgaL2OvarQBxlbZG8QwhiiZ7jD5BoCR5QmpOR32d/DwHYhYDFetefExkiA3V5AHyu3BPKG/9Hs8mhc8=
+	 MIME-Version; b=c5pZZlr6eAP6eUV1q5YAdA/+k3NrScSS0YSnFdgLzkDN1qLtqJvmivZbG2/AVG13tPeikpwJzdUgd1R/JejM9CSUwiCKq6UykfcXTI5D4fiHN5EAQllUBSDNB0YE8McdL4eP5ycrGhsF22O1CKjuoRc4LAtxUp78jrEbKvfAAEE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=passt.top; arc=none smtp.client-ip=88.198.0.164
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=passt.top
 Received: by passt.top (Postfix, from userid 1000)
-	id 65CAF5A061C; Mon, 18 May 2026 20:34:24 +0200 (CEST)
+	id 685E05A061D; Mon, 18 May 2026 20:34:24 +0200 (CEST)
 From: Stefano Brivio <sbrivio@redhat.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -52,9 +52,9 @@ Cc: Pavel Emelyanov <xemul@scylladb.com>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	Simon Horman <horms@kernel.org>,
 	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net v2 1/2] tcp: Don't accept data when socket is in repair mode
-Date: Mon, 18 May 2026 20:34:23 +0200
-Message-ID: <20260518183424.3144867-2-sbrivio@redhat.com>
+Subject: [PATCH net v2 2/2] selftests: Add data path tests for TCP_REPAIR mode
+Date: Mon, 18 May 2026 20:34:24 +0200
+Message-ID: <20260518183424.3144867-3-sbrivio@redhat.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260518183424.3144867-1-sbrivio@redhat.com>
 References: <20260518183424.3144867-1-sbrivio@redhat.com>
@@ -70,11 +70,11 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
@@ -84,202 +84,693 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sbrivio@redhat.com,netdev@vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,inner.sh:url,run.sh:url];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289154-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289155-lists,netdev=lfdr.de];
 	R_DKIM_NA(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 919E95725DB
+X-Rspamd-Queue-Id: 32509572549
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Once a socket enters repair mode (TCP_REPAIR socket option with
-TCP_REPAIR_ON value), it's possible to dump the receive sequence
-number (TCP_QUEUE_SEQ) and the contents of the receive queue itself
-(using TCP_REPAIR_QUEUE to select it).
+The new tests check that, once TCP_REPAIR is enabled on a socket:
 
-If we receive data after the application fetched the sequence number
-or saved the contents of the queue, though, the application will now
-have outdated information, which defeats the whole functionality,
-because this leads to gaps in sequence and data once they're restored
-by the target instance of the application, resulting in a hanging or
-otherwise non-functional TCP connection.
+- additional incoming data queued to it don't increase the sequence
+  number dumped via TCP_QUEUE_SEQ socket option
 
-This type of race condition was discovered in the KubeVirt integration
-of passt(1), using a remote iperf3 client connected to an iperf3
-server running in the guest which is being migrated. The setup allows
-traffic to reach the origin node hosting the guest during the
-migration.
+- a connected endpoint will not receive ACK segments after sending
+  more data
 
-If passt dumps sequence number and contents of the queue *before*
-further data is received and acknowledged to the peer by the kernel,
-once the TCP data connection is migrated to the target node, the
-remote client becomes unable to continue sending, because a portion
-of the data it sent *and received an acknowledgement for* is now lost.
+These tests are implemented by a client, sending data and commands
+(accept connection, enter repair mode, dump sequences, receive data,
+and exit) describing the test sequence, and a server receiving data
+and implementing those commands.
 
-Schematically:
+This way, the client can accurately synchronise repair modes with
+data exchanges.
 
-1. client --seq 1:100--> origin host --> passt --> guest --> server
+In order to avoid using loopback connections, where data would be
+immediately acknowledged by the server side without packets being
+actually sent or received, the client resides in a separate network
+namespace ("inner") compared to the server, and a veth interface pair
+connects them.
 
-2. client <--ACK: 100-- origin host
+The tests can be run unprivileged as the outer network and user
+namespaces are also detached as a first step, so that the veth
+interfaces can be created in outer and inner namespaces without
+capabilities.
 
-3. migration starts, passt enables repair mode, dumps the sequence
-   number (101) and sends it to the target node of the guest migration
-
-4. client --seq 101:201--> origin host (passt not receiving anymore)
-
-5. client <--ACK: 201-- origin host
-
-6. migration completes, and passt restores sequence number 101 on the
-   migrated socket
-
-7. client --seq 201:301--> target host (now seeing a sequence jump)
-
-8. client <--ACK: 100-- target host
-
-...and the connection can't recover anymore, because the client can't
-resend data that was already (erroneously) acknowledged. We need to
-avoid step 5. above.
-
-This would equally affect CRIU (the other known user of TCP_REPAIR),
-should data be received while the original container is frozen: the
-sequence dumped and the contents of the saved incoming queue would
-then depend on the timing.
-
-The race condition is also illustrated in the kselftests introduced
-by the next patch.
-
-To prevent this issue, discard data received for a socket in repair
-mode, with a new reason, SKB_DROP_REASON_SOCKET_REPAIR.
-
-In order to do this without affecting the TCP fast path, once repair
-mode is set, disable the fast path for the given socket using the
-pred_flags mechanism (as commonly done for other corner cases), so
-that tcp_rcv_established() can handle this in the slow path.
-
-Once / if repair mode is disabled, take care of re-enabling the fast
-path if conditions are met, as implemented by tcp_fast_path_check().
-
-v2: Instead of directly checking for tp->repair in the common case
-    of tcp_rcv_established(), disable the fast path by setting
-    pred_flags to 0 on TCP_REPAIR_ON, and re-enable it as we leave
-    repair mode, while checking for that in tcp_fast_path_check().
-
-    This way, we avoid touching the fast path itself, as requested by
-    Kuniyuki Iwashima and Eric Dumazet.
-
-Fixes: ee9952831cfd ("tcp: Initial repair mode")
-Tested-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Stefano Brivio <sbrivio@redhat.com>
 ---
- include/net/dropreason-core.h |  3 +++
- include/net/tcp.h             |  3 ++-
- net/ipv4/tcp.c                |  9 +++++++++
- net/ipv4/tcp_input.c          | 15 +++++++++++++--
- 4 files changed, 27 insertions(+), 3 deletions(-)
+v2: No changes
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 2f312d1f67d6..19ab9e6ffc33 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -9,6 +9,7 @@
- 	FN(SOCKET_CLOSE)		\
- 	FN(SOCKET_FILTER)		\
- 	FN(SOCKET_RCVBUFF)		\
-+	FN(SOCKET_REPAIR)		\
- 	FN(UNIX_DISCONNECT)		\
- 	FN(UNIX_SKIP_OOB)		\
- 	FN(PKT_TOO_SMALL)		\
-@@ -158,6 +159,8 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_SOCKET_FILTER,
- 	/** @SKB_DROP_REASON_SOCKET_RCVBUFF: socket receive buff is full */
- 	SKB_DROP_REASON_SOCKET_RCVBUFF,
-+	/** @SKB_DROP_REASON_SOCKET_REPAIR: socket is in repair mode */
-+	SKB_DROP_REASON_SOCKET_REPAIR,
- 	/**
- 	 * @SKB_DROP_REASON_UNIX_DISCONNECT: recv queue is purged when SOCK_DGRAM
- 	 * or SOCK_SEQPACKET socket re-connect()s to another socket or notices
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index ecbadcb3a744..bc26ab16e39d 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1958,7 +1958,8 @@ static inline void tcp_fast_path_check(struct sock *sk)
- 	if (RB_EMPTY_ROOT(&tp->out_of_order_queue) &&
- 	    tp->rcv_wnd &&
- 	    atomic_read(&sk->sk_rmem_alloc) < sk->sk_rcvbuf &&
--	    !tp->urg_data)
-+	    !tp->urg_data &&
-+	    !tp->repair)
- 		tcp_fast_path_on(tp);
- }
- 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 432fa28e47d4..74ef96bda8c7 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3993,13 +3993,22 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
- 			tp->repair = 1;
- 			sk->sk_reuse = SK_FORCE_REUSE;
- 			tp->repair_queue = TCP_NO_QUEUE;
+ tools/testing/selftests/Makefile              |   1 +
+ .../selftests/net/tcp_repair/.gitignore       |   3 +
+ .../testing/selftests/net/tcp_repair/Makefile |  23 ++
+ .../testing/selftests/net/tcp_repair/client.c | 273 ++++++++++++++++++
+ .../testing/selftests/net/tcp_repair/inner.sh |  32 ++
+ .../testing/selftests/net/tcp_repair/outer.sh |  44 +++
+ tools/testing/selftests/net/tcp_repair/run.sh |  12 +
+ .../testing/selftests/net/tcp_repair/server.c | 155 ++++++++++
+ tools/testing/selftests/net/tcp_repair/talk.h |  26 ++
+ 9 files changed, 569 insertions(+)
+ create mode 100644 tools/testing/selftests/net/tcp_repair/.gitignore
+ create mode 100644 tools/testing/selftests/net/tcp_repair/Makefile
+ create mode 100644 tools/testing/selftests/net/tcp_repair/client.c
+ create mode 100755 tools/testing/selftests/net/tcp_repair/inner.sh
+ create mode 100755 tools/testing/selftests/net/tcp_repair/outer.sh
+ create mode 100755 tools/testing/selftests/net/tcp_repair/run.sh
+ create mode 100644 tools/testing/selftests/net/tcp_repair/server.c
+ create mode 100644 tools/testing/selftests/net/tcp_repair/talk.h
+
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index 6e59b8f63e41..e119abe5c78e 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -84,6 +84,7 @@ TARGETS += net/packetdrill
+ TARGETS += net/ppp
+ TARGETS += net/rds
+ TARGETS += net/tcp_ao
++TARGETS += net/tcp_repair
+ TARGETS += nolibc
+ TARGETS += nsfs
+ TARGETS += pci_endpoint
+diff --git a/tools/testing/selftests/net/tcp_repair/.gitignore b/tools/testing/selftests/net/tcp_repair/.gitignore
+new file mode 100644
+index 000000000000..9756c86770b9
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_repair/.gitignore
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0
++client
++server
+diff --git a/tools/testing/selftests/net/tcp_repair/Makefile b/tools/testing/selftests/net/tcp_repair/Makefile
+new file mode 100644
+index 000000000000..d01d0a20b6df
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_repair/Makefile
+@@ -0,0 +1,23 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# selftests/net/tcp_repair: TCP_REPAIR connection tests
++#
++# Makefile - Build test client and server, declare run.sh entrypoint
++#
++# Copyright (c) 2026 Red Hat GmbH
++#
++# Author: Stefano Brivio <sbrivio@redhat.com>
 +
-+			/* Disable fast path so that we can freeze the receive
-+			 * queue as needed, see tcp_rcv_established().
-+			 */
-+			tp->pred_flags = 0;
- 		} else if (val == TCP_REPAIR_OFF) {
- 			tp->repair = 0;
- 			sk->sk_reuse = SK_NO_REUSE;
- 			tcp_send_window_probe(sk);
++top_srcdir = ../../../../..
 +
-+			tcp_fast_path_check(sk);
- 		} else if (val == TCP_REPAIR_OFF_NO_WP) {
- 			tp->repair = 0;
- 			sk->sk_reuse = SK_NO_REUSE;
++CFLAGS += -Wall -Wextra -pedantic
 +
-+			tcp_fast_path_check(sk);
- 		} else
- 			err = -EINVAL;
- 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index d5c9e65d9760..3081ccfa90b4 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6451,8 +6451,9 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
-  *	- Out of order segments arrived.
-  *	- Urgent data is expected.
-  *	- There is no buffer space left
-- *	- Unexpected TCP flags/window values/header lengths are received
-- *	  (detected by checking the TCP header against pred_flags)
-+ *	- Unexpected TCP flags/window values/header lengths are received, or
-+ *	  socket is in repair mode (detected by checking the TCP header against
-+ *	  pred_flags)
-  *	- Data is sent in both directions. Fast path only supports pure senders
-  *	  or pure receivers (this means either the sequence number or the ack
-  *	  value must stay constant)
-@@ -6632,6 +6633,11 @@ void tcp_rcv_established(struct sock *sk, struct sk_buff *skb)
- 		goto discard;
- 	}
- 
-+	if (tp->repair) {
-+		reason = SKB_DROP_REASON_SOCKET_REPAIR;
-+		goto discard;
++TEST_PROGS := \
++	run.sh
++
++TEST_GEN_FILES := \
++	client \
++	server \
++# end of TEST_GEN_FILES
++
++include ../../lib.mk
+diff --git a/tools/testing/selftests/net/tcp_repair/client.c b/tools/testing/selftests/net/tcp_repair/client.c
+new file mode 100644
+index 000000000000..b5106bf922b1
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_repair/client.c
+@@ -0,0 +1,273 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++/* selftests/net/tcp_repair: TCP_REPAIR connection tests
++ *
++ * client.c - Run list of tests, send commands and data to server
++ *
++ * Copyright (c) 2026 Red Hat GmbH
++ *
++ * Author: Stefano Brivio <sbrivio@redhat.com>
++ */
++
++#include <errno.h>
++#include <fcntl.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <sys/socket.h>
++#include <arpa/inet.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netdb.h>
++
++#include <linux/tcp.h>		/* latest and greatest struct tcp_info, but */
++#define SOL_TCP		6	/* we can't include netinet/tcp.h as a result */
++
++#include "talk.h"
++
++/**
++ * srv() - Send command to server, return received value (not for ACCEPT)
++ * @ctl:	Control socket
++ * @op:		Command type
++ * @arg:	Optional argument (always sent, might be zero)
++ *
++ * Return: integer value received by client as response
++ */
++int srv(int ctl, enum op op, int arg)
++{
++	int cmd[2] = { op, arg }, ret;
++
++	send(ctl, cmd, sizeof(cmd), 0);
++	if (op != ACCEPT)
++		recv(ctl, &ret, sizeof(ret), 0);
++
++	return ret;
++}
++
++/**
++ * test_seq_slow_path() - Sequence doesn't change after sending one byte
++ * @ctl:	Control socket
++ * @data:	Data socket
++ *
++ * Return: 0 if the test passes, -1 if it fails
++ */
++int test_seq_slow_path(int ctl, int data)
++{
++	uint32_t seq1, seq2;
++
++	(void)ctl;
++	(void)data;
++
++	srv(ctl, REPAIR, TCP_REPAIR_ON);
++	seq1 = (uint32_t)srv(ctl, DUMP_RECV_SEQ, 0);
++
++	send(data, (char *)("a"), 1, 0);
++
++	seq2 = (uint32_t)srv(ctl, DUMP_RECV_SEQ, 0);
++
++	if (seq1 != seq2) {
++		fprintf(stderr, "Sequence changed in repair mode, %u -> %u\n",
++			seq1, seq2);
++		return -1;
 +	}
 +
- 	/*
- 	 *	Standard slow path.
- 	 */
-@@ -7125,6 +7131,11 @@ tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 	int queued = 0;
- 	SKB_DR(reason);
- 
-+	if (tp->repair) {
-+		SKB_DR_SET(reason, SOCKET_REPAIR);
-+		goto discard;
++	return 0;
++}
++
++/**
++ * test_seq_fast_path() - Sequence doesn't change after a large transfer
++ * @ctl:	Control socket
++ * @data:	Data socket
++ *
++ * Return: 0 if the test passes, -1 if it fails
++ */
++int test_seq_fast_path(int ctl, int data)
++{
++	char buf[1000] = { 0 };
++	uint32_t seq1, seq2;
++	int i;
++
++	(void)ctl;
++	(void)data;
++
++	for (i = 0; i < 50; i++) {
++		send(data, buf, sizeof(buf), 0);
++		srv(ctl, RECV, sizeof(buf));
 +	}
 +
- 	switch (sk->sk_state) {
- 	case TCP_CLOSE:
- 		SKB_DR_SET(reason, TCP_CLOSE);
++	srv(ctl, REPAIR, TCP_REPAIR_ON);
++	seq1 = (uint32_t)srv(ctl, DUMP_RECV_SEQ, 0);
++
++	fcntl(data, F_SETFL, O_NONBLOCK);
++	for (i = 0; i < 50; i++)
++		send(data, buf, sizeof(buf), 0);
++
++	seq2 = (uint32_t)srv(ctl, DUMP_RECV_SEQ, 0);
++
++	if (seq1 != seq2) {
++		fprintf(stderr, "Sequence changed in repair mode, %u -> %u\n",
++			seq1, seq2);
++		return -1;
++	}
++
++	return 0;
++}
++
++/**
++ * test_acked_slow_path() - Our ACK sequence doesn't change after sending byte
++ * @ctl:	Control socket
++ * @data:	Data socket
++ *
++ * Return: 0 if the test passes, -1 if it fails
++ */
++int test_acked_slow_path(int ctl, int data)
++{
++	unsigned long acked1, acked2;
++	struct tcp_info tinfo;
++	socklen_t sl;
++
++	(void)ctl;
++	(void)data;
++
++	srv(ctl, REPAIR, TCP_REPAIR_ON);
++
++	sl = sizeof(tinfo);
++	getsockopt(data, SOL_TCP, TCP_INFO, &tinfo, &sl);
++	acked1 = tinfo.tcpi_bytes_acked;
++
++	send(data, (char *)("a"), 1, 0);
++
++	getsockopt(data, SOL_TCP, TCP_INFO, &tinfo, &sl);
++	acked2 = tinfo.tcpi_bytes_acked;
++
++	if (acked1 != acked2) {
++		fprintf(stderr, "ACK received in repair mode, %lu -> %lu\n",
++			acked1, acked2);
++		return -1;
++	}
++
++	return 0;
++}
++
++/**
++ * test_acked_fast_path() - Our ACK sequence doesn't change after large transfer
++ * @ctl:	Control socket
++ * @data:	Data socket
++ *
++ * Return: 0 if the test passes, -1 if it fails
++ */
++int test_acked_fast_path(int ctl, int data)
++{
++	unsigned long acked1, acked2;
++	char buf[1000] = { 0 };
++	struct tcp_info tinfo;
++	socklen_t sl;
++	int i;
++
++	(void)ctl;
++	(void)data;
++
++	for (i = 0; i < 50; i++) {
++		send(data, buf, sizeof(buf), 0);
++		srv(ctl, RECV, sizeof(buf));
++	}
++
++	srv(ctl, REPAIR, TCP_REPAIR_ON);
++
++	sl = sizeof(tinfo);
++	getsockopt(data, SOL_TCP, TCP_INFO, &tinfo, &sl);
++	acked1 = tinfo.tcpi_bytes_acked;
++
++	fcntl(data, F_SETFL, O_NONBLOCK);
++	for (i = 0; i < 50; i++)
++		send(data, buf, sizeof(buf), 0);
++
++	getsockopt(data, SOL_TCP, TCP_INFO, &tinfo, &sl);
++	acked2 = tinfo.tcpi_bytes_acked;
++
++	if (acked1 != acked2) {
++		fprintf(stderr, "ACK received in repair mode, %lu -> %lu\n",
++			acked1, acked2);
++		return -1;
++	}
++
++	return 0;
++}
++
++/**
++ * struct test - List of tests
++ * @desc:	Test description
++ * @f:		Function executing the test
++ */
++struct {
++	char *desc;
++	int (*f)(int ctl, int data);
++} test[] = {
++	{
++		"Sequence freezes in repair mode, slow path TCP input",
++		test_seq_slow_path,
++	},
++	{
++		"Sequence freezes in repair mode, fast path TCP input",
++		test_seq_fast_path,
++	},
++	{
++		"No ACKs in repair mode, slow path TCP input",
++		test_acked_slow_path,
++	},
++	{
++		"No ACKs in repair mode, fast path TCP input",
++		test_acked_fast_path,
++	},
++};
++
++/**
++ * main() - Entry point, connect control socket to server and run list of tests
++ * @argc:	Argument count, must be 3 (two options)
++ * @argv:	Options: server address and port
++ *
++ * Return: -1 on bad usage, 0 on success, 1 if at least one test fails
++ */
++int main(int argc, char **argv)
++{
++	struct addrinfo hints = { 0, AF_UNSPEC, SOCK_STREAM, 0, 0,
++				  NULL, NULL, NULL };
++	int ctl, data, ret = 0;
++	struct addrinfo *r;
++	unsigned i;
++
++	if (argc != 3) {
++		fprintf(stderr, "%s DST_ADDR DST_PORT\n", argv[0]);
++		return -1;
++	}
++
++	getaddrinfo(argv[1], argv[2], &hints, &r);
++
++	ctl = socket(r->ai_family, SOCK_STREAM, IPPROTO_TCP);
++	setsockopt(ctl, SOL_SOCKET, SO_REUSEADDR, &((int){ 1 }), sizeof(int));
++	connect(ctl, r->ai_addr, r->ai_addrlen);
++
++	for (i = 0; i < sizeof(test) / sizeof(test[0]); i++) {
++		int rc;
++
++		data = socket(r->ai_family, SOCK_STREAM, IPPROTO_TCP);
++		setsockopt(data, SOL_SOCKET, SO_REUSEADDR,
++			   &((int){ 1 }), sizeof(int));
++		srv(ctl, ACCEPT, 0);
++		connect(data, r->ai_addr, r->ai_addrlen);
++
++		rc = test[i].f(ctl, data);
++
++		close(data);
++
++		if (rc) {
++			fprintf(stdout, "TEST: %-60s  [FAIL]\n", test[i].desc);
++			ret = 1;
++		} else {
++			fprintf(stdout, "TEST: %-60s  [ OK ]\n", test[i].desc);
++		}
++	}
++
++	return ret;
++}
+diff --git a/tools/testing/selftests/net/tcp_repair/inner.sh b/tools/testing/selftests/net/tcp_repair/inner.sh
+new file mode 100755
+index 000000000000..3987dc0514a8
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_repair/inner.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh -euf
++# SPDX-License-Identifier: GPL-2.0
++#
++# selftests/net/tcp_repair: TCP_REPAIR connection tests
++#
++# inner.sh - Set up link to outer namespace, run test client in inner namespace
++#
++# Copyright (c) 2026 Red Hat GmbH
++#
++# Author: Stefano Brivio <sbrivio@redhat.com>
++
++ns_inner_dir="${1}"
++
++# Tell the parent shell about our PID
++echo "${$}" > "${ns_inner_dir}/pid"
++mkdir "${ns_inner_dir}/pid_ready"
++
++# Wait for veth to appear
++while [ -z "$(sed -n '4p' /proc/net/dev)" ]; do
++	sleep 0.1 || sleep 1
++done
++
++# Set up link to outer namespace
++ip link set dev veth0 up
++ip addr add 169.254.2.2 dev veth0
++ip ro add default dev veth0
++
++# Finally run tests
++set +e
++./client 169.254.2.1 1024
++echo "${?}" > "${ns_inner_dir}/result"
++mkdir "${ns_inner_dir}/result_ready"
+diff --git a/tools/testing/selftests/net/tcp_repair/outer.sh b/tools/testing/selftests/net/tcp_repair/outer.sh
+new file mode 100755
+index 000000000000..17ae1230f0e5
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_repair/outer.sh
+@@ -0,0 +1,44 @@
++#!/bin/sh -euf
++# SPDX-License-Identifier: GPL-2.0
++#
++# selftests/net/tcp_repair: TCP_REPAIR connection tests
++#
++# outer.sh - Set up outer namespace, run test server there
++#
++# Copyright (c) 2026 Red Hat GmbH
++#
++# Author: Stefano Brivio <sbrivio@redhat.com>
++
++ns_inner_dir="$(mktemp -d)"
++
++cleanup() {
++	rm -rf "${ns_inner_dir}"
++}
++
++trap cleanup EXIT
++
++# Detach inner namespace in a subshell, tests start from there
++unshare -rUn -- ./inner.sh "${ns_inner_dir}" &
++
++# Wait for inner namespace
++while [ ! -d "${ns_inner_dir}/pid_ready" ]; do
++	sleep 0.1 || sleep 1
++done
++
++# Set up link to inner namespace
++ip link add veth0 type veth peer name veth0 netns "$(cat "${ns_inner_dir}/pid")"
++ip link set dev veth0 up
++ip addr add 169.254.2.1 dev veth0
++ip ro add default dev veth0
++
++# Run test server
++./server 1024
++
++# Wait for test results
++while [ ! -d "${ns_inner_dir}/result_ready" ]; do
++	sleep 0.1 || sleep 1
++done
++
++# Clean up and return results
++ret="$(cat "${ns_inner_dir}/result")"
++exit "${ret}"
+diff --git a/tools/testing/selftests/net/tcp_repair/run.sh b/tools/testing/selftests/net/tcp_repair/run.sh
+new file mode 100755
+index 000000000000..f87ff0a8a6f6
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_repair/run.sh
+@@ -0,0 +1,12 @@
++#!/bin/sh -euf
++# SPDX-License-Identifier: GPL-2.0
++#
++# selftests/net/tcp_repair: TCP_REPAIR connection tests
++#
++# run.sh - Test entry point: detach outer namespace and run outer.sh in it
++#
++# Copyright (c) 2026 Red Hat GmbH
++#
++# Author: Stefano Brivio <sbrivio@redhat.com>
++
++unshare -rUn -- ./outer.sh
+diff --git a/tools/testing/selftests/net/tcp_repair/server.c b/tools/testing/selftests/net/tcp_repair/server.c
+new file mode 100644
+index 000000000000..256c321320b7
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_repair/server.c
+@@ -0,0 +1,155 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* selftests/net/tcp_repair: TCP_REPAIR connection tests
++ *
++ * server.c - Receive commands and data, set TCP_REPAIR options on data socket
++ *
++ * Copyright (c) 2026 Red Hat GmbH
++ *
++ * Author: Stefano Brivio <sbrivio@redhat.com>
++ */
++
++#include <errno.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <sys/socket.h>
++#include <arpa/inet.h>
++
++#include <linux/tcp.h>		/* needed for TCP_REPAIR constants but */
++#define SOL_TCP		6	/* we can't include netinet/tcp.h as a result */
++
++#include "talk.h"
++
++/**
++ * cmd_accept() - Accept data connection (must be first command in test)
++ * @unused:	Not used
++ * @listen:	Listening socket
++ * @data:	Return value from accept(), set on return
++ *
++ * Return: 0
++ */
++int cmd_accept(int unused, int listen, int *data)
++{
++	(void)unused;
++
++	if (*data != -1)
++		close(*data);
++
++	*data = accept(listen, NULL, NULL);
++
++	return 0;
++}
++
++/**
++ * cmd_dump_recv_seq() - Dump receive sequence of data socket
++ * @unused:	Not used
++ * @unused2:	Not used
++ * @data:	File descriptor for data socket
++ *
++ * Return: receive sequence of data socket
++ */
++int cmd_dump_recv_seq(int unused, int unused2, int *data)
++{
++	socklen_t sl;
++	int v;
++
++	(void)unused;
++	(void)unused2;
++
++	v = TCP_RECV_QUEUE;
++	setsockopt(*data, SOL_TCP, TCP_REPAIR_QUEUE, &v, sizeof(v));
++
++	sl = sizeof(v);
++	getsockopt(*data, SOL_TCP, TCP_QUEUE_SEQ, &v, &sl);
++	return v;
++}
++
++/**
++ * cmd_exit() - Exit successfully
++ * @unused:	Not used
++ * @unused2:	Not used
++ * @unused3:	Not used
++ *
++ * Return: this function doesn't actually return
++ */
++int cmd_exit(int unused, int unused2, int *unused3)
++{
++	(void)unused;
++	(void)unused2;
++	(void)unused3;
++
++	exit(EXIT_SUCCESS);
++	return 0;
++}
++
++/**
++ * cmd_recv() - Receive (discard) a given amount of bytes
++ * @len:	Amount of bytes the client wants us to receive
++ * @unused:	Not used
++ * @data:	File descriptor for data socket
++ *
++ * Return: return code from recv()
++ */
++int cmd_recv(int len, int unused, int *data)
++{
++	(void)unused;
++
++	return recv(*data, NULL, len, MSG_TRUNC);
++}
++
++/**
++ * cmd_repair() - Set repair mode to mode supplied by client
++ * @mode:	Value for socket option provided by the client
++ * @unused:	Not used
++ * @data:	File descriptor for data socket
++ *
++ * Return: return code from setsockopt()
++ */
++int cmd_repair(int mode, int unused, int *data)
++{
++	(void)unused;
++
++	return setsockopt(*data, SOL_TCP, TCP_REPAIR, &mode, sizeof(mode));
++}
++
++/* List of commands and their handlers */
++int (*fn[])(int arg, int listen, int *data) = {
++	[ACCEPT]	= cmd_accept,
++	[DUMP_RECV_SEQ]	= cmd_dump_recv_seq,
++	[EXIT]		= cmd_exit,
++	[RECV]		= cmd_recv,
++	[REPAIR]	= cmd_repair,
++};
++
++/**
++ * main() - Entry point, accept control connection and dispatch commands
++ * @argc:	Argument count, must be 2 (one option)
++ * @argv:	Options: server port
++ *
++ * Return: 0 on success, exit on failure
++ */
++int main(int argc, char **argv)
++{
++	struct sockaddr_in a = { AF_INET, htons(atoi(argv[1])), { 0 }, { 0 } };
++	int s, ctl, data = -1, cmd[2];
++
++	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
++	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &((int){ 1 }), sizeof(int));
++
++	if (argc != 2) {
++		fprintf(stderr, "%s PORT\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	bind(s, (struct sockaddr *)&a, sizeof(a));
++	listen(s, 0);
++	ctl = accept(s, NULL, NULL);
++
++	while (recv(ctl, cmd, sizeof(cmd), 0) == sizeof(cmd)) {
++		int ret = fn[cmd[0]](cmd[1], s, &data);
++		if (cmd[0] != ACCEPT)
++			send(ctl, &ret, sizeof(ret), 0);
++	}
++
++	return 0;
++}
+diff --git a/tools/testing/selftests/net/tcp_repair/talk.h b/tools/testing/selftests/net/tcp_repair/talk.h
+new file mode 100644
+index 000000000000..e2fbad7fae07
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_repair/talk.h
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++/* selftests/net/tcp_repair: TCP_REPAIR connection tests
++ *
++ * talk.h - Communication protocol for client and server
++ *
++ * Copyright (c) 2026 Red Hat GmbH
++ *
++ * Author: Stefano Brivio <sbrivio@redhat.com>
++ */
++
++/**
++ * enum op - Server command type (taking optional int argument, returning int)
++ * @ACCEPT		Accept connection on data socket (doesn't return int)
++ * @DUMP_RECV_SEQ	Dump receive sequence, return it to the client
++ * @EXIT		Exit, return 0 to the client
++ * @RECV		Try receiving given amount of bytes, return received
++ * @REPAIR		Set repair mode to argument, return setsockopt() value
++ */
++enum op {
++	ACCEPT,
++	DUMP_RECV_SEQ,
++	EXIT,
++	RECV,
++	REPAIR,
++};
 -- 
 2.43.0
 
