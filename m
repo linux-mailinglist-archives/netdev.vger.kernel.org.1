@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-289340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289341-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKtfCncoDGq/XgUAu9opvQ
-	(envelope-from <netdev+bounces-289340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:08:07 +0200
+	id qGoLMosoDGq/XgUAu9opvQ
+	(envelope-from <netdev+bounces-289341-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:08:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C502057AE97
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:08:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66DF057AE9F
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:08:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9F1523095080
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:00:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 030E4309957B
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793FB3F660B;
-	Tue, 19 May 2026 08:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C023F6C5F;
+	Tue, 19 May 2026 08:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2C2beJi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NTgwWEbw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568933F65F7;
-	Tue, 19 May 2026 08:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F50E3F65F7;
+	Tue, 19 May 2026 08:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779181110; cv=none; b=H+ALW1A/57BKhbQcCCBKhi68NesBC5a81s5abHehU3zOnllpZweg0fYW9keB6VL1vYILpImNmdzlToeXPgqTQe0v8lqqG3Slt2sxAutt2Uq6ap93415UBsKw36JSJaQSbRd8uJ25VhJlbpGE+TBMTCeGNtehw0hYaW3pkKkjtv0=
+	t=1779181113; cv=none; b=XeAc+R5AS5gsZSfhj88+VYdXB9hWbvHX0oOucOFt3M6RjRXe9sicmhuOh1k95jJYCmCsNyZo/79jtH2Rd4FW39xYjckO+mczLcsI99ZdX8TO2W2Ve0NJQzt66CR1bsISE4EMmHsECYNKMQsVjKLA3AfJzDbrA40lWdzDlKk2KOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779181110; c=relaxed/simple;
-	bh=v9g1kGvyMZef+DT0kXwcSoPza90m6NytS0FfoJje0sM=;
+	s=arc-20240116; t=1779181113; c=relaxed/simple;
+	bh=PYjKbAzL9TGggPm3kjc7214y/9EFSBkPL8WaWAvWkdE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=P7+Jelq5a+4atlm8hc7HwG4XKJEG25tcNdBBo5+h5K4q2ER8WcF4QEPaDNluX1fAbbi2+LbH+0eqELIMQv2A6S93zVcGBqJ3BwLPDMyQmHPIj2/Ibecwgjdpd34GmEBK5kcKe76rHbVEbGvPhEHZPMrkSn25WwO1R8/AGIvQk8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2C2beJi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1EE1C2BCC6;
-	Tue, 19 May 2026 08:58:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=f8SP7uAamPsHSymVq8izpHLT6/PvrEtRRFyD9ddQ4V5gqd3j7h4l/GaF41Bf1qlB56KNUYTMi29CJUdXKg/1U3AIock1zH157vcj6s/oSpIrvA/0TkuOOU2eWzkRQrW8H3Fs4shnU91PlRp45emP6JQv5V4ewS96l3UFPY+f4Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NTgwWEbw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F6CC2BCF6;
+	Tue, 19 May 2026 08:58:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779181110;
-	bh=v9g1kGvyMZef+DT0kXwcSoPza90m6NytS0FfoJje0sM=;
+	s=k20201202; t=1779181113;
+	bh=PYjKbAzL9TGggPm3kjc7214y/9EFSBkPL8WaWAvWkdE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=L2C2beJiif8UUwE2bNk0Jl75SK8UTKKTWzmnERvhn4/qqNn1qrvNFGg2VqTELAb3p
-	 bnoENvarF8Lb0uPerD5ceWRKGY9qqzOksJ+YieMK76CHtNdLxyOXcdi1r+doi7yxYe
-	 t4OmPxMBnA1J7BwZavWl3JSnq/y1LAhLk9D0xx4YV3BKlVxdZFLHFIscYwI2V1ZPao
-	 TIqByuHVcdeOol6TBEWYORdsctFvYwwQ92xFL1UkMLwedN2nsH1JtZCDyAzer12dBZ
-	 Le3WxsW8pp0X+3+uN/Q6o1ZceihLPOyxzeQ2KX96yP8IhF4keYrSbpKsH2lxT7VOj7
-	 9ADE8Rgxrb5Og==
+	b=NTgwWEbwKhOCES0wzU6h8ZgP8wxViEr+HTq+DquS00KhmWlCu9coCTrC4BAwXSyCs
+	 awfUOZIcs5iyaCTqU2A4HAY39gfKr+XEZj4y3GpIUAcrOagoJ4lwLU6W3RRQp9KqFO
+	 c4IUq0jEwNFMRjiiLAhLGYl+tv6OUVQXlIKlfVsfBtrrGlpoyh0PiwdFFDC2wMOKwT
+	 xjN/WwDubUX2Si3rfNCr4byug9ShooDdz5F6DzaqTSZ8VoTbZyCkdIf6pD67NuRi+Z
+	 gTjo9lQ5MZdnwHFedvZ66A7cBsj1w+6ayHq3SK1xpMFffa+LVAcp0fCHN2WohqrLTi
+	 N2zi1XTRzqrcg==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 19 May 2026 10:57:47 +0200
-Subject: [PATCH net-next v8 04/10] net: airoha: Rely on airoha_gdm_dev
- pointer in airoha_is_lan_gdm_port()
+Date: Tue, 19 May 2026 10:57:48 +0200
+Subject: [PATCH net-next v8 05/10] net: airoha: Move qos_sq_bmap in
+ airoha_gdm_dev struct
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260519-airoha-eth-multi-serdes-v8-4-6bd70e329df6@kernel.org>
+Message-Id: <20260519-airoha-eth-multi-serdes-v8-5-6bd70e329df6@kernel.org>
 References: <20260519-airoha-eth-multi-serdes-v8-0-6bd70e329df6@kernel.org>
 In-Reply-To: <20260519-airoha-eth-multi-serdes-v8-0-6bd70e329df6@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -67,26 +67,25 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: Christian Marangi <ansuelsmth@gmail.com>, 
  Benjamin Larsson <benjamin.larsson@genexis.eu>, 
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- Xuegang Lu <xuegang.lu@airoha.com>
+ netdev@vger.kernel.org, devicetree@vger.kernel.org
 X-Mailer: b4 0.14.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289340-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289341-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -95,82 +94,192 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,airoha.com:email]
-X-Rspamd-Queue-Id: C502057AE97
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 66DF057AE9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Rename airoha_is_lan_gdm_port in airoha_is_lan_gdm_dev. Moreover, rely
-on airoha_gdm_dev pointer in airoha_is_lan_gdm_dev() instead of
-airoha_gdm_port one.
-This is a preliminary patch to support multiple net_devices connected to
-the same GDM{3,4} port via an external hw arbiter.
+Since now multiple net_devices connected to different QDMA blocks can
+share the same GDM port, qos_sq_bmap field can be overwritten with the
+configuration obtained from a net_device connected to a different QDMA
+block. In order to fix the issue move qos_sq_bmap field from
+airoha_gdm_port struct to airoha_gdm_dev one.
+Add qos_channel_map bitmap in airoha_qdma struct to track if a shared
+QDMA channel is already in use by another net_device.
 
-Tested-by: Xuegang Lu <xuegang.lu@airoha.com>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 6 ++----
- drivers/net/ethernet/airoha/airoha_eth.h | 4 +++-
- drivers/net/ethernet/airoha/airoha_ppe.c | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 58 ++++++++++++++++++++------------
+ drivers/net/ethernet/airoha/airoha_eth.h |  6 ++--
+ 2 files changed, 40 insertions(+), 24 deletions(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 9f93a1f28c89..847f432b0a2b 100644
+index 847f432b0a2b..594fbebcb12c 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -73,12 +73,10 @@ static void airoha_qdma_irq_disable(struct airoha_irq_bank *irq_bank,
- 
- static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *addr)
- {
--	struct airoha_gdm_port *port = dev->port;
- 	struct airoha_eth *eth = dev->eth;
- 	u32 val, reg;
- 
--	reg = airoha_is_lan_gdm_port(port) ? REG_FE_LAN_MAC_H
--					   : REG_FE_WAN_MAC_H;
-+	reg = airoha_is_lan_gdm_dev(dev) ? REG_FE_LAN_MAC_H : REG_FE_WAN_MAC_H;
- 	val = (addr[0] << 16) | (addr[1] << 8) | addr[2];
- 	airoha_fe_wr(eth, reg, val);
- 
-@@ -1866,7 +1864,7 @@ static int airoha_dev_init(struct net_device *netdev)
- 	int i;
- 
- 	/* QDMA0 is used for lan ports while QDMA1 is used for WAN ports */
--	dev->qdma = &eth->qdma[!airoha_is_lan_gdm_port(port)];
-+	dev->qdma = &eth->qdma[!airoha_is_lan_gdm_dev(dev)];
- 	dev->dev->irq = dev->qdma->irq_banks[0].irq;
- 	airoha_set_macaddr(dev, netdev->dev_addr);
- 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index f1eea492217c..f6f59d25abd9 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -647,8 +647,10 @@ static inline u16 airoha_qdma_get_txq(struct airoha_qdma *qdma, u16 qid)
- 	return qid % ARRAY_SIZE(qdma->q_tx);
+@@ -2600,30 +2600,40 @@ static int airoha_qdma_set_tx_rate_limit(struct net_device *netdev,
+ 	return 0;
  }
  
--static inline bool airoha_is_lan_gdm_port(struct airoha_gdm_port *port)
-+static inline bool airoha_is_lan_gdm_dev(struct airoha_gdm_dev *dev)
+-static int airoha_tc_htb_alloc_leaf_queue(struct net_device *netdev,
+-					  struct tc_htb_qopt_offload *opt)
++static int airoha_tc_htb_modify_queue(struct net_device *dev,
++				      struct tc_htb_qopt_offload *opt)
  {
-+	struct airoha_gdm_port *port = dev->port;
+ 	u32 channel = TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
+ 	u32 rate = div_u64(opt->rate, 1000) << 3; /* kbps */
+-	int err, num_tx_queues = netdev->real_num_tx_queues;
+-	struct airoha_gdm_dev *dev = netdev_priv(netdev);
+-	struct airoha_gdm_port *port = dev->port;
+ 
+ 	if (opt->parent_classid != TC_HTB_CLASSID_ROOT) {
+ 		NL_SET_ERR_MSG_MOD(opt->extack, "invalid parent classid");
+ 		return -EINVAL;
+ 	}
+ 
+-	err = airoha_qdma_set_tx_rate_limit(netdev, channel, rate,
+-					    opt->quantum);
+-	if (err) {
++	return airoha_qdma_set_tx_rate_limit(dev, channel, rate, opt->quantum);
++}
 +
- 	/* GDM1 port on EN7581 SoC is connected to the lan dsa switch.
- 	 * GDM{2,3,4} can be used as wan port connected to an external
- 	 * phy module.
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 22f5f1bae730..047141b2d6d8 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -362,7 +362,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
- 			/* For downlink traffic consume SRAM memory for hw
- 			 * forwarding descriptors queue.
- 			 */
--			if (airoha_is_lan_gdm_port(port))
-+			if (airoha_is_lan_gdm_dev(dev))
- 				val |= AIROHA_FOE_IB2_FAST_PATH;
- 			if (dsa_port >= 0)
- 				val |= FIELD_PREP(AIROHA_FOE_IB2_NBQ,
++static int airoha_tc_htb_alloc_leaf_queue(struct net_device *netdev,
++					  struct tc_htb_qopt_offload *opt)
++{
++	u32 channel = TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
++	int err, num_tx_queues = netdev->real_num_tx_queues;
++	struct airoha_gdm_dev *dev = netdev_priv(netdev);
++	struct airoha_qdma *qdma = dev->qdma;
++
++	/* Here we need to check the requested QDMA channel is not already
++	 * in use by another net_device running on the same QDMA block.
++	 */
++	if (test_and_set_bit(channel, qdma->qos_channel_map)) {
+ 		NL_SET_ERR_MSG_MOD(opt->extack,
+-				   "failed configuring htb offload");
+-		return err;
++				   "qdma qos channel already in use");
++		return -EBUSY;
+ 	}
+ 
+-	if (opt->command == TC_HTB_NODE_MODIFY)
+-		return 0;
++	err = airoha_tc_htb_modify_queue(netdev, opt);
++	if (err)
++		goto error;
+ 
+ 	err = netif_set_real_num_tx_queues(netdev, num_tx_queues + 1);
+ 	if (err) {
+@@ -2631,13 +2641,17 @@ static int airoha_tc_htb_alloc_leaf_queue(struct net_device *netdev,
+ 					      opt->quantum);
+ 		NL_SET_ERR_MSG_MOD(opt->extack,
+ 				   "failed setting real_num_tx_queues");
+-		return err;
++		goto error;
+ 	}
+ 
+-	set_bit(channel, port->qos_sq_bmap);
++	set_bit(channel, dev->qos_sq_bmap);
+ 	opt->qid = AIROHA_NUM_TX_RING + channel;
+ 
+ 	return 0;
++error:
++	clear_bit(channel, qdma->qos_channel_map);
++
++	return err;
+ }
+ 
+ static int airoha_qdma_set_rx_meter(struct airoha_gdm_dev *dev,
+@@ -2818,11 +2832,13 @@ static int airoha_dev_setup_tc_block(struct net_device *dev,
+ static void airoha_tc_remove_htb_queue(struct net_device *netdev, int queue)
+ {
+ 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
+-	struct airoha_gdm_port *port = dev->port;
++	struct airoha_qdma *qdma = dev->qdma;
+ 
+ 	netif_set_real_num_tx_queues(netdev, netdev->real_num_tx_queues - 1);
+ 	airoha_qdma_set_tx_rate_limit(netdev, queue + 1, 0, 0);
+-	clear_bit(queue, port->qos_sq_bmap);
++
++	clear_bit(queue, qdma->qos_channel_map);
++	clear_bit(queue, dev->qos_sq_bmap);
+ }
+ 
+ static int airoha_tc_htb_delete_leaf_queue(struct net_device *netdev,
+@@ -2830,9 +2846,8 @@ static int airoha_tc_htb_delete_leaf_queue(struct net_device *netdev,
+ {
+ 	u32 channel = TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
+ 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
+-	struct airoha_gdm_port *port = dev->port;
+ 
+-	if (!test_bit(channel, port->qos_sq_bmap)) {
++	if (!test_bit(channel, dev->qos_sq_bmap)) {
+ 		NL_SET_ERR_MSG_MOD(opt->extack, "invalid queue id");
+ 		return -EINVAL;
+ 	}
+@@ -2845,10 +2860,9 @@ static int airoha_tc_htb_delete_leaf_queue(struct net_device *netdev,
+ static int airoha_tc_htb_destroy(struct net_device *netdev)
+ {
+ 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
+-	struct airoha_gdm_port *port = dev->port;
+ 	int q;
+ 
+-	for_each_set_bit(q, port->qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS)
++	for_each_set_bit(q, dev->qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS)
+ 		airoha_tc_remove_htb_queue(netdev, q);
+ 
+ 	return 0;
+@@ -2859,9 +2873,8 @@ static int airoha_tc_get_htb_get_leaf_queue(struct net_device *netdev,
+ {
+ 	u32 channel = TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
+ 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
+-	struct airoha_gdm_port *port = dev->port;
+ 
+-	if (!test_bit(channel, port->qos_sq_bmap)) {
++	if (!test_bit(channel, dev->qos_sq_bmap)) {
+ 		NL_SET_ERR_MSG_MOD(opt->extack, "invalid queue id");
+ 		return -EINVAL;
+ 	}
+@@ -2880,6 +2893,7 @@ static int airoha_tc_setup_qdisc_htb(struct net_device *dev,
+ 	case TC_HTB_DESTROY:
+ 		return airoha_tc_htb_destroy(dev);
+ 	case TC_HTB_NODE_MODIFY:
++		return airoha_tc_htb_modify_queue(dev, opt);
+ 	case TC_HTB_LEAF_ALLOC_QUEUE:
+ 		return airoha_tc_htb_alloc_leaf_queue(dev, opt);
+ 	case TC_HTB_LEAF_DEL:
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index f6f59d25abd9..a308a770116b 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -533,6 +533,8 @@ struct airoha_qdma {
+ 
+ 	struct airoha_queue q_tx[AIROHA_NUM_TX_RING];
+ 	struct airoha_queue q_rx[AIROHA_NUM_RX_RING];
++
++	DECLARE_BITMAP(qos_channel_map, AIROHA_NUM_QOS_CHANNELS);
+ };
+ 
+ struct airoha_gdm_dev {
+@@ -540,6 +542,8 @@ struct airoha_gdm_dev {
+ 	struct airoha_qdma *qdma;
+ 	struct net_device *dev;
+ 	struct airoha_eth *eth;
++
++	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
+ };
+ 
+ struct airoha_gdm_port {
+@@ -549,8 +553,6 @@ struct airoha_gdm_port {
+ 
+ 	struct airoha_hw_stats stats;
+ 
+-	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
+-
+ 	/* qos stats counters */
+ 	u64 cpu_tx_packets;
+ 	u64 fwd_tx_packets;
 
 -- 
 2.54.0
