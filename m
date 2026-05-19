@@ -1,169 +1,342 @@
-Return-Path: <netdev+bounces-289286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289287-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uLlCBXUFDGq+TwUAu9opvQ
-	(envelope-from <netdev+bounces-289286-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:38:45 +0200
+	id SPjxHfYHDGodUAUAu9opvQ
+	(envelope-from <netdev+bounces-289287-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:49:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ECAE578351
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:38:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 813C2578592
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:49:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0ADA3038F4E
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:28:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C97F23032FD7
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C091F382F0A;
-	Tue, 19 May 2026 06:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098A138A738;
+	Tue, 19 May 2026 06:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b="JhWK8ac0"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="axi1jPDH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [152.89.196.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8580D37CD35
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6263937D10F;
+	Tue, 19 May 2026 06:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.89.196.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779172131; cv=none; b=rW45nmsALQjZCwX0IwlpErqlVQ2EEB76bA7lCCzC9VPCQeynHGJh9TZZkFrdRD/HcUtIJb49JlUY2ZoltmkSWVNhish3uZi1nhltZQKKemDQay/sKMOe+ty9QPnw3OrszzG7CAwyCoh2H/wB/0rDU6Te5VFv6TPYjpXsawHqfw0=
+	t=1779172659; cv=none; b=J7J1KFDnL/9q5hcPZVE2HfVBPswJ1aR+TBTZoqN5thfTcH1TAXg/szRob/k90I72cGOH1i259pQzu3kHh+2h7iTImYSoP5MFXK49QQfZW5Fn9rPYBMdT0+vbsKl4MgdDL2c9diwXUfEbczNJIAvA3E8fO0k70/T+mE/JtxxU3rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779172131; c=relaxed/simple;
-	bh=H6RNv3g1Ds2kKIb9mbKPwle8pMhHto8h2eiocv6qV68=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SCBKOEaX4AEP6G/pPIUlIIjDOn1NOazc5SYKnSRG3s2xMlnD+K5lnb/iyopEQuIKxEkKuOS8XJO0brxcYdg1kIOrUAlj6QkNebPGemHpWM52LBEJ5h4tbpmn7xZDbiLSWXD3TPWSXnXL7eRP+etpdNCJZSoXJ86pCRzJ0TaZOmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b=JhWK8ac0; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-83d31ac4017so1391153b3a.3
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 23:28:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cse-iitm-ac-in.20251104.gappssmtp.com; s=20251104; t=1779172130; x=1779776930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8zUEbH0RzskapC2a5NR15SwMDD1KBLfzEqEE74hnw70=;
-        b=JhWK8ac0Cpa6D1/fLMmJcIEk7hAANA+AMuFfPkT7pWPDCLxCJ6sWm3Vs1bExv5lTc/
-         Gi4qARbwwI//nPz5ysZvxIoASaSnlkaGiZEerxy6/w+NYZvHlz+1muE1QNPHWtKu3AWk
-         V+WCF2YKNh7lfpFeMJzTcSUQI6JPCvDOm/zUbwGexjPmemEb/LwBgeKkZcAy6I9/2mhV
-         /jXdfOpr0b9ohCodE2n2jU6/5lzG4XPCQdoQKjti5owMGgjGh09kDsWp1MZtB0wfj4yx
-         cwJFuuZlRe8YzPQOVp2ug6wD8N3MR4HnAWVzxhKFkdfyyOLOoblOpf8VSf9UnIPl1XEM
-         6sbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779172130; x=1779776930;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8zUEbH0RzskapC2a5NR15SwMDD1KBLfzEqEE74hnw70=;
-        b=EN7CB+5nJsXmloflKBpn+hWlrATdhu2dw66Sf/EP72TnBEnIQ+d2TV33inkYjyjjca
-         bxhzgU+58RRNwZ7yZlrEknyARMh3E+y49Iu+0FOCZO8Cr+HOPAgsEHHU+oX169MJ+tyR
-         lCD/sysekJ4mrShCsSwMdUYUa6wrdE8u6DXjBQseL+hG5c6seEq7Djwv1d9HO/IdxCJ/
-         Xb9jcxhgJEk1Sz82jLFu4sF3SApQ3PnqTbAD3aqh3uS+OBlAEjSeXnKlbCO1PjevqIQ+
-         o5QgmRx92Jjmpwrflx46sVFx0qmNRTPr2ld4Uwk9jEpJtmeJGNb3kcj2mEU0yG1LrQfl
-         dE1w==
-X-Forwarded-Encrypted: i=1; AFNElJ/BuAOw/v1fcsxzDpKf6D6hLg+tgxRICfT1A+tdtA2jTLlPS3WtnIGajqE0RIs2UQf/XI9JIGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOtseWo+PszZnQctVJIEvvWEyaN04kQcomnGYn5XeDVc5iQi9R
-	Zjv6XF9bumVlFfyZ/d3T8/7N7VOd8FnCWQRYr967R1Ftsq3KAQHh8LJjLrwSMo1YBM8G34VEuFu
-	MtLdLMDA=
-X-Gm-Gg: Acq92OH2k+XQpwUDb/0O26hqgTQpoA/aulRXKZf+74cq26ER35azb3UYD2wbsdyYN3R
-	MmrqVc4sdVXG4dFoj25mVzTj10BgydbNkkU4/hyuVoA8WDfJvyswB+dfPvweVgizJuVBX4Mib6u
-	4ZzI+5E3joyTEtjIEBvnPOYximSbVuJ3/0dVYEc7+zx3V6f3eic+tZ/DaJClfYpSv3dNIOE7aWO
-	E3mRLRT2QF4o3WqoR2K6Csd7h82fmylLxa2vzb8Xh4xsBjYWKHlS4ngRB62kXzHhl5lcIMxvvna
-	2YKD/zHbR0eCEM3RX4Cfw2JUYQzT6Kuqm9+p2vB0qCO84o/Guzzk/jWb6+lbRM1Z0BK7lIDJLWn
-	/KTZz+TdlfWGDBIfd9bwmL1Nd/JVOQJPP7p4X19WTLMrl36EDku/JoJ+v7vJ/U7fBO+OMDtBgLR
-	YJO6cUKkNoXUzaYkM3hth96QKr0HcLhrX+N5T8Yd0/bXpNPKD6ZlU6EbfCBnUVQWFTJRDfQR0rX
-	OwlKygWlCROdAhgmfH9ei64rm4QOh306hwww3arhDPh4/o2T4j4Ij37C/kV5qhIUynM
-X-Received: by 2002:a05:6a00:3e22:b0:83e:f208:b113 with SMTP id d2e1a72fcca58-83f33c541cdmr17707506b3a.7.1779172129825;
-        Mon, 18 May 2026 23:28:49 -0700 (PDT)
-Received: from localhost.localdomain ([103.158.43.41])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-83f1966471dsm17045725b3a.6.2026.05.18.23.28.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 23:28:49 -0700 (PDT)
-From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
-To: loic.poulain@oss.qualcomm.com
-Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v2] net: wwan: iosm: fix potential memory leaks in ipc_imem_init()
-Date: Tue, 19 May 2026 11:57:39 +0530
-Message-ID: <20260519062815.55545-1-nihaal@cse.iitm.ac.in>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1779172659; c=relaxed/simple;
+	bh=Ba54tlaLzVS0tnkEUiadMTQemQZTXU53H6g52Xw1Q4g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=pqd58jaPaE6BjcTBYg91s7SfSGyXBX7p+KeZwHKggSh1mJ+QdaXVz2WN2b35r5qbnXJOHuDNac3RYw53G8tED2KyKI7usTwMfoxA4Tw20v+iJIH0xRYCI88iqPY4okDYVb0BlrnUSyrR0AjtVoBB/IBzhzc2zLzK+smqSUF5qFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=axi1jPDH; arc=none smtp.client-ip=152.89.196.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx4.sberdevices.ru (Postfix) with ESMTP id 43BCD40017;
+	Tue, 19 May 2026 09:37:27 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 43BCD40017
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=post; t=1779172647;
+	bh=wq2XHzZwQG7ofdjqejV+Sf3LE4yTZqvjhYHDHUch4Us=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=axi1jPDHTZTyrBusIdQ53XIbLeNr4/1b269hdRGnUBfLwu9zM+unxUUGrT4WOqI97
+	 B618CgvWiJo24vVwBOBmrudFNAZU5B4Q5dyrriWUcPUmXORlYe/EgeHHTWZrq7N35h
+	 S9b1B58xPMB7g1QAsk204Kx3XaOZuxlBWPUnJTpIzMyZXlhMA+NtNhrGZ3rCl7JZ0H
+	 4Ly9UtzZgl8Zam0NRScxYxI/5xlB25yFvpdJAwe0JGGeP5n28NimXVDLZjIq6WsplU
+	 0m/5kRvW3J6H4G0Zct0aH9f2JNFneaLmRnZPjjNZXF9YMNLaTesiNRn5l69XOurGbn
+	 h0yjJqevvOcYg==
+Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "sberdevices.ru", Issuer "R12" (not verified))
+	by mx4.sberdevices.ru (Postfix) with ESMTPS;
+	Tue, 19 May 2026 09:37:25 +0300 (MSK)
+Message-ID: <aea2227c-3011-4457-b909-d16de1596a6d@salutedevices.com>
+Date: Tue, 19 May 2026 09:37:23 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] vsock/virtio: fix zerocopy completion for multi-skb
+ sends
+Content-Language: ru
+To: Stefano Garzarella <sgarzare@redhat.com>, David Laight
+	<david.laight.linux@gmail.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>, <netdev@vger.kernel.org>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+	<kvm@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, <virtualization@lists.linux.dev>, "David S.
+ Miller" <davem@davemloft.net>, Jason Wang <jasowang@redhat.com>,
+	<linux-kernel@vger.kernel.org>, Maher Azzouzi <maherazz04@gmail.com>
+References: <20260514092948.268720-1-sgarzare@redhat.com>
+ <20260516125329.7b699c6f@pumpkin> <agrXvCtNRlySlwgx@sgarzare-redhat>
+ <20260518053223-mutt-send-email-mst@kernel.org>
+ <agrg1GVzoJWtNuSd@sgarzare-redhat> <20260518115005.5f13bd2b@pumpkin>
+ <20260519053951.1C60440015@mx4.sberdevices.ru>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <20260519053951.1C60440015@mx4.sberdevices.ru>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.44 / 15.00];
+X-ClientProxiedBy: p-exch-cas-s-m2.sberdevices.ru (172.16.210.3) To
+ p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
+X-KSMG-AntiPhishing: NotDetected, bases: 2026/05/19 06:19:00
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Info: LuaCore: 105 0.3.105 c7fb587251b1312ef0d9243823bef7335f8fcbef, {Tracking_phishing_log_reg_50_60}, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;git.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;sashiko.dev:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 203239 [May 19 2026]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.22
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/05/19 04:09:00 #28206517
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-KATA-Status: Not Scanned
+X-KSMG-LinksScanning: NotDetected, bases: 2026/05/19 06:18:00
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 5
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[cse-iitm-ac-in.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[salutedevices.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[salutedevices.com:s=post];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[iitm.ac.in : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289286-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289287-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[cse.iitm.ac.in,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,kernel.org,google.com,linux.alibaba.com,lists.linux.dev,davemloft.net,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nihaal@cse.iitm.ac.in,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[cse-iitm-ac-in.20251104.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[avkrasnov@salutedevices.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[salutedevices.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,cse-iitm-ac-in.20251104.gappssmtp.com:dkim,iitm.ac.in:email,cse.iitm.ac.in:mid]
-X-Rspamd-Queue-Id: 9ECAE578351
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[salutedevices.com:email,salutedevices.com:mid,salutedevices.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,sashiko.dev:url]
+X-Rspamd-Queue-Id: 813C2578592
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The memory allocated in ipc_protocol_init() is not freed on the error
-paths that follow in ipc_imem_init(). Fix that by calling the
-corresponding release function ipc_protocol_deinit() in the error path.
 
-Fixes: 3670970dd8c6 ("net: iosm: shared memory IPC interface")
-Cc: stable@vger.kernel.org
-Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
----
-v1->v2:
-- Moved the ipc_protocol_deinit() call to a point after the tasklets and
-  workers are cleaned up to avoid a possible Use after free, as
-  suggested by Jakub Kicinski.
 
-Link to v1 patch: https://lore.kernel.org/all/20260508092141.82495-1-nihaal@cse.iitm.ac.in/
+On 18/05/2026 14:08, Stefano Garzarella wrote:
+> On Mon, May 18, 2026 at 11:50:05AM +0100, David Laight wrote:
+>> On Mon, 18 May 2026 11:54:19 +0200
+>> Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>>> On Mon, May 18, 2026 at 05:33:08AM -0400, Michael S. Tsirkin wrote:
+>>> >On Mon, May 18, 2026 at 11:18:24AM +0200, Stefano Garzarella wrote:
+>>> >> On Sat, May 16, 2026 at 12:53:29PM +0100, David Laight wrote:
+>>> >> > On Thu, 14 May 2026 11:29:48 +0200
+>>> >> > Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>> >> >
+>>> >> > > From: Stefano Garzarella <sgarzare@redhat.com>
+>>> >> > >
+>>> >> > > When a large message is fragmented into multiple skbs, the zerocopy
+>>> >> > > uarg is only allocated and attached to the last skb in the loop.
+>>> >> > > Non-final skbs carry pinned user pages with no completion tracking,
+>>> >> > > so the kernel has no way to notify userspace when those pages are safe
+>>> >> > > to reuse. If the loop breaks early the uarg is never allocated at all,
+>>> >> > > leaking pinned pages with no completion notification.
+>>> >> > >
+>>> >> > > Fix this by following the approach used by TCP: allocate the zerocopy
+>>> >> > > uarg (if not provided by the caller) before the send loop and attach
+>>> >> > > it to every skb via skb_zcopy_set(), which takes a reference per skb.
+>>> >> > > Each skb's completion properly decrements the refcount, and the
+>>> >> > > notification only fires after the last skb is freed.
+>>> >> > > On failure, if no data was sent, the uarg is cleanly aborted via
+>>> >> > > net_zcopy_put_abort().
+>>> >> > >
+>>> >> > > This issue was initially discovered by sashiko while reviewing commit
+>>> >> > > 1cb36e252211 ("vsock/virtio: fix MSG_ZEROCOPY pinned-pages accounting")
+>>> >> > > but was pre-existing.
+>>> >> > >
+>>> >> > > Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+>>> >> > > Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>>> >> > > Closes: https://sashiko.dev/#/patchset/20260420132051.217589-1-sgarzare%40redhat.com
+>>> >> > > Reported-by: Maher Azzouzi <maherazz04@gmail.com>
+>>> >> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>> >> > > ---
+>>> >> > >  net/vmw_vsock/virtio_transport_common.c | 83 ++++++++++---------------
+>>> >> > >  1 file changed, 34 insertions(+), 49 deletions(-)
+>>> >> > >
+>>> >> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> >> > > index 989cc252d3d3..1e3409d28164 100644
+>>> >> > > --- a/net/vmw_vsock/virtio_transport_common.c
+>>> >> > > +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> >> > > @@ -70,34 +70,6 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
+>>> >> > >      return true;
+>>> >> > >  }
+>>> >> > >
+>>> >> > > -static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
+>>> >> > > -                       struct sk_buff *skb,
+>>> >> > > -                       struct msghdr *msg,
+>>> >> > > -                       size_t pkt_len,
+>>> >> > > -                       bool zerocopy)
+>>> >> > > -{
+>>> >> > > -    struct ubuf_info *uarg;
+>>> >> > > -
+>>> >> > > -    if (msg->msg_ubuf) {
+>>> >> > > -        uarg = msg->msg_ubuf;
+>>> >> > > -        net_zcopy_get(uarg);
+>>> >> > > -    } else {
+>>> >> > > -        struct ubuf_info_msgzc *uarg_zc;
+>>> >> > > -
+>>> >> > > -        uarg = msg_zerocopy_realloc(sk_vsock(vsk),
+>>> >> > > -                        pkt_len, NULL, false);
+>>> >> > > -        if (!uarg)
+>>> >> > > -            return -1;
+>>> >> > > -
+>>> >> > > -        uarg_zc = uarg_to_msgzc(uarg);
+>>> >> > > -        uarg_zc->zerocopy = zerocopy ? 1 : 0;
+>>> >> > > -    }
+>>> >> > > -
+>>> >> > > -    skb_zcopy_init(skb, uarg);
+>>> >> > > -
+>>> >> > > -    return 0;
+>>> >> > > -}
+>>> >> > > -
+>>> >> > >  static int virtio_transport_fill_skb(struct sk_buff *skb,
+>>> >> > >                       struct virtio_vsock_pkt_info *info,
+>>> >> > >                       size_t len,
+>>> >> > > @@ -317,8 +289,10 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>> >> > >      u32 src_cid, src_port, dst_cid, dst_port;
+>>> >> > >      const struct virtio_transport *t_ops;
+>>> >> > >      struct virtio_vsock_sock *vvs;
+>>> >> > > +    struct ubuf_info *uarg = NULL;
+>>> >> > >      u32 pkt_len = info->pkt_len;
+>>> >> > >      bool can_zcopy = false;
+>>> >> > > +    bool have_uref = false;
+>>> >> > >      u32 rest_len;
+>>> >> > >      int ret;
+>>> >> > >
+>>> >> > > @@ -360,6 +334,25 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>> >> > >          if (can_zcopy)
+>>> >> > >              max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
+>>> >> > >                          (MAX_SKB_FRAGS * PAGE_SIZE));
+>>> >> > > +
+>>> >> > > +        if (info->msg->msg_flags & MSG_ZEROCOPY &&
+>>> >> > > +            info->op == VIRTIO_VSOCK_OP_RW) {
+>>> >> > > +            uarg = info->msg->msg_ubuf;
+>>> >> > > +
+>>> >> > > +            if (!uarg) {
+>>> >> > > +                uarg = msg_zerocopy_realloc(sk_vsock(vsk),
+>>> >> > > +                                pkt_len, NULL, false);
+>>> >> > > +                if (!uarg) {
+>>> >> > > +                    virtio_transport_put_credit(vvs, pkt_len);
+>>> >> > > +                    return -ENOMEM;
+>>> >> > > +                }
+>>> >> > > +
+>>> >> > > +                if (!can_zcopy)
+>>> >> > > +                    uarg_to_msgzc(uarg)->zerocopy = 0;
+>>> >> > > +
+>>> >> > > +                have_uref = true;
+>>> >> > > +            }
+>>> >> > > +        }
+>>> >> >
 
- drivers/net/wwan/iosm/iosm_ipc_imem.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi guys! Just some replies after quick look:
 
-diff --git a/drivers/net/wwan/iosm/iosm_ipc_imem.c b/drivers/net/wwan/iosm/iosm_ipc_imem.c
-index 1b7bc7d63a2e..4405c8531888 100644
---- a/drivers/net/wwan/iosm/iosm_ipc_imem.c
-+++ b/drivers/net/wwan/iosm/iosm_ipc_imem.c
-@@ -1425,6 +1425,8 @@ struct iosm_imem *ipc_imem_init(struct iosm_pcie *pcie, unsigned int device_id,
- protocol_init_fail:
- 	cancel_work_sync(&ipc_imem->run_state_worker);
- 	ipc_task_deinit(ipc_imem->ipc_task);
-+	if (ipc_imem->ipc_protocol)
-+		ipc_protocol_deinit(ipc_imem->ipc_protocol);
- ipc_task_init_fail:
- 	kfree(ipc_imem->ipc_task);
- ipc_task_fail:
--- 
-2.43.0
+>>> >> > Surely that block should only be done if can_zcopy is true?
+
+I guess no, since TCP also allocates uarg even if zerocopy is impossible -
+it just sets uarg_to_msgzc(uarg)->zerocopy = 0;
+
+>>> >> > And shouldn't something unset it if info->op != VIRTIO_VSOCK_OP_RW ?
+
+Hm, we can't enter block 'if (info->msg) {' when 'info->op' is not equal to 'VIRTIO_VSOCK_OP_RW',
+because 'msg' is not NULL only for 'VIRTIO_VSOCK_OP_RW'. But anyway You point to right thing - check for
+'VIRTIO_VSOCK_OP_RW' could be removed here. Just with comment why.
+
+>>> >> > If the msg_zerocopy_realloc() fails then can't you just set can_zcopy to false.
+
+Here I guess it is better to follow TCP way to make same behaviour, because exact
+logic for MSG_ZEROCOPY is not documented. TCP also returns error and stops tx loop.
+
+>>> >> >
+>>> >> > It info->msg->msg_buf is already set then I think you have to disable zero-copy.
+>>> >> > The caller has already requested a callback - and you can't add another.
+
+In TCP implementation if 'msg_ubuf' is set they just use it and check for zerocopy in
+the same way as 'msg_ubuf' is NULL.
+
+>>> >> >
+>>> >> > In any case by the end of this can_zcopy and have_uref are really the same flag.
+>>> >>
+
+Need to check it more. But 'can_zcopy' means that we fill frags in skb, have_uref means that we
+allocated completion (but it could be reported with not set 'SO_EE_CODE_ZEROCOPY_COPIED' if
+'can_zcopy' was false).
+
+
+@Stefano, I guess current implementation differs from TCP in two cases (at least from first
+view):
+1) When 'msg_ubuf' is set: in TCP, already set 'msg_ubuf' is passed to 'skb_zerocopy_iter_stream()'
+   (if zerocopy is possible) where it is used as in vsock in call 'skb_zcopy_set()'. In vsock case if
+   'msg_ubuf' is not NULL we will pass just NULL to 'skb_zcopy_set()'. Yes this is will be
+   no-effect call today (due to checks in 'skb_zcopy_set()'), but anyway - in future may be not.
+2) Also i see that 'skb_zerocopy_iter_stream()' in TCP version has some extra checks which are
+   missed in vsock - we only just call '__zerocopy_sg_from_iter()' to fill skb in zerocopy way.
+
+But, I think, instead of trying to compare vsock and TCP versions best way is to just copy
+current TCP flow as close as possible:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/tree/net/ipv4/tcp.c#n1144
+1) Use same flow of checks for 'msg_flags', 'msg_ubuf', SOCK_ZEROCOPY etc.
+2) To copy data we can use 'skb_zerocopy_iter_stream()'.
+3) The only thing that we don't need in vsock is dev mem related code from TCP implementation.
+
+I can take this task, but pls need some time - may be two/three weeks due to another tasks. 
+
+What do You think?
+
+Thanks
+
+>>> >> I kept the same approach we had before, trying to make as few changes as
+>>> >> possible.
+>>> >>
+>>> >> All these potential issues seem to be pre-existing and should be eventually
+>>> >> addressed in other patches IMHO. This patch one only resolves the main issue
+>>> >> of calling `skb_zcopy_set()` for every skb to avoid leaking pages, etc.
+>>> >
+>>> >the patch is upstream now, right? So pretty much have to be patches on
+>>> >top.
+>>>
+>>> If those are actual issues, then yes. TBH, I didn’t look into that
+>>> aspect and left it as it was before. We should take a closer look at how
+>>> MSG_ZEROCOPY is handled.
+>>>
+>>> David, if you think it needs fixing and you have time, feel free to send
+>>> patches on top.
+>>
+>> I'm not fully sure how it all works.
+> 
+> Same here, so I pinged Arseniy who worked on that, since it seemed deliberate to have `can_zcopy` (and set `uarg->zerocopy` accordingly) only when it was supported by the transport.
+> 
+>> Especially the paths where msg->msg_ubuf is non-NULL, I suspect it should
+>> be added to all the skb even if the ZEROCOPY flag isn't set.
+>> I was just reading the one function.
+>> But there did look like some very dodgy conditionals.
+> 
+> I see, let's wait for Arseniy's feedback; otherwise, I'll try to fix it next week. As mentioned, this issue existed before this patch, so it shouldn't be a regression.
+> 
+> Thanks,
+> Stefano
+> 
 
 
