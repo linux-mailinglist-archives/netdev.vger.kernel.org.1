@@ -1,225 +1,160 @@
-Return-Path: <netdev+bounces-289370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289358-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CLF8AaU2DGqOaAUAu9opvQ
-	(envelope-from <netdev+bounces-289370-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:08:37 +0200
+	id ciZpJu4vDGpuZAUAu9opvQ
+	(envelope-from <netdev+bounces-289358-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:39:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0725157BE59
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:08:35 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5CBC57B72F
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:39:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3693E3088A6B
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:47:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1B0CD300D9D3
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A633643C07D;
-	Tue, 19 May 2026 09:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B30C3FF1B8;
+	Tue, 19 May 2026 09:34:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjXN07us"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="H6ugWpLk";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iajCMxdo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827883F0AB3;
-	Tue, 19 May 2026 09:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069C13F0AB3;
+	Tue, 19 May 2026 09:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779184029; cv=none; b=XNgOn2+TRnC5pL5o3R1MqwDjxxg10awdMHRdWqgjS3UQlSSuQ5Y8h3UicxMgXee05HjtLDCBhBUJWBA3tXh1mewB/Ttjlme5Dbm/rD6iaaAtFuQga6/FSOBnRZZjD37JKKAfhrLUjW/vxCSrWaUZrJQgRE8u2flwoWVCG8ejbSE=
+	t=1779183247; cv=none; b=FBPnt2JtM56R/9/abXhKtxkRK+hGJbFLdkttuB1Xm5zn6waIfENGEXMuVmKWmYtY7Mnhdxs2CP7pArGynbx0E03eijHASZiBvjbgL/7vXIQOWex3Iaucg0LhOtHYKcH9HjkujRdVr5Dauzf/gdpddLsJxZp5vTGBScVK/KlFinQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779184029; c=relaxed/simple;
-	bh=OH/yfiCu0Mp3b66K0reocEsxvYcepzYQzij9x5dEOxk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=JvKGX4nM6HKFtUD+gmuhHJqZYJJ0c76C33xi1oVEdwL8PYFo+VehyZ2X08G3XpyYqP4FJ47FqppXDvRCgnTuvgP+nWTqPIlQozde4/57yoahQb9QcV00okJ/XCehsAk4QHgCPi7EHvTjIkWbae29rrkeSnB3wDezqLdBlBzf5m0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjXN07us; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1ACBDC2BCB3;
-	Tue, 19 May 2026 09:47:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779184029;
-	bh=OH/yfiCu0Mp3b66K0reocEsxvYcepzYQzij9x5dEOxk=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=SjXN07usVOFyeVoXxp8t0WX9DMiBCBYdY4olW/q5/kw7SB0rwIn/dNuOEbs82JQ7S
-	 uYQjQEt4d94I3CuKzfoEmKLwmVDh2jwstzG5Di4e/QcDmWzbmEM10wWxKnOXdClDGF
-	 FUrLQVI5qkIYIFJ8R7z2hvdZcvlXYfx7meNkOZcbqVEj8cVkgHf8dktSiRPTmGiEZH
-	 YMiDuZadgB1TZJXR/7X1YGpoWsdfFvFxyMSJoIxeeTZvxY413tX8HAVsw2EVgPYNPh
-	 h8OKXNo70DO34FJjlS7LeuRHGlFkCX3zBs2bCjcLWZwdqWIyyAXxHrkbKB8jL8eIDl
-	 LTbNSC+jkVlNA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09478CD4F57;
-	Tue, 19 May 2026 09:47:09 +0000 (UTC)
-From: Carl Lee via B4 Relay <devnull+carl.lee.amd.com@kernel.org>
-Date: Tue, 19 May 2026 17:32:53 +0800
-Subject: [PATCH v5] nfc: nxp-nci: i2c: use rising-edge IRQ on ACPI systems
+	s=arc-20240116; t=1779183247; c=relaxed/simple;
+	bh=9JHcOzht1n0wfKVTJuq0d8Jgtu8JOvyjFJ+NPArVa08=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=DxKEhHZQ/MVTY1BiUSEdYZ9mPvZWQ4bjojlLR5TKORaIUey6o6SI+9V5djCyvQ/sx+BGRx8QE8mlAqYtMXSRDrQbMzlqXVk8JyRFtv2NH6zAGTQVP0Pqun7EcpbIlYRpC7R1nsykWen4RhzDtEoyVEBHml8Md/KYTQLkebUp7ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=H6ugWpLk; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iajCMxdo; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 8B06C1D00085;
+	Tue, 19 May 2026 05:34:04 -0400 (EDT)
+Received: from phl-imap-05 ([10.202.2.95])
+  by phl-compute-04.internal (MEProxy); Tue, 19 May 2026 05:34:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1779183244;
+	 x=1779269644; bh=9JHcOzht1n0wfKVTJuq0d8Jgtu8JOvyjFJ+NPArVa08=; b=
+	H6ugWpLkIoztUOAw5JR9QLk/qk0eaMhQXCerZiNCkSj3wN01YD7oY9FNCVVwscUr
+	4ijhDnk159vWVC5/e/267qUhtuLg+UQti6zEPes7sp2nGznW70nZQDsM24GBQhNb
+	2WnHasYB0+cbtkLYQet/weSrI7/USmg0zjCCe2Mql9sXZAYsF5antFkWQXkr8LVi
+	6hG+AtLtMcyRskKtBPSHQn27Sdh7Z3nRu0t8bRpN5njc47UOOn/wnYs9LoqxRSoj
+	KcP8t2zRuIuGvKOI8/mjgpq+jnTy5sjeboMCAJJFRPAJLoKYPJ24Hp12ZTcZYPB1
+	qvM1yY+TMnobA28ufQ8nwA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779183244; x=
+	1779269644; bh=9JHcOzht1n0wfKVTJuq0d8Jgtu8JOvyjFJ+NPArVa08=; b=i
+	ajCMxdoNsH80/XVkJb9mNk0HqA7ElDQPG1/RTRs7gBtpDF7eLCKhh/eL2Do6JvWV
+	FRUfvz0whPX1ZkOWPYgs0OtG4Z1OimguwWJvWHMwbz6urtTzHbmMzL4CbB4Gd+hp
+	Bs8mRAjR8j2zpfL/XEJnDyzdj8xTv9VEldnWmyn71TUQcZkx/KCdSiihTWc5fg4O
+	BK13jEF0Of1ZRh6j31fpR0znrgR3B6CZGi8VNOmNt9q43Q1DqzxmutXWLDwGfgEX
+	b3Y0VtbqEwJKSWWnAXVM06ZJ1p3XeM+Xk5+GDElmUvzQZHp1TA4KZixgUXkT+3h3
+	zqBVyz1yTgtdOjzk/419w==
+X-ME-Sender: <xms:iy4Mag96X3tWADTpDEn3fRj7yZHuGGLUuunythREV9QMb8t_Qc7Xhg>
+    <xme:iy4MajhGs7ItTnl3w7HaoxtobLvI6Yjoh_ljHL-Zk6nphPGFfS2CTtCl_Ic2Dr3dQ
+    Ix66cN_Ww0Nj28j9k2NAykTU7CR9XN0UyZBdQIaiPQOQ5WrXsb-7kW0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugedugedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
+    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhu
+    thdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoh
+    epvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrd
+    gthhdprhgtphhtthhopehlsghulhifrghhnhesrhgvughhrghtrdgtohhmpdhrtghpthht
+    oheplhhukhgrshdrsghulhifrghhnhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepph
+    grsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehkvghrnhgvlhdqjhgrnhhi
+    thhorhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkh
+    gvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:iy4MajgDqaCwXHQDOMiFnKzafgJ_4IzATzLcSP5w_dEqFiS9UjpXlA>
+    <xmx:iy4MaoO_7IrKQUAJnU_giCvYjEFzT_JqO32UvvYn60nweflHSirG3w>
+    <xmx:iy4Maur-G4v0MnTSC0bT48E94Hkznv0WD4qs_APPpeXLLTIbFlk6hA>
+    <xmx:iy4Maq5LIrDbYMJPqCdz5Vc1mpNtu3GUoNs7nqGlNq-TMpW2i2tWXA>
+    <xmx:jC4Mah_O-0wsYoZWF9D9V9os8vDHDjRa_WhPLB1yU92dASr6Efxk1U_k>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id CFFCE182007A; Tue, 19 May 2026 05:34:03 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-ThreadId: ACgEviAZ6E4Z
+Date: Tue, 19 May 2026 11:33:43 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Lukas Bulwahn" <lbulwahn@redhat.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ Netdev <netdev@vger.kernel.org>
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>,
+ kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Lukas Bulwahn" <lukas.bulwahn@redhat.com>
+Message-Id: <a55cbd57-b81c-424e-af61-53a3e7caf3c1@app.fastmail.com>
+In-Reply-To: <20260519091646.302458-1-lukas.bulwahn@redhat.com>
+References: <20260519091646.302458-1-lukas.bulwahn@redhat.com>
+Subject: Re: [PATCH] MAINTAINERS: remove obsolete file entry in NETWORKING DRIVERS
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260519-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v5-1-1a826cfbc128@amd.com>
-X-B4-Tracking: v=1; b=H4sIAEQuDGoC/53NQW7DIBCF4atErDsVAxjjrnqPqgsMgzNqglMcW
- aki3704mzpLd/kQ8/13MVFhmsTb4S4KzTzxmOtoXg4iHH0eCDjWLZRUVmpEyClAvl0gBwZWAQp
- N17HUb+UbroWHgQokfzr1PnxBiL4zqtEyWCkqeSmU+PbIfXzWfeT1+OdRn3F9/WdoRkDoSMkWj
- UGM7bs/x9cwnsWamdWWVjtpVWltlTYutclr+UzrP7pBu5PWK9323vSWOunsM222dLeTNpV2jZP
- RETqJG3pZll9X+str9wEAAA==
-X-Change-ID: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, krzk@kernel.org, carl.lee@amd.com, 
- peter.shen@amd.com, colin.huang2@amd.com, kuba@kernel.org, david@ixit.cz, 
- luca.stefani.ge1@gmail.com, brgl@kernel.org, mpearson@squebb.ca
-Cc: Mark Pearson <mpearson-lenovo@squebb.ca>, 
- Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779183174; l=3788;
- i=carl.lee@amd.com; s=20260203; h=from:subject:message-id;
- bh=AuJE8naMhN8VuJ0Xkt3hE9rAU8BuKShRUpf+0Ld/H78=;
- b=+nkcf9jeJ6vKQ5w1r1mJahWWd1a9UhYHs8pHNRr6OI7EWQ0ABp+xQ5psnJJzSPb06KK5Gdaqc
- m0/zySMbxyMA8Bphn4KY3AcN9/huCEfkvZaBPiR8o0HFZjkI0SHiQGS
-X-Developer-Key: i=carl.lee@amd.com; a=ed25519;
- pk=pyq7QaQvoxMg806KVkRwpCbiah+7ncWr4MBpK1AEyjA=
-X-Endpoint-Received: by B4 Relay for carl.lee@amd.com/20260203 with
- auth_id=623
-X-Original-From: Carl Lee <carl.lee@amd.com>
-Reply-To: carl.lee@amd.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
+	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289370-lists,netdev=lfdr.de,carl.lee.amd.com];
-	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,amd.com,ixit.cz,gmail.com,squebb.ca];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-289358-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[carl.lee@amd.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,amd.com:replyto,amd.com:mid,amd.com:email]
-X-Rspamd-Queue-Id: 0725157BE59
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,app.fastmail.com:mid]
+X-Rspamd-Queue-Id: E5CBC57B72F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Carl Lee <carl.lee@amd.com>
+On Tue, May 19, 2026, at 11:16, Lukas Bulwahn wrote:
+> From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+>
+> Commit 5e138e0ec32b ("w5100: remove MMIO support") removes
+> include/linux/platform_data/wiznet.h, but misses to remove the file entry
+> in NETWORKING DRIVERS referring to that file.
+>
+> Remove the obsolete file entry in NETWORKING DRIVERS.
+>
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
 
-Some ACPI-based platforms report incorrect IRQ trigger types (e.g.
-IRQF_TRIGGER_HIGH), which can lead to interrupt storms.
+Thanks for the fixup!
 
-Use the historically working rising-edge trigger on ACPI systems to
-avoid this regression.
-
-Device Tree-based systems continue to use the firmware-provided
-trigger type.
-
-Fixes: 57be33f85e36 ("nfc: nxp-nci: remove interrupt trigger type")
-Cc: stable@vger.kernel.org
-
-Tested-by: Luca Stefani <luca.stefani.ge1@gmail.com>
-Tested-by: Mark Pearson <mpearson-lenovo@squebb.ca>
-Tested-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Reviewed-by: Mark Pearson <mpearson-lenovo@squebb.ca>
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Signed-off-by: Carl Lee <carl.lee@amd.com>
----
-Some ACPI-based platforms report incorrect IRQ trigger types,
-which can lead to interrupt storms.
-
-Use rising-edge IRQ on ACPI systems to avoid this regression,
-while keeping firmware-provided trigger types on non-ACPI systems.
----
-Changes in v5:
-- Add missing Reviewed-by and Tested-by tags
-- No functional changes
-- Link to v4: https://lore.kernel.org/r/20260519-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v4-1-8580d8e18016@amd.com
-
-Changes in v4:
-- Add Fixes tag
-- Add Cc: stable@vger.kernel.org
-- Link to v3: https://lore.kernel.org/r/20260516-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v3-1-37ba4b6e9086@amd.com
-
-Changes in v3:
-- Use rising-edge IRQ on ACPI systems to avoid interrupt storms
-- Keep using firmware-provided trigger type on non-ACPI systems
-- Refine commit message to focus on regression on ACPI platforms
-- Link to v2: https://lore.kernel.org/r/20260312-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v2-1-362348f7fa30@amd.com
-
-Changes in v2:
-- Add missing <linux/irq.h> include for irq_get_trigger_type().
-- Link to v1: https://lore.kernel.org/r/20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v1-1-9e20714411d7@amd.com
----
- drivers/nfc/nxp-nci/i2c.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
-index 6a5ce8ff91f0..266dc231c47d 100644
---- a/drivers/nfc/nxp-nci/i2c.c
-+++ b/drivers/nfc/nxp-nci/i2c.c
-@@ -16,6 +16,7 @@
- #include <linux/delay.h>
- #include <linux/i2c.h>
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- #include <linux/module.h>
- #include <linux/nfc.h>
- #include <linux/gpio/consumer.h>
-@@ -267,6 +268,7 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
- {
- 	struct device *dev = &client->dev;
- 	struct nxp_nci_i2c_phy *phy;
-+	unsigned long irqflags;
- 	int r;
- 
- 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-@@ -303,9 +305,26 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
- 	if (r < 0)
- 		return r;
- 
-+	/*
-+	 * ACPI platforms may report incorrect IRQ trigger types
-+	 * (e.g. level-high), which can lead to interrupt storms.
-+	 *
-+	 * Use the historically stable rising-edge trigger for ACPI devices.
-+	 *
-+	 * On non-ACPI systems (e.g. Device Tree), prefer the firmware-
-+	 * provided trigger type, falling back to rising-edge if not set.
-+	 */
-+	if (ACPI_COMPANION(dev)) {
-+		irqflags = IRQF_TRIGGER_RISING;
-+	} else {
-+		irqflags = irq_get_trigger_type(client->irq);
-+		if (!irqflags)
-+			irqflags = IRQF_TRIGGER_RISING;
-+	}
-+
- 	r = request_threaded_irq(client->irq, NULL,
- 				 nxp_nci_i2c_irq_thread_fn,
--				 IRQF_ONESHOT,
-+				 irqflags | IRQF_ONESHOT,
- 				 NXP_NCI_I2C_DRIVER_NAME, phy);
- 	if (r < 0)
- 		nfc_err(&client->dev, "Unable to register IRQ handler\n");
-
----
-base-commit: 7109a2155340cc7b21f27e832ece6df03592f2e8
-change-id: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
-
-Best regards,
--- 
-Carl Lee <carl.lee@amd.com>
-
-
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 
