@@ -1,193 +1,160 @@
-Return-Path: <netdev+bounces-289439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289440-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SG1MK/1SDGqmfAUAu9opvQ
-	(envelope-from <netdev+bounces-289439-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:09:33 +0200
+	id yAPsFXlVDGqmfAUAu9opvQ
+	(envelope-from <netdev+bounces-289440-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:20:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30A3057E5C2
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:09:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67BCE57E8A9
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:20:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 85845302A4C4
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:02:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0F621305DFEB
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374654C0437;
-	Tue, 19 May 2026 12:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867F24CA29D;
+	Tue, 19 May 2026 12:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="MWlKAqsv"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gPAceZru"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7142F4C041B
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 12:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3628F4CA294;
+	Tue, 19 May 2026 12:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779192124; cv=none; b=LChmEKJSCB5/ydMGgSFN65MfAZoiqQ3UqlVASs6ucJ7p25FpPr7qNDpzTWL5cdcLBKp4dKlaVzDahn49WMIU5szapW1a6jK6MaA6qMKaEwkOmtzL3uPpPgDLYEPdi1iNJJBorTlMdw30bn2bTzowCIqDonMotEVfCoxmiwHjhPo=
+	t=1779192451; cv=none; b=pXB8KwwH8120IxvhnEp5inX8G6cChWmGdq6ygZUSLptKp4E5k0cYIj4sT+aEhtUXzkrLtUdsgpohBfrva34UEItMI3NDSg+wLn7insMA/Fg5XzA+SRwEDJkT/SMKQWkv1EUcDq0r4Lqd9R5/26kFqurVW+3pGtlRsRxFGy26AHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779192124; c=relaxed/simple;
-	bh=e6h0tO72to3PU8thjV+AhqKHoURvgfu/GeEfGz1AGIA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZIgi6LuUpE9wRrwgBcwVLzHsEzpphUxSrMMyi0JJ414CSVqMZ+izV7R3MNwxWCG/lq3zDYB0h1WvjBP5woQ0J9mssFUbEL2N8sOSG87HOeO+6f4neGoofZrMvX+9Z6JEjgGp2P1QcLcRDGz1szum380hQVS2blWFjYrkHvhsOX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=MWlKAqsv; arc=none smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-479d593a0c3so2926353b6e.0
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 05:02:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1779192121; x=1779796921; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pc9ls6ISdMIH1NykmT18sDrVEK+ZnWHWMr5PgdhH2Ww=;
-        b=MWlKAqsvoo2U7BoEbxYJgmltlSJ8IpsRuLSa8QuIuHq5KmTqyw6sYoOagrs9ENKkv+
-         P0bfugUqdqohxu917n4jgEC0UEaehnFnNvoI3Ij8f14YdKQpjYbAz+ccPkzVQdhz8XqA
-         iBZH5AKundUk4d8qdHITAFrrJroXrbVdM1ERFEtD6pWW+IY6TWnVQM9LbSC2YdSfkAdR
-         uILPFAy/8+3YwI0dZirAFjv+KOmbSTo2c18xwHBcnm3c289ecIWTEouQOZ9vPBqlUnW5
-         ayvPTFWCobCAvg9haP1VJHJKTYJAdT6uVIoxHGwCU7jCUHy3E6DIFcbpP3VONadqqYRr
-         PVVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779192121; x=1779796921;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pc9ls6ISdMIH1NykmT18sDrVEK+ZnWHWMr5PgdhH2Ww=;
-        b=X9Mm7GqzlEbKoQ0LE4dPauhSzxHekWZ2S1nOaHcvKkQC3f1sDhT4us1mPY5bXUlTCe
-         ax5h7Vw021d3fhichgHbMbMkiF4IeSs97QJk2Nib+Sm91P5fABQFcPJ3Z/KD4mq/3Ah5
-         zDf4T8p658w02fap0USL7Oq2vhT7LYJCTyigt6Mrx6fgQT3JrjDSU7LOwObObG4yRHPr
-         w08piF3oIWQWEaYfzeVr6Wk88CzqWxvcBCbmoOUgqwN4c/SwDT7vKoM7UsDmZRNaAHDZ
-         qXTAOfe/P7cZEZ24creN7PfZdMsqZsRobKtKbDTif2XEGh/qHrfy7mpmVJPbS9cp0ESl
-         EVtQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8OWD6CekTNXEFZJMGLf9TtdCyeKMwzm664/fKwEvSIJAjMNCQYrzWPfcOsmY1i+rj25OGMirY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxY7clhN7hc7RZIsO8XayXTypKJoVPUwMuR/h5H+VAneBJbts40
-	+INNaz8ctqdEcQJu2tMJp4ShqJCrNw1kPDTtz47ie5cx40DLltJxNFXmKhh7Qt0WfC+BMkf1qFJ
-	+0qehDwkDpZIxHDm5cngko/icNsw26nCXaBjzGhXrnTBj3CMZ5rWjnOr9oqsiQYi8530=
-X-Gm-Gg: Acq92OHB/AMR1jIsnExzBr7BtJX7D217ESPZ5uva7TE7vCPOjQKSZnjdy30vTSZYJeu
-	F4P4KoPhKKCN6JVW5WLvGwLdRcDDW7OOSu7A1qeaIeItYIqw1UQuH+yFhu/UE3VVPS/rflFuAnK
-	EMxCtUtnUgY4WwDb2ymywKFiPBFjPwGG4pENYzo/RwinO4KY73WRrgYbuTnK/R5vIZ1sdDSwtG0
-	uj4RJp1G9p35PXmOsHKHuryyqL88uMnbWsf2yxLJiCgLvPXQ6QUfDYsUoHeVK4N4uKVTNGZ9AD+
-	qRx8H3B2WkD3tl44WYFDdMrKi+1E0xRMAOKFYBAtE9tsa7wljss0lCUdhNhbm0Np2bnOvM82ZQt
-	KhWuVeGg0Mql90B4YTJBVwWXgTbM4Hn9H0EPwGMNljtkyBDRgClB/WZLuuvD+mZTiQX2IbdCMli
-	EoWe+ji79WC6sJdP297SQubJUNKWMIWGSmpk3SeahOmOT+oil8wgRSKbmVbLoS1T1EakZ/Jxb0
-X-Received: by 2002:a05:6808:170a:b0:479:d372:b7d0 with SMTP id 5614622812f47-482cb7219a5mr11640483b6e.5.1779192120990;
-        Tue, 19 May 2026 05:02:00 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:fcdd:239e:4fa1:a75d? ([2001:67c:2fbc:1:fcdd:239e:4fa1:a75d])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5164581fdf9sm160869751cf.24.2026.05.19.05.01.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 May 2026 05:01:59 -0700 (PDT)
-Message-ID: <9550ce52-c230-4a88-a2a5-a61727fc933b@openvpn.net>
-Date: Tue, 19 May 2026 14:01:56 +0200
+	s=arc-20240116; t=1779192451; c=relaxed/simple;
+	bh=24gjXT5wmA214FuTksvBZxjgz04Ja4qpNigX7sxq6hM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ODCRDUYWlDM9bDMNPsoUOJLnVerjyqbhxeItlgFZfSNXItE8GXzOLRwlwWXCNxIs5T1PaDuYoyKKiIWzMtAtBHABw7u4hnewb4oXaRh1CpqLb9zoNtISaHHNfDmKA6slr/df0EuWRzpOI3RpoeOx0DusG4/t+oJy5WvQNZ8eMbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gPAceZru; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 777D5C2BCC7;
+	Tue, 19 May 2026 12:07:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1779192451;
+	bh=24gjXT5wmA214FuTksvBZxjgz04Ja4qpNigX7sxq6hM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gPAceZru+S9ZuIhn16V91zK89WlwILsx+YuFd/0X3f6mr5V35bCAYgGzZxVQG94An
+	 XeLA3r777h01ClFUmPgrT+qG6kESsr7JJlPG8caR1aRWaxNz6iiadjiTWvOZ/2rBTs
+	 Ftcf22u/gnE0okDk/bJGyZnN1lx4JEEc36yQhWRw=
+Date: Tue, 19 May 2026 14:06:43 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
+	kuba@kernel.org,
+	Linux kernel regressions list <regressions@lists.linux.dev>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [GIT PULL] bluetooth 2026-05-14
+Message-ID: <2026051909-impurity-nemesis-2f65@gregkh>
+References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
+ <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
+ <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
+ <2026051954-revision-sierra-6bb4@gregkh>
+ <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/5] pull request: fixes for ovpn 2026-05-14
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Ralf Lici <ralf@mandelbit.com>
-References: <20260514231544.795993-1-antonio@openvpn.net>
- <98bf6672-334a-40df-a21d-c53fac584314@redhat.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <98bf6672-334a-40df-a21d-c53fac584314@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289439-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[openvpn.net:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289440-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davemloft.net,lists.linux.dev,linux-foundation.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,openvpn.net:mid,openvpn.net:dkim]
-X-Rspamd-Queue-Id: 30A3057E5C2
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 67BCE57E8A9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Paolo,
-
-On 19/05/2026 13:50, Paolo Abeni wrote:
-> LGTM, but sashiko idendified a number of pre-existing issue that could
-> deserve some follow-up:
+On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
+> On 5/19/26 12:30, Greg KH wrote:
+> > On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
+> >> On 5/15/26 17:10, Thorsten Leemhuis wrote:
+> >>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
+> >>>
+> >>>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
+> >>>>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
+> >>>>
+> >>>> are available in the Git repository at:
+> >>>>
+> >>>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
+> >>>>
+> >>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
+> >>>>
+> >>>>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
+> >>>
+> >>> It seems this PR sadly came too late for this week's net PR to mainline
+> >>> that was merged yesterday.
+> >>>
+> >>> TWIMC, from my point of view, it would be great if we somehow could
+> >>> still get the changes from this PR or at least the btmtk fix it
+> >>> contains[1] to mainline this week before -rc4, as it is fixing a
+> >>> regression known since 2026-04-24 that at least five people encountered
+> >>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
+> >>> validate WMT event SKB length before struct access") [006b9943b982 in
+> >>> -next].
+> >>
+> >> Greg, Sasha, that [1] fix I was talking about now reached -next as
+> >> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
+> >> events") and will likely hit mainline on Thursday or so with the weekly
+> >> -net PR to -mainline. If that's good enough for you, I'd say it would be
+> >> good to pick this up for the next round of stable kernels.
+> > 
+> > That "Fixes:" tag is referring to something that is also not in any
+> > tree, but that commit does have a cc: stable in it.  So do we need both
+> > of these:
 > 
-> https://sashiko.dev/#/patchset/20260514231544.795993-1-antonio%40openvpn.net
-
-Yes, we're working on them.
-
-We've also configured sashiko to pick up patches directly from our 
-mailing list, so we can work all the issues out before sending further PRs.
-
-Thanks a lot.
-Regards,
-
+> Valid question, as yes, there is a slight mixup here:
 > 
-> /P
+> > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
 > 
+> That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
+> -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
+> btmtk: validate WMT event SKB length before struct access") -- the one
+> that is causing the regression that I want to get fixed. So we now only
+> need:
+> 
+> > 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
+Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
+nightmare to track over time, ugh.
 
+I'll go queue this up now, thanks.
+
+greg k-h
 
