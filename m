@@ -1,119 +1,152 @@
-Return-Path: <netdev+bounces-289223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289224-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iMEvHeqtC2omLAUAu9opvQ
-	(envelope-from <netdev+bounces-289223-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:25:14 +0200
+	id cOzGImWvC2q2LAUAu9opvQ
+	(envelope-from <netdev+bounces-289224-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:31:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBCFD575885
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:25:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78EDB5758E0
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:31:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2E5113049141
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:23:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 55A463028F4D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28D1196C7C;
-	Tue, 19 May 2026 00:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE71623B638;
+	Tue, 19 May 2026 00:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ny6PtYzq"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="C6+dbiLA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBB17262A
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 00:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE9378F2F;
+	Tue, 19 May 2026 00:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779150228; cv=none; b=BT4ISllaH7zpR82BkgStcGSqOXr51ZMUi/u/LKlTRncxYRMdcCB1MZ1WRQWoaNtXg7chKAt4AYJOb+/d0s8/JcpGUg7DBSxA6rxI6fADXypaGRzc/DUy8vKo3TVdlI177ewg27jG2y98iHq8MN7XXVftwb533yPCye9o4gurvNM=
+	t=1779150681; cv=none; b=AlDANr1tPwucvlBQYLsNl+cChOpmzxRV6+yZZoezZb2nHUT87EDwCY9ancM2hY71ARYrCZKE3gzc2ACsA+DricWlq3olb9XT1LZ60K7aU0LOGMZd2cnmPZA9PwZorzhxNpnahtaSfukBkNPifjggsLpqOQC/Dl1XMiSG42QFXVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779150228; c=relaxed/simple;
-	bh=rNw6wYF1JK8hQpSNh1nZ2UxNKo2L8wQUYcfBM40BBjM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UUVm6zZt78aUGYJBVZuYc/DlUstdgU4fbZhbyF9tIF2s2D88Kdrrcwk+Qsep7sYHcJdZsa5DhJA2oUYS8MPB60cc/C1AOYt70Fu0mCR7NbSTszbo6gypDskY+lbQzJeH/k89B3tZVtZVQG9qyrm3VRUxmMkxg9aGVtOlpwqjD7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ny6PtYzq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E3DAC2BCB7;
-	Tue, 19 May 2026 00:23:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779150228;
-	bh=rNw6wYF1JK8hQpSNh1nZ2UxNKo2L8wQUYcfBM40BBjM=;
+	s=arc-20240116; t=1779150681; c=relaxed/simple;
+	bh=Hn8nkfC6AtTfS13eIodWwSfN5loWrhpApSyYRHdiRas=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=h+vMfNYoiBTw8BVY9krbMNYBkwjp88y1N/j2lff5HT32SypwT3z1/nBpzgZdW7Xr9vs58/4nbcQ78z/wcAzaQRDsDljVCJFfI5GQi4S7FHUpCChS5DSRFeSojmCjkldcY4xzIBqJIj6VlOqP3mVlvZlG5r7/KPG4J2N+dd/r1QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=C6+dbiLA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B115AC2BCB7;
+	Tue, 19 May 2026 00:31:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1779150680;
+	bh=Hn8nkfC6AtTfS13eIodWwSfN5loWrhpApSyYRHdiRas=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ny6PtYzqpPQzBWph4yt6QI+V2gAjyg1aXKg2MzfwNzYu1UVM2HkOqg2jL+4r2ImJ+
-	 /Rn7OApnsksLA4gPUOQmkMofgl4Qivzz+xU51PMq2SxmrHwXMIeCQu4nK6ALyR/Pre
-	 dm9lKLAxc+XN0WCs8+4nUwsT9Jo+qxbNv50RLurn9BA0Y/6/PgB9v/VDM7ra13aM2x
-	 JJU8/euE69sf+yWFHKxX7p9CKzfxIpP1gFO8ma2HlbYfVpwKRA2AN5VG+sZdTKg0Sd
-	 q5vW492Mijf0IZvxOZT6Ws6Q/xAMsXin6qI+sLuYG/KAxWNb998cF6ysFR+aa8jNRP
-	 ObWKZi9G9BZ2Q==
-Date: Mon, 18 May 2026 17:23:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Joyner <eric.joyner@amd.com>
-Cc: netdev@vger.kernel.org, Brett Creeley <brett.creeley@amd.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 1/5] ionic: Small improvements in devcmd
- retry logic
-Message-ID: <20260518172346.30c32a73@kernel.org>
-In-Reply-To: <4c18744d-742e-49c2-bca1-90c86cdcc2ed@amd.com>
-References: <20260512224421.25236-1-eric.joyner@amd.com>
-	<20260512224421.25236-2-eric.joyner@amd.com>
-	<20260514182646.16f8ad33@kernel.org>
-	<4c18744d-742e-49c2-bca1-90c86cdcc2ed@amd.com>
+	b=C6+dbiLA7Qe6C0VhGgzhrJtQCs/262xxPZUANDJfuzXdf5siA85xk0If9yuFKEStg
+	 JNM8zLf2+9wzRszYeOSqj6gJWs/TZFkhPTp+jsjM28txbYbPLzs+VTomvIr1FBeb5e
+	 QnXYXs9hEmJw+yiIH2VrSFVQO9NUCJT9ECzDRppg=
+Date: Mon, 18 May 2026 17:31:19 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Lorenzo Stoakes <ljs@kernel.org>
+Cc: Byungchul Park <byungchul@sk.com>, kernel_team@skhynix.com,
+ ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+ hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+ saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ david@kernel.org, liam@infradead.org, vbabka@kernel.org, rppt@kernel.org,
+ surenb@google.com, mhocko@suse.com, horms@kernel.org, jackmanb@google.com,
+ hannes@cmpxchg.org, ziy@nvidia.com, ilias.apalodimas@linaro.org,
+ kas@kernel.org, willy@infradead.org, baolin.wang@linux.alibaba.com,
+ asml.silence@gmail.com, toke@redhat.com, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH] Revert
+ "mm: introduce a new page type for page pool in page type"
+Message-Id: <20260518173119.f3348ec4cc66b793fed4cccf@linux-foundation.org>
+In-Reply-To: <agruFy80Ag3uIab0@lucifer>
+References: <20260515034701.17027-1-byungchul@sk.com>
+	<agruFy80Ag3uIab0@lucifer>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289223-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289224-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[linux-foundation.org];
+	RCPT_COUNT_TWELVE(0.00)[38];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux-foundation.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[akpm@linux-foundation.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[sk.com,skhynix.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,infradead.org,suse.com,cmpxchg.org,linaro.org,linux.alibaba.com,vger.kernel.org,kvack.org];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EBCFD575885
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-foundation.org:mid,linux-foundation.org:dkim]
+X-Rspamd-Queue-Id: 78EDB5758E0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 18 May 2026 17:01:57 -0700 Eric Joyner wrote:
-> On 5/14/2026 6:26 PM, Jakub Kicinski wrote:
-> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> > 
-> > 
-> > On Tue, 12 May 2026 15:44:17 -0700 Eric Joyner wrote:  
-> >>  Another commit uses this return value to help
-> >> signal that a deferred probe should be performed due to the firmware not
-> >> being ready, which is why it would return EAGAIN.  
-> > 
-> > Where can we find that "another commit". Reading this I was expecting
-> > it to be another commit in this series, but I don't see any EAGAIN
-> > later.  
-> 
-> It's in a commit in the series that's targeting net that I've posted; but I
-> think it'll be clearer if I roll that into this series in the next rev.
+On Mon, 18 May 2026 12:00:11 +0100 Lorenzo Stoakes <ljs@kernel.org> wrote:
 
-I see. Maybe wait for it to be committed and add a git commit quote
-here? The hash won't change once it's in tree.
+> Maybe worth putting [PATCH mm-hotfixes] just to make it clear this should be an
+> urgent hotfix?
+> 
+> On Fri, May 15, 2026 at 12:47:01PM +0900, Byungchul Park wrote:
+> > This reverts commit db359fccf212e7fa3136e6edbed6228475646fd7.
+> 
+> Maybe 'this reverts commit db359fccf212 ("...") and partially reverts commit
+> 735a309b4bfb9e ("...") <details>'?
+> 
+> >
+> > Netpp page_type'ed pages might be used in mapping so as to use
+> > @_mapcount.  However, since @page_type and @_mapcount are union'ed in
+> > struct page, these two can't be used at the same time.  Revert the
+> > commit introducing page_type for Netpp for now.
+> 
+> Yikes!
+> 
+> >
+> > The patch will be retried once @page_type and @_mapcount get allowed to
+> > be used at the same time.
+> >
+> > The revert also includes removal of @page_type initialization part
+> > introduced by commit 735a309b4bfb9e ("net: add net_iov_init() and use it
+> > to initialize ->page_type"), which will be restored on the retry.
+> 
+> As above maybe mentioning at top of commit msg, as right now this reads as a
+> pure revert of db359fccf212.
+
+I did
+
+: This reverts commit db359fccf212 ("mm: introduce a new page type for page
+: pool in page type") and a part of 735a309b4bfb9e ("net: add net_iov_init()
+: and use it > to initialize ->page_type").
+
+> >
+> > Reported-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > Closes: https://lore.kernel.org/all/982b9bc1-0a0a-4fc5-8e3a-3672db2b29a1@nvidia.com
+> 
+> Fixes tag?
+
+I assume db359fccf212 ("mm: introduce a new page type for page pool in
+page type") is close enough.  Both that and 735a309b4bfb9e are new in
+7.1-rcX.
+
 
