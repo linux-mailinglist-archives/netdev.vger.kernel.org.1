@@ -1,207 +1,171 @@
-Return-Path: <netdev+bounces-289361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHAfBycyDGrdZAUAu9opvQ
-	(envelope-from <netdev+bounces-289361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:49:27 +0200
+	id 2NeLD1g1DGoKaAUAu9opvQ
+	(envelope-from <netdev+bounces-289374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:03:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8048157B9F3
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:49:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE1F157BD06
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F0AA306E509
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:42:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4E4F33029C23
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101414657C4;
-	Tue, 19 May 2026 09:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DsWvEJTx";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MO2yYzcL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC37466B63;
+	Tue, 19 May 2026 09:51:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EF74657E5
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 09:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE332388E53
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 09:51:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779183726; cv=none; b=tigLu7DyFVw9tmoTJSiIqMbxcUGJhGMn+c0tztf04WZvaQrClHnMlAZ1ebzpXbXmuDUQliyblLUmpEUkFmFeQMZMhZohEfSvAASKHTeLMG2B1ZTeWIT6rPOsFZgvgWAHbpRM1wyy+ozlT63r+OqqBK05ZwjHF7BcoImPvP9391o=
+	t=1779184315; cv=none; b=NaX2qyTYOjeQ2PzcK4OFlXb1Zqx5LH83L7bJEDARCYyUqgfjHtRiCl6eAKX5xbXT+VOGGkUq6lwD6zOa4S1KXKCJhmQGj/Bdoun9uKT/98aL5AYoTXprgQ1VekZOpbcrVXr0f1t+l68kk7opXGuYapDeiOu5qYI8p71vwJiFM60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779183726; c=relaxed/simple;
-	bh=yt0H3bvBRFcuJ9DYVM0S3Grsofv+ydRaNi8hw/H/mjI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rK4vDJyf4RfhVkzOS8lqvh8OeOA2SubpXqB5ITf3b5IOCHZ8UXgTkxHC9eYmIKjlKPXZH5pAYdbqlcP9EfbOtWAHhz+5F3lprUQMhulGzkPwQvqRaw3JESZQiQaKKWGuTfoi0fvYabVCLms5y/vRBFwDHOqXT7uj3dmjNTVGCbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DsWvEJTx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MO2yYzcL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779183716;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tk6v1iOlM6Sc6be+bYwuVr8WIaK4VMHqbDmDqfyVw54=;
-	b=DsWvEJTxEjMz9QABqBLgiYO4614/hfm+wUx+WhKi81zif/3hna5r3c9rOMgvF5Ww1MvSjB
-	b+B3w+PcgGTlokrpLbc41nJOF7Z1bSVl7AgO2+LYf/eXr180GF/RAElB8Y9o1RBY17T3e6
-	IpLAVa2rVLpJS6gD9Vz1kmX4pgrGRF0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-542-0wGbRp44PIWLZkdHRad0rw-1; Tue, 19 May 2026 05:41:55 -0400
-X-MC-Unique: 0wGbRp44PIWLZkdHRad0rw-1
-X-Mimecast-MFC-AGG-ID: 0wGbRp44PIWLZkdHRad0rw_1779183714
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-45e55c44ac1so2670680f8f.0
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 02:41:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779183713; x=1779788513; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tk6v1iOlM6Sc6be+bYwuVr8WIaK4VMHqbDmDqfyVw54=;
-        b=MO2yYzcLm49L+93RMyfoZ7e3aSRE0Vt6y/zTmzYK3ivNwMrBbGczvi692nr+ZeTdoJ
-         HihyHPxRIxa13cvSWsGidW2MvMvaef5gCYGkMcQNC46Si8moHcHAAWYkAFGKATDL24ue
-         8LMNeHpPBIC9EjrD/anW7wBw+UKaIlBX4gEvX5wKOyIvyDPVvGVbxHIGY2C3vt9D9+jT
-         XF1kSxWcvfHfNo3B87rxrwr+nC/ixJD7O9dozQnvlq9HhbrluTL6y0uAFdC6VQ8252ok
-         LYtHeZBpDgjKyoecZIUNQdJiIvlNVp250dFO+hragUSVR1EGxYF/OSNQBLDe3g34LO1v
-         /ZRg==
+	s=arc-20240116; t=1779184315; c=relaxed/simple;
+	bh=VV0WQeCgbPqBTi7yab+uEYQeq6u9LFtTUX4clbsM2Vw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qfO2e4yeMYCqOZOr8ndx7qo28YtjK/74D+l/Y7NB6B1NUnRIJWpH3wqmpbKKnBxXQEEKBT3C/3RtJptjqPrVxZZGKm3E0r/7ooI/+ZoBR3hKvMVFjvEcKiDqJ6E7Txd4UzFsQrWE1liDz562xIN/8cvcZdJVEmxdhmy+9pGKXJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-43a6faf8d1eso1229198fac.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 02:51:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779183713; x=1779788513;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tk6v1iOlM6Sc6be+bYwuVr8WIaK4VMHqbDmDqfyVw54=;
-        b=M5d5x84ghS4PyT7Y3JozqGOiNeYbEohu9vK74cU/0Mi5sBpvm8QJ/7Icrgm4KFrWf3
-         G85LWW3M6vL3Y/WD7l2Ft1IsqKSy0lYRwvABZzBUTfZybVV/64XojgH9sz3wN+QC9vZ3
-         9idkaBUpFY9INi9PwQ+OKsfX4s+lB2d7kz6spHRuGZeh+SVZJkeajVDPNkoXjSXPFnKY
-         sOZsC/lJ+c4GKTa/7suiAtVBIIGWXntGjwWM92v+TpqRCIx0LLBMzfnC/JziAy6AoMAL
-         8OxilxYlj6woEOs5R5LMDGtnAZInf3wxRGXddB8PT1UKja1nNb9CHhWLIAA9e4u9058a
-         zAqw==
-X-Forwarded-Encrypted: i=1; AFNElJ93aP2iTnmqwGwRGiZ0Vt+Wjljojkx0vjuzwkMB6h7fcmyzW3/4toB7GTBaCu2AtY4Aypgabik=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyhp7X6YkSY+FJqNUJx81cgZALgizcKjTaDTn5QDDL0w1gTzZ2f
-	kCqIJc2wtOYHpfNLx1u2AWjcYCL+7QrTepi/JRz8y1OGNQ6Z3oauNZto+zqyDAL90URijk4a1wH
-	nxVq+0GCOKr+zZAv4gsrX8RfwSRJMyzSWdqo/z1cooSgt2edczddldSXd2WSzbJF1Aw==
-X-Gm-Gg: Acq92OFM/5YlnB2i/4PJqMRDLlktp6ORVlBvvANLdGwjyR1i0AjFp5gEBQ0FMTVGa5U
-	tV4njQVWAh8cp24m9izgkuwY+UjVMLaGg2Q7B4WW9auFC98/hhAJJv00LQ8M7DaeyVJ5Eo0IyMw
-	Jq1xu/a6PX/M/9c/d5ZLZLw+Xnx62vn3r7euc+C/uUwiRNX2/wGoFe4EAn1sURuBybKB7RGaED2
-	btHcU8rTmms+Dyge8YFvtEbIpxXzfheXHUAJYWZzM6ByeTPLv3YuunagRiuFa/BOD0xfCvudIhb
-	wvW9Sd5T0X9XEUnHGV23GXE8GJodEyGOzmspF7IcAmTDZjNvCiWmptaF3qwSPsjSkoClaVnWBeH
-	OSQk4sl1zaSO7i5RCS6Q73iVKSzU1+0lyHYfza5b0PgmC+Fz2GYvbmk174h+AnOnX178KMEkGNA
-	==
-X-Received: by 2002:a05:6000:25c1:b0:43c:fb48:6856 with SMTP id ffacd0b85a97d-45e5c5af3c9mr35164488f8f.13.1779183713288;
-        Tue, 19 May 2026 02:41:53 -0700 (PDT)
-X-Received: by 2002:a05:6000:25c1:b0:43c:fb48:6856 with SMTP id ffacd0b85a97d-45e5c5af3c9mr35164400f8f.13.1779183712778;
-        Tue, 19 May 2026 02:41:52 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-16-204-231.retail.telecomitalia.it. [87.16.204.231])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9ed2f738sm43263408f8f.16.2026.05.19.02.41.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 02:41:52 -0700 (PDT)
-Date: Tue, 19 May 2026 11:41:44 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
-	Minh Nguyen <minhnguyen.080505@gmail.com>, Bryan Tan <bryan-bt.tan@broadcom.com>
-Cc: Minh Nguyen <minhnguyen.080505@gmail.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v2] vsock/vmci: fix UAF when peer resets connection
- during handshake
-Message-ID: <agwv3YkxYIC7mvyj@sgarzare-redhat>
-References: <20260512025851.189140-1-minhnguyen.080505@gmail.com>
- <3518e2b5-b669-4aaa-82ca-bbf479a85889@redhat.com>
+        d=1e100.net; s=20251104; t=1779184313; x=1779789113;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T+2SZGl9spcuw3ZVraVsNeWL62/l5e6HnqNdDh6fCso=;
+        b=i1BRUaYrZU5o+1qMJUMU4ujm0QbEYY6earethr0et1NT3+CelA4QG3kRltzbCNUodr
+         LWTOEAszGIMqKbd45S0QVjhMbDa3xTQMh1aW8ynVQeKtCx1fEldVu5FhBpSDSWb46dgj
+         CNwDRHlKqOzd8OnGOd+IqdAdKvbiq1hL2pBPqrUc474k7VwYZKuNZgXkPSCHtkcnrXjN
+         txEj3IdDOTBH5knb9DTGST1NYkdS4jyhj/FvHHSihhxCjZeEWnU7knWDukVHtLigCWfs
+         l9Jdfg81aLyQBojY0LtTSZ3QTMogAzvroqffj8nCjde4WqynjtF251DWNMmBSLWYCuJk
+         sIUw==
+X-Forwarded-Encrypted: i=1; AFNElJ/LCmw8Kfbuh5twXr3DxX2LeMT49UkFY9VVGlQ6GldJSkSloB4JQAbLro9bdHLmLM54H9GOr/o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyvF0WHtH/c3POhq6wg5QbSqY/HahD9fCjwuPugP3UFc//T3P+
+	z1RxEmJVaBMbCVzsouRCbL0e0QYWSD/b/FNJ694OGLgNX3Iz+gPkhCkNeGMtmQXX
+X-Gm-Gg: Acq92OFL0WhfRrWOFR4bEPGw81PhHFCvAfVZu7jpK2z9cL2RmyTXVtL0oKCRxBP5/i1
+	y13jg4qGk2o7qgEMtzzfcyUY3wy6EirJc8hCmijgpMDq4XG6/GAhsd744NB55uMCxUayCdp/LBs
+	K6w6qXEUbO8JlJ74uvrqHkrOCnW9UNdtGHL/YEF9IsceRxkpA2t2GB9lmSDGA97l7dqxePHNvH5
+	2MrwWXhmCYZfjUbMJtmwuDDGO0Tn1sqRTJck6zyOWdzoQPPbUu71Vo+2RjGrGgbiOx6NOyMpO7P
+	eXXYo/4+8B7QwKY7W86q45v9vj3Nd0FR1UrBvjV846WJjTOINAJxa1I6EHltBBgObdbKASfAkwe
+	SkrzfRDwSJn+CRk5rAoXzedIH0u8sQftCX566y/GSw5usS49dV6oPiYIM6/spqQjFpj3YpcEoLz
+	PCfB+mbjHoMqM8+6CaJe9Qm4XFUS4jP6EM9/EPZn9LiuQ+DR87p93y92cQIwZ+wK0YRJQTnrZYA
+	OU=
+X-Received: by 2002:a05:6871:3a21:b0:42c:d98:9540 with SMTP id 586e51a60fabf-43a2d4aeba7mr12302063fac.0.1779184312744;
+        Tue, 19 May 2026 02:51:52 -0700 (PDT)
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com. [209.85.167.182])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43a94f49da9sm7027295fac.3.2026.05.19.02.51.51
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 May 2026 02:51:52 -0700 (PDT)
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-47cba53479aso2455637b6e.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 02:51:51 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ9tZguR0BzGcUwphlQmY70UBz+cfaof/QLC2cm+T7x13Pc7ErRX53uJlU1GW9dZpFMlY+HJ9ao=@vger.kernel.org
+X-Received: by 2002:a05:6102:511f:b0:634:d42d:15e2 with SMTP id
+ ada2fe7eead31-63a403ac9a2mr7077474137.26.1779183821499; Tue, 19 May 2026
+ 02:43:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <3518e2b5-b669-4aaa-82ca-bbf479a85889@redhat.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+References: <20260518042833.272221-1-enelsonmoore@gmail.com> <20260519094820.1f05ab8e@pumpkin>
+In-Reply-To: <20260519094820.1f05ab8e@pumpkin>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 19 May 2026 11:43:30 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVw349EBZUuYZAns3FnTndx0A=PHbznxarYuAQr8nbqDQ@mail.gmail.com>
+X-Gm-Features: AVHnY4Lfn8Mcrjf-CZtgFTL8ilhwbGlXFwz-O3Z8xcIZpla9SRL4d3C994HiNs4
+Message-ID: <CAMuHMdVw349EBZUuYZAns3FnTndx0A=PHbznxarYuAQr8nbqDQ@mail.gmail.com>
+Subject: Re: [PATCH] nios2: remove the architecture
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>, linux-doc@vger.kernel.org, 
+	devicetree@vger.kernel.org, workflows@vger.kernel.org, 
+	linux-arch@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-csky@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Daniel Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Alex Shi <alexs@kernel.org>, 
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>, 
+	Hu Haowen <2023002089@link.tyut.edu.cn>, Dinh Nguyen <dinguyen@kernel.org>, 
+	Kees Cook <kees@kernel.org>, Oleg Nesterov <oleg@redhat.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Nick Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Vinod Koul <vkoul@kernel.org>, 
+	Frank Li <Frank.Li@kernel.org>, Dave Penkler <dpenkler@gmail.com>, 
+	Andi Shyti <andi.shyti@kernel.org>, Jonathan Cameron <jic23@kernel.org>, 
+	David Lechner <dlechner@baylibre.com>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Andy Shevchenko <andy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	URIBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:server fail];
-	TAGGED_FROM(0.00)[bounces-289361-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289374-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[redhat.com,gmail.com,broadcom.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[linux-m68k.org];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lwn.net,linuxfoundation.org,kernel.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,infradead.org,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,davemloft.net,google.com,kernel.org,vger.kernel.org,lists.linux.dev];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8048157B9F3
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:email,mail.gmail.com:mid,lpc.events:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: AE1F157BD06
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 14, 2026 at 03:26:28PM +0200, Paolo Abeni wrote:
->On 5/12/26 4:58 AM, Minh Nguyen wrote:
->> vmci_transport_recv_connecting_server() jumps to its destroy: label
->> and performs an unconditional sock_put(pending) to release the
->> explicit sock_hold() taken by vmci_transport_recv_listen() before
->> schedule_delayed_work().  The existing comment claimed this was safe
->> because the listen handler removes pending from the pending list on
->> the way out, which would prevent vsock_pending_work() from dropping
->> the same reference later.
+Hi David,
+
+On Tue, 19 May 2026 at 10:55, David Laight <david.laight.linux@gmail.com> wrote:
+> The company I used to work for used 4 NIOS II inside an fpga.
+> The instruction timing for one is pretty critical, it has some code that
+> has to complete in 122 clocks (worst case).
+> Our solution was to spend a few man-weeks writing a compatible cpu!
+> I think it came out with fewer pipeline stalls (in particular it 'lost'
+> the one for a (predicted) taken branch).
+> The maximum clock frequency might be lower; but it is ok at 62.5MHz and the
+> higher 125MHz in just impossible for all sorts of reasons.
 >
+> OTOH I really wouldn't run Linux on it!
 
-[...]
+Sounds similar to what CoreSemi is doing with J2 (nommu, also for
+predictable latency), but their products do run Linux.
+See the video from the LPC session at
+https://lpc.events/event/19/contributions/2097/
 
->Sashiko says:
->
->---
->Could this change lead to a socket memory leak if another packet arrives
->before vsock_pending_work() executes?
->If a peer RST is received (err == 0), the socket stays on the
->pending_links list with its state set to TCP_CLOSE, and the base
->reference is kept.
->If the peer then sends another packet (such as another RST) within the
->delay window before vsock_pending_work() runs,
->vmci_transport_get_pending() might find this same socket.
->Since its state is TCP_CLOSE, vmci_transport_recv_listen() would hit the
->default switch case, set err = -EINVAL, and call vsock_remove_pending().
->This removes the socket from the list and drops the list reference, but
->it bypasses vmci_transport_recv_connecting_server(), meaning the base
->reference is never dropped.
->When vsock_pending_work() runs later, vsock_is_pending() evaluates to false.
->This sets cleanup = false and bypasses the sock_put(sk) call, leaking
->the pending socket.
->While not introduced by this patch, does this error path leak
->sk_ack_backlog slots on failed handshakes?
->If a handshake fails due to an error, vmci_transport_recv_listen()
->handles it by calling vsock_remove_pending(). This removes the socket
->from the pending_links list but does not call sk_acceptq_removed(sk).
->When vsock_pending_work() runs later, vsock_is_pending() evaluates to
->false because the socket is no longer in the list. This causes the work
->function to skip its own sk_acceptq_removed(listener) call, meaning the
->listener's sk_ack_backlog is never decremented.
->---
->
->it looks like the above is trading an UaF for a leak ?!?
->
+Gr{oetje,eeting}s,
 
-@Minh @Bryan can you check this report?
-It seems a real issue, so the patch was not applied.
+                        Geert
 
-Thanks,
-Stefano
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
