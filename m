@@ -1,376 +1,172 @@
-Return-Path: <netdev+bounces-289406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPFCFvtJDGrjdQUAu9opvQ
-	(envelope-from <netdev+bounces-289406-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:31:07 +0200
+	id GIuvDExGDGp/cwUAu9opvQ
+	(envelope-from <netdev+bounces-289408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:15:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5DAE57DA51
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:31:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30F2E57D53E
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:15:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 43A7C308396C
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:57:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6410330200B7
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE8B3F4DD1;
-	Tue, 19 May 2026 10:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4BA83A451A;
+	Tue, 19 May 2026 11:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eybWjlsl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q4BwtKE7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lqr9PpuP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9E33D88FC
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 10:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5443D5663
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 11:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779188230; cv=none; b=nfOcdu7XKlme5IjVBVI8mQnc9JC0LGXIZwmfMcqnLap/x7srgSVS1aYTwnfaTkpFa3gW6o7oiDNrjqRTWhCFgsFp4XHPP13INkaD6ngdcGZ336hH1051bdk8vY2zyv85+2KWAnv+8YdqmI+EJEbymsyoXF8i73EuszLQ6z2FMlM=
+	t=1779188415; cv=none; b=VDAKA8diBd6Phgj0QZPXsqeoPWm2SVt8I9kNmc0c68PEqtl6UVXdwtVxDiU+R24ReS/MIvxHj3huwbDziQ8OG6B3a2upOSD0qp0oz5sACM8YX+bnw0k1p6RXbENmtyTnhfMZ/F07CZA3ak8SysQsP2X2eCZs5RuBnnvrb4XTrY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779188230; c=relaxed/simple;
-	bh=lsBVMREThc1wx/FRt7E+QCeVCwR4ZbEJEAKra/cO96g=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Pgz+IqpMFpZYfySmNmPVEDacCA9qhxkpdqjHTRyo6OqFk6rMfW8BQpVsh4SKVmtrV6pzj7FY72PHSasjbhV+HqZz9zeFSSygWb0MjnW/aOm5gZIPZq+LIR0RQu8+FQEOapgZX22IrKkEtf3hP8gt14uSN/FzMNOuF4LMEkMbcPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eybWjlsl; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779188228; x=1810724228;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=lsBVMREThc1wx/FRt7E+QCeVCwR4ZbEJEAKra/cO96g=;
-  b=eybWjlsl6/aLww82hQ2pcmzxzWwWX2mf7N9NGabIcEg7eSYY12cmni07
-   5AHY1N7NJZoIPIsljNgXMRxCivuwENQo4yGMDSIngsV2S1Jey8jU0/abb
-   AVh+LLi50bxF+5R9F8FFAmD0bFQVmIyTvvlfEvrhTrhVxU56JI5GSMLG8
-   8FREXHg1aut/9mW9+FUaM6migD987ZOuNE3HUAk0nYcFtkJk/2Utzu0VG
-   KDC4FPkLdaLtAoqojGwB0Hixy/XUSWINPJGtrr8O+uiWMadWcrT7nnbJZ
-   zRVwBARDExj7+mRwV/SjicY7USNWG/xniHFLVMnCkN9T3Fi/r+hRzIXtE
-   w==;
-X-CSE-ConnectionGUID: rhBShf0aT4GSdpPWDNBp+w==
-X-CSE-MsgGUID: MLvqugEFQfKIgRKtier7Vg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11790"; a="82626789"
-X-IronPort-AV: E=Sophos;i="6.23,243,1770624000"; 
-   d="scan'208";a="82626789"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2026 03:57:00 -0700
-X-CSE-ConnectionGUID: BaVOWXebSbS9DesvgV6Uyg==
-X-CSE-MsgGUID: KrVgaAA7SkmaoJajXSmd1g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,243,1770624000"; 
-   d="scan'208";a="241568910"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa004.fm.intel.com with ESMTP; 19 May 2026 03:56:58 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Sunitha Mekala <sunithax.d.mekala@intel.com>
-Subject: [PATCH v3 iwl-net] i40e: keep q_vectors array in sync with channel count changes
-Date: Tue, 19 May 2026 12:56:38 +0200
-Message-Id: <20260519105637.839438-1-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1779188415; c=relaxed/simple;
+	bh=n5B6+29nvQxZ/wHGFunRXCweF9/I5ooQyav/joDC1Q4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Q1vywbQnCUwkhgmIGWEUGVnZ/jrkuwtpoJCa5BqDVoPVJyb5N0igFViPWDaToLzvx/fLcLMMXEUi1CE3WSeMENxyP8DAQnPOwTUt1AGwdCnB0D1wgu8vwVr3ZIXWk74cM3VXA/b5XmvRTpCQiOA3ec0f5mV9hIgcT47WSNqmMYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q4BwtKE7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lqr9PpuP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779188409;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E/R7pULBaPP9T6iOFYumwv5ZvUtdIBTximZQUVwysfc=;
+	b=Q4BwtKE7uNTsEkD/j5jMaKXp0nnUiF3z5p2gv6uYIRYAs7gzYS8an75qOLfmqI7o1Xjca7
+	pDtNbrDmE6Si16bxNnEe6ESYgQrrhapVlhZgCD6QfVIqR6K2Sea+bxYuIpvqwaaDQQpikC
+	pHM8MzlMMYbVuKsB8ROaYqtF8MTCA5U=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-510-uq7XQ_xPNxOGBNRy9rxzAQ-1; Tue, 19 May 2026 07:00:08 -0400
+X-MC-Unique: uq7XQ_xPNxOGBNRy9rxzAQ-1
+X-Mimecast-MFC-AGG-ID: uq7XQ_xPNxOGBNRy9rxzAQ_1779188407
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-45b7ff2140eso2980529f8f.3
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 04:00:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779188407; x=1779793207; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=E/R7pULBaPP9T6iOFYumwv5ZvUtdIBTximZQUVwysfc=;
+        b=Lqr9PpuPjwo3YudVUUXbjouAMXWS+euf1Q5DySZWiYXjCryFE6TpDjrcWtI8rmNXXI
+         DkVrheFtgzD9skCrS7XWwEgFR7QkmzRP1KeZ/EaAf/0XxP363I+gUDbvXXp/Y+PmTl+D
+         tfvDP9jqms+W1rnbY/8Vo0HYJ/HHfJsz7Hs4oDrkd5qIy+jvVFtll/D5PanmoScs4JWM
+         qXabsy3X+SxSEyP4laaRHNtWQtiVL1Owa12taeJfZjh4wUsEkr8OFY3djnjoShA8v+Ry
+         zaFBznKWySCXDeXY7xikvU3VaJO02jQnI0M4NjrC1U1H5d/LQyLS7Vr63R2hQ6inWlM3
+         XpYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779188407; x=1779793207;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E/R7pULBaPP9T6iOFYumwv5ZvUtdIBTximZQUVwysfc=;
+        b=WaJ0scphufBukM3WWJ51OYHJ1FrHbflwhJv96RVIpfSmvctO800a1NshSvqNRJpcc9
+         AdoHQbdB/M6NQVDMzjcisJmxCsE/ezvM8IDM8nZtfwjjLVcfEHdCp4udEonN0bDXdCqP
+         M51M016v5WjXInRpoQnFT0LlyD6sNrD/6hV33ijTfYsHx/Ij1Amc8OZGwHGuAkXscJ/Q
+         AoM+R05sYB29jnONT5KxxuFfhfJN+qjUsymGYIjvMkWWrrVCdpmiLjgTZO0s5HCFTFTh
+         ixFa7wu8Tns3iHY0QCAXINZa8G30LkvWfgFoJ+Z0OGMbqotdBhwaD5ra1MEV86NiqDEf
+         5rkw==
+X-Forwarded-Encrypted: i=1; AFNElJ9SD9c9nYYVUtiCUwoHqi6OmVbpy2kxX/FC2mJ7RzEzssTvACdICz2WIY1ywt3mHp+CfW24Pxk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaXAvv2M5G1U1IlObR2S6prN1wGwRIcnZNmCrDOWTWUV0jF3ie
+	+K7Fs4RNw5R0P0PCT5h69nOw1Rm5yXIW9xY3t8k6hy2CtzA3HB6mGpSMyeXy6OgdVGdRCLzarTB
+	xmMJAFMLTjBVw+KCL4q10fku1HJfsGTqtksqF7dmYxn0KL2Or4YHpsTObGA==
+X-Gm-Gg: Acq92OGUWskRXhTj0UWfrRvnUG47LNGj9gkiS7Bvk1fiz8t5E40shjKb0imVg4l/xIE
+	oyW4VK5eOoWe7BAV07uLzDFFtCgDOtR2AVgjkrnqKiod2zhpx4UzOijl8F2kPmeBRllBgoE/iCN
+	kbEuLgrSfQiKtwfkFciPytQJSdvCqcFEN+jQs7JVXmAuH3JlelWfLZxK/EZYQOjk59WP4Tzz0Sx
+	JjgpW8seL8vdfb320qCEeU5VYVeEPqPINSWEEGcr0EFSWIRyBcoa+6epuDBK1xFL5y/xSt1kVBX
+	erzB8pM/hpVVVDeAIgw9S96ArFfgXX96QduriLcKBhC1x55IvSo12elr2HHMzWs4/ojzZsaUx/x
+	8g2iu+wdZNgo2zeqlVpta0uUTdYy+eAxXwUJzEPzInOVGZyGNVhvGu/U=
+X-Received: by 2002:a05:6000:40cc:b0:43f:dd91:b022 with SMTP id ffacd0b85a97d-45e5c5ccb3amr31758304f8f.35.1779188406918;
+        Tue, 19 May 2026 04:00:06 -0700 (PDT)
+X-Received: by 2002:a05:6000:40cc:b0:43f:dd91:b022 with SMTP id ffacd0b85a97d-45e5c5ccb3amr31758224f8f.35.1779188406402;
+        Tue, 19 May 2026 04:00:06 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.25.33])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9e768acesm47847795f8f.7.2026.05.19.04.00.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 May 2026 04:00:05 -0700 (PDT)
+Message-ID: <8a33f35a-195a-4f1f-9282-85f68399b89f@redhat.com>
+Date: Tue, 19 May 2026 13:00:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: mana: Fix TOCTOU double-fetch of hwc_msg_id from
+ DMA buffer
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ longli@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, dipayanroy@linux.microsoft.com,
+ horms@kernel.org, kees@kernel.org, shacharr@microsoft.com,
+ stephen@networkplumber.org, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260514194156.466823-1-ernis@linux.microsoft.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260514194156.466823-1-ernis@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289406-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289408-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C5DAE57DA51
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 30F2E57D53E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-For the main VSI, i40e_set_num_rings_in_vsi() always derives
-num_q_vectors from pf->num_lan_msix. At the same time, ethtool -L stores
-the user requested channel count in vsi->req_queue_pairs and the queue
-setup path uses that value for the effective number of queue pairs.
+On 5/14/26 9:41 PM, Erni Sri Satya Vennela wrote:
+> In mana_hwc_rx_event_handler(), resp->response.hwc_msg_id is read from
+> DMA-coherent memory and bounds-checked, then mana_hwc_handle_resp()
+> re-reads the same field from the same DMA buffer for test_bit() and
+> pointer arithmetic.
+> 
+> DMA-coherent memory is mapped uncacheable on x86 and is shared,
+> unencrypted, in Confidential VMs (SEV-SNP/TDX), so each load goes
+> directly to host-visible memory. A H/W can modify the value
+> between the check and the use, bypassing the bounds validation.
 
-This leaves queue and vector counts out of sync after shrinking channel
-count via ethtool -L. The active queue configuration is reduced, but the
-VSI still keeps the full PF-sized q_vector topology.
+Sashiko noted there are more related issues in the nearby code:
 
-That mismatch breaks reconfiguration flows which rely on vector/NAPI
-state matching the effective channel configuration. In particular,
-toggling /sys/class/net/<dev>/threaded after reducing the channel count
-can hang, and later channel-count changes can fail because VSI reinit
-does not rebuild q_vectors to match the new vector count.
+https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260514194156.466823-1-ernis%40linux.microsoft.com
 
-Fix this by making the main VSI num_q_vectors follow the effective
-requested channel count, capped by the available MSI-X vectors. Update
-i40e_vsi_reinit_setup() to rebuild q_vectors during VSI reinit so the
-vector topology is refreshed together with the ring arrays when channel
-count changes.
+you may consider a follow-up.
 
-Keep alloc_queue_pairs unchanged and based on pf->num_lan_qps so the VSI
-retains its full queue capacity.
-
-Selftest napi_threaded.py was originally used when Jakub reported hang
-on /sys/class/net/<dev>/threaded toggle. In order to make it pass on
-i40e, use persistent NAPI configuration for q_vector NAPIs so NAPI
-identity and threaded settings survive q_vector reallocation across
-channel-count changes. This is achieved by using netif_napi_add_config()
-when configuring q_vectors.
-
-$ export NETIF=ens259f1np1
-$ sudo -E env PATH="$PATH" ./tools/testing/selftests/drivers/net/napi_threaded.py
-TAP version 13
-1..3
-ok 1 napi_threaded.napi_init
-ok 2 napi_threaded.change_num_queues
-ok 3 napi_threaded.enable_dev_threaded_disable_napi_threaded
-Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/intel-wired-lan/20260316133100.6054a11f@kernel.org/
-Fixes: d2a69fefd756 ("i40e: Fix changing previously set num_queue_pairs for PFs")
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
-v3:
-- address UAF when ring arrays where freed before q_vector's ring
-  containers (Sashiko, Jacob)
-- remove bool params from alloc/free array routines (Simon)
-v2:
-- NULL vsi->tx_rings in i40e_vsi_alloc_arrays() (Sashiko)
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 73 +++++++++++++--------
- 1 file changed, 44 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index a04683004a56..4e7cffb23d03 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -11406,10 +11406,14 @@ static void i40e_service_timer(struct timer_list *t)
- static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
- {
- 	struct i40e_pf *pf = vsi->back;
-+	u16 qps;
- 
- 	switch (vsi->type) {
- 	case I40E_VSI_MAIN:
- 		vsi->alloc_queue_pairs = pf->num_lan_qps;
-+		qps = vsi->req_queue_pairs ?
-+		      min(vsi->req_queue_pairs, pf->num_lan_qps) :
-+		      pf->num_lan_qps;
- 		if (!vsi->num_tx_desc)
- 			vsi->num_tx_desc = ALIGN(I40E_DEFAULT_NUM_DESCRIPTORS,
- 						 I40E_REQ_DESCRIPTOR_MULTIPLE);
-@@ -11417,7 +11421,7 @@ static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
- 			vsi->num_rx_desc = ALIGN(I40E_DEFAULT_NUM_DESCRIPTORS,
- 						 I40E_REQ_DESCRIPTOR_MULTIPLE);
- 		if (test_bit(I40E_FLAG_MSIX_ENA, pf->flags))
--			vsi->num_q_vectors = pf->num_lan_msix;
-+			vsi->num_q_vectors = clamp(qps, 1, pf->num_lan_msix);
- 		else
- 			vsi->num_q_vectors = 1;
- 
-@@ -11469,12 +11473,11 @@ static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
- /**
-  * i40e_vsi_alloc_arrays - Allocate queue and vector pointer arrays for the vsi
-  * @vsi: VSI pointer
-- * @alloc_qvectors: a bool to specify if q_vectors need to be allocated.
-  *
-  * On error: returns error code (negative)
-  * On success: returns 0
-  **/
--static int i40e_vsi_alloc_arrays(struct i40e_vsi *vsi, bool alloc_qvectors)
-+static int i40e_vsi_alloc_arrays(struct i40e_vsi *vsi)
- {
- 	struct i40e_ring **next_rings;
- 	int size;
-@@ -11493,19 +11496,18 @@ static int i40e_vsi_alloc_arrays(struct i40e_vsi *vsi, bool alloc_qvectors)
- 	}
- 	vsi->rx_rings = next_rings;
- 
--	if (alloc_qvectors) {
--		/* allocate memory for q_vector pointers */
--		size = sizeof(struct i40e_q_vector *) * vsi->num_q_vectors;
--		vsi->q_vectors = kzalloc(size, GFP_KERNEL);
--		if (!vsi->q_vectors) {
--			ret = -ENOMEM;
--			goto err_vectors;
--		}
-+	/* allocate memory for q_vector pointers */
-+	size = sizeof(struct i40e_q_vector *) * vsi->num_q_vectors;
-+	vsi->q_vectors = kzalloc(size, GFP_KERNEL);
-+	if (!vsi->q_vectors) {
-+		ret = -ENOMEM;
-+		goto err_vectors;
- 	}
- 	return ret;
- 
- err_vectors:
- 	kfree(vsi->tx_rings);
-+	vsi->tx_rings = NULL;
- 	return ret;
- }
- 
-@@ -11578,7 +11580,7 @@ static int i40e_vsi_mem_alloc(struct i40e_pf *pf, enum i40e_vsi_type type)
- 	if (ret)
- 		goto err_rings;
- 
--	ret = i40e_vsi_alloc_arrays(vsi, true);
-+	ret = i40e_vsi_alloc_arrays(vsi);
- 	if (ret)
- 		goto err_rings;
- 
-@@ -11603,18 +11605,15 @@ static int i40e_vsi_mem_alloc(struct i40e_pf *pf, enum i40e_vsi_type type)
- /**
-  * i40e_vsi_free_arrays - Free queue and vector pointer arrays for the VSI
-  * @vsi: VSI pointer
-- * @free_qvectors: a bool to specify if q_vectors need to be freed.
-  *
-  * On error: returns error code (negative)
-  * On success: returns 0
-  **/
--static void i40e_vsi_free_arrays(struct i40e_vsi *vsi, bool free_qvectors)
-+static void i40e_vsi_free_arrays(struct i40e_vsi *vsi)
- {
- 	/* free the ring and vector containers */
--	if (free_qvectors) {
--		kfree(vsi->q_vectors);
--		vsi->q_vectors = NULL;
--	}
-+	kfree(vsi->q_vectors);
-+	vsi->q_vectors = NULL;
- 	kfree(vsi->tx_rings);
- 	vsi->tx_rings = NULL;
- 	vsi->rx_rings = NULL;
-@@ -11674,7 +11673,7 @@ static int i40e_vsi_clear(struct i40e_vsi *vsi)
- 	i40e_put_lump(pf->irq_pile, vsi->base_vector, vsi->idx);
- 
- 	bitmap_free(vsi->af_xdp_zc_qps);
--	i40e_vsi_free_arrays(vsi, true);
-+	i40e_vsi_free_arrays(vsi);
- 	i40e_clear_rss_config_user(vsi);
- 
- 	pf->vsi[vsi->idx] = NULL;
-@@ -12046,7 +12045,8 @@ static int i40e_vsi_alloc_q_vector(struct i40e_vsi *vsi, int v_idx)
- 	cpumask_copy(&q_vector->affinity_mask, cpu_possible_mask);
- 
- 	if (vsi->netdev)
--		netif_napi_add(vsi->netdev, &q_vector->napi, i40e_napi_poll);
-+		netif_napi_add_config(vsi->netdev, &q_vector->napi,
-+				      i40e_napi_poll, v_idx);
- 
- 	/* tie q_vector and vsi together */
- 	vsi->q_vectors[v_idx] = q_vector;
-@@ -14267,12 +14267,26 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 
- 	pf = vsi->back;
- 
-+	if (test_bit(I40E_FLAG_MSIX_ENA, pf->flags)) {
-+		i40e_put_lump(pf->irq_pile, vsi->base_vector, vsi->idx);
-+		vsi->base_vector = 0;
-+	}
-+
- 	i40e_put_lump(pf->qp_pile, vsi->base_queue, vsi->idx);
-+	i40e_vsi_free_q_vectors(vsi);
- 	i40e_vsi_clear_rings(vsi);
-+	i40e_vsi_free_arrays(vsi);
- 
--	i40e_vsi_free_arrays(vsi, false);
- 	i40e_set_num_rings_in_vsi(vsi);
--	ret = i40e_vsi_alloc_arrays(vsi, false);
-+	ret = i40e_vsi_alloc_arrays(vsi);
-+	if (ret)
-+		goto err_vsi;
-+
-+	/* Rebuild q_vectors during VSI reinit because the effective channel
-+	 * count may change num_q_vectors. Keep vector topology aligned with the
-+	 * queue configuration after ethtool's .set_channels() callback.
-+	 */
-+	ret = i40e_vsi_setup_vectors(vsi);
- 	if (ret)
- 		goto err_vsi;
- 
-@@ -14284,7 +14298,7 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 		dev_info(&pf->pdev->dev,
- 			 "failed to get tracking for %d queues for VSI %d err %d\n",
- 			 alloc_queue_pairs, vsi->seid, ret);
--		goto err_vsi;
-+		goto err_lump;
- 	}
- 	vsi->base_queue = ret;
- 
-@@ -14308,7 +14322,6 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 	return vsi;
- 
- err_rings:
--	i40e_vsi_free_q_vectors(vsi);
- 	if (vsi->netdev_registered) {
- 		vsi->netdev_registered = false;
- 		unregister_netdev(vsi->netdev);
-@@ -14318,6 +14331,8 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 	if (vsi->type == I40E_VSI_MAIN)
- 		i40e_devlink_destroy_port(pf);
- 	i40e_aq_delete_element(&pf->hw, vsi->seid, NULL);
-+err_lump:
-+	i40e_vsi_free_q_vectors(vsi);
- err_vsi:
- 	i40e_vsi_clear(vsi);
- 	return NULL;
-@@ -14459,12 +14474,12 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
- #endif /* CONFIG_I40E_DCB */
- 		fallthrough;
- 	case I40E_VSI_FDIR:
--		/* set up vectors and rings if needed */
--		ret = i40e_vsi_setup_vectors(vsi);
-+		ret = i40e_alloc_rings(vsi);
- 		if (ret)
- 			goto err_msix;
- 
--		ret = i40e_alloc_rings(vsi);
-+		/* set up vectors and rings if needed */
-+		ret = i40e_vsi_setup_vectors(vsi);
- 		if (ret)
- 			goto err_rings;
- 
-@@ -14487,9 +14502,9 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
- 	return vsi;
- 
- err_config:
--	i40e_vsi_clear_rings(vsi);
--err_rings:
- 	i40e_vsi_free_q_vectors(vsi);
-+err_rings:
-+	i40e_vsi_clear_rings(vsi);
- err_msix:
- 	if (vsi->netdev_registered) {
- 		vsi->netdev_registered = false;
--- 
-2.43.0
+/P
 
 
