@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-289448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289450-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qEJPDEtbDGodfwUAu9opvQ
-	(envelope-from <netdev+bounces-289448-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:44:59 +0200
+	id cJkNFmJbDGrMgAUAu9opvQ
+	(envelope-from <netdev+bounces-289450-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:45:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8375357EF1A
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:44:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8D757EF40
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:45:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A8393002134
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:37:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0EC9C30B063D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CD94D8D8E;
-	Tue, 19 May 2026 12:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E7D4DC528;
+	Tue, 19 May 2026 12:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LP4WRwSw"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E9J0B+PF"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012057.outbound.protection.outlook.com [40.107.200.57])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011060.outbound.protection.outlook.com [52.101.57.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68343409E16
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 12:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DE52628D
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 12:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.60
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779194268; cv=fail; b=tjCo6G89YZ0QvctmnV+ZS4fTIsHNPNHIMhQT2km9WtCrkVwzloM+kPcW5V2ZnNsAYHyujBf2md2jIYQk0p3ZmqH7ZgNPxRjHxrDBJVIGwy8Txh8GyY53Rz0iATQm8NpWjLKegg4LLOPKkC0CBDs/O2chqCNPaaKrJaXcdDv1wkA=
+	t=1779194268; cv=fail; b=cEXzuz1kTkijCBnqRsvY1oeLT3KCdNjx6GouHQ6NOUa6+O79udDRzOoC+BpWXxXT0T7EvmVi0tDLtPLgoWmUlCgHfwjRcdhbFsx42xrGWBtEP2NgUeAgfqdb8vC02J8WYFRCLHtdG41Z0jj5lG+97MaH3d7jiKcGOYAFCMjvp08=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779194268; c=relaxed/simple;
-	bh=4QiyXNrblvlgaDjCtPreIJZR7I37MQWeRawX8KtjQXs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oQ6oAeXibIlyh21ZIdANS0xuXKHzQTKSbWTp7Uff/1R6s8QchkbygwhVGAECOK0sJFysDjYLeTGUjnLuOjLTFyJs7WjVBOVy7XLCj2duu4zjf6h77eIZuZXiIBMQLcYdiLlkOAQrD3VmyH6pJoDc3XDEvtaRXKBjus/XfYufmF8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LP4WRwSw; arc=fail smtp.client-ip=40.107.200.57
+	bh=Rz7lLLoFnzZER9cCWhuOoJ1hZdbiNFjbC0cUNuYUe0Y=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d82nTPjPzYof0Wp97ohKLYjd3eDORJ3gTpQ3VZRZkh97aVzn+dzPDOTYQgDI/m8FgzOemo8H1LAZNoafzEJ7zkJzXRdsXVedPlpHsr7BO+A6GawEFe/KclsUoCZK7iWQi+E8w1NiDCMTVX2I8mOVBawaxcdJ8K6DpQrLKi3ur/8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=E9J0B+PF; arc=fail smtp.client-ip=52.101.57.60
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JZ+GQZpQgVKsmZgtI9YEuBJm6PL4lDrolsWFt8EJJEAlYiN0EoERCa/m4SD9fbdEwZPzBa5bu6TcEly9sFIOSbNwx00vvZwsWER1Qooz79K5OlNY3iGx013gnfTmJ1N9J17124FapVGJQLtKDA4AIYfjcrdsxEq42+RlsSznGxRyEqHtOUAksqWZA6A21CyXTtFCWJix0I6ZoPITs2o4adE8ZBPeO4/Gd/i96S3OfBYZUcTBf0XcmJskdxzDysR0V9kh229i35Vl+duKJE0EmvOjCUHz4I1xg2Kprj26P4xzlZnoodYDKoS96Cy08+nejCcRVeiPsir+n65OnTcbbQ==
+ b=XzWtJjW9R2btlwvyvs6XKG3/2mMo8y8Gg66hXCWdp3SivWgfnwXiIknXqwraAN6nHzjvL3KWNMWgMgn5rMGcLMRuv11V/RiJ1YcyQTpcyWneR8AxcsTnAipjAcjSjPHPFoJOnOIxNihf1247TcwxHqDD7qvwcSlE3rthS0p56kY9Zu194LZeLWHAUOVkOtqBtsT4DJTLTEd9ZKr64N1g80vUIV0sTbpAwb0pUNjyom86UcMlbSGbPsjFFQVc9XpeBMjxaPlxon4gM/jsjZyh6VGDAMILbsdMfK4ClxH2Ide+jgpL7/GHoZLipENQw2FEv04CQRfskUlMuFzOWAAQpw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aC0gZFKqAusun2IqQWNqseKNMZ8oOZUdQ0xl7odGVwc=;
- b=lwV9C8boIDquFynooomY71G36ixOso0hjsMuF6lEXcnl5LJsXkzX4mxk49cQIQUxbvSa0MV6smMeqPU78jEzL70lW5dPe1NHw2HbJiZRPei4j+bPTlA+00JgI/S6p1sqVG0u6XmDWAaKmUBKBgqnFt52g3WLhA6vLxIPjIaNWOMxl6gtfj/WKxrBxhR/duQ88JD27rbH9SWR1FMTpL13BWlfQJF5Oyvkm8nUW5CIQfDLxjyfP9i0GROsOjriZLXpS6tnjbFg7lk7ahbt4yAbMcGSKV9iiJVevq1QjaHg369oeQgEfaQRCL+NXv2MEBD47iHhNE0mjAwqm1/tQ9htFg==
+ bh=TLD3QS6UFLHJj0RTuaJmZnufbr8UK66br0CNPi6oOUY=;
+ b=eSdy9jJCnAveXilySbVXcElY41QCTtoaXYZW//UwST2PxuB7vM/Wb6R6WnmeZRir3A7oZOYxMIuemNkvz6VvCYCjRvg4I5u+p3+8uvgyx2XJdUgmvpuOreE3z74e5KIDXvA03fkfjPdRZKcoRwZGMnrcav8nMHrgbPLpmIXTrxwUM5GbNMa57wwzXRBrvyi9hwjuDBontrLzLojAWzingugI6tXtn8X8Kn3/2iJAo//Jo0qs1y9KAhbd2MYbDPCTrS4Gdqw6qiRhzLLH/DQHo2zu2MKaOSCJyH/400WRmPDobd3opoDksqq/DRKcXL//eOPGaHGW695lU/Yi+89AQw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -47,18 +48,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aC0gZFKqAusun2IqQWNqseKNMZ8oOZUdQ0xl7odGVwc=;
- b=LP4WRwSw5h5gQNEa2UmiXQo07NFYxt+7qXZI2jXh1R1sJAm0o48k4j37raqg0T3yTabtrSxA1Gpd4Nk6wJriOQeiwbf8taLnlWYaU2u4iQ6tfk5MgKbn2hyl474F9tTIkTNTKzMUVpWmE6mZ7rcWzkkrPNedZNKCQe0hH0eLUYxTqLBEJ99uvfP3606t0s7nszVC1QhiSkxCBSjo8SgGA0feJP+P94pH9BL2zyGFzr7dJe8Crs56PdxiGMfkca26hZkB6g/DOgjJSzfJjnRza/tzddvrP8OqIleTGXwA4d2yVhFEiM2c98vj1lfLXyf7HPJMVFslqOIKihjNQ1fYGQ==
-Received: from BY3PR10CA0009.namprd10.prod.outlook.com (2603:10b6:a03:255::14)
- by IA0PR12MB8893.namprd12.prod.outlook.com (2603:10b6:208:484::19) with
+ bh=TLD3QS6UFLHJj0RTuaJmZnufbr8UK66br0CNPi6oOUY=;
+ b=E9J0B+PFbqWigiQ5M9dMZLwB94ikIaG665LoUeSuh6QVFaG/WwHax5kv1s9tvRY79ytcHelsqL113hxr+VJ8sFUp53vI6EvLkHsZziOCpzluxVUvnaG6OEFIW26Lf94S1NbdGqBplqdhYFN2zydCoVnP7dsvdSnIIDerY7XGKQNLk73u6dxIB/OJIjcgWMwXh2Bu7VEm6JOa+mGn2kdVC65AYSvdPHD6DXfmhjGX91zJlRHbf2EHn6MQI5PZ/rTePmM7goqxGeuA+8EO1obgAFsJ71X6anA+kcpqaU/j742iXkU/0U6JnLlVRjbpHKKCH7OZovoiUaTFFe0aMrpg6Q==
+Received: from BY5PR17CA0012.namprd17.prod.outlook.com (2603:10b6:a03:1b8::25)
+ by CY1PR12MB9603.namprd12.prod.outlook.com (2603:10b6:930:108::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.18; Tue, 19 May
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.24; Tue, 19 May
  2026 12:37:39 +0000
-Received: from SJ1PEPF00002322.namprd03.prod.outlook.com
- (2603:10b6:a03:255:cafe::2c) by BY3PR10CA0009.outlook.office365.com
- (2603:10b6:a03:255::14) with Microsoft SMTP Server (version=TLS1_3,
+Received: from SJ1PEPF00002320.namprd03.prod.outlook.com
+ (2603:10b6:a03:1b8:cafe::49) by BY5PR17CA0012.outlook.office365.com
+ (2603:10b6:a03:1b8::25) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Tue, 19
- May 2026 12:37:37 +0000
+ May 2026 12:37:39 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -66,25 +67,27 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- SJ1PEPF00002322.mail.protection.outlook.com (10.167.242.84) with Microsoft
+ SJ1PEPF00002320.mail.protection.outlook.com (10.167.242.86) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.48.11 via Frontend Transport; Tue, 19 May 2026 12:37:37 +0000
+ 15.21.48.11 via Frontend Transport; Tue, 19 May 2026 12:37:39 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 19 May
- 2026 05:37:18 -0700
+ 2026 05:37:20 -0700
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.37) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Tue, 19 May 2026 05:37:15 -0700
+ 15.2.2562.20; Tue, 19 May 2026 05:37:17 -0700
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <mkubecek@suse.cz>, <idosch@nvidia.com>, <petrm@nvidia.com>, "Danielle
  Ratson" <danieller@nvidia.com>
-Subject: [PATCH ethtool-next v2 0/5] ethtool: Add 'pages on|off' option for module EEPROM hex dump
-Date: Tue, 19 May 2026 15:36:57 +0300
-Message-ID: <cover.1779190777.git.danieller@nvidia.com>
+Subject: [PATCH ethtool-next v2 1/5] module-common: Add module_dump_eeprom_hex() helper
+Date: Tue, 19 May 2026 15:36:58 +0300
+Message-ID: <931f2708e3d4b8bb86f41856f6f460117a1f0a1d.1779190777.git.danieller@nvidia.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1779190777.git.danieller@nvidia.com>
+References: <cover.1779190777.git.danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,30 +100,30 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002322:EE_|IA0PR12MB8893:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ddbf6b3-b2c3-47c6-bda7-08deb5a368b6
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002320:EE_|CY1PR12MB9603:EE_
+X-MS-Office365-Filtering-Correlation-Id: 89211e73-ef48-4743-c6fb-08deb5a369c4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700016|376014|3023799003|18002099003|56012099003|11063799006;
+	BCL:0;ARA:13230040|376014|36860700016|1800799024|82310400026|22082099003|18002099003|56012099003|11063799006;
 X-Microsoft-Antispam-Message-Info:
-	6pHWESSSz9DMl1cA60AvqjIeMmQDAKuM/LT17kXSEG39jgdoYzEceEF2wMJM3LQnoAc5fViAUIGJPOuIjnSRd6HJu7TzVy5pk7KMSHJpOkGe33HZzeMbZAd4hG5CdXyBpf0U5Es6i8+xKn6Riltp0vfIjeeb4+J17Wd50hCGjK7tz3ykZcwMSdk+TRCBhUlbMWTmwuBixBy2IOarEg44zLs7t1QxZderg0PVlrDOB8Twz6SR67c/LhrZ7F0XmURcDlF6g1C14C6tF8H3kPoHjTlqubpuS7Sc8vdPVN0B4ft0jTQjxaIDT3QkUG8qzId6PGV7kOs0E7yJWrNiOlk5lVX/rM6L7QPpaX1VFP1ER2vtyBndt+dd+zKeQS8rbvkFsqSoAKdG1MBPkbnYWbl1xjmpNV3XCHKMrQwBCpGele5zuJ8euJ5iP/laPrjPVwY0A/gmua6qbVxgwtRlJBCT6vfCLlZUqlEiwimlETeC0wj7O2UTuhvQZCJuHmzbj0xsCZm2FyYRjUArU/+4pInscuvtI9EKnC9kKgiAJEr+d+Fyq3H8qzgskyX/fhBJSJgbKCrZh/tbOeQEKePRdzIgEFSvlBs2A+TLYWrZAjEy8Zf5F+b7Ea7lyIX/rEn89+TETbfHqNPWg4er025k86En98KQksUO5FVkEsomYazqYg2J+EalFObNPBtDMTDIl0q9TP/nZcmHncCUUnkYTzLbJHEczijFP3M8Uu3L22530yY=
+	WBIzG8Tsu3ZjzykOgPRJf+HYFTJxwCMx+w6TJ3NGBXLIoWFG+khJ7wB3gNIj22QNNy1eDUNBbfEU1sg9py7gyWqpH5Z1l4rwI0/7PdzDnPONj4UhNHHqu5QdbXzD11wOJxh0YcpjLR/YUq13UoX75yxohWGf+wFup+7w5FVPKV4KmuKf+ssipyt7ryfvuIub5ufJ+KgUB4gq8c3/0wHouWP0HMFSdCkCfkJXTeJdvIVbw0d0dlhOCeClZhk3O3qIUhBkxu/6vyYZG6eZ7KIpMKM5/P6H3aUKLoreFG47J392SkD6qfGPV2PLhQ1Y5Ib5c5GqAcSrrfn8Ul8PfJ2/HDEKjtaEwD/1JFBoU6LE8PnUd8Ewvkkbx/9f0zlhG1pMUpEaqFfAfSbXIqxh8cG/OtOV+8vIarW14MVbF45TrRMhWLpnj31aRGwgT336kUYdf909ONszo1yIfRW43pR/1pUcxYN2/HEdLknc2SOA2mQGgO6aC7U6DVa54tY6OSUIbvlIlvooy+SSucvo+ZLKEVQrHXhbSsdmXOswTck60JVWVvM1vP6QC4fNLcgsTxvhDIeZAwf0oKL/ycOQzTocaodAvCNURk+Js8zP8B2qIfg555JokCBztWw1FBg2kJg+9jAreBCELoF6+6+XdrD89ICYQcQogPSeeDoGnlin61eCUZS39b/xJP6DiZQq25tnN+lqqpn0JXbK/vNM4X1FSZHwdN4Aty1epM1mE2Swi50=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700016)(376014)(3023799003)(18002099003)(56012099003)(11063799006);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700016)(1800799024)(82310400026)(22082099003)(18002099003)(56012099003)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	FGZPCi8fgtGTSd39UvEDMtWFk/VGBFSAfRkALGZSFtZmjb69WGL31r30WRJXpnlFyojrPg4p9x0ErduSlwmHzW8xmsjJ640VkYGONSmf4jk88GDALsFPpIL0+ws4KWVdeLE4UPxstYzXgRYtmIOOB+KpS1omnmMHwFAeEP6gBUMd/svR/9EBfxLshvsHGtaPvbThW1l58g+HZ4Fy3jNX5DzNWWSodgjRfyqTMUyQL4dq6PT9EayqxNYIDbvg+ooRHbmxSBbOYlCh7vzZ6QTV6O9pUPfMJ6hf2EIBw4+RF3vQZBKe1zy55qQeYfJsMggR9ZasY9ysDu5uQ6FMnZho9uDShffbAGEf9h9AqLNqKXO7PoScsj0AXkGTx/hIAiHPuArbtDn+AIvZ87ACEHLRe+KIbyoun+O7q7fNi3JnirbV/DE8o/YjzewJQPBsq1l3
+	xGXvCsjUVstLuQmZJbp/DVykTIqcOeZrn2s7gpm5kPlnE+Rdzs/P2TIP0pptTNfK5jJ5240BlWLEAdNVY5cGHP9VK3P1DDqPtuUJr89vKSR7r1rZityj8u5j6F3ITk/wM+lPKTZfGwE+SoKHL+jqNbPFfhgyFgiRyOBYg+yLwR0Tm3X2Z9/uYreC3CNuNkWiQFXarPJrlFMhBaayR42CmNEPErelpX58qMneK/g0ApogXSssiaHVXht9BS2WgYTHOBsrbuJjYai8C98TPtlio2Up787xbrgvndshQ0m4Au28dNIQrwc///WlIPGrJep8ONxVCJCqyvppwok1mk53bUBmACv09jHTTKSMvEEasJ8smtCJTy9k4fiDSqnvf3rSFkcsCERQnMvjkgug2XCNea9R6ZM7QDmCPdxKY1saEsoNNpZTmwfUe4eyR3oy9Ntq
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 12:37:37.2873
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 12:37:39.0926
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ddbf6b3-b2c3-47c6-bda7-08deb5a368b6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89211e73-ef48-4743-c6fb-08deb5a369c4
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002322.namprd03.prod.outlook.com
+	SJ1PEPF00002320.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8893
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR12MB9603
 X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
@@ -133,7 +136,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289448-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289450-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -143,124 +146,104 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,Nvidia.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,8.in:url];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:mid,nvidia.com:email];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 8375357EF1A
+X-Rspamd-Queue-Id: CD8D757EF40
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The existing 'ethtool -m' command can dump module EEPROM data either as
-a parsed pretty-print or as a raw/hex dump. The pretty-printer reads
-multiple pages per module type, but decodes only specific fields from them.
+Add module_dump_eeprom_hex() as the shared building block for the
+per-type EEPROM page hex dump functions added in the next patch. It
+prints a per-page header followed by a hex dump; the header format is
+selected by print_i2c / print_bank flags in struct module_eeprom_dump.
 
-In practice, both outputs are often needed together for offline debugging:
-the pretty-print to identify the module type and decoded fields, and the
-hex dump for fields the pretty-printer does not decode. However, there is
-no single command that provides the raw hex dump of all relevant pages,
-organized by page boundary. This is especially problematic for CMIS
-transceivers where the existing hex dump does not provide Upper Pages
-beyond Page 02h, let alone banked pages.
+In JSON context, the flags are ignored and all metadata fields are
+emitted as one object inside the enclosing "pages" array.
 
-This series adds 'pages on|off' sub-option to 'hex on|off' for
-'ethtool -m':
-$ ethtool -m hex on pages on
+Assisted-by: Claude:claude-sonnet-4.6
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Danielle Ratson <danieller@nvidia.com>
+---
+ module-common.c | 38 ++++++++++++++++++++++++++++++++++++++
+ module-common.h | 12 ++++++++++++
+ 2 files changed, 50 insertions(+)
 
-That produces a hex dump organized by page, matching exactly the pages read
-by the pretty-printer for each module type.
-
-Each page is preceded by a header identifying the page number and, for
-banked modules, the bank number. For SFP, where the two memory regions
-are separate I2C addresses rather than pages, the header shows the I2C
-address instead.
-
-In JSON context (--json), each function emits a "pages" array with one
-object per page, containing page/bank or I2C address, offset, length and
-data. Consumers that need a stable, machine-parseable form of the hex
-dump can use this output instead of the text format.
-
-SFF-8636 Output examples (values zeroed to omit vendor-specific
-identifiers):
-
-$ ethtool -m swp61 hex on pages on
-Page: 0x0
-
-Offset          Values
-------          ------
-0x0000:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0010:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0020:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0030:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0040:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0050:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0060:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0070:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-
-Page: 0x0
-
-Offset          Values
-------          ------
-0x0080:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0090:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00a0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00b0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00c0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00d0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00e0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00f0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-
-$ ethtool -j -m swp61 hex on pages on
-[ {
-        "pages": [ {
-                "bank": 0,
-                "page": 0,
-                "offset": 0,
-                "length": 128,
-                "i2c_address": 80,
-                "data": ["0","0",...,"0"]
-            },{
-                "bank": 0,
-                "page": 0,
-                "offset": 128,
-                "length": 128,
-                "i2c_address": 80,
-                "data": ["0","0",...,"0"]
-            } ]
-    } ]
-
-v2:
-	* Add JSON output support: each per-type function emits a "pages"
-	  array with one object per page containing bank, page, offset,
-	  length, i2c_address and data.
-	* The shared module_dump_eeprom_hex() helper takes a struct
-	  module_eeprom_dump with print_bank / print_i2c flags selecting
-	  which header fields are printed
-	* In JSON context all fields are emitted unconditionally.
-	* Document the JSON output format in the man page.
-
-
-Danielle Ratson (5):
-  module-common: Add module_dump_eeprom_hex() helper
-  sfpid: Refactor sff8079_show_all_nl() to separate page retrieval from
-    display
-  module: Add per-type EEPROM page hex dump functions
-  netlink: module-eeprom: Add 'hex on pages on' option for
-    page-organized hex dump
-  ethtool: Add man page and bash completion for 'pages on|off'
-
- cmis.c                        | 70 +++++++++++++++++++++++++++----
- cmis.h                        |  2 +-
- ethtool.8.in                  | 18 ++++++++
- ethtool.c                     |  1 +
- internal.h                    |  4 +-
- module-common.c               | 38 +++++++++++++++++
- module-common.h               | 12 ++++++
- netlink/module-eeprom.c       | 43 +++++++++++++++----
- qsfp.c                        | 67 +++++++++++++++++++++++++----
- sfpid.c                       | 79 +++++++++++++++++++++++++++--------
- shell-completion/bash/ethtool |  2 +
- 11 files changed, 294 insertions(+), 42 deletions(-)
-
+diff --git a/module-common.c b/module-common.c
+index 4e9a0a7..1cfe243 100644
+--- a/module-common.c
++++ b/module-common.c
+@@ -656,3 +656,41 @@ void module_show_dom_mod_lvl_monitors(const struct sff_diags *sd)
+ 	PRINT_VCC_ALL("Module voltage", "module_voltage_measurement",
+ 		      sd->sfp_voltage[MCURR]);
+ }
++
++/* Print one EEPROM memory block with a descriptive header followed by hex
++ * dump. The header is selected by the dump->print_i2c and dump->print_bank
++ * flags: "Page: 0xN" is always printed, an I2C-addressed block prints
++ * "I2C Address: 0xN" and a banked page prints "Bank: 0xN".
++ *
++ * In JSON context, all fields (bank, page, offset, length, i2c_address) are
++ * emitted unconditionally as a JSON object inside the enclosing "pages"
++ * array.
++ */
++void module_dump_eeprom_hex(const struct module_eeprom_dump *dump)
++{
++	u32 i;
++
++	if (is_json_context()) {
++		open_json_object(NULL);
++		print_uint(PRINT_JSON, "bank", "%u", dump->bank);
++		print_uint(PRINT_JSON, "page", "%u", dump->page);
++		print_uint(PRINT_JSON, "offset", "%u", dump->offset);
++		print_uint(PRINT_JSON, "length", "%u", dump->length);
++		print_uint(PRINT_JSON, "i2c_address", "%u", dump->i2c_address);
++		open_json_array("data", "");
++		for (i = 0; i < dump->length; i++)
++			print_hex(PRINT_JSON, NULL, "%02x", dump->data[i]);
++		close_json_array("");
++		close_json_object();
++		return;
++	}
++
++	if (dump->print_i2c)
++		printf("I2C Address: 0x%02x\n", dump->i2c_address);
++	if (dump->print_bank)
++		printf("Bank: 0x%x\n", dump->bank);
++	printf("Page: 0x%x\n\n", dump->page);
++
++	dump_hex(stdout, dump->data, dump->length, dump->offset);
++	printf("\n");
++}
+diff --git a/module-common.h b/module-common.h
+index 985b518..4063448 100644
+--- a/module-common.h
++++ b/module-common.h
+@@ -261,6 +261,17 @@ struct module_aw_chan {
+ 	__u8 adver_value;	/* Supported if (offset & value) != 0. */
+ };
+ 
++struct module_eeprom_dump {
++	u32 offset;
++	u32 length;
++	u8 page;
++	u8 bank;
++	u8 i2c_address;
++	bool print_bank;
++	bool print_i2c;
++	const u8 *data;
++};
++
+ extern const struct module_aw_mod module_aw_mod_flags[];
+ extern const struct module_aw_chan module_aw_chan_flags[];
+ 
+@@ -283,5 +294,6 @@ void module_show_identifier(const __u8 *id, int id_offset);
+ void module_show_connector(const __u8 *id, int ctor_offset);
+ void module_show_mit_compliance(u16 value);
+ void module_show_dom_mod_lvl_monitors(const struct sff_diags *sd);
++void module_dump_eeprom_hex(const struct module_eeprom_dump *dump);
+ 
+ #endif /* MODULE_COMMON_H__ */
 -- 
 2.51.0
 
