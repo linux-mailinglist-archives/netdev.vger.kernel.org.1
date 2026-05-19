@@ -1,290 +1,217 @@
-Return-Path: <netdev+bounces-289514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289516-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEVnKq2KDGo1iwUAu9opvQ
-	(envelope-from <netdev+bounces-289514-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:07:09 +0200
+	id gONAEEqQDGp1jAUAu9opvQ
+	(envelope-from <netdev+bounces-289516-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:31:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A908581F30
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:07:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97436582681
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:31:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3057830E865A
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:58:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD1C4319DCAB
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 16:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D2C35203F;
-	Tue, 19 May 2026 15:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858BF2E7657;
+	Tue, 19 May 2026 16:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sCraIdDP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kg74Crdt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B2E3F1AA2
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 15:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779206307; cv=pass; b=MSqP96h0nz2KzeD3ywvgiemF6vb5dm7kMtGs42/KI1UO0RdPPr5xuJQ2xPugA85NO3VSDL2Q2pLM3R56XUtKniBBB1jkd39EdfMBwHena6nKT5P49SUi9JSPk626KCBvEuhz/4Fl9oPaBE771xZr5MA7QsB5BwCX2K4xcc8KBB0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779206307; c=relaxed/simple;
-	bh=UwfRDIGy2q3FUkgiUSA/dAFUOsVNn+iJpmUP4CYfdjA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RZSVHEamFcbFwm4vtALNHRH+DsI9J5ycu1dyEDMysGVTX1UHWbjEdb0vTCa4PensHrGMWRxtB6n8td0AQkkj/5fmU37MDZPZofZSVYHcO9nsMszTlVE7hbpOK8vWng09THbB1gKHdswFoCkdxOD/CFgQH7PNB/DNR0kkpdWlkLE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sCraIdDP; arc=pass smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E115D2E8DE3
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 16:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779206671; cv=none; b=u3t4Zt1pWIc783J2WSzVPbn4aISXzPaTvdjrnMIr2RG9krXHPp9XbBwQphcDuNAKJFBv8RXjodxImTytDrEpkiPF2kJXqP131bInrQ+MUMAfloDxqYU3o2fs5x+YFfUNvbsZZoV2HfWoMjygmLJWL4ZyIyzmOiAtJ68mPVoI43A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779206671; c=relaxed/simple;
+	bh=2tjWB4WUQQSaJNP4H/chO839vCPnJWUadjgVObpCiKE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VVz6zS/XlCtNmUWGn0sWajHMoGv5P1pXQgY255jYumwlT8Q1Ni2XRysdn0zzwKhHB2iy6A802DVQndWe1gVOpwqVFJgAS67PDDubU0XDXA2xAluGDOJm8PL3v1OFTBZlDqHpIiTZ7DuUi+swbjOQ2okXW9I4/q1VhXKOPL+ITdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kg74Crdt; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-48d10c981e4so5254305e9.0
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:58:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779206301; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hqVQzBCmzJeFfDNuu3KdK6c0QwF5geZg9atRfksvlKSSfP4Bd8AywNrk3ifZFqYpCu
-         AvQ5Buk0EIMpi/TN6eHqZGYhFej4j0oP4bDB5pGYvid8ewQNHTAahIwL2W1WmV9Hr6DN
-         m/oTJ7fuvIFo8ZnZAnzp/zlD1yT77d39eHROTtVAyjjS4+R4fsECT5nktCEjoOmwOGHF
-         UFZ4cp5K9WCxcMExNdlD+t9SQS84lCvUgdQvQWs7J1wVn+5g6xqhWroX90+njWtJruo4
-         pWvu4Py/PfsbXKbvJm3BrVXjWApMZx9krb+Zq/aVuyuyftBjbeESsb9HLK1NTWHYuOWt
-         RKpg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=xJpp1n+QvIrZfr5BvihSJggMhnHMI8y+n8buQsHz600=;
-        fh=OreROVuWG60Mee9m0RanDLyBYvBZaII33WnO1U+1MTw=;
-        b=OtD09XspdDtGtnmGkYSQQmGlniZpfAkDtwvgWqBIaCUbbS1Pl+VDM9D3c28l09mJbb
-         8MMfgeEsCXvybAj8c090VrXk1zFUdm2DC1wItdAyPUr5zVSXG2+ycAyWt9uQkEyT5ns7
-         PgXwR+8rbfAOCsGiVOXsr14GgmUprpATb7if/csoVfYwnexaNH3gAYmSGsxw7vGPlohB
-         y7I2asHREncZOb6ZAJL5oiZAgs5b05a2uxRTshq5UGcEv3E3HegU6qzlDdMXxUlISD33
-         MIKZZWQCNaaq6RJcDQr712a0Tvpv8y4kaVL6H4pPgw4PrmZVqfcaF9zBm7bcNpZbTQPC
-         j59A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488af96f6b2so41232185e9.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 09:04:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779206301; x=1779811101; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xJpp1n+QvIrZfr5BvihSJggMhnHMI8y+n8buQsHz600=;
-        b=sCraIdDPryFLcvRUAK2KbLzN2FwAn2tKX1P4WPsetFug1Zw77ceaB9fSJlO4cUrCva
-         ukVk9c5/yTT2BxE9UedXvRqfBHKYSv599Iz3IKQm2uiln5N54O2AkK/HLzOlP2/7ZCDk
-         HYSogE3y3JOtezww/gmIA2iS4z02WbokPBkxsFoTcoNXO1z59mVscR2Eg0I6BfcGKWq4
-         DIyN0rpteRwF18nh8EviLhDCG/KA/CznBAfDNwRMCfJsQepvK8oXXG7fjKNRRGKaDs8Q
-         Y6wgDmm1EqJU7RJvLXfUXxYT3yrh+usuvWROSTs0mxywxV7T800iwZ9yc3FmkYOhdvAr
-         MbNA==
+        d=gmail.com; s=20251104; t=1779206668; x=1779811468; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kKpR0xmeanMEpxqOiWggE8obfMM9EdqhCBPTTtEFV9I=;
+        b=kg74Crdtz3jf/JJtHhf+jrCoyCfor+1DIZDOm3W26dYJL9sBEcbkCbeqvD3q+lvR4x
+         l71Si9gwcnpjBBOCHdK3o/Vk0IK6zncLBYfvQKeJK3gNzrwEiJUGJlLsJ2ls6ECgv47r
+         89c3sxNV9iuMpKfEwkYGhRpYtC9yEyRoOvVcNnS/UadKBhhF4UArTzzFvwxNjr74Pksp
+         tHGqKUeMdp+0+K1MD2n8a3CGkmw/1tsDWy5V8cVzaBRwAvom7/mCBlcnT7ULkvE0whnL
+         wufKro9tSaQVjH0JRp3pb2IMoBQSipGify23USt+bdwsK36QbB/8rh9wghsduRYM0WOS
+         kPjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779206301; x=1779811101;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xJpp1n+QvIrZfr5BvihSJggMhnHMI8y+n8buQsHz600=;
-        b=AbLuw5htdrPtbsgAP9PDy7JGEAf+FPQ/hAyXI/whJNtTm03cZGKdLHZnttkSczOeQZ
-         AEJGeochui3/YcAkfG/EgQtWONo0yIXPHNvPKfUSHJnORGBcmg3WJdsFta+7ZTIWm6EO
-         H+vKn+QubqgXQrpha01NwwCchIKpSiDhx+6Am+qXq5Tae60RDrBKemXVcqprR8B9Ozxk
-         Jxy3teFjur+Z6SlL8Dkxp+FlQ3Jb9J0pnypRJZ6nYU43d/VcqtGcbYHItyWAPLiEMJYf
-         WaLHWzl3MWImq6RAZ0uZcn5Xf5hA2C88cygPxl4FX8BumZL+rtF7Nbv+80j3Vn3671wB
-         xBxQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9nL9yx0l4YhmCf+/ibdsxgC8ySFNAR6RRefnSX1/OaEQv1bIT3AJCkVqQPemQLPfrezAW+ZuA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7TFCg3vbBWh6oIOn7ZJYu/dxXqs5sXwel7+YtkK/Njo35+J2P
-	FdLFqPJJtqhWiIjSy/Jt+vMUvXmEABJh8/Nk+mqRdYSjkbaOb3cQ4d+o0C87Lb29PjTxk/JZAxD
-	oBU+K1d/jWk62BVil+DouSNPZhzNLgxc=
-X-Gm-Gg: Acq92OGbDahdPHjb0BGaGT2U3kYLinGkl22SADkyaCNyZra737QgCQP7QBJqI0pPeH+
-	x1RnBkJYDFX2LEMlqHxAceMjvm8b6tP5E72HOCKdihlEXYkz3QoAW5YwK+j7fk605Wnvbsvhk1V
-	r0LrD0n1W3WdtuzReAYth0cK7z2gkEq59nKjVSZfhhNrK2wYB1BnUOrjhyiSW3B/hvCJ/qnJPci
-	XipUmgwPTq81L2Arzo/uq+TlOhWzLVeh5Jscyp+7nL4DvVXiMGaHf3Qbw1o/6PuSjb39Ok9d+dA
-	/pNbrIM=
-X-Received: by 2002:a05:600c:1d02:b0:48a:5302:8ed9 with SMTP id
- 5b1f17b1804b1-48fe5ea0842mr180244485e9.0.1779206300911; Tue, 19 May 2026
- 08:58:20 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779206668; x=1779811468;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kKpR0xmeanMEpxqOiWggE8obfMM9EdqhCBPTTtEFV9I=;
+        b=O5wCcRz8NN2kZEiLOrZnx2lXDZBVqB+tu8o2wNN5eiX/0phOCsOvfPc92CZ74H/0+0
+         5aofjYcQbcdjN2mGKhxgbmxX0AhhYZhKRurVLevgH6uJtN7t1XwBLSCYvTlGudTe/G7X
+         Xq0qc3J3xqggCUW5dij4zz6anbt16Ugs8g09umM9GIRvJpE1aSUN0PP54UKaPyg6E+Rx
+         18sjsGsNTM9NfX3S9MIyoSfWsxEg3ZGYUSnh2F/0HsdYyNPfQqRxYHRz8tlxQJ+XLVYX
+         D6HBb+k/k0CDwF5JdmYHD/KjZ+ZYypreGYFPquUVOYJ0JshOFCxJb6PWvdxrX++rv5Y4
+         CgdA==
+X-Gm-Message-State: AOJu0YzT+9QmL4+H1KKUAdtoQfuaOJIfeh12y9w4Qei3IlRS7pI4578Q
+	WO2Wx/Jb7SgzcKeAPIndZl7Nl2BLMjCIt5e+kHhNFBN+g3QsHCE4D3Rc
+X-Gm-Gg: Acq92OEt4hQmE/ZOgTVA1PckyxVDcJtbK08h9SabaGkJevtv6UH4HF9c/vi7QexbJMy
+	MVLQvVROIzNANE4fIXdyfArBeDHrXF+0jXI9DoxlbvhPH4Gh2PySkj7EFnMYb7OOJBmVy9BWFv5
+	MA7OCAGmRheS3DIYHOTe25Hjfmw+UiuwlNhjZa0fOpOqZ+DscLOSBJNqQFl6ed+vvpyPpsblrLz
+	dxmblq/eCnIxwhd11Y0ohJtjjrIS2aOLKQ5JYyQAvUDDEn0wNT3bLHV7tDIO/ZgZ4osLCQPwwde
+	a9iYxKqdubkLhoJ+TZ7uJ4BU+LxGXG9cRf0phOczOWahGR2Q6tL+3lp4buGRvQCao8UnzQkEHOm
+	1XGb48slXQ697iUOHBfISNN1PtxuLq51i8TVzKnWVhgbT4taxK21h9uG8K2MC9yRbBG44fO5pgG
+	p74ThFVJMEXd5D1SOhx+O4gXPWILr9L53erli0kQ8aT0q4kJRk4kkpcFbDSqNRpCHZpKKFva5Lu
+	6ITTm6H30RDBz+BzAbRK3VbEIeVAWNmByvyw7Uv8zrgg0Q0mtWg9PsLu5sKZpz9HOhbtccY5ZsL
+	Ng==
+X-Received: by 2002:a05:600c:46cf:b0:48f:d5a0:284e with SMTP id 5b1f17b1804b1-48fe66267eemr303236615e9.28.1779206668014;
+        Tue, 19 May 2026 09:04:28 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9e767ee0sm43798869f8f.1.2026.05.19.09.04.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 May 2026 09:04:27 -0700 (PDT)
+Message-ID: <7db0d602-bbbd-4554-996c-1dcefd69e2bf@gmail.com>
+Date: Tue, 19 May 2026 17:04:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260516034745.260442-1-ziyuzhang201@gmail.com>
- <agrldIdftDXvATYx@sgarzare-redhat> <CACPoYJx6szY6HcvBf+aNr5+BgrxNNJM0su-qKxzp0qW+cJWO9w@mail.gmail.com>
- <agwugKMrTsNxQ2BD@sgarzare-redhat>
-In-Reply-To: <agwugKMrTsNxQ2BD@sgarzare-redhat>
-From: ziyu zhang <ziyuzhang201@gmail.com>
-Date: Tue, 19 May 2026 23:58:05 +0800
-X-Gm-Features: AVHnY4JF15iV8VNxh-zoQopw8snUWS1lixKwNhMLTZ44g5qqA7v69Lig3q9xBy4
-Message-ID: <CACPoYJxJN0fmmK-7e7B9JaS7sqsCdEYxYMiaMK1gDaPMGuwhhA@mail.gmail.com>
-Subject: Re: [PATCH net] vsock: keep poll shutdown state consistent
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Andy King <acking@vmware.com>, George Zhang <georgezhang@vmware.com>, 
-	Dmitry Torokhov <dtor@vmware.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, r33s3n6@gmail.com, 
-	gality369@gmail.com, zhenghaoran154@gmail.com, hanguidong02@gmail.com, 
-	zzzccc427@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6/8] io_uring/zcrx: notify user when out of buffers
+To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+Cc: netdev@vger.kernel.org, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
+ <cleger@meta.com>, Vishwanath Seshagiri <vishs@meta.com>
+References: <cover.1779189667.git.asml.silence@gmail.com>
+ <35cd307a03a43583838a2e151fc641c69abd786f.1779189667.git.asml.silence@gmail.com>
+ <7bfd707b-1e21-413e-a2e7-71e8df3e43d7@kernel.dk>
+ <6d1187c8-ba4f-41ad-b692-351d8b072038@gmail.com>
+ <a2a92049-0974-478a-9297-76af96b455d8@kernel.dk>
+ <c8a21efc-1443-4ff2-ac53-7846533a26bb@gmail.com>
+ <2305e4d6-55cf-421c-94b0-ad8aae8db99c@kernel.dk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <2305e4d6-55cf-421c-94b0-ad8aae8db99c@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289514-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289516-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vmware.com,lists.linux.dev,vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ziyuzhang201@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 2A908581F30
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 97436582681
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 19 May 2026 at 17:36, Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> On Mon, May 18, 2026 at 08:39:37PM +0800, ziyu zhang wrote:
-> >On Mon, 18 May 2026 at 18:16, Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >>
-> >> On Sat, May 16, 2026 at 11:47:45AM +0800, Ziyu Zhang wrote:
-> >> >vsock_poll() reads vsk->peer_shutdown before taking the socket
-> >> >lock to set EPOLLHUP and EPOLLRDHUP, then reads it again under the
-> >> >lock to report EOF readability. A shutdown packet can update
-> >> >peer_shutdown while poll is waiting for the lock, so one poll invocation
-> >> >can report EPOLLIN without the corresponding HUP/RDHUP bits.
-> >> >
-> >> >Keep non-connectible sockets on a single lockless READ_ONCE()
-> >>
-> >> Should this be paired with WRITE_ONCE() on writers?
-> >
-> >Yes, since the poll path uses lockless READ_ONCE() snapshots of
-> >peer_shutdown, the writer side should be annotated with WRITE_ONCE() as
-> >well. I will add that in v2.
-> >
-> >>
-> >> >snapshot. For connectible sockets, defer shutdown-derived poll bits
-> >> >until after lock_sock() and use one READ_ONCE() snapshot for both EOF
-> >> >readability and HUP/RDHUP. This preserves shutdowns that arrive before
-> >> >the lock is acquired and keeps all peer-shutdown-derived bits consistent
-> >> >for a poll pass.
-> >> >
-> >> >Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
-> >> >Signed-off-by: Ziyu Zhang <ziyuzhang201@gmail.com>
-> >> >---
-> >> > net/vmw_vsock/af_vsock.c | 40 ++++++++++++++++++++++++++--------------
-> >> > 1 file changed, 26 insertions(+), 14 deletions(-)
-> >> >
-> >> >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> >> >index adcba1b7b..bed42347b 100644
-> >> >--- a/net/vmw_vsock/af_vsock.c
-> >> >+++ b/net/vmw_vsock/af_vsock.c
-> >> >@@ -1122,6 +1122,25 @@ static int vsock_shutdown(struct socket *sock, int mode)
-> >> >       return err;
-> >> > }
-> >> >
-> >> >+static __poll_t vsock_poll_shutdown(struct sock *sk, u32 peer_shutdown)
-> >> >+{
-> >> >+      __poll_t mask = 0;
-> >> >+
-> >> >+      /* INET sockets treat local write shutdown and peer write shutdown as a
-> >> >+       * case of EPOLLHUP set.
-> >> >+       */
-> >> >+      if (sk->sk_shutdown == SHUTDOWN_MASK ||
-> >> >+          ((sk->sk_shutdown & SEND_SHUTDOWN) &&
-> >> >+           (peer_shutdown & SEND_SHUTDOWN)))
-> >> >+              mask |= EPOLLHUP;
-> >> >+
-> >> >+      if (sk->sk_shutdown & RCV_SHUTDOWN ||
-> >> >+          peer_shutdown & SEND_SHUTDOWN)
-> >> >+              mask |= EPOLLRDHUP;
-> >> >+
-> >> >+      return mask;
-> >> >+}
-> >> >+
-> >> > static __poll_t vsock_poll(struct file *file, struct socket *sock,
-> >> >                              poll_table *wait)
-> >> > {
-> >> >@@ -1139,19 +1158,9 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
-> >> >               /* Signify that there has been an error on this socket. */
-> >> >               mask |= EPOLLERR;
-> >> >
-> >> >-      /* INET sockets treat local write shutdown and peer write shutdown as a
-> >> >-       * case of EPOLLHUP set.
-> >> >-       */
-> >> >-      if ((sk->sk_shutdown == SHUTDOWN_MASK) ||
-> >> >-          ((sk->sk_shutdown & SEND_SHUTDOWN) &&
-> >> >-           (vsk->peer_shutdown & SEND_SHUTDOWN))) {
-> >> >-              mask |= EPOLLHUP;
-> >> >-      }
-> >> >-
-> >> >-      if (sk->sk_shutdown & RCV_SHUTDOWN ||
-> >> >-          vsk->peer_shutdown & SEND_SHUTDOWN) {
-> >> >-              mask |= EPOLLRDHUP;
-> >> >-      }
-> >> >+      if (!sock_type_connectible(sk->sk_type))
-> >> >+              mask |= vsock_poll_shutdown(sk,
-> >> >+                                          READ_ONCE(vsk->peer_shutdown));
-> >>
-> >> Can we move this in the `if (sock->type == SOCK_DGRAM)` branch ?
-> >>
-> >> Not a strong opinion about that, but in any case IMO we should add a
-> >> comment here to explain why we are doing only for not connectible
-> >> sockets.
-> >>
-> >> That said, if we use WRITE_ONCE in the writers, do we really need to
-> >> move this after the lock_sock for the connectable ones?
-> >
-> >Yes, I will move the non-connectible handling into the SOCK_DGRAM branch
-> >and add a comment there.
-> >
-> >For connectible sockets, my current understanding is that
-> >READ_ONCE()/WRITE_ONCE() make the individual lockless accesses explicit, but
-> >they do not make two separate reads in one vsock_poll() invocation observe the
-> >same peer_shutdown value. So I still think using one peer_shutdown snapshot
-> >after lock_sock() is useful for keeping the returned mask internally
-> >consistent. Please let me know if you think WRITE_ONCE() is enough for this
-> >case.
->
-> What will be the issue of "do not make two separate reads in one
-> vsock_poll() invocation observe the same peer_shutdown value." ?
->
-> In any case, I'm not against it; I just want to understand the issue
-> better.
+On 5/19/26 16:43, Jens Axboe wrote:
+> On 5/19/26 9:40 AM, Pavel Begunkov wrote:
+>> On 5/19/26 16:37, Jens Axboe wrote:
+>>> On 5/19/26 9:30 AM, Pavel Begunkov wrote:
+>>>> On 5/19/26 16:26, Jens Axboe wrote:
+>>>>> On 5/19/26 5:44 AM, Pavel Begunkov wrote:
+>>>>>> @@ -1126,6 +1142,48 @@ static unsigned io_zcrx_refill_slow(struct page_pool *pp, struct io_zcrx_ifq *if
+>>>>>>         return allocated;
+>>>>>>     }
+>>>>>>     +static void zcrx_notif_tw(struct io_tw_req tw_req, io_tw_token_t tw)
+>>>>>> +{
+>>>>>> +    struct io_kiocb *req = tw_req.req;
+>>>>>> +    struct io_ring_ctx *ctx = req->ctx;
+>>>>>> +
+>>>>>> +    io_post_aux_cqe(ctx, req->cqe.user_data, req->cqe.res, 0);
+>>>>>> +    percpu_ref_put(&ctx->refs);
+>>>>>> +    io_poison_req(req);
+>>>>>> +    kmem_cache_free(req_cachep, req);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static void zcrx_send_notif(struct io_zcrx_ifq *ifq, unsigned type)
+>>>>>> +{
+>>>>>> +    gfp_t gfp = GFP_ATOMIC | __GFP_NOWARN | __GFP_ZERO;
+>>>>>> +    u32 type_mask = 1 << type;
+>>>>>> +    struct io_kiocb *req;
+>>>>>> +
+>>>>>> +    if (!(type_mask & ifq->allowed_notif_mask))
+>>>>>> +        return;
+>>>>>> +
+>>>>>> +    guard(spinlock_bh)(&ifq->ctx_lock);
+>>>>>> +    if (!ifq->master_ctx)
+>>>>>> +        return;
+>>>>>> +    if (type_mask & ifq->fired_notifs)
+>>>>>> +        return;
+>>>>>> +
+>>>>>> +    req = kmem_cache_alloc(req_cachep, gfp);
+>>>>>> +    if (unlikely(!req))
+>>>>>> +        return;
+>>>>>
+>>>>> It'd be nice to avoid an allocation here inside ctx_lock and with bh's
+>>>>> disabled, which looks like is also the only reason why GFP_ATOMIC is
+>>>>> being used here.
+>>>>
+>>>> I thought about it, but it's already bh, it'd need to do pre
+>>>> allocations + caching to be reliable, but that's left out for now.
+>>>
+>>> Not sure I follow - GFP_KERNEL would be more reliable than GFP_ATOMIC.
+>>> What's the contract in terms of the notification? If we fail the alloc,
+>>> then userspace can't rely on the notification on the refill failure.
+>>>
+>>> Are we under bh save already here, before doing it ourselves? If so,
+>>> then how does the guard work?
+>>
+>> In 99% of cases it's called from softirq, not sure what you mean
+>> by how it works.
+> 
+> Ah ok, I thought you meant it was already called with softirqs disabled.
+> In which case the guard would seem broken, as we'd enable softirqs when
+> exiting. But if we're just inside softirq yeah it's fine, and there's no
+> point shuffling the allocation either.
 
-The issue I was trying to avoid is a transiently inconsistent poll mask
-from one vsock_poll() pass.
+Softirqs are run with bh disabled, but bh_disable()/enable() are
+reenterable.
 
-For example, the early peer_shutdown read can see 0, so the
-shutdown-derived bits are not set, especially EPOLLRDHUP, and EPOLLHUP
-in the cases where the existing logic would set it. Then, before
-lock_sock() succeeds, the peer shutdown can be processed. The later read
-after lock_sock() can see SEND_SHUTDOWN and set EPOLLIN|EPOLLRDNORM for
-EOF readability.
+> Question on the contract still stands, in terms of missing a
+> notification. I guess since it's a hint basically it doesn't really
+> matter, just something that should be documented on the userspace side.
 
-So the returned mask can say that EOF is readable, but miss the
-shutdown-derived indication from the same peer_shutdown state. If
-userspace is waiting specifically for EPOLLRDHUP, that notification can
-be missed or delayed for that poll pass.
+Should rather be improved than documented, I'd say, but it's still
+better than not getting anything at all. And it's the only place
+where it can in theory be dropped, e.g. CQE overflow handling,
+though different GFP.
 
-I agree this is small and transient. A following read() or another poll
-pass will observe the shutdown state. My intention with the single
-snapshot is only to avoid mixing old and new peer_shutdown values in one
-returned mask.
+> Do you have test cases for these?
 
-I will send a v2 as a new thread with WRITE_ONCE() on the writers, the
-DGRAM comment, and your ordering suggestion.
+Clement needs to resend them. Actually, seems I forgot to CC Vish
+and Clement here, my bad.
 
-Thanks,
-Ziyu
+-- 
+Pavel Begunkov
 
->
-> Thanks,
-> Stefano
->
 
