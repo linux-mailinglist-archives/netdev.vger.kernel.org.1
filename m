@@ -1,206 +1,353 @@
-Return-Path: <netdev+bounces-289240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289242-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0M4PM7q9C2rBLwUAu9opvQ
-	(envelope-from <netdev+bounces-289240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 03:32:42 +0200
+	id uDi5FF2+C2olMAUAu9opvQ
+	(envelope-from <netdev+bounces-289242-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 03:35:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 772A457617F
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 03:32:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC26A5761CA
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 03:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4CC1030167B9
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:32:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2477630416C6
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:33:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFB62BCF46;
-	Tue, 19 May 2026 01:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3DA12E6CB8;
+	Tue, 19 May 2026 01:33:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XpjomkDf"
+	dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b="Nl9JUDMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f68.google.com (mail-qv1-f68.google.com [209.85.219.68])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12FD1DF751
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779154360; cv=pass; b=T5nNx8pIB1mmo3e8rBedj1O30QN6aAFxhuLvMWc5bcbxEz1mFdmPvTSqi/z4T9OY6DDsFEkQWj8IxijHT3t5OX8ENa6k6tPeKbQW4QBubYoKVGiKcdq8ZIuYOyTQF0wIcjaNVMD+UzuP9aeRJk+J2DDfoslebeRmLrdqvMOxO64=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779154360; c=relaxed/simple;
-	bh=CXi7UxLtcJ5TyVxKRS+hkUYEbmjcbpX1Ukueu5YWL+Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m6a7cTKTwFYBpF5/E38baVhoxueeovBqqdBFZy1JxFIAqjWVoMBv9O7qq5BdT1wVwDYzqKV5NZ0Q5QWR+aEHQtUIcZuc7ybKDSR1OsREV0U3gD4G7yyw5CMIIp5UUzfOo7f85tJC1wU5oY0wyANVl2zbcA1WzJhR9LmalKypqQQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XpjomkDf; arc=pass smtp.client-ip=209.85.219.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f68.google.com with SMTP id 6a1803df08f44-8b4000e51fdso34076336d6.1
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 18:32:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779154358; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jeoZJzisBRu/DiQ2pBiFfGDK4XML3oPB/Br6KH04MJUJXNHGiHZdQCe/NfCmHZZJgA
-         SSBTIp2k8NAVavLThdXTkkSXd108A0Y+9eNHMPfKzPYNqZDZhx62XgFg19XmN3Ex+96W
-         IK1Otz21vr11SNvpzhD44o1OjHnNnjUM3SSi8vbLN+GzOziqK+a5XRdRhDEbvWLMu/qe
-         Y/T36Pcr4wVCtMrx/h6BJNshgPd+5vvGq9roj9rJfl17smtGnY6g2KNFUqMEUsACofxD
-         uxGIYcIR8yIWn155CbWWYIi3MEQksXyaGlkucEvEHapbpJQTOCKEja2zHTm7ci0iRlA4
-         mzbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Ja/CV5fv5UnqqWR8UixOkds2Qx2OdDYxCo/m/q65Ga0=;
-        fh=qJZK21Loqz0q1QQaM1/72+iIpgq3IsovaDi+jX9o12M=;
-        b=KQfOOimUN2Jk32K1U8jamfOa0aAvqH8ezCP/orgfpPBwb7vBBhLQlvGJtkJ4btDGrI
-         6uA8jVwZY+bouKQjcin4ElOZFWtBM+rkxoBm8NEi83XmlPnbA2fDoNzFt7Sb1MoUgdtL
-         E1/X28rN2G8FXAuhWrw75u+PvCyCoX26/ybyPknJLof7CoHyVn4l1pzDgugMHb+L7/af
-         0EBvVHHRCEpDRXz9d0l9EkiTDdlEQD6QBBE+uZg7W99nrtLT+45JAhK8y8wxanDFaR3W
-         g16VJh0MEdRWaI4C86eF8nwz045EeGG7+wH3po1bSN4nitKwlgNgXXah0sCvn8RPK7l4
-         NJow==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F6C2DA75A
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779154430; cv=none; b=Ci7c05upOvHxnOC0FarRh5Qk6AiKGohtwzZmVg1/Tuxu9esTT0v+Xo/1+nGwphkUJ9Za0138z4vgbGvb7U3DEksBJunmBdxpM197GtLMxJpevZk9RqjMRQEJaBVqcn0EemS9b0kXGdZuwUTOLhJgZRsduiA61pTt82MRkbTm/ug=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779154430; c=relaxed/simple;
+	bh=yfu3HXA6WpN97f2/JLOaEHAfe4Lu3Fr+ei26pjJ6UjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mxlVlLUNI40aIu4ijjfDzo3dpaCCMKaEBjVEXnyfWyXY8mDDZbPSL4kL2juk7uvyuWN2l+SJzN58lYugsBe26sof93VJ3lekKE2BxpfOWBVNnPuszE8CYAnyuzf+E3GZBoY4615QdY9NKvVFQqNliOwWn3MxF2Xh7rXeZqLsWn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b=Nl9JUDMZ; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2b95a78a11dso5969975ad.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 18:33:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779154358; x=1779759158; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ja/CV5fv5UnqqWR8UixOkds2Qx2OdDYxCo/m/q65Ga0=;
-        b=XpjomkDfeXrhJOihW0xzMSkmNTwXHslAXcOxApb4+x6KJV++Z+T1GnIfMEOZcHTTeD
-         +9ouMYCUGk/BpbFT9QKBbcVQORHMmoGB83vXNO9jOMmqeewddcncFzutSzlO3ZQv0zSJ
-         Wt8G93XicZtixyBdOuJ6AsZg3Ub6icbFa6ngSczx+LYVIm28avjOFdN1uRVzHFAB3hKm
-         bNRyHgEv04r1xjIRQHyh3QuzuloZvfvw+yIW9uU+eBynNMBlvFCJUdBzvZ68Xt0iLxrt
-         weO4u+gCCO5TKlufsWPVQCUb2RWXRHsoOuFvS+XgvFTrULVG6308RrWOPuNrRHtZRDVe
-         CEDg==
+        d=jrife-io.20251104.gappssmtp.com; s=20251104; t=1779154428; x=1779759228; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PMUulh6qid06yp999kMZYRmV0VRKarV0DjzjDNUvDFI=;
+        b=Nl9JUDMZSi2Y7h5AOqoLvz7XV7wbX66yP8vU6ojg+DRPPGuANXRxW1KkDVpB0McFzW
+         NNVJRZZe90ACPhbIIGTQ8rahvxpR28Ml3Z4t5vXMlAGAnUqR8c78lfnrWZZ7E2H+AxE9
+         12cy5sX1yiFVnrqt3iIbnl500nRYseapg4RGYhvm/N8iRe0heT0vCWO7itB+qAuSKkWM
+         nhbHw5sdYaWnuvVLxiUaIcXYF/jS6kdq5QcYcVHp5oRFoBl8XfcfEF4sZLlplzlCayw4
+         vbLto2R7/e2b88bdePQPLqLRKX9TJctORZt/HizMRugAFV5QpkTbbjG6ugMVBa8OjSXh
+         UL9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779154358; x=1779759158;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ja/CV5fv5UnqqWR8UixOkds2Qx2OdDYxCo/m/q65Ga0=;
-        b=B9WVfIgTWH+J5rulUphxb0SkaWZx+g6KK6ag8fEbyqdodYyyloMm6z3B+swTQ+GcUA
-         wwH1SCiETOdEzvj3JyqcKmMHDB5tjzJjnn9W/yNHiInh3v5DFajCv11Mu0ukWiz8oQBV
-         G8I7JT3kf7uLLlAL44X6GjuUJ8hMmMeVxYcp4cH7rQWNSImO/+nUdoTpADq9qBKcrvhD
-         GkZkRQyHo23+R2wNhU4YO2O/gYf0pR9ng2EUyKEyTFlqo+G4euIroYrc30FBstjkwPvf
-         e8Ff9vt03xe2Rqem0jQSY/BtngA15JdLrI5Lj0G/d0m97ZdVIiYcRq+6EStYHqm31im6
-         jiVA==
-X-Gm-Message-State: AOJu0YzrieE5QBiJe5altLSAUctqj/3li78p0Zw01nAUBSQUyUwEN+5N
-	DduV/7M5tpp3k0w9FDhV2uAp+ABaHR9RPD3R+31pJ0prlDihHs5lH4ceSYwu+e/XbHTKVSVzLnT
-	uebOXJzTvsuFHnGsvQoh+fGT6Mxn1gHFyd004BSk=
-X-Gm-Gg: Acq92OG4pW4/l/psmApNH6zRvn6Veyp8siwXtgMqVktmusCt2+9uAilQRwfSkwblqzH
-	m3QFo/O6ytqHUkcdbYClojrbj+pSdspl+RuyzpFQwY1SOo/qF2MRGM/iDmnhvqPVUQpGfRd74fA
-	aFrjZX+mXfCO+B4jtO0aNN9a+cOR6h7d9xs121RjNQ9k4IBCH6mVX3/TcaB1BVhd0TzsN75j77A
-	xyOIW4doq1og8Qca6FRgVPzWJBG+KCK0AnKqQ+fqLbojaM62ySNQPl9NexIQLSj4NPnvMAQOaqI
-	Q7Ku52WklJtaULe6hwYS/f+ZCF1KVmnlZ4ZfScsEf25mWY4js8UrMiHqvxqMGpFIrtlEmOaS17E
-	GjPE=
-X-Received: by 2002:a05:6214:487:b0:8ae:60c4:857 with SMTP id
- 6a1803df08f44-8ca0f610e18mr270704626d6.18.1779154357667; Mon, 18 May 2026
- 18:32:37 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779154428; x=1779759228;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PMUulh6qid06yp999kMZYRmV0VRKarV0DjzjDNUvDFI=;
+        b=Awgq4dj8jSQOJiG50Rc2WVqL4VGXDdcEV36Ks45k3SgsJIIVfS9EfOnMxmJfL2g7SW
+         MMshKIo0wNG4MW8t9NZi6oKDyqvH841PtKxq8RfZSVLljcZ+hvtLklXYIuUmS3oYdDcV
+         Aym7ECMENQsxdsa+618xRZpsr7SyHsyDgYyqpAjqGm35H5957WADj3Sxzr/ZKuMhSiBG
+         nNlovT18atkUf8/woPAxm0mRMVI05PgwPdZh7M9n/OlV2rzg2lSVmuRvs+YjUK+jOTq4
+         x+Ayd0iq3yktfvvEOlJef4dF5k2heZegxoCK/aAEneBquSjq0OdUhYt6ZjlpptzSE/yx
+         BvQQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/1uRAcIaGHY1Z/2qBW9WeKNj58GWxx4aDX+Aobwmu+R4zqPsg055ABdgdvdSNoheNMdM2VY9c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLhjmOYftbSsWJsF2j6/IPrO/DV6yhlGSIWqUR6PBicqgxUFAe
+	760Q4xc2loXRO5x3UXW+cXhygFRxoP1DDLFVtMdkWA/jm7nWqAgkXJtK2b5tHSgkmxU=
+X-Gm-Gg: Acq92OHE9dSvEqRtki6c6ZHDzT0mhd8CUAPMNMiiJzm6iKovDD4cQv5yimRMNOZngIl
+	/mLewos8UAhVGNeRkCqI0F66yibFVuP5jlybJaJkfbbqj/TaIuCHG1smD5RQInDTbs6SA28AckP
+	pCufoZJXCfXZ/mYhQH6CY/eqrrTpLBgGf7mr91bi3dHULXBMRxt+4LywQr4hVTspcMwpOTm1lzB
+	qsboILycqvh4fy/3TSwijg4agzv2QvbQq3qAbQ4zJFmnBb7W8NhmphoMO7dywoo1zVRIZmNTyh0
+	pTyoKdCkQMdkpp+txDVAzU9cA5tn1MrUSOIebFk5DwJTAz2iQwJwFBpNrjNtG/awdVPo1wSt7Q9
+	6mJOFrOoxfvqFLLxFCU+Q2GKsQJ2KdmVXVk3IG3HGCRCsDJsclGqem1PMBQXbf2AvEPPAt6uzrl
+	r+t8N9Mo8yCXwXFQIuo8g8pUwi
+X-Received: by 2002:a17:903:2302:b0:2bd:e01c:d78 with SMTP id d9443c01a7336-2bde01c0e48mr37358615ad.7.1779154428357;
+        Mon, 18 May 2026 18:33:48 -0700 (PDT)
+Received: from m2 ([83.171.251.18])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5bd5f291sm170130185ad.15.2026.05.18.18.33.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 18:33:48 -0700 (PDT)
+Date: Mon, 18 May 2026 18:33:45 -0700
+From: Jordan Rife <jordan@jrife.io>
+To: Mahe Tardy <mahe.tardy@gmail.com>
+Cc: bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, ast@kernel.org, andrii@kernel.org, yonghong.song@linux.dev, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH bpf-next v6 3/6] bpf: add bpf_icmp_send kfunc
+Message-ID: <onco52d3vpxkcc6hh3s5vuqjxanasucteq7wnqfqgzg4d65alc@q7h22nu3ytjn>
+References: <20260518122842.218522-1-mahe.tardy@gmail.com>
+ <20260518122842.218522-4-mahe.tardy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260518010739.80979-1-enelsonmoore@gmail.com> <20260518010739.80979-2-enelsonmoore@gmail.com>
-In-Reply-To: <20260518010739.80979-2-enelsonmoore@gmail.com>
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Date: Mon, 18 May 2026 18:32:26 -0700
-X-Gm-Features: AVHnY4LWd6NskGG_YZi6KRPvzMxeGyTVfq2DCXyiAR5zRUPqHTbk49wxj1zjpGo
-Message-ID: <CADkSEUgs0k9eHS2_wAiEnu5PVpc+RiMcfXiF0y=wkh7rYbGouA@mail.gmail.com>
-Subject: [PATCH RESEND 0/7] ARCnet: remove outdated drivers and information
- and unused code; small cleanups and documentation improvements
-To: netdev@vger.kernel.org
-Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260518122842.218522-4-mahe.tardy@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[jrife-io.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289240-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[jrife.io];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289242-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	DKIM_TRACE(0.00)[jrife-io.20251104.gappssmtp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jordan@jrife.io,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linux.dev,iogearbox.net,gmail.com,kernel.org,google.com,redhat.com];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 772A457617F
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,jrife-io.20251104.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: AC26A5761CA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-[This is the cover letter for this previously submitted series - it
-didn't get sent correctly the first time.]
+On Mon, May 18, 2026 at 12:28:39PM +0000, Mahe Tardy wrote:
+> This is needed in the context of Tetragon to provide improved feedback
+> (in contrast to just dropping packets) to east-west traffic when blocked
+> by policies using cgroup_skb programs. We also extend this kfunc to tc
+> program as a convenience.
+> 
+> This reuses concepts from netfilter reject target codepath with the
+> differences that:
+> * Packets are cloned since the BPF user can still let the packet pass
+>   (SK_PASS from the cgroup_skb progs for example) and the current skb
+>   need to stay untouched (cgroup_skb hooks only allow read-only skb
+>   payload).
+> * We protect against recursion since the kfunc, by generating an ICMP
+>   error message, could retrigger the BPF prog that invoked it.
+> 
+> For now, we support cgroup_skb and tc program types. For cgroup_skb and
+> tc egress, almost everything should be good. However for tc ingress:
+> - packet will not be routed yet: need to set the net device for
+>   icmp_send, thus the call to ip[6]_route_reply_fill_dst.
+> - fragments could trigger hook: icmp_send will only reply to fragment 0.
+> - ensure the ip headers is linearized before processing, and zero out
+>   the SKB control block after cloning to prevent icmp_send()/icmpv6_send()
+>   from misinterpreting garbage data as IP options.
+> 
+> Only ICMP_DEST_UNREACH and ICMPV6_DEST_UNREACH are currently supported.
+> The interface accepts a type parameter to facilitate future extension to
+> other ICMP control message types.
+> 
+> Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
+> ---
+>  net/core/filter.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 118 insertions(+)
+> 
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 9590877b0714..843fa775596b 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -84,6 +84,8 @@
+>  #include <linux/un.h>
+>  #include <net/xdp_sock_drv.h>
+>  #include <net/inet_dscp.h>
+> +#include <linux/icmpv6.h>
+> +#include <net/icmp.h>
+> 
+>  #include "dev.h"
+> 
+> @@ -12464,6 +12466,110 @@ __bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len)
+>  	return 0;
+>  }
+> 
+> +static DEFINE_PER_CPU(bool, bpf_icmp_send_in_progress);
+> +
+> +/**
+> + * bpf_icmp_send - Send an ICMP control message
+> + * @skb_ctx: Packet that triggered the control message
+> + * @type: ICMP type (only ICMP_DEST_UNREACH/ICMPV6_DEST_UNREACH supported)
+> + * @code: ICMP code (0-15 for IPv4, 0-6 for IPv6)
+> + *
+> + * Sends an ICMP control message in response to the packet. The original packet
+> + * is cloned before sending the ICMP message, so the BPF program can still let
+> + * the packet pass if desired.
+> + *
+> + * Currently only ICMP_DEST_UNREACH (IPv4) and ICMPV6_DEST_UNREACH (IPv6) are
+> + * supported.
+> + *
+> + * Recursion protection: If called from a context that would trigger recursion
+> + * (e.g., root cgroup processing its own ICMP packets), returns -EBUSY on
+> + * re-entry.
+> + *
+> + * Return: 0 on success, negative error code on failure:
+> + *         -EINVAL: Invalid code parameter
+> + *         -EBADMSG: Packet too short or malformed
+> + *         -ENOMEM: Memory allocation failed
+> + *         -EBUSY: Recursion detected
+> + *         -EHOSTUNREACH: Routing failed
+> + *         -EPROTONOSUPPORT: Non-IP protocol
+> + *         -EOPNOTSUPP: Unsupported ICMP type
+> + */
+> +__bpf_kfunc int bpf_icmp_send(struct __sk_buff *skb_ctx, int type, int code)
+> +{
+> +	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
+> +	struct sk_buff *nskb;
+> +	bool *in_progress;
+> +
+> +	in_progress = this_cpu_ptr(&bpf_icmp_send_in_progress);
+> +	if (*in_progress)
+> +		return -EBUSY;
+> +
+> +	switch (skb->protocol) {
+> +#if IS_ENABLED(CONFIG_INET)
+> +	case htons(ETH_P_IP):
+> +		if (type != ICMP_DEST_UNREACH)
+> +			return -EOPNOTSUPP;
+> +		if (code < 0 || code > NR_ICMP_UNREACH)
+> +			return -EINVAL;
+> +
+> +		nskb = skb_clone(skb, GFP_ATOMIC);
+> +		if (!nskb)
+> +			return -ENOMEM;
+> +
+> +		if (!pskb_network_may_pull(nskb, sizeof(struct iphdr))) {
+> +			kfree_skb(nskb);
+> +			return -EBADMSG;
 
-This patch series mainly removes the ISA and PCMCIA ARCnet drivers and
-documentation for them and hardware they supported. While ARCnet is still used
-in industrial environments, and cards are still manufactured, it is unlikely
-anyone is still using it with ISA and PCMCIA cards. Removing these drivers
-reduces future maintenance burden.
+nit: Instead of having several places where you call kfree_skb, maybe
+consider just cleaning up in once place at the end like:
 
-While updating the ARCnet documentation to remove references to the removed
-drivers, I noticed that it contained thousands of lines of outdated and
-irrelevant information (much of it so outdated that it would not even work on
-modern kernels). I took the opportunity to remove this information and improve
-the writing style slightly.
+out:
+	if (nskb)
+		kfree_skb(nskb);
+	return err;
+	
+then in places like this do something like:
 
-I noticed that the BUS_ALIGN macro was always defined to 1, which meant that the
-custom arcnet_in/out/read/write* I/O macros were unnecessary. I expanded and
-removed them to make the code more straightforwards.
+	err = -EBADMSG;
+	goto out;
 
-I also corrected some typos and comments.
+> +		}
+> +
+> +		if (!skb_dst(nskb) && ip_route_reply_fill_dst(nskb) < 0) {
+> +			kfree_skb(nskb);
+> +			return -EHOSTUNREACH;
+> +		}
+> +
+> +		memset(IPCB(nskb), 0, sizeof(struct inet_skb_parm));
+> +
+> +		*in_progress = true;
+> +		icmp_send(nskb, type, code, 0);
+> +		*in_progress = false;
+> +		kfree_skb(nskb);
+> +		break;
+> +#endif
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	case htons(ETH_P_IPV6):
+> +		if (type != ICMPV6_DEST_UNREACH)
+> +			return -EOPNOTSUPP;
+> +		if (code < 0 || code > ICMPV6_REJECT_ROUTE)
+> +			return -EINVAL;
+> +
+> +		nskb = skb_clone(skb, GFP_ATOMIC);
+> +		if (!nskb)
+> +			return -ENOMEM;
+> +
+> +		if (!pskb_network_may_pull(nskb, sizeof(struct ipv6hdr))) {
+> +			kfree_skb(nskb);
+> +			return -EBADMSG;
+> +		}
+> +
+> +		if (!skb_dst(nskb) && ip6_route_reply_fill_dst(nskb) < 0) {
+> +			kfree_skb(nskb);
+> +			return -EHOSTUNREACH;
+> +		}
+> +
+> +		memset(IP6CB(nskb), 0, sizeof(struct inet6_skb_parm));
+> +
+> +		*in_progress = true;
+> +		icmpv6_send(nskb, type, code, 0);
+> +		*in_progress = false;
+> +		kfree_skb(nskb);
+> +		break;
+> +#endif
+> +	default:
+> +		return -EPROTONOSUPPORT;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  __bpf_kfunc_end_defs();
+> 
+>  int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
+> @@ -12506,6 +12612,10 @@ BTF_KFUNCS_START(bpf_kfunc_check_set_sock_ops)
+>  BTF_ID_FLAGS(func, bpf_sock_ops_enable_tx_tstamp)
+>  BTF_KFUNCS_END(bpf_kfunc_check_set_sock_ops)
+> 
+> +BTF_KFUNCS_START(bpf_kfunc_check_set_icmp_send)
+> +BTF_ID_FLAGS(func, bpf_icmp_send)
+> +BTF_KFUNCS_END(bpf_kfunc_check_set_icmp_send)
+> +
+>  static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
+>  	.owner = THIS_MODULE,
+>  	.set = &bpf_kfunc_check_set_skb,
+> @@ -12536,6 +12646,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_sock_ops = {
+>  	.set = &bpf_kfunc_check_set_sock_ops,
+>  };
+> 
+> +static const struct btf_kfunc_id_set bpf_kfunc_set_icmp_send = {
+> +	.owner = THIS_MODULE,
+> +	.set = &bpf_kfunc_check_set_icmp_send,
+> +};
+> +
+>  static int __init bpf_kfunc_init(void)
+>  {
+>  	int ret;
+> @@ -12557,6 +12672,9 @@ static int __init bpf_kfunc_init(void)
+>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+>  					       &bpf_kfunc_set_sock_addr);
+>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
+> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SKB, &bpf_kfunc_set_icmp_send);
+> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_icmp_send);
 
-The first three patches are the same as those I posted on February 8th:
-https://lore.kernel.org/all/20260209030649.54779-1-enelsonmoore@gmail.com/
-https://lore.kernel.org/all/20260209033604.60033-1-enelsonmoore@gmail.com/
-https://lore.kernel.org/all/20260209025442.50987-1-enelsonmoore@gmail.com/
+Thanks, this could come in handy for TC.
 
-Ethan Nelson-Moore (7):
-  net: arcnet: com20020: remove misleading references to multicast
-  net: arcnet: fix typos in comments
-  net: arcnet: remove code depending on nonexistent config option
-  net: arcnet: expand unnecessary I/O abstraction macros
-  net: arcnet: remove ISA and PCMCIA support; modernize documentation
-  docs: net: arcnet: remove outdated/irrelevant information; improve
-    style
-  net: arcnet: com20020-pci: avoid -Wformat-truncation warning
+I'm not quite sure yet on using it in lieu of the sock_destroy kfunc for
+the UDP connected socket use case we discussed at LSFMMBPF. For socket
+LB mode in Cilium to make this work you'd need to add at least one new
+map lookup in the fast path to check for backend liveness and this
+partially defeats the performance benefits of socket LB which right
+now avoids service + backend lookups in the fast path for connected UDP.
+Ultimately, it might be better to stick with sock_destroy to kill
+sockets out-of-band for that use case, but still it's good to have this
+option.
 
- .../admin-guide/kernel-parameters.txt         |   14 -
- Documentation/networking/arcnet-hardware.rst  | 2979 +----------------
- Documentation/networking/arcnet.rst           |  235 +-
- arch/mips/configs/mtx1_defconfig              |    4 -
- drivers/net/arcnet/Kconfig                    |   52 +-
- drivers/net/arcnet/Makefile                   |    5 -
- drivers/net/arcnet/arc-rimi.c                 |  386 ---
- drivers/net/arcnet/arcdevice.h                |   36 +-
- drivers/net/arcnet/com20020-isa.c             |  230 --
- drivers/net/arcnet/com20020-pci.c             |    9 +-
- drivers/net/arcnet/com20020.c                 |  107 +-
- drivers/net/arcnet/com20020.h                 |    6 +-
- drivers/net/arcnet/com20020_cs.c              |  330 --
- drivers/net/arcnet/com90io.c                  |  427 ---
- drivers/net/arcnet/com90xx.c                  |  716 ----
- drivers/net/arcnet/rfc1201.c                  |    2 +-
- 16 files changed, 125 insertions(+), 5413 deletions(-)
- delete mode 100644 drivers/net/arcnet/arc-rimi.c
- delete mode 100644 drivers/net/arcnet/com20020-isa.c
- delete mode 100644 drivers/net/arcnet/com20020_cs.c
- delete mode 100644 drivers/net/arcnet/com90io.c
- delete mode 100644 drivers/net/arcnet/com90xx.c
+> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &bpf_kfunc_set_icmp_send);
+>  	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SOCK_OPS, &bpf_kfunc_set_sock_ops);
+>  }
+>  late_initcall(bpf_kfunc_init);
+> --
+> 2.34.1
+> 
 
---
-2.43.0
+Jordan
 
