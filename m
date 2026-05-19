@@ -1,278 +1,241 @@
-Return-Path: <netdev+bounces-289509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289510-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPW7LkGODGpCjAUAu9opvQ
-	(envelope-from <netdev+bounces-289509-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:22:25 +0200
+	id CJ3WOEmODGpCjAUAu9opvQ
+	(envelope-from <netdev+bounces-289510-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:22:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21FA258234F
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:22:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 523F8582358
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DFD6313FDAB
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:50:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 230C6314487B
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3BB33985A;
-	Tue, 19 May 2026 15:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC4B31A7E2;
+	Tue, 19 May 2026 15:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QEiXkpkR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="O80NOxY1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010027.outbound.protection.outlook.com [52.101.46.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861413546CA
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 15:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA7E33A9FE;
+	Tue, 19 May 2026 15:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.27
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779205801; cv=pass; b=D7fHscDS9fJgZFZfKVZssNdnnUx/K73bKC7pit/Avx2IxbZxde04lc9OBZk2MwRu47389jcWR+WMm8p31+BpmA84ltGjDCkcbT+lU1mSaJ8bo3ElVOaLGB/geHRxwAZY7VwTrOsmPGZI5/shFDl9PWvKAFWtqcgEv15QMZOlaO0=
+	t=1779205836; cv=fail; b=OVxkph5jJObKrJBal3Uzwgq0HLbEvnalLPuM8mT5Ch5wfwJsc/yMq2fA8WJIdN+7ahJeip/76NB0Cs9BC8f1LUgK20vrL3PJRjYe6gzrq4eRtIvFRIO2kiWCXcxzNYjGum8+cCGwhoJQGsgZch6Aab/DVgiqm9a7pcBLMtwrWUQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779205801; c=relaxed/simple;
-	bh=x/7cCwdNDXXJxtXg1SGsgN05u2+rsVMZSWA2qFFjjh0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X9jcmAwa7xsVn2/4azz+diRoCyexoiBR8uLGjETnsZvqqDobf/+GL42vzHYcA1mAU3a3vE7R8ekEyglx9jTxbMb5AmmQ6ENi4ojY8fRGZ7lg9BlNcr+OqV8uHpdvYpIdmdwEVGnwh1g0f9o8xAHPIzO9KIg9UcP4FHVnI6nWM+0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QEiXkpkR; arc=pass smtp.client-ip=74.125.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-65e15fb394bso2763858d50.2
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:49:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779205798; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NqTppGFWyihmJ1LuBFXmkS9u97CYSffiLho6OUMWJHOwyoxRbuH5x+umt/rhCgJlzC
-         T5YozTaSJitVNy+rLrze6lxDDb/9nB8kls49Slb6sEwbLCFa6wiQXf341rG+nPwGCD8Z
-         GqeOwQnJjF4yY0l9DpYLSSLllt2fdxFDMgbLAi72Xdtc1DXUFhs8ue43/DtMNVV6L9uP
-         2GtjVNrlWu+twCMatKikiW6JLLo+oLj7RnTHChIo+if5zsJmM/pkFql69Ih4vPPT01Do
-         2zhoZEAm7eba2wVLT3L2DjO7CPxyL/nC2skTKCLGLToBKslZHyQL6s+LjbqXpEpfVmHI
-         wzrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=svXaO9Car/cL1x6P0kXNjSbwoRo/ZLSYkrf9JDZDMqE=;
-        fh=cFhrOeKJul2HVMyrBzIytTnMwp6fmwY1h0pzc2jd3NY=;
-        b=ZusF4kw81+F/MT7O0AwJ3MzyRkfJoCJmV7Wj5h3qi26DjkDz2gIpntFpHYAFOy1Y6w
-         Hke/79m7WB8x+u5D2DZv5EF5pUe86SRRvJCQKUxK4ixeYl6M7mR3A2212vw54ap/qQFP
-         c+i5yWiC2eQgELQu2iu1XvIspMWlruv+fKRcJUXtkkkZBhtwZ1xW41txSxo6lCLo5OXh
-         wfHWeZnP9J8LJa56uAqhahrDb7vEdc3wlkePKffBbVbriKbW5Pvg3focSJUif2GcDp8F
-         IhuOqFzR/uFOTWIGxPyYlG3jJ4qiWii4XoWQFLZQSEk5Ie7ocykvG/0UgSm+zTVLdX19
-         YLMg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779205798; x=1779810598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=svXaO9Car/cL1x6P0kXNjSbwoRo/ZLSYkrf9JDZDMqE=;
-        b=QEiXkpkRj4+tE3U+2AlitOx/CXjgde+D3wyFc+K/ivxh2pXy0UmTqgrtXuqMm68o1V
-         jOZkrPoI1ajdVVx6Mlz0Z7jN+VSM8k84LKF0NZAUCLgnZS8eNTSxAXSZZ/QGhTpmjoi2
-         cfUrsM7wBc7xOOos/MtU1uyfZqKSkKqhfAImmnQte4ywipgLktjLiuSGOarn2fD35y3G
-         lMaa1Z8nt6DZA/18qQaXmFlA7lnM0e4SnMgqAnW53oKmw/q8ZmaJedqbOKSrrhQYw4io
-         eUF6rjZIC4zrgXcW5KyaXU9XYjEe8NMJLeNUFq9xf6GJUHYFsfbmTkHPRLlnpSilp7hF
-         yw+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779205798; x=1779810598;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=svXaO9Car/cL1x6P0kXNjSbwoRo/ZLSYkrf9JDZDMqE=;
-        b=rYiho55obl+VVfn6rerXVM87YqRzoliS7Ij/jKOO1DbM4180uRo5ES/KdIm4AD7zd9
-         IwE7FrPkKmeHZR5g5yjURPUFII/LRR85Z3qXqrBOC45C2u+GTFlzwI5JnzP6HQpe472q
-         7n7DXDEZ9uM7ok0EzaUDfUsMuL4aRtPOiOCpOu56Gt1C01na9l2Oxqh+o6wXUFwi8yca
-         F0WOKN7zge3/5dP5wg2DRmvKkZlq5Sxj2RfWO+iAmdiSe4NwuIcD0JmYTHR3mbdNP4EG
-         wTQRqiBXtMcVQ4VhYalpVlNNgIn+hhevBqmaDugLqp2/5+nFIBRFugTZT5bIoUoMbAHP
-         Ifhg==
-X-Forwarded-Encrypted: i=1; AFNElJ+aRlOUEZVoR/d2Lf8x+aEBCxg7CfoVS/yEZE6ROyq+fToKsrUnJKG+JCrKSoZibMyL1Xi+xss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDVEXSJ5QjqxsxmVO+FjplrMbkj+pWlog+J4Xgdy9KHcUbEmHs
-	IPeF5nJ/QgkmOg61SyE30bCCFM9lrrqRBh0pLf1RGfHjfJqWkxgv6AdYdNYXc7/gPmoJ2e8xTMj
-	7DQtz10hFS6EfUfGNoj6lMbEAC9Y5cJipZ5nPMRuxNQ==
-X-Gm-Gg: Acq92OHil/zgx+vLO+u4dqFUyWgSlfYQagc34O/o1UsjXO6J1VeOkoNVjof9ZknYLmY
-	XbHysOlmtNewsrqDXZhHTlR8NuA7KRZXqg5vVIkjrmEWJwiwHJcie8khAtRwtGp/dK0SiKOSUMR
-	5Ojhm6YkEeAO50scG/UpnpUwljvErTIxPB6POCuNP2D6clVdjSQFZDIPpu33T/oFhVEoYIgU+6q
-	KU3HgQ9Jw/UbveHftYlYtuUTCz/M0JIO/qhsIJAAzbHtbnx3dyaamhwvTYNKFGZbJh9wjLT2/4D
-	pzyHd9WCrxlA7MI3fvLxrCs4ZFtB4wfKMANLi1EcbYoQPtUajYLKQlIKIw/gAHKVNwXxaQ==
-X-Received: by 2002:a05:690e:12cd:b0:65e:41dc:e8de with SMTP id
- 956f58d0204a3-65e41dcecd9mr12441208d50.61.1779205798318; Tue, 19 May 2026
- 08:49:58 -0700 (PDT)
+	s=arc-20240116; t=1779205836; c=relaxed/simple;
+	bh=iWIHShihCdiR+VDMPZe86G60MP0QhKRgopNFQqlSzxw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=T63wKSW1ofSNVD84g+Jr1ngwi1/ZRwpUndc/ytkibd4CTmKaRij4mSdNeVDM+lSrEYQAbBEFZklsl/B6Cv346Y1yTNqF63CnmUKLB+5ZtY8/ceG1vQ7yKSL6e3f9NgvU7kfUj4CPMD6iZCiZMc+sRtXMxz0tGS8yzLz9gjzAu2U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=O80NOxY1; arc=fail smtp.client-ip=52.101.46.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=W4FNnDgdrgGUqiTJoEdQA5XF5QJD1GZShsDlIWyPqqxcDb3bfBfdgppvoxl324g0b0asDlnbs1O3JGmabxFKC8qnkqwdg3jkhW19LyUjz8s5OXuRgMM27Pxb3F41SJ4Sr0MXaUA3jXJWkLzg8OyqrVnJyVIiUqH5P7gODpaYU904L70Kdn1FhHkLuU1DGZHcjHV9cCh2Wzb040NcsxLvHncAe0+yQblNTTW6a9mNQq0tRVtRuTr4y6WEbkdQw17zAKjqlul9Aswu453p2tuJS93Pv+dUSfuqprXe47bmyeSP/3dnOcz9Av0B0bltZDmryJjTegfZjaNrPwQ75bk0aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HkIXyLuc+NumBxqPFLdaLgJHUnV/o+l10rJjwuo+ESA=;
+ b=k749J5poMJusjMUPLfZmyMZtaNewlNvizTtt63B9Ta9relyWZLTvh295HYg6puU9P29pzB+PSD23vpn2IPfQgrM4wfke6Fhczz7wrEsHOLOTFVOGssZP42AJ4bu+8rqDQrSerJwC907WKOBo+FYJSEgvBRlWDjhEmsjO0nhp8ksy4IHxv8gF4XdznGbS0lh7SRb4H0QJ7OK9NOMUrUaOZCjvNwELxVfi0ypvb1emk8B+bZzE9kLPx/cV6PylPYr6r4ht5IeQwy6UnCNopAtsG4b97/vlVismAENKYRsBVKfUi/uRuNiBqrKIJAGnDodMlzJfP2hnhfqv+4qwK5/fQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HkIXyLuc+NumBxqPFLdaLgJHUnV/o+l10rJjwuo+ESA=;
+ b=O80NOxY1FowRUYvZVcPakIR+PHTyFdQWnl7oUMB5DVrPvE1hdGMQp3uprPNl6XHQ0OsayRh3888+VxSnDXmvmfcihUI+VcFynhSPDlgON/okrDmbkKuyHtiJMb8XfF5oNpNPrOSWWgPM/t/XylI+6ekTcmL/qmv7id8ukgwgDnCtcYsvWpdlx/CpAz9DkRAwad8dJ1TfDuVfKuaie+moB+1kUeMQfksjyIWXLOCbc5PldVq8ksGnUdXmSn5J44keW0DNR9fMuTDOpgs7nhXXAviuZGZk2VLOBAaLrQ6kAli5KHCSxEcc/MbQdCwxMg3TxWIymMgmffjaPd3OUnmWhg==
+Received: from MN0P222CA0026.NAMP222.PROD.OUTLOOK.COM (2603:10b6:208:531::31)
+ by LV5PR12MB9803.namprd12.prod.outlook.com (2603:10b6:408:306::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.24; Tue, 19 May
+ 2026 15:50:31 +0000
+Received: from BL02EPF0001A103.namprd05.prod.outlook.com
+ (2603:10b6:208:531:cafe::6a) by MN0P222CA0026.outlook.office365.com
+ (2603:10b6:208:531::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Tue, 19
+ May 2026 15:50:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL02EPF0001A103.mail.protection.outlook.com (10.167.241.133) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.48.11 via Frontend Transport; Tue, 19 May 2026 15:50:30 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 19 May
+ 2026 08:50:07 -0700
+Received: from [10.221.212.38] (10.126.230.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 19 May
+ 2026 08:50:03 -0700
+Message-ID: <55bc6475-b24b-41a3-8e71-3196236fe627@nvidia.com>
+Date: Tue, 19 May 2026 18:50:00 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
- <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info> <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh> <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
- <2026051909-impurity-nemesis-2f65@gregkh> <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
- <2026051942-uproar-drainpipe-6370@gregkh>
-In-Reply-To: <2026051942-uproar-drainpipe-6370@gregkh>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 19 May 2026 11:49:47 -0400
-X-Gm-Features: AVHnY4L0X8LYGYt87xzFEQmSQ0jaH-sWR5xnvms9EdsiDiaiEGK8SYnDvpGiMU0
-Message-ID: <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, Linux kernel regressions list <regressions@lists.linux.dev>, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 4/8] net/mlx5: Switch vport HCA cap helpers to
+ kvzalloc
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>, Akiva Goldberger <agoldberger@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Simon Horman <horms@kernel.org>
+References: <20260518071356.345723-1-tariqt@nvidia.com>
+ <20260518071356.345723-5-tariqt@nvidia.com>
+Content-Language: en-US
+From: Moshe Shemesh <moshe@nvidia.com>
+In-Reply-To: <20260518071356.345723-5-tariqt@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A103:EE_|LV5PR12MB9803:EE_
+X-MS-Office365-Filtering-Correlation-Id: 17b37934-d54c-4a91-4f9e-08deb5be5af3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|82310400026|376014|1800799024|36860700016|4143699003|18002099003|56012099003|22082099003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	Q6ZOSBx/R7O8v8lHvmurWDUsU9GaEzpUAPSnBwooQxORVpos9beD/pW7OlmEa0xukGhS9yzgBP1stEzZDsAXDfm6u51MRsTUH+XDmRPxMeXFdjDKTcHx0dN+iaFCvtWq+jSmoz7UhF4IQ3Ct0PAkRdFjYuw/vegprPYrRnneVxLHMMj+XNhV0T+MvC1kbtzFMCUTWFfpeeO2LP+HsdSLE9O66luD7/XVQ1HjNDr2Po/wauycqBLR7eMemK1+NgXFc9BuvHWKQbj4XlJOAzy6g0qn/tS1fgysG6Q6zXh9Dc7Je+ZUyMohC3L2O28amy2eC8GpZnQYJ1o0iqKQ3uxXtGWGYyfyRnJCrAuaFXcFjrA67424ikBndwdPuXtErrMMi2C+ElClw2xn9ZMu+8sJhLMVIPNpzCDWZBvzlAsJE4E0ibWw2xs/jwRuhYQ4+r1eMqK9Ztc/5CnSKTg1EuSI+54EFFSeAYTitEm8M3i6+VgzcflUPisKcPz6ZeKmcjBcgefBU2b10baVImJGKLx04y+GpRfKtjmNdzCRLI8+W9Z8VyvN2jIKDnuUXi0R93Y/9+8n9Odl5x52Pk3afl8uPBvEtIv3dPfRG13kDvRX89ib6wM2b2bHXoxEapJWLJQk2vBXeZ+YI6tVqbVMaa66zV6hnQU59Y09I4YrKttq3HwcJ97taBNvxZp4ci4zQW3pBczfiGHOMGb1X6BB4DYME6R2aWxR2SDsC8aeKdEHZxA=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(82310400026)(376014)(1800799024)(36860700016)(4143699003)(18002099003)(56012099003)(22082099003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	vXgDW5mhbGSENTmSBcu+NUIVNtWJRMpHOIHHsvJpXvtA/ryI1sheSdcbyQZp7lFKct/bxZR9hhUmo7syQXopkHQYW5JthqueMXaoZ0xyxJtJ7vxaBQXfOrpJasPgz77Z3PimjuivTlT7iOYkrcs0kx53xKKz7W8+JaPnKxG8nJX1iUfIO+yz2LR3QFkGZEZzpjj3cnC4uESQFKdPpGo8V8wStOW5FQ9i5sy9NgW9yEYEf6RSqMvckjHfUjyJzv4QUVSuaavkbdFwZrl9zrQ16P9rRFr/gCvAls72ulps6wJ+UMEKI9RaEgNlIVg6XHB/CPP6HvdIuh7I0WBsZ5fc3pvyiA0H0Wncg36oUUYmjeZTGx+rDF9sV4AkZGcPoL55IMvGC8RAdz1p2bLtsTrY6qrq9ORskN3mom8odbdwcxU1w2zfu9HPZEUAX2DUm+cT
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 15:50:30.5648
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17b37934-d54c-4a91-4f9e-08deb5be5af3
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A103.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV5PR12MB9803
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289510-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289509-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linuxfoundation.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 21FA258234F
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sashiko.dev:url,nvidia.com:mid,nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[moshe@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 523F8582358
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Greg,
-
-On Tue, May 19, 2026 at 11:19=E2=80=AFAM Greg KH <gregkh@linuxfoundation.or=
-g> wrote:
->
-> On Tue, May 19, 2026 at 09:44:39AM -0400, Luiz Augusto von Dentz wrote:
-> > Hi Greg,
-> >
-> > On Tue, May 19, 2026 at 8:07=E2=80=AFAM Greg KH <gregkh@linuxfoundation=
-.org> wrote:
-> > >
-> > > On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
-> > > > On 5/19/26 12:30, Greg KH wrote:
-> > > > > On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote=
-:
-> > > > >> On 5/15/26 17:10, Thorsten Leemhuis wrote:
-> > > > >>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
-> > > > >>>
-> > > > >>>> The following changes since commit c78bdba7b9666020c0832150a4f=
-c4c0aebc7c6ac:
-> > > > >>>>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15=
-:17:12 +0200)
-> > > > >>>>
-> > > > >>>> are available in the Git repository at:
-> > > > >>>>
-> > > > >>>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/blue=
-tooth.git tags/for-net-2026-05-14
-> > > > >>>>
-> > > > >>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6=
-275c00282:
-> > > > >>>>
-> > > > >>>>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026=
--05-14 09:58:08 -0400)
-> > > > >>>
-> > > > >>> It seems this PR sadly came too late for this week's net PR to =
-mainline
-> > > > >>> that was merged yesterday.
-> > > > >>>
-> > > > >>> TWIMC, from my point of view, it would be great if we somehow c=
-ould
-> > > > >>> still get the changes from this PR or at least the btmtk fix it
-> > > > >>> contains[1] to mainline this week before -rc4, as it is fixing =
-a
-> > > > >>> regression known since 2026-04-24 that at least five people enc=
-ountered
-> > > > >>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btm=
-tk:
-> > > > >>> validate WMT event SKB length before struct access") [006b9943b=
-982 in
-> > > > >>> -next].
-> > > > >>
-> > > > >> Greg, Sasha, that [1] fix I was talking about now reached -next =
-as
-> > > > >> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTR=
-L
-> > > > >> events") and will likely hit mainline on Thursday or so with the=
- weekly
-> > > > >> -net PR to -mainline. If that's good enough for you, I'd say it =
-would be
-> > > > >> good to pick this up for the next round of stable kernels.
-> > > > >
-> > > > > That "Fixes:" tag is referring to something that is also not in a=
-ny
-> > > > > tree, but that commit does have a cc: stable in it.  So do we nee=
-d both
-> > > > > of these:
-> > > >
-> > > > Valid question, as yes, there is a slight mixup here:
-> > > >
-> > > > > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length be=
-fore struct access")
-> > > >
-> > > > That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is t=
-he
-> > > > -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
-> > > > btmtk: validate WMT event SKB length before struct access") -- the =
-one
-> > > > that is causing the regression that I want to get fixed. So we now =
-only
-> > > > need:
-> > > >
-> > > > > 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL e=
-vents")
-> > >
-> > > Ok, but that "Fixes:" tag pointing to an invalid commit is going to b=
-e a
-> > > nightmare to track over time, ugh.
-> >
-> > Hmm, did we get the wrong hash or something? Usually, that would show
-> > up in the verify-fixes.sh, but perhaps it didn't capture it this time
-> > for some reason, perhaps I'm running an outdated version or something
-> > similar.
->
-> Something went wrong if we ended up with a patch in the stable trees,
-> yet this fix is referring to it as a different git sha.  Don't know
-> where the disconnect happend :(
-
-041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before
-struct access")
-
-I don't have that in any of our tree either, this is actually
-634a4408c061 on all trees in the chain:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/com=
-mit/?id=3D634a4408c061
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=
-=3D634a4408c061
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
-id=3D634a4408c061
-
-Or actually that was the hash before it got rebased on bluetooth-next tree:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/commit/?id=3D041e88fb0c08
-
-But I didn't send the PR from that three so perhaps somebody else sent
-it to stable with the wrong fixes tag?
-
-> thanks,
->
-> greg k-h
 
 
+On 5/18/2026 10:13 AM, Tariq Toukan wrote:
+> From: Moshe Shemesh <moshe@nvidia.com>
+> 
+> mlx5_vport_set_other_func_cap() and mlx5_vport_get_vhca_id() allocate
+> command buffers that embed the HCA capability union, exceeding 4KiB.
+> Use kvzalloc/kvfree so the allocation can fall back to vmalloc when
+> contiguous memory is scarce.
+> 
+> Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/vport.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+> index 4effe37fd455..f8e6b1ab7c5c 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+> @@ -1336,7 +1336,7 @@ int mlx5_vport_get_vhca_id(struct mlx5_core_dev *dev, u16 vport, u16 *vhca_id)
+>   	if (mlx5_esw_vport_vhca_id(dev->priv.eswitch, vport, vhca_id))
+>   		return 0;
+>   
+> -	query_ctx = kzalloc(query_out_sz, GFP_KERNEL);
+> +	query_ctx = kvzalloc(query_out_sz, GFP_KERNEL);
+>   	if (!query_ctx)
+>   		return -ENOMEM;
 
---=20
-Luiz Augusto von Dentz
+Sashiko.dev says:
+"
+The commit message notes that these structures exceed 4KiB and are 
+vulnerable to allocation failures under memory fragmentation. Are there 
+other allocations of these same structures that were missed?
+For instance, mlx5_core_get_caps_mode() in main.c allocates 
+query_hca_cap_out with kzalloc(). Since this is on the initialization 
+path for every mlx5 device (including dynamically created SR-IOV VFs), 
+could this fail under fragmentation and prevent VF creation?
+Other locations that still appear to use kzalloc() for these >4KiB 
+structures include devlink configuration paths like 
+mlx5_devlink_port_fn_migratable_set() and 
+mlx5_devlink_port_fn_roce_set() in eswitch_offloads.c and eswitch.c.
+Should these be converted to kvzalloc() as well to prevent similar 
+allocation failures?
+"
+
+As it says, there are more places in the driver, this patch handles it 
+for the vport. I will send cleanup patches for others.
+
+>   
+> @@ -1348,7 +1348,7 @@ int mlx5_vport_get_vhca_id(struct mlx5_core_dev *dev, u16 vport, u16 *vhca_id)
+>   	*vhca_id = MLX5_GET(cmd_hca_cap, hca_caps, vhca_id);
+>   
+>   out_free:
+> -	kfree(query_ctx);
+> +	kvfree(query_ctx);
+>   	return err;
+>   }
+>   EXPORT_SYMBOL_GPL(mlx5_vport_get_vhca_id);
+> @@ -1363,7 +1363,7 @@ int mlx5_vport_set_other_func_cap(struct mlx5_core_dev *dev, const void *hca_cap
+>   	void *set_ctx;
+>   	int ret;
+>   
+> -	set_ctx = kzalloc(set_sz, GFP_KERNEL);
+> +	set_ctx = kvzalloc(set_sz, GFP_KERNEL);
+>   	if (!set_ctx)
+>   		return -ENOMEM;
+>   
+> @@ -1392,6 +1392,6 @@ int mlx5_vport_set_other_func_cap(struct mlx5_core_dev *dev, const void *hca_cap
+>   	MLX5_SET(set_hca_cap_in, set_ctx, function_id, function_id);
+>   	ret = mlx5_cmd_exec_in(dev, set_hca_cap, set_ctx);
+>   
+> -	kfree(set_ctx);
+> +	kvfree(set_ctx);
+>   	return ret;
+>   }
+
 
