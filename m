@@ -1,277 +1,157 @@
-Return-Path: <netdev+bounces-289421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOH3IG9NDGrjdQUAu9opvQ
-	(envelope-from <netdev+bounces-289421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:45:51 +0200
+	id sBaAMVNQDGrwegUAu9opvQ
+	(envelope-from <netdev+bounces-289422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:58:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652BC57DEFD
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:45:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 416EE57E2C7
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:58:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9768F303CD6F
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:44:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 756C83091B05
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5F74A340B;
-	Tue, 19 May 2026 11:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FAD63D9DD2;
+	Tue, 19 May 2026 11:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FJkXRWCi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C9JgtFQX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FF9331A6E
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 11:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DB445BD6F
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 11:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779191042; cv=none; b=TZtBz45gy2v6vwZrR4Qqhba1iQPofEodzd+je6mHluei6Yg+YVukeSlBcPGS2YSQybw51VzzyK4cXruckwcqBhQkTcAxrCDpPtWKLDQrhI0CIFW8h730vuXSKRGCW6vYij5ZqAV1/TA4FUxtB6/XXElKj6M6J4Y+0MpZ9qBr39k=
+	t=1779191085; cv=none; b=MGNjKxbM+7i9dw3w2Fyas69OOrY7Z9gPEY78FHjvVxcB1PSyAymyDg6hnFQmujCCxU+EnZY6U4Qjamj5yLi/nMCGwPnTdZClLUdh4x52WpRBbR0bxiGNo5FgwaXZrqSdnWN1Ff6F7jBfMIdpEHnpP8iKYBfoeTkiupkQpZjjSR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779191042; c=relaxed/simple;
-	bh=FBz9tT367NOveFkgTXJIp3fcfL4+cF9VuG0RohZV40s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TTlb0YhX9eiW9jxckphN1fhWasrLKlCy8ZzXPr/9ErMJciL0QKfbPHjVnu4mk9BH2PMSnL1z3tLsDoK2KkRR9U4i8ZOGJomKG78+H0w8at5NGczAX23JS6O8VRpBxmdCIAYTiW3keImwHAJUgm3DuUAe0PTqoKZDYLVNmic1GFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FJkXRWCi; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8aca172588cso100576536d6.0
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 04:44:01 -0700 (PDT)
+	s=arc-20240116; t=1779191085; c=relaxed/simple;
+	bh=Thp/yGRYPzrK7+o1uGmfOmX/4+AmLSGA/EjCvgrXHto=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sFB8QkWz9uUmBEcWN24v/BWptLWz9hP/6FRsufL2yZuvnNMm5A3ql6xn+bv9iX0tYRl2j8raYcQAA3RQK20xPsGPENsbVugdmW7w97ycPMgq03J8ygeowhmfLYlbjxn1Pfw3aOc9j/WZ01RvrgvWZ+Iq1jFfubXUaFHth3v0OBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C9JgtFQX; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48fde648a71so24940425e9.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 04:44:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779191040; x=1779795840; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nthh0wOYkbgoOXenxGs1OlmA1njW0yrnzAWO8T7rE7o=;
-        b=FJkXRWCiJBDPDU0YAxQ3lkoNNIiqGruSlgdnAF0H3RVbIQeJJYshWnYh3+3oOSJCMm
-         4P2xVKrlcq9iqLICYycG6mDRtq+2cbeCnObmIVwa03m0zJEA+7fUXDRN5ms8kZN948V0
-         hvk09yOo5tbtu9gktUeoqbJVuwTdGZ4CU10SxBCc0PPECbbwbLihVt9Ln8tGUNNtiubs
-         kjufUIWgAtUxCvjKMke2XdJOdSJElPz/UIiCO7FmlfukowkZ2Qr65AU1emc8d9H2QRUP
-         9ikYGO/RDtOSifX5RB3akUjL24lVhVl88ZyQEGweY5MR6WW/hitG7kgL1N+tLAc6x2EB
-         b3Tw==
+        d=gmail.com; s=20251104; t=1779191082; x=1779795882; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cf/dxnqWNAfphMgMYtVh0cJBYEPwPfrN54UMe38KMEQ=;
+        b=C9JgtFQXuljf5C2Hy0R1wmGX/F3gUvKqHyPd9bOC+zA7S8Ke/qebiUfffr8jsm/TrV
+         PzlNvoRfG5LWB66uXbLc1dVpZvmrf34Q6CP1CvLHd7U4VPUq2HAUXxWjtjdkzf1LZmdY
+         ZBk8mYgzAYOmk/TGdRqX35UaO6pti2zhzO2T+lJ1DZbARi1FaZM1EqMoQWKISU6xy6/a
+         LdSgG8QVzec3zNE1m//BvcJbeVf82lrQiq1M1FfzF2ytS8R3Q2J3p5441i7yEgLKDFAN
+         osYt59aWbOJVvS5+1ti0g1xNvaf288sl9Zk5DLcwTCNCdVazv+PtdYpgpY7O5jAcUsUc
+         oWUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779191040; x=1779795840;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nthh0wOYkbgoOXenxGs1OlmA1njW0yrnzAWO8T7rE7o=;
-        b=bsW9FeM6nVJrZ3J8nnDirYXkbReuOXmzjx8ny1JBrgf5qUtQKsAGCUADEoQgjgwwL/
-         MrZP3heChscnEQm6DGnZtpVi1AQMmG4OpYMsqjdtzteyqy+3g0qK1RKd0fcovhCnNkKs
-         eGAe5nn7GZOPKZmMKo+2Bpr86kQ6dcdQZl+YTdCjypmt27JtbmpUZkgogmX7l2LrzLLw
-         aqE05dVYhodAwbDxDlLKk9sxnYTk8uO2xlVCkHgzaOCxwT0Z6+u2kTd39pWAgre0Kjem
-         MD9LMkv0HIykmTBUhxW+1MswkFOV39atYK0eRfpNcnZutMzDjHdMoGe4LtOskj4mdwne
-         g4vQ==
-X-Forwarded-Encrypted: i=1; AFNElJ93ES1hwvinRVPbFPfQOs/VK9mRauEGk/spsdylZ7jUJrng3vfxBMtL/XrJsQMeCrkorOFbgig=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGr62L+/dCSonj534MziMiGJvgRTHgkpvLbtcSiT9/+ifcgBjQ
-	82t5Ze4Lz0K/KLPVTlDXubrlfZD5UJ70tOMutYVWYgBqG4id+iLFwnXmXdOkwgoM13PvTYYsR/U
-	BaxKRqBmP2UEWiw==
-X-Received: from qvcc10.prod.google.com ([2002:a05:6214:224a:b0:8b7:a795:d3f4])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:4b04:b0:8be:3da0:bba7 with SMTP id 6a1803df08f44-8ca0f671f23mr341421916d6.16.1779191039958;
- Tue, 19 May 2026 04:43:59 -0700 (PDT)
-Date: Tue, 19 May 2026 11:43:55 +0000
-In-Reply-To: <20260519114355.2769474-1-edumazet@google.com>
+        d=1e100.net; s=20251104; t=1779191082; x=1779795882;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cf/dxnqWNAfphMgMYtVh0cJBYEPwPfrN54UMe38KMEQ=;
+        b=HXQ1MXQhGHlWBhOkMqI2a8MHuE0L3UX/1S9bWrvVkTC/jDz67h9FjyILqsdEe9/Ymc
+         F2fnJCW4kE/9ruv35YVvAZEhATGiMSn73rWc6GFYsS8LgMjIlY3Bj+BrNzaeKFTBzu/H
+         NIAs0UnXYMni6A4N7RlOStYC16uObJQ96TJ5EeBuKOx5BmbgJoqW4h6TB+9sbmYxNImQ
+         HVEKjlschK7LKiTKE5eygrfKaJWpcbhdtPxUxJPXHK+h/qXjikMINhoSa3zQkX+U2nFZ
+         uLJ8bieGYzhplXkB0fWLlYZUwHMfB7spgW/bIhTpJFoFQzaAKhdQDqz7WDbqhZ2DT3EW
+         BdxA==
+X-Forwarded-Encrypted: i=1; AFNElJ+BYs4gGOLVfHVM6A9wCI6GECgXyE8qsEWSn7DmOxmdhXkYiuFF7xswtYJTPjgt3rIOdSsf010=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+NKo3hoZui1teEnmMdonHBrJvHSeAhANn3UgsWGs1hQO9TpiU
+	5VAqVtqOVVp0GO9J6x9TXMSxbgvSUzaq8oCU8urSp91WGESI/7mQTQF3
+X-Gm-Gg: Acq92OFnBpFWryBM+87Qr90REou0MOtUrvmLRC5/PqKFaiJhteBNsuYcYrY/NdNI/6b
+	fqMnvuBgyqcdReqKJzaxsevlXkDfNkEMClJWPyS1Gsspbeow6ZCELXgZy1NC3zKHXC61gC1r/DM
+	wuJtMo/F1GBL+gpTnAPooEmD8gzAfisraxEOLs/ikCmA/5eTlMXS4nsRdnIqlgxMMlJmaMl7biC
+	F7A6Pvcc0CpKxdaGjgAcf3cto7i8T/dWIIalN/XHEG6AMryQC59RfBe1tTtdfXN54u8zhruUyb3
+	nv3gYuMZlQ296iXVbJrzsYHAfoFmGfWdAQ2kNFIM0qLwkIXWA487M3SukhYGY/1A8qeS2REddL2
+	2cGRBDqr8oS2/4J5EDsU/jZkWKWVSu9CezfKKzQoJWVcwhN4oTZ9Zmq09RwOXxf9L1CE6V+ZYcA
+	BZ1P6RC491d/TOFXmrQBgT9f6ZOHGh1xe1t4ufl65R+kYQ6c1aRflG5iVuyuQfBhG2g4dUAzoN/
+	NOxoPU0XkNkM3+wrHMropyHk2nJaw==
+X-Received: by 2002:a05:600c:609b:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48fe4cadfeemr291089965e9.2.1779191082265;
+        Tue, 19 May 2026 04:44:42 -0700 (PDT)
+Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe5694f2csm323392445e9.4.2026.05.19.04.44.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 04:44:41 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH 0/8] first zcrx updates for 7.2
+Date: Tue, 19 May 2026 12:44:26 +0100
+Message-ID: <cover.1779189667.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260519114355.2769474-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260519114355.2769474-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 2/2] rtnetlink: do not acquire RTNL for
- RTM_GETLINK with RTEXT_FILTER_NAME_ONLY
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289421-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289422-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 652BC57DEFD
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 416EE57E2C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When RTEXT_FILTER_NAME_ONLY is requested, rtnl_fill_ifinfo()
-is dumping device attributes which do not need RTNL protection.
+First batch of zcrx updates for 7.2. The main part is patches 5-8,
+which add notifications from zcrx to userspace via asynchronous
+CQE posting about events like allocation failures and copying, and
+statistics. It's accompanied by relevant query updates. Patches 1-4
+are general cleanups.
 
-Many shell scripts invoke iproute2 commands specifying a device by
-its name. After this patch, they will no longer add RTNL pressure.
+Bertie Tryner (1):
+  io_uring/zcrx: reorder fd allocation in zcrx_export()
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-v2: move the ASSERT_RTNL() in rtnl_fill_ifinfo()
+Clément Léger (2):
+  io_uring/zcrx: notify user on frag copy fallback
+  io_uring/zcrx: add shared-memory notification statistics
 
- net/core/rtnetlink.c | 72 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 52 insertions(+), 20 deletions(-)
+Pavel Begunkov (5):
+  io_uring/zcrx: make scrubbing more reliable
+  io_uring/zcrx: poison pointers on unregistration
+  io_uring/zcrx: remove extra ifq close
+  io_uring/zcrx: add ctx pointer to zcrx
+  io_uring/zcrx: notify user when out of buffers
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index ae0254f19178735b2805a8189e81a960a49b2858..68cd2238ee170f44841caf47c86ef48303a3d15e 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2068,7 +2068,6 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 	struct nlmsghdr *nlh;
- 	struct Qdisc *qdisc;
- 
--	ASSERT_RTNL();
- 	nlh = nlmsg_put(skb, pid, seq, type, sizeof(*ifm), flags);
- 	if (nlh == NULL)
- 		return -EMSGSIZE;
-@@ -2091,6 +2090,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 	if (ext_filter_mask & RTEXT_FILTER_NAME_ONLY)
- 		goto end;
- 
-+	ASSERT_RTNL();
- 	if (tgt_netnsid >= 0 &&
- 	    nla_put_s32(skb, IFLA_TARGET_NETNSID, tgt_netnsid))
- 		goto nla_put_failure;
-@@ -3468,6 +3468,21 @@ static struct net_device *rtnl_dev_get(struct net *net,
- 	return __dev_get_by_name(net, ifname);
- }
- 
-+static struct net_device *rtnl_dev_get_rcu(struct net *net,
-+					   struct nlattr *tb[])
-+{
-+	char ifname[ALTIFNAMSIZ];
-+
-+	if (tb[IFLA_IFNAME])
-+		nla_strscpy(ifname, tb[IFLA_IFNAME], IFNAMSIZ);
-+	else if (tb[IFLA_ALT_IFNAME])
-+		nla_strscpy(ifname, tb[IFLA_ALT_IFNAME], ALTIFNAMSIZ);
-+	else
-+		return NULL;
-+
-+	return dev_get_by_name_rcu(net, ifname);
-+}
-+
- static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			struct netlink_ext_ack *extack)
- {
-@@ -4187,14 +4202,15 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			struct netlink_ext_ack *extack)
- {
- 	struct net *net = sock_net(skb->sk);
-+	struct nlattr *tb[IFLA_MAX + 1];
-+	netdevice_tracker dev_tracker;
-+	struct net_device *dev = NULL;
- 	struct net *tgt_net = net;
-+	u32 ext_filter_mask = 0;
- 	struct ifinfomsg *ifm;
--	struct nlattr *tb[IFLA_MAX+1];
--	struct net_device *dev = NULL;
- 	struct sk_buff *nskb;
- 	int netnsid = -1;
- 	int err;
--	u32 ext_filter_mask = 0;
- 
- 	err = rtnl_valid_getlink_req(skb, nlh, tb, extack);
- 	if (err < 0)
-@@ -4214,14 +4230,19 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (tb[IFLA_EXT_MASK])
- 		ext_filter_mask = nla_get_u32(tb[IFLA_EXT_MASK]);
- 
--	err = -EINVAL;
- 	ifm = nlmsg_data(nlh);
--	if (ifm->ifi_index > 0)
--		dev = __dev_get_by_index(tgt_net, ifm->ifi_index);
--	else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
--		dev = rtnl_dev_get(tgt_net, tb);
--	else
-+	rcu_read_lock();
-+	if (ifm->ifi_index > 0) {
-+		dev = dev_get_by_index_rcu(tgt_net, ifm->ifi_index);
-+	} else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME]) {
-+		dev = rtnl_dev_get_rcu(tgt_net, tb);
-+	} else {
-+		rcu_read_unlock();
-+		err = -EINVAL;
- 		goto out;
-+	}
-+	netdev_hold(dev, &dev_tracker, GFP_ATOMIC);
-+	rcu_read_unlock();
- 
- 	err = -ENODEV;
- 	if (dev == NULL)
-@@ -4232,25 +4253,35 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (nskb == NULL)
- 		goto out;
- 
--	/* Synchronize the carrier state so we don't report a state
--	 * that we're not actually going to honour immediately; if
--	 * the driver just did a carrier off->on transition, we can
--	 * only TX if link watch work has run, but without this we'd
--	 * already report carrier on, even if it doesn't work yet.
--	 */
--	linkwatch_sync_dev(dev);
-+	if (!(ext_filter_mask & RTEXT_FILTER_NAME_ONLY)) {
-+		rtnl_lock();
-+		/* Synchronize the carrier state so we don't report a state
-+		 * that we're not actually going to honour immediately; if
-+		 * the driver just did a carrier off->on transition, we can
-+		 * only TX if link watch work has run, but without this we'd
-+		 * already report carrier on, even if it doesn't work yet.
-+		 */
-+		linkwatch_sync_dev(dev);
-+	}
- 
- 	err = rtnl_fill_ifinfo(nskb, dev, net,
- 			       RTM_NEWLINK, NETLINK_CB(skb).portid,
- 			       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
- 			       0, NULL, 0, netnsid, GFP_KERNEL);
-+
-+	if (!(ext_filter_mask & RTEXT_FILTER_NAME_ONLY))
-+		rtnl_unlock();
-+
- 	if (err < 0) {
- 		/* -EMSGSIZE implies BUG in if_nlmsg_size */
--		WARN_ON(err == -EMSGSIZE);
-+		WARN_ON_ONCE(err == -EMSGSIZE &&
-+			     !(ext_filter_mask & RTEXT_FILTER_NAME_ONLY));
- 		kfree_skb(nskb);
--	} else
-+	} else {
- 		err = rtnl_unicast(nskb, net, NETLINK_CB(skb).portid);
-+	}
- out:
-+	netdev_put(dev, &dev_tracker);
- 	if (netnsid >= 0)
- 		put_net(tgt_net);
- 
-@@ -7116,7 +7147,8 @@ static const struct rtnl_msg_handler rtnetlink_rtnl_msg_handlers[] __initconst =
- 	{.msgtype = RTM_DELLINK, .doit = rtnl_dellink,
- 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETLINK, .doit = rtnl_getlink,
--	 .dumpit = rtnl_dump_ifinfo, .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
-+	 .dumpit = rtnl_dump_ifinfo,
-+	 .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE | RTNL_FLAG_DOIT_UNLOCKED},
- 	{.msgtype = RTM_SETLINK, .doit = rtnl_setlink,
- 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETADDR, .dumpit = rtnl_dump_all},
+ include/uapi/linux/io_uring/query.h |  12 ++
+ include/uapi/linux/io_uring/zcrx.h  |  36 ++++-
+ io_uring/io_uring.c                 |   2 +-
+ io_uring/io_uring.h                 |   1 +
+ io_uring/query.c                    |  16 ++
+ io_uring/zcrx.c                     | 227 ++++++++++++++++++++++++----
+ io_uring/zcrx.h                     |  11 +-
+ 7 files changed, 274 insertions(+), 31 deletions(-)
+
 -- 
-2.54.0.563.g4f69b47b94-goog
+2.54.0
 
 
