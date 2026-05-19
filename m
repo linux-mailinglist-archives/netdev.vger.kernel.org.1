@@ -1,174 +1,119 @@
-Return-Path: <netdev+bounces-289649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289650-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNjkArDqDGq9pwUAu9opvQ
-	(envelope-from <netdev+bounces-289649-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:56:48 +0200
+	id AGE0BmXtDGp6qAUAu9opvQ
+	(envelope-from <netdev+bounces-289650-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:08:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11603585E05
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:56:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73172585EE5
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:08:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 608A83025FA6
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 22:56:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D213F302A2EF
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 23:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE233B5306;
-	Tue, 19 May 2026 22:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F2835E931;
+	Tue, 19 May 2026 23:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MMfYXFX6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tj+JlzbH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F223373C1E;
-	Tue, 19 May 2026 22:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97B230F543;
+	Tue, 19 May 2026 23:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779231364; cv=none; b=X/Xki5W9dgynMTFtsEjaYgQkccLs8TZqbhvQ8Zx77y6ShB+xxxZUByawgptxjP1WfkPFqPCLCewmyMJoabw3QO9GBa1LqVPXBUznt4IBC7JBIl9MRXbBCHkxkWeoQzU5RW0J+0lMnF1RlsQ3dk4oiAPJ+LyDTTWA4dOID9kNEBY=
+	t=1779232096; cv=none; b=Ic1nWdXU5KIstrS5WvUsQKb74pzUDnpbAL5/JuF+uPXMvWgtsyrA/hUsg68r8O0mqTASgPA+Cini/qI/YQ9RaAIR7xaRKtXC8iGYoy4J1PMb1ZSV4kV8jOJ3scAjXPeYXp9hihgjWA6485XYXM9R70KjcRDlZKMDqn0RHN4u0MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779231364; c=relaxed/simple;
-	bh=QM5FMHHm++AknD1r9z3aFr5seHTml9EIHn+s7uS8KwY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rFoJKb+PZ9RefgWln6XaTO9X6PcLaNUZQISORtOcA14o88XFs1kZA3fkzps0lwm9WvVx3nNBKbHxEd6ozzTbARKzUxI3haYfCUGlbLS7sNKYJTb+u8NR4WvNMhYdycr/oKOqwsw2eJ3ckvnnv1raEP1t+2AONj4HZWRZ+88HXw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MMfYXFX6; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C59691F00893;
-	Tue, 19 May 2026 22:55:59 +0000 (UTC)
+	s=arc-20240116; t=1779232096; c=relaxed/simple;
+	bh=m4ouFijZ/f67FvcXcp6pmhPM+pabAiPxP914Yinp8Bw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jZjYxUDCfAhHJf5fatFNbaW1jL+8Y2dx6ezMSk9zM88ClXxkOvNgf17hurvqDeVlM7m7ROM2fnr7hQmwnBGafYSZJ8aj6zvhvsVKitpFD21LORPTtDbJWvp6KMCPpuo98YLbl/j2Raa16pHep2SehR3lyuM74eOZp8A0bOgCtig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tj+JlzbH; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 197721F000E9;
+	Tue, 19 May 2026 23:08:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779231361;
-	bh=Ju/T6dr7tnzbHkBsBfFbYbB7NVyyfDZAOl1owW3rAJI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MMfYXFX6PzYqZig4fP7heX9bolmzbam+Ez/+CCI5rJNKvCu76yNTc26XeUeWOfV6f
-	 76yv86BhY4CnUd1d+CF+8MeKTgF8Az6M13Rel7tLRKceUbwzI7ZaZLG7ddC0Sh0O+G
-	 OpGSYA3c7bnMfWd4PozIH6adolxs9O7hCJTeHUE4fTOLSPnhG9c6s0uXmfP1jyy6he
-	 /+5D5p8IgablTI20XeiafXKQ5YsInH/h3vTiwnlHEY5x2livNflhYkggqIBaNFysCb
-	 JfaqpT5w+l7pQqv5v7WiYLodJhRURvpkZq6X7M30GwX47mj9ul446ScUZzCKGziXdu
-	 bNiGRDDDnMRrQ==
+	s=k20260515; t=1779232094;
+	bh=m4ouFijZ/f67FvcXcp6pmhPM+pabAiPxP914Yinp8Bw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Tj+JlzbHgJNURYEGo+0/hYiFbcHVdL/fzObe+JCLoCSMHET7hN3Yv4ntxiVTYKwYs
+	 nw2xWuCRYrrjdaLc7PQWK9NkJHLwDJzHncPpnXHxLoibfgSEdc+XqgcakScoJPz33e
+	 eVjMhXXWD7O/aq/eu+W7UcQ2Vqro4yDwWwZ5E4Dg3tXB0itf1rF4xBW7QQiNslSeMU
+	 tQeW5im8oeIkCY306uJ030bee1AJfscNlr5J4Ci5CG7Ycqohjh24r2E7NG1RMxC9sJ
+	 clbpLsqzs0ddPd5brHahNnn144N9PGB0lksimyjF+echLBZ1tWTx5+j8rqZ2A2aTd3
+	 f1cW+f4zRs5nA==
+Date: Tue, 19 May 2026 16:08:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: dipayanroy@linux.microsoft.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	leon@kernel.org,
-	longli@microsoft.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	stephen@networkplumber.org,
-	jacob.e.keller@intel.com,
-	dipayanroy@microsoft.com,
-	leitao@debian.org,
-	kees@kernel.org,
-	john.fastabend@gmail.com,
-	hawk@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	sdf@fomichev.me,
-	yury.norov@gmail.com
-Subject: Re: [PATCH net 2/2] net: mana: Skip redundant detach in queue reset handler if already detached
-Date: Tue, 19 May 2026 15:55:59 -0700
-Message-ID: <20260519225559.3939235-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260518194654.735580-3-dipayanroy@linux.microsoft.com>
-References: <20260518194654.735580-3-dipayanroy@linux.microsoft.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
+ <horms@kernel.org>, Petr Machata <petrm@nvidia.com>, Breno Leitao
+ <leitao@debian.org>, Nimrod Oren <noren@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>, Willem de Bruijn <willemb@google.com>, Dimitri Daskalakis
+ <dimitri.daskalakis1@gmail.com>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next 3/3] selftests: Use a master ssh connection for
+ remote commands
+Message-ID: <20260519160812.20678f72@kernel.org>
+In-Reply-To: <20260518093653.551166-4-cratiu@nvidia.com>
+References: <20260518093653.551166-1-cratiu@nvidia.com>
+	<20260518093653.551166-4-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289650-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289649-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,microsoft.com,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,debian.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 11603585E05
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 73172585EE5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: mana: Skip redundant detach in queue reset handler if already detached
+On Mon, 18 May 2026 12:36:53 +0300 Cosmin Ratiu wrote:
+> This finally implements this part of
+> tools/testing/selftests/drivers/net/README.rst:
+> "Using persistent SSH connections is strongly encouraged to avoid
+> the latency of SSH connection setup on every command."
 
-This commit adds a check for netif_device_present() in the queue reset
-handler. If the device is already detached, it skips the redundant
-mana_detach() call and proceeds directly to mana_attach().
+As this part of the README indicates, the expectation was that this
+part of the setup will be handled outside of the harness itself.
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 9e7e4bf526bf6..740f3c34db451 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -316,12 +316,19 @@ static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
-[ ... ]
-> +	/* If already detached (indicates detach succeeded but attach failed
-> +	 * previously). Now skip mana detach and just retry mana_attach.
-> +	 */
-> +	if (!netif_device_present(ndev))
-> +		goto attach;
-> +
->  	err = mana_detach(ndev, false);
+After all something also has to set up the keys to make sure that
+the hosts can actually log into each other, right?
 
-The fix here correctly prevents mana_detach() from running on an already
-detached device. However, do identical issues remain in mana_change_mtu(),
-mana_set_channels(), mana_set_ringparam(), and mana_bpf()?
-
-If mana_attach() previously failed (for example, due to out of memory),
-the port is left with apc->port_is_up = false, but it preserves
-apc->port_st_save = true, and calls netif_device_detach(ndev).
-
-If an admin tries to recover the port by retrying a configuration command
-like changing the MTU or attaching XDP, these functions appear to
-unconditionally call mana_detach(ndev, false) without the
-!netif_device_present(ndev) check added here.
-
-Inside mana_detach(), apc->port_st_save = apc->port_is_up executes. Since
-port_is_up is already false, port_st_save is overwritten to false,
-permanently erasing the intent that the port should be up.
-
-The subsequent call to mana_attach() would then see port_st_save == false,
-skip mana_alloc_queues(), set port_is_up = false, and successfully call
-netif_device_attach(ndev).
-
-Would this result in the configuration command returning 0 to userspace
-while the port queues were never allocated, leaving the interface silently
-broken until manually toggled down and up?
+I'm a bit on the fence, some extra Review / support tags would be
+useful, and it'd be useful to make the code in patch 3 less ugly.
+Patches 1 and 2 make sense.
 
