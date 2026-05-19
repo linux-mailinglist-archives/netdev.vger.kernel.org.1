@@ -1,160 +1,197 @@
-Return-Path: <netdev+bounces-289440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289441-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yAPsFXlVDGqmfAUAu9opvQ
-	(envelope-from <netdev+bounces-289440-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:20:09 +0200
+	id 0CmlKSNWDGqUfgUAu9opvQ
+	(envelope-from <netdev+bounces-289441-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:22:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67BCE57E8A9
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:20:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1DC757E98A
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:22:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0F621305DFEB
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:07:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B98913000BB5
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867F24CA29D;
-	Tue, 19 May 2026 12:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F934C77AD;
+	Tue, 19 May 2026 12:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gPAceZru"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRZjJq4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3628F4CA294;
-	Tue, 19 May 2026 12:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277424BCAA6
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 12:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779192451; cv=none; b=pXB8KwwH8120IxvhnEp5inX8G6cChWmGdq6ygZUSLptKp4E5k0cYIj4sT+aEhtUXzkrLtUdsgpohBfrva34UEItMI3NDSg+wLn7insMA/Fg5XzA+SRwEDJkT/SMKQWkv1EUcDq0r4Lqd9R5/26kFqurVW+3pGtlRsRxFGy26AHk=
+	t=1779192718; cv=none; b=EyNDnuy25gN8wTxfXdMlRF0ed0ACj7JM4QytSj2VE0kkmLM0kkwj+e2cxAEZnslSyCp/z1xLndtx0lrsBrcWLYwIOnoWwzVTNt6Ib7eqzYJm9uW/RC+MURPUmvDM323uQQukk9Q6eFelqN0LnPp6MkMnxlVdJZSDFvAVaxW7BVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779192451; c=relaxed/simple;
-	bh=24gjXT5wmA214FuTksvBZxjgz04Ja4qpNigX7sxq6hM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ODCRDUYWlDM9bDMNPsoUOJLnVerjyqbhxeItlgFZfSNXItE8GXzOLRwlwWXCNxIs5T1PaDuYoyKKiIWzMtAtBHABw7u4hnewb4oXaRh1CpqLb9zoNtISaHHNfDmKA6slr/df0EuWRzpOI3RpoeOx0DusG4/t+oJy5WvQNZ8eMbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gPAceZru; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 777D5C2BCC7;
-	Tue, 19 May 2026 12:07:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1779192451;
-	bh=24gjXT5wmA214FuTksvBZxjgz04Ja4qpNigX7sxq6hM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gPAceZru+S9ZuIhn16V91zK89WlwILsx+YuFd/0X3f6mr5V35bCAYgGzZxVQG94An
-	 XeLA3r777h01ClFUmPgrT+qG6kESsr7JJlPG8caR1aRWaxNz6iiadjiTWvOZ/2rBTs
-	 Ftcf22u/gnE0okDk/bJGyZnN1lx4JEEc36yQhWRw=
-Date: Tue, 19 May 2026 14:06:43 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
-	kuba@kernel.org,
-	Linux kernel regressions list <regressions@lists.linux.dev>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-Message-ID: <2026051909-impurity-nemesis-2f65@gregkh>
-References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
- <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
- <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh>
- <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
+	s=arc-20240116; t=1779192718; c=relaxed/simple;
+	bh=IYaQaJj5MVcvrd+hSHbZutQNIAVNVlA6s1NlpyumyNE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kgFV7o94roEkv/BbtUNgWmECNn0FqzMfi+c1flF4F6nb5tv+pfWYHCefeN2EuAKhK8csicfHryFzMIvEe36rKniVnyfXvhKK4snAv79uHavCjKiJoeySYT6yrZm5U8okq1RIo8T1DFZTcJWqov3Quxco6+mK6nOEsrI0FvIkHAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fRZjJq4t; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-48d10c981e4so4860555e9.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 05:11:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779192715; x=1779797515; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ww4CKOsmbnsFPVH2QTfL4TQf7KmUuJr3ZNu7Wd6tZ5Q=;
+        b=fRZjJq4ttyYIGVGyskHuLjAE1hsUdBlf90mnpquzsTzMLlU/BbucUhUEvyorqfFccK
+         h1lcmEBz/RmewteGB5Gd9f2LBcf/hKKpFcH/vD2z/WOkvAUZJ2zBZAo6tDiTDSsWXUFx
+         6GNXIGV8I3LnQujh5qfWIH8dfKh73oIkQSzgVs4efaDYDqlr718V3OzviP7QL5k9xkWU
+         X/HJRsoxhCKVNcClUtmBun+yBLrOUgrskIrQmLpu4iSplYi0l5vGTVmPd4vmbMTjdiMd
+         bZTfan5gt/klXXhzGXQ5sW+8JsO7Jfm2DpMUeQ7guU6qZFNEFmSlAfdT0p7T6fJ2/PAr
+         b3+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779192715; x=1779797515;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ww4CKOsmbnsFPVH2QTfL4TQf7KmUuJr3ZNu7Wd6tZ5Q=;
+        b=OxxWkYnKofSk7kb8PjZWO/mEXbZq9rWYyvwd6PaRBnNYK4sbrot1O0tXeWYOhB1Q3/
+         UbeoBZ2LCxdAhlph+BdR2ut81rnPJ2wOsIPPNUAxwX2h68xHSjzjDGF5zoOFINgrvcl0
+         b/Vke5q7ASVJKDsKdzjXHlKIlCM4oPtkLPAGw2l5RZSFwoCMp1LpntK62L8JLH2RgHzf
+         IW9j63ttFuGSZSK4Q+UhB+DYdm3jcULbAioNDV3SviptzUmkxLD7Q4IEXb73NUHRdIro
+         lD3VnZPrYUJSqBiBc6PttFiD0XF0rRoZhq0I7mCMImQ8McOVrKi7fXWEkwX1irJmXXna
+         6T8w==
+X-Forwarded-Encrypted: i=1; AFNElJ+Yjh8RgCfjywufsMOfamqmhtsVHKkdW2iYEZrGZZn+GZHoBmVgnGI9uzwLhewhLboRIf2k9f8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzx7T/y6zPIebq+YAouYLdCINPagMO7H4czhzrGGyi9PnyvbBP3
+	6Ke7+XRLIQNqqihLrbTR/Ux7mxGt9vjZv5vsg8KhKtTCv6ar77HxnScL
+X-Gm-Gg: Acq92OEGDPlx2NtPncaPsa8GpFLByOb4L6afyQIb52rGz4oHlj65osguuDbgKIqE6t4
+	jBDdHCz+0W3XH7Kdsdy5jrIPfvxN0ovko6huZVB1URnICn5FVawN3LwYKgmYrbb/YlryWnayXPO
+	DeKl4g73cCd65zN5M+UoVcF7/dBF1NKyEXmAWBYBimpuOT/4WV9cjrw6VtlkYADybM+A4hVmO+3
+	WotQ63y0L527JksQtnkMpKVu6HzD5JGSI9mWv+MO4A+6vUmgXeN1Dcs9/C8rvskB1GbObySqlKD
+	XR+HSVRXFMw/Y8A3vUfC7t39sZfqvwZU7jU0rkLWcr9nNo1o7+C1XOo9+W9F/sGz8qIw87fwMcl
+	0I4gdzafGGLFbx83SoN0RtrHWMS90WKVVmtz5GEPyIJW804WUjrD8geZUCLkRZvA8FThEQW77jm
+	bff59hTZcq+VbvKbkzZZTmx61Nr0ZXumGSmosgcWya1UEtKkKut1YeFHI8+LAB4zmvmQcJC506w
+	ECZT1K537jV+hnHTKMq
+X-Received: by 2002:a05:600c:4588:b0:489:1c1f:35e5 with SMTP id 5b1f17b1804b1-48fe664be2amr136275035e9.6.1779192715261;
+        Tue, 19 May 2026 05:11:55 -0700 (PDT)
+Received: from ?IPV6:2a02:aa16:1105:8100:aca5:18d3:d87:7987? ([2a02:aa16:1105:8100:aca5:18d3:d87:7987])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48feab2896bsm109146625e9.4.2026.05.19.05.11.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 May 2026 05:11:54 -0700 (PDT)
+Message-ID: <d864aff0-d9e9-42c9-87e8-0074dc35e857@gmail.com>
+Date: Tue, 19 May 2026 14:11:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
-X-Spamd-Result: default: False [3.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dev_addr_lists: don't WARN on GFP_ATOMIC
+ kmalloc failure in netif_rx_mode_run
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Qingfang Deng <qingfang.deng@linux.dev>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260519095557.3749407-1-yzjaurora@gmail.com>
+ <878q9fod8m.fsf@cloudflare.com>
+Content-Language: en-US
+From: Zijing yin <yzjaurora@gmail.com>
+In-Reply-To: <878q9fod8m.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289440-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davemloft.net,lists.linux.dev,linux-foundation.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289441-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	FROM_NEQ_ENVFROM(0.00)[yzjaurora@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 67BCE57E8A9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,pastebin.com:url]
+X-Rspamd-Queue-Id: A1DC757E98A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
-> On 5/19/26 12:30, Greg KH wrote:
-> > On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
-> >> On 5/15/26 17:10, Thorsten Leemhuis wrote:
-> >>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
-> >>>
-> >>>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
-> >>>>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
-> >>>>
-> >>>> are available in the Git repository at:
-> >>>>
-> >>>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
-> >>>>
-> >>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
-> >>>>
-> >>>>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
-> >>>
-> >>> It seems this PR sadly came too late for this week's net PR to mainline
-> >>> that was merged yesterday.
-> >>>
-> >>> TWIMC, from my point of view, it would be great if we somehow could
-> >>> still get the changes from this PR or at least the btmtk fix it
-> >>> contains[1] to mainline this week before -rc4, as it is fixing a
-> >>> regression known since 2026-04-24 that at least five people encountered
-> >>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
-> >>> validate WMT event SKB length before struct access") [006b9943b982 in
-> >>> -next].
-> >>
-> >> Greg, Sasha, that [1] fix I was talking about now reached -next as
-> >> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
-> >> events") and will likely hit mainline on Thursday or so with the weekly
-> >> -net PR to -mainline. If that's good enough for you, I'd say it would be
-> >> good to pick this up for the next round of stable kernels.
-> > 
-> > That "Fixes:" tag is referring to something that is also not in any
-> > tree, but that commit does have a cc: stable in it.  So do we need both
-> > of these:
-> 
-> Valid question, as yes, there is a slight mixup here:
-> 
-> > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
-> 
-> That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
-> -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
-> btmtk: validate WMT event SKB length before struct access") -- the one
-> that is causing the regression that I want to get fixed. So we now only
-> need:
-> 
-> > 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
+Thank you so much for the feedback! I will address these comments in the 
+next version. This is not found by syzbot by the way.
 
-Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
-nightmare to track over time, ugh.
+Hope you have a great day!
 
-I'll go queue this up now, thanks.
+On 19.05.2026 13:22, Jakub Sitnicki wrote:
+> On Tue, May 19, 2026 at 02:55 AM -07, Zijing Yin wrote:
+>> netif_rx_mode_run() fires netdev_WARN() when netif_addr_lists_snapshot()
+>> returns non-zero. The only path to a non-zero return is -ENOMEM from
+>> __hw_addr_create() failing its kmalloc(GFP_ATOMIC) -- syzkaller hits it
+>> via failslab, and it can also be reached under real memory pressure.
+>>
+>> This is the only allocator-failure site in this file that WARNs.
+>> __hw_addr_create() itself, and every other caller of it in this file
+>> (__hw_addr_add_ex(), dev_uc_add_excl(), dev_uc_add(), dev_mc_add(), ...)
+>> just propagate the -ENOMEM silently. GFP_ATOMIC is a may-fail allocator;
+>> callers are required to handle NULL, so a returned -ENOMEM here is an
+>> expected runtime condition, not an invariant violation.
+>>
+>> The miss is self-healing: any subsequent change to dev->uc / dev->mc
+>> (every dev_{uc,mc}_{add,del}, IFF_PROMISC flip, etc.) calls
+>> __dev_set_rx_mode() -> netif_rx_mode_queue(), which re-queues the device
+>> and retries the sync. The only cost of a failed attempt is one stale
+>> rx-mode window until the next update; nothing in the kernel relies on
+>> this attempt succeeding.
+>>
+>> Demote to net_err_ratelimited() so the condition stays observable in
+>> dmesg without tripping panic_on_warn.
+>>
+>> Reproducer (syzkaller .prog format with setup notes): 
+>> https://pastebin.com/t7AQKx9v
+>>
+>> Fixes: 3554b4345d85 ("net: introduce ndo_set_rx_mode_async and netdev_rx_mode_work")
+>> Signed-off-by: Zijing Yin <yzjaurora@gmail.com>
+>> ---
+>>  net/core/dev_addr_lists.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
+>> index d73fcb0c6..c6fdcac74 100644
+>> --- a/net/core/dev_addr_lists.c
+>> +++ b/net/core/dev_addr_lists.c
+>> @@ -1275,7 +1275,8 @@ static void netif_rx_mode_run(struct net_device *dev)
+>>  		err = netif_addr_lists_snapshot(dev, &uc_snap, &mc_snap,
+>>  						&uc_ref, &mc_ref);
+>>  		if (err) {
+>> -			netdev_WARN(dev, "failed to sync uc/mc addresses\n");
+>> +			net_err_ratelimited("%s: failed to sync uc/mc addresses\n",
+>> +					    netdev_name(dev));
+>>  			netif_addr_unlock_bh(dev);
+>>  			return;
+>>  		}
+> 
+> 1) I'd go with net_warn_ratelimited() instead. The promoted message
+> level in syslog might cause operational pain, and as you say the
+> condition is self-healing. Seems unwarranted.
+> 
+> 2) Since it has a Fixes tag, should probably be sumitted for 'net' tree.
+> 
+> 3) Was this reported by syzbot? If so, there should also be Reported-by
+> and Closes tags.
 
-greg k-h
 
