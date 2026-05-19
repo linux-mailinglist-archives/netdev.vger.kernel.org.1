@@ -1,204 +1,159 @@
-Return-Path: <netdev+bounces-289205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289206-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JJrHHOnC2p2KgUAu9opvQ
-	(envelope-from <netdev+bounces-289205-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:57:39 +0200
+	id cBERJ5KoC2oGKwUAu9opvQ
+	(envelope-from <netdev+bounces-289206-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:02:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6F8A57549C
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:57:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2567257557A
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:02:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6C1D6301A409
-	for <lists+netdev@lfdr.de>; Mon, 18 May 2026 23:57:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A9C7302ED67
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365F0330D28;
-	Mon, 18 May 2026 23:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33D5339863;
+	Tue, 19 May 2026 00:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mkzAcBi6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vCktNkqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1523112C0
-	for <netdev@vger.kernel.org>; Mon, 18 May 2026 23:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779148656; cv=pass; b=hoioWZdcOdQHcEoADo7tdkKpZxKF/Q/lNMZJQ9UInSZEX0zh0P18vCJ3L+rSqHHiQl7ykHgiOLyucNBLVxoX7XKsVLi6bPiED3TsztZuISKc8K1Pd2nfUmGzV0qFnL5JlGM3PRuIiUgtMYSUUcZTn8eGRLNAuWMT9ngr9MfKI38=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779148656; c=relaxed/simple;
-	bh=4xz9D7VAQrmdEZXxAcS5UoEWPCKtzjLiBUCPWtmx2B4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iy4zY3cB3DR5YZYiP0hMaUpOpvghbHiWydgItqiNsnEPvzCpoQMi0RNtdGOZQIuO0pU6uvXovIPeT9M12GPys4HwL7s0K9Oj83INID/Dl76dpHLw4XVwju0b+jJBHCTKuUIhwRwBJ336kpG+RiQU90yh4IcYzRTH3Do0tXzY5KQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mkzAcBi6; arc=pass smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5a40cfab24dso3895064e87.2
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 16:57:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779148653; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hTMfFs3jujUIGnBJpqNN2inUNL9PhitifSKOmZXGRyedXYLY+7EF+D8zvI6fPZw6XE
-         EIQHOFJbKxwuu4B+mrBl4Kb8mlY92zATdHpcffejWu5PSkqArj/LTABC6zL0kKL9mqST
-         m43FFnbxMWfBI+p9Kht1QYsQEZUKW0cUUFfOhNUi/SZj/T5Zhzd3ZvJlcKN3fpiD9PPn
-         cCvw9d60fPi1J36NKqKSNKJY4C7X67dYvoQ0o/FKT1HB/FqSdKVQ2Bc9mhQ0OMJ11+Tf
-         J3y/QpSfslF11mek7LNI2K90uxNGD43I/Vkb6OuQGk9U8nJKOx8pPU6jp0AUqvxc9NiM
-         zW3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=W8rgBOoJQIg12SJZYcIEL+l2QP9Xebk+rpGwoK9DyJ4=;
-        fh=EAH9SxANYe7mjM3ukcLh6hVtxssvtmrbvHsN9d94uZA=;
-        b=Qu6DVvftwNUMDpUXvbjodu2X6AfU3k++cYy/YtC30eIQtQakiYvXXSpvuRzehOMdL3
-         Y6FTpk0u6McanZz9BJ4FZFZnRRoxRsaoGtcIGqJj2PteKuWdToYERYYx+wY4G01lFs+l
-         k5FGmSpWer468DJuUKU2paL+J6C+D1JmXnxLlGz8k3nHH2k5HD8djHkHdAnIZREeJRML
-         bNkfi9P0yY3Ng8UW8YUuvOiMLm32Q5UnNEpcgS2a9Jw9RxkLwlRATG+RSEVEnRAA68CB
-         niAxMwoGbTH/dnHZEspmMS1bVTAIsjhdq/fSnH45KgsuWlF0cytMvfay9TBYJwiewDGa
-         agGA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779148653; x=1779753453; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W8rgBOoJQIg12SJZYcIEL+l2QP9Xebk+rpGwoK9DyJ4=;
-        b=mkzAcBi620+pQwhVeVniDJ17RfgJhvsMhOx3i+BhAl1H9J7himww5AH/FFlSDwiGkD
-         Ao5qNXgFsLIzq7jSmQkAjWHprvlbpVBntUkb31O2EF34b5kz7RqBSbZh9LM8rcU/ZpGU
-         BUOcoByPnEaX3V9+pJWSSe0Ja4ZV6TX8g2//ZFPrVuh4+Gzk+EoCqEinLMUU7JOjMcyY
-         hlku4y2imW8glzB9nWIzmuCa+LH486+eGcTE37ZLTLppPfjnwPhXk1TrmFPOuCh7Wb0V
-         5Dq7QL1+HHu1S7R+A6Zg8l1v9JKPTHFIyNTs9CJCTAzSP4syXfJfRVJcrigqma8JKVhr
-         uAoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779148653; x=1779753453;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=W8rgBOoJQIg12SJZYcIEL+l2QP9Xebk+rpGwoK9DyJ4=;
-        b=L5WdqD8EYmN2T0c3vrsK+JFbSLDtZSyx7/KzYg4WIJbtoWbBmO/bnpJ4pNY/PYagql
-         WCYcc7TyCs/2/jsSYvx+kW81MLt+2luw1l8QpkGlUMsNfBPrIxPKcl1wcqqA0S/cJ9e5
-         jZK0o6+0qjD0A4lLgD6N6rPYKnP9zlO+focigthek/xHY+DV07CYCIhXi3VhbK/bSTco
-         DVOBDzuBrQlCKAJHW/DP5dsyYWAjicln98ps4W4vls9O+1JfwF23H1cK4kvSc37Z0zGj
-         0/Af0JdNb6VpvLbKIK88FmTj8VJBQNaKxqLc2V2plmbnxgZ3otT2IySTxsc009gw3sfK
-         L6mw==
-X-Forwarded-Encrypted: i=1; AFNElJ9ya7pGdQcclH9eNpfv3feK43/pQRNXFIRCHjBFV3dHY738n3/+ZxcxJxZbPCfpS2p9SeQbu64=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0tnCn7oQIg2dWl/JNTS8/965NkD6cn0bdioazxWIQjvVT60qe
-	udAwiqLhNCIjG08FEiDcNQPCNOVovKm5UXAscSF/etTqspo6wQe4jlCKRBFrjUIJDu1l+tIc0rQ
-	dVIZJn0eA463oMdcCFf0v70EZrNkXjEc=
-X-Gm-Gg: Acq92OEOluqc89rPADgUUz4BwtDy816jEpCiTqhk335VN3qSvqtoUZ4U7fe4c5AoVZW
-	Cj27jrhQl6QSzB8IoEXiIG+VHIEDhK4M3H+/Y+kHUKZJwWY9zQ+/FEQ+bC3dJgqXGQGHCQPd5c9
-	cl9IslRWrj8o/M2aKC36fMqix5YP4ZIwQLIQlQp9SokCFakQ0XVjdiRTW3fpKjYUuYPXXnCvz8S
-	vbwpGaU83p1hD8DoGoBDZSaXz5a9dWcfNRdEteZuXXhLzQg5cKPua6TlBU+NzXtR5Zm6BNE4na9
-	gNEkgcS24cCGaRax0hTEbUjtoy70WZW5RZVE1sE=
-X-Received: by 2002:a05:6512:1094:b0:5a4:175d:21a with SMTP id
- 2adb3069b0e04-5aa0e600e20mr5276550e87.2.1779148652475; Mon, 18 May 2026
- 16:57:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09D0306B3B
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 00:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779148811; cv=none; b=gxeQvj/P7cZUI2AlAF/Mnj3b3GiQaf1nRms9KbpHCHe2g6bBcZbOn5ymMPPPXCPCwT9Jmt57w9NWhhF1Je3YPoq7PXh0LnQNcbg3/+BdOdzir6YL2E3qeL3h5TqZCVrc2ideGRY5TnhB0scXx0GPueaamF9y+juj7YvF4g7kETs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779148811; c=relaxed/simple;
+	bh=kuTqi/4P3P1Pltknu+oTj37VkQ8fT36kuly6Uv6oqms=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gVb2d3Eh35BHkQZoi7pQY6FnocuJqXxdEbjRntnkKIdht10miRc8fpHfavgdTQ8P2tagNz8XJOemcehEY8SqzDm/e53J4z2YroMY98faHcApG406hElyG/HtbewFOMQ/ZuhbY8qmkjlrdO29jIA2qNYPY6IRv7lBiy8+m78GH3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vCktNkqB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44772C2BCB7;
+	Tue, 19 May 2026 00:00:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779148811;
+	bh=kuTqi/4P3P1Pltknu+oTj37VkQ8fT36kuly6Uv6oqms=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=vCktNkqBSfqF6Vy/AXyocNpgtv4NktC/pTSwmggCo0ErtHh1o5HCdWwT7NQzkKRar
+	 lGtnvpX4i1qb5hMAqrSjwBb1z1OibIrgGxVoYLhQ+CO7UmrbcH1m+sDrY5iOHef5se
+	 vQL38z8XnCRRTSnVI7yR/Kf86scP9sPKbqph0uBlWq1b0leqqxrk4ytsqZeqUbVY1d
+	 KNnDgj5bcXcwI1Kj9MNqSy/oNyW1G9QQ8gmT+gtieMDkKepd0uqnj62FYFmoWV5KGd
+	 5/MAlW3NELVtzP/bhe6MXpL5N8I4DfSWTccN31pQSrrbj1sizv0GWdkMbx84tw5vZ2
+	 r9H6mih09flwQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0BC83930CBF;
+	Tue, 19 May 2026 00:00:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260518082344.96647-1-kerneljasonxing@gmail.com>
- <20260518082344.96647-6-kerneljasonxing@gmail.com> <agsxE575ri8iLgxM@devvm7509.cco0.facebook.com>
-In-Reply-To: <agsxE575ri8iLgxM@devvm7509.cco0.facebook.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 19 May 2026 07:56:55 +0800
-X-Gm-Features: AVHnY4KqQCXKCs456Fffv-Vucw_lyoIiww_LVFXcU_9Mv3prioM5sCl1Gc9ovRg
-Message-ID: <CAL+tcoASR9sfdi_TiMEN2kqb=WL+HCuOTcO3h4XrLVR+2G2XCA@mail.gmail.com>
-Subject: Re: [PATCH net-next 5/6] bpf: enable bpf timestamping rx in TCP layer
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, willemb@google.com, kuniyu@google.com, 
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	jolsa@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 01/14] batman-adv: fix tp_meter counter underflow
+ during
+ shutdown
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177914882239.2018613.11265100133321410962.git-patchwork-notify@kernel.org>
+Date: Tue, 19 May 2026 00:00:22 +0000
+References: <20260515095540.325586-2-sw@simonwunderlich.de>
+In-Reply-To: <20260515095540.325586-2-sw@simonwunderlich.de>
+To: Simon Wunderlich <sw@simonwunderlich.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ b.a.t.m.a.n@lists.open-mesh.org, rakukuip@gmail.com, stable@kernel.org,
+ yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+ bird@lzu.edu.cn, n05ec@lzu.edu.cn, sven@narfation.org
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-289206-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,lists.open-mesh.org,gmail.com,lzu.edu.cn,narfation.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289205-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,vger.kernel.org,tencent.com];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: E6F8A57549C
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,narfation.org:email]
+X-Rspamd-Queue-Id: 2567257557A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 18, 2026 at 11:34=E2=80=AFPM Stanislav Fomichev
-<sdf.kernel@gmail.com> wrote:
->
-> On 05/18, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Add two if statements to accurately isolate bpf timestamping and so
-> > timestamping. They can work respectively.
-> >
-> > As to so_timestamping, only add a loose condition via report flags
-> > to avoid duplicate strict checks that is done in tcp_recv_timestamp()
-> > and performance impact. If the loose condition is hit,
-> > tcp_recv_timestamp() is able to handle the exact case and doesn't
-> > hamper the existing timestamping feature.
-> >
-> > Make it work in TCP protocol.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  net/ipv4/tcp.c | 14 ++++++++++++--
-> >  1 file changed, 12 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index 21ece4c71612..64c69bb3578a 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -2949,8 +2949,18 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *=
-msg, size_t len, int flags)
-> >       release_sock(sk);
-> >
-> >       if ((cmsg_flags | msg->msg_get_inq) && ret >=3D 0) {
-> > -             if (cmsg_flags & TCP_CMSG_TS)
-> > -                     tcp_recv_timestamp(msg, sk, &tss);
-> > +             if (cmsg_flags & TCP_CMSG_TS) {
-> > +                     u32 tsflags =3D READ_ONCE(sk->sk_tsflags);
-> > +
-> > +                     if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
-> > +                         SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_RX_TIMESTAM=
-PING))
-> > +                             bpf_skops_rx_timestamping(sk, &tss,
-> > +                                                       BPF_SOCK_OPS_TS=
-TAMP_RCV_CB);
->
-> What about tcp_zc_finalize_rx_tstamp? Do you not want the rx tstamp for
-> tcp rx zc?
+Hello:
 
-Zerocopy support should not be complicated, I suppose. Let me find a
-benchmark to test it locally.
+This series was applied to netdev/net.git (main)
+by Sven Eckelmann <sven@narfation.org>:
 
-Thanks,
-Jason
+On Fri, 15 May 2026 11:55:26 +0200 you wrote:
+> From: Luxiao Xu <rakukuip@gmail.com>
+> 
+> batadv_tp_sender_shutdown() unconditionally decrements the "sending"
+> atomic counter. If multiple paths (e.g. timeout, user cancel, and
+> normal finish) call this function, the counter can underflow to -1.
+> 
+> Since the sender logic treats any non-zero value as "still sending",
+> a negative value causes the sender kthread to loop indefinitely.
+> This leads to a use-after-free when the interface is removed while
+> the zombie thread is still active.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,01/14] batman-adv: fix tp_meter counter underflow during shutdown
+    https://git.kernel.org/netdev/net/c/94f3b133168d
+  - [net,02/14] batman-adv: tp_meter: fix tp_vars reference leak in receiver shutdown
+    https://git.kernel.org/netdev/net/c/77098e4bea37
+  - [net,03/14] batman-adv: tt: reject oversized local TVLV buffers
+    https://git.kernel.org/netdev/net/c/1e9fab756f83
+  - [net,04/14] batman-adv: tt: fix negative tt_buff_len
+    https://git.kernel.org/netdev/net/c/b64963a2ceeb
+  - [net,05/14] batman-adv: tt: fix negative last_changeset_len
+    https://git.kernel.org/netdev/net/c/fc92cdfcb295
+  - [net,06/14] batman-adv: tt: fix TOCTOU race for reported vlans
+    https://git.kernel.org/netdev/net/c/94d27005016b
+  - [net,07/14] batman-adv: tt: avoid empty VLAN responses
+    https://git.kernel.org/netdev/net/c/fa1bd704940b
+  - [net,08/14] batman-adv: tt: prevent TVLV entry number overflow
+    https://git.kernel.org/netdev/net/c/99d9958fa10f
+  - [net,09/14] batman-adv: fix fragment reassembly length accounting
+    https://git.kernel.org/netdev/net/c/9cd3f16c320b
+  - [net,10/14] batman-adv: clear current gateway during teardown
+    https://git.kernel.org/netdev/net/c/a340a51ed801
+  - [net,11/14] batman-adv: dat: handle forward allocation error
+    https://git.kernel.org/netdev/net/c/2d8826a2d365
+  - [net,12/14] batman-adv: tp_meter: avoid use of uninit sender vars
+    https://git.kernel.org/netdev/net/c/6c65cf23d4c6
+  - [net,13/14] batman-adv: frag: disallow unicast fragment in fragment
+    https://git.kernel.org/netdev/net/c/bc62216dc8e2
+  - [net,14/14] batman-adv: tp_meter: directly shut down timer on cleanup
+    https://git.kernel.org/netdev/net/c/d5487249a81e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
