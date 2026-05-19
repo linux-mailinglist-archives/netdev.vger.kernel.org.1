@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-289556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJbcI/ugDGq8jwUAu9opvQ
-	(envelope-from <netdev+bounces-289556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 19:42:19 +0200
+	id iKbqCSShDGq8jwUAu9opvQ
+	(envelope-from <netdev+bounces-289557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 19:43:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC8115833E2
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 19:42:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95DA558341D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 19:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B1B75301230E
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 17:39:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5EC3F300A503
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 17:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2EA34388D;
-	Tue, 19 May 2026 17:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE95343884;
+	Tue, 19 May 2026 17:39:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17782343881;
-	Tue, 19 May 2026 17:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674E134388D;
+	Tue, 19 May 2026 17:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779212366; cv=none; b=RrrTqqyKDFR3Ip/9gULt+730/JqGvFdM1Sn1dVI9ES3mDpi+a8OowdJL68dSpCC67udVKcjXg4J5hRPBeIrxzd2yryLo/2MvqYf6CvrSkTwGA+KdoQNtU/BogN5hJhVffOwv8AfKh+Jl05RJB505gZtz9BIbjok53QAEwWx+UCg=
+	t=1779212377; cv=none; b=M9egEe9/su24QZliTk4Yn5FwglKaPTFDq6kpR8yafGdHxuPGlmeTMpnVvlNT2BBP977I4Z8s4quHTgWizWCSG7+ak+7q2e2iS9AYdT+coPK6F1YQuZoE5WnlRE3FapOYySrUE6g/7tJZQV5ag148vHuqwc9vbYogyy3msZuCjfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779212366; c=relaxed/simple;
-	bh=N4OtNAdWlZgaE7/poB009/CC73sbOkq7Flnl8pCeaQM=;
+	s=arc-20240116; t=1779212377; c=relaxed/simple;
+	bh=es4WBaWaKuPWr8PRkzEli5klze8Y1SRaMJT36sbcJF8=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FCujeTNqTcyaoTZd6DSGY1a5iItgx/97YspM8xKHoQ1qGO4KedJF5VyR93nVJwTym+6dY+NsuycfAkJ5McM7qJ4MFXCDKWTJhORWzRDInCljOBl4lQ88EBoX8mVVOATs6+TiGzfIhtmWjjVc3H9Bs9WVVBMu2f4c018uUcfl29U=
+	 Content-Type:Content-Disposition:In-Reply-To; b=QpN6LT0Hpi8UDH3vEDKAFT+zsHojEF5V3QNKVeYTj8vpnY5zW+SuaGMXE/skjdV7zBQZq1FR33UB88qE6Yj4dRF/oktgDAgyEFLBm+FIr2e8sk2URSBtb5Im8q5DRAysZ5C9Ds1JOCVH8CBbquDgzqAv0Cw7pIlkya+eqjdAduE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -36,9 +36,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wPOPX-000000001fH-0dym;
-	Tue, 19 May 2026 17:39:19 +0000
-Date: Tue, 19 May 2026 18:39:16 +0100
+	id 1wPOPk-000000001fa-25kO;
+	Tue, 19 May 2026 17:39:32 +0000
+Date: Tue, 19 May 2026 18:39:29 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -47,8 +47,9 @@ To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 4/5] net: dsa: mxl862xx: add support for SerDes ports
-Message-ID: <8e05a9259d5fce99cea733fdbb2785294c3a53d7.1779203863.git.daniel@makrotopia.org>
+Subject: [PATCH net-next 5/5] net: dsa: mxl862xx: add SerDes ethtool
+ statistics
+Message-ID: <5e8391488f4dbf23133d16ceaf1b168b39304c97.1779203863.git.daniel@makrotopia.org>
 References: <cover.1779203863.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -66,7 +67,7 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289556-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289557-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -84,812 +85,286 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,makrotopia.org:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,st.link:url]
-X-Rspamd-Queue-Id: CC8115833E2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,makrotopia.org:mid,makrotopia.org:email]
+X-Rspamd-Queue-Id: 95DA558341D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The MxL862xx has two XPCS/SerDes interfaces (XPCS0 for ports 9-12,
-XPCS1 for ports 13-16). Each can operate in various single-lane modes
-(SGMII, 1000BASE-X, 2500BASE-X, 10GBASE-R, 10GBASE-KR, USXGMII) or as
-QSGMII or 10G_QXGMII providing four sub-ports per interface.
+Expose SerDes equalization and signal detect parameters as ethtool
+statistics on ports 9-16 (XPCS-backed ports). Uses the XPCS EQ_GET
+and SIGNAL_DETECT firmware commands to read TX/RX equalization
+coefficients, DFE taps, and link-level signal status.
 
-Implement phylink PCS operations using the firmware's XPCS API:
-
-  - pcs_config: configure negotiation mode and CL37/SGMII advertising.
-  - pcs_get_state: read link/speed/duplex/LPA from firmware and decode
-    using phylink's standard CL37, SGMII, and USXGMII decoders, with
-    firmware-resolved speed/duplex override for downshift detection.
-  - pcs_an_restart: restart CL37 or CL73 auto-negotiation.
-  - pcs_link_up: force speed/duplex for SGMII.
-  - pcs_inband_caps: report per-mode in-band status capabilities.
-
-Register a PCS instance for each SerDes interface and
-QSGMII/10G_QXGMII sub-ports during setup. Advertise the supported
-interface modes in phylink_get_caps based on port number.
-
-Lacking support for expressing PHY-side role modes in Linux only the
-MAC-side of SGMII, QSGMII, USXGMII and 10G_QXGMII are implemented for
-now.
+The 19 additional stats (serdes_tx_*, serdes_rx_*, serdes_pma_link,
+serdes_link_fault, serdes_in_reset) are appended after the standard
+RMON counters and gated on firmware >= 1.0.84.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/mxl862xx/mxl862xx-api.h     | 302 +++++++++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-cmd.h     |   9 +
- drivers/net/dsa/mxl862xx/mxl862xx-phylink.c | 306 +++++++++++++++++++-
- drivers/net/dsa/mxl862xx/mxl862xx-phylink.h |  10 +
- drivers/net/dsa/mxl862xx/mxl862xx.c         |   6 +-
- drivers/net/dsa/mxl862xx/mxl862xx.h         |  22 ++
- 6 files changed, 652 insertions(+), 3 deletions(-)
+ drivers/net/dsa/mxl862xx/mxl862xx-api.h     | 90 ++++++++++++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-cmd.h     |  2 +
+ drivers/net/dsa/mxl862xx/mxl862xx-phylink.c | 93 +++++++++++++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-phylink.h |  3 +
+ drivers/net/dsa/mxl862xx/mxl862xx.c         |  6 +-
+ 5 files changed, 193 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-api.h b/drivers/net/dsa/mxl862xx/mxl862xx-api.h
-index fb21ddc1bf1c..6e332c99b245 100644
+index 6e332c99b245..4cd5d3f0b266 100644
 --- a/drivers/net/dsa/mxl862xx/mxl862xx-api.h
 +++ b/drivers/net/dsa/mxl862xx/mxl862xx-api.h
-@@ -1366,4 +1366,306 @@ struct mxl862xx_rmon_port_cnt {
- 	__le64 tx_good_bytes;
+@@ -1668,4 +1668,94 @@ struct mxl862xx_xpcs_reset_cfg {
+ 	__le16 result;
  } __packed;
  
 +/**
-+ * enum mxl862xx_xpcs_if_mode - XPCS interface mode
-+ * @MXL862XX_XPCS_IF_SGMII: SGMII
-+ * @MXL862XX_XPCS_IF_1000BASEX: 1000BASE-X
-+ * @MXL862XX_XPCS_IF_2500BASEX: 2500BASE-X
-+ * @MXL862XX_XPCS_IF_USXGMII: USXGMII (single or quad)
-+ * @MXL862XX_XPCS_IF_10GBASER: 10GBASE-R
-+ * @MXL862XX_XPCS_IF_10GKR: 10GBASE-KR
-+ * @MXL862XX_XPCS_IF_5GBASER: 5GBASE-R
-+ * @MXL862XX_XPCS_IF_QSGMII: QSGMII
++ * struct mxl862xx_xpcs_eq_item - single equalization parameter
++ * @value: current initial value
++ * @ovrd: override value
++ * @ovrd_en: override enable flag
 + */
-+enum mxl862xx_xpcs_if_mode {
-+	MXL862XX_XPCS_IF_SGMII = 0,
-+	MXL862XX_XPCS_IF_1000BASEX = 1,
-+	MXL862XX_XPCS_IF_2500BASEX = 2,
-+	MXL862XX_XPCS_IF_USXGMII = 3,
-+	MXL862XX_XPCS_IF_10GBASER = 4,
-+	MXL862XX_XPCS_IF_10GKR = 5,
-+	MXL862XX_XPCS_IF_5GBASER = 6,
-+	MXL862XX_XPCS_IF_QSGMII = 7,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_neg_mode - PCS negotiation mode
-+ * @MXL862XX_XPCS_NEG_NONE: no inband negotiation
-+ * @MXL862XX_XPCS_NEG_INBAND_AN_OFF: inband selected but AN disabled
-+ * @MXL862XX_XPCS_NEG_INBAND_AN_ON: inband with AN enabled
-+ */
-+enum mxl862xx_xpcs_neg_mode {
-+	MXL862XX_XPCS_NEG_NONE = 0,
-+	MXL862XX_XPCS_NEG_INBAND_AN_OFF = 1,
-+	MXL862XX_XPCS_NEG_INBAND_AN_ON = 2,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_role - PCS protocol role
-+ * @MXL862XX_XPCS_ROLE_MAC: local end is MAC side (TX_CONFIG = 0)
-+ * @MXL862XX_XPCS_ROLE_PHY: local end is PHY side (TX_CONFIG = 1)
-+ *
-+ * Selects the role the XPCS plays in protocols that have an asymmetric
-+ * AN code word (Cisco SGMII / QSGMII / USXGMII). Drives
-+ * VR_MII_AN_CTRL.TX_CONFIG: 0 means the local end receives the partner's
-+ * AN word, 1 means it sources one. Ignored for symmetric protocols
-+ * (1000BASE-X, 2500BASE-X, 10GBASE-R/KR).
-+ */
-+enum mxl862xx_xpcs_role {
-+	MXL862XX_XPCS_ROLE_MAC = 0,
-+	MXL862XX_XPCS_ROLE_PHY = 1,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_usx_lane_mode - USXGMII lane mode
-+ * @MXL862XX_XPCS_USX_SINGLE: single USXGMII lane
-+ * @MXL862XX_XPCS_USX_QUAD: quad USXGMII (4 ports per lane)
-+ */
-+enum mxl862xx_xpcs_usx_lane_mode {
-+	MXL862XX_XPCS_USX_SINGLE = 0,
-+	MXL862XX_XPCS_USX_QUAD = 1,
-+};
-+
-+/**
-+ * union mxl862xx_xpcs_an_word - XPCS AN code word, tagged by interface mode
-+ * @cl37: 16-bit base-page word exchanged over the CL37 hardware AN path
-+ *        (SR_MII_AN_ADV on write, SR_MII_LP_BABL on read). Carries the
-+ *        802.3 CL37 base page for 1000BASE-X/2500BASE-X and the Cisco
-+ *        SGMII config word for SGMII/QSGMII.
-+ * @usx: USXGMII 16-bit AN code word, MDIO_USXGMII_* layout
-+ * @cl73: CL73 48-bit base page (10GBASE-KR), three 16-bit registers per
-+ *        802.3 Annex 28C
-+ * @cl73.adv1: CL73 SR_AN_ADV1 / SR_AN_LP_ABL1
-+ * @cl73.adv2: CL73 SR_AN_ADV2 / SR_AN_LP_ABL2
-+ * @cl73.adv3: CL73 SR_AN_ADV3 / SR_AN_LP_ABL3
-+ *
-+ * The host picks the right member based on the interface field of the
-+ * surrounding struct (and, for the asymmetric protocols, on the role).
-+ */
-+union mxl862xx_xpcs_an_word {
-+	__le16 cl37;
-+	__le16 usx;
-+	struct {
-+		__le16 adv1;
-+		__le16 adv2;
-+		__le16 adv3;
-+	} cl73;
++struct mxl862xx_xpcs_eq_item {
++	u8 value;
++	u8 ovrd;
++	u8 ovrd_en;
 +} __packed;
 +
 +/**
-+ * enum mxl862xx_xpcs_speed - PCS speed values
-+ * @MXL862XX_XPCS_SPEED_UNKNOWN: unknown speed
-+ * @MXL862XX_XPCS_SPEED_10: 10 Mbps
-+ * @MXL862XX_XPCS_SPEED_100: 100 Mbps
-+ * @MXL862XX_XPCS_SPEED_1000: 1000 Mbps
-+ * @MXL862XX_XPCS_SPEED_2500: 2500 Mbps
-+ * @MXL862XX_XPCS_SPEED_5000: 5000 Mbps
-+ * @MXL862XX_XPCS_SPEED_10000: 10000 Mbps
++ * struct mxl862xx_xpcs_tx_eq_info - TX equalization status
++ * @main: TX main cursor (0-63)
++ * @pre: TX pre-cursor (0-63)
++ * @post: TX post-cursor (0-63)
++ * @iboost_lvl: TX iboost level (0-15)
++ * @vboost_lvl: TX vboost level (0-7)
++ * @vboost_en: TX vboost enable (0-1)
 + */
-+enum mxl862xx_xpcs_speed {
-+	MXL862XX_XPCS_SPEED_UNKNOWN = 0,
-+	MXL862XX_XPCS_SPEED_10 = 10,
-+	MXL862XX_XPCS_SPEED_100 = 100,
-+	MXL862XX_XPCS_SPEED_1000 = 1000,
-+	MXL862XX_XPCS_SPEED_2500 = 2500,
-+	MXL862XX_XPCS_SPEED_5000 = 5000,
-+	MXL862XX_XPCS_SPEED_10000 = 10000,
-+};
++struct mxl862xx_xpcs_tx_eq_info {
++	struct mxl862xx_xpcs_eq_item main;
++	struct mxl862xx_xpcs_eq_item pre;
++	struct mxl862xx_xpcs_eq_item post;
++	struct mxl862xx_xpcs_eq_item iboost_lvl;
++	struct mxl862xx_xpcs_eq_item vboost_lvl;
++	struct mxl862xx_xpcs_eq_item vboost_en;
++} __packed;
 +
 +/**
-+ * enum mxl862xx_xpcs_duplex - PCS duplex mode
-+ * @MXL862XX_XPCS_DUPLEX_HALF: half duplex
-+ * @MXL862XX_XPCS_DUPLEX_FULL: full duplex
++ * struct mxl862xx_xpcs_rx_eq_info - RX equalization status
++ * @att_lvl: RX attenuation level (0-7)
++ * @vga1_gain: RX VGA1 gain (0-7)
++ * @vga2_gain: RX VGA2 gain (0-7)
++ * @ctle_boost: RX CTLE boost (0-31)
++ * @ctle_pole: RX CTLE pole (0-3)
++ * @dfe_tap1: RX DFE tap1 (0-255)
++ * @dfe_bypass: RX DFE bypass (0-1)
++ * @adapt_mode: RX adapt mode (0-3)
++ * @adapt_sel: RX adapt select (0-1)
 + */
-+enum mxl862xx_xpcs_duplex {
-+	MXL862XX_XPCS_DUPLEX_HALF = 0,
-+	MXL862XX_XPCS_DUPLEX_FULL = 1,
-+};
++struct mxl862xx_xpcs_rx_eq_info {
++	struct mxl862xx_xpcs_eq_item att_lvl;
++	struct mxl862xx_xpcs_eq_item vga1_gain;
++	struct mxl862xx_xpcs_eq_item vga2_gain;
++	struct mxl862xx_xpcs_eq_item ctle_boost;
++	struct mxl862xx_xpcs_eq_item ctle_pole;
++	struct mxl862xx_xpcs_eq_item dfe_tap1;
++	struct mxl862xx_xpcs_eq_item dfe_bypass;
++	struct mxl862xx_xpcs_eq_item adapt_mode;
++	struct mxl862xx_xpcs_eq_item adapt_sel;
++} __packed;
 +
 +/**
-+ * enum mxl862xx_xpcs_loopback_mode - XPCS loopback mode
-+ * @MXL862XX_XPCS_LB_DISABLE: disable all loopback
-+ * @MXL862XX_XPCS_LB_PCS_SERIAL: PCS TX-to-RX serial loopback
-+ * @MXL862XX_XPCS_LB_PCS_PARALLEL: PCS RX-to-TX parallel loopback
-+ * @MXL862XX_XPCS_LB_PMA_SERIAL: PMA TX-to-RX serial loopback
-+ * @MXL862XX_XPCS_LB_PMA_PARALLEL: PMA RX-to-TX parallel loopback
++ * struct mxl862xx_xpcs_eq_get - EQ get request/response
++ * @port_id: XPCS port index (0 or 1)
++ * @result: firmware result
++ * @tx: TX equalization info
++ * @rx: RX equalization info
 + */
-+enum mxl862xx_xpcs_loopback_mode {
-+	MXL862XX_XPCS_LB_DISABLE = 0,
-+	MXL862XX_XPCS_LB_PCS_SERIAL = 1,
-+	MXL862XX_XPCS_LB_PCS_PARALLEL = 2,
-+	MXL862XX_XPCS_LB_PMA_SERIAL = 3,
-+	MXL862XX_XPCS_LB_PMA_PARALLEL = 4,
-+};
++struct mxl862xx_xpcs_eq_get {
++	u8 port_id;
++	__le16 result;
++	struct mxl862xx_xpcs_tx_eq_info tx;
++	struct mxl862xx_xpcs_rx_eq_info rx;
++} __packed;
 +
 +/**
-+ * enum mxl862xx_xpcs_reset_type - XPCS reset type
-+ * @MXL862XX_XPCS_RESET_VR: vendor-specific reset (fast)
-+ * @MXL862XX_XPCS_RESET_SOFT: PCS soft reset
-+ * @MXL862XX_XPCS_RESET_HARD: full hardware reset
-+ */
-+enum mxl862xx_xpcs_reset_type {
-+	MXL862XX_XPCS_RESET_VR = 0,
-+	MXL862XX_XPCS_RESET_SOFT = 1,
-+	MXL862XX_XPCS_RESET_HARD = 2,
-+};
-+
-+/**
-+ * struct mxl862xx_xpcs_pcs_cfg - PCS configuration parameters
-+ * @port_id: XPCS port index (0-3)
-+ * @interface: PCS interface mode. See &enum mxl862xx_xpcs_if_mode
-+ * @neg_mode: PCS negotiation mode. See &enum mxl862xx_xpcs_neg_mode
-+ * @permit_pause: Allow pause to MAC
-+ * @usx_lane_mode: USXGMII lane mode.
-+ *                 See &enum mxl862xx_xpcs_usx_lane_mode
-+ * @role: PCS protocol role. See &enum mxl862xx_xpcs_role
++ * struct mxl862xx_xpcs_signal_detect - signal detect status
++ * @port_id: XPCS port index (0 or 1)
++ * @rx_signal: RX signal detected
++ * @pma_link: PMA link up
++ * @link_fault: PCS link fault
++ * @in_reset: XPCS in reset
 + * @__rsv: reserved
-+ * @advertising: AN code word the local end transmits. The active union
-+ *               member is selected by @interface (and, for the asymmetric
-+ *               protocols, by @role). Ignored when the local end does
-+ *               not transmit an AN word (role=MAC for SGMII/QSGMII/
-+ *               USXGMII, 10GBASE-R, 5GBASE-R) or when @neg_mode is not
-+ *               INBAND_AN_ON. Pass all-zero to keep the firmware default
-+ *               advertisement.
-+ * @result: Firmware result. >0 means the host must follow with an AN
-+ *          restart, 0 means no host follow-up is needed, <0 is an errno.
++ * @__pad: padding
++ * @result: firmware result
 + */
-+struct mxl862xx_xpcs_pcs_cfg {
++struct mxl862xx_xpcs_signal_detect {
 +	u8 port_id:2;
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 neg_mode:2; /* enum mxl862xx_xpcs_neg_mode */
-+	u8 permit_pause:1;
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 role:1; /* enum mxl862xx_xpcs_role */
++	u8 rx_signal:1;
++	u8 pma_link:1;
++	u8 link_fault:1;
++	u8 in_reset:1;
 +	u8 __rsv:2;
-+	union mxl862xx_xpcs_an_word advertising;
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_pcs_state - PCS link state
-+ * @port_id: XPCS port index (0-3) (input)
-+ * @interface: PCS interface mode (input).
-+ *             See &enum mxl862xx_xpcs_if_mode
-+ * @usx_lane_mode: USX lane mode (input)
-+ * @usx_subport: USX sub-port 0-3 (input)
-+ * @link: Link up (1) / down (0) (output)
-+ * @an_complete: Auto-negotiation complete (output)
-+ * @duplex: Duplex mode (output). See &enum mxl862xx_xpcs_duplex
-+ * @pcs_fault: PCS fault (output)
-+ * @pause: Pause negotiation result, bit 0 symmetric, bit 1 asymmetric
-+ *         (output)
-+ * @lp_eee_cap: Link partner supports EEE (output)
-+ * @lp_eee_cs_cap: Link partner supports EEE clock-stop (output)
-+ * @__rsv: reserved
-+ * @__pad: padding
-+ * @speed: Resolved speed (output). See &enum mxl862xx_xpcs_speed
-+ * @lpa: Link partner ability word (output). Same union as
-+ *       &union mxl862xx_xpcs_an_word; the host picks the member based on
-+ *       @interface.
-+ */
-+struct mxl862xx_xpcs_pcs_state {
-+	u8 port_id:2;
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 usx_subport:2;
-+	u8 link:1;
-+	u8 an_complete:1;
-+	u8 duplex:1; /* enum mxl862xx_xpcs_duplex */
-+	u8 pcs_fault:1;
-+	u8 pause:2;
-+	u8 lp_eee_cap:1;
-+	u8 lp_eee_cs_cap:1;
-+	u8 __rsv:4;
 +	u8 __pad;
-+	__le16 speed; /* enum mxl862xx_xpcs_speed */
-+	union mxl862xx_xpcs_an_word lpa;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_pcs_disable - PCS disable parameters
-+ * @port_id: XPCS port index
-+ * @__pad: padding
-+ * @result: Firmware result. 0 on success, <0 on error.
-+ *
-+ * Asserts IDDQ + PHY + XPCS resets to power down the SERDES when the
-+ * port is admin-down or no module is plugged in. The next PCS config
-+ * implicitly powers it back up and reprograms the desired interface.
-+ */
-+struct mxl862xx_xpcs_pcs_disable {
-+	u8 port_id;
-+	u8 __pad;
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_an_restart - AN restart parameters
-+ * @port_id: XPCS port index (0-3)
-+ * @interface: PCS interface mode. See &enum mxl862xx_xpcs_if_mode
-+ * @usx_lane_mode: USX lane mode
-+ * @__rsv: reserved
-+ * @result: Firmware result. 0 on success, <0 on error.
-+ *
-+ * Restarts auto-negotiation on the given XPCS port. The SERDES must
-+ * already be configured.
-+ */
-+struct mxl862xx_xpcs_an_restart {
-+	u8 port_id:2;
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 __rsv:6;
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_pcs_link_up - PCS link-up parameters
-+ * @port_id: XPCS port index (0-3)
-+ * @interface: PCS interface mode. See &enum mxl862xx_xpcs_if_mode
-+ * @duplex: Duplex mode. See &enum mxl862xx_xpcs_duplex
-+ * @usx_lane_mode: USX lane mode (USXGMII only; ignored otherwise).
-+ *                 See &enum mxl862xx_xpcs_usx_lane_mode
-+ * @usx_subport: USX sub-port 0-3 (QUSXGMII only; ignored otherwise)
-+ * @__rsv0: reserved
-+ * @speed: Resolved speed. See &enum mxl862xx_xpcs_speed
-+ * @result: Firmware result. 0 on success, <0 is errno.
-+ *
-+ * Called once per link-up event after the host has resolved the
-+ * line-side speed/duplex (from the PHY's read_status, from a preceding
-+ * PCS get-state, or from a fixed-link description).
-+ */
-+struct mxl862xx_xpcs_pcs_link_up {
-+	u8 port_id:2;
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 duplex:1; /* enum mxl862xx_xpcs_duplex */
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 usx_subport:2;
-+	u8 __rsv0:3;
-+	__le16 speed; /* enum mxl862xx_xpcs_speed */
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_loopback_cfg - loopback control
-+ * @port_id: XPCS port index
-+ * @mode: loopback mode. See &enum mxl862xx_xpcs_loopback_mode
-+ * @result: firmware result
-+ */
-+struct mxl862xx_xpcs_loopback_cfg {
-+	u8 port_id;
-+	u8 mode; /* enum mxl862xx_xpcs_loopback_mode */
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_reset_cfg - XPCS reset
-+ * @port_id: XPCS port index
-+ * @reset_type: reset type. See &enum mxl862xx_xpcs_reset_type
-+ * @result: firmware result
-+ */
-+struct mxl862xx_xpcs_reset_cfg {
-+	u8 port_id;
-+	u8 reset_type; /* enum mxl862xx_xpcs_reset_type */
 +	__le16 result;
 +} __packed;
 +
  #endif /* __MXL862XX_API_H */
 diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-index f1ea40aa7ea0..c87a955c13c4 100644
+index c87a955c13c4..f6fa32bac5d8 100644
 --- a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
 +++ b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-@@ -24,6 +24,7 @@
- #define MXL862XX_SS_MAGIC		0x1600
- #define GPY_GPY2XX_MAGIC		0x1800
- #define SYS_MISC_MAGIC			0x1900
-+#define MXL862XX_XPCS_MAGIC		0x1a00
+@@ -79,6 +79,8 @@
+ #define MXL862XX_XPCS_PCS_LINK_UP	(MXL862XX_XPCS_MAGIC + 0x7)
+ #define MXL862XX_XPCS_LOOPBACK		(MXL862XX_XPCS_MAGIC + 0x8)
+ #define MXL862XX_XPCS_RESET		(MXL862XX_XPCS_MAGIC + 0x9)
++#define MXL862XX_XPCS_EQ_GET		(MXL862XX_XPCS_MAGIC + 0xc)
++#define MXL862XX_XPCS_SIGNAL_DETECT	(MXL862XX_XPCS_MAGIC + 0xd)
  
- #define MXL862XX_COMMON_CFGGET		(MXL862XX_COMMON_MAGIC + 0x9)
- #define MXL862XX_COMMON_CFGSET		(MXL862XX_COMMON_MAGIC + 0xa)
-@@ -71,6 +72,14 @@
- 
- #define SYS_MISC_FW_VERSION		(SYS_MISC_MAGIC + 0x2)
- 
-+#define MXL862XX_XPCS_PCS_CONFIG	(MXL862XX_XPCS_MAGIC + 0x1)
-+#define MXL862XX_XPCS_PCS_GET_STATE	(MXL862XX_XPCS_MAGIC + 0x2)
-+#define MXL862XX_XPCS_PCS_DISABLE	(MXL862XX_XPCS_MAGIC + 0x4)
-+#define MXL862XX_XPCS_AN_RESTART	(MXL862XX_XPCS_MAGIC + 0x5)
-+#define MXL862XX_XPCS_PCS_LINK_UP	(MXL862XX_XPCS_MAGIC + 0x7)
-+#define MXL862XX_XPCS_LOOPBACK		(MXL862XX_XPCS_MAGIC + 0x8)
-+#define MXL862XX_XPCS_RESET		(MXL862XX_XPCS_MAGIC + 0x9)
-+
  #define MMD_API_MAXIMUM_ID		0x7fff
  
- #endif /* __MXL862XX_CMD_H */
 diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
-index f17c429d1f1d..f99c69984357 100644
+index f99c69984357..c5ee07a444e9 100644
 --- a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
 +++ b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
-@@ -11,6 +11,9 @@
- #include <net/dsa.h>
- 
- #include "mxl862xx.h"
-+#include "mxl862xx-api.h"
-+#include "mxl862xx-cmd.h"
-+#include "mxl862xx-host.h"
- #include "mxl862xx-phylink.h"
- 
- void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
-@@ -19,8 +22,306 @@ void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
- 	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 |
- 				   MAC_100 | MAC_1000 | MAC_2500FD;
- 
--	__set_bit(PHY_INTERFACE_MODE_INTERNAL,
--		  config->supported_interfaces);
-+	switch (port) {
-+	case 1 ... 8:
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+			  config->supported_interfaces);
-+		break;
-+	case 9:
-+	case 13:
-+		__set_bit(PHY_INTERFACE_MODE_SGMII, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_2500BASEX, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10GBASER, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10GKR, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_USXGMII, config->supported_interfaces);
-+		fallthrough;
-+	case 10 ... 12:
-+	case 14 ... 16:
-+		__set_bit(PHY_INTERFACE_MODE_QSGMII, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, config->supported_interfaces);
+@@ -351,3 +351,96 @@ const struct phylink_mac_ops mxl862xx_phylink_mac_ops = {
+ 	.mac_link_up = mxl862xx_phylink_mac_link_up,
+ 	.mac_select_pcs = mxl862xx_phylink_mac_select_pcs,
+ };
 +
-+		break;
-+	default:
-+		break;
-+	}
++/* --- SerDes ethtool statistics --- */
 +
-+	if (port == 9 || port == 13)
-+		config->mac_capabilities |= MAC_10000FD | MAC_5000FD;
-+}
-+
-+static struct mxl862xx_pcs *pcs_to_mxl862xx_pcs(struct phylink_pcs *pcs)
-+{
-+	return container_of(pcs, struct mxl862xx_pcs, pcs);
-+}
-+
-+static int mxl862xx_xpcs_if_mode(phy_interface_t interface)
-+{
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+		return MXL862XX_XPCS_IF_SGMII;
-+	case PHY_INTERFACE_MODE_QSGMII:
-+		return MXL862XX_XPCS_IF_QSGMII;
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+		return MXL862XX_XPCS_IF_1000BASEX;
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		return MXL862XX_XPCS_IF_2500BASEX;
-+	case PHY_INTERFACE_MODE_USXGMII:
-+	case PHY_INTERFACE_MODE_10G_QXGMII:
-+		return MXL862XX_XPCS_IF_USXGMII;
-+	case PHY_INTERFACE_MODE_10GBASER:
-+		return MXL862XX_XPCS_IF_10GBASER;
-+	case PHY_INTERFACE_MODE_10GKR:
-+		return MXL862XX_XPCS_IF_10GKR;
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
-+static int mxl862xx_xpcs_neg_mode(unsigned int neg_mode)
-+{
-+	if (!(neg_mode & PHYLINK_PCS_NEG_INBAND))
-+		return MXL862XX_XPCS_NEG_NONE;
-+	if (neg_mode & PHYLINK_PCS_NEG_ENABLED)
-+		return MXL862XX_XPCS_NEG_INBAND_AN_ON;
-+	return MXL862XX_XPCS_NEG_INBAND_AN_OFF;
-+}
-+
-+static void mxl862xx_pcs_disable(struct phylink_pcs *pcs)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_pcs_disable dis = {};
-+
-+	if (mpcs->slot != 0)
-+		return;
-+
-+	dis.port_id = mpcs->serdes_id;
-+
-+	MXL862XX_API_WRITE(priv, MXL862XX_XPCS_PCS_DISABLE, dis);
-+}
-+
-+static int mxl862xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+			       phy_interface_t interface,
-+			       const unsigned long *advertising,
-+			       bool permit_pause_to_mac)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_pcs_cfg cfg = {};
-+	int if_mode, ret;
-+	u16 adv;
-+
-+	if (mpcs->slot != 0)
-+		return 0;
-+
-+	if_mode = mxl862xx_xpcs_if_mode(interface);
-+	if (if_mode < 0) {
-+		dev_err(priv->ds->dev, "unsupported interface: %s\n",
-+			phy_modes(interface));
-+		return if_mode;
-+	}
-+
-+	mpcs->if_mode = if_mode;
-+
-+	cfg.port_id = mpcs->serdes_id;
-+	cfg.usx_lane_mode = (interface == PHY_INTERFACE_MODE_10G_QXGMII) ?
-+			    MXL862XX_XPCS_USX_QUAD : MXL862XX_XPCS_USX_SINGLE;
-+	cfg.interface = if_mode;
-+	cfg.neg_mode = mxl862xx_xpcs_neg_mode(neg_mode);
-+	cfg.role = MXL862XX_XPCS_ROLE_MAC;
-+	cfg.permit_pause = permit_pause_to_mac ? 1 : 0;
-+
-+	if (neg_mode & PHYLINK_PCS_NEG_INBAND) {
-+		switch (interface) {
-+		case PHY_INTERFACE_MODE_1000BASEX:
-+		case PHY_INTERFACE_MODE_2500BASEX:
-+			adv = linkmode_adv_to_mii_adv_x(advertising,
-+				ETHTOOL_LINK_MODE_1000baseX_Full_BIT);
-+			cfg.advertising.cl37 = cpu_to_le16(adv);
-+			break;
-+		case PHY_INTERFACE_MODE_SGMII:
-+		case PHY_INTERFACE_MODE_QSGMII:
-+			cfg.advertising.cl37 = cpu_to_le16(ADVERTISE_SGMII);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	ret = MXL862XX_API_READ(priv, MXL862XX_XPCS_PCS_CONFIG, cfg);
-+	if (ret)
-+		return ret;
-+
-+	return le16_to_cpu(cfg.result) > 0 ? 1 : 0;
-+}
-+
-+static void mxl862xx_pcs_get_state(struct phylink_pcs *pcs,
-+				   unsigned int neg_mode,
-+				   struct phylink_link_state *state)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_pcs_state st = {};
-+	int if_mode, ret;
-+	u16 bmsr;
-+
-+	if_mode = mxl862xx_xpcs_if_mode(state->interface);
-+	if (if_mode < 0)
-+		return;
-+
-+	st.port_id = mpcs->serdes_id;
-+	st.interface = if_mode;
-+	st.usx_subport = mpcs->slot;
-+
-+	ret = MXL862XX_API_READ(priv, MXL862XX_XPCS_PCS_GET_STATE, st);
-+	if (ret)
-+		return;
-+
-+	state->link = st.link && !st.pcs_fault;
-+	state->an_complete = st.an_complete;
-+
-+	switch (state->interface) {
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+	case PHY_INTERFACE_MODE_SGMII:
-+	case PHY_INTERFACE_MODE_QSGMII:
-+		bmsr = (state->link ? BMSR_LSTATUS : 0) |
-+		       (state->an_complete ? BMSR_ANEGCOMPLETE : 0);
-+		phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr,
-+						 le16_to_cpu(st.lpa.cl37));
-+		break;
-+
-+	case PHY_INTERFACE_MODE_USXGMII:
-+	case PHY_INTERFACE_MODE_10G_QXGMII:
-+		if (state->link)
-+			phylink_decode_usxgmii_word(state,
-+						    le16_to_cpu(st.lpa.usx));
-+		break;
-+
-+	case PHY_INTERFACE_MODE_10GBASER:
-+	case PHY_INTERFACE_MODE_10GKR:
-+		if (state->link) {
-+			state->speed = SPEED_10000;
-+			state->duplex = DUPLEX_FULL;
-+		}
-+		break;
-+
-+	default:
-+		state->link = false;
-+		break;
-+	}
-+}
-+
-+static void mxl862xx_pcs_an_restart(struct phylink_pcs *pcs)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_an_restart an = {};
-+
-+	if (mpcs->slot != 0)
-+		return;
-+
-+	an.port_id = mpcs->serdes_id;
-+	an.interface = mpcs->if_mode;
-+
-+	MXL862XX_API_WRITE(priv, MXL862XX_XPCS_AN_RESTART, an);
-+}
-+
-+static void mxl862xx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
-+				 phy_interface_t interface, int speed,
-+				 int duplex)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_pcs_link_up lu = {};
-+	int if_mode;
-+
-+	if (mpcs->slot != 0)
-+		return;
-+
-+	if_mode = mxl862xx_xpcs_if_mode(interface);
-+	if (if_mode < 0)
-+		return;
-+
-+	lu.port_id = mpcs->serdes_id;
-+	lu.interface = if_mode;
-+	lu.duplex = (duplex == DUPLEX_FULL) ? MXL862XX_XPCS_DUPLEX_FULL :
-+					      MXL862XX_XPCS_DUPLEX_HALF;
-+	lu.speed = cpu_to_le16(speed);
-+
-+	MXL862XX_API_WRITE(priv, MXL862XX_XPCS_PCS_LINK_UP, lu);
-+}
-+
-+static unsigned int mxl862xx_pcs_inband_caps(struct phylink_pcs *pcs,
-+					     phy_interface_t interface)
-+{
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+	case PHY_INTERFACE_MODE_QSGMII:
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
-+	case PHY_INTERFACE_MODE_USXGMII:
-+	case PHY_INTERFACE_MODE_10G_QXGMII:
-+	case PHY_INTERFACE_MODE_10GKR:
-+		return LINK_INBAND_ENABLE;
-+	case PHY_INTERFACE_MODE_10GBASER:
-+		return LINK_INBAND_DISABLE;
-+	default:
-+		return 0;
-+	}
-+}
-+
-+static const struct phylink_pcs_ops mxl862xx_pcs_ops = {
-+	.pcs_disable = mxl862xx_pcs_disable,
-+	.pcs_config = mxl862xx_pcs_config,
-+	.pcs_get_state = mxl862xx_pcs_get_state,
-+	.pcs_an_restart = mxl862xx_pcs_an_restart,
-+	.pcs_link_up = mxl862xx_pcs_link_up,
-+	.pcs_inband_caps = mxl862xx_pcs_inband_caps,
++static const char mxl862xx_serdes_stats[][ETH_GSTRING_LEN] = {
++	"serdes_tx_main",
++	"serdes_tx_pre",
++	"serdes_tx_post",
++	"serdes_tx_iboost",
++	"serdes_tx_vboost",
++	"serdes_tx_vboost_en",
++	"serdes_rx_att",
++	"serdes_rx_vga1",
++	"serdes_rx_vga2",
++	"serdes_rx_ctle_boost",
++	"serdes_rx_ctle_pole",
++	"serdes_rx_dfe_tap1",
++	"serdes_rx_dfe_bypass",
++	"serdes_rx_adapt_mode",
++	"serdes_rx_adapt_sel",
++	"serdes_rx_signal",
++	"serdes_pma_link",
++	"serdes_link_fault",
++	"serdes_in_reset",
 +};
 +
-+void mxl862xx_setup_pcs(struct mxl862xx_priv *priv, struct mxl862xx_pcs *pcs,
-+			int port)
++static bool mxl862xx_port_has_serdes_stats(struct dsa_switch *ds, int port)
 +{
-+	pcs->priv = priv;
-+	pcs->serdes_id = MXL862XX_SERDES_PORT_ID(port);
-+	pcs->slot = MXL862XX_SERDES_SLOT(port);
++	struct mxl862xx_priv *priv = ds->priv;
 +
-+	pcs->pcs.ops = &mxl862xx_pcs_ops;
-+	pcs->pcs.poll = true;
-+
-+	__set_bit(PHY_INTERFACE_MODE_QSGMII, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, pcs->pcs.supported_interfaces);
-+	if (pcs->slot != 0)
-+		return;
-+
-+	__set_bit(PHY_INTERFACE_MODE_SGMII, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_1000BASEX, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_2500BASEX, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_10GBASER, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_10GKR, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_USXGMII, pcs->pcs.supported_interfaces);
++	return port >= 9 && port <= 16 &&
++	       MXL862XX_FW_VER_MIN(priv, 1, 0, 84);
 +}
 +
-+static struct phylink_pcs *
-+mxl862xx_phylink_mac_select_pcs(struct phylink_config *config,
-+				phy_interface_t interface)
++int mxl862xx_serdes_stats_count(struct dsa_switch *ds, int port)
 +{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct mxl862xx_priv *priv = dp->ds->priv;
-+	int port = dp->index;
++	if (mxl862xx_port_has_serdes_stats(ds, port))
++		return ARRAY_SIZE(mxl862xx_serdes_stats);
 +
-+	if (!MXL862XX_FW_VER_MIN(priv, 1, 0, 84))
-+		return NULL;
++	return 0;
++}
 +
-+	switch (port) {
-+	case 9 ... 16:
-+		return &priv->serdes_ports[port - 9].pcs;
-+	default:
-+		return NULL;
++void mxl862xx_serdes_get_strings(struct dsa_switch *ds, int port, u8 *data)
++{
++	int i;
++
++	if (!mxl862xx_port_has_serdes_stats(ds, port))
++		return;
++
++	for (i = 0; i < ARRAY_SIZE(mxl862xx_serdes_stats); i++)
++		ethtool_puts(&data, mxl862xx_serdes_stats[i]);
++}
++
++void mxl862xx_serdes_get_stats(struct dsa_switch *ds, int port, u64 *data)
++{
++	struct mxl862xx_xpcs_eq_get eq = {
++		.port_id = MXL862XX_SERDES_PORT_ID(port),
++	};
++	struct mxl862xx_xpcs_signal_detect sig = {};
++
++	if (!mxl862xx_port_has_serdes_stats(ds, port))
++		return;
++
++	sig.port_id = MXL862XX_SERDES_PORT_ID(port);
++
++	if (!MXL862XX_API_READ(ds->priv, MXL862XX_XPCS_EQ_GET, eq)) {
++		*data++ = eq.tx.main.value;
++		*data++ = eq.tx.pre.value;
++		*data++ = eq.tx.post.value;
++		*data++ = eq.tx.iboost_lvl.value;
++		*data++ = eq.tx.vboost_lvl.value;
++		*data++ = eq.tx.vboost_en.value;
++		*data++ = eq.rx.att_lvl.value;
++		*data++ = eq.rx.vga1_gain.value;
++		*data++ = eq.rx.vga2_gain.value;
++		*data++ = eq.rx.ctle_boost.value;
++		*data++ = eq.rx.ctle_pole.value;
++		*data++ = eq.rx.dfe_tap1.value;
++		*data++ = eq.rx.dfe_bypass.value;
++		*data++ = eq.rx.adapt_mode.value;
++		*data++ = eq.rx.adapt_sel.value;
++	} else {
++		data += 15;
 +	}
- }
- 
- static void mxl862xx_phylink_mac_config(struct phylink_config *config,
-@@ -48,4 +349,5 @@ const struct phylink_mac_ops mxl862xx_phylink_mac_ops = {
- 	.mac_config = mxl862xx_phylink_mac_config,
- 	.mac_link_down = mxl862xx_phylink_mac_link_down,
- 	.mac_link_up = mxl862xx_phylink_mac_link_up,
-+	.mac_select_pcs = mxl862xx_phylink_mac_select_pcs,
- };
++
++	if (!MXL862XX_API_READ(ds->priv, MXL862XX_XPCS_SIGNAL_DETECT, sig)) {
++		*data++ = sig.rx_signal;
++		*data++ = sig.pma_link;
++		*data++ = sig.link_fault;
++		*data++ = sig.in_reset;
++	} else {
++		data += 4;
++	}
++}
 diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
-index c3d5215bdf60..54a4c652ec5a 100644
+index 54a4c652ec5a..82cc3817adc1 100644
 --- a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
 +++ b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
-@@ -7,8 +7,18 @@
- 
- #include "mxl862xx.h"
- 
-+#define MXL862XX_SERDES_SLOT(port) \
-+	(((port) - MXL862XX_FIRST_SERDES_PORT) % MXL862XX_SERDES_SLOTS)
-+#define MXL862XX_SERDES_PORT_ID(port) \
-+	(((port) - MXL862XX_FIRST_SERDES_PORT) / MXL862XX_SERDES_SLOTS)
-+#define MXL862XX_PCS_PORT(mpcs) \
-+	(MXL862XX_FIRST_SERDES_PORT + \
-+	 (mpcs)->serdes_id * MXL862XX_SERDES_SLOTS + (mpcs)->slot)
-+
- extern const struct phylink_mac_ops mxl862xx_phylink_mac_ops;
- void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
+@@ -20,5 +20,8 @@ void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
  			       struct phylink_config *config);
-+void mxl862xx_setup_pcs(struct mxl862xx_priv *priv, struct mxl862xx_pcs *pcs,
-+			int port);
+ void mxl862xx_setup_pcs(struct mxl862xx_priv *priv, struct mxl862xx_pcs *pcs,
+ 			int port);
++int mxl862xx_serdes_stats_count(struct dsa_switch *ds, int port);
++void mxl862xx_serdes_get_strings(struct dsa_switch *ds, int port, u8 *data);
++void mxl862xx_serdes_get_stats(struct dsa_switch *ds, int port, u64 *data);
  
  #endif /* __MXL862XX_PHYLINK_H */
 diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
-index 0b1a23364eb5..0af41efccbc6 100644
+index 0af41efccbc6..a18e42b9cd6b 100644
 --- a/drivers/net/dsa/mxl862xx/mxl862xx.c
 +++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
-@@ -622,7 +622,7 @@ static int mxl862xx_setup(struct dsa_switch *ds)
- 	int n_user_ports = 0, max_vlans;
- 	int ingress_finals, vid_rules;
- 	struct dsa_port *dp;
--	int ret;
-+	int ret, i;
+@@ -1776,6 +1776,8 @@ static void mxl862xx_get_strings(struct dsa_switch *ds, int port,
  
- 	ret = mxl862xx_reset(priv);
- 	if (ret)
-@@ -632,6 +632,10 @@ static int mxl862xx_setup(struct dsa_switch *ds)
- 	if (ret)
- 		return ret;
- 
-+	for (i = 0; i < ARRAY_SIZE(priv->serdes_ports); i++)
-+		mxl862xx_setup_pcs(priv, &priv->serdes_ports[i],
-+				   i + MXL862XX_FIRST_SERDES_PORT);
+ 	for (i = 0; i < ARRAY_SIZE(mxl862xx_mib); i++)
+ 		ethtool_puts(&data, mxl862xx_mib[i].name);
 +
- 	/* Calculate Extended VLAN block sizes.
- 	 * With VLAN Filter handling VID membership checks:
- 	 *   Ingress: only final catchall rules (PVID insertion, 802.1Q
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.h b/drivers/net/dsa/mxl862xx/mxl862xx.h
-index 79fd32c4db4e..1c75bb078a9a 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx.h
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx.h
-@@ -11,6 +11,9 @@
- struct mxl862xx_priv;
++	mxl862xx_serdes_get_strings(ds, port, data);
+ }
  
- #define MXL862XX_MAX_PORTS		17
-+#define MXL862XX_FIRST_SERDES_PORT	9
-+#define MXL862XX_SERDES_SLOTS		4
-+
- #define MXL862XX_DEFAULT_BRIDGE		0
- #define MXL862XX_MAX_BRIDGES		48
- #define MXL862XX_MAX_BRIDGE_PORTS	128
-@@ -242,6 +245,22 @@ struct mxl862xx_port {
- 	spinlock_t stats_lock; /* protects stats accumulators */
- };
+ static int mxl862xx_get_sset_count(struct dsa_switch *ds, int port, int sset)
+@@ -1783,7 +1785,7 @@ static int mxl862xx_get_sset_count(struct dsa_switch *ds, int port, int sset)
+ 	if (sset != ETH_SS_STATS)
+ 		return 0;
  
-+/**
-+ * struct mxl862xx_pcs - link SerDes interfaces to bridge ports
-+ * @pcs:       &struct phylink_pcs instance
-+ * @priv:      pointer to &struct mxl862xx_priv
-+ * @serdes_id: SerDes instance index (0 or 1)
-+ * @slot:      slot within the SerDes (0-3 for QSGMII/QUSXGMII, 0 otherwise)
-+ * @if_mode:   cached firmware interface mode (enum mxl862xx_xpcs_if_mode)
-+ */
-+struct mxl862xx_pcs {
-+	struct phylink_pcs pcs;
-+	struct mxl862xx_priv *priv;
-+	int serdes_id;
-+	int slot;
-+	int if_mode;
-+};
+-	return ARRAY_SIZE(mxl862xx_mib);
++	return ARRAY_SIZE(mxl862xx_mib) + mxl862xx_serdes_stats_count(ds, port);
+ }
+ 
+ static int mxl862xx_read_rmon(struct dsa_switch *ds, int port,
+@@ -1819,6 +1821,8 @@ static void mxl862xx_get_ethtool_stats(struct dsa_switch *ds, int port,
+ 		else
+ 			*data++ = le64_to_cpu(*(__le64 *)field);
+ 	}
 +
- /**
-  * union mxl862xx_fw_version - firmware version for comparison and display
-  * @major: firmware major version
-@@ -293,6 +312,8 @@ union mxl862xx_fw_version {
-  *                      flooding)
-  * @fw_version:         cached firmware version, populated at probe and
-  *                      compared with MXL862XX_FW_VER_MIN()
-+ * @serdes_ports:       SerDes interfaces incl. sub-interfaces in case of
-+ *                      10G_QXGMII or QSGMII
-  * @ports:              per-port state, indexed by switch port number
-  * @bridges:            maps DSA bridge number to firmware bridge ID;
-  *                      zero means no firmware bridge allocated for that
-@@ -311,6 +332,7 @@ struct mxl862xx_priv {
- 	unsigned long flags;
- 	u16 drop_meter;
- 	union mxl862xx_fw_version fw_version;
-+	struct mxl862xx_pcs serdes_ports[8];
- 	struct mxl862xx_port ports[MXL862XX_MAX_PORTS];
- 	u16 bridges[MXL862XX_MAX_BRIDGES + 1];
- 	u16 evlan_ingress_size;
++	mxl862xx_serdes_get_stats(ds, port, data);
+ }
+ 
+ static void mxl862xx_get_eth_mac_stats(struct dsa_switch *ds, int port,
 -- 
 2.54.0
 
