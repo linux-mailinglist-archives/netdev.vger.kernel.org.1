@@ -1,218 +1,161 @@
-Return-Path: <netdev+bounces-289576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AD5OFLuoDGoIkgUAu9opvQ
-	(envelope-from <netdev+bounces-289576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:15:23 +0200
+	id 0FzEGD+pDGoIkgUAu9opvQ
+	(envelope-from <netdev+bounces-289578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:17:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F6258382E
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:15:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 047C9583874
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8C83C304F411
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:13:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4F00E303A4E0
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4EC03446CB;
-	Tue, 19 May 2026 18:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76A7366823;
+	Tue, 19 May 2026 18:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKmJex/8"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="YQcA+QlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BCE342510
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 18:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8F535C1A9;
+	Tue, 19 May 2026 18:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779214421; cv=none; b=YFjfVmaWLA5BqArX2XAUNgyrlVAMHaFDoYLi1VPua+oqw5ACUZG6da9Jg37OQu+OlfU3m1NjvGHO9UWIg3EoNK/WoVqzYlb9G+jEn+Lw6Mk4D1ZD3KXAp2veK9L+MctznMRKgb9n9N1t0TjQi8p5bCzW29P6AaBOThEUDGzM/O4=
+	t=1779214653; cv=none; b=EwPW4WdzfH4JYSmRYUsF7Z+cn435UlRYhHDCuPYc566tN7cIbTOaS1fCSS4P9sMiwZkqnvti99CDD0w2yYuPjU+vBDeLIL0ezyNTCj5uhZNPs95Aw7e+yzNa28nSVsCqKmE5oHJbCjSbzPfeAPLIaGRYqbxZTWK0t9F9iwqIkxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779214421; c=relaxed/simple;
-	bh=QdNRFe0vIqkka4xbbVpTimo0ga8a86tcP8wKsinRgWY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nlk+27P/mDnYmQxcgmQIVwIJRsVd3Zf+wPYxF34BKN5n1yusYRwb6fgOISV5OKKSeHZCd8qyjjE/rAwtsln9BI2YrBkb6h8TXqlQXB5o2M0ph0PRnDKHqq5yx8HcpjkzNmPHxpJ9TkELL0n4qYYq4d7MFX4USaeJCTIo5FUWIXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKmJex/8; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7bde9d73678so37561147b3.0
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 11:13:38 -0700 (PDT)
+	s=arc-20240116; t=1779214653; c=relaxed/simple;
+	bh=tzDMwVPvKGOjTE4ixRbRU/Ng8o6AM2WQTjKsIjZQFJk=;
+	h=MIME-Version:Content-Type:Subject:From:To:CC:In-Reply-To:
+	 References:Date:Message-ID; b=DBu6zA7g8dmoJnCDO3ZSq1zxtu14BzeB13UNmZOAn8ipxsbDH2L9son/s8XZH4IxMtE+kcUr+fqchlVJ7/0ruWxnevwpAdThtKZxGZLVM/22zqFzIZF2mvLQTweN6U/Kxzt7m13qLNvNIFDH7WK+iau+MOJ+qnhRHcge5hansbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=YQcA+QlD; arc=none smtp.client-ip=52.34.181.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779214417; x=1779819217; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PlP5n46PN41L6jV72akk3EQSHatEAlv9HooAnPxWzak=;
-        b=EKmJex/8i1GBWWvXOPSm2HahWM4x41pa1zK9bkzrWaYgwpe43+lU65MutAupvqS+JK
-         pbaSUgzx+p6jc1319wcqlZMbsgZC9FNvPua1z2jnWGrOi08r38aVswVTOcGezw+hBf9S
-         IviGlJf7VUU3giDGdG4uyN7qkLau2DqFCzbOe9xbwwVIQKSSFaa1GieKQSH/2t/qaOmI
-         R7uugDAjMXX7uBXdzw+dAAlZFZAMA2y6MPGaQ+kYwHEyrQTFpORVleOjFrGqiCilqxDo
-         RSOHkhYw/C3Yw1a6nqr+E/a9t8z26GmkIGij1I+TNA4cCnoMh2dmlggvHhULZptG7G7e
-         g7bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779214417; x=1779819217;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PlP5n46PN41L6jV72akk3EQSHatEAlv9HooAnPxWzak=;
-        b=jsNdl/i3W3huF1An3lcvWEGKzzhZCD27ynZIdBtdPnsgzfXNg/fomsD9pJz+pmrRkM
-         2hyvKzb/iGn3XWoyWYUKBQLM8oeiplhTbP8LjGQUMN7OE55SJamjP3A+Z+Nh6TInOxPF
-         qAqXnYJDn/yupapil8LUNCXBUutTEO937QNnrwxC/3erSyQpjeOcjlDfld9pYxvjkCEB
-         XJ3tyC/Yn0LzCoyg7RCjGj8px7AQHBtB38vBtoq5Ktk2jcrxhF929saQpzpEt9QRln7a
-         VHERNm+hNcD10IgSogLHHkb+OfwOKzbljnh0aylqFh6S+8EwDmbuaZlF3dNP6j/VIdGn
-         KDxg==
-X-Gm-Message-State: AOJu0Yyf4TrQEvo6N1ZQAjh0so7padqTlf+vDTmotrD81Yz+Hu3p5jCA
-	sUcXubv0BZLY3uSSDFPkIGk/W+S/K3Ynpqlst3CgzqME7dXrYppVyXiM
-X-Gm-Gg: Acq92OHByOXvAxXMXljQKyNRoc3LItIxAZWn5FHynbg8cIufBRyKseZaoYswOtbyPT3
-	Sz/dX983E/LoRsElqcOjI+eiQuwi7+WSnxBbJx0mQJVF8rkVa2rXj67ukMurKE+9mHT1uYkmyWX
-	a/2JWSULI+qUQPpxg3FlUu+siy8p1VadScwQmI5Lt0Rs9cBOfN2giN07ME9bJiYDiZUl5yK1TdS
-	XKKkfWO8I0tM16Q8ntPSWyBRDhkjLV+2np0pc+Nn9w8dhIpEFt9O5E3X59FCAvZIUDOT5OLAWU7
-	pKV/JuqzCIZyFLxSQmBOXIrdS9LFB4yhmlb3U5W+69GIj2OYlz/fUOH0FriwBrj+LkH4wi8Fog9
-	UvJRvYljyA0ABwz4KzKG/czXjsNglg1/ZVnCstGYq4MBniYjW8FD9hyHp0Oz85Twh7JjYOj0bLC
-	inusygi3Cc0D+Iiy0U2lPB5DfVMedLQ96iPg==
-X-Received: by 2002:a05:690c:c4e8:b0:7bf:1433:8f92 with SMTP id 00721157ae682-7c7e5d9034amr210208817b3.7.1779214417481;
-        Tue, 19 May 2026 11:13:37 -0700 (PDT)
-Received: from localhost ([2a03:2880:f806::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc9c6ce2f4sm40449947b3.39.2026.05.19.11.13.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 11:13:37 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	memxor@gmail.com,
-	martin.lau@kernel.org,
-	mykyta.yatsenko5@gmail.com,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v5 14/14] selftests/bpf: Test using file dynptr after the reference on file is dropped
-Date: Tue, 19 May 2026 11:13:12 -0700
-Message-ID: <20260519181314.2731658-15-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260519181314.2731658-1-ameryhung@gmail.com>
-References: <20260519181314.2731658-1-ameryhung@gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1779214652; x=1810750652;
+  h=mime-version:content-transfer-encoding:subject:from:to:
+   cc:in-reply-to:references:date:message-id;
+  bh=OKxzwZZVaRVGRqfji1EVdehMm8SP7oMFaDJplS5Kw8w=;
+  b=YQcA+QlDzLZFIdiq31qu91BbnunNTz8Y49RHkgsKXRqILR99Zr7hzyLg
+   aJmMtuifLP5gFDIlXjWLzY/MhBhevRxlguH6amppeDLUGZWI45gBpObZP
+   i/8jtZ+0ryePZThqN8yngVsRn/TGCYPqbWgNVCqBSnfXz+FO+ptFyZ6FF
+   bLq5qu68ZiXok3s3reqdiWxINHqQnRMSSl8DWroUvLUHj8BJe+EyYqal1
+   hGFAU4aT9fz9y57syp23spiG1oPAFnVYJ/RJ3IaTuU7qlSjN7t9totWo4
+   DJskd47aIZLZg1LZj1MKm4jE+NPvqqB0EgZnqMUqu2GMfuExmuEbWEXS8
+   g==;
+X-CSE-ConnectionGUID: CyMblZmIQhOQgI+JAEjVLw==
+X-CSE-MsgGUID: gKfVhmdiTAu2n/mSBGJGNA==
+X-IronPort-AV: E=Sophos;i="6.23,243,1770595200"; 
+   d="scan'208";a="19999748"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2026 18:17:28 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:16348]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.131:2525] with esmtp (Farcaster)
+ id fbcd1353-b887-4d25-9afd-ce86c04d0305; Tue, 19 May 2026 18:17:28 +0000 (UTC)
+X-Farcaster-Flow-ID: fbcd1353-b887-4d25-9afd-ce86c04d0305
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Tue, 19 May 2026 18:17:27 +0000
+Received: from dev-dsk-akiyano-1c-2138b29d.eu-west-1.amazon.com (172.19.83.6)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Tue, 19 May 2026 18:17:23 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH v3 net-next 0/7] ptp: Add PHC timestamp quality
+ attributes
+From: Arthur Kiyanovski <akiyano@amazon.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Arthur Kiyanovski <akiyano@amazon.com>, David Miller
+	<davem@davemloft.net>, <netdev@vger.kernel.org>, Richard Cochran
+	<richardcochran@gmail.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, David Woodhouse <dwmw2@infradead.org>, Thomas Gleixner
+	<tglx@linutronix.de>, Miroslav Lichvar <mlichvar@redhat.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Wen Gu <guwen@linux.alibaba.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, David Woodhouse <dwmw@amazon.com>, "Yonatan
+ Sarna" <ysarna@amazon.com>, Zorik Machulsky <zorik@amazon.com>, "Alexander
+ Matushevsky" <matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, Matt
+ Wilson <msw@amazon.com>, Anthony Liguori <aliguori@amazon.com>, Nafea Bshara
+	<nafea@amazon.com>, Evgeny Schmeilin <evgenys@amazon.com>, Netanel Belgazal
+	<netanel@amazon.com>, Ali Saidi <alisaidi@amazon.com>, Benjamin Herrenschmidt
+	<benh@amazon.com>, Noam Dagan <ndagan@amazon.com>, David Arinzon
+	<darinzon@amazon.com>, Evgeny Ostrovsky <evostrov@amazon.com>, Ofir Tabachnik
+	<ofirt@amazon.com>, Amit Bernstein <amitbern@amazon.com>,
+	<linux-kselftest@vger.kernel.org>, <shuah@kernel.org>,
+	<vadim.fedorenko@linux.dev>
+In-Reply-To: <20260518182646.2d1337d4@kernel.org>
+References: <20260515164033.6403-1-akiyano@amazon.com>
+ <20260518182646.2d1337d4@kernel.org>
+Date: Tue, 19 May 2026 18:17:16 +0000
+Message-ID: <177921463623.22936.15326822041328476600.b4-reply@b4>
+X-Mailer: b4 0.15.2
+X-ClientProxiedBy: EX19D041UWA003.ant.amazon.com (10.13.139.105) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-Spamd-Result: default: False [-7.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289578-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289576-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_NONE(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	FROM_NEQ_ENVFROM(0.00)[akiyano@amazon.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[amazon.com,davemloft.net,vger.kernel.org,gmail.com,google.com,redhat.com,infradead.org,linutronix.de,lunn.ch,linux.alibaba.com,kernel.org,linux.dev];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 10F6258382E
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 047C9583874
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-File dynptr and slice should be invalidated when the parent file's
-reference is dropped in the program. Without the verifier tracking
-dyntpr's parent referenced object, the dynptr would continute to be
-incorrectly used even if the underlying file is being tear down or gone.
+On 2026-05-18 18:26:46-07:00, Jakub Kicinski wrote:
+> On Fri, 15 May 2026 16:40:20 +0000 Arthur Kiyanovski wrote:
+> 
+> > This series adds quality attributes to PTP Hardware Clock (PHC)
+> > timestamps, allowing userspace to obtain error bound, clock status,
+> > timescale, and raw counter values alongside timestamps in a single
+> > call.
+> 
+> How does this proposal relate to:
+> 
+> https://lore.kernel.org/all/20260517220326.4625-9-dwmw2@infradead.org/
+> 
+> ?
+The two series are independent and complementary. This patchset adds a
+generic PTP subsystem interface for reporting quality attributes (error
+bounds, clock status) alongside PHC timestamps — it's a userspace-facing
+API extension. The RFC is about kernel-internal feed-forward clock
+discipline, letting the timekeeping subsystem lock directly to a vmclock
+reference.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../selftests/bpf/progs/file_reader_fail.c    | 60 +++++++++++++++++++
- 1 file changed, 60 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/progs/file_reader_fail.c b/tools/testing/selftests/bpf/progs/file_reader_fail.c
-index 0739620dea8a..d5fae5e4cf9a 100644
---- a/tools/testing/selftests/bpf/progs/file_reader_fail.c
-+++ b/tools/testing/selftests/bpf/progs/file_reader_fail.c
-@@ -50,3 +50,63 @@ int xdp_no_dynptr_type(struct xdp_md *xdp)
- 	bpf_dynptr_file_discard(&dynptr);
- 	return 0;
- }
-+
-+SEC("lsm/file_open")
-+__failure
-+__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
-+int use_file_dynptr_after_put_file(void *ctx)
-+{
-+	struct task_struct *task = bpf_get_current_task_btf();
-+	struct file *file = bpf_get_task_exe_file(task);
-+	struct bpf_dynptr dynptr;
-+	char buf[64];
-+
-+	if (!file)
-+		return 0;
-+
-+	if (bpf_dynptr_from_file(file, 0, &dynptr))
-+		goto out;
-+
-+	/* this should fail - file dynptr should be discarded first to prevent resource leak */
-+	bpf_put_file(file);
-+
-+	bpf_dynptr_read(buf, sizeof(buf), &dynptr, 0, 0);
-+	return 0;
-+
-+out:
-+	bpf_dynptr_file_discard(&dynptr);
-+	bpf_put_file(file);
-+	return 0;
-+}
-+
-+SEC("lsm/file_open")
-+__failure
-+__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
-+int use_file_dynptr_slice_after_put_file(void *ctx)
-+{
-+	struct task_struct *task = bpf_get_current_task_btf();
-+	struct file *file = bpf_get_task_exe_file(task);
-+	struct bpf_dynptr dynptr;
-+	char *data;
-+
-+	if (!file)
-+		return 0;
-+
-+	if (bpf_dynptr_from_file(file, 0, &dynptr))
-+		goto out;
-+
-+	data = bpf_dynptr_data(&dynptr, 0, 1);
-+	if (!data)
-+		goto out;
-+
-+	/* this should fail - file dynptr should be discarded first to prevent resource leak */
-+	bpf_put_file(file);
-+
-+	*data = 'x';
-+	return 0;
-+
-+out:
-+	bpf_dynptr_file_discard(&dynptr);
-+	bpf_put_file(file);
-+	return 0;
-+}
--- 
-2.53.0-Meta
+Both touch ptp_vmclock.c but in different code paths: this series adds a
+gettimexattrs64 callback for PTP chardev ioctls, the RFC adds
+timekeeping_set_reference() for kernel-internal clock steering. No
+functional dependency or overlap.
 
 
