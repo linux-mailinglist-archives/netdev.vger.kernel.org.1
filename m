@@ -1,133 +1,208 @@
-Return-Path: <netdev+bounces-289606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289607-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EGTPAonHDGp2lwUAu9opvQ
-	(envelope-from <netdev+bounces-289606-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 22:26:49 +0200
+	id OJT9NcLJDGrAlwUAu9opvQ
+	(envelope-from <netdev+bounces-289607-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 22:36:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE89584A8C
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 22:26:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C8F584C2A
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 22:36:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E19EB3016246
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:26:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 30037302A4C4
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:35:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560443B38BD;
-	Tue, 19 May 2026 20:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D6E3BD63B;
+	Tue, 19 May 2026 20:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nCXbCoje"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Syds0zMU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF242874E3;
-	Tue, 19 May 2026 20:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080C53BB680
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 20:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779222381; cv=none; b=KfRroTn1Hxb0XTfBoVSvyD3Nt4r2ISYXfsLI5eIdQ8/kTHAtXgRPn9caEvPfbWNwpqE6q1HwwkISCK7R55j4EdUwXhkxYpG9m+NHl3r+HYP/+g8jvoodnvf59mfks0qWSyBueUXh6O+TrEE7OazPQqGSWABC8SuR9/zckjYfWLI=
+	t=1779222937; cv=none; b=JKDl/vcpFkEwP+EIPWQ5ml3F2F6VSZn/TLS07/2ZOzKQEW304/tvzrGGtrpZOKGsWyzoV6qa4NxxpVXYtsG5aeOKkNQSsHNwupa5cxa83wYgdd9jnWwpbayF+E4aUctnsQjGAp5EXAR6tFApdhc3Zvisk/81WlByM0YWCH4aeJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779222381; c=relaxed/simple;
-	bh=l6Cn7HEELqc4tHWwQOHslAPenl93wOtMeTnsCORUAJ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aw65Zf8MaU6tY5kRQqwoAWlM1Bf2P61h34GxtR3MceU9M9YnXstNzvQTXI26HZcnmEECQoYrH56fTExW9ReRJ4AQfsJ2os4b0YE/o+iFsPW9lqeIUvv2NgeuAQQ+BqnCN+9VHskEsrQZ9CKAzfKdT/0ZFhc6mB5j67kaWHZXe1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nCXbCoje; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC411F000E9;
-	Tue, 19 May 2026 20:26:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779222379;
-	bh=1QaohRfK/Pp16YUyd3MuiVvxN0mjbrearDCh1e89Psc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=nCXbCojeCCvfKedCNiIEtV7bDjml9LlzSW/PTswikOpX+BKEjtOon3XqRqo43h2Uv
-	 ft1HVLjMOZANUWZ+PS5kcmX1dacX0SOR/My6IcNjWvMX0cJyQuqGcygoeVdNtCY82W
-	 SHHxS9KYKwYtlFDT4iLZwHQPgg8Z/WgDyVKWyz18WNhGEfz8iGkX5mkzQzplRC6r2Z
-	 8GTS8J6+DhulZLgMa0bXRmjX22Ci/r8zULR61OiDEIcAQ/hHj1eLksh5Kb43K6ycmM
-	 ysdwUC9fnNgbbl/8P5iicMt6y8F+CrbVDWRvAaZOrWLE2glpvrvSScOxd4Jx9LTgET
-	 SfePCzXTcowfg==
-Date: Tue, 19 May 2026 21:26:14 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dawei Feng <dawei.feng@seu.edu.cn>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn,
-	stable@vger.kernel.org, Zilin Guan <zilin@seu.edu.cn>
-Subject: Re: [PATCH net] octeontx2-pf: avoid double free of pool->stack on AQ
- init failure
-Message-ID: <20260519202614.GA988238@horms.kernel.org>
-References: <20260515151826.1005397-1-dawei.feng@seu.edu.cn>
+	s=arc-20240116; t=1779222937; c=relaxed/simple;
+	bh=5nJqDD/dXtl9IILNdZwN304brhy7+urj60vJWRhs4Bw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GXNjbnUxe88PJFlXShqt5kObKizR3VnscO+kLPM6g9K4WmmQZvYS53nGOqNInF331INHODl1/P6CiAQo/XeY/RVbQQBnhLA0Eq18cbbbygn0Zc6iHk4h7IInkUeR7zwoGND6Ga+EHKDPsIYqFOaTtW1EiX1jR6YV7nJ6cTijYvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Syds0zMU; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488af9fdaa7so19957745e9.1
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 13:35:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779222934; x=1779827734; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=e2iG1hz81YAuxXAiaPdaZ3OGfdkiju2FjT0lpwqJRqQ=;
+        b=Syds0zMUNLUQH1tYRXypJNoepH1zZksTSknTM4XtDa9kmqg87iNHufLDAJIy/a9xxx
+         lsegPg/0b2LYqktvO6Unryvegju0ik3q49nvfnTwsUTEZMfqnbm0t5Kn+c/gTmvOAjfL
+         A9OZ8cx8ykCfAIWwtCTzxAI9WJPTmWBhpOLn/D7yOeYB3wOC0y9p6at61my2c4PPkhXr
+         kklHwscHjEu5G+eOLdRYUO7oJcJuivtJnh3sP3Ve+SYbMVGQ9TQQzeKssET+t2186nKN
+         OfnOpTWHI0iy2RWpevHB4Ir5ra+MObQobOhb8tbTkWLrtCKdK3qDNgwZ6+PNDaTAar1K
+         V1Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779222934; x=1779827734;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e2iG1hz81YAuxXAiaPdaZ3OGfdkiju2FjT0lpwqJRqQ=;
+        b=tJauBBfH0qv9KzSqliNE2UD4d4BrOS6fs54CQszvirhTCbVwXU6pf0iyoOOyZb+HIX
+         6wb5+W1/hzcTKPsccDmLS3b9lk3abAiHS369roomt2KhC5OT4nWZR6PL8pCNdsHDfIOI
+         4qHDsWEDxzT6uu767GM1QxYFA54fSgAxi8CRtzO4O/F61oBraZ9f0joI+vcyVt6EP87E
+         ddcCcPbnvcOM5T/Gp5bOAudtenzAl5JLUkfpbjQIjFKkEUbVtPus3vhICfizAXkUYJ8A
+         EBaPODbBfMl0hApRz2CgX8drgZ7pshs12QldMp1glE0cRUD05O9KozWdpmWNEUhXZHiT
+         uQvQ==
+X-Gm-Message-State: AOJu0YyNYBxvyLtxOnI8e+R9w1jQ+rqPUaL32y8oQaCiFlbUivvjr8Az
+	fLCcJqNUIYV+He6Pr6rrRk9bIcA+SmdaZfikkIN0/l6C0bLS37uAsX1XnnZB7vTyJVY=
+X-Gm-Gg: Acq92OH2+lK30mwNA2dUcgQ4BTEQvnljJ6VJhSouerNfKJoeYbHXFYGh+5J3VuQn/x3
+	f4afX0hM10x6mrirf0kxGYIaoCXUElf7fnVC90t7ccNkuDPSBg9eb11ggsPN68TtV1P8ZCyVHt7
+	cMomqVt6egbBXzXtGIbQR9pZQcUO4ev+APK4zwV4/1e5CFaYCGCPc2+D67slyLf+ok5O6JFGluj
+	luutXwDzHzdsALe+dXORKxxZZOWv+4n3/rZUNvsjGx7yGRrNzD7WWs814e6Y0XilgZ5jbNo7gOB
+	vBiqFYEgwc0FJEuq9ED9sH7f3JvCQdyq3OzAwOtWZ9w/5qzufxk3hw9gzeqYU3vUNTGJcxHz8PJ
+	DsCC1MJYtWtJud+mg4Z2Kq9aYJfBBIapk5BVe1wlIDYLfFDRs8autI1fYruSDnm8wFFisT+Lum3
+	MahbtK0kuiJSeDbaKIvmPFIVpqdUTp07L9T4VyMWoU/UzKfJYewrgZ9feCapqN+mZdLWExDtTHI
+	8TC0xpCohU=
+X-Received: by 2002:a05:600c:5298:b0:48e:635a:18d2 with SMTP id 5b1f17b1804b1-48fe60e51d1mr328374555e9.2.1779222934041;
+        Tue, 19 May 2026 13:35:34 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4900c16c744sm177738225e9.3.2026.05.19.13.35.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 13:35:33 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: netdev@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	sdf.kernel@gmail.com,
+	kaiyuanz@google.com,
+	almasrymina@google.com,
+	bobbyeshleman@gmail.com,
+	linux-kernel@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>
+Subject: [PATCH net v2] net: devmem: reject dma-buf bind with non-page-aligned size or SG length
+Date: Tue, 19 May 2026 21:35:30 +0100
+Message-ID: <20260519203530.66310-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260515151826.1005397-1-dawei.feng@seu.edu.cn>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289606-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,fomichev.me,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-289607-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url,seu.edu.cn:email,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 7BE89584A8C
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 52C8F584C2A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, May 15, 2026 at 11:18:26PM +0800, Dawei Feng wrote:
-> otx2_pool_aq_init() frees pool->stack when mailbox sync or retry
-> allocation fails, but leaves the pointer unchanged. Later,
-> otx2_sq_aura_pool_init() unwinds the partial setup through
-> otx2_aura_pool_free(), which frees pool->stack again. The CN20K-specific
-> cn20k_pool_aq_init() implementation has the same bug in
-> its corresponding error path.
-> 
-> Set pool->stack to NULL immediately after the local free so the shared
-> cleanup path does not free the same stack again while cleaning up
-> partially initialized pool state.
-> 
-> The bug was first flagged by an experimental analysis tool we are
-> developing for kernel memory-management bugs while analyzing
-> v6.13-rc1. The tool is still under development and is not yet publicly
-> available. Manual inspection confirms that the bug is still present in
-> v7.1-rc3.
-> 
-> Runtime validation was not performed because reproducing this path
-> requires OcteonTX2/CN20K hardware.
-> 
-> Fixes: caa2da34fd25 ("octeontx2-pf: Initialize and config queues")
-> Fixes: d322fbd17203 ("octeontx2-pf: Initialize cn20k specific aura and pool contexts")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-> Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
+net_devmem_bind_dmabuf() trusts dmabuf->size and sg_dma_len() to be
+PAGE_SIZE multiples without checking:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+  - tx_vec is sized dmabuf->size / PAGE_SIZE, and
+    net_devmem_get_niov_at() only bounds-checks virt_addr < dmabuf->size
+    before indexing tx_vec[virt_addr / PAGE_SIZE]. With size =
+    N*PAGE_SIZE + r (1 <= r < PAGE_SIZE), sendmsg() at iov_base =
+    N*PAGE_SIZE passes the bound check and reads tx_vec[N] -- one past.
 
-There is an AI generated review of this patch available on sashiko.dev
-I believe the issues raised there can be considered in the context of
-possible follow-up. I do not believe they should effect the progress
-of this patch.
+  - owner->area.num_niovs = len / PAGE_SIZE while gen_pool_add_owner()
+    covers the full byte len, so a non-page-multiple non-final sg
+    desyncs num_niovs from the gen_pool region for every later sg, on
+    both RX and TX.
+
+dma-buf does not require page-aligned sizes, so the bind path has to
+enforce what its own indexing assumes. Reject both with -EINVAL.
+
+The size check is TX-only (only tx_vec is sized off dmabuf->size); the
+SG-length check covers both directions.
+
+Fixes: bd61848900bf ("net: devmem: Implement TX path")
+Cc: stable@vger.kernel.org
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+Changes in v2:
+  - Reframe commit message around the kernel-side OOB instead of
+    "real exporters already page-align", which read as the OOB being
+    unreachable and undercut Cc: stable (Stanislav Fomichev).
+  - Hoist the SG-length check out of the if (TX) branch so it covers
+    RX too; RX has the same num_niovs / gen_pool desync on a
+    contract-violating exporter, just without an OOB. Keep the
+    size-multiple check TX-only (Stanislav Fomichev).
+  - Drop bool todevice; compare direction == DMA_TO_DEVICE inline to
+    match the existing call site at the tx_vec[] assignment
+    (Bobby Eshleman).
+
+ net/core/devmem.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 468344739db2..4f71de44c0fb 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -241,6 +241,11 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 	}
+ 
+ 	if (direction == DMA_TO_DEVICE) {
++		if (!IS_ALIGNED(dmabuf->size, PAGE_SIZE)) {
++			err = -EINVAL;
++			NL_SET_ERR_MSG(extack, "TX dma-buf size must be a multiple of PAGE_SIZE");
++			goto err_unmap;
++		}
+ 		binding->tx_vec = kvmalloc_objs(struct net_iov *,
+ 						dmabuf->size / PAGE_SIZE);
+ 		if (!binding->tx_vec) {
+@@ -267,6 +272,12 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 		size_t len = sg_dma_len(sg);
+ 		struct net_iov *niov;
+ 
++		if (!IS_ALIGNED(len, PAGE_SIZE)) {
++			err = -EINVAL;
++			NL_SET_ERR_MSG(extack, "dma-buf SG length must be PAGE_SIZE aligned");
++			goto err_free_chunks;
++		}
++
+ 		owner = kzalloc_node(sizeof(*owner), GFP_KERNEL,
+ 				     dev_to_node(&dev->dev));
+ 		if (!owner) {
+-- 
+2.53.0
+
 
