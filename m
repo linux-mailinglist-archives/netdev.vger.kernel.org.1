@@ -1,204 +1,227 @@
-Return-Path: <netdev+bounces-289294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289295-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6KyvLpoMDGqFUwUAu9opvQ
-	(envelope-from <netdev+bounces-289294-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:09:14 +0200
+	id oJY/EXoNDGqFUwUAu9opvQ
+	(envelope-from <netdev+bounces-289295-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:12:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 240D9578AC5
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:09:14 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3927E578BE4
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:12:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3944330474E5
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 07:04:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C022930521E9
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 07:07:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488263B3894;
-	Tue, 19 May 2026 07:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE583B3C0A;
+	Tue, 19 May 2026 07:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pTRO3Aj2"
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="TN0ErKKY"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011014.outbound.protection.outlook.com [52.101.57.14])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [185.244.194.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F5E2874E3;
-	Tue, 19 May 2026 07:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779174262; cv=fail; b=FnoJ56jDfNytb8XNqRHjSPZi8XYOwSNTdMIeXig2yV0IHbNjLCUbOo3FiANfS22wOeOYf/Arpvx7VRQeLYhJyS8v7Rt0hfIxns2OwFYf8+yjfef4yIyKyFPfC+3c2FvGiEiX40O5NBZ2QUeeQ9EUvGfVis1KD/p5i6tqY6gj2Rw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779174262; c=relaxed/simple;
-	bh=DBlTPciHsnSbB7DUGnQhVkSRjdn5p1RAg7M9cS0E/PI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RojRLnrlVD0HgJbR0ybvUHYXiz1BSsJWyJevl5FaisM/jjufa3UoEg0alnd0iU8qMhMUcDMNNimoUvhhEB4hmRGK/sCjh/ypZWuTiG/piR9IGIJbflkXJSyb0yI9zTDCTW1kwcs5bd/fz/IWu/vrYWBluOT2yCJ7MjfTH3t6iZo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pTRO3Aj2; arc=fail smtp.client-ip=52.101.57.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TnANcKn9DOjDY6oEMHYPTBYhByxkjV3AFaupz/TLd5EnwvfdTcAu2jrvjSRSsOItRkzTTXbInpjuHUdBI5pyvwzpBIPf3LXz3f8niqOfJcTd4/+UwNe2Mti2Nb9zxN0svnX4/8lzUNp7eNChZFW0cwfNtA+pv9ojMxCfVHD6CuWFHL1XEL873PF3XL6N6mVhkzSODRb9F+XtpNJjBYwKavWyu60+QTLK7Kqus88CvfNjqyPfXTnzAroX4e9v1rDxCjuOzz7v/sCKqfS9i2mkmVVjRjjiv59W2pGpG2wFb0QwKvFAL6ghvIovlQFfSWO3q1yqdLp5gYL0DVZQhl88Ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Kpxqaq1j2+A+nTN09x4s9iZCdIsq2LB9Mzr4twCNTvg=;
- b=XjwTpNAua/cyIbh5+zAKDfLuTaZDGI4LCAbsMWFtkYLhFCLbsh6iC+h8XW3HAdKz4o4BeRvCzXnMTx/463dNVYjaF6++EDLwVllWCrZ5mxYcHgnAyRvid3A/uKH3NrBhwIWyJatRcrqgr0xPgwX3Khhtcp3BPgdOaCffpf0sjqLXWfz10jdMK2XQzKUa879T7D5L8r8o5ydX96HwFQ7dfFP8/EJeAJ1+x39Awa5QmmDC0trM3lPEavoz0iOfDxBJmoMfSbHAerr4iknjWWu30h7jtOBm/ZAAALw+v6NkDCGQMvFE9bLNO1Xq69iHbETrZWc4sloD1oV7pCfcJDzngw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kpxqaq1j2+A+nTN09x4s9iZCdIsq2LB9Mzr4twCNTvg=;
- b=pTRO3Aj2hXRjHsEhs2gN79sJYtwG+UGeLL37SM1aRoJn6W7obLWzGzMkw4DB8FnU6l4bN3I5Gty6eE89N2epN21bvCjiRlThzubvayhhvpRrXq5rtlKHiXVy/9oTXO5f4FoD53EP4MZvAz9oz7aL2L1CuPpDO7U+7Zjb0m351n881yWqit75FH55s0HOK4QbPfANXIHU0Ocds+MbcuAwAtgBtfJEPxOh6pIhQ74coAjaIPlEqIatG30NzQPwk76jys/7P9O5t21zlWe+yLPuHhuJnBOsUyMMmni9Y9dSMY1tzJMZ2j+EnobzKYZgTmvWGMF7NjtS4bO1Vj7e/Ej1LQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB6802.namprd12.prod.outlook.com (2603:10b6:303:20f::19)
- by CH3PR12MB8401.namprd12.prod.outlook.com (2603:10b6:610:130::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.24; Tue, 19 May
- 2026 07:04:13 +0000
-Received: from MW4PR12MB6802.namprd12.prod.outlook.com
- ([fe80::51f4:a3d9:b44e:9587]) by MW4PR12MB6802.namprd12.prod.outlook.com
- ([fe80::51f4:a3d9:b44e:9587%5]) with mapi id 15.21.0025.022; Tue, 19 May 2026
- 07:04:13 +0000
-Message-ID: <364bb4db-2a45-4b01-b2bc-1f6fdff937ad@nvidia.com>
-Date: Tue, 19 May 2026 10:04:03 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] selftests: net: Fix checksums in xdp_native
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Mohsin Bashir
- <mohsin.bashr@gmail.com>, Amery Hung <ameryhung@gmail.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- Carolina Jubran <cjubran@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-References: <20260513072355.1083381-1-noren@nvidia.com>
- <20260514183832.5ef205c1@kernel.org>
- <aa818076-6e5a-4b61-bc7f-0bfe3907fe2f@nvidia.com>
- <20260518143138.74839bf9@kernel.org>
-Content-Language: en-US
-From: Nimrod Oren <noren@nvidia.com>
-In-Reply-To: <20260518143138.74839bf9@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0155.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a2::16) To MW4PR12MB6802.namprd12.prod.outlook.com
- (2603:10b6:303:20f::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1223F3B388A;
+	Tue, 19 May 2026 07:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.244.194.184
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779174425; cv=none; b=GH2fM1XNas6lK4/l8AuvrpmKzDXxLgNwWkHc5srswtspF+RjKSX8iwCK2+5SlMVH9uZizfqk6C7hLDBo80UngH6JKgJCXi57sRiUAWaOrS809hZwYBF8S0wuBC3WVpgv6j+5QvlIV4xfrhKjwKap0aI71wReYQnyyF6mnccm1Io=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779174425; c=relaxed/simple;
+	bh=Kbi02mnUFXxeexEHvbh0wMhOy1M0F4jrVLISqBF8Tbw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=qj1wXz5cSyfAPUWL4wb0Lqw1Zz1iuh9bkYuaN9ZVpO99G0tnr4kyqCOcocPzxnm7wUfK1DIbLHQqkqw9y08wg1+nHYPAi2X4x7RmijEL0aWPa9JtmUJlAA0R5tyqwor+Px0Uu4T+0zFyhnl9P4RStc3aqjce3nzkA3K/mMh6nVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=TN0ErKKY; arc=none smtp.client-ip=185.244.194.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Received: from relay01-mors.netcup.net (localhost [127.0.0.1])
+	by relay01-mors.netcup.net (Postfix) with ESMTPS id 4gKQf26W0dz96MW;
+	Tue, 19 May 2026 09:04:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1779174282;
+	bh=Kbi02mnUFXxeexEHvbh0wMhOy1M0F4jrVLISqBF8Tbw=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=TN0ErKKYRQSuKIq7C2e5MFoo5n0VF25zRxXqyYU65XjDGkAfVe0Am549XQbqMtaos
+	 YqSQLVskTs1JVHz5gss6kdBZmymbqr1wk6vThOY3kAS3wlzGNmbu9fYKn5ySDrw0Ip
+	 NbottmFZFbVgOCXp4ALD0DB4YECF3MSd7d8qFFTk4fzwbbi9A2Pvdkm5xUPgj5Yq+j
+	 7H06OKrHBV+wVnTk4V3WLufpgn7S8YpeJn8nHjiy6jRkKc25p5Nraq7+9XdzVNfRbb
+	 vvH5wZsiEa6MuuI2IubYmKV4cIh3NhDlxTlF6zPsfCMfpnu/ATlKWUBedorizMKiiZ
+	 k45i9/Fgx/dfA==
+Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
+	by relay01-mors.netcup.net (Postfix) with ESMTPS id 4gKQf25nn1z7vS1;
+	Tue, 19 May 2026 09:04:42 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
+X-Spam-Flag: NO
+X-Spam-Score: -2.898
+X-Spam-Level: 
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4gKQf02kjWz8tbD;
+	Tue, 19 May 2026 09:04:40 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 573CD61840;
+	Tue, 19 May 2026 09:04:39 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
+Date: Tue, 19 May 2026 09:04:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB6802:EE_|CH3PR12MB8401:EE_
-X-MS-Office365-Filtering-Correlation-Id: a53ac3a8-4bee-42a3-ab68-08deb574d50b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|56012099003|18002099003|22082099003|11063799003|4143699003;
-X-Microsoft-Antispam-Message-Info:
-	RgZerwTYjaJh1BmiKgWcaXiECqcESNXUvsXs805Mr8nRrujhRkM274yUdyhH7k46HsvuDBoj66tH69gpDkZEidsPoyUsCkANBW/GLV1SNMJdLXh1gWmN95zwXwzTQPyXH4Vx0xWWRR7BIa34/KJTcyeps5nyIzJptYVcwtJIubTOSXNT7zryTmcwSF2GE1f+N/YBFx1MrHdVClqG8Cl66ZvXeBgRnrC93UsPzIsbwaNIwXaMcWu3/bTSTkbbu/x7tCPPmYPXhn98YVIRIq55F20R9udql/doCVxGJtPSL5CXageQxX/jQXgzrcXHezpQnrwLeS9P58erVhaFlmk42OGRIjA6iNTFLlngPkMSCnTHcqAq93UuH/O4uf4WT/bvrNFido5aeFM0eMtnl8ZHQ3gi283MoWZPJNGdE361NWzPi66UGXz6kSsCOFfHHOTbX/OXdkIoL7Vs1ksCYZKDdzjw6lbmP98Ej7TtjiyoHma0xE6cSUys+x9WdiSC+e+b2BamvaDX6cRA13N46A0WSxmpBQmUckFgFYU6/5S14rpjC8kRasADN3f5bNaxFO/af8f7yORIttY8cBvoX0hZK0V01UlB043ym+C9xQYiOEVti8pDn4lQ0zhMTqxTcpT/2DeWe5wKW9z7pPCXPJfRAl2svIFkV44kPscEMhFBgHXGWXGdzSltvJG0PafurWh5
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB6802.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(56012099003)(18002099003)(22082099003)(11063799003)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eGZkVS9GU1VRZzVSVWJldURlZ1Z0OEM5TEsyTFNUN25IZ2lXbmtFWDgvWjZo?=
- =?utf-8?B?NnhvakNTQTIwZTdZVC9QSFpBOTNlWWxlNDkvOWVjSG1sTklMcHI3SCs4RHJo?=
- =?utf-8?B?R2xsclhnbDhHRUw0M00rWWRaN0VFQjlOQ3d5WGJzVlpQVVJackJ2UHBZZmxH?=
- =?utf-8?B?SklMWXhLOGpoVG96RFh5Mm1ON2VPMEZZdThuNVhQMDFZMEZHd2xvd2tsRWw5?=
- =?utf-8?B?SVRFamZhOW9VeUlxUHhoZzI3WlF2alhLVlNNTndQc2dJazh0YndUS3N1QWhZ?=
- =?utf-8?B?K2p6a0N2RXFLdmZLaXlDTFppeDd0TVp6bDdHRzNYQVpaRDY4QzM3Rk5Ub3gv?=
- =?utf-8?B?eWs4a1NRY3c1b0FjV0RMS0paYWs3UmFpTVNCV3MvNnpsaEVpdUMzaFhvVzJ0?=
- =?utf-8?B?dmRtaWx0SzlpbWljMzFOcWtrK0sveVBUaXBQQVZPNWZFYXVQN0Y4TkgzUlV4?=
- =?utf-8?B?SGx5RXkrMXpLQ1c2MENFa3dURU4wYjRBQ2xvMnJSa3JEQ2ROdFBFQmhWV1JM?=
- =?utf-8?B?cnpmNFZrR0xKcVJBZ3pBY1hQTk10K3Y2M21oR3pyQkVsT2tIWUYwcE1PY0lR?=
- =?utf-8?B?VkVCR2xzTmU4ZHAzQUVqaURuWVczMER4N0R0cHJIY1JxVE9KanRSMUhLZmRw?=
- =?utf-8?B?MDdneXZpVys5dFp3RjNkMFY2NFhzWnNHak9CM252Tjh4SHp1dngrSkRFVlJn?=
- =?utf-8?B?TEpmQkVqQk54b1BpZXFDSGpSZWhDWlhnb0JtcEtlazd0b1dKN2hnVmp0dVhj?=
- =?utf-8?B?NDF2MEhOT3R4TEh5dmZSc2Z0UTB2TGdvQnI4WTFGYWdRN0x1cDc5R3FQeER4?=
- =?utf-8?B?YW1mMDRTZ1c1bkxVS2luRkYwK0JLMlYzZElteU5LZ1hkRWtFYVEwQld4cmpz?=
- =?utf-8?B?VzVSSnBSU3Buc284MVpNeTM1eURYNFlITUJmZlpHUFQxQy9DUzEyTzVwRXpN?=
- =?utf-8?B?bGF1TGw2UXl4dVVJVmZzcGxpYXlEWk1SaFZKNTlCQThQc3l6NGNobk9Camx0?=
- =?utf-8?B?aFdPUlZSOUdFVTEwS1JwbXJ3NTUxVEt4R1crZngzOWVFUHpkUE0vbDBLMDhW?=
- =?utf-8?B?d1lmVSsydTU0Z0NjaUNIRSsvM1lUeFQ2Unl2TXowSVRGTVRQMisrMUdTNHdH?=
- =?utf-8?B?U2tVY2IvQ0p4OE00aW9LZ3VwT0kxVWJhM0JOblAzNk1MMkI1RS8xeWhQN0RM?=
- =?utf-8?B?Nm1CSjUvajZEOVdPSGg1UHBIdkRQUm43UWIxMW5pdWN6NU1wbk9tWHFMRWFU?=
- =?utf-8?B?VjBhYm5vT0JaYlBEM3N5TUk3eklJSmVUd2dLcDZPL0RXRVp1UGVOVG9wUGRR?=
- =?utf-8?B?cGN2ek9Jc0lIMmUwWmorNUlid2VXR0hvcGpQT0lYakZubm5OTUE4dGRsTGJC?=
- =?utf-8?B?OHF3R0NHbWt1ZUtvTkx0Q3pjbU1QWldBT3E4QUdqRFAxYW45M0V3VUdtUW9W?=
- =?utf-8?B?ek1BaUVQcFdXWmxCQlVrUWJYcHV0RkNmYkhobU93c2FqOThkRGJkbVRTQnMr?=
- =?utf-8?B?QWhNRWgyeFFIdkYrd2tWa05Fbk93YkZ1dlh3YmpUR3grc0lQeDllbnFEYnJL?=
- =?utf-8?B?c0Jpc3ROdEdpTGNiKy9hNGVYeFFMbjRzYkxvaFp3UHozaE8ydWZET20rQUxr?=
- =?utf-8?B?NXc0bnFHTUlUMkxvbFVlckovTUFRS2thRUd4SVAxOG92YVFzVDhDeWhYMDlm?=
- =?utf-8?B?amxMYkZxL29rQlhaN3R2RTdxSEpJRFZuL05sU21qdTlLb2pNN1JRa2RIdmJl?=
- =?utf-8?B?SmlVTkVndzhlaXJoWEw5emhzMWdVODh6bzJ6cENMTzRkWk1RSXZNanRzRlpE?=
- =?utf-8?B?dHR1dUpzM0dqcU82eGt0S1ZncDlLbEVIdnEvNmRhQzVEaGJmSUZDTUQyRmVV?=
- =?utf-8?B?OFRoNXRJVUVCdlZ4U25Wb1dXdzNZSlN2RWtETFozaWhvMjVjR0tuSG5oY2cr?=
- =?utf-8?B?ZDJCaE5hOWlmUzJjVTQwUnV6NFFXZ2VzUmdRaWg0RFNSRjhoOFNzZlpwK3Rh?=
- =?utf-8?B?NVZmTUlNaExhbGJBVjZXa3huNkxxNlRyMFhxdk8vREJmemJwdG1xMk1GbzVT?=
- =?utf-8?B?dWFxc1U4YXJrbnJwbUVWN2ZHenBTeXR6RUJKZ0Y4d2gxWnMvSHkxUU5pckNt?=
- =?utf-8?B?anRibk42YjFCRWl2YXJIMUlpOG1CMW83ZjAvVDREa1dhK09FTFNrbTVEWTJT?=
- =?utf-8?B?YS9qWDZXMEdEVkVrUVJSL0RERGx5TlhVRjVMeVJlK3A0aHJna2t5VlVyRE1V?=
- =?utf-8?B?OSs4Y1B6djJxbG1JbjZOd1RUaGxEaTU3MmI2K3VJZldObGhPTW5vK0NUcnZK?=
- =?utf-8?Q?cFKnMQjCTgKwKVVlh/?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a53ac3a8-4bee-42a3-ab68-08deb574d50b
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB6802.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 07:04:13.0248
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JMw+vzpARIrKKuBq2ZJCV16YePfb754sIcD8juCYU43J7Eq9E5FlV0LxWBvV/sPPjgcCzSQKdx7crX7kjEgwKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8401
-X-Spamd-Result: default: False [1.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] bluetooth 2026-05-14
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+To: Greg KH <gregkh@linuxfoundation.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ Sasha Levin <sashal@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
+ kuba@kernel.org, Linux kernel regressions list
+ <regressions@lists.linux.dev>, Linus Torvalds <torvalds@linux-foundation.org>
+References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
+ <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: 
+ <177917427974.1028416.13755667585499179933@mxe9fb.netcup.net>
+X-NC-CID: DUzrp9NfZvXVLNpdroel/q9mtQMCKy5sP1vj16MOZXEFJ2YL3nM=
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,leemhuis.info:mid,leemhuis.info:dkim,fedoraproject.org:url];
+	TAGGED_FROM(0.00)[bounces-289295-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289294-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,nvidia.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[leemhuis.info];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,kernel.org,lists.linux.dev,linux-foundation.org];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[leemhuis.info:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[noren@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid]
-X-Rspamd-Queue-Id: 240D9578AC5
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 3927E578BE4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 19/05/2026 0:31, Jakub Kicinski wrote:
-> This patch needs a respin for the issues Sashiko pointed out, to be 
-> clear.
-Replied to Sashiko earlier (my reply went to sashiko-reviews and bpf
-but not netdev - oops).
+On 5/15/26 17:10, Thorsten Leemhuis wrote:
+> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
+>
+>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
+>>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
+>>
+>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
+>>
+>>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
+> 
+> It seems this PR sadly came too late for this week's net PR to mainline
+> that was merged yesterday.
+> 
+> TWIMC, from my point of view, it would be great if we somehow could
+> still get the changes from this PR or at least the btmtk fix it
+> contains[1] to mainline this week before -rc4, as it is fixing a
+> regression known since 2026-04-24 that at least five people encountered
+> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
+> validate WMT event SKB length before struct access") [006b9943b982 in
+> -next].
 
-All issues are pre-existing and harmless, so I don't think they should
-be addressed in a net fix.
+Greg, Sasha, that [1] fix I was talking about now reached -next as
+162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
+events") and will likely hit mainline on Thursday or so with the weekly
+-net PR to -mainline. If that's good enough for you, I'd say it would be
+good to pick this up for the next round of stable kernels.
+
+Ciao, Thorsten
+
+P.S.: Side note, in case anyone cares: this regression meanwhile was
+reported at least 14 times by now (only counting upstream reports, there
+are many more in various downstreams).
+
+> Another reason: Greg a few hours ago backported the culprit for the
+> regression to v7.0.7, v6.18.30, and v6.12.88, which led to a bunch of
+> other reports coming in[3]. Greg could, of course, revert it, but
+> usually he prefers to just merge the fix. But of course the fix must
+> first hit mainline (or at least -next) -- and that might only happen
+> next Thursday, as there usually is only one net PR per week. Luiz even
+> wanted to "expedite a PR to have it fixed asap"[4], but that didn't work
+> out afaics, hence this mail.
+> 
+> Ciao, Thorsten
+> 
+> [1] btmtk: accept too short WMT FUNC_CTRL events – also available here:
+> https://lore.kernel.org/all/770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi/
+> 
+> [2]
+> https://lore.kernel.org/lkml/20260508173121.27526-1-mikhail.v.gavrilov@gmail.com/
+> https://lore.kernel.org/lkml/f652d5d9841a9b7c100dd19ee97c86099f580724.camel@gmail.com/
+> https://bugzilla.kernel.org/show_bug.cgi?id=221511
+> https://lore.kernel.org/lkml/20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in/
+> https://lore.kernel.org/lkml/20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in/
+> (+ one more report in a Fedora kernel chatroom)
+> 
+> [3]
+> https://bugzilla.kernel.org/show_bug.cgi?id=221521
+> https://lore.kernel.org/lkml/51b55b97-615b-4f5e-b454-df646f4058b7@augustwikerfors.se/
+> + a four more people in
+> https://bodhi.fedoraproject.org/updates/FEDORA-2026-6b173ffc2a#comment-4646633
+> 
+> [4]
+> https://lore.kernel.org/all/CABBYNZ+FfhYtU2=J-V4pjKf_vKV=Y5LhVhxS_epKe-qaUUt8_g@mail.gmail.com/
+> 
+> 
+>> ----------------------------------------------------------------
+>> bluetooth pull request for net:
+>>
+>>  - af_bluetooth: serialize accept_q access
+>>  - L2CAP: ecred_reconfigure: send packed pdu, not stack pointer
+>>  - btmtk: accept too short WMT FUNC_CTRL events
+>>  - hci_qca: Convert timeout from jiffies to ms
+>>
+>> ----------------------------------------------------------------
+>> Jiexun Wang (1):
+>>       Bluetooth: serialize accept_q access
+>>
+>> Michael Bommarito (1):
+>>       Bluetooth: L2CAP: ecred_reconfigure: send packed pdu, not stack pointer
+>>
+>> Pauli Virtanen (1):
+>>       Bluetooth: btmtk: accept too short WMT FUNC_CTRL events
+>>
+>> Shuai Zhang (1):
+>>       Bluetooth: hci_qca: Convert timeout from jiffies to ms
+>>
+>>  drivers/bluetooth/btmtk.c         |  4 +-
+>>  drivers/bluetooth/hci_qca.c       | 33 +++++++--------
+>>  include/net/bluetooth/bluetooth.h |  1 +
+>>  net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++++++++----------
+>>  net/bluetooth/l2cap_core.c        |  2 +-
+>>  5 files changed, 85 insertions(+), 42 deletions(-)
+>>
+> 
 
 
