@@ -1,198 +1,224 @@
-Return-Path: <netdev+bounces-289386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289388-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WG/9EuU+DGqqawUAu9opvQ
-	(envelope-from <netdev+bounces-289386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:43:49 +0200
+	id aE9MLuc4DGq2aAUAu9opvQ
+	(envelope-from <netdev+bounces-289388-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:18:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54FA857CAD8
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:43:48 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74BA257C09A
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:18:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E6AD83116C2A
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:16:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9B7C030362C2
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D3B4B8DC9;
-	Tue, 19 May 2026 10:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4887D4B8DED;
+	Tue, 19 May 2026 10:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DAG29ITP"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2094.outbound.protection.partner.outlook.cn [139.219.17.94])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434EA4BCAB1;
-	Tue, 19 May 2026 10:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.94
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779185736; cv=fail; b=EHZJb+lOhPx7bPRzlcOuiDeBzzKd+S4bBxJTkSJEAysG60LCeoImNHBE0Y+OsOpEJCZXxxOn7MerCw+zi9vZosYJ2QwrIsABaN0QO/7B/s2agpWDkTz5Jq7+hFnj567P3Fq7lUUEa1XQJyPUvsJgMcACT36yiG78ulpiRJhFdkc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779185736; c=relaxed/simple;
-	bh=yL6ui8ktzhawcv/SdZY9elIupb0a0LP9TuR/Dy21ub8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nRgWSU5k8iBsrepiefV+MT1bD06yd66P5Z7NlkGFzSrdumz1+Rvm9Okv7a2IMqtB2MwsTrT4lz58e41H5pem6D6sK51VV8oDRozHTBDI2UMOPHu1s0IW1I0TCD+A0ascw5HQvpA0/zlRpiZx5v9rhRPe6RbuoVtNCu+aMq9d/Ag=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ky45Nb9ynI4g9DVQx77Vme7BWq5WpaJXyifcSMB2m0Ig06SOuk9Y9fTI2MXDJcX5dWgjnGAgib4YJhuPpQRzabJGnuNZdyzaofOpAhDpqjdDXwplEJ6VkesPxEjUJhoZIdJf/2S5DR24YjGgGou4/0W0LzKRO+CWpzmagsYXSJuYkAEv+S3oqyf/sFP5Xm6EZfkxfBhbDi315Ag6QOjjbvkV5yvaDcF7gOQ4/6x+s0p8aeOhjidsZVhLcBHdEVlZYDdAVLD6TmMcSGl2+TTd/xVRlRSaAKSMBKX5ekoHPT0NZiEhAjL2H04dJq7DR4e5IkIicfxDkAPeQ47Re3ASUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1b/bV8x8x3pMZx3ArEvkkCyXtmTv4A3di3Ps5BMbChs=;
- b=h0Twmp0QKr11BXwnkwPng927yVuISVle4HFePKZYGQK4VB1nKf7qkN0wCpmfwSctbbrjHTlmor11Hg2EVeqFOAcIKW8Kn1EUs3vetZQ41ayP7AwAoiaX0UP2zPHPOelHUDAkoCAxvrw1un2DIE0PDzxOgHW9BTnoiEmfznQcTnKPiWno7V5rv3E0YBZaq0F3468Wc+nFH566GSi0nRlnp5f+3bSrADr3pHC3fRB1J6W4nr0s8c9VzTODv2h0+Rgyk2eQ/QMwZLrPOL+peU6x2sdUjE6qhtViiMVFzrzPrRSddi9pmS+uVzIIbnyL/k/7GFqT7yEG87y8DWS16YD+Jg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15) by SHXPR01MB0493.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:1e::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.24; Tue, 19 May
- 2026 10:14:53 +0000
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- ([fe80::9b99:12dc:a115:b90f]) by
- SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::9b99:12dc:a115:b90f%3])
- with mapi id 15.20.9891.021; Tue, 19 May 2026 10:14:53 +0000
-From: Minda Chen <minda.chen@starfivetech.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor@kernel.org>,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	devicetree@vger.kernel.org,
-	Minda Chen <minda.chen@starfivetech.com>
-Subject: [net-next v4 5/5] net: stmmac: starfive: Add STMMAC_FLAG_SPH_DISABLE flag
-Date: Tue, 19 May 2026 18:14:36 +0800
-Message-Id: <20260519101436.111476-6-minda.chen@starfivetech.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20260519101436.111476-1-minda.chen@starfivetech.com>
-References: <20260519101436.111476-1-minda.chen@starfivetech.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BJXPR01CA0056.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c211:12::23) To SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C0D4C041F
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 10:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779185792; cv=none; b=k2XYSOAHySd8UehmGOVi9RFb3ruNfPC2ORSUsBWLEq7TqBCBclQUnyc8R0bMADGEC5Hud3Vw1YixYGtIxyZIwefH2mWeeiuIbsIB7UtfgWYBVmEIap+QuClRRRhOPZgF8awD2NzlDDbVUOfU1XzLVuI3n1vY8ExHhJMiyqqnMag=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779185792; c=relaxed/simple;
+	bh=A8lCk64tyDutpdWygpqGjJXORX5zZQ3IQ4DQQhG5Q8o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=k/yChPSc9syqjaYXFgTIymk9VoKUtQgWj9xHvdWo7umQ/oZSyRa3seVvvjPAUrrx8xCq9lq59oGy21UySZwU6iJvx8MNSBtcJdHHDCFK2YQurRzdk0P4Ecp1/OeThDgBHCYMN8+ABmNOpEe1t2wJBLhyIvb1R/ejgXALXPfIh4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DAG29ITP; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3665b67ed66so2043354a91.1
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 03:16:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779185786; x=1779790586; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a6PE6oczvQzlzFTW3XERm2G8PX98I8qUZJMdLKZ7oFc=;
+        b=DAG29ITPJ/oltyXTun/ebhMLfI83fqgSN5oYsS8vRj/qE1KkpfXMT5DP39bLfwUYKR
+         A6BsCPu6Q7ejgyDVjPGZzdCTDcGFuJbTDWldnF1AIX7qzyQw1hb4iD6DikwQIAm0hk5I
+         Joa75cPtaN+xi+JdCSK5IEGsGP3hy8FzGGDho8DnGsK1oNn69lBhVSWIg845okyayfgN
+         XwH2LITXECyTa/FmUOZYrrP84s1HQ60j6XeEqRarl27x7qAyK8IXwc6qoRQ0vsFFbI+L
+         W1KzxEBC7kFJYAPkvUiusmzN1FbPmLRmNtF5s8svPufgVbe2VqbgnTtzXMgWxtSxoerD
+         dO6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779185786; x=1779790586;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=a6PE6oczvQzlzFTW3XERm2G8PX98I8qUZJMdLKZ7oFc=;
+        b=YIwhyWVEqR7LYo9S+v+cJu3WVEyDKvtcPzPVNneDLMSPSj7QaT6kZm3FomKLXFAS9S
+         EILE2U99of+vCS0Km00CkncjNdESsDwBrZqBS044BHngUA+7h1V1h5kR3+IIpTE7O9ab
+         xNLY5jBZm+askNFATTngYu0oc6+/8jeMVtrEfSszx0dLXYAaovuu8TWfJGfdKA3Uwlyg
+         y2Cpe5GgtGCzSLpeGewQmDWvC8mxhuatQRz1nz+Xem9oUdPuZahatzkFKnOeBkLQzi8T
+         uucqMH1tYicYASK+7gRIKblLzp2wRegyzMk4Zz7m5SOluDuaxWXb39uidPk4eMaCmpOI
+         wpKA==
+X-Forwarded-Encrypted: i=1; AFNElJ9wEEAhDcysL66bFAYwIlo/dT+PmBqK/aBJDXmU0rV6MvgWq+RpQyEQNfIHlw5fM8Cx/BEsKY4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywjm9StKKoZsHYYsi02z3bSD1jKIcEWAwVuVE7BnGQfQM8EupAh
+	Akehf0AE5VS2cbFWVBYfWjhC7QdMPXGXM7MwwJ87CG7KmCddZOHd/oZo
+X-Gm-Gg: Acq92OETK1EbqzaZEWGjPP9aBQmJfFD7QuEyG7wnjq2TFpxIk2MEkCEhM1hFoBf+5Ye
+	DShpa37xdC893DXih7rQ3x8eSYVhKfo+LxqHo+ZnmaYqinSAa4Rd/sEYwf8KnMKAtqF6ZLOejJC
+	lHAomRr326P7PogiVJM1wXb0A8M0s75cQ+ZWsdnelZjgk95DZCEtg/g3nWClDDqCZq9/Fq/A2gj
+	cYmJbZln9hb8RgXt7WYCrqGfeR3sHJ6bdst/AXyctj7j9UzRgWtiBeDjtQs0R4jkvnQ/OrjIHSs
+	OmH8awmfU+CqT9erAnbutAf9377mK4TdND8nTlOA6bH3GZRNXxazBxMU9V7RoxNNa3+6jxWS1cS
+	0Yv6spVdL2cCwrjaR20rhz+dsfKImDo7YN24joVYsp/pjJCWi7QJho6C4NyWOlYACkA7WfR1G8q
+	QnWpyOErYc8jNimpMgo3FJBn5xIQ==
+X-Received: by 2002:a17:90b:2742:b0:368:cefe:ddd0 with SMTP id 98e67ed59e1d1-36951b82f8fmr19522119a91.15.1779185785623;
+        Tue, 19 May 2026 03:16:25 -0700 (PDT)
+Received: from fedora ([171.243.49.69])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5d234540sm177683165ad.79.2026.05.19.03.16.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 03:16:24 -0700 (PDT)
+From: Minh Nguyen <minhnguyen.080505@gmail.com>
+To: pabeni@redhat.com,
+	bryan-bt.tan@broadcom.com
+Cc: sgarzare@redhat.com,
+	vishnu.dasa@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v3] vsock/vmci: fix UAF when peer resets connection during handshake
+Date: Tue, 19 May 2026 17:16:10 +0700
+Message-ID: <20260519101610.233070-1-minhnguyen.080505@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <agwv3YkxYIC7mvyj@sgarzare-redhat>
+References: <agwv3YkxYIC7mvyj@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SHXPR01MB0863:EE_|SHXPR01MB0493:EE_
-X-MS-Office365-Filtering-Correlation-Id: 191de377-879c-464d-bcdf-08deb58f77ee
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|52116014|376014|7416014|1800799024|22082099003|18002099003|56012099003|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	6+SFH79ao7wQwh2p9PGG05IIm1z4VnfvuofBI0eGql8YNbbFGnEAIRL+vql3q1oXljUMjuvU1BLZFDIo28Na8NXNIle3xjbUiN6vEIAGUl8kQNEYypdn/W7IqSfGG18bGqdKLTXk89WORT3neNXrg7QDxJ7fHsY0Ob/blvHaIC/4cVoeG2iOWkgYF5JDMMb6/DZS9IuuGD9hMAqFvbC4woIUeS87d7dk+dbQgGmjVMJ1rnme/AOr7gXRTTnWsCFhtI3Ic0KqiprwCy3xut56SBpeNEaDbkkL7tF3At5os3DQqtzWFSr2JvFs/AajrycZ6Mz1g67CBUpLbSTBlYll+uYBx/E2FeBME5yPcnYamR5CW7wvEV9hK60HMGqZ35qg7W64R0i1xotTT5ttEKhk5Js24Yv7oV1dL+HMQ0fcz72romLsy2YZMjgmQ5BH/TawNdhWAUr5JFBZhuybe5DDTwm5KIj8oXL2EardZcHXAJSnKT2l1sxSpRfBGsSDiI7c7utH24SGOw4JbcFb4pCdFzxzRWClWuxVfNBMaAWRSMqOLc7Py9tmdrfHEEAeb90bNK0DijN76YldIfAHlNR9fQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(376014)(7416014)(1800799024)(22082099003)(18002099003)(56012099003)(38350700014)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ABue8PFQDJmD41bYyErUxUpXSaFsW7bhGIbhUMUEykLYosm2ZgKwITdLKs0g?=
- =?us-ascii?Q?p6cf67jijFotpSAT3q6Y/9r3lSdccrg4G9mP2PNsPvIAt9Nu3BleucoCA4Kb?=
- =?us-ascii?Q?57uqFlD5p81NJBCbpNTVo7s8ZaWy0o9BZruZzAf/YhI2fPPDbOILoBG2F21c?=
- =?us-ascii?Q?hYVZhe/3gwHOljFFwIIqYFXTBroekWEjCiC5HVVY9rtLKOVMa3ycD7XJOmVU?=
- =?us-ascii?Q?KcDfPLsSEvQO55kZHHJ2duYCgSrEgF5LtdADeficyKvCRJJ6NFQua7fMNogX?=
- =?us-ascii?Q?u9GTC4UN17kDAGTvmVmaw4lQXBWVGn2JTYGBTSuuKHlsUbQKkdBkklHOEB4/?=
- =?us-ascii?Q?sL1DElFM0tCFGhfibYabZt8ZmrCSZ7VBAE0wT0J5WHPOG9ZJMKezRaMbwsXZ?=
- =?us-ascii?Q?jqdlsJUp5G6r1g3zMBMXYz3xOvpRhxYm8KmG3DoMc6FS2xw4Gm/MQMx6hkbm?=
- =?us-ascii?Q?ZoNGjeJ1qEITHCuWYUjozgy0nWqQaonl7LSDCkb4u7MHnyYX0ZFrL4QK9sB+?=
- =?us-ascii?Q?fbth/0rZ4w2RlcdfHvrP1uXIUwmhBh40vmiLsUlvaE9ADUQF2Mt9bJOFmRwg?=
- =?us-ascii?Q?dEQu840Q6AbYi6DqfL3PXoxMJVYlv0pzWd2NQ9VFavZ+HNw/vviZu1MZFzl6?=
- =?us-ascii?Q?+jQTylfrC74MwrKLQzeHtrMZXr5nAHxqAHtJwfF/phs3AFII5TyS6TpG8gSq?=
- =?us-ascii?Q?zkvYXgqti8BWhuGX9COXYM1FLzMVrvzdlGPnQCkd3SWlU6EsxCrGQ+8iaHxZ?=
- =?us-ascii?Q?UafH1BXytNSIZBSyhLj4eima3JFUhSI0tv/cVTq8oR4ANSFre5/X000rVa8g?=
- =?us-ascii?Q?UvfDDnIThQJgROQvXI0ap9bDjRF+fOUy2MKyoCgERKETbieC2r4dKqEF0yMx?=
- =?us-ascii?Q?cY5JySFTnMAPgsnCNJbM5h+yBk4gohYnuPRBHCyDaqJ7NYUOC2VuHwvc6A6h?=
- =?us-ascii?Q?9LFUQloumhQuJ22RR0O6iTyNkXzjM53+uZway65gW19pOYhU6KO/JrVVZcW5?=
- =?us-ascii?Q?oNq4q4kPV/6mnEffGInZhL+ZVeQrBPuPmQLE3kRvkMnllPWxSOx+COSz8JK1?=
- =?us-ascii?Q?Dm4SVw0FDBPcdHoYRryw0hhUTWo2g+AvJwY3DSUUnCIepfQWT3O0nj1Pkmwv?=
- =?us-ascii?Q?GaPp5zOkOBLmUacMl92xQKa1KQBS89GkhvW7ZzbPlFYl09wwM2sanY/Cp9ca?=
- =?us-ascii?Q?luI2QjIYIL5PZUd192WSjXvBN9L86jnU+oC1YJvX6asCcPRjzAAPozRZYRrO?=
- =?us-ascii?Q?eknj4rwiRvBptjEpKJy1mhQyV3wXfzp/OEEOsALhdtAHB39vKZ0p2Q4lqV0H?=
- =?us-ascii?Q?zfWWfNLex5PdpiOJLCWAW/WcakOh/vEuNFOFQtg4EBLX66xdYP9yKgyBo/aH?=
- =?us-ascii?Q?r91gmVTsW0pYG75mHvbZA3cL52RYulQtn2JEHS/zxqqTpSrLTjnUnTizqhry?=
- =?us-ascii?Q?qZzuG6q0Hts7TqkWcOCuT758saFudheTRtF0Qcua9DscimP90bm7Gr6/sOVR?=
- =?us-ascii?Q?l+FEovgPAGyDxHmGVEp0VX1fANryh7kj+3UWYa+qmODeWDKgM9Cen7xUHujl?=
- =?us-ascii?Q?+6fPuKfe+disyQLgs4KOLgtWZ3W/y3LyKxqlczCnXmEWcEfHcdzv0yBnRx46?=
- =?us-ascii?Q?Quf6XlZp3YJd3/2B38ZxnFjnagYgoEJF1fYE1X7AbaQTfVo4qaQDR2v+X4Ld?=
- =?us-ascii?Q?qfed2ZTc3rTq7XgR5WczgbpQWALmSs/1aG1I/0k9KoS6nyDusjlH2hduL3lL?=
- =?us-ascii?Q?vzj0LJ4FK2B0e3Fx/C8GRoXrUNAdW6s=3D?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 191de377-879c-464d-bcdf-08deb58f77ee
-X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 10:14:53.1410
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DadFYcw3ayDtnmGf3z81hwxqRAQAlpjDIHP332CpUN6PI7z+4LqM187/zza+0ZaQOAuWYnNJpCFpGG1EsHdXMmNz4hGyBAuJ55haLYPaC4k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0493
-X-Spamd-Result: default: False [5.04 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	GREYLIST(0.00)[pass,body];
-	TAGGED_FROM(0.00)[bounces-289386-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	R_DKIM_NA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-289388-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,starfivetech.com:mid,starfivetech.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 54FA857CAD8
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[minhnguyen080505@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 74BA257C09A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add default disable split header flag in all the starfive
-soc.
+vmci_transport_recv_connecting_server() returned err = 0 for a peer
+RST in its default switch arm:
 
-Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+	err = pkt->type == VMCI_TRANSPORT_PACKET_TYPE_RST ? 0 : -EINVAL;
+
+That made vmci_transport_recv_listen() skip vsock_remove_pending(),
+leaving the pending socket on the listener's pending_links with
+sk_state = TCP_CLOSE while destroy: still dropped the explicit
+reference taken before schedule_delayed_work().
+
+One second later vsock_pending_work() observed is_pending=true and
+performed full cleanup: vsock_remove_pending() then the two trailing
+sock_put(sk) calls -- the first reached refcount 0 and __sk_freed
+the socket, and the second wrote into the freed object:
+
+  BUG: KASAN: slab-use-after-free in refcount_warn_saturate
+  Write of size 4 at addr ffff88800b1cac80 by task kworker
+  Workqueue: events vsock_pending_work
+
+Treat peer RST like any other unexpected packet type (err = -EINVAL).
+All destroy: arms now return err < 0, so vmci_transport_recv_listen()
+removes pending from pending_links synchronously and
+vsock_pending_work() takes the is_pending=false / !rejected branch,
+dropping only its own work reference.  This also closes the
+multi-packet race Sashiko reported on v2: pending is removed from
+the list before any subsequent packet can find it.
+
+The pre-existing sk_acceptq_removed() gap on the err < 0 path of
+vmci_transport_recv_listen() that Sashiko also noted is not
+introduced or changed by this patch.
+
+Tested on lts-6.12.79 with KASAN: 52/100 unpatched -> 0/100 patched.
+
+Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
+Cc: stable@vger.kernel.org
+Signed-off-by: Minh Nguyen <minhnguyen.080505@gmail.com>
+Assisted-by: Claude:claude-opus-4-7
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v3:
+  - Different approach to Sashiko/Paolo's "trading UAF for leak"
+    concern: normalize RST to err = -EINVAL so all destroy: arms
+    take the same err < 0 cleanup path -- no special case, no
+    multi-packet race.
+  - Sashiko's secondary observation ("while not introduced by this
+    patch, does this error path leak sk_ack_backlog slots on failed
+    handshakes?") is correct: the sk_acceptq_removed() gap on the
+    err < 0 branch of vmci_transport_recv_listen() is pre-existing
+    and is not introduced or changed by this patch.  v3 stays
+    focused on the UAF; a separate fix for that gap is needed and
+    would be welcome from anyone closer to that area.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-index eb882ec14c8d..6a887260d5ee 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-@@ -147,7 +147,7 @@ static int starfive_dwmac_probe(struct platform_device *pdev)
- 			return err;
+v2: https://lore.kernel.org/netdev/20260512025851.189140-1-minhnguyen.080505@gmail.com/
+
+v1 was sent to security@kernel.org on 2026-05-10 (not on lore).
+
+ net/vmw_vsock/vmci_transport.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+index 4296ca1..ba3a66e 100644
+--- a/net/vmw_vsock/vmci_transport.c
++++ b/net/vmw_vsock/vmci_transport.c
+@@ -1161,10 +1161,17 @@ vmci_transport_recv_connecting_server(struct sock *listener,
+ 		}
+ 		break;
+ 	default:
+-		/* Close and cleanup the connection. */
++		/* Close and cleanup the connection.  Peer RST is treated like
++		 * any other unexpected packet type in this state so that the
++		 * pending socket follows the same cleanup path as other
++		 * handshake failures, instead of being left on the pending
++		 * list for vsock_pending_work() to find later (which races
++		 * with subsequent packets and was the source of a UAF when
++		 * the cleanup work observed an inconsistent ref count).
++		 */
+ 		vmci_transport_send_reset(pending, pkt);
+ 		skerr = EPROTO;
+-		err = pkt->type == VMCI_TRANSPORT_PACKET_TYPE_RST ? 0 : -EINVAL;
++		err = -EINVAL;
+ 		goto destroy;
  	}
  
--	plat_dat->flags |= STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP;
-+	plat_dat->flags |= (STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP | STMMAC_FLAG_SPH_DISABLE);
- 	plat_dat->dma_cfg->dche = true;
- 
- 	return stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+
+base-commit: be48e5fe51a5864566307998286a699d6b986934
 -- 
-2.17.1
+2.54.0
 
 
