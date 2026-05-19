@@ -1,451 +1,185 @@
-Return-Path: <netdev+bounces-289326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aLWINgcfDGqoWgUAu9opvQ
-	(envelope-from <netdev+bounces-289326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:27:51 +0200
+	id yJo6K6EdDGpJWQUAu9opvQ
+	(envelope-from <netdev+bounces-289327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:21:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A4757A06C
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:27:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 503E2579E27
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:21:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AF467305DB5E
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:21:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2D853300680F
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88893E0C6B;
-	Tue, 19 May 2026 08:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84263E1200;
+	Tue, 19 May 2026 08:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="USXO6Kip"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HAT1d1pm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DC33E0C4D;
-	Tue, 19 May 2026 08:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57B63DCD8E;
+	Tue, 19 May 2026 08:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779178857; cv=none; b=HXY+aoq6FHnGfoDiKxPO59P86eNyv1OXfIpSChhyBBG2oSZkg4LaT9zNTH0nnd/tTpw/n8kky9CcPnhETP3pEJxcTzKOA7mnbQMREQW81QFLLrHnPETXGDWouBevfqI5UTxVjuSbOs4kVwm8PyEqffHXzxzvHPtSUkhHauiQOfg=
+	t=1779178873; cv=none; b=siAZXZbbrB4c/yHcvpoTuhpGlm3FwdNU7+Txy5TSy7Qm4YHClh4ZFgWTVYQmw2SjPAsqYmaYn3sOztBco2ncc5r3u962XJbQoyUAxTpltuWWhIWgJzO7oF0exM9qyjx9ZcXUHWMxlt1YKmufF/XuBW3wa+sWyCFP6bE2892NWEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779178857; c=relaxed/simple;
-	bh=fuzhnyoilWzd57vJ+bEoD5Zmuhb+4Qh4JxANN6Dr0sY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ysuk8Vu0ClBW+mdmxPUf8767hZzy4dvkrDD288UKS1ZnjB3hslsHyS3BG5CA4HRoxei0NBCa1z8jFpsMnWIGdpSTNmNiTqVhz4phxeSAvaQugesC/l5y7f24KzGuYeSEpEEnzt8kG2+iJO4/oS8zrvIu3nrvLR10mpPYc+lILd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=USXO6Kip; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4gKSKn6fShz9v16;
-	Tue, 19 May 2026 10:20:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1779178846; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sQfaAnbU3FNLooD1DsvIeItu9adpCmZtOJCbvFgPeek=;
-	b=USXO6Kipz2iYG1/Y8VHZ3ADJpNbbf3zB6UBJhW4VK0YEzVzhblZgP4uPS8FfqkRHGWnBb/
-	9QxNKjWHa2SfQ036Tlji0JeFoKcj0HK9AOqAEgZP8JtAaxcNynnj4zL1LvRKJmeiIyCA3w
-	gtuHSg+grlRsOlXJyzmqqC1KhRVoW8Z4in+PlvnjNgW3+7+/LqZClCGunbP86+VOnaZBEb
-	FoX2/BLL7/CU6fPrcATVTLc3BIFa3Kio7koRToyWHkUAbU5QQT5Uvu8D2gQ/PyS13BzZ84
-	hxvEQ+vodHEUNwH2hxkoA3q48PzVKyv2Vqu/nVT0FaYx0fl6Yr0hLHIHDTOY2g==
-Message-ID: <7a477885c58709f287f6c1440fb7e31331227d10.camel@mailbox.org>
-Subject: Re: [PATCH net-next v3 02/14] libie: add PCI device initialization
- helpers to libie
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Bjorn Helgaas <helgaas@kernel.org>, Tony Nguyen
- <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com,  andrew+netdev@lunn.ch, netdev@vger.kernel.org, Phani
- R Burra <phani.r.burra@intel.com>, larysa.zaremba@intel.com, 
- przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com, 
- sridhar.samudrala@intel.com, anjali.singhai@intel.com, 
- michal.swiatkowski@linux.intel.com, maciej.fijalkowski@intel.com, 
- emil.s.tantilov@intel.com, madhu.chittim@intel.com, joshua.a.hay@intel.com,
-  jacob.e.keller@intel.com, jayaprakash.shanmugam@intel.com,
- jiri@resnulli.us,  horms@kernel.org, corbet@lwn.net,
- richardcochran@gmail.com,  linux-doc@vger.kernel.org, bhelgaas@google.com,
- linux-pci@vger.kernel.org,  Bharath R <bharath.r@intel.com>, Samuel Salin
- <Samuel.salin@intel.com>, Aleksandr Loktionov
- <aleksandr.loktionov@intel.com>, Philipp Stanner <phasta@kernel.org>
-Date: Tue, 19 May 2026 10:20:27 +0200
-In-Reply-To: <20260518215441.GA640516@bhelgaas>
-References: <20260518215441.GA640516@bhelgaas>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1779178873; c=relaxed/simple;
+	bh=tDJ676BMgLDH5QXHQXESWIgejlRC5ysodvGdf6zhXJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jmi9JI12GNy0J6G2CvwPOgxHP4x0k+1eACbUtn2dXCCBOaTO2C/GuwRCmPxWfayBDtJz3v5P1F5vE2l6s3xt4ZM6kKXD6BOIRBUZKjlTgsFmycdLvT8F6oXcJ4oYwkaZH2S/iyAPqGqbTW4NynwxBb5h9YMXf4m9a/TYTIOXHgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HAT1d1pm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E47CEC2BCB3;
+	Tue, 19 May 2026 08:21:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779178873;
+	bh=tDJ676BMgLDH5QXHQXESWIgejlRC5ysodvGdf6zhXJg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HAT1d1pm7N1FFCeffinmDHW6oJul7lkYiUgRe1Mu+RNcWdjjDJh3narpSaCw5Hz2r
+	 6NcopBBimft48kpIsCxDvfOaPOEHPvJ+8GT04NR4Fd62mwiGPWosuWQeWky387jWD0
+	 /rsVWQn4QroUCBgnBBn0QogA97u+vJsEhvT8mUEAbOIqoo42qa4T0RI23CgUztu6ta
+	 W7/SklrsUT5ejmrQ863MP0bFcktZPkslBF+2F2wL7994H+96gTHVBOb8ISrcCEUfnz
+	 98QCYHJGIrn5oMnTpKt0gTtiEjzzl/YaWwkQsOA/nSS7zU1wjoVa2Ka7E3oz3HKPY3
+	 cnEvMiZBQ32NQ==
+Date: Tue, 19 May 2026 10:21:10 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: conor+dt@kernel.org, robh@kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v7 03/10] net: airoha: Move airoha_qdma pointer
+ in airoha_gdm_dev struct
+Message-ID: <agwddqW7CZQfYaPn@lore-desk>
+References: <20260516-airoha-eth-multi-serdes-v7-3-99e0093303e2@kernel.org>
+ <20260517055811.39179C2BCB0@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-META: bu4mq3maazu4tprzgcr66hucmwurcb8x
-X-MBO-RS-ID: 8ab3abc5a08522f74bf
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="LJ7Nk84mR0QUSsMi"
+Content-Disposition: inline
+In-Reply-To: <20260517055811.39179C2BCB0@smtp.kernel.org>
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289326-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,lunn.ch,vger.kernel.org,intel.com,linux.intel.com,resnulli.us,lwn.net,gmail.com];
+	TAGGED_FROM(0.00)[bounces-289327-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	HAS_REPLYTO(0.00)[phasta@kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[phasta@mailbox.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DKIM_TRACE(0.00)[mailbox.org:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,mailbox.org:mid,mailbox.org:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 98A4757A06C
+	TO_DN_NONE(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 503E2579E27
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 2026-05-18 at 16:54 -0500, Bjorn Helgaas wrote:
-> [+cc Philipp]
+
+--LJ7Nk84mR0QUSsMi
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+> - [High] Deadlock risk due to using `spin_lock` instead of `spin_lock_bh`=
+ in `airoha_update_hw_stats`.
+> --
 >=20
-> On Fri, May 15, 2026 at 03:44:26PM -0700, Tony Nguyen wrote:
-> > From: Phani R Burra <phani.r.burra@intel.com>
-> >=20
-> > Add support functions for drivers to configure PCI functionality and ac=
-cess
-> > MMIO space.
+> commit af5b93ea60b28ce8a1ab1016b0911418480e766a
+> Author: Lorenzo Bianconi <lorenzo@kernel.org>
 >=20
-> This looks kind of like what pcim_iomap_range() does, i.e., a way to
-> ioremap (BAR-idx, offset, size) pieces of PCI BARs.=C2=A0 That sounds lik=
-e
-> useful functionality.
+> net: airoha: Move airoha_qdma pointer in airoha_gdm_dev struct
 >=20
-> Is there something Intel-specific or even ethernet-specific about
-> this?=C2=A0 If devm_* and pcim_* don't do what you need, maybe they shoul=
-d
-> be extended or this could be made generic so any drivers could use it?
+> This commit moves the airoha_qdma pointer from the airoha_gdm_port
+> struct to airoha_gdm_dev, since the QDMA block depends on the net_device
+> configuration. This is a preliminary patch to support multiple
+> net_devices connected to the same port via an external hardware arbiter.
 >=20
-> This looks like a mix of managed (pcim_enable_device(),
-> pcim_request_region()), and unmanaged (ioremap(), iounmap()) things.
-> I haven't looked at how all this is used, but it's pretty easy to get
-> things wrong when mixing models.
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 3ca0dbd19275a..6c9f4b289dba7 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> [ ... ]
+> > @@ -1560,9 +1564,10 @@ static void airoha_qdma_stop_napi(struct airoha_=
+qdma *qdma)
+> >  	}
+> >  }
+> > =20
+> > -static void airoha_update_hw_stats(struct airoha_gdm_port *port)
+> > +static void airoha_update_hw_stats(struct airoha_gdm_dev *dev)
+> >  {
+> > -	struct airoha_eth *eth =3D port->qdma->eth;
+> > +	struct airoha_gdm_port *port =3D dev->port;
+> > +	struct airoha_eth *eth =3D dev->eth;
+> >  	u32 val, i =3D 0;
+> > =20
+> >  	spin_lock(&port->stats.lock);
 >=20
-> > +++ b/drivers/net/ethernet/intel/libie/pci.c
-> > @@ -0,0 +1,208 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/* Copyright (C) 2025 Intel Corporation */
-> > +
-> > +#include <linux/intel/libie/pci.h>
-> > +
-> > +/**
-> > + * libie_find_mmio_region - find MMIO region containing a range
-> > + * @mmio_list: list that contains MMIO region info
-> > + * @offset: range start offset
-> > + * @size: range size
-> > + * @bar_idx: BAR index containing the range to search
-> > + *
-> > + * Return: pointer to a MMIO region overlapping with the range in any =
-way or
-> > + *	=C2=A0=C2=A0 NULL if no such region is mapped.
-> > + */
-> > +static struct libie_pci_mmio_region *
-> > +libie_find_mmio_region(const struct list_head *mmio_list,
-> > +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 resource_size_t offset, resourc=
-e_size_t size,
-> > +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int bar_idx)
-> > +{
-> > +	resource_size_t end_offset =3D offset + size;
-> > +	struct libie_pci_mmio_region *mr;
-> > +
-> > +	list_for_each_entry(mr, mmio_list, list) {
-> > +		resource_size_t mr_end =3D mr->offset + mr->size;
-> > +		resource_size_t mr_start =3D mr->offset;
-> > +
-> > +		if (mr->bar_idx !=3D bar_idx)
-> > +			continue;
-> > +		if (offset < mr_end && end_offset > mr_start)
-> > +			return mr;
-> > +	}
-> > +
-> > +	return NULL;
-> > +}
-> > +
-> > +/**
-> > + * __libie_pci_get_mmio_addr - get the MMIO virtual address
-> > + * @mmio_info: contains list of MMIO regions
-> > + * @offset: register offset to find
-> > + * @num_args: number of additional arguments present
-> > + *
-> > + * This function finds the virtual address of a register offset by ite=
-rating
-> > + * through the non-linear MMIO regions that are mapped by the driver.
-> > + *
-> > + * Return: valid MMIO virtual address or NULL.
-> > + */
-> > +void __iomem *__libie_pci_get_mmio_addr(struct libie_mmio_info *mmio_i=
-nfo,
-> > +					resource_size_t offset,
-> > +					int num_args, ...)
-> > +{
-> > +	struct libie_pci_mmio_region *mr;
-> > +	int bar_idx =3D 0;
-> > +	va_list args;
-> > +
-> > +	if (num_args) {
-> > +		va_start(args, num_args);
-> > +		bar_idx =3D va_arg(args, int);
-> > +		va_end(args);
-> > +	}
-> > +
-> > +	list_for_each_entry(mr, &mmio_info->mmio_list, list)
-> > +		if (bar_idx =3D=3D mr->bar_idx && offset >=3D mr->offset &&
-> > +		=C2=A0=C2=A0=C2=A0 offset < mr->offset + mr->size) {
-> > +			offset -=3D mr->offset;
-> > +
-> > +			return mr->addr + offset;
-> > +		}
-> > +
-> > +	return NULL;
-> > +}
-> > +EXPORT_SYMBOL_NS_GPL(__libie_pci_get_mmio_addr, "LIBIE_PCI");
-> > +
-> > +/**
-> > + * __libie_pci_map_mmio_region - map PCI device MMIO region
-> > + * @mmio_info: struct to store the mapped MMIO region
-> > + * @offset: MMIO region start offset
-> > + * @size: MMIO region size
-> > + * @num_args: number of additional arguments present
-> > + *
-> > + * Return: true on success, false on memory map failure.
-> > + */
-> > +bool __libie_pci_map_mmio_region(struct libie_mmio_info *mmio_info,
-> > +				 resource_size_t offset,
-> > +				 resource_size_t size, int num_args, ...)
-> > +{
-> > +	struct pci_dev *pdev =3D mmio_info->pdev;
-> > +	struct libie_pci_mmio_region *mr;
-> > +	resource_size_t pa;
-> > +	void __iomem *va;
-> > +	int bar_idx =3D 0;
-> > +	va_list args;
-> > +
-> > +	if (num_args) {
-> > +		va_start(args, num_args);
-> > +		bar_idx =3D va_arg(args, int);
-> > +		va_end(args);
-> > +	}
-> > +
-> > +	if (offset + size > pci_resource_len(pdev, bar_idx))
-> > +		return false;
-> > +
-> > +	mr =3D libie_find_mmio_region(&mmio_info->mmio_list, offset, size,
-> > +				=C2=A0=C2=A0=C2=A0 bar_idx);
-> > +	if (mr) {
-> > +		pci_warn(pdev,
-> > +			 "Mapping of BAR%u (offset=3D%llu, size=3D%llu) intersecting region=
- (offset=3D%llu, size=3D%llu) already exists\n",
-> > +			 bar_idx, (unsigned long long)mr->offset,
-> > +			 (unsigned long long)mr->size,
-> > +			 (unsigned long long)offset, (unsigned long long)size);
-> > +		return mr->offset <=3D offset &&
-> > +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mr->offset + mr->size >=3D offs=
-et + size;
-> > +	}
-> > +
-> > +	pa =3D pci_resource_start(pdev, bar_idx) + offset;
-> > +	va =3D ioremap(pa, size);
+> This isn't a regression introduced by this patch, but does this spin_lock=
+()
+> need to use the _bh variant to prevent a deadlock?
+>=20
+> This function is called from ethtool paths like airoha_ethtool_get_mac_st=
+ats()
+> and airoha_ethtool_get_rmon_stats(), which run in process context. It is =
+also
+> called from airoha_dev_get_stats64() via ndo_get_stats64, which can be in=
+voked
+> from softirq context when queried by a bridging or bonding master or qdis=
+c in
+> the TX/RX paths.
+>=20
+> If a process-context ethtool operation is preempted by a softirq on the s=
+ame
+> CPU that then invokes dev_get_stats(), could the softirq attempt to acqui=
+re
+> the already-held port->stats.lock and cause a deadlock?
 
-I agree with Bjorn, this certainly looks like something that can be
-covered by shared PCI infrastructure?
+according to my understanding ndo_get_stats64() can't be invoked from softi=
+rq
+context.
 
-> > +	if (!va) {
-> > +		pci_err(pdev, "Failed to map BAR%u region\n", bar_idx);
-> > +		return false;
-> > +	}
-> > +
-> > +	mr =3D kvzalloc_obj(*mr);
-> > +	if (!mr) {
-> > +		iounmap(va);
-> > +		return false;
-> > +	}
-> > +
-> > +	mr->addr =3D va;
-> > +	mr->offset =3D offset;
-> > +	mr->size =3D size;
-> > +	mr->bar_idx =3D bar_idx;
-> > +
-> > +	list_add_tail(&mr->list, &mmio_info->mmio_list);
-> > +
-> > +	return true;
-> > +}
-> > +EXPORT_SYMBOL_NS_GPL(__libie_pci_map_mmio_region, "LIBIE_PCI");
-> > +
-> > +/**
-> > + * libie_pci_unmap_fltr_regs - unmap selected PCI device MMIO regions
-> > + * @mmio_info: contains list of MMIO regions to unmap
-> > + * @fltr: returns true, if region is to be unmapped
-> > + */
-> > +void libie_pci_unmap_fltr_regs(struct libie_mmio_info *mmio_info,
-> > +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool (*fltr)(struct libie_mmio=
-_info *mmio_info,
-> > +					=C2=A0=C2=A0=C2=A0 struct libie_pci_mmio_region *reg))
-> > +{
-> > +	struct libie_pci_mmio_region *mr, *tmp;
-> > +
-> > +	list_for_each_entry_safe(mr, tmp, &mmio_info->mmio_list, list) {
-> > +		if (!fltr(mmio_info, mr))
-> > +			continue;
-> > +		iounmap(mr->addr);
-> > +		list_del(&mr->list);
-> > +		kvfree(mr);
-> > +	}
-> > +}
-> > +EXPORT_SYMBOL_NS_GPL(libie_pci_unmap_fltr_regs, "LIBIE_PCI");
-> > +
-> > +/**
-> > + * libie_pci_unmap_all_mmio_regions - unmap all PCI device MMIO region=
-s
-> > + * @mmio_info: contains list of MMIO regions to unmap
-> > + */
-> > +void libie_pci_unmap_all_mmio_regions(struct libie_mmio_info *mmio_inf=
-o)
-> > +{
-> > +	struct libie_pci_mmio_region *mr, *tmp;
-> > +
-> > +	list_for_each_entry_safe(mr, tmp, &mmio_info->mmio_list, list) {
-> > +		iounmap(mr->addr);
-> > +		list_del(&mr->list);
-> > +		kvfree(mr);
-> > +	}
-> > +}
-> > +EXPORT_SYMBOL_NS_GPL(libie_pci_unmap_all_mmio_regions, "LIBIE_PCI");
-> > +
-> > +/**
-> > + * libie_pci_init_dev - enable and reserve PCI regions of the device
-> > + * @pdev: PCI device information
-> > + *
-> > + * Return: %0 on success, -%errno on failure.
-> > + */
-> > +int libie_pci_init_dev(struct pci_dev *pdev)
-> > +{
-> > +	int err;
-> > +
-> > +	err =3D pcim_enable_device(pdev);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	for (int bar =3D 0; bar < PCI_STD_NUM_BARS; bar++)
-> > +		if (pci_resource_flags(pdev, bar) & IORESOURCE_MEM) {
-> > +			err =3D pcim_request_region(pdev, bar, pci_name(pdev));
+Regards,
+Lorenzo
 
-So mappings are handled manually, and region requests automatically
-through devres?
+>=20
+> --=20
+> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260516-airoha-eth-=
+multi-serdes-v7-0-99e0093303e2@kernel.org?part=3D3
 
-In case you can use (or add) a pcim_iomap_region() function for that,
-you would get consistent automatic devres management.
+--LJ7Nk84mR0QUSsMi
+Content-Type: application/pgp-signature; name=signature.asc
 
+-----BEGIN PGP SIGNATURE-----
 
-Greetings,
-P.
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagwddgAKCRA6cBh0uS2t
+rAW/AP0aD9yWvysA4UQZWMt8KYNajMyf11KY05+00GEq79lH5AD/YUZPKzhQdrP7
+doMJF/1zsYgfpHeJZmwlhUdhbiqNpgM=
+=lPdz
+-----END PGP SIGNATURE-----
 
-> > +			if (err)
-> > +				return err;
-> > +		}
-> > +
-> > +	err =3D dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	pci_set_master(pdev);
-> > +
-> > +	return 0;
-> > +}
-> > +EXPORT_SYMBOL_NS_GPL(libie_pci_init_dev, "LIBIE_PCI");
-> > +
-> > +MODULE_DESCRIPTION("Common Ethernet PCI library");
-> > +MODULE_LICENSE("GPL");
-> > diff --git a/include/linux/intel/libie/pci.h b/include/linux/intel/libi=
-e/pci.h
-> > new file mode 100644
-> > index 000000000000..effd072c55c8
-> > --- /dev/null
-> > +++ b/include/linux/intel/libie/pci.h
-> > @@ -0,0 +1,56 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/* Copyright (C) 2025 Intel Corporation */
-> > +
-> > +#ifndef __LIBIE_PCI_H
-> > +#define __LIBIE_PCI_H
-> > +
-> > +#include <linux/pci.h>
-> > +
-> > +/**
-> > + * struct libie_pci_mmio_region - structure for MMIO region info
-> > + * @list: used to add a MMIO region to the list of MMIO regions in
-> > + *	=C2=A0 libie_mmio_info
-> > + * @addr: virtual address of MMIO region start
-> > + * @offset: start offset of the MMIO region
-> > + * @size: size of the MMIO region
-> > + * @bar_idx: BAR index to which the MMIO region belongs to
-> > + */
-> > +struct libie_pci_mmio_region {
-> > +	struct list_head	list;
-> > +	void __iomem		*addr;
-> > +	resource_size_t		offset;
-> > +	resource_size_t		size;
-> > +	u16			bar_idx;
-> > +};
-> > +
-> > +/**
-> > + * struct libie_mmio_info - contains list of MMIO regions
-> > + * @pdev: PCI device pointer
-> > + * @mmio_list: list of MMIO regions
-> > + */
-> > +struct libie_mmio_info {
-> > +	struct pci_dev		*pdev;
-> > +	struct list_head	mmio_list;
-> > +};
-> > +
-> > +#define libie_pci_map_mmio_region(mmio_info, offset, size, ...)	\
-> > +	__libie_pci_map_mmio_region(mmio_info, offset, size,		\
-> > +				=C2=A0=C2=A0=C2=A0=C2=A0 COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-> > +
-> > +#define libie_pci_get_mmio_addr(mmio_info, offset, ...)		\
-> > +	__libie_pci_get_mmio_addr(mmio_info, offset,			\
-> > +				=C2=A0=C2=A0 COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-> > +
-> > +bool __libie_pci_map_mmio_region(struct libie_mmio_info *mmio_info,
-> > +				 resource_size_t offset, resource_size_t size,
-> > +				 int num_args, ...);
-> > +void __iomem *__libie_pci_get_mmio_addr(struct libie_mmio_info *mmio_i=
-nfo,
-> > +					resource_size_t offset,
-> > +					int num_args, ...);
-> > +void libie_pci_unmap_all_mmio_regions(struct libie_mmio_info *mmio_inf=
-o);
-> > +void libie_pci_unmap_fltr_regs(struct libie_mmio_info *mmio_info,
-> > +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool (*fltr)(struct libie_mmio=
-_info *mmio_info,
-> > +					=C2=A0=C2=A0=C2=A0 struct libie_pci_mmio_region *reg));
-> > +int libie_pci_init_dev(struct pci_dev *pdev);
-> > +
-> > +#endif /* __LIBIE_PCI_H */
-> > --=20
-> > 2.47.1
-> >=20
-
+--LJ7Nk84mR0QUSsMi--
 
