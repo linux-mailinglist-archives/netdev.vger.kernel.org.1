@@ -1,186 +1,204 @@
-Return-Path: <netdev+bounces-289458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289459-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2D4qGRtiDGpXggUAu9opvQ
-	(envelope-from <netdev+bounces-289458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:14:03 +0200
+	id oCidNRpiDGpXggUAu9opvQ
+	(envelope-from <netdev+bounces-289459-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:14:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2EB057F617
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:14:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E27F57F616
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:14:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DD86730791C6
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:06:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9860303C42D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A74034040D;
-	Tue, 19 May 2026 13:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D39E3EF675;
+	Tue, 19 May 2026 13:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="kwXBGbji"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="INxQ4EN7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eASMPlwt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1D73403FC
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 13:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296AC34041A
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 13:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779195977; cv=none; b=t9XpMAJDqOuz+GoggrmJIxHY/vFhYX8LmI9Dl0WLCI6Key4DMPoPW7RYUmZfZLxT5cfwT3csvdH/DUROm+EZuNEhE90UK6TpzFBQRj8S9XCK2vNkiQGzLTbiHyWBHZXckY807E9L9+K9mYDPX8M6Kdcn20xJ/oF/C0WHfM5kY/M=
+	t=1779196332; cv=none; b=R/lFGzNtWicThLPowzdpcKmMHNfhNpVKvYZmc1nsQcIzkPI8L+tnSxhgChsx739c9W7pJVKmkAS68KRAfhhQVzf1juytnqGnFR0S/OdbXvsBV3wORMXRPuGoV+zL3sclJH41XozXg8eaohtDcComn0YVpldu9vB3PtsdtLnFBOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779195977; c=relaxed/simple;
-	bh=cg4z7G7iNBSO9WPLaSxyK3mhnsTtEoKLiHUito40w9U=;
+	s=arc-20240116; t=1779196332; c=relaxed/simple;
+	bh=wIALats8330P4GY254CIgPMnQvywdc1NoEvfnpJIuBU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UhgS6friacAMzPZoSAxeD9BEi0pDbxMFkaU8JK5nZs74eyMBZSRv/YnT6CkS411kFLTGuNrwEFRnv7ZoLGgHoaAN6NlFS7jJ/77qdfcIvQ5GAGL1gN8GmjlzM5rRJ12MuQEwkGl2kilyg1lcvBNjwehb3EUjDi4Pm8iSlJYzmTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=kwXBGbji; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5a8fbe18b1dso6017406e87.2
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1779195974; x=1779800774; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mBDmsIRaLxU1htRPlExjpxjIYZQeUV/LcGzok6vPGGI=;
-        b=kwXBGbjiqKL80cPycnq0bJj0qNvwKq+TrenGRUW0bjWmNDdZhDsHgxuYXhzEL9tZQN
-         q7Liw5l6DLYZdsD4Azs/D3o4r0stvUnvR0Hgpt+rosIX+B1lIEOT/IKAW2gHwnUMRgft
-         1euULnig2fCtGImNof/t+O/M+XZ23xnZ9fbNr3Z0k0olPbeFsgpWDuUW1l76AiUy+56L
-         g/HDaOZu8IovYijPLhxGCfiJacQYxIK+ihL+UqPK66aeDEMpRL0/V1cUQZhj3G3krWpJ
-         a6lV/S7IzdtS+Hb+gPiquLG2HAgB/jYTJIEK9sq5GmKT/o00lytsDX/rNFdemZyXYEEZ
-         YjDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779195974; x=1779800774;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mBDmsIRaLxU1htRPlExjpxjIYZQeUV/LcGzok6vPGGI=;
-        b=V9wuVjzF1ndowA6GZN8CwBUI7Hv6X4zpL7+MzuJ7rYzyk2iTsZMidiSgY8kw3JfL5D
-         LVK2ydwq9TXHFShT9NApPBTpMlJY8J0FXkvAO5ULUH2ZEYbqg/QA8cG49PdEUp1BN039
-         +5AAqq1P/+8ipa+7woNjM0Ymyl82T77Vn6n1SmML6CcgpqiYlWK3EYz+A01FTwnaUW8S
-         n0QNh91c4LQB71BKlIliu1cKehRfoorgNmdVJxz2oNu+p2cKixI5RNP7taXSgJRzSg0C
-         E11kEvERHp5OjyUuPKJw5qq6vcw1LFiidc+FQw5vaCKcN0FTu6LO+U2h4QRzgNmACZl1
-         /CsQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8Vt0Kb0xjDzuR82rtRpCw5FMFDAkuBYlvjxbX1amAKwQRpQBGWdeAIDoBhnOGFrlIOa1YXEB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2cEl3lzk1hIdnfT9QhzBQBZ9LuUDVWO0iitdH6nG0ZPZ2Qxei
-	RS2sIXzfjEg3PRSR4aVct5Bb2HkQXp2/M+3ik/ZALXMGo3IsaJjNFXZ+N3Bhh5Z/mX8mpjBIRnn
-	euCoh
-X-Gm-Gg: Acq92OEBV1/zKKydIEr2hk5wdtngM9WIE1rEoBAsHn5BcItkBacAjlVNYTb//Uhp7cT
-	GNswWyHW+RdAgKhv86uUibevWENPGRCPGB5TgOf19Hq/MACTlBMoWN6lgXyMXAkA7Mzh5vxtrTQ
-	6+XUEQBj+XrDgThWhTG54XwGV+rEqiIYnH7Q7OKUucstw+7gQepQMSYIeRcobbMlZswpMX5KO4T
-	6JNPJDV7VjTERWTnoKDEJKNnJuz0W1+1oQ7iMNo3/XvcfmsvakQtAIoTzsCNxXCNohCvdSWmmln
-	0FnLDykFTqWbJ/EpOwKUS6BtADeoBJ02LrxgkcN0kGrr5KFFqKPyM4Qw5A/1xYkOyEU+QqMjrVP
-	M6jKq26j8lG/421FN5UbIvWX3GJDjefFSFc63nGBHuRI2AZhEwqTGzhgRw1qIigd0fGmjIkEf0F
-	5cnNQf2CJKPZaGVNJO4ffj4WNNQZK/G2ki24wdLzSmLA==
-X-Received: by 2002:a05:6512:1321:b0:5a8:8df1:61bf with SMTP id 2adb3069b0e04-5aa0e763a62mr5665485e87.21.1779195973589;
-        Tue, 19 May 2026 06:06:13 -0700 (PDT)
-Received: from localhost ([176.111.181.159])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a9164c5a36sm4124074e87.60.2026.05.19.06.06.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 06:06:13 -0700 (PDT)
-Date: Tue, 19 May 2026 16:06:06 +0300
-From: Nikolay Aleksandrov <razor@blackwall.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=djzbD9EauyMRSAHRFVmH/0SsbrMIX7RT9nLKd0VQiZg+yWEKA+nLemewto9GvhiwN9FmvPVzLrlAa0iD6KtXJFCo8taVHIdxK58zDlhnlh3XJCGWwHDNPMO5P4JoAwqex3F1SN99O1xzyJ5CdqQmlHoHiMWFDW9cWT3rjjbZGUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=INxQ4EN7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eASMPlwt; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id 3EE7AEC0092;
+	Tue, 19 May 2026 09:12:09 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Tue, 19 May 2026 09:12:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1779196329; x=1779282729; bh=C8UJjN9YIM4dF2un1h9N5JgiFsD8ZA8f
+	TKRS/ARFXxg=; b=INxQ4EN7m81c6gPrhcpB6idlpBG7cHagf+wSRqU3bDWkbURY
+	IjVPQCOYExulZV/hu2iAp7jzN+rKNMI6JXJcb7aWOHLFvWqVaawW34TowJytz3dU
+	un6wA4ZaeaSI0Qlt9SMBvKCdrgFBnDuwzmrCJIKBoxEYd6Yted9iP+iU6Ie71JVg
+	WkCQ7EoyzioC6JmC4tBvXtdXQrAX3AErowWI6dxHFgbloNUQasGmxe8rP24PyO9Y
+	xDmbQGa3UZk75L2eO+XIMK6wO05gRrehNJ5myl1tu2/FRslzUVMMAuIU0dUfGpVE
+	k03mDxISj5a3UcVD4s09PFbeJHC7tuwYGdDf9w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779196329; x=
+	1779282729; bh=C8UJjN9YIM4dF2un1h9N5JgiFsD8ZA8fTKRS/ARFXxg=; b=e
+	ASMPlwtVYqD1Bo4cAxpkgWqkRWx1h+KetkpLKiv63C+37SS9v3pyK/Sa6N1H/uls
+	SbwlZ4+OldI62w9pJo9a34cdrkFRZlz+3/U00ijdqRkaYFLEvbTn7TwxCq5FWzdL
+	bgRqk2RfBYpHiaVN2bO6umfx4h8PdgE2O8vzWJ9SKRLaY/4aZKYsOcWevrUz+3Ip
+	4dddwHILBq/dMkGTW/mBboToMO1kKE5dzM+79gVNa4O9XFS6RcFe6LD4vC4fz03l
+	0oaYA8DtcjCzAfXszCzo/Gnw/AkpewgvmauyEXIwGlcp9+JYab/dnZqqrFSfw+zo
+	QlcXeICZUnEtJxvGWqpxg==
+X-ME-Sender: <xms:qGEMasiXOypnAIoZQR8E-A8T2MLFtixq4MTayVJ_Xz_POyffNcCP5A>
+    <xme:qGEMankw0RSfz5V5crIXinF6kdYv1tm0GoF_BKFdld8vcthX-1zBcweoomg9Vlcp2
+    VKrNCWBLx5RSEMyAStVXZUZb7EUqT5hRweYbsf3-kxMeBfU8crKW1g>
+X-ME-Received: <xmr:qGEMansuSPNE8i45uNvnED8x8_tIfo8uBM2EuNH0Qe_0xkaCctjD3kfWVd_aEiNtM2gwUvH6LQrLUWkdDeLA_4M>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugedukeegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
+    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
+    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
+    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepledpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
+    homhdprhgtphhtthhopeifihhllhgvmhgssehgohhoghhlvgdrtghomhdprhgtphhtthho
+    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhuhiirg
+    hifhgrshesrhgvughhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhl
+    ohhfthdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopegrshhmlhdrshhilhgvnhgtvgesghhmrghilh
+    drtghomh
+X-ME-Proxy: <xmx:qGEMatYBbwAytSisAgp2abJWc8eFI7Ujx6v7Fw_4Lcq8IPWxdifvDw>
+    <xmx:qGEMavA7srHCutKKKRTzOi55mof4aPj5y63k0vq45xgKRPAuiGyTtg>
+    <xmx:qGEMal_bnj3ByBWaHNoIO_uSz7alj0aCYZUWbrahO_R-9zvqITOkow>
+    <xmx:qGEMarS9VVxvzsN4Omqu3I7NtpelKy6AkvBPutPTZBO0Wb8J-js9DQ>
+    <xmx:qWEMamLk582IMjCjruyAuKGQrNuCwxc6ALJFxQ29_DaXvVkkiFms7LBd>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 19 May 2026 09:12:08 -0400 (EDT)
+Date: Tue, 19 May 2026 15:12:06 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
 To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
+Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+	Huzaifa Sidhpurwala <huzaifas@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [PATCH net-next] net: bridge: remove stale rcu_barrier() in
- br_multicast_dev_del()
-Message-ID: <agxgPqDGkXspLZzJ@penguin>
-References: <20260519095540.2643318-1-edumazet@google.com>
+	Simon Horman <horms@kernel.org>,
+	Pavel Begunkov <asml.silence@gmail.com>
+Subject: Re: [PATCH net] net: gro: don't copy frags between mixed zcopy skbs
+Message-ID: <agxhpnI84II_Utjk@krikkit>
+References: <4d583fc5401298453d0a2f1b4719a15be30c8e49.1779194090.git.sd@queasysnail.net>
+ <CANn89i+w93DBm_yo5DZ6K_dgV4Gst=vb5OnTcXi2rKqeNHZSbQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260519095540.2643318-1-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+w93DBm_yo5DZ6K_dgV4Gst=vb5OnTcXi2rKqeNHZSbQ@mail.gmail.com>
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-289459-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289458-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,redhat.com,davemloft.net,kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,nvidia.com];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,blackwall.org:email,blackwall.org:dkim]
-X-Rspamd-Queue-Id: D2EB057F617
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,messagingengine.com:dkim,queasysnail.net:email,queasysnail.net:dkim]
+X-Rspamd-Queue-Id: 3E27F57F616
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 09:55:40AM +0000, Eric Dumazet wrote:
-> This rcu_barrier() came from a time call_rcu() calls were used in
-> net/bridge/br_multicast.c.
+2026-05-19, 05:57:22 -0700, Eric Dumazet wrote:
+> On Tue, May 19, 2026 at 5:40 AM Sabrina Dubroca <sd@queasysnail.net> wrote:
+> >
+> > skb_gro_receive() can currently copy frags between the source and GRO
+> > skb, without checking the zerocopy status, and in particular the
+> > SKBFL_MANAGED_FRAG_REFS flag.
+> >
+> > When SKBFL_MANAGED_FRAG_REFS is set, the skb doesn't hold a reference
+> > on the pages in shinfo->frags. Appending those frags to another skb's
+> > frags without fixing up the page refcount can lead to UAF.
+> >
+> > When either the last skb in the GRO chain (the one we would append
+> > frags to) or the source skb is zerocopy, skip the frags copy, and just
+> > append the new skb to the frag_list.
+> >
+> > This is probably a bit less efficient than calling
+> > skb_zcopy_downgrade_managed(), but then we'd also have to handle the
+> > rest of the zerocopy flags/machinery. This can be improved in
+> > net-next.
+> >
+> > Fixes: 753f1ca4e1e5 ("net: introduce managed frags infrastructure")
+> > Reported-by: Huzaifa Sidhpurwala <huzaifas@redhat.com>
+> > Assisted-by: Claude:claude-mythos-preview
+> > Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> > ---
+> >  net/core/gro.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > Huzaifa has found this to be exploitable to overwrite the page cache
+> >
+> > diff --git a/net/core/gro.c b/net/core/gro.c
+> > index 31d21de5b15a..cae0a0dbfa69 100644
+> > --- a/net/core/gro.c
+> > +++ b/net/core/gro.c
+> > @@ -123,6 +123,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
+> >         lp = NAPI_GRO_CB(p)->last;
+> >         pinfo = skb_shinfo(lp);
+> >
+> > +       if (skb_zcopy(skb) || skb_zcopy(lp))
+> > +               goto merge;
+> > +
+> >         if (headlen <= offset) {
+> >                 skb_frag_t *frag;
+> >                 skb_frag_t *frag2;
 > 
-> Now kfree_rcu() is there, we can remove this problematic rcu_barrier()
-> which causes extreme RTNL pressure in many syzbot reports.
+> Do we really want to merge these skbs in the first place?
 > 
-> INFO: task syz-executor:77945 is blocked on a mutex likely owned by task kworker/u1024:5:36537.
-> task:kworker/u1024:5 state:D stack:24616 pid:36537 tgid:36537 ppid:2      task_flags:0x4208060 flags:0x00080000 last_sleep:612797637337
-> Workqueue: netns cleanup_net
-> Call Trace:
->  <TASK>
->   [<ffffffff81914eaa>] context_switch+0xf2a/0x1730 kernel/sched/core.c:6483
->   [<ffffffff81201143>] __schedule+0x1133/0x43a0 kernel/sched/core.c:8411
->   [<ffffffff8120446b>] __schedule_loop kernel/sched/core.c:8514 [inline]
->   [<ffffffff8120446b>] schedule+0xab/0x260 kernel/sched/core.c:8529
->   [<ffffffff8121a093>] schedule_timeout+0xc3/0x2b0 kernel/time/sleep_timeout.c:75
->   [<ffffffff81205347>] do_wait_for_common kernel/sched/completion.c:100 [inline]
->   [<ffffffff81205347>] __wait_for_common kernel/sched/completion.c:121 [inline]
->   [<ffffffff81205347>] wait_for_common kernel/sched/completion.c:132 [inline]
->   [<ffffffff81205347>] wait_for_completion+0x2c7/0x5d0 kernel/sched/completion.c:153
->   [<ffffffff81b8f27f>] rcu_barrier+0x49f/0x620 kernel/rcu/tree.c:3888
->   [<ffffffff860091b3>] br_multicast_dev_del+0x303/0x350 net/bridge/br_multicast.c:4459
->   [<ffffffff85fb5dbc>] br_dev_uninit+0x1c/0x40 net/bridge/br_device.c:157
->   [<ffffffff8568058c>] unregister_netdevice_many_notify+0x1c1c/0x2300 net/core/dev.c:12599
->   [<ffffffff8562be43>] ops_exit_rtnl_list net/core/net_namespace.c:187 [inline]
->   [<ffffffff8562be43>] ops_undo_list+0x3d3/0x940 net/core/net_namespace.c:248
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> Cc: Ido Schimmel <idosch@nvidia.com>
-> ---
->  net/bridge/br_multicast.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-> index 49ceea3ff9742d3043ac605d656b7fcf37dbcb96..8efa3add5d47508fb2b032ff6238ffbbabfd27ad 100644
-> --- a/net/bridge/br_multicast.c
-> +++ b/net/bridge/br_multicast.c
-> @@ -4453,8 +4453,6 @@ void br_multicast_dev_del(struct net_bridge *br)
->  	br_multicast_ctx_deinit(&br->multicast_ctx);
->  	br_multicast_gc(&deleted_head);
->  	cancel_work_sync(&br->mcast_gc_work);
-> -
-> -	rcu_barrier();
->  }
->  
->  int br_multicast_set_router(struct net_bridge_mcast *brmctx, unsigned long val)
-> -- 
-> 2.54.0.563.g4f69b47b94-goog
-> 
+> What about play safe?
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Seems reasonable to me. I'll wait another 23.5 hours to submit v2.
+(and I'll let you pick some commit tags if you want)
+
+-- 
+Sabrina
 
