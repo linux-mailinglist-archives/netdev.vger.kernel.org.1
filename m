@@ -1,214 +1,244 @@
-Return-Path: <netdev+bounces-289400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289402-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AG3BA65BDGq4bwUAu9opvQ
-	(envelope-from <netdev+bounces-289400-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:55:42 +0200
+	id IORvE6hBDGq4bwUAu9opvQ
+	(envelope-from <netdev+bounces-289402-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:55:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ABCE57CF59
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:55:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1010957CF52
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 13E983162882
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:44:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 19CC630BEB75
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32363ACEF2;
-	Tue, 19 May 2026 10:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09300369D4C;
+	Tue, 19 May 2026 10:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="QTLzPnxY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYi6q0Ku"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [152.89.196.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 421283F1ACE;
-	Tue, 19 May 2026 10:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.89.196.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9422D369D45
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 10:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779187235; cv=none; b=t3Kn/dj43w9RvrUt/6lzXbyhNoZy4krh2lH4qYqQD5EQXzJkVi/IvzK6fZ/ryuVxV57ROgBE/CwY4B/d5kOUnUu1GccxoDFtakdLbVlNhEc59Kak4ZxXIc6Xe6oA71qiI4i7Dd5sXcDykY6AkcJXGP5F7jieKQl6IPP2sQz9Buk=
+	t=1779187626; cv=none; b=qhvHifceeeGR6SKKppyGXMVvdU1oEeJTTiyvlIztmxxyksZSg0Hepr7CangAjfNBzVOyuRBZV/HUKBFoF1yyjAiaEl/9sW2HTad0+TM699qs+/urGZjd+Zy76+JrDfUHrBxflSKvrmGwS34NQy+F21jelm/Zs4iR1/rnTEjfnI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779187235; c=relaxed/simple;
-	bh=1DDPEQ6Ad+zkc7CbGn3iTPqfeWsmlCnU2S/NaEW3rjI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QlpZhqMLcTbppt9IkyrQII/KmOkvqItofeFC5efEfS2mrfSuBaqMiHvxd+YW4SSGcykweESWhF52+pWgTw63BTVJOFiuC0QZoKgq3vBu6jx+cOZCcJe8GX93j+ZuHfFZ8NA1lp19PL2EEzg1TJ2UC7zvtuqPQ+eylfu2ntBEkT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=QTLzPnxY; arc=none smtp.client-ip=152.89.196.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
-Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx4.sberdevices.ru (Postfix) with ESMTP id B33A740016;
-	Tue, 19 May 2026 13:40:28 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru B33A740016
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1779187228;
-	bh=dQ9xHtZ7tzYnOTboAdIpbJmWJfaj5XbwXVJmG5/3vLo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=QTLzPnxYDxxlPG8sixs+G8eEMZPgXxe0sDYdFEXBtPaDmpzXwmk9uwLWVn/tRNaon
-	 Z1d4Xo2HWhf78s+EFxWF36PRIzQlb7/N2afnF6XqGEL5ZKeCrRA/ihJLLJAOS2dU/C
-	 ZvNWBfvFSUJ8NaVbxXTNDNKoeQj/8Ha1p5NPHoLfPqG4XKj9aYlNlgFUuGdaNWKze7
-	 vqJppw6eeml7CuZC3AmskNMMZYq7sN541J9KVEjuupY7lQI6vq5+C6x/TzG7DC5wMG
-	 C1OKMENojcjJIMn8V2kGWmmyMSjRUtCYvzuoQlKzKv9mIkafLim+PWD4dH2CgvlFaa
-	 V+7UGrGF6WuIg==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "sberdevices.ru", Issuer "R12" (not verified))
-	by mx4.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 19 May 2026 13:40:26 +0300 (MSK)
-Message-ID: <9da0992f-207e-4d40-8f12-c98fea299414@salutedevices.com>
-Date: Tue, 19 May 2026 13:40:24 +0300
+	s=arc-20240116; t=1779187626; c=relaxed/simple;
+	bh=mO0cTsfurZJRh70+4cjjSUsu5ZmYxVvvAclYwTEmi+Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MzWs/t3CxT7EE8YQe6TwR07/KfrHuOd1pTmivpi+h7Vx9Y/AeJh2eJjh2ur9YocBb/3w71lnbh40El6xbsndR769aFGvROLum84FTMDTuB+gRePsQUQs0UooHXag+18jVqUO+3JVYrz7YronghVQ4SjpQVQVh6BIGFd/81HQXnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cYi6q0Ku; arc=none smtp.client-ip=209.85.210.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-83ef8b48f94so2529384b3a.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 03:47:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779187625; x=1779792425; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=n2h2PNmKKKAGDfcHH2hpILyf7BR19TWjTq3xq81PbRc=;
+        b=cYi6q0Ku9L0WTgHZ4aQ8ErrZtncvpFHlKVRrKNAYMXYPWeeXYID5edaG2xe6OUcjpH
+         T3qRAskFlABw0Ll8hXbTeneFLjGmxb1NHY6/pcoDW1kgUVS6YoF2GgzjCAiNKV+wHdo+
+         QEaD0aRuLkAUjygenlkx2nn9V93CLe60c+gZLdqXrfAaTvQPF1ac1iZ5JlZ1kuPXoJwH
+         Rtz+w9lpC6Y7X+JzNx8DsjkmSAQmzn1emBtCtBdAw9SZXmR+8DEF2zkUrtM2hCWFuWNZ
+         eFYLOMQnYA2ZqId04wOK2Wqa7hNrSLDRgu5ryFvc1qYz5Jn0Szbr8aCXEjb9YE8Sp78v
+         VhwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779187625; x=1779792425;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n2h2PNmKKKAGDfcHH2hpILyf7BR19TWjTq3xq81PbRc=;
+        b=C71WHgZhnB1e2+hk6xrAbx04Y0wuddRF/xRShr0oMH6k2T9++iSOYS9SNEQi/I/Kmw
+         53VNklZjXGqCTjMkxCr4IvWzhY/3VwTuKFfNxlNUuEMjdVvL2GewIqC8swlfOsM9ihpv
+         bjS0HlDg4xlL4exMjtveV7ZlxZKXlmciTMp1TacSYNwb9BABXOLczARBHFUSmf/Tg9Td
+         1TebUCz64zx1LfOJ7UpIxPeMAx6KcPMd0ZriLIGo/p4V08gIdgbmN7qGCnPNr0+FC513
+         wCmgWJLh22odOrzXd46PTQ9ns/4ysogzGvI+2G8aRLhx6caoNlDK2+LeO0pB4kafrUIx
+         6/HQ==
+X-Gm-Message-State: AOJu0YwzD0G88Xj4wpSNlHqI2cDb1gHWvx9fog4LkuNR9d/pLtX+CcLa
+	vOqHF00//shoQDePlQCYxyMOIdsfnza1dxOm4/JHUPR5/DpAsoq8gcN3
+X-Gm-Gg: Acq92OGfvRCfH4PpjXckN16y4/Pz76Cb1jfNykahLf7cRCmAdbFnb/MVd2016LIs//H
+	W4uZVc+4YaSlDEYuv1am6BzBAEh+xmFVObCjiPlAlGogU+n0VJnD0k+MxeROMK+aEw+6pRWWD2G
+	2ztljJV99vHLRZDQ6XoIBK0trvSGrxrUWGZyvEQMDnlk1UXsq6IR2EaFWBLzTJRv0c0uzrhS4EP
+	42P0NO0D7SuHahAA7TIaGGQ3VyJ2dO1HRYp61sKtjzn+mnPiuuptxfl4SChnMp7QpMOEdMD+fRo
+	k7qTfTjVZ6+8m3yCa9UJdvq/Nk0NubMnNqNxWhoEwGFf5mlP1WoBhPZV7lkS+V7n5gY0gkkZK8r
+	RBp0u7NRlfC31J4Ba+pcv2WAhQWyUOxLT6bP+CUEO42foLdw0NY4X9GTi1Ekiceba4UDtGbJU7/
+	X/FcU498JQDAg/jIOp5GMMb5DgM6tduA4=
+X-Received: by 2002:a05:6a00:2d8c:b0:83e:f75d:828d with SMTP id d2e1a72fcca58-83f33cb5e90mr19566890b3a.16.1779187624803;
+        Tue, 19 May 2026 03:47:04 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f19778c87sm16666168b3a.19.2026.05.19.03.46.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 03:47:04 -0700 (PDT)
+From: Zhang Cen <rollkingzzc@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zerocling0077@gmail.com,
+	2045gemini@gmail.com,
+	Zhang Cen <rollkingzzc@gmail.com>
+Subject: [PATCH v2] netpoll: normalize skb->dev to the netpoll device
+Date: Tue, 19 May 2026 18:46:47 +0800
+Message-Id: <20260519104647.3517990-1-rollkingzzc@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] vsock/virtio: fix zerocopy completion for multi-skb
- sends
-Content-Language: ru
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: David Laight <david.laight.linux@gmail.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stefan
- Hajnoczi <stefanha@redhat.com>, <kvm@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, <virtualization@lists.linux.dev>,
-	"David S. Miller" <davem@davemloft.net>, Jason Wang <jasowang@redhat.com>,
-	<linux-kernel@vger.kernel.org>, Maher Azzouzi <maherazz04@gmail.com>
-References: <20260514092948.268720-1-sgarzare@redhat.com>
- <20260516125329.7b699c6f@pumpkin> <agrXvCtNRlySlwgx@sgarzare-redhat>
- <20260518053223-mutt-send-email-mst@kernel.org>
- <agrg1GVzoJWtNuSd@sgarzare-redhat> <20260518115005.5f13bd2b@pumpkin>
- <20260519053951.1C60440015@mx4.sberdevices.ru>
- <aea2227c-3011-4457-b909-d16de1596a6d@salutedevices.com>
- <agwwxuQlIWjwXtMN@sgarzare-redhat>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <agwwxuQlIWjwXtMN@sgarzare-redhat>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-exch-cas-s-m2.sberdevices.ru (172.16.210.3) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-AntiPhishing: NotDetected, bases: 2026/05/19 09:18:00
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Info: LuaCore: 105 0.3.105 c7fb587251b1312ef0d9243823bef7335f8fcbef, {Tracking_phishing_log_reg_50_60}, {Tracking_uf_ne_domains}, {Tracking_arrow_http}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1;git.kernel.org:7.1.1;salutedevices.com:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 203250 [May 19 2026]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.22
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/05/19 08:45:00 #28204055
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-KATA-Status: Not Scanned
-X-KSMG-LinksScanning: NotDetected, bases: 2026/05/19 09:18:00
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 5
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[salutedevices.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[salutedevices.com:s=post];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289400-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-289402-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org,kernel.org,google.com,linux.alibaba.com,lists.linux.dev,davemloft.net];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[avkrasnov@salutedevices.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[salutedevices.com:+];
+	FROM_NEQ_ENVFROM(0.00)[rollkingzzc@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[salutedevices.com:mid,salutedevices.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 5ABCE57CF59
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 1010957CF52
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+__netpoll_send_skb() always transmits through np->dev and queues busy
+packets on np->dev->npinfo->txq, but it leaves skb->dev unchanged.
+Stacked callers such as DSA and macvlan can reach netpoll with skb->dev
+still naming the upper device while np->dev is the lower device that
+owns the netpoll state.
 
+If the skb has to be deferred, queue_process() later dequeues it from
+the lower device's txq but retries it through skb->dev. That can
+re-enter the upper ndo_start_xmit path on an already transformed skb,
+and if the upper device disappears before the lower txq drains the
+workqueue can dereference a stale skb->dev pointer.
 
-On 19/05/2026 12:49, Stefano Garzarella wrote:
-> On Tue, May 19, 2026 at 09:37:23AM +0300, Arseniy Krasnov wrote:
->> On 18/05/2026 14:08, Stefano Garzarella wrote:
->>> On Mon, May 18, 2026 at 11:50:05AM +0100, David Laight wrote:
->>>> On Mon, 18 May 2026 11:54:19 +0200
->>>> Stefano Garzarella <sgarzare@redhat.com> wrote:
-> 
-> [...]
-> 
->>
->> Hi guys! Just some replies after quick look:
->>
->>>>> >> > Surely that block should only be done if can_zcopy is true?
->>
->> I guess no, since TCP also allocates uarg even if zerocopy is impossible -
->> it just sets uarg_to_msgzc(uarg)->zerocopy = 0;
->>
->>>>> >> > And shouldn't something unset it if info->op != VIRTIO_VSOCK_OP_RW ?
->>
->> Hm, we can't enter block 'if (info->msg) {' when 'info->op' is not equal to 'VIRTIO_VSOCK_OP_RW',
->> because 'msg' is not NULL only for 'VIRTIO_VSOCK_OP_RW'. But anyway You point to right thing - check for
->> 'VIRTIO_VSOCK_OP_RW' could be removed here. Just with comment why.
->>
->>>>> >> > If the msg_zerocopy_realloc() fails then can't you just set can_zcopy to false.
->>
->> Here I guess it is better to follow TCP way to make same behaviour, because exact
->> logic for MSG_ZEROCOPY is not documented. TCP also returns error and stops tx loop.
->>
->>>>> >> >
->>>>> >> > It info->msg->msg_buf is already set then I think you have to disable zero-copy.
->>>>> >> > The caller has already requested a callback - and you can't add another.
->>
->> In TCP implementation if 'msg_ubuf' is set they just use it and check for zerocopy in
->> the same way as 'msg_ubuf' is NULL.
->>
->>>>> >> >
->>>>> >> > In any case by the end of this can_zcopy and have_uref are really the same flag.
->>>>> >>
->>
->> Need to check it more. But 'can_zcopy' means that we fill frags in skb, have_uref means that we
->> allocated completion (but it could be reported with not set 'SO_EE_CODE_ZEROCOPY_COPIED' if
->> 'can_zcopy' was false).
->>
->>
->> @Stefano, I guess current implementation differs from TCP in two cases (at least from first
->> view):
->> 1) When 'msg_ubuf' is set: in TCP, already set 'msg_ubuf' is passed to 'skb_zerocopy_iter_stream()'
->>   (if zerocopy is possible) where it is used as in vsock in call 'skb_zcopy_set()'. In vsock case if
->>   'msg_ubuf' is not NULL we will pass just NULL to 'skb_zcopy_set()'. Yes this is will be
->>   no-effect call today (due to checks in 'skb_zcopy_set()'), but anyway - in future may be not.
->> 2) Also i see that 'skb_zerocopy_iter_stream()' in TCP version has some extra checks which are
->>   missed in vsock - we only just call '__zerocopy_sg_from_iter()' to fill skb in zerocopy way.
->>
->> But, I think, instead of trying to compare vsock and TCP versions best way is to just copy
->> current TCP flow as close as possible:
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/tree/net/ipv4/tcp.c#n1144
->> 1) Use same flow of checks for 'msg_flags', 'msg_ubuf', SOCK_ZEROCOPY etc.
->> 2) To copy data we can use 'skb_zerocopy_iter_stream()'.
->> 3) The only thing that we don't need in vsock is dev mem related code from TCP implementation.
->>
->> I can take this task, but pls need some time - may be two/three weeks due to another tasks.
->>
->> What do You think?
-> 
-> If you can work on it, please go head. They seems all pre-existing, so 2/3 weeks are fine. Please let me know if you can't and I'll try to allocate some time.
+The buggy scenario involves two paths, with each column showing the
+order within that path:
 
-No problem I'll take it. If something goes wrong or stuck - i'll let you know
+path A label: netpoll enqueue path   path B label: upper-device teardown
+1. Stacked xmit calls netpoll        1. Teardown unregisters the upper
+   with lower np->dev and upper         net_device while lower npinfo
+   skb->dev.                            stays alive.
+2. __netpoll_send_skb() uses         2. netdev_release() runs for the
+   np->dev->npinfo as the txq           upper net_device.
+   owner.
+3. Busy transmit queues the skb      3. The lower txq still owns the
+   on that lower txq with upper         deferred skb.
+   skb->dev.
+4. queue_process() drains the        4. queue_process() dereferences
+   lower txq and reads skb->dev.        that stale upper skb->dev.
 
-Thanks
+Normalize skb->dev to np->dev after loading np->dev from the netpoll
+instance, before either the direct transmit path or the fallback enqueue.
+This keeps the queued skb in the same device and txq domain as the
+netpoll state that owns it.
 
-> 
-> Thanks for the help!
-> 
-> Stefano
-> 
+KASAN report as below:
+
+KASAN slab-use-after-free in queue_process+0x7c/0x480
+Workqueue: events queue_process
+The buggy address belongs to the object at ffff88810906c000 which belongs
+to the cache kmalloc-4k of size 4096
+The buggy address is located 168 bytes inside of freed 4096-byte region
+[ffff88810906c000, ffff88810906d000)
+Read of size 8
+Call trace:
+  dump_stack_lvl+0x73/0xb0 (?:?)
+  print_report+0xd1/0x620 (?:?)
+  srso_alias_return_thunk+0x5/0xfbef5 (?:?)
+  __virt_addr_valid+0x215/0x420 (?:?)
+  kasan_complete_mode_report_info+0x64/0x200 (?:?)
+  kasan_report+0xf7/0x130 (?:?)
+  queue_process+0x7c/0x480 (net/core/netpoll.c:88)
+  kasan_check_range+0x10c/0x1c0 (?:?)
+  __kasan_check_read+0x15/0x20 (?:?)
+  process_one_work+0x8b7/0x1af0 (kernel/workqueue.c:3200)
+  assign_work+0x170/0x3f0 (?:?)
+  worker_thread+0x574/0xf10 (?:?)
+  _raw_spin_unlock_irqrestore+0x4b/0x60 (?:?)
+  trace_hardirqs_on+0x2a/0x180 (?:?)
+  kthread+0x2fc/0x3f0 (?:?)
+  ret_from_fork+0x58b/0x830 (?:?)
+  __switch_to+0x58e/0xe90 (?:?)
+  __switch_to_asm+0x39/0x70 (?:?)
+  ret_from_fork_asm+0x1a/0x30 (?:?)
+Freed by task stack:
+  kasan_save_stack+0x3d/0x60 (?:?)
+  kasan_save_track+0x18/0x40 (?:?)
+  kasan_save_free_info+0x3f/0x60 (?:?)
+  __kasan_slab_free+0x48/0x70 (?:?)
+  kfree+0x20e/0x4e0 (?:?)
+  kvfree+0x31/0x40 (?:?)
+  netdev_release+0x71/0x90 (net/core/net-sysfs.c:2227)
+  device_release+0xd2/0x250 (?:?)
+  kobject_put+0x181/0x4c0 (lib/kobject.c:730)
+  netdev_run_todo+0x700/0x1000 (net/core/dev.c:11666)
+  rtnl_dellink+0x396/0xc00 (net/core/rtnetlink.c:3558)
+  rtnetlink_rcv_msg+0x740/0xc20 (net/core/rtnetlink.c:6897)
+  netlink_rcv_skb+0x147/0x3a0 (?:?)
+  rtnetlink_rcv+0x19/0x20 (net/core/rtnetlink.c:7021)
+  netlink_unicast+0x4d1/0x830 (net/netlink/af_netlink.c:1327)
+  netlink_sendmsg+0x840/0xe10 (net/netlink/af_netlink.c:1812)
+  ____sys_sendmsg+0x8a7/0xb50 (?:?)
+  ___sys_sendmsg+0x104/0x190 (?:?)
+  __sys_sendmsg+0x135/0x1d0 (?:?)
+  __x64_sys_sendmsg+0x7b/0xc0 (?:?)
+  x64_sys_call+0x205c/0x2130 (?:?)
+  do_syscall_64+0x115/0x6a0 (arch/x86/entry/syscall_64.c:87)
+  entry_SYSCALL_64_after_hwframe+0x77/0x7f (?:?)
+
+Fixes: 5de4a473bda4 ("netpoll queue cleanup")
+Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
+---
+v2:
+Add the KASAN access, object, and free-side details requested during review.
+Add Fixes: 5de4a473bda4 ("netpoll queue cleanup").
+
+ net/core/netpoll.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index 84faace50ac28..3f4a17fa5713a 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -319,6 +319,8 @@ static netdev_tx_t __netpoll_send_skb(struct netpoll *np, struct sk_buff *skb)
+ 	lockdep_assert_irqs_disabled();
+ 
+ 	dev = np->dev;
++	/* npinfo->txq belongs to np->dev, so retries must stay bound to it. */
++	skb->dev = dev;
+ 	rcu_read_lock();
+ 	npinfo = rcu_dereference_bh(dev->npinfo);
+ 
+-- 
+2.43.0
 
 
