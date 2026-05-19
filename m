@@ -1,304 +1,206 @@
-Return-Path: <netdev+bounces-289331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289332-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yGkdC3IjDGpqXAUAu9opvQ
-	(envelope-from <netdev+bounces-289331-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:46:42 +0200
+	id EGvmOdMlDGoIXQUAu9opvQ
+	(envelope-from <netdev+bounces-289332-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:56:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B676457A6E3
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:46:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DFB057AA35
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:56:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 28DF5302F9C7
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:46:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3162C30FB559
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:48:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8A8395254;
-	Tue, 19 May 2026 08:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F953EF0C5;
+	Tue, 19 May 2026 08:48:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mJYFwKVE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKm0WEKT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD213C585C
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9013C3EF0A0
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779180377; cv=none; b=RcgVfG/mSkC8lvpxA8NtAnX+vDgyVVpsfNoACUd+GcTMS2ddFz/RcCKnV3g/3SW13dhSIUrCvNnIr688uiRw9TXgGgXPUpEgM/VzdHfOJB13vdW2DL1mBxZQwqKaYvAResHVL6prb5KfyMPtw1gIclVHdaxKyt52/PRXDNxk0fQ=
+	t=1779180506; cv=none; b=h4NDDIH15dFPoKAVf59TxT72CywanzheSVQG+r8mwAT9K4U0OCaR4Vw0FSujH9g9djBwcU8DuRaPalEB64Eed8I7+2fV7esZ/NoVS1QmtWtCw7rn+Ve/Vxr+IvaeT8RaOPpBF5Vxoeo8Y0QqEZ5qw+wrarRJfcNDBirRSuva6Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779180377; c=relaxed/simple;
-	bh=XtvZssOFq3x9ABupOERdo79VOaXLriwhFH111CrzZpI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=B/azZ7aLcZvltJ9SpNyVoDCg+wxm/k4SrA09uZKIA6Epm6JcKa12KZIX/DLKgWM5B2gfej+f5q0nEFnhDIP9GKn9nXSH74lFNFQFjv6KFcXWJw+/BiZnQmrh2ZvUzNRhdSc4s4Oz/MvT9HWH6qPUlqoBy+3AK1JhPWmqpFmY8ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mJYFwKVE; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-90d6fe98316so776579585a.3
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:46:13 -0700 (PDT)
+	s=arc-20240116; t=1779180506; c=relaxed/simple;
+	bh=Hyx9uiXztVttxLdo9VjcbHUiP6qvqHfhOZr9vbJAYdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lMXGTadC4SR3CHIttANFrRQmQbg+xiHG7Ja5Xf99HQQwOL2pD57npxrps8wikpb0nUKv1JCYCtPtzfjGVrfFSN1SNmdqz8+x2AR/D5n4bhKxflDSDe2zKi9gNtQHjwyuOWPIiafJ2Iynr0u0ViG9KjvRS5Ot/CaL580SxkuHyqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKm0WEKT; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso25938895e9.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:48:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779180373; x=1779785173; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fo2sHMd0p1op9HVG5DbuQOAb0262oSskb/WnMIBx3ro=;
-        b=mJYFwKVE+f/uKvA+W/yZ4Pf+C/FPo8lUqgYP6kBpsSYHR0GoIBcwI0yjUP+SFfUJ7/
-         pB0zKUYlr2a1rIt8qIOruR775/l46VQvKDo449iFBzdxE3yOQYmiQDbfFFd/wq0k2/p2
-         ymMByk7G0y+n9xCXDeMTE0vzO0oUCjzj4m9iQKimEkNYcv+IjbFIEAmZMTbUScwD53hP
-         djdZQKEz9wrjq4ymBca+zNRYLrvhwrGaY3o1CKxd4mHbrHSkzn8mhEY7Et99Wj+1b0fe
-         fZm1gWLEMgN1b5xXvsTQJzbxd/DomTQUoj/sUWHtStUztNPfPnXonScx8qIHa2hj6IQe
-         j67Q==
+        d=gmail.com; s=20251104; t=1779180503; x=1779785303; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8U8k5KUlWmxiDre3dDf6j/8PHyhhwOqohUrC9tjzC3Y=;
+        b=eKm0WEKT3mVDrwy7IMshOn0GT2kwmWUNussjaxGEyv482mBKvskG0hs7pJ5k+AfXcN
+         l7Rjpy9iZzrpocdayWNqfQdXtH/nwyhXHiZOuGC5I7B98fO16ELapo992aMvVW7NErxJ
+         Dom6oCaQBG4n0rJrkSsLMhnHP63zTKUiw5KuKnT6p7IvYNK+2mRBlfzqpifVUT/esNd3
+         vlhe3vAPa4t8awQvJiHD5JpieSz9o9c/NHG55x2xnbEgyrkqQ4UwvMthmyx0XIjO0dD8
+         Ds9+nZuBWp3o5j4Qfh95443MbvDyxxMyRCOg8xUEL3EtMFxko1g7WSrXeeWqy5p4Vy/L
+         m4TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779180373; x=1779785173;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fo2sHMd0p1op9HVG5DbuQOAb0262oSskb/WnMIBx3ro=;
-        b=GOQVXBv5UiefSAaeDwmcGed2M9AbDTECgsRPR7JgfNOzlQvstS1lRsK90SX7RfMHZe
-         rU53CIymO2W1VfShaaOvknvoqQiEZD1P4qgyyS96yYUC2bPNI2ZHHdLZzb/l14yZQBeZ
-         HLOLtXNm1m0hRETvxWG5itjnP9kHfBp1zmVHNGc0fYgZ+0yvOZyrxOMzNMJ68UlV9U/1
-         VWYjJ0gRRH0sySAa155JfisutpN1k8nLP2JLMp+BT3OobULg0FW3gmUqMpfg+7T2kvNh
-         7jY/I21kKmVFSSpTZQu2snkg18a9aHwIC3wzqeAnmRwyZOL2ZLV5eBCPnXpjs0nbZIvB
-         pdYQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8XILwigTHJ/KGq5f2F/nQTFqPYG8kP3RqfLxkxVyDxXeg4YKdBm1px3XchpZPdu4xmqI98J40=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/iwu6PBzL/9aRMVv+/pQwAygje/nU2PcR/MrVCA5vzEpcEpDa
-	IGNAt4XCT1Ga6xjY3frQRpxgqUQRshThP+iB0/0FV7XNZ+p5w5Vmve68DXvdE8llCKa/b/Sxyeh
-	bZjpUW/OsQCkt9w==
-X-Received: from qknsg43.prod.google.com ([2002:a05:620a:936b:b0:912:6847:c74f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:3708:b0:8cd:c01f:fd25 with SMTP id af79cd13be357-911cd07b23amr2811427285a.14.1779180372544;
- Tue, 19 May 2026 01:46:12 -0700 (PDT)
-Date: Tue, 19 May 2026 08:46:11 +0000
+        d=1e100.net; s=20251104; t=1779180503; x=1779785303;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8U8k5KUlWmxiDre3dDf6j/8PHyhhwOqohUrC9tjzC3Y=;
+        b=ja/3NB2tGvvMgsVYZ+xI5x7aUYV56nl55CH1BUrQMJ4t5AZgaUZ+2vwjlVrTB/3VOa
+         /H6ja/+kgnWje/o8HAOsBwrHW8RgpT4Kv3OMhWzCQo9gzgh0CJc+9erH99PJlw2I+GvJ
+         9adwGi4c5FVxW7x+VdGn3zv2QnyqJu4Bn59Ux3KyyLCNxnDXxND5bpoRY0xOYBGM8Tgm
+         Zqma+b9+WfxaAJ1YB7LOwQbK40anp71/Ojna67W05Le2E3ggNKgO78T7a1gAmg4pCkMo
+         Jx2RYepyNzu00lT4WCJ6KhtYmkmjdlzxnPW2NtyOQcCXevDZeQoy9BH/ikr3tGAK/gw1
+         0MlA==
+X-Forwarded-Encrypted: i=1; AFNElJ/d07d5KFJkMovGHLNhHlSUht1oPRM0d91M9jln6TQhHhH0GG82OrXUTsQnn4U3TPyg7GPnPyU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmvePdcXo2EKHX7uI8IxGZI4IYapM8yuHY8B92OAItjQT7AvTB
+	+kVnBVpuDAVD6Lk+EHZe2Pgn9sSzhggBgNJnlJ20fTO7iCsiAabjIwuA
+X-Gm-Gg: Acq92OFfeIzwggruYIjUl1j0A457ufItJt/zT1kbPr0EH0a6iV2uuoH6Yo9xvLNdYas
+	JPhXPpkeX9JhHaB8iSpqFnOJqLFF4yWp4K+4QIcGhoF8X/Mz3qIzeCzxgsvmL15tX/urL2ZBZD5
+	d0CFf3cdYYGEAytlo1XeCLmQ86bm69y6n04BDT2BXXk4YfTdZLi0qELsSb3wgNi8hpsLjBb6c5r
+	1Wj6DnU27CkzLQ53hw06Z1Ij/CWNlOKs9wtIkX+oqY5T94Q70lZ5eJ/ADqr0jr4v5FmJSzdFi5Y
+	KwnDUlNQd7xu/Ao12R09l94yCa3Q5BTpjresustV4tCc/rc9ln5VC+093pIB2mnesQnDLcSXv+0
+	oOm5tFQisDiHouc7PhRzrtCU6kmYkytPSILmtrmeGeoP+zPyO+HtQaFJ03KV4CrY8I5qwCe9SMT
+	rAKO6ynItUNqaSGVlZ3r6JJYNoDaCu58RT3OaMJ4fWgeMceMB1ZPUw1NGJq2VYllMa
+X-Received: by 2002:a05:600c:3e1b:b0:48a:8905:a500 with SMTP id 5b1f17b1804b1-48fe60da647mr311906705e9.12.1779180502860;
+        Tue, 19 May 2026 01:48:22 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c8344asm530004325e9.1.2026.05.19.01.48.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 01:48:22 -0700 (PDT)
+Date: Tue, 19 May 2026 09:48:20 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+ workflows@vger.kernel.org, linux-arch@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+ linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-csky@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Daniel
+ Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Alex Shi <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, Dongliang
+ Mu <dzm91@hust.edu.cn>, Hu Haowen <2023002089@link.tyut.edu.cn>, Dinh
+ Nguyen <dinguyen@kernel.org>, Kees Cook <kees@kernel.org>, Oleg Nesterov
+ <oleg@redhat.com>, Will Deacon <will@kernel.org>, "Aneesh Kumar K.V"
+ <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Nick
+ Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Vinod
+ Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>, Dave Penkler
+ <dpenkler@gmail.com>, Andi Shyti <andi.shyti@kernel.org>, Jonathan Cameron
+ <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, Nuno
+ =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy Shevchenko <andy@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo Pieralisi
+ <lpieralisi@kernel.org>, Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?=
+ <kwilczynski@kernel.org>
+Subject: Re: [PATCH] nios2: remove the architecture
+Message-ID: <20260519094820.1f05ab8e@pumpkin>
+In-Reply-To: <20260518042833.272221-1-enelsonmoore@gmail.com>
+References: <20260518042833.272221-1-enelsonmoore@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260519084611.2485277-1-edumazet@google.com>
-Subject: [PATCH v4 net] tcp: fix stale per-CPU tcp_tw_isn leak enabling ISN prediction
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Chris Mason <clm@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289331-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[48];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,meta.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289332-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,meta.com:email,vmlinux.new:url]
-X-Rspamd-Queue-Id: B676457A6E3
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lwn.net,linuxfoundation.org,kernel.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,gmail.com,infradead.org,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sourceware.org:url,gnu.org:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,altera.com:url]
+X-Rspamd-Queue-Id: 9DFB057AA35
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Blamed commit moved the TIME_WAIT-derived ISN from the skb control
-block to a per-CPU variable, assuming the value would always be consumed
-by tcp_conn_request() for the same packet that wrote it. That assumption
-is violated by multiple drop paths between the producer
-(__this_cpu_write(tcp_tw_isn, isn) in tcp_v{4,6}_rcv()) and the consumer
-(tcp_conn_request()):
+On Sun, 17 May 2026 21:28:33 -0700
+Ethan Nelson-Moore <enelsonmoore@gmail.com> wrote:
 
- - min_ttl / min_hopcount check
- - xfrm policy check
- - tcp_inbound_hash() MD5/AO mismatch
- - tcp_filter() eBPF/SO_ATTACH_FILTER drop
- - th->syn && th->fin discard in tcp_rcv_state_process() TCP_LISTEN
- - psp_sk_rx_policy_check() in tcp_v{4,6}_do_rcv()
- - tcp_checksum_complete() in tcp_v{4,6}_do_rcv()
- - tcp_v{4,6}_cookie_check() returning NULL
+> The Nios II architecture is a soft-core architecture developed by
+> Altera (since acquired by Intel) and intended to run on their FPGAs.
+> 
+> Licenses for the architecture have not been available for purchase
+> since 2024 [1],
 
-When a packet is dropped on any of these paths, tcp_tw_isn is left set.
+Except I think they got 'beaten up' by some telcos.
+The Nios II gets used inside fpga for small cpu doing things that it would
+be far to difficult to do in VHDL.
+(I believe some mobile base stations fgpa embed a lot of them.)
+These will have a small amount of code (maybe 4k - 64k) and a similarly
+small amount of data memory along with access to fpga peripheral registers
+and (optionally) host memory vie PCIe. No MMU, no cache (or rather the code/data
+is in the cache memory but it isn't backed by anything), no branch predictor
+(guaranteed cycle times), etc.
+Intel suggested that RISCV could be used instead, but it isn't the same beast.
+They didn't document the instruction timings nor how to add custom instructions.
 
-The next SYN processed on the same CPU then consumes the non zero value in
-tcp_conn_request(), receiving a potentially predictable ISN.
+The company I used to work for used 4 NIOS II inside an fpga.
+The instruction timing for one is pretty critical, it has some code that
+has to complete in 122 clocks (worst case).
+Our solution was to spend a few man-weeks writing a compatible cpu!
+I think it came out with fewer pipeline stalls (in particular it 'lost'
+the one for a (predicted) taken branch).
+The maximum clock frequency might be lower; but it is ok at 62.5MHz and the
+higher 125MHz in just impossible for all sorts of reasons.
 
-This patch moves back tcp_tw_isn to skb->cb[], getting rid of the per-cpu
-variable.
+OTOH I really wouldn't run Linux on it!
 
-Note that tcp_v{4,6}_fill_cb() do not set it.
+-- David
 
-Very litle impact on overall code size/complexity:
-
-$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-add/remove: 0/0 grow/shrink: 2/1 up/down: 8/-15 (-7)
-Function                                     old     new   delta
-tcp_v6_rcv                                  3038    3042      +4
-tcp_v4_rcv                                  3035    3039      +4
-tcp_conn_request                            2938    2923     -15
-Total: Before=24436060, After=24436053, chg -0.00%
-
-Fixes: 41eecbd712b7 ("tcp: replace TCP_SKB_CB(skb)->tcp_tw_isn with a per-cpu field")
-Reported-by: Chris Mason <clm@meta.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-v4: okay, move back tcp_tw_isn to skb->cb[]
-
- include/net/tcp.h    |  7 ++++---
- net/ipv4/tcp.c       |  3 ---
- net/ipv4/tcp_input.c | 15 ++++++---------
- net/ipv4/tcp_ipv4.c  |  3 ++-
- net/ipv6/tcp_ipv6.c  |  3 ++-
- 5 files changed, 14 insertions(+), 17 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index ecbadcb3a7446cb18c245e670ba49ff574dfaff7..98848db62894aa4453efa9db7ea425d0aab263da 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -65,8 +65,6 @@ static inline void tcp_orphan_count_dec(void)
- 	this_cpu_dec(tcp_orphan_count);
- }
- 
--DECLARE_PER_CPU(u32, tcp_tw_isn);
--
- void tcp_time_wait(struct sock *sk, int state, int timeo);
- 
- #define MAX_TCP_HEADER	L1_CACHE_ALIGN(128 + MAX_HEADER)
-@@ -1102,10 +1100,13 @@ struct tcp_skb_cb {
- 	__u32		seq;		/* Starting sequence number	*/
- 	__u32		end_seq;	/* SEQ + FIN + SYN + datalen	*/
- 	union {
--		/* Note :
-+		/* Notes :
-+		 *	tcp_tw_isn is used in input path only
-+		 *	(isn chosen by tcp_timewait_state_process())
- 		 * 	  tcp_gso_segs/size are used in write queue only,
- 		 *	  cf tcp_skb_pcount()/tcp_skb_mss()
- 		 */
-+		u32		tcp_tw_isn;
- 		struct {
- 			u16	tcp_gso_segs;
- 			u16	tcp_gso_size;
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 432fa28e47d4c8ef5d50339bfdf7da0ea8772b94..389a7cc17110daa5b3b490b3c339e53e212969f8 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -299,9 +299,6 @@ enum {
- DEFINE_PER_CPU(unsigned int, tcp_orphan_count);
- EXPORT_PER_CPU_SYMBOL_GPL(tcp_orphan_count);
- 
--DEFINE_PER_CPU(u32, tcp_tw_isn);
--EXPORT_PER_CPU_SYMBOL_GPL(tcp_tw_isn);
--
- long sysctl_tcp_mem[3] __read_mostly;
- 
- DEFINE_PER_CPU(int, tcp_memory_per_cpu_fw_alloc);
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index d5c9e65d97606d8eb57aba8ebc2373adf1bed62b..de9f68a9c0cf04109101b0d1bca20440376d4b05 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -7589,6 +7589,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
- 		     struct sock *sk, struct sk_buff *skb)
- {
- 	struct tcp_fastopen_cookie foc = { .len = -1 };
-+	u32 isn = TCP_SKB_CB(skb)->tcp_tw_isn;
- 	struct tcp_options_received tmp_opt;
- 	const struct tcp_sock *tp = tcp_sk(sk);
- 	struct net *net = sock_net(sk);
-@@ -7599,20 +7600,16 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
- 	struct dst_entry *dst;
- 	struct flowi fl;
- 	u8 syncookies;
--	u32 isn;
- 
- #ifdef CONFIG_TCP_AO
- 	const struct tcp_ao_hdr *aoh;
- #endif
- 
--	isn = __this_cpu_read(tcp_tw_isn);
--	if (isn) {
--		/* TW buckets are converted to open requests without
--		 * limitations, they conserve resources and peer is
--		 * evidently real one.
--		 */
--		__this_cpu_write(tcp_tw_isn, 0);
--	} else {
-+	/* If isn is non-zero, this SYN originally matched a TIME_WAIT socket.
-+	 * TW sockets are converted to open requests without limitations,
-+	 * we skip the queue limits and syncookie checks in the block below.
-+	 */
-+	if (!isn) {
- 		syncookies = READ_ONCE(net->ipv4.sysctl_tcp_syncookies);
- 
- 		if (syncookies == 2 || inet_csk_reqsk_queue_is_full(sk)) {
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index c0526cc0398049fb34b5de20a1175d54942e80cd..fdc81150ff6cf938b1971c33b2b997e5d0d8fcaa 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2198,6 +2198,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 		}
- 	}
- 
-+	isn = 0;
- process:
- 	if (static_branch_unlikely(&ip4_min_ttl)) {
- 		/* min_ttl can be changed concurrently from do_ip_setsockopt() */
-@@ -2227,6 +2228,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 	th = (const struct tcphdr *)skb->data;
- 	iph = ip_hdr(skb);
- 	tcp_v4_fill_cb(skb, iph, th);
-+	TCP_SKB_CB(skb)->tcp_tw_isn = isn;
- 
- 	skb->dev = NULL;
- 
-@@ -2313,7 +2315,6 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 			sk = sk2;
- 			tcp_v4_restore_cb(skb);
- 			refcounted = false;
--			__this_cpu_write(tcp_tw_isn, isn);
- 			goto process;
- 		}
- 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index d13d49bfef19457cc5902cb556605a80f4c0ab2c..36d75fb50a70b728fedb7c316e023758bd61d62c 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1839,6 +1839,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 		}
- 	}
- 
-+	isn = 0;
- process:
- 	if (static_branch_unlikely(&ip6_min_hopcount)) {
- 		/* min_hopcount can be changed concurrently from do_ipv6_setsockopt() */
-@@ -1868,6 +1869,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 	th = (const struct tcphdr *)skb->data;
- 	hdr = ipv6_hdr(skb);
- 	tcp_v6_fill_cb(skb, hdr, th);
-+	TCP_SKB_CB(skb)->tcp_tw_isn = isn;
- 
- 	skb->dev = NULL;
- 
-@@ -1956,7 +1958,6 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 			sk = sk2;
- 			tcp_v6_restore_cb(skb);
- 			refcounted = false;
--			__this_cpu_write(tcp_tw_isn, isn);
- 			goto process;
- 		}
- 
--- 
-2.54.0.563.g4f69b47b94-goog
+> and support for it has been removed from GCC 15 [2],
+> Buildroot [3], and QEMU [4].
+> 
+> Given all of these factors, it is time to remove Nios II support from
+> the kernel. The maintainer stated in 2024 that they were planning to do
+> so soon [5], but this did not come to pass.
+> 
+> Remove Nios II support from the kernel and move the former maintainer
+> to CREDITS. Thank you, Dinh Nguyen, for maintaining Nios II support!
+> 
+> References:
+> [1] https://docs.altera.com/v/u/docs/781327/is-discontinuing-ip-ordering-codes-listed-in-pdn2312-for-nios-ii-ip
+> [2] https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=e876acab6cdd84bb2b32c98fc69fb0ba29c81153
+> [3] https://github.com/buildroot/buildroot/commit/6775ccc5a199d574ad70b5f79ec58cce97a07c6f
+> [4] https://github.com/qemu/qemu/commit/6c3014858c4c0024dd0560f08a6eda0f92f658d6
+> [5] https://sourceware.org/pipermail/newlib/2024/021083.html
+> 
+> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 
 
