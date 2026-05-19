@@ -1,293 +1,238 @@
-Return-Path: <netdev+bounces-289466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289467-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBuWB3lnDGpXggUAu9opvQ
-	(envelope-from <netdev+bounces-289466-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:36:57 +0200
+	id aGhpJalpDGo8hQUAu9opvQ
+	(envelope-from <netdev+bounces-289467-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:46:17 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9150557FCEA
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:36:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA7F57FF19
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D10F23035F2D
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:31:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 87B80305F0D9
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96487348C6E;
-	Tue, 19 May 2026 13:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5915371D10;
+	Tue, 19 May 2026 13:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K3cuUKgG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KIoBG67H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5DffAy5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A31348C61
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 13:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779197458; cv=none; b=rqM1SaTeR4faisfqmsq7bFINnM+RH/XZpZ89P4UhUMn3n16wgCpTvc93UnToluyES+jG9LKSweck81lb3L6ppPvyCnTaAEj4nnVPovmTSyOw+suUmaFdBiV329LCeHT9nBVj53oAdt4oQcF6QycWFe9apbNWxiWhKKQJH3oRRa4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779197458; c=relaxed/simple;
-	bh=GNwt91Y/YiIXrN/ComEQSNR7c7pJ+6wypbzG/h6P8+g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PiPEP6oKhwk5619lfbKIu96l8rA1WNaau1eVGWON1x4klvUPzuHQPU3zRX7/FTjoql7dn3+FgPl6LM5zyojNrIZlQVO48wZPhRBOMMjuXIo9s1esdTvGUb4auZGeic01Dbxe1QpMDUXvhO/KN08DpYttHmnTYSXJQmbTyCZV+LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K3cuUKgG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KIoBG67H; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779197456;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/z2hwgz7OuA2Yx5IaqY06Z77nRzj4o/TXN2wk1POIRo=;
-	b=K3cuUKgGsPgmhJyt3itpU9G3TbDAToWhVi3qFEjQhtWAqPxxbKK734i6T+G+DuaLsCiw//
-	U5bQawuVB0KXzpxF68JhNfYDXKp1zEXKkhjOAn7/MQyJ+/udhB/av8ZfxIn6CVt9q7l+jJ
-	JzAxdDCkJmDeTG1EjjyIPO2ayF9HNZ8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-9xE5NTGNMQ2ZsMkcusruRQ-1; Tue, 19 May 2026 09:30:52 -0400
-X-MC-Unique: 9xE5NTGNMQ2ZsMkcusruRQ-1
-X-Mimecast-MFC-AGG-ID: 9xE5NTGNMQ2ZsMkcusruRQ_1779197451
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43ff19e54beso2423913f8f.2
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:30:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDC1348C69
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 13:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779198293; cv=pass; b=qv3cIvLVesVCCiAoSuNNXtXs18TOnuSj1XrZJoLhtzT+A152Mp/xbVfZROijLg7AbtWc959d6e+1TRFCOxaCHCQtCMPYY/sq0S3ARF02D2TzGgBykSIXmsvmlpRtHoJ5+dH9729aRKaBcVvU0OB1uy+epMAGitHWjRA/WEbfKvs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779198293; c=relaxed/simple;
+	bh=TPvCxuHJtKVGhQ/GlHUaH8cPjA9QMgDJQzp3fZRPCXg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jw0R02chdlU48CS0Ay18ei8Bqn1bayrlPl/sZJqzAHXFux+z89MEr6nOovt3tlsSrInfmLA2/ClqsuOLP4WTz18Zo6KQed6rFWDSyZn2ZGmwRiZh8VVCYISY8PYJAO4DJ9G3QhzEOwWwbMU/SlxWy9zlRTQgnuCqBR64snd0JZ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5DffAy5; arc=pass smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-651c7ddf514so3261707d50.1
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:44:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779198291; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k4cwW/aXFnqy7Kca6Uc5drLRQTnlQmZ6QT9XFw7PYO9W+HV7HAYx4hDbzRWYsDSGMu
+         r/RXV7+pHiIjKLjzDu3dlX8Jb3FrAjaxmcKaJr7dq8k8StxgsVgtfPA65LVSoZD0aWFu
+         Z0GHqO5GiskUffD2e8x7bh1l9q+85bkvpNQe+PzRckCOWq+7cXQn8DnI2MfwjMDaM7kD
+         fo0l07b8b+N020JZQ6lpJTZuhFevvy5DxjGPThRGe4xRy68/5vAzDJmB+8M/QcwHFYBQ
+         z3xRLCurfr4YYKvXoRdR7x9qeNFL6m4lAZd3jOf+4n0XiU221bHEi0T4ocjKM2BzGKT/
+         e7Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8vQ2huze1xO1NqJdBFnf6nbs9kGsrUpnagEQxYLNrLw=;
+        fh=E291k/VTLcsFaYnEXit9fRTQKiK9EZdoaCjZIpP4EWA=;
+        b=PshyInkkjh7QE/MkSoisECY8vw7M6ThLepD8mWKSifeB+3pljF5ilhnXo9xvZ7YIdI
+         HHlipb/ehoBv0dmVb6g05kPVwZ+NJBON4c9wG29iLG2mk271d4HKjYYzEQd/nMFZ92Wf
+         5BihgJ9/CT7rrc9q0h6XQug9zimPbna+ViteQxhJDpeRPMe6ZOXGsF1vDzUPTAN7y4j0
+         d4n7HXXdIvD5p4A9AN22+e96YQgXjxVxYZ+aB9DI4BoeRNF0gwplKJyaa0DRM/WnZHOW
+         Ubbw6tID1jn9JJxewHfBwzbATp7zKtRJ/DezuZXbfJZFOlW70gLWXBSRFaN36Apx+ePH
+         yaxg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779197451; x=1779802251; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/z2hwgz7OuA2Yx5IaqY06Z77nRzj4o/TXN2wk1POIRo=;
-        b=KIoBG67Hb2wC2cmJiYmU59PJgUWXckmJgocJMiqx0R4vkHaswS8lH+qU7F7Gu/MDkF
-         qRkBWc5k7hojdGTOpLg41FuPsq0mx4wVB6oZOIj3/OKnfYu/dELBPLwPNnxKwPnuhWBp
-         dTa4Y1UnLzFTi+0B1xw5eLm0EMDMCC0M7t2jZHDoLy6sPf+K4KFs32zCBVA9EHKtsUAR
-         AcAULmJ2Y8n0t8MQ/OmuW+7dim2nb89zr80tIR/F0qV4DQS/ya6B3gpzfSK0t8OJPtjT
-         FayrjgB96HGf9r6SFrM/nR/TclkNF1HpA3zy9QqgyXW4CSLr0iC/ccUFYonM18al028A
-         YvhQ==
+        d=gmail.com; s=20251104; t=1779198291; x=1779803091; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8vQ2huze1xO1NqJdBFnf6nbs9kGsrUpnagEQxYLNrLw=;
+        b=e5DffAy5YmQTHnCkxba0f59RXxKgLjRM56xRjEt56UTVgdcmoyLfLbbjjl751b45Bg
+         9IYFIbiyqN5DdOlpywDf6Ssb4Gg2oNZgX/6WpKBPV43CR7a/rfAeFZAlqW+pN73WLFGr
+         ptdzW7ne1l2Rhrwp802akVViUwo/JK6MhvgDMM2ZJw1m6AX0tkOKSnd4/MBLWbFKuKHN
+         zBMGyDcmKRLKyasmpq3ClzUbpl34hd7+Vf8IZqlps2gyT1/4rwklVtPsriByd/f3IrV+
+         pt4Eg/4c34h0swJ7rX9wFoU2Ya/Ij8sibcssFB5SL4YQ1aoLSvv5eIE/LgRApxqPCzph
+         DxHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779197451; x=1779802251;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/z2hwgz7OuA2Yx5IaqY06Z77nRzj4o/TXN2wk1POIRo=;
-        b=VIPkQfQfFKzdaJF0fYw3sq8DG5SVmoZ/zmmZrbjuQwQYgMaghM769AUM4qGrybcgPB
-         IFs5aoR1wLGHN9OlTmn4XOg2UHY9L9mO+2iFSy2CDr0JtgZ9vhHa2TEEfe1WaQPEPzGC
-         CkbE35YNwXQR7n2uSr0psMMzM/1kudfiv6PP9k+2pf8x6Oc3HEDjOcxPHwFqMoVABN3v
-         EZJzS2J952rcsfz+HPB7Erh5lrN3/ea4S9sYVAdb9Dyq6AH1Ro0006zEiRsts232ADcR
-         GIAJG3Wn7wqz5k+7Tzh+Wqyd702Mc/boFJYtF8D/jAPf7XTvfRfdrgeIcsyxDxzy6izd
-         6P4g==
-X-Forwarded-Encrypted: i=1; AFNElJ8CUArqCTnDEDzg9vAPCvrQKuVpgbS5ui786mTWjTPFlflfOCE5Q0rSx2GoYpcFgzs2b4LQjRU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1ukxQmtfpAIjJt5yUjFHY0H5eXZM54mw5nEl0Td9trEGCtRWh
-	2VOiYala2n7Hdc2KkX1b8V7lNKAeHUnwrncRenEMzXP9nGEm0QjArHZgVTfgFq/ES7mHXYovwW6
-	3n+HRSRizi37mzeJAzpOGr75/6eYrCBCnEI8bxVVHcVQEdH7723CRXgDz5g==
-X-Gm-Gg: Acq92OGhZw0Q+aXrPLwTFpCaCqyWPY5BNn5yndLAfr3l//rkET1opDD9IZC0nP5Ohm/
-	1HC/n1tMTJAUwp4Zx6mbf/19oRNwm1HA95ozyoumk2KMqH3b6ZllRKiTXxnSYksTvIi1kfo9OHE
-	MbfHG2wPRFxFFFkIk8qUCzfqyM1EWijrjkBFOSbcALzK/QSNGAkORZIXBanwXkBtSfmPJovNfch
-	FJdTW3E88tVrbbGEVxYzCn1KMyCnEqpDIRgydRzxbhpRCALxvPVFrGvWzynENPSB7YTyrGl0oz0
-	5IERis9swfX8+RMPm1sMdXK8ie6jbKEiVlqfxZqk7a7oKhsYEiazttNnKlFJWizMCvYchWWKMLG
-	5l2kb9GVn0aQMr44do9W/tZbmPDl4MEHZwkaxAewcf3hXBqlFwx4LASU=
-X-Received: by 2002:a05:6000:400f:b0:44b:cd2f:a3c8 with SMTP id ffacd0b85a97d-45e5c57d40bmr31702173f8f.4.1779197450883;
-        Tue, 19 May 2026 06:30:50 -0700 (PDT)
-X-Received: by 2002:a05:6000:400f:b0:44b:cd2f:a3c8 with SMTP id ffacd0b85a97d-45e5c57d40bmr31702094f8f.4.1779197450324;
-        Tue, 19 May 2026 06:30:50 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.25.33])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0fe248dsm45094750f8f.30.2026.05.19.06.30.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 May 2026 06:30:49 -0700 (PDT)
-Message-ID: <e024150c-6970-47a5-8ba5-d16a7a189d89@redhat.com>
-Date: Tue, 19 May 2026 15:30:47 +0200
+        d=1e100.net; s=20251104; t=1779198291; x=1779803091;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8vQ2huze1xO1NqJdBFnf6nbs9kGsrUpnagEQxYLNrLw=;
+        b=Z8cElDvU8oBjvnosFGzPvOVrrGhOMyQD04vimt6qX5d/nhu26UDueERdhMjHo6w0zw
+         Rdaze/4mfULDI3KSdbJCCpWSMoliDXZ4DoJvU2y01w3nBVbyZJ2B2tajt76iQyuX3fUc
+         hvDNDx8U1ljlQi3zOY6ZhWD2IgKl/w0OL6BAl8GLddkbcZshQl9othe/3cEv3Slzd5Ly
+         /CPZKwoiSq8LAdfFhWMh4nHLXkxsglTDQcHAS0LnML2GgMfcP9rTr5mEy541Jh9E9HeB
+         UCSF75NvjeJ5nTeSzUqNt2GFPam8T9B1IC1zUymhuxrGi3jkM11ZfkRN+bD/S6V1AVQ9
+         Vm3A==
+X-Forwarded-Encrypted: i=1; AFNElJ8Z7XO5QqUBxWte73fXpMEDPO/12KqJ/oBGuGLxjGwqH2rvyLKyFGqgDrkom/jiUFj9Ir7Z7FQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2/ai6N+2HlUGOQu4QCAXhNrNmxIk/zq9zQqeZ7mIGloTBLV6Z
+	KVKrYXYjP1eJbkC+1hxp00iSbzMtDu/9Y4UtyfgESfY9P3xtgO1Si4bdxZVo8ekS65Nxa5SHpY5
+	Zk8hkxetzvN12EqaBpb9qxBUKCBZUoy8=
+X-Gm-Gg: Acq92OHTBE+uqZwhfKQCXhz0Fa0NoY+l7GnXTH42AWS5CvTHkt2QkJ5W34qwMhGSkFE
+	IRAO7xkCgXe5p56mTXPMUuzjXLk6fVRDtFy9tiQkmqJ73NjBScr6vTb+DzDkkwY3ukfrH25YhX5
+	v3BU4vmEkn3GPwsL4fMIipuLTxSMCDKMkCzdOLSl2rA5qs3fw/wLeszrihVVU1m2XHjwMPl83wp
+	ERiOEOO0zwg8XMGYzXAYdnbBb4RagWndGIw1opPcLTLRJDEd8CkTETrdKExepMqMm3dE7alXhft
+	KoFSQmyiLLtaLyqiai4w4BCnz64r/q8jZPOSZeFYPJOXt6NOP4IPX3Ezx+Pe2dwnbyenwA==
+X-Received: by 2002:a05:690e:1586:10b0:65c:17fe:6d49 with SMTP id
+ 956f58d0204a3-65e2287ddbamr15415688d50.61.1779198291234; Tue, 19 May 2026
+ 06:44:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 1/6] net: mana: Create separate EQs for each
- vPort
-To: longli@microsoft.com
-Cc: kotaranov@microsoft.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, andrew+netdev@lunn.ch, jgg@ziepe.ca, leon@kernel.org,
- haiyangz@microsoft.com, kys@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, shradhagupta@linux.microsoft.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260515040508.491748-2-longli@microsoft.com>
- <20260519132825.172490-1-pabeni@redhat.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260519132825.172490-1-pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
+ <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info> <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
+ <2026051954-revision-sierra-6bb4@gregkh> <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
+ <2026051909-impurity-nemesis-2f65@gregkh>
+In-Reply-To: <2026051909-impurity-nemesis-2f65@gregkh>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 19 May 2026 09:44:39 -0400
+X-Gm-Features: AVHnY4J8lmhWqH_MENNxHDU5i3eOmFVjrJt3J47QyY0UJsMFJDc4Qg43-D2Njck
+Message-ID: <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth 2026-05-14
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net, 
+	kuba@kernel.org, Linux kernel regressions list <regressions@lists.linux.dev>, 
+	Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289466-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289467-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
-X-Rspamd-Queue-Id: 9150557FCEA
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0DA7F57FF19
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/19/26 3:28 PM, Paolo Abeni wrote:
-> From: AI Reviewer <ai@example.com>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
-> ---
-> net: mana: Create separate EQs for each vPort
-> 
-> This patch moves EQ allocation from per-device to per-vPort, exports
-> mana_create_eq()/mana_destroy_eq() for use by the RDMA driver, takes
-> a vport reference for RSS QPs, and adds cross-port PD-sharing
-> rejection for raw QPs along with serialization between
-> mana_set_channels() and the RDMA vport configuration.
-> 
->> diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
->> index ac5e75dd3494..f8a9013f0ca3 100644
->> --- a/drivers/infiniband/hw/mana/main.c
->> +++ b/drivers/infiniband/hw/mana/main.c
->> @@ -40,13 +42,27 @@ int mana_ib_cfg_vport(struct mana_ib_dev *dev, u32 port, struct mana_ib_pd *pd,
->>  
->>  	pd->vport_use_count++;
->>  	if (pd->vport_use_count > 1) {
->> +		/* Reject cross-port PD sharing. EQs and vport config
->> +		 * are per-port, so the PD must stay bound to the port
->> +		 * that was configured on the first raw QP creation.
->> +		 */
->> +		if (pd->vport_port != port) {
->> +			pd->vport_use_count--;
->> +			mutex_unlock(&pd->vport_mutex);
->> +			ibdev_dbg(&dev->ib_dev,
->> +				  "PD already bound to port %u\n",
->> +				  pd->vport_port);
->> +			return -EINVAL;
->> +		}
->>  		ibdev_dbg(&dev->ib_dev,
->>  			  "Skip as this PD is already configured vport\n");
->>  		mutex_unlock(&pd->vport_mutex);
->>  		return 0;
->>  	}
->>  
->> -	err = mana_cfg_vport(mpc, pd->pdn, doorbell_id);
->> +	pd->vport_port = port;
->> +
->> +	err = mana_cfg_vport(mpc, pd->pdn, doorbell_id, true);
->>  	if (err) {
->>  		pd->vport_use_count--;
->>  		mutex_unlock(&pd->vport_mutex);
-> 
-> [Low]
-> In the failure path of mana_ib_cfg_vport(), if mana_cfg_vport() or the
-> later mana_create_eq() fails, vport_use_count is rolled back to 0 but
-> pd->vport_port keeps the value just written.
-> 
-> Is the contract that pd->vport_port is only meaningful while
-> vport_use_count > 0?  That invariant is not documented in the struct
-> mana_ib_pd comment, and a future reader who consults pd->vport_port
-> without first checking vport_use_count under vport_mutex would see stale
-> data.  Would it be worth either resetting pd->vport_port on the rollback
-> path or documenting the rule explicitly?
-> 
->> @@ -55,15 +71,23 @@ int mana_ib_cfg_vport(struct mana_ib_dev *dev, u32 port, struct mana_ib_pd *pd,
->>  		return err;
->>  	}
->>  
->> -	mutex_unlock(&pd->vport_mutex);
->>  
->> -	pd->tx_shortform_allowed = mpc->tx_shortform_allowed;
->> -	pd->tx_vp_offset = mpc->tx_vp_offset;
->> +	err = mana_create_eq(mpc);
->> +	if (err) {
->> +		mana_uncfg_vport(mpc);
->> +		pd->vport_use_count--;
->> +	} else {
->> +		pd->tx_shortform_allowed = mpc->tx_shortform_allowed;
->> +		pd->tx_vp_offset = mpc->tx_vp_offset;
->> +	}
-> 
-> [ ... ]
-> 
->> diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
->> index 0fbcf449c134..108ec4c5ce51 100644
->> --- a/drivers/infiniband/hw/mana/qp.c
->> +++ b/drivers/infiniband/hw/mana/qp.c
->> @@ -155,6 +156,18 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
->>  
->>  	qp->port = port;
->>  
->> +	/* Take a reference on the vport to ensure EQs outlive this QP.
->> +	 * The vport must already be configured by a raw QP.
->> +	 */
->> +	mutex_lock(&mana_pd->vport_mutex);
->> +	if (!mana_pd->vport_use_count) {
->> +		mutex_unlock(&mana_pd->vport_mutex);
->> +		ret = -EINVAL;
->> +		goto fail;
->> +	}
->> +	mana_pd->vport_use_count++;
->> +	mutex_unlock(&mana_pd->vport_mutex);
->> +
-> 
-> [Critical]
-> The cross-port PD-sharing check added to mana_ib_cfg_vport() is not
-> mirrored here.  mana_ib_create_qp_rss() takes the user-supplied port
-> from ucmd.port and only checks that vport_use_count is non-zero, so the
-> RSS path will happily attach to a different port than the one bound to
-> the PD by the first raw QP.
-> 
-> If a user creates a raw QP on port A (which sets pd->vport_port=A and
-> allocates mpc_A->eqs via mana_create_eq()), then creates an RSS QP on
-> the same PD with ucmd.port=B where port B has no Ethernet up and no
-> RDMA activity, mpc_B->eqs is NULL.  The subsequent code in this same
-> function:
-> 
-> 	eq = &mpc->eqs[cq->comp_vector % mpc->num_queues];
-> 	cq_spec.attached_eq = eq->eq->id;
-> 
-> would then dereference NULL through mpc_B->eqs.
-> 
-> If port B does have Ethernet up, mpc_B->eqs is owned by the Ethernet
-> driver and the RSS QP attaches to those EQs.  When the QP is destroyed
-> mana_ib_destroy_qp_rss() calls mana_ib_uncfg_vport(mdev, pd, qp->port=B),
-> and once pd->vport_use_count reaches 0 mana_ib_uncfg_vport() will run
-> mana_destroy_eq(mpc_B) on Ethernet's live EQs and call mana_uncfg_vport
-> on a port whose apc->vport_use_count was never incremented by this PD,
-> tripping the WARN_ON in mana_uncfg_vport() and corrupting Ethernet's
-> vport state.  Meanwhile port A's EQs and vport configuration are leaked
-> because nothing on this PD will destroy them.
-> 
-> Should mana_ib_create_qp_rss() apply the same pd->vport_port == port
-> check that mana_ib_cfg_vport() now performs, before bumping
-> vport_use_count?
+Hi Greg,
 
-Sashiko reported alredy this problematic pattern in 2 separate places.
-Please ensure that there are no other similar buggy usage pattern
-elsewhere in the newly introduced code.
+On Tue, May 19, 2026 at 8:07=E2=80=AFAM Greg KH <gregkh@linuxfoundation.org=
+> wrote:
+>
+> On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
+> > On 5/19/26 12:30, Greg KH wrote:
+> > > On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
+> > >> On 5/15/26 17:10, Thorsten Leemhuis wrote:
+> > >>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
+> > >>>
+> > >>>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0=
+aebc7c6ac:
+> > >>>>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:=
+12 +0200)
+> > >>>>
+> > >>>> are available in the Git repository at:
+> > >>>>
+> > >>>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetoot=
+h.git tags/for-net-2026-05-14
+> > >>>>
+> > >>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c=
+00282:
+> > >>>>
+> > >>>>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-=
+14 09:58:08 -0400)
+> > >>>
+> > >>> It seems this PR sadly came too late for this week's net PR to main=
+line
+> > >>> that was merged yesterday.
+> > >>>
+> > >>> TWIMC, from my point of view, it would be great if we somehow could
+> > >>> still get the changes from this PR or at least the btmtk fix it
+> > >>> contains[1] to mainline this week before -rc4, as it is fixing a
+> > >>> regression known since 2026-04-24 that at least five people encount=
+ered
+> > >>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
+> > >>> validate WMT event SKB length before struct access") [006b9943b982 =
+in
+> > >>> -next].
+> > >>
+> > >> Greg, Sasha, that [1] fix I was talking about now reached -next as
+> > >> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
+> > >> events") and will likely hit mainline on Thursday or so with the wee=
+kly
+> > >> -net PR to -mainline. If that's good enough for you, I'd say it woul=
+d be
+> > >> good to pick this up for the next round of stable kernels.
+> > >
+> > > That "Fixes:" tag is referring to something that is also not in any
+> > > tree, but that commit does have a cc: stable in it.  So do we need bo=
+th
+> > > of these:
+> >
+> > Valid question, as yes, there is a slight mixup here:
+> >
+> > > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before=
+ struct access")
+> >
+> > That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
+> > -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
+> > btmtk: validate WMT event SKB length before struct access") -- the one
+> > that is causing the regression that I want to get fixed. So we now only
+> > need:
+> >
+> > > 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL event=
+s")
+>
+> Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
+> nightmare to track over time, ugh.
 
-/P
+Hmm, did we get the wrong hash or something? Usually, that would show
+up in the verify-fixes.sh, but perhaps it didn't capture it this time
+for some reason, perhaps I'm running an outdated version or something
+similar.
 
+I will try making the Bluetooth CI run the verify-fixes.sh to detect
+this sort of issue early on.
+
+> I'll go queue this up now, thanks.
+>
+> greg k-h
+
+
+
+--=20
+Luiz Augusto von Dentz
 
