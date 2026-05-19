@@ -1,203 +1,189 @@
-Return-Path: <netdev+bounces-289312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFAnMfkYDGrrVwUAu9opvQ
-	(envelope-from <netdev+bounces-289312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:02:01 +0200
+	id SD9TOVcZDGrrVwUAu9opvQ
+	(envelope-from <netdev+bounces-289313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:03:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A36B579968
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:01:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE0C35799BD
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A5EA430B9D57
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 07:55:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 10AFC30D8AEE
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 07:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C58E3DA7D2;
-	Tue, 19 May 2026 07:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6993B19D9;
+	Tue, 19 May 2026 07:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="2F1K0J3s"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="veWnd5gU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MvxkyHAx";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="veWnd5gU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MvxkyHAx"
 X-Original-To: netdev@vger.kernel.org
-Received: from n169-112.mail.139.com (n169-112.mail.139.com [120.232.169.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAB619644B;
-	Tue, 19 May 2026 07:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EAC1C3BFC
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 07:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779177330; cv=none; b=qIQSbVPUztRoOGebI10tgZXv+F3Qrzvsib6DDSEM0rXYwq7wtEeeALQXNh3LjjJfegKi5dgCAnWAze4jeZDunRpH1P25krzR5L/u1FGd9X7HxVnlJ9N5N1yp5AI0I5NEHpee72TIARFHimM3/SVRPAIkhTlmcaMYwe/QZ7EGALM=
+	t=1779177352; cv=none; b=Pn1NVlQWwJyJnGp0YXpiMxak63JuAj9To1sW5p1ePgiCotBDX1GWjHujKKU6SoaQI8u/Ll6PH+NtCrakYAWOinelfMExo4hT2SvHcbNzbu3L/3kl0xdV2UbuZxk1TT4HWimE5b9KQtZYlompifcVOiDwd05keJuJb8eEJPfzV54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779177330; c=relaxed/simple;
-	bh=hvwJY0zgagSKeFkymx3E5hGWKUTh3knZ/BDqdUWZXUE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bO10K3QPW6oRVhmMBF6I9V0EH7JTyuGJB9jl8ZNZDHU0MCVov20RWKM1nW5aZQQC76LJjxjuP2Eaa5P1FCFMPuCtg0EBNV0t1lIWAbXH5q58NM6EkB0dkMf2100/LdYmaZU4PAV5jUz1UwK7HOYfteorsRhI2wRftyTepY7O0gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=2F1K0J3s; arc=none smtp.client-ip=120.232.169.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=2F1K0J3s1Gokcf+pR4XKMSorKna0Hh8p9Vfw3WOKT6kK61i1omLfMb2Tvygm6395iXfFiTCmRKpsl
-	 8IqYSxCAX9MLGuqhWliSzXf4XZ/wtlyKz3QPfNhsvw/i8Mgbkpw80NxHD50VwPIf+1vFg7XihRLIrG
-	 i7mX0xWx8bktkbrQ=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from NTT-kernel-dev (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-24-12027 (RichMail) with SMTP id 2efb6a0c17611ba-021e2;
-	Tue, 19 May 2026 15:55:19 +0800 (CST)
-X-RM-TRANSID:2efb6a0c17611ba-021e2
-From: Li hongliang <1468888505@139.com>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	pablo@netfilter.org
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	y0un9sa@gmail.com,
-	fw@strlen.de
-Subject: [PATCH 6.6.y] netfilter: nf_tables: unconditionally bump set->nelems before insertion
-Date: Tue, 19 May 2026 15:55:18 +0800
-Message-Id: <20260519075518.2106753-1-1468888505@139.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1779177352; c=relaxed/simple;
+	bh=ljnwFwORCer+VUJr1iMq1FU8ABqb7EObT0yQgeghEPM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ci8eHFvt/tRgkz5x5S1H92Kqi7kaSkGbhKlTagvUIOzbrUh3+dj0zTfCddsH158D4NT6r4A0seRVTqQkQ3ONuvoH6DepGza13WOrB8l+Is5GRWHyGfFkBIe9ckpo318zm71qTe7AigFCLIPX7D99pMk+p+xW+NtQVBF1xbaZI+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=veWnd5gU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MvxkyHAx; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=veWnd5gU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MvxkyHAx; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 41E0767BE0;
+	Tue, 19 May 2026 07:55:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779177349; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aIuSa4Q4dMultZ8PBSbLMyy9WSo6AwaKdXcHKLDBDC8=;
+	b=veWnd5gU+IacJtakxKB5Bq8XPrPBybU2tIE8hkMMKOAdihO+GSBQZR8k3K9L6bnimySqeI
+	rxEvYgGBKVJY6usR26pgMDrBMmbl4/k8UulRf7LtlyzMduJjGyJtEY8D8Ge6kpdgj2iqPl
+	0j9QpsIoN/hN6ckvB0OwjTWBXeA2xZA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779177349;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aIuSa4Q4dMultZ8PBSbLMyy9WSo6AwaKdXcHKLDBDC8=;
+	b=MvxkyHAxTy0I4vLj366t/wr5Xz5/Dv70kNQvK1NcxhrEhCZnNeQIjb0XIgT60eD/9AuL8S
+	OmWpaMScjiFfSEAw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=veWnd5gU;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=MvxkyHAx
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779177349; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aIuSa4Q4dMultZ8PBSbLMyy9WSo6AwaKdXcHKLDBDC8=;
+	b=veWnd5gU+IacJtakxKB5Bq8XPrPBybU2tIE8hkMMKOAdihO+GSBQZR8k3K9L6bnimySqeI
+	rxEvYgGBKVJY6usR26pgMDrBMmbl4/k8UulRf7LtlyzMduJjGyJtEY8D8Ge6kpdgj2iqPl
+	0j9QpsIoN/hN6ckvB0OwjTWBXeA2xZA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779177349;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aIuSa4Q4dMultZ8PBSbLMyy9WSo6AwaKdXcHKLDBDC8=;
+	b=MvxkyHAxTy0I4vLj366t/wr5Xz5/Dv70kNQvK1NcxhrEhCZnNeQIjb0XIgT60eD/9AuL8S
+	OmWpaMScjiFfSEAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 19245593A8;
+	Tue, 19 May 2026 07:55:49 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id J7w8BYUXDGrLagAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 19 May 2026 07:55:49 +0000
+Message-ID: <76f6bb7c-c0b4-4dfc-b101-13d0bb7d7f0e@suse.de>
+Date: Tue, 19 May 2026 09:55:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 4/7] net/handshake: Take a long-lived file reference
+ at submit
+To: Chuck Lever <cel@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Chris Mason <clm@meta.com>, Christian Brauner <brauner@kernel.org>,
+ kernel-tls-handshake@lists.linux.dev, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
+References: <20260518-handshake-file-pin-v1-0-4bbcb7e62fda@oracle.com>
+ <20260518-handshake-file-pin-v1-4-4bbcb7e62fda@oracle.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260518-handshake-file-pin-v1-4-4bbcb7e62fda@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[139.com:s=dkim];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,netfilter.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,strlen.de];
-	TAGGED_FROM(0.00)[bounces-289312-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DMARC_NA(0.00)[139.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289313-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[139.com];
-	FROM_NEQ_ENVFROM(0.00)[1468888505@139.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[139.com:-];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hare@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RSPAMD_EMAILBL_FAIL(0.00)[pablo.netfilter.org:query timed out,y0un9sa.gmail.com:query timed out,1468888505.139.com:query timed out,fw.strlen.de:query timed out];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[139.com:mid,139.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,netfilter.org:email,strlen.de:email]
-X-Rspamd-Queue-Id: 8A36B579968
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oracle.com:email,suse.de:email,suse.de:mid,suse.de:dkim]
+X-Rspamd-Queue-Id: EE0C35799BD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Pablo Neira Ayuso <pablo@netfilter.org>
+On 5/18/26 20:24, Chuck Lever wrote:
+> From: Chuck Lever <chuck.lever@oracle.com>
+> 
+> handshake_nl_accept_doit() needs the file pointer backing
+> req->hr_sk->sk_socket to survive the window between
+> handshake_req_next() and the subsequent FD_PREPARE() and get_file().
+> The submit-side sock_hold() does not provide that. sk_refcnt keeps
+> struct sock alive, but struct socket is owned by sock->file: when
+> the consumer fputs the last file reference, sock_release() tears
+> the socket down regardless of any sock_hold.
+> 
+> Prepare for a fix by adding an hr_file pointer to struct
+> handshake_req and acquiring an explicit reference on sock->file
+> during handshake_req_submit(). Release the reference on the
+> completion-bit-winning path of handshake_complete() and
+> handshake_req_cancel(), and on the submit error paths that destroy
+> the request before it has been published.
+> 
+> The accept-side dereferences are not yet retargeted; that change
+> comes in the next patch.
+> 
+> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> ---
+>   net/handshake/handshake.h |  2 ++
+>   net/handshake/netlink.c   |  6 ------
+>   net/handshake/request.c   | 27 ++++++++++++++++++++++++++-
+>   3 files changed, 28 insertions(+), 7 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-[ Upstream commit def602e498a4f951da95c95b1b8ce8ae68aa733a ]
+Cheers,
 
-In case that the set is full, a new element gets published then removed
-without waiting for the RCU grace period, while RCU reader can be
-walking over it already.
-
-To address this issue, add the element transaction even if set is full,
-but toggle the set_full flag to report -ENFILE so the abort path safely
-unwinds the set to its previous state.
-
-As for element updates, decrement set->nelems to restore it.
-
-A simpler fix is to call synchronize_rcu() in the error path.
-However, with a large batch adding elements to already maxed-out set,
-this could cause noticeable slowdown of such batches.
-
-Fixes: 35d0ac9070ef ("netfilter: nf_tables: fix set->nelems counting with no NLM_F_EXCL")
-Reported-by: Inseo An <y0un9sa@gmail.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
-[ Minor conflict resolved. ]
-Signed-off-by: Li hongliang <1468888505@139.com>
----
- net/netfilter/nf_tables_api.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
-
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index a0914a92e07d..6fc88bf51109 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -6803,6 +6803,7 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
- 	struct nft_data_desc desc;
- 	enum nft_registers dreg;
- 	struct nft_trans *trans;
-+	bool set_full = false;
- 	u64 timeout;
- 	u64 expiration;
- 	int err, i;
-@@ -7095,10 +7096,18 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
- 	if (err < 0)
- 		goto err_elem_free;
- 
-+	if (!(flags & NFT_SET_ELEM_CATCHALL)) {
-+		unsigned int max = nft_set_maxsize(set), nelems;
-+
-+		nelems = atomic_inc_return(&set->nelems);
-+		if (nelems > max)
-+			set_full = true;
-+	}
-+
- 	trans = nft_trans_elem_alloc(ctx, NFT_MSG_NEWSETELEM, set);
- 	if (trans == NULL) {
- 		err = -ENOMEM;
--		goto err_elem_free;
-+		goto err_set_size;
- 	}
- 
- 	ext->genmask = nft_genmask_cur(ctx->net);
-@@ -7130,23 +7139,16 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
- 		goto err_element_clash;
- 	}
- 
--	if (!(flags & NFT_SET_ELEM_CATCHALL)) {
--		unsigned int max = nft_set_maxsize(set);
--
--		if (!atomic_add_unless(&set->nelems, 1, max)) {
--			err = -ENFILE;
--			goto err_set_full;
--		}
--	}
--
- 	nft_trans_elem(trans) = elem;
- 	nft_trans_commit_list_add_tail(ctx->net, trans);
--	return 0;
- 
--err_set_full:
--	nft_setelem_remove(ctx->net, set, &elem);
-+	return set_full ? -ENFILE : 0;
-+
- err_element_clash:
- 	kfree(trans);
-+err_set_size:
-+	if (!(flags & NFT_SET_ELEM_CATCHALL))
-+		atomic_dec(&set->nelems);
- err_elem_free:
- 	nf_tables_set_elem_destroy(ctx, set, elem.priv);
- err_parse_data:
+Hannes
 -- 
-2.34.1
-
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
