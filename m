@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-289620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SFWqHKPdDGphpAUAu9opvQ
-	(envelope-from <netdev+bounces-289620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:01:07 +0200
+	id mAAJDr3dDGphpAUAu9opvQ
+	(envelope-from <netdev+bounces-289621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:01:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC7BA585616
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:01:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E95658562C
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:01:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 06D7B303DABB
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 21:59:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 766C7307F2B0
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 21:59:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63BE3EC2D0;
-	Tue, 19 May 2026 21:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9BE3E92AE;
+	Tue, 19 May 2026 21:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wU9E1OOV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KEjKzvut"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433453DF00B
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 21:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409D93EBF35
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 21:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779227949; cv=none; b=maoZXEct/gt2y+HBYr7NZwTJ1lUjiAtHBhbgho123Iw5SujOUH/0/lEkcqNfIPpL2ENPFSdbY+I7dtYFBpnvQVMKOFbFJdWxiOd8Wosn/3oLn8jdoieSZS6hClzznQYpGEhwBf8gikYgkGustQL7BQ4CroLutyy7wdRN86stNJg=
+	t=1779227951; cv=none; b=i7RliHQVbBonSXgGcJ2K67q6BObKdgA4BJW9ZqaRg0P/r8BiN4BaO4k6B3e4lElrmRTMawrz+2ha1+zeifYlitiN/8CgGJ2urpOJCmjYhVsk94msKzydfOchvs/kBaE/+ZjdBVvC7XtulEcWx50eVP3FcFlDjXCWYkGo10qihzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779227949; c=relaxed/simple;
-	bh=diuE7PQ8Pon9vMXdOPJIS446mlbcUV4fCnM51klAihE=;
+	s=arc-20240116; t=1779227951; c=relaxed/simple;
+	bh=dEk75An2YkA3CBnlcplMbTnVw3keCaXWCpF9FHp6TqE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RKtqoYkJkPaPX+feU+AfMWiY9IO2ZY+SKVz+sCVTBzMoeeU7OA/ALhtlU1e0YkwlDYsnRa18wm2a3DmYKDCCsGAjyEEPskatR2HJp54tfY61eSmr3euwd/WpdKR0QJ/9GpWCDPwC+tAAMcLScl1JEPzG2qKty3O03DknBMgx+qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wU9E1OOV; arc=none smtp.client-ip=95.215.58.171
+	 MIME-Version; b=inZr5l3i52WieMc7DMQNJ0fwT7NzloWkpTt8HZJ8o62TC1Ur2CGNM0I8TNA+R8LnG0i4mSXS0Y2NMLUlLDKVbP0sP57rWrr5HBv2YCXU8HAwz74ZEeWPiA12scjgp9BbdoPkuZFDVHlzCCXY9I/OuKFwCfpXbyjzmP7kbgx0oMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KEjKzvut; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779227946;
+	t=1779227947;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=j+XTc5KfpwasDw2bVqQ0ao7p4cs5JHtFCbk2g1BNKx4=;
-	b=wU9E1OOVibgOPnB7VTXwdXftkcnRedZ3P232U2wIayqqFxkeJgzPNaiwuerSQWo2ITmUoV
-	NKAnGIVPaa8buPkv95P966Nlk+m1sfq8xv5JMBf0tKnqU4fPV8tLJFmvlkiBSPLUfxVAUI
-	zmjp5JL4FY8N00/kvjfCeKa1Q1N6lfI=
+	bh=WOYHOKQDvpyW5zXK61LIUEiKW6F8YP2r9o8T71QFzlo=;
+	b=KEjKzvutR2zokl38wIxK22byY4kPyfevWdzlE1c6aukMmHzvb29Kaxlqj+zeC+N8kEQm+b
+	xuyDGspL1ZEL+3JAkowqDrlJSxstzXEcGonK0PDsrVq/rh/QsBVMuR63HcO1U1cf/9MOmw
+	oyFzm+LYaek7oWSbrv+KRttt0ispm2A=
 From: Martin KaFai Lau <martin.lau@linux.dev>
 To: bpf@vger.kernel.org
 Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
@@ -54,9 +54,9 @@ Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
 	'Roman Gushchin ' <roman.gushchin@linux.dev>,
 	'Amery Hung ' <ameryhung@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [RFC PATCH bpf-next 01/12] bpf: Remove __rcu tagging in st_link->map
-Date: Tue, 19 May 2026 14:58:08 -0700
-Message-ID: <20260519215841.2984970-2-martin.lau@linux.dev>
+Subject: [RFC PATCH bpf-next 02/12] bpf: Make struct_ops tasks_rcu grace period optional
+Date: Tue, 19 May 2026 14:58:09 -0700
+Message-ID: <20260519215841.2984970-3-martin.lau@linux.dev>
 In-Reply-To: <20260519215841.2984970-1-martin.lau@linux.dev>
 References: <20260519215841.2984970-1-martin.lau@linux.dev>
 Precedence: bulk
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289620-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289621-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -95,133 +95,181 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: BC7BA585616
+X-Rspamd-Queue-Id: 9E95658562C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Martin KaFai Lau <martin.lau@kernel.org>
 
-st_link->map is always written under update_mutex. The paths that read
-st_link->map with rcu_read_lock() are not in the fast path, so they can
-simply take update_mutex instead. Remove the __rcu annotation and replace
-all RCU accessors with direct pointer reads under update_mutex. Use
-READ_ONCE() in bpf_struct_ops_map_link_poll() which reads the pointer
-without holding update_mutex.
+bpf_struct_ops_map_free() currently waits for both a regular RCU grace
+period and a tasks RCU grace period for every struct_ops map through
+synchronize_rcu_mult(call_rcu, call_rcu_tasks).
 
-It is a simplification change.
+A regular RCU grace period is still required for all struct_ops maps
+because the struct_ops trampoline ksyms requires a rcu grace period
+(take a look at the list_del_rcu in __bpf_ksym_del).
+Add a map_free_pre_rcu() callback so the struct_ops map can remove
+ksyms before bpf_map_put() wait for the regular rcu grace period.
+
+The tasks RCU grace period is only needed by tcp_congestion_ops.
+Add free_after_tasks_rcu_gp only to struct bpf_struct_ops instead
+of the bpf_map.
+
+When CONFIG_TASKS_RCU=n, synchronize_rcu_tasks() is the same as
+synchronize_rcu(). Since all struct_ops maps now complete a regular RCU
+grace period before bpf_struct_ops_map_free() runs, skip the extra
+synchronize_rcu_tasks() call in this case.
+
+This cleanup prepares for a later patch that needs to support
+free_after_mult_rcu_gp.
 
 Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
 ---
- kernel/bpf/bpf_struct_ops.c | 29 ++++++++++++++---------------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+ include/linux/bpf.h         |  7 +++++++
+ kernel/bpf/bpf_struct_ops.c | 31 +++++++++++++------------------
+ kernel/bpf/syscall.c        |  3 +++
+ net/ipv4/bpf_tcp_ca.c       | 16 ++++++++++++++++
+ 4 files changed, 39 insertions(+), 18 deletions(-)
 
-diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-index 521cb9d7e8c7..08791180d71d 100644
---- a/kernel/bpf/bpf_struct_ops.c
-+++ b/kernel/bpf/bpf_struct_ops.c
-@@ -57,7 +57,7 @@ struct bpf_struct_ops_map {
- 
- struct bpf_struct_ops_link {
- 	struct bpf_link link;
--	struct bpf_map __rcu *map;
-+	struct bpf_map *map;
- 	wait_queue_head_t wait_hup;
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 1b28cacc3075..a276eada19c4 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -86,6 +86,7 @@ struct bpf_map_ops {
+ 	struct bpf_map *(*map_alloc)(union bpf_attr *attr);
+ 	void (*map_release)(struct bpf_map *map, struct file *map_file);
+ 	void (*map_free)(struct bpf_map *map);
++	void (*map_free_pre_rcu)(struct bpf_map *map);
+ 	int (*map_get_next_key)(struct bpf_map *map, void *key, void *next_key);
+ 	void (*map_release_uref)(struct bpf_map *map);
+ 	void *(*map_lookup_elem_sys_only)(struct bpf_map *map, void *key);
+@@ -1992,6 +1993,11 @@ struct btf_member;
+  *	   unloaded while in use.
+  * @name: The name of the struct bpf_struct_ops object.
+  * @func_models: Func models
++ * @free_after_tasks_rcu_gp: Set to true if it needs the bpf core to wait for
++ *                           a tasks_rcu gp before freeing the struct_ops map
++ *                           and its progs. It is unnecessary if the @unreg
++ *                           has waited for the correct rcu gp or the @unreg
++ *                           has ensured all struct_ops prog has finished running.
+  */
+ struct bpf_struct_ops {
+ 	const struct bpf_verifier_ops *verifier_ops;
+@@ -2010,6 +2016,7 @@ struct bpf_struct_ops {
+ 	struct module *owner;
+ 	const char *name;
+ 	struct btf_func_model func_models[BPF_STRUCT_OPS_MAX_NR_MEMBERS];
++	bool free_after_tasks_rcu_gp;
  };
  
-@@ -1220,8 +1220,7 @@ static void bpf_struct_ops_map_link_dealloc(struct bpf_link *link)
- 	struct bpf_struct_ops_map *st_map;
- 
- 	st_link = container_of(link, struct bpf_struct_ops_link, link);
--	st_map = (struct bpf_struct_ops_map *)
--		rcu_dereference_protected(st_link->map, true);
-+	st_map = (struct bpf_struct_ops_map *)st_link->map;
- 	if (st_map) {
- 		st_map->st_ops_desc->st_ops->unreg(&st_map->kvalue.data, link);
- 		bpf_map_put(&st_map->map);
-@@ -1236,11 +1235,11 @@ static void bpf_struct_ops_map_link_show_fdinfo(const struct bpf_link *link,
- 	struct bpf_map *map;
- 
- 	st_link = container_of(link, struct bpf_struct_ops_link, link);
--	rcu_read_lock();
--	map = rcu_dereference(st_link->map);
-+	mutex_lock(&update_mutex);
-+	map = st_link->map;
- 	if (map)
- 		seq_printf(seq, "map_id:\t%d\n", map->id);
--	rcu_read_unlock();
-+	mutex_unlock(&update_mutex);
+ /* Every member of a struct_ops type has an instance even a member is not
+diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+index 08791180d71d..28eab24ef0ed 100644
+--- a/kernel/bpf/bpf_struct_ops.c
++++ b/kernel/bpf/bpf_struct_ops.c
+@@ -983,9 +983,18 @@ static void __bpf_struct_ops_map_free(struct bpf_map *map)
+ 	bpf_map_area_free(st_map);
  }
  
- static int bpf_struct_ops_map_link_fill_link_info(const struct bpf_link *link,
-@@ -1250,11 +1249,11 @@ static int bpf_struct_ops_map_link_fill_link_info(const struct bpf_link *link,
- 	struct bpf_map *map;
++static void bpf_struct_ops_map_free_pre_rcu(struct bpf_map *map)
++{
++	struct bpf_struct_ops_map *st_map = (struct bpf_struct_ops_map *)map;
++
++	bpf_struct_ops_map_del_ksyms(st_map);
++}
++
+ static void bpf_struct_ops_map_free(struct bpf_map *map)
+ {
+ 	struct bpf_struct_ops_map *st_map = (struct bpf_struct_ops_map *)map;
++	struct bpf_struct_ops *st_ops = st_map->st_ops_desc->st_ops;
++	bool tasks_rcu = st_ops->free_after_tasks_rcu_gp;
  
- 	st_link = container_of(link, struct bpf_struct_ops_link, link);
--	rcu_read_lock();
--	map = rcu_dereference(st_link->map);
-+	mutex_lock(&update_mutex);
-+	map = st_link->map;
- 	if (map)
- 		info->struct_ops.map_id = map->id;
--	rcu_read_unlock();
-+	mutex_unlock(&update_mutex);
- 	return 0;
+ 	/* st_ops->owner was acquired during map_alloc to implicitly holds
+ 	 * the btf's refcnt. The acquire was only done when btf_is_module()
+@@ -996,24 +1005,8 @@ static void bpf_struct_ops_map_free(struct bpf_map *map)
+ 
+ 	bpf_struct_ops_map_dissoc_progs(st_map);
+ 
+-	bpf_struct_ops_map_del_ksyms(st_map);
+-
+-	/* The struct_ops's function may switch to another struct_ops.
+-	 *
+-	 * For example, bpf_tcp_cc_x->init() may switch to
+-	 * another tcp_cc_y by calling
+-	 * setsockopt(TCP_CONGESTION, "tcp_cc_y").
+-	 * During the switch,  bpf_struct_ops_put(tcp_cc_x) is called
+-	 * and its refcount may reach 0 which then free its
+-	 * trampoline image while tcp_cc_x is still running.
+-	 *
+-	 * A vanilla rcu gp is to wait for all bpf-tcp-cc prog
+-	 * to finish. bpf-tcp-cc prog is non sleepable.
+-	 * A rcu_tasks gp is to wait for the last few insn
+-	 * in the tramopline image to finish before releasing
+-	 * the trampoline image.
+-	 */
+-	synchronize_rcu_mult(call_rcu, call_rcu_tasks);
++	if (tasks_rcu && IS_ENABLED(CONFIG_TASKS_RCU))
++		synchronize_rcu_tasks();
+ 
+ 	__bpf_struct_ops_map_free(map);
  }
+@@ -1122,6 +1115,7 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
  
-@@ -1277,7 +1276,7 @@ static int bpf_struct_ops_map_link_update(struct bpf_link *link, struct bpf_map
+ 	mutex_init(&st_map->lock);
+ 	bpf_map_init_from_attr(map, attr);
++	map->free_after_rcu_gp = true;
  
- 	mutex_lock(&update_mutex);
+ 	return map;
  
--	old_map = rcu_dereference_protected(st_link->map, lockdep_is_held(&update_mutex));
-+	old_map = st_link->map;
- 	if (!old_map) {
- 		err = -ENOLINK;
- 		goto err_out;
-@@ -1299,7 +1298,7 @@ static int bpf_struct_ops_map_link_update(struct bpf_link *link, struct bpf_map
- 		goto err_out;
+@@ -1154,6 +1148,7 @@ const struct bpf_map_ops bpf_struct_ops_map_ops = {
+ 	.map_alloc_check = bpf_struct_ops_map_alloc_check,
+ 	.map_alloc = bpf_struct_ops_map_alloc,
+ 	.map_free = bpf_struct_ops_map_free,
++	.map_free_pre_rcu = bpf_struct_ops_map_free_pre_rcu,
+ 	.map_get_next_key = bpf_struct_ops_map_get_next_key,
+ 	.map_lookup_elem = bpf_struct_ops_map_lookup_elem,
+ 	.map_delete_elem = bpf_struct_ops_map_delete_elem,
+diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+index 6600e126fbfb..d0e8e9c8c888 100644
+--- a/kernel/bpf/syscall.c
++++ b/kernel/bpf/syscall.c
+@@ -950,6 +950,9 @@ void bpf_map_put(struct bpf_map *map)
+ 		/* bpf_map_free_id() must be called first */
+ 		bpf_map_free_id(map);
  
- 	bpf_map_inc(new_map);
--	rcu_assign_pointer(st_link->map, new_map);
-+	WRITE_ONCE(st_link->map, new_map);
- 	bpf_map_put(old_map);
++		if (map->ops->map_free_pre_rcu)
++			map->ops->map_free_pre_rcu(map);
++
+ 		WARN_ON_ONCE(atomic64_read(&map->sleepable_refcnt));
+ 		/* RCU tasks trace grace period implies RCU grace period. */
+ 		if (READ_ONCE(map->free_after_mult_rcu_gp))
+diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
+index 791e15063237..e224ecafbd69 100644
+--- a/net/ipv4/bpf_tcp_ca.c
++++ b/net/ipv4/bpf_tcp_ca.c
+@@ -339,6 +339,22 @@ static struct bpf_struct_ops bpf_tcp_congestion_ops = {
+ 	.validate = bpf_tcp_ca_validate,
+ 	.name = "tcp_congestion_ops",
+ 	.cfi_stubs = &__bpf_ops_tcp_congestion_ops,
++	/* The struct_ops's function may switch to another struct_ops.
++	 *
++	 * For example, bpf_tcp_cc_x->init() may switch to
++	 * another tcp_cc_y by calling
++	 * setsockopt(TCP_CONGESTION, "tcp_cc_y").
++	 * During the switch,  bpf_struct_ops_put(tcp_cc_x) is called
++	 * and its refcount may reach 0 which then free its
++	 * trampoline image while tcp_cc_x is still running.
++	 *
++	 * A vanilla rcu gp is to wait for all bpf-tcp-cc prog
++	 * to finish. bpf-tcp-cc prog is non sleepable.
++	 * A rcu_tasks gp is to wait for the last few insn
++	 * in the tramopline image to finish before releasing
++	 * the trampoline image.
++	 */
++	.free_after_tasks_rcu_gp = true,
+ 	.owner = THIS_MODULE,
+ };
  
- err_out:
-@@ -1316,7 +1315,7 @@ static int bpf_struct_ops_map_link_detach(struct bpf_link *link)
- 
- 	mutex_lock(&update_mutex);
- 
--	map = rcu_dereference_protected(st_link->map, lockdep_is_held(&update_mutex));
-+	map = st_link->map;
- 	if (!map) {
- 		mutex_unlock(&update_mutex);
- 		return 0;
-@@ -1325,7 +1324,7 @@ static int bpf_struct_ops_map_link_detach(struct bpf_link *link)
- 
- 	st_map->st_ops_desc->st_ops->unreg(&st_map->kvalue.data, link);
- 
--	RCU_INIT_POINTER(st_link->map, NULL);
-+	WRITE_ONCE(st_link->map, NULL);
- 	/* Pair with bpf_map_get() in bpf_struct_ops_link_create() or
- 	 * bpf_map_inc() in bpf_struct_ops_map_link_update().
- 	 */
-@@ -1345,7 +1344,7 @@ static __poll_t bpf_struct_ops_map_link_poll(struct file *file,
- 
- 	poll_wait(file, &st_link->wait_hup, pts);
- 
--	return rcu_access_pointer(st_link->map) ? 0 : EPOLLHUP;
-+	return READ_ONCE(st_link->map) ? 0 : EPOLLHUP;
- }
- 
- static const struct bpf_link_ops bpf_struct_ops_map_lops = {
-@@ -1401,7 +1400,7 @@ int bpf_struct_ops_link_create(union bpf_attr *attr)
- 		link = NULL;
- 		goto err_out;
- 	}
--	RCU_INIT_POINTER(link->map, map);
-+	link->map = map;
- 	mutex_unlock(&update_mutex);
- 
- 	return bpf_link_settle(&link_primer);
 -- 
 2.53.0-Meta
 
