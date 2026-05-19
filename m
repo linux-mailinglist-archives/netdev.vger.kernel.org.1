@@ -1,85 +1,94 @@
-Return-Path: <netdev+bounces-289494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289515-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EN1vID2BDGpPigUAu9opvQ
-	(envelope-from <netdev+bounces-289494-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 17:26:53 +0200
+	id 4C6IE+GQDGp1jAUAu9opvQ
+	(envelope-from <netdev+bounces-289515-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:33:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D79F45816D5
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 17:26:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1A4458272D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E728E3046069
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:12:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ABF76303A52B
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 16:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A7B3F1AAA;
-	Tue, 19 May 2026 15:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5662E2DFB;
+	Tue, 19 May 2026 16:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aya43SRk"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sSCLvZ9U"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011007.outbound.protection.outlook.com [40.93.194.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9802BCF46
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 15:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779203572; cv=none; b=FTu9YwB2t1bZx/m1dB+/I68ZUR0AElA7ByPk1f9+YOGbTX2OE/N5iZJPT+zQYY7bDGKrvWYVarguH15wBp9u47xC/LXqdgbU9FBPEgY+6Hzl58ukK1yx8rtIZIoGsPjUL/RuQNFA0t6JPJPbfroSQFAgwEhB07pJC/oHy+PpD8Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779203572; c=relaxed/simple;
-	bh=k2Gys1WSXj9cUNZuoppth6MBxRzei5WQ8ljX2QfZ/sw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DNe5u42o+w0/Z26K+ier72NlRSlxouhpMB7qZOfclme1QCOBkgN9sFH76kHgfaJjw8fadRs9SArEZIG/xQkMQE6BYAvALnrmdo2MtcHfdtNaCGE8yVXUW8dJXlODDZ3hD3wVbL5DUwqRqR3mF0kCmNsoRqXnisz18vwAkOYGBt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Aya43SRk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779203569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NlRK7WHE5X+HRUb6MZqDZLmc/NWUl9fce+uDFFEwApM=;
-	b=Aya43SRkejDBPfFJtlCIi0yRQ7uoy3XM+9Tbnu73VGzUJQ1UfeM3olw2VkmmQV1qDq1heX
-	dnSEe2/xbZcilaSEVQHOUKhxxdr3DmixEe1PdDw97uLR76h2Dimb/iCme6qemAhrm7Xbyr
-	kutB0eHyQLil9ZE3kKpxis0fISuujtc=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-573-VmvgSFy9N6m4u2ZaC8bb4Q-1; Tue,
- 19 May 2026 11:12:46 -0400
-X-MC-Unique: VmvgSFy9N6m4u2ZaC8bb4Q-1
-X-Mimecast-MFC-AGG-ID: VmvgSFy9N6m4u2ZaC8bb4Q_1779203563
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 754D318002C7;
-	Tue, 19 May 2026 15:12:43 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.89.15])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D5E030001A2;
-	Tue, 19 May 2026 15:12:38 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org,  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S.
- Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
- Horman <horms@kernel.org>,  Eelco Chaudron <echaudro@redhat.com>,  David
- Ahern <dsahern@kernel.org>,  Ido Schimmel <idosch@nvidia.com>,  Shuah Khan
- <shuah@kernel.org>,  Nikolay Aleksandrov <razor@blackwall.org>,  Kuniyuki
- Iwashima <kuniyu@google.com>,  Petr Machata <petrm@nvidia.com>,  Fernando
- Fernandez Mancera <fmancera@suse.de>,  Antoine Tenart
- <atenart@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,
-  linux-kernel@vger.kernel.org,  dev@openvswitch.org,
-  linux-kselftest@vger.kernel.org
-Subject: Re: [RFC net-next 0/6] openvswitch: remove support for legacy
- tunnel ports
-In-Reply-To: <20260513183559.2141010-1-i.maximets@ovn.org> (Ilya Maximets's
-	message of "Wed, 13 May 2026 20:35:20 +0200")
-References: <20260513183559.2141010-1-i.maximets@ovn.org>
-Date: Tue, 19 May 2026 11:12:37 -0400
-Message-ID: <f7tse7n8mca.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C222DF153;
+	Tue, 19 May 2026 16:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779206618; cv=fail; b=llAIP3Hq7n7XdyrdmKFoQfTzV/j9DU3/b0lvJr6pRUls9xSc8VwbDjyqJ9zC/YaHYCMgttvwuiu6tz7aQqTemITh04ddl3p+84DLzk6A6wmMjIizcVAt8IUkkXn0VRc8kAxiGSWMEZJ/ox2hPTE2XWQ4jLE7S7KginjyKFNyV/k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779206618; c=relaxed/simple;
+	bh=JgV+Y8a/U5HTQuwV4SI8+j4bl13nKeyMADiZ2D5uglE=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=m1/FIPQ/e4KH/RVG+AT00sXALISR7MgQRVX3gniUu0el8kbzhynjsfQ4T7r2dyNNc32nnc3aIwArSE3sGhCAUEsysxxW93JFHgx5dNm7aylbJXrs0D3wIbcAertgHFCkMfXNB4r+CeygkA1+egH1icRSOxMgFQdfnnUHb4lgKsg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sSCLvZ9U; arc=fail smtp.client-ip=40.93.194.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Q2mRZIrdPXHAkwlhsXU8/YjVu4D5t53nFmk9zSrMFGb9HQAxERVCiTQIzCS6xzK0fRm+fW1nkyt2Qo0OZAUMQmHCTL9I0HjxooME0sYccgwaNUjRaUfH3KPIotgbyxGw+ahAhwgHiHj90m3jxPRiQ2IEIlvtVGQxsRLkLkUPNlqBjql7olSVKGntXnTfJWdVf0sLzu0U4pq9Uvl7amGnPAFj4/nxscsfgljlLLHcKf2Q3MHA8jn0x/ajLrexIEOi0KKAPYF/ZzPWlLWebwDVjRCrfrDjP2P/5iU9Vf9Lf951GjQn80nwghAcDFkYoVU0EgdCfrf+NCUPf1Qf2C62cA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=g/Ig8+Gc8GyhlMFsDvndSipNwRU0S3b3/VVQddws5GU=;
+ b=B5fQW4hZB5AgXSop/D4kb/YxDuscTVEVl4DBRybIUVdpBrlamq3GQSxISWQI7T9Ndd5k320OjU2hH3+qzP6Uop1lDNBt7tirHHyuNcMfnbkCV/gG+wODbqzDTHVG0GlA6LRgK4579KK+XBKsXyDIzxP0GMhjrOUjpmSLs5DgBNFFkoyC+PBNh02+9AgzzVLC9RaZt2Zzg5+0+tqpCrZTaTAItTMjqMdHzWILR/cU1OCtFrScIHrEUeAcN6mB2FZ6/0YyX/FY/p79CuAPJc0gCvNRvt01iu0OfR2IgkpxJ1LMMYmTt1dQcQB4AYzXIiuIstEJop7NZ6dH28C2Xfsazg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=g/Ig8+Gc8GyhlMFsDvndSipNwRU0S3b3/VVQddws5GU=;
+ b=sSCLvZ9UFZCWiYM60iqOmLKeznDqgHgnU1F87RAZCOpn41dAlOcTJ2xZMDnPieVZpB3/0XGp6qVP+YNUHs0s9Xd2i4c5vSYo22NssaDzhPvZyDmXphuQUdDIEFTPUjjJ2ZBfkzF6WTSdL1MSgxXsrwsyiQRydSwNpNpNYd0vjVo36AYHqUvKyPXpRA/lxHWBOMwjM0aYs1zbiSvZGCBHoSdjN2lD+N38ZhZuDY3ajjdDUb6Vrds9ewBulSmDUJ1sr5/zP0fgo442qqDc2fnlcZQXyQelGCUza5qg5ZZZyJqWhqh1HVu4vz2+iwkFk0OyHuwSXtp1WgJbz6AuIukouw==
+Received: from MN2PR03CA0011.namprd03.prod.outlook.com (2603:10b6:208:23a::16)
+ by PH7PR12MB6812.namprd12.prod.outlook.com (2603:10b6:510:1b6::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Tue, 19 May
+ 2026 16:03:30 +0000
+Received: from MN1PEPF0000F0E3.namprd04.prod.outlook.com
+ (2603:10b6:208:23a:cafe::4d) by MN2PR03CA0011.outlook.office365.com
+ (2603:10b6:208:23a::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Tue, 19
+ May 2026 16:03:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MN1PEPF0000F0E3.mail.protection.outlook.com (10.167.242.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.48.11 via Frontend Transport; Tue, 19 May 2026 16:03:29 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 19 May
+ 2026 09:03:02 -0700
+Received: from fedora (10.126.231.37) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 19 May
+ 2026 09:02:59 -0700
+References: <agqqK_6PxbvAwsMX@juliahub.com>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Keno Fischer <keno@juliahub.com>
+CC: <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
+	<petrm@nvidia.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] mlxsw: spectrum_dcb: Reject writes owned by an
+ offloaded qdisc
+Date: Tue, 19 May 2026 17:14:48 +0200
+In-Reply-To: <agqqK_6PxbvAwsMX@juliahub.com>
+Message-ID: <87ik8jmlow.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,117 +96,145 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E3:EE_|PH7PR12MB6812:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49bb0758-1a1d-4608-e9e5-08deb5c02b5f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700016|1800799024|22082099003|11063799006|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	G5c1WFOl569z7a9ERFoUPESasKe7EGbBtCdtJNG60SZkiGAcKs47jPv5a7tPvFbslh175zKgzK40xGfZ+EIQ1AurGl60mHFW0NwtcMYE2qpuDp3FnUwk03jF2mFdNLVeJcrVJhfLgrWp3le+HCDf1k0RGRzCS8dPgIvwkhdMLwJxyiSkNGXrmrZ/VKg4GLH8Q93oBz+PZhC1NwIVpnZPbifMKkzPc5Ca9JBFsuPl8WqKXVb3wpEJUmoESoTaK2QAsTFAhGYn+yfHz42xHKI0HRCk7P6iFuKS0tLqXHN5mcbeip/JkGSfPDfDajx8jCsdvoIdzICWcVfj4T/qA31sNGd0araeJz7mXdbDtykUU+Nh/TV1uGsXPBcgqxos9UZeP214bL0oMuAhWnDWg0PUQzJX2Er0ZNaKefn8mdIogjGMgcF07Kuz2PJu9vcYR4n6GlTk+hpFOVwZtT+vYalCLfwCLHJYoJvYhk11CBSHeoKaGJ1Wk9UAT1fzL11ndUfYnDCyLsWa+oorvrds/YrIQy17xqera1cg9sTrsDhQtZTZcVwUZ9IZq7S4snDGAAJo8sz6iQl+E/OT5yIb3BDuXDCvYgP0lzchn99FK+NL200Nny/aK5WI+hLuRzcY13hEW+ts7lGVuPLZxd7760G24/RMcI+eKYbhOdJdY+E1t7p0SyKQ3SeGgDwuEbCaKMmpOEucj/gLez4Ai2R+4akEuIIgER/CD/PF8Rn2gok5Qt8=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700016)(1800799024)(22082099003)(11063799006)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	rrq+777cn6yxtRhosaFcoXlGa6+gghRkd19r3ww8dfOyS5StbdtZFlfQaTAveCuMRzM9vXubIhuGbVFLQ337xGPxIqZWAswu7wXdi0bbq2U0SfBqzXy6pAasPviVRUz5Qy+/V4lTnp6Yoq+Pa3F3jCrlqsOKufCR2KwEJze81RMszYYB13ZP5j2TiAlLIr2t3u/f1VfYqmzCTe+kPhd+avIRJBL1Sxb/dq6/BCQpP5zwoWbllVQK0+ECP3BZPTsRkViGaVuU5dVRpQgWc1S8jW5c8mkS6sEtfRVSPRNW3s8mOxRYDrPqpaFJNkLvT6cCadWMiZc9+YDT6I2rE6om0PjdTbcQJ7dL6QRGbc19eGO1gWplaTNVwmxk/o3jnvsNaC0R5Dq0HLXASzz1UlR2kkg9dnw8yitRum3bSKjC5b88XY3YGMYJUQ1vvCE6MGtW
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 16:03:29.7398
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49bb0758-1a1d-4608-e9e5-08deb5c02b5f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E3.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6812
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289494-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289515-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid,juliahub.com:email];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ovn.org:email]
-X-Rspamd-Queue-Id: D79F45816D5
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: C1A4458272D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Ilya Maximets <i.maximets@ovn.org> writes:
 
-> ovs-vswitchd doesn't use OVS_VPORT_TYPE_GRE/VXLAN/GENEVE with upstream
-> Linux kernel module since adding support for standard tunnel devices
-> with COLLECT_METADATA back in 2017.  The code to use them is still
-> present, but it is only activated as a fallback for old kernels, so
-> not used in practice.  And it is marked for removal in the next OVS
-> release this summer.  Modern way to use tunnels with OVS is to create
-> standard tunnel ports with RTM_NEWLINK + COLLECT_METADATA and add them
-> as OVS_VPORT_TYPE_NETDEV.
->
-> Device reference management and the netlink options parsing for these
-> legacy port types is complicated and was a CVE magnet recently.  Since
-> there are no actual users for these port types for a very long time,
-> let's just remove the support entirely.
->
->
-> There are 3 parts to this set:
->
-> 1. The first patch does the tunnel port removal, which is the primary
->    goal here.
->
-> 2. Patches 2 and 3 remove extra infrastructure that is no longer in
->    use by anything inside the openvswitch module.  It may technically
->    be used by some out-of-tree module, but it is unlikely, so the
->    proposal here is to also just remove it.  Or we can consider
->    deprecation.  It's not really a user API, it's an API for modules.
->    Which can be considered as users, I guess.  Not sure.
->
-> 3. Patches 4-6 remove functions from gre/vxlan/geneve modules that
->    were added for openvswitch in the past to support the tunnel types.
->    And openvswitch is the only in-tree consumer of these functions,
->    so we could remove them.  But they are also exported symbols, so
->    can in theory be used by some out-of-tree modules, though I doubt
->    that.  Not sure what the process should be here.  Removal seems
->    reasonable, but we may consider deprecation first.
->
-> Thoughts?
+Keno Fischer <keno@juliahub.com> writes:
 
-I guess the only question is whether we would consider this some kind of
-userspacce ABI break.  BUT, I'm not sure that it is.  After all, users
-could still create some kind of tunnel ports (but they would no long get
-to do INADDR_ANY type ports) and add them as regular netdev ports.  This
-only changes how they would have to do this.  And as you note, there
-aren't any known users for a long time.
-
-I think it's nice to remove them since they create confusion for anyone
-trying to debug what is going on.
-
-> Ilya Maximets (6):
->   openvswitch: remove support for legacy tunnel types
->   openvswitch: vport: remove infrastructure for vport options
->   openvswitch: vport: remove infrastructure for separate modules
->   net: geneve: remove unused geneve_dev_create_fb
->   net: gre: remove unused gretap_fb_dev_create
->   net: vxlan: remove unused vxlan_dev_create
+> Some bits of state in the mlxsw driver can be controlled by two
+> mechanisms. The first is the DCB netlink command set (RTM_SETDCB
+> and e.g. DCB_ATTR_IEEE_ETS/DCB_ATTR_IEEE_MAXRATE), reachable e.g. from
+> the `dcb` userspace utility. The second is via the qdisc framework
+> (reachable e.g. from the `tc` userspace utility). Because they touch
+> the same bit of state, it is currently possible for the ETS config
+> to get out of sync with what the qdisc expects. One hard-to-debug
+> consequence is that a config script becomes non-idempotent. E.g.,
+> consider
 >
->  drivers/net/geneve.c                          |  48 -----
->  drivers/net/vxlan/vxlan_core.c                |  42 +----
->  include/net/geneve.h                          |   5 -
->  include/net/gre.h                             |   2 -
->  include/net/vxlan.h                           |   3 -
->  include/uapi/linux/openvswitch.h              |  31 +++-
->  net/ipv4/ip_gre.c                             |  47 -----
->  net/openvswitch/Kconfig                       |  35 ----
->  net/openvswitch/Makefile                      |   4 -
->  net/openvswitch/datapath.c                    |  22 +--
->  net/openvswitch/vport-geneve.c                | 143 ---------------
->  net/openvswitch/vport-gre.c                   | 106 -----------
->  net/openvswitch/vport-netdev.c                |  28 +--
->  net/openvswitch/vport-netdev.h                |   3 +-
->  net/openvswitch/vport-vxlan.c                 | 172 ------------------
->  net/openvswitch/vport.c                       |  76 +-------
->  net/openvswitch/vport.h                       |  23 +--
->  tools/testing/selftests/net/config            |   3 -
->  .../selftests/net/openvswitch/openvswitch.sh  |  37 ----
->  .../selftests/net/openvswitch/ovs-dpctl.py    |  93 +++-------
->  20 files changed, 59 insertions(+), 864 deletions(-)
->  delete mode 100644 net/openvswitch/vport-geneve.c
->  delete mode 100644 net/openvswitch/vport-gre.c
->  delete mode 100644 net/openvswitch/vport-vxlan.c
+> ```
+> dcb ets set dev "${port}" prio-tc 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
+> tc qdisc replace dev "${port}" root handle 1: prio bands 8 \
+> 	priomap 0 1 2 3 4 5 6 7
+> ```
+>
+> Here the user made a mistake and put the priomap in the wrong order.
+> The first time this code is run, the `qdisc` specification overwrites
+> the `prio-tc` specification. However, the second time this code is run,
+> the subsystem sees that the qdisc is identical and does nothing, causing
+> the `prio-tc` setting to stick and the final mapping to be different.
+> This can be very confusing, since the same config script creates two
+> different states.
+>
+> I think there's two reasonable ways to fix this. One would be by
+> reflecting the ets state changes back into the qdisc, so that the
+> qdisc subsystem notices that it's been changed. However, I think it
+> is clearer to just forbid the non-qdisc API from trying to make
+> changes while the qdisc is offloaded.
+>
+> This is similar to the existing check in mlxsw_sp_dcbnl_setbuffer,
+> which does essentially the same thing in reverse (buffers are only
+> explicitly managed when there is an offloaded qdisc, otherwise
+> they're managed explicitly).
+>
+> I hope this saves the next person a few hours of debugging wondering
+> why their tc_no_buffer_discard_uc_tc_ counters are going up.
+>
+> Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Keno Fischer <keno@juliahub.com>
 
+We do have this overwriting behavior documented on the wiki, but I don't
+think it was ever really a deliberate consideration. I think it makes
+sense to distance the DCB and qdisc configurations that way. I ran the
+mlxsw-specific qos / sch tests that we have have, and everything passes,
+which indicates that at least we didn't rely on the behavior in any way.
+
+I'll let it pass through a full regression tonight. Overall the patch
+looks OK to me, but Sashiko found something:
+
+> diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_qdisc.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_qdisc.c
+> index 73519301b744..c2ce4f3f562e 100644
+> --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_qdisc.c
+> +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_qdisc.c
+> @@ -2316,6 +2316,49 @@ int mlxsw_sp_setup_tc_block_qevent_mark(struct mlxsw_sp_port *mlxsw_sp_port,
+>  					      action_mask);
+>  }
+>  
+> +bool mlxsw_sp_qdisc_has_prio_ets(struct mlxsw_sp_port *mlxsw_sp_port)
+> +{
+> +	struct mlxsw_sp_qdisc_state *qdisc_state = mlxsw_sp_port->qdisc;
+> +	struct mlxsw_sp_qdisc *root_qdisc;
+> +	bool found;
+> +
+> +	mutex_lock(&qdisc_state->lock);
+> +	root_qdisc = &qdisc_state->root_qdisc;
+> +	found = root_qdisc->ops &&
+> +		    (root_qdisc->ops->type == MLXSW_SP_QDISC_PRIO ||
+> +		     root_qdisc->ops->type == MLXSW_SP_QDISC_ETS);
+> +	mutex_unlock(&qdisc_state->lock);
+> +
+> +	return found;
+> +}
+
+From Sashiko review:
+
+    The check here only examines the root qdisc type. However, a prio or ets
+    qdisc can be a valid child of a root tbf qdisc in the offloaded
+    configuration.
+
+This is correct, ETS/PRIO are offloaded when under root TBF as well.
 
