@@ -1,206 +1,181 @@
-Return-Path: <netdev+bounces-289332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EGvmOdMlDGoIXQUAu9opvQ
-	(envelope-from <netdev+bounces-289332-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:56:51 +0200
+	id WIzeBZskDGroXAUAu9opvQ
+	(envelope-from <netdev+bounces-289333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:51:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DFB057AA35
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:56:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7283F57A874
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:51:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3162C30FB559
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:48:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32D7B3012C47
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F953EF0C5;
-	Tue, 19 May 2026 08:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0563E834A;
+	Tue, 19 May 2026 08:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKm0WEKT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYyNsvhC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9013C3EF0A0
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126D53590C3
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779180506; cv=none; b=h4NDDIH15dFPoKAVf59TxT72CywanzheSVQG+r8mwAT9K4U0OCaR4Vw0FSujH9g9djBwcU8DuRaPalEB64Eed8I7+2fV7esZ/NoVS1QmtWtCw7rn+Ve/Vxr+IvaeT8RaOPpBF5Vxoeo8Y0QqEZ5qw+wrarRJfcNDBirRSuva6Ys=
+	t=1779180696; cv=none; b=CHdM02bm8AiDIAI4lPCFzTF4wamDtE+wIn3Qd1qbKiSklzRDVGiwY3a+4JsWqeMB9RncIkzlBb8wKTmK1Yz+wp3xIfWJjiQKDC8M9rNX78YiHOi0BB3hUahz9tdWOmY7e+Ss/WtAhikvzCvHYE0kJAtR0oWztLU1aLYP1FF7068=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779180506; c=relaxed/simple;
-	bh=Hyx9uiXztVttxLdo9VjcbHUiP6qvqHfhOZr9vbJAYdk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lMXGTadC4SR3CHIttANFrRQmQbg+xiHG7Ja5Xf99HQQwOL2pD57npxrps8wikpb0nUKv1JCYCtPtzfjGVrfFSN1SNmdqz8+x2AR/D5n4bhKxflDSDe2zKi9gNtQHjwyuOWPIiafJ2Iynr0u0ViG9KjvRS5Ot/CaL580SxkuHyqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKm0WEKT; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1779180696; c=relaxed/simple;
+	bh=ShXYyTq6XRYDv0NW5GQ6tZPIHQT/abm6bnt8jn1jQvg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pgJB9FoLSzxxckEj7XCoE0IztbHwMambFOALYpcppPnO3h5slPCFS3TQbB3C96QPyB9WiakYFOVXRnF1ge+KcI794ZPGORPup6lQSiGzFNg+Qcn7dYEK6xkwtqau0cVMJrTqjljSYW8gfbnKCFTLArHBChyFqOU24jhaRv/7HmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dYyNsvhC; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso25938895e9.2
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:48:24 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2bccb978bd9so25062875ad.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:51:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779180503; x=1779785303; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8U8k5KUlWmxiDre3dDf6j/8PHyhhwOqohUrC9tjzC3Y=;
-        b=eKm0WEKT3mVDrwy7IMshOn0GT2kwmWUNussjaxGEyv482mBKvskG0hs7pJ5k+AfXcN
-         l7Rjpy9iZzrpocdayWNqfQdXtH/nwyhXHiZOuGC5I7B98fO16ELapo992aMvVW7NErxJ
-         Dom6oCaQBG4n0rJrkSsLMhnHP63zTKUiw5KuKnT6p7IvYNK+2mRBlfzqpifVUT/esNd3
-         vlhe3vAPa4t8awQvJiHD5JpieSz9o9c/NHG55x2xnbEgyrkqQ4UwvMthmyx0XIjO0dD8
-         Ds9+nZuBWp3o5j4Qfh95443MbvDyxxMyRCOg8xUEL3EtMFxko1g7WSrXeeWqy5p4Vy/L
-         m4TQ==
+        d=gmail.com; s=20251104; t=1779180694; x=1779785494; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1SJtW4aJl8cf/mrCTLtiDDHrsvycOscx3Mi7viUyAdI=;
+        b=dYyNsvhCNbOYVhl2dR2MflQVDumYBrfUC5SfN4+/vkauqphiL1urZmXLb4U8V1nGeL
+         qSNpgUYRlqreO29CGXDXrMw7I52Qwc2G6gYuH6xutGrfqUSt8/tXHHnGfRUEyeBB/9M5
+         2M7HTZLlfjbAAWzz6jbsuXVPjFIKhQ+1ETmidUKHJprpYkRjckqKlk/nd5LNw4ncIDAd
+         h9QNnFp62wMgjzAJS2wgnp2Kb4HRl8ETGxZSRKe60qESCaShM0PYMmT0UdsjmTgT5frr
+         cAUKr3YSH0oZX0j/NDrqcea2MkLcJRnKbhCt6ez0sQUp2IwE8zobsbkXfWCS7nBbcGXZ
+         Sn8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779180503; x=1779785303;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8U8k5KUlWmxiDre3dDf6j/8PHyhhwOqohUrC9tjzC3Y=;
-        b=ja/3NB2tGvvMgsVYZ+xI5x7aUYV56nl55CH1BUrQMJ4t5AZgaUZ+2vwjlVrTB/3VOa
-         /H6ja/+kgnWje/o8HAOsBwrHW8RgpT4Kv3OMhWzCQo9gzgh0CJc+9erH99PJlw2I+GvJ
-         9adwGi4c5FVxW7x+VdGn3zv2QnyqJu4Bn59Ux3KyyLCNxnDXxND5bpoRY0xOYBGM8Tgm
-         Zqma+b9+WfxaAJ1YB7LOwQbK40anp71/Ojna67W05Le2E3ggNKgO78T7a1gAmg4pCkMo
-         Jx2RYepyNzu00lT4WCJ6KhtYmkmjdlzxnPW2NtyOQcCXevDZeQoy9BH/ikr3tGAK/gw1
-         0MlA==
-X-Forwarded-Encrypted: i=1; AFNElJ/d07d5KFJkMovGHLNhHlSUht1oPRM0d91M9jln6TQhHhH0GG82OrXUTsQnn4U3TPyg7GPnPyU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmvePdcXo2EKHX7uI8IxGZI4IYapM8yuHY8B92OAItjQT7AvTB
-	+kVnBVpuDAVD6Lk+EHZe2Pgn9sSzhggBgNJnlJ20fTO7iCsiAabjIwuA
-X-Gm-Gg: Acq92OFfeIzwggruYIjUl1j0A457ufItJt/zT1kbPr0EH0a6iV2uuoH6Yo9xvLNdYas
-	JPhXPpkeX9JhHaB8iSpqFnOJqLFF4yWp4K+4QIcGhoF8X/Mz3qIzeCzxgsvmL15tX/urL2ZBZD5
-	d0CFf3cdYYGEAytlo1XeCLmQ86bm69y6n04BDT2BXXk4YfTdZLi0qELsSb3wgNi8hpsLjBb6c5r
-	1Wj6DnU27CkzLQ53hw06Z1Ij/CWNlOKs9wtIkX+oqY5T94Q70lZ5eJ/ADqr0jr4v5FmJSzdFi5Y
-	KwnDUlNQd7xu/Ao12R09l94yCa3Q5BTpjresustV4tCc/rc9ln5VC+093pIB2mnesQnDLcSXv+0
-	oOm5tFQisDiHouc7PhRzrtCU6kmYkytPSILmtrmeGeoP+zPyO+HtQaFJ03KV4CrY8I5qwCe9SMT
-	rAKO6ynItUNqaSGVlZ3r6JJYNoDaCu58RT3OaMJ4fWgeMceMB1ZPUw1NGJq2VYllMa
-X-Received: by 2002:a05:600c:3e1b:b0:48a:8905:a500 with SMTP id 5b1f17b1804b1-48fe60da647mr311906705e9.12.1779180502860;
-        Tue, 19 May 2026 01:48:22 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c8344asm530004325e9.1.2026.05.19.01.48.21
+        d=1e100.net; s=20251104; t=1779180694; x=1779785494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1SJtW4aJl8cf/mrCTLtiDDHrsvycOscx3Mi7viUyAdI=;
+        b=ZeW2UFJpvGjCZtT+Tx86EeCDaXEAiDDzyk2R+jp6b8QTaEi6U1izMlxy8OvcvSfJXi
+         aj7DCSoTaAZJrMVj2IP53xhclhc6U+gBpzk3hnrC5gwxArzEAKQ8s+Wc87qg97wZAh7e
+         fAT5JRPLU+AXkvt9D/DWdZro6t/BCjwnuS7h00lG47VpVknYb15dBqNgo6yGtf2EBE1R
+         SmP3gGlL+x1ISFzdV6Fxsv5CU90bD1M3aTpKeus/gMzTopW/rhUGgnPaWgst2XI2qELV
+         1cQEQz5Zi9pD1Uc6jpHDbcn1w2M4IgoXVZcMx8rZp91wy5evfClkxR868gLtrT9FBWlN
+         AL+A==
+X-Forwarded-Encrypted: i=1; AFNElJ9dx72+aZ+/E6GeLYxCMX3Hmnkbi02smUMg3gvqS6C3KTbzKMiYVnJKgEMs4LDw4KoLnF2BxTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHnJzqNF88xbD2XcmsAnK8OghN6t/rgvL5d4bKsD9k/qM4WndG
+	dFhUh1cL8T1e9SqdtjvQgzJfCEbjoVEMIvGL/5FDEELMjFfgaxgg7K3l0eCPHyrY5Mk=
+X-Gm-Gg: Acq92OEphcrz5URfOiVG750aQ39mKch/UMEakQPHe5g17QafLqQW9r8YgBpPgk/FoOf
+	Ijg+1Numzvb0jFDV6HBxsc5LhHZ5NrNVeTqMgmeum3QzSTYYC6pThrHuXCb03DSBJTqcuywB8mV
+	eqgWtC3rFnksfRvfzDtH/IDDIz3cVFF7q1ayXA8g5/4XkmqEFNTqh5u1cOSqeN2gyqhgfOJdhUP
+	mcIYAQKZA3BkwOpKSfYRZz9VZFy4fRyN7q7NS4Hytza9Z5vBN4dCLHyLoKOucZ2iJZCJpihUBqR
+	1pD4LTpNs59Ibi74lP4DU8DypQc5pLqDsnUoxn+ILdDkQvZ3Vvoel6zI0MRSMyf8SE8pNroLXE7
+	9OCMbp6t0+T6a+d9uPaUNnXM2RMmENwn/OOhSWQzqYtMngC+DJoe+r1B+NuoXQor0mrmkRkyVJf
+	i/0vxnhngPLD9yaM3OsOg7OFfSaI7exu6sNVqtYKQGyJ6YTUL/spg=
+X-Received: by 2002:a17:902:f545:b0:2bd:4bc3:2995 with SMTP id d9443c01a7336-2bd5281ff47mr192532385ad.22.1779180694243;
+        Tue, 19 May 2026 01:51:34 -0700 (PDT)
+Received: from Air.local ([198.176.50.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5c26355csm177354465ad.35.2026.05.19.01.51.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 01:48:22 -0700 (PDT)
-Date: Tue, 19 May 2026 09:48:20 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
- workflows@vger.kernel.org, linux-arch@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
- linux-iio@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
- linux-csky@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
- <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Daniel
- Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Alex Shi <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, Dongliang
- Mu <dzm91@hust.edu.cn>, Hu Haowen <2023002089@link.tyut.edu.cn>, Dinh
- Nguyen <dinguyen@kernel.org>, Kees Cook <kees@kernel.org>, Oleg Nesterov
- <oleg@redhat.com>, Will Deacon <will@kernel.org>, "Aneesh Kumar K.V"
- <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Nick
- Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Vinod
- Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>, Dave Penkler
- <dpenkler@gmail.com>, Andi Shyti <andi.shyti@kernel.org>, Jonathan Cameron
- <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, Nuno
- =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy Shevchenko <andy@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo Pieralisi
- <lpieralisi@kernel.org>, Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?=
- <kwilczynski@kernel.org>
-Subject: Re: [PATCH] nios2: remove the architecture
-Message-ID: <20260519094820.1f05ab8e@pumpkin>
-In-Reply-To: <20260518042833.272221-1-enelsonmoore@gmail.com>
-References: <20260518042833.272221-1-enelsonmoore@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Tue, 19 May 2026 01:51:33 -0700 (PDT)
+Date: Tue, 19 May 2026 16:51:28 +0800
+From: Weiming Shi <bestswngs@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH net v2] net: team: fix NULL pointer dereference in
+ team_xmit during mode change
+Message-ID: <agwJNX-q0NmmrMpy@Air.local>
+References: <20260509181825.1523951-2-bestswngs@gmail.com>
+ <20260510082509.1530a1a3@kernel.org>
+ <agCtGqWLK53TWCaS@Air.local>
+ <20260510095937.598c27a6@kernel.org>
+ <agrdjt6CjpJo3AYF@Air.local>
+ <20260518142230.4403b3ce@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260518142230.4403b3ce@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289332-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289333-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lwn.net,linuxfoundation.org,kernel.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,gmail.com,infradead.org,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sourceware.org:url,gnu.org:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,altera.com:url]
-X-Rspamd-Queue-Id: 9DFB057AA35
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Air.local:mid]
+X-Rspamd-Queue-Id: 7283F57A874
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 17 May 2026 21:28:33 -0700
-Ethan Nelson-Moore <enelsonmoore@gmail.com> wrote:
-
-> The Nios II architecture is a soft-core architecture developed by
-> Altera (since acquired by Intel) and intended to run on their FPGAs.
+On 26-05-18 14:22, Jakub Kicinski wrote:
+> On Mon, 18 May 2026 17:51:54 +0800 Weiming Shi wrote:
+> > On 26-05-10 09:59, Jakub Kicinski wrote:
+> > > On Mon, 11 May 2026 00:06:50 +0800 Weiming Shi wrote:  
+> > > > The handler function pointer against the mode_priv state it operates
+> > > > on.  On setup, init() writes mode_priv, then smp_store_release()
+> > > > publishes the real handler - the paired smp_load_acquire() in the
+> > > > reader ensures the handler sees that state.  On teardown,
+> > > > smp_store_release() publishes the dummy before synchronize_net()
+> > > > drains readers, so exit_op() won't tear down state under an
+> > > > in-flight reader.  
+> > > 
+> > > Still does not make sense to me. You already add sync_net().
+> > > And if it's possible to switch from dummy to non-dummy mode
+> > > the ordering is inverted.
+> > >   
+> > > > Not specific to the bug, just a reproducer detail.  Dropped.
+> > > > 
+> > > > Sending v3 with the updated changelog shortly.  
+> > > 
+> > > Please don't rush new versions out.  
+> > 
+> > Hi Jakub,
+> > 
+> > Apologies for the late reply and for rushing v3.
+> > 
+> > I was muddling two things. On teardown synchronize_net() is the protection,
+> > the release/acquire is for the setup path where init() writes
+> > mode_priv before team_adjust_ops() publishes the handler.
+> > 
+> > If that makes sense I'll send v4 with the corrected commit message.
 > 
-> Licenses for the architecture have not been available for purchase
-> since 2024 [1],
+> Can you provide more details for the init() path race?
+> What's the sequence of events?
 
-Except I think they got 'beaten up' by some telcos.
-The Nios II gets used inside fpga for small cpu doing things that it would
-be far to difficult to do in VHDL.
-(I believe some mobile base stations fgpa embed a lot of them.)
-These will have a small amount of code (maybe 4k - 64k) and a similarly
-small amount of data memory along with access to fpga peripheral registers
-and (optionally) host memory vie PCIe. No MMU, no cache (or rather the code/data
-is in the cache memory but it isn't backed by anything), no branch predictor
-(guaranteed cycle times), etc.
-Intel suggested that RISCV could be used instead, but it isn't the same beast.
-They didn't document the instruction timings nor how to add custom instructions.
+With loadbalance mode:
+ 
+  lb_init() stores select_tx_port_func (team_mode_loadbalance.c:595).
+  When a port is later enabled, team_adjust_ops() publishes
+  lb_transmit with a plain store (team_core.c:539).
 
-The company I used to work for used 4 NIOS II inside an fpga.
-The instruction timing for one is pretty critical, it has some code that
-has to complete in 122 clocks (worst case).
-Our solution was to spend a few man-weeks writing a compatible cpu!
-I think it came out with fewer pipeline stalls (in particular it 'lost'
-the one for a (predicted) taken branch).
-The maximum clock frequency might be lower; but it is ok at 62.5MHz and the
-higher 125MHz in just impossible for all sorts of reasons.
+Without the release/acquire, a concurrent team_xmit() on a weakly-ordered 
+arch can see lb_transmit but not the select_tx_port_func store, and lb_transmit 
+dereferences it at line 227.
 
-OTOH I really wouldn't run Linux on it!
+I'll send a PoC in the next mail so you can reproduce it.
 
--- David
-
-> and support for it has been removed from GCC 15 [2],
-> Buildroot [3], and QEMU [4].
-> 
-> Given all of these factors, it is time to remove Nios II support from
-> the kernel. The maintainer stated in 2024 that they were planning to do
-> so soon [5], but this did not come to pass.
-> 
-> Remove Nios II support from the kernel and move the former maintainer
-> to CREDITS. Thank you, Dinh Nguyen, for maintaining Nios II support!
-> 
-> References:
-> [1] https://docs.altera.com/v/u/docs/781327/is-discontinuing-ip-ordering-codes-listed-in-pdn2312-for-nios-ii-ip
-> [2] https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=e876acab6cdd84bb2b32c98fc69fb0ba29c81153
-> [3] https://github.com/buildroot/buildroot/commit/6775ccc5a199d574ad70b5f79ec58cce97a07c6f
-> [4] https://github.com/qemu/qemu/commit/6c3014858c4c0024dd0560f08a6eda0f92f658d6
-> [5] https://sourceware.org/pipermail/newlib/2024/021083.html
-> 
-> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-
+ 
 
