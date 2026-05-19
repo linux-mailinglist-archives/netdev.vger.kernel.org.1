@@ -1,99 +1,90 @@
-Return-Path: <netdev+bounces-289447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wMJnLsdaDGodfwUAu9opvQ
-	(envelope-from <netdev+bounces-289447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:42:47 +0200
+	id qEJPDEtbDGodfwUAu9opvQ
+	(envelope-from <netdev+bounces-289448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:44:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1727357EE59
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:42:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8375357EF1A
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9095B30EE96D
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:36:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A8393002134
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C6B4DBD70;
-	Tue, 19 May 2026 12:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CD94D8D8E;
+	Tue, 19 May 2026 12:37:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RxdNV23U"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LP4WRwSw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012057.outbound.protection.outlook.com [40.107.200.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906C74CA278
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 12:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779194164; cv=none; b=c89xNvKQ1HurVZFE9He1WE5S1Xl15zYlkjxDq/DtQS2mOZx+F1LtB9Kz5+YFhq1chfEcSsZCX38VRVeboTSUrEpYDK2OTGyGG8PWFzXJjtfAmWfJjMkb1k6oJQlnC37Jy7iHYPab++LOUiyiWpsrYn3Zn56Chuc/05/XSH7iuBA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779194164; c=relaxed/simple;
-	bh=lIc9IvGukuTxrcKPyEANUt/P7j7/XDF0to6T1xKrVwg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qaQeEWtZQ8qmmRgUbh4s+c/Fuw5Csq97FwLK51DyTqPH+N9vLLXJL2vnGWRC8mH1hJ/vOOW/uL50mDSqRSfljfr+R9j+X1I0e+6r7aW8Ax24QVg1k9DxlU9hfL0lqGADrn11zklR9njXxBmmE0FdFiqSrLe7Tc13TpM8Uu7QOUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RxdNV23U; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2b4583f0a1aso21764765ad.3
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 05:36:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779194159; x=1779798959; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WnqfNLPf1FZpTLzCn6yNj1v+FRpfxLX1loWYM78LAiU=;
-        b=RxdNV23U+rPsSJ2il8ENIcIFV40H/lty0OrdzTXSVqMXYIz66s5o3jbYDXuRgDRHZc
-         mocdfsHTWeH9IxBBe0SpTmTOyhbvkoQYYcewzG1coz4ZXz9ebX1CjusnhKYHmlIAKyHG
-         APx13kdteRvuESCs92OtIkWtLS64LSRezJpseyRGKI+MwXAvBcnDuCeLpXWa1lf1qcLV
-         s94bvNCIl2PF6LeweFQBTzIQ6Xk74SazVQE0VsSY7VtGWCxu7IZZa7oc3ZMPTkFLf5z9
-         Aibou2FWyPxzTDquj6XAkfcb3Bs2SJ7ePLXMFsP97O+thyIjOqZtrtz29wNF/n+9vyWE
-         1hdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779194159; x=1779798959;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WnqfNLPf1FZpTLzCn6yNj1v+FRpfxLX1loWYM78LAiU=;
-        b=BRX7XAl68/PVv1Hi0aF75pUJTB3G/IVVyIMUUqnN17Y5SiX5I326GhMwgG+2XdsVUL
-         9qTD/QQHpPT/zfrYCiIqA+WWZBzZ4oaltVx2hY7bDCfx3YN/4oCm5IndPB8OBbGL32Ax
-         EGZCR7HWzCXxtFkStpSoqs8/1KLmmH2q8pvqPK0EWUv0u2AC8dnZwSznL7gAwztp7dBj
-         mJQeffAXE9QWTab0ufAiE/Tk8/yN5FsK7khZnUekPBJnZLZ1+ptOb7Q2OelxnHDmRUJA
-         gTxiermi2sXdtHvE1ciDnUcdoIGCFSY+5FmozbklMDEo2t+5oiLPnSL7aTnictN9GFPE
-         cq5g==
-X-Forwarded-Encrypted: i=1; AFNElJ/fE3qmi4W69UnoJ9gNEfcqUKU9HPy52CnXenK+KR7NjkhNqkwEeOvzYZFgUISiCf8fZaeI5GY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpI0uANBraWWH/oSAE/1d7ublz9J+9Zi5GKEbmXsMUobv0EFyc
-	DvjRJU6UgZm4FRdxE2CVFhtGm+WiCq5+Y0NciUxokGMfiXiZk/i/1YLX
-X-Gm-Gg: Acq92OF6l1858Tq+zfJYu/H7Qb5qNvNMoLMRfXjE7bApeSCZFVCGF1QhNcBA4A3QCZ4
-	hm+JhSs0G44hLTD78NfC0zMVjm6czrHlGZEh0zwNPNwJ/zyupxu/mjY6ubwKl7Vbhu8KJzzdyhA
-	cTOi6VLKGBH0TwOioHQ63mKWMoAlvAq3Q4+PVDvU0abXLkFf0S09TKGfrTO9WtVsYReyVuhrdXg
-	IivVrcoTZxcKe0lLe8cXZm5IlHJKD4iHKiUGbxn7DzTJLfhJQMxktZFqUU4lUHvn/k7ByfGgu8d
-	FMfCrWznXCuyzZ1PgTET0p4ut5a8szLkQ3Wq5Fk8Wpj3aOZf9Gf6p9fRbw4bl+6U9/7B0qbnMxl
-	cCPDMaTd92nVp2bj4yju/8sHaoA1E6wJgS1B9O7351pexATIoi8ARxGWCwCAFYYmN3yIYV3m/hJ
-	O1SngIdw4QzOWhPNQKWHY0ubEf7XqmTHz2xw8rLQFMLqD/FOOe
-X-Received: by 2002:a17:903:950:b0:2bd:a3c5:6d96 with SMTP id d9443c01a7336-2bda3c56ef9mr147376025ad.14.1779194158910;
-        Tue, 19 May 2026 05:35:58 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5bd5fc60sm193216245ad.9.2026.05.19.05.35.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 05:35:58 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Shaw Leon <shaw.leon@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v3 2/2] ip6: vti: Use ip6_tnl.net in vti6_siocdevprivate().
-Date: Tue, 19 May 2026 20:35:47 +0800
-Message-Id: <20260519123547.2055911-3-maoyixie.tju@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260519123547.2055911-1-maoyixie.tju@gmail.com>
-References: <20260519123547.2055911-1-maoyixie.tju@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68343409E16
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 12:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779194268; cv=fail; b=tjCo6G89YZ0QvctmnV+ZS4fTIsHNPNHIMhQT2km9WtCrkVwzloM+kPcW5V2ZnNsAYHyujBf2md2jIYQk0p3ZmqH7ZgNPxRjHxrDBJVIGwy8Txh8GyY53Rz0iATQm8NpWjLKegg4LLOPKkC0CBDs/O2chqCNPaaKrJaXcdDv1wkA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779194268; c=relaxed/simple;
+	bh=4QiyXNrblvlgaDjCtPreIJZR7I37MQWeRawX8KtjQXs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oQ6oAeXibIlyh21ZIdANS0xuXKHzQTKSbWTp7Uff/1R6s8QchkbygwhVGAECOK0sJFysDjYLeTGUjnLuOjLTFyJs7WjVBOVy7XLCj2duu4zjf6h77eIZuZXiIBMQLcYdiLlkOAQrD3VmyH6pJoDc3XDEvtaRXKBjus/XfYufmF8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LP4WRwSw; arc=fail smtp.client-ip=40.107.200.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JZ+GQZpQgVKsmZgtI9YEuBJm6PL4lDrolsWFt8EJJEAlYiN0EoERCa/m4SD9fbdEwZPzBa5bu6TcEly9sFIOSbNwx00vvZwsWER1Qooz79K5OlNY3iGx013gnfTmJ1N9J17124FapVGJQLtKDA4AIYfjcrdsxEq42+RlsSznGxRyEqHtOUAksqWZA6A21CyXTtFCWJix0I6ZoPITs2o4adE8ZBPeO4/Gd/i96S3OfBYZUcTBf0XcmJskdxzDysR0V9kh229i35Vl+duKJE0EmvOjCUHz4I1xg2Kprj26P4xzlZnoodYDKoS96Cy08+nejCcRVeiPsir+n65OnTcbbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aC0gZFKqAusun2IqQWNqseKNMZ8oOZUdQ0xl7odGVwc=;
+ b=lwV9C8boIDquFynooomY71G36ixOso0hjsMuF6lEXcnl5LJsXkzX4mxk49cQIQUxbvSa0MV6smMeqPU78jEzL70lW5dPe1NHw2HbJiZRPei4j+bPTlA+00JgI/S6p1sqVG0u6XmDWAaKmUBKBgqnFt52g3WLhA6vLxIPjIaNWOMxl6gtfj/WKxrBxhR/duQ88JD27rbH9SWR1FMTpL13BWlfQJF5Oyvkm8nUW5CIQfDLxjyfP9i0GROsOjriZLXpS6tnjbFg7lk7ahbt4yAbMcGSKV9iiJVevq1QjaHg369oeQgEfaQRCL+NXv2MEBD47iHhNE0mjAwqm1/tQ9htFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aC0gZFKqAusun2IqQWNqseKNMZ8oOZUdQ0xl7odGVwc=;
+ b=LP4WRwSw5h5gQNEa2UmiXQo07NFYxt+7qXZI2jXh1R1sJAm0o48k4j37raqg0T3yTabtrSxA1Gpd4Nk6wJriOQeiwbf8taLnlWYaU2u4iQ6tfk5MgKbn2hyl474F9tTIkTNTKzMUVpWmE6mZ7rcWzkkrPNedZNKCQe0hH0eLUYxTqLBEJ99uvfP3606t0s7nszVC1QhiSkxCBSjo8SgGA0feJP+P94pH9BL2zyGFzr7dJe8Crs56PdxiGMfkca26hZkB6g/DOgjJSzfJjnRza/tzddvrP8OqIleTGXwA4d2yVhFEiM2c98vj1lfLXyf7HPJMVFslqOIKihjNQ1fYGQ==
+Received: from BY3PR10CA0009.namprd10.prod.outlook.com (2603:10b6:a03:255::14)
+ by IA0PR12MB8893.namprd12.prod.outlook.com (2603:10b6:208:484::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.18; Tue, 19 May
+ 2026 12:37:39 +0000
+Received: from SJ1PEPF00002322.namprd03.prod.outlook.com
+ (2603:10b6:a03:255:cafe::2c) by BY3PR10CA0009.outlook.office365.com
+ (2603:10b6:a03:255::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Tue, 19
+ May 2026 12:37:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF00002322.mail.protection.outlook.com (10.167.242.84) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.48.11 via Frontend Transport; Tue, 19 May 2026 12:37:37 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 19 May
+ 2026 05:37:18 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.37) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Tue, 19 May 2026 05:37:15 -0700
+From: Danielle Ratson <danieller@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <mkubecek@suse.cz>, <idosch@nvidia.com>, <petrm@nvidia.com>, "Danielle
+ Ratson" <danieller@nvidia.com>
+Subject: [PATCH ethtool-next v2 0/5] ethtool: Add 'pages on|off' option for module EEPROM hex dump
+Date: Tue, 19 May 2026 15:36:57 +0300
+Message-ID: <cover.1779190777.git.danieller@nvidia.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,105 +92,176 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002322:EE_|IA0PR12MB8893:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5ddbf6b3-b2c3-47c6-bda7-08deb5a368b6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700016|376014|3023799003|18002099003|56012099003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	6pHWESSSz9DMl1cA60AvqjIeMmQDAKuM/LT17kXSEG39jgdoYzEceEF2wMJM3LQnoAc5fViAUIGJPOuIjnSRd6HJu7TzVy5pk7KMSHJpOkGe33HZzeMbZAd4hG5CdXyBpf0U5Es6i8+xKn6Riltp0vfIjeeb4+J17Wd50hCGjK7tz3ykZcwMSdk+TRCBhUlbMWTmwuBixBy2IOarEg44zLs7t1QxZderg0PVlrDOB8Twz6SR67c/LhrZ7F0XmURcDlF6g1C14C6tF8H3kPoHjTlqubpuS7Sc8vdPVN0B4ft0jTQjxaIDT3QkUG8qzId6PGV7kOs0E7yJWrNiOlk5lVX/rM6L7QPpaX1VFP1ER2vtyBndt+dd+zKeQS8rbvkFsqSoAKdG1MBPkbnYWbl1xjmpNV3XCHKMrQwBCpGele5zuJ8euJ5iP/laPrjPVwY0A/gmua6qbVxgwtRlJBCT6vfCLlZUqlEiwimlETeC0wj7O2UTuhvQZCJuHmzbj0xsCZm2FyYRjUArU/+4pInscuvtI9EKnC9kKgiAJEr+d+Fyq3H8qzgskyX/fhBJSJgbKCrZh/tbOeQEKePRdzIgEFSvlBs2A+TLYWrZAjEy8Zf5F+b7Ea7lyIX/rEn89+TETbfHqNPWg4er025k86En98KQksUO5FVkEsomYazqYg2J+EalFObNPBtDMTDIl0q9TP/nZcmHncCUUnkYTzLbJHEczijFP3M8Uu3L22530yY=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700016)(376014)(3023799003)(18002099003)(56012099003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	FGZPCi8fgtGTSd39UvEDMtWFk/VGBFSAfRkALGZSFtZmjb69WGL31r30WRJXpnlFyojrPg4p9x0ErduSlwmHzW8xmsjJ640VkYGONSmf4jk88GDALsFPpIL0+ws4KWVdeLE4UPxstYzXgRYtmIOOB+KpS1omnmMHwFAeEP6gBUMd/svR/9EBfxLshvsHGtaPvbThW1l58g+HZ4Fy3jNX5DzNWWSodgjRfyqTMUyQL4dq6PT9EayqxNYIDbvg+ooRHbmxSBbOYlCh7vzZ6QTV6O9pUPfMJ6hf2EIBw4+RF3vQZBKe1zy55qQeYfJsMggR9ZasY9ysDu5uQ6FMnZho9uDShffbAGEf9h9AqLNqKXO7PoScsj0AXkGTx/hIAiHPuArbtDn+AIvZ87ACEHLRe+KIbyoun+O7q7fNi3JnirbV/DE8o/YjzewJQPBsq1l3
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 12:37:37.2873
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ddbf6b3-b2c3-47c6-bda7-08deb5a368b6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002322.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8893
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289447-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[google.com,secunet.com,gmail.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-289448-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,Nvidia.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,8.in:url];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ip6_tnl.net:url]
-X-Rspamd-Queue-Id: 1727357EE59
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 8375357EF1A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-After "ip6: vti: Use ip6_tnl.net in vti6_changelink()." in the same
-series, vti6_update() unlinks and relinks the tunnel through t->net.
-vti6_siocdevprivate() still uses dev_net(dev) for the collision
-lookup. For a tunnel migrated through IFLA_NET_NS_FD, dev_net(dev)
-is the new namespace, not t->net.
+The existing 'ethtool -m' command can dump module EEPROM data either as
+a parsed pretty-print or as a raw/hex dump. The pretty-printer reads
+multiple pages per module type, but decodes only specific fields from them.
 
-The SIOCCHGTUNNEL path on a migrated tunnel then proceeds as
-follows:
+In practice, both outputs are often needed together for offline debugging:
+the pretty-print to identify the module type and decoded fields, and the
+hex dump for fields the pretty-printer does not decode. However, there is
+no single command that provides the raw hex dump of all relevant pages,
+organized by page boundary. This is especially problematic for CMIS
+transceivers where the existing hex dump does not provide Upper Pages
+beyond Page 02h, let alone banked pages.
 
-  net = dev_net(dev)                    /* migrated netns */
-  t   = vti6_locate(net, &p1, false)    /* misses target in t->net */
-  ...
-  t   = netdev_priv(dev)
-  vti6_update(t, &p1, false)            /* mutates t->net's hash */
+This series adds 'pages on|off' sub-option to 'hex on|off' for
+'ethtool -m':
+$ ethtool -m hex on pages on
 
-A caller in the migrated netns sets the migrated tunnel's parameters
-to those of a tunnel that lives only in the creation netns. The
-collision check in dev_net(dev) sees nothing. vti6_update() then
-prepends the migrated tunnel at the head of the creation netns
-hash bucket for those parameters. Subsequent lookups in the creation
-netns resolve to the migrated device. xfrm receive delivers packets
-matching those parameters through a device the caller controls.
+That produces a hex dump organized by page, matching exactly the pages read
+by the pretty-printer for each module type.
 
-Reachable from an unprivileged user namespace ("unshare --user
---map-root-user --net"). Cross tenant scope on container hosts.
+Each page is preceded by a header identifying the page number and, for
+banked modules, the bank number. For SFP, where the two memory regions
+are separate I2C addresses rather than pages, the header shows the I2C
+address instead.
 
-Use t->net for the SIOCCHGTUNNEL path on a non fallback device. The
-lookup then matches the namespace vti6_update() operates on.
-SIOCADDTUNNEL and SIOCCHGTUNNEL on the fallback device retain
-dev_net(dev), which equals init_net for the fallback.
+In JSON context (--json), each function emits a "pages" array with one
+object per page, containing page/bank or I2C address, offset, length and
+data. Consumers that need a stable, machine-parseable form of the hex
+dump can use this output instead of the text format.
 
-Fixes: 5e72ce3e3980 ("net: ipv6: Use link netns in newlink() of rtnl_link_ops")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Cc: stable@vger.kernel.org # v5.15+
-Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
----
- net/ipv6/ip6_vti.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+SFF-8636 Output examples (values zeroed to omit vendor-specific
+identifiers):
 
-diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
---- a/net/ipv6/ip6_vti.c
-+++ b/net/ipv6/ip6_vti.c
-@@ -834,15 +834,19 @@ vti6_siocdevprivate(struct net_device *dev, struct ifreq *ifr, void __user *data
- 		if (p.proto != IPPROTO_IPV6  && p.proto != 0)
- 			break;
- 		vti6_parm_from_user(&p1, &p);
--		t = vti6_locate(net, &p1, cmd == SIOCADDTUNNEL);
- 		if (dev != ip6n->fb_tnl_dev && cmd == SIOCCHGTUNNEL) {
-+			struct ip6_tnl *self = netdev_priv(dev);
-+
-+			t = vti6_locate(self->net, &p1, false);
- 			if (t) {
- 				if (t->dev != dev) {
- 					err = -EEXIST;
- 					break;
- 				}
- 			} else
--				t = netdev_priv(dev);
-+				t = self;
+$ ethtool -m swp61 hex on pages on
+Page: 0x0
 
- 			err = vti6_update(t, &p1, false);
-+		} else {
-+			t = vti6_locate(net, &p1, cmd == SIOCADDTUNNEL);
- 		}
- 		if (t) {
---
-2.34.1
+Offset          Values
+------          ------
+0x0000:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0010:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0020:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0030:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0040:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0050:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0060:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0070:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+Page: 0x0
+
+Offset          Values
+------          ------
+0x0080:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0090:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x00a0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x00b0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x00c0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x00d0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x00e0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x00f0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+$ ethtool -j -m swp61 hex on pages on
+[ {
+        "pages": [ {
+                "bank": 0,
+                "page": 0,
+                "offset": 0,
+                "length": 128,
+                "i2c_address": 80,
+                "data": ["0","0",...,"0"]
+            },{
+                "bank": 0,
+                "page": 0,
+                "offset": 128,
+                "length": 128,
+                "i2c_address": 80,
+                "data": ["0","0",...,"0"]
+            } ]
+    } ]
+
+v2:
+	* Add JSON output support: each per-type function emits a "pages"
+	  array with one object per page containing bank, page, offset,
+	  length, i2c_address and data.
+	* The shared module_dump_eeprom_hex() helper takes a struct
+	  module_eeprom_dump with print_bank / print_i2c flags selecting
+	  which header fields are printed
+	* In JSON context all fields are emitted unconditionally.
+	* Document the JSON output format in the man page.
+
+
+Danielle Ratson (5):
+  module-common: Add module_dump_eeprom_hex() helper
+  sfpid: Refactor sff8079_show_all_nl() to separate page retrieval from
+    display
+  module: Add per-type EEPROM page hex dump functions
+  netlink: module-eeprom: Add 'hex on pages on' option for
+    page-organized hex dump
+  ethtool: Add man page and bash completion for 'pages on|off'
+
+ cmis.c                        | 70 +++++++++++++++++++++++++++----
+ cmis.h                        |  2 +-
+ ethtool.8.in                  | 18 ++++++++
+ ethtool.c                     |  1 +
+ internal.h                    |  4 +-
+ module-common.c               | 38 +++++++++++++++++
+ module-common.h               | 12 ++++++
+ netlink/module-eeprom.c       | 43 +++++++++++++++----
+ qsfp.c                        | 67 +++++++++++++++++++++++++----
+ sfpid.c                       | 79 +++++++++++++++++++++++++++--------
+ shell-completion/bash/ethtool |  2 +
+ 11 files changed, 294 insertions(+), 42 deletions(-)
+
+-- 
+2.51.0
 
 
