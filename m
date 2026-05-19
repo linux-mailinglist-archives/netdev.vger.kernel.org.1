@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-289573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289577-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oPA7JGqpDGoIkgUAu9opvQ
-	(envelope-from <netdev+bounces-289573-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:18:18 +0200
+	id sEh5FdWoDGoIkgUAu9opvQ
+	(envelope-from <netdev+bounces-289577-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:15:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F020F5838A4
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:18:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF1A4583844
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:15:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA13A30E805C
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:13:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9191A30942ED
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6445E344024;
-	Tue, 19 May 2026 18:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6A53446AB;
+	Tue, 19 May 2026 18:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IqUxy2iv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rRcqCFCq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B4B33F8D9
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 18:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4276343D75
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 18:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779214416; cv=none; b=t12TrRYMWVQ35RHx6ybXwHsxbPiqsrrX3r+bGQ4hKqyBv6Tfke62/V0In67dYFaYuM2jtCkB2/D3zAhDDWu3fUI1/Sl5vJtLdqpDDxRCI2vVPMEmgvJk4UztR7lScndHhKAkkEy1bRL5Kv3NPz0ltfhureTe1xBr3CMnCsRTOv8=
+	t=1779214423; cv=none; b=Br4Z1NwOsoffEEueHDujSejAABuARbvq4Wb+tU77xz8HP1joDrlUPCYvd+sdG8DuJb9lu8L0f3EaimZM/o/3ebNz/nTOuFIbMXOo8Lf0icgw8e9vBWF+BFPkCeMSyDu24oOI+s1byD70tMFlbQUFOnjVuIUAgh9d4QbUHOhvHoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779214416; c=relaxed/simple;
-	bh=Yy9nxMqDxlsi2eFEMJmHQMFtl2AvZuZ2+2rqjXag50s=;
+	s=arc-20240116; t=1779214423; c=relaxed/simple;
+	bh=NWJpeI/1k/9vPVgb++J1pU3sBb/BTOHNNpFqGvhmQHA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mll8y9Sw35wwe77mXv6uDQlEKafnO5V03gRJN1bG6kB39xViVSzB33yM+n5RxuDnwGlpTD3oEkinqx0Y3TjmxbjJ6TXHX12pDOoeIlh3RbMNNcrxVnCoNT6wXxRhDxvseXOsZXVJdztiHtRwzopWTijYqeXLmO4v7czzEMkpbeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IqUxy2iv; arc=none smtp.client-ip=74.125.224.53
+	 MIME-Version; b=tPu5MO7erDzL+YwjuXndEDkpIl9bojyWAnEp85CB/F6KdNcMdUe38C7l/KhcNVY3dHp72glvKZTS7qiV58Tb7vMynvI89qIQ2/IrSlhZ6MKIF0ye0Cxtt3CraVEGnV+GcZcA5Ce72EKveGofR9mKX5l6M+Z9pATxNgkIYM/6RB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rRcqCFCq; arc=none smtp.client-ip=209.85.128.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-6530287803cso4050642d50.1
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 11:13:33 -0700 (PDT)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7cff695e6b1so7659317b3.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 11:13:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779214413; x=1779819213; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779214414; x=1779819214; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QecDNGP+w/3sDQd+DHV0ny1tRHbDSeV8L549ZYAjJFY=;
-        b=IqUxy2ivVqWQlIh8U14l6Wt3IFO537beLmbTWFhp+Ju2t33nx1CxZ6fLVI/8leTcli
-         VOqrmsvZfGnwtYTCBKPsV2NE0HLzkWdMxTucso4KtoDTVtZoiDLc6FeEXlky+UkT/meg
-         VT5zEVSb6EMQvzK2AqW+YzmF6IJPxQQwG5QNgf1Ipx/wF+RptbGgz71P4w6lGSlb92SS
-         SOf9tyT48lMSBZgSo6aiIOKENzx0zYnykf0s4EBvuF5xaW3wgN0Z32rab/T7gveYuZyV
-         tEQJlh3GxhFQQ6SVcK7KfQXSQaHAQfjpGF79mz+c13+M6uCP9dvfhbWEQXgavze+kTuh
-         3xUg==
+        bh=CGJ9ymGUEKtLNacSkRlXr90Y+PFppYrhxlfdv5A8Yz4=;
+        b=rRcqCFCq1twmEaPL7jMqPGNQj9e1ABbK9igCytUARvL4M0wAKEPuH9It4k9JlfVUqE
+         2BT5Ezo8n7nfuXXfRrN5jaBVckrSNzP1RFiaxXXM7UTAPdy/kJzw/XMUHzCWYr3zkR/v
+         Sie3YXoDxaCs5yxHFwN4qid8oKXgdMPS5c1vbqfZWcKY3pYUhJ+A9+4gnA07riQWIvf6
+         ItYoLKRkiJgbilnZd640tRWDtbHnTSYY7t5RLJS0EqDMkFqTbQPvn00oDE+Pwfsn5iED
+         km9mWjDuBtswTPA/tgsVp/wKi/lHkBDnGb0WA6n/kDi6JvVB6vr1qASVju0YMbtgcdA7
+         UmZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779214413; x=1779819213;
+        d=1e100.net; s=20251104; t=1779214414; x=1779819214;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QecDNGP+w/3sDQd+DHV0ny1tRHbDSeV8L549ZYAjJFY=;
-        b=QO4kuZvT8wwRiBa49W8P5vWY+ycpM1lkTvw4p+D6VAVn5gEUfG1G1hzL4IJtD28Rcb
-         EkfatK2NejNlwWmQSTV9ao5+xUjy6tq+bS73vvVmEn8uvTcLrSTG2pDXq0mLmpVJnYrL
-         vSYvRRFu8w8ynERWzoZoSbSMoc2y6TMG5jmWO05qdwsNSKV+j8bCJNAURB6Zf5giYyNQ
-         NeK4XeiVV30jckaCd8uOSGcFqZi9e/56j2eYe2GcjInbuhhhKEcibMJyQpzLLnpUW2Yd
-         /ZwMKwnZPe3PPv9voQelsSE2+dhoMDUAUybOPOLnAAPHPQ1hTqofsfTtbmPcOmJy4u3h
-         npjg==
-X-Gm-Message-State: AOJu0YxEPU47yKjAlcb8el3j8oP0Pyc5ERfuwkDHxNS82TgAPI9FSpx+
-	uLuDaB/mHCSV8RhgKoCbiWswnQbA7YEkCHQxgRmm2nlCY/iIOVu8Qq0e
-X-Gm-Gg: Acq92OEEtzYbf3M5ps0blb4o3LHfUXE9y3TG73aBI6fvRFm63hoqZAFp9DR0n368JA9
-	BLD3jgSMc7jwN0V1UYFOP6gDIl43r6oElvkm8WBTqlJnmhhvI3Ob2a6q40pBEuoEhhtLw2Y8eri
-	63wXgbZHrDCA1apgF32l+Ht7AF7UT30JpXu6ZxATp0KZcU0lBjV943VWIwgPQwNbIhS0DOZ6Twv
-	Q8iBx+GNfOgrBQIID3e4tuTEhBPxe8kDDVoegzeHPZcxgEF2MHU5qrksnJs2DyT28HWH2OfNO9Z
-	jzBAQDkCMB3NEmXpH1gdRp2izPzQNlnk66xndckuRRDEuJaYORTl1da/bYJi8sQEwHDJuiWk7en
-	n5zJQ9T4ud6QfxZqL7v8sw+N2iVWWDc9wHFFxKYrky7/smp9RegqJDUCcN4NbCVfUa7zYFkfiZM
-	pBAZhy6effB8kEL1fTJLVMszJ6jg==
-X-Received: by 2002:a05:690e:4082:b0:65e:412e:681b with SMTP id 956f58d0204a3-65e412e68a9mr13850054d50.55.1779214412933;
-        Tue, 19 May 2026 11:13:32 -0700 (PDT)
-Received: from localhost ([2a03:2880:f806:5::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65e0d8e701fsm8211829d50.8.2026.05.19.11.13.32
+        bh=CGJ9ymGUEKtLNacSkRlXr90Y+PFppYrhxlfdv5A8Yz4=;
+        b=m2msX2n7YCBO5LzUpL6jq3WVKoTVBl6FCKJBu0imNnZ1KGUNsTbBx+brXXTDUGb/TA
+         M8BAIE8va920i8FwOWLMlEOq2vJvccDFImHAF4dSVlfa3PCT1dtfoQRoaI7nMunpE9sm
+         R0ZusH5oaFdxnY1FWb89/0hrZjqMvVxvomomDEGg6nmotJJd2sryk2f7Git6iNK+3EFA
+         rKrLrZ1cRy/LKuA+5+5k0jFHPYzwWqDkEE1/eX2CuYRx2+leBu7MIHFz/5LKTFt3hrmC
+         F4FyqVEYlGA251TByP8GPzkrzc0rQJG/0Q8JNnT951j/NGqrpMkh+YSqCcPNcy6xfdTg
+         gUcw==
+X-Gm-Message-State: AOJu0YzaUiacuchxl8hx2lXRZxFsD9f+7+P8L9OJg6XwHHG5yUN8fI9J
+	Az/rFEXxcFNR9kRrQGY8jiMMN+CfNcZ2NSbNxIlNNGFnnv5j0w+RXgCX
+X-Gm-Gg: Acq92OHFsd/n/oo1gE75ra7Yh6AoP5IRBVMyOcLjEwC1DivzIjpZrEETeCQzXLe+An6
+	E25eIDzNE39vHejBgnJMNufVi2gCfT4Ndb0cfm2pSwdQTUGKChTfj0KCV423JULW5jGORrKOUuy
+	9a8u+BSbZMEmcQTeDDbYOCIsf37pvT0+CQ5JjwnrGohzk6QUDWy+QDtW1zEnDzqvEFKRBIUUgIq
+	pvsKk556Vte3oR51l3AtDZMyizDCur4FdAgHEwWorTtX6jMOsQQcw2uaU4qS6aGkwrRm+hzNkxb
+	BOie8XL5mnTIL7k+PK2+5PDdcpYSXAc+WaL2CbB3V5+9yMqQn6oELI7syqwBfnoCFBUGjHDOwJ9
+	5R8GFzui0lMDDMRwhuDokU+V7OZ+FBgjln2v4H9HtyZN7q+j6leTalPdvpVeNOmc+3gXckhtBOP
+	81PZR8iTy8kx+4wTEP
+X-Received: by 2002:a05:690c:39b:b0:7c0:4f0:7bc1 with SMTP id 00721157ae682-7c95b8296bamr220148647b3.31.1779214414489;
+        Tue, 19 May 2026 11:13:34 -0700 (PDT)
+Received: from localhost ([2a03:2880:f806:12::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc997b26a8sm40485957b3.15.2026.05.19.11.13.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 11:13:32 -0700 (PDT)
+        Tue, 19 May 2026 11:13:34 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -87,9 +87,9 @@ Cc: netdev@vger.kernel.org,
 	mykyta.yatsenko5@gmail.com,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v5 11/14] selftests/bpf: Test creating dynptr from dynptr data and slice
-Date: Tue, 19 May 2026 11:13:09 -0700
-Message-ID: <20260519181314.2731658-12-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v5 12/14] selftests/bpf: Test using dynptr after freeing the underlying object
+Date: Tue, 19 May 2026 11:13:10 -0700
+Message-ID: <20260519181314.2731658-13-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260519181314.2731658-1-ameryhung@gmail.com>
 References: <20260519181314.2731658-1-ameryhung@gmail.com>
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -116,9 +116,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289573-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289577-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
@@ -129,72 +129,279 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F020F5838A4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BF1A4583844
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The verifier currently does not allow creating dynptr from dynptr data
-or slice. Add a selftest to test this explicitly.
+Make sure the verifier invalidates the dynptr and dynptr slice derived
+from an skb after the skb is freed.
 
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- .../testing/selftests/bpf/progs/dynptr_fail.c | 42 +++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ .../selftests/bpf/prog_tests/bpf_qdisc.c      |  6 ++
+ .../progs/bpf_qdisc_fail__invalid_dynptr.c    | 68 +++++++++++++++++
+ ...f_qdisc_fail__invalid_dynptr_cross_frame.c | 74 +++++++++++++++++++
+ .../bpf_qdisc_fail__invalid_dynptr_slice.c    | 70 ++++++++++++++++++
+ 4 files changed, 218 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_cross_frame.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_slice.c
 
-diff --git a/tools/testing/selftests/bpf/progs/dynptr_fail.c b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-index 40a14a5174a5..344fb2aa0813 100644
---- a/tools/testing/selftests/bpf/progs/dynptr_fail.c
-+++ b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-@@ -705,6 +705,48 @@ int dynptr_from_mem_invalid_api(void *ctx)
- 	return 0;
+diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+index 730357cd0c9a..65277c8fc887 100644
+--- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
++++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+@@ -8,6 +8,9 @@
+ #include "bpf_qdisc_fifo.skel.h"
+ #include "bpf_qdisc_fq.skel.h"
+ #include "bpf_qdisc_fail__incompl_ops.skel.h"
++#include "bpf_qdisc_fail__invalid_dynptr.skel.h"
++#include "bpf_qdisc_fail__invalid_dynptr_slice.skel.h"
++#include "bpf_qdisc_fail__invalid_dynptr_cross_frame.skel.h"
+ 
+ #define LO_IFINDEX 1
+ 
+@@ -223,6 +226,9 @@ void test_ns_bpf_qdisc(void)
+ 		test_qdisc_attach_to_non_root();
+ 	if (test__start_subtest("incompl_ops"))
+ 		test_incompl_ops();
++	RUN_TESTS(bpf_qdisc_fail__invalid_dynptr);
++	RUN_TESTS(bpf_qdisc_fail__invalid_dynptr_cross_frame);
++	RUN_TESTS(bpf_qdisc_fail__invalid_dynptr_slice);
  }
  
-+/* Cannot create dynptr from dynptr data */
-+SEC("?raw_tp")
-+__failure __msg("Unsupported reg type mem for bpf_dynptr_from_mem data")
-+int dynptr_from_dynptr_data(void *ctx)
+ void serial_test_bpf_qdisc_default(void)
+diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr.c b/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr.c
+new file mode 100644
+index 000000000000..1d96f7987a3f
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr.c
+@@ -0,0 +1,68 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <vmlinux.h>
++#include "bpf_experimental.h"
++#include "bpf_qdisc_common.h"
++#include "bpf_misc.h"
++
++char _license[] SEC("license") = "GPL";
++
++int proto;
++
++SEC("struct_ops")
++__failure __msg("Expected an initialized dynptr as R1")
++int BPF_PROG(invalid_dynptr, struct sk_buff *skb, struct Qdisc *sch,
++	     struct bpf_sk_buff_ptr *to_free)
 +{
-+	struct bpf_dynptr ptr, ptr2;
-+	__u8 *data;
++	struct bpf_dynptr ptr;
++	struct ethhdr *hdr;
 +
-+	if (get_map_val_dynptr(&ptr))
-+		return 0;
++	bpf_dynptr_from_skb((struct __sk_buff *)skb, 0, &ptr);
 +
-+	data = bpf_dynptr_data(&ptr, 0, sizeof(__u32));
-+	if (!data)
-+		return 0;
++	bpf_qdisc_skb_drop(skb, to_free);
 +
-+	/* this should fail */
-+	bpf_dynptr_from_mem(data, sizeof(__u32), 0, &ptr2);
++	hdr = bpf_dynptr_slice(&ptr, 0, NULL, sizeof(*hdr));
++	if (!hdr)
++		return NET_XMIT_DROP;
 +
++	proto = hdr->h_proto;
++
++	return NET_XMIT_DROP;
++}
++
++SEC("struct_ops")
++__auxiliary
++struct sk_buff *BPF_PROG(bpf_qdisc_test_dequeue, struct Qdisc *sch)
++{
++	return NULL;
++}
++
++SEC("struct_ops")
++__auxiliary
++int BPF_PROG(bpf_qdisc_test_init, struct Qdisc *sch, struct nlattr *opt,
++	     struct netlink_ext_ack *extack)
++{
 +	return 0;
 +}
 +
-+/* Cannot create dynptr from dynptr slice */
-+SEC("?tc")
-+__failure __msg("Unsupported reg type mem for bpf_dynptr_from_mem data")
-+int dynptr_from_dynptr_slice(struct __sk_buff *skb)
++SEC("struct_ops")
++__auxiliary
++void BPF_PROG(bpf_qdisc_test_reset, struct Qdisc *sch)
 +{
-+	struct bpf_dynptr ptr, ptr2;
-+	struct ethhdr *hdr;
-+	char buffer[sizeof(*hdr)] = {};
-+
-+	bpf_dynptr_from_skb(skb, 0, &ptr);
-+
-+	hdr = bpf_dynptr_slice_rdwr(&ptr, 0, buffer, sizeof(buffer));
-+	if (!hdr)
-+		return SK_DROP;
-+
-+	/* this should fail */
-+	bpf_dynptr_from_mem(hdr, sizeof(*hdr), 0, &ptr2);
-+
-+	return SK_PASS;
 +}
 +
- SEC("?tc")
- __failure __msg("cannot overwrite referenced dynptr") __log_level(2)
- int dynptr_pruning_overwrite(struct __sk_buff *ctx)
++SEC("struct_ops")
++__auxiliary
++void BPF_PROG(bpf_qdisc_test_destroy, struct Qdisc *sch)
++{
++}
++
++SEC(".struct_ops")
++struct Qdisc_ops test = {
++	.enqueue   = (void *)invalid_dynptr,
++	.dequeue   = (void *)bpf_qdisc_test_dequeue,
++	.init      = (void *)bpf_qdisc_test_init,
++	.reset     = (void *)bpf_qdisc_test_reset,
++	.destroy   = (void *)bpf_qdisc_test_destroy,
++	.id        = "bpf_qdisc_test",
++};
+diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_cross_frame.c b/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_cross_frame.c
+new file mode 100644
+index 000000000000..2e23b8593af9
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_cross_frame.c
+@@ -0,0 +1,74 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <vmlinux.h>
++#include "bpf_experimental.h"
++#include "bpf_qdisc_common.h"
++#include "bpf_misc.h"
++
++char _license[] SEC("license") = "GPL";
++
++int proto;
++
++static __noinline int free_skb(struct sk_buff *skb)
++{
++	bpf_kfree_skb(skb);
++	return 0;
++}
++
++SEC("struct_ops")
++__failure __msg("invalid mem access 'scalar'")
++int BPF_PROG(invalid_dynptr_cross_frame, struct sk_buff *skb, struct Qdisc *sch,
++	     struct bpf_sk_buff_ptr *to_free)
++{
++	struct bpf_dynptr ptr;
++	struct ethhdr *hdr;
++
++	bpf_dynptr_from_skb((struct __sk_buff *)skb, 0, &ptr);
++
++	hdr = bpf_dynptr_slice(&ptr, 0, NULL, sizeof(*hdr));
++	if (!hdr)
++		return NET_XMIT_DROP;
++
++	free_skb(skb);
++
++	proto = hdr->h_proto;
++
++	return NET_XMIT_DROP;
++}
++
++SEC("struct_ops")
++__auxiliary
++struct sk_buff *BPF_PROG(bpf_qdisc_test_dequeue, struct Qdisc *sch)
++{
++	return NULL;
++}
++
++SEC("struct_ops")
++__auxiliary
++int BPF_PROG(bpf_qdisc_test_init, struct Qdisc *sch, struct nlattr *opt,
++	     struct netlink_ext_ack *extack)
++{
++	return 0;
++}
++
++SEC("struct_ops")
++__auxiliary
++void BPF_PROG(bpf_qdisc_test_reset, struct Qdisc *sch)
++{
++}
++
++SEC("struct_ops")
++__auxiliary
++void BPF_PROG(bpf_qdisc_test_destroy, struct Qdisc *sch)
++{
++}
++
++SEC(".struct_ops")
++struct Qdisc_ops test = {
++	.enqueue   = (void *)invalid_dynptr_cross_frame,
++	.dequeue   = (void *)bpf_qdisc_test_dequeue,
++	.init      = (void *)bpf_qdisc_test_init,
++	.reset     = (void *)bpf_qdisc_test_reset,
++	.destroy   = (void *)bpf_qdisc_test_destroy,
++	.id        = "bpf_qdisc_test",
++};
+diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_slice.c b/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_slice.c
+new file mode 100644
+index 000000000000..731216c4e45a
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_slice.c
+@@ -0,0 +1,70 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <vmlinux.h>
++#include "bpf_experimental.h"
++#include "bpf_qdisc_common.h"
++#include "bpf_misc.h"
++
++char _license[] SEC("license") = "GPL";
++
++int proto;
++
++SEC("struct_ops")
++__failure __msg("invalid mem access 'scalar'")
++int BPF_PROG(invalid_dynptr_slice, struct sk_buff *skb, struct Qdisc *sch,
++	     struct bpf_sk_buff_ptr *to_free)
++{
++	struct bpf_dynptr ptr;
++	struct ethhdr *hdr;
++
++	bpf_dynptr_from_skb((struct __sk_buff *)skb, 0, &ptr);
++
++	hdr = bpf_dynptr_slice(&ptr, 0, NULL, sizeof(*hdr));
++	if (!hdr) {
++		bpf_qdisc_skb_drop(skb, to_free);
++		return NET_XMIT_DROP;
++	}
++
++	bpf_qdisc_skb_drop(skb, to_free);
++
++	proto = hdr->h_proto;
++
++	return NET_XMIT_DROP;
++}
++
++SEC("struct_ops")
++__auxiliary
++struct sk_buff *BPF_PROG(bpf_qdisc_test_dequeue, struct Qdisc *sch)
++{
++	return NULL;
++}
++
++SEC("struct_ops")
++__auxiliary
++int BPF_PROG(bpf_qdisc_test_init, struct Qdisc *sch, struct nlattr *opt,
++	     struct netlink_ext_ack *extack)
++{
++	return 0;
++}
++
++SEC("struct_ops")
++__auxiliary
++void BPF_PROG(bpf_qdisc_test_reset, struct Qdisc *sch)
++{
++}
++
++SEC("struct_ops")
++__auxiliary
++void BPF_PROG(bpf_qdisc_test_destroy, struct Qdisc *sch)
++{
++}
++
++SEC(".struct_ops")
++struct Qdisc_ops test = {
++	.enqueue   = (void *)invalid_dynptr_slice,
++	.dequeue   = (void *)bpf_qdisc_test_dequeue,
++	.init      = (void *)bpf_qdisc_test_init,
++	.reset     = (void *)bpf_qdisc_test_reset,
++	.destroy   = (void *)bpf_qdisc_test_destroy,
++	.id        = "bpf_qdisc_test",
++};
 -- 
 2.53.0-Meta
 
