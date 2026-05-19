@@ -1,161 +1,451 @@
-Return-Path: <netdev+bounces-289325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289326-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IIBLAFweDGqoWgUAu9opvQ
-	(envelope-from <netdev+bounces-289325-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:25:00 +0200
+	id aLWINgcfDGqoWgUAu9opvQ
+	(envelope-from <netdev+bounces-289326-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:27:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F220579F4D
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:24:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A4757A06C
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:27:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1A30D3016483
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:18:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AF467305DB5E
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D42C3E0C47;
-	Tue, 19 May 2026 08:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88893E0C6B;
+	Tue, 19 May 2026 08:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E1Bu2I5N"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="USXO6Kip"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f193.google.com (mail-lj1-f193.google.com [209.85.208.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24D33CDBB4
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.193
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779178683; cv=pass; b=jfw8OvgH+uqgF60uZ3ufhv7aeJzQqtaBVSMWPdhbXVEsatr4sbVfw/+D3v8SEECz8uHZ2bG2D64XRD3QuHjemlCGTIplnr7JhdLDHiCpVBpz5qS1g6w3JtEvEYOH5uqR/rjiOSJ6EAIig10pYBzSn3kltwQCZPdBs+j8ZyYtniw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779178683; c=relaxed/simple;
-	bh=8O8ltV7jl4u0QXwaiPbQAejGc7c5nL6LsAKF+LaerBU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jl+HqVNZ2KK+EGmycRugzwxCzfFVlgJ3iTqJdwZUmOJyr7Pc0YEIQ0FIsW0YwwXy/P/8We1b+xs8jmrcppveGPOEaRweb3g12U3rgbMd4miHHgOfmwCOhdHjVsL+G2CKqO3jR4dHJmbnPSzTcYdWdD5IvwlrIoGDZ+ir9O3xld8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E1Bu2I5N; arc=pass smtp.client-ip=209.85.208.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f193.google.com with SMTP id 38308e7fff4ca-3939d2bd739so28197381fa.0
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:18:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779178680; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Qb0XUvLCC5Iht3slsCBsxg4MdvLDbSPouO7L8yYmpfkmbZvoS1hqpHtBx5pu39Nbxu
-         /THI0taDIxDRYtT6mxME9HZN+g50tjSr10wBK5RhUcz5MtAuETmvlcqP7ZD1XnNkchuf
-         eZp/c0ZPYISM9IfXti/b9tiJobkdTAvA3oHyougbjYbSMqRoI2rNGoFoUeYpBGNkyPCm
-         mRp2FLbnuW1ilFgT7mqQoS3g994bgA7ukxMJpPAycuArHWWr/82hGzy+9Wp7KsWzEHyJ
-         Xf9Ft9QcU5TS+chOcNa+RnlLPYTuA2PRiyaCVo6dwEZYZ9n1IDmp4DmuahgyDrk6mjnC
-         dp4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=8O8ltV7jl4u0QXwaiPbQAejGc7c5nL6LsAKF+LaerBU=;
-        fh=gcki3JCkc//aD9HpIAl8rrLikX2TNPS+bUIa3CjdEXw=;
-        b=UsBGhM1EQ4RoyCj9+eb+7m7q3fE/kccTgxte5afdwMExrDCemNQejmJI//SdCL8rC+
-         9emsFeIxuXA0DJUzB6EaA+FtTGkAuTIQjd4SpZA+Xl0odjEcNhOc02eqLb3x/GQ82ObD
-         Rrgwe0dblRPDmCh22Vmedhct5BhZZXYxlj9x6srL5l7q/78fuJ7yuyqSHZHuGFNJra9y
-         z0kLJIz1/4KpIR8ajDUzcfWQr+OkYmIotdq+7/RZg1TkUn4fNIDK7t3YNld21GQieou+
-         uhVr+3goPUGaCDKS01VVWJsXwA+0rhk5WQanGSEUPpAXZsen9hN3W07RYme5wbgGKQ73
-         E+DA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779178680; x=1779783480; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8O8ltV7jl4u0QXwaiPbQAejGc7c5nL6LsAKF+LaerBU=;
-        b=E1Bu2I5NkllqM/ge4BCsPVvN+bltFbo+ymuuqunVTvh+stZYnejtw5ipEtC+VbXkr2
-         fOWkUKRPqVxxFRQCyKKepXGMG86oqUa4X6wHchtpev1vWitI/6XqbaDOzu7E1InxP/J+
-         f8MlAc0y8+1VY/4xWrr9hYByt4o8MCPHvxCMXXa/0gADx4fXPQI15U+XhGMTHEsNNmx1
-         f3mXyqKyS00qs0n4uIbXVsv+45dIbRwNL1EeTcxwKFBeDm9Gv/aIx9hf2PWJMPj5YUkL
-         tryDA/sJykNt5rIYz1r2/E9PvE0pD6CIRcpkoUZYmOV6YzpAYiWScO0Ia2SzMHazILYs
-         RH2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779178680; x=1779783480;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8O8ltV7jl4u0QXwaiPbQAejGc7c5nL6LsAKF+LaerBU=;
-        b=VJXmpFzGtD9cwE8ug/wjfnBMlCyjFYEEtJZFZnVXK46g2XQIoq8gH+drxjMyuiOPKo
-         WcZvgThaai1utvEWaN4A/N2dc2zlZxgAznQJhd32gixgrxLRvUtSMy50EpoBLAX3NN1u
-         VWJGgD176jqs6K+7E51eB7iKed5B1CKV5r7gTMjs26TS4as8RPM2r0auMpNgZreTzgop
-         fDF+zGR1EwoQfdQDTx8s2GDaE2oUFA2FKcEMkQhR016vIGuVN/0HZWF7o2d8JreenyBc
-         vefuech7m2ITpoGdwv9+xP65t+l0c05luJgLRUVIptZqxUYamjrm9V4w7aaD46j4Uc+W
-         3OAQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/f1rV/gAD6poNB3KKCrQcft3cG/j8m6WAF992hFejiLBZU+vzJrETJdC3MmYogsBTHa0e+H3g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoG7uHHDYbBrHAQt/+BN0uRcaTpHSRUkk4cqMxOmykPp/vHsG8
-	iUaLyCopBvr5wUUj4mQl+1WctbrJABhsNCPV9w+oqDOfpaO329tvGQJTjmt5JZFoYyaXKYH6Twu
-	FdPyNXTTwBJocsVk5ax/oWF5mZNEWBgKlksX75tlt0UUx1JY=
-X-Gm-Gg: Acq92OFUgM2Q/nk0dsIvmxCWiKI0rkzKTY/emXo+CoZ9MCN8xq61YGwJjyNF4vQD7eI
-	uFwiWtwDegY7JeBoy0OltAHEcTzVVD1MGQcmeG2UAi+swszCGBBwJFHLY9fB28fS365xy9unDDV
-	S36bdL6avaZJmtf4deIV8bLjyWWA8WRrY1rF6T2PNNg/f+GQUIFxdekWK1RPV5I4NhvvZmJ571m
-	YaEOOLt6KVbkx7UgXeV6tK5mD1let11L1YENMKWa0giVmyvDWggCspp4vzm58bUq8SyQdLlZQ5Y
-	i7mMqf9DGdweHffZQavbIVgEm1piQfRlPQTrzDLL
-X-Received: by 2002:a2e:bc27:0:b0:37f:c5ca:a6d4 with SMTP id
- 38308e7fff4ca-39561c832a4mr57096311fa.6.1779178679768; Tue, 19 May 2026
- 01:17:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DC33E0C4D;
+	Tue, 19 May 2026 08:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779178857; cv=none; b=HXY+aoq6FHnGfoDiKxPO59P86eNyv1OXfIpSChhyBBG2oSZkg4LaT9zNTH0nnd/tTpw/n8kky9CcPnhETP3pEJxcTzKOA7mnbQMREQW81QFLLrHnPETXGDWouBevfqI5UTxVjuSbOs4kVwm8PyEqffHXzxzvHPtSUkhHauiQOfg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779178857; c=relaxed/simple;
+	bh=fuzhnyoilWzd57vJ+bEoD5Zmuhb+4Qh4JxANN6Dr0sY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Ysuk8Vu0ClBW+mdmxPUf8767hZzy4dvkrDD288UKS1ZnjB3hslsHyS3BG5CA4HRoxei0NBCa1z8jFpsMnWIGdpSTNmNiTqVhz4phxeSAvaQugesC/l5y7f24KzGuYeSEpEEnzt8kG2+iJO4/oS8zrvIu3nrvLR10mpPYc+lILd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=USXO6Kip; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4gKSKn6fShz9v16;
+	Tue, 19 May 2026 10:20:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1779178846; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sQfaAnbU3FNLooD1DsvIeItu9adpCmZtOJCbvFgPeek=;
+	b=USXO6Kipz2iYG1/Y8VHZ3ADJpNbbf3zB6UBJhW4VK0YEzVzhblZgP4uPS8FfqkRHGWnBb/
+	9QxNKjWHa2SfQ036Tlji0JeFoKcj0HK9AOqAEgZP8JtAaxcNynnj4zL1LvRKJmeiIyCA3w
+	gtuHSg+grlRsOlXJyzmqqC1KhRVoW8Z4in+PlvnjNgW3+7+/LqZClCGunbP86+VOnaZBEb
+	FoX2/BLL7/CU6fPrcATVTLc3BIFa3Kio7koRToyWHkUAbU5QQT5Uvu8D2gQ/PyS13BzZ84
+	hxvEQ+vodHEUNwH2hxkoA3q48PzVKyv2Vqu/nVT0FaYx0fl6Yr0hLHIHDTOY2g==
+Message-ID: <7a477885c58709f287f6c1440fb7e31331227d10.camel@mailbox.org>
+Subject: Re: [PATCH net-next v3 02/14] libie: add PCI device initialization
+ helpers to libie
+From: Philipp Stanner <phasta@mailbox.org>
+Reply-To: phasta@kernel.org
+To: Bjorn Helgaas <helgaas@kernel.org>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com,  andrew+netdev@lunn.ch, netdev@vger.kernel.org, Phani
+ R Burra <phani.r.burra@intel.com>, larysa.zaremba@intel.com, 
+ przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com, 
+ sridhar.samudrala@intel.com, anjali.singhai@intel.com, 
+ michal.swiatkowski@linux.intel.com, maciej.fijalkowski@intel.com, 
+ emil.s.tantilov@intel.com, madhu.chittim@intel.com, joshua.a.hay@intel.com,
+  jacob.e.keller@intel.com, jayaprakash.shanmugam@intel.com,
+ jiri@resnulli.us,  horms@kernel.org, corbet@lwn.net,
+ richardcochran@gmail.com,  linux-doc@vger.kernel.org, bhelgaas@google.com,
+ linux-pci@vger.kernel.org,  Bharath R <bharath.r@intel.com>, Samuel Salin
+ <Samuel.salin@intel.com>, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>, Philipp Stanner <phasta@kernel.org>
+Date: Tue, 19 May 2026 10:20:27 +0200
+In-Reply-To: <20260518215441.GA640516@bhelgaas>
+References: <20260518215441.GA640516@bhelgaas>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260515050511.106309-1-rollkingzzc@gmail.com> <20260518185409.3e7f638e@kernel.org>
-In-Reply-To: <20260518185409.3e7f638e@kernel.org>
-From: Cen Zhang <rollkingzzc@gmail.com>
-Date: Tue, 19 May 2026 16:17:48 +0800
-X-Gm-Features: AVHnY4IAhXRa7m6G9bZf4mTqWWlFiS_3YmPecVVpQ5mo0o0eKVZoSG9pHTY9V-U
-Message-ID: <CAB7XQsEoyhgU-cNDEEMbb3-=bfKjc3278Q6DdvztLBA86gk5kA@mail.gmail.com>
-Subject: Re: [PATCH] netpoll: normalize skb->dev to the netpoll device
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zerocling0077@gmail.com, 2045gemini@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-MBO-RS-META: bu4mq3maazu4tprzgcr66hucmwurcb8x
+X-MBO-RS-ID: 8ab3abc5a08522f74bf
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289325-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289326-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[32];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,lunn.ch,vger.kernel.org,intel.com,linux.intel.com,resnulli.us,lwn.net,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	HAS_REPLYTO(0.00)[phasta@kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rollkingzzc@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[phasta@mailbox.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 6F220579F4D
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DKIM_TRACE(0.00)[mailbox.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,mailbox.org:mid,mailbox.org:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 98A4757A06C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub,
+On Mon, 2026-05-18 at 16:54 -0500, Bjorn Helgaas wrote:
+> [+cc Philipp]
+>=20
+> On Fri, May 15, 2026 at 03:44:26PM -0700, Tony Nguyen wrote:
+> > From: Phani R Burra <phani.r.burra@intel.com>
+> >=20
+> > Add support functions for drivers to configure PCI functionality and ac=
+cess
+> > MMIO space.
+>=20
+> This looks kind of like what pcim_iomap_range() does, i.e., a way to
+> ioremap (BAR-idx, offset, size) pieces of PCI BARs.=C2=A0 That sounds lik=
+e
+> useful functionality.
+>=20
+> Is there something Intel-specific or even ethernet-specific about
+> this?=C2=A0 If devm_* and pcim_* don't do what you need, maybe they shoul=
+d
+> be extended or this could be made generic so any drivers could use it?
+>=20
+> This looks like a mix of managed (pcim_enable_device(),
+> pcim_request_region()), and unmanaged (ioremap(), iounmap()) things.
+> I haven't looked at how all this is used, but it's pretty easy to get
+> things wrong when mixing models.
+>=20
+> > +++ b/drivers/net/ethernet/intel/libie/pci.c
+> > @@ -0,0 +1,208 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/* Copyright (C) 2025 Intel Corporation */
+> > +
+> > +#include <linux/intel/libie/pci.h>
+> > +
+> > +/**
+> > + * libie_find_mmio_region - find MMIO region containing a range
+> > + * @mmio_list: list that contains MMIO region info
+> > + * @offset: range start offset
+> > + * @size: range size
+> > + * @bar_idx: BAR index containing the range to search
+> > + *
+> > + * Return: pointer to a MMIO region overlapping with the range in any =
+way or
+> > + *	=C2=A0=C2=A0 NULL if no such region is mapped.
+> > + */
+> > +static struct libie_pci_mmio_region *
+> > +libie_find_mmio_region(const struct list_head *mmio_list,
+> > +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 resource_size_t offset, resourc=
+e_size_t size,
+> > +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int bar_idx)
+> > +{
+> > +	resource_size_t end_offset =3D offset + size;
+> > +	struct libie_pci_mmio_region *mr;
+> > +
+> > +	list_for_each_entry(mr, mmio_list, list) {
+> > +		resource_size_t mr_end =3D mr->offset + mr->size;
+> > +		resource_size_t mr_start =3D mr->offset;
+> > +
+> > +		if (mr->bar_idx !=3D bar_idx)
+> > +			continue;
+> > +		if (offset < mr_end && end_offset > mr_start)
+> > +			return mr;
+> > +	}
+> > +
+> > +	return NULL;
+> > +}
+> > +
+> > +/**
+> > + * __libie_pci_get_mmio_addr - get the MMIO virtual address
+> > + * @mmio_info: contains list of MMIO regions
+> > + * @offset: register offset to find
+> > + * @num_args: number of additional arguments present
+> > + *
+> > + * This function finds the virtual address of a register offset by ite=
+rating
+> > + * through the non-linear MMIO regions that are mapped by the driver.
+> > + *
+> > + * Return: valid MMIO virtual address or NULL.
+> > + */
+> > +void __iomem *__libie_pci_get_mmio_addr(struct libie_mmio_info *mmio_i=
+nfo,
+> > +					resource_size_t offset,
+> > +					int num_args, ...)
+> > +{
+> > +	struct libie_pci_mmio_region *mr;
+> > +	int bar_idx =3D 0;
+> > +	va_list args;
+> > +
+> > +	if (num_args) {
+> > +		va_start(args, num_args);
+> > +		bar_idx =3D va_arg(args, int);
+> > +		va_end(args);
+> > +	}
+> > +
+> > +	list_for_each_entry(mr, &mmio_info->mmio_list, list)
+> > +		if (bar_idx =3D=3D mr->bar_idx && offset >=3D mr->offset &&
+> > +		=C2=A0=C2=A0=C2=A0 offset < mr->offset + mr->size) {
+> > +			offset -=3D mr->offset;
+> > +
+> > +			return mr->addr + offset;
+> > +		}
+> > +
+> > +	return NULL;
+> > +}
+> > +EXPORT_SYMBOL_NS_GPL(__libie_pci_get_mmio_addr, "LIBIE_PCI");
+> > +
+> > +/**
+> > + * __libie_pci_map_mmio_region - map PCI device MMIO region
+> > + * @mmio_info: struct to store the mapped MMIO region
+> > + * @offset: MMIO region start offset
+> > + * @size: MMIO region size
+> > + * @num_args: number of additional arguments present
+> > + *
+> > + * Return: true on success, false on memory map failure.
+> > + */
+> > +bool __libie_pci_map_mmio_region(struct libie_mmio_info *mmio_info,
+> > +				 resource_size_t offset,
+> > +				 resource_size_t size, int num_args, ...)
+> > +{
+> > +	struct pci_dev *pdev =3D mmio_info->pdev;
+> > +	struct libie_pci_mmio_region *mr;
+> > +	resource_size_t pa;
+> > +	void __iomem *va;
+> > +	int bar_idx =3D 0;
+> > +	va_list args;
+> > +
+> > +	if (num_args) {
+> > +		va_start(args, num_args);
+> > +		bar_idx =3D va_arg(args, int);
+> > +		va_end(args);
+> > +	}
+> > +
+> > +	if (offset + size > pci_resource_len(pdev, bar_idx))
+> > +		return false;
+> > +
+> > +	mr =3D libie_find_mmio_region(&mmio_info->mmio_list, offset, size,
+> > +				=C2=A0=C2=A0=C2=A0 bar_idx);
+> > +	if (mr) {
+> > +		pci_warn(pdev,
+> > +			 "Mapping of BAR%u (offset=3D%llu, size=3D%llu) intersecting region=
+ (offset=3D%llu, size=3D%llu) already exists\n",
+> > +			 bar_idx, (unsigned long long)mr->offset,
+> > +			 (unsigned long long)mr->size,
+> > +			 (unsigned long long)offset, (unsigned long long)size);
+> > +		return mr->offset <=3D offset &&
+> > +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mr->offset + mr->size >=3D offs=
+et + size;
+> > +	}
+> > +
+> > +	pa =3D pci_resource_start(pdev, bar_idx) + offset;
+> > +	va =3D ioremap(pa, size);
 
-Thanks for the review.
+I agree with Bjorn, this certainly looks like something that can be
+covered by shared PCI infrastructure?
 
-> You trimmed the stack trace too much, the information about
-> the object on which the UAF was detected is missing, and
-> so is the UAF location.
->
-> Please add a Fixes tag (even if it's the first commit in git history).
->
-> With that fixed please repost.
+> > +	if (!va) {
+> > +		pci_err(pdev, "Failed to map BAR%u region\n", bar_idx);
+> > +		return false;
+> > +	}
+> > +
+> > +	mr =3D kvzalloc_obj(*mr);
+> > +	if (!mr) {
+> > +		iounmap(va);
+> > +		return false;
+> > +	}
+> > +
+> > +	mr->addr =3D va;
+> > +	mr->offset =3D offset;
+> > +	mr->size =3D size;
+> > +	mr->bar_idx =3D bar_idx;
+> > +
+> > +	list_add_tail(&mr->list, &mmio_info->mmio_list);
+> > +
+> > +	return true;
+> > +}
+> > +EXPORT_SYMBOL_NS_GPL(__libie_pci_map_mmio_region, "LIBIE_PCI");
+> > +
+> > +/**
+> > + * libie_pci_unmap_fltr_regs - unmap selected PCI device MMIO regions
+> > + * @mmio_info: contains list of MMIO regions to unmap
+> > + * @fltr: returns true, if region is to be unmapped
+> > + */
+> > +void libie_pci_unmap_fltr_regs(struct libie_mmio_info *mmio_info,
+> > +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool (*fltr)(struct libie_mmio=
+_info *mmio_info,
+> > +					=C2=A0=C2=A0=C2=A0 struct libie_pci_mmio_region *reg))
+> > +{
+> > +	struct libie_pci_mmio_region *mr, *tmp;
+> > +
+> > +	list_for_each_entry_safe(mr, tmp, &mmio_info->mmio_list, list) {
+> > +		if (!fltr(mmio_info, mr))
+> > +			continue;
+> > +		iounmap(mr->addr);
+> > +		list_del(&mr->list);
+> > +		kvfree(mr);
+> > +	}
+> > +}
+> > +EXPORT_SYMBOL_NS_GPL(libie_pci_unmap_fltr_regs, "LIBIE_PCI");
+> > +
+> > +/**
+> > + * libie_pci_unmap_all_mmio_regions - unmap all PCI device MMIO region=
+s
+> > + * @mmio_info: contains list of MMIO regions to unmap
+> > + */
+> > +void libie_pci_unmap_all_mmio_regions(struct libie_mmio_info *mmio_inf=
+o)
+> > +{
+> > +	struct libie_pci_mmio_region *mr, *tmp;
+> > +
+> > +	list_for_each_entry_safe(mr, tmp, &mmio_info->mmio_list, list) {
+> > +		iounmap(mr->addr);
+> > +		list_del(&mr->list);
+> > +		kvfree(mr);
+> > +	}
+> > +}
+> > +EXPORT_SYMBOL_NS_GPL(libie_pci_unmap_all_mmio_regions, "LIBIE_PCI");
+> > +
+> > +/**
+> > + * libie_pci_init_dev - enable and reserve PCI regions of the device
+> > + * @pdev: PCI device information
+> > + *
+> > + * Return: %0 on success, -%errno on failure.
+> > + */
+> > +int libie_pci_init_dev(struct pci_dev *pdev)
+> > +{
+> > +	int err;
+> > +
+> > +	err =3D pcim_enable_device(pdev);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	for (int bar =3D 0; bar < PCI_STD_NUM_BARS; bar++)
+> > +		if (pci_resource_flags(pdev, bar) & IORESOURCE_MEM) {
+> > +			err =3D pcim_request_region(pdev, bar, pci_name(pdev));
 
-Sorry about that. I will include the missing KASAN object information,
-the exact UAF location, and a Fixes tag in v2.
+So mappings are handled manually, and region requests automatically
+through devres?
 
-Best regards
-Zhang Cen
+In case you can use (or add) a pcim_iomap_region() function for that,
+you would get consistent automatic devres management.
+
+
+Greetings,
+P.
+
+> > +			if (err)
+> > +				return err;
+> > +		}
+> > +
+> > +	err =3D dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	pci_set_master(pdev);
+> > +
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL_NS_GPL(libie_pci_init_dev, "LIBIE_PCI");
+> > +
+> > +MODULE_DESCRIPTION("Common Ethernet PCI library");
+> > +MODULE_LICENSE("GPL");
+> > diff --git a/include/linux/intel/libie/pci.h b/include/linux/intel/libi=
+e/pci.h
+> > new file mode 100644
+> > index 000000000000..effd072c55c8
+> > --- /dev/null
+> > +++ b/include/linux/intel/libie/pci.h
+> > @@ -0,0 +1,56 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/* Copyright (C) 2025 Intel Corporation */
+> > +
+> > +#ifndef __LIBIE_PCI_H
+> > +#define __LIBIE_PCI_H
+> > +
+> > +#include <linux/pci.h>
+> > +
+> > +/**
+> > + * struct libie_pci_mmio_region - structure for MMIO region info
+> > + * @list: used to add a MMIO region to the list of MMIO regions in
+> > + *	=C2=A0 libie_mmio_info
+> > + * @addr: virtual address of MMIO region start
+> > + * @offset: start offset of the MMIO region
+> > + * @size: size of the MMIO region
+> > + * @bar_idx: BAR index to which the MMIO region belongs to
+> > + */
+> > +struct libie_pci_mmio_region {
+> > +	struct list_head	list;
+> > +	void __iomem		*addr;
+> > +	resource_size_t		offset;
+> > +	resource_size_t		size;
+> > +	u16			bar_idx;
+> > +};
+> > +
+> > +/**
+> > + * struct libie_mmio_info - contains list of MMIO regions
+> > + * @pdev: PCI device pointer
+> > + * @mmio_list: list of MMIO regions
+> > + */
+> > +struct libie_mmio_info {
+> > +	struct pci_dev		*pdev;
+> > +	struct list_head	mmio_list;
+> > +};
+> > +
+> > +#define libie_pci_map_mmio_region(mmio_info, offset, size, ...)	\
+> > +	__libie_pci_map_mmio_region(mmio_info, offset, size,		\
+> > +				=C2=A0=C2=A0=C2=A0=C2=A0 COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
+> > +
+> > +#define libie_pci_get_mmio_addr(mmio_info, offset, ...)		\
+> > +	__libie_pci_get_mmio_addr(mmio_info, offset,			\
+> > +				=C2=A0=C2=A0 COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
+> > +
+> > +bool __libie_pci_map_mmio_region(struct libie_mmio_info *mmio_info,
+> > +				 resource_size_t offset, resource_size_t size,
+> > +				 int num_args, ...);
+> > +void __iomem *__libie_pci_get_mmio_addr(struct libie_mmio_info *mmio_i=
+nfo,
+> > +					resource_size_t offset,
+> > +					int num_args, ...);
+> > +void libie_pci_unmap_all_mmio_regions(struct libie_mmio_info *mmio_inf=
+o);
+> > +void libie_pci_unmap_fltr_regs(struct libie_mmio_info *mmio_info,
+> > +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool (*fltr)(struct libie_mmio=
+_info *mmio_info,
+> > +					=C2=A0=C2=A0=C2=A0 struct libie_pci_mmio_region *reg));
+> > +int libie_pci_init_dev(struct pci_dev *pdev);
+> > +
+> > +#endif /* __LIBIE_PCI_H */
+> > --=20
+> > 2.47.1
+> >=20
+
 
