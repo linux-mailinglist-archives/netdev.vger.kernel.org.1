@@ -1,189 +1,161 @@
-Return-Path: <netdev+bounces-289454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289455-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJHcBDtaDGpxgAUAu9opvQ
-	(envelope-from <netdev+bounces-289454-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:40:27 +0200
+	id wJtlJZtdDGqYgQUAu9opvQ
+	(envelope-from <netdev+bounces-289455-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:54:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 975A257EDF4
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:40:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE06C57F14D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:54:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0D26F30010EF
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:40:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 80BDF30151CD
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7694DD6CB;
-	Tue, 19 May 2026 12:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5514DD6F3;
+	Tue, 19 May 2026 12:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="YtOL7+Tt";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LODq2MTL"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="xH8uJz5C"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2230A4A340B
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 12:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C494C9567;
+	Tue, 19 May 2026 12:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779194424; cv=none; b=p7vYZo0o8rjmHuiyUezsWCvDa4sNbufvLWvqM+c/DimMGPWs/Juuu9H5RukaM47Nq7Xlj1ZwWJqsDLMcZn2+V2SrUqWdPYO2TdBSdWzFVnY2KE+Mm6UvYK6G3CmpociTt0g/2Cxjj58G9nCMSU5yCTc/yMZnHzY8+N+weuFQfRE=
+	t=1779194984; cv=none; b=D1hLZRu/wSe8ZU3lbKuOylaP66TXxVghYnKgxTssKQhCf4T6HQ9sX0prgUnkyadZ5HO/u1SXqedJJtmUv+FPLYcqVmdlihUCwViW2r8g63Kpif/KZ8SdNlmc0hcXqUdi9iEUOhy2Do3LodGO0BJgva9bdt84RBRSZ5McUU1sfTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779194424; c=relaxed/simple;
-	bh=FD5JKsw4/Ypa6KLwNXQEszGXgWNnMikuWJIsdX0dWR0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M3Q3NHGmb490RKFNvbs5Kp17j+f16MevYKxqXjFne7m5K7nImtfSuzDDhSs0O8WyWiRp2TGc0UEnIoN4a3RExbFlbpofQgJndblnQgEgB1fN8USdxKTsvvSwLokKzTzzNqrop5l2K57SlWgQhEsBnSWgNuRQmeDtL2qcbhAFomk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=YtOL7+Tt; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LODq2MTL; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id A237314000FA;
-	Tue, 19 May 2026 08:40:16 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Tue, 19 May 2026 08:40:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm1; t=1779194416; x=1779280816; bh=mBhfrvE24E
-	UpY+x8fycbbiO2J+Y3UC2JSp1Xnx7ZG10=; b=YtOL7+TtdVH+zKVw5xXORmDCNQ
-	+2XEb0StygNAjF3uZeMXx43L6mYvKcrHPy6tq9zTjE9GeOoREzcA9nVQYjkM8Hvg
-	RJ6UvwUatZMExc1ecNuE9mGp5ajaPLj7ufzUNn2NMVcEg8mXq3yq8xt99aycMLg0
-	Qfu5iG4+Ary54gU1Acm5VxRPzrxZviRCj2h7D0Y7diYm+6SgjgJtUR7k8jThQ7eA
-	4nUkM2dTIIhsIsMpkKqvHuhvdKy36D87lQl1LeQ+tYsjG1Y8yVTnEMIZsxKzbZY7
-	i09DxmkJHQoVtvgBkDxlEobHMYqhn17xNqswWkSI1TTuCAsRcGQLxkdBpjIw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1779194416; x=1779280816; bh=mBhfrvE24EUpY+x8fycbbiO2J+Y3UC2JSp1
-	Xnx7ZG10=; b=LODq2MTLUtRXFrgDaq4izwrKniTElGLKa7shE5Eb5+WHd/bIBJu
-	bxNGVj3TfITfW/EKKmR65bHucL873M3rkLHgM1W+3wZyubR90o9txEEuTT3yVqWC
-	9RzIDDhhRGcl/gtFHn0EZ+xyDeqWY2FN6iUFkqoCo7KS+RTRLRLY3EiaXRgRpY28
-	5SZSRDIz/Zp6+CI5saT6+IrJcr1uog5ZV1gK1S0VLZIBbmgSLRkpPJoYpnL0Efew
-	PHZK72VnVWTn6ElAxpFzNXQFM8kmH8oS3gw7r4d11afpXG0wKIQpCNUey7LezOj8
-	LSW3hNuHeXimcnRxNTtGQg5Vc3vcGSxOHKg==
-X-ME-Sender: <xms:MFoMasPMIHe9c3ptKiFh-uHloqZyM9_mugaYByDsv2YkVuBPPVsUSg>
-    <xme:MFoMalhBZkEcaD8C-8dmjsL5LVek67s0QAgV_mQhUmzbBZzsptDYbd0K0epQ7MptT
-    DMYE7zaMVYApc8XvSgOBNuaJR5pKBO4lqPBuaWFasstncDUyHBrxS0>
-X-ME-Received: <xmr:MFoMam63fMuZnxvAN7liLqfCHuCK_jdtyaGcVpR-uAIYyQMt1q20yxf768TiQpHYjhaaMSeuUCqBoihEBQmK1z8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugedujeejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepjedtuefgffekjeefheekieeivdejhedvudffveefteeuffehgeettedvhfff
-    veffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsh
-    gusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeelpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtphhtthho
-    pehhuhiirghifhgrshesrhgvughhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesug
-    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgv
-    rdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheprghsmhhlrdhsihhlvghntggvsehgmhgrihhlrdgtoh
-    hm
-X-ME-Proxy: <xmx:MFoMak2j2zstDFf2JOPp6kcLjeuG7Zi4nR86tGjhNUZnAbEpMuuphQ>
-    <xmx:MFoMapvlt6OvcTi2Kw7oiZnPj_b3XdLXCJgQ7AKFYlSDeQAPuMipvw>
-    <xmx:MFoMai67GxQr7D8wdGM0KcnxJjZjc6WTDljRdaTRc4BD3qDm-R-H0A>
-    <xmx:MFoMatcCabURF4gQPqZPMNljUp85q9IFre1ooxz63w_oh4_tfwP0-Q>
-    <xmx:MFoMaloXMV7UPh20qmmx0-9wSbG8V5Ar2y1l64YF9fvnwxjege67SCnx>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 19 May 2026 08:40:15 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Huzaifa Sidhpurwala <huzaifas@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH net] net: gro: don't copy frags between mixed zcopy skbs
-Date: Tue, 19 May 2026 14:40:04 +0200
-Message-ID: <4d583fc5401298453d0a2f1b4719a15be30c8e49.1779194090.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1779194984; c=relaxed/simple;
+	bh=PmRdx8FRHXEbQy7+lAOa4RyFLZUwwH/S0Yo3h+evwYY=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=i2on5J8cddnn1QRx60GfAvqKpZ62asyZzSjA1fG8rP5h5TQORrV/zaLMHMPLvCxmeAZf+iUGrZ3L4AxAxM5hS4ije41JCEos1CX1kXe21issJ7BBI506FNN+qJiNNfjFQ2mCor1wPvGPitWOsJMFRTJforxtTYMO9IlHQLi+zUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=xH8uJz5C; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 337BDA4FA2;
+	Tue, 19 May 2026 14:49:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1779194971; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=KYHK9v8QDbL8YKvFNpIhVX5SjY8D12WYNhJK8Mla/t0=;
+	b=xH8uJz5CyS1nIr22DGdlIQrbdTZcXek14ghLIo7lNXiUst5FiCopGRidLa8kI+dEN4UmXX
+	Z2H6vX2S+yl6Bn3TIFvV5KeKLxdkan7l/GIBWZX9vDjucLS6c+uwwYxpMqFpEqvJvD221G
+	Co768t1utmjTK9Dox7xKBZNc9ObVWqVgHTpNEi2JBGh+LTYPH4RVjJ2maYz2PksPmxFUTX
+	yNH9UUD/dNoLgMNy2mfERcbPlgzvg/9J/Lncq8nSV1swVxQ2mRqFBBFGjEhFqJYA4WfykM
+	Vgt9S6A+KpZ2KihPEK32Q/BMuBh7YSUpjQzxk9s+dUmU/dgTmCxyzKqhbPVw3g==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Date: Tue, 19 May 2026 14:49:23 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: =?UTF-8?Q?Nerijus_Bend=C5=BEi=C5=ABnas?= <nerijus.bendziunas@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ regressions@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net: phy: skip EEE advertisement write when
+ autoneg is disabled
+In-Reply-To: <20260516150251.879680-1-nerijus.bendziunas@gmail.com>
+References: <20260516150251.879680-1-nerijus.bendziunas@gmail.com>
+Message-ID: <f8cb33492160a3d75669c573913a363f@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[queasysnail.net,redhat.com,davemloft.net,google.com,kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289454-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[queasysnail.net];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289455-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.linux.dev];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,queasysnail.net:email,queasysnail.net:mid,queasysnail.net:dkim]
-X-Rspamd-Queue-Id: 975A257EDF4
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: EE06C57F14D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-skb_gro_receive() can currently copy frags between the source and GRO
-skb, without checking the zerocopy status, and in particular the
-SKBFL_MANAGED_FRAG_REFS flag.
+Hi Nerijus
 
-When SKBFL_MANAGED_FRAG_REFS is set, the skb doesn't hold a reference
-on the pages in shinfo->frags. Appending those frags to another skb's
-frags without fixing up the page refcount can lead to UAF.
+On 16.5.2026 17:02, Nerijus Bendžiūnas wrote:
+> genphy_c45_an_config_eee_aneg() writes the EEE advertisement to the
+> auto-negotiation device's MMD register space (MDIO_MMD_AN, register
+> MDIO_AN_EEE_ADV).  These registers are read by the link partner only
+> during auto-negotiation, so writing them while autoneg is disabled
+> cannot influence the link.  On some PHYs (e.g. Broadcom BCM54213PE)
+> the write nevertheless reaches the chip and disturbs the receive
+> datapath.
+> 
+> Concretely, running
+> 
+>     ethtool -s eth0 speed 100 duplex full autoneg off
+>     ethtool --set-eee eth0 eee off
+> 
+> leaves eth0 with TX working and RX completely silent on a
+> Raspberry Pi 4 / CM4 board (bcmgenet + BCM54213PE in rgmii-rxid).
+> Switching back to autoneg recovers the link.
+> 
 
-When either the last skb in the GRO chain (the one we would append
-frags to) or the source skb is zerocopy, skip the frags copy, and just
-append the new skb to the frag_list.
+Can confirm this. A quick look at the BCM54213PE datasheet shows that 
+EEE is
+only applied if autoneg is enabled (as expected). With autoneg disabled 
+it
+is undefined behavior, but clearly breaks communication.
 
-This is probably a bit less efficient than calling
-skb_zcopy_downgrade_managed(), but then we'd also have to handle the
-rest of the zerocopy flags/machinery. This can be improved in
-net-next.
+> [...]
 
-Fixes: 753f1ca4e1e5 ("net: introduce managed frags infrastructure")
-Reported-by: Huzaifa Sidhpurwala <huzaifas@redhat.com>
-Assisted-by: Claude:claude-mythos-preview
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
- net/core/gro.c | 3 +++
- 1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+> index d48aa7231b37..126951741428 100644
+> --- a/drivers/net/phy/phy-c45.c
+> +++ b/drivers/net/phy/phy-c45.c
+> @@ -940,6 +940,14 @@ EXPORT_SYMBOL_GPL(genphy_c45_read_eee_abilities);
+>   */
+>  int genphy_c45_an_config_eee_aneg(struct phy_device *phydev)
+>  {
+> +	/* Writing MMD AN advertisements while autoneg is disabled has no
+> +	 * effect on link-partner negotiation, but on some PHYs (e.g. the
+> +	 * Broadcom BCM54213PE) the write itself disturbs the receive
+> +	 * datapath. Skip it.
+> +	 */
+> +	if (phydev->autoneg == AUTONEG_DISABLE)
+> +		return 0;
+> +
+>  	if (!phydev->eee_cfg.eee_enabled) {
+>  		__ETHTOOL_DECLARE_LINK_MODE_MASK(adv) = {};
 
-Huzaifa has found this to be exploitable to overwrite the page cache
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Tested-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-diff --git a/net/core/gro.c b/net/core/gro.c
-index 31d21de5b15a..cae0a0dbfa69 100644
---- a/net/core/gro.c
-+++ b/net/core/gro.c
-@@ -123,6 +123,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
- 	lp = NAPI_GRO_CB(p)->last;
- 	pinfo = skb_shinfo(lp);
- 
-+	if (skb_zcopy(skb) || skb_zcopy(lp))
-+		goto merge;
-+
- 	if (headlen <= offset) {
- 		skb_frag_t *frag;
- 		skb_frag_t *frag2;
--- 
-2.54.0
-
+Thanks
+Nicolai
 
