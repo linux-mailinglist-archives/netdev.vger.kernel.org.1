@@ -1,170 +1,196 @@
-Return-Path: <netdev+bounces-289266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289268-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uHIsHM7hC2qzPwUAu9opvQ
-	(envelope-from <netdev+bounces-289266-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:06:38 +0200
+	id iGe0MzPlC2r+QAUAu9opvQ
+	(envelope-from <netdev+bounces-289268-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:21:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A045771B8
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:06:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 885A6577342
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:21:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7EE7C30398AA
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 04:06:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 228DB304D709
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 04:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954F42D47FF;
-	Tue, 19 May 2026 04:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FF930499A;
+	Tue, 19 May 2026 04:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="VdCskvjt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mN+9HMmP"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB841C5D59;
-	Tue, 19 May 2026 04:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6EF2D7DC6
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 04:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779163594; cv=none; b=fR2F2k2neyg/mvwom4iVhBcVy3XBeSnjVKtnkb0Lq9d/2vWJ0PHTQFI5lri1dpMO7JJB91j8G7UP4JBJtSnj960exxUlzsjbsT1ZIth5788RzDqitw+24YyqWF+s6ZsdKq0ntl8ZRbUIbzr7CQWOPAkEw61/FlJFuWY1i5nl9+Y=
+	t=1779164450; cv=none; b=UiWneYQ6KMuxewJeiWjSyK4RmqTgUV9BmPZbV9tRK5wd935ONq+aiM17gOBbDekBqfelMnc6wPg19ef9qERDqrYCJGT+ppOtZr9R6NI2R0lO3YiDpuVT70Ho4cwYO1bH9T/AdSXUUmT7KeErf49gc2IuhNuDQeGE35QLKUreV+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779163594; c=relaxed/simple;
-	bh=a0FFF8UWIgGnE2Sg2dQt5JXH3hA5G4j19E/rDP378CQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JrrEtVAE8G0qFHON5IiT93Nji4Cl3BIchfrY9g8SV2dA045nRhzOkKrQjpjLwY4pHFHmyQ/xzQZvo/2PvhY+siCouDL8+RkZa+F4J+OfpErENL62xfjEw4zVWPvuUAj9gCPRFgWABOgyaWYDii9kp1xoa2aOd+7VoEThJTHzmq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=VdCskvjt; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1779164450; c=relaxed/simple;
+	bh=LiV0xUqYF1sDgcQ4JGiJk2vaMfz4EW5Z764wJBePVXg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kuwp0R3mY88eXKEpV9Swdyp7x4++e95HO4dyxx/FUXByuwiR/1vdH4URid2Mh+B2RwN0+ZDdprdbgndQtPuYjeDNtQ4r/oiO3h4X8o9m07wlFBe6KSJvK/FohJC4R0DkQpsvmnW4JHDGE4GF2/UwFo6Ba3E77lcCrc9+kbaDwao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mN+9HMmP; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8353fd1cb5fso1443040b3a.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 21:20:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1779163584;
-	bh=a0FFF8UWIgGnE2Sg2dQt5JXH3hA5G4j19E/rDP378CQ=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=VdCskvjtfkRPR1ypTEVetgKvX6GR5eUrfE+8xMsp6PLB6rZPVjwwSLzxBNXufL6h8
-	 7eV4v0Z1LExj+yJxJMTu0QtHnCHwC2Fvu6sixGvy6g5NNh0mB7Fnftk2lid+c40Q4F
-	 3b9nECtRpI9SYbYEieLctL6x9qi29Zj1OoROU0ih4UWBIvnve1uAgb0Ze0WT+z+hD+
-	 GyaegA4ylBL4W7xGuqtzZxlQWNUBdjkwdvTV+gQ+S/FUA0fGkZTe34ilqCZvcTlSx5
-	 zO2G4AezGdf5qyQ47NagRxiGrHcwY0oVyilWGnApK6dP3Irhe1enlH44ZzQEWMFJie
-	 OBpSUR/U/SqJw==
-Received: from [10.36.158.48] (unknown [50.175.227.221])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id DDA83605C8;
-	Tue, 19 May 2026 12:06:19 +0800 (AWST)
-Message-ID: <bca423e86899791f96c626b10f816ac1bff8059e.camel@codeconstruct.com.au>
-Subject: Re: [net-next v42] mctp pcc: Implement MCTP over PCC Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Adam Young <admiyo@os.amperecomputing.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>,  Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Matt Johnston <matt@codeconstruct.com.au>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Mon, 18 May 2026 21:06:17 -0700
-In-Reply-To: <20260518203900.30720-1-admiyo@os.amperecomputing.com>
-References: <20260518203900.30720-1-admiyo@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4-2+deb12u1 
+        d=gmail.com; s=20251104; t=1779164447; x=1779769247; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YUFBQc52UJfk2XrsTn834tkvWEs3F4USHaB2v8AXGtk=;
+        b=mN+9HMmPwfWflA/7V+bxot6Y4Hn438kqmFqWq2bw80NYUjYm/3J1Gxto+O/muGvWuo
+         OxJUihMzIi5Alo3NMs2cw2VHEIbgU4Mi/dwFz2ycRazpYswheoQUQ1coLAFQ/ojOZNwr
+         LCv+SSpzQIxl4ufz6zbZbaM3Jcgvds6sIgICsa/9OymWQUqZ4oZzM9DaVBp/9NjNW0wb
+         WcDvOVCRbbsOApabXyUjWNfPAiOioOTj9rJbh2p1uA/XdO88/+LIpluveUIwOFNyHD2z
+         ECaet5dPLoOKGWT/tSS17wzKjnTGjxxmNi+7oKIiMyUJnUYXIXzz7YnqshMxPSJTrNmW
+         tPLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779164447; x=1779769247;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YUFBQc52UJfk2XrsTn834tkvWEs3F4USHaB2v8AXGtk=;
+        b=dVwITiiW9Pas2xAcV+FJFeaSPwu3pAV0rp99P9AwwFaxBhx8wwuS9WAvczxlgQSXkg
+         mdkoXR9gk9wZ/Pd5gBEWrT49ulYFk/IE3iepteAe5MIP+GhGnlpWREcMLpu3LZOGXJKS
+         FWQ118gMZk1z+NeH7YFn9Ve8dQkRe1Jyh4x5KSuD2ZjM+Cc++0ec/7KkPLl1koOjqo++
+         EwJeVk1OZeh8I6SMRiPYagtU6oeZ5Sk04FCZpy8sbzDeX214miWO4FPTBqE03eotBGQo
+         0W/L2UjhbScIhLs7AaJmQLYJoElVjxfT1SbeiKAqWSvWPYWB31zkx0EYQbZfp9F+ylPf
+         eeNQ==
+X-Gm-Message-State: AOJu0YyBK1VOAKFEN7WQ5rR+KJsCqUep72JHawBM/Zi+FL4M1YFoTu5O
+	gDlpzvxvDncEK2mGDzMEhuSW5ZxvVjXE1vaBH/jBbYgLZouCvQ5g98TC
+X-Gm-Gg: Acq92OF7OxJWVP+e6zWt15Skhfjg8/d/zYcNENbAZvhq2eiu2qRE8AYDZZx+FQZSYY1
+	+NsNyD7N8JDlitguXmjIzj/7dChrspIdvfxsMF/J+jtiBn1vQBgklgvh5+zvSTaZj4/XNS8aWgA
+	I/ta1FvykD0QAAUJC2+U9zzN5AwFF8a7Ns73WATI6tC+ph6ssuxUQ9h5qDq8OnUs/GaIUFClbme
+	wpNFbleS68X6IMypCBVYzsYlnRVlx9GrKLiy/lGJkAV9JX38NJQSGax2/w7dyeb/9caFnAA3/CK
+	0S3HzTK1IudnRCdA/wqw/m3SGFo2dqqiXVm5/73ToT8WyqBUoa7AFgNWiGieJKr1/yaMylHqHRx
+	LP+opTHvEX2HUVRXN9jVpZK/uE5eDjCYrg5ET+g2aKXz22VzmgVbX/2LGhPzN+JiGBSHukdMSTG
+	eYzW/saBKrIqpZoKrLaQqJdFPniEGfr5teHnh3nvCeiLyljAGPNAj5Uwgd91+GqHJzqCutzn6wY
+	Q==
+X-Received: by 2002:a05:6a00:2394:b0:82c:7420:82bf with SMTP id d2e1a72fcca58-83f33c8a27amr13455006b3a.19.1779164446475;
+        Mon, 18 May 2026 21:20:46 -0700 (PDT)
+Received: from node ([202.47.63.86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f19c5b4bfsm16929148b3a.28.2026.05.18.21.20.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 21:20:46 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Kees Cook <kees@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Muhammad Bilal <meatuni001@gmail.com>
+Subject: [PATCH] Bluetooth: RFCOMM: add minimum length check in rfcomm_recv_frame
+Date: Tue, 19 May 2026 00:20:17 -0400
+Message-ID: <20260519042017.29564-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-0.56 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289266-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,holtmann.org,gmail.com,kernel.org];
+	TAGGED_FROM(0.00)[bounces-289268-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[meatuni001@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[codeconstruct.com.au:mid,codeconstruct.com.au:dkim]
-X-Rspamd-Queue-Id: C0A045771B8
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 885A6577342
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-SGkgQWRhbSwKCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL3N0WU5G
-ckNUIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvc3RZTkZyQ1QKPiBuZXcgZmlsZSBtb2Rl
-IDEwMDY0NAo+IGluZGV4IDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAu
-LjliMDFkMWU5MDlmMjBmZTAzN2VlYTY4NTExNmQzNDRhMjE2NWRiNTIKPiBHSVQgYmluYXJ5IHBh
-dGNoCj4gbGl0ZXJhbCA1NjQwNzMKClsxMjU1IGxpbmVzIG9mIGI4NSBkYXRhXQoKSSB0aGluayBz
-b21ldGhpbmcgbGVha2VkIGludG8geW91ciBjb21taXQ/Cgo+ICtzdGF0aWMgdm9pZCBtY3RwX3Bj
-Y19jbGllbnRfcnhfY2FsbGJhY2soc3RydWN0IG1ib3hfY2xpZW50ICpjbCwgdm9pZCAqbXNzZykK
-PiArewo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBhY3BpX3BjY3RfZXh0X3BjY19zaGFyZWRfbWVt
-b3J5IHBjY19oZWFkZXI7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX25kZXYgKm1j
-dHBfcGNjX25kZXY7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX21haWxib3ggKmlu
-Ym94Owo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtY3RwX3NrYl9jYiAqY2I7Cj4gK8KgwqDCoMKg
-wqDCoMKgc3RydWN0IHNrX2J1ZmYgKnNrYjsKPiArwqDCoMKgwqDCoMKgwqB1MzIgaGVhZGVyX2xl
-bmd0aDsKPiArwqDCoMKgwqDCoMKgwqBpbnQgc2l6ZTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0
-cF9wY2NfbmRldiA9IGNvbnRhaW5lcl9vZihjbCwgc3RydWN0IG1jdHBfcGNjX25kZXYsIGluYm94
-LmNsaWVudCk7Cj4gK8KgwqDCoMKgwqDCoMKgaW5ib3ggPSAmbWN0cF9wY2NfbmRldi0+aW5ib3g7
-Cj4gK8KgwqDCoMKgwqDCoMKgbWVtY3B5X2Zyb21pbygmcGNjX2hlYWRlciwgaW5ib3gtPmNoYW4t
-PnNobWVtLCBzaXplb2YocGNjX2hlYWRlcikpOwo+ICsKPiArwqDCoMKgwqDCoMKgwqAvLyBUaGUg
-bWVzc2FnZSBtdXN0IGF0IGxlYXN0IGhhdmUgdGhlIFBDQyBjb21tYW5kIGluZGljYXRpbmcgaXQg
-aXMgYW4gTUNUUAo+ICvCoMKgwqDCoMKgwqDCoC8vIG1lc3NhZ2UgZm9sbG93ZWQgYnkgdGhlIE1D
-VFAgaGVhZGVyLCBvciB3ZSBoYXZlIGEgbWFsZm9ybWVkIG1lc3NhZ2UuCj4gK8KgwqDCoMKgwqDC
-oMKgLy8gVGhpcyBtYXkgYmUgcnVuIG9uIGJpZyBlbmRpYW4gc3lzdGVtLCBidXQgdGhlIGRhdGEg
-aW4gdGhlIGJ1ZmZlciBpcwo+ICvCoMKgwqDCoMKgwqDCoC8vIGV4cGxpY2l0bHkgbGl0dGxlIGVu
-ZGlhbi4KPiArwqDCoMKgwqDCoMKgwqBoZWFkZXJfbGVuZ3RoID0gbGUzMl90b19jcHUocGNjX2hl
-YWRlci5sZW5ndGgpOwoKSXMgdGhpcyBzdGlsbCBPSyB3aXRoIHBjY19oZWFkZXIubGVuZ3RoIGJl
-aW5nIGEgdTMyIChhbmQgbm90IGEgX19sZTMyPykKCj4gK3N0YXRpYyBuZXRkZXZfdHhfdCBtY3Rw
-X3BjY190eChzdHJ1Y3Qgc2tfYnVmZiAqc2tiLCBzdHJ1Y3QgbmV0X2RldmljZSAqbmRldikKPiAr
-ewo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBhY3BpX3BjY3RfZXh0X3BjY19zaGFyZWRfbWVtb3J5
-ICpwY2NfaGVhZGVyOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtY3RwX3BjY19uZGV2ICptcG5k
-ID0gbmV0ZGV2X3ByaXYobmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgaW50IGxlbiA9IHNrYi0+bGVu
-Owo+ICsKPiArwqDCoMKgwqDCoMKgwqBpZiAoc2tiX2Nvd19oZWFkKHNrYiwgc2l6ZW9mKCpwY2Nf
-aGVhZGVyKSkpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gZXJyb3I7Cj4g
-Kwo+ICvCoMKgwqDCoMKgwqDCoHBjY19oZWFkZXIgPSBza2JfcHVzaChza2IsIHNpemVvZigqcGNj
-X2hlYWRlcikpOwo+ICvCoMKgwqDCoMKgwqDCoHBjY19oZWFkZXItPnNpZ25hdHVyZSA9IFBDQ19T
-SUdOQVRVUkUgfCBtcG5kLT5vdXRib3guaW5kZXg7Cj4gK8KgwqDCoMKgwqDCoMKgcGNjX2hlYWRl
-ci0+ZmxhZ3MgPSBQQ0NfQ01EX0NPTVBMRVRJT05fTk9USUZZOwo+ICvCoMKgwqDCoMKgwqDCoG1l
-bWNweSgmcGNjX2hlYWRlci0+Y29tbWFuZCwgTUNUUF9TSUdOQVRVUkUsIE1DVFBfU0lHTkFUVVJF
-X0xFTkdUSCk7Cj4gK8KgwqDCoMKgwqDCoMKgcGNjX2hlYWRlci0+bGVuZ3RoID0gbGVuICsgTUNU
-UF9TSUdOQVRVUkVfTEVOR1RIOwoKWW91J3JlIGRvaW5nIHRoZSBlbmRpYW4gY29udmVyc2lvbiBv
-biByZWFkLCBidXQgbm90IG9uIHdyaXRlLiBXaGF0IHdhcwp0aGUgZGVjaXNpb24gb24gd2hldGhl
-ciB5b3UgbmVlZCBpdCBvciBub3Q/Cgo+ICsKPiArwqDCoMKgwqDCoMKgwqBpZiAoc2tiLT5sZW4g
-PiBtcG5kLT5vdXRib3guY2hhbi0+c2htZW1fc2l6ZSkKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgZ290byBlcnJvcjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgaWYgKG1ib3hfc2VuZF9t
-ZXNzYWdlKG1wbmQtPm91dGJveC5jaGFuLT5tY2hhbiwgc2tiKSA8IDApIHsKPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgbmV0aWZfc3RvcF9xdWV1ZShuZGV2KTsKPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-ICogVGhlcmUgaXMgYSBwb3NzaWJpbGl0eSB0aGF0IHRoZSBtYWlsYm94IHdhcyBjbGVhcmVkIG9u
-Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIGFub3RoZXIgdGhyZWFkIGJldHdl
-ZW4gdGhlIGZhaWxlZCBzZW5kIGF0dGVtcHQgYW5kCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCAqIHN0b3BwaW5nIHRoZSBxdWV1ZS7CoCBJZiB0aGF0IGlzIHRoZSBjYXNlLCBhbmQg
-d2UgZG9uJ3QgcmVzdGFydAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiB0aGUg
-cXVldWUsIGl0IHdpbGwgcmVtYWluIHBlcm1hbmVudGx5IHN0b3BwZWQuwqAgVG8gdGVzdCwKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogdHJ5IHN1Ym1pdHRpbmcgdGhlIG1lc3Nh
-Z2UgYWdhaW4uIElmIHN1Y2Nlc3NmdWwsIHJlc3RhcnQgdGhlCj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCAqIHF1ZXVlLgo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-Ki8KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKG1ib3hfc2VuZF9tZXNzYWdl
-KG1wbmQtPm91dGJveC5jaGFuLT5tY2hhbiwgc2tiKSA+PSAwKSB7Cj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBuZXRpZl93YWtlX3F1ZXVlKG5kZXYpOwoK
-VGhlIHJldHJ5IGlzIGEgYml0IG9kZDsgeW91IGNhbiBzaW1wbGlmeSB0aGlzIHJhY2UgaGFuZGxp
-bmcgYnkgZG9pbmcgdGhlCnN0b3BfcXVldWUgcGVzc2ltaXN0aWNhbGx5LCBhbmQgdGhlIHJlLXN0
-YXJ0aW5nIHRoZSBxdWV1ZSBvbiBzdWNjZXNzOgoKICAgIG5ldGlmX3N0b3BfcXVldWUoKTsKICAg
-IGlmIChtYm94X3NlbmRfbWVzc2FnZSguLi4pID49IDApIHsKICAgICAgICBuZXRpZl9zdGFydF9x
-dWV1ZSgpOwogICAgfQoKSSBkb24ndCB0aGluayB5b3UgbmVlZCBhIHdha2UgKHZzIHN0YXJ0KSwg
-c2luY2UgeW91J3JlIHJ1bm5pbmcgaW4gdGhlCnNhbWUgc29mdGlycSBjb250ZXh0IGFzIHRoZSBz
-dG9wLgoKQ2hlZXJzLAoKCkplcmVteQo=
+rfcomm_recv_frame() casts skb->data to struct rfcomm_hdr * and
+immediately dereferences hdr->addr and hdr->ctrl without first
+validating that skb->len is large enough to hold the header. A
+remote device can send a crafted short RFCOMM frame over L2CAP to
+trigger an out-of-bounds read before any session state is checked.
+
+The FCS trimming code that follows compounds the problem:
+
+	skb->len--; skb->tail--;
+
+If skb->len is already zero the decrement wraps to UINT_MAX, causing
+skb_tail_pointer() to return a pointer far outside the skb and
+producing a second out-of-bounds read when the FCS byte is consumed.
+
+Add a minimum length check before the header pointer is assigned. A
+well-formed RFCOMM frame requires at least addr(1) + ctrl(1) +
+len(1) + fcs(1) = sizeof(struct rfcomm_hdr) + 1 bytes. This single
+guard prevents both the header out-of-bounds read and the skb->len
+integer underflow.
+
+Note: SeungJu Cheon posted a related patch that adds equivalent
+length checks inside the individual MCC sub-handlers
+(rfcomm_recv_pn, rfcomm_recv_rpn, rfcomm_recv_rls, rfcomm_recv_msc,
+rfcomm_recv_mcc). That fix and this one are complementary and
+independent; neither subsumes the other.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+---
+ net/bluetooth/rfcomm/core.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index d11bd5337..6b300237c 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1741,7 +1741,7 @@ static int rfcomm_recv_data(struct rfcomm_session *s, u8 dlci, int pf, struct sk
+ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
+ 						struct sk_buff *skb)
+ {
+-	struct rfcomm_hdr *hdr = (void *) skb->data;
++	struct rfcomm_hdr *hdr;
+ 	u8 type, dlci, fcs;
+ 
+ 	if (!s) {
+@@ -1750,10 +1750,17 @@ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
+ 		return s;
+ 	}
+ 
++	/* Minimum valid frame: addr(1) + ctrl(1) + len(1) + fcs(1) */
++	if (skb->len < sizeof(*hdr) + 1) {
++		kfree_skb(skb);
++		return s;
++	}
++
++	hdr = (void *) skb->data;
+ 	dlci = __get_dlci(hdr->addr);
+ 	type = __get_type(hdr->ctrl);
+ 
+-	/* Trim FCS */
++	/* Trim FCS - safe: skb->len >= sizeof(*hdr) + 1 >= 1 */
+ 	skb->len--; skb->tail--;
+ 	fcs = *(u8 *)skb_tail_pointer(skb);
+ 
+-- 
+2.54.0
 
 
