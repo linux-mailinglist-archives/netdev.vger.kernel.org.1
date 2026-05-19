@@ -1,162 +1,144 @@
-Return-Path: <netdev+bounces-289284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289285-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GLDOLPoCDGrETgUAu9opvQ
-	(envelope-from <netdev+bounces-289284-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:28:10 +0200
+	id WKpOMSIBDGpcTQUAu9opvQ
+	(envelope-from <netdev+bounces-289285-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:20:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 330D1578165
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:28:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6070A577EC4
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:20:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D99AA311502B
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:19:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BA457302425B
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C563876C3;
-	Tue, 19 May 2026 06:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B1337CD5C;
+	Tue, 19 May 2026 06:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b="FgYoqae9"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="395kkW1G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329BD37CD42
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F279C37BE7E;
+	Tue, 19 May 2026 06:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779171567; cv=none; b=gLefgt6N9WSTEcJm99SSVlLVPcDFdObNW6t1HUkzXDBtc4cvEICBkdOylak7fBg48xbrQKDjkWELP2W+JKxX9xFTG6T0RSmGNA49NcKuvx6jPqQmT96MUlnJaI23mtj/K0qbmCnaZvw4r8g7MwR2HkACmDE3YJw/mTDLM8kBWeA=
+	t=1779171614; cv=none; b=jBAomDpBE96yqbxFJbujd+bcDxYn2AZOSxYNOIO7T3nKOHYxUaZB8m1tGkO6n88rdzy0D+/SZCiOb/WOf7jodogRn5q7yBsR2Xfkih8fMIc5KbEW9z5/wNLc6fwXv4jB7my3HBdZRikArDiAIOlUavttHV9Od5TUVHARJLr7fYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779171567; c=relaxed/simple;
-	bh=vqb0FpFo19y3A274d+b4C+8E/9a+TiVcC5zMvUUwpfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EHtptDokZVf0bdxWDerX5LSMhOA9wBFPVVejozsqsoYh2+VyvNo+ORENwnuVT/4687ydr3b81S/kvLUoPS2JwbS1xDIeITBAbP6FY+BjASTR/N7l9pX2KIOL78Fco7VCDluKIWbYm0G5dMZXC/UbPLz4XzY7qsf3CPyVM4R2FnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b=FgYoqae9; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-36974217d4eso1767647a91.2
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 23:19:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cse-iitm-ac-in.20251104.gappssmtp.com; s=20251104; t=1779171565; x=1779776365; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LLDd1nTNoi/a2u/UDZO1p6PnaILOwf1IfErETTfppzs=;
-        b=FgYoqae9d0kYsxVeyeJCXvnRYKuz0CZrVeopGOLX/U0TWihRCBaMQ7DI+RGAAcfxZA
-         XdqWioCnLk0xvdCW+u3NNXaqDye1d5MTCGPaCQSujOPnjSa3u3QUSd9j9T5WECkjdDIW
-         //Fo6RVlOLJOiOZ5jAWJ9v0uq3vHwbDqqY+lXHrwbqdQuz23j3I3pCFrqo+mOdv/Ip1O
-         1ZyUPDu0TJIIMOn8YbTHo0gC17m7ZF6nnA/Z1ehxIhEKuHKHwiKV6A1KQI2IbNSy85zR
-         E9i16nAbOcUxUj1J8LyJa8gjOd1xlznbHinSl19DATSH8sjEKMNi9a5NxNkCW6palTbj
-         wQGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779171565; x=1779776365;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LLDd1nTNoi/a2u/UDZO1p6PnaILOwf1IfErETTfppzs=;
-        b=BpwBFAbWfvV/B32J86tcDJEP6x4I19wKW3tLzmAy4Qm6ndNS4/IGifSBzk7seNG0Ui
-         mGKtpZFkbpxbjBAtbIVFsoGVKyLIHFOZjSrd4jWzHbeOOd15Ph+06nxL4Drmwcp2zccm
-         jmqptlhfIkOPzGaYmJ6QpvNCR8F2HaJJWLdriXpWyaxBDv4XWErGJbE0COz88bt0h1Za
-         t5+pYOyM9Js4gC3mH6QVcw7FJUpqSsR50ADRDinnUKmHA267h5wj2KXTyh9oOz7g6SCR
-         hPaM946355f5oCZzjXSD6a9qC8bIljBPMddI7wssBeIHVSvSx7omWQHqj/kCY7H/4pok
-         e38Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+rV0LPVxpE8qsZOLJfxG+P8SDgjVlE0NFGDQaXiCSUG9T22g6uUnJiKzmjwWzCiG6hxQioYs0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjLQX48l9dl/uV8tv8QZDC1mVNvaKkU0N2N960SBJfLT9+LVvW
-	z/KYGCnem85DdYOhXWe7C4cve2opC6MaoaUtSU5lLX2TKpnSfp5kT3hLgUylsmma0So=
-X-Gm-Gg: Acq92OHnoFhkAaMoWMA9TI8iJSF4EjZIuu8G/EAr+xaMB5I6p9oIX4hPGZTO58iG2QM
-	hbqFhmU8q+iyD30Unq4Qw9I0H1VjBbb1pRZEYQe2eLUjOR+sCqTpsLdStBPav4Aaf2ya37mMd6K
-	q1Hx0DRJLR9p//zYTgGhYVgd1ZZ2ED9X+sjy3bYjMh/D1ORGAz25/LLsQxa0DddRoqPbx5CeQkX
-	CnTtRvTfL8qOFfaI/UqKUDeeCG0wXNuMpPXtCX420oqIztYgKmf9J6Ol56azgyosmTuPAHwTtfw
-	g5QB2vdFDgPCY3wegPCeW1viOSMyT6rvNrTHvbOUSReDjT0YpVLbx1qvRFpKlYhf2/WvLd/+Dm8
-	cP0Vc54uL6Anu5Vg+miNbpE4llvRwiWiNX/sDrKKsbrELRSyEK/nmK5uHsa7SntsJkc72+sBfl2
-	2cWUWwAev0igBUm038F+pf07wa0uyyJYe9VT16b9MAePZSD3Ua40YTBEwjHwHUm82NzUtlhI/Y7
-	gPFSBhy0vVf/P9ebJ/D4VkZfcy1L/9QVa4Vj51XFeJbjQ==
-X-Received: by 2002:a17:90b:33c4:b0:35d:9c32:6219 with SMTP id 98e67ed59e1d1-369519e8faamr17627377a91.9.1779171565440;
-        Mon, 18 May 2026 23:19:25 -0700 (PDT)
-Received: from essd ([103.158.43.41])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3695a09e95esm5167462a91.9.2026.05.18.23.19.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 23:19:25 -0700 (PDT)
-Date: Tue, 19 May 2026 11:49:17 +0530
-From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com, 
-	johannes@sipsolutions.net, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	m.chetan.kumar@intel.com, stable@vger.kernel.org
-Subject: Re: [PATCH net] net: wwan: iosm: fix potential memory leaks in
- ipc_imem_init()
-Message-ID: <r6xteqo3uj3hiujtohra63pdkwx4uqqub4zovkkaywfuburhan@6xqqvahrep5g>
-References: <20260508092141.82495-1-nihaal@cse.iitm.ac.in>
- <20260510170451.3886726-1-kuba@kernel.org>
+	s=arc-20240116; t=1779171614; c=relaxed/simple;
+	bh=z6H4YotxyqSq1CfYcKMO1007taDdzQQWv3LKGZM1maM=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=jyle/SgsGRX4tatF8mB1msVSZ5Va57W9+uKyHWzdyGELT55+jsmzK44sNYIQP1b/hNCOxp/FzWWxZrWlDmLUZfhYXOMv3o0SyNLEd39uot6MxSo+YKg+iqRs0gqEvkJuEDVwKsKhwwWJ3N0MS4kdTfnCm+IRE5cmA/V/kZGDG6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=395kkW1G; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 31401A383E;
+	Tue, 19 May 2026 08:20:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1779171606; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=/mR69zAIjo8yrwpIMgxuHnPe8pPL8L80P3EcXieDedo=;
+	b=395kkW1GQ35jR7JnQnBwdsToZLyGw5a/9a3yhWNu9idCu+xi830Q8Xw2vDgyGggDgw/aYZ
+	nFRUNt/pZ9zbAk8iP7uzHsQlqFapwJSFTgLyj38a55zVnDxAN/0s8/KehuDBAOhOUGU0q9
+	YDytpeAiBJfGKqPCo/eYExSgSXpAklrDOD8RDge4bNZU450d36ytB9BiNk1JdgKdObETvY
+	h3Ko0JpSGR/lNpFIaRnxNzOnTS/Thk6AFNy1sgdB6KSHP1m1PT+/iLaIE9l6ivwLDgLT6I
+	44hC829xvRVx9yokKTnvABTBPXfl4dVvh5A4gyNGILhKfUE3alMuhSTKgCiokQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260510170451.3886726-1-kuba@kernel.org>
-X-Spamd-Result: default: False [0.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Date: Tue, 19 May 2026 08:20:02 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 1/2] net: phy: honor eee_disabled_modes in
+ phy_support_eee()
+In-Reply-To: <05a24b73-ff89-41e2-a655-224f1c2dbc31@lunn.ch>
+References: <20260518-devel-phy-support-eee-fix-v2-0-05b52626fa68@tipi-net.de>
+ <20260518-devel-phy-support-eee-fix-v2-1-05b52626fa68@tipi-net.de>
+ <05a24b73-ff89-41e2-a655-224f1c2dbc31@lunn.ch>
+Message-ID: <7245b9c6294300265636ad954c01c248@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[cse-iitm-ac-in.20251104.gappssmtp.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[iitm.ac.in : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289284-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289285-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,intel.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nihaal@cse.iitm.ac.in,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[cse-iitm-ac-in.20251104.gappssmtp.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,cse-iitm-ac-in.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 330D1578165
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:email]
+X-Rspamd-Queue-Id: 6070A577EC4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 10, 2026 at 10:04:51AM -0700, Jakub Kicinski wrote:
-> > diff --git a/drivers/net/wwan/iosm/iosm_ipc_imem.c b/drivers/net/wwan/iosm/iosm_ipc_imem.c
-> > index 1b7bc7d63a2e8..f4edb277efd92 100644
-> > --- a/drivers/net/wwan/iosm/iosm_ipc_imem.c
-> > +++ b/drivers/net/wwan/iosm/iosm_ipc_imem.c
-> > @@ -1422,6 +1422,7 @@ struct iosm_imem *ipc_imem_init(struct iosm_pcie *pcie, unsigned int device_id,
-> >  	hrtimer_cancel(&ipc_imem->fast_update_timer);
-> >  	hrtimer_cancel(&ipc_imem->tdupdate_timer);
-> >  	hrtimer_cancel(&ipc_imem->startup_timer);
-> > +	ipc_protocol_deinit(ipc_imem->ipc_protocol);
-> >  protocol_init_fail:
-> >  	cancel_work_sync(&ipc_imem->run_state_worker);
-> >  	ipc_task_deinit(ipc_imem->ipc_task);
+Hi Andrew,
 
-> Calling ipc_protocol_deinit() here frees the ipc_protocol structure.
-> Since ipc_task_deinit() has not yet been called to flush the queue and
-> kill the tasklet, any pending tasklet may still execute.
+Thanks for your review.
+
+On 19.5.2026 04:19, Andrew Lunn wrote:
+> On Mon, May 18, 2026 at 10:23:09AM +0200, Nicolai Buchwitz wrote:
+>> phy_support_eee() copies supported_eee into advertising_eee
+>> unconditionally, overwriting any filtering applied during phy_probe()
+>> based on DT eee-broken-* properties or driver-populated
+>> eee_disabled_modes.
 > 
-> Would it be safer to place the ipc_protocol_deinit() call after the
-> tasklet and worker are fully destroyed?
+> Sorry, i should of questioned this on v1. What PHY are you using which
+> masks advertising_eee in probe? It seems like this is wrong, and it
+> should be setting >eee_disabled_modes, or maybe eee_supported.c
 
-Thanks for reviewing the patch. I agree that this change may introduce a
-use after free since we are freeing the ipc_protocol while tasklets and
-workers are running concurrently. I'll fix it and send a v2 patch.
+The masking isn't PHY-specific. phy_probe() applies eee_disabled_modes
+to advertising_eee after of_set_phy_eee_broken() picks up the
+eee-broken-* properties from the PHY DT node.
 
-The same UAF bug seems to exist in the ipc_imem_cleanup() function.
-Will send a patch for that as well.
+The PHYs in my case are BCM54210PE / BCM54213PE on Raspberry Pi
+CM4 / 5, and I use eee-broken-* to disable EEE on boards where the
+switch doesn't handle LPI well. phy_support_eee() then clobbers that
+filtering by overwriting advertising_eee with the unfiltered
+supported_eee.
 
-Regards,
-Nihaal
+> 
+>> Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC 
+>> support EEE")
+>> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+> 
+> This patch itself looks O.K.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> 
+>     Andrew
+
+Regards
+Nicolai
 
