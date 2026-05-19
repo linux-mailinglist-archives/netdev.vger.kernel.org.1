@@ -1,282 +1,188 @@
-Return-Path: <netdev+bounces-289503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289504-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODt7IISKDGo1iwUAu9opvQ
-	(envelope-from <netdev+bounces-289503-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:06:28 +0200
+	id 6FVcHzOLDGo1iwUAu9opvQ
+	(envelope-from <netdev+bounces-289504-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:09:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE457581F14
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:06:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D971C581FFC
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 175C431793BF
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:32:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E1AE9312EAD7
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A7E23C4F3;
-	Tue, 19 May 2026 15:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DEE23C4F3;
+	Tue, 19 May 2026 15:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="LhwxbXK1"
+	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="IY+8Hyi5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB581A3172
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 15:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2761A6801
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 15:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779204761; cv=none; b=GArAVH4pHBYJ/JnrufcajYo7ALsr6iCtp5ZJ28qROB4ywUdqTwoXXRnQghEF6cRxVlwGk629Vxqfz7CxRg6EMm+PbH6Pnqk1Xkw4GlJ5fysksKy96UnxrBI6zMIFIXJPLcwhNMDyzwjBArqr74Oxpi8KiRbqQWIJ/LVBh1EDIkI=
+	t=1779204984; cv=none; b=CzzC1uvdEg2sVscsunq2yLOTgDVv/G8gAQKeRFu2OQ9MSBKdYiUsdHH0kZLLMjJUIp8xL4sPQdv2fVKrKuncTdWTkQIkRsynD1mejSB7fJYXjp0PPzhxbzhc/qluoMxS8Wxbxk2w+4vpNCWfKX1xd5Vw+w4bG+Idbjwaf9Jirn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779204761; c=relaxed/simple;
-	bh=Ax590YbqXYIAmnaGMKl7FSUvi1v38AH/AztU4zuuBM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LTXO/a/c84Ext/+i7OJ6hd6UFLKC0mouPltE5p9C/GSRtOz8hhT/jQs96N4ZMShHzgcLKEG+gfDKUfxwuiA1+pMRZDvG3kAgP0UrqwxN9E4up9OqV1nIcanYvH/hDiRpq3JfkHPWA41fm+234meaqrA+spQdGUoLqS1oga60CBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=LhwxbXK1; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-479ef2b78f3so3564857b6e.2
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:32:39 -0700 (PDT)
+	s=arc-20240116; t=1779204984; c=relaxed/simple;
+	bh=EBBUE7qShvyfN14gNjO3prhA882aTyRYnLBM3i1q2Kc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t6rVuv4DWfrImAs7ZdoAwjImDlvESm+UiJg0D5XlN7I75p/cGq/fjsJoJRXJLwtjpQvUuGA0x0PiiGRwOVjMzMlllS12gaYiYBI1j6kicdTP3seyXmv+fk8bmQ4FNOo3Gz1bx6Kvc5ltoHeBRY5x4Jxm9p7mwgqyu/gOJsgtzz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=IY+8Hyi5; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-44e1860558fso2320530f8f.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:36:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1779204759; x=1779809559; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OMgg3DcMPG/CkFUdDvWT7P0SoXNm1HcPg5ezYHCRXcs=;
-        b=LhwxbXK19yCgd8YZ23YM3Z/oBn4nXz/TJLcA+m5W65YjBwhi3iPoEmacQvginZh4+M
-         4bKYxPpxEeiipCJOiUmlGDwFAmt1526G2zAABZ19nR9DnrVowNdEQ59LZEEmrq7fkSSK
-         g7SSotT14tPQnTP3PCebckEsgtmfGuAFkqGqysgkSp7oUi5KUnkWc+Q/AOynwTRP7o8x
-         NeLomN4euX3EB8EvIt/HTh4jSOjRLKMvoCN+knzS3C/UYDJnfVHDEWFL8KQJdWLCERSQ
-         mCHpxCh7gHwcZ2jYUuL1gTBx9kS+UUJh7z1qjr/3A/4DPUUPKZiSMIPoQpIyBwaoNFib
-         H/Ag==
+        d=baylibre.com; s=google; t=1779204981; x=1779809781; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EHgQsdjh/tw+KP8Pe+oR8xvrCMFKlF9bJwtDE420eOs=;
+        b=IY+8Hyi5jskyD6PmLe2shU3Qc+owPSRj87Isn7BPZ90D53m0Qpq4FLusH+4wM8UYHh
+         0Ky5eDRsLV+rTlRTo8aABsAjnW6GICZklNrtcvJEn3uWEORNdB8aA22JkAorSu3htCBo
+         y4xVbevVSsobYJk1X4sO3AWEIWgmi74dbub3aowZB+jzythlgv6loiF+XNWcLZ3vrCJL
+         iTeX6m2K3NlELng6ThPSVj3nMNEjHuZ3sHxpPXBkcpQLA6hdyNSz6i26Jn49EomY2dvv
+         DbpXT4VDRtSiJV8QpbGJbpfh3FXy/oL7UNp7LV+ifXe2aOHudRJ08CfXoa7SJaz7zd5s
+         xKMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779204759; x=1779809559;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OMgg3DcMPG/CkFUdDvWT7P0SoXNm1HcPg5ezYHCRXcs=;
-        b=WDvOr3LtUqaPSGtOTOd8tKSSikZZ8OF1AVPJwrZXvP/RuuKnoUZVEQ6wnxSOcjwlQH
-         wGag235LMUCmEtcnhyJ4/ZHi34tDwCFKkhjYmCBW7pf6pfr1kctyo9Yi5bJMgOR+M/vl
-         mdF7vNPdSKC45Bpt6JlylNQUjv9c7Z+iUMfQ7YE6IPEEPnqyiPjtCB3nfZVDhz78QTTP
-         o7q5WW0Ds49pupbkdaclJhA5QpdULYT7dIlV4KZSU4O3J/v1a11R8u1XWGyHqoAFHB2q
-         m20MDllpCXo0ucnrzFcXfsPk5aki6ZYwx+q2BQ6PLK/x99lyidRcC5T6o2us5Utqfy0s
-         R1pw==
-X-Forwarded-Encrypted: i=1; AFNElJ/3KUTRsM5KZASwaBb90RCdVjQzyvXzGwDkD6wYhmedjtoBX55QJHf5yt0u/hl4uChU22/zNgY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx162+Xd6/R+m93BleInLdnIWNG1On57Lw4mMPqxe8QuJGSZxbk
-	7x+f4YjmcRHQ6hhuVUqmEI2xu9BKDwdZoMOA13zwLfe0y3HiD9JGNxnJ8tIV2IXsWsw=
-X-Gm-Gg: Acq92OEVB5QxWdSCirEhPZVwo9UPHzFrKTs7E8LPk2YLArbdKycc9Z3b+t8fJCskz9S
-	4BUbu3Pqdgm5TUK6+xBkgpF9/I3FJQ0lgb4fS3DJ70tL5//xrOEd/q3NfTyhZ+3th6Fy6BHRGXV
-	zvrA4kaUVWjM4lXqloR2KCAHIKzCkMRKN/n8UhfIMdTlj8X9iL6vvUtaDQP6bZCN/U1Sbk7g2zT
-	q93TTPWz6QgkmbkxNfF7aVGDVg7DLBeLvZHgHbMgznvGn/1lgQ0pTu65Ft2DX7jhqwr1zUZzb6i
-	BJW3ud7hLjV1rGFGRnZwAKP1sCZDHRoUp/oTd7UNbTmzPu0NATGxwIw1pCa3KsQ9kEvm0Q24DH3
-	iATxKVtGjw6FsrWSNXACkmhSb00eYMK3WpVnZFCg3x/l2c6TGkpJN9YMZgWD3c51Nf/MMTgFerw
-	fWC+Z09/L3a8+E/dmAESgyqa2eu5IOlDo7haXFmoD3sjj6EOvAyFZ734m8u9h0nIS9ZaRk11CWK
-	GGIzw==
-X-Received: by 2002:a05:6809:251:10b0:484:c3b5:9b11 with SMTP id 5614622812f47-484c3b5a183mr4889324b6e.36.1779204758974;
-        Tue, 19 May 2026 08:32:38 -0700 (PDT)
-Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5164585cf66sm170094531cf.30.2026.05.19.08.32.38
+        d=1e100.net; s=20251104; t=1779204981; x=1779809781;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EHgQsdjh/tw+KP8Pe+oR8xvrCMFKlF9bJwtDE420eOs=;
+        b=oTWo8jA4UKigIwmqExuRfrxT/VRtNSW+yzCn97ArFDEJ8+eSM9SQoDoxvuPncHvni0
+         iKGkfoNOcaLZmkj3vgxRkmEFF2HUS0C6EOIYmGiCZhNtO4aj/6+jmS+Eu7nH+oC2hY5U
+         duS3tA8VCQV1E5FtWhxIH+F+cIkzExBmU4DmkrH6pyHJrULF0eKTrMazGAusBWPjVNhF
+         kJ8p0H5ABoNuniz8KF5+qnPaz/Wwgy6MjmIb0rtcBLfxihYShmrWb+ouOrS3NC69xHfq
+         0IOliYRjy5VLIijMnTtRmO8ocOh2pupMatIMiMzyle8RpZ8n5wGjlLhUw7m8j+AqSpeh
+         LtyQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/Pe02YZ7IFc5VCdngDNeCjy6K5ikWdy/wrFlOi8EyBzTZ5Qr83sjb08ktYpBSQxB0DpiP74tM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQ2vu61DrbwHxDEMfMxBSPJq9VyAOiVHNjuwcmGX5qVufgTkbu
+	upqk+P4NNQh27UVmj+T5GFSa2OUdKYFIeivC7LU+/aQD1iltlYd/i+ohkPAbUEWUC+0=
+X-Gm-Gg: Acq92OHvD5O4yUOOK2ze2qDb1mw8tgssRnO1j2wCZLgl73VjX0x2bHp5M92p61uLkh2
+	rcwn9KP9ogwiXQLvZ3Iee6/1Go2gomDXoBXVBRQ6BvFhbJCirDivuNAJRYznxKVermHWc+Gt1kj
+	Qo90qVgFwYfXFloYdMAvWt3T6B1sDtRpnS59XM5PitXFj5ZxSPgR9lcGb2ZcYRtFCE/ebavu5Um
+	SDf6CtvpdAjptky5bBZo7Bxxl3afXBfqjOQbIF+TQfPNWLVId5IRPKbYYVt2X6ikqpGiDoT/3Lo
+	jely6aTeSh6fQq+jb3XCCjlfy2RcEpaSZ52lXF1kmuYYYGvZxO6IvZ84xq/GQMossVeCfceaczO
+	FP5aI1KIhFCpyEZ2RbSJjkJgj5xMIYYEdFGWvd2m6nxLk0Ex2wC3GuKrKZMXO/+IUn/buWNcImZ
+	GhTzmagS8z8cfr9fc8birtRUeKvs+3bKb4SoSpF4ryUkNbbr2IdmULJbvZeI1MYKwTDkfxZ5lIm
+	okAGf58YItvxdfjZMCqTmoBDQ==
+X-Received: by 2002:a05:6000:2401:b0:43d:7275:c1eb with SMTP id ffacd0b85a97d-45e5c5dadeamr32728157f8f.39.1779204978760;
+        Tue, 19 May 2026 08:36:18 -0700 (PDT)
+Received: from localhost (p200300f65f47db048a8dfcf61053817f.dip0.t-ipconnect.de. [2003:f6:5f47:db04:8a8d:fcf6:1053:817f])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-45da0a1aeafsm48913050f8f.23.2026.05.19.08.36.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 08:32:38 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1wPMQv-0000000FCii-39HS;
-	Tue, 19 May 2026 12:32:37 -0300
-Date: Tue, 19 May 2026 12:32:37 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        Tue, 19 May 2026 08:36:18 -0700 (PDT)
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH mlx5-next] net/mlx5: Consolidate UAR index to PFN helpers
-Message-ID: <20260519153237.GN7702@ziepe.ca>
-References: <20260519-mlx5-uar-index-v1-1-1027ae724bff@nvidia.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v1] mctp: i2c: Use named initializers for struct i2c_device_id
+Date: Tue, 19 May 2026 17:36:13 +0200
+Message-ID: <20260519153613.1594429-2-u.kleine-koenig@baylibre.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260519-mlx5-uar-index-v1-1-1027ae724bff@nvidia.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1877; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=EBBUE7qShvyfN14gNjO3prhA882aTyRYnLBM3i1q2Kc=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqDINtflqiqSRYEphRyq90IVkncL7xfJMx+eoGW coz61bkkv+JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCagyDbQAKCRCPgPtYfRL+ TvUpB/4+chmXVG0nW2ZLc93NaMyQNheUmBELFw8n0geXGI5TM3tQYFJkw/hCw1PyIQ4kRENfZcO bdogjf80grxAtzJp1U84szXzhuOzxEWthU6p/ANPqF/ZGL2asWYqNkutz3uBAu5QXowTS4CK4zI 3EbluqRqIjmLdcPgcr5GwgwXgs4NOMLvmJJC8KIRkdXsj5h+ylsZJlccAUVNkvn20dfuU/XEeBB KA/XfTMm+nhnbrJ/1pfxGquDmIlc4juoIda/R3ziO23Boeg/J3VRsO7E/gIxrOkwWtYTS37MOkR TSjVnMz/ma1kvK2buPTJLjiKC3lC8XnhD89uUn9Ve1TD2JJX
+X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289503-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289504-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[baylibre.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: DE457581F14
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[baylibre.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,baylibre.com:email,baylibre.com:mid,baylibre.com:dkim]
+X-Rspamd-Queue-Id: D971C581FFC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 06:08:18PM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> mlx5_core's uar2pfn() and mlx5_ib's uar_index2pfn() compute the same
-> value via slightly different idioms.  Given:
-> 
->   MLX5_ADAPTER_PAGE_SHIFT = 12
->   MLX5_UARS_IN_PAGE       = PAGE_SIZE / MLX5_ADAPTER_PAGE_SIZE
->                           = 1 << (PAGE_SHIFT - 12)
-> 
-> when uar_4k is set, uar2pfn()'s "index >> (PAGE_SHIFT - 12)" reduces to
-> "index / MLX5_UARS_IN_PAGE", which is exactly what uar_index2pfn() does.
-> When uar_4k is clear, both fall through to the identity case.  The same
-> arithmetic is also open-coded a third time in uar_index2paddress(), which
-> just multiplies the result by PAGE_SIZE.
-> 
-> The duplication is historical: uar_index2pfn() landed with the original
-> mlx5_ib driver in 2013 (e126ba97dba9), uar2pfn() was added in 2017
-> (a6d51b68611e) when the bfreg allocator moved into mlx5_core, and no
-> shared header ever exposed the helper.  The two were last touched in
-> parallel by aa8106f137b9 ("net/mlx5: Add explicit bar address field"),
-> confirming they are meant to behave identically.
-> 
-> Replace all three local copies with two static inlines in
-> include/linux/mlx5/driver.h returning phys_addr_t, which is the
-> appropriate type for a value that subsequently feeds ioremap*() and
-> rdma_user_mmap_io().  No functional change.
-> 
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
-> mlx5_core's uar2pfn() and mlx5_ib's uar_index2pfn() compute the same
-> value via slightly different idioms. Let's consolidate them.
-> ---
->  drivers/infiniband/hw/mlx5/main.c             | 25 ++-----------------------
->  drivers/net/ethernet/mellanox/mlx5/core/uar.c | 14 +-------------
->  include/linux/mlx5/driver.h                   | 16 ++++++++++++++++
->  3 files changed, 19 insertions(+), 36 deletions(-)
-> 
-> diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
-> index 428811fa805b..e61db29bc166 100644
-> --- a/drivers/infiniband/hw/mlx5/main.c
-> +++ b/drivers/infiniband/hw/mlx5/main.c
-> @@ -2373,27 +2373,6 @@ static void mlx5_ib_dealloc_ucontext(struct ib_ucontext *ibcontext)
->  	}
->  }
->  
-> -static phys_addr_t uar_index2pfn(struct mlx5_ib_dev *dev,
-> -				 int uar_idx)
-> -{
-> -	int fw_uars_per_page;
-> -
-> -	fw_uars_per_page = MLX5_CAP_GEN(dev->mdev, uar_4k) ? MLX5_UARS_IN_PAGE : 1;
-> -
-> -	return (dev->mdev->bar_addr >> PAGE_SHIFT) + uar_idx / fw_uars_per_page;
-> -}
-> -
-> -static u64 uar_index2paddress(struct mlx5_ib_dev *dev,
-> -				 int uar_idx)
-> -{
-> -	unsigned int fw_uars_per_page;
-> -
-> -	fw_uars_per_page = MLX5_CAP_GEN(dev->mdev, uar_4k) ?
-> -				MLX5_UARS_IN_PAGE : 1;
-> -
-> -	return (dev->mdev->bar_addr + (uar_idx / fw_uars_per_page) * PAGE_SIZE);
-> -}
-> -
->  static int get_command(unsigned long offset)
->  {
->  	return (offset >> MLX5_IB_MMAP_CMD_SHIFT) & MLX5_IB_MMAP_CMD_MASK;
-> @@ -2643,7 +2622,7 @@ static int uar_mmap(struct mlx5_ib_dev *dev, enum mlx5_ib_mmap_cmd cmd,
->  		uar_index = bfregi->sys_pages[idx];
->  	}
->  
-> -	pfn = uar_index2pfn(dev, uar_index);
-> +	pfn = mlx5_uar_index_to_pfn(dev->mdev, uar_index);
->  	mlx5_ib_dbg(dev, "uar idx 0x%lx, pfn %pa\n", idx, &pfn);
->
->  	err = rdma_user_mmap_io(&context->ibucontext, vma, pfn, PAGE_SIZE,
-> @@ -4327,7 +4306,7 @@ alloc_uar_entry(struct mlx5_ib_ucontext *c,
->  		goto end;
->  
->  	entry->page_idx = uar_index;
-> -	entry->address = uar_index2paddress(dev, uar_index);
-> +	entry->address = mlx5_uar_index_to_paddr(dev->mdev, uar_index);
->  	if (alloc_type == MLX5_IB_UAPI_UAR_ALLOC_TYPE_BF)
->  		entry->mmap_flag = MLX5_IB_MMAP_TYPE_UAR_WC;
->  	else
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/uar.c b/drivers/net/ethernet/mellanox/mlx5/core/uar.c
-> index 1513112ecec8..a85d8fed1546 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/uar.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/uar.c
-> @@ -66,18 +66,6 @@ static int uars_per_sys_page(struct mlx5_core_dev *mdev)
->  	return 1;
->  }
->  
-> -static u64 uar2pfn(struct mlx5_core_dev *mdev, u32 index)
-> -{
-> -	u32 system_page_index;
-> -
-> -	if (MLX5_CAP_GEN(mdev, uar_4k))
-> -		system_page_index = index >> (PAGE_SHIFT - MLX5_ADAPTER_PAGE_SHIFT);
-> -	else
-> -		system_page_index = index;
-> -
-> -	return (mdev->bar_addr >> PAGE_SHIFT) + system_page_index;
-> -}
-> -
->  static void up_rel_func(struct kref *kref)
->  {
->  	struct mlx5_uars_page *up = container_of(kref, struct mlx5_uars_page, ref_count);
-> @@ -132,7 +120,7 @@ static struct mlx5_uars_page *alloc_uars_page(struct mlx5_core_dev *mdev,
->  		goto error1;
->  	}
->  
-> -	pfn = uar2pfn(mdev, up->index);
-> +	pfn = mlx5_uar_index_to_pfn(mdev, up->index);
->  	if (map_wc) {
->  		up->map = ioremap_wc(pfn << PAGE_SHIFT, PAGE_SIZE);
+While being less compact, using named initializers allows to more easily
+see which members of the structs are assigned which value without having
+to lookup the declaration of the struct. And it's also more robust
+against changes to the struct definition.
 
-The only places using PFN here immediately shift it, this should be
-using mlx5_uar_index_to_paddr()
+This patch doesn't modify the compiled arrays, only their representation
+in source form benefits. The former was confirmed with x86 and arm64
+builds.
 
+While touching this array, unify usage of whitespace in the list
+terminator to what most other arrays are using.
 
-> +static inline phys_addr_t mlx5_uar_index_to_pfn(struct mlx5_core_dev *mdev,
-> +						u32 uar_idx)
-> +{
-> +	u32 fw_uars_per_page = MLX5_CAP_GEN(mdev, uar_4k) ? MLX5_UARS_IN_PAGE : 1;
-> +
-> +	return (mdev->bar_addr >> PAGE_SHIFT) + uar_idx / fw_uars_per_page;
-> +}
-> +
-> +static inline phys_addr_t mlx5_uar_index_to_paddr(struct mlx5_core_dev *mdev,
-> +						  u32 uar_idx)
-> +{
-> +	u32 fw_uars_per_page = MLX5_CAP_GEN(mdev, uar_4k) ? MLX5_UARS_IN_PAGE : 1;
-> +
-> +	return mdev->bar_addr + (uar_idx / fw_uars_per_page) * PAGE_SIZE;
-> +}
+Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
+---
+Hello,
 
-Then there is only one caller of the pfn version in uar_mmap which can
-just be written using phys and open code the >> PAGE_SHIFT
+this patch is part of a bigger quest to use named initializers for
+mainly struct i2c_device_id::driver_data to be able to modify
+i2c_device_id. See e.g.
+https://lore.kernel.org/all/20260518111203.639603-2-u.kleine-koenig@baylibre.com/
+for the details.
 
-No reason to duplicate this
+This patch here isn't critical for this quest, as no driver makes use of
+.driver_data, so apart from the better readability this is only about
+consistency with other subsystems.
 
-Jason
+This is the only i2c driver under drivers/net/mctp, so this is the only
+patch needed to adapt the whole subsystem to the new style for
+initializing i2c_device_id arrays.
+
+Best regards
+Uwe
+
+ drivers/net/mctp/mctp-i2c.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index 15fe4d1163c1..24e0dd01f180 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -1101,8 +1101,8 @@ static struct notifier_block mctp_i2c_notifier = {
+ };
+ 
+ static const struct i2c_device_id mctp_i2c_id[] = {
+-	{ "mctp-i2c-interface" },
+-	{}
++	{ .name = "mctp-i2c-interface" },
++	{ }
+ };
+ MODULE_DEVICE_TABLE(i2c, mctp_i2c_id);
+ 
+
+base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+-- 
+2.47.3
+
 
