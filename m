@@ -1,288 +1,312 @@
-Return-Path: <netdev+bounces-289269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289270-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oCzgB/7nC2pXQgUAu9opvQ
-	(envelope-from <netdev+bounces-289269-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:33:02 +0200
+	id 9725BO/tC2pQRQUAu9opvQ
+	(envelope-from <netdev+bounces-289270-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:58:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7F25773E2
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:33:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B4C5774C1
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:58:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7AD193006988
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 04:32:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 23CFE3047BD3
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 04:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA082D0614;
-	Tue, 19 May 2026 04:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84BF3093DF;
+	Tue, 19 May 2026 04:58:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZUlQQuWt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s2ABm2JD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E9C128395
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 04:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB742EDD7D
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 04:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779165176; cv=none; b=juNyILvyvSjfzsrFc8Cnaq6GOiRscqtMEpHHLR3lOxT1fJTwqxuOrVOYVsSaXO0L0J0Vud+vbqnedKDD/MQVR5h1rmRG3EjHXmBAT9ZaRp8BC1rq5RqjaKK1qlBGchDen8w1EKu9JBSzO30Wa1OipLILc9jp1DV1OqsoNQzpQgo=
+	t=1779166696; cv=none; b=Kkkhjh147jo0gL5XVaZ8yh28GnqERSFMv9ZbCNWaYZuHA8IDy8uhbN+UW8ouuOcJihutcOq+UEZ/PXMuhvmNC5zQfgQoPs5uGpTy56vhz1ZHfLf/IHg3i+3dPqDpHEI0J9avFEGWaS27b9+sInprAhYI6FezRH4a4gB4MpB/m0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779165176; c=relaxed/simple;
-	bh=2/mvF74bsOBWsGqlNvNRzQU9LK4+PzmgJWuYuVFP0HE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=POzifrzukz0Erlwrd4knEiuVZ4vn8oMYNgvsy7GarM2dxVKG0F92hhXyK8w4tNTwALHbLRnvDJx3QrDCIePSIaLH76/Ar/gNsFrwrbnKumh4nyylw9z3QTN862VTwJzu59enUhpQqFHyXHYTVAfxguU+HuOqlmKOj+kUgfJAcAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZUlQQuWt; arc=none smtp.client-ip=209.85.221.43
+	s=arc-20240116; t=1779166696; c=relaxed/simple;
+	bh=KJXO7/rOTG6BeeYL0LfEfBJbokPx/cBlBbaUTj0pr24=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=G1F1ALqbqcQCaX5jQaVwTU74NCbZbAsf3whAkJWpVWQkTbmFbOexXFmY2N9EWp+u8P27lBWxk8fNz8Rc2H1zBhcBczEwMkPT8FLzs0dn5ayCZznuazYH4pcWNRp9pohu74qNZwWlGEQ7rBYQTECu7ENXHx2xUx3qZj2QWLmDpSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s2ABm2JD; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-43fe62837baso1637271f8f.3
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 21:32:54 -0700 (PDT)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-90ea08cc5ceso564461785a.2
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 21:58:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779165173; x=1779769973; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uqVrwZhTS4+jEVcoMiK7OH2y16LpRHVglx7FTCzRJ5Q=;
-        b=ZUlQQuWtyr9TE/CtyJHiTU7FFXofXbGpQiru8PhLYncEvydMHnUE1Sl8qKO8GXxAZ+
-         VsLh6Wg+20Y2iQxigspWJq+C4MW7HfgkB9Enmw8hJlh8++ZrM2bfUIq6yWtwCPODHG+g
-         Bw7VsQYsPOY3qV17zCUvN3UhnzHQNE5077f8oUpRmtjaeBLw/HMG+tkouZATX8jBW0ld
-         25SNVMYFK/g4oxjLT51PS9iBRE3SXvmbHBMD4VDmx6yIZr4ZvJKWhjSrNfP3rpsBgoOn
-         MueWcLL7JLickXHYtRddZn6z35oEoyYDPtjvUIznRwthkn89F1x4ZVZgmCLGvkG0XYYG
-         aNjQ==
+        d=gmail.com; s=20251104; t=1779166693; x=1779771493; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xx56vMqzDIyLCnIS01xeQI9ZapGjWmBkyJ9Xo7JzsbE=;
+        b=s2ABm2JD54tlZerjHNm0PDP3FGivvWztIZrrPqjtyZOXXNdMFSjtKARVwaM4yYrNyQ
+         yifP47859fhhjg+HNtdzvmVQJ5NPE8RnaNvFXTErdQN1YyqMYaE482MQocJfkuoNLWjP
+         W17qN6mEKvt0/OrC5h9ujMI/eTo/XNLdWWzbc9uM9ooe4vgDbRQRCzAnTcBZm2IEKnK/
+         3qEepvfAzBXBXD+w0/xY2R0NfTbzU6J5Z1Jv8e+7/crcnc+X/p87fNQ7SxT+mZliSfPv
+         Q0tDN1tzFxdMBHvr4MWYk2CI6xXXtOGtR/2AYpy25nPKiUit9iBGFULIeAAqjj1OaP3/
+         +n1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779165173; x=1779769973;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1779166693; x=1779771493;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uqVrwZhTS4+jEVcoMiK7OH2y16LpRHVglx7FTCzRJ5Q=;
-        b=NZ7UjUUiwNv+cxrQyp2OcFD1QtkgPnRq+N1Xs27cjMb5Q/eDen5gvRC0TgnhrB6+dj
-         gIFANZwTslS54iO1JxbEMfmj3YG1CDEaSD3t+IVLQXZT/gmyE6Nkyl5OKQ6LYuRmdCr9
-         qVWAz9gY7o9LW6Rs6Wwbh3q6Gcc4maVgZBtgaXoOYrmB5l28JDkgMNVag/2972jr/B2k
-         kUWKNkpbgam9w9qaeYG/DL1CQUlvaYqZ026FMMGk6OFEJPTt6J95SWJ3OVMPDMal960t
-         c9Q91leSEBhW0qp0t+O72vR55EPKWh7KJGMm3zY1TkkE3IRUPLIjKkq+IZoQVBGPB1p1
-         2gpg==
-X-Gm-Message-State: AOJu0YyUTVg2pUKkMdW+NvErjFnO8suuo1pD6tPaAmMBTinBjx2fhMzC
-	pdnjyhkeoXhXt0LhlePnRT1YVxXHzLTIQPYz0TFoC9EZ0fKFUsteoOt7P/0/jVOr
-X-Gm-Gg: Acq92OGh8EBC0+G2UuboPM77li/C87jyYXJm7WdUr033HXrTOcVMxB56+AQJFhnhEWI
-	mqkWdY2SxGuzTxiqwmmy1bv9Sldlt1h6ynyXTOauA4ixsSkH9GxE+4R96Jui3GAa9YJmy+KnVYw
-	qUAKiNpAwIDcsWN1L6gkO4obf7fDFMoujvuAfuEPINp7e5GYM65uQ6zw5xXyZeA9FFAokrZRHA8
-	OKBrBZIKl6gNgB71Uq9Y5W4lgsddsiJVRxnJHLPwCLsoALr+ODgGO8iAnGD8CIO/FgB4Q6iQhQV
-	JoNsXcCqCG9JGWo5BfFSXV2watMX6JeWzrteo9W5Oeg1uuIokRylXS+aOifWGZislDDdxMvFszU
-	xRNKsze9QwyYnXO/b5m5nkF/qjRqbd43z09iJzWU39JEizot7JfTwc/OayaCGFnnzZaqa6ate/v
-	C+ddCpNicjD2Z6t5aRoX1SuEI/16MAXSFskSBLkgfYRLWFoG6bzWvfuqY=
-X-Received: by 2002:a05:6000:4021:b0:45a:c97a:905e with SMTP id ffacd0b85a97d-45e5c35db40mr27602343f8f.1.1779165173174;
-        Mon, 18 May 2026 21:32:53 -0700 (PDT)
-Received: from localhost.localdomain ([87.236.194.191])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45e6a135f0csm23722540f8f.27.2026.05.18.21.32.50
+        bh=xx56vMqzDIyLCnIS01xeQI9ZapGjWmBkyJ9Xo7JzsbE=;
+        b=fkr7ocoXR4gBxLEFcjt8+4O+ri8A0cVUFmVapUoWozjTZELSUopgq6JFsmrKO269s2
+         57MbNnQ07kMrf3yoH18hJFeZOIQOCUedpWsiWM/R+HV3QswGu198aKlNawyKF6OXZkmw
+         Z+lAsQpxee+pYcPXAww5MxEy86PsLYMYUZnEsvzII5tRocvBrUkEfqN574sz/UpWXvZj
+         aL104og5137Hpt1vApsr+YPVnJrAd6M/V67e6MulyxVBk5cHtYFGArSSmXz4Wpom1vvx
+         4Z+8tH7iZNWeuSvIE345ZruG4th8pv3HNtKyIDuSVP5tcN58FbEn1i/LeRQAB5EFnKzr
+         /OlQ==
+X-Gm-Message-State: AOJu0YzEssOCrU8lGaaeiFlQ3uHmp3zMVq1DAp/moXl2J0mBG/ucoR8f
+	ThcNoa3S1I5scZWPFHaSEC6hpMwsWfx6sKer/zWW3S9wXP/Wx3Sel0e2
+X-Gm-Gg: Acq92OG3vH5gOHLUZJXxlr5dsuITXa7E3aNWBNMDI9rNccba0cmpt9fGTmnruQbYYd9
+	QI9ny1U8vKnp9+IRWLteNlDOnFfqkHpbFyQtUSfHg8BX7BTDpg8w7Ciw7qcUZjh3X0wsaubMrXq
+	OV76L5lyk5u5Pj2vbjMvwgJoo9umjMvFXTVi988+BNsQPJNid8rJTccnyu8IvmXKGNMKn/9IKdm
+	Ahic89DunuI4eC9JROWAa2Gj0MPofn5K0bAdt3CiObhVhhKni3qK5m4uTOZzJQCIvaf2ENGHNM9
+	YmLzmJay66SxixeTziShgZp9M31HUWXG8xZOqWr3nVQcPwi8rL3viDPes6ryBXy38cf4QWsv4I/
+	RALlNldonSxorPiKB+haYcea/19PVnF9QhVhEdAGdpPPZKKZb58Sa/1GjM1oqlaTIC73Xyiv52B
+	QkkxABlJZKCY6NFuUegS2timeji+L/p+Qyq9Dn+qI=
+X-Received: by 2002:a05:620a:258d:b0:8cf:c513:349c with SMTP id af79cd13be357-911cdd431f7mr2636693285a.9.1779166693131;
+        Mon, 18 May 2026 21:58:13 -0700 (PDT)
+Received: from tresc054937.tre-sc.gov.br ([187.65.210.13])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9114edfd3ebsm1588593185a.23.2026.05.18.21.58.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 21:32:51 -0700 (PDT)
-From: Petr Wozniak <petr.wozniak@gmail.com>
-To: netdev@vger.kernel.org
-Cc: bjorn@mork.no,
-	andrew@lunn.ch,
-	linux-phy@lists.infradead.org,
-	kuba@kernel.org,
-	Petr Wozniak <petr.wozniak@gmail.com>
-Subject: [PATCH net-next v4] net: phy: sfp: probe for RollBall I2C-to-MDIO bridge in mdio-i2c
-Date: Tue, 19 May 2026 06:32:49 +0200
-Message-ID: <20260519043249.2868-1-petr.wozniak@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        Mon, 18 May 2026 21:58:12 -0700 (PDT)
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Subject: [net-next PATCH v5 0/8] net: dsa: realtek: rtl8365mb: bridge
+ offloading and VLAN support
+Date: Tue, 19 May 2026 01:57:55 -0300
+Message-Id: <20260519-realtek_forward-v5-0-cb9f702c1782@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-B4-Tracking: v=1; b=H4sIANPtC2oC/23OTQrCMBAF4KtI1kaSTJpWV95DRPIz0aC2kpaol
+ N7dUBeW1uXj8b2ZnrQYA7Zkt+pJxBTa0NQ5FOsVsRddn5EGlzMRTCgGAmhEfevwevJNfOroKDf
+ agi5Lq5QkWT0i+vAaFw+kxo7W+OrIMTeX0HZNfI+nEh/77yrwxWrilFEpvVGQe1Pi/nzX4baxz
+ X3cSuLnC7b8KonsHVMShWAGtnzuYerV0kP23FWlLXxVaDBzLyee//Ey+8oopzRH9M5O/TAMH4I
+ Yvr14AQAA
+X-Change-ID: 20260323-realtek_forward-1bac3a77c664
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Linus Walleij <linusw@kernel.org>, 
+ =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+ Yury Norov <yury.norov@gmail.com>, 
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
+ Abdulkader Alrezej <abdulkader.alrezej@gmail.com>, 
+ Mieczyslaw Nalewaj <namiltd@yahoo.com>, Yury Norov <ynorov@nvidia.com>
+X-Mailer: b4 0.15.2
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-289269-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[mork.no,lunn.ch,lists.infradead.org,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-289270-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,yahoo.com,nvidia.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 1C7F25773E2
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,msgid.link:url,armlinux.org.uk:email,davemloft.net:email]
+X-Rspamd-Queue-Id: 79B4C5774C1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The "OEM"/"SFP-10G-T" quirk entry in sfp_fixup_rollball_cc()
-unconditionally forces MDIO_I2C_ROLLBALL for all modules matching that
-vendor/part-number combination.  This works for modules that genuinely
-implement a RollBall I2C-to-MDIO bridge, but silently breaks modules
-that share the same EEPROM strings without having such a bridge.
+This series introduces bridge offloading, FDB management, and VLAN support
+for the Realtek rtl8365mb DSA switch driver. The primary goal is to
+enable hardware frame forwarding between bridge ports, reducing CPU
+overhead and providing advanced features like VLAN and FDB isolation.
 
-The Realtek RTL8261BE-CG is one such module: a pure copper 10G SFP+
-media converter with no I2C-to-MDIO bridge.  Its EEPROM reports
-vendor="OEM", part="SFP-10G-T-I", and -- critically -- Vendor OUI
-00:00:00, making OUI-based differentiation impossible.  With
-MDIO_I2C_ROLLBALL the kernel stalls waiting for a PHY that never
-appears:
+Some of these patches are based on original work by Alvin Šipraga,
+subsequently adapted and updated for the current net-next state.
 
-  sfp sfp2: probing phy device through the [MDIO_I2C_ROLLBALL] protocol
-
-Move the probe into i2c_mii_init_rollball() in mdio-i2c.c, where the
-RollBall protocol constants are already defined.  After sending the
-unlock password, issue a CMD_READ and wait ~70 ms for CMD_DONE.  A
-genuine RollBall bridge asserts CMD_DONE within that window; modules
-without a bridge never do, so i2c_mii_init_rollball() returns -ENODEV.
-mdio_i2c_alloc() propagates -ENODEV to the caller without logging an
-error.  sfp_sm_add_mdio_bus() catches -ENODEV and transitions
-sfp->mdio_protocol to MDIO_I2C_NONE so the rest of the state machine
-skips PHY probing for this module.
-
-Add "OEM"/"SFP-10G-T-I" to the quirk table so RTL8261BE modules enter
-the probe path; genuine RollBall modules continue to work as before.
-
-Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
 ---
+I attempted to reach Alvin for review of the final version but was
+unable to establish contact. Any regressions in this version are my
+responsibility.
 
-Changes since v3 (feedback from Jakub Kicinski):
-  - Drop spurious Tested-by: tag -- author and tester are the same person
-  - Use PATCH net-next subject prefix
-  - Move -ENODEV handling from sfp_i2c_mdiobus_create() into
-    sfp_sm_add_mdio_bus() so bus-creation code does not mutate
-    sfp->mdio_protocol; the state machine is the correct place for
-    protocol-state transitions
-  - Split combined variable declaration for clarity
+Changes in v5:
+* General:
+ - Removed Alvin from Co-Developed-By and added myself.
+* Patch 1 (err_ptr):
+ - fixed error message on failed IRQ mapping
+* Patch 2 (DSA helpers):
+ - fixed missing irq teardown when DSA link port was detected.
+ - added missing \n in error message when DSA link port is detected.
+* Patch 4 (Table lookup):
+ - fixed RTL8365MB_TABLE_ADDR_MASK mask
+ - added a check for busy table access before preparing and issuing
+   a new command (protecting from a failed previous access)
+ - increased table timeout from 100us to 10000us
+ - changed -ENOENT to -ENOSPC when writing to L2 failed
+ - moved RTL8365MB_TABLE_ENTRY_MAX_SIZE to table.h (as kdoc mentions it)
+* Patch 5 (VLAN):
+ - removed duplicated filtering registers macros
+ - removed wrong comment on undo_transparent
+ - forced the removal of a possible PVID state if an added port
+   is not PVID
+ - added vlanmc->priority_en to VlanMC reading, although always zero
+ - use VlanMC member just for tracking ports using PVID and do not
+   try to keep it in sync with Vlan4k. rtl8365mb_vlan_mc_pvid_members()
+   is not needed anymore.
+ - changed rtl8365mb_vlan_mc_port_set signature to receive vid and pvid
+   instead of the vlan struct to avoid null pointer dereference
+* Patch 7 (L2):
+ - removed addr from rtl8365mb_l2_del_mc when -ENOENT is returned by the table_access as it is undefined (noticed by sashiko)
+ - added RTL8365MB_L2_TABLE_SIZE and use it instead of RTL8365MB_LEARN_LIMIT_MAX when needed
+ - extended RTL8365MB_LEARN_LIMIT_MAX comment to cite that the exception RTL8370B might not even be a RTL8367C member
+ - moved l2_lock init to rtl83xx.c as it is a field in a common struct.
+ - fixed fdb_dump kdoc, now returning OK when the table is empty
+ - expaned L2 commit to cite unicast/multicast table key
+   differences
+- Link to v4: https://patch.msgid.link/20260516-realtek_forward-v4-0-8b6d6a1eefdc@gmail.com
 
-Changes since v2:
-  - Compile-tested and hardware-tested on BPI-R4 (MT7988A, 6.12.87)
-  - RTL8261BE (OEM/SFP-10G-T-I): probes MDIO_I2C_NONE, link Up 10Gbps
-  - Genuine RollBall (OEM/SFP-10G-T): bridge detected, link Up 10Gbps
+Changes in v4:
+* General:
+ - fixed comments/kdoc wording identified by Sashiko.
+* Patch 1 (err_prt):
+ - added missing %pe/ERR_PTR conversion identified by Sashiko.
+* Patch 2 (dsa macros):
+ - reorganize port setup initialization, collecting ports in upports_mask
+   and downports_mask.
+ - include a fail fast during setup if DSA links ports are detected.
+* Patch 4 (table):
+ - added missing return value check for regmap_bulk_read in table access
+   (spotted by Sashiko).
+* Patch 5 (vlan):
+ - added undo steps to rtl8365mb_port_vlan_filtering (noticed by
+   Sashiko).
+ - removed residual double max packet configuation (noticed by Sashiko).
+ - added meteridx and policing_en to rtl8365mb_vlan_mc_read, although
+   always written as zero in rtl8365mb_vlan_mc_write() (noticed by
+   Sashiko).
+ - explicitly comment that VlanMC[0] uses EVID==0 (Sashiko was worried).
+ - always undo previous PVID setting before applying a new one. It might
+   exhaust VlanMC entries if the user keeps changing PVID without removing
+   the port from the previous PVID VLAN (bug detected by Sashiko).
+ - Fixed a bug where a missing VLAN MC entry during PVID assignment would
+   return success instead of an error (reportd by Sashiko).
+* Patch 6 (bridge join/leave):
+ - Added error unwinding path (undo isolation and EFID) in
+   rtl83xx_port_bridge_join (noticed by Sashiko).
+* Patch 7 (FDB support):
+ - added RTL8365MB_L2_ENTRY_SIZE macro.
+ - fixed RTL8365MB_L2_FLUSH_CTRL2_TYPE_BOTH definition (noticed by
+   Sashiko).
+ - removed the union in rtl8365mb_l2_uc_key. Each field is independent
+   now (bug detected by by Sashiko).
+ - fixed mc->member calculation. Now it uses bitfield to rebuild the
+   value (bug detected by Sashiko).
+ - return mdb_del without errors if entry is missing.
+ - improve debug messages for l2 operations.
+ - added comment about ds->assisted_learning_on_cpu_port and
+   fdb_isolation in the commit message (asked by Sashiko)
+ - renamed some _MASK macros to _MSK to reduce the name length.
+ ** rtl83xx_port_fdb_dump fixes:
+  - initialize entry as null (noticed by Sashiko)
+  - check return of cb() (bugfix reported by Sashiko)
+  - fix address overflow (noticed by Sashiko)
+- Link to v3: https://patch.msgid.link/20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com
 
- drivers/net/mdio/mdio-i2c.c | 57 +++++++++++++++++++++++++++++++-----
- drivers/net/phy/sfp.c       | 15 ++++++++--
- 2 files changed, 62 insertions(+), 10 deletions(-)
+Changes in v3:
+- Fixed kernel-doc warnings
+- Removed unnecessary defensive checks
+- Link to v2: https://patch.msgid.link/20260503-realtek_forward-v2-0-d064e220b391@gmail.com
 
---- a/drivers/net/mdio/mdio-i2c.c
-+++ b/drivers/net/mdio/mdio-i2c.c
-@@ -419,6 +419,46 @@
- 	return 0;
- }
- 
-+static int i2c_mii_probe_rollball(struct i2c_adapter *i2c)
-+{
-+	u8 data_buf[] = { ROLLBALL_DATA_ADDR, 0x01, 0x00, 0x00 };
-+	u8 cmd_buf[]  = { ROLLBALL_CMD_ADDR, ROLLBALL_CMD_READ };
-+	u8 cmd_addr = ROLLBALL_CMD_ADDR;
-+	u8 result;
-+	struct i2c_msg msgs[2];
-+	int ret;
-+
-+	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[0].flags = 0;
-+	msgs[0].len   = sizeof(data_buf);
-+	msgs[0].buf   = data_buf;
-+	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[1].flags = 0;
-+	msgs[1].len   = sizeof(cmd_buf);
-+	msgs[1].buf   = cmd_buf;
-+
-+	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-+	if (ret)
-+		return ret;
-+
-+	msleep(70);
-+
-+	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[0].flags = 0;
-+	msgs[0].len   = 1;
-+	msgs[0].buf   = &cmd_addr;
-+	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-+	msgs[1].flags = I2C_M_RD;
-+	msgs[1].len   = 1;
-+	msgs[1].buf   = &result;
-+
-+	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-+	if (ret)
-+		return ret;
-+
-+	return result == ROLLBALL_CMD_DONE ? 0 : -ENODEV;
-+}
-+
- static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
- {
- 	struct i2c_msg msg;
-@@ -439,10 +479,10 @@
- 	ret = i2c_transfer(i2c, &msg, 1);
- 	if (ret < 0)
- 		return ret;
--	else if (ret != 1)
-+	if (ret != 1)
- 		return -EIO;
--	else
--		return 0;
-+
-+	return i2c_mii_probe_rollball(i2c);
- }
- 
- static bool mdio_i2c_check_functionality(struct i2c_adapter *i2c,
-@@ -487,9 +527,10 @@
- 	case MDIO_I2C_ROLLBALL:
- 		ret = i2c_mii_init_rollball(i2c);
- 		if (ret < 0) {
--			dev_err(parent,
--				"Cannot initialize RollBall MDIO I2C protocol: %d\n",
--				ret);
-+			if (ret != -ENODEV)
-+				dev_err(parent,
-+					"Cannot initialize RollBall MDIO I2C protocol: %d\n",
-+					ret);
- 			mdiobus_free(mii);
- 			return ERR_PTR(ret);
- 		}
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -579,7 +579,8 @@
- 	// OEM SFP-GE-T is a 1000Base-T module with broken TX_FAULT indicator
- 	SFP_QUIRK_F("OEM", "SFP-GE-T", sfp_fixup_ignore_tx_fault),
- 
--	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
-+	SFP_QUIRK_F("OEM", "SFP-10G-T-I", sfp_fixup_rollball),
-+	SFP_QUIRK_F("OEM", "SFP-10G-T",   sfp_fixup_rollball_cc),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
-@@ -2022,10 +2023,17 @@
- 
- static int sfp_sm_add_mdio_bus(struct sfp *sfp)
- {
--	if (sfp->mdio_protocol != MDIO_I2C_NONE)
--		return sfp_i2c_mdiobus_create(sfp);
-+	int ret;
- 
--	return 0;
-+	if (sfp->mdio_protocol == MDIO_I2C_NONE)
-+		return 0;
-+
-+	ret = sfp_i2c_mdiobus_create(sfp);
-+	if (ret == -ENODEV) {
-+		sfp->mdio_protocol = MDIO_I2C_NONE;
-+		return 0;
-+	}
-+	return ret;
- }
- 
- /* Probe a SFP for a PHY device if the module supports copper - the PHY
--- 
-2.51.0
+Changes in v2:
+- added patch to use ERR_PTR()
+- dropped bitfield patch. Use FIELD_PREP instead. Suggested by Yury
+  Norov
+- tag_rtl8_4 patches were submitted on its own series (already accepted)
+- dropped rtl8365mb_vlan_mc_port_{add,del}(). rtl8365mb_vlan_mc_port_set
+  is now called directly from PVID methods.
+- reordered methods in rtl8365mb_vlan.c
+- use dsa_switch_for_each_user_port() instead of simple for in bridge
+  port join/leave
+- PVID check now uses dsa_switch_for_each_available_port instead of
+  dsa_switch_for_each_port
+- set EFID of user ports to 0 at setup(), although it is the expected
+  state after reset
+- STP patch was dropped and replaced by a more extensive one that
+  disables all ports (including unused ones) before setting CPU and user
+  ports. It also extended the CPU port isolation to include all user
+  ports.
+- refactored bridge, FDB, and MDB port operations into the common
+  rtl83xx module, introducing new realtek_ops callbacks to abstract the
+  hardware access
+- Collected Reviewed-by and Suggested-by tags
+- Link to v1:
+  https://patch.msgid.link/20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com
+
+To: Linus Walleij <linusw@kernel.org>
+To: Alvin Šipraga <alsi@bang-olufsen.dk>
+To: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+Alvin Šipraga (6):
+      net: dsa: realtek: rtl8365mb: prepare for multiple source files
+      net: dsa: realtek: rtl8365mb: add table lookup interface
+      net: dsa: realtek: rtl8365mb: add VLAN support
+      net: dsa: realtek: rtl8365mb: add port_bridge_{join,leave}
+      net: dsa: realtek: rtl8365mb: add FDB support
+      net: dsa: realtek: rtl8365mb: add bridge port flags
+
+Luiz Angelo Daros de Luca (2):
+      net: dsa: realtek: rtl8365mb: use ERR_PTR
+      net: dsa: realtek: rtl8365mb: use dsa helpers for port iteration
+
+ drivers/net/dsa/realtek/Makefile                   |   4 +
+ drivers/net/dsa/realtek/realtek.h                  |  42 ++
+ drivers/net/dsa/realtek/rtl8365mb_l2.c             | 553 +++++++++++++++
+ drivers/net/dsa/realtek/rtl8365mb_l2.h             |  32 +
+ .../dsa/realtek/{rtl8365mb.c => rtl8365mb_main.c}  | 593 ++++++++++++++--
+ drivers/net/dsa/realtek/rtl8365mb_table.c          | 223 ++++++
+ drivers/net/dsa/realtek/rtl8365mb_table.h          | 134 ++++
+ drivers/net/dsa/realtek/rtl8365mb_vlan.c           | 754 +++++++++++++++++++++
+ drivers/net/dsa/realtek/rtl8365mb_vlan.h           |  25 +
+ drivers/net/dsa/realtek/rtl83xx.c                  | 536 +++++++++++++++
+ drivers/net/dsa/realtek/rtl83xx.h                  |  27 +
+ 11 files changed, 2851 insertions(+), 72 deletions(-)
+---
+base-commit: 627ac78f2741e2ebd2225e2e953b6964a8a9182f
+change-id: 20260323-realtek_forward-1bac3a77c664
+
+Best regards,
+--  
+Luiz Angelo Daros de Luca <luizluca@gmail.com>
+
 
