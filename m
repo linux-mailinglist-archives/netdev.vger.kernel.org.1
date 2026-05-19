@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-289383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289384-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KIYKBt85DGp8aQUAu9opvQ
-	(envelope-from <netdev+bounces-289383-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:22:23 +0200
+	id MNoJFPE5DGp8aQUAu9opvQ
+	(envelope-from <netdev+bounces-289384-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:22:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866FC57C21D
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:22:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB05457C23B
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3425630B198E
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:15:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6481A3029A46
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E304B8DE6;
-	Tue, 19 May 2026 10:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EDC4B8DC2;
+	Tue, 19 May 2026 10:15:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2094.outbound.protection.partner.outlook.cn [139.219.17.94])
+Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2123.outbound.protection.partner.outlook.cn [139.219.146.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D8E4A2E20;
-	Tue, 19 May 2026 10:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1363947DD7C;
+	Tue, 19 May 2026 10:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.123
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779185719; cv=fail; b=V5gwHsOgD1kBgmRh+gFu8RmlWY2VSmr6p6CzS6OL2wLP/2cahO9T46REX1JkBxutldmUSGJ7dvkD+XbiOrUU08mkeWf595htgphRuyCIRrIPxzd9gZ3IjcFqyY87y9bo4twEzoH/UTlvWqTnJFynq4VmxJQ3gq+ZqQwtv6DQekQ=
+	t=1779185724; cv=fail; b=GyzOJX6AG8P7RWY9xuUj8QpWr2ffilU+slqa/wIVRIxyQJVSDunnPV/BgFSq4ogneGacERJ+5iGhiwB4gfhQVyrZ3Tods3JA2+/Sx7gcHbhIYXuWSaj9UJDmyqTKkAVHyXJOdHjfkvL1Pejai7mWXnAYHjlVuD1TrI3EuyAJFqk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779185719; c=relaxed/simple;
-	bh=CDRer719KYGVwVtG52U+ad/PqaviuaMP3OV70A4F8xs=;
+	s=arc-20240116; t=1779185724; c=relaxed/simple;
+	bh=0mu6UxoakgfMCFAA1LRdfrl4D/HveT1GAO/c3wow8rY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PQctUF1NEv8r9IuLVoKGDHwt1RmKBm+Sbcj66j/UOTYqSHPnoiUGQBVKwAkfuhh7+6vRfZjmBytHbTwEGREk5//B+IB5inciFpXONuALJU1WQ8dwfpwM9yvs5o1EEHfTtWd3BElxM6QyLK5Gb0QQ3vdBq2ZrYFOTA3KgPrBCbYI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.94
+	 Content-Type:MIME-Version; b=iF7E4VWL24AanADmBemWwXBv9atYsekCMLXBI5iXoghVUvzq2TjZRmSiuXw2QNryUcUrIVC6UN5IEA5/qPfgDQucxsd1c64X9fQN+KfMfWSV7HLPg7MrAQuZsSLmDivzD4d8wS+11iLUwE+7fwwC5nt0CeX5TcfXasZqSeK7K30=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g5jQoHMttqSGr9TJTGxu4UPg0ooJBc/cxkUC52r/5yvi2l4kF1+7eRHGaLnXZU/CMnwsd42bdJLlr6/rn5VtGC1LjyYKbcIeqNoXmtz8s0n5B+NuuFwEoeOqr7CVhqdb91E6JqG3IpHF+R1CE29RklYrRXx/gnbRDTh63Q1zYHZAYS6Fqhbk6Vib88HSCBJvbpJW4l7k0OgxqsPlLJvf8+bwLT8VG9Ip2kkCTGNdaq1gzlJolUesIVYo21NjJuDNLvRKO6fvRuUO99Dq8yriFMlBdGeocGRx8PbcDZ0h/0CtV35ypOTOP13pznfEDJmeUwFYpgT53KFHZstMBikR5Q==
+ b=BBDZhL+ut/TWF5i0GD+dI5rsURVo3NYxLDwNilIeBOHKrdhWzUubDFJ8kN3tiBXWF/l+jXl3TpapxoFCnQBcQd1Cvrso4uW0r322ERs20aSsR1ihdxTh5SDHpEAbVy4vd70MXeQOPyc2Y3Hxg1/sn7nX5Pwyl3U8QWWgWDtp9bSAe95/1Sjwh52LogVJTL6rhxHlcyVXibz+FEGEnPKN5Qzs2amQZBphD33NGb/yn87MOcr3Mppn2qWNEE4TKgUvXuIMYMPGWgScNuOWEP49vUA86VyT2KjapXJ4l72BBbpIWxRKtXcj+vpera+2NQyulCEEP3IHwH9HwASJAA5Yug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QSuTNxaOHK8IF2jEPBALgIgPSk7URmKKThqcy8k3090=;
- b=l7azWNpmRqZGDk4qSNO8Z643ZHDiZyMTINO28PLMk9zt1kjeZatlTVtk6qt+EX13G3WyDry0xrph/ouEOHEUwOWuSQmW1F6FkBGAhhfkH5Y6aK94uut6rbrefRjbsQ2l9FPuDgbuoMdOEAkNmeNYAeisgfaElm37Yws5ck5qouC/il5J1p4AokO8pWZC9Jrzu6f3B1RxVSQ0OGnfmLrEmOncE/7nsead4Wp8iNheXGSB/HNtlEqolscw4voL4iJ/qbrX/SdHFCm+4Cd0Gq5ticFL7Kap6mOkkB0zZaXZ6Z7shWj9k1heW5Ub1KGkDM+2qEoF1/4leqHDMQpFag6C4g==
+ bh=hxJobuoN9Xxk6KUYNZ2BpZ/tx6UOqD4aMDKtmwQz0/o=;
+ b=Ukw8sTTZJLTeCDiO99xxCGtbeIPeHOXrTFLhfq92oLx30sCQltpH9syIXvPpoS7glJAG4SNL8B1UEyWcyAzMnCykwSyFxSmi+B/IGqE1PxRHAkjKZd5VwJahd7LffSQz9DjSJoJihJpxaq6GN01PAdpXYYF/PxsJLnbChjOgS25R9lCygmcMtmXUCBqvT5RcPxZy9502I6fTwCvrMp1lbUgNkfiQ1KXED8XhfLDEAm4elQbQDMIH7ervxwQgEUIB7fyPKUUI27Bx81UPMNQyKLD/yBGTCZG5C/vMOTSvtNV/Cv27/ED5wK2o0rhH7EulNY+TiQ+cKPx6iGwN82x8PQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=starfivetech.com; dmarc=pass action=none
  header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
@@ -48,11 +48,11 @@ Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c311:25::15) by SHXPR01MB0493.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c311:1e::18) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.24; Tue, 19 May
- 2026 10:14:47 +0000
+ 2026 10:14:48 +0000
 Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
  ([fe80::9b99:12dc:a115:b90f]) by
  SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::9b99:12dc:a115:b90f%3])
- with mapi id 15.20.9891.021; Tue, 19 May 2026 10:14:47 +0000
+ with mapi id 15.20.9891.021; Tue, 19 May 2026 10:14:48 +0000
 From: Minda Chen <minda.chen@starfivetech.com>
 To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -70,9 +70,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	devicetree@vger.kernel.org,
 	Minda Chen <minda.chen@starfivetech.com>
-Subject: [net-next v4 1/5] dt-bindings: net: starfive,jh7110-dwmac: Remove jh8100
-Date: Tue, 19 May 2026 18:14:32 +0800
-Message-Id: <20260519101436.111476-2-minda.chen@starfivetech.com>
+Subject: [net-next v4 2/5] dt-bindings: net: starfive,jh7110-dwmac: Add jhb100 support
+Date: Tue, 19 May 2026 18:14:33 +0800
+Message-Id: <20260519101436.111476-3-minda.chen@starfivetech.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260519101436.111476-1-minda.chen@starfivetech.com>
 References: <20260519101436.111476-1-minda.chen@starfivetech.com>
@@ -88,56 +88,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SHXPR01MB0863:EE_|SHXPR01MB0493:EE_
-X-MS-Office365-Filtering-Correlation-Id: b96f248e-4cb9-450f-8271-08deb58f7465
+X-MS-Office365-Filtering-Correlation-Id: d09f5e4c-2653-4830-e59b-08deb58f7549
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|52116014|376014|7416014|1800799024|22082099003|18002099003|56012099003|38350700014|921020;
 X-Microsoft-Antispam-Message-Info:
-	j7WelhQlnxt8CkMmTmlKTQ/ghJnH0Ggz8Rz7RjXni2tciI0tGqE9+eNwVjGeCdVD46EH9OY4BxsoW2mqDcIrMH474VE/yk+i3l+J3VjwHCreiJicVCSXRrzek2C02B7dqRxKCZr+0Ulj2p/wwzfs40lygF51KcFr5HCRxrOeP7IQLbhvN22SO2OCXNwqQIfQA6DOdS4pxqVUf4iEWUxTlo7S2x/rTyncAyoGTjkYTmH5rzBqoCsuJhf9vj/yf1vQUlqE7cPDruCcCxlUJXQX7lgnz/zc9+tRYRBjQtSuDcmC1Mi8Vv69A+eIjr6F6KWPX70ycHdenAIyd5OJyUEHBjrf9+G+AxGq1jqCN6sZcMZjVc/RCMYLEp/IsCxIE9eYmk6mencGVpqV14I8aQliVU+dYe+sgNBZrOVz2vM4ZZ1buzB9E9ms00FHtOYmHGiWoDJQ6i0ISAMg+YjbeMWqsQaO7GQ0WAZCvVgp+lPvdi9lPyiVAN+sGbW9MC2hbmvS0cHd41RV0c4hS1JatTmpjrXM+oBzNpT+yUy3UIE0RhrUlPmLje6k4JKrIOA3qeDjtZAxq39mwjXf6zCKO6tfTg==
+	uv2hYS5IXU+UeRvAW2sTw96A5mAJXXbNj7ENyXvwl5S6r7atjEaOA/RMtwDeMf8cCmksbVTv+bzMWxjLkF7AkBZaE/7I0+C23SRXaNhL+Tl7KA4gC/5X1MyWn/y1JzRW16eCWoJtB7b/1E6NH5jFhAnFZn2+gyAfJPS0YLG0LanlwnkqINhzGBIwR/MmfjwyBw45KJMIUVa1eqRqE4nQL4G4u+dEf8ofqiXmutce+8pTT/FyHbcQ2nhWo2O9cKkv14SAQqDv/64d/hO8zy0BX1CbnvhGkzFIBphNzSmhCXOi/WnM2vWp7jp9Q5xX9WgIqgpwiAg7RJAyk2QTo8wkqdRcaYSAiQDetWBTqvL3CRkpvxIrbG3G/5UizQU14ub22yPi0cVV17tw1/HNuwXItFsl9PhQzKkav/l3IC6olZy4KnVN8gBKbBodq2lWGiJ+xiAysslqh6O8eGKprdzQAGsbTstt1X9MZxw0li5e6nui6nWB4JMBKLSzFKN5OoZGFYY7fy/vU7O2WMJ4ErGyJ5fw1Af5GXK3nKItVDj3KiJeP+rMNdzJGhUo88nMSx5SV3Rr973X1x5I54HMymosRQ==
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(376014)(7416014)(1800799024)(22082099003)(18002099003)(56012099003)(38350700014)(921020);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Ky29SXzH6Z53fFqLjEINbECKuW5W4F7DRo1V56ItD4oX9ypxwsi+jKG/EjVi?=
- =?us-ascii?Q?1yVtZ5na4Jfs3E/6myDKeDJLD/9hNHjItMJGwjZBD2nyVC20rwfFO0PVxSwZ?=
- =?us-ascii?Q?so21620VoJU8ClqHsjVmAfHEYj2azY4oiPhgbQLiCrNqrTQTpHbVqWhCiKLj?=
- =?us-ascii?Q?1MH++xaYqx+pEqez5UmfHwuePAcnJa2YQQ3uU7whRGfA0UB5FPRMCukD4kzI?=
- =?us-ascii?Q?LBbgrQicfcNGIYQeb5nSXQlVuhDG1jZT0Hhcydn3Xj3QsuW9+m3ks8h/hecO?=
- =?us-ascii?Q?gGaflyjFxhQ3B2dzkzO/09O7kiTTSC02vnFY8Je99lq3uk4w0N4ibpWQ5OtN?=
- =?us-ascii?Q?AXPLB6zfDngk+OYkjeUiODz2oWCzu+ZuuB14BnXyxn4hDfiVVHdrbwq/TPwl?=
- =?us-ascii?Q?brG0vC1/NB3P9mu1mbFhKEDXTFiUaRM4/EzTP3t8O6tPx3Ek3LD2XwJg2yPc?=
- =?us-ascii?Q?rLi4q9YAAoAO6vIsIC+UQw65WzQpLGUtc3vPDMDUUu2AS7t3HR7FkYQ5Gxep?=
- =?us-ascii?Q?WvajBgeuvmUzravigeT+Rb3BpYd8IkLNFSjZkv+rMyn7WDHV0QLleVQFSpBs?=
- =?us-ascii?Q?j4HnozAjxbkKImmidDEKkBa4vYpjOACSmo0tBa4xeLokBpxUPmP6rwQDZh8T?=
- =?us-ascii?Q?SSmsEd8QU//8Up5OICD/bOWDs37Mt3nQtvcRWFCdhvs0dLL1qiiZ42LHoLiF?=
- =?us-ascii?Q?ykqj4eOKE05GxsvXqcmuF8iAcwj8rH4Hdx0NP3f0B/O90JfuTx41iwuiMxYI?=
- =?us-ascii?Q?tmTBrPBe6vbEYnsfHNB5k7rfoCArq5cLQpzJXw2aiW6WFqaxUA/3dBR5fS4I?=
- =?us-ascii?Q?+TVAA5hgPOjmnDgJasRK5wmRzK5WnKz2tsqt8qF+dnbXk4rIwHcCk2NDcOjs?=
- =?us-ascii?Q?m8SqYa4Ycf6m7/JXqP0aDt16Cmccw2moP9mYX3qV13CKjWl87sunnAoSR/Tx?=
- =?us-ascii?Q?xcatEGqjYKYXnH/ri0Ca+PnB1YFwfxl5+84NaN8TvSrZFOR3vbR1Ju/ZYu1e?=
- =?us-ascii?Q?mpkm2G7xuzdoW1I4caKQla+fJLO96ZjQVwLnjKgh5iQP0sLnf9aLJ5wxmsZj?=
- =?us-ascii?Q?AdbFjVaSA77Q4JzErPz9bvNwKitilKiyQknBQB/LbwAVpTrLqbu8aYr27SSh?=
- =?us-ascii?Q?mBC7FzFAEzIgJrB7l1ag3TMGbu9x++CTDUgZAZcwYoxfHGSQAqEwbMUMzvH+?=
- =?us-ascii?Q?8f2MB6XYUpJKZX3wFZS0WblxZpTJRxIw4flda8vUk1zA5Oiw9gP9uWk4jxEC?=
- =?us-ascii?Q?foRWN0HuKsJ8EnmlZMqyvQm6DBeUUINL1ItPmJ4ZFEpSP68pPxFqhF7ib6tj?=
- =?us-ascii?Q?GVvJgTpxoB+u5KEcHOOHoNOkO/FFy4wQDJz/nfapjWooxU+YfWgrZUQtp/xg?=
- =?us-ascii?Q?ku350odjI4t7Z8TbNzgpFKZtkKiN/+UyCGLqa79CZVJAK9VQsQ6AQRp/vB7S?=
- =?us-ascii?Q?RGTOgQp6kokUjjJsx0Y3b/tFOPBPp/UYUoKt9yGpIKJlSboXX0ym21nEVlEj?=
- =?us-ascii?Q?nlwAqyn9szASXmTgUW6YTagE/xNjAdO49aycUI5NxWMbk7U+mPPjf+Giu4DX?=
- =?us-ascii?Q?c6FJLuQATt7XLJTOxT6hlYvSAyLog7t1XRM26dvcTI3krz6oSV64UM1q/YnI?=
- =?us-ascii?Q?5tcTy7dKXB5Gtp0tiSWrthIDibH36ZA6Bu7QnPgXNmekEeMpc2CwgzhX1f0Q?=
- =?us-ascii?Q?S/yWXYjCw5/7ovREkhywIoDBR0YS8QZmZ+b3Tq002I0elbzplmNUNT1n8jTj?=
- =?us-ascii?Q?Bzzs+tWLRQDo4VslYshNkwXv8X4z8C4=3D?=
+	=?us-ascii?Q?hZPThOk/n79jUGo2tTT2oHd6woYsoaCHNafoZVNSjYWTwmzrC3oZcFEv/UUN?=
+ =?us-ascii?Q?IYhAw0Vdu6xSHNdJHfJlR1wDk/skC1uUKTmLuhZo8ng9Xw2W8lHIe+9FKuPc?=
+ =?us-ascii?Q?4oLcBxAhWKkz3vc7p3/+awpiA1CGp2MJ15yKAem4rw2V2GzqSEnIP1PD8wFF?=
+ =?us-ascii?Q?ixgmfy7Iu5Agzsdot3kMt+f9BVk1MxgSdc9RmoysgRdamP4UiBRcyoB6VlSa?=
+ =?us-ascii?Q?qkYQc5NoPuWbdRQtGcSjYs+a0HPEpJGwyj8U7w1eoejs+jEBiJFssr3wXm1K?=
+ =?us-ascii?Q?NRydhRw81FaYm+XjS8GC3RB6sOjeG9mElssN1P4dKeD++xipg+F4et50oeLO?=
+ =?us-ascii?Q?qC7nGKsoO2ItS0TWzklOqIsIIECpdhXrqqQ+ppOzeGEkP9DvtcAayuSHQeo5?=
+ =?us-ascii?Q?qsc1A51BFmGVCiJNgsLKBOGHQNLn0Uf/TAmD0IwEiHpR6X09SoJxLW2dyTWf?=
+ =?us-ascii?Q?DeZB0azLuMG3ev62CceK+V9THDyOZroX86lK3vef4tL4lmG25yXEst535lyd?=
+ =?us-ascii?Q?NXencLBFxKzPoZgKAqtka5FhTHgaVAyl0LJhLxp7epmn86e2t+DFfHfHVC0F?=
+ =?us-ascii?Q?PtfhMl/jM4X/U3Tto2ABbVQUSKo9jq7V55BEdnjoW1dqjj+rvncjUab23nU4?=
+ =?us-ascii?Q?y0n36BL2Lw09WR7rA5OeUaVCIXsqzgYpdLXvd+khttTk5yIFBPhQLd8U3O2G?=
+ =?us-ascii?Q?b4wCrS5slErupXfp1fB6T/6QD0mM120woCoGQXrqPLvV4FgQpjusMX0bKNBD?=
+ =?us-ascii?Q?6dCHhVZz1+Z3gmTi5XFbFohrPkxf0Xm7p1A2YpXF0WY67WWKQf1SQHgfdIJM?=
+ =?us-ascii?Q?Jhh2DYFlMHBz9w4Y4rDpdaqnldyCp5heaWQo0wnp8E/bPZa7q2/a9Gi6DC08?=
+ =?us-ascii?Q?DN9LJ3rIpdH/3UnkpAbN08W/HTLOEkcu0j9omaeJ60tKosqZa3EXFldRbHrV?=
+ =?us-ascii?Q?7OsAChQrZ9j3Y6PFazbzm6GDWWrRDlaVNqNOcIqUn9//pFBtGUvFeppTCR0M?=
+ =?us-ascii?Q?pevHX5k/zOGn5G11itYwFugt4TvB5lyduspNvr8ntBrL3dnjSzYktKZOFtgZ?=
+ =?us-ascii?Q?Btu2VLQlPVRdsPtNo6kw5mKuXKmGE0OV4GGcnGYsx7Hu7okFALaqB1H0MOxU?=
+ =?us-ascii?Q?E9xJHaPLaJ19heMpZQjvJpCxuNM/DhmZzqpsKKehzRpC4PbTqnagwcLQRldI?=
+ =?us-ascii?Q?Ky2R2jmkvFf83j/rr9Oog1cebwRJBGYlISbB8qBr4S060VhkKWVK1eCTUE4f?=
+ =?us-ascii?Q?Zza4WkL4pVHRjJuBiK5JMRooW9JTutrgseZlVH9Yceo2yq1CuUYQcVbwmQX8?=
+ =?us-ascii?Q?WgNrYn/0vEMiBUvFXGUGQ6T4/n/T7YIMKyQRnnb1KiCvJTSBgTa7GKZOdYM8?=
+ =?us-ascii?Q?G+CzoK4OTX313MJyif6WMmniXePx8PytVLKWlguPNVrrl7TzJqVdYr5eErN4?=
+ =?us-ascii?Q?TUVMSJyrsbrEMqLPOLUCZvZe1gbsdmAoGtAihgSmwowUroN5QR6djynsd8bU?=
+ =?us-ascii?Q?Ek/Pb01K864wZYt/GCaiPTVlLCeoD/EVSTkeHoYYr+EYcKvqWvAd42qdkE8K?=
+ =?us-ascii?Q?HW1oer6DFCEVN9yaFPsFXoM6g3DPRFZKyGDzse+J0f9ghTaRsqOXYRrvenwu?=
+ =?us-ascii?Q?6IkDlzQlOZklp9Pq2Ljg/gEVae7xpqCcspnjhtNdN5whT2Cdoxo5E9o56wyA?=
+ =?us-ascii?Q?iUZxIsA8mC7klxoRcc63bORl5GFSNGrKFdYiF6FxtPjok+z6C45XYSS6vRSh?=
+ =?us-ascii?Q?Gy0f7MPlTDJ2A50Q6/4+Z5f6P3ppB90=3D?=
 X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b96f248e-4cb9-450f-8271-08deb58f7465
+X-MS-Exchange-CrossTenant-Network-Message-Id: d09f5e4c-2653-4830-e59b-08deb58f7549
 X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 10:14:47.1976
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 10:14:48.6919
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TVOvyzsilFa+HV+a9KdROQOok4+0uiA2p2Bo2LY304pyP45dpiUroAWFSWACbIfEmc0NWGIy8pPi/FjQY0YGk8Put+DgxqlvRdlldW4hoLU=
+X-MS-Exchange-CrossTenant-UserPrincipalName: SOZfo8iX4w7pPZd7r+1XjKg0lt3iqbE1EMGn7cyCj6/F6HwVxs+vuQE/078Or24ksF7rQBX4N4fyHGl0+qlpR0sCPuH8n5iiy/PSmTQReQI=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0493
 X-Spamd-Result: default: False [5.04 / 15.00];
 	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
@@ -145,7 +145,7 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -154,7 +154,7 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	GREYLIST(0.00)[pass,body];
-	TAGGED_FROM(0.00)[bounces-289383-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289384-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
@@ -162,68 +162,91 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	R_DKIM_NA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:mid,starfivetech.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,microchip.com:email,lunn.ch:email]
-X-Rspamd-Queue-Id: 866FC57C21D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:mid,starfivetech.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BB05457C23B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Remove jh8100 dt-bindings because do not support it now.
-StarFive have stopped jh8100 developing and will not release
-it outside.
+The jhb100 GMAC still using Synopsys designware GMAC core.
+hardware features are similar with jh7100.
+Add jhb100 GMAC compatible and reset, interrupts features.
+jhb100 dwmac has only one reset signal and one interrupt
+line.
 
 Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- .../bindings/net/starfive,jh7110-dwmac.yaml   | 28 ++++---------------
- 1 file changed, 5 insertions(+), 23 deletions(-)
+ .../bindings/net/starfive,jh7110-dwmac.yaml   | 51 ++++++++++++++-----
+ 1 file changed, 37 insertions(+), 14 deletions(-)
 
 diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-index 313a15331661..0d1962980f57 100644
+index 0d1962980f57..06aeaa0f6f00 100644
 --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
 +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-@@ -30,10 +30,6 @@ properties:
+@@ -30,6 +30,10 @@ properties:
        - items:
            - const: starfive,jh7110-dwmac
            - const: snps,dwmac-5.20
--      - items:
--          - const: starfive,jh8100-dwmac
--          - const: starfive,jh7110-dwmac
--          - const: snps,dwmac-5.20
++      - items:
++          - const: starfive,jhb100-dwmac
++          - const: starfive,jh7110-dwmac
++          - const: snps,dwmac-5.20
  
    reg:
      maxItems: 1
-@@ -120,25 +116,11 @@ allOf:
-           minItems: 3
-           maxItems: 3
- 
--      if:
--        properties:
--          compatible:
--            contains:
--              const: starfive,jh8100-dwmac
--      then:
--        properties:
--          resets:
--            maxItems: 1
+@@ -107,20 +111,39 @@ allOf:
+           contains:
+             const: starfive,jh7110-dwmac
+     then:
+-      properties:
+-        interrupts:
+-          minItems: 3
+-          maxItems: 3
 -
--          reset-names:
--            const: stmmaceth
--      else:
--        properties:
--          resets:
--            minItems: 2
+-        interrupt-names:
+-          minItems: 3
+-          maxItems: 3
 -
--          reset-names:
--            minItems: 2
-+        resets:
-+          minItems: 2
+-        resets:
+-          minItems: 2
+-
+-        reset-names:
+-          minItems: 2
++      if:
++        properties:
++          compatible:
++            contains:
++              const: starfive,jhb100-dwmac
++      then:
++        properties:
++          interrupts:
++            maxItems: 1
 +
-+        reset-names:
-+          minItems: 2
++          interrupt-names:
++            const: macirq
++
++          resets:
++            maxItems: 1
++
++          reset-names:
++            const: stmmaceth
++      else:
++        properties:
++          interrupts:
++            minItems: 3
++            maxItems: 3
++
++          interrupt-names:
++            minItems: 3
++            maxItems: 3
++
++          resets:
++            minItems: 2
++
++          reset-names:
++            minItems: 2
  
  unevaluatedProperties: false
  
