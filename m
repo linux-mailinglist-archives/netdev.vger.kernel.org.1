@@ -1,204 +1,231 @@
-Return-Path: <netdev+bounces-289459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oCidNRpiDGpXggUAu9opvQ
-	(envelope-from <netdev+bounces-289459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:14:02 +0200
+	id 6KpGCHpiDGpXggUAu9opvQ
+	(envelope-from <netdev+bounces-289460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:15:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E27F57F616
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:14:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4E1A57F66F
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A9860303C42D
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:12:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC555302630B
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D39E3EF675;
-	Tue, 19 May 2026 13:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4AB3EF675;
+	Tue, 19 May 2026 13:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="INxQ4EN7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eASMPlwt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sImQ2+3L"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296AC34041A
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 13:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779196332; cv=none; b=R/lFGzNtWicThLPowzdpcKmMHNfhNpVKvYZmc1nsQcIzkPI8L+tnSxhgChsx739c9W7pJVKmkAS68KRAfhhQVzf1juytnqGnFR0S/OdbXvsBV3wORMXRPuGoV+zL3sclJH41XozXg8eaohtDcComn0YVpldu9vB3PtsdtLnFBOI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779196332; c=relaxed/simple;
-	bh=wIALats8330P4GY254CIgPMnQvywdc1NoEvfnpJIuBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=djzbD9EauyMRSAHRFVmH/0SsbrMIX7RT9nLKd0VQiZg+yWEKA+nLemewto9GvhiwN9FmvPVzLrlAa0iD6KtXJFCo8taVHIdxK58zDlhnlh3XJCGWwHDNPMO5P4JoAwqex3F1SN99O1xzyJ5CdqQmlHoHiMWFDW9cWT3rjjbZGUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=INxQ4EN7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eASMPlwt; arc=none smtp.client-ip=103.168.172.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id 3EE7AEC0092;
-	Tue, 19 May 2026 09:12:09 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Tue, 19 May 2026 09:12:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1779196329; x=1779282729; bh=C8UJjN9YIM4dF2un1h9N5JgiFsD8ZA8f
-	TKRS/ARFXxg=; b=INxQ4EN7m81c6gPrhcpB6idlpBG7cHagf+wSRqU3bDWkbURY
-	IjVPQCOYExulZV/hu2iAp7jzN+rKNMI6JXJcb7aWOHLFvWqVaawW34TowJytz3dU
-	un6wA4ZaeaSI0Qlt9SMBvKCdrgFBnDuwzmrCJIKBoxEYd6Yted9iP+iU6Ie71JVg
-	WkCQ7EoyzioC6JmC4tBvXtdXQrAX3AErowWI6dxHFgbloNUQasGmxe8rP24PyO9Y
-	xDmbQGa3UZk75L2eO+XIMK6wO05gRrehNJ5myl1tu2/FRslzUVMMAuIU0dUfGpVE
-	k03mDxISj5a3UcVD4s09PFbeJHC7tuwYGdDf9w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779196329; x=
-	1779282729; bh=C8UJjN9YIM4dF2un1h9N5JgiFsD8ZA8fTKRS/ARFXxg=; b=e
-	ASMPlwtVYqD1Bo4cAxpkgWqkRWx1h+KetkpLKiv63C+37SS9v3pyK/Sa6N1H/uls
-	SbwlZ4+OldI62w9pJo9a34cdrkFRZlz+3/U00ijdqRkaYFLEvbTn7TwxCq5FWzdL
-	bgRqk2RfBYpHiaVN2bO6umfx4h8PdgE2O8vzWJ9SKRLaY/4aZKYsOcWevrUz+3Ip
-	4dddwHILBq/dMkGTW/mBboToMO1kKE5dzM+79gVNa4O9XFS6RcFe6LD4vC4fz03l
-	0oaYA8DtcjCzAfXszCzo/Gnw/AkpewgvmauyEXIwGlcp9+JYab/dnZqqrFSfw+zo
-	QlcXeICZUnEtJxvGWqpxg==
-X-ME-Sender: <xms:qGEMasiXOypnAIoZQR8E-A8T2MLFtixq4MTayVJ_Xz_POyffNcCP5A>
-    <xme:qGEMankw0RSfz5V5crIXinF6kdYv1tm0GoF_BKFdld8vcthX-1zBcweoomg9Vlcp2
-    VKrNCWBLx5RSEMyAStVXZUZb7EUqT5hRweYbsf3-kxMeBfU8crKW1g>
-X-ME-Received: <xmr:qGEMansuSPNE8i45uNvnED8x8_tIfo8uBM2EuNH0Qe_0xkaCctjD3kfWVd_aEiNtM2gwUvH6LQrLUWkdDeLA_4M>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugedukeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
-    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
-    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
-    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepledpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
-    homhdprhgtphhtthhopeifihhllhgvmhgssehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhuhiirg
-    hifhgrshesrhgvughhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhl
-    ohhfthdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopegrshhmlhdrshhilhgvnhgtvgesghhmrghilh
-    drtghomh
-X-ME-Proxy: <xmx:qGEMatYBbwAytSisAgp2abJWc8eFI7Ujx6v7Fw_4Lcq8IPWxdifvDw>
-    <xmx:qGEMavA7srHCutKKKRTzOi55mof4aPj5y63k0vq45xgKRPAuiGyTtg>
-    <xmx:qGEMal_bnj3ByBWaHNoIO_uSz7alj0aCYZUWbrahO_R-9zvqITOkow>
-    <xmx:qGEMarS9VVxvzsN4Omqu3I7NtpelKy6AkvBPutPTZBO0Wb8J-js9DQ>
-    <xmx:qWEMamLk582IMjCjruyAuKGQrNuCwxc6ALJFxQ29_DaXvVkkiFms7LBd>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 19 May 2026 09:12:08 -0400 (EDT)
-Date: Tue, 19 May 2026 15:12:06 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
-	Huzaifa Sidhpurwala <huzaifas@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pavel Begunkov <asml.silence@gmail.com>
-Subject: Re: [PATCH net] net: gro: don't copy frags between mixed zcopy skbs
-Message-ID: <agxhpnI84II_Utjk@krikkit>
-References: <4d583fc5401298453d0a2f1b4719a15be30c8e49.1779194090.git.sd@queasysnail.net>
- <CANn89i+w93DBm_yo5DZ6K_dgV4Gst=vb5OnTcXi2rKqeNHZSbQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5E526299
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 13:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779196414; cv=pass; b=QmT1/c4MEB8kmZYgOhr/M76emP+ZRyEM5EYMrdbq7U9Oed17R/+o0qeIY2nhonxgMHYVCPx35y/7EP0Ho2Ro41TEu7fVqqPSwmh+aN+brOg/Q6VG4A2G4SmkRk49oVj6KLvjT2/WOMLw8L9gCPHlBG34AbPcrVBu5dQwFPd8osA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779196414; c=relaxed/simple;
+	bh=Uq8Uv76VoSqgu2Xxy7jY5UaQBqn/xykEQFsH3kw+DnM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Pl2ZDi2Vp9u6WAOnArXxDykZrH+3X5XJCz1ev0TpFfiRQJr62dm7ip1XzxN3B4cqBIb6mxkptpRYpIUnmzfJsC3kTeDwpvK9sytBEEIf24yvQ2Nf1IAq8jpDT6gTn6la851on0O+mkcrL0HVghFzNi95mRTx4nYsfWC9/xUN9EA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sImQ2+3L; arc=pass smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-4824176bbbeso1093791b6e.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:13:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779196412; cv=none;
+        d=google.com; s=arc-20240605;
+        b=O+8kf3UDzf5wn1FfphHk6TfK6rLXVWy3+QjOi4h7wN6PjVAc+VUJln9pjtjq30yHcG
+         TI6ekUrXkFesPkXEgls/o5k3ZPhUSqMyecaqGwthwRepxxhkiBBNqHJM6dkdMfZqwquY
+         NgoLGLdyckX3t9aYoGY4NP7pBkD1gqj5nr2PgGJBjwnAD2sUOdFKLkAAbqqQa1Xggr+W
+         XddWo/Bqx2KfhV8t+B2VMQf62dgl+VJLbm46j3pYagjXdXR7QTYyzHmjtqWQ/56pC9on
+         WalKxCrK1AeRmiBSQfmJ0vW5F9IhI94kObGq+d1ugC5iqwffMHkpYVCoAcaxFd5w3rrs
+         FAQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=Uq8Uv76VoSqgu2Xxy7jY5UaQBqn/xykEQFsH3kw+DnM=;
+        fh=+xku+NwDVD9G+O5tNrwkR++oEpvVqdeDnU9pkd2HbEs=;
+        b=TXpczRHSPmBDWSLPAd+OtOFc0gJ33RyT0SZg5j05d5aGkOsmVlIJy+avwkk6yK8oKW
+         MmHVn4schnVrQqZsz5Zoqq4Pa0fjI1vHHL5Ab8TLMgz9yFO5ZNsQfNyfoTbm9VBKbrXB
+         7gBO72XSRaQturcVxy/PC5+hbWm0Z901sNr3j6F36Pw/baSgxqQUSXhZpb8ifL45mPkE
+         yGdflYuiCgtcQof5DWn/zYDWiqHMJyTIKIVMFoANr3MtRoDf6sQOKIsUYGUarpHUzjTO
+         vmM2EeBw+nA1mSLxUylgRTmq1WYHLhzjlZ+nxyq2LDshvU5XW+qLaMBFcXHB6X7BWNpg
+         7rNg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779196412; x=1779801212; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Uq8Uv76VoSqgu2Xxy7jY5UaQBqn/xykEQFsH3kw+DnM=;
+        b=sImQ2+3LBj4tN1tLtKeZtlLXXtH+gIo1drsLy3GRBRyqeKCK4VYKElxx/7fqMdTJ51
+         zxIUzHjWqDb7Ot3X07lNj2Ve3Afz5WzJLn+Cyh8Fw0N7UFJZHEI78xx+rCwydrpDNck2
+         UOFTkeTqyn4z/UPJd5m0Ho+WZlfEHQhpl+qKW4j6XjY3y31heZmg9C4op2Oe73rxeKkS
+         3WsPOOiCY28KVTDOU+tHQ8W/DU3bJlQPIE6D7CuCX9ijIjB8Ra4t1hodY4y8oaRbTybn
+         q9y5yAaW5s3XySmwNDBd1hWzMzrKsVEeSnhenI8QNuDSFS2rLHV74hU86kWN0+roZpth
+         9kBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779196412; x=1779801212;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uq8Uv76VoSqgu2Xxy7jY5UaQBqn/xykEQFsH3kw+DnM=;
+        b=YxGyaFBqRNGtWCQ8gFJIgLldFtULKR9cFdt6EHWi4kXdZ1oDUGMSS1/qO03yP35Wwy
+         /1VLLY+weXrGztRuTBrHcJwlSur5LZFxns0tGObZ/qjWS1/sz56wn4EbsuyIR6OCjHh5
+         hQovDSxZsG67PNUhwWmvaNS5djZVkP9YG6hhLfV8ADLXwYlu3cASlTPPbEc0g1nx5CfI
+         Te8aG4jB8xwN95yxOu94708n3HwUF3YgxnKzsdAffYwyurwOHo3OrY0TFEwXweiL9zgX
+         FD8BjWnvvXahT/IgA4rCPxv3dyFuS4xwSl7FzvNhtcIZJ2uKjA3Q9PYXUM6Xp+xUMlZO
+         CKWg==
+X-Gm-Message-State: AOJu0Yxezds3oXMZd0r2G/FdbEcqc1oqqGdWlRpSTloJcKKMu+cZY4/d
+	x2o1B69vokwjgkE13IC3fXlLJ9O8HQctTFRhJEFd8flSfODi6ljh1zqMrDZm0iv3nVopszUlb+y
+	epBgSWM1TOw2T9aBZOjugERTvCvGeO8+YJvwle9g=
+X-Gm-Gg: Acq92OG9bO2KWwB+3m1LqUL7VNFIiJoPjIQkGnkhTMTY7QF+3F28qVl4v54cSlozNTg
+	3CUlCnm8bzUMAia2j0gclOcOVv9oVa1FueZU7HGa3f+zzy9H4lfLRXmHEW6jrJXO4d40QwmSikH
+	l0kGTxsxZ+YnekwCH2m2E6LwHMFerYBcPouHU6xPDWb9c2S+I17+YULe6tImv8pDJOcYAz2vjYH
+	ptdKy+O/fTDTvoru17IIGPoMwIUL4/SjxUY3I5vAHfNE5tnq9Sax9Ir+P5KAg1xtPMRsINBn/aA
+	DDbX4g==
+X-Received: by 2002:a05:6808:124e:b0:479:ac7d:6da8 with SMTP id
+ 5614622812f47-482e56310e9mr11580479b6e.18.1779196412539; Tue, 19 May 2026
+ 06:13:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+w93DBm_yo5DZ6K_dgV4Gst=vb5OnTcXi2rKqeNHZSbQ@mail.gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+From: Federico Brasili <federico.brasili@gmail.com>
+Date: Tue, 19 May 2026 15:13:22 +0200
+X-Gm-Features: AVHnY4K2s5mNKsvcTMCldiaF7FozFvwcgzBTCP_F_3U_m1StpUhvC6KUAc_DFjo
+Message-ID: <CAAEr8jbV+e5SM_GZqqbiV0zwoA5EH=eH_L+8Lg0w5RPmBPeekA@mail.gmail.com>
+Subject: [net] AF_PACKET PACKET_VNET_HDR CHECKSUM_PARTIAL packets bypass ct
+ invalid classification
+To: netdev@vger.kernel.org
+Cc: netfilter-devel@vger.kernel.org, 
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
+	"edumazet@google.com" <edumazet@google.com>, kuba@kernel.org, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "fw@strlen.de" <fw@strlen.de>, 
+	"pablo@netfilter.org" <pablo@netfilter.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289459-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289460-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,redhat.com,davemloft.net,kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,strlen.de,netfilter.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[federicobrasili@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,messagingengine.com:dkim,queasysnail.net:email,queasysnail.net:dkim]
-X-Rspamd-Queue-Id: 3E27F57F616
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: B4E1A57F66F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-05-19, 05:57:22 -0700, Eric Dumazet wrote:
-> On Tue, May 19, 2026 at 5:40 AM Sabrina Dubroca <sd@queasysnail.net> wrote:
-> >
-> > skb_gro_receive() can currently copy frags between the source and GRO
-> > skb, without checking the zerocopy status, and in particular the
-> > SKBFL_MANAGED_FRAG_REFS flag.
-> >
-> > When SKBFL_MANAGED_FRAG_REFS is set, the skb doesn't hold a reference
-> > on the pages in shinfo->frags. Appending those frags to another skb's
-> > frags without fixing up the page refcount can lead to UAF.
-> >
-> > When either the last skb in the GRO chain (the one we would append
-> > frags to) or the source skb is zerocopy, skip the frags copy, and just
-> > append the new skb to the frag_list.
-> >
-> > This is probably a bit less efficient than calling
-> > skb_zcopy_downgrade_managed(), but then we'd also have to handle the
-> > rest of the zerocopy flags/machinery. This can be improved in
-> > net-next.
-> >
-> > Fixes: 753f1ca4e1e5 ("net: introduce managed frags infrastructure")
-> > Reported-by: Huzaifa Sidhpurwala <huzaifas@redhat.com>
-> > Assisted-by: Claude:claude-mythos-preview
-> > Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> > ---
-> >  net/core/gro.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > Huzaifa has found this to be exploitable to overwrite the page cache
-> >
-> > diff --git a/net/core/gro.c b/net/core/gro.c
-> > index 31d21de5b15a..cae0a0dbfa69 100644
-> > --- a/net/core/gro.c
-> > +++ b/net/core/gro.c
-> > @@ -123,6 +123,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
-> >         lp = NAPI_GRO_CB(p)->last;
-> >         pinfo = skb_shinfo(lp);
-> >
-> > +       if (skb_zcopy(skb) || skb_zcopy(lp))
-> > +               goto merge;
-> > +
-> >         if (headlen <= offset) {
-> >                 skb_frag_t *frag;
-> >                 skb_frag_t *frag2;
-> 
-> Do we really want to merge these skbs in the first place?
-> 
-> What about play safe?
+Hello,
 
-Seems reasonable to me. I'll wait another 23.5 hours to submit v2.
-(and I'll let you pick some commit tags if you want)
+I would like to ask for feedback on a possible checksum/conntrack
+inconsistency in the AF_PACKET PACKET_VNET_HDR transmit path.
 
--- 
-Sabrina
+A locally injected IPv4/UDP packet with an invalid raw UDP checksum is
+classified as ct state invalid when sent as a normal AF_PACKET raw
+frame. However, an otherwise equivalent packet sent through AF_PACKET
+with PACKET_VNET_HDR and VIRTIO_NET_HDR_F_NEEDS_CSUM is not classified
+as invalid and is delivered to a UDP socket, even though packet
+sockets still observe the UDP checksum field unchanged and report
+CSUMNOTREADY.
+
+Minimal behavior observed:
+
+RAW_BAD
+
+AF_PACKET raw frame
+UDP checksum field: 0x1111
+
+nft:
+ct state invalid counter packets 1 drop
+udp dport 12345 counter packets 0 accept
+
+UDP socket:
+no packet received
+
+VNET_BAD
+
+AF_PACKET + PACKET_VNET_HDR
+VIRTIO_NET_HDR_F_NEEDS_CSUM
+csum_start = 34
+csum_offset = 6
+UDP checksum field: 0x1111
+
+packet socket:
+PACKET_AUXDATA reports CSUMNOTREADY
+UDP header still contains checksum 0x1111
+
+nft:
+ct state invalid counter packets 0 drop
+udp dport 12345 counter packets 1 accept
+
+UDP socket:
+packet received
+
+A trace of the VNET case shows the packet being converted to
+CHECKSUM_PARTIAL and reaching conntrack/UDP in that state:
+
+skb_partial_csum_set(... arg_start=34 arg_off=6) = 1
+XMIT ip_summed=3 csum_start=36 csum_offset=6
+NF_CT_UDP ip_summed=3 csum_start=36 csum_offset=6
+UDP_RCV ip_summed=3 csum_start=36 csum_offset=6
+UDP_QUEUE ip_summed=3 csum_start=36 csum_offset=6
+
+The relevant path appears to be:
+
+net/packet/af_packet.c
+packet_snd()
+tpacket_snd()
+__packet_snd_vnet_parse()
+virtio_net_hdr_to_skb()
+
+include/linux/virtio_net.h
+__virtio_net_hdr_to_skb()
+skb_partial_csum_set()
+
+The same behavior was also reproduced through PACKET_TX_RING + PACKET_VNET_HDR.
+
+An explicit nftables rule such as udp dport 12345 drop still works
+correctly, so this is not a general firewall bypass. The observed
+difference is specifically around checksum-invalid classification: raw
+invalid packets are treated as ct state invalid, while
+PACKET_VNET_HDR/NEEDS_CSUM packets with the same invalid raw checksum
+are not.
+
+My question is whether this is considered intended behavior for
+locally injected CHECKSUM_PARTIAL skbs, or whether AF_PACKET should
+reject or normalize this case before the packet reaches conntrack/UDP.
+
+I can provide the minimal reproducer and full logs privately if useful.
+
+Tested on:
+
+Linux 6.19.14+kali-amd64 x86_64
+
+Thanks,
+Federico
 
