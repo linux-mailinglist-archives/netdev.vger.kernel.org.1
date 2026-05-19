@@ -1,258 +1,225 @@
-Return-Path: <netdev+bounces-289357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289370-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLGsEH8vDGo4ZAUAu9opvQ
-	(envelope-from <netdev+bounces-289357-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:38:07 +0200
+	id CLF8AaU2DGqOaAUAu9opvQ
+	(envelope-from <netdev+bounces-289370-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:08:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A705257B6C4
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 11:38:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0725157BE59
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6A41530475C1
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:31:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3693E3088A6B
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 09:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61E53DB65A;
-	Tue, 19 May 2026 09:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A633643C07D;
+	Tue, 19 May 2026 09:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h8tKaBij"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjXN07us"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012036.outbound.protection.outlook.com [40.93.195.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556583FB7F1
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 09:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779183094; cv=fail; b=oEMMloE54arPy1Ehbwoi92x2DgpEK0rFtObFxfPTDCDa0v8gN/gtuwqbLqr4s7cKh7QiRAoMcwBUK+70rxKrXEvirzIDei4gARB4LsKrIrQF9FjIpun6SlZsIjf4QmorbDCOTpHOUAFUwsM1a4viDT194dacSmE4p7HwXjrLGhs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779183094; c=relaxed/simple;
-	bh=IXJ2JEcOMmMMkvrGt3GSV3KEyinXWyHVnD0ceYN2Iqc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Zb2tMyxxVE1YLQQ2Rj848VyiRHh+5UsJUc/NTg8e2z29p5NBtssOi4V+fp9N3LeBbE6DFl7Nvr0OnwPF5mxBB/eJWqp24CeIdQGwdlsIa28xhvVZIK39MSOcAXfxUO+Kw+EOpphr9V506DlTbqCKX/miJJVTki4mV7cVqlfWz8Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=h8tKaBij; arc=fail smtp.client-ip=40.93.195.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=b1FtpTwwuvABI0UVli7WW5yyYbl/lsEK9c1ZP5/QFygr3i1MQE1jeArV5/Ga0VmQY7qGPK/0PN7bKhqIpYFeCloUj8rDNbLlobyFAq7IfbPnZmCsExUzyqUFWGhgI9biLtwtF9GGr+Fw/ZPC8/oqxRnp4PdXaidagYCSr9YlHJgzJGXW17dXiJFWo+aEpG8QgvbDaouh/I/Wyb8KJlgpAuQJUMkrze2pCWoXvHlVWAkbD0HJBGNxA1Vqgm/UW6oco9hy5s5px/6ifO01dFxnsIsq94Q27UV1PNDRzFnE3aVIIIS4yXDa5popRhW4S8TQ5LuiDwxYtAMOGlvgMeqSuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sKGe+53oNZaMSQbG94PxdGthgfVRMAQXARWlfN/X5E4=;
- b=LBeBn1fGW6/2s2tR2Np+2HBtBB9Isi61A+q/eeVjnv5zmVeFWf+cvLdX1opMHnGxp8/vA5SNUeNvu39ca/hUGdw3GYIorMnaqQYkexNyhvnTA/ZCtXC5/wY4KEs7emsyIX5FkQCM/rPwfJTWPlG+fyrkxiRDrUGl/60VCE38sgZKCyR28gJMny4PbNKo8yq6rF+xcbgGqCpFN10nSxaEkOenOK24tEYznC50EAgL3cRr7hgFryc4oCjkfn6DUiDNaURU3ftqhMBcrl3r62SLgkgnovRlCDiw3n98uaz6VzFuy20goQt/EvxgM/lofSqpD5NQWWYYXe0tZ+gN3QYKbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sKGe+53oNZaMSQbG94PxdGthgfVRMAQXARWlfN/X5E4=;
- b=h8tKaBij+Ee8ZQlaDVnuhUBrCAwWZKM3rqE06VfBEXBsKIHYebXikhvsPcoKs5BVJb9CIYAa/EbylT6nsAe71NJBYIxGM1TfvNlp2fT93zZaWTRMC1uztEv2qPCZrNY1Yb4fO1YvjoMcG0N8KRy7X3l3WZVEjz35+7MkRJo3Ml7Z3CxjbZz2gw1949LXoVcH9yOLZxh/KXrc3TUVp+XpOE3filQ+MemAFV5zs6qa0vUX5IzdnV+SOTfLnx+qly5QnmYvz68neq/fRdk78pKxoZRDrHPm2yMbHyGEEeTUhxgQjL6TMxIjnu/IthjGl2mcNxM50DHLxZF0taAPvqtv4Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by SJ2PR12MB8977.namprd12.prod.outlook.com (2603:10b6:a03:539::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Tue, 19 May
- 2026 09:31:28 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0025.023; Tue, 19 May 2026
- 09:31:28 +0000
-Date: Tue, 19 May 2026 12:31:18 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: netdev@vger.kernel.org, bridge@lists.linux-foundation.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, razor@blackwall.org, horms@kernel.org,
-	dsahern@kernel.org, yongwang@nvidia.com, aroulin@nvidia.com,
-	petrm@nvidia.com, tglx@kernel.org
-Subject: Re: [PATCH net 1/2] bridge: mcast: Fix a possible use-after-free
- when removing a bridge port
-Message-ID: <20260519093118.GA395034@shredder>
-References: <20260517121122.188333-1-idosch@nvidia.com>
- <20260517121122.188333-2-idosch@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260517121122.188333-2-idosch@nvidia.com>
-X-ClientProxiedBy: FR4P281CA0301.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f6::13) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827883F0AB3;
+	Tue, 19 May 2026 09:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779184029; cv=none; b=XNgOn2+TRnC5pL5o3R1MqwDjxxg10awdMHRdWqgjS3UQlSSuQ5Y8h3UicxMgXee05HjtLDCBhBUJWBA3tXh1mewB/Ttjlme5Dbm/rD6iaaAtFuQga6/FSOBnRZZjD37JKKAfhrLUjW/vxCSrWaUZrJQgRE8u2flwoWVCG8ejbSE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779184029; c=relaxed/simple;
+	bh=OH/yfiCu0Mp3b66K0reocEsxvYcepzYQzij9x5dEOxk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=JvKGX4nM6HKFtUD+gmuhHJqZYJJ0c76C33xi1oVEdwL8PYFo+VehyZ2X08G3XpyYqP4FJ47FqppXDvRCgnTuvgP+nWTqPIlQozde4/57yoahQb9QcV00okJ/XCehsAk4QHgCPi7EHvTjIkWbae29rrkeSnB3wDezqLdBlBzf5m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjXN07us; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1ACBDC2BCB3;
+	Tue, 19 May 2026 09:47:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779184029;
+	bh=OH/yfiCu0Mp3b66K0reocEsxvYcepzYQzij9x5dEOxk=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=SjXN07usVOFyeVoXxp8t0WX9DMiBCBYdY4olW/q5/kw7SB0rwIn/dNuOEbs82JQ7S
+	 uYQjQEt4d94I3CuKzfoEmKLwmVDh2jwstzG5Di4e/QcDmWzbmEM10wWxKnOXdClDGF
+	 FUrLQVI5qkIYIFJ8R7z2hvdZcvlXYfx7meNkOZcbqVEj8cVkgHf8dktSiRPTmGiEZH
+	 YMiDuZadgB1TZJXR/7X1YGpoWsdfFvFxyMSJoIxeeTZvxY413tX8HAVsw2EVgPYNPh
+	 h8OKXNo70DO34FJjlS7LeuRHGlFkCX3zBs2bCjcLWZwdqWIyyAXxHrkbKB8jL8eIDl
+	 LTbNSC+jkVlNA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09478CD4F57;
+	Tue, 19 May 2026 09:47:09 +0000 (UTC)
+From: Carl Lee via B4 Relay <devnull+carl.lee.amd.com@kernel.org>
+Date: Tue, 19 May 2026 17:32:53 +0800
+Subject: [PATCH v5] nfc: nxp-nci: i2c: use rising-edge IRQ on ACPI systems
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SJ2PR12MB8977:EE_
-X-MS-Office365-Filtering-Correlation-Id: 217dff1e-82a6-4927-fca3-08deb5896770
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|366016|7416014|22082099003|56012099003|11063799006|18002099003|4143699003;
-X-Microsoft-Antispam-Message-Info:
-	KOCkY5rIsC2p9uvDayPwZB2/TfH+NpjrSuVEIoc3X/GeV+2zr46cZSLMu6FF7YCGgn3f0gN5tk2FXUFNwchLmw8d+f+AKBBHFbxhH5CMdJU81/pmY/vivOFhug9VpJx4p1PiAG6AvjcNiQEEHd0tLTSKGqyENHBiTkA8Tu7OPhbRr9nLCCaq85+RQswud5iFvsa/8aaYnsjAg7Z9lNXx/PnLCrlLvAevlltL2Ha9qtS5NAGxH7b4zVlvBDntpM8nPfUidu93ST30ZiClTI7XoDtZsjDQAPMt8RSvhPiaBKpfVwwQWMVOb3Y+OhAzGffA4bir+NrfAkULpvTd0rOCadiw5FTa33C1sjCcCqs6s4b2VvY5oP6u1+runCwaJwa8LCCNh79sSXLYuWYI/ixrI9C9eC2KRPhh6CGjUWSMKwSPpTV1C6IXcZKu9i+uzuF24nmpEZS2jJw0w0gU2ZtGYmgRSt/ZBYiGU8ocYDSq0SgB+cZJKJqGVhv3aISPGJhWCZMJ9SsZ43eCYS6m3ww2hYHGFtvKKuudZE9Dojb1cA10LnbCjGsKD0HV8CMATkX8guKExxInHEEZnnkxy2tTmpuaGUa9yBWaRgfRB8FOHIi6g9sPoKHYJvHfYAh9kOVnrNdinPOwgECqMadCK+qbOnE01ca5otnwqrWVRH3+F8JZunK/s9kVI8liS5+oFMZm
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(22082099003)(56012099003)(11063799006)(18002099003)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?IEcDcsHtgiDgLAzgqoR6Hn3lf5Hu7bCWrR7h37k3RY6OlgrilF5A18Unc+4i?=
- =?us-ascii?Q?hkYZWFFIz/Jx3d8ek3GETYDdrkdkVYJpkQpcarGmO6j2vTPbEoOiejlTIBpT?=
- =?us-ascii?Q?cD7Jwkownw+HLU/NwLV1xhmsSQi56titZhqD21ZaDkZMsuJVxtbYzBh3o7hV?=
- =?us-ascii?Q?faw4niiujU7YILJIW8LT8v9mel5CwydO0Ueq08RCnFDCnai6BAMek8WNmtdY?=
- =?us-ascii?Q?1Mc4UwCz2aJAgy3GE9Ix56qug9yMAyBuT+K+iBoi33Ovyt2hCmDziEsC+dbb?=
- =?us-ascii?Q?TjNqH/et1hQGwKUAbC9qNAtiQTRYwUeL0ihVSJ+LSPtPeXYlmr+uSkvUNHTs?=
- =?us-ascii?Q?BZsSFMVO5LL8WNZumGCuM/O9onOzFPk9Num4Ga+4/LOawoni6tOqQwT7H1Ei?=
- =?us-ascii?Q?42rIvJtD7d/V3Vl/NLhkKbA16z4HEv/NhLSbLIfTJZUR5YGDWOxnOAFwQLEc?=
- =?us-ascii?Q?lzNsg4B8SiK1yAiM7gHX3NKjFaIsj7ypuEgxP2yypPxJEBER5PYgyJB3CTvY?=
- =?us-ascii?Q?RW4/qmn5+/nMh45FOLrs16I3zllHb/YaX9LiVcEkJ7YZ7NUHvmAcObPyrx49?=
- =?us-ascii?Q?rV4EiVTf7Djup3Fhnz8+0QH4yeLQvmSmPP481Kkj2uPR6KlPR5+DGGSUr71n?=
- =?us-ascii?Q?+M6M9DYZ4OmuuiMnhZPTqozPKbOJ5eEfcBXc+O+05okd1DnHn1kgMHjwy3Cf?=
- =?us-ascii?Q?DuJW257xJFBFjtCZ2cao9MFxWjNEkLEh9au/8W/Ma2mLUZSROQys7znw2gp9?=
- =?us-ascii?Q?BJ35KAUvZrqGb3F02LXPFGXGfspIaBZc9gXGr9tcyDWZ/PnzQeM2r+CvtOJf?=
- =?us-ascii?Q?uLKnlRt0vXbXnv/WnztbOTJ2UUun5Uw/z195MVo6u9PTk31RZj5Tc7fvrV52?=
- =?us-ascii?Q?Ahn2PZ8TyguujGpM/N1TiMayeaEh//yrmNQKIoK9i/b1aiOEmZYzIDPE59f3?=
- =?us-ascii?Q?/tnvOkIMbVYyVkwAmV5jTb3bcYylf8iVoFbMKhlflT5xK96OBw5BfnJL5nzr?=
- =?us-ascii?Q?W865fRWGTpYQpO2vV0qjV/Delre8csettabb+BbRO7JknE82HMx4BPDMcljk?=
- =?us-ascii?Q?iZg0LeUrUEKe6afpxGF06srg1p7gs/pUxsDof5C/FgqzTu9e18lKuXrnMjfC?=
- =?us-ascii?Q?p5f8Q26bTJbQHP7LELBbe7wBlmzdHG5E0RRMIXrdxdt0llDg4wcXQEALu2X3?=
- =?us-ascii?Q?cze0DrKuUOL3ywnRy2U99ez27VL9G2SFUDmdKTBlteuV2St8Np/VHfO/tHYn?=
- =?us-ascii?Q?JLg6K5STFPkvgyP5VWYcdSDcDPeBchWAahKkxxlOsuwz3nnqz3VuV+NNuCpM?=
- =?us-ascii?Q?Jlvy2xx4PKh+EHE/ou2EfRNofmeRNjEwd3LY8k83n0jDy8+Qsh0kaq1Npcry?=
- =?us-ascii?Q?WgVnGDfVqH4WywsSyXicKr5fKqdF/hpUCQFe0L25IvNBimlvWjxY+9CyttFj?=
- =?us-ascii?Q?1+D3Bf5WTs7gxXDccyudmG/nOcL67lnQNNqkwXIVKzPnEqXD3v8jFY0KkJuD?=
- =?us-ascii?Q?wZY5S4NLKKu7yHTl+MvNjrNlPL0KER6SbeEDI7FhnmCISG6t15SiLaienhMp?=
- =?us-ascii?Q?xiIkc4noRWivOFntFEKaTVeMtjbqHTeVEaeDWfU1Yxt9BV6km6HBjB/k2vPN?=
- =?us-ascii?Q?9vQ8lxltVcmsHx8/N9mLTwKCQCBoUXlQSfYtAZOVzGHC6VxQ3de1YGrAo5Qq?=
- =?us-ascii?Q?s12Cn40de4gTOrDO7cKY2peD3C9W8B1o6EJybR88ky4Bh2b+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 217dff1e-82a6-4927-fca3-08deb5896770
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 09:31:28.5569
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8VF5dS4ThA18Cg+CsWA12WvawIwtyrdUWcxvcvDhqALmX7zYL6t98kJSnOv4Pa71rpWh+o8wqlGdYiH1t2+p6Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8977
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260519-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v5-1-1a826cfbc128@amd.com>
+X-B4-Tracking: v=1; b=H4sIAEQuDGoC/53NQW7DIBCF4atErDsVAxjjrnqPqgsMgzNqglMcW
+ aki3704mzpLd/kQ8/13MVFhmsTb4S4KzTzxmOtoXg4iHH0eCDjWLZRUVmpEyClAvl0gBwZWAQp
+ N17HUb+UbroWHgQokfzr1PnxBiL4zqtEyWCkqeSmU+PbIfXzWfeT1+OdRn3F9/WdoRkDoSMkWj
+ UGM7bs/x9cwnsWamdWWVjtpVWltlTYutclr+UzrP7pBu5PWK9323vSWOunsM222dLeTNpV2jZP
+ RETqJG3pZll9X+str9wEAAA==
+X-Change-ID: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, krzk@kernel.org, carl.lee@amd.com, 
+ peter.shen@amd.com, colin.huang2@amd.com, kuba@kernel.org, david@ixit.cz, 
+ luca.stefani.ge1@gmail.com, brgl@kernel.org, mpearson@squebb.ca
+Cc: Mark Pearson <mpearson-lenovo@squebb.ca>, 
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779183174; l=3788;
+ i=carl.lee@amd.com; s=20260203; h=from:subject:message-id;
+ bh=AuJE8naMhN8VuJ0Xkt3hE9rAU8BuKShRUpf+0Ld/H78=;
+ b=+nkcf9jeJ6vKQ5w1r1mJahWWd1a9UhYHs8pHNRr6OI7EWQ0ABp+xQ5psnJJzSPb06KK5Gdaqc
+ m0/zySMbxyMA8Bphn4KY3AcN9/huCEfkvZaBPiR8o0HFZjkI0SHiQGS
+X-Developer-Key: i=carl.lee@amd.com; a=ed25519;
+ pk=pyq7QaQvoxMg806KVkRwpCbiah+7ncWr4MBpK1AEyjA=
+X-Endpoint-Received: by B4 Relay for carl.lee@amd.com/20260203 with
+ auth_id=623
+X-Original-From: Carl Lee <carl.lee@amd.com>
+Reply-To: carl.lee@amd.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289357-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289370-lists,netdev=lfdr.de,carl.lee.amd.com];
+	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,amd.com,ixit.cz,gmail.com,squebb.ca];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	HAS_REPLYTO(0.00)[carl.lee@amd.com];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,Nvidia.com:dkim]
-X-Rspamd-Queue-Id: A705257B6C4
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,amd.com:replyto,amd.com:mid,amd.com:email]
+X-Rspamd-Queue-Id: 0725157BE59
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-tl;dr - I believe that the issues that Sashiko flagged are false
-positives.
+From: Carl Lee <carl.lee@amd.com>
 
-On Sun, May 17, 2026 at 03:11:21PM +0300, Ido Schimmel wrote:
-> diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-> index 881d866d687a..2eef4f3345cd 100644
-> --- a/net/bridge/br_multicast.c
-> +++ b/net/bridge/br_multicast.c
-> @@ -4640,10 +4640,24 @@ static void br_multicast_start_querier(struct net_bridge_mcast *brmctx,
->  	rcu_read_unlock();
->  }
->  
-> -static void br_multicast_del_grps(struct net_bridge *br)
-> +static void br_multicast_enable_all_ports(struct net_bridge *br)
->  {
->  	struct net_bridge_port *port;
->  
-> +	if (br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED))
-> +		return;
+Some ACPI-based platforms report incorrect IRQ trigger types (e.g.
+IRQF_TRIGGER_HIGH), which can lead to interrupt storms.
 
-Sashiko says:
+Use the historically working rising-edge trigger on ACPI systems to
+avoid this regression.
 
-"
-If global multicast snooping is toggled back on, this early return skips
-iterating over the ports. 
+Device Tree-based systems continue to use the firmware-provided
+trigger type.
 
-Does this fail to restart the per-VLAN per-port querier timers
-(such as ip4_own_query.timer) by omitting the call to
-__br_multicast_enable_port_ctx(&vlan->port_mcast_ctx)? 
+Fixes: 57be33f85e36 ("nfc: nxp-nci: remove interrupt trigger type")
+Cc: stable@vger.kernel.org
 
-Could this permanently break VLAN multicast snooping on all ports after
-a global toggle?
-"
+Tested-by: Luca Stefani <luca.stefani.ge1@gmail.com>
+Tested-by: Mark Pearson <mpearson-lenovo@squebb.ca>
+Tested-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Reviewed-by: Mark Pearson <mpearson-lenovo@squebb.ca>
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Signed-off-by: Carl Lee <carl.lee@amd.com>
+---
+Some ACPI-based platforms report incorrect IRQ trigger types,
+which can lead to interrupt storms.
 
-Even before this change we didn't touch the per-{port, VLAN} context
-when toggling global multicast snooping. I don't think it makes sense to
-only toggle "mcast_snooping" when "mcast_vlan_snooping" is enabled.
+Use rising-edge IRQ on ACPI systems to avoid this regression,
+while keeping firmware-provided trigger types on non-ACPI systems.
+---
+Changes in v5:
+- Add missing Reviewed-by and Tested-by tags
+- No functional changes
+- Link to v4: https://lore.kernel.org/r/20260519-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v4-1-8580d8e18016@amd.com
 
-> +
-> +	list_for_each_entry(port, &br->port_list, list)
-> +		__br_multicast_enable_port_ctx(&port->multicast_ctx);
-> +}
-> +
-> +static void br_multicast_disable_all_ports(struct net_bridge *br)
-> +{
-> +	struct net_bridge_port *port;
-> +
-> +	if (br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED))
-> +		return;
+Changes in v4:
+- Add Fixes tag
+- Add Cc: stable@vger.kernel.org
+- Link to v3: https://lore.kernel.org/r/20260516-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v3-1-37ba4b6e9086@amd.com
 
-Sashiko says:
+Changes in v3:
+- Use rising-edge IRQ on ACPI systems to avoid interrupt storms
+- Keep using firmware-provided trigger type on non-ACPI systems
+- Refine commit message to focus on regression on ACPI platforms
+- Link to v2: https://lore.kernel.org/r/20260312-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v2-1-362348f7fa30@amd.com
 
-"
-When global multicast snooping is turned off, this early return prevents
-__br_multicast_disable_port_ctx() from being called on the ports.
+Changes in v2:
+- Add missing <linux/irq.h> include for irq_get_trigger_type().
+- Link to v1: https://lore.kernel.org/r/20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v1-1-9e20714411d7@amd.com
+---
+ drivers/nfc/nxp-nci/i2c.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-Prior to this patch, br_multicast_del_grps() was called unconditionally.
+diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
+index 6a5ce8ff91f0..266dc231c47d 100644
+--- a/drivers/nfc/nxp-nci/i2c.c
++++ b/drivers/nfc/nxp-nci/i2c.c
+@@ -16,6 +16,7 @@
+ #include <linux/delay.h>
+ #include <linux/i2c.h>
+ #include <linux/interrupt.h>
++#include <linux/irq.h>
+ #include <linux/module.h>
+ #include <linux/nfc.h>
+ #include <linux/gpio/consumer.h>
+@@ -267,6 +268,7 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
+ {
+ 	struct device *dev = &client->dev;
+ 	struct nxp_nci_i2c_phy *phy;
++	unsigned long irqflags;
+ 	int r;
+ 
+ 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+@@ -303,9 +305,26 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
+ 	if (r < 0)
+ 		return r;
+ 
++	/*
++	 * ACPI platforms may report incorrect IRQ trigger types
++	 * (e.g. level-high), which can lead to interrupt storms.
++	 *
++	 * Use the historically stable rising-edge trigger for ACPI devices.
++	 *
++	 * On non-ACPI systems (e.g. Device Tree), prefer the firmware-
++	 * provided trigger type, falling back to rising-edge if not set.
++	 */
++	if (ACPI_COMPANION(dev)) {
++		irqflags = IRQF_TRIGGER_RISING;
++	} else {
++		irqflags = irq_get_trigger_type(client->irq);
++		if (!irqflags)
++			irqflags = IRQF_TRIGGER_RISING;
++	}
++
+ 	r = request_threaded_irq(client->irq, NULL,
+ 				 nxp_nci_i2c_irq_thread_fn,
+-				 IRQF_ONESHOT,
++				 irqflags | IRQF_ONESHOT,
+ 				 NXP_NCI_I2C_DRIVER_NAME, phy);
+ 	if (r < 0)
+ 		nfc_err(&client->dev, "Unable to register IRQ handler\n");
 
-Does skipping this cause stale dynamic MDB entries to remain intact in
-pmctx->port->mglist instead of being flushed?
-"
+---
+base-commit: 7109a2155340cc7b21f27e832ece6df03592f2e8
+change-id: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
 
-The per-port multicast context was already disabled when per-VLAN
-multicast snooping was enabled.
+Best regards,
+-- 
+Carl Lee <carl.lee@amd.com>
 
-It also says:
 
-"
-While this patch aims to fix a use-after-free for the port query timers,
-does a concurrent execution race still exist during port removal?
-
-When removing a bridge port, br_multicast_disable_port() calls the non-sync
-timer_delete() for ip4_own_query.timer. Later, br_multicast_port_ctx_deinit()
-omits timer_delete_sync() for ip4_own_query.timer and ip6_own_query.timer.
-
-If the timer callback (br_ip4_multicast_port_query_expired()) is already
-executing on another CPU, it can outlive the RCU grace period since timer
-softirqs do not hold RCU read locks.
-
-Could this lead to a use-after-free when the callback dereferences the
-freed pmctx->port?
-"
-
-I don't see how a timer callback that is executing in softirq can
-outlive the RCU grace period.
-
-Regardless, like I wrote in the cover letter, in net-next I am going to
-synchronously shutdown all the timers when de-initializing the port
-multicast context.
 
