@@ -1,167 +1,157 @@
-Return-Path: <netdev+bounces-289289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289290-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6AzuIfAHDGodUAUAu9opvQ
-	(envelope-from <netdev+bounces-289289-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:49:20 +0200
+	id MAQgJGYIDGodUAUAu9opvQ
+	(envelope-from <netdev+bounces-289290-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:51:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0233E57858B
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:49:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F05C57861D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BE05930EE5E6
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:41:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 194C0300DD46
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F71399360;
-	Tue, 19 May 2026 06:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 926B239DBF8;
+	Tue, 19 May 2026 06:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b="kbXdHB8F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="szNMMRbR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F8939E6E9
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4723339D6D9
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779172843; cv=none; b=IJmIKOBqwCi3CqXpDNNoyApDNCW2XG/YkTnqhBH4z47b2giHXMAQj5bxU7HgQTSJqPzJlf/tPaQM/DNaTKXiptdJSSO2MvnrFQdzD4e92EuhFXSWTN4jTuW1+jCSyhGjLAnooGmNpL4kmn4aPYB5cCZPYCN0/Jzw62KmkXss2UQ=
+	t=1779173123; cv=none; b=pITsqmym9Hbq3McH4kL2fCLKMnPHcWa8g4lPoYpzY27yRTSr1NX49DEoGnsuLj7puw04cVgCqPVoiYsxSCUXzBEMBTGHwwe8yQk4K4oOPDAAe87d0HCRfxI9kNxsFuS+Nky+hNtjwbEo4+GENri86Ym8lsLHrK/DSZgAehBVLq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779172843; c=relaxed/simple;
-	bh=MQCFbZ3T0Cv/Ph/FRR02W3Cr8hDPWbgSkEbNklJIDjI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JbOmgm//40uul399I1wpdG91okXP5C94D0TyuB3eDKD1PXHUXfy4/vT2RcpMNLhr6ZIxTwAi9gPuqCCqzP+nLi3CQ4WN3naSb6B75yiB7fxeh/ABu2M/99hkhf3o8PHCiDR7FZ+ed0M3R8lMfGn/+Lfd+o6U4T1hrGmL/gQtSls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b=kbXdHB8F; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c795f441ff7so2558178a12.2
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 23:40:42 -0700 (PDT)
+	s=arc-20240116; t=1779173123; c=relaxed/simple;
+	bh=UOcuMTpdbzoPX4wfvaURAgMpzn1YqSDoIYupHwNwy4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q2tR8J/QeZ5UowoOAetoBtoklS9BHbpWUHKtcpD7zcv5OSqmr2Vvibexgdc8u0KfkxfZXasXF0TrGKkH4FsG48Bl55gk3+MhYhgSHmPuWYuNQAyQOvlEgSxeqDKNfsYz2k9BAfarjcx+jM+sYBMYfN0K42bvbf03sHYs0UkdyYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=szNMMRbR; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8353c9f24d2so1539457b3a.3
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 23:45:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cse-iitm-ac-in.20251104.gappssmtp.com; s=20251104; t=1779172842; x=1779777642; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ilstlfRPhBZeYWhJ1uRBmJ2rJZHG0b5shZT6RRPeE68=;
-        b=kbXdHB8FKTUVidwzRYhRX4F/IMXm39wwq7483muiFfSgX/7rJoyq4Z4XdRohNgPCBO
-         NKeW5rE5Xpb8BMX5ame8X3QUDN4W0xAm3CLFhEs3eaqb9fYMitYvUNArxSP9PMGWRWNk
-         jsRYPLW4Jj8HSFoNuyImJlT96VxgPeTOOLMtcpC77/5R7f4E2/5cusKNnEJcaQYXmoP7
-         A/W6PExLTdkFTkOiEIziZu8HUs4Ffd2UeNHE9ooqPxaegKrQhU/KdqA4Pqyj187Nql2p
-         L4K+npTTPGw5R8eIpawFJGrjhjhWexJAeKLCNQ7saqcohwvwxnP1mm8XmmiP1FQATNSS
-         FqwQ==
+        d=gmail.com; s=20251104; t=1779173122; x=1779777922; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9tSJoOKg/vW50+p43BRksSfoFvz7qTykVby+kYZtXs8=;
+        b=szNMMRbRvVGOY2b/MA7V4hhZy4HvHYiULKiwDPmcjPb19BUn/M+63ftLjOdtjwdc8w
+         7zNvTAynRJJoQ0oKG9cdpo+I/1tdRgf6kSQiBlpSlQ0dBDMZ+uQLEkvHWFx5X9TKjtZi
+         Qevw/hXAFNbEkA26/9GQ8eq23E7f8P80m8HrqBkW+F4Ca8uyuSw+k0DMciczpF27StLi
+         Y/tagLx+d8S2ogSWn0cilU02qMhIviodjYfgH6VQG+2ocg79HLstCndE2x/aanvG9XEc
+         W8v/XWcBo8UddYROT00S+YzRsgh5j3FMayx7VzELJwri49fEIje/N8F6HO+R36ki96mO
+         bXOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779172842; x=1779777642;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ilstlfRPhBZeYWhJ1uRBmJ2rJZHG0b5shZT6RRPeE68=;
-        b=h1P/N81/aNuqmLhLpXf9oADVB5lzjgfz0O8krCF3bBGDini/uNYiVgugcedQCrZNrl
-         Llk+kuBwU7xk8AbuYUMh7+mzG9zPT2Puq0/jLQDMBO5R29b/2avqhx2/Wlcnrx9/dqu1
-         j4Whv7DCnv5V1+xVx2CFxnCE5sI1+JJ5tC9zbT1C+h3E3gbJbFGEej4/3QCohTy7ysCW
-         dqY2iORYfk9orrebNaAql1Xv+FKjlNfN6vOdrU+RHhHcxyFJ+nrSrhQS2IvcLfKEA9aF
-         E6bLwtEYfoGOk7v9+q1IIrZcZWdafH89vLqzGsn4aN0jAPmgltF8u3XblOcPPV13M1SH
-         QPvA==
-X-Forwarded-Encrypted: i=1; AFNElJ98UvoIy7AYO46XERJ+IgLIzzy48hB569tzhXUUbOQxBrXInFDWbGiXU+YvCF/CM51U/YDDAmo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjsLdXBQL0NBtCk1d1hFlAuGW51DFS7UmuaqxoZMITvO/V9UgM
-	oRq0Quj4J9xlGxeqNioyli2zxSjYGN2GS/veKy4cvuOGXCOi2ni6GDl27Uwze1eNiOYvYCLWZnh
-	DHCpjw+s=
-X-Gm-Gg: Acq92OGQFETJ9dvqrwZSG7F+sgQB9haB4fdVF035W8Iy4Q9AxeR4S+MF9X/VWd/VXTw
-	QQb4tFic7n4V8tZvbcfFaKDzcrm9WBJN/KFvdZF6dOyUJO1K9KBPuO4n8S3zNFo5DQFul2sjrhh
-	ZdUmLnuKm1pe1XEq3k3Wd5PC60nGdXmDMDsPJJn5sLzs55bWgxxItmcaiu7n9/3Eu5h/wQg9DRl
-	EQuaJMTiKwiQ/EKT35SA0N2eto9ZDBYe0rkSlNk7oYimj1SnAVQYL/QAyuDEOTytrmU3/LhRUEG
-	zamCP9Oey7+E114v/YNjATOthBQxEeSzLGL1TG7T8CIAOEzJwNCD9T5ad0iqlQHxicUjkQ23OHE
-	8Aoiypl+Z50egRi0CoV/JJ819Y8LiAPBj+xvhrDW7frFKusQPUPNR6x1mZW6KOaEheKfnrOu4X6
-	hyVuPQwnMQ2DJ1I77Z/yXHf4GC1AJ5EyDNHcC3Nu02jO//viA7M+5lQp2g2hbZC04Kcnb3nEd0w
-	QSElzjvLu7sGa7A5CdDJE1dhC2Lel4OS23Muza7X3pOh0cwQdurX7Bx9Q==
-X-Received: by 2002:a05:6a20:3d1d:b0:3a1:90ef:7e37 with SMTP id adf61e73a8af0-3b22ebe1b1amr21126082637.33.1779172841901;
-        Mon, 18 May 2026 23:40:41 -0700 (PDT)
-Received: from localhost.localdomain ([103.158.43.41])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c82bb0ff0edsm16016589a12.20.2026.05.18.23.40.37
+        d=1e100.net; s=20251104; t=1779173122; x=1779777922;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9tSJoOKg/vW50+p43BRksSfoFvz7qTykVby+kYZtXs8=;
+        b=R9FWpwLWP0x0u6IP1FjgaOaJmetHuO9HRRusKoIp2HsFP1/yC5FSEkza3sYAH9xXyg
+         Ym5CvSBi+/rMtnaWLTT5xJ/Z02o27Co1SUmK3ESYZCUTsElmYI33dFsfjkbSCCScTxKD
+         WtRQmR3lozppRlLhVaMf+tzCwxwofSuZ4pWG8Nw7b6wZ1IfABiKugHh36CKYsA7CHasi
+         vEWsD332wD5S4sstgmD0NdxFZMqLX6C/8UEsFdWAJluTaqhiksqEKyT6gar7mkjyznsr
+         j+402SjEEA6GZm5NwAIogKtlVYgQ9ysWh/+q1hh9hETdmAUJlK6x+bsTFS7lMJur0CRC
+         OB4w==
+X-Forwarded-Encrypted: i=1; AFNElJ+X4TXtsyWCi32WD1QMFwfHk3sypBQutWrrXmMiW+VIw3DpYcERCBS7Oq3bDuQHpKnqKF/6C80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRu+PwgoJ8kiksNsiFjQn9kO6MS42Ztg82FqbGFKCZCyGDE/i9
+	DxQBDXnv4SH10lBG0cjtSvAwQuibVQATIwujKUP0ZNulvdJzi4/fJ8Yb
+X-Gm-Gg: Acq92OGtrg8mPPvAMVIshXg3mwWddkCbusXonmLcDzNi1XDayhVEmAtgmVQ1fZvi46/
+	6hiGvZgS8o4tgAhE5OmhP4cOEAKuVXVTZ+2FAPMMKz4d7jZPZQkDlDMSOhWS/TSQ5ObS5Bg9gic
+	3eQfoSFzmHq0deLAAbXORdwZYhmbKfduY1zCMAMhCI+bDQ9uOfuLz1Dyf/HAUgGLZeOGhx05XHQ
+	bZc+ez8Ket7MxNk8y7NFhrbDZwTNSqUcChYhzqDkCztuPICPFnAlDQ13TKVo1fbodX+Zl8x51aK
+	Iow33+QuukeiAh4M3lios7bz9u0DQK6ur2txZxE9I6q6yAG0ga1Y83sk07ucwKKQbSNVpr+jRAD
+	1UAePFO2Lu+4Iva7UybME1zZaGB5KGGUs9w6mf99WQt13BMSDUKyBcmwBTfmlKRTgv6qRvGMsfC
+	MdlGWi7uGG9KwHuBTuPLF0HmvBJ5z4srsYYnVMzVVqV2A=
+X-Received: by 2002:a05:6a00:4484:b0:829:8cfb:df45 with SMTP id d2e1a72fcca58-83f33c99b07mr18066494b3a.15.1779173121683;
+        Mon, 18 May 2026 23:45:21 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f19c78844sm16002649b3a.47.2026.05.18.23.45.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 23:40:41 -0700 (PDT)
-From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
-To: loic.poulain@oss.qualcomm.com
-Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: wwan: iosm: fix potential use after free in ipc_imem_cleanup()
-Date: Tue, 19 May 2026 12:10:26 +0530
-Message-ID: <20260519064028.60992-1-nihaal@cse.iitm.ac.in>
-X-Mailer: git-send-email 2.43.0
+        Mon, 18 May 2026 23:45:21 -0700 (PDT)
+Date: Tue, 19 May 2026 15:45:16 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+Cc: aaron1esau@gmail.com, ben@decadent.org.uk, davem@davemloft.net,
+	dsahern@kernel.org, edumazet@google.com,
+	herbert@gondor.apana.org.au, horms@kernel.org,
+	jiayuan.chen@linux.dev, kerneljasonxing@gmail.com, kuba@kernel.org,
+	kuniyu@google.com, malin89@huawei.com, mhal@rbox.co,
+	netdev@vger.kernel.org, pabeni@redhat.com, sd@queasysnail.net,
+	stable@vger.kernel.org, steffen.klassert@secunet.com,
+	sultan@kerneltoast.com, tanjingguo@huawei.com, imv4bel@gmail.com
+Subject: Re: [PATCH net v5] net: skbuff: propagate shared-frag marker through
+ frag-transfer helpers
+Message-ID: <agwG_G7l9gdT0BsH@v4bel>
+References: <ageeJfJHwgzmKXbh@v4bel>
+ <20260519040232.1395-1-rajat.gupta@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260519040232.1395-1-rajat.gupta@oss.qualcomm.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[cse-iitm-ac-in.20251104.gappssmtp.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[iitm.ac.in : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289289-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[cse.iitm.ac.in,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-289290-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,decadent.org.uk,davemloft.net,kernel.org,google.com,gondor.apana.org.au,linux.dev,huawei.com,rbox.co,vger.kernel.org,redhat.com,queasysnail.net,secunet.com,kerneltoast.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nihaal@cse.iitm.ac.in,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[cse-iitm-ac-in.20251104.gappssmtp.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iitm.ac.in:email,cse.iitm.ac.in:mid,cse-iitm-ac-in.20251104.gappssmtp.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0233E57858B
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,qualcomm.com:email]
+X-Rspamd-Queue-Id: 0F05C57861D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-During cleanup, the ipc_protocol_deinit() is called before the tasklets
-are cleaned up. The tasklets may concurrently access the memory
-allocated for ipc_protocol and so it could result in a use-after-free.
-Fix that by moving ipc_protocol_deinit() after ipc_task_deinit().
+On Mon, May 18, 2026 at 09:02:32PM -0700, Rajat Gupta wrote:
+> The skb_gro_receive() and skb_shift() fixes look correct -- we
+> independently reported both to security@kernel.org with working
 
-Fixes: 3670970dd8c6 ("net: iosm: shared memory IPC interface")
-Cc: stable@vger.kernel.org
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
----
-Compile tested only. Not tested on hardware.
+Thank you for testing. When did you report it? The two PoCs were 
+already public.
 
- drivers/net/wwan/iosm/iosm_ipc_imem.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/wwan/iosm/iosm_ipc_imem.c b/drivers/net/wwan/iosm/iosm_ipc_imem.c
-index 4405c8531888..939364daf5c7 100644
---- a/drivers/net/wwan/iosm/iosm_ipc_imem.c
-+++ b/drivers/net/wwan/iosm/iosm_ipc_imem.c
-@@ -1256,8 +1256,8 @@ void ipc_imem_cleanup(struct iosm_imem *ipc_imem)
- 	ipc_imem_device_ipc_uninit(ipc_imem);
- 	ipc_imem_channel_reset(ipc_imem);
- 
--	ipc_protocol_deinit(ipc_imem->ipc_protocol);
- 	ipc_task_deinit(ipc_imem->ipc_task);
-+	ipc_protocol_deinit(ipc_imem->ipc_protocol);
- 
- 	kfree(ipc_imem->ipc_task);
- 	kfree(ipc_imem->mmio);
--- 
-2.43.0
+Best regards,
+Hyunwoo Kim
 
+> LPE exploits confirming they are exploitable from unprivileged
+> user namespaces.
+> 
+> Could you add the following tags when respinning or applying?
+> 
+> Reported-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+> Tested-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+
+> 
+> Thanks,
+> Rajat
 
