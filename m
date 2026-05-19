@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-289329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNhLJ8QfDGqoWgUAu9opvQ
-	(envelope-from <netdev+bounces-289329-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:31:00 +0200
+	id oL8pF64jDGpqXAUAu9opvQ
+	(envelope-from <netdev+bounces-289330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:47:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44E9357A135
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:31:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D561557A733
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:47:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 49E7D309D95E
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:23:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 59876306B55D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279C23E121F;
-	Tue, 19 May 2026 08:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4ABB3E1CFD;
+	Tue, 19 May 2026 08:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LnqIQAei"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bzr8mfJn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034EE3E0C7C;
-	Tue, 19 May 2026 08:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A028C3E173D;
+	Tue, 19 May 2026 08:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779178984; cv=none; b=PrGB6PTpNpGNCSG4hFzRTow1b1hLpQPGdqoO3J8/ztFBsReG/1z+cD5We5fiO03RmNU1xlE6t42zv8ifDY8oGWmEx8GkI9DOQ5LVos3kGoNgWorTZqgVBJWDeFkfpSX7IPGZ0IQyroOccV9DV4iKyINRpJ3eh9I4N7Em4jx7gpA=
+	t=1779179876; cv=none; b=S43kV6zlg14G2ZawL2BvDNrbh5OboIYm70l7oVSIhHXe5pLOXhvCzcPthATVz7UJCRkAMHFiPlSbxMbev0Op+o7oomZSbrKy7yIte8nmq2UtRbKOt/nOesfZzMsRA5iL2l89uQRIDMh571VorY51F4zgLHjQv4e36GZh3rNkHXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779178984; c=relaxed/simple;
-	bh=thro7mnnhW+9WpBCb+tmj8k0b2t2H/Tbbq/LQowUuzg=;
+	s=arc-20240116; t=1779179876; c=relaxed/simple;
+	bh=IhCg9hQ7TA0OsyArZ3MT3Wx1G3TYybLj1nvD4TQ0T/0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LC4CXu7KLihkY3Ve6755DYkBzihrabeBUQ0BWZBWBfPHoWSRsHafNpU+tiNUg2RGT2n6Jtbyshp1Xs0nzEd4VqTc7XfUchtJ9AiDREelHte41oh2PYYqZMmbHgnEEogZEwGSsz+tkv/z66luPXVVsOGVYYAh6ZeheTRb5lw7B/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LnqIQAei; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A118C2BCC6;
-	Tue, 19 May 2026 08:23:03 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=pbg3Sb+EbUjyGWzIxaRAJJ2JGU+4ZwRMpkc5NRltrvF6loUqYaVZA3ojPGB9+zD7JCiYZWfu7w3NyrOc19Ns3KVMkp+o7xJVqVDRKYJTTm87oEaBRKZ7TWwOrBDN810S2x2rt/HJuATSCQ2wP4WV+QfqK9a4ECsgICDibDZS2cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bzr8mfJn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6734C2BCB3;
+	Tue, 19 May 2026 08:37:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779178983;
-	bh=thro7mnnhW+9WpBCb+tmj8k0b2t2H/Tbbq/LQowUuzg=;
+	s=k20201202; t=1779179876;
+	bh=IhCg9hQ7TA0OsyArZ3MT3Wx1G3TYybLj1nvD4TQ0T/0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LnqIQAeiE0wWG0PKpbs0JJDlHfOX2se3rwtV+2/IYDYdblD7l7jeA6GJ6z47X1EvO
-	 748WHBIR6gAyB05SMxBvcKPZWrjsR8CYFYYfHjcsNeGerr4F85xOnq9Tfft06OmymK
-	 n4JEZSz6kvNndOH7P+XiLeRXzHfGd2Buszbi+S94qLTIBkAUA6Q0dV7subE+wnH6Ic
-	 ks+dwxQ/y2em70bv6xWfTO87MsFRByrTHQS+Atw3yoMumswq56ZBHv1N5ztf2RZ1aq
-	 yhu25IrR0jnp+xL4Fty4iDPvS+xeBNFi+aoVXqVPqq7Nga/MMUL+3lGetZILPSy3mW
-	 UU0jwbfKZgWYA==
-Date: Tue, 19 May 2026 10:23:01 +0200
+	b=Bzr8mfJnKGmNmn3/YOA1EICKhRqvkYz+S3+GN0uDBsA1XvcQEuFPfnlsQaRwjvfQ4
+	 TNx6Hg3Z3sQYZsPDfstP1HIKMQUoMxQ7djSsZ3UlNX7+U7pdvwDOL/WcDrIbDqW6tT
+	 IHdA+r01i/do+dbYWV04m+89FtKeoTfP7p8Z/mYis3J5x4vpAraghwp15/F4CoBz9x
+	 AUeXpeZkOCxr6bktyYBbzP+m7n25xIdG542nNbaL4JevmILYaqzVnLVJ/AHCDhVpOq
+	 wpW27EcN7ykJhsRaSeAgTZjzA55EtbaoiSBnhDIdO7Ib7u12Y3OQUoSEsBg3xRBTy8
+	 WczD+qkJ/sMuA==
+Date: Tue, 19 May 2026 10:37:53 +0200
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: conor+dt@kernel.org, devicetree@vger.kernel.org, robh@kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v7 05/10] net: airoha: Move qos_sq_bmap in
- airoha_gdm_dev struct
-Message-ID: <agwd5avrCT3qqyqd@lore-desk>
-References: <20260516-airoha-eth-multi-serdes-v7-5-99e0093303e2@kernel.org>
- <20260517055814.3D107C2BCB0@smtp.kernel.org>
+Subject: Re: [PATCH net-next v7 10/10] net: airoha: Support multiple LAN/WAN
+ interfaces for hw MAC address configuration
+Message-ID: <agwhYWN-6-c7syDK@lore-desk>
+References: <20260516-airoha-eth-multi-serdes-v7-10-99e0093303e2@kernel.org>
+ <20260517055815.89B7CC2BCB0@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,9 +61,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="S4iYFzht4X/oMccC"
+	protocol="application/pgp-signature"; boundary="qQqzhGnGkjNnj5Yx"
 Content-Disposition: inline
-In-Reply-To: <20260517055814.3D107C2BCB0@smtp.kernel.org>
+In-Reply-To: <20260517055815.89B7CC2BCB0@smtp.kernel.org>
 X-Spamd-Result: default: False [-3.76 / 15.00];
 	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -75,7 +75,7 @@ X-Spamd-Result: default: False [-3.76 / 15.00];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289329-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289330-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -90,147 +90,124 @@ X-Spamd-Result: default: False [-3.76 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url]
-X-Rspamd-Queue-Id: 44E9357A135
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: D561557A733
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
---S4iYFzht4X/oMccC
+--qQqzhGnGkjNnj5Yx
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
+On May 17, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
 e(s) to consider:
-> - [High] Off-by-one error in airoha_tc_remove_htb_queue when clearing har=
-dware rate limit.
-> - [High] Blind increment/decrement of real_num_tx_queues breaks HTB offlo=
-ad for non-sequential queue IDs.
+> - [High] Device probe fails when multiple LAN/WAN interfaces are assigned=
+ randomly generated MAC addresses.
 > --
 >=20
-> commit 7088e1abda5f2f9f4a048fc5586684fdaf382845
+> commit 7861c44e7e1da4203e80f67d02418deac7e491b4
 > Author: Lorenzo Bianconi <lorenzo@kernel.org>
 >=20
-> net: airoha: Move qos_sq_bmap in airoha_gdm_dev struct
+> net: airoha: Support multiple LAN/WAN interfaces for hw MAC address confi=
+guration
 >=20
-> This commit moves the qos_sq_bmap field from airoha_gdm_port to
-> airoha_gdm_dev to prevent overwrites when multiple net_devices share a GDM
-> port. It also adds qos_channel_map to track QDMA channels in use.
+> This commit extends the hardware MAC address configuration logic in the a=
+iroha
+> driver to support multiple LAN or WAN interfaces by deriving minimum and
+> maximum values for the lower MAC bytes, while expecting the upper MAC byt=
+es to
+> be shared.
 >=20
 > > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
 ernet/airoha/airoha_eth.c
-> > index b90fc1cbfbc48..2a2a30dbad27e 100644
 > > --- a/drivers/net/ethernet/airoha/airoha_eth.c
 > > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -2597,44 +2597,61 @@ static int airoha_qdma_set_tx_rate_limit(struct=
- net_device *netdev,
+> > @@ -71,20 +71,69 @@ static void airoha_qdma_irq_disable(struct airoha_i=
+rq_bank *irq_bank,
+> >  	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
+> >  }
+> > =20
+> > -static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *a=
+ddr)
+> > +static int airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *ad=
+dr)
+> >  {
+> > +	u8 ref_addr[ETH_ALEN] __aligned(2);
+> >  	struct airoha_eth *eth =3D dev->eth;
 >=20
 > [ ... ]
 >=20
-> >  	err =3D netif_set_real_num_tx_queues(netdev, num_tx_queues + 1);
-> >  	if (err) {
-> >  		airoha_qdma_set_tx_rate_limit(netdev, channel, 0,
-> >  					      opt->quantum);
-> >  		NL_SET_ERR_MSG_MOD(opt->extack,
-> >  				   "failed setting real_num_tx_queues");
-> > -		return err;
-> > +		goto error;
-> >  	}
-> > =20
-> > -	set_bit(channel, port->qos_sq_bmap);
-> > +	set_bit(channel, dev->qos_sq_bmap);
-> >  	opt->qid =3D AIROHA_NUM_TX_RING + channel;
+> > +			netdev =3D iter_dev->dev;
+> > +			if (netdev->reg_state !=3D NETREG_REGISTERED)
+> > +				continue;
+> > +
+> > +			ether_addr_copy(ref_addr, netdev->dev_addr);
+> > +			val =3D (netdev->dev_addr[3] << 16) |
+> > +			      (netdev->dev_addr[4] << 8) | netdev->dev_addr[5];
+> > +			if (val < lmin)
+> > +				lmin =3D val;
+> > +			if (val > lmax)
+> > +				lmax =3D val;
+> > +		}
+> > +	}
+> > +
+> > +	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3)) {
 >=20
-> This problem wasn't introduced by this patch, but is a logic flaw that
-> breaks the offload functionality.
+> If the device tree lacks a MAC address for an interface and the driver as=
+signs
+> a random one via eth_hw_addr_random(), will this comparison fail during d=
+evice
+> probe?
 >=20
-> When allocating a QoS channel, real_num_tx_queues is blindly incremented =
+> Since eth_hw_addr_random() generates independent random bytes for each
+> interface, the upper 3 bytes will likely mismatch. This returns -EINVAL a=
+nd
+> propagates up to register_netdev(), which causes the driver probe to abor=
+t.
+>=20
+> Prior to this patch, the hardware MAC register was overwritten with the n=
+ewest
+> interface's MAC, but the probe continued successfully. Can this be adjust=
+ed to
+> handle randomly generated MAC addresses without aborting the probe?
+
+As already pointed out this is a requirement imposed by the hw design. Plea=
+se
+note we are not introducing any regression since this is required just when=
+ we
+have multiple net_devices configured as LAN and this feature is introduced =
 by
-> 1 while the qid is derived from the channel. If a user allocates a
-> non-sequential classid (for example, mapping to channel 3 when it is the
-> first allocated queue), real_num_tx_queues will become
-> AIROHA_NUM_TX_RING + 1, but qid will be AIROHA_NUM_TX_RING + 3.
->=20
-> When transmitting, netdev_cap_txqueue() strictly validates that the packe=
-t's
-> queue_mapping is < real_num_tx_queues.
->=20
-> Since qid exceeds the blindly incremented count, will the stack log a war=
-ning
-> and forcefully route the packet to queue 0, silently bypassing the HTB
-> hardware rate limit?
->=20
-> Additionally, does blindly decrementing the count when deleting queues
-> immediately invalidate any active higher-indexed queues?
-
-Since this issue has not been introduced by this series, I will fix it with=
- a
-dedicated patch.
-
->=20
-> > @@ -2815,11 +2832,13 @@ static int airoha_dev_setup_tc_block(struct net=
-_device *dev,
-> >  static void airoha_tc_remove_htb_queue(struct net_device *netdev, int =
-queue)
-> >  {
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > -	struct airoha_gdm_port *port =3D dev->port;
-> > +	struct airoha_qdma *qdma =3D dev->qdma;
-> > =20
-> >  	netif_set_real_num_tx_queues(netdev, netdev->real_num_tx_queues - 1);
-> >  	airoha_qdma_set_tx_rate_limit(netdev, queue + 1, 0, 0);
->=20
-> This problem wasn't introduced by this patch, but the patch exposes it to
-> cross-device corruption.
->=20
-> In airoha_tc_remove_htb_queue(), the driver attempts to disable the hardw=
-are
-> rate limit for the removed queue by calling airoha_qdma_set_tx_rate_limit=
-()
-> with queue + 1. However, the queue is originally allocated and configured
-> using the channel index (where channel equals queue).
->=20
-> Passing queue + 1 fails to clear the rate limit of the actually deleted q=
-ueue,
-> permanently leaking its hardware state. Furthermore, it incorrectly zeros=
- out
-> the rate limit of the adjacent queue.
->=20
-> Because this patch allows multiple net_devices to share the same QDMA blo=
-ck
-> and its channels, could deleting a QoS queue on one interface unexpectedly
-> corrupt the QoS hardware state of another interface actively using the
-> adjacent channel?
-
-Since this issue has not been introduced by this series, I will fix it with=
- a
-dedicated patch.
+this patch.
 
 Regards,
 Lorenzo
 
 >=20
-> > -	clear_bit(queue, port->qos_sq_bmap);
-> > +
-> > +	clear_bit(queue, qdma->qos_channel_map);
-> > +	clear_bit(queue, dev->qos_sq_bmap);
-> >  }
+> > +		/* According to the HW design, hw mac address MS bits
+> > +		 * must be the same for each net_device with the same
+> > +		 * LAN/WAN configuration.
+> > +		 */
+> > +		netdev_err(dev->dev, "wrong mac addr for shared GDM port\n");
+> > +		return -EINVAL;
+> > +	}
 >=20
 > --=20
 > Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260516-airoha-eth-=
-multi-serdes-v7-0-99e0093303e2@kernel.org?part=3D5
+multi-serdes-v7-0-99e0093303e2@kernel.org?part=3D10
 
---S4iYFzht4X/oMccC
+--qQqzhGnGkjNnj5Yx
 Content-Type: application/pgp-signature; name=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagwd5QAKCRA6cBh0uS2t
-rIoLAP9kDup7PnCYbTDJInYAN6wTDToDw40cWk0vYDIL9MLpyQD+JKxaxReqK8Di
-Vz4jItOr+heMuSHJMaUEr9VSv3yM0wY=
-=vqYP
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagwhYQAKCRA6cBh0uS2t
+rNHeAPsEf3993KpAQ/Rp9ao/wfzefUN6thROAQvEF6FNAXo2vwD9FkDO3+fb9e8j
+Z7HZtR2wULBvMURHYFMooMMxPGEOjA8=
+=J5Ge
 -----END PGP SIGNATURE-----
 
---S4iYFzht4X/oMccC--
+--qQqzhGnGkjNnj5Yx--
 
