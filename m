@@ -1,182 +1,265 @@
-Return-Path: <netdev+bounces-289280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289281-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cK91C+X8C2qrTAUAu9opvQ
-	(envelope-from <netdev+bounces-289280-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:02:13 +0200
+	id GG+JIUv+C2qrTAUAu9opvQ
+	(envelope-from <netdev+bounces-289281-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:08:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB448577AE6
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:02:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EECA577BD0
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D330430547CF
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 05:56:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 05FCD3008636
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B413644C9;
-	Tue, 19 May 2026 05:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1823837AA75;
+	Tue, 19 May 2026 06:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JmnoS6Yk"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="JqJmJ/Y6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E7535C1B0
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 05:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50F633345A;
+	Tue, 19 May 2026 06:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779170188; cv=none; b=pAwjq44vVBxDHNPKjF0EkEJpa/GsbLiAyT4+3dE75mFKJYNWLh6jhzZLGakyK+HjmNnXi3qVOs0ECBO2BYa7B8p0WnGHiBeAvn/8z6fN1rOdE8wmxUw5abQy08+hzmAUY4gtrMk/w1pvz94G4UMoFVyx2LrCc5DyiwIrL82PXdE=
+	t=1779170879; cv=none; b=tyQYNN8zNO/aWBMTVYS8/R7ewITvqoOTDZFAOSZT27dqPgDjktzBdYpcLxwMzaqt567ETuDmqXEY7y1BUWNKrdu1o/XG4wptqtvQFHoQ8UbZ37SLmso4m9W17kUSjba2ASydKUVt5SMb/0yMdLtytkfLSYUgqvG18SXQceJMm9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779170188; c=relaxed/simple;
-	bh=TCLu5MNEcNIL5e7ATwDDhlB3YNv67f7AtXIvfVcNMA8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=E5l+8UBZD0il84NeYh+7vq7G5+5VO3Ul3Lgj28bDThh4ganDnBHKbdZIbTo7c1U/42ai+t7zWdwg0kX+8Cy+SUmn8Tu+I7sURT4lneLpUF1ogNiAuevoEFbwtiiP+15iGUEWsZWmAfYpg6WsphTrpJl37u+vO7YY4+UuPuniVj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JmnoS6Yk; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 19 May 2026 07:55:55 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779170174;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fDUb5wllfZTf/t6wsoMQEEce9T5suMuho2M4U8byo6M=;
-	b=JmnoS6YkymUjv5x1woBoN7AX65oKlCbRuqVZaYKNPDvlFcEISydaMEn9eUrvSy17Gal4Ul
-	3yjnk5MEtQQLKK7jFO834FSFiXy9WI9MshO8HC+h42iUbC8d2nWTYUVieYUyJnbcC+fbcy
-	dmcbRF4bkF1xgNkUpmYJdOMHkxrgrhQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Luka Gejak <luka.gejak@linux.dev>
-To: Jakub Kicinski <kuba@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
- Felix Maurer <fmaurer@redhat.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- Roger Quadros <rogerq@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Meghana Malladi <m-malladi@ti.com>, Jacob Keller <jacob.e.keller@intel.com>,
- David Carlier <devnexen@gmail.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, Kevin Hao <haokexin@gmail.com>,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Vladimir Oltean <vladimir.oltean@nxp.com>, luka.gejak@linux.dev
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next_v2_2/2=5D_net=3A_ti=3A?=
- =?US-ASCII?Q?_icssg=3A_Add_HSR_and_LRE_PA_statistics?=
-In-Reply-To: <20260518184506.694c584e@kernel.org>
-References: <20260514075605.850674-1-danishanwar@ti.com> <20260514075605.850674-3-danishanwar@ti.com> <20260518184506.694c584e@kernel.org>
-Message-ID: <E30AAC96-01D2-4A23-B562-126087DEB7FA@linux.dev>
+	s=arc-20240116; t=1779170879; c=relaxed/simple;
+	bh=PZndKE+k5QGC8aLpPQMN1H7BjKRFK23i1VvVtQVRyTE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TV8gCfuY026bF6lDJlcS0BkQLW1H8PF6WIw/LTei0Ky/IHYGeX2aMZuO+EpZN9WQVItN0v769VqBa1YftE2bpo7lzdLVyYKh/IYBJBP9jpQFgU2makTxV7cjnoGDNFj4dKU2CjEohpwZD3ZqYsp1FEoyaRUG3jjSmqqxyMYPAAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=JqJmJ/Y6; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1779170865; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=rK/MNzc7TgF79y6vUvuw5P/fnsxLJQlPVnDjCHUzi7k=;
+	b=JqJmJ/Y6hEKRoXVia4v7r6Gxgm7rVstruzpnzhK4Fpb3CV3ajdpi/QeNaksOqURcfRTOOWyBe7C+5xSaOSJUEFl+1sjoL5PVp1UAqDGfcbXPw47PoCFPMSoP8ioAhdyKToGsu3Ae2AWXL54ESqiRq62vSPhhFkv91dJEI/nth8I=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R721e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0X3EVwCV_1779170864;
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0X3EVwCV_1779170864 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 19 May 2026 14:07:44 +0800
+Date: Tue, 19 May 2026 14:07:44 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: alibuda@linux.alibaba.com, davem@davemloft.net,
+	dust.li@linux.alibaba.com, edumazet@google.com, kuba@kernel.org,
+	sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+	horms@kernel.org, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	oliver.yang@linux.alibaba.com, pasic@linux.ibm.com
+Subject: Re: [PATCH net-next 2/2] net/smc: reduce TX slot contention with
+ exclusive wait
+Message-ID: <20260519060744.GA7104@j66a10360.sqa.eu95>
+References: <20260508063718.101622-3-alibuda@linux.alibaba.com>
+ <20260512082643.89020-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	SUBJ_EXCESS_QP(1.20)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260512082643.89020-1-pabeni@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289280-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,lwn.net,linuxfoundation.org,lunn.ch,ti.com,intel.com,gmail.com,linux.dev,vger.kernel.org,lists.infradead.org,nxp.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: BB448577AE6
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289281-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.dev:url,linux.alibaba.com:dkim];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+]
+X-Rspamd-Queue-Id: 8EECA577BD0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On May 19, 2026 3:45:06 AM GMT+02:00, Jakub Kicinski <kuba@kernel=2Eorg> wr=
-ote:
->On Thu, 14 May 2026 13:26:05 +0530 MD Danish Anwar wrote:
->> Add new firmware PA statistics counters for HSR and LRE to the ethtool
->> statistics exposed by the ICSSG driver=2E
->>=20
->> New statistics added:
->>  - FW_HSR_FWD_CHECK_FAIL_DROP: Packets dropped on the HSR forwarding pa=
-th
->>  - FW_HSR_HE_CHECK_FAIL_DROP: Packets dropped on the HSR host egress pa=
-th
->>  - FW_HSR_SKIP_HOST_DUP_DISCARD_FRAMES: Frames with duplicate discard
->>    skipped
->>  - FW_LRE_CNT_UNIQUE/DUPLICATE/MULTIPLE_RX: LRE duplicate detection
->>    counters
->>  - FW_LRE_CNT_RX/TX: LRE per-port frame counters
->>  - FW_LRE_CNT_OWN_RX: Own HSR tagged frames received
->>  - FW_LRE_CNT_ERRWRONGLAN: Frames with wrong LAN identifier (PRP)
->>=20
->> Document the new HSR/LRE statistics in icssg_prueth=2Erst=2E
->
->To an untrained eye these stats look like stuff that could=20
->be standardized across drivers=2E=20
->
->Luka, Felix, others on CC, do you think we should expose these
->from HSR over netlink as "standard" offload stats different drivers=20
->can plug into or not worth it?
+On Tue, May 12, 2026 at 10:26:43AM +0200, Paolo Abeni wrote:
+> From: AI Reviewer <ai@example.com>
+> 
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+> ---
+> net/smc: reduce TX slot contention with exclusive wait
+> 
+> This patch replaces the non-exclusive wait_event_interruptible_timeout()
+> in smc_wr_tx_get_free_slot() with an open-coded exclusive wait loop via
+> prepare_to_wait_exclusive(), so wake_up() on a freed TX slot wakes only
+> a single waiter instead of the entire wait queue.
+> 
+> > diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
+> > index 48037a3d97a3..0a6f2befb0e2 100644
+> > --- a/net/smc/smc_wr.c
+> > +++ b/net/smc/smc_wr.c
+> > @@ -171,17 +173,27 @@ int smc_wr_tx_get_free_slot(struct smc_link *link,
+> >  		if (rc)
+> >  			return rc;
+> >  	} else {
+> > -		rc = wait_event_interruptible_timeout(
+> > -			link->wr_tx_wait,
+> > -			!smc_link_sendable(link) ||
+> > -			lgr->terminating ||
+> > -			(smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY),
+> > -			SMC_WR_TX_WAIT_FREE_SLOT_TIME);
+> > -		if (!rc) {
+> > -			/* timeout - terminate link */
+> > -			smcr_link_down_cond_sched(link);
+> > -			return -EPIPE;
+> > +		rc = 0;
+> > +		for (;;) {
+> > +			prepare_to_wait_exclusive(&link->wr_tx_wait, &wait,
+> > +						  TASK_INTERRUPTIBLE);
+> > +			if (!smc_link_sendable(link) || lgr->terminating ||
+> > +			    smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY)
+> > +				break;
+> > +			timeout = schedule_timeout(timeout);
+> > +			if (!timeout) {
+> > +				/* timeout - terminate link */
+> > +				smcr_link_down_cond_sched(link);
+> > +				break;
+> > +			}
+> > +			if (signal_pending(current)) {
+> > +				rc = -ERESTARTSYS;
+> > +				break;
+> > +			}
+> 
+> [High]
+> With exclusive waiters, wake_up() on link->wr_tx_wait wakes only one
+> task per freed slot. If that waiter is about to exit via the
+> signal_pending() branch, can the freed slot be lost to the remaining
+> sleepers?
+> 
+> Consider two exclusive waiters A and B asleep in schedule_timeout():
+> 
+>   1. smc_wr_tx_put_slot() -> wake_up(&link->wr_tx_wait) is effectively
+>      __wake_up(..., nr_exclusive=1).  default_wake_function makes A
+>      runnable, autoremove_wake_function pulls A off the queue, and
+>      __wake_up_common stops -- B is not woken.
+> 
+>   2. A signal is delivered to A before it actually runs.  Because A is
+>      already TASK_RUNNING, signal_wake_up only sets TIF_SIGPENDING.
+> 
+>   3. A returns from schedule_timeout() with timeout > 0, so the
+>      !timeout branch is skipped.  signal_pending(current) is true, so
+>      the loop sets rc = -ERESTARTSYS and breaks without re-testing
+>      smc_wr_tx_get_free_slot_index() and without issuing any wake_up()
+>      on the way out.
+> 
+>   4. B stays asleep on the wait queue even though the wr_tx_mask bit
+>      for the freed slot is still available.  With no further
+>      completions, B sleeps until the full SMC_WR_TX_WAIT_FREE_SLOT_TIME
+>      expires, at which point smcr_link_down_cond_sched() tears down an
+>      otherwise healthy link.
+> 
+> The previous wait_event_interruptible_timeout() was non-exclusive, so
+> every waiter was woken on each wake_up() and re-evaluated the
+> condition, which avoided this class of lost-wakeup.
+> 
+> Should the signal path re-check the slot condition before returning,
+> or issue a wake_up() on exit so another exclusive waiter gets a chance
+> at the slot?
+> 
 
-Hi Jakub,
-I think there is a case for standardizing part of this, but I would=20
-not standardize the whole set as-is=2E
+Thanks for the review, all three points are valid.
 
-The LRE counters look generic enough to me, especially:
- - unique rx
- - duplicate rx
- - multiple rx
- - rx / tx
- - own rx
- - wrong LAN, PRP only
+[High] & [Low]: Both resolved by a unified re-check after finish_wait():
+if no slot was acquired in the loop (due to signal or timeout),
+re-evaluate the condition one final time. If a slot is now available,
+claim it and proceed. No wake_up() is needed on exit — the teardown path
+already does wake_up_all when the link goes down, and waking the next
+waiter when no slot exists is pointless.
 
-Those are protocol/LRE concepts rather than TI firmware details, so
-exposing them from the HSR/PRP layer sounds useful=2E I would expect=20
-both the software implementation and offloaded implementations to be=20
-able to provide at least some of them, with unsupported counters=20
-omitted or reported as not available=2E
-I would not put the firmware check/drop counters in the same standard
-bucket, though:
- - FW_HSR_FWD_CHECK_FAIL_DROP
- - FW_HSR_HE_CHECK_FAIL_DROP
- - FW_HSR_SKIP_HOST_DUP_DISCARD_FRAMES
+> [Medium]
+> The commit message says this is a contention optimization and that
+> "teardown behavior is unchanged", but does it also change the errno
+> returned to callers on signal delivery?
+> 
+> Before this patch, wait_event_interruptible_timeout() returned
+> -ERESTARTSYS on signal; that value is non-zero, so the old if (!rc)
+> branch was skipped, control fell through to the trailing
+> if (idx == link->wr_tx_cnt) return -EPIPE, and callers saw -EPIPE.
+> 
+> After the patch, the signal path does:
+> 
+>     if (signal_pending(current)) {
+>         rc = -ERESTARTSYS;
+>         break;
+>     }
+>     ...
+>     finish_wait(&link->wr_tx_wait, &wait);
+>     if (rc)
+>         return rc;
+> 
+> so -ERESTARTSYS propagates up through smc_cdc_get_free_slot() (which
+> only remaps rc to -EPIPE when conn->killed is set),
+> smcr_cdc_get_slot_and_msg_send(), smc_cdc_get_slot_and_msg_send() and
+> smc_tx_sendmsg(), meaning userspace sees syscall restart / -EINTR
+> instead of -EPIPE.
+> 
+> Note that the sibling smc_wr_reg_send() in the same file explicitly
+> converts -ERESTARTSYS to -EINTR.  Should this return-code change be
+> called out in the commit message (and possibly split out), given that
+> the stated intent of the patch is purely to reduce contention?
 
-Those sound more like implementation/debug counters for the ICSSG
-firmware pipeline=2E They are still useful in ethtool driver stats, but=20
-I would be hesitant to bake their exact semantics into HSR UAPI=2E
-So my preference would be:
- 1=2E Keep driver-private ethtool stats for the full firmware counter set=
-=2E
- 2=2E Add a small HSR/PRP standard stats set separately, limited to
-    well-defined LRE counters=2E
- 3=2E Make the HSR layer expose them, with offload drivers plugging in via
-    an optional callback or offload stats op=2E
- 4=2E Define the counters carefully, including whether they are per-HSR
-    device or per-port A/B, and what PRP-only counters mean for HSR=2E
+Agreed. I'll keep the return code as -EPIPE to match the original behavior, so
+this patch remains a pure contention optimization with no semantic
+change.
 
-I do not think this patch should blindly become the UAPI definition,=20
-but I do think it points at a useful follow-up=2E If we want to avoid=20
-adding driver-private names first and then standardizing different=20
-names later, then it may be worth asking Danish to split the=20
-protocol-level LRE counters out and route those through a common HSR=20
-stats interface=2E
 
-Best regards,
-Luka Gejak
+> [Low]
+> On timeout expiry the new loop takes the teardown path without
+> re-testing whether a slot became available:
+> 
+> > +			timeout = schedule_timeout(timeout);
+> > +			if (!timeout) {
+> > +				/* timeout - terminate link */
+> > +				smcr_link_down_cond_sched(link);
+> > +				break;
+> > +			}
+> 
+> The old wait_event_interruptible_timeout() expansion re-evaluated the
+> condition via ___wait_cond_timeout after schedule_timeout() returned
+> 0, so a wake_up() racing with timer expiry could still report success
+> and let smc_wr_tx_get_free_slot_index() claim the slot.
+> 
+> In the narrow race where a slot is freed at the same instant the
+> timer fires, does this now tear the link down even though a slot was
+> actually available?
+> 
+> >  		}
+> > +		finish_wait(&link->wr_tx_wait, &wait);
+> > +		if (rc)
+> > +			return rc;
+> >  		if (idx == link->wr_tx_cnt)
+> >  			return -EPIPE;
+> >  	}
+
+D. Wythe
+
+> -- 
+> This is an AI-generated review.
 
