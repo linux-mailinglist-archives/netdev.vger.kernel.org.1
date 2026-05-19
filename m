@@ -1,219 +1,256 @@
-Return-Path: <netdev+bounces-289236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289232-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eBEGOWK8C2q3LgUAu9opvQ
-	(envelope-from <netdev+bounces-289236-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 03:26:58 +0200
+	id 0CMYFz67C2q3LgUAu9opvQ
+	(envelope-from <netdev+bounces-289232-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 03:22:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A25C5760D5
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 03:26:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 784B757601D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 03:22:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F21BA308DC57
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:23:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C557D3016B41
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 01:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5F22D5932;
-	Tue, 19 May 2026 01:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p9ckhRst"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7EC21D3CC;
+	Tue, 19 May 2026 01:22:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12382D7DF8
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B2223ED5B;
+	Tue, 19 May 2026 01:21:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779153789; cv=none; b=q9p69VXyUXOO9p6HSNR29tz1IkQGyWlt9PNLCTp7dg27hRZAgwjrUI4ugRtvDGp5NaZaTwixgf8tnlEmHgQczKByuI+742fvCoSp1/q3vTfSqTqhxMNGx6SWI8QfaggyyUekFNsH8lw/gG7h2h4YbUrGnfHPT90+Uit/GXdrlc8=
+	t=1779153721; cv=none; b=XMvgHWi7KNCXVHide7mFKzxRyXbxY95wKaySml4NqBuwZqHGLNorbRp4fudP7JC6+IMaa1oU7mE9zPLLN1vYwM8warGUr9j43n2YCQy/51jIeTOsbYOWjXU1KmH3tb7paBNzw/U/86C2RiXClliakw+TdW2fqwOm7OieZSCzLas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779153789; c=relaxed/simple;
-	bh=4vi/+e3xOXjw7xLTlUAikVPvzws2OAFyV8H8dZm6ePs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EHXW4rDCltIO2gc916rrzFjsu1KgL69+J89ULlaqRzr7DwNyvvO3C1cy3xtFFIBolg1nAVRRaGVOHPhf73CpU2U5NFVM+dDItnYYU2p18Uq/TUP9/l7qiiStOtpUnUCeAF/3oNrmVMJif/i+zAS1Y/KsoouV8XPisf2IXK6NtM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p9ckhRst; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48ff4f8ef0dso33157885e9.3
-        for <netdev@vger.kernel.org>; Mon, 18 May 2026 18:23:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779153786; x=1779758586; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+T0H92Yt0pUbOJ2kFSqG2xMZBSz8hScaz9YpU8JwLL0=;
-        b=p9ckhRst6+1XMFm9y23i0fqGCcPZa2CBPI+F3LOwSj3X39O4YF9hfCOVpYuc6toS9R
-         HzrPtQBiVc6siUEPv+mPIJkCLO1vtMfjHvqjTW3OlO1X8k+uDfgpnq6doXqMn9zOdjQw
-         hpxY+mSQT4q9T5Jc2/Fm7A+TwVBH3h2gavynDLcCbOCjMdnUt+SOR5H5o9mlPrzqR5bn
-         efYvrothcrHbHhs8FdzuAs8wLka/4VaeLr5iMUPLP1eRiG2DbdvX7ii63y8HA/dJseRY
-         I1IFIIQf7g9roaOD5z17tUhhQz5TnZcAtFxXLuO7ptm9bZt+OARyqbiDncqlbPmLgTNm
-         Xgmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779153786; x=1779758586;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+T0H92Yt0pUbOJ2kFSqG2xMZBSz8hScaz9YpU8JwLL0=;
-        b=WZGQ/NeBskDM7Xq/+eIaCGLkQbmWqDkb7+IE/R7jdsezXEtBfB1PGglDwka9McHf47
-         IN56rUn0RQZZGGeqOuRLTJgz2Ujsodv7MUueLnr1rSfggAEo9ciQupOJpfUvyBmmmn5c
-         RipkWD2ZiCFdMA8w5n8UPxk+pc97deUYQqIPSGDWmfKYQiqIt3Hc/r/2ON4kJiDZBbhB
-         KL2xMYmI5RIQk+S6PuBo8ak5zvo/cTXqKIjquYooKGI4FKB74icFuNYhoCukX6YqFM3h
-         DML468PslGxAcQ+gA2qwqVU/v2zgXpULsaZZRv3Ss0rvEiI/tJ6klWX6s7exKygrGfPU
-         USpA==
-X-Gm-Message-State: AOJu0Yx8NY4E2E9QfU8Iz50/YQ6qHTY8kWeIueBMfptYhWIrE/r0E0Ja
-	L08AyAA2ALh218+SqUixGS3WkAMgfU0jVeaCZHPX/DQhEDQzfnFU91MVB/8xISZZ3Qo=
-X-Gm-Gg: Acq92OHyBZwn1RR+UisQqRnanUqiXU1VuTjNUYAKJOrpycG/8y4H/OkSBGQpCgW08hV
-	D/eJpruXH4jxXBn+dlImbRz6zK9fsUv36H82A2qPajR3YZYOBT/9gIs4xah1lRmEppqtHKREfx2
-	LFxEcmtVM7EGqecn7DbEICK40dpL46NIt5kcvZe6eZudI+p2qM6t+5PkgiUp++7twVC48S4o6O2
-	sC3nv+RDI49G4MClqj3fEUob7GsI3P5aa21QVpPudnAKNRXgiKX8I3BaLjcXlZUVIY65ZsqbsLB
-	Nfx2Cu8wCdclSrzCn3oI7SnGHl8vVY8ZugjSSF81brpxDDpiX3TinzvBTR5JpzoTx0en66xT9dV
-	PpP8lb3gTooypKHmEbSUPDL1L/ImpvnjWvwkEpeqtFc1CUx89ZHG17J8xJX08sue4zlSk3FiT4R
-	rVrF5IWP8qOwhWIkLGwFZsrkQoUNuJ+xKTsLV08hd4+MzskP7pnPAjs2mhSu+x5EcuZR/zo6ZL3
-	w==
-X-Received: by 2002:a05:600d:10:b0:48f:e230:2a1b with SMTP id 5b1f17b1804b1-48fe6630137mr219596215e9.30.1779153785784;
-        Mon, 18 May 2026 18:23:05 -0700 (PDT)
-Received: from node ([202.47.63.86])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9ec39ff1sm44255416f8f.10.2026.05.18.18.23.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 18:23:05 -0700 (PDT)
-From: Muhammad Bilal <meatuni001@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	oe-linux-nfc@lists.linux.dev,
-	david+nfc@ixit.cz,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	stable@vger.kernel.org,
-	Muhammad Bilal <meatuni001@gmail.com>
-Subject: [PATCH net 2/2] nfc: llcp: add missing bounds checks in nfc_llcp_recv_snl()
-Date: Mon, 18 May 2026 21:19:37 -0400
-Message-ID: <20260519011937.12903-3-meatuni001@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260519011937.12903-1-meatuni001@gmail.com>
-References: <20260519011937.12903-1-meatuni001@gmail.com>
+	s=arc-20240116; t=1779153721; c=relaxed/simple;
+	bh=ewChc/ER0917lirtRzENqvjMiCzDIUR29ne0LCRL+MQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=etjRXTusxiWdsF1At/3ho3o2H0LBtZYgSXFHczbd6MJ5BtqFktENf2dhPCNmotqATMB481QbhBeCS0biZz1z9rjv4XH4901G8EX5bO+XgBVTWhVxqR566E3iY+KDtpMItBV3CfdJCNtHAaEZ1TEkB3bS5duLfvUgETXILDgbU90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64J1LZGQ036493;
+	Tue, 19 May 2026 10:21:35 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64J1LZBl036483
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 19 May 2026 10:21:35 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <ef62371e-ddd5-4074-b554-410c708ca1cd@I-love.SAKURA.ne.jp>
+Date: Tue, 19 May 2026 10:21:32 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net v2] can: j1939: use netdevice_tracker for
+ j1939_{priv,session,ecu} tracking
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Robin van der Gracht <robin@protonic.nl>,
+        Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+        Oliver Hartkopp <socketcan@hartkopp.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>
+References: <c109e9fc-3fb7-4a48-a0bd-a4d7663e7342@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <c109e9fc-3fb7-4a48-a0bd-a4d7663e7342@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav402.rs.sakura.ne.jp
+X-Virus-Status: clean
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,ixit.cz,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289236-lists,netdev=lfdr.de];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,I-love.SAKURA.ne.jp:mid,i-love.sakura.ne.jp:email];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[meatuni001@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,nfc];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8A25C5760D5
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289232-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 784B757601D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-nfc_llcp_recv_snl() processes remotely supplied SNL frames without
-validating TLV buffer boundaries before accessing header and value
-bytes, leading to three issues:
+syzbot is still reporting
 
-1. No bounds check before reading tlv[0] (type) and tlv[1] (length).
-   When tlv_len - offset == 1, reading tlv[1] accesses one byte past
-   the end of the skb data.
+  unregister_netdevice: waiting for vcan0 to become free. Usage count = 2
 
-2. For LLCP_TLV_SDREQ entries, tlv[2] (tid) and tlv[3+]
-   (service_name) are read without checking offset+2+length <= tlv_len,
-   allowing out-of-bounds reads beyond the skb data boundary.
+problem. A debug printk() patch in linux-next-20260508 identified that
+there is dev_hold()/dev_put() imbalance in j1939_priv management.
 
-3. service_name_len = length - 1 with length as u8 and service_name_len
-   as size_t. When length == 0, the subtraction yields SIZE_MAX on
-   64-bit kernels due to integer promotion. The computed SIZE_MAX value
-   is propagated into nfc_llcp_sock_from_sn() as sn_len, bypassing the
-   sn_len == 0 guard and reaching subsequent comparison logic with an
-   excessively large length argument.
+  Call trace for vcan0[26] +4 at
+     __dev_hold include/linux/netdevice.h:4470 [inline]
+     netdev_hold include/linux/netdevice.h:4513 [inline]
+     dev_hold include/linux/netdevice.h:4536 [inline]
+     j1939_priv_create net/can/j1939/main.c:140 [inline]
+     j1939_netdev_start+0x36b/0xc10 net/can/j1939/main.c:268
+     j1939_sk_bind+0x853/0xb30 net/can/j1939/socket.c:506
+     __sys_bind_socket net/socket.c:1948 [inline]
+     __sys_bind+0x2e9/0x410 net/socket.c:1979
 
-Fix all three issues by:
-  - Adding a header bounds check before reading tlv[0]/tlv[1].
-  - Adding a value bounds check after reading length.
-  - Rejecting SDREQ TLVs with length < 1 to prevent the SIZE_MAX
-    underflow, while preserving length == 1 as a valid case.
-  - Rejecting SDRES TLVs with length < 2 since both tlv[2] and
-    tlv[3] are required.
+  Call trace for vcan0[28] -3 at
+     __dev_put include/linux/netdevice.h:4456 [inline]
+     netdev_put include/linux/netdevice.h:4523 [inline]
+     dev_put include/linux/netdevice.h:4548 [inline]
+     __j1939_priv_release net/can/j1939/main.c:166 [inline]
+     kref_put include/linux/kref.h:65 [inline]
+     j1939_priv_put+0x128/0x270 net/can/j1939/main.c:172
+     j1939_sk_sock_destruct+0x52/0x90 net/can/j1939/socket.c:388
+     __sk_destruct+0x8d/0x9d0 net/core/sock.c:2352
+     rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+     rcu_core kernel/rcu/tree.c:2869 [inline]
+     rcu_cpu_kthread+0x99e/0x1470 kernel/rcu/tree.c:2957
+     smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+     kthread+0x388/0x470 kernel/kthread.c:436
+     ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+     ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-Fixes: 19cfe5843e86 ("NFC: Initial SNL support")
-Cc: stable@vger.kernel.org
-Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+This refcount leak in j1939_priv might be caused by a refcount leak in
+j1939_{session,ecu} because j1939_{session,ecu} holds a ref on j1939_priv.
+For further investigation using upstream kernels, enable netdevice_tracker
+in j1939_{priv,session,ecu} management.
+
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 ---
- net/nfc/llcp_core.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ net/can/j1939/bus.c        | 2 ++
+ net/can/j1939/j1939-priv.h | 3 +++
+ net/can/j1939/main.c       | 8 ++++----
+ net/can/j1939/transport.c  | 2 ++
+ 4 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-index db5bc6a87..da7c6377d 100644
---- a/net/nfc/llcp_core.c
-+++ b/net/nfc/llcp_core.c
-@@ -1300,12 +1300,28 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
- 	sdres_tlvs_len = 0;
+diff --git a/net/can/j1939/bus.c b/net/can/j1939/bus.c
+index dc374286eeb6..cdc3c0a71937 100644
+--- a/net/can/j1939/bus.c
++++ b/net/can/j1939/bus.c
+@@ -20,6 +20,7 @@ static void __j1939_ecu_release(struct kref *kref)
+ 	struct j1939_priv *priv = ecu->priv;
  
- 	while (offset < tlv_len) {
--		type = tlv[0];
-+		if (offset + 2 > tlv_len) {
-+			pr_err("Truncated TLV header at offset %u\n", offset);
-+			goto exit;
-+		}
-+
-+		type   = tlv[0];
- 		length = tlv[1];
+ 	list_del(&ecu->list);
++	netdev_put(priv->ndev, &ecu->priv_dev_tracker);
+ 	kfree(ecu);
+ 	j1939_priv_put(priv);
+ }
+@@ -155,6 +156,7 @@ struct j1939_ecu *j1939_ecu_create_locked(struct j1939_priv *priv, name_t name)
+ 	if (!ecu)
+ 		return ERR_PTR(-ENOMEM);
+ 	kref_init(&ecu->kref);
++	netdev_hold(priv->ndev, &ecu->priv_dev_tracker, gfp_any());
+ 	ecu->addr = J1939_IDLE_ADDR;
+ 	ecu->name = name;
  
-+		if (offset + 2 + length > tlv_len) {
-+			pr_err("TLV length %u overflows buffer at offset %u\n",
-+			       length, offset);
-+			goto exit;
-+		}
-+
- 		switch (type) {
- 		case LLCP_TLV_SDREQ:
--			tid = tlv[2];
-+			if (length < 1) {
-+				pr_err("SDREQ TLV length %u too short\n", length);
-+				goto exit;
-+			}
-+
-+			tid          = tlv[2];
- 			service_name = (char *) &tlv[3];
- 			service_name_len = length - 1;
+diff --git a/net/can/j1939/j1939-priv.h b/net/can/j1939/j1939-priv.h
+index 81f58924b4ac..cf26352d1d8c 100644
+--- a/net/can/j1939/j1939-priv.h
++++ b/net/can/j1939/j1939-priv.h
+@@ -38,6 +38,7 @@ struct j1939_ecu {
+ 	struct hrtimer ac_timer;
+ 	struct kref kref;
+ 	struct j1939_priv *priv;
++	netdevice_tracker priv_dev_tracker;
  
-@@ -1369,6 +1385,9 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
- 			break;
+ 	/* count users, to help transport protocol decide for interaction */
+ 	int nusers;
+@@ -60,6 +61,7 @@ struct j1939_priv {
+ 	rwlock_t lock;
  
- 		case LLCP_TLV_SDRES:
-+			if (length < 2)
-+				break;
-+
- 			mutex_lock(&local->sdreq_lock);
+ 	struct net_device *ndev;
++	netdevice_tracker dev_tracker;
  
- 			pr_debug("LLCP_TLV_SDRES: searching tid %d\n", tlv[2]);
+ 	/* list of 256 ecu ptrs, that cache the claimed addresses.
+ 	 * also protected by the above lock
+@@ -230,6 +232,7 @@ enum j1939_session_state {
+ 
+ struct j1939_session {
+ 	struct j1939_priv *priv;
++	netdevice_tracker priv_dev_tracker;
+ 	struct list_head active_session_list_entry;
+ 	struct list_head sk_session_queue_entry;
+ 	struct kref kref;
+diff --git a/net/can/j1939/main.c b/net/can/j1939/main.c
+index 9937c04241bc..5e5e6c228f22 100644
+--- a/net/can/j1939/main.c
++++ b/net/can/j1939/main.c
+@@ -137,7 +137,7 @@ static struct j1939_priv *j1939_priv_create(struct net_device *ndev)
+ 	priv->ndev = ndev;
+ 	kref_init(&priv->kref);
+ 	kref_init(&priv->rx_kref);
+-	dev_hold(ndev);
++	netdev_hold(ndev, &priv->dev_tracker, GFP_KERNEL);
+ 
+ 	netdev_dbg(priv->ndev, "%s : 0x%p\n", __func__, priv);
+ 
+@@ -163,7 +163,7 @@ static void __j1939_priv_release(struct kref *kref)
+ 	WARN_ON_ONCE(!list_empty(&priv->ecus));
+ 	WARN_ON_ONCE(!list_empty(&priv->j1939_socks));
+ 
+-	dev_put(ndev);
++	netdev_put(ndev, &priv->dev_tracker);
+ 	kfree(priv);
+ }
+ 
+@@ -281,7 +281,7 @@ struct j1939_priv *j1939_netdev_start(struct net_device *ndev)
+ 		 */
+ 		kref_get(&priv_new->rx_kref);
+ 		mutex_unlock(&j1939_netdev_lock);
+-		dev_put(ndev);
++		netdev_put(ndev, &priv->dev_tracker);
+ 		kfree(priv);
+ 		return priv_new;
+ 	}
+@@ -298,7 +298,7 @@ struct j1939_priv *j1939_netdev_start(struct net_device *ndev)
+ 	j1939_priv_set(ndev, NULL);
+ 	mutex_unlock(&j1939_netdev_lock);
+ 
+-	dev_put(ndev);
++	netdev_put(ndev, &priv->dev_tracker);
+ 	kfree(priv);
+ 
+ 	return ERR_PTR(ret);
+diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+index df93d57907da..158433511552 100644
+--- a/net/can/j1939/transport.c
++++ b/net/can/j1939/transport.c
+@@ -283,6 +283,7 @@ static void j1939_session_destroy(struct j1939_session *session)
+ 		kfree_skb(skb);
+ 	}
+ 	__j1939_session_drop(session);
++	netdev_put(session->priv->ndev, &session->priv_dev_tracker);
+ 	j1939_priv_put(session->priv);
+ 	kfree(session);
+ }
+@@ -1515,6 +1516,7 @@ static struct j1939_session *j1939_session_new(struct j1939_priv *priv,
+ 	INIT_LIST_HEAD(&session->active_session_list_entry);
+ 	INIT_LIST_HEAD(&session->sk_session_queue_entry);
+ 	kref_init(&session->kref);
++	netdev_hold(priv->ndev, &session->priv_dev_tracker, gfp_any());
+ 
+ 	j1939_priv_get(priv);
+ 	session->priv = priv;
 -- 
 2.54.0
+
 
 
