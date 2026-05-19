@@ -1,212 +1,186 @@
-Return-Path: <netdev+bounces-289457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289458-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KHkfMIZeDGq5gQUAu9opvQ
-	(envelope-from <netdev+bounces-289457-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:58:46 +0200
+	id 2D4qGRtiDGpXggUAu9opvQ
+	(envelope-from <netdev+bounces-289458-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:14:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EF3C57F2D0
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:58:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2EB057F617
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:14:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 39DED304CF55
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:57:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DD86730791C6
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 13:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89D64DD6DA;
-	Tue, 19 May 2026 12:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A74034040D;
+	Tue, 19 May 2026 13:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JHHOpMAu"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="kwXBGbji"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445374E3781
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 12:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779195457; cv=pass; b=m0hi7ZCpiqF1RTbTEiIYO4AYK83khjBXKcUyg961E5U2GL/c7nxr7EeT8U3D8n2Ma1KaKqH+vLTdOeHRfiibgBnKwT7e87+lRqZuM3gIiL+HQevt/aN6XG1XMfcAe3ARH16McmQtqQNr5nwA+UkDh4Kr3pd6V80EmFEtFjM6Cm4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779195457; c=relaxed/simple;
-	bh=syki1LcY9HcC9sEvA/osomvyfE2utk7kCHBpcweDB1c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V0dUV7wlXHbdfGvMqS+nK/C56PS6HXIfY0ilAxdtez+MjeGaLWALi9BicFabH/1yL5YOhRrmxrYluvkErRcj3CJ4ngvOV/Ace7S3cqoFoDTT/BkStIIqzLBnsdfQaqjSZpU9oapf8+GdpLlcN6GleHVsL2AicVIMVj6Ah8f6zsY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JHHOpMAu; arc=pass smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-910f734b477so409280185a.0
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 05:57:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779195455; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fw7pmzhfn9vN2w2fdoWZoPJx0W5yZJ/IqncBsdxqij/nmBEWSSHS1z2T7UhQQTd8yq
-         i/Yz/GIvVvSg2a/lmog7dCpvh2gDmr4yaHHV6oImJBn3Xacnhezh5L9CvwOaOYGosNYz
-         LHY5pUAOu1S/410lEwUUGEqqWTcIEVuMPPAAAg7c7fSappT3xLgUzaGIMULfNfOcRPiK
-         fyzTZwBTrcafsWvt6R/Djf7a/zRr2JBHRWoTiaCHfBxCa3YCiZAZd5UIkdy3xFjScg9V
-         rIpH1SoKTH33pM+nY3iJ21w5RN/0jSBh/gT+YGOmdIDljFBLU363lVRiqdIUN5zsUBNK
-         bT1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=e9IdxpJyv+V3JPoCN9VNaCT4NZj9yJLeNXfr5f3Dpm0=;
-        fh=GFn6lLVdtTWT69leMbZP2QWVG4n8g5YEWUkpkSe12zE=;
-        b=bOW1lkVd+kOcmEjmiT0EfirllGP2CrODwyGDxgv+U8uersLQunFI7PDtO5iFiWPD7s
-         ljnYY6xJ8ngGETB12RU/0s5Ju+eo8MAD9H+2ul1Ddk+wwhGlzH5x+qfXXi778voy/k9b
-         hmUA4gXRHxUNTeDXY/kVRHfHW2z+PtEC9oe6sMsfeJN0Mk2fayCqU3/ifStAuiEn/LFx
-         1GG/6oIAWP1VS5qbMeSly5XVYGVW5E1jVfKwEum2N4/KloA77jotXRHYQfLFcpu+f2AK
-         9Spb/OuJSfAclVBicLNgzVRDpwjn521RZrq3AXYrBPQpitcWCIeIWc3TmkIz0yW6Qx/j
-         G9ag==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1D73403FC
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 13:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779195977; cv=none; b=t9XpMAJDqOuz+GoggrmJIxHY/vFhYX8LmI9Dl0WLCI6Key4DMPoPW7RYUmZfZLxT5cfwT3csvdH/DUROm+EZuNEhE90UK6TpzFBQRj8S9XCK2vNkiQGzLTbiHyWBHZXckY807E9L9+K9mYDPX8M6Kdcn20xJ/oF/C0WHfM5kY/M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779195977; c=relaxed/simple;
+	bh=cg4z7G7iNBSO9WPLaSxyK3mhnsTtEoKLiHUito40w9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UhgS6friacAMzPZoSAxeD9BEi0pDbxMFkaU8JK5nZs74eyMBZSRv/YnT6CkS411kFLTGuNrwEFRnv7ZoLGgHoaAN6NlFS7jJ/77qdfcIvQ5GAGL1gN8GmjlzM5rRJ12MuQEwkGl2kilyg1lcvBNjwehb3EUjDi4Pm8iSlJYzmTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=kwXBGbji; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5a8fbe18b1dso6017406e87.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 06:06:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779195455; x=1779800255; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e9IdxpJyv+V3JPoCN9VNaCT4NZj9yJLeNXfr5f3Dpm0=;
-        b=JHHOpMAuBAMDpqcqEiuIgKslMpO1VnvpdNC7Wn1hJ22+GhZd26XA1mNUycjPI0Itqi
-         JDBt/Fn7W6vGI8cHoUsYcAEiQasa8nXizzXv+dyskyDYZ5Z8N8CV/ukLfFTXjJcfgjy+
-         Fi8BwRPqIlL5NuGpg2JR3Dy0VOuEFQvRixdKnJWOtiPjef2PZ4i6xoCC7s9x6cEvmXkH
-         2h0dGuG+BdBmgZH/+Jmjs5UDvyhVWcYyPLrDcBKOx3MFVcXcifYSKhpxiqRhPozBFAuH
-         Q4xTqYtJOlGbkYJdzqOIrFPbyM+xlEcT6HEJp7gZmNrl+4N7L8FlChOH/cGHH3RPlwdY
-         rPuQ==
+        d=blackwall.org; s=google; t=1779195974; x=1779800774; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mBDmsIRaLxU1htRPlExjpxjIYZQeUV/LcGzok6vPGGI=;
+        b=kwXBGbjiqKL80cPycnq0bJj0qNvwKq+TrenGRUW0bjWmNDdZhDsHgxuYXhzEL9tZQN
+         q7Liw5l6DLYZdsD4Azs/D3o4r0stvUnvR0Hgpt+rosIX+B1lIEOT/IKAW2gHwnUMRgft
+         1euULnig2fCtGImNof/t+O/M+XZ23xnZ9fbNr3Z0k0olPbeFsgpWDuUW1l76AiUy+56L
+         g/HDaOZu8IovYijPLhxGCfiJacQYxIK+ihL+UqPK66aeDEMpRL0/V1cUQZhj3G3krWpJ
+         a6lV/S7IzdtS+Hb+gPiquLG2HAgB/jYTJIEK9sq5GmKT/o00lytsDX/rNFdemZyXYEEZ
+         YjDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779195455; x=1779800255;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=e9IdxpJyv+V3JPoCN9VNaCT4NZj9yJLeNXfr5f3Dpm0=;
-        b=PM0ivcictl1gOvfNAlLaA3MwaATItmSu5djf/b4yomvacKJGlwT35BEOdD/IMyM6N1
-         cklolqwWAd8oo1iX1nublCBvQunVzy3NCGzs0yDAElgjD6m4inQySlUoqo/QLg2ib3DH
-         3L1670mkTli3BIRUCdySFa1xTNkLclyRriWS8g7Eqp5ahiuudanueKSXOC4j9QhJrZGY
-         1RUyl0CE+4rQMIYLa7e0g3mkbkO1m1Xbj/f2u5atzikn7u2gNwAtyyEymnVWG2J9rUtd
-         mmrzRIgYh3Lb73zL47/OtuOTjCQkInWssXv8UnapTiN4YpsgPGZ6gmkylwSwhkQ0dv7T
-         2Uiw==
-X-Gm-Message-State: AOJu0YykoGOurKFBXFEYH7iIVLEn4pNteIb3rfU8FcgQUbHAj1V1jE53
-	S6AuNodIiVcxVVOVMl6pRzNYOg2fVaAJFuEbztTVQhcO5NIEYGGRtMjnHnMambzdS0JZ5Q3icIS
-	IeyduC13+sEwWRZLgZDyrlHE9VGOh2H4rYyfhmCTU
-X-Gm-Gg: Acq92OGu2vPaXkpBQQNtkThoxKnUGOh3DSJrCwKFiAunAxoHaxn2EQw+YY0x/XqWSlf
-	lnSSyYk/WZ5ALoUQwnKqriOTlGSx1p2pNVhJPuGuAhT39G/y0HeraIINoNax5sMqP3yC5FKN1Q0
-	v/zk0bXzWTEvHPCXkaGov5c5xzmQKSORuj3RRKrKwdA3t+JlNs2j9SqutkmuCrJZ+thrXwkP/9y
-	EufOmHdkB5HD+rFgTsKbfdAH2mAK08a/X04vzhkwCt77jv9AKudYoV71+pnpQMOZrJYlQpLouVU
-	HX+JBYjhxTNSqvD+tYy3Fff6srOP0at9YqAiLMcwSrdMWK2xAsERFLw/NpFGN41VhYQlHV3m5tP
-	rcN/iG2CZdS3ASrPa06ZlU2VTUbEaLLoBKb5yvzlVBtDmqEkfHRXuNWDR0BIaS+E=
-X-Received: by 2002:a05:622a:4d09:b0:509:2527:d789 with SMTP id
- d75a77b69052e-51659fde5ecmr279342441cf.6.1779195454133; Tue, 19 May 2026
- 05:57:34 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779195974; x=1779800774;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mBDmsIRaLxU1htRPlExjpxjIYZQeUV/LcGzok6vPGGI=;
+        b=V9wuVjzF1ndowA6GZN8CwBUI7Hv6X4zpL7+MzuJ7rYzyk2iTsZMidiSgY8kw3JfL5D
+         LVK2ydwq9TXHFShT9NApPBTpMlJY8J0FXkvAO5ULUH2ZEYbqg/QA8cG49PdEUp1BN039
+         +5AAqq1P/+8ipa+7woNjM0Ymyl82T77Vn6n1SmML6CcgpqiYlWK3EYz+A01FTwnaUW8S
+         n0QNh91c4LQB71BKlIliu1cKehRfoorgNmdVJxz2oNu+p2cKixI5RNP7taXSgJRzSg0C
+         E11kEvERHp5OjyUuPKJw5qq6vcw1LFiidc+FQw5vaCKcN0FTu6LO+U2h4QRzgNmACZl1
+         /CsQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8Vt0Kb0xjDzuR82rtRpCw5FMFDAkuBYlvjxbX1amAKwQRpQBGWdeAIDoBhnOGFrlIOa1YXEB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2cEl3lzk1hIdnfT9QhzBQBZ9LuUDVWO0iitdH6nG0ZPZ2Qxei
+	RS2sIXzfjEg3PRSR4aVct5Bb2HkQXp2/M+3ik/ZALXMGo3IsaJjNFXZ+N3Bhh5Z/mX8mpjBIRnn
+	euCoh
+X-Gm-Gg: Acq92OEBV1/zKKydIEr2hk5wdtngM9WIE1rEoBAsHn5BcItkBacAjlVNYTb//Uhp7cT
+	GNswWyHW+RdAgKhv86uUibevWENPGRCPGB5TgOf19Hq/MACTlBMoWN6lgXyMXAkA7Mzh5vxtrTQ
+	6+XUEQBj+XrDgThWhTG54XwGV+rEqiIYnH7Q7OKUucstw+7gQepQMSYIeRcobbMlZswpMX5KO4T
+	6JNPJDV7VjTERWTnoKDEJKNnJuz0W1+1oQ7iMNo3/XvcfmsvakQtAIoTzsCNxXCNohCvdSWmmln
+	0FnLDykFTqWbJ/EpOwKUS6BtADeoBJ02LrxgkcN0kGrr5KFFqKPyM4Qw5A/1xYkOyEU+QqMjrVP
+	M6jKq26j8lG/421FN5UbIvWX3GJDjefFSFc63nGBHuRI2AZhEwqTGzhgRw1qIigd0fGmjIkEf0F
+	5cnNQf2CJKPZaGVNJO4ffj4WNNQZK/G2ki24wdLzSmLA==
+X-Received: by 2002:a05:6512:1321:b0:5a8:8df1:61bf with SMTP id 2adb3069b0e04-5aa0e763a62mr5665485e87.21.1779195973589;
+        Tue, 19 May 2026 06:06:13 -0700 (PDT)
+Received: from localhost ([176.111.181.159])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a9164c5a36sm4124074e87.60.2026.05.19.06.06.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 06:06:13 -0700 (PDT)
+Date: Tue, 19 May 2026 16:06:06 +0300
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Ido Schimmel <idosch@nvidia.com>
+Subject: Re: [PATCH net-next] net: bridge: remove stale rcu_barrier() in
+ br_multicast_dev_del()
+Message-ID: <agxgPqDGkXspLZzJ@penguin>
+References: <20260519095540.2643318-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4d583fc5401298453d0a2f1b4719a15be30c8e49.1779194090.git.sd@queasysnail.net>
-In-Reply-To: <4d583fc5401298453d0a2f1b4719a15be30c8e49.1779194090.git.sd@queasysnail.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 19 May 2026 05:57:22 -0700
-X-Gm-Features: AVHnY4J-s1Pz69JZvWlwC3nxLmgDfJNgiuhqmlFvPNZjcnyZxeD1ZIK9j5iF2P4
-Message-ID: <CANn89i+w93DBm_yo5DZ6K_dgV4Gst=vb5OnTcXi2rKqeNHZSbQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: gro: don't copy frags between mixed zcopy skbs
-To: Sabrina Dubroca <sd@queasysnail.net>, Willem de Bruijn <willemb@google.com>
-Cc: netdev@vger.kernel.org, Huzaifa Sidhpurwala <huzaifas@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Pavel Begunkov <asml.silence@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260519095540.2643318-1-edumazet@google.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289457-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,davemloft.net,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-289458-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DMARC_NA(0.00)[blackwall.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,nvidia.com];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,queasysnail.net:email]
-X-Rspamd-Queue-Id: 6EF3C57F2D0
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,blackwall.org:email,blackwall.org:dkim]
+X-Rspamd-Queue-Id: D2EB057F617
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 5:40=E2=80=AFAM Sabrina Dubroca <sd@queasysnail.net=
-> wrote:
->
-> skb_gro_receive() can currently copy frags between the source and GRO
-> skb, without checking the zerocopy status, and in particular the
-> SKBFL_MANAGED_FRAG_REFS flag.
->
-> When SKBFL_MANAGED_FRAG_REFS is set, the skb doesn't hold a reference
-> on the pages in shinfo->frags. Appending those frags to another skb's
-> frags without fixing up the page refcount can lead to UAF.
->
-> When either the last skb in the GRO chain (the one we would append
-> frags to) or the source skb is zerocopy, skip the frags copy, and just
-> append the new skb to the frag_list.
->
-> This is probably a bit less efficient than calling
-> skb_zcopy_downgrade_managed(), but then we'd also have to handle the
-> rest of the zerocopy flags/machinery. This can be improved in
-> net-next.
->
-> Fixes: 753f1ca4e1e5 ("net: introduce managed frags infrastructure")
-> Reported-by: Huzaifa Sidhpurwala <huzaifas@redhat.com>
-> Assisted-by: Claude:claude-mythos-preview
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+On Tue, May 19, 2026 at 09:55:40AM +0000, Eric Dumazet wrote:
+> This rcu_barrier() came from a time call_rcu() calls were used in
+> net/bridge/br_multicast.c.
+> 
+> Now kfree_rcu() is there, we can remove this problematic rcu_barrier()
+> which causes extreme RTNL pressure in many syzbot reports.
+> 
+> INFO: task syz-executor:77945 is blocked on a mutex likely owned by task kworker/u1024:5:36537.
+> task:kworker/u1024:5 state:D stack:24616 pid:36537 tgid:36537 ppid:2      task_flags:0x4208060 flags:0x00080000 last_sleep:612797637337
+> Workqueue: netns cleanup_net
+> Call Trace:
+>  <TASK>
+>   [<ffffffff81914eaa>] context_switch+0xf2a/0x1730 kernel/sched/core.c:6483
+>   [<ffffffff81201143>] __schedule+0x1133/0x43a0 kernel/sched/core.c:8411
+>   [<ffffffff8120446b>] __schedule_loop kernel/sched/core.c:8514 [inline]
+>   [<ffffffff8120446b>] schedule+0xab/0x260 kernel/sched/core.c:8529
+>   [<ffffffff8121a093>] schedule_timeout+0xc3/0x2b0 kernel/time/sleep_timeout.c:75
+>   [<ffffffff81205347>] do_wait_for_common kernel/sched/completion.c:100 [inline]
+>   [<ffffffff81205347>] __wait_for_common kernel/sched/completion.c:121 [inline]
+>   [<ffffffff81205347>] wait_for_common kernel/sched/completion.c:132 [inline]
+>   [<ffffffff81205347>] wait_for_completion+0x2c7/0x5d0 kernel/sched/completion.c:153
+>   [<ffffffff81b8f27f>] rcu_barrier+0x49f/0x620 kernel/rcu/tree.c:3888
+>   [<ffffffff860091b3>] br_multicast_dev_del+0x303/0x350 net/bridge/br_multicast.c:4459
+>   [<ffffffff85fb5dbc>] br_dev_uninit+0x1c/0x40 net/bridge/br_device.c:157
+>   [<ffffffff8568058c>] unregister_netdevice_many_notify+0x1c1c/0x2300 net/core/dev.c:12599
+>   [<ffffffff8562be43>] ops_exit_rtnl_list net/core/net_namespace.c:187 [inline]
+>   [<ffffffff8562be43>] ops_undo_list+0x3d3/0x940 net/core/net_namespace.c:248
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->  net/core/gro.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> Huzaifa has found this to be exploitable to overwrite the page cache
->
-> diff --git a/net/core/gro.c b/net/core/gro.c
-> index 31d21de5b15a..cae0a0dbfa69 100644
-> --- a/net/core/gro.c
-> +++ b/net/core/gro.c
-> @@ -123,6 +123,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff=
- *skb)
->         lp =3D NAPI_GRO_CB(p)->last;
->         pinfo =3D skb_shinfo(lp);
->
-> +       if (skb_zcopy(skb) || skb_zcopy(lp))
-> +               goto merge;
-> +
->         if (headlen <=3D offset) {
->                 skb_frag_t *frag;
->                 skb_frag_t *frag2;
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> Cc: Ido Schimmel <idosch@nvidia.com>
+> ---
+>  net/bridge/br_multicast.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+> index 49ceea3ff9742d3043ac605d656b7fcf37dbcb96..8efa3add5d47508fb2b032ff6238ffbbabfd27ad 100644
+> --- a/net/bridge/br_multicast.c
+> +++ b/net/bridge/br_multicast.c
+> @@ -4453,8 +4453,6 @@ void br_multicast_dev_del(struct net_bridge *br)
+>  	br_multicast_ctx_deinit(&br->multicast_ctx);
+>  	br_multicast_gc(&deleted_head);
+>  	cancel_work_sync(&br->mcast_gc_work);
+> -
+> -	rcu_barrier();
+>  }
+>  
+>  int br_multicast_set_router(struct net_bridge_mcast *brmctx, unsigned long val)
+> -- 
+> 2.54.0.563.g4f69b47b94-goog
+> 
 
-Do we really want to merge these skbs in the first place?
-
-What about play safe?
-
-diff --git a/net/core/gro.c b/net/core/gro.c
-index 31d21de5b15a76439239d15f10d0fd6b6c8ab328..bae89062a053dd9804e772e711e=
-277645e6fee4a
-100644
---- a/net/core/gro.c
-+++ b/net/core/gro.c
-@@ -109,6 +109,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *=
-skb)
-        if (p->pp_recycle !=3D skb->pp_recycle)
-                return -ETOOMANYREFS;
-
-+       if (skb_zcopy(p) || skb_zcopy(skb))
-+               return -ETOOMANYREFS;
-+
-        if (unlikely(p->len + len >=3D netif_get_gro_max_size(p->dev, p) ||
-                     NAPI_GRO_CB(skb)->flush))
-                return -E2BIG;
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
