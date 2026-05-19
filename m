@@ -1,155 +1,120 @@
-Return-Path: <netdev+bounces-289256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iMB0FZ/GC2qWMQUAu9opvQ
-	(envelope-from <netdev+bounces-289256-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 04:10:39 +0200
+	id 0AuNGdXIC2pSNQUAu9opvQ
+	(envelope-from <netdev+bounces-289257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 04:20:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1416576506
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 04:10:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4887257661D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 04:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 319CD3045098
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:10:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3DCDE303074A
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEB430B51D;
-	Tue, 19 May 2026 02:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5606E30E838;
+	Tue, 19 May 2026 02:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWplNKEx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ri6LkZ6H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88A12DF68;
-	Tue, 19 May 2026 02:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179922EFD9B;
+	Tue, 19 May 2026 02:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779156630; cv=none; b=NbOlby+jMDRn1VYGxrrkhDtbAqejOa/p0vY5+A7RVbB767OQ1idAiyZcYVRAG+mmmtcWABl3e764rfxq53LtR5piVNTe43xWBafzC98Vu29hIi6Kor/Cn8I8iAW7vqeFXcd+tLvgoREkPAxikuuHcVNryQhfVKxHhGKWY9xs2O8=
+	t=1779157202; cv=none; b=Jmp91onNgYeggrUDkJVoBiBULZloOM7IdlRtdHdmtInSZ52bpJRWK/voKPetIRkBB/DNupZs+uRPfPtl0Ebx2rMtcyMaKI9Gaxlfcx/XFjzeEiN6FoWZ7xcoS1xDqnwIcMhYvAuIvsvMGuUG4vlnEgbyErSl6wcssoZURC139pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779156630; c=relaxed/simple;
-	bh=tztf4Nw5ut0/6DpoJ41Cp6mb7XeZ6UqH/1hSjhNFz7Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BJd/XgpYjBb4jAFUrwbshPVlnRpZ9LD04sZMh0zb8Ph7v1Q46AXHuBfd4ohxKPhtegPuNJvIsT9c2gnmAb3YZdY48GirWXckYIJiUSjxfSSUS2a4ysHNxQES3lLHUgMp6+wi3HrBcbWnJUG7sRrrxJELjh8UxqoYlBWjVGTSIaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWplNKEx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91C8EC2BCB7;
-	Tue, 19 May 2026 02:10:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779156630;
-	bh=tztf4Nw5ut0/6DpoJ41Cp6mb7XeZ6UqH/1hSjhNFz7Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WWplNKExtQuHDHTw8UbUhu2fO1NKnQ2AVH94j1ajgcn25WbgB2ljKdWg2SX9zbw7n
-	 LhhSdjHhIFvE9F0HfoqDxxeVSd6fPJPfaE+ZDZU5c70F+LlypOp0Jc73yzH8nfPmJz
-	 OwnIHSAFYWlwkkzlmzQkMjqA3saqd36t7YzJLHMC43lhCSKLEXxUBWbBkDxn2/S+qA
-	 1rGyeaRH+U9gz63DJZKka+sSEEIMMZy2I3rPW/iKcklQKZawCf/gFEjTEOA7t7hsDS
-	 Hh6Oc0iC/BY07nhLrQqYBHaJeYT+9LTwRSqzR1BezX8FXybyNOrz30JK2yi56NWc9t
-	 VEa7IkVlcoNgg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198D93930D10;
-	Tue, 19 May 2026 02:10:43 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1779157202; c=relaxed/simple;
+	bh=S+Be9QbRUA8mj/wKyMTanDw0iY8dOqs8erFeNPqm30o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rIP6TzCQNf7wA8vrDRR32yKulbassEdZECE0Rfz2vznoJfUWH+fzkAAhwf6BmZFm3sy6mzmFLRWyUaCMinZr3jv2NW/njydbbiM7av0COc8r7ET4MxqI82jZhtBjRsUUy0VlMWniKJE7pge5Gfl8WGhplLKUICbl2TZrxMMY9ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ri6LkZ6H; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TD50u8oIXhVSPGMfaOTBqShX/wD9XGWEgPD9NWB+GWo=; b=ri6LkZ6Ho5Ur2lSZiVBS6AMU40
+	HSNEZfer3zgDEqdJGjurhNVIFbLakDoFyIuVjGE7CmAh9D+aKhUYPYb7ov3J+WySOtu3S4hDs3b0X
+	nZlhEOQBvxLB34r1R4fLJGyZ5Ltd5xHonDf4dATB0RYbf81GdzKDLQm9YgB8FMtetb3M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wPA3Y-003aFZ-NN; Tue, 19 May 2026 04:19:40 +0200
+Date: Tue, 19 May 2026 04:19:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 1/2] net: phy: honor eee_disabled_modes in
+ phy_support_eee()
+Message-ID: <05a24b73-ff89-41e2-a655-224f1c2dbc31@lunn.ch>
+References: <20260518-devel-phy-support-eee-fix-v2-0-05b52626fa68@tipi-net.de>
+ <20260518-devel-phy-support-eee-fix-v2-1-05b52626fa68@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/8] net: devmem: support devmem with netkit
- devices
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177915664163.2054007.6384747943531037676.git-patchwork-notify@kernel.org>
-Date: Tue, 19 May 2026 02:10:41 +0000
-References: <20260514-tcp-dm-netkit-v5-0-408c59b91e66@meta.com>
-In-Reply-To: <20260514-tcp-dm-netkit-v5-0-408c59b91e66@meta.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org, alexs@kernel.org, si.yanteng@linux.dev,
- dzm91@hust.edu.cn, michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- joshwash@google.com, hramamurthy@google.com, saeedm@nvidia.com,
- tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org, alexanderduyck@fb.com,
- kernel-team@meta.com, daniel@iogearbox.net, razor@blackwall.org,
- shuah@kernel.org, dw@davidwei.uk, sdf.kernel@gmail.com,
- mohsin.bashr@gmail.com, willemb@google.com, jiang.kun2@zte.com.cn,
- xu.xin16@zte.com.cn, wang.yaxin@zte.com.cn, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, sdf@fomichev.me, almasrymina@google.com,
- bobbyeshleman@meta.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260518-devel-phy-support-eee-fix-v2-1-05b52626fa68@tipi-net.de>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-289257-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289256-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,broadcom.com,nvidia.com,fb.com,meta.com,iogearbox.net,blackwall.org,davidwei.uk,gmail.com,zte.com.cn,vger.kernel.org,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[41];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C1416576506
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tipi-net.de:email,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 4887257661D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+On Mon, May 18, 2026 at 10:23:09AM +0200, Nicolai Buchwitz wrote:
+> phy_support_eee() copies supported_eee into advertising_eee
+> unconditionally, overwriting any filtering applied during phy_probe()
+> based on DT eee-broken-* properties or driver-populated
+> eee_disabled_modes.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Sorry, i should of questioned this on v1. What PHY are you using which
+masks advertising_eee in probe? It seems like this is wrong, and it
+should be setting >eee_disabled_modes, or maybe eee_supported.
 
-On Thu, 14 May 2026 10:22:27 -0700 you wrote:
-> This series enables TCP devmem TX through netkit devices.
-> 
-> Netkit now supports queue leasing. A physical NIC's RX queue can be
-> leased to a netkit guest interface inside a container namespace. This
-> gives the container a devmem-capable data path on the RX side (bind-rx,
-> etc...). On the TX side, the container process binds to its netkit guest
-> interface and sends traffic that netkit redirects (via BPF or ip
-> forwarding) to the physical NIC for DMA.
-> 
-> [...]
+> Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC support EEE")
+> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-Here is the summary with links:
-  - [net-next,v5,1/8] net: convert netmem_tx flag to enum
-    https://git.kernel.org/netdev/net-next/c/7d3ab852dcd8
-  - [net-next,v5,2/8] net: netkit: declare NETMEM_TX_NO_DMA mode
-    https://git.kernel.org/netdev/net-next/c/6ce2bb048055
-  - [net-next,v5,3/8] net: devmem: support TX over NETMEM_TX_NO_DMA devices
-    https://git.kernel.org/netdev/net-next/c/1abe839b34ae
-  - [net-next,v5,4/8] selftests: drv-net: ncdevmem: add -n flag to skip NIC configuration
-    https://git.kernel.org/netdev/net-next/c/ecbdf3da7813
-  - [net-next,v5,5/8] selftests: drv-net: make attr _nk_guest_ifname public
-    https://git.kernel.org/netdev/net-next/c/28357ac667d4
-  - [net-next,v5,6/8] selftests: drv-net: refactor devmem command builders into lib module
-    https://git.kernel.org/netdev/net-next/c/6cac32fc3f1f
-  - [net-next,v5,7/8] selftests: drv-net: add primary_rx_redirect support to NetDrvContEnv
-    https://git.kernel.org/netdev/net-next/c/886a790b59f9
-  - [net-next,v5,8/8] selftests: drv-net: add netkit devmem tests
-    https://git.kernel.org/netdev/net-next/c/28c1cc999fbb
+This patch itself looks O.K.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-
+    Andrew
 
