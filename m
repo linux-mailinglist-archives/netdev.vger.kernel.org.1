@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-289622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289623-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMurNN7dDGrdpAUAu9opvQ
-	(envelope-from <netdev+bounces-289622-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:02:06 +0200
+	id gJuwKTfdDGp5owUAu9opvQ
+	(envelope-from <netdev+bounces-289623-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 23:59:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 361D7585664
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:02:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B177D5855B3
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 23:59:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7C943308EB89
+	by sin.lore.kernel.org (Postfix) with ESMTP id B503B301997B
 	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 21:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5566D3EB81D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3F63EBF35;
 	Tue, 19 May 2026 21:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="L2lOC/3/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PAODQb4d"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E65F3E8671
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 21:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7229B3E9582
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 21:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779227953; cv=none; b=cuIYVdQSuQPdnhOQIwECjgtHfL7EjlwvLofCuAf19b3UciVx7TGRbF1uRwBID+lKv/QFniPqhm4l0+OafLJ22buz+GEoSe7WPZxTD1ij1Lss/IMr7QccOtHeDQ5G1XEhjzvlZUHM6gwI5h81DPYRnk8qgJBzTcWXcTyDoeqKjx4=
+	t=1779227953; cv=none; b=J+bmlg/c9EM/aawIaY+Tg8c2aPlQCHD1MHBbRSoHEKaaHMal97BdRuTcUNVFoYxKXyTELFE3SMe2bAEoqMHgJa8Yf0f1H6fCXGz8okePiP1NFiT2RvctDL2YRj12leN/X/y95C7z/8XMp11Z+BCCBCJljZyXmTgDOj0ps3p55i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779227953; c=relaxed/simple;
-	bh=H5zf7hyY5jhHjLE/Um6PIp4ND2nSLp3EuddCQZIZAwI=;
+	bh=YN/W5BZGqTP1q83IDV8HPtDRR6AKJWU9rbqelM1ecyA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rlm+UOXDlTZYtW+7z1gAK5RQUWWNV1edgsVq7tjHxIGXgrSsRB2O97mY+xt65rtlAKx57PtWhIKEmstzGKe/vhVxKZG0tBCAaI3eVqNHsK/dPOVF+M7wAsqqg4UFUJuyOdb6xi9K0EPKjg2CUcBQU88mvYsPKgprG4ixN7S7ZgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=L2lOC/3/; arc=none smtp.client-ip=95.215.58.181
+	 MIME-Version; b=ALSJ6CACATjlM2xvubgt7kmoNMS9RtD0PvinoHp2n9MLlT3P+eKfOBcX2CdgSNk5oYGQ7XZfFtugFdpVV31pGGx89h4QOKuxJZOMNtsYVN1e/E7EhHCTOhesPkaclZo36HW4yJUwVLxsw14aSu+YryRpgOXVEaFR0nWQ2+lVQN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PAODQb4d; arc=none smtp.client-ip=95.215.58.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779227948;
+	t=1779227950;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=U/I6S8Kw28BAahmP437WtXsPWiDEg/SpJL4HlJOaL8M=;
-	b=L2lOC/3/L8+LUVnPOV/TD7LY9UayHbWUq6pU7DrtaGzDgC2nnsccBjOZ9+2HhskbA23HCS
-	PRX9ubEmN53EyK9VP0LSPs8sPLCtFV9tw2SmMvU4hC8ZQgNOhIYcBUFc94mmUNMNE3q0d+
-	HGfZzy7jHqIXpVT/2h1M/LqHgZi9SPM=
+	bh=iin+MykhrTNreja/QVKr8SkAh/iPwo5XPK3tnDQnPds=;
+	b=PAODQb4druN14M9AkmMoIZ5m7MblN1Xqtnksspcb297zY4WSpaZE0NBkBjrhI2MEwDyayW
+	2+z+5ChqvYGzLj93MDtRJb8BmoqkRGDb3rkUNmk+uEPWy1wFkivHDNTeq1eZVDJ6aurxxq
+	nMUeQv7kw1H6MiVhmpGfV/JvlX8sMwE=
 From: Martin KaFai Lau <martin.lau@linux.dev>
 To: bpf@vger.kernel.org
 Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
@@ -54,9 +54,9 @@ Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
 	'Roman Gushchin ' <roman.gushchin@linux.dev>,
 	'Amery Hung ' <ameryhung@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [RFC PATCH bpf-next 03/12] bpf: Add bpf_struct_ops accessor helpers
-Date: Tue, 19 May 2026 14:58:10 -0700
-Message-ID: <20260519215841.2984970-4-martin.lau@linux.dev>
+Subject: [RFC PATCH bpf-next 04/12] bpf: Remove unnecessary prog_list_prog() check
+Date: Tue, 19 May 2026 14:58:11 -0700
+Message-ID: <20260519215841.2984970-5-martin.lau@linux.dev>
 In-Reply-To: <20260519215841.2984970-1-martin.lau@linux.dev>
 References: <20260519215841.2984970-1-martin.lau@linux.dev>
 Precedence: bulk
@@ -72,7 +72,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289622-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289623-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -93,170 +93,61 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 361D7585664
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: B177D5855B3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Martin KaFai Lau <martin.lau@kernel.org>
 
-Add the helper functions bpf_struct_ops_map_kdata(),
-bpf_struct_ops_kdata_map_id(), and bpf_struct_ops_map_cfi_stubs()
-in bpf_struct_ops.c. They will be called from cgroup.c in the upcoming
-patch to create a struct_ops to cgroup attachment link.
+Both replace_effective_prog() and purge_effective_progs() test
+the "!prog_list_prog(pl)" to skip a 'detaching' pl.
 
-bpf_struct_ops_valid_to_reg() is also exposed for the upcoming caller
-in cgroup.c.
+When detaching a pl, pl->prog and pl->link are set to NULL in case
+the update_effective_progs() failed.
 
-The link update validation is also refactored into a new function
-bpf_struct_ops_link_update_check() such that it can be reused by the caller
-in cgroup.c in the upcoming patch.
+However, replace_effective_prog() is not detaching a pl,
+so the case "!prog_list_prog()" will not happen.
+
+In purge_effective_prog(), the pl->prog and pl->link are restored
+before calling purge_effective_progs(), so the case "!prog_list_prog()"
+will not happen either.
+
+This patch removes them as a prep work for the upcoming work
+in attaching struct_ops to cgroup. When attaching a struct_ops
+to cgroup, there is a link->map case and the prog_list_prog()
+will not consider the link->map. The replace_effective_prog()
+and purge_effective_progs() will then incorrectly skip a pl
+with struct_ops map attached to it.
 
 Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
 ---
- include/linux/bpf.h         | 28 +++++++++++++++++
- kernel/bpf/bpf_struct_ops.c | 63 ++++++++++++++++++++++++++++---------
- 2 files changed, 77 insertions(+), 14 deletions(-)
+ kernel/bpf/cgroup.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index a276eada19c4..dbf98741f15b 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -2136,6 +2136,12 @@ int bpf_prog_assoc_struct_ops(struct bpf_prog *prog, struct bpf_map *map);
- void bpf_prog_disassoc_struct_ops(struct bpf_prog *prog);
- void *bpf_prog_get_assoc_struct_ops(const struct bpf_prog_aux *aux);
- u32 bpf_struct_ops_id(const void *kdata);
-+void *bpf_struct_ops_map_kdata(struct bpf_map *map);
-+u32 bpf_struct_ops_kdata_map_id(void *kdata);
-+void *bpf_struct_ops_map_cfi_stubs(struct bpf_map *map);
-+bool bpf_struct_ops_valid_to_reg(struct bpf_map *map);
-+int bpf_struct_ops_link_update_check(struct bpf_map *new_map, struct bpf_map *old_map,
-+				     struct bpf_map *expected_old_map);
+diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
+index 876f6a81a9b6..71591f6dc458 100644
+--- a/kernel/bpf/cgroup.c
++++ b/kernel/bpf/cgroup.c
+@@ -946,8 +946,6 @@ static void replace_effective_prog(struct cgroup *cgrp,
  
- #ifdef CONFIG_NET
- /* Define it here to avoid the use of forward declaration */
-@@ -2200,6 +2206,28 @@ static inline void bpf_map_struct_ops_info_fill(struct bpf_map_info *info, struc
- static inline void bpf_struct_ops_desc_release(struct bpf_struct_ops_desc *st_ops_desc)
- {
- }
-+static inline void *bpf_struct_ops_map_kdata(struct bpf_map *map)
-+{
-+	return NULL;
-+}
-+static inline u32 bpf_struct_ops_kdata_map_id(void *kdata)
-+{
-+	return 0;
-+}
-+static inline void *bpf_struct_ops_map_cfi_stubs(struct bpf_map *map)
-+{
-+	return NULL;
-+}
-+static inline bool bpf_struct_ops_valid_to_reg(struct bpf_map *map)
-+{
-+	return false;
-+}
-+static inline int bpf_struct_ops_link_update_check(struct bpf_map *new_map,
-+						   struct bpf_map *old_map,
-+						   struct bpf_map *expected_old_map)
-+{
-+	return -EOPNOTSUPP;
-+}
+ 			head = &cg->bpf.progs[atype];
+ 			hlist_for_each_entry(pl, head, node) {
+-				if (!prog_list_prog(pl))
+-					continue;
+ 				if (pl->link == link)
+ 					goto found;
+ 				pos++;
+@@ -1099,8 +1097,6 @@ static void purge_effective_progs(struct cgroup *cgrp, struct bpf_prog *prog,
  
- #endif
- 
-diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-index 28eab24ef0ed..8650a3b88bf6 100644
---- a/kernel/bpf/bpf_struct_ops.c
-+++ b/kernel/bpf/bpf_struct_ops.c
-@@ -1199,7 +1199,33 @@ u32 bpf_struct_ops_id(const void *kdata)
- }
- EXPORT_SYMBOL_GPL(bpf_struct_ops_id);
- 
--static bool bpf_struct_ops_valid_to_reg(struct bpf_map *map)
-+void *bpf_struct_ops_map_kdata(struct bpf_map *map)
-+{
-+	struct bpf_struct_ops_map *st_map;
-+
-+	st_map = container_of(map, struct bpf_struct_ops_map, map);
-+	return st_map->kvalue.data;
-+}
-+
-+u32 bpf_struct_ops_kdata_map_id(void *kdata)
-+{
-+	struct bpf_struct_ops_value *kvalue =
-+		container_of(kdata, struct bpf_struct_ops_value, data);
-+	struct bpf_struct_ops_map *st_map =
-+		container_of(kvalue, struct bpf_struct_ops_map, kvalue);
-+
-+	return st_map->map.id;
-+}
-+
-+void *bpf_struct_ops_map_cfi_stubs(struct bpf_map *map)
-+{
-+	struct bpf_struct_ops_map *st_map;
-+
-+	st_map = container_of(map, struct bpf_struct_ops_map, map);
-+	return st_map->st_ops_desc->st_ops->cfi_stubs;
-+}
-+
-+bool bpf_struct_ops_valid_to_reg(struct bpf_map *map)
- {
- 	struct bpf_struct_ops_map *st_map = (struct bpf_struct_ops_map *)map;
- 
-@@ -1252,6 +1278,26 @@ static int bpf_struct_ops_map_link_fill_link_info(const struct bpf_link *link,
- 	return 0;
- }
- 
-+int bpf_struct_ops_link_update_check(struct bpf_map *new_map,
-+				     struct bpf_map *old_map,
-+				     struct bpf_map *expected_old_map)
-+{
-+	struct bpf_struct_ops_map *st_map, *old_st_map;
-+
-+	if (!old_map)
-+		return -ENOLINK;
-+	if (expected_old_map && old_map != expected_old_map)
-+		return -EPERM;
-+
-+	st_map = container_of(new_map, struct bpf_struct_ops_map, map);
-+	old_st_map = container_of(old_map, struct bpf_struct_ops_map, map);
-+	/* The new and old struct_ops must be the same type. */
-+	if (st_map->st_ops_desc != old_st_map->st_ops_desc)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static int bpf_struct_ops_map_link_update(struct bpf_link *link, struct bpf_map *new_map,
- 					  struct bpf_map *expected_old_map)
- {
-@@ -1270,23 +1316,12 @@ static int bpf_struct_ops_map_link_update(struct bpf_link *link, struct bpf_map
- 		return -EOPNOTSUPP;
- 
- 	mutex_lock(&update_mutex);
--
- 	old_map = st_link->map;
--	if (!old_map) {
--		err = -ENOLINK;
--		goto err_out;
--	}
--	if (expected_old_map && old_map != expected_old_map) {
--		err = -EPERM;
-+	err = bpf_struct_ops_link_update_check(new_map, old_map, expected_old_map);
-+	if (err)
- 		goto err_out;
--	}
- 
- 	old_st_map = container_of(old_map, struct bpf_struct_ops_map, map);
--	/* The new and old struct_ops must be the same type. */
--	if (st_map->st_ops_desc != old_st_map->st_ops_desc) {
--		err = -EINVAL;
--		goto err_out;
--	}
- 
- 	err = st_map->st_ops_desc->st_ops->update(st_map->kvalue.data, old_st_map->kvalue.data, link);
- 	if (err)
+ 			head = &cg->bpf.progs[atype];
+ 			hlist_for_each_entry(pl, head, node) {
+-				if (!prog_list_prog(pl))
+-					continue;
+ 				if (pl->prog == prog && pl->link == link)
+ 					goto found;
+ 				pos++;
 -- 
 2.53.0-Meta
 
