@@ -1,265 +1,217 @@
-Return-Path: <netdev+bounces-289214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289215-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yAW8FoCqC2oGKwUAu9opvQ
-	(envelope-from <netdev+bounces-289214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:10:40 +0200
+	id fM4YAlqrC2ojLAUAu9opvQ
+	(envelope-from <netdev+bounces-289215-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:14:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18A8B57569D
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:10:40 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 911795756C9
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 02:14:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 452D33032391
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:10:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 513E5301D5B9
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 00:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCCCA3AC00;
-	Tue, 19 May 2026 00:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017B913DDAE;
+	Tue, 19 May 2026 00:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwIuIXcb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d59lwcl8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f194.google.com (mail-qt1-f194.google.com [209.85.160.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7E418050
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 00:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779149427; cv=none; b=cHkq9kwdbGBSxL8xmSqhLK0J+hZrNHDWoaPW0dGIf+/NSqPkvIppsE9Vk3S7PYthXxCsUodKlXgCceuLzr17k8cMMh9g0MzsaS3I97TkQ65LMZYccvDFuJXcGxDBcI9IHcXXqt4IW2mLOVHBu/zRR9hvTWS8DIrZqjDS+VhWX9o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779149427; c=relaxed/simple;
-	bh=Mo8/CGWGkJilXODGTqxfB+W+dru73o1aZU1xef0d8hQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZU1fSLKlHVrsBlSxBnywpc9d7i05mykBabseSEW2L4aLdKkXnI7jnw+wXtVQrMQVM/zpnYgNf79QoXoB4Eo7BtzpTLFttZCnlQ1NxsnUVNOIFaxOj3KhPkH/iWoJvyR0h3alBWKfRCmOZ1Q/HhLSdBviMCFhZLuq/jp4Pv//VRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gwIuIXcb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 341B4C2BCB7;
-	Tue, 19 May 2026 00:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779149427;
-	bh=Mo8/CGWGkJilXODGTqxfB+W+dru73o1aZU1xef0d8hQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gwIuIXcb74AJ5fI/6XVQK6aDNHTNxTEvY6mpoQutBCADafg2/AE91KazXEQZbUG27
-	 1oVmtPmfhitUcwJ7cyjQ9b4rRwB6a9Rmu9wZvBiVrdRNQR3v6BIBUap0jDSDBlBKfS
-	 BTpdeTkKeD9JCxMblNxqbkWhAP3XgkjYksK1JFNvHMSuVKFpO0U7SgmRaokk9pM/g8
-	 apKx2bp0j/8jGJcQKFHjnw8wMEVdXWiHZdKxxZBG66644EG3nCs/brWyCiP9tZ2eIy
-	 Qh96egYE16JSqQ3gcc7NFEtEdewS4RgBNZG0bdaR646W1Ji4mIGa6rJ6w8W4BT59xO
-	 8dQo23Yx25tXg==
-Date: Mon, 18 May 2026 17:10:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Wozniak <petr.wozniak@gmail.com>
-Cc: netdev@vger.kernel.org, bjorn@mork.no, andrew@lunn.ch,
- linux-phy@lists.infradead.org
-Subject: Re: [PATCH v3] net: phy: sfp: probe for RollBall I2C-to-MDIO bridge
- in mdio-i2c
-Message-ID: <20260518171026.4f2f0c20@kernel.org>
-In-Reply-To: <20260515174044.26036-1-petr.wozniak@gmail.com>
-References: <20260515174044.26036-1-petr.wozniak@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBD62AD0C
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 00:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.194
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779149651; cv=pass; b=hFzHjH4VF+ot6Xxo/IHQz2ftNMvCqOmdpO0okpSI3Ho7R6eeY1McvhilU0S3gEvN8AiyFyHDfMP3JzREdq6+j2Ns1Mh5mwz2NOvR/koHwh2JtFEEqAOaWk3LMlBHYxwkMjSWQGEr++dPIOUUAKiaIOIpusJW2NRroKlnxHT1nZw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779149651; c=relaxed/simple;
+	bh=LPwsRaL3/VhQKGJMHLIVfCwqYVCTUXR7opK9047JBWk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TO4rv0ZmDgwtf/X3u+bgNYl8NnGyi2bM9eJNazdUgYTQrcnEFKOd+KIAWYUwEYjO6/FdSd9IuVTOvjLDJEq1GWKM/xXRXrozF8oYTAl/DZ3knFp4X/C1XvCpT3UIrFLyhvmdplXqc22W7Di5rLQVReHwaHZ/ejSnvYhg6W8wGhQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d59lwcl8; arc=pass smtp.client-ip=209.85.160.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f194.google.com with SMTP id d75a77b69052e-50e63771d91so32411591cf.0
+        for <netdev@vger.kernel.org>; Mon, 18 May 2026 17:14:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779149649; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Zd4VBVX7aYolSzielX23zh7nncN07nyH+Au1sWe1KvxA2FuEwk1tnuJaFxN9qsfkX0
+         2DR9bJCZiei6juJulmvvvZXfrE1esxDgTlBqQ4Qlbz1XKpKOfSlONW0DaCwFIlyVjlpE
+         apjJZyJJDYX681VFdmwWt5cCJO8Zr274RXKq0+lkDyGWCCzoOzFSuBuupwXrvDkGUvGH
+         fLkFCRuxmw/q3Nwrb27CKmQPg3WiwI26EK34ewEtniaCA/7CC+2p02v+YYlLyHB7fd3i
+         gKkyfnmqMBZOhYdXhWzWgTXvSw+Oj1hhRX8D0rKRs0vDTvR1QH9gR3e/9vmzATDGB4tL
+         SEvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=LPwsRaL3/VhQKGJMHLIVfCwqYVCTUXR7opK9047JBWk=;
+        fh=65sVwrMFAnmE69LCgeRV3bsqanmuqXEd1arxqIxbeFU=;
+        b=H5e4CJA60sUnJCrAO03bgdya0D3emNvNqS2QdqqRgJ/I2VaillE4n3DiHDhMQuWHQ1
+         bQ/PKNDcF6bCqBosBcP54iTlVXar0tYvFp9xPHcZqdVdtS6R+8pefaJGf4uY/dJT4UEv
+         pxBklQNOAnxqjZJcFSmy9u6v/JuGUUxQGkybCHxag1i+dL/z4pRbqrtk31CoYcYqecJo
+         jAc2q09r2TDMRKxnvngvGrWW2Y12h9VvMSW0IZVSs73TIUVSAl1Fup6imGcUxEXKjOvB
+         5MR1XVQq8e3NEowIonMjAH2IyAlEBVVYgKbQIDSjqOqc+sDj1eV07P3cMRcW0gjcpzfv
+         ZY/A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779149649; x=1779754449; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LPwsRaL3/VhQKGJMHLIVfCwqYVCTUXR7opK9047JBWk=;
+        b=d59lwcl8NvuOHlMwJ/jtLfvIVKwSl887jI0zUq+n+MokZhIz5kSNG+Q7m83cRRj++o
+         7S3rzqts7N4yutIkInkFXV9kygWG7yxiMPc0JWryBnFhkU7pGX5375FZhqllLsu46QxD
+         yqRXefPbKqpNqDqlvNkmKy9NH53MH/MzNhs5i0t6EGN/qbHwnG3z9w6y+vTpWbbm4ui8
+         +Y/emkK8/ZzUeQNXSb3F20EcO2qGGKw0KLfo5yfAg9tQxjLb8ir1PQn5DJpL6n74Uv7I
+         Kzy/KgWqFZU9F5z3/y0h3xh8lwac6mtJi6nFuR/ealUBmYZWKM9xgcZKuPtDs3lS0PL6
+         E+cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779149649; x=1779754449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LPwsRaL3/VhQKGJMHLIVfCwqYVCTUXR7opK9047JBWk=;
+        b=dqFtXDak/9AMJ0RgBaxtCc2HU28iTGituqqKtFDxyv/it4sqxn0MetnsAU2oZLYz+p
+         RQWG37MmIQIKGBIHlo84HwncUScoevk4tZmJuZWb6t8N2VrJBAs+Ru/rBDqyf93yeZRj
+         dv2KE/oNTTpc5hjHx92ChScGYD0q8KJK3pYyTNIiSrBWED0LNpn9KteUshXQZCNarjKM
+         clitVxtMcRcDLRE8V4FXy46ITyjVQxCP3iJZEE+cMwgI0EzcAt/zJCwkxDSC0G8wFUbA
+         0Xwm4UzbAqVA2IRMZgTPv8e64kYPUhZIzG9q5rnBkpFgdjhsK6epMMR5ugtK/2Q4IRlQ
+         EuFg==
+X-Forwarded-Encrypted: i=1; AFNElJ/QBYqktk8kJgU0cwPF8VliX5Hchg1vpmgCDHb0S680lq6+bEMzqjpv+OixNXXWbiR95EN97HY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNfgtjH+jQXysuIyHzvlUiRoKejoSodgDDR6KYhrJr7fi/qlmh
+	1sAdyYROkyITGbg4/KyFsJ1rwNFgmrlrKMS49o9fIwkUYUsChnxXvxb8EEQLeRAS4tdMeuJRPQg
+	Jrc93jdlUzVuVZuCmlP7XDhnis5fyJB4=
+X-Gm-Gg: Acq92OGgJfTwZRXm5jR+CVLepQabELZ71QnTgnjRsKrECb9OrrfCtuM58/Lek3SXe5H
+	vxiaj6MmHiVi9dN95MGEixy6IqqQvLW0f6WQuayFY6xa7SYEzhkOl4d0xNg/LREy4lrCXDt6flG
+	dACg0JZ6BVoyBH6KszrRfjuq8ClRs2QTMTHnnOUecPvh4b5Q8JOzQf/OtTSzfa7UxIu93As7pa+
+	ZJMcibC+mGRwqtqu0biVNjguDz+z1+Wxn1d37HLrWVlOKcDD2l4iMX44JH/6fo05/T8pzHzK5vJ
+	Gn42DZZwLZJS/WqGCBtzxVAJioFoJp4hIgBmfpEDpwin8A+rsECsJDJ0XJTeWhCryWk1FWef+ax
+	J39A=
+X-Received: by 2002:a05:622a:d0e:b0:516:707a:cf8 with SMTP id
+ d75a77b69052e-516707a0e9amr149948671cf.44.1779149648695; Mon, 18 May 2026
+ 17:14:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20260518042833.272221-1-enelsonmoore@gmail.com>
+ <d40b1e80-37fc-4c88-9d7f-dae6458efe6c@app.fastmail.com> <20260518105735.GW3126523@noisy.programming.kicks-ass.net>
+ <20260518172444.zyd47mcagrcwu7wt@dev-vm-schuster>
+In-Reply-To: <20260518172444.zyd47mcagrcwu7wt@dev-vm-schuster>
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Mon, 18 May 2026 17:13:58 -0700
+X-Gm-Features: AVHnY4ICd7H9-70Xucdx9uJAfA9u6BhUaXyRyteuNE6Jo8mNtePRuTvmeSFjqyQ
+Message-ID: <CADkSEUjhq6HSdg4ignzbuJiN5uXATsTdxFbRJ3BMxs5=WUWLDg@mail.gmail.com>
+Subject: Re: [PATCH] nios2: remove the architecture
+To: Simon Schuster <schuster.simon@siemens-energy.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Dinh Nguyen <dinguyen@kernel.org>, linux-doc@vger.kernel.org, devicetree@vger.kernel.org, 
+	workflows@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, 
+	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-iio@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
+	linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	"linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Daniel Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Alex Shi <alexs@kernel.org>, 
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>, 
+	Hu Haowen <2023002089@link.tyut.edu.cn>, Kees Cook <kees@kernel.org>, 
+	Oleg Nesterov <oleg@redhat.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Nicholas Piggin <npiggin@gmail.com>, Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>, 
+	Dave Penkler <dpenkler@gmail.com>, Andi Shyti <andi.shyti@kernel.org>, 
+	Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, 
+	=?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Andy Shevchenko <andy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, Krzysztof WilczyDski <kwilczynski@kernel.org>, 
+	Andreas Oetken <andreas.oetken@siemens-energy.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289214-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289215-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[infradead.org,arndb.de,kernel.org,vger.kernel.org,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,gmail.com,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com,siemens-energy.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 18A8B57569D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linuxfoundation.org:url]
+X-Rspamd-Queue-Id: 911795756C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 15 May 2026 19:40:44 +0200 Petr Wozniak wrote:
-> The "OEM"/"SFP-10G-T" quirk entry in sfp_fixup_rollball_cc()
-> unconditionally forces MDIO_I2C_ROLLBALL for all modules matching that
-> vendor/part-number combination.  This works for modules that genuinely
-> implement a RollBall I2C-to-MDIO bridge, but silently breaks modules
-> that share the same EEPROM strings without having such a bridge.
-> 
-> The Realtek RTL8261BE-CG is one such module: a pure copper 10G SFP+
-> media converter with no I2C-to-MDIO bridge.  Its EEPROM reports
-> vendor="OEM", part="SFP-10G-T-I", and -- critically -- Vendor OUI
-> 00:00:00, making OUI-based differentiation impossible.  With
-> MDIO_I2C_ROLLBALL the kernel stalls waiting for a PHY that never
-> appears:
-> 
->   sfp sfp2: probing phy device through the [MDIO_I2C_ROLLBALL] protocol
-> 
-> Move the probe into i2c_mii_init_rollball() in mdio-i2c.c, where the
-> RollBall protocol constants are already defined.  After sending the
-> unlock password, issue a CMD_READ and wait ~70 ms for CMD_DONE.  A
-> genuine RollBall bridge asserts CMD_DONE within that window; modules
-> without a bridge never do, so i2c_mii_init_rollball() returns -ENODEV.
-> sfp_i2c_mdiobus_create() treats -ENODEV as no PHY and falls back to
-> MDIO_I2C_NONE without creating an MDIO bus.
-> 
-> Add "OEM"/"SFP-10G-T-I" to the quirk table so RTL8261BE modules enter
-> the probe path; genuine RollBall modules continue to work as before.
-> 
-> Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
-> Tested-by: Petr Wozniak <petr.wozniak@gmail.com>
+Hi, Simon,
 
-Tested-by tag is for when the person testing is different than the
-author of the patch. Please drop.
+Thank you for notifying us of your continued use of the Nios II architectur=
+e.
 
-> Targeting: net-next
+On Mon, May 18, 2026 at 10:24=E2=80=AFAM Simon Schuster
+<schuster.simon@siemens-energy.com> wrote:
+> Unfortunately, as we are an infrastructure provider for civil energy
+> infrastructure, the refurbishment cycle is a bit slower than for
+> traditional consumer systems. This implies that the traditional LTS
+> support duration (max. Dec 2028 as of writing [1]) is rather short, and
+> we would be glad if we could keep the architecture in mainline for at
+> least 5 years and only then "decay" to LTS.
 
-This usually means --subject-prefix="PATCH net-next vN"
+Your reasoning makes complete sense. However, there is an alternative
+to maintaining the architecture in mainline.
 
-But more importantly, this patch does not apply to netdev/net-next
+The Civil Infrastructure Platform project maintains super-LTS kernels
+(and a set of base Debian packages) for 10 years. They are intended to
+be used for exactly these kinds of devices.
+See here: https://wiki.linuxfoundation.org/civilinfrastructureplatform/star=
+t#kernel_maintainership
+and here: https://cip-project.org/about/linux-kernel-core-packages
 
-> Changes since v2:
->   - Compile-tested and hardware-tested on BPI-R4 (MT7988A, 6.12.87)
->   - RTL8261BE (OEM/SFP-10G-T-I): probes MDIO_I2C_NONE, link Up 10Gbps
->   - Genuine RollBall (OEM/SFP-10G-T): bridge detected, link Up 10Gbps
-> 
->  drivers/net/mdio/mdio-i2c.c | 59 +++++++++++++++++++++++++++++++++----
->  drivers/net/phy/sfp.c       |  8 ++++-
->  2 files changed, 60 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/mdio/mdio-i2c.c b/drivers/net/mdio/mdio-i2c.c
-> index da2001e..1973fda 100644
-> --- a/drivers/net/mdio/mdio-i2c.c
-> +++ b/drivers/net/mdio/mdio-i2c.c
-> @@ -352,6 +352,52 @@ static int i2c_mii_write_rollball(struct mii_bus *bus, int phy_id, int devad,
->  	return 0;
->  }
->  
-> +/*
-> + * Probe for a RollBall I2C-to-MDIO bridge by issuing CMD_READ and waiting
-> + * ~70 ms for CMD_DONE.  Genuine RollBall bridges respond within that window.
-> + * Modules that share the same EEPROM vendor/part strings but have no bridge
-> + * (e.g. RTL8261BE pure copper media converter) never assert CMD_DONE, so
-> + * -ENODEV is returned for them.
-> + */
-> +static int i2c_mii_probe_rollball(struct i2c_adapter *i2c)
-> +{
-> +	u8 data_buf[] = { ROLLBALL_DATA_ADDR, 0x01, 0x00, 0x00 };
-> +	u8 cmd_buf[]  = { ROLLBALL_CMD_ADDR, ROLLBALL_CMD_READ };
-> +	u8 cmd_addr   = ROLLBALL_CMD_ADDR, result;
+CIP will maintain kernel 6.12 until 2035. Is this long enough for your
+lifecycle? What kernel are you currently using? If it's newer than
+6.12, we can easily wait until the next CIP SLTS release to remove
+Nios II support to avoid a downgrade.
 
-Is this code doing some magic or you're assigning to values to one
-integer?
+One important thing to note is that the default CIP kernel branches
+are not equivalent to standard LTS branches and include new hardware
+support, which has a higher likelihood of introducing regressions.
+However, the -st branches do not include these changes and follow the
+same patch acceptance rules as standard LTS, so they are likely a
+better fit for your use case.
 
-> +	struct i2c_msg msgs[2];
-> +	int ret;
-> +
-> +	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-> +	msgs[0].flags = 0;
-> +	msgs[0].len   = sizeof(data_buf);
-> +	msgs[0].buf   = data_buf;
-> +	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-> +	msgs[1].flags = 0;
-> +	msgs[1].len   = sizeof(cmd_buf);
-> +	msgs[1].buf   = cmd_buf;
-> +
-> +	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-> +	if (ret)
-> +		return ret;
-> +
-> +	msleep(70);
-> +
-> +	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-> +	msgs[0].flags = 0;
-> +	msgs[0].len   = 1;
-> +	msgs[0].buf   = &cmd_addr;
-> +	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-> +	msgs[1].flags = I2C_M_RD;
-> +	msgs[1].len   = 1;
-> +	msgs[1].buf   = &result;
-> +
-> +	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-> +	if (ret)
-> +		return ret;
-> +
-> +	return result == ROLLBALL_CMD_DONE ? 0 : -ENODEV;
-> +}
-> +
->  static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
->  {
->  	struct i2c_msg msg;
-> @@ -372,10 +418,10 @@ static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
->  	ret = i2c_transfer(i2c, &msg, 1);
->  	if (ret < 0)
->  		return ret;
-> -	else if (ret != 1)
-> +	if (ret != 1)
->  		return -EIO;
-> -	else
-> -		return 0;
-> +
-> +	return i2c_mii_probe_rollball(i2c);
->  }
->  
->  struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
-> @@ -399,9 +445,10 @@ struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
->  	case MDIO_I2C_ROLLBALL:
->  		ret = i2c_mii_init_rollball(i2c);
->  		if (ret < 0) {
-> -			dev_err(parent,
-> -				"Cannot initialize RollBall MDIO I2C protocol: %d\n",
-> -				ret);
-> +			if (ret != -ENODEV)
-> +				dev_err(parent,
-> +					"Cannot initialize RollBall MDIO I2C protocol: %d\n",
-> +					ret);
->  			mdiobus_free(mii);
->  			return ERR_PTR(ret);
->  		}
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index 218c775..ce745b6 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -599,7 +599,8 @@ static const struct sfp_quirk sfp_quirks[] = {
->  	SFP_QUIRK_S("TP-LINK", "TL-SM410U", sfp_quirk_oem_2_5g),
->  
->  	SFP_QUIRK_F("ETU", "ESP-T5-R", sfp_fixup_rollball_cc),
-> -	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
-> +	SFP_QUIRK_F("OEM", "SFP-10G-T-I", sfp_fixup_rollball),
-> +	SFP_QUIRK_F("OEM", "SFP-10G-T",   sfp_fixup_rollball_cc),
->  	SFP_QUIRK_S("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
->  	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
->  	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
-> @@ -802,6 +803,11 @@ static int sfp_i2c_mdiobus_create(struct sfp *sfp)
->  	int ret;
->  
->  	i2c_mii = mdio_i2c_alloc(sfp->dev, sfp->i2c, sfp->mdio_protocol);
-> +	if (PTR_ERR_OR_ZERO(i2c_mii) == -ENODEV) {
-> +		/* RollBall probe found no bridge: no PHY on this module */
-> +		sfp->mdio_protocol = MDIO_I2C_NONE;
+Also, CIP focuses on architectures used by CIP members - currently I
+think they are x86 (32 and 64-bit), ARM (32 and 64-bit) and RISC-V.
+Since Siemens is already a CIP member, you can simply ask them to add
+Nios II to the list, and you can assist them with testing and directly
+submit patches to them once the standard 6.12 LTS period ends.
 
-Uh, oh. Hope someone with SFP expertise will review v4.
+I hope this information helps you decide on the best course of action.
 
-> +		return 0;
-> +	}
->  	if (IS_ERR(i2c_mii))
->  		return PTR_ERR(i2c_mii);
->  
--- 
-pw-bot: cr
+Ethan
 
