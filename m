@@ -1,214 +1,125 @@
-Return-Path: <netdev+bounces-289550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMK/BPWfDGq8jwUAu9opvQ
-	(envelope-from <netdev+bounces-289550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 19:37:57 +0200
+	id UGCQChegDGq8jwUAu9opvQ
+	(envelope-from <netdev+bounces-289551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 19:38:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDC3A5832E9
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 19:37:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D298583311
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 19:38:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CF1BA3052AD5
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 17:37:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 435B430086BB
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 17:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78DD73FC5AE;
-	Tue, 19 May 2026 17:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=augustwikerfors.se header.i=@augustwikerfors.se header.b="lBMZD9Kd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A2E48C3E9;
+	Tue, 19 May 2026 17:38:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from phan-van4.scw-tem.cloud (phan-van4.scw-tem.cloud [51.159.124.109])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E80233F5B1
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 17:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.124.109
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C586409122;
+	Tue, 19 May 2026 17:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779212274; cv=none; b=manRsKEWih6F0PwZZkhwgFzlOsu6WHqizEZumySMuqwPx96PYpUPzY495SBSB1mdI1c/Mv80NZ0KlEQW8YilkRjUUZWbuZ1uNGT+tcqNB3Sh1RnXVQ0AnHoT3JCmNuIxVuLm7ZRhWnQjE7/O08b/a6h7jA2IF1V8s+3HOERk/aU=
+	t=1779212289; cv=none; b=I4SdDhZhPgMmwvmjMR+o/dMQ6TxDcf7h0LogmrVOJOcmzz6yHLc+xTx+hw+d3/9Yhv9ZNNwFxxp9Zh47ZOBJBjC9V29TmcAbbKZMwLBs5llBAD8zFMm0M6N+mYsycUVtqZ1E+nvSZzj257Uoafib6MOEGoG2CqFblSbbSmzvrcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779212274; c=relaxed/simple;
-	bh=Hh1YcciGZumXppFcnqOssFAiw5yBXVmcqR70GJ2lvdg=;
-	h=Message-ID:Date:Mime-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nyruSQOmXJArULW2LEGTFlm/4kIxjIPN4gB378XrPywZ5dJfN3KXXzDAez9a1sdHmIrMNt6lWudmLdevQ6HwRgdK6qeCaQikkSeik3Xvs7N04mB8DrU1ym4PY0g+6qTdO1pA7tnxovr2M5eHoeIuaALMhqwa6fmCKDuquhNKSkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=augustwikerfors.se; spf=pass smtp.mailfrom=augustwikerfors.se; dkim=pass (2048-bit key) header.d=augustwikerfors.se header.i=@augustwikerfors.se header.b=lBMZD9Kd; arc=none smtp.client-ip=51.159.124.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=augustwikerfors.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=augustwikerfors.se
-Message-ID: <e666c332-e2aa-4525-a208-a4a08742d2e0@augustwikerfors.se>
-Date: Tue, 19 May 2026 19:37:35 +0200
+	s=arc-20240116; t=1779212289; c=relaxed/simple;
+	bh=AtrT929H9sA3accdr0mH/7h6YGVnKrtINt2hya3nOuc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=AIW8zmx/pnJejKCgb/ifOardt9e6VFlrRC0QG8UFc7xcgLGYhSWAOWIjFeHk7ukC+vz4bEfIk02TerZ07lCJARi36vizoTSFtkDg+qMCgRGbf6AgHo9IamwMGlFLBtE1aexT7Ukiwg5G7+0XTiRW1CkmEsuRGlhp2G97YO/vaLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com; spf=pass smtp.mailfrom=perches.com; arc=none smtp.client-ip=216.40.44.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=perches.com
+Received: from omf10.hostedemail.com (lb01a-stub [10.200.18.249])
+	by unirelay07.hostedemail.com (Postfix) with ESMTP id 68521160FB5;
+	Tue, 19 May 2026 17:37:59 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf10.hostedemail.com (Postfix) with ESMTPA id 036D530;
+	Tue, 19 May 2026 17:37:56 +0000 (UTC)
+Message-ID: <33318503dca54fd9401ca99213632c59d5deec12.camel@perches.com>
+Subject: Re: [PATCH net] net: fec_mpc52xx: Fix resource size format
+From: Joe Perches <joe@perches.com>
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  open list
+ <linux-kernel@vger.kernel.org>
+Date: Tue, 19 May 2026 10:37:56 -0700
+In-Reply-To: <20260518044047.1002235-1-rosenp@gmail.com>
+References: <20260518044047.1002235-1-rosenp@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg KH <gregkh@linuxfoundation.org>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- Linus Torvalds <torvalds@linux-foundation.org>
-References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
- <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
- <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh>
- <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
- <2026051909-impurity-nemesis-2f65@gregkh>
- <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
- <2026051942-uproar-drainpipe-6370@gregkh>
- <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
-Content-Language: en-US
-From: August Wikerfors <git@augustwikerfors.se>
-In-Reply-To: <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scw-Domain: augustwikerfors.se
-X-Scw-Tem-Message-Id: b807181e-083e-4510-880a-8e8153927351
-DKIM-Signature: a=rsa-sha256; bh=Txy3fsJraKmT/pLDtNhESFuzdhjEx/YzrQC5SlbqiTY=;
- c=relaxed/relaxed; d=augustwikerfors.se;
- h=message-id:date:subject:to:cc:from;
- s=812a4465-b64d-440c-bdd2-3148e8f56cf0; t=1779212260; v=1;
- b=lBMZD9Kd+T5V+7XewGRsx0w0BZFXZO0Zk9NSl3kzyhehcF9E/YUIMHGil1mpX4Es+P+mhtU0
- ZMqqlJ9MKTebANvtAraehHuBU9ld3Nj93udTNHLRs3pvYgCR15krTgAqM9UROkxRDZUvpJrS7Gy
- RbH74EGsermX8dX9Cd1vrkzxl96q+jF0mvRwXzF1y9wdTAxt/2T4YkuxHNjJ9qWR3GnJ0+wFN1X
- SUWBe2aTbyOZGTdk7knsXDY/eE/FqRpVhvsaU0g+6hJDZF7WWej1h6U6tNF+f/kptb2no/M8ny0
- oLesXcJN22M3hV8wYUPpKLY8WE4yO6DWPsF+R6RtfzqIg==
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+X-Stat-Signature: yfzwabfdt3kbtxtc3g84g4s3iuthot93
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX18yIAiw2nrCp2W6h9tC531K0QNLmsaiPHc=
+X-HE-Tag: 1779212276-903603
+X-HE-Meta: U2FsdGVkX19Agru9PSoG/6heNx52oYfDd17MI1CKBhsWQks7LClVOnJuSgrkeGTwwn5b/cu8MP9Z2+6WXNYGGef6Pql/enzGCsqa1LtkgUXDf6Hn++frW3XKT5xX/yqoLGiWY7xKIQvFtavuEC+EB/vWkoD3XmBRXjaVWZeBMPiiFRp/KBazO2TZ+nJPfsQ9I603Tw9qPyIgMcHORjJmRO0KlQn1DWdJopw/shoLNDm7ncSuK9nOGNH4vC0t1JA/AbLRe3mXcoQJvU5t1rAIis0TR2WFMxqXIQVKdPOHAQNghd2ZIvn/9KAAQv2os/1s32UItuwVeI8/1eLPfFZ1sPWM+002wUujB+zC3v/LZPlbEs7mbQtOE0CGcZR6+hQy4KJSv2XhJNHqIergVf79FJG0cli2zgZd
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[augustwikerfors.se,quarantine];
-	R_DKIM_ALLOW(-0.20)[augustwikerfors.se:s=812a4465-b64d-440c-bdd2-3148e8f56cf0];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289550-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,linuxfoundation.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[git@augustwikerfors.se,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[augustwikerfors.se:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-289551-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[perches.com];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[augustwikerfors.se:mid,augustwikerfors.se:dkim,linuxfoundation.org:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EDC3A5832E9
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@perches.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,perches.com:mid,ozlabs.org:email]
+X-Rspamd-Queue-Id: 2D298583311
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-05-19 17:49, Luiz Augusto von Dentz wrote:
-> Hi Greg,
-> 
-> On Tue, May 19, 2026 at 11:19 AM Greg KH <gregkh@linuxfoundation.org> wrote:
->>
->> On Tue, May 19, 2026 at 09:44:39AM -0400, Luiz Augusto von Dentz wrote:
->>> Hi Greg,
->>>
->>> On Tue, May 19, 2026 at 8:07 AM Greg KH <gregkh@linuxfoundation.org> wrote:
->>>>
->>>> On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
->>>>> On 5/19/26 12:30, Greg KH wrote:
->>>>>> On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
->>>>>>> On 5/15/26 17:10, Thorsten Leemhuis wrote:
->>>>>>>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
->>>>>>>>
->>>>>>>>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
->>>>>>>>>    net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
->>>>>>>>>
->>>>>>>>> are available in the Git repository at:
->>>>>>>>>
->>>>>>>>>    git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
->>>>>>>>>
->>>>>>>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
->>>>>>>>>
->>>>>>>>>    Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
->>>>>>>>
->>>>>>>> It seems this PR sadly came too late for this week's net PR to mainline
->>>>>>>> that was merged yesterday.
->>>>>>>>
->>>>>>>> TWIMC, from my point of view, it would be great if we somehow could
->>>>>>>> still get the changes from this PR or at least the btmtk fix it
->>>>>>>> contains[1] to mainline this week before -rc4, as it is fixing a
->>>>>>>> regression known since 2026-04-24 that at least five people encountered
->>>>>>>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
->>>>>>>> validate WMT event SKB length before struct access") [006b9943b982 in
->>>>>>>> -next].
->>>>>>>
->>>>>>> Greg, Sasha, that [1] fix I was talking about now reached -next as
->>>>>>> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
->>>>>>> events") and will likely hit mainline on Thursday or so with the weekly
->>>>>>> -net PR to -mainline. If that's good enough for you, I'd say it would be
->>>>>>> good to pick this up for the next round of stable kernels.
->>>>>>
->>>>>> That "Fixes:" tag is referring to something that is also not in any
->>>>>> tree, but that commit does have a cc: stable in it.  So do we need both
->>>>>> of these:
->>>>>
->>>>> Valid question, as yes, there is a slight mixup here:
->>>>>
->>>>>> 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
->>>>>
->>>>> That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
->>>>> -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
->>>>> btmtk: validate WMT event SKB length before struct access") -- the one
->>>>> that is causing the regression that I want to get fixed. So we now only
->>>>> need:
->>>>>
->>>>>> 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
->>>>
->>>> Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
->>>> nightmare to track over time, ugh.
->>>
->>> Hmm, did we get the wrong hash or something? Usually, that would show
->>> up in the verify-fixes.sh, but perhaps it didn't capture it this time
->>> for some reason, perhaps I'm running an outdated version or something
->>> similar.
->>
->> Something went wrong if we ended up with a patch in the stable trees,
->> yet this fix is referring to it as a different git sha.  Don't know
->> where the disconnect happend :(
-> 
-> 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before
-> struct access")
-> 
-> I don't have that in any of our tree either, this is actually
-> 634a4408c061 on all trees in the chain:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/commit/?id=634a4408c061
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=634a4408c061
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=634a4408c061
-> 
-> Or actually that was the hash before it got rebased on bluetooth-next tree:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=041e88fb0c08
-> 
-> But I didn't send the PR from that three so perhaps somebody else sent
-> it to stable with the wrong fixes tag?
-I believe the confusion comes from "Bluetooth: btmtk: accept too short 
-WMT FUNC_CTRL events" itself currently having different commit hashes in 
-bluetooth (e3ac0d9f1a20) and bluetooth-next (162b1adeb057). The former 
-correctly refers to "Bluetooth: btmtk: validate WMT event SKB length 
-before struct access" as 634a4408c061 in the Fixes tag and was merged 
-into net yesterday heading for 7.1-rc5. The latter still refers to it as 
-041e88fb0c08. Both are now in next-20260519 but only the latter was in 
-next-20260518 which was the latest at the time of Thorsten's message.
+On Sun, 2026-05-17 at 21:40 -0700, Rosen Penev wrote:
+> resource_size() is printed after casting to unsigned long, but
+> sizeof() returns size_t.
 
-Greg, this means picking e3ac0d9f1a20 instead of 162b1adeb057 should 
-result in a valid Fixes tag.
+trivia and I wonder if this code path is even possible
 
-Regards,
-August Wikerfors
+> diff --git a/drivers/net/ethernet/freescale/fec_mpc52xx.c b/drivers/net/e=
+thernet/freescale/fec_mpc52xx.c
+[]
+> @@ -834,7 +834,7 @@ static int mpc52xx_fec_probe(struct platform_device *=
+op)
+>  		goto err_netdev;
+>  	}
+>  	if (resource_size(&mem) < sizeof(struct mpc52xx_fec)) {
+> -		pr_err("invalid resource size (%lx < %x), check mpc52xx_devices.c\n",
+> +		pr_err("invalid resource size (%lx < %zx), check mpc52xx_devices.c\n",
+>  		       (unsigned long)resource_size(&mem),
+>  		       sizeof(struct mpc52xx_fec));
+
+mpc52xx_devices.c does not exist.
+It was deleted nearly 20 years ago by:
+
+commit 917f0af9e5a9ceecf9e72537fabb501254ba321d
+Author: Paul Mackerras <paulus@ozlabs.org>
+Date:   Mon Jun 9 14:01:46 2008 +1000
+
+and
+
+It's possible to remove the cast to unsigned long and use %pa
+and %zx could be %#zx to match output prefixes.
 
