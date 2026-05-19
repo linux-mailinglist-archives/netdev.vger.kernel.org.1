@@ -1,58 +1,103 @@
-Return-Path: <netdev+bounces-289322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJc+JSkbDGp3WQUAu9opvQ
-	(envelope-from <netdev+bounces-289322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:11:21 +0200
+	id UAFmJckbDGpJWQUAu9opvQ
+	(envelope-from <netdev+bounces-289324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:14:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E3B579B9C
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:11:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F40FC579C28
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A25033010148
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:05:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC5EA304D456
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF273DFC81;
-	Tue, 19 May 2026 08:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 563A52F1FC9;
+	Tue, 19 May 2026 08:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FrFtxzWX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h7FXl/5l";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPXkKFkO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC003DFC82
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66083DCD8E
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779177923; cv=none; b=LEnrQusUDk1WYAUmA0KFcRbF00SiPcVfIdZ+DxtsYELHtV6BFcv7VDqBIUSnwQbQG/2IvQTGeNfokiZXaJr0i7RH/riXjLqFr9sUSFr56SBeRYxkkFhCaDP0pGs+wSnzw/6at7LlsS6Vj6w1T0gJXbRsFvMhajQ0DEV5TQjyPSs=
+	t=1779178206; cv=none; b=GNRnJBD0z7FT1J0zbukzfydlsfJ36YJBzSVr2JiXie9QPemBbjNL72OT2gVCJAp6H5XoSRKVzzuk4NgZ2+GUhESt1axtumrpSNTNqpgOpKT+lYTv4VmpgmHgcpTZuDgvdIPt8yBeYPb4P9TcbgDOa+kcaDwCGausf6MQ3Q2tsSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779177923; c=relaxed/simple;
-	bh=o/APiyGdkOx6ww1TKj+oXa29N4qky/7SQqXXkZ0oIwc=;
+	s=arc-20240116; t=1779178206; c=relaxed/simple;
+	bh=Nz3rSNu9zVS3yzH3mh9tWAgp4wMrjab4VlPPaO9g/iQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=plt91mlZ+gmjmWqO+oXxJvuwP1RXeE49IDuqztZF5FfPj1/qhGwPOIllXXilsdDfQb6txt6+qlXr8YIiQPjgVx0ctbr5WqNoof6U6gzRVg3M7rcXADuyNVqMXEdWb6b/d4bEQGGMV87RJ9QvJgaUDv6UMhYGKtPjHripBQAAZfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FrFtxzWX; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 67368C2B9E9;
-	Tue, 19 May 2026 08:06:12 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 46E18606E9;
-	Tue, 19 May 2026 08:05:19 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A3F3411AF8B49;
-	Tue, 19 May 2026 10:05:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779177918; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=/sf1+CAARLtgZZj6iq4iw8wMFJ2lji9vQCugsGmCdGo=;
-	b=FrFtxzWXEK93CSk2VZVEAt3sYbWTiuBeJ6SmTaGiRXB/pCBxewtKH/gxzkn8qMjvSEoy+x
-	vzM1K8wbCdFuJrwx575/2nKnAxZVCTIJqYpzBIyjFk71v8A/KG7kZ/sDKYwqdeNG5FDY8F
-	zi+JH+rCcQJCKgBGnanHl8DFgEZHKiyYcYLHQZGHr+pCxnVmVlqff/sBoyzNybJ5O3HvoU
-	o8O3eq2XtNbOJV4yM/ChUw9aY/y/HtVms+b10HrAcNsfeTKN0PMjkqMCramPsBz49Rz8Fv
-	bqQuNSe7GdmcvOwPYWKDTmWwZAIiqSyJjvbUlVc3JcS6z8mTJaGTmkbnsLnvNg==
-Message-ID: <d5e738c3-d7e8-4303-9a79-1d669b8250b4@bootlin.com>
-Date: Tue, 19 May 2026 10:05:11 +0200
+	 In-Reply-To:Content-Type; b=itMrdW7CJ2kdi/KZu7U6a/6WZOL6EJtsp51CyeLbgAeQvBUcvbw4RCRTEGXiBqU1KCXkDQ+wxkp+jOW0lM+vC1xiRmrICeZAGLMEN4dknxxoAwhXa8h+4G7gzfuotZP6IDT7QE1O84ZRE+5UdE88JCHJif80c9f+O2kwjln1Aek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h7FXl/5l; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VPXkKFkO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779178204;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hz4WqFcaJrUTE5OjjN9FY4tws1Nc4Bwkqhu4It5u51A=;
+	b=h7FXl/5lkIbYS/QaS065L5A4IVUHbRmqxplHRxEOoFB1z9gPcJ+oigUGUyinmblIbA45Ig
+	oFhchJZIzXXWX19tKkBAZLEZOmMLJAZ0NvX7nTctmAbgawjtmjgMwr/W9PWf/1sJ5cBNYY
+	XBMZzbJfEUS0DrnhFjiuuDbNLIL19VM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-168-B4fYt9B-POSH2HqiIeaZmg-1; Tue, 19 May 2026 04:10:02 -0400
+X-MC-Unique: B4fYt9B-POSH2HqiIeaZmg-1
+X-Mimecast-MFC-AGG-ID: B4fYt9B-POSH2HqiIeaZmg_1779178201
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-44f65835b77so2563404f8f.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 01:10:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779178201; x=1779783001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hz4WqFcaJrUTE5OjjN9FY4tws1Nc4Bwkqhu4It5u51A=;
+        b=VPXkKFkOYknpbr5B4+CXMWlB/vLw5QfPwcXDWKRd7omJYRx8JY/Czi9PU8mt0RF1WH
+         FGtmCiyWrVBdMvwIGBjHYLBD0Qx0iEKT/71vqpGeczPd9V3693D7eZ6Ep83mLtjQdPUp
+         +XDnp3rSDqqPkZDPgYn3cbxEMHU27ALye6ZPaDHvVh69HSl6KekSc/zd/vguC/8yPCR6
+         pLwF23DyHNEqQsLkDwsnAuPnNq19peCsiYfCztRagkdutN6d8Pdl1sjYZrz2KEMhWP5c
+         +Cwr6fKT4RqkspQKtkPJXU7TIi1SMg5O8fHFoQdNIKOZQsdbt0/duBnYboiB4TRp3O7w
+         X9RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779178201; x=1779783001;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hz4WqFcaJrUTE5OjjN9FY4tws1Nc4Bwkqhu4It5u51A=;
+        b=az5nrkaDvxiLNfvhg5vcBmW1+MsdVPULJbH+cT8dx3znqbpGeEW/2hvte0GIiOTOSW
+         ivcsAjYP4UVmqwp0Mz8wdjh0yG3aqKA2CyTzrKt3gsO0dB0b79KXsdk3tOf0PcwjqGJ7
+         J8F2Y9OcUx647IL/BF+kjiTuRDJhaGnGvj8uQ6kiEs89uNS74yyB0zsIg9D5d8yEbbMP
+         1msjkXZ7/4kgLXfkNnYXutwaZ70DfQBaC6P6FFdBVdshzhNYl/pSpJPI8WG69NdvQAI/
+         k1gNQ8HJMxCHJggc4CosFdvYshWGw65GTM8kyBwamr5yqYvXURMWxNT3g4Iqt2nl6d9s
+         TlDA==
+X-Forwarded-Encrypted: i=1; AFNElJ8p9FZsqpNJAKbVhNFWevEWTRa+R+ZdNXNnXadoeEwG9TvBpXB5WMPh9rSaVa78c6eHl1W400M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzruvAgHFLc02UUoB2Xvb7MHEJcryeDO8/bD5FMt+xBlSc+rUHX
+	Thg8Sncp++ifGwzf2OHUQtFj92AIIIXUw0L8qL7p0TxZi7R6lzLz6j4tWBFiznIpjBznsGTcMrR
+	psxgsibt62OWySuWYQFuAV3pH3Gc0yaVygLKtf5B+1isHCq0vblxyzY5fwA==
+X-Gm-Gg: Acq92OHhtqWoL4qkV7n/fkwwoa5bt61Ob3mw9/+Jv4lVGAlX9YKxucKqTURif6pUAr4
+	042PiDKVbqvJbizB47hkgOhZjkfxqwL9N5uYie3ZTq1O50bfM69Ti7Il8wQXDsCUZ3H1wOZdJsg
+	t3ab/yU45F9Z91n4EUKq+GJvI0PxJTPGdOI85bPDu6EIgqZEeWSyGOnQubdxa7guO/787bqIfe+
+	GqYXJ94n/wqhjD/mbyErZz74X4j5C+gMBvMLDVX366rerTxerKxcc5FQl2lplu0lgPnP5b/PZ6E
+	TPzYIDp7SsfT8cAoqtJ3//biqxgZ+2Fc2DjTcfWR/uKMnNLbIzY42YlWPyUV/hWmfsxUw+pyXbh
+	3P6V2ytoUrsdX+SZpMBOq6PddNMARClOVRgo3VpWcqOyFvYN6+ym8OYs=
+X-Received: by 2002:a05:600c:c087:b0:488:d6eb:e63c with SMTP id 5b1f17b1804b1-48fe61f2768mr209624245e9.15.1779178200617;
+        Tue, 19 May 2026 01:10:00 -0700 (PDT)
+X-Received: by 2002:a05:600c:c087:b0:488:d6eb:e63c with SMTP id 5b1f17b1804b1-48fe61f2768mr209623505e9.15.1779178200067;
+        Tue, 19 May 2026 01:10:00 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.25.33])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da15a5653sm44145281f8f.35.2026.05.19.01.09.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 May 2026 01:09:59 -0700 (PDT)
+Message-ID: <c7e0dd4f-e34b-42a6-ae4d-8060a59e9b8f@redhat.com>
+Date: Tue, 19 May 2026 10:09:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,307 +105,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 2/2] net: sfp: extend SMBus support
-To: Jonas Jelonek <jelonek.jonas@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, Simon Horman <horms@kernel.org>
-References: <20260516135442.2234729-1-jelonek.jonas@gmail.com>
- <20260516135442.2234729-3-jelonek.jonas@gmail.com>
+Subject: Re: [PATCH net] net/mlx5e: Skip IPsec flow modify when MAC address is
+ unchanged
+To: Simon Horman <horms@kernel.org>, tariqt@nvidia.com
+Cc: edumazet@google.com, kuba@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, borisp@nvidia.com, saeedm@nvidia.com, leon@kernel.org,
+ mbloch@nvidia.com, jianbol@nvidia.com, cjubran@nvidia.com,
+ acassen@corp.free.fr, kees@kernel.org, Jason@zx2c4.com,
+ michal.swiatkowski@linux.intel.com, fmancera@suse.de, antonio@openvpn.net,
+ cratiu@nvidia.com, ecree.xilinx@gmail.com, sridhar.samudrala@intel.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, gal@nvidia.com, leonro@nvidia.com
+References: <20260513190226.335562-1-tariqt@nvidia.com>
+ <20260518112710.510979-2-horms@kernel.org>
+From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260516135442.2234729-3-jelonek.jonas@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20260518112710.510979-2-horms@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289322-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	TAGGED_FROM(0.00)[bounces-289324-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,lunn.ch,davemloft.net,nvidia.com,corp.free.fr,zx2c4.com,linux.intel.com,suse.de,openvpn.net,gmail.com,intel.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 17E3B579B9C
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: F40FC579C28
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jonas,
-
-On 5/16/26 15:54, Jonas Jelonek wrote:
-> Commit 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
-> added SMBus access for SFP modules, but limited it to single-byte
-> transfers. As a side effect, hwmon is disabled (16-bit reads cannot be
-> guaranteed atomic) and a warning is printed.
+On 5/18/26 1:27 PM, Simon Horman wrote:
+> From: 'Simon Horman' <horms@kernel.org>
 > 
-> Many SMBus-only I2C controllers in the wild support more than just
-> byte access, and SFP cages are often wired to such controllers
-> rather than to a full-featured I2C controller -- e.g. the SMBus
-> controllers in the Realtek longan and mango SoCs, which advertise
-> word access and I2C block reads. Today, they cannot drive an SFP at
-> all without falling back to the byte-only path.
-> 
-> Extend sfp_smbus_read()/sfp_smbus_write() so that, in addition to
-> the existing byte access, they also use SMBus word access and SMBus
-> I2C block access whenever the adapter advertises them. Both
-> directions are handled in a single read and a single write helper
-> that pick the largest supported transfer per chunk and fall back as
-> needed.
-> 
-> I2C-block is preferred unconditionally when available: the protocol
-> carries any length 1..32, so it can serve every chunk -- including
-> the 1- and 2-byte tails -- without help from word or byte access.
-> Note that this requires I2C_FUNC_SMBUS_I2C_BLOCK, which reads a
-> caller-specified number of bytes. This deviates from the official
-> SMBus Block Read (length is supplied by the slave) but is widely
-> supported by Linux I2C controllers/drivers.
-> 
-> Capability matrix this implementation supports:
-> 
->    - BYTE only:                  works (unchanged behaviour); 1-byte
->                                  xfers, hwmon disabled.
->    - BYTE + WORD:                word for >=2-byte chunks, byte for
->                                  trailing odd byte.
->    - I2C_BLOCK present (with or
->      without BYTE/WORD):         block as the universal transport for
->                                  every chunk.
->    - WORD only (no BYTE/BLOCK):  accepted with WARN_ONCE. Even-length
->                                  transfers work; odd-length transfers
->                                  (e.g. the 3-byte cotsworks fixup
->                                  write) hit the BYTE branch which the
->                                  adapter does not implement, so the
->                                  xfer returns an error and the
->                                  operation is aborted. No mainline
->                                  I2C driver was found to advertise
->                                  WORD without BYTE; the warning lets
->                                  us learn about it if it ever shows
->                                  up.
-> 
-> Adapters with asymmetric R/W capabilities (e.g. only READ_I2C_BLOCK
-> but not WRITE_I2C_BLOCK) remain functionally correct -- the
-> per-iteration fallback uses the direction-specific bits -- but the
-> shared i2c_max_block_size is sized by the all-bits-set check, so a
-> transfer in the better-supported direction is not upgraded. None of
-> the mainline I2C bus drivers surveyed during review advertise such
-> asymmetry; promoting i2c_max_block_size to per-direction sizes can
-> be revisited if needed.
-> 
-> Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Thanks !
-
-Maxime
-
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
 > ---
->   drivers/net/phy/sfp.c | 136 +++++++++++++++++++++++++++++++++---------
->   1 file changed, 108 insertions(+), 28 deletions(-)
+> net/mlx5e: Skip IPsec flow modify when MAC address is unchanged
 > 
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index e58e29a1e8d2..85eb13cf5df2 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -14,6 +14,7 @@
->   #include <linux/platform_device.h>
->   #include <linux/rtnetlink.h>
->   #include <linux/slab.h>
-> +#include <linux/unaligned.h>
->   #include <linux/workqueue.h>
->   
->   #include "sfp.h"
-> @@ -756,50 +757,110 @@ static int sfp_i2c_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
->   	return ret == ARRAY_SIZE(msgs) ? len : 0;
->   }
->   
-> -static int sfp_smbus_byte_read(struct sfp *sfp, bool a2, u8 dev_addr,
-> -			       void *buf, size_t len)
-> +static int sfp_smbus_read(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-> +			  size_t len)
->   {
-> -	union i2c_smbus_data smbus_data;
-> +	union i2c_smbus_data smbus_data = {0};
->   	u8 bus_addr = a2 ? 0x51 : 0x50;
-> +	size_t this_len, transferred;
-> +	u32 functionality;
->   	u8 *data = buf;
->   	int ret;
->   
-> -	while (len) {
-> -		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> -				     I2C_SMBUS_READ, dev_addr,
-> -				     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> -		if (ret < 0)
-> -			return ret;
-> +	functionality = i2c_get_functionality(sfp->i2c);
->   
-> -		*data = smbus_data.byte;
-> +	while (len) {
-> +		this_len = min(len, sfp->i2c_block_size);
-> +
-> +		if (functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
-> +			smbus_data.block[0] = this_len;
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_READ, dev_addr,
-> +					     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			memcpy(data, &smbus_data.block[1], this_len);
-> +			transferred = this_len;
-> +		} else if (this_len >= 2 &&
-> +			   (functionality & I2C_FUNC_SMBUS_READ_WORD_DATA)) {
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_READ, dev_addr,
-> +					     I2C_SMBUS_WORD_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			put_unaligned_le16(smbus_data.word, data);
-> +			transferred = 2;
-> +		} else {
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_READ, dev_addr,
-> +					     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			*data = smbus_data.byte;
-> +			transferred = 1;
-> +		}
->   
-> -		len--;
-> -		data++;
-> -		dev_addr++;
-> +		data += transferred;
-> +		len -= transferred;
-> +		dev_addr += transferred;
->   	}
->   
->   	return data - (u8 *)buf;
->   }
->   
-> -static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
-> -				void *buf, size_t len)
-> +static int sfp_smbus_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-> +			   size_t len)
->   {
->   	union i2c_smbus_data smbus_data;
->   	u8 bus_addr = a2 ? 0x51 : 0x50;
-> +	size_t this_len, transferred;
-> +	u32 functionality;
->   	u8 *data = buf;
->   	int ret;
->   
-> +	functionality = i2c_get_functionality(sfp->i2c);
-> +
->   	while (len) {
-> -		smbus_data.byte = *data;
-> -		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> -				     I2C_SMBUS_WRITE, dev_addr,
-> -				     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> -		if (ret)
-> -			return ret;
-> +		this_len = min(len, sfp->i2c_block_size);
-> +
-> +		if (functionality & I2C_FUNC_SMBUS_WRITE_I2C_BLOCK) {
-> +			smbus_data.block[0] = this_len;
-> +			memcpy(&smbus_data.block[1], data, this_len);
-> +
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_WRITE, dev_addr,
-> +					     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			transferred = this_len;
-> +		} else if (this_len >= 2 &&
-> +			   (functionality & I2C_FUNC_SMBUS_WRITE_WORD_DATA)) {
-> +			smbus_data.word = get_unaligned_le16(data);
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_WRITE, dev_addr,
-> +					     I2C_SMBUS_WORD_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			transferred = 2;
-> +		} else {
-> +			smbus_data.byte = *data;
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_WRITE, dev_addr,
-> +					     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			transferred = 1;
-> +		}
->   
-> -		len--;
-> -		data++;
-> -		dev_addr++;
-> +		data += transferred;
-> +		len -= transferred;
-> +		dev_addr += transferred;
->   	}
->   
->   	return data - (u8 *)buf;
-> @@ -815,10 +876,29 @@ static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
->   		sfp->read = sfp_i2c_read;
->   		sfp->write = sfp_i2c_write;
->   		max_block_size = SFP_EEPROM_BLOCK_SIZE;
-> -	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA)) {
-> -		sfp->read = sfp_smbus_byte_read;
-> -		sfp->write = sfp_smbus_byte_write;
-> -		max_block_size = 1;
-> +	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA) ||
-> +		   i2c_check_functionality(i2c, I2C_FUNC_SMBUS_I2C_BLOCK)) {
-> +		/* Either protocol alone covers any length: I2C-block carries
-> +		 * 1..32 bytes per xfer, byte iterates one byte at a time.
-> +		 */
-> +		sfp->read = sfp_smbus_read;
-> +		sfp->write = sfp_smbus_write;
-> +
-> +		if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_I2C_BLOCK))
-> +			max_block_size = SFP_EEPROM_BLOCK_SIZE;
-> +		else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_WORD_DATA))
-> +			max_block_size = 2;
-> +		else
-> +			max_block_size = 1;
-> +	} else if (WARN_ONCE(i2c_check_functionality(i2c, I2C_FUNC_SMBUS_WORD_DATA),
-> +			     "SMBus word-only adapter; odd-length transfers will fail\n")) {
-> +		/* Word-only: even-length xfers work; odd-length xfers fall
-> +		 * to BYTE, which the adapter does not advertise and will
-> +		 * likely fail.
-> +		 */
-> +		sfp->read = sfp_smbus_read;
-> +		sfp->write = sfp_smbus_write;
-> +		max_block_size = 2;
->   	} else {
->   		sfp->i2c = NULL;
->   		return -EINVAL;
+> When a netdev event fires for an IPsec SA, skip calling
+> mlx5e_accel_ipsec_fs_modify() if the MAC address has not changed and
+> the rule is not in drop mode. This avoids redundant hardware updates.
+> 
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+>> index a52e12c3c95a2..f567cd801adb3 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+>> @@ -674,19 +674,26 @@ static void mlx5e_ipsec_handle_netdev_event(struct work_struct *_work)
+>>  	struct mlx5e_ipsec_sa_entry *sa_entry = work->sa_entry;
+>>  	struct mlx5e_ipsec_netevent_data *data = work->data;
+>>  	struct mlx5_accel_esp_xfrm_attrs *attrs;
+> [ ... ]
+>> +
+>> +	if (ether_addr_equal(mac, data->addr) && !attrs->drop)
+>> +		return;
+>> +
+>> +	ether_addr_copy(mac, data->addr);
+>>  	attrs->drop = false;
+>>  	mlx5e_accel_ipsec_fs_modify(sa_entry);
+> 
+> If mlx5e_accel_ipsec_fs_modify() fails (for example, due to a memory
+> allocation failure), does this early return prevent the hardware state
+> from recovering?
+> 
+> Since attrs->drop and the mac address are updated before calling
+> mlx5e_accel_ipsec_fs_modify(), a failure in the hardware update leaves the
+> software state out of sync with the hardware.
+> 
+> Prior to this patch, a subsequent netdev event for the same neighbor would
+> unconditionally retry the hardware update. With this patch, the early return
+> sees the optimistically updated software state, matches it, and skips the
+> retry, potentially leaving the hardware permanently stuck in a dropped or
+> failed state.
+
+@Tariq, @Jianbo: I tend to think that the above qualifies as
+pre-existing issue: when mlx5e_accel_ipsec_fs_modify() failed the S/W
+and the H/W ended-up in out-of-sync state for a potentially unlimited
+time even before this patch. WDYT?
+
+/P
 
 
