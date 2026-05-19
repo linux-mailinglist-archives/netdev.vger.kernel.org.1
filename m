@@ -1,271 +1,182 @@
-Return-Path: <netdev+bounces-289475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289476-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +PPNNh9uDGpKhgUAu9opvQ
-	(envelope-from <netdev+bounces-289475-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 16:05:19 +0200
+	id qJrhDaNuDGomhwUAu9opvQ
+	(envelope-from <netdev+bounces-289476-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 16:07:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80E87580371
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 16:05:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA992580434
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 16:07:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5A74F305AE30
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:01:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 370E7305EA34
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 14:04:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9193ED3D3;
-	Tue, 19 May 2026 14:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029653ED3C8;
+	Tue, 19 May 2026 14:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="bv4sxd4r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DlxNFjN3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BwGqlPGP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F922FC881
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 14:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99326340415
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 14:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779199278; cv=none; b=lG2e3s4GOSF4NGRDgOHlteiAiQCO9bfd5O30bvvsippCDc8Vdi5XJFH/l3DphbjlQpkA6gD1PATz9bAec+nopWN6uJcqazbUGPE+CevXVRmJlw4G+T6kA5Vow92xJpMnwFfn7m9X35jpCe+7D/kr+YZtqLWz0KA2xbuuCO3ELNs=
+	t=1779199473; cv=none; b=DXb5ShSG2vIxO73AU6t/ui7SU/UXAljg4SilktJSLbFpVpL/oqhl6x6q7LPYtUWbYZ9TtdKep2pCk84M+lzXv5VUAnEFxYkvKM55AQPfxrjp/pa+OTM0KG5Fujmup6NvG6QpmBAjtwS/SCxgqEld+fxCJ0gzQR9xOOLTbNkTf5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779199278; c=relaxed/simple;
-	bh=Unbfd+jMuUVdbtRMYUn9CMrCJcN79/joicb4mz1QtVk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dCoKWQDxJjUi5a0mdswhpMCdbqyPjd7dlbKbhQwaOsZ8ThWvkUEGoIQhV6eZFtDCW/wCWUXwx/S/tv1I7CURiFLOxVfQKgPnrLmAGry5YoxGxNQNNSTsb5JPgpalCmcIQb81KRnU+PDIokPs9DbXqwq1mJXj/l+9Jba2lMzr5Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=bv4sxd4r; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-449d6c68ed8so932361f8f.0
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 07:01:16 -0700 (PDT)
+	s=arc-20240116; t=1779199473; c=relaxed/simple;
+	bh=FMaMUKz/x8QbjfR3g5V6+iL3OxM0o0sNRaKeIldoQQ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fQeXm4cTs0cNS5ouVecttD3nLVbLxOKNW0vKTxdNyntdrKg/PbZaqa44F7jCIfim/m+tAOmsEHKnvinna3SwHI3VDWo253g8ifsEGvqOZTirB4yHAz9we5zpVQkc+h40C5oXmFgVkbxfyTbqfTmuyJsvGaTzOgOI4iidkOFh+EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DlxNFjN3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BwGqlPGP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779199471;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JyK79IEx4ySepGt4cTN7KOjcr0GF19I7WDCAu3CkGGI=;
+	b=DlxNFjN3lyvNeNWdth2K8s1+gqMkhAWouoKTLoCcoB36t5YuyhcVqkRJJ3Ir9dgp+4xAkD
+	BA+y0buyHlQ2eKLRWThCA2Jsd2dp8MZQTh9CQeXXBAPBRDZ57BQVjAkHuhW+2MCGb5AB6b
+	iYdfBmAzkt5hB88fr9l2c+nhfwIaY3g=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-575-Yea_b17lMqqvm_7LZmcrBg-1; Tue, 19 May 2026 10:04:19 -0400
+X-MC-Unique: Yea_b17lMqqvm_7LZmcrBg-1
+X-Mimecast-MFC-AGG-ID: Yea_b17lMqqvm_7LZmcrBg_1779199456
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-45b7ff2140eso3180066f8f.3
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 07:04:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1779199275; x=1779804075; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s6V0npOlv/pb1pXj0+v8WQf0cSg92bgbaYxRXmYzFU0=;
-        b=bv4sxd4rsJkTK7N0ubnrvFRxlVJ85FE+SSu+jz8irJKMsFSRKBC+sar3HWOUBDBqsq
-         HCGj/2aPydbuOXjU5QrZCV97ALlUpwah6Pg/76pUrt4oGqv8z0L1dZ60fpuBmDmg92p5
-         +qaztR7AeJ6jYf8sO5oNfRJXoOfV04u1Rieifyqgex3x04BM3aPVTDELziaKjQ2O0j7u
-         btyXBDAtDdFZSRewa7R3tgdaA57AtH1/IAHTYY9Hx5nB9Stwx4HksYKvyzWjmEW1GP7g
-         wxuaCBX8bL0W0XhL1QY5mvAPAUbvVQ596fNY1PzXbyjrAmJXGi/LzyVXmFkWRWN+Fhvl
-         Metg==
+        d=redhat.com; s=google; t=1779199456; x=1779804256; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JyK79IEx4ySepGt4cTN7KOjcr0GF19I7WDCAu3CkGGI=;
+        b=BwGqlPGPyTAEKuDwo8sJ84HiXt9d6LyIl3O6pJQ3hFJOV4X0PKuplQNp5LYIT5tB3W
+         jvYM2P1TV4Ezar8/q2HeMsjw+6oduw9NQD8f/Hb0CxUzal9g5uUqJrYPYRRryByceluC
+         dN+sGVRQWEkkApEI9FS4l42ymmv6oRo5fa4yDkCGQYSpQJ+2Kw/S4P2ZS7+TICNjVrMc
+         /H2GzVj7PBn6KpvYWQafxXhQfq5dJT5yS3XCF4/o9+sEC6gxlvL4jze434UqMaL0jH3F
+         ekmJ6zok9+j/itf1kcEJY5lMyadAa/kjXBfmEp9QEGC+/nTaVVsIpHljlx5YsJjmxU2W
+         G0Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779199275; x=1779804075;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s6V0npOlv/pb1pXj0+v8WQf0cSg92bgbaYxRXmYzFU0=;
-        b=YbxJEK6DqFxs763kqZpCmmr89BcMGBAAE6lv0cElRjglVE1NWJ6AILeD7jio1lWco6
-         s9Wl3E36b3NI15XnaG9aM+UbDt16w0+dy8FvwUBkl+M90bhPLHSuohqJIUsb51xMcqTs
-         bRz9ZNKLw7XlnmDcgAHd7Nk/Umo12wRVJetOb3zgBBEh1YFVq0xq1K/zXZH6rLbBmZo6
-         7+RFE5a4eLSOMu/69O52rtV/fkbRJTe8QeRiDl5KbyXbqf8g7vZUta2eJ174D3WpN1fV
-         L3bw1JmWKYh35PA7NhyPguK7zvvpSWw96c+/IbOlbwJsDYS2Yj79s7iaahih6E5RwVBD
-         Y0Eg==
-X-Forwarded-Encrypted: i=1; AFNElJ9JbQPk+hTy1WP3Z7OeHwsljTWgkJ/k2PPrVtmrHxRuaLCQvkJpap030XB61SESizUbqeCU96A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRzJd0hL6zhCYAJAlzGBflF40tbJLSnt1dtICk42QTNTjAmXTH
-	V4tDIg2NLjglT5D4FI+R1Jw1cU4kCWQ9GDSjRVTo4XVLwlet1q37P7sMf8xg4IU1XQQ=
-X-Gm-Gg: Acq92OHMzfQm6XtzXv9fNygK8XuBA7W6u517JpMfqPjz6IbixzVa6He7rp20UOqPK9B
-	V/y2wkVJ2D/UyHw2J1s3XNq1pg8omWFFDuGuFhbHbsTp4U5qLKEweICkbOc8RCzwnhHF98ETPEC
-	syF5kYy895U8Nqv+2nSRVbiG3mV+PD00WfUKWSwQpmQZXMSkbSv6+kg0MXbBzra3fhkDuxzLBa/
-	8Tnfqyf26kNFq7SKULnN9oL2Vyc8pEjAX4nEveYT2L2nWQGHeHc4pscKUNCwWp37v9s62tBi9O2
-	d9hfgdJg+/j9/bKHouX7yXByX5h9l22szlVSZfTApiwZ+rL4HJ+HR7nrDE7rrdk3wa92wNtgT43
-	X6r0ynVp4gdbMQJ6p0RewGJ/UoDjSK04Wh5gWlUfafcVWno4OI7KgTWLP2o/g2OFL9hVpD0jJI8
-	Uh6JIiFWBwL/sqwe+tl1cAq/gk2IeV2Fj8CJ0wcfM8M0iM9BQTPwr2cSSJPFCFO5s9SavMtMBDT
-	nFtcfilzq2GHL3l9vqiJTI8rQ==
-X-Received: by 2002:a05:6000:186c:b0:44a:247e:67b1 with SMTP id ffacd0b85a97d-45e5c35e40amr31881085f8f.5.1779199274455;
-        Tue, 19 May 2026 07:01:14 -0700 (PDT)
-Received: from localhost (p200300f65f47db048a8dfcf61053817f.dip0.t-ipconnect.de. [2003:f6:5f47:db04:8a8d:fcf6:1053:817f])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-45da0a178adsm48461563f8f.18.2026.05.19.07.01.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 07:01:13 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v1] net: pse-pd: Use named initializers for arrays of i2c_device_data
-Date: Tue, 19 May 2026 16:01:01 +0200
-Message-ID: <20260519140101.1584946-2-u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
+        d=1e100.net; s=20251104; t=1779199456; x=1779804256;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JyK79IEx4ySepGt4cTN7KOjcr0GF19I7WDCAu3CkGGI=;
+        b=KSCLitxVpNSGWR1LBildOnkffJ0X8nulgG0zOfqiNvzFElwzYXJe1LUaPihjSroVL0
+         +AA3fpeO9JDpBHzgd5zW5UF/5Tj6hNctrJKTBZw9c2otJCxt3cka8LDkj+952XDZfavy
+         SagZWg7XPJf5xFphu6xyySJbbzg0CykZ9NO81m+3n7BpZrP0j0bS6JeeFG2BjR2QMcQk
+         KdjdSbV5dM7o4DebJSTz9FToSSAjyuWeTC6TdJhUfOzpMW8SDndtbO9r5ygfSMa7YmSx
+         WuS6fhZafxwj78Zi8rbRjHwQYPMTQbIxOmIEZskpCsqf8liPA5ojypJuJ055b5r760uy
+         +y2Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8xoFxkuZzB8WrmaCnGOnXZptousIB6XiaSQD/ja/TkdaRSD2WNnBWalGhcbybsyvmvAlQ71KA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFH0loM4cLkHDR1ZJxsZndsySS9eR36PdxMVPjN+uScoqi3F1F
+	P3d6CwuD3lEnt6zwft4GwvWk6rNjfXWe5hIhbpWwVoSdDxlVElznYFbYmN+8XdiepzdRy9ASrT1
+	uR3OQTqmU9icHnhYp/+jwzBFVMA0ImYOiS2M/DVkkrsU30P40ilWjAfSSgg==
+X-Gm-Gg: Acq92OEGQAgfxmjSFOI2Y8xNqA4DS+e2LPt0O4WMtcKOWY48qcU9HvdgRfNSZKv0a3O
+	Uih20XyzShtDKiAQwpGwAzuNvwOWf5kqXUivQsXksXZiCvKox3F0KsEwDhQbo8gMAsn4Nlz4P2I
+	E8qKAFVwkwhHFCKyTfiNnNvl36ooizXzTy51GMNbjg2rboLSDHm0i8d+niqnLmwt2hHSS61wUam
+	Qk0YJ/jaW+VH0wRCVpIJS+D3bai148Xfa0brdYa38Flx+9aThL6TVIibK7M5V4SKpEcJTMAwCoG
+	p1lOCDQVL92yltZgkKVxaUNsVYV2+kgbqx8SxKp1gsb+IDM/FAQGbMfeTK5yjqRME/wv22QJDz1
+	Zc0hQAdS8SCnNe4DZKJLHCajWHG5oh+D9P8W2ZzoeAwS49tGl4it+BZU=
+X-Received: by 2002:a05:600c:34cd:b0:488:936a:6220 with SMTP id 5b1f17b1804b1-48fe61f2c03mr335533495e9.21.1779199456382;
+        Tue, 19 May 2026 07:04:16 -0700 (PDT)
+X-Received: by 2002:a05:600c:34cd:b0:488:936a:6220 with SMTP id 5b1f17b1804b1-48fe61f2c03mr335532795e9.21.1779199455912;
+        Tue, 19 May 2026 07:04:15 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.25.33])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe57943b2sm337222105e9.8.2026.05.19.07.04.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 May 2026 07:04:15 -0700 (PDT)
+Message-ID: <eada2df3-7e3f-46a5-b290-fe0e8975a1bb@redhat.com>
+Date: Tue, 19 May 2026 16:04:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 3/7] atm: convert to getsockopt_iter
+To: Breno Leitao <leitao@debian.org>, Chas Williams <3chas3@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
+ Alexandra Winter <wintera@linux.ibm.com>,
+ Thorsten Winkler <twinkler@linux.ibm.com>,
+ James Chapman <jchapman@katalix.com>, David Howells <dhowells@redhat.com>,
+ Marc Dionne <marc.dionne@auristor.com>, David Heidelberg
+ <david+nfc@ixit.cz>, Samuel Ortiz <sameo@linux.intel.com>
+Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, linux-s390@vger.kernel.org,
+ linux-afs@lists.infradead.org, oe-linux-nfc@lists.linux.dev,
+ kernel-team@meta.com
+References: <20260515-getsock_four-v2-0-0d8eed952627@debian.org>
+ <20260515-getsock_four-v2-3-0d8eed952627@debian.org>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260515-getsock_four-v2-3-0d8eed952627@debian.org>
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5192; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=Unbfd+jMuUVdbtRMYUn9CMrCJcN79/joicb4mz1QtVk=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqDG0ewcHQT5DffG5Eg6fy1z4TZi+R4rnoEDhWo xvM9vwuA06JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCagxtHgAKCRCPgPtYfRL+ TvVcB/0QT6bP47k1eZUYJ00NbxGEls4QW7QmMlOonh8h6dGDUDOFHKAvrMBqDANFkfgrYzbmvs3 QTNQlqYMCefFMtsl+SejqGqtaHDsG2rc2OvjZvc/N0yobelPOWdSfPr198Kd9HRAxtrej5r0oG0 wDagpnXX8GyPXiNlk7XuBOfPU6EdsiiAJq5wWMOyfeGZanvuHvR8lVfCQw4BI9ioiEkDGhLfdJE EAotOUNcEscyU/FYUl07ZVjPozmJehxTP0TDzyTbHJH7qx95AzbxJO3ZpG4tKxMapkCBMlzlv+O xEAwLEbKTdhUk5n+kxZWwMER31aoNQ325rJqSJPbcvF5qZSc
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289475-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289476-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[debian.org,gmail.com,davemloft.net,google.com,kernel.org,intel.com,fomichev.me,iogearbox.net,redhat.com,linux.ibm.com,katalix.com,auristor.com,ixit.cz,linux.intel.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lwn.net:url]
-X-Rspamd-Queue-Id: 80E87580371
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: EA992580434
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-While being less compact, using named initializers allows to more easily
-see which members of the structs are assigned which value without having
-to lookup the declaration of the struct. And it's also more robust
-against changes to the struct definition.
+On 5/15/26 10:32 AM, Breno Leitao wrote:
+> @@ -797,13 +798,13 @@ int vcc_setsockopt(struct socket *sock, int level, int optname,
+>  }
+>  
+>  int vcc_getsockopt(struct socket *sock, int level, int optname,
+> -		   char __user *optval, int __user *optlen)
+> +		   sockopt_t *opt)
+>  {
+>  	struct atm_vcc *vcc;
+> +	int val;
 
-The mentioned robustness is relevant for a planned change to struct
-i2c_device_id that replaces .driver_data by an anonymous union.
+I *think* you should use 'unsigned long' here to avoid user-visible
+changes due to put_user() replacement.
 
-While touching all these arrays, unify usage of whitespace in the list
-terminator.
-
-This patch doesn't modify the compiled arrays, only their representation
-in source form benefits. The former was confirmed with x86 and arm64
-builds.
-
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
----
-Hello,
-
-the mentioned change to i2c_device_id is the following:
-
-	diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-	index 23ff24080dfd..aebd3a5e90af 100644
-	--- a/include/linux/mod_devicetable.h
-	+++ b/include/linux/mod_devicetable.h
-	@@ -477,7 +477,11 @@ struct rpmsg_device_id {
-
-	 struct i2c_device_id {
-		char name[I2C_NAME_SIZE];
-	-	kernel_ulong_t driver_data;	/* Data private to the driver */
-	+	union {
-	+		/* Data private to the driver */
-	+		kernel_ulong_t driver_data;
-	+		const void *driver_data_ptr;
-	+	};
-	 };
-
-	 /* pci_epf */
-
-and this requires that .driver_data is assigned via a named initializer
-for static data. This requirement isn't a bad one because named
-initializers are also much better readable than list initializers.
-
-The union added to struct i2c_device_id enables further cleanups like:
-
-	diff --git a/drivers/regulator/ad5398.c b/drivers/regulator/ad5398.c
-	index 0123ca8157a8..dfb0b07500a7 100644
-	--- a/drivers/regulator/ad5398.c
-	+++ b/drivers/regulator/ad5398.c
-	@@ -207,8 +207,8 @@ struct ad5398_current_data_format {
-	 static const struct ad5398_current_data_format df_10_4_120 = {10, 4, 0, 120000};
-
-	 static const struct i2c_device_id ad5398_id[] = {
-	-	{ .name = "ad5398", .driver_data = (kernel_ulong_t)&df_10_4_120 },
-	-	{ .name = "ad5821", .driver_data = (kernel_ulong_t)&df_10_4_120 },
-	+	{ .name = "ad5398", .driver_data_ptr = &df_10_4_120 },
-	+	{ .name = "ad5821", .driver_data_ptr = &df_10_4_120 },
-	 	{ }
-	 };
-	 MODULE_DEVICE_TABLE(i2c, ad5398_id);
-	@@ -219,8 +219,7 @@ static int ad5398_probe(struct i2c_client *client)
-	 	struct regulator_init_data *init_data = dev_get_platdata(&client->dev);
-	 	struct regulator_config config = { };
-	 	struct ad5398_chip_info *chip;
-	-	const struct ad5398_current_data_format *df =
-	-	                (struct ad5398_current_data_format *)id->driver_data;
-	+	const struct ad5398_current_data_format *df = id->driver_data;
-
-	 	chip = devm_kzalloc(&client->dev, sizeof(*chip), GFP_KERNEL);
-	 	if (!chip)
-
-that are an improvement for readability (again!) and it keeps some
-properties of the pointers (here: being const) without having to pay
-attention for that. (I didn't find a pse-pd driver that benefits, so
-this is "only" a regulator driver example.)
-
-My additional motivation for this effort is CHERI[1]. This is a hardware
-extension that uses 128 bit pointers but unsigned long is still 64 bit.
-So with CHERI you cannot store pointers in unsigned long variables.
-
-Best regards
-Uwe
-
-[1] https://cheri-alliance.org/discover-cheri/
-    https://lwn.net/Articles/1037974/
-
- drivers/net/pse-pd/pd692x0.c  | 2 +-
- drivers/net/pse-pd/si3474.c   | 4 ++--
- drivers/net/pse-pd/tps23881.c | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index 4a3c852780f5..49b1527829ad 100644
---- a/drivers/net/pse-pd/pd692x0.c
-+++ b/drivers/net/pse-pd/pd692x0.c
-@@ -1853,7 +1853,7 @@ static void pd692x0_i2c_remove(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id pd692x0_id[] = {
--	{ PD692X0_PSE_NAME },
-+	{ .name = PD692X0_PSE_NAME },
- 	{ }
- };
- MODULE_DEVICE_TABLE(i2c, pd692x0_id);
-diff --git a/drivers/net/pse-pd/si3474.c b/drivers/net/pse-pd/si3474.c
-index aa07ffbce54d..1845b9c51cf7 100644
---- a/drivers/net/pse-pd/si3474.c
-+++ b/drivers/net/pse-pd/si3474.c
-@@ -550,8 +550,8 @@ static int si3474_i2c_probe(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id si3474_id[] = {
--	{ "si3474" },
--	{}
-+	{ .name = "si3474" },
-+	{ }
- };
- MODULE_DEVICE_TABLE(i2c, si3474_id);
- 
-diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-index d40cb35a2547..49d6389da067 100644
---- a/drivers/net/pse-pd/tps23881.c
-+++ b/drivers/net/pse-pd/tps23881.c
-@@ -1528,8 +1528,8 @@ static int tps23881_i2c_probe(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id tps23881_id[] = {
--	{ "tps23881", .driver_data = (kernel_ulong_t)&tps23881_info[TPS23881] },
--	{ "tps23881b", .driver_data = (kernel_ulong_t)&tps23881_info[TPS23881B] },
-+	{ .name = "tps23881", .driver_data = (kernel_ulong_t)&tps23881_info[TPS23881] },
-+	{ .name = "tps23881b", .driver_data = (kernel_ulong_t)&tps23881_info[TPS23881B] },
- 	{ }
- };
- MODULE_DEVICE_TABLE(i2c, tps23881_id);
-
-base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
--- 
-2.47.3
+/P
 
 
