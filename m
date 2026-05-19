@@ -1,214 +1,204 @@
-Return-Path: <netdev+bounces-289392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WP4MELE+DGqPbAUAu9opvQ
-	(envelope-from <netdev+bounces-289392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:42:57 +0200
+	id sEnEBdQ9DGqPbAUAu9opvQ
+	(envelope-from <netdev+bounces-289393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:39:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C496757CAAA
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:42:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF8A757C78C
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:39:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B694C31069F2
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:24:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 10CC9304BCF4
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D67B4BCADD;
-	Tue, 19 May 2026 10:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AACA31F988;
+	Tue, 19 May 2026 10:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dw0uXmx8"
+	dkim=pass (1024-bit key) header.d=flowmailer.net header.i=@flowmailer.net header.b="EZaazZKd";
+	dkim=pass (2048-bit key) header.d=siemens-energy.com header.i=schuster.simon@siemens-energy.com header.b="Te2jAfZD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta-65-132.flowmailer.net (mta-65-132.flowmailer.net [185.136.65.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1924BCAC2
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 10:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CE823393E
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 10:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779186207; cv=none; b=a5wgERdHCnSsv7tt7LncHmbINI/laYuy7NA77ala4l4GmuXU2jCiad5aijF0EBOYUFLmH8T/nnlM0lUnY9IzX8gmDgc9Sh37ESleokn5t33RpDyh7n9bWanfd5REd4OyXyIe29gKWbHmvIwE6fO+Cncw9v6xPKimh8uoucOJCz4=
+	t=1779186622; cv=none; b=UFyG7Q3Wyh+3qFwc4o9eS8jGZ6A9135LF+4e5a+jbcGl0P6Umpn4TcW3AB+Euz9YJtBOhgNCE3KyimSmA+7tHi2KNlWnjZ07GJgzuFDB2TqXdtKhpckgdstGccsMM/HWdzlrAMDEsTVHJfuUTczaASbkVwwU55+P3EPzg/s6jbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779186207; c=relaxed/simple;
-	bh=DO0Gh9yEyPAdPj/ANVn8igAk2S/1BupY7L+OcOzpdyU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KjqcdeXigildMpwDnKESF/U+9BLZtcFk/BYm66+n76OFQrWjE1qOQ9bvxpVUhng3v1pGsL9RfjI34hxdEv0GbUOB6eZI9/vVPMWCnktU+UEEei7prIGxT6OPhoLSAr2z6gXdartLFZvvHZDbtMhfDgm2/hvly2/9sVrmRPe74Yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dw0uXmx8; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-36974221f93so1602389a91.2
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 03:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779186205; x=1779791005; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wI00RqYwNVXaarsJLcvON/gPH4U7fY7Oeb6rc01MfGw=;
-        b=dw0uXmx8wfhvQErBnHKHsyXQmIHBpuoHrvL8TmqDp6nVpzUDm+BgeFRVfEX808Ufr9
-         gsO/JCrPk2ijFo0+nlgSyVDB1VEIodsDol1ss/gybvby+jGmdT2oKEMSiEIZXi66JgU1
-         ZwJ1g1/oHI0Qyks7ewwGrnWR+bwwjUwQpJebi5Oit0CmgjUx9gm4RnX6W3p5eFm7caXB
-         iXWTdAcIVphJdAc7uJXHTbl0mbGRKRSoGmJYEA+V+zx0NwAxElx+PNtxyVRZGdgVTRDA
-         S8Z8nY1OzbZj9TUmvGzQI4iIDOG6hxj4LkjoxBk0pqXfxDPmyVgQ17ExUvkaB/3+488O
-         lgow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779186205; x=1779791005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wI00RqYwNVXaarsJLcvON/gPH4U7fY7Oeb6rc01MfGw=;
-        b=pQ2Brr26ymGbwx/eKSBfVyqMxHNwhrODQt+cc7gHlSPk9QBi0QYF8p5Ci7JzhikgFe
-         3Hz7XP3QbDQLti6CqqnDp1MmzSaSX/awSS5CkOfQEAnel57WCkA8eeOlPK84H4DnCyku
-         0JjCXuwPlO/hj1RB3WK0XfwkIhhG/cqu0kNOhqXntaJBfqn9SGZbi6uLVGCSqzkA8fjt
-         TBQqWecDsVp86R6Nl5Uupz0Yod8wSUj3QJPojlAmdKwGSEsobZ/Y35AAzNbTN3QbYx6+
-         l8q80Vq6pzzDkgMDO0hSG3V9QlmJndeFainegaSOqxXlIjQDEIbTO13SJHSO6S9OZvRy
-         VGbA==
-X-Forwarded-Encrypted: i=1; AFNElJ9zMyiHrWGt28sC+vGunA4QS31VxFau5ep5LeSWdTq1W1ZuligzGtjvln9qitClDzfNpBWlDtg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNpGTHrg6gWiDtq6BZ0uZD7Z+w7e95u+YgvpTeZ+ZaXxR5MY1v
-	1ApVPO+masFKjgXqLKLS3nY9IaoPIDp5aUAa2ThILCTth4u2BpGmEbZ/
-X-Gm-Gg: Acq92OEegG8AnPrgRtGTOb+E0mbFRhMH2ysQxkBKtUEzc0laHmyBylVVxUJzSLWjVqX
-	HEE9yPTD0Gvpp3SVCHfEv5+GXtSjf+ukWmfB29cTmduiKkzRtw9YE0Khd/0n1K0g9PAMSYSKg5z
-	W8q15SVcyxA75hcM0ynNOGQiikWNrcdPL8Y7r/G0XfTHB+fMOgAuLJ0tCJcsbjsfjLv9LvYOeLY
-	bntKlNZCOQdlKl95uo9W64lXlmGJPKUEEweVm6sHoIeUJi1snnB8Sa/lD2+U33cG3VLzB6lr8ZM
-	BcHbgO2OpvQoNKYp5i+UWtOsKI4t/x5uzBreAdsW+Z/1O/sEJKni2GeTAH6NBUH2qRJXISosXEB
-	wBPi2ckc3i6Hk/eZjILoIu8nicl4FMRBz26e7RQOX9hMsJ2lg0GbT736ALfdJsBiETn/aml7P9M
-	zmt36CpaiKRKNduruROiTbXJB9qA==
-X-Received: by 2002:a17:90b:5290:b0:366:1bab:c3d6 with SMTP id 98e67ed59e1d1-36951a02b73mr18385801a91.10.1779186205288;
-        Tue, 19 May 2026 03:23:25 -0700 (PDT)
-Received: from fedora ([171.243.49.69])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3695148d53asm13708947a91.15.2026.05.19.03.23.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 03:23:24 -0700 (PDT)
-From: Minh Nguyen <minhnguyen.080505@gmail.com>
-To: pabeni@redhat.com,
-	bryan-bt.tan@broadcom.com
-Cc: sgarzare@redhat.com,
-	vishnu.dasa@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	bcm-kernel-feedback-list@broadcom.com,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v4] vsock/vmci: fix UAF when peer resets connection during handshake
-Date: Tue, 19 May 2026 17:23:10 +0700
-Message-ID: <20260519102310.237181-1-minhnguyen.080505@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1779186622; c=relaxed/simple;
+	bh=FMylFNF2LBIsDQTt92IHLCTEBM4Uc4LrYwy7HvJjx8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cqZG83RNVUghJTCbT5aB1yFpSgo+hPvnXuYbk1fd2VlmUPR+GIbXwu0dkDzxp24B/Gcd7zIAz5TscWG3BzovT5lgBSLy39XiUIuqdiC+yHLdN/jL6Dzzus8kikWuGs8s6GxctkTt6saXJwR25ZIRtNlWQq2Vi0yj1X7oYOU3zsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens-energy.com; spf=pass smtp.mailfrom=errorhandling.siemens-energy.com; dkim=pass (1024-bit key) header.d=flowmailer.net header.i=@flowmailer.net header.b=EZaazZKd; dkim=pass (2048-bit key) header.d=siemens-energy.com header.i=schuster.simon@siemens-energy.com header.b=Te2jAfZD; arc=none smtp.client-ip=185.136.65.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens-energy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=errorhandling.siemens-energy.com
+Received: by mta-65-132.flowmailer.net with ESMTPSA id 20260519103015ac1cd022690019fd73
+        for <netdev@vger.kernel.org>;
+        Tue, 19 May 2026 12:30:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=s1;
+ d=flowmailer.net;
+ h=from:from:sender:to:to:cc:cc:subject:subject:content-type:content-type:content-transfer-encoding:References:In-Reply-To:Date:Message-ID:MIME-Version;
+ bh=VQcumpK/VH7AMVe3D9QfBdm875bqYNSA1S/WhQcMd50=;
+ b=EZaazZKd3ZONXRq4GpMzuNQLKWTjDM3BCDcJN1Zro5Jf4shP6ldQEZRd/JpK1AZ4rlK0YF
+ /Aa7cioXIloqt5aLEMZp2zhOmX1/9l/6y1VhiFuSN27YZpJ0WrZoxkmuTSB8KOR9mJccLgIF
+ U5YZLq88tEC65edr76mfk0J41cOEg=;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm3;
+ d=siemens-energy.com; i=schuster.simon@siemens-energy.com;
+ h=from:from:sender:to:to:cc:cc:subject:subject:content-type:content-type:content-transfer-encoding:References:In-Reply-To:Date:Message-ID:MIME-Version;
+ bh=VQcumpK/VH7AMVe3D9QfBdm875bqYNSA1S/WhQcMd50=;
+ b=Te2jAfZD7hDN23NQ3+54hePl7vopCgSM3JMxLh/fm7xcDVL3oowG/1GukwfDalvkw/93pk
+ r1edcvtKHS8aMq6NRNiOadutVoT+ObgjmyLqPfqBF0IzKI4s/3l4Ljo3Ns0e8129/XbiB/f0
+ eILgqZumYF4wXN2RrKqjT6iJT48jJyha8qiB1Ms2c7YCYUsoOaUZYeqchP96MjjkD2jP9Tnp
+ Bup5ZCH2E2PIWkx0GqjYc7NY1+ofQc4JMbJbK42rmOgM8diRAjnGGhXNzlSI65tykwA8DWj2
+ tjMUFpTA0awNupV3gXQUmo6aF83iBjTdaCqUN4ZyrwUBouDMkjB7zheA==;
+Date: Tue, 19 May 2026 12:30:12 +0200
+From: Simon Schuster <schuster.simon@siemens-energy.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
+ Dinh Nguyen <dinguyen@kernel.org>, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, workflows@vger.kernel.org, Linux-Arch
+ <linux-arch@vger.kernel.org>, dmaengine@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, Netdev
+ <netdev@vger.kernel.org>, linux-pci@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-hardening@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, "linux-csky@vger.kernel.org"
+ <linux-csky@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Daniel
+ Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Alex Shi <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, Dongliang
+ Mu <dzm91@hust.edu.cn>, Hu Haowen <2023002089@link.tyut.edu.cn>, Kees Cook
+ <kees@kernel.org>, Oleg Nesterov <oleg@redhat.com>, Will Deacon
+ <will@kernel.org>, "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Nicholas Piggin
+ <npiggin@gmail.com>, Vinod Koul <vkoul@kernel.org>, Frank Li
+ <Frank.Li@kernel.org>, Dave Penkler <dpenkler@gmail.com>, Andi Shyti
+ <andi.shyti@kernel.org>, Jonathan Cameron <jic23@kernel.org>, David Lechner
+ <dlechner@baylibre.com>, =?ISO-8859-1?Q?Nuno_S=E1?= <nuno.sa@analog.com>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, Krzysztof
+ WilczyDski <kwilczynski@kernel.org>, Andreas Oetken
+ <andreas.oetken@siemens-energy.com>
+Subject: Re: [PATCH] nios2: remove the architecture
+Message-ID: <20260519103012.blot4bssgiqfer6p@dev-vm-schuster>
+References: <20260518042833.272221-1-enelsonmoore@gmail.com>
+ <d40b1e80-37fc-4c88-9d7f-dae6458efe6c@app.fastmail.com>
+ <20260518105735.GW3126523@noisy.programming.kicks-ass.net>
+ <20260518172444.zyd47mcagrcwu7wt@dev-vm-schuster>
+ <CADkSEUjhq6HSdg4ignzbuJiN5uXATsTdxFbRJ3BMxs5=WUWLDg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADkSEUjhq6HSdg4ignzbuJiN5uXATsTdxFbRJ3BMxs5=WUWLDg@mail.gmail.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[siemens-energy.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[flowmailer.net:s=s1,siemens-energy.com:s=fm3];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-289393-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289392-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[minhnguyen080505@gmail.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,sang-engineering.com];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[flowmailer.net:+,siemens-energy.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[51];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[schuster.simon@siemens-energy.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[infradead.org,arndb.de,kernel.org,vger.kernel.org,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,gmail.com,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com,siemens-energy.com];
+	TAGGED_RCPT(0.00)[netdev,renesas,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C496757CAAA
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[siemens-energy.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,cip-project.org:url,flowmailer.net:dkim,linuxfoundation.org:url]
+X-Rspamd-Queue-Id: BF8A757C78C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-vmci_transport_recv_connecting_server() returned err = 0 for a peer
-RST in its default switch arm:
+Hi Ethan, hi Wolfram,
 
-	err = pkt->type == VMCI_TRANSPORT_PACKET_TYPE_RST ? 0 : -EINVAL;
+Thank you for your thoughtful responses.
 
-That made vmci_transport_recv_listen() skip vsock_remove_pending(),
-leaving the pending socket on the listener's pending_links with
-sk_state = TCP_CLOSE while destroy: still dropped the explicit
-reference taken before schedule_delayed_work().
+On Mon, May 18, 2026 at 05:13:58PM -0700, Ethan Nelson-Moore wrote:
+> Your reasoning makes complete sense. However, there is an alternative
+> to maintaining the architecture in mainline.
+> 
+> The Civil Infrastructure Platform project maintains super-LTS kernels
+> (and a set of base Debian packages) for 10 years. They are intended to
+> be used for exactly these kinds of devices.
+> See here: https://wiki.linuxfoundation.org/civilinfrastructureplatform/start#kernel_maintainership
+> and here: https://cip-project.org/about/linux-kernel-core-packages
+> 
+> CIP will maintain kernel 6.12 until 2035. Is this long enough for your
+> lifecycle? What kernel are you currently using? If it's newer than
+> 6.12, we can easily wait until the next CIP SLTS release to remove
+> Nios II support to avoid a downgrade.
 
-One second later vsock_pending_work() observed is_pending=true and
-performed full cleanup: vsock_remove_pending() then the two trailing
-sock_put(sk) calls -- the first reached refcount 0 and __sk_freed
-the socket, and the second wrote into the freed object:
+This depends. For released/maintained firmware revisions we already
+track CIP SLTS versions (candidates) to be prepared, the majority of which
+is currently still running 6.1.x with 6.12.x up-and-coming.
+But for the reasons outlined by you regarding architectural and feature
+support in CIP SLTS, we do not, however, use the extended support duration
+SLTS releases in production, and instead upgrade with the kernel.org LTS
+branch release schedule and track these internally alongside mainline
+to prevent major obstacles during version jumps.
+2035 is still a rather tight timeframe for our typical support/phase-out
+period (we would hope to get close to 2040 with the SLTS extensions),
+which is also the reason for our targeted 'lifetime extension' for the
+nios2 architecture for approximately 5 years, or more precisely ~2-3
+SLTS kernels assuming the usual cadence of 2 years between SLTS versions
+(+ some safety margin).
 
-  BUG: KASAN: slab-use-after-free in refcount_warn_saturate
-  Write of size 4 at addr ffff88800b1cac80 by task kworker
-  Workqueue: events vsock_pending_work
+> Also, CIP focuses on architectures used by CIP members - currently I
+> think they are x86 (32 and 64-bit), ARM (32 and 64-bit) and RISC-V.
+> Since Siemens is already a CIP member, you can simply ask them to add
+> Nios II to the list, and you can assist them with testing and directly
+> submit patches to them once the standard 6.12 LTS period ends.
 
-Treat peer RST like any other unexpected packet type (err = -EINVAL).
-All destroy: arms now return err < 0, so vmci_transport_recv_listen()
-removes pending from pending_links synchronously and
-vsock_pending_work() takes the is_pending=false / !rejected branch,
-dropping only its own work reference.  This also closes the
-multi-packet race Sashiko reported on v2: pending is removed from
-the list before any subsequent packet can find it.
+We have already been in contact with the CIP team (even though the
+contact has unfortunately lapsed a bit, mostly our fault), but adding an
+additional architecture seemed to be a more substantial effort.
+N.B.: Due to past circumstances, we are a completely distinct business
+entity from Siemens AG that merely shares the trademark and a common
+history; but of course this should not hinder us from getting directly
+involved in CIP (quite the opposite!). But this also requires some setup
+time.
 
-The pre-existing sk_acceptq_removed() gap on the err < 0 path of
-vmci_transport_recv_listen() that Sashiko also noted is not
-introduced or changed by this patch.
+On Mon, May 18, 2026 at 10:46:55PM +0200, Wolfram Sang wrote:
+> > If desired, we also would be happy to intensify our support regarding
+> > reviews or testing to share the maintnance burden if it helps to keep
+> > nios2 in mainline a bit longer.
+> 
+> ... but given this, you might want to get added in MAINTAINERS as
+> reviewer (or even maintainer) for nios2? Besides that your efforts are
+> already worth it in my book, it would also ensure you get CCed on
+> patches like this. Then, you are not depending on people like Arnd
+> putting you in the loop manually.
 
-Tested on lts-6.12.79 with KASAN: 52/100 unpatched -> 0/100 patched.
+Sure, I'd be glad to do so, but so far I refrained from it as I was a bit
+unsure about the netiquette (can I simply do so by self-proclamation? At
+least the git history seems to suggest so...).
 
-Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
-Cc: stable@vger.kernel.org
-Signed-off-by: Minh Nguyen <minhnguyen.080505@gmail.com>
-Assisted-by: Claude:claude-opus-4-7
----
-v4:
-  - Resend as an independent thread per netdev workflow (v3 was
-    incorrectly posted in-reply-to the v2 thread).
-  - Drop the inline comment expansion; keep the original
-    /* Close and cleanup the connection. */.  No functional change.
-
-v3:
-  - Different approach to Sashiko/Paolo's "trading UAF for leak"
-    concern: normalize RST to err = -EINVAL so all destroy: arms
-    take the same err < 0 cleanup path -- no special case, no
-    multi-packet race.
-  - Sashiko's secondary observation ("while not introduced by this
-    patch, does this error path leak sk_ack_backlog slots on failed
-    handshakes?") is correct: the sk_acceptq_removed() gap on the
-    err < 0 branch of vmci_transport_recv_listen() is pre-existing
-    and is not introduced or changed by this patch.  A separate fix
-    for that gap is needed and would be welcome.
-
-v2: https://lore.kernel.org/netdev/20260512025851.189140-1-minhnguyen.080505@gmail.com/
-
-v1 was sent to security@kernel.org on 2026-05-10 (not on lore).
-
- net/vmw_vsock/vmci_transport.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-index 4296ca1..d257938 100644
---- a/net/vmw_vsock/vmci_transport.c
-+++ b/net/vmw_vsock/vmci_transport.c
-@@ -1164,7 +1164,7 @@ vmci_transport_recv_connecting_server(struct sock *listener,
- 		/* Close and cleanup the connection. */
- 		vmci_transport_send_reset(pending, pkt);
- 		skerr = EPROTO;
--		err = pkt->type == VMCI_TRANSPORT_PACKET_TYPE_RST ? 0 : -EINVAL;
-+		err = -EINVAL;
- 		goto destroy;
- 	}
- 
-
-base-commit: be48e5fe51a5864566307998286a699d6b986934
--- 
-2.54.0
-
+Best regards,
+Simon
 
