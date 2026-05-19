@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-289655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289656-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFuOHsjxDGoGqQUAu9opvQ
-	(envelope-from <netdev+bounces-289655-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:27:04 +0200
+	id MPg0DBDyDGoGqQUAu9opvQ
+	(envelope-from <netdev+bounces-289656-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:28:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF1EA586022
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:27:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DAADA58607A
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 28C66300B846
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 23:26:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6313F30594DF
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 23:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11766369D4D;
-	Tue, 19 May 2026 23:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE244372EE3;
+	Tue, 19 May 2026 23:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AczC3q4j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkEV/E+B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055EE2F2607;
-	Tue, 19 May 2026 23:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D7D369D4D;
+	Tue, 19 May 2026 23:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779233214; cv=none; b=HfsJ7/eAf47PyFzqhyJu/tQaCPnsl6PXK6EJc2JRTAirK5tmHOoxg6fRGdjeyryI52x155mrsQvplm/9d3feKbMjFoLZRc8bsHZJNt6GknndO3+xthZFW8aU1MhnEX+dCzId9YP/oS2xVQ4TAP70ktiTn2zxWXs1k2miwodO1RQ=
+	t=1779233256; cv=none; b=ZT/COX7wATVoAN0sL07dWJmFS0wS45jDa/b+JQsu6IcR39lEVqHzUhJxqtlh3/A0WW0JO7lAkaOX+MEMQIoTvCVY8NFGUGtqgf04fZ8BrVkSPa574JnHi1NngGamYIjLv06bYlLHuEMgmpwuUObsiy+1LbQkL7Jdnex71dDrSMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779233214; c=relaxed/simple;
-	bh=I0hsHaMtnPi/bAvwUJpJzf8T7fh6Jopm/e+Iidj6xAc=;
+	s=arc-20240116; t=1779233256; c=relaxed/simple;
+	bh=LresoJMBliSTJ0gLRz7zwGGd5xyOcccMyUikDbSg54Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uESbWuy1IB1uz0fmx5L4tlvgoL62FMTZz31FJ7pb1mTyk2icl//3QrFirto2AozLabVec67b7BRHeJigjqo3OoM3EFE23O0HQlcmNyUu+uGU4MXdvj//r03/rG/p/k+vYrFs/SQeORLExaaeK3VEVUV/eOFIYFRdcwG2ec7GeaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AczC3q4j; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD8941F000E9;
-	Tue, 19 May 2026 23:26:51 +0000 (UTC)
+	 MIME-Version:Content-Type; b=f+JGN/GTKfPHrFFU+z3jJuW4pSGl+3JeJ1v7wyozKwFHwVM/VrW6U8fb5cOj8yKajHtAU7eHh43g6u6W2g8nk6re35a2qx2mpM4uYIj+Ej6a8qhxmjgVje5T4myLu2mszoNrwxhzGahB6Y0JY9W2CXMKHNtfnpfBEJiq4o8BZSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AkEV/E+B; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DFCB1F00893;
+	Tue, 19 May 2026 23:27:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779233212;
-	bh=HYjnBPBPS67l+j1tn04D+J2nO0RoeF3lUjicMmnNUls=;
+	s=k20260515; t=1779233255;
+	bh=1NywW2m3p3nUPZKoCbvZovAaBqZYfLm47Ryb2FylT4E=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=AczC3q4jZdt2BLmc4SNIdD+4Zpdtb1nIO5fXG+JHOhccAzw4DacDluBOUT0X2wFRv
-	 QpSA9qH3KSdJf/wG/xc7oasCymqdfFY7w0Ymfs7K9NHeu0AnExwHr93KNB9aoDF85g
-	 8Q6Ec1Dhbl0rQzr0yUjUd0Ai/AdkFS0b8vtKNbcOHUaqNO7c32Sw684h2RrZJFoAG8
-	 WSS0alaZNxQ3anxJdbbEm7lx+rQnlBh961bajcQcaaIEmmIRepXJthzntqwvpbq9cq
-	 EyVEYGDd1y8fqZi/ria9kKFs2eJfjDwmGrN+z2Ruje0uU0dmlKV4RKjQG0T1gIWC/T
-	 KDU8Yn+OvS1xg==
-Date: Tue, 19 May 2026 16:26:51 -0700
+	b=AkEV/E+B7HmPzBHHoSXrDI0HXQnO2NLAT79R/+eYqR8VnTsmwMpoSNMM0m6SIK5c6
+	 q+b2KcGgbg3D6h02wamjNiOvf67kiF2sSigIdPqJXWr3Y0mEe3qt66eqBlFt2SQpg1
+	 JrHTbnqj3zwUCLAyrAydXaJg0Kr3sI/XXIE2Kx1QAmbyJsgmrdlLogD7E1MwUEjIOj
+	 Mad/K5esQfFH5VOijzGiZcBtuMc7jPtZorq2o3Qd+GB1lPKjnwUWXIkewVE40ifURy
+	 UMrsr8moNhVJXvUxwjts4dvVsyzFbNuz5CQP+rfGzsPaN3Xc4Ta8OCrIPmdsHIpECL
+	 I42FxXiCt+04g==
+Date: Tue, 19 May 2026 16:27:33 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Nimrod Oren <noren@nvidia.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -62,13 +62,14 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  <bpf@vger.kernel.org>, Carolina Jubran <cjubran@nvidia.com>, Dragos Tatulea
  <dtatulea@nvidia.com>
 Subject: Re: [PATCH net] selftests: net: Fix checksums in xdp_native
-Message-ID: <20260519162651.765cd587@kernel.org>
-In-Reply-To: <364bb4db-2a45-4b01-b2bc-1f6fdff937ad@nvidia.com>
+Message-ID: <20260519162733.25114c19@kernel.org>
+In-Reply-To: <20260519162651.765cd587@kernel.org>
 References: <20260513072355.1083381-1-noren@nvidia.com>
 	<20260514183832.5ef205c1@kernel.org>
 	<aa818076-6e5a-4b61-bc7f-0bfe3907fe2f@nvidia.com>
 	<20260518143138.74839bf9@kernel.org>
 	<364bb4db-2a45-4b01-b2bc-1f6fdff937ad@nvidia.com>
+	<20260519162651.765cd587@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,7 +88,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,nvidia.com];
-	TAGGED_FROM(0.00)[bounces-289655-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289656-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[21];
@@ -107,21 +108,16 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EF1EA586022
+X-Rspamd-Queue-Id: DAADA58607A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 19 May 2026 10:04:03 +0300 Nimrod Oren wrote:
-> On 19/05/2026 0:31, Jakub Kicinski wrote:
-> > This patch needs a respin for the issues Sashiko pointed out, to be 
-> > clear.  
-> Replied to Sashiko earlier (my reply went to sashiko-reviews and bpf
-> but not netdev - oops).
+On Tue, 19 May 2026 16:26:51 -0700 Jakub Kicinski wrote:
+> > All issues are pre-existing and harmless, so I don't think they should
+> > be addressed in a net fix.  
+> 
+> Please fix the csum thing.
 
-Yeah, it's a bit buggy in how it collects the CCs.
-
-> All issues are pre-existing and harmless, so I don't think they should
-> be addressed in a net fix.
-
-Please fix the csum thing.
+Well, that's not very accurate. I mean carrying the overflow.
+It's trivial.
 
