@@ -1,342 +1,281 @@
-Return-Path: <netdev+bounces-289287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289288-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPjxHfYHDGodUAUAu9opvQ
-	(envelope-from <netdev+bounces-289287-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:49:26 +0200
+	id eGIsJlMHDGodUAUAu9opvQ
+	(envelope-from <netdev+bounces-289288-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:46:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 813C2578592
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:49:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2774A5784E1
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:46:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C97F23032FD7
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:37:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 82CA1305685E
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 06:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098A138A738;
-	Tue, 19 May 2026 06:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9390A39A06E;
+	Tue, 19 May 2026 06:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="axi1jPDH"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sZPt18rY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [152.89.196.46])
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010023.outbound.protection.outlook.com [52.101.201.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6263937D10F;
-	Tue, 19 May 2026 06:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.89.196.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779172659; cv=none; b=J7J1KFDnL/9q5hcPZVE2HfVBPswJ1aR+TBTZoqN5thfTcH1TAXg/szRob/k90I72cGOH1i259pQzu3kHh+2h7iTImYSoP5MFXK49QQfZW5Fn9rPYBMdT0+vbsKl4MgdDL2c9diwXUfEbczNJIAvA3E8fO0k70/T+mE/JtxxU3rU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779172659; c=relaxed/simple;
-	bh=Ba54tlaLzVS0tnkEUiadMTQemQZTXU53H6g52Xw1Q4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=pqd58jaPaE6BjcTBYg91s7SfSGyXBX7p+KeZwHKggSh1mJ+QdaXVz2WN2b35r5qbnXJOHuDNac3RYw53G8tED2KyKI7usTwMfoxA4Tw20v+iJIH0xRYCI88iqPY4okDYVb0BlrnUSyrR0AjtVoBB/IBzhzc2zLzK+smqSUF5qFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=axi1jPDH; arc=none smtp.client-ip=152.89.196.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
-Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx4.sberdevices.ru (Postfix) with ESMTP id 43BCD40017;
-	Tue, 19 May 2026 09:37:27 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 43BCD40017
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1779172647;
-	bh=wq2XHzZwQG7ofdjqejV+Sf3LE4yTZqvjhYHDHUch4Us=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=axi1jPDHTZTyrBusIdQ53XIbLeNr4/1b269hdRGnUBfLwu9zM+unxUUGrT4WOqI97
-	 B618CgvWiJo24vVwBOBmrudFNAZU5B4Q5dyrriWUcPUmXORlYe/EgeHHTWZrq7N35h
-	 S9b1B58xPMB7g1QAsk204Kx3XaOZuxlBWPUnJTpIzMyZXlhMA+NtNhrGZ3rCl7JZ0H
-	 4Ly9UtzZgl8Zam0NRScxYxI/5xlB25yFvpdJAwe0JGGeP5n28NimXVDLZjIq6WsplU
-	 0m/5kRvW3J6H4G0Zct0aH9f2JNFneaLmRnZPjjNZXF9YMNLaTesiNRn5l69XOurGbn
-	 h0yjJqevvOcYg==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "sberdevices.ru", Issuer "R12" (not verified))
-	by mx4.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 19 May 2026 09:37:25 +0300 (MSK)
-Message-ID: <aea2227c-3011-4457-b909-d16de1596a6d@salutedevices.com>
-Date: Tue, 19 May 2026 09:37:23 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BCC399342;
+	Tue, 19 May 2026 06:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779172836; cv=fail; b=WU8AHp//9ZI4ioBYAEkSI8Sg5Ldw99vrdWmkD1Qn3wfJZ3tmfMgVt5UKMcHWgAj3MI2vBrsMeC/zCyJqS/fvD3/IJldpC0VzyN5Jqm9Lbnt0TxV/2K94omm9aze2ZOHtU5FvYaxQAi4UpdByCk4Og05g+tLyhhkdrCbgxtx6qQc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779172836; c=relaxed/simple;
+	bh=KbAmsAZxdYgy8luig858STWZO6csf7/lHDn12+MZ1tM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=imrI2J76S5XIgv53Zn3WDmMFsch5lUQzEcKQYMiF1R3JRLOYvnyrJo4x2/lgx7/vunUdWXiITqkDjKZsSjpIQHGfWynxB43SRdHEi7e6mFCz9MgCd/CSxADn5hIAuJ/JrH2HKGkro8PbA2YGQz/PW2NdnlwYVK1lXDG9+42i+qM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sZPt18rY; arc=fail smtp.client-ip=52.101.201.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=O8Dx2r/25uyF0ktAKl7b+5Or77MdYmu5ZzLpvD3i35ALgKPBJ8cT9uurYGBy7QxHW6ypYS2ZwfmAtMuimelOyo74ujS+YfDwbKLzBQdIQpHGCn2RuH94TdN8cbahjsYY32zVkLQ3gEnAKttDSEYYtuKMJKgJep059XcNO0MkcgQ9DoAniQcQULHf9Ja7CZIIBXjLGQ9KLbGmvLcp/gubS6PJ22n6IXBJbi7M5YLcafZnWTDjm9sQjJQ/CWrWaOuv+R8SsaIZAqLB17FjQPXr7G0YxhWXltNDzEGue334bh4mCF98UPGZo+cabo5dzjL57skhVMs3mymyN+DIsOd7+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JzFacYu/6pcoKl8873XrDHl81h85aFTT9TdasEclmQY=;
+ b=bbhWSSJueImkJWlhp5Gr6AyaoS9KLkDj96ZuQh3QeEmhPUlG+lCYty+sPDUqXD1YIcsD2kqcXLarfD8Kre8NHePWcsHwE4s6ouDoGr+ZY/JoLEugLfUbaYtjXW2ToQsbbX9zxQ4PB4HCBVd3/wv6HX0lTkKWM49uRlQSPvLDHUZ1alXMI+YDpKS6uT90FPe6cCN0rsvTbHeK8ZJBN+yzyo2fs5wM2cNvNbt5rbYMnCHrxtr8QqKJL/gnahjLfHUqmMqa8GVTjo5JOfwnYrz9fT1cSLIIzYrxVVk0l9cgEfFi2c1HxcY0ElLDPfLXlLN+QIo2V9D7e4WMptRD0kVWwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JzFacYu/6pcoKl8873XrDHl81h85aFTT9TdasEclmQY=;
+ b=sZPt18rYgq/3CCv1VbmhkrTByFfIRdn2/csHUj7v5yAulOmXWABJNj6uMRGoQ24dC8Jo2H/I62veZMSoum5deHFB8ohvzTTVAWvpq4MRUmlO7/38m7yueyDYAE4Mwk1Gsjg5XR3F7wau95J2Z1HwTtFuRkEq7qRdm78Hl44TYwQt52PDeWG+5rrNG0gUfKd/q1xM07uN05Yj/mc/DY9i/eIEK4JMHPhqcPuYoeSRN732qrfRoLwOVT1kCGYp4ZBW7FszBoKSwuDWJFviav8j2gaGftqSsH8SfaY8oOtww5yk3cwe3FTgcmVoxFquQFNe6GzWiLLC7ph3QvtOaWlOjQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by SA5PPF590085732.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8ca) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.21; Tue, 19 May
+ 2026 06:40:31 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0025.023; Tue, 19 May 2026
+ 06:40:30 +0000
+Date: Tue, 19 May 2026 09:40:17 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: syzbot <syzbot+9fdcc9f05a98a540b816@syzkaller.appspotmail.com>,
+	marek.lindner@mailbox.org, sw@simonwunderlich.de,
+	antonio@mandelbit.com, sven@narfation.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] general protection fault in arp_create (4)
+Message-ID: <20260519064017.GA370647@shredder>
+References: <6a09f2c4.a00a0220.300e5b.000a.GAE@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a09f2c4.a00a0220.300e5b.000a.GAE@google.com>
+X-ClientProxiedBy: FR4P281CA0185.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ca::18) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] vsock/virtio: fix zerocopy completion for multi-skb
- sends
-Content-Language: ru
-To: Stefano Garzarella <sgarzare@redhat.com>, David Laight
-	<david.laight.linux@gmail.com>
-CC: "Michael S. Tsirkin" <mst@redhat.com>, <netdev@vger.kernel.org>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
-	<kvm@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, <virtualization@lists.linux.dev>, "David S.
- Miller" <davem@davemloft.net>, Jason Wang <jasowang@redhat.com>,
-	<linux-kernel@vger.kernel.org>, Maher Azzouzi <maherazz04@gmail.com>
-References: <20260514092948.268720-1-sgarzare@redhat.com>
- <20260516125329.7b699c6f@pumpkin> <agrXvCtNRlySlwgx@sgarzare-redhat>
- <20260518053223-mutt-send-email-mst@kernel.org>
- <agrg1GVzoJWtNuSd@sgarzare-redhat> <20260518115005.5f13bd2b@pumpkin>
- <20260519053951.1C60440015@mx4.sberdevices.ru>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20260519053951.1C60440015@mx4.sberdevices.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-exch-cas-s-m2.sberdevices.ru (172.16.210.3) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-AntiPhishing: NotDetected, bases: 2026/05/19 06:19:00
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Info: LuaCore: 105 0.3.105 c7fb587251b1312ef0d9243823bef7335f8fcbef, {Tracking_phishing_log_reg_50_60}, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;git.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;sashiko.dev:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 203239 [May 19 2026]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.22
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/05/19 04:09:00 #28206517
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-KATA-Status: Not Scanned
-X-KSMG-LinksScanning: NotDetected, bases: 2026/05/19 06:18:00
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 5
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SA5PPF590085732:EE_
+X-MS-Office365-Filtering-Correlation-Id: 439d14e7-c0dc-4b67-1811-08deb57183ca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|3023799003|18002099003|22082099003|11063799003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	+r5fAbwLBEOXlssTsjCulYR1G/7p1SXa3CpZjR2IUXl70KFrjV4AwYnSASLk018vnunXv49zPW/a/LuJhhs5RiUYvkByMIId+kEnuPkonco1GQ9k5ZSj4QWRMC2L9b2rL0oNXJs4wyFt7403vPyemdB0s5v+ypFIjhq0kurcCZNmk/1U//0ZE+YljtKlsunRMnydcf8VzhfM4cBwxFubxtn6yQysa8MyFwyytvw5gDxs3ZfovxybXLpsxNfIdDKkc/pwoz95vCaehw9IBhxoWshn0znfoCw81MvL7Q15B2wwWZ5eMyTAGMDh4KOfVkrnRxy5pV259LjJaXfJrE03Y2DC8r1QRGTV0gksu8yC8EdnkNEfgaq4WWQ7RyA32i0S2l41dAWBXWurnZzMGv8F4JBomdbqOYr7DHBKTGLGeqnSRDUY0YZQcbRb0swZVg9KN0RFJKqzJViWaSDc269INspHo99Zdy223qsPryA0rNMHG296f3kkNols+TTu/qWY3CThJwy3OVI3p8LKz5A9tRzf0FJLVi1BC5L8DW0ezkihDWDAaicI7GeuG70wzuy4aqOspLTwseK+YBBJ04Qg2y4wqRPb72fVpEkYgBzjnVk+vbi31w4dOwS/vrGPSHoqav833o7qtvosQgqt+8EYpm7UgNqqsKrRcy09varVO9HR93U0ZecJUyZ2lMFg/5WE
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(3023799003)(18002099003)(22082099003)(11063799003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?fJvt9cSDEiSZS/DCGxUFhqqzPxtkFS1l//WrLIk5k2vHFTHIge63UKERZpJH?=
+ =?us-ascii?Q?8wH82/dDpWuLeQlb0ORA7+pkIDMhfUJ99RKtCl4/VseZ17oOCFfQmFg+Tocf?=
+ =?us-ascii?Q?AnLqzvjPidPujeK0q7IzMecmyQkpM7hRy5jo8TQh6T41uMYlCZwaVUzBqzs4?=
+ =?us-ascii?Q?e20pEQjFdHacCyH9rgIaRfJjAqpUynh7X21fx9DfRw7HeT7e9cFmJma/6LFL?=
+ =?us-ascii?Q?JmhB82r3xRVAoaAbEV1CmpM0q6Ms1fFnL8Zd8dbYBgGr3YoL/dQRkg329+D6?=
+ =?us-ascii?Q?WgZhgntr0cwF/8mlEFu8Ter1JfvjJOAJ0wa6Z3pf/9CRAVL9m8yRq5Jj00qr?=
+ =?us-ascii?Q?X4VgbE9FAvBw4zd3aS1D+2sq7vZqPtIy6P3ZKsRBmBfqIBM7UBdjkh3E+16u?=
+ =?us-ascii?Q?fcfJJEJXmSjE1LqOdxMG5qZTaTHjrgWXGnJBu7TQD8N7eYZoDZDVtpUOxgcv?=
+ =?us-ascii?Q?uo277YYF6eQ3BPjabEt+4/kwON1IbiGPVXu4/wrCJEQiaks7CY9gKJ8yV7U0?=
+ =?us-ascii?Q?juCSSKVHqd3Kyd4nLLmNyZFgjst35IdF5WEMLt35YpLhrBsFsll8YNx3/Beg?=
+ =?us-ascii?Q?hIyH1A3ilvMfrks26b32DwhgY+WDkfZNKRZej/IHyfYh7MxQNO0g6c2nhHh4?=
+ =?us-ascii?Q?9DCyXsALvwWXTSm0qj8oR7Rd6QbdeEEcwY5tkKcKBMrfDZADbMRKvwokvDDu?=
+ =?us-ascii?Q?Qf3+EIkmfLYDCYFhOHo+Z/LxCnav2VhRpEwKRyQcUvW9+1YXMBgG14lS+oaA?=
+ =?us-ascii?Q?8680H3BRKhBw73o75uHWtRrpz7Q38z2/2rJANc/CEtSvdoErJL5kPuuK5rjU?=
+ =?us-ascii?Q?cuXb6nQrofl18a8i3bkAmBFI4KLCSl2KuOyM/HiXYrtMs95wKUynxR2BNPgR?=
+ =?us-ascii?Q?HB2Xw9LN1pmPbZRfGuAk4MStkkoJZuxFGqulGeVPpxwXTGxodRXJG8T67GzH?=
+ =?us-ascii?Q?u7ddLkZBiI01RN06zrZdfGbN/G1FFsAcDFX28cb7714P/3dKgai+aoZ3fQ0d?=
+ =?us-ascii?Q?UMveD4tB2Ok4uBrJX+jdWGR8MoSC+SRrXsfHjaHoL/ouTtr/x4vigU0GYTiu?=
+ =?us-ascii?Q?tXkzOitdUZWSe2Vo+eUt4DeCqRkYPESgC6juAtWfoeTb445FLdWlneWCU18T?=
+ =?us-ascii?Q?cTJKh1ZIZ8zDZVUPBPGKdNOJ4bUHEeONZ9TnbtcdS/OvNUk+wSuO6hHzjmeO?=
+ =?us-ascii?Q?BWiD3eftsdKVRSIHbCJQ/+FunKMMnv6vVubKOakNe7VWhVdPyj1/i+UKPcFN?=
+ =?us-ascii?Q?ZAIhzOLuEDP56B5mkEs77y6Ha4zTNGl6GSdNAqUV/hCfdaUEQNVdqg1815b1?=
+ =?us-ascii?Q?275yZ+Lm6O9KG2Vj1SenuzJskkJAfUDJGjLwi2c8IGoI77OAJdNhikD7Q2c2?=
+ =?us-ascii?Q?dvW/B85A8wwbP3wiPvXHbZ/UguUQfmitFhiAxp18J+DCB3VyOB9cTzV0IM3M?=
+ =?us-ascii?Q?VZQszrrIfH22MhNChIfVRSqKs3NL1Da+zR/17Ez3JW9zOBvtyia0d7+PssSS?=
+ =?us-ascii?Q?JD6ttUWxRB/Uie5UyYEN7vkjcs9FcLFiUWIxZIKDDByoDfHUikzwyVOssTE9?=
+ =?us-ascii?Q?YMBqe34x3X8f6pU0ABdqbmwwbUifq2F/mfL4cSRcVdyvw3qeUDyi/gyB/VZ0?=
+ =?us-ascii?Q?rnlKN+sCxcr/jIN+t5wtSb/nQDUjgyE6tj8X+TM57jf6IgQR0HGDXkvpIJuy?=
+ =?us-ascii?Q?wmjraS0EWuuzBCXu/xG99iHJYUgoXp2UGmd05tUWMh56Ptra?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 439d14e7-c0dc-4b67-1811-08deb57183ca
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 06:40:29.6878
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UwJ+Jh4gmgTZxj6yW9K3oBc7xsGxQg05rkxT6tUusp1SpVs76Z5t+wa1lvRvXxLvlCMnzN5IigV5/do/dlc9pQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF590085732
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[salutedevices.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[salutedevices.com:s=post];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289287-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-289288-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,kernel.org,google.com,linux.alibaba.com,lists.linux.dev,davemloft.net,gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,storage.googleapis.com:url,goo.gl:url,appspotmail.com:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[avkrasnov@salutedevices.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[salutedevices.com:+];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[salutedevices.com:email,salutedevices.com:mid,salutedevices.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,sashiko.dev:url]
-X-Rspamd-Queue-Id: 813C2578592
+	REDIRECTOR_URL(0.00)[goo.gl];
+	TAGGED_RCPT(0.00)[netdev,9fdcc9f05a98a540b816];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 2774A5784E1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
++ batman maintainers
 
-
-On 18/05/2026 14:08, Stefano Garzarella wrote:
-> On Mon, May 18, 2026 at 11:50:05AM +0100, David Laight wrote:
->> On Mon, 18 May 2026 11:54:19 +0200
->> Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->>> On Mon, May 18, 2026 at 05:33:08AM -0400, Michael S. Tsirkin wrote:
->>> >On Mon, May 18, 2026 at 11:18:24AM +0200, Stefano Garzarella wrote:
->>> >> On Sat, May 16, 2026 at 12:53:29PM +0100, David Laight wrote:
->>> >> > On Thu, 14 May 2026 11:29:48 +0200
->>> >> > Stefano Garzarella <sgarzare@redhat.com> wrote:
->>> >> >
->>> >> > > From: Stefano Garzarella <sgarzare@redhat.com>
->>> >> > >
->>> >> > > When a large message is fragmented into multiple skbs, the zerocopy
->>> >> > > uarg is only allocated and attached to the last skb in the loop.
->>> >> > > Non-final skbs carry pinned user pages with no completion tracking,
->>> >> > > so the kernel has no way to notify userspace when those pages are safe
->>> >> > > to reuse. If the loop breaks early the uarg is never allocated at all,
->>> >> > > leaking pinned pages with no completion notification.
->>> >> > >
->>> >> > > Fix this by following the approach used by TCP: allocate the zerocopy
->>> >> > > uarg (if not provided by the caller) before the send loop and attach
->>> >> > > it to every skb via skb_zcopy_set(), which takes a reference per skb.
->>> >> > > Each skb's completion properly decrements the refcount, and the
->>> >> > > notification only fires after the last skb is freed.
->>> >> > > On failure, if no data was sent, the uarg is cleanly aborted via
->>> >> > > net_zcopy_put_abort().
->>> >> > >
->>> >> > > This issue was initially discovered by sashiko while reviewing commit
->>> >> > > 1cb36e252211 ("vsock/virtio: fix MSG_ZEROCOPY pinned-pages accounting")
->>> >> > > but was pre-existing.
->>> >> > >
->>> >> > > Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
->>> >> > > Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>
->>> >> > > Closes: https://sashiko.dev/#/patchset/20260420132051.217589-1-sgarzare%40redhat.com
->>> >> > > Reported-by: Maher Azzouzi <maherazz04@gmail.com>
->>> >> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->>> >> > > ---
->>> >> > >  net/vmw_vsock/virtio_transport_common.c | 83 ++++++++++---------------
->>> >> > >  1 file changed, 34 insertions(+), 49 deletions(-)
->>> >> > >
->>> >> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>> >> > > index 989cc252d3d3..1e3409d28164 100644
->>> >> > > --- a/net/vmw_vsock/virtio_transport_common.c
->>> >> > > +++ b/net/vmw_vsock/virtio_transport_common.c
->>> >> > > @@ -70,34 +70,6 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
->>> >> > >      return true;
->>> >> > >  }
->>> >> > >
->>> >> > > -static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
->>> >> > > -                       struct sk_buff *skb,
->>> >> > > -                       struct msghdr *msg,
->>> >> > > -                       size_t pkt_len,
->>> >> > > -                       bool zerocopy)
->>> >> > > -{
->>> >> > > -    struct ubuf_info *uarg;
->>> >> > > -
->>> >> > > -    if (msg->msg_ubuf) {
->>> >> > > -        uarg = msg->msg_ubuf;
->>> >> > > -        net_zcopy_get(uarg);
->>> >> > > -    } else {
->>> >> > > -        struct ubuf_info_msgzc *uarg_zc;
->>> >> > > -
->>> >> > > -        uarg = msg_zerocopy_realloc(sk_vsock(vsk),
->>> >> > > -                        pkt_len, NULL, false);
->>> >> > > -        if (!uarg)
->>> >> > > -            return -1;
->>> >> > > -
->>> >> > > -        uarg_zc = uarg_to_msgzc(uarg);
->>> >> > > -        uarg_zc->zerocopy = zerocopy ? 1 : 0;
->>> >> > > -    }
->>> >> > > -
->>> >> > > -    skb_zcopy_init(skb, uarg);
->>> >> > > -
->>> >> > > -    return 0;
->>> >> > > -}
->>> >> > > -
->>> >> > >  static int virtio_transport_fill_skb(struct sk_buff *skb,
->>> >> > >                       struct virtio_vsock_pkt_info *info,
->>> >> > >                       size_t len,
->>> >> > > @@ -317,8 +289,10 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>> >> > >      u32 src_cid, src_port, dst_cid, dst_port;
->>> >> > >      const struct virtio_transport *t_ops;
->>> >> > >      struct virtio_vsock_sock *vvs;
->>> >> > > +    struct ubuf_info *uarg = NULL;
->>> >> > >      u32 pkt_len = info->pkt_len;
->>> >> > >      bool can_zcopy = false;
->>> >> > > +    bool have_uref = false;
->>> >> > >      u32 rest_len;
->>> >> > >      int ret;
->>> >> > >
->>> >> > > @@ -360,6 +334,25 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>> >> > >          if (can_zcopy)
->>> >> > >              max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
->>> >> > >                          (MAX_SKB_FRAGS * PAGE_SIZE));
->>> >> > > +
->>> >> > > +        if (info->msg->msg_flags & MSG_ZEROCOPY &&
->>> >> > > +            info->op == VIRTIO_VSOCK_OP_RW) {
->>> >> > > +            uarg = info->msg->msg_ubuf;
->>> >> > > +
->>> >> > > +            if (!uarg) {
->>> >> > > +                uarg = msg_zerocopy_realloc(sk_vsock(vsk),
->>> >> > > +                                pkt_len, NULL, false);
->>> >> > > +                if (!uarg) {
->>> >> > > +                    virtio_transport_put_credit(vvs, pkt_len);
->>> >> > > +                    return -ENOMEM;
->>> >> > > +                }
->>> >> > > +
->>> >> > > +                if (!can_zcopy)
->>> >> > > +                    uarg_to_msgzc(uarg)->zerocopy = 0;
->>> >> > > +
->>> >> > > +                have_uref = true;
->>> >> > > +            }
->>> >> > > +        }
->>> >> >
-
-Hi guys! Just some replies after quick look:
-
->>> >> > Surely that block should only be done if can_zcopy is true?
-
-I guess no, since TCP also allocates uarg even if zerocopy is impossible -
-it just sets uarg_to_msgzc(uarg)->zerocopy = 0;
-
->>> >> > And shouldn't something unset it if info->op != VIRTIO_VSOCK_OP_RW ?
-
-Hm, we can't enter block 'if (info->msg) {' when 'info->op' is not equal to 'VIRTIO_VSOCK_OP_RW',
-because 'msg' is not NULL only for 'VIRTIO_VSOCK_OP_RW'. But anyway You point to right thing - check for
-'VIRTIO_VSOCK_OP_RW' could be removed here. Just with comment why.
-
->>> >> > If the msg_zerocopy_realloc() fails then can't you just set can_zcopy to false.
-
-Here I guess it is better to follow TCP way to make same behaviour, because exact
-logic for MSG_ZEROCOPY is not documented. TCP also returns error and stops tx loop.
-
->>> >> >
->>> >> > It info->msg->msg_buf is already set then I think you have to disable zero-copy.
->>> >> > The caller has already requested a callback - and you can't add another.
-
-In TCP implementation if 'msg_ubuf' is set they just use it and check for zerocopy in
-the same way as 'msg_ubuf' is NULL.
-
->>> >> >
->>> >> > In any case by the end of this can_zcopy and have_uref are really the same flag.
->>> >>
-
-Need to check it more. But 'can_zcopy' means that we fill frags in skb, have_uref means that we
-allocated completion (but it could be reported with not set 'SO_EE_CODE_ZEROCOPY_COPIED' if
-'can_zcopy' was false).
-
-
-@Stefano, I guess current implementation differs from TCP in two cases (at least from first
-view):
-1) When 'msg_ubuf' is set: in TCP, already set 'msg_ubuf' is passed to 'skb_zerocopy_iter_stream()'
-   (if zerocopy is possible) where it is used as in vsock in call 'skb_zcopy_set()'. In vsock case if
-   'msg_ubuf' is not NULL we will pass just NULL to 'skb_zcopy_set()'. Yes this is will be
-   no-effect call today (due to checks in 'skb_zcopy_set()'), but anyway - in future may be not.
-2) Also i see that 'skb_zerocopy_iter_stream()' in TCP version has some extra checks which are
-   missed in vsock - we only just call '__zerocopy_sg_from_iter()' to fill skb in zerocopy way.
-
-But, I think, instead of trying to compare vsock and TCP versions best way is to just copy
-current TCP flow as close as possible:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/tree/net/ipv4/tcp.c#n1144
-1) Use same flow of checks for 'msg_flags', 'msg_ubuf', SOCK_ZEROCOPY etc.
-2) To copy data we can use 'skb_zerocopy_iter_stream()'.
-3) The only thing that we don't need in vsock is dev mem related code from TCP implementation.
-
-I can take this task, but pls need some time - may be two/three weeks due to another tasks. 
-
-What do You think?
-
-Thanks
-
->>> >> I kept the same approach we had before, trying to make as few changes as
->>> >> possible.
->>> >>
->>> >> All these potential issues seem to be pre-existing and should be eventually
->>> >> addressed in other patches IMHO. This patch one only resolves the main issue
->>> >> of calling `skb_zcopy_set()` for every skb to avoid leaking pages, etc.
->>> >
->>> >the patch is upstream now, right? So pretty much have to be patches on
->>> >top.
->>>
->>> If those are actual issues, then yes. TBH, I didn’t look into that
->>> aspect and left it as it was before. We should take a closer look at how
->>> MSG_ZEROCOPY is handled.
->>>
->>> David, if you think it needs fixing and you have time, feel free to send
->>> patches on top.
->>
->> I'm not fully sure how it all works.
+On Sun, May 17, 2026 at 09:54:28AM -0700, syzbot wrote:
+> Hello,
 > 
-> Same here, so I pinged Arseniy who worked on that, since it seemed deliberate to have `can_zcopy` (and set `uarg->zerocopy` accordingly) only when it was supported by the transport.
+> syzbot found the following issue on:
 > 
->> Especially the paths where msg->msg_ubuf is non-NULL, I suspect it should
->> be added to all the skb even if the ZEROCOPY flag isn't set.
->> I was just reading the one function.
->> But there did look like some very dodgy conditionals.
+> HEAD commit:    70eda68668d1 Merge tag 'hid-for-linus-2026051401' of git:/..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15f56e36580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0
+> dashboard link: https://syzkaller.appspot.com/bug?extid=9fdcc9f05a98a540b816
+> compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 > 
-> I see, let's wait for Arseniy's feedback; otherwise, I'll try to fix it next week. As mentioned, this issue existed before this patch, so it shouldn't be a regression.
+> Unfortunately, I don't have any reproducer for this issue yet.
 > 
-> Thanks,
-> Stefano
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/6f3c10169d74/disk-70eda686.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/67977be60189/vmlinux-70eda686.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/cf642084f321/bzImage-70eda686.xz
 > 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+9fdcc9f05a98a540b816@syzkaller.appspotmail.com
+> 
+> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000016: 0000 [#1] SMP KASAN NOPTI
+> KASAN: null-ptr-deref in range [0x00000000000000b0-0x00000000000000b7]
+> CPU: 1 UID: 0 PID: 37 Comm: kworker/u8:2 Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+> Workqueue: bat_events batadv_bla_periodic_work
+> RIP: 0010:arp_create+0xb1/0x980 net/ipv4/arp.c:554
+> Code: 89 4c 24 78 4a 89 04 21 e8 8c f7 a0 f7 44 89 b4 24 a0 00 00 00 89 9c 24 b0 00 00 00 49 8d bf b4 00 00 00 48 89 f8 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 15 06 00 00 41 0f b7 9f b4 00 00 00 49
+> RSP: 0018:ffffc90000ad7720 EFLAGS: 00010213
+> RAX: 0000000000000016 RBX: 0000000000000000 RCX: ffff8880202edc40
+> RDX: 0000000000000000 RSI: 0000000000000806 RDI: 00000000000000b4
+> RBP: ffffc90000ad7840 R08: 0000000000000000 R09: 0000000000000000
+> R10: dffffc0000000000 R11: fffff5200015af20 R12: dffffc0000000000
+> R13: ffff88806501d0a0 R14: 0000000000000000 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff88812538a000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000200000032000 CR3: 0000000022ee7000 CR4: 0000000000350ef0
+> Call Trace:
+>  <TASK>
+>  batadv_bla_send_claim+0x183/0xeb0 net/batman-adv/bridge_loop_avoidance.c:361
+>  batadv_bla_send_loopdetect net/batman-adv/bridge_loop_avoidance.c:1402 [inline]
+>  batadv_bla_periodic_work+0x654/0xae0 net/batman-adv/bridge_loop_avoidance.c:1492
 
+batadv_bla_send_claim() is calling arp_create() with
+primary_if->mesh_iface being NULL
+
+>  process_one_work kernel/workqueue.c:3314 [inline]
+>  process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3397
+>  worker_thread+0xa53/0xfc0 kernel/workqueue.c:3478
+>  kthread+0x389/0x470 kernel/kthread.c:436
+>  ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>  </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:arp_create+0xb1/0x980 net/ipv4/arp.c:554
+> Code: 89 4c 24 78 4a 89 04 21 e8 8c f7 a0 f7 44 89 b4 24 a0 00 00 00 89 9c 24 b0 00 00 00 49 8d bf b4 00 00 00 48 89 f8 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 15 06 00 00 41 0f b7 9f b4 00 00 00 49
+> RSP: 0018:ffffc90000ad7720 EFLAGS: 00010213
+> RAX: 0000000000000016 RBX: 0000000000000000 RCX: ffff8880202edc40
+> RDX: 0000000000000000 RSI: 0000000000000806 RDI: 00000000000000b4
+> RBP: ffffc90000ad7840 R08: 0000000000000000 R09: 0000000000000000
+> R10: dffffc0000000000 R11: fffff5200015af20 R12: dffffc0000000000
+> R13: ffff88806501d0a0 R14: 0000000000000000 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff88812538a000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000200000032000 CR3: 0000000022ee7000 CR4: 0000000000350ef0
+> ----------------
+> Code disassembly (best guess):
+>    0:	89 4c 24 78          	mov    %ecx,0x78(%rsp)
+>    4:	4a 89 04 21          	mov    %rax,(%rcx,%r12,1)
+>    8:	e8 8c f7 a0 f7       	call   0xf7a0f799
+>    d:	44 89 b4 24 a0 00 00 	mov    %r14d,0xa0(%rsp)
+>   14:	00
+>   15:	89 9c 24 b0 00 00 00 	mov    %ebx,0xb0(%rsp)
+>   1c:	49 8d bf b4 00 00 00 	lea    0xb4(%r15),%rdi
+>   23:	48 89 f8             	mov    %rdi,%rax
+>   26:	48 c1 e8 03          	shr    $0x3,%rax
+> * 2a:	42 0f b6 04 20       	movzbl (%rax,%r12,1),%eax <-- trapping instruction
+>   2f:	84 c0                	test   %al,%al
+>   31:	0f 85 15 06 00 00    	jne    0x64c
+>   37:	41 0f b7 9f b4 00 00 	movzwl 0xb4(%r15),%ebx
+>   3e:	00
+>   3f:	49                   	rex.WB
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
