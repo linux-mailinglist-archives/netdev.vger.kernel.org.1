@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-289570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGIkOn6oDGoIkgUAu9opvQ
-	(envelope-from <netdev+bounces-289570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:14:22 +0200
+	id 8A0vD42oDGoIkgUAu9opvQ
+	(envelope-from <netdev+bounces-289572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:14:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6510C5837E5
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:14:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCBF25837F5
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 20:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E605230684B9
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:13:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C69D304CF60
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A30F344D91;
-	Tue, 19 May 2026 18:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B6534028B;
+	Tue, 19 May 2026 18:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Aiafw/lG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KzlLLodl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D440D341660
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 18:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA8C345736
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 18:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779214410; cv=none; b=PoehVn3g9natC0C28SwoeY3FeiXfgrvmlJE8IEsNk189/yp0WraNgz2J1gFCVINuKgVyFVN2C2GJDdkyyhnzGIWsj8/E+elzeOXd1UgAZI/i8LtM+hTHmPDCh64eSeonE96OxYvdC1VjxXBkfu2XkNgUSHJXYZwIZxUoWyzbKNw=
+	t=1779214415; cv=none; b=N1D5HbCV+E4qjIvq3MsHAxRcQooZV8m/PuCRG4tpTwaoddPULoYpWO+PO2Wt4lyR/P0lxnhL6TxeXrQkhGS+r0MMWxr3U/2AXhpiXqRb7g4mNbShy0fH7N0fUL5AWH3h+UruWXB2KOBo9hi5xKru2UuoDZswxrPlcXoF3DrklV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779214410; c=relaxed/simple;
-	bh=ouzmvsnRkwpZ8W/u3WwzPzLXyf7uqdRs1Ent+qWBP2w=;
+	s=arc-20240116; t=1779214415; c=relaxed/simple;
+	bh=2qmsqelTzaUPE+QK1mvrHRxBWfuhpXdRbMayHHlrJeU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pZSECxHq39kk1/iajiVQ2OevLoV4QB8zGJUQlHbz7+yDjDHo39syXyrctzjzRZnm139TZVAq+sW7PfV3N00ejadCQR5Qyp3IOqxFmJD/nVz0yDrfFNFiz03llt3Lk6e2h7sN0C0RZwx+21QtpFB2N+KvqubXvWDZIkzwlSplCBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Aiafw/lG; arc=none smtp.client-ip=74.125.224.52
+	 MIME-Version; b=Top3WqdxB5yXVs0dN9Xjg8aQg0hhsVzTqp3kAMBWLCeZFisSogW1zAMZAMM9Ofw9rfoUHPge1GvVOQBcBwrLSx2RzVwRGon20OAfHAkI04OlXk/HQofmwiVyHJSVpQvxJqZmHBOobha+D8rWIgkqeqB0cA7y2bw1rURMHjooDy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KzlLLodl; arc=none smtp.client-ip=209.85.128.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-651c5d525f6so4015252d50.3
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 11:13:27 -0700 (PDT)
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-7c52e49d978so36081467b3.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 11:13:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779214407; x=1779819207; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779214408; x=1779819208; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I9vuEZ9clKtyiX6S1pd6lRPe1pCSfFS2thpXEIF4jKY=;
-        b=Aiafw/lGxMSt4j0uYqtngEABcNau1mJzabom5QvBFVbclrBoHxrP3AM1t349tcRVhZ
-         Cpn6pSwe5P3e1ewSHf0+nh8YFC3KXgTYdFm47TRA/KzETVwoP0eHO+d9FTyq8tAWAh/K
-         k4hNaITlfQkhCjtP/++efanhpVjYvCSDMJdCpb2coWMsRxuNfxYW7i11HCDG9snum7+Q
-         ypitkJ2wc5fLoZC3ZsL3Vui5CK0e8YXQiwTnAR6d7t4gtYZyZp7DZ3kyhh79SvO8vrcp
-         Z45RZALLG56Y+tOMvpfGLHFkWxaYM8dEtvyzsTw7FhprEX8oJ8YSBtgoScsHS0Aos+Nw
-         LWdQ==
+        bh=Aggv8QASjdRQfG/woLFGI7y1SYOCff2twxV5smHA+GQ=;
+        b=KzlLLodlhqSUGWBTyMnHbZmgLFymd2GKM4LIQp0rdBiyQOrSMwD5uqtf4dsTyKVW41
+         UbGeS8dRf1m+eySeseIUkWn8EY0YdslJA5moaSwfunCWP5okjZ3FcaeNw7Cqt/7wrsZc
+         +FT0GgP0Q764Z8FtQK3mx5DJzBYoKdSqwTkIzuFzOIN0aGGWIpd+tkH11L+xm+ZQJtqf
+         lNpMSg8lP1eYpa8DQd8nWA8r2HZDTsn6I8xkULBLc7qTnHQFFoSb0TsTURSDVxmMnicj
+         LYQ5umgoOoN9kUj1h5fFNim64qtcB1mIID51GdvlWl4EwZRFzZ6cEHZwYhLPq+cPpWce
+         3EJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779214407; x=1779819207;
+        d=1e100.net; s=20251104; t=1779214408; x=1779819208;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=I9vuEZ9clKtyiX6S1pd6lRPe1pCSfFS2thpXEIF4jKY=;
-        b=ToQFyJrpBgtPDG4SY0FUVQlJhGRPo+DwyNMZDOavFrxVL3oMRqabzLNwromDCHkUFp
-         36hkHYCWT3L7mJNOW4fAIxeiWJDFMEK8wsl/bvDGnsRfDFVaU4aPj2IzDxm7eWMSVJeG
-         u2byPrXGj0PzlHjg1SBmMPLt0eO7xSdkEyduMB8BXHPLZdacKlTZ7gV2alR3LG8WafGO
-         JArjwHdD9R6diMavBvfdZiK8516AREh9WRzHKSXNu/XaQ3CC0Mo7GGlkHm850YZaRg1/
-         D0agHnUnCB9FdgYQuhXapZfp9p4A1eo7nEZ7fhaaEuF9iNyzz0KyYqxphlGeG7FPGMFn
-         wLMA==
-X-Gm-Message-State: AOJu0YzpHBXp/sHjKiuETxE0uarARLZZVftF+ETL/1ByY2BHK3R1BoMp
-	b11CZYi0FudKJQbLXEV/H83+VaEX7iqyYTxq7+0UI2pO4YAgJLAi4z6i
-X-Gm-Gg: Acq92OHD1uzNfpJnbvRETj6ZY5bSV57E7HHCOKLuFv/Kd/BUg/e30ZPyW2ao264Z9Ei
-	JQlVmJjAIib0BfDA8bva9xAcwLuo6C7dgbE4VIxTLcl+Ksv2Fl3SbEXaMPS5PGzsSdQTS0nR38l
-	MIZGRZIZhtQXuMwMfno5nnEc5zHyaUEZaxF6npacJymw5RzYnltJD/Nx6Y9tka5qYhuJDAkAZpt
-	RHoyhhqxv9x+jVTzH9+LXTEahumnRhuQqzIIu5tgFkZ/VrVHgpReA4+G3dWDjmb18yYKL8SaG8G
-	dU8yyPMwWZlBOY5aFHMYTEuUycVL63kMH6Dl1IGk67zP0SEnCSA1rxosbSwnmb1YR6+XKpW6smq
-	fVAKBJYYN7g+OaNL4Hrmea8Q7Pl+Lf7DuVoAwGDNzQHHjHunouBBjYbhF2UjvdGKjumAVSpZE0S
-	PxLIbcZOvrAzRx2CkXD+qIrQp5Jrw=
-X-Received: by 2002:a05:690e:150c:b0:658:e645:7736 with SMTP id 956f58d0204a3-65e2280daf5mr17154025d50.39.1779214406523;
-        Tue, 19 May 2026 11:13:26 -0700 (PDT)
-Received: from localhost ([2a03:2880:f806:39::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65e0d8e60c5sm8138834d50.7.2026.05.19.11.13.26
+        bh=Aggv8QASjdRQfG/woLFGI7y1SYOCff2twxV5smHA+GQ=;
+        b=Y03ubZKHC56ixcFd7IGYIyww9GFkSP/kWEYmco6URI/+yf7HNqly1L9sRX6Ezr/mkk
+         t2ogurSB17r/E+T8/gs+XcjT2B/HizBNpu6nSj+uu9LO0NjFJwzkstza1ELYw/Ca+MYB
+         opOGl+fD0gPIQrrsSdlobvbFVSTGglr4OaFAyDg/zuOTyhX9CLbPU+lG2qTw0FEedqxc
+         WYCijN3ef4ilv2YCh6ie1jyswVJYzoRl2Wgv5c8Ym0T3htwM34LYTLoq32JFrMOLMQgB
+         KhdNXF6VSUG8duearOWvLLnav89TlGs4vC4YYFssstu8GUJOEyKbnuLvaS8DgWrAhIzI
+         aeCQ==
+X-Gm-Message-State: AOJu0YwJNSjWVvt2e6MMEqqvyQ//qcWiMRTKG6J2mOz4u25SV2rWlkbW
+	xa1K8Br89FQWZOsrSmcyNMRVBxydmdqi1XQMB5V5plSFT4I/06yYSW7o
+X-Gm-Gg: Acq92OG3TczkQysVjUZsezRlwV7tszBeCWsHh+pXpbNltmVKzhrbLMdopU2uJVD91Lz
+	DkKyFFxPYkj2SDiX4TZuE5mDemaOLTZoywMDGrhQ5vwf3sppYcYVZxb6l/US5wAv9u2GGkE74YX
+	m5Vrx16Ju31mbYwBXvb0dbRmgC/+13Mx++gVthCx2mVVLtD35AAosMX3qkPYKELREsyXyGsYp21
+	fSbAwUjwALh2ejwLrDhhdlWPSQ8PKB6b5EcwjnQPJDF1LN5VO9H3q8E1WH3/vxxqu/zco7MwVRd
+	ZDMu2au4BFkKT3qauoMv+PBkJjL3wXb6WK4jhl4pm9CrmUqQ1Xu+k/ezrMg408CWCAVZ4p0Hew0
+	zfdS6rsOiftTBxu9lKsB5PYyo2OUPoZvHIwocUTqp0/nY79vPrgWrgQPYCV9fZJBopePntHdEjD
+	5g6jx3bAhiDZ04++Pi
+X-Received: by 2002:a05:690c:c6ce:20b0:7bf:55b:8f9e with SMTP id 00721157ae682-7c95bf12374mr167301097b3.28.1779214408146;
+        Tue, 19 May 2026 11:13:28 -0700 (PDT)
+Received: from localhost ([2a03:2880:f806:3e::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc991ca758sm40805727b3.5.2026.05.19.11.13.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 11:13:26 -0700 (PDT)
+        Tue, 19 May 2026 11:13:27 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -87,9 +87,9 @@ Cc: netdev@vger.kernel.org,
 	mykyta.yatsenko5@gmail.com,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v5 07/14] bpf: Unify referenced object tracking in verifier
-Date: Tue, 19 May 2026 11:13:05 -0700
-Message-ID: <20260519181314.2731658-8-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v5 08/14] bpf: Unify release handling for helpers and kfuncs
+Date: Tue, 19 May 2026 11:13:06 -0700
+Message-ID: <20260519181314.2731658-9-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260519181314.2731658-1-ameryhung@gmail.com>
 References: <20260519181314.2731658-1-ameryhung@gmail.com>
@@ -99,458 +99,607 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289570-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289572-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_NONE(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 6510C5837E5
+X-Rspamd-Queue-Id: CCBF25837F5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Helpers and kfuncs independently tracked referenced object metadata (id,
-ref_obj_id) using separate fields in their respective arg_meta structs.
-This led to duplicated logic and inconsistent error handling between the
-two paths.
+Introduce release_reg() to consolidate the release logic shared by both
+helpers and kfuncs: dynptr release, kptr_xchg percpu-to-RCU conversion,
+regular reference release, and NULL pass-through. NULL pass-through is
+only allowed if the prototype indicates the argument may be null.
 
-Introduce struct ref_obj_desc to consolidate these fields along with a
-count of how many arguments carry a reference. Add update_ref_obj() to
-populate it from a bpf_reg_state, replacing open-coded assignments in
-check_func_arg(), check_kfunc_args(), and process_iter_arg(). Add
-validate_ref_obj() to check for ambiguous ref_obj before using it.
+Determine release_regno from the function prototype/metadata before
+argument checking, rather than discovering it dynamically during
+argument processing. For helpers, scan the arg_type array in
+check_func_proto() via check_proto_release_reg(). For kfuncs, set
+release_regno to BPF_REG_1 in bpf_fetch_kfunc_arg_meta() when
+KF_RELEASE is set. In the future when we start adding decl_tag to
+kfunc arguments, we can just look at the function prototype instead
+of a release_regno.
 
-For ref_obj releasing helpers and kfuncs, keep checking it before
-calling update_ref_obj() for now. A later patch will make these
-functions not depending on ref_obj. For other users of ref_obj, move the
-checks to the use locations. For helper, this means moving the checks
-inside helper_multiple_ref_obj_use() to use locations.
-is_acquire_function() is dropped as ref_obj is never used.
+Extract ref_convert_alloc_rcu_protected() and
+invalidate_rcu_protected_refs() to make it more clear what the code is
+doing. For ref_convert_alloc_rcu_protected(), it pre-converts
+MEM_ALLOC | MEM_PERCPU registers to MEM_RCU (clearing ref_obj_id so they
+survive), then calls release_reference() to invalidate the remaining
+registers and release the reference state.
 
-Pass ref_obj_desc into process_dynptr_func()/mark_stack_slots_dynptr()
-instead of a bare parent_id to make it less confusing.
+Add KF_RELEASE to bpf_dynptr_file_discard() so its release_regno is set
+via fetch_kfunc_meta rather than being assigned manually in the dynptr
+argument processing. Set arg_type to ARG_PTR_TO_DYNPTR for
+KF_ARG_PTR_TO_DYNPTR so that check_func_arg_reg_off() correctly allows
+non-zero stack offsets for dynptr release arguments same as helper.
 
-Drop the selftest introduced in 7ec899ac90a2 (“selftests/bpf: Negative
-test case for ref_obj_id in args”) since the verifier no longer
-complains about ambiguous ref_obj if it is not used.
-
+Acked-by: Eduard Zingerman <eddyz87@gmail.com>
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- include/linux/bpf_verifier.h                  |  15 ++-
- kernel/bpf/verifier.c                         | 118 +++++++++---------
- .../bpf/progs/test_ringbuf_map_key.c          |  11 +-
- tools/testing/selftests/bpf/verifier/calls.c  |  24 ----
- 4 files changed, 78 insertions(+), 90 deletions(-)
+ include/linux/bpf_verifier.h                  |   6 +-
+ kernel/bpf/helpers.c                          |   2 +-
+ kernel/bpf/verifier.c                         | 206 +++++++++---------
+ .../selftests/bpf/prog_tests/cb_refs.c        |   2 +-
+ .../selftests/bpf/progs/cgrp_kfunc_failure.c  |   6 +-
+ .../selftests/bpf/progs/map_kptr_fail.c       |   2 +-
+ .../selftests/bpf/progs/task_kfunc_failure.c  |   6 +-
+ .../bpf/progs/verifier_global_ptr_args.c      |   2 +-
+ .../bpf/progs/verifier_ref_tracking.c         |   2 +-
+ .../selftests/bpf/progs/verifier_sock.c       |   6 +-
+ .../selftests/bpf/progs/verifier_vfs_reject.c |   2 +-
+ 11 files changed, 121 insertions(+), 121 deletions(-)
 
 diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
-index d83b9fbfef7f..0e27b92749a7 100644
+index 0e27b92749a7..1391bd0c4259 100644
 --- a/include/linux/bpf_verifier.h
 +++ b/include/linux/bpf_verifier.h
-@@ -1458,6 +1458,18 @@ struct bpf_dynptr_desc {
- 	u32 parent_id;
- };
+@@ -1460,9 +1460,9 @@ struct bpf_dynptr_desc {
  
-+/*
-+ * The last seen rereferenced object; Updated by update_ref_obj() when a register refers to a
-+ * referenced object. Used when the helper or kfunc is releasing a referenced object, casting
-+ * a referenced object, returning allocated memory derived from referenced object or creating
-+ * a dynptr with a referenced object as parent.
-+ */
-+struct ref_obj_desc {
-+	u32 id;
-+	u32 ref_obj_id;
-+	u8 cnt;
-+};
-+
- struct bpf_kfunc_call_arg_meta {
- 	/* In parameters */
- 	struct btf *btf;
-@@ -1466,8 +1478,6 @@ struct bpf_kfunc_call_arg_meta {
- 	const struct btf_type *func_proto;
- 	const char *func_name;
- 	/* Out parameters */
--	u32 ref_obj_id;
--	u32 id;
- 	u8 release_regno;
- 	bool r0_rdonly;
- 	u32 ret_btf_id;
-@@ -1505,6 +1515,7 @@ struct bpf_kfunc_call_arg_meta {
- 	} iter;
- 	struct bpf_map_desc map;
- 	struct bpf_dynptr_desc dynptr;
-+	struct ref_obj_desc ref_obj;
- 	u64 mem_size;
- };
+ /*
+  * The last seen rereferenced object; Updated by update_ref_obj() when a register refers to a
+- * referenced object. Used when the helper or kfunc is releasing a referenced object, casting
+- * a referenced object, returning allocated memory derived from referenced object or creating
+- * a dynptr with a referenced object as parent.
++ * referenced object. Used when the helper or kfunc is casting a referenced object, returning
++ * allocated memory derived from referenced object or creating a dynptr with a referenced
++ * object as parent.
+  */
+ struct ref_obj_desc {
+ 	u32 id;
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index 07de26e7314c..da1b55aea1bd 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -4857,7 +4857,7 @@ BTF_ID_FLAGS(func, bpf_stream_print_stack, KF_IMPLICIT_ARGS)
+ BTF_ID_FLAGS(func, bpf_task_work_schedule_signal, KF_IMPLICIT_ARGS)
+ BTF_ID_FLAGS(func, bpf_task_work_schedule_resume, KF_IMPLICIT_ARGS)
+ BTF_ID_FLAGS(func, bpf_dynptr_from_file)
+-BTF_ID_FLAGS(func, bpf_dynptr_file_discard)
++BTF_ID_FLAGS(func, bpf_dynptr_file_discard, KF_RELEASE)
+ BTF_ID_FLAGS(func, bpf_timer_cancel_async)
+ BTF_KFUNCS_END(common_btf_ids)
  
 diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index edebeb3ad363..bc7f8725cc69 100644
+index bc7f8725cc69..c4b4b1dfdfda 100644
 --- a/kernel/bpf/verifier.c
 +++ b/kernel/bpf/verifier.c
-@@ -231,9 +231,28 @@ static void bpf_map_key_store(struct bpf_insn_aux_data *aux, u64 state)
- 			     (poisoned ? BPF_MAP_KEY_POISON : 0ULL);
- }
+@@ -8210,28 +8210,15 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
+ 		return err;
  
-+static void update_ref_obj(struct ref_obj_desc *ref_obj, struct bpf_reg_state *reg)
-+{
-+	ref_obj->id = reg->id;
-+	ref_obj->ref_obj_id = reg->ref_obj_id;
-+	ref_obj->cnt++;
-+}
-+
-+static int validate_ref_obj(struct bpf_verifier_env *env, struct ref_obj_desc *ref_obj)
-+{
-+	if (ref_obj->cnt > 1) {
-+		verifier_bug(env, "function expects only one referenced object but got %d\n",
-+			     ref_obj->cnt);
-+		return -EFAULT;
-+	}
-+
-+	return 0;
-+}
-+
- struct bpf_call_arg_meta {
- 	struct bpf_map_desc map;
- 	struct bpf_dynptr_desc dynptr;
-+	struct ref_obj_desc ref_obj;
- 	bool raw_mode;
- 	bool pkt_access;
- 	u8 release_regno;
-@@ -530,20 +549,6 @@ bool bpf_is_may_goto_insn(struct bpf_insn *insn)
- 	return insn->code == (BPF_JMP | BPF_JCOND) && insn->src_reg == BPF_MAY_GOTO;
- }
- 
--static bool helper_multiple_ref_obj_use(enum bpf_func_id func_id,
--					const struct bpf_map *map)
--{
--	int ref_obj_uses = 0;
--
--	if (is_ptr_cast_function(func_id))
--		ref_obj_uses++;
--	if (is_acquire_function(func_id, map))
--		ref_obj_uses++;
--
--	return ref_obj_uses > 1;
--}
--
--
- static bool is_spi_bounds_valid(struct bpf_func_state *state, int spi, int nr_slots)
- {
-        int allocated_slots = state->allocated_stack / BPF_REG_SIZE;
-@@ -670,11 +675,11 @@ static int destroy_if_dynptr_stack_slot(struct bpf_verifier_env *env,
- 				        struct bpf_func_state *state, int spi);
- 
- static int mark_stack_slots_dynptr(struct bpf_verifier_env *env, struct bpf_reg_state *reg,
--				   enum bpf_arg_type arg_type, int insn_idx, int parent_id,
--				   struct bpf_dynptr_desc *dynptr)
-+				   enum bpf_arg_type arg_type, int insn_idx,
-+				   struct ref_obj_desc *ref_obj, struct bpf_dynptr_desc *dynptr)
- {
- 	struct bpf_func_state *state = bpf_func(env, reg);
--	int spi, i, err, ref_obj_id = 0;
-+	int spi, i, err, ref_obj_id = 0, parent_id = 0;
- 	enum bpf_dynptr_type type;
- 
- 	spi = dynptr_get_spi(env, reg);
-@@ -707,12 +712,18 @@ static int mark_stack_slots_dynptr(struct bpf_verifier_env *env, struct bpf_reg_
- 		return -EINVAL;
- 
- 	if (dynptr->type == BPF_DYNPTR_TYPE_INVALID) { /* dynptr constructors */
-+		err = validate_ref_obj(env, ref_obj);
-+		if (err)
-+			return err;
-+
- 		if (dynptr_type_referenced(type)) {
- 			ref_obj_id = acquire_reference(env, insn_idx);
- 			if (ref_obj_id < 0)
- 				return ref_obj_id;
- 		}
-+
- 		/* Track parent's id if the parent is a referenced object */
-+		parent_id = ref_obj->id;
- 	} else { /* bpf_dynptr_clone() */
- 		ref_obj_id = dynptr->ref_obj_id;
- 		parent_id = dynptr->parent_id;
-@@ -7172,7 +7183,7 @@ static int process_kptr_func(struct bpf_verifier_env *env, int regno,
-  */
- static int process_dynptr_func(struct bpf_verifier_env *env, struct bpf_reg_state *reg,
- 			       argno_t argno, int insn_idx, enum bpf_arg_type arg_type,
--			       int parent_id, struct bpf_dynptr_desc *dynptr)
-+			       struct ref_obj_desc *ref_obj, struct bpf_dynptr_desc *dynptr)
- {
- 	int spi, err = 0;
- 
-@@ -7213,7 +7224,7 @@ static int process_dynptr_func(struct bpf_verifier_env *env, struct bpf_reg_stat
- 				return err;
- 		}
- 
--		err = mark_stack_slots_dynptr(env, reg, arg_type, insn_idx, parent_id, dynptr);
-+		err = mark_stack_slots_dynptr(env, reg, arg_type, insn_idx, ref_obj, dynptr);
- 	} else /* OBJ_RELEASE and None case from above */ {
- 		/* For the reg->type == PTR_TO_STACK case, bpf_dynptr is never const */
- 		if (reg->type == CONST_PTR_TO_DYNPTR && (arg_type & OBJ_RELEASE)) {
-@@ -7262,13 +7273,6 @@ static int process_dynptr_func(struct bpf_verifier_env *env, struct bpf_reg_stat
- 	return err;
- }
- 
--static u32 iter_ref_obj_id(struct bpf_verifier_env *env, struct bpf_reg_state *reg, int spi)
--{
--	struct bpf_func_state *state = bpf_func(env, reg);
--
--	return state->stack[spi].spilled_ptr.ref_obj_id;
--}
--
- static bool is_iter_kfunc(struct bpf_kfunc_call_arg_meta *meta)
- {
- 	return meta->kfunc_flags & (KF_ITER_NEW | KF_ITER_NEXT | KF_ITER_DESTROY);
-@@ -7301,6 +7305,7 @@ static bool is_kfunc_arg_iter(struct bpf_kfunc_call_arg_meta *meta, int arg_idx,
- static int process_iter_arg(struct bpf_verifier_env *env, struct bpf_reg_state *reg, argno_t argno, int insn_idx,
- 			    struct bpf_kfunc_call_arg_meta *meta)
- {
-+	struct bpf_func_state *state = bpf_func(env, reg);
- 	const struct btf_type *t;
- 	u32 arg_idx = arg_idx_from_argno(argno);
- 	int spi, err, i, nr_slots, btf_id;
-@@ -7372,7 +7377,7 @@ static int process_iter_arg(struct bpf_verifier_env *env, struct bpf_reg_state *
- 		/* remember meta->iter info for process_iter_next_call() */
- 		meta->iter.spi = spi;
- 		meta->iter.frameno = reg->frameno;
--		meta->ref_obj_id = iter_ref_obj_id(env, reg, spi);
-+		update_ref_obj(&meta->ref_obj, &state->stack[spi].spilled_ptr);
- 
- 		if (is_iter_destroy_kfunc(meta)) {
- 			err = unmark_stack_slots_iter(env, reg, nr_slots);
-@@ -8151,6 +8156,7 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
- 	u32 regno = BPF_REG_1 + arg;
- 	struct bpf_reg_state *reg = reg_state(env, regno);
- 	enum bpf_arg_type arg_type = fn->arg_type[arg];
-+	argno_t argno = argno_from_arg(arg + 1);
- 	enum bpf_reg_type type = reg->type;
- 	u32 *arg_btf_id = NULL;
- 	u32 key_size;
-@@ -8218,14 +8224,13 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
+ skip_type_check:
+-	if (arg_type_is_release(arg_type)) {
+-		if (!arg_type_is_dynptr(arg_type) && !reg->ref_obj_id && !bpf_register_is_null(reg)) {
+-			verbose(env, "R%d must be referenced when passed to release function\n",
+-				regno);
+-			return -EINVAL;
+-		}
+-		if (meta->release_regno) {
+-			verifier_bug(env, "more than one release argument");
+-			return -EFAULT;
+-		}
+-		meta->release_regno = regno;
++	if (arg_type_is_release(arg_type) && !arg_type_is_dynptr(arg_type) &&
++	    !reg->ref_obj_id && !bpf_register_is_null(reg)) {
++		verbose(env, "release helper %s expects referenced PTR_TO_BTF_ID passed to %s\n",
++			func_id_name(meta->func_id), reg_arg_name(env, argno));
++		return -EINVAL;
  	}
  
- 	if (reg->ref_obj_id && base_type(arg_type) != ARG_KPTR_XCHG_DEST) {
--		if (meta->ref_obj_id) {
--			verbose(env, "more than one arg with ref_obj_id R%d %u %u",
--				regno, reg->ref_obj_id,
--				meta->ref_obj_id);
-+		if (meta->release_regno && meta->ref_obj.cnt) {
-+			verbose(env, "more than one arg with ref_obj_id %s %u %u",
-+				reg_arg_name(env, argno), reg->ref_obj_id,
-+				meta->ref_obj.ref_obj_id);
- 			return -EACCES;
- 		}
--		meta->ref_obj_id = reg->ref_obj_id;
--		meta->id = reg->id;
-+		update_ref_obj(&meta->ref_obj, reg);
- 	}
+-	if (reg->ref_obj_id && base_type(arg_type) != ARG_KPTR_XCHG_DEST) {
+-		if (meta->release_regno && meta->ref_obj.cnt) {
+-			verbose(env, "more than one arg with ref_obj_id %s %u %u",
+-				reg_arg_name(env, argno), reg->ref_obj_id,
+-				meta->ref_obj.ref_obj_id);
+-			return -EACCES;
+-		}
++	if (reg->ref_obj_id)
+ 		update_ref_obj(&meta->ref_obj, reg);
+-	}
  
  	switch (base_type(arg_type)) {
-@@ -8365,7 +8370,7 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
- 					 true, meta);
- 		break;
- 	case ARG_PTR_TO_DYNPTR:
--		err = process_dynptr_func(env, reg, argno_from_reg(regno), insn_idx, arg_type, 0,
-+		err = process_dynptr_func(env, reg, argno_from_reg(regno), insn_idx, arg_type, &meta->ref_obj,
- 					  &meta->dynptr);
+ 	case ARG_CONST_MAP_PTR:
+@@ -8790,11 +8777,29 @@ static bool check_mem_arg_rw_flag_ok(const struct bpf_func_proto *fn)
+ 	return true;
+ }
+ 
+-static int check_func_proto(const struct bpf_func_proto *fn)
++static bool check_proto_release_reg(const struct bpf_func_proto *fn, struct bpf_call_arg_meta *meta)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(fn->arg_type); i++) {
++		enum bpf_arg_type arg_type = fn->arg_type[i];
++
++		if (arg_type_is_release(arg_type)) {
++			if (meta->release_regno)
++				return false;
++			meta->release_regno = i + 1;
++		}
++	}
++
++	return true;
++}
++
++static int check_func_proto(const struct bpf_func_proto *fn, struct bpf_call_arg_meta *meta)
+ {
+ 	return check_raw_mode_ok(fn) &&
+ 	       check_arg_pair_ok(fn) &&
+ 	       check_mem_arg_rw_flag_ok(fn) &&
++	       check_proto_release_reg(fn, meta) &&
+ 	       check_btf_id_ok(fn) ? 0 : -EINVAL;
+ }
+ 
+@@ -8941,6 +8946,42 @@ static void invalidate_non_owning_refs(struct bpf_verifier_env *env)
+ 	}));
+ }
+ 
++static void invalidate_rcu_protected_refs(struct bpf_verifier_env *env)
++{
++	struct bpf_stack_state *stack;
++	struct bpf_func_state *state;
++	struct bpf_reg_state *reg;
++	u32 clear_mask = (1 << STACK_SPILL) | (1 << STACK_ITER);
++
++	bpf_for_each_reg_in_vstate_mask(env->cur_state, state, reg, stack, clear_mask, ({
++		if (reg->type & MEM_RCU) {
++			reg->type &= ~(MEM_RCU | PTR_MAYBE_NULL);
++			reg->type |= PTR_UNTRUSTED;
++		}
++	}));
++}
++
++static int ref_convert_alloc_rcu_protected(struct bpf_verifier_env *env, u32 ref_obj_id)
++{
++	struct bpf_func_state *state;
++	struct bpf_reg_state *reg;
++	int err;
++
++	err = release_reference_nomark(env->cur_state, ref_obj_id);
++
++	bpf_for_each_reg_in_vstate(env->cur_state, state, reg, ({
++		if (reg->ref_obj_id != ref_obj_id)
++			continue;
++		if ((reg->type & MEM_ALLOC) && (reg->type & MEM_PERCPU)) {
++			reg->ref_obj_id = 0;
++			reg->type &= ~MEM_ALLOC;
++			reg->type |= MEM_RCU;
++		}
++	}));
++
++	return err;
++}
++
+ static void clear_caller_saved_regs(struct bpf_verifier_env *env,
+ 				    struct bpf_reg_state *regs)
+ {
+@@ -9999,6 +10040,23 @@ static const char *non_sleepable_context_description(struct bpf_verifier_env *en
+ 	return "non-sleepable prog";
+ }
+ 
++static int release_reg(struct bpf_verifier_env *env, struct bpf_reg_state *reg,
++		       bool convert_rcu, bool release_dynptr)
++{
++	int err = -EINVAL;
++
++	if (release_dynptr)
++		err = unmark_stack_slots_dynptr(env, reg);
++	else if (convert_rcu)
++		err = ref_convert_alloc_rcu_protected(env, reg->ref_obj_id);
++	else if (reg->ref_obj_id)
++		err = release_reference(env, reg->ref_obj_id);
++	else if (bpf_register_is_null(reg))
++		err = 0;
++
++	return err;
++}
++
+ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
+ 			     int *insn_idx_p)
+ {
+@@ -10048,7 +10106,7 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
+ 	memset(&meta, 0, sizeof(meta));
+ 	meta.pkt_access = fn->pkt_access;
+ 
+-	err = check_func_proto(fn);
++	err = check_func_proto(fn, &meta);
+ 	if (err) {
+ 		verifier_bug(env, "incorrect func proto %s#%d", func_id_name(func_id), func_id);
+ 		return err;
+@@ -10093,37 +10151,11 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
+ 	}
+ 
+ 	if (meta.release_regno) {
+-		err = -EINVAL;
+-		if (arg_type_is_dynptr(fn->arg_type[meta.release_regno - BPF_REG_1])) {
+-			err = unmark_stack_slots_dynptr(env, &regs[meta.release_regno]);
+-		} else if (func_id == BPF_FUNC_kptr_xchg && meta.ref_obj.ref_obj_id) {
+-			u32 ref_obj_id = meta.ref_obj.ref_obj_id;
+-			bool in_rcu = in_rcu_cs(env);
+-			struct bpf_func_state *state;
+-			struct bpf_reg_state *reg;
+-
+-			err = release_reference_nomark(env->cur_state, ref_obj_id);
+-			if (!err) {
+-				bpf_for_each_reg_in_vstate(env->cur_state, state, reg, ({
+-					if (reg->ref_obj_id == ref_obj_id) {
+-						if (in_rcu && (reg->type & MEM_ALLOC) && (reg->type & MEM_PERCPU)) {
+-							reg->ref_obj_id = 0;
+-							reg->type &= ~MEM_ALLOC;
+-							reg->type |= MEM_RCU;
+-						} else {
+-							mark_reg_invalid(env, reg);
+-						}
+-					}
+-				}));
+-			}
+-		} else if (meta.ref_obj.ref_obj_id) {
+-			err = release_reference(env, meta.ref_obj.ref_obj_id);
+-		} else if (bpf_register_is_null(&regs[meta.release_regno])) {
+-			/* meta.ref_obj.ref_obj_id can only be 0 if register that is meant to be
+-			 * released is NULL, which must be > R0.
+-			 */
+-			err = 0;
+-		}
++		struct bpf_reg_state *reg = &regs[meta.release_regno];
++		bool convert_rcu = (func_id == BPF_FUNC_kptr_xchg) && in_rcu_cs(env) &&
++				   (reg->type & MEM_ALLOC) && (reg->type & MEM_PERCPU);
++
++		err = release_reg(env, reg, convert_rcu, !!meta.dynptr.ref_obj_id);
  		if (err)
  			return err;
-@@ -9021,6 +9026,7 @@ static int btf_check_func_arg_match(struct bpf_verifier_env *env, int subprog,
- 	struct bpf_subprog_info *sub = subprog_info(env, subprog);
- 	struct bpf_func_state *caller = cur_func(env);
- 	struct bpf_verifier_log *log = &env->log;
-+	struct ref_obj_desc ref_obj = {};
- 	u32 i;
- 	int ret, err;
+ 	}
+@@ -10499,7 +10531,6 @@ static bool is_kfunc_release(struct bpf_kfunc_call_arg_meta *meta)
+ 	return meta->kfunc_flags & KF_RELEASE;
+ }
  
-@@ -9098,7 +9104,7 @@ static int btf_check_func_arg_match(struct bpf_verifier_env *env, int subprog,
- 			if (ret)
- 				return ret;
- 
--			ret = process_dynptr_func(env, reg, argno, -1, arg->arg_type, 0, NULL);
-+			ret = process_dynptr_func(env, reg, argno, -1, arg->arg_type, &ref_obj, NULL);
- 			if (ret)
- 				return ret;
- 		} else if (base_type(arg->arg_type) == ARG_PTR_TO_BTF_ID) {
-@@ -10090,8 +10096,8 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
- 		err = -EINVAL;
- 		if (arg_type_is_dynptr(fn->arg_type[meta.release_regno - BPF_REG_1])) {
- 			err = unmark_stack_slots_dynptr(env, &regs[meta.release_regno]);
--		} else if (func_id == BPF_FUNC_kptr_xchg && meta.ref_obj_id) {
--			u32 ref_obj_id = meta.ref_obj_id;
-+		} else if (func_id == BPF_FUNC_kptr_xchg && meta.ref_obj.ref_obj_id) {
-+			u32 ref_obj_id = meta.ref_obj.ref_obj_id;
- 			bool in_rcu = in_rcu_cs(env);
- 			struct bpf_func_state *state;
- 			struct bpf_reg_state *reg;
-@@ -10110,10 +10116,10 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
- 					}
- 				}));
- 			}
--		} else if (meta.ref_obj_id) {
--			err = release_reference(env, meta.ref_obj_id);
-+		} else if (meta.ref_obj.ref_obj_id) {
-+			err = release_reference(env, meta.ref_obj.ref_obj_id);
- 		} else if (bpf_register_is_null(&regs[meta.release_regno])) {
--			/* meta.ref_obj_id can only be 0 if register that is meant to be
-+			/* meta.ref_obj.ref_obj_id can only be 0 if register that is meant to be
- 			 * released is NULL, which must be > R0.
- 			 */
- 			err = 0;
-@@ -10378,15 +10384,12 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
- 	if (type_may_be_null(regs[BPF_REG_0].type))
- 		regs[BPF_REG_0].id = ++env->id_gen;
- 
--	if (helper_multiple_ref_obj_use(func_id, meta.map.ptr)) {
--		verifier_bug(env, "func %s#%d sets ref_obj_id more than once",
--			     func_id_name(func_id), func_id);
--		return -EFAULT;
--	}
 -
- 	if (is_ptr_cast_function(func_id)) {
- 		/* For release_reference() */
--		regs[BPF_REG_0].ref_obj_id = meta.ref_obj_id;
-+		err = validate_ref_obj(env, &meta.ref_obj);
-+		if (err)
-+			return err;
-+		regs[BPF_REG_0].ref_obj_id = meta.ref_obj.ref_obj_id;
- 	} else if (is_acquire_function(func_id, meta.map.ptr)) {
- 		int id = acquire_reference(env, insn_idx);
- 
-@@ -11850,14 +11853,13 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+ static bool is_kfunc_destructive(struct bpf_kfunc_call_arg_meta *meta)
+ {
+ 	return meta->kfunc_flags & KF_DESTRUCTIVE;
+@@ -11852,24 +11883,16 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+ 			return -EACCES;
  		}
  
- 		if (reg->ref_obj_id) {
--			if (is_kfunc_release(meta) && meta->ref_obj_id) {
--				verifier_bug(env, "more than one arg with ref_obj_id %s %u %u",
--					     reg_arg_name(env, argno), reg->ref_obj_id,
--					     meta->ref_obj_id);
-+			if (is_kfunc_release(meta) && meta->ref_obj.cnt) {
-+				verbose(env, "more than one arg with ref_obj_id %s %u %u",
-+					reg_arg_name(env, argno), reg->ref_obj_id,
-+					meta->ref_obj.ref_obj_id);
- 				return -EFAULT;
- 			}
--			meta->ref_obj_id = reg->ref_obj_id;
--			meta->id = reg->id;
+-		if (reg->ref_obj_id) {
+-			if (is_kfunc_release(meta) && meta->ref_obj.cnt) {
+-				verbose(env, "more than one arg with ref_obj_id %s %u %u",
+-					reg_arg_name(env, argno), reg->ref_obj_id,
+-					meta->ref_obj.ref_obj_id);
+-				return -EFAULT;
+-			}
+-			update_ref_obj(&meta->ref_obj, reg);
+-			if (is_kfunc_release(meta)) {
+-				if (regno < 0) {
+-					verbose(env, "%s release arg cannot be a stack argument\n",
+-						reg_arg_name(env, argno));
+-					return -EINVAL;
+-				}
+-				meta->release_regno = regno;
+-			}
++		if (regno == meta->release_regno && !is_kfunc_arg_dynptr(meta->btf, &args[i]) &&
++		    !reg->ref_obj_id && !bpf_register_is_null(reg)) {
++			verbose(env, "release kfunc %s expects referenced PTR_TO_BTF_ID passed to %s\n",
++				func_name, reg_arg_name(env, argno));
++			return -EINVAL;
+ 		}
+ 
++		if (reg->ref_obj_id)
 +			update_ref_obj(&meta->ref_obj, reg);
- 			if (is_kfunc_release(meta)) {
- 				if (regno < 0) {
- 					verbose(env, "%s release arg cannot be a stack argument\n",
-@@ -12040,7 +12042,7 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
++
+ 		ref_t = btf_type_skip_modifiers(btf, t->type, &ref_id);
+ 		ref_tname = btf_name_by_offset(btf, ref_t->name_off);
+ 
+@@ -11933,7 +11956,6 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+ 				}
  			}
- 
- 			ret = process_dynptr_func(env, reg, argno, insn_idx, dynptr_arg_type,
--						  meta->ref_obj_id ? meta->id : 0, &meta->dynptr);
-+						  &meta->ref_obj, &meta->dynptr);
- 			if (ret < 0)
- 				return ret;
+ 			fallthrough;
+-		case KF_ARG_PTR_TO_DYNPTR:
+ 		case KF_ARG_PTR_TO_ITER:
+ 		case KF_ARG_PTR_TO_LIST_HEAD:
+ 		case KF_ARG_PTR_TO_LIST_NODE:
+@@ -11950,6 +11972,9 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+ 		case KF_ARG_PTR_TO_IRQ_FLAG:
+ 		case KF_ARG_PTR_TO_RES_SPIN_LOCK:
  			break;
-@@ -12987,8 +12989,12 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
- 				regs[BPF_REG_0].type |= MEM_RDONLY;
++		case KF_ARG_PTR_TO_DYNPTR:
++			arg_type = ARG_PTR_TO_DYNPTR;
++			break;
+ 		case KF_ARG_PTR_TO_CTX:
+ 			arg_type = ARG_PTR_TO_CTX;
+ 			break;
+@@ -11958,7 +11983,7 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+ 			return -EFAULT;
+ 		}
  
- 			/* Ensures we don't access the memory after a release_reference() */
--			if (meta.ref_obj_id)
--				regs[BPF_REG_0].parent_id = meta.ref_obj_id;
-+			if (meta.ref_obj.ref_obj_id) {
-+				err = validate_ref_obj(env, &meta.ref_obj);
-+				if (err)
-+					return err;
-+				regs[BPF_REG_0].parent_id = meta.ref_obj.ref_obj_id;
-+			}
+-		if (is_kfunc_release(meta) && reg->ref_obj_id)
++		if (regno == meta->release_regno)
+ 			arg_type |= OBJ_RELEASE;
+ 		ret = check_func_arg_reg_off(env, reg, argno, arg_type);
+ 		if (ret < 0)
+@@ -12023,12 +12048,6 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+ 				dynptr_arg_type |= DYNPTR_TYPE_FILE;
+ 			} else if (meta->func_id == special_kfunc_list[KF_bpf_dynptr_file_discard]) {
+ 				dynptr_arg_type |= DYNPTR_TYPE_FILE | OBJ_RELEASE;
+-				if (regno < 0) {
+-					verbose(env, "%s release arg cannot be a stack argument\n",
+-						reg_arg_name(env, argno));
+-					return -EINVAL;
+-				}
+-				meta->release_regno = regno;
+ 			} else if (meta->func_id == special_kfunc_list[KF_bpf_dynptr_clone] &&
+ 				   (dynptr_arg_type & MEM_UNINIT)) {
+ 				enum bpf_dynptr_type parent_type = meta->dynptr.type;
+@@ -12306,12 +12325,6 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+ 		}
+ 	}
  
- 			if (is_kfunc_rcu_protected(&meta))
- 				regs[BPF_REG_0].type |= MEM_RCU;
-diff --git a/tools/testing/selftests/bpf/progs/test_ringbuf_map_key.c b/tools/testing/selftests/bpf/progs/test_ringbuf_map_key.c
-index 21bb7da90ea5..0efafa927a3d 100644
---- a/tools/testing/selftests/bpf/progs/test_ringbuf_map_key.c
-+++ b/tools/testing/selftests/bpf/progs/test_ringbuf_map_key.c
-@@ -35,7 +35,7 @@ SEC("fentry/" SYS_PREFIX "sys_getpgid")
- int test_ringbuf_mem_map_key(void *ctx)
- {
- 	int cur_pid = bpf_get_current_pid_tgid() >> 32;
--	struct sample *sample, sample_copy;
-+	struct sample *sample;
- 	int *lookup_val;
- 
- 	if (cur_pid != pid)
-@@ -55,16 +55,11 @@ int test_ringbuf_mem_map_key(void *ctx)
- 	lookup_val = (int *)bpf_map_lookup_elem(&hash_map, sample);
- 	__sink(lookup_val);
- 
--	/* workaround - memcpy is necessary so that verifier doesn't
--	 * complain with:
--	 *   verifier internal error: more than one arg with ref_obj_id R3
--	 * when trying to do bpf_map_update_elem(&hash_map, sample, &sample->seq, BPF_ANY);
--	 *
-+	/*
- 	 * Since bpf_map_lookup_elem above uses 'sample' as key, test using
- 	 * sample field as value below
- 	 */
--	__builtin_memcpy(&sample_copy, sample, sizeof(struct sample));
--	bpf_map_update_elem(&hash_map, &sample_copy, &sample->seq, BPF_ANY);
-+	bpf_map_update_elem(&hash_map, sample, &sample->seq, BPF_ANY);
- 
- 	bpf_ringbuf_submit(sample, 0);
+-	if (is_kfunc_release(meta) && !meta->release_regno) {
+-		verbose(env, "release kernel function %s expects refcounted PTR_TO_BTF_ID\n",
+-			func_name);
+-		return -EINVAL;
+-	}
+-
  	return 0;
-diff --git a/tools/testing/selftests/bpf/verifier/calls.c b/tools/testing/selftests/bpf/verifier/calls.c
-index 0bb4337552c8..42d523a21a43 100644
---- a/tools/testing/selftests/bpf/verifier/calls.c
-+++ b/tools/testing/selftests/bpf/verifier/calls.c
-@@ -2410,27 +2410,3 @@
- 	.errstr_unpriv = "",
- 	.prog_type = BPF_PROG_TYPE_CGROUP_SKB,
- },
--{
--	"calls: several args with ref_obj_id",
--	.insns = {
--	/* Reserve at least sizeof(struct iphdr) bytes in the ring buffer.
--	 * With a smaller size, the verifier would reject the call to
--	 * bpf_tcp_raw_gen_syncookie_ipv4 before we can reach the
--	 * ref_obj_id error.
--	 */
--	BPF_MOV64_IMM(BPF_REG_2, 20),
--	BPF_MOV64_IMM(BPF_REG_3, 0),
--	BPF_LD_MAP_FD(BPF_REG_1, 0),
--	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 0, 0, BPF_FUNC_ringbuf_reserve),
--	/* if r0 == 0 goto <exit> */
--	BPF_JMP_IMM(BPF_JEQ, BPF_REG_0, 0, 3),
--	BPF_MOV64_REG(BPF_REG_1, BPF_REG_0),
--	BPF_MOV64_REG(BPF_REG_2, BPF_REG_0),
--	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 0, 0, BPF_FUNC_tcp_raw_gen_syncookie_ipv4),
--	BPF_EXIT_INSN(),
--	},
--	.fixup_map_ringbuf = { 2 },
--	.result = REJECT,
--	.errstr = "more than one arg with ref_obj_id",
--	.prog_type = BPF_PROG_TYPE_SCHED_CLS,
--},
+ }
+ 
+@@ -12338,6 +12351,10 @@ int bpf_fetch_kfunc_arg_meta(struct bpf_verifier_env *env,
+ 
+ 	meta->kfunc_flags = *kfunc.flags;
+ 
++	/* Only support release referenced argument passed by register */
++	if (is_kfunc_release(meta))
++		meta->release_regno = BPF_REG_1;
++
+ 	return 0;
+ }
+ 
+@@ -12830,23 +12847,12 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
+ 	if (rcu_lock) {
+ 		env->cur_state->active_rcu_locks++;
+ 	} else if (rcu_unlock) {
+-		struct bpf_stack_state *stack;
+-		struct bpf_func_state *state;
+-		struct bpf_reg_state *reg;
+-		u32 clear_mask = (1 << STACK_SPILL) | (1 << STACK_ITER);
+-
+ 		if (env->cur_state->active_rcu_locks == 0) {
+ 			verbose(env, "unmatched rcu read unlock (kernel function %s)\n", func_name);
+ 			return -EINVAL;
+ 		}
+-		if (--env->cur_state->active_rcu_locks == 0) {
+-			bpf_for_each_reg_in_vstate_mask(env->cur_state, state, reg, stack, clear_mask, ({
+-				if (reg->type & MEM_RCU) {
+-					reg->type &= ~(MEM_RCU | PTR_MAYBE_NULL);
+-					reg->type |= PTR_UNTRUSTED;
+-				}
+-			}));
+-		}
++		if (--env->cur_state->active_rcu_locks == 0)
++			invalidate_rcu_protected_refs(env);
+ 	} else if (preempt_disable) {
+ 		env->cur_state->active_preempt_locks++;
+ 	} else if (preempt_enable) {
+@@ -12877,13 +12883,7 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
+ 	 * PTR_TO_BTF_ID in bpf_kfunc_arg_meta, do the release now.
+ 	 */
+ 	if (meta.release_regno) {
+-		struct bpf_reg_state *reg = &regs[meta.release_regno];
+-
+-		if (meta.dynptr.ref_obj_id) {
+-			err = unmark_stack_slots_dynptr(env, reg);
+-		} else {
+-			err = release_reference(env, reg->ref_obj_id);
+-		}
++		err = release_reg(env, &regs[meta.release_regno], false, !!meta.dynptr.ref_obj_id);
+ 		if (err)
+ 			return err;
+ 	}
+diff --git a/tools/testing/selftests/bpf/prog_tests/cb_refs.c b/tools/testing/selftests/bpf/prog_tests/cb_refs.c
+index 6300b67a3a84..78566b817fd7 100644
+--- a/tools/testing/selftests/bpf/prog_tests/cb_refs.c
++++ b/tools/testing/selftests/bpf/prog_tests/cb_refs.c
+@@ -11,7 +11,7 @@ struct {
+ 	const char *prog_name;
+ 	const char *err_msg;
+ } cb_refs_tests[] = {
+-	{ "underflow_prog", "must point to scalar, or struct with scalar" },
++	{ "underflow_prog", "release kfunc bpf_kfunc_call_test_release expects referenced PTR_TO_BTF_ID passed to R1" },
+ 	{ "leak_prog", "Possibly NULL pointer passed to helper R2" },
+ 	{ "nested_cb", "Unreleased reference id=4 alloc_insn=2" }, /* alloc_insn=2{4,5} */
+ 	{ "non_cb_transfer_ref", "Unreleased reference id=4 alloc_insn=1" }, /* alloc_insn=1{1,2} */
+diff --git a/tools/testing/selftests/bpf/progs/cgrp_kfunc_failure.c b/tools/testing/selftests/bpf/progs/cgrp_kfunc_failure.c
+index a875ba8e5007..d0d65d6d450c 100644
+--- a/tools/testing/selftests/bpf/progs/cgrp_kfunc_failure.c
++++ b/tools/testing/selftests/bpf/progs/cgrp_kfunc_failure.c
+@@ -154,7 +154,7 @@ int BPF_PROG(cgrp_kfunc_xchg_unreleased, struct cgroup *cgrp, const char *path)
+ }
+ 
+ SEC("tp_btf/cgroup_mkdir")
+-__failure __msg("must be referenced or trusted")
++__failure __msg("release kfunc bpf_cgroup_release expects referenced PTR_TO_BTF_ID passed to R1")
+ int BPF_PROG(cgrp_kfunc_rcu_get_release, struct cgroup *cgrp, const char *path)
+ {
+ 	struct cgroup *kptr;
+@@ -191,7 +191,7 @@ int BPF_PROG(cgrp_kfunc_release_untrusted, struct cgroup *cgrp, const char *path
+ }
+ 
+ SEC("tp_btf/cgroup_mkdir")
+-__failure __msg("R1 pointer type STRUCT cgroup must point")
++__failure __msg("release kfunc bpf_cgroup_release expects referenced PTR_TO_BTF_ID passed to R1")
+ int BPF_PROG(cgrp_kfunc_release_fp, struct cgroup *cgrp, const char *path)
+ {
+ 	struct cgroup *acquired = (struct cgroup *)&path;
+@@ -237,7 +237,7 @@ int BPF_PROG(cgrp_kfunc_release_null, struct cgroup *cgrp, const char *path)
+ }
+ 
+ SEC("tp_btf/cgroup_mkdir")
+-__failure __msg("release kernel function bpf_cgroup_release expects")
++__failure __msg("release kfunc bpf_cgroup_release expects referenced PTR_TO_BTF_ID passed to R1")
+ int BPF_PROG(cgrp_kfunc_release_unacquired, struct cgroup *cgrp, const char *path)
+ {
+ 	/* Cannot release trusted cgroup pointer which was not acquired. */
+diff --git a/tools/testing/selftests/bpf/progs/map_kptr_fail.c b/tools/testing/selftests/bpf/progs/map_kptr_fail.c
+index 8f36e74fd8f9..f11848dfa78f 100644
+--- a/tools/testing/selftests/bpf/progs/map_kptr_fail.c
++++ b/tools/testing/selftests/bpf/progs/map_kptr_fail.c
+@@ -252,7 +252,7 @@ int reject_untrusted_store_to_ref(struct __sk_buff *ctx)
+ }
+ 
+ SEC("?tc")
+-__failure __msg("R2 must be referenced")
++__failure __msg("release helper bpf_kptr_xchg expects referenced PTR_TO_BTF_ID passed to R2")
+ int reject_untrusted_xchg(struct __sk_buff *ctx)
+ {
+ 	struct prog_test_ref_kfunc *p;
+diff --git a/tools/testing/selftests/bpf/progs/task_kfunc_failure.c b/tools/testing/selftests/bpf/progs/task_kfunc_failure.c
+index 41047d81ec42..8e947d445f8e 100644
+--- a/tools/testing/selftests/bpf/progs/task_kfunc_failure.c
++++ b/tools/testing/selftests/bpf/progs/task_kfunc_failure.c
+@@ -178,7 +178,7 @@ int BPF_PROG(task_kfunc_release_untrusted, struct task_struct *task, u64 clone_f
+ }
+ 
+ SEC("tp_btf/task_newtask")
+-__failure __msg("R1 pointer type STRUCT task_struct must point")
++__failure __msg("release kfunc bpf_task_release expects referenced PTR_TO_BTF_ID passed to R1")
+ int BPF_PROG(task_kfunc_release_fp, struct task_struct *task, u64 clone_flags)
+ {
+ 	struct task_struct *acquired = (struct task_struct *)&clone_flags;
+@@ -224,7 +224,7 @@ int BPF_PROG(task_kfunc_release_null, struct task_struct *task, u64 clone_flags)
+ }
+ 
+ SEC("tp_btf/task_newtask")
+-__failure __msg("release kernel function bpf_task_release expects")
++__failure __msg("release kfunc bpf_task_release expects referenced PTR_TO_BTF_ID passed to R1")
+ int BPF_PROG(task_kfunc_release_unacquired, struct task_struct *task, u64 clone_flags)
+ {
+ 	/* Cannot release trusted task pointer which was not acquired. */
+@@ -313,7 +313,7 @@ int BPF_PROG(task_access_comm4, struct task_struct *task, const char *buf, bool
+ }
+ 
+ SEC("tp_btf/task_newtask")
+-__failure __msg("R1 must be referenced or trusted")
++__failure __msg("release kfunc bpf_task_release expects referenced PTR_TO_BTF_ID passed to R1")
+ int BPF_PROG(task_kfunc_release_in_map, struct task_struct *task, u64 clone_flags)
+ {
+ 	struct task_struct *local;
+diff --git a/tools/testing/selftests/bpf/progs/verifier_global_ptr_args.c b/tools/testing/selftests/bpf/progs/verifier_global_ptr_args.c
+index e7dae0cf9c17..ea273e152209 100644
+--- a/tools/testing/selftests/bpf/progs/verifier_global_ptr_args.c
++++ b/tools/testing/selftests/bpf/progs/verifier_global_ptr_args.c
+@@ -153,7 +153,7 @@ __weak int subprog_trusted_destroy(struct task_struct *task __arg_trusted)
+ 
+ SEC("?tp_btf/task_newtask")
+ __failure __log_level(2)
+-__msg("release kernel function bpf_task_release expects refcounted PTR_TO_BTF_ID")
++__msg("release kfunc bpf_task_release expects referenced PTR_TO_BTF_ID passed to R1")
+ int BPF_PROG(trusted_destroy_fail, struct task_struct *task, u64 clone_flags)
+ {
+ 	return subprog_trusted_destroy(task);
+diff --git a/tools/testing/selftests/bpf/progs/verifier_ref_tracking.c b/tools/testing/selftests/bpf/progs/verifier_ref_tracking.c
+index 139f70bb3595..199ad18f8eb5 100644
+--- a/tools/testing/selftests/bpf/progs/verifier_ref_tracking.c
++++ b/tools/testing/selftests/bpf/progs/verifier_ref_tracking.c
+@@ -1288,7 +1288,7 @@ l1_%=:	r1 = r6;					\
+ 
+ SEC("tc")
+ __description("reference tracking: bpf_sk_release(listen_sk)")
+-__failure __msg("R1 must be referenced when passed to release function")
++__failure __msg("release helper bpf_sk_release expects referenced PTR_TO_BTF_ID passed to R1")
+ __naked void bpf_sk_release_listen_sk(void)
+ {
+ 	asm volatile (
+diff --git a/tools/testing/selftests/bpf/progs/verifier_sock.c b/tools/testing/selftests/bpf/progs/verifier_sock.c
+index a2132c72d3b8..9f680cf44512 100644
+--- a/tools/testing/selftests/bpf/progs/verifier_sock.c
++++ b/tools/testing/selftests/bpf/progs/verifier_sock.c
+@@ -603,7 +603,7 @@ l2_%=:	r0 = *(u32*)(r0 + %[bpf_tcp_sock_snd_cwnd]);	\
+ 
+ SEC("tc")
+ __description("bpf_sk_release(skb->sk)")
+-__failure __msg("R1 must be referenced when passed to release function")
++__failure __msg("release helper bpf_sk_release expects referenced PTR_TO_BTF_ID passed to R1")
+ __naked void bpf_sk_release_skb_sk(void)
+ {
+ 	asm volatile ("					\
+@@ -620,7 +620,7 @@ l0_%=:	r0 = 0;						\
+ 
+ SEC("tc")
+ __description("bpf_sk_release(bpf_sk_fullsock(skb->sk))")
+-__failure __msg("R1 must be referenced when passed to release function")
++__failure __msg("release helper bpf_sk_release expects referenced PTR_TO_BTF_ID passed to R1")
+ __naked void bpf_sk_fullsock_skb_sk(void)
+ {
+ 	asm volatile ("					\
+@@ -644,7 +644,7 @@ l1_%=:	r1 = r0;					\
+ 
+ SEC("tc")
+ __description("bpf_sk_release(bpf_tcp_sock(skb->sk))")
+-__failure __msg("R1 must be referenced when passed to release function")
++__failure __msg("release helper bpf_sk_release expects referenced PTR_TO_BTF_ID passed to R1")
+ __naked void bpf_tcp_sock_skb_sk(void)
+ {
+ 	asm volatile ("					\
+diff --git a/tools/testing/selftests/bpf/progs/verifier_vfs_reject.c b/tools/testing/selftests/bpf/progs/verifier_vfs_reject.c
+index 0990de076844..2870738d93f7 100644
+--- a/tools/testing/selftests/bpf/progs/verifier_vfs_reject.c
++++ b/tools/testing/selftests/bpf/progs/verifier_vfs_reject.c
+@@ -80,7 +80,7 @@ int BPF_PROG(get_task_exe_file_kfunc_unreleased)
+ }
+ 
+ SEC("lsm.s/file_open")
+-__failure __msg("release kernel function bpf_put_file expects")
++__failure __msg("release kfunc bpf_put_file expects referenced PTR_TO_BTF_ID passed to R1")
+ int BPF_PROG(put_file_kfunc_unacquired, struct file *file)
+ {
+ 	/* Can't release an unacquired pointer. */
 -- 
 2.53.0-Meta
 
