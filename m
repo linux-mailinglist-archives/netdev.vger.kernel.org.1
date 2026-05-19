@@ -1,185 +1,129 @@
-Return-Path: <netdev+bounces-289327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJo6K6EdDGpJWQUAu9opvQ
-	(envelope-from <netdev+bounces-289327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:21:53 +0200
+	id EHgwFW4fDGqoWgUAu9opvQ
+	(envelope-from <netdev+bounces-289328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:29:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503E2579E27
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:21:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED5757A0E5
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:29:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2D853300680F
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:21:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CE95C30936A4
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 08:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84263E1200;
-	Tue, 19 May 2026 08:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03633E1CF6;
+	Tue, 19 May 2026 08:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HAT1d1pm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZMOH+Gyw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57B63DCD8E;
-	Tue, 19 May 2026 08:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C263E008D;
+	Tue, 19 May 2026 08:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779178873; cv=none; b=siAZXZbbrB4c/yHcvpoTuhpGlm3FwdNU7+Txy5TSy7Qm4YHClh4ZFgWTVYQmw2SjPAsqYmaYn3sOztBco2ncc5r3u962XJbQoyUAxTpltuWWhIWgJzO7oF0exM9qyjx9ZcXUHWMxlt1YKmufF/XuBW3wa+sWyCFP6bE2892NWEQ=
+	t=1779178927; cv=none; b=XWtU/fmB1BwM62umNST8dul+teZgr4JrWHQ4MmF7FpHyARi79jAC+gx/7xi1rVYoJbOu3wcQHNyoTcvLqgrjiJjNWGKWDLo16OTndZYjltgv7FT3n5c1FSPX2dqB0ncLAlA406H9W1aW94ntbymIQZE0nKZxdAPXpxet4bXxJL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779178873; c=relaxed/simple;
-	bh=tDJ676BMgLDH5QXHQXESWIgejlRC5ysodvGdf6zhXJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jmi9JI12GNy0J6G2CvwPOgxHP4x0k+1eACbUtn2dXCCBOaTO2C/GuwRCmPxWfayBDtJz3v5P1F5vE2l6s3xt4ZM6kKXD6BOIRBUZKjlTgsFmycdLvT8F6oXcJ4oYwkaZH2S/iyAPqGqbTW4NynwxBb5h9YMXf4m9a/TYTIOXHgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HAT1d1pm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E47CEC2BCB3;
-	Tue, 19 May 2026 08:21:12 +0000 (UTC)
+	s=arc-20240116; t=1779178927; c=relaxed/simple;
+	bh=YN/NueC/tor3Ym7c9g0Cn60Rx3xpLTXKFWn08HBWXfQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HIh59522TniSxzlypWdKmTKxU7/r8dvhenLBJE93rRwq6LdnYr+qdjrQGSZJFRkA4S4pJr2+/gUMlcHw7BUpgZ94iJURYdNCIuoTPklZKhEqrQWL26kqaAPyV+n+PcyEmy98s1g5DSQ7DsWvhjSjjqzFfRQpR0VSNL9UL5on9kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZMOH+Gyw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7842EC2BCB3;
+	Tue, 19 May 2026 08:22:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779178873;
-	bh=tDJ676BMgLDH5QXHQXESWIgejlRC5ysodvGdf6zhXJg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HAT1d1pm7N1FFCeffinmDHW6oJul7lkYiUgRe1Mu+RNcWdjjDJh3narpSaCw5Hz2r
-	 6NcopBBimft48kpIsCxDvfOaPOEHPvJ+8GT04NR4Fd62mwiGPWosuWQeWky387jWD0
-	 /rsVWQn4QroUCBgnBBn0QogA97u+vJsEhvT8mUEAbOIqoo42qa4T0RI23CgUztu6ta
-	 W7/SklrsUT5ejmrQ863MP0bFcktZPkslBF+2F2wL7994H+96gTHVBOb8ISrcCEUfnz
-	 98QCYHJGIrn5oMnTpKt0gTtiEjzzl/YaWwkQsOA/nSS7zU1wjoVa2Ka7E3oz3HKPY3
-	 cnEvMiZBQ32NQ==
-Date: Tue, 19 May 2026 10:21:10 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: conor+dt@kernel.org, robh@kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v7 03/10] net: airoha: Move airoha_qdma pointer
- in airoha_gdm_dev struct
-Message-ID: <agwddqW7CZQfYaPn@lore-desk>
-References: <20260516-airoha-eth-multi-serdes-v7-3-99e0093303e2@kernel.org>
- <20260517055811.39179C2BCB0@smtp.kernel.org>
+	s=k20201202; t=1779178927;
+	bh=YN/NueC/tor3Ym7c9g0Cn60Rx3xpLTXKFWn08HBWXfQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZMOH+Gyw7gDTDviVnVSr3mxcQk5YJ9y7i8Z3Rgi6WwMww/EjK/ayCGrvSemguUVz9
+	 rAPzYK+LLVI2FjJK49r0tfKV1QjRPYHNMkMzjlvxLlWvBdXfZZ2HX4LYAvsoLLCwLb
+	 08UOnotz/FCviDYIHMj3t7iwv7Fa3rg9Xi1LySeDJkQM+xuTWbqOgFr1wpOzTvtidD
+	 oV0kuOcwfQ9ZRIVlojb1JsVj7YcJGDuIqMA8jCUGGd+K90zdqK0LuezK1VEI/xgRSM
+	 ozEZQJf3iAig+r6kEF1yNQmdNzdTDhcqwoIVX1oyVb6ebNmQJSJKh6FY8ocIOgmQKP
+	 VohuFQA01+Caw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0AC53930DC9;
+	Tue, 19 May 2026 08:22:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="LJ7Nk84mR0QUSsMi"
-Content-Disposition: inline
-In-Reply-To: <20260517055811.39179C2BCB0@smtp.kernel.org>
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] selftests: net: add tests for PPPoL2TP
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177917893865.2164934.9404550668175304415.git-patchwork-notify@kernel.org>
+Date: Tue, 19 May 2026 08:22:18 +0000
+References: <20260514015743.37869-1-qingfang.deng@linux.dev>
+In-Reply-To: <20260514015743.37869-1-qingfang.deng@linux.dev>
+To: Qingfang Deng <qingfang.deng@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, fmaurer@redhat.com,
+ bigeasy@linutronix.de, petrm@nvidia.com, linux-kernel@vger.kernel.org,
+ linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-289328-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289327-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 503E2579E27
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:email]
+X-Rspamd-Queue-Id: BED5757A0E5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hello:
 
---LJ7Nk84mR0QUSsMi
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
-> - [High] Deadlock risk due to using `spin_lock` instead of `spin_lock_bh`=
- in `airoha_update_hw_stats`.
-> --
->=20
-> commit af5b93ea60b28ce8a1ab1016b0911418480e766a
-> Author: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> net: airoha: Move airoha_qdma pointer in airoha_gdm_dev struct
->=20
-> This commit moves the airoha_qdma pointer from the airoha_gdm_port
-> struct to airoha_gdm_dev, since the QDMA block depends on the net_device
-> configuration. This is a preliminary patch to support multiple
-> net_devices connected to the same port via an external hardware arbiter.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 3ca0dbd19275a..6c9f4b289dba7 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> [ ... ]
-> > @@ -1560,9 +1564,10 @@ static void airoha_qdma_stop_napi(struct airoha_=
-qdma *qdma)
-> >  	}
-> >  }
-> > =20
-> > -static void airoha_update_hw_stats(struct airoha_gdm_port *port)
-> > +static void airoha_update_hw_stats(struct airoha_gdm_dev *dev)
-> >  {
-> > -	struct airoha_eth *eth =3D port->qdma->eth;
-> > +	struct airoha_gdm_port *port =3D dev->port;
-> > +	struct airoha_eth *eth =3D dev->eth;
-> >  	u32 val, i =3D 0;
-> > =20
-> >  	spin_lock(&port->stats.lock);
->=20
-> This isn't a regression introduced by this patch, but does this spin_lock=
-()
-> need to use the _bh variant to prevent a deadlock?
->=20
-> This function is called from ethtool paths like airoha_ethtool_get_mac_st=
-ats()
-> and airoha_ethtool_get_rmon_stats(), which run in process context. It is =
-also
-> called from airoha_dev_get_stats64() via ndo_get_stats64, which can be in=
-voked
-> from softirq context when queried by a bridging or bonding master or qdis=
-c in
-> the TX/RX paths.
->=20
-> If a process-context ethtool operation is preempted by a softirq on the s=
-ame
-> CPU that then invokes dev_get_stats(), could the softirq attempt to acqui=
-re
-> the already-held port->stats.lock and cause a deadlock?
+On Thu, 14 May 2026 09:57:32 +0800 you wrote:
+> Add ping, iperf3, and recursion tests for PPPoL2TP.
+> 
+> Assisted-by: Gemini:gemini-3-flash
+> Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+> ---
+> v2:
+>  - use named veth pair instead of netkit
+>  - reset RET prior to the recursion test
+> v1: https://lore.kernel.org/netdev/20260508032158.67887-1-qingfang.deng@linux.dev
+> 
+> [...]
 
-according to my understanding ndo_get_stats64() can't be invoked from softi=
-rq
-context.
+Here is the summary with links:
+  - [net-next,v2] selftests: net: add tests for PPPoL2TP
+    https://git.kernel.org/netdev/net-next/c/7af2a94f4dcf
 
-Regards,
-Lorenzo
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
->=20
-> --=20
-> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260516-airoha-eth-=
-multi-serdes-v7-0-99e0093303e2@kernel.org?part=3D3
 
---LJ7Nk84mR0QUSsMi
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagwddgAKCRA6cBh0uS2t
-rAW/AP0aD9yWvysA4UQZWMt8KYNajMyf11KY05+00GEq79lH5AD/YUZPKzhQdrP7
-doMJF/1zsYgfpHeJZmwlhUdhbiqNpgM=
-=lPdz
------END PGP SIGNATURE-----
-
---LJ7Nk84mR0QUSsMi--
 
