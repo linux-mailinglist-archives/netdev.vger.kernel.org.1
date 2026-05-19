@@ -1,484 +1,269 @@
-Return-Path: <netdev+bounces-289379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KG7KOvA7DGp8aQUAu9opvQ
-	(envelope-from <netdev+bounces-289379-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:31:12 +0200
+	id SJjuNW83DGq2aAUAu9opvQ
+	(envelope-from <netdev+bounces-289380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:11:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 346CA57C446
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:31:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54E6857BF5D
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 12:11:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id ECBD6302997B
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:04:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 25CD9304E324
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 10:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C52A1CAA6C;
-	Tue, 19 May 2026 10:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4D7481AB9;
+	Tue, 19 May 2026 10:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P2mqFKkG"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="K/fN/j7s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f100.google.com (mail-oa1-f100.google.com [209.85.160.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C82480978;
-	Tue, 19 May 2026 10:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779185055; cv=fail; b=eC0cTwehXS+0kGM3C7DXKCU3xFGGV/K3MvQeWlYVlj0ry56s8npxTpfbWGr8kJpfclsM3DAlJeVX4PNOJk5wRyWk87kC51XzcG3IrBsGxzrkgAUXqZ0Xi2FHibu8ranCmpD6qZARAA6cg5qQnLA/PTvisYcpw8J78wq3/X4+aCA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779185055; c=relaxed/simple;
-	bh=g4Hukdxnusd1YJv2nDMSxcesvFFWAE/hGsKCUJRka2w=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=kkOpNeQZV1MwW9fq9kuuR1Stw3ufumMxs/fh2oAe8Ov+6gVLc5RVakCD0AY14JghIpLsteIY3Jv7vsKR6cVR28fF3gEsW2dPE7jQgbQeVwtnFn1Nt5DCXrTmQj93CnX8Nq7PvQZ9bY8j31adCbKeB2kxeeUAMRO/d/ZKkhu97bg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P2mqFKkG; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779185054; x=1810721054;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=g4Hukdxnusd1YJv2nDMSxcesvFFWAE/hGsKCUJRka2w=;
-  b=P2mqFKkGIbOI7F/iG05DbVTd3kPPuuyVtz9cB2kasFfa6GHs7q30lXht
-   DonvjgP7Jfu9amH8J5goUodd6cOdjByFmmevfbeRBXez6lFUEAE+7K1q6
-   nJ+AQXINh2pR1NOqnllh1RyLkfpPIi4zpAdu3UncV6IxLzQbwhJWpwOyJ
-   /BqP7ldmc02s4EqSpeQTbUjhIDtszZpk515A5Emnhf8iv1MKLpjz5p1ec
-   HD0glUXl/Qig3mz6uNAY/CuslPBM3u/2PPZ7fFuAT4VGlBewFfOKh8oJ9
-   UWoRkhe0fdmKRT28ZBjGBAP2wFX3wQssj3fPHN95Zz4CRU2hGOySFdSos
-   A==;
-X-CSE-ConnectionGUID: /1LH/NaaQamtEGK9GN8Saw==
-X-CSE-MsgGUID: /mWme057Qr2slPTFt12Yjw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11790"; a="80110066"
-X-IronPort-AV: E=Sophos;i="6.23,243,1770624000"; 
-   d="scan'208";a="80110066"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2026 03:04:13 -0700
-X-CSE-ConnectionGUID: lXyPvL4+RxeCuTQHff2C8g==
-X-CSE-MsgGUID: C6KGfI83QzCX+vnJAgIMbg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,243,1770624000"; 
-   d="scan'208";a="238733298"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2026 03:04:13 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 19 May 2026 03:04:12 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 19 May 2026 03:04:12 -0700
-Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.46) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 19 May 2026 03:04:11 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iaVW3OSykN0IGIcOgLotdcKk/uQdKWrVXOEQzDjG8/wyzKfjqCujDaVC6lo6+CCh1SPDodpZS3cE9U/v87iaA+JWhx2wggi110vRn4fmdCqxH9EZ0Uzcwcx51wZqvJL65E+syzHsQrpMNboLAd6VSjtXg3+PDBaI4qwZCHAa1wxdPRLGFniTrnz07blVwFRN96XbQXBYj5rO6YjdoZf/lIUv0lgJcejCtnt6UBAltBM45ZFy0Ni1W2DZAbW2UD69Y1Uzq13THxDPJTzQ+g0XJAkgkIfptkxnHzmykWxq5kRLw5RjmDRZDVD5X9vKQmZuCXP5AC6gd7b0FlRAIWhOMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wMoVdlK0zux7tKlXLMUlVXV9wwUEnXkMRQwCD+iCBxI=;
- b=GHKvIcs4O1C+FRMKXglPOfU7bMb6n1ONiTI1RM+AULaCUNZa221A8Qp7Ato+aQqruf1YHFSFWrd79jXQlspAEd6o2/EGoLLlUoPemZTyvZ4uUxkWv89HuNgSmmyfR1r0SLw6aIgIEFM3iJ6ZpUtuhpntntsl2mmX8pFohyf8n8je4hcPfSQ6hTxfSkIJBT5kJdpHvAzkREiMYOC1rOracq8bY7Wy/yhF5et7cUb/oGGjKNuSOC1WjsZEjno2H5eMw0I6o781SVvlevpCJ4uTXo03ckpuhb7bE5cwrWOD/DqajCmO0Gx76LskT7Y8xsehpUf5RZGl28y7fZwCFRlJNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by BY1PR11MB8007.namprd11.prod.outlook.com (2603:10b6:a03:525::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Tue, 19 May
- 2026 10:04:04 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b%6]) with mapi id 15.21.0048.013; Tue, 19 May 2026
- 10:04:04 +0000
-Date: Tue, 19 May 2026 12:03:49 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: <phasta@kernel.org>, Bjorn Helgaas <helgaas@kernel.org>
-CC: Bjorn Helgaas <helgaas@kernel.org>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>, Phani R Burra <phani.r.burra@intel.com>,
-	<przemyslaw.kitszel@intel.com>, <aleksander.lobakin@intel.com>,
-	<sridhar.samudrala@intel.com>, <anjali.singhai@intel.com>,
-	<michal.swiatkowski@linux.intel.com>, <maciej.fijalkowski@intel.com>,
-	<emil.s.tantilov@intel.com>, <madhu.chittim@intel.com>,
-	<joshua.a.hay@intel.com>, <jacob.e.keller@intel.com>,
-	<jayaprakash.shanmugam@intel.com>, <jiri@resnulli.us>, <horms@kernel.org>,
-	<corbet@lwn.net>, <richardcochran@gmail.com>, <linux-doc@vger.kernel.org>,
-	<bhelgaas@google.com>, <linux-pci@vger.kernel.org>, Bharath R
-	<bharath.r@intel.com>, Samuel Salin <Samuel.salin@intel.com>, "Aleksandr
- Loktionov" <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next v3 02/14] libie: add PCI device initialization
- helpers to libie
-Message-ID: <agw1hWoriXhQ7vK3@soc-5CG4396X81.clients.intel.com>
-References: <20260518215441.GA640516@bhelgaas>
- <7a477885c58709f287f6c1440fb7e31331227d10.camel@mailbox.org>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7a477885c58709f287f6c1440fb7e31331227d10.camel@mailbox.org>
-X-ClientProxiedBy: VI1PR07CA0222.eurprd07.prod.outlook.com
- (2603:10a6:802:58::25) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FEE481AB2
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 10:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.100
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779185365; cv=none; b=cmy3DkTQ6zpyvbO9brKb46dWrWfo8ZEDR2LSkIhGoaZd3z/haU6kAXlOa427Z5eE4YAQ4TKH07vkUs8S6xTkVkAVDd78suPFKT69LCGELi31fJM7QByoTiTCI46Tgwpvh6LBykoETS6FafW7DOZhvTBwY0qX0xwWeb5mE6/WMLo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779185365; c=relaxed/simple;
+	bh=aRXSz2HUHJGL5xeFCwDEnuJvpc4Oan5WmeWxfyncOUk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dqjoa6hJumjIdlfO3UE9MwzR6Mq1PpK07M7nPsESq0C/lu6+GFCUIMkHLfbFQOjL9WpG0nw1HajLNz1JIubxab16Bgg3q/r4Nuij2u17EmVR2RMXGH1BenhOSMne4QfbDG2C1h2vmHjrq/sSDZY+a+YV94cjB45Ls5+LX2VPTX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=K/fN/j7s; arc=none smtp.client-ip=209.85.160.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oa1-f100.google.com with SMTP id 586e51a60fabf-40ef10ec84cso2981362fac.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 03:09:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779185363; x=1779790163;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xPsNsN5/rnzfHgLyJBpZ4rzvkLyc7YqGO72z507Am7s=;
+        b=AXD8M5xLw4qWH8k8qWIX8ouRLGOlX7gE2GSPNpD9cLssUndMW5O7R+bEOJQIH2whzT
+         ppacToSLQw3GSh9a5JXpGF3Prtv98kOsapaJRyPixt0DR7X/AIh4IH/GDpNGXLiI7aDG
+         zjVMhBHANnlUkwc+eaGXFOnEECAwwZMnpdrmHfFktc2WCB1gCOJt/5wyDgMlEra1VfBA
+         pX79IP8sZfXS59OmvQkY9kymA4e9MyaHArDRJ0g+yIkz+M+5RFXO1juUCpEanyVB/qG2
+         kPzJ2ZfzhrAk5F9Pn2twMtCUN20VTrhx5WNcvCCaLNXeEQtIACt4Jz1h7AfnVkWYqJkc
+         okaA==
+X-Forwarded-Encrypted: i=1; AFNElJ9ex3HZRjvDp1/rOUP1EdtowysoC6eenRHkLa6AtP/QTHCTSSBksZiMBOXnH+E7rrGo+Z8nEhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzww476qoS5OmyCRJIwD1+eQLcqfDcJ3SYCzgQnspe5lBXEHDZW
+	za/PCk/0jTeCuzzwkYOumMRSZVZsq6DXnAnBKs5UAIjz+t6ajhPN52oX/43FNvXDa4RfMacylne
+	Ubd6gcSq+0KjY19J11LLCiFrEyWn+WPGB8IP/8el9VhKYLIIfeRCeA9Ci7X9csmgBLlCO0GISZM
+	b7Vmk6yWnhwcvCA7Kr8K0uDXdhyIqmmPh/iORFEclJqBhNNOxqZOaaplRUFP2HBsrC9mpVjSNzR
+	IXoy/SFkG4=
+X-Gm-Gg: Acq92OF7elfPQWhXsll8ys4nYWnDBK8mVItJp306XSdXyfzmVXlstCdeY6xL99o5Rk+
+	2FdkWyrFhDN0/5z/TLpIB2h50VXq9E+JLjGkrSIl6/5k+DW8NlKtiZkIRBnblqKrrqP99xVdYiH
+	G8kzoJEWHdoiUJYooCEh0n09HXb2OhS6CYiLgMZmVIdHGH+9RhHgpzx7mgyffXo6FzJfeEKBKyb
+	Uo/M8t1wVJuzTSDpjpeqQBrNoxaImkQkCHdqCMlctodScrOzr4Ss/Wq+H0Em6ubnogy/qu9Ujgj
+	VCZvnV63f1epcuS6zU3S8Lxzwq8HQsDJ/rig5sOhRFZzQeMyWCTdMwZrHZJbnQtdZzxyNvXodNq
+	oPqKXZ7PoxEG/E0h79JbW/tgJevy+daWZAFxV+grs2RLQUxlnvNf/ki1YZVk8TwwfTGmcAK5NjR
+	etiZtQHU1DH7NH54o=
+X-Received: by 2002:a05:6871:e48d:b0:424:6f4:fd12 with SMTP id 586e51a60fabf-43a2d8f447amr12729454fac.3.1779185362635;
+        Tue, 19 May 2026 03:09:22 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-43a95815974sm987767fac.12.2026.05.19.03.09.21
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 19 May 2026 03:09:22 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-83ef22f8e8bso2169423b3a.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 03:09:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1779185361; x=1779790161; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xPsNsN5/rnzfHgLyJBpZ4rzvkLyc7YqGO72z507Am7s=;
+        b=K/fN/j7sIrfZl2KeXKxIJ+WXjsctneHOS3CQvx8OSITJ2I0fpCxV7y8g20k221f7a2
+         Ba7T+JCIrDKaDLLCjUWF5QeKFvi+YqNAmesLSqt4AWRgcKht12dGXddWO1GnY5MHWFg9
+         8+HbWk7yWbHagnreKxXXyUHG2pH867enuqgW8=
+X-Forwarded-Encrypted: i=1; AFNElJ8YXjoD0aVFUPMCzjVaSvXnMbq8Oc+fvo1wrMXXU8VJIu3CctQTKaTNnwlz/XVolB/S9XkGISA=@vger.kernel.org
+X-Received: by 2002:a05:6a00:950f:b0:83e:6fde:54d3 with SMTP id d2e1a72fcca58-83f33f3d3f0mr17276737b3a.50.1779185360732;
+        Tue, 19 May 2026 03:09:20 -0700 (PDT)
+X-Received: by 2002:a05:6a00:950f:b0:83e:6fde:54d3 with SMTP id
+ d2e1a72fcca58-83f33f3d3f0mr17276714b3a.50.1779185360307; Tue, 19 May 2026
+ 03:09:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|BY1PR11MB8007:EE_
-X-MS-Office365-Filtering-Correlation-Id: c9119180-d464-4c2e-64b4-08deb58df418
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|10070799003|56012099003|22082099003|18002099003|11063799006|4143699003;
-X-Microsoft-Antispam-Message-Info: 6C4lUNFXvnFOVFRxhahMnzjwTLsXz18moIkbig9RbxFv9Amc/lbAkiyvH3IDXQECdlIpXR5VorBKT+RhVscSY0h7pOoodPR46YPeJlOfNdE8w56kzZEbnLEKN+aDqXfzCYlE0Vtd6QUSzqoGEr71nZRQqaB3Fn8mTV1xZ9QrWSPaS3ZvZtxC+3Hgh2JOp4gwv1r89pRYO/ty71TQQrC3PEse0qg51DTbgOfltsvWXNpJAc9Tawj6iHpppdEEXUJy2LwNM2yfKtuN5zk7JoSohV6KbPkPWfo5c95C/Au4BLj7akYh8CYmN/g1fAY3Haka/HEI8R8Z7X0JcR7UGMlXVu94sPR+RDK70QWKxulfpt8NOqVXjQSD9+JwDr4CwOMGqxRDdErZ2GmBvxCUqpvrhjDEfdGzCeTSie73u2cQ13TrRrhbY5H8qHL2vBp5FCDx1VMTtkmhOFvdm0RX+gJ1wI6G7robFlzuqjWyeLWaCBYyBTS9KRZh0TCd3WjxZREqqUU79RwSgifnIedCA05K0ZhUUPUr5qqx+TCTHMy1xlSoJVzYQsU4GYJ6YGLcR4tdXvzNPfW+meRiFaRxAjHjn39Yz3S5GX1as9EH+eYgnPB+csGDgPDJu1mlgWMQw2FZSb0vYkEHbKySZHBRZDjikP/+O2xGYzo2Ee6qHarMw5HY/NRFtHk3BuoBoybJhnyp
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(10070799003)(56012099003)(22082099003)(18002099003)(11063799006)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?93YuGE+8zocMh9oRNDS9Ykvywaua4SW1dLpM2HRJ17jDBnPA46fLxyBpnD?=
- =?iso-8859-1?Q?Qp4OKt5UHV1qWlFf/Tal680ruiSEvhwq0D45JfbWz5ABzPVgnhO9Il2o4w?=
- =?iso-8859-1?Q?5hrlGnnTxPk+olncGFf8DmK/W9wcrc9jWVbQWQSAKKb6KWhDDXJrhUJ080?=
- =?iso-8859-1?Q?+wpxtydekfF3bx0SgB32Y3TXU8iRrK6o5GUYGasixCv95z02OBvVcwBxYj?=
- =?iso-8859-1?Q?blcS/kur89QXVGmr1IChCMobiDVlmKc17UESaCktEbmhsQ5ee6JCzNV4s+?=
- =?iso-8859-1?Q?WUM9lJ0L4EKxUT3gsqS57wPOq2+k8Cjr6vGrWvE7M6bgF84qisz50KhmGG?=
- =?iso-8859-1?Q?GRmAlatRnVtMsyQUTaziBbgedy5ilcLUfOnhC4uMl4OrosLASjZ9gkOQo0?=
- =?iso-8859-1?Q?CpBbCmsGLy6Px+CJ7Emg0ckga94X9pbczW8QQbQHcWNHdjyiVdPUUULn0n?=
- =?iso-8859-1?Q?/OdK7BcV4DvTzUb+JxDx7Wm3DVeZIdFWWiLVAZLmCOfYF+GfmgbMrlQFtS?=
- =?iso-8859-1?Q?LrfDJS2wc3LwlDM5uC9D2jpNdafVEkzvqTW9VAkM7c8qqkOayxQIwK1Gy7?=
- =?iso-8859-1?Q?2iIlQ+vxiXJqIn9WORTdt+ECc5Ug40eJSAomhlwh1fahvsLtDkzxDBT/IC?=
- =?iso-8859-1?Q?hWRmI4mzRTEJVquFgzBguC9JFXam8igryw0Ym17FOvpD1zMyBjgVAFmj2n?=
- =?iso-8859-1?Q?kG14eLmU/IBjMp3qQy58RaMtU+RMr4m/ZxBJEIqH8PtDP4febDFqcz70VJ?=
- =?iso-8859-1?Q?V2EX24SMMxVLP2HZ8H88H10zi6FgEJhO3Vj62YNq/juaFcrcxEvVTVcWwd?=
- =?iso-8859-1?Q?GL6NaAjplNaSFgAz19Tpb2qv3l0kcjWvj3Aw3+Qdg+zz679xZdSA3e9l/U?=
- =?iso-8859-1?Q?Zia73MROmwwkGh0g2VbxIKp4lVANiCn4K1jEaXvbgsu2kW1C1SWFztm07Q?=
- =?iso-8859-1?Q?4QIDAP3v2XfJfWPDfaSJO1IrXwgEEEAB0/wMRaSbTbIZ1CxmrOtWwegNcH?=
- =?iso-8859-1?Q?UYXjJ7IASTjsdVV3vPE9wlLVZZ/Az+MrDplk1+SNBTDMIbkoGTQoKGS1Ab?=
- =?iso-8859-1?Q?wGLgKTRLPDprhbH5awwhgaszpl5TQfBjGeRPt2Gho1uPJRS3uv3arEKsQ1?=
- =?iso-8859-1?Q?ygeGn6SxgC7ttJO0gIJ2d8uws9TiWQTqGc14CiRxNJgkUZFhiwTTrrSKUE?=
- =?iso-8859-1?Q?BfEkcF2dwxVlcLHyO4ctyltKKmZDmpFlvcpe2nFVCnao730eC24++iuD4C?=
- =?iso-8859-1?Q?394bOFwvfACPwR3otxwBaZCl3wm15AEl/vWF8/fztniYfi+PJcovtRscUU?=
- =?iso-8859-1?Q?8Va0UJWxvugBY3/pTiMZLAZz8nKBcebt5mI+WvFUNvF8+BkcmGDlgI2f7u?=
- =?iso-8859-1?Q?iXLyJEXcGAYTrMr1iFNU0jhaNJyL45BqCPa9vKLbrnxEv+Fvq74fB4Tjl7?=
- =?iso-8859-1?Q?Nw3Wkc1b+8RCboj5AVy1Ht+qSMgWqxWm4wxQf8aS5HaNnRZBvPxin6KC8u?=
- =?iso-8859-1?Q?vok/jZA2ssjtib92jMbE0QLwXVGMd12Bo1VaV/KLxtoWhSJia906ly+P1C?=
- =?iso-8859-1?Q?qpgLk037jeXhSrLDMGHuVlCJIbDq9xtWwJWyZRFGd8aN7Suoi9lRTi2nis?=
- =?iso-8859-1?Q?E+m7Q6NgN/gxCEUMbSAQ0dKQlanRqeOSSTpA5tKYsfTqY2j7iW0+xaryzM?=
- =?iso-8859-1?Q?4YKTMuISU6dVyTV9sKK9nFWEB9Ll/Rm8Yw5sDHoQ9A6BRXEEXUnb+BKQ0P?=
- =?iso-8859-1?Q?wc2z34PLqHlmOYxigZnV/UeD5qflNgYxi65V6/Gfu3uxw+YgBQm5ksBcrV?=
- =?iso-8859-1?Q?DWhBjhrijP/SRYIf5X/tG8IPWyOFf2nCl2Q4KkIQLTakq+aYndtI+i8XnY?=
- =?iso-8859-1?Q?1k?=
-X-MS-Exchange-AntiSpam-MessageData-1: L7/TjX2WgAdMDzxUnu7BJCsvBGjv0x10aIY=
-X-Exchange-RoutingPolicyChecked: jqZUSrSG+6FVA6P1MYE1flrL1bHAkV4ldU9aTsV01IaT5oHHeH4EQcRgvr9UCIoZ/T77LKhQFWK/wVR24PRFgJq/CI0GAmBAlTU0XQxpySipJwj+rO99zA0T/d2gndNdgTmqkm2ccaLzgz0s+87ct7Mksb/RAg5kGX7Do+IG5DCU1AuibsUv/aFTMtUHqqdOmpceCG1XOnXgckXAlsnouzPggFRDOn5LwjLz5dvmztpFVCoir8oIJBn4oSbtCM700luJj0dUvBYxvMCPn0KX4HGM515TZQHj6906TvwK7LBRqGUJ+QFFhoCFfXbgM73Kp+5pQJV/VqbKuVTGlFDRMQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9119180-d464-4c2e-64b4-08deb58df418
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 10:04:04.0232
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: w+OOshhdNi69+xCs0toqBcf8ptEUu4Qe+Hhk67tEaW/2lvIgcwq3iuhJES+v1gdr6GsGV9WJ+pMORnHbRWmKPvrNnAx/0OpvbgiWqLdAI+o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8007
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
+References: <CAPzpGcTtw+ou+8jid_qE9w96UWt+4KUZXN-aC=44Oqkk=qdERg@mail.gmail.com>
+ <CALs4sv3XH1DEB+EXmSjKvPz8Av-53HOrJ+Dc_mjOv+3EnnuV9w@mail.gmail.com>
+ <a120c9f5-5818-4335-ac2c-caaf4f6f4fc7@arista.com> <CALs4sv2bNZkBvqKwSMOM5CtJG+GM8P6D6PMHWFJUqtNS4xw34A@mail.gmail.com>
+ <CACKFLikhxsYc6zP2ksV4=_MwZDLC=6Q2rD9CGwEACKOiVgXBhw@mail.gmail.com> <8ea0f79a-a8b0-4d1e-85dc-6f5b8fd3c135@arista.com>
+In-Reply-To: <8ea0f79a-a8b0-4d1e-85dc-6f5b8fd3c135@arista.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Tue, 19 May 2026 15:39:08 +0530
+X-Gm-Features: AVHnY4LZvK5MEDALYQXNbXPyRUoJIt_b5jMnUV-fGwIpxO-ThrPL7zMUQIRA3eQ
+Message-ID: <CALs4sv1jEd2dm7=ZhYiW+otxCcjb3Ci3enpRYrqUWf=uq3putA@mail.gmail.com>
+Subject: Re: [PATCH] tg3: guard napi_disable and pci_disable_device calls
+To: "Yury M." <yurypm@arista.com>
+Cc: Michael Chan <michael.chan@broadcom.com>, mchan@broadcom.com, netdev@vger.kernel.org, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000007089ea065228df76"
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	TAGGED_FROM(0.00)[bounces-289379-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,intel.com,davemloft.net,redhat.com,google.com,lunn.ch,vger.kernel.org,linux.intel.com,resnulli.us,lwn.net,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[soc-5CG4396X81.clients.intel.com:mid,intel.com:email,intel.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-289380-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 346CA57C446
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pavan.chebbi@broadcom.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,broadcom.com:email,broadcom.com:dkim,arista.com:email]
+X-Rspamd-Queue-Id: 54E6857BF5D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 10:20:27AM +0200, Philipp Stanner wrote:
-> On Mon, 2026-05-18 at 16:54 -0500, Bjorn Helgaas wrote:
-> > [+cc Philipp]
-> > 
-> > On Fri, May 15, 2026 at 03:44:26PM -0700, Tony Nguyen wrote:
-> > > From: Phani R Burra <phani.r.burra@intel.com>
-> > > 
-> > > Add support functions for drivers to configure PCI functionality and access
-> > > MMIO space.
-> > 
-> > This looks kind of like what pcim_iomap_range() does, i.e., a way to
-> > ioremap (BAR-idx, offset, size) pieces of PCI BARs.  That sounds like
-> > useful functionality.
+--0000000000007089ea065228df76
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I agree that pci_iomap_range() could simplify the implementation a little bit. 
-But libie_pci API is still needed for ixd and idpf.
-
-I guess commit message lacks clarity. Apart from mapping separate ranges, 
-libie_pci also adds a list which is intended to be tranversed by a driver, e.g. 
-to pass certain IO mappings to the auxbus devices. Such list is also traversed 
-by the libie_pci_get_mmio_addr() helper. And there is also some input 
-validation, because ranges are received from a very customizable FW. So a lot of 
-driver-specific convenience stuff.
-
-> > 
-> > Is there something Intel-specific or even ethernet-specific about
-> > this?  If devm_* and pcim_* don't do what you need, maybe they should
-> > be extended or this could be made generic so any drivers could use it?
-> >
-> > This looks like a mix of managed (pcim_enable_device(),
-> > pcim_request_region()), and unmanaged (ioremap(), iounmap()) things.
-> > I haven't looked at how all this is used, but it's pretty easy to get
-> > things wrong when mixing models.
-> >
-
-The mix of managed-unmanaged things is because of static and non-static regions. 
-Static regions do have a device lifetime. Dynamic are theoretically only valid 
-between hard resets (e.g. from idpf_vc_core_init() and idpf_vc_core_deinit), so 
-a nice thing to do in such case is to unmap them before the reset.
-
-I settled on a "mixed" model, because this way libie_pci_init_dev() can befefit 
-from managed APIs, but region management part can stay much more flexible.
-
-I do not think making this generic makes sense, it is rather tailored to the 
-requirements of idpf (data plane) + ixd (control plane) generation of intel 
-ethernet devices. I you have some examples that could use the same logic, I 
-could take a look.
-
-For context:
-Libie was generally created as a way to just reduce code duplication between 
-intel ethernet drivers. And we had a lot of code duplication. So this library is 
-mostly things that would be otherwise copy-pasted.
- 
-> > > +++ b/drivers/net/ethernet/intel/libie/pci.c
-> > > @@ -0,0 +1,208 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +/* Copyright (C) 2025 Intel Corporation */
-> > > +
-> > > +#include <linux/intel/libie/pci.h>
-> > > +
-> > > +/**
-> > > + * libie_find_mmio_region - find MMIO region containing a range
-> > > + * @mmio_list: list that contains MMIO region info
-> > > + * @offset: range start offset
-> > > + * @size: range size
-> > > + * @bar_idx: BAR index containing the range to search
-> > > + *
-> > > + * Return: pointer to a MMIO region overlapping with the range in any way or
-> > > + *	   NULL if no such region is mapped.
-
-[...]
-
-> > > +
-> > > +	if (offset + size > pci_resource_len(pdev, bar_idx))
-> > > +		return false;
-> > > +
-> > > +	mr = libie_find_mmio_region(&mmio_info->mmio_list, offset, size,
-> > > +				    bar_idx);
-> > > +	if (mr) {
-> > > +		pci_warn(pdev,
-> > > +			 "Mapping of BAR%u (offset=%llu, size=%llu) intersecting region (offset=%llu, size=%llu) already exists\n",
-> > > +			 bar_idx, (unsigned long long)mr->offset,
-> > > +			 (unsigned long long)mr->size,
-> > > +			 (unsigned long long)offset, (unsigned long long)size);
-> > > +		return mr->offset <= offset &&
-> > > +		       mr->offset + mr->size >= offset + size;
-> > > +	}
-> > > +
-> > > +	pa = pci_resource_start(pdev, bar_idx) + offset;
-> > > +	va = ioremap(pa, size);
-> 
-> I agree with Bjorn, this certainly looks like something that can be
-> covered by shared PCI infrastructure?
+On Mon, May 18, 2026 at 10:14=E2=80=AFPM Yury M. <yurypm@arista.com> wrote:
+>
+> Yes, mostly this patch is about adding a flag to track the NAPI status
+> to avoid a double release.
 >
 
-I terms of address calculation I agree that pci_iomap_range() could help shrink 
-the code a little bit.
+Thanks Michael. Hi Yuri, you may submit a v2 with a fixes tag? thanks
 
-> > > +	if (!va) {
-> > > +		pci_err(pdev, "Failed to map BAR%u region\n", bar_idx);
-> > > +		return false;
-> > > +	}
-> > > +
-> > > +	mr = kvzalloc_obj(*mr);
-> > > +	if (!mr) {
-> > > +		iounmap(va);
-> > > +		return false;
-> > > +	}
-> > > +
-> > > +	mr->addr = va;
-> > > +	mr->offset = offset;
-> > > +	mr->size = size;
-> > > +	mr->bar_idx = bar_idx;
-> > > +
-> > > +	list_add_tail(&mr->list, &mmio_info->mmio_list);
-> > > +
-> > > +	return true;
-> > > +}
-> > > +EXPORT_SYMBOL_NS_GPL(__libie_pci_map_mmio_region, "LIBIE_PCI");
-> > > +
-> > > +/**
-> > > + * libie_pci_unmap_fltr_regs - unmap selected PCI device MMIO regions
-> > > + * @mmio_info: contains list of MMIO regions to unmap
-> > > + * @fltr: returns true, if region is to be unmapped
-> > > + */
-> > > +void libie_pci_unmap_fltr_regs(struct libie_mmio_info *mmio_info,
-> > > +			       bool (*fltr)(struct libie_mmio_info *mmio_info,
-> > > +					    struct libie_pci_mmio_region *reg))
-> > > +{
-> > > +	struct libie_pci_mmio_region *mr, *tmp;
-> > > +
-> > > +	list_for_each_entry_safe(mr, tmp, &mmio_info->mmio_list, list) {
-> > > +		if (!fltr(mmio_info, mr))
-> > > +			continue;
-> > > +		iounmap(mr->addr);
-> > > +		list_del(&mr->list);
-> > > +		kvfree(mr);
-> > > +	}
-> > > +}
-> > > +EXPORT_SYMBOL_NS_GPL(libie_pci_unmap_fltr_regs, "LIBIE_PCI");
-> > > +
-> > > +/**
-> > > + * libie_pci_unmap_all_mmio_regions - unmap all PCI device MMIO regions
-> > > + * @mmio_info: contains list of MMIO regions to unmap
-> > > + */
-> > > +void libie_pci_unmap_all_mmio_regions(struct libie_mmio_info *mmio_info)
-> > > +{
-> > > +	struct libie_pci_mmio_region *mr, *tmp;
-> > > +
-> > > +	list_for_each_entry_safe(mr, tmp, &mmio_info->mmio_list, list) {
-> > > +		iounmap(mr->addr);
-> > > +		list_del(&mr->list);
-> > > +		kvfree(mr);
-> > > +	}
-> > > +}
-> > > +EXPORT_SYMBOL_NS_GPL(libie_pci_unmap_all_mmio_regions, "LIBIE_PCI");
-> > > +
-> > > +/**
-> > > + * libie_pci_init_dev - enable and reserve PCI regions of the device
-> > > + * @pdev: PCI device information
-> > > + *
-> > > + * Return: %0 on success, -%errno on failure.
-> > > + */
-> > > +int libie_pci_init_dev(struct pci_dev *pdev)
-> > > +{
-> > > +	int err;
-> > > +
-> > > +	err = pcim_enable_device(pdev);
-> > > +	if (err)
-> > > +		return err;
-> > > +
-> > > +	for (int bar = 0; bar < PCI_STD_NUM_BARS; bar++)
-> > > +		if (pci_resource_flags(pdev, bar) & IORESOURCE_MEM) {
-> > > +			err = pcim_request_region(pdev, bar, pci_name(pdev));
-> 
-> So mappings are handled manually, and region requests automatically
-> through devres?
-> 
-> In case you can use (or add) a pcim_iomap_region() function for that,
-> you would get consistent automatic devres management.
-> 
-> 
-> Greetings,
-> P.
-> 
-> > > +			if (err)
-> > > +				return err;
-> > > +		}
-> > > +
-> > > +	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-> > > +	if (err)
-> > > +		return err;
-> > > +
-> > > +	pci_set_master(pdev);
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +EXPORT_SYMBOL_NS_GPL(libie_pci_init_dev, "LIBIE_PCI");
-> > > +
-> > > +MODULE_DESCRIPTION("Common Ethernet PCI library");
-> > > +MODULE_LICENSE("GPL");
-> > > diff --git a/include/linux/intel/libie/pci.h b/include/linux/intel/libie/pci.h
-> > > new file mode 100644
-> > > index 000000000000..effd072c55c8
-> > > --- /dev/null
-> > > +++ b/include/linux/intel/libie/pci.h
-> > > @@ -0,0 +1,56 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > > +/* Copyright (C) 2025 Intel Corporation */
-> > > +
-> > > +#ifndef __LIBIE_PCI_H
-> > > +#define __LIBIE_PCI_H
-> > > +
-> > > +#include <linux/pci.h>
-> > > +
-> > > +/**
-> > > + * struct libie_pci_mmio_region - structure for MMIO region info
-> > > + * @list: used to add a MMIO region to the list of MMIO regions in
-> > > + *	  libie_mmio_info
-> > > + * @addr: virtual address of MMIO region start
-> > > + * @offset: start offset of the MMIO region
-> > > + * @size: size of the MMIO region
-> > > + * @bar_idx: BAR index to which the MMIO region belongs to
-> > > + */
-> > > +struct libie_pci_mmio_region {
-> > > +	struct list_head	list;
-> > > +	void __iomem		*addr;
-> > > +	resource_size_t		offset;
-> > > +	resource_size_t		size;
-> > > +	u16			bar_idx;
-> > > +};
-> > > +
-> > > +/**
-> > > + * struct libie_mmio_info - contains list of MMIO regions
-> > > + * @pdev: PCI device pointer
-> > > + * @mmio_list: list of MMIO regions
-> > > + */
-> > > +struct libie_mmio_info {
-> > > +	struct pci_dev		*pdev;
-> > > +	struct list_head	mmio_list;
-> > > +};
-> > > +
-> > > +#define libie_pci_map_mmio_region(mmio_info, offset, size, ...)	\
-> > > +	__libie_pci_map_mmio_region(mmio_info, offset, size,		\
-> > > +				     COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-> > > +
-> > > +#define libie_pci_get_mmio_addr(mmio_info, offset, ...)		\
-> > > +	__libie_pci_get_mmio_addr(mmio_info, offset,			\
-> > > +				   COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-> > > +
-> > > +bool __libie_pci_map_mmio_region(struct libie_mmio_info *mmio_info,
-> > > +				 resource_size_t offset, resource_size_t size,
-> > > +				 int num_args, ...);
-> > > +void __iomem *__libie_pci_get_mmio_addr(struct libie_mmio_info *mmio_info,
-> > > +					resource_size_t offset,
-> > > +					int num_args, ...);
-> > > +void libie_pci_unmap_all_mmio_regions(struct libie_mmio_info *mmio_info);
-> > > +void libie_pci_unmap_fltr_regs(struct libie_mmio_info *mmio_info,
-> > > +			       bool (*fltr)(struct libie_mmio_info *mmio_info,
-> > > +					    struct libie_pci_mmio_region *reg));
-> > > +int libie_pci_init_dev(struct pci_dev *pdev);
-> > > +
-> > > +#endif /* __LIBIE_PCI_H */
-> > > -- 
-> > > 2.47.1
-> > > 
-> 
+> On 5/18/26 17:27, Michael Chan wrote:
+> > On Mon, May 18, 2026 at 8:43=E2=80=AFAM Pavan Chebbi <pavan.chebbi@broa=
+dcom.com> wrote:
+> >
+> >> I am not sure if we should allow this fix for what I think is a
+> >> situation arising out of an unsupported topology..
+> >> I will defer this to Michael or netdev maintainers for their feedback.
+> > If the question is about adding a driver flag to keep track of the
+> > NAPI state, I think it should be ok.  bnxt has a similar
+> > BNXT_STATE_NAPI_DISABLED flag for this purpose.
+
+--0000000000007089ea065228df76
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
+ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
+NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
+MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
+miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
+QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
+Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
+CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
+jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
+6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
+PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
+eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
+Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
+a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCjiMHg
+HUU4avndlslIVbM05R1KSGKUmQ0H+dcmA+sJ0zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA1MTkxMDA5MjFaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQArR0u2jZpgvOcu/TYQ1LY1N44wioKLjdqxUmzeLCyo
+/KvzOWQbVa+2hISpF+bOTYh1CVEsyWGBCFWFvytXurCGKwAXXY/OuFYer0tqtGOS9/Rp4lKsdy3/
+sZbu4S6HFId7bOD/fDBvkJUTTP2tpc55uPrQfj6eg8Xg8vibNQi0nDAJqyx8x4BFTY8IsO/cbNUO
+Z/pzvssXpAKW1MQWvjVhc2qHZdE9Rmadj7/5kJMtSOU8n0dSPsdlLEcvRseDSeIsdcN+OpCHRiPk
+hnR0vHBBvL4pA9RLeMAQLPlzV1ulZPoReLJB0PZiRWSEKn3LAMG7bFx6SFg7iukwQMHhKntb
+--0000000000007089ea065228df76--
 
