@@ -1,287 +1,282 @@
-Return-Path: <netdev+bounces-289502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289503-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oINAAGmKDGo1iwUAu9opvQ
-	(envelope-from <netdev+bounces-289502-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:06:01 +0200
+	id ODt7IISKDGo1iwUAu9opvQ
+	(envelope-from <netdev+bounces-289503-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:06:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5991F581EFD
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:06:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE457581F14
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 18:06:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E27FF3150758
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:32:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 175C431793BF
+	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 15:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3080640801F;
-	Tue, 19 May 2026 15:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A7E23C4F3;
+	Tue, 19 May 2026 15:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="GdZnXjes";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ASW8MmXx"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="LhwxbXK1"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B149E40800A
-	for <netdev@vger.kernel.org>; Tue, 19 May 2026 15:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB581A3172
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 15:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779204742; cv=none; b=F12BkY9ocQu9+2DTgX3g0cLAyFbdSQyOtfUK+wYvuifURqrM2M2bZT3YKa+4/QU+WbWEDMm9TU3bz0uVtIASSzq0Y0ijFiSifqJeoZmqaLXXSgYDfUbiU1isfcPF8YMoc5dA0XBFVOGv2XMaaLMCbeTuF9apdmUUt5wcvry+UVM=
+	t=1779204761; cv=none; b=GArAVH4pHBYJ/JnrufcajYo7ALsr6iCtp5ZJ28qROB4ywUdqTwoXXRnQghEF6cRxVlwGk629Vxqfz7CxRg6EMm+PbH6Pnqk1Xkw4GlJ5fysksKy96UnxrBI6zMIFIXJPLcwhNMDyzwjBArqr74Oxpi8KiRbqQWIJ/LVBh1EDIkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779204742; c=relaxed/simple;
-	bh=tPghhxRJnB0jjLAb8HJXB8ewuPlR6939Iw61y0yT4oo=;
-	h=From:To:Cc:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VY5VAeQAhdsetTZn/Z+aywa3FTlyFcp0h7ihYQ4WE9e50UjCoYuDQvkWErbVaqKb3VZKCvUW5mWY2s6wVDdQPR5B/cxqLWhEGJ2d5ZeV1pzZwpsGw6OImO1SBB4oZtmJqvriP7ClfkmElN9LMTTjpD2gc6k7+SeUerhk3BnqNIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=fail (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=GdZnXjes reason="signature verification failed"; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ASW8MmXx; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1779204739;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Oa2bh2GId8P8GQWr0oWiZRdrWAPUGjG0feRgRc6k0k=;
-	b=GdZnXjesawKtENYnBwUdJ4w5BmtIAWfTB2R2BD5Jst7ReZXdftvQ+1Vs/xcqVHshdKyTk3
-	6eI+EZ/UTrRVC3FZReRVb+g4kaGDEUbwotxT0vUlUanXXP9g4x5HOgz3URMv070QCJMXcG
-	rvpEn2NTZHbKd1pwolah0fT99GJ4RTyGb3cw7kmRXmgH2KVChn2SHR6svd6PtmjQ1N7N/P
-	SddU8BFiavgXo2WJ8dXHqThEgFNw2sD+TdIBM70bKBI511RB3yclphY9KClnwBLsRgd+eR
-	+h7OP7UrDqZVTU3x5khXPPGaW616JsxdToPOQ4PeZS79PD0OrkBHISpjM4z8fg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1779204739;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Oa2bh2GId8P8GQWr0oWiZRdrWAPUGjG0feRgRc6k0k=;
-	b=ASW8MmXxPoHlIvhkJwGuHM0hyYmGcqPWEtQNVPLkdCU/9rZMsF0PgE+1LPwWn5t11WZMv6
-	d/S/h5G5BDAVHLCw==
-To: Florian Zeitz <florian.zeitz@schettke.com>, yangbo.lu@nxp.com
-Cc: =?utf-8?B?w43DsWlnbw==?= Huguet <ihuguet@redhat.com>, Richard Cochran
- <richardcochran@gmail.com>, Miroslav Lichvar <mlichvar@redhat.com>, Blanco
- Alcaine Hector <hector.blanco.alcaine@intel.com>, "Christopher S. Hall"
- <christopher.s.hall@intel.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org
-Subject: Re: ptp_vclock bug: Obtaining a mutex during RCU lock
-In-Reply-To: <00a8cce8-410e-4038-98af-49be6d93d7bd@schettke.com>
-References: <00a8cce8-410e-4038-98af-49be6d93d7bd@schettke.com>
-Date: Tue, 19 May 2026 17:32:17 +0200
-Message-ID: <87lddf2z5q.fsf@jax.kurt.home>
+	s=arc-20240116; t=1779204761; c=relaxed/simple;
+	bh=Ax590YbqXYIAmnaGMKl7FSUvi1v38AH/AztU4zuuBM8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LTXO/a/c84Ext/+i7OJ6hd6UFLKC0mouPltE5p9C/GSRtOz8hhT/jQs96N4ZMShHzgcLKEG+gfDKUfxwuiA1+pMRZDvG3kAgP0UrqwxN9E4up9OqV1nIcanYvH/hDiRpq3JfkHPWA41fm+234meaqrA+spQdGUoLqS1oga60CBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=LhwxbXK1; arc=none smtp.client-ip=209.85.167.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-479ef2b78f3so3564857b6e.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 08:32:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1779204759; x=1779809559; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OMgg3DcMPG/CkFUdDvWT7P0SoXNm1HcPg5ezYHCRXcs=;
+        b=LhwxbXK19yCgd8YZ23YM3Z/oBn4nXz/TJLcA+m5W65YjBwhi3iPoEmacQvginZh4+M
+         4bKYxPpxEeiipCJOiUmlGDwFAmt1526G2zAABZ19nR9DnrVowNdEQ59LZEEmrq7fkSSK
+         g7SSotT14tPQnTP3PCebckEsgtmfGuAFkqGqysgkSp7oUi5KUnkWc+Q/AOynwTRP7o8x
+         NeLomN4euX3EB8EvIt/HTh4jSOjRLKMvoCN+knzS3C/UYDJnfVHDEWFL8KQJdWLCERSQ
+         mCHpxCh7gHwcZ2jYUuL1gTBx9kS+UUJh7z1qjr/3A/4DPUUPKZiSMIPoQpIyBwaoNFib
+         H/Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779204759; x=1779809559;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OMgg3DcMPG/CkFUdDvWT7P0SoXNm1HcPg5ezYHCRXcs=;
+        b=WDvOr3LtUqaPSGtOTOd8tKSSikZZ8OF1AVPJwrZXvP/RuuKnoUZVEQ6wnxSOcjwlQH
+         wGag235LMUCmEtcnhyJ4/ZHi34tDwCFKkhjYmCBW7pf6pfr1kctyo9Yi5bJMgOR+M/vl
+         mdF7vNPdSKC45Bpt6JlylNQUjv9c7Z+iUMfQ7YE6IPEEPnqyiPjtCB3nfZVDhz78QTTP
+         o7q5WW0Ds49pupbkdaclJhA5QpdULYT7dIlV4KZSU4O3J/v1a11R8u1XWGyHqoAFHB2q
+         m20MDllpCXo0ucnrzFcXfsPk5aki6ZYwx+q2BQ6PLK/x99lyidRcC5T6o2us5Utqfy0s
+         R1pw==
+X-Forwarded-Encrypted: i=1; AFNElJ/3KUTRsM5KZASwaBb90RCdVjQzyvXzGwDkD6wYhmedjtoBX55QJHf5yt0u/hl4uChU22/zNgY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx162+Xd6/R+m93BleInLdnIWNG1On57Lw4mMPqxe8QuJGSZxbk
+	7x+f4YjmcRHQ6hhuVUqmEI2xu9BKDwdZoMOA13zwLfe0y3HiD9JGNxnJ8tIV2IXsWsw=
+X-Gm-Gg: Acq92OEVB5QxWdSCirEhPZVwo9UPHzFrKTs7E8LPk2YLArbdKycc9Z3b+t8fJCskz9S
+	4BUbu3Pqdgm5TUK6+xBkgpF9/I3FJQ0lgb4fS3DJ70tL5//xrOEd/q3NfTyhZ+3th6Fy6BHRGXV
+	zvrA4kaUVWjM4lXqloR2KCAHIKzCkMRKN/n8UhfIMdTlj8X9iL6vvUtaDQP6bZCN/U1Sbk7g2zT
+	q93TTPWz6QgkmbkxNfF7aVGDVg7DLBeLvZHgHbMgznvGn/1lgQ0pTu65Ft2DX7jhqwr1zUZzb6i
+	BJW3ud7hLjV1rGFGRnZwAKP1sCZDHRoUp/oTd7UNbTmzPu0NATGxwIw1pCa3KsQ9kEvm0Q24DH3
+	iATxKVtGjw6FsrWSNXACkmhSb00eYMK3WpVnZFCg3x/l2c6TGkpJN9YMZgWD3c51Nf/MMTgFerw
+	fWC+Z09/L3a8+E/dmAESgyqa2eu5IOlDo7haXFmoD3sjj6EOvAyFZ734m8u9h0nIS9ZaRk11CWK
+	GGIzw==
+X-Received: by 2002:a05:6809:251:10b0:484:c3b5:9b11 with SMTP id 5614622812f47-484c3b5a183mr4889324b6e.36.1779204758974;
+        Tue, 19 May 2026 08:32:38 -0700 (PDT)
+Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5164585cf66sm170094531cf.30.2026.05.19.08.32.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 08:32:38 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1wPMQv-0000000FCii-39HS;
+	Tue, 19 May 2026 12:32:37 -0300
+Date: Tue, 19 May 2026 12:32:37 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH mlx5-next] net/mlx5: Consolidate UAR index to PFN helpers
+Message-ID: <20260519153237.GN7702@ziepe.ca>
+References: <20260519-mlx5-uar-index-v1-1-1027ae724bff@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-X-Spamd-Result: default: False [0.74 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	R_DKIM_REJECT(1.00)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	MULTIPLE_UNIQUE_HEADERS(0.70)[Cc];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260519-mlx5-uar-index-v1-1-1027ae724bff@nvidia.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[linutronix.de : SPF not aligned (relaxed),none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	TAGGED_FROM(0.00)[bounces-289502-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289503-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,intel.com,linutronix.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:-];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DMARC_NA(0.00)[ziepe.ca];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 5991F581EFD
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: DE457581F14
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Tue, May 19, 2026 at 06:08:18PM +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> mlx5_core's uar2pfn() and mlx5_ib's uar_index2pfn() compute the same
+> value via slightly different idioms.  Given:
+> 
+>   MLX5_ADAPTER_PAGE_SHIFT = 12
+>   MLX5_UARS_IN_PAGE       = PAGE_SIZE / MLX5_ADAPTER_PAGE_SIZE
+>                           = 1 << (PAGE_SHIFT - 12)
+> 
+> when uar_4k is set, uar2pfn()'s "index >> (PAGE_SHIFT - 12)" reduces to
+> "index / MLX5_UARS_IN_PAGE", which is exactly what uar_index2pfn() does.
+> When uar_4k is clear, both fall through to the identity case.  The same
+> arithmetic is also open-coded a third time in uar_index2paddress(), which
+> just multiplies the result by PAGE_SIZE.
+> 
+> The duplication is historical: uar_index2pfn() landed with the original
+> mlx5_ib driver in 2013 (e126ba97dba9), uar2pfn() was added in 2017
+> (a6d51b68611e) when the bfreg allocator moved into mlx5_core, and no
+> shared header ever exposed the helper.  The two were last touched in
+> parallel by aa8106f137b9 ("net/mlx5: Add explicit bar address field"),
+> confirming they are meant to behave identically.
+> 
+> Replace all three local copies with two static inlines in
+> include/linux/mlx5/driver.h returning phys_addr_t, which is the
+> appropriate type for a value that subsequently feeds ioremap*() and
+> rdma_user_mmap_io().  No functional change.
+> 
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+> mlx5_core's uar2pfn() and mlx5_ib's uar_index2pfn() compute the same
+> value via slightly different idioms. Let's consolidate them.
+> ---
+>  drivers/infiniband/hw/mlx5/main.c             | 25 ++-----------------------
+>  drivers/net/ethernet/mellanox/mlx5/core/uar.c | 14 +-------------
+>  include/linux/mlx5/driver.h                   | 16 ++++++++++++++++
+>  3 files changed, 19 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
+> index 428811fa805b..e61db29bc166 100644
+> --- a/drivers/infiniband/hw/mlx5/main.c
+> +++ b/drivers/infiniband/hw/mlx5/main.c
+> @@ -2373,27 +2373,6 @@ static void mlx5_ib_dealloc_ucontext(struct ib_ucontext *ibcontext)
+>  	}
+>  }
+>  
+> -static phys_addr_t uar_index2pfn(struct mlx5_ib_dev *dev,
+> -				 int uar_idx)
+> -{
+> -	int fw_uars_per_page;
+> -
+> -	fw_uars_per_page = MLX5_CAP_GEN(dev->mdev, uar_4k) ? MLX5_UARS_IN_PAGE : 1;
+> -
+> -	return (dev->mdev->bar_addr >> PAGE_SHIFT) + uar_idx / fw_uars_per_page;
+> -}
+> -
+> -static u64 uar_index2paddress(struct mlx5_ib_dev *dev,
+> -				 int uar_idx)
+> -{
+> -	unsigned int fw_uars_per_page;
+> -
+> -	fw_uars_per_page = MLX5_CAP_GEN(dev->mdev, uar_4k) ?
+> -				MLX5_UARS_IN_PAGE : 1;
+> -
+> -	return (dev->mdev->bar_addr + (uar_idx / fw_uars_per_page) * PAGE_SIZE);
+> -}
+> -
+>  static int get_command(unsigned long offset)
+>  {
+>  	return (offset >> MLX5_IB_MMAP_CMD_SHIFT) & MLX5_IB_MMAP_CMD_MASK;
+> @@ -2643,7 +2622,7 @@ static int uar_mmap(struct mlx5_ib_dev *dev, enum mlx5_ib_mmap_cmd cmd,
+>  		uar_index = bfregi->sys_pages[idx];
+>  	}
+>  
+> -	pfn = uar_index2pfn(dev, uar_index);
+> +	pfn = mlx5_uar_index_to_pfn(dev->mdev, uar_index);
+>  	mlx5_ib_dbg(dev, "uar idx 0x%lx, pfn %pa\n", idx, &pfn);
+>
+>  	err = rdma_user_mmap_io(&context->ibucontext, vma, pfn, PAGE_SIZE,
+> @@ -4327,7 +4306,7 @@ alloc_uar_entry(struct mlx5_ib_ucontext *c,
+>  		goto end;
+>  
+>  	entry->page_idx = uar_index;
+> -	entry->address = uar_index2paddress(dev, uar_index);
+> +	entry->address = mlx5_uar_index_to_paddr(dev->mdev, uar_index);
+>  	if (alloc_type == MLX5_IB_UAPI_UAR_ALLOC_TYPE_BF)
+>  		entry->mmap_flag = MLX5_IB_MMAP_TYPE_UAR_WC;
+>  	else
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/uar.c b/drivers/net/ethernet/mellanox/mlx5/core/uar.c
+> index 1513112ecec8..a85d8fed1546 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/uar.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/uar.c
+> @@ -66,18 +66,6 @@ static int uars_per_sys_page(struct mlx5_core_dev *mdev)
+>  	return 1;
+>  }
+>  
+> -static u64 uar2pfn(struct mlx5_core_dev *mdev, u32 index)
+> -{
+> -	u32 system_page_index;
+> -
+> -	if (MLX5_CAP_GEN(mdev, uar_4k))
+> -		system_page_index = index >> (PAGE_SHIFT - MLX5_ADAPTER_PAGE_SHIFT);
+> -	else
+> -		system_page_index = index;
+> -
+> -	return (mdev->bar_addr >> PAGE_SHIFT) + system_page_index;
+> -}
+> -
+>  static void up_rel_func(struct kref *kref)
+>  {
+>  	struct mlx5_uars_page *up = container_of(kref, struct mlx5_uars_page, ref_count);
+> @@ -132,7 +120,7 @@ static struct mlx5_uars_page *alloc_uars_page(struct mlx5_core_dev *mdev,
+>  		goto error1;
+>  	}
+>  
+> -	pfn = uar2pfn(mdev, up->index);
+> +	pfn = mlx5_uar_index_to_pfn(mdev, up->index);
+>  	if (map_wc) {
+>  		up->map = ioremap_wc(pfn << PAGE_SHIFT, PAGE_SIZE);
 
-Hi,
+The only places using PFN here immediately shift it, this should be
+using mlx5_uar_index_to_paddr()
 
-On Tue Jun 03 2025, Florian Zeitz wrote:
-> Hi,
->
-> I believe I have found a bug in the PTP vclock implementation.
->
-> Occasionally, when running ptp4l and phc2sys on a virtual clock, I=20
-> encounter the following warning from within the ptp4l process (full=20
-> backtrace below):
-> "Voluntary context switch within RCU read-side critical section!"
->
-> As the backtrace shows the warning originates from=20
-> `ptp_convert_timestamp()` in drivers/ptp/ptp_vclock.c, specifically line=
-=20
-> 203 where `mutex_lock_interruptible()` is called inside an RCU read-side=
-=20
-> critical section.
-> Having read up on RCU, it seems to me that trying to obtain a mutex=20
-> during an RCU lock is generally not allowed and voids the RCU lock=20
-> should scheduling happen.
->
-> This can occur whenever a timestamped packet is received while the mutex=
-=20
-> is still held by another call, in my case `ptp_vclock_gettime()`.
 
-Yes. We're seeing exactly the same issue. Using a mutex in a RCU read
-lock section is not allowed. Commit 67d93ffc0f3c ("ptp: vclock: use
-mutex to fix "sleep on atomic" bug") introduced the mutex in the first
-place.
+> +static inline phys_addr_t mlx5_uar_index_to_pfn(struct mlx5_core_dev *mdev,
+> +						u32 uar_idx)
+> +{
+> +	u32 fw_uars_per_page = MLX5_CAP_GEN(mdev, uar_4k) ? MLX5_UARS_IN_PAGE : 1;
+> +
+> +	return (mdev->bar_addr >> PAGE_SHIFT) + uar_idx / fw_uars_per_page;
+> +}
+> +
+> +static inline phys_addr_t mlx5_uar_index_to_paddr(struct mlx5_core_dev *mdev,
+> +						  u32 uar_idx)
+> +{
+> +	u32 fw_uars_per_page = MLX5_CAP_GEN(mdev, uar_4k) ? MLX5_UARS_IN_PAGE : 1;
+> +
+> +	return mdev->bar_addr + (uar_idx / fw_uars_per_page) * PAGE_SIZE;
+> +}
 
-Adding a few more people to Cc and keeping the context intact.
+Then there is only one caller of the pfn version in uar_mmap which can
+just be written using phys and open code the >> PAGE_SHIFT
 
-Any idea how to solve this? For example, using SRCU instead? Reverting
-the commit in question?
+No reason to duplicate this
 
-Thanks,
-Kurt
-
-> To make this easier to reproduce, I've written a small test program that=
-=20
-> triggers frequent locking:
-> ```c
-> #define _GNU_SOURCE
->
-> #include <fcntl.h>
-> #include <sys/stat.h>
-> #include <sys/timex.h>
-> #include <time.h>
->
-> #define CLOCKFD 3
-> #define FD_TO_CLOCKID(fd) ((~(clockid_t)(fd) << 3) | CLOCKFD)
->
-> int main(void) {
->    struct timespec time;
->    struct timex tmx =3D {0};
->
->    int fd =3D open("/dev/ptp1", O_RDWR);
->    clockid_t clock =3D FD_TO_CLOCKID(fd);
->
->    while (1) {
->      clock_gettime(clock, &time);
->      clock_adjtime(clock, &tmx);
->    }
-> }
-> ```
->
-> Running this in parallel with ptp4l (in a gPTP setup, which sends SYNC=20
-> messages at a higher rate than the default profile) typically reproduces=
-=20
-> the issue within a few minutes.
->
-> Best Regards,
->
-> Florian Zeitz
->
-> ```
-> [ 1084.825057] ------------[ cut here ]------------
-> [ 1084.825072] Voluntary context switch within RCU read-side critical=20
-> section!
-> [ 1084.825091] WARNING: CPU: 1 PID: 677 at kernel/rcu/tree_plugin.h:331=20
-> rcu_note_context_switch+0x4e4/0x
-> 530
-> [ 1084.825118] Modules linked in: rfkill rtc_pcf85063 regmap_i2c emc2305=
-=20
-> v3d vc4 snd_soc_hdmi_codec binf
-> mt_misc gpu_sched drm_display_helper cec drm_shmem_helper drm_dma_helper=
-=20
-> bcm2835_codec(C) bcm2835_isp(C) rpi_hevc_dec bcm2835_v4l2(C)=20
-> snd_soc_core drm_kms_helper bcm2835_mmal_vchiq(C) videobuf2_vmalloc=20
-> snd_compress vc_sm_cma(C) v4l2_mem2mem snd_pcm_dmaengine=20
-> videobuf2_dma_contig raspberrypi_hwmon i2c_mux_pinctrl videobuf2_memops=20
-> videobuf2_v4l2 i2c_mux videodev snd_bcm2835(C) i2c_brcmstb snd_pcm=20
-> snd_timer raspberrypi_gpiomem i2c_bcm2835 videobuf2_common mc snd=20
-> pps_gpio nvmem_rmem uio_pdrv_genirq uio drm fuse=20
-> drm_panel_orientation_quirks backlight dm_mod ip_tables x_tables ipv6
-> [ 1084.825259] CPU: 1 UID: 0 PID: 677 Comm: ptp4l Tainted: G         C=20
->        6.12.30-v8-ptpfix+ #2
-> [ 1084.825269] Tainted: [C]=3DCRAP
-> [ 1084.825272] Hardware name: Raspberry Pi Compute Module 4 Rev 1.1 (DT)
-> [ 1084.825277] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS=20
-> BTYPE=3D--)
-> [ 1084.825283] pc : rcu_note_context_switch+0x4e4/0x530
-> [ 1084.825291] lr : rcu_note_context_switch+0x4e4/0x530
-> [ 1084.825298] sp : ffffffc08162b7e0
-> [ 1084.825302] x29: ffffffc08162b7e0 x28: ffffff8046414200 x27:=20
-> ffffff807fb78c40
-> [ 1084.825313] x26: 0000000000000001 x25: 0000000000000000 x24:=20
-> 0000000000000000
-> [ 1084.825324] x23: ffffff8046414200 x22: 0000000000000000 x21:=20
-> ffffff8046414200
-> [ 1084.825335] x20: 0000000000000000 x19: ffffff807fb79a40 x18:=20
-> 0000000000000000
-> [ 1084.825345] x17: 0000000000000000 x16: 0000000000000000 x15:=20
-> 0000000000000000
-> [ 1084.825355] x14: fffffffffffc78ef x13: 216e6f6974636573 x12:=20
-> 206c616369746972
-> [ 1084.825365] x11: ffffffd7ed4c54f8 x10: 00000000000001a8 x9 :=20
-> ffffffd7ec11e494
-> [ 1084.825375] x8 : 0000000000017fe8 x7 : 00000000fffff1a7 x6 :=20
-> ffffffd7ed51d4f8
-> [ 1084.825386] x5 : ffffff807fb663c8 x4 : 0000000000000000 x3 :=20
-> 0000000000000027
-> [ 1084.825396] x2 : 0000000000000000 x1 : 0000000000000000 x0 :=20
-> ffffff8046414200
-> [ 1084.825406] Call trace:
-> [ 1084.825410]  rcu_note_context_switch+0x4e4/0x530
-> [ 1084.825418]  __schedule+0xac/0xb58
-> [ 1084.825425]  schedule+0x3c/0x150
-> [ 1084.825429]  schedule_preempt_disabled+0x2c/0x58
-> [ 1084.825435]  __mutex_lock.constprop.0+0x464/0x940
-> [ 1084.825440]  __mutex_lock_interruptible_slowpath+0x1c/0x30
-> [ 1084.825446]  mutex_lock_interruptible+0x68/0x80
-> [ 1084.825452]  ptp_convert_timestamp+0x8c/0xd0
-> [ 1084.825459]  __sock_recv_timestamp+0x2f0/0x490
-> [ 1084.825466]  __sock_recv_cmsgs+0x5c/0x168
-> [ 1084.825472]  packet_recvmsg+0x130/0x540
-> [ 1084.825482]  sock_recvmsg+0x78/0xd0
-> [ 1084.825487]  ____sys_recvmsg+0xb0/0x250
-> [ 1084.825494]  ___sys_recvmsg+0xd8/0x100
-> [ 1084.825500]  __sys_recvmsg+0x8c/0x100
-> [ 1084.825507]  __arm64_sys_recvmsg+0x2c/0x40
-> [ 1084.825513]  invoke_syscall+0x50/0x120
-> [ 1084.825522]  el0_svc_common.constprop.0+0x48/0xf0
-> [ 1084.825529]  do_el0_svc+0x24/0x38
-> [ 1084.825536]  el0_svc+0x30/0xd0
-> [ 1084.825543]  el0t_64_sync_handler+0x120/0x130
-> [ 1084.825550]  el0t_64_sync+0x190/0x198
-> [ 1084.825556] ---[ end trace 0000000000000000 ]---
-> ```
->
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmoMgoETHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgu/zD/95+kjscu9/jZqzMYaOULsthQoLc5ez
-qa1kMH0pu429ebFqfB07qNhVjup8L7tdDFrd3SgpPgtqvkjrCrb/I419q+nt0zix
-4plJNWphDUoRc6CivHPBPq9CtR/GpSiUXMkHz7+CaJsgdocZypr7m+sKACLC/ZvV
-P/QZ8+75SK0BASdWlO97D4VqzWAmrzluKjNx6Vn7u+qh8vZeo7Ewjcoy5Syc//6g
-AtD+B4R2QTF5AzLDXPBxm+VbMN97ZyY+geH/R28o6F9e5R0RTMH5wwdkVXrmAW9O
-ih8GOhpf3UczMuFIiLsXUaPANFqG5Ph6bYKYgrnFnkS+tjsgi1TD5nQ2Pa9HNvBU
-7K4HEUxIMcFOm0tOsW4dh3tH5kc+YkqIWRijLkQwD8SE/mir0M+FnXKhvqy6jDYh
-hE7he0mmjEUIf+htm7kRrgAxrh3wAQ9wthiRIYcCtP07H1r04qH8fJ5wZ8J6pbmW
-yYaZEpbTFG+i3gI9hLQBb/vJKcIgM92sIIl9AZOhhgR0fSO8gn31UKbLKezXHKC1
-0V6/84dTWFjsm1t7hF8+TfIgUpkMqorZCYaejr33303Jbnw8+OW+o83shnaweH9U
-ed8AWikzwv4H4vozq7NZg+eBEPJ4GWxLIvPOX/xjFr2IhL1THEPRqRnXOvK7Ojvx
-xBjaOuf6bA9t3Q==
-=YxOW
------END PGP SIGNATURE-----
---=-=-=--
+Jason
 
