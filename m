@@ -1,389 +1,113 @@
-Return-Path: <netdev+bounces-289899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4GDZEjibDWoU0AUAu9opvQ
-	(envelope-from <netdev+bounces-289899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:30:00 +0200
+	id WCBlMQWZDWrKzwUAu9opvQ
+	(envelope-from <netdev+bounces-289892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:20:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4960058C764
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:29:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A2F758C43A
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:20:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 19A79308362C
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:22:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A9E983047E87
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280703E2ABF;
-	Wed, 20 May 2026 11:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpJCoZl2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4D3371063;
+	Wed, 20 May 2026 11:18:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B787F3E0C4D;
-	Wed, 20 May 2026 11:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D3F39C636;
+	Wed, 20 May 2026 11:18:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779276019; cv=none; b=l3b4S5z6wqrTIVGafxeeY6cW2yR9xUMf59yDGHNcmWh94kBuC+wh6DrjJjhnDScVUp3nervXfjxQhWCA97u0Pcxg7GijcL5sTN9Uhp968hynAp1FWrTwHx/zRdrrOxhayVSLpxuqnG3xiRkl9zU6jJ4/wsfYtDqDwvrttiySYLA=
+	t=1779275937; cv=none; b=ay53chJmYCF9m8sY+HBLjjVWN5aIlEueVpDnHqRJElF8VcPIMd0H+XhFeengLZVdJSXju3dhfAXV16l8dergfxnBNDCnjethKU9dmVaDhf8nku/7R5rxPzuocCv4QvWU0BVv/IvqPkPBR2kEMM9nS7HX17gb9taKJaKTU6YSCGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779276019; c=relaxed/simple;
-	bh=Zn4J0fHdy3xfzUz38tOmseZcZesPxgZvA1MCNOqyk+A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lDSD9tmgrETvVKsmVw1OcqcY7LH5fKZ+WO4jNRiz5B7Np8Fem3kYXQuxrEzP/ISCngw0/FYTjfvf9zL61xaEnmmKMYQ/NOEZc38GUjRdND9z5OHsdJMLAeYKkockhApL8KhnKl8IF32yFUXxB3pk0NV4R+qXOnlvwxZLifNs3Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpJCoZl2; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0A1B1F00893;
-	Wed, 20 May 2026 11:20:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779276014;
-	bh=XALIm2Iuwc7MsCYWith74rhgd3QLLhfXeWK1lqtsaxQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fpJCoZl2QBrLX0Z4G5TJF6nsQz3aN2V0gZIooY6tB+/ID+nOnClLOWYdWjN02RZOF
-	 kgI83q3GWGM25cVcXBCYaffMNANArdcSPG6iXt16KV0M6Xm180F6SRM0ejrAcLf9g3
-	 PRpa64sj2l5pchHx5ds52LMrsg/ACnbsZCXw8JHMXrj62xVjAdRw6lTowDHd4ZuPfi
-	 bZkK3Bz0DDOMmhCv9tGPd3hRo7/9Dlmd1zgO2vbP4i3zfemRCSjxn/FVREjCh1s9nz
-	 a0EMd+oAotqj5cHSHR5vChpHoTvHjri5J8EGi8VV5RUdx03gzs4VzJ3YdfXjCILEiv
-	 O6oskaVgLZ9bw==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Birger Koblitz <mail@birger-koblitz.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-5.15] net: usb: r8152: add TRENDnet TUC-ET2G v2.0
-Date: Wed, 20 May 2026 07:18:52 -0400
-Message-ID: <20260520111944.3424570-20-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260520111944.3424570-1-sashal@kernel.org>
-References: <20260520111944.3424570-1-sashal@kernel.org>
+	s=arc-20240116; t=1779275937; c=relaxed/simple;
+	bh=rhroXm6SCr/NQ8PxGDprYub37B17PaAS4WvIeJrIifg=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Yr6/6S+j+B1BtJeEAH6RypOlrIz1uSjeI2NIwlU0u0WSwourivIm+ZoOP9chqUVJ/Tm6CfbkyCsS3jToPmPP1uprBLyNLBkZ5eTBZz61siQrcPb7UdlPTXdT+ryPmP1SzbrIv4nyhjp9uU9vMk05PDi2AD/OcqtkXShwNTSBtOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id 9985192009E; Wed, 20 May 2026 13:18:53 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id 92B5692009B;
+	Wed, 20 May 2026 12:18:53 +0100 (BST)
+Date: Wed, 20 May 2026 12:18:53 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>
+cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net 2/5] ethernet: 3c509: Fix AUI transceiver type
+ selection
+In-Reply-To: <alpine.DEB.2.21.2605201115010.1450@angie.orcam.me.uk>
+Message-ID: <alpine.DEB.2.21.2605201205160.1450@angie.orcam.me.uk>
+References: <alpine.DEB.2.21.2605201115010.1450@angie.orcam.me.uk>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 7.0.9
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289899-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[wp.pl,lunn.ch,birger-koblitz.de,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289892-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DMARC_NA(0.00)[orcam.me.uk];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[wp.pl:email,birger-koblitz.de:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lunn.ch:email,msgid.link:url]
-X-Rspamd-Queue-Id: 4960058C764
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[angie.orcam.me.uk:mid,orcam.me.uk:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 3A2F758C43A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
+The transceiver type is held in bits 15:14 of the Address Configuration
+Register, with the values of 0b00, 0b01, and 0b11 denoting TP, AUI, and
+BNC types respectively.  Therefore switching from BNC to AUI requires
+bits to be cleared before setting bit 14 or the setting won't change.
 
-[ Upstream commit f93836b236773862e9ee268a82e3614caf77ea01 ]
+NB this has always been wrong ever since this code was added in 2.5.42.
 
-The TRENDnet TUC-ET2G V2.0 is an RTL8156B based 2.5G Ethernet controller.
-
-Add the vendor and product ID values to the driver. This makes Ethernet
-work with the adapter.
-
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Birger Koblitz <mail@birger-koblitz.de>
-Link: https://patch.msgid.link/20260430213435.21821-1-olek2@wp.pl
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
 ---
-
-LLM Generated explanations, may be completely bogus:
-
-## Phase 1: Commit Message Forensics
-Step 1.1 Record: Subsystem `net: usb: r8152`; action verb `add`; claimed
-intent: add TRENDnet TUC-ET2G v2.0 USB device ID so the existing `r8152`
-driver binds to the adapter.
-
-Step 1.2 Record: Tags present:
-- `Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>`
-- `Reviewed-by: Andrew Lunn <andrew@lunn.ch>`
-- `Reviewed-by: Birger Koblitz <mail@birger-koblitz.de>`
-- `Link: https://patch.msgid.link/20260430213435.21821-1-olek2@wp.pl`
-- `Signed-off-by: Jakub Kicinski <kuba@kernel.org>`
-
-No `Fixes:`, `Reported-by:`, `Tested-by:`, or `Cc:
-stable@vger.kernel.org` tag was present. Absence of those tags is not a
-negative signal here.
-
-Step 1.3 Record: The body describes a real hardware support failure:
-TRENDnet TUC-ET2G V2.0 is RTL8156B-based, but without its USB
-vendor/product ID in `rtl8152_table`, Ethernet does not work with that
-adapter. No affected kernel versions are named.
-
-Step 1.4 Record: This is not a hidden memory/synchronization bug. It is
-an explicit new USB device ID addition to an existing driver, which is a
-stable exception category.
-
-## Phase 2: Diff Analysis
-Step 2.1 Record: One file changed: `drivers/net/usb/r8152.c`, `+1/-0`.
-No function body changed. The modified object is `rtl8152_table`. Scope:
-single-file surgical device-ID addition.
-
-Step 2.2 Record: Before the change, the table contained TRENDnet
-`0xe02b` but not `0xe02c`, so USB matching would not select `r8152` for
-`20f4:e02c`. After the change, `USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02c)`
-is matched by the driver table used by both `rtl8152_driver.id_table`
-and `rtl8152_cfgselector_driver.id_table`.
-
-Step 2.3 Record: Bug category is hardware enablement / USB device ID
-addition. It does not touch error paths, locking, reference counts,
-memory safety, or public APIs.
-
-Step 2.4 Record: The fix is obviously correct if the ID maps to RTL8156B
-hardware. I verified the device identity externally: WikiDevi lists TUC-
-ET2G v2.0R as USB ID `20f4:e02c` with Realtek RTL8156B, and TRENDnet’s
-own support page confirms the TUC-ET2G v2 product. Regression risk is
-very low; existing devices are unaffected unless another incompatible
-device uses the same exact USB ID.
-
-## Phase 3: Git History Investigation
-Step 3.1 Record: `git blame` around the table showed the existing
-TRENDnet `0xe02b` entry came from `15fba71533bc` and the new `0xe02c`
-line comes from `f93836b23677`. The table terminator dates back to
-`ac718b69301c`. The “bug” is not introduced by a code commit; it is the
-absence of a product-specific ID for existing supported silicon.
-
-Step 3.2 Record: No `Fixes:` tag, so there is no introducing commit to
-follow.
-
-Step 3.3 Record: Recent related history includes `15fba71533bc` adding
-the first TRENDnet TUC-ET2G ID and `dc9c67820f81` adding a TP-Link ID.
-The candidate is standalone on trees that already have
-`VENDOR_ID_TRENDNET`.
-
-Step 3.4 Record: The author has at least one prior `r8152` device-ID
-commit, `848b09d53d92` for Dell Alienware AW1022z. The patch was
-reviewed by Andrew Lunn and Birger Koblitz and applied by Jakub
-Kicinski.
-
-Step 3.5 Record: Dependency found: `VENDOR_ID_TRENDNET` was introduced
-by `15fba71533bc`, and `git merge-base --is-ancestor` confirms that
-commit is an ancestor of `f93836b23677`. Mainline release tags `v5.15`,
-`v6.1`, `v6.6`, `v6.12`, and `v6.19` lack `VENDOR_ID_TRENDNET`, while
-`v7.0-rc3` has it. Older stable backports therefore need either
-`15fba71533bc` first or a small backport adjustment adding `#define
-VENDOR_ID_TRENDNET 0x20f4`.
-
-## Phase 4: Mailing List And External Research
-Step 4.1 Record: `b4 dig -c f93836b23677` found the original patch
-submission by patch-id. `b4 dig -a` reported the accepted one-patch
-submission at `20260430213435.21821-1-olek2@wp.pl`; `b4` also found an
-earlier identical submission from
-`20260426214909.3426105-1-olek2@wp.pl`. The earlier thread had Andrew
-Lunn asking for repost after netdev opened and giving his `Reviewed-by`.
-No NAK or technical objection found.
-
-Step 4.2 Record: `b4 dig -w` showed the patch was sent to netdev
-maintainers/lists and USB networking lists, including Andrew Lunn, David
-Miller, Eric Dumazet, Jakub Kicinski, Paolo Abeni, Realtek contacts,
-`linux-usb`, `netdev`, and `linux-kernel`. `MAINTAINERS` confirms those
-netdev maintainers for `NETWORKING DRIVERS`, and `drivers/net/usb/` is
-under `USB NETWORKING DRIVERS`.
-
-Step 4.3 Record: No separate bug report or `Reported-by` tag. External
-hardware verification found TUC-ET2G v2.0R as `20f4:e02c` / RTL8156B.
-
-Step 4.4 Record: This is a single-patch submission, not a multi-patch
-fix series. The only practical dependency for older trees is the
-TRENDnet vendor define from the prior TUC-ET2G ID commit.
-
-Step 4.5 Record: WebFetch to lore was blocked by Anubis. WebSearch did
-not find stable-specific discussion for `f93836b23677` or the patch
-message ID. No stable objection found.
-
-## Phase 5: Code Semantic Analysis
-Step 5.1 Record: No functions modified. Modified data structure:
-`rtl8152_table`.
-
-Step 5.2 Record: `rtl8152_table` is referenced by
-`MODULE_DEVICE_TABLE(usb, rtl8152_table)`, `rtl8152_driver.id_table`,
-and `rtl8152_cfgselector_driver.id_table`. Matching devices enter the
-normal USB probe path via `rtl8152_probe`.
-
-Step 5.3 Record: The relevant probe path checks vendor-specific
-interface class, `rtl_check_vendor_ok`, `rtl8152_get_version`, then
-calls `rtl8152_probe_once`. The config selector uses `__rtl_get_hw_ver`.
-This patch adds no new calls.
-
-Step 5.4 Record: Reachability is USB device enumeration: plugging in or
-booting with the adapter attached. It is not a remote or syscall-
-triggered security issue.
-
-Step 5.5 Record: Similar pattern exists throughout the same table for
-Realtek, Lenovo, TP-Link, D-Link, Dell, ASUS, and earlier TRENDnet IDs.
-`git log -S'0xe02c'` found no prior `0xe02c` entry in the checked
-history.
-
-## Phase 6: Stable Tree Analysis
-Step 6.1 Record: Checked mainline release tags `v5.15`, `v6.1`, `v6.6`,
-`v6.12`, and `v6.19`: all contain `0x8156` and RTL8156B version
-handling, but not the TRENDnet `0xe02c` ID. This means the supported
-chipset path exists in those releases, but the product-specific match is
-missing.
-
-Step 6.2 Record: Backport difficulty is low. It applies cleanly to trees
-with `VENDOR_ID_TRENDNET` / `0xe02b`; older bases need a minor
-context/define adjustment or the prior TRENDnet ID patch.
-
-Step 6.3 Record: No alternate local fix for `0xe02c` was found. No
-stable-specific replacement fix was verified.
-
-## Phase 7: Subsystem And Maintainer Context
-Step 7.1 Record: Subsystem is `drivers/net/usb`, USB Ethernet networking
-driver. Criticality: driver-specific, important for users of this
-hardware, not core-kernel-wide.
-
-Step 7.2 Record: The file is active, with recent `r8152` feature and fix
-commits, but this change is isolated to the USB ID table and does not
-depend on recent functional refactoring except the vendor
-define/backport context noted above.
-
-## Phase 8: Impact And Risk
-Step 8.1 Record: Affected users are systems with TRENDnet TUC-ET2G V2.0
-and `CONFIG_USB_RTL8152`.
-
-Step 8.2 Record: Trigger is common for affected users: adapter insertion
-or boot with the adapter connected. Not remotely triggerable; physical
-USB access is needed.
-
-Step 8.3 Record: Failure mode is device non-binding / Ethernet
-unavailable. Severity is not crash/security-critical, but it is a real
-user-visible hardware functionality failure.
-
-Step 8.4 Record: Benefit is high for affected stable users because it
-makes the adapter work with an already-supported RTL8156B driver. Risk
-is very low: one table entry, no behavior change for existing IDs.
-
-## Phase 9: Final Synthesis
-Evidence for backporting:
-- New USB device ID for existing driver and already-supported RTL8156B
-  silicon.
-- Fixes a real user-visible failure: Ethernet does not work with this
-  adapter.
-- One-line, single-file, no API or behavior change for existing
-  hardware.
-- Reviewed by Andrew Lunn and Birger Koblitz; applied by Jakub Kicinski.
-- Hardware identity verified as TRENDnet `20f4:e02c` / RTL8156B.
-
-Evidence against backporting:
-- Not a crash, data corruption, security, or deadlock fix.
-- Older stable bases may need the prior `VENDOR_ID_TRENDNET` definition
-  or a tiny backport adjustment.
-
-Unresolved:
-- I did not verify every active stable branch state directly; I verified
-  mainline release tags and the dependency relationship. Lore WebFetch
-  was blocked, but `b4` successfully fetched the thread.
-
-Stable rules checklist:
-1. Obviously correct and tested? Yes, one matching-table entry;
-   reviewed; hardware ID verified.
-2. Fixes a real bug affecting users? Yes, adapter does not bind/work
-   without the ID.
-3. Important issue? Yes under the stable “new device IDs” exception,
-   though not crash/security.
-4. Small and contained? Yes, one insertion in one file.
-5. No new features/APIs? Yes, no API or behavioral change except
-   matching this USB device.
-6. Can apply to stable trees? Yes with low difficulty; older trees may
-   need `VENDOR_ID_TRENDNET`.
-
-Exception category: New USB device ID for an existing driver. This is a
-standard stable-appropriate exception.
-
-## Verification
-- [Phase 1] Parsed commit `f93836b236773862e9ee268a82e3614caf77ea01`
-  with `git show`; confirmed subject, body, tags, and `+1/-0` diff.
-- [Phase 2] Compared `git diff f938^..f938`; confirmed only `{
-  USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02c) }` is added.
-- [Phase 3] Ran `git blame` around `rtl8152_table`; confirmed existing
-  `0xe02b` from `15fba71533bc` and new `0xe02c` from `f93836b23677`.
-- [Phase 3] Ran `git merge-base --is-ancestor 15fba71533bc
-  f93836b23677`; confirmed the vendor define dependency is in the
-  candidate’s ancestry.
-- [Phase 3] Checked release tags `v5.15`, `v6.1`, `v6.6`, `v6.12`,
-  `v6.19`, `v7.0-rc3`, `v7.1-rc3`; confirmed older release tags have
-  RTL8156/RTL_VER_13 support but lack TRENDnet IDs until `v7.0-rc3`.
-- [Phase 4] Ran `b4 dig -c`, `b4 dig -a`, and `b4 dig -w`; confirmed
-  patch-id match, one-patch submission, recipients, and
-  review/application thread.
-- [Phase 4] Read full `b4 mbox` threads; confirmed Andrew Lunn review on
-  repost request, Birger Koblitz review, and patchwork notification that
-  Jakub applied it.
-- [Phase 4] WebFetch to lore was blocked by Anubis; external GitHub
-  commit fetch confirmed the commit metadata and diff.
-- [Phase 4] WebFetch of WikiDevi and TRENDnet pages verified TUC-ET2G v2
-  hardware identity; WikiDevi specifically listed USB ID `20f4:e02c` and
-  RTL8156B.
-- [Phase 5] Searched `rtl8152_table` references; confirmed use by
-  `MODULE_DEVICE_TABLE`, `rtl8152_driver.id_table`, and
-  `rtl8152_cfgselector_driver.id_table`.
-- [Phase 5] Read `rtl8152_probe` and config selector code; confirmed
-  affected path is USB enumeration/probe, with no changed runtime logic.
-- [Phase 7] Checked `MAINTAINERS`; confirmed netdev maintainers and
-  `drivers/net/usb/` list coverage.
-- [Phase 8] Checked `drivers/net/usb/Kconfig`; confirmed affected
-  configuration is `CONFIG_USB_RTL8152`.
-
-This is exactly the kind of low-risk new USB ID addition stable trees
-normally take.
-
-**YES**
-
- drivers/net/usb/r8152.c | 1 +
+ drivers/net/ethernet/3com/3c509.c |    1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 0c83bbbea2e7c..0ac2b079e435c 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -10055,6 +10055,7 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_DELL,    0xb097) },
- 	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
- 	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02b) },
-+	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02c) },
- 	{}
- };
- 
--- 
-2.53.0
-
+linux-3c509-aui.diff
+Index: linux-3c509/drivers/net/ethernet/3com/3c509.c
+===================================================================
+--- linux-3c509.orig/drivers/net/ethernet/3com/3c509.c
++++ linux-3c509/drivers/net/ethernet/3com/3c509.c
+@@ -1099,6 +1099,7 @@ el3_netdev_set_ecmd(struct net_device *d
+ 		dev->if_port = 0;
+ 		break;
+ 	case PORT_AUI:
++		tmp &= ~(3<<14);
+ 		tmp |= (1<<14);
+ 		dev->if_port = 1;
+ 		break;
 
