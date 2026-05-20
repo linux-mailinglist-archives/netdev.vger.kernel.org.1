@@ -1,329 +1,216 @@
-Return-Path: <netdev+bounces-290107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290108-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NXDCOMiDmr26QUAu9opvQ
-	(envelope-from <netdev+bounces-290107-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:08:51 +0200
+	id 8OEYBpolDmr26QUAu9opvQ
+	(envelope-from <netdev+bounces-290108-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:20:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 952D459A7DB
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:08:50 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACD5E59AB84
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0F5F8301C6F0
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:08:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F33FB3017457
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE4B37AA77;
-	Wed, 20 May 2026 21:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4203237F724;
+	Wed, 20 May 2026 21:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqdqhYBQ"
+	dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b="Nc4BYxCz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from srv4.3e8.eu (srv4.3e8.eu [193.25.101.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF04374721;
-	Wed, 20 May 2026 21:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDA337C930
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 21:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.25.101.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779311327; cv=none; b=rjmmvVPaFTl7Yc3/eRlSrUwLFqVEztEMGu2+BsyVud17gK0nmCNiVuiXkM5fJr3YylqIxk3qeTSvSCDruQZoD76vr+QEUpxwQ/ehgzbMi4j5MYyZoNQjrjvZi4yKmXtUAQyQjpKjYZ0nKZJNgiOacxQA5wUKOO6jRZe6VWD3EKw=
+	t=1779312022; cv=none; b=ilE/L4C0I56IRwWHJWtnU+xQnDPlFfyDS72vOAD+mr6dVvTg16HWRWrNH70cZuGv0bXHbggc4pQtMHeEzzvRIYZ0r5l2PkJLMWhh6YZWKjLHlpoD3Iav1lU4ztmCzoXwbi04Q0w2SuGKmgpiMzz9KdogDqC8sqbCJqpQfwegPKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779311327; c=relaxed/simple;
-	bh=Ipv9L2oY2ZKvCKuBrESr6hIXmrYLVtmJWQQqoo5YJJA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cqlqKOYXQ6gTRQc1R70XixO9sXYTksP4m0JAUGtDrjb5EfObdAArbeEOxkO72/XPW5nX+0NRBLCOa9uz7eiVZBejah1cBNKgkmqKGl3WAwxjx6C8C4gJ870Hsk5PwHfn95SZnXBqQr1oNE1EKcAVzgVWD6RuZLBec0t6jVHhDJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqdqhYBQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 6486A1F00A39;
-	Wed, 20 May 2026 21:08:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779311326;
-	bh=oLNLi08itDX7jR+qOyWa8710Li0EKz+b0ONR4MNoKgE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=RqdqhYBQ56nQHSQTqimZ8o0JAqysXNys3c28ivdp3OIccaktMzHeSr1/j/JQo7k2b
-	 Bf3JxK9NhGDMrxsyUJ2msHy4dLs2rT2zJoAiX/YjlLwjuCE8JlosXdJpgv/bMx3nPt
-	 FLvhWjUdpxgiIxdZeLRE68NqQUA3chSj1+IJ4ZfF69iOifUDl8AGJ8mJrWAKfRtHwi
-	 24aoLxD7S7+4UyhVCwxYVeIWPybTf5iVi4r8mzJKGIKAVC+ElejQR7EnzOGbuBn5D6
-	 bvgG25SJAuIREqzDKZcgBghHEsnzS7lQbbjiQG1ajfjEHdP9PIggTdlpTveREhITJi
-	 0kagzgvW07pqQ==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org
-Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, richardcochran@gmail.com, jstultz@google.com,
- sboyd@kernel.org, willemb@google.com, nktgrg@google.com,
- jfraker@google.com, ziweixiao@google.com, maolson@google.com,
- jordanrhee@google.com, thostet@google.com, alok.a.tiwari@oracle.com,
- pkaligineedi@google.com, horms@kernel.org, dwmw2@infradead.org,
- jacob.e.keller@intel.com, yyd@google.com, jefrogers@google.com,
- linux-kernel@vger.kernel.org, Naman Gulati <namangulati@google.com>
-Subject: Re: [PATCH net-next v8 3/3] gve: implement PTP gettimex64
-In-Reply-To: <20260514225842.110706-4-hramamurthy@google.com>
-References: <20260514225842.110706-1-hramamurthy@google.com>
- <20260514225842.110706-4-hramamurthy@google.com>
-Date: Wed, 20 May 2026 23:08:42 +0200
-Message-ID: <87mrxtwzz9.ffs@tglx>
+	s=arc-20240116; t=1779312022; c=relaxed/simple;
+	bh=YPlbjnFKmW20YBpmz2p7ko66EMBRLxteKyDN58pDSJ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=STrvi9psfbdYS5o+MwA4+fIfjKzMEa1/nCDGgoitrwEY1bMmNT4nWP2VPn8aZ21TjozGlBH6ytAYKZxvQbJWR9K1oZQDruoRInM5mxZ7lDUtWiEEjFrq1/Oh2+hIH8UC4258gE599c41UpfZ0gxl2HuHmY7HAGOHQ2IXGDCiGXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu; spf=pass smtp.mailfrom=3e8.eu; dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b=Nc4BYxCz; arc=none smtp.client-ip=193.25.101.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3e8.eu
+Received: from [IPV6:2003:ed:4732:25a0:50c3:56a0:3512:8308] (p200300ed473225a050c356a035128308.dip0.t-ipconnect.de [IPv6:2003:ed:4732:25a0:50c3:56a0:3512:8308])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by srv4.3e8.eu (Postfix) with ESMTPSA id BEFAF4013D;
+	Wed, 20 May 2026 23:19:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3e8.eu; s=mail20211217;
+	t=1779311980;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Ojjeq7+ms71ydv932HWX0xixpyovLL1JHZY71n4KzRs=;
+	b=Nc4BYxCzxOrNpN0f3Y+F8yrfn/5ymR4AvaNWy1ffGeYZYq2GHprQ5+OFU00YyKNtvZsD7V
+	/La3I+TyXWS63mlTnfzkfSWDGE/gykuLNxQ0V7ObD6t3BDhESy6yfx/92uCjRMZBz1GfNx
+	zWqWBBbQN2LauH3Ca6/Mb/OuCrwXfTKOYBTumjP2o3t8t8NlsL9+6YgQGYJFRvZcNbiwYv
+	JWrmUx91fRiIa8LEztrlIuRGEP3u0LXLhA5bcpaKgaHLKJOrurVDRwGCZr/LME06fsuxUq
+	YMAiEQIzjX72mgdPuK5iftdszLQ2SOSj/L8QZpXlLk5cjp/adhJmAXe2BEahwg==
+Message-ID: <f33cf10b-bbf9-457f-ae83-35f9edb94090@3e8.eu>
+Date: Wed, 20 May 2026 23:19:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spamd-Result: default: False [4.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5] net: phy: sfp: probe for RollBall I2C-to-MDIO
+ bridge in mdio-i2c
+To: Petr Wozniak <petr.wozniak@gmail.com>, netdev@vger.kernel.org
+Cc: maxime.chevallier@bootlin.com, bjorn@mork.no, andrew@lunn.ch,
+ linux-phy@lists.infradead.org, kuba@kernel.org
+References: <20260519162007.13635-1-petr.wozniak@gmail.com>
+Content-Language: en-US
+From: Jan Hoffmann <jan@3e8.eu>
+Autocrypt: addr=jan@3e8.eu; keydata=
+ xsFNBFTH+vEBEADkcsHlJpyRJydfNeBm35/sU5Rm/gzvrwatYF44RSosfzNvZ7Ihb0ouazI5
+ 3PzOS46yAc8LyujrZnH/06/nWqTLyxxwXoAIeUc87MboDKYQzskP3HAyqF6NgPH+MgUQB/8a
+ 56ypfOD1f0MSod7kO3sz/y3QdO6kky+JX7Sq3CsfKUg4DrARvpGKrrqHA0xNpsz++9pYUveW
+ i7jJlDz917HpcX39GnBQnLByDTML5cfQYiRMjQiPfwWRUUgsnxWDLkfOlWVW+wU9zvEKJGNP
+ 6VAT38C3WuurCeHbslp26D2J4NBZdmmgMl3fHB2TYbVj/WzrNsci6uAc2CIiA+RSIjAdXhB8
+ w8Fp7FRDY/8/yEuirpQsuYs6BWRpiFv2Lqe1Z2aNshux965VBZhkB2UFCkSe5B2aXqZS4r6S
+ kdZijN9v8/NII84j3skfYH8du426GrJFW1TV/sS4JsKhbFRnVrGVaSRB8j82XY+7Bq5mhIwX
+ qULQKMZV+y6YHKOaKOGJal6Y8rq+vjpf+kMvekb8zlQ2sStnGuXiQGlfSYMVeV12zv6xtX4U
+ GTnQn8Nm6ekJm3PFZ8Jdhy37FzcwLKs7GE6jFHrzWyeKa0ATNuFN/wRmxQzVx2CRxujZ83/I
+ gtqte3TzJjDOhIJdAzz/qhZZRQ1TJVBc0nyVHmGsckCsw56H4QARAQABzRlKYW4gSG9mZm1h
+ bm4gPGphbkAzZTguZXU+wsGOBBMBCAA4FiEEmLuY0iqAFrsdfdQ4eNoW6ZLnw4cFAlvNvmUC
+ GwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQeNoW6ZLnw4fFMw/9GhCiWWIw/u+qJ+Z8
+ zV32B7C9jwpVcBoxyHMrbDl/KzEUoF3nSm6YNPfkmxgsQ2u0wd50p7nsLoPWwSET1wCE3VKU
+ Cux5fXVC4m7y238HdmSNGmeYgKqvCKti1l+pR58HefMnct0DVsPvfsHc+AUtZCc8AqyJN/Jk
+ aZiAKW3sKf3t4RoIyUl7aHwj2TBsi1rvB3VwXPbj5ZrD2imZaE3m7mfSj8Z6n/C83K9+vQEf
+ zxxSA1SuV2k5PE/sY4hxD0jgkmk/IForze+BjjKOwuClkfgT4HcTvWwnq9R1f09jscR4JJ7r
+ OSzixcxOoC1QBrCoEEr3cQK9z9knn5Y6DMmiAABz472joo0QZR2uWAcQXUF2opxdCstwCWYT
+ djc88F9XkdsEh1xY3MpfhQLg4RqYju8hXrRyA+KeQObnEzfUTd0Q8wObK44OrzZt7jyjdwyX
+ f7FhTJMyhHwDCWZASkAe2o/mJSlZBAUKcLLegL5tMeo2nx93pJcZVhO5cFv3CM1iIOaho374
+ GleMUhOy4urTT5gMKBm3G4SZmzfqOBDrr1ps/goSmpVXEn/IbDvCD1OusideZfYmUTjYHPln
+ a7GmFF4fdfL62a0yi96+3l4DSsIF6998F5U8zteWwBCtTm4HBsLpRu0DbDP2IUuEmNCyQhnp
+ 7EbpdxMJeysv+0U5jgTOwU0EVMf68QEQANpRg30TZ5rVNt7dJNiOf57dRUpdluSRROmyFt5S
+ fS3IUaH3dpLCYkHqwRQl5BrDxkUrxkbhoK0bftW9uHt3Cn4o199k1WuyHc/GD8Q9EjbfLXIQ
+ WgPjZgNcoxKt8PfSscD6Y/YhUYBQBa+8C346ozR1eugXsbw3Nfuzc4ZXseSOMSLSjlPhrYQC
+ swmYt5kLjiWfxSBWpw4hm+S2zA77sBAGaf4JXOTgibY8y4JOLvdNwL3GxBdmc/vunyr5FwBz
+ 8AZD0FEfxRgDinOiLSoTXUOj4kR+FT+98kUJqlUNwvVUq3tpFEXefWPrqcsVEinWoZsm3K31
+ 2m1jJfeNbjldep72C1iQC1ut365ZNCMZmVctGZ90dFKDs4l+GkaBJ8S+n3TuMH7sRDVwHG8b
+ cAm7kR/3YT5cz26vKy5dGMwm8CFvYF/3UU0aQPGrM711ploz4JdhxRvE1RtRUeqnsiXeBtMo
+ BSHtCfP2J5+YZSB+wj0OY00RSDhlwHszkmEBqstZiFECYazv+CsgQfbrX7eQqAsqKRtO3EOM
+ QKBwTR+yAtNTrFrQmjE5u9QuIqrvbRTnxhZMRyyimpR6jKYlczNAKVN8RFmxBHOrpUf7slk5
+ H2GrHFIXygOA7zZtr+2ufY4TVZjnymKbbrC20JBin4/UNSJF0BDGcXKbpil78YlXu/EfABEB
+ AAHCwV8EGAECAAkFAlTH+vECGwwACgkQeNoW6ZLnw4fqFxAA0mGTZXLNlsAAma7XAIdkMqDZ
+ aAU+N8SHtceQjeIuhdOV34T9AhbiIhDbf/MeVBz1D/skRtnwk5qtQBjDhzVFfxUu9XFeZHKs
+ ZFugcWwmzC0kLWG9xnzeWOl5VSq/CW5i4naaWNic5R2suNQiTFF7ZtGxv4i0H/FA1F6conbE
+ 5Pi2NN2t6cN22uMZm9tAdXW0QmLfoHzrqkmnFCYHlnLwzhMuBnSrErlV6biYyNRki/uGig69
+ ixQ9PRJdEpP1NFrTDexQalb5+JDpHCsGt5mzRBnT5WutZ/HBVj5PbzCxNXemtv0OCnN57Hae
+ p2EFXZjDLfOUYdJSpnudtSvBtmJgs7TgwmzcGCOZfWqPd0mRFjG101mhHh0g4GhlUBPvDe4k
+ +E5YwEYEWQuO5G0tqwTGXU2bD/8NoMsWPGkABltaVeOvzOITuOe3HHZANwbyMCguTALQ29RF
+ 5ZxUUfXMU9BxSf7dh5YiYqgceD5ey86nIjKTyxWb1wONrLtsirO2aX+Ch24UyAIHO0H6NVlU
+ h8gKGU/jv0XySGZQsU/j79NdOR4sr0c9N6PH6TZiByTVuHDa6FBWeSq8JJltDu1V3kIa07X6
+ DPttzFhJHSBzcx5TSQTyN6ErfdYFT8mfBuvG5XJjYoR4xpMl0BLTPJSTmHokossdcyiu4ng+
+ AqNjQxfojjo=
+In-Reply-To: <20260519162007.13635-1-petr.wozniak@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[3e8.eu,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[3e8.eu:s=mail20211217];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-290107-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290108-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	GREYLIST(0.00)[pass,meta];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,infradead.org,intel.com,vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 952D459A7DB
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jan@3e8.eu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[3e8.eu:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: ACD5E59AB84
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 14 2026 at 22:58, Harshitha Ramamurthy wrote:
-> From: Jordan Rhee <jordanrhee@google.com>
->
-> Enable chrony and phc2sys to synchronize system clock to NIC clock.
->
-> Two paths are implemented: a precise path using system counter values
-> sampled by the device, and a fallback path using system counter values
-> sampled in the driver using ptp_read_system_prets()/postts().
->
-> To use the precise path, the current system clocksource must match the
-> units returned by the device, which on x86 is X86_TSC and on ARM64 is
-> ARM_ARCH_COUNTER. The clockid requested for the cross-timestamp must
-> be either CLOCK_REALTIME or CLOCK_MONOTONIC_RAW. These conditions hold
-> by default on GCP VMs using Chrony, so we expect the precise path to be
-> used the vast majority of the time. If the system clocksource is changed
-> to kvm-clock, it activates the fallback path. Ethtool counters have been
-> added to count how many times each path is used.
->
-> The uncertainty window in the precise path is typically around 1-2us,
-> while in the fallback path is around 60-80us.
->
-> Stub implementions of adjfine and adjtime are added to avoid NULL
-> dereference when phc2sys tries to adjust the clock.
+Hi Petr,
 
-Sorry that I did not react to this earlier, but I was burried in
-regressions and allowed myself to take a few days off.
+The patch seems to be malformed. I had to do some manual changes to get 
+it applied.
 
-> +/*
-> + * Read NIC clock by issuing the AQ command. The command is subject to
-> + * rate limiting and may need to be retried. Requires nic_ts_read_lock
-> + * to be held.
-> + */
-> +static int gve_ptp_read_timestamp(struct gve_ptp *ptp, cycles_t *pre_cycles,
-> +				  cycles_t *post_cycles)
-> +{
-> +	unsigned long deadline = jiffies + msecs_to_jiffies(100);
-> +	unsigned long delay_us = 1000;
-> +	int err;
-> +
-> +	lockdep_assert_held(&ptp->nic_ts_read_lock);
-> +
-> +	do {
-> +		*pre_cycles = get_cycles();
+On 2026-05-19 at 18:20, Petr Wozniak wrote:
+> The "OEM"/"SFP-10G-T" quirk entry in sfp_fixup_rollball_cc()
+> unconditionally forces MDIO_I2C_ROLLBALL for all modules matching that
+> vendor/part-number combination.  This works for modules that genuinely
+> implement a RollBall I2C-to-MDIO bridge, but silently breaks modules
+> that share the same EEPROM strings without having such a bridge.
+> 
+> The Realtek RTL8261BE-CG is one such module: a pure copper 10G SFP+
+> media converter with no I2C-to-MDIO bridge.  Its EEPROM reports
+> vendor="OEM", part="SFP-10G-T-I", and -- critically -- Vendor OUI
+> 00:00:00, making OUI-based differentiation impossible.  With
+> MDIO_I2C_ROLLBALL forced, the module silently ACKs the unlock password
+> write, the MDIO bus is created, but no PHY responds; the SFP state
+> machine cycles through the RollBall PHY-probe retry window before
+> reporting no PHY.
+> 
+> Move the probe into i2c_mii_init_rollball() in mdio-i2c.c, where the
+> RollBall protocol constants are already defined.  After sending the
+> unlock password, issue a CMD_READ and wait ~70 ms for CMD_DONE.  A
+> genuine RollBall bridge asserts CMD_DONE within that window; modules
+> without a bridge never do, so i2c_mii_init_rollball() returns -ENODEV.
+> mdio_i2c_alloc() propagates -ENODEV to the caller to signal that no
+> bridge is present and PHY probing should be skipped.
+> sfp_sm_add_mdio_bus() catches -ENODEV and transitions
+> sfp->mdio_protocol to MDIO_I2C_NONE so the rest of the state machine
+> skips PHY probing for this module.
 
-This is a completely non-sensical hack. Why do you need get_cycles()
-here, which is a horrible and ill-defined interface that others are
-trying to get rid of?
+This approach works fine here for a module identifying as "OEM 
+SFP-10G-T" / "OEM SFP-10G-T-I", which doesn't support Rollball (the 
+label on the outside says "ATS SFP-10G-T", and the PHY inside is also an 
+RTL8261BE).
 
-Just because it's still there is not a good answer and it's actually not
-required at all. See below.
+Using this patch, the module works right away, without waiting several 
+minutes for the PHY probing retry loop to finish (see my reply to the 
+previous patch version for details).
 
-> +		err = gve_adminq_report_nic_ts(ptp->priv,
-> +					       ptp->nic_ts_report_bus);
-> +
-> +		/* Prevent get_cycles() from being speculatively executed
-> +		 * before the AdminQ command
-> +		 */
-> +		rmb();
-> +		*post_cycles = get_cycles();
-> +		if (likely(err != -EAGAIN))
-> +			return err;
-> +
-> +		fsleep(delay_us);
-> +
-> +		/* Exponential backoff */
-> +		delay_us *= 2;
-> +	} while (time_before(jiffies, deadline));
-> +
-> +	return -ETIMEDOUT;
-> +}
-> +
->  /* Read the nic timestamp from hardware via the admin queue. */
-> -static int gve_clock_nic_ts_read(struct gve_ptp *ptp, u64 *nic_raw)
-> +static int gve_clock_nic_ts_read(struct gve_ptp *ptp, u64 *nic_raw,
-> +				 struct gve_sysclock_sample *sysclock)
->  {
-> +	cycles_t host_pre_cycles, host_post_cycles;
-> +	struct gve_nic_ts_report *ts_report;
->  	int err;
->  
->  	mutex_lock(&ptp->nic_ts_read_lock);
+However, I am wondering if this could potentially break PHY access on 
+other modules, which do support the Rollball protocol.
 
-Why is this lock taken _after_ the regular (fallback) pre/post
-timestamps are aquired?
+I also have a 2.5G module (XikeStor SKT-2.5G-100M). It supports 
+Rollball, but does not respond to commands immediately. With this patch, 
+it only works with a small delay in "module_t_wait" (one second is 
+fine). For that particular module this is not a problem, as it is not 
+yet supported. So the necessary delay could be included when an SFP 
+quirk is added for it.
 
-What's wrong with doing:
+But if there are already supported modules behaving similarly it could 
+be an issue for those (assuming they don't have a long enough 
+"module_t_wait" in the SFP quirk, as it wasn't really needed so far).
 
-       do {
-         	guard(mutex)(&ptp->nic_ts_read_lock);
+> Add "OEM"/"SFP-10G-T-I" to the quirk table so RTL8261BE modules enter
+> the probe path; genuine RollBall modules continue to work as before.
 
-                ptp_read_system_prets(sts);
-                err = read_nic_timestamp(...);
-                ptp_read_system_postts(sts);
-       } while (err && !timeout(...));
+I am a bit confused by this change. This is the same model name which is 
+used by my non-Rollball ATS module when is linked at 1G on the copper 
+side (so it doesn't need to go through the probe path). Are there other 
+modules actually supporting Rollball which also use the model name 
+including "-I"?
 
-       return err;
-
-which moves the "fallback" timestamp right next to the actual hardware
-readout?
-
-That would make the "fallback" case too precise, right?
-
-After noticing the obvious, I just checked what our new AI review
-overlord "sashiko" has to say about this:
-
-     "Does wrapping the timestamp read outside the locks and retry loops skew the
-      measurements?
-
-      In the fallback path, ptp_read_system_prets() is captured before calling
-      gve_clock_nic_ts_read(), and postts() is captured after it returns. However,
-      gve_clock_nic_ts_read() acquires ptp->nic_ts_read_lock and calls
-      gve_ptp_read_timestamp(), which can sleep using fsleep() during retries. This
-      means the prets/postts window could include mutex wait times and sleep
-      durations."
-
-It _IS_ actually on spot. So why the heck did this garbage get merged
-without addressing this obvious fail?
-
-What "sashiko" actually saw aside of that, which I didn't see myself when
-looking at this, is:
-
-   "Similarly, in gve_ptp_read_timestamp(), the get_cycles() bounds are taken
-    outside the gve_adminq_report_nic_ts() call, which acquires the shared
-    priv->adminq_lock. If there is lock contention, the cycle bounds could become
-    extremely wide."
-
-Oh well.
-
-So what you really want is:
-
-       do {
-         	guard(mutex)(&ptp->nic_ts_read_lock);
-         	guard(mutex)(&gpe_priv->adminq_lock);
-
-                ptp_read_system_prets(sts);
-                err = read_nic_timestamp(...) {
-                   	...
-                   	return gve_adminq_execute_cmd_locked(....);
-                      }
-                ptp_read_system_postts(sts);
-       } while (err && !timeout(...));
-
-       return err;
-
-Or just rely on gpe_priv->adminq_lock in the first place. No?
-
-But what's worse and escaped the AI scrutiny is:
-
-  Your attempt to convert these 'get_cycles()' time stamps after the
-  fact and outside of the timekeeping core protection is fundamentally
-  wrong.
-
-get_device_system_crosststamp() does
-
-      do {
-      		seq = read_seqcount_begin(&tk_core.seq);
-                take_timestamps(...);
-                convert_timestamps(...)
-      } while (read_seqcount_retry(&tk_core.seq, seq));
-
-which covers the whole sequence of taking the snapshots from the
-hardware and the conversion.
-
-Your abuse of this is completely out of spec. Just because it did not
-blow up in your face yet does not make it in any way correct. You do not
-even get bonus points for creative abuse.
-
-
-Now let me look at the "firmware" provided timestamps.
-
-That's the poor mans emulation of actual hardware timestamps aka PTM.
-
-Why do you need all this pre_nic/post_nic muck there? Fix your firmware
-to actually honor PTM and not provide some made up version of it.
-
-Also the whole debug mechanism of comparing the time stamps of
-get_cycles() with the timestamps provided by firmware tells me that your
-firmware is a hacked together piece of garbage.
-
-If you want to use "hardware" timestamps then populate the
-ptp.info.getcrosststamp() callback.
-
-If your firmware really can't do PTM and only provides pre and post
-values, then you simply can take the midpoint in your getcrosststamp()
-callback:
-
-      do {
-         	guard(mutex)(&ptp->nic_ts_read_lock);
-                err = read_nic_timestamp(...);
-                system_counterval->cycles = (nic_pre + nic_post) / 2;
-      } while (err && !timeout(...));
-
-If you do not even trust your firmware then you still can validate it
-easily without creating horrible hacks:
-
-      do {
-         	guard(mutex)(...);
-
-                ptp_read_system_prets(&ctx->sts);
-                err = read_nic_timestamp(...);
-                system_counterval->cycles = (nic_pre + nic_post) / 2;
-                ptp_read_system_postts(&ctx->sts);
-      } while (err && !timeout(...));
-
-and then check the ctx->sts timestamps against the results provided by
-get_device_system_crosststamp() after conversion in your
-ptp.info.getcrosststamp() callback:
-
-        err = get_device_system_crosststamp(..., &ctx);
-        if (err)
-           return err;
-        if (ctx.sts.pre_ts > xtstamp.sys... || ctx.sts.post_ts < xtstamp.sys...)
-           return -EBROKENFIRMWARE;        
-
-no?
-
-Jakub, please back out this hackery before it makes a precedence for others
-to copy from.
-
-Thanks,
-
-        tglx
+Jan
 
