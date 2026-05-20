@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-289672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJqpCTcFDWoksQUAu9opvQ
-	(envelope-from <netdev+bounces-289672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:49:59 +0200
+	id OJBxB2gFDWotsQUAu9opvQ
+	(envelope-from <netdev+bounces-289673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:50:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7218458660F
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:49:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 708E158662D
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DFA77300FED2
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:49:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F25B6303A538
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311A225332E;
-	Wed, 20 May 2026 00:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F32625F7A9;
+	Wed, 20 May 2026 00:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fN4OIBan"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ejD92kPB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2230AE573;
-	Wed, 20 May 2026 00:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A16E573;
+	Wed, 20 May 2026 00:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779238196; cv=none; b=Famoq5ym7dn2ACWPFNlVTY+BdzYRlrc2WdvSD3MtdjbbSE/j4lRhJi0Ee2ow3/O003ktn+gkzvJrQHuDpnxSb9H8hAmKfp17SHkzaanFv/YlcF5P9hfBAV89XdTMqLk9y9bkKSUx51cub4zxUsNHm9AWwFXlIVhqZU03WGxjBLA=
+	t=1779238200; cv=none; b=qp1AZYntx6UvSQOmIIhms8SJbbntwQyOwCOMvUJU9/b9yfFIPtArbOCIlBt1JEb9FkHAsVtu0qWKV5V38AaMe6X6nwL62qpu0YdfSOvM34CikMXMl+c90IHZL1Xq0o3ItYzY94lt3I2txKQpZbzSM+CK9KSA0bDZvwqQtQigcF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779238196; c=relaxed/simple;
-	bh=lBfm9tSSe0sbgpengcGxja9yeUM22QBkM9dkNrYcNjc=;
+	s=arc-20240116; t=1779238200; c=relaxed/simple;
+	bh=FzG5rMrwxhc1g3YILVGaByRQ7gWAqOUQ2U5Vw7l9FPY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SMc33yQqdt+TsXRFtg77Qf6fg69HeD0+plFtPec8gx1BxFHrRNrQuXbNKd/DxPS93BR91vZpmDVtlVfwlSa1bi5thfJ+7ld6A+LR7xKSSqKmlQ4stg+OPvxXpaQrjjAl640kmU2bn15eb0At8dTHqy5csEtdJQNwa2aH1fDmoEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fN4OIBan; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCC9A1F000E9;
-	Wed, 20 May 2026 00:49:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qaASf8xNZlIk4y7TJvFbuMYYKDgQAGkoJkO8Vyb8D6Nl7lzLrYvs0WVrjigpYGXp9CPfOdPOaVZGlQwjimBTpnOg3Uw9TFf8Q/FvcnCGOJn7hE5WyTedONEOX/WRoSanIQK8N7MyJqa2BUzgTEUVo66wujqrCZKenZKn/Q8CdeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ejD92kPB; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 069891F000E9;
+	Wed, 20 May 2026 00:49:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779238194;
-	bh=0mq7kib0N1oJE7BLzLydBG9O6cvohSd5MZVgGw55/X8=;
+	s=k20260515; t=1779238199;
+	bh=MmoD3rFCdGNXuu4oCruzaEdZPOexdlnOf6QsyJLqtcY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=fN4OIBantfenbOAJ1Mt3Qe3d8rUabM/SQo2v5hx7QprQVpcqFJpq/Hn3WPPysIcH7
-	 SKz25/9L4pcIjLavZv51ADJn6RNrAZIx1C+4eNageGJuSBz4wEXtXszPc6rpoDkwVF
-	 jxec6E0IpG5Ug/BWrKL4C8eAObCpjbFT6t1roOuTPnm9rZbAJhLCFQ/wLABKutCb26
-	 VewtahUhony2/EPQzeUeJDeh2rgJynEkH9Idbah1WZy2umWTf9iWcoQuf6vNDyB9ag
-	 ymNSOPl0f+e9kxm4axKvWo449yiaDfwYqEOExQjRJcn1yFswaqu7KbFR3q59JnPGm5
-	 4kx9twgXM+ANA==
+	b=ejD92kPBW9/rvy650vCm0UZgdfVaNKvd1m+DSOGVjhdBXGBv6DjTwmK6Fasof9O4u
+	 klrCdc6UsTwwW/Qkrc8rDdj1MyutkiHPCczj+W31lO+yYk5uzZAA/GTRnfoJkmdlxI
+	 jWSVUJscNq4kbiBgbBcOZ4yeeJPxg2Yho1kGw1RpmK9WjK/yw5eKQwxOHf9wJ5mCdZ
+	 8bd2odtDnbC8q/pITmPMSZnIUJowX+4cjYB7GZgiJrch7Vpn1BfU3hJoJyt7/sOfdn
+	 QW5pGd8o/vv2+rikGicMkZUdcaY2JyYpAaPoFZraH065OSI5oFbRjBdzj4L2loq5AD
+	 dd7QJ3bXBDWCQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0B04383BF53;
-	Wed, 20 May 2026 00:50:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19827383BF53;
+	Wed, 20 May 2026 00:50:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,20 +55,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: pse-pd: fix sign on -ENOENT check in
- of_load_pse_pis()
+Subject: Re: [PATCH net-next] net: phy: micrel: use dev_err_probe()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177923820539.2936298.11897991390696602983.git-patchwork-notify@kernel.org>
-Date: Wed, 20 May 2026 00:50:05 +0000
-References: <20260515143103.1721888-1-jelonek.jonas@gmail.com>
-In-Reply-To: <20260515143103.1721888-1-jelonek.jonas@gmail.com>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: o.rempel@pengutronix.de, kory.maincent@bootlin.com, andrew+netdev@lunn.ch,
+ <177923820963.2936298.7454721965938463012.git-patchwork-notify@kernel.org>
+Date: Wed, 20 May 2026 00:50:09 +0000
+References: <20260515120608.706361-1-robert.marko@sartura.hr>
+In-Reply-To: <20260515120608.706361-1-robert.marko@sartura.hr>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, luka.perkov@sartura.hr
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
@@ -76,48 +74,49 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289672-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,sartura.hr];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289673-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7218458660F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sartura.hr:email]
+X-Rspamd-Queue-Id: 708E158662D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 15 May 2026 14:31:03 +0000 you wrote:
-> of_count_phandle_with_args() returns the count on success and a negative
-> errno on failure, including -ENOENT when the "pairsets" property is
-> absent. The existing comparison in of_load_pse_pis() checks against
-> ENOENT (positive 2) instead of -ENOENT, so the branch is taken for any
-> error return: legitimate DTs that omit "pairsets" trigger a spurious
-> "wrong number of pairsets" error and probe fails with -EINVAL.
+On Fri, 15 May 2026 14:05:40 +0200 you wrote:
+> Currently, during probe defferal the driver will print multiple times:
+> mscc-miim e20101a8.mdio: Cannot register MDIO bus (-517)
+> 
+> So, lets silence that by using the dev_err_probe() for printing the probe
+> error as it handles probe defferal.
+> 
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: pse-pd: fix sign on -ENOENT check in of_load_pse_pis()
-    https://git.kernel.org/netdev/net/c/33d35975cbea
+  - [net-next] net: phy: micrel: use dev_err_probe()
+    https://git.kernel.org/netdev/net-next/c/65d6d1fa5093
 
 You are awesome, thank you!
 -- 
