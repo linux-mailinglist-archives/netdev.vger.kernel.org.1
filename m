@@ -1,311 +1,253 @@
-Return-Path: <netdev+bounces-289902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289903-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EMVyNducDWoU0AUAu9opvQ
-	(envelope-from <netdev+bounces-289902-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:36:59 +0200
+	id eFbbHpGhDWq10QUAu9opvQ
+	(envelope-from <netdev+bounces-289903-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:57:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7266958CAB5
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:36:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E72058D146
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9903031036B9
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:31:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4CED32953FB
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57CF3D75B9;
-	Wed, 20 May 2026 11:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633503E834B;
+	Wed, 20 May 2026 11:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="At51JHLs"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="OWqINoQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010051.outbound.protection.outlook.com [52.101.193.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C02B2E8B64
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779276214; cv=none; b=UzL0ixCCwijHB20iPF2W/JqLlPr2TnMqFo7TQSXpYgIEFAim28aWif4BHBEmw1p4a3USOSEO6I7tfLznGpz+d68gbX8ZC8Ap9JnqRcuoU3gziGuKuFN2OH3gLZtNSh1hloKTMqz95AFpreTaDrnSmFS97fMvWvGajSZWWX203y4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779276214; c=relaxed/simple;
-	bh=7rsUPt1tduntxvqWGRDK+3R1RqTZuELegUeUx6qEvBE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=io26xZMi8xeFLqg/vK5NimE0KX5AVpuxM9zODDD3nF2eOH3GYK2N34Ivk4xytjbaCQEvk068vOhQmYSTPkRMbaxyvTz7fUflOI7hzzcK0urQB80ML15NMt+JLhOOP+LakPFujEIGcESskFSGGGUTAAFIahjuh5V9+WdynH+qtqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=At51JHLs; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-366be8040a9so1909591a91.3
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 04:23:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779276213; x=1779881013; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BhaoB8u6zHtRNjD6pdvvJsZ7im80YuxbV9CFFPE8/do=;
-        b=At51JHLsbUP6Ql3dwI8t6ezJRRxcbgPYa2ZvX7j1HC4RZeH6LhJLHSAF22sq1p74EW
-         3WZTEQKCaopoKFHeeKpmkD8pDKpy4MfHd4JpUwR6Hn4lPfV/TdQ2EdzOipOZPznxJRkh
-         zOihUORIXqo/Exlv7ip+ARFF/nnRG97F8lzA/KQiEAV8P4oDF2KAYGgTLUu/dz/OyaM3
-         TmrSbt1Qg6a39v6SRXxgJsj4ssKops6IiiQGmQvAr3Tm0kOkSj8EZPnJpOzJY6glfHxp
-         VTss8k+sGOMe51hP5L9i0dVGBA2qbmBRKrz7Vkl7xo6dS2ZDpSKInv6IpQC9TbLaDLMA
-         89fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779276213; x=1779881013;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BhaoB8u6zHtRNjD6pdvvJsZ7im80YuxbV9CFFPE8/do=;
-        b=plQn3mZSWYydY3SR0WzwThCzoBiY/lCiuSA/DWWkr1+N/fIXs8qWj3tb3dOH+CGbMW
-         bdzYqScGdFCi20PecdVOBePZM1aO6Bns78M/U5uN5uoBSBiIyHgJPJMfnWIZpAMctE7O
-         MiZ+LvLUDsRMpkJx5nMh2i1JTfRdyX7UnfYAY3rMyTRCTp1c4qKXPs2qcb/NMr+twz7G
-         JqzQhPT3W0RdHIDOXURNPjuZxb4IqnAyqUES6D/lBlrgR77LZWz3nv+3gCl1Pl51ayv/
-         JF1qSsT1NG1JqfuHgcAkqEc2xchmJZLD0ml04XSWFMPgHc+jLgXDNgM0w1LMyjPZ8SQE
-         Ph+g==
-X-Forwarded-Encrypted: i=1; AFNElJ9wtGEVycnmbCLEm2wPXV6RVFMl6pyl2UVIWpezmMF15GdCG2NAT3zuogAvebRjFxzMzDaqCZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzp9zWNtbqIklJ+ec0tkh4aab3aLrWP6zQlitT1eAEdx3dv/2rN
-	Om+GNMkMc4fqrZrP0eAM6An3Nk8yGJL5alcU+V3urXJKJsTzwd7P2FhU
-X-Gm-Gg: Acq92OHaCBlCFDci1TcQqfZaThdVXKe4jQ2wMsCRr/m/t0cELY3t7IrcEu3z+hr/laS
-	dAT/tVMYovBEfQpYvXS2pH+kYyBC3CL+aPN+Z8L7IbTbUWolmADK9LWCMr/9TeflmlMgAfueAN8
-	paGbnDnoJKKcIgQ+Bvm7ibgJz9LNMnJgbFRmF1yHaPUL/pxDr4HwB8WfueLUTpBcqCGuHIk4ftk
-	TTWHL/yPLhfuiK/LFqAQXQAqV23L97Tbf2mdP2Ys3FYfnl2tsQJzSQjxpFjnDo5BH7daQsX0Tte
-	wn8jTR/KrtVyCKd+J+ReOjLn/5Yub1dv6UxjiO0NLgvB5aPoGdj/6YiiD2ZpAEzZXTfqSS+O8Mn
-	AhHLBJBeEeGh2KW7JqH/5piHrbktxVDK1Fo680fGI1Tx2l8AjtXU8v9fxmUpqsLqQao7ixNyOvD
-	qZQQw6e0OyAcLuYFJ5DrW5Wl7m82YiErfmzDRwDl0jEMECdsFLVA==
-X-Received: by 2002:a17:90b:3149:b0:35e:5051:fb18 with SMTP id 98e67ed59e1d1-36951cc9a37mr22675267a91.26.1779276212534;
-        Wed, 20 May 2026 04:23:32 -0700 (PDT)
-Received: from localhost.localdomain ([2001:250:3007:3:7ce4:b643:7525:b52e])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-369515895d2sm16922217a91.8.2026.05.20.04.23.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 04:23:32 -0700 (PDT)
-From: Junxi Qian <qjx1298677004@gmail.com>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH bpf] bpf, sockmap: keep sk_msg copy bitmap in sync
-Date: Wed, 20 May 2026 19:23:27 +0800
-Message-Id: <20260520112327.189660-1-qjx1298677004@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605D73DCDA3;
+	Wed, 20 May 2026 11:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779276296; cv=fail; b=XYhKxU91gw5QiA5A7OSKGq4Y1utYmvKlAHJ55CTdZOflKKiubH+Htj5wF3SPDiqUU16tCJI/tYNe9XoE0zor/+L127tPJIUsTzIRhawPWRSu0yCY3Nk+Q9UF+hHMQjxA9VrgwiT0+p02qZLEjqx1quSBYH0LOAqTYOjWJyyWTdY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779276296; c=relaxed/simple;
+	bh=xyqRmrc/SoHMS9DvjiiPmMdpYcUlSrvPaeBzkyLXZh4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=GWfRpF0QpGiFOjo60Lg9be9WKrXQ8+AoyudhysFVaWCbUzSPHLG8SZCsUXnFHZyq/mxfDSKDeDaveBBZPaskE3AZnV03OT7lD2xP9tbj6j92nam3MVxWbZvmL2x3aWQ0cKhxEVgpk5ggaTFYKR8286MzWvTW2/gX6jkO/U6RSmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=OWqINoQY; arc=fail smtp.client-ip=52.101.193.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=G597oNL0K4kCmUz5hLEOTQKwLpA8aRNlbVAW5hbr1wwhy5e5vTKWN+fBL5jtu7wAXuf0Zy9VYjJ9NE8r8mEqO4SMeh355wwbsPqFV9nWdpPu/Egw0PxIqceR5e3c+kqv1T7F8f1OyVhUIEIJtm1WNISzSH1NTwuDbXGRYqVg6cSKhjRP7uZuceNofgaRlukaaKwxZl4k1jYFTp5PUECGSQjol+G5VGy5o0qrPCaiRYUlyqlapDul46Td1KVvDLYBQfI2ZXcGMillU4utxYO1AaMXLDvC1RHoUqLzPi7veaPNrDhne/VW9epiHotB1Ok3Ftbi72ofhZmEZ0sVipcU3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nEWWEUGyXIpYjIqB2rL6YOnMSuAZRG9G/KZjSdGWEEw=;
+ b=dER+kQwcVvOALInloKzQQOqqp1e2Hw/mPcpULXpq6HC1uGhdRfIuTkr2BZjWFESkAoS0DXUj1jU71gE6m2WkSQotNf3CRSRaIgAd4ldIY25wqhKJ87pFuzv+NS3rayrHX57uoy91jewuBCY/t2oH8JhFyNyRwozre4wmpogKl97BQ1rqULdQvxRmEMY0irYnD9/q16n/i9SpvrP3Mt0ekNV0Hjq819yhvSNk2Hn1j/msWMlbGxhN7aCd/9UYlR9JtOWp9KiW/811YbzH9KFBRDOnbTuMI33Pp+aXFEZ1dJMevWvu6yZFgJZJyuRPvZQYZmKX6cWl21isS076nAK4OQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.194) smtp.rcpttodomain=couthit.com smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nEWWEUGyXIpYjIqB2rL6YOnMSuAZRG9G/KZjSdGWEEw=;
+ b=OWqINoQYu2yRm/SSiyACQozpbRy1k/DP9d1SWuI/jvve7lfGgtOfCSh1p1iTIUUNzESwwkjP0Nm2c9HDtvL4qwNHSmDDcyTNqxJp+imEx3W+dTcIP2ccjTEN40G9HoeFxLNMQMcPqgnpxxrhrvzayOi4yHkmR2L012jliBWqxLI=
+Received: from BLAPR03CA0133.namprd03.prod.outlook.com (2603:10b6:208:32e::18)
+ by CH2PR10MB4247.namprd10.prod.outlook.com (2603:10b6:610:7a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Wed, 20 May
+ 2026 11:24:52 +0000
+Received: from BL02EPF00021F6E.namprd02.prod.outlook.com
+ (2603:10b6:208:32e:cafe::5) by BLAPR03CA0133.outlook.office365.com
+ (2603:10b6:208:32e::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Wed, 20
+ May 2026 11:24:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ BL02EPF00021F6E.mail.protection.outlook.com (10.167.249.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.48.11 via Frontend Transport; Wed, 20 May 2026 11:24:51 +0000
+Received: from DLEE203.ent.ti.com (157.170.170.78) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 20 May
+ 2026 06:24:51 -0500
+Received: from DLEE207.ent.ti.com (157.170.170.95) by DLEE203.ent.ti.com
+ (157.170.170.78) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 20 May
+ 2026 06:24:49 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE207.ent.ti.com
+ (157.170.170.95) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
+ Transport; Wed, 20 May 2026 06:24:49 -0500
+Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 64KBOfl51864530;
+	Wed, 20 May 2026 06:24:41 -0500
+Message-ID: <60dfd918-876b-4b3e-b18f-9d27dab3b455@ti.com>
+Date: Wed, 20 May 2026 16:54:40 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 0/3] Add support for ICSSM Ethernet on AM57x, AM437x,
+ and AM335x
+To: Parvathi Pudi <parvathi@couthit.com>, <nm@ti.com>, <vigneshr@ti.com>,
+	<afd@ti.com>, <khilman@baylibre.com>, <rogerq@kernel.org>,
+	<tony@atomide.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>, <richardcochran@gmail.com>, <aaro.koskinen@iki.fi>,
+	<andreas@kemnade.info>
+CC: <linux-omap@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <andrew@lunn.ch>,
+	<pratheesh@ti.com>, <j-rameshbabu@ti.com>, <praneeth@ti.com>, <srk@ti.com>,
+	<rogerq@ti.com>, <krishna@couthit.com>, <mohan@couthit.com>,
+	<pmohan@couthit.com>, <basharath@couthit.com>
+References: <20260428072046.3022679-1-parvathi@couthit.com>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20260428072046.3022679-1-parvathi@couthit.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00021F6E:EE_|CH2PR10MB4247:EE_
+X-MS-Office365-Filtering-Correlation-Id: 010c22d4-1d37-4dbc-41a8-08deb66268ea
+X-LD-Processed: e5b49634-450b-4709-8abb-1e2b19b982b7,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|36860700016|82310400026|1800799024|3023799007|921020|18002099003|22082099003|56012099003|5023799004;
+X-Microsoft-Antispam-Message-Info:
+	wRBAgxmYRkhDQHaSZzVOxQ/LFHh5O3c2lj0Xss5HFfGDJeyme9ZlQ6oNep1aZLmaGY62x5RK6Qi8gwlokzVT11PbnvYAZqcVV9eK0jdwzRbSatFrWGN0AksaBe4z4gR89aQHAkUtwb9mmvlhuBic39ggSj+jQqIN9uZnSyNhtShyw/xnKw6exjI4Oi9IiLM+OBWhkwdZnyeIHBcWuEyps0Y1GdGcl4igWaqaR7+2/N8VMv+cbQISDeaShDRbfBIOwzHXUhdeOPNnq/Q/M/NkUsy4T5L0LYDN4mPqtW5E4Zil67y4PEEaRS8BDNuyc2x/sPU6JgG1SnHYC06WAtDeZrUzB1BN5vbrXar3FpAiKG4rcXzXdmNchMxHLuRvkTNVVJlVpNo0Lk1jIV9ssETWZMXkfY4xvcq9hXMk6uZYoyt6NJ3DyOArR0KAqoYqeZrWk4z0Ep0EhHvEKR06ww7wjQDkJB+a1zAhCaVe04FGBVzj3YADLNumEZEb5YkDJLJV9wzxeTD38in1tFqZvV4tOOZj/V7AUHfGu0bERKClAyX1aPQj/r/T48/4dDJ6jYj/vxMeRk4WL7Hyxe59zAZvDroj/i3/zXJ3/9BayizW2GAMqGPYXP5NnkICX1OT81QEDFaLI7G8Wuo9G9vlXXv3urTNNQvf8CEU0z+njNpiIdvXX/PhFl5hCsU8AUFs86qP+2e2WxIBGfOCKs6f4phU/meUCr6oiwWneUNPFKPfSQKBrB4K90RUG0XNvw78o832OBD1ab9Aq2mswvMkvGCukQ==
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700016)(82310400026)(1800799024)(3023799007)(921020)(18002099003)(22082099003)(56012099003)(5023799004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	YwAo5eOcjqSFiSAhXyfxPuX0m6+C1U9c4QInqJCUnclUT85999cBPkLIEJ5++oOXNjUC1bPwlTu5PzRZMl5VCTJ6iKz3G6YvNiH4HbpBeXLY2Ty6NLZkR5pLHawTbxOApkk3hZlb/MUDa/JtNhd8dsb4XhNq7WzRvKY/mB+u1QBvTRpj9Y/sTsedS8RaJjUrcLxJpoIc0IgUa8xCeD4ErN0VFcsE59Pt2jXEWNZQFOowD5ciynZ+gtLabnzog8aS6owHGayJglQS9gNwHjpd0RH7JaUcZRl5RUf5HFAW47lfCICqjqLPtwilIOqAaJgyQB7yPWJCLPLXs6GW9WBULD+/mBBXXFUuESFOUOiVLBimoempis/B8EGAGKl/iuZT/361Ve4e44FN0aF2Mnd4Nxl+SDFFRFo705uwScyX2CPL6l8IhtMVro6z89+l3FDn
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 11:24:51.5269
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 010c22d4-1d37-4dbc-41a8-08deb66268ea
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF00021F6E.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4247
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,fomichev.me,davemloft.net,google.com,redhat.com];
+	TAGGED_FROM(0.00)[bounces-289903-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289902-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[couthit.com,ti.com,baylibre.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qjx1298677004@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:email,ti.com:mid,ti.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[danishanwar@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7266958CAB5
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 1E72058D146
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The sk_msg scatterlist ring stores the actual page descriptors in
-sg.data[] and stores the copy-required state for each slot in the
-parallel sg.copy bitmap.  bpf_msg_pull_data() trusts this bitmap to
-know whether the current slot can be exposed for direct packet access or
-whether it has to be copied into a private page first.
 
-Several SK_MSG helpers move or split sg.data[] entries without moving
-the matching sg.copy bit.  In particular, bpf_msg_push_data() can split
-a copy-marked entry and place the tail in a new slot with a stale clear
-copy bit.  A later bpf_msg_pull_data() can then skip the private copy
-and expose a direct writable pointer to the shared page.
 
-Keep sg.copy synchronized whenever these helpers move, split, replace or
-remove scatterlist entries.  Clear the bit for newly allocated private
-pages and preserve it for descriptors that still refer to the original
-shared backing page.
+On 28/04/26 12:47 pm, Parvathi Pudi wrote:
+> Hi,
+> 
+> This series adds support for ICSSM Ethernet on Texas Instruments AM57x,
+> AM437x and AM335x platforms.
+> 
+> The AM57x and AM437x IDKs support two PRU-ICSS instances, each consisting
+> of two PRU cores, with each PRU-ICSS instance capable of handling two
+> Ethernet ports. For the AM57x platforms, the PRU-ICSS2 node has been added
+> to the am57xx-idk-common.dtsi, while for the AM437x platform, the PRU-ICSS1
+> node has been added to the am437x-idk-evm.dts.
+> 
+> The AM335x ICE features a single PRU-ICSS instance. A new device tree overlay
+> source file, am335x-icev2-prueth-overlay.dtso, has been introduced to define the
+> PRU-ICSS node for the AM335x platform.
+> 
+> This is v7 of the patch series [v1]. This series is based on the latest
+> next-20260427 linux-next.
+> 
+> Changes from v6 to v7 :
+> 
+> *) No code changes were made, only the version was updated.
+> *) Rebased the series on latest linux-next.
+> 
+> Changes from v5 to v6 :
+> 
+> *) Addressed Kevin Hilman, Krzysztof and Andrew lunn comments on patch 3 of
+> the series.
+> *) Fixed an issue with overlaying "output-low" property in "mux-mii-hog"
+> sub-node under "gpio3" node.
+> *) Rebased the series on latest linux-next.
+> 
+> Changes from v4 to v5 :
+> 
+> *) Addressed Andrew Davis's comments on patch 2 of the series.
+> *) Addressed Andrew Lunn and Nikolaus Schaller comments on patch 2 of the series.
+> *) Rebased the series on latest linux-next.
+> 
+> Changes from v3 to v4 :
+> 
+> *) No code changes were made, only the version was updated.
+> *) Rebased the series on latest linux-next.
+> 
+> Changes from v2 to v3 :
+> 
+> *) Addressed Andrew Davis's comment by placing PRUETH nodes in a new overlay file
+> am335x-icev2-prueth-overlay.dtso.
+> *) Rebased the series on latest linux-next.
+> 
+> Changes from v1 to v2 :
+> 
+> *) Addressed Andrew Lunn's comment on patch 1 of the series.
+> *) Addressed MD Danish Anwar comment on patch 1 of the series.
+> *) Rebased the series on latest linux-next.
+> 
+> [v1] https://lore.kernel.org/all/20251013125401.1435486-1-parvathi@couthit.com/
+> [v2] https://lore.kernel.org/all/20251103124820.1679167-1-parvathi@couthit.com/
+> [v3] https://lore.kernel.org/all/20251217130715.1327138-1-parvathi@couthit.com/
+> [v4] https://lore.kernel.org/all/20260105162546.1809714-1-parvathi@couthit.com/
+> [v5] https://lore.kernel.org/all/20260307122641.738450-1-parvathi@couthit.com/
+> [v6] https://lore.kernel.org/all/20260402073853.2170099-1-parvathi@couthit.com/
+> 
+> Thanks and Regards,
+> Parvathi
+> 
+> Roger Quadros (3):
+>   arm: dts: ti: Add device tree support for PRU-ICSS on AM57xx
+>   arm: dts: ti: Add device tree support for PRU-ICSS on AM437x
+>   arm: dts: ti: Add device tree support for PRU-ICSS on AM335x
+> 
 
-Fixes: 015632bb30da ("bpf: sk_msg program helper bpf_sk_msg_pull_data")
-Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
-Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
-Reported-by: Junxi Qian <qjx1298677004@gmail.com>
-Reported-by: Qi Tang <tpluszz77@gmail.com>
-Signed-off-by: Junxi Qian <qjx1298677004@gmail.com>
-Cc: stable@vger.kernel.org
----
- net/core/filter.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+For this series,
+Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 5fa9189eb..2fc21b87c 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2724,11 +2724,13 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
- 		poffset += len;
- 		sge->length = 0;
- 		put_page(sg_page(sge));
-+		__clear_bit(i, msg->sg.copy);
- 
- 		sk_msg_iter_var_next(i);
- 	} while (i != last_sge);
- 
- 	sg_set_page(&msg->sg.data[first_sge], page, copy, 0);
-+	__clear_bit(first_sge, msg->sg.copy);
- 
- 	/* To repair sg ring we need to shift entries. If we only
- 	 * had a single entry though we can just replace it and
-@@ -2754,9 +2756,11 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
- 			break;
- 
- 		msg->sg.data[i] = msg->sg.data[move_from];
-+		assign_bit(i, msg->sg.copy, test_bit(move_from, msg->sg.copy));
- 		msg->sg.data[move_from].length = 0;
- 		msg->sg.data[move_from].page_link = 0;
- 		msg->sg.data[move_from].offset = 0;
-+		__clear_bit(move_from, msg->sg.copy);
- 		sk_msg_iter_var_next(i);
- 	} while (1);
- 
-@@ -2784,6 +2788,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 	   u32, len, u64, flags)
- {
- 	struct scatterlist sge, nsge, nnsge, rsge = {0}, *psge;
-+	bool sge_copy, nsge_copy, nnsge_copy, rsge_copy = false;
- 	u32 new, i = 0, l = 0, space, copy = 0, offset = 0;
- 	u8 *raw, *to, *from;
- 	struct page *page;
-@@ -2857,6 +2862,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 			sk_msg_iter_var_prev(i);
- 		psge = sk_msg_elem(msg, i);
- 		rsge = sk_msg_elem_cpy(msg, i);
-+		rsge_copy = test_bit(i, msg->sg.copy);
- 
- 		psge->length = start - offset;
- 		rsge.length -= psge->length;
-@@ -2881,24 +2887,32 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 
- 	/* Shift one or two slots as needed */
- 	sge = sk_msg_elem_cpy(msg, new);
-+	sge_copy = test_bit(new, msg->sg.copy);
- 	sg_unmark_end(&sge);
- 
- 	nsge = sk_msg_elem_cpy(msg, i);
-+	nsge_copy = test_bit(i, msg->sg.copy);
- 	if (rsge.length) {
- 		sk_msg_iter_var_next(i);
- 		nnsge = sk_msg_elem_cpy(msg, i);
-+		nnsge_copy = test_bit(i, msg->sg.copy);
- 		sk_msg_iter_next(msg, end);
- 	}
- 
- 	while (i != msg->sg.end) {
- 		msg->sg.data[i] = sge;
-+		assign_bit(i, msg->sg.copy, sge_copy);
- 		sge = nsge;
-+		sge_copy = nsge_copy;
- 		sk_msg_iter_var_next(i);
- 		if (rsge.length) {
- 			nsge = nnsge;
-+			nsge_copy = nnsge_copy;
- 			nnsge = sk_msg_elem_cpy(msg, i);
-+			nnsge_copy = test_bit(i, msg->sg.copy);
- 		} else {
- 			nsge = sk_msg_elem_cpy(msg, i);
-+			nsge_copy = test_bit(i, msg->sg.copy);
- 		}
- 	}
- 
-@@ -2912,6 +2926,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 		get_page(sg_page(&rsge));
- 		sk_msg_iter_var_next(new);
- 		msg->sg.data[new] = rsge;
-+		assign_bit(new, msg->sg.copy, rsge_copy);
- 	}
- 
- 	sk_msg_reset_curr(msg);
-@@ -2939,25 +2954,33 @@ static void sk_msg_shift_left(struct sk_msg *msg, int i)
- 		prev = i;
- 		sk_msg_iter_var_next(i);
- 		msg->sg.data[prev] = msg->sg.data[i];
-+		assign_bit(prev, msg->sg.copy, test_bit(i, msg->sg.copy));
- 	} while (i != msg->sg.end);
- 
- 	sk_msg_iter_prev(msg, end);
-+	__clear_bit(msg->sg.end, msg->sg.copy);
- }
- 
- static void sk_msg_shift_right(struct sk_msg *msg, int i)
- {
- 	struct scatterlist tmp, sge;
-+	bool tmp_copy, copy;
- 
- 	sk_msg_iter_next(msg, end);
- 	sge = sk_msg_elem_cpy(msg, i);
-+	copy = test_bit(i, msg->sg.copy);
- 	sk_msg_iter_var_next(i);
- 	tmp = sk_msg_elem_cpy(msg, i);
-+	tmp_copy = test_bit(i, msg->sg.copy);
- 
- 	while (i != msg->sg.end) {
- 		msg->sg.data[i] = sge;
-+		assign_bit(i, msg->sg.copy, copy);
- 		sk_msg_iter_var_next(i);
- 		sge = tmp;
-+		copy = tmp_copy;
- 		tmp = sk_msg_elem_cpy(msg, i);
-+		tmp_copy = test_bit(i, msg->sg.copy);
- 	}
- }
- 
-@@ -3015,6 +3038,8 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
- 	 */
- 	if (start != offset) {
- 		struct scatterlist *nsge, *sge = sk_msg_elem(msg, i);
-+		u32 sge_idx = i;
-+		bool copy = test_bit(i, msg->sg.copy);
- 		int a = start - offset;
- 		int b = sge->length - pop - a;
- 
-@@ -3029,6 +3054,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
- 				sg_set_page(nsge,
- 					    sg_page(sge),
- 					    b, sge->offset + pop + a);
-+				assign_bit(i, msg->sg.copy, copy);
- 			} else {
- 				struct page *page, *orig;
- 				u8 *to, *from;
-@@ -3045,6 +3071,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
- 				memcpy(to, from, a);
- 				memcpy(to + a, from + a + pop, b);
- 				sg_set_page(sge, page, a + b, 0);
-+				__clear_bit(sge_idx, msg->sg.copy);
- 				put_page(orig);
- 			}
- 			pop = 0;
 -- 
-2.43.0
+Thanks and Regards,
+Danish
 
 
