@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-290075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eBw3NNI0Dmqt8AUAu9opvQ
-	(envelope-from <netdev+bounces-290075-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:25:22 +0200
+	id eAv9EDgkDmr26QUAu9opvQ
+	(envelope-from <netdev+bounces-290074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:14:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC3759BF52
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:25:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E1A59A945
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:14:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4DF8339DD4C9
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:21:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C30DE32EB900
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F0D3403FC;
-	Wed, 20 May 2026 19:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C75340A6B;
+	Wed, 20 May 2026 19:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WLeRYqeV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZBlLoQ4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB01E33B6D1
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CFB3446CE
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779304864; cv=none; b=e6Z+1xhZvji64XbVTWTdP4xGeoTL2qzCcAYhw2H8Qc0FfsLlNwT5aDTKHRY4JeMHhoi2dQd1puebdepumaGkr2og4UXiqwEj6ESn+zbsM//QVkLrvGU2g1MMFMb1FJE/umtk4M1W74slDOXFSzbQEpo3z6cqT8Kt9P8FpHI7HJI=
+	t=1779304863; cv=none; b=Txk4KwU1h1rgtorPUo3ja5N+RX7WdENwYS4PQmK1iGJNn96MZuqftHTBri0QyZWBWdCRhLzWCzwwd/1AVChypWhvgwx2G11Qp6yRwhLA47y1D2lnJTcQSxxtg41+2Con5U1fU+iZwss+Tc/oW4PXlqSIZBwsE74TcGkfIwrOPak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779304864; c=relaxed/simple;
-	bh=Ml8+WIXJmSGrbqib0u5ulf7PiZ8NZS12P3rO01gEh/8=;
+	s=arc-20240116; t=1779304863; c=relaxed/simple;
+	bh=Brhw9cLH5ylmQDDlDuI16ieR0V8mAKyLCwpMqKfdA7Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PYl+It5he9Hzjtr20Dw7j1CLIuvAg2A9Q0de+e54zJ9WQwRagKfMxItY8KYpq26yNOrt0YI/2uK8jfXBcYiHi6EX8EN/krRQJ+xwMC8FYc+tahFScPnIprrPV4Fg5SyQqNqIps3nudy8ufx1CDjXd26USJI3KTqxaOBFXw2C8/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WLeRYqeV; arc=none smtp.client-ip=209.85.128.169
+	 MIME-Version; b=VL6IJqIYG385bynPTsjCMqLp5OMjD0tu7ESvQQH3OuANjbZPcGW8+dRyuxOVsb+ATXKgP3ZTtIaqLA5drRzZ9r2xW219Pu2A/Q+kGtPDk3oAuosS34RUl5TrB8MuHgzenocaL0tmVR4fduL9H3OEv6ahTZ+ps93SkCEZkNFEeNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZBlLoQ4S; arc=none smtp.client-ip=209.85.128.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7bde9d73678so53121867b3.0
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 12:21:02 -0700 (PDT)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7cb345cb5bfso41155327b3.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 12:21:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779304862; x=1779909662; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779304861; x=1779909661; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rwF/HhmYwf5QBeLN9SEfEOEh9juP5SjaaFwH3isu8iY=;
-        b=WLeRYqeVpli5/TM8ddIWG9QHPs6THZEQsoxujNVTLRBAYrA81gzsMcPrJJKpgRNVUx
-         kid0Go6Lx45PAzZRcKzvr7cHIqd0ai1AfBpGu0N287SLszRtc/+QFAURh6ZU+JRVuoQO
-         IPLxDuhvNvA6THL4nL/18EkUgs0sETV95bXvZX/059FaIp/42AN9K3Gm3Tj2QXCSEZKJ
-         MJd8VjVPvfTubJEIVUGRHiacXYO9fbg9uuKGmlmwgDh1NN7ZYJ18vcnuQXqBLEIgeyMr
-         lI49F6dS1xWkBW/m6P5CYy/v45dSJzEbLtenA6WR7Yxk6oRoj7wDWrsMGhsy/z5sm7IL
-         jXCA==
+        bh=p5TTDq02y3Gl4AgphCYbWKzZgUrY86RmMrga/1rglYM=;
+        b=ZBlLoQ4SgWl/Zs1Y5ySFU+lPw/+FrYhRk+SgHxY1Ka/72BbbQkxPFKe/4h745K0L4k
+         AAeGK9ZbUr2Wmvc2bvPJrCf30t6ai5gjpFVC8qboK8kocMB5Uf/8rshp9jJtXEO/xGbb
+         Bin4HFQHDTSZjdsVZ450Hk0SaujTConmaDDGxOkRnXI5/Hn7wvsAb4YjFkEDMfYkNXRD
+         qILNmjTMNjFcY2jz07tbhARoq05jKkgjXI2kg0vmVuZX3dzwEOCx89BAVpsFEcdd/8nk
+         I/DY/RLHUWpZ8Tj6h+rLGJTxZbG9fyKP1gSUttiGRvlICkGZxWKGTCWKIqWSWfiOgePR
+         X/ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779304862; x=1779909662;
+        d=1e100.net; s=20251104; t=1779304861; x=1779909661;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=rwF/HhmYwf5QBeLN9SEfEOEh9juP5SjaaFwH3isu8iY=;
-        b=Z6XGtfr956w5w2I+pEuXPYbIg7YUo5ES+dU5dPm7KFpi/4mHP4rUTA5Um+xijnu+RN
-         HjckDiXqpd0uedoJxCs2cyw41IG9dIfJT9M49E6wGZ1qBJCCMEMhHH7I3AdpjvlNzfNW
-         IQRxslk/wCspkJW36POcjMClJ4jDYDRHCDx+SF6J1TbDyDDOTeSQ5t0vWLM0zj7xr5kl
-         4Ftzw+W32tNvZV58sMDt9T548WSS6vOZok9JIgJoXodXJcR9hHJuRqqMhLvDOCzXydGp
-         c3TtrrYgqX6keFB3wIrxfGdz1PaLnCZOK2n3dKX78pj4dH17jbwMMMlAZjbeYKZKweT6
-         urLQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8vhgRGy47q0CkDGdJN95g+11A965bKqCz6Ezqca+5LoCPobm0B9TWUdL+bbtn7LMhtphhr4Oc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBFBF2EEFCATaIiWBdgj8862G3FoqiEuuMXDIqHNfx9tveAzcp
-	E4c4jMGolWoA3bR+Oy4sNH5m8MBm+pYWAAhRHX/4bdDoRl6/On6yczw=
-X-Gm-Gg: Acq92OGq1M+yJS0HNXDJLa8wggf6VzaG9S/CRPutUg5vk3tai3QQCWXtVfrA5lltAQ1
-	UQCfojbXTs2kS1asrgMMIAwfRtKkaYlGXzhWlRAHw+4OKSkB165MFLKwDilfxNqLtZ+TqPAXxtk
-	aLWRk6xOgJIYvTDwR6D9EMMPg5OAXYQn8qTr2b16mzxNz6budiMF0jvXR9yq1ArZmKyajkPrfwc
-	Uegi3UBgWcnRBnCp22I6ThHfgMS/X2Pz4MsFztXDPzm4U9lOPUEbEzlef8CKRUPIFKIkVojF7ti
-	WGa/PXTDrVLDbc/nAYIG94OT8vxMnSYUu7cOKT/qDdJRotyEodRmu/qsY4Cxt5Fg4GBKzmv3NR0
-	n3EhKTGgoWHUKJmN+JeV90fvJCa9e5mzh8PgMTvSQ133eBoyN2F2h6rImxJq/oi/+gN3r+MUKwc
-	IfE5b7/UFezv5DTzJXgUiJFgLiuloGcJsKtUwNR2HL2i4DlA==
-X-Received: by 2002:a05:690c:b01:b0:7ba:ded4:df69 with SMTP id 00721157ae682-7d1c369ba38mr8993067b3.1.1779304857169;
-        Wed, 20 May 2026 12:20:57 -0700 (PDT)
+        bh=p5TTDq02y3Gl4AgphCYbWKzZgUrY86RmMrga/1rglYM=;
+        b=CGbWU9lhQ3aMC56Gsqqfdi89G2X2HKmZDqXoHXcZ2uBHyujsQiTh/NROOPcGwm6bIu
+         DhRpy0J9Tldsadj3vYCp8vpLPWfxGfveW2XYMX9Fp8bcud7i3sz9khg/tex4LEiJL955
+         zl1UdWjsQGwci2zC7LP3dC735xqcSZteAW3/sFfO9SRVS2osESjzKqGhFD/Km/CI6vTd
+         tdMEofe5cWum8LSvDfdhEAxx2/Su6NCVguHrmsNggBL4gPAl18G/hnd64PfrmFxFfi5V
+         SDxvMTpXk05TvRngtabq9CueWMtlVNEkcA/I/et0nhIba5C7q0+umS/hk0uztKtaRU6r
+         Pcnw==
+X-Forwarded-Encrypted: i=1; AFNElJ9RkY5Jjd+h1wZranN0oOCcs6neM3X7eWSZN2Kuk2FUkuAIASmxhnw4UQfJqmPze2TLjN1HJlE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmaGx5SU5r5KWvfDg3UkcJp57TIFlnUJNZy7GX6p74g2IMvP3x
+	MzN1Rqe6zY0PSd7XGUhUGfcKOyz7objzYWh+w7mKQoLN1A3qSTE9qiE=
+X-Gm-Gg: Acq92OH4c0vG50+KpC/xWpYMfbYd7XHyerQQsvApnRX3+G12t/j8+Y2Xcc3NqOgfZSo
+	DzDZz8mUA6u4hoKwRhqdgiAj3r3ERlvim0mRALOb7HwWZpiu9ZaqQFVrliqv/TK9F7suchWanbu
+	dK4dcg9vLKBy4Rgw9M2M6EQ09/ZKtfmsXzt7C9KjHCaco5WW+CO3WHGg01uyJAfZV0lGOqQfKH3
+	xmaRsasfIl1Iq1TffBMrO5LPw02/U5QlY2rGfWoXniTbDS2eujEP8FW9jgPYzOhBE1ja7/UNGJE
+	nYt0DQ5tYvoszuTQKgvwd/ERzwcJiRzCCKpyOfQmW0l645x73fxqnuM2IdbyFI3Q1QogKAsr8Gn
+	nV6uGBYaTtJvyUF7R9XKTyhJz8gdZqEzpcIrbAzd1C7OrGWRl9QMvARK/w4mjDtaOS1yY3K17To
+	W+WpRRPtO+qyHzSyEiE5C13qjWMZ0BofuI98a7cs031DVqTSOlhPhP0p2s
+X-Received: by 2002:a05:690c:19:b0:7bb:eaf:5101 with SMTP id 00721157ae682-7c9599a2f1emr289856297b3.16.1779304860938;
+        Wed, 20 May 2026 12:21:00 -0700 (PDT)
 Received: from alir-mac.sitimecorp.com ([12.1.37.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc9d18dcddsm56346757b3.49.2026.05.20.12.20.55
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc9d18dcddsm56346757b3.49.2026.05.20.12.20.59
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 20 May 2026 12:20:56 -0700 (PDT)
+        Wed, 20 May 2026 12:21:00 -0700 (PDT)
 From: Ali Rouhi <rouhi.ali@gmail.com>
 X-Google-Original-From: Ali Rouhi <arouhi@sitime.com>
 To: jiri@resnulli.us
@@ -90,9 +90,9 @@ Cc: vadim.fedorenko@linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Ali Rouhi <arouhi@sitime.com>
-Subject: [PATCH v2 net-next 1/3] dt-bindings: vendor-prefixes: add SiTime Corporation
-Date: Wed, 20 May 2026 12:19:41 -0700
-Message-Id: <20260520191943.73938-2-arouhi@sitime.com>
+Subject: [PATCH v2 net-next 2/3] dt-bindings: dpll: add SiTime SiT9531x clock generator
+Date: Wed, 20 May 2026 12:19:42 -0700
+Message-Id: <20260520191943.73938-3-arouhi@sitime.com>
 X-Mailer: git-send-email 2.39.2 (Apple Git-143)
 In-Reply-To: <20260520191943.73938-1-arouhi@sitime.com>
 References: <20260520191943.73938-1-arouhi@sitime.com>
@@ -109,54 +109,196 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-290075-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-290074-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rouhiali@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
+	DBL_PROHIBIT(0.00)[0.0.0.1:email];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sitime.com:mid,sitime.com:email]
-X-Rspamd-Queue-Id: 6BC3759BF52
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sitime.com:mid,sitime.com:email,0.0.0.0:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,devoxsoftware.com:email,0.0.0.68:email]
+X-Rspamd-Queue-Id: 89E1A59A945
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add vendor prefix for SiTime Corporation, manufacturer of
-programmable clock generators and MEMS oscillators.
+Add device tree binding documentation for the SiTime SiT95316
+and SiT95317 DPLL clock generators.
 
+Co-developed-by: Oleg Zadorozhnyi <Oleg.Zadorozhnyi@devoxsoftware.com>
+Signed-off-by: Oleg Zadorozhnyi <Oleg.Zadorozhnyi@devoxsoftware.com>
 Signed-off-by: Ali Rouhi <arouhi@sitime.com>
 ---
- Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
- 1 file changed, 2 insertions(+)
+ .../bindings/dpll/sitime,sit9531x.yaml        | 145 ++++++++++++++++++
+ 1 file changed, 145 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml
 
-diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-index 28784d66ae7b..5e81b9bfa3d0 100644
---- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
-+++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-@@ -1527,6 +1527,8 @@ patternProperties:
-     description: SiRF Technology, Inc.
-   "^sis,.*":
-     description: Silicon Integrated Systems Corp.
-+  "^sitime,.*":
-+    description: SiTime Corporation
-   "^sitronix,.*":
-     description: Sitronix Technology Corporation
-   "^skov,.*":
+diff --git a/Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml b/Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml
+new file mode 100644
+index 000000000000..ac88f2f0b2ae
+--- /dev/null
++++ b/Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml
+@@ -0,0 +1,145 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/dpll/sitime,sit9531x.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: SiTime SiT9531x DPLL Clock Generator
++
++maintainers:
++  - Ali Rouhi <arouhi@sitime.com>
++
++description: |
++  SiTime SiT95316 and SiT95317 are I2C-controlled programmable clock
++  generators with integrated DPLL for synchronization applications.  Both
++  variants contain four PLLs with automatic/manual reference selection,
++  DCO frequency adjustment, and phase offset measurement via an on-chip
++  TDC (Time-to-Digital Converter).
++
++  SiT95317 provides 4 inputs and 8 outputs; SiT95316 provides
++  4 inputs and 12 outputs.
++
++properties:
++  compatible:
++    enum:
++      - sitime,sit95316
++      - sitime,sit95317
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++    description:
++      External crystal/oscillator feeding the chip's XIN/XO_CLK input.
++      The chip's PLL Fvco is computed relative to this reference, so the
++      driver requires a non-zero rate at probe time.
++
++  clock-names:
++    items:
++      - const: xtal
++
++  reset-gpios:
++    maxItems: 1
++    description:
++      GPIO connected to the chip's active-low reset pin (RESETB).
++
++  interrupts:
++    maxItems: 1
++    description:
++      Interrupt from the chip's active-low INTRB output.  Asserted when
++      the device detects a status change such as lock acquisition or loss.
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++
++allOf:
++  - $ref: /schemas/dpll/dpll-device.yaml#
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    xo: xo {
++        compatible = "fixed-clock";
++        #clock-cells = <0>;
++        clock-frequency = <48000000>;
++    };
++
++    i2c {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        dpll@68 {
++            compatible = "sitime,sit95317";
++            reg = <0x68>;
++            clocks = <&xo>;
++            clock-names = "xtal";
++        };
++    };
++
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++    #include <dt-bindings/interrupt-controller/irq.h>
++
++    xo2: xo2 {
++        compatible = "fixed-clock";
++        #clock-cells = <0>;
++        clock-frequency = <48000000>;
++    };
++
++    i2c {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        dpll@68 {
++            compatible = "sitime,sit95316";
++            reg = <0x68>;
++            clocks = <&xo2>;
++            clock-names = "xtal";
++            reset-gpios = <&gpio 78 GPIO_ACTIVE_LOW>;
++            interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
++            dpll-types = "eec", "eec", "eec", "eec";
++
++            input-pins {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                pin@0 {
++                    reg = <0>;
++                    label = "clkin0";
++                    connection-type = "ext";
++                    supported-frequencies-hz = /bits/ 64 <10000000>;
++                };
++
++                pin@1 {
++                    reg = <1>;
++                    label = "clkin1";
++                    connection-type = "synce";
++                    supported-frequencies-hz = /bits/ 64 <156250000>;
++                };
++            };
++
++            output-pins {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                pin@0 {
++                    reg = <0>;
++                    label = "clkout0";
++                    esync-control;
++                    supported-frequencies-hz = /bits/ 64 <156250000>;
++                };
++
++                pin@1 {
++                    reg = <1>;
++                    label = "clkout1";
++                    supported-frequencies-hz = /bits/ 64 <25000000>;
++                };
++            };
++        };
++    };
++...
 -- 
 2.43.0
 
