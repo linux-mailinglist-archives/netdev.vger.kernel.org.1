@@ -1,67 +1,84 @@
-Return-Path: <netdev+bounces-289791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289792-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGi5L3ZbDWolwgUAu9opvQ
-	(envelope-from <netdev+bounces-289791-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:57:58 +0200
+	id aFYxGrlZDWpuwQUAu9opvQ
+	(envelope-from <netdev+bounces-289792-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:50:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F9295888D6
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:57:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF29058860D
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 905D73071DAD
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:48:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A4B8730205C2
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED044364E80;
-	Wed, 20 May 2026 06:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B70334D3A9;
+	Wed, 20 May 2026 06:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E/ANz9aC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THIjqPKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC2C3630B9
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCBF33F8BC
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779259728; cv=none; b=QthVG1NiyKnYeBBrtbxQD5XwaaxqLaOFe17YmCImbD5sbL/BRWSSAmewNvU6ahqkdxfoI53gk62wE4VPWAd0/b1VrfJHirICYSsWPXdoJbTftCMM2oAuMrVxOq1tPSRCqscpw7kMGNKETLPUvS4bFn/0jrrLvSZHrNm7DBqiQyw=
+	t=1779259802; cv=none; b=pfyuRs3YkfglBz/EF7C84hdrAZqgbXzSlajeEjQg/hlFjFFkns74BCgdXtKErYf19VBc/xoJftA/+aab3RdJHQbGtS7gjdqbwZezRmwodZ1OPRNNYAEUiyR7gIZ8kYClgHpZULFlebYzBh6g1c6aHHIzn00crCc3Oubp6q8BEoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779259728; c=relaxed/simple;
-	bh=ZYpmqab6WhoOzXOcx2EvyFXWFf5IPGpglQK/hyx+H68=;
+	s=arc-20240116; t=1779259802; c=relaxed/simple;
+	bh=qt99GYg/1shljr6n/ZEewGKE7srK7gzVSvn5dxL10OM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kh7++nCSo7UGMdexESzhbyQmtlfSrv55PRiRbAv+aVKfeNRLf+uGQIvZFFGFiz/Jn6vXbBb0yhdEhwHHcoB5ZPvZZ57lVaCqRmhfamzgIy3vCwC35SVe0KUsNs0VSm2MzpvLRJB8iB54KdrvWWkk6TUTarYmemHn6Arxk2/tLII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E/ANz9aC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779259725;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xauAd+4aqIgMuLm7Tiw+VX/5LeN56B9EH9yKQTJwiMs=;
-	b=E/ANz9aCLQnrh03TTIu2w3lsaNDiqe0grXht5Iw8rr0VyPEVB4hjglGDS9Qeil0tL+p5vI
-	c5RAnj8vno2XMH8B3VSTGC6+JLvORA/MHNkjpRMurZwIcDpKnuvSQQByxGYf7xSeWQmY0w
-	HUryo8P/au0xc+xIA7CltrmQgRiNJU4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-400-LJj5Jf5XMc2mR1gXmGPGZg-1; Wed,
- 20 May 2026 02:48:42 -0400
-X-MC-Unique: LJj5Jf5XMc2mR1gXmGPGZg-1
-X-Mimecast-MFC-AGG-ID: LJj5Jf5XMc2mR1gXmGPGZg_1779259721
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 737DD18002E3;
-	Wed, 20 May 2026 06:48:40 +0000 (UTC)
-Received: from [10.44.32.79] (unknown [10.44.32.79])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3CB7B18004A3;
-	Wed, 20 May 2026 06:48:38 +0000 (UTC)
-Message-ID: <b2ef0af0-a140-475a-86e0-f32b1b240a6b@redhat.com>
-Date: Wed, 20 May 2026 08:48:37 +0200
+	 In-Reply-To:Content-Type; b=r8OW6z4h83oz1T46fcwQ5cENu3rffKSgjMXfJ8T3HC3TkJZp/nWReVleYjY9f6irwP1g/vzxJhOUCsGMX6DLIeGVPk4/NHtQkv+CskYTgHfmI+1Vu4ljX8zXTfk023NoQtYy8a2zqsLQIxJgtstGOE7NPyMbpVJEY7I1NSh1FdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THIjqPKX; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-44c350a5b87so2655427f8f.3
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 23:50:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779259799; x=1779864599; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mchzN0Z6nfnR1XaYP0jBIFjxXcTRqvaSqlUOs9Gpon8=;
+        b=THIjqPKXvpab7sWexlmGvwlBRXeI8Xr4JMcaEpe9e3GNYDOvyjr6yVQgBtit63oHmR
+         dc5kbIZitf2GEI3wROs0vHQjdHqG8RbXc/GwInS52/FLnvOR/0rpqjKWSfE25KekSsHN
+         r1vxyukCi+aFTCt52htCk7X3BHLW6tt96jjw+Xj4WbuTL+2mExn6colH0FTKRugsKu7k
+         fXW4Ndl8YMDpWPE3bZZd3pJmtADOK8uMIEFwTyVJQvj/E+/hkOxNfhkc5yGhO7hzAcOj
+         7c3d8tLz98ILPZVl/qOJyHvPH7inO2bUcdE8g4Walx5wQo9xb1k73Pd6fb+K9MsHqj/P
+         wocg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779259799; x=1779864599;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mchzN0Z6nfnR1XaYP0jBIFjxXcTRqvaSqlUOs9Gpon8=;
+        b=K7uZCYdwMjpgJeigQZi19Fy0u5lk0hx2yPD3ORCPXSpwXpLx9S6PTDGN64KBNhzIGk
+         xWBdMLISaYYGPNm8Q4AOZKpvj0ahM2+zCcgHRLnvtBgWI6purZKEN31WHvPAfqm4+u6/
+         YzpVe6TXQ1JMXxlNCVNuZ1LCzUWS7lirsK9IemFwhAOVfccuPM0tKbdxMwK01QTAXv+4
+         oJVa8KEA78w0luYIU1fR25I+iYj4Rflij5ha2LdK6Yx86OEeTssDeCFhzBkqWNR6nxcF
+         eu4k2a3+WaBaADVycQ1lo3v/A88bAgDocm2n7ujrepxmX4/edc9h80zX3vPJHkLEfE1M
+         9itg==
+X-Gm-Message-State: AOJu0YzQCGxfD/lK06Dr7iveIbUdwEvZpw8kMjidwSCsa/WLWi/rALno
+	1JcEh1Fp3tqsLAHWw3qI82rCCWEJOSLpjGS+iYo8dlfPsh7eVrHAaZwh
+X-Gm-Gg: Acq92OH3fabFIqUaVgpt5Za4PN9prhzm+PXfHzYblsjC74TFhV5bMZogzJp9VkM+jbT
+	OGB3o2O6IcrmiLKI2iqvvKgjGqEw7eJBuCcMZQAv6E6eyy6HEFnSYCzYJp/khhnhDlTAvz7M2e9
+	KHdZyBFOJfXZHeDZX4x6YEpt9DLPt2EBGnmlFiY4qVLWVAh2VcwVfALZCXOi5ttqtsdsyKP6+T1
+	nFN92da+vzip9hcfoxOpDqjsfPKHwLSU2sfLEVUOhWV2mtYCLkNXVoilYBizBt4d2StgFUWhEdv
+	Bg8RJi+LnESbPCiUEvVf+pg6qoL8WkwIzMtdRC3/cqRQLrK8pJWeXLAGiMz9dxonNPKk8/biHwu
+	yFos65O3ukQFDj1OGSFZXtik7whbnjCaa6ZrgWfU6l5coF3RHWvdVGGAFCET0q64YXVh4FOa5TT
+	GNFsNCrN45HCdTM1kimWW23JMARRY4o+6J8XUBIYkFx9qMsAtBaD3eSxJjPkYDRFxc8JR5rGOI2
+	rdILiUTDQ==
+X-Received: by 2002:a05:6000:2405:b0:43b:3e40:2223 with SMTP id ffacd0b85a97d-45e5c5b9673mr37127459f8f.19.1779259799002;
+        Tue, 19 May 2026 23:49:59 -0700 (PDT)
+Received: from [10.1.0.164] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a17ec2sm48407651f8f.24.2026.05.19.23.49.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 May 2026 23:49:58 -0700 (PDT)
+Message-ID: <ad1d07ed-2fe7-40c3-a043-dd6d2c1c4f8f@gmail.com>
+Date: Wed, 20 May 2026 08:49:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,65 +86,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] dpll: zl3073x: Use named initializers for struct
- i2c_device_id
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29?=
- <u.kleine-koenig@baylibre.com>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260519142710.1587324-2-u.kleine-koenig@baylibre.com>
+Subject: Re: [PATCH v5 0/3] ksz87xx: add support for low-loss cable equalizer
+ errata
+To: Marek Vasut <marex@nabladev.com>, Woojung Huh
+ <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Tristram Ha <Tristram.Ha@microchip.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Fidelio Lawson <fidelio.lawson@exotec.com>
+References: <20260505-ksz87xx_errata_low_loss_connections-v5-0-da4002b21c42@exotec.com>
+ <fe01752d-95d4-4686-b536-0acc8a2046cb@nabladev.com>
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20260519142710.1587324-2-u.kleine-koenig@baylibre.com>
+From: Fidelio LAWSON <lawson.fidelio@gmail.com>
+In-Reply-To: <fe01752d-95d4-4686-b536-0acc8a2046cb@nabladev.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289792-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289791-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[nabladev.com,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 1F9295888D6
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: CF29058860D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/19/26 4:27 PM, Uwe Kleine-König (The Capable Hub) wrote:
-> While being less compact, using named initializers allows to more easily
-> see which members of the structs are assigned which value without having
-> to lookup the declaration of the struct. And it's also more robust
-> against changes to the struct definition.
-> 
-> This patch doesn't modify the compiled arrays, only their representation
-> in source form benefits. The former was confirmed with x86 and arm64
-> builds.
-> 
-> Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
+On 5/16/26 03:44, Marek Vasut wrote:
+> Is there still anything left to do with this series ?
 
-LGTM...
+Hi, sorry for the delay I just got back from a trip.
+Thanks for your feedback! I’ll fix everything and submit a new version 
+today.
 
-Reviewed-by: Ivan Vecera <ivecera@redhat.com>
-
+Best
+Fidelio
 
