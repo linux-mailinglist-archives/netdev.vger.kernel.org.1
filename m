@@ -1,264 +1,331 @@
-Return-Path: <netdev+bounces-290100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPyWLr4bDmrP6AUAu9opvQ
-	(envelope-from <netdev+bounces-290100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:38:22 +0200
+	id IN6NI9I8Dmqr9AUAu9opvQ
+	(envelope-from <netdev+bounces-290101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:59:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38E4D599DD5
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:38:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10EA259C76D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3FEC03040945
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:37:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DDB7301CCD0
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BDD372ED2;
-	Wed, 20 May 2026 20:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126FE372EDA;
+	Wed, 20 May 2026 20:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tM8G90hX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hyRC9W/x"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969DC372ED0;
-	Wed, 20 May 2026 20:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779309446; cv=none; b=R553lmcS6v+ASyXpSe7hmZZYz1QdO6TtIfX2F565hbKnoNWSejd4Rm8Ld676wEGTMDIPRek0uVEw4HKts/6cjcmGzvzGGvM1pOV+7JFzpZ1xQ208ZI1u+H7I61ev1zJow0HMx7Zv5m16RaOv+jLpOE/yt28514X+I0JpkeC9Hv0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779309446; c=relaxed/simple;
-	bh=Yi70dB/jT91/u8tcFVwviOtAofrfiAfrDmEIEUS6P6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YJ3XJthY21G+gESUHMtobthcUSeWvN3+N+2okXUWcP83nHhF1WbttwXTIZGD8J5BwQNcv26a/ibJmlVdaG+sv4Xr0Bo7BtPTXvVvVLLTgCNGfXMN+wRhUGYHuIb+ZQkWTlAuhFXmSV73LIGuVG5oeRGp4boFq2udwDDLNxl62lI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tM8G90hX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/jydwNDrtaG39ojIvvfIFNlq6g4H991wFtbH0rqz4Uc=; b=tM8G90hXYMVoob2lWMPUhwSKaR
-	Xkif/sFjJMnNYo74mtArpRq0FoSCFHzxNbylJm8Ja3ROjUdNywRdnFu3rwsQNKTjMs5VH1mfgQHx6
-	FF+zA5+wHYDg3vgiY/UN1Lw9XYdjlikPEE1+jVEyqyhwC72wZUTZiZkxvUC8ZBjCFyg0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wPnf3-003twE-N4; Wed, 20 May 2026 22:37:01 +0200
-Date: Wed, 20 May 2026 22:37:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: mike.marciniszyn@gmail.com
-Cc: Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Daniel Golle <daniel@makrotopia.org>, Kees Cook <kees@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, Lee Trager <lee@trager.us>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	Alok Tiwari <alok.a.tiwari@oracle.com>,
-	Chengfeng Ye <dg573847474@gmail.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] net: eth: fbnic: Add led support
-Message-ID: <74576086-f51f-41ef-b0ef-c4e0373a06c4@lunn.ch>
-References: <20260520200337.204431-1-mike.marciniszyn@gmail.com>
- <20260520200337.204431-4-mike.marciniszyn@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651CB371053
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 20:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779309769; cv=pass; b=OEjEHFKbOEu88UPHkfMPIZ73AZuEyIcnMq7czpjfI1BC2d8ZQw6IljS84kWCIzU2S1jo215eM66VKs6hvLam4WgXWE+noon09jfikKtcfOPMgOJhe1d5Ra3r/hKv9iTasJOc57J4cqUlw6IjFpAzepk70S+YVgMWczGhP8bAqMs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779309769; c=relaxed/simple;
+	bh=swoniN8dKbxjmhX+Uk6nTtqqeMOaDJuOsCzcMmvbw1o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hF/or02dNNNTgRNH7iaXlfmjK47mTLR7AqfEVv7huaFO8XH+VxYEYvtPKo8a7PkO+jahHAVg4piwbh4R4Tbdl/O5SXe/FtJDoLanw7JHQRoUKkhUi1JUcSRbgybi28wuZesJp6mPrCIIb0octt3xH6k4umvWUWVnJZ+Xgy696Ng=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hyRC9W/x; arc=pass smtp.client-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-135181f726dso136c88.1
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 13:42:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779309766; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fDdvzQaSWJ4JpwqiSajIdeB0EPfhJH0tHJeKA9cAEhb9TjeQoeaoZVgSRt1MUNxtmj
+         1QICS1TStdrIIPEFCRWBnV78V9asUBcdjFtiB75e2hqj9hCLU9DACMX2C74yFo3MA3E8
+         igiyH3KQpxqRZ56nFNp+//zBOUfJVNadp5zP2Cb0XCB/VvKqzqKVgQutdmtQ9AietA7n
+         LOQE6a+6FiIBEclELauWTuWfSAv7YqUr5VH6fNdryjhmJGFWMlKe5AAMHXpE/Q0hYsk1
+         xzjlSWn9w3oWAmBkaAGAaGFCreWVLEUqggJSouprlxbaWWatuHXuyUhf9s2/+EqMm0ay
+         u7KA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vcExwVYkUpCIudziU/6/ngXHhFQ/KYbIMq9N2HBF1YI=;
+        fh=WzJnkKbTbKHAJAKXas1DO3bX4bwoyJ6QioUKyQXxsCs=;
+        b=MkmlYGiF3V+BfEJmj6PJL16kX++9eWJnyqjQNRBQCdIhfeIqSz4nMOsVrGekF1hEy6
+         cf1gkYpq+51r8Zc3GiKEgOTfVA/fEDtcSBw0b5PfKcO3KAH0FS1wgFB9sCUdomgwgCCa
+         OCMIMjpxUl9Z9kqEGhF+GaJB5Vw9C7hoom5XHd6aDEsRU4IaI+zDRxE3uddbzSqs7Phl
+         OTJZWmWbcEqUmHbgVGowGx4kvJPIVtJmU6nTTmhpE55/pf4prPxYAEAufc/3uAZdS/hB
+         2MPpJZJEcpFEFSF4V5bbVgVCB4VoRi7w39gSLZ0rWuxD3afeCZ4M5MEh3WaRhIZuD3bi
+         Zw2Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779309766; x=1779914566; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vcExwVYkUpCIudziU/6/ngXHhFQ/KYbIMq9N2HBF1YI=;
+        b=hyRC9W/x/40Epk8d6ZrXyLem/qA+ZN9MJCA8UCBodEADRwAwaG06o/sWyYJ8w+S1J7
+         o10WCZAMsFlBLXyTdgnVRq3s/Ke6tPYA4kvR6bPzGC3sIQRydCKmLIkIBj3IU3rWRTj+
+         2CNsNauJDn/+CDAuE7UCVfxJnOFNxpY5p+EKl8S8omlSOrIQ6bzLfxd/YwjO9VBgTIFy
+         ZHN5/NZ8W9nkocXKEd1gIZSiFmd/Nfs6jFHdT4N4YFpp2c+sbaommHE0R0jWXxIueIwQ
+         +gDi8pZgqQNwPgA1IgN8ZG2DbLNNIdzY0UuZJGWBIk7/B54MV4hZRow6F8kVtATPcOj4
+         KZTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779309766; x=1779914566;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vcExwVYkUpCIudziU/6/ngXHhFQ/KYbIMq9N2HBF1YI=;
+        b=cidteSUJIcoyNAGV7Lm9hv7Y59vJDMn2OtM6C2WbCr1iH1dsu2C6kaf7wruuHxZcDi
+         Q+cjA1g/uR2ZZbbWoXDS//bmdPCE4fsVRD+qb9q9mfh/+DqH6A+V6dC6+E6HwQQ0qYIt
+         yAVjsqsBEcUiKXp2naheZnn5xpVcEv8OMcTcLij0I1z5p/tnwbbXFRtDMCTvxTZAnn1o
+         VyvuCW8OT5UzaDUchNuItfc3hS4HyHKuKzFTlXVNtXrIjc3g+6SKymzXpSdLBclNGctb
+         /HWL2CJy9u0xpoEmIy4+Pja+D7j7sniWIbzIsZ0xEtsBtnaYa/cNR9Qtka0TtoS37Ezs
+         8Pqg==
+X-Gm-Message-State: AOJu0YwBVyUt0DDDKiX6DHJNOqqDyrPGCrs80gvprmlZhsUc2Z8ocZpz
+	4bIOdmTHLcYGCWiEV2bWQlTwl5SNkK4v/HtiARl75qgHpGxqjw8e35JuP/YTpy2dJ/2TQeN4qG9
+	VgvHECNlOHz2Mo0E2cjd2q+dgIbWGIJhJnqrkbJS5
+X-Gm-Gg: Acq92OH919CJ6a5OjbGo9F5UbxAAJQ0XYF4DaVCh/EZ6BdlxgvK5GLhTVRNPnPXaan7
+	ctM5C4dYZbgxUb9ZaCymm1broNMi8F9B3dT87xC7qWm2nWL6l8qvth/jK6NcKP0O7lSmfEkhjPK
+	cRJjG0WaYI5xNsVXx3uoBlGeXc+1nLQD2JK1RsD0Oxf5s6HMDRFPMUlArX5d+Wia7U/jQqL09ND
+	MRCaiqsmKJBdsrRy9BaN87Sh9V+Grr0QIqhl7BnjPhYhvG8TdqIYzN4Fw+dWa/zt2HfWj9ROwF2
+	j/heZyzgrIAyQEghDIbm1sAji/973HXFBIXQCk1o4JJhE+ho19mc
+X-Received: by 2002:a05:7022:108:b0:11a:b4dc:7773 with SMTP id
+ a92af1059eb24-1363394eabfmr4014c88.12.1779309765824; Wed, 20 May 2026
+ 13:42:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260520200337.204431-4-mike.marciniszyn@gmail.com>
+References: <20260519203530.66310-1-devnexen@gmail.com> <CAHS8izOL4yyPH4+ZUXxKB6JAj0EgbFK5UkG+SSb4rk_vG6EfhQ@mail.gmail.com>
+ <CA+XhMqxPNEBVey8xw_yisymwL2H_04hL48GOyPk08U8p0tYM2g@mail.gmail.com>
+In-Reply-To: <CA+XhMqxPNEBVey8xw_yisymwL2H_04hL48GOyPk08U8p0tYM2g@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 20 May 2026 13:42:32 -0700
+X-Gm-Features: AVHnY4ICiwqE7hbYCr0VxH30HD8L8io-G094d2MA_FbIMSMclBaeXhhNRblCHYc
+Message-ID: <CAHS8izMTxrywNPEeYsuyeJ9ETfdwt0qYdHFh5=v8pohboT86AQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: devmem: reject dma-buf bind with
+ non-page-aligned size or SG length
+To: David CARLIER <devnexen@gmail.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	sdf@fomichev.me, sdf.kernel@gmail.com, kaiyuanz@google.com, 
+	bobbyeshleman@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290100-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-290101-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,makrotopia.org,gmail.com,intel.com,trager.us,oracle.com,linux.intel.com,vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[almasrymina@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,fomichev.me,gmail.com];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 38E4D599DD5
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 10EA259C76D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> +/**
-> + * fbnic_set_phys_id - Used to strobe the MAC LEDs in a recognizable pattern
-> + * @netdev: Interface/port to strobe the LEDs for
-> + * @phys_id_state: State requested by the call
-> + *
-> + * This function can really be broken down into two parts. There are the
-> + * ACTIVE/INACTIVE states which really are meant to be defining the start
-> + * and stop of the LED strobing. There is also the ON/OFF states which are
-> + * used to provide us with a way of telling us that we should be turning
-> + * the LED on and/or off.
-> + *
-> + * We translate these calls and pass them off to the MAC layer. They will
-> + * be used to initialize a strobe, then on and off will be used to cycle
-> + * between the patterns, and finally we will restore the original LED state.
-> + *
-> + * We will return 2 when we are requested to go active. This will tell the
-> + * call that it will need to call back to turn on/off the LED twice every
-> + * second.
-> + *
-> + * Return: blink in half second intervals on success, negative value on failure
-> + */
+On Wed, May 20, 2026 at 12:28=E2=80=AFPM David CARLIER <devnexen@gmail.com>=
+ wrote:
+>
+> On Wed, 20 May 2026 at 19:55, Mina Almasry <almasrymina@google.com> wrote=
+:
+> >
+> > On Tue, May 19, 2026 at 1:35=E2=80=AFPM David Carlier <devnexen@gmail.c=
+om> wrote:
+> > >
+> > > net_devmem_bind_dmabuf() trusts dmabuf->size and sg_dma_len() to be
+> > > PAGE_SIZE multiples without checking:
+> > >
+> > >   - tx_vec is sized dmabuf->size / PAGE_SIZE, and
+> > >     net_devmem_get_niov_at() only bounds-checks virt_addr < dmabuf->s=
+ize
+> > >     before indexing tx_vec[virt_addr / PAGE_SIZE]. With size =3D
+> > >     N*PAGE_SIZE + r (1 <=3D r < PAGE_SIZE), sendmsg() at iov_base =3D
+> > >     N*PAGE_SIZE passes the bound check and reads tx_vec[N] -- one pas=
+t.
+> > >
+> > >   - owner->area.num_niovs =3D len / PAGE_SIZE while gen_pool_add_owne=
+r()
+> > >     covers the full byte len, so a non-page-multiple non-final sg
+> > >     desyncs num_niovs from the gen_pool region for every later sg, on
+> > >     both RX and TX.
+> > >
+> > > dma-buf does not require page-aligned sizes, so the bind path has to
+> > > enforce what its own indexing assumes. Reject both with -EINVAL.
+> > >
+> > > The size check is TX-only (only tx_vec is sized off dmabuf->size); th=
+e
+> > > SG-length check covers both directions.
+> > >
+> > > Fixes: bd61848900bf ("net: devmem: Implement TX path")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: David Carlier <devnexen@gmail.com>
+> > > ---
+> > > Changes in v2:
+> > >   - Reframe commit message around the kernel-side OOB instead of
+> > >     "real exporters already page-align", which read as the OOB being
+> > >     unreachable and undercut Cc: stable (Stanislav Fomichev).
+> > >   - Hoist the SG-length check out of the if (TX) branch so it covers
+> > >     RX too; RX has the same num_niovs / gen_pool desync on a
+> > >     contract-violating exporter, just without an OOB. Keep the
+> > >     size-multiple check TX-only (Stanislav Fomichev).
+> > >   - Drop bool todevice; compare direction =3D=3D DMA_TO_DEVICE inline=
+ to
+> > >     match the existing call site at the tx_vec[] assignment
+> > >     (Bobby Eshleman).
+> > >
+> > >  net/core/devmem.c | 11 +++++++++++
+> > >  1 file changed, 11 insertions(+)
+> > >
+> > > diff --git a/net/core/devmem.c b/net/core/devmem.c
+> > > index 468344739db2..4f71de44c0fb 100644
+> > > --- a/net/core/devmem.c
+> > > +++ b/net/core/devmem.c
+> > > @@ -241,6 +241,11 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+> > >         }
+> > >
+> > >         if (direction =3D=3D DMA_TO_DEVICE) {
+> > > +               if (!IS_ALIGNED(dmabuf->size, PAGE_SIZE)) {
+> > > +                       err =3D -EINVAL;
+> > > +                       NL_SET_ERR_MSG(extack, "TX dma-buf size must =
+be a multiple of PAGE_SIZE");
+> > > +                       goto err_unmap;
+> > > +               }
+> > >                 binding->tx_vec =3D kvmalloc_objs(struct net_iov *,
+> > >                                                 dmabuf->size / PAGE_S=
+IZE);
+> > >                 if (!binding->tx_vec) {
+> > > @@ -267,6 +272,12 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+> > >                 size_t len =3D sg_dma_len(sg);
+> > >                 struct net_iov *niov;
+> > >
+> > > +               if (!IS_ALIGNED(len, PAGE_SIZE)) {
+> > > +                       err =3D -EINVAL;
+> > > +                       NL_SET_ERR_MSG(extack, "dma-buf SG length mus=
+t be PAGE_SIZE aligned");
+> > > +                       goto err_free_chunks;
+> > > +               }
+> > > +
+> > >                 owner =3D kzalloc_node(sizeof(*owner), GFP_KERNEL,
+> > >                                      dev_to_node(&dev->dev));
+> > >                 if (!owner) {
+> > > --
+> > > 2.53.0
+> > >
+> >
+> > No hold on, I don't think we actually have a bug here. AFAIR all
+> > you're describing is intionional . Yes the TX vectors and their niov
+> > arrays do implicitly 'pad' the dmabuf size to PAGE_SIZE.
+> >
+> > But net_devmem_get_niov_at has this check that prevents us from trying
+> > to send past the dma-buf size, even if it's not page_aligned:
+> >
+> > ```
+> > if (virt_addr >=3D binding->dmabuf->size)
+> > return NULL;
+> > ```
+> >
+> > IIRC the NULL should be bubbled up to the user as some error.
+> >
+> > Please double check that we actually have a bug here. If not, please
+> > don't merge this. This change could break existing users using devmem
+> > TX correctly with non-PAGE_SIZE aligned dmabufs, which is a valid use
+> > case.
+> >
+> > And if we have a bug, lets fix it in some way that doesn't deprecate
+> > support for non page-aligned TX dmabufs. You may be breaking users
+> > here.
+> >
+> > --
+> > Thanks,
+> > Mina
+>
+> Hi, Mina, note that the guard you're quoting doesn't cover the case
+> I'm describing. It's in bytes against dmabuf->size, while tx_vec is
+> sized dmabuf->size / PAGE_SIZE
+>   (truncating) -- there's a sub-page window where the check passes and
+> the index doesn't.
+>
+>   Concretely, PAGE_SIZE =3D 4096 and dmabuf->size =3D 4097:
+>
+>   tx_vec allocated for 4097 / 4096 =3D 1 entry (valid index 0).
+>   sendmsg with iov_base =3D 4096:
+>     virt_addr >=3D dmabuf->size   ->  4096 >=3D 4097, passes.
+>     tx_vec[virt_addr / PAGE_SIZE] -> tx_vec[1], OOB by one.
+>
+>   And the OOB pointer isn't just returned to the caller -- it flows
+> through get_netmem() -> __get_netmem(), which dereferences it
+> (net_is_devmem_iov() reads ->type) and
+>    on a matching byte refcounts the binding off of it. So this is a
+> controlled OOB deref, not just a stray read.
+>
 
-Could you drop this for the moment. Ideally, we want the LED core to
-be implementing this somehow, so that all devices using the core get
-this functionality, rather than put it in every driver.
+Ah, I see. I think that is indeed the bug. In the case PAGE_SIZE=3D4096
+and dmabuf->size is 4097, the intention in the code was to have tx_vec
+be an array of 2, where tx_vec[0] is [1->4096] and tx_vec[1] is
+[4097]. I have an off-by-one error in the tx_vec allocation :(
 
-> +static int fbnic_led_hw_ctl_set(struct led_classdev *led_cdev,
-> +				unsigned long flags)
-> +{
-> +	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-> +	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-> +	int led_idx = fbnic_led_get_idx(fbd, ldev);
-> +	u32 supported_modes;
-> +
-> +	supported_modes = fbnic_led_get_supported_modes(fbd, led_idx);
-> +
-> +	if (flags & ~supported_modes)
-> +		return -EINVAL;
-> +
-> +	/* Turn on activity LED only when both the TX and RX flags are set. */
-> +	if (led_idx == FBNIC_LED_ACTIVITY && (flags & supported_modes) &&
-> +	    flags != supported_modes) {
-> +		dev_warn(fbd->dev,
-> +			 "Invalid activity LED mode(s): 0x%lx\n", flags);
-> +		return -EINVAL;
+tx_vec[1] would contain an niov and as is stands we assume nvios are
+PAGE_SIZE, but IIRC net_devmem_get_niov_at() would make sure that the
+callers trying to use tx_vec[1] would only use it for a range that's
+valid, so using [4097] and not a range like [4097->8192].
 
-How does this happen? It should be that the core will not ask you to
-do something you cannot do, if you have answered -EOPNOTSUPP in
-fbnic_led_hw_ctl_is_supported().
+However when I dug deeper on proper pruning of page alignment
+assumptions in net_devmem_bind_dmabuf, the problems are deeper than
+this patch suggests. We don't properly handle the (probably
+non-existent?) edge case where the dma-buf itself is page aligned but
+for_each_sgtable_dma_sg itself gives us un-page_aligned sg entries :(
 
-> +static int fbnic_led_brightness_set_blocking(struct led_classdev *led_cdev,
-> +					     enum led_brightness brightness)
-> +{
-> +	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-> +	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-> +	int led_idx = fbnic_led_get_idx(fbd, ldev);
-> +
-> +	mutex_lock(&fbd->led_mutex);
-> +	if (!brightness) {
-> +		fbd->leds[led_idx].enabled_modes = 0;
-> +		fbd->leds[led_idx].strobe_mode = 0;
-> +	} else {
-> +		u32 mode;
-> +
-> +		switch (led_idx) {
-> +		case FBNIC_LED_ACTIVITY:
-> +			fbd->leds[led_idx].enabled_modes =
-> +				BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-> +			break;
-> +		default:
-> +			mode = fbnic_led_get_link_speed_mode(fbd);
-> +			fbd->leds[led_idx].enabled_modes = mode;
-> +			break;
-> +		}
-> +	}
+I think probably all of this is very theoretical. In practice probably
+the dmabuf implementations in the wild seem to be page-aligned.
+udmabuf doesn't support non-page-aligned dmabufs even so we can't add
+tests for these things. So I guess fine, lets merge this.
 
-This looks odd. led_brightness_set() is simply used to set the LED to
-on or off. The netdev trigger will use it to software blink the LEDs
-when asked to do something which cannot be offloaded to the hardware.
+>   On breaking users: the partial-page tail was never TX-usable to
+> begin with. The fill loop only populates num_niovs =3D len / PAGE_SIZE
+> entries while
+>   gen_pool_add_owner() covers the full byte len, so any sendmsg into
+> [num_niovs*PAGE_SIZE, dmabuf->size) was already heading for either
+> NULL or this OOB. It's not
+>   deprecating a working configuration -- it's rejecting one that wasn't w=
+orking.
+>
 
-And when the LED is being used to show NUMLOCK, or Morse code crash
-dump, network activity should not intervene.
+Yes, but still, today binding a non-PAGE_SIZE TX dmabuf but only using
+actually sendmsging up to the last PAGE_SIZE boundary is working,
+andthat would break entirely. I guess lets merge this and on the
+offchance someone is hitting this edge case we can revisit.
 
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-> index 53b7a938b4c2..c6b1130f9159 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
+I don't know if you're interested in also fixing the edge case where
+the sg table entries themselves are not not page-aligned. I think that
+also doesn't work properly?
 
-> @@ -623,6 +623,53 @@ static bool fbnic_pmd_update_state(struct fbnic_dev *fbd, bool signal_detect)
->  	return false;
->  }
->  
-> +u32 fbnic_get_link_speed(u8 link_speed)
-> +{
-> +	switch (link_speed) {
-> +	case FBNIC_FW_LINK_MODE_25CR:
-> +		return SPEED_25000;
-> +	case FBNIC_FW_LINK_MODE_50CR2:
-> +	case FBNIC_FW_LINK_MODE_50CR:
-> +		return SPEED_50000;
-> +	case FBNIC_FW_LINK_MODE_100CR2:
-> +		return SPEED_100000;
-> +	default:
-> +		return 0;
-> +	}
-> +}
-> +
-> +static void fbnic_set_led_state(struct fbnic_dev *fbd, int state)
-> +{
-> +	mutex_lock(&fbd->led_mutex);
-> +
-> +	/* alternating amber,blue IDs device every half second */
-> +	switch (state) {
-> +	case FBNIC_LED_OFF: /* amber on, blue off */
-> +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode = FBNIC_STROBE_ON;
-> +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode = FBNIC_STROBE_OFF;
-> +		break;
-> +	case FBNIC_LED_ON: /* amber off, blue on */
-> +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode = FBNIC_STROBE_OFF;
-> +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode = FBNIC_STROBE_ON;
-> +		break;
-> +	case FBNIC_LED_RESTORE:
-> +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode =
-> +			FBNIC_STROBE_DISABLED;
-> +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode =
-> +			FBNIC_STROBE_DISABLED;
-> +		break;
-> +	case FBNIC_LED_STROBE_INIT: /* a no-op */
-> +		/* Initialization is a no-op; LED toggling happens on ON/OFF */
-> +		goto out_unlock;
-> +	default:
-> +		goto out_unlock;
-> +	}
-> +
-> +	fbnic_led_update_csr(fbd);
-> +out_unlock:
-> +	mutex_unlock(&fbd->led_mutex);
-> +}
-> +
-
-This appears to be something different to trig-netdev and sys class
-LED control of the LED. Please could you move this out into another
-patch. Add clean support for the LED first, and them mess it all up in
-follow up patches adding all your vendor specific stuff. We can then
-think about if some of that can be moved into the LED core/trig-netdev
-somehow.
-
-	Andrew
+--
+Thanks,
+Mina
 
