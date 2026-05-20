@@ -1,149 +1,154 @@
-Return-Path: <netdev+bounces-289792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFYxGrlZDWpuwQUAu9opvQ
-	(envelope-from <netdev+bounces-289792-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:50:33 +0200
+	id aBq9LtpZDWpuwQUAu9opvQ
+	(envelope-from <netdev+bounces-289793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:51:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF29058860D
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:50:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349EA588650
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:51:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A4B8730205C2
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:50:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D56EB3023DA6
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B70334D3A9;
-	Wed, 20 May 2026 06:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE2D364935;
+	Wed, 20 May 2026 06:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THIjqPKX"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="YaHCtxr6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCBF33F8BC
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06433630B9;
+	Wed, 20 May 2026 06:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779259802; cv=none; b=pfyuRs3YkfglBz/EF7C84hdrAZqgbXzSlajeEjQg/hlFjFFkns74BCgdXtKErYf19VBc/xoJftA/+aab3RdJHQbGtS7gjdqbwZezRmwodZ1OPRNNYAEUiyR7gIZ8kYClgHpZULFlebYzBh6g1c6aHHIzn00crCc3Oubp6q8BEoU=
+	t=1779259807; cv=none; b=ss/6MLyHEipx30VuRqq/J2Uk8UZem+YnN8F24yZkxk5SxVf2HUM/uIhYXY3sN3JSzttxPOyweyzt/M7eeC7Kf1/b4ZbJwh/Ovobp9CpZ2+1zSajpZ1/u3WSRSCtwxTTPUPEV1sV20s9t/DiuknIpq6eK008K3FwEXBWMxW+gNbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779259802; c=relaxed/simple;
-	bh=qt99GYg/1shljr6n/ZEewGKE7srK7gzVSvn5dxL10OM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r8OW6z4h83oz1T46fcwQ5cENu3rffKSgjMXfJ8T3HC3TkJZp/nWReVleYjY9f6irwP1g/vzxJhOUCsGMX6DLIeGVPk4/NHtQkv+CskYTgHfmI+1Vu4ljX8zXTfk023NoQtYy8a2zqsLQIxJgtstGOE7NPyMbpVJEY7I1NSh1FdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THIjqPKX; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-44c350a5b87so2655427f8f.3
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 23:50:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779259799; x=1779864599; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mchzN0Z6nfnR1XaYP0jBIFjxXcTRqvaSqlUOs9Gpon8=;
-        b=THIjqPKXvpab7sWexlmGvwlBRXeI8Xr4JMcaEpe9e3GNYDOvyjr6yVQgBtit63oHmR
-         dc5kbIZitf2GEI3wROs0vHQjdHqG8RbXc/GwInS52/FLnvOR/0rpqjKWSfE25KekSsHN
-         r1vxyukCi+aFTCt52htCk7X3BHLW6tt96jjw+Xj4WbuTL+2mExn6colH0FTKRugsKu7k
-         fXW4Ndl8YMDpWPE3bZZd3pJmtADOK8uMIEFwTyVJQvj/E+/hkOxNfhkc5yGhO7hzAcOj
-         7c3d8tLz98ILPZVl/qOJyHvPH7inO2bUcdE8g4Walx5wQo9xb1k73Pd6fb+K9MsHqj/P
-         wocg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779259799; x=1779864599;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mchzN0Z6nfnR1XaYP0jBIFjxXcTRqvaSqlUOs9Gpon8=;
-        b=K7uZCYdwMjpgJeigQZi19Fy0u5lk0hx2yPD3ORCPXSpwXpLx9S6PTDGN64KBNhzIGk
-         xWBdMLISaYYGPNm8Q4AOZKpvj0ahM2+zCcgHRLnvtBgWI6purZKEN31WHvPAfqm4+u6/
-         YzpVe6TXQ1JMXxlNCVNuZ1LCzUWS7lirsK9IemFwhAOVfccuPM0tKbdxMwK01QTAXv+4
-         oJVa8KEA78w0luYIU1fR25I+iYj4Rflij5ha2LdK6Yx86OEeTssDeCFhzBkqWNR6nxcF
-         eu4k2a3+WaBaADVycQ1lo3v/A88bAgDocm2n7ujrepxmX4/edc9h80zX3vPJHkLEfE1M
-         9itg==
-X-Gm-Message-State: AOJu0YzQCGxfD/lK06Dr7iveIbUdwEvZpw8kMjidwSCsa/WLWi/rALno
-	1JcEh1Fp3tqsLAHWw3qI82rCCWEJOSLpjGS+iYo8dlfPsh7eVrHAaZwh
-X-Gm-Gg: Acq92OH3fabFIqUaVgpt5Za4PN9prhzm+PXfHzYblsjC74TFhV5bMZogzJp9VkM+jbT
-	OGB3o2O6IcrmiLKI2iqvvKgjGqEw7eJBuCcMZQAv6E6eyy6HEFnSYCzYJp/khhnhDlTAvz7M2e9
-	KHdZyBFOJfXZHeDZX4x6YEpt9DLPt2EBGnmlFiY4qVLWVAh2VcwVfALZCXOi5ttqtsdsyKP6+T1
-	nFN92da+vzip9hcfoxOpDqjsfPKHwLSU2sfLEVUOhWV2mtYCLkNXVoilYBizBt4d2StgFUWhEdv
-	Bg8RJi+LnESbPCiUEvVf+pg6qoL8WkwIzMtdRC3/cqRQLrK8pJWeXLAGiMz9dxonNPKk8/biHwu
-	yFos65O3ukQFDj1OGSFZXtik7whbnjCaa6ZrgWfU6l5coF3RHWvdVGGAFCET0q64YXVh4FOa5TT
-	GNFsNCrN45HCdTM1kimWW23JMARRY4o+6J8XUBIYkFx9qMsAtBaD3eSxJjPkYDRFxc8JR5rGOI2
-	rdILiUTDQ==
-X-Received: by 2002:a05:6000:2405:b0:43b:3e40:2223 with SMTP id ffacd0b85a97d-45e5c5b9673mr37127459f8f.19.1779259799002;
-        Tue, 19 May 2026 23:49:59 -0700 (PDT)
-Received: from [10.1.0.164] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a17ec2sm48407651f8f.24.2026.05.19.23.49.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 May 2026 23:49:58 -0700 (PDT)
-Message-ID: <ad1d07ed-2fe7-40c3-a043-dd6d2c1c4f8f@gmail.com>
-Date: Wed, 20 May 2026 08:49:51 +0200
+	s=arc-20240116; t=1779259807; c=relaxed/simple;
+	bh=Dw8JHXEVllQ9n7pZfoiDVu9fzd0smpGzRTc2eF2Ujgk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KrszzBT1rpoTSP5hiJmDsQdhr9vWflpijCnw86un6gYN9212A2bWrbbSgUbTITnXVACWhlFuVKryER8eoaC6YAQH4Gnsr4p9vbi7ARNZeHnHZPG3D6Ooml1pBrOE0CmcMkZifelOBzcjZQRply0hWWBB1B2HSzq0gv6lzyAiR3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=YaHCtxr6; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id E937E207B0;
+	Wed, 20 May 2026 08:50:02 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id NcFQuUOI_VUh; Wed, 20 May 2026 08:50:02 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 551BC20184;
+	Wed, 20 May 2026 08:50:02 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 551BC20184
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1779259802;
+	bh=b0dUhk71na/5H1HuRBdGtqOC/Q+GWVi3wSXiWsgSpbY=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=YaHCtxr6sd1kxYaOzrXAq/yTS560LoCHIyvYiH8GgroHkqYcW0LC0grKtdgbExENw
+	 IaSG4Zokm5czItrV/EbRERFteaUZEpcj0tt4xTJ/4PeFEKZWBINq14xwB1KZxOINgH
+	 5aE14/xS9BIasGBoAGo6PB9Ydve73l6YKjAbKXKMCSbiuUtFLiGySM1ZkJzcbPkzSA
+	 /nPryhbiIXzog/daRELb3EvJIZFmpMF6Y0hmCFzctD7nyDkQFXrboGouM76tmEWJ1Y
+	 JJB/MqmRynW544NM9ObYpscJz9C7fu7dnA8tRpYPv5El1Q0vjVx9JXSkbWIifLemX+
+	 B5yF2z+0m82uA==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 20 May
+ 2026 08:50:01 +0200
+Received: (nullmailer pid 1139874 invoked by uid 1000);
+	Wed, 20 May 2026 06:50:01 -0000
+Date: Wed, 20 May 2026 08:50:01 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: =?iso-8859-1?Q?G=FCnther?= Muller <gunther.muller2008@gmail.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] xfrm: fix missing headroom check in
+ xfrm_dev_direct_output
+Message-ID: <ag1ZmRYxpWBkhba4@secunet.com>
+References: <20260517111940.8987-1-gunther.muller2008@gmail.com>
+ <20260518080410.11119-1-gunther.muller2008@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/3] ksz87xx: add support for low-loss cable equalizer
- errata
-To: Marek Vasut <marex@nabladev.com>, Woojung Huh
- <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Tristram Ha <Tristram.Ha@microchip.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Fidelio Lawson <fidelio.lawson@exotec.com>
-References: <20260505-ksz87xx_errata_low_loss_connections-v5-0-da4002b21c42@exotec.com>
- <fe01752d-95d4-4686-b536-0acc8a2046cb@nabladev.com>
-Content-Language: en-US
-From: Fidelio LAWSON <lawson.fidelio@gmail.com>
-In-Reply-To: <fe01752d-95d4-4686-b536-0acc8a2046cb@nabladev.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260518080410.11119-1-gunther.muller2008@gmail.com>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289792-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:mid,secunet.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	TAGGED_FROM(0.00)[bounces-289793-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[nabladev.com,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: CF29058860D
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 349EA588650
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/16/26 03:44, Marek Vasut wrote:
-> Is there still anything left to do with this series ?
+On Mon, May 18, 2026 at 10:04:09AM +0200, Günther Muller wrote:
+> Ensure the skb has enough headroom for the hardware offload device's
+> hard_header_len. If the headroom is insufficient (e.g., when routing
+> through certain virtual or tunnel devices), __skb_push() underflows
+> skb->data below skb->head, causing silent memory corruption.
+> 
+> Fix this by using skb_cow_head() to dynamically expand headroom if
+> needed, and switch to the checked skb_push() variant.
+> 
+> Fixes: 5eddd76ec2fd ("xfrm: fix tunnel mode TX datapath in packet offload mode")
+> 
+> Signed-off-by: Günther Muller <gunther.muller2008@gmail.com>
+> ---
+>  net/xfrm/xfrm_output.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+> index cc35c2fcbb..35f974d209 100644
+> --- a/net/xfrm/xfrm_output.c
+> +++ b/net/xfrm/xfrm_output.c
+> @@ -649,7 +649,10 @@ static int xfrm_dev_direct_output(struct sock *sk, struct xfrm_state *x,
+>  	 * to netdevice.
+>  	 */
+>  	skb->dev = x->xso.dev;
+> -	__skb_push(skb, skb->dev->hard_header_len);
+> +	err = skb_cow_head(skb, skb->dev->hard_header_len);
+> +	if (err)
+> +		return err;
 
-Hi, sorry for the delay I just got back from a trip.
-Thanks for your feedback! Iâ€™ll fix everything and submit a new version 
-today.
-
-Best
-Fidelio
+You leak skb here. Also, we should bump a statistic counter
+when droping the packet.
 
