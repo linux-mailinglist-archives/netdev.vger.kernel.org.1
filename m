@@ -1,170 +1,622 @@
-Return-Path: <netdev+bounces-289844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289845-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yE2kGHd3DWokxwUAu9opvQ
-	(envelope-from <netdev+bounces-289844-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:57:27 +0200
+	id WCfCCT54DWqGxwUAu9opvQ
+	(envelope-from <netdev+bounces-289845-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:00:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D18C858A40B
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:57:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E8658A4E2
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0BCFD31BD3D3
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:42:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66EC431E6AA2
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34B33B38B5;
-	Wed, 20 May 2026 08:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDAD3AEF33;
+	Wed, 20 May 2026 08:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nfKwdu3D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S5b2Pi4L"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010060.outbound.protection.outlook.com [52.101.61.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAED39BFFA;
-	Wed, 20 May 2026 08:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779266193; cv=fail; b=XFvuHHmEk47Uihem+P1xeNPpy/dCj7B7PokbO4i4B8k1mPKR1AVWmYwKGlDMD94l+yc9sysix/VrJrfV1C0ERGCX2APvKgcIAmZk7AnfxaoO1um7QzqUfevdot/xu8QDDCwmIz4H9wk39EtuT1OIwzn7WZadwvOWVJoSZcNjKII=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779266193; c=relaxed/simple;
-	bh=hdZaoTCF6zRHbRwxpdhBx8zHcdvy+3s+wA7HyvhBiE4=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=heer2QiC9Tu1ARp2sTUxgTgFSH3gfzUlx3Ty0H9jEjvdgGbZ79i/aUWUXib0xAXTFIeT+pMPNsZ90MaYl21rjHmpKxTVdnOh/8YTvvpVr6KQd4zBY+YV8OxRHfEeeASNNqL7HFdeH7xhTP5IZtW5/f1/x2PP9Z2TLBoHGSQusjc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nfKwdu3D; arc=fail smtp.client-ip=52.101.61.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XyQmhdb3rzr2EwPKbf18C9wdzBgdXbwdq7wnUiYcls+vznfIp1zC862CqxhIBw9/oDgefWmGdHmLRjQ8Ay2E8sRF8EjhYGOUtVTfpMg4YB+4ZsZI2Eub0ic6yP3xpmJZTnQPW1uL6P/fvyl27+vFHA6JbRbrKzsEbA4XBTxjcWpr29SIjv65CV2rhLcts1cDd8hILLrmT4vLZ8auygc6H5iS3QuGiy8mm1Oqcc//2FRlY4a9Gza6NCgkNwlH3asCVEMwR4ZxBye0tbaI1e+OA5fRI53VqYGJmqXx8T4CxGKRE+potcKwyTLZDlDawEjaPii59HVIlsj/f14cZ3KUgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hdZaoTCF6zRHbRwxpdhBx8zHcdvy+3s+wA7HyvhBiE4=;
- b=bqUnd6TBdDavRxjBBR3x79QqdDZYhliJnDT4q2eaHlsV9e41/4eXXeeK12gW/O+QOsyVCi7w6oxy9Rz7isqmpfRE9qx1FaxZbgmptRjy69tXBnC5ETj2Wpm7ogIWcqQI4PPGYvRbn1OILMcCN+0hVAZoJiCYEFTuzMrML5qhWmjRIVHU8SQ/RVGyfiu+oF+Vk524ssUiDou/1wo0Oif7E5cEN93yYQIj4T8IXjb116eB99TZ7dOFtkV1z6zSNihdhQpis9dvf1UB6rVYh5KdZfgfx6bD9xTBzx4JYUCRRCDP0bfB/JncFz4uV8wTfSAXGa6Dqfkc3HrekADDqNLDGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hdZaoTCF6zRHbRwxpdhBx8zHcdvy+3s+wA7HyvhBiE4=;
- b=nfKwdu3D2k/H2KxsNyhtHgD3jLdbKwJmyqmXVh3vzsucldXliTV5CDDlj5kU5NrUace4Q3b90M6k6bxU3AQooewGq3csmZsyMAU0PUSwDCNDVp2QoCi1Clkrag76gYG8B47tkZ1wlZnI7rKZocfBpJLjILvuBAYoTVWIx+58xpQtjiPLHrWszgnUVTEuqybpm00lQWtSg0YIfFCXmul1h3RzG2BPLV6Z58MnzEPoPHXKnK62MygWCT9xOcpVZKop4hxyBPMe5REkNk9bEWpnZAoHlRWMJWflI09Sa8oo4BlSc4iYCbE0mZI3ujLvo5ETSut5INMooveZawPySgLeFA==
-Received: from CH0PR03CA0103.namprd03.prod.outlook.com (2603:10b6:610:cd::18)
- by LV2PR12MB5821.namprd12.prod.outlook.com (2603:10b6:408:17a::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.24; Wed, 20 May
- 2026 08:36:23 +0000
-Received: from DM2PEPF00003FC4.namprd04.prod.outlook.com
- (2603:10b6:610:cd:cafe::43) by CH0PR03CA0103.outlook.office365.com
- (2603:10b6:610:cd::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.16 via Frontend Transport; Wed, 20
- May 2026 08:36:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DM2PEPF00003FC4.mail.protection.outlook.com (10.167.23.22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.48.11 via Frontend Transport; Wed, 20 May 2026 08:36:23 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 20 May
- 2026 01:36:08 -0700
-Received: from fedora (10.126.230.37) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 20 May
- 2026 01:36:04 -0700
-References: <agqqK_6PxbvAwsMX@juliahub.com> <87ik8jmlow.fsf@nvidia.com>
- <CABV8kRwnfmc_xVEP5e_9mq3+DMpz4tC0AYSamiJysgG2GUoaKg@mail.gmail.com>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Keno Fischer <keno@juliahub.com>
-CC: Petr Machata <petrm@nvidia.com>, <netdev@vger.kernel.org>, Ido Schimmel
-	<idosch@nvidia.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] mlxsw: spectrum_dcb: Reject writes owned by an
- offloaded qdisc
-Date: Wed, 20 May 2026 10:35:15 +0200
-In-Reply-To: <CABV8kRwnfmc_xVEP5e_9mq3+DMpz4tC0AYSamiJysgG2GUoaKg@mail.gmail.com>
-Message-ID: <87a4tumqa8.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2029280A5A
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 08:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779266565; cv=none; b=qeFgs7V+dSB0Kyvhty7DDjh+gqy7Vn04pYYv75sZz0KNQ3rm/sXQCm1Mcf/O0l5njzyp+F3DJtxZaJD3k0t910JxwnV2rnmubAxa8dwkWTOaBBxD5havffdn6rUfcIe6se2swC89cssL2z73GIH20tLtz7ueKXgOITX8MNXsTE8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779266565; c=relaxed/simple;
+	bh=tHiytlwYL5ZPS+5bOp5RZBz2MEVQjQT02NVce6+vGbs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=avIu+CW71eEL+oZ+VmhlHwmjKnA9z4DfnZacbYG7xiBwX/RwyAEFw6dma3iAjBAdnsGmXob6ZIIbSVIBC7qZ7zw+VdhTKNcCd2vgKwB+aapePgz47K5iE06RVkZEUSAcjhX9XUbf6D5VKAtrk/pOIHPmVRg6G+sx1AQQ4U9Pni0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S5b2Pi4L; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c801d732058so2012058a12.1
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 01:42:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779266563; x=1779871363; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cj9dNWpwR7KR9FuTwwa9cr68HYXxFlOPEg+1G0DdtjA=;
+        b=S5b2Pi4Ld5d9QRWiWPuN9GJZ7YN+I5QiaGUaLYE0uGvNzLZCMExQgL5t6JfDf8JEMa
+         nfYDfOvIYAezWXrd9otZWdm/ksUPBslWcsqzPqanACHPJBAZRYMwgH4Mpl9CCKIR9K5G
+         MWyEHGfz+JrYziHB9wAzY/VgwCVVS+RMRBc9lCX1XZ+cCgXNfMtUZkeMNrwH4Va07lem
+         EfrSOLJSJUo1umDuaJ17lUzlgDbqMp0HQ9+NZwhA50asBJ40+41RN6YtIYtnMT4n2Wj5
+         b+HMXeWrmZB1Us2T1qG2b/cgLouHir4hpCgdP6B7oQGMHXuGFkRYRZ0Qm5dI16B3oIaU
+         9zag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779266563; x=1779871363;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cj9dNWpwR7KR9FuTwwa9cr68HYXxFlOPEg+1G0DdtjA=;
+        b=i/dXGrZiyl75/5Pg73w8mpikHNUfUUe1uY1AiTAETL4MLJhIh6P9yLSq6WTIQHWv62
+         xYiNR0APhd6bepcdXW2aQP/Y9FuRApcntKQ+pMaO+xQeZwjrxnsdQ0AvA/BaRRjDKzC2
+         2LbY4Ew1GXPIgw7PNfeHT3t5PgNgTlqOsXX/OVpQm7quAhYZJqr4vQQngpvSs8FJq9Bw
+         DMnOJKSaAgMOIe3FaG74uv1i0vbDvH+KM2fnDzLxyDSRnX8++GG84eiw7Kb/VwL55xfZ
+         /XI0o8lV6IsPtkCnR8vME+dAs9F3caAKksPQwpl9b3UJjpOaQhAXWzWsb+Z4tHKCHAE7
+         6hVA==
+X-Gm-Message-State: AOJu0Yz1nF79pmEkt2/xUwOhlvpAChLHwtN0bhw7EQEGy+lWDb6Zvc4O
+	7mawI9IZ5RmPeU56bJndp8i5IPKRcc623zaHe2Gx9O1DTsP4gqOO+gt2LB4NQg==
+X-Gm-Gg: Acq92OH+M9NrVqFjMV8zPH2FwXWZ5IoQHWk1q6nFD+8m0xwJumTO3I6s89N7xwpb/fQ
+	Bw60gYVl19k2pL2+Q8j71uJWVSSo769vjDiOJnNQf74LITk8p5XE42tkzE8OAS0ZH1XfBS1ANbc
+	gloSFkNDCx7mWfw8OUrWpF0K536i+PhOm2/Gg1+lVmJ4Ja1o6mOaUy0hCWqzjIdL3cvFwlYDFxi
+	TnqikBl+zgu2h/aNi1/NOVgoBh9u2x+xACToJlo01rBdiTIQIv2zQ4INcL04So4+2Q2wSRvQPgj
+	2S6Ts5I5PAFTBRiqQrPMoxUtNFct00esWXoNt8fTB2i8hW65Ya31hjO91XqiMBu0OKzktN9uPR5
+	wEt0Dwt3On8ORkhRKAGC0qDWFvg5PNU+SKQWqmWcjUJ82A+E7QV2bOdCby1uMmSu+sDIvpB6F4n
+	HOpDLeNuGiCBsADdNkxJymQtVySEu37E3NCyYsg3BSPp6N2Ojf
+X-Received: by 2002:a05:6a20:4328:b0:3a2:cf6d:aa04 with SMTP id adf61e73a8af0-3b0bdd00bfbmr25707703637.8.1779266562681;
+        Wed, 20 May 2026 01:42:42 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c82bb123986sm20808751a12.32.2026.05.20.01.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 01:42:42 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Allison Henderson <achender@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>,
+	rds-devel@oss.oracle.com,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v6] rds: filter RDS_INFO_* getsockopt by caller's netns
+Date: Wed, 20 May 2026 16:42:36 +0800
+Message-Id: <20260520084236.2724349-1-maoyixie.tju@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM2PEPF00003FC4:EE_|LV2PR12MB5821:EE_
-X-MS-Office365-Filtering-Correlation-Id: 370cd85e-cfed-42cc-81a0-08deb64adfe6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|376014|1800799024|4143699003|22082099003|18002099003|56012099003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	V+I7P0ZEEYiT1zcweOQk/JQE6I9zxWiUqQ8mfO3blJOOvF/A+AwAtRgA7JoNq+i2+XJ6joocJwiYOgnOA01lY3GL9cyOPdrdFB3zFs1D1oJHWweHYIlWq6DvtdugXH+5B/ie2GL41JvoMB3PVsLraEJIi8jykd9zVCcIY3xn0DGPHOcmn4wU+VwMv2q/P1UZ0UIi0Vv/nEfFJd5ByLq8sFowPJcrunnWsKFWeq6eyu6/ND97J9jZAZOv8QYAlmZi+ZQixD/ojBdPWp91UHA87wdwUh1a6OIb/8Bqg1UsJi1SK9WvHezHOau0k2LAdIxv73jXhGoy9L1zSkQy9enzCtwnlsp8V/A+5lMKJf7NdKYSMwvH4mJEn+Ieio8K5Y17d15lrqRvmIQhhrYbZZTGK3LDzF3x4nr0/16pkVMbpXzkp+8LWvh0CaeoOEYnYzfiPJsx84tSdQXmUjlyHP31S/ckz8e/x6lexMOLodoZ0AVGQbqq2Ktfs46GQBltvYpVPQIZRu17uM/JIBfxWFP7i7SiMjn8x9wJrSdm83P+T3Q5h0fme3v70bCnRuRTPY8cgutujx1sl7cyrB6KDJI0sd5uFB436ZAnTU/OkFWwML6hvsfbT/ukThJrSEkkSj+IyXMbFvWBSjmxuJkWu5hOXW3kEgGCrOkutu6eubqXRk7yGNQBV1bfmZWF+syAxoFIaXd44SJQyjaOkkk1hz8NkuKrsW14Yu5VcguLWwcYKRM=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(376014)(1800799024)(4143699003)(22082099003)(18002099003)(56012099003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	ojpw1zPyKsjqJ711q02y6EJn82+QhaKiF90VBZ/CQgZZtf5j8XMkpCQOzHzXnBzOgWSAxdJe5pEoxcnjx6YXJJifhOMWOjIQ2IfdUmfFrevd2ykMX2YIGhD8TgC7HMPVR1t2snvhfcyJP+eCah0azhju2FD9khi+U2WfAnfjVbfo14WXnqRZe+wxZt5QfcTIYUxtfbTA4P+tKgrw3Y5ozXCDfW5bPzxxqqj7syStccvbFRtcvs002guMpjxWqU7MHOjAYxTwfXPXhY6vAdXispfo80uYnoXRQksjqD0wzHnMzlXVxLv4dVwSF2oS4uh6Sq0bRrtYiO6nZZ8VgT2UGe95QYbH0EQS4wvf9Hao67HEnDR3z0bh75+bDPF9DJ1LDStxAUf67BMoQRvf9cIxzLC/ECtzobfFxPOyc76FsY9RZJrjMVvK/r4+e+X9nghD
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 08:36:23.1968
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 370cd85e-cfed-42cc-81a0-08deb64adfe6
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DM2PEPF00003FC4.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5821
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289844-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email,juliahub.com:email];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289845-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: D18C858A40B
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,aumovio.com:email,ntu.edu.sg:email]
+X-Rspamd-Queue-Id: 60E8658A4E2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+The RDS_INFO_* family of getsockopt(2) options reads several
+file-scope global lists that are not per-netns:
 
-Keno Fischer <keno@juliahub.com> writes:
+  rds_sock_info / rds6_sock_info,
+  rds_sock_inc_info / rds6_sock_inc_info        -> rds_sock_list
+  rds_tcp_tc_info / rds6_tcp_tc_info            -> rds_tcp_tc_list
+  rds_conn_info / rds6_conn_info,
+  rds_conn_message_info_cmn (for the *_SEND_MESSAGES and
+  *_RETRANS_MESSAGES variants),
+  rds_for_each_conn_info (for RDS_INFO_IB_CONNECTIONS)
+                                                -> rds_conn_hash[]
 
-> On Tue, May 19, 2026 at 12:03=E2=80=AFPM Petr Machata <petrm@nvidia.com> =
-wrote:
->>
->> I'll let it pass through a full regression tonight. Overall the patch
->> looks OK to me, but Sashiko found something:
->
-> Sounds good - I will wait for your testing before sending v2.
+The handlers do not filter by the caller's network namespace.
+rds_info_getsockopt() has no netns or capable() check, and
+rds_create() has no capable() check, so AF_RDS is reachable from
+an unprivileged user namespace. As a result, an unprivileged
+caller in a fresh user_ns plus netns can read the bound address
+and sock inode of every RDS socket on the host, the peer address
+of incoming messages on every RDS socket on the host, the peer
+address and TCP sequence numbers of every rds-tcp connection on
+the host, and the peer address and RDS sequence numbers of every
+RDS connection on the host.
 
-It went well -- no regressions.
+The rds-tcp transport is reachable from a non-initial netns (see
+rds_set_transport()), so a one-shot init_net gate at
+rds_info_getsockopt() would deny legitimate per-netns visibility
+to rds-tcp callers. Instead, filter at each handler by comparing
+the netns of the caller's socket to the netns of the list entry,
+or to rds_conn_net(conn) for connection paths. Only copy entries
+whose netns matches the caller. Counters (RDS_INFO_COUNTERS) are
+aggregate statistics and remain global.
+
+Reproducer (KASAN VM, rds and rds_tcp loaded): an AF_RDS socket
+binds 127.0.0.1:4242 in init_net as root. A child process enters
+a fresh user_ns plus netns and opens AF_RDS there, then calls
+getsockopt(SOL_RDS, RDS_INFO_SOCKETS). Before this change, the
+child sees the init_net socket. After this change, the child
+sees zero entries.
+
+Drop the rds_sock_count, rds_tcp_tc_count, and rds6_tcp_tc_count
+globals. v2 used them for the size precheck and lens->nr; v3
+replaced the precheck with a per-ns count from a first pass over
+the list, so the globals have no remaining readers. The matching
+increments and decrements in rds_create()/rds_destroy_sock() and
+rds_tcp_set_callbacks()/rds_tcp_restore_callbacks() go away with
+them. Reported by the kernel test robot under clang W=1.
+
+Suggested-by: Allison Henderson <achender@kernel.org>
+Suggested-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Allison Henderson <achender@kernel.org>
+Co-developed-by: Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>
+Signed-off-by: Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>
+Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+---
+v6: Rebased on current net main tip (dc416e32baae) after Jakub
+    pw-bot:cr on v5. The patch failed to apply at net/rds/tcp.c:201
+    because the separately submitted "rds_tcp: close NULL deref
+    window in rds_tcp_set_callbacks" patch landed in net main
+    between v5 and v6. That commit reorders tc->t_sock = sock
+    inside the rds_tcp_tc_list_lock and adds a comment block.
+    The 3-way merge preserves both changes. No functional change
+    in the netns filter behaviour relative to v5.
+v5: Address Simon Horman's review of v4. rds_bind() writes
+    rs_bound_addr without holding rds_sock_lock (bind.c:123,
+    138, 160). rds_sock_info() holds rds_sock_lock across the
+    two passes, but a concurrent rds_bind() can still change
+    rs_bound_addr between them. The second pass can then match
+    an entry the first pass did not count. For a len=0 probe
+    with cnt=0, this reaches iter->pages while the buffer is
+    still empty.
+    Cap the second pass at the cnt from the first pass
+    (if (copied >= cnt) break). The cap goes in all four
+    handlers: rds_sock_info, rds6_sock_info, rds_tcp_tc_info,
+    and rds6_tcp_tc_info.
+    The reverse case is also handled. If pass2 copies fewer
+    entries than cnt because of a concurrent rds_remove_bound(),
+    set cnt = copied before the out: label. lens->nr then
+    reports what was actually written.
+v4: Drop the rds_sock_count, rds_tcp_tc_count, and rds6_tcp_tc_count
+    globals reported by the kernel test robot under clang W=1
+    (-Wunused-but-set-global). They have no remaining readers after v3
+    replaced the size precheck with a per-ns count from the first pass.
+    Inc/dec sites in rds_create()/rds_destroy_sock() and
+    rds_tcp_set_callbacks()/rds_tcp_restore_callbacks() are removed
+    with them. No functional change beyond v3 for the netns-filter
+    behaviour.
+
+    Note for applier: this patch touches rds_tcp_set_callbacks() in the
+    same hunk window as a separate [PATCH net] sent earlier (Message-Id
+    <20260512142807.1855619-1-maoyi.xie@ntu.edu.sg>, "rds_tcp: close
+    NULL deref window in rds_tcp_set_callbacks"). Both apply cleanly
+    to net/main tip b266bacba in isolation. When applied together the
+    second one needs a trivial 3-way merge in net/rds/tcp.c.
+v3: Address Simon Horman's review of v2. The size precheck and the
+    lens count are now both restricted to the caller's netns in
+    rds_sock_info, rds6_sock_info, rds_tcp_tc_info and
+    rds6_tcp_tc_info. Each handler now does a first pass under the
+    list lock to count entries visible in the caller's netns, then
+    short-circuits with that count if the user buffer is too small,
+    then a second pass to fill data. This closes both issues Simon
+    flagged: a zero-length probe no longer returns the global count,
+    and a caller that sizes its buffer to the value returned by lens
+    no longer hits ENOSPC on the second call.
+    Re-verified on KASAN VM with the v1 PoC: attacker in fresh
+    user_ns + netns sees zero RDS_INFO_SOCKETS entries; init_net
+    access sees its own entries; lens returns the ns-scoped count
+    on both probe and full reads.
+v2: rebased onto net/main tip (b266bacba) so patchwork can apply.
+    No code changes. Carries forward Reviewed-by from v1 review.
+v1: https://lore.kernel.org/r/20260506075031.2238596-1-maoyixie.tju@gmail.com
+
+
+ net/rds/af_rds.c     | 59 ++++++++++++++++++++++++++++++++++++++++-------
+ net/rds/connection.c | 13 +++++++++++
+ net/rds/tcp.c        | 63 ++++++++++++++++++++++++++++++++++-----------------
+ 3 files changed, 104 insertions(+), 31 deletions(-)
+
+diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
+index 76f625986a7f2..bd6271bab32cc 100644
+--- a/net/rds/af_rds.c
++++ b/net/rds/af_rds.c
+@@ -43,7 +43,6 @@
+ 
+ /* this is just used for stats gathering :/ */
+ static DEFINE_SPINLOCK(rds_sock_lock);
+-static unsigned long rds_sock_count;
+ static LIST_HEAD(rds_sock_list);
+ DECLARE_WAIT_QUEUE_HEAD(rds_poll_waitq);
+ 
+@@ -82,7 +81,6 @@ static int rds_release(struct socket *sock)
+ 
+ 	spin_lock_bh(&rds_sock_lock);
+ 	list_del_init(&rs->rs_item);
+-	rds_sock_count--;
+ 	spin_unlock_bh(&rds_sock_lock);
+ 
+ 	rds_trans_put(rs->rs_transport);
+@@ -694,7 +692,6 @@ static int __rds_create(struct socket *sock, struct sock *sk, int protocol)
+ 
+ 	spin_lock_bh(&rds_sock_lock);
+ 	list_add_tail(&rs->rs_item, &rds_sock_list);
+-	rds_sock_count++;
+ 	spin_unlock_bh(&rds_sock_lock);
+ 
+ 	return 0;
+@@ -735,6 +732,7 @@ static void rds_sock_inc_info(struct socket *sock, unsigned int len,
+ 			      struct rds_info_iterator *iter,
+ 			      struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds_sock *rs;
+ 	struct rds_incoming *inc;
+ 	unsigned int total = 0;
+@@ -744,6 +742,9 @@ static void rds_sock_inc_info(struct socket *sock, unsigned int len,
+ 	spin_lock_bh(&rds_sock_lock);
+ 
+ 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		/* Only show sockets in the caller's netns. */
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
+ 		/* This option only supports IPv4 sockets. */
+ 		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
+ 			continue;
+@@ -774,6 +775,7 @@ static void rds6_sock_inc_info(struct socket *sock, unsigned int len,
+ 			       struct rds_info_iterator *iter,
+ 			       struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds_incoming *inc;
+ 	unsigned int total = 0;
+ 	struct rds_sock *rs;
+@@ -783,6 +785,9 @@ static void rds6_sock_inc_info(struct socket *sock, unsigned int len,
+ 	spin_lock_bh(&rds_sock_lock);
+ 
+ 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		/* Only show sockets in the caller's netns. */
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
+ 		read_lock(&rs->rs_recv_lock);
+ 
+ 		list_for_each_entry(inc, &rs->rs_recv_queue, i_item) {
+@@ -806,20 +811,34 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
+ 			  struct rds_info_iterator *iter,
+ 			  struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds_info_socket sinfo;
+ 	unsigned int cnt = 0;
++	unsigned int copied = 0;
+ 	struct rds_sock *rs;
+ 
+ 	len /= sizeof(struct rds_info_socket);
+ 
+ 	spin_lock_bh(&rds_sock_lock);
+ 
+-	if (len < rds_sock_count) {
+-		cnt = rds_sock_count;
+-		goto out;
++	/* First pass: count entries visible in the caller's netns. */
++	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
++		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
++			continue;
++		cnt++;
+ 	}
+ 
++	if (len < cnt)
++		goto out;
++
+ 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		if (copied >= cnt)
++			break;
++		/* Only show sockets in the caller's netns. */
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
+ 		/* This option only supports IPv4 sockets. */
+ 		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
+ 			continue;
+@@ -832,8 +851,13 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
+ 		sinfo.inum = sock_i_ino(rds_rs_to_sk(rs));
+ 
+ 		rds_info_copy(iter, &sinfo, sizeof(sinfo));
+-		cnt++;
++		copied++;
+ 	}
++	/* A concurrent rds_bind() can change rs_bound_addr between the
++	 * two passes without holding rds_sock_lock, so copied may be
++	 * less than cnt. Report what was actually copied.
++	 */
++	cnt = copied;
+ 
+ out:
+ 	lens->nr = cnt;
+@@ -847,17 +871,32 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
+ 			   struct rds_info_iterator *iter,
+ 			   struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds6_info_socket sinfo6;
++	unsigned int cnt = 0;
++	unsigned int copied = 0;
+ 	struct rds_sock *rs;
+ 
+ 	len /= sizeof(struct rds6_info_socket);
+ 
+ 	spin_lock_bh(&rds_sock_lock);
+ 
+-	if (len < rds_sock_count)
++	/* First pass: count entries visible in the caller's netns. */
++	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
++		cnt++;
++	}
++
++	if (len < cnt)
+ 		goto out;
+ 
+ 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		if (copied >= cnt)
++			break;
++		/* Only show sockets in the caller's netns. */
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
+ 		sinfo6.sndbuf = rds_sk_sndbuf(rs);
+ 		sinfo6.rcvbuf = rds_sk_rcvbuf(rs);
+ 		sinfo6.bound_addr = rs->rs_bound_addr;
+@@ -867,10 +906,12 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
+ 		sinfo6.inum = sock_i_ino(rds_rs_to_sk(rs));
+ 
+ 		rds_info_copy(iter, &sinfo6, sizeof(sinfo6));
++		copied++;
+ 	}
++	cnt = copied;
+ 
+  out:
+-	lens->nr = rds_sock_count;
++	lens->nr = cnt;
+ 	lens->each = sizeof(struct rds6_info_socket);
+ 
+ 	spin_unlock_bh(&rds_sock_lock);
+diff --git a/net/rds/connection.c b/net/rds/connection.c
+index c10b7ed06c49f..7c8ab8e973e1b 100644
+--- a/net/rds/connection.c
++++ b/net/rds/connection.c
+@@ -568,6 +568,7 @@ static void rds_conn_message_info_cmn(struct socket *sock, unsigned int len,
+ 				      struct rds_info_lengths *lens,
+ 				      int want_send, bool isv6)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct hlist_head *head;
+ 	struct list_head *list;
+ 	struct rds_connection *conn;
+@@ -590,6 +591,9 @@ static void rds_conn_message_info_cmn(struct socket *sock, unsigned int len,
+ 			struct rds_conn_path *cp;
+ 			int npaths;
+ 
++			/* Only show connections in the caller's netns. */
++			if (!net_eq(rds_conn_net(conn), net))
++				continue;
+ 			if (!isv6 && conn->c_isv6)
+ 				continue;
+ 
+@@ -688,6 +692,7 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
+ 			  u64 *buffer,
+ 			  size_t item_len)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct hlist_head *head;
+ 	struct rds_connection *conn;
+ 	size_t i;
+@@ -700,6 +705,9 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
+ 	for (i = 0, head = rds_conn_hash; i < ARRAY_SIZE(rds_conn_hash);
+ 	     i++, head++) {
+ 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
++			/* Only show connections in the caller's netns. */
++			if (!net_eq(rds_conn_net(conn), net))
++				continue;
+ 
+ 			/* Zero the per-item buffer before handing it to the
+ 			 * visitor so any field the visitor does not write -
+@@ -733,6 +741,7 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
+ 				    u64 *buffer,
+ 				    size_t item_len)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct hlist_head *head;
+ 	struct rds_connection *conn;
+ 	size_t i;
+@@ -747,6 +756,10 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
+ 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
+ 			struct rds_conn_path *cp;
+ 
++			/* Only show connections in the caller's netns. */
++			if (!net_eq(rds_conn_net(conn), net))
++				continue;
++
+ 			/* XXX We only copy the information from the first
+ 			 * path for now.  The problem is that if there are
+ 			 * more than one underlying paths, we cannot report
+diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+index 5830b31a1f37b..fbaf150e3edaa 100644
+--- a/net/rds/tcp.c
++++ b/net/rds/tcp.c
+@@ -46,14 +46,6 @@
+ static DEFINE_SPINLOCK(rds_tcp_tc_list_lock);
+ static LIST_HEAD(rds_tcp_tc_list);
+ 
+-/* rds_tcp_tc_count counts only IPv4 connections.
+- * rds6_tcp_tc_count counts both IPv4 and IPv6 connections.
+- */
+-static unsigned int rds_tcp_tc_count;
+-#if IS_ENABLED(CONFIG_IPV6)
+-static unsigned int rds6_tcp_tc_count;
+-#endif
+-
+ /* Track rds_tcp_connection structs so they can be cleaned up */
+ static DEFINE_SPINLOCK(rds_tcp_conn_lock);
+ static LIST_HEAD(rds_tcp_conn_list);
+@@ -110,11 +102,6 @@ void rds_tcp_restore_callbacks(struct socket *sock,
+ 	/* done under the callback_lock to serialize with write_space */
+ 	spin_lock(&rds_tcp_tc_list_lock);
+ 	list_del_init(&tc->t_list_item);
+-#if IS_ENABLED(CONFIG_IPV6)
+-	rds6_tcp_tc_count--;
+-#endif
+-	if (!tc->t_cpath->cp_conn->c_isv6)
+-		rds_tcp_tc_count--;
+ 	spin_unlock(&rds_tcp_tc_list_lock);
+ 
+ 	tc->t_sock = NULL;
+@@ -206,11 +193,6 @@ void rds_tcp_set_callbacks(struct socket *sock, struct rds_conn_path *cp)
+ 	spin_lock(&rds_tcp_tc_list_lock);
+ 	tc->t_sock = sock;
+ 	list_add_tail(&tc->t_list_item, &rds_tcp_tc_list);
+-#if IS_ENABLED(CONFIG_IPV6)
+-	rds6_tcp_tc_count++;
+-#endif
+-	if (!tc->t_cpath->cp_conn->c_isv6)
+-		rds_tcp_tc_count++;
+ 	spin_unlock(&rds_tcp_tc_list_lock);
+ 
+ 	/* accepted sockets need our listen data ready undone */
+@@ -238,20 +220,37 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
+ 			    struct rds_info_iterator *iter,
+ 			    struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(rds_sock->sk);
+ 	struct rds_info_tcp_socket tsinfo;
+ 	struct rds_tcp_connection *tc;
++	unsigned int cnt = 0;
++	unsigned int copied = 0;
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&rds_tcp_tc_list_lock, flags);
+ 
+-	if (len / sizeof(tsinfo) < rds_tcp_tc_count)
++	/* First pass: count entries visible in the caller's netns. */
++	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
++		if (tc->t_cpath->cp_conn->c_isv6)
++			continue;
++		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
++			continue;
++		cnt++;
++	}
++
++	if (len / sizeof(tsinfo) < cnt)
+ 		goto out;
+ 
+ 	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
+ 		struct inet_sock *inet = inet_sk(tc->t_sock->sk);
+ 
++		if (copied >= cnt)
++			break;
+ 		if (tc->t_cpath->cp_conn->c_isv6)
+ 			continue;
++		/* Only show connections in the caller's netns. */
++		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
++			continue;
+ 
+ 		tsinfo.local_addr = inet->inet_saddr;
+ 		tsinfo.local_port = inet->inet_sport;
+@@ -266,10 +265,12 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
+ 		tsinfo.tos = tc->t_cpath->cp_conn->c_tos;
+ 
+ 		rds_info_copy(iter, &tsinfo, sizeof(tsinfo));
++		copied++;
+ 	}
++	cnt = copied;
+ 
+ out:
+-	lens->nr = rds_tcp_tc_count;
++	lens->nr = cnt;
+ 	lens->each = sizeof(tsinfo);
+ 
+ 	spin_unlock_irqrestore(&rds_tcp_tc_list_lock, flags);
+@@ -284,19 +285,35 @@ static void rds6_tcp_tc_info(struct socket *sock, unsigned int len,
+ 			     struct rds_info_iterator *iter,
+ 			     struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds6_info_tcp_socket tsinfo6;
+ 	struct rds_tcp_connection *tc;
++	unsigned int cnt = 0;
++	unsigned int copied = 0;
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&rds_tcp_tc_list_lock, flags);
+ 
+-	if (len / sizeof(tsinfo6) < rds6_tcp_tc_count)
++	/* First pass: count entries visible in the caller's netns. */
++	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
++		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
++			continue;
++		cnt++;
++	}
++
++	if (len / sizeof(tsinfo6) < cnt)
+ 		goto out;
+ 
+ 	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
+ 		struct sock *sk = tc->t_sock->sk;
+ 		struct inet_sock *inet = inet_sk(sk);
+ 
++		if (copied >= cnt)
++			break;
++		/* Only show connections in the caller's netns. */
++		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
++			continue;
++
+ 		tsinfo6.local_addr = sk->sk_v6_rcv_saddr;
+ 		tsinfo6.local_port = inet->inet_sport;
+ 		tsinfo6.peer_addr = sk->sk_v6_daddr;
+@@ -309,10 +326,12 @@ static void rds6_tcp_tc_info(struct socket *sock, unsigned int len,
+ 		tsinfo6.last_seen_una = tc->t_last_seen_una;
+ 
+ 		rds_info_copy(iter, &tsinfo6, sizeof(tsinfo6));
++		copied++;
+ 	}
++	cnt = copied;
+ 
+ out:
+-	lens->nr = rds6_tcp_tc_count;
++	lens->nr = cnt;
+ 	lens->each = sizeof(tsinfo6);
+ 
+ 	spin_unlock_irqrestore(&rds_tcp_tc_list_lock, flags);
+
+-- 
+2.34.1
 
