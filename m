@@ -1,75 +1,90 @@
-Return-Path: <netdev+bounces-289855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289857-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEIcLlmADWosyAUAu9opvQ
-	(envelope-from <netdev+bounces-289855-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:35:21 +0200
+	id WF/hJcyBDWrUyQUAu9opvQ
+	(envelope-from <netdev+bounces-289857-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:41:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FD8D58ADBB
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:35:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F6E58AF87
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 95AE6301F15E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:34:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D5D5F301D114
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647093B585F;
-	Wed, 20 May 2026 09:34:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FAA39934B;
+	Wed, 20 May 2026 09:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="PQC2yBc6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kLKQIq4V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17D7370AFA;
-	Wed, 20 May 2026 09:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B753C0603;
+	Wed, 20 May 2026 09:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779269667; cv=none; b=XEhJco7Rc3ldfDg8T/Rav7AdCBOQaZPhmUPmF7wLVUelZVndFaR7+wlVhE4/lJYcY2+vzTSiyDt8z+MDRE+5dQheoalQKJzKwYbznf7ibzjS0w8dNCUImmIym/ukHt4qFamYqEjC5mWOsz0zYP4DylmcF6twD9R5n8wsaPh7g3o=
+	t=1779270066; cv=none; b=Fzw1fn+TZT5YA6oMB4n53O1lVasXEAc+k+Fm6hVWNZK+XCE+g3QupRAM9MFNTVLPBtJB4aVjACIxd59gPK46zKvE2Kzuh9NgjnApLwjPWFSaor/QH7FWDLBmXlQAXvLt41TWACO3FsVTYTGY5aL7ZUg2vMUKvXOyZV2zSFjWHvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779269667; c=relaxed/simple;
-	bh=BoblhB4Xpk4LlfwvhT1PyKrbb08G4mcOXJ9gtHhleuU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tavmz/HyXzrPpsBMo+gEQ+4xXjqvEk6IU0lJuCPrpBKx5PtN+4HTZimBugCARMJISyBcJXjWGFUcAh+P8Btr5qRPmtNx6g7YSHOZIhv+sywK1XsRrV97XBiZ+gJIzFyVB9QetPo88Fg16Qa9ANc4be2wN1cXsbuzuOKtJot9uXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=PQC2yBc6; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64K2pmZD3009289;
-	Wed, 20 May 2026 02:34:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=tWEoPTrzvEZ7qqivt3k6eDh
-	pPFiR0vgOIDIx7kdmhaY=; b=PQC2yBc6zFg/1n9iRNMKqY2E9hcR6/tq7NoKIRi
-	xgJx1sWMjC0ZLCRoD6TdhBBYRV89unXYyvFQvgBunltr+e0GO2Y/CKbaa/Uu4qgG
-	hCdpsS7v4dbkU+GpuknUNJwPREFWBViv11/CufwONqPR54tPTE7ih+HJzPcpVs2O
-	7VFcGHwzjqD3zTXtGmg55Z2hJ4SVn/6o/0/l/4vnQwH9zUPrLUc7X7Ruk4fAQGRN
-	ElaMKkenEPRsRs2r656unBcvK6hK/fePcaY9kMc2F03Tnx2uRHtZz9XRNkFJcP3/
-	XLckOYgVN9Jwj2cQIP3Y5o+cfmhNyGlHpLSa3qe4hs+XNoQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e8jywcayt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 May 2026 02:34:13 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 20 May 2026 02:34:12 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 20 May 2026 02:34:12 -0700
-Received: from hyd1vellox1.032marvell.com032caveonetworks.com (unknown [10.29.37.43])
-	by maili.marvell.com (Postfix) with ESMTP id 6356F5B693E;
-	Wed, 20 May 2026 02:34:08 -0700 (PDT)
-From: Anshumali Gaur <agaur@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <gakula@marvell.com>,
-        <hkelam@marvell.com>, <sbhatta@marvell.com>, <sgoutham@marvell.com>,
-        <bbhushan2@marvell.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Anshumali Gaur <agaur@marvell.com>
-Subject: [PATCH net-next v5] octeontx2-pf: Retain ethtool stats across interface down/up.
-Date: Wed, 20 May 2026 15:04:04 +0530
-Message-ID: <20260520093404.1945835-1-agaur@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1779270066; c=relaxed/simple;
+	bh=/A8T628cXPkWxHavNgxSa3ZcoWcI2pIF/Evd/3UL7ZM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qG3GrSYcK8VBT4g8m1sGBCF5hl8UOEEen2WFpTESPqJI6Hs8jnOHViLndfTGFT0aVfksjLf0rHfLEO0uirSoskVjc1uah0Yrf7HiBKEaq0PcBFl2UrGS/1grNO0NFylctYTHY7rTKjgzjdFFglTl3P+9cRZBdvM6DtHZeqeAczc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kLKQIq4V; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779270063; x=1810806063;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/A8T628cXPkWxHavNgxSa3ZcoWcI2pIF/Evd/3UL7ZM=;
+  b=kLKQIq4VNEnkc/OSybpVu24abJfBUj2AFOY9qNNBjCq+21hDBmBu0hvq
+   MKfo3F5yyhwpxowutbE4DX2h57Lma9wzro3eCVgo2upgU0pBM5rAk49Jq
+   2aAC6cymyafpUuqBCSy5SVOah3zI8lHsU+epNTw5EVGYdHLjWDx3oHLqK
+   mEAno0PRal+rZ/A+iTJ3Sk+J/qj1i4UB6uCE/wgNe7XWBPt2mTW7id4fn
+   bemCp1lEe/NqioB8JveCA/Hny15zRx8YpBguhWpXPdt0wwsIoW6f1eAo6
+   vKOB+0TNG+0vLaAxn6OJkn4J05N9f0xvcVH2f8PRmSM/nquFse3e/sov9
+   w==;
+X-CSE-ConnectionGUID: XDYJsSf8RdiXZIPrdGukQQ==
+X-CSE-MsgGUID: JWINTw8BTS2zN5s0baYLeg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11791"; a="90860315"
+X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
+   d="scan'208";a="90860315"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 02:41:01 -0700
+X-CSE-ConnectionGUID: iamqZinyR5yRbm0rCtSyxA==
+X-CSE-MsgGUID: ZAvFgQ5lRESp8xAnWwoWIQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
+   d="scan'208";a="240364996"
+Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
+  by orviesa007.jf.intel.com with ESMTP; 20 May 2026 02:40:56 -0700
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	poros@redhat.com,
+	richardcochran@gmail.com,
+	andrew+netdev@lunn.ch,
+	przemyslaw.kitszel@intel.com,
+	anthony.l.nguyen@intel.com,
+	Prathosh.Satish@microchip.com,
+	ivecera@redhat.com,
+	jiri@resnulli.us,
+	arkadiusz.kubalewski@intel.com,
+	vadim.fedorenko@linux.dev,
+	donald.hunter@gmail.com,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [PATCH v10 net-next 0/8] dpll/ice: Add generic DPLL type and full TX reference clock control for E825
+Date: Wed, 20 May 2026 11:36:20 +0200
+Message-Id: <20260520093628.3930705-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,170 +92,331 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: vlheHNz2e9Dk8KHYFtohrHYvrX5uUwRz
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDA5MCBTYWx0ZWRfX3EEhXbd3U6gq
- sBDET3qP3z63Vz9w18iLwKQiMGIXIhoazv9boofV2BJ/2+LoFlodzAuq2Z0KG7TEOInFfahtpim
- YtiJLmek0KwrzgME54D1iuaR35zcxVwmC39PdNYJDu0ewJuMYihlKDCtNrseWFUjDEcEBgZkWlW
- 44M5GpPOIb79tjrPArCJJ5fuR5Eq3cLb2uBQtmF0xn1Ri6Fq7DrulY1W2M5rU8cIZZnV4F3QNBB
- lFRVeRSt3WqWJJiZjSNWCZ2S6JxBKstSw7BNknlwAIHHrdFqTDCefObeoNEw2SBu1Ys6Rt0ZA2h
- rnRc5xR+uKQGXy6exTX6LI305UEs0wgFBcKpxV9JR8uHBCtab00e2Nr9q8MYKyxCwqEsESXxtpd
- 9govGTatdNxrJQFNQ+xEgb2B9fEH+/D/Z65l8dDUkkU8GRFWH1wbV0oT+jc6UdwFffjiG6GbTAA
- U+y1nnHTOMPMAPMyVdw==
-X-Proofpoint-ORIG-GUID: vlheHNz2e9Dk8KHYFtohrHYvrX5uUwRz
-X-Authority-Analysis: v=2.4 cv=QbNWeMbv c=1 sm=1 tr=0 ts=6a0d8015 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=6arj5X4aKY2yYbu-eEwA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-20_02,2026-05-18_01,2025-10-01_01
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289857-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289855-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[agaur@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,marvell.com:email,marvell.com:mid,marvell.com:dkim];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 2FD8D58ADBB
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: A1F6E58AF87
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Currently the hardware counters reset when the interface is
-brought down, causing stats visible to userspace to drop to zero.
-Save the accumulated stats before bringing the interface down
-so they persist across routine down/up cycles.
+NOTE: This series is intentionally submitted on net-next (not
+intel-wired-lan) as early feedback of DPLL subsystem changes is
+welcomed. In the past possible approaches were discussed in [1].
 
-Signed-off-by: Anshumali Gaur <agaur@marvell.com>
----
-v5:
-  - Split variable declaration and initialization in otx2_stop (Paolo)
-  - Fix reverse christmas tree order in otx2_get_stats64() (Paolo)
-  - Move stats collection just before otx2_free_hw_resources() to
-    avoid race with NAPI (Paolo/Sashiko)
-  - Remove duplicate otx2_rxtx_enable() call
-v4:
-  - Move stats accumulation after disabling tx/rx (Dragos)
-  - Fetch latest HW counters before accumulating in otx2_stop()
-v3:
-  - Code format according to kernel coding style
-  - Reword commit message
-v2:
-  - Fix subject prefix to target net-next
- .../marvell/octeontx2/nic/otx2_common.c       | 20 ++++++++++--------
- .../marvell/octeontx2/nic/otx2_common.h       |  1 +
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 21 +++++++++++++++++++
- 3 files changed, 33 insertions(+), 9 deletions(-)
+This series adds TX reference clock support for E825 devices and exposes
+TX clock selection and synchronization status via the Linux DPLL
+subsystem.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 971fcab1c248..fce46816446f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -138,20 +138,22 @@ void otx2_get_dev_stats(struct otx2_nic *pfvf)
- void otx2_get_stats64(struct net_device *netdev,
- 		      struct rtnl_link_stats64 *stats)
- {
-+	struct otx2_dev_stats *dev_stats, *old_stats;
- 	struct otx2_nic *pfvf = netdev_priv(netdev);
--	struct otx2_dev_stats *dev_stats;
- 
- 	otx2_get_dev_stats(pfvf);
- 
- 	dev_stats = &pfvf->hw.dev_stats;
--	stats->rx_bytes = dev_stats->rx_bytes;
--	stats->rx_packets = dev_stats->rx_frames;
--	stats->rx_dropped = dev_stats->rx_drops;
--	stats->multicast = dev_stats->rx_mcast_frames;
--
--	stats->tx_bytes = dev_stats->tx_bytes;
--	stats->tx_packets = dev_stats->tx_frames;
--	stats->tx_dropped = dev_stats->tx_drops;
-+	old_stats = &pfvf->hw.old_stats;
-+
-+	stats->rx_bytes = old_stats->rx_bytes + dev_stats->rx_bytes;
-+	stats->rx_packets = old_stats->rx_frames + dev_stats->rx_frames;
-+	stats->rx_dropped = old_stats->rx_drops + dev_stats->rx_drops;
-+	stats->multicast = old_stats->rx_mcast_frames + dev_stats->rx_mcast_frames;
-+
-+	stats->tx_bytes = old_stats->tx_bytes + dev_stats->tx_bytes;
-+	stats->tx_packets = old_stats->tx_frames + dev_stats->tx_frames;
-+	stats->tx_dropped = old_stats->tx_drops + dev_stats->tx_drops;
- }
- EXPORT_SYMBOL(otx2_get_stats64);
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index eecee612b7b2..ad65aa19b80d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -255,6 +255,7 @@ struct otx2_hw {
- 
- 	/* Stats */
- 	struct otx2_dev_stats	dev_stats;
-+	struct otx2_dev_stats	old_stats;
- 	struct otx2_drv_stats	drv_stats;
- 	u64			cgx_rx_stats[CGX_RX_STATS_COUNT];
- 	u64			cgx_tx_stats[CGX_TX_STATS_COUNT];
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index ee623476e5ff..3b4e32d899b7 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -2154,6 +2154,7 @@ EXPORT_SYMBOL(otx2_open);
- int otx2_stop(struct net_device *netdev)
- {
- 	struct otx2_nic *pf = netdev_priv(netdev);
-+	struct otx2_dev_stats *old_stats, *dev;
- 	struct otx2_cq_poll *cq_poll = NULL;
- 	struct otx2_qset *qset = &pf->qset;
- 	int qidx, vec, wrk;
-@@ -2200,6 +2201,26 @@ int otx2_stop(struct net_device *netdev)
- 		cancel_delayed_work_sync(&pf->refill_wrk[wrk].pool_refill_work);
- 	devm_kfree(pf->dev, pf->refill_wrk);
- 
-+	/* Read final HW counters and accumulate */
-+	dev = &pf->hw.dev_stats;
-+	old_stats = &pf->hw.old_stats;
-+	otx2_get_dev_stats(pf);
-+
-+	/* Accumulate old stats */
-+	old_stats->rx_bytes     += dev->rx_bytes;
-+	old_stats->rx_drops     += dev->rx_drops;
-+	old_stats->rx_bcast_frames      += dev->rx_bcast_frames;
-+	old_stats->rx_mcast_frames      += dev->rx_mcast_frames;
-+	old_stats->rx_ucast_frames      += dev->rx_ucast_frames;
-+	old_stats->rx_frames            += dev->rx_frames;
-+
-+	old_stats->tx_bytes             += dev->tx_bytes;
-+	old_stats->tx_drops             += dev->tx_drops;
-+	old_stats->tx_bcast_frames      += dev->tx_bcast_frames;
-+	old_stats->tx_mcast_frames      += dev->tx_mcast_frames;
-+	old_stats->tx_ucast_frames      += dev->tx_ucast_frames;
-+	old_stats->tx_frames            += dev->tx_frames;
-+
- 	otx2_free_hw_resources(pf);
- 	otx2_free_cints(pf, pf->hw.cint_cnt);
- 	otx2_disable_napi(pf);
+Here is the high-level connection diagram for E825 device:
+  +------------------------------------------------------------------+
+  |                                                                  |
+  |                           +-----------------------------+        |
+  |                           |                             |        |
+  |                           |         MAC                 |        |
+  |                           |+------------+-----+         |        |
+  |                           ||RX/1588 |PHC|tspll<----\    |        |
++---+----+                    ||MUX     +---+-^---|    |    |        |
+| E | RX >--------------------->              |   >--\ |    |        |
+| T |    |    /---------------->              |   >-\| |    |        |
+| H |----+    |               |+---------+----^---+ || |    |        |
+| 1 | TX <----|----------------+TX MUX   < OCXO   | || |    |        |
+|   |PLL |    |               ||         |--------| || |    |        |
++---+----+    |           /----+         <-ext_ref<-||-|----|------ext_ref
+| E | RX >----/           |   ||         |--------+ || |    |        |
+| T |    |                |   ||         <  SyncE | || |    |        |
+| H |----+                |   |+-----------^------+ || |    |        |
+| 2 | TX <----------------/   |            | /------||-/    |        |
+|   |PLL |                    +------------|-|------||------+        |
++---+----+                              /--/ |      ||               |
+| . | RX >---                           |    |      ||               |
+| . |    |                   +----------|----|------||--+            |
+| . |----+                   |        +-^-+--^+     ||  |            |
+|   | TX <---                |        |EEC|PPS|     ||  |            |
+|   |PLL |                   |        +-------+     ||  |            |
++---+----+                   |        |       <-CLK0/|  |            |
+| E | RX >---                |        |  DPLL |      |  |            |
+| T |    |                   |        |       <-CLK1-/  |            |
+| H |----+                   |        |       |         |            |
+| X | TX <---                |        |       <---SMA---<            |
+|   |PLL |                   |        |       |         |            |
++---+----+                   |        |       <---GPS---<            |
+  |                          |        |       |         |            |
+  |                          |        |       <---...---<            |
+  |                          |        |       |         |            |
+  |                          |        +-------+         |            |
+  |                          | External timing module   |            |
+  |                          +--------------------------+            |
+  +------------------------------------------------------------------+
+
+E825 hardware contains a dedicated TX clock domain with per-port source
+selection behavior that is distinct from PPS handling and from board-level
+EEC distribution. TX reference clock selection is device-wide, shared
+across ports, and mediated by firmware as part of link bring-up. As a
+result, TX clock selection intent may differ from effective hardware
+configuration, and software must verify outcome after link-up.
+
+To support this, the series extends the DPLL core and the ice driver
+incrementally. The series also introduces DPLL_TYPE_GENERIC as a broad
+UAPI class for DPLL instances outside PPS/EEC categories. The intent is
+to keep type naming reusable and scalable across different ASIC
+topologies while preserving functional discoverability via
+driver/device context and pin topology.
+
+This follows netdev discussion guidance that UAPI type naming should avoid
+location-specific or vendor-specific taxonomy, because such labels do not
+scale across different ASIC designs. The function of a given DPLL instance
+is already discoverable from driver/device context and pin topology, and
+does not require an additional narrow type identifier in UAPI.
+
+At the same time, a separate DPLL object is still needed for E825 TX clock
+control/reporting semantics. Using DPLL_TYPE_GENERIC provides a reusable
+class for devices outside PPS/EEC without overfitting UAPI naming to one
+topology.
+
+The relevant discussion is in [2].
+
+Series content
+- add a new generic DPLL type for devices outside PPS/EEC classes;
+- relax DPLL pin registration rules for firmware-described shared pins
+  and extend pin notifications with a source identifier;
+- allow dynamic state control of SyncE reference pins where hardware
+  supports it;
+- add CPI infrastructure for PHY-side TX clock control on E825C;
+- introduce a TX-clock DPLL device and TX reference clock pins
+  (EXT_EREF0 and SYNCE) in the ice driver;
+- extend the Restart Auto-Negotiation command to carry a TX reference
+  clock index;
+- implement hardware-backed TX reference clock switching, post-link
+  verification, and TX synchronization reporting.
+
+TXCLK pins report TX reference topology only. Actual synchronization
+success is reported via DPLL lock status, updated after hardware
+verification: external TX references report LOCKED, while the internal
+ENET/TXCO source reports UNLOCKED.
+
+This provides reliable TX reference selection and observability on E825
+devices using standard DPLL interfaces, without conflating user intent
+with effective hardware behavior.
+
+[1] https://lore.kernel.org/netdev/20250905160333.715c34ac@kernel.org/
+[2] https://lore.kernel.org/netdev/20260402230626.3826719-1-grzegorz.nitka@intel.com/
+
+Changes in v10:
+- rebased
+Addressed AI review (Sashiko) concerns (all in patch 8/8):
+- moved INIT_WORK(txclk_work) and added init_rwsem(txclk_notify_rwsem)
+  next to mutex_init(&d->lock) in ice_dpll_init_e825() so both are
+  initialized before any path that can fail and trigger ice_dpll_deinit()
+- added struct rw_semaphore txclk_notify_rwsem to struct ice_dplls and
+  used it (down_read across the whole critical region of
+  ice_txclk_update_and_notify(), including the out-of-lock dpll_*_change_ntf()
+  calls; down_write/up_write barrier in ice_dpll_deinit() to drain
+  in-flight notifiers before pins and the TXC DPLL device are freed) -
+  closes a use-after-free window on rmmod
+- ice_dpll_txclk_state_on_dpll_set(): reject pin states other than
+  CONNECTED/DISCONNECTED with -EINVAL and NL_SET_ERR_MSG() instead of
+  silently treating them as a connect request
+- ice_dpll_txclk_work(): on a failed switch, capture old/new pin pointers
+  under the lock and emit dpll_pin_change_ntf() after dropping it, so
+  userspace sees the requested pin flip back to DISCONNECTED and the
+  effective pin to CONNECTED
+- ice_dpll_txclk_work(): only clear txclk_switch_requested / roll back
+  tx_clk_req when no newer request arrived while the lock was dropped,
+  so a re-queued worker run picks up the updated value
+- ice_txclk_update_and_notify(): replaced the
+  pf->dplls.txc.dpll = ERR_PTR(-ENODEV) "suppress notification" hack
+  with an explicit local bool notify_dpll; the dpll_state update and
+  the notification decision are made under the lock, the notification
+  itself is emitted after unlock
+- ice_ptp_setup_pf(): seed the per-PHY Tx reference clock usage map
+  only on E825 and explained the "no locking needed" invariant in a
+  comment (runs before pf->dplls.lock exists and before any link event
+  or DPLL callback can observe the map)
+- moved port_num/phy and tx_ref_clk locals into the E825-only branches
+  where they are actually used
+- ice_txclk_enable_peer(): use ice_pf_to_dev(pf) for dev_err() to match
+  the rest of the file (was ice_hw_to_dev(&pf->hw))
+- extended ctrl_pf->dplls.lock coverage in ice_txclk_set_clk() and
+  ice_txclk_enable_peer() across both the usage check and the
+  ice_cpi_ena_dis_clk_ref() AQ command so two PFs racing to switch to
+  the same (phy, clk) cannot both observe clk_in_use == false and issue
+  duplicate enables
+Other:
+- replaced ternary-for-statement-effect (`(clk == i) ? set_bit() :
+  clear_bit();`) with plain if/else in the two tx_refclks bitmap loops
+- dropped 15 unused CFG_*/CFG_RESERVED* SERDES field defines in
+  ice_ptp_hw.h; kept only CFG_ICTL_PCS_REF_SEL_RX_NT,
+  CFG_ICTL_PCS_REF_SEL_TX_NT and REF_SEL_NT_ENET/EREF0/SYNCE which are
+  actually consumed
+- updated kernel-doc for struct ice_dpll
+Patch 7/8:
+- cosmetic: removed a stray double space in the
+  ice_aq_set_link_restart_an() prototype
+Patches 1-6: unchanged
+
+Changes in v9:
+- rebased
+- fixed kernel-doc: member 'module_name' not described in 'dpll_pin' (patch 2/8)
+Addressed AI review concerns:
+- reworded commit message to use 'src_clock_id' instead 'src_id' (patch 3/8)
+- use rclk.num_parents when setting is_rclk_parent (patch 5/8)
+- fixed retry mechanism in ice_cpi_wait_ack (patch 6/8)
+- fixed txclk_switch_requested, tx_clk, tx_clk_req settings on HW
+  failure (patch 8/8)
+- use cancel_work_sync instead flush_work (patch 8/8)
+- protect clearing ICE_FLAG_DPLL flag with mitex on DPLL
+  deinit (patch 8/8)
+- dpll_state update and the notify_dpll decision are made inside
+  the lock (patch 8/8)
+
+Changes in v8:
+- rebased
+Addressed AI review concerns:
+- caching the module name in the pin object at allocation time and using
+  the cached string in netlink paths (patch 2/8)
+- dropped references to netlink in the commit message for (patch 3/8, it's
+  internal notification only)
+- replaced the commit 4/8 with the new one (relax the capability check in
+  dpll_pin_state_set)
+- resolved potential teradown race between ice_dpll_deinit_txclk_pins and
+  ice_dpll_pin_notify_work() that is about to register the SYNCE pin
+  (patch 5/8)
+- resolved potential path deadlock during driver probe and error path
+  (patch 5/8)
+- relaxed kernel-doc regarding cpi mutex usage (patch 6/8)
+- fixed ice_cpi.c header (patch 6/8)
+- fix retry mechanism in ice_cpi_wait_req0_ack0 (patch 6/8)
+- fix potrntial leaving LM.REQ stuck asserted on the hardware (patch 6/8)
+- fix kernel-doc for ice_cpi_ena_dis_clk_ref
+- removed unused CPI definitions (patch 6/8)
+- fix header inclusion (patch 6/8)
+- addressed Sashiko issues for patch (8/8)
+
+Changes in v7:
+- rebased
+- replace TXC-specific DPLL type with DPLL_TYPE_GENERIC (patch 1/8)
+- update TXC framework to use DPLL_TYPE_GENERIC instead of DPLL_TYPE_GENERIC
+  (patch 5/8)
+- AI-review: added short trailing comment to the local mutex declaration
+  to satisfy checkpatch report (patch 6/8)
+
+Changes in v6:
+ - rebased
+ - AI-review: fix unprotected concurrent access to shared clock
+   bitmap (patch 8/8)
+ - AI-review: fix potential issue in tx-clk pin state request handling
+   ('already set' early-exit based now on tx_clk_req comparison, patch 8/8)
+ - AI-review: CPI transaction serialization (patch 6/8) 
+
+Changes in v5:
+ - rebased
+ - reworded cover letter
+ - replace 'ntfy_src' new argument name with 'src_clk_id' and use it
+   consistently in DPLL notification calls (patch 3/8)
+ - reworded commit message (patch 5/8)
+ - use FIELD_PREP/GENMSK macros instead of struct bitfields (patch 6/8)
+ - reworded commit message (patch 5/8, patch 8/8)
+ - refactor the code to avoid sleeping while DPLL mutex is held (using
+   work_queue, patch 8/8)
+ - added TXCLK pins and TXC DPLL notifications (patch 8/8)
+ - removed 'unused clock disable' mechanism from the scope of this series
+
+Changes in v4:
+ - rebased
+ - edited, shortened the commit message in 3/8 patch
+ - moved ice_get_ctrl_pf to the header file (patch 8/8) and
+   removed duplicated static definitions from ice_ptp and ice_txlck
+   modules
+ - add NULL/invalid pointer checker for returned pointer from
+   ice_get_ctrl_pf (patch 8/8)
+ - edited error message in case AN restart failure (patch 8/8)
+
+Changes in v3:
+- improved commit message (patch 1/8, AI review comment)
+- improved deinitialization path in ice_dpll_deinit_txclk_pins to
+  avoid potential NULL dereference. NULL checking moved to
+  ice_dpll_unregister_pins (patch 5/8, found by AI review)
+- removed redundant semicolon (patch 6/8)
+
+Changes in v2:
+- rebased
+- added autogenerated DPLL files (patch 1/8)
+- fixed checkpatch 'parenthesis alignment' warning (patch 2/8)
+- fixed error path in ice_dpll_init_txclk_pins (AI warning, patch 5/8)
+- fixed kdoc warnings (patch 6/8, patch 8/8)
+
+Grzegorz Nitka (8):
+  dpll: add generic DPLL type
+  dpll: allow registering FW-identified pin with a different DPLL
+  dpll: extend pin notifier with notification source ID
+  dpll: allow fwnode pins to attempt state change without capability bit
+  ice: introduce TXC DPLL device and TX ref clock pin framework for E825
+  ice: implement CPI support for E825C
+  ice: add Tx reference clock index handling to AN restart command
+  ice: implement E825 TX ref clock control and TXC hardware sync status
+
+ Documentation/netlink/specs/dpll.yaml         |   3 +
+ drivers/dpll/dpll_core.c                      |  34 +-
+ drivers/dpll/dpll_core.h                      |   5 +-
+ drivers/dpll/dpll_netlink.c                   |  26 +-
+ drivers/dpll/dpll_netlink.h                   |   4 +-
+ drivers/dpll/dpll_nl.c                        |   2 +-
+ drivers/net/ethernet/intel/ice/Makefile       |   2 +-
+ drivers/net/ethernet/intel/ice/ice.h          |  12 +
+ drivers/net/ethernet/intel/ice/ice_adapter.c  |   4 +
+ drivers/net/ethernet/intel/ice/ice_adapter.h  |   7 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |   5 +-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   2 +-
+ drivers/net/ethernet/intel/ice/ice_cpi.c      | 362 ++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_cpi.h      |  58 +++
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 468 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  36 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   3 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  37 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |   7 +
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  37 ++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  17 +
+ drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |   5 +-
+ drivers/net/ethernet/intel/ice/ice_txclk.c    | 320 ++++++++++++
+ drivers/net/ethernet/intel/ice/ice_txclk.h    |  40 ++
+ drivers/net/ethernet/intel/ice/ice_type.h     |   2 +
+ include/linux/dpll.h                          |   1 +
+ include/uapi/linux/dpll.h                     |   2 +
+ 28 files changed, 1442 insertions(+), 61 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_cpi.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_cpi.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_txclk.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_txclk.h
+
+
+base-commit: 794cd1c77f53309f5eb8c05b4b833ad3723eccff
 -- 
-2.25.1
+2.39.3
 
 
