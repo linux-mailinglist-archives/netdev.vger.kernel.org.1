@@ -1,622 +1,260 @@
-Return-Path: <netdev+bounces-289845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289846-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCfCCT54DWqGxwUAu9opvQ
-	(envelope-from <netdev+bounces-289845-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:00:46 +0200
+	id CFfKNcJ2DWpAxwUAu9opvQ
+	(envelope-from <netdev+bounces-289846-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:54:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60E8658A4E2
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:00:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70A6658A346
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:54:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66EC431E6AA2
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:45:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5C8A83004D29
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDAD3AEF33;
-	Wed, 20 May 2026 08:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4EF36C9D5;
+	Wed, 20 May 2026 08:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S5b2Pi4L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qAP/4OTu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2029280A5A
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 08:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4D63438B5
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 08:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779266565; cv=none; b=qeFgs7V+dSB0Kyvhty7DDjh+gqy7Vn04pYYv75sZz0KNQ3rm/sXQCm1Mcf/O0l5njzyp+F3DJtxZaJD3k0t910JxwnV2rnmubAxa8dwkWTOaBBxD5havffdn6rUfcIe6se2swC89cssL2z73GIH20tLtz7ueKXgOITX8MNXsTE8=
+	t=1779266951; cv=none; b=Fvee5GTLPVPXnhaEy5tQ4cChEIzx38Ahwfy+3qOZJSl/OS5jP4z6qoPQ9XmKV1dNPbrFHtc/Nj7BPWagYaX8QxWzYNAPPD3VokO4sTx1GpB/Ql3tGwwroFD2+/YCCunZQq0Wfjynw84xy1Ih+kGlr5MzCSjtLG8s5v3hVYbkl8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779266565; c=relaxed/simple;
-	bh=tHiytlwYL5ZPS+5bOp5RZBz2MEVQjQT02NVce6+vGbs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=avIu+CW71eEL+oZ+VmhlHwmjKnA9z4DfnZacbYG7xiBwX/RwyAEFw6dma3iAjBAdnsGmXob6ZIIbSVIBC7qZ7zw+VdhTKNcCd2vgKwB+aapePgz47K5iE06RVkZEUSAcjhX9XUbf6D5VKAtrk/pOIHPmVRg6G+sx1AQQ4U9Pni0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S5b2Pi4L; arc=none smtp.client-ip=209.85.215.170
+	s=arc-20240116; t=1779266951; c=relaxed/simple;
+	bh=/sILZbxDKoq1vskza1mwSZlFPw4VrzFfpFOSLhoWh9o=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mIVkl1yUis0v4cgGvtwkotIPR8oztvIWLBfp0O8dPMqL5dj139Z3xxTTYhH7cEB1mcPjj5YoFYAKHspsjA6gxiL8IB0Oc65Em9uProuTAWBNd5KG62mLbwvXi94nt68+rtHXiJHgPD8CeL2FjbIwEFC5zVt+rbGDs8fNZ1hMuZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qAP/4OTu; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c801d732058so2012058a12.1
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 01:42:43 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-441209fb77eso2801247f8f.1
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 01:49:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779266563; x=1779871363; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cj9dNWpwR7KR9FuTwwa9cr68HYXxFlOPEg+1G0DdtjA=;
-        b=S5b2Pi4Ld5d9QRWiWPuN9GJZ7YN+I5QiaGUaLYE0uGvNzLZCMExQgL5t6JfDf8JEMa
-         nfYDfOvIYAezWXrd9otZWdm/ksUPBslWcsqzPqanACHPJBAZRYMwgH4Mpl9CCKIR9K5G
-         MWyEHGfz+JrYziHB9wAzY/VgwCVVS+RMRBc9lCX1XZ+cCgXNfMtUZkeMNrwH4Va07lem
-         EfrSOLJSJUo1umDuaJ17lUzlgDbqMp0HQ9+NZwhA50asBJ40+41RN6YtIYtnMT4n2Wj5
-         b+HMXeWrmZB1Us2T1qG2b/cgLouHir4hpCgdP6B7oQGMHXuGFkRYRZ0Qm5dI16B3oIaU
-         9zag==
+        d=gmail.com; s=20251104; t=1779266948; x=1779871748; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ejL+l53hnYgckUQi0VlDCQvjptKPu8absQUJq5r1j9Q=;
+        b=qAP/4OTu/cXWbrhvHg1g7/MFsA+mUTRZV27PzCW3tiY+6m8V5IkJCkO/0czVcvbZA3
+         l068LvpBEq1ZmWoGgu8UrOcy2ZfeiVs1MnARSVQ72mGHbPsJ2NvljUO6VtMLQW5qikfs
+         RRj3PIZohZl6VigkTfTwmL2eDi/vw9Jz75Dy+iZpzPlfXR1oM8m8afVWY7Ru64C7KUSj
+         uwJ9n4CUrOQjDs/GKQlIXXzJt7P+7iyxDalSro680jbNjvEMbnuEX7rvEvj6AQ2L/yAN
+         GCeuNAQEGca5XMTN5DTRWiOtnlc/oDikQOvOlbh5n05E6+I0ASd8rHt68W3U/CmGb4qH
+         LtyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779266563; x=1779871363;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1779266948; x=1779871748;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Cj9dNWpwR7KR9FuTwwa9cr68HYXxFlOPEg+1G0DdtjA=;
-        b=i/dXGrZiyl75/5Pg73w8mpikHNUfUUe1uY1AiTAETL4MLJhIh6P9yLSq6WTIQHWv62
-         xYiNR0APhd6bepcdXW2aQP/Y9FuRApcntKQ+pMaO+xQeZwjrxnsdQ0AvA/BaRRjDKzC2
-         2LbY4Ew1GXPIgw7PNfeHT3t5PgNgTlqOsXX/OVpQm7quAhYZJqr4vQQngpvSs8FJq9Bw
-         DMnOJKSaAgMOIe3FaG74uv1i0vbDvH+KM2fnDzLxyDSRnX8++GG84eiw7Kb/VwL55xfZ
-         /XI0o8lV6IsPtkCnR8vME+dAs9F3caAKksPQwpl9b3UJjpOaQhAXWzWsb+Z4tHKCHAE7
-         6hVA==
-X-Gm-Message-State: AOJu0Yz1nF79pmEkt2/xUwOhlvpAChLHwtN0bhw7EQEGy+lWDb6Zvc4O
-	7mawI9IZ5RmPeU56bJndp8i5IPKRcc623zaHe2Gx9O1DTsP4gqOO+gt2LB4NQg==
-X-Gm-Gg: Acq92OH+M9NrVqFjMV8zPH2FwXWZ5IoQHWk1q6nFD+8m0xwJumTO3I6s89N7xwpb/fQ
-	Bw60gYVl19k2pL2+Q8j71uJWVSSo769vjDiOJnNQf74LITk8p5XE42tkzE8OAS0ZH1XfBS1ANbc
-	gloSFkNDCx7mWfw8OUrWpF0K536i+PhOm2/Gg1+lVmJ4Ja1o6mOaUy0hCWqzjIdL3cvFwlYDFxi
-	TnqikBl+zgu2h/aNi1/NOVgoBh9u2x+xACToJlo01rBdiTIQIv2zQ4INcL04So4+2Q2wSRvQPgj
-	2S6Ts5I5PAFTBRiqQrPMoxUtNFct00esWXoNt8fTB2i8hW65Ya31hjO91XqiMBu0OKzktN9uPR5
-	wEt0Dwt3On8ORkhRKAGC0qDWFvg5PNU+SKQWqmWcjUJ82A+E7QV2bOdCby1uMmSu+sDIvpB6F4n
-	HOpDLeNuGiCBsADdNkxJymQtVySEu37E3NCyYsg3BSPp6N2Ojf
-X-Received: by 2002:a05:6a20:4328:b0:3a2:cf6d:aa04 with SMTP id adf61e73a8af0-3b0bdd00bfbmr25707703637.8.1779266562681;
-        Wed, 20 May 2026 01:42:42 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c82bb123986sm20808751a12.32.2026.05.20.01.42.39
+        bh=ejL+l53hnYgckUQi0VlDCQvjptKPu8absQUJq5r1j9Q=;
+        b=f3ms2Hq3AfSpV9AyNXNYWtHxxrJnPJUbbS6QiT2Co+Eaof94i2kX+g4JiUtlsGl5CV
+         U33eHlJafRi29FV1HjktRCwFa5GgjR9gxQr5DfamhItFtjTA5cFnHtQdWVeeBbUNVvtW
+         QIpBJALtbuTX06WCc89kO3dw2FbU3b510RmjMWGrXMH5NWcQq7nV1UHISkuPssrVoZc/
+         yZcKKgtI6iOX9/S736cGZy6JpHMP8hP1finMdKKZVKpvP55diObasR69TI17+SRmED+l
+         C66V42BA2GypRsBkgGuTgqv7BBULk2jSdlUuuVe36D3rtf/AWlVZ2gIzEPWut90vyIQf
+         awxw==
+X-Forwarded-Encrypted: i=1; AFNElJ/Y56WVhTFw0sNbhFIaoao5C29s84nOPeTe4r/XI4hSVAL6U5nJ1VLApvwi/JGOGMNa1zmRX44=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzErPup0V7TiBp77FAF3qr+n5hYod9mXgVrMTpeUdZl5r4DO5Qd
+	une8eJH/125C54PavndVtA6y2LHFrf+Sm9ZvChcwM8UXBs+pHv4dSL5G
+X-Gm-Gg: Acq92OFVd5cqho7GJuoXyYoR6eSfCYsm95avI2G8HtPkkNmF5Ed3Rwave3P9/q8Tndv
+	QjvKyViTDoFk3lojo4dSReb0HC1oVbini5830dJkRoMmamigjB/lwuT+mD/RujQ+Wsk0x8NxWDZ
+	JkCfLbiDmYPgz9f/d/ogK0Tc0J3vi7FKo3tFESZqClwU4n5lwF1VM3zUPUkGMgNahGsY1e0abDf
+	SZ1+82iwC/JgALY2zShtKHSnUm19936LXRi1ADRjemgrm/zWT8UK6Xdkkz6rlsccrXMXFvixyLS
+	a2pLK5Sfq28T8t+hK2UH0eXbUheJOCqRReoneaw/LRrsXdPRPCXUbu8TKmvvlaMvUvaI9iWYLyO
+	dgcAkcC7efR49D1JTMp5j9dX3GeLAxUk530uLq/sL2akGogTPbV9EeoMesQg2dUB2SMRJtFbOBx
+	kML11WI8h7WxaUHokpRCD0vjUZO6qiHY5OAN8MZc/hIZ/FCaKjY4bBvuy/HOt7TB4uHGEr/gGDm
+	wV05d/X0Q==
+X-Received: by 2002:a05:6000:4012:b0:45d:2b7e:a20 with SMTP id ffacd0b85a97d-45e5b884f76mr36942576f8f.14.1779266947752;
+        Wed, 20 May 2026 01:49:07 -0700 (PDT)
+Received: from [127.0.1.1] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9ec39806sm51244283f8f.9.2026.05.20.01.49.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 01:42:42 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Allison Henderson <achender@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>,
-	rds-devel@oss.oracle.com,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v6] rds: filter RDS_INFO_* getsockopt by caller's netns
-Date: Wed, 20 May 2026 16:42:36 +0800
-Message-Id: <20260520084236.2724349-1-maoyixie.tju@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 20 May 2026 01:49:07 -0700 (PDT)
+From: Fidelio Lawson <lawson.fidelio@gmail.com>
+X-Google-Original-From: Fidelio Lawson <fidelio.lawson@exotec.com>
+Subject: [PATCH v6 0/3] ksz87xx: add support for low-loss cable equalizer
+ errata
+Date: Wed, 20 May 2026 10:48:55 +0200
+Message-Id: <20260520-ksz87xx_errata_low_loss_connections-v6-0-43f33d4aaf0f@exotec.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-B4-Tracking: v=1; b=H4sIAHd1DWoC/43Py07DMBAF0F+pvMbIr/jBiv9AKHKmE2oeMbJDC
+ FT5dyZFqEXdZOHFlcbnzhxZxZKwsrvdkRWcUk15oGBvdgwOcXhCnvaUmRLKCq00f6nf3s1zi6X
+ EMbav+ZNerS3kYUAY6XvlnW3QWVSdEZqR9F6wT/Op5eHxN9eP7pnGV3qdOKQ65vJ1WmOS69xfo
+ 93UOEkuuAvRBt8bbZW9xzmPCLeQ39haOakzaoTfhioueYAetbdBOqmvUH2BSrMN1bSpIFJ7iMF
+ DuELNJeq2oYZQC04Yg0D3X2/anNFGNNvQhtB9NEKoTkkw6h+6LMsPNkgajD0CAAA=
+X-Change-ID: 20260323-ksz87xx_errata_low_loss_connections-b65e76e2b403
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Marek Vasut <marex@denx.de>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Tristram Ha <Tristram.Ha@microchip.com>
+Cc: Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Fidelio Lawson <fidelio.lawson@exotec.com>
+X-Mailer: b4 0.15.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779266946; l=5082;
+ i=fidelio.lawson@exotec.com; s=20260326; h=from:subject:message-id;
+ bh=/sILZbxDKoq1vskza1mwSZlFPw4VrzFfpFOSLhoWh9o=;
+ b=AKMWaXqBuCTaMvaN5jBiUboaLWW+Za0y5J3fdUNJwry79t8A9LqDykqW3ji9waXzVAdvfrUoo
+ SLAssUUvs0wBPqcqSdlS78lCdGQ2vP36RgV9/QsvlIKoKHhip2H3+S4
+X-Developer-Key: i=fidelio.lawson@exotec.com; a=ed25519;
+ pk=866eH9Bmmpjc+ctgkr5T1uXxBefZzob3tEEuiVWZ6BI=
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289845-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289846-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,aumovio.com:email,ntu.edu.sg:email]
-X-Rspamd-Queue-Id: 60E8658A4E2
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,exotec.com:mid,exotec.com:email]
+X-Rspamd-Queue-Id: 70A6658A346
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The RDS_INFO_* family of getsockopt(2) options reads several
-file-scope global lists that are not per-netns:
+Hello,
 
-  rds_sock_info / rds6_sock_info,
-  rds_sock_inc_info / rds6_sock_inc_info        -> rds_sock_list
-  rds_tcp_tc_info / rds6_tcp_tc_info            -> rds_tcp_tc_list
-  rds_conn_info / rds6_conn_info,
-  rds_conn_message_info_cmn (for the *_SEND_MESSAGES and
-  *_RETRANS_MESSAGES variants),
-  rds_for_each_conn_info (for RDS_INFO_IB_CONNECTIONS)
-                                                -> rds_conn_hash[]
+This patch implements the “Module 3: Equalizer fix for short cables” erratum
+described in Microchip document DS80000687C for KSZ87xx switches.
 
-The handlers do not filter by the caller's network namespace.
-rds_info_getsockopt() has no netns or capable() check, and
-rds_create() has no capable() check, so AF_RDS is reachable from
-an unprivileged user namespace. As a result, an unprivileged
-caller in a fresh user_ns plus netns can read the bound address
-and sock inode of every RDS socket on the host, the peer address
-of incoming messages on every RDS socket on the host, the peer
-address and TCP sequence numbers of every rds-tcp connection on
-the host, and the peer address and RDS sequence numbers of every
-RDS connection on the host.
+According to the erratum, the embedded PHY receiver in KSZ87xx switches is
+tuned by default for long, high-loss Ethernet cables. When operating with
+short or low-loss cables (for example CAT5e or CAT6), the PHY equalizer may
+over-amplify the incoming signal, leading to internal distortion and link
+establishment failures.
 
-The rds-tcp transport is reachable from a non-initial netns (see
-rds_set_transport()), so a one-shot init_net gate at
-rds_info_getsockopt() would deny legitimate per-netns visibility
-to rds-tcp callers. Instead, filter at each handler by comparing
-the netns of the caller's socket to the netns of the list entry,
-or to rds_conn_net(conn) for connection paths. Only copy entries
-whose netns matches the caller. Counters (RDS_INFO_COUNTERS) are
-aggregate statistics and remain global.
+Microchip documents two independent mechanisms to mitigate this issue:
+adjusting the receiver low‑pass filter bandwidth and reducing the DSP
+equalizer initial value. These registers are located in the switch’s
+internal LinkMD table and cannot be accessed directly through a
+stand‑alone PHY driver.
 
-Reproducer (KASAN VM, rds and rds_tcp loaded): an AF_RDS socket
-binds 127.0.0.1:4242 in init_net as root. A child process enters
-a fresh user_ns plus netns and opens AF_RDS there, then calls
-getsockopt(SOL_RDS, RDS_INFO_SOCKETS). Before this change, the
-child sees the init_net socket. After this change, the child
-sees zero entries.
+To keep the PHY‑facing API clean, this series models the erratum handling
+as vendor‑specific Clause 22 PHY registers, virtualized by the KSZ8 DSA
+driver. Accesses are intercepted by ksz8_r_phy() / ksz8_w_phy() and
+translated into the appropriate indirect LinkMD register writes. The
+erratum affects the shared PHY analog front‑end and therefore applies
+globally to the switch.
 
-Drop the rds_sock_count, rds_tcp_tc_count, and rds6_tcp_tc_count
-globals. v2 used them for the size precheck and lens->nr; v3
-replaced the precheck with a per-ns count from a first pass over
-the list, so the globals have no remaining readers. The matching
-increments and decrements in rds_create()/rds_destroy_sock() and
-rds_tcp_set_callbacks()/rds_tcp_restore_callbacks() go away with
-them. Reported by the kernel test robot under clang W=1.
+Based on review feedback, the user‑visible interface is kept deliberately
+simple and predictable:
 
-Suggested-by: Allison Henderson <achender@kernel.org>
-Suggested-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Allison Henderson <achender@kernel.org>
-Co-developed-by: Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>
-Signed-off-by: Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>
-Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+- A boolean “short‑cable” PHY tunable applies a documented and
+  conservative preset (LPF bandwidth 62MHz, DSP EQ initial value 0).
+  This is the recommended KISS interface for the common short‑cable
+  scenario.
+
+- Two additional integer PHY tunables allow advanced or experimental
+  tuning of the LPF bandwidth and the DSP EQ initial value. These
+  controls are orthogonal, have no ordering requirements, and simply
+  override the corresponding setting when written.
+
+The tunables act as simple setters with no implicit state machine or
+invalid combinations, avoiding surprises for userspace and not relying
+on extended error reporting or netlink ethtool support.
+
+This series contains:
+
+  1. Support for the KSZ87xx low‑loss cable erratum in the KSZ8 DSA driver,
+     including the short‑cable preset and orthogonal tuning controls.
+
+  2. Addition of vendor‑specific PHY tunable identifiers for the
+     short‑cable preset, LPF bandwidth, and DSP EQ initial value.
+
+  3. Exposure of these tunables through the Micrel PHY driver via
+     get_tunable / set_tunable callbacks.
+
+This version follows the design agreed upon during v3 review and
+reworks the interface accordingly.
+
+This series is based on Linux v7.0-rc1.
+
+Signed-off-by: Fidelio Lawson <fidelio.lawson@exotec.com>
 ---
-v6: Rebased on current net main tip (dc416e32baae) after Jakub
-    pw-bot:cr on v5. The patch failed to apply at net/rds/tcp.c:201
-    because the separately submitted "rds_tcp: close NULL deref
-    window in rds_tcp_set_callbacks" patch landed in net main
-    between v5 and v6. That commit reorders tc->t_sock = sock
-    inside the rds_tcp_tc_list_lock and adds a comment block.
-    The 3-way merge preserves both changes. No functional change
-    in the netns filter behaviour relative to v5.
-v5: Address Simon Horman's review of v4. rds_bind() writes
-    rs_bound_addr without holding rds_sock_lock (bind.c:123,
-    138, 160). rds_sock_info() holds rds_sock_lock across the
-    two passes, but a concurrent rds_bind() can still change
-    rs_bound_addr between them. The second pass can then match
-    an entry the first pass did not count. For a len=0 probe
-    with cnt=0, this reaches iter->pages while the buffer is
-    still empty.
-    Cap the second pass at the cnt from the first pass
-    (if (copied >= cnt) break). The cap goes in all four
-    handlers: rds_sock_info, rds6_sock_info, rds_tcp_tc_info,
-    and rds6_tcp_tc_info.
-    The reverse case is also handled. If pass2 copies fewer
-    entries than cnt because of a concurrent rds_remove_bound(),
-    set cnt = copied before the out: label. lens->nr then
-    reports what was actually written.
-v4: Drop the rds_sock_count, rds_tcp_tc_count, and rds6_tcp_tc_count
-    globals reported by the kernel test robot under clang W=1
-    (-Wunused-but-set-global). They have no remaining readers after v3
-    replaced the size precheck with a per-ns count from the first pass.
-    Inc/dec sites in rds_create()/rds_destroy_sock() and
-    rds_tcp_set_callbacks()/rds_tcp_restore_callbacks() are removed
-    with them. No functional change beyond v3 for the netns-filter
-    behaviour.
+Changes in v6:
+- Nitpicks corrections
+- Link to v5: https://patch.msgid.link/20260505-ksz87xx_errata_low_loss_connections-v5-0-da4002b21c42@exotec.com
 
-    Note for applier: this patch touches rds_tcp_set_callbacks() in the
-    same hunk window as a separate [PATCH net] sent earlier (Message-Id
-    <20260512142807.1855619-1-maoyi.xie@ntu.edu.sg>, "rds_tcp: close
-    NULL deref window in rds_tcp_set_callbacks"). Both apply cleanly
-    to net/main tip b266bacba in isolation. When applied together the
-    second one needs a trivial 3-way merge in net/rds/tcp.c.
-v3: Address Simon Horman's review of v2. The size precheck and the
-    lens count are now both restricted to the caller's netns in
-    rds_sock_info, rds6_sock_info, rds_tcp_tc_info and
-    rds6_tcp_tc_info. Each handler now does a first pass under the
-    list lock to count entries visible in the caller's netns, then
-    short-circuits with that count if the user buffer is too small,
-    then a second pass to fill data. This closes both issues Simon
-    flagged: a zero-length probe no longer returns the global count,
-    and a caller that sizes its buffer to the value returned by lens
-    no longer hits ENOSPC on the second call.
-    Re-verified on KASAN VM with the v1 PoC: attacker in fresh
-    user_ns + netns sees zero RDS_INFO_SOCKETS entries; init_net
-    access sees its own entries; lens returns the ns-scoped count
-    on both probe and full reads.
-v2: rebased onto net/main tip (b266bacba) so patchwork can apply.
-    No code changes. Carries forward Reviewed-by from v1 review.
-v1: https://lore.kernel.org/r/20260506075031.2238596-1-maoyixie.tju@gmail.com
+Changes in v5:
+- Added Fixes tag
+- Added validation to ensure that only the documented bitfields are accepted before writing the registers
+- Link to v4: https://patch.msgid.link/20260417-ksz87xx_errata_low_loss_connections-v4-0-6c7044ec4363@exotec.com
 
+Changes in v4:
+- Reworked the user‑visible API to a boolean short‑cable preset plus
+  orthogonal advanced tunables, following the KISS principle.
+- Dropped the previous mode‑selector semantics in favor of simple
+  setters with no ordering requirements
+- Added persistent tracking of LPF bandwidth and EQ initial value.
+- Clarified defaults and preset values to match Microchip documentation.
+- Link to v3: https://patch.msgid.link/20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com
 
- net/rds/af_rds.c     | 59 ++++++++++++++++++++++++++++++++++++++++-------
- net/rds/connection.c | 13 +++++++++++
- net/rds/tcp.c        | 63 ++++++++++++++++++++++++++++++++++-----------------
- 3 files changed, 104 insertions(+), 31 deletions(-)
+Changes in v3:
+- Exposed all LPF bandwidth values supported by the hardware.
+- Added phy tunable.
+- Link to v2: https://patch.msgid.link/20260408-ksz87xx_errata_low_loss_connections-v2-1-9cfe38691713@exotec.com
 
-diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-index 76f625986a7f2..bd6271bab32cc 100644
---- a/net/rds/af_rds.c
-+++ b/net/rds/af_rds.c
-@@ -43,7 +43,6 @@
- 
- /* this is just used for stats gathering :/ */
- static DEFINE_SPINLOCK(rds_sock_lock);
--static unsigned long rds_sock_count;
- static LIST_HEAD(rds_sock_list);
- DECLARE_WAIT_QUEUE_HEAD(rds_poll_waitq);
- 
-@@ -82,7 +81,6 @@ static int rds_release(struct socket *sock)
- 
- 	spin_lock_bh(&rds_sock_lock);
- 	list_del_init(&rs->rs_item);
--	rds_sock_count--;
- 	spin_unlock_bh(&rds_sock_lock);
- 
- 	rds_trans_put(rs->rs_transport);
-@@ -694,7 +692,6 @@ static int __rds_create(struct socket *sock, struct sock *sk, int protocol)
- 
- 	spin_lock_bh(&rds_sock_lock);
- 	list_add_tail(&rs->rs_item, &rds_sock_list);
--	rds_sock_count++;
- 	spin_unlock_bh(&rds_sock_lock);
- 
- 	return 0;
-@@ -735,6 +732,7 @@ static void rds_sock_inc_info(struct socket *sock, unsigned int len,
- 			      struct rds_info_iterator *iter,
- 			      struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds_sock *rs;
- 	struct rds_incoming *inc;
- 	unsigned int total = 0;
-@@ -744,6 +742,9 @@ static void rds_sock_inc_info(struct socket *sock, unsigned int len,
- 	spin_lock_bh(&rds_sock_lock);
- 
- 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		/* Only show sockets in the caller's netns. */
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
- 		/* This option only supports IPv4 sockets. */
- 		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
- 			continue;
-@@ -774,6 +775,7 @@ static void rds6_sock_inc_info(struct socket *sock, unsigned int len,
- 			       struct rds_info_iterator *iter,
- 			       struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds_incoming *inc;
- 	unsigned int total = 0;
- 	struct rds_sock *rs;
-@@ -783,6 +785,9 @@ static void rds6_sock_inc_info(struct socket *sock, unsigned int len,
- 	spin_lock_bh(&rds_sock_lock);
- 
- 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		/* Only show sockets in the caller's netns. */
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
- 		read_lock(&rs->rs_recv_lock);
- 
- 		list_for_each_entry(inc, &rs->rs_recv_queue, i_item) {
-@@ -806,20 +811,34 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
- 			  struct rds_info_iterator *iter,
- 			  struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds_info_socket sinfo;
- 	unsigned int cnt = 0;
-+	unsigned int copied = 0;
- 	struct rds_sock *rs;
- 
- 	len /= sizeof(struct rds_info_socket);
- 
- 	spin_lock_bh(&rds_sock_lock);
- 
--	if (len < rds_sock_count) {
--		cnt = rds_sock_count;
--		goto out;
-+	/* First pass: count entries visible in the caller's netns. */
-+	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
-+		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
-+			continue;
-+		cnt++;
- 	}
- 
-+	if (len < cnt)
-+		goto out;
-+
- 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		if (copied >= cnt)
-+			break;
-+		/* Only show sockets in the caller's netns. */
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
- 		/* This option only supports IPv4 sockets. */
- 		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
- 			continue;
-@@ -832,8 +851,13 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
- 		sinfo.inum = sock_i_ino(rds_rs_to_sk(rs));
- 
- 		rds_info_copy(iter, &sinfo, sizeof(sinfo));
--		cnt++;
-+		copied++;
- 	}
-+	/* A concurrent rds_bind() can change rs_bound_addr between the
-+	 * two passes without holding rds_sock_lock, so copied may be
-+	 * less than cnt. Report what was actually copied.
-+	 */
-+	cnt = copied;
- 
- out:
- 	lens->nr = cnt;
-@@ -847,17 +871,32 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
- 			   struct rds_info_iterator *iter,
- 			   struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds6_info_socket sinfo6;
-+	unsigned int cnt = 0;
-+	unsigned int copied = 0;
- 	struct rds_sock *rs;
- 
- 	len /= sizeof(struct rds6_info_socket);
- 
- 	spin_lock_bh(&rds_sock_lock);
- 
--	if (len < rds_sock_count)
-+	/* First pass: count entries visible in the caller's netns. */
-+	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
-+		cnt++;
-+	}
-+
-+	if (len < cnt)
- 		goto out;
- 
- 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		if (copied >= cnt)
-+			break;
-+		/* Only show sockets in the caller's netns. */
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
- 		sinfo6.sndbuf = rds_sk_sndbuf(rs);
- 		sinfo6.rcvbuf = rds_sk_rcvbuf(rs);
- 		sinfo6.bound_addr = rs->rs_bound_addr;
-@@ -867,10 +906,12 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
- 		sinfo6.inum = sock_i_ino(rds_rs_to_sk(rs));
- 
- 		rds_info_copy(iter, &sinfo6, sizeof(sinfo6));
-+		copied++;
- 	}
-+	cnt = copied;
- 
-  out:
--	lens->nr = rds_sock_count;
-+	lens->nr = cnt;
- 	lens->each = sizeof(struct rds6_info_socket);
- 
- 	spin_unlock_bh(&rds_sock_lock);
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index c10b7ed06c49f..7c8ab8e973e1b 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -568,6 +568,7 @@ static void rds_conn_message_info_cmn(struct socket *sock, unsigned int len,
- 				      struct rds_info_lengths *lens,
- 				      int want_send, bool isv6)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct hlist_head *head;
- 	struct list_head *list;
- 	struct rds_connection *conn;
-@@ -590,6 +591,9 @@ static void rds_conn_message_info_cmn(struct socket *sock, unsigned int len,
- 			struct rds_conn_path *cp;
- 			int npaths;
- 
-+			/* Only show connections in the caller's netns. */
-+			if (!net_eq(rds_conn_net(conn), net))
-+				continue;
- 			if (!isv6 && conn->c_isv6)
- 				continue;
- 
-@@ -688,6 +692,7 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
- 			  u64 *buffer,
- 			  size_t item_len)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct hlist_head *head;
- 	struct rds_connection *conn;
- 	size_t i;
-@@ -700,6 +705,9 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
- 	for (i = 0, head = rds_conn_hash; i < ARRAY_SIZE(rds_conn_hash);
- 	     i++, head++) {
- 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
-+			/* Only show connections in the caller's netns. */
-+			if (!net_eq(rds_conn_net(conn), net))
-+				continue;
- 
- 			/* Zero the per-item buffer before handing it to the
- 			 * visitor so any field the visitor does not write -
-@@ -733,6 +741,7 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
- 				    u64 *buffer,
- 				    size_t item_len)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct hlist_head *head;
- 	struct rds_connection *conn;
- 	size_t i;
-@@ -747,6 +756,10 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
- 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
- 			struct rds_conn_path *cp;
- 
-+			/* Only show connections in the caller's netns. */
-+			if (!net_eq(rds_conn_net(conn), net))
-+				continue;
-+
- 			/* XXX We only copy the information from the first
- 			 * path for now.  The problem is that if there are
- 			 * more than one underlying paths, we cannot report
-diff --git a/net/rds/tcp.c b/net/rds/tcp.c
-index 5830b31a1f37b..fbaf150e3edaa 100644
---- a/net/rds/tcp.c
-+++ b/net/rds/tcp.c
-@@ -46,14 +46,6 @@
- static DEFINE_SPINLOCK(rds_tcp_tc_list_lock);
- static LIST_HEAD(rds_tcp_tc_list);
- 
--/* rds_tcp_tc_count counts only IPv4 connections.
-- * rds6_tcp_tc_count counts both IPv4 and IPv6 connections.
-- */
--static unsigned int rds_tcp_tc_count;
--#if IS_ENABLED(CONFIG_IPV6)
--static unsigned int rds6_tcp_tc_count;
--#endif
--
- /* Track rds_tcp_connection structs so they can be cleaned up */
- static DEFINE_SPINLOCK(rds_tcp_conn_lock);
- static LIST_HEAD(rds_tcp_conn_list);
-@@ -110,11 +102,6 @@ void rds_tcp_restore_callbacks(struct socket *sock,
- 	/* done under the callback_lock to serialize with write_space */
- 	spin_lock(&rds_tcp_tc_list_lock);
- 	list_del_init(&tc->t_list_item);
--#if IS_ENABLED(CONFIG_IPV6)
--	rds6_tcp_tc_count--;
--#endif
--	if (!tc->t_cpath->cp_conn->c_isv6)
--		rds_tcp_tc_count--;
- 	spin_unlock(&rds_tcp_tc_list_lock);
- 
- 	tc->t_sock = NULL;
-@@ -206,11 +193,6 @@ void rds_tcp_set_callbacks(struct socket *sock, struct rds_conn_path *cp)
- 	spin_lock(&rds_tcp_tc_list_lock);
- 	tc->t_sock = sock;
- 	list_add_tail(&tc->t_list_item, &rds_tcp_tc_list);
--#if IS_ENABLED(CONFIG_IPV6)
--	rds6_tcp_tc_count++;
--#endif
--	if (!tc->t_cpath->cp_conn->c_isv6)
--		rds_tcp_tc_count++;
- 	spin_unlock(&rds_tcp_tc_list_lock);
- 
- 	/* accepted sockets need our listen data ready undone */
-@@ -238,20 +220,37 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
- 			    struct rds_info_iterator *iter,
- 			    struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(rds_sock->sk);
- 	struct rds_info_tcp_socket tsinfo;
- 	struct rds_tcp_connection *tc;
-+	unsigned int cnt = 0;
-+	unsigned int copied = 0;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&rds_tcp_tc_list_lock, flags);
- 
--	if (len / sizeof(tsinfo) < rds_tcp_tc_count)
-+	/* First pass: count entries visible in the caller's netns. */
-+	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
-+		if (tc->t_cpath->cp_conn->c_isv6)
-+			continue;
-+		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
-+			continue;
-+		cnt++;
-+	}
-+
-+	if (len / sizeof(tsinfo) < cnt)
- 		goto out;
- 
- 	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
- 		struct inet_sock *inet = inet_sk(tc->t_sock->sk);
- 
-+		if (copied >= cnt)
-+			break;
- 		if (tc->t_cpath->cp_conn->c_isv6)
- 			continue;
-+		/* Only show connections in the caller's netns. */
-+		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
-+			continue;
- 
- 		tsinfo.local_addr = inet->inet_saddr;
- 		tsinfo.local_port = inet->inet_sport;
-@@ -266,10 +265,12 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
- 		tsinfo.tos = tc->t_cpath->cp_conn->c_tos;
- 
- 		rds_info_copy(iter, &tsinfo, sizeof(tsinfo));
-+		copied++;
- 	}
-+	cnt = copied;
- 
- out:
--	lens->nr = rds_tcp_tc_count;
-+	lens->nr = cnt;
- 	lens->each = sizeof(tsinfo);
- 
- 	spin_unlock_irqrestore(&rds_tcp_tc_list_lock, flags);
-@@ -284,19 +285,35 @@ static void rds6_tcp_tc_info(struct socket *sock, unsigned int len,
- 			     struct rds_info_iterator *iter,
- 			     struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds6_info_tcp_socket tsinfo6;
- 	struct rds_tcp_connection *tc;
-+	unsigned int cnt = 0;
-+	unsigned int copied = 0;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&rds_tcp_tc_list_lock, flags);
- 
--	if (len / sizeof(tsinfo6) < rds6_tcp_tc_count)
-+	/* First pass: count entries visible in the caller's netns. */
-+	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
-+		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
-+			continue;
-+		cnt++;
-+	}
-+
-+	if (len / sizeof(tsinfo6) < cnt)
- 		goto out;
- 
- 	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
- 		struct sock *sk = tc->t_sock->sk;
- 		struct inet_sock *inet = inet_sk(sk);
- 
-+		if (copied >= cnt)
-+			break;
-+		/* Only show connections in the caller's netns. */
-+		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
-+			continue;
-+
- 		tsinfo6.local_addr = sk->sk_v6_rcv_saddr;
- 		tsinfo6.local_port = inet->inet_sport;
- 		tsinfo6.peer_addr = sk->sk_v6_daddr;
-@@ -309,10 +326,12 @@ static void rds6_tcp_tc_info(struct socket *sock, unsigned int len,
- 		tsinfo6.last_seen_una = tc->t_last_seen_una;
- 
- 		rds_info_copy(iter, &tsinfo6, sizeof(tsinfo6));
-+		copied++;
- 	}
-+	cnt = copied;
- 
- out:
--	lens->nr = rds6_tcp_tc_count;
-+	lens->nr = cnt;
- 	lens->each = sizeof(tsinfo6);
- 
- 	spin_unlock_irqrestore(&rds_tcp_tc_list_lock, flags);
+Changes in v2:
+- Dropped the device tree approach based on review feedback
+- Modeled the errata control as a vendor-specific Clause 22 PHY register
+- Added KSZ87xx-specific guards and replaced magic values with named macros
+- Rebased on Linux v7.0-rc1
+- Link to v1: https://patch.msgid.link/20260326-ksz87xx_errata_low_loss_connections-v1-0-79a698f43626@exotec.com
 
--- 
-2.34.1
+---
+Fidelio Lawson (3):
+      net: dsa: microchip: implement KSZ87xx Module 3 low-loss cable errata
+      net: ethtool: add KSZ87xx low-loss cable PHY tunables
+      net: phy: micrel: expose KSZ87xx low-loss cable tunables
+
+ drivers/net/dsa/microchip/ksz8.c       | 78 ++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/microchip/ksz8.h       |  1 +
+ drivers/net/dsa/microchip/ksz8_reg.h   | 23 +++++++++-
+ drivers/net/dsa/microchip/ksz_common.h |  4 ++
+ drivers/net/phy/micrel.c               | 54 +++++++++++++++++++++++
+ include/uapi/linux/ethtool.h           |  3 ++
+ net/ethtool/common.c                   |  3 ++
+ net/ethtool/ioctl.c                    |  3 ++
+ 8 files changed, 168 insertions(+), 1 deletion(-)
+---
+base-commit: 2d1373e4246da3b58e1df058374ed6b101804e07
+change-id: 20260323-ksz87xx_errata_low_loss_connections-b65e76e2b403
+
+Best regards,
+--  
+Fidelio Lawson <fidelio.lawson@exotec.com>
+
 
