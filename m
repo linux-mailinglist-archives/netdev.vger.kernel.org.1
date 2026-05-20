@@ -1,253 +1,255 @@
-Return-Path: <netdev+bounces-289903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289905-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eFbbHpGhDWq10QUAu9opvQ
-	(envelope-from <netdev+bounces-289903-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:57:05 +0200
+	id eMfEN0+dDWoS0AUAu9opvQ
+	(envelope-from <netdev+bounces-289905-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:38:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E72058D146
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:57:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6297058CBC4
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:38:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4CED32953FB
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:32:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3B092300F168
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633503E834B;
-	Wed, 20 May 2026 11:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA4F3E7BDE;
+	Wed, 20 May 2026 11:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="OWqINoQY"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="ix2+MP7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010051.outbound.protection.outlook.com [52.101.193.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f98.google.com (mail-ej1-f98.google.com [209.85.218.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605D73DCDA3;
-	Wed, 20 May 2026 11:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779276296; cv=fail; b=XYhKxU91gw5QiA5A7OSKGq4Y1utYmvKlAHJ55CTdZOflKKiubH+Htj5wF3SPDiqUU16tCJI/tYNe9XoE0zor/+L127tPJIUsTzIRhawPWRSu0yCY3Nk+Q9UF+hHMQjxA9VrgwiT0+p02qZLEjqx1quSBYH0LOAqTYOjWJyyWTdY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779276296; c=relaxed/simple;
-	bh=xyqRmrc/SoHMS9DvjiiPmMdpYcUlSrvPaeBzkyLXZh4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GWfRpF0QpGiFOjo60Lg9be9WKrXQ8+AoyudhysFVaWCbUzSPHLG8SZCsUXnFHZyq/mxfDSKDeDaveBBZPaskE3AZnV03OT7lD2xP9tbj6j92nam3MVxWbZvmL2x3aWQ0cKhxEVgpk5ggaTFYKR8286MzWvTW2/gX6jkO/U6RSmw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=OWqINoQY; arc=fail smtp.client-ip=52.101.193.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G597oNL0K4kCmUz5hLEOTQKwLpA8aRNlbVAW5hbr1wwhy5e5vTKWN+fBL5jtu7wAXuf0Zy9VYjJ9NE8r8mEqO4SMeh355wwbsPqFV9nWdpPu/Egw0PxIqceR5e3c+kqv1T7F8f1OyVhUIEIJtm1WNISzSH1NTwuDbXGRYqVg6cSKhjRP7uZuceNofgaRlukaaKwxZl4k1jYFTp5PUECGSQjol+G5VGy5o0qrPCaiRYUlyqlapDul46Td1KVvDLYBQfI2ZXcGMillU4utxYO1AaMXLDvC1RHoUqLzPi7veaPNrDhne/VW9epiHotB1Ok3Ftbi72ofhZmEZ0sVipcU3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nEWWEUGyXIpYjIqB2rL6YOnMSuAZRG9G/KZjSdGWEEw=;
- b=dER+kQwcVvOALInloKzQQOqqp1e2Hw/mPcpULXpq6HC1uGhdRfIuTkr2BZjWFESkAoS0DXUj1jU71gE6m2WkSQotNf3CRSRaIgAd4ldIY25wqhKJ87pFuzv+NS3rayrHX57uoy91jewuBCY/t2oH8JhFyNyRwozre4wmpogKl97BQ1rqULdQvxRmEMY0irYnD9/q16n/i9SpvrP3Mt0ekNV0Hjq819yhvSNk2Hn1j/msWMlbGxhN7aCd/9UYlR9JtOWp9KiW/811YbzH9KFBRDOnbTuMI33Pp+aXFEZ1dJMevWvu6yZFgJZJyuRPvZQYZmKX6cWl21isS076nAK4OQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.194) smtp.rcpttodomain=couthit.com smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nEWWEUGyXIpYjIqB2rL6YOnMSuAZRG9G/KZjSdGWEEw=;
- b=OWqINoQYu2yRm/SSiyACQozpbRy1k/DP9d1SWuI/jvve7lfGgtOfCSh1p1iTIUUNzESwwkjP0Nm2c9HDtvL4qwNHSmDDcyTNqxJp+imEx3W+dTcIP2ccjTEN40G9HoeFxLNMQMcPqgnpxxrhrvzayOi4yHkmR2L012jliBWqxLI=
-Received: from BLAPR03CA0133.namprd03.prod.outlook.com (2603:10b6:208:32e::18)
- by CH2PR10MB4247.namprd10.prod.outlook.com (2603:10b6:610:7a::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Wed, 20 May
- 2026 11:24:52 +0000
-Received: from BL02EPF00021F6E.namprd02.prod.outlook.com
- (2603:10b6:208:32e:cafe::5) by BLAPR03CA0133.outlook.office365.com
- (2603:10b6:208:32e::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Wed, 20
- May 2026 11:24:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
-Received: from lewvzet200.ext.ti.com (198.47.23.194) by
- BL02EPF00021F6E.mail.protection.outlook.com (10.167.249.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.48.11 via Frontend Transport; Wed, 20 May 2026 11:24:51 +0000
-Received: from DLEE203.ent.ti.com (157.170.170.78) by lewvzet200.ext.ti.com
- (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 20 May
- 2026 06:24:51 -0500
-Received: from DLEE207.ent.ti.com (157.170.170.95) by DLEE203.ent.ti.com
- (157.170.170.78) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 20 May
- 2026 06:24:49 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE207.ent.ti.com
- (157.170.170.95) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
- Transport; Wed, 20 May 2026 06:24:49 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 64KBOfl51864530;
-	Wed, 20 May 2026 06:24:41 -0500
-Message-ID: <60dfd918-876b-4b3e-b18f-9d27dab3b455@ti.com>
-Date: Wed, 20 May 2026 16:54:40 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5A83C661A
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.98
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779276346; cv=none; b=F65tVRHSkTNATKfpU+WMgHoVZcaoDmE6+5AVpkQaF0ZCwHIWrRjGI3WFxiH0h/Bq3fwRtNLttaMiUs2l4xZ61sCfROgt0gDdjL2TeXfLGdjjsTZhQEg0iVHs4sNkes9HWt5z3wkEEWeM1Ot01iaQ6xwF6F2igJBrC+l4ha/gCWA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779276346; c=relaxed/simple;
+	bh=7juzTveXUeaB3fsBdJmZ/nA5HHfUkOLD/Q2nyXqayLo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UusKohA4/mTwDDJMN+E7gySFWQhoX/eGBMXsJpunOJFVrKCY3/9af1n8YKhOjMihWwrOSutA2zghBGHtradRuovjRyK483HW7NVtCmnBY5zavnssIKx9/pUy8XkgXwHsa2yFgIaaziHM7KWNiL/uZLraRN9VNIIezeFmpbNzRow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=ix2+MP7+; arc=none smtp.client-ip=209.85.218.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-ej1-f98.google.com with SMTP id a640c23a62f3a-bd8f9725b30so380074166b.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 04:25:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1779276341; x=1779881141; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rbvKu8M5hQerrHEUTFB6c6pcUL6vC+91lraKZ1m/HRo=;
+        b=ix2+MP7+6FcKtWV4GRZbLtuHwPNr2FM7rmwGzaXkF9azlAWE7dxuzpH9Gdn6rHK1vw
+         5eOubBFsEPwMOQ0OYGl/bbRjSCR9j9l92l0Htey2lSY6MB184NWOoywfPK87FA7iT9bG
+         JakiVIPzlc36O0WS9djYge6AugfFEg72yK/01de0wp8GKFprkoG5Dz9rbJT1EeKz1E85
+         DWWm6yn7zDCuCuvYhuVJss1RO5x/IEtlUMxcqotFYgIcLauZ5OPEAClN/CUOnD1JI7Hm
+         EOKdQiS3Pf5sJAV/yXaDG5R9afRvDwRjdysR0XUZcK34iZnBUbs9kY0ppB7s+sdxHzS7
+         5t1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779276341; x=1779881141;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rbvKu8M5hQerrHEUTFB6c6pcUL6vC+91lraKZ1m/HRo=;
+        b=q+/gv48A0YkRJ3Voc3JYK+H6msHfI36tVL2Tj5LZR39vglXQIHF6VUdBmX/LTFNTVq
+         2Lkb3gMZYE0UOVPZ34FATQAAyf7ynA5sHLR7p350n5hpqC+TvmHsAFORMLDoGIFM2uul
+         1cwqjUcyTD4qXunCNSlS4wb8vJF43IrMcTLTgr/j6SDeunY4pC2JkwfK9u4qJCHIS8FN
+         6cFHvDagRr4UMyIBq+cELxizO6tlOqmh9AlEBEvGcAUZ1SCgzIPdwI0y0Ko3mPfiGNlV
+         ic+hhUG6xjkgZ1xCGlUyFEhs4kpxuzJXG+TFGj11NZaIoK2RYH81KXRC0R5e0wriXDL6
+         mCZw==
+X-Gm-Message-State: AOJu0YzG1ERx4GQfieZOTrxJuhf9lvGU1dr6S3VIk4IMRWFwMiqLi13j
+	xG+T8I4htkPLtj0/HkzFLTd89FGXTdytzLPyH3u2/VLMk13xFbZcaR2ULEV5GiHD3Z45s/ygxTw
+	R3FlaBfOc/sScsnH5tYjVTOjXwJh1QBDKaqRN
+X-Gm-Gg: Acq92OG2OtOcKvr7rogb6DIYm+k8yeGGx6PhHAbcaN+2miFOy1fPFz7vYEM4ula+BMl
+	Ff/ugbYYj2C3/6+e715RJ0Vr1YkffFSuejOyJEBi4drzKDi8QifSW2tn8H2ELpOMKa0KYbPFgET
+	XIFnb2AdTTZCD6X9hYkJPr7TSxyGYj6vfD29BdEAugTQCGi+kW5D/KdUSi/95AqOe7BZN7d5QQ3
+	gZ5K3eiRi3819L2Y589Lgv76Ys5c08NeM+M+s/Evo5OrkJk6NOOvNuBVo1Zt5AE6ZjhdsLuXRnc
+	wMZeJtgkD3MXeXeWaVD3f+r4tlSQDXcn7ox2NkLDHRu3WbdLDWnovF48+j7Ouf6T7uMYl97AT4S
+	Jlk+sYIsa5rQJOr1dZqiGfIMcCTXYPhV5zETSO26HXyUcuEIp/zZG
+X-Received: by 2002:a17:907:a286:b0:bd3:2b8a:2164 with SMTP id a640c23a62f3a-bd517842e7dmr1382243466b.16.1779276341444;
+        Wed, 20 May 2026 04:25:41 -0700 (PDT)
+Received: from smtpservice.6wind.com ([185.13.181.2])
+        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-bd5048b1deesm116545966b.19.2026.05.20.04.25.41;
+        Wed, 20 May 2026 04:25:41 -0700 (PDT)
+X-Relaying-Domain: 6wind.com
+Received: from stryper.dev.6wind.com (stryper.dev.6wind.com [10.17.2.5])
+	by smtpservice.6wind.com (Postfix) with ESMTP id 3CAD71153D;
+	Wed, 20 May 2026 13:25:41 +0200 (CEST)
+From: Louis Scalbert <louis.scalbert@6wind.com>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	jv@jvosburgh.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	fbl@redhat.com,
+	andy@greyhouse.net,
+	shemminger@vyatta.com,
+	maheshb@google.com,
+	jonas.gorski@gmail.com,
+	Louis Scalbert <louis.scalbert@6wind.com>
+Subject: [PATCH net v6 0/4] bonding: 3ad: fix carrier state with no usable slaves
+Date: Wed, 20 May 2026 13:25:35 +0200
+Message-Id: <20260520112539.798275-1-louis.scalbert@6wind.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 0/3] Add support for ICSSM Ethernet on AM57x, AM437x,
- and AM335x
-To: Parvathi Pudi <parvathi@couthit.com>, <nm@ti.com>, <vigneshr@ti.com>,
-	<afd@ti.com>, <khilman@baylibre.com>, <rogerq@kernel.org>,
-	<tony@atomide.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>, <richardcochran@gmail.com>, <aaro.koskinen@iki.fi>,
-	<andreas@kemnade.info>
-CC: <linux-omap@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <andrew@lunn.ch>,
-	<pratheesh@ti.com>, <j-rameshbabu@ti.com>, <praneeth@ti.com>, <srk@ti.com>,
-	<rogerq@ti.com>, <krishna@couthit.com>, <mohan@couthit.com>,
-	<pmohan@couthit.com>, <basharath@couthit.com>
-References: <20260428072046.3022679-1-parvathi@couthit.com>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20260428072046.3022679-1-parvathi@couthit.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F6E:EE_|CH2PR10MB4247:EE_
-X-MS-Office365-Filtering-Correlation-Id: 010c22d4-1d37-4dbc-41a8-08deb66268ea
-X-LD-Processed: e5b49634-450b-4709-8abb-1e2b19b982b7,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700016|82310400026|1800799024|3023799007|921020|18002099003|22082099003|56012099003|5023799004;
-X-Microsoft-Antispam-Message-Info:
-	wRBAgxmYRkhDQHaSZzVOxQ/LFHh5O3c2lj0Xss5HFfGDJeyme9ZlQ6oNep1aZLmaGY62x5RK6Qi8gwlokzVT11PbnvYAZqcVV9eK0jdwzRbSatFrWGN0AksaBe4z4gR89aQHAkUtwb9mmvlhuBic39ggSj+jQqIN9uZnSyNhtShyw/xnKw6exjI4Oi9IiLM+OBWhkwdZnyeIHBcWuEyps0Y1GdGcl4igWaqaR7+2/N8VMv+cbQISDeaShDRbfBIOwzHXUhdeOPNnq/Q/M/NkUsy4T5L0LYDN4mPqtW5E4Zil67y4PEEaRS8BDNuyc2x/sPU6JgG1SnHYC06WAtDeZrUzB1BN5vbrXar3FpAiKG4rcXzXdmNchMxHLuRvkTNVVJlVpNo0Lk1jIV9ssETWZMXkfY4xvcq9hXMk6uZYoyt6NJ3DyOArR0KAqoYqeZrWk4z0Ep0EhHvEKR06ww7wjQDkJB+a1zAhCaVe04FGBVzj3YADLNumEZEb5YkDJLJV9wzxeTD38in1tFqZvV4tOOZj/V7AUHfGu0bERKClAyX1aPQj/r/T48/4dDJ6jYj/vxMeRk4WL7Hyxe59zAZvDroj/i3/zXJ3/9BayizW2GAMqGPYXP5NnkICX1OT81QEDFaLI7G8Wuo9G9vlXXv3urTNNQvf8CEU0z+njNpiIdvXX/PhFl5hCsU8AUFs86qP+2e2WxIBGfOCKs6f4phU/meUCr6oiwWneUNPFKPfSQKBrB4K90RUG0XNvw78o832OBD1ab9Aq2mswvMkvGCukQ==
-X-Forefront-Antispam-Report:
-	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700016)(82310400026)(1800799024)(3023799007)(921020)(18002099003)(22082099003)(56012099003)(5023799004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	YwAo5eOcjqSFiSAhXyfxPuX0m6+C1U9c4QInqJCUnclUT85999cBPkLIEJ5++oOXNjUC1bPwlTu5PzRZMl5VCTJ6iKz3G6YvNiH4HbpBeXLY2Ty6NLZkR5pLHawTbxOApkk3hZlb/MUDa/JtNhd8dsb4XhNq7WzRvKY/mB+u1QBvTRpj9Y/sTsedS8RaJjUrcLxJpoIc0IgUa8xCeD4ErN0VFcsE59Pt2jXEWNZQFOowD5ciynZ+gtLabnzog8aS6owHGayJglQS9gNwHjpd0RH7JaUcZRl5RUf5HFAW47lfCICqjqLPtwilIOqAaJgyQB7yPWJCLPLXs6GW9WBULD+/mBBXXFUuESFOUOiVLBimoempis/B8EGAGKl/iuZT/361Ve4e44FN0aF2Mnd4Nxl+SDFFRFo705uwScyX2CPL6l8IhtMVro6z89+l3FDn
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 11:24:51.5269
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 010c22d4-1d37-4dbc-41a8-08deb66268ea
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F6E.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4247
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289903-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[couthit.com,ti.com,baylibre.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info];
+	FREEMAIL_CC(0.00)[lunn.ch,jvosburgh.net,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com,6wind.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289905-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:email,ti.com:mid,ti.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danishanwar@ti.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ti.com:+];
+	DKIM_TRACE(0.00)[6wind.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 1E72058D146
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6297058CBC4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi everyone,
+
+This series addresses a blackholing issue and a subsequent link-flapping
+issue in the 802.3ad bonding driver when dealing with inactive slaves
+and the `min_links` parameter.
+
+When an 802.3ad (LACP) bonding interface has no slaves in the
+collecting/distributing state, the bonding master still reports
+carrier as up as long as at least 'min_links' slaves have carrier.
+
+In this situation, only one slave is effectively used for TX/RX,
+while traffic received on other slaves is dropped. Upper-layer
+daemons therefore consider the interface operational, even though
+traffic may be blackholed if the lack of LACP negotiation means
+the partner is not ready to deal with traffic.
+
+This patchset introduces an optional behavior, widely adopted across
+the industry, to address this issue. It consists of bringing the
+bonding master interface down to signal to upper-layer processes
+that it is not usable.
+
+This patchset depends on the following iproute2 change:
+ip/bond: add lacp_strict support
+
+Patch 1 introduces the lacp_strict configuration knob, which is
+applied in the subsequent patch. The default (off) mode preserves
+the existing behavior, while the strict mode (on) is intended to force
+the bonding master carrier down in this situation.
+
+Patch 2 addresses the core issue when lacp_strict is set to strict.
+It ensures that carrier is asserted only when at least 'min_links'
+slaves are in the Collecting/Distributing state.
+
+Patch 3 fixes a side effect of the second patch. Tightening the carrier 
+logic exposes a state persistence bug: when a physical link goes down, 
+the LACP collecting/distributing flags remain set. When the link returns, 
+the interface briefly hallucinates that it is ready, bounces the carrier 
+up, and then drops it again once LACP renegotiation starts. Fix by
+resetting Collecting and Distributing state as soon as the link goes
+down.
+
+Patch 4 adds a test for bonding lacp_strict both modes.
 
 
-On 28/04/26 12:47 pm, Parvathi Pudi wrote:
-> Hi,
-> 
-> This series adds support for ICSSM Ethernet on Texas Instruments AM57x,
-> AM437x and AM335x platforms.
-> 
-> The AM57x and AM437x IDKs support two PRU-ICSS instances, each consisting
-> of two PRU cores, with each PRU-ICSS instance capable of handling two
-> Ethernet ports. For the AM57x platforms, the PRU-ICSS2 node has been added
-> to the am57xx-idk-common.dtsi, while for the AM437x platform, the PRU-ICSS1
-> node has been added to the am437x-idk-evm.dts.
-> 
-> The AM335x ICE features a single PRU-ICSS instance. A new device tree overlay
-> source file, am335x-icev2-prueth-overlay.dtso, has been introduced to define the
-> PRU-ICSS node for the AM335x platform.
-> 
-> This is v7 of the patch series [v1]. This series is based on the latest
-> next-20260427 linux-next.
-> 
-> Changes from v6 to v7 :
-> 
-> *) No code changes were made, only the version was updated.
-> *) Rebased the series on latest linux-next.
-> 
-> Changes from v5 to v6 :
-> 
-> *) Addressed Kevin Hilman, Krzysztof and Andrew lunn comments on patch 3 of
-> the series.
-> *) Fixed an issue with overlaying "output-low" property in "mux-mii-hog"
-> sub-node under "gpio3" node.
-> *) Rebased the series on latest linux-next.
-> 
-> Changes from v4 to v5 :
-> 
-> *) Addressed Andrew Davis's comments on patch 2 of the series.
-> *) Addressed Andrew Lunn and Nikolaus Schaller comments on patch 2 of the series.
-> *) Rebased the series on latest linux-next.
-> 
-> Changes from v3 to v4 :
-> 
-> *) No code changes were made, only the version was updated.
-> *) Rebased the series on latest linux-next.
-> 
-> Changes from v2 to v3 :
-> 
-> *) Addressed Andrew Davis's comment by placing PRUETH nodes in a new overlay file
-> am335x-icev2-prueth-overlay.dtso.
-> *) Rebased the series on latest linux-next.
-> 
-> Changes from v1 to v2 :
-> 
-> *) Addressed Andrew Lunn's comment on patch 1 of the series.
-> *) Addressed MD Danish Anwar comment on patch 1 of the series.
-> *) Rebased the series on latest linux-next.
-> 
-> [v1] https://lore.kernel.org/all/20251013125401.1435486-1-parvathi@couthit.com/
-> [v2] https://lore.kernel.org/all/20251103124820.1679167-1-parvathi@couthit.com/
-> [v3] https://lore.kernel.org/all/20251217130715.1327138-1-parvathi@couthit.com/
-> [v4] https://lore.kernel.org/all/20260105162546.1809714-1-parvathi@couthit.com/
-> [v5] https://lore.kernel.org/all/20260307122641.738450-1-parvathi@couthit.com/
-> [v6] https://lore.kernel.org/all/20260402073853.2170099-1-parvathi@couthit.com/
-> 
-> Thanks and Regards,
-> Parvathi
-> 
-> Roger Quadros (3):
->   arm: dts: ti: Add device tree support for PRU-ICSS on AM57xx
->   arm: dts: ti: Add device tree support for PRU-ICSS on AM437x
->   arm: dts: ti: Add device tree support for PRU-ICSS on AM335x
-> 
+Changelog:
 
-For this series,
-Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
+v5 -> v6
+  - Patch 3: the v5 patch was compliant with 802.1ax-2020, but the target
+    specification is 802.1ax-2014. The fix has been reworked accordingly.
+    Collecting and Distributing were not cleared on port down because the
+    Receive state machine was not clearing the Partner Sync flag.
+  Link: https://lore.kernel.org/netdev/20260506161144.465485-1-louis.scalbert@6wind.com/
+
+v4 -> v5
+  - Patch 4: replace the use of netem, which is not included in the
+    bonding selftests configuration. Instead, use a dedicated netns to
+    forward frames between the partner and DUT. The partner and DUT are
+    bridged within that netns. Since Linux bridges do not forward LACP
+    special frames by default, group_fwd_mask is configured on bridge
+    interfaces to allow them.
+  Link: https://lore.kernel.org/netdev/20260417140505.3860237-1-louis.scalbert@6wind.com/
+
+v3 -> v4
+  - Rename the configuration knob to lacp_strict on/off instead of
+    lacp_fallback legacy/strict.
+  - Patch 1: change the command documentation accordingly and wrap
+    text at approximately 75 columns.
+  - Use "usable" wording instead "valid" for LACP Collecting /
+    Distributing state in code and commit log.
+  - Patch 2: test collecting and distributing state regardless of
+    coupled_control
+  - Patch 3: Reworked because removing the SELECTED flag was not
+    compliant with 802.1AX. Instead, to transition to the WAITING state
+    on port disabled, except when already in the DETACHED state.
+    And remove Collecting and Distributing state in WAITING state.
+  - Patch 4 is removed. It was a fix for patch 3 but it is no more
+    needed since patch 3 was reworked.
+  Link: https://lore.kernel.org/netdev/20260408152353.276204-1-louis.scalbert@6wind.com/
+
+v2 -> v3
+  - Add an initial patch introducing the lacp_fallback configuration
+    knob (no behavior change yet).
+  - Patch 2 (was patch 1 in v2): apply the new behavior only when
+    lacp_fallback is set to strict, and re-evaluate the bonding
+    master carrier when the setting changes.
+  Link: https://lore.kernel.org/netdev/20260325134439.3048615-1-louis.scalbert@6wind.com/
+
+v1 -> v2
+  - Patch 1: split a comment line that exceeded 80 characters.
+  - Move the change from patch 2 in __agg_ports_are_ready() into a third
+    patch, as it is actually a side effect of the fix introduced in
+    patch 2.
+  - Patch 2: Expand the commit message and add a code comment describing
+    the change in ad_port_selection_logic().
+  - Patch 3: Check the READY_N flag only on ports in the WAITING state,
+    rather than on all enabled ports. This more closely matches 802.3ad.
+  Link: https://lore.kernel.org/netdev/20260316131838.3257889-1-louis.scalbert@6wind.com/
+
+Louis Scalbert (4):
+  bonding: 3ad: add lacp_strict configuration knob
+  bonding: 3ad: fix carrier when no usable slaves
+  bonding: 3ad: fix mux port state on oper down
+  selftests: bonding: add test for lacp_strict mode
+
+ Documentation/networking/bonding.rst          |  23 ++
+ drivers/net/bonding/bond_3ad.c                |  22 +-
+ drivers/net/bonding/bond_main.c               |   1 +
+ drivers/net/bonding/bond_netlink.c            |  16 +
+ drivers/net/bonding/bond_options.c            |  27 ++
+ include/net/bond_options.h                    |   1 +
+ include/net/bonding.h                         |   1 +
+ include/uapi/linux/if_link.h                  |   1 +
+ .../selftests/drivers/net/bonding/Makefile    |   1 +
+ .../drivers/net/bonding/bond_lacp_strict.sh   | 347 ++++++++++++++++++
+ 10 files changed, 439 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh
 
 -- 
-Thanks and Regards,
-Danish
+2.39.2
 
 
