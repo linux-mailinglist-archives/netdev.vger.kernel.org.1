@@ -1,190 +1,218 @@
-Return-Path: <netdev+bounces-290102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIvZOF0dDmpT6AUAu9opvQ
-	(envelope-from <netdev+bounces-290102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:45:17 +0200
+	id IPZCGvQdDmro6AUAu9opvQ
+	(envelope-from <netdev+bounces-290103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:47:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 582D159A0DC
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:45:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D4D59A1CD
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:47:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1A2A230193BC
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:44:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D92D63016014
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA7936F421;
-	Wed, 20 May 2026 20:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC51372EE2;
+	Wed, 20 May 2026 20:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="DuSvPyBN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RDes3Jx4"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tE+gqgpe"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013067.outbound.protection.outlook.com [40.93.196.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4062E36A34D
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 20:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779309895; cv=none; b=XU7HlraJox6L4bZXpQ6Cf10vNAQetWN1UWoF7h0qnF+DYV5+AAFkpA02+oSJQGQ0Rrwum+mn6HQ+y7/E3AtbOf4f3zEepRkg08SLPxvClvmr8uDzb5XTFM040zaSVynFjWxL0BtBwm0mkcwHYiSs78c2lSA5zsF5KGsrZ6y/h5s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779309895; c=relaxed/simple;
-	bh=+O8MAv14pMuRBsL1Pc2yMzFNGBar6BQMqDJrwqgJnNY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DXTo2vp0WSs/4MBPbrBqjtWaAMV/Qz8VyzY7ZgYeI67h6hoOHdnpFksvxZtPtHWmAWc70TvEEO3h412IUml5P+Kapk6MHkUT7h0xANhD+PO19rv4xoNUmtNfeJjA9VTf/rWPUH2jk2F0GnfiBQl4iHk+FaB2J3nBxUbc2SwSlFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=DuSvPyBN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RDes3Jx4; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfout.stl.internal (Postfix) with ESMTP id D916E1D00078;
-	Wed, 20 May 2026 16:44:50 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Wed, 20 May 2026 16:44:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm1; t=1779309890; x=1779396290; bh=pFYuzxZEyp
-	hWFvnyVIp/fTNvm5kNeUip0os9Gb52Z9E=; b=DuSvPyBNYvKCbyO9l4ED2kYoHm
-	+uHbW4KHs+K8z71P3kKJKAG59+42lmFXi38Xfkf4X8oGwjWhredTYqfO3hCIcXRv
-	TuE+pwgSWR3z8eSeHRV5khDzHdeK9M+xqyM8Vgz1MwKdsNGvBfHbMeYnlEU3gt4d
-	1QF2FpkBSHQniqwZKtQXTF1QnK4EzCzPdKLXKVM8b3MVl58Ts2Xp0pDHutydtv2N
-	Ms0By045DesYVoNDnhmpZMkkkjWCSWC3ZWS0haQQsceHvzCt+AWbOmjHTgxcCm/D
-	4srumIvaw+171r6Bqo/KP5gDIBHeHD33Xey37PW7ptaDEi2xLjtMCbfMqCTQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1779309890; x=1779396290; bh=pFYuzxZEyphWFvnyVIp/fTNvm5kNeUip0os
-	9Gb52Z9E=; b=RDes3Jx4BCOu4iIK8PQmH9vDnvpLGB9YxGvo3iHKssJ1c/vscWY
-	wZxOsP5E9rVcbzj3nuKeoWwBf1IRUuor5SP0sZHrxFXY5TsjEtU1423P184NzVE9
-	cRVS4nIUV4a5RTKm5guK2KcoerRb+GoNodHQ83Yik+BKUDDpdsWxGxTIIik6cnoR
-	/hhdPDbtLtDd+50utYwIl0R/SssQaZk/TBM5XLE6wCjRfzo5NRPipTtvHsfO0nK6
-	XF3zOPjA/DZh6vmgSR8RdsfzEKv9jNJW1Y/2ZQRDSzvp2msjzj1PMFTM800bLAbm
-	jQ8yVRm4ZnN8IaVkvODaREXAQdHfNaCUuuQ==
-X-ME-Sender: <xms:Qh0OaoYnT1BtKjWkLVqmZUBemQlMfr9w-ZesGwtXdK6_p1H8nr58tQ>
-    <xme:Qh0Oal8YciUHoMJ4Rft-kJ4o3MSFyvT0ZLEydCRAwrBXkMENDitKs9HB43bJXSR8m
-    vc2Zjwp9qdYTtQftHXA8wd8QZFFG08XfUwprvuXCZu5qdLvXW2yyw>
-X-ME-Received: <xmr:Qh0OammPK9SGG4ee7lIFEtSo-RmMHrclp-VUSzAPLwoZM_uv43palUfDL5M52kGaHNTsLuSyA1uhTzaRpsSy-os>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugeehiedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepvefgiedtteejtdekheffteejkeetkeegjedtiedujeelheegueeludfgheev
-    ledtnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgv
-    thdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnh
-    gvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgusehquhgv
-    rghshihsnhgrihhlrdhnvghtpdhrtghpthhtohephhhuiigrihhfrghssehrvgguhhgrth
-    drtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghp
-    thhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrg
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtgho
-    mhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrsh
-    hmlhdrshhilhgvnhgtvgesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:Qh0OaiwbvckxOnu4lVsKt2l9QBecBhf3UsUo539aBUKK2J2Q9hn3GA>
-    <xmx:Qh0Oao5J_oGOhlCzImYt1n1ClTFakj2Z_wwQaJKH1ukxI1WXrIM1yw>
-    <xmx:Qh0OaqWb5NNi0qt8snPU-EPHKtQJVUXdW0wk-kux32F9emfd_ZO1Xg>
-    <xmx:Qh0OaoJ_T_dkEGwpXxG3UeE4GCEGPXNIx7AVkByv3mzjQ9SnXXAhsA>
-    <xmx:Qh0OasiBl3bkAuEt9UvQfQFvaSFa4Ynd9u-5jbWF0yGQDgHAoUvCG1J->
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 20 May 2026 16:44:49 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Huzaifa Sidhpurwala <huzaifas@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH net v3] net: gro: don't merge zcopy skbs
-Date: Wed, 20 May 2026 22:44:42 +0200
-Message-ID: <c3b7f906bbfcbdfd7b4fa9d6c18a438870df85be.1779307748.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.54.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F4228C5CB
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 20:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779310065; cv=fail; b=UNagfB7L6UACOIltp8Ei+RkbVh8mOhB0iJwC32Zvege6FJUuKERbytJYvxoDoiinyVE3hnXRVMMNntTfc6mU0bhrJl9Jwa5Nxcy+R2SXHlKOEMXMo2dcO6H4fXG2QMjMYyFYeu4/QSUCOGi7AgdwFCIafoku12m/it5FFXq/eZQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779310065; c=relaxed/simple;
+	bh=LHuqQNSRkIqzWOFjBmXMtJWIvbxxrH0LyGAUqRSt0wk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ac9D66CqQlV2W9KZSsGRyZhiBx7zz3y/3cy7LIyn+RlsZtm+114Cem9YFzazwfFFvKYE3u8P4hPiyHpYrrZdORMQiZLdIVV7VXhgpgV0Vmmc4UIPXRrNgDH4bG6OdKlSQBoLxsbYnRTTBenDI5BqN0DWrDD0qRTFD860kyD0DqU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tE+gqgpe; arc=fail smtp.client-ip=40.93.196.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RKGRyfiswXvWHJtbgNCmojTYiTr1eVlDun2OvxB5Tun4Zs2UgXYMEZhyX0c5wZXPaSusl0btguM41mgN36BuDlbcYeKcq3OnslHgVNv9kAn9J0IeM7nbOKg8nw1AVLQ1VSjjkFle7fDjZ0K8u2zuglvZ6rGMAXEgNeNbVFIVtcS3YfrnFKbyaWyHtrjHKJis3nGcG2j1LfHDBSbFiNgMze2WccyOniiwkbFrbucyBE8ObtlJeQCt0mf5lPUtS8jGFnjqHlhKuTk6bWEtIh7C/0r6JX33SIuf2eWxIM6k6Iwgpy4+Gi5ZxTwH6D7t3KETWW7tE8p2i/LfFgTvikc7pA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4vrDXWF50gVh3aXK97DnrvnSBLsoMSUw+aWdjI0cBw4=;
+ b=aQeMc1swxammhHye/eG4tvOmMnyF88elhu9ChPdrAyYdy8MAAaMphEvGmNf97dRsMlyS7QxZV/8ZYl6oeVpWGCE7NK0DNCXdpMlNVrTFVZbrKhOhH3SB2JpNV2wFhHxAc6tT4KY7YAhatJ3rOakL//zTO0o/TDxMuodRSsvFfoSMqsgTBSWRHopLmheS1Hq1O/b5NAtJ+MOfg4B4F4TufQLmbNr3USctOtlI6a1H0DB55l3Tngcb1Itj9JbIlaa2rXQtf80cqfKgXga2IL7iuZdVKvQI5eqD3JzXfZF+MrKCUe7axkBFOCou+kwQH0sXPBxdIbKuMvTF5Nr2yP8/dQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4vrDXWF50gVh3aXK97DnrvnSBLsoMSUw+aWdjI0cBw4=;
+ b=tE+gqgpep/PmYwn4Da++Z9QMMFhog/DbUinFR2qrpz/0uva7GAQq2NlNRDkwpK+0AnZD3yH+SVtJugXtWKTO+C9biDGRShwHrdMxRrnKp0nID/XtKPi8BKMZTSo8Dx1SKtdYqTI+2Uwecfa3mFUfA/pafFvXrQ5UzmAl9dG1qgY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN2PR12MB3485.namprd12.prod.outlook.com (2603:10b6:208:c9::22)
+ by SJ5PPF4D350AC80.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::993) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Wed, 20 May
+ 2026 20:47:39 +0000
+Received: from MN2PR12MB3485.namprd12.prod.outlook.com
+ ([fe80::7ac:5acc:f8b7:65c9]) by MN2PR12MB3485.namprd12.prod.outlook.com
+ ([fe80::7ac:5acc:f8b7:65c9%5]) with mapi id 15.21.0025.012; Wed, 20 May 2026
+ 20:47:39 +0000
+Message-ID: <9c2e0768-b2e3-4bc0-b700-b097fafdb4e5@amd.com>
+Date: Wed, 20 May 2026 13:47:36 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] pds_core: fix potential stack info leak in firmware
+ version reporting
+To: Jakub Kicinski <kuba@kernel.org>, "Nikhil P. Rao" <nikhil.rao@amd.com>
+Cc: netdev@vger.kernel.org, brett.creeley@amd.com, eric.joyner@amd.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com
+References: <20260515212907.998028-2-nikhil.rao@amd.com>
+ <20260519191644.1574c9c8@kernel.org>
+Content-Language: en-US
+From: "Rao, Nikhil" <nikhirao@amd.com>
+In-Reply-To: <20260519191644.1574c9c8@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR05CA0070.namprd05.prod.outlook.com
+ (2603:10b6:a03:74::47) To MN2PR12MB3485.namprd12.prod.outlook.com
+ (2603:10b6:208:c9::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3485:EE_|SJ5PPF4D350AC80:EE_
+X-MS-Office365-Filtering-Correlation-Id: b9b7a420-66e6-4783-069f-08deb6b107b2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|11063799006|4143699003|22082099003|18002099003|56012099003|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	DlhJMNdQ1reqE+sUhor6uMAeOmu4ROTirVjuIJhzXC6VAnfN9muCrRxz+UyDMTyAMIahTzhzxtB6eSIMw/fUBQtVeqlZU458JQX4SvjTnjFdir/P3GFsvth8/ydbqxrySyrZsWjt8WYXc5xaMy2CCctPIOQIJU5kXOzY9+Rl1gvlzHSUsAq6Bvg2aemMnmfFDXlj9IQSRL6eh8gF9r56QkOFiX1zInmrtpw5LV4Rp51K1Frxd4Q5rmPNGMhdwFVpVAP2tJOZFWpcwPltHjwMvd/2eMJJxVsfdQEYc94xFKPYrfr1WfqK6hmFxtl3tnUKrIrhomaAGMe1Q6+bJjXJSIqbVUnWkT10XNN77YfhaVudhzrnNHcU4tsswNhovNnCFQhAvn8JJ0usE3rinEq0n4o6C9/L/AqDb1dl0x0WU0Ei7ewHRxFkExHIsrrZ3bMfKNz0D1zmFHMo2B9hR74TsLTcv6Ao8arWmLGDi3pRqwdm32EcHW73C2+aVb6wyqVJGtzkVOMwCb8ZvI076AExaR/bngAuYNXhnP1nDhISwSLGoNjMXxjivU4rpB6xFRYVaUGDKCkfTdXXNrRUyzFGjhpP3rnHfPr7oE9BcGCj5Jfo5kzBRg/Culm6NA5aPLXqmISXy3fv7Vv2LTk900ur4hcP8U/APJT5Tzqf40wB1O1tvST6j8QdO9mdcZXMfA72
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3485.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(11063799006)(4143699003)(22082099003)(18002099003)(56012099003)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TVpqKzJFNWhFeWg4WFljbnpqUHhENWQwbFRad1N2aWdHck1aMGJxdDJKc0J2?=
+ =?utf-8?B?RVdiWGplSDc1c0RBa2dWcXRqQlRtYzFBeCt0Q3RYc1JjY1o1c3FvTDZWZGpr?=
+ =?utf-8?B?aUVQQ1kvSmZBR1RLYWR6R3dOMllhTDN3UGFuOWV4aFFyTFlsQ2lGbUM0M0pI?=
+ =?utf-8?B?aEVqQzFFS0FtWWVZdU02OU9QU3kxYlFsb29nT3JJMWVjeitPTFRBWmdCZ1Jp?=
+ =?utf-8?B?MXd2cEk2bGE4L2tyYlNzTk1lTndEYTZXV2M3cyt4TGp1cU1WZHozNHFQSGFH?=
+ =?utf-8?B?bmlDRmllZVMvK0pWODBKcEFkWFdzWnc0R2hLY1VUQUdiVWl0ZksyN3l4MjhY?=
+ =?utf-8?B?bTNNYXR1MjFmZlp3dWxLS2ZqUEtJYm5tcjRkc280Ym5panF3NTA1WWFjUVdC?=
+ =?utf-8?B?c1MxbjVUandrcWY0YzhpZktGeVloL2tZZnJYTzNhY3NFcHh2YUc1QWpZOEJz?=
+ =?utf-8?B?R09PQWpoeWIxaW9ycGlFRTR6Tm1lZXNMOTZ5L1ByN1FxK05DL042ZEthTWIw?=
+ =?utf-8?B?c0FCQkExSnBvcEZrK01yK25hanF3MXJrUDNUOWhGdVEvYlRGbHh6dlkzOXAv?=
+ =?utf-8?B?SFgrbTVhN1ExM0FYdHk3eHcwam9TMTNVTDViaERkc0wwbVljdWk2dFcySjl5?=
+ =?utf-8?B?VllEb2NmY1AwNGZta2xaRDBDNEljUzI5Q2VPNkhKOEdOUjhYTlFtMWZ3Wnhq?=
+ =?utf-8?B?dE1IV1FpQkdlZUpURjJHVUx6NlFtdzlmMjkwbm1US09hRzVpTkhjY2lsS3pr?=
+ =?utf-8?B?QWQyMTBjRjFaeTQ5SHk0eDMzUlVwbEJOWXo4NGIyaTdld1hsbkFtWTM0MTZy?=
+ =?utf-8?B?RVNjU3hTcUFCL01BU3RGVE82dlU2YjV6MjUzaHdERjFIOFVEVSs1Q01XajFM?=
+ =?utf-8?B?b1Nxd1FsMVFRVW5iQUhMN0hCUkF2ZlFNVjVQTW5LbHFZMFgwaWY3by9ORDVN?=
+ =?utf-8?B?M3g2a200dmlqOFNmOWZUdWRBbjdwZWRaeTM4bTN3UDQvY0IzblRVMVIyT28w?=
+ =?utf-8?B?Y2JUNkNBV2pydU45RmdzRkxldzErb2NhNExXVmJWaHhtaTFBbWE1VnlkKzA3?=
+ =?utf-8?B?UlpuUlROajJ1S2dsNGxjTDlPSmtjRVA1dCtxTTVtbTFpWmlITHk0SFdqc3VG?=
+ =?utf-8?B?ZlFtS3l4OHFQR01KZGJNSGNIdWJOVWZNZjVoWGsrbGgxMXBqUnVNL1pMS1RF?=
+ =?utf-8?B?MEF0TGkxOVRTY21xd3ZuZXFlT3ZSbzhnWHNuL05LeU1FS0Yxa1VkL0p2SUU0?=
+ =?utf-8?B?Zy8xM2tVeS9SdHVzV1BzemgyWVZkZzl1bkFkK0NST2JGTUxiL25sYnpUN1px?=
+ =?utf-8?B?ekRwMEdYTjg3ajZOV1VPa0g4OTI5aEMxUG5LVHBwWGpSZnF6b3E5eU5OZ2Fj?=
+ =?utf-8?B?dFJnOUpVYVFNZkMxTHdoa2VBeVd0NHJ4Qi8zY3hLNDRLYThTZU5jKzg3Y3Rx?=
+ =?utf-8?B?cE5ub20rZUcxT2xIN2lXOVIrbkw1VmVEdXpMU0diTDlETzZNdlBBdVE5bUtk?=
+ =?utf-8?B?OG9NdFh5RzNFbEM3Mmp4ek45UlQybkJ1L3NlUjd2dVhsWWNkOFJLYzNoTXFS?=
+ =?utf-8?B?YjZGNlppaDEyMlZiZ2YrWFdJMkdBd3lWR0dzNjkwRCtiUldmR2NqZ0N2N1Ew?=
+ =?utf-8?B?S2ZjUnR5UXE2RGJYcE0yL2NsbS9GRG5iLzZzNzMrSGFrQWtYRk5jajZONWwv?=
+ =?utf-8?B?V2ZDVXZYWjM2d0duQmpITkVvS0lCaTNuVXFlclk1L3dWZVYrUDZGWnpESERa?=
+ =?utf-8?B?cElaQkpKYUVuYi9tRjNkTVJ4UzNmMk5KZ1Q5RzdybjZLRzd1RWxpT29VS292?=
+ =?utf-8?B?djRUZ0xxNGxUY2hYd0l6Z2l0UWFkNTBDZUo2a0ZVUnNDRXZZdFBhTFIyb0Qx?=
+ =?utf-8?B?M3ZMT2Iwb3VTb1JwZUpsZDZod2xrR1ZjQ3F4Uy82RUFiZHA5a09FaEt3c2Zw?=
+ =?utf-8?B?N0FuWVRtYm9uQmlteDQ2NEtvR1JjSlM4Tjd0M3RrSElLS3VGQi9wYkk1ZGts?=
+ =?utf-8?B?THgvS3VkeTVqY2lubGhBZ3pVUk95VmsyT3Rqckt4cWsxVC9Eb1A5TXB2SVY1?=
+ =?utf-8?B?aVQ1dlJxSVJVdWtEOWFNdGxHY1hYc3MrY09zK0Voak1ya0tZNHpvYlhmSzFB?=
+ =?utf-8?B?bkhCSUZtNW1mb1VMOXM1ZVZkdCtIUTR2MCtLQ3ZmZUhtaTNxUDlXY21RMGxG?=
+ =?utf-8?B?cG9RalZuT2lFYVFZNDY1Z281dFY2cS85eUkrNllFM0YxelhVVzc5K3BwRzN6?=
+ =?utf-8?B?aUZ2TkJEQVZQZ3E2dmp5NGdtUmFBNnNsb0ZWQjJadk1POWNyOE1jajNzNmph?=
+ =?utf-8?B?SDlLei9YSDlIbVc2bVF1TEFXdndzb3JjWTBrOURoTUxLRHA1cElqdz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9b7a420-66e6-4783-069f-08deb6b107b2
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3485.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 20:47:39.0574
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: h3RYBptNERiK1p6yidAp5k0eIT7yUv5eeuTinB0O1cTJS4zowsZkkgyzWAam9ATpoYfPL467UlRrreEUBCpBJA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF4D350AC80
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[queasysnail.net,redhat.com,davemloft.net,google.com,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-290103-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290102-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[queasysnail.net];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nikhirao@amd.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 582D159A0DC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,amd.com:mid,amd.com:dkim]
+X-Rspamd-Queue-Id: 11D4D59A1CD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-skb_gro_receive() can currently copy frags between the source and GRO
-skb, without checking the zerocopy status, and in particular the
-SKBFL_MANAGED_FRAG_REFS flag.
 
-When SKBFL_MANAGED_FRAG_REFS is set, the skb doesn't hold a reference
-on the pages in shinfo->frags. Appending those frags to another skb's
-frags without fixing up the page refcount can lead to UAF.
 
-When either the last skb in the GRO chain (the one we would append
-frags to) or the source skb is zerocopy, don't merge the skbs.
+On 5/19/2026 7:16 PM, Jakub Kicinski wrote:
+>  
+> On Fri, 15 May 2026 21:29:06 +0000 Nikhil P. Rao wrote:
+>> The fw_version field in pds_core_fw_name_info is a fixed 32-byte array
+>> that may not be null-terminated if firmware writes exactly 32
+>> characters. When passed to devlink_info_version_stored_put(), this
+>> could cause a read beyond the array boundary, potentially leaking
+>> stack contents to userspace or causing a crash if the read crosses
+>> into an unmapped page.
+>>
+>> Null-terminate the firmware version string in place before passing it
+>> to the devlink API.
+> 
+> This loses the last, presumably meaningful character of the FW version.
+> Are you saying that device should never send names this long and this
+> is defensive? Otherwise we could trivially memcpy() the name into a
+> buffer on the stack that has one extra byte.
+> 
+> Please fix or clarify the commit msg.
 
-Fixes: 753f1ca4e1e5 ("net: introduce managed frags infrastructure")
-Reported-by: Huzaifa Sidhpurwala <huzaifas@redhat.com>
-Assisted-by: Claude:claude-mythos-preview
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
- net/core/gro.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-Huzaifa has found this to be exploitable to overwrite the page cache
-
-v3: maybe no stupid mistake this time. sorry again.
-v2: as Eric suggested, don't merge those skbs
-    https://lore.kernel.org/netdev/9f5afc14ea4ecd22c70d6eaf279a94d10fe29448.1779289597.git.sd@queasysnail.net/
-v1: https://lore.kernel.org/netdev/4d583fc5401298453d0a2f1b4719a15be30c8e49.1779194090.git.sd@queasysnail.net/
-
-diff --git a/net/core/gro.c b/net/core/gro.c
-index 31d21de5b15a..bae89062a053 100644
---- a/net/core/gro.c
-+++ b/net/core/gro.c
-@@ -109,6 +109,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
- 	if (p->pp_recycle != skb->pp_recycle)
- 		return -ETOOMANYREFS;
+Thanks for the review.
  
-+	if (skb_zcopy(p) || skb_zcopy(skb))
-+		return -ETOOMANYREFS;
-+
- 	if (unlikely(p->len + len >= netif_get_gro_max_size(p->dev, p) ||
- 		     NAPI_GRO_CB(skb)->flush))
- 		return -E2BIG;
--- 
-2.54.0
+ 
+ 
 
+The firmware already null-terminates these strings, so the fix won't 
+truncate any valid data. This is a defensive fix - the driver shouldn't 
+rely on firmware behavior.
+ 
+ 
+ 
+
+I'll send v2 with an updated commit message that clarifies this.
+
+Nikhil
 
