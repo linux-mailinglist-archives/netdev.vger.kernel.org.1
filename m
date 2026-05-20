@@ -1,237 +1,217 @@
-Return-Path: <netdev+bounces-289935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2ArxHA2pDWpr1AUAu9opvQ
-	(envelope-from <netdev+bounces-289935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:29:01 +0200
+	id IKzeCROrDWox1QUAu9opvQ
+	(envelope-from <netdev+bounces-289936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:37:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F4958DA83
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:29:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C41058DD1F
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 846F8300E178
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:28:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 160BB309C264
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAA03DE43A;
-	Wed, 20 May 2026 12:28:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E933DDDCB;
+	Wed, 20 May 2026 12:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RL3me7op"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b0HBZXtz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483C33DE427;
-	Wed, 20 May 2026 12:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D725A13A86C
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 12:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779280123; cv=none; b=FuCxnQE3kdBWh8pvPA8e+GqPM4mF0TyKM+0liRJq7DcnN+Pr6GNcVQdBkcRlGhfgP54cHrOqF33ElEFO0txwIgvHFBky0mYBluZDzdQlc4Pxd/x2x3QAbOr7B+RQ5iA0zDVWrZJUkQoli87LReEGn/U5p96eIKyo0hTYilXPob0=
+	t=1779280279; cv=none; b=FaJLow1zWp3sVabQrVA4gCnztduxfllBkeFYTFgC3UFxJQYbJwRSX0NyXF3krMbSbSlIaogbP4nAsUoZw5iUJHl11vXy4daMw2sXUfZcihwQi41TEDF5/dG1eoDvW1i6nOm938rhynT5LppeWMp4IiAUKaAjg9GAUqe5HK5GkAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779280123; c=relaxed/simple;
-	bh=u0M4354NcRaRw6UV2ZqR75Z7RSZiD8Qk15kGhL8vtIw=;
+	s=arc-20240116; t=1779280279; c=relaxed/simple;
+	bh=7gAk2JTKbsfJYuia6suT6lU9Gcv0TRau2aV5ozbZXCU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kVSEUBKwy6SfLnbyStr/226n+FQgReUpT3FnPGetdjO4dDqiHmORMTgJ8BRYZkH43MWOTJT9clAuQSHBadCwxplu4ouo5huNg/vktLlqRq5dDM3OBKExqXqBhtSHSb1Nnix199KqUE1LgXr5Q6Lj2uLcVnELmobDzK3QOV9h9B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RL3me7op; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 630B41F000E9;
-	Wed, 20 May 2026 12:28:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779280120;
-	bh=9QGGlk3LDXhixnD+kizSU53+b+n8Av5GKm/+8vIIvWg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RL3me7op5+Ne284qNANnRtEVsnHsTWjWIztw4vNU3VsQ2GOxCYonftnAgUARHgGOo
-	 ySQpBay1EpB6b4guqnOMA4uatrGwNyYmAd5DHgpW79Qrg+58hsdoTJtOPWRkR2TSnl
-	 GNtZG2YwTWfjeEvYave3oE8OWSoH4tnvQTtc8s1tEE6t+lTIYbbhmflEiVPZmdE19b
-	 Vuv5CRlatIzI3GldO2Fdz2qq/TwBc9HXoXpYw9UJ8CUuD5EZs2pzcdNZ9so2658oXA
-	 DpGlXxziOQV8WF0nn9HWcBkVgbDTTPoWPh/7b/0KQ1iLrK76aFUe5wRga606fKzy0H
-	 V0GR+Ce39u1tw==
-Date: Wed, 20 May 2026 14:28:38 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: robh@kernel.org, conor+dt@kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v8 07/10] net: airoha: Support multiple
- net_devices for a single FE GDM port
-Message-ID: <ag2o9qLAa2HXN5es@lore-desk>
-References: <20260519-airoha-eth-multi-serdes-v8-7-6bd70e329df6@kernel.org>
- <20260520085933.35D171F00897@smtp.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XnMunmWRDqNtAQCqHBDtAvcAcFqOy+6MRN1/gpc2NLd5DV5KGVuF9UHltiJTrIMxm+VsmE3OkFhtX0A9eE76dwGEVJPtcu1u9mnc8iOHVF6+2RjwRAAkT2wGj9sGZudkEjkhPKvdHK0k/kaNipo55BPo2t04vN/196Im3/UET2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b0HBZXtz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779280277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CB/Z4bzbsyrd+gSXXFc5hMEcaetYVQ+7kd0CfM+SH9M=;
+	b=b0HBZXtzb8hjap4X+k/bAjl+jgzpiIu9yDYDgYHRQVFFEJSXpnuG6PvxoUP/Cwl3ZlkhVj
+	l0IUVGRpYcD8v7zp2iMG0Ah0NAU5Vm1/ZxQhqFju4WawgaM+ufs0BPu0FCvDqEdnEpBupg
+	wWh0Bu5ImK08rSJPmftQdIKoQFaiSTc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-OFz8t6rZN3-_6eMhLI993A-1; Wed,
+ 20 May 2026 08:31:13 -0400
+X-MC-Unique: OFz8t6rZN3-_6eMhLI993A-1
+X-Mimecast-MFC-AGG-ID: OFz8t6rZN3-_6eMhLI993A_1779280271
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B3E3A1956096;
+	Wed, 20 May 2026 12:31:09 +0000 (UTC)
+Received: from thinkpad (dhcp-64-111.muc.redhat.com [10.32.64.111])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 271F01800465;
+	Wed, 20 May 2026 12:31:03 +0000 (UTC)
+Date: Wed, 20 May 2026 14:31:00 +0200
+From: Felix Maurer <fmaurer@redhat.com>
+To: Luka Gejak <luka.gejak@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Roger Quadros <rogerq@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Meghana Malladi <m-malladi@ti.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	David Carlier <devnexen@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Kevin Hao <haokexin@gmail.com>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v2 2/2] net: ti: icssg: Add HSR and LRE PA
+ statistics
+Message-ID: <ag2phK4k7PuyBo5B@thinkpad>
+References: <20260514075605.850674-1-danishanwar@ti.com>
+ <20260514075605.850674-3-danishanwar@ti.com>
+ <20260518184506.694c584e@kernel.org>
+ <E30AAC96-01D2-4A23-B562-126087DEB7FA@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hdgogd+ttgvpRBQT"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260520085933.35D171F00897@smtp.kernel.org>
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+In-Reply-To: <E30AAC96-01D2-4A23-B562-126087DEB7FA@linux.dev>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289935-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289936-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,ti.com,davemloft.net,google.com,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,intel.com,gmail.com,linux.dev,vger.kernel.org,lists.infradead.org,nxp.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url]
-X-Rspamd-Queue-Id: 15F4958DA83
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mibbrowser.online:url]
+X-Rspamd-Queue-Id: 9C41058DD1F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi everyone,
 
---hdgogd+ttgvpRBQT
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, May 19, 2026 at 07:55:55AM +0200, Luka Gejak wrote:
+> On May 19, 2026 3:45:06 AM GMT+02:00, Jakub Kicinski <kuba@kernel.org> wrote:
+> >On Thu, 14 May 2026 13:26:05 +0530 MD Danish Anwar wrote:
+> >> Add new firmware PA statistics counters for HSR and LRE to the ethtool
+> >> statistics exposed by the ICSSG driver.
+> >>
+> >> New statistics added:
+> >>  - FW_HSR_FWD_CHECK_FAIL_DROP: Packets dropped on the HSR forwarding path
+> >>  - FW_HSR_HE_CHECK_FAIL_DROP: Packets dropped on the HSR host egress path
+> >>  - FW_HSR_SKIP_HOST_DUP_DISCARD_FRAMES: Frames with duplicate discard
+> >>    skipped
+> >>  - FW_LRE_CNT_UNIQUE/DUPLICATE/MULTIPLE_RX: LRE duplicate detection
+> >>    counters
+> >>  - FW_LRE_CNT_RX/TX: LRE per-port frame counters
+> >>  - FW_LRE_CNT_OWN_RX: Own HSR tagged frames received
+> >>  - FW_LRE_CNT_ERRWRONGLAN: Frames with wrong LAN identifier (PRP)
+> >>
+> >> Document the new HSR/LRE statistics in icssg_prueth.rst.
+> >
+> >To an untrained eye these stats look like stuff that could
+> >be standardized across drivers.
+> >
+> >Luka, Felix, others on CC, do you think we should expose these
+> >from HSR over netlink as "standard" offload stats different drivers
+> >can plug into or not worth it?
+>
+> Hi Jakub,
+> I think there is a case for standardizing part of this, but I would
+> not standardize the whole set as-is.
+>
+> The LRE counters look generic enough to me, especially:
+>  - unique rx
+>  - duplicate rx
+>  - multiple rx
+>  - rx / tx
+>  - own rx
+>  - wrong LAN, PRP only
 
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
-e(s) to consider:
-> - [High] Port-wide hardware configuration is improperly modified via per-=
-net_device callbacks, breaking the newly introduced 1:N relationship.
-> - [High] Sequential initialization of multiple net_devices sharing a GDM =
-port silently overwrites singleton hardware loopback and WAN configuration =
-registers.
-> --
->=20
-> commit d922e17d3b113696fc139ac4b2b3ef81e2b9ad50
-> Author: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> net: airoha: Support multiple net_devices for a single FE GDM port
->=20
-> This commit introduces support for multiple net_devices connected to the
-> same Frame Engine (FE) GDM port (GDM3 or GDM4) via an external hw arbiter.
-> It updates the airoha_gdm_port structure to hold an array of devices inst=
-ead
-> of a single device.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/eth=
-ernet/airoha/airoha_eth.h
-> > index fbb50dc73af84..fc49f0049983e 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> [ ... ]
-> > @@ -540,19 +541,20 @@ struct airoha_qdma {
-> >  struct airoha_gdm_dev {
-> >  	struct airoha_gdm_port *port;
-> >  	struct airoha_qdma *qdma;
-> > -	struct net_device *dev;
-> >  	struct airoha_eth *eth;
-> > +	struct net_device *dev;
-> > =20
-> >  	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
-> >  	/* qos stats counters */
-> >  	u64 cpu_tx_packets;
-> >  	u64 fwd_tx_packets;
-> > +
-> > +	int nbq;
-> >  };
-> > =20
-> >  struct airoha_gdm_port {
-> > -	struct airoha_gdm_dev *dev;
-> > +	struct airoha_gdm_dev *devs[AIROHA_MAX_NUM_GDM_DEVS];
-> >  	int id;
-> > -	int nbq;
->=20
-> This introduces a 1:N relationship between a GDM port and net_devices, but
-> are the net_device lifecycle and MTU callbacks updated to account for sha=
-red
-> ports?
->=20
-> Looking at airoha_dev_stop(), the driver unconditionally drops all traffic
-> for the port:
->=20
-> airoha_dev_stop()
->     airoha_set_gdm_port_fwd_cfg(qdma->eth, REG_GDM_FWD_CFG(port->id), FE_=
-PSE_PORT_DROP);
->    =20
-> Since this modifies the forwarding configuration for the entire GDM port,
-> does stopping just one net_device silently drop all traffic for the port,
-> breaking any other active net_devices sharing it?
->=20
-> Similarly, airoha_dev_change_mtu() overwrites port-wide hardware registers
-> such as REG_GDM_LEN_CFG. Could this lower the port MTU while another devi=
-ce
-> still requires a larger MTU?
->=20
-> I note this regression is addressed later in the series by commit
-> 646f1e7bb6021 (net: airoha: Do not stop GDM port if it is shared).
+I'm very much in favor of having standardized stats for hsr hardware
+offloads that the drivers can supply. The list above looks about right,
+I'd add "frames with errors" and "(proxy) node table entry count" as
+well and that "own rx" is HSR only.
 
-as pointed out here, this is resolved from a patch in the same series.
+In general, I don't think we need to standardize this ourselves but can
+adapt to the counters that the SNMP MIB for IEC 62439-3 [1] already has.
+It's part of the standard and IMHO we should gather these counters from
+offloads (and later supply the same set from our sw implementation, but
+the current netlink interface for hsr is quite messy). For reference,
+the list in the MIB is (no need to fully adopt this naming):
+- lreCntTx{A,B,C}: Sent frames per-port (for A,B only tagged frames)
+- lreCntRx{A,B,C}: Received frames per-port (for A,B only tagged frames)
+- lreCntErrWrongLan{A,B}: Received frames per-port with wrong LAN ID
+  (only for PRP)
+- lreCntErrWrongLanC: Received frames on interlink port of HSR-PRP
+  RedBox with wrong LAN ID
+- lreCntErrors{A,B,C}: Received frames with errors per-port
+- lreCnt{,Proxy}Nodes: Nodes in the (proxy) node table
+- lreCntUnique{A,B,C}: Frames only received once, per-port
+- lreCntDuplicate{A,B,C}: Frames received with exactly one duplicate,
+  per-port
+- lreCntMulti{A,B,C}: Frames received with more than one duplicate,
+  per-port
+- lreCntOwnRx{A,B}: Frames received per-port (A,B) that originated from
+  this node, only for HSR rings
 
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 27b214ce2a4ed..8d36ab6cd7854 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> [ ... ]
-> > @@ -1830,7 +1831,7 @@ static int airoha_set_gdm2_loopback(struct airoha=
-_gdm_dev *dev)
-> >  	airoha_fe_clear(eth, REG_FE_VIP_PORT_EN, BIT(AIROHA_GDM2_IDX));
-> >  	airoha_fe_clear(eth, REG_FE_IFC_PORT_EN, BIT(AIROHA_GDM2_IDX));
-> > =20
-> > -	src_port =3D eth->soc->ops.get_sport(port, port->nbq);
-> > +	src_port =3D eth->soc->ops.get_sport(port, dev->nbq);
-> >  	if (src_port < 0)
-> >  		return src_port;
-> > =20
->=20
-> When multiple net_devices sharing a GDM port are sequentially initialized
-> via ndo_init (airoha_dev_init()), they unconditionally call
-> airoha_set_gdm2_loopback().
->=20
-> Inside this function, global singleton hardware registers are modified:
->=20
-> airoha_set_gdm2_loopback()
->     airoha_fe_rmw(eth, REG_FE_WAN_PORT,
->                   WAN1_EN_MASK | WAN1_MASK | WAN0_MASK,
->                   FIELD_PREP(WAN0_MASK, src_port));
->=20
-> Does initializing the second device on the same port silently overwrite
-> the hardware loopback and WAN configuration of the previously initialized
-> device?
->=20
-> I see this regression is resolved later in the series by commit
-> 8a565b44990bb (net: airoha: Introduce WAN device flag).
+Note that we can not currently completely distinguish
+Unique/Duplicate/Multi in the kernel implementation and their meaning is
+not entirely clear to me from the MIB.
 
-as pointed out here, this is resolved from a patch in the same series.
+The explanations in the MIB in [1] are otherwise quite explicit for each
+of the counters but we may want to adapt the meaning of "port C" to the
+counters. For example, there is lreCntRx{A,B,C} for received HSR/PRP
+tagged frames (by the LRE). Port A and B are clear, but for port C the
+meaning is "number of frames received from the application interface of
+a DANP or DANH or the number of number of frames received on the
+interlink of a RedBox". IMHO, we should consider separating "application
+interface" (what the kernel calls master) and the interlink port because
+these two are not mutually exclusive in the kernel (nor in the NICs that
+support hardware offload).
 
-Regards,
-Lorenzo
+Thanks,
+   Felix
 
->=20
-> --=20
-> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260519-airoha-eth-=
-multi-serdes-v8-0-6bd70e329df6@kernel.org?part=3D7
 
---hdgogd+ttgvpRBQT
-Content-Type: application/pgp-signature; name=signature.asc
+[1]: you can find it for example here: https://mibbrowser.online/mibdb_search.php?mib=IEC-62439-3-MIB
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCag2o9gAKCRA6cBh0uS2t
-rKsLAQCTKSY91GpYjO0OdC90ZCeNmsb/wVXSqWIzNa6HMKz23gD/X3yJnMzsvJgg
-vTiV8EEIEjiuSBUZ3pzo0yDDhflWiwA=
-=6JIv
------END PGP SIGNATURE-----
-
---hdgogd+ttgvpRBQT--
 
