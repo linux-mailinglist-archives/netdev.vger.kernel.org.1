@@ -1,131 +1,161 @@
-Return-Path: <netdev+bounces-290059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sLW3GawFDmp25gUAu9opvQ
-	(envelope-from <netdev+bounces-290059-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:04:12 +0200
+	id uO1EHxkODmqe5wUAu9opvQ
+	(envelope-from <netdev+bounces-290065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:40:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC09B597AAE
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:04:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A570459892B
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5EEBA2466C7
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:45:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1D6D131DF254
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661763EAC82;
-	Wed, 20 May 2026 18:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E77D40803F;
+	Wed, 20 May 2026 18:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YxN/XarZ"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="o8oFhaTo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8763FF1A4
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB97B3E277C;
+	Wed, 20 May 2026 18:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779302374; cv=none; b=lryTKGJjDVfruxVQAMf/c5/NrbVsrXud60LA95qC/ZWikbBh/MrlP9nYrVuZgWwUpdvCR9GWN8UahXQX3VEo0BRAAKwpK0YzzRnV/gNQwB/LY9iNJJ7jGMOsh/cH9tgbpSQfv0UARncyOKEaojntz+QPySDxYR+Yd/4c3A/DPMc=
+	t=1779302647; cv=none; b=ol+9hMoX+kLiZrO16g8xz9jp+pc+31jskP1TkWUs6HALtJRfPsnr0azj9nmgF4/2MELZhEdtRaoKZJXx9P+KLDK92zBA3u8kOJ/+IUeVtvyOqQv9DWwc4flkeIxRRqIILbG//4Es7CsnXJw1L9WDiecrRtJLoWfPdi++j/hzzpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779302374; c=relaxed/simple;
-	bh=6tdWWTJ11C7Sr+A1qPIzMojRq37VjC1M8vczAlblpLA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INOYL2JZ+s65gP3vrTXsRyo8yoTjQhE7NqgHtxJkGHe6jfebqNTqhXovOoAF7zrg8GMH/ozzY7n+UB/2yVKQq1ajDQHTXaZgDHgWtVuqhoJWlk0ZfX34WCIzc+q86Pbv7WBCYmwLKZBx1zEy35IzJ54a8WIdqEEUiJOIHJy0KNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YxN/XarZ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AD1E1F000E9;
-	Wed, 20 May 2026 18:39:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779302372;
-	bh=z/6d4XDsP8kzqaS2wZT45uE1TsRr5QPcLiTvEq5CEp4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YxN/XarZZPxmKvMiwPj489ukmgHFMGOrsVkFyl/ynf53vG7zGHp8ViqspWjlnRwOT
-	 qoZdVQJz8txRV0T774UZaKnd5hwRT7vU0vqdmrz14YL9vA8jd6AaB1bGjxyP02Ldp3
-	 reCYb+KUZC1vQwHD9lNqMSiW0OXxJDCmRRhN+elpD/K7mQg6OWyQRA612on5CptqmB
-	 Bmxtl9XkF7bz+b6VQw8FbabVhCgmnDq9y/vGLPY4SNanC7lPwS8NYGyzP8Al8A8+T1
-	 /BDmie27y2nPmVCftGN7zoyQyvio1+JS+pnu+cq4tL9xHAYLPVBNE/xo/30uUIT5Ka
-	 2+Hlp3yw4HC1w==
-Date: Wed, 20 May 2026 19:39:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Przemyslaw Korba <przemyslaw.korba@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com, arkadiusz.kubalewski@intel.com
-Subject: Re: [PATCH iwl-net v2] ice: suppress DPLL errors during reset
- recovery
-Message-ID: <20260520183928.GF988238@horms.kernel.org>
-References: <20260520115213.10864-2-przemyslaw.korba@intel.com>
- <20260520183801.GE988238@horms.kernel.org>
+	s=arc-20240116; t=1779302647; c=relaxed/simple;
+	bh=b03qRrZcAGccNMFvgTiUEzk6iVDZdoOo75O+YD1y1oA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t2svFEnWHQRzgxqyDRhbRW8FXU0XawBBEsObtxd9mGZaQj58C55ZVCyWMSAnCjHLDEklWClkoG7L0S2gixbCPuDBF7HSjSuhDS9VtbpWrV7bhYFdiL1cb94yfy99WJwaJfxOp+IdIakcbtPVDxtFlfBtP/8atU/nxfvdHDQLFmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=o8oFhaTo; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 14B56A3E19;
+	Wed, 20 May 2026 20:43:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1779302634; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=5sb4b5JmNuf3m+PKjvTG++e3CU9o6TXzphhA4z3gnCE=;
+	b=o8oFhaTowOetH30VgwONoGjAb/GifoAEFAD/JavPTlVYM/llZLkTPD3W09toHmOUU85ojq
+	RQjUmydjNTMAOd3bpKODNKbkWUJkkX3ih0cX23WiRxQVltGS4wQQ9+2i9BTSAZOZV/rTmY
+	oG/xIbIweqG1ZL/+sBLN9ji2UFpjjKm8lBsI44mVxfNggYZh6tmh8XnWYC5mniiMLi2Yre
+	KNgm2d69FpQ3CUjpR//ApN7axkCnZZ5sJLzgfeERWzxrj0SEA7tRomHS8+L8dR9oTWrzON
+	8EZCre0IxUiFQn9nfTz8gWGsQmB83ZlezsOlZ6FyetDCgsRYJba0Y+7eTIYZ8g==
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: opendmb@gmail.com,
+	florian.fainelli@broadcom.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: justin.chen@broadcom.com,
+	phil@raspberrypi.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Nicolai Buchwitz <nb@tipi-net.de>
+Subject: [PATCH net] net: bcmgenet: keep RBUF EEE/PM disabled
+Date: Wed, 20 May 2026 20:43:20 +0200
+Message-ID: <20260520184320.652053-1-nb@tipi-net.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260520183801.GE988238@horms.kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290059-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_TO(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290065-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: BC09B597AAE
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A570459892B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 07:38:05PM +0100, Simon Horman wrote:
-> On Wed, May 20, 2026 at 01:50:06PM +0200, Przemyslaw Korba wrote:
-> > During reset recovery, the admin queue returns EBUSY which is expected
-> > behavior. However, the DPLL subsystem was logging these as errors and
-> > incrementing the error counter, potentially leading to unnecessary
-> > warnings and even disabling the DPLL periodic worker if the threshold
-> > was reached.
-> > 
-> > Suppress error logging and error counter increments when the admin
-> > queue returns EBUSY, as this is expected during reset recovery and
-> > not a real failure condition.
-> > 
-> > test case:
-> > - ethtool --reset eth3 irq-shared dma-shared filter-shared offload-shared
-> > mac-shared phy-shared ram-shared
-> > - observe if dmesg EBUSY errors are gone
-> > 
-> > Fixes: d7999f5ea64b ("ice: implement dpll interface to control cgu")
-> > Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-> > ---
-> > v2:
-> > add missing EBUSY check in ice_dpll_pps_update_phase_offsets()
-> > v1:
-> > https://lore.kernel.org/intel-wired-lan/20260520105311.5336-1-przemyslaw.korba@intel.com/T/#u
-> 
-> Thanks for the update.
+Setting RBUF_EEE_EN | RBUF_PM_EN in RBUF_ENERGY_CTRL breaks the RX
+path on GENET hardware once MAC EEE becomes active. RX traffic stops
+flowing while the link stays up and the usual descriptor/RX error
+counters remain quiet. In that state the MAC still accepts frames
+(rbuf_ovflow_cnt keeps climbing) but RBUF no longer forwards them to
+DMA, so rx_packets is no longer incremented at the netdev level. On
+some boards the corruption ends up as a paging fault in
+skb_release_data via bcmgenet_rx_poll on an LPI exit.
 
-Sorry, hit send too soon.
-I meant to also include:
+Reproduced on Pi 4B (BCM2711 + BCM54213PE) and confirmed by Florian
+Fainelli on an internal Broadcom 4908-family board with the same crash
+signature. RBUF_PM_EN is not publicly documented.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This shows up more often now that phy_support_eee() enables EEE by
+default, but it also affects older kernels as soon as TX LPI is
+turned on via ethtool, so it is not specific to recent changes.
+
+Always clear RBUF_EEE_EN | RBUF_PM_EN in bcmgenet_eee_enable_set so
+the bits stay off across resets. UMAC and TBUF setup is left alone so
+TX-side EEE keeps working.
+
+Link: https://github.com/raspberrypi/linux/issues/7304
+Fixes: 6ef398ea60d9 ("net: bcmgenet: add EEE support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+---
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index 54f71b1e85fc..7c11cf916762 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -1368,13 +1368,12 @@ void bcmgenet_eee_enable_set(struct net_device *dev, bool enable)
+ 		reg &= ~(TBUF_EEE_EN | TBUF_PM_EN);
+ 	bcmgenet_writel(reg, priv->base + off);
+ 
+-	/* Do the same for thing for RBUF */
++	/* RBUF EEE/PM can break the RX path on GENET. Keep it disabled. */
+ 	reg = bcmgenet_rbuf_readl(priv, RBUF_ENERGY_CTRL);
+-	if (enable)
+-		reg |= RBUF_EEE_EN | RBUF_PM_EN;
+-	else
++	if (reg & (RBUF_EEE_EN | RBUF_PM_EN)) {
+ 		reg &= ~(RBUF_EEE_EN | RBUF_PM_EN);
+-	bcmgenet_rbuf_writel(priv, reg, RBUF_ENERGY_CTRL);
++		bcmgenet_rbuf_writel(priv, reg, RBUF_ENERGY_CTRL);
++	}
+ 
+ 	if (!enable && priv->clk_eee_enabled) {
+ 		clk_disable_unprepare(priv->clk_eee);
+-- 
+2.53.0
 
 
