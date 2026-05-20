@@ -1,148 +1,160 @@
-Return-Path: <netdev+bounces-289987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6vX1N+bYDWrE4AUAu9opvQ
-	(envelope-from <netdev+bounces-289987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 17:53:10 +0200
+	id 8M+MCI/QDWr53QUAu9opvQ
+	(envelope-from <netdev+bounces-289989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 17:17:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 478C559145E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 17:53:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0435590A5B
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 17:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A48A31B1392
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 15:14:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 05D0F300EE82
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 15:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D662E62B7;
-	Wed, 20 May 2026 15:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40543EF0D7;
+	Wed, 20 May 2026 15:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="NKYi+8O2"
+	dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b="L1rsEDsM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24416.protonmail.ch (mail-24416.protonmail.ch [109.224.244.16])
+Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBB02D94B5
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 15:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1D13EF642;
+	Wed, 20 May 2026 15:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779290059; cv=none; b=LUpYo8HJF9SKYQjfOTVib11xIHo51CrhqOYeWy4n9NH/G7enihcjVR7o4yW27Os+9qa5yVRpUg//Vps5+GZL56aWAC0Z5jxRunYjLg1cYXVTwDhCjdx4kMVvx5uY8RdgxlG/VUaUdxt9jNE//WmtGIBikVld6EcO+qevbgP5Gj8=
+	t=1779290223; cv=none; b=i2a+phbZ2It5ctMUj/bVQXKR++Ajh8qAQvQ4odM07RjLNiCulkYr2HGDndLwW/CMnsZViw4KK8VSMkJ3j1FMDqy/gqvugH2WOGmiN5tTaTCUsEh0M0YUUgpnZhlpJmaHa3wuTeB9T+bSfeapkukT8dmbgRbnCokQCabJrVJ/aFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779290059; c=relaxed/simple;
-	bh=tBU/y8NXwO+HznKDeUAhUrw6+S0levSMmkSBR0DWUOE=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=U6q1QU5MSjM0ERuLIRVb8agyT12L/WfD5nfXrhn4eEAceD0X3MO64m7QQjUJtrDSzfn5dK+dNIttGvwEsmvHDx64z+Zm1dNGUmOLy862n3YmRUzCGBfNptwePFTUS8wJIv/u70OdSyrdgSeRBihwtrXOEkA9X6AZEzZ6ic1sW9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=NKYi+8O2; arc=none smtp.client-ip=109.224.244.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1779290045; x=1779549245;
-	bh=tBU/y8NXwO+HznKDeUAhUrw6+S0levSMmkSBR0DWUOE=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=NKYi+8O2U969qbeyTqpQH7SPY0E8UJibtW3e2OvwqrErFtgRMCynvKNGt19miZg1g
-	 e839TLKNeSRIJ3sYDHV0sbrKk8EzHh1QIDzjbBVWmF3qB5fo7jqVtMXpHpMcOv0LVg
-	 UhCMRybtwMcJecBy68ssQ+Nw0myoe677aNQX5h/OtS1pW1L7vrjZh773Quw+e5Gt7Y
-	 UmySrn1uMzfXOCv6vm1kSUOy123Up5vT+NvkR7FOyQjNJFjY/VYh6Lgjjf7sZQ++Ye
-	 byfAizxlX0wMmO9J/NwVaV4pvqFhDqRL2B13USGfD15GhwUiC45bVd1NliMFnFZafM
-	 HKjxTClv7ZY2A==
-Date: Wed, 20 May 2026 15:13:59 +0000
-To: netdev@vger.kernel.org
-From: "leo.moerlein@proton.me" <leo.moerlein@proton.me>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>, =?utf-8?Q?Leonardo_M=C3=B6rlein?= <leo.moerlein@proton.me>, Russell King <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>, Buday Csaba <buday.csaba@prolan.hu>, Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: phy: mdio_device: leave PHY reset deasserted on unregister
-Message-ID: <20260520151355.1371163-1-leo.moerlein@proton.me>
-Feedback-ID: 198615653:user:proton
-X-Pm-Message-ID: ebeb80a96ffe5828a66b7942284ec46f3495edd3
+	s=arc-20240116; t=1779290223; c=relaxed/simple;
+	bh=2IhOhT/g8r66zAMyV1dJLobZkqvOZ74vllZdclHnYEM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mHLYd6Tydzhwc5Qm25WboTAgGysVWZ151HcIm6kkn0F6a2Dfg9G6uD7iTQ2wWPJfXm7rkJ9ZBrHamreBBel2wy+44dO1rifMmCGkxDIcFQnobARwtV2GSKTywPHe+V/8xMv2kwn4VZTLjRkrsvGHws8vtbwyonCShDUtTK1HEQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=analog.com; spf=pass smtp.mailfrom=analog.com; dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b=L1rsEDsM; arc=none smtp.client-ip=148.163.135.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=analog.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=analog.com
+Received: from pps.filterd (m0167089.ppops.net [127.0.0.1])
+	by mx0a-00128a01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64KDoukh417075;
+	Wed, 20 May 2026 11:16:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=analog.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=DKIM; bh=g5b1M
+	kL3xOTz+4EinhhDYo3oQY1LO8pte1y8xB8Xja4=; b=L1rsEDsMIRc0Wthr2nLYx
+	pyvfPeG9uWAyABalygM8m9woI0Ra8MEdpDUE0dxJ5iwgeL5kSFDAnFL/+i6u2ROy
+	5Dl32dW04+7FgstWxsluvlQjZvb5nNyWNNBlXJJ+tX1FYMm6W6UCEKzrYMo1tSUu
+	0wm1eGlCre7L0M2/O5116vnau2NQ7WRkOTpDe7NigATEmxqh4xnRhDwliOYnaChX
+	VWXYQ2etiGXJ0ECtXxleg7Jr++PZJaPPlcJjAqKa3Sp/TET33LynOt7hVA3RP1NZ
+	3fASv22cj1gAYqCKgcTGDklSt1iKm8S1bvPMzin+dOW7tavaR6HAM+M4mzjvSh7n
+	A==
+Received: from nwd2mta4.analog.com ([137.71.173.58])
+	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 4e9e6wraq7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 May 2026 11:16:49 -0400 (EDT)
+Received: from ASHBMBX9.ad.analog.com (ASHBMBX9.ad.analog.com [10.64.17.10])
+	by nwd2mta4.analog.com (8.14.7/8.14.7) with ESMTP id 64KFGmnw037607
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 20 May 2026 11:16:48 -0400
+Received: from ASHBCASHYB5.ad.analog.com (10.64.17.133) by
+ ASHBMBX9.ad.analog.com (10.64.17.10) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.37; Wed, 20 May 2026 11:16:48 -0400
+Received: from ASHBMBX8.ad.analog.com (10.64.17.5) by
+ ASHBCASHYB5.ad.analog.com (10.64.17.133) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.37; Wed, 20 May 2026 11:16:48 -0400
+Received: from zeus.spd.analog.com (10.66.68.11) by ashbmbx8.ad.analog.com
+ (10.64.17.5) with Microsoft SMTP Server id 15.2.1748.37 via Frontend
+ Transport; Wed, 20 May 2026 11:16:48 -0400
+Received: from xvr.ad.analog.com ([10.48.65.167])
+	by zeus.spd.analog.com (8.15.1/8.15.1) with ESMTP id 64KFGVex021857;
+	Wed, 20 May 2026 11:16:34 -0400
+From: Ciprian Regus <ciprian.regus@analog.com>
+To: <selvamani.rajagopal@onsemi.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+        <parthiban.veerasooran@microchip.com>, <ciprian.regus@analog.com>
+Subject: Re: [PATCH net 1/2] net: ethernet: oa_tc6: Interrupt is active low, level triggered.
+Date: Wed, 20 May 2026 18:16:21 +0300
+Message-ID: <20260520151621.405125-1-ciprian.regus@analog.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CY8PR02MB9249D2392242AF27988B9C0583042@CY8PR02MB9249.namprd02.prod.outlook.com>
+References: <CY8PR02MB9249D2392242AF27988B9C0583042@CY8PR02MB9249.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	FROM_DN_EQ_ADDR(1.00)[];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ADIRuleOP-NewSCL: Rule Triggered
+X-Proofpoint-GUID: gYNbkJvFd1D6ArbRs6EZuWyqJN6OrKCd
+X-Proofpoint-ORIG-GUID: gYNbkJvFd1D6ArbRs6EZuWyqJN6OrKCd
+X-Authority-Analysis: v=2.4 cv=K8gS2SWI c=1 sm=1 tr=0 ts=6a0dd061 cx=c_pps
+ a=3WNzaoukacrqR9RwcOSAdA==:117 a=3WNzaoukacrqR9RwcOSAdA==:17
+ a=ZsT_3VxfWKg2-RS7:21 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=0sLvza09kfJOxVLZPwjg:22 a=Z0pTeXoby7EwIRygza74:22 a=GrngUzCRepzmGNCGzS8A:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDE0OCBTYWx0ZWRfX9et7EkN5k8VV
+ 1qGwYQyfhdHOsPFluyLBoHspuQy9OhEg8EXqOpx08QI1fNESKseMO9+XrGzWmfi4g6rAh4jP8mk
+ 9HLs2o9cxDDvozYtE9fOe+YmAV+/sm4UM0xp7WRmdiJ93xXkClOMAfFadUXQz0m01pxDohOeXWu
+ j6nH/UcnTL+5hooufwIyOOaz2R6FJaUC2tZzj1Nsl8rtH9xiICNlUuQq6Q42pmd/VS7B+9vDK5q
+ hFt/nTjdz6RA0Hi1/K+3+I8C/Rh2b1CQkZg1snbRP7FCBpzJqWyfYmOstedEtD2kCRnp6lY/Ttg
+ +icJlMwPW1AJnVS3MUU1M7El53hcIlEgkO8Qpu7A1luTVwJuupmugDcRYTfZpfV1LV0GKiuP4Tj
+ DWC5d9mVlq4mVqwySLcgzI+43rh0X+3dw/aujFNiiXTZYr3rMVCYRqRrrdBQz5KbCaSAxzUnkLn
+ XRfponGUFfvs0AcStOg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-20_03,2026-05-18_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 lowpriorityscore=0 spamscore=0 impostorscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1011 bulkscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605200148
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
-	R_DKIM_ALLOW(-0.20)[proton.me:s=protonmail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[analog.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[analog.com:s=DKIM];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[ciprian.regus@analog.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-289989-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289987-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leo.moerlein@proton.me,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[proton.me:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[analog.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,proton.me:email,proton.me:mid,proton.me:dkim]
-X-Rspamd-Queue-Id: 478C559145E
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,analog.com:mid,analog.com:dkim]
+X-Rspamd-Queue-Id: B0435590A5B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Leonardo M=C3=B6rlein <leo.moerlein@proton.me>
+>        ret = devm_request_irq(&tc6->spi->dev, tc6->spi->irq, oa_tc6_macphy_isr,
+>-                              IRQF_TRIGGER_FALLING, dev_name(&tc6->spi->dev),
+>+                              IRQF_TRIGGER_LOW, dev_name(&tc6->spi->dev),
+>                               tc6);
 
-Some PHY devices are discovered again after the MDIO bus is torn down and
-reprobed, for example when a parent driver first returns -EPROBE_DEFER and
-is probed again later.
+oa_tc6_macphy_isr() doesn't clear the interrupt condition or disable the
+interrupt. So it will be triggered several times until the oa tc6
+thread gets to run. Should we use something like this instead?
 
-This breaks boards where external PHYs have per-device reset lines
-described through reset-gpios. mdiobus_register_device() acquires the
-reset GPIO and asserts reset, mdio_probe() later deasserts it for the
-active device, but mdiobus_unregister_device() used to release the GPIO
-descriptor without first driving the line back to the inactive state.
-If that descriptor was the last owner, then the PHY could remain held
-in reset across the next bus registration and disappear from the reprobe
-scan.
+devm_request_threaded_irq(..., IRQF_TRIGGER_LOW | IRQF_ONESHOT, ...)
 
-On a Lantiq GSWIP based FRITZ!Box 7360 v2 this left PHYs 0 and 1 missing
-after a deferred reprobe, while PHYs without external reset lines were
-still found. DSA then failed to attach those ports with -ENODEV.
-
-Before releasing optional reset resources, deassert reset again for
-PHY devices so the hardware stays discoverable across a later reprobe.
-
-Link: https://github.com/openwrt/openwrt/issues/20629
-Fixes: 8ea25274ebaf2 ("net: mdiobus: release reset_gpio in mdiobus_unregist=
-er_device()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Leonardo M=C3=B6rlein <leo.moerlein@proton.me>
-Assisted-by: GitHubCopilot:GPT-5.4
----
- drivers/net/phy/mdio_device.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
-index 56080d3d2d25..9caeb9ea5248 100644
---- a/drivers/net/phy/mdio_device.c
-+++ b/drivers/net/phy/mdio_device.c
-@@ -215,6 +215,12 @@ int mdiobus_unregister_device(struct mdio_device *mdio=
-dev)
- =09if (mdiodev->bus->mdio_map[mdiodev->addr] !=3D mdiodev)
- =09=09return -EINVAL;
-=20
-+=09/*
-+=09 * Leave optional reset lines deasserted before releasing them so devic=
-es
-+=09 * remain discoverable across a later bus reprobe.
-+=09 */
-+=09mdio_device_reset(mdiodev, 0);
-+
- =09mdio_device_unregister_reset(mdiodev);
-=20
- =09mdiodev->bus->mdio_map[mdiodev->addr] =3D NULL;
---=20
-2.51.2
-
+(together with some rework to call oa_tc6_try_spi_transfer() from the
+threaded irq part).
 
 
