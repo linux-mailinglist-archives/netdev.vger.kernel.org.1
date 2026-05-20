@@ -1,214 +1,365 @@
-Return-Path: <netdev+bounces-290066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QC8sFC0EDmqs5QUAu9opvQ
-	(envelope-from <netdev+bounces-290066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:57:49 +0200
+	id 6Ax4C50vDmoK7wUAu9opvQ
+	(envelope-from <netdev+bounces-290067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:03:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E227059779E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:57:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADC8D59BA70
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:03:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B8DA932BBF32
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:51:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 95CC439AD0CE
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:52:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A873FF1B8;
-	Wed, 20 May 2026 18:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1364028E2;
+	Wed, 20 May 2026 18:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ctTuXHwj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZAESE6/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f225.google.com (mail-vk1-f225.google.com [209.85.221.225])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C443FE660
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B354028CB
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779302767; cv=none; b=hQjqDCbYVVQUHjihdjcWMGTgki839NI2/Ki6aMFh6xayr3Lk8bzVVbEG7HbvH1DTP0eRaaork3EA0tOFYG8ayo6PRhqoE7SK+7sqaGyHhfvEUD4ejAejeXLjgIHCS/PV1tSC+K9v4V0AllmlBKMNp3/pDj8R1nI+RDc5J5UDpHY=
+	t=1779302923; cv=none; b=Quk7Un/UEA5GmOkm4v4nl/7+E7sFKJztTzwhmQ6dTFi9YIBT7DNQ2dUo+lxQ0E01Vy8C7rRT/qGOvULWHuZIWatzuyeYpWjRqsOmNY/DwoCmSoDiMZPFhkByRYVv2H3Vf77GUhgMGa8jAc7vtBAMfNvUZc7KTnbGNTARA9xK6y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779302767; c=relaxed/simple;
-	bh=IEgOhX5mSlGgMwF6CJs9QGBb5c//pY837CoFBbgWLjI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LgKvk0FHgbshhy9MyMIxciqRJFQcGrnk4bWyBVRaBR9r6XV9SsEsvJ/iyuJ/XQgDthZoQV8Miu+NuB8k4Uplef7oR9dmLnQC3d4WETTDafwMKyUYrctCxZvYK3h3TE+PNTdgCGnPP/too5u/Ouasxie0co0R7LOn9b7Sk3hYxms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ctTuXHwj; arc=none smtp.client-ip=209.85.221.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vk1-f225.google.com with SMTP id 71dfb90a1353d-57746f02da7so3407537e0c.3
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:46:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779302762; x=1779907562;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yz8WNPTLivvf8aO0NCQc1Y4S+bsvggq3/xlwaBZWzOA=;
-        b=MpM9rnniZcR3UJHtSr4ufAd1wt6iWFfjR++04d4u4O5qEumaN7RwBLXWClEOxdF9o2
-         SGtW75Sz9wOZdGEqjvptC/MijqmvP2agRXxPXWJDHTOHxdv06Tvvnp0jD2bLQa+bViiQ
-         vcPkx5XWuVB2MzePMOO4a9VLJqrBoiyJ9bfdIpbsxSHY/SeVmMHr9K4J9rak3DjXZVqW
-         mWSHIAJhjMJiaC2aGzgKnyEWJyGpCGi7piA4uDFu173yUm+x+MH/RPlHi21uQbVGvwyN
-         uOT2+tXHyoX5vW449I+qAmrre+TaG0ErpJ7+OrnK+47uyK42pNcU4Ctfz+YcZF+U6Li8
-         pVoA==
-X-Forwarded-Encrypted: i=1; AFNElJ8KWhsIqK3CbzDgqV0mVgxqOArzazumCszpJ1juKLhHKAD7VrhXgYdyPie+25iJb8mUCVSAX9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjcNhWYIw30vqeZhisegBYXrlnVXxB3BBanuOz6TtNLhxlgt6u
-	Fl9c8xafdU2nMT9hEjyepGOrjNJFgHwc2arNKlttdxHBDo/ksUzsa8ilW/isFYDyAPDWfUeKtbm
-	2CiUA/IIahoHIhplDXTUIzzlKXwGK7DVAz8hUFlvxmm2geuzq2GyPk0Iekl2Z+XRnGavWDxsThg
-	NNrcbVOKH+HQp48GgFEhTl13WQriQuSQxya01vOHStttnsV7cgR5hgqWStSkkHoRGGLdVEDCSKp
-	S//wrwnkZ334CgF
-X-Gm-Gg: Acq92OEhpzRNJ00d87dfJ+FWoP50nKZXY4vD80BYr1UPBxZz/DGuBSg3p+wESj1XBgK
-	aifed365vf9IhxrAwtANsTDA57Uo8qlqrKma37wjnLLPYp3J3yqMdetCbqlu8/otZ47uE13QtEn
-	eZXuvtdKI3kVkEFFxokXRs07L615ARRbha7Wu322NyOOKvqTsvYmA+CanYFz9Iq7q+fUAsmPTQ5
-	iorzh1HwVCXwW7VxkDjlJGPkiBdI4/0JzkevpTSVPTP9Xoa9Uw7WDyZYc8iDdjE9Lh2W/Zn6+52
-	lzHrtHF+PNOwi8nsiQa6CJWXKfKAF/zLDtPLc3wKxREjvvbcjPZ/Tj8CKuTNGCjFVxL1aVskgAB
-	cDbSbUzr7wGJ7JUfgpABhrtkibLlP3qxnqe8Ec9GJS4HCI2FFpRo6lk1pMVUM6qGFbEcNd5JCnd
-	X4afPnfyo3GqvDmKD2EkpXLlSkfKE9SqKFMwwqmkrlKDrlml25Ag7h5HpUw8pvpw==
-X-Received: by 2002:a05:6122:4f9f:b0:56f:6add:9029 with SMTP id 71dfb90a1353d-5760be34e4amr15507013e0c.1.1779302762471;
-        Wed, 20 May 2026 11:46:02 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-16.dlp.protect.broadcom.com. [144.49.247.16])
-        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-5760f7b1612sm1444697e0c.4.2026.05.20.11.46.02
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 May 2026 11:46:02 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-2f525565b33so6512249eec.0
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:46:02 -0700 (PDT)
+	s=arc-20240116; t=1779302923; c=relaxed/simple;
+	bh=+8/Erynk4MZt8ofJCHgv8LLJ6eah4GjJA0JiD2n6b0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZoY9wBcNNI3FXnMTLpfrTzwy6690fzcL1dHZQxpMvKfWrBBRMlacTwHC+W9oPoUYu8yvZspB/m6CSJ/F4VxIDqYEAEkyo71d+qwTBV1ICiBLwP4tEgPF10XOIwCJwIzbICfURSHbrPXSyKjdP/N4u/jmf+9jrj+crjy2t/GVtpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TZAESE6/; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-45d96d21e82so3080290f8f.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:48:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1779302761; x=1779907561; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yz8WNPTLivvf8aO0NCQc1Y4S+bsvggq3/xlwaBZWzOA=;
-        b=ctTuXHwjiEwLHDYK0cmw9W7MsHzoHq4SxYuF5718RCg8h53xzdyt/KVbgW6a1kQcx6
-         qGnfUo8n7YKn+WfJU2qFuQO4hc6sOoRfuNhG3mCJ6zX37xqMDW66iouGNWQSyxv10UQW
-         9kBkPvCxjAYEoHl4REQvFEhY7EwVxv7taDxxM=
-X-Forwarded-Encrypted: i=1; AFNElJ/HTBbOsiJXxkGiisoBHBikMv+kIHXi3VETI4JrWGX5Sl+MCTGOfQyEWcjPm9PQvAFiaIwwybo=@vger.kernel.org
-X-Received: by 2002:a05:7300:5b88:b0:300:255:22cf with SMTP id 5a478bee46e88-30398652e7emr12183196eec.28.1779302761019;
-        Wed, 20 May 2026 11:46:01 -0700 (PDT)
-X-Received: by 2002:a05:7300:5b88:b0:300:255:22cf with SMTP id 5a478bee46e88-30398652e7emr12183176eec.28.1779302760431;
-        Wed, 20 May 2026 11:46:00 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-304052f79ecsm6188546eec.11.2026.05.20.11.45.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 May 2026 11:45:59 -0700 (PDT)
-Message-ID: <59df32fc-59eb-429e-aca1-2c5a64c988fc@broadcom.com>
-Date: Wed, 20 May 2026 11:45:57 -0700
+        d=gmail.com; s=20251104; t=1779302916; x=1779907716; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aPR9vml157T4AFMb0/LQfAP6U5qDsLmLgjLzNQHI+FU=;
+        b=TZAESE6/Xgxb8TYn8+/gTIsxXyd3d81qZx9mcMhLsdEQyxO6qyqQRBIudwLxD10PeV
+         +/C/SovMbmgAIhe2Fo/34b/JKkyZ49zzzivfHURUa1ECM5EUpWc4C5yDsLki82knLJ62
+         ochwZIGtiIr+4Mta+XNK3LABIMgUqE5rpe7FHaPCMoBRZMNTYDyZtteKMFsrt06swbF5
+         vxHcGTdnju6tjA/iVcjYdsvBT8DJmLjH6DwaHBbdC0rdkD2zboMWStmBxJxdoquDREps
+         9RfBqygRSpiCzyhBLd/dQn2cgYtt0o0YJrbPXo/Y0uoO7GEa/XNKETFlm/BUYVbkTWDi
+         5fvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779302916; x=1779907716;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aPR9vml157T4AFMb0/LQfAP6U5qDsLmLgjLzNQHI+FU=;
+        b=G1vv0++uBi4wCeRTfvNj+550CcclU+Qvc4FGasLP0ieOGq+bf6vuKC59fFb2uyphU/
+         WnzUgBp3jx3KD44DOmmFNr47sZiRuZy/tKDK+3NkgY3HF+UTqAcrWZe78c+sMRByuPXn
+         8+lRIQ5s93VBA4z3BzCkdibWqjZm3mpbMBkLfK2oz6pxj+uuRTPfAYLaYrmd3XXQtLDt
+         pPtLFaY+1mLxtGnKUu0ztMWy20kj+b/WaQBPVDYWzwjiG/Cb2rQ4aLJ+wdQsz+nGKjjf
+         /a3dHiYfbuF+hqN6dHad6X+EG+kD/FFqqQwMsuVu3eUu5t2qTfuUnJq5jVMNO+cFtDZW
+         +LYg==
+X-Forwarded-Encrypted: i=1; AFNElJ9pPYGJS4EkAKmrUidf/UCS1zphGdBW0KVOfR26S3GUNNSFkkutOEQI63VjTmW7TxOUh1mKmpI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2rEcv1rrGWB4DU8hwHMGjy5vqTbEmNwThUWtZEwKY/cPX0eRO
+	1p9eSszJ5WgSpOlvzx2Wge7FRmNroHUaxqSyMHeHkyPjE29kYqdYdJvD
+X-Gm-Gg: Acq92OHfODfgNAkfGG9cpy+HVIF7vgWiiKKy71XOCI9/T0oZB/H1JEQ7jg68wTJH76m
+	sY725eg2zCJXmWthIEgprPY/jvWyNL5FgRBP16kwvZje/TQ3V5p2W1wXWBtxIuv5b+uwg9xmU82
+	4NHhD07jCY4o/pODfOqlTadqxABoT9g14qoTDxlzKZFLjnZvdAv08Lyh6Me+oVyNx6SvwUq2gwV
+	YkV3pVeyMOdM8e0Le1oU9F7jykHdpPZIkD40iLLRmcXId4Jmsctni4Y/ygOc2HRYA2EZ9BtWw70
+	oIYLxcQryw45k+dMv1QzKcaU6QuCsXsQqb824QCeClONx91fTOTaxGzrZ5p0sdYbUEgDLyqsxJB
+	VGCQ1xWlqQ0uAtbovxL0qjmYKKK4VcIl9PKQlfOtnAfb0pPHcl+S3QoRR/C5PWrFuommxEwVRpE
+	czA6Vh7lklDpik38yjrrq/f0lDzCoPlqIJ/q4xj7PLU+/1CWZLZsAQBCw=
+X-Received: by 2002:a05:600c:3e11:b0:48f:e230:c3fb with SMTP id 5b1f17b1804b1-48fe6626a8emr375953415e9.33.1779302916153;
+        Wed, 20 May 2026 11:48:36 -0700 (PDT)
+Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49033d3514esm11300845e9.3.2026.05.20.11.48.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 11:48:35 -0700 (PDT)
+Date: Wed, 20 May 2026 20:48:33 +0200
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: Jordan Rife <jordan@jrife.io>
+Cc: bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net,
+	john.fastabend@gmail.com, ast@kernel.org, andrii@kernel.org,
+	yonghong.song@linux.dev, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH bpf-next v6 3/6] bpf: add bpf_icmp_send kfunc
+Message-ID: <ag4CAVec9jPCAuD0@gmail.com>
+References: <20260518122842.218522-1-mahe.tardy@gmail.com>
+ <20260518122842.218522-4-mahe.tardy@gmail.com>
+ <onco52d3vpxkcc6hh3s5vuqjxanasucteq7wnqfqgzg4d65alc@q7h22nu3ytjn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bcmgenet: keep RBUF EEE/PM disabled
-To: Nicolai Buchwitz <nb@tipi-net.de>, opendmb@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: justin.chen@broadcom.com, phil@raspberrypi.com,
- bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260520184320.652053-1-nb@tipi-net.de>
-Content-Language: en-US, fr-FR
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20260520184320.652053-1-nb@tipi-net.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <onco52d3vpxkcc6hh3s5vuqjxanasucteq7wnqfqgzg4d65alc@q7h22nu3ytjn>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-290067-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290066-lists,netdev=lfdr.de];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[tipi-net.de,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linux.dev,iogearbox.net,gmail.com,kernel.org,google.com,redhat.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tipi-net.de:email,broadcom.com:email,broadcom.com:mid,broadcom.com:dkim];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[florian.fainelli@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: E227059779E
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: ADC8D59BA70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/20/26 11:43, Nicolai Buchwitz wrote:
-> Setting RBUF_EEE_EN | RBUF_PM_EN in RBUF_ENERGY_CTRL breaks the RX
-> path on GENET hardware once MAC EEE becomes active. RX traffic stops
-> flowing while the link stays up and the usual descriptor/RX error
-> counters remain quiet. In that state the MAC still accepts frames
-> (rbuf_ovflow_cnt keeps climbing) but RBUF no longer forwards them to
-> DMA, so rx_packets is no longer incremented at the netdev level. On
-> some boards the corruption ends up as a paging fault in
-> skb_release_data via bcmgenet_rx_poll on an LPI exit.
+On Mon, May 18, 2026 at 06:33:45PM -0700, Jordan Rife wrote:
+> On Mon, May 18, 2026 at 12:28:39PM +0000, Mahe Tardy wrote:
+> > This is needed in the context of Tetragon to provide improved feedback
+> > (in contrast to just dropping packets) to east-west traffic when blocked
+> > by policies using cgroup_skb programs. We also extend this kfunc to tc
+> > program as a convenience.
+> > 
+> > This reuses concepts from netfilter reject target codepath with the
+> > differences that:
+> > * Packets are cloned since the BPF user can still let the packet pass
+> >   (SK_PASS from the cgroup_skb progs for example) and the current skb
+> >   need to stay untouched (cgroup_skb hooks only allow read-only skb
+> >   payload).
+> > * We protect against recursion since the kfunc, by generating an ICMP
+> >   error message, could retrigger the BPF prog that invoked it.
+> > 
+> > For now, we support cgroup_skb and tc program types. For cgroup_skb and
+> > tc egress, almost everything should be good. However for tc ingress:
+> > - packet will not be routed yet: need to set the net device for
+> >   icmp_send, thus the call to ip[6]_route_reply_fill_dst.
+> > - fragments could trigger hook: icmp_send will only reply to fragment 0.
+> > - ensure the ip headers is linearized before processing, and zero out
+> >   the SKB control block after cloning to prevent icmp_send()/icmpv6_send()
+> >   from misinterpreting garbage data as IP options.
+> > 
+> > Only ICMP_DEST_UNREACH and ICMPV6_DEST_UNREACH are currently supported.
+> > The interface accepts a type parameter to facilitate future extension to
+> > other ICMP control message types.
+> > 
+> > Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
+> > ---
+> >  net/core/filter.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 118 insertions(+)
+> > 
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 9590877b0714..843fa775596b 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -84,6 +84,8 @@
+> >  #include <linux/un.h>
+> >  #include <net/xdp_sock_drv.h>
+> >  #include <net/inet_dscp.h>
+> > +#include <linux/icmpv6.h>
+> > +#include <net/icmp.h>
+> > 
+> >  #include "dev.h"
+> > 
+> > @@ -12464,6 +12466,110 @@ __bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len)
+> >  	return 0;
+> >  }
+> > 
+> > +static DEFINE_PER_CPU(bool, bpf_icmp_send_in_progress);
+> > +
+> > +/**
+> > + * bpf_icmp_send - Send an ICMP control message
+> > + * @skb_ctx: Packet that triggered the control message
+> > + * @type: ICMP type (only ICMP_DEST_UNREACH/ICMPV6_DEST_UNREACH supported)
+> > + * @code: ICMP code (0-15 for IPv4, 0-6 for IPv6)
+> > + *
+> > + * Sends an ICMP control message in response to the packet. The original packet
+> > + * is cloned before sending the ICMP message, so the BPF program can still let
+> > + * the packet pass if desired.
+> > + *
+> > + * Currently only ICMP_DEST_UNREACH (IPv4) and ICMPV6_DEST_UNREACH (IPv6) are
+> > + * supported.
+> > + *
+> > + * Recursion protection: If called from a context that would trigger recursion
+> > + * (e.g., root cgroup processing its own ICMP packets), returns -EBUSY on
+> > + * re-entry.
+> > + *
+> > + * Return: 0 on success, negative error code on failure:
+> > + *         -EINVAL: Invalid code parameter
+> > + *         -EBADMSG: Packet too short or malformed
+> > + *         -ENOMEM: Memory allocation failed
+> > + *         -EBUSY: Recursion detected
+> > + *         -EHOSTUNREACH: Routing failed
+> > + *         -EPROTONOSUPPORT: Non-IP protocol
+> > + *         -EOPNOTSUPP: Unsupported ICMP type
+> > + */
+> > +__bpf_kfunc int bpf_icmp_send(struct __sk_buff *skb_ctx, int type, int code)
+> > +{
+> > +	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
+> > +	struct sk_buff *nskb;
+> > +	bool *in_progress;
+> > +
+> > +	in_progress = this_cpu_ptr(&bpf_icmp_send_in_progress);
+> > +	if (*in_progress)
+> > +		return -EBUSY;
+> > +
+> > +	switch (skb->protocol) {
+> > +#if IS_ENABLED(CONFIG_INET)
+> > +	case htons(ETH_P_IP):
+> > +		if (type != ICMP_DEST_UNREACH)
+> > +			return -EOPNOTSUPP;
+> > +		if (code < 0 || code > NR_ICMP_UNREACH)
+> > +			return -EINVAL;
+> > +
+> > +		nskb = skb_clone(skb, GFP_ATOMIC);
+> > +		if (!nskb)
+> > +			return -ENOMEM;
+> > +
+> > +		if (!pskb_network_may_pull(nskb, sizeof(struct iphdr))) {
+> > +			kfree_skb(nskb);
+> > +			return -EBADMSG;
 > 
-> Reproduced on Pi 4B (BCM2711 + BCM54213PE) and confirmed by Florian
-> Fainelli on an internal Broadcom 4908-family board with the same crash
-> signature. RBUF_PM_EN is not publicly documented.
+> nit: Instead of having several places where you call kfree_skb, maybe
+> consider just cleaning up in once place at the end like:
 > 
-> This shows up more often now that phy_support_eee() enables EEE by
-> default, but it also affects older kernels as soon as TX LPI is
-> turned on via ethtool, so it is not specific to recent changes.
+> out:
+> 	if (nskb)
+> 		kfree_skb(nskb);
+> 	return err;
+> 	
+> then in places like this do something like:
 > 
-> Always clear RBUF_EEE_EN | RBUF_PM_EN in bcmgenet_eee_enable_set so
-> the bits stay off across resets. UMAC and TBUF setup is left alone so
-> TX-side EEE keeps working.
-> 
-> Link: https://github.com/raspberrypi/linux/issues/7304
-> Fixes: 6ef398ea60d9 ("net: bcmgenet: add EEE support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+> 	err = -EBADMSG;
+> 	goto out;
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Yep yep I see, just if I follow Stanislav recommendation to use consume_skb
+in the success path[^1], I think it would be simpler to keep the other error
+paths with kfree_skb and returning the error.
 
-Thank you Nicolai!
--- 
-Florian
+[^1]: https://lore.kernel.org/bpf/ags3HARTFYwKU8nR@devvm7509.cco0.facebook.com/
+
+> 
+> > +		}
+> > +
+> > +		if (!skb_dst(nskb) && ip_route_reply_fill_dst(nskb) < 0) {
+> > +			kfree_skb(nskb);
+> > +			return -EHOSTUNREACH;
+> > +		}
+> > +
+> > +		memset(IPCB(nskb), 0, sizeof(struct inet_skb_parm));
+> > +
+> > +		*in_progress = true;
+> > +		icmp_send(nskb, type, code, 0);
+> > +		*in_progress = false;
+> > +		kfree_skb(nskb);
+> > +		break;
+> > +#endif
+> > +#if IS_ENABLED(CONFIG_IPV6)
+> > +	case htons(ETH_P_IPV6):
+> > +		if (type != ICMPV6_DEST_UNREACH)
+> > +			return -EOPNOTSUPP;
+> > +		if (code < 0 || code > ICMPV6_REJECT_ROUTE)
+> > +			return -EINVAL;
+> > +
+> > +		nskb = skb_clone(skb, GFP_ATOMIC);
+> > +		if (!nskb)
+> > +			return -ENOMEM;
+> > +
+> > +		if (!pskb_network_may_pull(nskb, sizeof(struct ipv6hdr))) {
+> > +			kfree_skb(nskb);
+> > +			return -EBADMSG;
+> > +		}
+> > +
+> > +		if (!skb_dst(nskb) && ip6_route_reply_fill_dst(nskb) < 0) {
+> > +			kfree_skb(nskb);
+> > +			return -EHOSTUNREACH;
+> > +		}
+> > +
+> > +		memset(IP6CB(nskb), 0, sizeof(struct inet6_skb_parm));
+> > +
+> > +		*in_progress = true;
+> > +		icmpv6_send(nskb, type, code, 0);
+> > +		*in_progress = false;
+> > +		kfree_skb(nskb);
+> > +		break;
+> > +#endif
+> > +	default:
+> > +		return -EPROTONOSUPPORT;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  __bpf_kfunc_end_defs();
+> > 
+> >  int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
+> > @@ -12506,6 +12612,10 @@ BTF_KFUNCS_START(bpf_kfunc_check_set_sock_ops)
+> >  BTF_ID_FLAGS(func, bpf_sock_ops_enable_tx_tstamp)
+> >  BTF_KFUNCS_END(bpf_kfunc_check_set_sock_ops)
+> > 
+> > +BTF_KFUNCS_START(bpf_kfunc_check_set_icmp_send)
+> > +BTF_ID_FLAGS(func, bpf_icmp_send)
+> > +BTF_KFUNCS_END(bpf_kfunc_check_set_icmp_send)
+> > +
+> >  static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
+> >  	.owner = THIS_MODULE,
+> >  	.set = &bpf_kfunc_check_set_skb,
+> > @@ -12536,6 +12646,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_sock_ops = {
+> >  	.set = &bpf_kfunc_check_set_sock_ops,
+> >  };
+> > 
+> > +static const struct btf_kfunc_id_set bpf_kfunc_set_icmp_send = {
+> > +	.owner = THIS_MODULE,
+> > +	.set = &bpf_kfunc_check_set_icmp_send,
+> > +};
+> > +
+> >  static int __init bpf_kfunc_init(void)
+> >  {
+> >  	int ret;
+> > @@ -12557,6 +12672,9 @@ static int __init bpf_kfunc_init(void)
+> >  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+> >  					       &bpf_kfunc_set_sock_addr);
+> >  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
+> > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SKB, &bpf_kfunc_set_icmp_send);
+> > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_icmp_send);
+> 
+> Thanks, this could come in handy for TC.
+> 
+> I'm not quite sure yet on using it in lieu of the sock_destroy kfunc for
+> the UDP connected socket use case we discussed at LSFMMBPF. For socket
+> LB mode in Cilium to make this work you'd need to add at least one new
+> map lookup in the fast path to check for backend liveness and this
+> partially defeats the performance benefits of socket LB which right
+> now avoids service + backend lookups in the fast path for connected UDP.
+> Ultimately, it might be better to stick with sock_destroy to kill
+> sockets out-of-band for that use case, but still it's good to have this
+> option.
+> 
+> > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &bpf_kfunc_set_icmp_send);
+> >  	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SOCK_OPS, &bpf_kfunc_set_sock_ops);
+> >  }
+> >  late_initcall(bpf_kfunc_init);
+> > --
+> > 2.34.1
+> > 
+> 
+> Jordan
 
