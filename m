@@ -1,255 +1,195 @@
-Return-Path: <netdev+bounces-290037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290038-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMbDGpolDmr26QUAu9opvQ
-	(envelope-from <netdev+bounces-290037-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:20:26 +0200
+	id ACAENkn9DWoo5QUAu9opvQ
+	(envelope-from <netdev+bounces-290038-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:28:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B637A59AB85
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:20:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8625963F6
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 63C7F33C38C2
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:11:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8688530874D5
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E563F9287;
-	Wed, 20 May 2026 18:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23113A6B6D;
+	Wed, 20 May 2026 18:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="njSup9zs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OPilAgUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE0F3A6B6D;
-	Wed, 20 May 2026 18:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779300701; cv=none; b=csz8FvVdASEmVy93vW6A2Oic/rlwds1k+Gk4bVHey1bRqklACM7K9BwtXYS+QQdgxSYd567PTmqleN0Q8Z5qgR4tYTGdZoAHayD/n+ZsuAOPZdervzKsJgyl5Vqd9UVfpX3xwNh42WQK3wbyjMY1W2ElE0wAuoiEzVARV+CzAus=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779300701; c=relaxed/simple;
-	bh=ReI7Pe1k2azsgNrEH63iUCivw8znTCYb+QNRCjEgjIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VllHL7sn2uofsk0A2JsI7ukOU9HXDOxDGQA0qheG2vdsRJciGRtj1Z+aqrjdrwjH6YCu/Zk+RRKdTadBo4UbnroO2KrefqwtNEsIq6Hrn2bOnDcUZPAdqgf/XdA6xq0wKkxvUcC/F18z64FwsTmRFV0VXE/mO8LCjbM+DHUN5Qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=njSup9zs; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 59A3D20B7168; Wed, 20 May 2026 11:11:33 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 59A3D20B7168
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1779300693;
-	bh=XfQvxMfI6M+Oo70/NIQBu2bKqGiJTjH2WuohEgBfMOY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=njSup9zsmcuXswBqk9kKeBxXe8+Tef4n3n6ki/hOJVKKtlxuW10NC0MeqJya4TJPr
-	 PXP0GCmnluc4tjP9pMAg2v+gdgDWzxivbh/pyd3Zg0hOOet44+nyfT0cmvopslIjPn
-	 OZwNqkKxfitaA/lk+vZW3JVozEpeJy/1i1T7zOoY=
-Date: Wed, 20 May 2026 11:11:33 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	stephen@networkplumber.org, jacob.e.keller@intel.com,
-	dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
-	john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
-	yury.norov@gmail.com
-Subject: Re: [PATCH net 1/2] net: mana: Add NULL guards in teardown path to
- prevent panic on attach failure
-Message-ID: <ag35VVYd0BOSYbrK@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260518194654.735580-2-dipayanroy@linux.microsoft.com>
- <20260519225556.3939204-1-kuba@kernel.org>
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892703D5647
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:12:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779300761; cv=pass; b=VcN+clvFr77aLSLesTjDuhEaEK+ZIdvtM9aq4okMJjd/TCdyuUYF5kJ5yhbEnqOOdGJo8C5SEQwuJp+aEwmC7beEjOVAFxJttdl7HmVfFgan9fQBJu6Ze47+0RCPbLTpPsXiuNFIzNNVhzyIk1Z/ksmMA2gYpNBe5EM9wsN4T3A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779300761; c=relaxed/simple;
+	bh=wchdTj3LxKmXT7X7x0m+2ZtiEJSduJaU2fpigkUEdPE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qX/W7jUM0rSVyTFr8FMOiIpjsMHsx+T4tEcPgI13UR/FY6VQ6k1z2K1ONYc6lVxuB8eG97S6q35Fv/jQMNbivQdY2pdPlBBwpB2knUPB1C74tQJy8pjfayAi3RF+Q0rYyHnI6TujBP3g1+HqFRqTfUtzko2yX5AziriGqV1FaCg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OPilAgUy; arc=pass smtp.client-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-132d1b2519eso12087721c88.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:12:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779300760; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XGLTcVuFXCNaZm39xCYZ52VsT+HY6Zhmd5k+vKZLkdcYgBEmMzkY8Bdoy1Rvwy3adz
+         xLx/Te+UWhNlNJUajHB2cEj2SGfm3NYmp+xSMYeg3CC2rwyjw20OF5sFgbRKmZibf4qI
+         JXFvgbDPSwASOXcD+8km7DXguJWv0DDQ3dd+1CYdtkj3iMVX7m01f4th7UDf7btetm9i
+         xtOMElEALkLkDd0plHG/DwiN1ihXEe7Pb8ToMtnO6TeMuU+MerIZHm2a0AwsQtZUrgcO
+         QbvnRiPbdJkKS0z23/gYrUdD9QfvQzlOyd3rXH8gjIX3tyST5umgp44N2yo0ad0IXTnU
+         RVQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=sdU4pIR9GEFmUiowF5+zoSCvVIVv3g6BVDDhCzEtXBY=;
+        fh=YcZMj0rCX6gBEcFjijImZBB2uKsyoVqFIOu2WQnkF74=;
+        b=NUQTiuw6UYvbTzIhEgH+LShf7zAGCTBb6VkY9ih1SwfMle460D0e5qVcNm8GWapgII
+         wkQKHX+eDyOhrOXdUofUv6g/kjn+QsvOBtOVLRouc/7CVmIggTlRi6wUdaxHSbaBDb57
+         yVev40uKvLdORKGYO8tlRsEZ3NbATbDRMzbhT9Ac3UYX+6BxTlDr4ghePuO96Dagn6zb
+         6sdlSC7PO790sx42UNm0PCC/WOZlzfhI/nO3dfTjggcLGXHE/en0JJgTQYto4IS0D8yr
+         6uLuVjEP1/y1eLm35y2ojRPgDfZilA2ZXxzVV5CU0QES7i5xpqk57PZ6NvJ3fX3GwMX6
+         yYAw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779300760; x=1779905560; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sdU4pIR9GEFmUiowF5+zoSCvVIVv3g6BVDDhCzEtXBY=;
+        b=OPilAgUyr7Kp77RVJmgINtsXMQ5V5zB3x4lew9fiqu1Sy3tks4wpNpjdx+mmb5sn7i
+         +Ch8ltqSeRH25KlLGxyBydDvl9l0wtHlLKtagEZxA07diNzWr9wDDN06Il+FMHwd8zyq
+         cFk7YewQUK9Y1NoaHw8MKg0969p9r9wqLoMsPdbKvrp91vrJZ2oJgeiPQXWzbJeRBFyi
+         SiLvK5K8682QXqDHjxdEGeHgy1EFxrFsWCfm9YmDHn7RFkSkA4EOMhMtce/GZdJr7pq8
+         z4xiDSWnHP+GBp/hBRTP8429qzLcshvFlIN8eECH9ci7ctQOoPk0G+hkmoy8UFkQNBCS
+         dhhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779300760; x=1779905560;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sdU4pIR9GEFmUiowF5+zoSCvVIVv3g6BVDDhCzEtXBY=;
+        b=cLwN83inL13BCfA6diU4bUOUv/QLy9OR5Xe2Cmcqmdj0+1PSg2L3hWy9ieCtNSAhmY
+         dsGzY1FSazvzJKNIRf9/ZSw+vRpY83RHT83DSjdTMF+e/gvpJpWdZ8pQQPLvyv7csRJS
+         7Le8P9RXT1GscQuJKxCFJEClw01nFxCmdDyegNnIqEfeiHWq3++xQma/fopop43MbEka
+         93Wi4hrlGtIvm6LEuC+XqI97rWrwu268UR+A+iJ6bwZwd5Ey7fHuQQRH5biVG3P5iEjw
+         UsslT4Pl8BOcg5JwcWoLwLO0kfyg/JCnXlII35dNxzXkYg2sZgA6MTBiKwvWCmU845HN
+         nOsA==
+X-Forwarded-Encrypted: i=1; AFNElJ918/G1+UOPdfAywXnhhLjJFJL2gJ/rpTQTPfwfaK2hzmbH6Lrkf6FeJ7CUNC3jEgHui+Ril3E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAPb/yUxWxHDJgC9OVJA4dBK7GKDav9Z9eV0FQ6jndHLNlzaI/
+	FvhUTsY/TjMRvKGodtoXW5DPzkeJfdh9ffZpNRGbRR9X2AnFyRocm+zOHXpvnY8BkPCfozwV+kQ
+	AKSigxAYwPw+XoA2AaAZ1hjfap8v+fg+k/S6AmPrl
+X-Gm-Gg: Acq92OEa4QXrOhhxHaTds3/0uMTSHPIAD35BxhG4pgGKCqCb5zFPLl4GA7rN07mzuHV
+	txPdSHlMr65U2ACqpV+/ZfMEWlJt73pW4pN0+pg3A7Wwzzns2gT3Ne3QqrL5Xow795FBFLy17RC
+	1e/iCg27rvsvz2ObxpEj/9NbmApSv544ikd9RrBnQqSav4TFyAr9vEKg+9FrgW3bWYmkM1mi5ak
+	8iA3+xjLXpDtfOuOdRIkUC4BT0jm4tBvVqh2gSMP+iGcbWGMNXhdseOnMkRGncPJlHreQS3LuE6
+	OOKXYB3znvvI7+EkoE8nUYoSEZQQPkpJAKDd62N7B2SRrHIummQq4KlolrT8D+MkmfCDPkNru2O
+	aWL3bkEkPM4tSZ+8w7ku6wBVZpqFt6vm+FZazFwN0N19qz18kdWZLnQnO2Bum9jQ=
+X-Received: by 2002:a05:7022:6b9f:b0:135:52d3:d9de with SMTP id
+ a92af1059eb24-13552d3da0dmr8811519c88.15.1779300758956; Wed, 20 May 2026
+ 11:12:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260519225556.3939204-1-kuba@kernel.org>
+References: <20260519084611.2485277-1-edumazet@google.com>
+In-Reply-To: <20260519084611.2485277-1-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 20 May 2026 11:12:27 -0700
+X-Gm-Features: AVHnY4I_dsz02rirRTut73ph8KwOYkaswxPyj6xc3PplZZzK4QfjYjqdZ9ph1k0
+Message-ID: <CAAVpQUDUQ7Sae3os1W=F5-c5j4UPCVQnfQZ9S-ewXu14vOsDNQ@mail.gmail.com>
+Subject: Re: [PATCH v4 net] tcp: fix stale per-CPU tcp_tw_isn leak enabling
+ ISN prediction
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Chris Mason <clm@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290037-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com,meta.com];
+	TAGGED_FROM(0.00)[bounces-290038-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
-X-Rspamd-Queue-Id: B637A59AB85
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vmlinux.new:url,meta.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 8D8625963F6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 03:55:56PM -0700, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: mana: Add NULL guards in teardown path to prevent panic on attach failure
->     
-> When queue allocation fails partway through, the error cleanup frees
-> and NULLs apc->tx_qp and apc->rxqs. The patch adds NULL guards for these
-> pointers in teardown paths such as mana_destroy_vport(), mana_fence_rqs(),
-> and mana_dealloc_queues() to prevent NULL pointer dereferences.
-> 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > index 9afc786b297a8..9e7e4bf526bf6 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> [ ... ]
-> > @@ -2858,13 +2861,16 @@ static void mana_destroy_vport(struct mana_port_context *apc)
-> >  	struct mana_rxq *rxq;
-> >  	u32 rxq_idx;
-> >  
-> > -	for (rxq_idx = 0; rxq_idx < apc->num_queues; rxq_idx++) {
-> > -		rxq = apc->rxqs[rxq_idx];
-> > -		if (!rxq)
-> > -			continue;
-> > +	if (apc->rxqs) {
-> >  
-> > -		mana_destroy_rxq(apc, rxq, true);
-> > -		apc->rxqs[rxq_idx] = NULL;
-> > +		for (rxq_idx = 0; rxq_idx < apc->num_queues; rxq_idx++) {
-> > +			rxq = apc->rxqs[rxq_idx];
-> > +			if (!rxq)
-> > +				continue;
-> > +
-> > +			mana_destroy_rxq(apc, rxq, true);
-> > +			apc->rxqs[rxq_idx] = NULL;
-> > +		}
-> >  	}
-> 
-> If the teardown path frees apc->rxqs and sets it to NULL on attach failure,
-> how does the interface recover if the user subsequently brings it back up?
-> 
-> When mana_open() is invoked, it directly calls mana_alloc_queues(). Inside
-> mana_alloc_queues() -> mana_add_rx_queues(), the code does:
-> 
->     apc->rxqs[i] = rxq;
-> 
-> If apc->rxqs was left as NULL during the teardown, will this cause a NULL
-> pointer dereference on the next interface bring-up?
-> 
-> [ ... ]
-Hi Jakub,
-
-The only path that recovers from this state is mana_attach(), which
-calls mana_init_port() -> mana_init_port_context() to re-allocate
-apc->rxqs before calling mana_alloc_queues().
-
-When mana_open is invoked prior to it the rxqs would be already setup by
-mana_probe_port -> mana_init_port -> mana_init_port_context.
-
-> > @@ -3287,33 +3294,38 @@ static int mana_dealloc_queues(struct net_device *ndev)
-> >  	 * number of queues.
-> >  	 */
-> >  
-> > -	for (i = 0; i < apc->num_queues; i++) {
-> > -		txq = &apc->tx_qp[i].txq;
-> > -		tsleep = 1000;
-> > -		while (atomic_read(&txq->pending_sends) > 0 &&
-> > -		       time_before(jiffies, timeout)) {
-> > -			usleep_range(tsleep, tsleep + 1000);
-> > -			tsleep <<= 1;
-> > -		}
-> > -		if (atomic_read(&txq->pending_sends)) {
-> > -			err = pcie_flr(to_pci_dev(gd->gdma_context->dev));
-> > -			if (err) {
-> > -				netdev_err(ndev, "flr failed %d with %d pkts pending in txq %u\n",
-> > -					   err, atomic_read(&txq->pending_sends),
-> > -					   txq->gdma_txq_id);
-> > +	if (apc->tx_qp) {
-> 
-> In the error path where queue creation fails partway through, will
-> mana_destroy_txq() be called?
-> 
-> If mana_destroy_txq() unconditionally iterates over all apc->num_queues:
-> 
->     for (i = 0; i < apc->num_queues; i++) {
->         ...
->         mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
->         ...
-> 
-> Will it pass 0 or INVALID_MANA_HANDLE to mana_destroy_wq_obj() for queues
-> that were never fully initialized?
-> 
-> Does mana_destroy_wq_obj() send a MANA_DESTROY_WQ_OBJ command to the hardware
-> with these uninitialized handles, and could handle 0 corrupt the firmware
-> state?
+On Tue, May 19, 2026 at 1:46=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-This is a known  exisiting issue in the cleaup path for partial tx
-setups and was also mentioned in the a recent patch where the rx partial
-init clean-up path was fixed. My colleague Aditya is already working on a
-patch to fix this and all other issues in the tx cleanup path.
- 
-> > +		for (i = 0; i < apc->num_queues; i++) {
-> > +			txq = &apc->tx_qp[i].txq;
-> > +			tsleep = 1000;
-> > +			while (atomic_read(&txq->pending_sends) > 0 &&
-> > +			       time_before(jiffies, timeout)) {
-> > +				usleep_range(tsleep, tsleep + 1000);
-> > +				tsleep <<= 1;
-> > +			}
-> > +			if (atomic_read(&txq->pending_sends)) {
-> > +				err =
-> > +				    pcie_flr(to_pci_dev(gd->gdma_context->dev));
-> 
-> If pcie_flr() is triggered here, the PCI Function Level Reset wipes the
-> internal GDMA state.
-> 
-> Further down in this function, mana_disable_vport_rx(), mana_fence_rqs(),
-> and mana_destroy_vport() are called. Will these functions attempt to send
-> commands to the now-destroyed GDMA admin queue via mana_send_request() and
-> wait for completions?
-> 
-> Could this lead to cascading timeouts since the hardware was just reset and
-> cannot process admin commands?
-> 
-This is pre-existing behavior/issue the pcie_flr() path and the
-subsequent calls to mana_disable_vport_rx()/mana_fence_rqs()/mana_destroy_vport()
-are unchanged by this patch. My patch only adds a NULL guard for
-apc->tx_qp to skip this entire TX drain block when tx_qp is already
-freed. But this point seems to be valid issue, I will investigate this
-further and I will send a different patch set for this as follow up work.
+> Blamed commit moved the TIME_WAIT-derived ISN from the skb control
+> block to a per-CPU variable, assuming the value would always be consumed
+> by tcp_conn_request() for the same packet that wrote it. That assumption
+> is violated by multiple drop paths between the producer
+> (__this_cpu_write(tcp_tw_isn, isn) in tcp_v{4,6}_rcv()) and the consumer
+> (tcp_conn_request()):
+>
+>  - min_ttl / min_hopcount check
+>  - xfrm policy check
+>  - tcp_inbound_hash() MD5/AO mismatch
+>  - tcp_filter() eBPF/SO_ATTACH_FILTER drop
+>  - th->syn && th->fin discard in tcp_rcv_state_process() TCP_LISTEN
+>  - psp_sk_rx_policy_check() in tcp_v{4,6}_do_rcv()
+>  - tcp_checksum_complete() in tcp_v{4,6}_do_rcv()
+>  - tcp_v{4,6}_cookie_check() returning NULL
+>
+> When a packet is dropped on any of these paths, tcp_tw_isn is left set.
+>
+> The next SYN processed on the same CPU then consumes the non zero value i=
+n
+> tcp_conn_request(), receiving a potentially predictable ISN.
+>
+> This patch moves back tcp_tw_isn to skb->cb[], getting rid of the per-cpu
+> variable.
+>
+> Note that tcp_v{4,6}_fill_cb() do not set it.
+>
+> Very litle impact on overall code size/complexity:
+>
+> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+> add/remove: 0/0 grow/shrink: 2/1 up/down: 8/-15 (-7)
+> Function                                     old     new   delta
+> tcp_v6_rcv                                  3038    3042      +4
+> tcp_v4_rcv                                  3035    3039      +4
+> tcp_conn_request                            2938    2923     -15
+> Total: Before=3D24436060, After=3D24436053, chg -0.00%
+>
+> Fixes: 41eecbd712b7 ("tcp: replace TCP_SKB_CB(skb)->tcp_tw_isn with a per=
+-cpu field")
+> Reported-by: Chris Mason <clm@meta.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-
-> > +				if (err) {
-> > +					netdev_err(ndev, "flr failed %d with %d pkts pending in txq %u\n",
-> > +						   err,
-> > +					    atomic_read(&txq->pending_sends),
-> > +					    txq->gdma_txq_id);
-> > +				}
-> > +				break;
-> >  			}
-> > -			break;
-> >  		}
-> -- 
-> pw-bot: cr
-
-Regards
-Dipayaan Roy
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
