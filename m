@@ -1,439 +1,212 @@
-Return-Path: <netdev+bounces-289888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MPBwHiGSDWrTzgUAu9opvQ
-	(envelope-from <netdev+bounces-289888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:51:13 +0200
+	id uOpaEROUDWoMzwUAu9opvQ
+	(envelope-from <netdev+bounces-289889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:59:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FE858BF82
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:51:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF4858C063
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:59:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3132A3011F34
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:50:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D21B30252B5
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4523D9DAA;
-	Wed, 20 May 2026 10:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7C803D9DD9;
+	Wed, 20 May 2026 10:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QZncm7y1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AU75cP9o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2EF2690D5
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208A739A053
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779274249; cv=none; b=Pr55PD8oIdZCDJmxCjzV9k5LKcuW37EVCtCkgEsPLO5kW/dxWh9mhBh5jnJ4OfGEd6qiWUoyQh2miF8jwyidvcMcaS2UT5z3I4dfUNmY7lBZ1Nf//8cLkoM+UyOcqYk77J8pqVw6SNNpa/nc8OK7mxUezD7AV3T1aW9hzix40Ww=
+	t=1779274702; cv=none; b=lXXW5hkYX0HSF8/MoDesof7mkxHVoxxnUEZMRnGEid89RspoGhgbx+YNXgzEyFdHyXdRFErnGSadgdubEdLSxKMk07I868Av32cUm+p7A3eLT7h4X9ncprGeFbEFi52G7Z/DadIlwJvoUn1IuCFthRyNFS181QT0nU8/XO3sIz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779274249; c=relaxed/simple;
-	bh=bOmnccMMInX9gRLQ9keUY72qmps0cEk6dkmIW0Cv46E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J+ALQ3sqPkPWJB2He2pr91IHK0o4bZtz8m3swI4V1S+YYCn2QHVswbr75Ru7HYH7nyQ5m/GUDyAnu1o4IHYKeKkbo9j2PVZckyteHx48pr7FdGQUXeawX6FzYwku0NH+zgFn8UXx+DOxA069txy7DzOW3V69EDbDKQh8qAAeWUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QZncm7y1; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779274248; x=1810810248;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=bOmnccMMInX9gRLQ9keUY72qmps0cEk6dkmIW0Cv46E=;
-  b=QZncm7y1JNbODbm0+2Cel+QsO9GSwJFrzyKJ2XmmxzLPZiFChktxlNVn
-   6w1Pa1EO5AqSuUeXDIxItcPDG2EPJZTKxG/GjZcv4BNryC6lJmJj6HJw1
-   emvEHWqwkzjJZn9DChI03MFvPic6eN0jw6FAlhWPP05r+zk1PCJV/ZDJI
-   EIKq9OjJQvyQUFjYnP9vxzsVKRiVZVg8epM8ECmNAESxm1BF67F7mcT90
-   Y0ZwQGbLHbu4x5cbsGTCGnFSZ5mvCASHDsrDP7ciqLS+J3pMI1I2gSJS4
-   9uwvdy5rQniK1MIIVBZJtBm8+1VfdtSDgQuu4Pou4viUlKLv8oKq8b9YV
-   Q==;
-X-CSE-ConnectionGUID: +AtGRXVcTc+P3Mt7TvqJtg==
-X-CSE-MsgGUID: ZLshsqutT6md0oCQ5emqJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11791"; a="84023598"
-X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="84023598"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 03:50:48 -0700
-X-CSE-ConnectionGUID: hgtqdcDITtunwuqjoRY+SQ==
-X-CSE-MsgGUID: PLd2TTQiSqSGkZjEaLAr4A==
-X-ExtLoop1: 1
-Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
-  by fmviesa003.fm.intel.com with ESMTP; 20 May 2026 03:50:46 -0700
-From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com,
-	arkadiusz.kubalewski@intel.com,
-	Przemyslaw Korba <przemyslaw.korba@intel.com>
-Subject: [PATCH iwl-net v3] ice: support SBQ posted writes with non-posted support for CGU
-Date: Wed, 20 May 2026 12:52:03 +0200
-Message-ID: <20260520105311.5336-1-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1779274702; c=relaxed/simple;
+	bh=17v94OCKGdEk/7VAXlR2xnD/Jsvb9yNV4bAK1pD/z7A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=uWPK5+0Y/FPds5fI3GZTD/xxciC8DUwrlJNahFVkMX8fRSPQeUDlWjhK6FLsbBQRV/k/Fxm/Q0Sdd2UHiPUUD+4I0lIoODTq31x1WA3hdNOize5cPYc+M35ecXKbekeM5v+CYGMdSI0l0fmfiMxfrWD/2QQzTJYNA9ASacrzLcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AU75cP9o; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2bd80b3aa13so29670795ad.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:58:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779274699; x=1779879499; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MpaQTw9IpMpA0HZfgbqByauqmXOHYN5iiaZ7k3HZ+l4=;
+        b=AU75cP9o4yu9681zxC564p/rf2xgJzOQX2d+vir2g5jLoUQBj2eEJGkvJt40mPW8RP
+         SV5hZAsvpjARtxB1bBHmRro5P4F/OTncmwUs6QtBGRfE3pB7L6XnLGG3cHYNFVJSW/K4
+         VxRXvw9s+E3ceycy07R6Cs5aVh/vxchmvlrfumacUQcXWB0W4Ih33grmeG5e2KBKje7d
+         D3fM4StOLfeplf0Sl8/+bm2yTdJ+Uv2lMAhTA2uznbiPjVMEyDLvRL2d6rhVpO8d/x/z
+         O4D8OX1WSo5J9VhP9CtptHhrs0yH4rGIulR0pU4ATOl04BEDPUy35J0LLfX3RoBgOZlq
+         pFvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779274699; x=1779879499;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MpaQTw9IpMpA0HZfgbqByauqmXOHYN5iiaZ7k3HZ+l4=;
+        b=d29ESgTUnLwNDntInQff3vT/RqMHPxJxCLfFB2p2PnTK6w+6daAgBlBWEgZJ9gpYT2
+         j7Y5DRF2wd4sCQgfoXkbl50NooWOcCPOhWyl6SnSgj93RhS7nsenv72MokG86LG+RCac
+         jSIMBx7rFFo2nNv/s/Jgg6+r+gsLTuAldvRXd4yOLzVbHkQCiuZSOrRHCssACEZ3KFap
+         H/JCK1jXvLNugpQSdg9v3rLyvKVWdNoQ6DqaTH5bP7wcdjrS+LzsjhAT/zMQe8OKqYWb
+         UA5Bs2y/zj/BIWDGRhMdDIaaTdOMMlXkhuS8li8vnFJ+7k8NHD8diTxR0PphUK9zxL7V
+         zg9w==
+X-Forwarded-Encrypted: i=1; AFNElJ8AbZhLRZdZu+Bze4Pz/ue96NxyelFALtzXDlbxcLbJ9I2mVs99oBTOj0en/2goB4nGP37NVLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8zShmLCk7x5CAplmwxG0Gawazyg5+vjcHos5AslBxzTn3ZZGs
+	Trx3R9sGoPk9p8nqFRHGTQ4jvjt5aS1zCF4/O6b1W1Hw3MgT3UsPLQ3e
+X-Gm-Gg: Acq92OF9tRgIwe7jRDITOEFdpMxxxpU+rDEo0Hk6zQ7oGrekSFqSXc9Gn/vrBsdLSlq
+	3i27PcZPLGf/ZXXnkYmxEvXjoDgJekQzppX2uJvhDIn3R0iTW307J2MZ+MVvzpBkDlO+XbaELgn
+	6MlyKP8g3hyqDDkVpvcc4ZXcpCf9CcwNdkC0KIhpx1Q4dbsSEdQlUhxpFM5JoQB7MFaJQZvcymD
+	4gVnf2Y22LFmuWxxYFSYpFKt7JlEO4Ezk/dXvhyh4BK4yZqqfOSiHb9ehv7M+aPbvgzA86t9QYR
+	FIpj+ASaqO4TG1w2REwRmd4iWQjLV/ooBXPjAIyJl8MB6QwquHmktM6tXg0HrBJeAI+NrGvcSKl
+	8GwUECqgNJeVg72aKZGNTyWayz1bKn6cELAH8ln5mzgmtXxam6qHh3kR2JsXJ+U6I747wgD+wrY
+	LIewYLTp9F3+ykDD8jwU3kE8mRT6aTvcvPgmq+S7/1V8OYsjwBtXpjMhFZ0O6Org==
+X-Received: by 2002:a17:903:2f47:b0:2b9:ecb4:a3dd with SMTP id d9443c01a7336-2bd7e8f2641mr252178805ad.34.1779274699367;
+        Wed, 20 May 2026 03:58:19 -0700 (PDT)
+Received: from localhost.localdomain ([115.110.225.242])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5cfe49c9sm220266615ad.49.2026.05.20.03.58.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 03:58:19 -0700 (PDT)
+From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
+X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+To: Miquel Raynal <miquel.raynal@bootlin.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Subject: [PATCH wpan v3] ieee802154: ca8210: fix pointer truncation in kfifo on 64-bit
+Date: Wed, 20 May 2026 16:27:50 +0530
+Message-Id: <20260520105750.30144-1-shitalkumar.gandhi@cambiumnetworks.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289889-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289888-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[bootlin.com,gmail.com,datenfreihafen.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 86FE858BF82
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cambiumnetworks.com:mid,cambiumnetworks.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BBF4858C063
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
+ca8210_test_int_driver_write() and ca8210_test_int_user_read() exchange
+a kmalloc'd buffer pointer through a struct kfifo, but pass a literal
+'4' as the byte count to kfifo_in()/kfifo_out().
 
-Sideband queue (SBQ) is a HW queue with very short completion time. All
-SBQ writes were posted by default, which means that the driver did not
-have to wait for completion from the neighbor device, because there was
-none. This introduced unnecessary delays, where only those delays were
-"ensuring" that the command is "completed" and this was a potential race
-condition.
+This is correct on 32-bit (pointer = 4 bytes), but on 64-bit only the
+low 4 bytes of the 8-byte pointer are written into the FIFO. The reader
+then reads back 4 bytes into an 8-byte local pointer variable, leaving
+the upper 4 bytes uninitialized stack data. The first dereference of
+the reconstructed pointer (fifo_buffer[1]) accesses an arbitrary kernel
+address and generally results in an oops.
 
-Add the possibility to perform non-posted writes where it's necessary to
-wait for completion, instead of relying on fake completion from the FW,
-where only the delays are guarding the writes.
+Use sizeof(fifo_buffer) so the byte count matches pointer width on every
+architecture.
 
-Flush the SBQ by reading address 0 from the PHY 0 before issuing SYNC
-command to ensure that writes to all PHYs were completed and skip SBQ
-message completion if it's posted.
+The driver has no architecture restriction in Kconfig, so any 64-bit
+build with CONFIG_IEEE802154_CA8210_DEBUGFS=y is exposed. Issue has
+been latent since the driver was added in 2017 because it is most
+commonly deployed on 32-bit MCUs.
 
-E810 only supports opcode 0x01, but its FW always sends completion
-responses for this opcode, so the driver waits for each write to complete.
-This makes E810 writes synchronous and eliminates the need for SBQ flush.
+Found via a custom Coccinelle semantic patch hunting for short-byte
+kfifo I/O on byte-mode kfifos used to shuttle pointers.
 
-To analyze if delays are gone, look for and compare time spent in
-ice_sq_send_cmd — posted writes should return immediately after the wr32.
-That can be done for example by adjusting phc time with phc_ctl on E830
-device, for less than 2 seconds to use this new mechanism. Without it,
-command below will fail.
-
-Reproduction steps:
-phc_ctl eth13 adj 1
-phc_ctl[4478170.994]: adjusted clock by 1.000000 seconds
-
-Check trace for timing for comparisions:
-echo ice_sbq_send_cmd > /sys/kernel/debug/tracing/set_ftrace_filter
-echo function_graph > /sys/kernel/debug/tracing/current_tracer
-cat /sys/kernel/debug/tracing/trace
-
-Tested on:
-  - Intel E830 NIC (FW version 1.00)
-  - Kernel 6.19.0+
-
-Fixes: 8f5ee3c477a8 ("ice: add support for sideband messages")
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
-v3:
-- include information in comments and commit message about different
-E810 behavior
-v2:
-https://lore.kernel.org/intel-wired-lan/20260508102247.826375-1-przemyslaw.korba@intel.com/
-- fix minor issues for E810 devices
-v1:
-https://lore.kernel.org/intel-wired-lan/20260507135110.809367-1-przemyslaw.korba@intel.com/
----
- drivers/net/ethernet/intel/ice/ice_common.c   | 26 +++++--
- drivers/net/ethernet/intel/ice/ice_controlq.c |  4 ++
- drivers/net/ethernet/intel/ice/ice_controlq.h |  1 +
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 70 ++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |  5 +-
- 5 files changed, 73 insertions(+), 33 deletions(-)
+Changes in v3:
+- Move declaration of `copied` to the top of the function (Miquèl)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 0ec65007d672..b6a3b428558c 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1762,6 +1762,7 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
- {
- 	struct ice_sbq_cmd_desc desc = {0};
- 	struct ice_sbq_msg_req msg = {0};
-+	struct ice_sq_cd cd = {};
- 	u16 msg_len;
- 	int status;
- 
-@@ -1774,19 +1775,34 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
- 	msg.msg_addr_low = cpu_to_le16(in->msg_addr_low);
- 	msg.msg_addr_high = cpu_to_le32(in->msg_addr_high);
- 
--	if (in->opcode)
-+	switch (in->opcode) {
-+	case ice_sbq_msg_wr_p:
-+	case ice_sbq_msg_wr_np:
- 		msg.data = cpu_to_le32(in->data);
--	else
-+		/* E810 FW only supports opcode 0x01, convert non-posted to posted */
-+		if (hw->mac_type == ICE_MAC_E810)
-+			msg.opcode = ice_sbq_msg_wr_p;
-+		break;
-+	case ice_sbq_msg_rd:
- 		/* data read comes back in completion, so shorten the struct by
- 		 * sizeof(msg.data)
- 		 */
- 		msg_len -= sizeof(msg.data);
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	/* E810 doesn't support posted mode, always wait for completion */
-+	cd.posted = in->opcode == ice_sbq_msg_wr_p &&
-+		    hw->mac_type != ICE_MAC_E810;
- 
- 	desc.flags = cpu_to_le16(flags);
- 	desc.opcode = cpu_to_le16(ice_sbq_opc_neigh_dev_req);
- 	desc.param0.cmd_len = cpu_to_le16(msg_len);
--	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, NULL);
--	if (!status && !in->opcode)
-+	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, &cd);
-+
-+	if (!status && in->opcode == ice_sbq_msg_rd)
- 		in->data = le32_to_cpu
- 			(((struct ice_sbq_msg_cmpl *)&msg)->data);
- 	return status;
-@@ -6557,7 +6573,7 @@ int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
- 		.dest_dev = ice_get_dest_cgu(hw),
--		.opcode = ice_sbq_msg_wr,
-+		.opcode = ice_sbq_msg_wr_np,
- 		.msg_addr_low = addr,
- 		.data = val
- 	};
-diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.c b/drivers/net/ethernet/intel/ice/ice_controlq.c
-index dcb837cadd18..a6008dc77fa4 100644
---- a/drivers/net/ethernet/intel/ice/ice_controlq.c
-+++ b/drivers/net/ethernet/intel/ice/ice_controlq.c
-@@ -1086,6 +1086,10 @@ ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 	wr32(hw, cq->sq.tail, cq->sq.next_to_use);
- 	ice_flush(hw);
- 
-+	/* If the message is posted, don't wait for completion. */
-+	if (cd && cd->posted)
-+		goto sq_send_command_error;
-+
- 	/* Wait for the command to complete. If it finishes within the
- 	 * timeout, copy the descriptor back to temp.
- 	 */
-diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.h b/drivers/net/ethernet/intel/ice/ice_controlq.h
-index 788040dd662e..c50d6fcbacba 100644
---- a/drivers/net/ethernet/intel/ice/ice_controlq.h
-+++ b/drivers/net/ethernet/intel/ice/ice_controlq.h
-@@ -77,6 +77,7 @@ struct ice_ctl_q_ring {
- /* sq transaction details */
- struct ice_sq_cd {
- 	struct libie_aq_desc *wb_desc;
-+	u8 posted : 1;
- };
- 
- /* rq event information */
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 2c18e16fe053..d47d5baf3281 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -352,6 +352,20 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- {
- 	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_rd,
-+	};
-+	int err;
-+
-+	/* Flush SBQ to ensure posted writes complete before SYNC command.
-+	 * Skip for E810 - FW always sends completions, so writes are synchronous.
-+	 */
-+	if (hw->mac_type != ICE_MAC_E810) {
-+		err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
-+		if (err)
-+			dev_warn(ice_hw_to_dev(hw), "Failed to flush SBQ: %d\n", err);
-+	}
- 
- 	if (!ice_is_primary(hw))
- 		hw = ice_get_primary_hw(pf);
-@@ -442,7 +456,7 @@ static int ice_write_phy_eth56g(struct ice_hw *hw, u8 port, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input msg = {
- 		.dest_dev = ice_ptp_get_dest_dev_e825(hw, port),
--		.opcode = ice_sbq_msg_wr,
-+		.opcode = ice_sbq_msg_wr_p,
- 		.msg_addr_low = lower_16_bits(addr),
- 		.msg_addr_high = upper_16_bits(addr),
- 		.data = val
-@@ -2504,11 +2518,12 @@ static bool ice_is_40b_phy_reg_e82x(u16 low_addr, u16 *high_addr)
- static int
- ice_read_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_rd,
-+	};
- 	int err;
- 
- 	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
--	msg.opcode = ice_sbq_msg_rd;
- 
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
-@@ -2577,16 +2592,18 @@ ice_read_64b_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 low_addr, u64 *val)
-  * @val: The value to write to the register
-  *
-  * Write a PHY register for the given port over the device sideband queue.
-+ * Uses posted writes - requires SBQ flush before SYNC_EXEC_CMD.
-  */
- static int
- ice_write_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_wr_p,
-+		.data = val
-+	};
- 	int err;
- 
- 	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
--	msg.opcode = ice_sbq_msg_wr;
--	msg.data = val;
- 
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
-@@ -2740,15 +2757,15 @@ static int ice_fill_quad_msg_e82x(struct ice_hw *hw,
- int
- ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_rd,
-+	};
- 	int err;
- 
- 	err = ice_fill_quad_msg_e82x(hw, &msg, quad, offset);
- 	if (err)
- 		return err;
- 
--	msg.opcode = ice_sbq_msg_rd;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -2774,16 +2791,16 @@ ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
- int
- ice_write_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_wr_p,
-+		.data = val
-+	};
- 	int err;
- 
- 	err = ice_fill_quad_msg_e82x(hw, &msg, quad, offset);
- 	if (err)
- 		return err;
- 
--	msg.opcode = ice_sbq_msg_wr;
--	msg.data = val;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -4450,14 +4467,14 @@ static void ice_ptp_init_phy_e82x(struct ice_ptp_hw *ptp)
-  */
- static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_rd,
-+		.msg_addr_low = lower_16_bits(addr),
-+		.msg_addr_high = upper_16_bits(addr),
-+	};
- 	int err;
- 
--	msg.msg_addr_low = lower_16_bits(addr);
--	msg.msg_addr_high = upper_16_bits(addr);
--	msg.opcode = ice_sbq_msg_rd;
--	msg.dest_dev = ice_sbq_dev_phy_0;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -4477,18 +4494,19 @@ static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
-  * @val: the value to write to the PHY
-  *
-  * Write a value to a register of the external PHY on the E810 device.
-+ * E810 FW sends completions for opcode 0x01, making writes synchronous.
-  */
- static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_wr_p,
-+		.msg_addr_low = lower_16_bits(addr),
-+		.msg_addr_high = upper_16_bits(addr),
-+		.data = val
-+	};
- 	int err;
- 
--	msg.msg_addr_low = lower_16_bits(addr);
--	msg.msg_addr_high = upper_16_bits(addr);
--	msg.opcode = ice_sbq_msg_wr;
--	msg.dest_dev = ice_sbq_dev_phy_0;
--	msg.data = val;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-diff --git a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-index 21bb861febbf..86a143ebf089 100644
---- a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-@@ -54,8 +54,9 @@ enum ice_sbq_dev_id {
- };
- 
- enum ice_sbq_msg_opcode {
--	ice_sbq_msg_rd	= 0x00,
--	ice_sbq_msg_wr	= 0x01
-+	ice_sbq_msg_rd		= 0x00,
-+	ice_sbq_msg_wr_p	= 0x01,
-+	ice_sbq_msg_wr_np	= 0x02,
- };
- 
- #define ICE_SBQ_MSG_FLAGS	0x40
+Changes in v2:
+- Use intermediate variable for kfifo_out() return value (Miquèl)
+- Add Cc: stable@vger.kernel.org (Miquèl)
+- Add Reviewed-by from Simon Horman (v1)
 
-base-commit: 1a199fb1e31a904b965a3000501d7c6732e4c50a
+Link to v1: https://lore.kernel.org/linux-wpan/20260513153412.1284549-1-shitalkumar.gandhi@cambiumnetworks.com/
+Link to v2: https://lore.kernel.org/all/20260520050707.38055-1-shitalkumar.gandhi@cambiumnetworks.com/
+
+ drivers/net/ieee802154/ca8210.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index 753215ebc67c..1f1dafc5c5f6 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -597,7 +597,7 @@ static int ca8210_test_int_driver_write(
+ 	fifo_buffer = kmemdup(buf, len, GFP_KERNEL);
+ 	if (!fifo_buffer)
+ 		return -ENOMEM;
+-	kfifo_in(&test->up_fifo, &fifo_buffer, 4);
++	kfifo_in(&test->up_fifo, &fifo_buffer, sizeof(fifo_buffer));
+ 	wake_up_interruptible(&priv->test.readq);
+ 
+ 	return 0;
+@@ -2528,6 +2528,7 @@ static ssize_t ca8210_test_int_user_read(
+ 	struct ca8210_priv *priv = filp->private_data;
+ 	unsigned char *fifo_buffer;
+ 	unsigned long bytes_not_copied;
++	unsigned int copied;
+ 
+ 	if (filp->f_flags & O_NONBLOCK) {
+ 		/* Non-blocking mode */
+@@ -2541,7 +2542,8 @@ static ssize_t ca8210_test_int_user_read(
+ 		);
+ 	}
+ 
+-	if (kfifo_out(&priv->test.up_fifo, &fifo_buffer, 4) != 4) {
++	copied = kfifo_out(&priv->test.up_fifo, &fifo_buffer, sizeof(fifo_buffer));
++	if (copied != sizeof(fifo_buffer)) {
+ 		dev_err(
+ 			&priv->spi->dev,
+ 			"test_interface: Wrong number of elements popped from upstream fifo\n"
 -- 
-2.43.0
+2.25.1
 
 
