@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-289822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289823-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GECIHz5uDWrgxAUAu9opvQ
-	(envelope-from <netdev+bounces-289822-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:18:06 +0200
+	id gBqCFfZuDWp9xQUAu9opvQ
+	(envelope-from <netdev+bounces-289823-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:21:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA78D5898D9
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:18:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E5A5899F2
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:21:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD86D30D4245
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:10:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A3CB30DBD87
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC6B3A6B81;
-	Wed, 20 May 2026 08:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4493A873D;
+	Wed, 20 May 2026 08:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIt2rD2G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9iquGcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C513D39BFFC
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 08:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3F93A7845
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 08:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779264629; cv=none; b=PxG8cq34gSztf6SZOsQ/v25HrqWLHOgmFZrThcWIZ3JkofgH19Bzfaw29AyLYpiDpR0uI6L4B0sOyascejr5p6S33vzNKmdsJS04mxxdKV0IZhEqSMKrQaVJMxQP+rsLcz7zXmEl+NfBEEqKmqSi6RnVMqr9a1cNBaM8vsbkwxk=
+	t=1779264631; cv=none; b=twLKqLzL7oSKSnA8D/UCXsUmHzCLQpg07+AXCaHA4FfW708agpkGDuf/bJfSAwphRVfeGzdmKVMu4o922Q9c/5h3rSkYfyaQ0lhYe4hY57E9It8CRurEe6hoRl+TcURmCERDSH92wuJ3jLTy+dWXnvWPaAzuB4LByMJJbfUyB8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779264629; c=relaxed/simple;
-	bh=ysrlFQYbnqdUZbioXLpDwJFsDqDNBDcsFeVNdyXQbLU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eFUb8SuuaulIYWmM1aERXOBBUR5uIYYcDFQpLGaTlTA5NCYMtZKzEblSTgzYFF+4/yIT80Ke7tbHC0Lg3gbM0Fz8ILO7LhwHk5SQuDGlrx/s9bGPvs5D7zbXEgvX4n15r3pVHlshvD1aXZCRgSiQQGkDhrlnguXDg52k633aBlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lIt2rD2G; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1779264631; c=relaxed/simple;
+	bh=73443vAbOnViwJT99Snz/ZFTOD/YCP1uLgVIWnv0a50=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=t79W7QQo2GmqKt1OjPOP6p675NPsw76E178QuzF0XfXFtYxyIOpVRCJNyrIpKpOolmudC9NQxxxt7KC9ogX1HLm5jZY3Lsnm7z/Bmrqc0pdStfVn3iGXiM6/6AjpiaiXhnietWFOIQQrqrwge6YpD6tgj3pFAW+Q1B3L8HDLsy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f9iquGcG; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2bab82d75fdso21714955ad.2
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 01:10:27 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-36a15ed5119so1054859a91.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 01:10:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779264626; x=1779869426; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zT9gW4My9WtjCFzxGL2IvZPJb7xvVTH1VSTzTxzzIek=;
-        b=lIt2rD2GFOU9KCfnOhLc8kCfVdqHqy897uq07T0pdkItlRh6Zp93x4pdjtYwfLatGa
-         cdu2lYEkFpFwMt0KoU8Xs2lOnWL+yBvxReCY3SqJ0ktwORroO+A7dXt58ovVgLVrHW9x
-         8EQgFIP+kk1Z1k4n41vvL8q/xtYG0ZbGoYeEU8Eir66fqQPEBNV7b6jRmRv0ttp7kJ4K
-         gkW24LiNseka3sr6EI5wQcJMlDXIhtOB3IZXPAyjWdyKVAw0T6iJHsIQd3urOKPnmBX6
-         zwYHRpVgIHaADaZLQ5jkQ8X69yNS4CpD0iY3Bw2FH9FN4mumcSQ0qXY3CwJwe+XZB10w
-         BXvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779264626; x=1779869426;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779264629; x=1779869429; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zT9gW4My9WtjCFzxGL2IvZPJb7xvVTH1VSTzTxzzIek=;
-        b=JtN3YCg+SKHEw2FGUC0XRFp/bb42crWNUGQ8haT2l2mzqehyNXWgCMsQSIdHQk+ljo
-         0Ja3m7yydxIwF/BwF8SzJLQrRmB0dQUYwX1mAx/FnKSUchCjPsZqQRKW8N48OjA22NMI
-         E3aLQdBB4Xln/pfZvC4VrF+VK1xnrBhFZGHQdGVUZh3O9oBqP9lva6v/dkfSuPu3NhKT
-         nKuAUd/do0MVicEesaWhTkAoscIDVObILHT+yON04Y7EMsOZwfWgkxwPo8vuypHDJkLL
-         tnHqFOLnhy3Ta3shrThXjJTIjFMkbEf4VuB1/gUwtRuWGgGJCn+65hNcxkbinIZYRdYJ
-         TiWw==
-X-Gm-Message-State: AOJu0Yw2B76FRhr2o5YbNr0A3JT0i4YTbB1FZTp6zskrCPt2v1OKiXrO
-	jTqXzua0WybcZ9NdSubJaxUs6LaaIaMdorCZ4D4NwvS+z+L/jCpSlk/3rD1vEUUX
-X-Gm-Gg: Acq92OFGPQNo7TRdEyzbULV5c99DmQJrHLB78IzxltqPgUZpd7EMddy3EDfZXnGQP3r
-	bi7PQMnMjuN4j+zA152xTWiTSjqocScKO9i33DWC8YVBG6dFTbdEG2U/uQH2Yz8ixV9ez3lP+3K
-	8nm+cVNldRLomxLfmEx0U8dG8JdpSFKH0cdIUbgfjqyea70IE8MJiSmRloHkTnbg/32lgiAd1dF
-	uCrDLrFr2RWbtM/Ru9MHfYh8zxDkwRqXiOK7zFkZzrfTsdDC8/h/2xB4AKz0PdMLq69/USB1m6i
-	c69KrGm1qlTp+vd9HeW+Di6puEBvHY4c83CvF730LUhjrU8IXDlEyVEikgreTBv2Xf01Elbg9ba
-	2GlLOQHK6/NMsbTZkDsxdZikYXbXKlRP3wBhaJ2AonrsOsebNLUQlohqL/hMkVbRj6zWzBBnAlW
-	Hj1m2hcm82e4ib24v6KmY+
-X-Received: by 2002:a17:902:d2cf:b0:2ba:6bd7:8f00 with SMTP id d9443c01a7336-2bd7e78228cmr241655625ad.5.1779264626117;
-        Wed, 20 May 2026 01:10:26 -0700 (PDT)
+        bh=vuIq0omjUggvBDRqrxdMgf0DV4raWV/SHuyYkGAo0Y8=;
+        b=f9iquGcGVwemiYfwxzl/zSq+cRUMYjMTzWfgdQcuir2KNzPcJDCwh6P6udyRbn0fIB
+         Bulj4BvJ3zYqcaGaleOABzu9HoGYKVigMnjeK2j0o0dx92FEQzx45i+J6c6EnVE0C295
+         20QpeP+sK/ey2AVtD/djN2RaV96GNjJ+WAVNYblQgGRBj15ZA+gFYUOnmnTyaQyRbkD5
+         uWbbgsHrCtemyx+Fp2n6uwDZPXejLTrSAbo/SUh0l0TeC/sc6h5TUmQ/ek14QqsAsvO/
+         e0s3nUecv1YfIWR6Gber9LDHtHXqNsg4CT9VZyFX3Jt01ZsOKYBT7vhgiTjyh+uhNkwC
+         hiUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779264629; x=1779869429;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vuIq0omjUggvBDRqrxdMgf0DV4raWV/SHuyYkGAo0Y8=;
+        b=LQl2ydxZOKN4o0P3YWCrKDmywuq1DVz5d59b86MIJhb68tx5Op1JBiouw6AJqc0gs+
+         9qp2bTHvGBW9YAWEhj6Zi5Jv939xSxT2wTMgJ3Jhtv9/t+OBe3y4/mmug51JX+l7kvv1
+         v9DYcqxpc/GcpnROpmzBjqOhngYz/azaWZREbsQ+3fY/cn7Ybiw1D05GRd0uA99IsVhY
+         iyuLKRJGUMyK/yp82itpY7g57sbvmc8K09EmufiIvNBZQmcjp4kPhwv7wapZ+P8rYiyi
+         dadPuVGyHroxpxkX+z6qntcx8Cn/Q1CIDevGqj8t7nWKLeOePFhgLMcuTP0aSh+dLdTI
+         o+Bw==
+X-Gm-Message-State: AOJu0YzJgwZ02G8F2mjORuOiPhhwCcLlfeI2df75PAp4fuhmx9UjGY83
+	mP8XsPxzGD6qiodoMksA3eZ9GnVvVMiNV9JiyK8rhAUl6COqbWjVdVtGDC1ynKLy
+X-Gm-Gg: Acq92OEkEEK0M4kgPWlaWw1l63YKzd912ktedC1aZQn6fPVOGdUwvypmoEQuP9Z2H6k
+	s/VNEgmUTYeKgru1m53Nrw6bg8alc1CDYMApVWOtlXMcVFCyQlrewM7K3adGw486Hb08rO5JOAv
+	PJZMqEA8Lr9zKwm8xspqTuTi+BcWerEnR5AS6z/ho+nA0o7lB2XjA2UdUEDU+wfedjzseO9KJ11
+	HLwu112tBDmmbl/cvjxEb/1V2Nq/N9zEjTxl77+fuKojLP8snr/KgwJo9vQqNnNz3+xLgDhKEAl
+	9e5eGzCtgMS/Y25X2vQpW9SQ6SQxYWn3sINn72F5YwvTwtUspRFqDWlZtU6jsvwHflJCJYzW7nk
+	SGjf+ZEKPgUA8olVDZ+WCG1CmyyDTXRxPdBf20W7HqjrWtgop9qnlCCYGArS2UyiftaQSOI8thU
+	FDQLwqnrIqLdRMjatM/YodCsruapk5312N/ovVOicXgQ==
+X-Received: by 2002:a17:902:8304:b0:2bc:8beb:525b with SMTP id d9443c01a7336-2bd7e8506a1mr188895445ad.18.1779264628831;
+        Wed, 20 May 2026 01:10:28 -0700 (PDT)
 Received: from mincom1 ([14.67.155.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5d116287sm211632735ad.68.2026.05.20.01.10.23
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5d116287sm211632735ad.68.2026.05.20.01.10.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 01:10:25 -0700 (PDT)
+        Wed, 20 May 2026 01:10:28 -0700 (PDT)
 From: Jihong Min <hurryman2212@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <jv@jvosburgh.net>,
@@ -86,10 +88,12 @@ Cc: Jay Vosburgh <jv@jvosburgh.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-kernel@vger.kernel.org,
 	Jihong Min <hurryman2212@gmail.com>
-Subject: [PATCH RFC net-next 0/4] bonding: support LAG IPsec offload with replicated SAs
-Date: Wed, 20 May 2026 17:10:00 +0900
-Message-ID: <20260520081004.2232091-1-hurryman2212@gmail.com>
+Subject: [PATCH RFC net-next 1/4] xfrm: add a lower-device offload handle resolver
+Date: Wed, 20 May 2026 17:10:01 +0900
+Message-ID: <20260520081004.2232091-2-hurryman2212@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260520081004.2232091-1-hurryman2212@gmail.com>
+References: <20260520081004.2232091-1-hurryman2212@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,14 +108,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,secunet.com,gondor.apana.org.au,vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-289822-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289823-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -124,73 +128,175 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: CA78D5898D9
+X-Rspamd-Queue-Id: C6E5A5899F2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This RFC adds a bonding model for IPsec/XFRM hardware offload on
-802.3ad and balance-xor LAG devices when the transmit hash policy is
-layer3+4. This is an intentional scope limit rather than a hard limit,
-as this is the configuration I can test with my gear.
+An upper device can own an XFRM offload state while the selected
+datapath device is one of its lower devices. A single xso.offload_handle
+is not enough for that case because each lower device may return a
+different hardware handle for the same state.
 
-The main idea is to leave the existing upstream single-lower-device XFRM
-offload path for active-backup intentionally untouched, while adding a
-replicated state model for LAG.
+Add an optional xfrmdev_ops resolver and a lower-driver opt-in flag so
+helper-aware lower drivers can resolve the handle for the lower device
+they are transmitting or receiving on. Keep the direct-device path as
+the fast path and clear upper private state when device offload state is
+freed.
 
-For LAG bonds, the bonding driver installs the same XFRM state on every
-eligible running slave and stores the per-slave hardware handles in
-bonding-private state. Lower drivers that support this model can then
-resolve the handle for the concrete lower netdev used by the datapath.
+Assisted-by: Codex:gpt-5.5
+Signed-off-by: Jihong Min <hurryman2212@gmail.com>
+---
+ include/linux/netdevice.h | 27 ++++++++++++++++++++++
+ include/net/xfrm.h        | 48 +++++++++++++++++++++++++++++++++++++--
+ net/xfrm/xfrm_state.c     |  1 +
+ 3 files changed, 74 insertions(+), 2 deletions(-)
 
-LAG IPsec features are user controlled. Newly eligible LAG bonds start
-with the ESP/XFRM features disabled, but advertise supported mutable
-features when all running eligible slaves can support them. Users can
-then opt in with ethtool. Feature enable is propagated to the lower
-devices and rolled back if a lower device cannot enable the requested
-features.
-
-The series also handles LAG membership and eligibility changes by adding
-replicated SAs to newly usable slaves, removing the departing lower
-instance on down/remove, and flushing bond-owned XFRM offload state when
-the bond leaves the supported mode or hash-policy configuration.
-
-This series does not convert any physical NIC driver. A lower driver
-must explicitly opt in to the replicated-upper-device model before it can
-use these bond-owned states in its datapath.
-
-For example, a driver such as mlx5 would opt in by marking its
-xfrmdev_ops and by resolving datapath handles through the helper:
-
-        static const struct xfrmdev_ops mlx5e_ipsec_xfrmdev_ops = {
-                ...
-                .xdo_dev_state_lower_handle = NULL,
-                .flags = XFRMDEV_OPS_F_LOWER_HANDLE,
-        };
-
-        handle = xfrm_dev_state_lower_handle(x, netdev);
-        if (!handle)
-                goto drop;
-
-        sa_entry = (struct mlx5e_ipsec_sa_entry *)handle;
-
-Jihong Min (4):
-  xfrm: add a lower-device offload handle resolver
-  bonding: replicate XFRM offload state across LAG slaves
-  bonding: expose user-controlled IPsec features for LAG
-  bonding: handle replicated IPsec SAs across LAG changes
-
- drivers/net/bonding/bond_main.c    | 855 ++++++++++++++++++++++++++++-
- drivers/net/bonding/bond_options.c |  59 +-
- include/linux/netdevice.h          |  27 +
- include/net/bonding.h              |  29 +-
- include/net/xfrm.h                 |  48 +-
- net/xfrm/xfrm_state.c              |   1 +
- 6 files changed, 1000 insertions(+), 19 deletions(-)
-
-
-base-commit: 27fa82620cbaa89a7fc11ac3057701d598813e87
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0e1e581efc5a..b4e844e90db8 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1033,6 +1033,16 @@ struct netdev_bpf {
+ #define XDP_WAKEUP_TX (1 << 1)
+ 
+ #ifdef CONFIG_XFRM_OFFLOAD
++/*
++ * xfrmdev_ops.flags values.
++ *
++ * XFRMDEV_OPS_F_LOWER_HANDLE marks a lower driver whose datapath gets XFRM
++ * hardware handles with xfrm_dev_state_lower_handle(). This is required when
++ * the XFRM state is owned by an upper device because xso.offload_handle may
++ * not contain the handle for the current lower device.
++ */
++#define XFRMDEV_OPS_F_LOWER_HANDLE	BIT(0)
++
+ struct xfrmdev_ops {
+ 	int	(*xdo_dev_state_add)(struct net_device *dev,
+ 				     struct xfrm_state *x,
+@@ -1048,6 +1058,23 @@ struct xfrmdev_ops {
+ 	int	(*xdo_dev_policy_add) (struct xfrm_policy *x, struct netlink_ext_ack *extack);
+ 	void	(*xdo_dev_policy_delete) (struct xfrm_policy *x);
+ 	void	(*xdo_dev_policy_free) (struct xfrm_policy *x);
++	/*
++	 * Resolve the offload handle for lower_dev when this upper device
++	 * owns the XFRM state. This belongs in xfrmdev_ops because the
++	 * resolver is an XFRM offload operation of the device that owns the
++	 * state. Keeping the dispatch here avoids a bonding-specific dependency
++	 * in the XFRM helper.
++	 *
++	 * Upper devices like bonding may implement this callback when they
++	 * keep the lower-device handle mapping. Lower devices must leave it
++	 * NULL because they do not own that map. Lower drivers advertise
++	 * that their datapath calls the resolver with
++	 * XFRMDEV_OPS_F_LOWER_HANDLE instead.
++	 */
++	unsigned long (*xdo_dev_state_lower_handle)(struct net_device *dev,
++						    struct xfrm_state *x,
++						    struct net_device *lower_dev);
++	u32	flags;
+ };
+ #endif
+ 
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 10d3edde6b2f..b61e2c023eb4 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -162,6 +162,10 @@ struct xfrm_dev_offload {
+ 	 */
+ 	struct net_device	*real_dev;
+ 	unsigned long		offload_handle;
++	/* Private state owned by dev in this structure when that device is an
++	 * upper device. Lower drivers must not use this directly.
++	 */
++	void __rcu		*upper_priv;
+ 	u8			dir : 2;
+ 	u8			type : 2;
+ 	u8			flags : 2;
+@@ -1700,6 +1704,37 @@ struct xfrm_state *xfrm_state_lookup_byspi(struct net *net, __be32 spi,
+ int xfrm_state_check_expire(struct xfrm_state *x);
+ void xfrm_state_update_stats(struct net *net);
+ #ifdef CONFIG_XFRM_OFFLOAD
++/*
++ * Return the hardware offload handle lower_dev should use for x. States
++ * installed directly on lower_dev use xso.offload_handle. States owned by an
++ * upper device are resolved through the owner's xdo_dev_state_lower_handle().
++ * Bonding uses that callback for replicated XFRM states because it installs the
++ * state on each slave and keeps the per-slave hardware handles internally.
++ */
++static inline unsigned long
++xfrm_dev_state_lower_handle(struct xfrm_state *x, struct net_device *lower_dev)
++{
++	struct xfrm_dev_offload *xdo = &x->xso;
++	struct net_device *real_dev = READ_ONCE(xdo->real_dev);
++	struct net_device *dev = READ_ONCE(xdo->dev);
++	unsigned long offload_handle = READ_ONCE(xdo->offload_handle);
++
++	if (!dev || !lower_dev)
++		return 0;
++
++	if (dev == lower_dev)
++		return offload_handle;
++
++	if (dev->xfrmdev_ops && dev->xfrmdev_ops->xdo_dev_state_lower_handle)
++		return dev->xfrmdev_ops->xdo_dev_state_lower_handle(dev, x,
++								    lower_dev);
++
++	if (real_dev == lower_dev)
++		return offload_handle;
++
++	return 0;
++}
++
+ static inline void xfrm_dev_state_update_stats(struct xfrm_state *x)
+ {
+ 	struct xfrm_dev_offload *xdo = &x->xso;
+@@ -1711,6 +1746,12 @@ static inline void xfrm_dev_state_update_stats(struct xfrm_state *x)
+ 
+ }
+ #else
++static inline unsigned long
++xfrm_dev_state_lower_handle(struct xfrm_state *x, struct net_device *lower_dev)
++{
++	return 0;
++}
++
+ static inline void xfrm_dev_state_update_stats(struct xfrm_state *x) {}
+ #endif
+ void xfrm_state_insert(struct xfrm_state *x);
+@@ -2089,15 +2130,18 @@ static inline void xfrm_dev_state_advance_esn(struct xfrm_state *x)
+ static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
+ {
+ 	struct xfrm_state *x = dst->xfrm;
++	bool has_offload_state;
+ 	struct xfrm_dst *xdst;
+ 
+ 	if (!x || !x->type_offload)
+ 		return false;
+ 
+ 	xdst = (struct xfrm_dst *) dst;
+-	if (!x->xso.offload_handle && !xdst->child->xfrm)
++	has_offload_state = x->xso.offload_handle ||
++			    rcu_access_pointer(x->xso.upper_priv);
++	if (!has_offload_state && !xdst->child->xfrm)
+ 		return true;
+-	if (x->xso.offload_handle && (x->xso.dev == xfrm_dst_path(dst)->dev) &&
++	if (has_offload_state && (x->xso.dev == xfrm_dst_path(dst)->dev) &&
+ 	    !xdst->child->xfrm)
+ 		return true;
+ 
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 686014d39429..584f913751bf 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -791,6 +791,7 @@ void xfrm_dev_state_free(struct xfrm_state *x)
+ 		if (dev->xfrmdev_ops->xdo_dev_state_free)
+ 			dev->xfrmdev_ops->xdo_dev_state_free(dev, x);
+ 		WRITE_ONCE(xso->dev, NULL);
++		RCU_INIT_POINTER(xso->upper_priv, NULL);
+ 		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
+ 		netdev_put(dev, &xso->dev_tracker);
+ 	}
 -- 
 2.53.0
 
