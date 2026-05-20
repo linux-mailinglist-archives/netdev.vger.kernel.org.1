@@ -1,171 +1,255 @@
-Return-Path: <netdev+bounces-290036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAZUBt4BDmqs5QUAu9opvQ
-	(envelope-from <netdev+bounces-290036-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:47:58 +0200
+	id sMbDGpolDmr26QUAu9opvQ
+	(envelope-from <netdev+bounces-290037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:20:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 756655973B0
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:47:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B637A59AB85
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C85583850856
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:10:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 63C7F33C38C2
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00C23E95A4;
-	Wed, 20 May 2026 18:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E563F9287;
+	Wed, 20 May 2026 18:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNSD8Nvl"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="njSup9zs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7427F331220;
-	Wed, 20 May 2026 18:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE0F3A6B6D;
+	Wed, 20 May 2026 18:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779300653; cv=none; b=V7RGLIDJucmExxEQAQW2+xs0NmxstEpF4Xykbp6rcn0hh4UnxwlkdSWzOwY4HFAf/CRjp9ORHvqPMMCfaPTKluHNl8CdUy2ZJQ8PUgCgQQOEDulIQmevYI8t6mM2xEH7gmI9onakG4y29gNeaVB9DTf0HMfTfw6EBX7qBAR9L3Q=
+	t=1779300701; cv=none; b=csz8FvVdASEmVy93vW6A2Oic/rlwds1k+Gk4bVHey1bRqklACM7K9BwtXYS+QQdgxSYd567PTmqleN0Q8Z5qgR4tYTGdZoAHayD/n+ZsuAOPZdervzKsJgyl5Vqd9UVfpX3xwNh42WQK3wbyjMY1W2ElE0wAuoiEzVARV+CzAus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779300653; c=relaxed/simple;
-	bh=9NB8iBCMLb6WMljvi9t2zQ8S1JE0iKrQ12TFlCoFjV8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pVb/OKR+gP1CD4hxJ+QGECdgSsbQzZXkx7k0w8dkEBHvoHW6Gw3hqUVp6s2S4BpxFxWp3tNkEurqHZNGPIGDm/3BE0zn5keq9KXx6Zn4kasfRqL7H+buZBQFVYSy3ni/K0+dD+MGXQyrgeBZh+VPg2roigsMQ7RVDsA8zY1EKn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNSD8Nvl; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAF461F00893;
-	Wed, 20 May 2026 18:10:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779300652;
-	bh=uMgNsZHHGhq0vm7lGFdiIF74J4CVM01doQlgu8okr6o=;
-	h=From:Date:Subject:To:Cc;
-	b=BNSD8NvlBGWMNCcnXibPB3Zt3AuDd1X+MpCNIp2Ox5CQMEecADYmdOfNAxDfIJWQJ
-	 OXnsFSwpj6xk3KVuRCQ/6UBdBB0Z8yZ9zfkGfJx4TFCioIT/ni8tvVXfCtrApr5Wou
-	 KWeaWPqnbPLKVWT260zUNgkhB/aluStcQyMjBRKFbBO4hBnjYEYO5MmgQq65IHZ2JY
-	 kgJaVwpfuvBRpOYCs+fO2W6YOsIymTNVSwLA4mjmkW43zRCMBE3qb4dOKpS7Ui0+lH
-	 YA+8Kv8mQ7S/ZXJV7v4Ydbj+U36Hjm+pN6HsNRJPmBDVqXIhn63al4OvIYdhLGeibQ
-	 7eiS9uHYl19og==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Wed, 20 May 2026 14:10:35 -0400
-Subject: [PATCH] sunrpc: use kref_get_unless_zero in auth_domain_lookup
+	s=arc-20240116; t=1779300701; c=relaxed/simple;
+	bh=ReI7Pe1k2azsgNrEH63iUCivw8znTCYb+QNRCjEgjIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VllHL7sn2uofsk0A2JsI7ukOU9HXDOxDGQA0qheG2vdsRJciGRtj1Z+aqrjdrwjH6YCu/Zk+RRKdTadBo4UbnroO2KrefqwtNEsIq6Hrn2bOnDcUZPAdqgf/XdA6xq0wKkxvUcC/F18z64FwsTmRFV0VXE/mO8LCjbM+DHUN5Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=njSup9zs; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 59A3D20B7168; Wed, 20 May 2026 11:11:33 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 59A3D20B7168
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1779300693;
+	bh=XfQvxMfI6M+Oo70/NIQBu2bKqGiJTjH2WuohEgBfMOY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=njSup9zsmcuXswBqk9kKeBxXe8+Tef4n3n6ki/hOJVKKtlxuW10NC0MeqJya4TJPr
+	 PXP0GCmnluc4tjP9pMAg2v+gdgDWzxivbh/pyd3Zg0hOOet44+nyfT0cmvopslIjPn
+	 OZwNqkKxfitaA/lk+vZW3JVozEpeJy/1i1T7zOoY=
+Date: Wed, 20 May 2026 11:11:33 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org, jacob.e.keller@intel.com,
+	dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
+	john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
+	yury.norov@gmail.com
+Subject: Re: [PATCH net 1/2] net: mana: Add NULL guards in teardown path to
+ prevent panic on attach failure
+Message-ID: <ag35VVYd0BOSYbrK@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260518194654.735580-2-dipayanroy@linux.microsoft.com>
+ <20260519225556.3939204-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260520-nfsd-fixes-v1-1-664ba702d698@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2LQQqAIBAAvyJ7TlgtM/pKdIhcay8WLkQg/j3pO
- MxMAaHMJDCrApkeFr5SA9Mp2M8tHaQ5NAaLdkRnUacoQUd+SXQ0vXfeBhwmhDbcmX7R+mWt9QN
- kt2AAXAAAAA==
-X-Change-ID: 20260520-nfsd-fixes-f137572d0480
-To: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Chris Mason <clm@meta.com>, linux-nfs@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1998; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=9NB8iBCMLb6WMljvi9t2zQ8S1JE0iKrQ12TFlCoFjV8=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBqDfkkXJn1U6bk1VvSTPQsVYUjH0wjcf4Iu9Fng
- DT4cUCIsJGJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCag35JAAKCRAADmhBGVaC
- FVgPEACDpsnHtz1IGcR79opTalJVgwPussUMl+JJS45+1YCJL3jJudQSxuAs4VCBpAGtrdnfKz7
- AHc/be1saLNx70fmIaXoiu/rWwnISgUnPc2scOIi4gVIHGfjnLHaJ1pTyOVqZtKlelai2bnGQBZ
- OodNAOBg9UO3g+2OWFugzQXfWipr28ehwo1pQgcXQUmp9rDCtkIX+MCcgiArKr0c1CNjhS1/MTs
- a10DwYO7t0UMaP/XgaVVchJFztEynEM//B67pBypo5Cj9T9dIT0qEZjDexshn7uuK0TKrLVLesW
- 5jbjfGDDSox1dBAbZO6pxSTRTvbq8MCwuI1OtgS8Unihi86MwnNcfpyU/vAbIcUxQclK7wQpB3A
- kQ3PidIyNCpHjgbDvdLoWe73Z0axQ1IL+aV7lSiA2OUPzmRVWp8B/h+SvUaZ6NC2nFdEQeU0mIQ
- HJScJZNSmL7+n1vCuAwzlEhxOUVIRbz6l03ub/8GNRWOVyuDp4hNcwOCL2FIlJ61HOpItRT+DU4
- Q4ReH+Q1REOALfelv3tTdsYKM8ldX4gmOWWCzrSe+UXq5zzhq3fARqCRh3AhgJ7BeJ/IFPrrQMP
- Y3AFnUoeZA+iB66+3OqRbXfIIQxWiTZBRY/bb6s8LLuJbUEaCe2CljnFBc4nKZmWrxGaz5S7aku
- RUxnqnamg8BGVHQ==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260519225556.3939204-1-kuba@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-290037-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290036-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jlayton@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,meta.com:email]
-X-Rspamd-Queue-Id: 756655973B0
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+X-Rspamd-Queue-Id: B637A59AB85
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-auth_domain_put() uses kref_put_lock(), which atomically decrements the
-refcount before acquiring auth_domain_lock. This creates a window where
-an auth_domain entry is still linked on the hash list with refcount == 0.
+On Tue, May 19, 2026 at 03:55:56PM -0700, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net: mana: Add NULL guards in teardown path to prevent panic on attach failure
+>     
+> When queue allocation fails partway through, the error cleanup frees
+> and NULLs apc->tx_qp and apc->rxqs. The patch adds NULL guards for these
+> pointers in teardown paths such as mana_destroy_vport(), mana_fence_rqs(),
+> and mana_dealloc_queues() to prevent NULL pointer dereferences.
+> 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > index 9afc786b297a8..9e7e4bf526bf6 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> [ ... ]
+> > @@ -2858,13 +2861,16 @@ static void mana_destroy_vport(struct mana_port_context *apc)
+> >  	struct mana_rxq *rxq;
+> >  	u32 rxq_idx;
+> >  
+> > -	for (rxq_idx = 0; rxq_idx < apc->num_queues; rxq_idx++) {
+> > -		rxq = apc->rxqs[rxq_idx];
+> > -		if (!rxq)
+> > -			continue;
+> > +	if (apc->rxqs) {
+> >  
+> > -		mana_destroy_rxq(apc, rxq, true);
+> > -		apc->rxqs[rxq_idx] = NULL;
+> > +		for (rxq_idx = 0; rxq_idx < apc->num_queues; rxq_idx++) {
+> > +			rxq = apc->rxqs[rxq_idx];
+> > +			if (!rxq)
+> > +				continue;
+> > +
+> > +			mana_destroy_rxq(apc, rxq, true);
+> > +			apc->rxqs[rxq_idx] = NULL;
+> > +		}
+> >  	}
+> 
+> If the teardown path frees apc->rxqs and sets it to NULL on attach failure,
+> how does the interface recover if the user subsequently brings it back up?
+> 
+> When mana_open() is invoked, it directly calls mana_alloc_queues(). Inside
+> mana_alloc_queues() -> mana_add_rx_queues(), the code does:
+> 
+>     apc->rxqs[i] = rxq;
+> 
+> If apc->rxqs was left as NULL during the teardown, will this cause a NULL
+> pointer dereference on the next interface bring-up?
+> 
+> [ ... ]
+Hi Jakub,
 
-auth_domain_lookup() walks the hash under auth_domain_lock but uses plain
-kref_get() to acquire a reference. If it finds an entry in this transient
-zero-refcount state, refcount_inc() triggers a WARN and refuses to
-increment (saturating refcount_t semantics), but the function returns the
-pointer anyway. The caller then holds a dangling reference: when the
-concurrent auth_domain_put() finally acquires the lock and runs
-auth_domain_release(), the object is freed while the lookup caller still
-has a pointer to it.
+The only path that recovers from this state is mana_attach(), which
+calls mana_init_port() -> mana_init_port_context() to re-allocate
+apc->rxqs before calling mana_alloc_queues().
 
-The sibling function auth_domain_find() already handles this correctly
-using kref_get_unless_zero(). Apply the same pattern in
-auth_domain_lookup(): treat a zero-refcount entry as absent and continue
-searching. The loop then either finds another live entry or falls through
-to insert the new domain, preserving existing semantics.
+When mana_open is invoked prior to it the rxqs would be already setup by
+mana_probe_port -> mana_init_port -> mana_init_port_context.
 
-Reported-by: Chris Mason <clm@meta.com>
-Assisted-by: kres:claude-opus-4-6
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- net/sunrpc/svcauth.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/sunrpc/svcauth.c b/net/sunrpc/svcauth.c
-index 55b4d2874188..8e01f0626759 100644
---- a/net/sunrpc/svcauth.c
-+++ b/net/sunrpc/svcauth.c
-@@ -245,8 +245,10 @@ auth_domain_lookup(char *name, struct auth_domain *new)
- 	spin_lock(&auth_domain_lock);
+> > @@ -3287,33 +3294,38 @@ static int mana_dealloc_queues(struct net_device *ndev)
+> >  	 * number of queues.
+> >  	 */
+> >  
+> > -	for (i = 0; i < apc->num_queues; i++) {
+> > -		txq = &apc->tx_qp[i].txq;
+> > -		tsleep = 1000;
+> > -		while (atomic_read(&txq->pending_sends) > 0 &&
+> > -		       time_before(jiffies, timeout)) {
+> > -			usleep_range(tsleep, tsleep + 1000);
+> > -			tsleep <<= 1;
+> > -		}
+> > -		if (atomic_read(&txq->pending_sends)) {
+> > -			err = pcie_flr(to_pci_dev(gd->gdma_context->dev));
+> > -			if (err) {
+> > -				netdev_err(ndev, "flr failed %d with %d pkts pending in txq %u\n",
+> > -					   err, atomic_read(&txq->pending_sends),
+> > -					   txq->gdma_txq_id);
+> > +	if (apc->tx_qp) {
+> 
+> In the error path where queue creation fails partway through, will
+> mana_destroy_txq() be called?
+> 
+> If mana_destroy_txq() unconditionally iterates over all apc->num_queues:
+> 
+>     for (i = 0; i < apc->num_queues; i++) {
+>         ...
+>         mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
+>         ...
+> 
+> Will it pass 0 or INVALID_MANA_HANDLE to mana_destroy_wq_obj() for queues
+> that were never fully initialized?
+> 
+> Does mana_destroy_wq_obj() send a MANA_DESTROY_WQ_OBJ command to the hardware
+> with these uninitialized handles, and could handle 0 corrupt the firmware
+> state?
+>
+This is a known  exisiting issue in the cleaup path for partial tx
+setups and was also mentioned in the a recent patch where the rx partial
+init clean-up path was fixed. My colleague Aditya is already working on a
+patch to fix this and all other issues in the tx cleanup path.
  
- 	hlist_for_each_entry(hp, head, hash) {
--		if (strcmp(hp->name, name)==0) {
--			kref_get(&hp->ref);
-+		if (strcmp(hp->name, name) == 0) {
-+			if (!kref_get_unless_zero(&hp->ref))
-+				continue;
-+
- 			spin_unlock(&auth_domain_lock);
- 			return hp;
- 		}
+> > +		for (i = 0; i < apc->num_queues; i++) {
+> > +			txq = &apc->tx_qp[i].txq;
+> > +			tsleep = 1000;
+> > +			while (atomic_read(&txq->pending_sends) > 0 &&
+> > +			       time_before(jiffies, timeout)) {
+> > +				usleep_range(tsleep, tsleep + 1000);
+> > +				tsleep <<= 1;
+> > +			}
+> > +			if (atomic_read(&txq->pending_sends)) {
+> > +				err =
+> > +				    pcie_flr(to_pci_dev(gd->gdma_context->dev));
+> 
+> If pcie_flr() is triggered here, the PCI Function Level Reset wipes the
+> internal GDMA state.
+> 
+> Further down in this function, mana_disable_vport_rx(), mana_fence_rqs(),
+> and mana_destroy_vport() are called. Will these functions attempt to send
+> commands to the now-destroyed GDMA admin queue via mana_send_request() and
+> wait for completions?
+> 
+> Could this lead to cascading timeouts since the hardware was just reset and
+> cannot process admin commands?
+> 
+This is pre-existing behavior/issue the pcie_flr() path and the
+subsequent calls to mana_disable_vport_rx()/mana_fence_rqs()/mana_destroy_vport()
+are unchanged by this patch. My patch only adds a NULL guard for
+apc->tx_qp to skip this entire TX drain block when tx_qp is already
+freed. But this point seems to be valid issue, I will investigate this
+further and I will send a different patch set for this as follow up work.
 
----
-base-commit: 508c9eaa7e0b952c4fe019880796e6207e3cd201
-change-id: 20260520-nfsd-fixes-f137572d0480
 
-Best regards,
--- 
-Jeff Layton <jlayton@kernel.org>
+> > +				if (err) {
+> > +					netdev_err(ndev, "flr failed %d with %d pkts pending in txq %u\n",
+> > +						   err,
+> > +					    atomic_read(&txq->pending_sends),
+> > +					    txq->gdma_txq_id);
+> > +				}
+> > +				break;
+> >  			}
+> > -			break;
+> >  		}
+> -- 
+> pw-bot: cr
+
+Regards
+Dipayaan Roy
 
 
