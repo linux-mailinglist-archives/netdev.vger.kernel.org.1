@@ -1,115 +1,150 @@
-Return-Path: <netdev+bounces-290085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJKhBoU4DmpC8gUAu9opvQ
-	(envelope-from <netdev+bounces-290085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:41:09 +0200
+	id oOEoMqgRDmrw5wUAu9opvQ
+	(envelope-from <netdev+bounces-290086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:55:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9527C59C315
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:41:08 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B082598E74
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 101693037DF3
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:54:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A97F330022FF
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DE8352026;
-	Wed, 20 May 2026 19:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A84435F8C9;
+	Wed, 20 May 2026 19:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ce+NKsSm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gvG3fYnW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E703834A3C4
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A72135B63D;
+	Wed, 20 May 2026 19:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779306873; cv=none; b=dpvR+9vHA9ePIWzvVhYNaGUZEDAUhsb8p97APJulCqzCWn78yalndQG60dGj61h8QUpiQycT+m+bQYbDCpx7R4H7KPJYHyEOJIDX5lInMO2CJM6+IRrgWlBIzsSyF33gIaZjMglrMfyKYC71oY2OVT8zXANPS/8zVhfBGL6s7ZA=
+	t=1779306917; cv=none; b=ZueIE1Umq8rnT5QaoS8QDW5PqlFtpayGKXRSinDb1Bxord6548F2QOyleeXalmZ5i4aagYyBngE+Vz//t/de1oEGabSmXxbtFIlD1lDfO1qt7GwX9UbxQPZcYLqpJ8S2uxNO3pjs11HmH9xYJ6xFwOdGPrPV7sPa/5ziRnr0XqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779306873; c=relaxed/simple;
-	bh=aB+z5ENZCHbOPB7WVjKyve84qWX2Al4grhne60hCxQU=;
+	s=arc-20240116; t=1779306917; c=relaxed/simple;
+	bh=ePlwtNrV8bm5af17CJA+hA03UVVUnZNvV6Gj4Csh34w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VU2UBut6zIRAJhEMBz1WP2HxpSDofagg2IoccJy9UPir3A8XPQT0zV95ssNqZEJHDY/mI4uMGZCGummicNRsiPnZKV2PVG9JiNRKSTvGriOexRYm9Mg+h6hI5ktbBgsnvMX15LuF1sn+Bey6giSOBot3/Nz4nkgdm4smaOrF1is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ce+NKsSm; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E13C41F000E9;
-	Wed, 20 May 2026 19:54:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=UyF58eo2l5pzOhJDKPW7p456ohnZiE9Yb0pVC23mfpMQjHeTQYlrVnUOps+LYROZQXFfc/t6HsYjefdcrqxxEEa5Rj56d6GOFkohuKM0erKXMtbaOSa02bDmGt/86vczIeJIVVLf+MWvcNucitkK2ONXtXvb6d+d6kT9JNEASaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gvG3fYnW; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9901C1F00893;
+	Wed, 20 May 2026 19:55:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779306872;
-	bh=G+DkWppDiIQaaJG07hShhTboOcGlWOtoOML2qdJZ3YI=;
+	s=k20260515; t=1779306915;
+	bh=RxqIxFG1IxAKAgegLj7Mzo2smFWW4Wovzg0Vzth+yOs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Ce+NKsSmWEcnyvxeORWtfGC3KmzFh5DypKUSWRbpoOICfiFU2pPuQAQS75q/X4ceN
-	 H1BmJhOdFBBJ3nuO9k+r6kLBTPHY1MKZNHWzOpvtAko7DVvgLGSC0gezsJfqirOATZ
-	 ZjgCc35CVlFrlExqfdTdFl9irm1wk30lxWxVgFt7cIN6x8GlY40xB6j/YIpOB9U4qo
-	 kmgqJurQ0jVAk9Ms0Xq/nU2p6p3U/YZTX4f5PWQXEo95pPsHAxaQ+GDrBDpsgnX22L
-	 V6pLZ5FbTSfmBiXnBQJGiLSCtEQGtCPL9GhmjxtK/8ZJpowleSfWceUhSDEKUkpMvC
-	 /pKdNo2mORkPQ==
-Date: Wed, 20 May 2026 20:54:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, hmohsin@meta.com
-Subject: Re: [PATCH net 0/2] net: shaper: fix VALID confusion even more
-Message-ID: <20260520195428.GA1506108@horms.kernel.org>
-References: <20260515221325.1685455-1-kuba@kernel.org>
+	b=gvG3fYnW6Y4GsW5195iIcSiXJU1+0oPs5SvDo+mc55KmvGxSPaS4DFpLF6Nq3pVXo
+	 i/TwWejnUp5GoBhF2fhGnMGQ0a6hlShS5M7jK720BACUhhdm1I73qVbEdulMdZN0gJ
+	 etbetJyiXyX49tNLv7nGAwZf7l7kl5KQSXsrCee5wgm59FE9DUfcyc9DZQlJNa1Cg9
+	 gMBhPm21dVv5A0rtSaw02BMwE9w174OarCQYDmh8SSymGXECjP744gtwVSsVDTU4RF
+	 9vt06p7O/3kL2csNUZlMURxZ8iAgBmDBmThdRLCtS65s3doC+AO7yd3Oixtll/2WEZ
+	 8uW2MKIoqHmug==
+Date: Wed, 20 May 2026 21:55:10 +0200
+From: Michael Grzeschik <mgr@kernel.org>
+To: netdev@vger.kernel.org
+Cc: Markus Schneider-Pargmann <mail@markussp.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: Update address for Michael Grzeschik
+Message-ID: <ag4RnvXbAoITkwth@pengutronix.de>
+References: <20260426-maintainer-v1-1-d74d2f4343f7@kernel.org>
+ <DICBWQ0WBG05.1D9181KHYC61C@markussp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-15
 Content-Disposition: inline
-In-Reply-To: <20260515221325.1685455-1-kuba@kernel.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DICBWQ0WBG05.1D9181KHYC61C@markussp.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290085-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290086-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mgr@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url]
-X-Rspamd-Queue-Id: 9527C59C315
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6B082598E74
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, May 15, 2026 at 03:13:23PM -0700, Jakub Kicinski wrote:
-> Sashiko reported another pre-exising issue in the previous
-> batch of fixes:
-> https://sashiko.dev/#/patchset/20260510192904.3987113-7-kuba@kernel.org
-> 
-> Turns out I over-esitmated the guarantees of the XArray flags.
-> Stop using them completely.
-> 
-> Jakub Kicinski (2):
->   net: shaper: annotate the data races
->   net: shaper: rework the VALID marking (again)
+Gentle ping to ask if anyone is picking this up?
 
-Sashiko suggests updating the wording of the VALID flag
-comment in net_shaper_pre_insert as part of the second patch.
-But, TBH, I don't feel strongly about that.
+On Thu, May 07, 2026 at 11:15:17AM +0200, Markus Schneider-Pargmann wrote:
+> On Sun Apr 26, 2026 at 12:20 AM CEST, Michael Grzeschik wrote:
+> > Since I am moving from Pengutronix update my email address for the
+> > ARCNET subsystems to point to my kernel.org address.
+> >
+> > Also update .mailmap.
+> >
+> > Signed-off-by: Michael Grzeschik <mgr@kernel.org>
+> 
+> Acked-by: Markus Schneider-Pargmann <mail@markussp.com>
+> 
+> > ---
+> >  .mailmap    | 2 ++
+> >  MAINTAINERS | 2 +-
+> >  2 files changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/.mailmap b/.mailmap
+> > index 34acd34bbf9bf..7b01246851705 100644
+> > --- a/.mailmap
+> > +++ b/.mailmap
+> > @@ -579,6 +579,8 @@ Mayuresh Janorkar <mayur@ti.com>
+> >  Md Sadre Alam <quic_mdalam@quicinc.com> <mdalam@codeaurora.org>
+> >  Miaoqing Pan <quic_miaoqing@quicinc.com> <miaoqing@codeaurora.org>
+> >  Michael Buesch <m@bues.ch>
+> > +Michal Grzeschik <mgr@kernel.org> <m.grzeschik@pengutronix.de>
+> > +Michal Grzeschik <mgr@kernel.org> <mgr@pengutronix.de>
+> >  Michael Riesch <michael.riesch@collabora.com> <michael.riesch@wolfvision.net>
+> >  Michal Simek <michal.simek@amd.com> <michal.simek@xilinx.com>
+> >  Michel Dänzer <michel@tungstengraphics.com>
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 2fb1c75afd163..48b601d36b846 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -2058,7 +2058,7 @@ F:	Documentation/devicetree/bindings/display/snps,arcpgu.txt
+> >  F:	drivers/gpu/drm/tiny/arcpgu.c
+> >  
+> >  ARCNET NETWORK LAYER
+> > -M:	Michael Grzeschik <m.grzeschik@pengutronix.de>
+> > +M:	Michael Grzeschik <mgr@kernel.org>
+> >  L:	netdev@vger.kernel.org
+> >  S:	Maintained
+> >  F:	drivers/net/arcnet/
+> >
+> > ---
+> > base-commit: 897d54018cc9aa97fd1529ca08a53b429d05a566
+> > change-id: 20260426-maintainer-eecd046c4a87
+> >
+> > Best regards,
+> 
 
-For the series:
-Reviewed-by: Simon Horman <horms@kernel.org>
+
 
