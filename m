@@ -1,160 +1,162 @@
-Return-Path: <netdev+bounces-289735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289742-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GHY+FfomDWo8twUAu9opvQ
-	(envelope-from <netdev+bounces-289735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 05:14:02 +0200
+	id SNc0M8MpDWo8twUAu9opvQ
+	(envelope-from <netdev+bounces-289742-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 05:25:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8759587198
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 05:14:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3824958736A
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 05:25:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5C97D301AFC4
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:14:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 955763052E72
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39DDE332907;
-	Wed, 20 May 2026 03:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6D23451BD;
+	Wed, 20 May 2026 03:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VDtfzZay"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="LkZe8GUo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF864330D43
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D37D3043B2;
+	Wed, 20 May 2026 03:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779246840; cv=none; b=l3xg0yblI8qsDfxOMp1wiv4umWpw/exQr6ZPEoKUJfu6oqQBO/T9lss1hfPa/bTZ03QHOTadMhJXNC43ejaGqCM3IwWBZ81H2Bvs9HbeAjpkhOYZwzwAkqdpq9PS+qmpvWOML5GcK+9Dygs7J5zZbEH3eCG/ych6mTqRVU7vQoA=
+	t=1779247003; cv=none; b=OY69cTRKm1P1wTBzwyBVUD0pkwrZzLhT++P9PFIbBpWwF3ZB3nWAZuTmfUX5HiU7kJrrAEofgYEa6x4o7Bi2dDbVPa8TThq90reFVKdmEWFE0GM3PcG4ECRMjqJgk7KNGrJJKf63bCWbfN1FLZ7FGpU19p3ZJ8XOgF2F+QZ2DYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779246840; c=relaxed/simple;
-	bh=rkZQB7CmExri+8CjjBQVPCHhPyaffU8DthTqgx6Ywcg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ewnXljkor7LQCaAXmfFZqU3Ey84/7+G7xQTvrq4Lea6RBBjDdAfZ7wo8tl98HUc4JspeHAw3NEhWWj7VRlrW5J9K1HpUni7OLLO/C2keP5bHdBIP+TzAqq18C739UkcvX8m08r1FA2fj1fcPIEFNszbBu8sUQzanulsSNtavQe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VDtfzZay; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <206188f9-5642-4348-9fa1-c48f9a890640@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779246826;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d/BAsYNaRoSPqOC7pVUIR0S0Ozuw6H+s2VNAeqI7FrU=;
-	b=VDtfzZay5VTZ6ayBG0Igk+ssjqN7hXy86j6RFoPTY8GN0Ygzj/uEbwWGWXT6/amFp0Ggi/
-	4bLUJ5ByOWyeMYlqfFo+xEwbtESaE4tOmDPkplztGbaNuvVGarHgK2BKteVXVnik1izSfP
-	hHXeS+BiQAfGgtxOKHCfjV9XqH86LCA=
-Date: Wed, 20 May 2026 11:13:30 +0800
+	s=arc-20240116; t=1779247003; c=relaxed/simple;
+	bh=GrEKKmBOINCMoW08RSTPJ+x5d07iRJdkwg38U9wxHxk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IpwB3VWcFTN5sOKaH9Amdw9ufXSUonCsqzV/Iq6kGMXVFseV6Ka6SDQaj7CGboRi4KSclxkRYOavVluwu6CnGCYwbfiHL5FRVVvK8qKtgIhbZStBF/PliInRyArb0+HGoXUkbwSp4BRPB2m2+j7EPgUjLpsmSe1qeWyuiq4CKx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=LkZe8GUo; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 64K3G5mjC3896058, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1779246966;
+	bh=PryQ+Lj4rzu9ID0uIAjVG55OBAh3m1escAql2a+18xc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=LkZe8GUoDyjTOJu/1ygU5D8OkjpxcEDlNvF/pfVBqzWiSD/48Jeg4TwDfegTRO+jQ
+	 0XO63ZmONBHM5Ia0HuRoLzoBGmXZxRAYe9gkAltxTC35TLq2voY3YvlPLSNApj3f5v
+	 v2DMRf3gFxLV79DvB9jNK5XsBFYCxuq0wvvGmguPbV1R7DbQuRwbyPvfaaXOzL97Ul
+	 8IbdjOprt0ysi5eMbdsg8u0Eg6fDYdfAGApo8rwT/GIfMHBHgrDht2j+P1AOicoc/z
+	 u0gNslTiN5p3Q9hDVMz0GC/SNgEa6RG6W3rYoLz9oWrjC/y5TdmsrWzngjANRhhfSL
+	 zcOwYIlEVMJJA==
+Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 64K3G5mjC3896058
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 20 May 2026 11:16:06 +0800
+Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
+ RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 20 May 2026 11:16:06 +0800
+Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
+ (172.29.17.102) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Wed, 20 May 2026 11:16:06 +0800
+From: javen <javen_xu@realsil.com.cn>
+To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Javen Xu
+	<javen_xu@realsil.com.cn>
+Subject: [Patch net-next v5 0/7] r8169: add RSS support for RTL8127
+Date: Wed, 20 May 2026 11:15:56 +0800
+Message-ID: <20260520031603.700-1-javen_xu@realsil.com.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] bpf, sockmap: keep sk_msg copy state in sync
-To: Zhang Cen <rollkingzzc@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Jakub Sitnicki <jakub@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- zerocling0077@gmail.com, 2045gemini@gmail.com, stable@vger.kernel.org
-References: <20260517121626.406516-1-rollkingzzc@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <20260517121626.406516-1-rollkingzzc@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289735-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,iogearbox.net,linux.dev,fomichev.me,cloudflare.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-289742-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E8759587198
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:dkim]
+X-Rspamd-Queue-Id: 3824958736A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+From: Javen Xu <javen_xu@realsil.com.cn>
 
-On 5/17/26 8:16 PM, Zhang Cen wrote:
-> SK_MSG uses msg->sg.copy as per-scatterlist-entry provenance. Entries
-> with this bit set are copied before data/data_end are exposed to SK_MSG
-> BPF programs for direct packet access.
->
-> bpf_msg_pull_data(), bpf_msg_push_data() and bpf_msg_pop_data() rewrite
-> the sk_msg scatterlist ring by collapsing, splitting and shifting
-> entries. These operations move msg->sg.data[] entries, but the parallel
-> copy bitmap can be left behind or stale in slots that no longer contain
-> the original entry. A copied entry can therefore later occupy a slot whose
-> copy bit is clear and be exposed as directly writable packet data.
->
-> Keep msg->sg.copy synchronized with scatterlist entry moves, preserve the
-> copy bit when an entry is split, clear it when a helper replaces an entry
-> with a private page, and clear every slot vacated by pull-data
-> compaction.
->
-> Fixes: 015632bb30da ("bpf: sk_msg program helper bpf_sk_msg_pull_data")
-> Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
-> Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
-> Cc: stable@vger.kernel.org
-> Co-developed-by: Han Guidong <2045gemini@gmail.com>
-> Signed-off-by: Han Guidong <2045gemini@gmail.com>
-> Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
-> ---
-> v2:
-> Sashiko-bot pointed out that bpf_msg_pull_data() could leave stale copy
-> bits on collapsed tail entries.
->
-> Clear msg->sg.copy for every entry consumed by bpf_msg_pull_data()
-> before compacting the scatterlist ring.
->
-> While researching recent page cache bugs, we discovered this bug.
-> We confirmed it allows overwriting the page cache of read-only files
-> via splice(). We haven't attempted to write an exploit, but the
-> corruption primitive is verified. PoC available upon request.
-> Recommend fixing ASAP.
+This patch series adds RSS (Receive Side Scaling) support for the r8169
+ethernet driver, specifically for RTL8127 (RTL_GIGA_MAC_VER_80).
 
-I think only "splice() + KTLS + sockmap" is vulnerable, right ?
+RSS enables packet distribution across multiple receive queues, which can
+significantly improve network throughput on multi-core systems by allowing
+parallel processing of incoming packets.
 
-I digded a lot but didn't find any other combo.
+Key features:
+- Multi-queue RX support (up to 8 queues)
+- MSI-X interrupt with vector mapping
+- Dynamic queue configuration via ethtool (-L)
+- RSS hash computation for flow classification
 
-Actually the normal TCP/UDP  with splice() will not go through sockmap 
-(unsupported yet)
+Experiments:
+Platform: AMD Ryzen Embedded R2514 with Radeon Graphics(4 Cores/8 Threads)
+Arch: x86_64
+Test command: 
+  Server: iperf3 -s
+  Client: iperf3 -c 192.168.2.1 -P 20 -t 3600
+Monitor: mpstat -P ALL 1
 
+Before this patch (Without RSS):
+  Throughput: Unstable, fluctuating between 3.76 Gbits/sec and
+  8.2 Gbits/sec.
+  CPU Usage: A single CPU core is fully occupied with softirq reaching 
+  up to 96%.
 
+After this patch (With RSS enabled):
+  Throughput: Stable at 9.42 Gbits/sec.
+  CPU Usage: The traffic load is evenly distributed across multiple CPU
+  cores. The maximum softirq on a single core dropped to 63%.
+  
+Other Experiments:
+Link: https://lore.kernel.org/netdev/0A5279953D81BB9C+f50c9b49-3e5d-467f-b69a-7e49ed223383@radxa.com/
 
+Javen Xu (7):
+  r8169: add support for multi irqs
+  r8169: add support for multi rx queues
+  r8169: add support for new interrupt mapping
+  r8169: enable new interrupt mapping
+  r8169: add support and enable rss
+  r8169: move struct ethtool_ops
+  r8169: add support for ethtool
 
+ drivers/net/ethernet/realtek/r8169_main.c | 1100 ++++++++++++++++++---
+ 1 file changed, 963 insertions(+), 137 deletions(-)
 
-I think only "splice() + KTLS + sockmap" is vulnerable, right ?
-
-I digded a lot but didn't find any other combo.
+-- 
+2.43.0
 
 
