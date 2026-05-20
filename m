@@ -1,174 +1,160 @@
-Return-Path: <netdev+bounces-289761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289762-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8JrYGo84DWpjugUAu9opvQ
-	(envelope-from <netdev+bounces-289761-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:29:03 +0200
+	id +OsbMhc5DWqBugUAu9opvQ
+	(envelope-from <netdev+bounces-289762-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:31:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEB035877D0
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:29:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3907D5877F0
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94C49300D447
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:28:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 74CAD304F38C
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14043546CB;
-	Wed, 20 May 2026 04:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6641F09AD;
+	Wed, 20 May 2026 04:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pf/xdFFt"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="WCGBf5Ex"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f66.google.com (mail-lf1-f66.google.com [209.85.167.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DC933BBA7
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 04:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779251338; cv=pass; b=cbFphrcuuh9Y3a/f2mYVrp5A8sdOsro2tNM0rB8aZZn+sLyo4EOzppl8NTYyOoP+VmB7lyAgWDksBJV5RbLwrjjqXV40Lo9p2wnUWXo3xtiiObACe9tkXmcjIIBVl9/pY1iecWiYVG5cc6ETAoM8K015KDniDawWPTD7Qx6qhXY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779251338; c=relaxed/simple;
-	bh=/JOTsuNNwm3OUcz8Y8bCu0RJEPYgzgrSgRWrrAjARiQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hUgNz1bxxADSK3TGc+zgK+Rq8IKC41ma+ho4iHqJytfm3zCe70KWUc31IORCB/rXrtVLX7EhXC2V5pXtbbs09wOVyv8Qb40GX85/mLVNl5XU8X92+gulwTFchgUrrL6dmFbvwlFDeaIfVhCWFy8jypV4hBJvS7LfKXzIrbn0vM8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pf/xdFFt; arc=pass smtp.client-ip=209.85.167.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f66.google.com with SMTP id 2adb3069b0e04-5a995ab70d1so6687568e87.3
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 21:28:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779251335; cv=none;
-        d=google.com; s=arc-20240605;
-        b=B3ERzNduuYJPo9Al26oKwCyFwGgQ+68jr/kUzJySA1CwC3G7jZGznF6+o4fXRnBQci
-         fzAGkZIpwaNg9Rc9pZWTd0FR0LIsMhwW+blMHYS9c0BMZiN9dGcB/YAYboT0QfAwOA7Y
-         tWJm8dzpR9v6/cFcpZiz/gceRdz45kpF45DgfyFFkjaJJgAOutuyZ4KkhwB+PyhwbByv
-         20CbWEog4P+cKBcVC/WplQVw68I3yBzBddClp2CyWEJakGrMNVUXpOo2m4l58jirYNvl
-         goeSBGA4rjnHeOOel8XvakedD+5f0+GDaXFZWBPcPj0cs7g2cOQo308Z618yk+nxxeLO
-         CkLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=/JOTsuNNwm3OUcz8Y8bCu0RJEPYgzgrSgRWrrAjARiQ=;
-        fh=Vkfqx6ffHSWACYhd/vBRaRBHvYAcD8YRkCMpVLUdrPI=;
-        b=LrHbLHmKm7azkkBfl+GD6PsOEk/mVQBnrWHXIuCFL96mBOMGorxJVB0gx7UUMNyJRV
-         03UlPplSrg1oRnU73Bf09UvqvgeswbROx5clbpeYIW7+0MEVtBdmZDFLpyRUxWqLXZDD
-         eCiwPXC8u6hKbdsN80ew4H+Ie4AfGX1cPC5yLHEhskmcwZj/Rb6TVwEgfrpRgUtTN95j
-         T2Qh81xhzB5N9k9K0i6nf/5pOeHcsEQZ68p2Mb/t6oUBy94uyJ0I0dkxdKeAfFnJ93Fz
-         VA7km7/cIUuI94t0IWOi7yO3Fi+XwjlRaX+B+OqVMDPGD8TAB9sKuzzhYVIakhS01IRw
-         UNJA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779251335; x=1779856135; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/JOTsuNNwm3OUcz8Y8bCu0RJEPYgzgrSgRWrrAjARiQ=;
-        b=pf/xdFFt04fdFs1N64CxC0xgaN2rRfa5Xp1aYJ0hEr0FlVQTG4l5JqWGzdYZxJai5O
-         Q/PjDVKIg2BSkneXzSmJSgIIqHTVYLZJYj/Cx27CnPMhQltpP94bGk6zFv4n0ln5Bouy
-         WnerPoDC9NnQfRUyilijsVOURO4dzwFlAfxIiPYZn1EHa4uhjt0kH8tGAKD8098ByXM6
-         xnmm2kNQ2bUL3sHFZXHKMezzgrg/jpNeKN3kBpzTKfr4dg/z50C+bEULRrmCGod7mxLV
-         il37h52WNVMJlIrMyVfQjKz4m9LGjjL1OeLlO3884O0Yl/Rsk8a74pqQVzE1F77lzvYu
-         H8zA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779251335; x=1779856135;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/JOTsuNNwm3OUcz8Y8bCu0RJEPYgzgrSgRWrrAjARiQ=;
-        b=lkTDrFaeYAg/NdY3Rmrmcq14TdvwKVuMYfUHeDDssJUYA5GhjazRagQiL/SlGEXL8n
-         o7Z2im8vfZiTB4Ubnf/eS8XculXlAOEc0+ndx6rE3lNC5berY0N59WBrQWFZsLjRG2Ae
-         rF4s33LXVYYgXGoDC8vK9rai1Q+vkRlk9pUmMep5iS1skKfV3+JqijRvRNBA7BPbKifA
-         Oax5760h55rxn6SF/VkijxmawTx5Rb+bansIOj7s8obsCCjxsNTdmrF4J07gwRvzOGSR
-         1YjTPj7coEFBpp73/FIAwEx06RjpBydRR9HDFYxoOA48Y2FRdL0+OCA+9EALnKj2DAhD
-         v/4w==
-X-Forwarded-Encrypted: i=1; AFNElJ+Z0P2P/q1rDOlHJvwcypP8OvleyZwyiJODbbwAj7oNWHZqTx29rMiqYkL0UqH38F3fh2sYOJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBcrCwUOMn2dYYSNEUvZl/8kc19/dWuUI4zrYK1L+b6v3XB/7K
-	uFk4nbYtWopJN6HuOQpn1MUEFHwa/Pk5wILgYIWPl2GsX0M14IyeKvdN8X4SnjdGxhRX7rpuW/3
-	VQgTRhBpDZU0Vj9H8eCu1Y+cMrvuv2gc=
-X-Gm-Gg: Acq92OEitFGQMdQ+z3VY8govXgGLRxBewOwKxpKWEgMVbxd3rXdfJOlShcBu+Swa9nw
-	uleuaEXc3K/MI7ExOWd3lNYVUpM16CuDMEE+Fmu3IYmSq0Yd3/0AWDn/H9PWwFSwBVWvBdclRyH
-	kd6cUmJ2FzLl2Y8ZMZ9jJ/P3wABZw5P/v8Dw8w2goCTKTtzIrTmqws70T9qSdb7cdPgmKVYoD+5
-	sEl+mkzqsPmVdFgyXcj2bOqdl+2E3GWZU8Fzv9Ok5ELrdeXXGBx8TZLjAUjjm5Fjs24uJbHH3nb
-	VhHQA14kF/kfcwTwKbkpz2cC9kFYAA==
-X-Received: by 2002:a05:6512:118a:b0:5a8:e32f:6edd with SMTP id
- 2adb3069b0e04-5aa0e5baa13mr6949512e87.0.1779251335198; Tue, 19 May 2026
- 21:28:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0773B13DDAE;
+	Wed, 20 May 2026 04:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779251474; cv=none; b=K+gneYUkPO5MhTKA6tEApNpDnG2RkNAGnTfQE1+cP3YXo1DyH7OA/MtOAUBOSjtRxdo2uvyHNQzQvO0OiXxmuH6Dv/Ik06pFTqhzRBCAFb9RaJn7u/hxasoeeGwtZrmgWO+kO/ENhYC540sBxrFBpOgI6FV/6va2DaC8dL1RSeI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779251474; c=relaxed/simple;
+	bh=f6mjM7KKs/UGkOydUaEw9o2nGol1Wj2FfP16fH5HU04=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kBWgCSfbcY+jOxIrM7SptSGVP0/Ullaq3RQDeQJH8enifKHIex/fqn1FXMrAg5hp/3wbNqW1Rbf+eksJKBiTnCQjEc11krMosuL1V7KXPW/6DkFs0I67te1+Apu8A/bw5Pt5DDQGfvdiiKfnESH2V1DEJo6PoWmw0HG8IxTtqJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=WCGBf5Ex; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64K2pm3k3009289;
+	Tue, 19 May 2026 21:30:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=bI/+cOvklyLRSX00+NsdRtz
+	PrQCcL9vTpdE4iKWbsPc=; b=WCGBf5ExVk4XucYPqtqVj7kTl83or794HistG0T
+	lZrdkmU240E0HZ6i19CYiTBvLkNCMEYUj1SYDPsrwQIlcrw6Kh1Whq7E+5FaoTQx
+	qkYQD9I2Y3coB3MA1whwx8MrJjBksRba3lYClHJpUe3rcdllDR/JQCdjuTH1AZiL
+	k9FNgZbeVPk1D8JWcxDUkF/FHfeMxrmE7AzAoLy+eCi2qjPhx9gVP/EJpiVSyCS0
+	HY05iZpdTbjObih9TllH1goCXge0InhgTef2vrNtzqYaRZlfhkKwQD/ixJsxndEk
+	vxDD3gaA6vRs0AHpoDyny2oA/aP1JV/N1JhiuSF+U2FYbzQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e8jywbj3e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 May 2026 21:30:58 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 19 May 2026 21:30:57 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 19 May 2026 21:30:57 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id D49045B693E;
+	Tue, 19 May 2026 21:30:53 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <davem@davemloft.net>, <gakula@marvell.com>, <horms@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH net] octeontx2-af: npc: Fix allmulticast skip logic for LBK and SDP VFs
+Date: Wed, 20 May 2026 10:00:36 +0530
+Message-ID: <20260520043036.1523798-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260517121626.406516-1-rollkingzzc@gmail.com>
- <rclmtymkiaor247n7gwi6ggmpwi2hyu5hicggroopeohspfnyv@7ryrgezzs63q>
- <CAB7XQsGe8ZA_WRYcGgkOa--f+XdB6d98_g4VedbFPK01eH0rBw@mail.gmail.com> <rn5uidhakwmnjb4ngkyvzzjnwb573ie35xu34z4fbmlp7spd2o@hr4ifc4lqcj7>
-In-Reply-To: <rn5uidhakwmnjb4ngkyvzzjnwb573ie35xu34z4fbmlp7spd2o@hr4ifc4lqcj7>
-From: Cen Zhang <rollkingzzc@gmail.com>
-Date: Wed, 20 May 2026 12:28:42 +0800
-X-Gm-Features: AVHnY4KqC33UsVo9KfyspcxLS3cGw-I0fQb_5ohSI4s38uJsussh1K0hTuQ2Shc
-Message-ID: <CAB7XQsEhgsgXTLvE=Dr92Ydex0e3jbZ1CeCs5NjWsJF6yBXn_w@mail.gmail.com>
-Subject: Re: [PATCH v2] bpf, sockmap: keep sk_msg copy state in sync
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	zerocling0077@gmail.com, 2045gemini@gmail.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Ykl5mFnTk5KqvcTKGXAcFxcStvNCwYCu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDA0MCBTYWx0ZWRfXzSk1KgKYRmUi
+ 4ye+RIYsBEhRTDdJ45XzuxBoM5LLZuCTW5+0g3oJ2KFe4IpdtDzZJiwhZwrHqFJAfeQXcjbzGP7
+ 9pzI761CUP5Ejhjx2p5CJjGoeiu9Gfj+9HLlvotS72VnvVgwW9anIGLavpb8A3dqyykqRMaIaAm
+ 96vN1cPSSG355gbVMyjnkjf1NY63zekI9IPTASnaeh7EeW+meiGtKk67BUdpN6wwTB9KrT4GtZK
+ jC2Op6lXKUnX/IZRkP9+1fPWoCWMAIovdNu1yGPL+595ZXvRvbF+rghqufAvQwipAf5rrHAYzNj
+ 1sOJ/461/oofxbY+zv5j6D+oTVoAwr3dFWgaATMlG8ZRE6Fjjd1hNDJPPYwghzB123N1GbaeMd9
+ jZVbb+56hwG7hfvdRsGFv6n52UEF7RLM4QJkRp5xJPWyraW7o/YKIw13m1zF1QXx+A2qLEvPdR1
+ Lf6xJtMTL9HckmLHJ7g==
+X-Proofpoint-ORIG-GUID: Ykl5mFnTk5KqvcTKGXAcFxcStvNCwYCu
+X-Authority-Analysis: v=2.4 cv=QbNWeMbv c=1 sm=1 tr=0 ts=6a0d3902 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=UmA0Cgb4WzkLnBq1GnIA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-20_01,2026-05-18_01,2025-10-01_01
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289761-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289762-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rollkingzzc@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,fomichev.me,cloudflare.com,davemloft.net,google.com,redhat.com,vger.kernel.org,gmail.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: BEB035877D0
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 3907D5877F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi John,
+When installing the allmulticast NPC rule, rvu_npc_install_allmulti_entry()
+should skip LBK and SDP VFs (only CGX PF/VF may add the entry).  The
+code combined is_lbk_vf() and is_sdp_vf() with logical AND, which is
+never true for a single pcifunc, so the intended early return never ran.
 
-On Wed, May 20, 2026 at 03:29, John Fastabend wrote:
+Use logical OR instead.
 
->
-> Great. I think its fine to address the tools extra callouts in a follow
-> on PR if you want. If it helps get this merged sooner lets do that. All
-> the tooling keeps hitting this and we have lots of duplicate reports.
+Cc: Geetha sowjanya <gakula@marvell.com>
+Fixes: ae703539f49d2 ("octeontx2-af: Cleanup loopback device checks")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 3c814d157ab9..607d0cf1a778 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -990,7 +990,7 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
+ 	u16 vf_func;
+ 
+ 	/* Only CGX PF/VF can add allmulticast entry */
+-	if (is_lbk_vf(rvu, pcifunc) && is_sdp_vf(rvu, pcifunc))
++	if (is_lbk_vf(rvu, pcifunc) || is_sdp_vf(rvu, pcifunc))
+ 		return;
+ 
+ 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
+-- 
+2.43.0
 
-Since we have not worked with the BPF selftest infrastructure before, it
-may take us some time to prepare a proper test. To avoid delaying the main
-fix, we will first focus on addressing the main issues in v2 and try to
-send v3 soon.
-
-We will follow up separately with a patch series for the selftest and the
-extra issues.
-
-Thanks,
-Zhang Cen
 
