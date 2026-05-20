@@ -1,167 +1,211 @@
-Return-Path: <netdev+bounces-289883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289884-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHPlMnmPDWoIzQUAu9opvQ
-	(envelope-from <netdev+bounces-289883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:39:53 +0200
+	id kKR/MqiPDWoIzQUAu9opvQ
+	(envelope-from <netdev+bounces-289884-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:40:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 466B358BE05
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:39:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A2558BE39
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:40:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9B963005AF8
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:37:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C78BC3077610
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088AD39D6CB;
-	Wed, 20 May 2026 10:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D5D63D890B;
+	Wed, 20 May 2026 10:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XDzhwGWd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aliN50wN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B972E371D16
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779273422; cv=none; b=Q2b+aKgwRo8qMTuU3s76eHEeukS5kLxkU+Z0PrWr1Jvzb35ckT7+QgRtcFzzI+qlatp58b19VMbzaKSghBMzDqrJEe2cpAWv6FOvLbXSEE/W4GciNo1ETCuUrJOt71tx5GQjcSI/nBS/l6Vdjdqb1MNxvvxLWd/1nMpkUIiaOTI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779273422; c=relaxed/simple;
-	bh=YHhT1zawAxLpF/+gpXRLZWVPjG4ZkiS659MyfYt66CE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bGvSyzIjOvgpSqFRMP5P4pbtJ7l8fT5deKZzzi/agQ6AdNrwHyk52zaplL6TMVcZRaFzQxuBPcg3CxlAq6oAnqYQHWCnTdMiTDBtl/E3BGpOixALiXkCUCHIVDzAjn4CqQwVrOoNRbvsMnEGcDr0DRJKGqSs7hvvLbl5F38THHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XDzhwGWd; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779273421; x=1810809421;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=YHhT1zawAxLpF/+gpXRLZWVPjG4ZkiS659MyfYt66CE=;
-  b=XDzhwGWdt2kE61lX1qf/dMmYfUOklAAee4u6uM6imork05xIW1Ee6qNm
-   fl5GdJdl9OWrgkLOtE8QI16PmU0cpNa1mDX1HyKQ8dNjPJqH2nD8g8joj
-   5sPy5FC0PTRvHRg8FNAM5weRrLNQk4DeBTyHSX6RWeSBefpNQj8386VVN
-   b59x4VdIKgx1CTFeadzXAvhagFRxi62H+5VIT/uDke5aFKK/bTOICr/G7
-   +kvS9NPf7YL2ofOkNNqODBpGuacCTAwO02iElLXME3KzVOZYmI6b+KfMz
-   BQpZN4cf7L9bw4bA55cynmkz0k+ByAR8Pozf24Z6ngyLt5ejn8Q8E02wS
-   g==;
-X-CSE-ConnectionGUID: oVPL9Es/Qz2hiSQfCGBgGw==
-X-CSE-MsgGUID: i52x7Dz9SHK/rttwzULfhA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11791"; a="67696237"
-X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="67696237"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 03:36:59 -0700
-X-CSE-ConnectionGUID: E5YR7U2QSYipsVTRRPEB3g==
-X-CSE-MsgGUID: ExrKOdGTR1SPe9bFtgZCiQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="237137989"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 03:36:57 -0700
-Date: Wed, 20 May 2026 12:36:54 +0200
-From: Raag Jadav <raag.jadav@intel.com>
-To: "Tauro, Riana" <riana.tauro@intel.com>
-Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, rodrigo.vivi@intel.com,
-	maarten@lankhorst.se, airlied@gmail.com, simona@ffwll.ch,
-	kuba@kernel.org
-Subject: Re: [PATCH v1 2/3] drm/xe/drm_ras: Make counter allocation drm
- managed
-Message-ID: <ag2OxgNBjSde2a7J@black.igk.intel.com>
-References: <20260514202839.1888688-1-raag.jadav@intel.com>
- <20260514202839.1888688-3-raag.jadav@intel.com>
- <ef067007-b928-4130-8e25-1c4f5afb5833@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE4F3D1CD1
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779273457; cv=pass; b=uoLVrnmkf9dmT41cEuIj98cxW/r2cdRiHD4RaHoReR/sSZfwrFJKavdzA5swoClrDK8jlJmiSZwp+a8Auo84gthopRlnpxd94L875I2BXGIKJZ7g0c0WajVUx4WMZrGhJQvl2R86UgoYYm1CclESDeRQ+K4lMGKQmKyOQBlOpmE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779273457; c=relaxed/simple;
+	bh=VlViicmk+1v30D9aNrApLr9YZ1aJ9aCUqM4mwd/sKqs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Isr4gbpYYGcwEs8Rt2uHRE3Ej0NIe1pH/PzTdWX66AqIAeaWVzvz3/RYnLURXERd+IwJXR8zWikMjHqyw9ss11WOv9gM4WDgmnPWCQ/jfRupeF3uJ5QCNSBu+SELHKIH6QbeBLpSF+1A8dEDp1767HXwhpEQr7W/LRlkIOWDk7M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aliN50wN; arc=pass smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-67bce1840f1so8148487a12.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:37:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779273454; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DttikiLIy7B3g/wBZYyncH2A/JwT5oZFwfECw08gac+V4CWRve+M4XhbMTNdADN05U
+         cO6HYRjytL2Lh2MEAtypqELGJuvHv9DISDSj5Dlav5eM5+hIzb1zO3h0K/5BD+NPr0jr
+         C/k/tmUCGFYXpNHB7pdSzhZqCDGXFYGILFpmXPxsLsGPH6p4QoaoVRvG2TuK9gldAA0E
+         VkCH29l4kxKeVunSDOxDdBi2uZSiQnHoy/RLSNVM00olcG0JB0a+H4omHgsw8pZRzk4a
+         o/C4HP+iKTGX0RMgQL195FhACl8PbrNfngmk9Zi1rZQpNT19qIG5RRLf3I9yBbTvYRZK
+         F6+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=VlViicmk+1v30D9aNrApLr9YZ1aJ9aCUqM4mwd/sKqs=;
+        fh=KyyqsPcfitIqHZkip3yoANomIOu7xBdsaDvxQc4AJCQ=;
+        b=VIX/I3AKXmed0UByxnXChSSFg/N45APAq0cdgUkei6drw6kQMUXtiRg35CTGniZ5RX
+         rY4FcOA6bBS2gtS1sv1NsMZCqPnec+3KdJjHHJTp2X2uWF2IouM8yHDdBgJmygfW9hPG
+         aN2ST6X2ENhT27626id5c0s/io1mlJMFxymhOCJGMKmVf+/deuQ/MOSjXCab1qbhyKpl
+         6icCPO7nuhss4My5pbjHu6++rlvuzDWMtalIwbK8zsdifbH5GpiceId9CqGU+AeFF5I1
+         jRQ4G9LBsizd5P7rVIUxODcc4g+G40dcklEwATO/4QnR7D9b2ZiisaTHvYIxO23aLcwQ
+         VfVw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779273454; x=1779878254; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VlViicmk+1v30D9aNrApLr9YZ1aJ9aCUqM4mwd/sKqs=;
+        b=aliN50wNOnpkP2GHlmnPPC07klXsA3jsg0hhWC02uFVB9JK0T1JaNt1fkJdQcS0zCx
+         U4HMxcgB/63MycAscwgPjBONIOpD4o0EuUWGtSpOwtlfWwKxv/9xmOaXl6S07ge6D+oL
+         wpvKfo0b5R+xijzvGRBb1IrfGrz7XvJDOU4LKp1fzCtGxn8ciKXf5oYoSaULivYnC1sN
+         jx5/zlRBWB9AUz5IJ6GSsdnhhNUG1VN9SX+gi/F7tpUzzH0xTufye9OI14exCFjqPgVD
+         JirjYJ7p8IuTKBFj07Tj0Snj6GB5aFFLA7wQFrPkoyi30H9DxHmenDgcp92rH58z146R
+         y2gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779273454; x=1779878254;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VlViicmk+1v30D9aNrApLr9YZ1aJ9aCUqM4mwd/sKqs=;
+        b=eq+Iu4MGEdiyc6FfEomjkH2b/w/t9RnZST131nZ08FwZjo64f35029LDLuduQWANA+
+         /HpvH1S1LDXoPQkL+M5k85cE8K2sl3Y3+q8HkfE6TnrabY6lV5HOVuUF2fuQeGJDZHpm
+         1VPcZuHIdBkRFhNb32YSbbT2qM25SP7nvudndhIjzCZH+3aLgv5tUcNHaC4pomna0e7g
+         eHmNKYDn98I2+KurA7XEz8zalNI9L7CozXR9eGfn5eqohSooBQ41+16GCMRVhAyJRRUH
+         Tiv8eEq2PAyz6kMalYD09xRKQsPEIxZuARq/pUCgAQJ6s+EtAaf7/EWT3SjiYcJSZlqr
+         6pEQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+VfUX3tYPB532cuqv4i4oZ0P9Bdpjz4UpmuqwOVf+HTx10JRWyPAXwo9MwQv0V/BUEmHc6xtU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlLqVRqRb9IZGtNDKrENvyjHb2D3Uog9Y4yUEtY1KesYywkZkE
+	4ULSkLKQrddwWXQfcr5ZpylzxmgCt8V0sfnsKdW3RUqWQek142cPgsZFn2oq9B42cE/uxkIieJH
+	gDBBfSOdDlxBDHQ1K9OYDBVL02zX7ZII=
+X-Gm-Gg: Acq92OHOHIUV9RQGvWuFGK1tPD69Pz63DMWTKv1S2Fd8d4Tr7BACIBX+SnI3wnnc1ic
+	7On6sfNL6IFjTZmlaUnsoPbjhbtjyeNmfgaDiCA9X/pxEwYGd+qRZFDL5nbFgQPt+4CI2WGvSoY
+	Ia9u3bo+hln0qAYCtNDMrUEdWjaRjCTBmvzlUOjsGDoaIu8ztE47XPPWoqSuEHkiPnTXxuOi7mE
+	yQVQmwmiLWaog/uN1npQNFiEjyce456Sre5cf/Qq+UcmS7NqCIaxtZCxhU/0u/ANwJxMjR9Hcdk
+	6RDGMTZmAtwa5SP5kg==
+X-Received: by 2002:aa7:c14a:0:b0:66d:d2f9:520c with SMTP id
+ 4fb4d7f45d1cf-683bd68303bmr9037447a12.19.1779273453744; Wed, 20 May 2026
+ 03:37:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ef067007-b928-4130-8e25-1c4f5afb5833@intel.com>
+References: <CAM0EoMkUPYSXKr2=+mR8YMq2a0TFdYPdzwPGob-UyU1fUWP9Ww@mail.gmail.com>
+ <20260519033950.2037-1-rajat.gupta@oss.qualcomm.com> <CAOPYjvb8d61sappVT6VxBd9rLsK0q3wHaiMsYp5cFXty0NOU5w@mail.gmail.com>
+ <CAM0EoMkaFabdr11nfiabpEjO_0iB7uKAd9_nFWX=yj-O=8YF0Q@mail.gmail.com>
+In-Reply-To: <CAM0EoMkaFabdr11nfiabpEjO_0iB7uKAd9_nFWX=yj-O=8YF0Q@mail.gmail.com>
+From: Han Guidong <2045gemini@gmail.com>
+Date: Wed, 20 May 2026 18:36:57 +0800
+X-Gm-Features: AVHnY4KsXJAUg5CqT8fPRaCwKDHcoYkcWtt-5YwQCs2cgknN7rH4MQOcCeNIZqE
+Message-ID: <CAOPYjvai8o1ak_iCUPUbwi339TXgL6rdTq8L-mcAn=ZGQeYQGQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: fix pedit partial COW leading to page
+ cache corruption
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Rajat Gupta <rajat.gupta@oss.qualcomm.com>, netdev@vger.kernel.org, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, jiri@resnulli.us, yimingqian591@gmail.com, 
+	keenanat2000@gmail.com, rollkingzzc@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FREEMAIL_CC(0.00)[lists.freedesktop.org,vger.kernel.org,intel.com,lankhorst.se,gmail.com,ffwll.ch,kernel.org];
+	TAGGED_FROM(0.00)[bounces-289884-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289883-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[2045gemini@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:email,intel.com:dkim,black.igk.intel.com:mid]
-X-Rspamd-Queue-Id: 466B358BE05
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mojatatu.com:email,mail.gmail.com:mid,qualcomm.com:email]
+X-Rspamd-Queue-Id: 48A2558BE39
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 03:21:49PM +0530, Tauro, Riana wrote:
-> On 5/15/2026 1:58 AM, Raag Jadav wrote:
-> > cleanup_node_param() is not registered in case of counter allocation
-> > failure, which results in stale memory of previous node that isn't
-> > cleaned up on unwind. Fix this using drm managed allocation, which is
-> > guaranteed to be cleaned up on unwind.
-> > 
-> > Fixes: b40db12b542f ("drm/xe/xe_drm_ras: Add support for XE DRM RAS")
-> > Signed-off-by: Raag Jadav <raag.jadav@intel.com>
-> > ---
-> >   drivers/gpu/drm/xe/xe_drm_ras.c | 5 +----
-> >   1 file changed, 1 insertion(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/gpu/drm/xe/xe_drm_ras.c b/drivers/gpu/drm/xe/xe_drm_ras.c
-> > index c21c8b428de6..89640ffb1c33 100644
-> > --- a/drivers/gpu/drm/xe/xe_drm_ras.c
-> > +++ b/drivers/gpu/drm/xe/xe_drm_ras.c
-> > @@ -80,7 +80,7 @@ static struct xe_drm_ras_counter *allocate_and_copy_counters(struct xe_device *x
-> >   	struct xe_drm_ras_counter *counter;
-> >   	int i;
-> > -	counter = kcalloc(DRM_XE_RAS_ERR_COMP_MAX, sizeof(*counter), GFP_KERNEL);
-> > +	counter = drmm_kcalloc(&xe->drm, DRM_XE_RAS_ERR_COMP_MAX, sizeof(*counter), GFP_KERNEL);
-> >   	if (!counter)
-> >   		return ERR_PTR(-ENOMEM);
-> 
-> The intention was to clean up nodes  if there is a failure, to prevent
-> memory
-> from  persisting throughout the drm device lifecycle. We actually discussed
-> this offline  afair.
-> 
-> So there was a change from from v5 to v6 in the initial patch [v6,2/5]
-> drm/xe/xe_drm_ras: Add support for XE DRM RAS - Patchwork
-> <https://patchwork.freedesktop.org/patch/704873/?series=155188&rev=6>
+On Wed, May 20, 2026 at 5:12=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Tue, May 19, 2026 at 11:11=E2=80=AFAM Han Guidong <2045gemini@gmail.co=
+m> wrote:
+> >
+> > On Tue, May 19, 2026 at 11:42=E2=80=AFAM Rajat Gupta
+> > <rajat.gupta@oss.qualcomm.com> wrote:
+> > >
+> > > tcf_pedit_act() computes the COW range for skb_ensure_writable()
+> > > once before the key loop using tcfp_off_max_hint, but the hint does
+> > > not account for the runtime header offset added by typed keys. This
+> > > can leave part of the write region un-COW'd.
+> > >
+> > > Fix by moving skb_ensure_writable() inside the per-key loop where
+> > > the actual write offset is known, and add overflow checking on the
+> > > offset arithmetic. For negative offsets (e.g. Ethernet header edits
+> > > at ingress), use skb_cow() to COW the headroom instead. Guard
+> > > offset_valid() against INT_MIN, where negation is undefined.
+> > >
+> > > Additionally, linearize skbs with shared frags upfront to prevent
+> > > silent data corruption when pedit operates on zero-copy pages
+> > > (e.g. from sendfile).
+> > >
+> > > Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is =
+writable")
+> >
+> > Fixes: 6c02568fd1ae ("net/sched: act_pedit: Parse L3 Header for L4 offs=
+et")
+> > Cc: stable@vger.kernel.org
+> >
+> > I took a closer look at the code, and this patch is really addressing
+> > two issues.
+> >
+> > The negative-offset write into shared head/headroom appears to be from
+> > 8b796475fd78, while the shared-frag write, and thus possible
+> > page-cache corruption, appears to be the later regression from
+> > 6c02568fd1ae. So it may be worth adding an additional Fixes tag for
+> > 6c02568fd1ae,
+>
+> Pushing it a little - but sure we should also point to that commit.
+>
+> > and I think an explicit Cc: stable@vger.kernel.org would also make sens=
+e here.
+>
+> Please study the rules.
 
-Yes, the idea was to prevent the driver from updating stale counter
-(which isn't exposed to the user). But rethinking about it now, this
-can be achieved by simply keeping info as NULL I guess?
+Hi Jamal,
 
-Raag
+Apologies, I'm still a newbie learning the process. I checked the docs
+and saw commit dbbe7c962c3a ("docs: networking: drop special stable
+handling"), but I'm still a bit confused.
 
-> > @@ -135,9 +135,6 @@ static void cleanup_node_param(struct xe_drm_ras *ras, const enum drm_xe_ras_err
-> >   {
-> >   	struct drm_ras_node *node = &ras->node[severity];
-> > -	kfree(ras->info[severity]);
-> > -	ras->info[severity] = NULL;
-> > -
-> >   	kfree(node->device_name);
-> >   	node->device_name = NULL;
-> >   }
+Did the rule change to allow explicit "Cc: stable@vger.kernel.org"
+tags for netdev?
+
+If I completely missed the correct documentation, I would be very
+grateful if you could point me to it.
+
+Thanks for your patience!
 
