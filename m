@@ -1,365 +1,253 @@
-Return-Path: <netdev+bounces-290067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290068-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Ax4C50vDmoK7wUAu9opvQ
-	(envelope-from <netdev+bounces-290067-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:03:09 +0200
+	id yEsgNW0EDmqs5QUAu9opvQ
+	(envelope-from <netdev+bounces-290068-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:58:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC8D59BA70
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:03:08 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6D9A597837
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 95CC439AD0CE
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:52:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 50D9F301D583
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1364028E2;
-	Wed, 20 May 2026 18:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48A04048A3;
+	Wed, 20 May 2026 18:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZAESE6/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WsQBHPx+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B354028CB
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779302923; cv=none; b=Quk7Un/UEA5GmOkm4v4nl/7+E7sFKJztTzwhmQ6dTFi9YIBT7DNQ2dUo+lxQ0E01Vy8C7rRT/qGOvULWHuZIWatzuyeYpWjRqsOmNY/DwoCmSoDiMZPFhkByRYVv2H3Vf77GUhgMGa8jAc7vtBAMfNvUZc7KTnbGNTARA9xK6y4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779302923; c=relaxed/simple;
-	bh=+8/Erynk4MZt8ofJCHgv8LLJ6eah4GjJA0JiD2n6b0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZoY9wBcNNI3FXnMTLpfrTzwy6690fzcL1dHZQxpMvKfWrBBRMlacTwHC+W9oPoUYu8yvZspB/m6CSJ/F4VxIDqYEAEkyo71d+qwTBV1ICiBLwP4tEgPF10XOIwCJwIzbICfURSHbrPXSyKjdP/N4u/jmf+9jrj+crjy2t/GVtpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TZAESE6/; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-45d96d21e82so3080290f8f.0
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:48:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02226403EB4
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779303356; cv=pass; b=fBj9Uhp9yLOS+6OiqT90EMZeZOQAnGi66OLemhBNM7jTr3/BHJFwo8LgSqsslW+G9s67Soc5EWvN6ffqrVI6kg7RzAXbaHhw5KhbUdr0IYAX/g7x03Iszzz2NlqTNNrxWjzvw6MV3Oj30IDuGj3XGXC9LsqcCGJd5GszelDep4M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779303356; c=relaxed/simple;
+	bh=2u490WDo595MMxpuiyMNdGJ0Bm1Dajiv8tCE+WbJBN8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tHCux+Y4g7BIRqeeD7fNgX3Ai+TgGqOh2xHB8IkXNqOGSFRX9lfClFjJ1KpZMIo1XGjMCiqSKjWEHiKDGS6HNuzbbhvFPGOxJVpj2K+j+zHngIuoEhaM7AJtfYyyplTimLDnbcR+PuZbTozxaDSJPeJbkEx9lciVRDGv1X3oMLE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WsQBHPx+; arc=pass smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488940ccfa6so225e9.1
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:55:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779303353; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gNxeoXUXkgIw9nVdjdiR9LreUiPYOCM4LxzDv6x1w3jYURb/E46/+raaV7bUxkKN0t
+         Du83KCiLM9n3HmLYOWwV7NukGvzwOO6w1uGxLBEV+VGNXCJNl3uQ53khLUMeFhx5V4oQ
+         oFS1hh/o+bDssNSMJaGo3KX5wuT1UYS+MNUm+rGpGfGQMj8MBw4eJvt3PPWXezA/pWXy
+         OAys/wB7i6UyOtHR38WEPuz7OeH14e9P150tyUPoxE8bT+oElMNbm8Sv8co5aZ6QoEAm
+         hnRTsK02NqOsIpmN9OiIrHmqmhdHfMp71nEnjRW4j9uRrSCt0XrPH2X4alhg009WNeUf
+         0ECg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=E1+n5AcFKPfiWIk+cScd/VlPyCmYE0i+xazRrH2IaoI=;
+        fh=kxISJkK7GQEtpGg6mZkC22BKy8nReXTUT2nkfnGLu9E=;
+        b=c5SxqlQEMOv2HowK/YaexgozhS5/xFJzU1qOrq7+P9mqqTvPRDxGCvqS4+kPfiAdLZ
+         JVfF5wIGKwSZE+y3HragAS+60mKI1pHT44si7cUUrvYmOTsVQU44RNu4vyi8GzNZHAPO
+         EGd111iiS/razvrDnLSGxG+2o5vl+IGMtWAf1cct5Q423psEkRRVQYa6mFy/a8wwhy8r
+         pevoKUdaALj1xy+G9NSSxIaZD0ZaoIVhQeOXmcZ2hlSHgNIkDAzhhJ4dQHNFgud05Hfm
+         R4ZgyMcse9IgyiMz48OGWZg2Nd1VqdFmaqAhfoTKlcErtvLzmXtO6Xm8798qpdFXbDhq
+         AK8Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779302916; x=1779907716; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aPR9vml157T4AFMb0/LQfAP6U5qDsLmLgjLzNQHI+FU=;
-        b=TZAESE6/Xgxb8TYn8+/gTIsxXyd3d81qZx9mcMhLsdEQyxO6qyqQRBIudwLxD10PeV
-         +/C/SovMbmgAIhe2Fo/34b/JKkyZ49zzzivfHURUa1ECM5EUpWc4C5yDsLki82knLJ62
-         ochwZIGtiIr+4Mta+XNK3LABIMgUqE5rpe7FHaPCMoBRZMNTYDyZtteKMFsrt06swbF5
-         vxHcGTdnju6tjA/iVcjYdsvBT8DJmLjH6DwaHBbdC0rdkD2zboMWStmBxJxdoquDREps
-         9RfBqygRSpiCzyhBLd/dQn2cgYtt0o0YJrbPXo/Y0uoO7GEa/XNKETFlm/BUYVbkTWDi
-         5fvQ==
+        d=google.com; s=20251104; t=1779303353; x=1779908153; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E1+n5AcFKPfiWIk+cScd/VlPyCmYE0i+xazRrH2IaoI=;
+        b=WsQBHPx+1BdW+nbVnlTQBbGq63Wb1VaMHOB+/CgrJ85TIVE1XUrDcLI2HwYcGtbWIR
+         N6+/EMzKPMWnIBJHfT39Ivm1F9ahWDYBFx0TVfLJz61eYOeCIewlw0OYpikMBLNnFxJr
+         HO8KQx5ItyRAHj3UZUZU6+Fo7vj57dkt/v6lPHo6wYAJzbBP1JSJNY9xf7veS7zC2up1
+         tEFmr3WozL8BN4j/iOBo0gqg64kTsqgh830MTm59+UKFHKL7dCAoSNjP8UIauEfM9oC1
+         TSauVAuFuwi/R+61DGCvuy4qNbfp84N8YsRXtQO3nrEeC5Sj9l8Qxup2IXo5KE6p0g4e
+         nyxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779302916; x=1779907716;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aPR9vml157T4AFMb0/LQfAP6U5qDsLmLgjLzNQHI+FU=;
-        b=G1vv0++uBi4wCeRTfvNj+550CcclU+Qvc4FGasLP0ieOGq+bf6vuKC59fFb2uyphU/
-         WnzUgBp3jx3KD44DOmmFNr47sZiRuZy/tKDK+3NkgY3HF+UTqAcrWZe78c+sMRByuPXn
-         8+lRIQ5s93VBA4z3BzCkdibWqjZm3mpbMBkLfK2oz6pxj+uuRTPfAYLaYrmd3XXQtLDt
-         pPtLFaY+1mLxtGnKUu0ztMWy20kj+b/WaQBPVDYWzwjiG/Cb2rQ4aLJ+wdQsz+nGKjjf
-         /a3dHiYfbuF+hqN6dHad6X+EG+kD/FFqqQwMsuVu3eUu5t2qTfuUnJq5jVMNO+cFtDZW
-         +LYg==
-X-Forwarded-Encrypted: i=1; AFNElJ9pPYGJS4EkAKmrUidf/UCS1zphGdBW0KVOfR26S3GUNNSFkkutOEQI63VjTmW7TxOUh1mKmpI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2rEcv1rrGWB4DU8hwHMGjy5vqTbEmNwThUWtZEwKY/cPX0eRO
-	1p9eSszJ5WgSpOlvzx2Wge7FRmNroHUaxqSyMHeHkyPjE29kYqdYdJvD
-X-Gm-Gg: Acq92OHfODfgNAkfGG9cpy+HVIF7vgWiiKKy71XOCI9/T0oZB/H1JEQ7jg68wTJH76m
-	sY725eg2zCJXmWthIEgprPY/jvWyNL5FgRBP16kwvZje/TQ3V5p2W1wXWBtxIuv5b+uwg9xmU82
-	4NHhD07jCY4o/pODfOqlTadqxABoT9g14qoTDxlzKZFLjnZvdAv08Lyh6Me+oVyNx6SvwUq2gwV
-	YkV3pVeyMOdM8e0Le1oU9F7jykHdpPZIkD40iLLRmcXId4Jmsctni4Y/ygOc2HRYA2EZ9BtWw70
-	oIYLxcQryw45k+dMv1QzKcaU6QuCsXsQqb824QCeClONx91fTOTaxGzrZ5p0sdYbUEgDLyqsxJB
-	VGCQ1xWlqQ0uAtbovxL0qjmYKKK4VcIl9PKQlfOtnAfb0pPHcl+S3QoRR/C5PWrFuommxEwVRpE
-	czA6Vh7lklDpik38yjrrq/f0lDzCoPlqIJ/q4xj7PLU+/1CWZLZsAQBCw=
-X-Received: by 2002:a05:600c:3e11:b0:48f:e230:c3fb with SMTP id 5b1f17b1804b1-48fe6626a8emr375953415e9.33.1779302916153;
-        Wed, 20 May 2026 11:48:36 -0700 (PDT)
-Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49033d3514esm11300845e9.3.2026.05.20.11.48.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 11:48:35 -0700 (PDT)
-Date: Wed, 20 May 2026 20:48:33 +0200
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: Jordan Rife <jordan@jrife.io>
-Cc: bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net,
-	john.fastabend@gmail.com, ast@kernel.org, andrii@kernel.org,
-	yonghong.song@linux.dev, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH bpf-next v6 3/6] bpf: add bpf_icmp_send kfunc
-Message-ID: <ag4CAVec9jPCAuD0@gmail.com>
-References: <20260518122842.218522-1-mahe.tardy@gmail.com>
- <20260518122842.218522-4-mahe.tardy@gmail.com>
- <onco52d3vpxkcc6hh3s5vuqjxanasucteq7wnqfqgzg4d65alc@q7h22nu3ytjn>
+        d=1e100.net; s=20251104; t=1779303353; x=1779908153;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=E1+n5AcFKPfiWIk+cScd/VlPyCmYE0i+xazRrH2IaoI=;
+        b=qU7UdViSokTe8O8l4T+MML03OeMtA2BmHOmicwhkImG1zTFlA2HuSgiERlzFROPqJF
+         j4ktaD9lbDYO+B7WxJIoxDUKtJFj24xHjV+bsRb7CDLf22MTriJEMmkpSI4AF39Xy2dl
+         qZqzfalgvbQa0CiSow6y9ydaZnUUi3blapU8nFlm+XnUvWJ+lBSAks5BBqB8heiGkvSP
+         vft1f7AXdCDY1kJsqQm6cNQ+Tgj0yxaBqGjzyUsAOo/GXE/W1SfvqjuNBnUbSOwWT3fA
+         SxRjop9cjrmJKs2+uU5iniRj1/nEnRcNx96RKL5Ki41wax/959hugc65aj0adjqqLMjO
+         97wg==
+X-Gm-Message-State: AOJu0YzFMn4vbdOOgNOa8AoaIsUGTx4pRGQquP+xBd4megRbedib6kBr
+	JvaaR73tU8cOOtCNVR7om0yDuPSgv2X4yG4oankPwqPIFnm0M9zjExz9D6wmmiqRf0J8IegCMvY
+	y8kUYMJpOpMMh/L2tQbbSIgi66cGHzf8njpSqrCWi
+X-Gm-Gg: Acq92OEwflZN5IBafHNsF8oeON3a+lB+xzToFYCPcicP89ccmekUJ2T2zQDxmTEjWxI
+	SBt2t17g6452FUC6AxjCubI1lAh5/MygjjVMeBnHvjjIpjSKnoas3E6idYlQSGGpW2ySLN+WDD0
+	8CbzCC6s1WEdvPdDQs5KVPwy8MMQ77aIuvKQiuvRGfDLgjw9tNRhp7s6GRlun5tTl3r56lrMNsw
+	QuQsdjSPfdUPn5IOHn09hIvJ1XPbrSC2FZOhSiv1kn0SUzW4I/acwKfO8CB9+8QAUt2dfKw0+pI
+	vTwDyRrnhiEvqY4JNHt0VMYDTFuuidGr8GEtiyIYOTQ1PsvsaCU8
+X-Received: by 2002:a05:600c:609b:b0:488:7ed5:38ef with SMTP id
+ 5b1f17b1804b1-4903415dcf6mr120965e9.9.1779303352876; Wed, 20 May 2026
+ 11:55:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <onco52d3vpxkcc6hh3s5vuqjxanasucteq7wnqfqgzg4d65alc@q7h22nu3ytjn>
+References: <20260519203530.66310-1-devnexen@gmail.com>
+In-Reply-To: <20260519203530.66310-1-devnexen@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 20 May 2026 11:55:19 -0700
+X-Gm-Features: AVHnY4KsF6gLgHIJlsnHvTuhZIZ-lL6YqMhepw9Q71OPa8u5kx3HMdWQKIsVi1M
+Message-ID: <CAHS8izOL4yyPH4+ZUXxKB6JAj0EgbFK5UkG+SSb4rk_vG6EfhQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: devmem: reject dma-buf bind with
+ non-page-aligned size or SG length
+To: David Carlier <devnexen@gmail.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	sdf@fomichev.me, sdf.kernel@gmail.com, kaiyuanz@google.com, 
+	bobbyeshleman@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290067-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linux.dev,iogearbox.net,gmail.com,kernel.org,google.com,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-290068-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[almasrymina@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,fomichev.me,gmail.com];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: ADC8D59BA70
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: A6D9A597837
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 18, 2026 at 06:33:45PM -0700, Jordan Rife wrote:
-> On Mon, May 18, 2026 at 12:28:39PM +0000, Mahe Tardy wrote:
-> > This is needed in the context of Tetragon to provide improved feedback
-> > (in contrast to just dropping packets) to east-west traffic when blocked
-> > by policies using cgroup_skb programs. We also extend this kfunc to tc
-> > program as a convenience.
-> > 
-> > This reuses concepts from netfilter reject target codepath with the
-> > differences that:
-> > * Packets are cloned since the BPF user can still let the packet pass
-> >   (SK_PASS from the cgroup_skb progs for example) and the current skb
-> >   need to stay untouched (cgroup_skb hooks only allow read-only skb
-> >   payload).
-> > * We protect against recursion since the kfunc, by generating an ICMP
-> >   error message, could retrigger the BPF prog that invoked it.
-> > 
-> > For now, we support cgroup_skb and tc program types. For cgroup_skb and
-> > tc egress, almost everything should be good. However for tc ingress:
-> > - packet will not be routed yet: need to set the net device for
-> >   icmp_send, thus the call to ip[6]_route_reply_fill_dst.
-> > - fragments could trigger hook: icmp_send will only reply to fragment 0.
-> > - ensure the ip headers is linearized before processing, and zero out
-> >   the SKB control block after cloning to prevent icmp_send()/icmpv6_send()
-> >   from misinterpreting garbage data as IP options.
-> > 
-> > Only ICMP_DEST_UNREACH and ICMPV6_DEST_UNREACH are currently supported.
-> > The interface accepts a type parameter to facilitate future extension to
-> > other ICMP control message types.
-> > 
-> > Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
-> > ---
-> >  net/core/filter.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 118 insertions(+)
-> > 
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index 9590877b0714..843fa775596b 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -84,6 +84,8 @@
-> >  #include <linux/un.h>
-> >  #include <net/xdp_sock_drv.h>
-> >  #include <net/inet_dscp.h>
-> > +#include <linux/icmpv6.h>
-> > +#include <net/icmp.h>
-> > 
-> >  #include "dev.h"
-> > 
-> > @@ -12464,6 +12466,110 @@ __bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len)
-> >  	return 0;
-> >  }
-> > 
-> > +static DEFINE_PER_CPU(bool, bpf_icmp_send_in_progress);
-> > +
-> > +/**
-> > + * bpf_icmp_send - Send an ICMP control message
-> > + * @skb_ctx: Packet that triggered the control message
-> > + * @type: ICMP type (only ICMP_DEST_UNREACH/ICMPV6_DEST_UNREACH supported)
-> > + * @code: ICMP code (0-15 for IPv4, 0-6 for IPv6)
-> > + *
-> > + * Sends an ICMP control message in response to the packet. The original packet
-> > + * is cloned before sending the ICMP message, so the BPF program can still let
-> > + * the packet pass if desired.
-> > + *
-> > + * Currently only ICMP_DEST_UNREACH (IPv4) and ICMPV6_DEST_UNREACH (IPv6) are
-> > + * supported.
-> > + *
-> > + * Recursion protection: If called from a context that would trigger recursion
-> > + * (e.g., root cgroup processing its own ICMP packets), returns -EBUSY on
-> > + * re-entry.
-> > + *
-> > + * Return: 0 on success, negative error code on failure:
-> > + *         -EINVAL: Invalid code parameter
-> > + *         -EBADMSG: Packet too short or malformed
-> > + *         -ENOMEM: Memory allocation failed
-> > + *         -EBUSY: Recursion detected
-> > + *         -EHOSTUNREACH: Routing failed
-> > + *         -EPROTONOSUPPORT: Non-IP protocol
-> > + *         -EOPNOTSUPP: Unsupported ICMP type
-> > + */
-> > +__bpf_kfunc int bpf_icmp_send(struct __sk_buff *skb_ctx, int type, int code)
-> > +{
-> > +	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
-> > +	struct sk_buff *nskb;
-> > +	bool *in_progress;
-> > +
-> > +	in_progress = this_cpu_ptr(&bpf_icmp_send_in_progress);
-> > +	if (*in_progress)
-> > +		return -EBUSY;
-> > +
-> > +	switch (skb->protocol) {
-> > +#if IS_ENABLED(CONFIG_INET)
-> > +	case htons(ETH_P_IP):
-> > +		if (type != ICMP_DEST_UNREACH)
-> > +			return -EOPNOTSUPP;
-> > +		if (code < 0 || code > NR_ICMP_UNREACH)
-> > +			return -EINVAL;
-> > +
-> > +		nskb = skb_clone(skb, GFP_ATOMIC);
-> > +		if (!nskb)
-> > +			return -ENOMEM;
-> > +
-> > +		if (!pskb_network_may_pull(nskb, sizeof(struct iphdr))) {
-> > +			kfree_skb(nskb);
-> > +			return -EBADMSG;
-> 
-> nit: Instead of having several places where you call kfree_skb, maybe
-> consider just cleaning up in once place at the end like:
-> 
-> out:
-> 	if (nskb)
-> 		kfree_skb(nskb);
-> 	return err;
-> 	
-> then in places like this do something like:
-> 
-> 	err = -EBADMSG;
-> 	goto out;
+On Tue, May 19, 2026 at 1:35=E2=80=AFPM David Carlier <devnexen@gmail.com> =
+wrote:
+>
+> net_devmem_bind_dmabuf() trusts dmabuf->size and sg_dma_len() to be
+> PAGE_SIZE multiples without checking:
+>
+>   - tx_vec is sized dmabuf->size / PAGE_SIZE, and
+>     net_devmem_get_niov_at() only bounds-checks virt_addr < dmabuf->size
+>     before indexing tx_vec[virt_addr / PAGE_SIZE]. With size =3D
+>     N*PAGE_SIZE + r (1 <=3D r < PAGE_SIZE), sendmsg() at iov_base =3D
+>     N*PAGE_SIZE passes the bound check and reads tx_vec[N] -- one past.
+>
+>   - owner->area.num_niovs =3D len / PAGE_SIZE while gen_pool_add_owner()
+>     covers the full byte len, so a non-page-multiple non-final sg
+>     desyncs num_niovs from the gen_pool region for every later sg, on
+>     both RX and TX.
+>
+> dma-buf does not require page-aligned sizes, so the bind path has to
+> enforce what its own indexing assumes. Reject both with -EINVAL.
+>
+> The size check is TX-only (only tx_vec is sized off dmabuf->size); the
+> SG-length check covers both directions.
+>
+> Fixes: bd61848900bf ("net: devmem: Implement TX path")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: David Carlier <devnexen@gmail.com>
+> ---
+> Changes in v2:
+>   - Reframe commit message around the kernel-side OOB instead of
+>     "real exporters already page-align", which read as the OOB being
+>     unreachable and undercut Cc: stable (Stanislav Fomichev).
+>   - Hoist the SG-length check out of the if (TX) branch so it covers
+>     RX too; RX has the same num_niovs / gen_pool desync on a
+>     contract-violating exporter, just without an OOB. Keep the
+>     size-multiple check TX-only (Stanislav Fomichev).
+>   - Drop bool todevice; compare direction =3D=3D DMA_TO_DEVICE inline to
+>     match the existing call site at the tx_vec[] assignment
+>     (Bobby Eshleman).
+>
+>  net/core/devmem.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/net/core/devmem.c b/net/core/devmem.c
+> index 468344739db2..4f71de44c0fb 100644
+> --- a/net/core/devmem.c
+> +++ b/net/core/devmem.c
+> @@ -241,6 +241,11 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+>         }
+>
+>         if (direction =3D=3D DMA_TO_DEVICE) {
+> +               if (!IS_ALIGNED(dmabuf->size, PAGE_SIZE)) {
+> +                       err =3D -EINVAL;
+> +                       NL_SET_ERR_MSG(extack, "TX dma-buf size must be a=
+ multiple of PAGE_SIZE");
+> +                       goto err_unmap;
+> +               }
+>                 binding->tx_vec =3D kvmalloc_objs(struct net_iov *,
+>                                                 dmabuf->size / PAGE_SIZE)=
+;
+>                 if (!binding->tx_vec) {
+> @@ -267,6 +272,12 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+>                 size_t len =3D sg_dma_len(sg);
+>                 struct net_iov *niov;
+>
+> +               if (!IS_ALIGNED(len, PAGE_SIZE)) {
+> +                       err =3D -EINVAL;
+> +                       NL_SET_ERR_MSG(extack, "dma-buf SG length must be=
+ PAGE_SIZE aligned");
+> +                       goto err_free_chunks;
+> +               }
+> +
+>                 owner =3D kzalloc_node(sizeof(*owner), GFP_KERNEL,
+>                                      dev_to_node(&dev->dev));
+>                 if (!owner) {
+> --
+> 2.53.0
+>
 
-Yep yep I see, just if I follow Stanislav recommendation to use consume_skb
-in the success path[^1], I think it would be simpler to keep the other error
-paths with kfree_skb and returning the error.
+No hold on, I don't think we actually have a bug here. AFAIR all
+you're describing is intionional . Yes the TX vectors and their niov
+arrays do implicitly 'pad' the dmabuf size to PAGE_SIZE.
 
-[^1]: https://lore.kernel.org/bpf/ags3HARTFYwKU8nR@devvm7509.cco0.facebook.com/
+But net_devmem_get_niov_at has this check that prevents us from trying
+to send past the dma-buf size, even if it's not page_aligned:
 
-> 
-> > +		}
-> > +
-> > +		if (!skb_dst(nskb) && ip_route_reply_fill_dst(nskb) < 0) {
-> > +			kfree_skb(nskb);
-> > +			return -EHOSTUNREACH;
-> > +		}
-> > +
-> > +		memset(IPCB(nskb), 0, sizeof(struct inet_skb_parm));
-> > +
-> > +		*in_progress = true;
-> > +		icmp_send(nskb, type, code, 0);
-> > +		*in_progress = false;
-> > +		kfree_skb(nskb);
-> > +		break;
-> > +#endif
-> > +#if IS_ENABLED(CONFIG_IPV6)
-> > +	case htons(ETH_P_IPV6):
-> > +		if (type != ICMPV6_DEST_UNREACH)
-> > +			return -EOPNOTSUPP;
-> > +		if (code < 0 || code > ICMPV6_REJECT_ROUTE)
-> > +			return -EINVAL;
-> > +
-> > +		nskb = skb_clone(skb, GFP_ATOMIC);
-> > +		if (!nskb)
-> > +			return -ENOMEM;
-> > +
-> > +		if (!pskb_network_may_pull(nskb, sizeof(struct ipv6hdr))) {
-> > +			kfree_skb(nskb);
-> > +			return -EBADMSG;
-> > +		}
-> > +
-> > +		if (!skb_dst(nskb) && ip6_route_reply_fill_dst(nskb) < 0) {
-> > +			kfree_skb(nskb);
-> > +			return -EHOSTUNREACH;
-> > +		}
-> > +
-> > +		memset(IP6CB(nskb), 0, sizeof(struct inet6_skb_parm));
-> > +
-> > +		*in_progress = true;
-> > +		icmpv6_send(nskb, type, code, 0);
-> > +		*in_progress = false;
-> > +		kfree_skb(nskb);
-> > +		break;
-> > +#endif
-> > +	default:
-> > +		return -EPROTONOSUPPORT;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  __bpf_kfunc_end_defs();
-> > 
-> >  int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
-> > @@ -12506,6 +12612,10 @@ BTF_KFUNCS_START(bpf_kfunc_check_set_sock_ops)
-> >  BTF_ID_FLAGS(func, bpf_sock_ops_enable_tx_tstamp)
-> >  BTF_KFUNCS_END(bpf_kfunc_check_set_sock_ops)
-> > 
-> > +BTF_KFUNCS_START(bpf_kfunc_check_set_icmp_send)
-> > +BTF_ID_FLAGS(func, bpf_icmp_send)
-> > +BTF_KFUNCS_END(bpf_kfunc_check_set_icmp_send)
-> > +
-> >  static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
-> >  	.owner = THIS_MODULE,
-> >  	.set = &bpf_kfunc_check_set_skb,
-> > @@ -12536,6 +12646,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_sock_ops = {
-> >  	.set = &bpf_kfunc_check_set_sock_ops,
-> >  };
-> > 
-> > +static const struct btf_kfunc_id_set bpf_kfunc_set_icmp_send = {
-> > +	.owner = THIS_MODULE,
-> > +	.set = &bpf_kfunc_check_set_icmp_send,
-> > +};
-> > +
-> >  static int __init bpf_kfunc_init(void)
-> >  {
-> >  	int ret;
-> > @@ -12557,6 +12672,9 @@ static int __init bpf_kfunc_init(void)
-> >  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
-> >  					       &bpf_kfunc_set_sock_addr);
-> >  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
-> > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SKB, &bpf_kfunc_set_icmp_send);
-> > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_icmp_send);
-> 
-> Thanks, this could come in handy for TC.
-> 
-> I'm not quite sure yet on using it in lieu of the sock_destroy kfunc for
-> the UDP connected socket use case we discussed at LSFMMBPF. For socket
-> LB mode in Cilium to make this work you'd need to add at least one new
-> map lookup in the fast path to check for backend liveness and this
-> partially defeats the performance benefits of socket LB which right
-> now avoids service + backend lookups in the fast path for connected UDP.
-> Ultimately, it might be better to stick with sock_destroy to kill
-> sockets out-of-band for that use case, but still it's good to have this
-> option.
-> 
-> > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &bpf_kfunc_set_icmp_send);
-> >  	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SOCK_OPS, &bpf_kfunc_set_sock_ops);
-> >  }
-> >  late_initcall(bpf_kfunc_init);
-> > --
-> > 2.34.1
-> > 
-> 
-> Jordan
+```
+if (virt_addr >=3D binding->dmabuf->size)
+return NULL;
+```
+
+IIRC the NULL should be bubbled up to the user as some error.
+
+Please double check that we actually have a bug here. If not, please
+don't merge this. This change could break existing users using devmem
+TX correctly with non-PAGE_SIZE aligned dmabufs, which is a valid use
+case.
+
+And if we have a bug, lets fix it in some way that doesn't deprecate
+support for non page-aligned TX dmabufs. You may be breaking users
+here.
+
+--=20
+Thanks,
+Mina
 
