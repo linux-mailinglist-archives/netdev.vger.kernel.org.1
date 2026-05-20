@@ -1,143 +1,144 @@
-Return-Path: <netdev+bounces-289759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289760-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPIoLIo0DWrLuQUAu9opvQ
-	(envelope-from <netdev+bounces-289759-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:11:54 +0200
+	id 8OekLSc3DWoGugUAu9opvQ
+	(envelope-from <netdev+bounces-289760-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:23:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D490858771A
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:11:53 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A7ED58779B
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:23:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8399C301B1CF
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:11:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2A19A3032576
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:23:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8301372EDB;
-	Wed, 20 May 2026 04:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4AD33CE80;
+	Wed, 20 May 2026 04:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="NPN1XABn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFw0SOl8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7C02DA756;
-	Wed, 20 May 2026 04:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F583438B6;
+	Wed, 20 May 2026 04:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779250306; cv=none; b=abGC4wePjkDTX9yJFroskcewhaXbSmGY0bs0uI9CDchpyWlb9QiooWJ9LCEndCRWFayOhgzLVeYKYJ+6ouUadWdTfKvgVlQAALCqTCyBeIiXE6ZALiUEDeBlsdQ6Ivt2+6hGgiA2imCYawGYcH0073OQwpxPPiX0GoNo9psBDS8=
+	t=1779250980; cv=none; b=W9vwwoE6b1u0pfaVehTbaG3jYToT9qLEUosXgaWZ6X7AMUqPc9M+ApNkLHzXcWGR9tb2O1y8DYF0TuRzQQ77x8D9YholyZTlmeAlFbLn7nmNLG4o/Jb7dgVIn29WteLYBGJOTOVPGmMoHRYZh0j7bvUfHp0bCXqOQ+idTDoX3Vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779250306; c=relaxed/simple;
-	bh=+nULNlyf4O/uiWjCAvQrgQHSz8xiGemqV8ciNy0wcQY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=pq6WoJn2+2eOSJOBrRDJIpEGRaGFApcfZwTkGOxQLHqfL7IRubFl3zQMpuGRQadcNukKRMl6LLVdUYqbtmCObr0qcqCfDxkAluW0PCtN7+d0oFMECiuj0ejmhaHUvtq7VjJA1srvVnDAL0Gmc4u3lVZw4B8oODBTrTw2+6ZoVEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=NPN1XABn; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id C41F5217D5;
-	Wed, 20 May 2026 07:11:35 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=4PfbLACuCQpSYnAR5qGzVx9PtsB1XBBP8U4mGrcUZcI=; b=NPN1XABnYshL
-	HYIJogFTb/2iePgLwlYe2Mnzyc49TfZNKCcekXgMjpRfBYnTf/lG7QzGwERaG/Yy
-	RNCJarJh1Q9UvVC/6HcVsLqEgS/+XbNP5kov3CR/aX/OXlnv1sUTa2+ZrAkSOX7e
-	eh+amjuwYZ04F7avpPuX+nguBMZMO6rsccr6o3OU/U0lX8sS5Wnx9URJtuZiKmfH
-	gBprEneIW+s4c7fG1m1RsgeETR0QnKBJsygwPVfz575stsMLwP4OTtLhT8pEZrUE
-	ZcVFLhAUkPCIaP5N0PqJLJlUNj9No4fdX+lGe4I3P4YJkdLcAODm0zBQHAefGglj
-	DLCQqwpuDiVTjC1VyUgawxfSR7UnZY1mdJC/Uk+bUggNZxYKUBWdEloJNtyuAD+Z
-	KtXJbJ2Wrw1zhwJFfc1/29UsuDFTKSGDB9ag71G3N+tYppx+9m9yL205/2Sw4MKl
-	/x6AQ1dOA5uBROxCa1KOGu1lBBeO0ZorIG58r/vJdAizMqgvHmyYkjRUx5RBGFag
-	1a7TofYPR/zRWxNM/0F1Rwsb8ScT0yDh+ukUwT7UnU+mHtKF/EnH+rwzF1AYSVcS
-	j6HUrMUE3M0Ca9mJD4/nSxSiQtJE3J3o3IY03yHzsTQ9TmFp61uuevcfSbVoHlDg
-	jDAcfHfI3Khf3lCZkxPQ0RIbtLXkZ1M=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Wed, 20 May 2026 07:11:35 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id BC78560FA8;
-	Wed, 20 May 2026 07:11:33 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.2/8.18.1) with ESMTP id 64K4BSM5008476;
-	Wed, 20 May 2026 07:11:28 +0300
-Date: Wed, 20 May 2026 07:11:28 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Jakub Kicinski <kuba@kernel.org>
-cc: Marco Crivellari <marco.crivellari@suse.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Michal Hocko <mhocko@suse.com>, Simon Horman <horms@verge.net.au>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org
-Subject: Re: [PATCH v2 net-next 2/2] ipvs: Replace use of system_unbound_wq
- with system_dfl_long_wq
-In-Reply-To: <20260519182219.0d685a27@kernel.org>
-Message-ID: <10173685-596f-1eb0-0903-a3d7ba4dff9b@ssi.bg>
-References: <20260515135143.259669-1-marco.crivellari@suse.com> <20260515135143.259669-3-marco.crivellari@suse.com> <20260519182219.0d685a27@kernel.org>
+	s=arc-20240116; t=1779250980; c=relaxed/simple;
+	bh=mZCK0Bne8vxrpfLfWHVNdZQMuhMMUH3JwK3zvHwzQz4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uZuGo21ifyf8uToLP6kw9fMbcfb9oTqORPsYliQr2SrpHT8OnhDWsqL161ZFsbvnm+MWvmQRT6OVdSdURk/r+R5f2sYZcP9S0yOA1yA3mlPgwtmKwLQd6juSdWeRW1FetI602XvIsBqHNJ/4SOwTSvbR1MLrMlsw+pvrgfADLKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFw0SOl8; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DECB1F000E9;
+	Wed, 20 May 2026 04:22:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779250979;
+	bh=cc0UIEMRSrem35vxrcyWPySXSMgJ6l/FNbmCJgtjbMI=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=eFw0SOl8lAEw4ERvfUKIHjUdPQtAmSMCwFqhaTj78d9WeKbwyewGVTImuZJxIDS/8
+	 mClDkxLtw0I8KuzaQ+gtJs/T3ZxxNNECz0FCpV48BaZt3kiFOy7q53pvqJqiz+xPxp
+	 1Jwhl7qBr/kNVtXxS1rtNIsNEwP+Dtb3y1LRqLM94cS3fN+ngEbeCo2P5LhiiB6QQw
+	 X3jdm6OtO030/j8q4FYE2bZl5dii+Ua9qtUzkTgkJ5sC7K2VPQNG+2bGV6rmzSjugU
+	 kLRjnLpnh1t6oREfUaVQHfVfMA66q3DRsrBV+IZmAQRx4hGPP7xjx/ejYdAEQKgaGA
+	 grCFdSD5i6mww==
+Message-ID: <8a10cffb9bdde6f90f0fd7b00679755a593f2d6e.camel@kernel.org>
+Subject: Re: [PATCH net] selftests: rds: config: disable modules
+From: Allison Henderson <achender@kernel.org>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	 <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	rds-devel@oss.oracle.com, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Tue, 19 May 2026 21:22:57 -0700
+In-Reply-To: <20260520-net-rds-config-modules-v1-1-2100df02fe9a@kernel.org>
+References: <20260520-net-rds-config-modules-v1-1-2100df02fe9a@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[suse.com,vger.kernel.org,kernel.org,gmail.com,linutronix.de,verge.net.au,google.com,davemloft.net,redhat.com,netfilter.org,strlen.de,nwl.cc];
-	TAGGED_FROM(0.00)[bounces-289759-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289760-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: D490858771A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 5A7ED58779B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Wed, 2026-05-20 at 11:34 +1000, Matthieu Baerts (NGI0) wrote:
+> The run.sh script explicitly checks that CONFIG_MODULES is disabled.
+>=20
+> By default, this config option is enabled. Explicitly disable it to be
+> able to run the RDS tests.
+>=20
+> Note that writing '# CONFIG_(...) is not set' is usually recommended to
+> disable an option in the .config, but it looks like selftests usually
+> set 'CONFIG_(...)=3Dn', which looks clearer.
+>=20
+> Fixes: 0f5d68004780 ("selftests: rds: add tools/testing/selftests/net/rds=
+/config")
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+>  tools/testing/selftests/net/rds/config | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/tools/testing/selftests/net/rds/config b/tools/testing/selft=
+ests/net/rds/config
+> index 97db7ecb892a..3d62d0c750a8 100644
+> --- a/tools/testing/selftests/net/rds/config
+> +++ b/tools/testing/selftests/net/rds/config
+> @@ -1,3 +1,4 @@
+> +CONFIG_MODULES=3Dn
+>  CONFIG_NET_NS=3Dy
+>  CONFIG_NET_SCH_NETEM=3Dy
+>  CONFIG_RDS=3Dy
+>=20
+> ---
+> base-commit: 90fc1a393736063b2b4077115e215a2e2eebb797
+> change-id: 20260520-net-rds-config-modules-cada926dc526
+>=20
+> Best regards,
+> -- =20
+> Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-	Hello,
+Hi Matthieu,
 
-On Tue, 19 May 2026, Jakub Kicinski wrote:
+The fix looks fine to me.  Thanks for catching this.
 
-> On Fri, 15 May 2026 15:51:37 +0200 Marco Crivellari wrote:
-> > Subject: [PATCH v2 net-next 2/2] ipvs: Replace use of system_unbound_wq with system_dfl_long_wq
-> 
-> FTR leaving this one to netfilter folks
+Reviewed-by: Allison Henderson <achender@kernel.org>
+Allison
 
-	Yep, we wait net to be merged to net-next because the patch
-depends on commit 5522d65d81a7
-("ipvs: avoid possible loop in ip_vs_dst_event on resizing")
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+>=20
 
 
