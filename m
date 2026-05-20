@@ -1,121 +1,107 @@
-Return-Path: <netdev+bounces-289967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289973-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IOqkCqTGDWrg3AUAu9opvQ
-	(envelope-from <netdev+bounces-289967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:35:16 +0200
+	id QPyCOyfHDWr93AUAu9opvQ
+	(envelope-from <netdev+bounces-289973-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:37:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CFCF58FB41
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:35:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C2E258FBCE
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 41FFE320BF3E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:14:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B09C731069F2
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10AB63EE1EC;
-	Wed, 20 May 2026 14:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0B03E9C07;
+	Wed, 20 May 2026 14:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pF51/FNy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtHeL0SM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D433EDAD1
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 14:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779286387; cv=pass; b=ml2Jq5MDcX8VC7PHVkFmblYlZx+xOZsKHCRfTEsfWWZUI+JznlKQXkYAds0Lzox27puzh4GJEGX8eEThSM6yK10LsnysQptyAnb3SkklIXpIdunr9ln/2+DCTSyi/sYAY2+qgvPL4X4O2ACpP0FbJnkO2gmHGjbWVZ3LDWWiRyA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779286387; c=relaxed/simple;
-	bh=Sde/gBT/xp0UIfybWtie6NS5tW5ikwXgAQMSfd/pE0k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bZai+jATkyCjpNS/7iE85K+vVG2O6UWae8nJ0LQR9wm9GOFSG+8IcT4caIf+usWvOujrSN/+iJdBsqD4C0zpbJ5lZWvoPXfPz4e4n2b2YG0rzLjYPssO7kufXfhLwgU7q9Pf8vNhTX1VyaJwJA24rdFOKmRJInwrshVsrg4aJLo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pF51/FNy; arc=pass smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1415C3E92B9
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 14:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779286618; cv=none; b=ZlGglXadHDovNZO+r0NETajCuu9Vx9aZ+s4Vxvu8J+9UC/+I1nJV5g6wQGOZe0rUwyUbJnRHlxmQe89MkKNeL2wv7iKm84DV0SiS0L2K94jK2fQgV3cMcysaWEASiIk8CDeVRpgJgO+eAjQ3Ok8VqhfchnjjFmCV4vNaLOTSXaM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779286618; c=relaxed/simple;
+	bh=7VFZ8F94wUu3BpT39Q6/44VPVbdrgBiUVDnaIyTiW3s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XiLQE4y1/HXGLwOOA9pExjQdPoig968YKOozObUegK6bbnWUo584PXLT2um56reO7hyuLaG6BECscqnphvXvki7fyExM383N6eP5ZroxuR8BLzDbEVampS4q550R78KJvCCSuW97Jo0LeSy4xjdDYfxGZvFb88hvBlickqRPD7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtHeL0SM; arc=none smtp.client-ip=74.125.224.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7bd4c61765dso45853217b3.3
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:13:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779286385; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GPmoW0tbBzDhZekjNZUY0c4xzbkL1ATS/X+SdfBy6NM7cRW5/I//Wck3l8S33NBj4r
-         soHBKuazGQ7kDT3VT0sC5tlP1VP1CEcXoS8Zvr2nIrlAnf1CtOjV8vLBQM7RD1opupkL
-         45MShqF9HrZAvERPo/itDTlsMHNuyRGoBe3Pt4u2o48wCPwnmrlWnYMnzGDkbOG6Uzln
-         9VcXVBRAyVg++PwMfXF+u2PE2rXHz3JsPxsoNxYPdqBcSY8GQI6XdiMg++JxU/cmovj1
-         5AMTmAF/Q4A8OAre+KPZZK1OfxzJTFSLok0EwtuH3CNjz+vpWXHNjysdqbLnGfWS5zXX
-         imAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Sde/gBT/xp0UIfybWtie6NS5tW5ikwXgAQMSfd/pE0k=;
-        fh=0iCbp7Iyz5qgfnGV4vkj0fwyjVTBK/s4ncc6FfTN9nY=;
-        b=b8ALFaQfv6mcT62VqAkxzG2nGErCUPGQ4xILadvdKZV3C4eaRb+IU3sLqPGFT0PJal
-         zcUMFnVt7WYVAzKZurQ7k6hjeT05MXJOSgLnwknAmGB/TJaqhuK8zotnrSoL3m7SwRdk
-         zfZlWRUzQnTdCoR/TCYp3YeXBrUsX1hPmb4T+QyYJJk41323e2EmNzU8Mk2RucKplb5X
-         yI29IyIsqygR/l9BuCrzaUoKC28FQrouOd3svDoRkHJ47C6+T7MHQnbQRWVZZf+rQ9lP
-         2b+UciDQXn9gqoBsJzN9JXy0DP6Cn7qQs7NUljO4FOBhr+VaqdWcLAPIlNtfZbuvpe1Q
-         ARAg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-65c477a3278so5154862d50.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:16:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779286385; x=1779891185; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sde/gBT/xp0UIfybWtie6NS5tW5ikwXgAQMSfd/pE0k=;
-        b=pF51/FNy/aGNyuPKZxf2LLRRzc6339p9TzxGRpp1NpOCaAChzTbDKcIKKxFiyYdz94
-         8ZPl1zLMbIwxQCar7nY4utT+/6g7rD8r6Oqa4I+P/XabwlnZYlOzI04Jta6EfEppmrx1
-         9O+zQiXRhl517v/nhZwM+6R5r6oThGd4ctK58L8/pKEiLUfDYBx6ps0nqUgmlHF2/mFq
-         qZgIxRtuuAQWHZeoIiGmpNWClsE8HHCSXq1X5/d8Jk4YkcMW7Evoq/7HqsUFtjELulXx
-         8DBW0htzglbzB6uDdDpCkOW+vdMcu59tcTYjohodZQCxX9e6YcrAQ4G0/2N/YDUtkdqX
-         oKGg==
+        d=gmail.com; s=20251104; t=1779286614; x=1779891414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hRZUQeBmoTEstKWsMVlBg95hUFZXrJz+CK/C25lcLP4=;
+        b=DtHeL0SMpDUYpXw44zCMEZvu1us6W32DyOVRj7rWQDysBuNQvj5o22ojsuiHZCVR2g
+         ynI0uFOKi8UP2Y6EB+FDkT4JkJiqUA9YCiiuK2jLkUtJ6sTfeYHuXK+YG/1BYzIVLyCs
+         ILCWPUcAxhfLV/0cDyHeJL/huhKC4njaiwvuSVi2PFg5mywnQmq7oSKl3mEVT9sxvX1V
+         HhLjDCF7ac4x2gYSkx3FVwJr31DlTiLvEhbBm9p2hMqqSHLtWyVE+VYB3sQofHUj5D+V
+         gXHFXzp58mmJ2aLA1aWohq6zoczHlsmUiGqo5w0VrT8JHioxDje2HUjBbE1COSXTX4TT
+         a+Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779286385; x=1779891185;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Sde/gBT/xp0UIfybWtie6NS5tW5ikwXgAQMSfd/pE0k=;
-        b=FPuZrm8I+BQlm2aM8BMvf7RkwrZmNIiNP45LBHq+wkWDgfUsfagVqA3TzmCddLfbU0
-         1MRCHzYpGN0YXVdoOWtCsaIO0E5CJLkfm0NjenbCECkKlw6iQH2Sx2Xr9iHoHJktVdA9
-         BftPvnS8qzOBsjI+voDCMDwVC1tqbDWgUHHMTC3AFa3KXG5qzod1tyxgY6634twq6yLR
-         6kHoYhHXuKXPN0UtjyMMffU0SAH82+xwFQGXSR/Kmlpgqm5tj1E/+95nlUJ13h6mvKne
-         pukGh5mQz5zzw/2pqd4IE6A7/em78EFCV1fcfQxDAXN721iwdwtbsCiRtQc+pKOxCx/3
-         d0xw==
-X-Forwarded-Encrypted: i=1; AFNElJ9WYyPdqqyHN+s4FzuJK3i+gX/deSlZR54+s+eWfRx/g9SKvs95G53lRKVpSnl+4HdJQ7KPpF8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0T5CTyYMr0q184dY8HAWQ8SorTbInD/UkxDnIVIxxuLlfFdeq
-	/EUR82gZc71h+zaX442UciL5CgXgHKHmnTtzWX1gI57zbNVHAaAw9a20fCNv/NgRC6OvKnZcbii
-	bI9qQetg+kDxU3mmU29YDVdI1Nnl2AyE=
-X-Gm-Gg: Acq92OF6PnO5CC+hw9uF0JKnGlFFx3H8kLXwXoVAfH6X+LXx6Cfib5z6OYLhrZekFsR
-	E2UgZ+Odi/ib6N1rcFjEHHi2kj/oQ7jagpRLV9Wy7qA6K+8ECto8SJTODsD9CK2GiL6T+J6iCm8
-	gEf66HdVP8Q7uB3dykC6XDPQ6r/Vlm4tMLbipodzB6TYhP8/h4KbwjNXfhj9Q0dLeS9rYM/eGC3
-	H4r0tc92M93mWXybZXVIpa+P2oOP3aSIMzYgFlmeQuA0Vh0jTMBfb1jFO24/YdXYBMMqg9RH6jf
-	yw18OooHQp+kRrDqFyFZmADd+HbcptPIG6Ha0gjLyw26EVYiRehEt9lNAQ==
-X-Received: by 2002:a05:690c:f09:b0:7bb:712:a768 with SMTP id
- 00721157ae682-7c959b92a05mr260964467b3.7.1779286385081; Wed, 20 May 2026
- 07:13:05 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779286614; x=1779891414;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hRZUQeBmoTEstKWsMVlBg95hUFZXrJz+CK/C25lcLP4=;
+        b=UxgEtXkKORRF+HPiG3rFeFaumRqPPLqY7KLfOKQABVEWGqVHeXdVVE/SRfHC2VbRt4
+         icGi7Rvhgm2Vu+ZJPWzUiFpVGeLE0fWJ5qAmOwI+klhPvC8JfxpA3GwG1qqQfRYmQGPU
+         gRmBiivlRkmYp0etZOitp8mO2tvQ4aDVh7wNhVWd1pSjic1bZEvCXaaFhUzEcgufkH1z
+         3gBnUH8DfUS3XDx0Yd1oMUQBe4PboJvK0LHCEprXuT8wG4EejP5Jv2DzFDdNdriBJg0P
+         Evw4D1By1Ky0EPO/+47/9C90xmjbKogXW1Alja7/ds5Fb/cCQd/cdGVisYgNekK+hF33
+         xm5w==
+X-Forwarded-Encrypted: i=1; AFNElJ9Vg6hZ2fVqwpzows0aTG/k6sPW+Chq4tn2hMnkZlnjYjdl3Qok3RJ+Ac2w5d8dYDVNPC5Hpc0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbgifwtwgA8gF3VdGgGsadfNn+AzYqtfLZqLSIv3vNO191a28s
+	UGcWJ9BU8XLBjqu0LX23XYqCBdsonLIoPR9dj1ZxG0cHC/apiCE8QndT
+X-Gm-Gg: Acq92OHmh+dwxO7UbvXCVz5mMZNyqM4yIqHZAw+6lq9dPahHxmtXUDMBfMxIr3rTpa8
+	Vv+eIOQuUUK9H0REdH7+EQvlYJRPfNsvn1QX+OaKL0FSSx2ojG+CSKqzf4BMsQ2dgmcVhugWpF1
+	YJm9Zuwbxgm4FJ6/ilDNhW1O6t4tRgU4kRjnfBW6DP6+mcUwvklVkUTBbM1iPU1DgQALkZaArs1
+	T00xvNo7BLPusMRRQOUnRI5tyXavTJOay4VrypyImgTVYihjVEeg5dT+Bbfjwba3t/pI99DRObU
+	TcJ7QKvWLyeOlURbX3AB/0UrmiQlz6xHAlEj8HNB/ro1yNsyNd7eV6z0XDEQhm43eL+8r8X9JfG
+	1VliDoE6iUZJhgLlmbsdgPOLiBX2C5uOlUiRVXLBXJ3j6/gcz4KW/6evi6u5d+PgPTe1+GK6tFh
+	yp5CLXiKUWZTgHTfLNvW2XvCBlDmyq/zTDL1JGKEV0ooFIyIFoZM0hZioXeoovKEsmpGm6BAdE8
+	K9u/9FEx06gF6gKlDNRwuFv6yxfN2Q=
+X-Received: by 2002:a05:690e:4415:20b0:654:5d65:9fe1 with SMTP id 956f58d0204a3-65e22678067mr19136094d50.8.1779286613949;
+        Wed, 20 May 2026 07:16:53 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-910ba463814sm2138952485a.5.2026.05.20.07.16.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 07:16:53 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 0/2] ieee802154: admin-gate legacy LLSEC dumps + un-deaden ADD/DEL
+Date: Wed, 20 May 2026 10:16:38 -0400
+Message-ID: <20260520141640.1149513-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260520135034.1060859-1-michael.bommarito@gmail.com> <CABBYNZLLw=VFfjaF_TXA=5ZgDt7rw=XgUULoc4JudMpUBf_BWg@mail.gmail.com>
-In-Reply-To: <CABBYNZLLw=VFfjaF_TXA=5ZgDt7rw=XgUULoc4JudMpUBf_BWg@mail.gmail.com>
-From: Michael Bommarito <michael.bommarito@gmail.com>
-Date: Wed, 20 May 2026 10:12:53 -0400
-X-Gm-Features: AVHnY4Jw2SUIqejxTca-2HXdzAfWn9R-0elBcKvZqiV0qBvm6QtxRM6lQabcQeY
-Message-ID: <CAJJ9bXw9r2XHYMkmjbJ9XAiGEG3VEWK6bjKHbHgwJqnOBzTu9w@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: L2CAP: reject BR/EDR signaling packets over MTUsig
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
@@ -123,51 +109,151 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289967-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-289973-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,datenfreihafen.org,bootlin.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 9CFCF58FB41
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6C2E258FBCE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 10:00=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Weird, does the AI come up with this? The id is actually _not_
-> important because the error code will essentially indicate that the
-> entire packet was rejected. Therefore, it doesn't matter if the id is
-> for a request or a response, it still needs rejection if it exceeds
-> the MTU, so this seems overengineered.
+The legacy IEEE802154_NL family (net/ieee802154/netlink.c) builds its
+ops table from two macros in net/ieee802154/ieee802154.h. IEEE802154_OP()
+sets .flags = GENL_ADMIN_PERM; IEEE802154_DUMP() sets no flags. Among
+the IEEE802154_DUMP() consumers are four LLSEC dump ops (LIST_KEY,
+LIST_DEV, LIST_DEVKEY, LIST_SECLEVEL), and the LLSEC_LIST_KEY dump
+handler at net/ieee802154/nl-mac.c emits the raw 16-byte AES-128
+keytable bytes (IEEE802154_ATTR_LLSEC_KEY_BYTES, .len = 16, copied
+verbatim from struct ieee802154_llsec_key.key) into the reply skb.
+The modern nl802154 family admin-gates the equivalent reads
+(NL802154_CMD_GET_SEC_KEY at net/ieee802154/nl802154.c:2978 with
+.flags = GENL_ADMIN_PERM) so the legacy interface is the open side.
 
-Yes, and I debated this with Claude, but it convinced me that the
-lifted helpers were more idiomatic for the actual spec and bt system:
-"The identifier shall match the first request command in the L2CAP
-packet. If only responses are recognized, the packet shall be silently
-discarded."
+Any local uid with no capabilities can dump the AES-128 LLSEC keytable
+of any wpan netdev that has an administrator-installed key. 802.15.4
+LLSEC uses CCM*, so the same key authenticates and encrypts frames at
+the chosen security level. One key leak compromises confidentiality
+and authenticity at the link layer.
 
-So if we ever lifted or refactored the code, it would be abundantly
-clear/safe to reuse elsewhere.
+Patches:
 
-There is also much shorter version that just peeks skb->data[1] and
-exits early if not ident=3D0 if that's what you're going for.
+  1/2 ieee802154: admin-gate legacy LLSEC dump operations
+      Introduce IEEE802154_DUMP_PRIV() mirroring IEEE802154_DUMP() but
+      with .flags = GENL_ADMIN_PERM. Switch the four LLSEC dump ops to
+      it. LIST_PHY and LIST_IFACE keep IEEE802154_DUMP() because the
+      modern nl802154 family exposes their equivalents to unprivileged
+      readers by design.
 
-Just let me know what version you prefer.
+  2/2 ieee802154: allow legacy LLSEC ADD/DEL ops to pass strict validation
+      While reproducing the dump leak the LLSEC ADD/DEL doit handlers
+      turned out to have been silently dead since strict netlink
+      validation became the default: IEEE802154_ATTR_LLSEC_KEY_BYTES
+      and _KEY_USAGE_COMMANDS are declared as NLA_UNSPEC in
+      nl_policy.c, which validate_nla() rejects under
+      NL_VALIDATE_STRICT. Add IEEE802154_OP_RELAXED() with
+      .validate = GENL_DONT_VALIDATE_STRICT and switch the eight LLSEC
+      mutate ops to it. The dump ops keep strict validation; their
+      gate from patch 1/2 stands.
 
-Thanks,
-Mike
+This would be a good time to revisit this thread from Alexander Aring:
+https://lore.kernel.org/r/20160725121450.4093-4-aar@pengutronix.de
+
+Ten years later the legacy interface is still in mainline and
+(per patch 2/2) silently dead on the doit side anyway. Maintainers
+who prefer to revive that deletion series should NACK patch 2/2 and
+pick patch 1/2 alone; patch 1/2 plugs the key leak whether the
+legacy doit path is ever brought back to life or removed entirely.
+
+Reproduction
+============
+
+Tree: mainline 7.1-rc2 (22be7671cc3497f68d14555285c0ac221597c8eb),
+x86 UML, KASAN off. Conditions: CONFIG_IEEE802154=y, CONFIG_MAC802154=y,
+CONFIG_IEEE802154_HWSIM=y; one wpan netdev exists; an administrator
+has installed an LLSEC key on it.
+
+Harness: a userspace C program opens AF_NETLINK / NETLINK_GENERIC,
+resolves the "802.15.4 MAC" family, and issues a CTRL_CMD_GETFAMILY
+followed by a IEEE802154_LLSEC_LIST_KEY dump on wpan0. The dump
+response is parsed for IEEE802154_ATTR_LLSEC_KEY_BYTES nested
+attributes and the 16-byte payload is hex-printed. The runner drops
+privileges to uid=1000 via setpriv with --bounding-set=-all and
+--inh-caps=-all before invoking the dump.
+
+For patch 2/2, the same harness shape sends a IEEE802154_LLSEC_ADD_KEY
+request with policy-conformant attributes (frame counter, key ID
+mode, key bytes, usage frame types) as root. The harness measures
+whether the doit handler is reached (ieee802154_llsec_add_key()
+return code visible via the netlink ack) or the dispatcher rejects
+the request at the validate phase.
+
+Stock vs patched outcomes (per patch):
+
+  1/2: stock dump returns the installed AES-128 key bytes
+       byte-identical to the unprivileged dumper; patched returns
+       -EPERM at the generic-netlink dispatch.
+
+  2/2: stock LLSEC_ADD_KEY as root returns "Unsupported attribute"
+       from __nla_validate_parse(); patched reaches
+       ieee802154_llsec_add_key() and installs the key.
+
+Regression-adjacent runs (per patch):
+
+  1/2: LIST_PHY and LIST_IFACE dumps continue to succeed from an
+       unprivileged uid post-patch, mirroring the modern
+       NL802154_CMD_GET_WPAN_PHY and NL802154_CMD_GET_INTERFACE
+       behavior.
+
+  2/2: modern nl802154 NL802154_CMD_NEW_SEC_KEY (which is admin-
+       gated and uses NLA_NESTED policy entries, not NLA_UNSPEC)
+       continues to install keys unchanged.
+
+Mitigations: a system administrator unwilling to ship patch 1/2
+can mitigate the leak by building the kernel without
+CONFIG_IEEE802154 or by ensuring no LLSEC key is installed on
+any wpan netdev. There is no per-process mitigation.
+
+Selftest gate: tools/testing/selftests/ has no matching binary
+for the legacy IEEE802154_NL interface.
+
+The trigger harness sources are available off-list on request.
+
+Scope notes:
+
+  - The dump handler reuses the same struct ieee802154_llsec_key
+    storage as the modern nl802154 NEW_SEC_KEY path. Both interfaces
+    expose the same backing keytable; gating only the legacy dump is
+    the minimal fix.
+  - The two new macros sit alongside the existing two; no existing
+    callers change beyond the four LIST_LLSEC* lines (patch 1/2)
+    and the eight LLSEC ADD/DEL lines (patch 2/2).
+
+Michael Bommarito (2):
+  ieee802154: admin-gate legacy LLSEC dump operations
+  ieee802154: allow legacy LLSEC ADD/DEL ops to pass strict validation
+
+ net/ieee802154/ieee802154.h | 17 +++++++++++++++++
+ net/ieee802154/netlink.c    | 36 ++++++++++++++++++------------------
+ 2 files changed, 35 insertions(+), 18 deletions(-)
+
+
+base-commit: 22be7671cc3497f68d14555285c0ac221597c8eb
+--
+2.53.0
+
 
