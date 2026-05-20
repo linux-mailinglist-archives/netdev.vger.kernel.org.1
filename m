@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-290138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290139-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNAjEmpJDmqZ9gUAu9opvQ
-	(envelope-from <netdev+bounces-290138-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:53:14 +0200
+	id QChsDbpJDmoM9gUAu9opvQ
+	(envelope-from <netdev+bounces-290139-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:54:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 500B859CF9F
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:53:13 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F15659CFCE
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:54:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 00C8D305B15E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:45:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 473AE30604A5
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F59F3D6CA5;
-	Wed, 20 May 2026 23:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAEF3D88F1;
+	Wed, 20 May 2026 23:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P95ok930"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRLpSTji"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322513CFF5D;
-	Wed, 20 May 2026 23:44:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A973D5647;
+	Wed, 20 May 2026 23:44:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779320679; cv=none; b=I3KqJGkSL1AsGztvj8bJRj+no4E7GGACMkoIeAkG0Fc5DDQzWAowJ165PxbE6JT88J+iF15U1vjNqTC6frIw3vlJXwYfD0TuEtGVQSIxeaIV948k5VOsZKOsE15A/LojFL8pcJgjtaalb4JrCIe7zBmXNAMIHaLs1GpsHOc2O28=
+	t=1779320680; cv=none; b=u0S9EL2elOfogyKR79FeaaDNOyz9bjAkKz6f64Omo7OxTv5KtnpOK0FhaZ+4et4Oy+fOuPyDX2aSk9vvWBWYkSCKREklj+vNqqcga15MwfXzGctR8H5rTbQrXgfm4SEhH0+2FL46bFmet4ma71I/HRrZm6OTKTgwM501R9nEG7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779320679; c=relaxed/simple;
-	bh=aje9XEuUNJjqw7H1SodHsl0ciXq/rE2V1ROFgfW0N7o=;
+	s=arc-20240116; t=1779320680; c=relaxed/simple;
+	bh=ZMRzyAmE/yzg4+0E9u6xce0ReYUWNfyNiVI/OREpeVo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Szsheic8Ys1OGMXPuZV80IBnSoYK25tNso03a7+8SmrwMh20uVoH7c75TD3EOXSnx6S8RxqAqXdIN72ppBuPnjO65hlZ5Hrxe48JuNI1PHjMCXf25BDbESesUoTdiBO/WT69TYmuSo6brMUrCPN0meW+w9ZzCyBUyo7BpL6OSjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P95ok930; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C9151F000E9;
-	Wed, 20 May 2026 23:44:36 +0000 (UTC)
+	 MIME-Version; b=fXlXHp/6JirM7bDQDro8R3a7+KQzpsf7CO2yXbGXyWy7SHeyezlLEWZzRAcN1a5h0xPwwdbi8tE2OzVYDWGm++0+ytSvl7W9ykf2rDWcw3em7rK91ef4DWBiWYb17IMyLm6vOkhS3be8agQnD+ay+i9H7W8hqXUXZAM2SY0hMNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRLpSTji; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052E71F00A39;
+	Wed, 20 May 2026 23:44:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779320677;
-	bh=SMGmAnaqqMFwZ/ms8bS1jE0mRxGhgL4+qrx5hR290rU=;
+	s=k20260515; t=1779320678;
+	bh=Y+HcjhdK5Ccx+Qwqnotk+/XYbwyNomlc9/tacwbIlQg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=P95ok930jk2rxBkIkSWPylzXui1iEWk0FwtTxb5mqSa1+u3YQxLMM9FSCgq0z18VM
-	 VBJ/tUlEURhMhws/d9wQB3VqaUI4YUju9fqnosw5OU5w1jXC8VnCTPpeurx2cofxjD
-	 EcIoEwn4avgPctdsUjBDVNODbWCaKWAjxQfO0vqhrY1Ja1ggpgU/DzvIdNUOCvjYuW
-	 deNW6z5WstCbbfeAiIDm+1GPuxpQelUvG8l82wwmx2ewFmlbwFEiByjbQ/8PlvBE7M
-	 E+IejAcq7jqMWu65f6WIPvx2vYfLwYYEuOwMQ1NIUaYajqnfbfX6ln/Q+ydL7p8cln
-	 EtTiSuWCTyiMw==
+	b=fRLpSTjiOkQVs7qRjO3IZt3ZnFC3BL/8LWJgu8xFpVv9yV+8tSd/ZIn6Gb99J3ShV
+	 +Vm6FDqDQwcGhgAEETlNV4ZVB73mZr1BZy+wKkaCLL1x4yemNbdGQPGZnluIQQnQbY
+	 3FZJHAHFtuJf/Y7fZpos+34TdwjDRYOIAnTnxaLqRGh//letbWrG4tBiIWYmzM3vB1
+	 YHjBKjtjH9G4EgDgipW5IMXQdPY5c0omkjn57ehIMnb+Ucr39HnnSrq5wLmlypZq7y
+	 0dqZBPw44glO4/BtQ1XLqP+MsH+/EQ/b3d5EyquK8fohxaL0J6wSnJllNu4aJ+F1qY
+	 ElI4oz/BmontA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: nikhil.rao@amd.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -56,12 +56,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	eric.joyner@amd.com,
 	Vamsi.Atluri@amd.com
-Subject: Re: [PATCH net-next v2 5/6] pds_core: add host backed memory support for firmware
-Date: Wed, 20 May 2026 16:44:35 -0700
-Message-ID: <20260520234435.567124-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 6/6] pds_core: add debugfs support for host backed memory
+Date: Wed, 20 May 2026 16:44:37 -0700
+Message-ID: <20260520234437.567156-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260516-upstream_v2_clean-v2-5-7e0d66bf4020@amd.com>
-References: <20260516-upstream_v2_clean-v2-5-7e0d66bf4020@amd.com>
+In-Reply-To: <20260516-upstream_v2_clean-v2-6-7e0d66bf4020@amd.com>
+References: <20260516-upstream_v2_clean-v2-6-7e0d66bf4020@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,7 +75,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -84,9 +84,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290138-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290139-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -98,286 +98,140 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 500B859CF9F
+X-Rspamd-Queue-Id: 3F15659CFCE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-pds_core: add host backed memory support for firmware
+pds_core: add debugfs support for host backed memory
 
-This patch adds support for the firmware to use host-backed DMA memory
-on AMD/Pensando cards with minimal on-card memory. A new set of adminq
-opcodes (MEM_GET_COUNT, MEM_QUERY, MEM_ADD, MEM_DEL) coordinate the
-allocation, mapping, and teardown of these regions.
+This adds a debugfs file (host_mem) under the pds_core device directory
+that displays the tag, size, order, and physical address of each host
+memory request tracked in pdsc->host_mem_reqs.
 
-> diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-> index 705cab7b0727..215242430b10 100644
-> --- a/drivers/net/ethernet/amd/pds_core/core.c
-> +++ b/drivers/net/ethernet/amd/pds_core/core.c
-> @@ -487,6 +487,7 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
->  		pdsc->viftype_status = NULL;
->  	}
->  
-> +	pdsc_host_mem_free(pdsc);
->  	pdsc_dev_uninit(pdsc);
-
-[High]
-
-Can pdsc_host_mem_free() unmap and free pages while firmware DMA is
-still in flight?
-
-pdsc_teardown() runs pdsc_devcmd_reset() earlier, but that command can
-itself time out when the firmware is hung, and even on success the PCI
-device remains bus-master enabled (pci_disable_device() runs much later
-in pdsc_remove(), and pdsc_dev_uninit() only frees IRQ vectors).
-
-Unlike the adminq/notifyq descriptor rings, host-mem buffers are used
-asynchronously by firmware for control-plane data, so the exposure
-window is much wider. If firmware did not actually halt DMA, can it
-continue writing into pages that have already been returned to the page
-allocator?
-
-Would it be safer to issue MEM_DEL and verify firmware quiescence (for
-example via pci_disable_device() or pcie_flr()) before unmapping and
-freeing the pages?
-
->  
->  	set_bit(PDSC_S_FW_DEAD, &pdsc->state);
-> @@ -496,6 +497,7 @@ int pdsc_start(struct pdsc *pdsc)
->  {
->  	pds_core_intr_mask(&pdsc->intr_ctrl[pdsc->adminqcq.intx],
->  			   PDS_CORE_INTR_MASK_CLEAR);
-> +	pdsc_host_mem_add(pdsc);
->  
->  	return 0;
+> diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
+> index 04c5e3abd8d7..058071f6f17e 100644
+> --- a/drivers/net/ethernet/amd/pds_core/debugfs.c
+> +++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
+> @@ -173,3 +173,53 @@ void pdsc_debugfs_del_qcq(struct pdsc_qcq *qcq)
+>  	debugfs_remove_recursive(qcq->dentry);
+>  	qcq->dentry = NULL;
 >  }
-
-[High]
-
-Does this introduce a self-deadlock on pdsc->wq during firmware
-recovery?
-
-pdsc_start() is invoked on the recovery path from
-pdsc_health_thread() -> pdsc_fw_up() -> pdsc_setup() -> pdsc_start().
-pdsc_health_thread runs on pdsc->wq, which is created via
-create_singlethread_workqueue() (max_active=1).
-
-pdsc_host_mem_add() then posts adminq commands via pdsc_adminq_post(),
-which calls wait_for_completion_timeout(). The completion is signaled
-only by pdsc_work_thread()/pdsc_process_adminq(), which is queued by
-pdsc_adminq_isr() onto the same pdsc->wq:
-
-	queue_work(pdsc->wq, &qcq->work);
-
-Because the wq's only worker is busy running pdsc_health_thread, the
-qcq->work item cannot be dispatched, the completion never fires, and
-every adminq command (MEM_GET_COUNT, MEM_QUERY, MEM_ADD) times out
-after devcmd_timeout.
-
-On top of that, pdsc_adminq_post() does:
-
-	if (err == -ENXIO || err == -ETIMEDOUT)
-		queue_work(pdsc->wq, &pdsc->health_work);
-
-which re-queues the currently running work on the same wq.
-
-[Medium]
-
-Could ignoring the result of pdsc_host_mem_add() be a problem?
-
-> @@ -496,6 +497,7 @@ int pdsc_start(struct pdsc *pdsc)
->  {
->  	pds_core_intr_mask(&pdsc->intr_ctrl[pdsc->adminqcq.intx],
->  			   PDS_CORE_INTR_MASK_CLEAR);
-> +	pdsc_host_mem_add(pdsc);
->  
->  	return 0;
->  }
-
-pdsc_host_mem_add() returns void and pdsc_start() always returns 0.
-Inside pdsc_host_mem_add() the kzalloc_objs() failure path and the
-inner add-loop simply return/break:
-
-	pdsc->host_mem_reqs = kzalloc_objs(*pdsc->host_mem_reqs, count,
-					   GFP_KERNEL);
-	if (!pdsc->host_mem_reqs) {
-		dev_err(pdsc->dev, "failed to alloc host_mem_reqs array\n");
-		return;
-	}
-
-	for (i = 0; i < count; i++) {
-		err = pdsc_host_mem_add_one(pdsc, i);
-		if (err)
-			break;
-	}
-
-The commit message says the firmware needs this memory for control-plane
-components, but the driver provides no mechanism to refuse bring-up or
-tell firmware "I gave you fewer regions than you requested". Should the
-final count be communicated, or should bring-up fail?
-
-Also, count from MEM_GET_COUNT is an le16 (up to 65535), and only
-per-region size is sanity-checked. Should there be an aggregate cap as
-well?
-
-> @@ -658,3 +660,168 @@ void pdsc_health_thread(struct work_struct *work)
-[ ... ]
-> +static int pdsc_host_mem_add_one(struct pdsc *pdsc, int index)
+> +
+> +static int host_mem_show(struct seq_file *seq, void *v)
 > +{
-[ ... ]
-> +	hm->pa = dma_map_page(pdsc->dev, hm->pg, 0, hm->size,
-> +			      DMA_BIDIRECTIONAL);
-> +	if (dma_mapping_error(pdsc->dev, hm->pa)) {
-> +		dev_err(pdsc->dev, "dma map failed for tag %d size %d\n",
-> +			hm->tag, hm->size);
-> +		__free_pages(hm->pg, hm->order);
-> +		hm->pg = NULL;
-> +		err = -EIO;
-> +		goto err_del;
-> +	}
+> +	struct pdsc *pdsc = seq->private;
+> +	struct pdsc_host_mem *hm;
+> +	int i;
 > +
-> +	/* Track this allocation so pdsc_host_mem_free() can clean it up */
-> +	pdsc->num_host_mem_reqs++;
-> +
-> +	memset(&cmd, 0, sizeof(cmd));
-> +	memset(&comp, 0, sizeof(comp));
-> +	cmd.mem_add.opcode = PDS_AQ_CMD_MEM_ADD;
-> +	cmd.mem_add.tag = cpu_to_le16(hm->tag);
-> +	cmd.mem_add.size = cpu_to_le32(hm->size);
-> +	cmd.mem_add.buf_pa = cpu_to_le64(hm->pa);
-> +
-> +	dev_dbg(pdsc->dev, "Sending aq cmd for mem add tag %d size %d pa %pad\n",
-> +		hm->tag, hm->size, &hm->pa);
-> +	err = pdsc_adminq_post(pdsc, &cmd, &comp, false);
-> +	if (err || comp.status != PDS_RC_SUCCESS) {
-> +		dev_err(pdsc->dev, "mem add failed err %d status %d for tag %d\n",
-> +			err, comp.status, hm->tag);
-> +		err = err ? err : -EIO;
-> +		goto err_del;
+> +	if (!pdsc->host_mem_reqs || pdsc->num_host_mem_reqs == 0) {
+> +		seq_puts(seq, "No host memory allocated\n");
+> +		return 0;
 > +	}
 
-[Medium]
+[High]
+Can host_mem_show() race with pdsc_host_mem_free() and end up
+dereferencing freed memory?
 
-Can MEM_DEL be sent twice for the same tag here?
+The reader takes no lock, but the writers in pdsc_host_mem_add() and
+pdsc_host_mem_free() are serialized by pdsc->config_lock and run from
+pdsc_fw_down()/pdsc_fw_up() during PCI reset_prepare/reset_done, AER
+recovery, and the watchdog-triggered pdsc_health_thread workqueue.
+pdsc_teardown() ultimately calls pdsc_host_mem_free(), which kfree()s
+host_mem_reqs and sets the pointer to NULL.
 
-num_host_mem_reqs++ runs after dma_map_page() succeeds but before
-MEM_ADD is posted. If MEM_ADD then fails, the err_del label calls
-pdsc_host_mem_del_one(pdsc, hm->tag, PDS_RC_ENOMEM) immediately, but
-the entry is still counted in num_host_mem_reqs.
+The initial check is also TOCTOU:
 
-Later, pdsc_host_mem_del() iterates by num_host_mem_reqs and calls
-pdsc_host_mem_del_one() again with the same tag:
+    if (!pdsc->host_mem_reqs || pdsc->num_host_mem_reqs == 0) {
 
-	for (i = 0; i < pdsc->num_host_mem_reqs; i++)
-		pdsc_host_mem_del_one(pdsc, pdsc->host_mem_reqs[i].tag,
-				      PDS_RC_SUCCESS);
+After this passes, host_mem_reqs can be freed and nulled before the
+loop body dereferences &pdsc->host_mem_reqs[i].
 
-The dma_mapping_error() path correctly avoids this by jumping to
-err_del before incrementing num_host_mem_reqs, which makes the two
-failure paths inconsistent.
-
-[Low]
-
-Is num_host_mem_reqs intended to track "pages to dma_unmap+free" or
-"tags to send MEM_DEL for"?
-
-The comment says:
-
-	/* Track this allocation so pdsc_host_mem_free() can clean it up */
-	pdsc->num_host_mem_reqs++;
-
-but the same counter also drives pdsc_host_mem_del()'s MEM_DEL loop.
-Those have different lifetimes: a successfully mapped page must always
-be freed, but MEM_DEL should only be sent for entries whose MEM_ADD was
-acknowledged. Correctness here depends on the exact placement of the
-increment between dma_map_page() success and MEM_ADD posting. Would
-per-entry booleans (mapped, added) make the lifecycle clearer and less
-fragile to future edits?
+Could this be addressed by holding pdsc->config_lock around the
+iteration, by removing the host_mem dentry from pdsc_fw_down() /
+pdsc_teardown() before pdsc_host_mem_free(), or by switching the
+array to RCU?
 
 > +
-> +void pdsc_host_mem_add(struct pdsc *pdsc)
+> +	seq_printf(seq, "Host memory requests: %d\n\n",
+> +		   pdsc->num_host_mem_reqs);
+> +	seq_puts(seq, "Tag    Size         Order  PA\n");
+> +	seq_puts(seq, "---    ----         -----  --\n");
+> +
+> +	for (i = 0; i < pdsc->num_host_mem_reqs; i++) {
+> +		hm = &pdsc->host_mem_reqs[i];
+> +
+> +		if (!hm->pg)
+> +			continue;
+> +
+> +		seq_printf(seq, "%-6d %-12u %-6d 0x%llx\n",
+> +			   hm->tag, hm->size, hm->order,
+> +			   (unsigned long long)hm->pa);
+
+[Low, Low]
+hm->tag is u16 and hm->order is u8, but they are printed with the
+signed %-6d specifier while hm->size (u32) uses %-12u. Should the
+unsigned types use %u here as well?
+
+Also, the canonical format specifier for dma_addr_t is %pad. Could
+hm->pa be printed with &hm->pa and %pad rather than cast to unsigned
+long long with 0x%llx?
+
+> +	}
+> +
+> +	return 0;
+> +}
+> +DEFINE_SHOW_ATTRIBUTE(host_mem);
+> +
+> +void pdsc_debugfs_add_host_mem(struct pdsc *pdsc)
 > +{
-[ ... ]
+> +	struct dentry *dentry;
+> +
 > +	if (!(pdsc->dev_ident.capabilities &
 > +	     cpu_to_le64(PDS_CORE_DEV_CAP_HOST_MEM)))
 > +		return;
 > +
-> +	cmd.mem_get_count.opcode = PDS_AQ_CMD_MEM_GET_COUNT;
-> +	cmd.mem_get_count.max_contig = cpu_to_le32(PDSC_HOST_MEM_MAX_CONTIG);
+> +	/* Check if file already exists (e.g., during reset recovery) */
+> +	dentry = debugfs_lookup("host_mem", pdsc->dentry);
+> +	if (!IS_ERR_OR_NULL(dentry)) {
+> +		dput(dentry);
+> +		return;
+> +	}
+> +
+> +	debugfs_create_file("host_mem", 0400, pdsc->dentry,
+> +			    pdsc, &host_mem_fops);
+> +}
 
 [Low]
+Is the comment "Check if file already exists (e.g., during reset
+recovery)" accurate here?
 
-Does baking PDSC_HOST_MEM_MAX_CONTIG into the firmware ABI cause
-problems across kernel builds?
+pdsc_debugfs_add_host_mem() is only called from pdsc_init_pf(), which
+is itself only called from pdsc_probe(). The reset and recovery paths
+go pdsc_fw_up() -> pdsc_setup() -> pdsc_start() -> pdsc_host_mem_add()
+and never re-invoke pdsc_debugfs_add_host_mem().
 
-PDSC_HOST_MEM_MAX_CONTIG is defined as:
+By contrast, pdsc_debugfs_add_ident() is genuinely called during
+recovery via pdsc_dev_init() from pdsc_setup(), so the same idiom
+there is meaningful.
 
-	#define PDSC_HOST_MEM_MAX_CONTIG ((PAGE_SIZE) << (MAX_PAGE_ORDER))
-
-MAX_PAGE_ORDER varies by architecture and CONFIG_ARCH_FORCE_MAX_ORDER,
-so the same firmware will see different "maximum contiguous size"
-values depending on which kernel build is loaded. The driver then tries
-to satisfy each request with bare:
-
-	hm->pg = alloc_pages(GFP_KERNEL | __GFP_ZERO, hm->order);
-
-which is unreliable for high-order allocations on a fragmented running
-system. pdsc_host_mem_add() runs both at probe and on firmware
-recovery, where fragmentation is likely.
-
-Also, PDSC_HOST_MEM_MAX_CONTIG is unsigned long while
-mem_get_count.max_contig is __le32. On configurations where
-(PAGE_SIZE << MAX_PAGE_ORDER) >= 4 GiB, cpu_to_le32() silently
-truncates without any BUILD_BUG_ON guarding it. Would advertising a
-fixed conservative size, with a compile-time size check, be more
-robust?
+Should the dead defensive branch be dropped, or was the intent to
+also wire pdsc_debugfs_add_host_mem() into the recovery path so the
+file reflects the post-recovery host_mem_reqs array?
 
 > diff --git a/drivers/net/ethernet/amd/pds_core/main.c b/drivers/net/ethernet/amd/pds_core/main.c
-> index 22db78343eb0..58b4d77f6eca 100644
+> index 58b4d77f6eca..aa7b5ce6f623 100644
 > --- a/drivers/net/ethernet/amd/pds_core/main.c
 > +++ b/drivers/net/ethernet/amd/pds_core/main.c
-> @@ -434,7 +436,8 @@ static void pdsc_remove(struct pci_dev *pdev)
->  		pdsc_sriov_configure(pdev, 0);
->  		pdsc_auxbus_dev_del(pdsc, pdsc, &pdsc->padev);
+> @@ -266,6 +266,8 @@ static int pdsc_init_pf(struct pdsc *pdsc)
 >  
-> -		timer_shutdown_sync(&pdsc->wdtimer);
-> +		pdsc_stop_health_thread(pdsc);
-> +		pdsc_host_mem_del(pdsc);
->  		if (pdsc->wq)
->  			destroy_workqueue(pdsc->wq);
-
-[Medium]
-
-Can health_work be re-queued after it has been cancelled here?
-
-The new ordering is:
-
-	pdsc_stop_health_thread(pdsc);  /* cancels health_work */
-	pdsc_host_mem_del(pdsc);        /* posts MEM_DEL adminq cmds */
-	if (pdsc->wq)
-		destroy_workqueue(pdsc->wq);
-
-pdsc_adminq_post() does:
-
-	if (err == -ENXIO || err == -ETIMEDOUT)
-		queue_work(pdsc->wq, &pdsc->health_work);
-
-If pdsc_host_mem_del()'s MEM_DEL adminq posts time out (firmware
-partially hung), health_work is re-queued and then drained by
-destroy_workqueue(). At that point PDSC_S_STOPPING_DRIVER is not yet
-set (it is set later, inside config_lock, after destroy_workqueue
-returns), so pdsc_health_thread() runs the full health check, sees FW
-dead, and dispatches pdsc_fw_down() -> pdsc_stop() +
-pdsc_teardown(RECOVERY).
-
-Then the main thread proceeds to call pdsc_stop() +
-pdsc_teardown(REMOVING) again. Some inner cleanups are idempotent, but
-pci_free_irq_vectors() in pdsc_dev_uninit() is not gated by an
-idempotency guard.
-
-Would setting PDSC_S_STOPPING_DRIVER before pdsc_host_mem_del(), or
-calling cancel_work_sync() once more after pdsc_host_mem_del(), close
-this window?
+>  	mutex_unlock(&pdsc->config_lock);
+>  
+> +	pdsc_debugfs_add_host_mem(pdsc);
+> +
+>  	err = pdsc_auxbus_dev_add(pdsc, pdsc, PDS_DEV_TYPE_FWCTL, &pdsc->padev);
+>  	if (err)
+>  		goto err_out_stop;
 
