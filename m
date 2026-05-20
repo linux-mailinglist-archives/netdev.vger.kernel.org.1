@@ -1,173 +1,179 @@
-Return-Path: <netdev+bounces-290005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qOf/M2zhDWop4gUAu9opvQ
-	(envelope-from <netdev+bounces-290005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:29:32 +0200
+	id oMPUKzvgDWrb4QUAu9opvQ
+	(envelope-from <netdev+bounces-290006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:24:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30B46592010
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:29:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44203591D69
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8E7632C81C4
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:01:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A8DE13031CAA
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE943603F7;
-	Wed, 20 May 2026 16:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B1132B101;
+	Wed, 20 May 2026 16:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r5P7wyPD"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="i6xcibCo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C907734AAF2
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 16:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526F130C61B;
+	Wed, 20 May 2026 16:03:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779292841; cv=none; b=GBF48cqokk+ZWm+jDxNKwAq5I5DldKHZdZsqHoTpKRAdrQpjeBtF9t5jml3drVp3N7gJ+zYb7hDiq7ufeNtOnIGqUn1PMkALgdGkXR9YxkrLS+iAAO1zD/b6J7UNBXZwINov7GIIgV3JV5y+NOrvNq4s8jVRJg6bl1OZeDv3z/U=
+	t=1779293034; cv=none; b=FN3w8Oe4mCVvGeTGKY30dpRCoIT+QjEjiFmMQcwCNiVWzkV3y4pdfqfqNYtSPIzFZxUbbd3R5KkfVxJsvS4a1OSJAuKBa5hJRSyl2GayiWjeJ0kTwcsOXMDQ16OhNTLalyZjD83HfH0QqmEsEmf3fN7xwB3rWtw2J6Amv9qva0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779292841; c=relaxed/simple;
-	bh=EYJENH/E9aIT1O7dcWbTzgwVXLLggCk/JlwRe3Mgr6g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L+7eM2ZUxx1QzIgUnM7vNTXQFbCzAU2dpCgdLohspatPEou3FP/ouw+uXEvLNnKiIYtuj8QKVoi8KOFfpjuxwhM1dMaKTOcsD4jzwuUJhV0Wz1xM9iT15OPt6I9ffjD3tx7qcSgr3dQZ3LEhoIGHsR7lLR35T2i841Y2Q14BRQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=r5P7wyPD; arc=none smtp.client-ip=74.125.82.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-3042a388168so74049eec.1
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 09:00:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779292838; x=1779897638; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZJSUSn4qvTX086pa/Fy4nlh1Sgz6dj9ak0JISPiC70=;
-        b=r5P7wyPD6ZOmqH5FIN6WC+P/QqQS/6J+jyST9QbYyJHqMw22PfKiua8mAA+SPgTW0/
-         oCXwfS2nPIId7QC4OungYlSzZRL350SHj1hTj77OVnolHHBE+EHEzC+c81M5faW+6KTm
-         mfDczGPIZdabk2QxCdIxal5ucqTZjB6O88cXWif1P8H10gcxa1Bi/DxAsTQj/4RMMsi3
-         w4TDEab5jFmPWBf8d4qb7PTyCXBEGQSB82fQhK9GVQoam0oTsGKmBqtbEI62KZl2DYkf
-         J1djl/Pm7xwj0Ocjbkg4/HGKOH/MecdtivKRMQssQRlGrgmkGoH3BVpbUuGL9QxpUuSC
-         JS3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779292838; x=1779897638;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jZJSUSn4qvTX086pa/Fy4nlh1Sgz6dj9ak0JISPiC70=;
-        b=JZDlFM1DvWBv61UBRshfQE9/8tmnWb6zLJ4oqr1aRpZ9WAdh9b0USmvT1knsQFusYD
-         7SiDJzZAeaeyBpYHUkb8UhkvFit4do9WZ1Pyvllyr8Ua5G6S2f9eVNPrfButEtMNQ42e
-         ZfxTqgZ+EYhc0I5/aKFezyqm8KvAHQlhBFSJNi9iOhoD22eeQQVkk5oAKXsAp3JvELtO
-         uHemaWXAAejcUsL50/Q0FVdZtBy0lzoeGTIIX9qZsSmF98tz27koaj58seJ7kyLQARzC
-         P/cj1dWGwUwBkqtUfnbDCWgbpSuMDWhgvuY/n6l4qhtmZriBsMXJzZpY7MA2phX7w8xK
-         J6Ew==
-X-Gm-Message-State: AOJu0YyBNoBXd3nL4VypiXx/fXM/mqowLNpshrTpr7iimtzNDP8UFf+B
-	aQXgH8B1MpoqR9GIvbdYKx1B6ldZkM0pJ01mNMSLvqyJ8wnWUW8ZXdK59NvD8Nt5
-X-Gm-Gg: Acq92OGlgaTrf3kg2j5AGeB31oyQFReYIYevOp8LkRssi/ch9abT622OeaaoFiAFPcV
-	5aP5yk7z8YbL9p20y3jityGGo3RRPSRrOxM9pi6/F1OieRG+mdMZ0nPRGwdrikqQ4IW73LPJFyD
-	vkHTCLQSPC3PjzRKlMxx+TcIKg87pKzUuxF8mL3dHfZOchMTynN7ccX3qKPOlHH070Jek+ZQzwx
-	3v1tXByiL4Fn8uk/FLviM45ZxySl/VIZCZGuc6wKTNeo4GWCdquU3WA6hlQgCRJu6owQt8rnO/Y
-	3kC5cDvM+Ja5fDx11lC8jrcLlb8qsVoRdOO6081dCymsLuRWLhBRgBM5Q7sk6MB/6qW59wOX2dD
-	u6iUf6uHR5yaSqGNlrF1YopyWhTLD8kbuSdhZUCghksug71qIGlxGPsg40DiqTA3Fg9BLZ0B3mF
-	1umUkuBD85e005cBOQWdRdv4mLVVSoCjE8ti86zovzF+aU22DKPOLBOqneMJTDkC2oLrF4bGG/c
-	Yb/RMA=
-X-Received: by 2002:a05:7300:430d:b0:2d9:db50:c6ce with SMTP id 5a478bee46e88-3042b30f58emr63273eec.3.1779292838345;
-        Wed, 20 May 2026 09:00:38 -0700 (PDT)
-Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30296dcb6e9sm23412317eec.16.2026.05.20.09.00.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 09:00:37 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	dongli.zhang@oracle.com,
-	xmei5@asu.edu,
-	linux-kernel@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net] tun: free page on short-frame rejection in tun_xdp_one()
-Date: Wed, 20 May 2026 09:00:21 -0700
-Message-ID: <20260520160020.375349-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1779293034; c=relaxed/simple;
+	bh=iREi0TgSWrf/+NC49XE3cMrSvYPy6cS+mt9MKwoijGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lk9CKwWE8PoPd6U1c+aZd992AB5EP4qEQVWfIZZsaQvxr6f0CU+Q6FtMKZGsXH79MDgfe+dP+BfilBPdBIRAtkiqkzwpA6JJfCoTf7x+FQ4ce7Oro38oaldeBoJtfHVlKy2EslmPPrXQylFWJSMTkoeJVAPPyKkSBKY4b93ITcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=i6xcibCo; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=S9ey94ABSE5YcmlVFgmDLitj2da7XPNFgvKx2foi25M=; b=i6xcibCot16Zj/LA9VF8jQvSgl
+	Tel0XDiP69+gv2Z+nfCYce3U8ESfEpewC10yH7fnLRl4fwBUQhw83+6c16NF6is0Sykfh0IvkdKag
+	IFZk8g/ESlyru+/TsBRqr+H1BA2J6Cqfp/vB8WZBkV5olIYW1fWE+FgBkZT0dCK/wUPK7Ha78VG9E
+	E+yg+Mn/7aoBk8aLgVk3o+8R0cTfkZBHUA+QhZZdpH9/0b11aKFxIlkwETO3aw52k/HZNsiYOa6LP
+	IrvmaXTXopyARKVARaEM5uRj1lnAXNqMf20me5fuKv2+khWfIUTmT8l57w18Ud1ycn+7Wryxsm3E4
+	47ZGjHbw==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wPjOD-003DeJ-24;
+	Wed, 20 May 2026 16:03:21 +0000
+Date: Wed, 20 May 2026 09:03:14 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Stanislav Fomichev <sdf.kernel@gmail.com>, 
+	Chas Williams <3chas3@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Jon Maloy <jmaloy@redhat.com>, 
+	Thorsten Winkler <twinkler@linux.ibm.com>, James Chapman <jchapman@katalix.com>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	David Heidelberg <david+nfc@ixit.cz>, Samuel Ortiz <sameo@linux.intel.com>, 
+	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	linux-s390@vger.kernel.org, linux-afs@lists.infradead.org, oe-linux-nfc@lists.linux.dev, 
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next v2 1/7] af_iucv: take socket lock around
+ SO_MSGSIZE getsockopt
+Message-ID: <ag3aAv4AV7VXQnKo@gmail.com>
+References: <20260515-getsock_four-v2-0-0d8eed952627@debian.org>
+ <20260515-getsock_four-v2-1-0d8eed952627@debian.org>
+ <ageFn6UV-c-pOPBW@devvm7509.cco0.facebook.com>
+ <732d4698-8b36-4803-9c81-ae9865b3f943@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+In-Reply-To: <732d4698-8b36-4803-9c81-ae9865b3f943@linux.ibm.com>
+X-Debian-User: leitao
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,kernel.org,google.com,oracle.com,asu.edu,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290006-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290005-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,intel.com,fomichev.me,iogearbox.net,linux.ibm.com,katalix.com,auristor.com,ixit.cz,linux.intel.com,lists.sourceforge.net,vger.kernel.org,lists.infradead.org,lists.linux.dev,meta.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 30B46592010
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 44203591D69
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-tun_xdp_one() returns -EINVAL on a frame shorter than ETH_HLEN without
-freeing the page that vhost_net_build_xdp() allocated for it.
-tun_sendmsg() discards that -EINVAL and still returns total_len, so
-vhost_tx_batch() takes the success path and never frees the page; each
-short frame in a batch leaks one page-frag chunk.
+On Mon, May 18, 2026 at 02:00:01PM +0200, Alexandra Winter wrote:
+> On 15.05.26 22:45, Stanislav Fomichev wrote:
+> > On 05/15, Breno Leitao wrote:
 
-A local process that can open /dev/net/tun and /dev/vhost-net can hit
-this path: it attaches a tun/tap device as the vhost-net backend and
-feeds TX descriptors whose length minus the virtio-net header is below
-ETH_HLEN. Each kick leaks the page-frag chunks for that batch, and a
-tight submission loop exhausts host memory and triggers an OOM panic.
-Free the page before returning -EINVAL, matching the XDP-program error
-path in the same function.
+> >> This is not an exploitable bug. iucv_sock_close() is the only writer
+> >> of iucv->hs_dev and only runs from the protocol release callback,
+> >> which the socket layer invokes after the last file reference drops.
+> >> The getsockopt() syscall holds an fd reference for its entire
+> >> duration via fdget()/fdput(), so iucv_sock_close() cannot run
+> >> concurrently with the SO_MSGSIZE read on the same socket. There is
+> >> no other writer of hs_dev, and the aligned pointer load cannot tear
+> >> on any architecture Linux supports, so the existing code cannot
+> >> observe a NULL dereference or use-after-free in practice.
+> 
+> Actually iucv_sock_bind() and afiucv_hs_callback_syn() also write hs_dev,
+> but iucv_sock_close() is the only instance that clears it to NULL.
+> Maybe there is another wording than 'writer'?
 
-Fixes: 049584807f1d ("tun: add missing verification for short frame")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- drivers/net/tun.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Good point, you are right. I'll reword it to be precise — something
+like "iucv_sock_close() is the only writer that clears hs_dev to NULL",
+and call out the other writers (iucv_sock_bind() and
+afiucv_hs_callback_syn()) so the reader has the full picture.
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index b183189f1853..f594360d66d6 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2394,8 +2394,10 @@ static int tun_xdp_one(struct tun_struct *tun,
- 	bool skb_xdp = false;
- 	struct page *page;
- 
--	if (unlikely(datasize < ETH_HLEN))
-+	if (unlikely(datasize < ETH_HLEN)) {
-+		put_page(virt_to_head_page(xdp->data));
- 		return -EINVAL;
-+	}
- 
- 	xdp_prog = rcu_dereference(tun->xdp_prog);
- 	if (xdp_prog) {
--- 
-2.43.0
 
+> >> diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
+> >> index 72dfccd4e3d58..3dd11d7a967c8 100644
+> >> --- a/net/iucv/af_iucv.c
+> >> +++ b/net/iucv/af_iucv.c
+> >> @@ -1566,9 +1566,11 @@ static int iucv_sock_getsockopt(struct socket *sock, int level, int optname,
+> >>  	case SO_MSGSIZE:
+> >>  		if (sk->sk_state == IUCV_OPEN)
+> >>  			return -EBADFD;
+> >> +		lock_sock(sk);
+> >>  		val = (iucv->hs_dev) ? iucv->hs_dev->mtu -
+> >>  				sizeof(struct af_iucv_trans_hdr) - ETH_HLEN :
+> >>  				0x7fffffff;
+> >> +		release_sock(sk);
+> >>  		break;
+> >>  	default:
+> >>  		return -ENOPROTOOPT;
+> >>
+> > 
+> > SO_IPRMDATA_MSG also seems to be only reading the value set via setsockopt,
+> > so maybe it's ok to just cover the whole switch with lock/unlock? (will
+> > mirror what setsockopt does)
+> > 
+> 
+> I like that idea.
+
+Ack, let me implement it and respin.
+
+> Feel free to split this improvement out from your series, if that is more convenient for you.
+
+That is what I was planning to do, but, it will cause some merge conflict
+later, so, I decided to get both of them on the same series, so, it apply
+cleanly. Let's try it once more in the same series, if this patch doesn't set
+easily, I will split it in v4.
+
+Thanks for the review,
+--breno
 
