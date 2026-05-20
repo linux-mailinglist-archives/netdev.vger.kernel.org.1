@@ -1,193 +1,235 @@
-Return-Path: <netdev+bounces-289763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289764-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GIwFw47DWrfugUAu9opvQ
-	(envelope-from <netdev+bounces-289763-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:39:42 +0200
+	id 8C1aKoo/DWoxvAUAu9opvQ
+	(envelope-from <netdev+bounces-289764-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:58:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5119587889
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:39:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14554587A79
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:58:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 623E7300DE0E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:39:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B21B83045A88
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C072EACEF;
-	Wed, 20 May 2026 04:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7541A8F7B;
+	Wed, 20 May 2026 04:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W+y/6/CT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RGzUfnH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D9D2D6E5A
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 04:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779251979; cv=pass; b=gWXOfWUK2wbjxXAW+4491jc3/D3oa+4KA7iBxz/iRtgKHVeTPyczasFdyDArNQBVskozjzZI2Gg+b9NxVZOczWMasKWdhdTFF6VX4n/0y386jPO7XWEnixNjLgpxUKYCC4HRrC9vut8X8YWsb9c5qiK3iMLE2ucsEgmUfxGD7Js=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779251979; c=relaxed/simple;
-	bh=P14/4Bqu5uUuw06j+SRo4HPvnUgRVexcBhmq9ZxsP+o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IJBC39LbRKac9InfcBnGdTOkNrAq/UbQvFsx3YApCISX7fW//oazJgQHux/lP3dJ9eRC/0K3bUldmAgvxasYAh5tZMrZHI5A7K0Y6IHVUV3Xvd7LEQTJKXB93bsQ4XxjAATFD2CVR6csng/Acevp9G4xCmnWsa4cfIYY60wRlWQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W+y/6/CT; arc=pass smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-912575fa768so753771685a.2
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 21:39:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779251977; cv=none;
-        d=google.com; s=arc-20240605;
-        b=igAAg3dvYnoNE4hVGYai2HsmHKNzZoAJupB0LBEWN4egNA9zoAOr6zSx3WcaRLCO8Y
-         /CWWCQ3chp81C3sW4DxPgtkVZWoAhK8sH0z2FvoDalEARR0FgLbhDLVRm8DvrCPd8zQI
-         zNz7f/aQTSjDr7rbiSfGg3gVQMSRVH9kZNjMSkCorPLT5z6vt3opMsn+XWZdI/KQ9XmC
-         Tic2RrBzLR2EDjzhqHMfcS3RD/3JbfaDdAPGsW1hfPs5DmbYQaG6Xp9y0BqwGBA0rcCD
-         yLHUKtlbXwC1wK0VVSldSiig9bS6oOYqIfoaCRMj7XByRoz9aWVEQX+2CUSd/IdP+Be5
-         qxsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=YVPSHkBYcknNlvutxyF1vq8PwV3dsuW7+IYZ8sKOiMo=;
-        fh=g+3+MkrhvsSn7ltrOkr4QBjccdX0nmCKGLlEqsquM1g=;
-        b=XMIDYQNs6xM+Xgct2Ns8HBkYUZ+P0Rw4fsFkxhh3Lvvi7Wod2TI9MVBA8rfRl1SqwW
-         TbmmBzhiWdFLy1STevLkpTc+q27NMZR/bFv198hGow4q7DuyAIqHJ3ocioPeQWfz5Hkj
-         2Zb9CVnXKFFJUZkdYJhF6NFfGwZT+8mSzRmS2p9dM29tgjs3reMAhbV/Ed8Mzqxo2o8i
-         CPa5RGIScdF1vP187Ei3V2RuURxuORt8h59p0/DTsmSHw0kLxMa3TWeCwEX57GXQ6lJV
-         cCrBt1RyH2iltYUuTXmuEP9Eg1tCgL/luI79vEp/c2wct5uxAAU+qQcvKEvuya66qDRj
-         e6XQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E781624D5
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 04:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779253126; cv=none; b=R3Z1wPuxPoRqzJhV1h1mkgRHxxIx/lb7myqTWyUhq7iaeuPjdEeXeQhtUIOddAhJCwYKOtML+zqlh66lwMsBz1EFAsoXhAZ8g4WTckFRRuPBMCGJZAVwYqrymwJpIvMYWYfLdjGyIP8Ix9Sadbj6h8cCK/JlQluXnAQt4Y1eQFk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779253126; c=relaxed/simple;
+	bh=XUSMYp4M20HINuGxpU42OOWWOj0UJ3oN4Zs7jdBvuNs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bwKj203Ddt9pz2k85ixEHZ3pIZtZO6cg7PqJdJndn88erZ+3HQSm95YnbcKVfg6iB1TdK+tn9GtOrLodspiudyJ4zUk7o09oXrrW1DNlcryUI0FZKMkZ3xbhV456XvFkAMUZINCdSWrEvwsNLrxTvnWrL5R3EmKkzMz5EB6GWa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RGzUfnH4; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2b9fcf7c91bso45697125ad.0
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 21:58:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779251977; x=1779856777; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YVPSHkBYcknNlvutxyF1vq8PwV3dsuW7+IYZ8sKOiMo=;
-        b=W+y/6/CTKc0MAFltSXmlz02Gjjl8iXwTym2khhlJTAsSb5p3LA8MyRonu6k2Ko9MSl
-         NTBHJFq+knMDlFQCPd6YT8duMhqbUJ6uDQtL5P3Yvh5/wh8vk0UxYZGpRsazPMAGHo5B
-         sVCf55PI2bZ5DXzH6smua9S7d9THWXHrmp9rJYt/7aC9bS8uitI+bNMWrIL+PMIi1ptz
-         m6ONrLaYBsadbPUpG38tgG4W7SqgGWy1cwLCdPLqRcNZgd5fwYrSeyZpeUrdZANFjbY3
-         zGIAvpU5gIjZechlh02hy3n/f/l84BPt/aTwwhKep0HZgyrtOPe8rRjihBuSAJpGEKTH
-         Tifg==
+        d=gmail.com; s=20251104; t=1779253124; x=1779857924; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6qQDxteP5DKPD6F1tvEYOWss8S5fYFMu8G8cmEQyncE=;
+        b=RGzUfnH4sNGfnw6XA2x3iLOc2v1IAthl3f6BCqx4SUgW2S6/IsfqLNjGYY2niuv0HY
+         VOFvzK4073ZelIsJhxdtWbAemj23eRlqzD0+O2dntiOHSs0QHdHEerUO2/lp9wvzTTo5
+         RpSNyy1u6oAS7EsNH/mTEUrZdUzx3HTXD5ES6eHFqWgMOiYPfzo9lmjIvRaFja413v1q
+         OnTDTlZVV4zmiiNOQw/L94Evq++V7OJ57tBrEwByVFbPWpgrwmKzwsaC+Pu2oLyhfS8C
+         G+Amjarijia0e7Cy+S6/jY0tKZRZqrfPY1HdDTVV47F+Vo+QHWrN+pS3MqTS246ZfjEF
+         e5tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779251977; x=1779856777;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YVPSHkBYcknNlvutxyF1vq8PwV3dsuW7+IYZ8sKOiMo=;
-        b=EVQyfog2Z/xaelRKOvL2Z6iaJfcLiA16foN6oJO9G1br+oq1fNOC5ZHBuKNGhzBLvq
-         cC840OnVpRBd3jo0QX1mDzMiHGj8IO05y9vIBeGMo5LpWjkZWXyIgJL1i9LK1M8G2stD
-         rLWIPlO+TXN+oK9/dh0ApTphrWFludkNV1ZCAJACVMkYHtv/4JlkQr/tmaq/MgdRMrZC
-         jhWw40m13u5N29RFLnH80XFI8eWT2n/exPrDBuWFxvEc8bwmkdwbT0i+8CMeaYcy98j3
-         c48d3ZXDuyFnp9oQTxjzDvAXEaEBdtvFy8mkuy8XixKWBwrBVMG6i9BUYwkeydQxPzy0
-         nsIg==
-X-Forwarded-Encrypted: i=1; AFNElJ82pVOK5P/G3Xr/V2gxwRBJH76yF9A0Ru4gRlb0w4jWYYCuga2WWsUGFtnay9N2SORVrNlTD5U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDKHyHf5vocVLCFuCBlgST6sT+bKCjkEVR4alDwkbx/5nmQPZT
-	HqDtv+Oj6M/fOn6fLQ7SMJOale5fMS7gwaa15n2FlU/M4D4Dfr+Qgs3vacselydF2joTW5stamx
-	pF4lhar54XaCsp7EBvbXSx2/RtX8RQE9kTqqIxekk
-X-Gm-Gg: Acq92OFtTUlUIUknVstDjXjtXRYN6SPZeJjAMuqs9Q/3Lh0bt42DSfMfBwPmlsfhw1Q
-	Nc8qF4HlYUFo91XfOD18+oc2NjKnAdYHolk4znHsETvbHJqlhaQNDCphnhjTVIt+gi54TzkyKtO
-	pGxHuxFjFzjceddwPLFgo+eY3qKro1STxz7V0NWl9/E0r+PXW/CGapNcdKlPVii5ty+pidsxeAv
-	1dIy377jPkRsoNu6+cycKdrLduv3FDOJdxGbTT62XQlDTY2ZR0DB0NJWV9KAayuAkv2TCXwBedv
-	FFVF6s4kVQPO2svcTQrZrsAM/xpYn3R9JDANbL2VTwczc6pa1uBhAQtgc1QXHUC0Ksh5rSrjdYT
-	Jw2JL5JlrjXldYchcCusIOcCq3K7d4X5qsE9TGo9cLUVi/M1lNzugB4Ne2CfXJ7wA
-X-Received: by 2002:ac8:7d94:0:b0:50e:5e8d:87d2 with SMTP id
- d75a77b69052e-51659fbe971mr323408931cf.1.1779251976863; Tue, 19 May 2026
- 21:39:36 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779253124; x=1779857924;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6qQDxteP5DKPD6F1tvEYOWss8S5fYFMu8G8cmEQyncE=;
+        b=rNHg4ujYkZQAo38ZdWMpQUrfwqNugUbwZ71Qr//PYtMoPro5cYBv0rHV7huOMD4pBw
+         TaICdN1SUdN9rIubdKozsYMShVjekhWmqH+EuiWbFMQeeqyij+u/V6ev+D6yFJXTHFU5
+         blnW1TmYvnGZib4k0dwDktspJHiewBKwb8QUSCtXgROONDDP+lr5vvbr5FB+Af5PwVN/
+         ysXM9pLLBrAV+lZmR2Ec0YHkZGglAKJYfp/s+iL+88WVWp7JsP5w50Vkkh7yZisk5vxf
+         xxtpALQZZVnAkBDW9XujVVZ7rGPMVSnFrTt8sLdzcw9vOL00+HZ5lCORspnAdQONdqFh
+         N0OQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+6FxoIpOr5g/PRWtSNSZpKviGOnsbHucshEwut/DKsoUV1HR18kMhimS5bLNNBiPchvRwqCxk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkImekjDVUw4vt9sQ2CFHF8+93HPBwtiDqoEJLuquyf4Qq6slU
+	nPMjMBnO9Fk4dDxVplMuVvxbOjYcgR37LePYzNwWWK7yNr8v9OMf3d1I
+X-Gm-Gg: Acq92OFL7I2bwfZgEXU0wnIYTRJYpz65g54YQT8S+nd2OnDG2Dij4JmNa4saP6gsMUl
+	flSjqGUeu3+czetOZ4IwV9hkxetVjK9EBsV6FtJlpY6IhI8pnS7yJExtWHrNudmV0O7V9GctZP9
+	94qF8W7eLM+qAsIbh4f6UJ0l9zHBOYFOC+1132N9Bt2u50JT8K/wU7j3wsF/kadphrGYPs8gTb3
+	q0RYJkAV27UOqpdODAy5Tkcofjkt2DQ78gFTz/l7gyYvq6FmSwBiKU6LcmtPq95CAk3hqZ4Pu1J
+	0TuJNi6nBiaAeO4yB/OowM43PmgLLpI1yo6mprEH0J4zglkBwEmi6iQBRVRF0lmmkqQEbh4C7tK
+	T6jNKQ0ySYw9PfXraDGV0GXHRnSVLQ/sVdeR82y8F9lBjIp4BGZV5BDpDqQcoSrD83+/cpy3+dk
+	SOAUS30ULcQePHQl35lURUMgKC5aH2wBYR/Bdtv94=
+X-Received: by 2002:a17:903:950:b0:2ba:6ca2:bca with SMTP id d9443c01a7336-2bd7e8c2c39mr234099755ad.26.1779253124290;
+        Tue, 19 May 2026 21:58:44 -0700 (PDT)
+Received: from fedora ([2001:ee0:4fc8:5b0:526c:3adf:8a0d:13a8])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5d235e04sm210308165ad.80.2026.05.19.21.58.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 21:58:43 -0700 (PDT)
+From: lazyming <minhnguyen.080505@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: security@kernel.org,
+	netdev@vger.kernel.org,
+	lazyming <minhnguyen.080505@gmail.com>
+Subject: [SECURITY] net/core/skbuff: pskb_carve_inside_nonlinear missing net_zcopy_get on MSG_ZEROCOPY skb -- UAF / LPE
+Date: Wed, 20 May 2026 11:58:29 +0700
+Message-ID: <20260520045829.134435-1-minhnguyen.080505@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260518183424.3144867-1-sbrivio@redhat.com> <20260519190352.45c8478e@kernel.org>
-In-Reply-To: <20260519190352.45c8478e@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 19 May 2026 21:39:25 -0700
-X-Gm-Features: AVHnY4IDfMyDXWooEL9P52eF0h3DnkFqEfpX7HmWX44NJSeGokXsyph8DZz-2k0
-Message-ID: <CANn89i+DknqarcKuZxku-XvoioqkXrd3sQd3PXW5fdFZBpPxjg@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/2] Fix race condition between TCP_REPAIR dump and
- data receive
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stefano Brivio <sbrivio@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Pavel Emelyanov <xemul@scylladb.com>, 
-	Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, 
-	Jon Maloy <jmaloy@redhat.com>, Dmitry Safonov <dima@arista.com>, Andrei Vagin <avagin@google.com>, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289763-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289764-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[minhnguyen080505@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: B5119587889
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 14554587A79
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 7:03=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 18 May 2026 20:34:22 +0200 Stefano Brivio wrote:
-> > Stefano Brivio (2):
-> >   tcp: Don't accept data when socket is in repair mode
->
-> Not sure Eric is on board with this patch in the first place.
-> Sound like it's not the intended use case for REPAIR so IMO
-> it's up to TCP maintainers whether we want to support this.
-> And it's definitely not a Fix.
+== Summary ==
 
-I am not on board. Only net-next material for sure.
+pskb_carve_inside_nonlinear() in net/core/skbuff.c copies the
+destructor_arg pointer (a ubuf_info / uarg for MSG_ZEROCOPY skbs)
+into a freshly-allocated skb_shared_info via memcpy without calling
+net_zcopy_get() first. This creates a refcount-less alias that
+causes spurious refcount_dec_and_test() calls when the aliased
+shinfo is freed, driving uarg->refcnt to zero prematurely and
+freeing the ubuf_info_msgzc object while other skbs still hold
+live destructor_arg pointers to it. The result is a use-after-free
+exploitable for local privilege escalation to root.
 
-While v2 is slightly better, we have the fundamental problem of adding
-stuff to TCP receive path for features that almost nobody use.
-(It took more than 13 years to finally complain about the race)
-
-This consumes Gigawats of power on our planet (and tons of CO2), given
-the trillions of packets processed every second.
-
-Please at least add a static key as we did in:
-
-commit 020e71a3cf7f50c0f2c54cf2444067b76fe6d785
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Mon Oct 25 09:48:24 2021 -0700
-
-    ipv4: guard IP_MINTTL with a static key
-
-    RFC 5082 IP_MINTTL option is rarely used on hosts.
+I have a working exploit demonstrated on Oracle Linux 10 UEK
+(kernel 6.12.0-202.76.4.2.el10uek.x86_64, default install,
+unprivileged user) and have confirmed the vulnerable code is
+present unchanged in current mainline net/core/skbuff.c.
 
 
-But in my original feedback I pointed that we TCP_REPAIR should
-probably only insert a TCP socket into TPC established hash table
-only when it is ready to process incoming packets.
+== Affected Versions ==
+
+All kernel versions that include pskb_carve_inside_nonlinear()
+with MSG_ZEROCOPY support. This covers approximately kernel 4.14
+onwards. The vulnerable code is present in current mainline.
 
 
+== Root Cause ==
 
->
-> >   selftests: Add data path tests for TCP_REPAIR mode
->
-> Please don't add a new target, fold it under net.
-> Targets are a PITA to deal with in kselftests.
+File:     net/core/skbuff.c
+Function: pskb_carve_inside_nonlinear()
+
+The function allocates a new head buffer and copies the old
+skb_shared_info header into it:
+
+    memcpy((struct skb_shared_info *)(data + size),
+           skb_shinfo(skb),
+           offsetof(struct skb_shared_info, frags[0]));
+
+This copies destructor_arg = uarg into the new shinfo without
+calling net_zcopy_get(uarg). The new shinfo now holds a pointer
+to uarg with no backing refcount.
+
+The correct pattern, as used in skb_clone() and
+skb_zerocopy_clone(), is:
+
+    if (skb_zcopy(skb))
+        net_zcopy_get(skb_zcopy(skb));
+
+The intended safety net skb_orphan_frags() immediately after
+the memcpy is permanently disabled for MSG_ZEROCOPY skbs
+because msg_zerocopy_alloc() always sets SKBFL_DONT_ORPHAN.
+
+
+== Trigger Path ==
+
+The only in-tree path reaching pskb_carve_inside_nonlinear()
+from unprivileged userspace:
+
+    rds_tcp_data_recv()        net/rds/tcp_recv.c
+      pskb_extract(head, off, to_copy, gfp)
+        skb_clone(head)
+        pskb_carve(clone, off)
+          pskb_carve_inside_nonlinear(clone, off)  <- BUG
+
+When GRO builds a frag_list (triggered when
+nr_frags(head) + nr_frags(incoming_skb) > MAX_SKB_FRAGS = 17),
+pskb_carve_inside_nonlinear() is called twice per pskb_extract()
+call: once on the head clone (alias #1) and once on an
+entry_clone created by pskb_carve_frag_list() (alias #2). Both
+aliases fire spurious decrements when the carved skb is freed
+at recvmsg time.
+
+The frag_list overflow is made deterministic by setting:
+  - tcp_rmem with a large default window so each TX skb
+    carries 16 frags (16+16=32 > MAX_SKB_FRAGS=17)
+  - GRO enabled on the veth interface (ETHTOOL_SGRO)
+  - NAPI threaded mode on veth (threaded=1) to batch GRO
+
+All three settings are reachable from an unprivileged
+user namespace.
+
+
+== Preconditions ==
+
+  CONFIG_RDS=m  (default in major distributions)
+  CONFIG_RDS_TCP=m
+  SO_ZEROCOPY socket option support
+
+On Oracle Linux 10 UEK the rds_tcp module auto-loads via
+socket(AF_RDS, SOCK_SEQPACKET, 0) without any privilege.
+On Fedora and Debian the module is blacklisted by default
+but compiled as =m and exploitable if the blacklist is absent.
+
+
+== Proof of Concept ==
+
+I have a video demonstration showing full privilege escalation
+from an unprivileged user to root on a fresh default Oracle
+Linux 10 UEK installation (minimal install, fully updated,
+no configuration changes). Available on request.
+
+Working exploit source code also available on request.
+
+
+lazyming
+minhnguyen.080505@gmail.com
 
