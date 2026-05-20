@@ -1,78 +1,90 @@
-Return-Path: <netdev+bounces-289885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yNxYOXqPDWoIzQUAu9opvQ
-	(envelope-from <netdev+bounces-289885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:39:54 +0200
+	id oLwsISSRDWpyzgUAu9opvQ
+	(envelope-from <netdev+bounces-289886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:47:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AB0158BE0C
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:39:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0910258BEBB
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:46:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CA9DE300FABB
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:39:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 076083045E0C
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC1839C006;
-	Wed, 20 May 2026 10:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7833D9DD6;
+	Wed, 20 May 2026 10:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="byEb3BSR"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="SDqDGbTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C7D3A257C
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599F7366563
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779273591; cv=none; b=Hzd+ZI/XcsqgsM2/R3bgd7sMaxTfTCy3Cpn4SX5VpIZrwwS9WbQWa3zJirib4OSltaHB9f5Zjs8J8AaUqZazn9yqFFKmM2RemvlCZaRFCAX9VF92jfAcwG5GBwALMgv/UGhKOkwGvA9+ZkKNfDO3fUvP7ux7J7a1ZRIZtAMTTmY=
+	t=1779273971; cv=none; b=tGPiKOi0dSnq75jNGqR+kW/lUUlPYT0kvXIojGsRuYYYLQeFjAj4xYNkNA0KFZwSIddi9Tz37TtsD53Eujh2QnxxDxM8N5Sm4jtJL6scZkroSgvZNzij8A6d8Xuwkp8r/7wL3+TsATECC3/vMk0kueJptA8oHUILzZgx54y//8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779273591; c=relaxed/simple;
-	bh=eUHiWHdMbcMjdbFC/ml9hfj6eOgpoWIDrHGgBD9VobU=;
+	s=arc-20240116; t=1779273971; c=relaxed/simple;
+	bh=efl3wMr6QGvwQGPJqiCqUYSf4y35y/Amel1hos+JnH8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kGhBznJHF60VkeDPjEfSl8IWIeZPzkBeOtsPnT0XsaVbenVYYiRq+ihza3rq9fMi82bdsqAz26iZN6IEYKpRgqBFC5hxIptQO23yI8W8VWxYE7cdOUhleKqkRjyI+a/vdJjG4QR4/0zaN/IHTaaQbVIirMC7aQCFubG7XQ7jvlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=byEb3BSR; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779273589; x=1810809589;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=eUHiWHdMbcMjdbFC/ml9hfj6eOgpoWIDrHGgBD9VobU=;
-  b=byEb3BSRACQWH5GeQjVUeVtbtAEC2rNIg5nrwGMBAX3T5ZX8eahg9SEK
-   tii7V9t4jqqEIPfqp096Ey5I0i2sQ/nIYv0loBgpj1aTIYW52s/uUfwrs
-   YSHmAOZaW7JoAlfmFvHYpyhzBOeNeD1v4SSOwoygEORxnHcB/zFShhqwP
-   KQi4UBVOVJh495k2AfisyoVB3j3PKJVkQnyJezHjUY/+7vEQPmI5ndHK8
-   FjJqWg97iOzJZrj3lPoy/Tm/LN6lilBDxTbPOp7Q+vpLbF9/t7mjUOS/R
-   iJp3h1QT1tsrridgw60DoEX/PQDdCOX6Mb/2LwMTc5w3XvA6VBPwiIBeJ
-   Q==;
-X-CSE-ConnectionGUID: QT4hfqdyR0WCiVwysoVkLg==
-X-CSE-MsgGUID: wjIQ8P3HT+e4YioZPhg0hA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11791"; a="102845325"
-X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="102845325"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 03:39:46 -0700
-X-CSE-ConnectionGUID: Y5XtTuW4QHiM0nD4GafOtw==
-X-CSE-MsgGUID: upJKWnHLQKWxxmesNQlb8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="244422210"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 03:39:44 -0700
-Date: Wed, 20 May 2026 12:39:40 +0200
-From: Raag Jadav <raag.jadav@intel.com>
-To: "Tauro, Riana" <riana.tauro@intel.com>
-Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, rodrigo.vivi@intel.com,
-	maarten@lankhorst.se, airlied@gmail.com, simona@ffwll.ch,
-	kuba@kernel.org
-Subject: Re: [PATCH v1 3/3] drm/xe/drm_ras: Add per node cleanup action
-Message-ID: <ag2PbIWctfd6yRTw@black.igk.intel.com>
-References: <20260514202839.1888688-1-raag.jadav@intel.com>
- <20260514202839.1888688-4-raag.jadav@intel.com>
- <5d52d3dd-2154-48e2-b849-0ca2aa74fb13@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NuRaVsS7sh9R0mOvtka0YJ9Lvyt/AN/SbcFaUPUixmIGmeSqa6GaE7a/dCQ8nmS8I9sOJ3HjlYC1BJGxTjcq2L5NL2BPtma73KIrHXYfbm/yNjULMaXFhXewZiB4z96NCybieH0sKy33jc8aYXOF58/WAxl1k/tTLfndQ4vjsKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=SDqDGbTe; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4891b0786beso32499025e9.1
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:46:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1779273969; x=1779878769; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sVg7I03MyVJa5h1QRkMOxIFRWS3ADKkxJT8MK8a91I4=;
+        b=SDqDGbTeS/uDYUlIMA5Fn9CDUdy+Ng8NRYbtkiZIjT+nmrKFHHuXAFpoyPuVS4DWTu
+         rgI6piOs9D5MNA/iY4qJpIIJsD3iSKtRq6vViK1y5NAQh+I5bOasAX8niZJNYC1LaHz7
+         gmyMuHd3cWjoNSc8tExJB1aTcSTjTTiI7c/kvZrXvC+yL8mTQG7P+uZbCfDEMQcZiHxu
+         LHeQjwPMKXbTqHjJiTgUyipE6gfV6qxYlvyFhnwWJeBE9SUDtpEowtpmxAukQ0f21wSs
+         lDqaduWQYljC+FitnawIdZWLMmwsgFlOJIQu7fnh8RkZ9Guj+LdrPOfL7EMXDUNB9cAq
+         4Qsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779273969; x=1779878769;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sVg7I03MyVJa5h1QRkMOxIFRWS3ADKkxJT8MK8a91I4=;
+        b=g+Ey27HvpNUk7cvJJUVMU/fKVRZXiyz1/Syfch9TPHyp6jxvBthyzSo1FFTui4ZPuI
+         UZLXMwodaH7kfrzzXxi1PMZsEYIrmiS4eVZikreqppPlCbZtWigqthLxRoWbvfoqFcbY
+         BXktY2fdO5HIUBcZfqbtkvh48A3OPmXnG2svtHVz1puRGcJlBJdMeqlSJvGI3ayJiBFv
+         yhisK0MEKqqgmuIerrQnUa6jCiA24dLrh/2qwQaxkTHVOsOYL/e8+6cIBRKpS3jgzjwH
+         B6yXFBHgjIFXD6ocvIZqmGi+0XUKZIdpajJbLD/UFqYR2NOpoJvYlgHpNNr7IwAZELbV
+         gSww==
+X-Gm-Message-State: AOJu0Yz5ZUuKU3qpIoniImQNAixnT+7BDBrAAm9EakwJZR60+0QJIN+d
+	tdwX063rD76g9kb13lceUbcS8aoQ3x+h6+E5bQseZN4tq66ziF2OKv9s0WkVfwbtuB4=
+X-Gm-Gg: Acq92OE6eHWrE434dKgDS04OXahWcVitcD7OaMUE3tyI6K0GAZhCaBXdjlkIPhDcf1R
+	I2QY6ieEBwG0eauD0Z8XFwh2l8XvyRhHX/tgiZyevEb3/c5FltabznQKwUy7rKglvO9lJCvrzQC
+	rgPZ5MaXmXMFn/74BnEiVz3vf805WH+KEiqtmg32EjgBDFhbSC73vylau0ClxQVUVJnMgoOfwHR
+	UzrTLK+1u2A6b5K7oWkW+ExMx0h0UiGpWpKPexJG4FPBEbXc5caLLKwIg2uhVjNU104M3rOOW5I
+	TOckKeE45ToTx1kIUkMhgzaBKBTNgJVwIV9hHm30GSWqCmtQ6YClFU6Nhm0b3uSAd/hB1gB361r
+	7F5uY0Aifo41cJxJBHqfJyH0fiOhFWAaS/23SmPjc89fmB4YjOQMzFrNWTm8DbK0KYmUiN3Muvr
+	sq0LBuR4CX6CZY3hZ4DTJScQbcvrQ=
+X-Received: by 2002:a05:600c:3e1b:b0:48d:46a:6e5b with SMTP id 5b1f17b1804b1-48fe60de6b2mr358299295e9.7.1779273968672;
+        Wed, 20 May 2026 03:46:08 -0700 (PDT)
+Received: from localhost ([165.85.72.231])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48ff43f8799sm274536375e9.2.2026.05.20.03.46.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 03:46:08 -0700 (PDT)
+Date: Wed, 20 May 2026 13:46:06 +0300
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: netdev@vger.kernel.org, dsahern@kernel.org, stephen@networkplumber.org,
+	petrm@nvidia.com, idosch@nvidia.com
+Subject: Re: [PATCH iproute2-next 2/2] bridge: vlan: Add support for
+ neigh_forward_grat
+Message-ID: <ag2Q7oW6EE1vTRhX@penguin>
+References: <20260517082501.899009-1-danieller@nvidia.com>
+ <20260517082501.899009-3-danieller@nvidia.com>
+ <ag2M3moiivqEvfNG@penguin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,149 +93,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5d52d3dd-2154-48e2-b849-0ca2aa74fb13@intel.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <ag2M3moiivqEvfNG@penguin>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FREEMAIL_CC(0.00)[lists.freedesktop.org,vger.kernel.org,intel.com,lankhorst.se,gmail.com,ffwll.ch,kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289885-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[blackwall.org];
+	TAGGED_FROM(0.00)[bounces-289886-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[blackwall.org:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email,intel.com:dkim,black.igk.intel.com:mid]
-X-Rspamd-Queue-Id: 8AB0158BE0C
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,blackwall.org:email,blackwall.org:dkim]
+X-Rspamd-Queue-Id: 0910258BEBB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 12:53:52PM +0530, Tauro, Riana wrote:
-> On 5/15/2026 1:58 AM, Raag Jadav wrote:
-> > cleanup_node_param() is not registered in case of counter allocation
-> > failure, which results in stale memory of previous node that isn't
-> > cleaned up on unwind.
-> 
-> It is registered.
-> 
-> ret = assign_node_params(xe, node, i);
-> if (ret)
->     cleanup_node_param(ras, i);
-
-Is that also true for previous node params (in case second node
-registration fails)?
-
-> >   Add per node cleanup action which guarantees
-> > cleanup on unwind and also simplifies the cleanup logic.
+On Wed, May 20, 2026 at 01:28:46PM +0300, Nikolay Aleksandrov wrote:
+> On Sun, May 17, 2026 at 11:25:01AM +0300, Danielle Ratson wrote:
+> > Add support for controlling gratuitous ARP and unsolicited NA
+> > forwarding at the per-VLAN level via the neigh_forward_grat option.
 > > 
-> > Fixes: b40db12b542f ("drm/xe/xe_drm_ras: Add support for XE DRM RAS")
-> > Signed-off-by: Raag Jadav <raag.jadav@intel.com>
+> > This allows configuring the option via:
+> > $ bridge vlan set dev <port> vid <vlan> neigh_forward_grat {on|off}
+> > 
+> > Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> > Reviewed-by: Petr Machata <petrm@nvidia.com>
+> > Signed-off-by: Danielle Ratson <danieller@nvidia.com>
 > > ---
-> >   drivers/gpu/drm/xe/xe_drm_ras.c | 42 +++++++++++++--------------------
-> >   1 file changed, 17 insertions(+), 25 deletions(-)
+> >  bridge/vlan.c     | 18 ++++++++++++++++++
+> >  man/man8/bridge.8 | 15 ++++++++++++++-
+> >  2 files changed, 32 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/drivers/gpu/drm/xe/xe_drm_ras.c b/drivers/gpu/drm/xe/xe_drm_ras.c
-> > index 89640ffb1c33..40abde29a26f 100644
-> > --- a/drivers/gpu/drm/xe/xe_drm_ras.c
-> > +++ b/drivers/gpu/drm/xe/xe_drm_ras.c
-> > @@ -131,14 +131,20 @@ static int assign_node_params(struct xe_device *xe, struct drm_ras_node *node,
-> >   	return 0;
-> >   }
-> > -static void cleanup_node_param(struct xe_drm_ras *ras, const enum drm_xe_ras_error_severity severity)
-> > +static void cleanup_node_param(struct drm_ras_node *node)
-> >   {
-> > -	struct drm_ras_node *node = &ras->node[severity];
-> > -
-> >   	kfree(node->device_name);
-> >   	node->device_name = NULL;
-> >   }
-> > +static void cleanup_node(struct drm_device *drm, void *arg)
-> > +{
-> > +	struct drm_ras_node *node = arg;
-> > +
-> > +	drm_ras_node_unregister(node);
-> > +	cleanup_node_param(node);
-> > +}
-> > +
-> >   static int register_nodes(struct xe_device *xe)
-> >   {
-> >   	struct xe_drm_ras *ras = &xe->ras;
-> > @@ -150,13 +156,19 @@ static int register_nodes(struct xe_device *xe)
-> >   		ret = assign_node_params(xe, node, i);
-> >   		if (ret) {
-> > -			cleanup_node_param(ras, i);
-> > +			cleanup_node_param(node);
-> 
-> At this point drm_ras node is not registered.
+>  
+> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Yes, and I don't believe we're attempting to unregister here :)
-
-> >   			return ret;
-> >   		}
-> >   		ret = drm_ras_node_register(node);
-> >   		if (ret) {
-> > -			cleanup_node_param(ras, i);
-> > +			cleanup_node_param(node);
-> 
-> Ditto
-
-Ditto.
-
-Raag
-
-> > +			return ret;
-> > +		}
-> > +
-> > +		ret = drmm_add_action_or_reset(&xe->drm, cleanup_node, node);
-> > +		if (ret) {
-> > +			cleanup_node(&xe->drm, node);
-> >   			return ret;
-> >   		}
-> >   	}
-> > @@ -164,20 +176,6 @@ static int register_nodes(struct xe_device *xe)
-> >   	return 0;
-> >   }
-> > -static void xe_drm_ras_unregister_nodes(struct drm_device *device, void *arg)
-> > -{
-> > -	struct xe_device *xe = arg;
-> > -	struct xe_drm_ras *ras = &xe->ras;
-> > -	int i;
-> > -
-> > -	for_each_error_severity(i) {
-> > -		struct drm_ras_node *node = &ras->node[i];
-> > -
-> > -		drm_ras_node_unregister(node);
-> > -		cleanup_node_param(ras, i);
-> > -	}
-> > -}
-> > -
-> >   /**
-> >    * xe_drm_ras_init() - Initialize DRM RAS
-> >    * @xe: xe device instance
-> > @@ -204,11 +202,5 @@ int xe_drm_ras_init(struct xe_device *xe)
-> >   		return err;
-> >   	}
-> > -	err = drmm_add_action_or_reset(&xe->drm, xe_drm_ras_unregister_nodes, xe);
-> > -	if (err) {
-> > -		drm_err(&xe->drm, "Failed to add action for Xe DRM RAS (%pe)\n", ERR_PTR(err));
-> > -		return err;
-> > -	}
-> > -
-> >   	return 0;
-> >   }
+sorry for the noise, for some reason I saw these marked as
+new without any replies in mutt and reviewed them again. :)
 
