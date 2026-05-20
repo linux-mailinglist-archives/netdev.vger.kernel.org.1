@@ -1,174 +1,213 @@
-Return-Path: <netdev+bounces-290088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290089-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AM2dMPASDmoW6AUAu9opvQ
-	(envelope-from <netdev+bounces-290088-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:00:48 +0200
+	id AFvQASgTDmoW6AUAu9opvQ
+	(envelope-from <netdev+bounces-290089-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:01:44 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40FB859902F
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:00:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08682599082
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:01:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 72C5530F8791
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:59:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5346230451DD
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683573624BC;
-	Wed, 20 May 2026 19:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BEA32938D;
+	Wed, 20 May 2026 20:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWJX3o4t"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="rZg1P4FJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B3335F61F
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779307173; cv=none; b=bEMeNGZ4aZoZo/Gv1oYaIGvsJTWLuEP+S6KgjXaUqE86d6l3PrsZCev5z5E+PBE3UchxEOr/dMRQvJRIgbFri9VaAwTOkKOPaQfFdm/HpKCZmhOzIVVDUDvm5Zoxpf635SKLplFngeZm9kuXJPaTCFAIP8nHCISsUVj1NOWZKkY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779307173; c=relaxed/simple;
-	bh=MRmQ1iSmQtrxEOe6qrbfT4Od4upA5Lzv945qF12PYNo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Fa6iKtivqNBPa/2agCdhs01onpKf3w1tSy8R7B+S0FeAQUIRTPNaR6nS6MYaOr3XtZh7BhcWSbZ5p7GJvh5EwrC3KtP+qBr/twNY/COy4DnpJ0LogYWo9uvJSDJSHi9YkRKuRnGNwVoOlLaMp3gqkEaZuSjSrCV785780jpicJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWJX3o4t; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-83945063f70so3023637b3a.0
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 12:59:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6DE3438BF
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 20:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779307260; cv=pass; b=dfuJmZURpBDPoaK+XMkNZx68QDRPMnNlhp41bK4JUyoRXK7rIaofycDwEYaURImng4Om8bYv0hImUA4J3RhGluyBL2r1/V1WiwAx+IM/tH5rOdBNwYJFpUsDeWm0W7dy7sRLlwdGE9R3gckyx9h1vUhbc/Yus1L7C5HdfZVIhrc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779307260; c=relaxed/simple;
+	bh=QgZPwpc53x2gDLOn/7k6j8lEeyE8Bm+sPm/7LN2H6tE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RFnLppg1nDpUlA6CiNwolT0c1lz5smJHEwe0htoNBaE1AAELfyTDpD3yIAYnVh0CFbWS0ckHHO+1jvYdv5SJfos6au/NoccXaHhBldtpEorKxVEU+q/6/Ezo2nLtf6AY/kuvgA4avNIxjgdYivqLjZJ+QIDCiSkNv3gqaKQtOzs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=rZg1P4FJ; arc=pass smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c82471904fcso2346920a12.2
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 13:00:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779307258; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WReVdflw3nJgor3Sek3UNUEa83TgkmYZXG12D15gxl8E5ejLJUg6P0UztxyLPPX/hI
+         l5gY+YWFjPT2cBELVkNMBEtA1zfQVEA+XEM3HXgaATHVPeIrMjsmry/5u9b3uZCAgjul
+         3hiFclF8wZCD+eanrgcjhKroggcBBoID2FrYF4oh+CuAWfxcxYPBFyjuKov3tquSS3fH
+         hBe4PpJR8rCDx2bNp4KL6xS/i+5IxBRzyuJTus++leG0E3yuYjr1YXVGVYzBQ+aB847O
+         VMXXTLvyleIjAKFfRoW2fdB0U2KopMVzrfFYvga3rbSE8qrTkPoLXrq81/JbSOGSaChW
+         +dYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Tc2MPVC08RCr6+ofbLSUug5Nk24uq4ZJZDkkbUz3sOM=;
+        fh=9OV2Fj+jq0UvwwDq3/PSsLPxDD9s9tw3U/HVq1Z658k=;
+        b=Y6+vdh3ORq+u3cPsVIZbvctn/WvZwBhNktMSPWVwTzmug1ci9IZdYbdms9486H0MXw
+         x8sf0zGsAoLfv2xudDvaOdP3hhVYx35w7oLmp2uRzyLI1L07jAL50KtqmORmZKti6/qd
+         05WJ+M6m6TfybOCOocNmb9N+L+CX9QKO0mArIGIASgBl8OEYH8220WSbFgj0Rl/+hZGq
+         D82e+cC5VHNIC0OEhWtemxXcaymwxcPd4ikSZhSef4kGPupTLwgizAABcT1Fd4Flerw2
+         MpwXGeqUnnuo/7pDb9g9jEVqTUyW1VACS8SFavC18nlnvmgk2ciiDHtd6aHrgzN5AgAr
+         G4Mg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779307169; x=1779911969; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VWvyBk6QerGzJy4Wnf433/QgHFYbGwPbSdseO5TT7EE=;
-        b=OWJX3o4t35fe8jY3gynmCbxoX1KOwQrJbUEB/b7ABu7yUxysexGXxkX7OFHjvYiz7X
-         nbYT+v9B+nlnZrxvuo085YoS1KsUHenDrnvvLEylWMlWnJrN+dyM1mG8EkePljDtCaom
-         NTawTotCdQ+NuuVvU8XM3JEq8mhlPuT9F+x46cK73/eK86vrJWcxmbC2Dw2iRmSD+H1R
-         sbom2EW/FZk/DcUb9X8bKB1y11MY/Xi/foOhPq5NiURnR2vue9QCwfv+epdCGlLryly0
-         deCCRsTUA/SKC1zMzuonpD8hw5BzQCGlMjK8u1laGVOfqTAT0PuBmBmQGbe2v6n2m50O
-         snww==
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779307258; x=1779912058; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tc2MPVC08RCr6+ofbLSUug5Nk24uq4ZJZDkkbUz3sOM=;
+        b=rZg1P4FJKAabLNhGlk29EYekhYSr2/E8J6TkXDxhVgqsSJdiDbdJRtIGFAZft3ihnH
+         IEF2Qz7sJoGvCg16iD0zJMmfZPHFtdohDBX4FFcLOWCFQZX5MntxOM5YVUH7/sZ228+L
+         nwOuzaAs/DTtkz5OwnaT381TaVnDBnCsFSZ4s45T1A4psTBrj9qXk2XH1OURLwP0J3ij
+         uHowdJLuwtembmy1W7uQwgI/kLaK6Kt6SVciVTB354uvhVE8udmW1gTfPYdf8SFEvJFH
+         FW6TbiB5YdJbJ6vIotvxk4p3nDTPDXSteFoUGmp7XtXQwEf/zC396CUWmsqnTBBaVGdR
+         FhiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779307169; x=1779911969;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VWvyBk6QerGzJy4Wnf433/QgHFYbGwPbSdseO5TT7EE=;
-        b=hAn2do2L2LOa+GrXZqFWi/xBfUjMRuekIFIoWWCj3lhazy2QvW6vxUf2hXSN/axYWk
-         DuaHTPtDVs1ZhL7BGW3Z9iNRuyckAyXBcLVRWVE7/fogSD1SZwO49HHBs5vnLzKZNhuZ
-         uxJZlknK6bcibhhNpf3Swp49Pu7g4Bs6o6hh+5IaSvYG8ghrASNMJ+q1zNwg/9bAcph9
-         70mj2vs+jQ9elerkP4NFy6ehamrbpNBnYH8fAy57967dJquWu9vw4+uPbrKW/q7sQ4mf
-         tyhCdmGK5aIjgYss2NnVbG9NUm4dAUYdbK/dP0ekYwJG0iqJ3zyMQWE6ZVka5ctu0nPx
-         cM4Q==
-X-Gm-Message-State: AOJu0YzNKwo1Q9UsNZd0n4hWhyaeLU4ylLqRoyZ24pxOGpE7yIQo9YaH
-	X/UbyjYqE0gJzqnXoDwdIezI2eUaUy5nR3ms8nZDtdV8np95+2kAqxOH
-X-Gm-Gg: Acq92OElNkwBoOEKn2nCLuxRnIfqU86TSREC7BEQNaXZGQD8CJ6aIk2rC2qZy6Q/KCW
-	xGhLWd7Qx+qM65fv3nDP1ts2ZdODCH4Pk6QaiUcj/A4HKgdevporOUIaJIt8AiNl78f5R3H5GPB
-	i7vUsmDAPL5AjwVBQcLqURm3bRYAJHKz/V2LU1d6Je21u/OTS9kFG5ikkGFgkZtzg8cLZ3eYNoy
-	d7Vr44Hg65QU8zQ9XqVckh214z/3B1JAIqwd0SKf6T/rabGVF4f5R+lJYjDZjRF8gv/Avp5GMYd
-	2XsBkr0jfUxUC5/lkoxLp5Ql1VtXghsfvAqbrIJPNNT/G/r3HM1mRJvJjWhlOdjhi3hrYFWadwV
-	nDOnNR+ZrAJxk6dFbF6UB5/hO6eeykbsxHOSLpePJ8RdRVsruhmhFZq5q1CcDNxz0AX7MQcwU7R
-	MPvCvO1IkTqsaT9MIWMl/gVsX4NRKHn0CKQ10AC4g0Qw17GJdIM+1M
-X-Received: by 2002:a05:6a00:3d55:b0:829:8083:472b with SMTP id d2e1a72fcca58-841486618c9mr633785b3a.4.1779307169295;
-        Wed, 20 May 2026 12:59:29 -0700 (PDT)
-Received: from [192.168.0.161] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f196660easm21503813b3a.11.2026.05.20.12.59.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 12:59:28 -0700 (PDT)
-Message-ID: <fa15610bc8ffbd41d418bfe61b2e647d8fb51489.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v5 10/14] bpf: Fix dynptr ref counting to scan
- all call frames
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- 	daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org, 
-	mykyta.yatsenko5@gmail.com, kernel-team@meta.com
-Date: Wed, 20 May 2026 12:59:26 -0700
-In-Reply-To: <20260519181314.2731658-11-ameryhung@gmail.com>
-References: <20260519181314.2731658-1-ameryhung@gmail.com>
-	 <20260519181314.2731658-11-ameryhung@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
+        d=1e100.net; s=20251104; t=1779307258; x=1779912058;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Tc2MPVC08RCr6+ofbLSUug5Nk24uq4ZJZDkkbUz3sOM=;
+        b=UKVGjpvny5/gPmELt+spfjnrBmNvRZk+YYllKsGXbFE0WN+WPHJv3LragomM94t1zo
+         8RPpMwbWu4nNUIGOdABJC9gQOcuh2hwl7f0woTDbFVpeGp+U9N/13R1zQ42cS50HZkS+
+         wDqFmGdyYC8hhSd4uPh5VazemsI72NpfIPXrj4vyLim+j9KvluzGqP/JZllDw/zUZL2C
+         hsDJE2f9KZB3e0ooPUSErS7aeeiVPWN/LFAjfDsU3kLiMqwTI5abscnjiLoti1RZFFZL
+         y8CWjiC2mFTx478OfiH1+kfBwbC8j6Vebh5jQaTjM9PnoF3qEvyNxkn/mJyP0w2K+AfZ
+         0qQQ==
+X-Gm-Message-State: AOJu0YzanllRFvb3pp6dnDvf8/xDnMftIW9bJl08nN1hzhJ9Vo1fIUsJ
+	BwiRecE+s4RiTdHrzaN8NUjgH/F1EHq9XgFOaO7LTTnCc5b3m4E20rnKjHyakQhXuSn9YK72w76
+	tFhSzSQe44Yn9nqMUIxoLqACoDKWa0bbml6b3OZSI
+X-Gm-Gg: Acq92OHCoMhIQhZtqsfFmq/rfYWRDjhO0qilwf+it168DS3fScnYtm7UTSHrVvFbWhR
+	lGXv8jXa63AfaPg2YalcuKmGzGfTCW3MDYbKnCGEFqQ8DcKwWk2kiFDzxVocre9OGvA5nHr6YRc
+	0M125ebkmWQHwuZgRhuxpHbSlZq77YQiN5K9tVd6I4oWkO1n+/OCS+g6tjoeyek0IJe2dq2GAqd
+	/TAq+jvOnZzRFfX0B/OqYwllpbomaMmnStik6DFvusGo6pwmTbY36vkuOtVBs1fn4N45uNCJRjV
+	GQnadmAf6MjRG0UPFeY=
+X-Received: by 2002:a05:6a20:e212:b0:3a3:a5cd:5621 with SMTP id
+ adf61e73a8af0-3b22ecf84f9mr28046959637.51.1779307258336; Wed, 20 May 2026
+ 13:00:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+References: <CAM0EoMkUPYSXKr2=+mR8YMq2a0TFdYPdzwPGob-UyU1fUWP9Ww@mail.gmail.com>
+ <20260519033950.2037-1-rajat.gupta@oss.qualcomm.com> <CAM0EoMmj-9uDpKBN4vjJqzaLQL=OZ-sdFO_pHPFp6kL6hSVeRA@mail.gmail.com>
+In-Reply-To: <CAM0EoMmj-9uDpKBN4vjJqzaLQL=OZ-sdFO_pHPFp6kL6hSVeRA@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 20 May 2026 16:00:44 -0400
+X-Gm-Features: AVHnY4JdU88E66yN5fzHrusUXmGZwSxrbCF948vEraCWVpbQ7BtFVgZcyNrXofM
+Message-ID: <CAM0EoMkDwdmP94yeoX7W-DOY3Emcq84jGcPf73vtRTpDf1N3-w@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: fix pedit partial COW leading to page
+ cache corruption
+To: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, 
+	yimingqian591@gmail.com, keenanat2000@gmail.com, 2045gemini@gmail.com, 
+	rollkingzzc@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290088-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-290089-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,gmail.com];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 40FB859902F
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mojatatu.com:email,mail.gmail.com:mid,linux.dev:url,qualcomm.com:email]
+X-Rspamd-Queue-Id: 08682599082
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 2026-05-19 at 11:13 -0700, Amery Hung wrote:
-> When checking whether a referenced dynptr can be overwritten,
-> destroy_if_dynptr_stack_slot only counted sibling dynptrs in the
-> current call frame. If a clone sharing the same virtual ref parent
-> existed in a different frame (e.g., passed to a subprog), it would
-> not be counted, causing the verifier to incorrectly reject the
-> overwrite with "cannot overwrite referenced dynptr".
->=20
-> Fix by extracting the counting into dynptr_ref_cnt() which uses
-> bpf_for_each_reg_in_vstate_mask() to scan dynptr stack slots across
-> all call frames.
->=20
-> Fixes: 017f5c4ef73c ("bpf: Allow overwriting referenced dynptr when refcn=
-t > 1")
-> Reported-by: Eduard Zingerman <eddyz87@gmail.com>
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
+On Wed, May 20, 2026 at 5:23=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Mon, May 18, 2026 at 11:42=E2=80=AFPM Rajat Gupta
+> <rajat.gupta@oss.qualcomm.com> wrote:
+> >
+> > tcf_pedit_act() computes the COW range for skb_ensure_writable()
+> > once before the key loop using tcfp_off_max_hint, but the hint does
+> > not account for the runtime header offset added by typed keys. This
+> > can leave part of the write region un-COW'd.
+> >
+> > Fix by moving skb_ensure_writable() inside the per-key loop where
+> > the actual write offset is known, and add overflow checking on the
+> > offset arithmetic. For negative offsets (e.g. Ethernet header edits
+> > at ingress), use skb_cow() to COW the headroom instead. Guard
+> > offset_valid() against INT_MIN, where negation is undefined.
+> >
+> > Additionally, linearize skbs with shared frags upfront to prevent
+> > silent data corruption when pedit operates on zero-copy pages
+> > (e.g. from sendfile).
+> >
+>
+> Sashiko makes the claim that:
+> "
+> ....
+> .....
+> If the payload part extending past offset 0 resides in a shared
+> fragment for a cloned skb, wouldn't skb_store_bits() write the
+> positive offset  portion directly into the shared page, causing a data
+> corruption regression?
+> "
+>
+> It missed the earlier code (before the quoted code is hit) which is
+> very well documented!
+> /*
+>  * If the skb has shared frags the user is likely using zero-copy
+>  * (e.g. sendfile).  Those page frags may point to page-cache pages;
+>  * writing into them would silently corrupt the page cache.
+>  * Linearize so pedit operates on a private copy.
+>  * TL;DR: if you want zero-copy, don't use pedit.
+>  */
+>  if (skb_has_shared_frag(skb)) {
+>         if (__skb_linearize(skb))
+>              goto bad;
+>  }
+>
+> TLDR:
+> If the  skb  has shared frags, it is linearized upfront using
+> __skb_linearize() which means any risk of modifying a shared fragment
+> is non-existent.
 
-Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+It seems there's a second sashiko ive been made aware of - these
+things are just multiplying ;->
+https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260519033950.2037-1-r=
+ajat.gupta%40oss.qualcomm.com
 
-[...]
+Both points it makes are valid. Dont have time right now.
+And infact looking at the second point sashiko 2 made I realize I was
+only paying attention to externally shared fragments which the poc
+used.
+So probably the sashiko1 had a point as well. Anyways i dont have time
+- will respond by am tommorow.
 
-> diff --git a/tools/testing/selftests/bpf/progs/wakeup_source_fail.c b/too=
-ls/testing/selftests/bpf/progs/wakeup_source_fail.c
-> index b8bbb61d4d4e..d4d0f1610853 100644
-> --- a/tools/testing/selftests/bpf/progs/wakeup_source_fail.c
-> +++ b/tools/testing/selftests/bpf/progs/wakeup_source_fail.c
-> @@ -42,7 +42,7 @@ int wakeup_source_access_lock_fields(void *ctx)
-> =C2=A0}
-> =C2=A0
-> =C2=A0SEC("syscall")
-> -__failure __msg("type=3Dscalar expected=3Dfp")
-> +__failure __msg("release kfunc bpf_wakeup_sources_read_unlock expects re=
-ferenced PTR_TO_BTF_ID passed to R1")
-
-Nit: this change seem unrelated.
-
-> =C2=A0int wakeup_source_unlock_no_lock(void *ctx)
-> =C2=A0{
-> =C2=A0	struct bpf_ws_lock *lock =3D (void *)0x1;
+cheers,
+jamal
 
