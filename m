@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-289785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289786-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6CIJDyhaDWpuwQUAu9opvQ
-	(envelope-from <netdev+bounces-289785-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:52:24 +0200
+	id +KpDFDVaDWpuwQUAu9opvQ
+	(envelope-from <netdev+bounces-289786-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:52:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA46C58871D
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:52:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A107058873C
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4827C30A3486
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:43:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6425B30A8658
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082D234D93B;
-	Wed, 20 May 2026 06:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663B734F26F;
+	Wed, 20 May 2026 06:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="KW8vR1IW"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="YWISqvlh"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012057.outbound.protection.outlook.com [52.101.66.57])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011035.outbound.protection.outlook.com [40.107.130.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D597F3446AB;
-	Wed, 20 May 2026 06:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84E030566E;
+	Wed, 20 May 2026 06:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.35
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779259354; cv=fail; b=PDnj55dxrcvvIK60GLKn7JO5qQc6D5YgLEJlh6IfGbgMd/EiMcBaot7qu2q+EaGQTUeGYfj3NzikqB/i0icVyvEvAtHJ/9Oix3cMI2FfnvrGEjzTbsD+L/KeiBC+mQ0o3KSwSpOaeqNDEo5ireIlyfMrItCgGhIuLZ1dfcSSEiU=
+	t=1779259361; cv=fail; b=KOefZy5XHXy6NUvQL9AmmApnzPrBMsxeiB1UhryFSteIvKa3TL0LIu0EVE5b4KVh9Jq8iJW3xAx/2vDOPFN4uuyNR2pKlytlOLVvL3r3p8rpdIQmyEBLHtYS+KRYg/Jolc3TuZ20MfuXaF/nYs+DGC4SJb1vIQpwB+CO2pMw9n4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779259354; c=relaxed/simple;
-	bh=Q1I5WcZnrE0bi1VUWTUmYU6AfSnviwG59Qn+/TLJlAU=;
+	s=arc-20240116; t=1779259361; c=relaxed/simple;
+	bh=gn4Q8jWQPsC7S6u5aJOGbAdDEkcK2RG1fkpUKafZSd4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QIGb+O0OH3iW+4w5CeHj5141p/qq9LtbLyv/XE7jZWuF4TBZYXGyBKdPGvQWu4l51ijtpYHfDgqhdM7oZywIXd8SUhHk6RJdPr3iWqJo28qpKmWWQfBjVnll3i6LrSdkrNtCZ0ped+l8GwXEEGRq908CMe8YcDm6GPfwhW+euw0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=KW8vR1IW; arc=fail smtp.client-ip=52.101.66.57
+	 Content-Type:MIME-Version; b=gDX9ddNu+jpFdJcH+3logVUq7AjxJkMIIDqtI6JcUccp7PrD3OYLCFixqMuw4w0qMTmwlYUqyOCoXEMHuqRxOmqNFB5VGXODK8b0olMTlOYd06n2YmoT0+YZK5LBCFS5s3nJBoDbXzeUw761a6PzB0ZLNkkBqH3WefwRX+ZdTAY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=YWISqvlh; arc=fail smtp.client-ip=40.107.130.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gDU+iNEpiIJqGQ13o6aap7Ue7ZW5F9s4UV9Gjecug8OfRowW+pIhDMfniUs2fWr0V5gB2rlYW2jFd/r/cIgUz3FozbeUxgwvvdjYutjy945vdo9p/2rubXp6Q2uuq++hZInR98FNc3qUUy1fUODffWOpvXj8EByclZvUv4L0cBGQxte+MOVKTMbqGnOskXj81dS03JVsbNGL8GgjmqPWyMyM9ylR+ghVoqjwHX0BWLWFYd24ZI3tGYL5Td50ydpVeBv1vY6AxtA7ESt4pztL7uuHyf01btIbDZcaDoPrLPi+2iIcSk6QQeC+7ftXI2QHx2WMiy0/54nlvs87bUFVJw==
+ b=JpuT8TfQToeINx7OwEDLqHVPGJqw6jhBOuWN0rcpf1dApaE6aB6cyTiEdi+ASrFkcHy+AQ3sBh0dWTCE7vY90cRDxETxVeeqPPX6zZv1G8eb+MByFkgW69bfQMiZe1lMGn4A6rXmeLsuxX8AKalzrODzgCpHfBab6sqHHbUxI9lsWseCxepdp9ngHg0Y1SR3rWKHha/+e7331ML/IytZHtgVsxSGKOed2K2I0axG2M2q1AEiUb3ZVQ4U3hQinwrKOXgB5qcNePq0R62Ze3MLWVAmlqzvEsK6YN7NSx4UVtSKgJ3CkCb4wIBsMFN9/5krmiIldmwmNzUeRLJy/dlGwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ytHGcylKvwYDxF2iTkoyMLEgyOOGA4NIIqw+syDRC4U=;
- b=ieTxRdVrmaFCgPvkpUgL1jBtyPT0puxs5OzTzLDOmTdNiw1blH2TZx1KLpLl0O1+NEEo1R/GmRYY/ZbH71wBnBOe4NsBxRKHd3WnbZ9RyBU35xdj5BVGXJQue2+X0jG9b1ksDGbGh00F5uDTnfRxolkIVdzexr1CmcFEONtrNC7Kkhlg3NwQGjggXEa4ToZZkv8yuJEvrZ/peGoiBPC1TXnednL+idxo4ylNmvHoVgOyFvzuptRZPvURjB+4IvqT/xHZb9LH9Ed02IcdbHhPFkPiadGpcx7Zt0ZiUJGPJNJkczQhIi6oLRE8CLrhb/fFwxwnvdoPIMOY9q63SguwUw==
+ bh=z1NePTMQkheurv3ZesBS98wTc2Z5z8HaphatNlThklM=;
+ b=VRUfmoj41+WmnHTsCX4MPkvsT8+Yjq7W26t+LtPBm78pO3u2/5Ccl+kV/vCexbvZVDCCcvo6TnMkfZmYVqm4Ap4H4hqXtWmcOodOKBWC96y65W1ZdHSSRzxIHPpRYQg64yWEruDiFRU1ageFA0dUyJ7Bqniw+w9l7L4GjWeAGsDVqdpNL5Zu3UYvYzwh1Q8B5+jluYO3SOADrUvKjXbdZj4xUgMEvNX2Q4Th3QkShQQoifgS2VWCA0BE806eMnunc076VBMFrKYcwvMWtTwDdVvQGvRddHx+iL0ryANsMuN/wclPtshgpA8c/DCDyT6g2cE7/8OyUIQyvpKGvpV2jA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ytHGcylKvwYDxF2iTkoyMLEgyOOGA4NIIqw+syDRC4U=;
- b=KW8vR1IWsqacm6YYNXk11aPywMHgonvlPTAqL/JZyZf+1ALSQMYkazdCVdv9Nq10Kq+VP/l//+SE8AOhEbJEyjPl9w3rXErTbL+dPSMPUNsoNYmIVQDUfMJRMqsw0ZFffmpMjPEz6hp2P6yOiTCpxXGcslfZiDSz6oucliXv19PU0IHb1Lj9l/wUhbtso5pTKtoDMlf/NA5zIDUeVoFMsLiyx7ldEYLxWA4cw54v63IDjKOBSJEvhFBYgfFblQm6/quIuO2pdJDrnosTct3LEUDkJDN5UtGvuwWzFB/Xr+t4gHbiZ35l6L6oTVMJ2DRDlRTo8Wf0mYIS7vMUkcDwiQ==
+ bh=z1NePTMQkheurv3ZesBS98wTc2Z5z8HaphatNlThklM=;
+ b=YWISqvlhkmQVtXZvqBZoj//BKNOeXvVixf/UWmJodJxvY0n9unXqZ/TUVFbfiSYDJhCXZvEG1f+RhfWgg6/4cHMWVUD3HYdFK6IZuWjk23RTCIUD4XrC1PrVttPhn63ZFGXWNAASCmuQFO0OudbZCBw+JiiHek9t8zhFIfN/HL6tZLfUfyAtMD+6Gjd3wJ9IsQC215k2UIpxN65ZUoufPD0ZUWcwuy8Y9+FckHx8/GUKyMovlcM0yZhmAUah1w90aXh9lU377D8KhWZANOi5Q7WMmDIJhTL2WhGNUS5WUYCNnk2FwTD0O+2e7EfGmEBqiHXcN/VB8wKQ0o1SYH1djA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
  by DB9PR04MB11659.eurprd04.prod.outlook.com (2603:10a6:10:607::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.14; Wed, 20 May
- 2026 06:42:30 +0000
+ 2026 06:42:35 +0000
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9913.009; Wed, 20 May 2026
- 06:42:29 +0000
+ 06:42:35 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -73,9 +73,9 @@ Cc: imx@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	catalin.horghidan@nxp.com
-Subject: [PATCH v3 net 7/9] net: enetc: fix unbounded loop and interrupt handling in VF-to-PF messaging
-Date: Wed, 20 May 2026 14:44:19 +0800
-Message-Id: <20260520064421.91569-8-wei.fang@nxp.com>
+Subject: [PATCH v3 net 8/9] net: enetc: fix init and teardown order to prevent use of unsafe resources
+Date: Wed, 20 May 2026 14:44:20 +0800
+Message-Id: <20260520064421.91569-9-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260520064421.91569-1-wei.fang@nxp.com>
 References: <20260520064421.91569-1-wei.fang@nxp.com>
@@ -92,57 +92,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|DB9PR04MB11659:EE_
-X-MS-Office365-Filtering-Correlation-Id: b39e119d-190e-4605-4954-08deb63af6b7
+X-MS-Office365-Filtering-Correlation-Id: f45fffc9-7206-4bfd-7ac6-08deb63af9da
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|19092799006|376014|52116014|1800799024|366016|38350700014|56012099003|18002099003|22082099003|11063799006;
 X-Microsoft-Antispam-Message-Info:
-	7KmWY150tvNRoPCt/qi3Rjw/HwARtrdN3m/3mz65JU5U3B2XNPnir1x5r7/agu4bMxhwB+ltWks38yoam64Xc1qJ85CWPARpgOXbTkqBTpd2LiNjtokuvSSPl0Ruq1XqKYb85NiRAs3zwEI+IAabzEMjGjUlxmiJ2SPwozoh3lVxhyHHo7SfexvWa0+m372qu0YQ5JwC+jfzOUBlP/M0I8Nb8okjcwoE4IgY6We+Mei41u9951RXiO2XdwvPEAQiojyeqj7AvbPAoVH4aot8FzD0twy0WKacM5Qi5FqMARvg1qqEK66gHXQF4KY4DUR9zie6SM3X2GTVonfuaweryfBGc3dcOZAxpqC3axHL5t/Eoh1gv4C6uj21r1cI3A99IN3eDfiKTjy5ZJ2/3fdIQ7rjU02UsD2NOl+ejIXMobtacD9gmG/VwzXRkF+b0iouGCdXQb+MMWly/dvxFTJfXCB8mDu1WSwXOCl4sdctfnddS06u9AQZ3179vTXMPK9NctosVZaH4YKNnMz12YDsKMegAVBjLkNbHe5h8Tt63Qvkh//ZXeQaYTNyri6js4gi1iJLzB3O19bi6k6WMCZijlrd/wD71KL9y+mpWwMxKkQTsKi9Z2XrEEENx8VmIH0ALR3cCkkAsBoQ9zfUUSpCDOY0tiaeoJClmEGdbc3tNDCx+IFirGfhICUbumdIy/Io+oWDvA3ARA5rO6bhztmNl/uZOl4iaMfvDylRBtXNBKlhEQvhcqcldYGU8TYra3mU
+	VP8O00KzFDtRx3l5GVWNaagHOUOdpEsF6MCmyyvHvWzJMd6chDTJS9uN9e9ZEeDOqzL3q7pfQ0bNqA0xpaCzFZVqlPfqifWmQAUP3w8KZideSAyxrj37GnK3PCDRa7DzHlMYqI6vxXheNncih4O3BiRUapmSnMafCuliyYv/MM0Pu1YHqBed79UNF123YnVXTRvPJH51rTNlUzp9SItWhAmC8EGWWFd6MNyGIIALcWew9PVawJQeeydj5WeNQep9kX46Euh5GH5CSFq/A59oawpwaVzTMtHd/Qk0PSHqvbG1TWoQ/Axpr490HBz7K1V0+sW48a8lno/u+tGMOvblkSLl4ipwqkruxpgxW2nN6Ra6AWZCcZeFfNrgFkUP1tAvTaKi1NAHsKwCJ2ESsnVscKOYFKe0SH2EwCEuxcsQPU05940Osk2Y1MRc6tDOQ618aexDWJARf/z6NkBWYcr6Wjj0ngBrB43dda0uXPB9UDGBX70CnaaBpTc5eoaWXhNQvjUevWuOJQPK1tdSL+xL1iY8Lg52AEqI+eZkKxF1PpBc4SzkF2fc80U24JsgF3axzaZzUdH/dF6mEJdXSMHDYk8gazaC8YXYw/rfC1yyKzgSo7r0nAmAT8b6cSoB6y9xi8ATakmUgo9H6pPUX71I2RONvpKWyCsoFiQggC+0MQYWXjqb5B9ldmbcKigVNdEO
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(52116014)(1800799024)(366016)(38350700014)(56012099003)(18002099003)(22082099003)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?D89fF9l9thNo1dnbWghdH5WUoNPgwb0zOxeo7mRUZpQo2HKJfBXyhT2WHmX9?=
- =?us-ascii?Q?PjYGAbiH+PIzYtfrUXTXki2fpH34GniKSaxwzMyFcsGAg9bmjd1LCPas/p2A?=
- =?us-ascii?Q?bYGc5e06BBdWwOdgqn2PFyahXP5NSfB5NLUiA5w4qjv+XPRwN1Q7KOvokWnV?=
- =?us-ascii?Q?/BY2tMu/iebN1j2SVpMpwVSvzM4ku3337K0GX40PTE8Z8/E40we8JVBDOnwI?=
- =?us-ascii?Q?x3b7GYjeGZoVMG6WnmODAdMSUdtX6XlsPTbm2vGj/3BoNiqDqEsDZ+ti/zVk?=
- =?us-ascii?Q?O9WNC1V/0ZR/pXZ6LGkVt47QFMYbygK9aEMLdKfoixBSMbl4JXSRJqXO9ot7?=
- =?us-ascii?Q?t8QIemKZMy5i9VgErbK2rOGh3PMbx+ul3yHZV/LLbZQMtcrFOw6gPo0Mlz5D?=
- =?us-ascii?Q?4Pgm+qS3MeRaC+7KahllVnqycSWj3pDQqDPg/zOguSpAsPcxA/JiMEf/6PmE?=
- =?us-ascii?Q?rtRC1AdWx4HIEryWq+Ns2PgcIauYZqNqotEO/bqErNQ/eI1TlPdmE6hpOTOE?=
- =?us-ascii?Q?ovEdTQageVYQzAaFzPHNSQ1OW2g6aeR/Hx94vHIB8Gx94fa+G0yM5lwfPPpk?=
- =?us-ascii?Q?YuyUHTQShUHj8yqpudWhlMiXk1OoXl4+ZP/6RIwu4e2Pqwmjco5D/gRRhGg+?=
- =?us-ascii?Q?+D8wzVMRMtZwA1Iyff9inUBFMQMJ7fRyxuS/aNkfDrnqZxsr1dAxN319lWWF?=
- =?us-ascii?Q?Jd5x+frbj9OaYSS/bO3g5ilkF2PLXVsXahkkecvHRqhUjBL6hFlnE18cs/D0?=
- =?us-ascii?Q?+4sH3h3xQPQ59z/e9ZtK3EF7m8vQc7yzeVPztsV+FWhcNbnrSnoVFKQXd7th?=
- =?us-ascii?Q?1Lc15q0icg1PLw25iQftkEJ4saGOfV+1Pl0UF3CZopD03LsWk4O8+loIxchz?=
- =?us-ascii?Q?FCJuQxfH8WYDeZW1b6eDVTHQ8nXK2rGQjh4rW8YHiugbSERTkNA6ZV8rgeP8?=
- =?us-ascii?Q?NAotPUnI3RBzGHjsL6sIJoU5ku5FU4yZy+uxUqlcQF2+nTycWB7kZI/MiEqR?=
- =?us-ascii?Q?fjTDeXoE9zBb6E6Zl915LIRSKDuoTW2AFTj+zDFDZIVEBgZsa2GDmH/Y8SUi?=
- =?us-ascii?Q?OYBsDL27ZWSeLTrjE/PJsREdkVkoV5HQzkwlOFm7qLVgVjQX8QGLDI03S8iU?=
- =?us-ascii?Q?s9dTMnD7xDsqSB/pscaf+aseoXjip1ggohSgpGYlWc6SOdpw5p9lzyatKkC9?=
- =?us-ascii?Q?70OAmjJTf7VAFSqvjVqXymMBZHJZ7Hg6mS/mWFj7bu3yN8fFVLuNW5dkNIuT?=
- =?us-ascii?Q?7vo0B2DnJCSaTT10NPworZtt9kWC3ADL9Dquuo8bjqnNBXMSScILnbHlfVqU?=
- =?us-ascii?Q?Q4Pa4nj9x+H0V3GLjr0E9PLP4etu2wXMt6f/03BsrzCIFhV6MVWtWmU7ugcD?=
- =?us-ascii?Q?QrH286JrC85uc8/CjsQEO01fvNjQQ8147ZhBM0x4ejA/4SvsK7KzxDsb4LV6?=
- =?us-ascii?Q?9AwQkFSHah12y7IYbEzvdEYCbNT+d1kdWUf3F44B4RiYi0w6JyMNLiuNwkb6?=
- =?us-ascii?Q?mwm/I6tzQ5T9i45/9JEeFzpy5vQt6s5Cd/F6bvcLed+ziw6ai/NWzAGCUwT0?=
- =?us-ascii?Q?zFfTrTjRHPahcy4XcoLPo3SLeK8B+/CHXf+ZKtNATZDTxpcJO3Iv1TKpDCm0?=
- =?us-ascii?Q?Sml/eV2RXvbY0RvyhinME3M/fGeUisvxkmo93+oqSdYO3ST7/V0Qoo6lJ9Zc?=
- =?us-ascii?Q?Zg5WBNa5CnL0iVUx3a52sRBm1Rm3BOWtGg8pJSk+0mzxy64DkydV8tUDREvY?=
- =?us-ascii?Q?a9/Io94zDA=3D=3D?=
+	=?us-ascii?Q?7dKgszoKq9yCgBDJS7NzwzwK6C5+cA+KqFgGZYkR5ei3ybWa8eCauqFpY48O?=
+ =?us-ascii?Q?tMiUCtipbWtnvr5lc9wS7+iqC3FeEkJl5XGnORnmpgRqJ3fBKsMGWToyGJ/V?=
+ =?us-ascii?Q?VLUlnG4yNxE4S4mhsmMsCaHHaxsAEIQR60JPwzQAOInDHBFdP5wEXNGCOeFN?=
+ =?us-ascii?Q?fHfQ8T3XVov8npzBXDgB4NXfDjrxEcIgI5MgCFs6ewAURuaTIfxDZv/YPKkU?=
+ =?us-ascii?Q?iv7HRZ9VAsxH3ZlMcsSR0DE/Z07DdDv2GQO63Fz08HwdcE9/SrDAS0RTkXfs?=
+ =?us-ascii?Q?HSn4STiMSRifgiKzn2ZeNwe8QvcNnKTBO5cqGXlxn19x0JTkDd76Gu4OhwrI?=
+ =?us-ascii?Q?m54Miz8lGUGcPJzRg2q1pu9oUIIaG/622Dq4dfRTeIlVOJz5ckvyOwd6qhIE?=
+ =?us-ascii?Q?Ez/vtysPoMqNalAgHRmlBVXvigkaAUsBfTCmO28WbX//yDegEyIy9SQ/nuy7?=
+ =?us-ascii?Q?oCEXCvXAvyl7LnitKKzdwVCmgDTHZBEpcMTj4XmwUTsaSXC+B016lm6005pC?=
+ =?us-ascii?Q?Mx6j7/GiT1/lmYWCvRUSwlXJdxbEa2UvfWB3IM1d56zp07Gb7zTB39etG9fL?=
+ =?us-ascii?Q?uibsF0EJDaYjpVpNScTzJ6TXoNs8LL4AgdFuMP6oha0oIHXF4dtnEKpow3GC?=
+ =?us-ascii?Q?e8wfwHvMFB3f2g2OMjhxVGA/NIHEPcF29T0NYwP4ExiKEwXffc3g2+sqWKdw?=
+ =?us-ascii?Q?+684rk8ebSY3Uvk3MjE/5bcgyoq+WOwNoixjn5xgCzjHd5kANNdTMa+Q++5W?=
+ =?us-ascii?Q?wjKn+G9pEI5YwiEWV8kx89qpWD1OsHa6XQAk0Yg9HvZMfc4+wOm0CnAXXIH7?=
+ =?us-ascii?Q?8fR/f0pef+VzSj/ovkhMiWdQ8Gw+Ul/oTGZ/RZzoqc7VdiR+jgty+2Mh0qyH?=
+ =?us-ascii?Q?Sgbl2ofDSIxQookGOJFhVBpC/I2uN9PN8dTszHtEwBdx6BR+yIiNGmYB8m4j?=
+ =?us-ascii?Q?dcXphQXGvy/6rEnn8W2sFS6IpucJfUhlN2Ky7M+Wk3NayCxa38PYsJ9MdRPd?=
+ =?us-ascii?Q?u+GqGvEYhC9IZdXbkGIO2Hh2j6KW9/7vYiYK+KAseUG7RA6/yJvR1ALcsuZ3?=
+ =?us-ascii?Q?DJYuapj3zOZ9xANmfV+FD6RBIr3V7RDmNxJZe6XcLawNRyJpIM6k/0cupuxF?=
+ =?us-ascii?Q?VM4k/dfDWPB5mOStdB04DM86PrvE/ov9SFFN34bIcSvO2xrr0B/PO5eB53Qp?=
+ =?us-ascii?Q?TXY7c1lP90qPTQZSeyUYoEMBkUt2A6x1RIYu9xtNha6UyLakNkC+M5JdS3xF?=
+ =?us-ascii?Q?DKvdFbdsz+OKFne1MjrJ7Oi3P+D+QJOhierqCafanphBmAWIMtKHKi9acUBN?=
+ =?us-ascii?Q?rANETD3g1IGW8OTnZKpaWglzHE8dI4twdvCI6FUHAFQZE2BTDTNcZmVFJ1po?=
+ =?us-ascii?Q?XK/1KYoRtOtga9fzsLzP3ldwmfdhmU0oXh6azaVW7HAcMKW0mh1sobf10oah?=
+ =?us-ascii?Q?K3i7f1qhVhasRy3pTk6Qufk8vDKtogwUdjgVB4sSFJhfbREF0J10dExgB/yj?=
+ =?us-ascii?Q?x78vJR47Hk604pW9ej6yQB0dGGz78PYDKByylz4gmGxvSKbL8otCsPQRqnff?=
+ =?us-ascii?Q?AZhJu86ohMXeKUuo6fYJmJ5GgoTI2Tgu6K7Ju8sTIvKL4ZRshrh6v1kF0Fjf?=
+ =?us-ascii?Q?SEMAwbMJtBj3inTn94qNY4Q5EHqMvSmWddU24Nw+vWM2Cp4R6wg6FPwW1uW0?=
+ =?us-ascii?Q?hsqwXC6+/bH0zGx3YmKfIuSXkxMBo5sTLvD96RY23E8/a3j7N3X4VPOwp+Q+?=
+ =?us-ascii?Q?H2xgOS8dxA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b39e119d-190e-4605-4954-08deb63af6b7
+X-MS-Exchange-CrossTenant-Network-Message-Id: f45fffc9-7206-4bfd-7ac6-08deb63af9da
 X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 06:42:29.9014
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 06:42:35.0868
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HGCmI9/aPLEGkTH91AgfSxI9XLgAw5CrahBe6fuILJ3Fe39eOEEi5QrSia3JuBpLiKSkqEJMSsMrZAu9aWDgyg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: pt3znIDQeCTqV5HLmL4o4exYcSu56XgGyfwJRml/oRN/aXFPYy9NwzlZlV8v0XUZVdOTC2fyzkrSynzoPjlsaw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB11659
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -156,7 +156,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289785-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289786-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
@@ -170,227 +170,154 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nxp.com:email,nxp.com:mid,nxp.com:dkim]
-X-Rspamd-Queue-Id: CA46C58871D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:mid,nxp.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url]
+X-Rspamd-Queue-Id: A107058873C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The enetc_msg_task() function has several issues that need to be addressed:
+Sashiko reported a potential issue in enetc_msg_psi_init() where the IRQ
+handler is registered before DMA resources are fully initialized [1].
 
-1. Unbounded loop causing potential DoS:
+The current initialization sequence is:
 
-enetc_msg_task() processes VF-to-PF mailbox messages in an unbounded
-for(;;) loop that keeps polling ENETC_PSIMSGRR until no MR bits are set.
-A malicious guest VM can exploit this by continuously sending messages at
-a high rate - immediately sending a new message as soon as the PF
-acknowledges the previous one. Since the worker thread never yields or
-enforces a processing budget, the mr_mask check frequently evaluates to
-non-zero, causing the PF to spin indefinitely and starving other tasks.
+  1. request_irq(enetc_msg_psi_msix)    <- IRQ handler registered
+  2. INIT_WORK(&pf->msg_task, ...)      <- work_struct initialized
+  3. enetc_msg_alloc_mbx()              <- mailbox DMA allocated
 
-Fix this by replacing the unbounded loop with a single snapshot read at
-task entry. The task processes only the VFs whose MR bits were set at
-that point, then re-enables message interrupts before returning. This
-bounds work per invocation to at most num_vfs iterations. No messages are
-lost because the message interrupt is disabled in enetc_msg_psi_msix()
-before scheduling enetc_msg_task(), so any new messages arriving during
-processing will trigger a fresh interrupt once re-enabled, scheduling
-another task invocation.
+This ordering is unsafe because if a spurious interrupt or pending
+interrupt from a previous device state fires immediately after
+request_irq() returns, the registered ISR enetc_msg_psi_msix() will
+execute and unconditionally call:
 
-2. Write order of ENETC_PSIIDR and ENETC_PSIMSGRR:
+  schedule_work(&pf->msg_task)
 
-Both ENETC_PSIIDR and ENETC_PSIMSGRR contain MR bits indicating messages
-have been received from VSIs, but only ENETC_PSIIDR trigger the CPU
-interrupt. Previously, ENETC_PSIMSGRR was written before ENETC_PSIIDR.
-Writing ENETC_PSIMSGRR returns the message code to the VSI in its upper
-16 bits, signaling to the VF that message processing is complete and it
-may send the next message. If the VF sends a new message before
-ENETC_PSIIDR is written, the subsequent w1c write to ENETC_PSIIDR would
-inadvertently clear the MR bit set by the new message, causing the
-interrupt to be lost and the new message to go unprocessed.
+At this point, pf->msg_task has not been initialized by INIT_WORK(), so
+the work_struct contains garbage values in its internal linked list
+pointers (work_struct->entry). Passing an uninitialized work_struct to
+schedule_work() could corrupt the kernel's workqueue linked lists,
+potentially leading to:
 
-Therefore, write ENETC_PSIIDR first to clear the interrupt source, then
-write ENETC_PSIMSGRR to acknowledge the message to the VSI.
+  - Kernel panic in __queue_work()
+  - Memory corruption in workqueue data structures
+  - System deadlock or undefined behavior
 
-3. Check both ENETC_PSIMSGRR and ENETC_PSIIDR for mr_status:
+Additionally, even if the work_struct was initialized, the mailbox DMA
+buffers (pf->rxmsg[]) may not yet be allocated when the work handler
+enetc_msg_task() runs, resulting in NULL pointer dereference.
 
-The write order change above introduces a potential race: if a VF sends
-a new message in the window between the ENETC_PSIIDR w1c and the
-ENETC_PSIMSGRR w1c, the ENETC_PSIMSGRR MR bit for the new message may
-not be set. If mr_status was derived solely from ENETC_PSIMSGRR, this
-message would never be detected despite ENETC_PSIIDR retaining its MR
-bit, leading to an unacknowledged interrupt storm.
+Fix by reordering the initialization sequence to ensure all resources are
+properly initialized before the interrupt handler can execute:
 
-Fix this by computing mr_status as the union of both ENETC_PSIMSGRR and
-ENETC_PSIIDR MR bits, ensuring all pending messages are detected
-regardless of which register reflects the new message state.
+  1. enetc_msg_alloc_mbx()              <- Allocate all mailboxes
+  2. INIT_WORK(&pf->msg_task, ...)      <- Initialize work first
+  3. request_irq(enetc_msg_psi_msix)    <- Register IRQ last
+  4. Configure hardware & enable MR interrupts
 
-Additionally, rename the per-register MR macros (ENETC_PSI*_MR_MASK,
-ENETC_PSI*_MR) to register-agnostic names (ENETC_PSIMR_MASK,
-ENETC_PSIMR_BIT) since the MR bit layout is shared across ENETC_PSIMSGRR,
-ENETC_PSIIER, and ENETC_PSIIDR. Make the mask macro dynamic based on
-the actual number of active VFs rather than hardcoded.
+This guarantees that when enetc_msg_psi_msix() runs:
+  - pf->msg_task is properly initialized (safe for schedule_work)
+  - pf->rxmsg[] buffers are allocated (safe for work handler access)
+  - Hardware is configured appropriately
 
+As the inverse of enetc_msg_psi_init(), enetc_msg_psi_free() also has
+similar problems. For example, if a pending interrupt fires between
+enetc_msg_free_mbx() and free_irq(), the ISR enetc_msg_psi_msix() may
+schedule the work handler again via schedule_work(), which could then
+access already-freed DMA buffers (pf->rxmsg[]), leading to use-after-free
+and potential memory corruption.
+
+Therefore, the order of enetc_msg_psi_free() is adjusted:
+  1. enetc_msg_disable_mr_int()       <- Stop new interrupts first
+  2. free_irq()                       <- Ensure no IRQ handler can run
+  3. cancel_work_sync()               <- Wait for any pending work
+  4. enetc_msg_disable_mr_int()       <- Re-disable in case work
+					 re-enabled it
+  5. enetc_msg_free_mbx()             <- Safe to free DMA buffers now
+
+Link: https://sashiko.dev/#/patchset/20260511080805.2052495-1-wei.fang%40nxp.com #1
 Fixes: beb74ac878c8 ("enetc: Add vf to pf messaging support")
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 ---
- .../net/ethernet/freescale/enetc/enetc_hw.h   | 15 ++++-
- .../net/ethernet/freescale/enetc/enetc_msg.c  | 65 +++++++++++--------
- 2 files changed, 49 insertions(+), 31 deletions(-)
+ .../net/ethernet/freescale/enetc/enetc_msg.c  | 35 ++++++++++---------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-index 662e4fbafb74..e58cc81d199d 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-@@ -56,11 +56,21 @@ static inline u32 enetc_vsi_set_msize(u32 size)
- }
- 
- #define ENETC_PSIMSGRR	0x204
--#define ENETC_PSIMSGRR_MR_MASK	GENMASK(2, 1)
--#define ENETC_PSIMSGRR_MR(n) BIT((n) + 1) /* n = VSI index */
- #define ENETC_PSIVMSGRCVAR0(n)	(0x210 + (n) * 0x8) /* n = VSI index */
- #define ENETC_PSIVMSGRCVAR1(n)	(0x214 + (n) * 0x8)
- 
-+/* Message received mask, n is the active number of VSIs.
-+ * It is available for ENETC_PSIMSGRR, ENETC_PSIIER, and
-+ * ENETC_PSIIDR registers.
-+ */
-+#define ENETC_PSIMR_MASK(n)	\
-+	({ typeof(n) _n = (n); (_n) ? GENMASK((_n), 1) : 0; })
-+
-+/* Message received bit, n is VSI index. It is available for
-+ * ENETC_PSIMSGRR, ENETC_PSIIER, and ENETC_PSIIDR registers.
-+ */
-+#define ENETC_PSIMR_BIT(n)	BIT((n) + 1)
-+
- #define ENETC_VSIMSGSR	0x204	/* RO */
- #define ENETC_VSIMSGSR_MB	BIT(0)
- #define ENETC_VSIMSGSR_MS	BIT(1)
-@@ -94,7 +104,6 @@ static inline u32 enetc_vsi_set_msize(u32 size)
- #define ENETC_SICAPR1	0x904
- 
- #define ENETC_PSIIER	0xa00
--#define ENETC_PSIIER_MR_MASK	GENMASK(2, 1)
- #define ENETC_PSIIDR	0xa08
- #define ENETC_SITXIDR	0xa18
- #define ENETC_SIRXIDR	0xa28
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc_msg.c b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-index b4d7457097e6..3136e8321e4d 100644
+index 3136e8321e4d..c09635e7eb3d 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc_msg.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-@@ -3,18 +3,25 @@
+@@ -118,6 +118,15 @@ int enetc_msg_psi_init(struct enetc_pf *pf)
+ 	struct enetc_si *si = pf->si;
+ 	int vector, i, err;
  
- #include "enetc_pf.h"
- 
--static void enetc_msg_disable_mr_int(struct enetc_hw *hw)
-+static void enetc_msg_disable_mr_int(struct enetc_pf *pf)
- {
--	u32 psiier = enetc_rd(hw, ENETC_PSIIER);
-+	struct enetc_hw *hw = &pf->si->hw;
-+	u32 psiier;
-+
-+	psiier = enetc_rd(hw, ENETC_PSIIER) & ~ENETC_PSIMR_MASK(pf->num_vfs);
-+
- 	/* disable MR int source(s) */
--	enetc_wr(hw, ENETC_PSIIER, psiier & ~ENETC_PSIIER_MR_MASK);
-+	enetc_wr(hw, ENETC_PSIIER, psiier);
- }
- 
--static void enetc_msg_enable_mr_int(struct enetc_hw *hw)
-+static void enetc_msg_enable_mr_int(struct enetc_pf *pf)
- {
--	u32 psiier = enetc_rd(hw, ENETC_PSIIER);
-+	struct enetc_hw *hw = &pf->si->hw;
-+	u32 psiier;
- 
--	enetc_wr(hw, ENETC_PSIIER, psiier | ENETC_PSIIER_MR_MASK);
-+	psiier = enetc_rd(hw, ENETC_PSIIER) | ENETC_PSIMR_MASK(pf->num_vfs);
-+
-+	enetc_wr(hw, ENETC_PSIIER, psiier);
- }
- 
- static irqreturn_t enetc_msg_psi_msix(int irq, void *data)
-@@ -22,7 +29,7 @@ static irqreturn_t enetc_msg_psi_msix(int irq, void *data)
- 	struct enetc_si *si = (struct enetc_si *)data;
- 	struct enetc_pf *pf = enetc_si_priv(si);
- 
--	enetc_msg_disable_mr_int(&si->hw);
-+	enetc_msg_disable_mr_int(pf);
- 	schedule_work(&pf->msg_task);
- 
- 	return IRQ_HANDLED;
-@@ -31,33 +38,35 @@ static irqreturn_t enetc_msg_psi_msix(int irq, void *data)
- static void enetc_msg_task(struct work_struct *work)
- {
- 	struct enetc_pf *pf = container_of(work, struct enetc_pf, msg_task);
-+	u32 mr_mask = ENETC_PSIMR_MASK(pf->num_vfs);
- 	struct enetc_hw *hw = &pf->si->hw;
--	unsigned long mr_mask;
-+	u32 mr_status;
- 	int i;
- 
--	for (;;) {
--		mr_mask = enetc_rd(hw, ENETC_PSIMSGRR) & ENETC_PSIMSGRR_MR_MASK;
--		if (!mr_mask) {
--			/* re-arm MR interrupts, w1c the IDR reg */
--			enetc_wr(hw, ENETC_PSIIDR, ENETC_PSIIER_MR_MASK);
--			enetc_msg_enable_mr_int(hw);
--			return;
--		}
-+	mr_status = (enetc_rd(hw, ENETC_PSIMSGRR) & mr_mask) |
-+		    (enetc_rd(hw, ENETC_PSIIDR) & mr_mask);
-+	if (!mr_status)
-+		goto out;
-+
 +	for (i = 0; i < pf->num_vfs; i++) {
-+		u32 psimsgrr;
-+		u16 msg_code;
- 
--		for (i = 0; i < pf->num_vfs; i++) {
--			u32 psimsgrr;
--			u16 msg_code;
-+		if (!(ENETC_PSIMR_BIT(i) & mr_status))
-+			continue;
- 
--			if (!(ENETC_PSIMSGRR_MR(i) & mr_mask))
--				continue;
-+		enetc_msg_handle_rxmsg(pf, i, &msg_code);
- 
--			enetc_msg_handle_rxmsg(pf, i, &msg_code);
-+		/* w1c to clear the corresponding VF MR bit */
-+		enetc_wr(hw, ENETC_PSIIDR, ENETC_PSIMR_BIT(i));
- 
--			psimsgrr = ENETC_SIMSGSR_SET_MC(msg_code);
--			psimsgrr |= ENETC_PSIMSGRR_MR(i); /* w1c */
--			enetc_wr(hw, ENETC_PSIMSGRR, psimsgrr);
--		}
-+		psimsgrr = ENETC_SIMSGSR_SET_MC(msg_code);
-+		psimsgrr |= ENETC_PSIMR_BIT(i); /* w1c */
-+		enetc_wr(hw, ENETC_PSIMSGRR, psimsgrr);
- 	}
++		err = enetc_msg_alloc_mbx(si, i);
++		if (err)
++			goto free_mbx;
++	}
 +
-+out:
-+	enetc_msg_enable_mr_int(pf);
- }
- 
- /* Init */
-@@ -133,7 +142,7 @@ int enetc_msg_psi_init(struct enetc_pf *pf)
++	/* initialize PSI mailbox */
++	INIT_WORK(&pf->msg_task, enetc_msg_task);
++
+ 	/* register message passing interrupt handler */
+ 	snprintf(pf->msg_int_name, sizeof(pf->msg_int_name), "%s-vfmsg",
+ 		 si->ndev->name);
+@@ -126,32 +135,21 @@ int enetc_msg_psi_init(struct enetc_pf *pf)
+ 	if (err) {
+ 		dev_err(&si->pdev->dev,
+ 			"PSI messaging: request_irq() failed!\n");
+-		return err;
++		goto free_mbx;
  	}
  
+ 	/* set one IRQ entry for PSI message receive notification (SI int) */
+ 	enetc_wr(&si->hw, ENETC_SIMSIVR, ENETC_SI_INT_IDX);
+ 
+-	/* initialize PSI mailbox */
+-	INIT_WORK(&pf->msg_task, enetc_msg_task);
+-
+-	for (i = 0; i < pf->num_vfs; i++) {
+-		err = enetc_msg_alloc_mbx(si, i);
+-		if (err)
+-			goto err_init_mbx;
+-	}
+-
  	/* enable MR interrupts */
--	enetc_msg_enable_mr_int(&si->hw);
-+	enetc_msg_enable_mr_int(pf);
+ 	enetc_msg_enable_mr_int(pf);
  
  	return 0;
  
-@@ -154,7 +163,7 @@ void enetc_msg_psi_free(struct enetc_pf *pf)
+-err_init_mbx:
++free_mbx:
+ 	for (i--; i >= 0; i--)
+ 		enetc_msg_free_mbx(si, i);
+ 
+-	free_irq(vector, si);
+-
+ 	return err;
+ }
+ 
+@@ -160,14 +158,17 @@ void enetc_msg_psi_free(struct enetc_pf *pf)
+ 	struct enetc_si *si = pf->si;
+ 	int i;
+ 
++	/* disable MR interrupts */
++	enetc_msg_disable_mr_int(pf);
++
++	/* de-register message passing interrupt handler */
++	free_irq(pci_irq_vector(si->pdev, ENETC_SI_INT_IDX), si);
++
  	cancel_work_sync(&pf->msg_task);
  
- 	/* disable MR interrupts */
--	enetc_msg_disable_mr_int(&si->hw);
-+	enetc_msg_disable_mr_int(pf);
+-	/* disable MR interrupts */
++	/* MR interrupts may be re-enabled by workqueue */
+ 	enetc_msg_disable_mr_int(pf);
  
  	for (i = 0; i < pf->num_vfs; i++)
  		enetc_msg_free_mbx(si, i);
+-
+-	/* de-register message passing interrupt handler */
+-	free_irq(pci_irq_vector(si->pdev, ENETC_SI_INT_IDX), si);
+ }
 -- 
 2.34.1
 
