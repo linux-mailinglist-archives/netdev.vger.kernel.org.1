@@ -1,220 +1,272 @@
-Return-Path: <netdev+bounces-289807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289808-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yBEANR1iDWquwgUAu9opvQ
-	(envelope-from <netdev+bounces-289807-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:26:21 +0200
+	id GJMvL25jDWquwgUAu9opvQ
+	(envelope-from <netdev+bounces-289808-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:31:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CBFE588EC4
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:26:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 204BC588FA1
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:31:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BF2753044213
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 07:25:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A37543018D5A
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 07:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61696370AE2;
-	Wed, 20 May 2026 07:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1333B366073;
+	Wed, 20 May 2026 07:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="elAByUqz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DnvG4t/e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD0437189D
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779261946; cv=pass; b=EUDHjIQH29yiepNzYyGt00EYl79mkjW5S6EH8WmXMHfXkm17D2iYd49NhaPkdL1bdz0OGRigiEsmAOJvk/zU6f66oywyH/K1WFA3YO/RXmP0RRsMZO4jm6QDHbIyiqNNaeqJR1nSi29En6Rhdn4tZ9e3pCDb/llh39RhZr/qHWM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779261946; c=relaxed/simple;
-	bh=DpuQ8Poe19voowdeiVQ8ziD67bSszQ9be7fcUPBKxIY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=idc1/3hkCj8dCGpHuEzW4o84YgVhMjgfXk5XHBUmrYIBoPNzTaFoTgqxvaWoqHxm0wgcWAYazASJCHDNs760pRa9GocrdanXifFRQSFgERLOAkH5eOEpKpmHugcSQKnexZ9pz8Hc5Yk3EZNWua5oCq2f4jBpt14W4LmgSJTvurE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=elAByUqz; arc=pass smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-90f850473f9so475416085a.3
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 00:25:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779261944; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LE461v7P+I7zzzzJpJ0hvIUp7kwZzORUoJ/2naW9MHK+RZ3DDSeUQWWVJwh7bsA/QH
-         ud0zfKWgkFYksX3bVC0zLrq+XqXV08FDDuU39GtyBgAdDTRvqUpgl6YQ9s5uvfnfQ+UU
-         QtNdyc7zYfElXAk3SBaXCDXMCWYhzMemAHUo2rKRiC66+6ipXDiDOWhOkSG/4GGWdeZM
-         mYMxQDr++RAA7+LZPfElXdoTdaPdcOFStkK4u9pQ9B9re+Wy8tGTEtW8gz4/EDsUcNDX
-         Cu58EOEupoWX22TEZT9UUiCYKmf41U0V3KnqgZ7r/evlKhJqNYcDgUysNM3hhFAWplti
-         XlEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=576nO/YV1iMXtGVxB8ckBZBIVkpdxC8JVKo+7JWN4sU=;
-        fh=hNzy4O4tk2xeHhbcxz2d6lzTvVRCyXqa1b5K7LahNDg=;
-        b=EaqIYKOA7uUNkYVuz4LN38NniwYSPATeIAQux7zNvWEWx5YWEnN1/GMEjJs+3CyxNt
-         pLZA1oP0isBZfh0OJXK+pivTFtyPBSCN+Plm5nVN/wxU94PzTIcV+ewgwqAEjBzeq3tr
-         YbuBzdhWs1/jo4VmXEHCJX5s0wAo3/jml4vkgfwR+xGr8bOpotnykBt3sfU286PnNBky
-         Oc2OAaQeNkaJu5FQCRlDK+Is9opWJfVexQSUnBrGDHTTncVtd1UpQWiGazX0wuXzb9Jw
-         5onydrYEoDIHcWd+HzOc5FIh5jR3QoWjlXAZo2Y6+hZvMzOj4nvnqWdhWdBil39coW81
-         na6A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D6533ADA4
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779262060; cv=none; b=Cl2gw3D3SNIgi8S2o5Z6mwuSi5Qd+KPGYdiGM2HXPDqJ4tvvAbLYLdh8cUoeIXebuDmqEocC05Oa6Zh7ObfHw+osa7bKnhlP9NOaTniiiQDixLh6oYrH6CsPuoV8FzMHTAQMmvU2KM63v12rId5MCVTHZdRUWqETNGQxHXBltrI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779262060; c=relaxed/simple;
+	bh=4FRxNnqDMNdEkwcqxtdH8RepBGpls1NqJol4l4qjRAw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gRBQVajX+XYlqmuhwFerXWWNjFqPjY42XbAh2x13m9pmfCV8V3DNT4FY+97YJwRzVQ18brM22TA/l0pai1aw3rJGpnE3IwdMoVfIJ0IZALgmOPBG/7YuRq5IbH+fG7ieNZyPx7qR50Enn8RJCQIjWXX8bkE19ufdIrzV37GAAew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DnvG4t/e; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-44c350a5b87so2681327f8f.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 00:27:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779261944; x=1779866744; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=576nO/YV1iMXtGVxB8ckBZBIVkpdxC8JVKo+7JWN4sU=;
-        b=elAByUqzdu+FsutTNWjq7d88iJhdXgyI7+cBlKN4EHhS8S32JoSOMuiCFkRFdyTxvi
-         t2x4Xy+C9oICuCwbE0mzeD7CbhpM+uFBjWrt64zaWc5jPDEZJUUIo628lJCdg2opSsVz
-         0JEAX16jjsxrJkecHiLhH1xDr7LmuYAsQ8D3NNMf5tvoQNp//KEF6Fv8N7zmYCvED+j6
-         8sL2ocEx+l4T0+6HREpFKdhttv+RmmXS4R0zl2bEAVyVnReZgmqQj1bnL1w6QBQwI3EI
-         l+K2aTWhLKD3Z+UbDZJyEBGLH6jZm6ZDDbW8Rj8XSTnBIonoC78sW4KwifHNbV7EmZCK
-         8s5g==
+        d=gmail.com; s=20251104; t=1779262057; x=1779866857; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YFCpyBr8c2WuPvvXn0j2wRYx2mdw2tGa8zkYj1VPho8=;
+        b=DnvG4t/es7kOIsXbZdDJArAzcr5IwUoq36YDnFoVV6dr137DrKgnkl1ayDnixQ11uF
+         YSLYpTbegvb2rPzi1jQ4kIRtNMJjlAzIn43kJWpexrUG96Zitc2Ob3A6AfKxzVdBQUHl
+         0NRG98UOj+uYLUcSLjd3LONjLV6qoRJvZ72rDRoC9WasF7DW841op0qek1tv3Yf0i/Hq
+         fQrBbXKIrO1q3sLRq7N3Jge+waj47R0G1HjTDe/dcWN5rqVfW1OjXn9hRs0rjw2IsR8i
+         cChdcYpx/IlMiz3+dhBUe1egGGBe3tCTlvjdNALF/A7FrQsnkDFgsVT1kx+sC9VTn+EO
+         JwQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779261944; x=1779866744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=576nO/YV1iMXtGVxB8ckBZBIVkpdxC8JVKo+7JWN4sU=;
-        b=KNAivCfAdur9cApDV8MuiOziVGRPwx7l3vBPjyLgR1ArwejjlYSATHQdcC5bEBSmXi
-         XHEkkhCNehCKJuZu2tDY0lmtvT1KhQF7jXZNao6d/+rMFt23nC3Yn5APK0rk2W3H9yuQ
-         pnnjGehlfFOFuq39cx3lyfOeeGblZXUNsCkajlZqrLCs25L9vDs6QzeUVOmr5fNZk6ub
-         0eWTd2yt3RWDqtV03lr9muwYYguw/JkIMpCLLfcWATuk9aItfwazA3r15CbqQjEGXcuF
-         r8tNyI9+TA0z43RcU8BUpQC0opEqH4CgDC/KmNMlSg9ptk0ulZ5wipbbq/ZM43IefDEp
-         2jpQ==
-X-Gm-Message-State: AOJu0YyIou3CRj3rly9xD+EOgqVZuydBRb9qI5SZl41U2EYEN0MWnDe1
-	9KuQegAjZ4CJrJonv5HaDVyEfD+d8/Izyn2TnXNQQ440aBBdtSyaNZfR3TGBBH9fvYfs7UBBoWt
-	KHpy9c8v6OJMoWR6zyfAhqc51jyJxRLytA5bQIywy
-X-Gm-Gg: Acq92OFQlCqw+u11ofH6O4sZqOdDkVxkQVtuf/Afpw31IbjYyuQwCnOX8eBI+S/dZUV
-	/1dwKkFU2v4qmJgrofNvyPTo/CYm03J3vreD0yno7CLMNOQYSqyHuH5YSkQWWqMmsQ4HHHV6Z77
-	ormPyCbmA2bbIC4vv9Ullzv66Ajy2HAO//zOKgOX33UL3w+TD3sxJ63XKUIR7aF07tva3Leblem
-	vb9TXvoEJETe+ccQj4OYcsqi3WSuccw0YLbBFvDf4RFpSp2f8dGTohdO/l9jOuwa5Q0oxEvCiF2
-	r/PwmWVlA1VceCG+PdSqWsf7NVZlRVkaLpZV3ucu05fC8Wmyb84NWHcrysIMq5IUYP/oAE/9Ozo
-	4E0iSJ/6y/BlVPmApR0l+SlTvawRD2wOcCDA7PNW0H17bTNWeH/5B6w4AFxPQeR5l
-X-Received: by 2002:a05:620a:2685:b0:90d:b6b7:ca93 with SMTP id
- af79cd13be357-911cef0364fmr3314735185a.47.1779261943125; Wed, 20 May 2026
- 00:25:43 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779262057; x=1779866857;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YFCpyBr8c2WuPvvXn0j2wRYx2mdw2tGa8zkYj1VPho8=;
+        b=hL8AVwpENLyVl+QmCK53bfLTyRychihPVUAsJ7Gmxo2S/aYwmTfIzbNBFmZGs1nMHW
+         dckKhr6sAg3V3Aa8sINPuUlKV6xFN2gjV2CCYuCNt80QRqX6JNreTFyk+T9uD3/mJBEW
+         uQIw8tGtxJjExPum4kEo+FnHUxH7H1xdcrrPPaDxixLDhDEGjcN8JEX30pGQY/zY2Lcj
+         vuqWb8ae9WL0PshNsvMq1OOL9ebHcxjDmAdZ3n7oLIMSxsC6Kr2CQfMWfMmtf7CBZmy+
+         INxFx8AjGrh+QgN8C8rvqOsFdG3o2yur67h24aR5vd5X92M/DI8bAmtiy4xSCGWfwktK
+         h6Pw==
+X-Gm-Message-State: AOJu0Yy81BGFaz1ifxzby4CI4ZI4PySvrTCkKoOrKF8ZfaflzLfbJCpP
+	p+DYstC5RX8edTboOJCvp0eZAjCAB/dC/QLz+k6qnesIGBQzYiduJpWYgTja2cKd
+X-Gm-Gg: Acq92OERI5egn4nUHeRzH/xqSEbuQFPsyxm61jDAGesRBgnLBa2i1zgVwE6IAHzgUcN
+	6GKDnYIwMc2sn44WPLr7EfUPcOY3lSBx7lXeIRODpUaoGvaNCIE4jFlrkucbNA2LykugpLRXNcX
+	k9+3OKOkIMKq07eo4ZnDTde215IJ6AH52BGJ3kOCFMyLl446jhBo3MNWvs5iov/RcWOy1QRNBzk
+	iIHJ69OWRnDVWppMieQM6sj7QrLcqKTIGn1v/mq5Crq58+H7XgKn4ZgikmGP3gTABh5eFbjIwrs
+	OswfN6HYIT+nZsEV1rBnyh17xVhiukrIihYvgoq7Q55XkMiksHXnJ5/fov0O4s4Fxs47p38kcqF
+	108P9/VvACLt/eQaCSzQmF4hNz8+jYS4BauzhZuuUfarihCRmOfjFn2HPDIiPZQliCAA0qqfhuH
+	bRiaHTyE6TPg1oj0sxKRInwMVv+dc0ofpDDm1czrRH1Hc05/iorIPFr++RgoH9Zx5NzefAoU67m
+	JWzkFNc6xjY1gFrjr1hGsyQEgz6nfAIIzK+npZ13drK2FqrvshEFsn40t1/5CCLndI=
+X-Received: by 2002:a05:6000:4305:b0:43c:fe66:43ec with SMTP id ffacd0b85a97d-45e5c5af3e1mr38635027f8f.14.1779262056517;
+        Wed, 20 May 2026 00:27:36 -0700 (PDT)
+Received: from localhost.localdomain (host-217-59-207-212.business.telecomitalia.it. [217.59.207.212])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0fe13a7sm53915917f8f.29.2026.05.20.00.27.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 00:27:36 -0700 (PDT)
+From: Alessandro Schino <7991aleschino@gmail.com>
+To: netdev@vger.kernel.org
+Cc: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	e521588 <alessandro.schino@sbb.ch>,
+	Alessandro Schino <7991aleschino@gmail.com>
+Subject: [PATCH ipsec v2] esp: fix page frag reference leak on skb_to_sgvec failure
+Date: Wed, 20 May 2026 09:27:17 +0200
+Message-ID: <20260520072717.2043-1-7991aleschino@gmail.com>
+X-Mailer: git-send-email 2.41.0.windows.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260520064310.4154268-1-ntspring@meta.com> <20260520064310.4154268-2-ntspring@meta.com>
-In-Reply-To: <20260520064310.4154268-2-ntspring@meta.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 20 May 2026 00:25:32 -0700
-X-Gm-Features: AVHnY4JA5ULcAD8FHiBt5X7hD0S7aFEuUITtlQpIRKTp5El2DBtrGA8XL-7n_ec
-Message-ID: <CANn89iLoHtMa+94G5NHC5L9Cp4dbkQPKnZneNo08ak4Z6ZzAtg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/2] tcp: rehash onto different local ECMP
- path on retransmit timeout
-To: Neil Spring <ntspring@meta.com>
-Cc: netdev@vger.kernel.org, ncardwell@google.com, kuniyu@google.com, 
-	davem@davemloft.net, kuba@kernel.org, dsahern@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,vger.kernel.org,sbb.ch,gmail.com];
+	TAGGED_FROM(0.00)[bounces-289808-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289807-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[7991aleschino@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,meta.com:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 8CBFE588EC4
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sbb.ch:email]
+X-Rspamd-Queue-Id: 204BC588FA1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 11:43=E2=80=AFPM Neil Spring <ntspring@meta.com> wr=
-ote:
->
-> Currently sk_rethink_txhash() re-rolls the socket's txhash on RTO, PLB,
-> and spurious-retransmission events, but the cached route is reused and
-> the new hash is not propagated into the ECMP path selection logic.  Two
-> changes are needed to make rehash select a different local ECMP path:
->
-...
->
-> Signed-off-by: Neil Spring <ntspring@meta.com>
-> ---
->  net/core/filter.c                |  1 +
->  net/ipv4/tcp_input.c             |  6 ++++--
->  net/ipv4/tcp_plb.c               |  7 ++++++-
->  net/ipv4/tcp_timer.c             |  4 ++++
->  net/ipv6/af_inet6.c              |  3 +++
->  net/ipv6/inet6_connection_sock.c |  7 +++++++
->  net/ipv6/syncookies.c            |  4 ++++
->  net/ipv6/tcp_ipv6.c              | 13 +++++++++++--
->  8 files changed, 40 insertions(+), 5 deletions(-)
->
->
+From: e521588 <alessandro.schino@sbb.ch>
 
-...
+In esp_output_tail(), when esp->inplace is false, the old skb page frags
+are replaced with a new page from the xfrm page_frag cache. The source
+scatterlist (sg) is built from the old frags before the replacement, and
+esp_ssg_unref() is responsible for releasing the old page references
+after the crypto operation completes.
 
-> diff --git a/net/ipv4/tcp_plb.c b/net/ipv4/tcp_plb.c
-> index c11a0cd3f8fe..accdd83dfc3d 100644
-> --- a/net/ipv4/tcp_plb.c
-> +++ b/net/ipv4/tcp_plb.c
-> @@ -78,7 +78,12 @@ void tcp_plb_check_rehash(struct sock *sk, struct tcp_=
-plb_state *plb)
->         if (plb->pause_until)
->                 return;
->
-> -       sk_rethink_txhash(sk);
-> +       if (sk_rethink_txhash(sk)) {
-> +#if IS_ENABLED(CONFIG_IPV6)
+However, if the second skb_to_sgvec() call (which builds the destination
+scatterlist from the new page) fails, the code jumps to error_free which
+only calls kfree(tmp). The old page frag references captured in the
+source scatterlist are never released:
 
-Please remove the #if IS_ENABLED(CONFIG_IPV6).
-Code will compile just fine if IPV6 is not enabled, and is not
-ultra-fast-path anyway.
+  1. sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
+  2. nr_frags is set to 1 and frag[0] is replaced with the new page
+  3. Second skb_to_sgvec() fails -> goto error_free
+  4. kfree(tmp) frees the sg[] memory but old frags are not unref'd
+  5. kfree_skb() only releases frag[0] (the new page), not the old ones
 
-if (sk_rethink_txhash(sk) && sk->sk_family =3D=3D AF_INET6)
-         __sk_dst_reset(sk);
+Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+unconditionally unrefs the source scatterlist frags without checking
+req->src and req->dst, since those fields are not yet initialized by
+aead_request_set_crypt() at the point of the error. Existing callers
+pass false to preserve the original behavior.
 
+The same issue exists in both esp4 and esp6 as the code is identical.
 
-> +               if (sk->sk_family =3D=3D AF_INET6)
-> +                       __sk_dst_reset(sk);
-> +#endif
-> +       }
->         plb->consec_cong_rounds =3D 0;
->         WRITE_ONCE(tcp_sk(sk)->plb_rehash, tcp_sk(sk)->plb_rehash + 1);
->         NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPPLBREHASH);
-> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> index 322db13333c7..24c1c19eda6e 100644
-> --- a/net/ipv4/tcp_timer.c
-> +++ b/net/ipv4/tcp_timer.c
-> @@ -300,6 +300,10 @@ static int tcp_write_timeout(struct sock *sk)
->         if (sk_rethink_txhash(sk)) {
->                 WRITE_ONCE(tp->timeout_rehash, tp->timeout_rehash + 1);
->                 __NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPTIMEOUTREHASH)=
-;
-> +#if IS_ENABLED(CONFIG_IPV6)
+Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
 
-Same remark here.
+Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
+---
+ net/ipv4/esp4.c | 12 +++++++-----
+ net/ipv6/esp6.c | 12 +++++++-----
+ 2 files changed, 14 insertions(+), 10 deletions(-)
 
-> +               if (sk->sk_family =3D=3D AF_INET6)
-> +                       __sk_dst_reset(sk);
-> +#endif
->         }
->
->         return 0;
->
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 6a5febbdbee4..8314d7bddcb7 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -96,7 +96,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+ 			     __alignof__(struct scatterlist));
+ }
+ 
+-static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
++static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
+ {
+ 	struct crypto_aead *aead = x->data;
+ 	int extralen = 0;
+@@ -113,7 +113,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+ 	/* Unref skb_frag_pages in the src scatterlist if necessary.
+ 	 * Skip the first sg which comes from skb->data.
+ 	 */
+-	if (req->src != req->dst)
++	if (already_unref || req->src != req->dst)
+ 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+ 			skb_page_unref(page_to_netmem(sg_page(sg)),
+ 				       skb->pp_recycle);
+@@ -220,7 +220,7 @@ static void esp_output_done(void *data, int err)
+ 	}
+ 
+ 	tmp = ESP_SKB_CB(skb)->tmp;
+-	esp_ssg_unref(x, tmp, skb);
++	esp_ssg_unref(x, tmp, skb, false);
+ 	kfree(tmp);
+ 
+ 	if (xo && (xo->flags & XFRM_DEV_RESUME)) {
+@@ -569,8 +569,10 @@ int esp_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
+ 		err = skb_to_sgvec(skb, dsg,
+ 			           (unsigned char *)esph - skb->data,
+ 			           assoclen + ivlen + esp->clen + alen);
+-		if (unlikely(err < 0))
++		if (unlikely(err < 0)) {
++			esp_ssg_unref(x, tmp, skb, true);
+ 			goto error_free;
++		}
+ 	}
+ 
+ 	if ((x->props.flags & XFRM_STATE_ESN))
+@@ -602,7 +604,7 @@ int esp_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
+ 	}
+ 
+ 	if (sg != dsg)
+-		esp_ssg_unref(x, tmp, skb);
++		esp_ssg_unref(x, tmp, skb, false);
+ 
+ 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
+ 		err = esp_output_tail_tcp(x, skb);
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 9c06c5a1419d..9d0c4957ac62 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -113,7 +113,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+ 			     __alignof__(struct scatterlist));
+ }
+ 
+-static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
++static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
+ {
+ 	struct crypto_aead *aead = x->data;
+ 	int extralen = 0;
+@@ -130,7 +130,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+ 	/* Unref skb_frag_pages in the src scatterlist if necessary.
+ 	 * Skip the first sg which comes from skb->data.
+ 	 */
+-	if (req->src != req->dst)
++	if (already_unref || req->src != req->dst)
+ 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+ 			skb_page_unref(page_to_netmem(sg_page(sg)),
+ 				       skb->pp_recycle);
+@@ -254,7 +254,7 @@ static void esp_output_done(void *data, int err)
+ 	}
+ 
+ 	tmp = ESP_SKB_CB(skb)->tmp;
+-	esp_ssg_unref(x, tmp, skb);
++	esp_ssg_unref(x, tmp, skb, false);
+ 	kfree(tmp);
+ 
+ 	esp_output_encap_csum(skb);
+@@ -600,8 +600,10 @@ int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
+ 		err = skb_to_sgvec(skb, dsg,
+ 			           (unsigned char *)esph - skb->data,
+ 			           assoclen + ivlen + esp->clen + alen);
+-		if (unlikely(err < 0))
++		if (unlikely(err < 0)) {
++			esp_ssg_unref(x, tmp, skb, true);
+ 			goto error_free;
++		}
+ 	}
+ 
+ 	if ((x->props.flags & XFRM_STATE_ESN))
+@@ -634,7 +636,7 @@ int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
+ 	}
+ 
+ 	if (sg != dsg)
+-		esp_ssg_unref(x, tmp, skb);
++		esp_ssg_unref(x, tmp, skb, false);
+ 
+ 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
+ 		err = esp_output_tail_tcp(x, skb);
+-- 
+2.41.0.windows.3
+
 
