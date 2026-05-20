@@ -1,211 +1,165 @@
-Return-Path: <netdev+bounces-290022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290023-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULVaIvPzDWoF5AUAu9opvQ
-	(envelope-from <netdev+bounces-290022-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:48:35 +0200
+	id sK3KHegZDmpT6AUAu9opvQ
+	(envelope-from <netdev+bounces-290023-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:30:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB935949F0
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:48:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE8A1599B4F
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2634A305C9F8
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 17:00:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B03FD31F33A2
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 17:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404783F44C9;
-	Wed, 20 May 2026 16:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xt4uN8yV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF323D6673;
+	Wed, 20 May 2026 17:23:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9095C36A352
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 16:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B86F36A376
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 17:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779296359; cv=none; b=uBsbl2J+drlcA9MOSb3b8coNUJhc/vHhPuj93eWsSuS5bVc0LoL0n37BEQQeZdpZHQW14kAVvzuYj3/bY+NPEIqvR7KkjvLe85T1sKnvVHg7CYzj6fFFPCb2YKe5mB67rfLw3nhxobHv+dWoc5slOvSc7S0Zs6dQguizcLSQbUQ=
+	t=1779297819; cv=none; b=XKMQVBrMFX/g/Dp6FNI0klAvqbAjmdgIC8zFDF5KVT1yeanxCJcUAqjuiY4otIeXN3a14oYudP51rqRcFeTydBHPVKPM5WnIqfKwdTrG2WlXZ5kTS1Gzr0gHwfoPDCLMESfpD965cnzwMS9QHz8CKCQe+qElSlZ7hgcCJrpwjoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779296359; c=relaxed/simple;
-	bh=AIhvkw0yBDgtvPsGE5h15ItzE0NtmWKsmKdeIQzLbpU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qOasv0JHlry6vikOAEzJQqDdX2KrBpGtQ6Jxboy/Rf77eofczmF7GdKvno5EC1FlnvXcZqzUo1MOqiWyfNc0XF1vlOnlOT+32pR/ADoMAv4o+Mi12FJlhvTiTbMq0W1icmkFz//eJAKaZIoFu244Ttl0BvoCiAKtEfallNBdA2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xt4uN8yV; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1779297819; c=relaxed/simple;
+	bh=SPD46zMf+vaQ0dKfzawI5VFezCApZmoz9FyM0dieZKg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sgkDB+6JbaZQ/ZMVDMbHMnk5NTykjCGjyXeR0em7UT6xJFiFBcoJxH/LSwiZkvPu2UZTt1rr6BQG1FGWhViyqwVHEPiKFcNrlzaHb4qcaxUxNlagu5mcGGdwT6anMZmCEK0U0ePvtJJzn9n0tfuq/6NIPiNtm5NmSVeGhw4k6fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2bc763e2ba8so24613885ad.3
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 09:59:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779296357; x=1779901157; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H7TAEp9q//rixySKUh0Tspzo/0EDR88Kz9RGYRdINGA=;
-        b=Xt4uN8yVvxa9hVN1z29L2KOGHYh0NsE3A3GRJA6naizfc37eEDzZZcDfObA2CAmq1U
-         c3yjUmA949D1gkGyQznm1dxzWbOFwLJ36DE1/y443cxHxgJLF7kuLyuJBOIA1d6edNiq
-         kmKlb5QdIa7rNNz8+vqcxMvgQQzGlzYWTpCFJm7nMd4L8WyV34Nv1NUfQP5YHbo8WDJD
-         iy1u2Kv5HSwjIFryNxaYYp3td+hJUTSpz7KUYUGU0z31aeoGD5j2kLr0mm23NIvlfm9j
-         U3gJw5OutCbGYYSJyAyyFP/hSjwHWAmFU/sV+d+Q8IAnDLiCkIyXkCcJi0c4SVDJji4S
-         8RZw==
+Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-44dd5cb0f81so4221683f8f.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:23:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779296357; x=1779901157;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H7TAEp9q//rixySKUh0Tspzo/0EDR88Kz9RGYRdINGA=;
-        b=a6ottPkcN/zi88pEteANF1K2jbZf+dkTI8LIkhC1FEv/SErSaJU7tTnqaUVrRqBGRw
-         s2Aag6zmqWaJ0sMLyydXb6F3X2NtJzIzBOHBNUpDm6xS11e4UEBEyxmF8np7DjrHu1Ht
-         9QA0X5DxKqeoP4xEWGVYrnUOHPvwbbJhbwyp7tl23mMwB4vZicugGjEDCzYni/WTkNlx
-         eHnN9EZKXMTMSI/UQiaCtks0u7BexwuM+AtL9RnvJh5Ydg+BK29eRAsssb8ESY93mI6g
-         D9POQHYtMCKZZHurdSd+CsQPFAeZLqB4IijJXqAXRo9A53MLtvXHAeaq7hxQCCiZq/VF
-         V+2w==
-X-Forwarded-Encrypted: i=1; AFNElJ8m945t4lhkHKg4EePSv49yPgyiEJ1VFucl1iqpSy15ZyOE3MmjZ4qd/oOXVTzpNadCvtMKP0w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEOgbpx40IWSuLXtwWPbg/neeRFm9+sPCybgRCF11vIdSD8dU3
-	4uK+EAiqe4Dk5/WfLEZiS50HIpt5AcCcyaGsg0+MswXJCv6x8w4PWgpq
-X-Gm-Gg: Acq92OEcG6HkQF89gcK5+W2DSgzmYPS5wxZe0kKkbPA4/5/jqYJkZ6vhrU4+9m7S0eM
-	wD3ADJg2F8JpvUO0IhS3RQgenxYrX+Z2vNPBkNK0FEdaxrQQch/UVtJff8h8tL1Ygn7dorgkCpw
-	o7vdnym1ayFHgcALufWpfcqhDUIEAHInwP81QqkdJaexUPaNBzorb1hKRkYpv052dYN4YxF6LYX
-	/hLqrCjgBleJ7NQ/zrQrNIIcJBkRhHVdtBvdrfYxK0JK7nQ04bDtxOVv1Wxs1U+cgkP2isSnhtO
-	Kbdh/V5cxzbPMpb6TJreK4FmqePvj4t/ZMvFCSPSw5bEF4JzfMCUlVl+IS2JQ8xj72G5GNyTn78
-	8geZPyuW4LC8qU/MLHxc7GbhUni8Mx1DaPVp+mkjo7xud9rJFdvtlvHSzZFawkSEAziamxEAMC0
-	GLghZBQiMy3hgVuVJTowoU
-X-Received: by 2002:a17:902:f987:b0:2bd:2430:eb7b with SMTP id d9443c01a7336-2bd7e8cbdf8mr183864475ad.12.1779296356690;
-        Wed, 20 May 2026 09:59:16 -0700 (PDT)
-Received: from john-p8 ([98.97.43.100])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5d11b495sm234935005ad.69.2026.05.20.09.59.15
+        d=1e100.net; s=20251104; t=1779297816; x=1779902616;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tIvRpJlug7n9+LmRFfk3DPM4edMme0ZuT6gdm05cYBg=;
+        b=M/T+hB6iDJjx2r7QWFsITAGlOXF4y131TLdVZglR+5aKMtHzIRoealufomtlrpMD8E
+         x3d/XfSQDfiy22lNLAo0ROyTXFfV7eCeAEjPxNGf028iRwzZu43QWA/xjCPk5ENB4rhW
+         6IsaqDzJTdm9WO+uZ3bx4lhYnM1ZRhrn0Gr6sxiqls1a74hc5IczhXfPFzHSU3LingRS
+         v1MFmJQxIkpeYh/HYDbNdPG7/+RwGuXypslAoUq/f3U2MLJ1gAckK5zlAZ3rMnAnmevv
+         Ujp6JfQqAlK3LsuOeyoiwJLZSCbnWO5VSYDAyPYytuwlbXij+AbCz8DM/+cCPpv7OHJ/
+         Zv+Q==
+X-Gm-Message-State: AOJu0Yy/SLd/31992iqvlCxvQPqJ5doGkjHxtD9nR3MHv/HKpHOMOgHC
+	zghaQrTPyMiR3MJjE0kKl/zyfl6PK1RTjL/BH1gJTgWpo6UX5hysEH8lOOrXCXNI
+X-Gm-Gg: Acq92OH5HNfVgWLbWCFPYd754k2EZvBZb3F8n3vC72dVpKu4QjGcbwH91ln3AJ/5T95
+	QOB7eLIj4yEfhRWR+0X0bf+t/2V60Cw7P4KpsmfVbjbDR26EBBngsfMerWgGQzpJ7bk3RoP/Wfp
+	trvR53uC770xvyiy5NxVLiypl83PsGu4wuDywYnDIQ8dO0CaAcRF8P+4NiOTtM7YyYe4Fq1I1mw
+	QWfDp/h97bwiVjdYUkOGNAxXF5ZGwTNO4pPDk3z0Nm2O7H0y5aVYkSPz4E6irFiQf8hl1VDVpFl
+	i3gtctoSk7eWsbLBQiggVzLLeDmnQwsrTaoifNm5VlbwvPQ/z8cmkJR6HK3J1Lv5VTjtXQoTqyE
+	GLRg94oLVVrF2oBO3/JIPTNXh3sLgTv5LoYvle/hqr4HvkNNNSyFXaMAPjEwZsmvbTtV8hXhcic
+	/bnS1MXgpvdAYTCvuhmc8PF/Qy18I5a6qy53tWUCHSFjhs/Z4D2g/ITYsSzy0=
+X-Received: by 2002:a05:6000:18a1:b0:43d:78ae:b785 with SMTP id ffacd0b85a97d-45ea0d89f66mr695485f8f.21.1779297815622;
+        Wed, 20 May 2026 10:23:35 -0700 (PDT)
+Received: from im-t490s.redhat.com (89-24-32-159.nat.epc.tmcz.cz. [89.24.32.159])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0fe0fecsm51125580f8f.26.2026.05.20.10.23.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 09:59:16 -0700 (PDT)
-Date: Wed, 20 May 2026 09:59:14 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: bot+bpf-ci@kernel.org
-Cc: rollkingzzc@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, sdf@fomichev.me, jakub@cloudflare.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zerocling0077@gmail.com, 2045gemini@gmail.com, 
-	stable@vger.kernel.org, martin.lau@kernel.org, eddyz87@gmail.com, 
-	yonghong.song@linux.dev, clm@meta.com, ihor.solodrai@linux.dev
-Subject: Re: [PATCH v3] bpf, sockmap: keep sk_msg copy state in sync
-Message-ID: <ds3zog2r7avfbiu6je6v24oevvg3ogaegkrjdv3w7ibm5eb7hy@unozyvsnb2ou>
-References: <20260520102715.3033936-1-rollkingzzc@gmail.com>
- <646104384170b8d95ce979ba3d0bd87a808e5dd2a1f6b2bc4e0a346ca38e654d@mail.kernel.org>
+        Wed, 20 May 2026 10:23:35 -0700 (PDT)
+From: Ilya Maximets <i.maximets@ovn.org>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Kees Cook <kees@kernel.org>,
+	Adrian Moreno <amorenoz@redhat.com>,
+	Jiri Benc <jbenc@redhat.com>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Matteo Perin <matteo.perin@canonical.com>,
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [PATCH net v2 0/4] netlink: fixes for cross-namespace nsid reporting
+Date: Wed, 20 May 2026 19:22:34 +0200
+Message-ID: <20260520172317.175168-1-i.maximets@ovn.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <646104384170b8d95ce979ba3d0bd87a808e5dd2a1f6b2bc4e0a346ca38e654d@mail.kernel.org>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290022-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,iogearbox.net,linux.dev,fomichev.me,cloudflare.com,davemloft.net,google.com,redhat.com,vger.kernel.org,meta.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johnfastabend@gmail.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[ovn.org];
+	TAGGED_FROM(0.00)[bounces-290023-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,6wind.com,vger.kernel.org,canonical.com,ovn.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7EB935949F0
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ovn.org:mid]
+X-Rspamd-Queue-Id: CE8A1599B4F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 11:09:36AM +0000, bot+bpf-ci@kernel.org wrote:
->> diff --git a/net/core/filter.c b/net/core/filter.c
->> index 9590877b0714..223d78708486 100644
->> --- a/net/core/filter.c
->> +++ b/net/core/filter.c
->
->[ ... ]
->
->> @@ -2794,6 +2835,8 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
->>  {
->>  	struct scatterlist sge, nsge, nnsge, rsge = {0}, *psge;
->>  	u32 new, i = 0, l = 0, space, copy = 0, offset = 0;
->> +	bool sge_copy = false, nsge_copy = false, nnsge_copy = false;
->> +	bool rsge_copy = false;
->>  	u8 *raw, *to, *from;
->>  	struct page *page;
->>
->> @@ -2866,6 +2909,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
->>  			sk_msg_iter_var_prev(i);
->>  		psge = sk_msg_elem(msg, i);
->>  		rsge = sk_msg_elem_cpy(msg, i);
->> +		rsge_copy = sk_msg_elem_is_copy(msg, i);
->>
->>  		psge->length = start - offset;
->>  		rsge.length -= psge->length;
+While working on some new features for OVS and OVN we discovered that
+self-referential NSIDs get unintentionally allocated in the system as
+well as unexpectedly reported for local events on all-nsid listeners.
 
-Zhang,
+More details in the patches.  They change user-visible behavior, but
+the current behavior is arguably a bug, as it makes it hard to use
+all-nsid sockets without a decent amount of extra unrelated work of
+tracking when new NSIDs are allocated for your local namespace.
 
-Did you want to push two smallish patches to fix these two? I have had
-similar patches on my test system for a few days so they LGTM. These
-two fixes
+Tests are added to check the expected behavior and YNL is extended to
+support all-nsid sockets in the tests.
 
->
->    page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC |
->                       __GFP_COMP | __GFP_ZERO,
->                       get_order(copy + len));
->
 
-and
+Version 2:
+ - The RTM_GETLINK change is dropped for now as it is not suitable for net.
+   A fix would require an opt-in flag.  [Jiri, Nicolas]
+ - Added a fix for 'nsid_is_set' flag not being reset between sockets. [Sashiko]
+ - Refactored the ynl code:
+   * Moved recvmsg call into a separate method. [Jakub]
+   * Added doc-string for the ntf_listen_all_nsid. [Jakub]
+   * Mentioned it in the Notifications API section.
 
->
->    rsge.offset += start - offset;
->
+Version 1:
+ - https://lore.kernel.org/netdev/20260515201937.2813983-1-i.maximets@ovn.org/
 
-bot must be reading reviews because I called that out in v2.
 
-[...]
+Ilya Maximets (4):
+  net: netlink: fix sending unassigned nsid after assigned one
+  net: netlink: don't set nsid on local notifications
+  tools: ynl: support listening on all nsids
+  selftests: net: add a test case for nsid in all nsid notifications
 
->
->Could the ring buffer state become corrupted when data is appended exactly
->at the end of the message and the ring buffer is full?
->
->If data is appended exactly at the end of the message (start == offset +
->l), the loop finishes with i pointing to the unused slot msg->sg.end. If
->the ring buffer is full (!space), the coalescing fallback logic reads:
->
->    copy = msg->sg.data[i].length
->
->Because i points to an unused slot, its length is 0, making copy == 0, and
->the fallback coalescing block is bypassed. The function then
->unconditionally calls:
->
->    sk_msg_iter_next(msg, end)
->
->which increments msg->sg.end. Since the ring buffer was already full,
->advancing msg->sg.end causes it to wrap around and equal msg->sg.start.
->This could corrupt the ring buffer state and overwrite the first element
->without calling put_page(), leading to page leaks.
+ net/netlink/af_netlink.c                  | 11 ++--
+ tools/net/ynl/pyynl/lib/ynl.py            | 37 ++++++++++++--
+ tools/testing/selftests/net/link_netns.py | 61 ++++++++++++++++++++++-
+ 3 files changed, 99 insertions(+), 10 deletions(-)
 
-^^^
+-- 
+2.53.0
 
-This one I haven't looked into yet. Let me know if you have time to get
-to above two issues this week would be great to get a v1 out at least.
-
-Thanks,
-John
 
