@@ -1,228 +1,250 @@
-Return-Path: <netdev+bounces-289974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289975-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0N9FLY3FDWrg3AUAu9opvQ
-	(envelope-from <netdev+bounces-289974-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:30:37 +0200
+	id sCAfMwPIDWod3QUAu9opvQ
+	(envelope-from <netdev+bounces-289975-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:41:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A522D58FA6A
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:30:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B17F58FD4D
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 664B730C567E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:17:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF62F30F8F42
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E823EA972;
-	Wed, 20 May 2026 14:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E433EB808;
+	Wed, 20 May 2026 14:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WVQyWPAT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvSBjbOe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7014031B114
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 14:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779286620; cv=none; b=OoNeT7d/K7JXPRXUfYFvy3EjGLLR+h+fP6Mp1N7Gf60zDr+C+mlRPDLOSkO/wEMvAc6CR4HGZCtTfMC7SHU90CkoL5+gutpsy2PLFz9hktsLOUQhykZKqOds1k+t+svBhRhfjyAtSxekGecrxefBatCxJpYoa1kXz8FRcda7D+g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779286620; c=relaxed/simple;
-	bh=WjKqJkiCTtmvejCIJSk2+o8+CaSQCH4dCt3cUySSNT4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Opw8NV7o8lHnP3T1rM/OIMWeRMbYR3s5WZi6Bb+FxxGeRrrt7uVOyNH2PdP/qjqQaqo69nAs4DVls80iWJMXAbKRZOhZkOfV4vD4q3TjZ+2txD4yRbDrt/KaWVLYDXFhhm6TCqONZZ7t9m9NNovSdI3K7hTxPwT/dRg6W6cXWwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WVQyWPAT; arc=none smtp.client-ip=209.85.217.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5A027B353
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 14:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779286815; cv=pass; b=LcVkuiGYJ5BOhr1/YBJ2Qf5Y4KLmH5MYEFFoa8PfTsuHcB9R8fnzLrNXFMcjkcxz1d5BoB6jrMNewq3Tgbukxh+GV15Z9bar51NIpt3Dfy8avVwRI5nHZXI0IiPeZ5lhl2ifBrlQzNSyjlkPG+vcpJ52Sq1taj6lG3amnWXI7DQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779286815; c=relaxed/simple;
+	bh=DCU90GwE/ZuwHdPi0QTy9yMdv9sIhc+WGo6IzUy2AFw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gGVENYxYZmA/XScuzcItsDf9KcRZ68dnRs6UU72ezFHx1S3KqdZgBy6GoeWCI0CKrp+u+h0oX36MXQSh7pqHXBUAGltlvt0412koIhqzfUYfboV6imoYMNuPo6audrUIWGhBzuV+XWpCclMRUQNFNW4zKHR89Ju67KgYBD9Vgb0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvSBjbOe; arc=pass smtp.client-ip=74.125.82.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-63124ac76f5so1389247137.1
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:16:57 -0700 (PDT)
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-2f68f3b075fso2419967eec.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:20:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779286810; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bdDbDH9glLIFhdn7zSA5bL2CtQJdci+jQLbFULFlGmuPdqrCrZJNvDM1xxaT3Glse3
+         xshhsAOp19dE2nKTVKkssJ3Q/1xondnQ1/lVdNJrr2tJTxKW8BLnWLJFCf9Ok8wcm4fh
+         tah8F0DLcYAK51uOCcXZY9NKExPAuKEHZXBf5XxiWf12jutdwX1Wn9lgGPys058aDJR1
+         ALTBrR6tWIzUB4cnXzFzDD7nouut5rw32kAKj07sBqH7W2443kx22tUXTKTO0tTMGqls
+         UY/2JodKI7+hdQL40AQJ8eVmBlC1c8Kgjf2Xbq1vvijZ83NFmwnic+nLTcdDoCFOO5JS
+         z2Ng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=VFiB/PW9sQR0VXs4DboOpTUqLnAoFKcFHc55VSpyjYo=;
+        fh=hmhJ/Oergd+8dzeYT3s7s6hzKGiSbgE+u+IldxOc9wE=;
+        b=Posga0UmZhG2CtWCZzq+C86mj9FKh0hNDCXiDSV1mfvea6euQXxAj2tidShx+S0moR
+         npcN1Jm4pP42l2wIQ/oHLDtdwUwVO2tO+UJnkrn7xqL7FKjXNS3zwXbzFHee1bSfrz5R
+         x+v0qDX2JMi0Hd1RTciDsHUlsZVyePsnyj9YP85Wxeo2SsJhZYD3BioUsBxTf9lMp2e1
+         RF/QEVU4BRy3D4/U7E3Vp+Y5ojmqV3ZFX18fcRL6dC57+nno8d4GursdDtrtx5T5zcod
+         2yHKah5SiOtbQvTwFewlKPrfRrFqBgfEG74C1zv5tBTxCNQn4D3AhPSicpAp00B+E0s8
+         /Xlw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779286616; x=1779891416; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779286810; x=1779891610; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rx7r4Y10liUqwimwJdlvRGNK/vx0KHWn1LAYPWA617s=;
-        b=WVQyWPATep/Iwv/N0fjKzeadrtnVzQp0seoFvJBZam/ptuvhzMcGrSIdjsdAHi5gAi
-         6NRIkIE7zMI06DbifRdAjjhcs8G4cQteNNB791/qKH5GPtekoTgyY+r20//OeqFWz9Mp
-         HNEudbUCzaVJ9nFQfkiIkYb8uKR4Ec9n/cJco+NypUUaztJeK9cqJrDahlPR5aKW598d
-         q6qAcDEokJE1vtPhBit+iPRgkcOOgCHqE+TDocLUPPUi3ezk7t+xnavEDVi1gg7lbMyH
-         FXm52GznWG9hTdzSnGWxUYwAUuCCGdU+Ln4nzYhyT0EVEg00A9AIjdjXyIWU2EFfiWbT
-         ObYQ==
+        bh=VFiB/PW9sQR0VXs4DboOpTUqLnAoFKcFHc55VSpyjYo=;
+        b=dvSBjbOegkV11Sojui1nGLWgCKpBSEl/vCrfsV/O7M6e4fTAdvKUp78nx7BCzxd3hP
+         IkZIEXQJKNvAIfyHzm9f74t1LI/bS++sZYer+dCvKpBp0mb7+wTHu5NjLPKdespoU2A2
+         IL684wnlw2xb7m240HOAn2aadL7DboLMYN5KNEiIIBB8+Lg2f2m65wPEvDOJbiPlDMxw
+         xAwiUPdmG+WG2+P83GcWoWknurCLlT0YIUG6BEo82L+i//xPD524Uf/+4Ipwe9pfyd95
+         8MkebDlongB50ysuZ5LHCiIPEbWdD2cul8ApW1XI5KmrLoHE621g+h73mxUKromYHJ0B
+         TmRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779286616; x=1779891416;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1779286810; x=1779891610;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=rx7r4Y10liUqwimwJdlvRGNK/vx0KHWn1LAYPWA617s=;
-        b=X8Qgi4y57/P+2fx9+nz5bAvsSz5YIOwHOzfH576yi+IeJ7h8gnFXO9iJg2YTOPscM9
-         QN7oEJswUOqXBjQ7jXRLj+lb+degF/5ijTvTYzu9dwgDr/o14QWnBdJTP3tx8xjQXK7J
-         kGs4PMQsdkm69dG1z1wrjt0J6u2QOM4YiS49Gc+/fbgyb27YTAOqPLoPIQOfBFq6DRyI
-         bOaG6j3PUR7SN2Q1SD5XnFmS38pcmKhRvItOcqK6T5EUvzuV4Of458DtuFdDwZzkaJey
-         +zlH3go1Vl4sMUWSjIAlStnUqK6CCMvvagJUryBd7ywRrIPRX7eoKlYL081uZrCIV5v+
-         Bs6A==
-X-Forwarded-Encrypted: i=1; AFNElJ+mHLQbMMHrxadbZP9iutN+FtKoGlX+LH/reYYWQv4QKbk7AYFrmE+Jn6rZzcsZ8k1j6+5b0i8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR97NUf/2ZW1Ajj/h+5pDo7kJNhRVVBQ1m8puBxV0+z9Sb2KkR
-	JXh5C97pq5np32GDYBwg3ZbtqvV+TEXEnMAHwm4TAJMA7wHe76SsuDYh
-X-Gm-Gg: Acq92OHf0GjTIysSmCrWoa1VWCopdRbsRwZwXna6scjYH5D4+repjX+NRoyVuQ0VP6f
-	VbTfoZURJvpEGd11/UnCgBxGWAGztXhxKoyFIprxyeO9lsQvWyXxOKBoYg6vE75t8UkZRXJFVGo
-	JorgDPB4G2gDFYAG+h8syFOCMMym8qg2cAk2NomGUDLMqEGEJ7ixNVVB/+/GzxrpqRlTIjNjKi/
-	MZPGlnOgH7aNX3TGZ5HTHg+mshNjml4AmRRb/RQNyllUu9TYxt4AWzPBjWDAPUXYnNfqTmgJsnF
-	oITgm9vIMVqu2RK28I2TNOC9EFLFaZkYKBtTDtxpBl1JqiYqpbeOx6+Dj1O3GrAzA/ot7tRcd/s
-	Y/ZEoH/tzkBlm0FMSmJLGO0VOkkdOJODNeYGzXxM99I0v6L6Rx+6w7O8vczyxufX/SwRmv5ft56
-	eiGM3NXJsQvngXMd4c1g1NCGzJUPzMQvT4duiJWm4nDTOjXh2IUAUaijQfDG8ELM0hqj2/izt2R
-	L+xrh9+UawS6pzNan4jLNRQVDpG7Nw=
-X-Received: by 2002:a67:e105:0:b0:611:61d3:819c with SMTP id ada2fe7eead31-63a3cf120a2mr11450388137.10.1779286616271;
-        Wed, 20 May 2026 07:16:56 -0700 (PDT)
-Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-910ba463814sm2138952485a.5.2026.05.20.07.16.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 07:16:55 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/2] ieee802154: allow legacy LLSEC ADD/DEL ops to pass strict validation
-Date: Wed, 20 May 2026 10:16:40 -0400
-Message-ID: <20260520141640.1149513-3-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260520141640.1149513-1-michael.bommarito@gmail.com>
-References: <20260520141640.1149513-1-michael.bommarito@gmail.com>
+        bh=VFiB/PW9sQR0VXs4DboOpTUqLnAoFKcFHc55VSpyjYo=;
+        b=T8+EK/Z2VgALYzwMR1n1sxQaO041THOzpgAi0PqhYJnYomJKDYoV3ccPaucLCYAxVb
+         q4SL1VS6vcWXpnnWxpIlg35BFr22iglu49PnFO4To8TLkIm2aUH7V2+PN15djxw6EYIp
+         UdE4yGcdXNKGmElXOIFcrrUBBF2qE0oy7O7KPZfMFII5gwjwFYlOirz1GDi23mXCr2R9
+         M8GvbFcfOTanygcyyzRNCzu/8Ts/Pn5NlgNOouMDLqb9P1RO921/UdIhUsQaw5L0KrLI
+         RfIV6gidcSLAkKjh+f6ZzdyTLvG3bFD6vSjkBLBRHUGlkaA7Z1i2YzPiNeJhrfyL4Jsw
+         xPhQ==
+X-Gm-Message-State: AOJu0Yxx34l2yQSBexYzVwElZ7u+degu1+Rm1aC0jX63WZ3pEQdibEWs
+	S3DxKXJnHVq+bo29TCn9h21EkOdpLS36nJLPTuUYYu8UrjckLy1K1zj15oin1GX67xkIVkyYiWA
+	ZLcI0x1tMx94xFffIiAQ31ZJeqy1y2bI=
+X-Gm-Gg: Acq92OF90t/bRTiBZ2sw1iYLwiG7rbqon+rWxtXAuN09NRMdIdP571HIcvuj6YDDdJr
+	yjmiQEaG6CsHkoVeVTFKmdM9W7gV7LPaqD6Y5uE+9FPQq8jyUwy15Qwf0ufCiYB3ZPdF1dJ18CO
+	4/1tAYy8T0sYaShkMSrQX84HFKV8n0qUBlfMSpSwvqG5maQCXtxLNZ/a4AS+TVo3TRDnYR/hucD
+	PC6EUON4uPAUNYKlYkmbw7koqwRMJqDBHPhv0mvSzrChr1aERKX51b9RI3fm1Y4w/V/ljQCiVug
+	TisXRrlEpnWOM/NuOCbhEpInJw==
+X-Received: by 2002:a05:7300:3722:b0:2c7:287:6740 with SMTP id
+ 5a478bee46e88-30398659f10mr12852905eec.28.1779286809772; Wed, 20 May 2026
+ 07:20:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+References: <20260515230516.2718212-1-dhowells@redhat.com>
+In-Reply-To: <20260515230516.2718212-1-dhowells@redhat.com>
+From: Marc Dionne <marc.c.dionne@gmail.com>
+Date: Wed, 20 May 2026 11:19:57 -0300
+X-Gm-Features: AVHnY4LZyU1fN0nLufEfK7ShUQmMFjrVSYIn74dwF45VhlPQ7pv5rafuxGEYCfY
+Message-ID: <CAB9dFdsSi74U3PXqY1Ay3tCc4WYkhbUtmBQqs7ntnOSsVfKRKg@mail.gmail.com>
+Subject: Re: [PATCH net v4 0/3] rxrpc: Better fix for DATA/RESPONSE decrypt vs splice()
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Hyunwoo Kim <imv4bel@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289974-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,datenfreihafen.org,bootlin.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-289975-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lists.infradead.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A522D58FA6A
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marccdionne@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,auristor.com:email]
+X-Rspamd-Queue-Id: 2B17F58FD4D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The LLSEC ADD/DEL doit handlers under the legacy IEEE802154_NL family
-consume IEEE802154_ATTR_LLSEC_KEY_BYTES and
-IEEE802154_ATTR_LLSEC_KEY_USAGE_COMMANDS, both declared in
-net/ieee802154/nl_policy.c as bare length entries with no .type
-(defaulting to NLA_UNSPEC). Generic netlink strict validation rejects
-all NLA_UNSPEC attributes via validate_nla(), so every LLSEC_ADD_KEY,
-LLSEC_DEL_KEY, LLSEC_ADD_DEV, LLSEC_DEL_DEV, LLSEC_ADD_DEVKEY,
-LLSEC_DEL_DEVKEY, LLSEC_ADD_SECLEVEL, and LLSEC_DEL_SECLEVEL request
-fails at the dispatcher with "Unsupported attribute" before reaching
-the handler.
+On Fri, May 15, 2026 at 8:05=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> Here are two patches containing better fixes for the in-place decryption =
+of
+> DATA and RESPONSE packets that can corrupt pagecache spliced into UDP
+> packets and sent to an AF_RXRPC server [CVE-2026-43500], plus a patch to
+> precheck the length of rxgk-secured DATA packets.
+>
+> Of the main patches, one patch fixes DATA decryption by having recvmsg
+> unconditionally extract the data into a flat bounce buffer and, if need b=
+e,
+> decrypt it there.  It doesn't seem to cause a performance problem to do
+> this even on unencrypted packets; for encrypted packets it makes sure the
+> content is correctly aligned for crypto which seems to get a small
+> performance gain.
+>
+> Further, it means that DATA packets are no longer copied in the I/O threa=
+d,
+> avoiding a slowdown of the protocol engine that runs there.
+>
+> The other main patch fixes RESPONSE decryption by having the connection
+> event handler worker copy the data to a flat buffer and, again, decrypt i=
+t
+> there.  This simplifies RESPONSE handling.
+>
+> With these two fixes, the data content of the received sk_buff no longer
+> gets altered.
+>
+> David
+>
+> The patches can be found here also:
+>
+>         http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git=
+/log/?h=3Drxrpc-fixes
+>
+> Changes
+> =3D=3D=3D=3D=3D=3D=3D
+> ver #4)
+> - Updated to current net/next, dropping Hyunwoo Kim's patch.
+> - Don't allocate more than 65535 bytes of buffer so that ->rx_dec_bsize w=
+on't
+>   overflow.
+> - Fixed Sashiko review comments[3]:
+>   - Fix incorrect ticket length limit.
+>   - Don't need the MSG_PEEK limitation; can avoid this by checking seq of
+>     skbuff being recmvsg'd against the one on record for the content of t=
+he
+>     decryption buffer and (re-)decrypting if it doesn't match.
+>
+> ver #3)
+> - Fixed Sashiko review comments[2]:
+>   - Fix wrong abort codes.
+>   - Fix skipped rxgk_put.
+>   - Fix some mis-sizeofs.
+>   - Fix flipped length check comparison.
+>
+> ver #2)
+> - In rxrpc_verify_data():
+>   - Flipped the order of the buffer size comparison.
+>   - Used max() not umin() to calculate the minimum buffer size.
+> - In rxrpc_verify_response(), returned -ENOMEM rather than uninitialised
+>   ret.
+> - Removed the xdr wrappers that were added to make backporting easier.
+> - Fixed Sashiko review comments[1]:
+>   - Added length prechecking of received packets secured with RxGK, there=
+by
+>     avoiding looking at an unallocated buffer.
+>   - Added missing crypto free.
+>
+> [1] https://sashiko.dev/#/patchset/20260511160753.607296-1-dhowells%40red=
+hat.com
+> [2] https://sashiko.dev/#/patchset/20260513131941.1439155-1-dhowells%40re=
+dhat.com
+> [3] https://sashiko.dev/#/patchset/20260514155304.2249591-1-dhowells%40re=
+dhat.com
+>
+> David Howells (3):
+>   crypto/krb5, rxrpc: Fix lack of pre-decrypt/pre-verify length checks
+>   rxrpc: Fix DATA decrypt vs splice() by copying data to buffer in
+>     recvmsg
+>   rxrpc: Fix RESPONSE packet verification to extract skb to a linear
+>     buffer
+>
+>  Documentation/crypto/krb5.rst |  17 +++-
+>  crypto/krb5/krb5_api.c        |  54 ++++++++++--
+>  include/crypto/krb5.h         |   9 +-
+>  include/trace/events/rxrpc.h  |   1 +
+>  net/rxrpc/ar-internal.h       |  14 +--
+>  net/rxrpc/call_event.c        |  22 +----
+>  net/rxrpc/call_object.c       |   2 +
+>  net/rxrpc/conn_event.c        |  32 +++----
+>  net/rxrpc/insecure.c          |   8 +-
+>  net/rxrpc/recvmsg.c           |  68 ++++++++++++---
+>  net/rxrpc/rxgk.c              | 160 ++++++++++++++--------------------
+>  net/rxrpc/rxgk_app.c          |  46 ++++------
+>  net/rxrpc/rxgk_common.h       |  66 +++++++-------
+>  net/rxrpc/rxkad.c             | 115 +++++++++---------------
+>  14 files changed, 309 insertions(+), 305 deletions(-)
 
-The doit path has been silently dead since strict validation became
-the default for genl families that do not opt out. The dump path is
-unaffected because dump requests carry no LLSEC attributes to
-validate, which is why the LLSEC_LIST_KEY read remained reachable
-(patch 1/2). Introduce IEEE802154_OP_RELAXED() mirroring
-IEEE802154_OP() but with .validate = GENL_DONT_VALIDATE_STRICT, and
-use it for the eight legacy LLSEC mutate ops so admin-driven LLSEC
-configuration via the legacy interface works again.
+Looks good in testing.
 
-Fixes: 3e9c156e2c21 ("ieee802154: add netlink interfaces for llsec")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
- net/ieee802154/ieee802154.h |  9 +++++++++
- net/ieee802154/netlink.c    | 20 ++++++++++----------
- 2 files changed, 19 insertions(+), 10 deletions(-)
-
-diff --git a/net/ieee802154/ieee802154.h b/net/ieee802154/ieee802154.h
-index fd9778f705503..e765adc4b88f2 100644
---- a/net/ieee802154/ieee802154.h
-+++ b/net/ieee802154/ieee802154.h
-@@ -16,6 +16,15 @@ void ieee802154_nl_exit(void);
- 		.flags	= GENL_ADMIN_PERM,		\
- 	}
- 
-+#define IEEE802154_OP_RELAXED(_cmd, _func)		\
-+	{						\
-+		.cmd		= _cmd,			\
-+		.doit		= _func,		\
-+		.dumpit		= NULL,			\
-+		.flags		= GENL_ADMIN_PERM,	\
-+		.validate	= GENL_DONT_VALIDATE_STRICT,\
-+	}
-+
- #define IEEE802154_DUMP(_cmd, _func, _dump)		\
- 	{						\
- 		.cmd	= _cmd,				\
-diff --git a/net/ieee802154/netlink.c b/net/ieee802154/netlink.c
-index 9c9fd14d0ca8b..cacad21347eca 100644
---- a/net/ieee802154/netlink.c
-+++ b/net/ieee802154/netlink.c
-@@ -100,22 +100,22 @@ static const struct genl_small_ops ieee802154_ops[] = {
- 	IEEE802154_OP(IEEE802154_LLSEC_SETPARAMS, ieee802154_llsec_setparams),
- 	IEEE802154_DUMP_PRIV(IEEE802154_LLSEC_LIST_KEY, NULL,
- 			     ieee802154_llsec_dump_keys),
--	IEEE802154_OP(IEEE802154_LLSEC_ADD_KEY, ieee802154_llsec_add_key),
--	IEEE802154_OP(IEEE802154_LLSEC_DEL_KEY, ieee802154_llsec_del_key),
-+	IEEE802154_OP_RELAXED(IEEE802154_LLSEC_ADD_KEY, ieee802154_llsec_add_key),
-+	IEEE802154_OP_RELAXED(IEEE802154_LLSEC_DEL_KEY, ieee802154_llsec_del_key),
- 	IEEE802154_DUMP_PRIV(IEEE802154_LLSEC_LIST_DEV, NULL,
- 			     ieee802154_llsec_dump_devs),
--	IEEE802154_OP(IEEE802154_LLSEC_ADD_DEV, ieee802154_llsec_add_dev),
--	IEEE802154_OP(IEEE802154_LLSEC_DEL_DEV, ieee802154_llsec_del_dev),
-+	IEEE802154_OP_RELAXED(IEEE802154_LLSEC_ADD_DEV, ieee802154_llsec_add_dev),
-+	IEEE802154_OP_RELAXED(IEEE802154_LLSEC_DEL_DEV, ieee802154_llsec_del_dev),
- 	IEEE802154_DUMP_PRIV(IEEE802154_LLSEC_LIST_DEVKEY, NULL,
- 			     ieee802154_llsec_dump_devkeys),
--	IEEE802154_OP(IEEE802154_LLSEC_ADD_DEVKEY, ieee802154_llsec_add_devkey),
--	IEEE802154_OP(IEEE802154_LLSEC_DEL_DEVKEY, ieee802154_llsec_del_devkey),
-+	IEEE802154_OP_RELAXED(IEEE802154_LLSEC_ADD_DEVKEY, ieee802154_llsec_add_devkey),
-+	IEEE802154_OP_RELAXED(IEEE802154_LLSEC_DEL_DEVKEY, ieee802154_llsec_del_devkey),
- 	IEEE802154_DUMP_PRIV(IEEE802154_LLSEC_LIST_SECLEVEL, NULL,
- 			     ieee802154_llsec_dump_seclevels),
--	IEEE802154_OP(IEEE802154_LLSEC_ADD_SECLEVEL,
--		      ieee802154_llsec_add_seclevel),
--	IEEE802154_OP(IEEE802154_LLSEC_DEL_SECLEVEL,
--		      ieee802154_llsec_del_seclevel),
-+	IEEE802154_OP_RELAXED(IEEE802154_LLSEC_ADD_SECLEVEL,
-+			      ieee802154_llsec_add_seclevel),
-+	IEEE802154_OP_RELAXED(IEEE802154_LLSEC_DEL_SECLEVEL,
-+			      ieee802154_llsec_del_seclevel),
- };
- 
- static const struct genl_multicast_group ieee802154_mcgrps[] = {
--- 
-2.53.0
-
+Tested-by: Marc Dionne <marc.dionne@auristor.com>
 
