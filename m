@@ -1,195 +1,194 @@
-Return-Path: <netdev+bounces-290079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290080-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLnXHQE3DmpN8QUAu9opvQ
-	(envelope-from <netdev+bounces-290079-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:34:41 +0200
+	id gN24ETM3DmpC8gUAu9opvQ
+	(envelope-from <netdev+bounces-290080-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:35:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4D0459C1B8
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:34:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAAE459C1E4
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:35:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38CE63283411
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:32:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD133329BD62
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D989348C4E;
-	Wed, 20 May 2026 19:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A4562367DF;
+	Wed, 20 May 2026 19:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="PnGibpC6"
+	dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b="T/pqa5Hk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from srv4.3e8.eu (srv4.3e8.eu [193.25.101.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560E91A8F7B
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FBA3469F6
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.25.101.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779305543; cv=none; b=K1UyGf8H2sn5HOT4dLfaBmnPULCTlddMOmVDvHwWecBIAK5sjll8nENgnpAH5TUZHy6soFmmxA97HZPbVAZKWrd6bmGpNV2hjiyz1Ybe63wMKb3NrWHzLhlEFnl2VAY8I0Bhy9kUk6D7UwzBtmKceEDvoy/v5kxqwvd5xgzK3Po=
+	t=1779305672; cv=none; b=PVMxfyuIpwTNHfbvr/i5qKganKf4OfMeuBXtWTg376xZpRReIhFtSc3ijeuKxlQvKU++UOAVyLvpKl/jnHWWMRN50Kzv60iEmp5hv6w7GJBXdQ6S8J6YnGywTqJYwYzRAmCr9Cd0FGldxUcJE5pN3z/R4UoQ9NroBDTAlUVQ8wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779305543; c=relaxed/simple;
-	bh=fE7L5X0OAZJPu0MR4qi275DCqHXUYbK31o+O4PycIek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BPujS+CtSIdYd7DeU1+z09EV4Uw7h/NvP2wmN5PDLwIRK7e+bI8k5qvnQLoWJKGz3jzpK6/cWBK0UJ+Pyc43MhofVvC3/mIr7cIZoWFNt6rwqDrTxZ6wKzOjEu7MHL0X38AloqJhmJ2MURA72zf3gF7ki1wTlR92Q2nbl6CPyIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=PnGibpC6; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-67bce1840f1so9041747a12.3
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 12:32:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1779305540; x=1779910340; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XtsLxXbuubW9aHbvOjPZig1kaSvDhEBypwJASxFDBgw=;
-        b=PnGibpC6rUadOiLRkvAXF6JgM6bQwoQyo6ys6Q2CJacxAU73u+6XZ0yoP+Cjb61/li
-         BfqnfLjWnBd4PsT1fMwJ2v4rQGmAeNp+gPIUuo+5tiRgM3j6WvHjyPemyqxdvm8PXT3R
-         7BULDtbzf7AL9/WnfKvWQ66RdEzaVGZnOZF8g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779305540; x=1779910340;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XtsLxXbuubW9aHbvOjPZig1kaSvDhEBypwJASxFDBgw=;
-        b=q8gaU5hyt+U20+QvQf5jad5IOPghPoC4iAIb2iG11Fq7UlCrxlvT2VQv1kyFu4PJW8
-         1LqnZpRRAYZLcFelP4zSAYOG/Ky9jMRsz/cMOD9jtzkhrs4/Wp7RTfdj9/2ce52N5gS3
-         StXAECDHXoPgKqwNipMI/arHTEhYhwZEizenWLmMkxQdjbeaa9Bmw6txwh0YaNEwIQwo
-         esIGvi61pHNoSZsg6FcniJvmLTRGUJvRXZ3OMG5wgMn0ZLLvtd+5qxBbGBnnPuH/lKHu
-         zWqblbFH82kLve5Lp4iPtpPNPfZVytYz8e9ucHXTOsd/ilevl//Zs/i18Wii5bQtJPmn
-         Fr1A==
-X-Forwarded-Encrypted: i=1; AFNElJ/iglYTeXWRof9oJVmthPfWSIoYqUag6h+FOG9Zgq1tYLpsHWWylLUkKSfwzGJqmHBfjyoa5lw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxV2yW9fF3WTar9jCk3ZYU9D13rJmfN3KBGdD03Zg9u9KJ2r9l
-	f8GsMHjRj4npoe5ukseNsYCPj/cG32ZKgUl/sCavAVHpmhxRW5qAqiZh79wzc6HQAtjdBshPFZu
-	Bw+UfjoHH0g==
-X-Gm-Gg: Acq92OG9kH1lT+TWCeKUPGmHhS8hpV/TRmEt9j8x9Ew9+k5NKBx8OTLvTAQAdIhbcYN
-	uyZnZHA8QN8VQWcH107azfbIPLDE7ysgE7J92pk1vB4zTSdrk+OS9fmqPimHaj5dwo2xDj4rFLR
-	cj8fGcNZ3CcUWJZZE6VJc7yb3qkr7Coo14FJlwO1WihPScqhLNEcte2mkid7TC9wJA4kJIzgQYS
-	Owu31TNY1zAhWiUnMbksGmhBhZc5UJYLte5Hj0OxpVdep5dwuP9gjcfseEDM/ZO273RMmhE3wr2
-	nywvc+MW/cnJr6taiX0p0PqWDaGcta5jjTgOkHh5zBgoXp19VzYGJemeoXzQu7e0YwyoX3hLeZs
-	72VdvnUqFcbWr/QyEo3CCH1eQjp4kzk62wlObEVbCPyMqiUOgYclb597t5MZV1MNhX4dQ5Pdb70
-	N4ohh8cKXsR3bZIaUERrA9BzKvAzgk7rikD9y773lHfRhGgMo+28i5M8d+6eH5PTcwocxtIXjy
-X-Received: by 2002:a17:907:dac:b0:bc2:1dab:3ea0 with SMTP id a640c23a62f3a-bd5177f0021mr1355811966b.8.1779305539559;
-        Wed, 20 May 2026 12:32:19 -0700 (PDT)
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com. [209.85.218.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4ded99dsm885485366b.30.2026.05.20.12.32.18
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 May 2026 12:32:18 -0700 (PDT)
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-bd0209f25c1so916891666b.2
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 12:32:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8RF5FZ4ucWzJL3yKlChGbPg+njErEd66LyGlpsKTgSxLsLX1i6eszC1DzuvdWUi87o7+ADAzc=@vger.kernel.org
-X-Received: by 2002:a17:907:8305:b0:bd5:2ed4:4ef6 with SMTP id
- a640c23a62f3a-bd52ed45a11mr891164366b.19.1779305538567; Wed, 20 May 2026
- 12:32:18 -0700 (PDT)
+	s=arc-20240116; t=1779305672; c=relaxed/simple;
+	bh=Ps9r1dbo8FjNVIPDw0T+23sQrwR5riwPhWC1nSF4yZM=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=p5vPx0vYbVHcsyeGbTYsYrRNspn1p7n4RFvCiw39wF26h9wk67mm9J2VwXK45gX5CDLscsUadlqiqNaq3UFy4gBNL7bwrWCCtu2ZWaTUFR4DnJyM9fRPL/9ybWST4x0Vnj02XVQ7+Sr/151sZttCA+V6pA0VWCxUEPPBLI7u9ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu; spf=pass smtp.mailfrom=3e8.eu; dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b=T/pqa5Hk; arc=none smtp.client-ip=193.25.101.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3e8.eu
+Received: from [IPV6:2003:ed:4732:25a0:50c3:56a0:3512:8308] (p200300ed473225a050c356a035128308.dip0.t-ipconnect.de [IPv6:2003:ed:4732:25a0:50c3:56a0:3512:8308])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by srv4.3e8.eu (Postfix) with ESMTPSA id D5AD2400D1;
+	Wed, 20 May 2026 21:33:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3e8.eu; s=mail20211217;
+	t=1779305602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=oOEzfbBHPC8r9KpG96ViZs/3f+GP1SliqG4aMfSM2bA=;
+	b=T/pqa5HkW95z8YcfdexeFz7Go9LlS4ttsSchpEOqx4+ZgCzI3Hz7aKGnwrgm72mw/YNyYq
+	H+1BsBn2ZcctWeMlGxWWD/LlTPKAqOAIe+i5O7aKQJcXGG7RRuTawvQFg3TY+Amr1Lo3PB
+	Jn3CCXKVrE4GtczNPhwzjG8hIeTE/ouBAEhF59MfpGeXKp1rc3MLWD+Dtp2TEkZ+uvWCW9
+	JTBL2+gZSv5sKqgqvZLf8Cq8dmLo1rJuvVaWAs+XgFX05NAtBcS85YT+qiPv8s4Vvlu+5W
+	ccfUvXaeMydfUysQIjGfwKKZ9EqhTrLiNaSu0mjb0bLQNnh2WTkz41rIa4MH4A==
+Message-ID: <c90c514a-2da4-42a5-b416-506cb2aadf0e@3e8.eu>
+Date: Wed, 20 May 2026 21:33:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh> <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
- <2026051909-impurity-nemesis-2f65@gregkh> <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
- <2026051942-uproar-drainpipe-6370@gregkh> <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
- <e666c332-e2aa-4525-a208-a4a08742d2e0@augustwikerfors.se> <2026052026-barber-espresso-1d9a@gregkh>
- <CABBYNZJ4woc+unpYN6_dzMLtxhFVUd5+ccv2+EQbDMkYuXQ12A@mail.gmail.com>
- <2026052047-silica-grub-0bb2@gregkh> <CABBYNZKnrqHyASMOah795i9eteY7S5AfN3tCWssSRgqBXZwRMw@mail.gmail.com>
-In-Reply-To: <CABBYNZKnrqHyASMOah795i9eteY7S5AfN3tCWssSRgqBXZwRMw@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 20 May 2026 14:32:01 -0500
-X-Gmail-Original-Message-ID: <CAHk-=whwq2_iaf7pTuzVXEcJmng_exwae_bKtgSDdm4BQivGHg@mail.gmail.com>
-X-Gm-Features: AVHnY4JbF0smfoYDE8sbuuYGNoDoNmD1Smk1nthlg9vTbrAZFGd72HXyofmB_k8
-Message-ID: <CAHk-=whwq2_iaf7pTuzVXEcJmng_exwae_bKtgSDdm4BQivGHg@mail.gmail.com>
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, August Wikerfors <git@augustwikerfors.se>, 
-	Thorsten Leemhuis <regressions@leemhuis.info>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, Linux kernel regressions list <regressions@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+From: Jan Hoffmann <jan@3e8.eu>
+Subject: Re: [PATCH net-next v4] net: phy: sfp: probe for RollBall I2C-to-MDIO
+ bridge in mdio-i2c
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Petr Wozniak <petr.wozniak@gmail.com>, netdev@vger.kernel.org
+Cc: bjorn@mork.no, andrew@lunn.ch, linux-phy@lists.infradead.org,
+ kuba@kernel.org
+References: <20260519043249.2868-1-petr.wozniak@gmail.com>
+ <e563f0be-8cdc-4451-ac93-af3a35485af9@bootlin.com>
+Content-Language: en-US
+Autocrypt: addr=jan@3e8.eu; keydata=
+ xsFNBFTH+vEBEADkcsHlJpyRJydfNeBm35/sU5Rm/gzvrwatYF44RSosfzNvZ7Ihb0ouazI5
+ 3PzOS46yAc8LyujrZnH/06/nWqTLyxxwXoAIeUc87MboDKYQzskP3HAyqF6NgPH+MgUQB/8a
+ 56ypfOD1f0MSod7kO3sz/y3QdO6kky+JX7Sq3CsfKUg4DrARvpGKrrqHA0xNpsz++9pYUveW
+ i7jJlDz917HpcX39GnBQnLByDTML5cfQYiRMjQiPfwWRUUgsnxWDLkfOlWVW+wU9zvEKJGNP
+ 6VAT38C3WuurCeHbslp26D2J4NBZdmmgMl3fHB2TYbVj/WzrNsci6uAc2CIiA+RSIjAdXhB8
+ w8Fp7FRDY/8/yEuirpQsuYs6BWRpiFv2Lqe1Z2aNshux965VBZhkB2UFCkSe5B2aXqZS4r6S
+ kdZijN9v8/NII84j3skfYH8du426GrJFW1TV/sS4JsKhbFRnVrGVaSRB8j82XY+7Bq5mhIwX
+ qULQKMZV+y6YHKOaKOGJal6Y8rq+vjpf+kMvekb8zlQ2sStnGuXiQGlfSYMVeV12zv6xtX4U
+ GTnQn8Nm6ekJm3PFZ8Jdhy37FzcwLKs7GE6jFHrzWyeKa0ATNuFN/wRmxQzVx2CRxujZ83/I
+ gtqte3TzJjDOhIJdAzz/qhZZRQ1TJVBc0nyVHmGsckCsw56H4QARAQABzRlKYW4gSG9mZm1h
+ bm4gPGphbkAzZTguZXU+wsGOBBMBCAA4FiEEmLuY0iqAFrsdfdQ4eNoW6ZLnw4cFAlvNvmUC
+ GwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQeNoW6ZLnw4fFMw/9GhCiWWIw/u+qJ+Z8
+ zV32B7C9jwpVcBoxyHMrbDl/KzEUoF3nSm6YNPfkmxgsQ2u0wd50p7nsLoPWwSET1wCE3VKU
+ Cux5fXVC4m7y238HdmSNGmeYgKqvCKti1l+pR58HefMnct0DVsPvfsHc+AUtZCc8AqyJN/Jk
+ aZiAKW3sKf3t4RoIyUl7aHwj2TBsi1rvB3VwXPbj5ZrD2imZaE3m7mfSj8Z6n/C83K9+vQEf
+ zxxSA1SuV2k5PE/sY4hxD0jgkmk/IForze+BjjKOwuClkfgT4HcTvWwnq9R1f09jscR4JJ7r
+ OSzixcxOoC1QBrCoEEr3cQK9z9knn5Y6DMmiAABz472joo0QZR2uWAcQXUF2opxdCstwCWYT
+ djc88F9XkdsEh1xY3MpfhQLg4RqYju8hXrRyA+KeQObnEzfUTd0Q8wObK44OrzZt7jyjdwyX
+ f7FhTJMyhHwDCWZASkAe2o/mJSlZBAUKcLLegL5tMeo2nx93pJcZVhO5cFv3CM1iIOaho374
+ GleMUhOy4urTT5gMKBm3G4SZmzfqOBDrr1ps/goSmpVXEn/IbDvCD1OusideZfYmUTjYHPln
+ a7GmFF4fdfL62a0yi96+3l4DSsIF6998F5U8zteWwBCtTm4HBsLpRu0DbDP2IUuEmNCyQhnp
+ 7EbpdxMJeysv+0U5jgTOwU0EVMf68QEQANpRg30TZ5rVNt7dJNiOf57dRUpdluSRROmyFt5S
+ fS3IUaH3dpLCYkHqwRQl5BrDxkUrxkbhoK0bftW9uHt3Cn4o199k1WuyHc/GD8Q9EjbfLXIQ
+ WgPjZgNcoxKt8PfSscD6Y/YhUYBQBa+8C346ozR1eugXsbw3Nfuzc4ZXseSOMSLSjlPhrYQC
+ swmYt5kLjiWfxSBWpw4hm+S2zA77sBAGaf4JXOTgibY8y4JOLvdNwL3GxBdmc/vunyr5FwBz
+ 8AZD0FEfxRgDinOiLSoTXUOj4kR+FT+98kUJqlUNwvVUq3tpFEXefWPrqcsVEinWoZsm3K31
+ 2m1jJfeNbjldep72C1iQC1ut365ZNCMZmVctGZ90dFKDs4l+GkaBJ8S+n3TuMH7sRDVwHG8b
+ cAm7kR/3YT5cz26vKy5dGMwm8CFvYF/3UU0aQPGrM711ploz4JdhxRvE1RtRUeqnsiXeBtMo
+ BSHtCfP2J5+YZSB+wj0OY00RSDhlwHszkmEBqstZiFECYazv+CsgQfbrX7eQqAsqKRtO3EOM
+ QKBwTR+yAtNTrFrQmjE5u9QuIqrvbRTnxhZMRyyimpR6jKYlczNAKVN8RFmxBHOrpUf7slk5
+ H2GrHFIXygOA7zZtr+2ufY4TVZjnymKbbrC20JBin4/UNSJF0BDGcXKbpil78YlXu/EfABEB
+ AAHCwV8EGAECAAkFAlTH+vECGwwACgkQeNoW6ZLnw4fqFxAA0mGTZXLNlsAAma7XAIdkMqDZ
+ aAU+N8SHtceQjeIuhdOV34T9AhbiIhDbf/MeVBz1D/skRtnwk5qtQBjDhzVFfxUu9XFeZHKs
+ ZFugcWwmzC0kLWG9xnzeWOl5VSq/CW5i4naaWNic5R2suNQiTFF7ZtGxv4i0H/FA1F6conbE
+ 5Pi2NN2t6cN22uMZm9tAdXW0QmLfoHzrqkmnFCYHlnLwzhMuBnSrErlV6biYyNRki/uGig69
+ ixQ9PRJdEpP1NFrTDexQalb5+JDpHCsGt5mzRBnT5WutZ/HBVj5PbzCxNXemtv0OCnN57Hae
+ p2EFXZjDLfOUYdJSpnudtSvBtmJgs7TgwmzcGCOZfWqPd0mRFjG101mhHh0g4GhlUBPvDe4k
+ +E5YwEYEWQuO5G0tqwTGXU2bD/8NoMsWPGkABltaVeOvzOITuOe3HHZANwbyMCguTALQ29RF
+ 5ZxUUfXMU9BxSf7dh5YiYqgceD5ey86nIjKTyxWb1wONrLtsirO2aX+Ch24UyAIHO0H6NVlU
+ h8gKGU/jv0XySGZQsU/j79NdOR4sr0c9N6PH6TZiByTVuHDa6FBWeSq8JJltDu1V3kIa07X6
+ DPttzFhJHSBzcx5TSQTyN6ErfdYFT8mfBuvG5XJjYoR4xpMl0BLTPJSTmHokossdcyiu4ng+
+ AqNjQxfojjo=
+In-Reply-To: <e563f0be-8cdc-4451-ac93-af3a35485af9@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290079-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290080-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[3e8.eu:?];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	DMARC_NA(0.00)[linux-foundation.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[bootlin.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	NEURAL_HAM(-0.00)[-0.994];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DMARC_DNSFAIL(0.00)[3e8.eu : query timed out];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jan@3e8.eu,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid,linux-foundation.org:dkim]
-X-Rspamd-Queue-Id: D4D0459C1B8
+	R_DKIM_TEMPFAIL(0.00)[3e8.eu:s=mail20211217];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,3e8.eu:mid]
+X-Rspamd-Queue-Id: EAAE459C1E4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 20 May 2026 at 08:53, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> >
-> > Just never rebase any public tree please.
->
-> I guess the alternative is to do merges, right?
+On 2026-05-29 at 12:13, Maxime Chevallier wrote:
+> Hi Petr,
+> 
+> On 5/19/26 06:32, Petr Wozniak wrote:
+>> The "OEM"/"SFP-10G-T" quirk entry in sfp_fixup_rollball_cc()
+>> unconditionally forces MDIO_I2C_ROLLBALL for all modules matching that
+>> vendor/part-number combination.  This works for modules that genuinely
+>> implement a RollBall I2C-to-MDIO bridge, but silently breaks modules
+>> that share the same EEPROM strings without having such a bridge.
+>>
+>> The Realtek RTL8261BE-CG is one such module: a pure copper 10G SFP+
+>> media converter with no I2C-to-MDIO bridge.  Its EEPROM reports
+>> vendor="OEM", part="SFP-10G-T-I", and -- critically -- Vendor OUI
+>> 00:00:00, making OUI-based differentiation impossible.  With
+>> MDIO_I2C_ROLLBALL the kernel stalls waiting for a PHY that never
+>> appears:
+>>
+>>    sfp sfp2: probing phy device through the [MDIO_I2C_ROLLBALL] protocol
+> 
+> Is it really stalling, or are you facing the 25 seconds retry loop for 
+> rollball ?
 
-No. Back-merges are bad too, unless they have a really damn solid
-reason for them, and some "keep up with other peoples work" is not
-that.
+The retry loop unfortunately takes much longer than 25 seconds if the 
+controller in the module is not responding to the Rollball protocol:
 
-The primary model should be that you care about your own work, and
-make sure that that is as stable as possible. Do *NOT* try to chase
-other people's work. Not with merges, not with rebases.
+- The ".read_c45" method of the Rollball implementation returns 0xffff 
+on timeout (which happens after 10 tries, sleeping 20 ms for each).
 
-Then when your branch is all done and ready, you ask upstream (in your
-case typically the networking tree) to pull it.
+- When all reads return 0xffff, "get_phy_c45_ids" reads 62 registers 
+("MDIO_DEVS1" and "MDIO_DEVS2" for MMD devices 0-29, plus "MDIO_STAT2" 
+for MMD 30 and 31).
 
-Some people at that point *jump* to the point where upstream merged from them.
+Considering the 25 attempts for probing, this means the actual retry 
+loop is at least 5.5 minutes long. In practice it is even worse, as the 
+I2C transfers also take some time.
 
-Or another fairly common model is to have just started another branch
-for future work. Keeping independent development branches for
-different features is also a good thing to strive for, because it
-makes it easier for different people to work on different branches
-without messing with each other, but it also means that one feature
-being delayed (due to unexpected problems or whatever) doesn't affect
-other branches. And if done well, it also means that you wouldn't even
-care about the whole "point where upstream merged", because your other
-work simply isn't dependent on things like that.
+It seems to me like this is the core of the issue here. If the timeout 
+was just 25 seconds, it would be a bit annoying, but still usable.
 
-So there are many ways to deal with them, but rebasing and merging are
-typically the worst ones that should be avoided unless active problems
-happen.
+Jan
 
-Sometimes you have to rebase because of a mistake. Sometimes you need
-to do back-merges. But you should damn well have *reasons* for both
-that aren't "that's just how we work".
-
-Back-merges in particular need to not just be "merge upstream". They
-need a commit message that explains *why* you're merging upstream (and
-not merge some random point, the same way you shouldn't start
-development at some random point of questionable stability).
-
-Rebasing is "invisible" except for the mess it leaves with random
-commit ids (and the problems it can cause for anybody who happened to
-use an older version). So you can't explain it, but it should then be
-explained to upstream why you ask them to pull recent changes that
-clearly cannot have been tested in that form.
-
-                Linus
 
