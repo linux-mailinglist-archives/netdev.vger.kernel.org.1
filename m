@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-289881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289882-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wFV2MqWODWoIzQUAu9opvQ
-	(envelope-from <netdev+bounces-289881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:36:21 +0200
+	id EFScBNqNDWoIzQUAu9opvQ
+	(envelope-from <netdev+bounces-289882-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:32:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C0AC58BD6A
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:36:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 143C958BCD8
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:32:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7DF9D302B76D
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:32:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C986D3003729
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE6E2FA0C4;
-	Wed, 20 May 2026 10:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3781D3D6CB9;
+	Wed, 20 May 2026 10:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CroOg7yJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DDFM35Dh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156C83D6CB8
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970A039B970
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779273157; cv=none; b=Eje89FSYpRS3WkQfP5lsSI/LpBPxxxirEGMrt81oEbuEZ3HkKp1BkPVEoG0SRWGAOm+tYnpVSPhcU2NdhsGVt7CfWOzlr5RgdutLrfiGVXLAvg+mYugU9O8I8ab7VQJv10jFQ7Y68cX6Ei7i8YxdBD2sX54W0wQEckoGtCXV71E=
+	t=1779273159; cv=none; b=bppg5w26XYc5bp75Fe3xRLM451+c5oxCqnJDVKng7ZphOq5nHNczjzTJOoUbbSG4PqPHfJEte8rJgsjD9lFcjd2Fq+lr51EkOXVsvW9dSus5K+Mi8MOCk3V1pQqdrZXBNk1xDAzWovMF9PmqEqahzGugo64dKZemqCFFTyH66ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779273157; c=relaxed/simple;
-	bh=5HZpXYL1+yx+u+fKQ46ckqwYmogZOOGUvG/G3+qky3w=;
+	s=arc-20240116; t=1779273159; c=relaxed/simple;
+	bh=mFwnmUroHa1k5ObQjQhOVzNw9tL6WAFZ5XNMTU8Kisg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=a2uGnSPId7+czIse9Iz0078ItOaeEqdj5ySe2QGmIMp5C3tYtdjyHMySZj1EG9LqUE9d91qv+kaAL04BFRVOxUiybrz1CNW8CORHfuvyf0wVic4fCYzzrcjiaFRE1Xnp0eZXkwqdq0aCEmT7MMuD3oksFtvIBI0++mIUBs5LkLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CroOg7yJ; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=aEP2uRIB+DvBegtQQ1XMV495eY2cjhnpKl15lojEDwgVxCcyV8iDmWrYRAIsKmgBPyeZAOAIOSMxcbZk4+Y+//DAaxk0EcwLxrMIxyt/kyvnTg5Q2thJ2GaajPi9YkU02RM54n9DnjQgsL8ZdPPF4+gH9knopDzkIUHJeKJdZsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DDFM35Dh; arc=none smtp.client-ip=209.85.219.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-90f5248b209so1134170885a.2
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:32:33 -0700 (PDT)
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8aca29dcd69so135669326d6.1
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:32:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779273152; x=1779877952; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1779273154; x=1779877954; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=261eqtSWtiLXznZIOGkWswG8v9FjA7zFYu1Otxst4kU=;
-        b=CroOg7yJEeJ415sqJx1ffBUSvWhFhHF7DNvGsjv//A/nA7fwhtITx0MFY8GvU1E/AY
-         NdfXolyT9mFm0rBhBl5lIZn6o/8tkG7e4v44E2HXhtONKEG3ogE9ukZrg5vB7EnmG5t4
-         0MaIBVbBWtjGNwwhUSVY8w5gZ8JyTZmSAB8YtxeZVcw8mOIujt1Kb1G2jBfzMZd8ZPxL
-         li2ujdaNBKGKkqWvIi/OymE/Vx2HE2cyLRt1/GtX4zrRtstCKDqFJSDZvJK8M9ZAJ/hb
-         HHX4Gx9DGT9SGAQDNLBRuobtw9yfgKHqV6/lVTUgiDpSBfKvRzI9kXWnRcuSY4E7YQzR
-         NRmg==
+        bh=7Q8SSp1rgFav41E733ke+1I1FDmpeIXtHuohDdvlSS0=;
+        b=DDFM35DhwitSF6QtgAubYO4iaS1/wiibPL+O7t+BuVdGSR/JDy0iDCirkaBqwXXmnL
+         ecAh/ihrbNRK7PkHYVo2eau1j4Y25tkoy8UwBaJxdGfmSxkCqkFXY10B5ywtc8+t2MNj
+         WSXTILG9lmSJkn/oYRs45LAQtUShlOpln+onXqwuD5PT2FS8CbSEotX6HyOunmvSYy64
+         EdfF+g3U29cf2HN3HaCUi7rtJ6ltyq5YGeARkXUV8S+v4K0J0229w1OrXSoQXhPeXcN3
+         L4aAyKYMm/0KPBNsIhERmS/UmUTFveSEwwn5zTF7NkpVsm7hJWP6m4wdxP8twncljMLu
+         dX0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779273152; x=1779877952;
+        d=1e100.net; s=20251104; t=1779273154; x=1779877954;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=261eqtSWtiLXznZIOGkWswG8v9FjA7zFYu1Otxst4kU=;
-        b=B44GZ51R9eVs203VCCqaVMj1uahdDo2aB4fNhTpmVU+WFCz8zYtuo8DjvQvAmavWve
-         DBd2v45G9n/ddoRT+RRuaG/VDYEPV0xEZgQ6tqKgP7u1HWC+hqTOFAXP5QD20gmGXyJp
-         t7w0BeSQ8PCSlVmA52gS1DFSE0awyvyHovF9r4HyhXlS4eAUYXKuYvAyUPx2i+dWmAXE
-         J3bQghgFGsIbCSSz/YWYAu5c7izfQ7SZzJAgJ/aMMM5RxMJuUqMlAKd593y44bsbThd4
-         r8FZ1mDqZb/h3TArZKgHZh7wb4uNlEXMsOO2NBLp66Z8oylR2aFOPrw+qYqvZaqRLzZv
-         CQCA==
-X-Forwarded-Encrypted: i=1; AFNElJ+vnknvFoTAaIsNQ3EaHqla5n0ofz9ON9v4rg0URe3POw0tlj1Yrj/Oe9ApW/iTPhPQWfiyLpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTTqTimaqeqmdujkHQbcF1OER0Hi1brcCcAiBrzn3ib4EMFqC6
-	/PBBxtX5BOqlCWSs6D7FxuCdzCkg9IbQbTwdicHfpxF5mobD+SmFIRQNZV3rB5zqNywuupOWXnm
-	LvZsHNzDcZvNcgA==
-X-Received: from qkhk26.prod.google.com ([2002:a05:620a:b9a:b0:911:449d:98da])
+        bh=7Q8SSp1rgFav41E733ke+1I1FDmpeIXtHuohDdvlSS0=;
+        b=l36/oDpYZIx2Akc9EYypuav7KsmwI5i09j7Nj3tbwRX5UJk3xOLQi6aVBKU/p2kHDg
+         D7pfjwBxxA6H1TR2OQfVJ6Ct+3KhlFZcu3l/DdTgLs3Ax+WbWHWqhXgWlYReEqI34sHe
+         E4/rwXwQpk9at8rdAhQZecbKjW2W/+4wGiz5cbnZh6xjdDDtJo2sf6JJVn6lSYpFNX4U
+         HScMnR3/0UeY7kJAFs8cweqr+B15/JpBYh3HjZQGRACFGlZy9LLaZIQ9MAQhH6CYORUf
+         eKLuQf5+1+8x8nrPz64cr8V84JNBcMlfwGCqAwRevGSY10AvhzbTqGw25Jk7a1zZh1Ou
+         PPrQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+utm7wfLMjfctUlK9CnrdQuPsLisSIVqHSGDq20N7axuFsIiF2seaPGp/79UoHaiB66M2LVmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8yZ9IyR5oi+Q4/vLP0jSzGjLDIfTIY8LVEHVA9/e5WuyPk7GZ
+	djy/7+junPjGcMdirpn1K8oPDGAY9sb8M4ThcUK+O05ESELWrn/vz3I4rrsM4nHc1fJma5N00DX
+	EKrGpf0Jq0cytsQ==
+X-Received: from qvbfh1.prod.google.com ([2002:a05:6214:1a01:b0:8bb:bac0:7868])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:2950:b0:90f:9cde:9788 with SMTP id af79cd13be357-911cda50d4dmr3493215185a.5.1779273151575;
- Wed, 20 May 2026 03:32:31 -0700 (PDT)
-Date: Wed, 20 May 2026 10:32:26 +0000
+ 2002:a0c:f109:0:b0:8ac:801d:c3dc with SMTP id 6a1803df08f44-8ca0f5c456amr296238486d6.9.1779273153276;
+ Wed, 20 May 2026 03:32:33 -0700 (PDT)
+Date: Wed, 20 May 2026 10:32:27 +0000
 In-Reply-To: <20260520103227.1133277-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260520103227.1133277-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.631.ge1b05301d1-goog
-Message-ID: <20260520103227.1133277-3-edumazet@google.com>
-Subject: [PATCH v3 net-next 2/3] net: defer netdev_name_node_alt_flush() call
- to netdev_run_todo()
+Message-ID: <20260520103227.1133277-4-edumazet@google.com>
+Subject: [PATCH v3 net-next 3/3] rtnetlink: do not acquire RTNL for
+ RTM_GETLINK with RTEXT_FILTER_NAME_ONLY
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289881-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289882-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -112,52 +112,172 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8C0AC58BD6A
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 143C958BCD8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In the following patch, we want to call rtnl_fill_prop_list() without
-RTNL being held, but after a device reference was taken.
+When RTEXT_FILTER_NAME_ONLY is requested, rtnl_fill_ifinfo()
+is dumping device attributes which do not need RTNL protection.
 
-We need to free altnames in netdev_run_todo() instead of
-unregister_netdevice_many_notify().
-
-Freeing will only happen once all device references
-have been released.
-
-Note that dev->name_node serves as the anchor for altnames,
-thus must be also freed in netdev_run_todo().
+Many shell scripts invoke iproute2 commands specifying a device by
+its name. After this patch, they will no longer add RTNL pressure.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reported-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/core/dev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/core/rtnetlink.c | 82 ++++++++++++++++++++++++++++++--------------
+ 1 file changed, 56 insertions(+), 26 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 26ac8eb9b259d489159c7ab5a2b206d425110b3b..2d795f3f569be00361809823fd3e59fb1871919c 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11738,6 +11738,8 @@ void netdev_run_todo(void)
- 		WARN_ON(rcu_access_pointer(dev->ip_ptr));
- 		WARN_ON(rcu_access_pointer(dev->ip6_ptr));
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index ae0254f19178735b2805a8189e81a960a49b2858..587bb8bbc73d0b2075ca508a5537200f65f74594 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -2068,7 +2068,6 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
+ 	struct nlmsghdr *nlh;
+ 	struct Qdisc *qdisc;
  
-+		netdev_name_node_alt_flush(dev);
-+		netdev_name_node_free(dev->name_node);
- 		netdev_do_free_pcpu_stats(dev);
- 		if (dev->priv_destructor)
- 			dev->priv_destructor(dev);
-@@ -12451,8 +12453,6 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 		dev_uc_flush(dev);
- 		dev_mc_flush(dev);
+-	ASSERT_RTNL();
+ 	nlh = nlmsg_put(skb, pid, seq, type, sizeof(*ifm), flags);
+ 	if (nlh == NULL)
+ 		return -EMSGSIZE;
+@@ -2091,6 +2090,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
+ 	if (ext_filter_mask & RTEXT_FILTER_NAME_ONLY)
+ 		goto end;
  
--		netdev_name_node_alt_flush(dev);
--		netdev_name_node_free(dev->name_node);
++	ASSERT_RTNL();
+ 	if (tgt_netnsid >= 0 &&
+ 	    nla_put_s32(skb, IFLA_TARGET_NETNSID, tgt_netnsid))
+ 		goto nla_put_failure;
+@@ -3468,6 +3468,21 @@ static struct net_device *rtnl_dev_get(struct net *net,
+ 	return __dev_get_by_name(net, ifname);
+ }
  
- 		netdev_rss_contexts_free(dev);
++static struct net_device *rtnl_dev_get_rcu(struct net *net,
++					   struct nlattr *tb[])
++{
++	char ifname[ALTIFNAMSIZ];
++
++	if (tb[IFLA_IFNAME])
++		nla_strscpy(ifname, tb[IFLA_IFNAME], IFNAMSIZ);
++	else if (tb[IFLA_ALT_IFNAME])
++		nla_strscpy(ifname, tb[IFLA_ALT_IFNAME], ALTIFNAMSIZ);
++	else
++		return NULL;
++
++	return dev_get_by_name_rcu(net, ifname);
++}
++
+ static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			struct netlink_ext_ack *extack)
+ {
+@@ -4187,14 +4202,15 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			struct netlink_ext_ack *extack)
+ {
+ 	struct net *net = sock_net(skb->sk);
++	struct nlattr *tb[IFLA_MAX + 1];
++	netdevice_tracker dev_tracker;
++	struct net_device *dev = NULL;
+ 	struct net *tgt_net = net;
++	u32 ext_filter_mask = 0;
+ 	struct ifinfomsg *ifm;
+-	struct nlattr *tb[IFLA_MAX+1];
+-	struct net_device *dev = NULL;
+ 	struct sk_buff *nskb;
+ 	int netnsid = -1;
+ 	int err;
+-	u32 ext_filter_mask = 0;
  
+ 	err = rtnl_valid_getlink_req(skb, nlh, tb, extack);
+ 	if (err < 0)
+@@ -4214,43 +4230,56 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (tb[IFLA_EXT_MASK])
+ 		ext_filter_mask = nla_get_u32(tb[IFLA_EXT_MASK]);
+ 
+-	err = -EINVAL;
+ 	ifm = nlmsg_data(nlh);
+-	if (ifm->ifi_index > 0)
+-		dev = __dev_get_by_index(tgt_net, ifm->ifi_index);
+-	else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
+-		dev = rtnl_dev_get(tgt_net, tb);
+-	else
++	rcu_read_lock();
++	if (ifm->ifi_index > 0) {
++		dev = dev_get_by_index_rcu(tgt_net, ifm->ifi_index);
++	} else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME]) {
++		dev = rtnl_dev_get_rcu(tgt_net, tb);
++	} else {
++		rcu_read_unlock();
++		err = -EINVAL;
+ 		goto out;
++	}
++	netdev_hold(dev, &dev_tracker, GFP_ATOMIC);
++	rcu_read_unlock();
+ 
+ 	err = -ENODEV;
+ 	if (dev == NULL)
+ 		goto out;
+ 
++	if (!(ext_filter_mask & RTEXT_FILTER_NAME_ONLY)) {
++		rtnl_lock();
++		/* Synchronize the carrier state so we don't report a state
++		 * that we're not actually going to honour immediately; if
++		 * the driver just did a carrier off->on transition, we can
++		 * only TX if link watch work has run, but without this we'd
++		 * already report carrier on, even if it doesn't work yet.
++		 */
++		linkwatch_sync_dev(dev);
++	}
++
+ 	err = -ENOBUFS;
+ 	nskb = nlmsg_new_large(if_nlmsg_size(dev, ext_filter_mask));
+-	if (nskb == NULL)
+-		goto out;
++	if (nskb)
++		err = rtnl_fill_ifinfo(nskb, dev, net,
++				       RTM_NEWLINK, NETLINK_CB(skb).portid,
++				       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
++				       0, NULL, 0, netnsid, GFP_KERNEL);
+ 
+-	/* Synchronize the carrier state so we don't report a state
+-	 * that we're not actually going to honour immediately; if
+-	 * the driver just did a carrier off->on transition, we can
+-	 * only TX if link watch work has run, but without this we'd
+-	 * already report carrier on, even if it doesn't work yet.
+-	 */
+-	linkwatch_sync_dev(dev);
++	if (!(ext_filter_mask & RTEXT_FILTER_NAME_ONLY))
++		rtnl_unlock();
+ 
+-	err = rtnl_fill_ifinfo(nskb, dev, net,
+-			       RTM_NEWLINK, NETLINK_CB(skb).portid,
+-			       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
+-			       0, NULL, 0, netnsid, GFP_KERNEL);
+ 	if (err < 0) {
+ 		/* -EMSGSIZE implies BUG in if_nlmsg_size */
+-		WARN_ON(err == -EMSGSIZE);
++		WARN_ON_ONCE(err == -EMSGSIZE &&
++			     !(ext_filter_mask & RTEXT_FILTER_NAME_ONLY));
+ 		kfree_skb(nskb);
+-	} else
++	} else {
+ 		err = rtnl_unicast(nskb, net, NETLINK_CB(skb).portid);
++	}
+ out:
++	netdev_put(dev, &dev_tracker);
+ 	if (netnsid >= 0)
+ 		put_net(tgt_net);
+ 
+@@ -7116,7 +7145,8 @@ static const struct rtnl_msg_handler rtnetlink_rtnl_msg_handlers[] __initconst =
+ 	{.msgtype = RTM_DELLINK, .doit = rtnl_dellink,
+ 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
+ 	{.msgtype = RTM_GETLINK, .doit = rtnl_getlink,
+-	 .dumpit = rtnl_dump_ifinfo, .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
++	 .dumpit = rtnl_dump_ifinfo,
++	 .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE | RTNL_FLAG_DOIT_UNLOCKED},
+ 	{.msgtype = RTM_SETLINK, .doit = rtnl_setlink,
+ 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
+ 	{.msgtype = RTM_GETADDR, .dumpit = rtnl_dump_all},
 -- 
 2.54.0.631.ge1b05301d1-goog
 
