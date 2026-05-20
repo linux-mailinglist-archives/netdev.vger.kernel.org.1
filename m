@@ -1,286 +1,399 @@
-Return-Path: <netdev+bounces-289867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289868-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OjqLj6HDWp4ygUAu9opvQ
-	(envelope-from <netdev+bounces-289867-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:04:46 +0200
+	id aANgEc2IDWpdygUAu9opvQ
+	(envelope-from <netdev+bounces-289868-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:11:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 417A158B4FB
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:04:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B151C58B70C
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:11:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9CEAD304C7DF
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:00:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 79A8030B25D0
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3B03D3002;
-	Wed, 20 May 2026 10:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139E93C4576;
+	Wed, 20 May 2026 10:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="d/2xfP+q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gj2aQomv"
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013003.outbound.protection.outlook.com [40.93.196.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8DB39C64E;
-	Wed, 20 May 2026 10:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FDD3D3339
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779271243; cv=fail; b=RfXHZEMp293N80d88xe8j4Y0q04bAoGWeOtgNtnQoLiaCmptutupyyud9Je7vQSjCQmSnTni9YL7HMisoTYxxUYSqjlW/1k0FsFctnOr3R1xVNVT4hkIny36n3ArEEUvUEelDutSU+I7Xi2TxKTOIViVapoK/j5OCQCYxxNIrsU=
+	t=1779271530; cv=pass; b=YgpYnb1g9enynL9AOBX7/ruRm90z2CZpupujinXVtsFoqt2k4yRsCcKZVNguEVOOF+qUxbZKu1z6W47cajeRMn22gZu4Lw/T1ozadJYwNBKkyuhoaRkxelUXtbkgA8IQWtgElLjK6ZJcngmQGuWa7LBeH9WHygbxO9/aNfOMr0E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779271243; c=relaxed/simple;
-	bh=PxOkhTG1J1ApiZrhHAebiJ8Y2SDGfc90iVVPzgIRUFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=b8pzjGtOQxo1ASbMrM97UlN5bUmQKKVk/GN1TpYnKioqdXRVWoOgU+/2059tJ4YPxq7g2+ZMT4gh19czMEHCiMwecf059u4BiGcXWjr0epqHMRTUHSc9rVmpy1RO7HLQ2JcpOyJDZtPJ7ryE8KROd/SdCDFZ7UyCuegKTYMjtdg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=d/2xfP+q; arc=fail smtp.client-ip=40.93.196.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=myVI+uE70Zp1+gvrpZCc/ztCbTAT6XlcIcP/2Sca2Ugbf3hfQDRviE0zjek1rXEUOAFvZJLs6qIaE3TSl3bwzMdYxhl4l2jks8W1qkfRyfQBXMQSq0hyjpr+DL91ZBRWfG9c7q1Vw3K/pVMuBaqRqObHGxwSZD1FUEYf/C8vtrRwXPWxR3R5eE1YYDbC+VDCv1h0bPOC/XQA2oNDJFj/IgChNwFQYCb5BNBTyyA8FLM80swMxGCVBNYPrIfMzwzGV89sUWrPRHN+V8dmuzZsTTVcOVPTliqJQziY+NaiWBojhiZrVfu1V9cbKsL+K5K6aK3ZhlK77m1e58uRSJOSrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L1e86+fEtFVZcjjxXF54aGBnFRIBUMnWEl24WNIiN7A=;
- b=oZGDLM86hNO/9LzoiQIWCMNIrzebu15lOLvZBnLV6ZdTPeEyGKJyQbvwG3E+VgY7xBrDIU40uxrQ4uUJeSQ5bIIUGVafbIlyH9i8uFHOgiamhyqtvdxDmUJQY6cnjYinCQUJrFnwS1anw6rYvhRYFrMy6NxFIitciIHMfpqB1EHtfUfphibiOeEWhN8gun592E9u4aju7WfFaxGHoooLtWx3Xo4SwEyLQG3FQTk0f3sEC8V2FwgyQ/QccgiJ1xMRDyzIlzI0ZCKh6kAO2VEsFou6G6yShAVgrDkf6lLOQQ3RT8RFT2zmtapkBs2MrPchvyS/OVO6lpetwPXUh4Qk6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.194) smtp.rcpttodomain=nxp.com smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L1e86+fEtFVZcjjxXF54aGBnFRIBUMnWEl24WNIiN7A=;
- b=d/2xfP+q11d/bdAbNHLRv1ChAP6hkPZGn/aVj4G/8dDXzi6bGWJifCPHHpKQLkUb5SW2gSpL5CZ7CcUUeqQ8erIW2RAQa2OPS/DmZnBPUKDbjOv3Emy/wQ8ppFxGC2b46s/tAO/0uHdLOLqWYHAiN2y88SFMyAnGZ1f2DZUxx+M=
-Received: from DS1P223CA0011.NAMP223.PROD.OUTLOOK.COM (2603:10b6:8:453::19) by
- IA0PR10MB7621.namprd10.prod.outlook.com (2603:10b6:208:484::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.13; Wed, 20 May
- 2026 10:00:37 +0000
-Received: from DS3PEPF0000C37B.namprd04.prod.outlook.com
- (2603:10b6:8:453:cafe::ae) by DS1P223CA0011.outlook.office365.com
- (2603:10b6:8:453::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.16 via Frontend Transport; Wed, 20
- May 2026 10:00:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
-Received: from flwvzet200.ext.ti.com (198.47.21.194) by
- DS3PEPF0000C37B.mail.protection.outlook.com (10.167.23.5) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.48.11 via Frontend Transport; Wed, 20 May 2026 10:00:35 +0000
-Received: from DFLE204.ent.ti.com (10.64.6.62) by flwvzet200.ext.ti.com
- (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 20 May
- 2026 05:00:32 -0500
-Received: from DFLE215.ent.ti.com (10.64.6.73) by DFLE204.ent.ti.com
- (10.64.6.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 20 May
- 2026 05:00:31 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE215.ent.ti.com
- (10.64.6.73) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
- Transport; Wed, 20 May 2026 05:00:31 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 64KA0PMN1739976;
-	Wed, 20 May 2026 05:00:25 -0500
-Message-ID: <1d8ab51a-6943-4978-88cf-adda8cc57f7e@ti.com>
-Date: Wed, 20 May 2026 15:30:24 +0530
+	s=arc-20240116; t=1779271530; c=relaxed/simple;
+	bh=SvBlrVzB2PNF8WSmusRhHLIUi/0AQrtxs9FN+toznKM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YW812dOARMeyBZo1uQYWhCvb3z66g2qyJPqZXdQwH65xbaLBhGrTjVsMzYi5IxTn/m75bFcf4tsXYA7u7c8x2Uf907my+p3WBJHhxM8KdGsTVJU2Lh46ZnaRi4VO5FSQhRnND4EWMjsXPbpkFw5VwDGRwHdwloWLEgDyGXQDH+4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gj2aQomv; arc=pass smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-bd5047a2a4cso750345766b.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:05:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779271526; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Nc+p530Yz2LsJ0t5UCvV0hQ+ye9v7uobL7OHMr+TfDF+mEvM0ud9yZdrF158YfvA6s
+         qbA2bbkLGifMQcmsJg2bnNcrACZim88pr0136CBxAaHtCySlhMJ/MoQy9IJXZtBeqjO8
+         eDhELSsj5Y32JtdUNH/WzZcnQIoo+/A/lVl6w84tgZhHxoTkz2tCSXxZPeqrdGr+HpIp
+         tEeo/ZHUMubiBWISsV/S6dM0ds/l+kKkjvEuVpK0UV5abgnt2nDgZDucoidAdlGKc50m
+         C/OjDKW1MXBYYObb0D11B7grmY5Hs1Ab+T4IpQVJoGJ86ZvpUgtUSB7iVhsDxzFKhxWe
+         mqpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xOuv9gIDFk2AV1ir59DHFt0RruUAZh5T/FINapyvQlk=;
+        fh=wl3RA01w3iFmMNKIruF+Wc/DHn7XEm69JcSa9rAG8Gk=;
+        b=fCYabX4H6NN4CYkNjyd+PD2R1MWlkh6XBxbsrodhjFo3K9hGnY7702x4MzulC8fNyw
+         GGs97nrk908ztuqXRPoDam49/lHTzOxGlydESWFBgEluCHVeszly2OQpEzfFUCs6jjy2
+         VFFI/f4ybSqSIDlGOvyES9DGSW6CEQGWWw9IT9mi4wecdR9eULyVd0xiD2gQqzKOMn8V
+         QRB05RQsoU0TJ+7nev5qF7qvmD+xeroqFa3gRidih0+hD1r8AvDt0i1R7MVNIsD+Pvvt
+         uQ9IAxA+7xyAXKlr6Xq1tjrn65i1n/1IT7/TFTQldOYloOS2xs/Vlyq3REgzin4Yk1P3
+         8kNg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779271526; x=1779876326; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xOuv9gIDFk2AV1ir59DHFt0RruUAZh5T/FINapyvQlk=;
+        b=Gj2aQomvqooPSM5DfkCKzLnd2iUndJ2fYdPoPz3i+ye2Hxl6FAqnvG+JC/CqPprdv5
+         VW88aJxiE/yUdhDwzhe2vHmtZr6VnRKFrGHd+nr1Ta4JcKlF846J+uAgHp3o2QB4wevb
+         JFVQ8nph+2YiL2g6gyJDLn8+iMn0ehWiRICinx//h8OHlPPS/GLyRTh9hI/8JySHZffy
+         V5g4Xw47iGPRUZhmTEg/VRhSGdV9v6T4nPyxX8j/6DprHb5kMnI5eqsvdAnxENgMjPJy
+         /My4cq/5uO/ezHx2UJJMUlRCx3HPtxX8Zw+FJetkHPk7/Xyre6uMWuytTNtN58hUBS4M
+         Ae5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779271526; x=1779876326;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xOuv9gIDFk2AV1ir59DHFt0RruUAZh5T/FINapyvQlk=;
+        b=sXi6KPBtLDLNi955a02aOcLZQocgc1NdVu2Ko6XN/2+KnGtXVJqg5qdePjNnuRxHd1
+         c2wQLf8byCYGimpqoTh6meF4xprxhJZHvTKFHv/wSrSNNXg6LI0EQ0d0pSwG71gTazNw
+         Gi7ULQZ0Dm8kSIhUlOm1txdEersIOvfSTqKP1Wzl4i3U8haReeXB+j3SzdBnje2p0Z1B
+         5ft0wq7+P8KmlVEl/1JRq9eXtloCemS+1N/GhIXsw6ONhwAgIMizg7S87Y23cdudNFr6
+         7rmlD1hWGeSyO6hQUAq8wdU/7DfyA/Kj1HeSYuW++oaXOuPHIkeZjK8tmisv2NYL9ppJ
+         PDaw==
+X-Forwarded-Encrypted: i=1; AFNElJ8gBDqtRzT55X9/+SuZsIQBt7uE6fgPb55n8Aa9aQCE087LupebMPb/VrNg8/ikxmVT9AULV2s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt7llYiVghu67EDog9prVSR+ZgVM0Gk2oUXhWiagkK9PFCaNqa
+	2smb61sowUHv4wtHmeLB137TjdEfAmRQ2tgBwft6pyWC1kNWUmqZ3ODAsY1JjZbeCx3F/PwtgLK
+	LJ8sXneV2xhyWQWGB9douxBX8HwEpwyA=
+X-Gm-Gg: Acq92OG03v8HibORSzFfQmOmAr5b7u+xepqgPh5jJFyHwdJRZWHFd1v9loouTmVM+8E
+	2y49gbyrhSl/FRWFUgB0YPPCGwWPSr5+6x70H0FQjll6aDHhPtC2HDoiR5ts+mP1L+nJrwPKACh
+	cc7gMFwRW4O4jsEO13+tnCUqqewhGKNNpswD4cI3fE/nCMhsrlqNqxgBkKPzkrlFeW+rf0Zxzwz
+	4I4dMgd9zecB1Ulg8//bwkhpz+TdTHluzAw0m4XbubXU6xa8c5WX6C4lcUXKiZmigec9kj0xplH
+	bwmuxNw=
+X-Received: by 2002:a17:907:8748:b0:b9d:1673:9994 with SMTP id
+ a640c23a62f3a-bd51793014amr1434740266b.39.1779271526127; Wed, 20 May 2026
+ 03:05:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/2] net: ti: icssg: Add HSR and LRE PA
- statistics
-To: Jakub Kicinski <kuba@kernel.org>, Luka Gejak <luka.gejak@linux.dev>
-CC: Felix Maurer <fmaurer@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Roger Quadros
-	<rogerq@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Meghana Malladi
-	<m-malladi@ti.com>, Jacob Keller <jacob.e.keller@intel.com>, David Carlier
-	<devnexen@gmail.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Kevin Hao
-	<haokexin@gmail.com>, <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-References: <20260514075605.850674-1-danishanwar@ti.com>
- <20260514075605.850674-3-danishanwar@ti.com>
- <20260518184506.694c584e@kernel.org>
- <E30AAC96-01D2-4A23-B562-126087DEB7FA@linux.dev>
- <20260519165646.09b0783f@kernel.org>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20260519165646.09b0783f@kernel.org>
+References: <CAM0EoMkUPYSXKr2=+mR8YMq2a0TFdYPdzwPGob-UyU1fUWP9Ww@mail.gmail.com>
+ <20260519033950.2037-1-rajat.gupta@oss.qualcomm.com> <CAOPYjvb8d61sappVT6VxBd9rLsK0q3wHaiMsYp5cFXty0NOU5w@mail.gmail.com>
+ <CAM0EoMkaFabdr11nfiabpEjO_0iB7uKAd9_nFWX=yj-O=8YF0Q@mail.gmail.com>
+In-Reply-To: <CAM0EoMkaFabdr11nfiabpEjO_0iB7uKAd9_nFWX=yj-O=8YF0Q@mail.gmail.com>
+From: Han Guidong <2045gemini@gmail.com>
+Date: Wed, 20 May 2026 18:04:49 +0800
+X-Gm-Features: AVHnY4In8owKQ9yaJHl2lpB7vB734uUFcd3OAsEcqe_M-s7lFJuc3I1NUbOgxNM
+Message-ID: <CAOPYjvYKJTiEGmugAqsuQhBd1LCuggepNGQh4kdhc0w3kdqnAg@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: fix pedit partial COW leading to page
+ cache corruption
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Rajat Gupta <rajat.gupta@oss.qualcomm.com>, netdev@vger.kernel.org, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, jiri@resnulli.us, yimingqian591@gmail.com, 
+	keenanat2000@gmail.com, rollkingzzc@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37B:EE_|IA0PR10MB7621:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27d2f068-5638-4494-cfb2-08deb656a38c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|1800799024|376014|7416014|3023799007|18002099003|56012099003|22082099003|4143699003;
-X-Microsoft-Antispam-Message-Info:
-	s24esD5NOSlhNilhwB+mD0fTBS72A9/4NAkXKlAwIW2VagLMstv+pyefbD0SydmIQNwL2LymAoXPTHZ//iX75LqX7i1NgAiIIl9AtVJKAGq3AIxdF2tK1hDmPUatn4CWxlur/5JBB702ITpO7E0OZCVhRVdbLErVH9ULgl6KGMsDXc15oefZjvaDJc4t20Ehxi4smHaL3+OlI3toSZa89yFeggosZxLGAChvGkR4gRfEkuL8qk2SdY1pxKDaOFI7lQj1NWgaZlZI6cKxyIsB+PrQ0+BgQoZ64MihfH53rj5MNpDcA+zubMhr47YJXF3k92AtmOYTP+XBAWxKsfWF9oKrorwORW0dh7gnDyWQO5e/K1boetDTiUbAzvUeTTw4xmanLrVfHGP3ffgZySnoHQjnwj+J3zseJZQIIPVqbNbuHo6M+ylFqxqjN/WZlgIpwSbNr70YMkRIiPelLA6t8Epk7Utw8xEGOy5ICsd8cUZWqovVf5sZW/BDUjHGPTRic85q3Ydh0p3tcenk7mVTSG2nbAye1piitJhWOLhMoXj23eFQqF1bUScrou1pZWTe3I1rnzPte1XD7p/GqIrVKSd3YFnHb5vaY/qu30lCmPjEe46jfcXDeaITJRW8OmngtNVWLq0OUQtBi3AaYSNOmAvk/wuEJz5ax7v3px+WPLfe+fd+0dUZTUrq0CR3QtK0n1QMa37PdldAu0anSKLtEptTueRu8wODcErabvgly18=
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(1800799024)(376014)(7416014)(3023799007)(18002099003)(56012099003)(22082099003)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	gf/f1jVHXrM2p/GLRIJTnKepPJNSe1O0wSIt+F0zs4t299EGcGm35e5vruOVULySMQhw5u//j0/ARRS9VB7w2AN9j1JwC029fSdK5yVQHVSr3Jrn7zv0/DsTANcsFr9YROx+K4FOiMiIAW/QkkYYe73pU3zQ4NjLbciSRimiGtpAEwwVq1gA1DKdGCb6ZZnkN/NEdNUB77jC05IcNpqnIUOsshYaR/0sgBrwAoUjC3SwVfdpzwftr5b16SRHQpcm5n6ziubgVrW1BETBrq5dJcbS5sO3Nuz7K5pQVALeJ0wsEIqSrtzGdWesAAkhyx3xmrifhdU3coCZJvQqWqlTBY2rn7r+o3i6/ABP4Me/x7OfpKj2H8v9a4S7DPOkhqhoFo3gF0XBD8qCagIroDumUc9gfTBPnQMCI1ii09cb5vUC1W/vSoOaqUxW23lZnfyG
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 10:00:35.9603
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27d2f068-5638-4494-cfb2-08deb656a38c
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF0000C37B.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR10MB7621
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289867-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,lwn.net,linuxfoundation.org,lunn.ch,ti.com,intel.com,gmail.com,linux.dev,vger.kernel.org,lists.infradead.org,nxp.com];
+	TAGGED_FROM(0.00)[bounces-289868-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:mid,ti.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danishanwar@ti.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ti.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[2045gemini@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 417A158B4FB
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,mail.gmail.com:mid,mojatatu.com:email]
+X-Rspamd-Queue-Id: B151C58B70C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub,
+On Wed, May 20, 2026 at 5:12=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Tue, May 19, 2026 at 11:11=E2=80=AFAM Han Guidong <2045gemini@gmail.co=
+m> wrote:
+> >
+> > On Tue, May 19, 2026 at 11:42=E2=80=AFAM Rajat Gupta
+> > <rajat.gupta@oss.qualcomm.com> wrote:
+> > >
+> > > tcf_pedit_act() computes the COW range for skb_ensure_writable()
+> > > once before the key loop using tcfp_off_max_hint, but the hint does
+> > > not account for the runtime header offset added by typed keys. This
+> > > can leave part of the write region un-COW'd.
+> > >
+> > > Fix by moving skb_ensure_writable() inside the per-key loop where
+> > > the actual write offset is known, and add overflow checking on the
+> > > offset arithmetic. For negative offsets (e.g. Ethernet header edits
+> > > at ingress), use skb_cow() to COW the headroom instead. Guard
+> > > offset_valid() against INT_MIN, where negation is undefined.
+> > >
+> > > Additionally, linearize skbs with shared frags upfront to prevent
+> > > silent data corruption when pedit operates on zero-copy pages
+> > > (e.g. from sendfile).
+> > >
+> > > Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is =
+writable")
+> >
+> > Fixes: 6c02568fd1ae ("net/sched: act_pedit: Parse L3 Header for L4 offs=
+et")
+> > Cc: stable@vger.kernel.org
+> >
+> > I took a closer look at the code, and this patch is really addressing
+> > two issues.
+> >
+> > The negative-offset write into shared head/headroom appears to be from
+> > 8b796475fd78, while the shared-frag write, and thus possible
+> > page-cache corruption, appears to be the later regression from
+> > 6c02568fd1ae. So it may be worth adding an additional Fixes tag for
+> > 6c02568fd1ae,
+>
+> Pushing it a little - but sure we should also point to that commit.
+>
+> > and I think an explicit Cc: stable@vger.kernel.org would also make sens=
+e here.
+>
+> Please study the rules.
 
-On 20/05/26 5:26 am, Jakub Kicinski wrote:
-> On Tue, 19 May 2026 07:55:55 +0200 Luka Gejak wrote:
->> On May 19, 2026 3:45:06 AM GMT+02:00, Jakub Kicinski <kuba@kernel.org> wrote:
->>> On Thu, 14 May 2026 13:26:05 +0530 MD Danish Anwar wrote:  
->>>> Add new firmware PA statistics counters for HSR and LRE to the ethtool
->>>> statistics exposed by the ICSSG driver.
->>>>
->>>> New statistics added:
->>>>  - FW_HSR_FWD_CHECK_FAIL_DROP: Packets dropped on the HSR forwarding path
->>>>  - FW_HSR_HE_CHECK_FAIL_DROP: Packets dropped on the HSR host egress path
->>>>  - FW_HSR_SKIP_HOST_DUP_DISCARD_FRAMES: Frames with duplicate discard
->>>>    skipped
->>>>  - FW_LRE_CNT_UNIQUE/DUPLICATE/MULTIPLE_RX: LRE duplicate detection
->>>>    counters
->>>>  - FW_LRE_CNT_RX/TX: LRE per-port frame counters
->>>>  - FW_LRE_CNT_OWN_RX: Own HSR tagged frames received
->>>>  - FW_LRE_CNT_ERRWRONGLAN: Frames with wrong LAN identifier (PRP)
->>>>
->>>> Document the new HSR/LRE statistics in icssg_prueth.rst.  
->>>
->>> To an untrained eye these stats look like stuff that could 
->>> be standardized across drivers. 
->>>
->>> Luka, Felix, others on CC, do you think we should expose these
->> >from HSR over netlink as "standard" offload stats different drivers 
->>> can plug into or not worth it?  
->>
->> I think there is a case for standardizing part of this, but I would 
->> not standardize the whole set as-is.
->>
->> The LRE counters look generic enough to me, especially:
->>  - unique rx
->>  - duplicate rx
->>  - multiple rx
->>  - rx / tx
->>  - own rx
->>  - wrong LAN, PRP only
->>
->> Those are protocol/LRE concepts rather than TI firmware details, so
->> exposing them from the HSR/PRP layer sounds useful. I would expect 
->> both the software implementation and offloaded implementations to be 
->> able to provide at least some of them, with unsupported counters 
->> omitted or reported as not available.
->> I would not put the firmware check/drop counters in the same standard
->> bucket, though:
->>  - FW_HSR_FWD_CHECK_FAIL_DROP
->>  - FW_HSR_HE_CHECK_FAIL_DROP
->>  - FW_HSR_SKIP_HOST_DUP_DISCARD_FRAMES
-> 
-> Thanks for the breakdown!
-> 
->> Those sound more like implementation/debug counters for the ICSSG
->> firmware pipeline. They are still useful in ethtool driver stats, but 
->> I would be hesitant to bake their exact semantics into HSR UAPI.
->> So my preference would be:
->>  1. Keep driver-private ethtool stats for the full firmware counter set.
->>  2. Add a small HSR/PRP standard stats set separately, limited to
->>     well-defined LRE counters.
->>  3. Make the HSR layer expose them, with offload drivers plugging in via
->>     an optional callback or offload stats op.
->>  4. Define the counters carefully, including whether they are per-HSR
->>     device or per-port A/B, and what PRP-only counters mean for HSR.
->>
->> I do not think this patch should blindly become the UAPI definition, 
-> 
-> Not at all, the unique / multiple stats gave me pause. We should
-> only put in the standard API what can be easily and unambiguously
-> defined given the protocol spec.
-> 
->> but I do think it points at a useful follow-up. If we want to avoid 
->> adding driver-private names first and then standardizing different 
->> names later, then it may be worth asking Danish to split the 
->> protocol-level LRE counters out and route those through a common HSR 
->> stats interface.
-> 
-> As a general policy we ask for standard stats to be added first and
-> ethtool to only contain what didn't fit in the standard ones.
-> There are some technical reasons but it's mostly a mindset thing.
+I will review the rules. Sorry for the noise.
 
-What should be the next steps here? Is there any existing defined set of
-stats where I could populate stats from ICSSG firmware for HSR (similar
-to ndo_get_stats64 callback). Or de we need to implement a new callback
-that will do this for HSR.
+>
+> > > Reported-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+> > > Reported-by: Yiming Qian <yimingqian591@gmail.com>
+> > > Reported-by: Keenan Dong <keenanat2000@gmail.com>
+> > > Reported-by: Han Guidong <2045gemini@gmail.com>
+> > > Reported-by: Zhang Cen <rollkingzzc@gmail.com>
+> > > Tested-by: Han Guidong <2045gemini@gmail.com>
+> > > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> > > Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+> > > ---
+> > >  net/sched/act_pedit.c | 54 ++++++++++++++++++++++++++++++++---------=
+--
+> > >  1 file changed, 41 insertions(+), 13 deletions(-)
+> > >
+> > > diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+> > > index bc20f08a2..79921b8d8 100644
+> > > --- a/net/sched/act_pedit.c
+> > > +++ b/net/sched/act_pedit.c
+> > > @@ -16,6 +16,7 @@
+> > >  #include <linux/ip.h>
+> > >  #include <linux/ipv6.h>
+> > >  #include <linux/slab.h>
+> > > +#include <linux/overflow.h>
+> > >  #include <net/ipv6.h>
+> > >  #include <net/netlink.h>
+> > >  #include <net/pkt_sched.h>
+> > > @@ -323,8 +324,10 @@ static bool offset_valid(struct sk_buff *skb, in=
+t offset)
+> > >         if (offset > 0 && offset > skb->len)
+> > >                 return false;
+> > >
+> > > -       if  (offset < 0 && -offset > skb_headroom(skb))
+> > > -               return false;
+> > > +       if (offset < 0) {
+> > > +               if (offset =3D=3D INT_MIN || -offset > skb_headroom(s=
+kb))
+> > > +                       return false;
+> > > +       }
+> > >
+> > >         return true;
+> > >  }
+> > > @@ -393,17 +396,21 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_b=
+uff *skb,
+> > >         struct tcf_pedit_key_ex *tkey_ex;
+> > >         struct tcf_pedit_parms *parms;
+> > >         struct tc_pedit_key *tkey;
+> > > -       u32 max_offset;
+> > >         int i;
+> > >
+> > >         parms =3D rcu_dereference_bh(p->parms);
+> > >
+> > > -       max_offset =3D (skb_transport_header_was_set(skb) ?
+> > > -                     skb_transport_offset(skb) :
+> > > -                     skb_network_offset(skb)) +
+> > > -                    parms->tcfp_off_max_hint;
+> > > -       if (skb_ensure_writable(skb, min(skb->len, max_offset)))
+> > > -               goto done;
+> > > +       /*
+> > > +        * If the skb has shared frags the user is likely using zero-=
+copy
+> > > +        * (e.g. sendfile).  Those page frags may point to page-cache=
+ pages;
+> > > +        * writing into them would silently corrupt the page cache.
+> > > +        * Linearize so pedit operates on a private copy.
+> > > +        * TL;DR: if you want zero-copy, don't use pedit.
+> > > +        */
+> > > +       if (skb_has_shared_frag(skb)) {
+> > > +               if (__skb_linearize(skb))
+> > > +                       goto bad;
+> > > +       }
+> > >
+> > >         tcf_lastuse_update(&p->tcf_tm);
+> > >         tcf_action_update_bstats(&p->common, skb);
+> > > @@ -412,6 +419,7 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buf=
+f *skb,
+> > >         tkey_ex =3D parms->tcfp_keys_ex;
+> > >
+> > >         for (i =3D parms->tcfp_nkeys; i > 0; i--, tkey++) {
+> > > +               int write_offset, write_len;
+> > >                 int offset =3D tkey->off;
+> > >                 int hoffset =3D 0;
+> > >                 u32 *ptr, hdata;
+> > > @@ -451,12 +459,32 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_b=
+uff *skb,
+> > >                         }
+> > >                 }
+> > >
+> > > -               if (!offset_valid(skb, hoffset + offset)) {
+> > > -                       pr_info_ratelimited("tc action pedit offset %=
+d out of bounds\n", hoffset + offset);
+> > > +               if (unlikely(check_add_overflow(hoffset, offset,
+> > > +                                               &write_offset))) {
+> >
+> > I also noticed two remaining unchecked additions, e.g. hoffset +
+> > tkey->at and offset +=3D (*d & offmask) >> shift. These look more like
+> > wrap/type-semantics cleanup than a practical signed-overflow/UB issue
+> > to me, so I am OK with this patch as-is.
+>
+> Did you get this from some AI?
+> None of these are possible. Both additions you mention are safe in
+> practice because any potential wrap around or overflow is caught
+> _before any memory access occurs_. Example see:
+> offset_valid() which implictly casts hoffset + key to signed int.
 
-I agree with Luka on the categorization,
+Not AI-generated. I was looking at the code and noticed that
+tc_pedit_key fields are unsigned, but the results are stored in int
+offset and int hoffset. I was just thinking about odd edge cases where
+an unsigned-to-signed conversion results in a negative number. I agree
+with you that offset_valid() catches this anyway, so it causes no
+actual harm.
 
-Below stats can be generic,
- - unique rx
- - duplicate rx
- - multiple rx
- - rx / tx
- - own rx
- - wrong LAN, PRP only
+>
+> > > +                       pr_info_ratelimited("tc action pedit offset o=
+verflow\n");
+> > > +                       goto bad;
+> > > +               }
+> > > +
+> > > +               if (!offset_valid(skb, write_offset)) {
+> > > +                       pr_info_ratelimited("tc action pedit offset %=
+d out of bounds\n",
+> > > +                                           write_offset);
+> > >                         goto bad;
+> > >                 }
+> > >
+> > > -               ptr =3D skb_header_pointer(skb, hoffset + offset,
+> > > +               if (write_offset < 0) {
+> >
+> > There is also a small negative-offset 4-byte-write corner case, e.g.
+> > an ETH-relative edit with hoffset=3D-14 and offset=3D12, giving a final
+> > write_offset=3D-2; if the linear head after skb->data is only 1 byte,
+> > that store spans -2..1. That seems unlikely in practice; fixing it
+> > would be nice, but I would not hold this patch for it.
+> >
+>
+> Again smells AI generated. I spent a lot of time trying to determine
+> the practicality and validity of this (and your previous claim), only
+> to find that this whole claim is based on  a view that a headroom of 1
+> byte is a valid scenario in practice. Is it theoretically possible
+> from the math? yes. Practically, I don't see how it makes any sense.
+> Can you describe a scenario where this would happen in practise?
 
-Below stats can be driver specific and can be pulled using `ethtool -S`
-on child interfaces of HSR
+As I mentioned in the previous mail, I agree it is unlikely in
+practice. For context, this was an edge case brought up by sashiko
+regarding our patch. I wrote a test kernel module and verified that if
+an skb is artificially constructed with exactly 1 byte of headroom,
+skb_cow() is indeed insufficient. However, I also checked real-world
+packets and the headroom is always plenty, so I agree it doesn't
+happen in the real world.
 
- - FW_HSR_FWD_CHECK_FAIL_DROP
- - FW_HSR_HE_CHECK_FAIL_DROP
- - FW_HSR_SKIP_HOST_DUP_DISCARD_FRAMES
+>
+> > Reviewed-by: Han Guidong <2045gemini@gmail.com>
+>
+> More like reviewed by my AI who goes by the name foobar.
 
-Let me know if I should go ahead and implement this.
+I will work on improving my review quality going forward. Sorry again
+for the noise.
 
--- 
-Thanks and Regards,
-Danish
+Thanks.
 
+>
+> cheers,
+> jamal
+>
+> >
+> >
+> > > +                       if (skb_cow(skb, -write_offset))
+> > > +                               goto bad;
+> > > +               } else {
+> > > +                       if (unlikely(check_add_overflow(write_offset,
+> > > +                                                       (int)sizeof(h=
+data),
+> > > +                                                       &write_len)))
+> > > +                               goto bad;
+> > > +                       if (skb_ensure_writable(skb, min_t(int, skb->=
+len,
+> > > +                                                          write_len)=
+))
+> > > +                               goto bad;
+> > > +               }
+> > > +
+> > > +               ptr =3D skb_header_pointer(skb, write_offset,
+> > >                                          sizeof(hdata), &hdata);
+> > >                 if (!ptr)
+> > >                         goto bad;
+> > > @@ -475,7 +503,7 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buf=
+f *skb,
+> > >
+> > >                 *ptr =3D ((*ptr & tkey->mask) ^ val);
+> > >                 if (ptr =3D=3D &hdata)
+> > > -                       skb_store_bits(skb, hoffset + offset, ptr, 4)=
+;
+> > > +                       skb_store_bits(skb, write_offset, ptr, sizeof=
+(hdata));
+> > >         }
+> > >
+> > >         goto done;
+> > > --
+> > > 2.51.2.windows.1
+> > >
 
