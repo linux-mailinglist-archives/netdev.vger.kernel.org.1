@@ -1,203 +1,257 @@
-Return-Path: <netdev+bounces-290011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290012-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPjOJaXkDWpz4gUAu9opvQ
-	(envelope-from <netdev+bounces-290011-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:43:17 +0200
+	id wJhADEYODmo35wUAu9opvQ
+	(envelope-from <netdev+bounces-290012-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:40:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58CFC59251B
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:43:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C235598976
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8516630688E7
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:36:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 71AFB3708B85
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 16:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40EA369D4C;
-	Wed, 20 May 2026 16:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F9B3546D9;
+	Wed, 20 May 2026 16:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IHNyvi05"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="TsdWpPVI"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012070.outbound.protection.outlook.com [40.93.195.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40EF369D4A
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 16:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779294876; cv=fail; b=Cf45L5k+ULwA7M3fxkOFCNBGYQQSvIqBStpeU9AaNRSzprLQ0sVPh8xlh7J0/AwL2yp/P+sGdzInnqPYhbA+SUVPeTW+KRJFYBA5S9OlY/0z/j8Cxa93KhX5ZuUVBo6DIyXyho91c9+iijbfvwNldXQ2rd478TwJivrL5y1wQHY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779294876; c=relaxed/simple;
-	bh=Qo/4pYWl2KRfmMPqgiRhDjK3rhMHEE/5ClK5fGrOXwo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Dggyx3rI2L4UdnP8W2QUlUIl0DwciPP0F0Ig5v/yCDC8zFx8xX5pd4CJm9oJzw9RYLieX/DNBVMjOata7f674085IddG7X9aT9DnlOy65C6EpHGj8I9A2YFXRLOSS2LffkZT+RBmQpzf7f9FII10BbB7fjBU1BYaGZjCHbYcK0s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IHNyvi05; arc=fail smtp.client-ip=40.93.195.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fetvQ2J8OdMNIeOlRK66nZimEHt7l4/ORl/GI/B//LJ5RfQwdJogPwAE72ytRW+xspQJgsRIrsRXTw3C2o/ya2x+DzzYRjbZm3UeTfZpUbGt6KXReTohvFu6ZB/xboWawO8v+qGwMIrdzB1Q+9hslJacJkBHQajip/klY+k11PU7YzgSsDf2YfTn2uVFe4F1VChC5xFy0rTlGiyESqBNFA8hUIKKNbrSuN2tVlqWyYkSIAmCM9o0vt/uVwNpMYp9yRVDavsFZt3zOREzhrMqtegrHpfTmtljk0ovLwFV10Pmw0WQ6fw2x/VUmPoTxqp7tGKpSCgYZ2hd56+f9cYlNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=31PgFVRlwIQEG6BnzviFCZHQmwAcXny02oQ6V7Yz0Uw=;
- b=eiYHinYisWdxDRAQto+V7N6iOX5lFDPBDYkkfZsbqBxQxkkI/YmL1a591RyvaRRaXkMMk/f7MrG0UOfZKMh6tU6TH3gYL/47ckYFLz2BGfr/TYsGtNRBq7xUmW+X0jLiomUi8ZgI87uWSlIr5A6DEsB2htkSxelIqC6vnclaUbedo69oTuA/byMKNwmD/vovFmZhCye4FjO6FMzSdBs9GEW7Ck8wfdDyLUyRcWg4GWb8Er7DmP+S2tevBk+WHl5CxHJKNX+kkwaVfpZlLPaLRJbLnpyY9IU+Iq47uEpTCKcoplI2iox2PY1DjbOVAyULersjiKT0YML1lSytuCxaPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=31PgFVRlwIQEG6BnzviFCZHQmwAcXny02oQ6V7Yz0Uw=;
- b=IHNyvi0595A6OA/cqe3qD8DHaX2tejs5h7rB2SKm0UFD2WavVlMsbUlGP+MpitKWM4ZIRBcuFVjoqlk0WRXBOeXzxey6HG8q9TXHLEK+VmdlwqrSTMzw8b/kEppsiKY3dWfILzUAyxSKm7IDhZWqyCXHBRBwAcm6leBlErW6dc+ZfRKbHwyTdyczklzEluy7PWiufYa1XOWDOGmS9V1FgBQtvG9HgNhQUxCR106rujeFtSdRYPvbA9b2zAG4aSurFlcN+6pGQxP5H7iMAHPatUp1oSJel16XTC5A4l0o9h6cw1xTPSmXONnPIw4smdRe6gncCkQ7tnG2VguQsGh19w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
- by SJ5PPF2CD49510F.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::98f) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.12; Wed, 20 May
- 2026 16:34:27 +0000
-Received: from DM4PR12MB5248.namprd12.prod.outlook.com
- ([fe80::92d8:797b:4db0:d385]) by DM4PR12MB5248.namprd12.prod.outlook.com
- ([fe80::92d8:797b:4db0:d385%4]) with mapi id 15.21.0048.016; Wed, 20 May 2026
- 16:34:24 +0000
-Message-ID: <f829d309-a4b8-4474-85ab-da5ffffc801a@nvidia.com>
-Date: Wed, 20 May 2026 19:34:17 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] udp: Fix UDP length on last GSO_PARTIAL
- segment
-To: Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
- Simon Horman <horms@kernel.org>, Dragos Tatulea <dtatulea@nvidia.com>,
- Alice Mikityanska <alice@isovalent.com>,
- Matthew Schwartz <matthew.schwartz@linux.dev>
-References: <20260518062250.3019914-1-gal@nvidia.com>
- <20260518062250.3019914-3-gal@nvidia.com>
- <20260519181200.323fbaef@kernel.org>
-From: Gal Pressman <gal@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <20260519181200.323fbaef@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0318.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::18) To DM4PR12MB5248.namprd12.prod.outlook.com
- (2603:10b6:5:39c::15)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9D03DE451
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 16:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779294934; cv=none; b=YtzF6GUea3P5WxC7P5emidRVykEymkkTCdme2XURFpD4iFxJjve81eOldSls3maRcX0nTwa2qTDIfI6qyUsfR/f6DhIO75ARNaVNMe4EMlYQ4srZDdIx0jgYzGDHvghzPQtd4YmTY/IhZJF34VHaVcXTexx9S+M1RMgCb/lykEM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779294934; c=relaxed/simple;
+	bh=8jEkkJubtXEaeLZQ+pYsHFV4qq1QXHCrTGtNi8vqZmA=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=BDm4EPNVDk2+4o3jf45kshF/8WKIFMwIo4yt6X8BUPkwG/3ZLUzbX6M+Y3g9CtU0ztMuK/Vr4aIHGT3iQ+i4DkkbSbVdEA9kk9Ay7aU0XGa5Hr1Cj20ehNGcZq1yi9NXGqVmrGK3Ycu7Mafo8e4+8RbffGW0O5TjVhw+iECHNK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=TsdWpPVI; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-45e7c636e74so2649773f8f.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 09:35:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1779294930; x=1779899730; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5m4belQIBg7Mn7sCkneyV4rbMVW1Gi36YS0PWnsWsEQ=;
+        b=TsdWpPVI859z2Ndq64Y66oZWBs/yYAR794a4lj9tpEM8wFHMYNTXB3+OWNrHb7ANH+
+         rD5igm/bpQcPRpUCOCDPZ8mnagjLrvNz5hhUV5+dDyAXIMeu28j4k8/me+xeQ+u3oPww
+         NqvYkwZRmGfvr2hZSUbhAPZEjf47GrbPDR93FnX2PV6RRbfV2q1BewvmfB0bWvXzY7A1
+         c10F6CFOoOIyuvvYd6bJ51EVkZJoo02N7wWu9U6JcI/zxwrSes6eziHW65+RCFYsRCIV
+         gop77/f1BR7UvcmMNgmDAA7biAQwZVhFw4enOc07WKG0w0ngIcf5901OKlUXg0i/oRH4
+         9ZNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779294930; x=1779899730;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5m4belQIBg7Mn7sCkneyV4rbMVW1Gi36YS0PWnsWsEQ=;
+        b=M0nHDXYtjaor3agKXjJgA2uhXHJFpZKII41HOXk2UYHaLtI+MGrRHJNdVkAyQMlgDB
+         JP7UBHCIp0VqX872LcbOK2514dR8s2G9zByytAF/3BheV/tndCQqNsEHHEcYRnHt0ewx
+         ZKw24TMLqW3R8uQjHew6thQ/uftz5ZF2HhYydpKpOjJ7y9hS/rGP5EDv/gsiTL+AP44v
+         KS5aulJFUaCTiIWelczE6XT1Y7CaLfUVqFFlYHMAWJ32md+WBmkN+FEczt0TeA1i2pOS
+         tSaK8BRD8bWnLw+UDVD2w0qzj/Pt7dTuIhCcRYF6FiK4HJv2vrzqY+K+5TOCyxGxWT4e
+         xGWA==
+X-Forwarded-Encrypted: i=1; AFNElJ/7nbwuYC5PaIINdflr7UevEWXV+Qz4JdysRuwIRuEaOK4CvWkOPxTIBQnhmOSo6i9wjO1apfU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIiCkegYg2CxQORAa9PbyYHW9B8wM8xccCvbgYST3xxordQH2G
+	cWX5ud+eK7XIqfCw0zH7mK1FifjeONohqfPp2VYgzalPqvLr/lB1wk0j2GQcOrm7sBQDAAf5FYk
+	OKYQciQ==
+X-Gm-Gg: Acq92OEzxVZDoQX2w+KaIbyBtZyiKHO2hGTFTpoxWJvwZJuNfJ1UHBgMB15LzZgT8Sq
+	OnkRVVfvEydNysBM6pJ7bPDKlPhvtdnhoxZF9RDWPrsbgpiWlJpYZVoP+ktHPhhqOv4d5PRpgYP
+	cA8SvuJHwMDgOT9/EmMdRX7wV3sGEut7YPC3eSpZQgpBW55U9pAyZ1WOv5E+oob05dZ5uLjyRBN
+	uxbKi0GT9kIq9xjTN2VtsCwF34LYBdGdQ5tgYeXBX2iEQ+5mrSM5JilXc0lyDrTAst0nh8J8Wzb
+	raKdMeVcnMLQm68ByIyvAGP5oH12A6kiUT1uXWghYR/61xCZBFwWxU4FUioIsgG1vKL40We/rxJ
+	ddDzD3ckGmr9/cfR5m0GKCxMc3lQ72rSOPFdNNrkvYlBYO8UkdMfQelO0lf02xrVUxXT1GNucix
+	V98SHg2nZCvsr1rAynxx2V0WM=
+X-Received: by 2002:a5d:588f:0:b0:43d:733f:aee6 with SMTP id ffacd0b85a97d-45e5c5aefe4mr39349312f8f.10.1779294930382;
+        Wed, 20 May 2026 09:35:30 -0700 (PDT)
+Received: from [10.83.43.186] ([159.134.255.34])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9e768c4fsm55863651f8f.8.2026.05.20.09.35.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 May 2026 09:35:29 -0700 (PDT)
+Message-ID: <591b66a1-4b20-40d5-b454-9eecbabfc832@arista.com>
+Date: Wed, 20 May 2026 17:35:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5248:EE_|SJ5PPF2CD49510F:EE_
-X-MS-Office365-Filtering-Correlation-Id: cf8dbdfc-bbf9-45b7-5d31-08deb68da6e5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|11063799006|4143699003|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	C1aYE1DXBU3x3K5tuZiz5wUnwWInbOZxWdErcrQzEOaKB4+dPVwxTexKpv0BurJWhPCrI7olMi/9B12MgH831pSN8HRYoSVmW3TAmkmbzJRcYRPXb8SuTt5QLZ6NhlQHOo91h7+5VKJoqlIeAxQkvbGIyuR5vlbfjjuWp3PBlx1D2QkV7Fd8ZXqyLFjjjxmeC6qpKGNdeayT392O+iK/OqaLTK1VQYNcKlm/5og+WsNBy3WKTtbIQzdAg3D/dQnoJBwDjAacHTXucs/pp/8fxjzyIxMQL9YkSoUAoxtUAn4Bg4mGhhFRTY8YwwkV9uqVEKR0WVeaoamqsOR8fyPCJLbHRMJnbAiaeuuixGPWwUWamQoBFz+6TMDwXoY/BElz+vNaD0N/NCNkUCGpd4vFXNan8HtvVQNLDF8dD3+m72WPJhdRCgvNfmX+LzQ2L24E/wKXwF+SrF4ELfnCqdBih8GF61Qb9nAoySRSp1c0v/0bHuNbqOQS/W687rF4thGa9R3gSsEJ6/AgIIO9paHy1Vkbf1b8rnvkHY3KTcCPAgVxoOETGZ54PpGNPwyS5W0SoejSElURPat6LFMvaVQSoGqOErBPGzA3EvFj+OQThH+vD8e8w7+aQlKDOfwVWlsNlGOa5U97UFk/l9534NluG0l4yC77g7FQLttHK9a53/jwuPVQ5W+tnhJLtnX2gYG6
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5248.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(11063799006)(4143699003)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?d29KbjFaVUkwcVpyREMwcWs4ZXRFOWVFSzNQbm0wV0lJcHlzMVAza1JIeGhq?=
- =?utf-8?B?cGNzS1ZNalViV1hkNG92VGRWU3BPeUtwd2JmeTN4RlVMSDNROEVpWjl5Tjk5?=
- =?utf-8?B?MldRQW96eFBxbVhGMFZxbUN1UUVQTXNEMXJ0WHA5c2VzbXRLdzcvUko1OWtO?=
- =?utf-8?B?RnducVJDQjVZZU90eEh4WDAzZDVzQ3VGYlJQaktUb1VIb0dibHkwei9uYjZk?=
- =?utf-8?B?NEZ1bnRScVdyQlE4K0IrL1RGbWxPeVB0VC9qOUNhYWkzNXdoNjFMQ3huT3N0?=
- =?utf-8?B?bGxVOTkvR01wRVhEeUdjQVJnRVZQVlA1bHpBYm5GRFE4b1ZpS3AveUNwcUYw?=
- =?utf-8?B?V2t0VkdKK2RTeU9lelBMTVMrT0ZEdVBBZ2JkYTJIdUI3Z0huWVZ2UTBYQzZX?=
- =?utf-8?B?Z2FidFVlRnUxQzNybUdhajR6eS8vMStNM0MxWVorN2p6Wm02b3B4K0lTT2h1?=
- =?utf-8?B?cGJTSXJweERuS3AybGVvS2YzZDlnTEc0Qm8wYmZ0bE9FUW9DaXFCTjVUK095?=
- =?utf-8?B?Y1Q0YXo4ZDdjT21PL2tHaTVLUDdLWXg2cFUzK1UwZy91N1dFNVY1WWtvTlpn?=
- =?utf-8?B?M0xrOERpRkVuS2RQK1NaR2N0SnhnTG10ZmxkYUs3Sml0L1EwU2k5WjUxcFBz?=
- =?utf-8?B?WjJ5b3FNWk9FcEZPTDRHSXBIaEFXN1ZGWU5wbXNoWXdVYWI0bXBibEpqTFVH?=
- =?utf-8?B?S0hSZlF0K1kwSGxrWkVZSm1sMVZ4eUhqUlhQZzd1SnpmY2IyTkVXeklBTUdG?=
- =?utf-8?B?VXpCTGpTc0hvanI5bVdIZGRYU2t5M3RheUJLSmhWMG9GdHN2T2RVTi91dC9S?=
- =?utf-8?B?QWl6cXNaZW1SNUxiVUhSbHlDRGRvVHBuTVZSSDBZbFJRT3VaaXNzOTFLYWJu?=
- =?utf-8?B?N01ZcVFLcjEyVnJjZVJnTGxuR05QNXBOR3ArdWlmZjY3RFhERGwvSGNLelVB?=
- =?utf-8?B?RDZYOEQrL0Z0Z0N3SEhFWm9mYWwrR1NkRWdpdlBhSDRzbzh3alBrYVlnVzlF?=
- =?utf-8?B?TUE1TjFYSk5FT0w0Mk95K2cwM0xhWDhUSktaMHhsOUJiOVB2ZzZQckcxbzlF?=
- =?utf-8?B?ZVcxSmJzNThZZUpBQXg4anJlOUZHVkp0SWpYRUE2aGJQVzBSMXZZVU9DZEN4?=
- =?utf-8?B?T3hoUkFuVmpXOGROeUUwU016T1Fucmprb0pWVUhVWkpWRXYzNGQ3RTl0bXdC?=
- =?utf-8?B?MnN2SlFpT0ptUFAwVEpGbkJNd0lNMUVGVy9TSVk2TUhNU3FzeFBhdHlDdFFv?=
- =?utf-8?B?eCtGb1QrbVlJa3VkSmRZSlg2Q29Jb1lONnl6Nlh1WHN6WmtIYWlPRkZtdjVY?=
- =?utf-8?B?c0VTSSt6bmtqcUFnN0hQT0E3amVkYjhpdmx6RCtJckFDZEs5VDZadHhPWStW?=
- =?utf-8?B?eTFsMjNDV0pMejhFZDN3ci9SYVhadmhFWnZyb3JuQ2lva2FXcnRFUjZ5Z0hV?=
- =?utf-8?B?UjlpQnpaNENSRU5CcUVmWCt5TDEreWVNZDJBOHRpQzFLRFJhdDRzTndpWTdy?=
- =?utf-8?B?dVYzL2xDWVN5YzR2aXNJVW9DQ3JoeUtHOUY1SWdTMkNPQS9HVkxKb0I4VmJS?=
- =?utf-8?B?V2JPTzdJV3FVZEhQOEhkUThadk9Od0V3UXZqMXYrRlp6TTc4b040SDBmVFVZ?=
- =?utf-8?B?a1d2WFFicE1qS3RlaHJqWVd3OHd2YUZNSmpoay9rSGorNlkxaFVaUVErbTVL?=
- =?utf-8?B?WjkvZ29zc2k1S2RobG9wTEtXK0F3MTNoVEVlRlozT0ptZ21USVVUQno0elNk?=
- =?utf-8?B?alJObjczT09WdzR1d2hCVjFqaGFHcG9wMmE3ZWFjL0hHS0dxMTRFSCt6MDds?=
- =?utf-8?B?V0FZV3hCb1RVTGIyYkZPNTJqTzFkbm41OWxuazdLVTlVaFByaE42UlZPbUpn?=
- =?utf-8?B?emlVOS9JN0trYkJYc09SRUNOZUxyV0JiUmUyYTMzeWZ4bGRxKzlib25sWE9M?=
- =?utf-8?B?Ni9PNytYVVhQazRFNG1OYzQwL0NVaVRqTjVUVjhHUFduampnVWhMd2pOMG9k?=
- =?utf-8?B?TjhySStPditudFA3L1hUdVJ4aGVXaWtOZGE1dndQdmk4TDZvdTd1REg2STB1?=
- =?utf-8?B?VGVnQ1VwYnNQMWpFd2VLdmM5cFVOSzRha2o1UlJSTkIwaVppcExqdFN3eVBI?=
- =?utf-8?B?SXBQa0tzc0hhTXAyeVVheXRRVmcyS2RHYU9qM1l0aTNhTzIwLzRQNkZud0Vr?=
- =?utf-8?B?YU83aEd5MFpGWEVGNGI2Mkw5aU5DMEpwQmFlQTRNcnA3ZGRUczZxTUt2d0d3?=
- =?utf-8?B?S211d1RJSS9nUTBQbWR2cWlGSHZBM1ljSStuUmNMdnpIdXdHbjN6bTh3eHh3?=
- =?utf-8?Q?WiQ1RG04zGJDCu6W8f?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf8dbdfc-bbf9-45b7-5d31-08deb68da6e5
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5248.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 16:34:24.1927
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EErzMGrAStv0zA8vkQgJmd9NoeKRd3aP5mr5CxMbpXIC8mqwT+t5eOOKAEyzyXd1
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF2CD49510F
-X-Spamd-Result: default: False [1.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+From: "Yury M." <yurypm@arista.com>
+Subject: [PATCH net v2] net: tg3: guard napi_disable and pci_disable_device
+ calls
+To: pavan.chebbi@broadcom.com, mchan@broadcom.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Yury Murashka <yurypm@arista.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
+	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290011-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[arista.com:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290012-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yurypm@arista.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 58CFC59251B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4C235598976
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 20/05/2026 4:12, Jakub Kicinski wrote:
-> On Mon, 18 May 2026 09:22:50 +0300 Gal Pressman wrote:
->> +	if (!skb_is_gso(seg))
->> +		/* last packet can be partial gso_size, account for that in
->> +		 * checksum.
->> +		 */
-> 
-> No need to repost but I think we should tweak this comment.
-> Saying "partial gso_size" when it such segment is in fact
-> not part of GSO_PARTIAL is a bit confusing. How about:
-> 
-> 	/* Unless skb fits perfectly as GSO_PARTIAL, the trailing
-> 	 * segment may not be full MSS, account for that in the checksum
-> 	 */
-> 
-> ?
+During PCIe hot-plug events, uncorrectable errors can be reported and
+AER recovery for the tg3 device is initiated by the AER kernel driver.
+The tg3_io_error_detected function is the AER error recovery handler.
 
-Sounds good, should I submit a patch?
+ From tg3_io_error_detected, we call tg3_netif_stop->tg3_napi_disable->
+napi_disable and return PCI_ERS_RESULT_NEED_RESET on non-fatal error.
+We expect that during AER recovery tg3_io_slot_reset and tg3_io_resume
+will be called. But AER error recovery can fail. For example, when one
+of PCIe devices on the same bus reports PCI_ERS_RESULT_NO_AER_DRIVER.
+As a result, tg3_io_slot_reset and tg3_io_resume are not called, PCIe
+device is disabled and NAPI is disabled (pci_disable_device and
+napi_disable are called from tg3_io_error_detected). Then we can try to
+disable PCIe link and napi_disable will be called again:
+
+   napi_disable+0x1b/0x1b0
+   tg3_napi_disable+0x89/0xa0 [tg3]
+   tg3_netif_stop+0x37/0xe3 [tg3]
+   tg3_stop+0x30/0x160 [tg3]
+   tg3_close+0x2a/0x60 [tg3]
+   __dev_close_many+0xad/0x130
+   dev_close_many+0xb2/0x190
+   unregister_netdevice_many_notify+0x19d/0xa00
+   unregister_netdevice_queue+0xf8/0x140
+   unregister_netdev+0x1c/0x30
+   tg3_remove_one+0xaa/0x150 [tg3]
+   pci_device_remove+0x42/0xb0
+   device_release_driver_internal+0x19c/0x200
+   pci_stop_bus_device+0x85/0xb0
+   pci_stop_bus_device+0x2c/0xb0
+   pci_stop_bus_device+0x2c/0xb0
+   pci_stop_and_remove_bus_device+0x12/0x20
+   pciehp_unconfigure_device+0x9f/0x160
+   pciehp_disable_slot+0x67/0x100
+   pciehp_handle_presence_or_link_change+0x77/0x350
+
+This is not expected by napi_disable and a thread can be locked in
+napi_disable forever. We have pcierr_recovery to cover a similar issue,
+but for fatal errors. We cannot reuse this flag because it is reset in
+tg3_io_resume, but it is not called when AER recovery fails.
+
+Similarly, if an AER error is reported and tg3_io_error_detected calls
+pci_disable_device, a subsequent device removal via tg3_remove_one or
+tg3_shutdown will call pci_disable_device again for the already-disabled
+device.
+
+Add a napi_enabled flag to struct tg3 to track whether napi_enable has
+been called. Guard tg3_napi_disable() against being called before
+tg3_napi_enable(), logging an error if that happens. Also guard
+pci_disable_device() calls in tg3_remove_one() and tg3_shutdown() with
+pci_is_enabled() to avoid disabling an already-disabled device.
+
+Fixes: b45aa2f6192e ("tg3: Add EEH support")
+Signed-off-by: Yury Murashka <yurypm@arista.com>
+---
+  drivers/net/ethernet/broadcom/tg3.c | 19 +++++++++++++++++--
+  drivers/net/ethernet/broadcom/tg3.h |  1 +
+  2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c 
+b/drivers/net/ethernet/broadcom/tg3.c
+index 73a4b569b..500b6f7fa 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -7396,8 +7396,18 @@ static void tg3_napi_disable(struct tg3 *tp)
+  	int txq_idx = tp->txq_cnt - 1;
+  	int rxq_idx = tp->rxq_cnt - 1;
+  	struct tg3_napi *tnapi;
++	struct net_device *netdev = tp->dev;
+  	int i;
+  +	if (!tp->napi_enabled) {
++		netdev_err(netdev, "%s() called when napi_enable wasn't called 
+before, netif_running=%d, pci_enabled=%d\n",
++			   __func__, netif_running(netdev),
++			   pci_is_enabled(tp->pdev));
++		return;
++	}
++
++	tp->napi_enabled = false;
++
+  	for (i = tp->irq_cnt - 1; i >= 0; i--) {
+  		tnapi = &tp->napi[i];
+  		if (tnapi->tx_buffers) {
+@@ -7420,6 +7430,8 @@ static void tg3_napi_enable(struct tg3 *tp)
+  	struct tg3_napi *tnapi;
+  	int i;
+  +	tp->napi_enabled = true;
++
+  	for (i = 0; i < tp->irq_cnt; i++) {
+  		tnapi = &tp->napi[i];
+  		napi_enable_locked(&tnapi->napi);
+@@ -17718,6 +17730,7 @@ static int tg3_init_one(struct pci_dev *pdev,
+  	tp->tx_mode = TG3_DEF_TX_MODE;
+  	tp->irq_sync = 1;
+  	tp->pcierr_recovery = false;
++	tp->napi_enabled = false;
+   	if (tg3_debug > 0)
+  		tp->msg_enable = tg3_debug;
+@@ -18099,7 +18112,8 @@ static void tg3_remove_one(struct pci_dev *pdev)
+  		}
+  		free_netdev(dev);
+  		pci_release_regions(pdev);
+-		pci_disable_device(pdev);
++		if (pci_is_enabled(pdev))
++			pci_disable_device(pdev);
+  	}
+  }
+  @@ -18257,7 +18271,8 @@ static void tg3_shutdown(struct pci_dev *pdev)
+   	rtnl_unlock();
+  -	pci_disable_device(pdev);
++	if (pci_is_enabled(pdev))
++		pci_disable_device(pdev);
+  }
+   /**
+diff --git a/drivers/net/ethernet/broadcom/tg3.h 
+b/drivers/net/ethernet/broadcom/tg3.h
+index a9e7f88fa..34fb771e8 100644
+--- a/drivers/net/ethernet/broadcom/tg3.h
++++ b/drivers/net/ethernet/broadcom/tg3.h
+@@ -3429,6 +3429,7 @@ struct tg3 {
+  	struct device			*hwmon_dev;
+  	bool				link_up;
+  	bool				pcierr_recovery;
++	bool				napi_enabled;
+   	u32                             ape_hb;
+  	unsigned long                   ape_hb_interval;
+-- 
+2.51.0
+
 
