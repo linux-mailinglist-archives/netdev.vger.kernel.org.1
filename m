@@ -1,227 +1,172 @@
-Return-Path: <netdev+bounces-289946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289947-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMj+I2a0DWoT2QUAu9opvQ
-	(envelope-from <netdev+bounces-289946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 15:17:26 +0200
+	id eze0HWi5DWpv2wUAu9opvQ
+	(envelope-from <netdev+bounces-289947-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 15:38:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D0358EA59
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 15:17:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BD9B58EEB3
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 15:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 39FA2303595B
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:15:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B89DD3013ECF
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 13:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59493D8906;
-	Wed, 20 May 2026 13:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32A72D8391;
+	Wed, 20 May 2026 13:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="pfjIpnZD"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="LGn1XMEq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E74318A92F;
-	Wed, 20 May 2026 13:14:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779282899; cv=none; b=qdlBWuPqHxnNhsIW8DVVKZn7FozgMIkQLdHNhTeVH3C5PdJETahqBSFxCmmWWjQUXZz2ftMSXEBgk8/2spl9khbylr+j91SfsbE3MW/2NZSj9SeuXiggmyydCftWwO2oWPY8/9qz6gFvaEhz+fOzpXbIdf4gyhHmMbHZxTL/u0g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779282899; c=relaxed/simple;
-	bh=332yNbiHDYC/q9L/Y5HE8KnpnzR9GFg1YT2UZ6XlgcE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I0ArusyJ09DcNqCLDaSz4aeTX/QbcPihmGmJTPlnMUaI0r3Uk5WmmXFQgejS4R1q41mYhZUYx/GvGiIVKpTcN7H3QOE1ycGtpPehO/HMVa6YY5oyDbgolj6YMKJTMl7tEbvfZpZlcHXMOzCsyKlBABtVfMXSU/5uj8i2uAQDKUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=pfjIpnZD; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5EA31F00894;
-	Wed, 20 May 2026 13:14:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1779282898;
-	bh=0QKNnksfj1AdZlcvGjbO9ONmdIYwgP155TcW3tFuYBk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=pfjIpnZDDTzdBq1CciBSb6qLL0OSY1mgfkIi87Qsdh/qJk2G0dcwH5LNpaK4YQmCp
-	 3oBlSlfNxcCdGOBxEKTAeeJF/ch8dkcwba7wAqrTu5KrEM6EKUsZ25U72aOpEgByq1
-	 wCMr9cZxgtiCf/URM350vXXm6I6fiGkstwbAx3MA=
-Date: Wed, 20 May 2026 15:15:01 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: August Wikerfors <git@augustwikerfors.se>,
-	Thorsten Leemhuis <regressions@leemhuis.info>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	Linux kernel regressions list <regressions@lists.linux.dev>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-Message-ID: <2026052047-silica-grub-0bb2@gregkh>
-References: <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh>
- <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
- <2026051909-impurity-nemesis-2f65@gregkh>
- <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
- <2026051942-uproar-drainpipe-6370@gregkh>
- <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
- <e666c332-e2aa-4525-a208-a4a08742d2e0@augustwikerfors.se>
- <2026052026-barber-espresso-1d9a@gregkh>
- <CABBYNZJ4woc+unpYN6_dzMLtxhFVUd5+ccv2+EQbDMkYuXQ12A@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2A62C15A9
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 13:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779284131; cv=pass; b=tpXwbBrouSizJeHHW8E5eRksUz3XaVFr4jLMDPJ95O3ZTZJHQOgjMS4GPcFZLyhnf20aNHaNqsseC/HuOW3zSTeLWDrK2LFP4+2/FA6g3YguCPdntisQBymz9LqgEDxUo8KXRPCWQWVjuTU3roxoDxJh2ZJK9CWkgcw6ctcD6zw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779284131; c=relaxed/simple;
+	bh=TaewVaaJSRTgVv7uiAvCvNN525apvixVpdwb+G50UPM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bH7M472NnuBSGlFXVkB9XfoYWroJyPse0OD9kexeJPgj7Hvexx3pTPUOxNnXi+SlneGASX2nY39jysNUZXOi/OEyz/2z+1CHCyC1i90yo21lo33HaErB+Zl8jhFNYCbB+A7Opf2hV7+QtSa04cEQFhrw0lrovO3tVIM3SnZAlgw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LGn1XMEq; arc=pass smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5a74ac8b40aso5456852e87.1
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:35:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779284128; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VXzjzdzxINLORxSQZb3nKQ7EJCk98V1vLl7oKfw7f73tao+V8HNxlDWe1YL4ZJcJfX
+         9jJUuRdDF7hcYoqYCsCR/UN07wjn8MxPjmTA2VMlfrIXYy7V+AYzyt+7lT8k7asvz/GC
+         1ypE6IIeDZ9uEpll3dM7S5XVDCP24PvzqoTJmyA9eB8aPglEsbq553YveCEBsyTHZUm/
+         Us/HuNEukk89SXA9HNKLOwSQ1Gf39MPKnTkHK4MwEPVGkQpPZyLKl6L4+Rc1shv/NEkC
+         nZluf2XqEdZY1fc5nipGYiWFYLJo3Bp3USvoJe+2E8y7krAGJcAoyF0NG0rUNB/JTImt
+         WBUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Yu0/XtO4dIfAu/cztcBneHSKuN0SeWCUAeJO4rKJAag=;
+        fh=lkHr/KJ4ZJxBrnCcPDBKosKqDaCTv+CDnYwd29zfdo4=;
+        b=f+iwkbHPk71zKv61UQbUehmwDN5jDMYnvlACi5cds53WtL0NGNm8vwtLvnIeUBv4QS
+         w4GufqhPuEj3rx0780axB1Ah3kBlRwKRDhDN/Acgl8t+NhntGEvglWorVQQo6kDZTH6D
+         2fHFj2nbrL4TCgTFcLSUfLTmzI/5hCxpqxYvCEJtTCyA/UYaoLbrCE+e3bM1hbTsRg7H
+         mLRNAdpCogEa72Vyzy9Po1M4m/szkKtyQ9uwuwAIC5tf9VySmLRajv3+Te7O4M9S3T4l
+         +LNEf+dXcb56FcjrYBqAR4eUml9ct/cwunGjYuNAuzDZzJc4oU3tQ0oRYGNwycr97UM8
+         6nNQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1779284128; x=1779888928; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yu0/XtO4dIfAu/cztcBneHSKuN0SeWCUAeJO4rKJAag=;
+        b=LGn1XMEqc7BwAhuIEoaGJz1Ki15lwdTkwh5ZqSasJbAHLIPYwItSy8PyDWIqj7TiRL
+         +/tqPFnreQHSqMjI+CDSKlR5UmBY80l3eOzhsVNwsHk2hFT3IMlzAqjI0HAw2QdbQLWy
+         xluVpgZ55mwkiBKrJNRzafPc5fdTSbXQfXgOIhqvjd5owAMLxTmTEYriHrHqu048yPpp
+         iYwowOEwcgfbNesWsaDGvFmot3AM/WxdRjaM24e/8Ubil/X06kWrSLd6OaUIaM5S3+Aw
+         skpgfWDVFbWWvacsKCsNzYkSWoI4yjb+kPgO3iPVHAv3bj2BpJuNYTXL2/xW2Cr21+8U
+         BKtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779284128; x=1779888928;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Yu0/XtO4dIfAu/cztcBneHSKuN0SeWCUAeJO4rKJAag=;
+        b=FR64afJsxuMeFOGN++uxVAs+yv8IRZKkBqJeUFg+R5Gl5k780/bbyPFo8q6heq/u1w
+         EPdxG30SFbGmEod3JhatpYH9RGChGSYa/xutu0o4DDzZPaB6CqB9H+LwErZhW+nExf0S
+         n0xycsRZtLeZPuRVYyP3F3Miz+PwVE4FK0w9Ci37pGuf8djSFUSMKfHSS5dl+TdBzWpd
+         90ocCGhLdM3mj5P+mDC5NLymyh/K5swXggPhsX5EyKz2vV0eQ4/yv8nUYAjyhgKw5F9/
+         Vs/pmhf8DRj0dCAdRrvKe/hT54+1nHrx6TY8ofVuHnAmEP2LREaNiJZLAp+vNUAR7Myb
+         P+0A==
+X-Forwarded-Encrypted: i=1; AFNElJ/nV7GTydFHVrP2SYtvDsGjjydFQWzSF5JIwpQL1X+Q/kY52tVxNDVEGMnf/DvdAbmjYU4Tm9M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuaWLcUTJvSMAMxRgsJXDjpjOMaQ1g3EQ9QwdNydScfLuSjC9p
+	HVG6e5tWJvf2P2cqhye356im0wXm7NN+oIi4Aj8NTIrm9yweJ0WVD66w2TCNR5pO2izS0dChXyz
+	aHL+oOewXY6Ote3z2yyyt2v+UbdN4fuPa9kTQD9FJuA==
+X-Gm-Gg: Acq92OFwwJsHHL1F4JCurMnyJuFyFoWdBmoGRn+7Vj9si2ttb1rM4nnAwnCj8fnZcHq
+	+Ox4CXtW8N53UNdRmDaM8xazxrxrpk6Dp/vujSaRHsoGlbj6PzF0Ngr+4woEGJwPKcwNdkjSy5o
+	2UzwouK8OuXbR4+5WXoM69M5HjWVFT6/LUWU3ROWkHN1RdRsyW1al6XoekhonuB2clorAxHhHro
+	hqECJ44CQoHJxxqpzUDo6yzWU0yjjfE06XaTxhM3oLuPGkyz+VtUXT7AvEjGorU9yzMDTcuJfx3
+	nR4GHLvLqBEdzawxDuE=
+X-Received: by 2002:a05:6512:3d17:b0:5a4:1096:94e4 with SMTP id
+ 2adb3069b0e04-5aa0e73f375mr6835140e87.2.1779284128482; Wed, 20 May 2026
+ 06:35:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZJ4woc+unpYN6_dzMLtxhFVUd5+ccv2+EQbDMkYuXQ12A@mail.gmail.com>
-X-Spamd-Result: default: False [3.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+References: <20260515135143.259669-1-marco.crivellari@suse.com>
+ <20260515135143.259669-3-marco.crivellari@suse.com> <20260519182219.0d685a27@kernel.org>
+ <10173685-596f-1eb0-0903-a3d7ba4dff9b@ssi.bg>
+In-Reply-To: <10173685-596f-1eb0-0903-a3d7ba4dff9b@ssi.bg>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Wed, 20 May 2026 15:35:17 +0200
+X-Gm-Features: AVHnY4IeRKHo331ej-I0dmnws79oeyR-8QctDEsIk4GCUGbIHbl2IQWDS5Yw-jk
+Message-ID: <CAAofZF47k3FiALNvNzaU8W=sNXXUH2Wfx==0G9qJAGM1rFOS_A@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/2] ipvs: Replace use of system_unbound_wq
+ with system_dfl_long_wq
+To: Julian Anastasov <ja@ssi.bg>
+Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Michal Hocko <mhocko@suse.com>, Simon Horman <horms@verge.net.au>, Eric Dumazet <edumazet@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
+	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-289947-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289946-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,linutronix.de,suse.com,verge.net.au,google.com,davemloft.net,redhat.com,netfilter.org,strlen.de,nwl.cc];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,linuxfoundation.org:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E3D0358EA59
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,ssi.bg:email]
+X-Rspamd-Queue-Id: 2BD9B58EEB3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 09:11:42AM -0400, Luiz Augusto von Dentz wrote:
-> Hi Greg,
-> 
-> On Wed, May 20, 2026 at 8:47 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+On Wed, May 20, 2026 at 6:11=E2=80=AFAM Julian Anastasov <ja@ssi.bg> wrote:
+> [...]
+> > On Fri, 15 May 2026 15:51:37 +0200 Marco Crivellari wrote:
+> > > Subject: [PATCH v2 net-next 2/2] ipvs: Replace use of system_unbound_=
+wq with system_dfl_long_wq
 > >
-> > On Tue, May 19, 2026 at 07:37:35PM +0200, August Wikerfors wrote:
-> > > On 2026-05-19 17:49, Luiz Augusto von Dentz wrote:
-> > > > Hi Greg,
-> > > >
-> > > > On Tue, May 19, 2026 at 11:19 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > > >
-> > > > > On Tue, May 19, 2026 at 09:44:39AM -0400, Luiz Augusto von Dentz wrote:
-> > > > > > Hi Greg,
-> > > > > >
-> > > > > > On Tue, May 19, 2026 at 8:07 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > > > > >
-> > > > > > > On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
-> > > > > > > > On 5/19/26 12:30, Greg KH wrote:
-> > > > > > > > > On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
-> > > > > > > > > > On 5/15/26 17:10, Thorsten Leemhuis wrote:
-> > > > > > > > > > > On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > > The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
-> > > > > > > > > > > >    net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
-> > > > > > > > > > > >
-> > > > > > > > > > > > are available in the Git repository at:
-> > > > > > > > > > > >
-> > > > > > > > > > > >    git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
-> > > > > > > > > > > >
-> > > > > > > > > > > > for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
-> > > > > > > > > > > >
-> > > > > > > > > > > >    Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
-> > > > > > > > > > >
-> > > > > > > > > > > It seems this PR sadly came too late for this week's net PR to mainline
-> > > > > > > > > > > that was merged yesterday.
-> > > > > > > > > > >
-> > > > > > > > > > > TWIMC, from my point of view, it would be great if we somehow could
-> > > > > > > > > > > still get the changes from this PR or at least the btmtk fix it
-> > > > > > > > > > > contains[1] to mainline this week before -rc4, as it is fixing a
-> > > > > > > > > > > regression known since 2026-04-24 that at least five people encountered
-> > > > > > > > > > > with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
-> > > > > > > > > > > validate WMT event SKB length before struct access") [006b9943b982 in
-> > > > > > > > > > > -next].
-> > > > > > > > > >
-> > > > > > > > > > Greg, Sasha, that [1] fix I was talking about now reached -next as
-> > > > > > > > > > 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
-> > > > > > > > > > events") and will likely hit mainline on Thursday or so with the weekly
-> > > > > > > > > > -net PR to -mainline. If that's good enough for you, I'd say it would be
-> > > > > > > > > > good to pick this up for the next round of stable kernels.
-> > > > > > > > >
-> > > > > > > > > That "Fixes:" tag is referring to something that is also not in any
-> > > > > > > > > tree, but that commit does have a cc: stable in it.  So do we need both
-> > > > > > > > > of these:
-> > > > > > > >
-> > > > > > > > Valid question, as yes, there is a slight mixup here:
-> > > > > > > >
-> > > > > > > > > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
-> > > > > > > >
-> > > > > > > > That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
-> > > > > > > > -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
-> > > > > > > > btmtk: validate WMT event SKB length before struct access") -- the one
-> > > > > > > > that is causing the regression that I want to get fixed. So we now only
-> > > > > > > > need:
-> > > > > > > >
-> > > > > > > > > 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
-> > > > > > >
-> > > > > > > Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
-> > > > > > > nightmare to track over time, ugh.
-> > > > > >
-> > > > > > Hmm, did we get the wrong hash or something? Usually, that would show
-> > > > > > up in the verify-fixes.sh, but perhaps it didn't capture it this time
-> > > > > > for some reason, perhaps I'm running an outdated version or something
-> > > > > > similar.
-> > > > >
-> > > > > Something went wrong if we ended up with a patch in the stable trees,
-> > > > > yet this fix is referring to it as a different git sha.  Don't know
-> > > > > where the disconnect happend :(
-> > > >
-> > > > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before
-> > > > struct access")
-> > > >
-> > > > I don't have that in any of our tree either, this is actually
-> > > > 634a4408c061 on all trees in the chain:
-> > > >
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/commit/?id=634a4408c061
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=634a4408c061
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=634a4408c061
-> > > >
-> > > > Or actually that was the hash before it got rebased on bluetooth-next tree:
-> > > >
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=041e88fb0c08
-> > > >
-> > > > But I didn't send the PR from that three so perhaps somebody else sent
-> > > > it to stable with the wrong fixes tag?
-> > > I believe the confusion comes from "Bluetooth: btmtk: accept too short WMT
-> > > FUNC_CTRL events" itself currently having different commit hashes in
-> > > bluetooth (e3ac0d9f1a20) and bluetooth-next (162b1adeb057). The former
-> > > correctly refers to "Bluetooth: btmtk: validate WMT event SKB length before
-> > > struct access" as 634a4408c061 in the Fixes tag and was merged into net
-> > > yesterday heading for 7.1-rc5. The latter still refers to it as
-> > > 041e88fb0c08. Both are now in next-20260519 but only the latter was in
-> > > next-20260518 which was the latest at the time of Thorsten's message.
-> > >
-> > > Greg, this means picking e3ac0d9f1a20 instead of 162b1adeb057 should result
-> > > in a valid Fixes tag.
-> >
-> > Ok, now done.  Be careful of duplicate commits in different branches
-> > that are marked for backporting with different ids.  It can cause
-> > massive confusion (i.e. don't be like the drm tree...)
-> 
-> Noted. I guess I need to dig into how other trees do to avoid that.
-> The problem seem related to using 2 trees: bluetooth->net (fixes only,
-> rebased on each RC) versus bluetooth-next->net-next (development,
-> rebased once per release).
+> > FTR leaving this one to netfilter folks
+>
+>         Yep, we wait net to be merged to net-next because the patch
+> depends on commit 5522d65d81a7
+> ("ipvs: avoid possible loop in ip_vs_dst_event on resizing")
 
-Just never rebase any public tree please.
+Thanks to both of you.
+
+--=20
+
+Marco Crivellari
+
+SUSE Labs
 
