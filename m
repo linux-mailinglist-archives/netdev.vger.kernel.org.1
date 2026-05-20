@@ -1,197 +1,264 @@
-Return-Path: <netdev+bounces-290099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290100-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJXuE/oXDmpT6AUAu9opvQ
-	(envelope-from <netdev+bounces-290099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:22:18 +0200
+	id mPyWLr4bDmrP6AUAu9opvQ
+	(envelope-from <netdev+bounces-290100-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:38:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D815997FC
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:22:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38E4D599DD5
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 21AF33038119
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:22:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3FEC03040945
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55515363C72;
-	Wed, 20 May 2026 20:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BDD372ED2;
+	Wed, 20 May 2026 20:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="otfqESK+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tM8G90hX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AB82C11CF;
-	Wed, 20 May 2026 20:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969DC372ED0;
+	Wed, 20 May 2026 20:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779308535; cv=none; b=rAGjnvWGaR71UmXeOrm0mxyt5ojgc7H9cg5qWeYwP96bnPN8wlHITvZzfJBnwWDnc///t7+TXq4wMkijUj3A33HgwPE99CEDqldOcGvDuddXu+TenhIRpf/gFcr3bPL8MV2r7msxEoHChYWAJ6TIsrm6oXnht3wXiuGPz8WTXRg=
+	t=1779309446; cv=none; b=R553lmcS6v+ASyXpSe7hmZZYz1QdO6TtIfX2F565hbKnoNWSejd4Rm8Ld676wEGTMDIPRek0uVEw4HKts/6cjcmGzvzGGvM1pOV+7JFzpZ1xQ208ZI1u+H7I61ev1zJow0HMx7Zv5m16RaOv+jLpOE/yt28514X+I0JpkeC9Hv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779308535; c=relaxed/simple;
-	bh=nRLqrDYk0roVUBeGzBI1ExnYXIRg22itoV4wyJXntaQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VeoTabnt766dtvway8JWnodjpc4Oc7iwsFQNC5k/k+8L+PdVHfFyAxxN4QpXab6kKN6r+IXs0mt9tYxF49peUrftOB54FMMXdwskLIg2U8ARXWB21aaGS7WzCvU//40Eyj3HhsclcEIHTeAQiUW5XKbBTTZ/s8Q1Bw36XlQMqN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=otfqESK+; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EC161F000E9;
-	Wed, 20 May 2026 20:22:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779308533;
-	bh=t2xs/wezjVbb05royOoz11bvYw63xJEuge6uovnJQtE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=otfqESK+xcMmlnJRLdgDOVMKUep2r4hwO77Py4qQ1Xxtj3Vo9zswAUCiIsSv1KLvl
-	 FJyF09J3y6dY/tWd55o8ze+2mVvkFh5aB995vX01eHlqymkis97AOGKx3fwJIOeZOD
-	 6hijIejx/9dPWrs8Q4Z8hH6BpsanpdQhhWjkMYP6PSMTsVGjc2D6ldS3w9RP6BlumS
-	 Rlh27Z6WSD5w3IcYBEbWRUcVz5GFz30oWMcc8TT5m5cOI+C6raJ4QsgFkChHN0MR1Q
-	 I5QQMWrwBKCINohyXypQmJT79ND1GINXC4RPW0C5gT4zSGcml3VbZkQjIyoDseirQN
-	 zqOMLDr9wik9A==
-From: Simon Horman <horms@kernel.org>
-To: len.bao@gmx.us
-Cc: 'Simon Horman' <horms@kernel.org>,
-	m.grzeschik@pengutronix.de,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] arcnet: com90xx: Mark cards and numcards variables as __ro_after_init
-Date: Wed, 20 May 2026 21:16:46 +0100
-Message-ID: <20260520201644.1528107-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260516134628.30672-1-len.bao@gmx.us>
-References: <20260516134628.30672-1-len.bao@gmx.us>
+	s=arc-20240116; t=1779309446; c=relaxed/simple;
+	bh=Yi70dB/jT91/u8tcFVwviOtAofrfiAfrDmEIEUS6P6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YJ3XJthY21G+gESUHMtobthcUSeWvN3+N+2okXUWcP83nHhF1WbttwXTIZGD8J5BwQNcv26a/ibJmlVdaG+sv4Xr0Bo7BtPTXvVvVLLTgCNGfXMN+wRhUGYHuIb+ZQkWTlAuhFXmSV73LIGuVG5oeRGp4boFq2udwDDLNxl62lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tM8G90hX; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/jydwNDrtaG39ojIvvfIFNlq6g4H991wFtbH0rqz4Uc=; b=tM8G90hXYMVoob2lWMPUhwSKaR
+	Xkif/sFjJMnNYo74mtArpRq0FoSCFHzxNbylJm8Ja3ROjUdNywRdnFu3rwsQNKTjMs5VH1mfgQHx6
+	FF+zA5+wHYDg3vgiY/UN1Lw9XYdjlikPEE1+jVEyqyhwC72wZUTZiZkxvUC8ZBjCFyg0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wPnf3-003twE-N4; Wed, 20 May 2026 22:37:01 +0200
+Date: Wed, 20 May 2026 22:37:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: mike.marciniszyn@gmail.com
+Cc: Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Daniel Golle <daniel@makrotopia.org>, Kees Cook <kees@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>, Lee Trager <lee@trager.us>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Alok Tiwari <alok.a.tiwari@oracle.com>,
+	Chengfeng Ye <dg573847474@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] net: eth: fbnic: Add led support
+Message-ID: <74576086-f51f-41ef-b0ef-c4e0373a06c4@lunn.ch>
+References: <20260520200337.204431-1-mike.marciniszyn@gmail.com>
+ <20260520200337.204431-4-mike.marciniszyn@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260520200337.204431-4-mike.marciniszyn@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290099-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmx.us];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290100-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,makrotopia.org,gmail.com,intel.com,trager.us,oracle.com,linux.intel.com,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: C2D815997FC
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 38E4D599DD5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+> +/**
+> + * fbnic_set_phys_id - Used to strobe the MAC LEDs in a recognizable pattern
+> + * @netdev: Interface/port to strobe the LEDs for
+> + * @phys_id_state: State requested by the call
+> + *
+> + * This function can really be broken down into two parts. There are the
+> + * ACTIVE/INACTIVE states which really are meant to be defining the start
+> + * and stop of the LED strobing. There is also the ON/OFF states which are
+> + * used to provide us with a way of telling us that we should be turning
+> + * the LED on and/or off.
+> + *
+> + * We translate these calls and pass them off to the MAC layer. They will
+> + * be used to initialize a strobe, then on and off will be used to cycle
+> + * between the patterns, and finally we will restore the original LED state.
+> + *
+> + * We will return 2 when we are requested to go active. This will tell the
+> + * call that it will need to call back to turn on/off the LED twice every
+> + * second.
+> + *
+> + * Return: blink in half second intervals on success, negative value on failure
+> + */
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Could you drop this for the moment. Ideally, we want the LED core to
+be implementing this somehow, so that all devices using the core get
+this functionality, rather than put it in every driver.
 
-Simon says: This is a driver that doesn't seem to have seen any
-            real attention for some time. I do wonder if we should
-	    leave it be.
+> +static int fbnic_led_hw_ctl_set(struct led_classdev *led_cdev,
+> +				unsigned long flags)
+> +{
+> +	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
+> +	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
+> +	int led_idx = fbnic_led_get_idx(fbd, ldev);
+> +	u32 supported_modes;
+> +
+> +	supported_modes = fbnic_led_get_supported_modes(fbd, led_idx);
+> +
+> +	if (flags & ~supported_modes)
+> +		return -EINVAL;
+> +
+> +	/* Turn on activity LED only when both the TX and RX flags are set. */
+> +	if (led_idx == FBNIC_LED_ACTIVITY && (flags & supported_modes) &&
+> +	    flags != supported_modes) {
+> +		dev_warn(fbd->dev,
+> +			 "Invalid activity LED mode(s): 0x%lx\n", flags);
+> +		return -EINVAL;
 
-	    But as we are here, I'm passing on the AI generated review
-	    with some commentary.
+How does this happen? It should be that the core will not ask you to
+do something you cannot do, if you have answered -EOPNOTSUPP in
+fbnic_led_hw_ctl_is_supported().
 
----
-arcnet: com90xx: Mark cards and numcards variables as __ro_after_init
+> +static int fbnic_led_brightness_set_blocking(struct led_classdev *led_cdev,
+> +					     enum led_brightness brightness)
+> +{
+> +	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
+> +	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
+> +	int led_idx = fbnic_led_get_idx(fbd, ldev);
+> +
+> +	mutex_lock(&fbd->led_mutex);
+> +	if (!brightness) {
+> +		fbd->leds[led_idx].enabled_modes = 0;
+> +		fbd->leds[led_idx].strobe_mode = 0;
+> +	} else {
+> +		u32 mode;
+> +
+> +		switch (led_idx) {
+> +		case FBNIC_LED_ACTIVITY:
+> +			fbd->leds[led_idx].enabled_modes =
+> +				BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
+> +			break;
+> +		default:
+> +			mode = fbnic_led_get_link_speed_mode(fbd);
+> +			fbd->leds[led_idx].enabled_modes = mode;
+> +			break;
+> +		}
+> +	}
 
-This commit marks the cards and numcards variables as __ro_after_init since
-they are only initialized during the init phase and are never changed
-afterward.
+This looks odd. led_brightness_set() is simply used to set the LED to
+on or off. The netdev trigger will use it to software blink the LEDs
+when asked to do something which cannot be offloaded to the hardware.
 
-> diff --git a/drivers/net/arcnet/com90xx.c b/drivers/net/arcnet/com90xx.c
-> index b3b287c165617..bdcdccbfb0017 100644
-> --- a/drivers/net/arcnet/com90xx.c
-> +++ b/drivers/net/arcnet/com90xx.c
-> @@ -67,8 +67,8 @@ static void com90xx_copy_from_card(struct net_device *dev, int bufnum,
+And when the LED is being used to show NUMLOCK, or Morse code crash
+dump, network activity should not intervene.
+
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+> index 53b7a938b4c2..c6b1130f9159 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+
+
+> @@ -623,6 +623,53 @@ static bool fbnic_pmd_update_state(struct fbnic_dev *fbd, bool signal_detect)
+>  	return false;
+>  }
 >  
->  /* Known ARCnet cards */
->  
-> -static struct net_device *cards[16];
-> -static int numcards;
-> +static struct net_device *cards[16] __ro_after_init;
-> +static int numcards __ro_after_init;
+> +u32 fbnic_get_link_speed(u8 link_speed)
+> +{
+> +	switch (link_speed) {
+> +	case FBNIC_FW_LINK_MODE_25CR:
+> +		return SPEED_25000;
+> +	case FBNIC_FW_LINK_MODE_50CR2:
+> +	case FBNIC_FW_LINK_MODE_50CR:
+> +		return SPEED_50000;
+> +	case FBNIC_FW_LINK_MODE_100CR2:
+> +		return SPEED_100000;
+> +	default:
+> +		return 0;
+> +	}
+> +}
+> +
+> +static void fbnic_set_led_state(struct fbnic_dev *fbd, int state)
+> +{
+> +	mutex_lock(&fbd->led_mutex);
+> +
+> +	/* alternating amber,blue IDs device every half second */
+> +	switch (state) {
+> +	case FBNIC_LED_OFF: /* amber on, blue off */
+> +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode = FBNIC_STROBE_ON;
+> +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode = FBNIC_STROBE_OFF;
+> +		break;
+> +	case FBNIC_LED_ON: /* amber off, blue on */
+> +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode = FBNIC_STROBE_OFF;
+> +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode = FBNIC_STROBE_ON;
+> +		break;
+> +	case FBNIC_LED_RESTORE:
+> +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode =
+> +			FBNIC_STROBE_DISABLED;
+> +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode =
+> +			FBNIC_STROBE_DISABLED;
+> +		break;
+> +	case FBNIC_LED_STROBE_INIT: /* a no-op */
+> +		/* Initialization is a no-op; LED toggling happens on ON/OFF */
+> +		goto out_unlock;
+> +	default:
+> +		goto out_unlock;
+> +	}
+> +
+> +	fbnic_led_update_csr(fbd);
+> +out_unlock:
+> +	mutex_unlock(&fbd->led_mutex);
+> +}
+> +
 
-Simon says: I believe this is an existing bug rather than a regression.
-            But I am concerned that this patch may make it worse.
-	    So I'm wondering if it should be fixed at the same time
-	    by a series containing:
-	    1. a patch to fix this overflow
-	    2. this patch (to set __ro_after_init)
+This appears to be something different to trig-netdev and sys class
+LED control of the LED. Please could you move this out into another
+patch. Add clean support for the LED first, and them mess it all up in
+follow up patches adding all your vendor specific stuff. We can then
+think about if some of that can be moved into the LED core/trig-netdev
+somehow.
 
-Could this change exacerbate an existing regression where we overflow the
-cards array?
-
-com90xx_probe() can test up to 32 default I/O ports. For each valid device
-found, com90xx_found() unconditionally executes:
-
-drivers/net/arcnet/com90xx.c:com90xx_found() {
-    ...
-	if (register_netdev(dev))
-		goto err_unmap;
-
-	cards[numcards++] = dev;
-	return 0;
-    ...
-}
-
-If more than 16 devices are successfully probed, this writes past the cards
-array. Since this patch marks these variables as __ro_after_init, they are
-now placed adjacently in memory.
-
-Is it possible that the overflow will now clobber numcards with a pointer
-value, leading to an out-of-bounds index on the next iteration?
-
-Simon says: The issue flagged below also appears to be an existing bug
-            rather than a regression. And I don't believe it impacts
-	    this patch or needs to block progress of it.
-
-Additionally, while reviewing this code, I noticed a second potential
-regression in com90xx_found(). Are we registering the IRQ handler before
-initializing the function pointers?
-
-drivers/net/arcnet/com90xx.c:com90xx_found() {
-    ...
-	/* reserve the irq */
-	if (request_irq(airq, arcnet_interrupt, 0, "arcnet (90xx)", dev)) {
-		arc_printk(D_NORMAL, dev, "Can't get IRQ %d!\n", airq);
-		goto err_release_mem;
-	}
-	dev->irq = airq;
-
-	/* Initialize the rest of the device structure. */
-	lp->card_name = "COM90xx";
-	lp->hw.command = com90xx_command;
-	lp->hw.status = com90xx_status;
-    ...
-}
-
-If an interrupt triggers immediately after request_irq() completes (e.g., due
-to a spurious interrupt), arcnet_interrupt() will execute, evaluate
-!netif_running(dev) as true, and invoke lp->hw.status(dev).
-
-Because alloc_arcdev() zero-allocates the private data, lp->hw.status is NULL
-at this point. Can this lead to a NULL pointer dereference?
+	Andrew
 
