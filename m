@@ -1,177 +1,307 @@
-Return-Path: <netdev+bounces-289706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289708-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GLbJA9QWDWq5tAUAu9opvQ
-	(envelope-from <netdev+bounces-289706-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:05:08 +0200
+	id QOZ6NiYYDWoctQUAu9opvQ
+	(envelope-from <netdev+bounces-289708-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:10:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E576586B34
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:05:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BC07586B8A
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:10:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4EDDC3005D0B
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:04:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C4D223036CFA
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DA02DAFCB;
-	Wed, 20 May 2026 02:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338362F0C7E;
+	Wed, 20 May 2026 02:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="X82Qn6g5"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Zbf+mCkW"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0041CDFCA
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 02:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768612D12EC;
+	Wed, 20 May 2026 02:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779242684; cv=none; b=cuy11DBGau4MPBzceDXk3HzEzMJJw4IE9UWQP7VjUtFPfBdGp0qFWi8fdc+e7AiKgQKeRvXC9DT1+dB8W7CNQh5X8JwzWv+DDT27dHLiV1XOr18ZzDdh3jWBmom++DuAjlsJuA9NrEfHKfMaSnR7DiyCFx9sbUjn1R31/811Zqc=
+	t=1779243042; cv=none; b=O5+0Apkg7kwuRb5iNhkUrGtZoLU5ZZ6bmnhvqkLkVs4aKAfApqo+/mF8uWYR2Hn9MVLlVHPU+R0i2n6bkP2CHJG66XQyubhk4hegxGtlEs5f1etDhkakdFpFpuHFJ/6C66hT+HjuJBqdp7bV69AmiZscgsxgYjjs8WsfvOYJQeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779242684; c=relaxed/simple;
-	bh=1mYZLt6JhKjD66nEjp0R8JMd2KC3DFKyLczm5lxC7yg=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MJZ6DdHF8IPA1ibw+5+HB9/dIBxLvuT0RFL9GVp3XeOiPjHAQntW4Ttlfviqu0rdwEeGvuC1uddiJwxl9LDai2510hcQeYV6+b8I46xicRiqI+eNmFMdgjaFbTk4frkVrdREA7Ijv6fxnsWBd2RRMMCGSi0yGDt8pV/qYBk1m4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=X82Qn6g5; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id C0BE62C0658;
-	Wed, 20 May 2026 14:04:33 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1779242673;
-	bh=1mYZLt6JhKjD66nEjp0R8JMd2KC3DFKyLczm5lxC7yg=;
-	h=From:To:Subject:Date:References:In-Reply-To:From;
-	b=X82Qn6g5waD7C0qYNNkWu9t163jzc+1jQDaXesi0PrXfEdSWduxa9Xc32NzmAbatV
-	 BSLjg3XspmFjovG3ahMp1VAV3XnZybS9DxTDGoxxg8rAyNUnvEOYx3e2YttCSdw0/S
-	 3+vhPsPZxohnEkg+Ba2b1QVRHmVP5RS+S64HBIoP9w30C2hNuu6zNJ/s/DyNl+TWxC
-	 jo/R7O8/uvonG8eObwru9mHE5LH2CGBjoPuNGzJoZCjSAQk9Mtlg9Qq40KWW7JH/7L
-	 WF5vXGd0Xwc5WXV0qlyyGpVuUdme4/91RNvdCrpElVAY6/KhfcfBvVtR5v5UYk2kDg
-	 8Xhm6L68Y+szQ==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B6a0d16b10002>; Wed, 20 May 2026 14:04:33 +1200
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Wed, 20 May 2026 14:04:33 +1200
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1748.039; Wed, 20 May 2026 14:04:33 +1200
-From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-To: Markus Stockhausen <markus.stockhausen@gmx.de>, "andrew@lunn.ch"
-	<andrew@lunn.ch>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "daniel@makrotopia.org"
-	<daniel@makrotopia.org>
-Subject: Re: [PATCH 0/9] mdio: realtek-rtl9300: Groundwork for multi SOC
- support
-Thread-Topic: [PATCH 0/9] mdio: realtek-rtl9300: Groundwork for multi SOC
- support
-Thread-Index: AQHc57Cy88mPwJb+m061hysJJswj3bYVYXSA
-Date: Wed, 20 May 2026 02:04:33 +0000
-Message-ID: <31a47180-e0cc-4731-aca4-e5266aecb7a2@alliedtelesis.co.nz>
-References: <20260519165747.1288903-1-markus.stockhausen@gmx.de>
-In-Reply-To: <20260519165747.1288903-1-markus.stockhausen@gmx.de>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <511AD8658A71A2468B1DFCD1421ABC2A@alliedtelesis.co.nz>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1779243042; c=relaxed/simple;
+	bh=89TI9AMKiIsSleln+m25W9TF16dEfvQiK5CBRT+Abrg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fUZBTmbjejaxKHEZ9ICXdEMb1yF9u+coauFDv8aCuHqBMceasTJRSdf6x/PeAK336FbdXfF8hdvWE3/zDKkAkEUbyVMgLAI05jozSIpEkgSpkCN5tLDYG5w/glXh0mLkQMu9ABcgTLbwWNKoN0+CC5CBGacibMII+sxPnkwDdf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Zbf+mCkW; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64JGkRdk243583;
+	Tue, 19 May 2026 19:10:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=qU7A6wzmErt/99IDFZq0JEV
+	JBjGikHaSrLDkxEY+42k=; b=Zbf+mCkW98kCtl6BF2RtjDc0vbzfmkuZrDY9S4M
+	JOHDZggMp7I/gWaq7AJUBvE4Pza1OqzrJqCjHSG7is/9bLK5wW2+yxuV9bGiP2OQ
+	iLCGVM61CzzgsbUd12jUwCvuJfXpdOUpOviRiMUz5d56Dkriz18Y0mQprSIFOmo2
+	SI1JpzOuUEaIR/vX4xdYgRUsYpeezf9oKJJUdf3ePXXydox1DHvGdCM82L2CTNcw
+	TjMao5C9ZFfOOzfRIN5X9XnyY8xbHiKsp8WWXkzdM3JKm7m2JBCXtnnpUqObW9Ip
+	XrX4kiPexKYM33+eSW8SF8ufp5rm4r7X/+dStcYukmc2rFA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e8k5rk4nd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 May 2026 19:10:01 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 19 May 2026 19:10:00 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 19 May 2026 19:10:00 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 6396F5B693E;
+	Tue, 19 May 2026 19:09:52 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <oss-drivers@corigine.com>
+CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
+        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
+        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
+        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
+        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
+        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
+        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
+        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
+        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
+        <vadim.fedorenko@linux.dev>, Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: [PATCH v15 net-next 0/9] octeontx2-af: npc: Enhancements.
+Date: Wed, 20 May 2026 07:39:30 +0530
+Message-ID: <20260520020939.1457231-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=Es1xrjcA c=1 sm=1 tr=0 ts=6a0d16b1 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=drD7vYo3kbIA:10 a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=q4N3wYjI9pO_S6glQpgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
-X-Spamd-Result: default: False [-2.06 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=Ka7idwYD c=1 sm=1 tr=0 ts=6a0d17f9 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=1rdZWFfAsYpIarNArpIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDAxOCBTYWx0ZWRfX4NBxceOx7Sop
+ kFENnyeC0nAGpeuJYTnIeB4MEwjxkAnfe2smKswfv3UKZysIa/3cmf5ajzZ4UqeoSTQaA8UMHFG
+ l9PWCAcA+NwMQ0F2UjF+V2osP1JaufUzL+ezSIjJMVP6t4hv5aYAqScBBbtqcBBPd0PDZjzBL0t
+ 01Xj51iLcuy+X7VSUo/M3gnlUfGlWtcFG5kQSE7OQa3ryoC2jnlObcKXpULMxuseB7Ue8aClBLY
+ UlbGoeLatRszfNncp4NhUnGoDciMbuFujlCBJ4u512hugLnR3XWvAc1RIZWN0+wEv3rMcM/9est
+ LAj63KTZqjIJFfyAH1ma/BHhDI0j87HHMWPX8MQcwEp5jb+KYGLMLY3My2XZsHR3ib5JTM+N13F
+ MJhavniGqkSaSJKToWlOiM/5OhNuA9d7ihEmOy/cZdrVP3J0FO8rPpJDwpNgKjq1ayjErvSvUVg
+ iz5Vc825vKVaNd1mdng==
+X-Proofpoint-GUID: 46gFyKetsYMmZTmOCoWPq0aIKy6F0HQ8
+X-Proofpoint-ORIG-GUID: 46gFyKetsYMmZTmOCoWPq0aIKy6F0HQ8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-19_06,2026-05-18_01,2025-10-01_01
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[alliedtelesis.co.nz,quarantine];
-	R_DKIM_ALLOW(-0.20)[alliedtelesis.co.nz:s=mail181024];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,gmx.de:email];
-	TAGGED_FROM(0.00)[bounces-289706-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmx.de,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,makrotopia.org];
+	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[alliedtelesis.co.nz:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Chris.Packham@alliedtelesis.co.nz,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289708-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 2E576586B34
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 5BC07586B8A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-SGkgTWFya3VzLA0KDQpPbiAyMC8wNS8yMDI2IDA0OjU3LCBNYXJrdXMgU3RvY2toYXVzZW4gd3Jv
-dGU6DQo+IFRoZSBSZWFsdGVrIE90dG8gc3dpdGNoIHBsYXRmb3JtIGNvbnNpc3Qgb2YgZm91ciBk
-aWZmZXJlbnQgc2VyaWVzDQo+DQo+IC0gUlRMODM4eCBha2EgbWFwbGUgICA6IDI4IHBvcnQgMUcg
-U3dpdGNoZXMNCj4gLSBSVEw4Mzl4IGFrYSBjeXByZXNzIDogNTIgcG9ydCAxRyBTd2l0Y2hlcw0K
-PiAtIFJUTDkzMHggYWthIGxvbmdhbiAgOiAyOCBwb3J0IDFHLzIuNUcvMTBHIFN3aXRjaGVzDQo+
-IC0gUlRMOTMxeCBha2EgbWFuZ28gICA6IDU2IHBvcnQgMUcvMi41Ry8xMEcgU3dpdGNoZXMNCj4N
-Cj4gVGhlIGV4aXN0aW5nIHJlYWx0ZWstcnRsOTMwMCBNRElPIGRyaXZlciB3YXMgb25seSBkZXNp
-Z25lZCBmb3IgUlRMOTMweA0KPiBkZXZpY2VzLiBUaGUgdGhyZWUgb3RoZXIgU09DcyBhcmUgbm90
-IHN1cHBvcnRlZCBhbHRob3VnaCB0aGV5IGJhc2ljYWxseQ0KPiBpbmNvcnBvcmF0ZSBhIHZlcnkg
-c2ltaWxhciBNRElPIGNvbnRyb2xsZXIuDQo+DQo+IFRoaXMgc2VyaWVzIGlzIHRoZSBmaXJzdCBz
-dGVwIGluIGEgbXVsdGkgc3RhZ2UgYXBwcm9hY2ggdG8gYWxzbyBzdXBwb3J0DQo+IHRoZSBtaXNz
-aW5nIFNPQ3MuIERldmljZSBzcGVjaWZpYyBwcm9wZXJ0aWVzIGFuZCByZWdpc3RlcnMgYXJlIGNv
-bnZlcnRlZA0KPiBpbnRvIGRlc2lnbmF0ZWQgaW5pdGlhbGl6ZXJzLiBCYXNlZCBvbiB0aGlzIG5l
-dyBkZXZpY2VzIGNhbiBiZSBhZGRlZA0KPiBtdWNoIGVhc2llciBpbiBmdXR1cmUgY29tbWl0cy4N
-Cj4NCj4gU2lnbmVkLW9mZi1ieTogTWFya3VzIFN0b2NraGF1c2VuIDxtYXJrdXMuc3RvY2toYXVz
-ZW5AZ214LmRlPg0KDQpGaXJzdCBvZmYgdGhhbmtzIGZvciBwaWNraW5nIHRoaXMgdXAuIFRoZSBp
-bml0aWFsIGRyaXZlciB3YXMgYSBiaXQgb2YgYSANCnBhaW4gdG8gZ2V0IG92ZXIgdGhlIGxpbmUu
-wqBJIHdhcyBuZXZlciBhYmxlIHRvIHRlc3QgdGhlIGNsYXVzZSAyMiBzdHVmZiANCm9uIGFueSBy
-ZWFsIGhhcmR3YXJlIChhbGwgb2YgbXkgc3R1ZmYgd2FzIEM0NSksIGl0IHdhcyBkb25lIGJhc2Vk
-IG9uIHRoZSANCmRhdGFzaGVldHMgSSBoYWQgYXQgdGhlIHRpbWUgKHdoaWNoIEkgZG9uJ3QgY3Vy
-cmVudGx5IGhhdmUgYWNjZXNzIHRvKS4NCg0KSSBzZWUgdGhlIE1ESU8oQlVTLEFERFIpIC0+IFBP
-UlQgaXMgc3RpbGwgY2F1c2luZyBjb25mdXNpb24uIEl0IGlzIG9uZSANCm9mIHRoZSBtb3JlIGFu
-bm95aW5nIGFzcGVjdHMgb2YgdGhlIGhhcmR3YXJlLiBUaGUgYmFzaWMgc3VtbWFyeSBpcyB0aGUg
-DQpoYXJkd2FyZSB3YW50cyB0byBvd24gdGhlIFBIWXMgYnV0IExpbnV4IHdhbnRzIHRvIGtub3cg
-YWJvdXQgdGhlbSB0b28uIA0KVGhlIFJlYWx0ZWsgU0RLIGJ1bmRsZXMgdGhpcyBhbGwgdG9nZXRo
-ZXIgd2l0aCBsb3RzIG9mIHRpZ2h0bHkgY291cGxlZCANCmNvZGUgb3JpZW50ZWQgYXJvdW5kIHN3
-aXRjaCBwb3J0cy4gTGludXggd2FudHMgUEhZcyBhbmQgTUFDcyB0byBleGlzdCANCnNlcGFyYXRl
-bHkgKElNSE8gdGhpcyBpcyB0aGUgY29ycmVjdCB0aGluZyB0byBkbykuwqAgSSBkb24ndCBrbm93
-IGhvdyB0aGUgDQpSZWFsdGVrIFNESyB3b3VsZCBkZWFsIHdpdGggZXhvdGljIFBIWXMgd2l0aCBz
-cGVjaWZpYyByZXF1aXJlbWVudHMgZm9yIA0KaG9zdC9saW5lIHNpZGUgc2V0dGluZ3Mgb3Igbm9u
-LVBIWSBkZXZpY2VzIGxpa2Ugd2UgaGF2ZSB3aXRoIHNvbWUgRFNBIA0Kc3dpdGNoZXMsIEkgc3Vz
-cGVjdCBpdCB3b3VsZG4ndA0KDQpUaGUgUmVhbHRlayBpbnRlcm5hbCBQSFkgcG9sbGluZyBzdHVm
-ZiBkb2VzIHNlZW0gdG8gYmUgYWJsZSB0byBjYXRlciBmb3IgDQpzb21ld2hhdCBhcmJpdHJhcnkg
-RXRoZXJuZXQgUEhZcyBpZiB5b3UgcHJvdmlkZSB0aGUgcmVsZXZhbnQgcmVnaXN0ZXJzLCANCm1h
-c2tzIHZhbHVlcyB0byB1c2UgZm9yIHBvbGxpbmcuIFRoZSBkZWZhdWx0cyBhcmUgc2V0dXAgZm9y
-IHRoZSBSZWFsdGVrIA0KUEhZcyB0aGV5IHdhbnQgdG8gc2VsbCB5b3UgYnV0IEkgaGF2ZSBzZWVu
-IGEgY291cGxlIG9mIFJlYWx0ZWsgYmFzZWQgDQpkZXNpZ25zIHVzaW5nIE1hcnZlbGwgKEFRUikg
-UEhZcy4NCg0KPiBNYXJrdXMgU3RvY2toYXVzZW4gKDkpOg0KPiAgICBuZXQ6IG1kaW86IHJlYWx0
-ZWstcnRsOTMwMDogQ29udmVydCB0byBnZW5lcmljIHByZWZpeA0KPiAgICBuZXQ6IG1kaW86IHJl
-YWx0ZWstcnRsOTMwMDogQWRkIGRldmljZSBzcGVjaWZpYyBpbmZvIHN0cnVjdHVyZQ0KPiAgICBu
-ZXQ6IG1kaW86IHJlYWx0ZWstcnRsOTMwMDogQWRkIHBvcnRzIHRvIGluZm8gc3RydWN0dXJlDQo+
-ICAgIG5ldDogbWRpbzogcmVhbHRlay1ydGw5MzAwOiBBZGQgcGFnZXMgdG8gaW5mbyBzdHJ1Y3R1
-cmUNCj4gICAgbmV0OiBtZGlvOiByZWFsdGVrLXJ0bDkzMDA6IEFkZCByZWdpc3RlciBzdHJ1Y3R1
-cmUNCj4gICAgbmV0OiBtZGlvOiByZWFsdGVrLXJ0bDkzMDA6IEFkZCBjb21tYW5kL0MyMiByZWdp
-c3Rlcg0KPiAgICBuZXQ6IG1kaW86IHJlYWx0ZWstcnRsOTMwMDogQWRkIEkvTyByZWdpc3Rlcg0K
-PiAgICBuZXQ6IG1kaW86IHJlYWx0ZWstcnRsOTMwMDogQWRkIG1hc2sgcmVnaXN0ZXINCj4gICAg
-bmV0OiBtZGlvOiByZWFsdGVrLXJ0bDkzMDA6IExpbmsgSS9PIGZ1bmN0aW9ucyBpbiBpbmZvIHN0
-cnVjdHVyZQ0KPg0KPiAgIGRyaXZlcnMvbmV0L21kaW8vbWRpby1yZWFsdGVrLXJ0bDkzMDAuYyB8
-IDIxMyArKysrKysrKysrKysrKy0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMTI5IGlu
-c2VydGlvbnMoKyksIDg0IGRlbGV0aW9ucygtKQ0KPg==
+This series extends Marvell octeontx2-af support for CN20K NPC (MCAM
+debuggability, allocation policy, default-rule lifetime, optional KPU
+profiles from firmware files, X2/X4 MCAM keyword handling in flows and
+defaults, and dynamic CN20K NPC private state), adds a devlink mechanism
+for multi-value parameters, and adjusts devlink param netlink helpers
+and mlx5 so stack usage stays within -Wframe-larger-than limits once union
+devlink_param_value grows.
+
+Patch 1 improves CN20K MCAM visibility in debugfs: mcam_layout marks
+enabled entries, dstats reports per-entry hit deltas, and mismatch lists
+enabled entries without a PF mapping. MCAM enable state is tracked in a
+bitmap updated from the CN20K enable path.
+
+Patch 2 reduces stack usage in mlx5e_pcie_cong_get_thresh_config() by
+reusing a single union devlink_param_value across four
+devl_param_driverinit_value_get() calls (instead of
+union devlink_param_value val[4] on the stack) and assigning each vu16
+into mlx5e_pcie_cong_thresh,
+so the helper stays under the frame-size warning limit as the union grows
+(patches 3-4).
+
+Patch 3 changes devlink_nl_param_value_put() and
+devlink_nl_param_value_fill_one() to pass union devlink_param_value by
+pointer instead of by value. Passing two copies of the union by value in
+the param netlink path consumes over 500 bytes of argument stack and risks
+CONFIG_FRAME_WARN as the union grows beyond its historical size (patch 4).
+
+Patch 4 (Saeed) introduces DEVLINK_PARAM_TYPE_U64_ARRAY and nested
+DEVLINK_ATTR_PARAM_VALUE_DATA attributes so drivers and user space can
+exchange bounded u64 arrays; YAML, uapi, and netlink validation are
+updated.
+
+Patch 5 adds a runtime devlink parameter srch_order to reorder CN20K
+subbank search during MCAM allocation.
+
+Patch 6 ties default MCAM entries to NIX LF alloc/free on CN20K, adds
+NIX_LF_DONT_FREE_DFT_IDXS for PF teardown paths that must not drop default
+NPC indexes while the driver still owns state, and tightens nix_lf_alloc
+error propagation.
+
+Patch 7 allows loading a custom KPU profile from /lib/firmware/kpu via
+module parameter kpu_profile, with cam2 / ptype_mask wiring and helpers
+that share firmware-sourced vs filesystem-sourced profile layouts.
+
+Patch 8 makes default-rule allocation, AF flow install, and PF-side RSS,
+defaults, and ethtool flows respect the active CN20K MCAM keyword width
+(X2 vs X4), including X4 reference-index masking and -EOPNOTSUPP when a
+flow needs X4 keys on an X2-only profile.
+
+Patch 9 replaces file-scope npc_priv and static dstats with allocation
+sized from discovered bank/subbank geometry, threads npc_priv_get()
+through CN20K NPC paths, and allocates dstats via devm_kzalloc for the
+debugfs helper.
+
+The mlx5 change sits immediately before the devlink patches so the series
+applies cleanly and stays warning-free when built incrementally;
+pass-by-pointer precedes the U64 array type so helpers are not copying an
+even larger union by value. The CN20K patches keep srch_order ahead of
+NIX LF coordination, KPU-from-filesystem, X2/X4 handling, and the npc_priv
+refactor that touches the same files heavily.
+
+Ratheesh Kannoth (8):
+  octeontx2-af: npc: cn20k: debugfs enhancements
+  net/mlx5e: Reduce stack use reading PCIe congestion thresholds
+  devlink: pass param values by pointer
+  octeontx2-af: npc: cn20k: add subbank search order control
+  octeontx2: cn20k: Coordinate default rules with NIX LF lifecycle
+  octeontx2-af: npc: Support for custom KPU profile from filesystem
+  octeontx2: cn20k: Respect NPC MCAM X2/X4 profile in flows and DFT
+    alloc
+  octeontx2-af: npc: cn20k: Allocate npc_priv and dstats dynamically.
+
+Saeed Mahameed (1):
+  devlink: Implement devlink param multi attribute nested data values
+
+ Documentation/netlink/specs/devlink.yaml           |   4 +
+ drivers/dpll/zl3073x/devlink.c                     |   6 +-
+ drivers/net/ethernet/amazon/ena/ena_devlink.c      |   8 +-
+ drivers/net/ethernet/amd/pds_core/core.h           |   2 +-
+ drivers/net/ethernet/amd/pds_core/devlink.c        |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c  |   6 +-
+ drivers/net/ethernet/intel/ice/devlink/devlink.c   |  30 +-
+ .../ethernet/marvell/octeontx2/af/cn20k/debugfs.c  |  16 +-
+ .../net/ethernet/marvell/octeontx2/af/cn20k/npc.c  | 542 ++++++++++++---------
+ .../net/ethernet/marvell/octeontx2/af/cn20k/npc.h  |   6 +-
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |   1 +
+ drivers/net/ethernet/marvell/octeontx2/af/npc.h    |  17 +
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |  12 +-
+ .../ethernet/marvell/octeontx2/af/rvu_devlink.c    | 114 ++++-
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |  69 ++-
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc.c    | 486 ++++++++++++++----
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc.h    |  17 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c |  12 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_reg.h    |   1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_devlink.c  |   4 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_flows.c    |  48 +-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |   6 +-
+ drivers/net/ethernet/mellanox/mlx4/main.c          |  14 +-
+ drivers/net/ethernet/mellanox/mlx5/core/devlink.c  |  72 +--
+ .../mellanox/mlx5/core/en/pcie_cong_event.c        |  45 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/nv_param.c |  12 +-
+ drivers/net/ethernet/mellanox/mlxsw/core.c         |   8 +-
+ drivers/net/ethernet/netronome/nfp/devlink_param.c |   6 +-
+ drivers/net/netdevsim/dev.c                        |   4 +-
+ include/net/devlink.h                              |  12 +-
+ include/uapi/linux/devlink.h                       |   1 +
+ net/devlink/netlink_gen.c                          |   2 +
+ net/devlink/param.c                                | 120 +++--
+ 35 files changed, 1175 insertions(+), 536 deletions(-)
+
+--
+
+v14 -> v15: Addressed Paolo comments
+	https://lore.kernel.org/netdev/20260514062537.3813802-1-rkannoth@marvell.com/
+
+v13 -> v14: Addressed sashiko comments.
+	I had to revert Jiri comment in v11 as sashiko was complaining about
+	leaking kernel memory to userspace.
+	https://lore.kernel.org/netdev/20260511033923.1301976-1-rkannoth@marvell.com/
+
+v12 -> v13: Addressed David Laight comments
+	https://lore.kernel.org/netdev/20260508034912.4082520-1-rkannoth@marvell.com/
+
+v11 -> v12: Addressed Paolo,Jiri comments.
+	https://lore.kernel.org/netdev/20260409025055.1664053-1-rkannoth@marvell.com/
+	Added one patch which was rejected by simon in net
+	(as it was kind of enhancement rather than a bug)
+	Added one more patch- which allocates two variables from heap.
+
+v10 -> v11: Addressed Paolo comments.
+	https://lore.kernel.org/netdev/20260403025533.6250-1-rkannoth@marvell.com/
+
+v9 -> v10: Addressed Paolo comments
+	https://lore.kernel.org/netdev/
+	20260330053105.2722453-1-rkannoth@marvell.com/
+
+v8 -> v9: Addressed Simon comments
+	https://lore.kernel.org/netdev/
+	20260325072159.1126964-1-rkannoth@marvell.com/
+
+v7 -> v8: Addressed Simon comments
+	https://lore.kernel.org/netdev/
+	20260323035110.3908741-1-rkannoth@marvell.com/T/#t
+
+v6 -> v7: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260320165432.98832-1-horms@kernel.org/
+
+v5 -> v6: Addressed Jakub,Jiri comments
+	https://lore.kernel.org/netdev/
+	20260317045623.250187-1-rkannoth@marvell.com/
+
+v4 -> v5: Addressed Jakub comments
+	https://lore.kernel.org/netdev/
+	20260312022754.2029595-6-rkannoth@marvell.com/
+
+v3 -> v4: Addressed Simon comments
+	https://lore.kernel.org/netdev/abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090/#t
+
+v2 -> v3: Addressed Simon comments.
+	https://lore.kernel.org/netdev/
+	20260304043032.3661647-1-rkannoth@marvell.com/
+
+v1 -> v2: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/
+	20260302085803.2449828-1-rkannoth@marvell.com/#t
+
+2.43.0
 
