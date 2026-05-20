@@ -1,145 +1,165 @@
-Return-Path: <netdev+bounces-289877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289878-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0FY7LzyODWoIzQUAu9opvQ
-	(envelope-from <netdev+bounces-289877-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:34:36 +0200
+	id WMNmFIeNDWoIzQUAu9opvQ
+	(envelope-from <netdev+bounces-289878-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:31:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3865858BD3A
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:34:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7389158BC78
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:31:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D33BC30534D7
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:28:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0B5693032650
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 10:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C983D3D6CA5;
-	Wed, 20 May 2026 10:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDA03559F8;
+	Wed, 20 May 2026 10:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="mtxjvHgn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S4kw9SHq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1612B3A3E90
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296CC3A3E9A
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 10:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779272934; cv=none; b=nR/Gf+2ecTH7xxIqMsJTE+yk3jT2KjLzBCo72hatdMVNrB+OJWMceWz3RwKC4opWiaKL19pmRlEn8mhaGMNsgV2Fi1mYGKH1ojNwSOAvvYM9MTv+bjG47jlgU1Pjm/9N26M2qDSmqgggDT8fEBwxpEJLy4JlT0DxN1xxauZ49fo=
+	t=1779273050; cv=none; b=MYWF0PXMsXaz7bcTMu/wJJ0/aC6OLEPfjQqN5G/t0Ny2gK2DFqANJPw95xpYbplcTmr4diaO6tUUN27VMuy6UCCI4VpZvPeHB4znpBmYWRx6dd8SHTolNItCbSodTpA+XW0nyIfVj4cpqia2R5yPsxe2nkXCPQI4zZlLXAwwWuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779272934; c=relaxed/simple;
-	bh=OFg7gaIIJENLADZC81W1MxkKRviL+wIHPBMCeJeFUYU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l04pKJCCIhRZwbDMeBHS9uWUepBncN/SZ9Rb3Pu89D9Jic4yL2ZMpaV+64hxgnh0gwDXUaYkiPtuBSUQM9aD03fQypbaDp219zDgw2GLvjJRVO//zWoJ6saoigonEivKUZhl+Nxcgu8WKwi7IBA4rhqWovt2uKWUSLpoWXeqjFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=mtxjvHgn; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-45297094718so3616709f8f.3
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:28:49 -0700 (PDT)
+	s=arc-20240116; t=1779273050; c=relaxed/simple;
+	bh=upNpFlueSbswk4/LyjzG9gRYu6Lh+62LkNXclwONq/0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NfMF0U9VNYQ90ZrsaMyM8V2GWbuWshQdC+6obQ7KQPvNZYm82pELShEtlubyul1TdpnIGRwjl/knYbEAmq/JlII2c9ypIxT3tKggD1h2f3rPCHqTyok1xqKFCvKnvNix4kCVcSGyGcJnqq1xPVBaJZqrfvpxSMYu9MyP3IW7lkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S4kw9SHq; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-50d9a6a853bso133633421cf.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:30:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1779272927; x=1779877727; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w6GwYArnaeioyDwurWj9r+Vzo/oXg0IJMt1SOHyO9K8=;
-        b=mtxjvHgn0Vxgn1PLDvOf4Dz36AQ3TADAVca3vyAdj9+M1x4DvX0VuHf8V2SkE3hBwn
-         +avCrGj2lKVj6ws9Cqu8dqMXRZLrMW++r7DDwsPNg16YvKcZvVvh5DHFhmITybxPVo7m
-         epjYrODebC+MZ4UQsgWoYLYYb2tOcptgr01AfrXlkNtunrkiOhnvU7enZWT6yDbXFmJz
-         BSg/kn32hVAs1kEMPonH6IpGaw+tsqDhfnfsSseNn10f41IVLUAtbiMZCF2TGFaP20PQ
-         YhTL7q6v1f31hQvFFLo6sp2LMT3ZIZZSkLLhtLy7ZnRwvtXTe1I19rhJS7axIBQT/+7i
-         SX+A==
+        d=google.com; s=20251104; t=1779273045; x=1779877845; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dW85YWydDMvWX9AFz2nhsSdKmKbjBZgKpuCpn+ixBrE=;
+        b=S4kw9SHq7KukPsgGlm4VXi8mpRGsWaD6FgWRChiVOCRfUUPs94RO/Nx7j/ka7OBXND
+         HhPxJ7oXt05hQ376UyxnWB0FgNHhEpgbxUmN8YrdcCyp2OhfYJEM6NaGKFXsOAoOCo3B
+         23tvRtllG3G05B7ZyzQrqo1hGaSQ4IwDbTlhoUNYLSO6gufG2jttzTuXwYmknsNlVCd8
+         Dp7FDTvmvJeoKMackvBM8cn2MvtRQbRJktZh5ZVVwrkU20800KEXV6zZolQNInVyp9Oi
+         FQkOXsdRpDzw8z347wHCYPsUb4b3hLJJkSJtq79wmFeLfnMrfPQtC2RL7Xdaas6m3WF9
+         vjtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779272927; x=1779877727;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w6GwYArnaeioyDwurWj9r+Vzo/oXg0IJMt1SOHyO9K8=;
-        b=ZBpQttiRAKoSofBjOnsLu2KwcMdke3E9XMTzQptkeQG+TsQAUUkez36axUu13FDuUq
-         R5+H49TXpbLbYMYJn3WAfYTg3ccXBl1IHlbgxCpBT5zWEerfv88oEqP3cPWp+7CL2f7/
-         73loGevXu3J5qucKbJWEGiPgdpIMvx2zRMwEnnWpB1mXYJOON9BpVOZr4UIBE6SfYdb6
-         LOf5sQVT6wEb7kR9Ucv+0GjjZ34+LwOww1ScpPfO/VOD2uZDwmde5tLTeyoQJLkrm42M
-         rna/HEP3lZOBQ8fXhiyU9PZj2EXoXWM9Gw36Ol2xG1oFpVJ5BCdaQBdgv4vN3ahZnNNa
-         uNqg==
-X-Gm-Message-State: AOJu0YwCKCjtuyFcSTCYnjnBMopTIC5DMGpIOWiO6uC4VABUzDfXrKcH
-	UoqGMR6H/ihrBA9qGWhdYEJdFZv4As41vZaLp71E5CQaVYkWP8SgND2ciHWEzIhaM5M=
-X-Gm-Gg: Acq92OE8PZriobwHp7eNPm2cJIDLaP9JYtOH99Eq6qPa+LUTb14j0MfD0JY19mHnJo5
-	xSbLwvYZxWQhBO2ivw4cul83Y710LRRx9mL0DdO/USFAb0zbljm3N+yOdReMLKnXg4W8BMW70+e
-	TO6upHhesWGWR40eGcL9zp/K1VAKOdbmKYt0NhDx1oyGl1O33eKkZZZPxE3sc8Y6Q/Pex10Z0/G
-	XF0wdB+DDAKAWEX3aD0CJ5sl58Bh1keLDPHDiSP/kp4osAru0cYbwH/sODFhGd4jV2IFIdv4CAf
-	HS6DQnN0NytQWLJKHHD/aBX7CZEYRoryG8savO+dyB7FLVD/F4sS7YoSCJ6isDBGO75/5AmvoP5
-	KTmYTealUVCspKMdn1RrBS1HwKaydSbVCrA/D4QZ3JuV1LJ+jNOWjuPr6tT+QfC5COVgaAohQUz
-	cBiLscUI8bgdWceMhq7I3x+PhfrVGirgvV3Q9AiNv6Mn9aXn1i443HaVPncQ==
-X-Received: by 2002:a05:6000:24c6:b0:43d:7b7b:ab76 with SMTP id ffacd0b85a97d-45e5c36b3camr37115121f8f.10.1779272927444;
-        Wed, 20 May 2026 03:28:47 -0700 (PDT)
-Received: from localhost (176.111.185.220.kyiv.nat.volia.net. [176.111.185.220])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da15a562dsm53857603f8f.33.2026.05.20.03.28.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 03:28:47 -0700 (PDT)
-Date: Wed, 20 May 2026 13:28:46 +0300
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, stephen@networkplumber.org,
-	petrm@nvidia.com, idosch@nvidia.com
-Subject: Re: [PATCH iproute2-next 2/2] bridge: vlan: Add support for
- neigh_forward_grat
-Message-ID: <ag2M3moiivqEvfNG@penguin>
-References: <20260517082501.899009-1-danieller@nvidia.com>
- <20260517082501.899009-3-danieller@nvidia.com>
+        d=1e100.net; s=20251104; t=1779273045; x=1779877845;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dW85YWydDMvWX9AFz2nhsSdKmKbjBZgKpuCpn+ixBrE=;
+        b=kw8HOpmRXC0BexU0jM7a8QScatpzhLxTK+f3e/y05SJc9hQKS4kdv4wxCcaQsHQ7AZ
+         yOtiNbP8+I0dmV+VYOXt3ZT6vdpOMp9fS7ylJIWXfIIyTcuLBUGCUsoyLycJ1J3zlvsK
+         aRJPUP3Dk1miRmzOC2yCWw/Eq8Vqm3QtGSEZJ0rxJRSW5GreL/zooNFfmTq22ndHcpl5
+         QnMxXtICJNqrjkp7emqM3UtQTdm4dy+uok9D3/Xy80P6r8JvKcdwDNJKWiqs7At15moI
+         eJ5z28vMTcWZN1JRFhVV++48eKVkBkcVnRoIGyIaRz9IJBCf4EInuH1HNfJ3w0jdRG+w
+         qUgA==
+X-Forwarded-Encrypted: i=1; AFNElJ88kQXJnhCjCMFo7n9uOC1XzAnTjboofmCWBuiCw4Ja+jYtKkTrUuy35+kzkX5ptEjDMSwbohU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS8AAEOSxumGhGTLkK+imspW9KvEOT76txkwyJuO+ptE7kaUvJ
+	rEEPYx1TgIiOXsZfQZ/MxEke8ETz1hJcCUUEZjFcLvbKIW8zJbvqZbLw/Eb6yVRxbAxfKPW/wp+
+	tRD3s1pPH4A2hVg==
+X-Received: from qtnt19.prod.google.com ([2002:ac8:5313:0:b0:50d:bd2c:6acb])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:9012:b0:50e:a1ab:114c with SMTP id d75a77b69052e-5165a1eb7e4mr289212761cf.32.1779273045258;
+ Wed, 20 May 2026 03:30:45 -0700 (PDT)
+Date: Wed, 20 May 2026 10:30:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260517082501.899009-3-danieller@nvidia.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.631.ge1b05301d1-goog
+Message-ID: <20260520103043.1131213-1-edumazet@google.com>
+Subject: [PATCH iproute2-next] ll_map: add RTEXT_FILTER_NAME_ONLY to
+ ll_link_get() and ll_init_map()
+From: Eric Dumazet <edumazet@google.com>
+To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
-	TAGGED_FROM(0.00)[bounces-289877-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289878-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,blackwall.org:email,blackwall.org:dkim]
-X-Rspamd-Queue-Id: 3865858BD3A
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7389158BC78
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 17, 2026 at 11:25:01AM +0300, Danielle Ratson wrote:
-> Add support for controlling gratuitous ARP and unsolicited NA
-> forwarding at the per-VLAN level via the neigh_forward_grat option.
-> 
-> This allows configuring the option via:
-> $ bridge vlan set dev <port> vid <vlan> neigh_forward_grat {on|off}
-> 
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-> ---
->  bridge/vlan.c     | 18 ++++++++++++++++++
->  man/man8/bridge.8 | 15 ++++++++++++++-
->  2 files changed, 32 insertions(+), 1 deletion(-)
-> 
+iproute2 can spend considerable amount of time in ll_init_map()
+or ll_link_get() to dump verbose netdev attributes, contributing
+to RTNL pressure.
+
+Add RTEXT_FILTER_NAME_ONLY new flag so that rtnl_fill_ifinfo()
+limits its output to:
+
+    - struct nlmsghdr
+    - IFLA_IFNAME
+    - IFLA_PROP_LIST (alternate names)
+
+This is supported in linux 7.2+ (and ignored in old kernels).
+
+RTNL avoidance should be automatically provided in upcoming
+kernel patches.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ lib/ll_map.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/lib/ll_map.c b/lib/ll_map.c
+index 07937e27d4f6fb5506a3da6e9318270635224364..21dd124960a604b0cd8912a11e1808c0eec5dc3e 100644
+--- a/lib/ll_map.c
++++ b/lib/ll_map.c
+@@ -273,7 +273,8 @@ static int ll_link_get(const char *name, int index)
+ 		.n.nlmsg_type = RTM_GETLINK,
+ 		.ifm.ifi_index = index,
+ 	};
+-	__u32 filt_mask = RTEXT_FILTER_VF | RTEXT_FILTER_SKIP_STATS;
++	__u32 filt_mask = RTEXT_FILTER_VF | RTEXT_FILTER_SKIP_STATS |
++			  RTEXT_FILTER_NAME_ONLY;
+ 	struct rtnl_handle rth = {};
+ 	struct nlmsghdr *answer;
+ 	int rc = 0;
+@@ -393,7 +394,8 @@ void ll_init_map(struct rtnl_handle *rth)
  
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+ 	if (rtnl_linkdump_req_filter(rth, AF_UNSPEC,
+ 				     RTEXT_FILTER_VF |
+-				     RTEXT_FILTER_SKIP_STATS) < 0) {
++				     RTEXT_FILTER_SKIP_STATS |
++				     RTEXT_FILTER_NAME_ONLY) < 0) {
+ 		perror("Cannot send dump request");
+ 		exit(1);
+ 	}
+-- 
+2.54.0.631.ge1b05301d1-goog
+
 
