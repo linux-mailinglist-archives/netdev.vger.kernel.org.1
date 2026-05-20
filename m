@@ -1,115 +1,110 @@
-Return-Path: <netdev+bounces-289683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289684-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8G0TEaYKDWrysQUAu9opvQ
-	(envelope-from <netdev+bounces-289683-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:13:10 +0200
+	id WI84K9IMDWqesgUAu9opvQ
+	(envelope-from <netdev+bounces-289684-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:22:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D38985867AA
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:13:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FC5C586814
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:22:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0A88C304CF74
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:13:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8BB973041864
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744182C21FE;
-	Wed, 20 May 2026 01:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE5A2DC357;
+	Wed, 20 May 2026 01:22:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fIpeKsBT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mtXVoJyx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85DB3438A4;
-	Wed, 20 May 2026 01:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA82299937;
+	Wed, 20 May 2026 01:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779239587; cv=none; b=TzKAKK7QFpPPv0D8NxseM7DMm9fUvj1JEIOZAWOGrJz87mUP6DxzxLSP87mZ1ZLTQNGcrhbluLMyAvULFKXU9LlSlZpRSC9KkrW3vIQWw0XQLboOsxv3T8KOSeuwPWCWRpjbl5pkfAjC0N9qUyX0c/jE8wuXx4Xei5qSnSlncAs=
+	t=1779240141; cv=none; b=muBQawC/KWpyC3lk30WAZ/6ebuYf/fzoQx5dLlRiawqg8J0tLOjJQM9FKTIlLkS0UP3GI5eWck7o+D/XNDIA9nr163TcngZvTP1n+gnhgw+jaV8593cJmd2DYQqYl9fxeyOKenWNHKwKYgP7e/s5aJN0T4aQRnZ6Hh2YQ7YO9ZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779239587; c=relaxed/simple;
-	bh=TFTfZ3XF6CqzODpasTiqIHoiDxbzAG2FkT+K1h47on4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ltH29xF8WKV2fajXIYg2ssrkXCO6DK/kddj3q5ZzBZISnaTR8MRIBO3PVdORE8Y3728coUnaHikCaftu0aZRDVDuTtw5p93KsmKspZgjIsk56mqt106qi5khY0XNP5EGYJ674OMyOGVa/44KCwr3FqkWoAIWFgktTzL5kEXxB2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fIpeKsBT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bXG0Wva1nU+HyoMbFpuo7P4RMd7L4v0ROGwriQ9bGXE=; b=fIpeKsBTB9Omqg6NFrbQDClLVP
-	EXo7ROfXBkpESbbBCiY3VN61eZfg263w6NRki0ijLDPhdgRYWmqyWNqK9aVjLVK98q7JOdUvIClaC
-	JBu1Dz5/WLRnFGoKK+znQ7tSZmWnM15idZKh+LmMBNgGcMmdIJbOZ/fhSBt0FjXOXV4E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wPVUW-003ktG-JG; Wed, 20 May 2026 03:12:56 +0200
-Date: Wed, 20 May 2026 03:12:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 5/5] net: dsa: mxl862xx: add SerDes ethtool
- statistics
-Message-ID: <8fe2cc9d-2a22-4a19-b313-8e570cdc975e@lunn.ch>
-References: <cover.1779203863.git.daniel@makrotopia.org>
- <5e8391488f4dbf23133d16ceaf1b168b39304c97.1779203863.git.daniel@makrotopia.org>
- <20260519184005.cx32dtj6v6wosb3s@skbuf>
- <agzqLhlZsSQnWjP-@makrotopia.org>
+	s=arc-20240116; t=1779240141; c=relaxed/simple;
+	bh=Jlxxfz2coa8Zxo883jNw4XVwpwOJ5iRS+2VhN9tAP98=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NGkJzSSXIqPvfUAspWWi6Lj6vAHGbFAzMgarhhuF87UdKbotzPnWMsJ/4yaAU6erNeQD/8KEgGUS9jaVw6N7sau9JzRBhmReZijiCEBLKLFZX9HwhtKSEfF4LBzx3bAK3C7rYVxZxE20gduIS1yf8qCQMeN3N3rAq9keBv0hx20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mtXVoJyx; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE4091F000E9;
+	Wed, 20 May 2026 01:22:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779240140;
+	bh=Jlxxfz2coa8Zxo883jNw4XVwpwOJ5iRS+2VhN9tAP98=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=mtXVoJyxmnjQY/v+iiRX8XrlLB9MdsSx3OD7Nnd91Z7+G90rSpl64A6rf+47DN2oB
+	 iJCHRmr/ZtUwGKAkmlFtpnrC81kCR1gwdz4rX7EfW4tY0BgxmHGB96MfZlQ+PpNE32
+	 9R0PnXz6s7CisfhyvvaU0a5rSZ++vSZcT3jMsajre+yKe9Ax2OK7xXRF+tswIR7ZSx
+	 KX3gEwLXGyvotdb8/fO/2p9I3/FdaeyreHY5DxSxHok6hj/wyxrUprKWRz/cHrYaUq
+	 nP7CZQQabjAKoeMkOm7tOPvTOcEe9vE8GRHs4Ffk0ZDqw6hLtwUE7TZt/DCYTFgpsx
+	 5XeBQR90wDGjA==
+Date: Tue, 19 May 2026 18:22:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marco Crivellari <marco.crivellari@suse.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Tejun Heo
+ <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, Frederic
+ Weisbecker <frederic@kernel.org>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, Michal Hocko <mhocko@suse.com>, Simon Horman
+ <horms@verge.net.au>, Eric Dumazet <edumazet@google.com>, "David S .
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Julian
+ Anastasov <ja@ssi.bg>, Pablo Neira Ayuso <pablo@netfilter.org>, Florian
+ Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+ lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org
+Subject: Re: [PATCH v2 net-next 2/2] ipvs: Replace use of system_unbound_wq
+ with system_dfl_long_wq
+Message-ID: <20260519182219.0d685a27@kernel.org>
+In-Reply-To: <20260515135143.259669-3-marco.crivellari@suse.com>
+References: <20260515135143.259669-1-marco.crivellari@suse.com>
+	<20260515135143.259669-3-marco.crivellari@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <agzqLhlZsSQnWjP-@makrotopia.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-289683-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,linutronix.de,suse.com,verge.net.au,google.com,davemloft.net,redhat.com,ssi.bg,netfilter.org,strlen.de,nwl.cc];
+	TAGGED_FROM(0.00)[bounces-289684-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D38985867AA
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2FC5C586814
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> The firmware also exposes self-test via PRBS and BERT, which also
-> doesn't fit the ethtool self-test model very well (which currently
-> supports only MAC-level and PHY-level loopback tests, with no way to
-> represent the PCS/SerDes-level)...
+On Fri, 15 May 2026 15:51:37 +0200 Marco Crivellari wrote:
+> Subject: [PATCH v2 net-next 2/2] ipvs: Replace use of system_unbound_wq with system_dfl_long_wq
 
-Where was a presentation about this at last years netdev conference
-and a long discussion with Alex at Meta about how to expose PRBS the
-fbnic has. It is probably the same PCS or similar PCS, since they
-licensed it as well.
-
-   Andrew
+FTR leaving this one to netfilter folks
 
