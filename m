@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-290050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290048-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGpNB6EADmo95QUAu9opvQ
-	(envelope-from <netdev+bounces-290050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:42:41 +0200
+	id wEqUFZMADmp+5QUAu9opvQ
+	(envelope-from <netdev+bounces-290048-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:42:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA2985970CA
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:42:40 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE8945970B0
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:42:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E12D53064DE4
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:35:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C10E23055AE3
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018913FCB0C;
-	Wed, 20 May 2026 18:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E383FC5C3;
+	Wed, 20 May 2026 18:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FgeV3ETg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BuqwnJXi"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B3A3FC5B7
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05C33FBEB3
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779302113; cv=none; b=iSw9NfjuiXtPGO7WPUx/Vi+eM7XIFvb6f5Zw1bEdlKC8Y19slPhwAdnKxBsWw6Zrkcom8H/zVqtpE9exdXGtO1PQm+b8fdKKuuZxCFOBTSVBkUlPTq5QTRLX3F0QwMi6ryupXpRDDoPU0CdXxTjtfGETUl17ZK0L7gS5M22BBuc=
+	t=1779302113; cv=none; b=gQ5Iwo7OkFjhBRny1XqGNOi8cQ6zxb8iejDV77vHlrRJH5MPn7Xau9yDvIa6TibRBFavC2uBgBRj6yG8AUymcgX6GReIEIb09EiExN/sNmVvVHDn8rFapW9wCnbTY8QK0UwRXBUspz/6KJRN39TnrNhlgZKStHlv9CdApb8uuyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779302113; c=relaxed/simple;
-	bh=ag9hXI9YgrcO409l5VeoPVUQmFY5eFPk0WLx0YKMmZE=;
+	bh=YjIFpceXumzYuQOJFoApvkkRKN9MLrnLFf5J3hWq3qI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B2NQnIEXQR/MDAEbj9FHaxAwAy8WfkYL+9oMCm3EWlnoKI2zgpvgym3ZauSU1xpm2akVZBnsL2jmJ6aK+vaQW7fSV+trpn4Qva/XzDHLjLRip166JWnAz1mdvIYWdMLLvcu5ZsKeCOTPr3idZMeNXIfMXB8hVKG7jEwC/z8KUqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FgeV3ETg; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=jTAm4SqYA6+Tk9wkDeKFdt9KPm8hb80RAkbr8HPvPWEPgcelEaTCvJ7h9lNx1eIe8Jq5NEPfBAvpc1u3h/MAo3t9yzfetxKU+5uMfHc5IHNvjPSGxShvhaJeBdr0EUUqptiDBLsCklgFfDOob02YGAfd6AhBDviZ0k0p5AZzpdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BuqwnJXi; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779302113; x=1810838113;
+  t=1779302112; x=1810838112;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ag9hXI9YgrcO409l5VeoPVUQmFY5eFPk0WLx0YKMmZE=;
-  b=FgeV3ETg4tiTNbJBXRrydHu90COerInnb1ymddx/A/J7N0BErhjSmzH+
-   416I6N1u9qSrvMl8MtV99o78L1U7n3o8OohZYsqsxbHovjeJJPwxsLIoy
-   6ueW3mD3a42WF1SArsPuwli+RdEDKchWi11BVhWrvMnNDknwFLYqFkzK2
-   lv0Rys09t71LcdgnzioXhjPbkpuu+ef6iUkkV6A0F/7M2hiwSW2sN4d+d
-   GD7yVmiOevhZyfe9MXM8UgsqhmjTLSKMnu9MuJGkN9prY5FtNhg06cgiF
-   fZ9PQeeqadqa62dkAd3tVYMyuIuiBNfXYgR3eDqmP5vnwKSN78Xnir7l9
-   A==;
-X-CSE-ConnectionGUID: dRSObtfeTjm5RQu+ZoZQ3A==
-X-CSE-MsgGUID: 15eQutdPRceVhpH+siZg2Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="80391778"
+  bh=YjIFpceXumzYuQOJFoApvkkRKN9MLrnLFf5J3hWq3qI=;
+  b=BuqwnJXiH5AyJ4nkeQCXsPOFEHUB3fxrqWldF4JS5KVE9KsLr27pK2wr
+   ToUy0XZGkzOAeA7MMrB1lPlTxjdYCSrXGy+BEA1SdCj9DpMSZ4JzdfKsc
+   wOWh05lAKQiTbW3GxkTX90NXOasx0jgFGwFDqFaaQn9QnATS2nbEiMPjU
+   WyFHzc4x6D2lNiQKLAzo/UMUuXXEtC0iL+Mle7dJhtMoi44U/MyJ+LvU5
+   eTCuGT2LG9Y/Jmp/yRb1kWgft9Hhv2AhH6MPgnXynwZ+3fDh0PxHEaD04
+   ASymlETWLVeaNNPeXObpYzpqyxhI1J5o0ClMotOUkCyHk+nZN8BN6lYH5
+   w==;
+X-CSE-ConnectionGUID: KIuvT9GZS/GUKg/I3sfp5g==
+X-CSE-MsgGUID: vtRGqGouTxqOQjPiw25w5A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="80391781"
 X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="80391778"
+   d="scan'208";a="80391781"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 11:35:08 -0700
-X-CSE-ConnectionGUID: hT2ZpgjWRYir5QQokGpgAg==
-X-CSE-MsgGUID: JkDxHMnMTuuhGc/xlWtf2w==
+X-CSE-ConnectionGUID: mOzdmUeqRPiWNj4GU8JT3A==
+X-CSE-MsgGUID: OjJnyqCsRIy8Zfr5oKuQRA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="239423903"
+   d="scan'208";a="239423907"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa010.jf.intel.com with ESMTP; 20 May 2026 11:35:08 -0700
+  by orviesa010.jf.intel.com with ESMTP; 20 May 2026 11:35:09 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -68,15 +68,18 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+Cc: Przemyslaw Korba <przemyslaw.korba@intel.com>,
 	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com,
-	horms@kernel.org,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net 6/8] ice: skip unnecessary VF reset when setting trust
-Date: Wed, 20 May 2026 11:34:54 -0700
-Message-ID: <20260520183501.3360810-7-anthony.l.nguyen@intel.com>
+	richardcochran@gmail.com,
+	kory.maincent@bootlin.com,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Sunitha Mekala <sunithax.d.mekala@intel.com>
+Subject: [PATCH net 7/8] i40e: set supported_extts_flags for rising edge
+Date: Wed, 20 May 2026 11:34:55 -0700
+Message-ID: <20260520183501.3360810-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260520183501.3360810-1-anthony.l.nguyen@intel.com>
 References: <20260520183501.3360810-1-anthony.l.nguyen@intel.com>
@@ -91,18 +94,19 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[intel.com,gmail.com,bootlin.com,kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290050-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290048-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -113,100 +117,43 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: BA2985970CA
+X-Rspamd-Queue-Id: EE8945970B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+From: Przemyslaw Korba <przemyslaw.korba@intel.com>
 
-Similar to the i40e fix, ice_set_vf_trust() unconditionally calls
-ice_reset_vf() when the trust setting changes. While the delay is smaller
-than i40e this reset is still unnecessary in most cases.
+The i40e driver always supported only rising edge detection, so
+advertise PTP_RISING_EDGE, and PTP_STRICT_FLAGS to ensure the
+PTP core properly validates user requests.
 
-Additionally, the original code has a race condition: it deletes MAC LLDP
-filters BEFORE resetting the VF. During this deletion, the VF is still
-ACTIVE and can add new MAC LLDP filters concurrently, potentially
-corrupting the filter list.
-
-When granting trust, no reset is needed - we can just set the capability
-flag to allow privileged operations.
-
-When revoking trust, we only need to reset (conservative approach) if
-the VF has actually configured advanced features that require cleanup
-(MAC LLDP filters, promiscuous mode). For VFs in a clean state, we can
-safely change the trust setting without the disruptive reset.
-
-When we do reset (MAC LLDP case), we fix the race condition by resetting
-first to clear VF state (which blocks new MAC LLDP filter additions), then
-delete existing filters safely. During cleanup, vf->trusted remains true so
-ice_vf_is_lldp_ena() works properly. Only after cleanup do we set
-vf->trusted = false.
-
-When we don't reset, we manually handle capability flag via helper
-function, eliminating the delay.
-
-Fixes: 2296345416b0 ("ice: receive LLDP on trusted VFs")
-Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Fixes: 7c571ac57d9d ("net: ptp: introduce .supported_extts_flags to ptp_clock_info")
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_sriov.c | 33 +++++++++++++++++++---
- 1 file changed, 29 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_ptp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 7e00e091756d..3c64ed1b41a8 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -1364,6 +1364,23 @@ int ice_set_vf_mac(struct net_device *netdev, int vf_id, u8 *mac)
- 	return __ice_set_vf_mac(ice_netdev_to_pf(netdev), vf_id, mac);
- }
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+index 7d07c389bb23..c4525bfab09c 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+@@ -1344,6 +1344,8 @@ static int i40e_init_pin_config(struct i40e_pf *pf)
+ 	pf->ptp_caps.n_ext_ts = 2;
+ 	pf->ptp_caps.pps = 1;
+ 	pf->ptp_caps.n_per_out = 2;
++	pf->ptp_caps.supported_extts_flags = PTP_RISING_EDGE |
++					     PTP_STRICT_FLAGS;
  
-+/**
-+ * ice_setup_vf_trust - Enable/disable VF trust mode without reset
-+ * @vf: VF to configure
-+ * @setting: trust setting
-+ *
-+ * Update VF flags when changing trust without performing a VF reset.
-+ * This is only called when it's safe to skip the reset (VF has no advanced
-+ * features configured that need cleanup).
-+ */
-+static void ice_setup_vf_trust(struct ice_vf *vf, bool setting)
-+{
-+	if (setting)
-+		set_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-+	else
-+		clear_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-+}
-+
- /**
-  * ice_set_vf_trust
-  * @netdev: network interface device structure
-@@ -1399,11 +1416,19 @@ int ice_set_vf_trust(struct net_device *netdev, int vf_id, bool trusted)
- 
- 	mutex_lock(&vf->cfg_lock);
- 
--	while (!trusted && vf->num_mac_lldp)
--		ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf), false);
--
-+	/* Reset only if revoking trust and VF has advanced features configured */
-+	if (!trusted &&
-+	    (vf->num_mac_lldp > 0 ||
-+	     test_bit(ICE_VF_STATE_UC_PROMISC, vf->vf_states) ||
-+	     test_bit(ICE_VF_STATE_MC_PROMISC, vf->vf_states))) {
-+		ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-+		while (vf->num_mac_lldp)
-+			ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf), false);
-+	} else {
-+		ice_setup_vf_trust(vf, trusted);
-+	}
- 	vf->trusted = trusted;
--	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-+
- 	dev_info(ice_pf_to_dev(pf), "VF %u is now %strusted\n",
- 		 vf_id, trusted ? "" : "un");
- 
+ 	pf->ptp_caps.pin_config = kzalloc_objs(*pf->ptp_caps.pin_config,
+ 					       pf->ptp_caps.n_pins);
 -- 
 2.47.1
 
