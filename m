@@ -1,200 +1,223 @@
-Return-Path: <netdev+bounces-289809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289810-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OP8GNX1iDWquwgUAu9opvQ
-	(envelope-from <netdev+bounces-289809-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:27:57 +0200
+	id INm1GaZiDWquwgUAu9opvQ
+	(envelope-from <netdev+bounces-289810-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:28:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57153588F11
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:27:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E4E7588F2F
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DEF8630298AE
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 07:27:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C43DD30055E3
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 07:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA0936D506;
-	Wed, 20 May 2026 07:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BB6369D71;
+	Wed, 20 May 2026 07:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J3ucB1jk"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="k/gph02s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40404366073
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779262072; cv=pass; b=nGHKRjLVUF/qMCM5pazeP0q/Z872UX+NB1w8pIhDf2t7vwJGtqR9YMLHXVTGLFqNipqmcxEtNQja8Ph0bGWWX+v6cWL4bA3JAech+84PItU0RwNamRbk3LzLwKnZ1F/JvJoW9bNugxIQYdWKNY7EbBHOAQABkDNfs8Gwz7MU27I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779262072; c=relaxed/simple;
-	bh=26j5PnrbpQm8XEb9ANX80wT6LvLHehW7AQcShY/SYFo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kAk1/Aq/QKEX4kY8Xodiue/CsUQJacNKPBsyKGN3IYz0UmIoCPZjG1+4qeVebWxbquWStP9WLdjztZT2v7/oivT72x+kQ30GNOjtRrSW7RpHriCxnXk3GHHpqjpJAW35/ollIf/+AKspc++by/t3C2uLTG4nVtzapSK6LEDEWRo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J3ucB1jk; arc=pass smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8ca12973e15so63134996d6.1
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 00:27:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779262070; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JF+XzVb9mqEBhFzi29prTJEM5Ojs56+hu2Eesqle9c2JiTTd62Nq2zj50/VNtfW6Ua
-         dvLX0P+x4cbr+URSpfTHWJi+QQNOLtLO9PQ+fsi/Wm6GQjG+hAeBZu9AOD8N8qYJ6DVR
-         4PdUNGqp1NxNp6r/LVr4LLb+Z6Y8WwKuGfr0aIa5LcKWAJKlR8TFYuT5P8OmyeT9Xs6f
-         DHFcPLR5c+cWQQr3Qoi1/BIB8gOK2q/loSLcZBA9xzZRd8jTBCvLlZss68lNoNNch9VX
-         gSCGQvyNlLoDEBuFf29lktzW1bNySpcI+SPHG29qVs4kr9DG5Is136Xmw2sYq8N5qTJR
-         EYXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6TWUWPUGYIqERhMMFki3MCHcvxh+u+UVkFu6uEBr1GA=;
-        fh=vjHwEWxQ9bVNWGrd8sTDMTG5rXyJiopBazEsZ4mc73A=;
-        b=KDFabWQDBb4Eu+6IF9S0OD/9rv3U4miqhiO0PJQOiaQ5NnvWr0nOb5nULs2OYH3NyP
-         QpTNvtSOunqnPmpQ765IVAf8rkqYQ8APSQAzlQ5tlMUCwLYIyWFn/miDtciXrASkcofy
-         Sa+afHNC2keUYndUDK2hAzQTi4U8mPNc82sI1L+VVUE3sQ+efIwnigIH6FcWxmu6ISWO
-         g/T+Rb6DoSm68qY7NUAp5vggrkfG1CjhynuFxG6n5Pdb3VrpXDXQVwY21qqTGiFIa+lD
-         jetyyWeQHDY2MigcWYt4t9Z+ge6QNCqtTxYCzqOYStOj+1mPX1pQBDH4+gA++o+fOYzf
-         kahA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779262070; x=1779866870; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6TWUWPUGYIqERhMMFki3MCHcvxh+u+UVkFu6uEBr1GA=;
-        b=J3ucB1jk8NrgQVflRPSrss+ErIo8aeQ5KUUengDp9cBQ9QD0+hECHCmaI03WtA27Bg
-         N/8t+GqZuD9Nf8dhlfTvj5ab+KrwqRjqoRcvhHUZ0vlwdeEEpHc7FHq+3IdzDPcZ/GBt
-         YyUf8SLSFGnMJrGV7XtnZyD34rfvm2KsXuhQsDHMs5REDzKS1JeoSa/Z/1MfV+tlBIcm
-         ka3grOZ68AUtRu1xHpMGbPFxOA+86gtquctcSewO5ds7hdPviG7bi6xdFH00eLxTj3sc
-         2Qd3+xVldn+QZe88+qhDKTiIWh704y+dY8HYLawyy7s7o0+C9II0ad4JHNllsIKC9zFi
-         Pkrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779262070; x=1779866870;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6TWUWPUGYIqERhMMFki3MCHcvxh+u+UVkFu6uEBr1GA=;
-        b=GyjR0eTbP4Cif00PURPCruAjHpEdbLrownNJ+vNkcAgkCmt+BDkpXxrFnFEzYoY2J5
-         zMokxqmdZEPlMA96ycrQfHYwL6F9Z7dumKpoz7qdVdKA3ccxeuPIJuO1ygHIu7uiibVF
-         J4Qg3oC0pcvEdAgcgJts5N0uFDo/zmxbeuw98vFzS3twB9gZIIxtp5jLrOWuW7oTzWoX
-         Jh8dNDf21VLCIR12lc8EDqzesaNiJQIY2MgMkAjFtF/szyVl52W346cjcTiCxGzJWWoC
-         Y695ggSu1dIeV/JKz4pr25SAAfE5o7i9hoj47WjnNB6mFdZ0xZ6PnoKEaAmnNFHpMucX
-         CyZw==
-X-Forwarded-Encrypted: i=1; AFNElJ8enFrnyjXZazsx/x2v7PHrsJP4w82uuvo3GdB42DDZbtSyByy3YtO1E8ee7HEXYaAiFp4DsrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSzDwsDpSaFDpDCAeQLaCbPlX32ayKW8xs5Ga2W0QMM/FodRqL
-	jln8YbndYPo7U3qkEQByw1BthlBhFQ+f/aO9tmTLlfXU6rB2M5z6gtwX8+3iqZcALhnwQElx1LC
-	iXdvoeXsxUbJlG3SKQaDf2Cknw8IQyT9W7SK+mC4t
-X-Gm-Gg: Acq92OHDvroIQO5UAHwVQH/n3KMvPdFHmvfHCjMU19t3xSn/wQVALfQSY9TBZnaYYcq
-	QB+ckYHDRV21WeAKj52LrkLZcyuWpcRsoBFbM/oMQhMPVxzZvbwvntintt7/8EU4YQ/4db0W5CV
-	DGZO405jL1xmxdDBk4YlixJ+HdK3l4wKYFeeMICCC1IOPQQp69jtqb3V78duWoC1HjxSG2iWFl7
-	EcWbQSVeigQQwVR3A3mtCtejJv4lPYHSFiufWQQ7pqjSboFfJ5CIiCd7pksYno2+FbLEw0VNe2z
-	ThlyVwmTaXBHWEwD0486fKMwbgYVNyX3n5IaJypWZaaEpcHJ+rNL9c33wb04JkpBD5gxf1gRN84
-	X/rmpcscVWa4qw5iAIW/GWWKjNHtQzzlzMkGxkGiQirTtf09HcngxKoFxmCoNxzlE
-X-Received: by 2002:a05:622a:2587:b0:509:238f:ad8f with SMTP id
- d75a77b69052e-51659fdeea0mr321928421cf.5.1779262069703; Wed, 20 May 2026
- 00:27:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D8E34DCC8
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779262112; cv=none; b=I48z19q+mnLCHtm/kEmVW28aKmcK/Q0AbHkAVboGdN2jKYuVtSG4duUGYoUEDu/ZEF07/lM2WdRZICK1SuhOxCmj9FNzuZtymyxqjhQYVdIdBEBb9DQmXHib+SxeSXhpgSAvxZOlhyHyGhBwQMFo68Y0M8M/ca9/21jjoT1SO54=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779262112; c=relaxed/simple;
+	bh=JCJFfdLKOXWLw+lPbUx2sXT4Z/Qydb5arHJKQqBkmFo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Aeuk4SVIDlvp/lQ9IkXI866iqedEtd+lrkOhIgfB/JhTvB1/o0BoqxM3FGIMKmGPwj7Nt5iJ6dJrBO2uOlMcbeQWhHKVpqqMYB30P1tGRN8H4W5LnBO4jomSQjp1daQyzyAZ8UcrSG/wGeOhqqqXK22jmnLre+kKygaf9cWNOtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=k/gph02s; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id F1D6C1A363B;
+	Wed, 20 May 2026 07:28:28 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B74C56070E;
+	Wed, 20 May 2026 07:28:28 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6A397107E9CC9;
+	Wed, 20 May 2026 09:28:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779262107; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=I7L0B4zuJvU5VGGd4jsf1N+GzT9Dz3BE0MhokQDV5K4=;
+	b=k/gph02soOpNxhtgf0jHjSDzxtUS6q1YG8RdzDhXdyfZ9dTn6l9dZK1EKYK1eRvl033vyj
+	1cpBLMmxA4aMEehLZuxG2B6ANWv8SW7PS1ofpgwQL7XQb7cYlWlvK2YRCqeDDNp7LIcgM5
+	g2SSKlSKGDdHbtBk4kPSiipXmfDlUuXz/+UntoLgG3dbP6sqV6D+UtbKW4pZHeijoBj1Dz
+	wxmv0G7BifDh0yDoeoiWHQ5JbfutjZugGVG6sUQYsRfKGJVUAd6D1TIo6u7mTi+3BPFMLk
+	xl35y2rxd9+FoBcPiuCMnnQY5gkWlSY1/evyjrzDMFVlRdTJal6wrDntX4hKdg==
+Message-ID: <b1eb4c18-7dd9-4c40-97c8-81e277332228@bootlin.com>
+Date: Wed, 20 May 2026 09:28:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260518183424.3144867-1-sbrivio@redhat.com> <20260519190352.45c8478e@kernel.org>
- <CANn89i+DknqarcKuZxku-XvoioqkXrd3sQd3PXW5fdFZBpPxjg@mail.gmail.com> <5c1de7cb-42c2-473f-8d67-0523a3c86464@redhat.com>
-In-Reply-To: <5c1de7cb-42c2-473f-8d67-0523a3c86464@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 20 May 2026 00:27:38 -0700
-X-Gm-Features: AVHnY4JD8oaBW3zadh01hZWF6u2hCLMPvpBIBzObevgCfqF7AtZO401ykCVikiA
-Message-ID: <CANn89i+RqFMt8X48V1xkk8mveLvcBORBb5crDKhSAGAvipxNRw@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/2] Fix race condition between TCP_REPAIR dump and
- data receive
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Stefano Brivio <sbrivio@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Pavel Emelyanov <xemul@scylladb.com>, David Gibson <david@gibson.dropbear.id.au>, 
-	Jon Maloy <jmaloy@redhat.com>, Dmitry Safonov <dima@arista.com>, Andrei Vagin <avagin@google.com>, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 6/9] net: phy: phy_port: Store information
+ about a MII port's vacant state
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+ Frank Wunderlich <frank.wunderlich@linux.dev>
+References: <20260513130521.1064094-1-maxime.chevallier@bootlin.com>
+ <20260513130521.1064094-7-maxime.chevallier@bootlin.com>
+ <97cd33a0-ee74-4f64-b11a-bb5b88bce79a@lunn.ch>
+ <c68f3abd-7a3d-4d37-9589-02433bbd5c5c@bootlin.com>
+ <d7086094-9f8b-4d18-92ae-e278b4e67658@lunn.ch>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <d7086094-9f8b-4d18-92ae-e278b4e67658@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-289810-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289809-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 57153588F11
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,bootlin.com:mid,bootlin.com:dkim,phy_port.id:url]
+X-Rspamd-Queue-Id: 5E4E7588F2F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 12:24=E2=80=AFAM Laurent Vivier <lvivier@redhat.com=
-> wrote:
->
-> On 5/20/26 06:39, Eric Dumazet wrote:
-> > On Tue, May 19, 2026 at 7:03=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> >>
-> >> On Mon, 18 May 2026 20:34:22 +0200 Stefano Brivio wrote:
-> >>> Stefano Brivio (2):
-> >>>    tcp: Don't accept data when socket is in repair mode
-> >>
-> >> Not sure Eric is on board with this patch in the first place.
-> >> Sound like it's not the intended use case for REPAIR so IMO
-> >> it's up to TCP maintainers whether we want to support this.
-> >> And it's definitely not a Fix.
-> >
-> > I am not on board. Only net-next material for sure.
-> >
-> > While v2 is slightly better, we have the fundamental problem of adding
-> > stuff to TCP receive path for features that almost nobody use.
-> > (It took more than 13 years to finally complain about the race)
-> >
-> > This consumes Gigawats of power on our planet (and tons of CO2), given
-> > the trillions of packets processed every second.
-> >
-> > Please at least add a static key as we did in:
-> >
-> > commit 020e71a3cf7f50c0f2c54cf2444067b76fe6d785
-> > Author: Eric Dumazet <edumazet@google.com>
-> > Date:   Mon Oct 25 09:48:24 2021 -0700
-> >
-> >      ipv4: guard IP_MINTTL with a static key
-> >
-> >      RFC 5082 IP_MINTTL option is rarely used on hosts.
-> >
-> >
-> > But in my original feedback I pointed that we TCP_REPAIR should
-> > probably only insert a TCP socket into TPC established hash table
-> > only when it is ready to process incoming packets.
->
-> The problem is on the source side of the migration and I think removing t=
-he socket from
-> the ehash table would trigger RSTs, closing the connection on the remote =
-side.
+Hi again,
 
-RST is triggered anyway if TCP_REPAIR did not occur yet.
+On 5/15/26 15:12, Andrew Lunn wrote:
+> On Fri, May 15, 2026 at 09:22:29AM +0200, Maxime Chevallier wrote:
+>> Hi Andrew,
+>>
+>> On 5/14/26 15:58, Andrew Lunn wrote:
+>>>> We have information about what MII they can handle, however we don't
+>>>> store anything about whether they are currently connected to an SFP
+>>>> module or not. As phy_port aims at listing the front-facing ports, let's
+>>>> store an "vacant" bit to know whether or not a MII port is currently
+>>>> vacant (i.e. there's no module in the SFP cage), or not (i.e.
+>>>> there's an SFP module).
+>>>
+>>> vacant == False actually means a bit more than there is a module in
+>>> the cage. It also means that, so far, we have not had any errors
+>>> trying to use the module. If there is an error, we might have a module
+>>> physically in the cage, but vacant == True.
+>>
+>> This is a good point. Even with an error, we should have vacant = false.
+>>
+>> TBH I'm unsure how to name this, vacant may not be the best word there, but
+>> I'm struggling to find a better term.
+>>
+>> maybe "empty" ?
+> 
+> My comment is really about, what do we mean by vacant/empty?
+> 
+> Is it simply about there physically being a module in the cage, or is
+> it also about being able to drive that module? If it is just about
+> there being a module in the cage, then vacant/empty is good. If we
+> also want to say that we have been able to read out the EEPROM and
+> determined the module will work in combination with the PCS and MAC,
+> then i would probably use a different name. "usable", "compatible"?
+> 
+> Either way, i think the code either needs simplifying, or made more
+> complex.
 
-This is why a netfilter solution is generally used to make sure no
-incoming packet is received until the whole state has been repaired.
+I've given this a go, and now I remember why it's that way. In a 
+nutshell, if something fails during .module_insert() (e.g. module isn't 
+compatible with the MII modes ont the cage), then .module_remove() isn't 
+called, so we can't track module presence unless we add that in the sfp 
+code itself.
+
+However a better way to deal with this whole situation may just be to 
+store the presence information in the module's port itself, as the 
+parent port id :
+                    phy_port.id = 1
+                   /                   phy_port.id = 2;
+                  /                  / phy_port.upstream_port = 1
++------+     +----------+     +------------+
+| MAC  | --- | SFP Cage | --- | SFP module |
++------+     +----------+     +------------+
+
+So, we lose one piece of information, that is "is there an SFP module 
+present, even if the module doesn't work". It's now indirectly present
+as "there's another port that references the SFP cage port, hence it's
+not empty".
+
+We gain however information about the topology, and this is relevant for 
+combo-port support :
+
+
+                    phy_port.id = 1
+                   /                   phy_port.id = 3;
+                  /                  / phy_port.upstream_port = 1
++------+     +----------+     +------------+
+| PHY  | --- | SFP Cage | --- | SFP module |
+|      | -   +----------+     +------------+
++------+  \
+            \   +------+
+             -- | RJ45 |
+                +------+
+                  \
+                   phy_port.id = 2
+
+If we want to allow userspace to select which port to use, the following
+commands will be equivalent (the command itself isn't set in stone, just 
+a rough idea of what it'll look like) :
+
+# Force using SFP
+
+   ethtool --set-port eth0 port 1 force-active on
+and
+   ethtool --set-port eth0 port 3 force-active on
+
+These commands above should be exactly equivalent
+
+As they act on ports, having the relationship "port 3 is actually 
+controlled through port 1" readily available will ease the implementation.
+
+If that's ok, add this change to the next iteration (only the GET part, 
+not yet the port selection :) )
+
+Maxime
 
