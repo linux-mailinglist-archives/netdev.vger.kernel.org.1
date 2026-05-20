@@ -1,198 +1,182 @@
-Return-Path: <netdev+bounces-289728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eLTkDMAjDWrctgUAu9opvQ
-	(envelope-from <netdev+bounces-289728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 05:00:16 +0200
+	id EHQfEagkDWrctgUAu9opvQ
+	(envelope-from <netdev+bounces-289729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 05:04:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A80B158703B
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 05:00:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C61587096
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 05:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 55B433019810
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:59:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4932530056D6
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCF7248861;
-	Wed, 20 May 2026 02:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BFF32B10F;
+	Wed, 20 May 2026 03:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bG+DJeDP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YhglDZjc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEAF31077A
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 02:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779245986; cv=pass; b=ZqhRIoskBxjj7VYK2wZUUmRjxcOZKsQNCNDIgxwKHXNVpUobUOptEAhwGuuzEyqh/yXNAl3QpDGPFdtpJnBgBS7q3gg0B931rvFdjVgAlx5EUbWh7iCzPtegCvCzUCDUxLDiM6lNvjorsPIHMV64lppjqCbWfeIIPqK6IK9thN0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779245986; c=relaxed/simple;
-	bh=gkg5apv26kveK8ieeIvoayv5d9V0BHoYpJWe0U0l4RY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bmAvcxqkcbWXgrOK9DD44F+DOXoKhLY3yYmBLsvgXRhLgX40CYyLIZDhE2OP2kDfoo5U6V2Uz7yx7BKJApb3Mk4dXaPMTiWOVDWuVM6EiFL7hoRk+2RHen9bTRBUdlEOmIt3tuaPd/C6IwL94y14lrnFBz1NVqG/H6alZTPv2aA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bG+DJeDP; arc=pass smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584E230C61B
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 03:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779246245; cv=none; b=lQxgPeBckn8az0JvaUkMHsYznZbd0sGNaBY22U5WHu/tQLumCXNOh6FSp0Kla9yrO094DHu6dIpku83t9cHW4cNPrTPppGVGOaEmVTkqkZqV5WdBNC8B8AKruqkJlxt99swieKrbLiBToK+dqhoFeEgno3WxFpJmeYq4hquQqIs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779246245; c=relaxed/simple;
+	bh=Wiih0f6OIaCvmndCXRWrRH6xlc+Q9XwF+Kgo0p/Z/uI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IRZv/7PiYJ7GcToDHOT0IRXsoSxaCjzq3KskfwrOLgel/hJNBJeX82lPro+ot/fPOpF0V3BXprdXVBI00wpeOVWUQp3Ibav7HXXoLOj12JssIRysRdhUEfYiynArxTKPLxUerIt7pF/wDlyA8d0INXzYPjH2iSiJSdbeJJ+HA6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YhglDZjc; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-bd2e8931915so1076697966b.1
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 19:59:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779245984; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gQvFmC+MAYbLzK0fNoJp5YzZRc49LjRf62wMz71wJJ4Mb382o7VtWkcFpyS0MZc0w5
-         QpP/FpSg6JZSP/9R3nmFFIc8DtwX+u4mkOJGWwZ9GkJijFZLTKTQEkhDXMeI0fE6Vr2G
-         lUPv+66oCcXDR5mziZzvi7353WKE0caaXNT4pmMmUiIIfRvR1b3VuJJB9KB2K6u3z+Gb
-         hnGkqwwBBJfUqj+4FrfZj3g+k8U6FF6+IY6RycbwmpZT7HPBrWPa2CAgmxLk07AdUYoa
-         7hFCJMj3qNAm51qNLoZpidAZX5U+9LQzdngwAAGetzmcDIgHiGr82MHHdft3kbMXMnXA
-         1h4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Nm6CIpHH9aBKYNyn4RB4weM0wPhHggfU/Ja8w2ciW80=;
-        fh=Eb0Flsu/vGaGIUZoajXksB4TCF93eajMZuh1sjzqRqk=;
-        b=BdZUB+TPdWJIeBEmls3aaW7+HA7uzaBi2QNurAC+C8oCM1g3d+70uOM5TlGQ9mUYgW
-         TjqiriKnuUQ0dJy+529S61EDSMJ8ULBJyZyclw2ou2cDdKUNbhl/JU6RjViH9MkEb4MN
-         450CkwUQ8oEKqgPE9I8w3xeoUnr9Nw4YDKFwPGRS7xyCpYsnnayquHdROxvScjrQZb+J
-         udkl0b9P8XSQEsbZUc1iadagsmAI+JCJL7CeygvFyEPU8yGcJlOrwbaNY3ZQUrM1teDU
-         eQ4P49XCzhxYjH9TUinkRhZC/1/LqcsNHWz+euyE/88X0vMK38KhvjR/jDC/A/hbAk7f
-         zE+Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50d6ab4476eso48239601cf.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 20:04:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779245984; x=1779850784; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nm6CIpHH9aBKYNyn4RB4weM0wPhHggfU/Ja8w2ciW80=;
-        b=bG+DJeDPHUAtln89XPmWFux+qUOjHG2jb6p3SQWVLQcJ7JFQOn+myOY+Cwzr7SBw/q
-         vFUcLbMSwNnMNEIQtGln0ID1Gpkgi9WjA/ntz7I429mnfmh9BWHz+vFElrtNTAQh6zzv
-         xR5s7ht0vIPksaDdizyv6UddhDNbShPpZ1EFVPEqmeXRVUhdJ5r721tNwsYSNW+xJVYs
-         Opi+2U8+zgC/okP0JUOd78nog6plA5FnhNGNEviZgBRihg4VIhcxYpshiuCsh0N71evz
-         vgyDB1hbScWgRhx6bIYTJuJ2tbdJTyebTvSretx4BEG7lnrFrCDJ6m65L1IuXZ/G/PW4
-         CYKw==
+        d=gmail.com; s=20251104; t=1779246243; x=1779851043; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kovsExyDN+b4Tnm+cUXV8cO+9boS4Oqn0adESQ9JWn0=;
+        b=YhglDZjcT1OOMYwihBsXNLmfkbFA8NIhqugUHpULC8akaoJ8XHLPWNo3UzvrKo7pjp
+         MlzLm6MCb0oVg18PQ1DySD9370lv/1wgVoqr4QO71BzNhPbG5U6NELTLHKrFEMfXExs1
+         4ttvix4yPHxVsPXwi457vFMAT5Bgsq6fK+HYFXqwdIXmn/8ENENWIGhIqmj/mPTe+7AV
+         XNRMIT2MHS4iRQL6o5JJhx023Y+vNZYi6PwZtwHB+OdXvF5W4fQE6Tgpv0CH88aGmfWT
+         k53Ak/OU7mQM8nKcly+Z2tz2qiElJ6wBV35druXkh5jq+5f/lWGnv6rnVxl8XgM13QQv
+         rlrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779245984; x=1779850784;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Nm6CIpHH9aBKYNyn4RB4weM0wPhHggfU/Ja8w2ciW80=;
-        b=YYNBDtVuziNgWkh/xzEqT29BdL5xNXTt7L2X9nadcmVNRVjOfYCOluUHy/crh8D4y7
-         dHlHH9Iewv10jNnkJFCd5PRy7JAacwOUL8UB4QvRkJcoc5iKCJWQrOSRgE9uqSGsNgRh
-         p03Un34LU1R5m5wdz8ljMkdOn3wg1o3MmCsYswf8t35W1FHYD8h7qq5U3LTOUzFdsyaa
-         r0Kwk92Wl+n6suXZc4a+7dk2Wj95e5f02k6a8IEmN8mu9nMqa4p+Shl6xjwgkFpDfBe8
-         humPfHY/2KZzmEyFjjAqJ8vkYuQDOA49bWy1pITp4PwMXq9GlNo4nmxLFgyvsvGzJILY
-         ybXg==
-X-Forwarded-Encrypted: i=1; AFNElJ8Hc0ogmvts00pEneIgz2tDxRK0SSeAUTFgBUSPJDXzPTrWmEMnbZUuOUEKywskpcwXaJpreb8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPDxFUID7grf5PpmUATPMJEUEgkvU7Z21XgnQZFePIeHwu5Vv3
-	tCDbkSV86AjbMdqFQKxMTN+oKAAdNdwNKzMoLxE5CNC36PpP51xbfeYUlbGr0QCvk5Fhn82sa76
-	RbS42HyNGea/qy//O6p/IjwayeLCB1M8=
-X-Gm-Gg: Acq92OGVeFCjvIo/+TmYBh+FSBWHovzchbQqarfxQHMxpLkttBk9SgHN3bXj1mDELmN
-	2121wfEyk9PzJXh/LEiHL+drd5klAhonds0yYXVnF2if1a4HUozjGd4wCB7Bn/dD1CowP/SFgoP
-	eo6d2aLGDskvGFBBAT4ZdTj0VY+9A3DJOaCN7h8zwFr4dSxcdahrGdlxMTff/k6Ok+U9pOgl+/3
-	9d3xt5Hh+a2N5c+yB2JMqMxXk1fQFeF2DvNOhDjujCR1uCaJ52zD1UPsg7gEx+LUD0um49tIaIG
-	ygxuh3nJhsoy4f12BsQm/vP0JidZmV6FJN7k0UPL1avHN5qlaJxPeYrhwDg=
-X-Received: by 2002:a17:907:9611:b0:bd9:e001:fbc2 with SMTP id
- a640c23a62f3a-bd9e0020955mr188644066b.30.1779245983230; Tue, 19 May 2026
- 19:59:43 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779246243; x=1779851043;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kovsExyDN+b4Tnm+cUXV8cO+9boS4Oqn0adESQ9JWn0=;
+        b=p67VFphM6kPNkcfY3paDJLAmnOHPVlxnyepU/blUewJMa7GozHL3qjZkSv3s/6723X
+         33Ho6guuH9WrlgTTrHd1QEMCVpQaS8+LHgwyBa/1/0w3ufpviYOfKduABA9H/OLRT6ss
+         VG1tYhL5ZabHXbFZNwExRECOwQvSdq2lhwtMtxdXfCWGtn+uRI/7sUzN7piGi1SzKiA4
+         D8Dd9g0dZLsMwjCaFGVM8UJp9cJf3iK6b2TR2UiAMk+Th9dPWmcNHg//n2lIYFouIigO
+         S5TbA84et4tdK/oPQKZA871J4CmwFGsUqezc4GXqhvMAgFPTGnjo73TUuyEqO6dCRo3Y
+         2vxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/k08URSNC0jNcwYFmTbKjCbPj3GI0rw/XlZIbD7gTYLIgQzg0ybactSIb4VvDLwwALZotu59g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYUc89S5bOXwv7ZPlGhObPbKYagDa2bjGZkUCBVYYAa49iesbD
+	wIgyqFcaKdFp80/BbIXVZFrwHmRVsq2vJwMbs3zdEAZdQDzQ4//zaztS
+X-Gm-Gg: Acq92OEPd4TjdJ4f0LXfyS+p5DH2HEQ2s7eWZ25OlkvkfFj0g9t/G+u9wEXbJQyJR7H
+	KDHgvWrt7e6nkE222c/yv6bTNdgUAcd/injJ2XU+QqxK9imy3oLsOnHBROarCBcda5548IwQsqj
+	13venxO8xbJnqby4MPEVRjg9tNAZSppMvnvcklUxQ9Z1+QaXPUG7weGXwHB8JwM4LstUP8ZOhpN
+	KqvFlqyzaNVVbdyelV0NQh7DMjdU4kWb7cCtk1I61idZ9HI7HX9AItbFlNCl0ZKxDIIXmkmh19q
+	bejP9uUnAY3elRKZ8VuPgCX38U2z+/irl2gcOdqBdS7zTvDFvEXyhLAi+2QzqrJer5E2LWgYx7n
+	SnqO0jO+V713R0BLBK+BLH30zrQUPHrVV2CHKhv5v5uEp4IISUTsTCTdQgZgjgTBysRy0PSWbL3
+	wcabcSUEotN9l9McQkEoccBvH61mLtZjNy3Wck4ocH
+X-Received: by 2002:a05:620a:12da:b0:912:67ca:bab7 with SMTP id af79cd13be357-91267cac05amr2355066385a.2.1779246243171;
+        Tue, 19 May 2026 20:04:03 -0700 (PDT)
+Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-910ba36e638sm2036138285a.9.2026.05.19.20.04.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 20:04:02 -0700 (PDT)
+From: Yuho Choi <dbgh9129@gmail.com>
+To: David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yuho Choi <dbgh9129@gmail.com>
+Subject: [PATCH v3] ipv6: route: Unregister netdevice notifier on BPF init failure
+Date: Tue, 19 May 2026 23:03:28 -0400
+Message-ID: <20260520030329.1061183-1-dbgh9129@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260518-handshake-file-pin-v1-0-4bbcb7e62fda@oracle.com> <20260518-handshake-file-pin-v1-2-4bbcb7e62fda@oracle.com>
-In-Reply-To: <20260518-handshake-file-pin-v1-2-4bbcb7e62fda@oracle.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 20 May 2026 12:59:16 +1000
-X-Gm-Features: AVHnY4LterXSqMooW_fn189c4rCYxZ0LkAk9IW_2wIKW6Yl8XwJEA0sFFAXx2F0
-Message-ID: <CAKmqyKOvK+MVuVy=tMgyVEPoM6gyQGzc2XCxxgRBK8aqRXM=3A@mail.gmail.com>
-Subject: Re: [PATCH net 2/7] nvme-tcp: store negative errno in queue->tls_err
-To: Chuck Lever <cel@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chris Mason <clm@meta.com>, Christian Brauner <brauner@kernel.org>, kernel-tls-handshake@lists.linux.dev, 
-	linux-nvme@lists.infradead.org, netdev@vger.kernel.org, 
-	Chuck Lever <chuck.lever@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-289729-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-289728-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alistair23@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A80B158703B
+	FROM_NEQ_ENVFROM(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A0C61587096
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 4:29=E2=80=AFAM Chuck Lever <cel@kernel.org> wrote:
->
-> From: Chuck Lever <chuck.lever@oracle.com>
->
-> nvme_tcp_tls_done() assigns queue->tls_err in three branches.  The
-> ENOKEY lookup failure and the EOPNOTSUPP initializer both store
-> negative errnos.  The third branch, reached when the handshake
-> layer reports a non-zero status, stores -status.
->
-> The handshake layer delivers status to the consumer callback as a
-> negative errno; the other in-tree consumers --
-> xs_tls_handshake_done() and the nvmet target callback -- treat
-> their status argument that way.  The extra negation in
-> nvme_tcp_tls_done() flips the sign, leaving tls_err as a positive
-> value (for instance, +EIO), which nvme_tcp_start_tls() then
-> returns to its caller.
->
-> Drop the extra negation so queue->tls_err uniformly carries a
-> negative errno on failure.
->
-> Fixes: be8e82caa685 ("nvme-tcp: enable TLS handshake upcall")
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+ip6_route_init() registers ip6_route_dev_notifier before registering the
+IPv6 route BPF iterator target. If bpf_iter_register() fails after the
+notifier has been registered, the error path currently jumps to
+out_register_late_subsys and unwinds the RTNL handlers and pernet route
+state without removing the notifier from the netdevice notifier chain.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+This leaves ip6_route_dev_notify() callable after the IPv6 route state it
+uses has been torn down. Add a separate unwind label for the BPF iterator
+failure path and unregister the netdevice notifier before continuing with
+the existing cleanup.
 
-Alistair
+Fixes: 138d0be35b14 ("net: bpf: Add netlink and ipv6_route bpf_iter targets")
+Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
+---
+Chagnes since v2:
+- Rebase on current net/ipv6/route.c.
+- Keep the goto-based unwind path.
+- Guard the notifier unwind label with the same BPF/procfs condition.
+Chages since v1:
+- Unregister ip6_route_dev_notifier directlry in the bpf_iter_register() failure path.
+ net/ipv6/route.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-> ---
->  drivers/nvme/host/tcp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 15d36d6a728e..68a1d7640494 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -1702,7 +1702,7 @@ static void nvme_tcp_tls_done(void *data, int statu=
-s, key_serial_t pskid)
->                 qid, pskid, status);
->
->         if (status) {
-> -               queue->tls_err =3D -status;
-> +               queue->tls_err =3D status;
->                 goto out_complete;
->         }
->
->
-> --
-> 2.54.0
->
->
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index e3d355d1fbd6..b106e5fef9cb 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -6933,7 +6933,7 @@ int __init ip6_route_init(void)
+ #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
+ 	ret = bpf_iter_register();
+ 	if (ret)
+-		goto out_register_late_subsys;
++		goto out_register_notifier;
+ #endif
+ 
+ 	for_each_possible_cpu(cpu) {
+@@ -6946,6 +6946,10 @@ int __init ip6_route_init(void)
+ out:
+ 	return ret;
+ 
++#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
++out_register_notifier:
++	unregister_netdevice_notifier(&ip6_route_dev_notifier);
++#endif
+ out_register_late_subsys:
+ 	rtnl_unregister_all(PF_INET6);
+ 	unregister_pernet_subsys(&ip6_route_net_late_ops);
+-- 
+2.43.0
+
 
