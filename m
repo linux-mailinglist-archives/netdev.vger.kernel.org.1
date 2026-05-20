@@ -1,85 +1,67 @@
-Return-Path: <netdev+bounces-289850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id v478DJF+DWqGyQUAu9opvQ
-	(envelope-from <netdev+bounces-289850-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:27:45 +0200
+	id gJt2Cdx+DWosyAUAu9opvQ
+	(envelope-from <netdev+bounces-289851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:29:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7643B58AC60
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:27:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 711AC58AC9C
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF6B73122C32
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:56:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC4993124793
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD24339936D;
-	Wed, 20 May 2026 08:56:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CBA43B2FC7;
+	Wed, 20 May 2026 08:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Mvuvilwd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V4LhfCgj"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013005.outbound.protection.outlook.com [40.107.201.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556CD1E2834;
-	Wed, 20 May 2026 08:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.5
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779267379; cv=fail; b=JkKOEJKxztFpEns6v2ejHLy0h09UfKSJl9Wnd9tNx0Io2sD4/6fwrXA4iry3e+A8OztaZ9LsLL29BImB0caA3fXKXVFP/RizbXc3juMDjB0FOyoy35KyozZZbGGT+bmChx7wnU9Xyp9f70P1HPMXqwlNjuAppZhsbjQVsRzl81g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779267379; c=relaxed/simple;
-	bh=GK0VVcwSQisawyPe1HxZOL8JczdaTaykWeoCrrDefCs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kwSoECODs62YdFdbmqLdRgW2ZgZxYBg+TYbvVcDPCBUZ+XKS6yH6MSbT8ZHWGFlJHEwWv7JKxkHpEJa4eEMGDtuKPQ4vPVf0mG+em5nBXfzZX82UeHnVwxgWohe4E/Fp1UZFxkwK/fJ9D/cxoz3nRg9u9L9TO5b9IMsBd8sQunc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Mvuvilwd; arc=fail smtp.client-ip=40.107.201.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZQ0gAfZGYvy4AVlvXUnEd5Damf3YXSkVdbq/eQRgPG4fZPjNP+bRO0aQeS0G5RJ7iZ+dVWwo8N3rkchx85UfY7zF6HB4yZVLYY0jtH5/z0a6xq5ln3AykB3adyrbJjk+unJgtyAu2ZrcV/LavvtkNHFoTsFGPpzqmUIdgKw7lIhb3bwRyZ3VuMmr2HYTRpVK+YthBB6cgV1TyBotoWvi4mv7MZ0b2PL7Q/jwEF29Hr+oGalfo7AnArbspR/FDohvtp+FNr5trb8EniWKhd1DjrwkWpUAPxAAxprB3dyzOLwxjM7lcpJ+v1NazYauWypbEE/NxGIROCdJdwYkwBoc3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JqfKfg020ZrDZ4B9kGqskpJvrz6KzU+ls9TNW6a/u4c=;
- b=YJvu/U/zcx5ZPcEZ5jqseVlIyAc+I2d6QpinNkU/9u6EEjNgisnxY1ijjIO9iew0JtlStS1ONu/XxgTrBYhev6wu7Att6ZZ7msyxnEeMd5UoihsIOq+NbvcM6CoA6cw/YEv+lFcy16jomrWyGAGo/ECeEsVv50VnX55omEG5Je+sTNFd3AVHXFVc54CDpF01MLy0KmzH1Qfvq4rXUIiEgzwp4u9/koDULlYqfcsGlHZ7okzmdY99wdpgsX4b8Dwny+i79x9MMx8TLQXcAQ6wr2vhmq2kx2DfDjyLVx/L5P2cRoTFGFYL6XK14kaFkr8WBL85NfWZp2Q3UFOTX1jUwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JqfKfg020ZrDZ4B9kGqskpJvrz6KzU+ls9TNW6a/u4c=;
- b=MvuvilwdFftBz7etu7BXV1dsMwz2OSM8D+QzEPXg52hwYe4G/DksW6WrbGsWXBRl7pFR3IdCrB+iFWXA8D7DYF0DBCsPtaXuDBmCYrOaYWRywGkHTOwfn3Lu9S/eZbEbz0+oBhCjee1PagpTyW/iGKx4R13vNfrVChZb19mXf5Lc3iXFn9kp+96oRQDETTY15D9xjcXJnrS9vV7nBfe3e9VBw5bgB7Mn55atF6DWDYSHWjBHiLg+nKf2aDqOqjiniXpC2znxRyPBYptBfQnWYguCqm/3tHeQDxelvU+HxxI1B3ky3KWWv88j6G2zszJASJ6oUO0swELQHwUZ4FlSfg==
-Received: from MN2PR15CA0052.namprd15.prod.outlook.com (2603:10b6:208:237::21)
- by MN2PR12MB4077.namprd12.prod.outlook.com (2603:10b6:208:1da::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.24; Wed, 20 May
- 2026 08:56:13 +0000
-Received: from BN1PEPF00004688.namprd05.prod.outlook.com
- (2603:10b6:208:237:cafe::78) by MN2PR15CA0052.outlook.office365.com
- (2603:10b6:208:237::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Wed, 20
- May 2026 08:56:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN1PEPF00004688.mail.protection.outlook.com (10.167.243.133) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.48.11 via Frontend Transport; Wed, 20 May 2026 08:56:13 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 20 May
- 2026 01:55:52 -0700
-Received: from [172.29.229.84] (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 20 May
- 2026 01:55:45 -0700
-Message-ID: <f2e7580f-6577-41d7-96cf-8081013a5505@nvidia.com>
-Date: Wed, 20 May 2026 16:55:39 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5AC3932DC
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 08:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779267510; cv=none; b=fa3tqlaLoSJFhyoKdxMIq79v7AjS3N9ubSbO37Ys3s3CH9+ZE4jyvnjVh/CVoKenx+zZUcT4s+q9t2i/jetrCsiG3+n9Q30PVpVZPh6AigLECHcYo8AGdOH6si7Fxm4JLhP9Imw33QGx9GMIyp9iou6eUyQwxg1Oea6mNFrgnZE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779267510; c=relaxed/simple;
+	bh=pUMU/P2CEVLR7r/H//y4B3kv/0wQhHOFYYiKWIB5spE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=t3vjx3CL6ohz8JjQdmSFvu2w590NL4l47Pnmtf7gmPdY/mnELc3EiiPqGMq33jkkJuFFEO20BGvcQTqxYCPb/8X54H/v5H9gp25avCDBTqrlm6wcHZvTyMfPkCpL74LBfNmAN054u7jo9UbK16K6Cov0+vr65qBYqyVHvtQ2rug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V4LhfCgj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779267497;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eYjEawSFilUImjuvb443qOSaRqxrooF94EekmmihcgA=;
+	b=V4LhfCgji8GqTj7LFw7K20CQCvlTlUI/+Q9iGsIr0VxqaqE2Ue9kVHJJWrAPxcOo32sk/Q
+	Gl7GNz1+a8IAumahlaGI6L7KN5Pg+E8hdVasnZBihUPBlTsJb+o4rWlQWO6m530w7BeSlY
+	/VEbf/9GvDsgxH2sjlRNnN99274HEIw=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-456-hZoo2lfKODCZU6FZiJFdMg-1; Wed,
+ 20 May 2026 04:58:14 -0400
+X-MC-Unique: hZoo2lfKODCZU6FZiJFdMg-1
+X-Mimecast-MFC-AGG-ID: hZoo2lfKODCZU6FZiJFdMg_1779267492
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DAF71195609F;
+	Wed, 20 May 2026 08:58:11 +0000 (UTC)
+Received: from [10.44.32.79] (unknown [10.44.32.79])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A491B1956053;
+	Wed, 20 May 2026 08:58:07 +0000 (UTC)
+Message-ID: <0a63ee24-024b-4f96-a66a-f949b3559bf7@redhat.com>
+Date: Wed, 20 May 2026 10:58:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,141 +69,211 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5e: Skip IPsec flow modify when MAC address is
- unchanged
-To: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	<tariqt@nvidia.com>
-CC: <edumazet@google.com>, <kuba@kernel.org>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <borisp@nvidia.com>, <saeedm@nvidia.com>,
-	<leon@kernel.org>, <mbloch@nvidia.com>, <cjubran@nvidia.com>,
-	<acassen@corp.free.fr>, <kees@kernel.org>, <Jason@zx2c4.com>,
-	<michal.swiatkowski@linux.intel.com>, <fmancera@suse.de>,
-	<antonio@openvpn.net>, <cratiu@nvidia.com>, <ecree.xilinx@gmail.com>,
-	<sridhar.samudrala@intel.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<gal@nvidia.com>, <leonro@nvidia.com>
-References: <20260513190226.335562-1-tariqt@nvidia.com>
- <20260518112710.510979-2-horms@kernel.org>
- <c7e0dd4f-e34b-42a6-ae4d-8060a59e9b8f@redhat.com>
+Subject: Re: [PATCH net-next v2 2/2] dpll: zl3073x: add NCO virtual input pin
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ Michal Schmidt <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pasi Vaananen <pvaanane@redhat.com>, Petr Oros <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Simon Horman <horms@kernel.org>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, linux-kernel@vger.kernel.org
+References: <20260516175744.26749-1-ivecera@redhat.com>
+ <20260516175744.26749-3-ivecera@redhat.com>
 Content-Language: en-US
-From: Jianbo Liu <jianbol@nvidia.com>
-In-Reply-To: <c7e0dd4f-e34b-42a6-ae4d-8060a59e9b8f@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004688:EE_|MN2PR12MB4077:EE_
-X-MS-Office365-Filtering-Correlation-Id: 987a9017-7748-4159-3ac9-08deb64da535
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|7416014|376014|1800799024|36860700016|4143699003|22082099003|56012099003|18002099003|11063799006|13003099007|5023799004|41080700001;
-X-Microsoft-Antispam-Message-Info:
-	EuxKSiK6fgre1EBcElTuQc+uVPA7nWayZuijnl3yBCHww3qlT//Ui1hkPUml+TGgRWjA+BAEhaICIRB9mfcQGogy2dcuLdhI6+55lr1n+pg7RAY2BNleQuqfxGnfaNaVaV7Ag4aLJT0tl4p/x/r5y4vXcsflkqkscG8u14lwBBEU90wxOXOLxL/wNTvH8ZdmiWU6cY8s0ENDah+Nf5LlK1Qzr5VJdwDn+b5qYL2/XdvOrZFaJ/UdKzQZ7iQMAU97NUuaB+hD851WWpUvFxIIy+9LbZlEV6kocIKo3UVTyRpjcHxfqYk6RbB0/4UJUCjCoTMZLy1SpEVftZ7eTqV/T36u6mXTVuONqNHLRnXPI4bs5AQeK4lg0TusxrvBnnT+1QubTq7S6QL/v697cyTsQBL+FunhYpzRkjP6DmKNb65y5qqAHtvBrfQtossxGONQU1RK28gtY4HKMBhihIVR5i1TxqOBi08mhU2Av8f/NC8I0xdRDJdzFtsthaV3ng9/Mseg+yY6086nWDKeKHgYK4q1VTJKe49ql/a/KUR/QG1T+6UR2zBW/Lait9BqYRPT2+MihKVhzixfLwAYHjXpYXbo5uJ1vRU4VYYJ2Dre1l9Xsm9EfouuFCsLipGRfip2S40IXjnaHgvRg6wn5asxsLk50bYfVWbXzAvg0L7dbQY1FOKbKr5IxkhDn8GBZZl5BZs7REa+JKUqlIZBinIdAZ68FjzNNwSx5g4uMcS4wrJcfIpN3TG664zILfJVwA7O1WVUb+NgrIu43zVt+VBErMVbwDh7J7Aa2js3LeIwKpc=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(1800799024)(36860700016)(4143699003)(22082099003)(56012099003)(18002099003)(11063799006)(13003099007)(5023799004)(41080700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	reArTpQ7vxZmeHstNIVtD/8h5iG42LiaMqdHQ6mnrO1f5gCGlQ3fjdpCrFM5ev07nC9fZ3T782tanbrCtWSYE5AzZbTr/jl2OpUP7et9qFKrxLjr7antIFA80zKurU8IOIZb/MYVneaPVAeFLYzInAcc/JD9e1Sg6ZPJyNssZ86iSVWUzi6JfF/PFu/NXA/pZZvV5XLbbU7HO8c/h0QTvZYgyH0G8EYtFZRBKckri7MmUe3gVal7PFLxR0uahlhc5as5/fHp7iu9VszyVtKhAum2xb3eqtijo0GGDua4uNM2w3O1jjIspEyPbfqiZH5apCbevNl44L2RZDcA8JKIQGRed4fKbRqxMKBG0x+5JyJhZ7axQcOm94MB+gQwJIk7fhnTRAOqxc97FOa07Cyr7BKjRzg48MY3AywmSVjoC7I9xiqht4+IkiHigNjKn9Dm
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 08:56:13.1797
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 987a9017-7748-4159-3ac9-08deb64da535
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004688.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4077
-X-Spamd-Result: default: False [1.34 / 15.00];
+In-Reply-To: <20260516175744.26749-3-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289850-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,lunn.ch,davemloft.net,nvidia.com,corp.free.fr,zx2c4.com,linux.intel.com,suse.de,openvpn.net,gmail.com,intel.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-289851-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,microchip.com,linux.dev,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:mid];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jianbol@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 7643B58AC60
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 711AC58AC9C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Sashiko findings clarification inline below...
 
+On 5/16/26 7:57 PM, Ivan Vecera wrote:
+> Add a virtual NCO (Numerically Controlled Oscillator) input pin that
+> lets userspace switch a DPLL channel into NCO mode. A single NCO pin
+> is shared across all DPLL channels — each channel has its own
+> independent connection state. The NCO pin is registered with the new
+> DPLL_PIN_TYPE_INT_NCO type and reports DPLL_PIN_STATE_CONNECTED /
+> DPLL_PIN_OPERSTATE_ACTIVE when the channel is in NCO mode.
+> ...
+> diff --git a/drivers/dpll/zl3073x/chan.c b/drivers/dpll/zl3073x/chan.c
+> index 2fe3c3da84bb5..f5d6c7917e57a 100644
+> --- a/drivers/dpll/zl3073x/chan.c
+> +++ b/drivers/dpll/zl3073x/chan.c
+> @@ -21,6 +21,11 @@ int zl3073x_chan_state_update(struct zl3073x_dev *zldev, u8 index)
+>   	u64 val;
+>   	int rc;
+>   
+> +	/* Serialize with zl3073x_chan_nco_mode_set() which also
+> +	 * modifies chan->mode_refsel and chan->df_offset.
+> +	 */
+> +	guard(mutex)(&zldev->multiop_lock);
+> +
+>   	rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_MON_STATUS(index),
+>   			     &chan->mon_status);
+>   	if (rc)
+> @@ -31,7 +36,10 @@ int zl3073x_chan_state_update(struct zl3073x_dev *zldev, u8 index)
+>   	if (rc)
+>   		return rc;
+>   
+> -	/* Read df_offset vs tracked reference */
+> +	/* Read df_offset only when locked to a reference */
+> +	if (zl3073x_chan_lock_state_get(chan) != ZL_DPLL_MON_STATUS_STATE_LOCK)
+> +		return 0;
+> +
 
-On 5/19/2026 4:09 PM, Paolo Abeni wrote:
-> On 5/18/26 1:27 PM, Simon Horman wrote:
->> From: 'Simon Horman' <horms@kernel.org>
->>
->> This is an AI-generated review of your patch. The human sending this
->> email has considered the AI review valid, or at least plausible.
->> Full review at: https://sashiko.dev
->> ---
->> net/mlx5e: Skip IPsec flow modify when MAC address is unchanged
->>
->> When a netdev event fires for an IPsec SA, skip calling
->> mlx5e_accel_ipsec_fs_modify() if the MAC address has not changed and
->> the rule is not in drop mode. This avoids redundant hardware updates.
->>
->>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
->>> index a52e12c3c95a2..f567cd801adb3 100644
->>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
->>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
->>> @@ -674,19 +674,26 @@ static void mlx5e_ipsec_handle_netdev_event(struct work_struct *_work)
->>>   	struct mlx5e_ipsec_sa_entry *sa_entry = work->sa_entry;
->>>   	struct mlx5e_ipsec_netevent_data *data = work->data;
->>>   	struct mlx5_accel_esp_xfrm_attrs *attrs;
->> [ ... ]
->>> +
->>> +	if (ether_addr_equal(mac, data->addr) && !attrs->drop)
->>> +		return;
->>> +
->>> +	ether_addr_copy(mac, data->addr);
->>>   	attrs->drop = false;
->>>   	mlx5e_accel_ipsec_fs_modify(sa_entry);
->>
->> If mlx5e_accel_ipsec_fs_modify() fails (for example, due to a memory
->> allocation failure), does this early return prevent the hardware state
->> from recovering?
->>
->> Since attrs->drop and the mac address are updated before calling
->> mlx5e_accel_ipsec_fs_modify(), a failure in the hardware update leaves the
->> software state out of sync with the hardware.
->>
->> Prior to this patch, a subsequent netdev event for the same neighbor would
->> unconditionally retry the hardware update. With this patch, the early return
->> sees the optimistically updated software state, matches it, and skips the
->> retry, potentially leaving the hardware permanently stuck in a dropped or
->> failed state.
-> 
-> @Tariq, @Jianbo: I tend to think that the above qualifies as
-> pre-existing issue: when mlx5e_accel_ipsec_fs_modify() failed the S/W
-> and the H/W ended-up in out-of-sync state for a potentially unlimited
-> time even before this patch. WDYT?
+Sashiko commented:
 
-I agree. Please drop this patch for now. I will submit a new one.
+> If the device boots already in NCO mode, can chan->df_offset ever be
+> populated?
+> Walking through zl3073x_chan_state_fetch() at probe time with the
+> hardware already in NCO mode:
+>   - state_fetch() reads ctrl and mode_refsel, then calls
+>     zl3073x_chan_state_update()
+>   - state_update() now early-returns above when lock_state is not
+>     STATE_LOCK, and an NCO-mode channel is not LOCK, so df_offset
+>     keeps its kzalloc default of 0
+>   - zl3073x_dpll_nco_pin_register() updates ctrl bits via
+>     zl3073x_chan_state_set() but does not touch mode_refsel, so the
+>     edge-triggered nco_auto_read does not fire (it captures only on
+>     the transition into NCO)
+>   - zl3073x_dpll_nco_pin_ffo_get() then reports
+>     -mul_s64_u64_shr(0, 244140625, 36) = 0
+> The commit message states "Input reference pins are now always
+> registered regardless of the initial DPLL mode", so boot-in-NCO is a
+> supported configuration.
+> Should zl3073x_dpll_nco_pin_register() (or state_fetch) read
+> ZL_REG_DPLL_DF_OFFSET when the channel is already in NCO mode, similar
+> to the read in the new zl3073x_chan_nco_mode_set()?
+
+In boot-in-NCO configuration the df_offset is zero... so this behavior
+is correct.
+
+> diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
+> index cff85cdb9d0e5..2efefb1d7e224 100644
+> --- a/drivers/dpll/zl3073x/dpll.c
+> +++ b/drivers/dpll/zl3073x/dpll.c
+> @@ -605,6 +630,7 @@ zl3073x_dpll_input_pin_state_on_dpll_set(const struct dpll_pin *dpll_pin,
+>   {
+>   	struct zl3073x_dpll *zldpll = dpll_priv;
+>   	struct zl3073x_dpll_pin *pin = pin_priv;
+> +	struct zl3073x_dpll_pin *nco_pin = NULL;
+>   	struct zl3073x_chan chan;
+>   	u8 mode, ref;
+>   	int rc;
+> @@ -634,6 +660,10 @@ zl3073x_dpll_input_pin_state_on_dpll_set(const struct dpll_pin *dpll_pin,
+>   			goto invalid_state;
+>   		}
+>   		break;
+> +	case ZL_DPLL_MODE_REFSEL_MODE_NCO:
+> +		if (state == DPLL_PIN_STATE_CONNECTED)
+> +			nco_pin = zl3073x_dpll_nco_pin_get(zldpll);
+> +		fallthrough;
+>   	case ZL_DPLL_MODE_REFSEL_MODE_FREERUN:
+>   	case ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER:
+>   		if (state == DPLL_PIN_STATE_CONNECTED) {
+
+Sashiko commented:
+
+> When a REF pin is connected while the channel is in REFLOCK and the
+> NCO pin is then connected, the channel transitions REFLOCK -> NCO via
+> zl3073x_chan_nco_mode_set(). The previously-locked REF pin now
+> reports DPLL_PIN_STATE_DISCONNECTED via the default branch in
+> zl3073x_dpll_input_pin_state_on_dpll_get(), but no immediate
+> __dpll_pin_change_ntf() is sent for that REF pin.
+> The periodic worker zl3073x_dpll_changes_check() will eventually pick
+> up the operstate change and call dpll_pin_change_ntf() for the REF
+> pin so userspace re-queries.
+> Should the same explicit-immediate-notification pattern that this
+> patch introduces for the NCO pin also apply to the previously-
+> connected REF pin when its connection state changes due to a mode
+> transition?
+
+No, explicit notification for NCO pin is sent because NCO-type pin is
+not monitored. For regulard HW input references the implicit
+notification will be sent by peridic monitor function.
+
+> ...
+> +static int
+> +zl3073x_dpll_nco_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
+> +			     const struct dpll_device *dpll, void *dpll_priv,
+> +			     struct dpll_ffo_param *ffo,
+> +			     struct netlink_ext_ack *extack)
+> +{
+> +	struct zl3073x_dpll *zldpll = dpll_priv;
+> +	const struct zl3073x_chan *chan;
+> +
+> +	chan = zl3073x_chan_state_get(zldpll->dev, zldpll->id);
+> +	if (!zl3073x_chan_mode_is_nco(chan))
+> +		return -ENODATA;
+> +
+> +	/* NCO register has inverted sign: f_offset = -df_offset / 2^48
+> +	 * Convert to PPT: ppt = -df * 5^12 / 2^36
+> +	 */
+> +	ffo->ffo = -mul_s64_u64_shr(zl3073x_chan_df_offset_get(chan),
+> +				    244140625, 36);
+> +
+> +	return 0;
+> +}
+
+Sashiko commented:
+
+> The new pin is registered with type DPLL_PIN_TYPE_INT_NCO. The UAPI
+> header include/uapi/linux/dpll.h documents that type as: "When
+> connected as a DPLL input, the DPLL enters NCO mode where the output
+> frequency is adjusted by the host via the PTP clock interface."
+> Does this driver satisfy that contract?
+> There is no PTP clock device registered anywhere under
+> drivers/dpll/zl3073x (no ptp_clock_register, no ptp_clock_info, no
+> adjfine/adjphase). The new zl3073x_dpll_nco_pin_ops exposes only
+> ffo_get, state_on_dpll_get/set, operstate_on_dpll_get and
+> direction_get, with no frequency or phase control. The pin properties
+> declare only DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE.
+> The commit message also says "The value is static for the duration of
+> NCO mode and serves as the FFO snapshot reported to userspace", so
+> zl3073x_chan_nco_mode_set() captures df_offset once and never updates
+> it.
+> Generic userspace recognizing DPLL_PIN_TYPE_INT_NCO will reasonably
+> expect a controllable NCO. Should this mode either expose a frequency
+> adjustment path (PTP or otherwise) or document that this device
+> exposes a read-only frozen-offset variant of the NCO type?
+
+The PTP support for zl3073x will follow this series.
 
 Thanks,
-Jianbo
+Ivan
 
 
