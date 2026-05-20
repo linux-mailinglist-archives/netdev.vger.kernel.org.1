@@ -1,116 +1,135 @@
-Return-Path: <netdev+bounces-290122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290123-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFEaIcEyDmrj7wUAu9opvQ
-	(envelope-from <netdev+bounces-290122-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:16:33 +0200
+	id UOsnKZIzDmrj7wUAu9opvQ
+	(envelope-from <netdev+bounces-290123-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:20:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00DA059BDD9
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:16:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A98C59BE57
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 50F8B3082F55
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:16:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 12EB230022ED
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46603BF680;
-	Wed, 20 May 2026 22:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2023BE644;
+	Wed, 20 May 2026 22:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tbk8kwOS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IhD4rxvh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D5C3BE642;
-	Wed, 20 May 2026 22:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9ADA3BB9F8
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 22:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779315372; cv=none; b=iteDpIBS3aIZuUUzZHRhW52oew6/+hJeFyg4tn2U5hwdpwNq+EziExgGKRj97t4nygwR8MC2o+aFIn/Obhnlc/k239OEKcznQftcqVwxvRVvMzpRmutwSn2RzKVJQ9KwVe5GVqfrSoXb9PEMdyGP5OquQ9hu65nfmSXcJRB08LA=
+	t=1779315598; cv=none; b=Rlb9AAyhbxEVgmnwm18mZsRSGRaNlJbivGqLMpnk22h7x5hgsJPWDaONSZhuQZuWRpQtR7mBXduI87EH5IOLiejPeLtRYqzXv/1yCZFi3p+FE0xw7R1wMWeEzTyAV8G9Kjupn10q7qFt1ZPX+3Keo32Q1e1Px4zLmDERDwV5has=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779315372; c=relaxed/simple;
-	bh=c/oDHDdVGvSyLqzoLzBh8Avjt+YlOJI5jmoykGAOf/c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lXir68NwqsL+xgOWwy7b2R6NM1eDistbDZcNb06ogbeDGOuV5mZq5g1WRKlNdCXLj+70NliLc2QeGdTF+ry8/fn0sIO+qX/iF7J7rrbOF9cmMwwSuGJChTdSyN4yqa7R+4vomig17O1VH4+AeimvfbNNbGGQdBRFFBNei1LVAbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tbk8kwOS; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0897A1F000E9;
-	Wed, 20 May 2026 22:16:09 +0000 (UTC)
+	s=arc-20240116; t=1779315598; c=relaxed/simple;
+	bh=cU+6i/NmsglUz8FvcHy9PZ8tsOMCsIN7naR06KS9IZ0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jqd3Y/O23Ylm+hYO+VmwAcYdECiCS8dfrEc254uM80F5OQSKEGPEjv2TisV5MLupoOZ7EH5PbEB/ZxQuj/XWhD/IMuIcv45bxNvdZ28DAm9geUU+8bHlgMGk9uIj/eKI6+uCKw9C1GUb3cq6xwgodj06VAeuelTjRwwb6pY28uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IhD4rxvh; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F95A1F000E9;
+	Wed, 20 May 2026 22:19:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779315371;
-	bh=c/oDHDdVGvSyLqzoLzBh8Avjt+YlOJI5jmoykGAOf/c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Tbk8kwOSJntaBrA7WS58xqdsZ4XdjJLNBvtCcXHpneMh2pudjAzO0rpVCax0rDUIO
-	 y1PCo6X+wCq/lJKIzsTsBmlrustqsr6xZz3HGJhtoqDORVZz2pnPiUdmuLydtSKz1w
-	 WZQlxK+PEk1yKQLAWE2rE6Tc8hUZZq3ZsxToqOsyvGVKPV60rCjamMl1DsgFFAZm0M
-	 MzMpgpgNGjuXffjV58mi7IWzl1OKwL+UxqujP/TYchjJcoLozA7PM8zTiAGvfmlSHJ
-	 xXSLpB8+Nn89lQcIke/XU+EAbHh/mGQn3/jZPzOTnLBicLSV28Sv82ciOgFvWOIn0K
-	 cvyjYzRVIrenw==
-Date: Wed, 20 May 2026 15:16:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org,
- joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, richardcochran@gmail.com,
- jstultz@google.com, sboyd@kernel.org, willemb@google.com,
- nktgrg@google.com, jfraker@google.com, ziweixiao@google.com,
- maolson@google.com, jordanrhee@google.com, thostet@google.com,
- alok.a.tiwari@oracle.com, pkaligineedi@google.com, horms@kernel.org,
- dwmw2@infradead.org, jacob.e.keller@intel.com, yyd@google.com,
- jefrogers@google.com, linux-kernel@vger.kernel.org, Naman Gulati
- <namangulati@google.com>
-Subject: Re: [PATCH net-next v8 3/3] gve: implement PTP gettimex64
-Message-ID: <20260520151609.7e7272ac@kernel.org>
-In-Reply-To: <87mrxtwzz9.ffs@tglx>
-References: <20260514225842.110706-1-hramamurthy@google.com>
-	<20260514225842.110706-4-hramamurthy@google.com>
-	<87mrxtwzz9.ffs@tglx>
+	s=k20260515; t=1779315597;
+	bh=5sXdvxUFoXEr+T9NBGv6/22RfDQBPHQ3AmXdLezYj4s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=IhD4rxvhfeO/8WX4fBmIleI4LH/PXS7s3DVx/me4T5ccGMTWAYTZPin2K56DzlOgT
+	 Q3hDx84dVUJBCz4ABQG8R7DWJgEFtGD3/pDeHi0jo4P+1oKdE0YgTmGiprI7wfaNhy
+	 a5AnX1V+f8OeVHAen7A2RVFrcOoe01UOolmqY5Q3Mpu/a1kIwLu1ZchrHE5rpRhmRi
+	 3dS7C8u7SWidfUnCFeUkFDV8WCt2/hVDJCJsCpW/dDu0BDo8GQ4Bkjc6lCSansFAEr
+	 BOcxMtXvQYcdSmtW/UW/TblWzRENXWRaodW7af0aSgk9f4mAUhHB0CfTC9Rwi4ZRoq
+	 Kw/DOd/xy68ng==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1997D3930BB9;
+	Wed, 20 May 2026 22:20:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 0/2] udp: gso: Fix __udp_gso_segment() after
+ GSO_PARTIAL UDP length change
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177931560764.3775142.17228942872118757951.git-patchwork-notify@kernel.org>
+Date: Wed, 20 May 2026 22:20:07 +0000
+References: <20260518062250.3019914-1-gal@nvidia.com>
+In-Reply-To: <20260518062250.3019914-1-gal@nvidia.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ horms@kernel.org, willemb@google.com, dtatulea@nvidia.com,
+ alice@isovalent.com
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290122-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,lunn.ch,davemloft.net,redhat.com,gmail.com,kernel.org,oracle.com,infradead.org,intel.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-290123-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 00DA059BDD9
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4A98C59BE57
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 20 May 2026 23:08:42 +0200 Thomas Gleixner wrote:
-> Jakub, please back out this hackery before it makes a precedence for others
-> to copy from.
+Hello:
 
-Done! 0ae361f7e43c in net-next.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I'd also appreciate if you could cast your eyes over:
-https://lore.kernel.org/20260515164033.6403-3-akiyano@amazon.com
-Different kettle of fish, but firmly more time than network..
+On Mon, 18 May 2026 09:22:48 +0300 you wrote:
+> This series fixes two issues introduced by commit b10b446ce7ad ("udp:
+> gso: Use single MSS length in UDP header for GSO_PARTIAL"), which
+> switched __udp_gso_segment() to write the single MSS length into the UDP
+> header for GSO_PARTIAL skbs.
+> 
+> Patch 1 (from Alice) fixes the UDP checksum adjustment in
+> __udp_gso_segment().
+> The patch adjusts the checksum by the correct delta, and since msslen
+> and newlen become equivalent before the loop, drops one of the two
+> variables to simplify the code.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] udp: gso: Fix handling checksum in __udp_gso_segment
+    https://git.kernel.org/netdev/net/c/5f17ae0f595a
+  - [net,v2,2/2] udp: Fix UDP length on last GSO_PARTIAL segment
+    https://git.kernel.org/netdev/net/c/78effd896eee
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
