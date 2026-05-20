@@ -1,147 +1,217 @@
-Return-Path: <netdev+bounces-290034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CAGxBIb7DWru5AUAu9opvQ
-	(envelope-from <netdev+bounces-290034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:20:54 +0200
+	id APLVN+sjDmoo6gUAu9opvQ
+	(envelope-from <netdev+bounces-290035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:13:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C886C595DBC
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:20:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 301C159A911
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:13:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8D8723073B60
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:03:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73435329EE5B
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 18:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4836D3E95A4;
-	Wed, 20 May 2026 18:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B47331220;
+	Wed, 20 May 2026 18:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ib+QDmV4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWeVJZTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160853F23C5;
-	Wed, 20 May 2026 18:03:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D913F4DD6
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779300211; cv=none; b=N9F0Vg24jCWa4jESN5i1ZvCE2GdTMpwZ2JodVoTIqotn1lRoQo0bt1Bnwq9eMBaEg65kops88yUuiqf7hl4RQthz9IHY2UPRtgDn3iUrt40VL/nsookjKlK7XdgpMMFUDHZGPwp2JIkDTi6SAbacr9RbkdYjs/AkG/nNxtHmgus=
+	t=1779300463; cv=none; b=sJ3MPIa+5J4rg/dDF5KYQs9I19yvdCF8Jl0iebyrVCQmXF9RUItGLlklo6pAzbviauelcm941hdYCo9E1jlw7v/zQlIcgTxADnuLxe0w4uBFWIqDSyg0cafuDZpKVykJdOMKdmeAH5sGLdQtiXc/jmJiNFd6+GefDpD2IoX7DkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779300211; c=relaxed/simple;
-	bh=rudgk+mg3/2rutSrlrlxvWavMk9JFqXDGu+KqmHIUbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rnGVJzg6j5/MpJ2s3PZgqQsWb5zcEZxFi0LjvDHbKAFCjIiHcPvmtlVd9C8zuLgE3OI4j4CWPf+gO8434xuudrNHHOgkZB7yyb8XoKMRzXnEqWSlu87vtMEIXzo8WMd3b+iXifKOR/toYdDgHIrtot35p0G1dl8rJL0c+7J1dSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ib+QDmV4; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D891F000E9;
-	Wed, 20 May 2026 18:03:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779300209;
-	bh=Rz7yAa3qcHc0KU19IaAMOIyX78z/nUqety1iBnItnZs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Ib+QDmV4vHjejSXodfCLFHpFhSOs+Q7oQQu/WZ9yi2afqDpljP/Ifrgc92lGA4LwA
-	 cedndEcxNrkxi1X9WIBdPKLJSeqMZkRF2ZUX+Q/mxb/lib18Ht49BItxiqEUyQU2Bf
-	 Z5uLcJBnmLZEBFuOn+x4ju/Got0rXky9wDz8IyuUEi3opEBlpmkNvDh3B4kOoPY1rp
-	 m2BVniLWCBGuos0/Wf8sXPNR1C0tp5Qlf+KSM/oHXFTz8ya+X6Yb+w4NRmEjYG7Hac
-	 5RaZfqd1Z/1aa0ZxmjaKUDoPfOx7OP1ZWEdjWq0PeFc1ypeYjOEVtHB7iuEqhINpCb
-	 oWVM2dINzb8RQ==
-Date: Wed, 20 May 2026 19:03:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: Cyrill Gorcunov <gorcunov@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v2] ice: Fix wrong dsn read in ice_adapter_put
-Message-ID: <20260520180324.GC988238@horms.kernel.org>
-References: <agQ_xZUp3Sq905O_@grain>
- <20260517125307.287246-1-horms@kernel.org>
- <ago_YTTWiZs6G8_5@grain>
- <agrjuAlzsV0RqAwU@grain>
- <agsj4Rrexhkqao0c@grain>
+	s=arc-20240116; t=1779300463; c=relaxed/simple;
+	bh=xfNlFdn1cqV9kYZZDjV/Uwxd3csiryoiiiDv+XVg55o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tGOiVOS/E7Hk/MaW1QbUmOgq2Ck7sWN9utLQKgdqfmVDV+olVzwB8NWfLRIE8LC5ZuQ0vK5Q3pKP19n5LD1xDhXHSUZyA0X8g0GFgEymY0W7DZWFgZUSCoZG2n+lcEQiDzQL+L8dqBBoZiRtBiD3lFuAynYHUQMwbwQu3XyM8xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWeVJZTe; arc=none smtp.client-ip=74.125.82.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-2f03d6cf77bso5253601eec.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:07:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779300461; x=1779905261; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nklZPvrJ0WfKoc1xZCOc0oOhjU6AGmqWwTNyTfjgmsQ=;
+        b=hWeVJZTeigJzObalTM7AUZy47yEbDptJfL2UhHrLO2c4T4AvgZKuRNypI/yP7gPZRx
+         QeUdPsyIxX8BugFuQ5mYBFH5pITc2XDpBQz5RpJt93hdvARv+mWeBdlNb/ZtTmdJs2Ms
+         jCXJZ+d03cMS/w18h/pWaGORbfxKePv1hPiOatN+6VrI4vOWFnrFEsb3eIjMoMOeYD8t
+         yxEFGWIKaimXpbpD8Ttd7uXRJ/JLwuFECJsDFUEC7TPRInFjAKsc+P65FiVMBzGpEq6U
+         XcWfYnazumOI0ppIJGUMpSGFoACsF3qYKgeifp+l6NNj9ejdsPoxJ4xleQa5iRkY0R3k
+         6KvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779300461; x=1779905261;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nklZPvrJ0WfKoc1xZCOc0oOhjU6AGmqWwTNyTfjgmsQ=;
+        b=gshmzvU8hnsQG0uhPUrniWr8fsTe5sAyJbAa/wAroDV0IkbmfSjBpFMN1UiVidm5CZ
+         Xb1e29brq8TPvlTWL0yE+YIbQrOUeGqSZGf/t7T3nrcXrLEOkR+y6Kx+829XisgYgqYK
+         ZuvS93WSGgD0XRdFm7OqVm2DrvuS36+P1AqRrg5gH21WsehjypoRxGMvtj1BSxlmS7Y3
+         FESDk1YzM+3uG7kc8CWoCqbNzY7k5lhq5ueAQVkDxxVYO9IAWQCO/UbRVelTUxhtMCCt
+         0Xooshc59l1qtTP740rzZT47ajVHcuzOBCAHaUFFXbkBGmgSNyK4DBbLByOHNY3rG47D
+         JIZQ==
+X-Gm-Message-State: AOJu0YylMtoPk9QG8Hu9VGMFqSXr4kZ/2dtg2xS2ivN2kwgF2pgsmCrC
+	ppLAoDsBGbAxggfhjduggw2Z+4U52/sIhvZWXq+tgohqQaVm14lFOld6VF1Q1FlcDJIQJA==
+X-Gm-Gg: Acq92OFOLNd3QM3e6w5eHapggy6eKCofhxTMZF5US3zgTKPEqWvWJ7obZPtOfGgcIVd
+	t9nNTNyE56ZeGRGy79Fm9J3+TgvOWEU1oT1nN2PJibpyNOuHNeN1qH3QM7dZbhBp+eQ6Cvazllz
+	yr3AGVK2CIFZH3YuLMj3d6yZXahgPPdQt+njCgR0sqBiz3IlvsFIY9FcSozFWj/ci11fsDiykOU
+	yGQur1YSfrDd4ayZs33JfU1mHOrGQPPL09Zh63GvCjEDmDz5mpf2WHTC76prWttwqm4ocxbVOMZ
+	NQpihgSLJfjvwUb2/7YUMY6J7QrgDN1uimHUYWCw8/ftYjFn+EucpFV422ShiZprmocEoyk4jf/
+	SRalJHWcnQSfH3K3wynigDhKW0pKkBB/c7rLN/SxpfPtUtO5hdMiiqLRhwhJZR+rTeZoRr/2SUu
+	7RjjRvW5PAdpIf6WYCkd/InqWiCgdD32m8lYQ0HA==
+X-Received: by 2002:a05:7300:a505:b0:2e2:4979:eb5 with SMTP id 5a478bee46e88-303982b2f85mr11180375eec.10.1779300460601;
+        Wed, 20 May 2026 11:07:40 -0700 (PDT)
+Received: from localhost.localdomain ([148.135.103.3])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30294500726sm18183954eec.10.2026.05.20.11.07.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 11:07:40 -0700 (PDT)
+From: Shaomin Chen <eeesssooo020@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Christian Hopps <chopps@labn.net>,
+	stable@vger.kernel.org
+Subject: [PATCH net] xfrm: iptfs: reset runtime state when cloning SAs
+Date: Thu, 21 May 2026 02:07:23 +0800
+Message-ID: <20260520180723.965339-1-eeesssooo020@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <agsj4Rrexhkqao0c@grain>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-290035-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290034-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eeesssooo020@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: C886C595DBC
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 301C159A911
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 18, 2026 at 05:36:17PM +0300, Cyrill Gorcunov wrote:
-> On Mon, May 18, 2026 at 01:02:32PM +0300, Cyrill Gorcunov wrote:
-> ...
-> > 
-> > Thinking more I think I got what sashiko meant here: the pullout of the
-> > adapter when it been in recovery mode already, and reading register state
-> > is obviously incorrect here too, instead we have to save the state upon
-> > probing in some flag and use it later. I'll update the patch.
-> 
-> Here is an updated. Actually even in recovery mode the ice_deinit_devlink()
-> may call for rd32() with undefined result as
-> 
->  | ice_health_deinit
->  |  ice_config_health_events
->  |    ice_sq_send_cmd_retry
->  |      ice_sq_send_cmd
-> 
-> unless I miss something obvious... (i don't address this in the patch).
-> Please take a look once time permits.
-> 
-> ---
-> From: Cyrill Gorcunov <gorcunov@gmail.com>
-> Subject: [PATCH v3] ice: Fix wrong dsn read in ice_adapter_put
-> 
-> When registering an adapter instance, we read the PCI configuration
-> space to fetch the DSN and generate an adapter index for lookups.
-> 
-> However, if the adapter has been physically unplugged, the PCI space
-> is no longer accessible. Reading it returns a zero value, which results
-> in either an incorrect adapter instance being put or the proper instance
-> not being put at all. To fix this, we will use the previously known
-> index instead.
-> 
-> Similar applies to recovery mode detection -- if card has been in
-> recovery mode and physically removed we're not allowed to read its
-> state from hardware registers but rather provide state flag for
-> this.
-> 
-> Signed-off-by: Cyrill Gorcunov <gorcunov@gmail.com>
+iptfs_clone_state() clones the IPTFS mode data with kmemdup(). This
+copies runtime objects which must not be shared with the original SA,
+including the embedded sk_buff_head, hrtimers, spinlock, and in-flight
+reassembly/reorder state.
 
-Thanks Cyrill,
+If xfrm_state_migrate() fails after clone_state() but before the later
+init_state() call has reinitialized those fields, the cloned state can be
+destroyed by xfrm_state_gc_task() with list and timer state copied from the
+original SA. With queued packets this lets the clone splice and free skbs
+owned by the original IPTFS queue, leading to use-after-free and
+double-free reports in iptfs_destroy_state() and skb release paths.
 
-I agree that this is a good approach.
+Reinitialize the clone's runtime state before publishing it through
+x->mode_data. Because clone_state() now publishes a destroyable mode_data
+object before init_state(), take the mode callback module reference there.
+Avoid taking it again from __iptfs_init_state() for the same object.
 
-I might suggest splitting the patch in two:s
-1. introduce and use ICE_FW_RECOVERY_MODE
-2. Address dns nread in ice_adapter_put
+Fixes: 0e4fbf013fa5 ("xfrm: iptfs: add user packet (tunnel ingress) handling")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shaomin Chen <eeesssooo020@gmail.com>
+---
+ net/xfrm/xfrm_iptfs.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+index 97bc979e55ba..6c6bbc040517 100644
+--- a/net/xfrm/xfrm_iptfs.c
++++ b/net/xfrm/xfrm_iptfs.c
+@@ -2650,7 +2650,8 @@ static void __iptfs_init_state(struct xfrm_state *x,
+ 	x->props.enc_hdr_len = sizeof(struct ip_iptfs_hdr);
+ 
+ 	/* Always keep a module reference when x->mode_data is set */
+-	__module_get(x->mode_cbs->owner);
++	if (x->mode_data != xtfs)
++		__module_get(x->mode_cbs->owner);
+ 
+ 	x->mode_data = xtfs;
+ 	xtfs->x = x;
+@@ -2658,22 +2659,39 @@ static void __iptfs_init_state(struct xfrm_state *x,
+ 
+ static int iptfs_clone_state(struct xfrm_state *x, struct xfrm_state *orig)
+ {
++	struct skb_wseq *w_saved = NULL;
+ 	struct xfrm_iptfs_data *xtfs;
+ 
+ 	xtfs = kmemdup(orig->mode_data, sizeof(*xtfs), GFP_KERNEL);
+ 	if (!xtfs)
+ 		return -ENOMEM;
+ 
+-	xtfs->ra_newskb = NULL;
+ 	if (xtfs->cfg.reorder_win_size) {
+-		xtfs->w_saved = kzalloc_objs(*xtfs->w_saved,
+-					     xtfs->cfg.reorder_win_size);
+-		if (!xtfs->w_saved) {
++		w_saved = kzalloc_objs(*w_saved, xtfs->cfg.reorder_win_size);
++		if (!w_saved) {
+ 			kfree_sensitive(xtfs);
+ 			return -ENOMEM;
+ 		}
+ 	}
++	xtfs->w_saved = w_saved;
++
++	__skb_queue_head_init(&xtfs->queue);
++	xtfs->queue_size = 0;
++	hrtimer_setup(&xtfs->iptfs_timer, iptfs_delay_timer, CLOCK_MONOTONIC,
++		      IPTFS_HRTIMER_MODE);
++
++	spin_lock_init(&xtfs->drop_lock);
++	hrtimer_setup(&xtfs->drop_timer, iptfs_drop_timer, CLOCK_MONOTONIC,
++		      IPTFS_HRTIMER_MODE);
+ 
++	xtfs->w_seq_set = false;
++	xtfs->w_wantseq = 0;
++	xtfs->w_savedlen = 0;
++	xtfs->ra_newskb = NULL;
++	xtfs->ra_wantseq = 0;
++	xtfs->ra_runtlen = 0;
++
++	__module_get(x->mode_cbs->owner);
+ 	x->mode_data = xtfs;
+ 	xtfs->x = x;
+ 
+-- 
+2.47.3
+
 
