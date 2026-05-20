@@ -1,178 +1,138 @@
-Return-Path: <netdev+bounces-289771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBtaFkRRDWqgvwUAu9opvQ
-	(envelope-from <netdev+bounces-289771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:14:28 +0200
+	id KHAjOmlTDWrAwAUAu9opvQ
+	(envelope-from <netdev+bounces-289772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:23:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5CE85880B1
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:14:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 159AF5881A0
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:23:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B51E33002A29
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:14:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 313BA3006D5C
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CBC372ED0;
-	Wed, 20 May 2026 06:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024F737268B;
+	Wed, 20 May 2026 06:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QwNgBdWX"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HCgskJps"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E32372662
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934472E9ED6
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779257658; cv=none; b=ml6/7ie5+KdCVRUT2fXA4MjjBVHhiTcu7HJpeXNw2XLVrdxdTY+TiKg+YgK7OtmFZCSxvFv9/uiwlF0fMNT2hDpshygwEwRnDqdHgqbqeWXsV3OLlfCaq8diFvoeel3qg7JUPnQX7+wCW2PsVciMVkHHI+v7djd52S+QtI+cAGk=
+	t=1779258211; cv=none; b=ne/C4cjHTA5ymxMv2MdeplOH0DdixBxASln/nrAwgftXfC0VTfQ6h7xC+WX65kYfmnkgo/XTK6hLMfB+6DECnk0oUgrVAlddYMMGBfiArxWVORYoKa43iAn3oUVyrsrmpc7TJn/YBEj1OR8Y/UgYsnLDkP8aXO5dxFsf4l97mUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779257658; c=relaxed/simple;
-	bh=M8qiunqkOgQWkAf3O82exmt0DGwWErUn3BZbkU3o/L8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YNVJSrT6pnFVJQQ4Dm106PALWf3n5nE/qJEX/gvWQZAitI0GYIooXLzriied6MjyziYhGSCmAFTmpX68JZK09C+s0lP85M1/gxf6WTE5pUBq2wlv5s0U5W/a6mXJl5Y7HfYMgJQNCR8vrtEsaTM0iaPcd6AbHOzDYwhPDS0usm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QwNgBdWX; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-369002b26f4so2310384a91.3
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 23:14:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779257656; x=1779862456; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7BbDIO2nNjsh71VERM5YNtwUxx3QhNEjyFxEw9Mfb5o=;
-        b=QwNgBdWXZQYyD55vBG8Nev3qHYFW7dSUdmW7Im7EODMcOE57USOOgcVx/N+9W8Qga3
-         zo53vVqQD0PIT+gwNCYfSOGCd6Q6QHj5GLgjnjAWXfD2Py2mGJjhJARktObOYlWj8obK
-         YKncubevZN2TDQYL+xiblI0VXleNYl8+L3P9/9juvhbqgp1yzwT6EonvY0+YnStS9hkF
-         Isj+Fc7BgWJFocbc+X0dkhaqapeTGb+uvK5yzAP0u2d5+WywSQbyweZb9ZFpqVoLNZmt
-         Zqd/ypyKLT2j4dP+hEuu96J4xqZ2z5S9nz7bqOM/vaHNCT1okG2TzNHAFkhVyg+pRqMj
-         mC9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779257656; x=1779862456;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7BbDIO2nNjsh71VERM5YNtwUxx3QhNEjyFxEw9Mfb5o=;
-        b=C0IiqW2uj4Sorbn2rlnV8HOynQf/WLBytddBwwmj9/herc6RAHKI9sRC4e9bpsVuou
-         lgsgBIwwjfSd+3J3CumYtwx/luq8Tg2245ucj8KajaWXZcVAClfSK5xDzPJO1Cxzoj+z
-         f9HJUeWgOEy4YMJhrK51VZISMY/HvxaSc3vNSAO7UPJIARN4tyS9F4kUyqhd1NHJnhvW
-         xj1fIz41Q/SLBuZV9PKgK2HHASago8ZHg4XWhF1x2nCYGxE6FcDAte7rImVhk30HbqTc
-         A2Cw+F655bsGiWyyUiC/PXkoagnvxuoKSFO9yoYU5WkX/NFnbU5I0+nBXzPFDy2ZOHFx
-         e/vg==
-X-Forwarded-Encrypted: i=1; AFNElJ+RE4JPj9z1o5MtAgfciKJPQU5azzoAumVCgSV0eC23eBjqrbxkdUvaFTpG4P940coyXFOgNzE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx67lp1w3LBrMnVvqTZ3XZEn/S8lrQvv6GUZ2Q08EMkXYS4FBfm
-	RPKAIncMDbPNRORXdIsEhFi29ULfEIVqLxajPnfjOdaM4aMVmXvcTTkY
-X-Gm-Gg: Acq92OEUl1zSrtlVK1kY7MRZu3hQRiEU3/Wzw4xIB0M4IWiQUCN9uba7jf+geo0GsA3
-	8TDhSbovluspRU4ZtX4L6AIIEDOTmYX3dXGCfOZfpHhzB2ZkDs4Z9HSOM2qCKjsW6hRRiZOCnpn
-	7Ga2PKOwu8hnlj/VZnLEhEEuO3IBWzVdkW/zsYwAscLyzKJHtvsGLMafSMJiHN6yZ8p/FWA2jTw
-	LQBxPt4j0KdZSJSUXv6IWSQPAucBVbgayhaoxwugvx8q8ePUxk/ozgXKMQeLQyUeJHuk8S3SB61
-	L+couAXJduYYe/6ZYZuq8V3qApykFwoY7skbtiip1uQx37TUgwUrUCnTMNvJ5mWXE9HL3na6odu
-	2+UdwzZ/zUI/gqkIDzOXrcrFt09q+h64wcxOrzJMuT8Mdbd3CZCpuI/9DRa7fus49Vo/rORJ27X
-	DZirInd2Gmvn+SGR3f0IT1ZStDv9FW/nMS2vctehXW71CwRxgb+rdJhQQNdl7IIg==
-X-Received: by 2002:a17:90b:48ca:b0:359:d54:846f with SMTP id 98e67ed59e1d1-369519c103emr21212757a91.7.1779257656282;
-        Tue, 19 May 2026 23:14:16 -0700 (PDT)
-Received: from Air.local ([198.176.50.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-369512424b2sm16006801a91.3.2026.05.19.23.14.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 23:14:15 -0700 (PDT)
-Date: Wed, 20 May 2026 14:14:10 +0800
-From: Weiming Shi <bestswngs@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH net v2] net: team: fix NULL pointer dereference in
- team_xmit during mode change
-Message-ID: <ag1PTfcsbowK68g5@Air.local>
-References: <20260509181825.1523951-2-bestswngs@gmail.com>
- <20260510082509.1530a1a3@kernel.org>
- <agCtGqWLK53TWCaS@Air.local>
- <20260510095937.598c27a6@kernel.org>
- <agrdjt6CjpJo3AYF@Air.local>
- <20260518142230.4403b3ce@kernel.org>
- <agwJNX-q0NmmrMpy@Air.local>
- <20260519162145.524da69e@kernel.org>
+	s=arc-20240116; t=1779258211; c=relaxed/simple;
+	bh=7Q4R3furNO4h7Yab4Zal4eqQik4zrrk78QCoGOUHkXo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WKc7oB5h+ExJygCvkiMsUwD1J29T8NMxW8LUq2sOPnvPsvvorSasCSaU0BXZsRRPyXj5gRyZfEF8VT/iUgCTmDKj8KAnVoV2O9Vqv3NpJF5CRp7En672szVaG8FGo9zlCxdQv5b93kzMLKe5+Lflk/1HSPfR1YAbg/f8Rzrm9BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HCgskJps; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id D084E1A363B;
+	Wed, 20 May 2026 06:23:26 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 92FA26070E;
+	Wed, 20 May 2026 06:23:26 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0C18E107E9C49;
+	Wed, 20 May 2026 08:23:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779258205; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=rOjeYYdRzTDpwvWM8Id5nwUl+GQuplW0764wBAzrADA=;
+	b=HCgskJpsQG8gVXl9+SoAB/vz+1ZCE4A/g7IhpEWm8/f9oQkUwG8VKMQkOML4lNgjkXfeoX
+	mCBOGBiXzTg/FAF3nkVINXZE6TNVJ4GVDHF6Q0xsZOvcdpaiSYj/UnsdFCo9M46YG3IrQS
+	QNCJGN79f8H/94dxfb+iSWNeVKeERPgcj7XFXp6nv3KmHv2r6Z2c1kkiLoSWWg2cQWGrFV
+	m6jRWKJGncBKVl3B7i7XsNDL2/sQarb+fARZi2fcdOimMjCD43bDhBARPDWcj9zhpCl0Vp
+	ZvphHVhb+vFPVAKXT+zOudfER/Cowypdjax6OB9GIZZ0sMy9A1MN5RmIaVxU7w==
+Message-ID: <ab7cfbf2-2491-4a18-b0fe-e245dc48b761@bootlin.com>
+Date: Wed, 20 May 2026 08:23:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260519162145.524da69e@kernel.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/8] net: dsa: microchip: don't reset on
+ shutdown or driver removal
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Pascal Eberhard <pascal.eberhard@se.com>,
+ =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Tristram Ha <tristram.ha@microchip.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
+References: <20260515-clean-ksz-2nd-series-v2-0-35a968a739f6@bootlin.com>
+ <20260515-clean-ksz-2nd-series-v2-1-35a968a739f6@bootlin.com>
+ <20260519191006.01f83aed@kernel.org>
+Content-Language: en-US
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+In-Reply-To: <20260519191006.01f83aed@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289771-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,se.com,bootlin.com,vger.kernel.org,nxp.com];
+	TAGGED_FROM(0.00)[bounces-289772-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Air.local:mid]
-X-Rspamd-Queue-Id: A5CE85880B1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 159AF5881A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 26-05-19 16:21, Jakub Kicinski wrote:
-> On Tue, 19 May 2026 16:51:28 +0800 Weiming Shi wrote:
-> > On 26-05-18 14:22, Jakub Kicinski wrote:
-> > > On Mon, 18 May 2026 17:51:54 +0800 Weiming Shi wrote:  
-> > > > On 26-05-10 09:59, Jakub Kicinski wrote:  
-> > > > Apologies for the late reply and for rushing v3.
-> > > > 
-> > > > I was muddling two things. On teardown synchronize_net() is the protection,
-> > > > the release/acquire is for the setup path where init() writes
-> > > > mode_priv before team_adjust_ops() publishes the handler.
-> > > > 
-> > > > If that makes sense I'll send v4 with the corrected commit message.  
-> > > 
-> > > Can you provide more details for the init() path race?
-> > > What's the sequence of events?  
-> > 
-> > With loadbalance mode:
-> >  
-> >   lb_init() stores select_tx_port_func (team_mode_loadbalance.c:595).
-> >   When a port is later enabled, team_adjust_ops() publishes
-> >   lb_transmit with a plain store (team_core.c:539).
-> > 
-> > Without the release/acquire, a concurrent team_xmit() on a weakly-ordered 
-> > arch can see lb_transmit but not the select_tx_port_func store, and lb_transmit 
-> > dereferences it at line 227.
-> > 
-> > I'll send a PoC in the next mail so you can reproduce it.
-> 
-> Not sure this is enough. But feel free to send the v3 if you prefer.
-> 
-> From looking at the repro it seems like you never add any ports?
-> I suspect that the author of this code assumed that if there are 
-> no ports there must be no traffic, so it's safe to be flipping the
-> modes. I'd rather prevent the race than make it safe. Could we defer
-> setting the real handler until after the first port is added?
+Hi Jakub,
 
-The next version will drops the release/acquire and replaces memset/memcpy 
-with per-field updates that skip transmit/receive entirely. They stay as dummies 
-throughout mode change since team_adjust_ops() already handles them based on port count.
-WRITE_ONCE/READ_ONCE for tearing, synchronize_net() before exit_op() to drain old readers.
+On 5/20/26 4:10 AM, Jakub Kicinski wrote:
+> On Fri, 15 May 2026 10:38:36 +0200 Bastien Curutchet wrote:
+>> @@ -4170,16 +4170,15 @@ int ksz_set_wol(struct dsa_switch *ds, int port,
+>>    * the wol_enabled flag accordingly to reflect whether WoL is active on any
+>>    * port.
+>>    */
+>> -static void ksz_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
+>> +static void ksz_wol_pre_shutdown(struct ksz_device *dev)
+> 
+> this needs a kdoc update, did I not report it on v1?
+> Maybe I forgot. scripts/kernel-doc is buggy, unfortunately
+> and doesn't catch it. The fix is on the way.
 
-Does that match what you had in mind, or would you prefer a different structure?
+Ok, I'll fix it in v3. I don't think that you reported it on v1.
+
+
+Best regards,
+Bastien
+
 
