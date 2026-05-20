@@ -1,411 +1,194 @@
-Return-Path: <netdev+bounces-290070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290073-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JrQBE4IDmp25gUAu9opvQ
-	(envelope-from <netdev+bounces-290070-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:15:26 +0200
+	id aPP3BsokDmr26QUAu9opvQ
+	(envelope-from <netdev+bounces-290073-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:16:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8DE4598067
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:15:25 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B03659AA8D
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:16:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4236230416C2
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:15:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F19153024801
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 19:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3E333D6F8;
-	Wed, 20 May 2026 19:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052DC33F8D9;
+	Wed, 20 May 2026 19:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ga4/ibmX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h2oIsDOd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F2F33D6D6
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1B6306B1B
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779304516; cv=none; b=VHeyjZCPV+CVyYHVuBEiZx52d2jTdWMGCLNHrdb3lJtU8iSpv8DDclAtBwpR2+0o6Qbpj163cg6jH/AYw/bUxfVLC/JSOSlhh6kydFU9x4u8Fd0GSaebJCJi1DhOHvhiSCW1YPFoTnMSTupm1h+O1IHOR2pKN8M96bAmmFvXQ/8=
+	t=1779304851; cv=none; b=SjI+5BvEWqopOgJsDBoecIYFVztgHWvf8qsB5dHxdMarusAJvon6wtDynP7PW3vKhDOijHv8tuXEm/buDSLOIeWT+rtoRVYnLoyz501fPBpB15xc8pSox0TUqNGIUjoEcI6zhBDny8p/HpbeSCFdfV8c9Ykn7E3Vnrz1ii4aXzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779304516; c=relaxed/simple;
-	bh=GoMBdLnBrcbm7Gx7KdtXk8bDQaIvoenjh+iyxSR65i8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cOn5Ex9Qq07U8BQBscN90gjuSZ+F5Ca+I+gGsOlXuRlM4wQZAshB3kUMce1TeSIAjkL0GmUowumytklo/JvXT4Fce3VVk57f2PmcQDEl6pUGvK1W/867ZcomvC2wergEj5zOCpV8P+JiOA6tqxj2nWBAEYsuUHs9rEaVhp8PRDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ga4/ibmX; arc=none smtp.client-ip=209.85.128.48
+	s=arc-20240116; t=1779304851; c=relaxed/simple;
+	bh=4/Lo7ChhuzCpClfioxkED+8KA9Q5Jky/0/oWzVmGRRE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SpVtUaFIVHCB7xLZqWUSci2rq6Xlk1+FOldaTkiIcdBLDJj1Eu1LoNyYnYzNblLUL9zjrLKQxxOhqHJynRx76Qqdu5nWdFkChLTQgcCmW2zjlABALvjeIn44E4sxti7RpPNz2yq02HzdTZiUEsvfG7LH8w6jV1MmGiw2hLjUd+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h2oIsDOd; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4891e86fabeso69939445e9.1
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 12:15:13 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7cfc382d896so18776007b3.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 12:20:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779304512; x=1779909312; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=haqlKhEJxhJQ1BOdNV2hG5Ryfl3eIwbTWa+eU+nTFeo=;
-        b=ga4/ibmX/i1rU4wzBRNL2Pwowko9sUNDlFfzlVsfOYYJKAeJvRvlEIfr/loRIdYRA7
-         qGcWy+F9+Tudxb61gHXV4yLM+p6YMKTPKjcd3CNrJhTymBtnBpLJ9P0oYmS1SBIJXhUz
-         s/cLTzFQUyhy87DMOjDisyoNPf5I0ebi1ynes+51XL1PQ9NYfjzNOj4H7L8Jknyaj4Ue
-         +NE2CEAATCHDI1mWk9PhL/p7tOqHPLgnt0Mv1noU5pfDmZpM03y3t05n2xQHwmBsVHfK
-         a/Ec6EJ+0zaOqrkdo7LXxvMRQIyiopA/Smq92s+y9gvf8qBH4FvuagzXQJN69Z4+n87u
-         nwPA==
+        d=gmail.com; s=20251104; t=1779304849; x=1779909649; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=i9UA9aEbbdQ0kKVzOUrQK9f5EhaQWo43O1Q7AsJtofw=;
+        b=h2oIsDOdoLo5f3q0/5La5e7SVctBEHZH6WpbU5HldSuwqWt/o6o+1PGCRKu6OooQhT
+         pHvRM+v93zP33fuPks3DSWMSJu8RISUqrF5JF8/eFl1MMqMODdZ//JZm/oNxItGJmWPC
+         xRwaJk1zfECe1i+2RwtVKFwEzcvt+3SE7wZy6FbkI8vcEZTrAdoVP2tMrUPLa9sz9Mlz
+         fpvm9FU57LtOK6FFaFBUfvC4ueQ53/3lOwpYTtxoy8iYdqg37crHICO5FWMGl9bXBi5i
+         RgmmBhQ++L92+Zy794JltufIuAFUoz9NaQZiVLSHz6/GfNR6pww6UvoDgYONsvwwllMq
+         ZjGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779304512; x=1779909312;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=haqlKhEJxhJQ1BOdNV2hG5Ryfl3eIwbTWa+eU+nTFeo=;
-        b=VGdsiO/1BZSyIEniPlvn+vu5ZsFyghN4BDziS19HQqajEKIpryNROZObxUizOMLabP
-         Wde/SBYU5qfMD4rq5DweaOyryS5X3lIKnmafFV/AM3tZiV/ArcDYKOEccTpEdp7kD5sk
-         Y1tM5KG/i/5V+DdB8IUb0iKyfo2W6tkzJpLEdcKwJcDZlrZ1TJiZij3jYtJhBqMZILlr
-         MOgp37bnO6/0Yhkc2F6XcQdaorVLd9cKy0RAeIxrSOhIMm3m1xfTBMdKyhIuVHbcQO28
-         d4W9nl35NxsAfBlUUud5NZ0mIiMTXuz6+BEQ/oG7V8AIhTPfaluAuaoUy3WXupxhu35T
-         kH8A==
-X-Forwarded-Encrypted: i=1; AFNElJ/yF1PDFjfxlhEUDKcHw+I+e60JYWtmVBI0E45j0c5gzn0cg4W0aRkiQ7gND6/I0iLwC1yzT6s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLarIXloENYE++S+EczKOeBDShObPc6ohAqfszqT4rHUSxK3ST
-	7fXGDay8/USU3qO9eS6WQW3nbARyK4pEoV2S2vX9MMRzve1/6AXYAsOL
-X-Gm-Gg: Acq92OHS9mP+i6Dk0nnGxFEuz9Pu3ZEgL55N/om9ZP+7EdiXACRqw6tQr8zD3Z9vQHs
-	z/cHeXK32CO/QQTSXRd2jLW3msSaQcb03szedUSK8aRnpPoNL5mfP8AGDviohdz57X+V4YSRKf+
-	nwiG730uPIxV9CNThgsFez94hPAO1maMbiLBq3nhbLI8Q/ISLXBPdakye1eiKf80Xu1tCBAUlop
-	sVx8TzJLNuduYonRaZzCOh9ZvyIhV4cpM6638aFd/RYOdfoydkyzmfWvpIWOmYNyqpbFfz2S4ou
-	UKnogwkWwBPT1McBvTKrXKSUD4O+fO910ZcHMUqpNV5FVdpo/GdhvH/EbTNlqEiJJPMWW8df6N2
-	/TtoYRWEquSXqfpssQSzLYzagTr8HLflv8ItHhc0R6rO/9FRpkbY5nWlWKL7zSYBuF2y2PKlqHT
-	StsDn1lWXl3NJiZNt+2+ynwacaXFI5HhrYS0myr7wM5Fdnxpm8O1FoP64=
-X-Received: by 2002:a05:600c:c10b:b0:48f:d612:3c59 with SMTP id 5b1f17b1804b1-48fe60eb0f6mr277706925e9.9.1779304512361;
-        Wed, 20 May 2026 12:15:12 -0700 (PDT)
-Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49033d52c8bsm13494835e9.8.2026.05.20.12.15.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 12:15:11 -0700 (PDT)
-Date: Wed, 20 May 2026 21:15:10 +0200
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: Jordan Rife <jordan@jrife.io>
-Cc: bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net,
-	john.fastabend@gmail.com, ast@kernel.org, andrii@kernel.org,
-	yonghong.song@linux.dev, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH bpf-next v6 4/6] selftests/bpf: add bpf_icmp_send kfunc
- tests
-Message-ID: <ag4IPnc_KBHid7Af@gmail.com>
-References: <20260518122842.218522-1-mahe.tardy@gmail.com>
- <20260518122842.218522-5-mahe.tardy@gmail.com>
- <q46w47cqezttz2otf76tncxu7sovhywy2dqwcbajigp64uhbtz@eimvxfeeexuz>
+        d=1e100.net; s=20251104; t=1779304849; x=1779909649;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i9UA9aEbbdQ0kKVzOUrQK9f5EhaQWo43O1Q7AsJtofw=;
+        b=biZcVUgTh1hv3UIVMYJvJ6mmMsh3LXsYPZJ3FxGA7TAAvIynyycB/EG+Qn7xDhZZnP
+         SeymRJDZ9YLE/TOLWX9GQwstRDdc/cAFOcDMUnkZWI1DDn31BW+xqMKy5IO4aBJoGtHQ
+         v5iJ/aP3Fft5GOq6Ho1uSi3x/HSIrjqLyDoPAFNI2ZG0xOYKZL1R4D5pbD8MO2JIpRpF
+         Ew5OoWzMyqFMsHHdnEi+HXUm5/jVv2s24EQNu1osBxj9n36Po5ZlMUsLiBsMI+iZ11Wm
+         PK6APVWJNl8bwx0riQCOE7JuUTqkt/Lwvej3aS5m1M7nwIksW1I4IUZmtn1wcqFScFG4
+         O/0g==
+X-Forwarded-Encrypted: i=1; AFNElJ+OaqExFB4CfObazbeWmOWchwde81vdatCtNNHoLswSJU2EXBOju3YOBUcUVsgi/PdmUwDDyDg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaxyHnJWP/DPWZLcRzNat0uX7+4yd2QNLN0SNxZaps061RTT1r
+	2gv4djExpUkQMLUEeQD6cKzBslQb/Pyqdr1NbIbzIdAs6/WM1uXPXrU=
+X-Gm-Gg: Acq92OF1N2F+iyK/XcyGeTWphKHcq/iXJ1dkBj5ky9bzdmNtINEJqpp7hp1yq7XkaVC
+	JXMV/CadKUsN8TlDj9DnXmT16T17QGKGjCoBKRULoX+nQxOJ8KyGIu2Nqp1/W57JxsS6Ijnic7L
+	5NUbLuHX5AbzLX4SPEA7xj3qnaig7todpGwKmePlwb0NsYiEuU33Cs2spCDbjj3RJldAb2s2OIP
+	cQ31CeCXzHuUxH+5MlJmf45HAflsQJMxN8nOKZoekEfbpNlHeL6vzryzR9qZNfRVVxZJqjtbqmq
+	+eyxwElISdpBHUfyIRPcsZP2H7LW9QV+T1Av4awHCL8r46XQELsJdeYH9hevaSQ1Py8Ch1dEdS/
+	Jwh1eCvqU15jZTmzyDppqwK+6N+rtHcVLJJ8E1g2KV0OwFUU3T7S5JW+GpbJ8yve7cR9NzdePD6
+	zyE/yPbzQgEBLk2Kp1Hj7js55te7Q0MARxAgah7I54XfbnnQ==
+X-Received: by 2002:a05:690c:350d:b0:7d1:9c6a:d60c with SMTP id 00721157ae682-7d19c6b0ec5mr19272437b3.18.1779304849408;
+        Wed, 20 May 2026 12:20:49 -0700 (PDT)
+Received: from alir-mac.sitimecorp.com ([12.1.37.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc9d18dcddsm56346757b3.49.2026.05.20.12.20.47
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 20 May 2026 12:20:48 -0700 (PDT)
+From: Ali Rouhi <rouhi.ali@gmail.com>
+X-Google-Original-From: Ali Rouhi <arouhi@sitime.com>
+To: jiri@resnulli.us
+Cc: vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	cjubran@nvidia.com,
+	Oleg.Zadorozhnyi@devoxsoftware.com,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ali Rouhi <arouhi@sitime.com>
+Subject: [PATCH v2 net-next 0/3] dpll: add SiTime SiT9531x DPLL clock driver
+Date: Wed, 20 May 2026 12:19:40 -0700
+Message-Id: <20260520191943.73938-1-arouhi@sitime.com>
+X-Mailer: git-send-email 2.39.2 (Apple Git-143)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <q46w47cqezttz2otf76tncxu7sovhywy2dqwcbajigp64uhbtz@eimvxfeeexuz>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290070-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-290073-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linux.dev,iogearbox.net,gmail.com,kernel.org,google.com,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rouhiali@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A8DE4598067
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sitime.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,0.0.0.68:email]
+X-Rspamd-Queue-Id: 1B03659AA8D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 18, 2026 at 06:34:02PM -0700, Jordan Rife wrote:
-> On Mon, May 18, 2026 at 12:28:40PM +0000, Mahe Tardy wrote:
+This series adds a DPLL subsystem driver for the SiTime SiT95316 and
+SiT95317 programmable clock generators, along with the associated
+device tree bindings.
 
-[...]
+This driver has been through multiple rounds of off-list review with
+Jiri Pirko and Carolina Jubran.
 
-> > +
-> > +static int connect_to_fd_nonblock(int server_fd)
-> > +{
-> > +	struct sockaddr_storage addr;
-> > +	socklen_t len = sizeof(addr);
-> > +	int fd, err;
-> > +
-> > +	if (getsockname(server_fd, (struct sockaddr *)&addr, &len))
-> > +		return -1;
-> > +
-> > +	fd = socket(addr.ss_family, SOCK_STREAM | SOCK_NONBLOCK, 0);
-> 
-> Is the only customization here SOCK_NONBLOCK? Would it be possible to
-> simply extend network_helper_opts to make it possible via the existing
-> connect_to_fd_opts? 
+v1: https://lore.kernel.org/netdev/20260511211143.19792-1-arouhi@sitime.com/
 
-So first I tried this with a very complicated callback to set NONBLOCK
-and the RECVERR for IPv6 but unfortunately the code from the helper
-looks like this:
+Changes in v2:
+- Patch 2/3 (DT bindings):
+  - Remove Linux-specific runtime description paragraph (Conor)
+  - Simplify reset-gpios, interrupts descriptions to hardware behavior (Conor)
+  - Add allOf: $ref: /schemas/dpll/dpll-device.yaml#, switch to
+    unevaluatedProperties (Conor)
+  - Add pin sub-nodes in example 2 (Conor)
+  - Rename node clock-generator@68 to dpll@68 to match dpll-device.yaml (Sashiko)
+  - Add clocks/clock-names properties for xtal reference clock
+- Patch 3/3 (driver):
+  - Fix SiT95316 num_inputs: 8 -> 4 (Carolina)
+  - Initialize xtal_freq at probe via devm_clk_get_optional_enabled
+  - Move DPLL/kworker init before IRQ registration to prevent NULL deref
+  - Clear notification latches in periodic worker to prevent IRQ tight loop
+  - Use clkout_map[] in output_phase_adjust_set() for correct register addressing
 
-if (connect(fd, (const struct sockaddr *)addr, addrlen)) {
-	log_err("Failed to connect to server");
-	save_errno_close(fd);
-	return -1;
-}
+Ali Rouhi (3):
+  dt-bindings: vendor-prefixes: add SiTime Corporation
+  dt-bindings: dpll: add SiTime SiT9531x clock generator
+  dpll: add SiTime SiT9531x DPLL clock driver
 
-And thus I can't really check for EINPROGRESS so it doesn't work.
+ .../bindings/dpll/sitime,sit9531x.yaml        |  145 +
+ .../devicetree/bindings/vendor-prefixes.yaml  |    2 +
+ MAINTAINERS                                   |    6 +
+ drivers/dpll/Kconfig                          |    1 +
+ drivers/dpll/Makefile                         |    1 +
+ drivers/dpll/sit9531x/Kconfig                 |   17 +
+ drivers/dpll/sit9531x/Makefile                |    4 +
+ drivers/dpll/sit9531x/core.c                  | 2636 +++++++++++++++++
+ drivers/dpll/sit9531x/core.h                  |  282 ++
+ drivers/dpll/sit9531x/dpll.c                  | 1147 +++++++
+ drivers/dpll/sit9531x/dpll.h                  |   90 +
+ drivers/dpll/sit9531x/prop.c                  |  345 +++
+ drivers/dpll/sit9531x/prop.h                  |   39 +
+ drivers/dpll/sit9531x/regs.h                  |  359 +++
+ 14 files changed, 5074 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml
+ create mode 100644 drivers/dpll/sit9531x/Kconfig
+ create mode 100644 drivers/dpll/sit9531x/Makefile
+ create mode 100644 drivers/dpll/sit9531x/core.c
+ create mode 100644 drivers/dpll/sit9531x/core.h
+ create mode 100644 drivers/dpll/sit9531x/dpll.c
+ create mode 100644 drivers/dpll/sit9531x/dpll.h
+ create mode 100644 drivers/dpll/sit9531x/prop.c
+ create mode 100644 drivers/dpll/sit9531x/prop.h
+ create mode 100644 drivers/dpll/sit9531x/regs.h
 
-> Alternatively, is it possible to test with SOCK_DGRAM to avoid the
-> handshake timeout issue?
+-- 
+2.43.0
 
-So thanks for suggesting this, I didn't think about it since the whole
-point of this was originally for TCP connections in my use case. I tried
-it, it kinda simplifies the test code however I feel like it kinda
-defeat the whole point of the patch set.
-
-In the case of using connected UDP, you need to send a first pkt to
-trigger the BPF prog and from my quick test and glance (might be wrong)
-send will immediately fail because the cgroup_skb program will make the
-kernel return an error to the syscall from the SK_DROP synchronously.
-
-I think the point of this was that when connecting with TCP, in the case
-of a drop, the kernel will just blindly retry to connect and sending an
-ICMP control message is a way to stop the kernel immediately and give
-the user the immediate feedback they were missing blocking on this.
-
-So you can still modify the bpf prog so that it returns SK_PASS but then
-it's not a good illustration of the use of this kfunc, as Martin pointed
-out originally, also the fact that you use UDP in the first place is not
-a good showcase of the utility of this.
-
-Does it make sense?
-
-> > +	if (fd < 0)
-> > +		return -1;
-> > +
-> > +	err = connect(fd, (struct sockaddr *)&addr, len);
-> > +	if (err < 0 && errno != EINPROGRESS) {
-> > +		close(fd);
-> > +		return -1;
-> > +	}
-> > +
-> > +	return fd;
-> > +}
-> > +
-> > +static void read_icmp_errqueue(int sockfd, int expected_code)
-> > +{
-> > +	ssize_t n;
-> 
-> very small nit: Other functions follow reverse xmas tree order but this
-> one doesn't which looks kind of weird.
-
-Ahah ok I can reorganize for reverse xmas tree.
-
-> 
-> > +	struct sock_extended_err *sock_err;
-> > +	struct cmsghdr *cm;
-> > +	char ctrl_buf[512];
-> > +	struct msghdr msg = {
-> > +		.msg_control = ctrl_buf,
-> > +		.msg_controllen = sizeof(ctrl_buf),
-> > +	};
-> > +	struct pollfd pfd = {
-> > +		.fd = sockfd,
-> > +		.events = POLLERR,
-> > +	};
-> > +
-> > +	if (!ASSERT_GE(poll(&pfd, 1, TIMEOUT_MS), 1, "poll_errqueue"))
-> > +		return;
-> > +
-> > +	n = recvmsg(sockfd, &msg, MSG_ERRQUEUE);
-> > +	if (!ASSERT_GE(n, 0, "recvmsg_errqueue"))
-> > +		return;
-> > +
-> > +	cm = CMSG_FIRSTHDR(&msg);
-> > +	if (!ASSERT_NEQ(cm, NULL, "cm_firsthdr_null"))
-> > +		return;
-> > +
-> > +	for (; cm; cm = CMSG_NXTHDR(&msg, cm)) {
-> > +		if (cm->cmsg_level != IPPROTO_IP ||
-> > +		    cm->cmsg_type != IP_RECVERR)
-> > +			continue;
-> > +
-> > +		sock_err = (struct sock_extended_err *)CMSG_DATA(cm);
-> > +
-> > +		if (!ASSERT_EQ(sock_err->ee_origin, SO_EE_ORIGIN_ICMP,
-> > +			       "sock_err_origin_icmp"))
-> > +			return;
-> > +		if (!ASSERT_EQ(sock_err->ee_type, ICMP_DEST_UNREACH,
-> > +			       "sock_err_type_dest_unreach"))
-> > +			return;
-> > +		ASSERT_EQ(sock_err->ee_code, expected_code, "sock_err_code");
-> > +		return;
-> > +	}
-> > +
-> > +	ASSERT_FAIL("no IP_RECVERR/IPV6_RECVERR control message found");
-> > +}
-> > +
-> > +static void trigger_prog_read_icmp_errqueue(struct icmp_send *skel,
-> > +					    int code)
-> > +{
-> > +	int srv_fd = -1, client_fd = -1;
-> > +	struct sockaddr_in addr;
-> > +	socklen_t len = sizeof(addr);
-> > +
-> > +	srv_fd = start_server(AF_INET, SOCK_STREAM, "127.0.0.1", 0,
-> > +			      TIMEOUT_MS);
-> > +	if (!ASSERT_GE(srv_fd, 0, "start_server"))
-> > +		return;
-> 
-> ASSERT_OK_FD
-
-Sure let's modify all of them thanks for the info!
-
-> 
-> > +
-> > +	if (getsockname(srv_fd, (struct sockaddr *)&addr, &len)) {
-> > +		close(srv_fd);
-> > +		return;
-> > +	}
-> > +	skel->bss->server_port = ntohs(addr.sin_port);
-> > +	skel->bss->unreach_code = code;
-> > +
-> > +	client_fd = connect_to_fd_nonblock(srv_fd);
-> > +	if (!ASSERT_GE(client_fd, 0, "client_connect_nonblock")) {
-> 
-> ASSERT_OK_FD
-> 
-> > +		close(srv_fd);
-> > +		return;
-> > +	}
-> > +
-> > +	/* Skip reading ICMP error queue if code is invalid */
-> > +	if (code >= 0 && code <= NR_ICMP_UNREACH)
-> > +		read_icmp_errqueue(client_fd, code);
-> > +
-> 
-> Consider doing all cleanup here and just adding a goto label like
-> cleanup in test_icmp_send_unreach?
-
-Yeah I thought it was simple enough so that the flow would be natural
-like this, but let me reconsider and see.
-
-> 
-> > +	close(client_fd);
-> > +	close(srv_fd);
-> > +}
-> > +
-> > +void test_icmp_send_unreach(void)
-> > +{
-> > +	struct icmp_send *skel;
-> > +	int cgroup_fd = -1;
-> > +
-> > +	skel = icmp_send__open_and_load();
-> > +	if (!ASSERT_OK_PTR(skel, "skel_open"))
-> > +		goto cleanup;
-> > +
-> > +	cgroup_fd = test__join_cgroup("/icmp_send_unreach_cgroup");
-> > +	if (!ASSERT_GE(cgroup_fd, 0, "join_cgroup"))
-> > +		goto cleanup;
-> 
-> ASSERT_OK_FD
-> 
-> > +
-> > +	skel->links.egress =
-> > +		bpf_program__attach_cgroup(skel->progs.egress, cgroup_fd);
-> > +	if (!ASSERT_OK_PTR(skel->links.egress, "prog_attach_cgroup"))
-> > +		goto cleanup;
-> > +
-> > +	for (int code = 0; code <= NR_ICMP_UNREACH; code++) {
-> > +		/* The TCP stack reacts differently when asking for
-> > +		 * fragmentation, let's ignore it for now.
-> > +		 */
-> > +		if (code == ICMP_FRAG_NEEDED)
-> > +			continue;
-> > +
-> > +		trigger_prog_read_icmp_errqueue(skel, code);
-> > +		ASSERT_EQ(skel->data->kfunc_ret, 0, "kfunc_ret");
-> > +	}
-> > +
-> > +	/* Test an invalid code */
-> > +	trigger_prog_read_icmp_errqueue(skel, -1);
-> > +	ASSERT_EQ(skel->data->kfunc_ret, -EINVAL, "kfunc_ret");
-> > +
-> > +cleanup:
-> > +	icmp_send__destroy(skel);
-> > +	close(cgroup_fd);
-> 
-> if (cgroup_fd != -1)
-> 	close(cgroup_fd);
-> 
-> > +}
-> > diff --git a/tools/testing/selftests/bpf/progs/icmp_send.c b/tools/testing/selftests/bpf/progs/icmp_send.c
-> > new file mode 100644
-> > index 000000000000..6d0be0a9afe1
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/bpf/progs/icmp_send.c
-> > @@ -0,0 +1,38 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +#include "vmlinux.h"
-> > +#include <bpf/bpf_helpers.h>
-> > +#include <bpf/bpf_endian.h>
-> > +
-> > +/* 127.0.0.1 in host byte order */
-> > +#define SERVER_IP 0x7F000001
-> > +
-> > +#define ICMP_DEST_UNREACH 3
-> > +
-> > +__u16 server_port = 0;
-> > +int unreach_code = 0;
-> > +int kfunc_ret = -1;
-> > +
-> > +SEC("cgroup_skb/egress")
-> 
-> No test for TC?
-
-Indeed, let me add one.
-
-> 
-> > +int egress(struct __sk_buff *skb)
-> > +{
-> > +	void *data = (void *)(long)skb->data;
-> > +	void *data_end = (void *)(long)skb->data_end;
-> > +	struct iphdr *iph;
-> > +	struct tcphdr *tcph;
-> > +
-> > +	iph = data;
-> > +	if ((void *)(iph + 1) > data_end || iph->version != 4 ||
-> > +	    iph->protocol != IPPROTO_TCP || iph->daddr != bpf_htonl(SERVER_IP))
-> > +		return SK_PASS;
-> > +
-> > +	tcph = (void *)iph + iph->ihl * 4;
-> > +	if ((void *)(tcph + 1) > data_end ||
-> > +	    tcph->dest != bpf_htons(server_port))
-> > +		return SK_PASS;
-> > +
-> > +	kfunc_ret = bpf_icmp_send(skb, ICMP_DEST_UNREACH, unreach_code);
-> > +
-> > +	return SK_DROP;
-> > +}
-> > +
-> > +char LICENSE[] SEC("license") = "Dual BSD/GPL";
-> > --
-> > 2.34.1
-> >
-> 
-> Jordan
-
-Mahe
-Thanks
 
