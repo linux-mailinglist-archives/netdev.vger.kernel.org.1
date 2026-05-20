@@ -1,164 +1,237 @@
-Return-Path: <netdev+bounces-289934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289935-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCaaKL2pDWox1QUAu9opvQ
-	(envelope-from <netdev+bounces-289934-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:31:57 +0200
+	id 2ArxHA2pDWpr1AUAu9opvQ
+	(envelope-from <netdev+bounces-289935-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:29:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18A2658DB4B
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:31:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F4958DA83
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:29:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B286E30160F0
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:28:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 846F8300E178
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 12:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E9623EAB0;
-	Wed, 20 May 2026 12:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAA03DE43A;
+	Wed, 20 May 2026 12:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tc4Tbi1m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RL3me7op"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04FA3DD84A;
-	Wed, 20 May 2026 12:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483C33DE427;
+	Wed, 20 May 2026 12:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779280084; cv=none; b=IH4r0P53Be8FGpKA1Culg3+i6b63kjRNhNyqPHXJ1vZ+mA0gUYMS7gbdl27wKh6pc4dj91Xogl50FV7hC/HkBntuU57dcfMCKDbTLf8JUJKqCysU34BS7WuP9cr8rbfTRMuXx1pIQ2CCXmGaA/CGvVJUQovsv9GDmernKOmeesI=
+	t=1779280123; cv=none; b=FuCxnQE3kdBWh8pvPA8e+GqPM4mF0TyKM+0liRJq7DcnN+Pr6GNcVQdBkcRlGhfgP54cHrOqF33ElEFO0txwIgvHFBky0mYBluZDzdQlc4Pxd/x2x3QAbOr7B+RQ5iA0zDVWrZJUkQoli87LReEGn/U5p96eIKyo0hTYilXPob0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779280084; c=relaxed/simple;
-	bh=bpGUI4gMFHLVJGU9/dS1wJA2rz7iCVT9GPaW6nsr9cM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BWTLTrt/AQaZssLfS9QNzAQbK0RxReTwhw7zH8LQeNzu+z5yLw1NjCSCcL56XeLU/dndqhE55GYnA3BbSE1DrOLPm1KMFIinwzjqOSuhPQQmzts7UrSu/19fH46b5P2EGfpTjpIRrPAu6M/T7gMpklPKjZfSHWcZ0tb+cgc4sFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tc4Tbi1m; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D74851F000E9;
-	Wed, 20 May 2026 12:27:58 +0000 (UTC)
+	s=arc-20240116; t=1779280123; c=relaxed/simple;
+	bh=u0M4354NcRaRw6UV2ZqR75Z7RSZiD8Qk15kGhL8vtIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kVSEUBKwy6SfLnbyStr/226n+FQgReUpT3FnPGetdjO4dDqiHmORMTgJ8BRYZkH43MWOTJT9clAuQSHBadCwxplu4ouo5huNg/vktLlqRq5dDM3OBKExqXqBhtSHSb1Nnix199KqUE1LgXr5Q6Lj2uLcVnELmobDzK3QOV9h9B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RL3me7op; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 630B41F000E9;
+	Wed, 20 May 2026 12:28:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779280080;
-	bh=YPsDEinQC31MNkFSqLK/AYf2QgBz8ODGpxSGL7Px3IA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=Tc4Tbi1mDQTXmycd1ELO6Lje82rVlRYlTAc840+8ZjfSzh5ogFOayADO17WMiJvZh
-	 eUNK8P1ItT1GNhsEXP5Mj8bYthxGgeidBMKeFrA/TA3FC//EjtKeQ1zpL1bKFrZdJq
-	 GcRahcvzBjBH176FYWWve2Ut0Ybt2qKHE/DXfqM+FKK8Jgur4ifwQtl5WqbcMRbILS
-	 IafqUbxhOZzvBEnm9K7SrCw4t/c6QnnVDOZj+Cr92f+H6VG+7JzE2moRiLTvlroN3v
-	 DtChkRU1G5QGhIR5nY39NCOmTHKTw2ZxnFHx48fDiSEmdSCKrprcl/eMiedM6X83SJ
-	 1LlS4+JwBqwDg==
-Message-ID: <8ba30f1d-19ce-449a-966c-236fd6026c07@kernel.org>
-Date: Wed, 20 May 2026 14:27:56 +0200
+	s=k20260515; t=1779280120;
+	bh=9QGGlk3LDXhixnD+kizSU53+b+n8Av5GKm/+8vIIvWg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RL3me7op5+Ne284qNANnRtEVsnHsTWjWIztw4vNU3VsQ2GOxCYonftnAgUARHgGOo
+	 ySQpBay1EpB6b4guqnOMA4uatrGwNyYmAd5DHgpW79Qrg+58hsdoTJtOPWRkR2TSnl
+	 GNtZG2YwTWfjeEvYave3oE8OWSoH4tnvQTtc8s1tEE6t+lTIYbbhmflEiVPZmdE19b
+	 Vuv5CRlatIzI3GldO2Fdz2qq/TwBc9HXoXpYw9UJ8CUuD5EZs2pzcdNZ9so2658oXA
+	 DpGlXxziOQV8WF0nn9HWcBkVgbDTTPoWPh/7b/0KQ1iLrK76aFUe5wRga606fKzy0H
+	 V0GR+Ce39u1tw==
+Date: Wed, 20 May 2026 14:28:38 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: robh@kernel.org, conor+dt@kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v8 07/10] net: airoha: Support multiple
+ net_devices for a single FE GDM port
+Message-ID: <ag2o9qLAa2HXN5es@lore-desk>
+References: <20260519-airoha-eth-multi-serdes-v8-7-6bd70e329df6@kernel.org>
+ <20260520085933.35D171F00897@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 2/2] powerpc: remove ehea driver references
-To: David Christensen <drc@linux.ibm.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>
-Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org
-References: <20260519224353.1282038-1-drc@linux.ibm.com>
- <20260519224353.1282038-3-drc@linux.ibm.com>
-Content-Language: fr-FR
-From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-In-Reply-To: <20260519224353.1282038-3-drc@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hdgogd+ttgvpRBQT"
+Content-Disposition: inline
+In-Reply-To: <20260520085933.35D171F00897@smtp.kernel.org>
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289934-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289935-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[linux.ibm.com,davemloft.net,google.com,kernel.org,redhat.com,ellerman.id.au,gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	REDIRECTOR_URL(0.00)[aka.ms];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,aka.ms:url]
-X-Rspamd-Queue-Id: 18A2658DB4B
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url]
+X-Rspamd-Queue-Id: 15F4958DA83
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
+--hdgogd+ttgvpRBQT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Le 20/05/2026 à 00:43, David Christensen a écrit :
-> [Vous ne recevez pas souvent de courriers de drc@linux.ibm.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> Follow-on cleanup after the removal of the IBM eHEA driver in commit
-> XXXXXXXXXXXX ("net: ethernet: ibm: remove the ehea driver").
-> 
-> Remove the CONFIG_IBM_EHEA entry from ppc64_defconfig and the obsolete
-> comment in arch/powerpc/mm/mem.c that referenced the driver.
-
-What do you mean by 'obsolete' ?
-
-As far as I can see the commit is still valid, I can't see any other 
-module caller of function walk_system_ram_range().
-
-The comment was introduced by commit 26b523356f49 ("powerpc: Drop 
-page_is_ram() and walk_system_ram_range()")
-
-> 
-> Signed-off-by: David Christensen <drc@linux.ibm.com>
-> ---
->   arch/powerpc/configs/ppc64_defconfig | 1 -
->   arch/powerpc/mm/mem.c                | 4 ----
->   2 files changed, 5 deletions(-)
-> 
-> diff --git a/arch/powerpc/configs/ppc64_defconfig b/arch/powerpc/configs/ppc64_defconfig
-> index 6316ca4df25d..b022d00708f4 100644
-> --- a/arch/powerpc/configs/ppc64_defconfig
-> +++ b/arch/powerpc/configs/ppc64_defconfig
-> @@ -210,7 +210,6 @@ CONFIG_BNX2X=m
->   CONFIG_CHELSIO_T1=m
->   CONFIG_BE2NET=m
->   CONFIG_IBMVETH=m
-> -CONFIG_EHEA=m
->   CONFIG_IBMVNIC=m
->   CONFIG_E100=y
->   CONFIG_E1000=y
-> diff --git a/arch/powerpc/mm/mem.c b/arch/powerpc/mm/mem.c
-> index 648d0c5602ec..1f5ad1a59d68 100644
-> --- a/arch/powerpc/mm/mem.c
-> +++ b/arch/powerpc/mm/mem.c
-> @@ -370,10 +370,6 @@ int devmem_is_allowed(unsigned long pfn)
->   }
->   #endif /* CONFIG_STRICT_DEVMEM */
-> 
-> -/*
-> - * This is defined in kernel/resource.c but only powerpc needs to export it, for
-> - * the EHEA driver. Drop this when drivers/net/ethernet/ibm/ehea is removed.
-> - */
->   EXPORT_SYMBOL_GPL(walk_system_ram_range);
-
-As mentioned in the comment, the EXPORT_SYMBOL_GPL() has to be dropped 
-when drivers/net/ethernet/ibm/ehea is removed, which is now.
-
-> 
->   #ifdef CONFIG_EXECMEM
+> Thank you for your contribution! Sashiko AI review found 2 potential issu=
+e(s) to consider:
+> - [High] Port-wide hardware configuration is improperly modified via per-=
+net_device callbacks, breaking the newly introduced 1:N relationship.
+> - [High] Sequential initialization of multiple net_devices sharing a GDM =
+port silently overwrites singleton hardware loopback and WAN configuration =
+registers.
 > --
-> 2.47.3
-> 
+>=20
+> commit d922e17d3b113696fc139ac4b2b3ef81e2b9ad50
+> Author: Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
+> net: airoha: Support multiple net_devices for a single FE GDM port
+>=20
+> This commit introduces support for multiple net_devices connected to the
+> same Frame Engine (FE) GDM port (GDM3 or GDM4) via an external hw arbiter.
+> It updates the airoha_gdm_port structure to hold an array of devices inst=
+ead
+> of a single device.
+>=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/eth=
+ernet/airoha/airoha_eth.h
+> > index fbb50dc73af84..fc49f0049983e 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> [ ... ]
+> > @@ -540,19 +541,20 @@ struct airoha_qdma {
+> >  struct airoha_gdm_dev {
+> >  	struct airoha_gdm_port *port;
+> >  	struct airoha_qdma *qdma;
+> > -	struct net_device *dev;
+> >  	struct airoha_eth *eth;
+> > +	struct net_device *dev;
+> > =20
+> >  	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
+> >  	/* qos stats counters */
+> >  	u64 cpu_tx_packets;
+> >  	u64 fwd_tx_packets;
+> > +
+> > +	int nbq;
+> >  };
+> > =20
+> >  struct airoha_gdm_port {
+> > -	struct airoha_gdm_dev *dev;
+> > +	struct airoha_gdm_dev *devs[AIROHA_MAX_NUM_GDM_DEVS];
+> >  	int id;
+> > -	int nbq;
+>=20
+> This introduces a 1:N relationship between a GDM port and net_devices, but
+> are the net_device lifecycle and MTU callbacks updated to account for sha=
+red
+> ports?
+>=20
+> Looking at airoha_dev_stop(), the driver unconditionally drops all traffic
+> for the port:
+>=20
+> airoha_dev_stop()
+>     airoha_set_gdm_port_fwd_cfg(qdma->eth, REG_GDM_FWD_CFG(port->id), FE_=
+PSE_PORT_DROP);
+>    =20
+> Since this modifies the forwarding configuration for the entire GDM port,
+> does stopping just one net_device silently drop all traffic for the port,
+> breaking any other active net_devices sharing it?
+>=20
+> Similarly, airoha_dev_change_mtu() overwrites port-wide hardware registers
+> such as REG_GDM_LEN_CFG. Could this lower the port MTU while another devi=
+ce
+> still requires a larger MTU?
+>=20
+> I note this regression is addressed later in the series by commit
+> 646f1e7bb6021 (net: airoha: Do not stop GDM port if it is shared).
 
+as pointed out here, this is resolved from a patch in the same series.
+
+>=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 27b214ce2a4ed..8d36ab6cd7854 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> [ ... ]
+> > @@ -1830,7 +1831,7 @@ static int airoha_set_gdm2_loopback(struct airoha=
+_gdm_dev *dev)
+> >  	airoha_fe_clear(eth, REG_FE_VIP_PORT_EN, BIT(AIROHA_GDM2_IDX));
+> >  	airoha_fe_clear(eth, REG_FE_IFC_PORT_EN, BIT(AIROHA_GDM2_IDX));
+> > =20
+> > -	src_port =3D eth->soc->ops.get_sport(port, port->nbq);
+> > +	src_port =3D eth->soc->ops.get_sport(port, dev->nbq);
+> >  	if (src_port < 0)
+> >  		return src_port;
+> > =20
+>=20
+> When multiple net_devices sharing a GDM port are sequentially initialized
+> via ndo_init (airoha_dev_init()), they unconditionally call
+> airoha_set_gdm2_loopback().
+>=20
+> Inside this function, global singleton hardware registers are modified:
+>=20
+> airoha_set_gdm2_loopback()
+>     airoha_fe_rmw(eth, REG_FE_WAN_PORT,
+>                   WAN1_EN_MASK | WAN1_MASK | WAN0_MASK,
+>                   FIELD_PREP(WAN0_MASK, src_port));
+>=20
+> Does initializing the second device on the same port silently overwrite
+> the hardware loopback and WAN configuration of the previously initialized
+> device?
+>=20
+> I see this regression is resolved later in the series by commit
+> 8a565b44990bb (net: airoha: Introduce WAN device flag).
+
+as pointed out here, this is resolved from a patch in the same series.
+
+Regards,
+Lorenzo
+
+>=20
+> --=20
+> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260519-airoha-eth-=
+multi-serdes-v8-0-6bd70e329df6@kernel.org?part=3D7
+
+--hdgogd+ttgvpRBQT
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCag2o9gAKCRA6cBh0uS2t
+rKsLAQCTKSY91GpYjO0OdC90ZCeNmsb/wVXSqWIzNa6HMKz23gD/X3yJnMzsvJgg
+vTiV8EEIEjiuSBUZ3pzo0yDDhflWiwA=
+=6JIv
+-----END PGP SIGNATURE-----
+
+--hdgogd+ttgvpRBQT--
 
