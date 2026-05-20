@@ -1,160 +1,193 @@
-Return-Path: <netdev+bounces-289762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289763-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OsbMhc5DWqBugUAu9opvQ
-	(envelope-from <netdev+bounces-289762-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:31:19 +0200
+	id 2GIwFw47DWrfugUAu9opvQ
+	(envelope-from <netdev+bounces-289763-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:39:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3907D5877F0
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:31:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5119587889
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 74CAD304F38C
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:31:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 623E7300DE0E
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6641F09AD;
-	Wed, 20 May 2026 04:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C072EACEF;
+	Wed, 20 May 2026 04:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="WCGBf5Ex"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W+y/6/CT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0773B13DDAE;
-	Wed, 20 May 2026 04:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779251474; cv=none; b=K+gneYUkPO5MhTKA6tEApNpDnG2RkNAGnTfQE1+cP3YXo1DyH7OA/MtOAUBOSjtRxdo2uvyHNQzQvO0OiXxmuH6Dv/Ik06pFTqhzRBCAFb9RaJn7u/hxasoeeGwtZrmgWO+kO/ENhYC540sBxrFBpOgI6FV/6va2DaC8dL1RSeI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779251474; c=relaxed/simple;
-	bh=f6mjM7KKs/UGkOydUaEw9o2nGol1Wj2FfP16fH5HU04=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kBWgCSfbcY+jOxIrM7SptSGVP0/Ullaq3RQDeQJH8enifKHIex/fqn1FXMrAg5hp/3wbNqW1Rbf+eksJKBiTnCQjEc11krMosuL1V7KXPW/6DkFs0I67te1+Apu8A/bw5Pt5DDQGfvdiiKfnESH2V1DEJo6PoWmw0HG8IxTtqJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=WCGBf5Ex; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64K2pm3k3009289;
-	Tue, 19 May 2026 21:30:58 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=bI/+cOvklyLRSX00+NsdRtz
-	PrQCcL9vTpdE4iKWbsPc=; b=WCGBf5ExVk4XucYPqtqVj7kTl83or794HistG0T
-	lZrdkmU240E0HZ6i19CYiTBvLkNCMEYUj1SYDPsrwQIlcrw6Kh1Whq7E+5FaoTQx
-	qkYQD9I2Y3coB3MA1whwx8MrJjBksRba3lYClHJpUe3rcdllDR/JQCdjuTH1AZiL
-	k9FNgZbeVPk1D8JWcxDUkF/FHfeMxrmE7AzAoLy+eCi2qjPhx9gVP/EJpiVSyCS0
-	HY05iZpdTbjObih9TllH1goCXge0InhgTef2vrNtzqYaRZlfhkKwQD/ixJsxndEk
-	vxDD3gaA6vRs0AHpoDyny2oA/aP1JV/N1JhiuSF+U2FYbzQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e8jywbj3e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 May 2026 21:30:58 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 19 May 2026 21:30:57 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 19 May 2026 21:30:57 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id D49045B693E;
-	Tue, 19 May 2026 21:30:53 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <davem@davemloft.net>, <gakula@marvell.com>, <horms@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <sgoutham@marvell.com>,
-        Ratheesh Kannoth
-	<rkannoth@marvell.com>
-Subject: [PATCH net] octeontx2-af: npc: Fix allmulticast skip logic for LBK and SDP VFs
-Date: Wed, 20 May 2026 10:00:36 +0530
-Message-ID: <20260520043036.1523798-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D9D2D6E5A
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 04:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779251979; cv=pass; b=gWXOfWUK2wbjxXAW+4491jc3/D3oa+4KA7iBxz/iRtgKHVeTPyczasFdyDArNQBVskozjzZI2Gg+b9NxVZOczWMasKWdhdTFF6VX4n/0y386jPO7XWEnixNjLgpxUKYCC4HRrC9vut8X8YWsb9c5qiK3iMLE2ucsEgmUfxGD7Js=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779251979; c=relaxed/simple;
+	bh=P14/4Bqu5uUuw06j+SRo4HPvnUgRVexcBhmq9ZxsP+o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IJBC39LbRKac9InfcBnGdTOkNrAq/UbQvFsx3YApCISX7fW//oazJgQHux/lP3dJ9eRC/0K3bUldmAgvxasYAh5tZMrZHI5A7K0Y6IHVUV3Xvd7LEQTJKXB93bsQ4XxjAATFD2CVR6csng/Acevp9G4xCmnWsa4cfIYY60wRlWQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W+y/6/CT; arc=pass smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-912575fa768so753771685a.2
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 21:39:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779251977; cv=none;
+        d=google.com; s=arc-20240605;
+        b=igAAg3dvYnoNE4hVGYai2HsmHKNzZoAJupB0LBEWN4egNA9zoAOr6zSx3WcaRLCO8Y
+         /CWWCQ3chp81C3sW4DxPgtkVZWoAhK8sH0z2FvoDalEARR0FgLbhDLVRm8DvrCPd8zQI
+         zNz7f/aQTSjDr7rbiSfGg3gVQMSRVH9kZNjMSkCorPLT5z6vt3opMsn+XWZdI/KQ9XmC
+         Tic2RrBzLR2EDjzhqHMfcS3RD/3JbfaDdAPGsW1hfPs5DmbYQaG6Xp9y0BqwGBA0rcCD
+         yLHUKtlbXwC1wK0VVSldSiig9bS6oOYqIfoaCRMj7XByRoz9aWVEQX+2CUSd/IdP+Be5
+         qxsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YVPSHkBYcknNlvutxyF1vq8PwV3dsuW7+IYZ8sKOiMo=;
+        fh=g+3+MkrhvsSn7ltrOkr4QBjccdX0nmCKGLlEqsquM1g=;
+        b=XMIDYQNs6xM+Xgct2Ns8HBkYUZ+P0Rw4fsFkxhh3Lvvi7Wod2TI9MVBA8rfRl1SqwW
+         TbmmBzhiWdFLy1STevLkpTc+q27NMZR/bFv198hGow4q7DuyAIqHJ3ocioPeQWfz5Hkj
+         2Zb9CVnXKFFJUZkdYJhF6NFfGwZT+8mSzRmS2p9dM29tgjs3reMAhbV/Ed8Mzqxo2o8i
+         CPa5RGIScdF1vP187Ei3V2RuURxuORt8h59p0/DTsmSHw0kLxMa3TWeCwEX57GXQ6lJV
+         cCrBt1RyH2iltYUuTXmuEP9Eg1tCgL/luI79vEp/c2wct5uxAAU+qQcvKEvuya66qDRj
+         e6XQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779251977; x=1779856777; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YVPSHkBYcknNlvutxyF1vq8PwV3dsuW7+IYZ8sKOiMo=;
+        b=W+y/6/CTKc0MAFltSXmlz02Gjjl8iXwTym2khhlJTAsSb5p3LA8MyRonu6k2Ko9MSl
+         NTBHJFq+knMDlFQCPd6YT8duMhqbUJ6uDQtL5P3Yvh5/wh8vk0UxYZGpRsazPMAGHo5B
+         sVCf55PI2bZ5DXzH6smua9S7d9THWXHrmp9rJYt/7aC9bS8uitI+bNMWrIL+PMIi1ptz
+         m6ONrLaYBsadbPUpG38tgG4W7SqgGWy1cwLCdPLqRcNZgd5fwYrSeyZpeUrdZANFjbY3
+         zGIAvpU5gIjZechlh02hy3n/f/l84BPt/aTwwhKep0HZgyrtOPe8rRjihBuSAJpGEKTH
+         Tifg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779251977; x=1779856777;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YVPSHkBYcknNlvutxyF1vq8PwV3dsuW7+IYZ8sKOiMo=;
+        b=EVQyfog2Z/xaelRKOvL2Z6iaJfcLiA16foN6oJO9G1br+oq1fNOC5ZHBuKNGhzBLvq
+         cC840OnVpRBd3jo0QX1mDzMiHGj8IO05y9vIBeGMo5LpWjkZWXyIgJL1i9LK1M8G2stD
+         rLWIPlO+TXN+oK9/dh0ApTphrWFludkNV1ZCAJACVMkYHtv/4JlkQr/tmaq/MgdRMrZC
+         jhWw40m13u5N29RFLnH80XFI8eWT2n/exPrDBuWFxvEc8bwmkdwbT0i+8CMeaYcy98j3
+         c48d3ZXDuyFnp9oQTxjzDvAXEaEBdtvFy8mkuy8XixKWBwrBVMG6i9BUYwkeydQxPzy0
+         nsIg==
+X-Forwarded-Encrypted: i=1; AFNElJ82pVOK5P/G3Xr/V2gxwRBJH76yF9A0Ru4gRlb0w4jWYYCuga2WWsUGFtnay9N2SORVrNlTD5U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDKHyHf5vocVLCFuCBlgST6sT+bKCjkEVR4alDwkbx/5nmQPZT
+	HqDtv+Oj6M/fOn6fLQ7SMJOale5fMS7gwaa15n2FlU/M4D4Dfr+Qgs3vacselydF2joTW5stamx
+	pF4lhar54XaCsp7EBvbXSx2/RtX8RQE9kTqqIxekk
+X-Gm-Gg: Acq92OFtTUlUIUknVstDjXjtXRYN6SPZeJjAMuqs9Q/3Lh0bt42DSfMfBwPmlsfhw1Q
+	Nc8qF4HlYUFo91XfOD18+oc2NjKnAdYHolk4znHsETvbHJqlhaQNDCphnhjTVIt+gi54TzkyKtO
+	pGxHuxFjFzjceddwPLFgo+eY3qKro1STxz7V0NWl9/E0r+PXW/CGapNcdKlPVii5ty+pidsxeAv
+	1dIy377jPkRsoNu6+cycKdrLduv3FDOJdxGbTT62XQlDTY2ZR0DB0NJWV9KAayuAkv2TCXwBedv
+	FFVF6s4kVQPO2svcTQrZrsAM/xpYn3R9JDANbL2VTwczc6pa1uBhAQtgc1QXHUC0Ksh5rSrjdYT
+	Jw2JL5JlrjXldYchcCusIOcCq3K7d4X5qsE9TGo9cLUVi/M1lNzugB4Ne2CfXJ7wA
+X-Received: by 2002:ac8:7d94:0:b0:50e:5e8d:87d2 with SMTP id
+ d75a77b69052e-51659fbe971mr323408931cf.1.1779251976863; Tue, 19 May 2026
+ 21:39:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: Ykl5mFnTk5KqvcTKGXAcFxcStvNCwYCu
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDA0MCBTYWx0ZWRfXzSk1KgKYRmUi
- 4ye+RIYsBEhRTDdJ45XzuxBoM5LLZuCTW5+0g3oJ2KFe4IpdtDzZJiwhZwrHqFJAfeQXcjbzGP7
- 9pzI761CUP5Ejhjx2p5CJjGoeiu9Gfj+9HLlvotS72VnvVgwW9anIGLavpb8A3dqyykqRMaIaAm
- 96vN1cPSSG355gbVMyjnkjf1NY63zekI9IPTASnaeh7EeW+meiGtKk67BUdpN6wwTB9KrT4GtZK
- jC2Op6lXKUnX/IZRkP9+1fPWoCWMAIovdNu1yGPL+595ZXvRvbF+rghqufAvQwipAf5rrHAYzNj
- 1sOJ/461/oofxbY+zv5j6D+oTVoAwr3dFWgaATMlG8ZRE6Fjjd1hNDJPPYwghzB123N1GbaeMd9
- jZVbb+56hwG7hfvdRsGFv6n52UEF7RLM4QJkRp5xJPWyraW7o/YKIw13m1zF1QXx+A2qLEvPdR1
- Lf6xJtMTL9HckmLHJ7g==
-X-Proofpoint-ORIG-GUID: Ykl5mFnTk5KqvcTKGXAcFxcStvNCwYCu
-X-Authority-Analysis: v=2.4 cv=QbNWeMbv c=1 sm=1 tr=0 ts=6a0d3902 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=UmA0Cgb4WzkLnBq1GnIA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-20_01,2026-05-18_01,2025-10-01_01
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+References: <20260518183424.3144867-1-sbrivio@redhat.com> <20260519190352.45c8478e@kernel.org>
+In-Reply-To: <20260519190352.45c8478e@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 19 May 2026 21:39:25 -0700
+X-Gm-Features: AVHnY4IDfMyDXWooEL9P52eF0h3DnkFqEfpX7HmWX44NJSeGokXsyph8DZz-2k0
+Message-ID: <CANn89i+DknqarcKuZxku-XvoioqkXrd3sQd3PXW5fdFZBpPxjg@mail.gmail.com>
+Subject: Re: [PATCH net v2 0/2] Fix race condition between TCP_REPAIR dump and
+ data receive
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stefano Brivio <sbrivio@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Pavel Emelyanov <xemul@scylladb.com>, 
+	Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, 
+	Jon Maloy <jmaloy@redhat.com>, Dmitry Safonov <dima@arista.com>, Andrei Vagin <avagin@google.com>, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289762-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289763-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 3907D5877F0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: B5119587889
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When installing the allmulticast NPC rule, rvu_npc_install_allmulti_entry()
-should skip LBK and SDP VFs (only CGX PF/VF may add the entry).  The
-code combined is_lbk_vf() and is_sdp_vf() with logical AND, which is
-never true for a single pcifunc, so the intended early return never ran.
+On Tue, May 19, 2026 at 7:03=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 18 May 2026 20:34:22 +0200 Stefano Brivio wrote:
+> > Stefano Brivio (2):
+> >   tcp: Don't accept data when socket is in repair mode
+>
+> Not sure Eric is on board with this patch in the first place.
+> Sound like it's not the intended use case for REPAIR so IMO
+> it's up to TCP maintainers whether we want to support this.
+> And it's definitely not a Fix.
 
-Use logical OR instead.
+I am not on board. Only net-next material for sure.
 
-Cc: Geetha sowjanya <gakula@marvell.com>
-Fixes: ae703539f49d2 ("octeontx2-af: Cleanup loopback device checks")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+While v2 is slightly better, we have the fundamental problem of adding
+stuff to TCP receive path for features that almost nobody use.
+(It took more than 13 years to finally complain about the race)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index 3c814d157ab9..607d0cf1a778 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -990,7 +990,7 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
- 	u16 vf_func;
- 
- 	/* Only CGX PF/VF can add allmulticast entry */
--	if (is_lbk_vf(rvu, pcifunc) && is_sdp_vf(rvu, pcifunc))
-+	if (is_lbk_vf(rvu, pcifunc) || is_sdp_vf(rvu, pcifunc))
- 		return;
- 
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
--- 
-2.43.0
+This consumes Gigawats of power on our planet (and tons of CO2), given
+the trillions of packets processed every second.
 
+Please at least add a static key as we did in:
+
+commit 020e71a3cf7f50c0f2c54cf2444067b76fe6d785
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Mon Oct 25 09:48:24 2021 -0700
+
+    ipv4: guard IP_MINTTL with a static key
+
+    RFC 5082 IP_MINTTL option is rarely used on hosts.
+
+
+But in my original feedback I pointed that we TCP_REPAIR should
+probably only insert a TCP socket into TPC established hash table
+only when it is ready to process incoming packets.
+
+
+
+>
+> >   selftests: Add data path tests for TCP_REPAIR mode
+>
+> Please don't add a new target, fold it under net.
+> Targets are a PITA to deal with in kselftests.
 
