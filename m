@@ -1,53 +1,74 @@
-Return-Path: <netdev+bounces-289674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0p6INEYFDWotsQUAu9opvQ
-	(envelope-from <netdev+bounces-289674-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:50:14 +0200
+	id FfKaD0cGDWpQsQUAu9opvQ
+	(envelope-from <netdev+bounces-289675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:54:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CFF258661E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:50:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB0C586646
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:54:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3C8413040027
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:50:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 049B730160C7
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F34E2475D0;
-	Wed, 20 May 2026 00:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38FD26AA91;
+	Wed, 20 May 2026 00:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fiEG+loa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OASkzpeR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB4F3438A4
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 00:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E3D25F7A9;
+	Wed, 20 May 2026 00:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779238212; cv=none; b=SXduNIvaNOgp6Q5S/vETOLOA2jp28VlOm/GWSGor5aB6qGReceF8KvcHKCx/V18HY0X3wnQvLQUQmU/DFF1SW1e9WfCQPgS3k/wz7+Ari4WGDLxLxoHGziXGajojmucZfoFPAubG572ULr6+3DA5niRXheyoNJBv+un+r4MUndY=
+	t=1779238466; cv=none; b=Den9VOBiy3tQbxkbLNmCSWmn2qnnFGSx6DO9wOa7UMbC71LIyMX2p9KMAqnEKwBxaTERTjXCAf2+j4ZYJxIGcasRjhY4AHTuHf2mFozygKXc/enMUgesPhhCkoH+rS14dxb+4DQn4tty0wSwFilJMZr4rtf2B4jfHudx8R0MV58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779238212; c=relaxed/simple;
-	bh=yZsanh6A6idxePmlY72aYExbwN7xMIrme4fuL445AsY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Tt+FiYGFzixoQLigJKOQMTOl9a+Ae61LVi6Nf1CZiwH9tjzTWcgUwwjLIC+luhg87PUk8Kh6WmJOyIVkL14gFroChhxkx+dkHuNubwJr8Ll/s3ofqrSqHLRP9hd/EUCauX7cpe9J11SIszZWJVKGOYRA07GpIRBxJ0Apo1EJlA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fiEG+loa; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 071461F000E9;
-	Wed, 20 May 2026 00:50:11 +0000 (UTC)
+	s=arc-20240116; t=1779238466; c=relaxed/simple;
+	bh=oJ/yexyTc4fld4Ml46TlMVb7vovfTZPFy5qhbWiansg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=K8A/KIRN102GKwEUfGh6V9vfbTJOC19EvukPgspyRydH10H5DN4tTvLCiSv8LuHazelzduAJmeKfUZ0TVxMn8og30wuim+NsIkSy1p0EG3UAgg/bm7OJ9QH2AM+6Z6yn/PDE4c5xpUGqTbpkBEMY322iTneKvC6rO/Nmwv9L8+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OASkzpeR; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E2D41F000E9;
+	Wed, 20 May 2026 00:54:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779238211;
-	bh=xETyB/jUNFN5VKGPq3BT+u4C5ttGHz5ikIxoZ46cPnM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=fiEG+loapb9SYuQvetGfJk4d3XPmND4/8meby4HfWxW6MOw3bkJVGTxJh6In+8cr7
-	 szmnRSQqwM76ccH+ty0XDhccn44qauo2wKrmXKhj8n5hEzWsNCOH0YIxEnMwod0VOk
-	 0IuMjNJCWhc/xRwmZz4rkY/vmARzyx+Q1fmwPyhfuB1Ss2z8czyXj0gUancn4GVjDB
-	 dhzbeId+hHmDe3cBR7YVH7kKRbdGcdUZaM0zNgwIcm9AdQL4iDxdbaIS1M9m4/yXLb
-	 6uM3slLV09RA4xlSaTonNI3Cl9jWOZ9ol8Wvy6LlgWQlgn+OXcQJgX/+8bWYrS2wrZ
-	 hZ2uoz0IGN91A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19967383BF53;
-	Wed, 20 May 2026 00:50:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1779238465;
+	bh=oJ/yexyTc4fld4Ml46TlMVb7vovfTZPFy5qhbWiansg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=OASkzpeRG8Al+okeTA7WKpIvzC/dVjB/uNd9UWTaw3NW1vhHq/Q1MhZwkMif0ZfV9
+	 Tf/vjAJYdvPipT0zms40ut02IRbVzAXpwtkGFY9urwkR8Ho/s1UqOPz0tT1nOjkTtp
+	 JSlBHzmhVWwOmP8Y0jbO389OcjvXKT+MY+vGPhdGm1hUCUEGSMXjIyN62sztrMykqP
+	 4joE+l+SqyI7moT+NkUiAUOVAMemJTZgcJ05aYDv7KGVjFiQgqGvGsvHLXlTZwwL+U
+	 ED844J1g4iZEUkj3/QoXZGvW68IBFVK7vV6SDGuEU++IwqjywGIciyKhBUAaKSAaMe
+	 3do5t9xF4AooA==
+From: Sasha Levin <sashal@kernel.org>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	pablo@netfilter.org
+Cc: Sasha Levin <sashal@kernel.org>,
+	patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	y0un9sa@gmail.com,
+	fw@strlen.de,
+	Li hongliang <1468888505@139.com>
+Subject: Re: [PATCH 6.12.y] netfilter: nf_tables: unconditionally bump set->nelems before insertion
+Date: Tue, 19 May 2026 20:54:15 -0400
+Message-ID: <20260519220508.reply-0001@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260519075504.2064229-1-1468888505@139.com>
+References: <20260519075504.2064229-1-1468888505@139.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,76 +76,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next 0/2] Add support for neigh_forward_grat
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177923822163.2936298.14037169284404480049.git-patchwork-notify@kernel.org>
-Date: Wed, 20 May 2026 00:50:21 +0000
-References: <20260517082501.899009-1-danieller@nvidia.com>
-In-Reply-To: <20260517082501.899009-1-danieller@nvidia.com>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, stephen@networkplumber.org,
- razor@blackwall.org, petrm@nvidia.com, idosch@nvidia.com
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289674-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-289675-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,lists.linux.dev,vger.kernel.org,netfilter.org,davemloft.net,google.com,redhat.com,gmail.com,strlen.de,139.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3CFF258661E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,139.com:email]
+X-Rspamd-Queue-Id: 9DB0C586646
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+On Tue, May 19, 2026 at 03:55:04PM +0800, Li hongliang wrote:
+> From: Pablo Neira Ayuso <pablo@netfilter.org>
+>
+> [ Upstream commit def602e498a4f951da95c95b1b8ce8ae68aa733a ]
+>
+> In case that the set is full, a new element gets published then removed
+> without waiting for the RCU grace period, while RCU reader can be
+> walking over it already.
+[...]
+> [ Minor conflict resolved. ]
+> Signed-off-by: Li hongliang <1468888505@139.com>
 
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+Queued for 6.12, thanks.
 
-On Sun, 17 May 2026 11:24:59 +0300 you wrote:
-> The existing neighbor suppression unconditionally suppresses gratuitous
-> ARP and unsolicited Neighbor Advertisements, which breaks legitimate use
-> cases like Multi-Homing and EVPN where these announcements need to
-> propagate across the VXLAN fabric.
-> 
-> This series adds a new neigh_forward_grat option that provides
-> independent control of gratuitous ARP and unsolicited NA forwarding.
-> When neigh_suppress is enabled and neigh_forward_grat is also enabled,
-> regular neighbor discovery is suppressed while gratuitous announcements
-> are forwarded.
-> 
-> [...]
-
-Here is the summary with links:
-  - [iproute2-next,1/2] iplink: bridge_slave: Add support for neigh_forward_grat
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=2c6d5e670539
-  - [iproute2-next,2/2] bridge: vlan: Add support for neigh_forward_grat
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=5d8d82f60c52
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--
+Thanks,
+Sasha
 
