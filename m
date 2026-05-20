@@ -1,1020 +1,230 @@
-Return-Path: <netdev+bounces-290094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290095-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8IQFKxUUDmot6AUAu9opvQ
-	(envelope-from <netdev+bounces-290094-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:05:41 +0200
+	id wPrJKl4UDmoW6AUAu9opvQ
+	(envelope-from <netdev+bounces-290095-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:06:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AD4C5991D9
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:05:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26A0A599253
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 22:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8D7C7300F5D0
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:04:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0E3503046DDC
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319D536405C;
-	Wed, 20 May 2026 20:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CB934CFD0;
+	Wed, 20 May 2026 20:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjJ0gNnJ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CmYhz8hU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011013.outbound.protection.outlook.com [52.101.62.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91A836212D
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 20:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779307428; cv=none; b=YcUrntZIRuar/ht9uLon/gVGHj+7gOPd4KArhqoej7w1Xmqchg5iy8ko8zdjGIO4PQW/7jak5pAly2JAxNRNsp2VhW0kk0P9x/TO0V7W3TWbVEEeEQioqTj8v1gK2UIhEP6tZXdOWVnKfoBVJ/FeKMj5Twd5Il1BSpalbhJyvSI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779307428; c=relaxed/simple;
-	bh=6cvUJBRsRmETKHLO52FmOFc//tiyQIlkClqq+i0qF9Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oz066V0GGRsRh1tl+Y7GY3K3Mq/FRwppPbnyVvD7NK3d8gkB0ai4AIY7WgvEIIqfgzEItpPePmnX1cvM96QOJnFAWC6DvvuV85vPy+Ul2EVj0WJnWU/Ijb3OyFgBKHn96Wg4z06aVopDg3JXmxxZPSdCyQ5tAOEFh1w5HBVDEWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kjJ0gNnJ; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-50d6b9bca48so79258551cf.2
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 13:03:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779307425; x=1779912225; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1N4UB0YVLf3dldz+nPe+MFHXrscyQbdsHGnb1vXEfI4=;
-        b=kjJ0gNnJT9h/Oubu9xgbGM8aa77fmvEU7lDhFGoenjhH7+DiFhFovu3K6xdPjcwhzh
-         zVhqh7K00lzC2Z+jef4GJ4EqaZrOKUuA0pZdUH0yv7mB2XxM6VZz2w9E8j5STNRbWYWV
-         2bGJqHqsVsFiI13sWRBvNb+SUWpNJr3/IukTmxSuUonmz/sQC7WrZurVM5yWFwZtCuiL
-         /+CFhnNH36bmceHZ9/zSGZW9cBdwQPNla9BZto/k74v8/6h6L5atWTis/lOQJJQNAoLk
-         EMGdqWpNb4vSJcx+ouMmyen5FJBBMeIqXP76xxL7z/nJUH2/7etd4fCiX0LwQ6f1395m
-         xIsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779307425; x=1779912225;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1N4UB0YVLf3dldz+nPe+MFHXrscyQbdsHGnb1vXEfI4=;
-        b=M8OfFOd2Q4zpgKDrJ0PUL4pKV+EWlzyH9XXdZTyv+bfV2mm/mLPB0+zh6RU6CPCVQM
-         2YgUL0yrUixiiANstzu8FhxQR859WDDENmOdzbWNvdrhDz6ii8Qf2Ks9Sz72srWE1IU6
-         2AqnspO7WMZQcZU7H0rCcRsE3wwzzyX/7Q/FptLDZiNOVE2LprZINLyOkIjH4ZNiA99R
-         WoMGn0DzLElTmKa69i4vxVJ8LjmgaTuH3uBTCTNyqQQrUktHhWl0IKCPr7dar5TbXMTN
-         dPnJjqitVpv8rmXujw/H3fqoRASX4N9XDbL9/iBcn1zkR2QjtfscVmy7XcF8n9EVU6JA
-         IM9w==
-X-Forwarded-Encrypted: i=1; AFNElJ+7+OpdJFlHHeOaUSN7X3BeNwMQy67k/Xgh/lcnXUE6ZkAVjuaNviFhYD1VQOCFLaxsCJumpM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBT6CKn/sl6xhwXjrhouvOLkUsjVHFGBRH84Ikf536Zm2sRoZm
-	VPcIxcL+dVkaPfvCm4aIcILLhZnZJy77rD1H2DWbhgEsi+J/tZAiyB0g
-X-Gm-Gg: Acq92OF2oEc8FF8EejpnnmRy5Gki5YAO3d7UTGoGd5HUpAcZH3E7ML6cDWbwS1X91yy
-	8esv/rP3239ZUvor/yRJ/VT1ma0XybCma5EPeUmCve4PIRHkIkAJLgpiGysA/QbARAagDmXZ5Yl
-	CG4EwU0xsATOO9Pkk+STzjYT4ebPutWHFTZWBqTBncRuJr/FUwYdLbzw6IJFhdElRnnE5x3uqPz
-	H4kH9rxkNHMKOltcr9Tn6tmvO1PamQz85k3Z5jW/smAo8XJUbC553RlNtieyiJYRUALrPDBabS9
-	S4s66ADQ7PO9tP3d/DyvAokLqHN7Jz++lbyER4Q0+vAsYYwjVXtBCzSg4tIWPHeBQ5iN+9zkeSb
-	mkCgVK+dncDLyvWaAuAB66ojsXQK4W4rbc3hsoksKo2pGfEZX9rWQ+z+thpODod5k/d6vDvbx8M
-	fZPm0rVzHTNovlD+b+GAdnZcRvKikihZ0cFcG7crbAu/ZiTSpu88w0k+H4
-X-Received: by 2002:ac8:5f4b:0:b0:510:2506:1ba9 with SMTP id d75a77b69052e-5165a1f326bmr334535821cf.49.1779307424327;
-        Wed, 20 May 2026 13:03:44 -0700 (PDT)
-Received: from PF5YBGDS.localdomain ([163.114.130.1])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516514e0b91sm188849301cf.15.2026.05.20.13.03.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 13:03:43 -0700 (PDT)
-From: mike.marciniszyn@gmail.com
-To: Lee Jones <lee@kernel.org>,
-	Pavel Machek <pavel@kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Kees Cook <kees@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Lee Trager <lee@trager.us>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	Alok Tiwari <alok.a.tiwari@oracle.com>,
-	Chengfeng Ye <dg573847474@gmail.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Cc: mike.marciniszyn@gmail.com,
-	linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next 3/3] net: eth: fbnic: Add led support
-Date: Wed, 20 May 2026 16:03:37 -0400
-Message-ID: <20260520200337.204431-4-mike.marciniszyn@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260520200337.204431-1-mike.marciniszyn@gmail.com>
-References: <20260520200337.204431-1-mike.marciniszyn@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1746C3431E7;
+	Wed, 20 May 2026 20:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779307610; cv=fail; b=ETvMOYOLTEPp2tGmk+UkxBB/wlUX+rPTzjHS/8WWK8PsT/Dtl5T4/Hd0+wuFOE2OjTx6r+9bCh5XD+59f350uE3ncT1rpsBQ58AuaoNa6jIwFp+QgkF/uxvpsFt14KMDLJ+o++WA2I9IjQfj7VTUm/8lYS0eEmCayc5dJ39DlXw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779307610; c=relaxed/simple;
+	bh=oQ4Zo+kVD+LVcvQFB+oiWxz5tnlbkJY0mpdIkhMLdyU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ZAqjYcEVaaUIFk782E0Xe2AYD7HdMVVwc0Yck4QIa5Zoxuiw0pCZ8QolUUzXuYu4ZXaIuhpvm6ilQkVF3HIgAM/tYvHg11kELQjxnOMZ+0sheSYk1zae98NitoNCpTHnZGyurJFHgdI36HQOixbuPLKPUuNWG4Doa++XB/VUqk4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CmYhz8hU; arc=fail smtp.client-ip=52.101.62.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KxMlS0O+LTjJrKF/qvaNdvzPvQuFUvaY4FPAuAaXTr4icTNeV7GGnAYbtSpvlcqe70ejIVCXFSLRjiCGrLmzFkhbL6N4HkyAGjEu/b7HZ5tqNOl/hU7rMMJ9PPjL5mLxpWF4iJEYO2siZTLMdBf6V4KdZw2NiJ+Bc+2RH8a+SZRGOs3uXZf+736teB13AapZIF/W6D7XBJSz4YRw+VMFWI8a76JdiIoLCP75yEhd6ZktOXSI11sxE9lRg1BwYvCdP9ztTDs9t2EoUwA5J8YuPz0NfB0tHaTcpHzTwPtKbVDw9UsPg66gP+nYR3VA9zs8dlYKHv3wH0mnsiu6h11Skw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nxGJt7Pk5nQ33hrjVRUhs6kxzJEQNHshxohBv/KdHnk=;
+ b=QLYgmRxYzm7+vId4LUiJsEyK5d3JGwW2ng7WdZ+jec5Z1LBfbOFUNek1+Wj2BvA+2KUbX5SIimE4Nd79Gb7bu0P/kOOLNeHWqKDEfBb7Bok3D7pd3lpgScLYi/AFXJ+up6EQA+z0rK/3M8NjylsA9xWh06DugN/irdhIqiUJaCk0V6Tx1d6OpXzaGVDP0qfQEyOOqi4U0eTftGloGpxYZDVvdZeg2eZcYTLY2xlf/IjVKXGQ8zXIc0Ia7WMfdpT99fZU4AqFnHgH9Bpyl+xOqu1svP8k/ELmNZILcuUyfF8ibZZPEY/vyva0E8BkQihtFJrbiCRkGF9MmVdjcfbhBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nxGJt7Pk5nQ33hrjVRUhs6kxzJEQNHshxohBv/KdHnk=;
+ b=CmYhz8hUZF48H3GdOie0PyndohNco+RWxgNBLBdijMCfRl+8q6pRj5+bEeEHXaiObh+enJ8xmHBrT8z7heJPvqK/ObKqP5tUE1PZVbDfzfVtD0vMO7Bptx2e8zVOXjCues6+OT0Mszhi4Qb3kYu1LZm3JiyWGwrAranqLt7VAkd9mhZ/ofpVPTBAS1Einyjq1g7+WFZ+D06IunMdXljdMgNcF2kz18wTEDDwAmb0YZcEHUCf4zhsqtX0IKsIZcOGxaigFe5+lDR7LFeg56hkkE90auKiu3v2qYlZG1+ZmPQqLMzdIY4LsaQJco0kSTtyaOWaCm1FLZRUWUaCFvwdSg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CY8PR12MB8065.namprd12.prod.outlook.com (2603:10b6:930:73::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.14; Wed, 20 May
+ 2026 20:06:45 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0048.016; Wed, 20 May 2026
+ 20:06:45 +0000
+Date: Wed, 20 May 2026 23:06:32 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Justin Iurman <justin.iurman@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] ipv6: ioam: refresh hdr pointer before ioam6_event()
+Message-ID: <20260520200632.GB738586@shredder>
+References: <20260520124242.32320-1-justin.iurman@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260520124242.32320-1-justin.iurman@gmail.com>
+X-ClientProxiedBy: FR2P281CA0055.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:93::14) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CY8PR12MB8065:EE_
+X-MS-Office365-Filtering-Correlation-Id: e7ffa4f8-baaf-44bd-8b80-08deb6ab50e8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|18002099003|22082099003|56012099003|11063799006|5023799004|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	xjoxx8kDkMzqlCE/mUVPx7I/D5nsR8MvMH6AGzw6zZbj4IWGyMoevhUyo6jQwjQM3jIpYG1Lrxe8S8moKoCUUvpQhJ7YW9qUZRzbf0kvy/pl98ybwo/fOpfEzXl1LU548H64PISF8sSAP2LF73c7CevJLv+RPraUNFUfykqtrsO7m8DtzCv10tJcNOFW/+C4VnrTicPkx5JZhm1gIQmcHBDSoE8ICjdaLFf4727kCR8zRHnGXEV1Ap+zz6SPzKGWuz1fnTbO9psjZ0bR31AqB0eDCDq5mOOgUP5f9HwHmF/9RWNlKr/1Ra4Y2Fo7RxdqoDGNgMQ4AvK/nFoI4gYZmJHF+qZLXdIaXGKEe9DBummx95b8wsWG7qmlbFRvmMSWHU+fHQFImok3qsNnPAyLTeCbNcyR9imjpeX5iby1JW+xbWs3boFS0T4ZSSBiEsXoBoDxOokcpWdUpW5YAPu4wGItiEg5e+4wDQhMFw9hlsZmKY0ssmgEThChzbutxHXiLLEWqnNKD0ZCSr1IkX4ENPutEw6VDemwKsM09Pz0dUX2OGEVxJ2/ZpS+Sxe9kEA8EoOVft/QBYdhCPH3ijumuiVU6iEbMC1PzPb2BYXxxL3IRLA8iuLK3bXoUcNti8tVMS9EGxbs/jco8JQX06PWLFhLpf6bzpJ756zqxRLSEeWfX/+4JQIueIe0iDrGP23A
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(18002099003)(22082099003)(56012099003)(11063799006)(5023799004)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?T9H11yvwt/5guk12v8hKu/1WAp24YLJKV51M9P3FhM+YRLbajjsefK/D+TxU?=
+ =?us-ascii?Q?nyqhU4i8p1L0iuhWF5vU8TJkZepAYHZwKz3luJyvfbFIfmzoZG7gz25exwVJ?=
+ =?us-ascii?Q?+k9AamELzISNe/5Bi4VS9qT/5wGeK+Vps0a6l5vVDcgKTxDeDsCUY2KSXZQy?=
+ =?us-ascii?Q?IEPatZ2II7tew9+norVpFS2HSrgqRoeFvh4XT6501ZMTU3dzEldz0ftZVr7T?=
+ =?us-ascii?Q?V+K+COTiowCuIldIx0T0h+BIfZiSOBfNHe2w6sucvWemCil8quZMGRbMeM4c?=
+ =?us-ascii?Q?LR5QUIrzCqTErbhRG9fl9ubkhPzXwNgD4GGqC6s3HPG6WYcNDs1/g6ffdQaP?=
+ =?us-ascii?Q?O9IUADiSOOpnq4TGlz5dDZsPidRvtMQ6E1g1PGzdUaz0LaqXDC7ZkyLGmZsy?=
+ =?us-ascii?Q?oGdR6ChknjsXWi6d1oew9cyv05O8fRg+qnxfsl2mlpR+vNh6PpUTETqOHgMe?=
+ =?us-ascii?Q?wgpMkz3mr0gpK3v2HLgma0Wwc9Vjhzbu2ZqDplFSzYcoDH5Be+h+qzpENXv0?=
+ =?us-ascii?Q?27HjUvaHZ1B3sXLqqOn14umEoaBVgWMD6gP9+wacBpZd4NLXajr4/Tm9bJBX?=
+ =?us-ascii?Q?CCd2bHoGJtLtgqtWS5UpdhZBUPpvhYCHs1+2BN8itipnNgLw3QttOlHmDQ6t?=
+ =?us-ascii?Q?x9Fv7e0VyuEMk916wd0NLvv/E0g+J+do7hOYbc0qqcbM31VYd0CluXyF2iZ2?=
+ =?us-ascii?Q?v/iHprhQlJmnJSqBRYHpfvYt2sLs3FpWRwYAqWdyHpWtyt7dKBgS2mOy7bUs?=
+ =?us-ascii?Q?Vp8BoOEUtIUyNO8ZF6Zv6wuw4CwSRmGsx+t1FPr05Sjj7aUE4qCaXLuRtaRT?=
+ =?us-ascii?Q?YW+Z8voEixZumyNfa3EutuD5fCSak2MnXFAixv+6ZSGXuD5HCUMlXwNxsvyM?=
+ =?us-ascii?Q?QOacEiawwoRomQ4CfxY/ssHo8xzJTNYRAUvP6IMIQxMNnd/sSxNup8JwVDum?=
+ =?us-ascii?Q?OsaMEXX/MpS4Lf1q0CeS25nM2j5lBB6FrClvpl9hT5h7+24ijH2eeZupSX1+?=
+ =?us-ascii?Q?smHw2LgTZVG5IfEb4I0HIwca/gxOCNMLD1fCX4Vgv9b8JAY9oVtjIoGYO7la?=
+ =?us-ascii?Q?hL8ZU98M26ILw2rX5HXSisDs7kwVc2rUZvifqfrKKYxVzwr1dAe5tXE4pWuW?=
+ =?us-ascii?Q?jMX9+RtQvXjqzFS2Wdz+kaDAGckVj9knOxhx+t5FZqSsifRjbOhrLPdMNybd?=
+ =?us-ascii?Q?trM25iQm3vvdyZDsiGIBVhXBxUXc66HNKkKFZtvE10f/klDQ7mcjnB6/gwrz?=
+ =?us-ascii?Q?UtclAbVIh1aS91Nx1/O+QsDq+kC+80pZ4VPCmYrr8ds2iyqegD2w9YxKDelO?=
+ =?us-ascii?Q?bS25Przjm5jrn7tospKPG/rTdnahgWNe1wu9Gsw91qPcx9ZbpKH+bLFTerqz?=
+ =?us-ascii?Q?N8elootQLYTBi5ZJ0qbeZHLWwo18Nrg/6WXjH3ndjNuONBLoFSmLzUfMFrEs?=
+ =?us-ascii?Q?lr/j+iZzF4ToU1VLohBkmVThnAKqiS4XR8Kz9PdRijl3yyNQzRe8c6SZjt4m?=
+ =?us-ascii?Q?PAx1mgaScevzeINcHPDazEb/D2tx9cizD6BwRpXi9eks90hwrKpV9pbVKbBH?=
+ =?us-ascii?Q?EXOFJSB3anckaV6rdBHcIm8m/Z0a7ZDo3gvLOP4YJqEzTVEO70v/al/9zJla?=
+ =?us-ascii?Q?tLLvXQgNb5x6yHWTF5LdIQsYiKm3Hf/t8o63635VHX2QfLbHVD9KRycR+F+r?=
+ =?us-ascii?Q?1A537z6jDvZYH2e50n0v93G732XG2rWDH1Iu68zZQMfqZDkZbnKLhP8iOHiv?=
+ =?us-ascii?Q?y3R9N9rvBA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7ffa4f8-baaf-44bd-8b80-08deb6ab50e8
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 20:06:44.9362
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xW872oIE9cZvgPKFK+npSpnv67I30kfAbbrN0qu9rlnOrqVFijvlJsDEfEj4gJxDWPTlMpDkLRcjiBb9BHI0Fw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8065
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[kernel.org,fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,makrotopia.org,gmail.com,intel.com,trager.us,oracle.com,linux.intel.com];
-	TAGGED_FROM(0.00)[bounces-290094-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290095-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	MIME_TRACE(0.00)[0:+];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8AD4C5991D9
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,Nvidia.com:dkim]
+X-Rspamd-Queue-Id: 26A0A599253
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+On Wed, May 20, 2026 at 02:42:42PM +0200, Justin Iurman wrote:
+> Reported by Sashiko:
+> 
+> In ipv6_hop_ioam(), the hdr pointer is initialized to point into the
+> skb's linear data buffer. Later, the code calls skb_ensure_writable(),
+> which might reallocate the buffer:
+> 
+> 	if (skb_ensure_writable(skb, optoff + 2 + hdr->opt_len))
+> 		goto drop;
+> 
+> 	/* Trace pointer may have changed */
+> 	trace = (struct ioam6_trace_hdr *)(skb_network_header(skb)
+> 					   + optoff + sizeof(*hdr));
+> 
+> 	ioam6_fill_trace_data(skb, ns, trace, true);
+> 
+> 	ioam6_event(IOAM6_EVENT_TRACE, dev_net(skb->dev),
+> 		    GFP_ATOMIC, (void *)trace, hdr->opt_len - 2);
+> 
+> If the skb is cloned or lacks sufficient linear headroom,
+> skb_ensure_writable() will invoke pskb_expand_head(), which reallocates
+> the skb's data buffer and frees the old one, invalidating pointers to
+> it. While the code recalculates the trace pointer immediately after the
+> call to skb_ensure_writable(), it fails to recalculate the hdr pointer.
+> 
+> This patch fixes the above by recalculating the hdr pointer before
+> passing hdr->opt_len to ioam6_event(), so that we avoid any UaF.
+> 
+> Fixes: f655c78d6225 ("net: exthdrs: ioam6: send trace event")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Justin Iurman <justin.iurman@gmail.com>
 
-This patch adds the LED support for fbnic and adds the
-user /sys/class/leds interfaces based on CONFIG_FBNIC_LEDS.
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
----
- drivers/net/ethernet/meta/Kconfig             |   8 +
- drivers/net/ethernet/meta/fbnic/Makefile      |   2 +
- drivers/net/ethernet/meta/fbnic/fbnic.h       |  13 +
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  15 ++
- .../net/ethernet/meta/fbnic/fbnic_devlink.c   |   4 +
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  59 +++++
- drivers/net/ethernet/meta/fbnic/fbnic_led.c   | 228 +++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c   | 239 ++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  62 +++++
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   8 +
- .../net/ethernet/meta/fbnic/fbnic_phylink.c   |   2 +
- 11 files changed, 640 insertions(+)
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_led.c
+> ---
+>  net/ipv6/exthdrs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+> index 47c5502a34a2..2f991c974395 100644
+> --- a/net/ipv6/exthdrs.c
+> +++ b/net/ipv6/exthdrs.c
+> @@ -967,8 +967,8 @@ static bool ipv6_hop_ioam(struct sk_buff *skb, int optoff)
+>  			goto drop;
+>  
+>  		/* Trace pointer may have changed */
 
-diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
-index ca5c7ac2a5bc..a8ca2aaf798a 100644
---- a/drivers/net/ethernet/meta/Kconfig
-+++ b/drivers/net/ethernet/meta/Kconfig
-@@ -35,4 +35,12 @@ config FBNIC
- 	  To compile this driver as a module, choose M here. The module
- 	  will be called fbnic.  MSI-X interrupt support is required.
- 
-+config FBNIC_LEDS
-+	def_bool LEDS_TRIGGER_NETDEV
-+	depends on FBNIC && LEDS_CLASS
-+	depends on LEDS_CLASS=y || FBNIC=m
-+	help
-+	  Optional support for controlling the NIC LEDs with the netdev
-+	  LED trigger.
-+
- endif # NET_VENDOR_META
-diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
-index 72c41af65364..7f3b70a1f444 100644
---- a/drivers/net/ethernet/meta/fbnic/Makefile
-+++ b/drivers/net/ethernet/meta/fbnic/Makefile
-@@ -26,3 +26,5 @@ fbnic-y := fbnic_csr.o \
- 	   fbnic_tlv.o \
- 	   fbnic_txrx.o \
- # End of objects
-+
-+fbnic-$(CONFIG_FBNIC_LEDS) += fbnic_led.o
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-index d0715695c43e..cf98beca53d3 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-@@ -97,6 +97,11 @@ struct fbnic_dev {
- 
- 	struct fbnic_fw_log fw_log;
- 
-+	/* Used to synchronize updates to LED state and CSR */
-+	struct mutex led_mutex;
-+	bool led_link_up;
-+	struct fbnic_led_cdev leds[FBNIC_NUM_LEDS];
-+
- 	/* MDIO bus for PHYs */
- 	struct mii_bus *mdio_bus;
- 
-@@ -243,6 +248,14 @@ void fbnic_dbg_exit(void);
- 
- void fbnic_rpc_reset_valid_entries(struct fbnic_dev *fbd);
- 
-+#if IS_ENABLED(CONFIG_FBNIC_LEDS)
-+int fbnic_led_init(struct fbnic_dev *fbd);
-+void fbnic_led_exit(struct fbnic_dev *fbd);
-+#else
-+static inline int fbnic_led_init(struct fbnic_dev *fbd) { return 0; }
-+static inline void fbnic_led_exit(struct fbnic_dev *fbd) {}
-+#endif
-+
- int fbnic_mdiobus_create(struct fbnic_dev *fbd);
- 
- void fbnic_csr_get_regs(struct fbnic_dev *fbd, u32 *data, u32 *regs_version);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index 64b958df7774..6f4ae091652b 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -857,6 +857,21 @@ enum {
- #define FBNIC_SIG_PCS_INTR_LINK_DOWN		CSR_BIT(1)
- #define FBNIC_SIG_PCS_INTR_LINK_UP		CSR_BIT(0)
- #define FBNIC_SIG_PCS_INTR_MASK		0x11816		/* 0x46058 */
-+#define FBNIC_SIG_LED			0x11820		/* 0x46080 */
-+#define FBNIC_SIG_LED_OVERRIDE_EN		CSR_GENMASK(2, 0)
-+#define FBNIC_SIG_LED_OVERRIDE_VAL		CSR_GENMASK(6, 4)
-+
-+enum {
-+	FBNIC_SIG_LED_OVERRIDE_ACTIVITY	= 0x1,
-+	FBNIC_SIG_LED_OVERRIDE_AMBER	= 0x2,
-+	FBNIC_SIG_LED_OVERRIDE_BLUE	= 0x4,
-+};
-+
-+#define FBNIC_SIG_LED_BLINK_RATE_MASK		CSR_GENMASK(11, 8)
-+enum {
-+	FBNIC_SIG_LED_BLINK_RATE_5HZ	= 0xf,
-+};
-+
- #define FBNIC_CSR_END_SIG		0x1184e /* CSR section delimiter */
- 
- #define FBNIC_CSR_START_MAC_STAT	0x11a00
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-index 546e1c12d287..8aabec5143cd 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-@@ -622,6 +622,8 @@ void fbnic_devlink_free(struct fbnic_dev *fbd)
- {
- 	struct devlink *devlink = priv_to_devlink(fbd);
- 
-+	mutex_destroy(&fbd->led_mutex);
-+
- 	devlink_free(devlink);
- }
- 
-@@ -651,6 +653,8 @@ struct fbnic_dev *fbnic_devlink_alloc(struct pci_dev *pdev)
- 
- 	fbd->mac_addr_boundary = FBNIC_RPC_TCAM_MACDA_DEFAULT_BOUNDARY;
- 
-+	mutex_init(&fbd->led_mutex);
-+
- 	return fbd;
- }
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index f14de2366854..3904081e24f9 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -2005,6 +2005,64 @@ fbnic_get_rmon_stats(struct net_device *netdev,
- 	*ranges = fbnic_rmon_ranges;
- }
- 
-+/**
-+ * fbnic_set_phys_id - Used to strobe the MAC LEDs in a recognizable pattern
-+ * @netdev: Interface/port to strobe the LEDs for
-+ * @phys_id_state: State requested by the call
-+ *
-+ * This function can really be broken down into two parts. There are the
-+ * ACTIVE/INACTIVE states which really are meant to be defining the start
-+ * and stop of the LED strobing. There is also the ON/OFF states which are
-+ * used to provide us with a way of telling us that we should be turning
-+ * the LED on and/or off.
-+ *
-+ * We translate these calls and pass them off to the MAC layer. They will
-+ * be used to initialize a strobe, then on and off will be used to cycle
-+ * between the patterns, and finally we will restore the original LED state.
-+ *
-+ * We will return 2 when we are requested to go active. This will tell the
-+ * call that it will need to call back to turn on/off the LED twice every
-+ * second.
-+ *
-+ * Return: blink in half second intervals on success, negative value on failure
-+ */
-+static int fbnic_set_phys_id(struct net_device *netdev,
-+			     enum ethtool_phys_id_state phys_id_state)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+	struct fbnic_dev *fbd = fbn->fbd;
-+	const struct fbnic_mac *mac;
-+	int cycle_interval = 0;
-+	int state;
-+
-+	mac = fbd->mac;
-+
-+	if (!mac || !mac->set_led_state)
-+		return -EOPNOTSUPP;
-+
-+	switch (phys_id_state) {
-+	case ETHTOOL_ID_ACTIVE:
-+		state = FBNIC_LED_STROBE_INIT;
-+		cycle_interval = 2;
-+		break;
-+	case ETHTOOL_ID_INACTIVE:
-+		state = FBNIC_LED_RESTORE;
-+		break;
-+	case ETHTOOL_ID_ON:
-+		state = FBNIC_LED_ON;
-+		break;
-+	case ETHTOOL_ID_OFF:
-+		state = FBNIC_LED_OFF;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	mac->set_led_state(fbd, state);
-+
-+	return cycle_interval;
-+}
-+
- static void fbnic_get_link_ext_stats(struct net_device *netdev,
- 				     struct ethtool_link_ext_stats *stats)
- {
-@@ -2062,6 +2120,7 @@ static const struct ethtool_ops fbnic_ethtool_ops = {
- 	.get_eth_mac_stats		= fbnic_get_eth_mac_stats,
- 	.get_eth_ctrl_stats		= fbnic_get_eth_ctrl_stats,
- 	.get_rmon_stats			= fbnic_get_rmon_stats,
-+	.set_phys_id			= fbnic_set_phys_id,
- };
- 
- void fbnic_set_ethtool_ops(struct net_device *dev)
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_led.c b/drivers/net/ethernet/meta/fbnic/fbnic_led.c
-new file mode 100644
-index 000000000000..44d0dc1be448
---- /dev/null
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_led.c
-@@ -0,0 +1,228 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-+#include <linux/netdevice.h>
-+#include <linux/pci.h>
-+#include <uapi/linux/uleds.h>
-+
-+#include "fbnic.h"
-+#include "fbnic_csr.h"
-+#include "fbnic_mac.h"
-+#include "fbnic_netdev.h"
-+
-+#define led_classdev_to_fbnic_led(cdev)  \
-+	container_of(cdev, struct fbnic_led_cdev, led)
-+
-+static const char *fbnic_led_names[FBNIC_NUM_LEDS] = {
-+	"activity",
-+	"link-amber",
-+	"link-blue"
-+};
-+
-+static void fbnic_led_get_name(struct fbnic_dev *fbd,
-+			       int led_idx, char *name)
-+{
-+	snprintf(name, LED_MAX_NAME_SIZE, "%s-%s",
-+		 fbd->netdev->name, fbnic_led_names[led_idx]);
-+}
-+
-+static int fbnic_led_get_idx(struct fbnic_dev *fbd,
-+			     struct fbnic_led_cdev *ldev)
-+{
-+	return ldev - &fbd->leds[0];
-+}
-+
-+static struct fbnic_dev *led_cdev_to_fbd(struct led_classdev *led_cdev)
-+{
-+	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-+
-+	return ldev->fbd;
-+}
-+
-+static u32 fbnic_led_get_supported_modes(struct fbnic_dev *fbd, int led_idx)
-+{
-+	u32 modes = 0;
-+
-+	if (led_idx == FBNIC_LED_ACTIVITY) {
-+		modes = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-+
-+		return modes;
-+	}
-+
-+	/* Set modes for link LEDs - note 40G not supported */
-+	modes = BIT(TRIGGER_NETDEV_LINK) |
-+		BIT(TRIGGER_NETDEV_LINK_25000) |
-+		BIT(TRIGGER_NETDEV_LINK_50000) |
-+		BIT(TRIGGER_NETDEV_LINK_100000);
-+
-+	return modes;
-+}
-+
-+static int fbnic_led_hw_ctl_set(struct led_classdev *led_cdev,
-+				unsigned long flags)
-+{
-+	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-+	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-+	int led_idx = fbnic_led_get_idx(fbd, ldev);
-+	u32 supported_modes;
-+
-+	supported_modes = fbnic_led_get_supported_modes(fbd, led_idx);
-+
-+	if (flags & ~supported_modes)
-+		return -EINVAL;
-+
-+	/* Turn on activity LED only when both the TX and RX flags are set. */
-+	if (led_idx == FBNIC_LED_ACTIVITY && (flags & supported_modes) &&
-+	    flags != supported_modes) {
-+		dev_warn(fbd->dev,
-+			 "Invalid activity LED mode(s): 0x%lx\n", flags);
-+		return -EINVAL;
-+	}
-+
-+	/* Preserve the configured modes for restoration after LED strobe */
-+	mutex_lock(&fbd->led_mutex);
-+	ldev->enabled_modes = flags;
-+
-+	if (ldev->strobe_mode)
-+		dev_warn(fbd->dev,
-+			 "LED config takes effect after strobe completes.\n");
-+
-+	fbnic_led_update_csr(fbd);
-+	mutex_unlock(&fbd->led_mutex);
-+
-+	return 0;
-+}
-+
-+static int fbnic_led_hw_ctl_get(struct led_classdev *led_cdev,
-+				unsigned long *flags)
-+{
-+	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-+	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-+
-+	mutex_lock(&fbd->led_mutex);
-+
-+	*flags = ldev->enabled_modes;
-+
-+	mutex_unlock(&fbd->led_mutex);
-+
-+	return 0;
-+}
-+
-+static struct device *fbnic_led_hw_ctl_get_device(struct led_classdev *led_cdev)
-+{
-+	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-+	struct net_device *netdev = fbd->netdev;
-+
-+	return &netdev->dev;
-+}
-+
-+static int fbnic_led_hw_ctl_is_supported(struct led_classdev *led_cdev,
-+					 unsigned long flags)
-+{
-+	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-+	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-+	int led_idx = fbnic_led_get_idx(fbd, ldev);
-+	u32 modes;
-+
-+	modes = fbnic_led_get_supported_modes(fbd, led_idx);
-+
-+	if (led_idx == FBNIC_LED_ACTIVITY && (flags & modes) && flags != modes)
-+		return -EOPNOTSUPP;
-+	if (flags & ~modes)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int fbnic_led_brightness_set_blocking(struct led_classdev *led_cdev,
-+					     enum led_brightness brightness)
-+{
-+	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-+	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-+	int led_idx = fbnic_led_get_idx(fbd, ldev);
-+
-+	mutex_lock(&fbd->led_mutex);
-+	if (!brightness) {
-+		fbd->leds[led_idx].enabled_modes = 0;
-+		fbd->leds[led_idx].strobe_mode = 0;
-+	} else {
-+		u32 mode;
-+
-+		switch (led_idx) {
-+		case FBNIC_LED_ACTIVITY:
-+			fbd->leds[led_idx].enabled_modes =
-+				BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-+			break;
-+		default:
-+			mode = fbnic_led_get_link_speed_mode(fbd);
-+			fbd->leds[led_idx].enabled_modes = mode;
-+			break;
-+		}
-+	}
-+
-+	fbnic_led_update_csr(fbd);
-+
-+	mutex_unlock(&fbd->led_mutex);
-+
-+	return 0;
-+}
-+
-+static int fbnic_led_setup(struct fbnic_dev *fbd, int led_idx)
-+{
-+	struct pci_dev *pdev = to_pci_dev(fbd->dev);
-+	struct led_classdev *led_cdev;
-+
-+	fbd->leds[led_idx].fbd = fbd;
-+	led_cdev = &fbd->leds[led_idx].led;
-+	led_cdev->name = fbd->leds[led_idx].name;
-+	fbnic_led_get_name(fbd, led_idx, fbd->leds[led_idx].name);
-+	led_cdev->max_brightness = 1;
-+	led_cdev->hw_control_trigger = "netdev";
-+	led_cdev->flags |= LED_RETAIN_AT_SHUTDOWN;
-+	led_cdev->hw_control_set = fbnic_led_hw_ctl_set;
-+	led_cdev->hw_control_get = fbnic_led_hw_ctl_get;
-+	led_cdev->hw_control_get_device = fbnic_led_hw_ctl_get_device;
-+	led_cdev->hw_control_is_supported = fbnic_led_hw_ctl_is_supported;
-+	led_cdev->brightness_set_blocking = fbnic_led_brightness_set_blocking;
-+
-+	return led_classdev_register(&pdev->dev, led_cdev);
-+}
-+
-+/**
-+ * fbnic_led_init - initialize the linux led interface for fbnic
-+ *
-+ * @fbd: FBNIC device structure
-+ *
-+ * Return: zero on success, negative value on failure
-+ *
-+ * This function creates three led devices for the fbnic device. One for the
-+ * activity LED and two for the color LEDs. The successful initialization
-+ * creates <netdev>-activity, <netdev>-link-amber and <netdev>-link-blue
-+ * under /sys/class/leds/
-+ */
-+int fbnic_led_init(struct fbnic_dev *fbd)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < FBNIC_NUM_LEDS; i++) {
-+		ret = fbnic_led_setup(fbd, i);
-+
-+		if (ret)
-+			goto err_led_setup;
-+	}
-+
-+	return 0;
-+
-+err_led_setup:
-+	while (i--)
-+		led_classdev_unregister(&fbd->leds[i].led);
-+
-+	return ret;
-+}
-+
-+void fbnic_led_exit(struct fbnic_dev *fbd)
-+{
-+	int i;
-+
-+	for (i = 0; i < FBNIC_NUM_LEDS; i++)
-+		led_classdev_unregister(&fbd->leds[i].led);
-+}
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index 53b7a938b4c2..c6b1130f9159 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -623,6 +623,53 @@ static bool fbnic_pmd_update_state(struct fbnic_dev *fbd, bool signal_detect)
- 	return false;
- }
- 
-+u32 fbnic_get_link_speed(u8 link_speed)
-+{
-+	switch (link_speed) {
-+	case FBNIC_FW_LINK_MODE_25CR:
-+		return SPEED_25000;
-+	case FBNIC_FW_LINK_MODE_50CR2:
-+	case FBNIC_FW_LINK_MODE_50CR:
-+		return SPEED_50000;
-+	case FBNIC_FW_LINK_MODE_100CR2:
-+		return SPEED_100000;
-+	default:
-+		return 0;
-+	}
-+}
-+
-+static void fbnic_set_led_state(struct fbnic_dev *fbd, int state)
-+{
-+	mutex_lock(&fbd->led_mutex);
-+
-+	/* alternating amber,blue IDs device every half second */
-+	switch (state) {
-+	case FBNIC_LED_OFF: /* amber on, blue off */
-+		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode = FBNIC_STROBE_ON;
-+		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode = FBNIC_STROBE_OFF;
-+		break;
-+	case FBNIC_LED_ON: /* amber off, blue on */
-+		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode = FBNIC_STROBE_OFF;
-+		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode = FBNIC_STROBE_ON;
-+		break;
-+	case FBNIC_LED_RESTORE:
-+		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode =
-+			FBNIC_STROBE_DISABLED;
-+		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode =
-+			FBNIC_STROBE_DISABLED;
-+		break;
-+	case FBNIC_LED_STROBE_INIT: /* a no-op */
-+		/* Initialization is a no-op; LED toggling happens on ON/OFF */
-+		goto out_unlock;
-+	default:
-+		goto out_unlock;
-+	}
-+
-+	fbnic_led_update_csr(fbd);
-+out_unlock:
-+	mutex_unlock(&fbd->led_mutex);
-+}
-+
- static bool fbnic_mac_get_link(struct fbnic_dev *fbd, u8 aui, u8 fec)
- {
- 	bool link;
-@@ -967,6 +1014,7 @@ static const struct fbnic_mac fbnic_mac_asic = {
- 	.link_down = fbnic_mac_link_down_asic,
- 	.link_up = fbnic_mac_link_up_asic,
- 	.get_sensor = fbnic_mac_get_sensor_asic,
-+	.set_led_state = fbnic_set_led_state,
- };
- 
- /**
-@@ -987,6 +1035,197 @@ int fbnic_mac_init(struct fbnic_dev *fbd)
- 	return 0;
- }
- 
-+/**
-+ * __fbnic_led_get_link_speed_mode - Get link speed mode
-+ * @curr_speed: ethtool speed
-+ *
-+ * Return: netdev trigger bit on success, 0 if link speed is not supported
-+ *
-+ * Convert ethtool speed to mode bit using parameter
-+ */
-+static u32
-+__fbnic_led_get_link_speed_mode(u32 curr_speed)
-+{
-+	switch (curr_speed) {
-+	case SPEED_25000:
-+		return BIT(TRIGGER_NETDEV_LINK_25000);
-+	case SPEED_50000:
-+		return BIT(TRIGGER_NETDEV_LINK_50000);
-+	case SPEED_100000:
-+		return BIT(TRIGGER_NETDEV_LINK_100000);
-+	default:
-+		return 0;
-+	}
-+}
-+
-+/**
-+ * fbnic_led_get_link_speed_mode - Get link speed mode
-+ * @fbd: FBNIC Device pointer
-+ *
-+ * Return: Link speed mode on success, 0 if link speed is not supported
-+ *
-+ * For the current link speed, this function returns trigger mode bit
-+ */
-+u32 fbnic_led_get_link_speed_mode(struct fbnic_dev *fbd)
-+{
-+	u32 curr_speed = fbnic_get_link_speed(fbd->fw_cap.link_speed);
-+
-+	return __fbnic_led_get_link_speed_mode(curr_speed);
-+}
-+
-+/**
-+ * fbnic_led_set_modes_ocp - Set LED state based on OCP link speed
-+ * @fbd: FBNIC Device pointer
-+ *
-+ * Set LED state based on OCP link speed. This function sets up the
-+ * LED state based on the current link speed while accounting for the
-+ * OCP specs. Called from fbnic_led_link_up() on link state changes.
-+ */
-+void fbnic_led_set_modes_ocp(struct fbnic_dev *fbd)
-+{
-+	u32 speed_mode, curr_speed, max_speed;
-+
-+	lockdep_assert_held(&fbd->led_mutex);
-+
-+	/* Turn on the activity LED independent of the link speed */
-+	fbd->leds[FBNIC_LED_ACTIVITY].enabled_modes = BIT(TRIGGER_NETDEV_TX) |
-+						      BIT(TRIGGER_NETDEV_RX);
-+	fbd->leds[FBNIC_LED_LINK_BLUE].enabled_modes = 0;
-+	fbd->leds[FBNIC_LED_LINK_AMBER].enabled_modes = 0;
-+
-+	curr_speed = fbnic_get_link_speed(fbd->fw_cap.link_speed);
-+	if (!curr_speed) {
-+		dev_warn(fbd->dev,
-+			 "Unsupported link speed detected.\n");
-+		goto bail;
-+	}
-+
-+	/* can't be zero */
-+	speed_mode = __fbnic_led_get_link_speed_mode(curr_speed);
-+
-+	/* need max_speed for amber/blue leds values */
-+	max_speed = fbnic_get_link_speed(fbd->fw_cap.max_link_speed);
-+	if (!max_speed) {
-+		dev_warn(fbd->dev,
-+			 "Unsupported max link speed detected.\n");
-+		goto bail;
-+	}
-+
-+	/* Set the LED modes according to OCP specs */
-+	if (curr_speed < max_speed)
-+		fbd->leds[FBNIC_LED_LINK_AMBER].enabled_modes = speed_mode;
-+	else
-+		fbd->leds[FBNIC_LED_LINK_BLUE].enabled_modes = speed_mode;
-+
-+bail:
-+	/* sync csr with above changes */
-+	fbnic_led_update_csr(fbd);
-+}
-+
-+static u32 fbnic_led_get_current_mode(struct fbnic_dev *fbd)
-+{
-+	u32 modes = BIT(TRIGGER_NETDEV_RX) | BIT(TRIGGER_NETDEV_TX);
-+
-+	if (fbd->led_link_up) {
-+		modes |= BIT(TRIGGER_NETDEV_LINK);
-+		modes |= fbnic_led_get_link_speed_mode(fbd);
-+	}
-+
-+	return modes;
-+}
-+
-+/**
-+ * fbnic_led_get_state - Get current LED state
-+ * @fbd: FBNIC Device pointer
-+ * @led_idx: LED index
-+ *
-+ * Get current LED state. This function returns the current LED state
-+ * based on the currently configured enabled modes. If current configured
-+ * modes are not set, it returns LED_OFF.
-+ */
-+static int fbnic_led_get_state(struct fbnic_dev *fbd, int led_idx)
-+{
-+	u8 strobe_mode = fbd->leds[led_idx].strobe_mode;
-+	int led_state = LED_OFF;
-+	u32 mask;
-+
-+	if (strobe_mode == FBNIC_STROBE_ON)
-+		return LED_ON;
-+	if (strobe_mode == FBNIC_STROBE_OFF)
-+		return LED_OFF;
-+
-+	mask = fbnic_led_get_current_mode(fbd);
-+	led_state = (mask & fbd->leds[led_idx].enabled_modes) ?
-+			LED_ON : LED_OFF;
-+
-+	return led_state;
-+}
-+
-+/**
-+ * fbnic_led_update_csr - Update LED CSR
-+ * @fbd: FBNIC Device pointer
-+ *
-+ * This function updates the LED CSR. This should be called every time
-+ * the link speed changes, or when the enabled modes are changed via
-+ * the linux LED API.
-+ */
-+void fbnic_led_update_csr(struct fbnic_dev *fbd)
-+{
-+	u32 led_csr = FBNIC_SIG_LED_ACTIVITY_OFF;
-+	int led_state;
-+
-+	lockdep_assert_held(&fbd->led_mutex);
-+
-+	led_state = fbnic_led_get_state(fbd, FBNIC_LED_ACTIVITY);
-+	if (led_state == LED_ON)
-+		led_csr = FBNIC_SIG_LED_ACTIVITY_DEFAULT;
-+
-+	led_state = fbnic_led_get_state(fbd, FBNIC_LED_LINK_AMBER);
-+	if (led_state == LED_ON)
-+		led_csr |= FBNIC_SIG_LED_AMBER_ON;
-+
-+	led_state = fbnic_led_get_state(fbd, FBNIC_LED_LINK_BLUE);
-+	if (led_state == LED_ON)
-+		led_csr |= FBNIC_SIG_LED_BLUE_ON;
-+
-+	dev_dbg(fbd->dev, "writing led_csr %x\n", led_csr);
-+	wr32(fbd, FBNIC_SIG_LED, led_csr);
-+}
-+
-+/**
-+ * fbnic_led_link_up - Update LED state on link up
-+ * @fbd: FBNIC Device pointer
-+ *
-+ * Called from phylink mac_link_up callback. Sets the internal link state
-+ * and configures LED modes according to OCP specs based on current link speed.
-+ */
-+void fbnic_led_link_up(struct fbnic_dev *fbd)
-+{
-+	mutex_lock(&fbd->led_mutex);
-+
-+	fbd->led_link_up = true;
-+	fbnic_led_set_modes_ocp(fbd);
-+
-+	mutex_unlock(&fbd->led_mutex);
-+}
-+
-+/**
-+ * fbnic_led_link_down - Update LED state on link down
-+ * @fbd: FBNIC Device pointer
-+ *
-+ * Called from phylink mac_link_down callback. Clears the internal link state
-+ * and updates the LED CSR to reflect link-down condition.
-+ */
-+void fbnic_led_link_down(struct fbnic_dev *fbd)
-+{
-+	mutex_lock(&fbd->led_mutex);
-+
-+	fbd->led_link_up = false;
-+	fbnic_led_update_csr(fbd);
-+
-+	mutex_unlock(&fbd->led_mutex);
-+}
-+
- int fbnic_mac_ps_protect_to_config(struct fbnic_dev *fbd, u16 timeout_ms)
- {
- 	u16 old_timeout_ms = fbd->ps_timeout;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-index 10f30e0e8f69..089afdde7b55 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-@@ -5,6 +5,8 @@
- #define _FBNIC_MAC_H_
- 
- #include <linux/types.h>
-+#include <linux/leds.h>
-+#include <uapi/linux/uleds.h>
- 
- struct fbnic_dev;
- 
-@@ -33,6 +35,27 @@ struct fbnic_dev;
- 	FBNIC_MAC_RXB_PS_TO_MS(FIELD_MAX(FBNIC_RXB_PAUSE_STORM_THLD_TIME))
- 
- #define FBNIC_MAX_JUMBO_FRAME_SIZE	9742
-+#define FBNIC_NUM_LEDS			3
-+
-+struct fbnic_led_cdev {
-+	char name[LED_MAX_NAME_SIZE];
-+	struct led_classdev led;
-+	struct fbnic_dev *fbd;
-+	u32 enabled_modes;
-+	u8 strobe_mode;
-+};
-+
-+enum {
-+	FBNIC_STROBE_DISABLED = 0,
-+	FBNIC_STROBE_ON = 1,
-+	FBNIC_STROBE_OFF = 2,
-+};
-+
-+enum {
-+	FBNIC_LED_ACTIVITY = 0,
-+	FBNIC_LED_LINK_AMBER,
-+	FBNIC_LED_LINK_BLUE,
-+};
- 
- /* States loosely based on section 136.8.11.7.5 of IEEE 802.3-2022 Ethernet
-  * Standard.  These are needed to track the state of the PHY as it has a delay
-@@ -58,6 +81,13 @@ enum {
- 	FBNIC_LINK_EVENT_DOWN	= 2,
- };
- 
-+enum {
-+	FBNIC_LED_STROBE_INIT,
-+	FBNIC_LED_ON,
-+	FBNIC_LED_OFF,
-+	FBNIC_LED_RESTORE,
-+};
-+
- /* Treat the FEC bits as a bitmask laid out as follows:
-  * Bit 0: RS Enabled
-  * Bit 1: BASER(Firecode) Enabled
-@@ -91,6 +121,29 @@ enum fbnic_sensor_id {
- 	FBNIC_SENSOR_VOLTAGE,		/* Voltage in millivolts */
- };
- 
-+#define FBNIC_SIG_LED_ACTIVITY_DEFAULT			\
-+	FIELD_PREP(FBNIC_SIG_LED_BLINK_RATE_MASK,	\
-+		   FBNIC_SIG_LED_BLINK_RATE_5HZ)
-+#define FBNIC_SIG_LED_ACTIVITY_ON			\
-+	FIELD_PREP(FBNIC_SIG_LED_OVERRIDE_EN,		\
-+		   FBNIC_SIG_LED_OVERRIDE_ACTIVITY)
-+/* override_en=1 with override_val=0 forces the activity LED off
-+ * while preserving the default blink rate setting
-+ */
-+#define FBNIC_SIG_LED_ACTIVITY_OFF			\
-+	(FBNIC_SIG_LED_ACTIVITY_DEFAULT |		\
-+	FBNIC_SIG_LED_ACTIVITY_ON)
-+#define FBNIC_SIG_LED_AMBER_ON				\
-+	(FIELD_PREP(FBNIC_SIG_LED_OVERRIDE_EN,		\
-+		    FBNIC_SIG_LED_OVERRIDE_AMBER) |	\
-+	FIELD_PREP(FBNIC_SIG_LED_OVERRIDE_VAL,		\
-+		    FBNIC_SIG_LED_OVERRIDE_AMBER))
-+#define FBNIC_SIG_LED_BLUE_ON				\
-+	(FIELD_PREP(FBNIC_SIG_LED_OVERRIDE_EN,		\
-+		    FBNIC_SIG_LED_OVERRIDE_BLUE) |	\
-+	FIELD_PREP(FBNIC_SIG_LED_OVERRIDE_VAL,		\
-+		    FBNIC_SIG_LED_OVERRIDE_BLUE))
-+
- /* This structure defines the interface hooks for the MAC. The MAC hooks
-  * will be configured as a const struct provided with a set of function
-  * pointers.
-@@ -112,6 +165,8 @@ enum fbnic_sensor_id {
-  *	Configure MAC for link down event
-  * void (*link_up)(struct fbnic_dev *fbd, bool tx_pause, bool rx_pause);
-  *	Configure MAC for link up event;
-+ * void (*set_led_state)(struct fbnic_dev *fbd, int state);
-+ *	Configure MAC for physical identification states
-  *
-  */
- struct fbnic_mac {
-@@ -139,10 +194,17 @@ struct fbnic_mac {
- 	void (*link_up)(struct fbnic_dev *fbd, bool tx_pause, bool rx_pause);
- 
- 	int (*get_sensor)(struct fbnic_dev *fbd, int id, long *val);
-+	void (*set_led_state)(struct fbnic_dev *fbd, int state);
- };
- 
- int fbnic_mac_init(struct fbnic_dev *fbd);
- void fbnic_mac_get_fw_settings(struct fbnic_dev *fbd, u8 *aui, u8 *fec);
-+u32 fbnic_led_get_link_speed_mode(struct fbnic_dev *fbd);
-+u32 fbnic_get_link_speed(u8 link_speed);
-+void fbnic_led_set_modes_ocp(struct fbnic_dev *fbd);
-+void fbnic_led_update_csr(struct fbnic_dev *fbd);
-+void fbnic_led_link_up(struct fbnic_dev *fbd);
-+void fbnic_led_link_down(struct fbnic_dev *fbd);
- int fbnic_mac_ps_protect_to_config(struct fbnic_dev *fbd, u16 timeout);
- void fbnic_mac_ps_protect_handler(struct fbnic_dev *fbd);
- bool fbnic_mac_check_tx_pause(struct fbnic_dev *fbd);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-index 7e85b480203c..06a40081f603 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-@@ -368,9 +368,16 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		dev_err(&pdev->dev, "Netdev registration failed: %d\n", err);
- 		goto ifm_destroy_ptp;
- 	}
-+	err = fbnic_led_init(fbd);
-+	if (err) {
-+		dev_err(&pdev->dev, "led init failed: %d\n", err);
-+		goto led_init_fail;
-+	}
- 
- 	return 0;
- 
-+led_init_fail:
-+	fbnic_netdev_unregister(netdev);
- ifm_destroy_ptp:
- 	fbnic_ptp_destroy(fbd);
- ifm_free_netdev:
-@@ -408,6 +415,7 @@ static void fbnic_remove(struct pci_dev *pdev)
- 	if (!fbnic_init_failure(fbd)) {
- 		struct net_device *netdev = fbd->netdev;
- 
-+		fbnic_led_exit(fbd);
- 		fbnic_netdev_unregister(netdev);
- 		cancel_delayed_work_sync(&fbd->service_task);
- 		fbnic_ptp_destroy(fbd);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 09c5225111be..86fccef901cc 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -154,6 +154,7 @@ fbnic_phylink_mac_link_down(struct phylink_config *config, unsigned int mode,
- 	struct fbnic_dev *fbd = fbn->fbd;
- 
- 	fbd->mac->link_down(fbd);
-+	fbnic_led_link_down(fbd);
- 
- 	fbn->link_down_events++;
- }
-@@ -172,6 +173,7 @@ fbnic_phylink_mac_link_up(struct phylink_config *config,
- 	fbnic_config_drop_mode(fbn, tx_pause);
- 
- 	fbd->mac->link_up(fbd, tx_pause, rx_pause);
-+	fbnic_led_link_up(fbd);
- }
- 
- static const struct phylink_mac_ops fbnic_phylink_mac_ops = {
--- 
-2.43.0
+If you need v2: /* Trace and hdr pointers may have changed */
 
+> -		trace = (struct ioam6_trace_hdr *)(skb_network_header(skb)
+> -						   + optoff + sizeof(*hdr));
+> +		hdr = (struct ioam6_hdr *)(skb_network_header(skb) + optoff);
+> +		trace = (struct ioam6_trace_hdr *)((u8 *)hdr + sizeof(*hdr));
+>  
+>  		ioam6_fill_trace_data(skb, ns, trace, true);
+>  
+> -- 
+> 2.34.1
+> 
 
