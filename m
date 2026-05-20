@@ -1,71 +1,64 @@
-Return-Path: <netdev+bounces-289661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289662-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AANbEMX4DGrnqgUAu9opvQ
-	(envelope-from <netdev+bounces-289661-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:56:53 +0200
+	id oMn8OV38DGqSrAUAu9opvQ
+	(envelope-from <netdev+bounces-289662-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:12:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF4DD58627A
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:56:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C2AC5863C3
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:12:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0871030791E2
-	for <lists+netdev@lfdr.de>; Tue, 19 May 2026 23:56:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 99D0D3008A47
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 00:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8FE3AC0E4;
-	Tue, 19 May 2026 23:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DB726290;
+	Wed, 20 May 2026 00:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="INtNDhNN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R1GoE4PQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8420C3A7F7E;
-	Tue, 19 May 2026 23:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BF81799F;
+	Wed, 20 May 2026 00:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779235009; cv=none; b=ryGsQODesjASxPYMtj+rYHitrMWuHNCEntdbMbJKtgD23DJiEYCPhsdJY/lEbutT3DD+Km7FWjlUhHjA+1+0M6+04WoONWxP6OPMUCyawJ2k09A/zs2yfqyHj+AjFV6AruxnlF6UWsQ3bTaNKAIgWcL7i4cQe97BaQ315IFkf0s=
+	t=1779235878; cv=none; b=TFb2gcN2NcxDfs1THlC3WP+xlZLRmceGqsIhwX6p02dv2/43ATRDgS1m22USHOLK7WtZMCttwGWMiy1rDO8HnhaX6bagcWRRaqBHQV4pIYMvMNwf7hwGqujJ54ioeAQjkLkYMg6ag7nTN6X0y87YSctdC9vP0tvTsqm9qoN7Uyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779235009; c=relaxed/simple;
-	bh=vdFQP87CxmaqQBGjYYUQzavFHxP3v9QLU+hTIDisHFo=;
+	s=arc-20240116; t=1779235878; c=relaxed/simple;
+	bh=0yllbxrTlrh80TDt+gArw2uBnfAS5bYiWbbBfmVWJqM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qfmx72rTudFVJbHfiY5mfXxxmR/PMG5700FeV1ok+zMXoUyRSrRo1UUuCmX3PqFn1YDQPd1WBdoHeRQCg6Iaom5myjmlvvuETxISnsv0WPVr0fj97Sn6uK5KdYaG8BCwe/W2IdxZg7n7ZlT1lsR5IE2lI4ijaM5SYlF1/rjnquA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=INtNDhNN; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458CC1F000E9;
-	Tue, 19 May 2026 23:56:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TwIiySSoI9DlDQW6DAmK1Uci7XH2j/mzo3IDyGwfER3ouyeKDfPEXQkAy6jKrNc8hJxXM17Z2DwFJUHjBEbk8Umqe73JVYlYe1qidO3edF+/4chVi8De/o4l25YzaYgvKVlSe6BG6QME7pxqqjg6yu2LsKCbrS7TTOrRbjLVfz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R1GoE4PQ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08C91F000E9;
+	Wed, 20 May 2026 00:11:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779235008;
-	bh=yYWbA7j46aueWZEJm8bnihGWxOjtMrOMmpHf9Fu5Y7A=;
+	s=k20260515; t=1779235877;
+	bh=6uQf65YPF0MhdxqyCDs+R/XpQCKP8zOjKHxPY/KRBJQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=INtNDhNNwgCAkz3ew87JMcdeZl6c+E1ryD+QFvS0NJQGxosUfkWGVZgyOiriYretc
-	 Y0AyKreTS1Ey0kji8T8wdYsuU1aUND9pI4BtwVhxE5Nh7XIscCq+4ICKXho4j0dn6K
-	 BZRkQoQRub0KZUMvFEB+Th0vMXgmiX5RNvtHPaFb/zOd5MgQPRHL907oVn5Zt3n7bL
-	 3X/A72M3Ub7C/EqQ86i6FtCOZWj2MYTwGJoJlXmr+LbG1dG3cqIabGsEchb1dno/Im
-	 bc0JnXGz1TW8HIipXfAy0B8T7OPqSfeb9cmLFLoRm6u0kFDttm3AD79iki7P2H8GKU
-	 RtO/BLJ2FDRXA==
-Date: Tue, 19 May 2026 16:56:46 -0700
+	b=R1GoE4PQdboMv+8Hx5gi9tUQ2rh95YkK//jTZ9b8ltIOssjJCdUmOZ/PPBR7MnHPe
+	 1Evd7kWXbzLgxu9do2arnnawhg1O7U41fiAR/W2gpEIiD9APj3bx6l4t74RZyby/Zv
+	 dGW/9XUHrWWwG/OyhCPiQRRgTIv5yWP6FZZp1oZ117a1Gm2/T1Z3uMSzf4saakWUIC
+	 neVvFdtaRLORaSOAlFXUSXS0CMI0uXgy20l6ybXdR8/ODoN4E9WSaIBqB7X0c2Bbw1
+	 rrN8FEMnbueQeD2+G5Zg8z30N7BKBfrVo/JLArBRdD0ODQ1jbKJDCwg34WHQ8lMY/c
+	 5cSX6SRDaEHEw==
+Date: Tue, 19 May 2026 17:11:15 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Luka Gejak <luka.gejak@linux.dev>
-Cc: MD Danish Anwar <danishanwar@ti.com>, Felix Maurer <fmaurer@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
- <skhan@linuxfoundation.org>, Roger Quadros <rogerq@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Meghana Malladi <m-malladi@ti.com>, Jacob Keller
- <jacob.e.keller@intel.com>, David Carlier <devnexen@gmail.com>, Vadim
- Fedorenko <vadim.fedorenko@linux.dev>, Kevin Hao <haokexin@gmail.com>,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v2 2/2] net: ti: icssg: Add HSR and LRE PA
- statistics
-Message-ID: <20260519165646.09b0783f@kernel.org>
-In-Reply-To: <E30AAC96-01D2-4A23-B562-126087DEB7FA@linux.dev>
-References: <20260514075605.850674-1-danishanwar@ti.com>
-	<20260514075605.850674-3-danishanwar@ti.com>
-	<20260518184506.694c584e@kernel.org>
-	<E30AAC96-01D2-4A23-B562-126087DEB7FA@linux.dev>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Shuah
+ Khan <shuah@kernel.org>, Adrian Moreno <amorenoz@redhat.com>, Jiri Benc
+ <jbenc@redhat.com>, Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Matteo Perin
+ <matteo.perin@canonical.com>
+Subject: Re: [PATCH net 4/5] tools: ynl: support listening on all nsids
+Message-ID: <20260519171115.60aceb71@kernel.org>
+In-Reply-To: <20260515201937.2813983-5-i.maximets@ovn.org>
+References: <20260515201937.2813983-1-i.maximets@ovn.org>
+	<20260515201937.2813983-5-i.maximets@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,16 +72,16 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-289661-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289662-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[ti.com,redhat.com,davemloft.net,google.com,kernel.org,lwn.net,linuxfoundation.org,lunn.ch,intel.com,gmail.com,linux.dev,vger.kernel.org,lists.infradead.org,nxp.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,6wind.com,canonical.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -101,87 +94,59 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: AF4DD58627A
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 8C2AC5863C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 19 May 2026 07:55:55 +0200 Luka Gejak wrote:
-> On May 19, 2026 3:45:06 AM GMT+02:00, Jakub Kicinski <kuba@kernel.org> wrote:
-> >On Thu, 14 May 2026 13:26:05 +0530 MD Danish Anwar wrote:  
-> >> Add new firmware PA statistics counters for HSR and LRE to the ethtool
-> >> statistics exposed by the ICSSG driver.
-> >> 
-> >> New statistics added:
-> >>  - FW_HSR_FWD_CHECK_FAIL_DROP: Packets dropped on the HSR forwarding path
-> >>  - FW_HSR_HE_CHECK_FAIL_DROP: Packets dropped on the HSR host egress path
-> >>  - FW_HSR_SKIP_HOST_DUP_DISCARD_FRAMES: Frames with duplicate discard
-> >>    skipped
-> >>  - FW_LRE_CNT_UNIQUE/DUPLICATE/MULTIPLE_RX: LRE duplicate detection
-> >>    counters
-> >>  - FW_LRE_CNT_RX/TX: LRE per-port frame counters
-> >>  - FW_LRE_CNT_OWN_RX: Own HSR tagged frames received
-> >>  - FW_LRE_CNT_ERRWRONGLAN: Frames with wrong LAN identifier (PRP)
-> >> 
-> >> Document the new HSR/LRE statistics in icssg_prueth.rst.  
-> >
-> >To an untrained eye these stats look like stuff that could 
-> >be standardized across drivers. 
-> >
-> >Luka, Felix, others on CC, do you think we should expose these
-> >from HSR over netlink as "standard" offload stats different drivers 
-> >can plug into or not worth it?  
-> 
-> I think there is a case for standardizing part of this, but I would 
-> not standardize the whole set as-is.
-> 
-> The LRE counters look generic enough to me, especially:
->  - unique rx
->  - duplicate rx
->  - multiple rx
->  - rx / tx
->  - own rx
->  - wrong LAN, PRP only
-> 
-> Those are protocol/LRE concepts rather than TI firmware details, so
-> exposing them from the HSR/PRP layer sounds useful. I would expect 
-> both the software implementation and offloaded implementations to be 
-> able to provide at least some of them, with unsupported counters 
-> omitted or reported as not available.
-> I would not put the firmware check/drop counters in the same standard
-> bucket, though:
->  - FW_HSR_FWD_CHECK_FAIL_DROP
->  - FW_HSR_HE_CHECK_FAIL_DROP
->  - FW_HSR_SKIP_HOST_DUP_DISCARD_FRAMES
+On Fri, 15 May 2026 22:19:23 +0200 Ilya Maximets wrote:
+> +    def ntf_listen_all_nsid(self):
 
-Thanks for the breakdown!
+doc-string needed
 
-> Those sound more like implementation/debug counters for the ICSSG
-> firmware pipeline. They are still useful in ethtool driver stats, but 
-> I would be hesitant to bake their exact semantics into HSR UAPI.
-> So my preference would be:
->  1. Keep driver-private ethtool stats for the full firmware counter set.
->  2. Add a small HSR/PRP standard stats set separately, limited to
->     well-defined LRE counters.
->  3. Make the HSR layer expose them, with offload drivers plugging in via
->     an optional callback or offload stats op.
->  4. Define the counters carefully, including whether they are per-HSR
->     device or per-port A/B, and what PRP-only counters mean for HSR.
-> 
-> I do not think this patch should blindly become the UAPI definition, 
+> +        self.sock.setsockopt(Netlink.SOL_NETLINK,
+> +                             Netlink.NETLINK_LISTEN_ALL_NSID, 1)
+> +
+> +    @staticmethod
+> +    def _decode_nsid(ancdata):
+> +        for cmsg_level, cmsg_type, cmsg_data in ancdata:
+> +            if (cmsg_level == Netlink.SOL_NETLINK and
+> +                    cmsg_type == Netlink.NETLINK_LISTEN_ALL_NSID):
+> +                nsid = struct.unpack('i', cmsg_data)[0]
+> +                if nsid >= 0:
+> +                    return nsid
+> +                return None
+> +        return None
+> +
+>      def set_recv_dbg(self, enabled):
+>          self._recv_dbg = enabled
+>  
+> @@ -1235,7 +1251,7 @@ class YnlFamily(SpecFamily):
+>                              f" when parsing '{attr_spec['name']}'")
+>          return raw
+>  
+> -    def handle_ntf(self, decoded):
+> +    def handle_ntf(self, decoded, nsid=None):
+>          msg = {}
+>          if self.include_raw:
+>              msg['raw'] = decoded
+> @@ -1246,15 +1262,20 @@ class YnlFamily(SpecFamily):
+>  
+>          msg['name'] = op['name']
+>          msg['msg'] = attrs
+> +        if nsid is not None:
+> +            msg['nsid'] = nsid
+>          self.async_msg_queue.put(msg)
+>  
+>      def check_ntf(self):
+>          while True:
+>              try:
+> -                reply = self.sock.recv(self._recv_size, socket.MSG_DONTWAIT)
+> +                reply, ancdata, _, _ = self.sock.recvmsg(self._recv_size,
+> +                                                         4096,
+> +                                                         socket.MSG_DONTWAIT)
 
-Not at all, the unique / multiple stats gave me pause. We should
-only put in the standard API what can be easily and unambiguously
-defined given the protocol spec.
-
-> but I do think it points at a useful follow-up. If we want to avoid 
-> adding driver-private names first and then standardizing different 
-> names later, then it may be worth asking Danish to split the 
-> protocol-level LRE counters out and route those through a common HSR 
-> stats interface.
-
-As a general policy we ask for standard stats to be added first and
-ethtool to only contain what didn't fit in the standard ones.
-There are some technical reasons but it's mostly a mindset thing.
+please add a helper method (_recvmsg()?) that only takes flags
+and doesn't return flags or addr since neither caller cares
 
