@@ -1,192 +1,357 @@
-Return-Path: <netdev+bounces-290105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gJ6oC+AuDmoK7wUAu9opvQ
-	(envelope-from <netdev+bounces-290105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:00:00 +0200
+	id 0KwWF6g+Dmqr9AUAu9opvQ
+	(envelope-from <netdev+bounces-290106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:07:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B8E859B918
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:59:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B83D259C8E8
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 280BE3056F2B
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 20:59:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 813F9332069A
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 21:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45A5376496;
-	Wed, 20 May 2026 20:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B53F379EE0;
+	Wed, 20 May 2026 21:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Qm67LFlo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/o9VH2T"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011043.outbound.protection.outlook.com [52.101.57.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F9A3750D5
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 20:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEBA379998
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 21:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.181
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779310748; cv=fail; b=LKNxnj1T7faMoeNBgQYNahASUPJ7I86VO1NgE1qJZwq2U6ZLzyQDDv4mibVUsZ/4xe90bWghQIZ/14G7o8wwhri6emrZtZxyX5ZDUkyiYjgu9xqN7WR8wFrimBtGRnnDAcVURY/jNJymJR7nYRQG6TBwoHdRS+ghejP5ihGxvWs=
+	t=1779310987; cv=pass; b=Cxo5RjQdKm4Ax1VX9vP0IwbkSrqBMCPNNBcXjzz5FnMmTfmkX+4gZ8So/3k4GlomX/BnE6x9BNZiMZQ9dU/FmRQzbgOzmX5AmXj8fn/qntGJsl7amP8xDVHH0jukpqJsm+svXuuwwn8e5NeM1TQLyUFcZ7nuRYs4TjGN1oIX3Tg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779310748; c=relaxed/simple;
-	bh=wxBa5aYWXXzRvjnJ+2Cg+iom9hE5Doj/FruLOK0gsD4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m+01wwylKv2nE3I4G3GDonnoLhkTUxgi+8P3mVg/GQDTwlH22kuy4pS2HigFm6JtqX05nPG7wPaK6ZGsFp16LcCmlSGeuXyBNXxWyGY9wtkZXb8gZZiAS5ysqr7Eh6Z1gQNGVdfySKF5I/4yu5qqUSZE1f3aeD0LapxsKFmm/Ys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Qm67LFlo; arc=fail smtp.client-ip=52.101.57.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kWvar/YJVaWXL9T0cnzeZzzpw0mDziVQpD/TOY27375jBSjNDJNAoOiheoehRqrym2WSpH5KLYAysJS1aiumO0vD/IsaX3VNrtZnIl9pbZwBLPz47AomCt6L+yKATl71pB7v70Ix4jZKYOkSH5mU4SCRtBHKK/cIswIt+u7LuOqnLZDLZKtIvZdxfP/0j7DD1qHNA3zm8zxgY4OCdrVV/IWYwQhtJrKvcJoOQHWR8EPkNg25/t3aYvJqlyXtoit+rhJYDcXjih2sSZnDjZb6MtLysk3Z9Ecrwy/DWEVlOw6pnsoh4AEjw5PDHt6aTLEmzuxCVjz0yADXF3+JL5tbLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Oy09x96204WMoNcyEXG8l0LXZ+oXY2z2Ff23zfxOiQ4=;
- b=GaVxqdnKN6N6tcai5wuIfCGxOrqXPtzHG7l5t37R5qOYK9hT8VOpDdQWh+nsbFEVj+0vLIBgscy6NrCwuGIYmAlYS29Jxk9GKBUaa46YZPXCBSrBbPsA4mCPEXW2irbYqvh8C6Yeg/HF/fvH3vJPpAlQi4Mx7Skp2sGlXfil2n6K5dPpQKfTcrec2qpMGsspNh2RkEStez7mP8RI5i0xla0d+s01/0Jng7i8ad9x8CkXB9XJlIKr5XyEts03oiMWfiNQw7CWC0jTVHnJd4GO4O6l1i7DdJhVst814YDFkcKSQDCcBNH1t3ia2mXp0IVasnsRVR1eoIU4qIfLNhbBEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Oy09x96204WMoNcyEXG8l0LXZ+oXY2z2Ff23zfxOiQ4=;
- b=Qm67LFlokuhTWrhaz9ownXO6hF1HDx+eIrruFb7+dTjcCL2ddZfhAbuCgqvtG/nWrkM9xCAOZFz6J4ZDRJNsoyJIiZEnml0uEmruKdxW6cUe8NBJLMfIa5VGke9G87eHdOIa9rVhD3muUY0idUEQmBwDfIbGpYWYeDg1UCO0Gww=
-Received: from SJ0PR13CA0122.namprd13.prod.outlook.com (2603:10b6:a03:2c6::7)
- by IA0PR12MB8645.namprd12.prod.outlook.com (2603:10b6:208:48f::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.21; Wed, 20 May
- 2026 20:59:03 +0000
-Received: from MWH0EPF000A6735.namprd04.prod.outlook.com
- (2603:10b6:a03:2c6:cafe::7f) by SJ0PR13CA0122.outlook.office365.com
- (2603:10b6:a03:2c6::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.16 via Frontend Transport; Wed, 20
- May 2026 20:59:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- MWH0EPF000A6735.mail.protection.outlook.com (10.167.249.27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.48.11 via Frontend Transport; Wed, 20 May 2026 20:59:02 +0000
-Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 20 May
- 2026 15:59:01 -0500
-From: "Nikhil P. Rao" <nikhil.rao@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <kuba@kernel.org>, <brett.creeley@amd.com>, <eric.joyner@amd.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, "Nikhil P. Rao" <nikhil.rao@amd.com>
-Subject: [PATCH net v2] pds_core: ensure null-termination for firmware version strings
-Date: Wed, 20 May 2026 20:58:42 +0000
-Message-ID: <20260520205842.1486718-1-nikhil.rao@amd.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1779310987; c=relaxed/simple;
+	bh=stpRi+PiiMy0l41q+2r76uTwBzr3MWreHkAxryAQ1EQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wi4z1IrKFx28PfeEBNrMHw7ngXmerhFhc1QPCt9MmNBTtBJm4fAjHAo0vxlfuyDVW2VWmUE8yNNCU0VjtPiHdLAsqZpMW4KNJRKcCbpk8UGHSd17wwyMLwbXjRkZnib+nJiK/EgYnJtB25vp7aAUC3ObjvRDVcDG/OlyJiC6Th8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/o9VH2T; arc=pass smtp.client-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-47c918c62b4so3580908b6e.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 14:03:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779310984; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JQ8KzfmDd32uZ8ymLCuM5h3QOqpnh0n91pPJAOGPWYQeHX+0KqaASlZecAM4cESWQr
+         tsudLbOppDwr9M41RlS3LtRB9pw6F2+vZHJCXvsQzTqi0bpXQ95Tdk1U3VTIs/jtK1JR
+         wl5TG0ATPl2RQC5oOYyRnFkwuVDZ7ZhfSpQd9TpyFw/2vzYMol4WMXPp7FVyjvE3nSem
+         aHOSHmfBd+PnItfzc0TgKaHCv+W0aZ32QgxsAyMNGbATd+TdCUg0ZuC9+Oq3PSy7s40f
+         nMrgqT6g58UECAjvAFZOsFIH91JojAyEJBZzUFutl9tzMpEWWKDhH1adKNitynZHp/Ij
+         HGhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IQTvCYBr9Cz3MOTTexPKRQiIGmQvkY0YRAS3I+gG8tY=;
+        fh=rr39U6oV3pVQh0ICWYqrzBc2zypk4O8QuK+sIb37zhU=;
+        b=Xm2xZzx4g/1cF4a3uwgg5sb5xpmLJIWfIV32P8WeeGefH2DMbbJ53m0N53oM3KXw4I
+         9VeeyjuzTnINwjzIZAD0UDoLePmwgMAjdoY6KS/07aAyc4UxE7+cXyjQI2flHl8R1jHZ
+         pWKyJBEOWZRQlFOWbOnUYgzYMvzPrTWa14+T57NdoZWZ4JMB+7odEHeeMtB+YLl6fsZh
+         HYTfH4ju0CRaues0ICozFmNrIZqpc8/SV0ZcvsCCLDJp2u/kHZ5nq33j3oFtpk2Zc+vI
+         7ZeUGn51X9zive5fa7DWxxWP3q2YtgpSpfd0AsDFh3eVRPkV4GSQgXEiTN1+KIopfpQg
+         GJkw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779310984; x=1779915784; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IQTvCYBr9Cz3MOTTexPKRQiIGmQvkY0YRAS3I+gG8tY=;
+        b=K/o9VH2TA0MvmoLnPyUM3aHNcLeqAPIIdTw2EVF7pSxtOFMg2UmyKi1rY4pEtDSL1Z
+         oGzuosXbdery23p6PqLO8eFAwVGZyjO+ajnTvcvC3dTfHfMnb+bV7STJRBzB7muJpPLy
+         8vKD/V1IXPjBCmTIqP1C5PmfaR8G8zDKeIxECdjrARA2TSpK+nXu9HmFDpliK+ms8uPG
+         p1Vd6hKEn/RXTpYJPHED1Xegk6IN1Kemv8QL5VoJ+yLxdDEV9q4BH41ffQf5ntK1+RwJ
+         bqfQJr4d0IBGc5nC1AJIK6M5lwI7a8apl/ndiNiqjwWS4JmecEEF9TvsQomqd1ck646R
+         QD7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779310984; x=1779915784;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IQTvCYBr9Cz3MOTTexPKRQiIGmQvkY0YRAS3I+gG8tY=;
+        b=cFJnSgRsraJHSsH2KfByeioaL9mDMuFu/lRyitJQXZbzDtYJKYtJHi+qc/KThtaxro
+         pq7hb3Tnef1PIeVBFJ5eWs0D6EQ+Iki+tC+cj38z5gGICi8YF0xEeuGB9rWObVIAwdbZ
+         /UOhum91U9tEPmfqOE4YYBLPi3HogN4xqYa1Mn2mmnlstJ9gNsblyKh+BOD9gatzVGgN
+         /YIOJ1Xw4hZ/hsDi92NcdudacEqFqrxMEtpl1zfV/Bx1AUPakMi15Qug+F22TlvOznbL
+         IeQMimBMMRR2gvrt2Mc/EO/hpQeru9ntQPSdsua0141uGffO/EeENAjh7AjcA+98tNK+
+         2buw==
+X-Gm-Message-State: AOJu0YwsAZBT9Mn7hWTNX0usHzkfjLMrBw+uXX4m2+dt8zdqqDkH394T
+	EztOeRhH9TPsJtXBLfN5vRRGJJgtntyBmQTmGYkmTuhpSyKP4uU76ztunx1dZbwLA5f7Ihwg6xO
+	XTzrw4pvuD8uphPl79X6XlOzX8iIUWSA=
+X-Gm-Gg: Acq92OFQxnuaGc6TC68dVdHffhce8LwqQXy5TYZ9Cq+SK+uRCuhMyD759yeCzvi2dqe
+	jNDSDJ1bs2l1eGf6d8/GMPyA+sKCR1dqcmQ1wJ9gYIkbpTZp/J15XGyicJlKQajqf1Qu59aOeO7
+	LPgIuRfhC5tQCpcbm7V3gh6hu8l/DXyA/Wpn0BUYL9xZ6NznX0QVALK//TlMTqzAVqGdx69P2Lr
+	PZRxKxmaYCA1y5Mk5qQAGqOxyrkUL+/PFGdXFz5w4nZWK7ol4l4XI1g4GBV/GGWtc/Lv6Q/yhTz
+	6cBC7rnTab/ZYnH8wIynEbU/VvQBtXdUOPCLJg==
+X-Received: by 2002:a05:6808:2382:b0:467:1458:2a8f with SMTP id
+ 5614622812f47-482e592d399mr16600671b6e.37.1779310984145; Wed, 20 May 2026
+ 14:03:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6735:EE_|IA0PR12MB8645:EE_
-X-MS-Office365-Filtering-Correlation-Id: 087bff11-3db9-4088-ae34-08deb6b29f34
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|1800799024|376014|82310400026|11063799006|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	kjqx94ooN8EVjr981zOeLidKruuFBPyo7KY5LCQWXH0PVTk2St8FFuJdO7VlsuMGDC0zTkj/mDkXsIXdi5L2B5kxEUe8t9VV9Ec6lM0Gk01geEzwpi9kZ+85hhj5WnbYspi+WaXKJtOFGKOpK0xNfwwuWVljwsuWqiLYXTHkqFSzkbYTSNI+b2711hXRTutD9eIMk4CUCIcM5wS7jdEkTuDEWSwhva8V1nHqksa6sH0XOg/UBM3eC+7rPYsjRVuMC0agdFFn5MUVXS43dqkMu2VTAW0ndsLj9j/4Wh8zSs8toDW45ms2b8fBWwXbT79W6TZdvl+o9lmQLjk9zecM95FcJoUhBWhF1htIHYRDHJa6SXM29HiR63Lp4GTNOpcsQB4R8m4/+G+/CLedYQFMHBjtDWneND8ABtgYcrDfzab0q/VyJUfxczqQc3Fizi7NXGlFfKNW4PPRcXRbr0DwJAGyCUhzv2QirPgUbgKJqRuePlb6uglT/qVme2Km5ejODnNLy15ceN36XkSvXClQKiDO8Qa8KVr0KR5bcGLhcp+JwxVhdAj9jR1G2vrdxISQCMB1vJ/zzUSbc8VIFvKZlJrReXLYhKeVqdhmZ6RH95rdb4u+6M/ojwMXMpCIKM0x7j+8XY/Wqcfxw6UlvK6NGGcZPeuZtE/iCXR/O+Z01LCBB/ztq9xNb05EOm7f1CYqow6Nj2m1koiHePvRAJGT47YSkaAeHvG+5jEH7i7mabg=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(1800799024)(376014)(82310400026)(11063799006)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	7o0ZBEnOeVCS5TpaiKDpHd/Qj/Ipg+JMWATnRZll+j2xA/3ALy6HlPZLa4bZoqCLRy8HvGUGBvycmFY9TGG1tqFNrJq279wZOASTZM2M5yaLZ3ORjgpi7EBKVH7GdUhLmMRr3cbSvx3OMdgIHzwxrFmhm+4ElsR9dMTKXxCsvs+Kut6m/3RQHbUxfB0CfeYc9ZdtW7eXAhOLkG/ir8IYyMgwaMIeD4OBFTQ7ZXGUv0eq41IyNqnvdlHlmECTmxdWsWdHv+NNBLCuoXME8WByP1oay7DYmbl2b6Ns4h4pMG03tJqsPPgd8mwAG74GhzD1FacdUlg0HfNXhykMSCUdSt8Dp8yHFGMovEDOw/JGd+l7ZBPr5UXjKCEWsQ48kVOgJdC5VuSs3iX33zmVTdSYeBOoHAsD1cwL+x3sbCK/NfyGb4S99qTHjnWbCxtDzm5z
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 20:59:02.3316
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 087bff11-3db9-4088-ae34-08deb6b29f34
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A6735.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8645
-X-Spamd-Result: default: False [2.84 / 15.00];
+References: <20260519203530.66310-1-devnexen@gmail.com> <CAHS8izOL4yyPH4+ZUXxKB6JAj0EgbFK5UkG+SSb4rk_vG6EfhQ@mail.gmail.com>
+ <CA+XhMqxPNEBVey8xw_yisymwL2H_04hL48GOyPk08U8p0tYM2g@mail.gmail.com> <CAHS8izMTxrywNPEeYsuyeJ9ETfdwt0qYdHFh5=v8pohboT86AQ@mail.gmail.com>
+In-Reply-To: <CAHS8izMTxrywNPEeYsuyeJ9ETfdwt0qYdHFh5=v8pohboT86AQ@mail.gmail.com>
+From: David CARLIER <devnexen@gmail.com>
+Date: Wed, 20 May 2026 22:02:53 +0100
+X-Gm-Features: AVHnY4Jpi7LniJLzlTb__HITTRBbXOaJ145PrJMHGg4oFhdjOskSHMzBvOrZi18
+Message-ID: <CA+XhMqx0F5Ujfo2BrgmjzYG030rsu271nppL4DPLEetfMcr-0g@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: devmem: reject dma-buf bind with
+ non-page-aligned size or SG length
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	sdf@fomichev.me, sdf.kernel@gmail.com, kaiyuanz@google.com, 
+	bobbyeshleman@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290106-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TAGGED_FROM(0.00)[bounces-290105-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,fomichev.me,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	RCVD_COUNT_SEVEN(0.00)[7];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,amd.com:email,amd.com:mid,amd.com:dkim]
-X-Rspamd-Queue-Id: 4B8E859B918
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: B83D259C8E8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The driver passes fw_version directly to devlink_info_version_stored_put()
-without ensuring null-termination. While current firmware null-terminates
-these strings, the driver should not rely on this behavior. Add explicit
-null-termination to prevent potential issues if firmware behavior changes.
+On Wed, 20 May 2026 at 21:42, Mina Almasry <almasrymina@google.com> wrote:
+>
+> On Wed, May 20, 2026 at 12:28=E2=80=AFPM David CARLIER <devnexen@gmail.co=
+m> wrote:
+> >
+> > On Wed, 20 May 2026 at 19:55, Mina Almasry <almasrymina@google.com> wro=
+te:
+> > >
+> > > On Tue, May 19, 2026 at 1:35=E2=80=AFPM David Carlier <devnexen@gmail=
+.com> wrote:
+> > > >
+> > > > net_devmem_bind_dmabuf() trusts dmabuf->size and sg_dma_len() to be
+> > > > PAGE_SIZE multiples without checking:
+> > > >
+> > > >   - tx_vec is sized dmabuf->size / PAGE_SIZE, and
+> > > >     net_devmem_get_niov_at() only bounds-checks virt_addr < dmabuf-=
+>size
+> > > >     before indexing tx_vec[virt_addr / PAGE_SIZE]. With size =3D
+> > > >     N*PAGE_SIZE + r (1 <=3D r < PAGE_SIZE), sendmsg() at iov_base =
+=3D
+> > > >     N*PAGE_SIZE passes the bound check and reads tx_vec[N] -- one p=
+ast.
+> > > >
+> > > >   - owner->area.num_niovs =3D len / PAGE_SIZE while gen_pool_add_ow=
+ner()
+> > > >     covers the full byte len, so a non-page-multiple non-final sg
+> > > >     desyncs num_niovs from the gen_pool region for every later sg, =
+on
+> > > >     both RX and TX.
+> > > >
+> > > > dma-buf does not require page-aligned sizes, so the bind path has t=
+o
+> > > > enforce what its own indexing assumes. Reject both with -EINVAL.
+> > > >
+> > > > The size check is TX-only (only tx_vec is sized off dmabuf->size); =
+the
+> > > > SG-length check covers both directions.
+> > > >
+> > > > Fixes: bd61848900bf ("net: devmem: Implement TX path")
+> > > > Cc: stable@vger.kernel.org
+> > > > Signed-off-by: David Carlier <devnexen@gmail.com>
+> > > > ---
+> > > > Changes in v2:
+> > > >   - Reframe commit message around the kernel-side OOB instead of
+> > > >     "real exporters already page-align", which read as the OOB bein=
+g
+> > > >     unreachable and undercut Cc: stable (Stanislav Fomichev).
+> > > >   - Hoist the SG-length check out of the if (TX) branch so it cover=
+s
+> > > >     RX too; RX has the same num_niovs / gen_pool desync on a
+> > > >     contract-violating exporter, just without an OOB. Keep the
+> > > >     size-multiple check TX-only (Stanislav Fomichev).
+> > > >   - Drop bool todevice; compare direction =3D=3D DMA_TO_DEVICE inli=
+ne to
+> > > >     match the existing call site at the tx_vec[] assignment
+> > > >     (Bobby Eshleman).
+> > > >
+> > > >  net/core/devmem.c | 11 +++++++++++
+> > > >  1 file changed, 11 insertions(+)
+> > > >
+> > > > diff --git a/net/core/devmem.c b/net/core/devmem.c
+> > > > index 468344739db2..4f71de44c0fb 100644
+> > > > --- a/net/core/devmem.c
+> > > > +++ b/net/core/devmem.c
+> > > > @@ -241,6 +241,11 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+> > > >         }
+> > > >
+> > > >         if (direction =3D=3D DMA_TO_DEVICE) {
+> > > > +               if (!IS_ALIGNED(dmabuf->size, PAGE_SIZE)) {
+> > > > +                       err =3D -EINVAL;
+> > > > +                       NL_SET_ERR_MSG(extack, "TX dma-buf size mus=
+t be a multiple of PAGE_SIZE");
+> > > > +                       goto err_unmap;
+> > > > +               }
+> > > >                 binding->tx_vec =3D kvmalloc_objs(struct net_iov *,
+> > > >                                                 dmabuf->size / PAGE=
+_SIZE);
+> > > >                 if (!binding->tx_vec) {
+> > > > @@ -267,6 +272,12 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+> > > >                 size_t len =3D sg_dma_len(sg);
+> > > >                 struct net_iov *niov;
+> > > >
+> > > > +               if (!IS_ALIGNED(len, PAGE_SIZE)) {
+> > > > +                       err =3D -EINVAL;
+> > > > +                       NL_SET_ERR_MSG(extack, "dma-buf SG length m=
+ust be PAGE_SIZE aligned");
+> > > > +                       goto err_free_chunks;
+> > > > +               }
+> > > > +
+> > > >                 owner =3D kzalloc_node(sizeof(*owner), GFP_KERNEL,
+> > > >                                      dev_to_node(&dev->dev));
+> > > >                 if (!owner) {
+> > > > --
+> > > > 2.53.0
+> > > >
+> > >
+> > > No hold on, I don't think we actually have a bug here. AFAIR all
+> > > you're describing is intionional . Yes the TX vectors and their niov
+> > > arrays do implicitly 'pad' the dmabuf size to PAGE_SIZE.
+> > >
+> > > But net_devmem_get_niov_at has this check that prevents us from tryin=
+g
+> > > to send past the dma-buf size, even if it's not page_aligned:
+> > >
+> > > ```
+> > > if (virt_addr >=3D binding->dmabuf->size)
+> > > return NULL;
+> > > ```
+> > >
+> > > IIRC the NULL should be bubbled up to the user as some error.
+> > >
+> > > Please double check that we actually have a bug here. If not, please
+> > > don't merge this. This change could break existing users using devmem
+> > > TX correctly with non-PAGE_SIZE aligned dmabufs, which is a valid use
+> > > case.
+> > >
+> > > And if we have a bug, lets fix it in some way that doesn't deprecate
+> > > support for non page-aligned TX dmabufs. You may be breaking users
+> > > here.
+> > >
+> > > --
+> > > Thanks,
+> > > Mina
+> >
+> > Hi, Mina, note that the guard you're quoting doesn't cover the case
+> > I'm describing. It's in bytes against dmabuf->size, while tx_vec is
+> > sized dmabuf->size / PAGE_SIZE
+> >   (truncating) -- there's a sub-page window where the check passes and
+> > the index doesn't.
+> >
+> >   Concretely, PAGE_SIZE =3D 4096 and dmabuf->size =3D 4097:
+> >
+> >   tx_vec allocated for 4097 / 4096 =3D 1 entry (valid index 0).
+> >   sendmsg with iov_base =3D 4096:
+> >     virt_addr >=3D dmabuf->size   ->  4096 >=3D 4097, passes.
+> >     tx_vec[virt_addr / PAGE_SIZE] -> tx_vec[1], OOB by one.
+> >
+> >   And the OOB pointer isn't just returned to the caller -- it flows
+> > through get_netmem() -> __get_netmem(), which dereferences it
+> > (net_is_devmem_iov() reads ->type) and
+> >    on a matching byte refcounts the binding off of it. So this is a
+> > controlled OOB deref, not just a stray read.
+> >
+>
+> Ah, I see. I think that is indeed the bug. In the case PAGE_SIZE=3D4096
+> and dmabuf->size is 4097, the intention in the code was to have tx_vec
+> be an array of 2, where tx_vec[0] is [1->4096] and tx_vec[1] is
+> [4097]. I have an off-by-one error in the tx_vec allocation :(
+>
+> tx_vec[1] would contain an niov and as is stands we assume nvios are
+> PAGE_SIZE, but IIRC net_devmem_get_niov_at() would make sure that the
+> callers trying to use tx_vec[1] would only use it for a range that's
+> valid, so using [4097] and not a range like [4097->8192].
+>
+> However when I dug deeper on proper pruning of page alignment
+> assumptions in net_devmem_bind_dmabuf, the problems are deeper than
+> this patch suggests. We don't properly handle the (probably
+> non-existent?) edge case where the dma-buf itself is page aligned but
+> for_each_sgtable_dma_sg itself gives us un-page_aligned sg entries :(
+>
+> I think probably all of this is very theoretical. In practice probably
+> the dmabuf implementations in the wild seem to be page-aligned.
+> udmabuf doesn't support non-page-aligned dmabufs even so we can't add
+> tests for these things. So I guess fine, lets merge this.
+>
+> >   On breaking users: the partial-page tail was never TX-usable to
+> > begin with. The fill loop only populates num_niovs =3D len / PAGE_SIZE
+> > entries while
+> >   gen_pool_add_owner() covers the full byte len, so any sendmsg into
+> > [num_niovs*PAGE_SIZE, dmabuf->size) was already heading for either
+> > NULL or this OOB. It's not
+> >   deprecating a working configuration -- it's rejecting one that wasn't=
+ working.
+> >
+>
+> Yes, but still, today binding a non-PAGE_SIZE TX dmabuf but only using
+> actually sendmsging up to the last PAGE_SIZE boundary is working,
+> andthat would break entirely. I guess lets merge this and on the
+> offchance someone is hitting this edge case we can revisit.
+>
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+>
+> I don't know if you're interested in also fixing the edge case where
+> the sg table entries themselves are not not page-aligned. I think that
+> also doesn't work properly?
+>
+> --
+> Thanks,
+> Mina
 
-Fixes: 45d76f492938 ("pds_core: set up device and adminq")
-Assisted-by: Claude:claude-opus-4
-Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
----
-v2:
-- Clarify this is a defensive fix; current firmware already
-  null-terminates these strings
+Thanks Mina, appreciate the review.
 
- drivers/net/ethernet/amd/pds_core/devlink.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+  On the SG side -- the second hunk in this patch already rejects any
+SG with !IS_ALIGNED(sg_dma_len(sg), PAGE_SIZE) at bind time, so the
+num_niovs vs
+  gen_pool_add_owner(len) desync I described in the changelog is
+covered for both RX and TX.
 
-diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
-index b576be626a29..3f0e56b951bf 100644
---- a/drivers/net/ethernet/amd/pds_core/devlink.c
-+++ b/drivers/net/ethernet/amd/pds_core/devlink.c
-@@ -122,12 +122,14 @@ int pdsc_dl_info_get(struct devlink *dl, struct devlink_info_req *req,
- 
- 	listlen = min(fw_list.num_fw_slots, ARRAY_SIZE(fw_list.fw_names));
- 	for (i = 0; i < listlen; i++) {
-+		char *fw_ver = fw_list.fw_names[i].fw_version;
-+
- 		if (i < ARRAY_SIZE(fw_slotnames))
- 			strscpy(buf, fw_slotnames[i], sizeof(buf));
- 		else
- 			snprintf(buf, sizeof(buf), "fw.slot_%d", i);
--		err = devlink_info_version_stored_put(req, buf,
--						      fw_list.fw_names[i].fw_version);
-+		fw_ver[sizeof(fw_list.fw_names[i].fw_version) - 1] = '\0';
-+		err = devlink_info_version_stored_put(req, buf, fw_ver);
- 		if (err)
- 			return err;
- 	}
--- 
-2.43.0
+  What's not checked is the sg_dma_address() alignment itself -- an SG
+with a page-multiple length but a sub-page start offset would still
+slip through and produce
+  niovs whose dma addresses straddle pages. Like you said, it's
+theoretical (in-tree exporters and udmabuf all hand back page-aligned
+addresses), but happy to send a
+  follow-up as a separate fix if you'd like.
 
+Cheers.
 
