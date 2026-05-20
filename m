@@ -1,69 +1,67 @@
-Return-Path: <netdev+bounces-290134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MD7JIn1JDmoM9gUAu9opvQ
-	(envelope-from <netdev+bounces-290134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:53:33 +0200
+	id CKIzGG5HDmoM9gUAu9opvQ
+	(envelope-from <netdev+bounces-290135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:44:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA31059CFAF
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:53:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4308559CE18
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C52DD3059032
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:42:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3695C302A672
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 23:44:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFE53CE48E;
-	Wed, 20 May 2026 23:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FC43CE48E;
+	Wed, 20 May 2026 23:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kasFb79F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bn9BhmOm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4CA3C4545;
-	Wed, 20 May 2026 23:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EB63C4545;
+	Wed, 20 May 2026 23:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779320530; cv=none; b=e4qiQ6V6p9w8cztNM2qJrCTgfk66tV+P3qTQsQ9wIuXcIIvsIioKT/wKmkqo0bmaQp4L2nKm5kVCg3TpZpKJ4FfU7Wh57/maYFaeAtRRfVYWFzSk3GBgtKp1ikDFsfJR5yU/Hpu66l4AiEgKIpZV/tbQp3b/KAttxhwLhmYrRMk=
+	t=1779320676; cv=none; b=smgLQxZ9WXhLP54rLZenrIPfvseqVYS3HgQg6IPccHDtHGnHDUieNlgnv7DYGS9YrA0v6fvjvEbNxFgeePKN1E2AYLbKrRIXvbUAjd5YiOkIcIpGQXT2yF5WheDjZIksEBjGIpjGKCOM6n4f+84l2NfFQAZYIsXTv1N6BFEsBWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779320530; c=relaxed/simple;
-	bh=bEUWZOBWy+MBReVZGl5+t4KiBQyc0kd7E5e9h1Wtz+I=;
+	s=arc-20240116; t=1779320676; c=relaxed/simple;
+	bh=EKSjvafpnttCExXk3XPWFaFdxfiX8mcA8XBb/AN0ptg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SWPesinQmSCcvmKr13mQR96SWEdifDJfP4UUKsv0b81v2GO5vuauV0K2eqilFussXTFj13ZMhS43AOkXDUTvHlrWkx23wg0h5oaXpoTH1CJz+7VqLkgogPPU3KWcMpZdQJpeUv5O/1kF7w157h+mBxGFbilCh8T1I20Lov2DZWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kasFb79F; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88FAB1F00A39;
-	Wed, 20 May 2026 23:42:08 +0000 (UTC)
+	 MIME-Version; b=mlQX2TF7SRe3G922QhE4OdYRjhcbh7R/xiW54tE4CdKxWA/7WoKq3eEWpvEYnUfXMptgSI3nwZ3u1pcdiMCsb0C0LcBLPQUEi44oJ6rqi3gNz4Robpy0h0gqk/a588kv28g6QS9XeHQvEYe/TKdp3T3bsS2mfKUyiyES4hWRciE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bn9BhmOm; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A3521F000E9;
+	Wed, 20 May 2026 23:44:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779320529;
-	bh=m+43ZtpYn3aHDSKlsMKkvvB3T9KL2nRj+z8LeDUt7No=;
+	s=k20260515; t=1779320672;
+	bh=8eh8kfoTChhuW8TFXUq8NY1zVm9yQEPbKToE5hIRcMk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kasFb79FednM7x/aegXyJK2Tk9kip72XYHIW+riAAkXxYMAdSOouUpgqJFJ6BSkeU
-	 yjC6b7aL2Rbcx6SI/YCk005iBubsv5VfbGjTBne+6Dd6MNL3YWZLCayYUB2kxxNAC6
-	 OnZinIvu4lxFJ1lTUCmBMTimXx748nCwHA/HAQdaLq+5VDKRp12R/IDG4eS/dYsMbS
-	 69ViLW3UKPSjHAR7Yt4qYlDe34y5EFL1Kli+9ayPLeUSRv9KBSBmYEBFVuXu3m3hdN
-	 8Bn+OeLe0y1HJ+HMFBju1b5c5K1S5X80Xhr6PZOsP3wbSN//lX341E04u3Cx/72Dki
-	 i8xBe6sY8+EQA==
+	b=bn9BhmOmfUURWFQYH+TObvOssSRG865/ciYM8RTRC/DvTgOzBX2M3BK297/WnLgdd
+	 05Ni2QMde85P14Z6IwXnUtE66TIS+IYzZj2RFKuzj+0NriX4R+uG6hZEgLkaBY1MDR
+	 Ue4KswvwMdXcjVersGrnXYp6Mnlp+TFGPCZwTw/39GNXw+/c9rbvmWTFbiCJeWlat/
+	 /esNFy/sxTGEVHpsdbeytCsK3P7FhKPeChUwnLkY5I+GzH5y3n+sAueBrezaRpOcYJ
+	 bL12EgaM2T+enWnsqzMPpdReEmhS9vdTMpjJ14BHRLHhFHby4xnKD0F45QQc+l1nxh
+	 VqtXjvWh+IoRA==
 From: Jakub Kicinski <kuba@kernel.org>
-To: jelonek.jonas@gmail.com
+To: nikhil.rao@amd.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
+	brett.creeley@amd.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	maxime.chevallier@bootlin.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	bjorn@mork.no,
-	horms@kernel.org
-Subject: Re: [PATCH net-next v8 2/2] net: sfp: extend SMBus support
-Date: Wed, 20 May 2026 16:42:07 -0700
-Message-ID: <20260520234208.565366-1-kuba@kernel.org>
+	eric.joyner@amd.com,
+	Vamsi.Atluri@amd.com
+Subject: Re: [PATCH net-next v2 2/6] pds_core: add support for identity version 2
+Date: Wed, 20 May 2026 16:44:25 -0700
+Message-ID: <20260520234425.567020-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260516135442.2234729-3-jelonek.jonas@gmail.com>
-References: <20260516135442.2234729-3-jelonek.jonas@gmail.com>
+In-Reply-To: <20260516-upstream_v2_clean-v2-2-7e0d66bf4020@amd.com>
+References: <20260516-upstream_v2_clean-v2-2-7e0d66bf4020@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,111 +73,79 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290134-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290135-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,bootlin.com,vger.kernel.org,mork.no];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EA31059CFAF
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4308559CE18
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: sfp: extend SMBus support
+pds_core: add support for identity version 2
 
-Extend SFP SMBus read/write helpers to use SMBus word access and I2C block
-access when advertised by the adapter, picking the largest supported transfer
-per chunk.
+This patch adds a new capabilities field to struct pds_core_dev_identity
+and bumps the identify command version to PDS_CORE_IDENTITY_VERSION_2,
+falling back to version 1 when version 2 negotiation fails.
 
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -756,50 +757,110 @@ static int sfp_i2c_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-> [ ... ]
-> -static int sfp_smbus_byte_read(struct sfp *sfp, bool a2, u8 dev_addr,
-> -			       void *buf, size_t len)
-> +static int sfp_smbus_read(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-> +			  size_t len)
->  {
-> -	union i2c_smbus_data smbus_data;
-> +	union i2c_smbus_data smbus_data = {0};
->  	u8 bus_addr = a2 ? 0x51 : 0x50;
-> +	size_t this_len, transferred;
-> +	u32 functionality;
->  	u8 *data = buf;
->  	int ret;
->  
-> -	while (len) {
-> -		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> -				     I2C_SMBUS_READ, dev_addr,
-> -				     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> -		if (ret < 0)
-> -			return ret;
-> +	functionality = i2c_get_functionality(sfp->i2c);
->  
-> -		*data = smbus_data.byte;
-> +	while (len) {
-> +		this_len = min(len, sfp->i2c_block_size);
+> diff --git a/drivers/net/ethernet/amd/pds_core/dev.c b/drivers/net/ethernet/amd/pds_core/dev.c
+> index 5b86d6cd0ac3..c9abea9b2eb1 100644
+> --- a/drivers/net/ethernet/amd/pds_core/dev.c
+> +++ b/drivers/net/ethernet/amd/pds_core/dev.c
+
+[ ... ]
+
+> @@ -327,6 +334,21 @@ static int pdsc_identify(struct pdsc *pdsc)
+>  	return 0;
+>  }
+>
+> +static int pdsc_identify(struct pdsc *pdsc)
+> +{
+> +	int err;
 > +
+> +	/* Older firmware rejects anything but PDS_CORE_IDENTIFY_VERSION_1
+> +	 * instead of returning the max supported identify version, so retry if
+> +	 * firmware doesn't support PDS_CORE_IDENTIFY_VERSION_2
+> +	 */
 
-Does this introduce an -EINVAL regression for ethtool -m during the initial
-300ms module insertion window?
+[Low]
+The macro names referenced in this comment are PDS_CORE_IDENTIFY_VERSION_1
+and PDS_CORE_IDENTIFY_VERSION_2, but the macros defined by this patch in
+include/linux/pds/pds_core_if.h are spelled PDS_CORE_IDENTITY_VERSION_1 and
+PDS_CORE_IDENTITY_VERSION_2 (IDENTITY, not IDENTIFY).
 
-When an SFP module is inserted, sfp_check_state() sets the SFP_F_PRESENT
-flag and schedules sfp_sm_mod_probe() to run after a 300ms delay.
-Because sfp->i2c_block_size isn't initialized until sfp_sm_mod_probe()
-runs, it remains 0 during this window.
+Should the comment use the actual macro names so that grep finds them?
 
-If ethtool -m is run during this 300ms window, sfp_module_eeprom() proceeds
-because SFP_F_PRESENT is set. This means this_len will evaluate to 0.
-For adapters supporting I2C_FUNC_SMBUS_READ_I2C_BLOCK, the code attempts
-a 0-length I2C block read, which the I2C subsystem core explicitly rejects
-with -EINVAL.
-
-Prior to this patch, sfp_smbus_byte_read() bypassed the block size entirely
-and safely executed 1-byte transfers during the 300ms window.
-
-This also seems to expose a pre-existing deadlock in the pure I2C path.
-For pure I2C controllers, sfp_i2c_read() is used. If this_len evaluates
-to 0, i2c_transfer() is called with a 0-length read message. If the I2C
-adapter returns success, the loop variables remain unchanged, causing an
-infinite loop while holding rtnl_lock, which deadlocks the networking stack.
-
-Is there a way to prevent reads before sfp->i2c_block_size is properly
-initialized, or fall back to 1-byte reads when the block size is 0?
-
-> +		if (functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
-> +			smbus_data.block[0] = this_len;
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_READ, dev_addr,
-> +					     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
+> +	err = pdsc_identify_ver(pdsc, PDS_CORE_IDENTITY_VERSION_2);
+> +	if (err)
+> +		err = pdsc_identify_ver(pdsc, PDS_CORE_IDENTITY_VERSION_1);
 > +
-> +			memcpy(data, &smbus_data.block[1], this_len);
-> +			transferred = this_len;
+> +	return err;
+> +}
+> +
+-- 
+pw-bot: cr
 
