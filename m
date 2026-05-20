@@ -1,199 +1,147 @@
-Return-Path: <netdev+bounces-289911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289981-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yEGgGXajDWq10QUAu9opvQ
-	(envelope-from <netdev+bounces-289911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:05:10 +0200
+	id KFmKJoHSDWpP3gUAu9opvQ
+	(envelope-from <netdev+bounces-289981-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 17:25:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF6F058D3CF
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 14:05:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA57E590C60
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 17:25:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 81697322238D
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 11:42:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BF70B31F4A11
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 15:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255A6371063;
-	Wed, 20 May 2026 11:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C38E3FB073;
+	Wed, 20 May 2026 15:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="opjUvsFn"
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="OqnLjSPJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1467365A13
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 11:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995D83F58D6;
+	Wed, 20 May 2026 15:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779277334; cv=none; b=pW/OGK5cJnlk3lt7jeXjrH1NnNP8xqLVUwZg3Rhe+nqH+i7ltVWOn9zthL42wv7vA3DDoXjjNWU16zByGF7h+J2LMyG4zx6dLhRUF7fVTdrZYELxoWnniNcpkM0tpqXsNS6j0QcE7j/VZLMhC73XFb46GFkKpH/+x1JeLb+dFVI=
+	t=1779289711; cv=none; b=Avy1fWxZeIQrlhM0pM7ZeVchMrQK1TuuPzpF0U4VtPyxFDTyTwJzxsXsPNyTt9hnozN81qdWgf1Zs/pyiIUfX2VZLjZe/wyzGvB8UQGwcypAsSG56/kbuwXBQW2txyXunp5SgaKkt72fAHZtc7WZsCEHuKrZIl6GYff4MFKLSps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779277334; c=relaxed/simple;
-	bh=HyCy4WILmkBZi+hq1dJB6rltF17bSvnmXqDPoaFf+is=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ib7hhlAq/qJTKLvPiGq9FfG2h7Lby3CwjlhQADRffZfM6cYsAaVs42mw918dSNeqFuCpxP5wsfNOjLam4RNhMULW6VjsE4Y++oD7wPstFxPSq4ajLRf1kAg72fFHBICXGKef8VvHDdZd0yPX43i2DvJo8HjjZLZbmoWj/PHHy1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=opjUvsFn; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-50d9a6a853bso135234851cf.0
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 04:42:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779277331; x=1779882131; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Wlle5DMc7ZBUDRnaeyWXWTc704a1wfEb/CL8LcRxd60=;
-        b=opjUvsFnXByWmRabhIVTzzaKQ2Yc5qNy0iMj00xznbnIF2gMHWTYoV59Uppr7eMMpP
-         sB3SWC0SEobmxh3WbSTSUZSxxw1ml6HbN1Our5GS61LORpEvqnkeEAjJW4k9jEZgIfW7
-         UAQW20VdpoNiNVIiHWQ65sLUxfbaNiFR3VqZcYJXAHMdKCFPkomqYrkx+xK4dgpQTr95
-         ZnR+KLgOLF/eGGC1UI8O32JQUaF3GixZ4FwRSBqTfOG9l5lcVdTh0KxsSCiNRuRbr981
-         pSYkga0pCA7XRtGT9O2v5rOMrrp3kfwvV5t24TxD/4N4K65KsugiZRi1+XTDNYt2yqWl
-         Z50A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779277331; x=1779882131;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wlle5DMc7ZBUDRnaeyWXWTc704a1wfEb/CL8LcRxd60=;
-        b=JxX24e+qzIak+EahPNjgf3quDlr6T4jGeemNwHvKw6wqKE2HTpzFVJ9LwcDBRsDUQk
-         zE2yUqJYaDHrqYApZlLiVe9dPFuQoVGYReRGMMnLqzirt1F2WuARo4MGy5xsn9StVrxN
-         dbZtOiCSV3xoA7K5/WA4DvbeASqXd1z/Mjxwb5glews4l90UWxEZa999nX73pmuEdgdq
-         Aq8forAQs0gYaHl6R68iUA1Oio08ur+oJ6z2m279J49Jnguj9Bae66iRLCUocyHxWoDx
-         Qb/idcf5ztaSmmDC8PAt64Va8mePicUJ7qaqhPcSpyEE8QZihO2UJjLoPYm5yLL1fpWT
-         avMA==
-X-Forwarded-Encrypted: i=1; AFNElJ/6bbkdPdmAaDyqooKuijBvTjv8Ax2ky+Ovl/gPJg1KzHl7+qgKWz+CYrCNIQ+rBIL1LHhMK5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI8PFzPKYsFwkCPkkJgwjQtpXIBOpUXaeotTLKmeRXWtDXTd1q
-	bBPHosf0wPmiwyJfaJIYWZcpnk1wdFtKffEUrJWCX9UAO3Wy84M9JBMf9Pf32FPmMBdWfL29ZzW
-	layTTeomXTE0bUg==
-X-Received: from qtpi13.prod.google.com ([2002:ac8:71cd:0:b0:50d:75d9:61aa])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:6bcd:b0:50f:c36a:381a with SMTP id d75a77b69052e-5165a26a99emr253069561cf.55.1779277331174;
- Wed, 20 May 2026 04:42:11 -0700 (PDT)
-Date: Wed, 20 May 2026 11:42:07 +0000
+	s=arc-20240116; t=1779289711; c=relaxed/simple;
+	bh=x4mPsOCxn9KhDckqmC0Ir9ExNnXLDlCfF98Hm7mjVR0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fxQ7J1rRZwnx8iWJES8g0cLNfSAz09p2F2hxpIJ57RPYFnxyN4YPhtxzRdIw/wOAafumaUPW8Ap5s083I6Kz7JQphPVtbIG9vRkfL+2nWQjSCYI7fzCblnAjGeUT/HCzvfdglaP8sxC29DTgJh3E2BZKtlhS/D5lUMM7OQZELvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=OqnLjSPJ; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7F8BC11491F;
+	Wed, 20 May 2026 17:08:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1779289700;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=8KpYenBxRuyIn0gHYdvx/R16eV5VvXl/6IFiYbeKdVU=;
+	b=OqnLjSPJwf+3bTLUyTCEp1iQl/wiF3OY6g9Bfp2GDvoA3fE15dHlu4aS6Ss0zaMl/oiM0z
+	piN3p1n6ae/Z6fTdieA0TKsvJmcLunicT4N345KO7tANCiH85rfa3ad7elxk3iHTLuCdKl
+	FxNcLxMSlMHLmTAkfVoKCibL9Q8gC6bIm7tCIRH5jdyIlQQMAVyKhmtEQ+TXdKdDwlLt7L
+	2zfzpOjQYMk/9gr6ZG0u/APmUG1++W6pyFQO538/995aW0AjhfWl1+iHpHm2ZR9LMS4aiX
+	zNe7cTcObozcYOl5521Sl9svfvMunBCaFN/sxJXj1oiGjyCfTC9c10AJHJoCig==
+Message-ID: <bb8004b1-b14f-4032-ac6e-121245b1a83d@nabladev.com>
+Date: Wed, 20 May 2026 13:47:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.631.ge1b05301d1-goog
-Message-ID: <20260520114207.1394241-1-edumazet@google.com>
-Subject: [PATCH v2 net] net: bridge: prevent too big nested attributes in br_fill_linkxstats()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+a35f9259d08f907c06e6@syzkaller.appspotmail.com, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/3] net: dsa: microchip: implement KSZ87xx Module 3
+ low-loss cable errata
+To: Fidelio Lawson <lawson.fidelio@gmail.com>,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Marek Vasut <marex@denx.de>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Tristram Ha <Tristram.Ha@microchip.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Fidelio Lawson <fidelio.lawson@exotec.com>
+References: <20260520-ksz87xx_errata_low_loss_connections-v6-0-43f33d4aaf0f@exotec.com>
+ <20260520-ksz87xx_errata_low_loss_connections-v6-1-43f33d4aaf0f@exotec.com>
+Content-Language: en-US
+From: Marek Vasut <marex@nabladev.com>
+In-Reply-To: <20260520-ksz87xx_errata_low_loss_connections-v6-1-43f33d4aaf0f@exotec.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
+	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,syzkaller.appspotmail.com,blackwall.org,nvidia.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289981-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289911-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,a35f9259d08f907c06e6];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,blackwall.org:email,appspotmail.com:email,nvidia.com:email]
-X-Rspamd-Queue-Id: BF6F058D3CF
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nabladev.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: BA57E590C60
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-After commit ff205bf8c554 ("netlink: add one debug check in nla_nest_end()")
-syzbot found that br_fill_linkxstats() can send corrupted netlink packets.
-
-Make sure the nested attribute size is bounded.
-
-Fixes: a60c090361ea ("bridge: netlink: export per-vlan stats")
-Reported-by: syzbot+a35f9259d08f907c06e6@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6a0b0da3.050a0220.175f0c.0000.GAE@google.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Ido Schimmel <idosch@nvidia.com>
----
-v2: remove the WARN_ON(err == -EMSGSIZE) in rtnl_stats_get() (Ido)
-    adjust limit (Ido)
-v1: https://lore.kernel.org/netdev/20260518130531.1015332-1-edumazet@google.com/
-
- net/bridge/br_netlink.c | 10 ++++++++++
- net/core/rtnetlink.c    |  5 +++--
- 2 files changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 6fd5386a1d646542c184702e13cc2e6c8ee1820d..c04a4d0889ae412a9fc3e2458faa41200f26b098 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -1824,6 +1824,7 @@ static int br_fill_linkxstats(struct sk_buff *skb,
- 			      const struct net_device *dev,
- 			      int *prividx, int attr)
- {
-+	unsigned int limit = U16_MAX - nla_total_size(0);
- 	struct nlattr *nla __maybe_unused;
- 	struct net_bridge_port *p = NULL;
- 	struct net_bridge_vlan_group *vg;
-@@ -1841,6 +1842,7 @@ static int br_fill_linkxstats(struct sk_buff *skb,
- 		p = br_port_get_rtnl(dev);
- 		if (!p)
- 			return 0;
-+		limit -= nla_total_size_64bit(sizeof(p->stp_xstats));
- 		br = p->br;
- 		vg = nbp_vlan_group(p);
- 		break;
-@@ -1855,6 +1857,9 @@ static int br_fill_linkxstats(struct sk_buff *skb,
- 	if (vg) {
- 		u16 pvid;
- 
-+#ifdef CONFIG_BRIDGE_IGMP_SNOOPING
-+		limit -= nla_total_size_64bit(sizeof(struct br_mcast_stats));
-+#endif
- 		pvid = br_get_pvid(vg);
- 		list_for_each_entry(v, &vg->vlan_list, vlist) {
- 			struct bridge_vlan_xstats vxi;
-@@ -1862,6 +1867,11 @@ static int br_fill_linkxstats(struct sk_buff *skb,
- 
- 			if (++vl_idx < *prividx)
- 				continue;
-+
-+			if (skb_tail_pointer(skb) - (unsigned char *)nest +
-+			    nla_total_size(sizeof(vxi)) >= limit)
-+				goto nla_put_failure;
-+
- 			memset(&vxi, 0, sizeof(vxi));
- 			vxi.vid = v->vid;
- 			vxi.flags = v->flags;
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index df042da422ef3137ed67efaf8d243cc6b1fec6c7..511c25bf6f2a25563b7dd8d618fb46c9297d2ed7 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -6328,8 +6328,9 @@ static int rtnl_stats_get(struct sk_buff *skb, struct nlmsghdr *nlh,
- 				  NETLINK_CB(skb).portid, nlh->nlmsg_seq, 0,
- 				  0, &filters, &idxattr, &prividx, extack);
- 	if (err < 0) {
--		/* -EMSGSIZE implies BUG in if_nlmsg_stats_size */
--		WARN_ON(err == -EMSGSIZE);
-+		/* -EMSGSIZE implies BUG in if_nlmsg_stats_size
-+		 * or a too big nested attribute.
-+		 */
- 		kfree_skb(nskb);
- 	} else {
- 		err = rtnl_unicast(nskb, net, NETLINK_CB(skb).portid);
--- 
-2.54.0.631.ge1b05301d1-goog
-
+On 5/20/26 10:48 AM, Fidelio Lawson wrote:
+> Implement the "Module 3: Equalizer fix for short cables" erratum from
+> Microchip document DS80000687C for KSZ87xx switches.
+> 
+> The issue affects short or low-loss cable links (e.g. CAT5e/CAT6),
+> where the PHY receiver equalizer may amplify high-amplitude signals
+> excessively, resulting in internal distortion and link establishment
+> failures.
+> 
+> KSZ87xx devices require a workaround for the Module 3 low-loss cable
+> condition, controlled through the switch TABLE_LINK_MD_V indirect
+> registers.
+> 
+> This change models the erratum handling as vendor-specific Clause 22 PHY
+> registers, virtualized by the KSZ8 DSA driver and accessed via
+> ksz8_r_phy() / ksz8_w_phy(). The following controls are provided:
+> 
+> - A boolean “short-cable” preset, which applies a documented and
+>    conservative configuration (LPF 62 MHz bandwidth and DSP EQ initial
+>    value 0), and is the recommended interface for typical use cases.
+> 
+> - Separate LPF bandwidth and DSP EQ initial value controls intended for
+>    advanced or experimental tuning. These are orthogonal and independent,
+>    and override the corresponding settings without requiring any specific
+>    ordering.
+> 
+> The preset and tunables act as simple setters with no implicit state
+> machine or invalid combinations, keeping the API predictable and aligned
+> with the KISS principle.
+> 
+> The erratum affects the shared PHY analog front-end and therefore applies
+> globally to the switch.
+> 
+> Fixes: e66f840c08a2 ("net: dsa: ksz: Add Microchip KSZ8795 DSA driver")
+> Signed-off-by: Fidelio Lawson <fidelio.lawson@exotec.com>
+Reviewed-by: Marek Vasut <marex@nabladev.com>
 
