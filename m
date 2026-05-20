@@ -1,127 +1,130 @@
-Return-Path: <netdev+bounces-289699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289700-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UpjENKEUDWqotAUAu9opvQ
-	(envelope-from <netdev+bounces-289699-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:55:45 +0200
+	id 6FHhAqgVDWq5tAUAu9opvQ
+	(envelope-from <netdev+bounces-289700-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:00:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A835586A62
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 03:55:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73ED8586AA8
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 04:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E68C3028B7E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 01:55:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 589DB3025E64
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 02:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6682F12A1;
-	Wed, 20 May 2026 01:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618982F8E8F;
+	Wed, 20 May 2026 02:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BBgiSrPd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IS6hK3JM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB7213B58A;
-	Wed, 20 May 2026 01:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8DB2F39B8;
+	Wed, 20 May 2026 02:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779242140; cv=none; b=f3HmcS5HSHbz63GoAfCU7jUGVC8YBlHd80Juj5zB+ksAJQezieYVe6OrSEFq7kCT/fCWJao2JJW+Izj4myFrkDzY7g1ksSrQxuJAKK//gBV2lV/UYWqhS1vIWzjj0uiFpZHPXItT5Bq9mV6kdNYmsIytWYROMMYpViTUVIU2Z5Y=
+	t=1779242404; cv=none; b=Bp8DzRXzLQxUwOgyq462cw9L2HFszT/ScZ8cxBWAYE10wkFWbyl03WeTNDHoq/d6dqyTpxno7uyBSpMIlwX9thR5Q6VlXFKdagB021nvft/W4uc+XnYu6ubOlF3YtRBkcl/dIPfRWRYgYbIxSnqC40kaaIB5WLw0avvDiQn/nZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779242140; c=relaxed/simple;
-	bh=CkmrZgpKxfQunIM/6TIJXwCf/UzRNYUgtGTw6zBiRJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HnAu7kXQdd7uGX576wJzwiJ01h7VsDYKO/la2mK2lt2IW2rSOLYFajI23p/ezJmtsv+AT2fH7/u431tkbSbZO5+jP6DfwRl3w0kyuO0nzjmqfcWwhSltUxVmjpEnKLfTRipTxVbn9JPhA0SxJruVV0CHPuxxeTxW0Fzc2ug2s3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BBgiSrPd; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 570A61F000E9;
-	Wed, 20 May 2026 01:55:38 +0000 (UTC)
+	s=arc-20240116; t=1779242404; c=relaxed/simple;
+	bh=gjgh8kdA3m/flPEQToQ1NLj0A2+4fb5TUiH2kSeFCt4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gigv6zsD16Lshsv0h0UIugQboYKCpF7tAjhWKEoZDln0q5lEt9tzQjUeL9fLco+DfFjdVWBcYRHz/LF5EAMDH5BgQTv3SkbyLkqhZnMY33pIBQyXCaCQ3HJDZvzpdosy9XTN3tn1yfbIsCSvN0lm6R7mFRoL+m2uj1I8TeGbdvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IS6hK3JM; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF71C1F000E9;
+	Wed, 20 May 2026 02:00:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779242139;
-	bh=Ib4SgarWJEX4iIZYZRN1n/Zcasoz6VE7lJsKARzwePA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=BBgiSrPdA8nHm/icV2+QiuLGf3xstqQ2NjGxpERaKQXTKEMS4eBHCvJdq2sV350gi
-	 UdPffEE89xHyzod7uJ/Xpfbqx3i/38TxF5l+9DMBT1HY74J3zQvBIhc3bG/3S0d929
-	 icPwZPUoRl//gN0hqLeY80EDIce7T1RweR3p0cpP598MYQv8fTrAGCrwHOKClyBJ9Z
-	 aE+bQM1B82HjRAFeWvvLSvlX2+nGaHRr5KeYLOPgFz1+arMXe8ePO1V9EdNubBZTie
-	 taWqJUJpXJmT1doIfr66YiY+UOe1cbI9ScsVrALDd9dpylYdoNnOPXBot1TZH1Edt7
-	 j74fPf0Xk1EBg==
-Date: Tue, 19 May 2026 18:55:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Allison Henderson <achender@kernel.org>, Praveen
- Kakkolangara <praveen.kakkolangara@aumovio.com>, Nathan Chancellor
- <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev
-Subject: Re: [PATCH net v5] rds: filter RDS_INFO_* getsockopt by caller's
- netns
-Message-ID: <20260519185537.772bf34c@kernel.org>
-In-Reply-To: <20260518174613.1592290-1-maoyixie.tju@gmail.com>
-References: <20260518174613.1592290-1-maoyixie.tju@gmail.com>
+	s=k20260515; t=1779242402;
+	bh=mDQa/S199WfXqfZtismbjSDacf9NhvAaoC6w4ISijaM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=IS6hK3JMuo7ESNyAKBQ0v1TYWTLCh8eDscxVMHvmt0GHw6mSY7dRFFYfEz37cBVtc
+	 WMqqgVk/yHmUM/9LP8Uwt3o8iddRIrl02rZLxDeqHV6vmLQ3ksde1zQgBifywY2K+M
+	 mUgb3/2oLMvK/21tE4w2pcr/u6Fmt+mKCSa1gVxOOlw/PTnwB9dWakictH2KzZ+Kxr
+	 RaAY2FdzYy4yW5vkeaN6qQtePzlK0D/KI1ZWrC698DIHMK6peFa7ygfYIwquOu/KUD
+	 GQG/e2eDo07ivHNF+H+ni28yqcj6UpyT/Fjt9WAiOKGlQhSk675O9nHd+I2Mmm0jZm
+	 5SYoa/3YnNe/g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56962383BF53;
+	Wed, 20 May 2026 02:00:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] ipv6: ioam: add NULL check for idev in
+ ipv6_hop_ioam()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177924241303.2949285.7584586372366351659.git-patchwork-notify@kernel.org>
+Date: Wed, 20 May 2026 02:00:13 +0000
+References: <20260517183059.29140-1-justin.iurman@gmail.com>
+In-Reply-To: <20260517183059.29140-1-justin.iurman@gmail.com>
+To: Justin Iurman <justin.iurman@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ idosch@nvidia.com, stable@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289699-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,aumovio.com,gmail.com,vger.kernel.org,oss.oracle.com,lists.linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-289700-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,lkml];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 2A835586A62
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 73ED8586AA8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 19 May 2026 01:46:13 +0800 Maoyi Xie wrote:
-> The RDS_INFO_* family of getsockopt(2) options reads several
-> file-scope global lists that are not per-netns:
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun, 17 May 2026 20:30:59 +0200 you wrote:
+> Reported by Sashiko:
 > 
->   rds_sock_info / rds6_sock_info,
->   rds_sock_inc_info / rds6_sock_inc_info        -> rds_sock_list
->   rds_tcp_tc_info / rds6_tcp_tc_info            -> rds_tcp_tc_list
->   rds_conn_info / rds6_conn_info,
->   rds_conn_message_info_cmn (for the *_SEND_MESSAGES and
->   *_RETRANS_MESSAGES variants),
->   rds_for_each_conn_info (for RDS_INFO_IB_CONNECTIONS)
->                                                 -> rds_conn_hash[]  
+> The function ipv6_hop_ioam() accesses
+> __in6_dev_get(skb->dev)->cnf.ioam6_enabled without validating the returned
+> idev pointer. Because addrconf_ifdown() can concurrently clear dev->ip6_ptr
+> via RCU, __in6_dev_get() can return NULL during interface teardown, which
+> could cause a NULL pointer dereference when processing an IOAM Hop-by-Hop
+> option.
+> 
+> [...]
 
-Does not apply to net:
+Here is the summary with links:
+  - [net] ipv6: ioam: add NULL check for idev in ipv6_hop_ioam()
+    https://git.kernel.org/netdev/net/c/d4ea0dfd7501
 
-Applying: rds: filter RDS_INFO_* getsockopt by caller's netns
-error: patch failed: net/rds/tcp.c:201
-error: net/rds/tcp.c: patch does not apply
-Patch failed at 0001 rds: filter RDS_INFO_* getsockopt by caller's netns
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
