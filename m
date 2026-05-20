@@ -1,186 +1,270 @@
-Return-Path: <netdev+bounces-289779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289788-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eGkjD8RaDWrBwQUAu9opvQ
-	(envelope-from <netdev+bounces-289779-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:55:00 +0200
+	id CPaVL8ZYDWpuwQUAu9opvQ
+	(envelope-from <netdev+bounces-289788-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:46:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 746EC58882D
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:54:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64BFA58852B
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:46:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EA2E2302A18E
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:42:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9B0AD303F219
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF3133FE05;
-	Wed, 20 May 2026 06:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C89533F59C;
+	Wed, 20 May 2026 06:43:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NHeYXAtv"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="CDsO/xD+"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012054.outbound.protection.outlook.com [52.101.53.54])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBB7322768;
-	Wed, 20 May 2026 06:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779259326; cv=fail; b=nOHE3kjLsL6UNKMHtnmel5zsjCZ9H1THYT6CqOHK76lJZ0AvJcPLIEluLtWwrE7RfVQghoSYVY4292kRS+QmK+Vv72B8EMZCtoHM1ABiNLEC9dOdmBxufnb3yO/PXNx8A74hIW5Gb85J2Yz5kQp43tvE0JRXpN0ypJKDDQJ4jpQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779259326; c=relaxed/simple;
-	bh=c4+vDv23EbKtMVPMCmHUV1t3yQbbJGNWYwTeMSBEieE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=E1glsPw4G6hL1yaJhCfr1K6aNQmfLEPEMqWnPFTKVpm6Q6mdfNqw3e4HL1ftpGFeVnr8VhevjBJCgeIUonx0QvQl9AaZM9UXw019zaGFvqxLpANxbgyl6I02eBTHTvs+W4RftHJcQE79S63WmDNHVCQ47Dd4hY84c26Ee8zQt6w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=fail (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NHeYXAtv reason="signature verification failed"; arc=fail smtp.client-ip=52.101.53.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IxFCrL1TBLY4ESrOrJUQQewfEJYsIE+VFNt8H+ceFcyOqVIQOpqOCsdJ5T3/yrTM/4wD3adVlYC6LPhHq/SY3iPANYe4NKA/xFiiVPMJuQwF5DhpvrMJoMOPv5ClktpO2guo+hnK5z3qP6IQDYui/yrhXwK9uI6013oMBw6Oa/Ri2wEA2A1Pku0in8LlOiPiB5DFCfrNj+CkENRdB9pQpduNd20xGsJQQyO5DQU5eACnLp2oiSfGUyqjuZow5LKUHACmKgMj9yXxrXfQeHzBeLVyTBLHEqELWF2Mkcc3uaMwfPb2miGEUD37H04JZDpcdNU20O+GB5LphY7CrmU90A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3AsAlwxXKOXW7Ow142/rf2GOapaFidwwOrCt8/DpTk8=;
- b=KOKRr1DS5WYCQsg7rM8NhoIWkW/IqmkkNUBmnalN3ciWNLD/hvrXaDyRjAdLtSe8XxGB1YXqL8NgHsIrZk+GTO6q4Ax8mVV+xFzUSISxEayi8bwVlF+7IE6s22noTConGBQxL8iHrZWir2WGwmzv5mwuC7iaPkyWI5nrq8Zc2/T27xnMwejPvzRZFX34BDYxfAMCVJM2VvaZBjqWXFnHODdD0NCVVP6pzHeO79qI2ccSC0hztXbUXcz+siu6r5Du4SGQ28gyTAXuMPwak/vKvMImb8327q4EdunfMWk1I/Z9oFCWxeX3DcW3lHKaE3ENJzrqlw4kvpFQtXx+8i8oQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3AsAlwxXKOXW7Ow142/rf2GOapaFidwwOrCt8/DpTk8=;
- b=NHeYXAtvWiKuyjuLHyYaHkSNL2Y+XptgYaTrTGl64+0/ujgS5KZugZuCH2i2S18ZPiyHL8+St4FmtoFb/GrH8jPlnc0yn/n1vi70/bhRcYpTm4re660+fNv23coYtUa9CajcU0H4UHBnBYSMM2p+HXUBxD9rlj3r+tiZ2Xwed1lt6DBEnf8ae5viAOl35QG3Y1IC0tOC8Fvr+3aiwyfA0NpUv5WSfQsiD/MBh6W0CEfV75h7VzOcmD6mtbi/iye9rv9S4WM0VztMCpuBDcIcoPmmMsaEkVKVu6mfzyp2jdZ3TnRWcsi9kwYx4Ccyq+GD7Q+dJmvQfQcqQSZroTAUTw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by SN7PR12MB7882.namprd12.prod.outlook.com (2603:10b6:806:348::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.19; Wed, 20 May
- 2026 06:41:59 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0048.013; Wed, 20 May 2026
- 06:41:59 +0000
-Date: Wed, 20 May 2026 09:41:49 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-Cc: Petr Machata <petrm@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 net-next] mlxsw: minimal: Use named initializers for
- struct i2c_device_id
-Message-ID: <20260520064149.GA544328@shredder>
-References: <20260519160721.1597568-2-u.kleine-koenig@baylibre.com>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260519160721.1597568-2-u.kleine-koenig@baylibre.com>
-X-ClientProxiedBy: TL0P290CA0014.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:5::8)
- To SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BADD33F5A3
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779259398; cv=none; b=BzW7sVhkGJ5Ydnj8QzzpqBcv2CKwh4vRBxH4u9Hd3BMIjDdVQGBzoWQg9frjZOa68iz8oOoZKEg+IkZzudAb0IbeMAEXsHGcymI+veEVVk5YWOte+alCZ47P5lWOP/3oC+9k3jA5c1HitsgPVNdeSew5RnoBPsE/DNYD3obaphg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779259398; c=relaxed/simple;
+	bh=5kXFiylQ90YK+HiJEYfaE/uD2O3c7z99rvu1iTHbCc0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ALcGgCQ0bU/8HcQI3IgyOpgJZcqC+qm6yvJ5w1CVTCKODzLSifhwFOzT6N54GxEqGmIVjSbQ6W3B3KyngIQ3JeKbq6yFw82kF1pz1tw0lKw9KuWv5nnG2/Kx6VdALn0atOWt2J/kMxad7C8NxX7tuB1i7U668ZrHL7XgC2Kpftk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=CDsO/xD+; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64JI5o7T2371713
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 23:43:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=s2048-2025-q2; bh=O5ugIPBXVY+bSmVcPaqTjL75KVknqr+
+	nsBD6NtKxUMk=; b=CDsO/xD+5l8X40ykp/bYF40BRflpEtmIDczsm+ITSA7ipUX
+	LfPk/khiJmRtLA7V9iYjzZdNQWRcfiP8YLEr5C6p6Iyifv4nz/c5Tkur827afmP6
+	SN8FszJmU+26qya26ycw44Krr8G9uWPd5EyeuhV6BbWOUxmFjmcljt6do6lJd8CT
+	4qG3t/aNL68tcmskpnQz9wgAuvwPguUsYZ0GHfw5kfcS0UUXdAL+CeTeMKuM3b7N
+	R7GEQe6WmnSM9CLnKtqhrsuSra8fDWFRdPzWcMQqS7mzwPpRUBBjNCaezPd7wCNt
+	BTRy+MEDHknhgYIwOCy04SRyVRXES1M1vVnJRgA==
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4e8vucur71-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 19 May 2026 23:43:15 -0700 (PDT)
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-4826dab501cso3556595b6e.3
+        for <netdev@vger.kernel.org>; Tue, 19 May 2026 23:43:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779259394; x=1779864194;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O5ugIPBXVY+bSmVcPaqTjL75KVknqr+nsBD6NtKxUMk=;
+        b=nrLpP08gnTNg+/1TY9LXf9LELjZcTnxWWc/7zl35Mbv79qm9/XL9uKeHCCY83iLR23
+         8iBQurIuXb0nRsCIgHl0FNhukSfSp1nk+eEMNSNerUJ3YNVEIyXlZMraOYUECk0V/VSf
+         pemOzkZdUU5nQPuZFyB2skD7jqCZxqzLfeiZXxDGG14I2DYG59xdxdbJzUByb5x+y7Eu
+         /u8iSJlM1UIWFPQI8A7cdZgCtSXM33nTpo44Rwe7GZpC69owX3FBwdyw8Rs38Of00VVm
+         wtjYQcLy9kZ6jmkmLjUArl+F5lnm7VujnYz/OjgcSI+suFMvnMsE2pM57OQ7/HYygwq0
+         Knqw==
+X-Gm-Message-State: AOJu0Yxxso3IH/40WT1fg3lNlKPbByJVNvuBtrM0Ac2pFs3Gez+D4yt8
+	Z17mlDx33062I+bpAeHSB75hiD7uX5KsWeNrlahv2EWQ/X+DW+MDcwwVKOO0EngqHMmnFoDfFUP
+	4jZgl5Qofp+5dj8rn0VJp3sDaQIFbpxI9G35Ch/aJ/sHl9Gpue5DhKZpEge0seZF8Ur9X0e1mlA
+	sN0hsilAwHIIp4yrPMa5vUDYle3WCssv17FD1+
+X-Gm-Gg: Acq92OFJXHpX8y4SpCmM9qJqeUZc6Roo8K/VUUns3Oxz1yPFRbcWQypLbSOq0n7DGal
+	RLJYjXON300sH3tZJvHrlnMr0iF8Vn9EBV/M7DXQz6g15hti7shvDnkeiL5cPNFS0AjCAXau8Ai
+	dMKKloVoBMjrb1lYU9sVCLF95qd5dFV9sSrUJ79berAkEORD2EXgGA46hzCUGAcgw5TAelzL5Fc
+	KilrCv/3rVjH+33bRxgFPfiOVecWg1BqCBJcNIG9qRS9eVMoXE3iNkQZWJPr7qDjtA6s1SlI7ts
+	KOfn6gPKTAc/6+0nndbI/svZxVxe0okKW22ejKrl/RI7kafEv1i1MlLqKEmhob9nNxHSQvZGX7b
+	r6gNLZaiPZg==
+X-Received: by 2002:a05:6808:1c06:b0:484:d5a3:9966 with SMTP id 5614622812f47-484d5a3a304mr8250498b6e.15.1779259394410;
+        Tue, 19 May 2026 23:43:14 -0700 (PDT)
+X-Received: by 2002:a05:6808:1c06:b0:484:d5a3:9966 with SMTP id 5614622812f47-484d5a3a304mr8250472b6e.15.1779259393898;
+        Tue, 19 May 2026 23:43:13 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:7::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-482ee5349a5sm7982344b6e.15.2026.05.19.23.43.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 23:43:12 -0700 (PDT)
+From: Neil Spring <ntspring@meta.com>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com,
+        davem@davemloft.net, kuba@kernel.org, dsahern@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org, ntspring@meta.com,
+        bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net
+Subject: [PATCH net-next v7 0/2] tcp: rehash onto different local ECMP path on retransmit timeout
+Date: Tue, 19 May 2026 23:43:08 -0700
+Message-ID: <20260520064310.4154268-1-ntspring@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SN7PR12MB7882:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f018854-fd3c-4971-f6bd-08deb63ae4ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|1800799024|56012099003|22082099003|18002099003|11063799006|5023799004;
-X-Microsoft-Antispam-Message-Info:
-	WzE4yeyvmYTFLTMxMXTPIzWqP0G12fIsxBu4cntSc/jE6bbxmwbYZwuEfVfMUNsIQSMKzWM+E/a2jNF+P1Jt+Qyh+jYuaRoTYPEUIj13tU8mipAH5Gb2fdBSBSWHkqpCygyX+PS0y2G8VCAHvpD2vv2Solxllk5+mgjiGsJxKAdX8OAxtBB22mRakMqT/OiZomar9Uy7IXcfEqSjsL10fbc0QYnKNVDY71Ifjtd8sZywfCM896XCYvSvwbHMqmuq/AuJueqRVW1oqFbh0KmpwAlcFJmnS3Pbq2x5dunmvPi9uz9ONAaP8EshHYaOdz2d0O5N5tJ+T+bkHfuZn3YGXHh7OzLdwHfkFYLIfqw0DWZjtS/6B05NBGSWbvwhDx0ZBA1CkHeSw3wVpyITVXut5TDp7xmZR7N7VFfUC6MeiE7uDMkRwCb+ThVFT0Gy0/d3JdRIl0PCFdy73MVadU2Okd6OJsXZNCtxn3izjAkptVKTpoMNzeEP5VMfDK0IHeMrh5rtc3p1ogDpXZRdKxK0yi3lN7mv9c006SIkYLBhJKBFzAkUTewO1Nj5jZMCH0q8624S5rS05xFYcjjQBFEHDnswkiChuJOAOiX5QjKe3UumRpDd543xzCiNT/N4Q3lwVeH4jPHqxq3KSauIrHkgRe7obg06tboEq68EqOZURpfBe6GKFNIhmI1l7dWorEKE
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(56012099003)(22082099003)(18002099003)(11063799006)(5023799004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?2960py+JxyZt2tUHtVapmmaXkkzdfCriWpLDxBoFvQmqsfiptn+KSSJaOC?=
- =?iso-8859-1?Q?YKFPp5rwdYF7q6QqgfFtxGBIerMfoF506eCoGoWGGrr5pchOJ5q28C57HK?=
- =?iso-8859-1?Q?8irLdOIDhd3spajc2q+XOcWVcgfMeZmHbOvSe6dnn2sQpTPEC0sBHZw//s?=
- =?iso-8859-1?Q?pd59cFfrSY6TfH5I7J8xkKYxFu3pJCvPT7N6RHKYKt0XtcoEoenWpllSZr?=
- =?iso-8859-1?Q?bpZqs/LZZP2DusPMzOKipgZLvAcZleW6QlIuk//7VeEG87SPMDTE6ZjKe0?=
- =?iso-8859-1?Q?42A20CwD38u/EfKrCcA/l0xCqiQ0VuI93dNnGjT3qkJQZt7+0seJnOvpNz?=
- =?iso-8859-1?Q?S0dzFUQPiXudsNftF967s707f7cDbgeh+GWBpXoGSPbshvl6Fh1TsXCsvP?=
- =?iso-8859-1?Q?sS4suFBnsPHFgzpG2g5UOiB7MhQWEs5pTPTE85tWI+gpknzqc3k33JrPSv?=
- =?iso-8859-1?Q?m9m5lK7hQf3C6y0MLvRyR6vO6oj0zK+Kpxhatn7i+kyTJkHFgdvtVCThWi?=
- =?iso-8859-1?Q?mYotFZxfOGF8cMgBDaTUSCyzWNt4Hx5KgW++XBAkwcbJEcvc75dNFIRN6b?=
- =?iso-8859-1?Q?ToOnUohionzN06/9ihfzpZDnNKBgJdloGn9Iu+zC8yAtPZj2/GBabP+oK4?=
- =?iso-8859-1?Q?wo6k71peuXGwzNhPkagQJoIRKdIBO+5/RskZKZajHqDgtDA1anDz9X48LX?=
- =?iso-8859-1?Q?Cipf8rAqZrFObutFfk5/+ZQpGnD2ThFSr6bFkeYaan2tchOlZqRIKCPCA9?=
- =?iso-8859-1?Q?WV17MJtdaKoebNGi5rSctYAf5luYELaLBXlj29D0ku3AEE8ERi8c6G0GTQ?=
- =?iso-8859-1?Q?QIIBFlVy1qFzy+8DdqbjNXgtVbGVsoNQDHSncloaKTEOMujAvPdYWRl28c?=
- =?iso-8859-1?Q?GPJHH/RmY5OdWCIEZh8FtSuGPehZbbtFpHApdCcdbiroYy+MvdB766075Q?=
- =?iso-8859-1?Q?FkoFy1wPaep51G26h/XJSkfUa0Ml4ntE3J7tqzeHelja9qPQrd1Yzaa4Lv?=
- =?iso-8859-1?Q?l3fggexZ8Z3Ftu7b2DRKFARVCroR2mQEUF4CxMiBUT9dRos+3PLVUL3YDi?=
- =?iso-8859-1?Q?3vTn2rr4XHt/uCffYR+4c+PmPNp0eQxCGtWyeKDx2qYlO+1GBIuhYxAibH?=
- =?iso-8859-1?Q?OFCmVFr41Aw+IQSPw9HOe+h4MI2zUtUjMxyNojy10i5hzzQcWJg8in6DiS?=
- =?iso-8859-1?Q?LKKuoq4VxahilGvAzLS1VsXyQP19Fl04nOVCnV4tgYRUHtwPCWbBj7akOW?=
- =?iso-8859-1?Q?n+/Xr1iNIJEEReYGDdy54hiGYejm5sF40CX721aDWo0O0zmfdsQiDLOiDf?=
- =?iso-8859-1?Q?wXZdCEebjk4UjJRdmpe/ha2K1NxBJGr1qLjYhQ4v1m7DehqhmjSeQJfxo1?=
- =?iso-8859-1?Q?pQxnJOjp9sqscRftZcCnV5nJ1tf9zHaJQzDujA1x9WWhl1ZHWkV+7l50y4?=
- =?iso-8859-1?Q?R8iPegtgWoYCWEsbSVz/XnfIM4Wx8l2HXO0NS9CEgoVDWITaeaW46KU9M8?=
- =?iso-8859-1?Q?xuP5W94ANFZWEk0dQaHvxBZbjC83MnyHp5RVV1q61ylmWi3Vt+Mns46iZU?=
- =?iso-8859-1?Q?TJaVvXzmEIeLXV+44FgoChqQdUSMcVFUzJ0bxUJmYA3iP5WsT4nD4fb/Sq?=
- =?iso-8859-1?Q?Pb7mcJiyccPBFyGxhfpQ8RupdoWUhYLxmxylL8IqN+gaTGEuXjrUn9Zp/Z?=
- =?iso-8859-1?Q?iJ87Kpg9xjCjvgQmJae4GZQOvZrTeSNGHL91pHHt3cIBlVqK9N0m4QgeCa?=
- =?iso-8859-1?Q?q6zE4IHkaqMgW4TusxhRhV051BO7Z8snG2pc3tPU0WPvez?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f018854-fd3c-4971-f6bd-08deb63ae4ad
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 06:41:59.6121
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: g4kAahCvBXEjXTBXhmWYwID7Cve5gj6Z/XOzEYUkc61jKtTTNr7CnDCt5LBfYBvZL9xf9yAWwhKKuArg4FbE+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7882
-X-Spamd-Result: default: False [5.54 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[nvidia.com : SPF not aligned (relaxed),reject];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_REJECT(1.00)[Nvidia.com:s=selector2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: zDQD4W4ZJz4M53ajmfFpDD96rvHdOHDo
+X-Proofpoint-GUID: zDQD4W4ZJz4M53ajmfFpDD96rvHdOHDo
+X-Authority-Analysis: v=2.4 cv=Xp/K/1F9 c=1 sm=1 tr=0 ts=6a0d5803 cx=c_pps
+ a=yymyAM/LQ7lj/HqAiIiKTw==:117 a=xqWC_Br6kY4A:10 a=NGcC8JguVDcA:10
+ a=f7IdgyKtn90A:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=tpM8CJlwf7uhpglF1g9U:22 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8
+ a=FjrsIhHQ_oyyAy4d2L8A:9 a=efpaJB4zofY2dbm2aIRb:22 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDA2MiBTYWx0ZWRfXyj5CWr34v29r
+ vDCIC173Cubw38ntq8DleuNm4HpWJjUSxR27m3/uNlW5W6oTsYXuO9C5O/huOa1kOISt6sDN6ol
+ uxZf4aLRWIEc87WscXKvH+y430YrdGDLmu4Z+cYkzL/GhNyE1i0dHR7eP1f7w8vZIMhPvFuXTzy
+ vEIJG60WTpc4Kl2Z/5IiLLspEiXNeI8oYA9bcKvv8fhhbOo0NJPfkcLks+INJUuWqpLwblVamsi
+ DyxnhIq/uo4WmkLFa0NgSTf1JRSFjo0M4lUIMn5osO+Z2fIqXsQWmsglj9voqH9sxVmM7TD68sa
+ Z3QojoaUo8ILnWG1wIxsbbs94YHu5nWrtyjDFr+7BSUrLb/eLAnR+t91x8VGIuT/KXXqqn2Yfez
+ gvlfgShGt1AQD3n5tdM7ZiUj04in2EEZZF9JdsRIuGMUE7Nw8x5orm5yygt8g9zdMMDjqV+2B/b
+ XrNv8pE8XpGrTvTLWbA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-20_01,2026-05-18_01,2025-10-01_01
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	GREYLIST(0.00)[pass,body];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-289779-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[Nvidia.com:-];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-289788-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[ntspring@meta.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:mid,meta.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
+	DKIM_TRACE(0.00)[meta.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,baylibre.com:email]
-X-Rspamd-Queue-Id: 746EC58882D
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 64BFA58852B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 19, 2026 at 06:07:21PM +0200, Uwe Kleine-König (The Capable Hub) wrote:
-> While being less compact, using named initializers allows to more easily
-> see which members of the structs are assigned which value without having
-> to lookup the declaration of the struct. And it's also more robust
-> against changes to the struct definition.
-> 
-> This patch doesn't modify the compiled array, only its representation in
-> source form benefits. The former was confirmed with x86 and arm64
-> builds.
-> 
-> Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
+Currently sk_rethink_txhash() re-rolls the socket's txhash on RTO,
+PLB, and spurious-retransmission events, but the new hash is not
+propagated into the IPv6 ECMP path selection logic.  The cached
+route is reused and fib6_select_path() is never re-invoked, so
+the connection stays on the same ECMP path.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+This series adds the two missing pieces:
+
+1. __sk_dst_reset() alongside sk_rethink_txhash() so the cached dst
+   is invalidated and the next transmit triggers a fresh route lookup.
+
+2. fl6->mp_hash set from sk_txhash before each route lookup so
+   fib6_select_path() picks a path based on the (potentially re-rolled)
+   hash.  This is conditioned on fib_multipath_hash_policy == 0 (L3)
+   because policies 1-3 compute a deterministic hash from the flow
+   keys which must not be overridden.
+
+Patch 1 is the kernel change; patch 2 adds selftests covering SYN
+rehash, SYN/ACK rehash, midstream RTO rehash, midstream ACK rehash
+(spurious retransmission), PLB rehash, a policy 1 negative test,
+a flowlabel leak regression test, and two dst rebuild consistency
+tests (normal and syncookie) verifying that natural route
+invalidation does not cause unintended path changes.
+
+Changes since v6: https://lore.kernel.org/netdev/20260517174522.2232057-1-ntspring@meta.com/
+- Guard mp_hash assignment with txhash != 0 so that non-TCP callers
+  of inet6_csk_route_socket() (e.g., L2TP) fall through to the
+  default rt6_multipath_hash() instead of forcing mp_hash to 1
+- Initialize txhash in bpf_sk_assign_tcp_reqsk() to avoid reading
+  uninitialized slab memory in inet6_csk_route_req()
+- Check post-rebuild busywait return status to avoid silent false pass
+
+Changes since v5: https://lore.kernel.org/netdev/20260513204048.2721843-1-ntspring@meta.com/
+- Improve selftest reliability: suppress __dst_negative_advice() via
+  tcp_retries1=255 in dst rebuild tests so a real RTO cannot trigger
+  an unintended rehash; add internal retry to midstream and ACK
+  rehash tests to tolerate probabilistic ECMP path selection; fix
+  midstream baseline capture to account for packets that bypass tc
+  filters during the prio qdisc's TCQ_F_CAN_BYPASS window
+- Increase ECMP_REBUILD_ROUNDS default to 10 for reliable regression
+  detection with 2-way ECMP; replace sleep with busywait
+- Use tcp_allowed_congestion_control instead of changing the host's
+  default congestion control for PLB test
+- Use (txhash >> 1) ?: 1 to guarantee non-zero mp_hash, since zero
+  falls back to rt6_multipath_hash()
+
+Changes since v4: https://lore.kernel.org/netdev/20260507171319.1259115-1-ntspring@meta.com/
+- Condition fl6->mp_hash on fib_multipath_hash_policy == 0 to preserve
+  deterministic hash policies 1-3 (e.g., symmetric 5-tuple for policy 1)
+- Set fl6->mp_hash in tcp_v6_connect() and cookie_v6_check() for
+  initial route lookup consistency; move sk_set_txhash() earlier
+  (Jakub Kicinski)
+- Add policy 1 negative test; improve sysctl save/restore
+- Add flowlabel leak test confirming mp_hash does not alter the
+  on-wire IPv6 flow label
+- Add dst rebuild consistency tests (normal and syncookie) verifying
+  that route table changes do not cause unintended ECMP path changes
+
+Changes since v3: https://lore.kernel.org/netdev/20260505193824.2791642-1-ntspring@meta.com/
+- Use __sk_dst_reset() instead of sk_dst_reset() since the socket lock
+  is held in all three call sites (Eric Dumazet)
+- Guard __sk_dst_reset() with sk->sk_family == AF_INET6 since IPv4 ECMP
+  does not use sk_txhash for path selection
+- Guard __sk_dst_reset() in tcp_plb_check_rehash() with the return value
+  of sk_rethink_txhash()
+- Move tcp_rsk(req)->txhash initialization before route_req() in
+  tcp_conn_request() to avoid reading uninitialized memory
+- Add CONFIG_TCP_CONG_DCTCP=m to selftests/net/config for PLB test
+- Skip PLB test gracefully if DCTCP is not available
+- Save and restore original congestion control algorithm in PLB test
+- Default get_netstat_counter() to 0 when counter is not found
+- Skip all tests if tcp_syn_linear_timeouts is not available
+- Replace bash/pipe data sources with socat OPEN:/dev/zero for
+  cleaner process cleanup
+- Fix shellcheck warnings
+
+Changes since v2: https://lore.kernel.org/netdev/20260408070514.1840227-1-ntspring@meta.com/
+- Retitle "ECMP" to "local ECMP" to distinguish from remote ECMP
+  (Neal Cardwell)
+- Add fl6->mp_hash propagation in inet6_sk_rebuild_header() (af_inet6.c),
+  covering the dst rebuild path used on established sockets
+- Remove incorrect ir_iif update from tcp_check_req() in tcp_minisocks.c;
+  the SYN/ACK rehash is already handled by tcp_rtx_synack() re-rolling
+  txhash which feeds into inet6_csk_route_req()'s mp_hash
+  (Eric Dumazet)
+- Add ACK rehash and PLB rehash selftests
+- Improve selftest reliability
+
+Changes since v1: https://lore.kernel.org/netdev/20260408002802.2448424-1-ntspring@meta.com/
+- Use tcp_rsk(req)->txhash instead of jhash_1word(req->num_retrans, ...)
+  for ECMP path selection in inet6_csk_route_req(), making the request
+  socket path consistent with the established socket path (Eric Dumazet)
+- Add comments explaining the >> 1 shift for 31-bit mp_hash range
+- Use socat -u (unidirectional) in selftest to avoid SIGPIPE race
+- Increase tcp_syn_retries and tcp_syn_linear_timeouts to 25 for
+  better rehash coverage
+
+Neil Spring (2):
+  tcp: rehash onto different local ECMP path on retransmit timeout
+  selftests: net: add local ECMP rehash test
+
+ net/core/filter.c                          |   1 +
+ net/ipv4/tcp_input.c                       |   6 +-
+ net/ipv4/tcp_plb.c                         |   7 +-
+ net/ipv4/tcp_timer.c                       |   4 +
+ net/ipv6/af_inet6.c                        |   3 +
+ net/ipv6/inet6_connection_sock.c           |   7 +
+ net/ipv6/syncookies.c                      |   4 +
+ net/ipv6/tcp_ipv6.c                        |  13 +-
+ tools/testing/selftests/net/Makefile       |   1 +
+ tools/testing/selftests/net/config         |   1 +
+ tools/testing/selftests/net/ecmp_rehash.sh | 933 +++++++++++++++++++++
+ 11 files changed, 975 insertions(+), 5 deletions(-)
+ create mode 100755 tools/testing/selftests/net/ecmp_rehash.sh
+
+--
+2.53.0-Meta
+
 
