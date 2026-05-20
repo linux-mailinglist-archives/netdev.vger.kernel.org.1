@@ -1,188 +1,138 @@
-Return-Path: <netdev+bounces-289775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289776-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKvVJd5VDWr9wAUAu9opvQ
-	(envelope-from <netdev+bounces-289775-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:34:06 +0200
+	id eG4OAShXDWp4wQUAu9opvQ
+	(envelope-from <netdev+bounces-289776-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:39:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 406D65882F6
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:34:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B49458841D
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 08:39:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 41C673035318
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:34:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DEAB13025294
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 06:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C787C2D9EDB;
-	Wed, 20 May 2026 06:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7793264D5;
+	Wed, 20 May 2026 06:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hR2vvoAJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rVFK+2oo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D269313E1D
-	for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FB12772E
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 06:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779258839; cv=none; b=s84ccnsCQJXyYZQyYkQm2N+C/P/YSoQfj4vRtOIlzlbbjczvJDj9jc1yqbCgpBF9VF+JbEp+k4FuliRDD8KCF+FwgUPwqoTX8hY41HyFym3WJVVV3yZEoBVH4NWvTigR8E7XOxmx2P8mwtJiZjF7yIzFVfl056y/yOZZ6jEZixU=
+	t=1779259172; cv=none; b=c46eIv/ysVOygsndhbCe/NYYhodWPR1CtRRQyORx+P1z4K+0djnT/RzCFz+0ZMrSK3GY8FviBPz+tJwbSat3fQ3mvnFsxhShwd00/IzeNdT6G8fy6otib2lYEmqFnCBFx1C8jAMebEVhlGS4OWqLw3y+JTTtr86XIN9aWWxW3TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779258839; c=relaxed/simple;
-	bh=BXKTXqRWY+jw4lZIuldyU990q9WRyFqBBlaJKhn7oHQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uZPJRA/POxlaBDmOLv0pNZCbDB482rC438OVgKqr0nMLSVqqhuyJe70uOrytsD/4fyzANZqi2F8AEkePXptCFHLzEO2HuBdnWnb4Y2SluUqBs59mBExHSo9po0FvkelHG3hJqBxZciEeGPEUjQKIY8VyhuHfRR0dqVGvWv8QEe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hR2vvoAJ; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so52618955e9.2
-        for <netdev@vger.kernel.org>; Tue, 19 May 2026 23:33:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779258837; x=1779863637; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KcDk9aKx0mhH0+EawoiaNTh4jeIEq1KFEhd8k4aMQ9s=;
-        b=hR2vvoAJrHRwi04MdBXK5thsPs+pqPlQmZD24YZ5lw1tb6TSgGA0G0D6ZicuECau0H
-         E6yf8bwXB1/R2QYwwSnkV87RBl+KQ9V24wPJHF0NcCAYhqyGmJUGfpiROHpURARddh45
-         MuzOGuj6CTgX9wN1qgRie1FV42mB1vHhff2pC734nWwRykHqTGjHhrxw6AoMT6lvQcYi
-         Qdt+IajMTTgDHj+il6sOu3TVBPM0Qbd/nE9QI7P0oJUKISq6c6+L0alTjGX7/ygjXkAB
-         COlcjUEC2PXm/MDcJdZzU/KrcFu2IHlDNW2xCWFf6fac0cbxhimunNjPZb8pRtWStpgo
-         5fqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779258837; x=1779863637;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KcDk9aKx0mhH0+EawoiaNTh4jeIEq1KFEhd8k4aMQ9s=;
-        b=gtgTd84YwptP5UH8Q3bbSm2GAQJMFF1URVKKEN+DCackzOp1iC21uOntCRONiHoYYh
-         mkl05qlbLnBW0tmi/w+5OUZCVZp8eNR1pXqGkMjTfy1ePCj8uMc5ERQaAEatQWkvrzI5
-         lxWFjauPETX3YbgSaXlbeeZGNV51J80ibna5r4mlEk0ak+Ry6JGAkxvPVZY7tcC68Exj
-         g8D5fIigHCSWCSN6QCc5N5CXA1RABrscOFCLdrYgQ/8QAiiu0hVkPbWc4qARAAiU98eY
-         6+p04THN2Sfl0am9V3lqfnMCsadFmASlHG27mVyUsb6CnyS+o6M9LQztZv4dpZaCoRDY
-         i1OA==
-X-Gm-Message-State: AOJu0YzdhPOH/ZCzxjyU2Avt8oS4egMkceRe9MHQ8tVfUtbyz0tN6LRi
-	J+1KDYdvnG0boJsSv5AGVxSq9Hg92VS++rdUrTF4xLqS6xyl4G7le1EkpsRb3YGq
-X-Gm-Gg: Acq92OFsXZxkNLciNS1P6s0m7pe3PM1J1FxQjDpN4R4sbzpIYQdCREFHQEReInf4Olj
-	yRAfFJ6U74mHGcYSenuOII44J+zhlzMm1+orls8PpnBGKf15GvBloPhdOtcRPQf3B9p59l5B0cq
-	Cj1RDLu9at+v0Yen09yF2jXga/z7twKuDjjFT/DHO47cZQjD6SpKNaMl3G0NR5q9SLeAaSIXYea
-	iEbaE8tD3HjV0DAnD+ye8/sNQIMjCbydhZDtCkAtYhkLnaGZQU3KDf+pldJa1f8QTBeVwGudxCZ
-	4LT1jayX/yFsJD5OxAxBMM/SxWBWuBimLQlykbYTIIVEh5G/oOwgiNb6uO9AFIfZQFHofJ8y1+y
-	e8TL02EnLNUIiDuhVkupyGT8wZOdohYiuFRUYrvF6njN8N25k/ZqFn4H8FWiEEphlGZhkrHsvVW
-	X2/rx5RyF8qJ/evKW0ZwYd
-X-Received: by 2002:a05:600c:3492:b0:48a:52ee:5776 with SMTP id 5b1f17b1804b1-48fe60e79eemr356478835e9.11.1779258836797;
-        Tue, 19 May 2026 23:33:56 -0700 (PDT)
-Received: from oscar-xps.. ([79.127.164.88])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c833fcsm374290485e9.2.2026.05.19.23.33.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 23:33:56 -0700 (PDT)
-From: Oscar Maes <oscmaes92@gmail.com>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Oscar Maes <oscmaes92@gmail.com>
-Subject: [PATCH net-next 2/2] pcnet32: switch to napi_alloc_skb() and napi_gro_receive()
-Date: Wed, 20 May 2026 08:33:29 +0200
-Message-Id: <20260520063329.6387-3-oscmaes92@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260520063329.6387-1-oscmaes92@gmail.com>
-References: <20260520063329.6387-1-oscmaes92@gmail.com>
+	s=arc-20240116; t=1779259172; c=relaxed/simple;
+	bh=G9YObRbn7FyUP+d8PJ+dI4Tvdp/EUY0J8aKHGnzu3f0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QZsxN8FqrdswHOyJl82WPUSF1aB5G78Pf8givCnK9OgF1yc643Bjo2YDxext6IfDFc5jf0uWoVLlIETf+QZvprKL0oPd4Vly814/NVxoLdRfhswQt3tZLKLQd3+ghsB756AKwC64lIE5smjtQ/zsDPpfu5mbN+RY/dUGYgrvcng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rVFK+2oo; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7cf35e75-28a6-40b4-86d5-82b0aa9773bd@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779259168;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1VS63f0SQXp0YYrkvpu+Ut5OR4TyOTvu00sYK25+llw=;
+	b=rVFK+2ooCe+s1qUlIqsyYfg2l3g7T249B6Cw4prECA3od3StnQ8H4g3q64UorzEj8SsiKJ
+	jEboaAeRQ0x7mIzvJQ181P0LJOfsKCNsacEX331SnKe5aIrdGEhlOHMZuo1q/zzfAQpNf2
+	lpumkI0Z0bvtgPDkxGE9xtBz/Qo1WTo=
+Date: Wed, 20 May 2026 14:39:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] ipv4: use WARN_ON_ONCE() in ip_rt_bug()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20260519193248.4018872-1-edumazet@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260519193248.4018872-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-289775-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-289776-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oscmaes92@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 406D65882F6
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7B49458841D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use the newer and more efficient napi_alloc_skb() and napi_gro_receive()
-APIs to improve RX throughput.
 
-Also removes the manual calls to skb_reserve(NET_IP_ALIGN), since
-napi_alloc_skb() already does this internally.
+On 5/20/26 3:32 AM, Eric Dumazet wrote:
+> It turns out ip_rt_bug() can be called more than expected.
+>
+> syzbot will still panic (because of panic_on_warn=1), but non debug
+> kernels will no longer die while repeating stack traces on the console.
+>
+> Fixes: c378a9c019cf ("ipv4: Give backtrace in ip_rt_bug().")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>   net/ipv4/route.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> index bc1296f0ea69b0705e00e547a0d550129e03326a..3d62d45d84bda986db8b3592c0c7f5c81da3fb7e 100644
+> --- a/net/ipv4/route.c
+> +++ b/net/ipv4/route.c
+> @@ -1272,7 +1272,7 @@ static int ip_rt_bug(struct net *net, struct sock *sk, struct sk_buff *skb)
+>   		 __func__, &ip_hdr(skb)->saddr, &ip_hdr(skb)->daddr,
+>   		 skb->dev ? skb->dev->name : "?");
+>   	kfree_skb(skb);
+> -	WARN_ON(1);
+> +	WARN_ON_ONCE(1);
+>   	return 0;
+>   }
+>   
 
-Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
----
- drivers/net/ethernet/amd/pcnet32.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/amd/pcnet32.c b/drivers/net/ethernet/amd/pcnet32.c
-index 4f3076d4ea34..06d5432bb464 100644
---- a/drivers/net/ethernet/amd/pcnet32.c
-+++ b/drivers/net/ethernet/amd/pcnet32.c
-@@ -1220,13 +1220,12 @@ static void pcnet32_rx_entry(struct net_device *dev,
- 		struct sk_buff *newskb;
- 		dma_addr_t new_dma_addr;
- 
--		newskb = netdev_alloc_skb(dev, PKT_BUF_SKB);
-+		newskb = napi_alloc_skb(&lp->napi, PKT_BUF_SIZE);
- 		/*
- 		 * map the new buffer, if mapping fails, drop the packet and
- 		 * reuse the old buffer
- 		 */
- 		if (newskb) {
--			skb_reserve(newskb, NET_IP_ALIGN);
- 			new_dma_addr = dma_map_single(&lp->pci_dev->dev,
- 						      newskb->data,
- 						      PKT_BUF_SIZE,
-@@ -1251,14 +1250,13 @@ static void pcnet32_rx_entry(struct net_device *dev,
- 		} else
- 			skb = NULL;
- 	} else
--		skb = netdev_alloc_skb(dev, pkt_len + NET_IP_ALIGN);
-+		skb = napi_alloc_skb(&lp->napi, pkt_len);
- 
- 	if (!skb) {
- 		dev->stats.rx_dropped++;
- 		return;
- 	}
- 	if (!rx_in_place) {
--		skb_reserve(skb, NET_IP_ALIGN);
- 		skb_put(skb, pkt_len);	/* Make room */
- 		dma_sync_single_for_cpu(&lp->pci_dev->dev,
- 					lp->rx_dma_addr[entry], pkt_len,
-@@ -1272,7 +1270,7 @@ static void pcnet32_rx_entry(struct net_device *dev,
- 	}
- 	dev->stats.rx_bytes += skb->len;
- 	skb->protocol = eth_type_trans(skb, dev);
--	netif_receive_skb(skb);
-+	napi_gro_receive(&lp->napi, skb);
- 	dev->stats.rx_packets++;
- }
- 
--- 
-2.39.5
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
+
+Recently I backported one missing patch to stable because of excessive
+ip_rt_bug() prints. So I think it is reasonable to carry a Fixes tag for 
+backporting.
+
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-6.6.y&id=da54b3039d436227deebbc202cefea63bd318a38
 
 
