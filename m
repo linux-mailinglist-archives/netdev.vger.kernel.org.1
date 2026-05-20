@@ -1,50 +1,85 @@
-Return-Path: <netdev+bounces-289801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-289802-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHLzBzZhDWoJwwUAu9opvQ
-	(envelope-from <netdev+bounces-289801-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:22:30 +0200
+	id mPpyOyZhDWquwgUAu9opvQ
+	(envelope-from <netdev+bounces-289802-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:22:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83EF0588D8F
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:22:29 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F197B588D64
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 09:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 760833003337
-	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 07:19:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F21C13006981
+	for <lists+netdev@lfdr.de>; Wed, 20 May 2026 07:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4373537C0;
-	Wed, 20 May 2026 07:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC4C35E943;
+	Wed, 20 May 2026 07:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="KyaRiwwY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw1.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1486346AFB;
-	Wed, 20 May 2026 07:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A32A2853E9
+	for <netdev@vger.kernel.org>; Wed, 20 May 2026 07:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779261567; cv=none; b=UkUoMxwaOJCcdldrssO7D0YKE9LftsROhnWoRfpCd+8ZKxIUc4EFbTbneac2VD2Btqhuktmx4eQ5MMbImwDIk04bW5bkjz21rEMzeW5CzuooOHrVv6vQVS2N77ideJsbW/CLTdW8OQoL2HZqusdvM4mfzp59NMvxgOVOs9vUeA0=
+	t=1779261728; cv=none; b=pqfA6PYMY7S/rG87ZB8e7ReEZWanyh5xWiysY3fODQpPKN1mSIB2qZMwPYPCmHfffV4tBFo3LfMepjrZUqTltMrzkNWqMpSsirvTIasgPKdTNkD/qyYdfOofGO3Vw0A75a/e/qFbkfUc40NIv1hJ1UN3LLIyJ2ngOJ/CmsfvI5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779261567; c=relaxed/simple;
-	bh=DsB1y8zvTzcDbYBkIUfmm86TaPSA3yTGT1BxBy9/rjo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=h+paOKAaoMoMPAdH8q+sWtaruwOJnSECkV1wmlqey1bT9yKyRpKy1gPwnMVv/JMeAr4r6Wxbx9b5F9zECJ8TbDdci3+DXRqM9yMs3+5ZQyHgOClgKe0kphbGkMVU54IyCzicKSCvlbSPyhqBifJ1jawPh1y4FupETFbBUGnzNXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=hygon.cn; spf=fail smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=hygon.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=hygon.cn
-Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
-	by mailgw1.hygon.cn (Postfix) with ESMTP id 4gL2w32tVjzTNdP;
-	Wed, 20 May 2026 15:18:59 +0800 (CST)
-Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
-	by mailgw1.hygon.cn (Postfix) with ESMTP id 4gL2w31JxwzTNdP;
-	Wed, 20 May 2026 15:18:59 +0800 (CST)
-Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp1.hygon.cn (Postfix) with ESMTPS id B35114B60;
-	Wed, 20 May 2026 15:18:53 +0800 (CST)
-Received: from [172.19.24.96] (172.19.24.96) by cncheex04.Hygon.cn
- (172.23.18.114) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 20 May
- 2026 15:18:58 +0800
-Message-ID: <d832ba36-4b25-4ce1-a247-2520439f6548@hygon.cn>
-Date: Wed, 20 May 2026 15:18:57 +0800
+	s=arc-20240116; t=1779261728; c=relaxed/simple;
+	bh=3bvqf0dqNQo3Tdcpr3G+EkeYKrO9suyD30/RelQhkDk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cvvaSmUmdAXo+yx3wpG3uGuVG+KmCzaKU9eEhmmdrwW0rUKK4nzIEzerLFPrB2u14+qo1rInH1ZJOitLRcYu6Hoaa1hnzX0XQ0/FdJqjRFqiWJ94HM3TNwRctFDlRq8SUc2CU6ZSE7077UxyggaCENB6gAuXzDRRt3cPydnJYPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=KyaRiwwY; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-912278ed3b5so490036885a.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 00:22:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1779261725; x=1779866525; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZThCgnqofA+sjum9vrs5/ytlz4MJgWGh3GxxVtJxpE8=;
+        b=KyaRiwwYSvX3k6UY2fK6l8YlsjVEzpLv6biceycpqxz4DVjeUT82/YMafftq18zEw8
+         v0hOoXgiKtt7uO0EXkbtznx+UVnh9FbttzVo39s5giCJv3JOCbLElvRRGkaZvkWwx0P5
+         078oludD5XaK3atcztI7KBeoC4avEHZuGak8ZXkcqeHnYxR68VEy8V1Jqzwi+1DBx8L3
+         vl7ocY68ucR0pUPI/5n94j2mr89SPX0WEPX+FHcsdNTogWdu8FvPoOrRPjXJ4AU8OKUS
+         7QyI0bW1kA1cosVnSELtc7zrybzu3aO9T3Sshk4b2OCCl3Jmuik8OqSobRfoicAWNYTA
+         hW9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779261725; x=1779866525;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZThCgnqofA+sjum9vrs5/ytlz4MJgWGh3GxxVtJxpE8=;
+        b=YUv0zPz2MstbX24RSKVQ7YSf5te1J2b8l+Cd+Un37vwDfuko+SJBurXGfFiX0YjfKz
+         dNwi4e8ZeAgVHQZbWHqbIdX1Au3xe1ct37zNKyP2KN3+1xhA3r+LlBQmdzrPxvgpfyBv
+         4wbDftpF7ZpRTINcnsdt/gcQ2hppf74SZcA9QHdkK7ht7zP9CAUhwgSW9fnp+i1zXRN8
+         zLxuZhfnmRUkTKEq+xfhKXIg2QNV1vPxDvvuWVRRxNUWmdXwAaTX//NuIXfRyVwdEMdT
+         7XyMEPK5DuUb21Vzw/e/kczYrGLVvlkFTGClsyQifvpxx5zi+RzUNO7Aq+pgDhzBO1f1
+         IiZA==
+X-Forwarded-Encrypted: i=1; AFNElJ/vJAE+59ExI4cgWHH8MJcTmP2IZy6poAamCrSvf1yvMSq0c6KxxGBE5GAuOgaZEEMhj2GkBTc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL40sXhTAV5HzyNb6HxHFnZwIfdT/6y4KA4KUuJmp40hZo99tN
+	96/SA5DWxWSofqN3LOJdOyxZ4Sn4Yfg4qNtifCwoz31/RT2gqQpcwBFNj8XNQ6m5YY3O6Nr+ZXa
+	Enpq5Sv5mtyW7PTmxj9T0Y62Ls452Q0jpU3PsXDE+hUwGmXy1OJE=
+X-Gm-Gg: Acq92OFv3tzINXcwlKJ/LF00NUw6WOnwYmOIFfjo8r191MEeSGIyr2xy6FRYSKFeYg0
+	lL+c2/KqTyTUs85W2yJESkdWQImOtBwY8yEEHZbg+7lN5liZcwXykW4ar1/qzANOiXIXMGc5O8u
+	eQXLnPGQmObuHcyPB/Lv+acWGhkDEzMXX3TBh1L/trsPp7Qm2N2YUruwxZBoz3CmcF/ssHf9zDz
+	0z+ot88taPpHPEL4bOCL3DS5FzBBgvpmksXzrIJi3uqXlkSWei93k0MtK5bHkzXO4b5ISjcDYQY
+	QBejHrJabeg+dMmcDlXyhAKqLBnmWgwY7inDgJQ0KUnmfO/1Eghc3lThkjlKWKn6z4RWKfEhOPV
+	vKt2YF3evrsWxynRUPTzdpuwkjuSLjGi+eUpRa9uEyGNymQWZEnFJyuqSVAbzyq4fY0mlMY3MHd
+	0sDLUwz8kLCZ304Q480J6ULwzS18iM+tmHzRobqp1nGtgyMb5Tr9II1jPq57ZwXg==
+X-Received: by 2002:a05:620a:2943:b0:911:c9e6:20c2 with SMTP id af79cd13be357-911cdd4da77mr3495622585a.19.1779261725401;
+        Wed, 20 May 2026 00:22:05 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:6834:371a:9574:110b? ([2001:67c:2fbc:1:6834:371a:9574:110b])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-910b785935bsm2062937685a.0.2026.05.20.00.22.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 May 2026 00:22:04 -0700 (PDT)
+Message-ID: <2932f619-81a0-4c26-8adf-7a7d0256a137@openvpn.net>
+Date: Wed, 20 May 2026 09:22:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,142 +87,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mlx5: Update mlx5_irq.mask when IRQ affinity changes
-To: Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20260514074208.23353-1-liyi@hygon.cn>
- <99c99bde-9800-4a5e-b8a1-7cc472af52cd@nvidia.com>
-From: Yi Li <liyi@hygon.cn>
-In-Reply-To: <99c99bde-9800-4a5e-b8a1-7cc472af52cd@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH net] net: ovpn: refuse TCP socket layering with an active
+ ULP
+To: Sabrina Dubroca <sd@queasysnail.net>,
+ Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260517155645.3882533-1-michael.bommarito@gmail.com>
+ <agx0ZRfgc7WhuJtI@krikkit>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <agx0ZRfgc7WhuJtI@krikkit>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: cncheex06.Hygon.cn (172.23.18.116) To cncheex04.Hygon.cn
- (172.23.18.114)
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[hygon.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-289801-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-289802-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[liyi@hygon.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[queasysnail.net,gmail.com];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[openvpn.net:+];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,hygon.cn:mid]
-X-Rspamd-Queue-Id: 83EF0588D8F
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,openvpn.net:mid,openvpn.net:dkim]
+X-Rspamd-Queue-Id: F197B588D64
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Tariq,
+Hi Sabrina,
 
-Thanks for the feedback.
+On 19/05/2026 16:32, Sabrina Dubroca wrote:
+> mptcp calls tcp_set_ulp() from the setup, maybe ovpn can also do
+> that. detach() may be an issue.
 
-On 5/17/2026 4:58 PM, Tariq Toukan wrote:
+What is your exact concern with detach()? if we prevent other protocols 
+from stacking, what is there to deal with in detach()?
 
-> 
-> Hi,
-> 
-> Thanks for the patch. Looking at the proposal, I want to discuss two distinct aspects:
-> 
-> NAPI Execution Location: We already track effective affinity closely through irq_get_effective_affinity_mask(); NAPI processing is dynamically moved accordingly, including a forced NAPI cycle break if needed.
-> 
+Cheers,
 
-Right. I also see the driver flushes the page_pool alloc cache via page_pool_nid_changed() in mlx5e_post_rx_wqes(),
-so RX data buffers follow the NAPI CPU as well.
-
-> Memory Allocation Location: This is the core focus of your patch.
-> 
-
-If I understand correctly, the current design keeps the page_pool cache
-near the NAPI CPU, and the channel queues near the NIC based on numa-distance.
-Please correct me if that's wrong.
-
-> I have serious comments on the proposed implementation, but first I want to discuss the idea.
-> 
-> We investigated a similar approach a few years ago but ultimately decided against upstreaming it due to stability concerns:
-> 
-> High Volatility: The "current affinity" value can be extremely dynamic, potentially shifting multiple times per second depending on system load and tuning.
-> 
-> Performance Risk: Sampling a highly volatile "current" value to allocate relatively permanent resources (like channel queues) risks severe worst-case performance regressions if the affinity shifts immediately after allocation.
-> 
-
-I agree with the concern. But page_pool already samples node id change on the hot path.
-Sampling affinity only in mlx5e_open_channel() might avoid most of the risk?
-
-> Because of this, we have historically relied on numa-distance logic for channel allocations to ensure a predictable baseline.
-> 
-> Do you have any benchmark data or specific use cases showing a clear net benefit over the existing numa-distance logic?
-> 
-
-Honestly, my Nginx test showed no measurable throughput change.
-
-It's more of a functional issue I ran into. My setup:
-  - 6 NUMA nodes, 32 SMT cores each
-  - ConnectX-6 on node0
-  - node1 and node2 equidistant from node0
-  - 63 combined queues
-  - default spread: 32 IRQs on node0, 16 on node1, 16 on node2
-
-I moved the 16 IRQs from node2 to node1 via smp_affinity. The IRQs
-followed, but the queues stayed on node2, and I observed a lot of
-cross-node traffic to/from node2. Nginx wasn't affected -- the
-bottleneck is elsewhere in my workload.
-
-Do you think it OK to have an option so users can change queue location?
-I'm not sure how common this need is in production, so I'd appreciate your idea.
-
-Also, I agree irq_get_effective_affinity_mask() is better than the IRQ notifier:
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index b6c12460b54a..073239082144 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -2769,6 +2769,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
- {
-        struct net_device *netdev = priv->netdev;
-        struct mlx5e_channel_param *cparam;
-+       const struct cpumask *eff_mask;
-        struct mlx5_core_dev *mdev;
-        struct mlx5e_xsk_param xsk;
-        bool async_icosq_needed;
-@@ -2786,6 +2787,10 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
-        if (err)
-                return err;
-
-+       eff_mask = irq_get_effective_affinity_mask(irq);
-+       if (eff_mask)
-+               cpu = cpumask_first(eff_mask);
-+
-        err = mlx5e_channel_stats_alloc(priv, ix, cpu);
-        if (err)
-                return err;
-
-
-> Best regards,
-> Tariq
-> 
-> 
-
-Thanks,
--Yi
-
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
