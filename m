@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-290421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WE6bBMwHD2qFEQYAu9opvQ
-	(envelope-from <netdev+bounces-290421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:25:32 +0200
+	id 2Ny3C6IGD2qFEQYAu9opvQ
+	(envelope-from <netdev+bounces-290422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:20:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6742B5A5B60
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:25:30 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C45705A5A19
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B9B0E32121B6
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:08:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4C3AA30F58A9
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A8C3E9C2F;
-	Thu, 21 May 2026 13:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F0B3EDAB8;
+	Thu, 21 May 2026 13:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cK7in4bI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYEULBhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C80C3E7BCD
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037C13ED103
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779368765; cv=none; b=W4zjrA+fU7/S/tusdeaKLWExsSTQ1i93hCXl/hyTszyOqqo7pdFJ1fkHMaMyrr5iTKcsBJO5Mpw79eo2YFkGC9IJj7ITP2JH2G4QbS0sI+pJm/Sk1JxCDbe7rdHOmqfTmA6QgkKwJ2agf9OTlUuh/eXyiOrZPkE2sJbEiNHXdSk=
+	t=1779368768; cv=none; b=VBk7dW/q3YlALoNaDqP/zYD/dGMpTG0IK/6Te3Ot4tD3fl3nqwbLQUi5rR/ZgqbTKXUGQyZ/mkTEN013/YMbzznawnQdmP8QFA+dry+rEN8eJWgjdyWpBhwC+tD9FF7he9+pm3S2pmsbc/XcIgX8UipZty6Fu3EDMywJ7wWgUys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779368765; c=relaxed/simple;
-	bh=o0+Uc1eRtmlTav0dVo/A4qHTGC+dTGpAF8PyhhZm7+I=;
+	s=arc-20240116; t=1779368768; c=relaxed/simple;
+	bh=qY+plYrHUjyEKlEwdjvB+Ilsps0ZT2pjPeZqXaLCeD8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ei1LJ2bYizI+js7fOieH9FXo0OnoLaPz1dYYMSrSLEPf85pxfIy7/entDTt3/F5H2DIkGJkgKT9X6rsx24bgkpsVXlYnOFW1drNx4o+jIwqpOkysbE98mN2qW639kBoIo/QcM5efyE7S+LkBBTT+RuPCJuDhLyscOA+omiMOl4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cK7in4bI; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=EKagogrpbusK8e2P+2Cjmqm+4UUeSXZWWMBbGejiMDMHTX0IgsZ/mJUaOufGOwqyq/kJtnN2Kdl8G6iNNaK1S//MheO8kLcNHSkb4mVXCehiUyG+q71nweQPgqxuMuHxB7ECP+EkbAa6OBsG3k7i09qPncZgnGD8l+xP9wn2lbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYEULBhT; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-835c98b659eso5299833b3a.0
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:06:04 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82fbf5d4dc2so4263167b3a.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:06:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779368763; x=1779973563; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779368766; x=1779973566; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+tgtXH02C6zRbkOdG+i0RmY3ValCYoij0GD+Hz/Vc9g=;
-        b=cK7in4bIs4TuLszQ+fRTJ9Dt/L4Qu5FTqdp04ooxQdsPZ8RQCd+2HFL2Cq2/LEZVVM
-         y2q59LUKw8s8Mk3HMs8PIiktc9HlIPGqb87XfAplqjQPYmeVnokD2kYIYUj5O8LpHjAW
-         Ga6a3tZvZkErmKSq36JZth6fCMsyJ4yy11nrg2v2qt46Ial/K3vwG64BYv8SSavyiXwv
-         I45fASOzlO+UYoRV48ufEtAMZ3JeB7iWkbdywMIrHVHkq4USKV5MfJFxPTmS1e6sl0ui
-         0JaanlzthHvDXlzIoutM+SJkuwmfcmAiyy1648pJssPvG2CF2Lvv/AyCMcXA6iWQR3RN
-         0Pww==
+        bh=M7dYXWxYJ/dsjCJq8MPbJ/YlkTALMLc3dGOHkkHfnHE=;
+        b=lYEULBhT41yP7oCnoZ984Au+TwRDfq10EG7j7JJ5w76Tjw+kkVQP1hwacrLoifpiAn
+         IrDM5GrH2/UC9DorpTiP7V4UFNkmWuro6oTB0nEHRCIYMJtz02JDh+9efF/w46x/xbID
+         HYXrytq9WlDGC/KslYIKc8pMSkbM+cj7EetJYg1uMoVKrqSCSoOcZKtKmSDfAgLdCpXO
+         GMQIBzi/Bee8cgTYjioVciVBvK/hELmliGHQoaBTPytuIOf5J19nAH+scEHjFb4od+c7
+         6lv4Ebjhok5bHFQjARCTtVxbWoLH52iwCh6rVzykNWQFrNbAgZBbex9kgYJXUsUTXwgV
+         lt0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779368763; x=1779973563;
+        d=1e100.net; s=20251104; t=1779368766; x=1779973566;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+tgtXH02C6zRbkOdG+i0RmY3ValCYoij0GD+Hz/Vc9g=;
-        b=DNlOqQ3+kdMOY84fBN5qnKrAAJMmgoDL/9aVZiZMG3GJKxwt6JreyZhuRUTpv5b/Bp
-         QSl9GQnjr9CnBP9XmL5yaCf0GZF51ukV8+9rTfhZWEqd3P0diGmnHnY2F+L8+6FelZcR
-         4AO/2J3yHJlxwL3r45g2n1xyOqvFMvzTgRXQ5JeUp2NB15PMPifZJU2Z4PBtLvYmwc0L
-         7JGlgspP5T/NUPZew0/g6W7DJtwvM/bm64SruXlE9nKDYVRbfvrSiFtx7jszUlJR0h+f
-         F2lSaEQKhZ4qR3TQnE0FhV7YxL5yw+1++4VmKJ4RUyhx+YZXvYrV18r0qG8h1hEKJx8m
-         1PJg==
-X-Forwarded-Encrypted: i=1; AFNElJ/BXAjwQPGs897pD29JYkQ0BuNnpgFuNI6obMZxhmBP9PHKPsonWKAJiyZvDvczVaKk/L+yuy0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo0sCubdjxlSFi68A7aL8Z+BASO9d7o69zA4ZNRD5jXALDvSNo
-	eZRRQ1QxC5SWz9zN23O2Q35kaGejyw2SZlb7x/uPDhhTo2Er8wT5Bwk4
-X-Gm-Gg: Acq92OHWphZ5Fw0FsCtQhhpuYZq/JMw6LszzrXWOFII8r5xbVTBCbuKnhVxdXD4X4ER
-	SfYhDUrh89Wv1X24AmyIT4o1jHpkcR004U02v6qfr7qoLoadgWfxE2h9czd4Rn/QSLc1dHJzTvf
-	IeHPvLmbRzYSlXRolSYV+FavUIadelxzg2DPMpm5bIdirnY1pDVeBTgk+18062KODkbX0Vy0+97
-	/IzP2NxIQ8Fv6bJbTyr3V6EA0wBRfQlr4wTgMdQL5HOFZ9KhKzxFlSO0qDjp6Unz7KHWC2tY0kJ
-	AxyqfFrIRoNWhQ69wd5Y907pnbAvwxq2CvaGa4wkA6tfNGskO7QsYvK/pSkxPRfa0HCDWUhvx6j
-	2W4gUgWMyNioUYeZa/eHth9E70vzz1hk5EuCoMtK1p+ozj4iZQr+bb8NDbx0JqXM8SLp/Oetz4x
-	ZTUQFqa+eCE6FdvAtABZHokjXESFcAW+M2ArFGtDLEcmYmbK51
-X-Received: by 2002:a05:6a00:850:b0:835:41f3:f449 with SMTP id d2e1a72fcca58-8414acda757mr2821717b3a.13.1779368763468;
-        Thu, 21 May 2026 06:06:03 -0700 (PDT)
+        bh=M7dYXWxYJ/dsjCJq8MPbJ/YlkTALMLc3dGOHkkHfnHE=;
+        b=mR6sSOnFz5Obiw5yUSJKicQgM+XG8+OWYVy01XtncUa8hFLDy/7n/6+WbflOs1M5ys
+         N5Ey+Z2IS3aJNIznQnCKUsQbLHEPOl/DI4kzoTKFsXOrKIlA9tCQIRp48QDV4pd/Zgg1
+         sZA8s1TzeYkVMwDligJe4vbDd2YoSOc3VjlByRbx7CAQSnwnUXt0i0sGAB0RaQMrMx/J
+         NO9qVtPaXucWffIIPhfmmxjCqTIOsSNK3h6Lm05sHRZY0ZgWifpy5KOOE6/ljD43d7Da
+         MCLsCjhWO1pQvVe0F+EC0dWgY2/2C0Jk04YYSpAhj43z2EbAevFrlHCHqZlxHjrD7OU3
+         WRFw==
+X-Forwarded-Encrypted: i=1; AFNElJ8NNHuQl0WISAWphk/nHzDV2D8rylf446Oxx10PVOLB/g49sWd48QrHNO/Bx/994PNKHX0DuT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/5deG1RO+BjbASL71QpRiRIiouVD/xUfW646SCnhyobbQKBal
+	L9ozxSuU4LvxkG1+tV5B0yHqU3/ccBBELfeL+hChKuaHgY2i/Ub6CbQPDV4SNQ==
+X-Gm-Gg: Acq92OE8CkLUzsX6ipK6vt0IqVUC+Exkn2FN8+ecylGZL5F2+u7RIDQv/yeKB2O+smV
+	lv0v7uV1kJH8DArihR/p0GzRY6gS3dXzRxyWf7dY7COWn+W3wn+kAQ0LANNrUynx/McJEfmZKNu
+	58RvhvkfNI6fl0uQwrt9PbDCl/5zAUpiQZwBzwJ66U1rxi2Lzg83AFxACotahKTFUDwGGfmQWIj
+	P+bsPNSiQecFAZWmXjmQNKQbyJKDAGmA3v8c2+QFPRNbwvg/OHkAtnokYtJWDNltjMDCjsk4Zcx
+	xYZZ9oeff+gWIN5wGxxa1yWFExbg92RdDjnsdWO1h8b7oJaRRcq+IvS/Ts4oh6T7EeQfesvzxsH
+	O6DTzQK1fAx2H2sE7yyDrw1uem051T3QOS3YgEK5bNFXdnSOkP5pzOoH3DeqTLyy3R06zcngCVr
+	q68BYf6EoBoJEoMfNUCWuW+W+BpJsCycuWXojXGVgJ/loKubL1
+X-Received: by 2002:a05:6a00:419b:b0:82f:1369:7268 with SMTP id d2e1a72fcca58-8414adf69admr3131200b3a.30.1779368766276;
+        Thu, 21 May 2026 06:06:06 -0700 (PDT)
 Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-841549be20fsm1693993b3a.12.2026.05.21.06.06.00
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-841549be20fsm1693993b3a.12.2026.05.21.06.06.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 06:06:03 -0700 (PDT)
+        Thu, 21 May 2026 06:06:05 -0700 (PDT)
 From: Maoyi Xie <maoyixie.tju@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	"David S . Miller" <davem@davemloft.net>,
@@ -88,9 +88,9 @@ Cc: Kuniyuki Iwashima <kuniyu@google.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH net v4 1/2] ip6: vti: Use ip6_tnl.net in vti6_changelink().
-Date: Thu, 21 May 2026 21:05:54 +0800
-Message-Id: <20260521130555.3421684-2-maoyixie.tju@gmail.com>
+Subject: [PATCH net v4 2/2] ip6: vti: Use ip6_tnl.net in vti6_siocdevprivate().
+Date: Thu, 21 May 2026 21:05:55 +0800
+Message-Id: <20260521130555.3421684-3-maoyixie.tju@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260521130555.3421684-1-maoyixie.tju@gmail.com>
 References: <20260521130555.3421684-1-maoyixie.tju@gmail.com>
@@ -106,14 +106,14 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290421-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290422-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -129,80 +129,90 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 6742B5A5B60
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: C45705A5A19
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
+After patch 1/2 in this series, vti6_update() unlinks and relinks
+the tunnel through t->net. vti6_siocdevprivate() still uses
+dev_net(dev) for the collision lookup. For a tunnel moved through
+IFLA_NET_NS_FD, dev_net(dev) is the new netns, not t->net.
 
-ip netns add ns1
-ip netns add ns2
-ip -n ns1 link add vti6_test type vti6 remote ::1 local ::2 key 7
-ip -n ns1 link set vti6_test netns ns2
-ip -n ns2 link set vti6_test type vti6 remote ::3 local ::4 key 9
-ip netns del ns2
-ip netns del ns1
-[  132.495484] ------------[ cut here ]------------
-[  132.497609] kernel BUG at net/core/dev.c:12376!
+SIOCCHGTUNNEL on a migrated tunnel then runs:
 
-Commit 61220ab34948 ("vti6: Enable namespace changing") dropped
-NETIF_F_NETNS_LOCAL from vti6 devices. A vti6 tunnel can then
-move through IFLA_NET_NS_FD. After the move dev_net(dev) points
-at the new netns while t->net stays at the creation netns.
+  net = dev_net(dev)                    /* migrated netns */
+  t   = vti6_locate(net, &p1, false)    /* misses target in t->net */
+  ...
+  t   = netdev_priv(dev)
+  vti6_update(t, &p1, false)            /* mutates t->net's hash */
 
-vti6_changelink() and vti6_update() still use dev_net(dev) and
-dev_net(t->dev). They unlink from one per netns hash and relink
-into another. The creation netns is left with a stale entry.
-cleanup_net() of that netns later walks freed memory.
+A caller in the migrated netns picks params that match a tunnel
+in the creation netns. The lookup in dev_net(dev) finds nothing.
+vti6_update() prepends the migrated tunnel at the head of the
+creation netns hash bucket for those params. Later lookups in
+the creation netns resolve to the migrated device. xfrm receive
+delivers the matched packets through a device the caller controls.
 
 Reachable from an unprivileged user namespace (unshare --user
 --map-root-user --net). Cross tenant scope on container hosts.
 
+Switch the SIOCCHGTUNNEL path on a non fallback device to use
+t->net for the lookup. The lookup now matches the netns
+vti6_update() operates on.
+
+Also add ns_capable(self->net->user_ns, CAP_NET_ADMIN) before
+the lookup. The check at the top of the case is against
+dev_net(dev)->user_ns, which after migration is the attacker's
+netns. A caller there can pick params absent from self->net,
+the lookup returns NULL, t becomes self, and vti6_update()
+inserts the device into the creation netns hash. The new check
+requires CAP_NET_ADMIN in the creation netns user_ns too.
+
+SIOCADDTUNNEL and SIOCCHGTUNNEL on the fallback device keep
+dev_net(dev), which equals init_net there.
+
 Fixes: 61220ab34948 ("vti6: Enable namespace changing")
-Reported-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Suggested-by: Xiao Liang <shaw.leon@gmail.com>
 Cc: stable@vger.kernel.org # v5.15+
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
 ---
- net/ipv6/ip6_vti.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ net/ipv6/ip6_vti.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
-index ad5290be4dd6..dcb257411d6e 100644
+index dcb257411d6e..df793c8bfffb 100644
 --- a/net/ipv6/ip6_vti.c
 +++ b/net/ipv6/ip6_vti.c
-@@ -722,10 +722,11 @@ vti6_tnl_change(struct ip6_tnl *t, const struct __ip6_tnl_parm *p,
- static int vti6_update(struct ip6_tnl *t, struct __ip6_tnl_parm *p,
- 		       bool keep_mtu)
- {
--	struct net *net = dev_net(t->dev);
--	struct vti6_net *ip6n = net_generic(net, vti6_net_id);
-+	struct net *net = t->net;
-+	struct vti6_net *ip6n;
- 	int err;
+@@ -835,17 +835,24 @@ vti6_siocdevprivate(struct net_device *dev, struct ifreq *ifr, void __user *data
+ 		if (p.proto != IPPROTO_IPV6  && p.proto != 0)
+ 			break;
+ 		vti6_parm_from_user(&p1, &p);
+-		t = vti6_locate(net, &p1, cmd == SIOCADDTUNNEL);
+ 		if (dev != ip6n->fb_tnl_dev && cmd == SIOCCHGTUNNEL) {
++			struct ip6_tnl *self = netdev_priv(dev);
++
++			err = -EPERM;
++			if (!ns_capable(self->net->user_ns, CAP_NET_ADMIN))
++				break;
++			t = vti6_locate(self->net, &p1, false);
+ 			if (t) {
+ 				if (t->dev != dev) {
+ 					err = -EEXIST;
+ 					break;
+ 				}
+ 			} else
+-				t = netdev_priv(dev);
++				t = self;
  
-+	ip6n = net_generic(net, vti6_net_id);
- 	vti6_tnl_unlink(ip6n, t);
- 	synchronize_net();
- 	err = vti6_tnl_change(t, p, keep_mtu);
-@@ -1031,11 +1032,12 @@ static int vti6_changelink(struct net_device *dev, struct nlattr *tb[],
- 			   struct nlattr *data[],
- 			   struct netlink_ext_ack *extack)
- {
--	struct ip6_tnl *t;
-+	struct ip6_tnl *t = netdev_priv(dev);
-+	struct net *net = t->net;
- 	struct __ip6_tnl_parm p;
--	struct net *net = dev_net(dev);
--	struct vti6_net *ip6n = net_generic(net, vti6_net_id);
-+	struct vti6_net *ip6n;
- 
-+	ip6n = net_generic(net, vti6_net_id);
- 	if (dev == ip6n->fb_tnl_dev)
- 		return -EINVAL;
- 
+ 			err = vti6_update(t, &p1, false);
++		} else {
++			t = vti6_locate(net, &p1, cmd == SIOCADDTUNNEL);
+ 		}
+ 		if (t) {
+ 			err = 0;
 -- 
 2.34.1
 
