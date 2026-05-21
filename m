@@ -1,246 +1,303 @@
-Return-Path: <netdev+bounces-290278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290279-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QG4MIuXBDmrXBwYAu9opvQ
-	(envelope-from <netdev+bounces-290278-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:27:17 +0200
+	id kCYRM2bDDmqiCAYAu9opvQ
+	(envelope-from <netdev+bounces-290279-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:33:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B2C85A104E
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:27:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DAD25A11B5
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:33:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D6750301A32A
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:25:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 00099309E199
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C573546EA;
-	Thu, 21 May 2026 08:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907D5361DBF;
+	Thu, 21 May 2026 08:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R0SBYGF3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8VZUagU";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PxFd7xv9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513CF3016FC;
-	Thu, 21 May 2026 08:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BC035B137
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 08:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779351949; cv=fail; b=irIimjkL/GcJLyOmAPTt2svWYu4MjVXGaYGN7b18Y9D4YlvHkHTGUjZZdzK6G2aTJSdJdDkcrkw3hyytA9e1ICVUsJu+AK9uYrdDxO/5ewZKQXS4nglsRufLm2UmcUh167tZef2CBoNrmRIm0LeGQtfYfWmOHVwDR2L53vHbseQ=
+	t=1779352050; cv=pass; b=MSFF8Lek0Aio+oNE2xbQvfxUsrMKZm5RVrnxygzmll1Vn4eO+w+0McCWtA3Ab8QF3Prp9wHzHQUEUCnmUaYa8lKrxgeXpaKyayiBkcKctDlqg2B6qaXc8mxFoXLSrErNN5SyIzBr6uGzvQ6021gBQNxpihkamnpaoD3Yji7FdNk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779351949; c=relaxed/simple;
-	bh=Vno1eiQ5KOMKvQNPpr4MqWKChMsbWaHmnQA7AOD3kiE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=imLyMk3VWs9BoPoYYiOTYwrLpT7KGiAzuDJB1nL1xOhlVadJ7S+izWM0iZBSRYYG1iZA3+noiqv/N8MDhicZpaf0BW/KtPScqv5Co3R480vUldJdqdtgJp+49rmbH1YmWNjSKOPcv6yCwzGx1i2DpkBlEAWB6h6i+dQTWlwefiY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R0SBYGF3; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779351947; x=1810887947;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=Vno1eiQ5KOMKvQNPpr4MqWKChMsbWaHmnQA7AOD3kiE=;
-  b=R0SBYGF3wmwrHdLZCihDj8m51SS1HCgBEjaAkWJLF+3ioCXdrO9nqHlT
-   egkJQEaKwUHGroPfjaYo9/TN6r5xBLSMj1STbkYkpgXHgGezZnnJveFbf
-   ZtrXhiCpWP9T7nR5qSaosn45zz9cGfE6QKZ0J+bjJ6l8gz+feh3xYx5Oy
-   TsTT8liz/ICEjnveZ0TN4tc7IL+WdnSrlEwljcAMVp+4q4t0sgWd1m+1P
-   O2kaI4fSKZ8iLrgpxtM7VVgCyCOZAotHuQ3Ty6jRRzd6keKOvGF59lcGd
-   QPbrkDRWcOmeNqoNAZTxf3ikAUYXCsEobgk3t3wZJJtGg9atHDY6ViKnr
-   g==;
-X-CSE-ConnectionGUID: FXi04lWpSJOBqEJ34cDsWw==
-X-CSE-MsgGUID: pE5KryyJR3KZRXhzYRFXbQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="91658476"
-X-IronPort-AV: E=Sophos;i="6.23,246,1770624000"; 
-   d="scan'208";a="91658476"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2026 01:25:33 -0700
-X-CSE-ConnectionGUID: LE3SWCKAR3CKn/G/F2GkfA==
-X-CSE-MsgGUID: bWxTtDN2R6ys7FIK+uvNAA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,246,1770624000"; 
-   d="scan'208";a="236044529"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2026 01:25:33 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 21 May 2026 01:25:32 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 21 May 2026 01:25:32 -0700
-Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.59) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 21 May 2026 01:25:32 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IJ31sLIiBB2CWauNOsOJTlVR0iagBI4sho+IkY8h97rUrScucCUD/S6jtzyf2wiQ+J7qiLBfSzxrgOTFMXFHgjPriz6szdL5/Cdz+QyZkwOowpXdnGA0Mu+AhT94eYB1edjlo+2zwrdvPBi5ZT/14JxA8cmgMsffWZfEsTCfThQB25O0Zwo+KMv/JonCymo7ndHq/mwUB2sDGRmjSkmwoVq8LjP8Ucqb0WN4gn/0DtlCO1wTnVVGnw78fyp2pFDugt5PcNfhn2hqqxtcmdc8TWRnBfImdd+nPpwNlfvrabUIZ5kHUgxwrvzk16M5d8y1/cIpahJBLT5pLK3s3HXtYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TqxnN9EFK772KUToQHFP0eVVtPVjkOxwLCToJ8x1KC4=;
- b=kJ0FHo53e0l/Qa/H70QkEQI0qWqQMzZ8WvCJC8pB3Cb1euWnCnPnin6OCv6xrKdAqkjkwkwgRla1Vb7b+KZcvfCNyZzarJxsFk50TsDdcjGaXNfvhlm00kgXtCd7t/6XI82wX/Z18Gx7B+3hmhqoKSf0ZZUIyMXCj6V8xio3yAM0xXSA3IcpZMs+jiE4SNIbNZxP9JoQeOiqcFISoy7KKmiKmNAHbNKSX6m7W899rp9QltDOYAujAV+sG+0z96j+TSun1vI5ER3rfBw/Y0SlsEuvQlQlOXa/v2M8DmVWtPhE2z0ihueqgHeViuKRkRLyGDH8NXM2Sbje4NxKEZ3qng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by LVUPR11MB9811.namprd11.prod.outlook.com (2603:10b6:408:39c::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.16; Thu, 21 May
- 2026 08:25:30 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b%6]) with mapi id 15.21.0048.016; Thu, 21 May 2026
- 08:25:30 +0000
-Date: Thu, 21 May 2026 10:25:16 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>, Phani R Burra <phani.r.burra@intel.com>,
-	<przemyslaw.kitszel@intel.com>, <aleksander.lobakin@intel.com>,
-	<sridhar.samudrala@intel.com>, <anjali.singhai@intel.com>,
-	<michal.swiatkowski@linux.intel.com>, <maciej.fijalkowski@intel.com>,
-	<emil.s.tantilov@intel.com>, <madhu.chittim@intel.com>,
-	<joshua.a.hay@intel.com>, <jacob.e.keller@intel.com>,
-	<jayaprakash.shanmugam@intel.com>, <jiri@resnulli.us>, <horms@kernel.org>,
-	<corbet@lwn.net>, <richardcochran@gmail.com>, <linux-doc@vger.kernel.org>,
-	Bharath R <bharath.r@intel.com>, Samuel Salin <Samuel.salin@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next v3 05/14] libie: add bookkeeping support for
- control queue messages
-Message-ID: <ag7BbB7EsMokmH7e@soc-5CG4396X81.clients.intel.com>
-References: <20260515224443.2772147-1-anthony.l.nguyen@intel.com>
- <20260515224443.2772147-6-anthony.l.nguyen@intel.com>
- <20260520185121.6f380ad0@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260520185121.6f380ad0@kernel.org>
-X-ClientProxiedBy: VI6PEPF0000022F.AUTP296.PROD.OUTLOOK.COM
- (2603:10a6:808:1::8e9) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	s=arc-20240116; t=1779352050; c=relaxed/simple;
+	bh=Mea46XcA70zxzmyZqyD+qyEd3ZA9s42FFfqINPOE7cg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dBzVqqqizF9trxelcMtkvxD434Il/HK1bMDCjIV31RNL5Fw2V8nF0MwlyVefA7b0dP1DvjuBsVdDGTo1KdByNA8y+aVFofzhTKbcesLE+ZA8cM/5XzUEbQ2WdxveeoCvgurPxdz1PaQJspvug9b38tCBkgfWTDPghEPFR74UwBg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U8VZUagU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PxFd7xv9; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779352048;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rB3LIF/atoVQxpAbXGNRQNLpos0KUx8F+xO8WV7sZgM=;
+	b=U8VZUagUhR3xhguPgv+jzwkwgNboMvr8k1lCViWaoXh+BTOH8D0WDglE6S2miRz9tUVcif
+	F6PeZY8XWmBJLoRXo9n2i2IOPLhCfEUB3LtpUZ8KK8w3giZ3PnSS9ratQrMj1GzCGDxsHa
+	nJJH/ILS5maOj11iX90whB9hcEv3s/M=
+Received: from mail-yx1-f70.google.com (mail-yx1-f70.google.com
+ [74.125.224.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492-z4FvYmoXN-mQY73zLMfIcw-1; Thu, 21 May 2026 04:27:26 -0400
+X-MC-Unique: z4FvYmoXN-mQY73zLMfIcw-1
+X-Mimecast-MFC-AGG-ID: z4FvYmoXN-mQY73zLMfIcw_1779352046
+Received: by mail-yx1-f70.google.com with SMTP id 956f58d0204a3-65db7715a7eso2218657d50.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 01:27:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779352046; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NwqpBCZMbTbgFQ6akcr2ouiqUH2gApJ5EmX4AB+kWsint27Tl/+qud3XjybfW6cLAu
+         FCj+Y+qDVQmDl0MUnOhMsj/1qx4OpnqL58g1I8ifE4JExDvBbCaiJg8844F1oqTcZ3VZ
+         //bKdzudfyuQQx/INgBTt+8MGfhzFwYRSbvh7s4/a1eHHXZ/gFuDHj5AqcWuoYmEOetf
+         Vu+/0iI6BSR8V+8OT3xkBSX3iD1EtOKE66qiZ3gKluc9O+MnNDnJGQ5aYjPEfuck9T7N
+         JYWQdcqCjedG94H74VOeQsii3wjHeepAUpVxRVedijPVJq+BfMWxQCUkeqKZk4w/zlIT
+         KiLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rB3LIF/atoVQxpAbXGNRQNLpos0KUx8F+xO8WV7sZgM=;
+        fh=4uzLhCs6Suw8Jewm0pzPBkaoKaa3ghLXolxFTfJHmUc=;
+        b=QRs2WrI86dZD5xMrgBSkAslnkIvZoekY0eY58tzOb92LXgZbDXHCEYaeyDBZ/Iw/1D
+         hoSbiN7h8lg9ACJC3Z4kjXuoWfanxSBBaIyx7yJdzkMrwHoGZllUEkLplpBeUoPDgNZj
+         5DjWHCuslQozZRRZIZ4/bn00VFPCh0/jFVDBs4xxd9DcXhZjTAM+Quuiv4S5PpWmjM/q
+         lkdLCh1DDzx4zfqME0iFox5ziic0q29fYdMvdIu0Rj0KshmWiCIp2qGg+Xys+TmvP3Bz
+         otvrsQlnjmA0ENgWPCWf0DpmDO8IjEuGw2povLqweiTNYaM8g4SLa8nwigcX7nDp9BWG
+         irAQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779352046; x=1779956846; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rB3LIF/atoVQxpAbXGNRQNLpos0KUx8F+xO8WV7sZgM=;
+        b=PxFd7xv9n5Lh1trRRIkPAY7LZu/Wzo99r+UATtnqVECSVvybuDD50SwCYpEQGqL+HJ
+         JwqBIi28MkizhMFkuAGDtzTrHe4ARSxKLNteND8xkg4vWudnbnVsMrpa4FKa6vLmhN8R
+         XL4uBRm1nVjXxh+V4yC56DwYPFYlunqsJ9yrbGTT0nykdfj46Ew84JCaqzkFostmSZU5
+         bKsl/zlglluoYTLSu7naM4KINIBnNBBDtHrkrfpbSCKckwNgWto1cknNmX3FlTP5vzHX
+         Z99RfWf/XFq13hBMQiIReak6cesY3flXqusRMWkFY5HGb1kQgqCk3ny2/TeRDmDmbXBW
+         qiwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779352046; x=1779956846;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rB3LIF/atoVQxpAbXGNRQNLpos0KUx8F+xO8WV7sZgM=;
+        b=J1xPtG7cCf/8eOLOTYLvSFofvXP+Gl8W5rSSueslj5qqzieuRtHVhuq0lVIY7jDDQQ
+         SuVbORXKA2VXYeEvt/1swUJQz20xdkJqPtuyGOIUuAii3pXQfQpLt6HvJ9aQKWmge+ZR
+         NmnMuq8Q23X5sf4AmktbGTm3RMZ2nkUkIeVcV/3F+pcsdk8g70HDE7Eb8js//q3IX6b7
+         F84HuR+gzZch8u21EvG1WH0m4g51X9X90G0SWV+Fx8+TAVbr+N7LfB8CiJ9+VqxwXEaH
+         THqZoRE2xTD2IphbyEjpwwlZuuokVObdyVFzqMD2Ta+109kVIGzCuhDDJ0z3/SsVYWjm
+         jRZg==
+X-Forwarded-Encrypted: i=1; AFNElJ81nC7UpTkFcQ5DgykTzXMp+tflsjzQIslWlgeztzVLeakTQqvma0i07Rjvn1SOP0r1ODXOI6M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQeJuUPLCzs3CdFYcfKibLlm3a0pQGQ9ImpKzEKgIPyRGUnT3T
+	q1MsZJ9lkDXVjdBX02XZnAL+hxd/ry+4JlnKu+rr0XTogpOIMkSV2dTq5YhC6GKxkf4V1ir4yOB
+	eIwoOjl0oWft6Dk9PtzWVgaGwzM4Ex5iM/WO+klS2k2W4FVzZQDhfemv+8DjfkChq1yU+gb4nN4
+	yomNHl38tY8kaKIvEjP5APf+Pcui75LYXx
+X-Gm-Gg: Acq92OHneXeIWPpCRBT9TvBXHP4vHp+AE9Cx9sGaSm/XhgUha9UR9sm/jJ8+pScmfsx
+	WWohUnUFXVDilOMOqmF94/4L7ggLiq3IvzN2zTVrusC+vjQlAlog054uoIxFZtx9Z2Oy3ZpaouG
+	RwGOcai+GsaTCWssceKFaVBWi3pHLUglbonMnYsoanze6N4BR6qtPDDHotXXPtRVvhJXgdxmdHX
+	3J4X+C5ae3J9Q==
+X-Received: by 2002:a05:690e:400a:b0:65e:3df3:1c71 with SMTP id 956f58d0204a3-65eae3402d0mr1402734d50.43.1779352046124;
+        Thu, 21 May 2026 01:27:26 -0700 (PDT)
+X-Received: by 2002:a05:690e:400a:b0:65e:3df3:1c71 with SMTP id
+ 956f58d0204a3-65eae3402d0mr1402702d50.43.1779352045681; Thu, 21 May 2026
+ 01:27:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|LVUPR11MB9811:EE_
-X-MS-Office365-Filtering-Correlation-Id: 91476fcb-7f47-46c4-c5b2-08deb7128504
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|10070799003|366016|1800799024|22082099003|56012099003|18002099003|5023799004|11063799006|4143699003|6133799003;
-X-Microsoft-Antispam-Message-Info: beUd9OpwC2afCcRiiDwrGs/BMaHZ3GHnfKLgvk+L7dT+PH8xdJ9klQGI7o6jqDdEK8odxXrdCSu8SJqThlDLUaO6Bi3j38rWQ1pqNLIY2wp//fBbP/yOhxjsA2gIzAOYtwlRhCRn/6qTX3aA7etW2hTquJC/jNtfQumpbIiJBdVEKUr0iBQsfJfGDkHx/vkMPh9PFgfp8+dwPHRrey/1pP2pLTaiTCOg9yMyMAvqI9eiFvPnjVhdP9TozbPkMLp0D9QYOvUnbYuNJMBg1ytYYNTOeg6rtXsY2c79vUyMx2FOSc0eSIs7SsIGUe/IJt9p5Sy43s0oOF7B/KUznSsYCgzXPC8IKFjC1Ie3CGHBKqb4bHrSA5BEh/F4MsjCE4OQvcDEIEiBmONBMulINsxuyOyaKDc+qSGcN41ckwDWKoi4hB4CVrzc6BJhvvNNynDj46XAotqTZvKrlauzxewfJbDqfgNUGntEx7Bd4vO6l6VR6cDZIBOIGr0jgzAkyHrAL+PQDA6CIPTXZreasuzNOSbYt7ek9A8ineRoe7jvWZ7d6P1TRMGwQdABovFSTfLSv8tlwQspYaXvsjSkL2RrzQRS8IRVl8UkLTpbfcTlVDGpJQy7FKsdCCP3jFzU0LRhuRIE0i6I3sQf4EJL2RkWmu9E1qQAYy7o3TMo9pWyLXdpA3R5DaQ7WaD79AQNT4U2LVS9j6epzAP7HrZ2zP5GRA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(10070799003)(366016)(1800799024)(22082099003)(56012099003)(18002099003)(5023799004)(11063799006)(4143699003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+93helK4e8cVjWkgj19h62GBYl3H6/MB+gug5H7XGVYtNsQxAEPmz7XO525y?=
- =?us-ascii?Q?5ns3rQ13H8uZ/HiTF+D3Apb8RhZ3dykvJVAiTMEIeGeXNpcNPvvStNI49MC8?=
- =?us-ascii?Q?QDZI4ah0isl31Z8PVCxTvBVWLf2u22U6PlnQ6wvZG68/IjilIhwxxgD+f+oq?=
- =?us-ascii?Q?kYl21HEJOXYwsSh1lyhhmsiq7A8f4wG139nUTiDxQGi08VN6RnU4IvpfNarV?=
- =?us-ascii?Q?DT6HFEXoyfMzv3FjaukFJpWJe9u2tqfAh9CM4+2Y7T5iAGQJ65cVX5jwXj/c?=
- =?us-ascii?Q?9UWz2I9L+MfjSD1ibe9QFyHwlhKWllZBFVKdYLDGSCLOBLrZuPI58q8hndir?=
- =?us-ascii?Q?ZcAsnk1XFp9zTNXVPindNig+YuUWXXm5KRGqow5Z4SMHJxrEe0m+8lY0/seD?=
- =?us-ascii?Q?F6RVKiL8VySPQceItAqjnoUztTZLnLV3rI0Fv6WrJeUtzjfuKZYjZCGIBC4b?=
- =?us-ascii?Q?JiMYwuvQI7M2TQpJ4jEEwoEZUBhQNSCH9i1KI78B42PWaGpb2JzVL7e7yEPj?=
- =?us-ascii?Q?8ihcRhDat/MrzGt9/44nxELJWk28vNgbJi8xmqNZ++bSuIoZNR+neKgMmN2S?=
- =?us-ascii?Q?bYSlXjiKA8dJpejXpnJ+RLXeJimMl67KbX0YXkWRaMQvH07HuYp/gxa3ZiKd?=
- =?us-ascii?Q?mbz7zY6R+HvaFRRnGLTBpphfVIrIsveyhpaeulFpTUycvEjllqU+fo2dqlc9?=
- =?us-ascii?Q?0/WglBcPADq4DP5xxrkII+wvg01ud2GhsdmUXqwy0SIqKL+gmMVe30uuxXpn?=
- =?us-ascii?Q?J52ra0l8VsL3uw3/NZdCE0GKDBItBspVwVBF6wC+37zgExoUzjW1zwPIftNL?=
- =?us-ascii?Q?E2L99Luo8fV6H3Z+MM2LaD947UjRi6zPB2QVzjF81TikqZXmv6VASaDas/Bj?=
- =?us-ascii?Q?+4zCpubozVZNYghPmNcgY97c+FqrjzpQG15uBKIxmAaFyHIGgsQRXt+8o9+3?=
- =?us-ascii?Q?Zexn7H0PSsl4cnml95p5BdB10kQvM/mws3+Be2/s3KnS3frMYiHiavMi+nwb?=
- =?us-ascii?Q?dtWGJZzH8v9Fda1Klo7G/z8609DYAT0UypeUDI73xT8x1wiXsT0uHFD9P3Ox?=
- =?us-ascii?Q?l0IsL2qruFHuCIMvkYj4+hFGXzqCTqWKNN0p/2zSN/hh9fn7mdDlQXxBnjxZ?=
- =?us-ascii?Q?ICd+6ol4+ClGx6eVGLXtdG0tVBAzgKN3XK6EFNaQayw5DZ4v+KY0sshZ6FZC?=
- =?us-ascii?Q?oxCUA1+6+/qEVoaHzolyLJsy1v6vADnwcA13mKjPCSJ6F8bHU31h4DSm211p?=
- =?us-ascii?Q?7e2abkc/jXQpBHQhrhgXIYMJUY9tbVS/ebPLsIpf7lEizlN4k8SZMoylzt9t?=
- =?us-ascii?Q?QnYU7Df+1kecB4dc1jR3HMwf+auSfTz/QsvKcN+j3brpaPbkSXWVihA8LJLR?=
- =?us-ascii?Q?cePYJMgtdLLEhJEHq+x4utyLlEK2AqFqv619KQzjkySHzgC15sFaFuiBP8Dk?=
- =?us-ascii?Q?S0ls9nuQwMcm17LaabxtJ2NWSJus0yafHrlC94ODMxPi/+XswNNcEP2sliMQ?=
- =?us-ascii?Q?SS22U6NeHfpm93ux+qlJWlf/DaiUGhZ1GTSv26XFZeBlMowVFQbmhEUqCBzw?=
- =?us-ascii?Q?QCZeExU4twoxR5M/lQujKV/qUPYpA1VZWrNVleWEetcQOcovOcbspvbUFBEj?=
- =?us-ascii?Q?u/9QdvKzV2xDtcffOMduWaSNMvUFJ5SsnxANuKKhBUQmQH86gdS09Qncjd3l?=
- =?us-ascii?Q?5/VUTDONuVWaYlnTg7e7KWsqc9G2zYbTudqMx4hkcJIB/MLn3Fi2L8SiwCp/?=
- =?us-ascii?Q?8hMUYAe93H7+cTMVorSulj53NuWISqNdWkWcVSTZ6H2FT7S6GtuRg2z51u/j?=
-X-MS-Exchange-AntiSpam-MessageData-1: fdTWiKaOBOJpjiMoTwCR6MgaHx27eOHp1aY=
-X-Exchange-RoutingPolicyChecked: qQwPse/52y6TgIjYBFPDawOdghNGeJPj7sOXiTEqOubHJ1B+GeDisH9F0RCq1hIaMpCuQZxeMczkPLDfAYXrhF2r/CMFIbMAdQE/JT1kp3cW6vAa0M7ydrEUnOfr8JBANKDEiwRaZLoJkrM68EiwuNnEwzyFc6vOOb8Ku5vWv5PLJnM7U1LUF5D/riyeeVhF3cOzeOrJkcgAckgWjeWvYn+RSqhDkFWFzdckNsq6jYx2JRYO+mxbu21MYOcA/TjTR+5nXhOVdZ0Bm0mGqwm2lQb6aMBilIOIl52Q9c9ng2CW1Lt+Gmgyd7Z0NvzR4kP5jk4+zRYm5kfqFxSGrUURbw==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91476fcb-7f47-46c4-c5b2-08deb7128504
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2026 08:25:30.5346
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BdaWEHDwyxsCyXlPMK69fyBEaO1DIWokg7Q46SNd45SLGtDdOs1I0PJv6F5yFffShyFeMr5B5FkGUx9PjhBvCwnunWF4X010xV2C9uab4J4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LVUPR11MB9811
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+References: <20260511094504.1619893-2-dtatulea@nvidia.com>
+In-Reply-To: <20260511094504.1619893-2-dtatulea@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 21 May 2026 10:26:48 +0200
+X-Gm-Features: AVHnY4KzvfnK96jq_WEM08qHvg7RJR8HuiYmXJ5atCT1OCaQOTYbbzhAXG5NZTQ
+Message-ID: <CAJaqyWc6gA=TU-YMYdttH3_MjBo+644kgmah1XZnvxP58Gxzag@mail.gmail.com>
+Subject: Re: [PATCH] vhost-vdpa: Expose ASID group change after DRIVER_OK via
+ backend feature
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, Shahar Shitrit <shshitrit@nvidia.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290278-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[intel.com,davemloft.net,redhat.com,google.com,lunn.ch,vger.kernel.org,linux.intel.com,resnulli.us,kernel.org,lwn.net,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:dkim];
+	TAGGED_FROM(0.00)[bounces-290279-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[eperezma@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 2B2C85A104E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 6DAD25A11B5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 06:51:21PM -0700, Jakub Kicinski wrote:
-> On Fri, 15 May 2026 15:44:29 -0700 Tony Nguyen wrote:
-> > +	guard(spinlock)(&xnm->free_xns_bm_lock);
-> 
-> Quoting documentation:
-> 
->   Using device-managed and cleanup.h constructs
->   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   
->   Netdev remains skeptical about promises of all "auto-cleanup" APIs,
->   including even ``devm_`` helpers, historically. They are not the preferred
->   style of implementation, merely an acceptable one.
->   
->   Use of ``guard()`` is discouraged within any function longer than 20 lines,
->   ``scoped_guard()`` is considered more readable. Using normal lock/unlock is
->   still (weakly) preferred.
+On Mon, May 11, 2026 at 11:46=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
+>
+> The commit in the fixes tag blocked VHOST_VDPA_SET_GROUP_ASID operations
+> once DRIVER_OK is set. That is too strict for devices which can safely
+> handle this during live migration flows.
+>
+> Bring back this behavior under a new vhost backend feature flag. The
+> feature is supported by mlx5 and vdpa_sim devices.
+>
+> Fixes: 3543b04a4ea3 ("vhost: forbid change vq groups ASID if DRIVER_OK is=
+ set")
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+
+Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+
+> ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c |  3 ++-
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c  |  3 ++-
+>  drivers/vhost/vdpa.c              | 13 +++++++++++--
+>  include/uapi/linux/vhost_types.h  |  4 ++++
+>  4 files changed, 19 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
+x5_vnet.c
+> index ad0d5fbbbca8..f89177957c76 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -2906,7 +2906,8 @@ static void unregister_link_notifier(struct mlx5_vd=
+pa_net *ndev)
+>
+>  static u64 mlx5_vdpa_get_backend_features(const struct vdpa_device *vdpa=
+)
+>  {
+> -       return BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK);
+> +       return BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) |
+> +              BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK);
+>  }
+>
+>  static int mlx5_vdpa_set_driver_features(struct vdpa_device *vdev, u64 f=
+eatures)
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdp=
+a_sim.c
+> index 8cb1cc2ea139..253c7fb35ea0 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> @@ -428,7 +428,8 @@ static u64 vdpasim_get_device_features(struct vdpa_de=
+vice *vdpa)
+>
+>  static u64 vdpasim_get_backend_features(const struct vdpa_device *vdpa)
+>  {
+> -       return BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK);
+> +       return BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) |
+> +              BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK);
+>  }
+>
+>  static int vdpasim_set_driver_features(struct vdpa_device *vdpa, u64 fea=
+tures)
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 692564b1bcbb..67b3f49fa709 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -682,7 +682,8 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa =
+*v, unsigned int cmd,
+>                         return -EFAULT;
+>                 if (idx >=3D vdpa->ngroups || s.num >=3D vdpa->nas)
+>                         return -EINVAL;
+> -               if (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK)
+> +               if ((ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK) &=
+&
+> +                   !vhost_backend_has_feature(vq, VHOST_BACKEND_F_GROUP_=
+ASID_AFTER_DRIVER_OK))
+>                         return -EBUSY;
+>                 if (!ops->set_group_asid)
+>                         return -EOPNOTSUPP;
+> @@ -791,7 +792,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *fi=
+lep,
+>                                  BIT_ULL(VHOST_BACKEND_F_IOTLB_PERSIST) |
+>                                  BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
+>                                  BIT_ULL(VHOST_BACKEND_F_RESUME) |
+> -                                BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRI=
+VER_OK)))
+> +                                BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRI=
+VER_OK) |
+> +                                BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER=
+_DRIVER_OK)))
+>                         return -EOPNOTSUPP;
+>                 if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+>                      !vhost_vdpa_can_suspend(v))
+> @@ -805,6 +807,13 @@ static long vhost_vdpa_unlocked_ioctl(struct file *f=
+ilep,
+>                 if ((features & BIT_ULL(VHOST_BACKEND_F_DESC_ASID)) &&
+>                      !vhost_vdpa_has_desc_group(v))
+>                         return -EOPNOTSUPP;
+
+Ouch to me here. By reading the errno manual:
+
+Nit: By reading errno(3):
+ENOTSUP - Operation not supported (POSIX.1-2001).
+EOPNOTSUPP - Operation not supported on socket (POSIX.1-2001).
+
+I picked the wrong constant even if they share the same errno value
+(by the same page of the manual). MST, is it worth changing it?
+
+> +               if (features & BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_D=
+RIVER_OK)) {
+> +                       if (!(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_AS=
+ID)))
+> +                               return -EINVAL;
+> +                       if (!(vhost_vdpa_get_backend_features(v) &
+> +                               BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_=
+DRIVER_OK)))
+> +                               return -EOPNOTSUPP;
+> +               }
+>                 if ((features & BIT_ULL(VHOST_BACKEND_F_IOTLB_PERSIST)) &=
+&
+>                      !vhost_vdpa_has_persistent_map(v))
+>                         return -EOPNOTSUPP;
+> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_=
+types.h
+> index 1c39cc5f5a31..ec1ff8a2e260 100644
+> --- a/include/uapi/linux/vhost_types.h
+> +++ b/include/uapi/linux/vhost_types.h
+> @@ -197,5 +197,9 @@ struct vhost_vdpa_iova_range {
+>  #define VHOST_BACKEND_F_DESC_ASID    0x7
+>  /* IOTLB don't flush memory mapping across device reset */
+>  #define VHOST_BACKEND_F_IOTLB_PERSIST  0x8
+> +/* Device supports changing the group ASID after DRIVER_OK.
+> + * Requires VHOST_BACKEND_F_IOTLB_ASID.
+> + */
+> +#define VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK  0x9
+>
+>  #endif
+> --
+> 2.54.0
 >
 
-I agree that using guard in long functions is confusing, but the longest 
-function in this patchset that uses guard() is libie_ctlq_xn_pop_free(), which 
-has 18 lines between curly braces and represents a concrete atomic operation.
-
-There is also scoped_guard() in libie_ctlq_xn_process_send(), which protects a 
-block of 22 lines, but I would consider it acceptable under the guidelines you 
-shared too.
-   
->   Low level cleanup constructs (such as ``__free()``) can be used when building
->   APIs and helpers, especially scoped iterators. However, direct use of
->   ``__free()`` within networking core and drivers is discouraged.
->   Similar guidance applies to declaring variables mid-function.
->   
-> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
 
