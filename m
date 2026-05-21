@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-290200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290201-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GJHoLGJqDmob+gUAu9opvQ
-	(envelope-from <netdev+bounces-290200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:13:54 +0200
+	id eCulAuVpDmob+gUAu9opvQ
+	(envelope-from <netdev+bounces-290201-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:11:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EAB459DF4A
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:13:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A362459DF0F
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6A1130BEEA1
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:10:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E04593043A23
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4666343D9D;
-	Thu, 21 May 2026 02:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF7C346FA8;
+	Thu, 21 May 2026 02:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cW7Dj58q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sf20Z5aF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AAE33E348;
-	Thu, 21 May 2026 02:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E79633F5BC;
+	Thu, 21 May 2026 02:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779329428; cv=none; b=iWRm3SyMfVEghh7S52Kgi9l2bN+MHRwlOHFNCGif9JuVcbq+Xa4Pe6eGaeFaCdWUgmBHd9vf2muS5qGNd5elwb6+M3HcXitBRS1S5N7NRdS8lgcm5e2nSJsmCY0R6fuNfXioPM7FZ+UuIaX09iP7+tFsyQ5sQH/FvJ4JRKVvIrk=
+	t=1779329430; cv=none; b=UjRU2ikWKBmRFQI9GwMLTEutrYmc5Rimn4hAnRJh4nLnqrpcJiWs7JDWcobBwNDJxwYkroShL4bUdoZUEdylnZAITrSh11U83SSa/H37esvC+K6BJLwQFShGG0HhmXvjQvDNqTbPe28EohNZAvdh/CwKaSIhsVvI8VtyLa+Rtko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779329428; c=relaxed/simple;
-	bh=JYWVZKsWEu4AOqw93qSduiZntYIYTahCBAm+Uk88Vsw=;
+	s=arc-20240116; t=1779329430; c=relaxed/simple;
+	bh=eozyLbpDdiloCRqtx0/ngaofjUmpN5fy7fLLFFFMWFM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DUHgUW10VCBOQAUN+SEHFyIZGDfMG427lWuUoqUbPhLnrNNM1RPePMTCpBYEf+Bzjp8Uf8EkChNrXpUWI61aDvwu4ZGsyxXITlNgt4xcTSFQ7Ry/Ezjx9jENlo2l2JknbLExXO7JeOSWYStJEXkljqrHTD+uNEDmXBMSzCq7+6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cW7Dj58q; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C9341F000E9;
-	Thu, 21 May 2026 02:10:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=byv2SlaF4jgl/UXuP+YkFGS3r/f+pFXCOiZjayBT7rzOEI8HACwUY55w+W1P417xwjdnfb4QBlcZUutMPK38mvbHuyG7B2xjYtTLrUo73SAwHbBhnOPFXfQo5PBY0f61am6lAcpMfHL+hBlTwNJFzzApH5ryFd5re3CGOmUPGu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sf20Z5aF; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D87B1F000E9;
+	Thu, 21 May 2026 02:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779329427;
-	bh=A2eiu4jRCST+cyQivatEZVXNGasrA0p8VcXeihk3UoI=;
+	s=k20260515; t=1779329429;
+	bh=ivDt/eXSZ8q8zdAd+yr/i20mMcVaiBKx5g2mCtrA0go=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=cW7Dj58qRso34AMHS0cZKY/rEJ/Sjfws6DwohO/rWUXaLvqLc3lE6gTakCOZzVPNj
-	 LFxd6sKFzHObi2KwKTm3zTb25kvL7KjL7OJ+T46JjJOXpjjyG0wKHpH43Qj4EU5zgi
-	 mQwf7gVu7vezHO7044QKd4yJWtaP+X8Rf5Gf3uxXenAGXfBvIhstup4VMgfmJUtZOG
-	 AaWkBJdm04ijTetNE8fAZVjr6XUHB4XkDT4/xabq1G0E6iq8IXqh2rECFNydy01ey5
-	 KyxELdGN/VOuuu4NFkT5bj95V7zExcFsHNlAwe5HXoOSjHi3SzEsLLaUOouAvEkM9X
-	 XHhTn57efA6yg==
+	b=Sf20Z5aFKCSFP8HNP8vxrhjXrmjxbV5nGPLL+1lNEYHLBhn4Dp3iPfaM39B5QlOa2
+	 AXyyjSiRX2qhcy2Ul7gjtsf7f5mX2dtRw7DJQujo0L5uAiBMI113uVk4n5B8wfdOEQ
+	 RAvgoivg9q+Mrb9BLbWP4dwWtZ2P+r7DBgymxWK1tI5skX9Oq1htz4f9dJ2U0r+FHi
+	 FrIUsGxS8XBBYB0igQ3UGl2kdUgQ/C16O96fe0JilPMsTRp03UJAUt508SUsSMTPKE
+	 NnX8zxuVjxzqJTK3CET0WZb0L8sHGW8nHM5E/V7GnUb9Haleno6Q95c0zDT/EmxZxG
+	 NzDOeEdhq2gIg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939873930C38;
-	Thu, 21 May 2026 02:10:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939563930C38;
+	Thu, 21 May 2026 02:10:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,36 +55,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] net: pse-pd: Use named initializers for
- arrays of
- i2c_device_data
+Subject: Re: [PATCH v1] dpll: zl3073x: Use named initializers for struct
+ i2c_device_id
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177932943713.3832404.16875991143751731467.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 02:10:37 +0000
-References: <20260519140101.1584946-2-u.kleine-koenig@baylibre.com>
-In-Reply-To: <20260519140101.1584946-2-u.kleine-koenig@baylibre.com>
+ <177932943911.3832404.650041739281306010.git-patchwork-notify@kernel.org>
+Date: Thu, 21 May 2026 02:10:39 +0000
+References: <20260519142710.1587324-2-u.kleine-koenig@baylibre.com>
+In-Reply-To: <20260519142710.1587324-2-u.kleine-koenig@baylibre.com>
 To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29_=3Cu=2Ekleine-koenig?=@codeaurora.org,
 	=?utf-8?q?=40baylibre=2Ecom=3E?=@codeaurora.org
-Cc: o.rempel@pengutronix.de, kory.maincent@bootlin.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+Cc: ivecera@redhat.com, Prathosh.Satish@microchip.com,
+ vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com, jiri@resnulli.us,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:-];
 	R_DKIM_REJECT(0.00)[kernel.org:s=k20260515];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	NEURAL_SPAM(0.00)[0.119];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290200-lists,netdev=lfdr.de,netdevbpf];
+	NEURAL_SPAM(0.00)[0.970];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290201-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FROM_NO_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -94,11 +92,11 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3EAB459DF4A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A362459DF0F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -107,20 +105,21 @@ Hello:
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 19 May 2026 16:01:01 +0200 you wrote:
+On Tue, 19 May 2026 16:27:10 +0200 you wrote:
 > While being less compact, using named initializers allows to more easily
 > see which members of the structs are assigned which value without having
 > to lookup the declaration of the struct. And it's also more robust
 > against changes to the struct definition.
 > 
-> The mentioned robustness is relevant for a planned change to struct
-> i2c_device_id that replaces .driver_data by an anonymous union.
+> This patch doesn't modify the compiled arrays, only their representation
+> in source form benefits. The former was confirmed with x86 and arm64
+> builds.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v1] net: pse-pd: Use named initializers for arrays of i2c_device_data
-    https://git.kernel.org/netdev/net-next/c/f186a3ae9061
+  - [v1] dpll: zl3073x: Use named initializers for struct i2c_device_id
+    https://git.kernel.org/netdev/net-next/c/a09dfac0296d
 
 You are awesome, thank you!
 -- 
