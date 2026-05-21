@@ -1,95 +1,68 @@
-Return-Path: <netdev+bounces-290525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290524-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SP+9IsM0D2rtHgYAu9opvQ
-	(envelope-from <netdev+bounces-290525-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:37:23 +0200
+	id OGWwFro0D2qSHgYAu9opvQ
+	(envelope-from <netdev+bounces-290524-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:37:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0CDD5A96A4
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:37:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEDDE5A9693
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:37:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 98E0F358540A
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:08:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A823832E5A28
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B51A30148A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146052D8385;
 	Thu, 21 May 2026 15:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="ruhfChTx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YoALMLLa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD8B33EF
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 15:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E9123BCEE;
+	Thu, 21 May 2026 15:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779376111; cv=none; b=AFsixXepnqUYAt6UGIuqzJfh1mQYqOlpI/6/y4mjdGSOSPRTM5lOkgfGdxznF99YaIwwPROPqTa+Xef4T4bodXcVQBUymKMARjaYpAiQd+h9NN+UDSXjp2H0O0xdrY6Q68jvmjCwRswK6n9MI85I36hRBcFd33ykhwS6AvsKt0M=
+	t=1779376111; cv=none; b=WEXtWcWOcabrQUcqv95QsyvI4gs3nyc3DwLkds+DwhzK+czxOKHy5xQuPEXGs7oo4W/91cmVGs3YOrvCDkbLD4VIHRIYO7j3+Udr7IkBkRGMuFCUVSRbfaiw9OVSFhZqt4Rg7TIoCsdiLRCHS2luV/XWWHtFg8S85+NXZI+lvH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779376111; c=relaxed/simple;
-	bh=MIEMnwZaaI8MzlytVI/SzwPnUTvl9nIqX7bLuUrzwE0=;
+	bh=jb34L8VcwgEauQgJyCRvP26vEIKsWar8YNnCNAzos48=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NJmuiRo+pY2Zm9HvZ1uuX6bvCQn1msB5C3gDNeDMSOuTJA7izyLq/ARX0AoP/8e+6dYqUFBHwzJbZLYx4fAZDbSfYCeetY4u4b805X6WAwhOuA5LPZEq+ZMJdqZDyjsPpWkwp41isqH8x06OikFjsk69suAWMRcJfgm9MDLN5tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=ruhfChTx; arc=none smtp.client-ip=209.85.217.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-6314c3818baso4788657137.1
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 08:08:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779376108; x=1779980908; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vP4DDMnmlizsQ9Dpg3n4UQuWai5cep+FUewvlTFey6o=;
-        b=ruhfChTxAaIi3WtHXiVubRKFtxpDIhqjRHeR8ZRnq+m9rN9uT44RQ5kod0z8LiW/+e
-         bzUSdt2v7eDCols5jv+iAuCvOzNunc5GJP/w2Z56x7NZ8smdHX1PrVzLNSbSTwX9QOXo
-         YUbxu0PQe2oDo6ZElJm8TOLo+sgtFa6Tzl0yYoXCP/GCvdxjROCnNRtIvc4inEp2I6ok
-         g2GqrxXStHVe7U8r4Z+qTuxokjbNku6ecQc8XBItci8rtt/Rucjigeu4tG8xiPRoIfba
-         /DmOWEBduSncAYy58Oeh8eYpmIc1J+YfVrFWK+9qOpxEcgPo7oe5u3y+WTODFcDOhFOH
-         gsGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779376108; x=1779980908;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vP4DDMnmlizsQ9Dpg3n4UQuWai5cep+FUewvlTFey6o=;
-        b=PJenUkd1tunBjJAZOgEioo81vvrNu5vou13FhdeGwZvAziG6wvAiGsESYYPJJqepN1
-         t8bdRaMB/vTSqEuH0gTV+U7Q3/eFsb97rrSfty6NZTcsUP5JZwQw6axYbtGWAFHzurXP
-         vIsHE7IJhfUJpKelHyBLqfE6WNfuVWZA13G7HjltjZNTeGUo+vHMi0tx34Q/llLVMjDH
-         9rpRwjDQLTDw08eiWbvBP2PkuW9SAsjOzVRqXA23eecu/c91+fthaidp1YTkkIEqaSE7
-         KQIwhIlYQn6FltiGO5hvjkkDJh37zCJk2nVqYunm4mVliTolWcNn9u6UsN6i/a+9RVHc
-         GvEg==
-X-Gm-Message-State: AOJu0YzsyISf7/7BqkWp1zdUxj7H6S3EiBN6ckmsiSqiPSZe5KurNxE0
-	AvovWBuAPC7RFRs65q64kdlFuQW7Lk2QrI1rhRH4zrdxXFSmfSFBgZdA2dPNVkinkw==
-X-Gm-Gg: Acq92OHGVn+5tccZAYXbFfaJTY9itxOlortxuzUQq2ZkK5soCVbvGTNbBmJ/qN/QqxN
-	AJ0RoJOoO/UAbkA+z1E1ZjCAZwsfFDQMBVoyNVVBYVRU7FtIZP5//PCB1/wA74ZRfBKpkztzgHL
-	tl4oSDsRBg5fmgiv2xCSXYxenCS1mULKWRNW+oG7YohA4VT4c1XAA+E0TrEkZ9AvTBHSx8/k61Z
-	OhQxP4zF8d2sYfIyTVY2Zu/J+/tSNY1uof9j7iolS9H/kBacxftG/ZbNUyyzEkJxp4G+279tsnU
-	p+22WX9Es0inQrxk8F7E+1X5T//6Wa/0X3e/uefjkVZpRcWaTucWoEhr+6vd8hTu5UqWt7dKnA9
-	pmVY2TZ2Dp1SzptaXAoIpJnnXywkqu2Xj69gOIEJ5nFTtzq7XWKPF1HQ2MXSktWfaKOZvAjBmL8
-	YyRO2wHvVujpwHPLWp6PG3q5ppboBI/F/yuWIq2MYGrjDZGA==
-X-Received: by 2002:a05:6102:952:b0:660:cba2:b6a5 with SMTP id ada2fe7eead31-6738d46a2c9mr2224143137.7.1779376108018;
-        Thu, 21 May 2026 08:08:28 -0700 (PDT)
-Received: from exu-caveira.tail33bf8.ts.net ([2804:14d:5c54:4d67:f17:d82a:d5b8:20a])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-679fa70c8d7sm881114137.11.2026.05.21.08.08.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 08:08:26 -0700 (PDT)
-From: Victor Nogueira <victor@mojatatu.com>
-To: davem@davemloft.net,
+	 MIME-Version; b=XmU7iYQZ1FTYqj0pUjgFoh3zdsCJRqb6Ut3rpN6jRENob90buoeMGFaJo6B7+40CT0XAkmIgNv+OU/nePiUIccqeWitFkbegssTXk6m39CZZA5SktgWchxHBP7ZSHctFnd2e5pC4QAqjVO4PnlWrS6FhUr/0emwtEfSQ9gKJ/FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YoALMLLa; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7D31F000E9;
+	Thu, 21 May 2026 15:08:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779376109;
+	bh=wsI2JSu5ZVhkCKTuqMWxdeMbkee5Xrcr6HitnmGytsQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=YoALMLLayXF0ALUJvhkhFGoFdVzju9pBQKZMMfkOBY48EHv/+PMq+wOzBeBqkMvC0
+	 jEGDLzN8o0T7QQ3GUJMV4ikUHeahRD4XwiXH92JXVwOjph81ijCfSWUwgcg3cvsKyK
+	 Y2geeg1mQ6qS6kum/uKa3560VFHIx7G0blOOAX7SK1NowOLYgaVbTZyrjRF2k7PzkW
+	 B7EypWUyjFPpZt78Ef8xaKU+2f/XK+YqCeThLk6NoFXjUIFakoLvcIkSssGZL67w5W
+	 ix6zomjqCftYvNKIywzx+6rQbCy+KEhxLYNot1coSDpeC/lvV+7GqgrU2TE3070n5i
+	 A9qkc1KqCRB7Q==
+From: Jakub Kicinski <kuba@kernel.org>
+To: nihaal@cse.iitm.ac.in
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	loic.poulain@oss.qualcomm.com,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	jhs@mojatatu.com,
-	jiri@resnulli.us
-Cc: netdev@vger.kernel.org,
-	pctammela@mojatatu.com
-Subject: [PATCH net-next 2/2] selftests/tc-testing: Adapt idempotent qdisc notify callback tests to recent fq_codel changes
-Date: Thu, 21 May 2026 12:08:11 -0300
-Message-ID: <20260521150811.1896373-2-victor@mojatatu.com>
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] net: wwan: iosm: fix potential use after free in ipc_imem_cleanup()
+Date: Thu, 21 May 2026 08:08:28 -0700
+Message-ID: <20260521150828.851544-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260521150811.1896373-1-victor@mojatatu.com>
-References: <20260521150811.1896373-1-victor@mojatatu.com>
+In-Reply-To: <20260519064028.60992-1-nihaal@cse.iitm.ac.in>
+References: <20260519064028.60992-1-nihaal@cse.iitm.ac.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,289 +70,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290525-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-290524-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu-com.20251104.gappssmtp.com:dkim,mojatatu.com:mid,mojatatu.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F0CDD5A96A4
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BEDDE5A9693
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Commit 150061a20651 ("net/sched: fq_codel: local packets no longer count against memory limit")
-made fq_codel not account for local packets in the
-memory limit. Since tests a4bb, a4be, a4bf, a4c0, a4c1 were relying on
-these packets being accounted so that parent's qlen notify callback was
-executed, they broke.
-
-Fix the tests by adding the qdiscs to ifb instead and making it see
-mirred packets that came from scapy. That way the packets are accounted
-in the memory limit and the parent's qlen notify callback is still
-executed.
-
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 ---
- .../tc-testing/tc-tests/infra/qdiscs.json     | 160 +++++++++++-------
- 1 file changed, 95 insertions(+), 65 deletions(-)
+net: wwan: iosm: fix potential use after free in ipc_imem_cleanup()
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-index 848696c373fc..3da9936e115d 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-@@ -392,26 +392,32 @@
-             "htb"
-         ],
-         "plugins": {
--            "requires": "nsPlugin"
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-         },
-         "setup": [
--            "$IP link set dev $DUMMY up || true",
--            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
--            "$TC qdisc add dev $DUMMY handle 1: root htb default 10",
--            "$TC class add dev $DUMMY parent 1: classid 1:10 htb rate 1kbit",
--            "$TC qdisc add dev $DUMMY parent 1:10 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
--            "$TC filter add dev $DUMMY parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:10",
--            "ping -c 5 -f -I $DUMMY 10.10.10.1 > /dev/null || true",
--            "sleep 0.1"
-+            "$TC qdisc add dev $IFB handle 1: root htb default 10",
-+            "$TC class add dev $IFB parent 1: classid 1:10 htb rate 1kbit",
-+            "$TC qdisc add dev $IFB parent 1:10 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
-+            "$TC filter add dev $IFB parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:10",
-+            "$TC qdisc add dev $DEV1 ingress",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 1 u32 match ip protocol 1 0xff action mirred egress mirror dev $IFB"
-         ],
--        "cmdUnderTest": "$TC -s qdisc show dev $DUMMY",
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 5,
-+            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+        },
-+        "cmdUnderTest": "$TC -s qdisc show dev $IFB",
-         "expExitCode": "0",
--        "verifyCmd": "$TC -s qdisc show dev $DUMMY | grep -A 5 'qdisc fq_codel'",
-+        "verifyCmd": "$TC -s qdisc show dev $IFB | grep -A 5 'qdisc fq_codel'",
-         "matchPattern": "dropped [1-9][0-9]*",
-         "matchCount": "1",
-         "teardown": [
--            "$TC qdisc del dev $DUMMY handle 1: root",
--            "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
-+            "$TC qdisc del dev $IFB root",
-+            "$TC qdisc del dev $DEV1 ingress"
-         ]
-     },
-     {
-@@ -423,26 +429,32 @@
-             "qfq"
-         ],
-         "plugins": {
--            "requires": "nsPlugin"
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-         },
-         "setup": [
--            "$IP link set dev $DUMMY up || true",
--            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
--            "$TC qdisc add dev $DUMMY handle 1: root qfq",
--            "$TC class add dev $DUMMY parent 1: classid 1:10 qfq weight 1 maxpkt 1000",
--            "$TC qdisc add dev $DUMMY parent 1:10 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
--            "$TC filter add dev $DUMMY parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:10",
--            "ping -c 10 -s 1000 -f -I $DUMMY 10.10.10.1 > /dev/null || true",
--            "sleep 0.1"
-+            "$TC qdisc add dev $IFB handle 1: root qfq",
-+            "$TC class add dev $IFB parent 1: classid 1:10 qfq weight 1 maxpkt 1000",
-+            "$TC qdisc add dev $IFB parent 1:10 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
-+            "$TC filter add dev $IFB parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:10",
-+            "$TC qdisc add dev $DEV1 ingress",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 1 u32 match ip protocol 1 0xff action mirred egress mirror dev $IFB"
-         ],
--        "cmdUnderTest": "$TC -s qdisc show dev $DUMMY",
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 10,
-+            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+        },
-+        "cmdUnderTest": "$TC -s qdisc show dev $IFB",
-         "expExitCode": "0",
--        "verifyCmd": "$TC -s qdisc show dev $DUMMY | grep -A 5 'qdisc fq_codel'",
-+        "verifyCmd": "$TC -s qdisc show dev $IFB | grep -A 5 'qdisc fq_codel'",
-         "matchPattern": "dropped [1-9][0-9]*",
-         "matchCount": "1",
-         "teardown": [
--            "$TC qdisc del dev $DUMMY handle 1: root",
--            "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
-+            "$TC qdisc del dev $IFB root",
-+            "$TC qdisc del dev $DEV1 ingress"
-         ]
-     },
-     {
-@@ -454,26 +466,32 @@
-             "hfsc"
-         ],
-         "plugins": {
--            "requires": "nsPlugin"
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-         },
-         "setup": [
--            "$IP link set dev $DUMMY up || true",
--            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
--            "$TC qdisc add dev $DUMMY handle 1: root hfsc default 10",
--            "$TC class add dev $DUMMY parent 1: classid 1:10 hfsc sc rate 1kbit ul rate 1kbit",
--            "$TC qdisc add dev $DUMMY parent 1:10 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
--            "$TC filter add dev $DUMMY parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:10",
--            "ping -c 5 -f -I $DUMMY 10.10.10.1 > /dev/null || true",
--            "sleep 0.1"
-+            "$TC qdisc add dev $IFB handle 1: root hfsc default 10",
-+            "$TC class add dev $IFB parent 1: classid 1:10 hfsc sc rate 1kbit ul rate 1kbit",
-+            "$TC qdisc add dev $IFB parent 1:10 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
-+            "$TC filter add dev $IFB parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:10",
-+            "$TC qdisc add dev $DEV1 ingress",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 1 u32 match ip protocol 1 0xff action mirred egress mirror dev $IFB"
-         ],
--        "cmdUnderTest": "$TC -s qdisc show dev $DUMMY",
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 5,
-+            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+        },
-+        "cmdUnderTest": "$TC -s qdisc show dev $IFB",
-         "expExitCode": "0",
--        "verifyCmd": "$TC -s qdisc show dev $DUMMY | grep -A 5 'qdisc fq_codel'",
-+        "verifyCmd": "$TC -s qdisc show dev $IFB | grep -A 5 'qdisc fq_codel'",
-         "matchPattern": "dropped [1-9][0-9]*",
-         "matchCount": "1",
-         "teardown": [
--            "$TC qdisc del dev $DUMMY handle 1: root",
--            "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
-+            "$TC qdisc del dev $IFB root",
-+            "$TC qdisc del dev $DEV1 ingress"
-         ]
-     },
-     {
-@@ -485,26 +503,32 @@
-             "drr"
-         ],
-         "plugins": {
--            "requires": "nsPlugin"
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-         },
-         "setup": [
--            "$IP link set dev $DUMMY up || true",
--            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
--            "$TC qdisc add dev $DUMMY handle 1: root drr",
--            "$TC class add dev $DUMMY parent 1: classid 1:10 drr quantum 1500",
--            "$TC qdisc add dev $DUMMY parent 1:10 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
--            "$TC filter add dev $DUMMY parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:10",
--            "ping -c 5 -f -I $DUMMY 10.10.10.1 > /dev/null || true",
--            "sleep 0.1"
-+            "$TC qdisc add dev $IFB handle 1: root drr",
-+            "$TC class add dev $IFB parent 1: classid 1:10 drr quantum 1500",
-+            "$TC qdisc add dev $IFB parent 1:10 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
-+            "$TC filter add dev $IFB parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:10",
-+            "$TC qdisc add dev $DEV1 ingress",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 1 u32 match ip protocol 1 0xff action mirred egress mirror dev $IFB"
-         ],
--        "cmdUnderTest": "$TC -s qdisc show dev $DUMMY",
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 5,
-+            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+        },
-+        "cmdUnderTest": "$TC -s qdisc show dev $IFB",
-         "expExitCode": "0",
--        "verifyCmd": "$TC -s qdisc show dev $DUMMY | grep -A 5 'qdisc fq_codel'",
-+        "verifyCmd": "$TC -s qdisc show dev $IFB | grep -A 5 'qdisc fq_codel'",
-         "matchPattern": "dropped [1-9][0-9]*",
-         "matchCount": "1",
-         "teardown": [
--            "$TC qdisc del dev $DUMMY handle 1: root",
--            "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
-+            "$TC qdisc del dev $IFB root",
-+            "$TC qdisc del dev $DEV1 ingress"
-         ]
-     },
-     {
-@@ -516,26 +540,32 @@
-             "ets"
-         ],
-         "plugins": {
--            "requires": "nsPlugin"
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-         },
-         "setup": [
--            "$IP link set dev $DUMMY up || true",
--            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
--            "$TC qdisc add dev $DUMMY handle 1: root ets bands 2 strict 1",
--            "$TC class change dev $DUMMY parent 1: classid 1:1 ets",
--            "$TC qdisc add dev $DUMMY parent 1:1 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
--            "$TC filter add dev $DUMMY parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:1",
--            "ping -c 5 -f -I $DUMMY 10.10.10.1 > /dev/null || true",
--            "sleep 0.1"
-+            "$TC qdisc add dev $IFB handle 1: root ets bands 2 strict 1",
-+            "$TC class change dev $IFB parent 1: classid 1:1 ets",
-+            "$TC qdisc add dev $IFB parent 1:1 handle 10: fq_codel memory_limit 1 flows 1 target 0.1ms interval 1ms",
-+            "$TC filter add dev $IFB parent 1: protocol ip prio 1 u32 match ip protocol 1 0xff flowid 1:1",
-+            "$TC qdisc add dev $DEV1 ingress",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 1 u32 match ip protocol 1 0xff action mirred egress mirror dev $IFB"
-         ],
--        "cmdUnderTest": "$TC -s qdisc show dev $DUMMY",
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 5,
-+            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+        },
-+        "cmdUnderTest": "$TC -s qdisc show dev $IFB",
-         "expExitCode": "0",
--        "verifyCmd": "$TC -s qdisc show dev $DUMMY | grep -A 5 'qdisc fq_codel'",
-+        "verifyCmd": "$TC -s qdisc show dev $IFB | grep -A 5 'qdisc fq_codel'",
-         "matchPattern": "dropped [1-9][0-9]*",
-         "matchCount": "1",
-         "teardown": [
--            "$TC qdisc del dev $DUMMY handle 1: root",
--            "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
-+            "$TC qdisc del dev $IFB root",
-+            "$TC qdisc del dev $DEV1 ingress"
-         ]
-     },
-     {
+This commit reorders ipc_imem_cleanup() so that ipc_task_deinit() runs
+before ipc_protocol_deinit(), so a tasklet observed mid-flight does not
+dereference protocol memory that has already been freed.
+
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_imem.c b/drivers/net/wwan/iosm/iosm_ipc_imem.c
+> index 1b7bc7d63a2e..a3353af6960c 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_imem.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_imem.c
+> @@ -1256,8 +1256,8 @@ void ipc_imem_cleanup(struct iosm_imem *ipc_imem)
+>  	ipc_imem_device_ipc_uninit(ipc_imem);
+>  	ipc_imem_channel_reset(ipc_imem);
+>  
+> -	ipc_protocol_deinit(ipc_imem->ipc_protocol);
+>  	ipc_task_deinit(ipc_imem->ipc_task);
+> +	ipc_protocol_deinit(ipc_imem->ipc_protocol);
+
+[High]
+Does this reorder fully close the cleanup race, or only the narrow window
+between the tasklet and ipc_protocol?
+
+The MSI handler ipc_msi_interrupt() remains registered throughout
+ipc_imem_cleanup(); ipc_release_irq() / free_irq() is only invoked later,
+from ipc_pcie_resources_release() after ipc_imem_cleanup() has returned.
+
+Once ipc_task_deinit() returns, ipc_imem->ipc_task->ipc_tasklet has been
+kfree()'d:
+
+void ipc_task_deinit(struct ipc_task *ipc_task)
+{
+	tasklet_kill(ipc_task->ipc_tasklet);
+
+	kfree(ipc_task->ipc_tasklet);
+	...
+}
+
+If the modem fires an MSI in the window between ipc_task_deinit() and
+ipc_release_irq(), can the path
+
+  ipc_msi_interrupt()
+    -> ipc_imem_irq_process()
+      -> ipc_task_queue_send_task()
+        -> ipc_task_queue_add_task()
+
+still dereference ipc_imem->ipc_task->ipc_tasklet (now freed) and call
+tasklet_schedule() on it? Once kfree(ipc_imem->ipc_task) executes, the
+q_lock and queue array are also freed.
+
+The only attempt to quiesce the IRQ producer before this point is
+ipc_imem_device_ipc_uninit(), which is best-effort: it is skipped when
+ipc_pcie_check_data_link_active() returns false, has roughly a 30 ms
+timeout, and does not call synchronize_irq().
+
+This race appears to predate the patch (the freed-tasklet use-after-free
+after ipc_task_deinit() was already reachable from the live IRQ handler),
+so it is not introduced by the reorder. Would it be worth calling
+ipc_release_irq() (or free_irq() / synchronize_irq()) before
+ipc_task_deinit() / ipc_protocol_deinit() so that no MSI can schedule new
+work against freed resources?
+
+>  
+>  	kfree(ipc_imem->ipc_task);
+>  	kfree(ipc_imem->mmio);
 -- 
-2.54.0
-
+pw-bot: cr
 
