@@ -1,174 +1,168 @@
-Return-Path: <netdev+bounces-290230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7fnjMCN4Dmrc+wUAu9opvQ
-	(envelope-from <netdev+bounces-290230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 05:12:35 +0200
+	id yH4cFeh8Dmo1/AUAu9opvQ
+	(envelope-from <netdev+bounces-290231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 05:32:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C08D759E4FC
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 05:12:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C44A259E79C
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 05:32:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9501A3008FDF
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 03:12:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C0DC03019110
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 03:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94D7383329;
-	Thu, 21 May 2026 03:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9701933F580;
+	Thu, 21 May 2026 03:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oQ59Fycg"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="WJAf7HYO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EF2374731
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 03:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26B22CCB9;
+	Thu, 21 May 2026 03:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779333139; cv=none; b=UpSEihdJ66qhuqEwCrbiAr7LBEG/XlyqaNnTO95LyEgKpflfUl5+zVhIXp0E3WRXxEHrNfFR4WkDrrzwF3YtXsPxzCrzQcKYzP7AZlRIDUNXlomXCS3+b/3Tsx25vmO/BTkIYq2Zw6pDgziYwru8o2VAt+u9P+1mOAjjVa15yrY=
+	t=1779334373; cv=none; b=rs8fmjlZ2/Jwf3nAf72y/Q+/jxqMxA3BNC3/C8ghspnjmZGiRvijld4KRvX20qO7dj+ZUT1774h9755KYj+RnBECqYUz+5hJBFR2h1v2v35UXsF3h2DmFWbXcgNa23q4ahZUqag8WK4TjTOWBmIgLehYoYJjxFXO+8tTFC6xxFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779333139; c=relaxed/simple;
-	bh=8wKZIV3M9dAvChZqriseN2eTo/lDeIhoPS+0TO8df0s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J/6aWoovlnb0WISznqfcdU+g1qFRQOVTe1dQAcyFg5NdAvheLW5SwwkRbrRHkivqpuZHaC/BnuYJdBCyh7ylNi9QXQ5i2ujg5b2KpD+ItSAPiBl+Ze+un96PBS92+toJdMigtwZU+HN3GXC/aAVguGgSbTTC1yB6GoVRA5PsmCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oQ59Fycg; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488af9fdaa7so27193915e9.1
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 20:12:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779333133; x=1779937933; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8wKZIV3M9dAvChZqriseN2eTo/lDeIhoPS+0TO8df0s=;
-        b=oQ59FycgUCDSIM5GHo6gvcWY8Ycnwm1OERb9qNKyIMpkDHrFTZevqW4cF0zQG3rVCc
-         FsTLld0sOYzVv8BHUHaViESnby5mIbq+wEJ10f0ptdRqKN6J5YNAKqEsv1WDx+85yDsX
-         ifZ/Z6Wi7AwwSgr1jRE8RoHN0iikE+rX3DRL6/ihlnAK+gfa7/H7OKuvAhBgyywAiF38
-         bksyfq8TUHwha9ETBiZr5HYakxhDYBi/Mab5i/QqHLYU6vve6LIbek0OuyLa3/FEvEo9
-         wcULHA3PYpCzb92X1pa99fYFFGYlDfF8M0ZceOzpmh6OSM1c6/RRzk8ijOiRNaGQH1sc
-         EdrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779333133; x=1779937933;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8wKZIV3M9dAvChZqriseN2eTo/lDeIhoPS+0TO8df0s=;
-        b=Cr0CFQ05y+pavayrE192liG20E+hIs3i/4ImAvl/jhCE5KGhs2nLOGPPGmy/8RD3Qh
-         dIv6UGi3g2s1Rga8gHHO01IlS4mG8wCwN7ONACJyxotV3IcpReQiQton7CAePu0Pe9Lj
-         FijsoomGLzktoMTygAVJvhucpFpMY67YQNvFGuBEVwtNvmzg2ccyx4t17Q2AG7axA0Ov
-         sPAMyMJ/6ngwT3Nm4HnNw+OdQ6yYwyyiH8yPLKpuJi/h29Z7g61+aveYT8VcGxH1Nr8f
-         9zUx4P2iSct6ajDKFAMY0eNhGi1SND9tm2Nrin22KunA4gvBuDAaqXf51cKxn229b7nB
-         x+bw==
-X-Gm-Message-State: AOJu0YyrtvYJMwn78MyePXzQA1zge0bK9Qi95ICtpqnD54Ul28stmlAT
-	+UWoXOwTbaQfJtP9kHReyEGp3PRIc0AEZoIIM0NU/pCHwb9l/T2NbJlNGZ1GlxDD
-X-Gm-Gg: Acq92OEhhtzyM2f7C/C1TC/eWgdvUMOHsARNQBMbCcFG/o7EBJH7WqS4G8Qz12u4BcY
-	mQD5cfGLcIM6dL1x3sD50dHj85JggnH261DjhcQGtdvWCs02flU748SFengV6Aki9dLjL1M6LYG
-	PZ206UNc2U3XM4lAOvU8wYMxycmq9P+Pq0pnUQUM0851uCclLsQ7WuGiwcb2UmuuSaraPfKYmGL
-	KRfq77c1uATgslYa+wdlpyfQI67ot/M92CTJbv4qGLdKvglJ6ilzO6uJZ9pFsvS/ocY/wLr08ef
-	T1RE1FZmNOITn/3Gmj0xN3mQtuwsL0tc8V/AGkbOHuuDs0lK2xsTwGg/YjONB/n4EksjhaJIny2
-	iQkbIWsvZ0ArCH+Eet/yaSgV9aKrKg7oDFZhciCkhvD779ZS2nVv+l2liep6330N58vZ1CdZrW/
-	uhsXAGTWyPXPKYKb7PfFgfox0zE46goetywggA8g9m1dij+xnc9bNpc/RGDaxtAT033ioqA2Usa
-	Fcw0rtiRfeblyoNSoV5+EWL0g9g
-X-Received: by 2002:a05:6000:460e:b0:44b:cb31:b767 with SMTP id ffacd0b85a97d-45ea413b90amr1144097f8f.36.1779333132789;
-        Wed, 20 May 2026 20:12:12 -0700 (PDT)
-Received: from localhost.localdomain (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da15a6449sm58636100f8f.37.2026.05.20.20.12.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 20:12:12 -0700 (PDT)
-From: Petr Wozniak <petr.wozniak@gmail.com>
-To: jan@3e8.eu
-Cc: netdev@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	maxime.chevallier@bootlin.com,
-	bjorn@mork.no,
-	andrew@lunn.ch,
-	kuba@kernel.org
-Subject: Re: [PATCH net-next v5] net: phy: sfp: probe for RollBall I2C-to-MDIO bridge in mdio-i2c
-Date: Thu, 21 May 2026 05:12:10 +0200
-Message-ID: <20260521031210.24834-1-petr.wozniak@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260519162007.12345-1-petr.wozniak@gmail.com>
-References: 
+	s=arc-20240116; t=1779334373; c=relaxed/simple;
+	bh=uNIXMJzs4YQYDLQ3MTX0keOY+2SpJv68o9GuVLrXDAE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KelXKkFDiV9tiNHtDRiuAZmYhjnqMue3HimEMzN5K2YxSpZgQs23xEGSYWwWdmwMByL9FaYIUGUfwiIQxjHEgncjEfeWihkbYtv8oxlhebmzu7OleRiOp3FjRlbzczh3vXuH6nin/31J86Fl/tYxtLyy8k+/KNn2AxrWLD7LpMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=WJAf7HYO; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64KH9Wdu2938976;
+	Wed, 20 May 2026 20:32:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=VTItxtoufp2IAQDsFpiT593sK
+	qFYt65+ZQHAloVdjRM=; b=WJAf7HYOAoKHaFTCW+xZ9RYUHb/X+fUrsn8O096N2
+	muwu5JfGAGizxSl/ruP9UGOEARBq/pQK0mPR8jAWZNvIKBQn2siEpeCo3y6sDXP3
+	GlRN53cynv3LSqAIx51FEQFHYc8QRy49AEPbqVTYOAwNxY0uq6l15Zig7fQjGDpz
+	C5g4WIf+sGGImnWtMoyLkGFTLpCmGrZcBkzlRd+O6d23DPCy4SRFt9e2NqT+R5Ip
+	GJ+mkBWr47pDXEtRfE43fmTJXhMHckooy/Zx9tLlVaKWbmZ2UjKovS13MOKq+saJ
+	1OHeakq5Ga/v2OT2uRort+4DuAbxnEW+rOD4aK3CIfI6A==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e9h419fn4-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 May 2026 20:32:14 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 20 May 2026 20:32:02 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 20 May 2026 20:32:02 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 44C5C3F704B;
+	Wed, 20 May 2026 20:31:54 -0700 (PDT)
+Date: Thu, 21 May 2026 09:01:53 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <oss-drivers@corigine.com>
+CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
+        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
+        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
+        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
+        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
+        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
+        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
+        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
+        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
+        <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v15 net-next 5/9] octeontx2-af: npc: cn20k: add subbank
+ search order control
+Message-ID: <ag58qT7ziHKkEr3e@rkannoth-OptiPlex-7090>
+References: <20260520020939.1457231-1-rkannoth@marvell.com>
+ <20260520020939.1457231-6-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260520020939.1457231-6-rkannoth@marvell.com>
+X-Proofpoint-ORIG-GUID: KM6A8F57saif4rs3xSqfci0IdVsY5Cf8
+X-Authority-Analysis: v=2.4 cv=XPEAjwhE c=1 sm=1 tr=0 ts=6a0e7cbf cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8
+ a=TqiHYjcEmwCWYqGesmoA:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
+ a=Oh551-UHZqmTy8JkqTUo:22
+X-Proofpoint-GUID: KM6A8F57saif4rs3xSqfci0IdVsY5Cf8
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIxMDAzMCBTYWx0ZWRfX5dr7/nnC5wj2
+ 5lD6wwDKls2Lm4ebbiamtXXSysWddF8NQswBFPaCrc2ClsHfIy2fKWZ7ayo0v/4KZYpFhm0K9Sq
+ i7heyVHjpnEWn4hUx7X7LFNUY7c9k1X2X0QqNgBXwXAKwumkJ6tcNtlPanNCTPlndJq2Lr+WMtY
+ ICxiRUFwCHMWhjY261olzjQO8zj2HwlHNHMDQVc9pPWFC2ActAAmutyClpTWWF1Gda7h2jLex+m
+ M03a7Apd4VYA/mBDPh7JEXLPy8tKCZlBzMsUXLAei0KYp75OtebcfbU6ZJcf1I48MzKHOQM7w4g
+ Sx8IBXgy0nGkfj3P7Tu6akytB/weox45xu2Hsex6/8ignpXm2H+0NoCfPtzfEiniNI753NVmNlm
+ nG20ebzaH59c6+qC8R8XsFIkNDgu7gwgsclRh/iBZodzGEMSS9x+e8l9Bbe1B7GnyR6hQ7txP8F
+ yWj1c62tb4+Pcgy5IAA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-20_03,2026-05-18_01,2025-10-01_01
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290230-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290231-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C08D759E4FC
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: C44A259E79C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-05-20 at 23:19, Jan wrote:
-> The patch seems to be malformed. I had to do some manual changes to get
-> it applied.
+On 2026-05-20 at 07:39:35, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> CN20K NPC MCAM is split into 32 subbanks that are searched in a
+> predefined order during allocation. Lower-numbered subbanks have
+> higher priority than higher-numbered ones.
 
-Thanks for testing and for taking the time to apply it manually. v6 has
-been sent just now with the formatting fixed.
+>> +	for (prio = 0; prio < cnt; prio++) {
+>> +		sb_idx = narr[prio];
+>> +		sb = &npc_priv.sb[sb_idx];
+>> +
+>> +		if (sb->flags & NPC_SUBBANK_FLAG_USED)
+>> +			xa = &npc_priv.xa_sb_used;
+>> +		else
+>> +			xa = &npc_priv.xa_sb_free;
+>> +
+>> +		rc = xa_err(xa_store(xa, sb->arr_idx,
+>> +				     xa_mk_value(sb_idx), GFP_KERNEL));
+>Are we using the correct key for xa_store() here?
+>It looks like the store operation uses the old priority index (sb->arr_idx)
+>instead of the new priority index (prio). Because the subbank is not stored
+>at the new priority slot, the cleanup loop below that erases priorities with a
+>net loss of subbanks could permanently delete valid subbanks from the xarrays,
+>making them unavailable for allocation.
 
-> Using this patch, the module works right away, without waiting several
-> minutes for the PHY probing retry loop to finish.
-
-Great to hear it works on your ATS SFP-10G-T module as well.
-
-> I also have a 2.5G module (XikeStor SKT-2.5G-100M). It supports
-> Rollball, but does not respond to commands immediately. With this patch,
-> it only works with a small delay in "module_t_wait".
-
-v6 replaces the fixed 70 ms sleep with a 10 x 20 ms polling loop
-(200 ms total), matching the tolerance used by the existing
-i2c_rollball_mii_poll(). This should give slow RollBall bridges a
-better chance to assert CMD_DONE in time.
-
-The XikeStor module is not yet in the quirk table so it won't be
-affected by this patch. When support for it is added later, an
-appropriate module_t_wait can be set in the quirk entry if needed.
-
-> I am a bit confused by this change. This is the same model name which
-> is used by my non-Rollball ATS module when it is linked at 1G on the
-> copper side. Are there other modules actually supporting Rollball which
-> also use the model name including "-I"?
-
-The "OEM"/"SFP-10G-T-I" quirk uses sfp_fixup_rollball (not
-sfp_fixup_rollball_cc), which routes the module through the new probe
-path rather than forcing MDIO_I2C_ROLLBALL unconditionally. If the
-module has no RollBall bridge -- as is the case for your ATS module --
-i2c_mii_probe_rollball() returns -ENODEV and sfp_sm_add_mdio_bus()
-transitions mdio_protocol back to MDIO_I2C_NONE, so PHY probing is
-skipped entirely. Non-bridge modules are handled correctly regardless
-of whether they respond at 1G or 10G.
-
-Thanks again for the detailed feedback.
-
-Petr
+pw-bot: changes-requested
+ACK.
 
