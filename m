@@ -1,174 +1,164 @@
-Return-Path: <netdev+bounces-290560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290559-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eEsFAIw9D2o1IQYAu9opvQ
-	(envelope-from <netdev+bounces-290560-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:14:52 +0200
+	id uCzSJXU9D2ocIQYAu9opvQ
+	(envelope-from <netdev+bounces-290559-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:14:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9954D5A9FDD
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:14:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 344005A9FBC
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 206B93062C14
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:33:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 04E9E303EF61
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D19437C90A;
-	Thu, 21 May 2026 16:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E941372079;
+	Thu, 21 May 2026 16:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ipsbWf5E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LT8oEfb9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200F532B105
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 16:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD7127144B;
+	Thu, 21 May 2026 16:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779381187; cv=none; b=qPWnnrOPMqzYHhNeBeJKM7j9yBlsEGb3KTikTMx9I5T48zgu8SyVeIJ4FlV9HR/mppSwAfCufxt8wKikqiMskhErp3HjS0zi70hve58YJJP7cLDbnTiLzXwu//ay7/dgxMm7GkyUXgk0ShRZ3mniZAZAQw4AO6O3eyhdJMkSVtg=
+	t=1779381168; cv=none; b=ePejU64Vz/9205XYsTIRq8Mri2f5kwjISEULEjRkzVkEfrlM7aWLOWdPaHTimeOw5ASxgZa01ghQOr1vVj3EVEMJ504zFrGHRA7KlgJHYScBujYpd9aLI2/yQbjqk7P+WflGR2xJ9MDf5pAwdNHZ/YQQmePALCGRMktgLKmtuDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779381187; c=relaxed/simple;
-	bh=wzqew7g6CT9dlDsf+TrWejqdUCW50+VVAcpXKutM9V8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kap0s7dZ9OMdNA8o2ltjVv8+5hzvgW/YEWKUyq+ruQhmaXznbbDdL8j8NUIbYFOuDBAKtwRsMteHu2oP/2jj2CIq+jqsIFtCrU0k1cm15K5OFVpZDDsoGVMDOPNIcrsKj+sAbk6VoVLSaLhJTT93Ul4VBXUATs6guxMkkWv9Ip0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ipsbWf5E; arc=none smtp.client-ip=74.125.82.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2f00a567cfaso3826566eec.0
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779381185; x=1779985985; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5R98YEASOuZ8Uxpfr/WLsgAsOAjnGS8bXv+DgQs1RHY=;
-        b=ipsbWf5EwJgJ2zEPKqfDA3X4GbhGgl3PNhpdCMzSc+dfjXKLbkJlPQu+nHEdmf9d/9
-         F7KHGjN6ubSqxQ/uawRM8bgf1ht5ur5HlS2mreyrpT01d5oU1cvv+5+/QoNwI6JlHTUj
-         2DjSdpkmxAlyN1dQRG5i3ADuD20c13gRFIPgQkF0aADBwLUg3clecZP1l+/1MuITAjE9
-         o0oWE/7IKoPtA4P5iyg2t+ePRP7AZ096IdpfMNyGufYFeuI9pT1d8nUg+OdhYmh28/Qn
-         2OxuvhItqMXys4v22cax9d4whdB1V2ZUEBHOr83qbZbj2LsFAMZjqF6YHXQcDS+LlMlp
-         AA7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779381185; x=1779985985;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5R98YEASOuZ8Uxpfr/WLsgAsOAjnGS8bXv+DgQs1RHY=;
-        b=M5mfI4I88aAwiomIbhSxNwzWOh1YaMpZyuLOOnpe3T3lc1Fcv+eBPMS72HhDskfoB/
-         /sCBkRp9HpjUfRHnvJZoZfTBziflC5gEmnVBVeJXuX5Rq7EfJqk6VEBXYDg7kuI87tEk
-         mfc9077wMLMFOkjn6FgWr5TggQpCtDn34eL861mhpry1BwuaT5r2ApwyLrKyUe1MLIM5
-         EBo51W0dPU0Smf7bkX1k+DsYTZL7oI4iixu6XfKmISuMViL6cOAmWInAwjw64SUoelk2
-         Xxi0dS7sqL+rjgvfgbNvnbk7v3wQSIt5hW7pz5DOIvkFPdDoO3FcF9XXJb9krxGXZf8K
-         jZgg==
-X-Gm-Message-State: AOJu0YwvP4p3Z3l8cSWV6P8hZijb0dtoaXS7MRIdDwSE+zfEUWFrOroo
-	+UvYnOVjG3gNCfQNsmsQLUaPd8DknmxiI9ZY8G2fz77rDFz4qFi2OLw2EKHIFtp0UT0=
-X-Gm-Gg: Acq92OGXJsJgxUbL8918zTtR5x0PRQ1DSc+XjFsLMKjTLRj0MtFaN3oBqKhdLkFS4Hq
-	BpSsd98HyswfxfNcRcIsqFu/ewi4MvRT22sZN2XYN0AcDMdas1vRdwm9ty1+XD0k+HOtupCElrT
-	8a5hCqag+QlLZid0HhYBEZrYch3KdBhlDMuuhyy7Ww70syA7KNxWY8+BqkE2S3rU0+OCyp0Y40j
-	inexVdwJbiWNOYzY8LS6g+OV1x0BnzHJkh/CFtBxfQ26scgDw+1p2XwoatgJsaMfpmPB3z83qJU
-	RZ0TLOPQo3AaDGaJwHJQtb1GMHG+f6GmK2SZ1YmTFVa0f/OyAALDANQP2PbrN9f8L9cXYnbFbC+
-	4VJN2P3aetZxlVWSR67awU2bXoC87KdT7zQn+zOGE0EQd0lRhQ1RzebTIcqanWhD42I1fQQfZCz
-	IFJNk9NMUFMV/tURNCO/lo/2SEQ3/TcMgmytQ2ONBwG8AsKJbiRc/DAhsY8nB1XohYY6Mo
-X-Received: by 2002:a05:7300:7c16:b0:2d3:9c91:6c45 with SMTP id 5a478bee46e88-3043203edeamr1945367eec.6.1779381184998;
-        Thu, 21 May 2026 09:33:04 -0700 (PDT)
-Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3044330cd9csm834851eec.11.2026.05.21.09.33.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 09:33:04 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	dongli.zhang@oracle.com,
-	xmei5@asu.edu,
-	linux-kernel@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net] tap: free page on error paths in tap_get_user_xdp()
-Date: Thu, 21 May 2026 09:32:31 -0700
-Message-ID: <20260521163230.1478627-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1779381168; c=relaxed/simple;
+	bh=z3v6YO+0Wv56+AsTvqL7AMaNeB9qSJnJg6uwyLqlCXQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Org022fU10gJ2UQsn+cFkaSZBWODbnLMynu30jdw1yFaV3SbCkWbzoMPIIKHzF3kQPi2T2BDrkP/eGMTDnAusnqqn9nOzhI6xul5fkHMvjHzcU5Nb60rWAi8yoZ2yULd8JECfYa/XV+mKsA5SD43nI2MKCyz9NCkDpdOwNrixbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LT8oEfb9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CD768C2BCB4;
+	Thu, 21 May 2026 16:32:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779381167;
+	bh=z3v6YO+0Wv56+AsTvqL7AMaNeB9qSJnJg6uwyLqlCXQ=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=LT8oEfb9sI945gIfNB7Ll7i8odp/msHWe6c1V0v2SbCfPy5l4EAQkotx9Dudz3bCO
+	 fcaL6onQCErdJZQZqWTUEWnnLvItCuEXY4JKKGHgDvP/6p7Kv8wYi8pygIxfewy/UN
+	 PRJxNY8Dg1L8s/Vm1k+sWUfY4NqicvnoUBTb7w1DhfPK5hQ8EEhRfpl+h6xX3m1P/I
+	 VlqWHbBJ0Nwwot6a1Y+t0ZRbE1Znq9c+rJtvCgElNglIic8at5gZ2kGjs4KsIgilrk
+	 2obsJiYVWJzQPCyJPoH29Y/a9rfGMQOBVcXLE1UodFW44w+c0ASPjhVNoLxSDxnsjc
+	 fhYSuNK2oa8Rw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C320CCD5BAF;
+	Thu, 21 May 2026 16:32:47 +0000 (UTC)
+From: Abid Ali via B4 Relay <devnull+dev.taqnialabs.gmail.com@kernel.org>
+Date: Thu, 21 May 2026 16:32:46 +0000
+Subject: [PATCH v2] net: stmmac: mmc: Remove duplicate mmc_rx crc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260521-xgmac-mmc_rx_crc-cleanup-v2-1-7d9de09f5898@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAK0zD2oC/42NUQ6CMBBEr0L67RpaAoJf3sMQsq5b2IQCaZVgS
+ O9u5QR+vsnMm10F9sJBXbNdeV4lyDwlMKdM0YBTzyDPxMrkpspLk8PWOyRwjjq/deQJaGSc3gu
+ gJcbKItb4UGm+eLayHep7m3iQ8Jr953ha9S/9Q7pq0HDRRWFL09RlY2+pKeOZZqfaGOMX/Bkb+
+ 8AAAAA=
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Abid Ali <dev.taqnialabs@gmail.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779381166; l=1735;
+ i=dev.taqnialabs@gmail.com; s=20260425; h=from:subject:message-id;
+ bh=YT6MwxbT32LmsJ0Q4toXiSUGLZ0LUkCCQs3ZtA9Xc6A=;
+ b=4nb99cKuWhzcka7MVU0baeVQGR1KS14hPy/Qj6o+FR+zkwGaooEwyN2rZln4L5Ctvpa4Fl4/0
+ VoiHf/eHZF6CxH9tbvd1DO3g0ClGL8324bUtCG3NHSJgcWl2owhEIwL
+X-Developer-Key: i=dev.taqnialabs@gmail.com; a=ed25519;
+ pk=4Syx51HH/MOySSUpi79M2ToLOdwt1yiNb338eKZBJNk=
+X-Endpoint-Received: by B4 Relay for dev.taqnialabs@gmail.com/20260425 with
+ auth_id=752
+X-Original-From: Abid Ali <dev.taqnialabs@gmail.com>
+Reply-To: dev.taqnialabs@gmail.com
+X-Spamd-Result: default: False [1.34 / 15.00];
+	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,kernel.org,google.com,oracle.com,asu.edu,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290559-lists,netdev=lfdr.de,dev.taqnialabs.gmail.com];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290560-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_REPLYTO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	HAS_REPLYTO(0.00)[dev.taqnialabs@gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,gmail.com];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,asu.edu:email]
-X-Rspamd-Queue-Id: 9954D5A9FDD
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 344005A9FBC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-tap_get_user_xdp() rejects a frame shorter than ETH_HLEN with -EINVAL,
-and returns -ENOMEM when build_skb() fails. Both paths jump to the err
-label without freeing the page that vhost_net_build_xdp() allocated for
-the frame. tap_sendmsg() discards the per-buffer return value and always
-returns 0, so vhost_tx_batch() takes the success path and never frees
-the page; each rejected frame in a batch leaks one page-frag chunk.
+From: Abid Ali <dev.taqnialabs@gmail.com>
 
-Free the page on both error paths, before the skb is built. This is the
-tap counterpart of the same leak in tun_xdp_one().
+MMC_XGMAC_RX_CRC_ERR is clear-on-read, and just a single read would
+update the mmc_rx_crc_error counter.
 
-Fixes: 0efac27791ee ("tap: accept an array of XDP buffs through sendmsg()")
-Fixes: ed7f2afdd0e0 ("tap: add missing verification for short frame")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+[1] commit b6cdf09 ("net: stmmac: xgmac: Implement MMC counters").
+The duplicate read appears to have been unintentionally introduced in
+the intial MMC counter implementation. The databook does not mention
+MMC_XGMAC_RX_CRC_ERR needing the additional read.
+
+Fixes: b6cdf09 ("net: stmmac: xgmac: Implement MMC counters")
+Signed-off-by: Abid Ali <dev.taqnialabs@gmail.com>
 ---
- drivers/net/tap.c | 2 ++
- 1 file changed, 2 insertions(+)
+Changes in v2:
+- Updated why the redundant read is removed based on feedback.
+- Link to v1: https://lore.kernel.org/r/20260520-xgmac-mmc_rx_crc-cleanup-v1-1-7133f529859f@gmail.com
+---
+ drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index b8240737dc51..2e75846d1072 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1052,6 +1052,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
- 	int err, depth;
- 
- 	if (unlikely(xdp->data_end - xdp->data < ETH_HLEN)) {
-+		put_page(virt_to_head_page(xdp->data));
- 		err = -EINVAL;
- 		goto err;
- 	}
-@@ -1061,6 +1062,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
- 
- 	skb = build_skb(xdp->data_hard_start, buflen);
- 	if (!skb) {
-+		put_page(virt_to_head_page(xdp->data));
- 		err = -ENOMEM;
- 		goto err;
- 	}
+diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+index 1b3b114e7..d81581dfa 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+@@ -479,8 +479,6 @@ static void dwxgmac_mmc_read(void __iomem *mmcaddr, struct stmmac_counters *mmc)
+ 			     &mmc->mmc_rx_multicastframe_g);
+ 	dwxgmac_read_mmc_reg(mmcaddr, MMC_XGMAC_RX_CRC_ERR,
+ 			     &mmc->mmc_rx_crc_error);
+-	dwxgmac_read_mmc_reg(mmcaddr, MMC_XGMAC_RX_CRC_ERR,
+-			     &mmc->mmc_rx_crc_error);
+ 	mmc->mmc_rx_run_error += readl(mmcaddr + MMC_XGMAC_RX_RUNT_ERR);
+ 	mmc->mmc_rx_jabber_error += readl(mmcaddr + MMC_XGMAC_RX_JABBER_ERR);
+ 	mmc->mmc_rx_undersize_g += readl(mmcaddr + MMC_XGMAC_RX_UNDER);
+
+---
+base-commit: 028ef9c96e96197026887c0f092424679298aae8
+change-id: 20260520-xgmac-mmc_rx_crc-cleanup-afcea6faa8ab
+
+Best regards,
 -- 
-2.43.0
+Abid Ali <dev.taqnialabs@gmail.com>
+
 
 
