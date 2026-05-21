@@ -1,130 +1,120 @@
-Return-Path: <netdev+bounces-290201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290202-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCulAuVpDmob+gUAu9opvQ
-	(envelope-from <netdev+bounces-290201-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:11:49 +0200
+	id OMFrGLNrDmob+gUAu9opvQ
+	(envelope-from <netdev+bounces-290202-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:19:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A362459DF0F
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:11:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFABA59DFE3
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:19:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E04593043A23
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:11:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3156B309214D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF7C346FA8;
-	Thu, 21 May 2026 02:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58FD33D6FC;
+	Thu, 21 May 2026 02:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sf20Z5aF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HFTF0pde"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E79633F5BC;
-	Thu, 21 May 2026 02:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A1632E134;
+	Thu, 21 May 2026 02:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779329430; cv=none; b=UjRU2ikWKBmRFQI9GwMLTEutrYmc5Rimn4hAnRJh4nLnqrpcJiWs7JDWcobBwNDJxwYkroShL4bUdoZUEdylnZAITrSh11U83SSa/H37esvC+K6BJLwQFShGG0HhmXvjQvDNqTbPe28EohNZAvdh/CwKaSIhsVvI8VtyLa+Rtko=
+	t=1779329800; cv=none; b=a45imBGoIhd2lOnpoE75LZ4Tdd6ODyFp9/GXXzaDQZsnzxx4RKy9p0JoUUh6br0+FJmuXzTmrIHl+xqYS3sbBH43ZJvJYzSIUDKENP1vBJ1pn1RgwyUUFop/kWevjrOQEjA0itOQ2tFxUfdDJKj15d+/qxbzCe8nmloDpUZpJpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779329430; c=relaxed/simple;
-	bh=eozyLbpDdiloCRqtx0/ngaofjUmpN5fy7fLLFFFMWFM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=byv2SlaF4jgl/UXuP+YkFGS3r/f+pFXCOiZjayBT7rzOEI8HACwUY55w+W1P417xwjdnfb4QBlcZUutMPK38mvbHuyG7B2xjYtTLrUo73SAwHbBhnOPFXfQo5PBY0f61am6lAcpMfHL+hBlTwNJFzzApH5ryFd5re3CGOmUPGu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sf20Z5aF; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D87B1F000E9;
-	Thu, 21 May 2026 02:10:29 +0000 (UTC)
+	s=arc-20240116; t=1779329800; c=relaxed/simple;
+	bh=5NNfixH43rJtIbq0/JHV8UMMN/w6MQSF5gq/5wPqC3M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sTZc++XV+MBU6JGCs9yIy4W4Cvb5YKUkOFcwEy4JCCEY3Q25N8JeHeZW4kN5gyYF4YXKWzYF0qphoyc6jkKno1ZjXdJyK3pJHSjkZJjmI0MQvQ7ruHeXpQQrZ54T6ztNOJMtTlmEBYDmNlrzjVDYOBa5GPb0SeDKrwvjbJnohnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFTF0pde; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6ADFF1F000E9;
+	Thu, 21 May 2026 02:16:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779329429;
-	bh=ivDt/eXSZ8q8zdAd+yr/i20mMcVaiBKx5g2mCtrA0go=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Sf20Z5aFKCSFP8HNP8vxrhjXrmjxbV5nGPLL+1lNEYHLBhn4Dp3iPfaM39B5QlOa2
-	 AXyyjSiRX2qhcy2Ul7gjtsf7f5mX2dtRw7DJQujo0L5uAiBMI113uVk4n5B8wfdOEQ
-	 RAvgoivg9q+Mrb9BLbWP4dwWtZ2P+r7DBgymxWK1tI5skX9Oq1htz4f9dJ2U0r+FHi
-	 FrIUsGxS8XBBYB0igQ3UGl2kdUgQ/C16O96fe0JilPMsTRp03UJAUt508SUsSMTPKE
-	 NnX8zxuVjxzqJTK3CET0WZb0L8sHGW8nHM5E/V7GnUb9Haleno6Q95c0zDT/EmxZxG
-	 NzDOeEdhq2gIg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939563930C38;
-	Thu, 21 May 2026 02:10:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1779329793;
+	bh=/Bp0SYVMP6JwekykUnpp109Yxa0slvT9rm10mIA60D8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=HFTF0pdevcJ2ZmKPVbmFLvzZGw1jxvli9uWf4+q7fporrrqx0aY/aTkzKBQnhpT2H
+	 FMbQnQplvuE5OmzhPGW7lkgdXDBrVckVxhXahCopMY0dRtKofd6cxGvH19an2vtDK3
+	 m3R++EBXTliVWCGrDIoLu2UnIGCwdttEiLbYmH85pQ2ZSN+DicUNFJKS8FZjaayQ74
+	 dHXQYcDWdaEaD88OWJ+QAPB6ON3yMDjdYcfL2ugN1w/oxEHTjxuaYodA8gSKn96si6
+	 IkJza/lCIyIHSb3y76s1Bhe58/eM77IdJqX09YZ13QGgeIrASAYolAZ2dp1f53FV5c
+	 CO/VoyG0LtBbQ==
+Date: Wed, 20 May 2026 19:16:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Arkadiusz Kubalewski
+ <arkadiusz.kubalewski@intel.com>, "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Jiri Pirko <jiri@resnulli.us>, Michal Schmidt
+ <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Pasi Vaananen
+ <pvaanane@redhat.com>, Petr Oros <poros@redhat.com>, Prathosh Satish
+ <Prathosh.Satish@microchip.com>, Simon Horman <horms@kernel.org>, Vadim
+ Fedorenko <vadim.fedorenko@linux.dev>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] dpll: add DPLL_PIN_TYPE_INT_NCO pin
+ type
+Message-ID: <20260520191631.639a9820@kernel.org>
+In-Reply-To: <20260516175744.26749-2-ivecera@redhat.com>
+References: <20260516175744.26749-1-ivecera@redhat.com>
+	<20260516175744.26749-2-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] dpll: zl3073x: Use named initializers for struct
- i2c_device_id
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177932943911.3832404.650041739281306010.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 02:10:39 +0000
-References: <20260519142710.1587324-2-u.kleine-koenig@baylibre.com>
-In-Reply-To: <20260519142710.1587324-2-u.kleine-koenig@baylibre.com>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29_=3Cu=2Ekleine-koenig?=@codeaurora.org,
-	=?utf-8?q?=40baylibre=2Ecom=3E?=@codeaurora.org
-Cc: ivecera@redhat.com, Prathosh.Satish@microchip.com,
- vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com, jiri@resnulli.us,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	TAGGED_FROM(0.00)[bounces-290202-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:-];
-	R_DKIM_REJECT(0.00)[kernel.org:s=k20260515];
-	NEURAL_SPAM(0.00)[0.970];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290201-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FROM_NO_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,davemloft.net,gmail.com,google.com,resnulli.us,redhat.com,microchip.com,kernel.org,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A362459DF0F
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BFABA59DFE3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+On Sat, 16 May 2026 19:57:43 +0200 Ivan Vecera wrote:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 19 May 2026 16:27:10 +0200 you wrote:
-> While being less compact, using named initializers allows to more easily
-> see which members of the structs are assigned which value without having
-> to lookup the declaration of the struct. And it's also more robust
-> against changes to the struct definition.
+> ---
+> v2:
+>   - Clarify int-nco pin type documentation to describe frequency
+>     control via the PTP clock interface instead of generic "controlled
+>     by the host".
+>   - Tighten FFO attribute documentation for INT_NCO pins to describe
+>     the DPLL's output frequency offset from nominal frequency.
+>   - Mention both fractional-frequency-offset (PPM) and
+>     fractional-frequency-offset-ppt attributes in the commit message.
 > 
-> This patch doesn't modify the compiled arrays, only their representation
-> in source form benefits. The former was confirmed with x86 and arm64
-> builds.
-> 
-> [...]
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-Here is the summary with links:
-  - [v1] dpll: zl3073x: Use named initializers for struct i2c_device_id
-    https://git.kernel.org/netdev/net-next/c/a09dfac0296d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Both patches have SoB after --- and changelog, please fix :(
 
