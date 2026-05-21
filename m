@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-290386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4G1nNjj3DmoSDwYAu9opvQ
-	(envelope-from <netdev+bounces-290386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:14:48 +0200
+	id mItSOVf3DmoSDwYAu9opvQ
+	(envelope-from <netdev+bounces-290387-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:15:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA5C5A49F2
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:14:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5B05A4A0D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:15:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5B8B73067CF3
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:12:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9DDBB3069C38
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:12:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D17173D5C15;
-	Thu, 21 May 2026 12:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9642A3D6CC7;
+	Thu, 21 May 2026 12:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="usu6Zu13"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WFJ6gUca"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E853CE0BB;
-	Thu, 21 May 2026 12:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CC33CF049
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 12:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779365484; cv=none; b=OmAFLO8we8GOiDUetZHxn3aCAOm3jVluP8Bc0AnlCUYOA8qWsZaoEmwntB/fuuEDWLwxHIMaaqLjh5pgIJZkG/0EYjDrcXiGEWj7rZlCaBuMDUua8NMZBNhFXnV633u81ZtSd6sO6AcOlQVmevSY5OBxbPnoKRsjU/y/4h8cWo0=
+	t=1779365487; cv=none; b=E0qvrvVD76FiGpxvZm4gS/5Kig1xuFt+X5pa6tdWw32cL1/+A+4Iia3V8b7litZXRqpAhAaMJqTkPeULMAMEgh5eouJPLePyPNoAf/hnPYnXMIzv8LAi7VKKLyG0QB+CVdxerW0cnYBQj5zTHqkVGRbKB435Rb5Slx+k0PhH7z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779365484; c=relaxed/simple;
-	bh=V3OamUcWYfbu/DkuLTLZdZLJI/LBIOlXBifIcx0k2MY=;
+	s=arc-20240116; t=1779365487; c=relaxed/simple;
+	bh=gLFCN9Kq3IPLvjz/zLiPs2vJXCmEj8pJG9QTU/Cc2DA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O0IC80FCSqI2Fvqvz+m1v7Tk5w4PrRolvrLNiDZa/su/8LbWJt4HXlhK89T1geH6GlV+uQKtKArZ0rmhdzO6hrah8EgbIRXvuwDJDqEMDP2gl9iClbc3Up0tFT0aJyzsev3mfW1HKRh5NwzeK1UoQj3A0qt0ioKHTz5lTCLqMYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=usu6Zu13; arc=none smtp.client-ip=185.246.84.56
+	 MIME-Version; b=dKYuCD8XPjgILHUAgbe5Fea2BSboL5qeKjHSji3QEoAxBtfqSYzdClk2alL13e1ygC65FeluIqkrApvKTWGbY2mtOT802gi61/5dEOJh5RghSfii5I/dgIHFUriNl6lIN9lKBI9WxFyZQtKrEQ3ycQLA501zxF5xB1nZ5D6pYIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WFJ6gUca; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id D569A1A365A;
-	Thu, 21 May 2026 12:11:20 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B4A914E42D0D;
+	Thu, 21 May 2026 12:11:23 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A876E60495;
-	Thu, 21 May 2026 12:11:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DF2F0107E8B3D;
-	Thu, 21 May 2026 14:11:16 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 88DED60495;
+	Thu, 21 May 2026 12:11:23 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DB3FC107E8B4A;
+	Thu, 21 May 2026 14:11:19 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779365479; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1779365482; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=0JdVb4iMIy5LVMOY66fK4TIUnCsvH021lJqidTyCUag=;
-	b=usu6Zu13htA7CDBQqFmoKVwEjYWXvMuKECD/Z+OXvTSadZUHKlqzlu8oY40GJjFZAbEck1
-	L4Nu7fdx66ZB995RuN+X6NEMevyeTMKaWpy2CMYFH/LWLCCojfS/IY1VhHv6MymIi47yzp
-	+tVjMXuwIRdJsTzNhURV4rWw1cIt+hGnaacvnI7WK9NfSP/ALP6ewsKnxGwfqcC6wpSUJO
-	nRyJOt/lnztfG78zRh2yi7eNpM6TWL2WUCNujTVsMxXnXDgVNIXs18zGC3W86DAfKBMoOo
-	0pAUZ8jjYosNeHVkYfIS4pKz0/a1obU6GQb9eW20KfoAelTEOrPn/gtv6gZC6Q==
+	bh=9fuOdLWcCVdn3c2ZJ20B3FaFb6ErwysOEXjn2J0AbPQ=;
+	b=WFJ6gUcablM3Auufnw4UDHyZ3PxQ9HzIPCSUIreg9cFoVNQSyNbozVa6WU3b2tAoHk9HgQ
+	hARKf0Zy+fdDWKu0vNqxjQ+j+LLBQhe6y7x4gvGxhaPQ2TK7U9XpmnhgMrlNKBpmYBIAvv
+	spAUiT8klZ1XN8K4bAAxDUSyDYUeETx4LF/q/h9IylOv8KdpyABCJeyp0yfeMJXNyXaKaK
+	PLGNRo+Ygey3K+j53H+mDDKzIZMC4K+Waq+cqAKTOJj5JMcR1MCvLj8EcND3X50ebtTBYu
+	eGKakSWNvUy6nYIYgdFR+/QU/A6GYe2+fpQh+C5i3z1vN/AucYba6FVtN5sxEw==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -77,9 +77,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
 	Frank Wunderlich <frank.wunderlich@linux.dev>
-Subject: [PATCH net-next v11 06/10] net: phy: phy_port: Store information about a port's upstream
-Date: Thu, 21 May 2026 14:10:34 +0200
-Message-ID: <20260521121040.1199622-7-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v11 07/10] net: phy: phy_link_topology: Add a helper to retrieve ports
+Date: Thu, 21 May 2026 14:10:35 +0200
+Message-ID: <20260521121040.1199622-8-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260521121040.1199622-1-maxime.chevallier@bootlin.com>
 References: <20260521121040.1199622-1-maxime.chevallier@bootlin.com>
@@ -104,7 +104,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
 	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_FROM(0.00)[bounces-290386-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290387-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	MIME_TRACE(0.00)[0:+];
@@ -121,158 +121,67 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 8AA5C5A49F2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 8E5B05A4A0D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-MII phy_ports are not meant to be connected directly to a link partner.
-They are meant to feed into some media converter devices that will
-expose an MDI phy_port, so far we only support SFP modules for that.
+In order to allow netlink access to phy_ports, let's add a helper to
+retrieve them. When handling a port coming from phy_link_topology, the
+caller must hold rtnl until it's done with it.
 
-In the case an MDI phy_port is backed by an MII port (e.g. a SFP
-module's port, backed by the SFP cage port), let's keep track of the
-port id of the MII port backing it.
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy_device.c | 27 +++++++++++++++++++++++++++
- drivers/net/phy/phylink.c    |  5 +++++
- include/linux/phy.h          |  3 +++
- include/linux/phy_port.h     |  3 +++
- 4 files changed, 38 insertions(+)
+ include/linux/phy_link_topology.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 03bcaf5e5fe3..2a3fc69e0625 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1493,6 +1493,7 @@ static int phy_sfp_connect_phy(void *upstream, struct phy_device *phy)
- 	int ret;
+diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
+index 66bceff72b19..ac2f5c80f1a6 100644
+--- a/include/linux/phy_link_topology.h
++++ b/include/linux/phy_link_topology.h
+@@ -13,6 +13,7 @@
  
- 	phydev->has_sfp_mod_phy = true;
-+	phy_set_upstream_port(phy, phydev->sfp_cage_port);
+ #include <linux/ethtool.h>
+ #include <linux/netdevice.h>
++#include <linux/rtnetlink.h>
  
- 	/* If we aren't attached to a netdev, we can't add the SFP PHY to its
- 	 * topology.
-@@ -1526,6 +1527,8 @@ static void phy_sfp_disconnect_phy(void *upstream, struct phy_device *phy)
- 
- 	if (dev)
- 		phy_link_topo_del_phy(dev, phy);
-+
-+	phy_set_upstream_port(phy, NULL);
+ struct xarray;
+ struct phy_device;
+@@ -66,6 +67,20 @@ phy_link_topo_get_phy(struct net_device *dev, u32 phyindex)
+ 	return NULL;
  }
  
- /**
-@@ -1661,6 +1664,8 @@ static int phy_add_sfp_mod_port(struct phy_device *phydev)
- 	 */
- 	phydev->mod_port = port;
- 
-+	port->upstream_port = phydev->sfp_cage_port->id;
-+
- 	return 0;
- }
- 
-@@ -3674,6 +3679,28 @@ struct phy_port *phy_get_sfp_port(struct phy_device *phydev)
- }
- EXPORT_SYMBOL_GPL(phy_get_sfp_port);
- 
-+/**
-+ * phy_set_upstream_port() - Sets the phy_port controlling the MII this PHY is
-+ *			     attached to.
-+ * @phydev: pointer to the PHY device we set the upstream of.
-+ * @port: The phy_port upstream of this PHY, can be NULL.
-+ */
-+void phy_set_upstream_port(struct phy_device *phydev, struct phy_port *port)
++static inline struct phy_port *
++phy_link_topo_get_port(struct net_device *dev, u32 port_id)
 +{
-+	struct phy_port *local_port;
++	struct phy_link_topology *topo = dev->link_topo;
 +
 +	ASSERT_RTNL();
 +
-+	phydev->upstream_port = port;
++	if (!topo)
++		return NULL;
 +
-+	phy_for_each_port(phydev, local_port)
-+		if (port)
-+			local_port->upstream_port = port->id;
-+		else
-+			local_port->upstream_port = 0;
++	/* Caller must hold RTNL while handling the phy_port */
++	return xa_load(&topo->ports, port_id);
 +}
-+EXPORT_SYMBOL_GPL(phy_set_upstream_port);
 +
- /**
-  * fwnode_mdio_find_device - Given a fwnode, find the mdio_device
-  * @fwnode: pointer to the mdio_device's fwnode
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 59ea3a2e5da4..d069338e8e4d 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -3959,6 +3959,8 @@ static int phylink_add_sfp_mod_port(struct phylink *pl)
- 		}
- 	}
- 
-+	port->upstream_port = pl->sfp_cage_port->id;
-+
- 	pl->mod_port = port;
- 
- 	return 0;
-@@ -4062,6 +4064,8 @@ static int phylink_sfp_connect_phy(void *upstream, struct phy_device *phy)
- 	phy_interface_and(phy->host_interfaces, phylink_sfp_interfaces,
- 			  pl->config->supported_interfaces);
- 
-+	phy_set_upstream_port(phy, pl->sfp_cage_port);
-+
- 	/* Do the initial configuration */
- 	return phylink_sfp_config_phy(pl, phy);
- }
-@@ -4070,6 +4074,7 @@ static void phylink_sfp_disconnect_phy(void *upstream,
- 				       struct phy_device *phydev)
+ #else
+ static inline int phy_link_topo_add_phy(struct net_device *dev,
+ 					struct phy_device *phy,
+@@ -95,6 +110,12 @@ phy_link_topo_get_phy(struct net_device *dev, u32 phyindex)
  {
- 	phylink_disconnect_phy(upstream);
-+	phy_set_upstream_port(phydev, NULL);
+ 	return NULL;
  }
- 
- static const struct sfp_upstream_ops sfp_phylink_ops = {
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 59903257e978..b7d65e72e4c6 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -791,6 +791,7 @@ struct phy_device {
- 	struct sfp_bus *sfp_bus;
- 	struct phy_port *sfp_cage_port;
- 	struct phy_port *mod_port;
-+	struct phy_port *upstream_port;
- 	struct phylink *phylink;
- 	struct net_device *attached_dev;
- 	struct mii_timestamper *mii_ts;
-@@ -2466,6 +2467,8 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
- 
- struct phy_port *phy_get_sfp_port(struct phy_device *phydev);
- 
-+void phy_set_upstream_port(struct phy_device *phydev, struct phy_port *port);
 +
- /**
-  * phy_module_driver() - Helper macro for registering PHY drivers
-  * @__phy_drivers: array of PHY drivers to register
-diff --git a/include/linux/phy_port.h b/include/linux/phy_port.h
-index 4e2a3fdd2f2e..e3a41cedebdc 100644
---- a/include/linux/phy_port.h
-+++ b/include/linux/phy_port.h
-@@ -40,6 +40,8 @@ struct phy_port_ops {
-  * @head: Used by the port's parent to list ports
-  * @parent_type: The type of device this port is directly connected to
-  * @phy: If the parent is PHY_PORT_PHYDEV, the PHY controlling that port
-+ * @upstream_port: For non-MII ports, indicates the MII port that feeds this
-+ *		   port, e.g. the SFP cage port for a SFP module port.
-  * @ops: Callback ops implemented by the port controller
-  * @pairs: The number of  pairs this port has, 0 if not applicable
-  * @mediums: Bitmask of the physical mediums this port provides access to
-@@ -59,6 +61,7 @@ struct phy_port {
- 	union {
- 		struct phy_device *phy;
- 	};
-+	u32 upstream_port;
++static inline struct phy_port *
++phy_link_topo_get_port(struct net_device *dev, u32 port_id)
++{
++	return NULL;
++}
+ #endif
  
- 	const struct phy_port_ops *ops;
- 
+ #endif /* __PHY_LINK_TOPOLOGY_H */
 -- 
 2.54.0
 
