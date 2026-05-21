@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-290553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290554-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qC3ZAOc+D2pzIQYAu9opvQ
-	(envelope-from <netdev+bounces-290553-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:20:39 +0200
+	id ANh8DxpED2r/IQYAu9opvQ
+	(envelope-from <netdev+bounces-290554-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:42:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC3545AA1AC
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:20:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F73D5AA6E6
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:42:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6C81C3201A14
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:00:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A740D313B2C9
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD40370D61;
-	Thu, 21 May 2026 16:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005A3372073;
+	Thu, 21 May 2026 16:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBTCkE56"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S5+sp8Hc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB92437105A;
-	Thu, 21 May 2026 16:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86FB370D70;
+	Thu, 21 May 2026 16:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779379211; cv=none; b=u8gbyvlrp31IjC+cQD7++B/Ot/ilIXKoxemMa03lb3D1+Ng/3MJWCjP0QTnjVmNwFYrH6Ih6plUvaHkCNCbZwbCS25IvjRluffJqhTtplBDxUCYiI6FoFf4MvB/K7Nje56NRFFAkRGrvwvm8IelvU8MJ1DZ9kKI451HBbKz1DP4=
+	t=1779379212; cv=none; b=QfNAOCR2Y44CI/0TykHwsGzlEfpvEpxVNbz9BAmYcJyfYAlossm6u+mPIWAtw79VQNNwzONmA/fPtGSUXXpwsFIQtfcexOvKFSyqhR5KiNxEKIAgv37gf+K0s17Sqhq9TyhnsMBR1P/TGB9cj2nfgaggQbwtIx4lwtAtTRpsWB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779379211; c=relaxed/simple;
-	bh=ju2uWccE12fiqVm7wE+fKfZwZ6h73RpNrbldnR/9OG8=;
+	s=arc-20240116; t=1779379212; c=relaxed/simple;
+	bh=rITkirD2uTUBYnsNArSerbG9BdZE0iZ6h3vyqgdqLhY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fUUgCGuDakKSF7slmFdg8YPAK9idIiS4meiYr4NCTX2ac3WK8wFu6N1fOpm2k+cJ2sDNJyWYVpIkqw9PeiVqJHKbmHJXnsVzfSm8WAQ+IzWTIuzwPsM+E1FddQzPW8djUPUW3EwvZpws1jRG6CrnJaNzM8R1hkPPmQC3eTGd02o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBTCkE56; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF371F000E9;
-	Thu, 21 May 2026 16:00:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=RAzxjii2RUoT1KCqGM6tvO1HV6lY3O6iX+fB4HX74fJ5ADh5UeCYayUKWTguWlr9VMREUNd2KV2AZn/J+KcFuRNhXsSJwM2yuGSzYW2pLP2YgxkEW5HduWi+9fKxWYV6wxgiGKDFgNyVUd8KZSkLcsq+zZROM4MjyM09NtJqObI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S5+sp8Hc; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE5201F00A3B;
+	Thu, 21 May 2026 16:00:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779379210;
-	bh=vRbmhKzqEo/N7s1MY7vJImxIbVLPP2pirP6DywPqASI=;
+	s=k20260515; t=1779379211;
+	bh=lXZG8Nuh1gjzWA1ZQS9DRDpYWOBFcIujbgEZdYrGYdI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=YBTCkE56mBgtCGHZXIOednJ6a5ScxIALFh8Gf9Rt8KHlqTt2aCyq9ThLmbQrO/Idx
-	 el6ichzL/wL8kLD7SrR0EV3LTNc3g+PCt0FdwzIZ4vVOXya2ufsb1e1axW2LoP1dRj
-	 vLk0/e/bhH0dk6VBpEm1D8EQWs+9lcs+PPt+/c+aJlxvcaZI88o1GELP1fTxRqHKg+
-	 SGvrUpF0Z8hKMXKTM1oTiYRoWHLbs1nb6v5bOw6Wzn+9p2YuB9ASFGpKC8QCr79QMW
-	 zN4Nt/KMpEv47lCr5JIMqMJNh1VLCdQ2pxfrK+iMWt/hzrmfSkBPuqSRE60lV8E3Yx
-	 vqmKcWkIGAfEg==
+	b=S5+sp8HccBv8yPTyQw9DkagbImSKY8YwAOo7t0HZ8txaxx9LdDVLaHawT9szLtwg6
+	 l7/m4C8fj7jfLd3AR7LJkia63obT1cWhpmimqzkufyXxpgj49YUUwrrDjAtl1EaoL7
+	 qRSHFpqEXBhsL1Oodn/fXoL/sboHivhOjko2LyXG5S9e00FdyyR3tRg9hTCzR2MwmR
+	 TopbX6ztBj5yrMadCSGa/iEF9QXDI/kq8hz3uOtQvgUqnUl1JEOar6+pYxb8EtD1re
+	 K3tevkiuNnR4lzbU+DxCNWQSN0xpMOh1fMJQpnPGXkJwRUAxx+rOESACH/x/sKEZfE
+	 7zIMe1XiqpM8w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5699B3930E0B;
-	Thu, 21 May 2026 16:00:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09973930E0B;
+	Thu, 21 May 2026 16:00:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,92 +55,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net 0/9] net: enetc: SR-IOV robustness and security
- fixes
+Subject: Re: [PATCH net] l2tp: use list_del_rcu in l2tp_session_unhash
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177937921988.398712.17366244673033381497.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 16:00:19 +0000
-References: <20260520064421.91569-1-wei.fang@nxp.com>
-In-Reply-To: <20260520064421.91569-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, hramamurthy@google.com,
- imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- catalin.horghidan@nxp.com
+ <177937922139.398712.13031007990966134157.git-patchwork-notify@kernel.org>
+Date: Thu, 21 May 2026 16:00:21 +0000
+References: <20260518183447.64078-1-michael.bommarito@gmail.com>
+In-Reply-To: <20260518183447.64078-1-michael.bommarito@gmail.com>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jchapman@katalix.com, tparkin@katalix.com,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290553-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-290554-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: AC3545AA1AC
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2F73D5AA6E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 20 May 2026 14:44:12 +0800 you wrote:
-> This patch series addresses a number of robustness, security, and
-> correctness issues in the ENETC driver's SR-IOV subsystem, focusing
-> primarily on the VF-to-PF mailbox communication path.
-> 
-> The series can be grouped into the following categories:
-> 
-> 1. DoS and security fixes:
->    - Prevent an unbounded loop DoS in the VF-to-PF message handler,
->      which could be triggered by a malicious or misbehaving VF.
->    - Fix a TOCTOU (Time-of-Check-Time-of-Use) race and add proper
->      validation of VF MAC addresses to prevent spoofing or invalid
->      configuration from being applied.
+On Mon, 18 May 2026 14:34:47 -0400 you wrote:
+> An unprivileged local user can pin a host CPU indefinitely in
+> l2tp_session_get_by_ifname() by issuing L2TP_CMD_SESSION_GET on
+> L2TP_ATTR_IFNAME concurrently with L2TP_CMD_SESSION_CREATE and
+> L2TP_CMD_SESSION_DELETE on the same tunnel. All three commands take
+> GENL_UNS_ADMIN_PERM, so CAP_NET_ADMIN in the netns user namespace
+> suffices; on any host that has l2tp_core loaded the trigger is
+> reachable from a standard `unshare -Urn` sandbox.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net,1/9] net: enetc: fix incorrect mailbox message status returned to VFs
-    https://git.kernel.org/netdev/net/c/8c84c5ec4aaf
-  - [v3,net,2/9] net: enetc: fix missing error code when pf->vf_state allocation fails
-    https://git.kernel.org/netdev/net/c/5027266dea47
-  - [v3,net,3/9] net: enetc: add ratelimiting to VF mailbox error messages
-    https://git.kernel.org/netdev/net/c/4a995d37b537
-  - [v3,net,4/9] net: enetc: fix TOCTOU race and validate VF MAC address
-    https://git.kernel.org/netdev/net/c/c666fa632fe6
-  - [v3,net,5/9] net: enetc: fix race condition in VF MAC address configuration
-    https://git.kernel.org/netdev/net/c/f262f5d89332
-  - [v3,net,6/9] net: enetc: fix DMA write to freed memory in enetc_msg_free_mbx()
-    https://git.kernel.org/netdev/net/c/adb4599979cd
-  - [v3,net,7/9] net: enetc: fix unbounded loop and interrupt handling in VF-to-PF messaging
-    https://git.kernel.org/netdev/net/c/f8ae63de2a87
-  - [v3,net,8/9] net: enetc: fix init and teardown order to prevent use of unsafe resources
-    https://git.kernel.org/netdev/net/c/54362b017608
-  - [v3,net,9/9] net: enetc: avoid VF->PF mailbox timeout during SR-IOV teardown
-    https://git.kernel.org/netdev/net/c/9e68817f12d5
+  - [net] l2tp: use list_del_rcu in l2tp_session_unhash
+    https://git.kernel.org/netdev/net/c/979c017803c4
 
 You are awesome, thank you!
 -- 
