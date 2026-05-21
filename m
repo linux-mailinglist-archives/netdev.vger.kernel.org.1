@@ -1,194 +1,156 @@
-Return-Path: <netdev+bounces-290629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290630-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qG22IpuND2pdNQYAu9opvQ
-	(envelope-from <netdev+bounces-290629-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 00:56:27 +0200
+	id AAnbOW+SD2oJNgYAu9opvQ
+	(envelope-from <netdev+bounces-290630-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 01:17:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27A1A5AC7C3
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 00:56:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 600A45AC89F
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 01:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5D623300B1B4
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 22:56:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0EC9301572E
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 23:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998EB368D5A;
-	Thu, 21 May 2026 22:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54A234EF1F;
+	Thu, 21 May 2026 23:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G+N8k20L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F9036606A
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 22:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DD1344D9B;
+	Thu, 21 May 2026 23:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779404183; cv=none; b=iR45BJLmcC0TAAIu98KDnBIOctwJSvsO8JatJ48LVGAjeLVTeFgRgl8HV8a9NXTU6altp0UC1+f+ZJJI6m8AS51d80KJMU+BMsCW/VSU0rqALA+5hBuvhJhjmTq8LOZASyZv8iSm6nxW0iXcRR/h9R5NEqqTblUmfGlOGWSiIDM=
+	t=1779405416; cv=none; b=DjUVpFWhJYvVJoqcpDgQQzCxIJXPfK2luCIGoo5j8sAlsWojRX5W/usX1O7BPhf8501W2iWj+oBNTdyST/J450lIGvoRpBUImmBoraHI1+sUspvNN6EmkaVo36K1HHaEDjdZ19J8/NMWrcL8X5wXoo+Wvl1ycUKVBdFTIfGcdeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779404183; c=relaxed/simple;
-	bh=woFJNG+AkIhIjdrUa3L5vqm1iAVDH/ulwz2H+d6Dlac=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EFsCk9fy3Xe1Q/RHBWHNDVF3uHZTMsaU/Wu3i9H09FZiHSL3Ts4k1sasJslqIzbin0qr2LufTBW6Sen+n8LYW4NRqYyP2wvy9odBFXe9P6HWh9Fb1dm3eRHBFyGStuMycQWfJ5LKKLc1gRY2ADLHp5lgA5hHYtYzY/5+uSFNY9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-4346755f7dcso12229601fac.3
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 15:56:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779404181; x=1780008981;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wKcggRR9OaSzW53BRXT7XgtoSulSO0zV7NnoewwOLLk=;
-        b=qkyUX1Vg8vCLBHMsdr2GrxC9+nBxDRu2CDVxU88ccawIJq/LIZ13xny42o6zyI10y9
-         dZGuEwUfR4DyUwYBC7ji5D8KLy83ldj9NyEtMYUGIwnjgFpbwGR204A7nukMr2au97Qi
-         YcgGPe+MwOgyczXsSUEM+rWx1ezAHLZ6ZMc+EqnP4vTKkWGpXaQERDa4NO3awcv8N6P5
-         ggugtqY+KZ/9+SduOVn6eedxS2Rr0P45YUjmfz+CpCynZbk1EnupTz4aUT+PAuyD18Zp
-         gA0xOZe/mp7KfteB6HnI2unoi+jbPJPj94pwY0zRw54D1xTA/qUaulDg3aa7y1afKVBx
-         VF4Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8gQzR9I1wRq9/AusSlfBbuKM9yoJ8EmssIwGSwvoAuibQMufT6QKYBG+3/0QrFTKUmOwBJ9UQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLL0ZL91j6n8Br8YC0Y0Wlx8qjmgxP6xJpqzH9YnvakusdfD1U
-	fS8YLwwkLi+OkRT8YJCF4EQ/mdZzfCFYz//AsVu9ZL3wHJHD43WxO9Sytqf52ae09r2QI/Ozoi0
-	xn78RUp1MbM6byZqiY2t2fHc5/4SkQVq3XYRHmeJlHvipcMsNt8virn74rv0=
+	s=arc-20240116; t=1779405416; c=relaxed/simple;
+	bh=cTlRn69Eqnrfv5gb6kYtbXsB/t6BrmvwRAeux77JNp8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DJtxKgOt7z5FM5WpkB9r80tlFUn9jjkhII47V7Uqcflth5QEwW2unw7pbZHvRIPGODoTX3lkPwhaflxhdqRYsnu2rDU01qasVSsvdT18L0nSDET4j2exkZ42USZowSjK0HbK5xERdcB345CkQTalO70gTozvraHzbO/73GpPLj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G+N8k20L; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779405413; x=1810941413;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cTlRn69Eqnrfv5gb6kYtbXsB/t6BrmvwRAeux77JNp8=;
+  b=G+N8k20Lgek1sDK2hjP0h3yJDVUqiV0j/+zw3H+ja3Bgq7AeDu8yVOf3
+   ndy6Bz7VQUeYSnx0GhiMSLm4PAnZLXb6s2I4myuwptdn0xJGpQxe7mkc6
+   q85yZc64txaMG+ZvKQR6ViRwBWgajUIPbW73Pb5lHuV8Lc4adgQnRJh46
+   RekidDomww5CjTLsY6uAab0fYIdu/wVzb/XyMF9XzgZwiWlZSTHGceyEx
+   zR4vgtv0Lm8S04gCwdryIZx1LKTt6dqbuLvaFFsd57H7oQ9j7OvYyqxE5
+   YtUR8nSwTAp8yFbLHYazyw+LdJL/x6oN6QKDCAqt+O4toqo9CfO3XGYdt
+   Q==;
+X-CSE-ConnectionGUID: NMhggxavQ3C5aZTwdcnolw==
+X-CSE-MsgGUID: fiiSiRukQxKwgXw/JYVD9w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11793"; a="97758578"
+X-IronPort-AV: E=Sophos;i="6.24,161,1774335600"; 
+   d="scan'208";a="97758578"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2026 16:16:51 -0700
+X-CSE-ConnectionGUID: ZiLJkafsQWuVlPOboch67g==
+X-CSE-MsgGUID: Qjr/RMbbSCaDuosBYtPq8g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,161,1774335600"; 
+   d="scan'208";a="240737782"
+Received: from lkp-server01.sh.intel.com (HELO fdb68b0ce653) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 21 May 2026 16:16:48 -0700
+Received: from kbuild by fdb68b0ce653 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wQCdA-000000001L3-2qe3;
+	Thu, 21 May 2026 23:16:44 +0000
+Date: Fri, 22 May 2026 07:16:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chuang Wang <nashuiliang@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Chuang Wang <nashuiliang@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Krishna Kumar <krikku@gmail.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: reduce RFS/ARFS flow updates by
+ checking LLC affinity
+Message-ID: <202605220754.aEHPLGaI-lkp@intel.com>
+References: <20260521133711.20725-1-nashuiliang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:998:b0:69d:7dbc:19b1 with SMTP id
- 006d021491bc7-69d7ed29503mr687622eaf.55.1779404180791; Thu, 21 May 2026
- 15:56:20 -0700 (PDT)
-Date: Thu, 21 May 2026 15:56:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a0f8d94.050a0220.6b33c.0000.GAE@google.com>
-Subject: [syzbot] [rds?] KCSAN: data-race in rds_poll / rds_sendmsg
-From: syzbot <syzbot+fbf3648ae7f5bdb05c59@syzkaller.appspotmail.com>
-To: achender@kernel.org, allison.henderson@oracle.com, davem@davemloft.net, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, rds-devel@oss.oracle.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260521133711.20725-1-nashuiliang@gmail.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=2e40c0f41e01837e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-290629-lists,netdev=lfdr.de,fbf3648ae7f5bdb05c59];
+	TAGGED_FROM(0.00)[bounces-290630-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,google.com,kernel.org,redhat.com,fomichev.me,linux.dev,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,googlegroups.com:email,storage.googleapis.com:url]
-X-Rspamd-Queue-Id: 27A1A5AC7C3
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,01.org:url]
+X-Rspamd-Queue-Id: 600A45AC89F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+Hi Chuang,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build errors:
 
-HEAD commit:    e5d505e3664b Merge tag 'trace-v7.1-rc3' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=144d37ba580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2e40c0f41e01837e
-dashboard link: https://syzkaller.appspot.com/bug?extid=fbf3648ae7f5bdb05c59
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+[auto build test ERROR on net-next/main]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+url:    https://github.com/intel-lab-lkp/linux/commits/Chuang-Wang/net-reduce-RFS-ARFS-flow-updates-by-checking-LLC-affinity/20260521-223039
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260521133711.20725-1-nashuiliang%40gmail.com
+patch subject: [PATCH net-next v4] net: reduce RFS/ARFS flow updates by checking LLC affinity
+config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20260522/202605220754.aEHPLGaI-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260522/202605220754.aEHPLGaI-lkp@intel.com/reproduce)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d01e24b29d85/disk-e5d505e3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/763a9ed109de/vmlinux-e5d505e3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/aa1f01135fd4/bzImage-e5d505e3.xz
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202605220754.aEHPLGaI-lkp@intel.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fbf3648ae7f5bdb05c59@syzkaller.appspotmail.com
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-==================================================================
-BUG: KCSAN: data-race in rds_poll / rds_sendmsg
+>> ERROR: modpost: "rps_llc_check" [net/sctp/sctp.ko] undefined!
 
-write to 0xffff8881054183a4 of 4 bytes by task 9010 on cpu 0:
- rds_sendmsg+0x1001/0x15b0 net/rds/send.c:1391
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x563/0x5b0 net/socket.c:2698
- ___sys_sendmsg+0x195/0x1e0 net/socket.c:2752
- __sys_sendmsg net/socket.c:2784 [inline]
- __do_sys_sendmsg net/socket.c:2789 [inline]
- __se_sys_sendmsg net/socket.c:2787 [inline]
- __x64_sys_sendmsg+0xd4/0x160 net/socket.c:2787
- x64_sys_call+0x194c/0x3020 arch/x86/include/generated/asm/syscalls_64.h:47
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x12c/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-read to 0xffff8881054183a4 of 4 bytes by task 9013 on cpu 1:
- rds_poll+0x9b/0x310 net/rds/af_rds.c:222
- sock_poll+0x21c/0x240 net/socket.c:1502
- vfs_poll include/linux/poll.h:82 [inline]
- __io_arm_poll_handler+0x1ef/0xbf0 io_uring/poll.c:590
- io_arm_apoll+0x2eb/0x400 io_uring/poll.c:698
- io_arm_poll_handler+0x12f/0x160 io_uring/poll.c:727
- io_queue_async+0x25d/0x320 io_uring/io_uring.c:1634
- io_queue_sqe io_uring/io_uring.c:1660 [inline]
- io_req_task_submit+0x9b/0xa0 io_uring/io_uring.c:1062
- io_handle_tw_list+0x1f5/0x230 io_uring/tw.c:72
- tctx_task_work_run+0x42/0x140 io_uring/tw.c:132
- tctx_task_work+0x3f/0x80 io_uring/tw.c:150
- task_work_run+0x130/0x1a0 kernel/task_work.c:233
- get_signal+0xdea/0xf20 kernel/signal.c:2809
- arch_do_signal_or_restart+0x96/0x480 arch/x86/kernel/signal.c:337
- __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
- exit_to_user_mode_loop+0x6f/0x820 kernel/entry/common.c:98
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
- do_syscall_64+0x232/0x3b0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-value changed: 0x00000000 -> 0x00000001
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 UID: 0 PID: 9013 Comm: syz.7.10555 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
