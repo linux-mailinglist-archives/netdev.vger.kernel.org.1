@@ -1,391 +1,194 @@
-Return-Path: <netdev+bounces-290628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2DcbNNqKD2qnNAYAu9opvQ
-	(envelope-from <netdev+bounces-290628-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 00:44:42 +0200
+	id qG22IpuND2pdNQYAu9opvQ
+	(envelope-from <netdev+bounces-290629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 00:56:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EBF85AC729
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 00:44:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27A1A5AC7C3
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 00:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1EDCA3033F9E
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 22:43:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5D623300B1B4
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 22:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D10835AC24;
-	Thu, 21 May 2026 22:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fp1sGh9U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998EB368D5A;
+	Thu, 21 May 2026 22:56:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B383563C7;
-	Thu, 21 May 2026 22:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F9036606A
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 22:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779403404; cv=none; b=gG0/t+OduGA6ZNj/X6oykqY9E3cXa7YMfzTnxB+OD1uhhKz93Oe6GkQwyU/5AAGKxd0Dmnp9GhV+uvg8H/oTP4TEBSDzqQemlQJw1j0hoAeEVOZKlahgtkcY8Q67sGMHVrQUKR9xQllfo8CLBkCowNcVFzEKiERcZZvodL5dqhw=
+	t=1779404183; cv=none; b=iR45BJLmcC0TAAIu98KDnBIOctwJSvsO8JatJ48LVGAjeLVTeFgRgl8HV8a9NXTU6altp0UC1+f+ZJJI6m8AS51d80KJMU+BMsCW/VSU0rqALA+5hBuvhJhjmTq8LOZASyZv8iSm6nxW0iXcRR/h9R5NEqqTblUmfGlOGWSiIDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779403404; c=relaxed/simple;
-	bh=caz9R6GJsHjBM35v75bwuV2JWRZo0NlSlf+W9Q4MeaM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=n7OCrvH+Jj67V37KssKWY20ba5VRRFGJCMPm7R9GECVy3hXdLJcCpAyRGY4haVUphBR6ujVCIaSqv2UMjeNCezESUTH2XkqW6GBrChmsKZ4ILk0uvptzyE+ArEnLtT/aetxdggKx0EuFwA5MCMiSixuHffP3GiL3rQzSPxSYyGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fp1sGh9U; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 8009F1F000E9;
-	Thu, 21 May 2026 22:43:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779403402;
-	bh=sfmUOwNhhpcINsPZHcWUWRwlQqcSxS+LOAqE+w8QiN4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=Fp1sGh9UTfnMF7soOGjZUss4KjK9V0LKdnmR1+/H3UUK14WPfc/YP6Imtax9IxWvM
-	 ac9Nv1RRjH1JbObYlnUvTVkRM6E1rMeDKK495Whiac8OjgwNXFkr5CDwhm3MkkR5ly
-	 ZoSfs34aUHa72MiddpTtaHCEVUM/l7FPXtG6An3qg19k6jrQRYdZqDyrc5iIwy24Q9
-	 eNk41mLLeuy1kM/nQz3Oej5tG/eC1WtvHRtIaCmfyG32/fbSjJkh0x5nKmYjDMEcw/
-	 GiADbzKPOY2z6nAuQ87fmcvwftWqo7mrpVjzAWSdR6OLQ/ffcmepPWd0CmFDmnaldS
-	 ruR+yWVa56FFg==
-From: Thomas Gleixner <tglx@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>, Harshitha Ramamurthy
- <hramamurthy@google.com>, netdev@vger.kernel.org, Arthur Kiyanovski
- <akiyano@amazon.com>
-Cc: joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, jstultz@google.com, sboyd@kernel.org,
- willemb@google.com, nktgrg@google.com, jfraker@google.com,
- ziweixiao@google.com, maolson@google.com, jordanrhee@google.com,
- thostet@google.com, alok.a.tiwari@oracle.com, pkaligineedi@google.com,
- horms@kernel.org, jacob.e.keller@intel.com, yyd@google.com,
- jefrogers@google.com, linux-kernel@vger.kernel.org, Naman Gulati
- <namangulati@google.com>, Thomas =?utf-8?Q?Wei=C3=9Fschuh?=
- <thomas.weissschuh@linutronix.de>
-Subject: Re: [PATCH net-next v8 3/3] gve: implement PTP gettimex64
-In-Reply-To: <63ff978516925951df0f95aecbd4ea5d7bb2956e.camel@infradead.org>
-References: <20260514225842.110706-1-hramamurthy@google.com>
- <20260514225842.110706-4-hramamurthy@google.com>
- <cd5868258edee932fd9b4ed46a48b5a07b4c6da8.camel@infradead.org>
- <87tss0vdrj.ffs@tglx>
- <63ff978516925951df0f95aecbd4ea5d7bb2956e.camel@infradead.org>
-Date: Fri, 22 May 2026 00:43:18 +0200
-Message-ID: <87bje8v0xl.ffs@tglx>
+	s=arc-20240116; t=1779404183; c=relaxed/simple;
+	bh=woFJNG+AkIhIjdrUa3L5vqm1iAVDH/ulwz2H+d6Dlac=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EFsCk9fy3Xe1Q/RHBWHNDVF3uHZTMsaU/Wu3i9H09FZiHSL3Ts4k1sasJslqIzbin0qr2LufTBW6Sen+n8LYW4NRqYyP2wvy9odBFXe9P6HWh9Fb1dm3eRHBFyGStuMycQWfJ5LKKLc1gRY2ADLHp5lgA5hHYtYzY/5+uSFNY9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-4346755f7dcso12229601fac.3
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 15:56:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779404181; x=1780008981;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wKcggRR9OaSzW53BRXT7XgtoSulSO0zV7NnoewwOLLk=;
+        b=qkyUX1Vg8vCLBHMsdr2GrxC9+nBxDRu2CDVxU88ccawIJq/LIZ13xny42o6zyI10y9
+         dZGuEwUfR4DyUwYBC7ji5D8KLy83ldj9NyEtMYUGIwnjgFpbwGR204A7nukMr2au97Qi
+         YcgGPe+MwOgyczXsSUEM+rWx1ezAHLZ6ZMc+EqnP4vTKkWGpXaQERDa4NO3awcv8N6P5
+         ggugtqY+KZ/9+SduOVn6eedxS2Rr0P45YUjmfz+CpCynZbk1EnupTz4aUT+PAuyD18Zp
+         gA0xOZe/mp7KfteB6HnI2unoi+jbPJPj94pwY0zRw54D1xTA/qUaulDg3aa7y1afKVBx
+         VF4Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8gQzR9I1wRq9/AusSlfBbuKM9yoJ8EmssIwGSwvoAuibQMufT6QKYBG+3/0QrFTKUmOwBJ9UQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLL0ZL91j6n8Br8YC0Y0Wlx8qjmgxP6xJpqzH9YnvakusdfD1U
+	fS8YLwwkLi+OkRT8YJCF4EQ/mdZzfCFYz//AsVu9ZL3wHJHD43WxO9Sytqf52ae09r2QI/Ozoi0
+	xn78RUp1MbM6byZqiY2t2fHc5/4SkQVq3XYRHmeJlHvipcMsNt8virn74rv0=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [3.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Received: by 2002:a05:6820:998:b0:69d:7dbc:19b1 with SMTP id
+ 006d021491bc7-69d7ed29503mr687622eaf.55.1779404180791; Thu, 21 May 2026
+ 15:56:20 -0700 (PDT)
+Date: Thu, 21 May 2026 15:56:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a0f8d94.050a0220.6b33c.0000.GAE@google.com>
+Subject: [syzbot] [rds?] KCSAN: data-race in rds_poll / rds_sendmsg
+From: syzbot <syzbot+fbf3648ae7f5bdb05c59@syzkaller.appspotmail.com>
+To: achender@kernel.org, allison.henderson@oracle.com, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, rds-devel@oss.oracle.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=2e40c0f41e01837e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290628-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,intel.com,vger.kernel.org,linutronix.de];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3EBF85AC729
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-290629-lists,netdev=lfdr.de,fbf3648ae7f5bdb05c59];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,googlegroups.com:email,storage.googleapis.com:url]
+X-Rspamd-Queue-Id: 27A1A5AC7C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 21 2026 at 20:59, David Woodhouse wrote:
-> On Thu, 2026-05-21 at 20:06 +0200, Thomas Gleixner wrote:
->> > It might be good to harmonise the way we convert to KVM clock if we're
->> > going to support that (although I'll accept an argument that any guest
->> > which chooses to use the KVM clock doesn't *deserve* to have accurate
->> > timekeeping).
->>=20
->> :)
->
-> I'm not sure I'm joking. The KVM clock is.... *hosed*. It was invented
-> to work around the ancient broken variable-speed TSCs which stopped on
-> HLT, etc.
->
-> In *those* days, sure it made sense for the hypervisor to constantly
-> update a data structure which let you approximate a TSC=E2=86=92nanosecon=
-ds
-> conversion.
+Hello,
 
-It was broken from day one and I explained the why in great length
-several times. But features first, correctness later...
+syzbot found the following issue on:
 
-At some point I gave up and ignored all complaints about time
-inconsistencies in guests which use kvmclock.
+HEAD commit:    e5d505e3664b Merge tag 'trace-v7.1-rc3' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=144d37ba580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2e40c0f41e01837e
+dashboard link: https://syzkaller.appspot.com/bug?extid=fbf3648ae7f5bdb05c59
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-> These days, a guest using the *actual* TSC is going to be a lot more
-> accurate, and guests basically shouldn't be using the kvmclock AT ALL.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-You're preaching to the choir.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d01e24b29d85/disk-e5d505e3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/763a9ed109de/vmlinux-e5d505e3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/aa1f01135fd4/bzImage-e5d505e3.xz
 
-> When I made it DTRT for ptp_vmclock, I did look briefly at what it
-> would take to do it centrally in common code.
->
-> But that lumbers the common PTP code with x86 arch-specific horridness
-> about the KVM clock. And it literally has to call back into the driver
-> in the seqcount loop, so I guess drivers would need to have a flag or
-> something that says it's OK to do that (they're fast enough, or
-> something?).
->
-> I didn't spent *that* long trying, but I couldn't see a way of doing it
-> centrally, which didn't end up making me sadder than the initial
-> duplication.
->
-> Honestly, whether it was intent or omission, I suspect the approach
-> Harshitha took for GVE is the right one: Support TSC, and anyone who
-> uses KVM clock doesn't deserve accurate time anyway.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fbf3648ae7f5bdb05c59@syzkaller.appspotmail.com
 
-I agree with the sentiment, but the implementation is just bonkers TBH.
+==================================================================
+BUG: KCSAN: data-race in rds_poll / rds_sendmsg
 
-The driver should not even care about TSC/ARM_XX. Drivers have to be
-mostly agnostic of this and we went to a great length for that with the
-existing PTM core support. The core might need extensions for the pre/post
-muck, but that's not a justification for hacks like this GVE stuff.
+write to 0xffff8881054183a4 of 4 bytes by task 9010 on cpu 0:
+ rds_sendmsg+0x1001/0x15b0 net/rds/send.c:1391
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x563/0x5b0 net/socket.c:2698
+ ___sys_sendmsg+0x195/0x1e0 net/socket.c:2752
+ __sys_sendmsg net/socket.c:2784 [inline]
+ __do_sys_sendmsg net/socket.c:2789 [inline]
+ __se_sys_sendmsg net/socket.c:2787 [inline]
+ __x64_sys_sendmsg+0xd4/0x160 net/socket.c:2787
+ x64_sys_call+0x194c/0x3020 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x12c/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
->> > From the dedicating hosting point of view, we *only* care about the
->> > counter, and absolutely DGAF about the host's timekeeping. Migrating
->> > KVM guests requires getting the guest TSC right (in terms of scaling
->> > factors and offset from the host TSC), and feeding accurate time to
->> > guests is done in terms of the guest TSC to realtime relationship.
->>=20
->> The offset has nothing to do with the scaling. It's the delta to the TSC
->> value which the migrated guest saw last when it was packed up for
->> migration.
->
-> Sure. As long as that guest TSC value is a consistent snapshot and not
-> some pulled out of thin air cycles value :)
+read to 0xffff8881054183a4 of 4 bytes by task 9013 on cpu 1:
+ rds_poll+0x9b/0x310 net/rds/af_rds.c:222
+ sock_poll+0x21c/0x240 net/socket.c:1502
+ vfs_poll include/linux/poll.h:82 [inline]
+ __io_arm_poll_handler+0x1ef/0xbf0 io_uring/poll.c:590
+ io_arm_apoll+0x2eb/0x400 io_uring/poll.c:698
+ io_arm_poll_handler+0x12f/0x160 io_uring/poll.c:727
+ io_queue_async+0x25d/0x320 io_uring/io_uring.c:1634
+ io_queue_sqe io_uring/io_uring.c:1660 [inline]
+ io_req_task_submit+0x9b/0xa0 io_uring/io_uring.c:1062
+ io_handle_tw_list+0x1f5/0x230 io_uring/tw.c:72
+ tctx_task_work_run+0x42/0x140 io_uring/tw.c:132
+ tctx_task_work+0x3f/0x80 io_uring/tw.c:150
+ task_work_run+0x130/0x1a0 kernel/task_work.c:233
+ get_signal+0xdea/0xf20 kernel/signal.c:2809
+ arch_do_signal_or_restart+0x96/0x480 arch/x86/kernel/signal.c:337
+ __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
+ exit_to_user_mode_loop+0x6f/0x820 kernel/entry/common.c:98
+ __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
+ syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
+ do_syscall_64+0x232/0x3b0 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-That's a different problem, which has nothing to do with the issue at
-hand and if that's not solved, then providing accurate frequency ratios
-is not making it much better :)
+value changed: 0x00000000 -> 0x00000001
 
-> There is lots to be said about accurate KVM migration, and a series of
-> 30-odd patches on the KVM list which attempts to improve it.
->
-> But either way, we still DGAF about the host's CLOCK_REALTIME when
-> we're doing it at scale.
->
-> KVM doesn't *have* a clean way to get/set the guest TSC based on
-> realtime; it only has the scaling and offsets from the host TSC. So to
-> do things precisely, we end up converting via the host TSC.
->
-> So we end up comparing a {host TSC, realtime} pair between source and
-> destination hosts, calculating the *guest* ticks that should have
-> occurred in the intervening time, and setting the "offset from host" on
-> the destination host to achieve the desired results. Almost all of
-> which is in terms of TSC cycles and offsets.
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 UID: 0 PID: 9013 Comm: syz.7.10555 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+==================================================================
 
-Fine, but you can only do that accurately if you have the relevant
-parameters:
 
-     1) Guest TSC value at freeze
-     2) Guest nominal TSC frequency
-     3) Old host REALTIME at freeze - Ideally you use TAI
-     4) New host TSC frequency
-     5) New host TSC/REALTIME/TAI snapshot
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-  #1 is a KVM problem, but see #3
-=20=20
-  #2 ideally communicated from the guest to the host after early
-     initialization at boot.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-     You really want this information because the guest won't change the
-     mult/shift pair for it ever.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-     That is more accurate than using the scaling factor on the old host
-     plus the old host frequency. Especially if you are migrating the VM
-     several times because every migration results obviously in rounding
-     errors, while if you use the nominal guest frequency you keep this
-     back and forth conversions and the resulting errors out of the way.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-  #3 That's obviously related to #1
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-     The old host knows the guest TSC scaling and the guest offset, so
-     it can take a coherent snapshot on the host side of REALTIME/TAI
-     and the host TSC value, which is convertible to the guest TSC
-     value.
-
-  #4, 5
-
-     are obviously required to set up the new host scaling/offset for
-     the guest TSC, but if based on the nominal assumed TSC frequency of
-     the guest it becomes actually accurate and usable across several
-     migrations.
-
-Anything else is just crystal ball magic, which is what KVM has today....
-
->> > +	precise_offset_attrs.device.att.counter_id =3D att.counter_id;
->> > +	precise_offset_attrs.device.att.counter_value =3D att.counter_value;
->>=20
->> That's exactly the hackery which is counterproductive. Why?
->
-> That's the same pattern as in the existing ptp_sys_offset_precise(),
-> isn't it? Copying from the internal data structures it got from the
-> driver, into the specific userspace structure for the ioctl that was
-> called.
-
-No.
-
-Q: How does the driver know what the snapshot of NIC/SYSTEM time means?
-A: It does not.
-
-That's what get_device_system_crosststamp() encapsulates in a generic
-way, which removes architecture/system specific knowledge from the
-driver.
-
-Q: How can the driver fill in att.counter_id and att.counter_value
-   _without_ specific knowlegde?
-A: It _cannot_ without get_device_system_crosststamp() providing it.
-
-Which is what I tried to explain you here:
-
->> Where does ptp::info::getcrosststampattrs() retrieve the system counter
->> value from?
->>=20
->> Either it has to convert from the ART based timestamp to TSC magically
->> by circumventing the core code or it has to use get_cycles() separately
->> which defeats the whole purpose of a hardware latched combo timestamp.
->
-> The point in ptp_sys_offset_precise is that all the timestamps are the
-> *same* time, isn't it?
-
-Yes.
-
-> So surely a device can only support this if it *does* have a precise
-> hardware timestamp, e.g. from ART? And the corresponding sys_realtime
-> and sys_monoraw fields also have to be from the *same* value, surely?
-
-That is correct, but you still fail to explain how this new made up
-att.counter_id/att.counter_value is filled in coherently without the
-driver doing something abysmal?
-
-You can't explain it, because the only way to do that correctly is by
-extending the cross time stamp struct and get_device_system_crosststamp().
-
-> Is that not how it works? If not.... WTF *is* it for?
-
-Yes, that's the way it works since get_device_system_crosststamp() got
-introduced, but that does not give a random driver access to the actual
-converted (TSC) counter value. The driver can only observe the PTM value
-which is ART on x86 and whatever on other architectures. So it does not
-know anything about it.
-
-> We're allowed to set *fire* to anyone who just throws a random
-> get_cycles() call in there, aren't we? That's basically just self-
-> defence, m'lud.
-
-I agree, but the way how this attr.counter_id/value extension is defined
-either requires unholy hacks to get access to the ART/TSC conversion or
-resort to get_cycles().
-
->> While this:
-...=20
-
->> +	xtstamp->sys_counter =3D system_counterval;
-
-...
-
-simple core code change:
-
->> Provides the information coherently and without any extra hacks. No?
->
-> Yeah, that looks eminently reasonable. It isn't actually that far off
-> what Arthur did in patch 1 of the series, is it? He was adding other
-> clock quality attributes at the same time, and ended up shoe-horning
-> the cs_id and cycle_count into those instead of using a separate
-> system_counterval_t as you have here, which *is* cleaner. So yes, let's
-> get him to do that, but that part is cosmetic?
-
-No. It's not cosmetic.
-
-This patch #1 just defines new attributes, which include the CS ID and
-the CS counter value with absolutely ZERO explanation where these values
-are supposed to come from and ZERO explanation how they are coherent.
-
-It suggests that the driver can fill them in along with the other truly
-driver related data, e.g. error_bound.
-
-But as I explained before the driver _cannot_ fill them in coherently
-neither for the new gettimexattrs64() nor for the getcrosststampattrs()
-callbacks.
-
-So you add an extension to the existing interface without core support,
-which means once that is merged the driver crowd will happily take any
-shortcut to support it.
-
-Are _you_ going to mop up the resulting mess?
-
->> Extending get_device_system_crosststamp() for AUX clocks is on my todo
->> list for a long time, but I did not come around to it yet. It's not
->> really complicated to make that work.
->>=20
->> The actual ena_phc_gettimexattrs64() implementation does not provide the
->> counter value at all despite the fact that it could trivially do so with
->> a modified ktime_get_snapshot() except for AUX clock IDs, but that's a
->> solvable problem. See uncompiled PoC below.
->
-> Huh? Unless it has PTM and is converting from ART (or is something
-> virtual like vmclock or the older non-LM-safe KVM hacks), surely the
-> driver has no business pretending to support 'precise' mode, and no
-> business providing a counter value?
-
-Huch?
-
-According to your earlier argumentation about counter values, you want
-the counter value, REALTIME, RAW combo even for gettimexattrs64() for
-the pre/post timestamps in case the hardware does not support PTM, no?
-
-> In this case, we'd want the pre_ts and post_ts to be generated by the
-> common code using ktime_get_snapshot_id(cs_id) so that we have the
-> corresponding system_counterval_t in the 'A' parts of the ABA tuple...
-> but the device part of it can't pull one out of thin air unless it is
-> *part* of the device reading, surely?
-
-Correct, but where does the proposed patch set implement any of this?
-
-In the ena driver it sets cs_id and cs_value to 0, which will be
-replaced by abysmal hacks within no time because someone figures out
-that adding these values will give "better" results ....
-
-Neither the gettimexattrs64() nor the getcrosststampattrs() have any
-coherent way to fill in the CS related data, but you are pushing for
-adding this infrastructure first before thinking about the
-consequences. You can't be serious about that.
-
->> I really have to ask why we put a lot of effort into consolidated
->> infrastructure, when every drivers/foo/ subsystem decides it needs it's
->> own absymal hacks just because sitting down and extending the generic
->> infrastructure is asked too much. TBH, that's frustrating as hell and
->> no, none of these usecases is so special that it would justify a single
->> one of these hacks.
->
-> Meh. I'm literally here trying to join the dots between timekeeping,
-> PTP and KVM, and come up with a holistic solution that makes sense for
-> all the use cases. And my brain hurts... :)
-
-Welcome to the wonderful world of time(keeping). Once you have done that
-for 20 years your brain stops to hurt :)
-
-Thanks,
-
-        tglx
+If you want to undo deduplication, reply with:
+#syz undup
 
