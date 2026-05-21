@@ -1,459 +1,213 @@
-Return-Path: <netdev+bounces-290249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290250-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8IPgCo2iDmpCAwYAu9opvQ
-	(envelope-from <netdev+bounces-290249-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:13:33 +0200
+	id gHCiMMOmDmr6AwYAu9opvQ
+	(envelope-from <netdev+bounces-290250-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:31:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1582959F547
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:13:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6564259F6A4
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7488B302287C
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 06:13:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43A27300FED6
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 06:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E65A394EB2;
-	Thu, 21 May 2026 06:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C101C394EBA;
+	Thu, 21 May 2026 06:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CnkaeMun"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="g7k0N3xx";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="gxeVeAXq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1CE384CF6;
-	Thu, 21 May 2026 06:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5E9367299
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779343987; cv=none; b=WIOq+hkFVPPUrVozYDsqoEsFgIWB9fX/PK8Mh7NCJYhgKxJ4EZrs/VU/l5BSSDa0UTwOFg1GUpLxSesEgPm3F4gkYFiQuYMHxW2TaCSOs46zEGPpr1piNuk1RlSJK6Y1BYAE7us6BH4bQ9MFHJ3dz/40taYvN0wMwL2hDeYIb8Q=
+	t=1779345029; cv=none; b=XSKxG2q17A9GJ6AwCiXxmheEzMUvQ5m14eML1V9KQ6DNUwpektOB4HX9IiphLmYPv8YZ7ZgJeEDVYXw1kP+bPaxBuL6qVbIFK7YUK1ZoEbXrOjrKrPuiEL6RsXF9Yu2Bgs2ixp4PjgwI/lSho+3S2BWWwDViyydxJEtDewsfD7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779343987; c=relaxed/simple;
-	bh=7bS6i8J5ujqhn019ZgqI1ZeDU3fL9lskmqBwHxM0YRc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ud0am0Vp/xsvLTqdBFxg69m1tg9ZwJekYKdEzTlikt5OgSD36G9ng/lxr+p3TaFTrd32LyVRJu+3phTQEjZtWO8mcWPK5smAEBaT9QSxhSGYrv7CN4qPzbH75kvMgCsvM0YLT5uI0ue+YMqmwIKXZ7cbOIiAHZII9vZ0wT56H/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CnkaeMun; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 1A83DC2C64F;
-	Thu, 21 May 2026 06:13:58 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 1CB0460718;
-	Thu, 21 May 2026 06:13:04 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 41B49107EA6BE;
-	Thu, 21 May 2026 08:13:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779343983; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=g627vnYilgadl7YKxNubEXPwJoMvFb1HQYQI6T7h0/k=;
-	b=CnkaeMunR0vQEwoclZi6OYXgpAq4ulzPwp9hePRXbsWWcXGNnwz+VvE4mn/M1Hx8J6yhE3
-	5dy3Yd+6C5AmBA7vJDjaUkYmn/Uy3ZN5rWdDmFBfnBxuB0UjSLPmQcrVln2+g9snTXYeRo
-	Kbv4+cZKQgVaalOo8fnJ/0Ss+qcPJeE3BdNDasADoRytgqni+zCPT1vZ2OUv54eF7fJfF5
-	EqWBxHn1jUTvM63xHD0lr7PsJc9KxUsgPULEoxSLu0G5H0etKHgGtyI4WkF9TFRUqLYLSW
-	KMWZdPvw8byxXjqYZRPNiKMk7Vg3f7RwYPF8OWJtPXZjM7zhfBXTtrdxaZATzw==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Thu, 21 May 2026 08:12:43 +0200
-Subject: [PATCH net-next v3 8/8] net: dsa: microchip: bypass dev_ops for
- phy_read()/phy_write()
+	s=arc-20240116; t=1779345029; c=relaxed/simple;
+	bh=fq3D+X3q7ZbEaR+KGlXHcg5ZzcIxpXF+jpXKklId51Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZUzXFf0LLc4g6RU8YRMJuhWsUvlFBTPTlBsxZjlYznfTjI5OBnUyQ27jk0AB1OzZSyG/t9ZBl6cfw3h/KqMsWxEROajBl+M1rT4I1pbPLP6svig7akxcRXKnac24vIf1D2JYgXawqJKO4c6xeay68cgHlsEeLF1NmAwUTkY2Bd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=g7k0N3xx; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gxeVeAXq; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64L2wlxE2180640
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:30:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	EcFnBmlGXUBnGQMannLvnZzhlvDc+81ZD8yCnd/foBU=; b=g7k0N3xxmtSzuTP5
+	5D5t/X8ZeozBD6m1DF16BcKLvbd8VFULNoVRu3uRU43O+y7D1vZNfucCYlLcKJFc
+	vl8fgFjDHUizBRQxRNmKP9rssOaKgSyHgpZh8HHzK+rTyzCjDzMwwK1kWDdqnGGr
+	RZI7xXViQQI/bw1w8wH+Pm3wj8bhhdrR9zkLFFEE0g1Y3FXaID+SiKVJeDeihTsU
+	n7YL2XKftFfGTCJSwgkijIzC05xOMpqTZr0mTHTaXR6UpEGEdecBbazHnwENBMoP
+	qEe+rHKVfhZhbu85Ju9OiX5jOjVCKaDdoTrdDSJIggA/Mmr5UBtvw5l/STBp1VWl
+	QsWIYQ==
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e9sr30pjm-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:30:26 +0000 (GMT)
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2bd04e4fe3dso101950365ad.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 23:30:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1779345025; x=1779949825; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EcFnBmlGXUBnGQMannLvnZzhlvDc+81ZD8yCnd/foBU=;
+        b=gxeVeAXq8tbSz5thLusW1uxGuEMqbcGoYFMfUK+NG93+28SoMXMqpKPQctBZt+Xg3d
+         cD/mfrW0TcwMZV8jCIPnTk0/mVs1k/zlfTDBvE0XY6Gmn+96Y6GSLEFRLA+ytGP6LsNx
+         dLHKEsdgPYnlf6o4LgUhfmBZJJ21BlAUihJ3L6s8/xKvwCtsh0YX/qLW8fKSUYsnBUtt
+         /exZU42/GnWhnpfEG1G9zF0FBKOWqHpyXnnOFIt81mhlyAIMopZcu1Hw2edz4IIwzw5t
+         COHe6ES+uOURtlb0eTHupGUaeekoSOo261AETvYB0L7P5x0rCVBXkkXArLDZ4f6E9Y7A
+         XIsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779345025; x=1779949825;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EcFnBmlGXUBnGQMannLvnZzhlvDc+81ZD8yCnd/foBU=;
+        b=dnstf4aHUaCxeUurwxDsvGtiT2YPals7b7ODZYwjtjzHGKYFX7foWkbJE4FbUa8CNn
+         p4KwoXzm17HA3pzvHnRjHV+k7Sk25kdggTGdpmrzRHRsw/BL9Lr1Thz1Yk3Nv9w1EdFW
+         dIPwUGaIEC3D11YqYKlhoErtEZNggmCk3PO4XFBCgKj5MNWl3O+DyQwuhjY3VAp1JfR/
+         64GdBz8pbuflDgVhJuCacqZvGKh/MRtVI3oJ8MhKekgSrchm8n4d7B0MZjkdU0lD0ijg
+         oz7r0B437fVPttG9XtW+85kJ0sTHhY7xOqSdIRDC6AR+Jiwp4MwTXgye24jKkq1tQULe
+         9Prg==
+X-Forwarded-Encrypted: i=1; AFNElJ9+85tD1x64tJBlrGDAeqkb3Mq1uU6RaJWXzCQBeyS4e12H1FQHZ3p2N0CYTTvsuw7U7x7rB5o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkZrIvR6nxK381RlcmrdkOVgp+YtmUYfBCAMQFyGZlIqvux8Sm
+	UPxPbUBUiMjFKKOhvZyUpN2xRoO1wZQIOZYtoQZw0/eyMXF0APVZNuC2sAdMvVHKIsUVBEfckhF
+	mPi73yeuC107FMf2TDoNdWm/oxp3rNIJ33p3ZwIkH9niRfjQo8r3zQsbYrEc=
+X-Gm-Gg: Acq92OEG6XyqPBHjMQFCfYo+ExDx6NtaGxmw8lZl3XxBOQTYKdPuSJ1wmSYBTCVvrXt
+	sPD076EuKPmrURd5Hfid+olv+DAXnEjcvcGTqUoZEu+u4HbgPQky9+30GlbPKgKdPqV6eWtNWEj
+	VWl6nX9wFCnSVUxSd9UpNMRggz66x0bGR3fiSSlPdgspFLUi/DjjF0ggHxAKKQ5TH2FQGw5qZjA
+	8gKuaSE9xZR/a7M0LV7ouJs/WXs2gUBWSgw8r9A97ULx9bhIk3pmlFh3TOOvFvdts1zOJ3Ao4ci
+	uj2kM1jlMSjgSHb4SjF2lQlsJSHTUFO1zzsYe3WnANpM7x0nao9vWp9iCuyAwrFZIOydyXndCMG
+	Ja84rvFGW70a4qEpJa0hytn/M+S85smbosgbVHzxgYieGOpEAd21Nxxq+
+X-Received: by 2002:a17:903:1a27:b0:2bd:ef12:14d6 with SMTP id d9443c01a7336-2bea33e5a0cmr16911325ad.34.1779345025353;
+        Wed, 20 May 2026 23:30:25 -0700 (PDT)
+X-Received: by 2002:a17:903:1a27:b0:2bd:ef12:14d6 with SMTP id d9443c01a7336-2bea33e5a0cmr16910625ad.34.1779345024887;
+        Wed, 20 May 2026 23:30:24 -0700 (PDT)
+Received: from [192.168.0.172] ([49.205.250.194])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5c263a0fsm241748305ad.37.2026.05.20.23.30.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 May 2026 23:30:24 -0700 (PDT)
+Message-ID: <b62c2a16-9e73-47a5-8bf7-3878e21c3da7@oss.qualcomm.com>
+Date: Thu, 21 May 2026 12:00:07 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 12/16] media: qcom: Pass proper PAS ID to
+ set_remote_state API
+To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        linux-media@vger.kernel.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+        linux-remoteproc@vger.kernel.org, konradybcio@kernel.org,
+        robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+        robin.clark@oss.qualcomm.com, sean@poorly.run,
+        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+        airlied@gmail.com, simona@ffwll.ch, dikshita.agarwal@oss.qualcomm.com,
+        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
+        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
+        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
+        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
+        vignesh.viswanathan@oss.qualcomm.com,
+        srinivas.kandagatla@oss.qualcomm.com,
+        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+        skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+        Sumit Garg <sumit.garg@oss.qualcomm.com>
+References: <20260518072856.22790-1-sumit.garg@kernel.org>
+ <20260518072856.22790-13-sumit.garg@kernel.org>
+Content-Language: en-US
+From: Vikash Garodia <vikash.garodia@oss.qualcomm.com>
+In-Reply-To: <20260518072856.22790-13-sumit.garg@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260521-clean-ksz-2nd-series-v3-8-75c38971c19a@bootlin.com>
-References: <20260521-clean-ksz-2nd-series-v3-0-75c38971c19a@bootlin.com>
-In-Reply-To: <20260521-clean-ksz-2nd-series-v3-0-75c38971c19a@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Richard Cochran <richardcochran@gmail.com>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Tristram Ha <tristram.ha@microchip.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.3
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Proofpoint-GUID: XvMIOvDbdIVbNv3PvJ8l_uLDjpL05Nd8
+X-Proofpoint-ORIG-GUID: XvMIOvDbdIVbNv3PvJ8l_uLDjpL05Nd8
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIxMDA2MCBTYWx0ZWRfX9X4ISLT16DyZ
+ k+BnntuLGnuTsArMTBkBYzbhNXojyK16LM8/oODYkicc7yXWHTcjbjMIUKI0AACmkZvqpx0w1/I
+ E4P7hFBnX1GyBcV2CxE/yhmczUS9htQ0AX01yQrq7id9V4I+DlJlJYj0zy/pM2hffG0rKxnwg3q
+ JED0nr2ehxzzmRLsgdYOOo09419ef0x4jy6BtFE36Z1niNsdEI64KKdixLHHZ6xheEM0kS9r8dI
+ SCJHAAzoPkWIww8FVR205lGcM00Hyx2Z06+TLclWF8Q39S8bq+WTJh9KxCXirD0NJROe62wA/Dl
+ 6gvlCiVRWK1iqOXfUaVXCshkFr855HV/FSQ535UWHn1GfYk752yzuCLOOn2BZEAUYtpIyRIP2al
+ JKEHR1uW/Ynp93q5CHS+Uw2OTCB2vCXh1Y3/J4TxmZmlQPjiv8VOxCoZX86exlqUjU8KBcLmslX
+ w6338Y25i4c9heSVoNA==
+X-Authority-Analysis: v=2.4 cv=L+YtheT8 c=1 sm=1 tr=0 ts=6a0ea682 cx=c_pps
+ a=cmESyDAEBpBGqyK7t0alAg==:117 a=X+kW/DRse7pI7A4riirJBw==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=EUspDBNiAAAA:8 a=Reuo-bjlSNWgIop-ackA:9 a=QEXdDO2ut3YA:10
+ a=1OuFwYUASf3TG4hYMiVC:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-20_03,2026-05-18_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 suspectscore=0 priorityscore=1501 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 phishscore=0 clxscore=1011 adultscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605210060
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290249-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	TAGGED_FROM(0.00)[bounces-290250-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[vikash.garodia@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 1582959F547
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 6564259F6A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-phy_read() and phy_write() are handled through common functions that
-redirect the treatment to ksz_dev_ops callbacks. This layer of
-indirection isn't needed since we now have a dsa_switch_ops for each
-kind of switch
 
-Remove one indirection layer for KSZ switches, by connecting the
-ksz_dev_ops::phy_r() and ksz_dev_ops::phy_w() operations directly to
-dsa_switch_ops.
-Remove the now unused phy_r()/phy_w() callbacks from ksz_dev_ops.
+On 5/18/2026 12:58 PM, Sumit Garg wrote:
+> From: Sumit Garg<sumit.garg@oss.qualcomm.com>
+> 
+> As per testing the SCM backend just ignores it while OP-TEE makes
+> use of it to for proper book keeping purpose.
+> 
+> Reviewed-by: Mukesh Ojha<mukesh.ojha@oss.qualcomm.com>
+> Tested-by: Mukesh Ojha<mukesh.ojha@oss.qualcomm.com> # Lemans
+> Signed-off-by: Sumit Garg<sumit.garg@oss.qualcomm.com>
+> ---
+>   drivers/media/platform/qcom/iris/iris_firmware.c | 2 +-
+>   drivers/media/platform/qcom/venus/firmware.c     | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
 
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz8.c         | 68 ++++++++++++++++++++++++++------
- drivers/net/dsa/microchip/ksz9477.c      | 31 +++++++++++++--
- drivers/net/dsa/microchip/ksz_common.c   | 25 ------------
- drivers/net/dsa/microchip/ksz_common.h   |  4 --
- drivers/net/dsa/microchip/lan937x_main.c | 29 ++++++++++----
- 5 files changed, 104 insertions(+), 53 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index 09968aec6506..0f84b2e7d25d 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -1057,6 +1057,19 @@ static int ksz8_r_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 *val)
- 	return 0;
- }
- 
-+static int ksz8_phy_read16(struct dsa_switch *ds, int addr, int reg)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	u16 val = 0xffff;
-+	int ret;
-+
-+	ret = ksz8_r_phy(dev, addr, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val;
-+}
-+
- /**
-  * ksz8_w_phy_ctrl - Translates and writes to the SMI interface from a MIIM PHY
-  *		     Control register (Reg. 31).
-@@ -1266,6 +1279,18 @@ static int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
- 	return 0;
- }
- 
-+static int ksz8_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	int ret;
-+
-+	ret = ksz8_w_phy(dev, addr, reg, val);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- static void ksz8_cfg_port_member(struct ksz_device *dev, int port, u8 member)
- {
- 	int offset = P_MIRROR_CTRL;
-@@ -2194,6 +2219,19 @@ static int ksz8463_r_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 *val)
- 	return 0;
- }
- 
-+static int ksz8463_phy_read16(struct dsa_switch *ds, int addr, int reg)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	u16 val = 0xffff;
-+	int ret;
-+
-+	ret = ksz8463_r_phy(dev, addr, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val;
-+}
-+
- static int ksz8463_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
- {
- 	u16 sw_reg = 0;
-@@ -2222,6 +2260,18 @@ static int ksz8463_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
- 	return 0;
- }
- 
-+static int ksz8463_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	int ret;
-+
-+	ret = ksz8463_w_phy(dev, addr, reg, val);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- static int ksz8_switch_init(struct ksz_device *dev)
- {
- 	dev->cpu_port = fls(dev->info->cpu_ports) - 1;
-@@ -2330,8 +2380,6 @@ const struct phylink_mac_ops ksz8_phylink_mac_ops = {
- const struct ksz_dev_ops ksz8463_dev_ops = {
- 	.get_port_addr = ksz8463_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
--	.r_phy = ksz8463_r_phy,
--	.w_phy = ksz8463_w_phy,
- 	.r_mib_cnt = ksz8_r_mib_cnt,
- 	.r_mib_pkt = ksz8_r_mib_pkt,
- 	.r_mib_stat64 = ksz88xx_r_mib_stats64,
-@@ -2343,8 +2391,6 @@ const struct ksz_dev_ops ksz8463_dev_ops = {
- const struct ksz_dev_ops ksz87xx_dev_ops = {
- 	.get_port_addr = ksz8_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
--	.r_phy = ksz8_r_phy,
--	.w_phy = ksz8_w_phy,
- 	.r_mib_cnt = ksz8_r_mib_cnt,
- 	.r_mib_pkt = ksz8_r_mib_pkt,
- 	.r_mib_stat64 = ksz_r_mib_stats64,
-@@ -2359,8 +2405,6 @@ const struct ksz_dev_ops ksz87xx_dev_ops = {
- const struct ksz_dev_ops ksz88xx_dev_ops = {
- 	.get_port_addr = ksz8_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
--	.r_phy = ksz8_r_phy,
--	.w_phy = ksz8_w_phy,
- 	.r_mib_cnt = ksz8_r_mib_cnt,
- 	.r_mib_pkt = ksz8_r_mib_pkt,
- 	.r_mib_stat64 = ksz88xx_r_mib_stats64,
-@@ -2378,8 +2422,8 @@ const struct dsa_switch_ops ksz8463_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= ksz8463_phy_read16,
-+	.phy_write		= ksz8463_phy_write16,
- 	.phylink_get_caps	= ksz8_phylink_get_caps,
- 	.port_setup		= ksz8_dsa_port_setup,
- 	.get_strings		= ksz_get_strings,
-@@ -2438,8 +2482,8 @@ const struct dsa_switch_ops ksz87xx_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= ksz8_phy_read16,
-+	.phy_write		= ksz8_phy_write16,
- 	.phylink_get_caps	= ksz8_phylink_get_caps,
- 	.port_setup		= ksz8_dsa_port_setup,
- 	.get_strings		= ksz_get_strings,
-@@ -2498,8 +2542,8 @@ const struct dsa_switch_ops ksz88xx_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= ksz8_phy_read16,
-+	.phy_write		= ksz8_phy_write16,
- 	.phylink_get_caps	= ksz8_phylink_get_caps,
- 	.port_setup		= ksz8_dsa_port_setup,
- 	.get_strings		= ksz_get_strings,
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index aac7fc478eda..c1395322e54b 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -575,6 +575,19 @@ static int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
- 	return 0;
- }
- 
-+static int ksz9477_phy_read16(struct dsa_switch *ds, int addr, int reg)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	u16 val = 0xffff;
-+	int ret;
-+
-+	ret = ksz9477_r_phy(dev, addr, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val;
-+}
-+
- static int ksz9477_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
- {
- 	u32 mask, val32;
-@@ -600,6 +613,18 @@ static int ksz9477_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
- 	return ksz_prmw32(dev, addr, 0x100 + (reg << 1), mask, val32);
- }
- 
-+static int ksz9477_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	int ret;
-+
-+	ret = ksz9477_w_phy(dev, addr, reg, val);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- void ksz9477_cfg_port_member(struct ksz_device *dev, int port, u8 member)
- {
- 	ksz_pwrite32(dev, port, REG_PORT_VLAN_MEMBERSHIP__4, member);
-@@ -1912,8 +1937,6 @@ const struct phylink_mac_ops ksz9477_phylink_mac_ops = {
- const struct ksz_dev_ops ksz9477_dev_ops = {
- 	.get_port_addr = ksz9477_get_port_addr,
- 	.cfg_port_member = ksz9477_cfg_port_member,
--	.r_phy = ksz9477_r_phy,
--	.w_phy = ksz9477_w_phy,
- 	.r_mib_cnt = ksz9477_r_mib_cnt,
- 	.r_mib_pkt = ksz9477_r_mib_pkt,
- 	.r_mib_stat64 = ksz_r_mib_stats64,
-@@ -1932,8 +1955,8 @@ const struct dsa_switch_ops ksz9477_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= ksz9477_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= ksz9477_phy_read16,
-+	.phy_write		= ksz9477_phy_write16,
- 	.phylink_get_caps	= ksz9477_phylink_get_caps,
- 	.port_setup		= ksz9477_dsa_port_setup,
- 	.set_ageing_time	= ksz9477_set_ageing_time,
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 3c09bc8ffaec..57c8abfe0147 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2838,31 +2838,6 @@ void ksz_init_mib_timer(struct ksz_device *dev)
- 	}
- }
- 
--int ksz_phy_read16(struct dsa_switch *ds, int addr, int reg)
--{
--	struct ksz_device *dev = ds->priv;
--	u16 val = 0xffff;
--	int ret;
--
--	ret = dev->dev_ops->r_phy(dev, addr, reg, &val);
--	if (ret)
--		return ret;
--
--	return val;
--}
--
--int ksz_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
--{
--	struct ksz_device *dev = ds->priv;
--	int ret;
--
--	ret = dev->dev_ops->w_phy(dev, addr, reg, val);
--	if (ret)
--		return ret;
--
--	return 0;
--}
--
- u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
- {
- 	struct ksz_device *dev = ds->priv;
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index c66d75347c6c..b67038cf1bd0 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -398,8 +398,6 @@ struct ksz_dev_ops {
- 	 *  - Negative error code on failure (e.g., invalid configuration).
- 	 */
- 	int (*create_phy_addr_map)(struct ksz_device *dev, bool side_mdio);
--	int (*r_phy)(struct ksz_device *dev, u16 phy, u16 reg, u16 *val);
--	int (*w_phy)(struct ksz_device *dev, u16 phy, u16 reg, u16 val);
- 	void (*r_mib_cnt)(struct ksz_device *dev, int port, u16 addr,
- 			  u64 *cnt);
- 	void (*r_mib_pkt)(struct ksz_device *dev, int port, u16 addr,
-@@ -442,8 +440,6 @@ void ksz_switch_macaddr_put(struct dsa_switch *ds);
- void ksz_switch_shutdown(struct ksz_device *dev);
- int ksz_handle_wake_reason(struct ksz_device *dev, int port);
- 
--int ksz_phy_read16(struct dsa_switch *ds, int addr, int reg);
--int ksz_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val);
- u32 ksz_get_phy_flags(struct dsa_switch *ds, int port);
- 
- int ksz_sset_count(struct dsa_switch *ds, int port, int sset);
-diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
-index 690f99da0bfe..536153886f7b 100644
---- a/drivers/net/dsa/microchip/lan937x_main.c
-+++ b/drivers/net/dsa/microchip/lan937x_main.c
-@@ -334,14 +334,29 @@ static int lan937x_internal_phy_read(struct ksz_device *dev, int addr, int reg,
- 	return ksz_read16(dev, REG_VPHY_IND_DATA__2, val);
- }
- 
--static int lan937x_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
-+static int lan937x_phy_read16(struct dsa_switch *ds, int addr, int reg)
- {
--	return lan937x_internal_phy_read(dev, addr, reg, data);
-+	struct ksz_device *dev = ds->priv;
-+	u16 val = 0xffff;
-+	int ret;
-+
-+	ret =  lan937x_internal_phy_read(dev, addr, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val;
- }
- 
--static int lan937x_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
-+static int lan937x_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
- {
--	return lan937x_internal_phy_write(dev, addr, reg, val);
-+	struct ksz_device *dev = ds->priv;
-+	int ret;
-+
-+	ret = lan937x_internal_phy_write(dev, addr, reg, val);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
- }
- 
- static int lan937x_reset_switch(struct ksz_device *dev)
-@@ -818,8 +833,6 @@ const struct ksz_dev_ops lan937x_dev_ops = {
- 	.cfg_port_member = ksz9477_cfg_port_member,
- 	.mdio_bus_preinit = lan937x_mdio_bus_preinit,
- 	.create_phy_addr_map = lan937x_create_phy_addr_map,
--	.r_phy = lan937x_r_phy,
--	.w_phy = lan937x_w_phy,
- 	.r_mib_cnt = ksz9477_r_mib_cnt,
- 	.r_mib_pkt = ksz9477_r_mib_pkt,
- 	.r_mib_stat64 = ksz_r_mib_stats64,
-@@ -836,8 +849,8 @@ const struct dsa_switch_ops lan937x_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= lan937x_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= lan937x_phy_read16,
-+	.phy_write		= lan937x_phy_write16,
- 	.phylink_get_caps	= lan937x_phylink_get_caps,
- 	.port_setup		= lan937x_dsa_port_setup,
- 	.set_ageing_time	= lan937x_set_ageing_time,
-
--- 
-2.54.0
-
+Reviewed-by: Vikash Garodia <vikash.garodia@oss.qualcomm.com>
 
