@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-290550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFW8FLExD2pSHgYAu9opvQ
-	(envelope-from <netdev+bounces-290550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:24:17 +0200
+	id QHqCDscxD2qSHgYAu9opvQ
+	(envelope-from <netdev+bounces-290551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:24:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E21115A9355
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:24:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBF2B5A937A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3EE0430E3558
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:50:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A255315E9C5
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39FF371063;
-	Thu, 21 May 2026 15:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C41237187E;
+	Thu, 21 May 2026 15:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZW0Ej509"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ImGr6Jwx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8960D36F8F5;
-	Thu, 21 May 2026 15:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A5B367288;
+	Thu, 21 May 2026 15:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779378609; cv=none; b=Ylsf2Gi1phlxEPGkoCRhhDVfkQ7StqBSX4AZVy0n3nr85ur9e3IAVgrBxgusD2yKCC3WRF2dR48G5Sa0/VMuqtgasyGyhPBFtLUhPV8cOSYcbJOmyILNtSndPfndEQHb2R4JtP1pCNZ0KBXGshjqM35523guYiW3qFs4wOa+L1c=
+	t=1779378611; cv=none; b=Am8A6CLWuAiC7UDWVzRZToQ94W9ygdmLbEn7lafYxwuyJT5guacvpr7Ks4M5WTq5IQQ3eeZDvZZesWzWAUKQa2zMUBElNQD20gbFilHP0RQe3Wv1R2qlo8gMUCQb1XdRizEOzwUT3+7iPuU2tvOduVmlI2DXsFoJFSmI8u+FrYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779378609; c=relaxed/simple;
-	bh=bcmvQZHvu/Ws7AQMNeblfGkI0Q7z6yPd3IbDP/A4tJs=;
+	s=arc-20240116; t=1779378611; c=relaxed/simple;
+	bh=I1hYJ5XVDqHMaWBttg4ogQLk984m8j5hnhshh219Nuc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H2gJyZj8I4ZSjt6f5abPBXbxEwxTgzfpXh19DKoM5IkbQ5nmgWGJFC0qON8WbHPTlKY1QQblla/ZfKzMQytcv/jVRYOPdwjZRba5l2FjgKeg3//wUgA4BfkqFmVKs/kEyXaeBQKxexunwJrKQUx9Va/WqiMEVh9QP7oSdL6eUlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZW0Ej509; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 456171F000E9;
-	Thu, 21 May 2026 15:50:08 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dz2W2lHPEykJjn71vbVhCj6cn/LrHGIYzWiWKjF31mioEaAj5J50xjJzfmx5lWUGvDX/fGLk4PXsn7FT/jgKYEO+1nQRxE5T0zhC7zRrJV+Qz6d9M5Noc1SwoVVYVNobJDh95kjI39pEBKlifV7UGfkKthCwO4YkeLTPneNO22Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ImGr6Jwx; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE33C1F000E9;
+	Thu, 21 May 2026 15:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779378608;
-	bh=9gMaUZeh+69Zu9rCTdveH3pR4oiIBblHtld73n+ZOyc=;
+	s=k20260515; t=1779378609;
+	bh=sgUJXmdhycpBMrQMCHKRV8tqCwwTG8MEEOae0Pn76Uw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=ZW0Ej509QvS8dKUpe6x3J0lrmEZ6dGsO6Tc6DzeLQWf5n52Cx/rba1f/Uc1LdA1YD
-	 tt+U3sRv6dKhdCYDt+0Avg/kIG+JP5dO1cyInmt2YttdexjIWykJhaRsT59/sfzPvq
-	 E/BqwdYaNg/PnsOfEbOT7A/t5MJQkypJAehCo2w9FyqNi2ZPu+13YK9164fMWOVQOa
-	 fMuUxvskSIvfOQ3WxQI6Zy8JCj5Zo7I4WCNKGvMdep3vdRGACHq3DoFZpfBdyXh5Wd
-	 qddy3sGcV17eSfFxx4mtPCt/J7YVjoqTupLMSSKE6yh1r90yEwLL1G5FcJ9ar93or1
-	 xSGd1s2gnnPWw==
+	b=ImGr6JwxTzdwMZGLsXD/3gpb0tuLQ12rywh5RK+Iju3JfoZK/rmgbvYNguN8rRzl9
+	 4PbNYDU9v3r9kJvl5RPaZ3uMbFfsb0fEtD4F8agVMO9U5e0ghlR+njrt00ZtJH94rU
+	 M//QjRomoqM1J70d9w0Hepm6RrgiC4TJxcJuE6IDvEozaW9aoUggrrJNFIo6ET5Hi9
+	 waqS2H/PcOPQwN7tYlExW49PmOYouYJJoYwSGi73uMy6QMXl3tTVVu+DUl3aUTciL6
+	 HfC9zNvwwojHqWBfz1qTlB1Br8bRtevgWK6GKRM5dsaPBOW221Y1UqTaEH00aGMhnE
+	 WsuCQLlaOMLJg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56A253930E08;
-	Thu, 21 May 2026 15:50:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09533930E08;
+	Thu, 21 May 2026 15:50:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,19 +55,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: bcmgenet: keep RBUF EEE/PM disabled
+Subject: Re: [PATCH net v2 0/4] netlink: fixes for cross-namespace nsid
+ reporting
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177937861789.394984.10118621842029368003.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 15:50:17 +0000
-References: <20260520184320.652053-1-nb@tipi-net.de>
-In-Reply-To: <20260520184320.652053-1-nb@tipi-net.de>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: opendmb@gmail.com, florian.fainelli@broadcom.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- justin.chen@broadcom.com, phil@raspberrypi.com,
- bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <177937861938.394984.8736975091170632288.git-patchwork-notify@kernel.org>
+Date: Thu, 21 May 2026 15:50:19 +0000
+References: <20260520172317.175168-1-i.maximets@ovn.org>
+In-Reply-To: <20260520172317.175168-1-i.maximets@ovn.org>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ donald.hunter@gmail.com, shuah@kernel.org, kuniyu@google.com,
+ kees@kernel.org, amorenoz@redhat.com, jbenc@redhat.com,
+ nicolas.dichtel@6wind.com, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, matteo.perin@canonical.com
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -77,12 +79,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290550-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,raspberrypi.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-290551-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,6wind.com,canonical.com];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_NO_DN(0.00)[];
@@ -97,30 +99,36 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E21115A9355
+X-Rspamd-Queue-Id: CBF2B5A937A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 20 May 2026 20:43:20 +0200 you wrote:
-> Setting RBUF_EEE_EN | RBUF_PM_EN in RBUF_ENERGY_CTRL breaks the RX
-> path on GENET hardware once MAC EEE becomes active. RX traffic stops
-> flowing while the link stays up and the usual descriptor/RX error
-> counters remain quiet. In that state the MAC still accepts frames
-> (rbuf_ovflow_cnt keeps climbing) but RBUF no longer forwards them to
-> DMA, so rx_packets is no longer incremented at the netdev level. On
-> some boards the corruption ends up as a paging fault in
-> skb_release_data via bcmgenet_rx_poll on an LPI exit.
+On Wed, 20 May 2026 19:22:34 +0200 you wrote:
+> While working on some new features for OVS and OVN we discovered that
+> self-referential NSIDs get unintentionally allocated in the system as
+> well as unexpectedly reported for local events on all-nsid listeners.
+> 
+> More details in the patches.  They change user-visible behavior, but
+> the current behavior is arguably a bug, as it makes it hard to use
+> all-nsid sockets without a decent amount of extra unrelated work of
+> tracking when new NSIDs are allocated for your local namespace.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: bcmgenet: keep RBUF EEE/PM disabled
-    https://git.kernel.org/netdev/net/c/9a1730245e41
+  - [net,v2,1/4] net: netlink: fix sending unassigned nsid after assigned one
+    (no matching commit)
+  - [net,v2,2/4] net: netlink: don't set nsid on local notifications
+    (no matching commit)
+  - [net,v2,3/4] tools: ynl: support listening on all nsids
+    https://git.kernel.org/netdev/net/c/3287e81292f4
+  - [net,v2,4/4] selftests: net: add a test case for nsid in all nsid notifications
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
