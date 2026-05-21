@@ -1,219 +1,179 @@
-Return-Path: <netdev+bounces-290590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290591-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJuZBvhTD2raJAYAu9opvQ
-	(envelope-from <netdev+bounces-290590-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:50:32 +0200
+	id IHkkH+NOD2orJAYAu9opvQ
+	(envelope-from <netdev+bounces-290591-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:28:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37E1C5AB423
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:50:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAB4B5AB0CD
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8E804302D325
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:21:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A4E23079AC9
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773203905FD;
-	Thu, 21 May 2026 18:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FCE361DB8;
+	Thu, 21 May 2026 18:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="1O0IsQDo";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="ivQQvNyQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CrIulQIY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.35])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29206284883;
-	Thu, 21 May 2026 18:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2515A38E13F
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 18:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779387692; cv=none; b=TT/M9fPuY8O1vTFfnqOAXBRQJK+4gWJ6VDHaC6RHPsg3Oe4HOMz7UPcp0NN0lA31OyfLtyKnnUe8YU+MPFhlteqvnFh9uJ6ImK9LUUCEhiozzNdrelrhD1aB/f8ie3U7kttgx2CLD9Y7sDa2a7m8WuBJ0/nAXp2OOgjJsQjAW94=
+	t=1779387747; cv=none; b=A3avCLOb/asYPnyxkrh3NjJ5mjL2Brk1Axlp/h01OwkKN8l9esdKIcSFrra3RwpLbJGFZeRHHeszbU5p7e11izPWT/hMDtUpFccYpMKP8NAWyp69PTJKXOz7heb4te5jMxkm7eY72H0f7fIIcS9BKEF3MOOVePoxj9PihbCpM3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779387692; c=relaxed/simple;
-	bh=Fc4XkOkC2fsDeUNBZj2hrWOfkqoHNR8tJ/rnr3cg6RU=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=ti70urnYdtiDAUwL/tW8qsqeOAsQC29nAa7DZM8gJ7WNoiv1GRzpRFZOOH/5gCmWGZnnBXmo13Oe+h2xrkDN1XgQb4LYuYTEZvt/RiWAAH/ghg1a7qx2QbyD0Ut67JXcoF0mqwFmSqpVN6dGrwv3wN+znAWl/3QAfdxMyNrNAOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=1O0IsQDo; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=ivQQvNyQ; arc=none smtp.client-ip=160.80.4.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 64LI94ZD007631;
-	Thu, 21 May 2026 20:09:09 +0200
-Received: from lubuntu-18.04 (host-95-246-236-184.retail.telecomitalia.it [95.246.236.184])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 935E8122966;
-	Thu, 21 May 2026 20:09:00 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1779386940; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	s=arc-20240116; t=1779387747; c=relaxed/simple;
+	bh=k9AurF181x2exwKnRJljaY/5VaLbBAqNYVOsdJvZuS4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lWG5AqdbFo6kaMs94BPXv91oJYLx7Zsa/U9VbA9Y+Al4qIvgBpsFi6Bw+vcdOAGnIVVawvFKelWmkjAIQdUW7bCPyBhBxDD8dO9OmgRci0904UF31iE1Zwf5wiXttg/Y3Lfj1p63KR1IwoDaOdT8IDFf+LrDiQ6hKTetGT8TAGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CrIulQIY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779387745;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=v06rNKHtTTqzGVOju0eVLf+KwCO60KxfyXnQ3HX/rMs=;
-	b=1O0IsQDoyRhMM7y8Z6vW4ggZLMDM+Po9W7d4iwBf/5XDu8R00X7Ruv4bwvkIJEHv6rgqeC
-	STSp1gFOhfd8GpCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1779386940; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v06rNKHtTTqzGVOju0eVLf+KwCO60KxfyXnQ3HX/rMs=;
-	b=ivQQvNyQ0da8dycES18w6SfY8J9bGsN2Dq87/U+MFYw4KGppU1oxZA8voYzfwXWjN8k4Xx
-	mCzvvl3dMMAs6gy+qvaln7uLYKJim7Ids7XYjl80Rik70lBYLiK/DSen7vkI2CjO9VbLi1
-	5XB5Y3jKo5+HdERYpK7YMbW48BnaG3p2erGTutqxddrjOdeNBZUcPVpPDHz5ELixJiJyAi
-	k/MNqnDWB3fIuANlp6NSyj4Hr0tazDCvsaeAQhmnfT+Ig3GsIeDYtqIdKQKkTpk/uv+cwa
-	04zU7AYSqhv80D+2fhdI2lHhha8EBaxQ8m1PTGfGdUfvUzt24/7iWRWB9b+m+w==
-Date: Thu, 21 May 2026 20:08:59 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, idosch@nvidia.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, alex.aring@gmail.com,
-        justin.iurman@gmail.com, bestswngs@gmail.com,
-        stefano.salsano@uniroma2.it, stable@vger.kernel.org,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net v2] ipv6: rpl: add NULL check for idev in
- ipv6_rpl_srh_rcv()
-Message-Id: <20260521200859.816b8923b5f27bba6124461e@uniroma2.it>
-In-Reply-To: <ddefecf4-0a2f-4382-99a9-26012f9e943a@kernel.org>
-References: <20260518140630.24280-1-andrea.mayer@uniroma2.it>
-	<ddefecf4-0a2f-4382-99a9-26012f9e943a@kernel.org>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	bh=OzJ1fElh4gv9IHJI4SOnoimlJUpeNOPWJb0z1lqLfg4=;
+	b=CrIulQIYkmBzLPxS/wDoY7oEO5fDZL5PodXkqJ2ooOttyz2R2vNjJZPXF/donOorlBeQ20
+	tAjBtaWXpcv/B5MXRePrthQy4ffvXkR85gctHwEaUHWM8xfnq/IFUDpk1QxnAZRtpCUws7
+	nm9sVHCEIEXCaO4G5o4u37syHNPFE20=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-690-PlbFa3BTP1Wy1SDncSoVFg-1; Thu,
+ 21 May 2026 14:22:21 -0400
+X-MC-Unique: PlbFa3BTP1Wy1SDncSoVFg-1
+X-Mimecast-MFC-AGG-ID: PlbFa3BTP1Wy1SDncSoVFg_1779387739
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 82A15195608D;
+	Thu, 21 May 2026 18:22:19 +0000 (UTC)
+Received: from thinkpad (headnet01.pony-001.prod.iad2.dc.redhat.com [10.2.32.101])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2D39D1800347;
+	Thu, 21 May 2026 18:22:14 +0000 (UTC)
+Date: Thu, 21 May 2026 20:22:11 +0200
+From: Felix Maurer <fmaurer@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, Jayachandran <j-rameshbabu@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
+	Daolin Qiu <d-qiu@ti.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Neelima Muralidharan <neelima@ti.com>,
+	Paolo Abeni <pabeni@redhat.com>, Praneeth Bajjuri <praneeth@ti.com>,
+	Pratheesh Gangadhar TK <pratheesh@ti.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next v4] hsr: Allow to send a specific port and with
+ HSR header
+Message-ID: <ag9NU2iGKLlSd6tz@thinkpad>
+References: <20260508-hsr_ptp-v4-1-aa19aa7c6a71@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260508-hsr_ptp-v4-1-aa19aa7c6a71@linutronix.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,uniroma2.it];
+	TAGGED_FROM(0.00)[bounces-290591-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290590-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[uniroma2.it:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,uniroma2.it:mid,uniroma2.it:dkim]
-X-Rspamd-Queue-Id: 37E1C5AB423
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: DAB4B5AB0CD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 18 May 2026 08:18:56 -0600
-David Ahern <dsahern@kernel.org> wrote:
+On Fri, May 08, 2026 at 12:17:38PM +0200, Sebastian Andrzej Siewior wrote:
+> HSR forwards all packets it received on slave port 1 to slave port 2 and
+> one of the two copies to the user (master) interface.
+> In terms of PTP this is not good because the latency introduced by
+> forwarding makes the timestamp in the PTP packet inaccurate.
+> The PTP packets should not be forwarded like regular packets.
+>
+> In order to work with PTP over HSR the following has been done:
+> - PTP packets which are received are dropped within the HSR stack. That
+>   means they are not forwarded or injected into the master port. If the
+>   user requires them, then they need to be obtained directly from the
+>   SLAVE interface.
+>
+> - Sending packets. If the ethernet type of the packet is ETH_P_1588 then
+>   the stack assumes a header of type struct hsr_inline_header. The size
+>   of this header is the same as ethhdr. As a safeguard, the header
+>   contains a magic field which matches the position of h_source and it
+>   needs to match HSR_INLINE_HDR.
+>   Once this is verified, the header contains the port on which this
+>   packet needs to be sent and if system's HSR header should be added.
+>   This information is used with the HSR stack. The packet is then
+>   pulled passed the custom header so the remaining stack will see the
+>   actual data.
+>
+> - HSR HW offloading. The stack passes the skb to the requested port. The
+>   driver needs to be aware of the mode (HSR/ PRP). In PRP mode, there
+>   must be no offloading if the ether type is ETH_P_1588. In HSR mode it
+>   needs to add a HSR header for the ETH_P_1588 ether type but none if it
+>   is already ETH_P_HSR.
 
-> On 5/18/26 8:06 AM, Andrea Mayer wrote:
-> > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> > index 03cbce842c1a..a4af6e63349c 100644
-> > --- a/net/ipv6/exthdrs.c
-> > +++ b/net/ipv6/exthdrs.c
-> > @@ -499,6 +499,10 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
-> >  	u32 r;
-> >  
-> >  	idev = __in6_dev_get(skb->dev);
-> > +	if (!idev) {
-> > +		kfree_skb_reason(skb, SKB_DROP_REASON_IPV6DISABLED);
-> > +		return -1;
-> > +	}
-> >  
-> >  	accept_rpl_seg = min(READ_ONCE(net->ipv6.devconf_all->rpl_seg_enabled),
-> >  			     READ_ONCE(idev->cnf.rpl_seg_enabled));
-> 
-> ipv6_rpl_srh_rcv and ipv6_srh_rcv are both called by ipv6_rthdr_rcv and
-> both of these functions check idev. Moving the check to ipv6_rthdr_rcv
-> which already has an idev lookup would simplifying both paths -- and set
-> the drop code reason the same.
+Hi Sebastian,
 
-Hi David,
+I unfortunately didn't get to properly reviewing your patch before
+leaving for vacation. But in general I like what you're proposing at the
+moment. The inline header feels like a bit of magic to me still, but
+it's probably necessary to have some amount of magic to make the
+different sending options possible. Also seems like it doesn't put too
+much burden on user space.
 
-thanks for the review. I went through the code to plan v3, and I'd like to
-share a couple of points before sending it, in case I'm missing something.
+Skimming the patch, one thing came to my mind: maybe there is a simple
+way to make user space opt-in to the inline header handling, e.g.,
+something like a respect-hsr-inline-header flag at socket level(?) that
+only gets checked in the hsr code. Without such flag, the special
+parsing wouldn't happen at all, with the flag we still check for the
+inline magic value to support sending normal frames and special frames.
+But this is mostly an idea, probably not too well thought through yet.
 
-ipv6_rthdr_rcv() seems to already tolerate idev == NULL. The per-device
-accept_source_route read is wrapped in "if (idev)", and all
-__IP6_INC_STATS() calls go through _DEVINC(), which is NULL safe.
-The code after the switch:
-
-  [...]
-  switch (hdr->type) {
-  case IPV6_SRCRT_TYPE_4:
-      return ipv6_srh_rcv(skb);
-  case IPV6_SRCRT_TYPE_3:
-      return ipv6_rpl_srh_rcv(skb);
-  default:
-      break;
-  }
-  [...]
-
-falls back to the "default: break;" path, which only uses idev through
-those macros. For this reason, I think an "if (!idev) drop" at the top
-would change the behavior of the default path. So if we want to put the
-check on idev in this function, the check would need to go inside the two
-switch cases.
-
-Both the callees in the switch need idev to read the per-device sysctl
-(idev->cnf.seg6_enabled, idev->cnf.rpl_seg_enabled). To remove their own
-__in6_dev_get() they would have to receive idev from the caller.
-
-Two possible shapes for v3, both pass idev to the callees and remove their
-own __in6_dev_get() and NULL check:
-
-(a) Check inside the two switch cases with goto to a "disabled:" label at
-    the end of the function (same style as the existing "unknown_rh:"):
-
-      switch (hdr->type) {
-      case IPV6_SRCRT_TYPE_4:
-          if (!idev)
-              goto disabled;
-          return ipv6_srh_rcv(skb, idev);
-      case IPV6_SRCRT_TYPE_3:
-          if (!idev)
-              goto disabled;
-          return ipv6_rpl_srh_rcv(skb, idev);
-      default:
-          break;
-      }
-      [...]
-      disabled:
-          kfree_skb_reason(skb, SKB_DROP_REASON_IPV6DISABLED);
-          return -1;
-
-(b) Single check before the switch, only for the two types that need
-    idev:
-
-      if (!idev && (hdr->type == IPV6_SRCRT_TYPE_4 ||
-                    hdr->type == IPV6_SRCRT_TYPE_3)) {
-          kfree_skb_reason(skb, SKB_DROP_REASON_IPV6DISABLED);
-          return -1;
-      }
-      /* switch unchanged, idev passed to the callees */
-
-Both change the signatures of ipv6_srh_rcv() and ipv6_rpl_srh_rcv().
-
-Any preference, or a different approach in mind?
+But I have one real ask: can you add a simple selftest for this? No need
+to do any kind of real PTP, but just verify that we don't break any case
+of the matrix "add header/includes header" x "send normally/send on
+single port". Maybe just by tcpdump'ing on the other end of a veth?
 
 Thanks,
-Andrea
+   Felix
+
 
