@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-290528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290529-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BHmITAsD2r+HQYAu9opvQ
-	(envelope-from <netdev+bounces-290528-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:00:48 +0200
+	id 4JZ1NuwwD2pSHgYAu9opvQ
+	(envelope-from <netdev+bounces-290529-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:21:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C1475A8D2D
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:00:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 587B55A924B
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2FD343097B03
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:20:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92A4532306DD
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C35349CF2;
-	Thu, 21 May 2026 15:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACE9357D0B;
+	Thu, 21 May 2026 15:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgYr5JNX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HaCVjfya"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF31346FDA;
-	Thu, 21 May 2026 15:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8300349CFB;
+	Thu, 21 May 2026 15:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779376804; cv=none; b=TNozwLpVD8YZSlwkAgPvl0cVW5SHmK0YbY4iowG4zmBl47QmUnXT1/bv8DVJNelTnY4Kh6RqdhxDSBGTXU3ukxLBWK8ndbd7/hJ2aLuFleoWZyxQxg/23QJIgH6bdnHkVYGnLHn2J3hCV1YkVn7u8j3FHNUvxKPM2i38hF9iy1I=
+	t=1779376805; cv=none; b=oEjtBJ7YgO000JkwVOE2MJPKGJJOFgmTxoNSTm/3RPUsNm7G8wlQAHi8nwYA9OQbOJbY30gCkoj54gOWrQLSTQvuoYQ7bJtzMWJVqAYADPhs5dIMnU09dGavizQURrac7zgkHWKK1fbfC647NDQnYwyb5QgWuGrKxQL7CZLFXiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779376804; c=relaxed/simple;
-	bh=c2pb3CTFTN6e3ANuLnPdWLo4qrL6AegPnUq7G0f/C4M=;
+	s=arc-20240116; t=1779376805; c=relaxed/simple;
+	bh=SnAbICt+sFNLmOpdQqMMqbTxXg08miDw6DF34MkSvCM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=boLWNclBXpERzmbVuAk9442oW8KBZ/rUsKOur7HvVBynhyftifJ7uyuAntNxzaRms8jfPlIMInwZuMQi6/XfNGHAU46qSXlY19sEa6RypPP8NIwqHAduOKFCX93964jk5pwfpVa/O9TxF/JswFC5PeCIfX7iVJSBaQa3R4BNrj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mgYr5JNX; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406591F000E9;
-	Thu, 21 May 2026 15:20:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=sfNwzZZ1cTiT3ETdfdh6NNHA/jCTjP0OPOrjMER30xQDPPDY9Dh8NRLuwO2INMBMjYfeF16wFgQNTypHSkYTNB4eoiAmri1bhNNp4FxivcZVcXOF79Pvek1bKFZxlNGZPIfzPz0ysKSpoLc0u5zvA0AcDa/EqjISWA1PRxjogTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HaCVjfya; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FCA91F00A3C;
+	Thu, 21 May 2026 15:20:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779376803;
-	bh=uDaaoq6QV8BI/Q9PBLoh/DVI/Cnzm0iK+gOhzH6ejlc=;
+	s=k20260515; t=1779376804;
+	bh=XuGkmvh5hLugoY+Ffa+rGH+vw37ScgDVNuo5fB8zqU4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=mgYr5JNX/Rj/hGadhqBxzU/Fhdxo9btiYcVUJoVUbpU2AQFkk6obt6wSKJbQ2WNlx
-	 GfSfZN9o+AXaV5T6+iauMEjkOQDcZAOmY7TA6by7GDDvsNnFvL5QLIr/V+EF+BVFw3
-	 zBSYG7D16MT8hEJiV4SHXzEVI8xtQt4YZj7RMH+0TBIT00NQzSbSSw7taPa1TfrMx4
-	 CdyJv6+FWdADDz0c0yBrrokS+f5RbrGOgrFlUau5qlAi3S73I0+NBbb+sYtW/fz20e
-	 sKMa/D7d4amdEp7dYDRma5Id6bmFQDu1nlNOC2h+nbzJsAB/gDuR5r7q9LNQM0xO81
-	 jq/FrNDXyXLKg==
+	b=HaCVjfya3nOEa97oGkCfmw4F6WExRTQh1rNExhRnXufBMrgWif7o5GdYOnKXfVLvy
+	 ORiWt39+R/8AqUoraqk8NVWwcejFYVQg52NRISJx3pUSqiK0XJ2ZWpLiFjXo9eTK/w
+	 Ywea0CqVUVYlYjI21pOOMy+2U0X4jua5Xk9m87jp3xLRsdf7WPlKkQ8FpHthAnYPQB
+	 Oiwqjvpz2hIVSBCWfdoJszp0kmeoicjcSDrdK7vrT8fCe2pSfkUIAT8edDEMO116kT
+	 G5cO7lAhdcBICCAggjJx9nZyNGbJGnl7awnKbrHreeI+VfX+NC+/iT6GW+QufP9FZY
+	 cgNCu8GdEGREg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569913930E00;
-	Thu, 21 May 2026 15:20:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938C93930E00;
+	Thu, 21 May 2026 15:20:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,48 +55,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] octeontx2-af: npc: Fix allmulticast skip logic for
- LBK
- and SDP VFs
+Subject: Re: [PATCH net] qed: fix double free in qed_cxt_tables_alloc()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177937681289.379332.18385656444728574089.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 15:20:12 +0000
-References: <20260520043036.1523798-1-rkannoth@marvell.com>
-In-Reply-To: <20260520043036.1523798-1-rkannoth@marvell.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: davem@davemloft.net, gakula@marvell.com, horms@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, sgoutham@marvell.com
+ <177937681438.379332.10701744949542256391.git-patchwork-notify@kernel.org>
+Date: Thu, 21 May 2026 15:20:14 +0000
+References: <20260520070323.2762379-1-dawei.feng@seu.edu.cn>
+In-Reply-To: <20260520070323.2762379-1-dawei.feng@seu.edu.cn>
+To: Dawei Feng <dawei.feng@seu.edu.cn>
+Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, kees@kernel.org,
+ Ariel.Elior@qlogic.com, Yuval.Mintz@qlogic.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn, stable@vger.kernel.org,
+ zilin@seu.edu.cn
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-290529-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290528-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 2C1475A8D2D
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 587B55A924B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -105,19 +105,21 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 20 May 2026 10:00:36 +0530 you wrote:
-> When installing the allmulticast NPC rule, rvu_npc_install_allmulti_entry()
-> should skip LBK and SDP VFs (only CGX PF/VF may add the entry).  The
-> code combined is_lbk_vf() and is_sdp_vf() with logical AND, which is
-> never true for a single pcifunc, so the intended early return never ran.
+On Wed, 20 May 2026 15:03:23 +0800 you wrote:
+> If one of the later PF or VF CID bitmap allocations fails,
+> qed_cid_map_alloc() jumps to cid_map_fail and frees the previously
+> allocated CID bitmaps before returning an error. qed_cxt_tables_alloc()
+> then calls qed_cxt_mngr_free(), which invokes qed_cid_map_free()
+> again.
 > 
-> Use logical OR instead.
+> Fix this by setting each CID bitmap pointer to NULL after bitmap_free()
+> to avoid double free.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] octeontx2-af: npc: Fix allmulticast skip logic for LBK and SDP VFs
-    https://git.kernel.org/netdev/net/c/9eddc819f00b
+  - [net] qed: fix double free in qed_cxt_tables_alloc()
+    https://git.kernel.org/netdev/net/c/2bccfb8476ca
 
 You are awesome, thank you!
 -- 
