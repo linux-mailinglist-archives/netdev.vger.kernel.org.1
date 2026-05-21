@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-290159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290160-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wP3rBWJPDmrL9gUAu9opvQ
-	(envelope-from <netdev+bounces-290159-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:18:42 +0200
+	id qP5qJT1PDmrL9gUAu9opvQ
+	(envelope-from <netdev+bounces-290160-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:18:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7632D59D3E4
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:18:41 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99BE459D3CD
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:18:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3DD6530E0F7C
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:17:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C95FE3019D83
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BD821ADC7;
-	Thu, 21 May 2026 00:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9471EE7B7;
+	Thu, 21 May 2026 00:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihcHIOLS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rfYvOpVA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
+Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0CD20299B
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 00:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5C021CC51
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 00:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779322644; cv=none; b=RkQ5UsngxVkaqUm+emoQUnPLEttuPp/EjW0CzcqSgWOtfpvyCShs6nHX226BzDZ1oGVgdhk5HS6DGEpvh+xxup14TEQNxfMFFy16b5KoxLSY2SPpZm0Ly/Q4QxixpMTye1QRH2yxJpu8KhPQ3JctOCsj0PwT4OKnUBoBnA/0bas=
+	t=1779322647; cv=none; b=QgN/wayTN4j0ncZc4dv1P7FE5UgBoiJ5JJpysf85RMrjvH3mfhHKNJC0yxY8T83q7SacZVg5G/HOIrmF7NgOxvhp3MlmSkkk5g0huELhH0ChXW7/Rgb1mX2+ItvL/IDVBMxwjf493C0H7MqhBceRcBV61IAL5Fh9hxRbM2X8cDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779322644; c=relaxed/simple;
-	bh=sP88QMBkB5WFeA9rGvVYUSHloFGHJ5YYBpExVoA4Bog=;
+	s=arc-20240116; t=1779322647; c=relaxed/simple;
+	bh=TOFT+GtrMRJZx4HNyidmMAJZlZ/MBpkuAo+8r3ytcIs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kDzi20XAzYxjYOIYSEPVWga34vvEeTBCqkQwLuCxrThrWCfrGV8XSbWvakIyRvQXaaGEHZkDdjti77TMODEDPTWkrH0l5TEAP83+qIf99sgVkOaUzlPiHgxWwvS966OtHTHxw4Wl+Cowiool2BhbWNrzPiFBPGLbNUejp+6TK2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihcHIOLS; arc=none smtp.client-ip=74.125.82.66
+	 MIME-Version; b=a4hiUDeYeMM/FFblrJ+n0mZkG/CxrGqOH6VDXufJufliQEMynZoq5JLMAMF+ARH9sLWorCQLFMzddhP9P3I3Gq8vY9iOPxyrChDupdBljcfZHs5BlT9sPng9STDsWYRuLWmj9vPkkb98MYzCTf/hIh0vqw83jcKxr+bK2+c5Wx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rfYvOpVA; arc=none smtp.client-ip=74.125.82.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-132d1b2519eso12615076c88.0
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 17:17:23 -0700 (PDT)
+Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-135e88b8e55so5391440c88.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 17:17:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779322643; x=1779927443; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779322645; x=1779927445; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DaqSbH53nnDwnuyvIsMb4KYjYHN14JziBMff4wFVy4A=;
-        b=ihcHIOLShAJ5VRGdP6shONr03aDJs/VwhoA3NiBu6GaO1KFyn6Pkmxv15Q+CaYgavw
-         BHh2JDnsgvH3MuOlAz7tVPjMHZ+gu2d3WLYETCFJEYG+pyz/hFaL1iA9o8ste8t0zMM6
-         +/JM09gj0ANOu/Cu5vpA7Kion7DKa5WCfcZTJJ/sOagKqy401quHbLZ6SvwhxvC4+inJ
-         h5jHvAbwjFbMzKWuWoM9GJwpaNBvQjbEkqrD6rASuZAIYmp+7WtrEAjKj/QCoauBXN9a
-         oBqB0xTfAiScpu5KHggReK/zBzyNMQKwOAT0xEs/qliGPnjWJAQGjrjtrT/Nz2zMGpdu
-         TIDw==
+        bh=JB8hLxgPFXR6TxheosPkUZdcss+SaUcFoZO7z76syt0=;
+        b=rfYvOpVA7LiEWCvi3NigVLkDt+h+zeUOaA0ri6gKONqLnom+R7f1+2B+7f+VGxTN/D
+         zKCP1KZsFGT/7J4V6TVgf2OFKIec1o4QjwaPWS14XjnkwEfs0OOwkWSi0bls2jQH2NiR
+         cXOiKpHhplIq7rZcOnsxaAMkszK0yWghPEgVszbQxMIdqXrgAV0/VD9Cv4eVQjEkXD5l
+         yHJsqKXbuOQPg3UZaTdEFIW7uQCM6fKwaex6eG3HtBhJGDIevqo+Pl4SjQK3/zFCspXH
+         wt7/FFSyjphzJlsnRxcEidhmdocrPmgZvT9Z3Hiunpn2i0h/LSZYZwPKO4whF2Bht1FW
+         mCqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779322643; x=1779927443;
+        d=1e100.net; s=20251104; t=1779322645; x=1779927445;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=DaqSbH53nnDwnuyvIsMb4KYjYHN14JziBMff4wFVy4A=;
-        b=kglbZDSuN/8vupw26IqDd39KyzP8xh5BlrOJzpCeoML49kjlLsaY/q2Ivi3/YASgqs
-         PAyr/4wuEVIgW8hRRyBLdwsNrUlDwPTz9mB3Ye0faeZ9azu1h2ZRzluA2MNkZi1yqKh2
-         PTKtrsydqMX4tle68zpIfine7su5OJP8NWcijmsi3zprQPlInhPvJQXqjA2q5r+T2z1o
-         +tRM4zplWCRd4Dptq2DHyERT5AFPkqTyzOQZUCp3JksXKkb13ebQpHpw8lQPA1IwUi6t
-         gDwS3ly36iFYHE9lFlCzzTJE9hamWZZX/PwK6bk4hu4h3E97puuAJ/+eF3TdvBbh5rHt
-         aFIA==
-X-Gm-Message-State: AOJu0YzPY2GG1DhglI94FQWmZCmlCLOMI8eehh0x0r/oZuEiD8HL8Wer
-	oV3rIFenPFqWo0swvl0ikEqbWSGVxmFjSHfwBIyQulE27ItbvqYOtoE8shSMoyYcsnM=
-X-Gm-Gg: Acq92OFcXRcVhdZV/rtEFMIG7lwfqb7XpMOF3/RI38OP6YZDz40QyrFSIFlWDgWl1u0
-	fByZAOG0ohFDvj6JjNyIg/BzbYUV/JE38FYApwWbrN/FhPp020evjjBVS9mWtzzMaPIDw98KrAv
-	c5Y86QOsYZ+kHOOt7UraoKl7Lr6eh7R4GC9qNm6/Noj8nAORhX2K74Nm1lCd27WCpVV84nSALCn
-	injANWlmj98jr96JoX9rahzIXG/JvyuDujVmEDbsI9s4EPTZjEIwcRxtsjuCBYI/7QBBfh1PyMR
-	aiWL/ixrN4xHt80d9lyNZcIo+bTkd6pBZcVrovWh3uTcGYJFudqr6dDRINR3e2xfJZiekVSLvB9
-	+bxWvkEePKw+N2byCi73L0zFX61JYnQer8+vjxkFYlupPCrFZx6N8NBbJazWC6xIz+S1rm9HmPX
-	jwV5MnEJbbgP1s6RvZO/umhrE5ghCotXAwOfyvMOSwk81Uebe72EKoSDJAbh6k0nf5U63g/TWnh
-	OpYiq78Oc8TmJAL7fR5fOktMbDm6EKmyFukg+g0GHxpO8Kz6RGe+bp1JLgEGNaPD/1yvPmSezhv
-	rF3p+uPpmpaTKMDE9g==
-X-Received: by 2002:a05:7022:42b:b0:130:aa42:167b with SMTP id a92af1059eb24-13632f57034mr409453c88.36.1779322642665;
-        Wed, 20 May 2026 17:17:22 -0700 (PDT)
+        bh=JB8hLxgPFXR6TxheosPkUZdcss+SaUcFoZO7z76syt0=;
+        b=SXccTgGMLSJlodQtsvn+Leq1ezBXSPO4jXWq5GrGNs5KoOczwv5EDk7+9obQfefqfN
+         CsIZF1aa/uEaoPn/d3dMzyjnF6/TeO5vyqzSlZyeGCDSlyy6mHVKaot4iofzaHCLwG5q
+         p+heG4IQulXpupCBh2NdJA8ju/rBcCwVdHnfPLH3xJzU9H57XR94FTaa9T4uv9qDxzia
+         bmA8uSmTFnBKbEvs1nzuZnQtSlU+f8vcIG3MiXxPsTAMEy8yvEP7F0JugGmv/wmJn73m
+         0ChsFyDIW67pliss9LWBkORnPlRdRw2Ex8VbzRNW0xwtaLNjrpInI+urGc1GXcLg/Cv+
+         QZxA==
+X-Gm-Message-State: AOJu0YzLpD7dNh5c4OsWFNcQrcNCD/0dacMVIiKUyLrM5aINgq4/IXaI
+	gMFf4TCflJ8eq03xvgvgF9bT2v3OMpSeo6cLsR4/euTvp/RDCF+K9mPCspivC8omluc=
+X-Gm-Gg: Acq92OHtZOO2E6fckvabub7xWtIb+4zYV3/BMTE0tpz9oAzXZnYsMbH488CfEQTummk
+	QxYc6nXEq+fuirmtI/9ICaKamVplCL9Uo1mja7Ub7Ntx0VMhtYUp6znRuYolnySrH2/HEJK1mh4
+	hutHBfoN8IFYCSg9zS78jV8Q42r5zZ/azurqBs0KFX74L1NfDhjVLjs83Svq9u04+TLrDbMOabo
+	2+70/tyLIM7F6y5oje8UkeTPc+40YFQEd6SDzlDHI/VJu0En+vPEb1f9qbdRyfzlxjV+Cp0iuw9
+	HfSUZrOJ7bus3oIvb5v5IK4grjFi9F8AmuzGp28elYGCghdDs/cTI7NdAA+N2ST1Wr6DSZsEo5I
+	OQOeGPjPf9Um1SoO7DEo6ZgQMwFEhXg+RmXpcRolZiol8xf7p4G+ElQiWEEItPbWhIlMk1Zd3qu
+	pmFZtJEFYUs5qpclpHSoRcJeECzNjl09pWPlECSJg4jJk9nKotPx5fcSviqNrcuJLnIC463tm1x
+	LV/kqH4MsxwV/ApOnm1/o8VVWnRd1Mwn9rKqFdDGWUPOLbdPlXpQ1KhhQu6XujB22/1RBoz6LX7
+	taH4hsy30b5fEOjNeQ==
+X-Received: by 2002:a05:701b:2612:b0:12a:b3c4:c3b6 with SMTP id a92af1059eb24-13632e44d5fmr243724c88.21.1779322645008;
+        Wed, 20 May 2026 17:17:25 -0700 (PDT)
 Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cbcb9ed3sm28444410c88.1.2026.05.20.17.17.22
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cbcb9ed3sm28444410c88.1.2026.05.20.17.17.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 17:17:22 -0700 (PDT)
+        Wed, 20 May 2026 17:17:24 -0700 (PDT)
 From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>,
@@ -86,9 +86,9 @@ Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Subject: [PATCH v2 1/7] net: arcnet: com20020: remove misleading references to multicast
-Date: Wed, 20 May 2026 17:16:13 -0700
-Message-ID: <20260521001631.45434-2-enelsonmoore@gmail.com>
+Subject: [PATCH v2 2/7] net: arcnet: fix typos in comments
+Date: Wed, 20 May 2026 17:16:14 -0700
+Message-ID: <20260521001631.45434-3-enelsonmoore@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260521001631.45434-1-enelsonmoore@gmail.com>
 References: <20260521001631.45434-1-enelsonmoore@gmail.com>
@@ -101,89 +101,123 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FREEMAIL_CC(0.00)[pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290160-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-290159-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7632D59D3E4
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 99BE459D3CD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ARCnet does not support multicast, only unicast and broadcast. In spite
-of this, the com20020 driver contains several references to multicast
-in a comment and a function name, including a FIXME that it should be
-implemented. Adjust the comment to make the lack of multicast support
-clear and rename com20020_set_mc_list to com20020_set_rx_mode.
+The ARCnet code contains quite a few typos in comments. Fix them.
+Initially noticed by inspection, then augmented using codespell.
 
 Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
- drivers/net/arcnet/com20020.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ drivers/net/arcnet/arc-rimi.c  |  2 +-
+ drivers/net/arcnet/arcdevice.h | 10 +++++-----
+ drivers/net/arcnet/rfc1201.c   |  2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/arcnet/com20020.c b/drivers/net/arcnet/com20020.c
-index b8526805ffac..f2fa26626a06 100644
---- a/drivers/net/arcnet/com20020.c
-+++ b/drivers/net/arcnet/com20020.c
-@@ -56,7 +56,7 @@ static void com20020_copy_to_card(struct net_device *dev, int bufnum,
- 				  int offset, void *buf, int count);
- static void com20020_copy_from_card(struct net_device *dev, int bufnum,
- 				    int offset, void *buf, int count);
--static void com20020_set_mc_list(struct net_device *dev);
-+static void com20020_set_rx_mode(struct net_device *dev);
- static void com20020_close(struct net_device *);
+diff --git a/drivers/net/arcnet/arc-rimi.c b/drivers/net/arcnet/arc-rimi.c
+index 53d10a04d1bd..fb3d3565aa9a 100644
+--- a/drivers/net/arcnet/arc-rimi.c
++++ b/drivers/net/arcnet/arc-rimi.c
+@@ -185,7 +185,7 @@ static int __init arcrimi_found(struct net_device *dev)
+ 	lp->hw.copy_to_card = arcrimi_copy_to_card;
+ 	lp->hw.copy_from_card = arcrimi_copy_from_card;
  
- static void com20020_copy_from_card(struct net_device *dev, int bufnum,
-@@ -194,7 +194,7 @@ const struct net_device_ops com20020_netdev_ops = {
- 	.ndo_start_xmit = arcnet_send_packet,
- 	.ndo_tx_timeout = arcnet_timeout,
- 	.ndo_set_mac_address = com20020_set_hwaddr,
--	.ndo_set_rx_mode = com20020_set_mc_list,
-+	.ndo_set_rx_mode = com20020_set_rx_mode,
- };
+-	/* re-reserve the memory region - arcrimi_probe() alloced this reqion
++	/* re-reserve the memory region - arcrimi_probe() allocated this reqion
+ 	 * but didn't know the real size.  Free that region and then re-get
+ 	 * with the correct size.  There is a VERY slim chance this could
+ 	 * fail.
+diff --git a/drivers/net/arcnet/arcdevice.h b/drivers/net/arcnet/arcdevice.h
+index bee60b377d7c..f1947342d67f 100644
+--- a/drivers/net/arcnet/arcdevice.h
++++ b/drivers/net/arcnet/arcdevice.h
+@@ -137,7 +137,7 @@ do {									\
+ #define TXACKflag       0x02	/* transmitted msg. ackd */
+ #define RECONflag       0x04	/* network reconfigured */
+ #define TESTflag        0x08	/* test flag */
+-#define EXCNAKflag      0x08    /* excesive nak flag */
++#define EXCNAKflag      0x08    /* excessive nak flag */
+ #define RESETflag       0x10	/* power-on-reset */
+ #define RES1flag        0x20	/* reserved - usually set by jumper */
+ #define RES2flag        0x40	/* reserved - usually set by jumper */
+@@ -166,7 +166,7 @@ do {									\
+ #define RESETclear      0x08	/* power-on-reset */
+ #define CONFIGclear     0x10	/* system reconfigured */
  
- /* Set up the struct net_device associated with this card.  Called after
-@@ -362,14 +362,8 @@ static void com20020_close(struct net_device *dev)
- 	arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
- }
+-#define EXCNAKclear     0x0E    /* Clear and acknowledge the excive nak bit */
++#define EXCNAKclear     0x0E    /* Clear and acknowledge the excessive nak bit */
  
--/* Set or clear the multicast filter for this adaptor.
-- * num_addrs == -1    Promiscuous mode, receive all packets
-- * num_addrs == 0       Normal mode, clear multicast list
-- * num_addrs > 0        Multicast mode, receive normal and MC packets, and do
-- *                      best-effort filtering.
-- *      FIXME - do multicast stuff, not just promiscuous.
-- */
--static void com20020_set_mc_list(struct net_device *dev)
-+/* ARCnet does not support multicast, only unicast and broadcast */
-+static void com20020_set_rx_mode(struct net_device *dev)
- {
- 	struct arcnet_local *lp = netdev_priv(dev);
- 	int ioaddr = dev->base_addr;
+ /* flags for "load test flags" command */
+ #define TESTload        0x08	/* test flag (diagnostic) */
+@@ -194,7 +194,7 @@ do {									\
+ struct ArcProto {
+ 	char suffix;		/* a for RFC1201, e for ether-encap, etc. */
+ 	int mtu;		/* largest possible packet */
+-	int is_ip;              /* This is a ip plugin - not a raw thing */
++	int is_ip;              /* This is an ip plugin - not a raw thing */
+ 
+ 	void (*rx)(struct net_device *dev, int bufnum,
+ 		   struct archdr *pkthdr, int length);
+@@ -257,7 +257,7 @@ struct arcnet_local {
+ 	char *card_name;	/* card ident string */
+ 	int card_flags;		/* special card features */
+ 
+-	/* On preemtive and SMB a lock is needed */
++	/* On preemptive and SMP a lock is needed */
+ 	spinlock_t lock;
+ 
+ 	struct led_trigger *tx_led_trig;
+@@ -299,7 +299,7 @@ struct arcnet_local {
+ 	int num_recons;		/* number of RECONs between first and last. */
+ 	int network_down;	/* do we think the network is down? */
+ 
+-	int excnak_pending;    /* We just got an excesive nak interrupt */
++	int excnak_pending;    /* We just got an excessive nak interrupt */
+ 
+ 	/* RESET flag handling */
+ 	int reset_in_progress;
+diff --git a/drivers/net/arcnet/rfc1201.c b/drivers/net/arcnet/rfc1201.c
+index 0edf35d971c5..f2ec58d06fc3 100644
+--- a/drivers/net/arcnet/rfc1201.c
++++ b/drivers/net/arcnet/rfc1201.c
+@@ -235,7 +235,7 @@ static void rx(struct net_device *dev, int bufnum,
+ 		skb->protocol = type_trans(skb, dev);
+ 		netif_rx(skb);
+ 	} else {		/* split packet */
+-		/* NOTE: MSDOS ARP packet correction should only need to
++		/* NOTE: MS-DOS ARP packet correction should only need to
+ 		 * apply to unsplit packets, since ARP packets are so short.
+ 		 *
+ 		 * My interpretation of the RFC1201 document is that if a
 -- 
 2.43.0
 
