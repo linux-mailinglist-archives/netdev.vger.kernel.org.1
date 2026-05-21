@@ -1,67 +1,91 @@
-Return-Path: <netdev+bounces-290522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YB4yJ+UrD2q3HQYAu9opvQ
-	(envelope-from <netdev+bounces-290522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:59:33 +0200
+	id sBhGCjEuD2r+HQYAu9opvQ
+	(envelope-from <netdev+bounces-290523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:09:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E945A8D00
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:59:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77C2A5A8EE8
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:09:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B2A3831EF128
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:59:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2A0231911AD
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C7127A47F;
-	Thu, 21 May 2026 14:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB20277CA5;
+	Thu, 21 May 2026 15:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cz4cbATQ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="LbcwQu88"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2994C23372C;
-	Thu, 21 May 2026 14:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7484D23BCEE
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 15:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779375548; cv=none; b=lTFR9uzsbgy/dCx2IVGOrQi/nLtNkKYhFecbOAUfIVCSZA6UukjgWLKatks06Mg96CskcKHGj3C+UKa3Nr6fEn22eEeGmnv9R6NE65TEjnvG4FG7gCn0Hi8LrRj8N2lx2frHFg9CFMCZCk72+XkwmQMbLWmlXvuTR3Qo1Onw8ck=
+	t=1779376103; cv=none; b=FEfjNhABxxCegy3CjR/yzsdv5vUe38XrjoaOLjQqOlAwE1YzkNu7D/VQtC2tjocunYMGcBJHj110ARTgIfj8gDUv2EqzbPzrw0unoepL/LCa89Q+b0KpG41JNkrizS0xuS/zNuafcoLE4hM3a6JA5RZ5XUn1TgPg6FMF79tsyvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779375548; c=relaxed/simple;
-	bh=7vV3U47dqceEoYlPJPQkAdHGPir0Dj/4Tzkmt+VmItI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mjy26Jx7LXHAfhxgZvLI3HilHPnxelsPkhMfSDd8lAVbHjYKc+5yfLYaCwfR8RDlbW5ZGgzza8yVmTPoP58mTfmj1tK+zF7Eijs8jD0jDZ6vl//C5Lup9/Azc/ZcUul26OVeKDtsWt0hbgdQaf4JxtzoHXHnUU+1g9Z/ycLU45o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cz4cbATQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE5E41F00A3D;
-	Thu, 21 May 2026 14:59:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779375546;
-	bh=u8Y8KDCejJZHIqnWx5pY4uc1dK4z52Fxk1r7C+1ecbk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Cz4cbATQW3NxW6y1zb36mbRj11yX2PUdrz6T9oLdRg2L4IX3u9WMRUGFL+T+IWpOV
-	 S7aat94BXSeYmu5ZN1aoBQQldNyy0rwkTBjSLI9cMRKmgrGylJrI2aXFsSo/curE2G
-	 JyREF4Y0MeQS5NQwGcEovRFPAmzcWKLA7SXXwwW7EGFW5iU2d2x5MGXBymbCuBxW6H
-	 iJiLSZpuVg3yafWmo4AxJZPPeGIuvDIeEvWTxWd4TwQs63b1LO7bdV2mxVtCKK/EtU
-	 Q2FubrIDm4R8EX7Vn5fwqD2kEw0lUS4qB39YdyBV9KU9CLe6QwP7Jr70kNBcIPUvHH
-	 pTk6SqlhgpS7w==
-From: Simon Horman <horms@kernel.org>
-To: yun.zhou@windriver.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	david+nfc@ixit.cz,
-	davem@davemloft.net,
+	s=arc-20240116; t=1779376103; c=relaxed/simple;
+	bh=OEPQOe7VPkCYeUN0fMBjKD0J61bU7391RwDg/hXAE7I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MO6WGNPrAx4yvm0vUdhWVfXSNSK9Y6js1Oy4DxWhnshRDCE9rBR2WwEtRij5r00WJaB/JD1sGO8ZzqhFqfolFySfIvmOkfIAEIOaUuLjCvpL4Ri7xpwULUzStAyYXJhFaC2MtLXsUpao9nhmtdqBncrVAbNlMHoQA5lG+aBOk8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=LbcwQu88; arc=none smtp.client-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-6314d2e31d6so2128964137.0
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 08:08:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779376100; x=1779980900; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dufChQmfBmIYymq91soBr9mxGxyqJ2a2wQN8zGScCUQ=;
+        b=LbcwQu884TNrVbIGtWYnkZcMwvgpLfO7xYRf+jt0BpUmky4s4V/WWx9fmVWliwXyIO
+         282m1Bso/Y+GCMAY7+iEhhD4mKFQ9Fv99YlwsILxJEwYsY2+JPQuTyINGdM44+xc9+We
+         z+6Eu/T6RTGrvWzNgO8IkOS92LoEM80Knuhnr4qVrj6yXpEMlBmf9ZzJSPRVhlPhsGiQ
+         gT834RAffoAFcWgx2RxDHEQ+Ya+5cO7H7w5Lx5PqzjULf6+fjOhAQeygwz6TyM7sE2ws
+         4PDF7Tfcy03jKlX+3nL4CC2e41hF+mtQ2p9Oz5NAsW4VHb6U6Z1bCZyj6GgMRqxT7UWP
+         r+6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779376100; x=1779980900;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dufChQmfBmIYymq91soBr9mxGxyqJ2a2wQN8zGScCUQ=;
+        b=Ie87/q9kHMAdek3ynr9NhinA5mq8PChZNctPjzsl7bYHeEhAVdgfyVd5YHWpNFJpop
+         b0YF5rh8BKzPbOAf7cVERWHlieZ1qjvTnGN8rT0ILldDwPi/PizYA1W4z0QcjtDedXjb
+         iRwmLiwuwa0CR5HDbcJGkNGfwvQ6hNhdThEa8T8RtW/UnRI2yQhposZ6IKmSFXu0RFrf
+         KoIEEbb1iRJLzpKqM6O/xGQjOB+GDqQpEZY/7MXj4IAMlG18fY/zWJA0wjvtCjMMNpzW
+         3HaMQhpb0+biC5Hj4teMvgrSdRnE770DhcZKZHmb9O1ITYcHdx6JQ1hG7/21C1u7HvYe
+         VmXw==
+X-Gm-Message-State: AOJu0YzbklLpE0mXeqo+QdrzrebhFGen6XgbM4/ARNdvGC91ikDnnkX8
+	v0xRumF9V7g4amaJKx1rgQgdCipngtiZys3DfzSZ0t9bM8iK5jP/8FSDGQ18+I9nNg==
+X-Gm-Gg: Acq92OEI6q/ZzlVAZwg8DBPO2D6M6kH9pDajk0NfguPmDBQTqRLb8nY3BtcAwUBh0Ql
+	rFboZFXJOKBVpSzYY2mpTXPZ+uv/AM5LoQkG2dN9aKKdHL6rcza96DvBQjWDqBW7WYA5ls3IH6h
+	wF0sg5fQmQovUjEVvPS0a7XWTqsL3OG+rOZGbo8Xh6vLEE5cywq6JNbpaq59sK/73zDMkmy9GBp
+	rR6lNWrkunoLCnbzz4k9Nnf4GdCyH7+oeQNEm+a/LmInRmRaTH0NvXVIqbsMCT3iR8d+oov8T5r
+	idJCVmz82pL8G4WTsTPQTSZQt6FUgKl8LwBGyadJbIrPlHQgLRfgMOsECRo8lW5J8i5zuPDAk60
+	JMVqdr9Ip2sA793pkTT2nehYpgFSwsCr/xzkTdaMppJpeLkgwYijCsqzxn7zGXHFTB8FR1dR1qC
+	ch4xNv4IluP+fzxOoR7/oXtvTVkk7S+yepUhifaS6c2HjCCg==
+X-Received: by 2002:a67:e7cc:0:b0:62f:357a:3297 with SMTP id ada2fe7eead31-6738d46402dmr1986197137.5.1779376100139;
+        Thu, 21 May 2026 08:08:20 -0700 (PDT)
+Received: from exu-caveira.tail33bf8.ts.net ([2804:14d:5c54:4d67:f17:d82a:d5b8:20a])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-679fa70c8d7sm881114137.11.2026.05.21.08.08.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2026 08:08:18 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	bongsu.jeon@samsung.com,
-	oe-linux-nfc@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] nfc: nci: fix use of uninitialized memory in CORE_INIT_RSP parsing
-Date: Thu, 21 May 2026 15:58:17 +0100
-Message-ID: <20260521145817.1990235-1-horms@kernel.org>
+	jhs@mojatatu.com,
+	jiri@resnulli.us
+Cc: netdev@vger.kernel.org,
+	pctammela@mojatatu.com
+Subject: [PATCH net-next 1/2] selftests/tc-testing: Add support for ifb devices
+Date: Thu, 21 May 2026 12:08:10 -0300
+Message-ID: <20260521150811.1896373-1-victor@mojatatu.com>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260519013042.3459906-1-yun.zhou@windriver.com>
-References: <20260519013042.3459906-1-yun.zhou@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,97 +93,145 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290523-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290522-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[mojatatu.com];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,nfc];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F2E945A8D00
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu.com:mid,mojatatu.com:email,mojatatu-com.20251104.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 77C2A5A8EE8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+Add support for ifb devices in tdc so that tests with the nsPlugin are
+able to use it when necessary.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 ---
-nfc: nci: fix use of uninitialized memory in CORE_INIT_RSP parsing
+ tools/testing/selftests/tc-testing/config                 | 1 +
+ tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py | 7 +++++++
+ tools/testing/selftests/tc-testing/tdc.py                 | 3 +++
+ tools/testing/selftests/tc-testing/tdc_config.py          | 1 +
+ 4 files changed, 12 insertions(+)
 
-This commit adds skb length checks to nci_core_init_rsp_packet_v1() and
-nci_core_init_rsp_packet_v2() before parsing the CORE_INIT_RSP packet to
-prevent reads of uninitialized memory.
+diff --git a/tools/testing/selftests/tc-testing/config b/tools/testing/selftests/tc-testing/config
+index c20aa16b1d63..0e5618be0335 100644
+--- a/tools/testing/selftests/tc-testing/config
++++ b/tools/testing/selftests/tc-testing/config
+@@ -4,6 +4,7 @@
+ 
+ CONFIG_DUMMY=y
+ CONFIG_VETH=y
++CONFIG_IFB=y
+ 
+ #
+ # Core Netfilter Configuration
+diff --git a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
+index bb19b8b76d3b..0bece7c74f07 100644
+--- a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
++++ b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
+@@ -120,6 +120,7 @@ class SubPlugin(TdcPlugin):
+         dev0 = self.args.NAMES["DEV0"];
+         dev1 = self.args.NAMES["DEV1"];
+         dummy = self.args.NAMES["DUMMY"];
++        ifb = self.args.NAMES['IFB']
+ 
+         if self.args.verbose:
+             print('{}._nl_ns_create'.format(self.sub_class))
+@@ -129,6 +130,7 @@ class SubPlugin(TdcPlugin):
+         with IPRoute() as ip:
+             ip.link('add', ifname=dev1, kind='veth', peer={'ifname': dev0, 'net_ns_fd':'/proc/1/ns/net'})
+             ip.link('add', ifname=dummy, kind='dummy')
++            ip.link('add', ifname=ifb, kind='ifb')
+             ticks = 20
+             while True:
+                 if ticks == 0:
+@@ -136,8 +138,10 @@ class SubPlugin(TdcPlugin):
+                 try:
+                     dev1_idx = ip.link_lookup(ifname=dev1)[0]
+                     dummy_idx = ip.link_lookup(ifname=dummy)[0]
++                    ifb_idx = ip.link_lookup(ifname=ifb)[0]
+                     ip.link('set', index=dev1_idx, state='up')
+                     ip.link('set', index=dummy_idx, state='up')
++                    ip.link('set', index=ifb_idx, state='up')
+                     break
+                 except:
+                     time.sleep(0.1)
+@@ -169,8 +173,11 @@ class SubPlugin(TdcPlugin):
+         cmds.append(self._replace_keywords('link set $DEV1 netns {}'.format(ns)))
+         cmds.append(self._replace_keywords('link add $DUMMY type dummy'.format(ns)))
+         cmds.append(self._replace_keywords('link set $DUMMY netns {}'.format(ns)))
++        cmds.append(self._replace_keywords('link add $IFB type ifb'))
++        cmds.append(self._replace_keywords('link set $IFB netns {}'.format(ns)))
+         cmds.append(self._replace_keywords('netns exec {} $IP link set $DEV1 up'.format(ns)))
+         cmds.append(self._replace_keywords('netns exec {} $IP link set $DUMMY up'.format(ns)))
++        cmds.append(self._replace_keywords('netns exec {} $IP link set $IFB up'.format(ns)))
+         cmds.append(self._replace_keywords('link set $DEV0 up'.format(ns)))
+ 
+         if self.args.device:
+diff --git a/tools/testing/selftests/tc-testing/tdc.py b/tools/testing/selftests/tc-testing/tdc.py
+index 81b4ac3f050c..511d66c36a2a 100755
+--- a/tools/testing/selftests/tc-testing/tdc.py
++++ b/tools/testing/selftests/tc-testing/tdc.py
+@@ -378,6 +378,7 @@ def run_one_test(pm, args, index, tidx):
+     dev0 = NAMES['DEV0']
+     dev1 = NAMES['DEV1']
+     dummy = NAMES['DUMMY']
++    ifb = NAMES['IFB']
+     result = True
+     tresult = ""
+     tap = ""
+@@ -414,6 +415,7 @@ def run_one_test(pm, args, index, tidx):
+     NAMES['DEV0'] = '{}id{}'.format(NAMES['DEV0'], tidx['id'])
+     NAMES['DEV1'] = '{}id{}'.format(NAMES['DEV1'], tidx['id'])
+     NAMES['DUMMY'] = '{}id{}'.format(NAMES['DUMMY'], tidx['id'])
++    NAMES['IFB'] = '{}id{}'.format(NAMES['IFB'], tidx['id'])
+ 
+     pm.call_pre_case(tidx)
+     prepare_env(tidx, args, pm, 'setup', "-----> prepare stage", tidx["setup"])
+@@ -474,6 +476,7 @@ def run_one_test(pm, args, index, tidx):
+     NAMES['DEV0'] = dev0
+     NAMES['DEV1'] = dev1
+     NAMES['DUMMY'] = dummy
++    NAMES['IFB'] = ifb
+ 
+     return res
+ 
+diff --git a/tools/testing/selftests/tc-testing/tdc_config.py b/tools/testing/selftests/tc-testing/tdc_config.py
+index 9488b03cbc2c..cd0bd42f05a5 100644
+--- a/tools/testing/selftests/tc-testing/tdc_config.py
++++ b/tools/testing/selftests/tc-testing/tdc_config.py
+@@ -17,6 +17,7 @@ NAMES = {
+           'DEV1': 'v0p1',
+           'DEV2': '',
+           'DUMMY': 'dummy1',
++          'IFB': 'ifbtdc0',
+           'ETHTOOL': '/usr/sbin/ethtool',
+ 	  'ETH': 'eth0',
+           'BATCH_FILE': './batch.txt',
+-- 
+2.54.0
 
-> diff --git a/net/nfc/nci/rsp.c b/net/nfc/nci/rsp.c
-> index 9eeb862825c5f..36e49fb7d8941 100644
-> --- a/net/nfc/nci/rsp.c
-> +++ b/net/nfc/nci/rsp.c
-> @@ -50,6 +50,9 @@ static u8 nci_core_init_rsp_packet_v1(struct nci_dev *ndev,
->  	const struct nci_core_init_rsp_1 *rsp_1 = (void *)skb->data;
->  	const struct nci_core_init_rsp_2 *rsp_2;
->  
-> +	if (skb->len < sizeof(*rsp_1))
-> +		return NCI_STATUS_SYNTAX_ERROR;
-> +
-
-Does this length check break the handling of valid NCI error responses?
-
-If the device returns an error status, the response payload might only
-contain the 1-byte status field. By requiring the full sizeof(*rsp_1)
-before checking the status, will this return NCI_STATUS_SYNTAX_ERROR
-instead of propagating the actual error code from the device?
-
->  	pr_debug("status 0x%x\n", rsp_1->status);
->  
->  	if (rsp_1->status != NCI_STATUS_OK)
-
-[ ... ]
-
-> @@ -87,15 +94,21 @@ static u8 nci_core_init_rsp_packet_v2(struct nci_dev *ndev,
->  				      const struct sk_buff *skb)
->  {
->  	const struct nci_core_init_rsp_nci_ver2 *rsp = (void *)skb->data;
-> -	const u8 *supported_rf_interface = rsp->supported_rf_interfaces;
-> +	const u8 *supported_rf_interface;
-> +	const u8 *skb_end = skb->data + skb->len;
->  	u8 rf_interface_idx = 0;
->  	u8 rf_extension_cnt = 0;
->  
-> +	if (skb->len < sizeof(*rsp))
-> +		return NCI_STATUS_SYNTAX_ERROR;
-> +
-
-Could the same issue occur here for v2 responses?
-
-If a command fails and the response payload only includes the status
-field, checking for the full sizeof(*rsp) will drop the error response
-and obscure the true failure reason.
-
->  	pr_debug("status %x\n", rsp->status);
->  
->  	if (rsp->status != NCI_STATUS_OK)
->  		return rsp->status;
 
