@@ -1,171 +1,211 @@
-Return-Path: <netdev+bounces-290495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290494-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wLG8CBUdD2rbFwYAu9opvQ
-	(envelope-from <netdev+bounces-290495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:56:21 +0200
+	id mKW1DPgfD2pSGAYAu9opvQ
+	(envelope-from <netdev+bounces-290494-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:08:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD7675A7C10
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:56:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A57F45A7F2D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:08:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6545D331270B
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:37:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 842C832DCD8D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45ACF3E5578;
-	Thu, 21 May 2026 14:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9363DB301;
+	Thu, 21 May 2026 14:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="a0dVKJ+m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xf3Qa7WK"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7423DA5BD;
-	Thu, 21 May 2026 14:33:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DAB3D9DA7
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779374028; cv=none; b=DeIkU3Aiio/I5OB4uLpfwBLARGxdyGXHWshieGDUQ0JcEyGIzOoR3hv5LiCgSWt6hhMUmCMsyiqwdzlv/wA5xK3PmqSdFhkQAQYZvtzZVJstng80dGUT9pgwheEw1n1sDgcnAQhUMCNKb4Ah0zd193mOC9V246YuPqZZAfeNkYk=
+	t=1779374027; cv=none; b=F4hNHyy5DshqMxOMh+qWyIziEDmzZqn/Gz5B2HXhUoXgrKeXAUovkZH0SjY1PQtt1LA++HbX0EgORUEm4dfk1JyJyuoKmoliVsJRcFwCwPjwJuYXIFDk0xSS01QkGd0nlbYAfdZQ2ceitBgHoyNmltxvFlBnN/h0jhUatEemjO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779374028; c=relaxed/simple;
-	bh=vUVzwioy7eyITUTnDSAg54tCJT7WpcF3kD1sfAlb9Xg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sSES84gI3HzIm5L70/WYPp100UuV/gHZ2am2b82VrEviRQ6eqPn5DFgkZ2WJ2osWBV1MvXneNXyIbCAuFsEBL7Z8ddxeUy44C5x++Ly5O9hFQmB/CdYiaFz7GGupLXniI2xqgPbfZJqCvcJXxL95lDA17Jm9bMzU8xOFt/cL2zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=a0dVKJ+m; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=1CytHvX5Z9CQODF2r8Uldp/4soH5aVdVyJhj02K+WN4=; b=a0dVKJ+mpjGCdpOj1QsIJMvtlR
-	xVM9K3vUwb5P3qDxarN0I7G1jum0faoZGGaOY3UiPAxwmYKQY0bh33eot2lKD0GVZQxZU5g9X48B2
-	Z4aqiiLpwUlN8JcZ7w8fwL26VDi8VAyBtxovhpSm6p2JNVAXBW9QPh/gt9oHeIDm9piBuggky7N0R
-	YycSBecv44DYTYFIh/Am1W4xHuMHi5yDKCWNXoIN1AlAXSDJ/khlpIzEKaidFi9hguHZwAb06OFc5
-	oW8fXCVhhLUG7qh7P3JzQk5uu7It/zHLzso2gQwmlWrRvZqr4zt7FfhhdDi/r5eEUxcey21Yu2g/j
-	NEGoNmvw==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wQ4St-003wxJ-0A;
-	Thu, 21 May 2026 14:33:35 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 21 May 2026 07:32:10 -0700
-Subject: [PATCH net v2 2/2] nfc: llcp: read llcp_sock->local under the
- socket lock in getsockopt
+	s=arc-20240116; t=1779374027; c=relaxed/simple;
+	bh=M3ST9lIDCvFMVutkVnk3WNUwJAYEzBIw9shmvATYFzE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YUDsNmA1dmjZDU42WReVkZu5EG488I/ya3t2Z9L13aI0sDKw+pNi6w80/dhJ9JyOPKq/Nsp4lFQM3wY/iXDRhZbgmaJug1xXOAnFdxdQ8FbvdlV0QIV38+PHnphLFbrcQXB8BAi0VKvi+///f4M9E0KjH4GJo0cQbXu54BtFMwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xf3Qa7WK; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-367c26471f5so3925161a91.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 07:33:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779374025; x=1779978825; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/hd2hkytsjU7+i14htqMoAzLGX+mC1QI1rvLUvekrzE=;
+        b=Xf3Qa7WKn9SPJi2A/5uS6fbuCzhqKI/OykMhFelWmq/f5rEPc474izPNKbfvTyXzbe
+         F+EtSTIjQJrF8uj5FgA9l3GZCaQjiyzbnN1qqOrErcr443dQCRbG2hXn1wIh3LeuJIXn
+         8iuUIPecA4w47lBigrhfssR5olufSWwoYsR9vy/Sr5ZLLWhIgYYst6RRkMzXcatiumdd
+         RTJZq89zAKG/Dk0vKhto5hNdscooYnQmM+xUcx1r6jCBzQgQtNJH/ZQJXGkdRx9uDWML
+         Gc6X83Hx82xj2f7i9U6OK6PshUYv3Y4I0xkM9XwyF7iG/8XI22Y/4Ba3HihHcFoSSfd/
+         JUTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779374025; x=1779978825;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/hd2hkytsjU7+i14htqMoAzLGX+mC1QI1rvLUvekrzE=;
+        b=CogmVJ00cmTIOcbvyd5/sg0KBfIVyl8FzFhRDlZ6tVgD3x3pfacRHR6Ogw14Nje5P5
+         GYKlKdqO5cqB1cuPKxAeX1GAy9woi4q98LTzbXmemm/4RXbjv6AcFYxQhbvWuh5UNhiz
+         CoPSzTvvCkjhlCd/FEDEOFZP9JCuFYak6nw315vuNWB0FrK0LU2PSCcpkHYnwUlwQD5e
+         dg5TNK+E+KCuxnZsAMG/erRikJzX6uqVtcwy5llJhu67oaWHuudR2bJfAxbGnlXGrofO
+         EWyry9E5I7abUYp/iMA/fvxctLpuHQrv0pa9jeOJoU3l3CRtIw9AqYcTSMVlwzw7H+6C
+         /1Wg==
+X-Forwarded-Encrypted: i=1; AFNElJ8pt5dPDjd6L036aKXTjA7IlFW/oQ2e8hTDdHllJOUZ5vCqQH0fsWHBSEpnU3r8J17CElsbC4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4qS3qfFv70+kS0Etj2N3nAYasTY2kEViMHKm6mgJ7+lVFx/iz
+	Lo59PIOhPMA962hPF7TTd/mnAWciVzMf56k8eGdtHmivQyOTTEuR33pC
+X-Gm-Gg: Acq92OGNiXzs/OU59LNkHQEARHRh4oL/OcqYUSGFQYekltXKBDVxCcm3ZlXZGexwZqT
+	qMT4kP0VgZy19SjQven1r8J7BVnVmXu6RHAqDDwliZx5y7+YvHCCP7XSxsWXLzAn9NfqKoUU7OV
+	XO7V0nnCIee2O5ouUUX5l4eiUMDgumsHCyuBxDvkjH2YkbVHkoTtJbirpmm/XEnKZOTqVIPxutv
+	NlUGrH/a8DkGUTtCmYtgdu7EGJ8m2H6qgyv+FmI63FPhgOuVI+WjXV4VUZPwDUDb0m66MHYdOVx
+	4i4T3nfeepWJZqRZm/e8AB8WKz+/vc2HahRNI9rAZSXJjHR9Kd8ZHF3mpOxNKu2F/6u7wp+y+h5
+	rp5RpUPBGxPsrRqg80fXvnlGSZ9ErE+/vIeo8GBvI4sbmx3DNXZeSrvX74NpuPFhUDCFtwMjkdY
+	pgwzhMNX/cxNNd3BqDiVuRNSBXnLAtG0uMbi2Pg9p8ItAm05zZcmJJyy9YMKMlL9Q/8xqXy24dQ
+	r59PDsmw7w=
+X-Received: by 2002:a17:90b:48cd:b0:368:147f:bd2b with SMTP id 98e67ed59e1d1-36a456300e9mr3192582a91.23.1779374024990;
+        Thu, 21 May 2026 07:33:44 -0700 (PDT)
+Received: from [192.168.0.4] (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a3c847c9asm3373414a91.0.2026.05.21.07.33.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 May 2026 07:33:44 -0700 (PDT)
+Message-ID: <237d0599-a2ff-4770-940b-fe3840de776c@gmail.com>
+Date: Thu, 21 May 2026 22:33:28 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260521-fix_llc-v2-2-ab44cc09179c@debian.org>
-References: <20260521-fix_llc-v2-0-ab44cc09179c@debian.org>
-In-Reply-To: <20260521-fix_llc-v2-0-ab44cc09179c@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, David Heidelberg <david+nfc@ixit.cz>, 
- Samuel Ortiz <sameo@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, oe-linux-nfc@lists.linux.dev, 
- Breno Leitao <leitao@debian.org>, kernel-team@meta.com
-X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1449; i=leitao@debian.org;
- h=from:subject:message-id; bh=vUVzwioy7eyITUTnDSAg54tCJT7WpcF3kD1sfAlb9Xg=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqDxexoLN0vvPGMg5rRL9uOhEDGMg02w+1OAMR1
- fP9m9G+cn2JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCag8XsQAKCRA1o5Of/Hh3
- bQq9D/99Rok2FqAlu/B4u7G+xFig/lgnWR56U7HkFxyB/MHLiES5loMrtFTAEnMjR4Fj+bp99Kf
- 7DdRLBZGTc+4Ag1d/1dADQxkap0Vi1S/fO2/O7HFCNJp6TS/7BjGZ0LfzAiOYaEiCozseK31SKo
- weejKQabDWL9LNKVxlE6ADyFPeN3aV19Rb8kRqOcDFcspjTRq/hqgWB9JEhav7q12fjyQ4kRdF5
- wrPUtycEyPpgodrPHvLpPRNwYuemo+IUfiEqXxHpcl/g2V+NkHCVlKCHQiXPq3AJCXi1dnKYLrl
- +ZYxvscmKoxzvOLmntpdleQCPmGdfhcRdgu0uIBfxMtQ5g+CeKpa7HKu5UcmytqwfUqTBFj8m5C
- rIFY4x7kvt5s2Hdt7Jciw/kFDUqTF3GYAnoasuSyG3fK4IYBxn+lc1Yqe7lbfptnPMHjKhohubq
- XCM8jmX5Bb3tAPbeOxOOTtrnHiawEBY4emqiteF7qEWrUT6+lacR5P13wZtHy3ZSPk5EDmEqEvA
- vQuFM0CS8vmDDZo2UlehJg5kAEOoicsSVeR1DeB4H1wbvZ7vhOtzMlD/HnorYGC03Uc3UQOFnb+
- 0cV9UrbR11QbjafVVMEJf7JxzeGf11pkw2gTpv5itKL/yyulcPsY4AVV4LrJqAZ0Czhp+CO4F29
- H5y9RgDpcRQ/V2A==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] net: phy: air_en8811h: add AN8811HB MCU
+ assert/deassert support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@mork.no,
+ ericwouds@gmail.com, frank-w@public-files.de, daniel@makrotopia.org,
+ lucien.jheng@airoha.com, albert-al.lee@airoha.com
+References: <20260517065041.50155-1-lucienzx159@gmail.com>
+ <20260520165424.5e61d5d9@kernel.org>
+Content-Language: en-US
+From: "Lucien.Jheng" <lucienzx159@gmail.com>
+In-Reply-To: <20260520165424.5e61d5d9@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290495-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,redhat.com,vger.kernel.org,mork.no,public-files.de,makrotopia.org,airoha.com];
+	TAGGED_FROM(0.00)[bounces-290494-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	FROM_NEQ_ENVFROM(0.00)[lucienzx159@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,nfc];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: BD7675A7C10
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A57F45A7F2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-nfc_llcp_getsockopt() read llcp_sock->local before lock_sock(sk) and
-then dereferenced the cached pointer inside the locked region.
-llcp_sock_bind() assigns and clears llcp_sock->local under the same
-socket lock, dropping the last reference on its error path. A
-getsockopt() racing an in-flight bind() can observe the pointer, block
-on lock_sock(), and then dereference a freed nfc_llcp_local once bind()
-has unwound.
+Hi Jakub
 
-Move the llcp_sock->local read and the NULL check inside the
-lock_sock(sk) region so bind() cannot mutate or free the pointer between
-the load and the use.
+Jakub Kicinski 於 2026/5/21 上午 07:54 寫道:
+> On Sun, 17 May 2026 14:50:41 +0800 Lucien.Jheng wrote:
+>> +static int __air_pbus_reg_write(struct mdio_device *mdiodev,
+>> +				u32 pbus_reg, u32 pbus_data)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_EXT_PAGE_ACCESS,
+>> +			      upper_16_bits(pbus_reg));
+>> +	if (ret < 0)
+>> +		return ret;
+>> +
+>> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_ADDR_HIGH,
+>> +			      (pbus_reg & GENMASK(15, 6)) >> 6);
+>> +	if (ret < 0)
+>> +		return ret;
+>> +
+>> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr,
+>> +			      (pbus_reg & GENMASK(5, 2)) >> 2,
+>> +			      lower_16_bits(pbus_data));
+> Please add proper defines for these GENMASK'ed fields and use
+> FIELD_GET() to access the fields?
+I will update it in the next patch.
+>
+>> +	if (ret < 0)
+>> +		return ret;
+>> +
+>> +	return __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_DATA_HIGH,
+>> +			       upper_16_bits(pbus_data));
+>> +}
+>> @@ -1175,10 +1281,21 @@ static int an8811hb_probe(struct phy_device *phydev)
+>>   		return -ENOMEM;
+>>   	phydev->priv = priv;
+>>
+>> +	mdiodev = mdio_device_create(phydev->mdio.bus,
+>> +				     phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS);
+> AI says:
+>
+> What happens when phydev->mdio.addr is in the range 24..31?
+> MDIO addresses 0..31 are all valid 5-bit hardware addresses, so a
+> strap-selected AN8811HB at address >= 24 makes
+> phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS land in 32..39. struct
+> mii_bus has mdio_map[PHY_MAX_ADDR] with PHY_MAX_ADDR == 32, and
+> mdiobus_register_device() does:
+> 	if (mdiodev->bus->mdio_map[mdiodev->addr])
+> 		return -EBUSY;
+> 	...
+> 	mdiodev->bus->mdio_map[mdiodev->addr] = mdiodev;
+> with no bounds check on mdiodev->addr. The OOB read from
+> mdio_map[32..39] may return garbage that happens to be non-NULL
+> (probe fails with -EBUSY) or NULL (the OOB store overwrites adjacent
+> fields of struct mii_bus such as phy_mask, phy_ignore_ta_mask, or
+> the irq[] array).
+> Even without corruption, every later __air_pbus_reg_write() goes
+> through __mdiobus_write(), which has:
+> 	if (addr >= PHY_MAX_ADDR)
+> 		return -ENXIO;
+> so each MCU assert/deassert silently fails with -ENXIO, which seems
+> to contradict the commit message:
+>      so every firmware load or MCU restart on AN8811HB correctly
+>      sequences the reset control registers.
+> Should an8811hb_probe() reject configurations where
+> phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS >= PHY_MAX_ADDR, or
+> otherwise enforce the assumed strap-pin constraint?
 
-Fixes: 26fd76cab2e6 ("NFC: llcp: Implement socket options")
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/nfc/llcp_sock.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+As previously discussed, the fact that the AN8811HB PHY address is 
+restricted to 8–15 (decimal)—meaning the PBUS address will only be 
+within the range of 16–21 (decimal)—will be documented in the comments 
+of the upcoming version.
 
-diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-index aa9a78a671521..266590d402664 100644
---- a/net/nfc/llcp_sock.c
-+++ b/net/nfc/llcp_sock.c
-@@ -325,14 +325,16 @@ static int nfc_llcp_getsockopt(struct socket *sock, int level, int optname,
- 	if (len < sizeof(u32))
- 		return -EINVAL;
- 
--	local = llcp_sock->local;
--	if (!local)
--		return -ENODEV;
--
- 	len = min_t(u32, len, sizeof(u32));
- 
- 	lock_sock(sk);
- 
-+	local = llcp_sock->local;
-+	if (!local) {
-+		release_sock(sk);
-+		return -ENODEV;
-+	}
-+
- 	switch (optname) {
- 	case NFC_LLCP_RW:
- 		rw = llcp_sock->rw > LLCP_MAX_RW ? local->rw : llcp_sock->rw;
-
--- 
-2.53.0-Meta
+Thanks
 
 
