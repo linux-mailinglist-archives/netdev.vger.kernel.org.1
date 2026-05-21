@@ -1,190 +1,222 @@
-Return-Path: <netdev+bounces-290315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WAqODwrWDmr2CQYAu9opvQ
-	(envelope-from <netdev+bounces-290315-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:53:14 +0200
+	id 2IPbBHHTDmr2CQYAu9opvQ
+	(envelope-from <netdev+bounces-290317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:42:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FE8D5A2B68
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:53:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2DDE5A2840
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4200D300B9CA
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:36:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 102AA303E21B
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580CC37702E;
-	Thu, 21 May 2026 09:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BBB379EC6;
+	Thu, 21 May 2026 09:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvJEN88+"
+	dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="0I4tMOaq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADC03750D5
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC35376A10;
+	Thu, 21 May 2026 09:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779356186; cv=none; b=OZ1KEkZZexpJnzg88rxmYz8iShELebA5Oo3YpMfBIaJSVSzlulZtBuSzpL0FQk6hUk5stFwylxAqn5X40Ze/aKMh/woEqLC3no56vegEerghJB+z+1i9mVQR8PQB1g3VIVfDZkughyuDOlpQWC+kg/geD0P5hu1Mfaz1RBWkjDY=
+	t=1779356329; cv=none; b=MfZj7393sxePZLF46o74pxuI+etB9G+ZLIlImEnprP51KLfYraJPD6WO5Oo1b7sC7FhHoZUqPfx/gJY/kHJm1J4Epe8ci6dkmtr9Q/tDB7Dr2QBmVJc0fmzLfPJcyAvO+8oADzKJQ3VSkVsEhBxj6PEvgljPH2dmUWCX5kGTlaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779356186; c=relaxed/simple;
-	bh=n1Ym8sC2tYw3JwVQIr8QOYkS8HeICb8ExlRhTy/6eOY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mkFQ9OYHsyR5zQvy4WX5Zg1dV7dtGxTSd4ii+RQ1k8hrYZ/yrIyGwm8XV7GLuWI3rM+jvtrxJnjKeVKw2bR5paLCTUqhdNyj5Lx6YFvJsyiPtfPeOmi9/nC4hIyszFsXsiVhvo5vBlr+2xy6fs+gnP6rEMC1Jb4lZ00IfXlfnLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GvJEN88+; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82f9fdfc965so2677581b3a.1
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 02:36:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779356184; x=1779960984; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/4CELazT4J7bYabOPvJV6gl1L91iH5vUTjK50awgg4=;
-        b=GvJEN88+9TzWf6xmEK3r7A2P3yB32DIMyFYHlyUOkwzDVeF4WXsVodMrELXe4CzbWT
-         rjmGX3wH4XP016TSrK4mB/3pm57wiHjUk+jVJYkDeN4DRnBh5N9g/OQ85AAW4LaCJPHm
-         tUNV37QxWodw44vyJqJLxtN6BGhNx1gE0aLuAr4hrnb1dAzVX+k9U6Sa2ARGKHsN9dZK
-         er6jk9npkJz1vep/0HdlyoVFHuJcHYLkQz4AvY4n+xbaOaNg2BVRaV7lqEZlGKori6+b
-         Bl/4ngO+3CSfqFdot096C/RbSGh8Kl+07KJ0edN4ab5k2KstVKBm8AXwAcVf7FzMsQn+
-         6qSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779356184; x=1779960984;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7/4CELazT4J7bYabOPvJV6gl1L91iH5vUTjK50awgg4=;
-        b=pn9JupXMiwuxuPKe110OaqtXAF34NuQFcw6DbTge/gO0O2vXgq6Y7AjWKWSQVaHqdW
-         mElcxCtAH8ui0rV7AKhrjePEVopC33UJhp6U5sMwgPPbGvRyP9tQmWPPwyl4rECaf+mB
-         rb+d7GerpTvRo8zFP/4gbTSRg547q+LD4wTXQh1eaa8hfhCbs92fNaFNjxcjZs1gxZI5
-         jEFlsTzSULKCYwWJjXoNv+GAXhwag2QBnrUb5g80pG4xkCWNkR4ucXC6sFEQcGssIYaD
-         dVS78xjls8Q89Bqhlhdy1tfq1R5K0NC5Tjgaf6ASFfjUMwvF0g3A7RikbSfwxiKu+UT+
-         wCvQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8rGkce6AtDS4b9N0Se+Ut1oO8DVJUwb/655jkvsVjaVTZCP06JnG+MKWShHeQhvqYjN6xO0as=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKOdQacVfotA8/1KPh4Rc04TiMPgk0ptVS9bCJSAqVa+rT+jFu
-	QZnMeiRoKsJL4OLoavkSR+X+MjHC37L4ff6SwtodFhsLasYtXIcuQBaL
-X-Gm-Gg: Acq92OGv8qL0DlnE30LyreMnE61c1ADW2ssLLhmquDdO8RwZlAwkYERIqQizWIJveIJ
-	6iQVRqrsigKn3kv9N3DLoz9KDINvkO3dwrVriVMq4RI//IR4xFKpwsSv7s9MNEFh6a96W+ErxF4
-	mmkbnczOOKsV+urddNncfcf+rIjWNZiGw5byzKtsSy91jM5GODSz0Sx2otCTB1jIh3lMjtpI/W+
-	47M42MjZk755+TPWzgOWNCdeX/qeIO05yL0Pz2/LOabZYR1xEtMSAWDP62/UKQsd98WmmH4sl33
-	6UCDy+reIWotK7QlmbTRg0sshjsrPs0rcIzu/xs6vCLBgv2/hEgcYLUyy1HliKDtWKLYnuKKaPd
-	WTWh3/fbIRhF7OXB2ASh8YszjGZPBPkZeGBAREtwLEQkZaFShMug+FtOt30JisHGA+9rDW34lnt
-	R07b4tz/2jhZ+r2zQ367gZHVb18ww+8y9g3xKw26Y7psgwJDWIwwVJFIt/KSqaHzN8Lzne/FR3A
-	hw=
-X-Received: by 2002:a05:6a00:1306:b0:835:cc47:6ff8 with SMTP id d2e1a72fcca58-8414ae56cf7mr2470482b3a.45.1779356184338;
-        Thu, 21 May 2026 02:36:24 -0700 (PDT)
-Received: from m-upc-A520M-HDV.flets-east.jp ([2400:2410:3f60:500:5c80:bb9e:85d5:f1b9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84154b1acf2sm912053b3a.22.2026.05.21.02.36.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 02:36:23 -0700 (PDT)
-From: Yuyang Huang <sigefriedhyy@gmail.com>
-To: Yuyang Huang <sigefriedhyy@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
+	s=arc-20240116; t=1779356329; c=relaxed/simple;
+	bh=KfGfTyFVL31vdUdOn+76p0c9asI51Kz6rpZ61Tm62g8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cEw3imQRhQn+KYwmqNMyGexNEwoS8UClVayeQ8FU6aYTc7vLw9cT0dHrvKadL0dWY25OaH6PiqmNjUujhbbyKHKqXHs1P/3GlDl/SRcOlfRY07DLXei3h5gEVSetrHh29J6PMt5hF86TC/vlW30M+D2Y0rnR84Z8UH+hZf9cdL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=0I4tMOaq; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Reply-To;
+	bh=82qSLImWzSWwJwDL4P56RDhSxB/3/+bLg3x1B6/8Vyo=; b=0I4tMOaqwxFvPcLAyXC1tGPrfE
+	HXHaVV7+wYwVP4UGjSNoFDd1VfRVRwKpSUpdi+/cM0lBIFBOtW57RPkKHZJ6gSZa57lZaOJNQszdB
+	j5MhP9nNF2ZBC5XTLEZLefqvWnNibulepEtkV4okP/kU2AAENM/x1cT5yntunk8HjnN93yJVk0KhD
+	4BGKyKzwZYIhS+icC3RQoCP/xlaXk2zQuPvKHmUwXbld7xPg620UPcbli2n9Nu98+Jo3ggiseSwXX
+	f5u71NtNcCGIkISy1Bu3AzX1ANpj9jp2f9+W1J8qexkOfVBSIDSPhC21GfXXPezuckw1Oq9h13vk1
+	Ke/2S4sA==;
+From: Heiko Stuebner <heiko@sntech.de>
+To: linux-phy@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Heiko Stuebner <heiko@sntech.de>,
+	Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-ide@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next] ipv4: igmp: annotate data-races around im->users
-Date: Thu, 21 May 2026 18:36:12 +0900
-Message-ID: <20260521093612.207475-1-sigefriedhyy@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	linux-media@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	spacemit@lists.linux.dev,
+	UNGLinuxDriver@microchip.com,
+	Abhinav Kumar <abhinav.kumar@linux.dev>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	=?UTF-8?q?Andr=C3=A9=20Draszik?= <andre.draszik@linaro.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Andy Yan <andy.yan@rock-chips.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Can Guo <quic_cang@quicinc.com>,
+	Chanho Park <chanho61.park@samsung.com>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	David Airlie <airlied@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Frank Li <Frank.Li@nxp.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Inki Dae <inki.dae@samsung.com>,
+	Jagan Teki <jagan@amarulasolutions.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	JC Kuo <jckuo@nvidia.com>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Jessica Zhang <jesszhan0024@gmail.com>,
+	Joe Perches <joe@perches.com>,
+	Johan Hovold <johan+linaro@kernel.org>,
+	Jonas Karlman <jonas@kwiboo.se>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Kevin Xie <kevin.xie@starfivetech.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+	=?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+	Linus Walleij <linusw@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Marijn Suijten <marijn.suijten@somainline.org>,
+	Markus Schneider-Pargmann <msp@baylibre.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Mathias Nyman <mathias.nyman@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	Michael Dege <michael.dege@renesas.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Niklas Cassel <cassel@kernel.org>,
+	Nitin Rawat <quic_nitirawa@quicinc.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Peter Chen <peter.chen@kernel.org>,
+	Peter Griffin <peter.griffin@linaro.org>,
+	Rob Clark <robin.clark@oss.qualcomm.com>,
+	Robert Foss <rfoss@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Samuel Holland <samuel@sholland.org>,
+	Sandy Huang <hjc@rock-chips.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Sean Paul <sean@poorly.run>,
+	Sebastian Reichel <sre@kernel.org>,
+	Shawn Guo <shawn.guo@linaro.org>,
+	Shawn Lin <shawn.lin@rock-chips.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Thinh Nguyen <Thinh.Nguyen@synopsys.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Tudor Ambarus <tudor.ambarus@linaro.org>,
+	Vincent Mailhol <mailhol@kernel.org>,
+	Xu Yang <xu.yang_2@nxp.com>,
+	Yixun Lan <dlan@kernel.org>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: Re: (subset) [PATCH v8 phy-next 00/31] Split Generic PHY consumer and provider API
+Date: Thu, 21 May 2026 11:38:18 +0200
+Message-ID: <177935628872.1653123.15514691751947313571.b4-ty@sntech.de>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260505100523.1922388-1-vladimir.oltean@nxp.com>
+References: <20260505100523.1922388-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[sntech.de,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[sntech.de:s=gloria202408];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_FROM(0.00)[bounces-290315-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-290317-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[sntech.de,kernel.org,linaro.org,lists.freedesktop.org,lists.infradead.org,vger.kernel.org,lists.linux.dev,microchip.com,linux.dev,bootlin.com,samsung.com,lunn.ch,intel.com,rock-chips.com,acm.org,google.com,quicinc.com,tuxon.dev,gmail.com,davemloft.net,nxp.com,glider.be,linuxfoundation.org,amarulasolutions.com,HansenPartnership.com,nvidia.com,perches.com,kwiboo.se,starfivetech.com,oss.qualcomm.com,ideasonboard.com,linux.intel.com,pengutronix.de,somainline.org,baylibre.com,oracle.com,renesas.com,redhat.com,armlinux.org.uk,sholland.org,poorly.run,ffwll.ch,synopsys.com,suse.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sigefriedhyy@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[106];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[heiko@sntech.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[sntech.de:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3FE8D5A2B68
+	TAGGED_RCPT(0.00)[netdev,renesas,linaro,kernel];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sntech.de:email,sntech.de:mid,sntech.de:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: C2DDE5A2840
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-/proc/net/igmp walks IPv4 multicast memberships under RCU and
-prints im->users without holding RTNL, while multicast join and leave
-paths update the field while holding RTNL. Annotate this intentional
-lockless snapshot with READ_ONCE() and the matching writers with
-WRITE_ONCE().
 
-Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
----
- net/ipv4/igmp.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+On Tue, 05 May 2026 13:04:52 +0300, Vladimir Oltean wrote:
+> The biggest problem requiring this split is the fact that consumer
+> drivers poke around in struct phy, accessing fields which shouldn't be
+> visible to them. Follow the example of mux, gpio, iio, spi offload,
+> pwrsec, pinctrl and regulator, which each expose separate headers for
+> consumers and providers.
+> 
+> Some off-list discussions were had with Vinod Koul regarding the 3 PHY
+> providers outside the drivers/phy/ subsystem. It was agreed that it is
+> desirable to relocate them to drivers/phy/, rather than to publish
+> phy-provider.h to include/linux/phy/ for liberal use. Only phy.h and
+> (new) phy-props.h - consumer-facing headers - stay there.
+> 
+> [...]
 
-diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-index 27d120183779..f2aca659b29c 100644
---- a/net/ipv4/igmp.c
-+++ b/net/ipv4/igmp.c
-@@ -1541,7 +1541,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
- 	}
- 
- 	if  (im) {
--		im->users++;
-+		WRITE_ONCE(im->users, im->users + 1);
- 		ip_mc_add_src(in_dev, &addr, mode, 0, NULL, 0);
- 		goto out;
- 	}
-@@ -1550,7 +1550,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
- 	if (!im)
- 		goto out;
- 
--	im->users = 1;
-+	WRITE_ONCE(im->users, 1);
- 	im->interface = in_dev;
- 	in_dev_hold(in_dev);
- 	im->multiaddr = addr;
-@@ -1784,7 +1784,10 @@ void __ip_mc_dec_group(struct in_device *in_dev, __be32 addr, gfp_t gfp)
- 	     (i = rtnl_dereference(*ip)) != NULL;
- 	     ip = &i->next_rcu) {
- 		if (i->multiaddr == addr) {
--			if (--i->users == 0) {
-+			int new_users = i->users - 1;
-+
-+			WRITE_ONCE(i->users, new_users);
-+			if (new_users == 0) {
- 				ip_mc_hash_remove(in_dev, i);
- 				*ip = i->next_rcu;
- 				in_dev->mc_count--;
-@@ -2977,7 +2980,7 @@ static int igmp_mc_seq_show(struct seq_file *seq, void *v)
- 		delta = im->timer.expires - jiffies;
- 		seq_printf(seq,
- 			   "\t\t\t\t%08X %5d %d:%08lX\t\t%d\n",
--			   im->multiaddr, im->users,
-+			   im->multiaddr, READ_ONCE(im->users),
- 			   im->tm_running,
- 			   im->tm_running ? jiffies_delta_to_clock_t(delta) : 0,
- 			   im->reporter);
+Applied, thanks!
+
+[15/31] drm/rockchip: dw_hdmi: avoid direct dereference of phy->dev.of_node
+        commit: 9392e7340bffb406a705de755adfb44eab547d40
+
+Best regards,
 -- 
-2.43.0
-
+Heiko Stuebner <heiko@sntech.de>
 
