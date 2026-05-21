@@ -1,94 +1,98 @@
-Return-Path: <netdev+bounces-290163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOUVE05PDmrL9gUAu9opvQ
-	(envelope-from <netdev+bounces-290163-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:18:22 +0200
+	id SGxzKKRPDmrL9gUAu9opvQ
+	(envelope-from <netdev+bounces-290164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:19:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E9FD59D3D4
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:18:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FDF959D402
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:19:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B2F98301258A
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:17:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 354673105AF1
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B861E5B88;
-	Thu, 21 May 2026 00:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206521FC7C5;
+	Thu, 21 May 2026 00:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6o1FT1w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PsukS55l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f67.google.com (mail-dl1-f67.google.com [74.125.82.67])
+Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE9D1FC7C5
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 00:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F077F215F42
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 00:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779322668; cv=none; b=uUIVLnhZLixO3yh1Oe/lYSx4TRWeZYBE0P2riVS8fz3JBfFTHdlDn9b8OpG9xAAPHbz/KCshwfexZn1rRvNlTWz1dNRw0ZKIQ6H7Yi2rKGbeHs6Aju52iYL02DW3CuBdyslSSR7zV6x3NcccXVzIYRjM40OzWtJgztiCHkbIL9E=
+	t=1779322673; cv=none; b=Wg4skjbNqSwxt/8VpuRe8SFGfCp2mB3iJdSkm7Sib2PR8p4pS54Vi6+JAQK9CCuJVIVPel2L3KuQMFoaliKqVqzf91UCF5GRnU3SxwReVVTgzgM6UnNyqbmBSg03f6K8Fqzp7jiJK+z5Drg9b1WBerkXe1zqYl4XwnevklCfxwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779322668; c=relaxed/simple;
-	bh=cZmxq7//joj0ix/hQ43wtkPBXlYFpmo/1mfSHjQMgcw=;
+	s=arc-20240116; t=1779322673; c=relaxed/simple;
+	bh=HRtHHOEjvmTW762UEXwLH23ZntlzxDErqOorLAVh0UU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ChAgnXYd+0clZKs6S1LWtFmigTGJ38U/hWbVPGrNrfw2QbcVzAxpmBpa5vCcPa6vSXtUOhYIFnNRg+/Jg0IQy7IPkP1UK/5JF16qjyj962hTyxflKlI8GBV497hF4tt4x4sWevp2972jkP2UKa1AWpGi1v+uVgx0IZtusyPg0Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6o1FT1w; arc=none smtp.client-ip=74.125.82.67
+	 MIME-Version; b=KiZQL1h9U5Xpo4RE3gUnCCxIA+VhrNFpgYl5mZuIiAsy01rbe3wlAnx3+7tUojSTMFca2PnlDkuu39OeXwRRHE0yATYyM+fvcspczdqGYpcdAn9SDgXskiY/kFc/+meStVQ4yO3Otv2ocTU/Tf5/NDWhqD0kvPhmZgrVCnE9dts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PsukS55l; arc=none smtp.client-ip=74.125.82.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f67.google.com with SMTP id a92af1059eb24-132830d8281so3959190c88.1
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 17:17:46 -0700 (PDT)
+Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-1334825de43so5160917c88.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 17:17:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779322665; x=1779927465; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779322670; x=1779927470; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e9c9xYjPrbAf6EEhEjSEzY/kkB9SIEDEDdWbIXAtZ84=;
-        b=J6o1FT1wNe9tfjs5TalpEtjyet+pVOEZGaDlU/+gFnGABqetyiDz3zWxJLoTD1NtUT
-         bDIR0Qj518iXAdcA+jvmVmLB76RCpwzUnm244ur1cKcvvK5hpLBD2APJdSvgTRSuGNS9
-         tPM30QrYv3BMA+D3iwBan75DVBGDavd6FU4zFEZ0PLnIbksrK/Uo+8Av5aKoo3q7XxHG
-         qmHjrgfhXhd+/gn1B+dist4TwCC6UAw3ojMqAlCVF/PLinbz0g7XNgh+E3xD8kmxnFYr
-         i3upZ81seP21eeo6q40LQCYhUZTYE+8Isz5sJ1XzG//3FZawkq1fGE4as3PyxniTXlOi
-         VuyQ==
+        bh=zHfRiZ9eAyYIM2WmjAuL1bwyh+6hR9i7GK44MUCPHv4=;
+        b=PsukS55lba4ADY8xOzDjmDFB85Xef4ndT2HqG+e1wICU23LDEeBRrKSbsAcPsIbbd6
+         xRStG21YjHbeG//Np6dLefnO7nyQuSRjsMhJP1XAgEugylcXHKQrYGi+DGGoYnTLtWrM
+         BdaREuhzcoFjM65u7x8NNJqPs9NlwZYVlLvQL2jS5irvtTQjW5IryualrQZu7iK6emqT
+         SgBnmGY7TZjdNT/vVESSI2bSIowWGOmAirolIXYzh+neX7vXGPB7GipPUWKUxl1tcPLE
+         fjBiKmP9e8IHUTjUR9fkykQ0V1ifhEUd3aqDkJBTq+YQLTrAabZxJwBnN4q9bPoQwwox
+         awOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779322665; x=1779927465;
+        d=1e100.net; s=20251104; t=1779322670; x=1779927470;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=e9c9xYjPrbAf6EEhEjSEzY/kkB9SIEDEDdWbIXAtZ84=;
-        b=AVCqZ3apZsoecEAbYRNBrAQgPBt24q8CyLcbp4VSLRNjOYPLRzSJgpPe4h4H4KM7mN
-         heTeNg1gwymGmCcxYUTHkIWINH2AhezzDv1Do4sRyBNBB07Vk8M9LBqD7h4OeH6kPyxy
-         MSUSG1oHmSw9OFhicMwedU8XAAg8/6O3UnJqvF1nmy+XdKP/kY0XEupnINRT48HoTi3J
-         65Au0VH465uEE3pLJU6yh2jC3VWUqHGD6ySM7auSJGgj2YeOM7awydGvQyPIm79ohohZ
-         ui8BZcaXEkK01RAB0BOkk3tuqoV4oujkSyoOhgcJhcRh6qs56FYy+ZS+wGiAm1v0WAjY
-         gsZg==
-X-Gm-Message-State: AOJu0YyhIoVJyo9DmhjLym5P9XRe0+RnmSXIPEwdg+9xsLn8l1Nc1R7h
-	aX7QuPEdlaiH0I4IFjIJrxg1EfzOOgFZ/ERYzvJ9EsNDSIxGEVDV0+lbht6rcXlZuWA=
-X-Gm-Gg: Acq92OF0dXxHag4F/X+PZ4GNEbqHuIr9VrJBAmvhr7qiXAxoY3zTE37mos9h60rc7G3
-	Vhm4O8b14cwHZiM9xbtesyZYYro8YuC5MRf+Z1eW5gaxQgT8EisErGZyQxk0ZoULPmCzc06FaWp
-	Iu5U4rT1HWrInRDd+A5cshTC8yiMVkM3gtRsKNoHbzHUexLG7x5pcZ9qniBswpcHDN39DgJnLAW
-	Wp/ds5w1PzoLaXKmV9Oev+6ywMK//ws+wLaEOYazygXUbcy5+MG8T8k5FgoxtATfhoazIQTVu2V
-	OunGl5pR9ezQCeR2aFTZ6h0DxioASmaiLwomnMOJx3iLbSUDNMeMSJGqm0UDzgPFSgZd+cixwwY
-	45f9XOfPXxrhRatB1Dm3w6viOZSY66+iQhisfwKaPSxHGGv55mdO4HOyYERlYBgMX7SUWO9MDRs
-	PNOxKp/mSYYNaVCVjPihQKVPBgG5nyz7E3f/zQtNNDzpzJC8hcwIb05UeacOreUpvTboB6Wphja
-	5Eyeb+Eq4VJVVn+PTD2i22foxD+XLEH6+zg5m/4y+6H1It+Qvot9b02Vb0HWPONWsbLrJs2xd0H
-	pipcCdXI2if27oP6Zg==
-X-Received: by 2002:a05:7022:6629:b0:135:6914:87e1 with SMTP id a92af1059eb24-13632a02c3fmr487381c88.6.1779322665379;
-        Wed, 20 May 2026 17:17:45 -0700 (PDT)
+        bh=zHfRiZ9eAyYIM2WmjAuL1bwyh+6hR9i7GK44MUCPHv4=;
+        b=HSUpKGbcu1cmvNEuQkztpWGaPG4ias9vgusCLBgfpryHfzxOQCNBaCuIRO25C3MqSx
+         /i9z2DNhzDG2Q1vka8JdlsQBmvQGI62ZAIKrlU2/uSClFoIt4PJ+kuaWKwhF0UMFHnvn
+         roa/8PS1EZk39gQDEqVLlXRK1eB6n5gBfgWWVbHjBtZfQVK2X/vtK4k3lWLkMlXHapkn
+         FOEuVOeopXU5uDTSrwujSj78OOwOXmTLgIvaGLTc8FI0JKMIadGVMexf4zDRby/0CDOn
+         gzi5GrXynKKbxOKut2bEc+9JuXJlZHlV66WBzJ6k0tpXMjFqKcwTDoXaWy9w+roQ+FEJ
+         sumA==
+X-Gm-Message-State: AOJu0Yyxd8hWh+TByNnvG2O9rq/BWUthQO1Rw73sV7SMbiPG9c0243WH
+	QmX3JavQPwzZ6NE61P4OTd5dBsJSjrsv8e+R80VijW789tdkJFBMdD2clEs4HGMZqRE=
+X-Gm-Gg: Acq92OEs4hZHywzuBp1KumMWmGLmgAZgA9V9iSq10m5Q46lKsSlsTd75ItNqDk/ndvo
+	oD0vJxIofOE7CpYVmlYh9WDs77QkHI7aDK7DadOYEE5e3but0xeG4vf2lPZANapYqEOOPYj4OC4
+	r9DEhqS9Amnn5jOv50gMs9fMbWgUp8qKBxn3AezN+UyYHdRbSjriIfKIv8yXUwTMs0SdNV1VaAH
+	TguC/0Qpyw8ufJ+3k1pRQ+GcivM2TNclVEsXRUaA0qNkfl9n6U4VUb7VB5KO06Eksrl8x3hoVRb
+	nPcDJ0kdbl9jfkAGZIWdv1nbA9Iehk26N5TWqeyT4VPROTShRMYnGIcyUNZuDsgcwl9/U3Bytn1
+	Aik8S1sqEfScXW5X7fR/AjidjcyyWGvp3qbTh5X4RDeOO/uJRvQqzvrdAl4EFf9IRFpKDuZgYGx
+	QU6xRJQ2l886/+yde5/AwdoMCMVhrnPuHUaFl1WeT4fXptBCw54GIaBJbpB1gcWLTl0NaAp2/fi
+	5jAQKS9ZNDZx14Hy2E/3kaW0Ctm/r2A8zN8oqPCGePdDyvxoicpyTx8UX8gU/QbS8zS86VY+sTu
+	x1zW0g4PWTpLQa84LGARaM8w2fcc
+X-Received: by 2002:a05:7022:3843:b0:128:d375:f1d4 with SMTP id a92af1059eb24-13632d36482mr368860c88.28.1779322669804;
+        Wed, 20 May 2026 17:17:49 -0700 (PDT)
 Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cbcb9ed3sm28444410c88.1.2026.05.20.17.17.44
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cbcb9ed3sm28444410c88.1.2026.05.20.17.17.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 17:17:45 -0700 (PDT)
+        Wed, 20 May 2026 17:17:49 -0700 (PDT)
 From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
+To: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org
 Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Subject: [PATCH v2 5/7] net: arcnet: expand unnecessary I/O abstraction macros
-Date: Wed, 20 May 2026 17:16:17 -0700
-Message-ID: <20260521001631.45434-6-enelsonmoore@gmail.com>
+	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>
+Subject: [PATCH v2 6/7] docs: net: arcnet: remove outdated/irrelevant information; improve style
+Date: Wed, 20 May 2026 17:16:18 -0700
+Message-ID: <20260521001631.45434-7-enelsonmoore@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260521001631.45434-1-enelsonmoore@gmail.com>
 References: <20260521001631.45434-1-enelsonmoore@gmail.com>
@@ -101,378 +105,265 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_CC(0.00)[pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	FREEMAIL_CC(0.00)[pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lwn.net,linuxfoundation.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-290164-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-290163-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 4E9FD59D3D4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[smc.com:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,qis.net:url,perftech.com:url,novell.com:url]
+X-Rspamd-Queue-Id: 0FDF959D402
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Now that the BUS_ALIGN variable has been removed, the
-arcnet_in/out/read/write* macros behave identically to the functions
-they wrap. Expand them and remove their definitions to make the code
-easier to maintain.
+The ARCnet documentation contains a lot of outdated and irrelevant
+information (such as changes in decades-old driver versions and
+messages from a former maintainer) and has some writing style issues.
+Remove this unnecessary information and improve the writing style. Also
+remove links to pages that no longer exist.
 
 Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
- drivers/net/arcnet/arcdevice.h    | 18 -------
- drivers/net/arcnet/com20020-pci.c |  6 +--
- drivers/net/arcnet/com20020.c     | 89 +++++++++++++++----------------
- drivers/net/arcnet/com20020.h     |  4 +-
- 4 files changed, 49 insertions(+), 68 deletions(-)
+ Documentation/networking/arcnet-hardware.rst | 36 +++++-----
+ Documentation/networking/arcnet.rst          | 69 +++-----------------
+ 2 files changed, 26 insertions(+), 79 deletions(-)
 
-diff --git a/drivers/net/arcnet/arcdevice.h b/drivers/net/arcnet/arcdevice.h
-index c870b8e21d44..a7c217359679 100644
---- a/drivers/net/arcnet/arcdevice.h
-+++ b/drivers/net/arcnet/arcdevice.h
-@@ -372,23 +372,5 @@ static inline void arcnet_set_addr(struct net_device *dev, u8 addr)
- 	dev_addr_set(dev, &addr);
- }
+diff --git a/Documentation/networking/arcnet-hardware.rst b/Documentation/networking/arcnet-hardware.rst
+index 17450e8e6ca7..37c016cee353 100644
+--- a/Documentation/networking/arcnet-hardware.rst
++++ b/Documentation/networking/arcnet-hardware.rst
+@@ -8,10 +8,8 @@ ARCnet Hardware
  
--/* I/O equivalents */
+ .. note::
+ 
+-   1) This file is a supplement to arcnet.rst.  Please read that for general
+-      driver configuration help.
+-   2) This file is no longer Linux-specific.  It should probably be moved out
+-      of the kernel sources.  Ideas?
++   This file is a supplement to arcnet.rst.  Please read that for general
++   driver configuration help.
+ 
+ Because so many people (myself included) seem to have obtained ARCnet cards
+ without manuals, this file contains a quick introduction to ARCnet hardware
+@@ -134,13 +132,11 @@ And now to the cabling.  What you can connect together:
+    network.
+ 
+ 2. A card to a passive hub.  Remember that all unused connectors on the hub
+-   must be properly terminated with 93 Ohm (or something else if you don't
+-   have the right ones) terminators.
++   must be properly terminated with 93 Ohm terminators (or something else if you
++   don't have the right ones), although the network may work without
++   terminators.
+ 
+-	(Avery's note: oops, I didn't know that.  Mine (TV cable) works
+-	anyway, though.)
 -
--/* addr and offset allow register like names to define the actual IO address */
--#define arcnet_inb(addr, offset)					\
--	inb((addr) + (offset))
--#define arcnet_outb(value, addr, offset)				\
--	outb(value, (addr) + (offset))
+-3. A card to an active hub.  Here is no need to terminate the unused
++3. A card to an active hub.  Here there is no need to terminate the unused
+    connectors except some kind of aesthetic feeling.  But, there may not be
+    more than eleven active hubs between any two computers.  That of course
+    doesn't limit the number of active hubs on the network.
+@@ -150,7 +146,7 @@ And now to the cabling.  What you can connect together:
+ 5. An active hub to passive hub.
+ 
+ Remember that you cannot connect two passive hubs together.  The power loss
+-implied by such a connection is too high for the net to operate reliably.
++implied by such a connection is too high for the network to operate reliably.
+ 
+ An example of a typical ARCnet network::
+ 
+@@ -163,8 +159,8 @@ An example of a typical ARCnet network::
+ 		    |
+ 		    S
+ 
+-The BUS topology is very similar to the one used by Ethernet.  The only
+-difference is in cable and terminators: they should be 93 Ohm.  Ethernet
++The BUS topology is very similar to the one used by 10BASE2 Ethernet.  The only
++difference is in cable and terminators: they should be 93 Ohm. 10BASE2 Ethernet
+ uses 50 Ohm impedance. You use T connectors to put the computers on a single
+ line of cable, the bus. You have to put terminators at both ends of the
+ cable. A typical BUS ARCnet network looks like::
+@@ -177,7 +173,7 @@ cable. A typical BUS ARCnet network looks like::
+   T - T connector
+ 
+ But that is not all! The two types can be connected together.  According to
+-the official documentation the only way of connecting them is using an active
++the official documentation, the only way of connecting them is using an active
+ hub::
+ 
+ 	 A------T------T------TR
+@@ -186,7 +182,7 @@ hub::
+ 	 |
+ 	 S
+ 
+-The official docs also state that you can use STAR cards at the ends of
++The official docs also state that you can use STAR cards at the ends of a
+ BUS network in place of a BUS card and a terminator::
+ 
+      S------T------T------S
+@@ -211,7 +207,7 @@ example::
+ 	   |   |      S------T----H---S   |
+ 	   S   S             B    R       S
+ 
+-A basically different cabling scheme is used with Twisted Pair cabling. Each
++A completely different cabling scheme is used with Twisted Pair cabling. Each
+ of the TP cards has two RJ (phone-cord style) connectors.  The cards are
+ then daisy-chained together using a cable connecting every two neighboring
+ cards.  The ends are terminated with RJ 93 Ohm terminators which plug into
+@@ -292,11 +288,13 @@ Setting the Jumpers
+     Make sure you set ETS1 and ETS2 to the SAME VALUE for all cards on your
+     network.
+ 
+-Also, on many cards (not mine, though) there are red and green LED's.
+-Vojtech Pavlik <vojtech@suse.cz> tells me this is what they mean:
++LED Indicators
++==============
++
++Many cards have red and green LEDs, which have the following meanings:
+ 
+ 	=============== =============== =====================================
+-	GREEN           RED             Status
++	Green           Red             Status
+ 	=============== =============== =====================================
+ 	OFF             OFF             Power off
+ 	OFF             Short flashes   Cabling problems (broken cable or not
+diff --git a/Documentation/networking/arcnet.rst b/Documentation/networking/arcnet.rst
+index ce1b009bef96..4e541aa44aec 100644
+--- a/Documentation/networking/arcnet.rst
++++ b/Documentation/networking/arcnet.rst
+@@ -12,26 +12,6 @@ ARCnet
+    and cabling information if you're like many of us and didn't happen to get a
+    manual with your ARCnet card.
+ 
+-Since no one seems to listen to me otherwise, perhaps a poem will get your
+-attention::
 -
--#define arcnet_insb(addr, offset, buffer, count)			\
--	insb((addr) + (offset), buffer, count)
--#define arcnet_outsb(addr, offset, buffer, count)			\
--	outsb((addr) + (offset), buffer, count)
+-		This driver's getting fat and beefy,
+-		But my cat is still named Fifi.
 -
--#define arcnet_readb(addr, offset)					\
--	readb((addr) + (offset))
--#define arcnet_writeb(value, addr, offset)				\
--	writeb(value, (addr) + (offset))
+-Hmm, I think I'm allowed to call that a poem, even though it's only two
+-lines.  Hey, I'm in Computer Science, not English.  Give me a break.
 -
- #endif				/* __KERNEL__ */
- #endif				/* _LINUX_ARCDEVICE_H */
-diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
-index dbadda08dce2..98f68cb13a52 100644
---- a/drivers/net/arcnet/com20020-pci.c
-+++ b/drivers/net/arcnet/com20020-pci.c
-@@ -195,8 +195,8 @@ static int com20020pci_probe(struct pci_dev *pdev,
- 		 * ARCNET controller needs
- 		 * this access to detect bustype
- 		 */
--		arcnet_outb(0x00, ioaddr, COM20020_REG_W_COMMAND);
--		arcnet_inb(ioaddr, COM20020_REG_R_DIAGSTAT);
-+		outb(0x00, ioaddr + COM20020_REG_W_COMMAND);
-+		inb(ioaddr + COM20020_REG_R_DIAGSTAT);
+-The point is:  I REALLY REALLY REALLY REALLY REALLY want to hear from you if
+-you test this and get it working.  Or if you don't.  Or anything.
+-
+-ARCnet 0.32 ALPHA first made it into the Linux kernel 1.1.80 - this was
+-nice, but after that even FEWER people started writing to me because they
+-didn't even have to install the patch.  <sigh>
+-
+-Come on, be a sport!  Send me a success report!
+-
+-(hey, that was even better than my original poem... this is getting bad!)
+-
+ ----
  
- 		SET_NETDEV_DEV(dev, &pdev->dev);
- 		dev->base_addr = ioaddr;
-@@ -224,7 +224,7 @@ static int com20020pci_probe(struct pci_dev *pdev,
- 			snprintf(dev->name, sizeof(dev->name), "arc%d-%d", dev->dev_id, i);
- 		}
+ These are the ARCnet drivers for Linux.
+@@ -62,31 +42,9 @@ netdev@vger.kernel.org and make sure to Cc: maintainer listed in
+ Other Drivers and Info
+ ----------------------
  
--		if (arcnet_inb(ioaddr, COM20020_REG_R_STATUS) == 0xFF) {
-+		if (inb(ioaddr + COM20020_REG_R_STATUS) == 0xFF) {
- 			pr_err("IO address %Xh is empty!\n", ioaddr);
- 			ret = -EIO;
- 			goto err_free_arcdev;
-diff --git a/drivers/net/arcnet/com20020.c b/drivers/net/arcnet/com20020.c
-index adcf69cb9d50..21f962357b0b 100644
---- a/drivers/net/arcnet/com20020.c
-+++ b/drivers/net/arcnet/com20020.c
-@@ -65,13 +65,13 @@ static void com20020_copy_from_card(struct net_device *dev, int bufnum,
- 	int ioaddr = dev->base_addr, ofs = 512 * bufnum + offset;
+-You can try my ARCNET page on the World Wide Web at:
+-
+-	http://www.qis.net/~jschmitz/arcnet/
+-
+-Also, SMC (one of the companies that makes ARCnet cards) has a WWW site you
+-might be interested in, which includes several drivers for various cards
+-including ARCnet.  Try:
+-
+-	http://www.smc.com/
+-
+-Performance Technologies makes various network software that supports
+-ARCnet:
+-
+-	http://www.perftech.com/ or ftp to ftp.perftech.com.
+-
+-Novell makes a networking stack for DOS which includes ARCnet drivers.  Try
+-FTPing to ftp.novell.com.
+-
+-You can get the Crynwr packet driver collection (including arcether.com, the
+-one you'll want to use with ARCnet cards) from
+-oak.oakland.edu:/simtel/msdos/pktdrvr. It won't work perfectly on a 386+
+-without patches, though, and also doesn't like several cards.  Fixed
+-versions are available on my WWW page, or via e-mail if you don't have WWW
+-access.
++You can try JoAnne Schmitz's ARCNET page on the World Wide Web at:
  
- 	/* set up the address register */
--	arcnet_outb((ofs >> 8) | RDDATAflag | AUTOINCflag,
--		    ioaddr, COM20020_REG_W_ADDR_HI);
--	arcnet_outb(ofs & 0xff, ioaddr, COM20020_REG_W_ADDR_LO);
-+	outb((ofs >> 8) | RDDATAflag | AUTOINCflag,
-+	     ioaddr + COM20020_REG_W_ADDR_HI);
-+	outb(ofs & 0xff, ioaddr + COM20020_REG_W_ADDR_LO);
++	https://www.qis.net/~jschmitz/arcnet/
  
- 	/* copy the data */
- 	TIME(dev, "insb", count,
--	     arcnet_insb(ioaddr, COM20020_REG_RW_MEMDATA, buf, count));
-+	     insb(ioaddr + COM20020_REG_RW_MEMDATA, buf, count));
- }
  
- static void com20020_copy_to_card(struct net_device *dev, int bufnum,
-@@ -80,12 +80,12 @@ static void com20020_copy_to_card(struct net_device *dev, int bufnum,
- 	int ioaddr = dev->base_addr, ofs = 512 * bufnum + offset;
+ Supported Hardware
+@@ -162,9 +120,8 @@ LAN Manager and Windows for Workgroups:
+ 	are incompatible with the Internet standard.  They try to pretend
+ 	the cards are Ethernet, and confuse everyone else on the network.
  
- 	/* set up the address register */
--	arcnet_outb((ofs >> 8) | AUTOINCflag, ioaddr, COM20020_REG_W_ADDR_HI);
--	arcnet_outb(ofs & 0xff, ioaddr, COM20020_REG_W_ADDR_LO);
-+	outb((ofs >> 8) | AUTOINCflag, ioaddr + COM20020_REG_W_ADDR_HI);
-+	outb(ofs & 0xff, ioaddr + COM20020_REG_W_ADDR_LO);
+-	However, v2.00 and higher of the Linux ARCnet driver supports this
+-	protocol via the 'arc0e' device.  See the section on "Multiprotocol
+-	Support" for more information.
++	The Linux ARCnet driver supports this protocol via the 'arc0e' device.
++	See the section on "Multiprotocol Support" for more information.
  
- 	/* copy the data */
- 	TIME(dev, "outsb", count,
--	     arcnet_outsb(ioaddr, COM20020_REG_RW_MEMDATA, buf, count));
-+	     outsb(ioaddr + COM20020_REG_RW_MEMDATA, buf, count));
- }
+ 	Using the freeware Samba server and clients for Linux, you can now
+ 	interface quite nicely with TCP/IP-based WfWg or Lan Manager
+@@ -199,7 +156,7 @@ NetBSD/AmiTCP:
+ Using Multiprotocol ARCnet
+ --------------------------
  
- /* Reset the card and check some basic stuff during the detection stage. */
-@@ -94,9 +94,9 @@ int com20020_check(struct net_device *dev)
- 	int ioaddr = dev->base_addr, status;
- 	struct arcnet_local *lp = netdev_priv(dev);
+-The ARCnet driver v2.10 ALPHA supports three protocols, each on its own
++The ARCnet driver supports three protocols, each on its own
+ "virtual network device":
  
--	arcnet_outb(XTOcfg(3) | RESETcfg, ioaddr, COM20020_REG_W_CONFIG);
-+	outb(XTOcfg(3) | RESETcfg, ioaddr + COM20020_REG_W_CONFIG);
- 	udelay(5);
--	arcnet_outb(XTOcfg(3), ioaddr, COM20020_REG_W_CONFIG);
-+	outb(XTOcfg(3), ioaddr + COM20020_REG_W_CONFIG);
- 	mdelay(RESETtime);
+ 	======  ===============================================================
+@@ -391,7 +348,7 @@ can set up your network then:
+ It works: what now?
+ -------------------
  
- 	lp->setup = lp->clockm ? 0 : (lp->clockp << 1);
-@@ -107,23 +107,23 @@ int com20020_check(struct net_device *dev)
- 	lp->setup = lp->setup | P1MODE;
+-Send mail following :ref:`arcnet-netdev`. Describe your setup, preferably
++:ref:`Send an email to netdev <arcnet-netdev>`. Describe your setup, preferably
+ including driver version, kernel version, ARCnet card model, CPU type, number
+ of systems on your network, and list of software in use.
  
- 	com20020_set_subaddress(lp, ioaddr, SUB_SETUP1);
--	arcnet_outb(lp->setup, ioaddr, COM20020_REG_W_XREG);
-+	outb(lp->setup, ioaddr + COM20020_REG_W_XREG);
+@@ -435,16 +392,8 @@ You can change the debug level without recompiling the kernel by typing::
+ where "xxx" is the debug level you want.  For example, "metric 1015" would put
+ you at debug level 15.  Debug level 7 is currently the default.
  
- 	if (lp->clockm != 0) {
- 		com20020_set_subaddress(lp, ioaddr, SUB_SETUP2);
--		arcnet_outb(lp->setup2, ioaddr, COM20020_REG_W_XREG);
-+		outb(lp->setup2, ioaddr + COM20020_REG_W_XREG);
+-Note that the debug level is (starting with v1.90 ALPHA) a binary
+-combination of different debug flags; so debug level 7 is really 1+2+4 or
+-D_NORMAL+D_EXTRA+D_INIT.  To include D_DURING, you would add 16 to this,
+-resulting in debug level 23.
++Note that the debug level is a binary combination of different debug flags;
++debug level 7 is really 1+2+4 or D_NORMAL+D_EXTRA+D_INIT.  To include D_DURING,
++you would add 16 to this, resulting in debug level 23.
  
- 		/* must now write the magic "restart operation" command */
- 		mdelay(1);
--		arcnet_outb(STARTIOcmd, ioaddr, COM20020_REG_W_COMMAND);
-+		outb(STARTIOcmd, ioaddr + COM20020_REG_W_COMMAND);
- 	}
- 
- 	lp->config = (lp->timeout << 3) | (lp->backplane << 2) | SUB_NODE;
- 	/* set node ID to 0x42 (but transmitter is disabled, so it's okay) */
--	arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
--	arcnet_outb(0x42, ioaddr, COM20020_REG_W_XREG);
-+	outb(lp->config, ioaddr + COM20020_REG_W_CONFIG);
-+	outb(0x42, ioaddr + COM20020_REG_W_XREG);
- 
--	status = arcnet_inb(ioaddr, COM20020_REG_R_STATUS);
-+	status = inb(ioaddr + COM20020_REG_R_STATUS);
- 
- 	if ((status & 0x99) != (NORXflag | TXFREEflag | RESETflag)) {
- 		arc_printk(D_NORMAL, dev, "status invalid (%Xh).\n", status);
-@@ -131,18 +131,17 @@ int com20020_check(struct net_device *dev)
- 	}
- 	arc_printk(D_INIT_REASONS, dev, "status after reset: %X\n", status);
- 
--	arcnet_outb(CFLAGScmd | RESETclear | CONFIGclear,
--		    ioaddr, COM20020_REG_W_COMMAND);
--	status = arcnet_inb(ioaddr, COM20020_REG_R_STATUS);
-+	outb(CFLAGScmd | RESETclear | CONFIGclear,
-+	     ioaddr + COM20020_REG_W_COMMAND);
-+	status = inb(ioaddr + COM20020_REG_R_STATUS);
- 	arc_printk(D_INIT_REASONS, dev, "status after reset acknowledged: %X\n",
- 		   status);
- 
- 	/* Read first location of memory */
--	arcnet_outb(0 | RDDATAflag | AUTOINCflag,
--		    ioaddr, COM20020_REG_W_ADDR_HI);
--	arcnet_outb(0, ioaddr, COM20020_REG_W_ADDR_LO);
-+	outb(0 | RDDATAflag | AUTOINCflag, ioaddr + COM20020_REG_W_ADDR_HI);
-+	outb(0, ioaddr + COM20020_REG_W_ADDR_LO);
- 
--	status = arcnet_inb(ioaddr, COM20020_REG_RW_MEMDATA);
-+	status = inb(ioaddr + COM20020_REG_RW_MEMDATA);
- 	if (status != TESTvalue) {
- 		arc_printk(D_NORMAL, dev, "Signature byte not found (%02Xh != D1h).\n",
- 			   status);
-@@ -159,7 +158,7 @@ static int com20020_set_hwaddr(struct net_device *dev, void *addr)
- 
- 	dev_addr_set(dev, hwaddr->sa_data);
- 	com20020_set_subaddress(lp, ioaddr, SUB_NODE);
--	arcnet_outb(dev->dev_addr[0], ioaddr, COM20020_REG_W_XREG);
-+	outb(dev->dev_addr[0], ioaddr + COM20020_REG_W_XREG);
- 
- 	return 0;
- }
-@@ -170,7 +169,7 @@ static int com20020_netdev_open(struct net_device *dev)
- 	struct arcnet_local *lp = netdev_priv(dev);
- 
- 	lp->config |= TXENcfg;
--	arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
-+	outb(lp->config, ioaddr + COM20020_REG_W_CONFIG);
- 
- 	return arcnet_open(dev);
- }
-@@ -184,7 +183,7 @@ static int com20020_netdev_close(struct net_device *dev)
- 
- 	/* disable transmitter */
- 	lp->config &= ~TXENcfg;
--	arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
-+	outb(lp->config, ioaddr + COM20020_REG_W_CONFIG);
- 	return 0;
- }
- 
-@@ -220,24 +219,24 @@ int com20020_found(struct net_device *dev, int shared)
- 
- 	/* FIXME: do this some other way! */
- 	if (!dev->dev_addr[0])
--		arcnet_set_addr(dev, arcnet_inb(ioaddr, 8));
-+		arcnet_set_addr(dev, inb(ioaddr + 8));
- 
- 	com20020_set_subaddress(lp, ioaddr, SUB_SETUP1);
--	arcnet_outb(lp->setup, ioaddr, COM20020_REG_W_XREG);
-+	outb(lp->setup, ioaddr + COM20020_REG_W_XREG);
- 
- 	if (lp->card_flags & ARC_CAN_10MBIT) {
- 		com20020_set_subaddress(lp, ioaddr, SUB_SETUP2);
--		arcnet_outb(lp->setup2, ioaddr, COM20020_REG_W_XREG);
-+		outb(lp->setup2, ioaddr + COM20020_REG_W_XREG);
- 
- 		/* must now write the magic "restart operation" command */
- 		mdelay(1);
--		arcnet_outb(STARTIOcmd, ioaddr, COM20020_REG_W_COMMAND);
-+		outb(STARTIOcmd, ioaddr + COM20020_REG_W_COMMAND);
- 	}
- 
- 	lp->config = (lp->timeout << 3) | (lp->backplane << 2) | SUB_NODE;
- 	/* Default 0x38 + register: Node ID */
--	arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
--	arcnet_outb(dev->dev_addr[0], ioaddr, COM20020_REG_W_XREG);
-+	outb(lp->config, ioaddr + COM20020_REG_W_CONFIG);
-+	outb(dev->dev_addr[0], ioaddr + COM20020_REG_W_XREG);
- 
- 	/* reserve the irq */
- 	if (request_irq(dev->irq, arcnet_interrupt, shared,
-@@ -288,26 +287,26 @@ static int com20020_reset(struct net_device *dev, int really_reset)
- 	arc_printk(D_DEBUG, dev, "%s: %d: %s: dev: %p, lp: %p, dev->name: %s\n",
- 		   __FILE__, __LINE__, __func__, dev, lp, dev->name);
- 	arc_printk(D_INIT, dev, "Resetting %s (status=%02Xh)\n",
--		   dev->name, arcnet_inb(ioaddr, COM20020_REG_R_STATUS));
-+		   dev->name, inb(ioaddr + COM20020_REG_R_STATUS));
- 
- 	arc_printk(D_DEBUG, dev, "%s: %d: %s\n", __FILE__, __LINE__, __func__);
- 	lp->config |= (lp->timeout << 3) | (lp->backplane << 2);
- 	/* power-up defaults */
--	arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
-+	outb(lp->config, ioaddr + COM20020_REG_W_CONFIG);
- 	arc_printk(D_DEBUG, dev, "%s: %d: %s\n", __FILE__, __LINE__, __func__);
- 
- 	if (really_reset) {
- 		/* reset the card */
--		arcnet_outb(lp->config | RESETcfg, ioaddr, COM20020_REG_W_CONFIG);
-+		outb(lp->config | RESETcfg, ioaddr + COM20020_REG_W_CONFIG);
- 		udelay(5);
--		arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
-+		outb(lp->config, ioaddr + COM20020_REG_W_CONFIG);
- 		mdelay(RESETtime * 2);
- 				/* COM20020 seems to be slower sometimes */
- 	}
- 	/* clear flags & end reset */
- 	arc_printk(D_DEBUG, dev, "%s: %d: %s\n", __FILE__, __LINE__, __func__);
--	arcnet_outb(CFLAGScmd | RESETclear | CONFIGclear,
--		    ioaddr, COM20020_REG_W_COMMAND);
-+	outb(CFLAGScmd | RESETclear | CONFIGclear,
-+	     ioaddr + COM20020_REG_W_COMMAND);
- 
- 	/* verify that the ARCnet signature byte is present */
- 	arc_printk(D_DEBUG, dev, "%s: %d: %s\n", __FILE__, __LINE__, __func__);
-@@ -321,7 +320,7 @@ static int com20020_reset(struct net_device *dev, int really_reset)
- 		return 1;
- 	}
- 	/* enable extended (512-byte) packets */
--	arcnet_outb(CONFIGcmd | EXTconf, ioaddr, COM20020_REG_W_COMMAND);
-+	outb(CONFIGcmd | EXTconf, ioaddr + COM20020_REG_W_COMMAND);
- 
- 	arc_printk(D_DEBUG, dev, "%s: %d: %s\n", __FILE__, __LINE__, __func__);
- 
-@@ -334,22 +333,22 @@ static void com20020_setmask(struct net_device *dev, int mask)
- 	u_int ioaddr = dev->base_addr;
- 
- 	arc_printk(D_DURING, dev, "Setting mask to %x at %x\n", mask, ioaddr);
--	arcnet_outb(mask, ioaddr, COM20020_REG_W_INTMASK);
-+	outb(mask, ioaddr + COM20020_REG_W_INTMASK);
- }
- 
- static void com20020_command(struct net_device *dev, int cmd)
- {
- 	u_int ioaddr = dev->base_addr;
- 
--	arcnet_outb(cmd, ioaddr, COM20020_REG_W_COMMAND);
-+	outb(cmd, ioaddr + COM20020_REG_W_COMMAND);
- }
- 
- static int com20020_status(struct net_device *dev)
- {
- 	u_int ioaddr = dev->base_addr;
- 
--	return arcnet_inb(ioaddr, COM20020_REG_R_STATUS) +
--		(arcnet_inb(ioaddr, COM20020_REG_R_DIAGSTAT) << 8);
-+	return inb(ioaddr + COM20020_REG_R_STATUS) +
-+		(inb(ioaddr + COM20020_REG_R_DIAGSTAT) << 8);
- }
- 
- static void com20020_close(struct net_device *dev)
-@@ -359,7 +358,7 @@ static void com20020_close(struct net_device *dev)
- 
- 	/* disable transmitter */
- 	lp->config &= ~TXENcfg;
--	arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
-+	outb(lp->config, ioaddr + COM20020_REG_W_CONFIG);
- }
- 
- /* ARCnet does not support multicast, only unicast and broadcast */
-@@ -374,14 +373,14 @@ static void com20020_set_rx_mode(struct net_device *dev)
- 			arc_printk(D_NORMAL, dev, "Setting promiscuous flag...\n");
- 		com20020_set_subaddress(lp, ioaddr, SUB_SETUP1);
- 		lp->setup |= PROMISCset;
--		arcnet_outb(lp->setup, ioaddr, COM20020_REG_W_XREG);
-+		outb(lp->setup, ioaddr + COM20020_REG_W_XREG);
- 	} else {
- 		/* Disable promiscuous mode, use normal mode */
- 		if ((lp->setup & PROMISCset))
- 			arc_printk(D_NORMAL, dev, "Resetting promiscuous flag...\n");
- 		com20020_set_subaddress(lp, ioaddr, SUB_SETUP1);
- 		lp->setup &= ~PROMISCset;
--		arcnet_outb(lp->setup, ioaddr, COM20020_REG_W_XREG);
-+		outb(lp->setup, ioaddr + COM20020_REG_W_XREG);
- 	}
- }
- 
-diff --git a/drivers/net/arcnet/com20020.h b/drivers/net/arcnet/com20020.h
-index 0bcc5d0a6903..e7aac0e81a13 100644
---- a/drivers/net/arcnet/com20020.h
-+++ b/drivers/net/arcnet/com20020.h
-@@ -123,9 +123,9 @@ static inline void com20020_set_subaddress(struct arcnet_local *lp,
- {
- 	if (val < 4) {
- 		lp->config = (lp->config & ~0x03) | val;
--		arcnet_outb(lp->config, ioaddr, COM20020_REG_W_CONFIG);
-+		outb(lp->config, ioaddr + COM20020_REG_W_CONFIG);
- 	} else {
--		arcnet_outb(val, ioaddr, COM20020_REG_W_SUBADR);
-+		outb(val, ioaddr + COM20020_REG_W_SUBADR);
- 	}
- }
- 
+ If you don't understand that, you probably don't want to know anyway.
+-E-mail me about your problem.
+-
+-
+-I want to send money: what now?
+--------------------------------
+-
+-Go take a nap or something.  You'll feel better in the morning.
 -- 
 2.43.0
 
