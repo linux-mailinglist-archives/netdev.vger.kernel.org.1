@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-290246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oGmnNYqjDmpxAwYAu9opvQ
-	(envelope-from <netdev+bounces-290246-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:17:46 +0200
+	id oKLvHXSjDmpxAwYAu9opvQ
+	(envelope-from <netdev+bounces-290245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:17:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 375C359F5B5
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:17:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24FCA59F5AC
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:17:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F128830D432A
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2697F30CF541
 	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 06:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE514393DE9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04201392C46;
 	Thu, 21 May 2026 06:13:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="U9o+ZvT0"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zx9PTO0c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A42392C5F
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C8A370AC3
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779343981; cv=none; b=GWodz6P6+cKAJPpunWFqGte74kK51aLtBVbstX7brh4g+49vYCYHebpp0WX5YeF0L21HLaloMOMfm7yyPKbaVaOnrbqwCRiIL0jBc51AQjUbHd0hixdLGv0gie3RDwBYygdwjgsNgMxXyV7kgwN8GGdTlzGLWs/8Pp37dmKdlYs=
+	t=1779343980; cv=none; b=EwCNzrIJSpauuQp+yjDD2O16choZbods9TUcovSQG0Qf2hiTA1KZdzDq6+rr+CKBTA0MpmOAVC9C8uLF2P39abLjbxiA65v2MG25KuI0hBXKsSb1XM+4yIDNrI8ws0EuA8sOvNZb4m8QJR5qhontccoeF/2YFRclmwhVNu9ySmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779343981; c=relaxed/simple;
-	bh=jrCjh6Gf7mvqfUCo/Z+WojGkoMK+qVYNKi2MK19UZDw=;
+	s=arc-20240116; t=1779343980; c=relaxed/simple;
+	bh=ld91UU0L0HSmWPpiKNfsfm48VRA3O2pevF+WesUfJ6g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=e1qgizXncw2TxZS1bImNOIBLOpKmhOH203IrEp8nmL3XOgs9zqiqoK1t4v1+mDQ+GEUQLltTz07rw36NnNtnZ5OFAvtgzhAPOGdIBjd614PvGfIOOBZPX4ynh2UybQbUlPCt0iFAYk9vCetC9/EpYK3bUK946sSSJidip1G2PBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=U9o+ZvT0; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=iITi7SNJZxea14ru/9VqmhAtPrDmwxQIylR1V7TIBuwucC8B1hMWeksy9Cv3NzlkE52C0ng3S5OplNnoWBs+YoyuibJr8LyJhs3Ebit48YqhjQkx4lV0QD2MT70XXHjU+dqdRYUELVN7jEzHZX4s9dD+ioBKm9uh23b7N1sDy5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zx9PTO0c; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 933A54E42D17;
-	Thu, 21 May 2026 06:12:55 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id B5FE1C2C64D;
+	Thu, 21 May 2026 06:13:51 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6767D60718;
-	Thu, 21 May 2026 06:12:55 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9DD57107EA6B7;
-	Thu, 21 May 2026 08:12:51 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B8E4660718;
+	Thu, 21 May 2026 06:12:57 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2C965107EA6BB;
+	Thu, 21 May 2026 08:12:54 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779343973; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1779343976; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=AqtCy147yU/f+Lx+VwPk3eev5t8Y0ZJDO+q3HAMz+74=;
-	b=U9o+ZvT0YszLH84e5C+wWY1yo02d5kSWKPg4rwlpoPzX/W6I83Am2THvUlKcsy6z10SnhA
-	vL/N02oD7A6N8fEoNL/KenDEiG0mXYc7myIvMV6QRBGghR0Yn6ahMOiF00XoXSDMX/XYGs
-	sh/GLVN2lAJ6NMUMIF/YN8AtIbOAVNVCPQt1XfGwoJxcarViSJOrhV8QK0UOvqLlSAlaFH
-	W42zsK7n0oeeywFwu+goqk5YFCSNB1Bbvk2KH3wm4a92/0MdI/SU0WTVP/WDCsZGu1Li0v
-	0i/ZdHosWsWbKxsgsBFs1g9LRtWkqKVaP/dE9JVX2T/BaNjy+iSFuawa0AKipQ==
+	bh=sId2BZ8mqqG0hBMYDKCUp5BU4QJP1FhJ+kadyR6vd+w=;
+	b=Zx9PTO0cE5/VKgqGIqj1Age5Eq+nsYgtxucuS4yE9ki4FYTNNosrvNpkn58L9zuQloaRUZ
+	cjY/4ir99MZzynD3JH/eUKwm5nerWXdM7psirfnCQbmTAz2YoI/M9GhpMIjbc2CRnzfhCq
+	3MEm++gn/u/eDWfH5EeNirEZwmgN2nM147D8nlWOKPNrxVy477pzYi0DAQG25/IEtp4CmT
+	EoCYq+VSNWq00+vVvzFvXUIkg7wqJErsvOwLzD/9uMZCR3RcQQDkPcW0Hf9yIZMkgfKvw1
+	irHu+ccqTEHUsjSWJO2FO+q04oUqipn17fA0attoGvLA4EPVWceu6LqZ/0L7XQ==
 From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Date: Thu, 21 May 2026 08:12:39 +0200
-Subject: [PATCH net-next v3 4/8] net: dsa: microchip: bypass
- dev_ops->setup() and teardown() for ksz8
+Date: Thu, 21 May 2026 08:12:40 +0200
+Subject: [PATCH net-next v3 5/8] net: dsa: microchip: remove
+ dev_ops->setup() and teardown()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260521-clean-ksz-2nd-series-v3-4-75c38971c19a@bootlin.com>
+Message-Id: <20260521-clean-ksz-2nd-series-v3-5-75c38971c19a@bootlin.com>
 References: <20260521-clean-ksz-2nd-series-v3-0-75c38971c19a@bootlin.com>
 In-Reply-To: <20260521-clean-ksz-2nd-series-v3-0-75c38971c19a@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -84,12 +84,12 @@ X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290246-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290245-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
@@ -98,7 +98,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -109,250 +109,210 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nxp.com:email]
-X-Rspamd-Queue-Id: 375C359F5B5
+X-Rspamd-Queue-Id: 24FCA59F5AC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-The KSZ switch families are sufficiently different that a common
-ds->ops->setup() - ksz_setup() with micro-managed dev_ops->reset(),
-dev_ops->pcs_create(), dev_ops->config_cpu_port(),
-dev_ops->enable_stp_addr(), dev_ops->setup() seems to be too convoluted.
+All switch families have been converted to have their own
+ds->ops->setup() methods and to call the common ksz_teardown().
 
-I am proposing to make each KSZ switch family part ways for
-dsa_switch_ops :: setup() and teardown(), to allow them greater
-flexibility. This here is the implementation for ksz8, which is
-nothing other than a copy of ksz_setup() with the dev_ops function
-pointers replaced with direct function calls.
+Remove the no longer used ksz_setup() function and the associated
+ksz_dev_ops callbacks.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
- drivers/net/dsa/microchip/ksz8.c | 139 +++++++++++++++++++++++++++++++++------
- 1 file changed, 119 insertions(+), 20 deletions(-)
+ drivers/net/dsa/microchip/ksz_common.c | 133 ---------------------------------
+ drivers/net/dsa/microchip/ksz_common.h |   8 --
+ 2 files changed, 141 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index ccbc3480717f..acc898c68f98 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -1935,9 +1935,52 @@ static int ksz8_enable_stp_addr(struct ksz_device *dev)
- static int ksz8_setup(struct dsa_switch *ds)
- {
- 	struct ksz_device *dev = ds->priv;
--	const u16 *regs = dev->info->regs;
--	int i, ret = 0;
-+	u16 storm_mask, storm_rate;
-+	struct dsa_port *dp;
-+	struct ksz_port *p;
-+	const u16 *regs;
-+	int i, ret;
-+
-+	regs = dev->info->regs;
-+
-+	dev->vlan_cache = devm_kcalloc(dev->dev, sizeof(struct vlan_table),
-+				       dev->info->num_vlans, GFP_KERNEL);
-+	if (!dev->vlan_cache)
-+		return -ENOMEM;
-+
-+	ret = ksz8_reset_switch(dev);
-+	if (ret) {
-+		dev_err(ds->dev, "failed to reset switch\n");
-+		return ret;
-+	}
-+
-+	ret = ksz_parse_drive_strength(dev);
-+	if (ret)
-+		return ret;
-+
-+	/* set broadcast storm protection 10% rate */
-+	storm_mask = BROADCAST_STORM_RATE;
-+	storm_rate = (BROADCAST_STORM_VALUE * BROADCAST_STORM_PROT_RATE) / 100;
-+	if (ksz_is_ksz8463(dev)) {
-+		storm_mask = swab16(storm_mask);
-+		storm_rate = swab16(storm_rate);
-+	}
-+	regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
-+			   storm_mask, storm_rate);
-+
-+	ksz8_config_cpu_port(ds);
-+
-+	ksz8_enable_stp_addr(dev);
-+
-+	ds->num_tx_queues = dev->info->num_tx_queues;
-+
-+	regmap_update_bits(ksz_regmap_8(dev), regs[S_MULTICAST_CTRL],
-+			   MULTICAST_STORM_DISABLE, MULTICAST_STORM_DISABLE);
-+
-+	ksz_init_mib_timer(dev);
- 
-+	ds->configure_vlan_while_not_filtering = false;
-+	ds->dscp_prio_mapping_is_global = true;
- 	ds->mtu_enforcement_ingress = true;
- 
- 	/* We rely on software untagging on the CPU port, so that we
-@@ -1987,12 +2030,80 @@ static int ksz8_setup(struct dsa_switch *ds)
- 		ret = ksz8_pme_write8(dev, regs[REG_SW_PME_CTRL], 0);
- 		if (!ret)
- 			ret = ksz_rmw8(dev, REG_INT_ENABLE, INT_PME, 0);
-+		if (ret)
-+			return ret;
- 	}
- 
--	if (!ret)
--		return ksz8_handle_global_errata(ds);
--	else
-+	ret = ksz8_handle_global_errata(ds);
-+	if (ret)
- 		return ret;
-+
-+	/* Start with learning disabled on standalone user ports, and enabled
-+	 * on the CPU port. In lack of other finer mechanisms, learning on the
-+	 * CPU port will avoid flooding bridge local addresses on the network
-+	 * in some cases.
-+	 */
-+	p = &dev->ports[dev->cpu_port];
-+	p->learning = true;
-+
-+	if (dev->irq > 0) {
-+		ret = ksz_girq_setup(dev);
-+		if (ret)
-+			return ret;
-+
-+		dsa_switch_for_each_user_port(dp, dev->ds) {
-+			ret = ksz_pirq_setup(dev, dp->index);
-+			if (ret)
-+				goto port_release;
-+
-+			if (dev->info->ptp_capable) {
-+				ret = ksz_ptp_irq_setup(ds, dp->index);
-+				if (ret)
-+					goto pirq_release;
-+			}
-+		}
-+	}
-+
-+	if (dev->info->ptp_capable) {
-+		ret = ksz_ptp_clock_register(ds);
-+		if (ret) {
-+			dev_err(dev->dev, "Failed to register PTP clock: %d\n",
-+				ret);
-+			goto port_release;
-+		}
-+	}
-+
-+	ret = ksz_mdio_register(dev);
-+	if (ret < 0) {
-+		dev_err(dev->dev, "failed to register the mdio");
-+		goto out_ptp_clock_unregister;
-+	}
-+
-+	ret = ksz_dcb_init(dev);
-+	if (ret)
-+		goto out_ptp_clock_unregister;
-+
-+	/* start switch */
-+	regmap_update_bits(ksz_regmap_8(dev), regs[S_START_CTRL],
-+			   SW_START, SW_START);
-+
-+	return 0;
-+
-+out_ptp_clock_unregister:
-+	if (dev->info->ptp_capable)
-+		ksz_ptp_clock_unregister(ds);
-+port_release:
-+	if (dev->irq > 0) {
-+		dsa_switch_for_each_user_port_continue_reverse(dp, dev->ds) {
-+			if (dev->info->ptp_capable)
-+				ksz_ptp_irq_free(ds, dp->index);
-+pirq_release:
-+			ksz_irq_free(&dev->ports[dp->index].pirq);
-+		}
-+		ksz_irq_free(&dev->girq);
-+	}
-+
-+	return ret;
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 185131399742..103f79179446 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2745,136 +2745,6 @@ int ksz_pirq_setup(struct ksz_device *dev, u8 p)
+ 	return ksz_irq_common_setup(dev, pirq);
  }
  
- static void ksz8_phylink_get_caps(struct dsa_switch *ds, int port,
-@@ -2206,7 +2317,6 @@ const struct phylink_mac_ops ksz8_phylink_mac_ops = {
+-int ksz_setup(struct dsa_switch *ds)
+-{
+-	struct ksz_device *dev = ds->priv;
+-	u16 storm_mask, storm_rate;
+-	struct dsa_port *dp;
+-	struct ksz_port *p;
+-	const u16 *regs;
+-	int ret;
+-
+-	regs = dev->info->regs;
+-
+-	dev->vlan_cache = devm_kcalloc(dev->dev, sizeof(struct vlan_table),
+-				       dev->info->num_vlans, GFP_KERNEL);
+-	if (!dev->vlan_cache)
+-		return -ENOMEM;
+-
+-	ret = dev->dev_ops->reset(dev);
+-	if (ret) {
+-		dev_err(ds->dev, "failed to reset switch\n");
+-		return ret;
+-	}
+-
+-	ret = ksz_parse_drive_strength(dev);
+-	if (ret)
+-		return ret;
+-
+-	if (ksz_has_sgmii_port(dev) && dev->dev_ops->pcs_create) {
+-		ret = dev->dev_ops->pcs_create(dev);
+-		if (ret)
+-			return ret;
+-	}
+-
+-	/* set broadcast storm protection 10% rate */
+-	storm_mask = BROADCAST_STORM_RATE;
+-	storm_rate = (BROADCAST_STORM_VALUE * BROADCAST_STORM_PROT_RATE) / 100;
+-	if (ksz_is_ksz8463(dev)) {
+-		storm_mask = swab16(storm_mask);
+-		storm_rate = swab16(storm_rate);
+-	}
+-	regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
+-			   storm_mask, storm_rate);
+-
+-	dev->dev_ops->config_cpu_port(ds);
+-
+-	dev->dev_ops->enable_stp_addr(dev);
+-
+-	ds->num_tx_queues = dev->info->num_tx_queues;
+-
+-	regmap_update_bits(ksz_regmap_8(dev), regs[S_MULTICAST_CTRL],
+-			   MULTICAST_STORM_DISABLE, MULTICAST_STORM_DISABLE);
+-
+-	ksz_init_mib_timer(dev);
+-
+-	ds->configure_vlan_while_not_filtering = false;
+-	ds->dscp_prio_mapping_is_global = true;
+-
+-	if (dev->dev_ops->setup) {
+-		ret = dev->dev_ops->setup(ds);
+-		if (ret)
+-			return ret;
+-	}
+-
+-	/* Start with learning disabled on standalone user ports, and enabled
+-	 * on the CPU port. In lack of other finer mechanisms, learning on the
+-	 * CPU port will avoid flooding bridge local addresses on the network
+-	 * in some cases.
+-	 */
+-	p = &dev->ports[dev->cpu_port];
+-	p->learning = true;
+-
+-	if (dev->irq > 0) {
+-		ret = ksz_girq_setup(dev);
+-		if (ret)
+-			return ret;
+-
+-		dsa_switch_for_each_user_port(dp, dev->ds) {
+-			ret = ksz_pirq_setup(dev, dp->index);
+-			if (ret)
+-				goto port_release;
+-
+-			if (dev->info->ptp_capable) {
+-				ret = ksz_ptp_irq_setup(ds, dp->index);
+-				if (ret)
+-					goto pirq_release;
+-			}
+-		}
+-	}
+-
+-	if (dev->info->ptp_capable) {
+-		ret = ksz_ptp_clock_register(ds);
+-		if (ret) {
+-			dev_err(dev->dev, "Failed to register PTP clock: %d\n",
+-				ret);
+-			goto port_release;
+-		}
+-	}
+-
+-	ret = ksz_mdio_register(dev);
+-	if (ret < 0) {
+-		dev_err(dev->dev, "failed to register the mdio");
+-		goto out_ptp_clock_unregister;
+-	}
+-
+-	ret = ksz_dcb_init(dev);
+-	if (ret)
+-		goto out_ptp_clock_unregister;
+-
+-	/* start switch */
+-	regmap_update_bits(ksz_regmap_8(dev), regs[S_START_CTRL],
+-			   SW_START, SW_START);
+-
+-	return 0;
+-
+-out_ptp_clock_unregister:
+-	if (dev->info->ptp_capable)
+-		ksz_ptp_clock_unregister(ds);
+-port_release:
+-	if (dev->irq > 0) {
+-		dsa_switch_for_each_user_port_continue_reverse(dp, dev->ds) {
+-			if (dev->info->ptp_capable)
+-				ksz_ptp_irq_free(ds, dp->index);
+-pirq_release:
+-			ksz_irq_free(&dev->ports[dp->index].pirq);
+-		}
+-		ksz_irq_free(&dev->girq);
+-	}
+-
+-	return ret;
+-}
+-
+ void ksz_teardown(struct dsa_switch *ds)
+ {
+ 	struct ksz_device *dev = ds->priv;
+@@ -2893,9 +2763,6 @@ void ksz_teardown(struct dsa_switch *ds)
+ 
+ 		ksz_irq_free(&dev->girq);
+ 	}
+-
+-	if (dev->dev_ops->teardown)
+-		dev->dev_ops->teardown(ds);
+ }
+ 
+ static void port_r_cnt(struct ksz_device *dev, int port)
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index 5fad56c2d067..f80034488cd1 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -359,8 +359,6 @@ struct alu_struct {
  };
  
- const struct ksz_dev_ops ksz8463_dev_ops = {
--	.setup = ksz8_setup,
- 	.get_port_addr = ksz8463_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
- 	.port_setup = ksz8_port_setup,
-@@ -2217,14 +2327,10 @@ const struct ksz_dev_ops ksz8463_dev_ops = {
- 	.r_mib_stat64 = ksz88xx_r_mib_stats64,
- 	.freeze_mib = ksz8_freeze_mib,
- 	.port_init_cnt = ksz8_port_init_cnt,
--	.config_cpu_port = ksz8_config_cpu_port,
--	.enable_stp_addr = ksz8_enable_stp_addr,
--	.reset = ksz8_reset_switch,
- 	.init = ksz8_switch_init,
+ struct ksz_dev_ops {
+-	int (*setup)(struct dsa_switch *ds);
+-	void (*teardown)(struct dsa_switch *ds);
+ 	u32 (*get_port_addr)(int port, int offset);
+ 	void (*cfg_port_member)(struct ksz_device *dev, int port, u8 member);
+ 	void (*port_setup)(struct ksz_device *dev, int port, bool cpu_port);
+@@ -417,12 +415,7 @@ struct ksz_dev_ops {
+ 	void (*port_init_cnt)(struct ksz_device *dev, int port);
+ 	void (*setup_rgmii_delay)(struct ksz_device *dev, int port);
+ 	int (*tc_cbs_set_cinc)(struct ksz_device *dev, int port, u32 val);
+-	void (*config_cpu_port)(struct dsa_switch *ds);
+-	int (*enable_stp_addr)(struct ksz_device *dev);
+-	int (*reset)(struct ksz_device *dev);
+ 	int (*init)(struct ksz_device *dev);
+-
+-	int (*pcs_create)(struct ksz_device *dev);
  };
  
- const struct ksz_dev_ops ksz87xx_dev_ops = {
--	.setup = ksz8_setup,
- 	.get_port_addr = ksz8_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
- 	.port_setup = ksz8_port_setup,
-@@ -2235,9 +2341,6 @@ const struct ksz_dev_ops ksz87xx_dev_ops = {
- 	.r_mib_stat64 = ksz_r_mib_stats64,
- 	.freeze_mib = ksz8_freeze_mib,
- 	.port_init_cnt = ksz8_port_init_cnt,
--	.config_cpu_port = ksz8_config_cpu_port,
--	.enable_stp_addr = ksz8_enable_stp_addr,
--	.reset = ksz8_reset_switch,
- 	.init = ksz8_switch_init,
- 	.pme_write8 = ksz8_pme_write8,
- 	.pme_pread8 = ksz8_pme_pread8,
-@@ -2245,7 +2348,6 @@ const struct ksz_dev_ops ksz87xx_dev_ops = {
- };
+ struct ksz_device *ksz_switch_alloc(struct device *base,
+@@ -433,7 +426,6 @@ void ksz_switch_remove(struct ksz_device *dev);
+ int ksz_switch_suspend(struct device *dev);
+ int ksz_switch_resume(struct device *dev);
  
- const struct ksz_dev_ops ksz88xx_dev_ops = {
--	.setup = ksz8_setup,
- 	.get_port_addr = ksz8_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
- 	.port_setup = ksz8_port_setup,
-@@ -2256,9 +2358,6 @@ const struct ksz_dev_ops ksz88xx_dev_ops = {
- 	.r_mib_stat64 = ksz88xx_r_mib_stats64,
- 	.freeze_mib = ksz8_freeze_mib,
- 	.port_init_cnt = ksz8_port_init_cnt,
--	.config_cpu_port = ksz8_config_cpu_port,
--	.enable_stp_addr = ksz8_enable_stp_addr,
--	.reset = ksz8_reset_switch,
- 	.init = ksz8_switch_init,
- 	.pme_write8 = ksz8_pme_write8,
- 	.pme_pread8 = ksz8_pme_pread8,
-@@ -2269,7 +2368,7 @@ const struct dsa_switch_ops ksz8463_switch_ops = {
- 	.get_tag_protocol	= ksz8463_get_tag_protocol,
- 	.connect_tag_protocol   = ksz8463_connect_tag_protocol,
- 	.get_phy_flags		= ksz_get_phy_flags,
--	.setup			= ksz_setup,
-+	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
- 	.phy_read		= ksz_phy_read16,
- 	.phy_write		= ksz_phy_write16,
-@@ -2329,7 +2428,7 @@ const struct dsa_switch_ops ksz87xx_switch_ops = {
- 	.get_tag_protocol	= ksz87xx_get_tag_protocol,
- 	.connect_tag_protocol   = ksz87xx_connect_tag_protocol,
- 	.get_phy_flags		= ksz_get_phy_flags,
--	.setup			= ksz_setup,
-+	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
- 	.phy_read		= ksz_phy_read16,
- 	.phy_write		= ksz_phy_write16,
-@@ -2389,7 +2488,7 @@ const struct dsa_switch_ops ksz88xx_switch_ops = {
- 	.get_tag_protocol	= ksz88xx_get_tag_protocol,
- 	.connect_tag_protocol   = ksz88xx_connect_tag_protocol,
- 	.get_phy_flags		= ksz_get_phy_flags,
--	.setup			= ksz_setup,
-+	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
- 	.phy_read		= ksz_phy_read16,
- 	.phy_write		= ksz_phy_write16,
+-int ksz_setup(struct dsa_switch *ds);
+ void ksz_teardown(struct dsa_switch *ds);
+ int ksz_port_setup(struct dsa_switch *ds, int port);
+ void ksz_port_teardown(struct dsa_switch *ds, int port);
 
 -- 
 2.54.0
