@@ -1,196 +1,205 @@
-Return-Path: <netdev+bounces-290603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290604-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGDAAitqD2qOLAYAu9opvQ
-	(envelope-from <netdev+bounces-290603-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 22:25:15 +0200
+	id wPU0ATprD2qOLAYAu9opvQ
+	(envelope-from <netdev+bounces-290604-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 22:29:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961EB5ABBFC
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 22:25:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D8DD5ABC57
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 22:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 64B663011C49
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:25:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C258D302590D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075C141C2FD;
-	Thu, 21 May 2026 20:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E1E3E7BC4;
+	Thu, 21 May 2026 20:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b="jZD9SlwE"
+	dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b="X9MHGiq/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013049.outbound.protection.outlook.com [40.107.162.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7737E40FDB9;
-	Thu, 21 May 2026 20:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.77
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779395105; cv=none; b=GVwD5DL13l1N93lYu7QVki0OIjeIMHb2dB87iQqENTcAChm/gNAjw1efXPNg5pcEQ1k3grgiV7QJZUzoRXQ+bo4cnI15R7Of63Q3b7Hk44b8CgGfiHCPU1kyw2NBRUCXHtrRVl8hd2BtzBhK4LI/OhOvxCNhXkWAzxOUOk7dF4o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779395105; c=relaxed/simple;
-	bh=VBJblbfRXVasXmc1tUXRza74fdyKHvYZVpFpOZMDTzM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GtggtIkMyxUi2sxwzL//fP3rhozj0Z538rpKWNLQtxRgRqxAo0ZPBIxFa8FOxhPwdW81oGhWbaKYk5K7Tir3lZHnmzIBKZ0hZyc+e3RD5PrNdoZShmxACqSmyXjor/40K6D867pSvOBvoqJ8zY7ZcQTyi4gb8Dp3hFiWl4vvqxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=analog.com; spf=pass smtp.mailfrom=analog.com; dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b=jZD9SlwE; arc=none smtp.client-ip=148.163.135.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=analog.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=analog.com
-Received: from pps.filterd (m0167088.ppops.net [127.0.0.1])
-	by mx0a-00128a01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64LHMSF42083442;
-	Thu, 21 May 2026 16:24:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=analog.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=DKIM; bh=YwjTp
-	V7wR1YJqK/hsAlBffHL6vypkkCvpDmi7r3PdLY=; b=jZD9SlwEaFOf9mEOj4FJu
-	1dfbyTuKbqleoYu6X9xrN2zfYqMytOhrfBncgNd2GwCO42/y9qRmF6wJ4YlShbX9
-	2PZ2kZf41Qu/sU5Cbi4fQoHE97jnjxlUVIHiuIba3zV1fguzxSJu8b1VJO8q0rfZ
-	Rw7MIqBepHzRzVWToHZlHKGLxBtuKT186/RN7ozBUjQn1D2C3Ah0CgiqqQuxKaol
-	fLk5UsYwKdzhp4FnykoFNWUKUuTPVlSy6X510IkWGNNLpdsT698+LmGU69DqIuHa
-	iFaYBBMD4MuYZ4pUnwcg2cUYZY2SlRe0i3S5nofz5N6u8vWfbEvnp1xmoPnAy4pL
-	Q==
-Received: from nwd2mta4.analog.com ([137.71.173.58])
-	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 4ea6d2gn6p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 May 2026 16:24:42 -0400 (EDT)
-Received: from ASHBMBX8.ad.analog.com (ASHBMBX8.ad.analog.com [10.64.17.5])
-	by nwd2mta4.analog.com (8.14.7/8.14.7) with ESMTP id 64LKOfVu016537
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 21 May 2026 16:24:41 -0400
-Received: from ASHBMBX9.ad.analog.com (10.64.17.10) by ASHBMBX8.ad.analog.com
- (10.64.17.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.37; Thu, 21 May
- 2026 16:24:41 -0400
-Received: from ASHBMBX9.ad.analog.com ([fe80::a11:40fc:1a6f:d912]) by
- ASHBMBX9.ad.analog.com ([fe80::a11:40fc:1a6f:d912%20]) with mapi id
- 15.02.1748.037; Thu, 21 May 2026 16:24:41 -0400
-From: "Regus, Ciprian" <Ciprian.Regus@analog.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Simon Horman <horms@kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Heiner Kallweit
-	<hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-Subject: RE: [PATCH net-next 3/5] net: phy: Add support for the ADIN1140 PHY
-Thread-Topic: [PATCH net-next 3/5] net: phy: Add support for the ADIN1140 PHY
-Thread-Index: AQHc2or/PLR+XGRoA0qfDv6DdRV2trX7uOeAgB1N4UA=
-Date: Thu, 21 May 2026 20:24:41 +0000
-Message-ID: <1d7f5247b07f44f2a30cfed8f7d3cd6d@analog.com>
-References: <20260503-adin1140-driver-v1-0-dd043cdd88f0@analog.com>
- <20260503-adin1140-driver-v1-3-dd043cdd88f0@analog.com>
- <2cfa6680-503a-4c4a-91bc-5f9a4331967d@lunn.ch>
-In-Reply-To: <2cfa6680-503a-4c4a-91bc-5f9a4331967d@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-adiruleop-newscl: Rule Triggered
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3541633B6F8;
+	Thu, 21 May 2026 20:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779395380; cv=fail; b=qCxRNu5gMXznH3V/5+NN10jf03oq1sVEUamTEzGK6hce+9xfs1BQoVhkH+zcSc0KJ+MRHKmjNA8D3IRGDYP2UtPbLnwRjoz0inbe0BhNryNFr7PhS+36vy7Mu53dnXCJHE3ZxW6iI6BqzLGZkj9cZ74P4f5Xpgujv7DIFY3WtFU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779395380; c=relaxed/simple;
+	bh=lcv2/4u9wq+ndC1O6g8k4cCML91MqkD4n/7E8xzkEz8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uxYyXss94rAtihenLBGo0ZhoY912rBwM7Y7EfNEHlZ3iFcugQLgiXx1MaCluiZhF796e/+hcIPIPFJZ/g4ahLdz7Hyk1ekk7XtZRdS0SYM/vchBzNEdYE0dLSe3FhYZQN3YvKxjeoqvdgQRNXU1P2LChe4dI7aHuFdP4eiXF8ZE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com; spf=pass smtp.mailfrom=ericsson.com; dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b=X9MHGiq/; arc=fail smtp.client-ip=40.107.162.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ericsson.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eC59YJasNm/cLzGONkRlY7+XarDuB5xkT/nRyIGzfIfvFYc+vBsuFcnnaZH5HHKIs+/Vbil/+5zi2Q9xYSx/IbFumoiFiX3cOa55wl+k48rex+VDH6d2qNq2vwu1GfYbOrSHwSCSN3Onfd2bQjbHA/SeyGF8NYBCNeWQ0Erkz0u/1kIJAlw56h7CGkBvTOTABbUsvrYj54AEZ+zthG/LbuhSXEyLczFTTZnyk2gXMDzHRE04wJYfzBaU00GhvnJ+h/TNB4m+Gkl/cOhoQUzkQLuPciR6zC0OQLaZr97AVRuAhuvt3dHBZVbG52tz2VVZ2gTNwJ6biISft0mvlGW2ew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+hMihQRdL8k31bZTdyoqHS3UY3Xq/q2IYMLc+S92hR4=;
+ b=Cn+x/4WqkCwQcCZQnZgDp+r7/Do7vz/MUFQ2YDcJAJFqmNiUaRUsEAc8EHlYB7Rds+Z7YbMulrc8DhrfroSw3y1otIpko/HXMShp+iUvsRbOTUNimIbvbN3fRWwNSMjhb+lfWt2bmih9u6SwiW8+soeY0coxjE+MS2d8z67Os+ng7EjRjYNvTQdZse3ObEcmG9OnZiZpRC1Bzjcd7hSWl0J0YRMYIKEDzaAoQPM3PpSuLWS1NT51WJAHmt9KurBmdVciU7rLCOP2XbKeoVg9dhpbfiixNW7+z6Waz6DmouBYHVvkTEWLEadit7ziK8q33Xh8Oac8jumXo3S5dIPIAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 192.176.1.74) smtp.rcpttodomain=davemloft.net smtp.mailfrom=ericsson.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=ericsson.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ericsson.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+hMihQRdL8k31bZTdyoqHS3UY3Xq/q2IYMLc+S92hR4=;
+ b=X9MHGiq/6+vrA/WTnAvc7umnvDE9ty8G/LG0bIYirpu8OT5ceqE55pxaiUEWz2BuOcBtedMtUNcK1UWg0XVWF/JoxWtt+3E9W8AN0N6um4n9BO23SxOw8vekWUPENkHD98ovqKmYzBetxt3dITK4j2egrv0ku5AayXpadXKBdBdwMHAHWyJjLwKUWWdgHqT9hEm8pILdmNke7V+vlYHe4AGPxo+I/NXhsrA7XhFCSwDki/W8iHcDGj3VckBsfzolZMGSwzE+pl9cC2EI/I6v9/8atIQlRFJZmUYpMVNzhhrxKtcmE6RCxq1RXXtwMM9VT+ZaMdPU7wJQ8jhixPMJ0Q==
+Received: from CWLP123CA0268.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:1d5::14)
+ by PAWPR07MB9687.eurprd07.prod.outlook.com (2603:10a6:102:384::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.17; Thu, 21 May
+ 2026 20:29:34 +0000
+Received: from AMS1EPF00000047.eurprd04.prod.outlook.com
+ (2603:10a6:400:1d5:cafe::30) by CWLP123CA0268.outlook.office365.com
+ (2603:10a6:400:1d5::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.17 via Frontend Transport; Thu, 21
+ May 2026 20:29:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 192.176.1.74)
+ smtp.mailfrom=ericsson.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=ericsson.com;
+Received-SPF: Pass (protection.outlook.com: domain of ericsson.com designates
+ 192.176.1.74 as permitted sender) receiver=protection.outlook.com;
+ client-ip=192.176.1.74; helo=oa.msg.ericsson.com; pr=C
+Received: from oa.msg.ericsson.com (192.176.1.74) by
+ AMS1EPF00000047.mail.protection.outlook.com (10.167.16.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.71.7 via Frontend Transport; Thu, 21 May 2026 20:29:33 +0000
+Received: from seroius18814.sero.gic.ericsson.se (153.88.142.248) by
+ smtp-central.internal.ericsson.com (100.87.178.64) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 21 May 2026 22:29:33 +0200
+Received: from seroius06448.sero.gic.ericsson.se (seroius06448.sero.gic.ericsson.se [10.117.92.228])
+	by seroius18814.sero.gic.ericsson.se (Postfix) with ESMTP id C58544020B7B;
+	Thu, 21 May 2026 22:29:32 +0200 (CEST)
+Received: by seroius06448.sero.gic.ericsson.se (Postfix, from userid 7434092)
+	id A7CBC1005D6A; Thu, 21 May 2026 22:29:32 +0200 (CEST)
+From: Fidan Aliyeva <fidan.aliyeva.ext@ericsson.com>
+To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<marek.behun@nic.cz>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<fidan.aliyeva.ext@ericsson.com>
+Subject: [PATCH net-next v2 0/4] mv88e6xxx: Cache scratch config3 of 6352
+Date: Thu, 21 May 2026 22:29:20 +0200
+Message-ID: <20260521202924.727929-1-fidan.aliyeva.ext@ericsson.com>
+X-Mailer: git-send-email 2.36.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Authority-Analysis: v=2.4 cv=dpbrzVg4 c=1 sm=1 tr=0 ts=6a0f6a0a cx=c_pps
- a=3WNzaoukacrqR9RwcOSAdA==:117 a=3WNzaoukacrqR9RwcOSAdA==:17
- a=xqWC_Br6kY4A:10 a=3zxtOzucoeEA:10 a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=0sLvza09kfJOxVLZPwjg:22 a=uXIjobp8t2wMuQ0fPvqm:22
- a=PVazNrEYVzhFiYv-KssA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIxMDIwNSBTYWx0ZWRfX+QHZcDJkxNRI
- OMCuXq4ICTSDM7TP/6OJzZq5b2ve0Hl1NtO14ELjK3yiobGgz2neOTdAtnstl7p8MuB17XCotxk
- 8pNQ2dyplvBCAvK7RZFHEzCSwmmPBAFChCugfIsnhaQ7PicOwk11VtgzAG+aQaHK3gCBzjxa8WW
- n/K1bheCDZsMZmqnQmk22JcX3B2p0Gh3zTjFJUPfECKNTDcZSuK0qaEo7Zg1tsBE55dDkJRRJN6
- 4cgm18UwRX5zm9QttHzk6FVbeL3bEm5oELWa2AGDlK3ORAp7iOOyiT5GaH4F4+9PsyznoS0EBH4
- ziZQzxo22Q6ABcc9vFSvMI0hzUnhB0uE2gYBw7W32Bc393kEiB3M97njTB7dD+3tGlTLMNiaYGX
- IWCpPJRag9JQ+xhawp4tQjfgr/B6GU1aRfGmJBtvlbG2j28P7MJN7dOhaigWJOf0b1+khw2KZt1
- j8KMV7OFgxicuJmP8Cw==
-X-Proofpoint-GUID: VfiWibBCwsAhzXUZg141LbN1MCLGwRUx
-X-Proofpoint-ORIG-GUID: VfiWibBCwsAhzXUZg141LbN1MCLGwRUx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-21_04,2026-05-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 phishscore=0 impostorscore=0 malwarescore=0 suspectscore=0
- bulkscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501 clxscore=1015
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605210205
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[analog.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[analog.com:s=DKIM];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS1EPF00000047:EE_|PAWPR07MB9687:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4774e771-699c-461b-0f70-08deb777ab72
+X-SMTP-Server: smtp-central.internal.ericsson.com
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700016|82310400026|1800799024|13003099007|11063799006|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	Pw5RIYHvjIL2DYoNZb1Ez8kdFYA99ZiD0hLCCeyhE/BsLVDeASyYB8VJF/DMqavwhOa0QC1lysQ+QzpdLgX0+6lcM8IHc6GAdAzHZzT3jFoIA7/a2vTREpnUrEFk1SuN24P17KjYG6IFU7uUZ6vYDyMWPTUPC0mJNQFY6I/MTYeD5HBVEGdfmfmpxuxt+A5J6569/AvU4DBbhLQbduBqI1DaiQI5YoR6YVKA5SU0vWCqodLR4hxP6vtdQH5qZ97XJhql8qsvJzdjvQiK1DZzxLSZMQ7VdEpBblvowcM7QWVxWbwvno90AHZp1Lg7ATFIcqguIiIttvDU6YvtAN6WkssAbh7osIEtlZhAWmHeq9eGVNftCbdqEcjzC4jGfjczWP8py5IbNrQEZASb3mkn/ZeFM5Pdvgtk4PUQGtu9WvJjOoKg2Yh6DoKkDitioAI1Jem6c7L8ypY53FbBivfBWefDAfDVmUrJcnGuZj2FpKfkbB9d9YSHb26lGHcee0QTId/QklGAkUslxu3i0hX9bWIIMfu3BdFrJ1LIjTBpCHUawFEa90/GPokTeBNto6s1LRBUHcs2yLdkvr+mK6Vb+sbLo+1/fkFpd3mG+Q59KCUu7r4/f7jRipVssvs63nOnbmsCR9FSfvfraeZVA6eIqfkzjAO3u2OB9gdN2CAQDpY+070q3zkcYk5kqp0dZgKF
+X-Forefront-Antispam-Report:
+	CIP:192.176.1.74;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:oa.msg.ericsson.com;PTR:office365.se.ericsson.net;CAT:NONE;SFS:(13230040)(376014)(36860700016)(82310400026)(1800799024)(13003099007)(11063799006)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	2er14lIbgeXZ5JFyvrqB8Rs8MwpDy/5CqkCOBaoDkdRyJJTx2jvlZUUDx0za1IwiSI7QTbyDqP4xu513MSn7+ezZenowVW59QhpYIh8aOPj6D0WWm0dG9rM930EUdaFjVcf8AmXTdT7kFLyPE+Hfkip61Vzm0FCciXohw/eVUdL1I6EPl5Vv2Gcx6iw+OlQJwVAKJh7S56cLD7xB97UJXux/+iyBkM5A2phampNqaTS8XDu2LTYhfeVJsQTQdbkSnmhh5kzMXMcXQL04gHAz+bTjWlUHSgXBr3OupAdcNxPnz/Y4ISTa87QdBxgWqCcaOuTrWYv4v0csVHSLaQnvY7djYaX0miX/VWEph+ud+cOx4/PdYdf5QjkDcFK2zEZCAvinx+pgtWs7iTKpguKEJbDso8r7JeVOsALYuO9/R3FcwDtVEUV5LF8LJz3pT/gv
+X-OriginatorOrg: ericsson.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2026 20:29:33.7948
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4774e771-699c-461b-0f70-08deb777ab72
+X-MS-Exchange-CrossTenant-Id: 92e84ceb-fbfd-47ab-be52-080c6b87953f
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=92e84ceb-fbfd-47ab-be52-080c6b87953f;Ip=[192.176.1.74];Helo=[oa.msg.ericsson.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS1EPF00000047.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR07MB9687
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ericsson.com,reject];
+	R_DKIM_ALLOW(-0.20)[ericsson.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-290603-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9];
+	TAGGED_FROM(0.00)[bounces-290604-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[fidan.aliyeva.ext@ericsson.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[analog.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Ciprian.Regus@analog.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nic.cz];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[ericsson.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 961EB5ABBFC
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 5D8DD5ABC57
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+In mv88e6352 scratch register in Global Control 2 set of registers
+returns which port is attached to SERDES. This value is a pin
+strapping value and is set after the switch is released from reset.
+Thus, it can be cached during chip setup instead of reading the
+register everytime when SERDES check is needed.
 
-> > +static int adin1140_phy_read_mmd(struct phy_device *phydev, int
-> devnum,
-> > +				 u16 regnum)
-> > +{
-> > +	struct mii_bus *bus =3D phydev->mdio.bus;
-> > +	int addr =3D phydev->mdio.addr;
-> > +
-> > +	return __mdiobus_c45_read(bus, addr, devnum, regnum);
-> > +}
-> > +
-> > +static int adin1140_phy_write_mmd(struct phy_device *phydev, int
-> devnum,
-> > +				  u16 regnum, u16 val)
-> > +{
-> > +	struct mii_bus *bus =3D phydev->mdio.bus;
-> > +	int addr =3D phydev->mdio.addr;
-> > +
-> > +	return __mdiobus_c45_write(bus, addr, devnum, regnum, val);
-> > +}
->=20
-> Why do these exist?
->
+The series consist of 4 parts:
+1. Add new mv88e6352_reset function as ops->reset
+2. Cache the register value in this reset function
+3. Refactor mv88e6352_g2_scratch_port_has_serdes to use the cached
+value.
+4. Remove the locks surrounding mv88e6352_g2_scratch_port_has_serdes.
 
-The PHY is always probed over C22. Unless read_mmd()/write_mmd() are define=
-d,
-phylib will default to indirect accesses to MMD devices. The 0xD and 0xE PH=
-Y registers
-are not implemented, so those transfers won't have any effect.
+---
+v2 changes:
+  - Fix the documentation of the return value for the new function
+  mv88e6352_g2_cache_global_scratch_config3
+as addressed by Jakub Kicinski
+
+v1 link:
+https://lore.kernel.org/netdev/20260515223707.1026325-1-fidan.aliyeva.ext@ericsson.com/
+
+Changes after RFC:
+  - Separate the patch into 4 different patches
+  - Move caching step into chip->info->ops->reset function
+as suggested by Andrew.
+
+RFC link:
+https://lore.kernel.org/netdev/20260510213429.2044612-1-fidan.aliyeva.ext@ericsson.com/
+
+---
+Fidan Aliyeva (4):
+  mv88e6xxx: Add mv88e6352_reset for 6352 family
+  mv88e6xxx: Cache scratch config3 of 6352
+  mv88e6xxx: Use cached config3 in 6352 has_serdes
+  mv88e6xxx: Remove locks for 6352's has_serdes
+
+ drivers/net/dsa/mv88e6xxx/chip.c            | 25 ++++++++++----
+ drivers/net/dsa/mv88e6xxx/chip.h            |  3 ++
+ drivers/net/dsa/mv88e6xxx/global2.h         |  1 +
+ drivers/net/dsa/mv88e6xxx/global2_scratch.c | 38 ++++++++++++++++-----
+ drivers/net/dsa/mv88e6xxx/pcs-6352.c        |  2 --
+ drivers/net/dsa/mv88e6xxx/serdes.c          |  2 --
+ 6 files changed, 51 insertions(+), 20 deletions(-)
+
+--
+2.36.0
+
 
