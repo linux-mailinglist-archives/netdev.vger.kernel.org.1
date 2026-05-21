@@ -1,191 +1,147 @@
-Return-Path: <netdev+bounces-290305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290307-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2C0NBivJDmoACQYAu9opvQ
-	(envelope-from <netdev+bounces-290305-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:58:19 +0200
+	id MHNGJTPODmpoCQYAu9opvQ
+	(envelope-from <netdev+bounces-290307-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:19:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADCCB5A1AA8
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:58:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 156D05A22D4
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:19:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1A6FF30252B2
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:57:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3214531C5F11
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02951357D05;
-	Thu, 21 May 2026 08:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F642372ED5;
+	Thu, 21 May 2026 09:04:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CEDK9bog"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U8xfN/oS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDCE363C6C
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 08:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5C83603D3
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779353841; cv=none; b=MtCQbXoo47C4qyyOftQUNiNa53Nr762NEAMJn0NE8bYbJM+8E+QjrYvBCW68iEgrDRbahLQDo8doxbkZGXhc8oamJJFMNkE2OCQXczeVD62Q5BeY3MzxcxoyuZKH5B6NP0Pjw0ogZ8obnsigq8cU7F74MlezL4/Yl5L5yuOBCqI=
+	t=1779354244; cv=none; b=mVpY7J6qP3c9vQRe0KYahUlDZI5Antux/AgBV+Uu/SNPtxfC8IiiEQN8Tao6XkiAKFAQdtf0Dfst4AW8Zrl+zsWl2dAZV3LoJRiGgxhvc3GrG6IhB25nQTq9gBIpRlfiy4swmiZhzjUjXf141w8PsCM2+hmTPejiS/RGc8AxAA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779353841; c=relaxed/simple;
-	bh=FTqWKc6Gxc/0tUOdH3YpvJvhqjzqY8tSDA5ezTotmKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c6aHjFk1BwVR/em/cwoy9jLbBORLSA0od1AZHg1Ot2ku3FDG3rRnfMdjcPOiXKmn7wGhbhLqiX+CUOZfcyEscHRTWIzyML60MrJ8pQ/bK7oeqBWxv6lDaMSNf623bHP/dVifqA4svxS1jOoWOM+NhlhekYaGoftUXIZd01aHmJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CEDK9bog; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779353840; x=1810889840;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=FTqWKc6Gxc/0tUOdH3YpvJvhqjzqY8tSDA5ezTotmKQ=;
-  b=CEDK9bogNcVTkMLyM2NLPSfof+egLI4oYx5Kh5Ml56afXk34IBFx+4U8
-   jLOqv84s5FI4FusgDpGsm1PJ6jSjm1/3ZvyIcjhqft+DCy2DFsL6Mp+TF
-   JqtI5vD2XM2hw8jr0n4n9sY3Jws4eklK1u9t7tllD59w4J3MjzmcioAeH
-   Yki085MUmh9bOuWRUxDtFo8SjxUlfvbosT5+HonZTS4SwOAw/jn7zgCkP
-   iN6u2Qz+Y5qncbqowyEIxflDWf3GMYt0I3+fs4t3dhff3pjxX8IdZ76TY
-   D3aZCOu8eTyKWnfhTNsLk6tZ2OAzc4HF1x8cdAZR1jTDl2ky/HrhZELm0
-   A==;
-X-CSE-ConnectionGUID: JdVZPGMmQi2EzYBkgOlOrw==
-X-CSE-MsgGUID: VWvgvKV4ScOVAnCuvdy+Gg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="79417398"
-X-IronPort-AV: E=Sophos;i="6.23,246,1770624000"; 
-   d="scan'208";a="79417398"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2026 01:57:19 -0700
-X-CSE-ConnectionGUID: zqTZeTNFRuKIBhBReAoWCQ==
-X-CSE-MsgGUID: dA12pg/lTl+xYJkuGC/hzA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,246,1770624000"; 
-   d="scan'208";a="245506392"
-Received: from gklab-003-014.igk.intel.com ([10.91.173.44])
-  by fmviesa005.fm.intel.com with ESMTP; 21 May 2026 01:57:17 -0700
-From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-To: e1000-patches@eclists.intel.com
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com,
-	arkadiusz.kubalewski@intel.com,
-	konstantin.ilichev@intel.com,
-	Przemyslaw Korba <przemyslaw.korba@intel.com>
-Subject: [PATCH iwl-net] idpf: add padding to PTP virtchnl structures
-Date: Thu, 21 May 2026 10:54:06 +0200
-Message-ID: <20260521085428.117991-2-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1779354244; c=relaxed/simple;
+	bh=1QUNyf1+4GK6M6glNGqXfbJnZI6n5ng1QfS4YTKrhtM=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MRJ1vYwx9TU025vpZCphpm0haB76nMI3o/64o0+pNgfdSt7I8nduPJh7ta36rvxl9Q4JW88y61dmv/jhxcoRpkiwQMONUvY6DybEOgVoOfBOHWgAB7OM6YEj/e4s5NlfkOnlO6jMoes2dz4mmqV4tLo0WeWCB2zPemHRo0MVKOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U8xfN/oS; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CD641F00A3D
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:04:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779354242;
+	bh=1QUNyf1+4GK6M6glNGqXfbJnZI6n5ng1QfS4YTKrhtM=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=U8xfN/oSnaOrNF+gtWDgNNJlSLhiqu7Q8UxQP2IAYfVXR5xgxWdbaVBaAzXyExy6m
+	 EiiCuk3G4CJ5/GOGGPGJAffJtx0E/wQuk3mK/TJjRlP9wLfMhSW/ggsqBOM9vvc0mJ
+	 4Q1+ZDu628ro1LYmqb+ztqMz72QHaA6fsdJrfe6qFmosM69fBhVsvkmDbR6GCCjFzr
+	 S0ofyit/qO0sxtHY0C1WlU4Xv1MWW0l23zwMhkHm/Ck0RnfSzGvkkrvPYsBRJCWr2a
+	 tN8Uht5hGv+3XNy6Y6s8OZja4tXvLwfByMASdUpbVP+Jw8XM0i8ZHc31/tsMxNxSAP
+	 tkWQifWvaOpFA==
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-13643f6d1a9so98622c88.0
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 02:04:02 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+lwxAczKStjn+o4tx7P8/1ecGcOhpGvo/wxIYpMN+T2vVQwLDWkR7KFv78q/LTxoIkBgG+kQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLOyTM/Z1yY+dv+XlEztBAH/73koKN06Qbqp4/YE+vvYDkiYcw
+	FdLv3cirx7cWoSBOM2MB01Ft9CGjqPWWQ1EFP5c1KMdPmriv6l06qDTpywe6ZkztX9/VkJ7qlDu
+	TkTpcwZQOhl9h/R2EXdeLhx2hsa2Yg6PSd5oNbBPuiQ==
+X-Received: by 2002:a05:7022:624:b0:134:7497:2153 with SMTP id
+ a92af1059eb24-13632b19501mr1138896c88.20.1779354241319; Thu, 21 May 2026
+ 02:04:01 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 21 May 2026 02:03:57 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 21 May 2026 02:03:57 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260520183815.2510387-3-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260520183815.2510387-1-arnd@kernel.org> <20260520183815.2510387-3-arnd@kernel.org>
+Date: Thu, 21 May 2026 02:03:57 -0700
+X-Gmail-Original-Message-ID: <CAMRc=Mf=JGOJUfs__HxxqTkiEk5NrkMX5J6RkO+=ybHUfWGShA@mail.gmail.com>
+X-Gm-Features: AVHnY4Iwi65kxiAOYAXhfVUikEld9MZPsgLFlTgVHCPfkqhuImHkvGx_B84f6lE
+Message-ID: <CAMRc=Mf=JGOJUfs__HxxqTkiEk5NrkMX5J6RkO+=ybHUfWGShA@mail.gmail.com>
+Subject: Re: [PATCH 02/10] [v3] input: gpio-keys: make legacy gpiolib optional
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+	Christian Lamparter <chunkeey@googlemail.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Aaro Koskinen <aaro.koskinen@iki.fi>, Andreas Kemnade <andreas@kemnade.info>, 
+	Kevin Hilman <khilman@baylibre.com>, Roger Quadros <rogerq@kernel.org>, 
+	Tony Lindgren <tony@atomide.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, Matti Vaittinen <mazziesaccount@gmail.com>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, Jonas Gorski <jonas.gorski@gmail.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-wireless@vger.kernel.org, 
+	linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mips@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-leds@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-gpio@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290305-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290307-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[41];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,googlemail.com,sipsolutions.net,iki.fi,kemnade.info,baylibre.com,kernel.org,atomide.com,alpha.franken.de,physik.fu-berlin.de,redhat.com,alien8.de,linux.intel.com,zytor.com,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,lists.infradead.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[intel.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email,intel.com:mid,intel.com:dkim]
-X-Rspamd-Queue-Id: ADCCB5A1AA8
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 156D05A22D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add padding to virtchnl2 PTP structures to match the Control Plane
-expected message sizes:
-- virtchnl2_ptp_get_dev_clk_time: 8 -> 16 bytes
-- virtchnl2_ptp_set_dev_clk_time: 8 -> 16 bytes
-- virtchnl2_ptp_get_cross_time: 16 -> 24 bytes
+On Wed, 20 May 2026 20:38:07 +0200, Arnd Bergmann <arnd@kernel.org> said:
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> Most users of gpio-keys and gpio-keys-polled use modern gpiolib
+> interfaces, but there are still number of ancient sh, arm32 and x86
+> machines that have never been converted.
+>
+> Add an #ifdef block for the parts of the driver that are only used on
+> those legacy machines.
+>
+> The two Rohm PMIC drivers use a gpio-keys device without an actual GPIO,
+> passing an IRQ number instead. In order to keep this working both with
+> and with CONFIG_GPIOLIB_LEGACY, change the gpio-keys driver to ignore
+> the gpio number if an IRQ is passed.
+>
+> Link: https://lore.kernel.org/all/b3c94552-c104-42e3-be15-7e8362e8039e@gmail.com/
+> Link: https://lore.kernel.org/all/afJXG4_rtaj3l2Dk@google.com/
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
 
-Reproduction steps:
-On ACC, run: ptp4l -i ACC_pf -m
-Observe: failed to open /dev/ptp0: Permission denied
-
-Fixes: bf27283ba594 ("virtchnl: add PTP virtchnl definitions")
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
----
- drivers/net/ethernet/intel/idpf/virtchnl2.h | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-index 02ae447cc24a..ba953dd5fb67 100644
---- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
-+++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-@@ -1572,13 +1572,16 @@ VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_ptp_get_vport_tx_tstamp_latches);
-  * struct virtchnl2_ptp_get_dev_clk_time - Associated with message
-  *					   VIRTCHNL2_OP_PTP_GET_DEV_CLK_TIME.
-  * @dev_time_ns: Device clock time value in nanoseconds
-+ * @pad: Padding for future extensions
-  *
-  * PF/VF sends this message to receive the time from the main timer.
-  */
- struct virtchnl2_ptp_get_dev_clk_time {
- 	__le64 dev_time_ns;
-+	u8 pad[8];
- };
--VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_ptp_get_dev_clk_time);
-+
-+VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_ptp_get_dev_clk_time);
- 
- /**
-  * struct virtchnl2_ptp_get_cross_time: Associated with message
-@@ -1586,26 +1589,32 @@ VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_ptp_get_dev_clk_time);
-  * @sys_time_ns: System counter value expressed in nanoseconds, read
-  *		 synchronously with device time
-  * @dev_time_ns: Device clock time value expressed in nanoseconds
-+ * @pad: Padding for future extensions
-  *
-  * PF/VF sends this message to receive the cross time.
-  */
- struct virtchnl2_ptp_get_cross_time {
- 	__le64 sys_time_ns;
- 	__le64 dev_time_ns;
-+	u8 pad[8];
- };
--VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_ptp_get_cross_time);
-+
-+VIRTCHNL2_CHECK_STRUCT_LEN(24, virtchnl2_ptp_get_cross_time);
- 
- /**
-  * struct virtchnl2_ptp_set_dev_clk_time: Associated with message
-  *					  VIRTCHNL2_OP_PTP_SET_DEV_CLK_TIME.
-  * @dev_time_ns: Device time value expressed in nanoseconds to set
-+ * @pad: Padding for future extensions
-  *
-  * PF/VF sends this message to set the time of the main timer.
-  */
- struct virtchnl2_ptp_set_dev_clk_time {
- 	__le64 dev_time_ns;
-+	u8 pad[8];
- };
--VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_ptp_set_dev_clk_time);
-+
-+VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_ptp_set_dev_clk_time);
- 
- /**
-  * struct virtchnl2_ptp_adj_dev_clk_fine: Associated with message
-
-base-commit: 4548d565aa80aad80274e2f3bff4d7cd914c703e
--- 
-2.43.5
-
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
