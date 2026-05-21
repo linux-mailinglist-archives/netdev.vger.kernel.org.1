@@ -1,130 +1,188 @@
-Return-Path: <netdev+bounces-290150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGcJGtZNDmrL9gUAu9opvQ
-	(envelope-from <netdev+bounces-290150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:12:06 +0200
+	id WAAdMJdMDmrL9gUAu9opvQ
+	(envelope-from <netdev+bounces-290151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:06:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C73A459D32B
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:12:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF3559D26E
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:06:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C1EC31B455B
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:00:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7C280301484A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3066E21ADC7;
-	Thu, 21 May 2026 00:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765553EA66;
+	Thu, 21 May 2026 00:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BF6NWsME"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qgjvGo5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41F61A6838;
-	Thu, 21 May 2026 00:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A06C11CBA
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 00:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779321616; cv=none; b=evZzsIhDA/gVevyx1TSBquXhebGT8eaJhZixlZL4scWTEHuVIfCl0d23E14AaoSPGLZXElo44bW0FfCi8Zxrf7COB9Dd+QDke08ma2ofaV71+S7lwNfFtRdHXFEwnFSl6tdeMLHhQ0jIj2Cmv7MZkJgmKlM8E/o5EjZTUerFmDY=
+	t=1779321921; cv=none; b=KjBJ1ofN9Ru9oxpcO3OUddnLy1yjKab1OaFdwxJ8fLn1dDsNyinUPooPYVdQnTAqGLwns1rTCaY3Opn/mdtOy7pU5P25cgaljrz4pO5rytDVkDH+FtIgp4Eazc5bwoF/RpBUeQXocHHUVgs7un0YwQAPwcNRZoBomULgZJzpvQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779321616; c=relaxed/simple;
-	bh=JLAI1uRWMkpuZB+Em5Kq79cn5TizB/UaipVZKu47EVo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SshbjO8wLALJ1pOoX+DOQrv2MvS48pQq/Yjgxfnyp+DHDvLI4USbhXYsfkYxPp1VC+CGY5tRrtXomhL5qTXNIMABZ7AQbODemi65Eu1Sjhhwwkip/7Le67IU1BjC5G+Dcf7lbDzJOfKteF8XOCo7ATiLurrVHgJqu4jQ005Kk34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BF6NWsME; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996631F000E9;
-	Thu, 21 May 2026 00:00:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779321615;
-	bh=HVm8tc0PebIx1kMEfESFSYNBtkiOfB9asJ+ZOPtlzWc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=BF6NWsMEb0xoctnJX1F0zQ5lbd5QUFj9Sm0DaFNP+iGov1ivDf0M6CSCgL0Xlqfxy
-	 RZ+OkiPiDvK+CCgySuRM4D2nBfs1eEcBsmn0CFV3fSLmWP3paFw54vWackGIRAOiYN
-	 muPfC4IQgokXsM6ughVSN/RlTb9dOvBSD8uYu25CmY23vJs23vFL8f7DCeY80Pb6/d
-	 el3an51ra9fVyHN4X820rB0n50paSkjP1bWp5oQsr+tuo/ij+fuCr9kDYnMXd+MyuI
-	 TxXkleGAxNDy1l0tqvydgam0ipDdP12EeChWe3CEM4M4iFrjTwbK82rxm9+ryxYnHm
-	 lHOw8v2Gcycdw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19C173930C25;
-	Thu, 21 May 2026 00:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1779321921; c=relaxed/simple;
+	bh=BbtGjjmeI2nVsSBJfqYLmKm3sQ2wmIxqjbeHSi9rv+A=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Hi6azPweE3/TkWg6chxnaO4YO/rLGGyC0ZqrNtHwi7HJKHCZqkje7YzwULnQnwR0fxCt2U7vBDvMalC665MRrGZDZYxg01Xs069w3fqck9fGMUHIQF8aifPYysh0uk/qX9vZrPCspPWfonRYO+Gl2Zk7JJswM4M9HLvfBwymcLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qgjvGo5D; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7bd9f61458eso40118017b3.0
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 17:05:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779321918; x=1779926718; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W4bH0PWwVzIcDIt4+BnyuzrmluUQcP68Q7Zx7vTal4I=;
+        b=qgjvGo5DQZcfdXg2G8z4VJQW8GFXwVJm1jmYgoM0uHpewOTkVKDK4rbTjNEG8NdS2d
+         QZ5dFje1OVRpTXJcplj9g81EomQrO3H2AsPnNOEJXmTzCFF5+cDgWKUTTMMlO5H407BT
+         mfo/Rq/YZlBTizeafQweDV0ZHa+6jeYdo6MumZ7epnerdXsKGKZ0HVPtJ/vAYZkAK11n
+         Z/tFxOhM5bQJsmknUNBBl7KlkuflVMHWsvz8dzeRa8BPUbiMKNE7ykDJH3tJWA/YpzpG
+         KAZw2GXQ2irOJuWJi/htqSmTjfTujYWyU/DmawAaYHPQvasfIN+Y8wuTOE+LkjQUsSl5
+         BgfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779321918; x=1779926718;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W4bH0PWwVzIcDIt4+BnyuzrmluUQcP68Q7Zx7vTal4I=;
+        b=MYFcS5v/J0EgRFKCufnv/YbfdrSQjw7l5ddUeyMRyB0AmPjHxSW4jijm6mcRbuTRr5
+         Uy3ULTRhXxyWRHbEqWjcr969cpMr88JRSTC1LW9Bplh5FRlPmCpWdXj6fX06djpkN+ng
+         CtG1fWU1AItn2cMOsZHAmlzXrv7eqWMB7pOmm/PV+KeFKq7BUSZAryx1S/kS3RKyV0lr
+         qbVfKgmwXpEXg9NZt7IhGA3QfackLt25uZz52hJOIi59sfXWiN267iMKgTki0zQE6O49
+         j16Uid4RsCfC0ZwBQaJkGsUdV2sOoBWYVBBtp84HYwzVU1ULO+NlH20PsI3Ix+H0uqHm
+         UZCg==
+X-Forwarded-Encrypted: i=1; AFNElJ//2C/Sp6x2OCSCTd41uDuTZWBIVQrbMyRxd0xj1Su0IXaJm4BcDv/6+l93RMQJUBdMKT3zO/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywx2o8jw+JL5UWD8ne7frLJtRbIz0aGkiWkF+QDs+/dV/L5XeuO
+	zNxWjVbjwMrwYGt9yE7taakoUwAxbG+UdIrgmrRpSyXxc2OwRWVjA+rC
+X-Gm-Gg: Acq92OEUfoiBXPlJtr4CJNUAe8hOi7/GBhU3dfKdHiMCgJdwOz3vKuVzKxcihINcfdG
+	+tpzH7YjLa5ArXMzJaN9kJKiM88x0xm9TWmyZ4rhM9PANFxrUN/fE9ch3miwtFKaG6hGA5o22nS
+	X/pdnRDugWeaQcW6ki6WSiPCHqrtDeiiu31mVm3Rea0oKsnPPuXiWMqEYUSQUdNazyslfFyADyC
+	0S52lDwTcYG0yBUaZYeD3lWI6Jv1Bh2Nq0UO8IODUAjXXkzGhbZ/xitYn4eFdYZDH+gTyATAeq6
+	iKcDFOxF35BLx3ylc65ih71bsGHY6UhBGNGCcia+/FaryhwHY21SJPq6GwlbyfJYehYG9+IF9B5
+	T/gXL8H2c5d1kT4Ip187LcL1PDbVKcT7Dh8PLI/wMwJG6Zn6IC2tZW8S74irwgv9gE1B9Hmc8mo
+	RAtRi2rUqse5ZX6cehrLPSzvObvpofXJqEcYEIw6dMbi91qDhpdGWKqgDSjev1QCVkqclflzSNk
+	RJA
+X-Received: by 2002:a05:690c:9b08:b0:7d0:4824:6411 with SMTP id 00721157ae682-7d20dff3867mr7208317b3.47.1779321917557;
+        Wed, 20 May 2026 17:05:17 -0700 (PDT)
+Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc991c9aefsm59495767b3.9.2026.05.20.17.05.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 17:05:17 -0700 (PDT)
+Date: Wed, 20 May 2026 20:05:16 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Weiming Shi <bestswngs@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com, 
+ pabeni@redhat.com, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ dongli.zhang@oracle.com, 
+ xmei5@asu.edu, 
+ linux-kernel@vger.kernel.org, 
+ Weiming Shi <bestswngs@gmail.com>
+Message-ID: <willemdebruijn.kernel.28580e8a2708a@gmail.com>
+In-Reply-To: <20260520160020.375349-2-bestswngs@gmail.com>
+References: <20260520160020.375349-2-bestswngs@gmail.com>
+Subject: Re: [PATCH net] tun: free page on short-frame rejection in
+ tun_xdp_one()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] net: phy: realtek: support MDI swapping for
- RTL8226-CG
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177932162564.3801238.2549776951847746974.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 00:00:25 +0000
-References: <20260516190456.387768-1-jan@3e8.eu>
-In-Reply-To: <20260516190456.387768-1-jan@3e8.eu>
-To: Jan Hoffmann <jan@3e8.eu>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- daniel@makrotopia.org, markus.stockhausen@gmx.de, dam.dejean@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290150-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,makrotopia.org,gmx.de,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,kernel.org,google.com,oracle.com,asu.edu,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-290151-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C73A459D32B
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BCF3559D26E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 16 May 2026 21:03:45 +0200 you wrote:
-> Add support for configuring swapping of MDI pairs (ABCD->DCBA) when the
-> property "enet-phy-pair-order" is specified.
+Weiming Shi wrote:
+> tun_xdp_one() returns -EINVAL on a frame shorter than ETH_HLEN without
+> freeing the page that vhost_net_build_xdp() allocated for it.
+> tun_sendmsg() discards that -EINVAL and still returns total_len, so
+> vhost_tx_batch() takes the success path and never frees the page; each
+> short frame in a batch leaks one page-frag chunk.
 > 
-> Unfortunately, no documentation about this feature is available, but
-> this implementation still tries to avoid magic numbers and raw register
-> numbers where it seems clear what is going on.
+> A local process that can open /dev/net/tun and /dev/vhost-net can hit
+> this path: it attaches a tun/tap device as the vhost-net backend and
+> feeds TX descriptors whose length minus the virtio-net header is below
+> ETH_HLEN. Each kick leaks the page-frag chunks for that batch, and a
+> tight submission loop exhausts host memory and triggers an OOM panic.
+> Free the page before returning -EINVAL, matching the XDP-program error
+> path in the same function.
 > 
-> [...]
+> Fixes: 049584807f1d ("tun: add missing verification for short frame")
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> ---
+>  drivers/net/tun.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index b183189f1853..f594360d66d6 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -2394,8 +2394,10 @@ static int tun_xdp_one(struct tun_struct *tun,
+>  	bool skb_xdp = false;
+>  	struct page *page;
+>  
+> -	if (unlikely(datasize < ETH_HLEN))
+> +	if (unlikely(datasize < ETH_HLEN)) {
+> +		put_page(virt_to_head_page(xdp->data));
+>  		return -EINVAL;
+> +	}
 
-Here is the summary with links:
-  - [net-next,v4] net: phy: realtek: support MDI swapping for RTL8226-CG
-    https://git.kernel.org/netdev/net-next/c/0765570f330f
+Make sense, thanks.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The error path from tun_xdp_act does the same. And the default: label
+used to too, before a batching optimization was introduced.
 
+Is the same then also missing if build_skb fails?
 
 
