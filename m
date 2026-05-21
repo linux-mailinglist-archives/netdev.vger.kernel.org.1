@@ -1,346 +1,242 @@
-Return-Path: <netdev+bounces-290566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290564-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFJADEJBD2qcIQYAu9opvQ
-	(envelope-from <netdev+bounces-290566-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:30:42 +0200
+	id AETiEEpAD2qcIQYAu9opvQ
+	(envelope-from <netdev+bounces-290564-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:26:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 838A05AA47F
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:30:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3BB85AA336
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB8533033F94
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:02:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE8523045DD8
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E1D3C871E;
-	Thu, 21 May 2026 17:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52967385D6B;
+	Thu, 21 May 2026 16:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6r1l/l/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FAaxIeCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB9B30E821
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 17:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5CA384CED
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 16:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779382969; cv=none; b=atobDCL7FOqKgqUs/ddfdslqJ+/JVCkD2//g0uUhwfCgMCu2Rv5Ic+QCE/NAxz+A5PAtutW1+ZYIULF6sB/3mX+lLCa1l2hHxUmjX5EAxVpSYPRHg9UkfZ0m7XMq6xq3TD0GosaFnKcOOXv0BZtO9E2ULi9elBv8A60QpceLhCY=
+	t=1779382448; cv=none; b=SUnoZaz3dh9toANiVpiiWCyWjePTXLAEk3VKqsu9KLVXpInEaL1l5h9n5gK5lNzyR+RpFo/Z3mffxHrOqnHymDx4GOfNU2LX+8sDuCBIeja56655oIZ/CMVmU5KSqjoTf6rD2qBpNFQdF65mQngqnM3mzaMcpW6K6BewOM2zHMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779382969; c=relaxed/simple;
-	bh=zx9iqLN9zmh++r23XiPtByTx7CLtzJ7HqXlS3Lo3u7M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=B1kZT2qnu8GKZKQ2Y6jyLN2SCNjFIKqMcF8AzyIBWh/RlWm10mA1CBwLQFxUK9Zyi8duUZJmH7tlvwpVIiOHiEXtyH9qlS/5T3InBcrgsDxUEmmTY7UhWZHxXUdsJyLdocqyubtAWjE03HLQNy1BQRg6h/mINxbHVTA0Qvlckkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U6r1l/l/; arc=none smtp.client-ip=74.125.224.50
+	s=arc-20240116; t=1779382448; c=relaxed/simple;
+	bh=jepHYHDTa1oN1HMbzfjCFYecBgYw0CAbnE+uP9SC7wQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dvBme7Q7Prh4dQhCFM5VSUOJ0VjvdhzYKW1MK/Vxio5Cbxj7jWgRK6RWG9UQAkKUM5UIPFAKHhBUUyKYwmyDBCbLKE1N65uZw1wyk+Ca7t01CEHNtEZm2hIF0CAqQPdvPQpE8QUGEOFzUtmzeeJFlKbW5EszftkJ3PREPc2N0P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FAaxIeCY; arc=none smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-65c6a2158d3so4650658d50.3
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 10:02:48 -0700 (PDT)
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3684a6f3b0bso3220618a91.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:54:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779382967; x=1779987767; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0B8qDAE2Hi4K54lFJwvYiq6K8A1ngqWVMdmiVrD5B7k=;
-        b=U6r1l/l/pgu0L3g+Isqnd1Wati3cftc6RKz2p2YiVi/e06muplMRMg/8/Wgvh4CF8b
-         5A5pBOs6awqO01v2bIg2pTL1nVFIuw5oC9tPPuKwPHsj2MGINawcbFvuXJuDGJds09Zl
-         J3VAmGPK/ywgAxq8448ZArgh0YSPVoMCtijk8RFJtSfSqTqqFWvp+Cfs35V/ALRWBivr
-         hp/H8TC33s40sBlG7KmmxMqjJXTAUtHNSfaQGRNkEzsg8xW7UhtV3wXRk3CtNBVz3XUZ
-         JkiBGdzIqUZj8J+l2dDNxrK8B8wJuMDDljZBRO/rB6oCXhSXTGvJGN0OIFsESHP+wAyp
-         lQMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779382967; x=1779987767;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779382446; x=1779987246; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0B8qDAE2Hi4K54lFJwvYiq6K8A1ngqWVMdmiVrD5B7k=;
-        b=raNTcM4dZhlWiOsO+plnwd76cSYPGTzzdwbnnXGdRHvBx8ReyujWdWo+0f2iRh7a+4
-         932tt5PWjL6DqYpjvZdETeN7n95cj5eVw6vxtVmy2kOJUNXVyRjTxUaKRFlk+ExlE+gu
-         gKeiCdKm46Dsh1B+6qLtMxsmyJK4KtnKaMvS9Bn2a3rssW3gKh55RYyzVQovUDU3wwjH
-         jO5xqCWsZLSxJq75UzfAdby53+H2dq9pwjtr4OleH4Q/pj0jrCP80FRdyHMahckRm79L
-         hjYpdOILrkfSqbThm2OHl3S5escb1rNFTnaGbnuecl7MlpbBHQZBOz2LbXg/T9jjRLOz
-         slyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+l8RhN7ViIBCdoiKw3a8aYC3H4S8CsN3+Pq1JdRJKPKavJ8b1w6/EI29bruzZAKPsPEpkJjl4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL3l2UxMoijt1uEtuHulWLHY3aC0Q7Rq9Zi0fFrMIqHVu+4uRJ
-	71L5gcrk9+oB+lcR+Mqj0/KZYR9rgFcIaXZUnmP7EW2SNdKV4/jSWRIE
-X-Gm-Gg: Acq92OEZb/y9Aw0zg+putNOa/LY2q4rAFmof/HL8fUQP2Uw7UH0VSFOboQLV7nxdPYq
-	uk52+zVOuOUTsG8U5fOzqD5aTxyYocJmXrz0UXaSYw3nOzyrUTzB3foRkHxVp/BHwlyLyq1WM3y
-	uLsOGr8h+uhwhnfJCU6eWRRsfq/t0WbXGD1swETFMdJpLX73SWn2MBz3mQGKKrC8yy/pHGKdSUk
-	YtOfEeGyp799QsH5M3E3SIAX2GXEhU9voxQDhYs0h1EmwnvErxlaG5TCMyXZU8oVnsqm3s5IrEl
-	RUUr0j9sZ7cyO4sDULtx/LtDyY2k2bYs4QT+3u38qAtCGRncfCInMUY0YtibQwppwc4feNrhymC
-	xXC05kibyGmHaosX+AAgF3BBOpEskzhV4Uy3bajRrgjCGh9f4U84eUreknB4tq6o/iMXFT7ydUN
-	zh7tEnS9wJT0/+JurMOQSL0xKUc1WNFA==
-X-Received: by 2002:a05:690e:440b:b0:65e:41a4:54ca with SMTP id 956f58d0204a3-65eae2b3fb9mr2406856d50.62.1779382966868;
-        Thu, 21 May 2026 10:02:46 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:55::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65ec1eea6d3sm430363d50.13.2026.05.21.10.02.46
+        bh=TZ3hB279QEnpQbR0KFTvz97dZDE5pAQRU4AviwCKwk8=;
+        b=FAaxIeCYupyrzk95ZLGtkoFnGrKNyKkU1ZQj52wFlciQ6rMgrso8dHO/vMrxEV6fk/
+         /eW3wwQTMrUtydKY2SVHIX2P6vyu55gKCLbBpjW+oR/c5+nBWJhwN0/gqamRZhUNG/Ad
+         +P+XvVKd8XcT44tLDId5tDl1JMmiSK3uANkqyTXNRzJ39yPila5ilxbs+h+2SmHcfz21
+         cC1pcTZ93dgzE/cxzPGAE6syC9dl2+x6ly1/X8NEm1a8FNDwKpf2S2B12lu3QeZBldUI
+         MlA9QNUhk+cgJllTSwzXYdMNlsf3Spcg3QKgStf5WI3+uXqCckozyGgZQ54t+xgEwRmm
+         mbEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779382446; x=1779987246;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TZ3hB279QEnpQbR0KFTvz97dZDE5pAQRU4AviwCKwk8=;
+        b=ETTeXkBe23rxHFbRya5rUvuIjkE60qO51jGgvf7SHP18bXKr5zSwLmZctX+ENx+8RU
+         wlhocW1irSh0nmj7u4dWTvOOCH0Nd8JJQbnAwPX0ZEHxrU1wRWcZMiymPaXTGNm8jFKV
+         YvtEEB46rVKz8jtI70XH7lCY9ngM1o5LY1QKhHM6zU2GUM91ZkHzhYrOhBFWRPwyJmGg
+         K83ghHTyExpsdX4It+6mfxLrGvgjKVaWsGaEH8dbYhO/vRZZFVQoJJHJK4NfrNBgL+EH
+         42uHQluvKDNjc4JEbz1mZ98Ggh5Mgi92RXXOGAhw9U5x4AFIwwCw7NPc79bb9D4EH8OZ
+         PQyw==
+X-Gm-Message-State: AOJu0Ywu0EJzxiFO7BcKoarylZKOWOPPGGkRg+67OQ0ziqsbLWV9yvVZ
+	72pEGhiiTowwYGsD+JNRO1eyGyEzukkT37HkSIP6VLT6QgmkLUJNjaOy7bXN/Gij
+X-Gm-Gg: Acq92OFCrR07gyhCwqRZJ0k/cDoke6EO0CUYhl9IO15lc/8cJffNiF6ntPbK6t0QwAZ
+	A8nVua3AeBO1ySBwqOnWKDBc8esfyAXSc4dd/pm53WaFGvZ0vzovd97CZ5ewXDgHN2+sjfwyxv6
+	Z2q74o9nZSTeHvJG5gD8In+r7iHrrHIQSU60YCAAHW3DhBFE7kWsvqrRLXQFe2OEOPpcuPITZki
+	SHpQt2u+fvMnGY7jr7LqliivZ4EO3YFHPzrzCu9cQoqpb/OJEaY74+BJ5IOuNJEFSl6h7RcTgcU
+	IMqIKTUdPnyFNABJiAAfMkRqK1QNL1QXKDIU+RdbMsbvKHw1djoPHrBt5EqCiHlT5aMJOGN9mqn
+	ZIigYwJ4L3YjVyjGPKOZFe0e3lyB9T7oc5k6o4w6SBFpvYP/SIOZuL5RCpJnu4uL8UxJvgyAGNw
+	y4XS3IqvYKwpO3dumM/6ANIcow
+X-Received: by 2002:a17:90b:2fc6:b0:35b:d795:cf5d with SMTP id 98e67ed59e1d1-36a49029ebamr2766601a91.5.1779382446154;
+        Thu, 21 May 2026 09:54:06 -0700 (PDT)
+Received: from paeyz.Davolink ([49.172.60.165])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a3d2079bbsm2955723a91.15.2026.05.21.09.54.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 10:02:46 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Thu, 21 May 2026 09:51:33 -0700
-Subject: [PATCH net] eth: fbnic: move aui and fec from fbnic_net to
- fbnic_dev
+        Thu, 21 May 2026 09:54:05 -0700 (PDT)
+From: Yeonju Bae <iwasbaeyz@gmail.com>
+To: netdev@vger.kernel.org
+Cc: gregkh@linuxfoundation.org,
+	security@kernel.org,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yeonju Bae <iwasbaeyz@gmail.com>
+Subject: [PATCH net] tls: avoid zc receive for file-backed pages
+Date: Fri, 22 May 2026 01:53:28 +0900
+Message-ID: <20260521165328.16112-1-iwasbaeyz@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <2026052150-stylus-germicide-780e@gregkh>
+References: <2026052150-stylus-germicide-780e@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260521-fbnic-aui-change-v1-1-fc0c46e8e682@meta.com>
-X-B4-Tracking: v=1; b=H4sIABU4D2oC/y3MTQqAIBAG0KsM3zqh7I+8SrQwnWo2FloRRHcPo
- vWDdyNxFE4wdCPyKUnWAENFRnCLDTMr8TAEnesmr4tSTWMQp+wh6vdKW9dpb0vfVsgIW+RJrq/
- sEXjH8DwvgxbgZWcAAAA=
-X-Change-ID: 20260513-fbnic-aui-change-42ac92da3d74
-To: Alexander Duyck <alexanderduyck@fb.com>, 
- Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>
-Cc: Mohsin Bashir <hmohsin@meta.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290566-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,gmail.com,queasysnail.net,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290564-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[iwasbaeyz@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,meta.com:mid,meta.com:email]
-X-Rspamd-Queue-Id: 838A05AA47F
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A3BB85AA336
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+kTLS RX zc decrypt writes unauthenticated AEAD output directly into
+pages pinned from the recvmsg iterator via tls_setup_from_iter().
+For MAP_SHARED, PROT_WRITE file-backed destinations, those pages are
+live page-cache pages rather than anonymous copies: MAP_SHARED does not
+trigger copy-on-write, so FOLL_WRITE returns the actual page-cache page.
 
-fbnic_mdio_read_pmd() reaches through fbd->netdev to netdev_priv() in
-order to read fbn->aui:
+crypto_aead_decrypt() writes CTR-mode decryption output into the
+scatter-gather list before the authentication tag is verified.  If the
+tag check fails (-EBADMSG), the plaintext-like output is already
+resident in the page-cache page.  exit_free_pages() calls put_page()
+without any content cleanup, so the modification persists through the
+backing file.  An independent open(O_RDONLY)/read() of the same file
+returns different content and its SHA-256 changes.  MAP_PRIVATE is safe
+via COW; PROT_READ-only destinations fail at iov_iter_get_pages2()
+before any decryption occurs.
 
-	if (fbd->netdev) {
-		fbn = netdev_priv(fbd->netdev);
-		if (fbn->aui < FBNIC_AUI_UNKNOWN)
-			aui = fbn->aui;
-	}
+Avoid zc receive for file-backed destination pages.  In
+tls_setup_from_iter(), after iov_iter_get_pages2() pins pages, check
+each page with folio_mapping(page_folio(page)).  If any pinned page is
+file-backed (mapping != NULL), release the pinned pages and return
+-EOPNOTSUPP.  Handle -EOPNOTSUPP in tls_decrypt_sw() by clearing
+darg->zc and retrying, which causes tls_decrypt_sg() to allocate a
+kernel bounce buffer instead.  Decryption output never reaches the
+file-backed page; on tag failure the bounce buffer is discarded.
 
-This can lead to a TOCTOU bug where fbd->netdev is checked after being
-freed but before being cleared.
+This follows the existing opportunistic zc retry pattern already used
+for TLS 1.3 record type mismatches in tls_decrypt_sw().
 
-Both aui and fec describe the link configuration of the NIC, so move
-them to fbnic_dev together. The MDIO layer (and other fbd-level code)
-can read them directly without bouncing through fbd->netdev. The
-hazardous accesses through fbd->netdev are dropped.
+Verified on linux-7.0-rc3 QEMU (x86-64), four destination types:
+  MAP_SHARED+RW:   file_changed=0  (was 4077/4096 bytes before patch)
+  MAP_PRIVATE+RW:  file_changed=0  (COW isolation; unchanged)
+  anonymous heap:  no file backing  (unchanged)
+  PROT_READ only:  file_changed=0  (EFAULT before decrypt; unchanged)
 
-Fixes: d0ce9fd7eae0 ("fbnic: Add SW shim for MDIO interface to PMD and PCS")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+Signed-off-by: Yeonju Bae <iwasbaeyz@gmail.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic.h         |  3 +++
- drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |  2 +-
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c     |  3 +--
- drivers/net/ethernet/meta/fbnic/fbnic_mdio.c    |  9 ++-------
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |  3 ---
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c | 18 ++++++++++--------
- 6 files changed, 17 insertions(+), 21 deletions(-)
+ net/tls/tls_sw.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-index d0715695c43e..76cfaf77b5ef 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-@@ -88,6 +88,9 @@ struct fbnic_dev {
- 	unsigned long end_of_pmd_training;
- 	u8 pmd_state;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index a977b0434..c312a83b4 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -36,6 +36,7 @@
+  */
  
-+	u8 aui;
-+	u8 fec;
+ #include <linux/bug.h>
++#include <linux/pagemap.h>
+ #include <linux/sched/signal.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+@@ -1443,6 +1444,34 @@ static int tls_setup_from_iter(struct iov_iter *from,
+ 
+ 		length -= copied;
+ 		size += copied;
++		/* Reject file-backed destination pages.  Writing unauthenticated
++		 * AEAD output into a page-cache page before tag verification
++		 * leaves the backing file modified even when recvmsg() returns
++		 * -EBADMSG.  Return -EOPNOTSUPP so the caller retries via the
++		 * non-ZC bounce-buffer path.
++		 */
++		{
++			ssize_t remain = copied;
++			size_t  off    = offset;
++			int     np = 0, j;
 +
- 	/* Local copy of hardware statistics */
- 	struct fbnic_hw_stats hw_stats;
++			while (remain > 0) {
++				remain -= min_t(ssize_t, remain,
++						(ssize_t)(PAGE_SIZE - off));
++				off = 0;
++				np++;
++			}
++			for (j = 0; j < np; j++) {
++				if (folio_mapping(page_folio(pages[j]))) {
++					int k;
++
++					for (k = 0; k < np; k++)
++						put_page(pages[k]);
++					rc = -EOPNOTSUPP;
++					goto out;
++				}
++			}
++		}
+ 		while (copied) {
+ 			use = min_t(int, copied, PAGE_SIZE - offset);
  
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-index 5e383d40abc7..03dbb53b33d9 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-@@ -132,7 +132,7 @@ static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
- 	fbn = netdev_priv(fbd->netdev);
- 
- 	/* Record link down events */
--	if (!fbd->mac->get_link(fbd, fbn->aui, fbn->fec))
-+	if (!fbd->mac->get_link(fbd, fbd->aui, fbd->fec))
- 		phylink_pcs_change(fbn->pcs, false);
- 
- 	return IRQ_HANDLED;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index 53b7a938b4c2..e911dbf41b46 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -515,7 +515,6 @@ static u32 __fbnic_mac_cmd_config_asic(struct fbnic_dev *fbd,
- 	/* Enable MAC Promiscuous mode and Tx padding */
- 	u32 command_config = FBNIC_MAC_COMMAND_CONFIG_TX_PAD_EN |
- 			     FBNIC_MAC_COMMAND_CONFIG_PROMISC_EN;
--	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
- 
- 	/* Disable pause frames if not enabled */
- 	if (!tx_pause)
-@@ -524,7 +523,7 @@ static u32 __fbnic_mac_cmd_config_asic(struct fbnic_dev *fbd,
- 		command_config |= FBNIC_MAC_COMMAND_CONFIG_RX_PAUSE_DIS;
- 
- 	/* Disable fault handling if no FEC is requested */
--	if (fbn->fec == FBNIC_FEC_OFF)
-+	if (fbd->fec == FBNIC_FEC_OFF)
- 		command_config |= FBNIC_MAC_COMMAND_CONFIG_FLT_HDL_DIS;
- 
- 	return command_config;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-index fe3a4ce88413..b571d4e3f36d 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-@@ -5,7 +5,6 @@
- #include <linux/pcs/pcs-xpcs.h>
- 
- #include "fbnic.h"
--#include "fbnic_netdev.h"
- 
- /* fbnic MDIO Interface Layout
-  *
-@@ -54,18 +53,14 @@ static int
- fbnic_mdio_read_pmd(struct fbnic_dev *fbd, int addr, int regnum)
- {
- 	u8 aui = FBNIC_AUI_UNKNOWN;
--	struct fbnic_net *fbn;
- 	int ret = 0;
- 
- 	/* We don't need a second PMD, just one can handle both lanes */
- 	if (addr)
- 		return 0;
- 
--	if (fbd->netdev) {
--		fbn = netdev_priv(fbd->netdev);
--		if (fbn->aui < FBNIC_AUI_UNKNOWN)
--			aui = fbn->aui;
--	}
-+	if (fbd->aui < FBNIC_AUI_UNKNOWN)
-+		aui = fbd->aui;
- 
- 	switch (regnum) {
- 	case MDIO_PMA_RXDET:
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index eded20b0e9e4..213253a818bb 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -46,9 +46,6 @@ struct fbnic_net {
- 	struct phylink_config phylink_config;
- 	struct phylink_pcs *pcs;
- 
--	u8 aui;
--	u8 fec;
--
- 	/* Cached top bits of the HW time counter for 40b -> 64b conversion */
- 	u32 time_high;
- 	/* Protect readers of @time_offset, writers take @time_lock. */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 09c5225111be..61463bcb6431 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -65,6 +65,7 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
- 					struct ethtool_link_ksettings *cmd)
- {
- 	struct fbnic_net *fbn = netdev_priv(netdev);
-+	struct fbnic_dev *fbd = fbn->fbd;
- 	int err;
- 
- 	err = phylink_ethtool_ksettings_get(fbn->phylink, cmd);
-@@ -72,7 +73,7 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
- 		unsigned long *supp = cmd->link_modes.supported;
- 
- 		cmd->base.port = PORT_DA;
--		cmd->lanes = (fbn->aui & FBNIC_AUI_MODE_R2) ? 2 : 1;
-+		cmd->lanes = (fbd->aui & FBNIC_AUI_MODE_R2) ? 2 : 1;
- 
- 		fbnic_phylink_get_supported_fec_modes(supp);
+@@ -1699,6 +1728,14 @@ tls_decrypt_sw(struct sock *sk, struct tls_context *tls_ctx,
+ 	if (err < 0) {
+ 		if (err == -EBADMSG)
+ 			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSDECRYPTERROR);
++		if (err == -EOPNOTSUPP && darg->zc) {
++			/* tls_setup_from_iter detected file-backed destination
++			 * pages; retry without ZC via the bounce-buffer path.
++			 */
++			darg->zc = false;
++			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSDECRYPTRETRY);
++			return tls_decrypt_sw(sk, tls_ctx, msg, darg);
++		}
+ 		return err;
  	}
-@@ -84,11 +85,12 @@ int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 			       struct ethtool_fecparam *fecparam)
- {
- 	struct fbnic_net *fbn = netdev_priv(netdev);
-+	struct fbnic_dev *fbd = fbn->fbd;
- 
--	if (fbn->fec & FBNIC_FEC_RS) {
-+	if (fbd->fec & FBNIC_FEC_RS) {
- 		fecparam->active_fec = ETHTOOL_FEC_RS;
- 		fecparam->fec = ETHTOOL_FEC_RS;
--	} else if (fbn->fec & FBNIC_FEC_BASER) {
-+	} else if (fbd->fec & FBNIC_FEC_BASER) {
- 		fecparam->active_fec = ETHTOOL_FEC_BASER;
- 		fecparam->fec = ETHTOOL_FEC_BASER;
- 	} else {
-@@ -96,7 +98,7 @@ int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 		fecparam->fec = ETHTOOL_FEC_OFF;
- 	}
- 
--	if (fbn->aui & FBNIC_AUI_MODE_PAM4)
-+	if (fbd->aui & FBNIC_AUI_MODE_PAM4)
- 		fecparam->fec |= ETHTOOL_FEC_AUTO;
- 
- 	return 0;
-@@ -120,7 +122,7 @@ fbnic_phylink_mac_prepare(struct phylink_config *config, unsigned int mode,
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 	struct fbnic_dev *fbd = fbn->fbd;
- 
--	fbd->mac->prepare(fbd, fbn->aui, fbn->fec);
-+	fbd->mac->prepare(fbd, fbd->aui, fbd->fec);
- 
- 	return 0;
- }
-@@ -140,7 +142,7 @@ fbnic_phylink_mac_finish(struct phylink_config *config, unsigned int mode,
- 	struct fbnic_dev *fbd = fbn->fbd;
- 
- 	/* Retest the link state and restart interrupts */
--	fbd->mac->get_link(fbd, fbn->aui, fbn->fec);
-+	fbd->mac->get_link(fbd, fbd->aui, fbd->fec);
- 
- 	return 0;
- }
-@@ -227,10 +229,10 @@ int fbnic_phylink_create(struct net_device *netdev)
- 	__set_bit(PHY_INTERFACE_MODE_25GBASER,
- 		  fbn->phylink_config.supported_interfaces);
- 
--	fbnic_mac_get_fw_settings(fbd, &fbn->aui, &fbn->fec);
-+	fbnic_mac_get_fw_settings(fbd, &fbd->aui, &fbd->fec);
- 
- 	phylink = phylink_create(&fbn->phylink_config, NULL,
--				 fbnic_phylink_select_interface(fbn->aui),
-+				 fbnic_phylink_select_interface(fbd->aui),
- 				 &fbnic_phylink_mac_ops);
- 	if (IS_ERR(phylink)) {
- 		err = PTR_ERR(phylink);
-
----
-base-commit: 8ebd24a7822cbae25beeafba49b2159d6a68a5f2
-change-id: 20260513-fbnic-aui-change-42ac92da3d74
-
-Best regards,
+ 	/* keep going even for ->async, the code below is TLS 1.3 */
 -- 
-Bobby Eshleman <bobbyeshleman@meta.com>
+2.43.0
 
 
