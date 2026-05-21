@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-290516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290517-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEb5OqgxD2pSHgYAu9opvQ
-	(envelope-from <netdev+bounces-290516-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:24:08 +0200
+	id GFrXH2gfD2p2GAYAu9opvQ
+	(envelope-from <netdev+bounces-290517-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:06:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A245A9346
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:24:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B9B5A7E87
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:06:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A648331F7C6B
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:52:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 280B330C2E7A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631BD367F4A;
-	Thu, 21 May 2026 14:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595C2368D7B;
+	Thu, 21 May 2026 14:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oII1NBAu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fLGnbwh6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3207E365A0B;
-	Thu, 21 May 2026 14:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D873672A0;
+	Thu, 21 May 2026 14:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779375009; cv=none; b=iqkw1Jw6PZCJRpaB72Jt4QjzXXTg3trCjNvl8GXLPya8jt7fL/zcQAgz+M0RgBCtMDyoXhu4gWBpuubfJ4i2pNq67Zn2T8fCkYQ9UnY2dqpT72oWmBEbEWk8Trq5dq4/Z+wkFzeLGNDR5TSdH7w1fCXgyaNL08A1JzwTB5v3mkI=
+	t=1779375010; cv=none; b=spNtOfrozq/p/PIB+shlpkMTHAJk8XR9TXYQxoiTJihfOPi6aiRwNd/74CvD5+e7Ur/eyQRRdXdVNhjYEf0vLx3WD0TtKLygZRT9vKnPkjKfnwqCgd4SMv9ZYAIYcX5OoprabDwU3jSbaF4cFiToXKUcTteOcW8lRcg9SaLCpHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779375009; c=relaxed/simple;
-	bh=kr5DCfDLze2bL0bMq4RX8rk/tZWf0JchX0ei7zNmgtM=;
+	s=arc-20240116; t=1779375010; c=relaxed/simple;
+	bh=tUtxi5DlEmbVARemvyZLQDWA8Nsa3EvQzxQUHSKuRXQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Elop2lhyFi4t6av7BP2k9yNK2ymjCg1fpPEH03S695D7LJ793M8IviFGhf0n6Rg7pPTiJ/DVsObUhuNH/aRLSicYityq+ETWXavbxGHJqp8CrGZiw2Ly0xeWS4eYT3jWKeDZxlOlv/tcsyD/d2wHjfxqkfOI+tW5DZVysyzIkvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oII1NBAu; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B92061F000E9;
-	Thu, 21 May 2026 14:50:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=VmCFS/GJjmhSbdqpjHCBfnnWVA6g4AfeHkR0vZyzJ/w1J+j0s2eFIRbgmZ2iGQE+0+xv9noKPwyIuw3fzCY5we1F6QsGPUzAfGHb0sR3o9FBXjfDediarv1iNyC9WXOLMh/Adj2oTc0OcNrLYcuTPrsOCSn9JoW2KYJh7Srt7Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fLGnbwh6; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED1A1F00A3B;
+	Thu, 21 May 2026 14:50:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779375007;
-	bh=3YfRdDSvMV6JRnlKEL6wB1iZXSalX1399J5l7yHyJ3o=;
+	s=k20260515; t=1779375008;
+	bh=9kAzeAobd1QwVu+ZPC4IJRv2fFhtnZ43FHryBfTepSc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=oII1NBAuoDXfGG5kMu6uesLvs3gxeEtQKu8nFHOVu+O5EHnygAzyPZeO5o2r6B1cL
-	 EkBAT3tZnrykUpi2zBl1dt/9hByBD15S1QkCKP01EtBP1KFXBJjjv+vBzZaRM/moxO
-	 qges17ZOSvGtzZ5klb6zwL0fXIYzsykFuOmrsvoJD6OeHQxz+l2QfJPBlGdQQwLoeq
-	 AUMfiS5lzMj2Ln0gnzeG2Bb8LwdwgWKq02ZDx6Di1B7kYz6FB4BRiVReMoti8EOQUv
-	 rTgqXrl8INqVGprqJtoheiSjPQ+qysorIWkQ9CFj0HQqw5QACGxfh4AErPIz2ARrPn
-	 t1h4KNMg0hUNg==
+	b=fLGnbwh683QQ/PbkbOuOXMOtebS2D2Ndl7KaL/0qVEPkfbHb6q9Zc19i2jzQOf5O6
+	 cWRYEO09hQLZtq3CI6ll3DSnheCr+/mz+I7kpqKQEX3hAt6pr5AmBkUELxFzIqKV3t
+	 haTAvoxD4UZPBzliak8pbgT9D32Y/yiuD7Bie//c98dq8xECrvHTNVdDX3mJrRfw1n
+	 sAMcCfcPk+0ty5H8fWlkQ0nFwAo3jp9AJW7TYwq4YVAOC41eQwnqxurGQc7NloM5k7
+	 hCE75Vwg2lUpU08YD7Wmv3irKjbK/tQj6xtr2so9tt2z+tD4CVeqKJu1VMrPQlElSI
+	 Pk617Q2eN6RiQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A6D3930DF1;
-	Thu, 21 May 2026 14:50:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 00DEA3930DF1;
+	Thu, 21 May 2026 14:50:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,48 +55,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] phonet/pep: disable BH around forwarded
- sk_receive_skb()
+Subject: Re: [PATCH RESEND] MAINTAINERS: Update address for Michael Grzeschik
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177937501739.361786.17790917589741494228.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 14:50:17 +0000
-References: <20260519172635.86304-1-yzjaurora@gmail.com>
-In-Reply-To: <20260519172635.86304-1-yzjaurora@gmail.com>
-To: Zijing Yin <yzjaurora@gmail.com>
-Cc: courmisch@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <177937501889.361786.10254072888498836799.git-patchwork-notify@kernel.org>
+Date: Thu, 21 May 2026 14:50:18 +0000
+References: <20260521-maintainer-v1-1-29b5e106682d@kernel.org>
+In-Reply-To: <20260521-maintainer-v1-1-29b5e106682d@kernel.org>
+To: Michael Grzeschik <mgr@kernel.org>
+Cc: kuba@kernel.org, mail@markussp.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-290516-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-290517-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 75A245A9346
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 47B9B5A7E87
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -105,27 +101,21 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 19 May 2026 10:26:33 -0700 you wrote:
-> The networking receive path is usually run from softirq context, but
-> protocols that take the socket lock may have packets stored in the
-> backlog and processed later from process context. In that case
-> release_sock() -> __release_sock() drops the slock with spin_unlock_bh()
-> and then calls sk->sk_backlog_rcv() with bottom halves enabled.
+On Thu, 21 May 2026 15:49:29 +0200 you wrote:
+> Since I am moving from Pengutronix update my email address for the
+> ARCNET subsystems to point to my kernel.org address.
 > 
-> Typical sk_backlog_rcv handlers process the socket whose backlog is
-> being drained, so the BH state at entry is irrelevant for the slocks
-> they touch. pep_do_rcv() is different: when the inbound skb targets an
-> existing PEP pipe, it forwards the skb to a different *child* socket
-> via sk_receive_skb(). That helper takes the child slock with
-> bh_lock_sock_nested(), which is just spin_lock_nested() and assumes BH
-> is already off. The same child slock therefore ends up acquired with
-> BH on (process path) and with BH off (softirq path):
+> Also update .mailmap.
+> 
+> Signed-off-by: Michael Grzeschik <mgr@kernel.org>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> Acked-by: Markus Schneider-Pargmann <mail@markussp.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] phonet/pep: disable BH around forwarded sk_receive_skb()
-    https://git.kernel.org/netdev/net/c/dbc81608e3a6
+  - [RESEND] MAINTAINERS: Update address for Michael Grzeschik
+    https://git.kernel.org/netdev/net/c/85fac50b58ca
 
 You are awesome, thank you!
 -- 
