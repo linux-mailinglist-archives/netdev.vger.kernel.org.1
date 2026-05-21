@@ -1,130 +1,154 @@
-Return-Path: <netdev+bounces-290395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290397-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6OpNDPr6DmoSDwYAu9opvQ
-	(envelope-from <netdev+bounces-290395-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:30:50 +0200
+	id ANJ8JCb8DmoSDwYAu9opvQ
+	(envelope-from <netdev+bounces-290397-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:35:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DCAC5A4D9C
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:30:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 109D55A4E74
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDD51309E80A
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:24:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 97FCC3015869
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:28:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B943CF967;
-	Thu, 21 May 2026 12:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88353BE638;
+	Thu, 21 May 2026 12:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sLOUzZvC"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XMAaPR8s"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70033B5F48;
-	Thu, 21 May 2026 12:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58285253B58;
+	Thu, 21 May 2026 12:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779366278; cv=none; b=KdMHDPHdJuP4Yon/Iqu9ioZMKbFspCHiLTK2m8H9rxWORzHyi7qrf7mUkUC6k99sdIacPL6MtqRHeA0wvjs5yB8Exe5JDGJNROVIzfmQEt44FFrEFkxg7nYdPUDYzC39mpo173Laxsi+0jQrgWwLgjBh15C1dfvIlxbHH9kpecs=
+	t=1779366503; cv=none; b=MuhyyJ7xuActsJN3zjkWjHvfiFGHZeaHTcqxArGIHdC9V2Cs7JceRxrP6cc51zZDYA3DAB/24tsGQypjM3/Mzs0UNWAeu29Tgs3pwad+fKBzh2maFPoHalYSsCwV37WGYZ34IiIu1zREYAUorsirbzLabr4QFWdbLwyfy8uo5G0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779366278; c=relaxed/simple;
-	bh=pgR/sfOkC+dxjzDy3Ty4FCZCllfFQJu94UTUwiCulR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dxa6Hped6Z1tn8Tc4WI4b5DcpZ09cZB04NjzMH7XzbOc9IjCgnCMq6hhvQkFYBizACcAjpmIUbPokDn+aDEMxbHrFYvqDVe1SoR+mOS4fU9xw6fGUKZ/wX9+Gkuxx7POhh9b4NhsaRnTXLR88F5Jp+A3vbt4Y8TNCPnADia8KLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sLOUzZvC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6Sq2Ha1ZC8o+rRc7gR1Qy/D/3XJfFdHu8duTVUUw/fQ=; b=sLOUzZvCCAz6CYaKHMGpe2AFD/
-	GrJoU5KRtsxRsew7SdzfePt/+2C7sZigzcmH30yqXDryrfhlTQ2zDn7WCEVUO80qKQqslPu4H7fLu
-	mVcYaY4WpBtvcD4jOLXx4jWSlWR86edXqixhLH+OkOEbBzK45KXs9ozWdItZVvQ9MrRw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wQ2Rm-00411s-2F; Thu, 21 May 2026 14:24:18 +0200
-Date: Thu, 21 May 2026 14:24:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ashwin Gundarapu <linuxuser509@zohomail.in>
-Cc: "anthony.l.nguyen@intel.com" <przemyslaw.kitszel@intel.com>,
-	andrewnetdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>,
-	edumazet <edumazet@google.com>, kuba <kuba@kernel.org>,
-	pabeni <pabeni@redhat.com>,
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>,
-	netdev <netdev@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: e100: replace silent 'hope for the best'
- with debug message
-Message-ID: <db588334-0871-4b83-a020-da8f621816d5@lunn.ch>
-References: <19e49280392.4757403170773.5767589851918809405@zohomail.in>
+	s=arc-20240116; t=1779366503; c=relaxed/simple;
+	bh=yJGmkCw3fBcFklUlcv06Ftia7PXkCASCxi01kumHb2E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X1weAtH7HoeJd/Q+OWigh2qFRvJAW6+uIlUe8wMK+NnhVwn+QXmNcJKmG+n9DZKmoo68vektbDTbIZgvSf8qAq/b39TNpO+gZatPTaIwjDyMRkim0/NyvFHHSE+PoPn2+BkMrREImtnk4BC2tAy8OG8ZoLTKXftMJUMZVJlah3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XMAaPR8s; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id D4B364E42D0D;
+	Thu, 21 May 2026 12:28:19 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A82E960495;
+	Thu, 21 May 2026 12:28:19 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5E2FF107E8B67;
+	Thu, 21 May 2026 14:28:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779366498; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=ssft/NzfZRZcfj5PrYHp1lVFl4VZcEXN3GWhU7p5eT0=;
+	b=XMAaPR8sLQ6fkvdLebTrLGWSJ0Nx34Ps+wEUDK4b1XlIUkwwL6VucJXFMXfRGHhv3aktkf
+	BGYq5Ox4jW/JY4wwc7BTCLBOsK3n6l/6j7FEaeolQznYC/z2ujWjCtK+edYWA1pE4WDh3G
+	pFepQjhbczEuZBF2kQcz+ZmoQwdW7By0MZY/xwoEVZY2M3ESYBgwzY4xS/YkRqbTinpVMM
+	Ped1YehsGbA0SLIHjSGgcrGTUc8ZqOLPzvdjoldIuAQlUJ2V5/Z6natwwnYhpEZ2LGcemq
+	QYB9Yoxs3lWeCIZsIFGLFssocsiNB4x6rvqfD3dQchNly7NCf+nq3/ITgCK62g==
+Message-ID: <45efcb6b-a439-4b38-8214-1c2f4f6808e9@bootlin.com>
+Date: Thu, 21 May 2026 14:28:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: e100: replace silent 'hope for the best'
+ with debug message
+To: Ashwin Gundarapu <linuxuser509@zohomail.in>,
+ "anthony.l.nguyen@intel.com" <przemyslaw.kitszel@intel.com>,
+ andrewnetdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>,
+ edumazet <edumazet@google.com>, kuba <kuba@kernel.org>,
+ pabeni <pabeni@redhat.com>
+Cc: intel-wired-lan <intel-wired-lan@lists.osuosl.org>,
+ netdev <netdev@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+References: <19e49280392.4757403170773.5767589851918809405@zohomail.in>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 In-Reply-To: <19e49280392.4757403170773.5767589851918809405@zohomail.in>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290395-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290397-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	TO_DN_ALL(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,zohomail.in:email,checkpatch.pl:url]
-X-Rspamd-Queue-Id: 5DCAC5A4D9C
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:mid,bootlin.com:dkim,zohomail.in:email,checkpatch.pl:url]
+X-Rspamd-Queue-Id: 109D55A4E74
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 21, 2026 at 11:40:19AM +0530, Ashwin Gundarapu wrote:
+Hi,
+
+On 5/21/26 08:10, Ashwin Gundarapu wrote:
 > From: Ashwin Gundarapu <linuxuser509@zohomail.in>
 > Date: Sun, 10 May 2026 15:09:12 +0530
 > Subject: [PATCH] net: e100: replace silent 'hope for the best' with debug
->  message
+>   message
 > 
 > Replace a silent return with a debug message when no MII PHY is
 > detected on known variants. This gives users visibility into the
 > failure instead of silently hoping for the best.
+
+It's not silent actually, e100_phy_check_without_mii() already prints a 
+message when returning 1.
+
+Not sure this patch achieves anything meaningful...
+
+Maxime
+
 > 
 > Found by checkpatch.pl inspection.
+> 
+> Signed-off-by: Ashwin Gundarapu <linuxuser509@zohomail.in>
+> ---
+>   drivers/net/ethernet/intel/e100.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
+> index 9074b558de35..bfacf877ca40 100644
+> --- a/drivers/net/ethernet/intel/e100.c
+> +++ b/drivers/net/ethernet/intel/e100.c
+> @@ -1450,7 +1450,9 @@ static int e100_phy_init(struct nic *nic)
+>   		 * But do this AFTER MII checking only, since this does
+>   		 * lookup of EEPROM values which may easily be unreliable. */
+>   		if (e100_phy_check_without_mii(nic))
+> -			return 0; /* simply return and hope for the best */
+> +                        netif_dbg(nic, probe, nic->netdev,
+> +                                  "No MII PHY detected, continuing anyway\n");
+> +                        return 0;
+>   		else {
+>   			/* for unknown cases log a fatal error */
+>   			netif_err(nic, hw, nic->netdev,
 
-Please make sure you really do compile test your changes.
-
-Also, look at the history of a driver. How old is e100? I guess this
-driver has been around 20 years? If this was an issue, somebody would
-of fixed it 15 years ago? 10 years ago?
-
-Please consider checkpatch as a tool which says there _might_ be an
-issue at this line of code, not there _is_ an issue at this line of
-code. You need to look at it, think about it, consider all the ways
-checkpatch could be wrong, and only once you have convinced yourself
-checkpatch is correct, fix it.
-
-    Andrew
-
----
-pw-bot: cr
 
