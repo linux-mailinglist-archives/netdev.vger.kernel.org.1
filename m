@@ -1,153 +1,112 @@
-Return-Path: <netdev+bounces-290338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLE2A37hDmqnCwYAu9opvQ
-	(envelope-from <netdev+bounces-290338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:42:06 +0200
+	id oJogHe3cDmonCwYAu9opvQ
+	(envelope-from <netdev+bounces-290339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:22:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB3F5A37AA
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:42:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 438465A3351
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:22:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B94B30FC9A3
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:16:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 26D7F30FBDC8
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6811C39DBD3;
-	Thu, 21 May 2026 10:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A134F3955C4;
+	Thu, 21 May 2026 10:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPUhabzh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47039394EA6
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 10:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A33389E02;
+	Thu, 21 May 2026 10:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779358591; cv=none; b=tiONzsEtKiBO/m70dIFSVL8riVQMujMNJ9FxEoKzUFQnAc1dNWZrSQHdyEII9MfQ52oIQSlT3D/21M10qQGjkdCg1q6YfBXC0SIX+8l1Z8AlRU/N1CO4Ip+eV8mvy8NcqHCF2G8CD17esd9SfDnZh+XL+1KO3iwfkv6zVrq0uM8=
+	t=1779358685; cv=none; b=OpRo0ri4Yo+MTgMVm+4gRJnRFpbMzE812SiHDGKHbcIBSK0uK/aedDEwTlffbI8S1rGheicr45ss3qf2Y2s35YNiSp4TJnTWqSRYk3IG/Xx7rcTORqChCprPwVJGq9zOPFeZdB3gLvptpDGmz5YqZfXCMAHwkDS5RhqF/vUjRB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779358591; c=relaxed/simple;
-	bh=wOhu+edThwNMgOsH2+Bsn4MX2XGKKf59YAa1SmJ7bfg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N32mSXeTUkbB0deNnsJYz6KoxNo9W4+hir5tSzjKklaNzXVckbkxaECfQopSfjYCr3EkU7zx72ePGwF1zu7xOV7OgYyJVrPBBmad1loK8QVTy4DCikfz+a+NVBG3uY3bx8WDjWmSkbqnaKU0AEYw8bfrgbd4QVxkDlnIHu/DKDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 1dbfd70054fe11f1aa26b74ffac11d73-20260521
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NAME
-	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED, SA_EXISTED
-	SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
-	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:f3d17580-5a63-4338-a38c-c51b35a7994e,IP:10,
-	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:35
-X-CID-INFO: VERSION:1.3.12,REQID:f3d17580-5a63-4338-a38c-c51b35a7994e,IP:10,UR
-	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:35
-X-CID-META: VersionHash:e7bac3a,CLOUDID:94f4e5be79ae350c88041e0986f71373,BulkI
-	D:260521181623MKNWAPBC,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
-	|865|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil
-	,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:
-	0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 1dbfd70054fe11f1aa26b74ffac11d73-20260521
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1062538901; Thu, 21 May 2026 18:16:22 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	netdev@vger.kernel.org
-Subject: [net-next] net: hwbm: fix buffer leak when construct callback is missing
-Date: Thu, 21 May 2026 18:16:18 +0800
-Message-Id: <20260521101618.1099537-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1779358685; c=relaxed/simple;
+	bh=G9dUDE57/plskdTOGXGFEUmoJDGDjy6KP6TN1k4cH5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GI1K3B0GgO5XJ8qGs90wQvbFQ3uHUXHL9Poipr5MVjN11O+K/OmJ7trdVtEUtUWAxzSp1plZOO9TeSemlZTR9OXxhVQbgzizhj8+fUHZ0io+MTCWnorVDnM12wFu49senAprez9F8nDRlpK83K+hIBwZBuaIyTZ4Dh7G2cGkVOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPUhabzh; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35B8C1F000E9;
+	Thu, 21 May 2026 10:18:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779358682;
+	bh=cWklvZ0hMHT0iogyKba21Wxgt77edXzV0ISJvMVJQ9k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=BPUhabzhrsU06hASnrmP4UJERr/cN59RiKfzgMzwfGfZruTBPzro19zyS3w3xoIEO
+	 ALv/ZpRMPTUXe/W/cHjjMKY7J+yPZNOqbM1Nr34RxPNbDbqjy94dL0oSM9/u05+6RQ
+	 N3LSLEZ1+wJdsPdc+rfimQrBUBb8EZ3iQZk2eTQhfsSSv2ccSFjFMrMa/n4Ik/++v/
+	 8XqDIckAiJUhzNCW54Y+Zl/pdp+iLHoFf1Joma3OlZDg4mHJwRFyVxHomnuROMSpVb
+	 hdPgKSFlI0EW2ZXgX49QnBfH3jXO77sL6M921cdtdUR/MdmDxVr6eIk6+JgIRwoAuc
+	 SwTMXkfk0yoTg==
+Date: Thu, 21 May 2026 12:18:00 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Ali Rouhi <rouhi.ali@gmail.com>
+Cc: jiri@resnulli.us, vadim.fedorenko@linux.dev, 
+	arkadiusz.kubalewski@intel.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	cjubran@nvidia.com, Oleg.Zadorozhnyi@devoxsoftware.com, devicetree@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Ali Rouhi <arouhi@sitime.com>
+Subject: Re: [PATCH v2 net-next 1/3] dt-bindings: vendor-prefixes: add SiTime
+ Corporation
+Message-ID: <20260521-happy-celadon-hamster-94802c@quoll>
+References: <20260520191943.73938-1-arouhi@sitime.com>
+ <20260520191943.73938-2-arouhi@sitime.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.04 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260520191943.73938-2-arouhi@sitime.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290338-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[kylinos.cn];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290339-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 2CB3F5A37AA
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 438465A3351
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-hwbm_pool_refill() could allocate a buffer and return success without
-calling construct(), leaking the buffer and letting hwbm_pool_add()
-incorrectly increment buf_num.
+On Wed, May 20, 2026 at 12:19:41PM -0700, Ali Rouhi wrote:
+> Add vendor prefix for SiTime Corporation, manufacturer of
+> programmable clock generators and MEMS oscillators.
+> 
+> Signed-off-by: Ali Rouhi <arouhi@sitime.com>
 
-Free the buffer and return -EINVAL if construct is NULL.
+Mismatch in From/DCO.
 
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
- net/core/hwbm.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/net/core/hwbm.c b/net/core/hwbm.c
-index ac1a66df9adc..284b97c488dc 100644
---- a/net/core/hwbm.c
-+++ b/net/core/hwbm.c
-@@ -33,11 +33,15 @@ int hwbm_pool_refill(struct hwbm_pool *bm_pool, gfp_t gfp)
- 	if (!buf)
- 		return -ENOMEM;
- 
--	if (bm_pool->construct)
--		if (bm_pool->construct(bm_pool, buf)) {
--			hwbm_buf_free(bm_pool, buf);
--			return -ENOMEM;
--		}
-+	if (!bm_pool->construct) {
-+		hwbm_buf_free(bm_pool, buf);
-+		return -EINVAL;
-+	}
-+
-+	if (bm_pool->construct(bm_pool, buf)) {
-+		hwbm_buf_free(bm_pool, buf);
-+		return -ENOMEM;
-+	}
- 
- 	return 0;
- }
--- 
-2.25.1
+Best regards,
+Krzysztof
 
 
