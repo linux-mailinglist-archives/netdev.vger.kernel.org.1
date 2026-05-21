@@ -1,130 +1,157 @@
-Return-Path: <netdev+bounces-290503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290504-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uMrjAuovD2peHgYAu9opvQ
-	(envelope-from <netdev+bounces-290503-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:16:42 +0200
+	id WbhKHZciD2rBGQYAu9opvQ
+	(envelope-from <netdev+bounces-290504-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:19:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 725AA5A90F4
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:16:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 099D85A82C2
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6715E3071C0B
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:46:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9DC0433EAB3A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541923F44F7;
-	Thu, 21 May 2026 14:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5111D3F54DA;
+	Thu, 21 May 2026 14:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N38ic3zB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qKO9LRF2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19D693783AA;
-	Thu, 21 May 2026 14:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5D03F1AA3
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779374535; cv=none; b=ZMwW9uzUhFCu44vEkSZ2LXmH33SPYLEqqmAPrgavzCO+BFr6W+4DwKzNksvDhViK6ONbEiHnt9iomf3p1QJLvreo7IkSAlbSyxY2+7Sf/sGuAR53u3aG5oaj3UVPruNGsaL4WVV7TI65MqvoMRSoOMBRdi7mYOh98etc1uRMuZ4=
+	t=1779374559; cv=none; b=Dw3Je78woCfSPPinRPWJyoY6HojdAtkeD4i7J7JMgn62uDbKS52fuVJIGj6q9Q1g5/6aLkk2SQkPz6UYk31o0LpzCWnENtmRnrGaraFSfs+s4Z2GD/72qAYBqLtH2+ACtU5i8lKlGrspbT/vyqqZAOmFPQRjyRCBApbbLlTMVQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779374535; c=relaxed/simple;
-	bh=J/HsxTTCIRAy3TXVt7VJ5+tiLxwGHR2mElOvPJ0HSpA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hDLcrA1qhzp/phVYI1OhaL9casYB/mUBuw3VT7bXfitimaw7Wkbt1vvew2vFwYJgtoIOujuMjCxAhEIMkyRG7z0kbXIA59ielvrjqyOWDJ6qAmp2wYvo1m4HWDGDJyUz/EyW9sXShNlqPMLO6c+VD9BRzoPpmQ+2khaKQJmYdfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N38ic3zB; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3941D1F000E9;
-	Thu, 21 May 2026 14:42:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779374533;
-	bh=WYsFDkNJCJZLRNvEDkX91LBJiFLA945zC2SYzDyqE4A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=N38ic3zBjZbPswwibccSKMIbhaJY+oCN5CixyxVcQi/3wB5IqY13uIPsbns4syzVg
-	 0QyEdT/GPMVgCIV1DRr/sAfdg82dLl0JAQaeubR4t0RgB1ACAor4e1PsF8LGANavbs
-	 GMeleMCrEYgoBqQYYr55fgI0VJcfwgxqWMN1TAMYeuBOjM5euRF1pStOl/6evEewCM
-	 LQ+jNaGIlKiwYnKJt+MpVSuiaSHJEk82sryBwskrsM5Svz/rRHWP958JXq2XMm/6nU
-	 rXwXr/0IIqERjZIB/gXRr/jIHLPq5QnKnCcwblkU0puCG6iQzgIsxQ4FjfWqB6wasQ
-	 N87bpl7pSLcOQ==
-Date: Thu, 21 May 2026 07:42:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: Allison Henderson <achender@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] selftests: rds: config: disable modules
-Message-ID: <20260521074212.66205e90@kernel.org>
-In-Reply-To: <20260520-net-rds-config-modules-v1-1-2100df02fe9a@kernel.org>
-References: <20260520-net-rds-config-modules-v1-1-2100df02fe9a@kernel.org>
+	s=arc-20240116; t=1779374559; c=relaxed/simple;
+	bh=JLb8dakvmIkiwIQ9BNtmiqDgh2DZEgTaUcPC8AgYwes=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wf2uYxo1K/24zKWMSMR0wqtt39Av8bU5HilakuS33Wm9JrczTzveFKWStGQk1QDScVGCNDzZA2trZsZqPUivDVyXGeZcJNEPHjc9msXDPCh9Fq/+oDDUvjIQl+2Pd8scwt/MIPqRHI/DOVEJuFcxzyS5yrkJWYDAMdgf+HhNQ7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qKO9LRF2; arc=none smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-651bf695701so6018334d50.2
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 07:42:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779374557; x=1779979357; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mENXEUb2I/IvitDd5eC5WRpQQNrmeFgj2UUSvwpfHeY=;
+        b=qKO9LRF2UnxnP+DcHJPCXdI8rsrIvscuOah5ocTUWzIogWlUKpWso+CaPbRekC9se5
+         sKvaUA9K5ks5HO/Aj/+tBlnrx1W/ftQV6/0oYrThZ3betqmbFMGV+zQioBHo/YlC9v1d
+         EQjCocN+LduiD3lrVIGLCsvt1GpEMCyz54SRpSJH8nakZtEBfyzMR3S5dM1SSCifLFs+
+         jiGR7nuL4T3sW5V1Qv10X5NW6/cp3nIbZRfdn5RUjOsCSH0OIYVpe983jzFQDZFxlO3/
+         n9m5vB4S8skeNHGrtOfaCy2WoyjgseY+UzPT256DK/eg+8fpZtNi8A/IjRCO6AoVgln6
+         V7dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779374557; x=1779979357;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mENXEUb2I/IvitDd5eC5WRpQQNrmeFgj2UUSvwpfHeY=;
+        b=W1qGrPrZ9sBqWx0ZAfDb6R4MU92k+sjD7iUKseXwI6qjY4DXieiodtvJLxg95bqeKT
+         wDLw8AMym8DWYml5f5R8d9thiI+zNjZOUd34gqWFSNthQrezEpXeLDwGNFf+Vd4chLNp
+         ZdGhIR/htzfxfyHpM7HhAWz4iqsmIyyVYlOd68sBlK8q6Ha0BzRUdVVmyzE8LC+eR6gT
+         1w34iwzkNRUbGKQgqSygO7RCeEyzYZmUk1jNyki2gmgY6VSOu6ILOdCW6D2BqpqKI8CS
+         Sh/Ws2QHcwYK/dQGWm3NsvztQfSfUUJcNU+3YAcgOVIaqK+4PUlvxx/tgC5qaWaro/qL
+         3pJw==
+X-Forwarded-Encrypted: i=1; AFNElJ96yj9TFgLhXb0B3n1l4GslwJkasaI5kfdsYquRcdZAWa8BlYl+nWxi4gP2VIap3TJtG7itpck=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGAmy05N7qztuBBT6Z9Gs7M6CBWbg2ya5AT55+WI3LgcjFiqKH
+	xgjlN+ZcU3s7sjD8sQD9wN00ynHfXxr3XD8WZzdm6bxK1EEIFrYTXTBX
+X-Gm-Gg: Acq92OH62yW2xPcpvhizoPzC5fq3RIgsw+m8wST2R2DK020U4a4Xbj0Zy1oz9G3zNT0
+	g5T77wSLHk5OmaCOvop0HnOndoEPkifqH8DNe+OFm2ztzrTUDkzI5gubeAA02qrLddXxkC9m/vb
+	x1y3p3HPrhn5sQe1v5JGlzHPpO6rgmSNyPNpXOUOmeK2g5NW0Sg8soza8NmILEDLWHjX5k5Il77
+	ENZYEeSkFTGeRwoImJ6KWHIfBmfWlruMqAgIZRHB90ABmL6FVehnqoHL7NqXKj/qYzBt+M5Ti4r
+	3+Mw4fxXVnuF7e0V2v8Drs1UjRXp3S/LurKTIxsjj3XKeA3d6RHUwTfUAJyQ4kx/UFd6jf3yRC+
+	3jv0X+styAFTDZ3Zj/vRiS93t2GHTqXRh0VEGZmp2TbotTjJDGlHhJJhtcoeWmYE+Hhoa9GLxcW
+	rol2maxA+0Ax0Tkz5x+jT6+82MpoLxju2fdXR1bQPTy04Ko/XjVlFx
+X-Received: by 2002:a05:690e:124d:b0:65d:8f98:6bb4 with SMTP id 956f58d0204a3-65eae00c434mr2809147d50.29.1779374556706;
+        Thu, 21 May 2026 07:42:36 -0700 (PDT)
+Received: from fsh.attlocal.net ([2600:1702:56e9:4b40:ed8c:6b8b:1fa3:d14b])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7d2cac72ebesm3596107b3.41.2026.05.21.07.42.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2026 07:42:36 -0700 (PDT)
+From: Akash Sukhavasi <akash.sukhavasi@gmail.com>
+To: krzk+dt@kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] dt-bindings: net: mdio: remove deprecated .txt binding stub
+Date: Thu, 21 May 2026 09:42:34 -0500
+Message-ID: <20260521144235.3414-1-akash.sukhavasi@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290503-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290504-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,run.sh:url]
-X-Rspamd-Queue-Id: 725AA5A90F4
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[akashsukhavasi@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 099D85A82C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 20 May 2026 11:34:43 +1000 Matthieu Baerts (NGI0) wrote:
-> The run.sh script explicitly checks that CONFIG_MODULES is disabled.
-> 
-> By default, this config option is enabled. Explicitly disable it to be
-> able to run the RDS tests.
-> 
-> Note that writing '# CONFIG_(...) is not set' is usually recommended to
-> disable an option in the .config, but it looks like selftests usually
-> set 'CONFIG_(...)=n', which looks clearer.
-> 
-> Fixes: 0f5d68004780 ("selftests: rds: add tools/testing/selftests/net/rds/config")
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
->  tools/testing/selftests/net/rds/config | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/tools/testing/selftests/net/rds/config b/tools/testing/selftests/net/rds/config
-> index 97db7ecb892a..3d62d0c750a8 100644
-> --- a/tools/testing/selftests/net/rds/config
-> +++ b/tools/testing/selftests/net/rds/config
-> @@ -1,3 +1,4 @@
-> +CONFIG_MODULES=n
->  CONFIG_NET_NS=y
->  CONFIG_NET_SCH_NETEM=y
->  CONFIG_RDS=y
+The plain text binding file was superseded by the YAML schema in
+commit 62d77ff7ecbf ("dt-bindings: net: Add a YAML schemas for the
+generic MDIO options"). The file now contains only a redirect notice.
+Remove it.
 
-Hm, okay, if it works it works, but IIUC disabling modules turns all =m
-from the default config into =n (not =y as one would naively hope?) so
-this may come back to bite us. Unless there's a strong reason to not use
-modules it may be good to follow up in net-next and life this
-requirement.
+Signed-off-by: Akash Sukhavasi <akash.sukhavasi@gmail.com>
+---
+ Documentation/devicetree/bindings/net/mdio.txt | 1 -
+ 1 file changed, 1 deletion(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/mdio.txt
+
+diff --git a/Documentation/devicetree/bindings/net/mdio.txt b/Documentation/devicetree/bindings/net/mdio.txt
+deleted file mode 100644
+index cf8a01054..000000000
+--- a/Documentation/devicetree/bindings/net/mdio.txt
++++ /dev/null
+@@ -1 +0,0 @@
+-This file has moved to mdio.yaml.
+-- 
+2.54.0
+
 
