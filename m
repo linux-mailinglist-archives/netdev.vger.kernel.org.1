@@ -1,215 +1,145 @@
-Return-Path: <netdev+bounces-290391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290392-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2PDFFnD4DmoSDwYAu9opvQ
-	(envelope-from <netdev+bounces-290391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:20:00 +0200
+	id GCavNTz5DmoSDwYAu9opvQ
+	(envelope-from <netdev+bounces-290392-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:23:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7157D5A4AF7
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:19:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F6A75A4B80
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD6623059FFC
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:16:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A869130E609C
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806563CE092;
-	Thu, 21 May 2026 12:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5882E31690E;
+	Thu, 21 May 2026 12:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEaG94iq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5n04J1WS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C573CF660
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 12:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30833CE092;
+	Thu, 21 May 2026 12:17:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779365804; cv=none; b=Ngf/z3dfi96dfx+/GClPv4W0p09K20jkG8wb6mqtiOezjT5eQdcvswKibSbezIdmRyc9s1+MH1RTol5LWrnXZAeCFsrlcBP0XU0TqomDbfn9HKaCzypoP5hMhEdSPpjoqA83XF65/GhF6A46gX67TD3mcujm9yeH9u1R+69pJ5M=
+	t=1779365838; cv=none; b=ZPT1/GoiqU2LlrOLEYEwFaP2LzX+btQMfDQb6EtXXtMvwYI6slQnNBH9T79HfZi97D3wdrIgo3Po6/6INexv2mPrEZNxhO6+/ThMR/VeMo4V9svHX1llgYoYqscW2nCL3aAgJ/xcLZQDSxm8lhti4tG1RDL/lRJxoLhIZPoyYlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779365804; c=relaxed/simple;
-	bh=5or+4E41SL8THkCOjUNgbJumJMLhuYZOhSlFgnCa8cM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QplyxBj30lSgIc9Vlx1lx78XEg8sNZYMS9n62QB/R8lIuBYvWT+uj00eiBn30Hf3xliEkdF75pxEkDX/kjxb4idIW+3nBRwYQxKaGtmJh5agkw6+fmayBrhMfGRxzulq4MDCT3V4jBn++TGj0BZezVDwDGd2pVQayfdXJIkU8TM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEaG94iq; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-36931e4f5e8so5213122a91.2
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 05:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779365802; x=1779970602; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vxP6h8dL5J030EST2E/d3Ecm7ut5abz34sAQXmwt+6s=;
-        b=jEaG94iqo6YNvx1BYIjsaB89Jrw7KM4p87mkdLQojCjebIXrg8uZP1KDduWzQyCSXn
-         2ElZWDUq/h/QnXjJoORaITBdbHJJpPC5yjTX2W1GyNvqO5jyJWHIEdVUK0Uq+MiR3J+v
-         UyMmci5wzNu+MpveR+ZtkEKd38l/AjCZ9llTx6Xc7e3Xl/65I+fKd/veKYxM2GzmQirx
-         tJfQnjv6pVK3quC3oKpyg/4lCTDHqMjNkgNrwFBS49FTk/xE1W2AB3cdyNqRf9/FviZH
-         7UDQa7HT+aHIjraidA7R8Nr8Su6Ef0SjoSDH3iKhG0cc+xjWzyRRjQGpIywI64lorxSx
-         QKfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779365802; x=1779970602;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vxP6h8dL5J030EST2E/d3Ecm7ut5abz34sAQXmwt+6s=;
-        b=d91qnzmMa2UbKfhvbO6uSPkibC8HWoGYuqbTX2yxrrbdPpJ4e+x/uRBWe7szCgpF10
-         GPqysUL4cGdqvyvwLTzYU9hFuZdofIg4JliKcTVIQ3YTueQQ7Ii5JNpGEis3rXpTC1Jw
-         n9iaV1miLLdcyoAsW9NhSvQDDGRwlO06Q1vLZYqNoubj2OjkRYv4I6RUuvTQjME3djgr
-         BgQhT0zxOTJiVNCMI9shqGJuMKRIWv58xiUepwcB1B8PmJNy69PlyXCG4ruTcGjcqmiQ
-         qG+1qQhrlRGWRQ8r6TgZpoubJJQDIY2kB8RgsnIQNslLcD+Hy7HbmJBLn0DVxK9tS4HY
-         5qeg==
-X-Gm-Message-State: AOJu0YyftaJuSUue53YXqP7wi2vER7rlsykYRPbtG2EjqUklSaoHwLlP
-	+gXawq2JZ+yI3+N+EzBmJ+MKDHWUw4NNIRmkOPDGNK3+6szKme2rmn5FEYYi9byJqks=
-X-Gm-Gg: Acq92OEBrI8bNtgQb6nIduvkNjuX0nuuDg9bNBsYD8aBzqmSZ+bWz+eLny9G4tAImIS
-	5UNnt3kZN3jU8TMGumora5mWbDyZZWukUX/f3IyICI4baU6qlxHHmFPYe/qxXl0PBRBMU034SZo
-	RCl2BmFdNGmW+Z/SIdS6sJkVasPs3Qn+EPmE2yCAsp0KGBUFcvgDKLZWbwk4PGu4AQj1Y+dnX4w
-	7Psob1WWt2/QcR06QFBDaY01Dr54QXZs0ZchRUPPQFR6WVG+Qt95IizAQOTZzfra16euYZfysEe
-	aU9nk8vhhpk5Ofc+p7gepOjM5z6wrOEMuLG2Q5FnSnTlZHuQ986cbMtcH6PRo52EveZyY4Yz/oQ
-	h2hwwe8RaHf6N7hQDn/ZaB9wYnruqoQdCUAETjsca6svgwKdHR4RvNNSqMHNGP7Zv/lsIqoUKID
-	S+BQqGFh1FtCvfyw9DtKFf6ZR9Jz0EeFT1y5u+B6EMAA+/ww8=
-X-Received: by 2002:a17:90b:28c5:b0:367:d850:6a5f with SMTP id 98e67ed59e1d1-36a45fd3682mr2664568a91.25.1779365802276;
-        Thu, 21 May 2026 05:16:42 -0700 (PDT)
-Received: from fedora ([171.243.49.69])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a46c53220sm753820a91.13.2026.05.21.05.16.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 05:16:41 -0700 (PDT)
-From: lazyming <minhnguyen.080505@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	w@1wt.eu,
-	security@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lazyming <minhnguyen.080505@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: skbuff: fix missing zerocopy reference in pskb_carve helpers
-Date: Thu, 21 May 2026 19:16:28 +0700
-Message-ID: <20260521121628.309924-1-minhnguyen.080505@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1779365838; c=relaxed/simple;
+	bh=Jk4+rfMKZ8lHig7foj3594eaY2uM2QAv6kp+lRHbTjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KGmuxxjQiA7LAQwSzEZUiK5Rvh/415osYaxASIzdSM3lauevTD5YmRLA3UAPa/amOqu39li0jGSWx+2evWr6P/Crel/okK90eiexGeMzTqO6U0vmCyqoFBLgTMbeCuYcj+idXlOqYAHoYM6ystAGDF0CS9NDOIyBnfCEGYibUMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5n04J1WS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iB4Yuhl6oOgylFRmPc9Zztfa4P8W39unwT+VZ9BG5f4=; b=5n04J1WSsJpFNg+aZpa3fPCKmy
+	cpnlbpfQQPZU9jtDMlKXJQu28Mf90D4557Mj9BIKZ6SoJxeuAkHsfIuXfFoXA/4NGXrXf5+ZZrx8o
+	6VzFD/2jXDwMDVUZIg7POICh8twp9ARhBmVTyWRCElkHR6nWaiALRg6SkUgQrFkt7s88=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wQ2Kq-0040wQ-NC; Thu, 21 May 2026 14:17:08 +0200
+Date: Thu, 21 May 2026 14:17:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/5] ethernet: 3c509: Bring driver back and make some
+ fixes
+Message-ID: <e1c7eab4-b330-49ad-bd39-df7dbc0a9511@lunn.ch>
+References: <alpine.DEB.2.21.2605201115010.1450@angie.orcam.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.2605201115010.1450@angie.orcam.me.uk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290392-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290391-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,1wt.eu,vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[minhnguyen080505@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7157D5A4AF7
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 3F6A75A4B80
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-pskb_carve_inside_header() and pskb_carve_inside_nonlinear() both copy
-the old skb_shared_info header into a new buffer via memcpy(), which
-includes the destructor_arg pointer (uarg) for MSG_ZEROCOPY skbs.
-Neither function calls net_zcopy_get() for the new shinfo, creating an
-unaccounted holder: every skb_shared_info with destructor_arg set will
-call skb_zcopy_clear() once when freed, but the corresponding
-net_zcopy_get() was never called for the new copy. Repeated calls
-drive uarg->refcnt to zero prematurely, freeing ubuf_info_msgzc while
-TX skbs still hold live destructor_arg pointers.
+On Wed, May 20, 2026 at 12:18:44PM +0100, Maciej W. Rozycki wrote:
+> Hi,
+> 
+>  As per the previous discussions[1][2] this patch series brings the 3c509 
+> driver back.  Picking up net rather than net-next as I consider it a fix 
+> to accidental removal and so that any downstream users do not suffer from 
+> disruption when using released kernels.
+> 
+>  In the course of making the coding style changes requested I have come 
+> across an actual bug in transceiver type selection code, where the old 
+> setting is not masked out before ORing in the new one, causing no change 
+> to be actually made in a requested transition from BNC to AUI.  I guess 
+> this code must have been executed exceedingly rarely, as it's always been 
+> wrong ever since it was added in 2.5.42 back in 2002.
+> 
+>  Therefore I find it not worth backporting to stable branches, however for 
+> the sake of appropriateness, in case someone downstream does want to have 
+> the fix, I chose to apply it second in the series, right after the actual 
+> revert and before code clean-ups.
+> 
+>  The remaining patches of the series should be obvious; see the respective 
+> commit descriptions for details.
 
-KASAN reports use-after-free on a freed ubuf_info_msgzc:
+You need to split this up. Patches to net are likely to get back
+ported, even if they don't have Fixes tags. So please add the driver
+back in net, but fixup the issues you have found in net-next.
 
-  BUG: KASAN: slab-use-after-free in skb_release_data+0x77b/0x810
-  Read of size 8 at addr ffff88801574d3e8 by task poc/220
+There is also an question of if we want the coding style patch or not.
 
-  Call Trace:
-   skb_release_data+0x77b/0x810
-   kfree_skb_list_reason+0x13e/0x610
-   skb_release_data+0x4cd/0x810
-   sk_skb_reason_drop+0xf3/0x340
-   skb_queue_purge_reason+0x282/0x440
-   rds_tcp_inc_free+0x1e/0x30
-   rds_recvmsg+0x354/0x1780
-   __sys_recvmsg+0xdf/0x180
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-  Allocated by task 219:
-   msg_zerocopy_realloc+0x157/0x7b0
-   tcp_sendmsg_locked+0x2892/0x3ba0
+  1.7.4. Clean-up patches
 
-  Freed by task 219:
-   ip_recv_error+0x74a/0xb10
-   tcp_recvmsg+0x475/0x530
+  Netdev discourages patches which perform simple clean-ups, which are
+  not in the context of other work. For example:
 
-The skb consuming the late access still referenced the same uarg via
-shinfo->destructor_arg copied by pskb_carve_inside_nonlinear() without
-a refcount bump. This has been verified to be reliably exploitable: a
-working proof-of-concept achieves full root privilege escalation from
-an unprivileged local user on a default kernel configuration.
+  * Addressing checkpatch.pl, and other trivial coding style warnings
 
-The fix follows the pattern of pskb_expand_head() which has the same
-memcpy/cloned structure. For pskb_carve_inside_header(), net_zcopy_get()
-is placed after skb_orphan_frags() succeeds, so the orphan error path
-needs no cleanup. For pskb_carve_inside_nonlinear(), net_zcopy_get() is
-placed after all failure points and just before skb_release_data(), so
-no error path needs cleanup at all -- matching pskb_expand_head() more
-closely and avoiding the need for a balancing net_zcopy_put().
+The problem with these sorts of patches is that they often break
+stuff. This driver has been stable for a long time. Do we care about
+coding style issues enough that we are happy to possibly break it? Do
+we want to spend time on debugging it? Probably more time than it took
+to fix the checkpatch issues?
 
-Fixes: 6fa01ccd8830 ("skbuff: Add pskb_extract() helper function")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-sonnet-4-6
-Signed-off-by: lazyming <minhnguyen.080505@gmail.com>
----
- net/core/skbuff.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 44ac121cf..6a1a2c203 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6810,6 +6810,8 @@ static int pskb_carve_inside_header(struct sk_buff *skb, const u32 off,
- 			skb_kfree_head(data);
- 			return -ENOMEM;
- 		}
-+		if (skb_zcopy(skb))
-+			net_zcopy_get(skb_zcopy(skb));
- 		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++)
- 			skb_frag_ref(skb, i);
- 		if (skb_has_frag_list(skb))
-@@ -6953,6 +6955,8 @@ static int pskb_carve_inside_nonlinear(struct sk_buff *skb, const u32 off,
- 		skb_kfree_head(data);
- 		return -ENOMEM;
- 	}
-+	if (skb_zcopy(skb))
-+		net_zcopy_get(skb_zcopy(skb));
- 	skb_release_data(skb, SKB_CONSUMED);
- 
- 	skb->head = data;
-
-base-commit: 94e3dd6874bf04d5939bc8431b9f7852f3a4a121
--- 
-2.54.0
-
+       Andrew
 
