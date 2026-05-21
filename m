@@ -1,57 +1,84 @@
-Return-Path: <netdev+bounces-290498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290487-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8IfBFlMhD2rPGAYAu9opvQ
-	(envelope-from <netdev+bounces-290498-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:14:27 +0200
+	id KC/8KRYiD2rPGAYAu9opvQ
+	(envelope-from <netdev+bounces-290487-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:17:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFDCA5A8157
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:14:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB615A824A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:17:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A78543249F3B
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:42:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E32EC33FD687
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:15:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5083EE1DA;
-	Thu, 21 May 2026 14:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DEA3EDE4A;
+	Thu, 21 May 2026 14:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="BSMtO0QA"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="u6iz365J"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD713F0AB1;
-	Thu, 21 May 2026 14:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578D53ED3C7;
+	Thu, 21 May 2026 14:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779374100; cv=none; b=buyB/pWQOqJ7Y3QiozBcICxSc7vbnMNkIm2dqQaiR+CR3BlSE6o1r4Ad7V9lygDo1un8snnVRUeQwADIDfzbsDkCRSIl4b4wJyfk7PoX1HdkhVxlXLKQoRBSWZ3bj7O1hKmcPX7lCjMadbV7KZFD8YKYQIfd7CLmfFRVBmGHv9I=
+	t=1779372779; cv=none; b=qaYz8V0bR/RB32CSWo0rKS+xgPGjsRLR5sB9zpWKABGOKJXDasntEGxn46srilNjGE3o00s9FzFqYWCXDv8LdBGfjKoKQpRSqy/6CbllS5xj/au9Phy4+YzCndWSJk/dXmrDTxNQTajcRrHcebfqKX81xnIWG4G1aj0jghl6Tis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779374100; c=relaxed/simple;
-	bh=KOcqB4yiXaUIQL7EBJxJNPCiiEntHJ1bUw8VYCWroQA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SasILCP03v6EOkCTvFeFk0Vm7OiHkZdSZAsJ8gl7C+6fGkCW4EiAz/kHVonzXPB/eImu/LcAlI2nIu5nKKDhPy0/06QPZs2j1zaH3rfQSMuUA8DQ9BaCwTLfsghbss+EeibXaDmfwc5EUd/QQ6s0c9iRfjPSd+IjPfLrBSl44RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=BSMtO0QA; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=qAMGqTgmR8jSCdmI+3X6UVT4uJLS740CwO54lzXmRr0=; b=BSMtO0QAxYtBvbaIUIuu/RkNRo
-	sP7sh6Xt1jZRnIb/d8RI0Jh5vpVeFqcyTdauqTCnkGyuMH9L9jnwfRVO0KRKJjg9iptb6CCj6GE3Y
-	qLqymGi6NbZ09QRCzIK8y9tDItyH2hCOfd8t+zrXi+VyAVMbdgY8isFlYNroWVF3FavcIrpi8iukT
-	6TkZ0KZizXy54h4LnH5K+Ao/yzxrft0HZTyQcuhSMl1maTsHu9qe1F5tEn611lamjSTd6Fjs4waj2
-	X+cftUQvX/sPHNDnpi2Fpha3m+rx3BFqU47CZGSV++Q7GhVqQCuQKmc41usxZFKn9dPfTsB4V6ZGC
-	zzP6/AEA==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wQ48C-003wJF-2q;
-	Thu, 21 May 2026 14:12:13 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 21 May 2026 07:11:45 -0700
-Subject: [PATCH net] net/iucv: fix locking in .getsockopt
+	s=arc-20240116; t=1779372779; c=relaxed/simple;
+	bh=3uHkCr3Czag36uOPZx+WfiLBDM/EZRglKu7YFz6fG0k=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SoXaLlGNsd7X8z7JYgggIIWXeCIhZJPANZe/UCETtJM9/TIJah21dPlwZnsO8GQDhh8nEpSkaQl7RhcnuBWXfnDv4/vO+700N2rMoRz/I7g13/5Mr5MBV7uOcDjS5xa1TLWFNsAzUx9spZCdHzYNM0np+AzF6v4n2x1gYDGDoiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=u6iz365J; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1779372778; x=1810908778;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=3uHkCr3Czag36uOPZx+WfiLBDM/EZRglKu7YFz6fG0k=;
+  b=u6iz365JCaRj8ylvrIcs++kvxocuMFQc/C2viGrC2f4KkxO15tkacVfv
+   up0iWaDPakWoKzRtskXjnANmFINJUwJMbN09fDMzGkNu83HzDscev3ZBI
+   u1L/y5EjFs7hDFYbZDPHfjCW7jTUNcvT8rdnV48oZEAdNpD4R3Py4f3y6
+   sVmYljOd2+NEcbjEtBYYJg4GZg8pzOTVliF/LjUo9Zbk38QGowy+NBsee
+   uKuTPiIaVdJ3ObfEDN80oOpOwttyiqIXPFJnfnVHwItNgRVu3EoVSHeM0
+   QK8/u2TWAd+E6HmNfXBKvuobnij8MZvXfAZs5t6L4nm7V9OGTmB0yIDTJ
+   g==;
+X-CSE-ConnectionGUID: 3cMiK0fJTeCaxLknjkz8Lw==
+X-CSE-MsgGUID: fp/hYsMdTyu9+GLOBX8BnA==
+X-IronPort-AV: E=Sophos;i="6.23,246,1770620400"; 
+   d="scan'208";a="289245092"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 May 2026 07:12:52 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Thu, 21 May 2026 07:12:50 -0700
+Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 21 May 2026 07:12:47 -0700
+Date: Thu, 21 May 2026 16:12:47 +0200
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Steen Hegelund
+	<steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Herve
+ Codina <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Mohsin Bashir
+	<mohsin.bashr@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next v5 00/13] net: lan966x: add support for PCIe FDMA
+Message-ID: <20260521141247.h2ekfhhzblopjm6s@DEN-DL-M70577.microsemi.net>
+References: <20260520-lan966x-pci-fdma-v5-0-ca56197ae05b@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,152 +86,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260521-af_iucv_fix2-v1-1-f16b1c510aa9@debian.org>
-X-B4-Tracking: v=1; b=H4sIAKASD2oC/yXMQQqDMBAF0KsMf20gpsZArlKKpHGi4yItiYog3
- r203b7FO1G5CFd4OlF4lyqvDE9tQ4hzyBMrGeEJRpteW6NVSINscR+SHEa5ztk+6FtnW4eG8C6
- c5Ph1d2Re8fhj3Z4Lx/Ub4bo+w+XycXUAAAA=
-X-Change-ID: 20260520-af_iucv_fix2-74756a034517
-To: Alexandra Winter <wintera@linux.ibm.com>, 
- Thorsten Winkler <twinkler@linux.ibm.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Ursula Braun <ursula.braun@de.ibm.com>, 
- Frank Blaschka <frank.blaschka@de.ibm.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel-team@meta.com, 
- Stanislav Fomichev <sdf.kernel@gmail.com>, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2436; i=leitao@debian.org;
- h=from:subject:message-id; bh=KOcqB4yiXaUIQL7EBJxJNPCiiEntHJ1bUw8VYCWroQA=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqDxK3tMf/ylUFHpLxikkm2upb64Ed2ZLgjulnm
- UAsOI56JViJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCag8StwAKCRA1o5Of/Hh3
- bS5GD/9g0WFCY/wMWvxDQMlhYsmfkNfHZL5OCW2hq02snkDp9agp/tjVHT3EFWoUFwc5hnFrSCE
- CGA0GdctEd+tvz/YkaFOA9dmtWruSMZX9IhtffAuvc6ZCZCdRwZvkSG1ZqY6XxUucU23Qe35oOt
- YAjmaXz9Bf19MkV/zPRLPbjmt6GyLJsC/lYUYHENWJhiRh6g1oQzmutnh5E7lO/8LQ2MjeJVu/V
- 5bXdNgfujk41lZ1YCPMbeSWPTLVMRX8GQKJnTB1Sxg7RBbxEFetrO2hPlxIJayTyQGFMGW/nGux
- TytPgwc/CWa4+o/mK0ueahgtCOD6OawLSu4Oukpknw5ldvsbsl44JbVHlXNTFtMsJVHvmA4NXMK
- z9w+HZymOemHONr4UGgMYo3DPLIREg/liAaMCCe1FKAqXQc2qriPc9aJFi3EnEKIS9GuSY00kF3
- D3nsvlwtimm6qV114e4+kiu3a21fohDh5IUX5MRTee4goQ9DtUANd7t/Ou1zdk18eifIddWqOKQ
- wYL0MofDUiCJuOcxPQ99fhI8THBDdTVJBRsMV/BcN5JwHyTwCBTCNwjCAMVv9H/Nb/ZeHQTgDzU
- /ieAQOzoM9IxXe/3pctCDx4qU8ij3GvfstfAonEGX/5y5R4OZ0EaaRJXoV72O+JHaxaGC13RDbJ
- sSCTIEbsk8VDF4g==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260520-lan966x-pci-fdma-v5-0-ca56197ae05b@microchip.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290498-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-290487-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[vger.kernel.org,meta.com,gmail.com,debian.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: CFDCA5A8157
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:dkim]
+X-Rspamd-Queue-Id: 0EB615A824A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Mirror iucv_sock_setsockopt() and wrap the whole switch in
-lock_sock()/release_sock(). The pre-existing SO_MSGLIMIT-only lock
-becomes redundant and is removed.
+> This series adds FDMA (Frame DMA) support for the PCIe path. When
+> operating as a PCIe endpoint, the internal FDMA engine on lan966x cannot
+> directly access host memory, so DMA buffers are allocated as contiguous
+> coherent memory and mapped through the PCIe Address Translation Unit
+> (ATU). The ATU provides outbound windows that translate internal FDMA
+> addresses to PCIe bus addresses, allowing the FDMA engine to read and
+> write host memory. Because the ATU requires contiguous address regions,
+> page_pool and normal per-page DMA mappings cannot be used. Instead,
+> frames are transferred using memcpy between the ATU-mapped buffers and
+> the network stack. With this, throughput increases from ~33 Mbps to
+> ~620 Mbps for default MTU.
 
-Any AF_IUCV HIPER user can potentially crash the kernel by racing
-recvmsg() with getsockopt(SO_MSGSIZE): the SO_MSGSIZE arm dereferences
-iucv->hs_dev->mtu after iucv_sock_close() (called from the racing
-recvmsg()) has set hs_dev to NULL, producing a NULL pointer dereference
-oops.
-
-Suggested-by: Stanislav Fomichev <sdf.kernel@gmail.com>
-Fixes: 51363b8751a6 ("af_iucv: allow retrieval of maximum message size")
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Note1: Not using goto/label to simplify the merge conflict that might
-happen with the migration of af_iucv to getsockopt_iter
-
-Note2: This was only compile-tested.
----
- net/iucv/af_iucv.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
-
-diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
-index 72dfccd4e3d58..c2dc3338670e8 100644
---- a/net/iucv/af_iucv.c
-+++ b/net/iucv/af_iucv.c
-@@ -1540,7 +1540,7 @@ static int iucv_sock_getsockopt(struct socket *sock, int level, int optname,
- 	struct sock *sk = sock->sk;
- 	struct iucv_sock *iucv = iucv_sk(sk);
- 	unsigned int val;
--	int len;
-+	int len, rc;
- 
- 	if (level != SOL_IUCV)
- 		return -ENOPROTOOPT;
-@@ -1553,26 +1553,34 @@ static int iucv_sock_getsockopt(struct socket *sock, int level, int optname,
- 
- 	len = min_t(unsigned int, len, sizeof(int));
- 
-+	rc = 0;
-+
-+	lock_sock(sk);
- 	switch (optname) {
- 	case SO_IPRMDATA_MSG:
- 		val = (iucv->flags & IUCV_IPRMDATA) ? 1 : 0;
- 		break;
- 	case SO_MSGLIMIT:
--		lock_sock(sk);
- 		val = (iucv->path != NULL) ? iucv->path->msglim	/* connected */
- 					   : iucv->msglimit;	/* default */
--		release_sock(sk);
- 		break;
- 	case SO_MSGSIZE:
--		if (sk->sk_state == IUCV_OPEN)
--			return -EBADFD;
-+		if (sk->sk_state == IUCV_OPEN) {
-+			rc = -EBADFD;
-+			break;
-+		}
- 		val = (iucv->hs_dev) ? iucv->hs_dev->mtu -
- 				sizeof(struct af_iucv_trans_hdr) - ETH_HLEN :
- 				0x7fffffff;
- 		break;
- 	default:
--		return -ENOPROTOOPT;
-+		rc = -ENOPROTOOPT;
-+		break;
- 	}
-+	release_sock(sk);
-+
-+	if (rc)
-+		return rc;
- 
- 	if (put_user(len, optlen))
- 		return -EFAULT;
-
----
-base-commit: dc416e32baaeb620b9809e9e25fc7b30889686e9
-change-id: 20260520-af_iucv_fix2-74756a034517
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
-
+I went through the sashiko review for v5 (gemini and nipa). AFAICT no new
+series-level issues were raised — the only Critical (XDP features exposed before
+the xdp_setup() PCIe short-circuit lands) is a per-patch bisectability concern
+that sashiko itself flags as "likely fixed by the subsequent patch", and indeed
+patch [11/13] adds the guard. The NAPI bailout issue Paolo raised on v4 is
+fixed in this version and not reflagged.
 
