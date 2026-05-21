@@ -1,67 +1,93 @@
-Return-Path: <netdev+bounces-290206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290211-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qOlHIVNsDmob+gUAu9opvQ
-	(envelope-from <netdev+bounces-290206-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:22:11 +0200
+	id ADfQAkRsDmob+gUAu9opvQ
+	(envelope-from <netdev+bounces-290211-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:21:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E973159E050
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:22:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A982E59E049
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:21:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0DA4E308CD0F
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:20:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DC01530438B7
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A141360EF2;
-	Thu, 21 May 2026 02:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307EC3672A9;
+	Thu, 21 May 2026 02:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CpMIaL+c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rBvCJi2X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D2735AC16;
-	Thu, 21 May 2026 02:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7B0363083
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 02:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779330007; cv=none; b=dVSXcXQ2YSZzyjN5VqETp0HyqQlRuDISxROUjFTF7y3bIAlm9hVzdVLvozjl8jdrLBTsN+CgnWd383V4LoYrOtuwQA7aOJzRgS20ztOOWI3vSr+Ua4D4yO9V85Xw5awkmefYatlnOEq0I1/prqsZsA6K2+J82QM+yFUJAp9M7Tk=
+	t=1779330033; cv=none; b=IM/6mscDL/1KcZCaRXHHbilZHboBFOBMw2F3+6SgU7jfvdJGR4Fr+VjRyyqUPlYgueN/mdh50IugRTBLMGB7MOr3fJPqvwhGM/689F1G02a8UAxT5KsQUl0U39jqba33VLJXHxB+G5w/DsMTHaHCxbavr+6AuP/P2wvb4xqJSxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779330007; c=relaxed/simple;
-	bh=EwcKMgCqeiakWJc2uhXVGqk/7K/uDWBZu/OPG+qCHsg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rxa3LHbd+amdULVLf0A8uE4XLGnrLNSZ/gto3plb0sX/ICNJeVNhrZAZkEDRr5rJfDuc++CnZ4fY6RhsAstUcTFZkcWGfy2ykQsSmTrjrfhy7+twtr5SKpDf819bsCtpmTN8xjv7vkm4aXtDH16trbDiGdGpTH8/4XPB9OyLcH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CpMIaL+c; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93D1B1F000E9;
-	Thu, 21 May 2026 02:19:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779329996;
-	bh=xstjoF/zJ5oZYerl5FVu9kOlDFuapp4BsgXi3VaC0Bw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=CpMIaL+cAI1j6hm0NlgZFY8RpYGZmAom/bO9wxzbrC0W3tnKOn6LZl3c+LmJc0gk4
-	 6YSBQpKEa3x4U74D7pLTs+j5PZUW76yN+sQOcg9wSe2sNvDnd7EzHEglhbndJ7H7q6
-	 kXSFik/VF8EXgajkRzuIZTTBuByVI/9HB894cykF8A3z15Ex4RcN23UfBeVsLWJkPX
-	 86F7kLvF2T8lcfKutPynZyg9CaKQyOZl/V315XJTC8sUvnJO9NFgVL0CIqgYWOmHpm
-	 cXA3sRGCfI078lp8JmSECsmtvi3rWn5tKa2Db4xjAb26TEsXEtRD+TpWB8xv3hssa6
-	 MHn1n+dv6GAJw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: poros@redhat.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	ivecera@redhat.com,
-	vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com,
-	jiri@resnulli.us,
-	milena.olech@intel.com,
+	s=arc-20240116; t=1779330033; c=relaxed/simple;
+	bh=sR0IMC2lxIT7oq78hReehczLAD93dLuWS2Pbfk9mJ5Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pg6sENNcEtQqTq0uwi5xLcUWQvmIlcrdyuAaK83v7THrLYJuYzbpLmUHn7ur9vtN/6Xj2nH+Jzraeq0kmvd0xESH8BdDvXa5gJdbYLzTQytijVVM0a9+QOFF0HChMX0YDE+E5iNqUpnGg9S6zEXpsUl6o0DGT2fM+hb5wmU6Z7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rBvCJi2X; arc=none smtp.client-ip=209.85.167.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-47c35be02fdso2025293b6e.3
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 19:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779330020; x=1779934820; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wItdenP8OH+7UqXadpcXzkNSudYXM+oPYSE7Yb54pbE=;
+        b=rBvCJi2XaMI85hMNQyfvJK1T3EfmoR+jbeFMKmGBFMJ2hbsS70aLf6HluSI1e4bUgr
+         GZWqmrs1LfBiZJ4xAEa6yLTI4kbaI6914v5zzp3pE3LezNd6oBEpRrE3sJqvN3etZd51
+         k8hF+/K+1oe1/P/z43ssO1GjZuSsSTSss1/w46/lIxZ0VsSTNBMbLInWq4yxBPxG51kN
+         sT6gqb1tI6FAp3vy3mMSqMaDkQpu1IBF+1696OPEjaqi5n0YgLdpjvgBIveGWDQRPXSP
+         4UoeoXTdWSHsEx6WPpX5rIWVFtHdmdquvXs9AJ2STiFTliYGk+JASL8PedNimaBV6i3N
+         M70g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779330020; x=1779934820;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wItdenP8OH+7UqXadpcXzkNSudYXM+oPYSE7Yb54pbE=;
+        b=ru4nFup2V4EHFKcmsh4ydIwLK54Cg2ChU70V2RkRcrGUX3olvQE8vS58DPcOcGO/T0
+         A5hKaixXkKGkohqGlawFvR6ID0P7tdqID1o98EdYky/FklAhUIBC3WZUHSPykXGvI3NZ
+         qnGfOSomAIOVN3W1NPv0VFb4xcgzXiq7zu9e0kV2qUHD1/eazdU0rI8sOazxT2BN3qP1
+         +oS6zRtgfVf5FUsJZQ7EYY8ybW42+nwymHPVDWPjZe//8PFFxAROMXQiYulm3QU64LU8
+         YNjP/Sa9FDsEeAQGb6nUqy5BHWkepn801wiR6LLQos4R9wxk1hoeCp3Gmi2RSWnkn2L0
+         FTFw==
+X-Gm-Message-State: AOJu0YwV80COrthXq8GvS3xgyiWjvjgQ6AyiMeDFx7UmdWWetXefkum/
+	l8Mf4zVWD/wpLFHTfDww0MMEUsDBVFN9rQrG9LJsWX5uuLEbmwP1Y1smhfyRNP9EHVA=
+X-Gm-Gg: Acq92OF5Dvwq547VsHPvGTV/jasraOQI+OKFPKe7dO0GyKudyJr0eTeWPqIDlGauR5/
+	N8T2XkVc8EXxoZAgL/nO+VYRQW/pCAfoGCQKn7qwWmMMHwe2bR0xotdBtQ0HCvbOJLzZHlaPUbn
+	PsRkNQymUaNfTefIhWg0pOpnO7mgkEfEEDyA9KSTsK+H3E+9O3PT8praHFzg5ABE+hAcvHr7ESP
+	EkHm0iywD05Yp7PXn9rBiI/+Kb3KapQ+ZJHlyijyDOE6zo9/lehEyqDktU8IXT/c//OQD1MVl63
+	VctOamwLW4MBmYl91Q5Fu6IehcudL+8v1iLG+4PIqsKYTxDt+Ee4PDTNLlMnY/ZavLvTcBFTwjV
+	M1H/8+EspDLE+0S/8Twho3HwHIaYEJbf1oBNFspR43PQZaOfuPMKDRUHOxriiEdStffEw51kuQU
+	ON42O+OxVtBg/CQz/Oump0CklbQg==
+X-Received: by 2002:a05:6808:148c:b0:479:e96e:65aa with SMTP id 5614622812f47-4852edb4dd5mr435645b6e.42.1779330020102;
+        Wed, 20 May 2026 19:20:20 -0700 (PDT)
+Received: from houminxi ([72.244.37.221])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e55b7c6b38sm13791720a34.2.2026.05.20.19.20.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 19:20:18 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: donald.hunter@gmail.com,
 	davem@davemloft.net,
-	michal.michalik@intel.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/2] dpll: fix NULL deref in dpll_device_ops() during teardown race
-Date: Wed, 20 May 2026 19:19:53 -0700
-Message-ID: <20260521021953.688132-1-kuba@kernel.org>
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	aconole@redhat.com,
+	linux-kernel@vger.kernel.org,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next v4 0/2] Add OVS packet family YNL spec and unicast notification support
+Date: Thu, 21 May 2026 10:20:00 +0800
+Message-ID: <20260521022002.879334-1-houminxi@gmail.com>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260516191317.1005612-2-poros@redhat.com>
-References: <20260516191317.1005612-2-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,158 +95,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290206-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-290211-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E973159E050
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A982E59E049
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-dpll: fix NULL deref in dpll_device_ops() during teardown race
+This series adds a YAML netlink spec for the OVS_PACKET_FAMILY genetlink
+family and a bind-only ntf_bind() helper for receiving unicast
+notifications.
 
-This patch tolerates an empty registration_list on a still-indexed dpll
-by dropping a WARN_ON in dpll_device_registration_first(), making
-dpll_priv() and dpll_device_ops() return NULL in that state, and adding
-an early return in dpll_cmd_pin_get_one() when the first dpll-ref of a
-pin is already torn down.
+Changes in v4:
+- patch 2: rename ntf_listen() to ntf_bind(addr=(0, 0)); the name
+  listen() was misleading since the operation is a bind(), and the
+  address is now an explicit argument defaulting to (0, 0)
+  (suggested by Jakub Kicinski)
 
-> diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-> index cbb635db4321..4a058b46c69d 100644
-> --- a/drivers/dpll/dpll_core.c
-> +++ b/drivers/dpll/dpll_core.c
-> @@ -1060,12 +1060,8 @@ EXPORT_SYMBOL_GPL(dpll_pin_ref_sync_pair_add);
->  static struct dpll_device_registration *
->  dpll_device_registration_first(struct dpll_device *dpll)
->  {
-> -	struct dpll_device_registration *reg;
-> -
-> -	reg = list_first_entry_or_null((struct list_head *)&dpll->registration_list,
-> -				       struct dpll_device_registration, list);
-> -	WARN_ON(!reg);
-> -	return reg;
-> +	return list_first_entry_or_null((struct list_head *)&dpll->registration_list,
-> +					struct dpll_device_registration, list);
->  }
->  
->  void *dpll_priv(struct dpll_device *dpll)
-> @@ -1073,6 +1069,8 @@ void *dpll_priv(struct dpll_device *dpll)
->  	struct dpll_device_registration *reg;
->  
->  	reg = dpll_device_registration_first(dpll);
-> +	if (!reg)
-> +		return NULL;
->  	return reg->priv;
->  }
+Changes in v3:
+- patch 1: add missing document start "---" after SPDX comment
+  (yamllint warning in v2)
 
-[High]
-With dpll_priv() now silently returning NULL for any half-dead dpll,
-the contract for the ~28 in-tree callers of dpll_priv() changes.  The
-commit message asserts that the only path which can observe the new
-NULL return is dpll_cmd_pin_get_one() reached from
-dpll_pin_event_send(), and that this path is "gated here" by the new
-check in dpll_cmd_pin_get_one().  Is that gate actually coextensive
-with the set of dplls walked by this code path?
+Changes in v2:
+- patch 1: use YAML anchor (&event-attrs / *event-attrs) to avoid
+  repeating the same attribute list for miss and action events
+  (suggested by Donald Hunter)
+- patch 1: fix enum-name from ovs-packet-attrs to ovs-packet-attr
+  to match the kernel enum name ovs_packet_attr
+- patch 2: add ntf_bind() to the YnlFamily docstring under the
+  "Notification API" heading (suggested by Donald Hunter)
 
-> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-> index ea6360263786..b73d718e8a56 100644
-> --- a/drivers/dpll/dpll_netlink.c
-> +++ b/drivers/dpll/dpll_netlink.c
-> @@ -709,6 +709,12 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
->  	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
->  	ASSERT_NOT_NULL(ref);
->  
-> +	/* The first dpll the pin references may be torn down while still
-> +	 * pinned by foreign-driver refs; drop the notification cleanly.
-> +	 */
-> +	if (!dpll_device_ops(ref->dpll))
-> +		return -ENODEV;
-> +
+Minxi Hou (2):
+  netlink: specs: add OVS packet family specification
+  tools: ynl: add unicast notification receive support
 
-[High]
-The check only validates the dpll returned by
-dpll_xa_ref_dpll_first(&pin->dpll_refs), i.e. the first ref.  Later in
-the same function, when pin->parent_refs is empty, control falls
-through to dpll_msg_add_pin_dplls(), which walks every entry of
-pin->dpll_refs:
+ Documentation/netlink/specs/ovs_packet.yaml | 130 ++++++++++++++++++++
+ tools/net/ynl/pyynl/lib/ynl.py              |   5 +
+ 2 files changed, 135 insertions(+)
+ create mode 100644 Documentation/netlink/specs/ovs_packet.yaml
 
-    xa_for_each(&pin->dpll_refs, index, ref) {
-        ...
-        ret = dpll_msg_add_pin_on_dpll_state(msg, pin, ref, extack);
-        ...
-        ret = dpll_msg_add_pin_operstate(msg, pin, ref, extack);
-        ...
-        ret = dpll_msg_add_pin_prio(msg, pin, ref, extack);
-        ...
-        ret = dpll_msg_add_pin_direction(msg, pin, ref, extack);
-        ...
-        ret = dpll_msg_add_phase_offset(msg, pin, ref, extack);
-        ...
-    }
+-- 
+2.54.0
 
-Each of those helpers calls dpll_priv(ref->dpll) and passes the
-result as the dpll_priv argument to a driver ops callback.  Can a
-non-first ref->dpll in this loop be in the same half-dead state (entry
-still indexed in dpll_device_xa, but registration_list empty), so that
-dpll_priv() now hands a NULL back to a driver callback that expects a
-non-NULL private pointer (e.g. ice_dpll_pin_state_get does
-struct ice_dpll *d = dpll_priv; struct ice_pf *pf = d->pf;)?
-
-The teardown path the commit message describes
-(zl3073x_dev_dpll_fini iterating list_for_each_entry over zldev->dplls
-and calling zl3073x_dpll_unregister on each) drops dpll_lock between
-per-dpll unregisters.  If a pin from a foreign driver references two
-dplls of the unloading provider, can a notify work observe one
-already torn down and the other still healthy, with the new gate
-inspecting only the first?
-
-Should the same NULL-tolerant treatment also be applied to the
-xa_for_each loop in dpll_msg_add_pin_dplls(), or should the gate skip
-half-dead refs there as well, so the commit message claim "those
-callers cannot see the new NULL return ... only path that can is ...
-gated here" actually holds?
-
-[Medium]
-Separately, the new -ENODEV return interacts with dpll_nl_pin_get_dumpit():
-
-    ret = dpll_cmd_pin_get_one(skb, pin, cb->extack);
-    if (ret) {
-        genlmsg_cancel(skb, hdr);
-        break;
-    }
-
-dpll_pin_available(pin) returns true as long as any of the pin's
-parent_refs or dpll_refs is still DPLL_REGISTERED, so a pin can be
-"available" while its first dpll_ref is the torn-down one.  In that
-case the new -ENODEV breaks out of the dump loop and propagates to
-userspace, hiding every later pin from a single dump call.  Should
-this dumpit caller treat -ENODEV from dpll_cmd_pin_get_one() as a
-"continue" rather than a fatal error, so the dump skips the transient
-pin instead of failing wholesale?
 
