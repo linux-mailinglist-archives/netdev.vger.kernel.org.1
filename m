@@ -1,325 +1,258 @@
-Return-Path: <netdev+bounces-290481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290482-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SDHBLkcZD2qLFgYAu9opvQ
-	(envelope-from <netdev+bounces-290481-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:40:07 +0200
+	id kCQBE0gWD2otFAYAu9opvQ
+	(envelope-from <netdev+bounces-290482-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:27:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 822235A774D
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E42A15A73F2
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:27:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 97D8131332DF
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:06:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BE65531F8BCB
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5994312834;
-	Thu, 21 May 2026 14:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28551367F26;
+	Thu, 21 May 2026 14:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C5jbsdTg"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Dl/SP/qu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173D4199949
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8053E5A0B;
+	Thu, 21 May 2026 14:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779372353; cv=none; b=DWpbCdv60ue0eGZgK4jbq/fQ0bN2Vrtd30Ka07x1MmRrwYl2vmjcM6lO+9+vY6Q/RoxKh7CuMSnOsgOwR8tyfYYaB3w017BpSwCQrd8VorPt3Zc6y6qdOwXNqYhYBMObqShLhC7lABILI1DswWle1FHft1O3u2ZQSlqVxLEIrS4=
+	t=1779372431; cv=none; b=C6C2x+EfC2EcZUc5Cao30y9YCI9C2nhuhJ8IRBxx8lJNZOw9BBWzkb7vVlYnzue9PUawUzTDKMjApRsq+0GG8LG+fZMIUFfpW11fHj9lD27zIXqfWJaQi4qVS97iDMPk+NrtXJ7SB1+6M2pZL9wdxUeOX+ePHmMgruFkM1083ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779372353; c=relaxed/simple;
-	bh=Qdrj70/7Fw9KpEAD7Q1c+H4tNdtMLmaZEEcLMxmrK38=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g8DEEj+hIqZEhPqovxE2FSDNGG6pbkqXGwHGaz8xjk1Qfgc6X2gOoFKWmgRMkTYbteqMayCSjih0YxV81AeWTv875Rf3V0VCb3SM29nx3FZWRrE/1QtpUp/B4dWVJmhwa9eg8i5knXWuCQ7D/Mf582Nxc2dpOmK6qR8Q7dtLzro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C5jbsdTg; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-bd8faef2e18so602128266b.3
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 07:05:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779372348; x=1779977148; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FPQl7cGyYLeedVT42x9toU1ulCeWeEYHpuhQ0U+w0E4=;
-        b=C5jbsdTg2rCu7Yd97r1TiygVK9nFjhp+0iFQKLaAEGWBKEWuWoW3g3VSC0Zh3Iwhfq
-         8bwlvFMUQNz+910lV43w9dFkb2m/aEZlqUvHzQ5mVwxgvqekBhFq9XIl4i3ZqeQm4LNb
-         nRBtr+5ErmUaHSJ1WGYLTU4cc4m3CNZ0N5z5UUWe+CosYaDVAQHr6QjNKK1YptoVbL77
-         f2lTJu9q3Aw3uocC6AVanpdmJeOgRspmNG04GcZP9ymgUoNqGdG7mxARKLTktlIdrSx/
-         2Zlowz1c58AYgAoAYXa3uE03VG27SZgsXQPMsf4kqg2t8mUuZ05riwfvbNWlwxwxyhvz
-         ykHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779372348; x=1779977148;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FPQl7cGyYLeedVT42x9toU1ulCeWeEYHpuhQ0U+w0E4=;
-        b=nr7zsDF3CzDBK9L8dtZpjpVSO5nUnY2dsehsQ/9FzSIMSjIUDnP8zTqY16qP4eLj8l
-         F5pD1IqkHHio04u2GLd6VhWZKFjXvxa/lzyzoNzhzlEiQtHJjLVWDlrK4qvLkEBJvPEL
-         VLmscEUgTDUp6Eaw12AWDBhQB2Mws6XZ7/pZdEPvre0tw+AU0qw4e0BAHMTEGA5Lovsu
-         Jp4doKglRAsAW5t9gS3BC2ANWmmLPGhQYggfgbFNOPEobzTM+6E8L18htE4zf7i/dw5W
-         /MBWOasdIxepD3ck86em1rNV3BnpuzyCbNKZ6aIIGkFj6EJqc5QHcKpFMKM9wrDShMCx
-         6ZbA==
-X-Forwarded-Encrypted: i=1; AFNElJ90Wcq/pHA4oDxH/ump2mzcUePW9pdOo/vJGxtv907IZZodMiFMtnxFPqeyHsai21NDli+P+pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGiXJp5LGHnAKv8dp+/SVAfQdaNgB9YeaU6qHMBklT1NgL6e8l
-	iUDYvqPCBrPO8oT7EO0A9B1+pPeIwMqJv2Y0DM//2JYTghiJMATsHOfT
-X-Gm-Gg: Acq92OHsU9fmEHFrS3oi6KbQfnKRQywiL/RjbPPvChzFh4/0b1oIYGsCC91nO6uTjuV
-	Pl6+jTyqlq3wLCv8nQdV4RgoWfuJJ/bdkHT/cev96AjGSRg8aBxUtHJNOhM52QQ8Z9o3ThtJDKh
-	oy/4CgO1EUntCwPKedS5cWSZ5/B708xT5ecTh4lIRTjT0+NaK9caDw2LpTO/Zi4aIo8ifh8baWB
-	cI/KswKrMMeHZD3da2wS1tmMFKR6wWIWryJAVmPJmOALpZeyA+H36yfbzVExHUJtKmKswtAaKgf
-	x0aRyVTO7yrz/2tigwSR44KR8VxIWTVngdtj7wUyr/KySuhCd7d5XwAITYJOVjeepPH7oZcxrOQ
-	2948U/39exgfo962ZaTi72ZuB5jZfpHsfD64fKEtReLUSPqVSt6Pcs3a934UoOHF4z1a5SnXi2k
-	RH4ZYp6L74dyTNm9Tv0b9yk/bjCqRgqKuEPXCHGqHoikf3KZI7/Gxmcux9YBCk2JXY/XozZ0aAV
-	dcjZA==
-X-Received: by 2002:a17:907:869f:b0:bd4:b787:cbc1 with SMTP id a640c23a62f3a-bdc13a703f5mr194274366b.12.1779372348026;
-        Thu, 21 May 2026 07:05:48 -0700 (PDT)
-Received: from PF5YBGDS.localdomain ([163.114.130.5])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bdc8789134esm51514766b.6.2026.05.21.07.05.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 07:05:47 -0700 (PDT)
-Date: Thu, 21 May 2026 10:05:43 -0400
-From: Mike Marciniszyn <mike.marciniszyn@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Daniel Golle <daniel@makrotopia.org>, Kees Cook <kees@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, Lee Trager <lee@trager.us>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	Alok Tiwari <alok.a.tiwari@oracle.com>,
-	Chengfeng Ye <dg573847474@gmail.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] net: eth: fbnic: Add led support
-Message-ID: <ag8RN5-J1peL5xhg@PF5YBGDS.localdomain>
-References: <20260520200337.204431-1-mike.marciniszyn@gmail.com>
- <20260520200337.204431-4-mike.marciniszyn@gmail.com>
- <74576086-f51f-41ef-b0ef-c4e0373a06c4@lunn.ch>
+	s=arc-20240116; t=1779372431; c=relaxed/simple;
+	bh=UrIciK5GBlwcCDWyv5Jjz7Ua5Ada7YbgVSoB3CrPSxk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cEeyPQIiF3x+ZULfcURJ1vAJ7b4fgdu3us2ugDnZsm0O42+c7S9+iFo/Cahpsw6petBjfeG6jzu0S1qPha+bIxHPBP9TEroeOwWgIRoHYgzopeVqLK/ONuzJtB6kGMjZHZ+TxiP7GUp7Oe4lNhLQS4FKpU8CDqoYjizI5VLhPms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Dl/SP/qu; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=UrIciK5GBlwcCDWyv5Jjz7Ua5Ada7YbgVSoB3CrPSxk=; b=Dl/SP/qudfEAHMkoYwttB7mDtN
+	ntSe0+ux3exFZSBe56acsS0+W1G5lZAzQod02XyZfn5mwB/eslcH790sEfeCuDYXmSp//iDTccqEw
+	RQ8KRyzs4ELceNXkVVQBo+fjWM8w0NEv+avqLYsNJicUbt2JbW74Yg96LIm7q4Agr4wo0VqQAYors
+	GBLU3bPfln2AhgClywT+WNfTYACYG9O4wn1teyT6VvuWhLkBvtWaf1/i5J//UnU1gK6f9f44CyEQb
+	oQVrJAMDC6s5+hsPv92KzX/sYOjr7iq7P+cP1/JAEsED+cDo6NzyLh1iAg7U/vbg1kH4kw9qBywua
+	pAx4Shuw==;
+Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wQ43E-00000008ZOr-0z2r;
+	Thu, 21 May 2026 14:07:04 +0000
+Message-ID: <0a7c12b3f01affbd2e58745778c7790c32b4e26b.camel@infradead.org>
+Subject: Re: [PATCH v3 net-next 4/7] ptp: ptp_vmclock: Implement attributes
+ ioctls
+From: David Woodhouse <dwmw2@infradead.org>
+To: Arthur Kiyanovski <akiyano@amazon.com>, David Miller
+ <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+Cc: Richard Cochran <richardcochran@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Miroslav Lichvar <mlichvar@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Wen Gu <guwen@linux.alibaba.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, David Woodhouse <dwmw@amazon.com>, Yonatan
+ Sarna <ysarna@amazon.com>, Zorik Machulsky <zorik@amazon.com>, Alexander
+ Matushevsky <matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, Matt
+ Wilson <msw@amazon.com>,  Anthony Liguori <aliguori@amazon.com>, Nafea
+ Bshara <nafea@amazon.com>, Evgeny Schmeilin <evgenys@amazon.com>,  Netanel
+ Belgazal <netanel@amazon.com>, Ali Saidi <alisaidi@amazon.com>, Benjamin
+ Herrenschmidt <benh@amazon.com>,  Noam Dagan <ndagan@amazon.com>, David
+ Arinzon <darinzon@amazon.com>, Evgeny Ostrovsky <evostrov@amazon.com>, Ofir
+ Tabachnik <ofirt@amazon.com>, Amit Bernstein <amitbern@amazon.com>,
+ linux-kselftest@vger.kernel.org, shuah@kernel.org, 
+ vadim.fedorenko@linux.dev
+Date: Thu, 21 May 2026 15:07:02 +0100
+In-Reply-To: <20260515164033.6403-5-akiyano@amazon.com>
+References: <20260515164033.6403-1-akiyano@amazon.com>
+	 <20260515164033.6403-5-akiyano@amazon.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-3O3l81w39Zc8SMgEUGO3"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <74576086-f51f-41ef-b0ef-c4e0373a06c4@lunn.ch>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290481-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290482-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,makrotopia.org,gmail.com,intel.com,trager.us,oracle.com,linux.intel.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[32];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	HAS_ATTACHMENT(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,redhat.com,linutronix.de,lunn.ch,linux.alibaba.com,amazon.com,vger.kernel.org,kernel.org,linux.dev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,PF5YBGDS.localdomain:mid]
-X-Rspamd-Queue-Id: 822235A774D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,amazon.co.uk:email,infradead.org:mid,infradead.org:dkim]
+X-Rspamd-Queue-Id: E42A15A73F2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 10:37:01PM +0200, Andrew Lunn wrote:
-> > +/**
-> > + * fbnic_set_phys_id - Used to strobe the MAC LEDs in a recognizable pattern
-> > + * @netdev: Interface/port to strobe the LEDs for
-> > + * @phys_id_state: State requested by the call
-> > + *
-> > + * This function can really be broken down into two parts. There are the
-> > + * ACTIVE/INACTIVE states which really are meant to be defining the start
-> > + * and stop of the LED strobing. There is also the ON/OFF states which are
-> > + * used to provide us with a way of telling us that we should be turning
-> > + * the LED on and/or off.
-> > + *
-> > + * We translate these calls and pass them off to the MAC layer. They will
-> > + * be used to initialize a strobe, then on and off will be used to cycle
-> > + * between the patterns, and finally we will restore the original LED state.
-> > + *
-> > + * We will return 2 when we are requested to go active. This will tell the
-> > + * call that it will need to call back to turn on/off the LED twice every
-> > + * second.
-> > + *
-> > + * Return: blink in half second intervals on success, negative value on failure
-> > + */
->
-> Could you drop this for the moment. Ideally, we want the LED core to
-> be implementing this somehow, so that all devices using the core get
-> this functionality, rather than put it in every driver.
->
 
-The driver does exploit the LED core.   The actually interface to the
-LEDs are simple on/off settings.  The strobing follows the OCP spec
-to alternate between the "below" speed color (amber for fbnic) and the "at"
-speed color (blue for fbnic).
+--=-3O3l81w39Zc8SMgEUGO3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The only complication is the the CSR bit for the activity LED is 1 implies
-off and zero implies on.  The activity LED flashes automatically
-based on actual network activity provides it is set to 0 (on).
+On Fri, 2026-05-15 at 16:40 +0000, Arthur Kiyanovski wrote:
+> Implement the gettimexattrs64 and getcrosststampattrs callbacks in the
+> ptp_vmclock driver to provide clock quality attributes through the new
+> PTP_SYS_OFFSET_EXTENDED_ATTRS and PTP_SYS_OFFSET_PRECISE_ATTRS ioctls.
+>=20
+> The ptp_vmclock device exposes:
+> - error_bound: Derived from time_maxerror_nanosec, accumulated with
+> =C2=A0 counter frequency error (counter_period_maxerror_rate_frac_sec) ov=
+er
+> =C2=A0 elapsed counter ticks
+> - clock_status: Mapped from the device's clock_status field
+> - timescale: Determined from time_type (UTC, TAI, monotonic, etc.)
+>=20
+> The legacy ioctls return -EINVAL when clock_status is UNRELIABLE since
+> they have no way to communicate clock state to userspace. The attrs
+> ioctls have a status field for this purpose, so they treat UNRELIABLE
+> as success and let userspace check the status field.
+>=20
+> To avoid a race where the hypervisor could update clock_status between
+> the timestamp call and the UNRELIABLE check, the clock state is captured
+> inside the seq_count loop for a consistent snapshot with the timestamp.
+>=20
+> Signed-off-by: Arthur Kiyanovski <akiyano@amazon.com>
 
-The return to the LED core gives the count of the number of cycles per
-second and each cycle alternates between amber and blue.  The driver
-is a slave to the ETHTOOL_ID_* phys_id state from the LED core based
-on that timing.
+Looks sane, although I haven't tested it. I think I recall pointing you
+at a QEMU hack which will export *some* actual hardcoded time
+information through vmclock, which is what I'd always tested the guest
+with so far. In the last week or so I've posted host kernel and QEMU
+support to expose *actual* host timekeeping to the guests, which might
+be useful to do some more comprehensive testing?=20
 
-I'm not sure what else would need to go into the LED core?
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-> > +static int fbnic_led_hw_ctl_set(struct led_classdev *led_cdev,
-> > +				unsigned long flags)
-> > +{
-> > +	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-> > +	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-> > +	int led_idx = fbnic_led_get_idx(fbd, ldev);
-> > +	u32 supported_modes;
-> > +
-> > +	supported_modes = fbnic_led_get_supported_modes(fbd, led_idx);
-> > +
-> > +	if (flags & ~supported_modes)
-> > +		return -EINVAL;
-> > +
-> > +	/* Turn on activity LED only when both the TX and RX flags are set. */
-> > +	if (led_idx == FBNIC_LED_ACTIVITY && (flags & supported_modes) &&
-> > +	    flags != supported_modes) {
-> > +		dev_warn(fbd->dev,
-> > +			 "Invalid activity LED mode(s): 0x%lx\n", flags);
-> > +		return -EINVAL;
->
-> How does this happen? It should be that the core will not ask you to
-> do something you cannot do, if you have answered -EOPNOTSUPP in
-> fbnic_led_hw_ctl_is_supported().
->
 
-Will need to investigate this.
 
-> > +static int fbnic_led_brightness_set_blocking(struct led_classdev *led_cdev,
-> > +					     enum led_brightness brightness)
-> > +{
-> > +	struct fbnic_led_cdev *ldev = led_classdev_to_fbnic_led(led_cdev);
-> > +	struct fbnic_dev *fbd = led_cdev_to_fbd(led_cdev);
-> > +	int led_idx = fbnic_led_get_idx(fbd, ldev);
-> > +
-> > +	mutex_lock(&fbd->led_mutex);
-> > +	if (!brightness) {
-> > +		fbd->leds[led_idx].enabled_modes = 0;
-> > +		fbd->leds[led_idx].strobe_mode = 0;
-> > +	} else {
-> > +		u32 mode;
-> > +
-> > +		switch (led_idx) {
-> > +		case FBNIC_LED_ACTIVITY:
-> > +			fbd->leds[led_idx].enabled_modes =
-> > +				BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-> > +			break;
-> > +		default:
-> > +			mode = fbnic_led_get_link_speed_mode(fbd);
-> > +			fbd->leds[led_idx].enabled_modes = mode;
-> > +			break;
-> > +		}
-> > +	}
->
-> This looks odd. led_brightness_set() is simply used to set the LED to
-> on or off. The netdev trigger will use it to software blink the LEDs
-> when asked to do something which cannot be offloaded to the hardware.
->
-> And when the LED is being used to show NUMLOCK, or Morse code crash
-> dump, network activity should not intervene.
->
+--=-3O3l81w39Zc8SMgEUGO3
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-Will need to investigate this.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUyMTE0MDcw
+MlowLwYJKoZIhvcNAQkEMSIEIJMBiXRLOHuwkeG3VYMzCcPJW+Hapj3ujigQGvb/XdOCMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAasWIp68AydbV
+sp5qz/pdSQtcY2QfJ6c2dt1Nq+v4fjtcEZ6hYkIHSYBnBH07Rq0BlqySX9G7IwCQhkkhYeqc+xQg
+RN8WZcaJMUXa+gqiL0ao6AFfWh7DM61tBaS8ergYsF8Eu/oUMiDyMzBQv4jk7e96SmpBZJ+AZx76
+Eff+Lhu0orZm6dxGhtR/4kDGoIRSzSBzJ+CrMV3T5n5oDyxEty1nW0FPjDpAh9uhqCrxzcV10pqU
+sV9pP6kmOGcH6ESoJyunoFiiV2mXWwyvyH2KfgVcKJRBXPW/JbYjBqS8oyfeBsdnH7U36eeXDRrY
+zK5dueV2heH+zA2NinY14ta2JOrvZPOiNjbAPnvp2rNr6/Y4tEZ28/jmI9SYGxl08TbwK+O5/KAR
+a61+ud58pZtIUb0weSuail7/7sVA+VNgDDT9Jysh4KWFJGS2fjiPSehgxzkmvVX4H1yf+0faMdUQ
+b+0v1uUApXwrcQz5/ARqaNCinsIDnMVzW9El33/ASxZ/qvSJE5dWk4LcDQup6Vg4PRBsWj7WANMT
+X3PbV3NKWqZdcIX96njifU5JJWyrmgEyCiwwUz/iOYa9is8Zt7enFlKTGlZh4MGpioc3dXWj45fD
+c0V+j40iGoCCiWDdaqgY1a2Uwk/c5rxP8jaEnNsuPWdRztmCFE6reYRPaMgHOjYAAAAAAAA=
 
-> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-> > index 53b7a938b4c2..c6b1130f9159 100644
-> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
->
->
-> > @@ -623,6 +623,53 @@ static bool fbnic_pmd_update_state(struct fbnic_dev *fbd, bool signal_detect)
-> >  	return false;
-> >  }
-> >
-> > +u32 fbnic_get_link_speed(u8 link_speed)
-> > +{
-> > +	switch (link_speed) {
-> > +	case FBNIC_FW_LINK_MODE_25CR:
-> > +		return SPEED_25000;
-> > +	case FBNIC_FW_LINK_MODE_50CR2:
-> > +	case FBNIC_FW_LINK_MODE_50CR:
-> > +		return SPEED_50000;
-> > +	case FBNIC_FW_LINK_MODE_100CR2:
-> > +		return SPEED_100000;
-> > +	default:
-> > +		return 0;
-> > +	}
-> > +}
-> > +
-> > +static void fbnic_set_led_state(struct fbnic_dev *fbd, int state)
-> > +{
-> > +	mutex_lock(&fbd->led_mutex);
-> > +
-> > +	/* alternating amber,blue IDs device every half second */
-> > +	switch (state) {
-> > +	case FBNIC_LED_OFF: /* amber on, blue off */
-> > +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode = FBNIC_STROBE_ON;
-> > +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode = FBNIC_STROBE_OFF;
-> > +		break;
-> > +	case FBNIC_LED_ON: /* amber off, blue on */
-> > +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode = FBNIC_STROBE_OFF;
-> > +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode = FBNIC_STROBE_ON;
-> > +		break;
-> > +	case FBNIC_LED_RESTORE:
-> > +		fbd->leds[FBNIC_LED_LINK_AMBER].strobe_mode =
-> > +			FBNIC_STROBE_DISABLED;
-> > +		fbd->leds[FBNIC_LED_LINK_BLUE].strobe_mode =
-> > +			FBNIC_STROBE_DISABLED;
-> > +		break;
-> > +	case FBNIC_LED_STROBE_INIT: /* a no-op */
-> > +		/* Initialization is a no-op; LED toggling happens on ON/OFF */
-> > +		goto out_unlock;
-> > +	default:
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	fbnic_led_update_csr(fbd);
-> > +out_unlock:
-> > +	mutex_unlock(&fbd->led_mutex);
-> > +}
-> > +
->
-> This appears to be something different to trig-netdev and sys class
-> LED control of the LED. Please could you move this out into another
-> patch. Add clean support for the LED first, and them mess it all up in
-> follow up patches adding all your vendor specific stuff. We can then
-> think about if some of that can be moved into the LED core/trig-netdev
-> somehow.
->
 
-This IS the slave to the LED core ID mechanism.
-
-If I'm understanding your suggestion the ethtool id, this routine and
-the fbnic_led_update_csr() need to be a separarate patch?
-
-> 	Andrew
+--=-3O3l81w39Zc8SMgEUGO3--
 
