@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-290184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290185-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oMRxOMRaDmo4+AUAu9opvQ
-	(envelope-from <netdev+bounces-290184-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 03:07:16 +0200
+	id 8HuaCPdaDmo4+AUAu9opvQ
+	(envelope-from <netdev+bounces-290185-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 03:08:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6100759D84B
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 03:07:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CEB759D862
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 03:08:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 404F530CBCB0
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:04:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C0E330E066A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 01:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8C229D26E;
-	Thu, 21 May 2026 01:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB972C08BB;
+	Thu, 21 May 2026 01:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMvF2c/K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="igHngFhj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F8A299927
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 01:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3E723D7F0
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 01:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779325446; cv=none; b=tn7nSCiW0EflZE5SdFQwJa8QrYFo5Ub3YJhfpZ010fVgrduehMj0jMxKjbDankzt6CFGOAgWwYU3f8fsodebOUvXBPmwb956lCMBeIzNLkTluAaL0PhHh9AJk87kDGjjar/esdH49DuxyUUf3hKbS/2G4XH/MF4Hq5zL/CvTcSE=
+	t=1779325450; cv=none; b=sDG96r/9BnmMRKIkkbUT5m4rCsu65GWDBsyg/IXtOo294kmRKXbva9rUajCsMIWdvG4sFcRXKBQGpIDOHhj3r1NGDTWRgDIHltqaM5KIuD8RBaGdrcUF8t7JJ0jBY4gUczAoTMyog9NdecSPBdouIwXc2zkT5jfcpp2aKye9XWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779325446; c=relaxed/simple;
-	bh=AS3r4SOTc4veYSfaHwgwn+ULtHBqWvT8Yq79Cu0j7WE=;
+	s=arc-20240116; t=1779325450; c=relaxed/simple;
+	bh=1ZjWBN0yIBNQfqflAGBfSTW8/icSlSo2UT4WXbyWYAA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pBeYvXk/+1pAUdbzsjWJQNJ38/ajW9bDNA+UDIOymMPtfvwPui+Lkx4ZIzINeP6Fuw1ZCy4chfrsMi3iT+DOHhWUhYL8EKTLz8YVMJn5/0WJJu1Lik+yBjbbOmv9NpUq4ZzBzYXEYSp/Oy6wYxkaas/Fw0xRRgyDAy2Xah9WqRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SMvF2c/K; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=kdCfmAmkjLhrAr/hteoVTpBjW8ntOxBZ5enD4u3E2PrvNr06P8g3cYAjlbUj8Q/SELOXOJsWcJ4ZllfGaqzBI+p3y7YTsqhoVlNSWaUv0elqpKB4hdLIXjA11TQBk6mM4FJFoq2clxwilfv8Qqk2nVkTJzyV89mJ0daw8VHb9og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=igHngFhj; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-824c9da9928so2288298b3a.3
-        for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:04:05 -0700 (PDT)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-c8025500cc7so4261461a12.1
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 18:04:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779325445; x=1779930245; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779325449; x=1779930249; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wLqsfTgrZOczLHoU8IEadZ/9mpSZuAXVPGGnbvVO5aU=;
-        b=SMvF2c/KcNGZT+6uRTRqQihxxx9dF5TPjroCcs7vjB/gVEymMYpEDC+uqY+DNOhkxN
-         b1ilTnE434PITCqplXatB8MzdO+xNgnKw6vxuTTkEWFPh+u0jbjicg1yP1zkNpnQY4fH
-         CsDa5h8CMVupxCpNYx9BBbWgp9Bx3P75J1Hm1MtdAccbuBzPt5SIl9ZqUtF/cbYIXiz7
-         ABcHxAcYWk0m+ERm23mrvmJKaNJMOl32R7S0ahPO1IJbMGxPVnMsKEoY2Yc+7abMydOw
-         ++DFW5SOqturRsm0byO66FuuejBJomsxIEFoNRy53v5UskAzgBzvAIJkH3tuqfPGfkp/
-         pQpg==
+        bh=A1zAZ9q3hOWLxZR5AYVa5Nm+ouUfN2L7nHWHZTxPEz0=;
+        b=igHngFhjo686CUY1sLkUjKTfg2rU6TjQfybS2J1mgowWcRPO3RfnDokgvDDRIM+Al0
+         SDVU+2XBUeac0K1CPJurAUa3vqyajWUpJAjmrOMa/M97YKA8GUkhri1mW82z0O9qOqL8
+         h3s0rb1OdIj8aoEe0bAluH9Ofot0cxGTWQj+q/5OTqHxLFosLd2JVjexN450baEpo0q3
+         pfj7a2mxEb9YDzucvbmnrqXVuBUYkpwthUztWPwQJbDNUkFApaRj19yDsStx+Moe9n6h
+         +h/MZ4tAv2CjCWzQeLRqy2iMHNfI8G/HLNHbjZV/imsMaRU9FX9nciDT9WoGLFXXpC3k
+         uw9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779325445; x=1779930245;
+        d=1e100.net; s=20251104; t=1779325449; x=1779930249;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=wLqsfTgrZOczLHoU8IEadZ/9mpSZuAXVPGGnbvVO5aU=;
-        b=XFeh/VpcnuWo1HkMp73e7m/dKkq+CQATw9fQHM5eFhJ3L0hlRozSo7ijp+BNgI5Qwb
-         wO7GPbfZPj9bknSEAqyRCpHrckP+crBtgP45VOTLbNRNDKI4Kk3yvH6beZC5v2VEFqDA
-         PFlEnpYl5tthq5DMJnjnwb51enUEaBgRFoyKWzElIZmkagwfQvBdoG7n811Pr582GQNx
-         FkwsGscTO7QSL3WT/fAYyXC/ml/pnMNJ7ildLFocY/uXylfLgBgcDi+7szXJiLmvz1du
-         aa8PAQhhX2bXdd/gwst2f11BuxoRZEi9Yblai+a8EPsU4BF2aSkG+IWVxijQfylFejFx
-         0d/g==
-X-Gm-Message-State: AOJu0Yy3tkqrA16lxGhq9mQ/rpb3JWrOLLvGAgnf3bv+rTlTSvlCL6Q3
-	ggp+YH9dZ8wYAKYae15ZbryVYYJ4U4gRgEaN2QAv3M3GZEIPaFG3atwucyKiEWhX
-X-Gm-Gg: Acq92OEYgio6xg05GYNeJm/Jt26onK0eY5Z/ZI8KkladVWHY78kMLXwCxA49nIvuBXu
-	z6rC8gZp/e/mOACEaVLw19khx/huPgRrnhCgdySLppQadZRPHvDOSohmHveBT8w2EjJlYbY2WSl
-	nKDWY5TWzcM6f/0jNtQlHn7s8PZigmFGC8IjCvdtUhFOhhdglEt1dZt4k9S/X4Ti0IEdJ/gr107
-	lDBdK3t1J1FO+EzO2kkFGKb+ME1/cAjdrAsaLy8/J7l8spEqocGni6zqkfBZFbq8qjQkWJxzNbG
-	QMk9I9jAOfojzElNybPQVAMrR0LuZQ+/uG/SrgrTaWdZfFxfkR7hNmWlG6ad+1Bgl+i2M3meyvk
-	SlLyfRzlgGc2PGIXfCXcCNo5Jk82ikmCVBPBGntzdU8sgtZq48Mq0zonxUgj8o9qJaA08gxwvCK
-	pp/UVZ5bWLOlYNAbZ1Tv7HEMMU21EZyffohd01LWdIh3acPEQY6CY3VIDfPpYc
-X-Received: by 2002:a05:6a20:7489:b0:3b2:8685:13e4 with SMTP id adf61e73a8af0-3b3086eca0emr810470637.15.1779325444711;
-        Wed, 20 May 2026 18:04:04 -0700 (PDT)
+        bh=A1zAZ9q3hOWLxZR5AYVa5Nm+ouUfN2L7nHWHZTxPEz0=;
+        b=RN6thwnusEevUk/rRtVw2euCpGLLqub8vXFDO7JnVNcNPRFIdbEbH7z8HJq/iLDqpx
+         d/274B0JaouLmcwiMAp49e6gbLY3z0xiCjh5k43ga2/JDj2LqGkwPwEa9jWJSLL8A4Wr
+         JCHgX5rAdOfhCIkMJ3UaDstD6fvbb4kvGLTfOlCdvjPaM7uhrzkqhgDyf6R/8cDccgOL
+         8/73T38hCyL248xxqJhwDVurAFYaHwuc400o3YOuAD0TiBDocQeNv5LeQDFn1W4X6OWw
+         AWH6fAPrgYO11pB6PFZCxTyMSuldgS39JOsjb0c7iVqquWicCrPEiGyE9WbBZ9zd5x/z
+         sFcw==
+X-Gm-Message-State: AOJu0YwlPTQUusxHepOzMgWo07UaL4ZPqWfpynTBJVVRTEWeFFryyWYQ
+	cZVoJfWFS52JnXcgZzsnpu8psu2q5rJlCb4+mcP2i6vF+6ImyRdYhZUzfJP6v7Ww
+X-Gm-Gg: Acq92OEe5whrWanUOeUGIOuTm8sgR8a0s4h4gCI5Op6ImulGWPlh77uKR65kP6Lox3s
+	XSLHSniLKFBYmOrx893yHtUM9yxU5KLlwYp66ztaZf6ftlyP3Fo5ZGQzhAxAOMouzPzXVbi/+L2
+	YQT1SCzSmzV9sTV+lcej/39rLaXLjFWnYK6ISVUyA6omtHHiK7jQ8/U3oHBW5k/M9yslgHgps1N
+	kc/UnOp0i4wjdxLtoTyzlU4UUpgbwf/XTqYxowhdmbdoWSmXWYt913d8+KHm3mN1ADWGkY8l/Pq
+	iM+ESq+K2MtxC+ctxt2iJuOYw+J0JyJMRt5JznJsrv7J/tnxMeE7lDMT+nYNUgDf2dScCNeVFFr
+	CtHQD1eGp2y+RW5dYDULOlHaeDsWjP6BKQ/9Xdi7eGMpkci/rSKY5dhHk6HGECWogNoo1JoQdT2
+	P008yYdYxr0VquCOxyDZHq5zqup3dM96NDiGaZtieyIS6bnoPR99DWnqYv8F4m
+X-Received: by 2002:a05:6a20:4307:b0:398:6ea8:21d8 with SMTP id adf61e73a8af0-3b3086e6a37mr742936637.15.1779325448508;
+        Wed, 20 May 2026 18:04:08 -0700 (PDT)
 Received: from d.home.yangfl.dn42 ([2a09:bac5:661f:1232::1d0:bf])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c82bb114a70sm26319616a12.22.2026.05.20.18.04.00
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c82bb114a70sm26319616a12.22.2026.05.20.18.04.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 18:04:04 -0700 (PDT)
+        Wed, 20 May 2026 18:04:07 -0700 (PDT)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -88,9 +88,9 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Simon Horman <horms@kernel.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 1/3] net/sched: prefer existing extack message in qdisc_offload_graft_helper()
-Date: Thu, 21 May 2026 09:03:05 +0800
-Message-ID: <20260521010320.208138-2-mmyangfl@gmail.com>
+Subject: [PATCH net-next v4 2/3] net/sched: tbf: add extack to offload params
+Date: Thu, 21 May 2026 09:03:06 +0800
+Message-ID: <20260521010320.208138-3-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260521010320.208138-1-mmyangfl@gmail.com>
 References: <20260521010320.208138-1-mmyangfl@gmail.com>
@@ -113,7 +113,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-290184-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290185-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
@@ -130,31 +130,87 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 6100759D84B
+X-Rspamd-Queue-Id: 7CEB759D862
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use NL_SET_ERR_MSG_WEAK so any existing error message (probably from the
-underlying driver) is used instead of the generic fallback.
+Drivers might have error messages to propagate to user space. Propagate
+the netlink extack so that they can inform user space in a verbal way of
+their limitations.
 
 Signed-off-by: David Yang <mmyangfl@gmail.com>
 ---
- net/sched/sch_api.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/pkt_cls.h | 1 +
+ net/sched/sch_tbf.c   | 9 +++++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 3c779e5098ef..8a3236456db4 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -859,7 +859,7 @@ void qdisc_offload_graft_helper(struct net_device *dev, struct Qdisc *sch,
- 	any_qdisc_is_offloaded |= old && old->flags & TCQ_F_OFFLOADED;
+diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+index 99ac747b7906..3bd08d7f39c1 100644
+--- a/include/net/pkt_cls.h
++++ b/include/net/pkt_cls.h
+@@ -1046,6 +1046,7 @@ struct tc_tbf_qopt_offload_replace_params {
+ };
  
- 	if (any_qdisc_is_offloaded)
--		NL_SET_ERR_MSG(extack, "Offloading graft operation failed.");
-+		NL_SET_ERR_MSG_WEAK(extack, "Offloading graft operation failed.");
+ struct tc_tbf_qopt_offload {
++	struct netlink_ext_ack *extack;
+ 	enum tc_tbf_command command;
+ 	u32 handle;
+ 	u32 parent;
+diff --git a/net/sched/sch_tbf.c b/net/sched/sch_tbf.c
+index 67c7aaaf8f60..58c9687efb0f 100644
+--- a/net/sched/sch_tbf.c
++++ b/net/sched/sch_tbf.c
+@@ -139,7 +139,8 @@ static u64 psched_ns_t2l(const struct psched_ratecfg *r,
+ 	return len;
  }
- EXPORT_SYMBOL(qdisc_offload_graft_helper);
  
+-static void tbf_offload_change(struct Qdisc *sch)
++static void tbf_offload_change(struct Qdisc *sch,
++			       struct netlink_ext_ack *extack)
+ {
+ 	struct tbf_sched_data *q = qdisc_priv(sch);
+ 	struct net_device *dev = qdisc_dev(sch);
+@@ -148,6 +149,7 @@ static void tbf_offload_change(struct Qdisc *sch)
+ 	if (!tc_can_offload(dev) || !dev->netdev_ops->ndo_setup_tc)
+ 		return;
+ 
++	qopt.extack = extack;
+ 	qopt.command = TC_TBF_REPLACE;
+ 	qopt.handle = sch->handle;
+ 	qopt.parent = sch->parent;
+@@ -166,6 +168,7 @@ static void tbf_offload_destroy(struct Qdisc *sch)
+ 	if (!tc_can_offload(dev) || !dev->netdev_ops->ndo_setup_tc)
+ 		return;
+ 
++	qopt.extack = NULL;
+ 	qopt.command = TC_TBF_DESTROY;
+ 	qopt.handle = sch->handle;
+ 	qopt.parent = sch->parent;
+@@ -176,6 +179,7 @@ static int tbf_offload_dump(struct Qdisc *sch)
+ {
+ 	struct tc_tbf_qopt_offload qopt;
+ 
++	qopt.extack = NULL;
+ 	qopt.command = TC_TBF_STATS;
+ 	qopt.handle = sch->handle;
+ 	qopt.parent = sch->parent;
+@@ -193,6 +197,7 @@ static void tbf_offload_graft(struct Qdisc *sch, struct Qdisc *new,
+ 		.parent		= sch->parent,
+ 		.child_handle	= new->handle,
+ 		.command	= TC_TBF_GRAFT,
++		.extack		= extack,
+ 	};
+ 
+ 	qdisc_offload_graft_helper(qdisc_dev(sch), sch, new, old,
+@@ -477,7 +482,7 @@ static int tbf_change(struct Qdisc *sch, struct nlattr *opt,
+ 	qdisc_put(old);
+ 	err = 0;
+ 
+-	tbf_offload_change(sch);
++	tbf_offload_change(sch, extack);
+ done:
+ 	return err;
+ }
 -- 
 2.53.0
 
