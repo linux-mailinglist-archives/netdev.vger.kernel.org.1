@@ -1,202 +1,149 @@
-Return-Path: <netdev+bounces-290477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290479-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yBr9FdIeD2pSGAYAu9opvQ
-	(envelope-from <netdev+bounces-290477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:03:46 +0200
+	id 0LWTNmoaD2qLFgYAu9opvQ
+	(envelope-from <netdev+bounces-290479-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:44:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0722C5A7DE8
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:03:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90BCB5A788A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 27D633272FF8
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:57:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7D9523161EFF
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E0A611E;
-	Thu, 21 May 2026 13:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D663035504D;
+	Thu, 21 May 2026 13:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ewTZg83o";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="K7LFu0W8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vjq4fVxL"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5C037C103
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B928F23395F
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779371849; cv=none; b=lSfY/TDB2gWY6m1Suiki0MKNEfMiEQwwrkUS4/5ajM1oV9EmWQbFiCOzoibiZii/jVx1TZEHN8dL7abuAgqqULF4eIwW9x6KRCDMYO5u2Ufgxn0EZYQDAd54KNm8JiSwadTnLTP0CZhN63LC1jJupIYBCSQ+tVSdfbLkFeQZ0gU=
+	t=1779371990; cv=none; b=HWvgPpXGmxXKxfl/Ax71RmgQNPmgkLEngO1T4zWfNc/dLmpo89qtBpcqsCIBuAqrS9WyI3STElQaaxVDLur4ntOgJIc0B2oxsAOw0dlW4by3drIu2ZRUkTzc1WcYZJa/GLKwkD9ErDwMPsjEge5fnJ+wJyBAkly17gcFsQ/QHDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779371849; c=relaxed/simple;
-	bh=0DoaqcCuigWWctjbGZDv6uM+d0KKf2UHN/ogXkeypXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OVij73VLkLDBHV5q/jrxkDSRxZ1HSPjvPxItHuQwfX8FbwwByi8E5dphkohhlWXGf9Ghm8gDkpg/itTIZElTcPE+HRMlQhVseDk3lg/m8cIBQoj+GIymD3ZS4dF9vb6N7a921CbeNSrI8WF7YyRj6ICNWe2Mh/62Z06TwG7hVi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ewTZg83o; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=K7LFu0W8; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 6C8987A00B2;
-	Thu, 21 May 2026 09:57:25 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Thu, 21 May 2026 09:57:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1779371845; x=
-	1779458245; bh=FPsjXzj7FkqynHWJfQkwyEPmoEk1/doC6g7UxnPbBj8=; b=e
-	wTZg83o6DV+SSoCD0KJ99nmZp0eS4UVKRkiIJjbmjSMTT2k/+mZC8KcoiQDo97yW
-	iTMic7unQe6KMUKND0lbWSKv1REEHxHfDIXgjZsMgMoWqggk3210/qH6c3aqyPyC
-	+jkmfxic6P05UHAEi7Gwi0X0+Il+z9sSSmMZF5ugMeTOoqwsWO/Rj2EhKJtEhUhD
-	wE6w8ZfOdJAuP2KPL/wpsNofhJzHpRtmOpA1i8Ft4VNVbtSvMSsHnR4r+c/Sk2Ry
-	pfQBXBdMi8A3Oy3a0K+fNOKsmbpYScDtzj/u0Mdcx4pKjxHgyB6GPIDC9zZhL0Xa
-	JYqK9CCVR/sHFcRTWQjZg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1779371845; x=1779458245; bh=FPsjXzj7FkqynHWJfQkwyEPmoEk1/doC6g7
-	UxnPbBj8=; b=K7LFu0W8bq17vu+S0I6rBN5CH1IIeME17/AO0Ct+fK/s1C/jn0A
-	5lMTEbudjgGfU5Y8ve6o6+kxg7kklw4IUiwDSMEzHabQBK/bwn0eWipGfCFGVe8Q
-	dsgiTqvtpaK9UVhpC/Y1g2Dv4YZTdrLc3yKMne57ve6d3LmTVZEj4merL21tu3kR
-	gT2YqdIDWsBhMdcu6lxJpOWhzagaKYZbwfUinbh2PHURaJPMZDjZBJqX80nnlCzG
-	evBS2AtLy5EB7IBLbRQnlxPdsKhQqf6fwC8BJu5X3CRJJBVe37Ii/AwzKllL3QtB
-	ziruOd+E8b/f6NDbq+8IKOszuLedzDKDRZg==
-X-ME-Sender: <xms:RA8PapI7O-iiHM1bI5cc1M8-oOue7iTNPQRNbxdk1_v4vSD3j6Uy3A>
-    <xme:RA8Pag_0hlxB9KWSDGYWqCiuQVsG3DaTdZUyeqMXuF-ibTwZnk1aHeI3QtMnOTD4b
-    CHzpNlbwkkt0B0ubB0ow9HxidQIigxiJKAlwgzT4uAwYbg23hH1p9M>
-X-ME-Received: <xmr:RA8PatGd4Gyf9T_BrHmepVMV04C0_F9fJyAxzpJ7kzN5IZ9G4aGUejK5S1r4S1MIe1zQdP5GOuFRvRpprKDNr7A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugeejieelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhjvghthhifrghnihesvghvvghrphhurh
-    gvuggrthgrrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepshgrvggvughmsehnvhhiughirgdrtghomhdprhgtphhtth
-    hopehtrghrihhqthesnhhvihguihgrrdgtohhmpdhrtghpthhtohepmhgslhhotghhsehn
-    vhhiughirgdrtghomhdprhgtphhtthhopegsohhrihhsphesnhhvihguihgrrdgtohhmpd
-    hrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghp
-    thhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurg
-    hvvghmlhhofhhtrdhnvght
-X-ME-Proxy: <xmx:RA8Paj41xxZfHOTNG21m-JCwOo_GQoWIHnNi_3yhSIDDaFg-HWHcqA>
-    <xmx:RA8Paub1WcyahEciT9K6zeDAUInBr8feMqMQEXSC1_wib9u0NMLFzw>
-    <xmx:RA8PapgoQSTSq0i-0rNWCoZYY_mcdGF1DHTq2WGAT8rHx0sYhany7Q>
-    <xmx:RA8Paofm7_9F-T2wXQDRM-5_hzbU66-VZfwN_lDKs1Qa3PgtyM5iHA>
-    <xmx:RQ8PapdmIh7lwcFwomicKeW3QPYIlI995sgvTK7K-opwh6zzwpthrHfA>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 21 May 2026 09:57:24 -0400 (EDT)
-Date: Thu, 21 May 2026 15:57:23 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Rishikesh Jethwani <rjethwani@everpuredata.com>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, leon@kernel.org
-Subject: Re: [PATCH v13 5/6] tls: add hardware offload key update support
-Message-ID: <ag8PQ2pxvKMHglWV@krikkit>
-References: <20260429181016.3164935-1-rjethwani@purestorage.com>
- <20260429181016.3164935-6-rjethwani@purestorage.com>
- <afsmVLSn2tA7UP9W@krikkit>
- <CAKaoeS2=W-WFxAmo2M_FOzS4d65L-1WM+3CJ2x3dy0U0NvMapA@mail.gmail.com>
+	s=arc-20240116; t=1779371990; c=relaxed/simple;
+	bh=8c003hN7G0f21x5kR9OP9tcqEm1RKjMBRlZSQMJomQE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Esf8kEvEWGKjQIF4alwYvjau7gccnWniSMVXlWBaAiYG8ELOmQyPPHaOhBtLJWkryzSfHYmlFNAX79boAQFEMBZkjHD/sLKULPD3kd278x6Z7bxoTyEQLEwPxuLSWZsm11aQ5AlAF4mtgyV0TAUkqUA6sU/mG+6Z8/lAABW9Dts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vjq4fVxL; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0ef1f7da-c5b3-4c91-a656-4a3efecbbaf2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779371986;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bRj9005vgDhPgnpQ/dtcz4E8gCE9nIZniCZA9rHTQdo=;
+	b=vjq4fVxLBX9uUH+YcTLL1N+CHTPaqjMSnKp/rL9NRqX/mQVhEFJ2C9a1JTEPJzSLopXjEg
+	Nr3la8sU0pGHHKbySe7NXTEHgILNen/9iqQRRxstciS6IzvlAYcXxzyd5kEasnTaevqzRk
+	HE7qpw6lGWHoOsToUUhGyVHF1RYC9lI=
+Date: Thu, 21 May 2026 21:59:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAKaoeS2=W-WFxAmo2M_FOzS4d65L-1WM+3CJ2x3dy0U0NvMapA@mail.gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Subject: Re: [PATCH net] ipv4: free net->ipv4.sysctl_local_reserved_ports
+ after unregister_net_sysctl_table()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
+ eric.dumazet@gmail.com, Ji'an Zhou <eilaimemedsnaimel@gmail.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>
+References: <20260521122147.3584624-1-edumazet@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260521122147.3584624-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290477-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,nvidia.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-290479-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,redhat.com,google.com];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,queasysnail.net:dkim]
-X-Rspamd-Queue-Id: 0722C5A7DE8
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 90BCB5A788A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-05-12, 10:55:35 -0700, Rishikesh Jethwani wrote:
-> > Not blaming you for NIC behavior, but... the NIC passes up as
-> > "decrypted" records that have failed decryption (because it was using
-> > the wrong (old) key), or passes as "encrypted" the incorrectly
-> > decrypted data (that it has "decrypted" with the old key)?
-> >
-> > Or this is only the first record(s) after the KeyUpdate message, if
-> > they fall within the same packet, the whole packet was "decrypted"
-> > with the old key but only the KeyUpdate itself (and maybe some more
-> > records before it) decrypted correctly ; but subsequent packets get
-> > passed as !decrypted and don't need this reencrypt dance?
-> >
-> > (this is maybe more of a question for Tariq or the other @nvidia
-> > folks)
-> >
-> >
-> > I haven't reviewed the whole patch at this point, because of Paolo's
-> > suggestion and this confusion with the RX rekey.
-> >
-> > The traces show how both NICs behave during the key transition:
-> 
->   Broadcom (NIC preserves decrypted flags):
->   - decrypted=1: NIC fully decrypted these with the old key; one reencrypt
-> pass (retry=0) re-encrypts those frags back to ciphertext, then SW decrypts
-> with the new key.
->   - encrypted=0, decrypted=0: boundary-straddling record; same single
-> reencrypt pass.
->   - encrypted=1: NIC never touched these; SW decrypts directly with the new
-> key.
-> 
->   Mellanox (NIC clears decrypted flags on auth failure):
->   - encrypted=0, decrypted=0: NIC partially processed the record but
-> cleared all decrypted flags on auth failure. retry=0 reencrypts with the
-> wrong frag interpretation and gets EBADMSG; retry=1 toggles the flags and
-> succeeds.
->   - encrypted=1: NIC reported these as untouched; SW decrypts directly.
-> 
->   The retry path exists specifically for the Mellanox case: cleared flags
-> hide which frags the NIC actually touched, so the first pass may pick the
-> wrong interpretation and need to flip it.
 
-Thanks for describing this.
+On 5/21/26 8:21 PM, Eric Dumazet wrote:
+> ipv4_sysctl_exit_net() is currently freeing net->ipv4.sysctl_local_reserved_ports
+> too soon.
+>
+> Only after unregister_net_sysctl_table() we can be sure no threads can possibly
+> use the sysctls, including /proc/sys/net/ipv4/ip_local_reserved_ports.
+>
+> Fixes: 122ff243f5f1 ("ipv4: make ip_local_reserved_ports per netns")
+> Reported-by: Ji'an Zhou <eilaimemedsnaimel@gmail.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Cong Wang <xiyou.wangcong@gmail.com>
+> ---
+>   net/ipv4/sysctl_net_ipv4.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+> index d8bdb1bdbff17ab52fe969b93ce13673e88c05a4..c0e85cc171aec099fd5d4897b1a623dd27eaee08 100644
+> --- a/net/ipv4/sysctl_net_ipv4.c
+> +++ b/net/ipv4/sysctl_net_ipv4.c
+> @@ -1705,10 +1705,10 @@ static __net_exit void ipv4_sysctl_exit_net(struct net *net)
+>   {
+>   	const struct ctl_table *table;
+>   
+> -	kfree(net->ipv4.sysctl_local_reserved_ports);
+>   	table = net->ipv4.ipv4_hdr->ctl_table_arg;
+>   	unregister_net_sysctl_table(net->ipv4.ipv4_hdr);
+>   	kfree(table);
+> +	kfree(net->ipv4.sysctl_local_reserved_ports);
+>   }
+>   
+>   static __net_initdata struct pernet_operations ipv4_sysctl_ops = {
 
-I don't think the core TLS implementation should implement workarounds
-for HW/drivers doing strange things. IMO this should instead be
-stuffed into a driver CB, which would implement the necessary steps to
-perform during a rekey.
 
-The core can provide a helper, but I would move the whole
-"reencrypt+maybe retry" logic to a CB.
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
--- 
-Sabrina
+
+If there are still processes in the namespace, the netns refcnt cannot 
+become 0,
+
+so I think it should be: first open 
+/proc/sys/net/ipv4/ip_local_reserved_ports, then pass
+
+the fd to another process outside the netns? Maybe SCM_RIGHTS is used?
+
+
 
