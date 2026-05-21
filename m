@@ -1,71 +1,103 @@
-Return-Path: <netdev+bounces-290556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WG4GFYhED2ptIgYAu9opvQ
-	(envelope-from <netdev+bounces-290556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:44:40 +0200
+	id KCYkLj81D2qSHgYAu9opvQ
+	(envelope-from <netdev+bounces-290557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:39:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5F15AA785
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:44:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 981C85A971E
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:39:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1A6B3315E59D
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:01:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A1C831103B4
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394A837107E;
-	Thu, 21 May 2026 16:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476D93815DB;
+	Thu, 21 May 2026 16:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dMrEMCSb";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GLZBP3tQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9319D36F8E5
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 16:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E5D22A7F0
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 16:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779379306; cv=none; b=gCDpCMxQB1eC5jhHQg7AuUVl04txowb9qbNoTIlEW2LJysVtu/642q/Qt74eAjvRqlwBJDKIhwJHq1c3UFc5EwJZqukt7D1iPBpffBg0p1aQESSYz7nyxJwYVmvqrouFH1SyApI7HDK9GojVxivhvalreugJmF9YQjJbIBgd+lQ=
+	t=1779380370; cv=none; b=EpanaV9uuXmfEchXvl4sP4JvmoVLccRDtRg6Ls2p/eremqSwyixMri8mOuM9CwhQN02rkv/fgUqLalOaUzv04qLqI4tBCjAPGHMWLNzUd1M0D9PzvutI1gKWhWZuuxQW4HXzpokmzjbfYDgTLFFCjWgHsBbNz+uh/dMxpPiAL7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779379306; c=relaxed/simple;
-	bh=4zM1ugNCLmNapDX1aXtA0pmcHFvT7iOMdAhWydF0hF8=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=CrDexUW4FD1aQuLwFvHqeNBi9YAlWOx2Px1zzRZEcqeeluZTeHYQIVLgJstsjtiZnsCZPLnML4MvLjTQ8hBudHqvSynoL1E1MjA7XqVkJeGucHN5GV7lJui7eqJrrN+ZYznAhzCOMbsvbUKsVifr8ko1BFBktAyRmZES8vBXMhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-48e82c23840so51433845e9.3
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:01:44 -0700 (PDT)
+	s=arc-20240116; t=1779380370; c=relaxed/simple;
+	bh=XhTY4iG1YZxytqYgUnZLZi1+HEG3elLJZtNJsczuB2g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eJMYi2IXWXswkZNnFEH8YXYmRfcqfQrp9XpliiP+WzLeNI1DHAh4feCuFBFFVMyuuM2wxH5gO1Pg6YPBFrrtDKyC0yTBogIuSi9q8s/hviYSdfdn0kp1DoM8gwP8NSRz85Tzr+5klrn7J/TXjOwXkU6t1Gev1int/MwgFewONZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dMrEMCSb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GLZBP3tQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779380368;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=49ZJPsxvJ9twf1WBJAA5ghsdPxQ9lRVco3njpKCl1ws=;
+	b=dMrEMCSbW+U9vux1xxhAoBczoKdNJzIGpIi1Hlbzfqs/KHxSOtwLq4mjj9ytfA++jd/1S4
+	+OPGEyUYNu27oQIwid5Y+3BmfCkVTj/w9CtfPRuhRSx3RvqgaNtBW5SnN6/dma0td0bNMa
+	Y9clDFE+jHhcjtLRdy4BnmjF1xf/FV8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-k77fe_kSNQOyKXwL-PoTlg-1; Thu, 21 May 2026 12:19:26 -0400
+X-MC-Unique: k77fe_kSNQOyKXwL-PoTlg-1
+X-Mimecast-MFC-AGG-ID: k77fe_kSNQOyKXwL-PoTlg_1779380365
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48a589c7879so47273555e9.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:19:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779380365; x=1779985165; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=49ZJPsxvJ9twf1WBJAA5ghsdPxQ9lRVco3njpKCl1ws=;
+        b=GLZBP3tQc8m+5oq6f/s+lOf9C03R/1ViYtpgTtk+tJhFZ16Zx6CT0qshDLNMn0e34p
+         qcNcL7liakMOoKUpRogxEbF6MasPigbDfmgJJP70f5jqVKVfzjIwoQxgMCelmWOsqgTX
+         eOCNvQpzVf/NWSovc4WSBNClWKi+hcyBaLbRiQ5vVlhEP38zWgrynCjQcDsPoxpMlUAp
+         ngDKtAB7GqFtJJOzzNY37tVFEF2iP0LZlHGDMObLiroQPeVSPuv0afGr+CK9UtKaHkdk
+         YLu+f/QaJjCrJSng5mS++/hwRvQ+Zb49gnvYwYvOEt8xSplVN4rCgL8goD73UhEA2Wc7
+         Tskg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779379303; x=1779984103;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hb7NHOCqWYUK919ibqoR4LSTe+C7bYY+lOLvabZfEs8=;
-        b=jA+DnR73PDxUkOfoOfo7pmHNZA6Jbwa5Bfpk/Z4kKhGJJ1cRC6pZr8Czfdv/MTpDJP
-         n8Enz4sG1YVgmzDfyK4mbjMYcLjYV/vQTtMquKnQn3THcOvvGKiOXYKgHpu4MU7K9KjE
-         PHuOLIjXntyFO4GoikvA+fOXUkUk5hX+srw64ONo6AH6u+dTFqgDCnlVmT+q5lDc5kM5
-         R3xjTJOvyBFnz9tDqdF+KfNM3MVFkdIRyPiMMeUQc3lsSi85FV/bWw+6rthUsC9b5gFb
-         H3ks9FhQ3ysxlk63q/JG704vyUADYUPNK2pPtfhOdIBdynFEtCCPPBtz0d1lZ77xNK4C
-         pQGw==
-X-Forwarded-Encrypted: i=1; AFNElJ+hCPJ9s5I8LJZrWQGDwAf22kUSdI3X5X88n+fcI5son9tLC09p50Ix4KUNSTnpKfcm7tVDi+A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLqQX4HDHjPkVuPL9C4NcbxpYZ4Lgr5BBPfSLdkALaZgDqGtjD
-	RlsLZfqeBw2r5HyG8RWyr78E4pH1V+fbZkxXikaEkrfhrk9f9m+udReS
-X-Gm-Gg: Acq92OGfIYcJVcMI6RQz99t2kw9rdfxcATPzcuHo2gOrw7GgPnjfT4xpKSyaJWt22iB
-	vt6eujnHRrMGXcuQromoQhqCJKDWWwaAbIH5z2dIPRZ7Qbpvy5Z+0ssca76ckWzXRgxeiCqsBfo
-	JgFeHL2TIg0dVHRau/6hjEbWqVKs/Vz/Y/Iw/QXWk20EhF6WQ43A9AIcjTePgpDIlamkc0GrLVn
-	NdBUJzxGlOzJoffjtxtGfsvqPr/FrydFV4x5AGgLsLPZofT/XuWo+iRCA7qPSEB6pJEsg4PzKDG
-	Yr4zXe26E4L9TGzxHopJhMNbrtyDSMaBQssyvOxfJ6rtFQOU/ay/ca/QzQNY36YmD5FudRzdZC8
-	Ymh+S8JcFCyXhxNaJo227yGvCtvTwSyeT7fR8AZXwmNEXf4Wvckx3z4ZdJyarvyteX/zaCCEORf
-	CkI8ym8pGyrcrdSIRXU0AVlkxuuBE/UTTw7k6x+wThOpk7tJ728AW0eWc84lhUDuWa1tT/FXOp6
-	usJ
-X-Received: by 2002:a05:600c:4818:b0:488:904b:f31 with SMTP id 5b1f17b1804b1-490360bac01mr35583275e9.22.1779379302644;
-        Thu, 21 May 2026 09:01:42 -0700 (PDT)
-Received: from [192.168.88.241] (89-24-33-222.nat.epc.tmcz.cz. [89.24.33.222])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49033cdcc01sm82691195e9.0.2026.05.21.09.01.40
+        d=1e100.net; s=20251104; t=1779380365; x=1779985165;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=49ZJPsxvJ9twf1WBJAA5ghsdPxQ9lRVco3njpKCl1ws=;
+        b=X5As0cRh+V75InRQXwulMOR5Vnj7UR8qrMqY4/kmaTh/LlROcVsWf9I7AQT9C8D2EE
+         H0GnBNxpquywrhJmZhJJyqId46L7iICXBFk02VvAuqpNflAtzF1ipc3RIMqknIZCqKlu
+         YwQhX30kY2bUCvNWkGgS82IxbzuQZJG+Srm9BtLQJccRwKScwD+e26e760yVEObnPjVv
+         KqVFUKXzug7zZbmjlKwHoN2XtWZ2PETLBnv6TGFrndVbS7D1TuBL/QX2ZgedB2AIEHQq
+         whViqCxTL8OnHVxU1JpZCMgE0EkWDq9cl9pR3sw0etZxbVfpxtsyYHHzM84R7bng2JGp
+         3CCg==
+X-Forwarded-Encrypted: i=1; AFNElJ9CdV9PlwmwUk6yyaC7pMOK3X+aH/gG3NarDR/ug7XvSpfwkcsBVmBVfnyZmt4PB+lE/k6325I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcEDpvq0I0ISdKFiA4qJ7qah04zaIBuk6hX4t402iX0IPd1uRA
+	UeuAr4TnkGNZICLDJiqv+bskldJp7/Wy1e1UX8vbPRa9Ss8/duJTZS5SjjxBRgTQN/PKaWGtYGJ
+	aBEZCj8+H+6WBq85nnIAvRtieJPekDk/Grt8AK6Y5foOSfBozwpEBrlc+Xw==
+X-Gm-Gg: Acq92OHUXf5cVE9FzeccbYqImVb0AfBSfwc1y2vY4DZtonfFGyb+khkl3QpCHGxeMyN
+	m4bA5YM2SW1BaWtxZm9eD+ajExrLjkvaTSQVdhBLPm9r1vM9zdgVUvFY82UyuMbPZG9SLMIMoHp
+	IzCpNiy4hggChlUf8OECa9TbleWnYDWUmx+MCbQPS9hIFIeazNVEiSYoNmajhHVGkdKjUHNR2Ds
+	UFiFT/k54Y28yEod9bTSnJ7qBJzM7gudabR9sa2t4FW9jYX2SvYSOV5OhdRtJlrA/xHaXYv0Cbp
+	rxeh0XIzHtQ+yVkA+AJgW7A0p03w/7QZj/TPMtYpoFUOD9fVJakUdewpgOawDt5Zb5DXPQEGNJI
+	5hAQXSci/rBac6LttERA5IKnHHj77//GH1CvOAeCarbzjd2uGzeOqvuiHHw==
+X-Received: by 2002:a05:600c:698e:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-49036048167mr39012245e9.2.1779380364712;
+        Thu, 21 May 2026 09:19:24 -0700 (PDT)
+X-Received: by 2002:a05:600c:698e:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-49036048167mr39011915e9.2.1779380364281;
+        Thu, 21 May 2026 09:19:24 -0700 (PDT)
+Received: from [192.168.88.32] ([169.155.232.242])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49035ef2d93sm26744775e9.9.2026.05.21.09.19.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2026 09:01:42 -0700 (PDT)
-Message-ID: <b8183167-9e8d-4c75-b340-bc3437a14ea0@ovn.org>
-Date: Thu, 21 May 2026 18:01:40 +0200
+        Thu, 21 May 2026 09:19:23 -0700 (PDT)
+Message-ID: <c75646e0-8a1c-4301-b6e8-fa2faf21563f@redhat.com>
+Date: Thu, 21 May 2026 18:19:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,142 +105,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, netdev@vger.kernel.org,
+Subject: Re: [PATCH net-next v3] net: napi: Skip last poll when arming gro
+ timer in busy poll
+To: Martin Karsten <mkarsten@uwaterloo.ca>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Kees Cook <kees@kernel.org>, Adrian Moreno <amorenoz@redhat.com>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Matteo Perin <matteo.perin@canonical.com>
-Subject: Re: [PATCH net v2 2/4] net: netlink: don't set nsid on local
- notifications
-To: nicolas.dichtel@6wind.com, Jiri Benc <jbenc@redhat.com>
-References: <20260520172317.175168-1-i.maximets@ovn.org>
- <20260520172317.175168-3-i.maximets@ovn.org>
- <bd9c0751-55ea-459e-8b22-8bd24abf235c@6wind.com>
- <20260521160036.413771e9@griffin>
- <9e7b7aab-dad4-4b72-87cd-822e67b27afe@6wind.com>
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: Joe Damato <joe@dama.to>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, =?UTF-8?B?Qmrvv71ybiBU77+9cGVs?=
+ <bjorn@kernel.org>, Frederik Deweerdt <fdeweerdt@fastly.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260518181337.886459-1-mkarsten@uwaterloo.ca>
+ <780d21ed-4ab3-478c-a932-6feb7aa6d7b4@redhat.com>
+ <b785b518-3a76-4058-ab76-644df400cd0a@uwaterloo.ca>
+From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <9e7b7aab-dad4-4b72-87cd-822e67b27afe@6wind.com>
+In-Reply-To: <b785b518-3a76-4058-ab76-644df400cd0a@uwaterloo.ca>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[ovn.org,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com];
-	TAGGED_FROM(0.00)[bounces-290556-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[ovn.org];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-290557-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,ovn.org:mid]
-X-Rspamd-Queue-Id: 6F5F15AA785
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 981C85A971E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/21/26 4:25 PM, Nicolas Dichtel wrote:
-> Le 21/05/2026 à 16:00, Jiri Benc a écrit :
->> On Thu, 21 May 2026 14:36:12 +0200, Nicolas Dichtel wrote:
->>> I still don't think that this is the right "fix". The app is broken. Even after
->>> this patch, the bug could be easily triggered again by a third party.
->>> There is nothing wrong with assigning a self-nsid. It would be a lot more robust
->>> for the app to assign itself a self-nsid when it starts.
+On 5/21/26 5:42 PM, Martin Karsten wrote:
+> On 2026-05-21 10:13, Paolo Abeni wrote:
+>> On 5/18/26 8:13 PM, Martin Karsten wrote:
+>>> +	} else {
+>>> +		/* All we really want here is to re-enable device interrupts. */
+>>> +		rc = napi->poll(napi, budget);
+>>> +		/* We can't gro_normal_list() here, because napi->poll() might
+>>> +		 * have rearmed the napi (napi_complete_done()) in which case
+>>> +		 * it could already be running on another CPU.
+>>> +		 */
+>>> +		trace_napi_poll(napi, rc, budget);
+>>> +		netpoll_poll_unlock(have_poll_lock);
+>>> +		if (rc == budget) {
+>>> +			gro_normal_list(&napi->gro);
 >>
->> On the other hand, does the patch break anything in practice (as
->> opposed to in theory)? It makes live of several apps simpler, which is
->> not a bad goal.
-> I'm not against the patch, it just look like a workaround.
-> I'm trying to understand how NETLINK_LISTEN_ALL_NSID is used (in fact, why it is
-> used if the app doesn't "understand" NSIDs).
+>> Not blocking, but I find the above slightly confusing after this
+>> refactor. Perhaps it should be re-worded?
+> 
+> I'd be happy to reword, but I am not familiar with the internals of gro 
+> processing, so would appreciate any help I can get?
+> 
+> Should I try-and-error via subsequent patch submission(s) or can you 
+> comment on this version:
+> 
+> 		/* Use the driver poll to re-enable device interrupts. */
+> 		rc = napi->poll(napi, budget);
+> 		trace_napi_poll(napi, rc, budget);
+> 		netpoll_poll_unlock(have_poll_lock);
+> 		if (rc == budget) {
+> 			/* If napi_complete_done has not been called by the
+> 			 * driver poll, the napi needs to be rescheduled.
+> 			 * Use the opportunity to pass up completed gro skbs.
 
-ovs-vswitchd works with NSIDs of remote ports.  So it does understand them, it
-just doesn't expect the self-referential ones for the local namespace.
+Possibly something alike the following:
 
-openvswitch module has a minimal support for cross-namespace operation.  Ports can
-be added to the openvswitch datapath and then moved to a different namespace (it's
-a little weird use case, but that's beyond the point here).  ovs-vswitchd learns
-new NSIDs of those ports from the openvswitch module and then it can perform a
-limited set of cross-namespace operations on them and monitor their status changes
-through notifications on an all-nsid socket.  It never learns the NSID of the
-current local namespace, because all the local ports can be directly accessed and
-openvswitch module doesn't report an NSID for them, as it's not needed for anything.
+			/* More work to do: no concurrent napi-related 	
+			 * irq is possible and the current thread can
+			 * pass up the pending skb batch.
+			 */
 
-In the end, ovs-vswitchd knows all the remote NSIDs it needs to know and can
-recognize them in notifications.  But it doesn't know the NSID of it's own local
-namespace, as the openvswitch module never reports that for local ports and
-ovs-vswitchd doesn't explicitly check its own NSID.  So, local notifications with
-NSID set get treatment of a notification from some remote namespace that we do not
-care about.
+?
 
-We will be putting changes into ovs-vswitch to work around this issue, simply
-because it will take time for the kernel patch to propagate to distros.  But this
-code will not be useful for anything except for working around this one specific
-case and so it would be nice to get rid of it eventually.  And it would be nice
-if future applications didn't need to care about this behavior as well.  Having
-the fix in stable will speed up the process significantly.
 
-HTH,
-Best regards, Ilya Maximets.
 
