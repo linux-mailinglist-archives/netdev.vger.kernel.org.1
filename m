@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-290220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290221-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iH79AOlwDmq8+gUAu9opvQ
-	(envelope-from <netdev+bounces-290220-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:41:45 +0200
+	id oCJYFxVxDmq8+gUAu9opvQ
+	(envelope-from <netdev+bounces-290221-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:42:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6926859E2C2
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:41:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8FC59E2D0
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:42:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D80A301983E
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:40:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A097E302207F
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8624F375F83;
-	Thu, 21 May 2026 02:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2998636AB56;
+	Thu, 21 May 2026 02:40:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDF136AB56;
-	Thu, 21 May 2026 02:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BF0375AC4;
+	Thu, 21 May 2026 02:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779331217; cv=none; b=MGglXI/6SAaPdSxbigWnl7MBIKn5E3wFZAc4Ajuu7ZbPOjCBkBF2aN8zR07pE6Oq6IEIaYw3bBI+A6AxEAP5NuGjkYWnMEe+4WUcCZcSkCbRtudyZxKbqcV6VBtvr33dTNdFytLL101J2sfYOs7ngmvv2winxLqkcybRTkWy6Ig=
+	t=1779331233; cv=none; b=iG9gJ0mKF6mm5HOTs/010qewJZ6mfj0wSPyvilo+B5jXjPvB/AnUIgUlxtC6zCGRtOrWPVbWREMiQObtUmWI+xhDIdfJQGryxwLlHdRnOZHUQGmavLVcIgPa0VgTKinB7WFzpbkl29gqo1/D6HC4qFsYVWxjnkkhoEsDPhWiejs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779331217; c=relaxed/simple;
-	bh=U2UZNLkL86bi9APMNPIl8uGlEIryY3wwdcEi0ga9w1k=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Ozpb2yFh3DhxTeMD7m+7TINV/CkewfhmQqW2cH7B5v+jqZcnSbkE/rw05OO13owLEuoNLJ5C8bl7a5QKr7O+TM0D40T/wZOIKNPy9v38zVNJ+Cz/GQ2It8VcOHfp+p+r7NT3qBvFZjsoGizZoltJdJsgfiFCJ0RoPuck+p8UI3o=
+	s=arc-20240116; t=1779331233; c=relaxed/simple;
+	bh=JS6YJFhMRLBVyhGHHkpEiJdsMIKUWJEUOjH/ygM6dFY=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZrnzcLx4W265hPi1teFoBwrnfkX6a/D/jzN0Wslqo2/YVvpVBVKnPmR30dbX4EMvoCfCB6CsP/NEt5btkCh5kW70gVCwBF4Q9SGdhIirM0vApA34FeitwDjVy6W9SIPvjJndrApQtZOwsfa84/5Z4nR9CQx/pMU7rJta1i/9QQM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -36,9 +36,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wPtKE-0000000033i-0GVA;
-	Thu, 21 May 2026 02:39:54 +0000
-Date: Thu, 21 May 2026 03:39:50 +0100
+	id 1wPtKl-0000000034L-3iIm;
+	Thu, 21 May 2026 02:40:27 +0000
+Date: Thu, 21 May 2026 03:40:25 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -47,8 +47,10 @@ To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH v2 0/4] net: dsa: mxl862xx: add SerDes ports
-Message-ID: <cover.1779330653.git.daniel@makrotopia.org>
+Subject: [PATCH v2 1/4] net: dsa: mxl862xx: store firmware version for
+ feature gating
+Message-ID: <98e1645882734e0c64fc5755b00c4f659b355bff.1779330653.git.daniel@makrotopia.org>
+References: <cover.1779330653.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,6 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1779330653.git.daniel@makrotopia.org>
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
@@ -64,16 +67,17 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290220-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290221-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[makrotopia.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
@@ -82,53 +86,109 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 6926859E2C2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,makrotopia.org:mid,makrotopia.org:email]
+X-Rspamd-Queue-Id: AF8FC59E2D0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for the two SerDes PCS interfaces of the MxL862xx switch
-ICs, which can both either be used to connect PHYs or SFP cages, or as
-CPU port(s). 1000Base-X, 2500Base-X, 10GBase-R, 10GBase-KR, SGMII,
-QSGMII and USXGMII (single 10G or quad 2.5G) are supported.
+Query the firmware version at init (already done in wait_ready),
+cache it in priv->fw_version, and provide MXL862XX_FW_VER_MIN()
+for version-gated code paths throughout the driver.
 
-The firmware only added the API to directly control the PCS as of
-version 1.0.84, so the PCS features are gated behind a version check.
+The union mxl862xx_fw_version lays out major/minor/revision so
+that the u32 raw field compares with natural version ordering on
+both big- and little-endian machines.
 
-As the driver is growing do some refactoring to break out the phylink
-parts into mxl862xx-phylink.c.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-Changes since v1:
- * drop custom ethtool stats (former patch 5/5)
- * add __{LE,BE}_BITFIELD layouts to ABI structs
- * per-sub-port QSGMII AN restart via usx_subport / usx_lane_mode
- * shared-SerDes refcount in pcs_disable via per-XPCS slot bitmap
- * let every sub-port call pcs_config
- * cache phy_interface_t instead of firmware type
- * skip pcs_link_up when inband-AN enabled
- * gate phylink_get_caps SerDes modes on same FW version as select_pcs
- * interpret xpcs_pcs_cfg.result as signed (s16)
- * drop dead MXL862XX_PCS_PORT macro
- * drop misleading "downshift detection" line from commit message
+v2: no changes
 
-Daniel Golle (4):
-  net: dsa: mxl862xx: store firmware version for feature gating
-  net: dsa: mxl862xx: move phylink stubs to mxl862xx-phylink.c
-  net: dsa: mxl862xx: move API macros to mxl862xx-host.h
-  net: dsa: mxl862xx: add support for SerDes ports
+ drivers/net/dsa/mxl862xx/mxl862xx.c |  3 +++
+ drivers/net/dsa/mxl862xx/mxl862xx.h | 36 +++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
- drivers/net/dsa/mxl862xx/Makefile           |   2 +-
- drivers/net/dsa/mxl862xx/mxl862xx-api.h     | 358 ++++++++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-cmd.h     |   9 +
- drivers/net/dsa/mxl862xx/mxl862xx-host.h    |   8 +
- drivers/net/dsa/mxl862xx/mxl862xx-phylink.c | 379 ++++++++++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-phylink.h |  21 ++
- drivers/net/dsa/mxl862xx/mxl862xx.c         |  54 +--
- drivers/net/dsa/mxl862xx/mxl862xx.h         |  67 ++++
- 8 files changed, 852 insertions(+), 46 deletions(-)
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
-
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
+index b60482d93a85..2f22adedfbf6 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx.c
++++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
+@@ -257,6 +257,9 @@ static int mxl862xx_wait_ready(struct dsa_switch *ds)
+ 			 ver.iv_major, ver.iv_minor,
+ 			 le16_to_cpu(ver.iv_revision),
+ 			 le32_to_cpu(ver.iv_build_num));
++		priv->fw_version.major = ver.iv_major;
++		priv->fw_version.minor = ver.iv_minor;
++		priv->fw_version.revision = le16_to_cpu(ver.iv_revision);
+ 		return 0;
+ 
+ not_ready_yet:
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.h b/drivers/net/dsa/mxl862xx/mxl862xx.h
+index 80053ab40e4c..79fd32c4db4e 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx.h
++++ b/drivers/net/dsa/mxl862xx/mxl862xx.h
+@@ -3,6 +3,7 @@
+ #ifndef __MXL862XX_H
+ #define __MXL862XX_H
+ 
++#include <asm/byteorder.h>
+ #include <linux/mdio.h>
+ #include <linux/workqueue.h>
+ #include <net/dsa.h>
+@@ -241,6 +242,38 @@ struct mxl862xx_port {
+ 	spinlock_t stats_lock; /* protects stats accumulators */
+ };
+ 
++/**
++ * union mxl862xx_fw_version - firmware version for comparison and display
++ * @major: firmware major version
++ * @minor: firmware minor version
++ * @revision: firmware revision number
++ * @raw: combined u32 for direct >= comparison (major most significant)
++ *
++ * The struct layout places major in the most-significant byte of the
++ * u32 on both big- and little-endian machines, so raw values compare
++ * with the natural major > minor > revision ordering.
++ */
++union mxl862xx_fw_version {
++	struct {
++#if defined(__BIG_ENDIAN)
++		u8 major;
++		u8 minor;
++		u16 revision;
++#elif defined(__LITTLE_ENDIAN)
++		u16 revision;
++		u8 minor;
++		u8 major;
++#endif
++	};
++	u32 raw;
++};
++
++#define MXL862XX_FW_VER(maj, min, rev) \
++	((union mxl862xx_fw_version){ .major = (maj), .minor = (min), \
++				      .revision = (rev) }).raw
++#define MXL862XX_FW_VER_MIN(priv, maj, min, rev) \
++	((priv)->fw_version.raw >= MXL862XX_FW_VER(maj, min, rev))
++
+ /* Bit indices for struct mxl862xx_priv::flags */
+ #define MXL862XX_FLAG_CRC_ERR		0
+ #define MXL862XX_FLAG_WORK_STOPPED	1
+@@ -258,6 +291,8 @@ struct mxl862xx_port {
+  * @drop_meter:         index of the single shared zero-rate firmware meter
+  *                      used to unconditionally drop traffic (used to block
+  *                      flooding)
++ * @fw_version:         cached firmware version, populated at probe and
++ *                      compared with MXL862XX_FW_VER_MIN()
+  * @ports:              per-port state, indexed by switch port number
+  * @bridges:            maps DSA bridge number to firmware bridge ID;
+  *                      zero means no firmware bridge allocated for that
+@@ -275,6 +310,7 @@ struct mxl862xx_priv {
+ 	struct work_struct crc_err_work;
+ 	unsigned long flags;
+ 	u16 drop_meter;
++	union mxl862xx_fw_version fw_version;
+ 	struct mxl862xx_port ports[MXL862XX_MAX_PORTS];
+ 	u16 bridges[MXL862XX_MAX_BRIDGES + 1];
+ 	u16 evlan_ingress_size;
 -- 
 2.54.0
 
