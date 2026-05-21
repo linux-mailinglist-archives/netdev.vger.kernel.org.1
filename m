@@ -1,157 +1,161 @@
-Return-Path: <netdev+bounces-290504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290505-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WbhKHZciD2rBGQYAu9opvQ
-	(envelope-from <netdev+bounces-290504-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:19:51 +0200
+	id yEvNLaMwD2pSHgYAu9opvQ
+	(envelope-from <netdev+bounces-290505-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:19:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 099D85A82C2
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:19:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3056D5A91E0
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:19:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9DC0433EAB3A
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:46:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 13D02348E4DE
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5111D3F54DA;
-	Thu, 21 May 2026 14:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D69253630B2;
+	Thu, 21 May 2026 14:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qKO9LRF2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHaAbRSG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5D03F1AA3
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E5B361667;
+	Thu, 21 May 2026 14:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779374559; cv=none; b=Dw3Je78woCfSPPinRPWJyoY6HojdAtkeD4i7J7JMgn62uDbKS52fuVJIGj6q9Q1g5/6aLkk2SQkPz6UYk31o0LpzCWnENtmRnrGaraFSfs+s4Z2GD/72qAYBqLtH2+ACtU5i8lKlGrspbT/vyqqZAOmFPQRjyRCBApbbLlTMVQw=
+	t=1779374785; cv=none; b=opnPGyFTmN5Mje/RsWpS+ndqaiJz4t6lkOvqIyg+w/1oVcRNbIr+rZCAIS9MtlH40i5Q/TPQUrED9lceqAI1YBwtQCjR6SjLzj1Pw+rGnwwbh/PxP1ZQAg9vraFfsYLgZ7WgoPwxfjbi+ctIAXmfBxrGRZI0x9WSdlaXxAKEmJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779374559; c=relaxed/simple;
-	bh=JLb8dakvmIkiwIQ9BNtmiqDgh2DZEgTaUcPC8AgYwes=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wf2uYxo1K/24zKWMSMR0wqtt39Av8bU5HilakuS33Wm9JrczTzveFKWStGQk1QDScVGCNDzZA2trZsZqPUivDVyXGeZcJNEPHjc9msXDPCh9Fq/+oDDUvjIQl+2Pd8scwt/MIPqRHI/DOVEJuFcxzyS5yrkJWYDAMdgf+HhNQ7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qKO9LRF2; arc=none smtp.client-ip=74.125.224.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-651bf695701so6018334d50.2
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 07:42:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779374557; x=1779979357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mENXEUb2I/IvitDd5eC5WRpQQNrmeFgj2UUSvwpfHeY=;
-        b=qKO9LRF2UnxnP+DcHJPCXdI8rsrIvscuOah5ocTUWzIogWlUKpWso+CaPbRekC9se5
-         sKvaUA9K5ks5HO/Aj/+tBlnrx1W/ftQV6/0oYrThZ3betqmbFMGV+zQioBHo/YlC9v1d
-         EQjCocN+LduiD3lrVIGLCsvt1GpEMCyz54SRpSJH8nakZtEBfyzMR3S5dM1SSCifLFs+
-         jiGR7nuL4T3sW5V1Qv10X5NW6/cp3nIbZRfdn5RUjOsCSH0OIYVpe983jzFQDZFxlO3/
-         n9m5vB4S8skeNHGrtOfaCy2WoyjgseY+UzPT256DK/eg+8fpZtNi8A/IjRCO6AoVgln6
-         V7dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779374557; x=1779979357;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mENXEUb2I/IvitDd5eC5WRpQQNrmeFgj2UUSvwpfHeY=;
-        b=W1qGrPrZ9sBqWx0ZAfDb6R4MU92k+sjD7iUKseXwI6qjY4DXieiodtvJLxg95bqeKT
-         wDLw8AMym8DWYml5f5R8d9thiI+zNjZOUd34gqWFSNthQrezEpXeLDwGNFf+Vd4chLNp
-         ZdGhIR/htzfxfyHpM7HhAWz4iqsmIyyVYlOd68sBlK8q6Ha0BzRUdVVmyzE8LC+eR6gT
-         1w34iwzkNRUbGKQgqSygO7RCeEyzYZmUk1jNyki2gmgY6VSOu6ILOdCW6D2BqpqKI8CS
-         Sh/Ws2QHcwYK/dQGWm3NsvztQfSfUUJcNU+3YAcgOVIaqK+4PUlvxx/tgC5qaWaro/qL
-         3pJw==
-X-Forwarded-Encrypted: i=1; AFNElJ96yj9TFgLhXb0B3n1l4GslwJkasaI5kfdsYquRcdZAWa8BlYl+nWxi4gP2VIap3TJtG7itpck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGAmy05N7qztuBBT6Z9Gs7M6CBWbg2ya5AT55+WI3LgcjFiqKH
-	xgjlN+ZcU3s7sjD8sQD9wN00ynHfXxr3XD8WZzdm6bxK1EEIFrYTXTBX
-X-Gm-Gg: Acq92OH62yW2xPcpvhizoPzC5fq3RIgsw+m8wST2R2DK020U4a4Xbj0Zy1oz9G3zNT0
-	g5T77wSLHk5OmaCOvop0HnOndoEPkifqH8DNe+OFm2ztzrTUDkzI5gubeAA02qrLddXxkC9m/vb
-	x1y3p3HPrhn5sQe1v5JGlzHPpO6rgmSNyPNpXOUOmeK2g5NW0Sg8soza8NmILEDLWHjX5k5Il77
-	ENZYEeSkFTGeRwoImJ6KWHIfBmfWlruMqAgIZRHB90ABmL6FVehnqoHL7NqXKj/qYzBt+M5Ti4r
-	3+Mw4fxXVnuF7e0V2v8Drs1UjRXp3S/LurKTIxsjj3XKeA3d6RHUwTfUAJyQ4kx/UFd6jf3yRC+
-	3jv0X+styAFTDZ3Zj/vRiS93t2GHTqXRh0VEGZmp2TbotTjJDGlHhJJhtcoeWmYE+Hhoa9GLxcW
-	rol2maxA+0Ax0Tkz5x+jT6+82MpoLxju2fdXR1bQPTy04Ko/XjVlFx
-X-Received: by 2002:a05:690e:124d:b0:65d:8f98:6bb4 with SMTP id 956f58d0204a3-65eae00c434mr2809147d50.29.1779374556706;
-        Thu, 21 May 2026 07:42:36 -0700 (PDT)
-Received: from fsh.attlocal.net ([2600:1702:56e9:4b40:ed8c:6b8b:1fa3:d14b])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7d2cac72ebesm3596107b3.41.2026.05.21.07.42.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 07:42:36 -0700 (PDT)
-From: Akash Sukhavasi <akash.sukhavasi@gmail.com>
-To: krzk+dt@kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] dt-bindings: net: mdio: remove deprecated .txt binding stub
-Date: Thu, 21 May 2026 09:42:34 -0500
-Message-ID: <20260521144235.3414-1-akash.sukhavasi@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1779374785; c=relaxed/simple;
+	bh=UqFj0OYKQ5SbVZfqgMgTcu5W8GyqDOp2mxfnKSHGWgQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AcoRteliuDmFB6nLUmqoyxNpNwWq6LcJfkJrkK5obA+hqdyKC96e+h7zhkPaQ4sov1jpbV16sMqj0XZMD7lgzrAn+zQWhXCznVwfYAhPErPZ7IFZn/WLRQzTojGDmzsiSKpTnH/2ti5+cAypW6cZ/LUQoKZk0XZo2OJFAFK/TAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHaAbRSG; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA36A1F000E9;
+	Thu, 21 May 2026 14:46:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779374784;
+	bh=FVS3s24HfC6S8k1o5yBNySDjxv7RhbXECfZaP0o73Og=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=hHaAbRSGT4lJxnb/rMTAEv3iCDCYsYlqbWL1XUO8L+zWLx34tKR15bNzLU1S9HNUU
+	 RBx8UH6BNhocgOrHCCOcEcY0IUZnlWnskSog/rC76hU0PKUMXSw31Hng48CuacSFSf
+	 VtJCOhGjwlAqzXbjmhMP76LBYjHvbqX4bNGTB8Y2TNbTDbnoXTWg9Uoajxm6ky5eYB
+	 jPg4Zkv7iWRXUpdu6/T/+Fv0cQL8cmCwy/uYE3qulOeLzIOvVWzRsAxwU0D7hbMI03
+	 GSKYeBC8DkYJg82n2/3rCDa5+czPNAjmbefxd3fTR13TuMxjhp007eFTBKd+LbPBbm
+	 ZDBU5cSUWaRng==
+Date: Thu, 21 May 2026 07:46:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: michael.bommarito@gmail.com
+Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, jchapman@katalix.com,
+ tparkin@katalix.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] l2tp: use list_del_rcu in l2tp_session_unhash
+Message-ID: <20260521074623.15efef0f@kernel.org>
+In-Reply-To: <20260521143654.1980290-1-horms@kernel.org>
+References: <20260518183447.64078-1-michael.bommarito@gmail.com>
+	<20260521143654.1980290-1-horms@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290504-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akashsukhavasi@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-290505-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 099D85A82C2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 3056D5A91E0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The plain text binding file was superseded by the YAML schema in
-commit 62d77ff7ecbf ("dt-bindings: net: Add a YAML schemas for the
-generic MDIO options"). The file now contains only a redirect notice.
-Remove it.
+On Thu, 21 May 2026 15:36:53 +0100 Simon Horman wrote:
+> From: 'Simon Horman' <horms@kernel.org>
+> 
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> l2tp: use list_del_rcu in l2tp_session_unhash
+> 
+> An unprivileged local user can pin a host CPU indefinitely in
+> l2tp_session_get_by_ifname() when l2tp_session_unhash() uses list_del_init()
+> while the list is being walked under RCU. This commit changes
+> l2tp_session_unhash() to use list_del_rcu() to match the existing
+> list_add_rcu(), preventing the infinite loop.
+> 
+> > diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+> > index 157fc23ce4e14..1455f67e01ddb 100644
+> > --- a/net/l2tp/l2tp_core.c
+> > +++ b/net/l2tp/l2tp_core.c
+> > @@ -1360,7 +1360,7 @@ static void l2tp_session_unhash(struct l2tp_session *session)
+> >  		spin_lock_bh(&pn->l2tp_session_idr_lock);
+> >  
+> >  		/* Remove from the per-tunnel list */
+> > -		list_del_init(&session->list);
+> > +		list_del_rcu(&session->list);  
+> 
+> Can this change lead to a use-after-free in l2tp_session_get_by_ifname()?
+> 
+> By switching to list_del_rcu(), the deleted session remains visible to
+> in-flight RCU readers. If l2tp_session_del_work() drops the session's
+> reference count to 0 concurrently, the session will be queued for
+> destruction via kfree_rcu().
 
-Signed-off-by: Akash Sukhavasi <akash.sukhavasi@gmail.com>
----
- Documentation/devicetree/bindings/net/mdio.txt | 1 -
- 1 file changed, 1 deletion(-)
- delete mode 100644 Documentation/devicetree/bindings/net/mdio.txt
+Saw this, but I don't get how list_del_init() -> list_del_rcu()
+can change visibility to the readers :| Without digging into the code
+this reads like Gemini reporting a different pre-existing issue.
 
-diff --git a/Documentation/devicetree/bindings/net/mdio.txt b/Documentation/devicetree/bindings/net/mdio.txt
-deleted file mode 100644
-index cf8a01054..000000000
---- a/Documentation/devicetree/bindings/net/mdio.txt
-+++ /dev/null
-@@ -1 +0,0 @@
--This file has moved to mdio.yaml.
--- 
-2.54.0
+Michael, could you investigate?
+
+> If an in-flight RCU reader in l2tp_session_get_by_ifname() encounters
+> this session before the grace period ends, it will execute:
+> 
+> 	list_for_each_entry_rcu(session, &tunnel->session_list, list) {
+> 		if (!strcmp(session->ifname, ifname)) {
+> 			refcount_inc(&session->ref_count);
+> 			rcu_read_unlock_bh();
+> 			return session;
+> 		}
+> 	}
+> 
+> Since refcount_inc() does not protect against zero-reference transitions,
+> the reader will obtain a pointer to a session that is already pending
+> destruction.
+> 
+> Once the RCU grace period expires, kfree_rcu() will free the session
+> memory, causing a use-after-free for the caller.
+> 
+> Should l2tp_session_get_by_ifname() use refcount_inc_not_zero() and skip
+> the session if it returns false, similar to other getters like
+> l2tp_v3_session_get()?
+
 
 
