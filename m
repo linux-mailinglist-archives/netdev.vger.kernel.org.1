@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-290586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKONDHJID2ptIgYAu9opvQ
-	(envelope-from <netdev+bounces-290586-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:01:22 +0200
+	id OM9nO7JJD2ptIgYAu9opvQ
+	(envelope-from <netdev+bounces-290578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:06:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4FA5AAB96
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:01:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F9F5AAC30
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 20:06:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C9CD1300F5F0
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:00:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C04C4301DCE3
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A973FE343;
-	Thu, 21 May 2026 18:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9DF33F7A8A;
+	Thu, 21 May 2026 17:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b="gkvKwdOi"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b="eCB85vuE"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081553FD14D
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 18:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE2037DAAA
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 17:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779386403; cv=none; b=OFC9bcRVRHSZjJ1sqzMFkqzE/NSlOqhq3bFRNHcC78STSFXm2h9KEYh0uK+L2krwN3gMBkXiYBzHaxwrfX3OBbsD3jh4jJNbbKu9rbjUi/pIwWzdQbfe9hv3NjdcOLBKXa8fKbG/Tpzu6xCpj8PtbnRbjHQgt/WWKqz6EME6+fQ=
+	t=1779386383; cv=none; b=VU+hjd7TspTltv99OKzMjN8O1dkkhV/v3ZalzNOaAYdUKeHHOnwzoPM90m4xucfkJ/5WisEHTO4fpHUnSkMGtZ8iKV4PQ5VFuW3jJ6OxRh+RnIG63eh4JuHfgaXwQaAgCqTh+U2BqGwkYMtkLjgiANWtGbEYxl0WYDSboODuvow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779386403; c=relaxed/simple;
-	bh=izdoFORXghVkA8vTDMCYxbZphUmokXboLDKjKcZrX7M=;
+	s=arc-20240116; t=1779386383; c=relaxed/simple;
+	bh=bdemff/c1wlZ9Q/Y7ycCSrjaE/doOy7Z4Y2Kypx1LIo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BSHm9PaXoRNRl9lxF1s3i8LueXuoUY/I2WYpUbxhKissKhuo3gWe8zUyFunC0jSF7A+R8/vRqmIAM7CfbD4zC0LPc4retPcodWmxLHaAwFeU/2zHDhWhNoIRV/cQe1S9WV8kF6zue5GgvmP0zfZSK4IhLrRscH+oj51ItvZr8VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=gkvKwdOi; arc=none smtp.client-ip=212.227.15.18
+	 MIME-Version; b=EOx7n2Ewj+NH2MDNPdSkdNHB2n3MGPipMYTrJJXpfTYYFJFuBvRofDkjtFylvcNBIjEYCiQ8CsqtAX+W0NlAwVpshuO/d1C9PTtjlfg2h7rW98w2oQcEMoITCLTiYGeCvdLDSGZ0bBsxJz7VMJinJ3EVaj0/kEqY6TikJrj+upI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=eCB85vuE; arc=none smtp.client-ip=212.227.15.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
 	s=s31663417; t=1779386376; x=1779991176;
 	i=markus.stockhausen@gmx.de;
-	bh=QjUWEgy4UqxrEPwEvCiiHqvxXXRmiqB8grcOJlQUqiM=;
+	bh=b0/TAR5nXBZiEISzKlrdiaTaK8GA5tNbNemNmWDmnTA=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=gkvKwdOiBodZEWGnxMJ98kv7n9IJu2uSGTKP9Q81XilWakOVsNNy3RuA/pCgIsf5
-	 kFfLBI2vC6UGthIo9vpjwD6dEHdz5IEj7kCDc5fGB0f51ayy9rKHob6zS9TqssJ4R
-	 fvpsLJSLad3Q+nKsR8c32msUU/GM3IzuRDQkgJSmd7kws6rHFyn1iL/74cxITRLLE
-	 3OtCNFNJgPLlylhbifhNvIlMwhDO0jI7p67laeJu5OSeK08HI/zmPJoGldsfIhhqP
-	 VWblsrKcceNtlhH0n1z4yYEoCTmAkieAzDdsdCamJxkYf8CsavvLPZVsbbASCFeqc
-	 2xVR84l798xvE5nNzA==
+	b=eCB85vuEpJwXzDXXKllbs6Uozmso3QYFtZDN2n7fP8LAHpa6AXS7oGvHUAu6SHEY
+	 sEEPKzdty2S5pvXGTsq90N9KOAhGaULRHSNTILlsEdzCW6talgh2qAMhB0gOqSjl6
+	 b7QPvAtmc0fZ+zGArUEd934DbMfpyR8iYwtnNmw57PvOg0fY8X5H1EMaV8D/z+d61
+	 6ALfkK9fSBof33TB/YvKqtkEuPt6cbCVVGiPQRytV8u7rQB9dvyNPUzavGWUFW81m
+	 oy2P4Hz7wWYom+UBU36yJXnnnoEeI9Y/BBK2ZhenA9EIPa7xXbTpHo9E5zH0JDBPA
+	 cpOOoGG1EwHP2WnaaA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from client.hidden.invalid by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MuUnA-1xGRQ21nT0-017p3Q; Thu, 21
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MCbEf-1wY8RH2pUZ-007i4f; Thu, 21
  May 2026 19:59:36 +0200
 From: Markus Stockhausen <markus.stockhausen@gmx.de>
 To: andrew@lunn.ch,
@@ -64,9 +64,9 @@ To: andrew@lunn.ch,
 	chris.packham@alliedtelesis.co.nz,
 	daniel@makrotopia.org
 Cc: Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: [PATCH net-next v2 3/9] net: mdio: realtek-rtl9300: Add ports to info structure
-Date: Thu, 21 May 2026 19:59:12 +0200
-Message-ID: <20260521175918.1494797-4-markus.stockhausen@gmx.de>
+Subject: [PATCH net-next v2 4/9] net: mdio: realtek-rtl9300: Add pages to info structure
+Date: Thu, 21 May 2026 19:59:13 +0200
+Message-ID: <20260521175918.1494797-5-markus.stockhausen@gmx.de>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260521175918.1494797-1-markus.stockhausen@gmx.de>
 References: <20260521175918.1494797-1-markus.stockhausen@gmx.de>
@@ -77,103 +77,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ddGPXYOSbuVoMcrG2BJf3uIRoGUFPhe9dQ25jrZ2u7BB2JOWMB1
- k8uO8SP8yYsTlshmrbqp+32z8qZ1naOQT/VIng7F4KNcSwF1KY/TrM250BUfuwrayfPwcLX
- AyEEozAUWU9fsb+hLMm/gFaNo0m6IG15USDhPXsRe3m/JpgpgVlt2Wy19U8q8hLVElMpeuO
- baBcvbTNeWqLsFYsj8iuA==
+X-Provags-ID: V03:K1:6AFbYxuZpx1GE45sPxUOHVLqkyUuUWnIuDzPN4t511DShLsacbO
+ 8c+jJC7TP1ZIfoY+B8A+nqcuH5xGpbyDpNMF51ADLVdJxZ5R6kpLz6cE8C26nRRmKbHHlcv
+ 2xpZOv5Cf3XzREfMsKsP1+uTB2I/oJwBbNwWYByFFpxHwHhEw1bbucZmBE2EDZD3oWpEAwl
+ qayPumXyGVF8HFtr21hLg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:8j4nZ3KyO3o=;InX9sUd4OVtP2QTgIB6b+8it7RS
- ROC2WHUDxkYXKxndNvEw+eMU5eWaP5elh07mtwtY1bAYXFgni5j7nFLenkJi/hzSATtUzHeO2
- Kpo471CFOFQlymHb+V8xiCrvfifUft6B0IOpbcGlTmAJXjJHA7WajmqoLTGJipYs8o97u9YIY
- YMGWEop5qwCqEleRBOKxeGAdvSwM6YiJJ6L7H/5zEPn9Lrz+3TGpIJGSkX29Fbo6foy1AXYqJ
- AB0cQyyMiyaM3gXxD4vNjLEGgjXdBdL6hsWCwzP6NSCHHsxB33H0xHDtidrCTwzkiJzBdMWhd
- Y6sSURWwERaYjlfmOb/xLDJN1irmhZlHQl0NueKi6yZ9T6iO8WQ5Dx1hqSO82JjWOYFxJl7+Y
- xZPvSnfTG33Dcw62DD6wK26bFkmmUYqLn5yKnQFp/l3EGDYH50eiH9+cLdwxkQeS9Qd4AMUvG
- Oh+Zv3hUpzSddCRHXXFqs5fbO5UhVM08JdvblNuk0M1NQlbZnExIyXLuhpQzkgOr2ArTBVjmp
- fPFyB7opeRSvlPqhzHxT1HUAVbVKVINkZEPTmpbBW7ESF9LMSZvJ741LJkj4n5B0r8mYGGMY+
- MESJHqxCSn4jOPjJEztasw2ePsVomBpRF/9yFsNGohVhSr2XH4DtDpnY8im+Y5d4JuHjEkzG2
- fl8Le5DTMLd/1Psa3Rjm1xdQntxSK4X/++snwEzA0FQgUFYISV6OgmJTbf8JiGuDjsoKezfBO
- 6kAI47dY46/Byy4u225+Jq3ywcxBdtmVxvvdEPrDRC77O+2ewBBFzPnbNV8b71V3gVbtm8Ie3
- 9by+i4p9K5VNkn3mf1s7MTKo1xeKIE3fB5aLJ9swu7lP6aSEYdsizoO3B4k392b2PXRs7+bnG
- MzfrdHq6FTO9EUYH52yBXcdAr7VNJS+JuZYbae6noCd+bW1/qvVt5ky8yvm3pUhLv8AVYlejk
- fSIxFh0j88Xbbj2e4Q9Ro1Glww9v54A+RM3OYxsKGe0zOfEWPav3cUIsIAsP/KqGwwBVHEK8M
- xMWYQ1lBGP4vPKSgGMpUqNCOvREZ65xXkZF5OTFu8On8syjjSvJeSJN985VrLgFfhfN+/TBcN
- qHVW9dsR4N1esQdMGBPX+/YjFrZSN0v+FJNL4yxX8W7sWt7VOVGYrqIvw4yTWjM4YKJWStmjf
- jjE/bgquQv1vyU1HU2PQYMCoqANIu1JBcB6a0ec/NnmKjXZkW/GAROgXBEVaNiAZkxj11n0xZ
- xgIcE9I3WjjSEeMeGg9MRw5eYeyqZRXdk2UaZMyBuTipgkVrYyXpyDdA1tnKc+z49ThEyv1FI
- dh62CzDtO7YnroHz0ebjw3tEogRkNeyKPrU+mfbh+tOeD+siKA1CaxBCZICcpg/oz2hx9v0ra
- WkJeyKKmBHfOR0AZ+c4DFH2/fTIM7FfdW7+GvMJvSYMN6LGZ5FEJNTVAN0PopXH4h4VDQ3G5N
- dGMUSlNd7+1amFbBBX1Apxm8N9/1uuOeuOeJmT9Y1BQ6LPpMHyYTuolUYMPdRgNv6LkWchoiw
- 4PM3q7cUzIvZckon3BodWv1NmIl0hNEqepYf3Zj7TAtsV7n03wxyzwaQpH41Nxdrq8Zty5Fri
- XueBlXahDzsLR7ailoVy8RYRVCujJLrRW7Xl6dVGk8FV4DyQLPXBPShtNJkm8iaxymmZ2f26R
- b0gXOO3WPt1gOVrzRp0dtmft3WZWpaZhsWFXcAP3apdRndaMggeUGa00B3oulkW8v67APPg62
- spdAo9BFO8cRRUJ2cVnxpbMeJWp2leVahmC+tgJtjbLXNGj14UTvTH2bmOiCEsawPl+BSxzgu
- sgugT+L51G35pwxPsOezTDpP1VMMUVYyrth2QeRnIphvjgRDb98ds5ZJO3uDsooYZzEfDO3eZ
- GJXCv3JHGUBBczur/WCb/H2i1fF53YJn7aG9/JAB7G92bvwZLSBQ3lk4dHYIhMAEydnUy3w2w
- 04frzDlSeTgU1xDeQM9fDGZwVZuSahqrWfEYTin3+G+P8F5QU3/rWL84+JcZLn3eSU4U1xaSB
- OoJcIXQLJjL7ymI/FCrUjfPyTMpIlInu3ob2fM5qcENBbeR9tuvL2avTIxHg9BGTI8TAqZuBR
- wM99CdQJDlr7ZKPWeWeHQtRufoc6X0juM9joiyaC2kQr8Vtb/rH1G78tYtCbqRV/BrhPseZDt
- 0BMFMWrbF5dSiesFWqi7GRtjV9pkOHjRTfA6/bV31wA66h4gu1k7SwVAAh0/RnXz+O2uGgACs
- 9cAcrFTdRadV/tPQ2XbliCvZS4AwF2A/CgF/BVbjBJkGh6pzGsOyJDdIyus82You1XNIdl1ps
- RWSUBNacUmEGRqdnEg/2TT8Uk942MDx4g5G2o6WbwBxKKaHvEWBXy6aJR49v7MbCoFxXQJzq0
- drOQUg9De9p43U7mk5wfGo0kUdfIycs6Ogx3trzRmsBhUDfqzKmhyMqNxtPvJdCbidIVk/BQp
- /NsIAJVi2UeAdhyz01vRDoyJssaP9ZXKtX41lLTBmIOAeIeD3XV85jDXcP5/k8Jn3PF6tAFBW
- K7ZVepzNVbmdJLQtmvDgqn4Ph76q+nR8SNHB3SL0ETocQQeTLt6JHypaRHZPCStWkHnYWyJeS
- Np9OgZXyTf8bJZeapn+yA0ePWzFa3Esh4mAS2HXedVd77OvXl5kAV0816Sxl+dKPPK/6SOyw9
- F8f8kdZ524Cq3Yly7cb2QCJZauFM6mt1z/eCPequsI2zs9fJbQeqkHR2TERqs+m/5S2LuvuJu
- YI1CL6+NVlYkk5UZHQ3D8DvZFlVY66jCyJQRb9vhWMbMsLcxIbY9lWinTbR5c2SfatH3HemgG
- tc3yVJsCgMXo5X5WJlb287XXAHGhVQ6a7pli6WTeueX2OLxEdIq98uHyfrifi2dUhAGsMrqoL
- 0MTnCBm/3gY4tKsmprUT6p0CfrTmOMznlXjux3p8P3H7YH4GAiKvX+CPaKlSaVEGxrLTitG53
- REsUMv31LnkCyxwajBHTtqadgcipCQCB9HDah0bIBgUKo6brG+t1uOJGcnhdwdmY+WUMarTgV
- cR/ccZ57txVf3ZGFIlDqdZgbRdFgclt+XpTDEaNaL6CG2qxvZcR2dyWTQKnFTGAXdoIfnZRxj
- 6hXkC32DKaboj5BbmAQKY252ta/YMfRlkE56nXcuSt24NAkHG8S1Uf3bPNxgKzyTsEbyF68FF
- DK1s7ct004EIXPufDTc0nf6jzSuHY5GZVkEgDyh8sH3HT8S+8aiC/Uw/9V/s2VLqH4G6cx3yv
- vIf8TnzEEWwBjqx+4xe2Or6EqIB61RAhP7Yk3J0ex55sK1h6lLygjrDseQrYxHDp/ZZNkweaK
- YmxjK5+KyT0KgWYg8gO36uZV0SegmAMnkXROQpfcDa5X6O52xWfcCpEkeyrvnxoDlUMSqTRWo
- L9Wf6Dn8OMoNjfd1VFZCwHcZTHCJaxIMIOrwz264XOrxeNzjUwubPwPgrCmKsDPQ4AD++6RmT
- eaPpCZXKc76+ly63DEjZpYJBPE7IBlGwASLPllW1XSMQFJe6BB2tXc3uu++j34cNCi8t9Cr6W
- bUn/7uaoBmgkLELh0n1oi6yg3Au2DCr/9OYoZCMjfl3zG+1SQHZ7DvkEr/8Q6IlxU6RuhY7/r
- f3WGS0nDhTCK96v60HvNZl4xACVZ7A3kijZ+JPAfEs0u5jQyzIJ11dB96wbBAvqgWDOqZ4q3R
- xDrNK6r3EIMkqLiK0TTprOGn11sIyfZbk6Oc2xtGwpYDHJP+TbttzpkmzQGYt145ATygG4KNE
- 71GT2Mh+efi1Ao0QA4T8igT3Z9/sFyYJcqt8rCOrG1dNf3j0PVqxDZZgbE1ogCwy21pBPq1Vn
- qt75Nd7YtEpGJXztavSXl34wbVEO/pyIBud/bn1qdcyIccSbsW4UR1t6r/7R3CvOpn7jPlBCv
- PItwhJ4OI5vJAZ9/QiK+XeulnH/9R5uWxoxWtg17EyE44G9z4sHgSvHbCu2DMAqYbKt+VQ457
- 7hNf4VScGs0WjSHdWnBtUdsw75YoG+/r+9k9Kc1ssldh/vvtCxzZZbX0Jbatf/8tEMesN4xO3
- vz4tr82nlVQCr66CAew6EYLjmRoC+d66Bz+8KscWcG7mfKXcMi67pVW/CbaANryVkDQm9yIrk
- wIJIj6o7Z/gUVz8fMa1x5JceZjSmXyz5uTItFaeN/Lb6kkAtB5K77JpTh3AIT/+RUoMAztnUI
- rTn1Gx2gJ15HwaV5AGN/p++DMiGQaQVpapSYh7kAu+CMN+9pCxzSkOKbgHM7ScZ1qwvYnhlaS
- Lj3E/WsNG+khiuKzaZb2x+rrY99BocnE+7leA02AKxM72FAagBsYIPWxvu8ygbSM/xutQmMg0
- /HfkOGA+Pq6FATsPQF2+w2wGP1HpI/KSeCtw/fjrQw4H+UTnqoJLfTECoNErvjjoE/WEaCMeR
- +B2Z85rt3fxzToERJRE0c1heOoiNA3z6gPD2IJg+0PAka732sGR8lLU9fe3RhHI0iqHa7MW5V
- o3IWiFj8K5zd18am5xDszOretL09hw4HuewOP0LnBU4HVIikM4ckDvvMmUWh5CR+U1SKmsWCh
- LS+d2cOlXo6ulUplCg+ZJmjl0Lh9dmjN5I2pVHnRWediMU5vzL8ZOYVowvPs+f1X80qkg/GSe
- FSi4WRmBUUo4Ahx713EdcAvf3rMPyg7M8ZFrsIlf436JmICUE61E+91XK/eVD392dSrlOpCTr
- Do2OfaZgaQO55+qbZSEkj8bg7FOqw3PPcv1XYCd0WaBh15rhSOLvK2L+EUZVLWfGCeKbrIZzb
- Z70YqV1cmIdKrQ67rVmecyUGXCfIvs1Ic4jbXnpeaey4wVFZaQyjU301fgprYfUZg2whwR+aU
- JUTPeYZ9bZl4P1bvlbgm2yIamgvw69DZAo0+oASni7dy8wbe5g8+H2Ubigej5lfJJCZ9mHrqW
- FPHhvUjnuWrOODUgu8EqLveMGeaUxNmzuZx5sTkxuozrAOOr5PhQAlnLlw46S+HSuTHaK7uyi
- YN4XGfIbofdmC9kLRsI2Md5mm5D12r8UAeo1XSAX4cOxiofwq2MfzLNhzcr7EjeYxEJJ+2gcp
- n/aMz9yUoFJZdO7M7VbAZtnWIMFAJJk+66byx63SFASEmVGM59U7XKX6Nn47ByxY1pU029lRm
- lYn0I5ju4NwyvaH/a6uiFfcjs/Q+YHw7c4xPnnZWDhm0fCc4yP846lEAebqdnwAvui0xL7Bfx
- MBWHAgLpsjoM9LsI8vjD+cMARovSVYzUlAdsQ4vsWc+ytvEWQCHVoP8v49Rb3A+0QrDcQvPAM
- F/pNG/scd+YIIhqmUrOCxiKzJbSnTshWW9Vmb1Dqgo+9TNPi+JU5EcE+sJFM8uKNHKa7H/cco
- G+sEEtSr7pxs6KNCqZBDSlAP/Jx45KKFxGeq8Q33fZTcx10n2ntg97VD8NppyjWtSnbuzMdA4
- sf1jB66PbbXtW9PDICte3OXxjKyDPPGCejmAk098pttha9oNpRxEdZffa++vSQaELeytzFZ1H
- u0bt0fLlYzH0bA8EUogvOhGbNpc49971JgPe/V+iwcEfn1xDbFm96+NuJ3AcySnty0Ju03yKo
- tKcOfxwT9QrQblEhkzVtGeGJiZ91/7vl4FGhNdS8cKgGK4A5uCvRla3JH84nvBMGAzxZC69dM
- Sc7DGm5LoAy+uhYGWAhdKYD4suBRtS+/klnyhQtSBhVsJydtVRJH1F7chXO8A==
+UI-OutboundReport: notjunk:1;M01:P0:W+BKVhZMnCQ=;646F3xOfFm4H9yG+zR+zMjlIwzg
+ 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
+ QqJSM+JvDGnFqBEx/bwyRkyAg4PrBDRTnNXOXRT
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
-	TAGGED_FROM(0.00)[bounces-290586-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290578-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[gmx.de];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
@@ -189,88 +189,99 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gmx.de:email,gmx.de:mid,gmx.de:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: CB4FA5AAB96
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,gmx.de:email,gmx.de:mid,gmx.de:dkim]
+X-Rspamd-Queue-Id: 47F9F5AAC30
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The ethernet MDIO controller in the Realtek Otto series has a very special
-command register style. Instead of working with bus/address it works on
-ethernet port numbers. For this the controller is initialized via mapping
-registers that tell which port is mapped to which bus/address. Every
-request to the driver is then converted as follows
+The Realtek ethernet MDIO controller has a proprietary paging feature
+that is closely aligned with Realtek based PHYs. These PHY know "pages"
+for C22 access. Those can be switched via reads/writes to register 31.
+Usually the paged access must be programmed in four steps.
 
-1. Kernel calls driver with bus/address
-2. Driver converts bus/address to port and issues command
-3. Hardware maps port back to bus/address
+1. read/save page register
+2. change "page" register 31
+3. read/write data register (on the given page)
+4. restore page register
 
-The number of ports is different for each device. Make this configurable
-by adding a property to the info structure. Switch the existing usage of
-MAX_PORTS to this new property where needed.
+The controller can run all this in hardware with one single request
+from the driver. It is given the page, the register and the data
+and takes care of all the rest. This reduces CPU load. The number
+of supported pages depend on the model. This is either 4096 for low
+port count SOCs (up to 28 ports) or 8192 for high port count SOCs
+(up to 56 ports).
+
+There is however one special page that allows to pass through all C22
+commands directly to the PHY - without any caching. This so called raw
+page is dependent of the hardware. It is the highest supported page
+number minus 1.
+
+Provide the number of supported pages as a device specific property.
+This new "num_pages" aligns with the existing properties and gives
+an better insight into the hardware layout than just defining the
+number of the raw page. The later directly derives from that and
+can be accessed with the new RAW_PAGE() macro. Make use of it where
+needed.
 
 Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
 =2D--
- drivers/net/mdio/mdio-realtek-rtl9300.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/net/mdio/mdio-realtek-rtl9300.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/mdio/mdio-realtek-rtl9300.c b/drivers/net/mdio/md=
 io-realtek-rtl9300.c
-index 931c6684b2f3..941e557bc0e2 100644
+index 941e557bc0e2..94f59a56bc46 100644
 =2D-- a/drivers/net/mdio/mdio-realtek-rtl9300.c
 +++ b/drivers/net/mdio/mdio-realtek-rtl9300.c
 @@ -52,6 +52,7 @@
  #include <linux/regmap.h>
 =20
  #define RTL9300_NUM_BUSES		4
-+#define RTL9300_NUM_PORTS		28
++#define RTL9300_NUM_PAGES		4096
+ #define RTL9300_NUM_PORTS		28
  #define SMI_GLB_CTRL			0xca00
  #define   GLB_CTRL_INTF_SEL(intf)	BIT(16 + (intf))
- #define SMI_PORT0_15_POLLING_SEL	0xca08
-@@ -80,6 +81,7 @@
+@@ -78,10 +79,12 @@
+ #define MAX_PORTS       28
+ #define MAX_SMI_BUSSES  4
+ #define MAX_SMI_ADDR	0x1f
++#define RAW_PAGE(priv)	((priv)->info->num_pages - 1)
 =20
  struct otto_emdio_info {
  	u8 num_buses;
-+	u8 num_ports;
+ 	u8 num_ports;
++	u16 num_pages;
  };
 =20
  struct otto_emdio_priv {
-@@ -106,7 +108,7 @@ static int otto_emdio_phy_to_port(struct mii_bus *bus,=
- int phy_id)
+@@ -154,7 +157,7 @@ static int otto_emdio_9300_read_c22(struct mii_bus *bu=
+s, int phy_id, int regnum)
 =20
- 	priv =3D chan->priv;
+ 	val =3D FIELD_PREP(PHY_CTRL_REG_ADDR, regnum) |
+ 	      FIELD_PREP(PHY_CTRL_PARK_PAGE, 0x1f) |
+-	      FIELD_PREP(PHY_CTRL_MAIN_PAGE, 0xfff) |
++	      FIELD_PREP(PHY_CTRL_MAIN_PAGE, RAW_PAGE(priv)) |
+ 	      PHY_CTRL_READ | PHY_CTRL_TYPE_C22 | PHY_CTRL_CMD;
+ 	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_1, val);
+ 	if (err)
+@@ -207,7 +210,7 @@ static int otto_emdio_9300_write_c22(struct mii_bus *b=
+us, int phy_id, int regnum
 =20
--	for_each_set_bit(i, priv->valid_ports, MAX_PORTS)
-+	for_each_set_bit(i, priv->valid_ports, priv->info->num_ports)
- 		if (priv->smi_bus[i] =3D=3D chan->mdio_bus &&
- 		    priv->smi_addr[i] =3D=3D phy_id)
- 			return i;
-@@ -351,7 +353,7 @@ static int otto_emdio_9300_mdiobus_init(struct otto_em=
-dio_priv *priv)
- 	int i, err;
-=20
- 	/* Associate the port with the SMI interface and PHY */
--	for_each_set_bit(i, priv->valid_ports, MAX_PORTS) {
-+	for_each_set_bit(i, priv->valid_ports, priv->info->num_ports) {
- 		int pos;
-=20
- 		pos =3D (i % 6) * 5;
-@@ -472,7 +474,7 @@ static int otto_emdio_map_ports(struct device *dev)
- 		if (err)
- 			return err;
-=20
--		if (pn >=3D MAX_PORTS)
-+		if (pn >=3D priv->info->num_ports)
- 			return dev_err_probe(dev, -EINVAL, "illegal port number %d\n", pn);
-=20
- 		if (test_bit(pn, priv->valid_ports))
-@@ -537,6 +539,7 @@ static int otto_emdio_probe(struct platform_device *pd=
+ 	val =3D FIELD_PREP(PHY_CTRL_REG_ADDR, regnum) |
+ 	      FIELD_PREP(PHY_CTRL_PARK_PAGE, 0x1f) |
+-	      FIELD_PREP(PHY_CTRL_MAIN_PAGE, 0xfff) |
++	      FIELD_PREP(PHY_CTRL_MAIN_PAGE, RAW_PAGE(priv)) |
+ 	      PHY_CTRL_WRITE | PHY_CTRL_TYPE_C22 | PHY_CTRL_CMD;
+ 	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_1, val);
+ 	if (err)
+@@ -540,6 +543,7 @@ static int otto_emdio_probe(struct platform_device *pd=
 ev)
-=20
  static const struct otto_emdio_info otto_emdio_9300_info =3D {
  	.num_buses =3D RTL9300_NUM_BUSES,
-+	.num_ports =3D RTL9300_NUM_PORTS,
+ 	.num_ports =3D RTL9300_NUM_PORTS,
++	.num_pages =3D RTL9300_NUM_PAGES,
  };
 =20
  static const struct of_device_id otto_emdio_ids[] =3D {
