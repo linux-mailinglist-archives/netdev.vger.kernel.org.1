@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-290469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290470-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kE/fE/AWD2qVFQYAu9opvQ
-	(envelope-from <netdev+bounces-290469-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:30:08 +0200
+	id +DeiDQUXD2oDFgYAu9opvQ
+	(envelope-from <netdev+bounces-290470-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:30:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA7475A7498
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:30:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7305A74A0
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7C67B33817A7
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:55:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6981930D3789
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1553E1D13;
-	Thu, 21 May 2026 13:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874AD3E559C;
+	Thu, 21 May 2026 13:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+6brNlC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mq5wjpIn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB5F3E0245
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDC23E5A0B
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779371598; cv=none; b=C7TcF72LJj3CWCn1zcqCehpH2WjaGXEICoqhMqgjQ3tklK/vOWSajQNwEM5sHlzo8HSYvpuAnn2PFygO5yb4S5Kq39gMEbEfY5DSIULeEbtGGsqY1CR1c519pNrTLqkQ1CPwgOTAGdpr96OniawEfRkn83s6CeXkwTOsMpkJ1pI=
+	t=1779371612; cv=none; b=FoIzfuTtzh/lv33xEgL+kZQr6RWTKIjcYL+8MOcUIyZ2ihmfB17mafwWlVlWVGlqv9Kd3f2aP1gi4D6SqjH10IBA1JSku1b96blwEHQUVkkDrHZBxZuiJS3XLBIaaApfABQ1c6yJZO3rca2hNMqP8lLFhA0LWLwVtqvM6waNR1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779371598; c=relaxed/simple;
-	bh=DOfWH6hLKc3o9vRvYL5MSuCO1dG989HvIXld9/XiNFU=;
+	s=arc-20240116; t=1779371612; c=relaxed/simple;
+	bh=7dRN2lVYiQcHQj85FKXslQHT95uAqRClKyLM9OSsglg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pA1bHC+hg+VgM31UD+NU+puCmf4qgI1TCcV8sdjZf2PagHJ07u8S684/B2lxdpR7HC4hh8hOPGst1K7Fz5jMacry4KKgGRkv2nj8/khzITr47EZcAeimHtP4eC7iWp+jqDhZBmhLcWBH91aJ0ABuJ0kZwXvHl0ILlGne91FpWyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z+6brNlC; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version; b=ljDKu0t0+gcvqH3uKOmwHlusFXch4sjCUW0dmxXe0cbpfL4r8BDZaL6x5bEIjgP/DJSIFFouMVseafXFp2MNOVjA39+nvrfebETqJwvPrsWtqgBpU/EudVWwcdCXPcYwHZ0MmkrlEQ5ag0/8eH2iufH2JfPjXOvRBJV4bRpRF8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mq5wjpIn; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2b941cd869cso39113385ad.1
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:53:17 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2ba21d32776so44168605ad.2
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779371597; x=1779976397; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779371609; x=1779976409; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A4/cZz+D5VB55BisYY3cQwNyjxNuoDjRYz6rglyNSPk=;
-        b=Z+6brNlCk8rg9zkj6XMWn5GlJ9sjPv+cecp+klRYajWObFN9dCivmMefFXbsAe94DB
-         2nNtlL1jhbbzenp/yZLuK0D6E97BIy3KV2pFO4eG9iFF7f3sm2QggLq8wSSz+Zse11wx
-         NteAC5HVtgq+amX3HdvGLB9a7nUddfNg7YABXFQlUzvu8Ajhz7g3Fv4dKbYzDKKHnR+z
-         aI5FVbzigvxocHsXxhtK8sfGtXaGNszG72fIE/TP4XRbQDQO6IgNFDnb9bHNjQaP1kiT
-         6dmFmlx3NAitTg2uYRotVofLZR2GUbfsv6ofB0zjOJS4qrFe5VCPqKy78UUmR5y3ik0C
-         fH4Q==
+        bh=3uxNYLIbpi8gIXuY+ONhzYZBPNfuEelESGS8WTu/ln4=;
+        b=Mq5wjpInx02XZj4i+RW0C7p5t+kYP1DX461Qqgjzo8QEYTDAJdxXCft8djRxudXGIv
+         EX3yTHRdHOp7WniHFQjYcoimWtk+IcOQQUuhVdyZ798rxVuz48mnw+UJOQXXH2CAhUkA
+         7KECSc3PKXWpfXVqifjB/LI4EoG4FVr7sSyqFS6yajbpwzWVMoOfA/8fFk104RxOQkAR
+         GGmqJ9J0YCNfsO2CcIulbbNrFDMlabvpofb8j3FqSzQGKvAd3BrGJzpfZ6Y+SfEnAhaD
+         0+90GO+1Ot7DHJgQn7wMcMTgdaKwRc3VL/if56fhgphPu1e2B+q+NG9/OVZ27Gsgm1Lu
+         6RlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779371597; x=1779976397;
+        d=1e100.net; s=20251104; t=1779371609; x=1779976409;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=A4/cZz+D5VB55BisYY3cQwNyjxNuoDjRYz6rglyNSPk=;
-        b=N4Cb4qxn1VlJhtwKOoU6N4Ue3mnaz4j3wpvfNoR0/pjEm1wsntZr1gP3fVAbcV8qQh
-         9b7m8L2x9OYbHy8cFIP0flWz9mQjpK8LaFnWMcI+YSFGLwuRRicmUXihLGzeICjG7CIF
-         UDibhGesQJ8SQ4riwwMmfD+FqQLjVErzQh2H2axxPP1h9d2LghiXDmY2lx3jmkM/dlJb
-         Rdjm0TDNxlzoM12Ute37El+7dA1vOuckk+kwCJMaXvVwKigbXtjPp57wIDsCIl5MaT4d
-         nn6/X/FjMMA0bwrAzWxa4lIpiUPZ4j/rkXZb/DNqjjIRfddsOfcMe3g691j7iRg3wpkl
-         hSqA==
-X-Gm-Message-State: AOJu0YxCGlCPqiRme7w4eJktZH8eVbBYwsPPsUct4RhDN4qa6mA3wEAO
-	GSGlKH7ciXRglmkA8G4DENegVtW9JPszYxWbrIpwgqn4lFNUBSYsxXpk
-X-Gm-Gg: Acq92OHgbt5t6FTSXW2VbbErHH8deJJLFpxEM0R8NQruTOFHz0IQihfhij+8eGyPx1A
-	95OyrxHgGQMxzHSf7/bachi0QhucXQKL3kUD/TMso+480I+X/kjTmqBSPoqOmuA+/45QGl/vESr
-	XU8SnvJ4FBervVarAnmFIYisaotDCmd3r9+IF/jgmOKK7f2LejPr2NkEpKk/cbzsGhDH4oeuJro
-	NmC18OSte0K+L9K5/MbADgS4qYFgS1G5KQvLzBtB7giDk4iF/tNdEJvkSDx0vKzb60JKUGgkUbV
-	UK15Q/5cvjrWOE9gma7HmYbLZNyjM4xuKT+AyPE4tZVbTwlJJkVrXXWywkxpCjiMrKUYkaOLW7p
-	bYIKtAVwuiM0E/4r2q0s31kJeGr49t4GhBDUo00BAxoIQb+DoPl3AxvJVpl9bjRK/yN1fKQ382+
-	ubxx3xWUHZdyx0AnGTU9FaAy1q5PWIZQYeYdpOzvRvBgprV2F7+hFXfNQy6LfxNFfu2Kg6VJoJZ
-	hnxOEs2ioxzcEn571iBwX1t1ChooZQ=
-X-Received: by 2002:a17:902:db07:b0:2bd:e01d:eb25 with SMTP id d9443c01a7336-2bea308aab8mr32286875ad.32.1779371596913;
-        Thu, 21 May 2026 06:53:16 -0700 (PDT)
+        bh=3uxNYLIbpi8gIXuY+ONhzYZBPNfuEelESGS8WTu/ln4=;
+        b=RNUm/zK6hQVFgw/NRJ7MAfR/yNqzBsrdq3Eho2B6u3Bt9rlsZIDpuu21YXyTeUP/9p
+         6E2ixPWC3tUndqdZaqK3fKFKswXgeIntRDVpuR+T2q2a0EYbDI/qb3DXL1UeY6c0YGyI
+         HwYm7ooTWgez8Ph72pXfPIpVX9ZPJXxT01o6eLQY7U+YAuHvmP7ydlRo0aTqN0/bTb6Y
+         +T2X9xvsNV1a8/7YLDq2Kk5MxAY8yX5WAUxnPAYIbhfb3NiEQwVSGt3hvBsAQeR28gGR
+         oCKfzZYQRZtYU4Pvsn1GNWek9naSpUefGg8f3tCkftx9kFmRiuFPzhFVbZEw1aJQHwU9
+         ++Hw==
+X-Gm-Message-State: AOJu0YyGAnUsSSnEI6+2UO/YMOQgxqT+9h12oFhkA3KgjlKUhYuCvQom
+	ia1+I16Fyr9rl0KLqzSPy/fB3IWVqCQ0MQU7xw52uRotqD5YQvt+NDIG
+X-Gm-Gg: Acq92OFzCcVDDLtprY7hW/0D+cJ/XLr7KywA8NHDAqkN6O12tjCtHd/cS4ww91ODSJj
+	2Gstu2PddeOG36MwI/kDsnXmNC/pA1wN2GBlCvivB8hFx3N62jg6csbXB41QkhKfR4SQu4DfHag
+	w9GqIonRHP+wboCVilDITW6c/tHhaqxge2EOLyU8KKKmTWFcSt5l213QTbD2YknyupJLvlbCsCZ
+	ITccRRzIk3YxMnWkqn+bYmZhBplDoT7nsE6quqLMvt07hPQnfdns4zWpRKKczBfTy1GZLL/BQOX
+	12ObcSPA/vj9nTvOd7L0WAcbp5d83mibVOYNjx8Tez7FCCR6Zv78nL2EPnlwKb695VFTjMt4Chb
+	WuD9rr57s+LHd2UEoBNNc0hVuIWvZCJ/f9A+tFS8sAojlFKaY/i30mAO/pXvvRSU9mwsOBfF/pd
+	XiTOssrr3qDlZ8ZPUdfgd5qR6ujGAcmBVcKeVzWHOw2c+DUpmqW/ht4SLQ3DlnOxpPjEpriBudK
+	hobuVbs3hRiA9Cm5I2ZKzR4ZP+9LGwcjBLNlm5iqQ==
+X-Received: by 2002:a17:903:2f8e:b0:2bd:7191:5708 with SMTP id d9443c01a7336-2bea30889bbmr29386365ad.29.1779371609075;
+        Thu, 21 May 2026 06:53:29 -0700 (PDT)
 Received: from KERNELXING-MC1.tencent.com ([2408:8207:1923:2c20:2035:4b1f:d540:7ffb])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bea98fcb09sm12957365ad.56.2026.05.21.06.53.05
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bea98fcb09sm12957365ad.56.2026.05.21.06.53.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 06:53:16 -0700 (PDT)
+        Thu, 21 May 2026 06:53:28 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -98,9 +98,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v2 1/6] bpf: Add bpf_ktime_get_real_ns() kfunc
-Date: Thu, 21 May 2026 21:52:39 +0800
-Message-Id: <20260521135244.40869-2-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v2 2/6] net: export sock_disable_timestamp() declaration
+Date: Thu, 21 May 2026 21:52:40 +0800
+Message-Id: <20260521135244.40869-3-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20260521135244.40869-1-kerneljasonxing@gmail.com>
 References: <20260521135244.40869-1-kerneljasonxing@gmail.com>
@@ -117,7 +117,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -125,7 +125,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-290469-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290470-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[21];
 	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me];
@@ -138,61 +138,50 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tencent.com:email]
-X-Rspamd-Queue-Id: BA7475A7498
+X-Rspamd-Queue-Id: 5C7305A74A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Currently BPF programs can obtain timestamps via bpf_ktime_get_ns(),
-which returns CLOCK_MONOTONIC time. However, the skb->tstamp field
-populated by the network stack uses ktime_get_real() which is in the
-CLOCK_REALTIME domain.
-
-In the series, kernel reports the software/hardware timestamps through
-sockopt and then userspace bpf application gets them and calculate the
-delta only through an unified time unit.
-
-However, prior to this, when a BPF program tries to measure RX packet
-delay by comparing skb->tstamp with bpf_ktime_get_ns(), the result
-is incorrect because the two clocks have different epochs.
-
-Introduce a new BPF kfunc bpf_ktime_get_real_ns() that returns the
-current CLOCK_REALTIME time. This allows BPF programs to perform
-accurate delay calculations without clock domain mismatch issue.
+In the series, sock_disable_timestamp() will be shortly used by bpf
+timestamping rx feature to dynamically turn off the global time record
+function. So remove the static label.
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- kernel/bpf/helpers.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/net/sock.h | 1 +
+ net/core/sock.c    | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-index 2bb60200c266..863645d096ef 100644
---- a/kernel/bpf/helpers.c
-+++ b/kernel/bpf/helpers.c
-@@ -2317,6 +2317,11 @@ void bpf_rb_root_free(const struct btf_field *field, void *rb_root,
+diff --git a/include/net/sock.h b/include/net/sock.h
+index e0263bae8da9..a579d5b09207 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -3047,6 +3047,7 @@ static inline bool sk_listener_or_tw(const struct sock *sk)
+ }
  
- __bpf_kfunc_start_defs();
+ void sock_enable_timestamp(struct sock *sk, enum sock_flags flag);
++void sock_disable_timestamp(struct sock *sk, unsigned long flags);
+ int sock_recv_errqueue(struct sock *sk, struct msghdr *msg, int len, int level,
+ 		       int type);
  
-+__bpf_kfunc u64 bpf_ktime_get_real_ns(void)
-+{
-+	return ktime_get_real_fast_ns();
-+}
-+
- /**
-  * bpf_obj_new() - allocate an object described by program BTF
-  * @local_type_id__k: type ID in program BTF
-@@ -4859,6 +4864,7 @@ BTF_ID_FLAGS(func, bpf_task_work_schedule_resume, KF_IMPLICIT_ARGS)
- BTF_ID_FLAGS(func, bpf_dynptr_from_file)
- BTF_ID_FLAGS(func, bpf_dynptr_file_discard)
- BTF_ID_FLAGS(func, bpf_timer_cancel_async)
-+BTF_ID_FLAGS(func, bpf_ktime_get_real_ns)
- BTF_KFUNCS_END(common_btf_ids)
+diff --git a/net/core/sock.c b/net/core/sock.c
+index f362e3ce1efb..f3d78da3aeba 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -474,7 +474,7 @@ static bool sock_needs_netstamp(const struct sock *sk)
+ 	}
+ }
  
- static const struct btf_kfunc_id_set common_kfunc_set = {
+-static void sock_disable_timestamp(struct sock *sk, unsigned long flags)
++void sock_disable_timestamp(struct sock *sk, unsigned long flags)
+ {
+ 	if (sk->sk_flags & flags) {
+ 		sk->sk_flags &= ~flags;
 -- 
 2.43.7
 
