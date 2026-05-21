@@ -1,249 +1,190 @@
-Return-Path: <netdev+bounces-290423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290424-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kPcnLX4OD2p7EgYAu9opvQ
-	(envelope-from <netdev+bounces-290423-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:54:06 +0200
+	id SO+6HKoJD2oHEgYAu9opvQ
+	(envelope-from <netdev+bounces-290424-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:33:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8915A66F4
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:54:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB6A65A5DD6
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:33:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 54E56319AE1F
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:14:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C407328356F
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D304014B4;
-	Thu, 21 May 2026 13:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF8A3E5EF0;
+	Thu, 21 May 2026 13:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiaHe+gJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V9VLScIj";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzUwknpy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BFC3E1CFD
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779368891; cv=pass; b=OBEpF4M8nWRECbGq6KrPbbXcNvLF7c+p5zSLJc4l3NGBrpEjpbYjxU/h5frqDJMnH5DrfyAOlEgG7LiJXqQ/VlzHu/qC2+MAfOJs3FY/OKnKrq9pWDUlEYphdWsN9TZotxk0YNtSWIyAsT9SCoe06eM3wQI+YeYUAHdbUXzoeaM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779368891; c=relaxed/simple;
-	bh=g8N9Jxfh9vj5aW2BbWJ5uDPhpDGPw8QkpqCpsud9jsg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TxHnc1zmhRh/iUh7A0pPg1iuKpwwPPsQDWTIwAUwBQFSeHf2j+iDhvgGCaYfHNjD8G6aRHz9GXIceOrj6x30dbJMkvLUsz5v0LxT0gfxREuj2WpM9zovLirtC2OJzZJcus1R1LTZ1bQelxUsTbmxuaGoSZ7dt50KxWdxctHcRVQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiaHe+gJ; arc=pass smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-39556b00a85so50686731fa.0
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:08:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779368888; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IAN3qlerpoZWtUVEpt5mmclezpr7ZTKp6flj7DbtMIkGMpaxqDmUbsTHBgUnJVx5vA
-         Sud+8JYNb1ytvE/u7tPB5PMWy/jEWPPw84yV8K5Fqj7BoZtiorkoEm32TfeSC9y6CGqC
-         3+ltaEL8hSLKCdq7t4H17cJyrjdv+IkAZQCeahn2s1dqF8Pws3rjQNWy6jfiFbHRtZTJ
-         +cxLrLoIfX7p/INwdFaTdNqrk8qw1Wig6SDINmBI/ybK9YZ2CL0hNbQtEbLUlTpAeUTK
-         1oKv0wwbtcw3osQtDQlEv7e/e8jh1pqJxOZA0E8uGL/4vTLZuRR5Z0DH1fx6gZopW2sN
-         7/EA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ElWo2ALZHjJJQIxSqxixUU8JFaAb9we00gbXuySd10Q=;
-        fh=hobeBBLoIjII5cgGtka22xOC2BBxOtGjVbApBbzfHAY=;
-        b=XD7nrjJQEZ5MEBHZr2iEU4/SDCJaBPNTkb1EvOj7ZutScutC3MHY5evGEPifxEcLYF
-         MdgNA5Siv3gb9iFYuGHEK/2M1uP0IJLTZ2yJrJWX7L5ikZekLglMS6sLvpv85VH+5ilY
-         h1z+diqd8C+HDsCxIZF+7Uka5Rb/aIvNSfixno78mbQcT5mljMIJLyamEK+mMSa16hug
-         ZSyNLDLgYPdWbcd5L8c7Aq4JyLHRSPiWOrdcftGMSpHl3h0RYANUPf5AcmK1TDEIALTN
-         +8VtOURngF2bn622a+Co+PPvQN7/NUZeqeutQUKt+PvcFMUZtm+XYw8qpxXGb3+N7vsZ
-         239Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873DA3D5C07
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779368985; cv=none; b=IuM4XFncWs/S2uhZW1KHUTrwY6Tg10fEW4qvSBNKw6u+7ZQj7GW0FZD5D+b5m8dneSveVl9QRVH5xSM9xGc3NhfRFuI5xCKxPl/WahvjmQCTP6uEVOBg3unrLxwjxiVnMGeME0OR+BnDtuta77GEPM6Kl9/mncU4uRkgGu0MHSA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779368985; c=relaxed/simple;
+	bh=Jdm389GpaXuX2GWxlZhF6BpB83Vj3ksApFOhdPl2pZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QCJMyuX1JWfoxUaep9Cr6KnoDo/f+SrTCTykGJgISpWwWfXYgGW7K2AL5SaLJmEd2OVZA7bxMuuey0qRigsXta1V2VH3QuLXTbhyvN4U3np+Vi/3yYa2RwAhWJn2pAHhXYJ0wxtZ4g6n/ZJ3xTK41SlSRcVrsyt3I4QlDasQONo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V9VLScIj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gzUwknpy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779368983;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E1vW/XPFrOLYW0lggR7O8cskrXPHeM9SnYmkXYtZE2U=;
+	b=V9VLScIjN+NhBKis4WUCTC2eyMjIRWjSwj2roLaAjHk8+GhLBsQy0RF1x7wi0vjDhb/apA
+	78TIbboWCWPAs0V37GtcSQoagELJTvQbNi1bLCHuBQNUpUz1u8RZpASjjpP6AidYZL9Zku
+	RN8P/o4o1OuzVIPg05g9S56TYHuUFvQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-527-op--vcQtNd-M1cwAZEEN3w-1; Thu, 21 May 2026 09:09:41 -0400
+X-MC-Unique: op--vcQtNd-M1cwAZEEN3w-1
+X-Mimecast-MFC-AGG-ID: op--vcQtNd-M1cwAZEEN3w_1779368980
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-44bf1ac8893so4814561f8f.0
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:09:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779368888; x=1779973688; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ElWo2ALZHjJJQIxSqxixUU8JFaAb9we00gbXuySd10Q=;
-        b=UiaHe+gJ6tu1ZsWczZOp855/kdK+HqXaPgr6gv30PGsaSd6mFF+3k+dUVEW8QmyxPz
-         UQQjNtdaonsBtL1y8uv7MDsmuDCGtRZe5aCxRgcwdItVxArqAzfOT0htC7GsbVx2pcWY
-         4s9tY3WeLpUMytWvIhfPmd61//S4xF+qw+nCIYCLFjm+mXZuQUB1uiFQxBHCKJ08bduE
-         5lw6K6RB5cuDzsxMt/AceCR5kpJnHdc1niIEiyr3xwIfWm/RUtOIPhqX0yE6IfhofUea
-         ZfulAOHzGGmAFrBzsVmHLAYLXmFejYaHNy2BAkOAcsLyGIPUr1lfVd8WbBS1IMLLIv0K
-         6Wog==
+        d=redhat.com; s=google; t=1779368979; x=1779973779; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E1vW/XPFrOLYW0lggR7O8cskrXPHeM9SnYmkXYtZE2U=;
+        b=gzUwknpykZJdMmq0ET5kHWWnIm59z8iScuw46XJl9HO4MtMct0S31JS9VQIqQS2Qmt
+         qBI8bstnFhn27TxXDNzbtmsdowmCgKD/zzRC1Q4GtV3i7YFEWUyPcdp0V9CyN0tAu3lY
+         rIXs7R3AKxDLQ7tw+s1Cm79+5P8EJ2WFsD3QGV2AMlxnkNVTV9hM233SYz0LvOgfxn8X
+         kE8NdwFXAeyknjLtTifPCUm8ixQI578I4ZOsjrifkaf704+49owwj15NJRm5CdiuAcL8
+         efD6eBJ65vXfLmHZAIZ4zgN/Utp5GvP2yeryupHCCarB9JLxDysDCkFq8yg0GMo4ltfy
+         f6QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779368888; x=1779973688;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ElWo2ALZHjJJQIxSqxixUU8JFaAb9we00gbXuySd10Q=;
-        b=fPpxF/pkpJvsPhDyOT9l1BDLG4BvT/gg4iETW5iUCQ1iZn8XcylIOFcW9YTrTQhV4x
-         VTq9l6B5N6exIh+ynTFm2x976kg+xdAqiH+w2tXFFilX1YinwCvuWkHBK9EysQC8I0BJ
-         ZRXfaFVSMxFNe9hgS2L4uG2lM1IEJlvEZCHcnyI+siWrpzFFMk05/o2sxVtmDOft6BZs
-         Spige3hj0h/4vSbuXcniL2hUsH5946ag+mgYhNKqTU/QJ34WedpoxJPq3ZxhzLHbYFwm
-         7pAYy54wEL+Nq6IRas7+h3fJ9zv74NzuWOlk28rRgnSxXUqkomYtV0P6ZhkODSCHElei
-         eW3w==
-X-Forwarded-Encrypted: i=1; AFNElJ9ZoOi4rKrPIfJ44aRHVtGkL1opyBLd81GuSO64JK+VLVYax6ikvZO5hzvUNQ6MOOKJoo1bZ3E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLawNnfc+EcK9wv9oHCTUa+d0vGVHX6wVqWgeuQF3tYFlXTYpn
-	8xqGNWqtLgDCErYPv8xPDH0ZaR4nu1pimNnVcEGM6m4KO3mfRBdf6mM/viOJO2qC5FLqiEQXbBM
-	mH3RVsdcGwTJ/+cb9FBf4aDsuZwf7toQ=
-X-Gm-Gg: Acq92OGdy8MzQIAuI/wIcRBZK1JUzLzDhguz/tY49wudwF1zfU2et1pqIqQCvkIbY2p
-	PphEhml9u1wXm1OM0LtE0b7DHiQ3tkmMtlEkWd/GPnC2D5VDhAz9bZqqukZchayYRfZe3Ij6fWI
-	a5sKZPhNB80BoP9ylBP9Msp4Qru6hkuffUNdV+0QtnNNzPs0cBMwYYdKohE//640fHVqbJpsgxI
-	KYZlt+y9NXEwWvqqx+vfHs1h8Z1ro+hluQ2GjGYcvQ/1W0+7k9ZPZfidSx/Dyb8RKbDQIOJj+AR
-	+GJbKvmpliz2kQL+S1cTsRkz6VE9DZeXvGW7xCo=
-X-Received: by 2002:a05:6512:3767:b0:5a8:750c:2f79 with SMTP id
- 2adb3069b0e04-5aa2ba69be0mr766870e87.3.1779368888045; Thu, 21 May 2026
- 06:08:08 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779368979; x=1779973779;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E1vW/XPFrOLYW0lggR7O8cskrXPHeM9SnYmkXYtZE2U=;
+        b=DHU503Y/JLGxuiTzQ1QsHZOrhlI8rgktBA0+zMk/4QnzuZpbeTGyp7E8QRmJRTyLaz
+         eOq8V3YQiX84OJZU2DEwxdtWi/h4idKCaUDoKHSgG//qxzKzz4hIrG/8LyeuthTyjtGN
+         p5bqcKl7+qAt2dZ6unm/SPQ8cf2bAVUW2bAqm5yBm7aADL5bBLg0JvEy9uLGEINdfOZv
+         gylT9LU+VC3bwJ9zm81JnvcQKrgkvH+qHOcGHS+0ftQbTPDQpxKvgdVOUX1GPSHCkVjk
+         pTpnVou4csizA8d+rVXyDWnfTwJO0m0NWDnRcJ8073IoDPJtlxsKOrPff+9bFv3kffQv
+         bVUQ==
+X-Gm-Message-State: AOJu0Yzmu7fsMRzguTM6G9gwJ36pDLZ+fMYSBFyPdrEi2I2gQxglbyR9
+	YzDR+ZesgYHiXavjVZYsO/9EsqHtefDZgFDHj0JmDUf1BesanoMDv3KOjRzUtMSckcWab+fFBop
+	DjrwAASmgIL1k+QQsOLIDLMLeKm3F2cHJEF8pBHVz2/n5Ruo0D7R+1qHqqQ==
+X-Gm-Gg: Acq92OGQSgoSdktz4dNcgYmfG5WPIA2mFWHrM6+Mkrjwtz409Cvwt+7d9NLas/jp41P
+	1irWBT+fmdvYm51bMRToqiIkJosReyKCsYP1VTUBvR3czqhDfBf1FCOSaxx3mjWgW7Out4d9Kzw
+	EHHJWCFqravqGI/WxlUokYnfj7r3sPjYxA8A3D6yuzRlZEW6R/j2U7/0G4Ep97//B9MYon6bhhA
+	mS4H7RgnO26LlavfzYXgyHIqq89qnnW5ZVlXZ2V4vwrHZQLnA1McXaR03RlihhducbKtQJtC0Hk
+	GYnnrvwZzq5fNEsG9XILP5yRqnb69U3ZeXJ031fn0OTe9t6sSRm7C2cR87AWmbX1iWwM9U0asAU
+	CpIlGVs+2lcvQUdIwnDIGXYMgPoH7tPdkjkvVwZlVYdU=
+X-Received: by 2002:a05:600c:a15:b0:490:3cef:bd90 with SMTP id 5b1f17b1804b1-4903cefbe6emr23446895e9.26.1779368979414;
+        Thu, 21 May 2026 06:09:39 -0700 (PDT)
+X-Received: by 2002:a05:600c:a15:b0:490:3cef:bd90 with SMTP id 5b1f17b1804b1-4903cefbe6emr23445975e9.26.1779368978717;
+        Thu, 21 May 2026 06:09:38 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-25-45.inter.net.il. [80.230.25.45])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49035edd7cfsm15236405e9.27.2026.05.21.06.09.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2026 06:09:38 -0700 (PDT)
+Date: Thu, 21 May 2026 09:09:33 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jason Wang <jasowang@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH net] vsock/virtio: fix skb overhead overflow on 32-bit
+ builds
+Message-ID: <20260521090927-mutt-send-email-mst@kernel.org>
+References: <20260521124732.125771-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260520004244.55663-1-kerneljasonxing@gmail.com>
- <ag75Xicuk6JwkTkC@boxer> <CAL+tcoAJ3i-WGnVx-9ASF29gPNAaP2ucw76x3ftLog-b1TPf_w@mail.gmail.com>
- <ag8ByhbrNNJaESYi@boxer>
-In-Reply-To: <ag8ByhbrNNJaESYi@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 21 May 2026 21:07:30 +0800
-X-Gm-Features: AVHnY4L0irZOSzas-U-4vMjoJZWIjS-Nu31vumax-XgZcnfqGCmdnfBoPgQhD9U
-Message-ID: <CAL+tcoA8BkJc5jy3de3cBE69UboR66SCbLVD6B-0ffHGhXp_gw@mail.gmail.com>
-Subject: Re: [PATCH net v4 0/5] xsk: fix meta and publish of cq issues
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260521124732.125771-1-sgarzare@redhat.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-290424-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290423-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch,vger.kernel.org,tencent.com];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,intel.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,tencent.com:email]
-X-Rspamd-Queue-Id: 9B8915A66F4
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: AB6A65A5DD6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 21, 2026 at 9:00=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Thu, May 21, 2026 at 08:41:08PM +0800, Jason Xing wrote:
-> > On Thu, May 21, 2026 at 8:24=E2=80=AFPM Maciej Fijalkowski
-> > <maciej.fijalkowski@intel.com> wrote:
-> > >
-> > > On Wed, May 20, 2026 at 08:42:39AM +0800, Jason Xing wrote:
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > The series is the product of previous review from sashiko[1].
-> > > >
-> > > > 1) META
-> > > > patch 1: address TOCTOU around metadata.
-> > > >
-> > > > 2) PUBLISH of CQ
-> > > > patch 2: make sure xsk_addr->addrs[] can be published to cq when
-> > > >          overflow occurs.
-> > > > patch 3: keep cleaning up the continuation descs (more than 17) and
-> > > >          publish its address when overflow occurs.
-> > > > patch 4: like patch 3, but only handles the invalid descs cases.
-> > > >
-> > > > [1]: https://lore.kernel.org/all/20260502200722.53960-1-kerneljason=
-xing@gmail.com/
-> > > >
-> > > > ---
-> > > > V4
-> > > > Link: https://lore.kernel.org/all/20260517063311.28921-1-kerneljaso=
-nxing@gmail.com/
-> > > > 1. correct the description of xmit path in patch 3 (sashiko)
-> > > > 2. move set logic into xmit path in patch 3 (Stan)
-> > > >
-> > > > V3
-> > > > Link: https://lore.kernel.org/all/20260515123018.80147-1-kerneljaso=
-nxing@gmail.com/
-> > > > 1. avoid breaking previous usage of sendto, and siliently handle
-> > > > overflow case (Stan, sashiko)
-> > > > 2. add one particular exception process in patch 4 (sashiko)
-> > > > 3. adjust the selftest to make sure it passes in either virutal or
-> > > > physical machines, which includes add usleep to support physical ma=
-chine.
-> > > >
-> > > > V2
-> > > > Link: https://lore.kernel.org/all/20260510012310.88570-1-kerneljaso=
-nxing@gmail.com/
-> > > > 1. adjust selftests (Jakub)
-> > > > 2. add READ_ONCE in patch 1 (Stan)
-> > >
-> > > FWIW I still get test failures (yes with patch 5 applied). PTAL.
-> >
-> > Thanks for the test. But I've tried with ixgbe driver...
-> >
-> > I noticed there are some flaky tests which have nothing to do with the
-> > series. Can you confirm that it's not caused because of the series?
->
-> That explains the different results as i am using i40e/ice which have
-> multi-buffer support whereas ixgbe does not even support mbuf at XDP.
-> Broken tests are from mbuf cases.
+On Thu, May 21, 2026 at 02:47:32PM +0200, Stefano Garzarella wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> On 32-bit architectures, both skb_queue_len() and SKB_TRUESIZE(0) evaluate
+> to 32-bit values. The multiplication can overflow before being assigned to
+> the u64 skb_overhead variable, making the skb overhead check ineffective.
+> 
+> Cast skb_queue_len() to u64 so the multiplication is always performed in
+> 64-bit arithmetic.
+> 
+> This issue was reported by Sashiko while reviewing another patch.
+> 
+> Fixes: 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue")
+> Closes: https://sashiko.dev/#/patchset/20260518090656.134588-1-sgarzare%40redhat.com
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-That's weird. I never expected the failed tests to be about multi-buffer.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Are they the same as the output you attached last time? Or something
-new? Could you please share it so that I can investigate the root
-cause?
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index df3b418e0392..71198bf23fc4 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -417,7 +417,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>  static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
+>  					u32 len)
+>  {
+> -	u64 skb_overhead = (skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0);
+> +	u64 skb_overhead = ((u64)skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0);
+>  
+>  	/* Allow at most buf_alloc * 2 total budget (payload + overhead),
+>  	 * similar to how SO_RCVBUF is doubled to reserve space for sk_buff
+> -- 
+> 2.54.0
 
-Thanks,
-Jason
-
->
-> >
-> > Thanks,
-> > Jason
-> >
-> >
-> > >
-> > > >
-> > > >
-> > > > Jason Xing (5):
-> > > >   xsk: cache csum_start/csum_offset to fix TOCTOU in xsk_skb_metada=
-ta()
-> > > >   xsk: fix buffer leak in xsk_drop_skb() for AF_XDP multi-buffer Tx
-> > > >   xsk: drain continuation descs after overflow in xsk_build_skb()
-> > > >   xsk: drain continuation descs on invalid descriptor in
-> > > >     __xsk_generic_xmit()
-> > > >   selftests/xsk: drain CQ to wait for TX completion
-> > > >
-> > > >  include/net/xdp_sock.h                        |  1 +
-> > > >  net/xdp/xsk.c                                 | 44 +++++++++++++--=
---
-> > > >  .../selftests/bpf/prog_tests/test_xsk.c       | 48 +++++++++++----=
-----
-> > > >  3 files changed, 63 insertions(+), 30 deletions(-)
-> > > >
-> > > > --
-> > > > 2.43.7
-> > > >
 
