@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-290387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290388-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mItSOVf3DmoSDwYAu9opvQ
-	(envelope-from <netdev+bounces-290387-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:15:19 +0200
+	id pqQIFbf4DmpKDwYAu9opvQ
+	(envelope-from <netdev+bounces-290388-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:21:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E5B05A4A0D
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:15:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EF0E5A4B2B
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9DDBB3069C38
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:12:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6A91C30788FF
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9642A3D6CC7;
-	Thu, 21 May 2026 12:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4347F3D7D66;
+	Thu, 21 May 2026 12:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WFJ6gUca"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="H6R7mMI1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CC33CF049
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 12:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166483CF687
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 12:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779365487; cv=none; b=E0qvrvVD76FiGpxvZm4gS/5Kig1xuFt+X5pa6tdWw32cL1/+A+4Iia3V8b7litZXRqpAhAaMJqTkPeULMAMEgh5eouJPLePyPNoAf/hnPYnXMIzv8LAi7VKKLyG0QB+CVdxerW0cnYBQj5zTHqkVGRbKB435Rb5Slx+k0PhH7z0=
+	t=1779365490; cv=none; b=r6uouoASc/xRIIgRK7wjgjMqoOYhdXVrNm9s5RKH77A5TV2QhVlr9CORYYwcMhKSV5I3vQaR+cSGwEGqN4EyHiWMoWPlx3cSF1An/6imrjvuK3pvkWAlPnC2gFfrWVMfPdUVRQO9T8GZ72B4WCbxVO7uRaQ02mfDFaLMyf4bJjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779365487; c=relaxed/simple;
-	bh=gLFCN9Kq3IPLvjz/zLiPs2vJXCmEj8pJG9QTU/Cc2DA=;
+	s=arc-20240116; t=1779365490; c=relaxed/simple;
+	bh=Ryh3pNiRaDGNUG+aq5aomoSP3wBvJiv7DF5w5ZHEYLQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dKYuCD8XPjgILHUAgbe5Fea2BSboL5qeKjHSji3QEoAxBtfqSYzdClk2alL13e1ygC65FeluIqkrApvKTWGbY2mtOT802gi61/5dEOJh5RghSfii5I/dgIHFUriNl6lIN9lKBI9WxFyZQtKrEQ3ycQLA501zxF5xB1nZ5D6pYIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WFJ6gUca; arc=none smtp.client-ip=185.246.85.4
+	 MIME-Version; b=dEQ2ZxPr4BJFbSlmSKmHlpRuYOQzpqyUGo3CABcGhWt74E+gV0NSN53Rnam6IfObzSJ/RRmkVy36PqEw9MH9l9HRfoXRO7L5lVq9D1asV37ZE9ZEsiQg4ESFxmGYIRlFH9MAnRzeKbd/maM2oFZFWFGFK0pJU+85LISiQb6795U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=H6R7mMI1; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id B4A914E42D0D;
-	Thu, 21 May 2026 12:11:23 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id C139D4E42D0F;
+	Thu, 21 May 2026 12:11:26 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 88DED60495;
-	Thu, 21 May 2026 12:11:23 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DB3FC107E8B4A;
-	Thu, 21 May 2026 14:11:19 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 9695F60495;
+	Thu, 21 May 2026 12:11:26 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9E4F2107E8B5A;
+	Thu, 21 May 2026 14:11:22 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779365482; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1779365485; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=9fuOdLWcCVdn3c2ZJ20B3FaFb6ErwysOEXjn2J0AbPQ=;
-	b=WFJ6gUcablM3Auufnw4UDHyZ3PxQ9HzIPCSUIreg9cFoVNQSyNbozVa6WU3b2tAoHk9HgQ
-	hARKf0Zy+fdDWKu0vNqxjQ+j+LLBQhe6y7x4gvGxhaPQ2TK7U9XpmnhgMrlNKBpmYBIAvv
-	spAUiT8klZ1XN8K4bAAxDUSyDYUeETx4LF/q/h9IylOv8KdpyABCJeyp0yfeMJXNyXaKaK
-	PLGNRo+Ygey3K+j53H+mDDKzIZMC4K+Waq+cqAKTOJj5JMcR1MCvLj8EcND3X50ebtTBYu
-	eGKakSWNvUy6nYIYgdFR+/QU/A6GYe2+fpQh+C5i3z1vN/AucYba6FVtN5sxEw==
+	bh=FGwSSkN/7kImuL1TsHpYTUZUmks+9te8dr17WUxceZI=;
+	b=H6R7mMI1i1+s0M5NaVVu0DjmaMdqOCm+BcVzENj+SGK26mRoXvtVGauVY1sLaUgXYYPj8B
+	8wvFvtQ02MTYSFqXzS4DdVetTjeeKZTtH/7dWL3+0gatQwgfaPPgfVdCYTDa2o6SX07ZGT
+	oyDlZ9veZy6lgxC7sbl07+JNivwkVHWAp2wWxSh/djUuY986Ru1izXrtId8mheoeSXXljA
+	RL4PCyw5nZeOEQ6Icrj5g3OIrQ8HPf8KG39HREQjbNGFz7wKpg0cAyjwcqT3EAPfoI/i2H
+	EvBJjPNoEhZhqZpz56o7Rs+89HfR0NZ5Ssw+babFKRgYf8WrMqWh4m/egH4aMg==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -77,9 +77,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
 	Frank Wunderlich <frank.wunderlich@linux.dev>
-Subject: [PATCH net-next v11 07/10] net: phy: phy_link_topology: Add a helper to retrieve ports
-Date: Thu, 21 May 2026 14:10:35 +0200
-Message-ID: <20260521121040.1199622-8-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v11 08/10] netlink: specs: Add ethernet port listing with ethtool
+Date: Thu, 21 May 2026 14:10:36 +0200
+Message-ID: <20260521121040.1199622-9-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260521121040.1199622-1-maxime.chevallier@bootlin.com>
 References: <20260521121040.1199622-1-maxime.chevallier@bootlin.com>
@@ -98,13 +98,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
 	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_FROM(0.00)[bounces-290387-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290388-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	MIME_TRACE(0.00)[0:+];
@@ -119,69 +119,202 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 8E5B05A4A0D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4EF0E5A4B2B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In order to allow netlink access to phy_ports, let's add a helper to
-retrieve them. When handling a port coming from phy_link_topology, the
-caller must hold rtnl until it's done with it.
+Ethernet network interfaces may have more than one front-facing port.
+The phy_port infrastructure was introduced to keep track of
+these ports, and allow userspace to know about the presence and
+capability of these ports. Add a ethnl netlink message to report this
+information.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- include/linux/phy_link_topology.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ Documentation/netlink/specs/ethtool.yaml      | 50 +++++++++++++++++++
+ Documentation/networking/ethtool-netlink.rst  | 34 +++++++++++++
+ .../uapi/linux/ethtool_netlink_generated.h    | 19 +++++++
+ 3 files changed, 103 insertions(+)
 
-diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
-index 66bceff72b19..ac2f5c80f1a6 100644
---- a/include/linux/phy_link_topology.h
-+++ b/include/linux/phy_link_topology.h
-@@ -13,6 +13,7 @@
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 5dd4d1b5d94b..d1151af335ca 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -210,6 +210,10 @@ definitions:
+       -
+         name: discard
+         value: 31
++  -
++    name: port-type
++    type: enum
++    entries: [mdi, sfp]
  
- #include <linux/ethtool.h>
- #include <linux/netdevice.h>
-+#include <linux/rtnetlink.h>
+ attribute-sets:
+   -
+@@ -1905,6 +1909,32 @@ attribute-sets:
+         name: link
+         type: nest
+         nested-attributes: mse-snapshot
++  -
++    name: port
++    attr-cnt-name: --ethtool-a-port-cnt
++    attributes:
++      -
++        name: header
++        type: nest
++        nested-attributes: header
++      -
++        name: id
++        type: u32
++      -
++        name: supported-modes
++        type: nest
++        nested-attributes: bitset
++      -
++        name: supported-interfaces
++        type: nest
++        nested-attributes: bitset
++      -
++        name: type
++        type: u32
++        enum: port-type
++      -
++        name: upstream-port
++        type: u32
  
- struct xarray;
- struct phy_device;
-@@ -66,6 +67,20 @@ phy_link_topo_get_phy(struct net_device *dev, u32 phyindex)
- 	return NULL;
- }
+ operations:
+   enum-model: directional
+@@ -2859,6 +2889,26 @@ operations:
+             - worst-channel
+             - link
+       dump: *mse-get-op
++    -
++      name: port-get
++      doc: Get ports attached to an interface
++
++      attribute-set: port
++
++      do: &port-get-op
++        request:
++          attributes:
++            - header
++            - id
++        reply:
++          attributes:
++            - header
++            - id
++            - supported-modes
++            - supported-interfaces
++            - type
++            - upstream-port
++      dump: *port-get-op
  
-+static inline struct phy_port *
-+phy_link_topo_get_port(struct net_device *dev, u32 port_id)
-+{
-+	struct phy_link_topology *topo = dev->link_topo;
-+
-+	ASSERT_RTNL();
-+
-+	if (!topo)
-+		return NULL;
-+
-+	/* Caller must hold RTNL while handling the phy_port */
-+	return xa_load(&topo->ports, port_id);
-+}
-+
- #else
- static inline int phy_link_topo_add_phy(struct net_device *dev,
- 					struct phy_device *phy,
-@@ -95,6 +110,12 @@ phy_link_topo_get_phy(struct net_device *dev, u32 phyindex)
- {
- 	return NULL;
- }
-+
-+static inline struct phy_port *
-+phy_link_topo_get_port(struct net_device *dev, u32 port_id)
-+{
-+	return NULL;
-+}
- #endif
+ mcast-groups:
+   list:
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index e92abf45faf5..bb02042bc9fd 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -2537,6 +2537,39 @@ Within each channel nest, only the metrics supported by the PHY will be present.
+ See ``struct phy_mse_snapshot`` kernel documentation in
+ ``include/linux/phy.h``.
  
- #endif /* __PHY_LINK_TOPOLOGY_H */
++PORT_GET
++========
++
++Retrieve information about the physical connection points of a network device,
++referred to as "ports". User needs to specify a PORT_ID for the DO operation,
++in which case the DO request returns information about that specific port.
++
++As there can be more than one port, the DUMP operation can be used to list the
++ports present on a given interface, by passing an interface index or name in
++the dump request.
++
++Request contents:
++
++  ===================================== ======  ===============================
++  ``ETHTOOL_A_PORT_HEADER``             nested  request header
++  ``ETHTOOL_A_PORT_ID``                 u32     port id
++  ===================================== ======  ===============================
++
++Kernel response contents:
++
++  ======================================= ======  =============================
++  ``ETHTOOL_A_PORT_HEADER``               nested  request header
++  ``ETHTOOL_A_PORT_ID``                   u32     the port's unique identifier,
++                                                  per netdevice.
++  ``ETHTOOL_A_PORT_SUPPORTED_MODES``      bitset  bitset of supported linkmodes
++  ``ETHTOOL_A_PORT_SUPPORTED_INTERFACES`` bitset  bitset of supported MII
++                                                  interfaces
++  ``ETHTOOL_A_PORT_TYPE``                 u32     the port type
++  ``ETHTOOL_A_PORT_UPSTREAM_PORT``        u32     If any, the index of the MII
++                                                  port that feeds into the this
++                                                  port.
++  ======================================= ======  =============================
++
+ Request translation
+ ===================
+ 
+@@ -2647,4 +2680,5 @@ are netlink only.
+   n/a                                 ``ETHTOOL_MSG_PHY_GET``
+   ``SIOCGHWTSTAMP``                   ``ETHTOOL_MSG_TSCONFIG_GET``
+   ``SIOCSHWTSTAMP``                   ``ETHTOOL_MSG_TSCONFIG_SET``
++  n/a                                 ``ETHTOOL_MSG_PORT_GET``
+   =================================== =====================================
+diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
+index 8134baf7860f..f9d8794eabc1 100644
+--- a/include/uapi/linux/ethtool_netlink_generated.h
++++ b/include/uapi/linux/ethtool_netlink_generated.h
+@@ -78,6 +78,11 @@ enum ethtool_pse_event {
+ 	ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR = 64,
+ };
+ 
++enum ethtool_port_type {
++	ETHTOOL_PORT_TYPE_MDI,
++	ETHTOOL_PORT_TYPE_SFP,
++};
++
+ enum {
+ 	ETHTOOL_A_HEADER_UNSPEC,
+ 	ETHTOOL_A_HEADER_DEV_INDEX,
+@@ -840,6 +845,18 @@ enum {
+ 	ETHTOOL_A_MSE_MAX = (__ETHTOOL_A_MSE_CNT - 1)
+ };
+ 
++enum {
++	ETHTOOL_A_PORT_HEADER = 1,
++	ETHTOOL_A_PORT_ID,
++	ETHTOOL_A_PORT_SUPPORTED_MODES,
++	ETHTOOL_A_PORT_SUPPORTED_INTERFACES,
++	ETHTOOL_A_PORT_TYPE,
++	ETHTOOL_A_PORT_UPSTREAM_PORT,
++
++	__ETHTOOL_A_PORT_CNT,
++	ETHTOOL_A_PORT_MAX = (__ETHTOOL_A_PORT_CNT - 1)
++};
++
+ enum {
+ 	ETHTOOL_MSG_USER_NONE = 0,
+ 	ETHTOOL_MSG_STRSET_GET = 1,
+@@ -893,6 +910,7 @@ enum {
+ 	ETHTOOL_MSG_RSS_CREATE_ACT,
+ 	ETHTOOL_MSG_RSS_DELETE_ACT,
+ 	ETHTOOL_MSG_MSE_GET,
++	ETHTOOL_MSG_PORT_GET,
+ 
+ 	__ETHTOOL_MSG_USER_CNT,
+ 	ETHTOOL_MSG_USER_MAX = (__ETHTOOL_MSG_USER_CNT - 1)
+@@ -954,6 +972,7 @@ enum {
+ 	ETHTOOL_MSG_RSS_CREATE_NTF,
+ 	ETHTOOL_MSG_RSS_DELETE_NTF,
+ 	ETHTOOL_MSG_MSE_GET_REPLY,
++	ETHTOOL_MSG_PORT_GET_REPLY,
+ 
+ 	__ETHTOOL_MSG_KERNEL_CNT,
+ 	ETHTOOL_MSG_KERNEL_MAX = (__ETHTOOL_MSG_KERNEL_CNT - 1)
 -- 
 2.54.0
 
