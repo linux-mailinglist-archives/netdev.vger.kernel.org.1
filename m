@@ -1,219 +1,249 @@
-Return-Path: <netdev+bounces-290422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290423-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Ny3C6IGD2qFEQYAu9opvQ
-	(envelope-from <netdev+bounces-290422-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:20:34 +0200
+	id kPcnLX4OD2p7EgYAu9opvQ
+	(envelope-from <netdev+bounces-290423-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:54:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C45705A5A19
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:20:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B8915A66F4
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4C3AA30F58A9
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:09:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 54E56319AE1F
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F0B3EDAB8;
-	Thu, 21 May 2026 13:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D304014B4;
+	Thu, 21 May 2026 13:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYEULBhT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiaHe+gJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037C13ED103
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779368768; cv=none; b=VBk7dW/q3YlALoNaDqP/zYD/dGMpTG0IK/6Te3Ot4tD3fl3nqwbLQUi5rR/ZgqbTKXUGQyZ/mkTEN013/YMbzznawnQdmP8QFA+dry+rEN8eJWgjdyWpBhwC+tD9FF7he9+pm3S2pmsbc/XcIgX8UipZty6Fu3EDMywJ7wWgUys=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779368768; c=relaxed/simple;
-	bh=qY+plYrHUjyEKlEwdjvB+Ilsps0ZT2pjPeZqXaLCeD8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EKagogrpbusK8e2P+2Cjmqm+4UUeSXZWWMBbGejiMDMHTX0IgsZ/mJUaOufGOwqyq/kJtnN2Kdl8G6iNNaK1S//MheO8kLcNHSkb4mVXCehiUyG+q71nweQPgqxuMuHxB7ECP+EkbAa6OBsG3k7i09qPncZgnGD8l+xP9wn2lbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYEULBhT; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BFC3E1CFD
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779368891; cv=pass; b=OBEpF4M8nWRECbGq6KrPbbXcNvLF7c+p5zSLJc4l3NGBrpEjpbYjxU/h5frqDJMnH5DrfyAOlEgG7LiJXqQ/VlzHu/qC2+MAfOJs3FY/OKnKrq9pWDUlEYphdWsN9TZotxk0YNtSWIyAsT9SCoe06eM3wQI+YeYUAHdbUXzoeaM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779368891; c=relaxed/simple;
+	bh=g8N9Jxfh9vj5aW2BbWJ5uDPhpDGPw8QkpqCpsud9jsg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TxHnc1zmhRh/iUh7A0pPg1iuKpwwPPsQDWTIwAUwBQFSeHf2j+iDhvgGCaYfHNjD8G6aRHz9GXIceOrj6x30dbJMkvLUsz5v0LxT0gfxREuj2WpM9zovLirtC2OJzZJcus1R1LTZ1bQelxUsTbmxuaGoSZ7dt50KxWdxctHcRVQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiaHe+gJ; arc=pass smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82fbf5d4dc2so4263167b3a.1
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:06:06 -0700 (PDT)
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-39556b00a85so50686731fa.0
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:08:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779368888; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IAN3qlerpoZWtUVEpt5mmclezpr7ZTKp6flj7DbtMIkGMpaxqDmUbsTHBgUnJVx5vA
+         Sud+8JYNb1ytvE/u7tPB5PMWy/jEWPPw84yV8K5Fqj7BoZtiorkoEm32TfeSC9y6CGqC
+         3+ltaEL8hSLKCdq7t4H17cJyrjdv+IkAZQCeahn2s1dqF8Pws3rjQNWy6jfiFbHRtZTJ
+         +cxLrLoIfX7p/INwdFaTdNqrk8qw1Wig6SDINmBI/ybK9YZ2CL0hNbQtEbLUlTpAeUTK
+         1oKv0wwbtcw3osQtDQlEv7e/e8jh1pqJxOZA0E8uGL/4vTLZuRR5Z0DH1fx6gZopW2sN
+         7/EA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ElWo2ALZHjJJQIxSqxixUU8JFaAb9we00gbXuySd10Q=;
+        fh=hobeBBLoIjII5cgGtka22xOC2BBxOtGjVbApBbzfHAY=;
+        b=XD7nrjJQEZ5MEBHZr2iEU4/SDCJaBPNTkb1EvOj7ZutScutC3MHY5evGEPifxEcLYF
+         MdgNA5Siv3gb9iFYuGHEK/2M1uP0IJLTZ2yJrJWX7L5ikZekLglMS6sLvpv85VH+5ilY
+         h1z+diqd8C+HDsCxIZF+7Uka5Rb/aIvNSfixno78mbQcT5mljMIJLyamEK+mMSa16hug
+         ZSyNLDLgYPdWbcd5L8c7Aq4JyLHRSPiWOrdcftGMSpHl3h0RYANUPf5AcmK1TDEIALTN
+         +8VtOURngF2bn622a+Co+PPvQN7/NUZeqeutQUKt+PvcFMUZtm+XYw8qpxXGb3+N7vsZ
+         239Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779368766; x=1779973566; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779368888; x=1779973688; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M7dYXWxYJ/dsjCJq8MPbJ/YlkTALMLc3dGOHkkHfnHE=;
-        b=lYEULBhT41yP7oCnoZ984Au+TwRDfq10EG7j7JJ5w76Tjw+kkVQP1hwacrLoifpiAn
-         IrDM5GrH2/UC9DorpTiP7V4UFNkmWuro6oTB0nEHRCIYMJtz02JDh+9efF/w46x/xbID
-         HYXrytq9WlDGC/KslYIKc8pMSkbM+cj7EetJYg1uMoVKrqSCSoOcZKtKmSDfAgLdCpXO
-         GMQIBzi/Bee8cgTYjioVciVBvK/hELmliGHQoaBTPytuIOf5J19nAH+scEHjFb4od+c7
-         6lv4Ebjhok5bHFQjARCTtVxbWoLH52iwCh6rVzykNWQFrNbAgZBbex9kgYJXUsUTXwgV
-         lt0g==
+        bh=ElWo2ALZHjJJQIxSqxixUU8JFaAb9we00gbXuySd10Q=;
+        b=UiaHe+gJ6tu1ZsWczZOp855/kdK+HqXaPgr6gv30PGsaSd6mFF+3k+dUVEW8QmyxPz
+         UQQjNtdaonsBtL1y8uv7MDsmuDCGtRZe5aCxRgcwdItVxArqAzfOT0htC7GsbVx2pcWY
+         4s9tY3WeLpUMytWvIhfPmd61//S4xF+qw+nCIYCLFjm+mXZuQUB1uiFQxBHCKJ08bduE
+         5lw6K6RB5cuDzsxMt/AceCR5kpJnHdc1niIEiyr3xwIfWm/RUtOIPhqX0yE6IfhofUea
+         ZfulAOHzGGmAFrBzsVmHLAYLXmFejYaHNy2BAkOAcsLyGIPUr1lfVd8WbBS1IMLLIv0K
+         6Wog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779368766; x=1779973566;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1779368888; x=1779973688;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=M7dYXWxYJ/dsjCJq8MPbJ/YlkTALMLc3dGOHkkHfnHE=;
-        b=mR6sSOnFz5Obiw5yUSJKicQgM+XG8+OWYVy01XtncUa8hFLDy/7n/6+WbflOs1M5ys
-         N5Ey+Z2IS3aJNIznQnCKUsQbLHEPOl/DI4kzoTKFsXOrKIlA9tCQIRp48QDV4pd/Zgg1
-         sZA8s1TzeYkVMwDligJe4vbDd2YoSOc3VjlByRbx7CAQSnwnUXt0i0sGAB0RaQMrMx/J
-         NO9qVtPaXucWffIIPhfmmxjCqTIOsSNK3h6Lm05sHRZY0ZgWifpy5KOOE6/ljD43d7Da
-         MCLsCjhWO1pQvVe0F+EC0dWgY2/2C0Jk04YYSpAhj43z2EbAevFrlHCHqZlxHjrD7OU3
-         WRFw==
-X-Forwarded-Encrypted: i=1; AFNElJ8NNHuQl0WISAWphk/nHzDV2D8rylf446Oxx10PVOLB/g49sWd48QrHNO/Bx/994PNKHX0DuT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/5deG1RO+BjbASL71QpRiRIiouVD/xUfW646SCnhyobbQKBal
-	L9ozxSuU4LvxkG1+tV5B0yHqU3/ccBBELfeL+hChKuaHgY2i/Ub6CbQPDV4SNQ==
-X-Gm-Gg: Acq92OE8CkLUzsX6ipK6vt0IqVUC+Exkn2FN8+ecylGZL5F2+u7RIDQv/yeKB2O+smV
-	lv0v7uV1kJH8DArihR/p0GzRY6gS3dXzRxyWf7dY7COWn+W3wn+kAQ0LANNrUynx/McJEfmZKNu
-	58RvhvkfNI6fl0uQwrt9PbDCl/5zAUpiQZwBzwJ66U1rxi2Lzg83AFxACotahKTFUDwGGfmQWIj
-	P+bsPNSiQecFAZWmXjmQNKQbyJKDAGmA3v8c2+QFPRNbwvg/OHkAtnokYtJWDNltjMDCjsk4Zcx
-	xYZZ9oeff+gWIN5wGxxa1yWFExbg92RdDjnsdWO1h8b7oJaRRcq+IvS/Ts4oh6T7EeQfesvzxsH
-	O6DTzQK1fAx2H2sE7yyDrw1uem051T3QOS3YgEK5bNFXdnSOkP5pzOoH3DeqTLyy3R06zcngCVr
-	q68BYf6EoBoJEoMfNUCWuW+W+BpJsCycuWXojXGVgJ/loKubL1
-X-Received: by 2002:a05:6a00:419b:b0:82f:1369:7268 with SMTP id d2e1a72fcca58-8414adf69admr3131200b3a.30.1779368766276;
-        Thu, 21 May 2026 06:06:06 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-841549be20fsm1693993b3a.12.2026.05.21.06.06.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 06:06:05 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v4 2/2] ip6: vti: Use ip6_tnl.net in vti6_siocdevprivate().
-Date: Thu, 21 May 2026 21:05:55 +0800
-Message-Id: <20260521130555.3421684-3-maoyixie.tju@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260521130555.3421684-1-maoyixie.tju@gmail.com>
-References: <20260521130555.3421684-1-maoyixie.tju@gmail.com>
+        bh=ElWo2ALZHjJJQIxSqxixUU8JFaAb9we00gbXuySd10Q=;
+        b=fPpxF/pkpJvsPhDyOT9l1BDLG4BvT/gg4iETW5iUCQ1iZn8XcylIOFcW9YTrTQhV4x
+         VTq9l6B5N6exIh+ynTFm2x976kg+xdAqiH+w2tXFFilX1YinwCvuWkHBK9EysQC8I0BJ
+         ZRXfaFVSMxFNe9hgS2L4uG2lM1IEJlvEZCHcnyI+siWrpzFFMk05/o2sxVtmDOft6BZs
+         Spige3hj0h/4vSbuXcniL2hUsH5946ag+mgYhNKqTU/QJ34WedpoxJPq3ZxhzLHbYFwm
+         7pAYy54wEL+Nq6IRas7+h3fJ9zv74NzuWOlk28rRgnSxXUqkomYtV0P6ZhkODSCHElei
+         eW3w==
+X-Forwarded-Encrypted: i=1; AFNElJ9ZoOi4rKrPIfJ44aRHVtGkL1opyBLd81GuSO64JK+VLVYax6ikvZO5hzvUNQ6MOOKJoo1bZ3E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLawNnfc+EcK9wv9oHCTUa+d0vGVHX6wVqWgeuQF3tYFlXTYpn
+	8xqGNWqtLgDCErYPv8xPDH0ZaR4nu1pimNnVcEGM6m4KO3mfRBdf6mM/viOJO2qC5FLqiEQXbBM
+	mH3RVsdcGwTJ/+cb9FBf4aDsuZwf7toQ=
+X-Gm-Gg: Acq92OGdy8MzQIAuI/wIcRBZK1JUzLzDhguz/tY49wudwF1zfU2et1pqIqQCvkIbY2p
+	PphEhml9u1wXm1OM0LtE0b7DHiQ3tkmMtlEkWd/GPnC2D5VDhAz9bZqqukZchayYRfZe3Ij6fWI
+	a5sKZPhNB80BoP9ylBP9Msp4Qru6hkuffUNdV+0QtnNNzPs0cBMwYYdKohE//640fHVqbJpsgxI
+	KYZlt+y9NXEwWvqqx+vfHs1h8Z1ro+hluQ2GjGYcvQ/1W0+7k9ZPZfidSx/Dyb8RKbDQIOJj+AR
+	+GJbKvmpliz2kQL+S1cTsRkz6VE9DZeXvGW7xCo=
+X-Received: by 2002:a05:6512:3767:b0:5a8:750c:2f79 with SMTP id
+ 2adb3069b0e04-5aa2ba69be0mr766870e87.3.1779368888045; Thu, 21 May 2026
+ 06:08:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+References: <20260520004244.55663-1-kerneljasonxing@gmail.com>
+ <ag75Xicuk6JwkTkC@boxer> <CAL+tcoAJ3i-WGnVx-9ASF29gPNAaP2ucw76x3ftLog-b1TPf_w@mail.gmail.com>
+ <ag8ByhbrNNJaESYi@boxer>
+In-Reply-To: <ag8ByhbrNNJaESYi@boxer>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 21 May 2026 21:07:30 +0800
+X-Gm-Features: AVHnY4L0irZOSzas-U-4vMjoJZWIjS-Nu31vumax-XgZcnfqGCmdnfBoPgQhD9U
+Message-ID: <CAL+tcoA8BkJc5jy3de3cBE69UboR66SCbLVD6B-0ffHGhXp_gw@mail.gmail.com>
+Subject: Re: [PATCH net v4 0/5] xsk: fix meta and publish of cq issues
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290423-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290422-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[google.com,secunet.com,gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C45705A5A19
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch,vger.kernel.org,tencent.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,intel.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,tencent.com:email]
+X-Rspamd-Queue-Id: 9B8915A66F4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-After patch 1/2 in this series, vti6_update() unlinks and relinks
-the tunnel through t->net. vti6_siocdevprivate() still uses
-dev_net(dev) for the collision lookup. For a tunnel moved through
-IFLA_NET_NS_FD, dev_net(dev) is the new netns, not t->net.
+On Thu, May 21, 2026 at 9:00=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Thu, May 21, 2026 at 08:41:08PM +0800, Jason Xing wrote:
+> > On Thu, May 21, 2026 at 8:24=E2=80=AFPM Maciej Fijalkowski
+> > <maciej.fijalkowski@intel.com> wrote:
+> > >
+> > > On Wed, May 20, 2026 at 08:42:39AM +0800, Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > The series is the product of previous review from sashiko[1].
+> > > >
+> > > > 1) META
+> > > > patch 1: address TOCTOU around metadata.
+> > > >
+> > > > 2) PUBLISH of CQ
+> > > > patch 2: make sure xsk_addr->addrs[] can be published to cq when
+> > > >          overflow occurs.
+> > > > patch 3: keep cleaning up the continuation descs (more than 17) and
+> > > >          publish its address when overflow occurs.
+> > > > patch 4: like patch 3, but only handles the invalid descs cases.
+> > > >
+> > > > [1]: https://lore.kernel.org/all/20260502200722.53960-1-kerneljason=
+xing@gmail.com/
+> > > >
+> > > > ---
+> > > > V4
+> > > > Link: https://lore.kernel.org/all/20260517063311.28921-1-kerneljaso=
+nxing@gmail.com/
+> > > > 1. correct the description of xmit path in patch 3 (sashiko)
+> > > > 2. move set logic into xmit path in patch 3 (Stan)
+> > > >
+> > > > V3
+> > > > Link: https://lore.kernel.org/all/20260515123018.80147-1-kerneljaso=
+nxing@gmail.com/
+> > > > 1. avoid breaking previous usage of sendto, and siliently handle
+> > > > overflow case (Stan, sashiko)
+> > > > 2. add one particular exception process in patch 4 (sashiko)
+> > > > 3. adjust the selftest to make sure it passes in either virutal or
+> > > > physical machines, which includes add usleep to support physical ma=
+chine.
+> > > >
+> > > > V2
+> > > > Link: https://lore.kernel.org/all/20260510012310.88570-1-kerneljaso=
+nxing@gmail.com/
+> > > > 1. adjust selftests (Jakub)
+> > > > 2. add READ_ONCE in patch 1 (Stan)
+> > >
+> > > FWIW I still get test failures (yes with patch 5 applied). PTAL.
+> >
+> > Thanks for the test. But I've tried with ixgbe driver...
+> >
+> > I noticed there are some flaky tests which have nothing to do with the
+> > series. Can you confirm that it's not caused because of the series?
+>
+> That explains the different results as i am using i40e/ice which have
+> multi-buffer support whereas ixgbe does not even support mbuf at XDP.
+> Broken tests are from mbuf cases.
 
-SIOCCHGTUNNEL on a migrated tunnel then runs:
+That's weird. I never expected the failed tests to be about multi-buffer.
 
-  net = dev_net(dev)                    /* migrated netns */
-  t   = vti6_locate(net, &p1, false)    /* misses target in t->net */
-  ...
-  t   = netdev_priv(dev)
-  vti6_update(t, &p1, false)            /* mutates t->net's hash */
+Are they the same as the output you attached last time? Or something
+new? Could you please share it so that I can investigate the root
+cause?
 
-A caller in the migrated netns picks params that match a tunnel
-in the creation netns. The lookup in dev_net(dev) finds nothing.
-vti6_update() prepends the migrated tunnel at the head of the
-creation netns hash bucket for those params. Later lookups in
-the creation netns resolve to the migrated device. xfrm receive
-delivers the matched packets through a device the caller controls.
+Thanks,
+Jason
 
-Reachable from an unprivileged user namespace (unshare --user
---map-root-user --net). Cross tenant scope on container hosts.
-
-Switch the SIOCCHGTUNNEL path on a non fallback device to use
-t->net for the lookup. The lookup now matches the netns
-vti6_update() operates on.
-
-Also add ns_capable(self->net->user_ns, CAP_NET_ADMIN) before
-the lookup. The check at the top of the case is against
-dev_net(dev)->user_ns, which after migration is the attacker's
-netns. A caller there can pick params absent from self->net,
-the lookup returns NULL, t becomes self, and vti6_update()
-inserts the device into the creation netns hash. The new check
-requires CAP_NET_ADMIN in the creation netns user_ns too.
-
-SIOCADDTUNNEL and SIOCCHGTUNNEL on the fallback device keep
-dev_net(dev), which equals init_net there.
-
-Fixes: 61220ab34948 ("vti6: Enable namespace changing")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Suggested-by: Xiao Liang <shaw.leon@gmail.com>
-Cc: stable@vger.kernel.org # v5.15+
-Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
----
- net/ipv6/ip6_vti.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
-index dcb257411d6e..df793c8bfffb 100644
---- a/net/ipv6/ip6_vti.c
-+++ b/net/ipv6/ip6_vti.c
-@@ -835,17 +835,24 @@ vti6_siocdevprivate(struct net_device *dev, struct ifreq *ifr, void __user *data
- 		if (p.proto != IPPROTO_IPV6  && p.proto != 0)
- 			break;
- 		vti6_parm_from_user(&p1, &p);
--		t = vti6_locate(net, &p1, cmd == SIOCADDTUNNEL);
- 		if (dev != ip6n->fb_tnl_dev && cmd == SIOCCHGTUNNEL) {
-+			struct ip6_tnl *self = netdev_priv(dev);
-+
-+			err = -EPERM;
-+			if (!ns_capable(self->net->user_ns, CAP_NET_ADMIN))
-+				break;
-+			t = vti6_locate(self->net, &p1, false);
- 			if (t) {
- 				if (t->dev != dev) {
- 					err = -EEXIST;
- 					break;
- 				}
- 			} else
--				t = netdev_priv(dev);
-+				t = self;
- 
- 			err = vti6_update(t, &p1, false);
-+		} else {
-+			t = vti6_locate(net, &p1, cmd == SIOCADDTUNNEL);
- 		}
- 		if (t) {
- 			err = 0;
--- 
-2.34.1
-
+>
+> >
+> > Thanks,
+> > Jason
+> >
+> >
+> > >
+> > > >
+> > > >
+> > > > Jason Xing (5):
+> > > >   xsk: cache csum_start/csum_offset to fix TOCTOU in xsk_skb_metada=
+ta()
+> > > >   xsk: fix buffer leak in xsk_drop_skb() for AF_XDP multi-buffer Tx
+> > > >   xsk: drain continuation descs after overflow in xsk_build_skb()
+> > > >   xsk: drain continuation descs on invalid descriptor in
+> > > >     __xsk_generic_xmit()
+> > > >   selftests/xsk: drain CQ to wait for TX completion
+> > > >
+> > > >  include/net/xdp_sock.h                        |  1 +
+> > > >  net/xdp/xsk.c                                 | 44 +++++++++++++--=
+--
+> > > >  .../selftests/bpf/prog_tests/test_xsk.c       | 48 +++++++++++----=
+----
+> > > >  3 files changed, 63 insertions(+), 30 deletions(-)
+> > > >
+> > > > --
+> > > > 2.43.7
+> > > >
 
