@@ -1,53 +1,61 @@
-Return-Path: <netdev+bounces-290542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290543-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gGdrLykuD2r+HQYAu9opvQ
-	(envelope-from <netdev+bounces-290542-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:09:13 +0200
+	id eFyZFBg0D2qSHgYAu9opvQ
+	(envelope-from <netdev+bounces-290543-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:34:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3255A8ED8
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:09:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B736B5A9606
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:34:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A617230F0894
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:30:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3EBBF33E923C
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D0536492A;
-	Thu, 21 May 2026 15:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518E530148A;
+	Thu, 21 May 2026 15:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSU+kHHO"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="C2wTQ8dw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCE4364EA5;
-	Thu, 21 May 2026 15:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A2C2DC79A;
+	Thu, 21 May 2026 15:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779377404; cv=none; b=LjruhIwBoYV+O+xpaZ7gYafbEqMKeDs83VtfU4tyKXeQ5BDIxFzJ+TI5IqwuYjEZfSENVaNCV8jybZd6eWlQq4e/RM0Pl9NYWDNsfbjuzjakCjywsc6XM83TWa1quVr1lWZx6LqjUf+a7r63Lv1TTgQB8hxlF8rkYmV+MlUwcEY=
+	t=1779377729; cv=none; b=hZZJWLjhN4UMvHuUIpEzp0p7F8VSL3+VWA90BkhiKqcMMf6reyD5pUb4UqUfZRnDV3Zj2B+5uMdO6fBuyCyl/KutZG7zOIqdG4BNMOKX6VvSWQAtENmuLjSB0P4l5Ywp5cl8Co6kWHHluSsoZy2r45rcx1C5vAhokhVnsWpjRSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779377404; c=relaxed/simple;
-	bh=r1mnfmvkRX9SMmDZdus6YhNreX8SnW+zV+H1XXECurA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gQUCK5gt3AMH97cUqf0R7pVztwjJNGOAWdX9oyHVhwZshCTy+QydH4rcYiuGjR2n7gPP3fe2ti2wjauZRbFsCaqg9wyj5Y32Jlm9vCmKo+68iiYyQgKwaS9UFq0iVpZOQfYarj9A35Y1Wt2yqrf4Zov5M4JOPpz3YRAXdJI4kHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TSU+kHHO; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8162C1F000E9;
-	Thu, 21 May 2026 15:30:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779377403;
-	bh=1jU9/CSxOb6fJcznlAn59JOWJxBhSZuTZEet7wdwa/M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=TSU+kHHOPQ5d+d6VKLIPOUOrx2srsJVzzS8sy7GIOUbzzTyt6HwZ9gRL8ePr1iGGx
-	 RgDEDX8pW8Gk7aMszx5Vy6rKhmkXT84ZiSjB7W6SJpkNOls8Y5ilIY2I40RTW7IeGY
-	 qShF+5oW5gJuiRFWdApcAv/w5NzWhEwBFF3HS6nFxw/QyVZ+oYp3YoeGdxB0S8Vbnb
-	 tdbkdJ+tw8RZgC++J/KRoykynF6npIEeW8QCESYUHDXh4BF1bepyVJDA3m/7By9zCx
-	 65xuHij/F5uBo3ead54zxnuvBKO7s3GsMNqEUFemRU7IocjGksR1uV/X/J6ZEHbEsU
-	 6bJzrBUFT1Prg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939063930E02;
-	Thu, 21 May 2026 15:30:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1779377729; c=relaxed/simple;
+	bh=hAUkly468AWRI/7CgdtEVIMENOcJpCc6kG7C4EPEaSw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oXSIoVEJOigXspdILabkJCKqKqd1T4WB1CP34RIa1GVsIKNUj93ES1sRfuMa/PlcS8qGluNcmEK5cMlbPq/PNlVqxi1IFF8huxlbbAGf9fs3sqov3RYTxkZBf0ViovLrUYf+hdK4Skd4HpjOzthLfWbd05ds6hcead3eTpYouT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=C2wTQ8dw; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=XdRokCzNV5ZuuttIV0+NR6JuOvOxi7zH8GQjAXfoeI4=; t=1779377727; x=1780587327; 
+	b=C2wTQ8dwCuFlSTtbA0H7Xb9OSKAHJtjRqKsAxni+x0b/aly0ClP6tKALMQHdd1wc/WxiDo1UqOW
+	OSWYkplsY9WAsxW5tm3e0p++kf6u7dtqmAqhfCUaAiqPviv1QTFtyz1GQLJHzaLl8/OGn109JhuGs
+	JhVAzFCF1OpLVwNMhlzijqbzqtNsusHcRgFBQavjEXHaP8P7ZC2siLeL8C5DZg7GaKGWjxapcnbyR
+	1+Old0qC+q5SU0Wx7CAOM7TFA6r484KS6z4LXuVkRBRFkWsWN4sWjEByGg70OxVY9T8WeGYqcLGz7
+	arBB5UzQcO+BFSxmxghmDaqmcF+AI6LCKl2Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1wQ5Qi-0000000ChVU-2AKh;
+	Thu, 21 May 2026 17:35:25 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-next-2026-05-21
+Date: Thu, 21 May 2026 17:34:34 +0200
+Message-ID: <20260521153519.380276-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,75 +63,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv6: ioam: refresh hdr pointer before ioam6_event()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177937741316.384060.7911615095323709207.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 15:30:13 +0000
-References: <20260520124242.32320-1-justin.iurman@gmail.com>
-In-Reply-To: <20260520124242.32320-1-justin.iurman@gmail.com>
-To: Justin Iurman <justin.iurman@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- idosch@nvidia.com, stable@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290542-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
+	TAGGED_FROM(0.00)[bounces-290543-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 5F3255A8ED8
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sipsolutions.net:mid,sipsolutions.net:dkim]
+X-Rspamd-Queue-Id: B736B5A9606
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+OK this one's pretty sparse, but I'll send it anyway so we
+can sync up with wireless content etc. later. I guess I'll
+get more driver pull requests for -next as we get to later
+RCs.
 
-On Wed, 20 May 2026 14:42:42 +0200 you wrote:
-> Reported by Sashiko:
-> 
-> In ipv6_hop_ioam(), the hdr pointer is initialized to point into the
-> skb's linear data buffer. Later, the code calls skb_ensure_writable(),
-> which might reallocate the buffer:
-> 
-> 	if (skb_ensure_writable(skb, optoff + 2 + hdr->opt_len))
-> 		goto drop;
-> 
-> [...]
+Please pull and let us know if there's any problem.
 
-Here is the summary with links:
-  - [net] ipv6: ioam: refresh hdr pointer before ioam6_event()
-    https://git.kernel.org/netdev/net/c/e46e6bc97fb1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks,
+johannes
 
 
+
+The following changes since commit 878492af7d503f4b093ea903173500be00e9cbe7:
+
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-05-14 10:08:06 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2026-05-21
+
+for you to fetch changes up to 1d174fec87850e1005db9b106f84bbbb19cb59b9:
+
+  ARM: dts: omap2: add stlc4560 spi-wireless node (2026-05-20 12:05:04 +0200)
+
+----------------------------------------------------------------
+Not much going on here right now:
+ - mac80211/hwsim:
+   - some NAN related things
+   - MCS/NSS rate issues with S1G
+ - p54: port SPI version to device-tree
+ - (a few other random things)
+
+----------------------------------------------------------------
+Arnd Bergmann (3):
+      dt-bindings: net: add st,stlc4560/p54spi binding
+      p54spi: convert to devicetree
+      ARM: dts: omap2: add stlc4560 spi-wireless node
+
+Daniel Gabay (1):
+      wifi: mac80211: allow cipher change on NAN_DATA interfaces
+
+Deepanshu Kartikey (1):
+      wifi: mac80211_hwsim: reject NAN on multi-radio wiphys
+
+Ilan Peer (2):
+      wifi: mac80211: Allow per station GTK for NAN Data interfaces
+      wifi: mac80211_hwsim: Do not declare NAN support for Extended Key ID
+
+Johannes Berg (3):
+      wifi: mac80211: check stations are removed before MLD change
+      wifi: mac80211_hwsim: advertise NPCA capability
+      wifi: cfg80211: add a function to parse UHR DBE
+
+Lachlan Hodges (2):
+      wifi: mac80211: skip NSS and BW init for S1G sta
+      wifi: mac80211: don't recalc min def for S1G chan ctx
+
+Miri Korenblit (1):
+      wifi: mac80211: don't call ieee80211_handle_reconfig_failure when not needed
+
+Rosen Penev (2):
+      wifi: rt2x00: allocate anchor with rt2x00dev
+      wifi: plfxlc: use module_usb_driver() macro
+
+ .../bindings/net/wireless/st,stlc4560.yaml         |  61 +++++++
+ MAINTAINERS                                        |   1 +
+ arch/arm/boot/dts/ti/omap/omap2.dtsi               |   4 +
+ .../arm/boot/dts/ti/omap/omap2420-n8x0-common.dtsi |  12 ++
+ arch/arm/mach-omap2/board-n8x0.c                   |  18 --
+ drivers/net/wireless/intersil/p54/p54spi.c         |  67 +++----
+ drivers/net/wireless/intersil/p54/p54spi.h         |   3 +
+ drivers/net/wireless/purelifi/plfxlc/usb.c         |  25 +--
+ drivers/net/wireless/ralink/rt2x00/rt2x00.h        |   3 +-
+ drivers/net/wireless/ralink/rt2x00/rt2x00usb.c     |  11 +-
+ drivers/net/wireless/virtual/mac80211_hwsim_main.c |  31 +++-
+ include/net/cfg80211.h                             |  10 ++
+ net/mac80211/chan.c                                |  10 +-
+ net/mac80211/key.c                                 |  22 ++-
+ net/mac80211/link.c                                |   5 +-
+ net/mac80211/sta_info.c                            |  17 ++
+ net/mac80211/util.c                                |   6 +-
+ net/wireless/chan.c                                | 130 ++++++++++++++
+ net/wireless/tests/chan.c                          | 192 ++++++++++++++++++++-
+ 19 files changed, 508 insertions(+), 120 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/wireless/st,stlc4560.yaml
 
