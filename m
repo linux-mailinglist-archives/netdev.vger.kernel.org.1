@@ -1,212 +1,190 @@
-Return-Path: <netdev+bounces-290316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290315-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKvJECHWDmr2CQYAu9opvQ
-	(envelope-from <netdev+bounces-290316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:53:37 +0200
+	id WAqODwrWDmr2CQYAu9opvQ
+	(envelope-from <netdev+bounces-290315-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:53:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DD045A2B96
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:53:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE8D5A2B68
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5D5EE3004D12
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:37:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4200D300B9CA
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A19A37703A;
-	Thu, 21 May 2026 09:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580CC37702E;
+	Thu, 21 May 2026 09:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uni-hannover.de header.i=@uni-hannover.de header.b="bXiOjmMW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvJEN88+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1n.rrzn.uni-hannover.de (mailout1n.rrzn.uni-hannover.de [130.75.2.107])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D812283CB5;
-	Thu, 21 May 2026 09:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.75.2.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADC03750D5
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779356273; cv=none; b=b6HeJ3q11h63d4XLOdU6vz3kyt5IiYPihPREj9hcQtGkKt0ZXq69sp/cs8WZxzdthh1GJobM74s0lYUoDXgA5RWcXFFfPxgRef2+7+bAlLZtG0nL3PD0mqF0KYEYZttHhF4jnLlSkOsM4EBCspuAVNZEsjDH/IsyjSpZkPRrztk=
+	t=1779356186; cv=none; b=OZ1KEkZZexpJnzg88rxmYz8iShELebA5Oo3YpMfBIaJSVSzlulZtBuSzpL0FQk6hUk5stFwylxAqn5X40Ze/aKMh/woEqLC3no56vegEerghJB+z+1i9mVQR8PQB1g3VIVfDZkughyuDOlpQWC+kg/geD0P5hu1Mfaz1RBWkjDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779356273; c=relaxed/simple;
-	bh=Wl/rN+uimoOVAIOMUx6li+N/fOPzSh9uL0WigNYNw6o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VqUKGjeO/ymdv/5l3YM7/LuzRHdVvjTYQJR6u8whfvVwf8Wsnfaeo43+zaQX1LfTJI14mSzBqOnmt41Vz1bKjoHI31FFarNCi/fF1T2ZPPSBhU5I00mfGHQxXcvOWvDBkEmTF/QAIW4c0H4agyH0gbvjRXd3KwLQARe8QE51tnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ikt.uni-hannover.de; spf=pass smtp.mailfrom=ikt.uni-hannover.de; dkim=pass (2048-bit key) header.d=uni-hannover.de header.i=@uni-hannover.de header.b=bXiOjmMW; arc=none smtp.client-ip=130.75.2.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ikt.uni-hannover.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ikt.uni-hannover.de
-Received: from [172.23.180.109] (gateway.ikt.uni-hannover.de [130.75.73.1])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mailout1n.rrzn.uni-hannover.de (Postfix) with ESMTPSA id 132AF1BC;
-	Thu, 21 May 2026 11:32:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=uni-hannover.de;
-	s=2024all; t=1779355949;
-	bh=Wl/rN+uimoOVAIOMUx6li+N/fOPzSh9uL0WigNYNw6o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bXiOjmMW9x7e2V8CUqs7T2almVyY8ncb6gdAnjM8vAfbNnnoplKFZQAYo6AKsKwWj
-	 TRcYQtcgkZ8fxDsunQ55QNzmfGMG6YejZi8fsAxcOExMgjFquwnPS8V95qy1gswdp4
-	 a6soBUF8ZaIlO9uCxzgLYIbdQLG02iB7vrjWb0ZaU93LQhqjhNbrcJ0JWRXNnCv4OI
-	 i4p92gv5VNMC34dJNXNrrS07cqkKmGNcDEZhsdnNauGbnunKgV8M4v89Aya8FvvcYS
-	 euzkM5/dw/WfnX4Ib72LZ31Z9c3xjDbp6RhzSpSo7aWCSmzAh7UoaITPc5D77nGInt
-	 kMM/i6Ch+8qmQ==
-Message-ID: <9a7a764d-afb0-43d6-a96e-dc4652db5fff@ikt.uni-hannover.de>
-Date: Thu, 21 May 2026 11:32:26 +0200
+	s=arc-20240116; t=1779356186; c=relaxed/simple;
+	bh=n1Ym8sC2tYw3JwVQIr8QOYkS8HeICb8ExlRhTy/6eOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mkFQ9OYHsyR5zQvy4WX5Zg1dV7dtGxTSd4ii+RQ1k8hrYZ/yrIyGwm8XV7GLuWI3rM+jvtrxJnjKeVKw2bR5paLCTUqhdNyj5Lx6YFvJsyiPtfPeOmi9/nC4hIyszFsXsiVhvo5vBlr+2xy6fs+gnP6rEMC1Jb4lZ00IfXlfnLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GvJEN88+; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82f9fdfc965so2677581b3a.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 02:36:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779356184; x=1779960984; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7/4CELazT4J7bYabOPvJV6gl1L91iH5vUTjK50awgg4=;
+        b=GvJEN88+9TzWf6xmEK3r7A2P3yB32DIMyFYHlyUOkwzDVeF4WXsVodMrELXe4CzbWT
+         rjmGX3wH4XP016TSrK4mB/3pm57wiHjUk+jVJYkDeN4DRnBh5N9g/OQ85AAW4LaCJPHm
+         tUNV37QxWodw44vyJqJLxtN6BGhNx1gE0aLuAr4hrnb1dAzVX+k9U6Sa2ARGKHsN9dZK
+         er6jk9npkJz1vep/0HdlyoVFHuJcHYLkQz4AvY4n+xbaOaNg2BVRaV7lqEZlGKori6+b
+         Bl/4ngO+3CSfqFdot096C/RbSGh8Kl+07KJ0edN4ab5k2KstVKBm8AXwAcVf7FzMsQn+
+         6qSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779356184; x=1779960984;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7/4CELazT4J7bYabOPvJV6gl1L91iH5vUTjK50awgg4=;
+        b=pn9JupXMiwuxuPKe110OaqtXAF34NuQFcw6DbTge/gO0O2vXgq6Y7AjWKWSQVaHqdW
+         mElcxCtAH8ui0rV7AKhrjePEVopC33UJhp6U5sMwgPPbGvRyP9tQmWPPwyl4rECaf+mB
+         rb+d7GerpTvRo8zFP/4gbTSRg547q+LD4wTXQh1eaa8hfhCbs92fNaFNjxcjZs1gxZI5
+         jEFlsTzSULKCYwWJjXoNv+GAXhwag2QBnrUb5g80pG4xkCWNkR4ucXC6sFEQcGssIYaD
+         dVS78xjls8Q89Bqhlhdy1tfq1R5K0NC5Tjgaf6ASFfjUMwvF0g3A7RikbSfwxiKu+UT+
+         wCvQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8rGkce6AtDS4b9N0Se+Ut1oO8DVJUwb/655jkvsVjaVTZCP06JnG+MKWShHeQhvqYjN6xO0as=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKOdQacVfotA8/1KPh4Rc04TiMPgk0ptVS9bCJSAqVa+rT+jFu
+	QZnMeiRoKsJL4OLoavkSR+X+MjHC37L4ff6SwtodFhsLasYtXIcuQBaL
+X-Gm-Gg: Acq92OGv8qL0DlnE30LyreMnE61c1ADW2ssLLhmquDdO8RwZlAwkYERIqQizWIJveIJ
+	6iQVRqrsigKn3kv9N3DLoz9KDINvkO3dwrVriVMq4RI//IR4xFKpwsSv7s9MNEFh6a96W+ErxF4
+	mmkbnczOOKsV+urddNncfcf+rIjWNZiGw5byzKtsSy91jM5GODSz0Sx2otCTB1jIh3lMjtpI/W+
+	47M42MjZk755+TPWzgOWNCdeX/qeIO05yL0Pz2/LOabZYR1xEtMSAWDP62/UKQsd98WmmH4sl33
+	6UCDy+reIWotK7QlmbTRg0sshjsrPs0rcIzu/xs6vCLBgv2/hEgcYLUyy1HliKDtWKLYnuKKaPd
+	WTWh3/fbIRhF7OXB2ASh8YszjGZPBPkZeGBAREtwLEQkZaFShMug+FtOt30JisHGA+9rDW34lnt
+	R07b4tz/2jhZ+r2zQ367gZHVb18ww+8y9g3xKw26Y7psgwJDWIwwVJFIt/KSqaHzN8Lzne/FR3A
+	hw=
+X-Received: by 2002:a05:6a00:1306:b0:835:cc47:6ff8 with SMTP id d2e1a72fcca58-8414ae56cf7mr2470482b3a.45.1779356184338;
+        Thu, 21 May 2026 02:36:24 -0700 (PDT)
+Received: from m-upc-A520M-HDV.flets-east.jp ([2400:2410:3f60:500:5c80:bb9e:85d5:f1b9])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84154b1acf2sm912053b3a.22.2026.05.21.02.36.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2026 02:36:23 -0700 (PDT)
+From: Yuyang Huang <sigefriedhyy@gmail.com>
+To: Yuyang Huang <sigefriedhyy@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] ipv4: igmp: annotate data-races around im->users
+Date: Thu, 21 May 2026 18:36:12 +0900
+Message-ID: <20260521093612.207475-1-sigefriedhyy@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Re: [PATCHv2 net-next] tcp: Add TCP ROCCET congestion control
- module.
-To: Jakub Kicinski <kuba@kernel.org>, t.fuechsel@gmx.de
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, ncardwell@google.com,
- kuniyu@google.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <agMMMUotXaG_Ypqz@volt-roccet-vm>
- <20260516011212.1859280-1-kuba@kernel.org>
-Content-Language: de-DE
-From: Lukas Prause <lukas.prause@ikt.uni-hannover.de>
-In-Reply-To: <20260516011212.1859280-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.9 at mailout1n
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[uni-hannover.de,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[uni-hannover.de:s=2024all];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290316-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-290315-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[kernel.org,gmx.de];
-	DKIM_TRACE(0.00)[uni-hannover.de:+];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[sigefriedhyy@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukas.prause@ikt.uni-hannover.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[uni-hannover.de:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,ikt.uni-hannover.de:mid]
-X-Rspamd-Queue-Id: 5DD045A2B96
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 3FE8D5A2B68
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+/proc/net/igmp walks IPv4 multicast memberships under RCU and
+prints im->users without holding RTNL, while multicast join and leave
+paths update the field while holding RTNL. Annotate this intentional
+lockless snapshot with READ_ONCE() and the matching writers with
+WRITE_ONCE().
 
-Thanks for the review.
+Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
+---
+ net/ipv4/igmp.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-On 5/16/26 03:12, Jakub Kicinski wrote:
-> Can the srRTT calculation cause a catastrophic integer underflow?
-> If a socket has not yet received a valid RTT sample, curr_rtt
-> remains 0. When roccettcp_cong_avoid() executes, it calls
-> update_min_rtt(), which computes curr_min_rtt as max(0, 1),
-> resulting in 1. Then update_srrtt()calculates curr_rtt -
-> curr_min_rtt (0 - 1). Since both are unsigned 32-bit integers, does
-> this underflow to 0xFFFFFFFF? Multiplying this by 100yields
-> 0xFFFFFF9C, which gets integrated into the curr_srrtt EWMA. Would
-> this resulting massive value instantly exceed the threshold and
-> falselytrigger a severe bufferbloat response that permanently
-> cripples the congestion window?
-Yes, this is a problem. We will add a check if curr_rtt < min_rtt
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 27d120183779..f2aca659b29c 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -1541,7 +1541,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
+ 	}
+ 
+ 	if  (im) {
+-		im->users++;
++		WRITE_ONCE(im->users, im->users + 1);
+ 		ip_mc_add_src(in_dev, &addr, mode, 0, NULL, 0);
+ 		goto out;
+ 	}
+@@ -1550,7 +1550,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
+ 	if (!im)
+ 		goto out;
+ 
+-	im->users = 1;
++	WRITE_ONCE(im->users, 1);
+ 	im->interface = in_dev;
+ 	in_dev_hold(in_dev);
+ 	im->multiaddr = addr;
+@@ -1784,7 +1784,10 @@ void __ip_mc_dec_group(struct in_device *in_dev, __be32 addr, gfp_t gfp)
+ 	     (i = rtnl_dereference(*ip)) != NULL;
+ 	     ip = &i->next_rcu) {
+ 		if (i->multiaddr == addr) {
+-			if (--i->users == 0) {
++			int new_users = i->users - 1;
++
++			WRITE_ONCE(i->users, new_users);
++			if (new_users == 0) {
+ 				ip_mc_hash_remove(in_dev, i);
+ 				*ip = i->next_rcu;
+ 				in_dev->mc_count--;
+@@ -2977,7 +2980,7 @@ static int igmp_mc_seq_show(struct seq_file *seq, void *v)
+ 		delta = im->timer.expires - jiffies;
+ 		seq_printf(seq,
+ 			   "\t\t\t\t%08X %5d %d:%08lX\t\t%d\n",
+-			   im->multiaddr, im->users,
++			   im->multiaddr, READ_ONCE(im->users),
+ 			   im->tm_running,
+ 			   im->tm_running ? jiffies_delta_to_clock_t(delta) : 0,
+ 			   im->reporter);
+-- 
+2.43.0
 
-> Are the congestion control state variables curr_rtt and curr_srrtt
-> properly initialized? In roccettcp_reset(), memset zeroes the
-> statestruct only up to the curr_rtt field, leaving curr_rtt and
-> curr_srrtt uninitialized. If a user dynamically switches an active
-> socket's congestion control to ROCCET via setsockopt, could the
-> icsk_ca_priv area contain leftover memory from the previous
-> algorithm? Might these garbage values be fed into the core RTT
-> logic, causing unpredictable bufferbloatdetection and spurious
-> throughput drops?
-We will initially initialize the whole struct to 0 using sizeof instead
-of offsetof.
-
-> Is it safe to expose internal TCP congestion control callbacks as
-> BPF kfuncs? The module natively hooks into the TCP stack, but it
-> annotates its static internal functions with __bpf_kfunc and exports
-> them via register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS). Does
-> this allow arbitrary BPF struct_ops programs to call these native
-> state-modifyingfunctions directly? Could a BPF program invoke these
-> functions on a socket using a different congestion control
-> algorithm, blindly casting sk->icsk_ca_priv to struct roccettcp and
-> corrupting the socket's internal state?
-Not sure which functions are meant.
-In my understanding, all exposed functions are the ones that
-algorithms like CUBIC, BBR, or dctcp also expose...
-The same problem (reinterpreting the memory layout of the private sk
-data as a roccet struct applies to the bbr struct in tcp_bbr.c. So I am
-unsure if we should just not expose the callbacks as kfuncs or leave
-them in)
-
-> Could the 16-bit ACK rate counter wrap around on high-speed links?
-> The ack_rate.cnt field is defined as a u16, accumulating the number
-> of acknowledged segments over a 100ms interval. On modern fast
-> links, more than 83,000 segments can be acknowledged in a single
-> 100ms window. Will this silently overflow multiple times per
-> interval, recording an artificially low, randomized rate and
-> breaking the slow start exit conditions?
-That could well happen here. We will change the type to u32.
-
-> Does the interval boundary logic discard acknowledged packets? In
-> update_ack_rate(), when the 100ms interval rolls over, the interval
-> state rotates and ack_rate.cnt is reset to 0. This happens inside
-> an if/else block where the else branch contains the counter
-> increment. Because the else branch is bypassed during a rollover,
-> are any segments acknowledged by the specific ACK packet that
-> triggered the boundary cross permanently discarded, causing a
-> persistent undercounting of the throughput?
-Yes, should probably reset the counter to acked instead of back to 0.
-
-> Can a timestamp wraparound freeze ACK rate tracking for idle
-> connections? The update_ack_rate() function evaluates elapsed time
-> via an explicit signed cast of a 32-bit microsecond timestamp delta.
-> Since this timestamp wraps around roughly every 71 minutes, if a
-> socketremains idle for more than about 35 minutes, the unsigned
-> delta exceeds 0x7FFFFFFF. Would the signed cast convert this into
-> a large negative number, rendering the interval condition false,
-> freezing the interval logic, and causing the counter to accumulate
-> indefinitely without rotation?
-Yes, but usage of the after() function should resolve this. We will add
-this.
-
-> Are ECN marks being ignored and cached, leading to spurious later
-> drops? In roccet_in_ack_event(), receiving an ECE flag sets
-> ece_received to true. However, in roccettcp_cong_avoid(), this flag
-> is only evaluated and cleared if curr_srrtt exceeds roccet_xj. If
-> an ECN mark arrives while the RTT is low, is it ignored, leaving
-> ece_received stuck at true? Could this stale flag falsely trigger a
-> severe congestion window reduction hours later if the RTT naturally
-> spikes above the threshold?
-We will change this. ECN should always be handled.
-
-> Is there a division by zero vulnerability during module
-> initialization? The variables beta and bic_scale are configurable
-> module parameters. In roccettcp_register(), bic_scale is used
-> directly in a do_div() call, and beta is used in a denominator.
-> If the module isloaded with bic_scale set to 0 or beta set to 1024,
-> will this instantly cause a division-by-zero kernel panic?
-This is CUBIC's code. Should we add a check there?
-
-> Does the implementation match its stated ACK rate bufferbloat
-> detection mechanism? The commit message states that the rate is
-> sampled over 5 RTT intervals, and slow start exits if the rate stays
-> on the same level. However, the code uses a hardcoded 100ms
-> interval, and the exit condition only triggers if the new rate drops
-> by 10 or more segments. If the rate genuinely stays on the same
-> level, the difference is 0. Does this completely fail the check?
-The evaluation of the ack rate diff is faulty. In fact, it would
-evaluate false if it were true. We will change this.
 
