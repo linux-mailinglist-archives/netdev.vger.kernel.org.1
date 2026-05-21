@@ -1,238 +1,212 @@
-Return-Path: <netdev+bounces-290314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290316-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IEvZEA3YDmr2CQYAu9opvQ
-	(envelope-from <netdev+bounces-290314-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:01:49 +0200
+	id IKvJECHWDmr2CQYAu9opvQ
+	(envelope-from <netdev+bounces-290316-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:53:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 148C05A2D94
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:01:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DD045A2B96
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:53:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 707C731F6147
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:29:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5D5EE3004D12
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305EF3750DB;
-	Thu, 21 May 2026 09:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A19A37703A;
+	Thu, 21 May 2026 09:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="joX77WAa"
+	dkim=pass (2048-bit key) header.d=uni-hannover.de header.i=@uni-hannover.de header.b="bXiOjmMW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mailout1n.rrzn.uni-hannover.de (mailout1n.rrzn.uni-hannover.de [130.75.2.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500F2282F1E;
-	Thu, 21 May 2026 09:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779355752; cv=fail; b=hghnRM2s5W2tb7VYj8Xk7Y3j3MCnEBKiUjFLqpeaO3vvGQI5Oi/M5oTDBeyfd0Z+0fBi3wfFgWULPAjEfGE/Hdie8K+GxZ/TY8K7/0y7bs10PalHzluXfmrx5lcV+JL0kzU+n/pURUIQXwLj8uNyaSukcx0vI7UJzJOKzxQDtqM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779355752; c=relaxed/simple;
-	bh=cbS2AaC45f1mQKNcZXxFDRmegZNys4j3WrbU3L9xXO8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YkA8nuCpjn8qeBFuDy3igl5BUc2jioYYRSzkp7gz/kvBeE7bFJFRogubaPm4GbHEZ7VHtS8E75E836Uz3ls19Byhbmz1qFlWhia+NXeWT0JlfvCUIX/3q3JImjhzxt7191m8KEr4STbzqwlSD0uQhSlfJFeQlrwydIk97W9fm44=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=joX77WAa; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779355751; x=1810891751;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=cbS2AaC45f1mQKNcZXxFDRmegZNys4j3WrbU3L9xXO8=;
-  b=joX77WAacbOu9uxyBUT57Pwg1991aPPaffmr0hawmVNNzHPEXpFDyJ0V
-   YtT9+njLD+Mje/AdPdrWKqAMl8IOOf0GdYWljtI3yyVEJuYky6pwT5doW
-   WQYMGNE6gUICt3NOkg9R+LnFxOvd0Y2oY0naIv3z4uRi8uYrI74ZZ/OGp
-   vT8Fuvj+A3LmRfofRLv4hNKsnEkulwQwB5dCwsayijeumdby2pTj2N6Ek
-   5Wvh3MHd5hqKBX9sTZqTdY0fVqSfcxP2mRNjitZpn5q4nlkOzZvjyHqkB
-   MlZIdVBjWnqRBiOtGhflxORkltCYRsdz2O+ggoS/+XT8Fc6LrmfT/qUun
-   A==;
-X-CSE-ConnectionGUID: W2qG2QDPRdOcdKMVIAO34g==
-X-CSE-MsgGUID: r8N99OygTXeNeTjxu9S16Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="80171876"
-X-IronPort-AV: E=Sophos;i="6.23,246,1770624000"; 
-   d="scan'208";a="80171876"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2026 02:29:10 -0700
-X-CSE-ConnectionGUID: G7VIPIlFThOaxeUNGwl9LA==
-X-CSE-MsgGUID: fo+ADXlcRu+DQm1dOCipXA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,246,1770624000"; 
-   d="scan'208";a="263998439"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2026 02:29:09 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 21 May 2026 02:29:08 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 21 May 2026 02:29:08 -0700
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.13) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 21 May 2026 02:29:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Cv/BYYcy/YnceUWhQGrO5TiYUu1Y12KDmTdB1TaOjaG0ZDMKdqqWiAkTX+9nepRb45+QHl06OcUZFzBzyDEDUc/CL+8K4trmbyG0ISmYzuqhtPKFCD35+NMzcpNArginvZoH01NWhuIQa5QoyyY1uIzQuY+75rWpUdkyVSAzzN9EkPkR3eq92dvxZtqnHEZU6J+luSuqlyl3LdxVk6uOhVWwVDpl1T0W8aNoXDXyLqC93l1VTqxneROV2T8s0b6oigw8qE5qUcIQiCOK+Exi2BaNBmD5/gKrQB8lNqJt2UfXSox/kc33nLrE3NMupDi9xJjhuW8ro4fMeAsBv84ZgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WlcdXieeKaywclaJOLvhi0vqKmWBHgjtboQqGtxYmbI=;
- b=K3aGQfXrP1nDkZ+SMmkQSGLfzbs0pu2ze6QRkCSmsGB7Iyg39PEy4BNdJyV+FYMsJCoJx7VAvQxzOJw50aG0b2dxS2q2+PkJyX/2dvOfe53trGKHr7Z3s1DWrqxFwiS2O+C/yC/BYEaWdpzjZzZ93C5lvL0XURPLo3hK7HWwqAfdOncT01TFi+f75RXs21Uny94yTL+Rmg1P96rQGSMILW+RdLDZ7VfvwHJZf18jp8gV9UYvGYPPAMPGNRf4kSZY2IXfvQEd0mY+XnxbfCW+IY65J/pTceIJWh/I3SbKDrCbpz3sMRAOPoQietFf1+BdEfRLmzWF1U4qoBBlcRS53w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by CY8PR11MB7291.namprd11.prod.outlook.com (2603:10b6:930:9b::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.17; Thu, 21 May
- 2026 09:29:05 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b%6]) with mapi id 15.21.0048.016; Thu, 21 May 2026
- 09:29:04 +0000
-Date: Thu, 21 May 2026 11:28:50 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>, <przemyslaw.kitszel@intel.com>,
-	<aleksander.lobakin@intel.com>, <sridhar.samudrala@intel.com>,
-	<anjali.singhai@intel.com>, <michal.swiatkowski@linux.intel.com>,
-	<maciej.fijalkowski@intel.com>, <emil.s.tantilov@intel.com>,
-	<madhu.chittim@intel.com>, <joshua.a.hay@intel.com>,
-	<jacob.e.keller@intel.com>, <jayaprakash.shanmugam@intel.com>,
-	<jiri@resnulli.us>, <horms@kernel.org>, <corbet@lwn.net>,
-	<richardcochran@gmail.com>, <linux-doc@vger.kernel.org>,
-	<tatyana.e.nikolova@intel.com>, <krzysztof.czurylo@intel.com>,
-	<jgg@ziepe.ca>, <leon@kernel.org>, <linux-rdma@vger.kernel.org>, Samuel Salin
-	<Samuel.salin@intel.com>, Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next v3 01/14] virtchnl: create 'include/linux/intel'
- and move necessary header files
-Message-ID: <ag7QUgfpM5UAAE2z@soc-5CG4396X81.clients.intel.com>
-References: <20260515224443.2772147-1-anthony.l.nguyen@intel.com>
- <20260515224443.2772147-2-anthony.l.nguyen@intel.com>
- <20260520175201.72f83c4a@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260520175201.72f83c4a@kernel.org>
-X-ClientProxiedBy: VI1PR09CA0144.eurprd09.prod.outlook.com
- (2603:10a6:803:12c::28) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D812283CB5;
+	Thu, 21 May 2026 09:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.75.2.107
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779356273; cv=none; b=b6HeJ3q11h63d4XLOdU6vz3kyt5IiYPihPREj9hcQtGkKt0ZXq69sp/cs8WZxzdthh1GJobM74s0lYUoDXgA5RWcXFFfPxgRef2+7+bAlLZtG0nL3PD0mqF0KYEYZttHhF4jnLlSkOsM4EBCspuAVNZEsjDH/IsyjSpZkPRrztk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779356273; c=relaxed/simple;
+	bh=Wl/rN+uimoOVAIOMUx6li+N/fOPzSh9uL0WigNYNw6o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VqUKGjeO/ymdv/5l3YM7/LuzRHdVvjTYQJR6u8whfvVwf8Wsnfaeo43+zaQX1LfTJI14mSzBqOnmt41Vz1bKjoHI31FFarNCi/fF1T2ZPPSBhU5I00mfGHQxXcvOWvDBkEmTF/QAIW4c0H4agyH0gbvjRXd3KwLQARe8QE51tnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ikt.uni-hannover.de; spf=pass smtp.mailfrom=ikt.uni-hannover.de; dkim=pass (2048-bit key) header.d=uni-hannover.de header.i=@uni-hannover.de header.b=bXiOjmMW; arc=none smtp.client-ip=130.75.2.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ikt.uni-hannover.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ikt.uni-hannover.de
+Received: from [172.23.180.109] (gateway.ikt.uni-hannover.de [130.75.73.1])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mailout1n.rrzn.uni-hannover.de (Postfix) with ESMTPSA id 132AF1BC;
+	Thu, 21 May 2026 11:32:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=uni-hannover.de;
+	s=2024all; t=1779355949;
+	bh=Wl/rN+uimoOVAIOMUx6li+N/fOPzSh9uL0WigNYNw6o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bXiOjmMW9x7e2V8CUqs7T2almVyY8ncb6gdAnjM8vAfbNnnoplKFZQAYo6AKsKwWj
+	 TRcYQtcgkZ8fxDsunQ55QNzmfGMG6YejZi8fsAxcOExMgjFquwnPS8V95qy1gswdp4
+	 a6soBUF8ZaIlO9uCxzgLYIbdQLG02iB7vrjWb0ZaU93LQhqjhNbrcJ0JWRXNnCv4OI
+	 i4p92gv5VNMC34dJNXNrrS07cqkKmGNcDEZhsdnNauGbnunKgV8M4v89Aya8FvvcYS
+	 euzkM5/dw/WfnX4Ib72LZ31Z9c3xjDbp6RhzSpSo7aWCSmzAh7UoaITPc5D77nGInt
+	 kMM/i6Ch+8qmQ==
+Message-ID: <9a7a764d-afb0-43d6-a96e-dc4652db5fff@ikt.uni-hannover.de>
+Date: Thu, 21 May 2026 11:32:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|CY8PR11MB7291:EE_
-X-MS-Office365-Filtering-Correlation-Id: aceaf1e5-13ee-4bf6-e2d4-08deb71b667f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|10070799003|1800799024|18002099003|22082099003|56012099003|11063799006|4143699003;
-X-Microsoft-Antispam-Message-Info: FukZ5HKAbLtB7EsSHprZdi26npJ24jsv23kg0I/zfUzK7nLp8xFl2QnMB0RHABRB9Q6N/hccSisVZ5jjSfb2h3yvw6WDn8c5Fx1Fx1WVgWIaWDTPnWN1vQkAHcbQbUrss2joWEo8o3SThax9G8BOYppLE5ITd2GlwU0dbnljRcxYfU1JGYSUwwWE7W72rO/qZ62g/BGzy2Xe11+84TXQBah+vBkCNR1qyDFRC+Lbl4xJOwMK9vqGD0Jdr/waB6EVWJ+r+Q0Uw9Rq/cmBmxGLMJbz5UrQTBBEKVMV2cOS5JISOiZAi9V/6YRLFW87L44hFq+oZnEJzfZAX1j15ajFFDiCR8dCKJcfIdXCq573rt9CbQl6YCvv1kduj/0gBzqvcK8hnmvlOsA9d/j5lozRfUgaCGD8+jn7qODE63HEk1+syrfJhUzgY4B7e0Vl/ieuTSyHbgjEP+k0wkq+fGVl7OBHRuzzTXIKeRxGWueUs1N2pPa+FDWWv0zTTb9A8Fe1XZtpDS/uWdEUU0YqGfbs2yONtT0/RrY/0VCXMQX5hUmMKw5ibY3i+1FOgkbOm2gRSUUPlNAgxeXGYmXBOur648fi94pNQMQevtktSUOyq/0nWsjzfK1AvbWpiZSg30HVPSQi/Q16CHEvr06eIa97cnCWvSHeDiUPRIUIqc53bdTi60Tsc64AKrqS/i+AAWtv
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(10070799003)(1800799024)(18002099003)(22082099003)(56012099003)(11063799006)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aLlb1ytQejDg9HO8EwiA+WchsxklZS5IasZhT+RpJLQysXNw4wugo+5kW+gP?=
- =?us-ascii?Q?IzoRWxTNu0BPavNj2KtLcPXzz2JMpNjuIJII4/Gm8uL/1gYfPKTKJwxMDD6f?=
- =?us-ascii?Q?T1ZYupMsq2WxmqeuuUWuQGONey508OfzYREOKwIM+TJgYOUb2yB29sqHeTeg?=
- =?us-ascii?Q?eHEY6kqq2/YUs65QA+971DvyMnhAuysaCd1ZYs4q13q2zxUHe1qLW3/eHkcd?=
- =?us-ascii?Q?YgwZ34moK0D7M1sWA2g1oQ488irMeqdt4ROHSDRMkha/oIpakD1gvMcEplud?=
- =?us-ascii?Q?V3YiAWHQ5jMM8V2WDHI4tXH/PO38m/yk2iH9Zgaa6wGk4fSnF6X/ijXuJk8+?=
- =?us-ascii?Q?DWCcgA7oofqPxssxm0b5W9aE4JVeF2fu/6YO6kQM+8LmnqjSEsH2tLXVWzCw?=
- =?us-ascii?Q?NCiz1hECsWyuWdSxhCkwC5rymdlVFC7EYW3pjE//JYiFU5DGunNdCGoZxDWG?=
- =?us-ascii?Q?FBo/BadOO/4uXx0xHTPzNU6fJsguppxH860PbWRayQ/DjaL5f2sVC+jGjE1W?=
- =?us-ascii?Q?BJn5lXX1ke53jUectC3TbmDz6pcV84bxia/J/n9gOc3A2+k93o0gWQQLjW8Z?=
- =?us-ascii?Q?yQhH8uWsdMxZrCU+FJwJ0d/FXc+dc1g7WQstez5wnmb+weMMtOzNU+tEfscd?=
- =?us-ascii?Q?1ygpGeJvqdTp8dULOHq1pt9eTSRZG5421xd1bRYBE5YCC32pz6PkvXQrcIuc?=
- =?us-ascii?Q?itspYrcP64fz+dUvR5uFSQKOPI/SGs15HKoofTX7PzxbHlwYWN0m39FwLK2h?=
- =?us-ascii?Q?wlqfmOaAOYdeaxZOcnrFQuFvrmgALDR0PLJmOCq1jJM2sgiIOP7XVWK+44Pi?=
- =?us-ascii?Q?N41BBWPtLajtq6iqsxjUxVLOnpbwH4swv94d+4MlBg6A3Iha2upMdtploTtC?=
- =?us-ascii?Q?WfkcpO8j4ESbd71Mp5MGRQDPZr+VM6PEtghLBrLsf4ZizER782P4lDox8ZMY?=
- =?us-ascii?Q?fcBReA+kY7oPbepeXE1eYfVEukCylZXtJ5mOQbmh4twW8TvA6Ybvv9ykbQ8t?=
- =?us-ascii?Q?UQeX6RviWFEEilN/d1m6UEiYQ6EYk01Sm2wUabCPXvVQSBVvEZ/aJU/eHcKT?=
- =?us-ascii?Q?RbF8FLOjQdCCXOlsAV5c+82DNKBQy5MjGo8oFSDbnIWkeMaTPX079Mzcazog?=
- =?us-ascii?Q?idTik6QV/s2yDcNCDWnTq7tfIBBJaFbfF5vAfT3KLgbdkMOn/MCHCiSjrwew?=
- =?us-ascii?Q?RJ576h5udQmKGpRsPA5n1wYxOHu5+LtYuOvV4LO591WTvSdbtnzDLX9wi2sn?=
- =?us-ascii?Q?n5FuCNXTbYSRywxnO/6N2Fajb0bMHr6uINkAjfR5yrEOr3KLCMavVENEyuea?=
- =?us-ascii?Q?lkgi3Mad+fwtJ7iCtSN+k7cGvjNr2VDXok+H3GjRJhc/CumJK3ghQ1CukwnC?=
- =?us-ascii?Q?LwfQN94dxzx7Un7efAHk8Ib7Uoq7/KnYeHvN7sPthKM4QiKFaGuZIeboD8Rf?=
- =?us-ascii?Q?2xidOB2L9Lh+VO87nUyheWm3YEWv6GIOHHBc99cX/lhDw0A07d8mB77oACgb?=
- =?us-ascii?Q?oh/4KuT5pbDbUZHCH5bQLfzrgh+dqQEItrqLcCXXS4KnyCXGAnyC4ICXVKvc?=
- =?us-ascii?Q?ifB0nfamCmcnSt1LWxr/r30wTktiGaxsJWMAEa/KsMpOCiOfSLGcl9nsNI14?=
- =?us-ascii?Q?MZZ6OE+EmZOvNI0tAqXHNa2dSzLSfkk3RsiGhM5CQotJo803OBUCUe6yJvzy?=
- =?us-ascii?Q?nJ87bsAcCuQteJJ2U9DNQKw1/afiD5buuLieTm6Yc06d0kN/9PqnLdJZsTps?=
- =?us-ascii?Q?CVezRffeHxnOHPT9sPKuEtjKeltmzte6DYyXaq7/xiQBHPqCLI8ZNewPyyl3?=
-X-MS-Exchange-AntiSpam-MessageData-1: Ar68Db5w5CZ5JW+txWIj8IGOStuW4uztRyA=
-X-Exchange-RoutingPolicyChecked: IahJPeQqdIoxuH6+ToX8Mtq6IEgGE9m7VEpLdxmlO5l//+kHzyYrhjlseMjARRDFJ+1Ah3GnTIeAiC7D6ZaKkhv4xL175U/M5NkM4N0qV9toM9WNpMnUw4ULR8xkUA9FMjKfRnNnNnCqH8G4vxtGC/Mefznajd6fYEPP5nCHzQprcOdxUHA+OyjTc2zMYUcJkuU/YHtTm3OEN1ANdpylKpAFI/WBVQdyEOAzoIazL9mW8/xhzsKSPbpce/tpMKys5mZUL2Vh3wlKe9bbnw/5ArNTGhSDQC0HeoG2TIqw1fCuWGZRAj0ytf6ud9xg4epyRJ1x6InHvWyNCOC6zH803Q==
-X-MS-Exchange-CrossTenant-Network-Message-Id: aceaf1e5-13ee-4bf6-e2d4-08deb71b667f
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2026 09:29:04.7566
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rHnQduymgAm9Wg9byrWkLNeScDezBczJausqdecFaWyFvgnXAjU+3B3i5j99E/fym0g4D0Idh95FQfmDXqd9HmR3npa0KKUd7chG26MtZ5Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7291
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+User-Agent: Mozilla Thunderbird
+Subject: Re: Re: [PATCHv2 net-next] tcp: Add TCP ROCCET congestion control
+ module.
+To: Jakub Kicinski <kuba@kernel.org>, t.fuechsel@gmx.de
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, ncardwell@google.com,
+ kuniyu@google.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <agMMMUotXaG_Ypqz@volt-roccet-vm>
+ <20260516011212.1859280-1-kuba@kernel.org>
+Content-Language: de-DE
+From: Lukas Prause <lukas.prause@ikt.uni-hannover.de>
+In-Reply-To: <20260516011212.1859280-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.9 at mailout1n
+X-Virus-Status: Clean
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[uni-hannover.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[uni-hannover.de:s=2024all];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290314-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-290316-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
-	FREEMAIL_CC(0.00)[intel.com,davemloft.net,redhat.com,google.com,lunn.ch,vger.kernel.org,linux.intel.com,resnulli.us,kernel.org,lwn.net,gmail.com,ziepe.ca];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[kernel.org,gmx.de];
+	DKIM_TRACE(0.00)[uni-hannover.de:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukas.prause@ikt.uni-hannover.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 148C05A2D94
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[uni-hannover.de:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,ikt.uni-hannover.de:mid]
+X-Rspamd-Queue-Id: 5DD045A2B96
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 05:52:01PM -0700, Jakub Kicinski wrote:
-> On Fri, 15 May 2026 15:44:25 -0700 Tony Nguyen wrote:
-> > include/linux/intel is vacant
-> 
-> I don't see any other vendor directory under include/linux
 
-There are at least
+Thanks for the review.
 
-include/linux/mlx4, include/linux/mlx5 and include/linux/bnxt.
+On 5/16/26 03:12, Jakub Kicinski wrote:
+> Can the srRTT calculation cause a catastrophic integer underflow?
+> If a socket has not yet received a valid RTT sample, curr_rtt
+> remains 0. When roccettcp_cong_avoid() executes, it calls
+> update_min_rtt(), which computes curr_min_rtt as max(0, 1),
+> resulting in 1. Then update_srrtt()calculates curr_rtt -
+> curr_min_rtt (0 - 1). Since both are unsigned 32-bit integers, does
+> this underflow to 0xFFFFFFFF? Multiplying this by 100yields
+> 0xFFFFFF9C, which gets integrated into the curr_srrtt EWMA. Would
+> this resulting massive value instantly exceed the threshold and
+> falselytrigger a severe bufferbloat response that permanently
+> cripples the congestion window?
+Yes, this is a problem. We will add a check if curr_rtt < min_rtt
 
-Those are per-driver and not per-vendor, but intel ethernet has too many drivers 
-to have separate folders for them.
+> Are the congestion control state variables curr_rtt and curr_srrtt
+> properly initialized? In roccettcp_reset(), memset zeroes the
+> statestruct only up to the curr_rtt field, leaving curr_rtt and
+> curr_srrtt uninitialized. If a user dynamically switches an active
+> socket's congestion control to ROCCET via setsockopt, could the
+> icsk_ca_priv area contain leftover memory from the previous
+> algorithm? Might these garbage values be fed into the core RTT
+> logic, causing unpredictable bufferbloatdetection and spurious
+> throughput drops?
+We will initially initialize the whole struct to 0 using sizeof instead
+of offsetof.
 
-I just do not think this creates a precedent neccessarily.
+> Is it safe to expose internal TCP congestion control callbacks as
+> BPF kfuncs? The module natively hooks into the TCP stack, but it
+> annotates its static internal functions with __bpf_kfunc and exports
+> them via register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS). Does
+> this allow arbitrary BPF struct_ops programs to call these native
+> state-modifyingfunctions directly? Could a BPF program invoke these
+> functions on a socket using a different congestion control
+> algorithm, blindly casting sk->icsk_ca_priv to struct roccettcp and
+> corrupting the socket's internal state?
+Not sure which functions are meant.
+In my understanding, all exposed functions are the ones that
+algorithms like CUBIC, BBR, or dctcp also expose...
+The same problem (reinterpreting the memory layout of the private sk
+data as a roccet struct applies to the bbr struct in tcp_bbr.c. So I am
+unsure if we should just not expose the callbacks as kfuncs or leave
+them in)
 
-Folder structure is for you to decide as a maintainer, but it would be nice to 
-have known about such doubts earlier.
+> Could the 16-bit ACK rate counter wrap around on high-speed links?
+> The ack_rate.cnt field is defined as a u16, accumulating the number
+> of acknowledged segments over a 100ms interval. On modern fast
+> links, more than 83,000 segments can be acknowledged in a single
+> 100ms window. Will this silently overflow multiple times per
+> interval, recording an artificially low, randomized rate and
+> breaking the slow start exit conditions?
+That could well happen here. We will change the type to u32.
 
-> and TBH I don't want to be the maintainer making a precedent
-> for this sort of stuff. include/net/intel is a better choice.
-> Or rather, at least its in "our" section of the tree so nobody
-> will complain.
-> 
+> Does the interval boundary logic discard acknowledged packets? In
+> update_ack_rate(), when the 100ms interval rolls over, the interval
+> state rotates and ack_rate.cnt is reset to 0. This happens inside
+> an if/else block where the else branch contains the counter
+> increment. Because the else branch is bypassed during a rollover,
+> are any segments acknowledged by the specific ACK packet that
+> triggered the boundary cross permanently discarded, causing a
+> persistent undercounting of the throughput?
+Yes, should probably reset the counter to acked instead of back to 0.
+
+> Can a timestamp wraparound freeze ACK rate tracking for idle
+> connections? The update_ack_rate() function evaluates elapsed time
+> via an explicit signed cast of a 32-bit microsecond timestamp delta.
+> Since this timestamp wraps around roughly every 71 minutes, if a
+> socketremains idle for more than about 35 minutes, the unsigned
+> delta exceeds 0x7FFFFFFF. Would the signed cast convert this into
+> a large negative number, rendering the interval condition false,
+> freezing the interval logic, and causing the counter to accumulate
+> indefinitely without rotation?
+Yes, but usage of the after() function should resolve this. We will add
+this.
+
+> Are ECN marks being ignored and cached, leading to spurious later
+> drops? In roccet_in_ack_event(), receiving an ECE flag sets
+> ece_received to true. However, in roccettcp_cong_avoid(), this flag
+> is only evaluated and cleared if curr_srrtt exceeds roccet_xj. If
+> an ECN mark arrives while the RTT is low, is it ignored, leaving
+> ece_received stuck at true? Could this stale flag falsely trigger a
+> severe congestion window reduction hours later if the RTT naturally
+> spikes above the threshold?
+We will change this. ECN should always be handled.
+
+> Is there a division by zero vulnerability during module
+> initialization? The variables beta and bic_scale are configurable
+> module parameters. In roccettcp_register(), bic_scale is used
+> directly in a do_div() call, and beta is used in a denominator.
+> If the module isloaded with bic_scale set to 0 or beta set to 1024,
+> will this instantly cause a division-by-zero kernel panic?
+This is CUBIC's code. Should we add a check there?
+
+> Does the implementation match its stated ACK rate bufferbloat
+> detection mechanism? The commit message states that the rate is
+> sampled over 5 RTT intervals, and slow start exits if the rate stays
+> on the same level. However, the code uses a hardcoded 100ms
+> interval, and the exit condition only triggers if the new rate drops
+> by 10 or more segments. If the rate genuinely stays on the same
+> level, the difference is 0. Does this completely fail the check?
+The evaluation of the ack rate diff is faulty. In fact, it would
+evaluate false if it were true. We will change this.
 
