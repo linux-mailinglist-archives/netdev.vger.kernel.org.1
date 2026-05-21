@@ -1,997 +1,309 @@
-Return-Path: <netdev+bounces-290224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JB/KWxxDmq8+gUAu9opvQ
-	(envelope-from <netdev+bounces-290224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:43:56 +0200
+	id 8ETKBbZxDmq8+gUAu9opvQ
+	(envelope-from <netdev+bounces-290225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:45:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0803F59E2E7
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:43:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BF1A59E2F7
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B5424303745F
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:41:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F40A63013A61
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F99936AB56;
-	Thu, 21 May 2026 02:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61FB33783AE;
+	Thu, 21 May 2026 02:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b="OWuMXNpS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from monticello.secure-endpoints.com (monticello.secure-endpoints.com [208.125.0.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE70C3148C9;
-	Thu, 21 May 2026 02:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5371F377EDF
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 02:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.125.0.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779331275; cv=none; b=R6DHMW5IMQeP0chVOsCEfyiFtRSZHilEtVYjsRgAdSxTfDUqUsquMB2vYjgibSS5ZwIFbwvLtIEGML0noVqOJv9VcSSZb4XKK/P2kX+TRkM5SgvV6yAJVMmG2QzhUzvZreG890NCj2PEN0b9xM4rC9UBvPuAvIY77ai5htYESHI=
+	t=1779331348; cv=none; b=mhsM7oXwkSbcxr9kep+7PnVLc4XEV6V7vU5hKPaSA2zcVZc1k//tuVgcDzWDkMspeQ4b/90FK7NQ5G358blQFctyYVl5GfgD1bqy6T7H51aL2EyUEDg8gIYV/8FZgr7D4EGJu+mR5WX5/HSVHqR70jiM23i7KGIiPd+xgoR8WAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779331275; c=relaxed/simple;
-	bh=HnCpuZ4wKa3bnpfVoMDk6JPf0RPi/g4kKEDZvBbWIdE=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mhy+twODjrJ3h6mhvfU9I+FqLJjqZUIRD7SCx2DRNrjyFAxJi/tCDPXdakYIOXn4omWCZ+SVNRA5tuH5Y7redxsWcgK/V/WRZugSHPvTl8i9AJKxcy/j1KSkyqVr4pgU/rk/FYb0G8Gf2V9zaN0smI4n5oIgOhl+Gqxp2RsKFBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1wPtLP-0000000035f-3cqY;
-	Thu, 21 May 2026 02:41:08 +0000
-Date: Thu, 21 May 2026 03:41:05 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 4/4] net: dsa: mxl862xx: add support for SerDes ports
-Message-ID: <dba64139e769c0e8a2f829363ece1abc1ccea6fe.1779330653.git.daniel@makrotopia.org>
-References: <cover.1779330653.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1779331348; c=relaxed/simple;
+	bh=x5T+ME9TY2Jx5EAJTi8qwbQSFVWQa6nlIBCK/SKgh/k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WP3ASokCHwwdzIDYUrZfEAfrg2HJwtqddOCc4Bm1h42cwV4Ewnr3ZFvHy96QIz1wZqxupIXBFe7Bm/oWyUAVqjXh4EGqdhEwq2hyfr/sO4fvnBp5yklfBaaB8kCEAmkfwvEFE8s+7lHcS4QXt4n5pZJxVu5iV2jV3bE2rVFCoYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auristor.com; spf=pass smtp.mailfrom=auristor.com; dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b=OWuMXNpS; arc=none smtp.client-ip=208.125.0.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auristor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=auristor.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=auristor.com; s=MDaemon; r=y; l=2875; t=1779331310;
+	x=1779936110; i=jaltman@auristor.com; q=dns/txt; h=Message-ID:
+	Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	Content-Language:From:Autocrypt:Organization:
+	Disposition-Notification-To:In-Reply-To:Content-Type:
+	Content-Transfer-Encoding; z=Received:=20from=20[IPV6=3A2603=3A7
+	002=3A100=3A8400=3Aac07=3Aac1c=3A5feb=3Ac3e6]=20by=20auristor.co
+	m=20(IPv6=3A2001=3A470=3A1f07=3Af77=3Affff=3A=3A312)=20(MDaemon=
+	20PRO=20v26.0.2)=20=0D=0A=09with=20ESMTPSA=20id=20md500100529533
+	3.msg=3B=20Wed,=2020=20May=202026=2022=3A41=3A48=20-0400|Message
+	-ID:=20<c6b61797-b050-48ad-8ba1-8f19e338bdbc@auristor.com>|Date:
+	=20Wed,=2020=20May=202026=2022=3A42=3A20=20-0400|MIME-Version:=2
+	01.0|User-Agent:=20Mozilla=20Thunderbird|Subject:=20Re=3A=20[PAT
+	CH=20net]=20rxrpc=3A=20Fix=20the=20ACK=20parser=20to=20extract=2
+	0the=20SACK=20table=0D=0A=20for=20parsing|To:=20Jakub=20Kicinski
+	=20<kuba@kernel.org>,=20dhowells@redhat.com|Cc:=20netdev@vger.ke
+	rnel.org,=20michael.bommarito@gmail.com,=0D=0A=20marc.dionne@aur
+	istor.com,=20edumazet@google.com,=20davem@davemloft.net,=0D=0A=2
+	0pabeni@redhat.com,=20horms@kernel.org,=20linux-afs@lists.infrad
+	ead.org,=0D=0A=20stable@kernel.org|References:=20<488970.1779144
+	259@warthog.procyon.org.uk>=0D=0A=20<20260521021910.687776-2-kub
+	a@kernel.org>|Content-Language:=20en-US|From:=20Jeffrey=20E=20Al
+	tman=20<jaltman@auristor.com>|Autocrypt:=20addr=3Djaltman@aurist
+	or.com=3B=20keydata=3D=0D=0A=20xsFNBEwLlO0BEACu6yWFkd1+qwsGg8Zzg
+	slSkcAKhSegWt5j86DpaRL0W8fxg6YjxwEPvwoH=0D=0A=20BGa/rpSdBd1gkmze
+	YxD3hVZdj75r6nVS9f/mxNQzW+o1sW4vaeSxKgZSQz5RqHmwPDcqQP66=0D=0A=2
+	0+ZSnjV+G88MKwZ9DIzA9AwpJhNAAlAlj3OvsQVsxd1ipc6C4/U3qjHL7Ih22UbP
+	BM71ltIZx=0D=0A=20kqcrAlXPnUTeraJXtfzYbq4mJFJ9JC6/o1NRSjsBvRD+AD
+	xlG50+KccZN4SS5xxdGuh1tA9U=0D=0A=20TydYBQB3YtJbq7CYau2kIYt/3HnyL
+	YGo1s6Ti6cuAJJ/40iIE1xkqhvMiIz/Q+1ztmksJbLQ=0D=0A=20aCtW8kF42nF8
+	MpPdIPTSPr2uGvpRtCjRbh4lgMXgyNUx1wpCEY0X11xce++H8HySmFwryE2y=0D=
+	0A=20kkxUQeMUjaaXZDHYUSyQz7riChFiZ9ax9dmX0wUY/A05v0qcualglpk4wJ2
+	kcsGKUEGkLvnV=0D=0A=20wwvya8zifPwKOw5JlGPvzX8t2m7jB2GXKzvVAsImqO
+	qnDBTKUXWQQZCW9Rqt7acdE8bQ2vqr=0D=0A=20vP+3Ykf4SrPwcuNCDt6QSgjVb
+	hc3hA3hCtE1iW/HhuBAzKiuzJ9era+q9QjTtLPIkQDHRpcC=0D=0A=20MMWvK0Y1
+	uQ34Ql1BfKRA4gc8A7CuVUY6+Ga7PuJWd+FSglvmKQARAQABzTZKZWZmcmV5IEFs
+	=0D=0A=20dG1hbiAoQXVyaVN0b3IsIEluYy4pIDxqYWx0bWFuQGF1cmlzdG9yLmN
+	vbT7CwXkEEwECACMF=0D=0A=20AlY2YwgCGyMHCwkIBwMCAQYVCAIJCgsEFgIDAQ
+	IeAQIXgAAKCRD3enNVkraaBDdzD/0XQUDW=0D=0A=20UWXrpapHdvZaHzPHc3xob
+	Ri4PABWfLW1jfMK5Xy4DP/x7x3I2qAqTD6vv/OPFMx8gG6+Xeod=0D=0A=20Mj5v
+	E7+7ZRd+J76J4DJH2qoaXX8qnUEABUJHZYDhw2/Ij5AQ6ZsuSwXuURGEMi0vu1ih
+	BbP6=0D=0A=203bt4LRIa+F60ebDvCl9po+UB7TrjQCs+YV1r1YeCSv9hEHBly/W
+	0u1OrnNCMWRcq7dmTCbZ0=0D=0A=20R5w6VJ/+QEio+T6paGGMjJmrNw2qUeuK+S
+	xOOxOWS8lgdqzjcK3NsfiERrVbOWM83ZVy0/GN=0D=0A=20vpusjhI/3Q8lbV/p+
+	IsJk/v1grkRzgU0frES2ANEPTpC4j2ggPOSMpsz3BZ8wIOg17rIWnK+=0D=0A=20
+	gNLQe+XN7kvDwGu0jYhTIZO10jcVsRSrAJGtgBNrYxOjEUhpnaSJDVcjapRvRPCQ
+	umA13Zkl=0D=0A=20nm4AYjp7L2oOIeOGcKRZwbrGDakksa5iaSIoywpwECWh2l9
+	V0W3SeynBgPtR4qpt4N8yKCcw=0D=0A=20suLCAKfBv9RcL641XZi/Fp9btSuTPU
+	m5Lw3SIGr5U+SyezmhzlwsObIF9W624aorriWoXNf3=0D=0A=20GgH9ZH0Hkc6aS
+	99pIZhh5USWRO/pS+lv5eNkEdf9LUBGX9b6ZMan0fpoEayqUejtZw3O2rgs=0D=0
+	A=20zA+pTSA+/HobvtL6L3XtlPJ1NXlkgM7BTQRMC5TtARAA88hJdpgcg2RU/uAW
+	fAL46XZHA59c=0D=0A=20VpPNNly1tPWCSbG6+ONH6nOG/NarmNVxX6Mb9YRkEU6
+	wmrZS85inz3otdyz/zlyNSWma8qGN=0D=0A=20UlMbiwFQqfXWVBAPGoRC0a0aJr
+	d4IayLuvv1UqEwx7Otp7y5RNHtRv35/kho0Z+UheYVdGm2=0D=0A=20I06xIc+aN
+	KW2LO7R5BNtjpADPIG+NSdsVIeamhAWPvLrwbf6mUb//eA9pF0w0QixLVrH/cCo=
+	0D=0A=20z+S27gCGJvY6zF22NgdhnkIqNz8E/LKt6S36ZI9Mw/ixpQTozqRmdNzV
+	QNgTHUZClbJj4iq1=0D=0A=20EPHB7XqpxOv+awrxSxq2jt8GFD0rU+sAuzW+F7c
+	BoIw434/IrxKYwcPHpHLEVQ1tLP7d3ZpZ=0D=0A=20R30p3oqoliGiLsWvHHxyXj
+	uMBF4XJ6MRXmD65/qOhuo2DKduHMNlmxzgSzvWgXZeNJq+OcS8=0D=0A=20jQZDt
+	2Na2pMKjWytau7xQu2ndm0FwS48ngMrDYRQMxzL1NfnBnT9BCwjiU+/6NBSwcNKI
+	qye=0D=0A=20a9IpTwsVfkF4/iui7xD9+LtzqeUkBAe7q5jEJmJMZhAfh7usZGT8
+	TGxXegCaF4Jwz2nxS4Fv=0D=0A=207VRza/yUAOJlc0daR11TPeiUNCQWY7PpL1A
+	XO9vaSyjFuOzTnU8vzXvI9fGoxIxKGRQpKMU8=0D=0A=20PROIFw0AEQEAAcLBXw
+	QYAQIACQUCTAuU7QIbDAAKCRD3enNVkraaBIxXD/4xlaBwW2TLFfMv=0D=0A=20l
+	cY/2XDSm6NO4JaJG2Nzp35xaaBVwMVzWvI+GgTgKNSFot9f4jiLBNQdnq3UKoETh
+	R2ORKVL=0D=0A=200ZJS1QYR7yyrOo0MteDSy8ofU1FJ6xu4ND3ekOjP20BTrihD
+	pqUdahir2uaRfMkwM+0imOlc=0D=0A=20utGMhJNF/LAjrhoDp9SeDMYBXZ1wfrb
+	rEo/EEu0PbkGyzqPyEPqwN1iSJkcAnjuIA0rTf1jQ=0D=0A=20tJAaDov7yHsSRw
+	UM+qTGsjOGQAN3wtYwjPpw7hI01sE+x0uq0pVeo4qeWTZ2TE4Vtp8FKXFA=0D=0A
+	=20kqnP878q+kNk9Ve+DRs8UlRfa9Lgf5ETjXOTVGaT/UGxi9B4oo8k0lzvM/A1t
+	xexL/lLw8AU=0D=0A=20LhUeGtyS6D2X9vFi6azna+o918R9BV86uXPiDOf1nMwq
+	KchNCxmgH9vd0aQm8TKCrWAW4kU1=0D=0A=20Ig6aMNuZiWloVZfKrmWizbgeGKE
+	9rhNPNqxkqBaA4lrJ8L6bdKbhAOe3NQjO2vUAXB53Jphl=0D=0A=20F74GwEsh+8
+	5i9/yIbvwJVcsFYhdZz7fCAUOcnFkGnyrwIgkizQ3xXShPW8mqkgUk4kYMnucC=0
+	D=0A=204kG/E7pI/4lke5X5X9vroXRHB7tkpAgT46SqSM/XTwCaseXG9orDgz3du
+	RTUp6K0++S/qsqT=0D=0A=20akGVmjD5917A1HqWfMmiKA=3D=3D|Organizatio
+	n:=20AuriStor,=20Inc.|Disposition-Notification-To:=20Jeffrey=20E
+	=20Altman=20<jaltman@auristor.com>|In-Reply-To:=20<2026052102191
+	0.687776-2-kuba@kernel.org>|Content-Type:=20text/plain=3B=20char
+	set=3DUTF-8=3B=20format=3Dflowed|Content-Transfer-Encoding:=207b
+	it; bh=TnPTKbrZ4mb0wyA5sNGsf29pVVrp95nrvMMIIJRTLIo=; b=OWuMXNpSW
+	PYBjQejS99zjsIUq5/+Y/y2TBa/eJ0mkiZipeyp2vQ1IF1RSgQ7L9DW+mJb5lR4j
+	pqAXVvp2Cnf8HrZMpgfK4SxH7PUynAdFA+VeArfSpLCEV096eoiGBl2tmt+HB/JK
+	CH1n3h8nOyfXBSUX1WYN0XBGnbixxZNwtI=
+X-MDAV-Result: clean
+X-MDAV-Processed: monticello.secure-endpoints.com, Wed, 20 May 2026 22:41:50 -0400
+Received: from [IPV6:2603:7002:100:8400:ac07:ac1c:5feb:c3e6] by auristor.com (IPv6:2001:470:1f07:f77:ffff::312) (MDaemon PRO v26.0.2) 
+	with ESMTPSA id md5001005295333.msg; Wed, 20 May 2026 22:41:48 -0400
+X-Spam-Processed: monticello.secure-endpoints.com, Wed, 20 May 2026 22:41:48 -0400
+	(not processed: message from trusted or authenticated source)
+X-MDRemoteIP: 2603:7002:100:8400:ac07:ac1c:5feb:c3e6
+X-MDHelo: [IPV6:2603:7002:100:8400:ac07:ac1c:5feb:c3e6]
+X-MDArrival-Date: Wed, 20 May 2026 22:41:48 -0400
+X-MDOrigin-Country: US, NA
+X-Authenticated-Sender: jaltman@auristor.com
+X-Return-Path: prvs=1601107ed7=jaltman@auristor.com
+X-Envelope-From: jaltman@auristor.com
+X-MDaemon-Deliver-To: netdev@vger.kernel.org
+Message-ID: <c6b61797-b050-48ad-8ba1-8f19e338bdbc@auristor.com>
+Date: Wed, 20 May 2026 22:42:20 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1779330653.git.daniel@makrotopia.org>
-X-Spamd-Result: default: False [-0.46 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] rxrpc: Fix the ACK parser to extract the SACK table
+ for parsing
+To: Jakub Kicinski <kuba@kernel.org>, dhowells@redhat.com
+Cc: netdev@vger.kernel.org, michael.bommarito@gmail.com,
+ marc.dionne@auristor.com, edumazet@google.com, davem@davemloft.net,
+ pabeni@redhat.com, horms@kernel.org, linux-afs@lists.infradead.org,
+ stable@kernel.org
+References: <488970.1779144259@warthog.procyon.org.uk>
+ <20260521021910.687776-2-kuba@kernel.org>
+Content-Language: en-US
+From: Jeffrey E Altman <jaltman@auristor.com>
+Autocrypt: addr=jaltman@auristor.com; keydata=
+ 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
+ akGVmjD5917A1HqWfMmiKA==
+Organization: AuriStor, Inc.
+Disposition-Notification-To: Jeffrey E Altman <jaltman@auristor.com>
+In-Reply-To: <20260521021910.687776-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-MDCFSigsAdded: auristor.com
+X-Spamd-Result: default: False [1.34 / 15.00];
+	HEADER_FORGED_MDN(2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[auristor.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[auristor.com:s=MDaemon];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290224-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[makrotopia.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290225-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	HAS_X_AS(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,auristor.com,google.com,davemloft.net,redhat.com,kernel.org,lists.infradead.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jaltman@auristor.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[auristor.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,makrotopia.org:mid,makrotopia.org:email,st.link:url]
-X-Rspamd-Queue-Id: 0803F59E2E7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,auristor.com:mid,auristor.com:dkim]
+X-Rspamd-Queue-Id: 1BF1A59E2F7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The MxL862xx has two XPCS/SerDes interfaces (XPCS0 for ports 9-12,
-XPCS1 for ports 13-16). Each can operate in various single-lane modes
-(SGMII, 1000Base-X, 2500Base-X, 10GBase-R, 10GBase-KR, USXGMII) or as
-QSGMII or 10G_QXGMII providing four sub-ports per interface.
 
-Implement phylink PCS operations using the firmware's XPCS API:
+On 5/20/2026 10:19 PM, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> rxrpc: Fix the ACK parser to extract the SACK table for parsing
+>
+> This commit fixes modification of the received skbuff and incorrect access
+> of the buffer in fragmented UDP packets during SACK table parsing. It copies
+> out the contents of the SACK table into a flat stack buffer instead of
+> relying on skb_condense().
+>
+> Link: https://lore.kernel.org/r/20260513180907.2061972-1-michael.bommarito@gmail.com
+>
+>> diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+>> index 24aceb183c2c3..0c15ebf19eae9 100644
+>> --- a/net/rxrpc/input.c
+>> +++ b/net/rxrpc/input.c
+>> @@ -963,21 +963,34 @@ static void rxrpc_input_soft_acks(struct rxrpc_call *call,
+>>   	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+>>   	struct rxrpc_txqueue *tq = call->tx_queue;
+>>   	unsigned long extracted = ~0UL;
+>> -	unsigned int nr = 0;
+>> +	unsigned int nr = 0, nsack;
+>>   	rxrpc_seq_t seq = call->acks_hard_ack + 1;
+>>   	rxrpc_seq_t lowest_nak = seq + sp->ack.nr_acks;
+>> -	u8 *acks = skb->data + sizeof(struct rxrpc_wire_header) + sizeof(struct rxrpc_ackpacket);
+>> +	u8 sack[256] __aligned(sizeof(unsigned long));
+>> +	u8 *acks = sack;
+> [ ... ]
+>
+>>   	for (unsigned int i = 0; i < sp->ack.nr_acks; i++) {
+>>   		/* Decant ACKs until we hit a txqueue boundary. */
+>>   		shiftr_adv_rotr(acks, extracted);
+>>   		if (i == 256) {
+>> -			acks -= i;
+>> +			acks = sack;
+>>   			i = 0;
+>>   		}
+> Can this lead to an out-of-bounds access and an infinite loop if
+> sp->ack.nr_acks is greater than 256?
+>
+> If a received packet has sp->ack.nr_acks > 256, on the 257th iteration
+> (where i == 256), the shiftr_adv_rotr(acks, extracted) macro will execute
+> before the wrap-around check resets the acks pointer.
+>
+> Since the acks pointer has been incremented 256 times by previous iterations,
+> wouldn't it point to sack + 256 at this point, causing an out-of-bounds read
+> and write on the sack[] array?
+>
+> Furthermore, resetting i to 0 inside the loop means the loop's i++
+> operation will set it to 1 for the next iteration. Because the counter is
+> reset without breaking out of the loop, will this ever terminate if
+> sp->ack.nr_acks > 256, or will it cycle infinitely and eventually cause a NULL
+> pointer dereference when tq->next runs out of transmit queues?
 
-  - pcs_config: configure negotiation mode and CL37/SGMII advertising.
-  - pcs_get_state: read link/speed/duplex/LPA from firmware and decode
-    using phylink's standard CL37, SGMII, and USXGMII decoders, with
-    firmware-resolved speed/duplex override for downshift detection.
-  - pcs_an_restart: restart CL37 or CL73 auto-negotiation.
-  - pcs_link_up: force speed/duplex for SGMII.
-  - pcs_inband_caps: report per-mode in-band status capabilities.
+Due to the lack of support for Extended SACK within the current rxrpc 
+implementation the value of ack.nr_acks cannot exceed 255. The value of 
+ack.nr_acks is assigned in rxrpc_extract_header() from the struct 
+rxrpc_ackpacket.nAcks field which is an unsigned 8-bit value whose 
+maximum is 255.
 
-Register a PCS instance for each SerDes interface and
-QSGMII/10G_QXGMII sub-ports during setup. Advertise the supported
-interface modes in phylink_get_caps based on port number.
+When support for Extended SACK tables is added the processing in 
+rxrpc_input_soft_acks() must be updated.
 
-Lacking support for expressing PHY-side role modes in Linux only the
-MAC-side of SGMII, QSGMII, USXGMII and 10G_QXGMII are implemented for
-now.
+Jeffrey Altman
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v2:
- * add __{LE,BE}_BITFIELD layouts to ABI structs
- * per-sub-port QSGMII AN restart via usx_subport / usx_lane_mode
- * shared-SerDes refcount in pcs_disable via per-XPCS slot bitmap
- * let every sub-port call pcs_config
- * cache phy_interface_t instead of firmware type
- * skip pcs_link_up when inband-AN enabled
- * gate phylink_get_caps SerDes modes on same FW version as select_pcs
- * interpret xpcs_pcs_cfg.result as signed (s16)
- * drop dead MXL862XX_PCS_PORT macro
- * drop misleading "downshift detection" line from commit message
 
- drivers/net/dsa/mxl862xx/mxl862xx-api.h     | 358 ++++++++++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-cmd.h     |   9 +
- drivers/net/dsa/mxl862xx/mxl862xx-phylink.c | 332 +++++++++++++++++-
- drivers/net/dsa/mxl862xx/mxl862xx-phylink.h |   7 +
- drivers/net/dsa/mxl862xx/mxl862xx.c         |   6 +-
- drivers/net/dsa/mxl862xx/mxl862xx.h         |  31 ++
- 6 files changed, 740 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-api.h b/drivers/net/dsa/mxl862xx/mxl862xx-api.h
-index fb21ddc1bf1c..f55544772376 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx-api.h
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-api.h
-@@ -1366,4 +1366,362 @@ struct mxl862xx_rmon_port_cnt {
- 	__le64 tx_good_bytes;
- } __packed;
- 
-+/**
-+ * enum mxl862xx_xpcs_if_mode - XPCS interface mode
-+ * @MXL862XX_XPCS_IF_SGMII: SGMII
-+ * @MXL862XX_XPCS_IF_1000BASEX: 1000BASE-X
-+ * @MXL862XX_XPCS_IF_2500BASEX: 2500BASE-X
-+ * @MXL862XX_XPCS_IF_USXGMII: USXGMII (single or quad)
-+ * @MXL862XX_XPCS_IF_10GBASER: 10GBASE-R
-+ * @MXL862XX_XPCS_IF_10GKR: 10GBASE-KR
-+ * @MXL862XX_XPCS_IF_5GBASER: 5GBASE-R
-+ * @MXL862XX_XPCS_IF_QSGMII: QSGMII
-+ */
-+enum mxl862xx_xpcs_if_mode {
-+	MXL862XX_XPCS_IF_SGMII = 0,
-+	MXL862XX_XPCS_IF_1000BASEX = 1,
-+	MXL862XX_XPCS_IF_2500BASEX = 2,
-+	MXL862XX_XPCS_IF_USXGMII = 3,
-+	MXL862XX_XPCS_IF_10GBASER = 4,
-+	MXL862XX_XPCS_IF_10GKR = 5,
-+	MXL862XX_XPCS_IF_5GBASER = 6,
-+	MXL862XX_XPCS_IF_QSGMII = 7,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_neg_mode - PCS negotiation mode
-+ * @MXL862XX_XPCS_NEG_NONE: no inband negotiation
-+ * @MXL862XX_XPCS_NEG_INBAND_AN_OFF: inband selected but AN disabled
-+ * @MXL862XX_XPCS_NEG_INBAND_AN_ON: inband with AN enabled
-+ */
-+enum mxl862xx_xpcs_neg_mode {
-+	MXL862XX_XPCS_NEG_NONE = 0,
-+	MXL862XX_XPCS_NEG_INBAND_AN_OFF = 1,
-+	MXL862XX_XPCS_NEG_INBAND_AN_ON = 2,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_role - PCS protocol role
-+ * @MXL862XX_XPCS_ROLE_MAC: local end is MAC side (TX_CONFIG = 0)
-+ * @MXL862XX_XPCS_ROLE_PHY: local end is PHY side (TX_CONFIG = 1)
-+ *
-+ * Selects the role the XPCS plays in protocols that have an asymmetric
-+ * AN code word (Cisco SGMII / QSGMII / USXGMII). Drives
-+ * VR_MII_AN_CTRL.TX_CONFIG: 0 means the local end receives the partner's
-+ * AN word, 1 means it sources one. Ignored for symmetric protocols
-+ * (1000BASE-X, 2500BASE-X, 10GBASE-R/KR).
-+ */
-+enum mxl862xx_xpcs_role {
-+	MXL862XX_XPCS_ROLE_MAC = 0,
-+	MXL862XX_XPCS_ROLE_PHY = 1,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_usx_lane_mode - USXGMII lane mode
-+ * @MXL862XX_XPCS_USX_SINGLE: single USXGMII lane
-+ * @MXL862XX_XPCS_USX_QUAD: quad USXGMII (4 ports per lane)
-+ */
-+enum mxl862xx_xpcs_usx_lane_mode {
-+	MXL862XX_XPCS_USX_SINGLE = 0,
-+	MXL862XX_XPCS_USX_QUAD = 1,
-+};
-+
-+/**
-+ * union mxl862xx_xpcs_an_word - XPCS AN code word, tagged by interface mode
-+ * @cl37: 16-bit base-page word exchanged over the CL37 hardware AN path
-+ *        (SR_MII_AN_ADV on write, SR_MII_LP_BABL on read). Carries the
-+ *        802.3 CL37 base page for 1000BASE-X/2500BASE-X and the Cisco
-+ *        SGMII config word for SGMII/QSGMII.
-+ * @usx: USXGMII 16-bit AN code word, MDIO_USXGMII_* layout
-+ * @cl73: CL73 48-bit base page (10GBASE-KR), three 16-bit registers per
-+ *        802.3 Annex 28C
-+ * @cl73.adv1: CL73 SR_AN_ADV1 / SR_AN_LP_ABL1
-+ * @cl73.adv2: CL73 SR_AN_ADV2 / SR_AN_LP_ABL2
-+ * @cl73.adv3: CL73 SR_AN_ADV3 / SR_AN_LP_ABL3
-+ *
-+ * The host picks the right member based on the interface field of the
-+ * surrounding struct (and, for the asymmetric protocols, on the role).
-+ */
-+union mxl862xx_xpcs_an_word {
-+	__le16 cl37;
-+	__le16 usx;
-+	struct {
-+		__le16 adv1;
-+		__le16 adv2;
-+		__le16 adv3;
-+	} cl73;
-+} __packed;
-+
-+/**
-+ * enum mxl862xx_xpcs_speed - PCS speed values
-+ * @MXL862XX_XPCS_SPEED_UNKNOWN: unknown speed
-+ * @MXL862XX_XPCS_SPEED_10: 10 Mbps
-+ * @MXL862XX_XPCS_SPEED_100: 100 Mbps
-+ * @MXL862XX_XPCS_SPEED_1000: 1000 Mbps
-+ * @MXL862XX_XPCS_SPEED_2500: 2500 Mbps
-+ * @MXL862XX_XPCS_SPEED_5000: 5000 Mbps
-+ * @MXL862XX_XPCS_SPEED_10000: 10000 Mbps
-+ */
-+enum mxl862xx_xpcs_speed {
-+	MXL862XX_XPCS_SPEED_UNKNOWN = 0,
-+	MXL862XX_XPCS_SPEED_10 = 10,
-+	MXL862XX_XPCS_SPEED_100 = 100,
-+	MXL862XX_XPCS_SPEED_1000 = 1000,
-+	MXL862XX_XPCS_SPEED_2500 = 2500,
-+	MXL862XX_XPCS_SPEED_5000 = 5000,
-+	MXL862XX_XPCS_SPEED_10000 = 10000,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_duplex - PCS duplex mode
-+ * @MXL862XX_XPCS_DUPLEX_HALF: half duplex
-+ * @MXL862XX_XPCS_DUPLEX_FULL: full duplex
-+ */
-+enum mxl862xx_xpcs_duplex {
-+	MXL862XX_XPCS_DUPLEX_HALF = 0,
-+	MXL862XX_XPCS_DUPLEX_FULL = 1,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_loopback_mode - XPCS loopback mode
-+ * @MXL862XX_XPCS_LB_DISABLE: disable all loopback
-+ * @MXL862XX_XPCS_LB_PCS_SERIAL: PCS TX-to-RX serial loopback
-+ * @MXL862XX_XPCS_LB_PCS_PARALLEL: PCS RX-to-TX parallel loopback
-+ * @MXL862XX_XPCS_LB_PMA_SERIAL: PMA TX-to-RX serial loopback
-+ * @MXL862XX_XPCS_LB_PMA_PARALLEL: PMA RX-to-TX parallel loopback
-+ */
-+enum mxl862xx_xpcs_loopback_mode {
-+	MXL862XX_XPCS_LB_DISABLE = 0,
-+	MXL862XX_XPCS_LB_PCS_SERIAL = 1,
-+	MXL862XX_XPCS_LB_PCS_PARALLEL = 2,
-+	MXL862XX_XPCS_LB_PMA_SERIAL = 3,
-+	MXL862XX_XPCS_LB_PMA_PARALLEL = 4,
-+};
-+
-+/**
-+ * enum mxl862xx_xpcs_reset_type - XPCS reset type
-+ * @MXL862XX_XPCS_RESET_VR: vendor-specific reset (fast)
-+ * @MXL862XX_XPCS_RESET_SOFT: PCS soft reset
-+ * @MXL862XX_XPCS_RESET_HARD: full hardware reset
-+ */
-+enum mxl862xx_xpcs_reset_type {
-+	MXL862XX_XPCS_RESET_VR = 0,
-+	MXL862XX_XPCS_RESET_SOFT = 1,
-+	MXL862XX_XPCS_RESET_HARD = 2,
-+};
-+
-+/**
-+ * struct mxl862xx_xpcs_pcs_cfg - PCS configuration parameters
-+ * @port_id: XPCS port index (0-3)
-+ * @interface: PCS interface mode. See &enum mxl862xx_xpcs_if_mode
-+ * @neg_mode: PCS negotiation mode. See &enum mxl862xx_xpcs_neg_mode
-+ * @permit_pause: Allow pause to MAC
-+ * @usx_lane_mode: USXGMII lane mode.
-+ *                 See &enum mxl862xx_xpcs_usx_lane_mode
-+ * @role: PCS protocol role. See &enum mxl862xx_xpcs_role
-+ * @usx_subport: Sub-port (0-3) within the XPCS. Used by the firmware
-+ *               to set MAC pause per sub-port; ignored for the
-+ *               XPCS-wide bringup, which is idempotent across slots.
-+ * @advertising: AN code word the local end transmits. The active union
-+ *               member is selected by @interface (and, for the asymmetric
-+ *               protocols, by @role). Ignored when the local end does
-+ *               not transmit an AN word (role=MAC for SGMII/QSGMII/
-+ *               USXGMII, 10GBASE-R, 5GBASE-R) or when @neg_mode is not
-+ *               INBAND_AN_ON. Pass all-zero to keep the firmware default
-+ *               advertisement.
-+ * @result: Firmware result. >0 means the host must follow with an AN
-+ *          restart, 0 means no host follow-up is needed, <0 is an errno.
-+ */
-+struct mxl862xx_xpcs_pcs_cfg {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+	u8 port_id:2;
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 neg_mode:2; /* enum mxl862xx_xpcs_neg_mode */
-+	u8 permit_pause:1;
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 role:1; /* enum mxl862xx_xpcs_role */
-+	u8 usx_subport:2;
-+#elif defined(__BIG_ENDIAN_BITFIELD)
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 port_id:2;
-+	u8 usx_subport:2;
-+	u8 role:1; /* enum mxl862xx_xpcs_role */
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 permit_pause:1;
-+	u8 neg_mode:2; /* enum mxl862xx_xpcs_neg_mode */
-+#else
-+#error "Unknown bitfield endianness"
-+#endif
-+	union mxl862xx_xpcs_an_word advertising;
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_pcs_state - PCS link state
-+ * @port_id: XPCS port index (0-3) (input)
-+ * @interface: PCS interface mode (input).
-+ *             See &enum mxl862xx_xpcs_if_mode
-+ * @usx_lane_mode: USX lane mode (input)
-+ * @usx_subport: USX sub-port 0-3 (input)
-+ * @link: Link up (1) / down (0) (output)
-+ * @an_complete: Auto-negotiation complete (output)
-+ * @duplex: Duplex mode (output). See &enum mxl862xx_xpcs_duplex
-+ * @pcs_fault: PCS fault (output)
-+ * @pause: Pause negotiation result, bit 0 symmetric, bit 1 asymmetric
-+ *         (output)
-+ * @lp_eee_cap: Link partner supports EEE (output)
-+ * @lp_eee_cs_cap: Link partner supports EEE clock-stop (output)
-+ * @__rsv: reserved
-+ * @__pad: padding
-+ * @speed: Resolved speed (output). See &enum mxl862xx_xpcs_speed
-+ * @lpa: Link partner ability word (output). Same union as
-+ *       &union mxl862xx_xpcs_an_word; the host picks the member based on
-+ *       @interface.
-+ */
-+struct mxl862xx_xpcs_pcs_state {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+	u8 port_id:2;
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 usx_subport:2;
-+	u8 link:1;
-+	u8 an_complete:1;
-+	u8 duplex:1; /* enum mxl862xx_xpcs_duplex */
-+	u8 pcs_fault:1;
-+	u8 pause:2;
-+	u8 lp_eee_cap:1;
-+	u8 lp_eee_cs_cap:1;
-+	u8 __rsv:4;
-+#elif defined(__BIG_ENDIAN_BITFIELD)
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 port_id:2;
-+	u8 pcs_fault:1;
-+	u8 duplex:1; /* enum mxl862xx_xpcs_duplex */
-+	u8 an_complete:1;
-+	u8 link:1;
-+	u8 usx_subport:2;
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 __rsv:4;
-+	u8 lp_eee_cs_cap:1;
-+	u8 lp_eee_cap:1;
-+	u8 pause:2;
-+#else
-+#error "Unknown bitfield endianness"
-+#endif
-+	u8 __pad;
-+	__le16 speed; /* enum mxl862xx_xpcs_speed */
-+	union mxl862xx_xpcs_an_word lpa;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_pcs_disable - PCS disable parameters
-+ * @port_id: XPCS port index
-+ * @__pad: padding
-+ * @result: Firmware result. 0 on success, <0 on error.
-+ *
-+ * Asserts IDDQ + PHY + XPCS resets to power down the SERDES when the
-+ * port is admin-down or no module is plugged in. The next PCS config
-+ * implicitly powers it back up and reprograms the desired interface.
-+ */
-+struct mxl862xx_xpcs_pcs_disable {
-+	u8 port_id;
-+	u8 __pad;
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_an_restart - AN restart parameters
-+ * @port_id: XPCS port index (0-3)
-+ * @interface: PCS interface mode. See &enum mxl862xx_xpcs_if_mode
-+ * @usx_lane_mode: USX lane mode
-+ * @usx_subport: Sub-port (0-3) within the XPCS. Selects the lane
-+ *               whose AN is restarted for QSGMII and QUSXGMII;
-+ *               ignored by single-lane modes.
-+ * @__rsv: reserved
-+ * @result: Firmware result. 0 on success, <0 on error.
-+ *
-+ * Restarts auto-negotiation on a single sub-port of the XPCS. The
-+ * SERDES must already be configured.
-+ */
-+struct mxl862xx_xpcs_an_restart {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+	u8 port_id:2;
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 usx_subport:2;
-+	u8 __rsv:4;
-+#elif defined(__BIG_ENDIAN_BITFIELD)
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 port_id:2;
-+	u8 __rsv:4;
-+	u8 usx_subport:2;
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+#else
-+#error "Unknown bitfield endianness"
-+#endif
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_pcs_link_up - PCS link-up parameters
-+ * @port_id: XPCS port index (0-3)
-+ * @interface: PCS interface mode. See &enum mxl862xx_xpcs_if_mode
-+ * @duplex: Duplex mode. See &enum mxl862xx_xpcs_duplex
-+ * @usx_lane_mode: USX lane mode (USXGMII only; ignored otherwise).
-+ *                 See &enum mxl862xx_xpcs_usx_lane_mode
-+ * @usx_subport: USX sub-port 0-3 (QUSXGMII only; ignored otherwise)
-+ * @__rsv0: reserved
-+ * @speed: Resolved speed. See &enum mxl862xx_xpcs_speed
-+ * @result: Firmware result. 0 on success, <0 is errno.
-+ *
-+ * Called once per link-up event after the host has resolved the
-+ * line-side speed/duplex (from the PHY's read_status, from a preceding
-+ * PCS get-state, or from a fixed-link description).
-+ */
-+struct mxl862xx_xpcs_pcs_link_up {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+	u8 port_id:2;
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 duplex:1; /* enum mxl862xx_xpcs_duplex */
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 usx_subport:2;
-+	u8 __rsv0:3;
-+#elif defined(__BIG_ENDIAN_BITFIELD)
-+	u8 interface:6; /* enum mxl862xx_xpcs_if_mode */
-+	u8 port_id:2;
-+	u8 __rsv0:3;
-+	u8 usx_subport:2;
-+	u8 usx_lane_mode:2; /* enum mxl862xx_xpcs_usx_lane_mode */
-+	u8 duplex:1; /* enum mxl862xx_xpcs_duplex */
-+#else
-+#error "Unknown bitfield endianness"
-+#endif
-+	__le16 speed; /* enum mxl862xx_xpcs_speed */
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_loopback_cfg - loopback control
-+ * @port_id: XPCS port index
-+ * @mode: loopback mode. See &enum mxl862xx_xpcs_loopback_mode
-+ * @result: firmware result
-+ */
-+struct mxl862xx_xpcs_loopback_cfg {
-+	u8 port_id;
-+	u8 mode; /* enum mxl862xx_xpcs_loopback_mode */
-+	__le16 result;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_xpcs_reset_cfg - XPCS reset
-+ * @port_id: XPCS port index
-+ * @reset_type: reset type. See &enum mxl862xx_xpcs_reset_type
-+ * @result: firmware result
-+ */
-+struct mxl862xx_xpcs_reset_cfg {
-+	u8 port_id;
-+	u8 reset_type; /* enum mxl862xx_xpcs_reset_type */
-+	__le16 result;
-+} __packed;
-+
- #endif /* __MXL862XX_API_H */
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-index f1ea40aa7ea0..c87a955c13c4 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-@@ -24,6 +24,7 @@
- #define MXL862XX_SS_MAGIC		0x1600
- #define GPY_GPY2XX_MAGIC		0x1800
- #define SYS_MISC_MAGIC			0x1900
-+#define MXL862XX_XPCS_MAGIC		0x1a00
- 
- #define MXL862XX_COMMON_CFGGET		(MXL862XX_COMMON_MAGIC + 0x9)
- #define MXL862XX_COMMON_CFGSET		(MXL862XX_COMMON_MAGIC + 0xa)
-@@ -71,6 +72,14 @@
- 
- #define SYS_MISC_FW_VERSION		(SYS_MISC_MAGIC + 0x2)
- 
-+#define MXL862XX_XPCS_PCS_CONFIG	(MXL862XX_XPCS_MAGIC + 0x1)
-+#define MXL862XX_XPCS_PCS_GET_STATE	(MXL862XX_XPCS_MAGIC + 0x2)
-+#define MXL862XX_XPCS_PCS_DISABLE	(MXL862XX_XPCS_MAGIC + 0x4)
-+#define MXL862XX_XPCS_AN_RESTART	(MXL862XX_XPCS_MAGIC + 0x5)
-+#define MXL862XX_XPCS_PCS_LINK_UP	(MXL862XX_XPCS_MAGIC + 0x7)
-+#define MXL862XX_XPCS_LOOPBACK		(MXL862XX_XPCS_MAGIC + 0x8)
-+#define MXL862XX_XPCS_RESET		(MXL862XX_XPCS_MAGIC + 0x9)
-+
- #define MMD_API_MAXIMUM_ID		0x7fff
- 
- #endif /* __MXL862XX_CMD_H */
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
-index f17c429d1f1d..55be53d77cec 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
-@@ -11,16 +11,343 @@
- #include <net/dsa.h>
- 
- #include "mxl862xx.h"
-+#include "mxl862xx-api.h"
-+#include "mxl862xx-cmd.h"
-+#include "mxl862xx-host.h"
- #include "mxl862xx-phylink.h"
- 
- void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
- 			       struct phylink_config *config)
- {
-+	struct mxl862xx_priv *priv = ds->priv;
-+
- 	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 |
- 				   MAC_100 | MAC_1000 | MAC_2500FD;
- 
--	__set_bit(PHY_INTERFACE_MODE_INTERNAL,
--		  config->supported_interfaces);
-+	switch (port) {
-+	case 1 ... 8:
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+			  config->supported_interfaces);
-+		break;
-+	case 9:
-+	case 13:
-+		if (!MXL862XX_FW_VER_MIN(priv, 1, 0, 84))
-+			break;
-+		__set_bit(PHY_INTERFACE_MODE_SGMII, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_2500BASEX, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10GBASER, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10GKR, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_USXGMII, config->supported_interfaces);
-+		fallthrough;
-+	case 10 ... 12:
-+	case 14 ... 16:
-+		if (!MXL862XX_FW_VER_MIN(priv, 1, 0, 84))
-+			break;
-+		__set_bit(PHY_INTERFACE_MODE_QSGMII, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, config->supported_interfaces);
-+
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	if (port == 9 || port == 13)
-+		config->mac_capabilities |= MAC_10000FD | MAC_5000FD;
-+}
-+
-+static struct mxl862xx_pcs *pcs_to_mxl862xx_pcs(struct phylink_pcs *pcs)
-+{
-+	return container_of(pcs, struct mxl862xx_pcs, pcs);
-+}
-+
-+static int mxl862xx_xpcs_if_mode(phy_interface_t interface)
-+{
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+		return MXL862XX_XPCS_IF_SGMII;
-+	case PHY_INTERFACE_MODE_QSGMII:
-+		return MXL862XX_XPCS_IF_QSGMII;
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+		return MXL862XX_XPCS_IF_1000BASEX;
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		return MXL862XX_XPCS_IF_2500BASEX;
-+	case PHY_INTERFACE_MODE_USXGMII:
-+	case PHY_INTERFACE_MODE_10G_QXGMII:
-+		return MXL862XX_XPCS_IF_USXGMII;
-+	case PHY_INTERFACE_MODE_10GBASER:
-+		return MXL862XX_XPCS_IF_10GBASER;
-+	case PHY_INTERFACE_MODE_10GKR:
-+		return MXL862XX_XPCS_IF_10GKR;
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
-+static int mxl862xx_xpcs_neg_mode(unsigned int neg_mode)
-+{
-+	if (!(neg_mode & PHYLINK_PCS_NEG_INBAND))
-+		return MXL862XX_XPCS_NEG_NONE;
-+	if (neg_mode & PHYLINK_PCS_NEG_ENABLED)
-+		return MXL862XX_XPCS_NEG_INBAND_AN_ON;
-+	return MXL862XX_XPCS_NEG_INBAND_AN_OFF;
-+}
-+
-+static void mxl862xx_pcs_disable(struct phylink_pcs *pcs)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_pcs_disable dis = {};
-+
-+	/* The SerDes is shared across QSGMII/QUSXGMII sub-ports; only
-+	 * power it down once the last active sub-port goes away.
-+	 */
-+	priv->serdes_active[mpcs->serdes_id] &= ~BIT(mpcs->slot);
-+	if (priv->serdes_active[mpcs->serdes_id])
-+		return;
-+
-+	dis.port_id = mpcs->serdes_id;
-+
-+	MXL862XX_API_WRITE(priv, MXL862XX_XPCS_PCS_DISABLE, dis);
-+}
-+
-+static int mxl862xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+			       phy_interface_t interface,
-+			       const unsigned long *advertising,
-+			       bool permit_pause_to_mac)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_pcs_cfg cfg = {};
-+	int if_mode, ret;
-+	u16 adv;
-+
-+	mpcs->interface = interface;
-+	priv->serdes_active[mpcs->serdes_id] |= BIT(mpcs->slot);
-+
-+	if_mode = mxl862xx_xpcs_if_mode(interface);
-+	if (if_mode < 0) {
-+		dev_err(priv->ds->dev, "unsupported interface: %s\n",
-+			phy_modes(interface));
-+		return if_mode;
-+	}
-+
-+	/* The XPCS bringup is per-instance and idempotent in the
-+	 * firmware: every QSGMII/QUSXGMII sub-port may call pcs_config
-+	 * and the firmware will skip the bringup if the requested mode
-+	 * matches the cached one, then update MAC pause for the
-+	 * sub-port indicated by @usx_subport.
-+	 */
-+	cfg.port_id = mpcs->serdes_id;
-+	cfg.usx_subport = mpcs->slot;
-+	cfg.usx_lane_mode = (interface == PHY_INTERFACE_MODE_10G_QXGMII) ?
-+			    MXL862XX_XPCS_USX_QUAD : MXL862XX_XPCS_USX_SINGLE;
-+	cfg.interface = if_mode;
-+	cfg.neg_mode = mxl862xx_xpcs_neg_mode(neg_mode);
-+	cfg.role = MXL862XX_XPCS_ROLE_MAC;
-+	cfg.permit_pause = permit_pause_to_mac ? 1 : 0;
-+
-+	if (neg_mode & PHYLINK_PCS_NEG_INBAND) {
-+		switch (interface) {
-+		case PHY_INTERFACE_MODE_1000BASEX:
-+		case PHY_INTERFACE_MODE_2500BASEX:
-+			adv = linkmode_adv_to_mii_adv_x(advertising,
-+				ETHTOOL_LINK_MODE_1000baseX_Full_BIT);
-+			cfg.advertising.cl37 = cpu_to_le16(adv);
-+			break;
-+		case PHY_INTERFACE_MODE_SGMII:
-+		case PHY_INTERFACE_MODE_QSGMII:
-+			cfg.advertising.cl37 = cpu_to_le16(ADVERTISE_SGMII);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	ret = MXL862XX_API_READ(priv, MXL862XX_XPCS_PCS_CONFIG, cfg);
-+	if (ret)
-+		return ret;
-+
-+	return (s16)le16_to_cpu(cfg.result) > 0 ? 1 : 0;
-+}
-+
-+static void mxl862xx_pcs_get_state(struct phylink_pcs *pcs,
-+				   unsigned int neg_mode,
-+				   struct phylink_link_state *state)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_pcs_state st = {};
-+	int if_mode, ret;
-+	u16 bmsr;
-+
-+	if_mode = mxl862xx_xpcs_if_mode(state->interface);
-+	if (if_mode < 0)
-+		return;
-+
-+	st.port_id = mpcs->serdes_id;
-+	st.interface = if_mode;
-+	st.usx_subport = mpcs->slot;
-+
-+	ret = MXL862XX_API_READ(priv, MXL862XX_XPCS_PCS_GET_STATE, st);
-+	if (ret)
-+		return;
-+
-+	state->link = st.link && !st.pcs_fault;
-+	state->an_complete = st.an_complete;
-+
-+	switch (state->interface) {
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+	case PHY_INTERFACE_MODE_SGMII:
-+	case PHY_INTERFACE_MODE_QSGMII:
-+		bmsr = (state->link ? BMSR_LSTATUS : 0) |
-+		       (state->an_complete ? BMSR_ANEGCOMPLETE : 0);
-+		phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr,
-+						 le16_to_cpu(st.lpa.cl37));
-+		break;
-+
-+	case PHY_INTERFACE_MODE_USXGMII:
-+	case PHY_INTERFACE_MODE_10G_QXGMII:
-+		if (state->link)
-+			phylink_decode_usxgmii_word(state,
-+						    le16_to_cpu(st.lpa.usx));
-+		break;
-+
-+	case PHY_INTERFACE_MODE_10GBASER:
-+	case PHY_INTERFACE_MODE_10GKR:
-+		if (state->link) {
-+			state->speed = SPEED_10000;
-+			state->duplex = DUPLEX_FULL;
-+		}
-+		break;
-+
-+	default:
-+		state->link = false;
-+		break;
-+	}
-+}
-+
-+static void mxl862xx_pcs_an_restart(struct phylink_pcs *pcs)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_an_restart an = {};
-+	int if_mode;
-+
-+	if_mode = mxl862xx_xpcs_if_mode(mpcs->interface);
-+	if (if_mode < 0)
-+		return;
-+
-+	an.port_id = mpcs->serdes_id;
-+	an.interface = if_mode;
-+	an.usx_subport = mpcs->slot;
-+	an.usx_lane_mode = (mpcs->interface == PHY_INTERFACE_MODE_10G_QXGMII) ?
-+			   MXL862XX_XPCS_USX_QUAD : MXL862XX_XPCS_USX_SINGLE;
-+
-+	MXL862XX_API_WRITE(priv, MXL862XX_XPCS_AN_RESTART, an);
-+}
-+
-+static void mxl862xx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
-+				 phy_interface_t interface, int speed,
-+				 int duplex)
-+{
-+	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
-+	struct mxl862xx_priv *priv = mpcs->priv;
-+	struct mxl862xx_xpcs_pcs_link_up lu = {};
-+	int if_mode;
-+
-+	/* With inband-AN enabled (role=MAC), the XPCS auto-resolves
-+	 * speed/duplex from the partner's AN word and the firmware
-+	 * short-circuits link_up.  Skip the firmware round-trip, same
-+	 * as pcs-mtk-lynxi.
-+	 */
-+	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
-+		return;
-+
-+	if_mode = mxl862xx_xpcs_if_mode(interface);
-+	if (if_mode < 0)
-+		return;
-+
-+	lu.port_id = mpcs->serdes_id;
-+	lu.interface = if_mode;
-+	lu.duplex = (duplex == DUPLEX_FULL) ? MXL862XX_XPCS_DUPLEX_FULL :
-+					      MXL862XX_XPCS_DUPLEX_HALF;
-+	lu.speed = cpu_to_le16(speed);
-+
-+	MXL862XX_API_WRITE(priv, MXL862XX_XPCS_PCS_LINK_UP, lu);
-+}
-+
-+static unsigned int mxl862xx_pcs_inband_caps(struct phylink_pcs *pcs,
-+					     phy_interface_t interface)
-+{
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+	case PHY_INTERFACE_MODE_QSGMII:
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
-+	case PHY_INTERFACE_MODE_USXGMII:
-+	case PHY_INTERFACE_MODE_10G_QXGMII:
-+	case PHY_INTERFACE_MODE_10GKR:
-+		return LINK_INBAND_ENABLE;
-+	case PHY_INTERFACE_MODE_10GBASER:
-+		return LINK_INBAND_DISABLE;
-+	default:
-+		return 0;
-+	}
-+}
-+
-+static const struct phylink_pcs_ops mxl862xx_pcs_ops = {
-+	.pcs_disable = mxl862xx_pcs_disable,
-+	.pcs_config = mxl862xx_pcs_config,
-+	.pcs_get_state = mxl862xx_pcs_get_state,
-+	.pcs_an_restart = mxl862xx_pcs_an_restart,
-+	.pcs_link_up = mxl862xx_pcs_link_up,
-+	.pcs_inband_caps = mxl862xx_pcs_inband_caps,
-+};
-+
-+void mxl862xx_setup_pcs(struct mxl862xx_priv *priv, struct mxl862xx_pcs *pcs,
-+			int port)
-+{
-+	pcs->priv = priv;
-+	pcs->serdes_id = MXL862XX_SERDES_PORT_ID(port);
-+	pcs->slot = MXL862XX_SERDES_SLOT(port);
-+	pcs->interface = PHY_INTERFACE_MODE_NA;
-+
-+	pcs->pcs.ops = &mxl862xx_pcs_ops;
-+	pcs->pcs.poll = true;
-+
-+	__set_bit(PHY_INTERFACE_MODE_QSGMII, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, pcs->pcs.supported_interfaces);
-+	if (pcs->slot != 0)
-+		return;
-+
-+	__set_bit(PHY_INTERFACE_MODE_SGMII, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_1000BASEX, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_2500BASEX, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_10GBASER, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_10GKR, pcs->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_USXGMII, pcs->pcs.supported_interfaces);
-+}
-+
-+static struct phylink_pcs *
-+mxl862xx_phylink_mac_select_pcs(struct phylink_config *config,
-+				phy_interface_t interface)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct mxl862xx_priv *priv = dp->ds->priv;
-+	int port = dp->index;
-+
-+	if (!MXL862XX_FW_VER_MIN(priv, 1, 0, 84))
-+		return NULL;
-+
-+	switch (port) {
-+	case 9 ... 16:
-+		return &priv->serdes_ports[port - 9].pcs;
-+	default:
-+		return NULL;
-+	}
- }
- 
- static void mxl862xx_phylink_mac_config(struct phylink_config *config,
-@@ -48,4 +375,5 @@ const struct phylink_mac_ops mxl862xx_phylink_mac_ops = {
- 	.mac_config = mxl862xx_phylink_mac_config,
- 	.mac_link_down = mxl862xx_phylink_mac_link_down,
- 	.mac_link_up = mxl862xx_phylink_mac_link_up,
-+	.mac_select_pcs = mxl862xx_phylink_mac_select_pcs,
- };
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
-index c3d5215bdf60..03bb9caad9aa 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
-@@ -7,8 +7,15 @@
- 
- #include "mxl862xx.h"
- 
-+#define MXL862XX_SERDES_SLOT(port) \
-+	(((port) - MXL862XX_FIRST_SERDES_PORT) % MXL862XX_SERDES_SLOTS)
-+#define MXL862XX_SERDES_PORT_ID(port) \
-+	(((port) - MXL862XX_FIRST_SERDES_PORT) / MXL862XX_SERDES_SLOTS)
-+
- extern const struct phylink_mac_ops mxl862xx_phylink_mac_ops;
- void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
- 			       struct phylink_config *config);
-+void mxl862xx_setup_pcs(struct mxl862xx_priv *priv, struct mxl862xx_pcs *pcs,
-+			int port);
- 
- #endif /* __MXL862XX_PHYLINK_H */
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
-index 0b1a23364eb5..0af41efccbc6 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx.c
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
-@@ -622,7 +622,7 @@ static int mxl862xx_setup(struct dsa_switch *ds)
- 	int n_user_ports = 0, max_vlans;
- 	int ingress_finals, vid_rules;
- 	struct dsa_port *dp;
--	int ret;
-+	int ret, i;
- 
- 	ret = mxl862xx_reset(priv);
- 	if (ret)
-@@ -632,6 +632,10 @@ static int mxl862xx_setup(struct dsa_switch *ds)
- 	if (ret)
- 		return ret;
- 
-+	for (i = 0; i < ARRAY_SIZE(priv->serdes_ports); i++)
-+		mxl862xx_setup_pcs(priv, &priv->serdes_ports[i],
-+				   i + MXL862XX_FIRST_SERDES_PORT);
-+
- 	/* Calculate Extended VLAN block sizes.
- 	 * With VLAN Filter handling VID membership checks:
- 	 *   Ingress: only final catchall rules (PVID insertion, 802.1Q
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.h b/drivers/net/dsa/mxl862xx/mxl862xx.h
-index 79fd32c4db4e..d5879094ffd3 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx.h
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx.h
-@@ -11,6 +11,9 @@
- struct mxl862xx_priv;
- 
- #define MXL862XX_MAX_PORTS		17
-+#define MXL862XX_FIRST_SERDES_PORT	9
-+#define MXL862XX_SERDES_SLOTS		4
-+
- #define MXL862XX_DEFAULT_BRIDGE		0
- #define MXL862XX_MAX_BRIDGES		48
- #define MXL862XX_MAX_BRIDGE_PORTS	128
-@@ -242,6 +245,26 @@ struct mxl862xx_port {
- 	spinlock_t stats_lock; /* protects stats accumulators */
- };
- 
-+/**
-+ * struct mxl862xx_pcs - link SerDes interfaces to bridge ports
-+ * @pcs:       &struct phylink_pcs instance
-+ * @priv:      pointer to &struct mxl862xx_priv
-+ * @serdes_id: SerDes instance index (0 or 1)
-+ * @slot:      slot within the SerDes (0-3 for QSGMII/QUSXGMII, 0 otherwise)
-+ * @interface: cached PHY interface, last value passed to pcs_config().
-+ *             %PHY_INTERFACE_MODE_NA before the first successful
-+ *             pcs_config().  Used by pcs_an_restart() to populate the
-+ *             firmware command and by pcs_disable() to skip the
-+ *             firmware power-down for shared (QSGMII/QUSXGMII) modes.
-+ */
-+struct mxl862xx_pcs {
-+	struct phylink_pcs pcs;
-+	struct mxl862xx_priv *priv;
-+	int serdes_id;
-+	int slot;
-+	phy_interface_t interface;
-+};
-+
- /**
-  * union mxl862xx_fw_version - firmware version for comparison and display
-  * @major: firmware major version
-@@ -293,6 +316,12 @@ union mxl862xx_fw_version {
-  *                      flooding)
-  * @fw_version:         cached firmware version, populated at probe and
-  *                      compared with MXL862XX_FW_VER_MIN()
-+ * @serdes_ports:       SerDes interfaces incl. sub-interfaces in case of
-+ *                      10G_QXGMII or QSGMII
-+ * @serdes_active:      per-XPCS bitmap, BIT(slot) set while that
-+ *                      sub-port's PCS is enabled by phylink.  pcs_disable
-+ *                      only powers the XPCS down once the last bit
-+ *                      clears.  Updates are serialised by rtnl.
-  * @ports:              per-port state, indexed by switch port number
-  * @bridges:            maps DSA bridge number to firmware bridge ID;
-  *                      zero means no firmware bridge allocated for that
-@@ -311,6 +340,8 @@ struct mxl862xx_priv {
- 	unsigned long flags;
- 	u16 drop_meter;
- 	union mxl862xx_fw_version fw_version;
-+	struct mxl862xx_pcs serdes_ports[8];
-+	u8 serdes_active[2];
- 	struct mxl862xx_port ports[MXL862XX_MAX_PORTS];
- 	u16 bridges[MXL862XX_MAX_BRIDGES + 1];
- 	u16 evlan_ingress_size;
--- 
-2.54.0
 
