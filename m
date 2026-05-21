@@ -1,159 +1,202 @@
-Return-Path: <netdev+bounces-290500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290502-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EFqOG0AvD2r+HQYAu9opvQ
-	(envelope-from <netdev+bounces-290500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:13:52 +0200
+	id AH5aLJovD2pSHgYAu9opvQ
+	(envelope-from <netdev+bounces-290502-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:15:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43905A9017
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:13:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 246F75A90AB
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:15:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5D98731B23F5
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:43:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C095315A23E
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0B5384CC5;
-	Thu, 21 May 2026 14:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C9C400E10;
+	Thu, 21 May 2026 14:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iNn4WNx3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GJ5cE09K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E8B371D1E;
-	Thu, 21 May 2026 14:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779374288; cv=none; b=uH1R1mAZ9q5TMtSOwXmp6mtbyFY1Mu23toyDHC3gq6YYpG/BxY0NidftfRhFA1BOyeqhB6LutMf+Sq9FFRX5ZV+VDGY3ykxQ5UDFbks5TLK3exlqOjQdG9faqeMD3FLiFGB788OqVdbsZrOsQpVPdr0NFzQvorwiMSkCESYFqyY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779374288; c=relaxed/simple;
-	bh=WRrXkbf9YoyTrpwsaB5szcpnFA4GtQb/j8QLGN43FTA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=okFBnj0Jilkyhn4nYbWKZJehoVmkXCZZHNItgRmcIsf5kPZzlp2y+8qgNsBX/I9PM0by3f2lExabl2Nh470luGOiUJITom08tjKUKMGaRVxWE6BYgX7I0cq2/J8mn5GK01hgy4K1fbGl01ikU6KWQxXZhLC9anUNMU0AVG1UOBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iNn4WNx3; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1750D1F000E9;
-	Thu, 21 May 2026 14:38:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779374287;
-	bh=oTM+eITGTchBcw+NoYaku3z1qr6Oghcm7yOLXYODklo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iNn4WNx34I1rJOOclnNENZGftSk1JxerNi0KTn0ylUZXp1t21pejga8Kwqrl1TsM0
-	 egqhvieR2tcWsP+hDIxkGfLjx0z10f6HokF8PVGicDOSkohPUnpY7lbFBsmLk4lZNl
-	 FpqNAD3HqDgOLLOITOb2wJXTu9ooQiBKAgUW5Z6dxXynXRWR+LXUIDwzZl1dQ5AtgH
-	 6FBp1D/E057ud8p4UbDy5vFyxfVmwmI2XEJ9Ghjj4gOFa5pzV6doCm9hyOhu/44Bkt
-	 V5IK/K23lfYrnkj9MmyH3ovU+0XOZqWcDuW0924bqxb6SPZ0LbjSeUnzAAjN+KDPB2
-	 uCUom9riIVPpw==
-From: Simon Horman <horms@kernel.org>
-To: michael.bommarito@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jchapman@katalix.com,
-	tparkin@katalix.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] l2tp: use list_del_rcu in l2tp_session_unhash
-Date: Thu, 21 May 2026 15:36:53 +0100
-Message-ID: <20260521143654.1980290-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260518183447.64078-1-michael.bommarito@gmail.com>
-References: <20260518183447.64078-1-michael.bommarito@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C653EF67D
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779374383; cv=pass; b=ec11k0WqN6b4VkUl3LxmqliKFRA3IuTGjrB6iJ7kO4HacuKTIcz174SFA4vO2GPd+7vpR+zvwvWFjr+IaWDgv89DQ+O4DwJLKqrPTUYT8VF7FN9u2kcj1H0hBDeJ0h6dKc5Ac03q5Qu6otPya/8zgzijU6Kb2Le5Zv1X2qv7BCI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779374383; c=relaxed/simple;
+	bh=wYIb5rN3P7kuxixn1bdTEPgSLkphG9irWlDn2ffT/ZU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NgNMTNM+xllHMAw3yVF6Np3oJ97N9J6SYgSl/TrxkP6vqrO/UH9Gp9yKAv5Gurk7c0kk8Qrj567JP8dJ1hmUpOcr3VR+rtRO+LkEEgWh01i8duo16gUVsa53dNktSvQdIltdSi8bWTGlMDSBGfBCQiT1P8BsEEJMdrFEPWrgNoc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GJ5cE09K; arc=pass smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-516d0119e4aso2180971cf.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 07:39:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779374381; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JdJX/XfXR6RklWQSrnoAovjLAlEHAdHkT6izjX8nh8jyjvxJmnLYBu5utWU+seKNQ1
+         k8oxmjpVpFhCH8zn82/YRv15VRZ7ksr/Ho7Ik1gdR/+tRvA8FkGPk8C2+TbAoa6jWJJp
+         cuH4eu+n/ZebVr6hTWalMDxySZTRY+gcQkAQC4LvullpSXy3BjnGzG6xGMwtUmTzc/l3
+         lhwPPsalRLv+irmfFaknJcrRSd+oMpP5CiR/flfVRo3KbTG6KdPhP91nB/rvjPfIZgE0
+         VZrjowbkYu0scDBWn8MSsr+lWCWxxPkXpXoAQIBAb57Gvim4vcToiH3bXKh4tOz1Aerh
+         JpAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=90Jz8cPF00cbR4Bu1muz3KoXvWhePQ5G+NSQ4v1nJsQ=;
+        fh=zhAufyjR9v/9pJZEH01kcF5SZrXCVdSli6SZGlAqSbI=;
+        b=jGJqCql4eWhBkk721AnV1V0spSUBdNPI1wxWvw+Znegtd8+Z9/nR37/R+vv4BEez+O
+         2LvU+eBILYhjWOhMr7lhxAjYkbt6MgBPusiP8SoaGmeDsJbRdcgGoCjWyYN2PXWJn/Fy
+         bG1p6J3VeoIK313x6HCAxkNF9mYoBLiKtNSg4vs1yOP5hxCCIJruomaUWTHblhvp4tYf
+         EAA6CBIIbchaEej4bqm+0wUbaiX/c+jw/ujsAhhRl6aVn0xoLwURBICt3ng0OgGjYKoM
+         smiZQ+ggxhaGEq47oJq+o7DlsKF8RnWbSl/6KUaoxQo6zmDwQ5exixVgy9RrvUX+3VgI
+         mxhw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779374381; x=1779979181; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=90Jz8cPF00cbR4Bu1muz3KoXvWhePQ5G+NSQ4v1nJsQ=;
+        b=GJ5cE09K6cXagIWh/w+UWDRKcBGYRtskI3rjGgPT5w3/wXAlbanRK2gpEbPXKKJuAS
+         TXZxyls+51YlslGEAwRsmGkCADCTIpCjxepHe6a6fcny0VeNZajpTtLexw7qzDUKGcMA
+         fMf67lTmZq/7Gz7xnRXZk+ynA8z8U6esAr1lwPte4RvZ1ZTrO1zpaSX9TFgf7VLCFJme
+         TAl3ua9DuhakG9GNVmKE1tc+mJrn+JvC+p3PIopto8LJQTX8pMiKdoctXc7TukNF4525
+         09i7y4odgTQBfrEtCQzBsY3jDuO4NWhvnZ491jWFJaLsz/fx/IOIVqIgkaTUY/pffcpk
+         6neA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779374381; x=1779979181;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=90Jz8cPF00cbR4Bu1muz3KoXvWhePQ5G+NSQ4v1nJsQ=;
+        b=FJ/9Yebmtu5YvRd2ZxdpOxFTfWvMJewc4u2icxNyxY8pg66FedlipZVQYw8HcL6gW7
+         WUfuXaAopFNrzhgI+uvS0ioJdOQrrJNzAQZb9Nx27iHfdK9XIBnPUOe1xLLTYhYnUhk/
+         TwpbLqthY9/n+7saOqauFf6BNv8SqAqz5ZOvfa1HyHxyNFEY8U4fZUbPt8mNjb7miHJ5
+         kwpqZGemhz0fQq1hnXa/+D/c0JbZV4bjlF5mmCKam8xzHurJLo7lYxI4/jfTBmpTA6XA
+         QAIXKhSNzN4+GJSMV7c0MhUq9LFPQ4H04CeO987SuAku0GlE4EnOA1E66HYHXILwsQZ6
+         kxMw==
+X-Forwarded-Encrypted: i=1; AFNElJ/4UaUNdn6n4m2g+DpAgLgkYZ+LnF+k6dCJ4+TxmxXRVNHCxy0irItszhdIozRV3YBmSdpbfm0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFKW8+x5gv5G6cXOYi87/NWts0X5v+oBG4SmsBGPcPmFsGHf2F
+	ifvdjq0z+gmXUo1FBFf1qaxZLzyE2JJMbIeYLewVKhuVRdOxIYhUkO6HglwRBSV9ZASIprvIEaR
+	dxrNtEEs8j0FKJMIskXeUkf7bbAI5KoN92FLbdMxz
+X-Gm-Gg: Acq92OElMW7BGN0N1t56J4KXFK/gs1xzGc22qtcpoS/5FYZq4HERbSU6C7yc7I2pUdu
+	YNLzKqqM/1SigfA2OgWRSIwyruPQQjOTPD5o/w+6jrd+cBJeE/1eQ4g6576mpRRmCx1O14Rr4zn
+	5YGOS/7QzUj3e3SJYVK19xg1rJavdlsgVpDiXjyqaTvkgNDKamlwtNRmSTgP+KsGZg9pmobLa7N
+	lthbsjb8zQgiQuFrvoT6Dak11eGvZj+lSfw5K4AwOClWKGzopXtjnKDmrLfHAQVntRlgNlF3BRl
+	/ItsKBFSl1nnIKvxznpZXpx0z3e8WCE1fufFy1fnImiNyZLdhn/WHS/ttN9jAzkGz5b2B9IGEz9
+	fxbz5dNWn+71/aDCQXvXPQKhMdZxwl8Y8FwhkbTq1xnbgB5CHwxgUcy1q6Eu4HSK0
+X-Received: by 2002:a05:622a:1920:b0:516:6749:4036 with SMTP id
+ d75a77b69052e-516c55d2c6amr35337451cf.22.1779374379762; Thu, 21 May 2026
+ 07:39:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <20260521122147.3584624-1-edumazet@google.com> <0ef1f7da-c5b3-4c91-a656-4a3efecbbaf2@linux.dev>
+In-Reply-To: <0ef1f7da-c5b3-4c91-a656-4a3efecbbaf2@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 21 May 2026 07:39:28 -0700
+X-Gm-Features: AVHnY4Krb7ufidsKA2p2_kj9pW905P0xfy5WN5RnvG6O3wSXEklr0RrIrlQT1vs
+Message-ID: <CANn89iKtnq+-d7EVYjJa1vLRGVA14hi6d4KWkas86W9K10tdcA@mail.gmail.com>
+Subject: Re: [PATCH net] ipv4: free net->ipv4.sysctl_local_reserved_ports
+ after unregister_net_sysctl_table()
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
+	"Ji'an Zhou" <eilaimemedsnaimel@gmail.com>, Cong Wang <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290500-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,nvidia.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-290502-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D43905A9017
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linux.dev:email]
+X-Rspamd-Queue-Id: 246F75A90AB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+On Thu, May 21, 2026 at 6:59=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.de=
+v> wrote:
+>
+>
+> On 5/21/26 8:21 PM, Eric Dumazet wrote:
+> > ipv4_sysctl_exit_net() is currently freeing net->ipv4.sysctl_local_rese=
+rved_ports
+> > too soon.
+> >
+> > Only after unregister_net_sysctl_table() we can be sure no threads can =
+possibly
+> > use the sysctls, including /proc/sys/net/ipv4/ip_local_reserved_ports.
+> >
+> > Fixes: 122ff243f5f1 ("ipv4: make ip_local_reserved_ports per netns")
+> > Reported-by: Ji'an Zhou <eilaimemedsnaimel@gmail.com>
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Cc: Cong Wang <xiyou.wangcong@gmail.com>
+> > ---
+> >   net/ipv4/sysctl_net_ipv4.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+> > index d8bdb1bdbff17ab52fe969b93ce13673e88c05a4..c0e85cc171aec099fd5d489=
+7b1a623dd27eaee08 100644
+> > --- a/net/ipv4/sysctl_net_ipv4.c
+> > +++ b/net/ipv4/sysctl_net_ipv4.c
+> > @@ -1705,10 +1705,10 @@ static __net_exit void ipv4_sysctl_exit_net(str=
+uct net *net)
+> >   {
+> >       const struct ctl_table *table;
+> >
+> > -     kfree(net->ipv4.sysctl_local_reserved_ports);
+> >       table =3D net->ipv4.ipv4_hdr->ctl_table_arg;
+> >       unregister_net_sysctl_table(net->ipv4.ipv4_hdr);
+> >       kfree(table);
+> > +     kfree(net->ipv4.sysctl_local_reserved_ports);
+> >   }
+> >
+> >   static __net_initdata struct pernet_operations ipv4_sysctl_ops =3D {
+>
+>
+> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+>
+>
+> If there are still processes in the namespace, the netns refcnt cannot
+> become 0,
+>
+> so I think it should be: first open
+> /proc/sys/net/ipv4/ip_local_reserved_ports, then pass
+>
+> the fd to another process outside the netns? Maybe SCM_RIGHTS is used?
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-l2tp: use list_del_rcu in l2tp_session_unhash
-
-An unprivileged local user can pin a host CPU indefinitely in
-l2tp_session_get_by_ifname() when l2tp_session_unhash() uses list_del_init()
-while the list is being walked under RCU. This commit changes
-l2tp_session_unhash() to use list_del_rcu() to match the existing
-list_add_rcu(), preventing the infinite loop.
-
-> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-> index 157fc23ce4e14..1455f67e01ddb 100644
-> --- a/net/l2tp/l2tp_core.c
-> +++ b/net/l2tp/l2tp_core.c
-> @@ -1360,7 +1360,7 @@ static void l2tp_session_unhash(struct l2tp_session *session)
->  		spin_lock_bh(&pn->l2tp_session_idr_lock);
->  
->  		/* Remove from the per-tunnel list */
-> -		list_del_init(&session->list);
-> +		list_del_rcu(&session->list);
-
-Can this change lead to a use-after-free in l2tp_session_get_by_ifname()?
-
-By switching to list_del_rcu(), the deleted session remains visible to
-in-flight RCU readers. If l2tp_session_del_work() drops the session's
-reference count to 0 concurrently, the session will be queued for
-destruction via kfree_rcu().
-
-If an in-flight RCU reader in l2tp_session_get_by_ifname() encounters
-this session before the grace period ends, it will execute:
-
-	list_for_each_entry_rcu(session, &tunnel->session_list, list) {
-		if (!strcmp(session->ifname, ifname)) {
-			refcount_inc(&session->ref_count);
-			rcu_read_unlock_bh();
-			return session;
-		}
-	}
-
-Since refcount_inc() does not protect against zero-reference transitions,
-the reader will obtain a pointer to a session that is already pending
-destruction.
-
-Once the RCU grace period expires, kfree_rcu() will free the session
-memory, causing a use-after-free for the caller.
-
-Should l2tp_session_get_by_ifname() use refcount_inc_not_zero() and skip
-the session if it returns false, similar to other getters like
-l2tp_v3_session_get()?
-
-[ ... ]
+We will not share the repro publicly, for obvious reasons :)
 
