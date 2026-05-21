@@ -1,110 +1,196 @@
-Return-Path: <netdev+bounces-290535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290536-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANZFNLw9D2ocIQYAu9opvQ
-	(envelope-from <netdev+bounces-290535-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:15:40 +0200
+	id sNYCF3M4D2rTHwYAu9opvQ
+	(envelope-from <netdev+bounces-290536-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:53:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id EABB75AA01F
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:15:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E745A9A7D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 17F3532C013B
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:27:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 269EC355A9A2
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF6C35AC16;
-	Thu, 21 May 2026 15:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lDn4m9UH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0288733EB1B;
+	Thu, 21 May 2026 15:27:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E6A35676D;
-	Thu, 21 May 2026 15:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B69B349CFD
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 15:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779377225; cv=none; b=cnBcqHrr3gChh8sQT4xklScWD9RvnCosi8jWCVe7AF2c5SMnTyQJnA7hQPpXeTEOfgMBelD7wdEQFx+5sdO+uS7iXvLD/wXu2ZZsDwPAnQMo1EaYSCP49rgKY3PFjH5pXpeS/YYjbwIFkMGS+P+EBmTXf7k+AhLEUobg67XEqyA=
+	t=1779377261; cv=none; b=Cck5W7n2jwmz3Xc+MEOZoflxbXFsia9/86GHP12a/x7hUMvhXhYbANeN28Lj8ATDGdvllWVCxOeAgJHdNQ5iasMtP7pg20yRcIk35l3OWi6VzH56qpPnuySNBqyj0Cnq/HS2PcyXFx/nFe9Ylo6zjF7bY+WG3fn4PzCEMTpvOYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779377225; c=relaxed/simple;
-	bh=t3MB2dT888WzKr+4v/7evtWQkQVbGao4c3jS/Wo5p84=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DATn3vdJCQb4O6hTtQkvDG24KyIY1shLDNW1C2erEw9W6RqVwSxZX1bm/hcQn0RoIJXMgt9HgplAWAkQowV/4Toa0y5FEslZS0Wu9xlYeBRisahgdkvCPJzf54LlRTn50kVK3tgY1SP60WbjtveZLZadTOQtspTB5H3uhVvBYg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lDn4m9UH; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E98A51F000E9;
-	Thu, 21 May 2026 15:27:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779377224;
-	bh=t3MB2dT888WzKr+4v/7evtWQkQVbGao4c3jS/Wo5p84=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=lDn4m9UHiR5bSYmGAkg64Xd2jUY8N0clJz+Yy556FWh3R0SPoyp4tSN3wJ+Qcf51D
-	 33em4FlkEUfQyRx8dFQfmLOI/las1Q1jNEd1YXqKtp+bxWX4RxLq1n71yjWmn814f9
-	 gg+LZLgazzD6tdm2ehGHl4xwHmbF04+u3ko1gPIu+hMpndx6Ou4AQ2E7XgLJt3pYvQ
-	 1kgaFjGNu8BdnZ4lm0dhIee9coqkC/23iyMY0y1V8ncF3R8YjSJZStEKAEESZAwC5f
-	 AH6YvFlNsL0ZR3VqdSaKih4MUvRd55cKGU6OYtpQBWBfiRrSkEyt0ZExKZcooRuEPB
-	 7WjhfKKK1dO4A==
-Date: Thu, 21 May 2026 08:27:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Maciej W. Rozycki" <macro@orcam.me.uk>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/5] ethernet: 3c509: Bring driver back and make
- some fixes
-Message-ID: <20260521082703.2991393f@kernel.org>
-In-Reply-To: <e1c7eab4-b330-49ad-bd39-df7dbc0a9511@lunn.ch>
-References: <alpine.DEB.2.21.2605201115010.1450@angie.orcam.me.uk>
-	<e1c7eab4-b330-49ad-bd39-df7dbc0a9511@lunn.ch>
+	s=arc-20240116; t=1779377261; c=relaxed/simple;
+	bh=YMyWGhnn82d8s1VoNMYdEELPpWZHkibRtHoYKpx5irw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Qi2+faSYRZF3bgoRcfvhTtYq4yPY14lxKx3CmE0FN6EevXU8xGRxgMZi2upIjca5ej+oZKJNjqn4Pm6ksjuc9Q0aKpSZXXvsKhDXcZl8FozHsA9Nep2+TJeMZkcfli9KpwZGVQmOhaeSaMG2SYXUM2MQvwmtWpygGRWMWrVGork=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-69d77736830so1115984eaf.3
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 08:27:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779377259; x=1779982059;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q7+Keg766WhyWy3D295hfJ9yyxOp545yG2+nUaggzYc=;
+        b=rpPyVD/CcRYoWMCO2byKQSOjSlXCmRykH6DwEBHigqY9TWh1qlgNHA3RapxhmHGYBa
+         gPQirKrNtH9/cmde76go6UbkLrHWo2Fnvn4ToTUQrNeYmZ5HwNdoKo+gjAGQuHIBhPYO
+         hBFHh/HuQbHQFh/jfTFrC61qvLU+NA/6ZQlAJ7HjA/pZhLUIk2EfOkWnx8/ZbgZQDCW1
+         gUu7f4tJQTD0MjNYXXJ7eO+YtGTFw/tMMvrZNyFX3hZlbk/WHo6rlS2oF2mrElrpw+cP
+         1+A09u9XfsELPENYPY+CmOe2OtQjJqBzsv7DG7AOuae7g6kpENw2JUdQlh5AvgBKQ1RP
+         x2uA==
+X-Forwarded-Encrypted: i=1; AFNElJ8kgjnqwsz4L4wZMZYDNv2+03ktAWN9CbAiB+FvOxGX6rhh3KOQ8v3yjc13TI/sV/aA5hvRL44=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLkjH5f4UfRJan1TmBbWB5nXa3YM36aM/1jte05d4K9soPIRhA
+	7a4muYGg8klM8HJIciG9vUc84agais5Oas2fjrdxj/MLUbVQabEzGRST/k0kwG5QwoylYbhVBLQ
+	V0vj93qVZUMO0E0feBPhZ7MumVD508cK7Rod6JkqjPaxQe3sYSMqR0rQI+Iw=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Received: by 2002:a05:6820:4b0f:b0:695:b571:e574 with SMTP id
+ 006d021491bc7-69d6ef88c3amr1658944eaf.59.1779377259512; Thu, 21 May 2026
+ 08:27:39 -0700 (PDT)
+Date: Thu, 21 May 2026 08:27:39 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a0f246b.170a0220.303405.4ce3.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in drv_get_tsf (3)
+From: syzbot <syzbot+1c8c45017f784e646b47@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=d0f0911eedbc130a];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290535-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-290536-lists,netdev=lfdr.de,1c8c45017f784e646b47];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EABB75AA01F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,goo.gl:url,googlegroups.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,appspotmail.com:email,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 81E745A9A7D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 21 May 2026 14:17:08 +0200 Andrew Lunn wrote:
-> The problem with these sorts of patches is that they often break
-> stuff. This driver has been stable for a long time. Do we care about
-> coding style issues enough that we are happy to possibly break it? Do
-> we want to spend time on debugging it? Probably more time than it took
-> to fix the checkpatch issues?
+Hello,
 
-The way I look at it, Maciej is the maintainer and has access to HW.
-If we have to keep this driver it's better to modernize it a bit.
-If nothing else it shows the maintainer is willing to put in the effort.
+syzbot found the following issue on:
+
+HEAD commit:    6916d5703ddf Merge tag 'drm-fixes-2026-05-16' of https://g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14dd2536580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d0f0911eedbc130a
+dashboard link: https://syzkaller.appspot.com/bug?extid=1c8c45017f784e646b47
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/1efefe7c73e1/disk-6916d570.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1dcf16f12a0f/vmlinux-6916d570.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7bc2e1f3e5cd/bzImage-6916d570.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1c8c45017f784e646b47@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+wlan0: Failed check-sdata-in-driver check, flags: 0x0
+WARNING: net/mac80211/driver-ops.c:255 at drv_get_tsf+0x33f/0x770 net/mac80211/driver-ops.c:255, CPU#0: kworker/u8:17/7122
+Modules linked in:
+CPU: 0 UID: 0 PID: 7122 Comm: kworker/u8:17 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:drv_get_tsf+0x345/0x770 net/mac80211/driver-ops.c:255
+Code: 0a 00 00 4d 85 ed 0f 84 45 03 00 00 e8 34 92 11 f7 49 81 c5 20 01 00 00 e8 28 92 11 f7 48 8d 3d c1 57 f2 05 44 89 f2 4c 89 ee <67> 48 0f b9 3a e9 a6 fd ff ff e8 0c 92 11 f7 65 44 8b 25 78 47 14
+RSP: 0018:ffffc90003797b70 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff88805c850e40 RCX: ffffffff8af67847
+RDX: 0000000000000000 RSI: ffff88805c850120 RDI: ffffffff90e8d060
+RBP: ffff88805c830f20 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff88805c851878
+R13: ffff88805c850120 R14: 0000000000000000 R15: ffff88805c8306c0
+FS:  0000000000000000(0000) GS:ffff888124374000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f619fa17e9c CR3: 000000005f5f6000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ieee80211_if_fmt_tsf+0x42/0x70 net/mac80211/debugfs_netdev.c:660
+ wiphy_locked_debugfs_read_work+0xe6/0x1c0 net/wireless/debugfs.c:168
+ cfg80211_wiphy_work+0x410/0x570 net/wireless/core.c:513
+ process_one_work+0xa0e/0x1980 kernel/workqueue.c:3314
+ process_scheduled_works kernel/workqueue.c:3397 [inline]
+ worker_thread+0x5ef/0xe50 kernel/workqueue.c:3478
+ kthread+0x370/0x450 kernel/kthread.c:436
+ ret_from_fork+0x72b/0xd50 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	0a 00                	or     (%rax),%al
+   2:	00 4d 85             	add    %cl,-0x7b(%rbp)
+   5:	ed                   	in     (%dx),%eax
+   6:	0f 84 45 03 00 00    	je     0x351
+   c:	e8 34 92 11 f7       	call   0xf7119245
+  11:	49 81 c5 20 01 00 00 	add    $0x120,%r13
+  18:	e8 28 92 11 f7       	call   0xf7119245
+  1d:	48 8d 3d c1 57 f2 05 	lea    0x5f257c1(%rip),%rdi        # 0x5f257e5
+  24:	44 89 f2             	mov    %r14d,%edx
+  27:	4c 89 ee             	mov    %r13,%rsi
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	e9 a6 fd ff ff       	jmp    0xfffffdda
+  34:	e8 0c 92 11 f7       	call   0xf7119245
+  39:	65                   	gs
+  3a:	44                   	rex.R
+  3b:	8b                   	.byte 0x8b
+  3c:	25                   	.byte 0x25
+  3d:	78 47                	js     0x86
+  3f:	14                   	.byte 0x14
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
