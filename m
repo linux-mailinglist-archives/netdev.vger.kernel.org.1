@@ -1,121 +1,114 @@
-Return-Path: <netdev+bounces-290174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290175-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKIVAdhUDmrl9wUAu9opvQ
-	(envelope-from <netdev+bounces-290174-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:42:00 +0200
+	id kDgiBjZWDmry9wUAu9opvQ
+	(envelope-from <netdev+bounces-290175-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:47:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90F6A59D5DF
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:41:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 703C159D647
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5938430268A9
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:41:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5D94B302417C
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:42:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C995123B63E;
-	Thu, 21 May 2026 00:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02FD234964;
+	Thu, 21 May 2026 00:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRyaCjoL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmBkn7+6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228E121E098
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 00:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1851EE01A;
+	Thu, 21 May 2026 00:42:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779324117; cv=none; b=r1YBMeGRe9rm5u6bKEhsT9cm2KCPdAM0sw1nRdwH5VLVB7Wgo+1RyXYPDLH/ift9QPLX4KzH5a+J8bPMOA/i1tbUjecmQR2yRJQUMuLwkAPGdESyXGY7DsYB4BMuI8T2S3CWAY+9Ek4BXsMoKxKdLWQR3hjwiXqeT4OgbvMImiM=
+	t=1779324130; cv=none; b=IlUpjEZu0jd0LoropH28b5hJO0wMEewTLMDEHUJViQy58x40Uh29iKsKtxgYdPSkjY7x8mjwBhHZHqhsL1sQW2WgXH78WNlSTJmkgZvNRaEbBAN5Y8Hv4u+/iHY5SDWE2jdgRrqpU02FknUJNKR9Fwx0cIQy7tIAnmKzVbEuQGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779324117; c=relaxed/simple;
-	bh=kjSZ1dRI7q35FIIpQf9dma7ELfjgm/6K4fR7s+Z+FnY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G5Tr7EBtqvm8cLoPQr/oIubqJLRLioqoE894Xgc1VQFJWI08jdm9VX+iYXuOAWABzP6/SvQtPSaxDBv5rV42tYxyMsvotmu7GIaLI7QQFKwbOmU6p/Q6Dwkh8P/onSDSJEgKdgFgpoVen0iL3xu+b5HjtID6qVFtDgVrCCNat6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRyaCjoL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 341AE1F000E9;
-	Thu, 21 May 2026 00:41:55 +0000 (UTC)
+	s=arc-20240116; t=1779324130; c=relaxed/simple;
+	bh=gE2xu90fi77DNXjCGh+yn+KWReZ7OnfCt+9yTRURpRk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GvZyjF8ErT97+1PhXce1d47FjpAYGcMWZoMk2d+I6W3QFkC1yJf1blYi0/hZGXyVGkV1jq73cLuOCdaY0ldBYW0te9BRsk7EUY9m06Ow4ZXGvfB2bC458hGfBocPP8DBeYLyBVtSbpMdW8OBy9AOx4jn32h8oEy6VJtZqnkNfdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmBkn7+6; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C98DB1F000E9;
+	Thu, 21 May 2026 00:42:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779324115;
-	bh=hMMv3S9vP5vZu7ThHWmKUo5BLkJTctQIlOxweiaOA/Y=;
-	h=From:To:Cc:Subject:Date;
-	b=XRyaCjoLz3tL+4ZPWIBhBOHUgKfyKWrj2biRvxZgqxySf3BHCffDMCeTy2Dg709o5
-	 B8zLSZejyGxeU8sRrLCdsq1a+3v4c9c2qHCTQRjnxfubz6pajFzXjtDVQ3mrG/UQ/I
-	 se8zfFDUk2gQwxtxpBmfvFVPdudth8WjHrnzYJebGf+0zLMJ0HA23O9iGgEgj1ilpV
-	 eZfDsrisS1myAi2G656UK9ZMDbASaYWpMz3gGlzsrOTINDzRm+YPXvtUM6CzqVdF0z
-	 +5n/yPPSDEwuLv05B0TKpAbP6dyVTeWzlrLGP0K9uyaNkNOdlkkUca8TDUXxkpNPUq
-	 fj9+DfBSuxVUw==
+	s=k20260515; t=1779324129;
+	bh=gE2xu90fi77DNXjCGh+yn+KWReZ7OnfCt+9yTRURpRk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=QmBkn7+61GhGmw2KAVBy8s2DUtwB5RjOdZaq3seCTfWxUTSye7DdCg8ugFvciRRXE
+	 tQOmvOfknd+6q5n42PENujyZtIFkZDmb2gDezQizIMRmzr7qP7LM6yu32e2r6A7Pu4
+	 XLBuPxWgj2UB5NugiXjsXevon+xwkTQRXnCgu3HxByi312TKQtJxgxkjBcqDOHkXRg
+	 yfaNAK5w6zyKoJmHdV13dMSn5Fl5FjsbvEF8qLJCYd20il7fOxFx+aVm3DMb9vVseP
+	 L6HXd/Jy3rN7hYAJ6z8BcCoKBNS6jfrVNQyLEc5H/61oPW4eTSb1JBRZYsVXTtxZgG
+	 SNGz+NWA2E+eg==
+Date: Wed, 20 May 2026 17:42:07 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net] MAINTAINERS: add missing entry for Bluetooth include files
-Date: Wed, 20 May 2026 17:41:51 -0700
-Message-ID: <20260521004151.625049-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: L2CAP: reject BR/EDR signaling packets
+ over MTUsig
+Message-ID: <20260520174207.5f8f26c0@kernel.org>
+In-Reply-To: <CAJJ9bXy1xQsfRd_DBiFjTj6GjkDDVFU3w_5xjXvZmp8CXnkz5g@mail.gmail.com>
+References: <20260521001327.3729880-1-michael.bommarito@gmail.com>
+	<20260520172609.3034337f@kernel.org>
+	<CAJJ9bXy1xQsfRd_DBiFjTj6GjkDDVFU3w_5xjXvZmp8CXnkz5g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-290174-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[holtmann.org,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-290175-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 90F6A59D5DF
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 703C159D647
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-We X-out net/bluetooth/ from "NETWORKING [GENERAL]" so that only
-the dedicated list is CCed on patches, and networking gets them
-once already processed by Luiz. We missed include/net/bluetooth.
+On Wed, 20 May 2026 20:32:28 -0400 Michael Bommarito wrote:
+> On Wed, May 20, 2026 at 8:26=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > Please (tell your bot to) use the get_maintainer script. =20
+>=20
+> It (and I) did, but I think this is because net/bluetooth/ matches net/, =
+right?
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5db1a2923dd2..fa3a766f38f1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18640,6 +18640,7 @@ F:	tools/testing/selftests/net/
- X:	Documentation/networking/mac80211-injection.rst
- X:	Documentation/networking/mac80211_hwsim/
- X:	Documentation/networking/regulatory.rst
-+X:	include/net/bluetooth/
- X:	include/net/cfg80211.h
- X:	include/net/ieee80211_radiotap.h
- X:	include/net/iw_handler.h
--- 
-2.54.0
-
+Looks like we're missing an X, sorry.
 
