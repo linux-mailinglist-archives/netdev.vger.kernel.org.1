@@ -1,141 +1,153 @@
-Return-Path: <netdev+bounces-290345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290346-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8DYrEgbmDmopDAYAu9opvQ
-	(envelope-from <netdev+bounces-290345-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:01:26 +0200
+	id IAO1GO/nDmopDAYAu9opvQ
+	(envelope-from <netdev+bounces-290346-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:09:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B9C15A3B58
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:01:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E07FC5A3C17
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:09:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC63530D8643
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:39:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DCE73026F2A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 10:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EC83A1688;
-	Thu, 21 May 2026 10:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03A23AC0F2;
+	Thu, 21 May 2026 10:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="WXMZyTGY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AttkTPCQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F62037B402;
-	Thu, 21 May 2026 10:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA17F356A38
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 10:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779359941; cv=none; b=LkRp00uFpuEDMm68jAx8nSWtQybbrsNMe90PBPTF8lO4za0DVoFkIqvqXGiJiShbRF0OqgAG+BzjqAYHxZRC+1MiFX5/ZviR7mHHWeqS1ylIvTmZVH18ULG6SRuerBKJecT7JiokK9iLRksNYwBDiOaQt3RrV9AESIanUlQXH0U=
+	t=1779360830; cv=none; b=A7MfwxnEwN1C8DbXWo+a488L9gqR21Rk5vwBrLSxzq/+mZ9/InlIY9eVrVnida3xEeTX1kBYX5I3LNiIRyqQBa3bbj9W57a/GalAL/NgyNjnmfHsYkjUgJrQMLEd66CziAk0ZfArQcbUdjASjh5eaGwWsConVn9YrX8FKOiOd3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779359941; c=relaxed/simple;
-	bh=/9/OZLIaJNpoLv+Ab0S1dgpd06WYFOit18dZsmNiFHs=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PKQuLU0ilnINtgqwAPTqghL7RHCN74e7OtUcw6P3Fot4DwQIHJzkI/xDv7iUAkuz/BdC7y4Mqhy3kOlrGFKcHxXuLfJmzA1dh8G2SZLCZgdlc6VfkgFeNqjfcYe+2Zb9BbphFMXzP6ugFEKERf8Vnu+J4P2fN9ll1bskD9E49Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=WXMZyTGY; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=/9/OZLIaJNpoLv+Ab0S1dgpd06WYFOit18dZsmNiFHs=;
-	b=WXMZyTGY68AQeR5lOM8Vmx4eJCnKUclz+fRk5aOlwmoCtt9sMZeoio3/LPK7rVxwDBe32Cmft
-	FXQzWezBEQSuW3w8nG/sz91IvI7XdYK2+k+2ViNkRrPCY+VNU4aKG69ux80Q0+Usl7peDSsQV8k
-	cRu8zFeHCIZCcRrt+N5yy+w=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gLl7F54bqzKm5G;
-	Thu, 21 May 2026 18:31:05 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2CB9440561;
-	Thu, 21 May 2026 18:38:50 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 21 May 2026 18:38:49 +0800
-Message-ID: <1dd58308-6c4c-4449-9c82-f9abfb4fc6ba@huawei.com>
-Date: Thu, 21 May 2026 18:38:48 +0800
+	s=arc-20240116; t=1779360830; c=relaxed/simple;
+	bh=b1D1sbVpVj9tsY8/y681O8mY0yENSBozDZCoQLbvao0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yy85O5lqkPb6N15x8HnHHtyt0VpvOrxfaz/FrG6gXAAA9KlZ1mGxCGAZh3HV5yeJw7QB3Drr0MLrkimVSJrJY38YsuiU3N16H/KOlhG6VI1x3Sd1GH2RHHKyt5iThGSIfCWYJHJweAFcsH+AJcBFVrL5q5hnoyN3g3NjAgtF2ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AttkTPCQ; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a6e9081a-b2d9-4a51-a7eb-aaf27a50fe1f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779360815;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WOXD72Rti67i5G3maLPI/XbykJHTdPayh8Ols8Zr+nk=;
+	b=AttkTPCQGJ4ae8pQsNTPV3NloWTk+ith+CUSrYKcWQ+MTJiyqWF+uGHhCov5OWjl7wzZe6
+	6axChq6U2JsSc+O9MtKr4VnitDfWeAbyVMldJfrsiux3a8ul4kHLm5qblry36DXDG70YGd
+	M6nb8F08Szk63eH7Q+4iX3Vm+wZxaOE=
+Date: Thu, 21 May 2026 18:53:27 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 4/6] net: hns3: support IP and tunnel VNI
- dissectors for tc flow
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20260518093526.1109595-1-shaojijie@huawei.com>
- <20260518093526.1109595-5-shaojijie@huawei.com>
- <20260519184839.4501f720@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20260519184839.4501f720@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net-next] ipv4: igmp: annotate data-races around im->users
+To: Yuyang Huang <sigefriedhyy@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Ido Schimmel <idosch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20260521093612.207475-1-sigefriedhyy@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260521093612.207475-1-sigefriedhyy@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemk100013.china.huawei.com (7.202.194.61)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290345-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[linux.dev:?];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290346-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[huawei.com:query timed out];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.959];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:mid,huawei.com:dkim]
-X-Rspamd-Queue-Id: 4B9C15A3B58
+	DMARC_DNSFAIL(0.00)[linux.dev : SPF/DKIM temp error,none];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_TEMPFAIL(0.00)[linux.dev:s=key1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:mid]
+X-Rspamd-Queue-Id: E07FC5A3C17
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
-on 2026/5/20 9:48, Jakub Kicinski wrote:
-> On Mon, 18 May 2026 17:35:24 +0800 Jijie Shao wrote:
->> Currently, the driver does not support FLOW_DISSECTOR_KEY_IP and
->> FLOW_DISSECTOR_KEY_ENC_KEYID. But the hardware supports
->> ip_tos (FLOW_DISSECTOR_KEY_IP) and
->> outer_tun_vni (FLOW_DISSECTOR_KEY_ENC_KEYID).
->>
->> This patch adds support for FLOW_DISSECTOR_KEY_IP and
->> FLOW_DISSECTOR_KEY_ENC_KEYID.
->>
->> Additionally, since tc flow cannot effectively support
->> l2_user_def, l3_user_def, and l4_user_def,
->> this patch explicitly sets them to not be used.
-> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:5771:37: warning: restricted __le32 degrades to integer
-> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:5773:37: warning: restricted __le32 degrades to integer
-> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:7369:31: warning: restricted __be32 degrades to integer
+On 5/21/26 5:36 PM, Yuyang Huang wrote:
+> /proc/net/igmp walks IPv4 multicast memberships under RCU and
+> prints im->users without holding RTNL, while multicast join and leave
+> paths update the field while holding RTNL. Annotate this intentional
+> lockless snapshot with READ_ONCE() and the matching writers with
+> WRITE_ONCE().
+>
+> Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
+> ---
+>   net/ipv4/igmp.c | 11 +++++++----
+>   1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+> index 27d120183779..f2aca659b29c 100644
+> --- a/net/ipv4/igmp.c
+> +++ b/net/ipv4/igmp.c
+> @@ -1541,7 +1541,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
+>   	}
+>   
+>   	if  (im) {
+> -		im->users++;
+> +		WRITE_ONCE(im->users, im->users + 1);
+>   		ip_mc_add_src(in_dev, &addr, mode, 0, NULL, 0);
+>   		goto out;
+>   	}
+> @@ -1550,7 +1550,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
+>   	if (!im)
+>   		goto out;
+>   
+> -	im->users = 1;
+> +	WRITE_ONCE(im->users, 1);
+>   	im->interface = in_dev;
+>   	in_dev_hold(in_dev);
+>   	im->multiaddr = addr;
+> @@ -1784,7 +1784,10 @@ void __ip_mc_dec_group(struct in_device *in_dev, __be32 addr, gfp_t gfp)
+>   	     (i = rtnl_dereference(*ip)) != NULL;
+>   	     ip = &i->next_rcu) {
+>   		if (i->multiaddr == addr) {
+> -			if (--i->users == 0) {
+> +			int new_users = i->users - 1;
+> +
+> +			WRITE_ONCE(i->users, new_users);
+> +			if (new_users == 0) {
+
+Using a local variable here feels slightly awkward, but it does save one 
+extra load compared
+
+to re-reading i->users after the WRITE_ONCE(), so it's acceptable.
 
 
-Thank you for the reminder.
-I noticed that when I compiled it myself before, there was an issue with the sparse version being unavailable,
-which I hadn't noticed earlier.
-
-After I upgrade sparse from 0.6.4 to 0.6.5-rc1, I will fix these warnings and resend these patches.
-Reminder: https://www.kernel.org/pub/software/devel/sparse/dist/ does not collect the latest version.
-
-Thanks,
-Jijie Shao
-
-
+One suggestion: please add a Fixes: tag, like other data-race fixes 
+annotated with READ_ONCE()/WRITE_ONCE().
 
