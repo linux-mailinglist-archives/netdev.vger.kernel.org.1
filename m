@@ -1,51 +1,103 @@
-Return-Path: <netdev+bounces-290318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290319-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eICvOa/bDmrmCgYAu9opvQ
-	(envelope-from <netdev+bounces-290318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:17:19 +0200
+	id gIy1M3DUDmr2CQYAu9opvQ
+	(envelope-from <netdev+bounces-290319-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:46:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5257A5A31C6
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 12:17:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79BE55A29B2
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8582F3141DF8
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:44:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9945B302F55A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1811937D12C;
-	Thu, 21 May 2026 09:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B545A37C102;
+	Thu, 21 May 2026 09:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="V8bj1nfh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFuj7Rl3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OyLAEn3d"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C52363C55;
-	Thu, 21 May 2026 09:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5683637C0EB
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779356692; cv=none; b=PStu+flMocwASBKo5jMsK05F0/5ljQfnJjJP38AcdVgQ7dqiNrvrc3vSMqvOh6+LZAyYVuSL53l5rJ6JXCtj9VvcbfJab0QKD02pDeGHDDg++xguu/rNl6rBtJdxlGhPVz00PLDRQE2TTsbC+CMp/XMt19GD4ko1eYbA9uREAxs=
+	t=1779356732; cv=none; b=J/h9yzOrWHYmcCHEbRLEze7xbQ6vB7/L03rvJ56wkW2pee9YZLax9Bj405unVPCToAh7C+BWQgV7V2JpODRAsgvoBwkxGLnA6Am9P1Ld2fQFgEKvTNk3H8ZOsEjo9xC9EU5AQv99N0bdbBMT+LN30K0GUO6FpwWd1Aq9LsukTYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779356692; c=relaxed/simple;
-	bh=2rSja1deBM1iWbRkxcvTnfwNvq3KSkNDXw0R+RFBDSE=;
+	s=arc-20240116; t=1779356732; c=relaxed/simple;
+	bh=HxL2mVpqGeWukkrHrqUp7lkfiZWZDF3J3N36wvgmCIw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SaTfbLKeYuNA1KGPBz0+RNetn7iL/zptkCgZKJuH8GS3eB1PD0YB74FRpGLPoXgwM1nsuJQpJt3/pqW2o7/JMOala7JNBRcyLaYyk13ZMYxZRlNMBPsKJAGFj81W77wmD0U+0XE53uhFOSqvr+NO1ismwlWxHN2MokdfSMNOe94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=V8bj1nfh; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F25A3D4F;
-	Thu, 21 May 2026 02:44:44 -0700 (PDT)
-Received: from [10.57.36.52] (unknown [10.57.36.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 339163F7B4;
-	Thu, 21 May 2026 02:44:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1779356689; bh=2rSja1deBM1iWbRkxcvTnfwNvq3KSkNDXw0R+RFBDSE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=V8bj1nfhEwDhWcowxYHmM7Xnhl5rgFZyeqahTQ0ZRV9mLcDf3Ozjm5MGzpI+c1910
-	 XJnMbe6wjO4t7P/70yn6macR20HahHT1WyAarLF6Wb7rYAgJ6Mt3h0WXN9SXMbK7F5
-	 uXAKXzo6njxuRMgh1oQmzIpBuzaBPmmeqI3TXRP8=
-Message-ID: <ddc7098e-5674-4f40-a46b-776c5334bda0@arm.com>
-Date: Thu, 21 May 2026 10:44:24 +0100
+	 In-Reply-To:Content-Type; b=u/1Lc3PnkYFSHMBAcq1op6ApL1tqYsi8DLTIJhF7qoqUx7Pwl7R7FZNVkhXlfE0LTtFXoNjNz+z9CNEVBQ+tgENYNC0Cnzt6CTmJ/Wg/qSqb5fpVQmP/f31YsKCCyY4AUhIhxi4ZvKDSjUR9XfgldakhBOZSb3rqVUZzqJqSBeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SFuj7Rl3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OyLAEn3d; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779356730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t8pOkYp++jH6DC65duzb8derhbUuB6qIKQ5RkuirNAE=;
+	b=SFuj7Rl3dvF0bG+RL4+VGqHPMBKjuKcTIGy4t8lZPhpgARVwM17yNWNPz7tH46k9B4m08x
+	t0iKdzE4rid8SHgNIN0UqSU5GVKhLC3L063ZV4gX88b1p14VBKI7/1IUFlibNMa/9ml/T/
+	dSvywF99Mcek7ExL7OAI1UQTnCxgbZY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-434-YWdWhjyeOHSxIFp7YZfScw-1; Thu, 21 May 2026 05:45:28 -0400
+X-MC-Unique: YWdWhjyeOHSxIFp7YZfScw-1
+X-Mimecast-MFC-AGG-ID: YWdWhjyeOHSxIFp7YZfScw_1779356727
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48fd8162ed7so43027195e9.2
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 02:45:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779356727; x=1779961527; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t8pOkYp++jH6DC65duzb8derhbUuB6qIKQ5RkuirNAE=;
+        b=OyLAEn3dke9Yxh5iFwcxgdsGqTE9E4RjdXlt1F4TOvHh+whouM9XlPN5Fv+sPeQhmt
+         wYP8tT3bwYxbvhWpUo91T7Ox9B9dgNorES2P8QqSfkPacFE8m1aUwyeZhd+QgqcCK6zB
+         1AtZmsc2XYj3IdvyU1H4U247rO0OFDb17GngJ9+2FLGv/fDliJ4ZRxkCRza77p+RPPDT
+         r4aJYxsi+u2VfU7tiyD/odrVO46h74v0tl3V4xX5S2BpUPDsPZ2R/CEgCHBDQasHXzbm
+         C9wjevZSKa/XyWf7OBeGY40lq78nr9etr+4dzQsCRN5c13y9IQHhjE0gDmZF3SWLfS3H
+         4YgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779356727; x=1779961527;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t8pOkYp++jH6DC65duzb8derhbUuB6qIKQ5RkuirNAE=;
+        b=ewZ/G9+mg1i0J4g8SSaskFpIqTcN9kTY8d1lHDvFwQ9YfhXI3CpJcomJhvVDhgbqzC
+         C9fv0fdD3wb2CP2stsSvLOlLveZ+m+N+OKP97XYUka+IkHs+H3eSP8H+/+44N/WZn0Ni
+         67h36PE1o7iQ0KA1ikpNMKRzoOn7jR6rmVsV7KOOfeSEpMmhUV25RjeWWCCkZYCMuHKx
+         5Jnfg9NoAxC5p3NSqEfATKmAA1iTy4ZtXKopYkarPoDvoo/sG8nwbm4BBXHLNs5E6xoy
+         Mcnwa0UBgBKYyh4tPcMbfJBn4o1qyolmleMtkzg3tEPG7/2yGArWSO+nlzwNkezyB5EB
+         8zdA==
+X-Forwarded-Encrypted: i=1; AFNElJ9BoNCVCA4MrXQwNW9bCOFXMVMNnS9o3qL08th+BLK6i2MktKwlD+pfYscn8iiHzkj1C7hw8ic=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyCNTB099CY3PKXsB6SqdnAOLOAtgCc9YCEylica11XS9XvYws
+	7hD7LJmjjQfcNA8jTqXvWadhjdZ0Fu1qJBlBBFmNe/oNkj9gcnVFD9rpQ3T3KkB71+Xxi3N2ay3
+	B2giBLfNLqb49lseDmabfhOcSlbt0ZGlQMpGWO1AE+1J9UaB34ikZTRPccA==
+X-Gm-Gg: Acq92OFFLdsCFUKSQXQEUu1E1wKsmpxV2BCFVDDwwcV8pSRC1xP/wEiXZm+NiyVbhB2
+	fF/Piv/ne8rPgw483WqmEWPpDxOempkHfq8ipKIEw141YuHR2tzs+qDzmidluooNZQ0WiBJ1R/Z
+	3yn9wHjYO80TaMwGpSl4AYtdUS6ZbeCP1lADOlKRAc6qpZ48zsVLs13FfUY/v0vNoYGKgfimkO2
+	CYenPVrQ6truEZz1aerJXAIJh14EL9oJosRBuwLHyxPhJsrkF++mte7mw5IxF/2xo92628EpBOs
+	DOtOukrtk2pPtuZQ0qr3XnPkKVQzZe2vbhztye3g64yzANugqeugJrIAjjvCT0EVClRGIbpDkad
+	ZTXfZD7YESjgsZv3svxI7VK+kAIUcVUXfsYSPSETz/sjYQfrvx4FRBJImRQ==
+X-Received: by 2002:a05:600c:3149:b0:490:261d:7dfe with SMTP id 5b1f17b1804b1-4903602d09amr27351405e9.6.1779356727310;
+        Thu, 21 May 2026 02:45:27 -0700 (PDT)
+X-Received: by 2002:a05:600c:3149:b0:490:261d:7dfe with SMTP id 5b1f17b1804b1-4903602d09amr27350855e9.6.1779356726833;
+        Thu, 21 May 2026 02:45:26 -0700 (PDT)
+Received: from [192.168.88.32] ([169.155.232.242])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49033d9eca8sm52423715e9.12.2026.05.21.02.45.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 May 2026 02:45:26 -0700 (PDT)
+Message-ID: <b9a1ce9c-1f5c-485c-8d65-bb00c7850842@redhat.com>
+Date: Thu, 21 May 2026 11:45:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,136 +105,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/23] iommu/fsl: use platform_device_set_of_node()
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
- Lee Jones <lee@kernel.org>, Mark Brown
- <broonie@opensource.wolfsonmicro.com>,
- Thierry Reding <thierry.reding@avionic-design.de>,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+Subject: Re: [PATCH net-next] net: ibm: emac: Clear MAL descriptors without
+ memset
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Srinivas Kandagatla <srini@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Vinod Koul <vkoul@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
- Saravana Kannan <saravanak@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Andi Shyti <andi.shyti@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Doug Berger <opendmb@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Ulf Hansson <ulfh@kernel.org>,
- Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Matthew Brost <matthew.brost@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Peter Chen <peter.chen@kernel.org>,
- Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Maximilian Luz <luzmaximilian@gmail.com>, Hans de Goede <hansg@kernel.org>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Krzysztof Kozlowski <krzk@kernel.org>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: brgl@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
- driver-core@lists.linux.dev, devicetree@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
- iommu@lists.linux.dev, linux-pm@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, intel-xe@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org,
- linux-mips@vger.kernel.org, platform-driver-x86@vger.kernel.org
-References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
- <20260521-pdev-fwnode-ref-v1-12-88c324a1b8d2@oss.qualcomm.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20260521-pdev-fwnode-ref-v1-12-88c324a1b8d2@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ Jakub Kicinski <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20260517033621.1839397-1-rosenp@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260517033621.1839397-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[arm.com:s=foss];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,linux.intel.com,8bytes.org,broadcom.com,nxp.com,pengutronix.de,intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290318-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[arm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robin.murphy@arm.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[65];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-290319-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:email,arm.com:email,arm.com:mid,arm.com:dkim]
-X-Rspamd-Queue-Id: 5257A5A31C6
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 79BE55A29B2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-05-21 9:36 am, Bartosz Golaszewski wrote:
-> Ahead of reworking the reference counting logic for platform devices,
-> encapsulate the assignment of the OF node for dynamically allocated
-> platform devices with the provided helper.
-
-FWIW,
-
-Acked-by: Robin Murphy <robin.murphy@arm.com>
-
-Although I'm not sure the whole lot couldn't just be replaced with 
-of_platform_device_create(), but then frankly this driver is on life 
-support anyway as it only serves one very niche VFIO use-case and it's 
-not clear whether it has any real mainline users left.
-
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+On 5/17/26 5:36 AM, Rosen Penev wrote:
+> Clear MAL descriptor rings with explicit field stores instead of
+> memset().  The descriptor rings are carved from MAL coherent DMA memory,
+> which may be mapped uncached on 32-bit powerpc.  The optimized memset()
+> path can use dcbz there and trigger an alignment warning.
+> 
+> The skb tracking arrays remain ordinary CPU memory and still use memset().
+> 
+> Assisted-by: Codex:GPT-5.5
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 > ---
->   drivers/iommu/fsl_pamu.c | 7 +++----
->   1 file changed, 3 insertions(+), 4 deletions(-)
+>  drivers/net/ethernet/ibm/emac/core.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/iommu/fsl_pamu.c b/drivers/iommu/fsl_pamu.c
-> index 25aa477a95a95cb4fa4e132727cde0a936750ee2..012839fa0d8a27cafc6a441373f4f6da794388c1 100644
-> --- a/drivers/iommu/fsl_pamu.c
-> +++ b/drivers/iommu/fsl_pamu.c
-> @@ -973,7 +973,8 @@ static __init int fsl_pamu_init(void)
->   		ret = -ENOMEM;
->   		goto error_device_alloc;
->   	}
-> -	pdev->dev.of_node = of_node_get(np);
+> diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
+> index 1fd7cb50c568..7ab5c944f5de 100644
+> --- a/drivers/net/ethernet/ibm/emac/core.c
+> +++ b/drivers/net/ethernet/ibm/emac/core.c
+> @@ -1161,6 +1161,17 @@ static void emac_clean_rx_ring(struct emac_instance *dev)
+>  	}
+>  }
+>  
+> +static void emac_clear_mal_desc(struct mal_descriptor *desc, int count)
+> +{
+> +	int i;
 > +
-> +	platform_device_set_of_node(pdev, np);
->   
->   	ret = pamu_domain_init();
->   	if (ret)
-> @@ -985,12 +986,10 @@ static __init int fsl_pamu_init(void)
->   		goto error_device_add;
->   	}
->   
-> +	of_node_put(np);
->   	return 0;
->   
->   error_device_add:
-> -	of_node_put(pdev->dev.of_node);
-> -	pdev->dev.of_node = NULL;
-> -
->   	platform_device_put(pdev);
->   
->   error_device_alloc:
-> 
+> +	for (i = 0; i < count; i++) {
+> +		desc[i].ctrl = 0;
+> +		desc[i].data_len = 0;
+> +		desc[i].data_ptr = 0;
+
+Sashiko noted that the compiler could still optimize the above to a
+memset(). Perhaps a barrier() is needed here?
+
+/P
 
 
