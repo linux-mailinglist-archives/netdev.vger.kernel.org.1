@@ -1,208 +1,197 @@
-Return-Path: <netdev+bounces-290238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290239-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 5o7VHZ6PDmqt/wUAu9opvQ
-	(envelope-from <netdev+bounces-290238-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 06:52:46 +0200
+	id /pvIGTqhDmpCAwYAu9opvQ
+	(envelope-from <netdev+bounces-290239-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:07:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B9359EE4A
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 06:52:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95A9659F4A4
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 08:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9FDCC3014240
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:52:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 13898304096E
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 06:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721FC34DCC7;
-	Thu, 21 May 2026 04:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2383672A5;
+	Thu, 21 May 2026 06:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O8TgVGya"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TyJpMhWw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB823438B1
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 04:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4E62BEFF6
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779339161; cv=none; b=gMLHgqj5ArBtAtSGTw1QoJVqnBB1++VAl9FB8ZwqcovfXTY1IpVjbB4qTfnn5hzNFcJ3h2pX7i1bsa8URpWh/S+7Bazm0fGhlSkJFemCcCZfFQJ7hPOtIDGyyMjFxGxbG5pPftBij+Mg5JrGVh2vohyEqvCSTHwSTcrxAdTWdb8=
+	t=1779343670; cv=none; b=HP+H+ed1ER5DWFVPflgYsCzJlgos44j1ILb9E0cJ/iYe0X8pPJ6qapXOyYXqhAfoxmHotxVfwwhC1bzwmQsTHQt3Ra/x0o6nVCmPMzE34otPCC3x2/J0z6hevzhzKHnRNG3pA0/Skz67ZXeIiEzJkZTwZXYo7YHEPpeu284b3a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779339161; c=relaxed/simple;
-	bh=fB62E0OIGJkoODKj8OfLkWohj+7ux5Lo1J4Ll9O/2Kw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hF352VVDHh6ldA0Ee+gjb7Vy2z1L1aX00tBtfaQI9XzYhQEX2mp9wHepduzBpDGGHbkfXkyfwsFCGoHybHTS7i1SpBSEvqplQP6gydPdD/1k00HY/oDbRbjfW8e4UCABpd85DeW8+9nCJ8L7uKNCnywlXp4AiNKRQNRPlPCNzxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O8TgVGya; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779339160; x=1810875160;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fB62E0OIGJkoODKj8OfLkWohj+7ux5Lo1J4Ll9O/2Kw=;
-  b=O8TgVGyaRj3UppPk2t6ChCoolWbS2cxX3rKP72aiuJaKBycIOLZPBYoA
-   BX5H+eB3bHSoKRFK174NpIN89tIXMswO19uxbj9aPR0vyGyMrX4bGXnFs
-   MR1XoyDZHpZjHl5vSDn06SPPqkRT+/nbJwDQaLCXFiKaEoY4/Dfh/+EJL
-   rM64LHvcqoRUgr6u95Y/dLNQ4bzZcnriEC9gZBNpVV2piWs947UUgn0e6
-   2Qi3wNzxWK136QgVZ2Il1F1Cakycb5RePcLbF5DJLUYYxWqeM/ICsP3ny
-   rUHdTf1QU+HKmXgpVVdmLwu9FkWaY+L+k5nSAg+8jwHp08X3hX9w8G58X
-   Q==;
-X-CSE-ConnectionGUID: q7Exyi9DSRm9/nPikfb8yw==
-X-CSE-MsgGUID: nATaS9RiQh+ibG7tv5J16w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="82830366"
-X-IronPort-AV: E=Sophos;i="6.23,245,1770624000"; 
-   d="scan'208";a="82830366"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 21:52:39 -0700
-X-CSE-ConnectionGUID: /D/HkRmxTeyI78Cdn0v9pw==
-X-CSE-MsgGUID: FYGcMwYaQaK7q2hzrEVfGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,245,1770624000"; 
-   d="scan'208";a="237393057"
-Received: from lkp-server02.sh.intel.com (HELO 30e86e9c1927) ([10.239.97.151])
-  by fmviesa007.fm.intel.com with ESMTP; 20 May 2026 21:52:35 -0700
-Received: from kbuild by 30e86e9c1927 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wPvOD-000000004Pl-3rvW;
-	Thu, 21 May 2026 04:52:12 +0000
-Date: Thu, 21 May 2026 12:51:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jayachandran <j-rameshbabu@ti.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
-	Daolin Qiu <d-qiu@ti.com>, Eric Dumazet <edumazet@google.com>,
-	Felix Maurer <fmaurer@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Neelima Muralidharan <neelima@ti.com>,
-	Paolo Abeni <pabeni@redhat.com>, Praneeth Bajjuri <praneeth@ti.com>,
-	Pratheesh Gangadhar TK <pratheesh@ti.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v4] hsr: Allow to send a specific port and with
- HSR header
-Message-ID: <202605211206.puPhEK7J-lkp@intel.com>
-References: <20260508-hsr_ptp-v4-1-aa19aa7c6a71@linutronix.de>
+	s=arc-20240116; t=1779343670; c=relaxed/simple;
+	bh=YNg1uNMBpTq8tTzFkHLFh9Nff7Tta9n4b4enIBryprM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BPpS5erGgQtYCWdRtDXKh5PUga2dWHNoYdIZi4DCWoB3OaQgwbveM7NFcochkJmF2yoYSb/Z5gI45qy6n3sdPspC2fwRgABeLqzmJAq5LlVhz9OXUGLLzoaO9N6k6fpNNYqXvuZruEaIojYialRqT6S3l0zmwb1O9arbHCm58WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TyJpMhWw; arc=none smtp.client-ip=74.125.224.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-651bf695701so5500889d50.2
+        for <netdev@vger.kernel.org>; Wed, 20 May 2026 23:07:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779343668; x=1779948468; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v/4tpqxeEoNUq/Dqf4W4r6oPmkkXtFBFoEdxmJFSLDs=;
+        b=TyJpMhWwHTpwGA5g/tD8DyVGWBhCd2D16hhTgfllsyTawwpDUEF2z34+sojqU3hnNf
+         VuieXl7AbD5cm2ygEfCqtR64B13iZ3BThcO7ezdJUM+K3CF1JcHU2r5NtWbT6t+i8+Nw
+         CJmmsGK9Z24NerrU2k1WEkluy1VyDwhkckQUaUq/q80pzKsgQcsWYRGtydIcDqN+0D/x
+         R5ahWTMHyr1NlmypkXoJKNz28WQqNWmgUw453becPZgls051pBnlnehoX8rjY6HcHnSO
+         57xy+bNUzMxSGEC6r15qLIR0cVhT6Hm3hMiJMizwnh0pe4DELN4YtudZ+SNdwkA/uVV8
+         /0tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779343668; x=1779948468;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v/4tpqxeEoNUq/Dqf4W4r6oPmkkXtFBFoEdxmJFSLDs=;
+        b=mVsWDvE83YyG9mlml0Zyvoe3SQuz0N5UjwDd0JSQcCRz60pmoBDIQVT5DKThU31TPX
+         DiFleoxHV0XfPSu4pN7j7myAzggCPft7JiN9mkDtVsqR0cQmBlyLPCXiKN2srTWLpjyP
+         V8gYGqhThG2efo09Z4xRp1988C9b59ZOxQuFtZo6nwopeEP63StHXVwhUo58XtoKYQnd
+         JWfYDHeVjWIYAuQE6MyPYQEIR5o8nd1o+rQjkzWELw5+iHIVjFKeREtmdFDw0BichZcj
+         wEBsuO0qbfMUN640E979xb8V1ym0XQh40Yl6+wzvispQt7fOaO0afa3WKqn/U81bOcLQ
+         l3mA==
+X-Gm-Message-State: AOJu0YyRzwWlscc27aVUr6TKOxdhRggldo4ZwYiTWygRFAnDBTsEUUxv
+	AdHuzG0/PXUQlEuZ6/hSsO4MDPe0bQrdvt+7ExnczJCt50Zh+aCndSSd3fP/6g==
+X-Gm-Gg: Acq92OFvVRj0nndYF+mpfnI2q+4Fv4HcUowL+E9ELGSoX8ylErPbwFw6kksN2yPW8Ff
+	wykJ2Bu8UPfulC/PjQ39lspcjV7suaDE5lq1BojQYummVGJHNn2/funN11kVNwQqQNve/m9ARL4
+	7urGECfY+0eWBou97/tcxD3DGQ+c9puaM6e/bbOwdqBD8cO0Q03e9QgJa1tFfTSwSMoo1rLOCow
+	nyOIgj+xHZgFVYaHdWskGwO46Bn16o0JKfvYT5URPxObLD4cNKtnl40zmrqcBOd4MZPKuhrUiPj
+	x09+79A/GlVg1FjA+E1vNXVbGRgPLAGweB27XcDxHESvnx2+NedH2VZTRhDrH+CVuc7kfkXC9lI
+	zNVasoxlfs3KPhEiNNenJhlBVJEDY5M8LxQlaLT7vBmExBHGI5FoadgZu0W1WIxqcDNj4sGreQQ
+	sM0LKbV9MVWbHvZ1Cr/5xiJNAukAPKIKlyilu86L1WRtloIWyTH4nCY8yKIo2F+HpXX+x0P5kmx
+	810nNyNY+sENOA3BQF1IvwH3LtEmIWjCrQ=
+X-Received: by 2002:a05:690e:120d:b0:65e:b97:771c with SMTP id 956f58d0204a3-65eae0ca72cmr1176525d50.42.1779343667896;
+        Wed, 20 May 2026 23:07:47 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65e0dbcda4bsm10325235d50.18.2026.05.20.23.07.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 23:07:46 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linuxppc-dev@lists.ozlabs.org (open list:FREESCALE QUICC ENGINE UCC ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2 net-next] net: ucc_geth: Batch RX packets before stack handoff
+Date: Wed, 20 May 2026 23:07:29 -0700
+Message-ID: <20260521060729.2293222-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260508-hsr_ptp-v4-1-aa19aa7c6a71@linutronix.de>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[lists.linux.dev,ti.com,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-290238-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290239-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,01.org:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D1B9359EE4A
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 95A9659F4A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Sebastian,
+Collect received skbs on a local list during RX polling and pass the
+completed batch to netif_receive_skb_list(). This lets the networking
+stack process packets from a poll cycle in bulk instead of handing each
+skb up individually.
 
-kernel test robot noticed the following build warnings:
+Speedup tested with bidirectional iperf3 on a Watchguard Firebox T15-W.
 
-[auto build test WARNING on 9e0898f1c0f134c6bad146ca8578f73c3e40ac0a]
+Before:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sebastian-Andrzej-Siewior/hsr-Allow-to-send-a-specific-port-and-with-HSR-header/20260515-223023
-base:   9e0898f1c0f134c6bad146ca8578f73c3e40ac0a
-patch link:    https://lore.kernel.org/r/20260508-hsr_ptp-v4-1-aa19aa7c6a71%40linutronix.de
-patch subject: [PATCH net-next v4] hsr: Allow to send a specific port and with HSR header
-config: mips-randconfig-r123-20260516 (https://download.01.org/0day-ci/archive/20260521/202605211206.puPhEK7J-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project 5bac06718f502014fade905512f1d26d578a18f3)
-sparse: v0.6.5-rc1
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260521/202605211206.puPhEK7J-lkp@intel.com/reproduce)
+[ ID][Role] Interval           Transfer     Bitrate         Retr
+[  5][TX-C]   0.00-10.00  sec   490 MBytes   411 Mbits/sec                  sender
+[  5][TX-C]   0.00-10.01  sec   488 MBytes   409 Mbits/sec                  receiver
+[  7][RX-C]   0.00-10.00  sec   176 MBytes   147 Mbits/sec  167            sender
+[  7][RX-C]   0.00-10.01  sec   175 MBytes   146 Mbits/sec                  receiver
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605211206.puPhEK7J-lkp@intel.com/
+After:
 
-sparse warnings: (new ones prefixed by >>)
->> net/hsr/hsr_device.c:242:42: sparse: sparse: restricted __be16 degrades to integer
->> net/hsr/hsr_device.c:243:39: sparse: sparse: restricted __be32 degrades to integer
+[ ID][Role] Interval           Transfer     Bitrate         Retr
+[  5][TX-C]   0.00-10.00  sec   502 MBytes   421 Mbits/sec                  sender
+[  5][TX-C]   0.00-10.01  sec   501 MBytes   420 Mbits/sec                  receiver
+[  7][RX-C]   0.00-10.00  sec   212 MBytes   178 Mbits/sec  148            sender
+[  7][RX-C]   0.00-10.01  sec   211 MBytes   177 Mbits/sec                  receiver
 
-vim +242 net/hsr/hsr_device.c
+It would be nice to use napi_gro_receive, but the tradeoff is lower
+routing performance. There is no support for hardware checksum offload,
+which really hurts routing performance.
 
-   223	
-   224	static netdev_tx_t hsr_dev_xmit(struct sk_buff *skb, struct net_device *dev)
-   225	{
-   226		enum hsr_port_type tx_port = HSR_PT_NONE;
-   227		struct hsr_priv *hsr = netdev_priv(dev);
-   228		struct hsr_port *master;
-   229		bool has_header = false;
-   230	
-   231		rcu_read_lock();
-   232		master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
-   233		if (!master)
-   234			goto drop;
-   235	
-   236		skb->dev = master->dev;
-   237		if (skb->len > ETH_HLEN * 2) {
-   238			struct hsr_inline_header *hsr_opt;
-   239	
-   240			BUILD_BUG_ON(sizeof(struct hsr_inline_header) != sizeof(struct ethhdr));
-   241			hsr_opt = (struct hsr_inline_header *)skb_mac_header(skb);
- > 242			if (hsr_opt->eth_type == htons(ETH_P_1588) &&
- > 243			    hsr_opt->magic == htonl(HSR_INLINE_HDR)) {
-   244				has_header = hsr_opt->hsr_hdr;
-   245				tx_port = hsr_opt->tx_port;
-   246				if (tx_port != HSR_PT_SLAVE_A && tx_port != HSR_PT_SLAVE_B)
-   247					goto drop;
-   248	
-   249				skb_pull(skb, sizeof(struct hsr_inline_header));
-   250				if (has_header)
-   251					skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
-   252				else
-   253					skb_set_network_header(skb, ETH_HLEN);
-   254			}
-   255		}
-   256	
-   257		skb_reset_mac_header(skb);
-   258		skb_reset_mac_len(skb);
-   259		spin_lock_bh(&hsr->seqnr_lock);
-   260		hsr_forward_skb(skb, master, tx_port, has_header);
-   261		spin_unlock_bh(&hsr->seqnr_lock);
-   262		rcu_read_unlock();
-   263	
-   264		return NETDEV_TX_OK;
-   265	drop:
-   266		rcu_read_unlock();
-   267		dev_core_stats_tx_dropped_inc(dev);
-   268		dev_kfree_skb_any(skb);
-   269		return NETDEV_TX_OK;
-   270	}
-   271	
+Assisted-by: Codex:GPT-5.5
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v2: add extra info in description
+ drivers/net/ethernet/freescale/ucc_geth.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+index 7af4b5e3f38e..bce1079fc06a 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -2894,6 +2894,7 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+ 	u32 bd_status;
+ 	u8 *bdBuffer;
+ 	struct net_device *dev;
++	LIST_HEAD(rx_list);
+ 
+ 	ugeth_vdbg("%s: IN", __func__);
+ 
+@@ -2934,7 +2935,7 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+ 
+ 			dev->stats.rx_bytes += length;
+ 			/* Send the packet up the stack */
+-			netif_receive_skb(skb);
++			list_add_tail(&skb->list, &rx_list);
+ 		}
+ 
+ 		skb = get_new_skb(ugeth, bd);
+@@ -2960,6 +2961,8 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+ 		bd_status = in_be32((u32 __iomem *)bd);
+ 	}
+ 
++	netif_receive_skb_list(&rx_list);
++
+ 	ugeth->rxBd[rxQ] = bd;
+ 	return howmany;
+ }
+-- 
+2.54.0
+
 
