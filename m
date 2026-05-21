@@ -1,148 +1,210 @@
-Return-Path: <netdev+bounces-290486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290498-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YO2QHNggD2qnGAYAu9opvQ
-	(envelope-from <netdev+bounces-290486-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:12:24 +0200
+	id 8IfBFlMhD2rPGAYAu9opvQ
+	(envelope-from <netdev+bounces-290498-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:14:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1869B5A80D2
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:12:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFDCA5A8157
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D3FA31F1D44
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:10:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A78543249F3B
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45AC41A6814;
-	Thu, 21 May 2026 14:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5083EE1DA;
+	Thu, 21 May 2026 14:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsKg+a+x"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="BSMtO0QA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175A7611E
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD713F0AB1;
+	Thu, 21 May 2026 14:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779372611; cv=none; b=XzqxaOIAGRSPYwBzzMqrUh6RpdeVqoQyfUp/n+Y+eDbYxvIp1w80YeQUiIscQMIMsd5gggH7dnXsONr8h6qgD3Xdu7gxYMPbl5ceGs4oFjZaBHBDb5Y1TaiYHrGBWuiW70Cjw2qMY8A/IQbwaI1PPGhNQ7pWQgvrkJzltMa6vkE=
+	t=1779374100; cv=none; b=buyB/pWQOqJ7Y3QiozBcICxSc7vbnMNkIm2dqQaiR+CR3BlSE6o1r4Ad7V9lygDo1un8snnVRUeQwADIDfzbsDkCRSIl4b4wJyfk7PoX1HdkhVxlXLKQoRBSWZ3bj7O1hKmcPX7lCjMadbV7KZFD8YKYQIfd7CLmfFRVBmGHv9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779372611; c=relaxed/simple;
-	bh=LfJEed8FVi8NmPUXZMR6kRoE98S+/KBhKkfvSRpeUCw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JzWt+eer2hurujf6OtHUz/t1ZI5EF/N5N0Rh2XYbuIxJY/BTYpkoYdPSCCW9OJ/NI5nQPA1r0eGVfzWqQ2Rh0FHRXWDVSlx0C/S0Y0/DxjsI+BM7cRUQ7gE13gPkEnMI+ZXgqZFoCEtlodtDYdbUweUGIyyt/bsS6uoQnm1Kr4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsKg+a+x; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3DD81F000E9;
-	Thu, 21 May 2026 14:10:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779372609;
-	bh=ALfJb7rTXQ+RL1IByyB+qWVeikkQgS87H8EQ9cZsr4c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=GsKg+a+xtMFkLOTv9gk5rAV2YNiDd1JwYCvfUQ06co0bMlI5PBcMJ5h3HVl23IdVx
-	 2sqDESNsx1vavu/1uQ/YJ4QXgp5qSb3hURNwetG9+yRteE4MovXVBJK8HhH7VrzwVX
-	 5ST5Wcw5AtD3ZUr0suDJmr28B7GVYg7kSl0nFK2ZbbyHdl8QpyhKjVcYTWb8VesBHA
-	 6ThCx27WsUb7K7Nqc+Ul97zkTs6vsK+ltsCbATsiAVkDguDjHTFR3s3G89yMUncfyr
-	 whtcpogu4uGJYy2I1uP8qPRMWZ9cSSw8outrshzJ+Sz8cnyanbfZwTKw23OlVh/5Kg
-	 diJsydiCnFH5Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0B733930DE5;
-	Thu, 21 May 2026 14:10:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1779374100; c=relaxed/simple;
+	bh=KOcqB4yiXaUIQL7EBJxJNPCiiEntHJ1bUw8VYCWroQA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SasILCP03v6EOkCTvFeFk0Vm7OiHkZdSZAsJ8gl7C+6fGkCW4EiAz/kHVonzXPB/eImu/LcAlI2nIu5nKKDhPy0/06QPZs2j1zaH3rfQSMuUA8DQ9BaCwTLfsghbss+EeibXaDmfwc5EUd/QQ6s0c9iRfjPSd+IjPfLrBSl44RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=BSMtO0QA; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
+	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
+	bh=qAMGqTgmR8jSCdmI+3X6UVT4uJLS740CwO54lzXmRr0=; b=BSMtO0QAxYtBvbaIUIuu/RkNRo
+	sP7sh6Xt1jZRnIb/d8RI0Jh5vpVeFqcyTdauqTCnkGyuMH9L9jnwfRVO0KRKJjg9iptb6CCj6GE3Y
+	qLqymGi6NbZ09QRCzIK8y9tDItyH2hCOfd8t+zrXi+VyAVMbdgY8isFlYNroWVF3FavcIrpi8iukT
+	6TkZ0KZizXy54h4LnH5K+Ao/yzxrft0HZTyQcuhSMl1maTsHu9qe1F5tEn611lamjSTd6Fjs4waj2
+	X+cftUQvX/sPHNDnpi2Fpha3m+rx3BFqU47CZGSV++Q7GhVqQCuQKmc41usxZFKn9dPfTsB4V6ZGC
+	zzP6/AEA==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wQ48C-003wJF-2q;
+	Thu, 21 May 2026 14:12:13 +0000
+From: Breno Leitao <leitao@debian.org>
+Date: Thu, 21 May 2026 07:11:45 -0700
+Subject: [PATCH net] net/iucv: fix locking in .getsockopt
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 01/11] batman-adv: fix batadv_skb_is_frag() kernel-doc
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177937261940.334326.3846070326283907142.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 14:10:19 +0000
-References: <20260520115422.53552-2-sw@simonwunderlich.de>
-In-Reply-To: <20260520115422.53552-2-sw@simonwunderlich.de>
-To: Simon Wunderlich <sw@simonwunderlich.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- b.a.t.m.a.n@lists.open-mesh.org, sven@narfation.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260521-af_iucv_fix2-v1-1-f16b1c510aa9@debian.org>
+X-B4-Tracking: v=1; b=H4sIAKASD2oC/yXMQQqDMBAF0KsMf20gpsZArlKKpHGi4yItiYog3
+ r203b7FO1G5CFd4OlF4lyqvDE9tQ4hzyBMrGeEJRpteW6NVSINscR+SHEa5ztk+6FtnW4eG8C6
+ c5Ph1d2Re8fhj3Z4Lx/Ub4bo+w+XycXUAAAA=
+X-Change-ID: 20260520-af_iucv_fix2-74756a034517
+To: Alexandra Winter <wintera@linux.ibm.com>, 
+ Thorsten Winkler <twinkler@linux.ibm.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Ursula Braun <ursula.braun@de.ibm.com>, 
+ Frank Blaschka <frank.blaschka@de.ibm.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+ Stanislav Fomichev <sdf.kernel@gmail.com>, Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.16-dev-d5d98
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2436; i=leitao@debian.org;
+ h=from:subject:message-id; bh=KOcqB4yiXaUIQL7EBJxJNPCiiEntHJ1bUw8VYCWroQA=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqDxK3tMf/ylUFHpLxikkm2upb64Ed2ZLgjulnm
+ UAsOI56JViJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCag8StwAKCRA1o5Of/Hh3
+ bS5GD/9g0WFCY/wMWvxDQMlhYsmfkNfHZL5OCW2hq02snkDp9agp/tjVHT3EFWoUFwc5hnFrSCE
+ CGA0GdctEd+tvz/YkaFOA9dmtWruSMZX9IhtffAuvc6ZCZCdRwZvkSG1ZqY6XxUucU23Qe35oOt
+ YAjmaXz9Bf19MkV/zPRLPbjmt6GyLJsC/lYUYHENWJhiRh6g1oQzmutnh5E7lO/8LQ2MjeJVu/V
+ 5bXdNgfujk41lZ1YCPMbeSWPTLVMRX8GQKJnTB1Sxg7RBbxEFetrO2hPlxIJayTyQGFMGW/nGux
+ TytPgwc/CWa4+o/mK0ueahgtCOD6OawLSu4Oukpknw5ldvsbsl44JbVHlXNTFtMsJVHvmA4NXMK
+ z9w+HZymOemHONr4UGgMYo3DPLIREg/liAaMCCe1FKAqXQc2qriPc9aJFi3EnEKIS9GuSY00kF3
+ D3nsvlwtimm6qV114e4+kiu3a21fohDh5IUX5MRTee4goQ9DtUANd7t/Ou1zdk18eifIddWqOKQ
+ wYL0MofDUiCJuOcxPQ99fhI8THBDdTVJBRsMV/BcN5JwHyTwCBTCNwjCAMVv9H/Nb/ZeHQTgDzU
+ /ieAQOzoM9IxXe/3pctCDx4qU8ij3GvfstfAonEGX/5y5R4OZ0EaaRJXoV72O+JHaxaGC13RDbJ
+ sSCTIEbsk8VDF4g==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290486-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-290498-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[vger.kernel.org,meta.com,gmail.com,debian.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,narfation.org:email]
-X-Rspamd-Queue-Id: 1869B5A80D2
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: CFDCA5A8157
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+Mirror iucv_sock_setsockopt() and wrap the whole switch in
+lock_sock()/release_sock(). The pre-existing SO_MSGLIMIT-only lock
+becomes redundant and is removed.
 
-This series was applied to netdev/net.git (main)
-by Sven Eckelmann <sven@narfation.org>:
+Any AF_IUCV HIPER user can potentially crash the kernel by racing
+recvmsg() with getsockopt(SO_MSGSIZE): the SO_MSGSIZE arm dereferences
+iucv->hs_dev->mtu after iucv_sock_close() (called from the racing
+recvmsg()) has set hs_dev to NULL, producing a NULL pointer dereference
+oops.
 
-On Wed, 20 May 2026 13:54:12 +0200 you wrote:
-> From: Sven Eckelmann <sven@narfation.org>
-> 
-> The kernel-doc comment for batadv_skb_is_frag() contained two errors:
-> 
-> * the function description referred to "gain a unicast packet" instead
->   of "contains unicast fragment".
-> * the Return section omitted "merged" from "newly skb", leaving the
->   description grammatically incorrect and inconsistent with the
->   function description.
-> 
-> [...]
+Suggested-by: Stanislav Fomichev <sdf.kernel@gmail.com>
+Fixes: 51363b8751a6 ("af_iucv: allow retrieval of maximum message size")
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Note1: Not using goto/label to simplify the merge conflict that might
+happen with the migration of af_iucv to getsockopt_iter
 
-Here is the summary with links:
-  - [net,01/11] batman-adv: fix batadv_skb_is_frag() kernel-doc
-    https://git.kernel.org/netdev/net/c/0039ac830506
-  - [net,02/11] batman-adv: v: stop OGMv2 on disabled interface
-    https://git.kernel.org/netdev/net/c/f8ce8b8331a1
-  - [net,03/11] batman-adv: tvlv: abort OGM send on tvlv append failure
-    https://git.kernel.org/netdev/net/c/501368506563
-  - [net,04/11] batman-adv: tvlv: reject oversized TVLV packets
-    https://git.kernel.org/netdev/net/c/f50487e35663
-  - [net,05/11] batman-adv: tp_meter: fix race condition in send error reporting
-    https://git.kernel.org/netdev/net/c/71dce47f0758
-  - [net,06/11] batman-adv: tp_meter: avoid role confusion in tp_list
-    https://git.kernel.org/netdev/net/c/ff24f2ecfd94
-  - [net,07/11] batman-adv: mcast: fix use-after-free in orig_node RCU release
-    https://git.kernel.org/netdev/net/c/20c2d6a20ca9
-  - [net,08/11] batman-adv: iv: recover OGM scheduling after forward packet error
-    https://git.kernel.org/netdev/net/c/aa3153bd139a
-  - [net,09/11] batman-adv: bla: fix report_work leak on backbone_gw purge
-    https://git.kernel.org/netdev/net/c/0459430add32
-  - [net,10/11] batman-adv: bla: avoid double decrement of bla.num_requests
-    https://git.kernel.org/netdev/net/c/83ab69bd12b8
-  - [net,11/11] batman-adv: bla: avoid NULL-ptr deref for claim via dropped interface
-    https://git.kernel.org/netdev/net/c/f80d3d98d2ff
+Note2: This was only compile-tested.
+---
+ net/iucv/af_iucv.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
+index 72dfccd4e3d58..c2dc3338670e8 100644
+--- a/net/iucv/af_iucv.c
++++ b/net/iucv/af_iucv.c
+@@ -1540,7 +1540,7 @@ static int iucv_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	struct iucv_sock *iucv = iucv_sk(sk);
+ 	unsigned int val;
+-	int len;
++	int len, rc;
+ 
+ 	if (level != SOL_IUCV)
+ 		return -ENOPROTOOPT;
+@@ -1553,26 +1553,34 @@ static int iucv_sock_getsockopt(struct socket *sock, int level, int optname,
+ 
+ 	len = min_t(unsigned int, len, sizeof(int));
+ 
++	rc = 0;
++
++	lock_sock(sk);
+ 	switch (optname) {
+ 	case SO_IPRMDATA_MSG:
+ 		val = (iucv->flags & IUCV_IPRMDATA) ? 1 : 0;
+ 		break;
+ 	case SO_MSGLIMIT:
+-		lock_sock(sk);
+ 		val = (iucv->path != NULL) ? iucv->path->msglim	/* connected */
+ 					   : iucv->msglimit;	/* default */
+-		release_sock(sk);
+ 		break;
+ 	case SO_MSGSIZE:
+-		if (sk->sk_state == IUCV_OPEN)
+-			return -EBADFD;
++		if (sk->sk_state == IUCV_OPEN) {
++			rc = -EBADFD;
++			break;
++		}
+ 		val = (iucv->hs_dev) ? iucv->hs_dev->mtu -
+ 				sizeof(struct af_iucv_trans_hdr) - ETH_HLEN :
+ 				0x7fffffff;
+ 		break;
+ 	default:
+-		return -ENOPROTOOPT;
++		rc = -ENOPROTOOPT;
++		break;
+ 	}
++	release_sock(sk);
++
++	if (rc)
++		return rc;
+ 
+ 	if (put_user(len, optlen))
+ 		return -EFAULT;
 
+---
+base-commit: dc416e32baaeb620b9809e9e25fc7b30889686e9
+change-id: 20260520-af_iucv_fix2-74756a034517
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
