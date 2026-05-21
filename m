@@ -1,279 +1,155 @@
-Return-Path: <netdev+bounces-290263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290264-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2HrvNfe0DmosBQYAu9opvQ
-	(envelope-from <netdev+bounces-290263-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:32:07 +0200
+	id aJCGJqC4DmrBBgYAu9opvQ
+	(envelope-from <netdev+bounces-290264-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:47:44 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EBE15A0278
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:32:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33CA75A057D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3A01304A6C3
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 07:26:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0DDBE302F3A0
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 07:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7794F39A800;
-	Thu, 21 May 2026 07:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4042384CE8;
+	Thu, 21 May 2026 07:42:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVV1TIFv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UPGvCxvR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A271D3955C5;
-	Thu, 21 May 2026 07:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA1A369970
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 07:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779348377; cv=none; b=OSSflHZ5BALPaJv1titicqSEFS18yyxbySYssdyo43a4sjErFw96IDnolz4DDybvevwoIuy1HmirewMWA7r+Y5fYkFofeIdZ3Zt+Hn6/DaHq09/K+FQUiMtP1WVfFuHHkVKOIZ7BiNWfvUZFjmAK5RsjirTvec9u9D7JQgR+MFA=
+	t=1779349360; cv=none; b=sVUChuTvQz9Gg4KlPygCLAOnVxKT3n0y5TMb50QAMMaCnF+i4/0L2YJG1v4pABem1OkX2nkOmGMJtU69J7Uxg8+hlgKz5mdJdIaK7HSiAbAl5pnbpSmrK45zU2Il4JsLJdVFdtpEKNC2CA7ipRY7+/pkswU95wsBoASk2TjM03U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779348377; c=relaxed/simple;
-	bh=OFrMN6zDaqSIP5FGJvYTyqZ2WeD27ThPOdSlDMTVUZw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H8IoRa5HFGWrCN/a4jWNCocTIU/7y5aHO2KJVBk4EqwvXLS1Uep3Hyc39x5VwwgLwznSauKNHyA6LW6uDjcTjrKD+YPjuIsXDiV+69baU1Qfx26l7le/GHES6XfpJ9Ms3iT8F9ZnUCPgR4ZcSSwPjTn/zHfp5Es7hdL9VPIjlb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVV1TIFv; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5C0B1F000E9;
-	Thu, 21 May 2026 07:26:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779348373;
-	bh=o9bC+9cpiCSB3nTnXAJVVDIec3sZpcV7549Ot/IF0lE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=EVV1TIFvEJnrYVqmXZjyV294rD5EgD5Eqsc6y/zsG5mumVzK46O2m/xpL+eZ+GG66
-	 58J71kmpPTCrP2hazDM2va/SoQcGIT7hkn+QYvnQgpXGq6SBXcax8CPHH0E0OMZfxi
-	 ZXSIYXRlBLCi6nFHImYL27aQQHDIMTeKVfuaih/gD2uJl3EEH760rq+ipMuNOPOxCr
-	 HLFF1SOEvYXCPNu3BpaqBsjBaUwmJ1x0HCP4uhPyi7P7MoOklbVzDYoY8o9uKOKOtK
-	 b/y+7tR8vIkugCR4KJf7GULb/pbnS3Mej7U9xKyQaT6P17c7mCloQgyX5Jmpp0SVGx
-	 gWV6NZyBMWeaQ==
-Message-ID: <48cc27ed-48e8-41db-8351-166774466a69@kernel.org>
-Date: Thu, 21 May 2026 09:26:09 +0200
+	s=arc-20240116; t=1779349360; c=relaxed/simple;
+	bh=j1mdV7OC7OIpYI7saIa/DWoNbEvAqsQycuTbEzIbups=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D+waSA2Uk/CEWPzudAXsGLbE1vEyL8vPIhAF2/IPI/0z0YSVO+RC9uAOXV0G44kYMSsH5nrupddm5+m3yfqIgIQF28FSsmx0ZTU2rwqc4sT5L63joPQfF6vxnT/DVQrnx5ue4AAFbvQbe26i+nb/+h5ZFzUpRTxZ+hsLe54kPuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UPGvCxvR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779349358;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OpRJi5ew7UC6Tw+onC7/ETTvlR3lzS4+PzEgUivNZSU=;
+	b=UPGvCxvR4hEbMnrzMVRkUIdwsp6Lu8ASRYcdjZU81tHiTcROZMZfL5mSjtsTz8dZdIcGRl
+	rIEfyqhXnguRinOLNqyMru/iZj2x3IPpAiuq3Mt0U++oGWdulI6jf5RwlK7NLKCXAsCmzr
+	vcogJxYwOZAfQr8nsx0JWKSILQkGaMc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-161-x8IFRELKPDm0-Yg-QbsxLg-1; Thu,
+ 21 May 2026 03:42:33 -0400
+X-MC-Unique: x8IFRELKPDm0-Yg-QbsxLg-1
+X-Mimecast-MFC-AGG-ID: x8IFRELKPDm0-Yg-QbsxLg_1779349352
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A86E1800611;
+	Thu, 21 May 2026 07:42:31 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.44.32.79])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BA9EF19560A3;
+	Thu, 21 May 2026 07:42:26 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pasi Vaananen <pvaanane@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Simon Horman <horms@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 0/2] dpll: add NCO pin type and zl3073x support
+Date: Thu, 21 May 2026 09:42:18 +0200
+Message-ID: <20260521074220.432590-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 2/3] dt-bindings: dpll: add SiTime SiT9531x
- clock generator
-To: Ali Rouhi <rouhi.ali@gmail.com>, jiri@resnulli.us
-Cc: vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- cjubran@nvidia.com, Oleg.Zadorozhnyi@devoxsoftware.com,
- devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ali Rouhi <arouhi@sitime.com>
-References: <20260520191943.73938-1-arouhi@sitime.com>
- <20260520191943.73938-3-arouhi@sitime.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260520191943.73938-3-arouhi@sitime.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290263-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,resnulli.us];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,microchip.com,linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290264-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.68:email,devicetree.org:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sitime.com:email]
-X-Rspamd-Queue-Id: 3EBE15A0278
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 33CA75A057D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 20/05/2026 21:19, Ali Rouhi wrote:
-> Add device tree binding documentation for the SiTime SiT95316
-> and SiT95317 DPLL clock generators.
-> 
-> Co-developed-by: Oleg Zadorozhnyi <Oleg.Zadorozhnyi@devoxsoftware.com>
-> Signed-off-by: Oleg Zadorozhnyi <Oleg.Zadorozhnyi@devoxsoftware.com>
-> Signed-off-by: Ali Rouhi <arouhi@sitime.com>
+Add a new DPLL_PIN_TYPE_INT_NCO pin type for virtual pins representing
+the NCO mode of a DPLL and implement support for it in the zl3073x driver.
 
-Mismatched DCO. Use consistent identity or fix your commits.
+Patch 1 adds the new pin type to the DPLL netlink spec and UAPI header.
 
-> ---
->  .../bindings/dpll/sitime,sit9531x.yaml        | 145 ++++++++++++++++++
->  1 file changed, 145 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml b/Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml
-> new file mode 100644
-> index 000000000000..ac88f2f0b2ae
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/dpll/sitime,sit9531x.yaml
-> @@ -0,0 +1,145 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/dpll/sitime,sit9531x.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: SiTime SiT9531x DPLL Clock Generator
-> +
-> +maintainers:
-> +  - Ali Rouhi <arouhi@sitime.com>
-> +
-> +description: |
-> +  SiTime SiT95316 and SiT95317 are I2C-controlled programmable clock
-> +  generators with integrated DPLL for synchronization applications.  Both
-> +  variants contain four PLLs with automatic/manual reference selection,
-> +  DCO frequency adjustment, and phase offset measurement via an on-chip
-> +  TDC (Time-to-Digital Converter).
-> +
-> +  SiT95317 provides 4 inputs and 8 outputs; SiT95316 provides
-> +  4 inputs and 12 outputs.
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - sitime,sit95316
-> +      - sitime,sit95317
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 1
-> +    description:
-> +      External crystal/oscillator feeding the chip's XIN/XO_CLK input.
-> +      The chip's PLL Fvco is computed relative to this reference, so the
-> +      driver requires a non-zero rate at probe time.
+Patch 2 adds a virtual NCO input pin to the zl3073x driver that allows
+userspace to switch a DPLL channel into NCO mode. The pin reports
+connected/active state when the channel is in NCO mode and handles
+the hardware-specific details of mode transitions including automatic
+df_offset capture and 1PPS phase preservation.
 
-Same as last time. Why are you describing drivers?
+Changes:
+v3:
+  - fixed SoB position
+v2:
+  - See individual patches for detailed changelogs.
 
-> +
-> +  clock-names:
-> +    items:
-> +      - const: xtal
-> +
-> +  reset-gpios:
-> +    maxItems: 1
-> +    description:
-> +      GPIO connected to the chip's active-low reset pin (RESETB).
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +    description:
-> +      Interrupt from the chip's active-low INTRB output.  Asserted when
-> +      the device detects a status change such as lock acquisition or loss.
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - clock-names
-> +
-> +allOf:
-> +  - $ref: /schemas/dpll/dpll-device.yaml#
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    xo: xo {
-> +        compatible = "fixed-clock";
-> +        #clock-cells = <0>;
-> +        clock-frequency = <48000000>;
-> +    };
+Ivan Vecera (2):
+  dpll: add DPLL_PIN_TYPE_INT_NCO pin type
+  dpll: zl3073x: add NCO virtual input pin
 
-Drop node. Wasn't here before, so why did you add it?
+ Documentation/netlink/specs/dpll.yaml |  13 ++
+ drivers/dpll/dpll_nl.c                |   2 +-
+ drivers/dpll/zl3073x/chan.c           |  68 ++++++-
+ drivers/dpll/zl3073x/chan.h           |  25 +++
+ drivers/dpll/zl3073x/dpll.c           | 277 ++++++++++++++++++++++----
+ drivers/dpll/zl3073x/dpll.h           |   2 +
+ drivers/dpll/zl3073x/regs.h           |   7 +
+ include/uapi/linux/dpll.h             |   4 +
+ 8 files changed, 357 insertions(+), 41 deletions(-)
 
+-- 
+2.53.0
 
-> +
-> +    i2c {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        dpll@68 {
-> +            compatible = "sitime,sit95317";
-> +            reg = <0x68>;
-> +            clocks = <&xo>;
-> +            clock-names = "xtal";
-> +        };
-> +    };
-> +
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +
-> +    xo2: xo2 {
-> +        compatible = "fixed-clock";
-> +        #clock-cells = <0>;
-> +        clock-frequency = <48000000>;
-> +    };
-
-Drop.
-
-> +
-> +    i2c {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-
-
-
-Best regards,
-Krzysztof
 
