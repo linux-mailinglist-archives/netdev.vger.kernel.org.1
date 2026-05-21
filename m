@@ -1,228 +1,145 @@
-Return-Path: <netdev+bounces-290620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uD2qBa98D2rLMgYAu9opvQ
-	(envelope-from <netdev+bounces-290620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 23:44:15 +0200
+	id AP1CKTh9D2rLMgYAu9opvQ
+	(envelope-from <netdev+bounces-290621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 23:46:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 097B75AC2C0
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 23:44:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E6355AC2D4
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 23:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D86663003735
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 21:44:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 390423013799
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 21:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BD33A599A;
-	Thu, 21 May 2026 21:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B332494F0;
+	Thu, 21 May 2026 21:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="acuUPtA3"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="d/P5yDMJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.83.148.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BF4399D0C;
-	Thu, 21 May 2026 21:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.83.148.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BA81A275
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 21:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779399849; cv=none; b=mZdnOj0AbOX+0l8HtFhiSyMMqdtqb59wzJGtrfVmAJJ2G0PmoDZEdsaStqlAXKtD7KkOsohMT0JefAQfcMcTwUCdqmOHPvMxdRkwtWn6gs9o7fUIBTD4QGnRpx4HKqXbZ5HxqLJmrbU10vnHaodzQcnWjoC0Lo5E1Gjw2ZKEeNc=
+	t=1779399971; cv=none; b=qSj1r9mYemg5EJQ2S9bxqU1FS8zAZq1o/z+UwtugCLBRETzzK4HSBb1w56Zz5SaIxIlM6hHjgOroc90//1cS5KdIZN30vExc+kRR89htJOyDPdga4dtdzkjWZTAJqVs6w9ksHL2wb6MVUgV6lMbj6rptLcXGDkSoGKCwwiC3xEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779399849; c=relaxed/simple;
-	bh=l2kQofxf3ROmaHwn0+2CfVH4nvcngDxzJOCHXC6eXcc=;
-	h=MIME-Version:Content-Type:Subject:From:To:CC:In-Reply-To:
-	 References:Date:Message-ID; b=Tx1eXQvHYsJmJwMp83NNcy4otUn9KSBmi5vBOY5a9DHCgL+1Je7V7ygxByy5Yksq/G5sCnZlC8WBSpsFm+Hwe8+BluuesRabnnE+iBxaSf2u46K7H3KzNBGqW3EeFeGsmBmidrrcLzdYAd7sZF/dCb7B9VtYP2yOriL0Vknqh3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=acuUPtA3; arc=none smtp.client-ip=35.83.148.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1779399971; c=relaxed/simple;
+	bh=QGFwCYm62pRfBMKZ2oCnw59SryglSN5PHN8XcB3oYYs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XORWBZTTgK6eLVGKQBhpPQBorRJYzJ47k2tA9wMAH7+LKds2Dyq8XS/36KUrNKTNtHfPCuzBPrEI7hximMQPl6cF9eHolRgpphHbEvhil4DTaVA0M4mS9uXCKYJdHIDjtPrzLVkmgkZ9nOTpKTdSkmxjKn4jMOeJudR1naSq6OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=d/P5yDMJ; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-67389cf78b0so14753472a12.2
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:46:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1779399848; x=1810935848;
-  h=mime-version:content-transfer-encoding:subject:from:to:
-   cc:in-reply-to:references:date:message-id;
-  bh=HNyHVCCSw5AAVJ5Et5IF+MrFWuKWxqHXWbInDs0oIqU=;
-  b=acuUPtA3QJFqpPvIPQ3JiVa2RMuMse/1Se10XGOxG+1thPlSqxjLGz7D
-   oyhrq/DBHQ1UUE21+wODYRCYIujMYv6OAmivJfo8MZt6jsT2OgpkiTNoi
-   J0llr0gO5g0Itp6E22yNnaDDma8oqh6lEsaSYKNyy9g03wSdkgpL28izg
-   6ScEApAPND/U1QU0KXIdFilF28NNLNNogPlO86WTSUshJDJiOOcOeI0kb
-   NFEulAIZg9jl/imryv+gP4eN3nTC8Lsk+z51dTR5f26xpcvx+Rz+gxGHh
-   wUd2QMlMIAmVVIDXhbkwEZbfp+Cjmfjz5qD2XRoYmKP6vG820ISpxeKJL
-   A==;
-X-CSE-ConnectionGUID: 6HgviaSbQgO0EQAvLcYpaw==
-X-CSE-MsgGUID: vKX6RcIrTdeQfmzSEp5JJQ==
-X-IronPort-AV: E=Sophos;i="6.24,161,1774310400"; 
-   d="scan'208";a="20026277"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2026 21:44:04 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:24928]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.243:2525] with esmtp (Farcaster)
- id ca1f3ea2-bc5b-4a46-adc2-88b2358ddd55; Thu, 21 May 2026 21:44:04 +0000 (UTC)
-X-Farcaster-Flow-ID: ca1f3ea2-bc5b-4a46-adc2-88b2358ddd55
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Thu, 21 May 2026 21:44:03 +0000
-Received: from dev-dsk-akiyano-1c-2138b29d.eu-west-1.amazon.com (172.19.83.6)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Thu, 21 May 2026 21:43:58 +0000
+        d=linux-foundation.org; s=google; t=1779399968; x=1780004768; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=MP3vGb2XHZMWEOywtu7VIbBhWRaVTquDcnMYanKoxFQ=;
+        b=d/P5yDMJqB47aWB+w9A2ozd7AJxruYpMkXPwpDX4nL2o6hInxMD8M0ODl/CfuTPTvE
+         K3sbjxoe38koYCUjsP7cAMjiO3WoXkZNRgQolW7cAJt9WaNmHQsJiFrl17URkOqtBNbt
+         RIvhKm7goTYQHw1kBXWj/GRZhU5nBQYzEV7AY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779399968; x=1780004768;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MP3vGb2XHZMWEOywtu7VIbBhWRaVTquDcnMYanKoxFQ=;
+        b=lssmj1z4tbeh/TbZrKWfw+ue0y9s5CvnDBf3ngRxthhAmgan81EnrORs9ljeaqGfzg
+         8zXnDUSkCk/dgfpNfEvvf6kRMXp6zzshcCM92PzK5Oh3cZk19T4NmqqAYBxTQy+/xJnJ
+         96E904DISR5IsfKud+eQuk9m3UX1AIDApS2m8Oy2zkdO5CFzwluf9ADlvqGMz2PMve+O
+         bd+077SoxufvsGhII6YqGFWX6hq6/hVeUKSsFUMZxgdM2ErMi1B8tsTLfNAR5k1k4Dzr
+         JTn4NRKCTGkjtf3fTKy7Vk2zPqnGbb1x1s5aDwboK82gDgCZJsN2sCY/IqJS7llNVgUm
+         FRsg==
+X-Forwarded-Encrypted: i=1; AFNElJ9R2+KO/oEE1yFVBnF/JwYM+7w3k/V4Ae/ck/iL2Z/1timFdM1p9cwN/aupDO6VZHapeWQ93Yc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfuLvLbXvFKxu5Fl9CEpwaGIiyA/5JA5kApt0jOFYRAycKLFDT
+	ehULyldyT2Y9S4nMzGPUdwqRvDsdZuK47dMXJ8lvwtH3GwfXlIFVarPm8ZjJmpyLyBGb/qXvIGn
+	un/KtWoQ=
+X-Gm-Gg: Acq92OGj7MpWpotWUJYjgGlBHq/BBUQOPKbJq5QFz7+o6JU2DZGHMT9t+Vu7uD3s/PA
+	13ztu9gfzx6nJJCDRCCRmeDV3N71twu4xmg7E9lQaeFp0PbPusBI8Lwcr7AIIfEgMNlPp3H0kvo
+	dsEa38RjbHdLYm+ys6d1GfelkdRh7ffyaoqj54bIxMlvO1ffH9v3ZjG8fzQc2EBKDbAVDvERJRS
+	UgBaWkvSBanbuwA9RPBeHKRmYZflsSKqlffvevr1DCyl8QpHWv9KrIShh7IR5QZkWtM32S2Sf3/
+	ShmJrKIk2rBtGEzxRxGE/mXqhTNdx4Y8suEpoZbuy1CCLpu0NONY9/qpIenyfxXVhoBpfEjNa+3
+	NV9KxD76lyjLthfHkIVqDvrXzoKXzfwOKRPAkXy8VsumWHnNuVcbu5JCaKi8PW+J30y+LP3noQ3
+	Ka6Q8vn+HT19NVSDNa9lIzVdal02xiERXXKR21fHKZoDMsT6WJwvTSWPvcqQba8mO17RBQ3/zz
+X-Received: by 2002:a05:6402:1ecc:b0:687:bf35:f049 with SMTP id 4fb4d7f45d1cf-6889cc4cad0mr315945a12.22.1779399967952;
+        Thu, 21 May 2026 14:46:07 -0700 (PDT)
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com. [209.85.218.41])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-688b22bee6esm45523a12.21.2026.05.21.14.46.07
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 May 2026 14:46:07 -0700 (PDT)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-bd2d8bb1068so1321369066b.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:46:07 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+eyyN1sYCC5syAlO+LwB/APtWgFXZLG7fKvVgnetpGwoXV9ffNhrwoJakVj76exBm6TidtqI8=@vger.kernel.org
+X-Received: by 2002:a17:906:ba8d:b0:bd3:a1e5:65f1 with SMTP id
+ a640c23a62f3a-bdd281a5d63mr62055566b.44.1779399967053; Thu, 21 May 2026
+ 14:46:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next 6/7] net: ena: Add error bound to PHC
- communication layer
-From: Arthur Kiyanovski <akiyano@amazon.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: <akiyano@amazon.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <richardcochran@gmail.com>, <edumazet@google.com>,
-	<dwmw2@infradead.org>, <tglx@linutronix.de>, <mlichvar@redhat.com>,
-	<andrew+netdev@lunn.ch>, <guwen@linux.alibaba.com>,
-	<xuanzhuo@linux.alibaba.com>, <dwmw@amazon.com>, <ysarna@amazon.com>,
-	<zorik@amazon.com>, <matua@amazon.com>, <saeedb@amazon.com>,
-	<msw@amazon.com>, <aliguori@amazon.com>, <nafea@amazon.com>,
-	<evgenys@amazon.com>, <netanel@amazon.com>, <alisaidi@amazon.com>,
-	<benh@amazon.com>, <ndagan@amazon.com>, <darinzon@amazon.com>,
-	<evostrov@amazon.com>, <ofirt@amazon.com>, <amitbern@amazon.com>,
-	<linux-kselftest@vger.kernel.org>, <shuah@kernel.org>,
-	<vadim.fedorenko@linux.dev>
-In-Reply-To: <20260521091644.84928-1-pabeni@redhat.com>
-References: <20260515164033.6403-7-akiyano@amazon.com>
- <20260521091644.84928-1-pabeni@redhat.com>
-Date: Thu, 21 May 2026 21:43:51 +0000
-Message-ID: <177939983124.4614.11659392626049369289.b4-reply@b4>
-X-Mailer: b4 0.15.2
-X-ClientProxiedBy: EX19D046UWB001.ant.amazon.com (10.13.139.187) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
-X-Spamd-Result: default: False [-7.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+References: <20260521184315.3654490-1-kuba@kernel.org>
+In-Reply-To: <20260521184315.3654490-1-kuba@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 21 May 2026 14:45:50 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wi_75mNMP6Rmz17E5ZwxGJ2Re6foOif7+gQbC+9Ox1r8g@mail.gmail.com>
+X-Gm-Features: AVHnY4JhC0pZGedKfOu4gC76mC8TO84x8hPgCuI_jKH13E4cLZ8s79drFIOwt64
+Message-ID: <CAHk-=wi_75mNMP6Rmz17E5ZwxGJ2Re6foOif7+gQbC+9Ox1r8g@mail.gmail.com>
+Subject: Re: [GIT PULL] Networking for v7.1-rc5
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290620-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290621-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	FREEMAIL_CC(0.00)[amazon.com,davemloft.net,kernel.org,vger.kernel.org,gmail.com,google.com,infradead.org,linutronix.de,redhat.com,lunn.ch,linux.alibaba.com,linux.dev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akiyano@amazon.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amazon.com:+];
+	DMARC_NA(0.00)[linux-foundation.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux-foundation.org:+];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 097B75AC2C0
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid,linux-foundation.org:dkim]
+X-Rspamd-Queue-Id: 0E6355AC2D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-05-21 11:16:32+02:00, Paolo Abeni wrote:
-> From: AI Reviewer <ai@example.com>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
-> ---
-> net: ena: Add error bound to PHC communication layer
-> 
-> This commit extends the ENA PHC communication layer to retrieve an
-> error_bound value from the device alongside the timestamp, and adds a
-> phc_err_eb statistic to count error_bound retrieval failures.
-> 
-> > diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c b/drivers/net/ethernet/amazon/ena/ena_com.c
-> > index 257910460bd8..832c4c1d0e5e 100644
-> > --- a/drivers/net/ethernet/amazon/ena/ena_com.c
-> > +++ b/drivers/net/ethernet/amazon/ena/ena_com.c
-> 
-> [ ... ]
-> 
-> > @@ -1882,14 +1888,15 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
-> >  		}
-> >  
-> >  		/* req_id was updated by the device which indicates that
-> > -		 * PHC timestamp and error_flags are updated too,
-> > -		 * checking errors before retrieving timestamp
-> > +		 * PHC timestamp, error_bound and error_flags are updated too,
-> > +		 * checking error flags before retrieving timestamp and
-> > +		 * error_bound values
-> >  		 */
-> >  		if (unlikely(resp->error_flags & ENA_PHC_ERROR_FLAGS)) {
-> 
-> [High]
-> 
-> Once req_id is observed equal to phc->req_id, the function reads
-> resp->error_flags, resp->timestamp and (now) resp->error_bound from the
-> device-shared DMA buffer. The updated comment explicitly states that once
-> req_id is observed updated, "PHC timestamp, error_bound and error_flags
-> are updated too" — which is the producer/consumer pattern that normally
-> requires a read barrier between the index check and the dependent data
-> loads.
-> 
-> The buffer is declared volatile and the req_id check uses READ_ONCE(),
-> but on weakly-ordered architectures such as arm64 (which includes AWS
-> Graviton, a primary ENA deployment target) neither volatile nor
-> READ_ONCE() orders dependent loads against DMA writes from the device.
-> Without a dma_rmb() the CPU may observe the new req_id while still
-> returning stale or torn values for the 64-bit timestamp, the error_bound,
-> or the error_flags.
-> 
-> Could a dma_rmb() be added between the req_id check and the subsequent
-> reads of resp->error_flags / resp->timestamp / resp->error_bound, similar
-> to the pattern already used elsewhere in the same driver?
-> 
-> For example, ena_com_handle_admin_completion() in the same file does:
-> 
-> 	/* Do not read the rest of the completion entry before the
-> 	 * phase bit was validated
-> 	 */
-> 	dma_rmb();
-> 
-> and ena_com_aenq_intr_handler() has:
-> 
-> 	/* Make sure the phase bit (ownership) is as expected before
-> 	 * reading the rest of the descriptor.
-> 	 */
-> 	dma_rmb();
-> 
-> The same shape applies here: device writes data fields, then writes
-> req_id last; driver checks req_id, then reads data fields.
-> 
-> This ordering issue is not introduced by this patch — the timestamp and
-> error_flags reads after the req_id check existed before — but the patch
-> extends the same unsynchronized read pattern to a third field
-> (error_bound) and the new comment now documents the assumed ordering
-> that is not actually enforced. Would it make sense to address the missing
-> dma_rmb() while touching this code?
-> 
-> >  			/* Retrieved invalid PHC timestamp, PHC enters into
-> 
-> [ ... ]
-> 
-> > @@ -1897,12 +1904,15 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
-> >  
-> >  		/* PHC timestamp value is returned to the caller */
-> >  		*timestamp = resp->timestamp;
-> > +		if (error_bound)
-> > +			*error_bound = resp->error_bound;
-> >  
-> >  		/* Update statistic on valid PHC timestamp retrieval */
-> >  		phc->stats.phc_cnt++;
-> 
-> [ ... ]
+On Thu, 21 May 2026 at 11:43, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> Misc:
+>
+>  - bring back the old 3c509 driver, Maciej wants to maintain it
 
-Thanks Paolo. Noted, we'll look into addressing this.
+Well, while I was hoping we'd be shedding some pounds in the kernel [
+insert "buff penguin" jpg ], I have to also admit that the 3c509 was
+the one I had personally the fondest memories of, so I'm not unhappy
+that it gets revived...
 
+Not that I'd ever want to go back to using such things.
+
+            Linus
 
