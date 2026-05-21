@@ -1,80 +1,72 @@
-Return-Path: <netdev+bounces-290157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290166-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mF+PNwpPDmrL9gUAu9opvQ
-	(envelope-from <netdev+bounces-290157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:17:14 +0200
+	id 8AijIrlPDmrL9gUAu9opvQ
+	(envelope-from <netdev+bounces-290166-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:20:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ADB259D397
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:17:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2174559D410
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:20:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5B55730942F4
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:17:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6442C3076B3F
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 00:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D021F151C;
-	Thu, 21 May 2026 00:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17AFC22157B;
+	Thu, 21 May 2026 00:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NcsaiMWO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4Mmkiwu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AD71E8342;
-	Thu, 21 May 2026 00:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DCC202F70;
+	Thu, 21 May 2026 00:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779322628; cv=none; b=qmyikhRZnZzLq0Z4lbDlyOLYmSta0KQq9X+9Wmfs4kdifKwlCCfrTjBeNkin+SOM+vjbGOgazIvqhnUu+TeKh1UuYowhLYU14ZvnCrydDK5iipc7JdfzD7WxUTt9TLXdM9tOVSUOPoLXpLl7piZ9C22GIU6ZikGE3Oqij24wDlM=
+	t=1779322798; cv=none; b=b5ONBbtHYl9Lh7h+G5D8SnJLisjSdNWFpNmlhe+a8dhmHYXndnRAK2BXWmiWA04Kj4GBC1r2a6sM88t5M6xcJyOaoJMfw2Ruo80tNGCscUBoLh9w59vXQ6HHN1kgUoCJIYRSUmmh81h/XiYnlYNKfJemA08jDDvis7yw7bFBFcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779322628; c=relaxed/simple;
-	bh=9xQyMzRJDgjOsefu5RYTSnP5MQ/1ObcFiMsvdejp5ms=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fC82iRipcxvfCnux1QNoUL+5QP+s2NExsZRwtVZUPBmXmGs0kKCNyiQaS2j2wGR8+rBgBqlq+k/70tEFNWL+AI4dVUF18A/ZU+rXbaqqabzp4eprxv2WHVYkBBDGUtzIc4Io5EFsqDgrFHCMiiNABx8I4eDVc/FqHn0qJ0fEmzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NcsaiMWO; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BCAC1F000E9;
-	Thu, 21 May 2026 00:17:04 +0000 (UTC)
+	s=arc-20240116; t=1779322798; c=relaxed/simple;
+	bh=tdv106NsGNZE3KOsaVsKBIXypxo3f/tbjJuHC6npBcM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JeD30bXhdweeDkGR4Y7YyDqAIChv0lS/ET7lJDzgrx7bzccWPLVMlJhk1EABcWzyF4jeGJj9y14nxZ4bqoONXuq5O7IJKSXLsSONHRWDYnQtMX2dQcNuMCu9ggXVvr2CyI/5OvuNmQ13U/MsqJRtYkZbY75QT95ekMb9fm4MBhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4Mmkiwu; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C7131F000E9;
+	Thu, 21 May 2026 00:19:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779322625;
-	bh=MFWnW8FG7FPKHLVohR1ScLZecv9inExETb+L71ZQhq0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=NcsaiMWO3+TfDhFPX38AQ0QkCqwNQxSzpwYSdvZ01lVDAVksWUP6tp4njVyJ72dTu
-	 /s4M+Zg9kIWs0UGDvHLB/RJClNVfgcMxmcAlX2ZQNf+ucBgqdDuejvSq30wpvt6muY
-	 S89S9gvlcMsYJyTrDmjUczzZufmj0sFni/JwnCPEVE/n4nJR7PKZNariSMkdVDoOHW
-	 AtzAU+erRvqXZuqG71RL9qjv4FdAt82AFIlrqxbdkRbjUoeb17/UIuViYB3K0czR4N
-	 4J6k6jmHHprdU2xGcWQlxFQboRBgSvOdbfcV2ab8q05tLg43gaAX4Z7qG2QGJ9h7nP
-	 YIlNwPWFV70OA==
-Date: Wed, 20 May 2026 17:17:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
- longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
- shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
- ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- stephen@networkplumber.org, jacob.e.keller@intel.com,
- dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
- john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
-Subject: Re: [PATCH net 2/2] net: mana: Skip redundant detach in queue reset
- handler if already detached
-Message-ID: <20260520171703.689c5462@kernel.org>
-In-Reply-To: <20260518194654.735580-3-dipayanroy@linux.microsoft.com>
-References: <20260518194654.735580-1-dipayanroy@linux.microsoft.com>
-	<20260518194654.735580-3-dipayanroy@linux.microsoft.com>
+	s=k20260515; t=1779322796;
+	bh=DXT/XakK7ZXPHFleNMPrKtaA7v+xAbQFoAwgecdd/mc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=Q4MmkiwuI85EAk6HpjXUdVaC8P2fDP6NETceuuFLhIkyf8XS/SSkmzICtmwd14WNv
+	 BqlkLsMt7Fgbk7QXMidSb0PvtVtBiA+FXUYeQXHSKC9d0kd0WAYwx8iAlShxFntNMJ
+	 y/iDQCkfaN+eVUN+1dIXTr/CZN1qeeuoXjUc3AeKLyY2SfCmFA19Y23SYfJJeIf8Ni
+	 HxPYJ1E31mZ6vPTStqDlxsMWoXHSBgLSRDPFFE21nUvslX6K8btjEOqo4UVatpUQCk
+	 Q+q0JCCUj4OqhJE9MKLGt7W9HZbEj1TpZpjAw15IpwY1fumEWtCkLHBApEi/hUalKe
+	 6Rder3S7vZhKg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1979E3930C25;
+	Thu, 21 May 2026 00:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] mlxsw: spectrum_ethtool: expose per-PG
+ rx_discards
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177932280665.3806355.5077784295396573616.git-patchwork-notify@kernel.org>
+Date: Thu, 21 May 2026 00:20:06 +0000
+References: <agqkMwgM1PdkyMUR@juliahub.com>
+In-Reply-To: <agqkMwgM1PdkyMUR@juliahub.com>
+To: Keno Fischer <keno@juliahub.com>
+Cc: netdev@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com,
+ linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
@@ -82,50 +74,52 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-290166-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290157-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 9ADB259D397
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Rspamd-Queue-Id: 2174559D410
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 18 May 2026 12:43:51 -0700 Dipayaan Roy wrote:
-> +	/* If already detached (indicates detach succeeded but attach failed
-> +	 * previously). Now skip mana detach and just retry mana_attach.
-> +	 */
-> +	if (!netif_device_present(ndev))
-> +		goto attach;
-> +
->  	err = mana_detach(ndev, false);
->  	if (err) {
->  		netdev_err(ndev, "mana_detach failed: %d\n", err);
->  		goto dealloc_pre_rxbufs;
->  	}
->  
-> +attach:
+Hello:
 
-goto's are acceptable for error unwinding, not to jump around 
-a function seemingly to avoid indenting something. Please use
-normal constructs or perhaps move the netif_device_present()
-into mana_detach() as an early exit condition? 
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
->  	err = mana_attach(ndev);
+On Mon, 18 May 2026 01:31:31 -0400 you wrote:
+> PPCNT group 0x10 (per-priority counters) carries an rx_discards field at
+> offset 0x78. These counters aggregate up into if_in_discards, but don't
+> show up anywhere else. Since there are many things that aggregate into
+> `if_in_discards`, having these counters helps distinguish what caused
+> those discards (in my case they were caused by headroom buffer overruns
+> due to inappropriately configured buffer sizes).
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] mlxsw: spectrum_ethtool: expose per-PG rx_discards
+    https://git.kernel.org/netdev/net-next/c/a2b5e31b668f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
