@@ -1,263 +1,346 @@
-Return-Path: <netdev+bounces-290563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIvDFhtFD2ptIgYAu9opvQ
-	(envelope-from <netdev+bounces-290563-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:47:07 +0200
+	id cFJADEJBD2qcIQYAu9opvQ
+	(envelope-from <netdev+bounces-290566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:30:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 116E95AA865
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:47:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 838A05AA47F
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EA4F931675FE
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:47:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB8533033F94
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365393C3BF6;
-	Thu, 21 May 2026 16:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E1D3C871E;
+	Thu, 21 May 2026 17:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hAiFXflX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6r1l/l/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AA1383996
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 16:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB9B30E821
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 17:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779382001; cv=none; b=j0aZ0ahAnXeouPuL7ogRGbUyVlOKXnxjtv9yPSr4mcmfbxN+enBpERkUYL89EI7R/HxMv1v/k2+7v1q699lY8z+LibGx2+wdE19Hp+xOGknNhtdWKpR3Ke7CFrWyfM9bWgpzoPY+K99kwuVM8+VSVHUjKi3tzOTz+QFDFuSxmyc=
+	t=1779382969; cv=none; b=atobDCL7FOqKgqUs/ddfdslqJ+/JVCkD2//g0uUhwfCgMCu2Rv5Ic+QCE/NAxz+A5PAtutW1+ZYIULF6sB/3mX+lLCa1l2hHxUmjX5EAxVpSYPRHg9UkfZ0m7XMq6xq3TD0GosaFnKcOOXv0BZtO9E2ULi9elBv8A60QpceLhCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779382001; c=relaxed/simple;
-	bh=55HpdrZ1XWqM3uwC+a47+vakAvshOA/Toys7NpGVJzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AQ5boxQNhk6nyKjYyoWQaa3Cajk4dhqc3/wkUklbDEz+FP/s3xBaBp3WAeV+enVc+aetzfJ8FSCoSLmjg8Brim+01UC0AULrczsP+zepCNbKuEjVPc8Vr+vEiNQlOexMd+cgnW/Bwb0+42uUU0T/R8ma4LUZKBbOHXBeSBz5Afc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hAiFXflX; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1779382969; c=relaxed/simple;
+	bh=zx9iqLN9zmh++r23XiPtByTx7CLtzJ7HqXlS3Lo3u7M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=B1kZT2qnu8GKZKQ2Y6jyLN2SCNjFIKqMcF8AzyIBWh/RlWm10mA1CBwLQFxUK9Zyi8duUZJmH7tlvwpVIiOHiEXtyH9qlS/5T3InBcrgsDxUEmmTY7UhWZHxXUdsJyLdocqyubtAWjE03HLQNy1BQRg6h/mINxbHVTA0Qvlckkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U6r1l/l/; arc=none smtp.client-ip=74.125.224.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48e8132c6d0so41746895e9.1
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:46:36 -0700 (PDT)
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-65c6a2158d3so4650658d50.3
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 10:02:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779381995; x=1779986795; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NA/nM16UoxaTsk3A7SWQL7q3HkgK647mNtY2rDcRyyc=;
-        b=hAiFXflXTEbRl6U5Air/vBGryJ1P7DUwv5y5hFcBfrvyOOjvwLAPWk6boHEMfrP+03
-         djrSF/MmhRRc4oKAARffcHojm9lrMfH/yxDwEmaCsT4BFCL3flmfjoZXGq6TFSC3TeHl
-         JsiTufiR6et1mz+pI8XV2U+9x+ymMfxMCAW0bX+y+95+67AVxLZvt8B0iLXkU9d/aiqe
-         9TLZTYgekPiyf54s88p+J1C3j1Lc4MyofWrYIv5jQC1MQsWTxKDTJulTH9sW3bkKM6Er
-         8ENfEnS8Rye+RBlr7U5dk7H7qISkWK2Sz6IRcVfJFcdljcS2gaAHhL/dDTECxI2slWnI
-         yang==
+        d=gmail.com; s=20251104; t=1779382967; x=1779987767; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0B8qDAE2Hi4K54lFJwvYiq6K8A1ngqWVMdmiVrD5B7k=;
+        b=U6r1l/l/pgu0L3g+Isqnd1Wati3cftc6RKz2p2YiVi/e06muplMRMg/8/Wgvh4CF8b
+         5A5pBOs6awqO01v2bIg2pTL1nVFIuw5oC9tPPuKwPHsj2MGINawcbFvuXJuDGJds09Zl
+         J3VAmGPK/ywgAxq8448ZArgh0YSPVoMCtijk8RFJtSfSqTqqFWvp+Cfs35V/ALRWBivr
+         hp/H8TC33s40sBlG7KmmxMqjJXTAUtHNSfaQGRNkEzsg8xW7UhtV3wXRk3CtNBVz3XUZ
+         JkiBGdzIqUZj8J+l2dDNxrK8B8wJuMDDljZBRO/rB6oCXhSXTGvJGN0OIFsESHP+wAyp
+         lQMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779381995; x=1779986795;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NA/nM16UoxaTsk3A7SWQL7q3HkgK647mNtY2rDcRyyc=;
-        b=S9aNS5cLK+xOQtphWDN9WN/yjgBvhq4A/XSvM3aA9NfAJYZX8W/l4UzL7AGzspQDbV
-         uh+nGQaTMx+HClzYZ/qZUPGhd9zJ1G1if8bLFS5tc9DpZuna4lwy2lWym41eZYCerMT4
-         zA2oiOGLRUKfeZfoFwhmUn2W3ZSkOsJUOeh2g9W7O88oxikm1MxZqw2pkDWgSA8ZRz8t
-         /h9a1/Jfmr4F3M5nDHOaE054twDiB9W725ElZT7MJZXqGGMfokgo9Fo+RdHBdgINBQ0h
-         FLklS0WtPEOvHVtC9u3+FXAfHxzmbPuazxZjpvmbBiojVtxCvW0dbw0+gb057KYk5lLW
-         dRqQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8JOEoRM4ZIVc8dZBgwoxECAxrxvWe9ioYaBm9vL1sa47Ca50tWdYqddY3UatZaAt1U8gSwOr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV1wDLBl5hPloofRYwWM0ppi9lmUt7iN3aBdHFU5qyUTiXVeBT
-	UzGymEh413DWgJ12XcMRriZds22I5GTQ88BeVpQV3uFJ2Ygh6iQeEvPB
-X-Gm-Gg: Acq92OHay9h+eRHVER0qSzaV+hOpDnOBB0Bym9x2Q4ahKb2v6CqL/wbdovdVtQhHdnn
-	A0QdkZy7LwmL55nfnXUBfee0zzNw5ye1RKkFkdDp8i/S+1QUMoqYD1el1sY2EBcSbFhySNWbghC
-	Dhy2KTWfSwL2qEjaYMFzzSNM91ipzYlbIHSTIo6nYXWHqwIqNwfnXw0dvHeScdnzzuYTQ34Y522
-	F2qP/ELWYor8dyZsoHoxXRNWIh/1cVNc+bDCZFmiUOridKcoollJMiyc3JQJ3EU+p7AiJ0Kq25e
-	NNLzIpp4d0fSF3SkIdd+WilldLGlRXq/U2nQ2X5/+Sy2Mvzr2wWnCRfW2seIaO8h/vsuU0uwaWy
-	WEyTR8Yz1/oFi+fRYl86MwiWhAjasxtLPEtHlJwoWjipe73sXhxf181GZkueRAyMrrkWi2ai5XV
-	8K6Hkc9KuXY1rNDRRtuCB4qnCSIjZwLPdFKAfrXuxIKy+74gvVhyTscKw7+uz6gGSo
-X-Received: by 2002:a05:600c:45c6:b0:488:ac01:72de with SMTP id 5b1f17b1804b1-49036033502mr53623425e9.5.1779381994891;
-        Thu, 21 May 2026 09:46:34 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49035ecac15sm31613075e9.6.2026.05.21.09.46.33
+        d=1e100.net; s=20251104; t=1779382967; x=1779987767;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0B8qDAE2Hi4K54lFJwvYiq6K8A1ngqWVMdmiVrD5B7k=;
+        b=raNTcM4dZhlWiOsO+plnwd76cSYPGTzzdwbnnXGdRHvBx8ReyujWdWo+0f2iRh7a+4
+         932tt5PWjL6DqYpjvZdETeN7n95cj5eVw6vxtVmy2kOJUNXVyRjTxUaKRFlk+ExlE+gu
+         gKeiCdKm46Dsh1B+6qLtMxsmyJK4KtnKaMvS9Bn2a3rssW3gKh55RYyzVQovUDU3wwjH
+         jO5xqCWsZLSxJq75UzfAdby53+H2dq9pwjtr4OleH4Q/pj0jrCP80FRdyHMahckRm79L
+         hjYpdOILrkfSqbThm2OHl3S5escb1rNFTnaGbnuecl7MlpbBHQZBOz2LbXg/T9jjRLOz
+         slyQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+l8RhN7ViIBCdoiKw3a8aYC3H4S8CsN3+Pq1JdRJKPKavJ8b1w6/EI29bruzZAKPsPEpkJjl4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxL3l2UxMoijt1uEtuHulWLHY3aC0Q7Rq9Zi0fFrMIqHVu+4uRJ
+	71L5gcrk9+oB+lcR+Mqj0/KZYR9rgFcIaXZUnmP7EW2SNdKV4/jSWRIE
+X-Gm-Gg: Acq92OEZb/y9Aw0zg+putNOa/LY2q4rAFmof/HL8fUQP2Uw7UH0VSFOboQLV7nxdPYq
+	uk52+zVOuOUTsG8U5fOzqD5aTxyYocJmXrz0UXaSYw3nOzyrUTzB3foRkHxVp/BHwlyLyq1WM3y
+	uLsOGr8h+uhwhnfJCU6eWRRsfq/t0WbXGD1swETFMdJpLX73SWn2MBz3mQGKKrC8yy/pHGKdSUk
+	YtOfEeGyp799QsH5M3E3SIAX2GXEhU9voxQDhYs0h1EmwnvErxlaG5TCMyXZU8oVnsqm3s5IrEl
+	RUUr0j9sZ7cyO4sDULtx/LtDyY2k2bYs4QT+3u38qAtCGRncfCInMUY0YtibQwppwc4feNrhymC
+	xXC05kibyGmHaosX+AAgF3BBOpEskzhV4Uy3bajRrgjCGh9f4U84eUreknB4tq6o/iMXFT7ydUN
+	zh7tEnS9wJT0/+JurMOQSL0xKUc1WNFA==
+X-Received: by 2002:a05:690e:440b:b0:65e:41a4:54ca with SMTP id 956f58d0204a3-65eae2b3fb9mr2406856d50.62.1779382966868;
+        Thu, 21 May 2026 10:02:46 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:55::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65ec1eea6d3sm430363d50.13.2026.05.21.10.02.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 09:46:34 -0700 (PDT)
-Date: Thu, 21 May 2026 17:46:31 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Kees Cook <kees@kernel.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Pengpeng Hou
- <pengpeng@iscas.ac.cn>, stable@vger.kernel.org, Petr Pavlu
- <petr.pavlu@suse.com>, Richard Weinberger <richard@nod.at>, Anton Ivanov
- <anton.ivanov@cambridgegreys.com>, Johannes Berg
- <johannes@sipsolutions.net>, "Rafael J. Wysocki" <rafael@kernel.org>, Len
- Brown <lenb@kernel.org>, Corey Minyard <corey@minyard.net>, Gabriel Somlo
- <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Jani Nikula
- <jani.nikula@linux.intel.com>, Joonas Lahtinen
- <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Bart Van Assche <bvanassche@acm.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Laurent
- Pinchart <laurent.pinchart@ideasonboard.com>, Hans de Goede
- <hansg@kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Bjorn
- Helgaas <bhelgaas@google.com>, Hannes Reinecke <hare@suse.de>, "James E.J.
- Bottomley" <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Daniel Lezcano <daniel.lezcano@kernel.org>,
- Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
- <jirislaby@kernel.org>, Alan Stern <stern@rowland.harvard.edu>, Jason Wang
- <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Jason Baron
- <jbaron@akamai.com>, Jim Cromie <jim.cromie@gmail.com>, Tiwei Bie
- <tiwei.btw@antgroup.com>, Benjamin Berg <benjamin.berg@intel.com>, Ilpo
- =?UTF-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, "David E. Box"
- <david.e.box@linux.intel.com>, "Maciej W. Rozycki" <macro@orcam.me.uk>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Peter Zijlstra
- <peterz@infradead.org>, Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
- <gor@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar
- <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, Vinod Koul <vkoul@kernel.org>, Frank Li
- <Frank.Li@kernel.org>, Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen
- <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, Alexander
- Potapenko <glider@google.com>, Marco Elver <elver@google.com>, Dmitry
- Vyukov <dvyukov@google.com>, Andrew Morton <akpm@linux-foundation.org>,
- John Johansen <john.johansen@canonical.com>, Paul Moore
- <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E. Hallyn"
- <serge@hallyn.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Georgia Garcia <georgia.garcia@canonical.com>, kvm@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-modules@vger.kernel.org,
- kasan-dev@googlegroups.com, linux-mm@kvack.org, apparmor@lists.ubuntu.com,
- linux-security-module@vger.kernel.org, linux-um@lists.infradead.org,
- linux-acpi@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
- qemu-devel@nongnu.org, intel-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
- linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-pm@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-serial@vger.kernel.org,
- linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, netdev@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 01/11] params: bound array element output to the
- caller's page buffer
-Message-ID: <20260521174631.71a06440@pumpkin>
-In-Reply-To: <20260521133326.2465264-1-kees@kernel.org>
-References: <20260521133315.work.845-kees@kernel.org>
-	<20260521133326.2465264-1-kees@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Thu, 21 May 2026 10:02:46 -0700 (PDT)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Date: Thu, 21 May 2026 09:51:33 -0700
+Subject: [PATCH net] eth: fbnic: move aui and fec from fbnic_net to
+ fbnic_dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Message-Id: <20260521-fbnic-aui-change-v1-1-fc0c46e8e682@meta.com>
+X-B4-Tracking: v=1; b=H4sIABU4D2oC/y3MTQqAIBAG0KsM3zqh7I+8SrQwnWo2FloRRHcPo
+ vWDdyNxFE4wdCPyKUnWAENFRnCLDTMr8TAEnesmr4tSTWMQp+wh6vdKW9dpb0vfVsgIW+RJrq/
+ sEXjH8DwvgxbgZWcAAAA=
+X-Change-ID: 20260513-fbnic-aui-change-42ac92da3d74
+To: Alexander Duyck <alexanderduyck@fb.com>, 
+ Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>
+Cc: Mohsin Bashir <hmohsin@meta.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,iscas.ac.cn,vger.kernel.org,suse.com,nod.at,cambridgegreys.com,sipsolutions.net,minyard.net,cmu.edu,redhat.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,acm.org,ziepe.ca,ideasonboard.com,google.com,suse.de,HansenPartnership.com,oracle.com,arm.com,linuxfoundation.org,rowland.harvard.edu,linux.alibaba.com,akamai.com,antgroup.com,orcam.me.uk,infradead.org,linux.ibm.com,alien8.de,zytor.com,atomlin.com,linux-foundation.org,canonical.com,paul-moore.com,namei.org,hallyn.com,googlegroups.com,kvack.org,lists.ubuntu.com,lists.infradead.org,lists.sourceforge.net,nongnu.org,lists.freedesktop.org,lists.ozlabs.org,lists.one-eyed-alien.net,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-290563-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290566-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_GT_50(0.00)[100];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,iscas.ac.cn:email,suse.com:email]
-X-Rspamd-Queue-Id: 116E95AA865
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,meta.com:mid,meta.com:email]
+X-Rspamd-Queue-Id: 838A05AA47F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 21 May 2026 06:33:14 -0700
-Kees Cook <kees@kernel.org> wrote:
+From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-> From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> 
-> param_array_get() appends each element's string representation into the
-> shared sysfs page buffer by passing buffer + off to the element getter.
-> 
-> That works for getters that only write a small bounded string, but
-> param_get_charp() and similar helpers format against PAGE_SIZE from the
-> pointer they receive. Once off is non-zero, an element getter can
-> therefore write past the end of the original sysfs page buffer.
-> 
-> Collect each element into a temporary PAGE_SIZE buffer first and then
-> copy only the remaining space into the caller's page buffer.
+fbnic_mdio_read_pmd() reaches through fbd->netdev to netdev_priv() in
+order to read fbn->aui:
 
-Should this be using a 4k buffer on all architectures?
-Initially perhaps just using a different name for the constant until
-all the associated PAGE_SIZE limits have been removed.
+	if (fbd->netdev) {
+		fbn = netdev_priv(fbd->netdev);
+		if (fbn->aui < FBNIC_AUI_UNKNOWN)
+			aui = fbn->aui;
+	}
 
--- David
+This can lead to a TOCTOU bug where fbd->netdev is checked after being
+freed but before being cleared.
 
-> 
-> Cc: stable@vger.kernel.org
-> Reviewed-by: Petr Pavlu <petr.pavlu@suse.com>
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> Signed-off-by: Kees Cook <kees@kernel.org>
-> ---
->  kernel/params.c | 26 ++++++++++++++++++++------
->  1 file changed, 20 insertions(+), 6 deletions(-)
-> 
-> diff --git a/kernel/params.c b/kernel/params.c
-> index 74d620bc2521..752721922a15 100644
-> --- a/kernel/params.c
-> +++ b/kernel/params.c
-> @@ -475,22 +475,36 @@ static int param_array_set(const char *val, const struct kernel_param *kp)
->  static int param_array_get(char *buffer, const struct kernel_param *kp)
->  {
->  	int i, off, ret;
-> +	char *elem_buf;
->  	const struct kparam_array *arr = kp->arr;
->  	struct kernel_param p = *kp;
->  
-> +	elem_buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
-> +	if (!elem_buf)
-> +		return -ENOMEM;
-> +
->  	for (i = off = 0; i < (arr->num ? *arr->num : arr->max); i++) {
-> -		/* Replace \n with comma */
-> -		if (i)
-> -			buffer[off - 1] = ',';
->  		p.arg = arr->elem + arr->elemsize * i;
->  		check_kparam_locked(p.mod);
-> -		ret = arr->ops->get(buffer + off, &p);
-> +		ret = arr->ops->get(elem_buf, &p);
->  		if (ret < 0)
-> -			return ret;
-> +			goto out;
-> +		ret = min(ret, (int)(PAGE_SIZE - 1 - off));
-> +		if (!ret)
-> +			break;
-> +		/* Replace the previous element's trailing newline with a comma. */
-> +		if (i)
-> +			buffer[off - 1] = ',';
-> +		memcpy(buffer + off, elem_buf, ret);
->  		off += ret;
-> +		if (off == PAGE_SIZE - 1)
-> +			break;
->  	}
->  	buffer[off] = '\0';
-> -	return off;
-> +	ret = off;
-> +out:
-> +	kfree(elem_buf);
-> +	return ret;
->  }
->  
->  static void param_array_free(void *arg)
+Both aui and fec describe the link configuration of the NIC, so move
+them to fbnic_dev together. The MDIO layer (and other fbd-level code)
+can read them directly without bouncing through fbd->netdev. The
+hazardous accesses through fbd->netdev are dropped.
+
+Fixes: d0ce9fd7eae0 ("fbnic: Add SW shim for MDIO interface to PMD and PCS")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+---
+ drivers/net/ethernet/meta/fbnic/fbnic.h         |  3 +++
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |  2 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c     |  3 +--
+ drivers/net/ethernet/meta/fbnic/fbnic_mdio.c    |  9 ++-------
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |  3 ---
+ drivers/net/ethernet/meta/fbnic/fbnic_phylink.c | 18 ++++++++++--------
+ 6 files changed, 17 insertions(+), 21 deletions(-)
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index d0715695c43e..76cfaf77b5ef 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -88,6 +88,9 @@ struct fbnic_dev {
+ 	unsigned long end_of_pmd_training;
+ 	u8 pmd_state;
+ 
++	u8 aui;
++	u8 fec;
++
+ 	/* Local copy of hardware statistics */
+ 	struct fbnic_hw_stats hw_stats;
+ 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+index 5e383d40abc7..03dbb53b33d9 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+@@ -132,7 +132,7 @@ static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
+ 	fbn = netdev_priv(fbd->netdev);
+ 
+ 	/* Record link down events */
+-	if (!fbd->mac->get_link(fbd, fbn->aui, fbn->fec))
++	if (!fbd->mac->get_link(fbd, fbd->aui, fbd->fec))
+ 		phylink_pcs_change(fbn->pcs, false);
+ 
+ 	return IRQ_HANDLED;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+index 53b7a938b4c2..e911dbf41b46 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+@@ -515,7 +515,6 @@ static u32 __fbnic_mac_cmd_config_asic(struct fbnic_dev *fbd,
+ 	/* Enable MAC Promiscuous mode and Tx padding */
+ 	u32 command_config = FBNIC_MAC_COMMAND_CONFIG_TX_PAD_EN |
+ 			     FBNIC_MAC_COMMAND_CONFIG_PROMISC_EN;
+-	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
+ 
+ 	/* Disable pause frames if not enabled */
+ 	if (!tx_pause)
+@@ -524,7 +523,7 @@ static u32 __fbnic_mac_cmd_config_asic(struct fbnic_dev *fbd,
+ 		command_config |= FBNIC_MAC_COMMAND_CONFIG_RX_PAUSE_DIS;
+ 
+ 	/* Disable fault handling if no FEC is requested */
+-	if (fbn->fec == FBNIC_FEC_OFF)
++	if (fbd->fec == FBNIC_FEC_OFF)
+ 		command_config |= FBNIC_MAC_COMMAND_CONFIG_FLT_HDL_DIS;
+ 
+ 	return command_config;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+index fe3a4ce88413..b571d4e3f36d 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+@@ -5,7 +5,6 @@
+ #include <linux/pcs/pcs-xpcs.h>
+ 
+ #include "fbnic.h"
+-#include "fbnic_netdev.h"
+ 
+ /* fbnic MDIO Interface Layout
+  *
+@@ -54,18 +53,14 @@ static int
+ fbnic_mdio_read_pmd(struct fbnic_dev *fbd, int addr, int regnum)
+ {
+ 	u8 aui = FBNIC_AUI_UNKNOWN;
+-	struct fbnic_net *fbn;
+ 	int ret = 0;
+ 
+ 	/* We don't need a second PMD, just one can handle both lanes */
+ 	if (addr)
+ 		return 0;
+ 
+-	if (fbd->netdev) {
+-		fbn = netdev_priv(fbd->netdev);
+-		if (fbn->aui < FBNIC_AUI_UNKNOWN)
+-			aui = fbn->aui;
+-	}
++	if (fbd->aui < FBNIC_AUI_UNKNOWN)
++		aui = fbd->aui;
+ 
+ 	switch (regnum) {
+ 	case MDIO_PMA_RXDET:
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+index eded20b0e9e4..213253a818bb 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+@@ -46,9 +46,6 @@ struct fbnic_net {
+ 	struct phylink_config phylink_config;
+ 	struct phylink_pcs *pcs;
+ 
+-	u8 aui;
+-	u8 fec;
+-
+ 	/* Cached top bits of the HW time counter for 40b -> 64b conversion */
+ 	u32 time_high;
+ 	/* Protect readers of @time_offset, writers take @time_lock. */
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
+index 09c5225111be..61463bcb6431 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
+@@ -65,6 +65,7 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
+ 					struct ethtool_link_ksettings *cmd)
+ {
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
+ 	int err;
+ 
+ 	err = phylink_ethtool_ksettings_get(fbn->phylink, cmd);
+@@ -72,7 +73,7 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
+ 		unsigned long *supp = cmd->link_modes.supported;
+ 
+ 		cmd->base.port = PORT_DA;
+-		cmd->lanes = (fbn->aui & FBNIC_AUI_MODE_R2) ? 2 : 1;
++		cmd->lanes = (fbd->aui & FBNIC_AUI_MODE_R2) ? 2 : 1;
+ 
+ 		fbnic_phylink_get_supported_fec_modes(supp);
+ 	}
+@@ -84,11 +85,12 @@ int fbnic_phylink_get_fecparam(struct net_device *netdev,
+ 			       struct ethtool_fecparam *fecparam)
+ {
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
+ 
+-	if (fbn->fec & FBNIC_FEC_RS) {
++	if (fbd->fec & FBNIC_FEC_RS) {
+ 		fecparam->active_fec = ETHTOOL_FEC_RS;
+ 		fecparam->fec = ETHTOOL_FEC_RS;
+-	} else if (fbn->fec & FBNIC_FEC_BASER) {
++	} else if (fbd->fec & FBNIC_FEC_BASER) {
+ 		fecparam->active_fec = ETHTOOL_FEC_BASER;
+ 		fecparam->fec = ETHTOOL_FEC_BASER;
+ 	} else {
+@@ -96,7 +98,7 @@ int fbnic_phylink_get_fecparam(struct net_device *netdev,
+ 		fecparam->fec = ETHTOOL_FEC_OFF;
+ 	}
+ 
+-	if (fbn->aui & FBNIC_AUI_MODE_PAM4)
++	if (fbd->aui & FBNIC_AUI_MODE_PAM4)
+ 		fecparam->fec |= ETHTOOL_FEC_AUTO;
+ 
+ 	return 0;
+@@ -120,7 +122,7 @@ fbnic_phylink_mac_prepare(struct phylink_config *config, unsigned int mode,
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
+ 	struct fbnic_dev *fbd = fbn->fbd;
+ 
+-	fbd->mac->prepare(fbd, fbn->aui, fbn->fec);
++	fbd->mac->prepare(fbd, fbd->aui, fbd->fec);
+ 
+ 	return 0;
+ }
+@@ -140,7 +142,7 @@ fbnic_phylink_mac_finish(struct phylink_config *config, unsigned int mode,
+ 	struct fbnic_dev *fbd = fbn->fbd;
+ 
+ 	/* Retest the link state and restart interrupts */
+-	fbd->mac->get_link(fbd, fbn->aui, fbn->fec);
++	fbd->mac->get_link(fbd, fbd->aui, fbd->fec);
+ 
+ 	return 0;
+ }
+@@ -227,10 +229,10 @@ int fbnic_phylink_create(struct net_device *netdev)
+ 	__set_bit(PHY_INTERFACE_MODE_25GBASER,
+ 		  fbn->phylink_config.supported_interfaces);
+ 
+-	fbnic_mac_get_fw_settings(fbd, &fbn->aui, &fbn->fec);
++	fbnic_mac_get_fw_settings(fbd, &fbd->aui, &fbd->fec);
+ 
+ 	phylink = phylink_create(&fbn->phylink_config, NULL,
+-				 fbnic_phylink_select_interface(fbn->aui),
++				 fbnic_phylink_select_interface(fbd->aui),
+ 				 &fbnic_phylink_mac_ops);
+ 	if (IS_ERR(phylink)) {
+ 		err = PTR_ERR(phylink);
+
+---
+base-commit: 8ebd24a7822cbae25beeafba49b2159d6a68a5f2
+change-id: 20260513-fbnic-aui-change-42ac92da3d74
+
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
 
 
