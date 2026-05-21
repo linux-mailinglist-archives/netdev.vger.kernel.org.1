@@ -1,180 +1,267 @@
-Return-Path: <netdev+bounces-290258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290259-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PVoOQOzDmosBQYAu9opvQ
-	(envelope-from <netdev+bounces-290258-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:23:47 +0200
+	id IJzJBoGzDmosBQYAu9opvQ
+	(envelope-from <netdev+bounces-290259-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:25:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A3D75A00DC
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:23:47 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1069A5A0120
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:25:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F5B7301ABB2
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 07:23:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A297D3000883
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 07:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA063839B7;
-	Thu, 21 May 2026 07:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F13E395AC1;
+	Thu, 21 May 2026 07:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eQSer9Mt"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OF6UXpN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012028.outbound.protection.outlook.com [52.101.48.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735062DB791;
-	Thu, 21 May 2026 07:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779348225; cv=none; b=XGwSo3tDqXKXRG2eLirmcnvOu006hmGwAMJ8BiqvewPm3r4Fo4fElEgE0S+kT9+98AIlzXZoBxoM5Jmu84RJly8TKUkU74Ie6iZwSSyOdA/AkcyJjt2aBH4ADEWupMQhLHZJUgq+EpKrJ9lsvvla5/rBYVqqlw1qcxPPwpvi8uI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779348225; c=relaxed/simple;
-	bh=AaiOpIcIh3A0lBeFxHwNa9dRAhxscW+mi3AGm/pz4tU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t0pwz0NbKCMoHHvKI4/nEVgQ8tpyTHgAzh+vhHHdrolUclgXDzNmL4mvjgWEKs8hn7ZMXPamevjOwv9mypRcQBOnEieL0oMSZXffozPMvjg4k4Q2a9fxMTz7x/SEj2g5/2i3IOmNjA8cgQTO4s66zBaUrYVd7EfdiQC6c8KKAiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eQSer9Mt; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F07B1F000E9;
-	Thu, 21 May 2026 07:23:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779348224;
-	bh=TCqf+SLxqDAmyK38cKu26c5GgsQXSCx2ylDh6U+MSwk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=eQSer9MtLEq5q9kfnWHpBZZsG+6+OCTD6dmCsRDDeWBQUb/tHXRo7SMc7wMCEFwS3
-	 h/vs3HxfJnMz32fyyCJxMKObLJIOa+FXD+eVqCpdBrGt60ypRAyTrcVx1UPNX7qsgB
-	 WcKcCeTLuuN95b2e+7lxjlBarsQuQhTJU93+9ho00UqME4JuVx4NDW/gEjrPW7qIK7
-	 5iO7kppwYxojnoDrLnZWa29VH01BOi/2QaTZMqxIRxL6pNk2TZQ7/ddfYHaFD1zAeW
-	 lL7d/n7wd+Pznye8PhgCT+6IO5qKTktwCBbAYwSjOnIwpwrI45RdygMWRDi/43g8er
-	 cWQLUmICR8jjg==
-Message-ID: <e3067b12-02d0-465c-a065-e6903d6c4c39@kernel.org>
-Date: Thu, 21 May 2026 09:23:39 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C9D384CD4;
+	Thu, 21 May 2026 07:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.28
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779348318; cv=fail; b=FEUqpdRMs3SLXd7jn4ChyHdPpYhPpM2kKdHM2LvAKw7U+XSar38w9/Fz/v7AKkKfZX5Fjf9tYceuM9zy4p2g4Q2nJGMB86AcM+aXvzABGsswO7wp+7zXqJVDhAH68Bpm4b4KUNA92ipl8L+kg0e1b6cfZga9lxiJYRp7EFzDM50=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779348318; c=relaxed/simple;
+	bh=a5I5JIWnhkOHjw41Bwp7G44TrGLdmusun7T90bvgOm8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BF2qVZ2XZaWLJYyxVKLaXGHo9d2BoyB10e8LnOeeePlcCvgn08Mffi3K9SnYS+u9LY/nsRapPBuoUR9KOSEHEY0aP1ZmaGwfziBGAU2PMdpE54I71LqEQgIc7uVtfbT5MWsVF/D1+kS8TkWJLZ55QzTMI1uDmIOsHi27YuO7cPw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OF6UXpN4; arc=fail smtp.client-ip=52.101.48.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Sv5rqz2WxIh50IcXP5n8/jTu+q9czquFynkPBoBydKVgM8t9D7Frc4MvtJ26V8IhiyOdpsEtQACnQZ4AfgPzCNk3+PrOZO2UixjltyvcHNQkpFX00SdOlrdlQMy1QPNWvYyNnbv0fFae/7xMEQKeCMM8AAUNufqSPfelomnUrZRvcJcMegASasSaisA9CtU1bSyc9EBukZNZYJznuZL7RnZe0Aj+VIn06j/C7EDAigPtNnSwVuj7fgQpy+kbBGx0nDGVafQR1P0c/ADL9YGrYfIuscYP76BP/ECgk/LBpD4XNsu2O+oCQYQvG1t8B+HHjxIZO3ZRr1hJ417uXAPQtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZsZIfBfDr7pHCAmelFZUIqSFuOp49wH2mNrLscraO0I=;
+ b=JKY4lNpqwLiQHd7s2lZNhrPTwpkex+bkqTri4yHzo1/3YcNy4JRSO+aQkndOI3k/np0p4I5Sv5kfkoBlaxejCPCSU41+kYqKYlXrvB5BvsS9fs1+FOpahHlxtwOiyeWlLSomzIRvKupwU8eHrC1NEBXMzi21zLg8f9BmR4g7g/JblNAAcemdKi8yvck2QFmLpbUw2zrqfg3yQJMFQyDZJf3ppxDsI5ZnwlOd0eEodCCWK9lUUhyt/Hcg/55TVQpIB3p7hR4RmqocBnTVw1/jwlbBMYpsRHBaEeaN/vExUdqU/r5rsuJWBqR7PgBjMe/eWzGMBwFlMFznI5GCu/Ne8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZsZIfBfDr7pHCAmelFZUIqSFuOp49wH2mNrLscraO0I=;
+ b=OF6UXpN4gUqJu6m+RxKLmfzoRFNThwbkIuXWiBilQwM679NYPX0/CG6JDsUQAprXhaZ9Fiuvtljz6qDJajgLK9sCG0ashtl5P4mzNpj98jBKwp90ktHmE9vd/a1cymy56I3SOYngTgbXIL3DsSP7F3lXn7Nqv3JSz8bf06fGbRp1DC2jMvEO5pDNCnjPkXaCfkyVtwiJuFvn3nefssfEFVjyQ1mUPMzAQ0bKbEuSZ9w/aWD9OjNwi8g7L+UzTt5d1RsLmhroqTQaP3z6bKERsTv/3VwE+TRk2ia8gmjfk6PyW02CmLOMelu3mpFOaHp99ifkUeVimChygdYAPQDmTQ==
+Received: from SJ0PR03CA0075.namprd03.prod.outlook.com (2603:10b6:a03:331::20)
+ by PH7PR12MB7209.namprd12.prod.outlook.com (2603:10b6:510:204::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.14; Thu, 21 May
+ 2026 07:25:08 +0000
+Received: from CO1PEPF00012E5F.namprd05.prod.outlook.com
+ (2603:10b6:a03:331:cafe::94) by SJ0PR03CA0075.outlook.office365.com
+ (2603:10b6:a03:331::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Thu, 21
+ May 2026 07:25:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ CO1PEPF00012E5F.mail.protection.outlook.com (10.167.249.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.48.11 via Frontend Transport; Thu, 21 May 2026 07:25:08 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 21 May
+ 2026 00:24:54 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Thu, 21 May 2026 00:24:53 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Thu, 21 May 2026 00:24:45 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, "Saeed
+ Mahameed" <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq
+ Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, "Borislav Petkov
+ (AMD)" <bp@alien8.de>, Andrew Morton <akpm@linux-foundation.org>, Randy
+ Dunlap <rdunlap@infradead.org>, Thomas Gleixner <tglx@kernel.org>, Petr
+ Mladek <pmladek@suse.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	"Tejun Heo" <tj@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, Feng Tang
+	<feng.tang@linux.alibaba.com>, Christian Brauner <brauner@kernel.org>, "Dave
+ Hansen" <dave.hansen@linux.intel.com>, Dapeng Mi
+	<dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>, Marco Elver
+	<elver@google.com>, Li RongQing <lirongqing@baidu.com>, Eric Biggers
+	<ebiggers@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>, Gal Pressman
+	<gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Jiri Pirko
+	<jiri@nvidia.com>
+Subject: [PATCH net-next 0/3] devlink: Add boot-time eswitch mode defaults
+Date: Thu, 21 May 2026 10:24:31 +0300
+Message-ID: <20260521072434.362624-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 1/3] dt-bindings: vendor-prefixes: add SiTime
- Corporation
-To: Ali Rouhi <rouhi.ali@gmail.com>, jiri@resnulli.us
-Cc: vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- cjubran@nvidia.com, Oleg.Zadorozhnyi@devoxsoftware.com,
- devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ali Rouhi <arouhi@sitime.com>
-References: <20260520191943.73938-1-arouhi@sitime.com>
- <20260520191943.73938-2-arouhi@sitime.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260520191943.73938-2-arouhi@sitime.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF00012E5F:EE_|PH7PR12MB7209:EE_
+X-MS-Office365-Filtering-Correlation-Id: c15df455-bdc0-4a6f-dea6-08deb70a162a
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|7416014|36860700016|1800799024|56012099003|18002099003|3023799007|11063799006|6133799003|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	65ncr7QGZBgTWbsGY2moOmkKij2XcRDxjsLZ23a6TLcSx5rrOVkEpDTd6a1XNTmkpuL/ZVZneTQTQcuZ8PmXam5Iu7sAPT1R326tf/BBUkKBhUEMf/wQ1yIvzieAMlCZktaDLdBfGZevUHMXeerhHb2jN7R6DhXg/5VPpxfpJQBzUhkxaORu/nXdCzqm9C+ZoaxMkrD4/Z/ETBWfacDEYjKd4Yo11F3oEYoLrjs8cs98hN5DOSCMX2VV10bV4ES/zmVLHWnloEDdJmFsEDWdcX1ZrF+jR88XkPZVbaVAHLGVEL4VV8ixJAfMycon2GQPRAEMAGeJdl2PQU31H2gGvYAJaGCejJW1XQZ2yYDhPJRTwS8pfL8o2YZNciKmWdlSKO/qVVdCAp6fWSChGFWRp9tk6MvQqwgEim8OaP4nWegAWVDmIKv60SSoeuRQH735sFDZ1qrvxT1QVrkYfhjW4w5ezBSJL6EqhsGs9h1XDrLSFgr8mPn+R9CGVEMYjm1Sdsm/uPH3K6NIqcaLfyMkl5gRYmLdRV50aaajfM2XYXRDb1MU+d0H5eNye9JW8WeWC4DPe1cYhZhKd/l8OP4t9q95KWVvxSc5LtSTm8sQI6BdhVIO/X0fhl7yg4CFmiNYESGYNmGq7ZkgPBt1D8GRCpBVP1+sZIiaqtDNxUsCNEDilOVxE4bKF5eD2otMxEioKvIdkDebC6tjqX6uLTQLAalt6S76wQShMLO8gsKcqXY=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(36860700016)(1800799024)(56012099003)(18002099003)(3023799007)(11063799006)(6133799003)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	P495Jzb0lqkXkZM/6PesAhoMOQlcbxXRmmZQTqz7s962pPas9vODmZ9Flvy0iMYLH1DC12wwOkv9JNCuGKRn0H8LgDIeE8h3OeqOaXV0xE71Aq93N9CDOTgSxy7Mm3Z2x5eFCkLeNGZaiedzn+5mTEgjDMS1VFjtRCYj1JUtQzWI2j1UQ0vwAZ3y/eCdvXYg//jNHpwMMkpv65uV4JkH5SZKigrm1prqSAJC19OfQoYJ6WktDH2GmiTb3ux+fk/rZUqLhulHDyggVgzor23IAgtjof1mJaPYx3/74aIV5XYNMZtIRoGPw6fp1BBxsYXRSFyo+uJzu2KmJhPJxO3MBjpZED9Z/q6mcgdNOlmCR98NGrBwMYf4QlqxVd6DHvH6dffOTPnfU0ASJMcwdUT8GbP5dUFWsPE/WdcnVLObS3JeA48n3+uPOL77VuF4wJVJ
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2026 07:25:08.1976
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c15df455-bdc0-4a6f-dea6-08deb70a162a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF00012E5F.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7209
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290258-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,resnulli.us];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290259-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:url]
-X-Rspamd-Queue-Id: 4A3D75A00DC
+	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,Nvidia.com:dkim];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 1069A5A0120
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 20/05/2026 21:19, Ali Rouhi wrote:
-> Add vendor prefix for SiTime Corporation, manufacturer of
-> programmable clock generators and MEMS oscillators.
-> 
-> Signed-off-by: Ali Rouhi <arouhi@sitime.com>
-> ---
->  Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
->  1 file changed, 2 insertions(+)
+Hi,
+
+See detailed feature description by Mark below.
+
+Regards,
+Tariq
 
 
+This series adds a devlink_eswitch_mode= kernel command line parameter
+for applying a default devlink eswitch mode during device
+initialization.
 
-<form letter>
-This is a friendly reminder during the review process.
+Following the discussion with Jakub[1] and the feedback on the RFC
+postings, this version implements the direction that was agreed on: keep
+the scope limited to a boot-time devlink eswitch mode default only.
 
-It looks like you received a tag and forgot to add it.
+The implementation is intended to support the following properties:
 
-If you do not know the process, here is a short explanation:
-Please add Acked-by/Reviewed-by/Tested-by tags when posting new versions
-of patchset, under or above your Signed-off-by tag, unless patch changed
-significantly (e.g. new properties added to the DT bindings). Tag is
-"received", when provided in a message replied to you on the mailing
-list. Tools like b4 can help here. However, there's no need to repost
-patches *only* to add the tags. The upstream maintainer will do that for
-tags received on the version they apply.
+- A system may have multiple devlink devices that usually need the same
+  configuration. For a configuration such as eswitch mode switchdev, a
+  user can specify either all devlink devices or an explicit list of
+  devices to which that mode applies.
 
-Please read:
-https://elixir.bootlin.com/linux/v6.12-rc3/source/Documentation/process/submitting-patches.rst#L577
+- Deployments can set the devlink eswitch mode before normal userspace
+  orchestration runs, while still using devlink concepts and driver
+  callbacks rather than adding driver-specific module parameters.
 
-If a tag was not added on purpose, please state in the patch changelog
-or cover letter why and what changed.
-</form letter>
+A default is scoped to either all devlink handles or to a
+comma-separated list of devlink handles, for example:
 
-Best regards,
-Krzysztof
+devlink_eswitch_mode=[*]:switchdev
+devlink_eswitch_mode=[pci/0000:08:00.0,pci/0000:09:00.1]:switchdev_inactive
+
+The supported modes are legacy, switchdev and switchdev_inactive.
+
+mlx5 wires this into device initialization after the devlink instance is
+registered and after mlx5 devlink operations are available, so eswitch
+mode defaults can be applied to matching PCI devlink devices.
+
+Patch 1 clears the mlx5 FW reset-in-progress bit before reloading after
+a firmware reset.
+
+Patch 2 adds the devlink eswitch mode boot-default parser, storage,
+devl_apply_default_esw_mode() API and documentation for the
+devlink_eswitch_mode= syntax.
+
+Patch 3 calls devl_apply_default_esw_mode() from mlx5 device
+initialization.
+
+Changelog:
+
+Since RFC v2:
+
+- Replaced the generic devlink=[...]:esw:mode:<mode> command line API
+  with devlink_eswitch_mode=[...]:<mode>.
+
+- Simplified the parser to handle one eswitch mode parameter instead of
+  a generic command/attribute grammar.
+
+- Renamed devl_apply_defaults() to devl_apply_default_esw_mode().
+
+- Added the mlx5 firmware reset cleanup as the first patch after the
+  cover letter.
+
+[1] https://lore.kernel.org/all/20260502184153.4fd8d06f@kernel.org/
+
+RFC V1:
+https://lore.kernel.org/all/20260506123739.1959770-1-mbloch@nvidia.com/
+
+RFC V2:
+https://lore.kernel.org/all/20260510185424.2041415-1-mbloch@nvidia.com/
+
+Mark Bloch (3):
+  net/mlx5: Clear FW reset-in-progress bit before reload
+  devlink: Add eswitch mode boot defaults
+  net/mlx5: Apply devlink default eswitch mode during init
+
+ .../admin-guide/kernel-parameters.txt         |  25 ++
+ .../networking/devlink/devlink-defaults.rst   |  80 ++++++
+ Documentation/networking/devlink/index.rst    |   1 +
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    |  28 +-
+ .../net/ethernet/mellanox/mlx5/core/main.c    |  17 ++
+ include/net/devlink.h                         |   1 +
+ net/devlink/core.c                            | 255 ++++++++++++++++++
+ 7 files changed, 396 insertions(+), 11 deletions(-)
+ create mode 100644 Documentation/networking/devlink/devlink-defaults.rst
+
+
+base-commit: 9bf93cb2e180a58d5984ba13daee95903ff4fc14
+-- 
+2.44.0
+
 
