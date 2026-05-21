@@ -1,139 +1,135 @@
-Return-Path: <netdev+bounces-290548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290549-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PPyKSM9D2rQIAYAu9opvQ
-	(envelope-from <netdev+bounces-290548-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:13:07 +0200
+	id iCFPKmdBD2rWIQYAu9opvQ
+	(envelope-from <netdev+bounces-290549-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:31:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38B495A9F75
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:13:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C633E5AA48D
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B534933CE73C
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:46:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B8F0130E9D3A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453103346B4;
-	Thu, 21 May 2026 15:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407E936F8E6;
+	Thu, 21 May 2026 15:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KMN4jEMq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="io+aDI+n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303AC33123D
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 15:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B85333B6F6;
+	Thu, 21 May 2026 15:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779378403; cv=none; b=dGSMIboTAWCbM4syccjQhxA5YXnlEyemslXgbiM6omDq4IscskQ4jquszl1TJTP/Q2DsnG8aH2+73+Lx7YBL3pwRcalf/EWN6ABJEBXWLFxDzWvnnIEyzsqnNnOna6SCCmnKiemoZBOHsCCnvkehMk2qk8+0NUs2YiPellKqsoY=
+	t=1779378608; cv=none; b=NiCzUuJGEO729+ewQzqRxmoLv4g8HULabIdXGvww4yjMkcDxk76zcut5pzYcp18DEs4eypDq8y7o/Yb5HhdQmgGWESiqFJR9Ov0N9OaXd4e6yOCUhrZgpV7WvBZi+1YwMKncA+XUn1tPbw9VcyU2g+cEkrbLIOSpLqIl5er7dw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779378403; c=relaxed/simple;
-	bh=wvXDD1ma/iYRTVZ5bpg4r7exu5q5j5s1o/cAIPHrbPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MnatHwCioditY+vg4robky4kDT2wCCXcb+2WJboVdGmLCyUCSDxv6Db7+0yUmW5Z1mxOzKfmnH8MLJJHy2ZC/2ZFKDvmFhrF9pok2Oe+7vMmHf3iQyvSF+nT6YCzblzZnK/uurhGrRoKQ1YG7uSk+KbVdjVe1JAiebB14vpwzAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KMN4jEMq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6082C1F000E9;
-	Thu, 21 May 2026 15:46:41 +0000 (UTC)
+	s=arc-20240116; t=1779378608; c=relaxed/simple;
+	bh=yc1/COf6YoWbjzPY1tKoTH/L/64cOAvOxQSmNCrIsBo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=X0Ypg3izlSsmGqRkuno1NOqHGdpLbITBOpMJY2lfhlafUn27EOo2AfiKniHyatm6m6+QN14BnK+SMtG+8lGNLztBljocRzAq1I0tQ/cFP7xog4dyBSGQeRaZtrfHdhHP98gJvfohw2rjX1vf2rfe6GnlF1FmrUjgL+BXtZLY4dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=io+aDI+n; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE76F1F000E9;
+	Thu, 21 May 2026 15:50:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779378401;
-	bh=wvXDD1ma/iYRTVZ5bpg4r7exu5q5j5s1o/cAIPHrbPE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=KMN4jEMqD0Gm1QA2vaaHePklRHefQZysxZ/4jJJ0k52zBNrGbn/gFghRBgqodfTWQ
-	 7RwwYrDhnjn/jwEVC7lE9u5nKvCDaNw60aC8ON2CALLg19u/gxZFRoToizNsQ2v33l
-	 8QM+j1axKXQ6JSvPWrTBISq91ePuT1hXPyAgXuQncr8srgx+nz6+zGbH5QEtenOFax
-	 HyUPg+HTqlIYMlJFyorddKWdPdiAMhulNtBFKBW/RFyUMHSmsIkFH8+C+02xXJwKQu
-	 kZtozPCkzHcVIeTpikuLQgclXMJp7l3cPbqSInklW+SXwUgt6TsOUI4xNu8S4uP9kK
-	 447AM/edVb0eA==
-Date: Thu, 21 May 2026 08:46:40 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Rajat Gupta <rajat.gupta@oss.qualcomm.com>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, jiri@resnulli.us, yimingqian591@gmail.com,
- keenanat2000@gmail.com, 2045gemini@gmail.com, rollkingzzc@gmail.com
-Subject: Re: [PATCH net] net/sched: fix pedit partial COW leading to page
- cache corruption
-Message-ID: <20260521084640.683c1ee6@kernel.org>
-In-Reply-To: <CAM0EoMnvrAxGC=bty=ZUXG6XDN_hTNZiy9LSZhNicEdbe8DghQ@mail.gmail.com>
-References: <CAM0EoMkUPYSXKr2=+mR8YMq2a0TFdYPdzwPGob-UyU1fUWP9Ww@mail.gmail.com>
-	<20260519033950.2037-1-rajat.gupta@oss.qualcomm.com>
-	<CAM0EoMmj-9uDpKBN4vjJqzaLQL=OZ-sdFO_pHPFp6kL6hSVeRA@mail.gmail.com>
-	<CAM0EoMkDwdmP94yeoX7W-DOY3Emcq84jGcPf73vtRTpDf1N3-w@mail.gmail.com>
-	<CAM0EoMn-O7KU1R=b8jzb=DmMtRCuoEVmAH9hEsKehrdbmODAjA@mail.gmail.com>
-	<CAM0EoM=sCnT69uPzB+HjOdRP9eQXVA+AcvPsBA80=dtQHi5sLQ@mail.gmail.com>
-	<20260521073526.793d30c3@kernel.org>
-	<CAM0EoMnvrAxGC=bty=ZUXG6XDN_hTNZiy9LSZhNicEdbe8DghQ@mail.gmail.com>
+	s=k20260515; t=1779378606;
+	bh=WX/R9NW+WINS2ZE/ZIX1djNTE3fQrYMS8AniTPQQF84=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=io+aDI+nr0utsP7rxumkLhDLNILnHXA1UBGxBNzkbEKBEKlqKU/m5piwVHuvbz3wy
+	 seAz+HPIokxrhyz0LffhChGXy33scTPEi/0dcSADm0R8/M3r+BrGcHnEgG/n9RSYB1
+	 tDJ/OjSX4Bt+pwPCiw1Hdsuxv7ZcJyR9M39ILutpTAGs2xWMl0dNCX4CoKPYryGRcv
+	 sOxD3RjOkoe/ozQdhFmUdgyYyPT21bZ0vTKPw/E6njSV/biIKzFGDuLckA0yU39zPu
+	 ZHS+1MSjdM5/DwLsjNxTj2LHUQ6AgJbM0hl1IKWcWodmASVANzlWMZhzdLxF/vyjy/
+	 ovrbztRYrssVg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0AF33930E08;
+	Thu, 21 May 2026 15:50:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/5] ethernet: 3c509: Bring driver back and make some
+ fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177937861664.394984.9776175958470833957.git-patchwork-notify@kernel.org>
+Date: Thu, 21 May 2026 15:50:16 +0000
+References: <alpine.DEB.2.21.2605201115010.1450@angie.orcam.me.uk>
+In-Reply-To: <alpine.DEB.2.21.2605201115010.1450@angie.orcam.me.uk>
+To: Maciej W. Rozycki <macro@orcam.me.uk>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,resnulli.us,gmail.com];
-	TAGGED_FROM(0.00)[bounces-290548-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290549-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 38B495A9F75
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: C633E5AA48D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 21 May 2026 11:16:35 -0400 Jamal Hadi Salim wrote:
-> On Thu, May 21, 2026 at 10:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> > > To be precise, something like attached (untested, uncompiled) =20
-> >
-> > Can we not pull the headers? Do you know of anyone modifying payloads
-> > with pedit?
->=20
-> not sure - but it is not unreasonable if someone used it for such a case.
+Hello:
 
-Ack, we'd still support modifying any offset in the packet.
-But not optimize for modifying frags until we know user exists.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> > The concept of "shared frags" is silly IMHO, if I'm checking right only
-> > rxrpc and xfrm think that it's a thing. I'm hoping to delete that and
-> > reclaim the flag id in net-next... =20
->=20
-> All these issues stem from the shared frags point, but the patchlet i
-> showed is unrelated to SKBFL_SHARED_FRAG, it is more related to
-> cloned+frags.
+On Wed, 20 May 2026 12:18:44 +0100 (BST) you wrote:
+> Hi,
+> 
+>  As per the previous discussions[1][2] this patch series brings the 3c509
+> driver back.  Picking up net rather than net-next as I consider it a fix
+> to accidental removal and so that any downstream users do not suffer from
+> disruption when using released kernels.
+> 
+> [...]
 
-Right, right. Just pointing it out cause Rajat's patch adds another
-skb_has_shared_frag(). Which we'll then have to delete in net-next :\
+Here is the summary with links:
+  - [net,1/5] Revert "drivers: net: 3com: 3c509: Remove this driver"
+    https://git.kernel.org/netdev/net/c/28db0338db61
+  - [net,2/5] ethernet: 3c509: Fix AUI transceiver type selection
+    https://git.kernel.org/netdev/net/c/029a6b3a14bf
+  - [net,3/5] ethernet: 3c509: Add GPL 2.0 SPDX license identifier
+    https://git.kernel.org/netdev/net/c/240117bb51b9
+  - [net,4/5] ethernet: 3c509: Update documentation to match MAINTAINERS
+    https://git.kernel.org/netdev/net/c/75756cb4b2aa
+  - [net,5/5] ethernet: 3c509: Fix most coding style issues
+    https://git.kernel.org/netdev/net/c/014767c709a4
 
-> If you remove it in net-next - does that necessitate removing all
-> "fixes" that tried to address that issue? It seems like that would be
-> sensible, but it makes me wonder why the shared frags concept exists
-> in the first place.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-IDK. We have in the tree plenty of "good ideas that went nowhere"..
-As I said elsewhere IMO having the maintain this flag correctly
-100% of the time will only create more CVEs, and there's no practical
-reason to optimize for frags not being shared.
+
 
