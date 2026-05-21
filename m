@@ -1,234 +1,163 @@
-Return-Path: <netdev+bounces-290216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290203-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OZREBBtDmob+gUAu9opvQ
-	(envelope-from <netdev+bounces-290216-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:25:20 +0200
+	id IAn2Db1rDmob+gUAu9opvQ
+	(envelope-from <netdev+bounces-290203-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:19:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8A759E0DA
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:25:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFB4F59DFF1
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 04:19:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 573D83082123
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:23:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9B7003013B9A
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 02:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB5B368D65;
-	Thu, 21 May 2026 02:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653933644D4;
+	Thu, 21 May 2026 02:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mLUSfnbr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVnty3VD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1DA368D44;
-	Thu, 21 May 2026 02:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D3F262A6
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 02:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779330223; cv=none; b=K67TZ/eNe4MS0gKVJZXn+FqV2WKjSebvXuz+z0VPSlVPmdfLgs6NR0F6eqbewWSNJLmW019BHwCS3B4HcavpiG4t89KalnRj+rkU4O34LfFjNdrSzBgk8XxMjYpgLhrA3WCkikPf6aJQAVUg3imagrEr9iuE+XG6VQQYrBb5fps=
+	t=1779329976; cv=none; b=ZHqiCSiRCwja5P+Fw/kdh1B/iWohvHHt5pbFfa7qaDc9vCCf+lDXPWL4fcOKuFpR8GkLfceiSJT3zahbwceYjIZq26F5CDTvO+YgW6ZTgGuWkknTGLw9EKuRIPAnwlnPIYvyJbcR0utcNiR89vFOWFncBG/53wUlnpaQmrkAPlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779330223; c=relaxed/simple;
-	bh=QY8td3YcQLWk5q7hECVjvlC2Mfr3wo/x/D/+0qQ8mA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rcZh+ipz/7inUFMaRnKESDOK7ycdecEFg3OZvVhi4nQsfMpG9AsOehlFdXL9MJq3FyPL7wLvahT9TRIs6AiaLYAfcTQnO3eQE9gAOvlxqkEolxoM9YMrX4AH2+cx/HhDutJ88HOcEfJOF6ChqJB7PqB6WYfjbx6MyCsQViiuM2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mLUSfnbr; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779330218; x=1810866218;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QY8td3YcQLWk5q7hECVjvlC2Mfr3wo/x/D/+0qQ8mA8=;
-  b=mLUSfnbr1X80MYQgTbzAaQzhcB5fxtbcl3M/WlL4QeaACj5swzOMJnbz
-   Ok0YYY018fE2NcYY5jVZpYll6LyS4eXQcgZQk+vHehxfpbfq07/Txnczg
-   zJPHcXHT77H6yf1cZfqcIlBBmGnHLJrlSH0WoAohhYFOdJH0TtDZMgdRP
-   O+4+LHZapf3dGwobU6PCVRFlPJYmfCZXrKFflW7uThg/8c7mv+PC0hq8R
-   07AD2QldjRs/aGC7ivcC18IJUwz+8hA4+I01O4BtVB/2cV3WmZ2qc4zHO
-   +rEhzr21K/hHTkI8I/uzFhVjUxzaUZ4OlsdRLRhmS70zF8/3slFtLCAkx
-   g==;
-X-CSE-ConnectionGUID: EKMC0QDbTkKAo4TTNZyeIw==
-X-CSE-MsgGUID: 65lwGY32SsiuVi22YNG3Bw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="97813203"
-X-IronPort-AV: E=Sophos;i="6.23,245,1770624000"; 
-   d="scan'208";a="97813203"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 19:23:30 -0700
-X-CSE-ConnectionGUID: VRnRNF5SQcKoDdWsilWeNg==
-X-CSE-MsgGUID: xWay2sQbTXy0lVMKX4fchA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,245,1770624000"; 
-   d="scan'208";a="237785791"
-Received: from lkp-server02.sh.intel.com (HELO 30e86e9c1927) ([10.239.97.151])
-  by fmviesa008.fm.intel.com with ESMTP; 20 May 2026 19:23:26 -0700
-Received: from kbuild by 30e86e9c1927 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wPt3W-000000004DV-283m;
-	Thu, 21 May 2026 02:22:52 +0000
-Date: Thu, 21 May 2026 10:18:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Alexander A. Klimov" <grandmaster@al2klimov.de>,
-	Chris Snook <chris.snook@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kees Cook <kees@kernel.org>,
-	Tobias Regnery <tobias.regnery@gmail.com>,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: alx: fix possible buffer overflow
-Message-ID: <202605211017.m1y6JlIV-lkp@intel.com>
-References: <20260520180140.538826-1-grandmaster@al2klimov.de>
+	s=arc-20240116; t=1779329976; c=relaxed/simple;
+	bh=MJJWJjFQO1tvTUXM49tXnOL6TTRE3K5kXfe94A9tbio=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NxW6uFcjQITGEUBPzhr03mgT5Z8lG2XNaBeGgZQwm0fqKYJOt+mNEPFFpoj4qlfSE1R6cJPvuXmWPs2XqGdKAZ00vErL/+uSGsF8NQL/vJGbG5Ta2Rawc3pKmHDklFi0U9nGIVt5qPsJfWoRql2RJe50Lo2Q1Q3yTCr/iFl5ltg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVnty3VD; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99ABB1F000E9;
+	Thu, 21 May 2026 02:19:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779329963;
+	bh=IZMsp9VVUkxohN2N1/noF25ZmTTG1KRgWvp5nTOpuck=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=TVnty3VD/Z15AutxH3Xh9UQMTmyLpCoHBqPfLNm/9Y1ThEioJkyX/K/xFlsbDeHIx
+	 EERIbWhbaUmznX9O/7otr2O8p8Hf0VovwJx2W8rovMIkD4LsfdVf/94oDm/7WnGO3U
+	 j+9Uc0fuC1kIYf7J0ijABy6ZmI/5XujeBGjbeg6IJkmgcN6RHumvfxuTMeW3D4OjJD
+	 U1lSWiupo09QfMSakkgt7I0pJwZSug7XhQIQwyDJlp1QexF9yi4JQqtFr99PzskOL6
+	 i6XDFdyjcQ0VcFK10L2oGcYg0S7pIdc4udW2m2WTd+odpXtvwXjCSKx8I2uCNNTBtz
+	 dhK3isVjL+ZmA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: dhowells@redhat.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	michael.bommarito@gmail.com,
+	marc.dionne@auristor.com,
+	jaltman@auristor.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-afs@lists.infradead.org,
+	stable@kernel.org
+Subject: Re: [PATCH net] rxrpc: Fix the ACK parser to extract the SACK table for parsing
+Date: Wed, 20 May 2026 19:19:11 -0700
+Message-ID: <20260521021910.687776-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <488970.1779144259@warthog.procyon.org.uk>
+References: <488970.1779144259@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260520180140.538826-1-grandmaster@al2klimov.de>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290216-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[al2klimov.de,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,auristor.com,google.com,davemloft.net,redhat.com,lists.infradead.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-290203-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email,intel.com:mid,intel.com:dkim]
-X-Rspamd-Queue-Id: AC8A759E0DA
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BFB4F59DFF1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Alexander,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+rxrpc: Fix the ACK parser to extract the SACK table for parsing
 
-kernel test robot noticed the following build warnings:
+This commit fixes modification of the received skbuff and incorrect access
+of the buffer in fragmented UDP packets during SACK table parsing. It copies
+out the contents of the SACK table into a flat stack buffer instead of
+relying on skb_condense().
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master v7.1-rc4 next-20260520]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Link: https://lore.kernel.org/r/20260513180907.2061972-1-michael.bommarito@gmail.com
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Alexander-A-Klimov/net-alx-fix-possible-buffer-overflow/20260521-022058
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260520180140.538826-1-grandmaster%40al2klimov.de
-patch subject: [PATCH] net: alx: fix possible buffer overflow
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20260521/202605211017.m1y6JlIV-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260521/202605211017.m1y6JlIV-lkp@intel.com/reproduce)
+> diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+> index 24aceb183c2c3..0c15ebf19eae9 100644
+> --- a/net/rxrpc/input.c
+> +++ b/net/rxrpc/input.c
+> @@ -963,21 +963,34 @@ static void rxrpc_input_soft_acks(struct rxrpc_call *call,
+>  	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+>  	struct rxrpc_txqueue *tq = call->tx_queue;
+>  	unsigned long extracted = ~0UL;
+> -	unsigned int nr = 0;
+> +	unsigned int nr = 0, nsack;
+>  	rxrpc_seq_t seq = call->acks_hard_ack + 1;
+>  	rxrpc_seq_t lowest_nak = seq + sp->ack.nr_acks;
+> -	u8 *acks = skb->data + sizeof(struct rxrpc_wire_header) + sizeof(struct rxrpc_ackpacket);
+> +	u8 sack[256] __aligned(sizeof(unsigned long));
+> +	u8 *acks = sack;
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605211017.m1y6JlIV-lkp@intel.com/
+[ ... ]
 
-All warnings (new ones prefixed by >>):
+>  	for (unsigned int i = 0; i < sp->ack.nr_acks; i++) {
+>  		/* Decant ACKs until we hit a txqueue boundary. */
+>  		shiftr_adv_rotr(acks, extracted);
+>  		if (i == 256) {
+> -			acks -= i;
+> +			acks = sack;
+>  			i = 0;
+>  		}
 
-   drivers/net/ethernet/atheros/alx/main.c: In function 'alx_request_msix':
->> drivers/net/ethernet/atheros/alx/main.c:874:77: warning: 'snprintf' output may be truncated before the last format character [-Wformat-truncation=]
-     874 |                         snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-rx-%u",
-         |                                                                             ^
-   drivers/net/ethernet/atheros/alx/main.c:874:25: note: 'snprintf' output between 6 and 25 bytes into a destination of size 24
-     874 |                         snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-rx-%u",
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     875 |                                  netdev->name, np->rxq->queue_idx);
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/atheros/alx/main.c:871:77: warning: 'snprintf' output may be truncated before the last format character [-Wformat-truncation=]
-     871 |                         snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-tx-%u",
-         |                                                                             ^
-   drivers/net/ethernet/atheros/alx/main.c:871:25: note: 'snprintf' output between 6 and 25 bytes into a destination of size 24
-     871 |                         snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-tx-%u",
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     872 |                                  netdev->name, np->txq->queue_idx);
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/atheros/alx/main.c:868:77: warning: '%u' directive output may be truncated writing between 1 and 5 bytes into a region of size between 3 and 18 [-Wformat-truncation=]
-     868 |                         snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-TxRx-%u",
-         |                                                                             ^~
-   drivers/net/ethernet/atheros/alx/main.c:868:68: note: directive argument in the range [0, 65535]
-     868 |                         snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-TxRx-%u",
-         |                                                                    ^~~~~~~~~~~~
-   drivers/net/ethernet/atheros/alx/main.c:868:25: note: 'snprintf' output between 8 and 27 bytes into a destination of size 24
-     868 |                         snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-TxRx-%u",
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     869 |                                  netdev->name, np->txq->queue_idx);
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Can this lead to an out-of-bounds access and an infinite loop if
+sp->ack.nr_acks is greater than 256?
 
+If a received packet has sp->ack.nr_acks > 256, on the 257th iteration
+(where i == 256), the shiftr_adv_rotr(acks, extracted) macro will execute
+before the wrap-around check resets the acks pointer.
 
-vim +/snprintf +874 drivers/net/ethernet/atheros/alx/main.c
+Since the acks pointer has been incremented 256 times by previous iterations,
+wouldn't it point to sack + 256 at this point, causing an out-of-bounds read
+and write on the sack[] array?
 
-   851	
-   852	static int alx_request_msix(struct alx_priv *alx)
-   853	{
-   854		struct net_device *netdev = alx->dev;
-   855		int i, err, vector = 0, free_vector = 0;
-   856	
-   857		err = request_irq(pci_irq_vector(alx->hw.pdev, 0), alx_intr_msix_misc,
-   858				  0, netdev->name, alx);
-   859		if (err)
-   860			goto out_err;
-   861	
-   862		for (i = 0; i < alx->num_napi; i++) {
-   863			struct alx_napi *np = alx->qnapi[i];
-   864	
-   865			vector++;
-   866	
-   867			if (np->txq && np->rxq)
- > 868				snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-TxRx-%u",
-   869					 netdev->name, np->txq->queue_idx);
-   870			else if (np->txq)
-   871				snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-tx-%u",
-   872					 netdev->name, np->txq->queue_idx);
-   873			else if (np->rxq)
- > 874				snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-rx-%u",
-   875					 netdev->name, np->rxq->queue_idx);
-   876			else
-   877				snprintf(np->irq_lbl, sizeof(np->irq_lbl), "%s-unused",
-   878					 netdev->name);
-   879	
-   880			np->vec_idx = vector;
-   881			err = request_irq(pci_irq_vector(alx->hw.pdev, vector),
-   882					  alx_intr_msix_ring, 0, np->irq_lbl, np);
-   883			if (err)
-   884				goto out_free;
-   885		}
-   886		return 0;
-   887	
-   888	out_free:
-   889		free_irq(pci_irq_vector(alx->hw.pdev, free_vector++), alx);
-   890	
-   891		vector--;
-   892		for (i = 0; i < vector; i++)
-   893			free_irq(pci_irq_vector(alx->hw.pdev,free_vector++),
-   894				 alx->qnapi[i]);
-   895	
-   896	out_err:
-   897		return err;
-   898	}
-   899	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Furthermore, resetting i to 0 inside the loop means the loop's i++
+operation will set it to 1 for the next iteration. Because the counter is
+reset without breaking out of the loop, will this ever terminate if
+sp->ack.nr_acks > 256, or will it cycle infinitely and eventually cause a NULL
+pointer dereference when tq->next runs out of transmit queues?
+-- 
+pw-bot: cr
 
