@@ -1,157 +1,237 @@
-Return-Path: <netdev+bounces-290311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290312-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPl0JQPODmqdCQYAu9opvQ
-	(envelope-from <netdev+bounces-290311-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:18:59 +0200
+	id KOlgKf/ODmq7CQYAu9opvQ
+	(envelope-from <netdev+bounces-290312-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:23:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6986D5A2279
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:18:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AB845A23ED
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 11:23:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B0CA2304CAED
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:14:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 630EC30170B8
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 09:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C356F36A02F;
-	Thu, 21 May 2026 09:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC26370AD6;
+	Thu, 21 May 2026 09:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="T5tm6Vpt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KizWIuuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0005834889F
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9318236C9EE
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 09:17:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779354849; cv=none; b=Oip4Jv0Om0HJoRXXfo3rNnetecfQdkyqumRzI6maqtk17ta8ZoV8qzPkvPbzZ/kchBcH1LbFi9/RbPpy0XOAjXAxgivfYHkkcD2LvOg2JU8ki5B593hmlfPiK+AXz2HJd/iJbPwRXdQ0FpE4syKohEHfDW6hG0viNceXqqjkohE=
+	t=1779355030; cv=none; b=h6f9bwA4WQoMfjyRgtsHaNc4RfCD7/N8FwqSb3GPqaRqQitUIweRdV2aIENb7Y4FjWGwohRLFueBGEsHXLRZkZAqOMkC+xzAilmlZ/yLtvbJiU0SJhxkE2QfJyHRn0874C3rCrJELFyki3LBdQLODhoTv1vp0SNY+AFf+JRlYQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779354849; c=relaxed/simple;
-	bh=i4LSJMuxYcgWYb3GPgbU+j9ntkVEZvedEpR1p4L24qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GAZpS2COfWCnnNH3Siv2ZNXzafVc4D9qQd35YkZoKbrxMRthDbjRQUXRX2zGq9+KUX6AlYlXvdYRxv+P7dQWQZYbAoA8A97z0ToiVVqC8YRHMksMyAArr51zAUf4AC57iFxVYCWaob5VX/ZY6FYcLDAFLnnEPNwhGxda1I0G5TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=T5tm6Vpt; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=Ff12
-	f+xeEXoOZ6ISjNWjK5es8Z76Ux83Stxx6bkIL2k=; b=T5tm6VptISE3O93lHV5y
-	d1q/FYUIW2uqPFQf4AutKE+i5zanr4UksjM12JMxuf3nzccBAC59W7CZrFMQf4ke
-	sYwjOF5rZY2SyYYDIJNe8nJH8ByPTr4OfMy9I9PZeD0YPhd2ivJwqtoVLrYHUqol
-	/qFE9/8U++tZNJHOjg8zaND7WbjUSiiz1WZbcFBTrKV/EIY7/NjJlJuBYuh7BD4z
-	LwWph88oAywOufRMhvrZsuYznaAwP8ZpzepDh50Uq3KZ7DRV9tY13cWYAUbbF62P
-	zMc0y1xCm5sFLOJwZQmj/qB46Aw1bcv3E7fQfmLpeC8uTSbrUAopKqMMpO19X8Qa
-	8Q==
-Received: (qmail 996243 invoked from network); 21 May 2026 11:13:53 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 21 May 2026 11:13:53 +0200
-X-UD-Smtp-Session: l3s3148p1@tTS7VFBSRpwujnvC
-Date: Thu, 21 May 2026 11:13:51 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Lee Jones <lee@kernel.org>,
-	Mark Brown <broonie@opensource.wolfsonmicro.com>,
-	Thierry Reding <thierry.reding@avionic-design.de>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Peter Chen <peter.chen@kernel.org>,
-	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Maximilian Luz <luzmaximilian@gmail.com>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>, brgl@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
-	driver-core@lists.linux.dev, devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
-	iommu@lists.linux.dev, linux-pm@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-usb@vger.kernel.org, linux-mips@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 11/23] i2c: pxa-pci: use platform_device_set_of_node()
-Message-ID: <ag7MzzkiA6sseuVb@shikoro>
-References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
- <20260521-pdev-fwnode-ref-v1-11-88c324a1b8d2@oss.qualcomm.com>
+	s=arc-20240116; t=1779355030; c=relaxed/simple;
+	bh=e4E9ApxuKnHL6gEt0l9i18QERzbyiDlwx9esv+XQqcY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l06kimMI6RzsohvUqgmMaWIqL/9M/JkiPk2iIOWHyrhpqpi2bROsaz3lt77WsIUF52g+ekYeo+090bLswQXHlJOMZ3whqmHBEbCt0o909bOMeVX+Lj0ne8aI23B0C7spZVGIyg4bCB1eLX61z6zTikPqpFi4Y7phmGEbVfnsy/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KizWIuuc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779355027;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dZC77d7mSmvyQZQpaB0KYORR6eKaPrKgUruY5Qci0Z8=;
+	b=KizWIuucBPGBntbVAYCZVmq6I79Fl+X5wsTm0FGTm1c3PHKNx+MixZ/j4wXqmt9KB4IQaS
+	sg8AU7oONZPOBEq7tGsQACIjqFU5xsPGbERE4ihy/RFSiUeIb+kDHPXpd3tHe9VK/mm0cX
+	hX0VcLGWhhFc8PT77S+Ti6eal3o6hHQ=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-Rzjuf-hSPqeW_WHY5-Q7hg-1; Thu,
+ 21 May 2026 05:17:01 -0400
+X-MC-Unique: Rzjuf-hSPqeW_WHY5-Q7hg-1
+X-Mimecast-MFC-AGG-ID: Rzjuf-hSPqeW_WHY5-Q7hg_1779355018
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EC2FD1956096;
+	Thu, 21 May 2026 09:16:57 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.233])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 840DD1800347;
+	Thu, 21 May 2026 09:16:48 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: akiyano@amazon.com
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	richardcochran@gmail.com,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	dwmw2@infradead.org,
+	tglx@linutronix.de,
+	mlichvar@redhat.com,
+	andrew+netdev@lunn.ch,
+	guwen@linux.alibaba.com,
+	xuanzhuo@linux.alibaba.com,
+	dwmw@amazon.com,
+	ysarna@amazon.com,
+	zorik@amazon.com,
+	matua@amazon.com,
+	saeedb@amazon.com,
+	msw@amazon.com,
+	aliguori@amazon.com,
+	nafea@amazon.com,
+	evgenys@amazon.com,
+	netanel@amazon.com,
+	alisaidi@amazon.com,
+	benh@amazon.com,
+	ndagan@amazon.com,
+	darinzon@amazon.com,
+	evostrov@amazon.com,
+	ofirt@amazon.com,
+	amitbern@amazon.com,
+	linux-kselftest@vger.kernel.org,
+	shuah@kernel.org,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH v3 net-next 6/7] net: ena: Add error bound to PHC communication layer
+Date: Thu, 21 May 2026 11:16:32 +0200
+Message-ID: <20260521091644.84928-1-pabeni@redhat.com>
+In-Reply-To: <20260515164033.6403-7-akiyano@amazon.com>
+References: <20260515164033.6403-7-akiyano@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260521-pdev-fwnode-ref-v1-11-88c324a1b8d2@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[sang-engineering.com:s=k1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290311-lists,netdev=lfdr.de,renesas];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,vger.kernel.org,gmail.com,google.com,redhat.com,infradead.org,linutronix.de,lunn.ch,linux.alibaba.com,amazon.com,linux.dev];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,linux.intel.com,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290312-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[sang-engineering.com];
-	DKIM_TRACE(0.00)[sang-engineering.com:+];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_GT_50(0.00)[66];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wsa@sang-engineering.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 6986D5A2279
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[33]
+X-Rspamd-Queue-Id: 4AB845A23ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 21, 2026 at 10:36:34AM +0200, Bartosz Golaszewski wrote:
-> Ahead of reworking the reference counting logic for platform devices,
-> encapsulate the assignment of the OF node for dynamically allocated
-> platform devices with the provided helper.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+From: AI Reviewer <ai@example.com>
 
-Acked-by: Wolfram Sang <wsa+renesas@sang-engineering.com> # for I2C
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+net: ena: Add error bound to PHC communication layer
+
+This commit extends the ENA PHC communication layer to retrieve an
+error_bound value from the device alongside the timestamp, and adds a
+phc_err_eb statistic to count error_bound retrieval failures.
+
+> diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c b/drivers/net/ethernet/amazon/ena/ena_com.c
+> index 257910460bd8..832c4c1d0e5e 100644
+> --- a/drivers/net/ethernet/amazon/ena/ena_com.c
+> +++ b/drivers/net/ethernet/amazon/ena/ena_com.c
+
+[ ... ]
+
+> @@ -1882,14 +1888,15 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
+>  		}
+>  
+>  		/* req_id was updated by the device which indicates that
+> -		 * PHC timestamp and error_flags are updated too,
+> -		 * checking errors before retrieving timestamp
+> +		 * PHC timestamp, error_bound and error_flags are updated too,
+> +		 * checking error flags before retrieving timestamp and
+> +		 * error_bound values
+>  		 */
+>  		if (unlikely(resp->error_flags & ENA_PHC_ERROR_FLAGS)) {
+
+[High]
+
+Once req_id is observed equal to phc->req_id, the function reads
+resp->error_flags, resp->timestamp and (now) resp->error_bound from the
+device-shared DMA buffer. The updated comment explicitly states that once
+req_id is observed updated, "PHC timestamp, error_bound and error_flags
+are updated too" — which is the producer/consumer pattern that normally
+requires a read barrier between the index check and the dependent data
+loads.
+
+The buffer is declared volatile and the req_id check uses READ_ONCE(),
+but on weakly-ordered architectures such as arm64 (which includes AWS
+Graviton, a primary ENA deployment target) neither volatile nor
+READ_ONCE() orders dependent loads against DMA writes from the device.
+Without a dma_rmb() the CPU may observe the new req_id while still
+returning stale or torn values for the 64-bit timestamp, the error_bound,
+or the error_flags.
+
+Could a dma_rmb() be added between the req_id check and the subsequent
+reads of resp->error_flags / resp->timestamp / resp->error_bound, similar
+to the pattern already used elsewhere in the same driver?
+
+For example, ena_com_handle_admin_completion() in the same file does:
+
+	/* Do not read the rest of the completion entry before the
+	 * phase bit was validated
+	 */
+	dma_rmb();
+
+and ena_com_aenq_intr_handler() has:
+
+	/* Make sure the phase bit (ownership) is as expected before
+	 * reading the rest of the descriptor.
+	 */
+	dma_rmb();
+
+The same shape applies here: device writes data fields, then writes
+req_id last; driver checks req_id, then reads data fields.
+
+This ordering issue is not introduced by this patch — the timestamp and
+error_flags reads after the req_id check existed before — but the patch
+extends the same unsynchronized read pattern to a third field
+(error_bound) and the new comment now documents the assumed ordering
+that is not actually enforced. Would it make sense to address the missing
+dma_rmb() while touching this code?
+
+>  			/* Retrieved invalid PHC timestamp, PHC enters into
+
+[ ... ]
+
+> @@ -1897,12 +1904,15 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
+>  
+>  		/* PHC timestamp value is returned to the caller */
+>  		*timestamp = resp->timestamp;
+> +		if (error_bound)
+> +			*error_bound = resp->error_bound;
+>  
+>  		/* Update statistic on valid PHC timestamp retrieval */
+>  		phc->stats.phc_cnt++;
+
+[ ... ]
+-- 
+This is an AI-generated review.
 
 
