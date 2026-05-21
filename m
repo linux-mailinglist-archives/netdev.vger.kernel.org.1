@@ -1,252 +1,205 @@
-Return-Path: <netdev+bounces-290520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290521-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KM74BlckD2rPGAYAu9opvQ
-	(envelope-from <netdev+bounces-290520-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:27:19 +0200
+	id 8LFEAAQuD2r+HQYAu9opvQ
+	(envelope-from <netdev+bounces-290521-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:08:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B2415A84F7
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:27:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C42D5A8E84
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 18:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9975533041F7
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:54:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9288633B47C0
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 14:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5E339D6DB;
-	Thu, 21 May 2026 14:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168FB314A6B;
+	Thu, 21 May 2026 14:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nB7dqaCb"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="N62VWbPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF5139E167
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 14:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83AA2C08BB;
+	Thu, 21 May 2026 14:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779375065; cv=none; b=OslAGn72y+MxDJyxilXy683TcNVHZ58vQGfqXgmtQHxq/Me2tGguCvtQjt8/x/U4MaCm+Y4uEGTGxGkEZOqtbgCvaV528kpFgOzn9mVPaB26wLwqiHpezWpVzcWg5v8LM8C6K3Mqr+yzmbWo9nMYb2xN8PX4+oEwMpM3MgfImsg=
+	t=1779375415; cv=none; b=WR2HwLpraJNxf7V6I3E/FPxzGCsjYHFHWKxEkbLTSFn8EkVMgp+Z8KfOHrSPLTPzty5gnUMbFKZVNvjuwULels5Y3Oh1LAnLiVsNJMPFx1Jn3Fx5py8g/uqAdCwqSdzwgHGQsj8lif6bnZ2BqoT8WgZ/oRCpDjiAvb0WHhixmtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779375065; c=relaxed/simple;
-	bh=a52OfR4iIxB7NR4aDT4cxoCuDzhHBrR+NfXk0hq4l9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nip+Jm2njBKA/LTXNkQIrrjvmED4ZRxf0pHI/seIu0Mqzoa9712CRldYzloXOj2gwGygktGMJB/awuwxPv9wqiNM/BQvNz7bh/pegOHEAwGeCbwErJnodm/tTJ/UKRiChtWxnfvR4WITDs17PsF5LQJHWvwPcx+Ti4ZljSHlWOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nB7dqaCb; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 53E484E42D0D;
-	Thu, 21 May 2026 14:50:56 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 044E760495;
-	Thu, 21 May 2026 14:50:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4E841107E89AF;
-	Thu, 21 May 2026 16:50:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779375055; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=fTteTqIzCkDDRfgTUqBszUa4Ju7v0nJjWKenJsd6KUA=;
-	b=nB7dqaCbGmYNQpadDDIPmQoye+tBE1lUNZvnmsMHr5H8yJL6gZlt6Z1KK1CsY6pxBD7CV7
-	0lg+Pcu0jDpSIlvZubgvSTe1r49CPtRBhdzx8oBEATZSE7hhmFjpp0VEIbWyr9UWVHTqsV
-	lG9cBJf2qbTkdmqxNydPfcP+ePMw9Utsrqf7SnHTGCuL1dZHqtjCyOmzIufrWaW8CNMxP+
-	YQAZteWlPklCBBlLPXLKMb0e6qeHAfFMpSWxn94l0h17LbH+RxTn3Q/b4oglUYEL0tZWUt
-	fpA6iLiaCGy1JFmy+U0dOPw3+OyGY95GLWgebbtNiJvNsPZPm7Qam6gkoJDq2A==
-Message-ID: <a02f6a76-add7-446a-9f92-304fee0ef594@bootlin.com>
-Date: Thu, 21 May 2026 16:50:44 +0200
+	s=arc-20240116; t=1779375415; c=relaxed/simple;
+	bh=xP7CJfTIejAfdAVRGd7RMiJaOviQ39NVPwTAMZglPc4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dfoTI5E9hnR4h0Q88DjEaWT4i/DUhYZHyS1HUiV6fuAJZiYJw4WtGGHCFx46QxHQPK6UCphzBrArdkISrF+JbvCFl6mPUOTVrcNkuQ+bgYJO19PiyA0i4MF2hTAeyuVAFNeebyrD7DgC/vYkUqIcAyNakArVx4TMs110GpX/ivQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=N62VWbPa; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64L3da8t032105;
+	Thu, 21 May 2026 14:56:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=Kd79+Q8RSCIQ0lsnfK7NO9/obXTHGBJwUeTnn628b
+	+I=; b=N62VWbPaDEz4nz3bA9AudgUakA8dqtW28JtoctRCummEn4jkLM5igPjhw
+	q6/ih9S91ZG+qZcFZiADa+MGK7NzQeiJR0Lskh+WAkI+8zAa0BuPsFzTmgzSDcq3
+	lf1B5NUsklqHR28ImBZwVo9flCr2urPwlesjNViLj5eMiF2avlj5Y91Maa6/Wgaw
+	iPJer2ToSGTSgNiWAis+9RtGnlDM106Q1SqAPUvGxG0vDme1Kq/cBPVHmxcjIzTt
+	kFrd6T6EACi10eNDcXjzIqWtxzL5YcX66ECIdLlX2STFItNbWxngFx6WrIC3Yvd2
+	lfvZrwpPfGHjb/vvUJ5XV/xLLHy9Q==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4e6h9y7pnv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 May 2026 14:56:45 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64LEs4DH009243;
+	Thu, 21 May 2026 14:56:44 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4e75kycen8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 May 2026 14:56:44 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64LEueOD52036046
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 May 2026 14:56:40 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 23C7820043;
+	Thu, 21 May 2026 14:56:40 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DF1F720040;
+	Thu, 21 May 2026 14:56:39 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 21 May 2026 14:56:39 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id C57DAE0616; Thu, 21 May 2026 16:56:39 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Halil Pasic <pasic@linux.ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+Subject: [PATCH net] net/smc: Do not re-initialize smc hashtables
+Date: Thu, 21 May 2026 16:56:39 +0200
+Message-ID: <20260521145639.10317-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6] net: phy: sfp: probe for RollBall I2C-to-MDIO
- bridge in mdio-i2c
-To: Petr Wozniak <petr.wozniak@gmail.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, bjorn@mork.no,
- linux-phy@lists.infradead.org, jan@3e8.eu
-References: <20260521025755.24649-1-petr.wozniak@gmail.com>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260521025755.24649-1-petr.wozniak@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIxMDE0NyBTYWx0ZWRfX/kxxoe6h8UfU
+ Epd7Gj881HoLcU8sXRhxtNE3nBhwiO1q9e6i5qrTwTwjGDqXGcf4D57Lm/Pa+9oD2H7CS5j6kKw
+ 88EqYnbjgH9D4YwPSeYUCv5JH3JE6U0lfk7VLs1jvWhREYiKW7e7y7TmzNqoPJJ7sNx/zBf3kTs
+ sfLYiRDJ/yC/1HKPHtRQpsogZXrxPGou4Pohh/WUnPCpVtFAkToN1NT2ii45c7B9vOrMnvjN2u4
+ qZy/h5v+mFmvK0WclXdAsDSWlxViciYj1kEr/MAoJjseL46UkhoMI2eKadZpjb4qq9vEd+Jxvad
+ IMBHLMZ/7JIR+F01qOppWkB76NB4bbJ5bZXRW9MMPLHnjtK2lEB2648n8q/muLObq0mlF+2ay0f
+ IyDizMpA4glKft8vW4e4IFmqoC02ntzqeiUPyZbu63dv/wy3LUrnKL6niMkHDTcjliwYniunX+I
+ 944H2rEWfOvNF+u0KVw==
+X-Authority-Analysis: v=2.4 cv=BNuDalQG c=1 sm=1 tr=0 ts=6a0f1d2d cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=uTnNPQT6LuAJtcTOVOAA:9
+X-Proofpoint-ORIG-GUID: B3MXXNGRvlM54cfMsoXrQImncGPKtHLH
+X-Proofpoint-GUID: vIn2PzKk3D7yKdajrNTis6jZyufV9kcl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-21_02,2026-05-18_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 malwarescore=0 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605210147
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290520-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,mork.no,lists.infradead.org,3e8.eu];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290521-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	RCVD_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 8B2415A84F7
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2C42D5A8E84
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+INIT_HLIST_HEAD(&smc_v*_hashinfo.ht) are called after smc_nl_init(),
+proto_register() and sock_register(). This can lead to smc_v*_hashinfo.ht
+being reset even though hash entries already exist and are being used,
+possibly resulting in a corrupted list.
 
-On 5/21/26 04:57, Petr Wozniak wrote:
-> The "OEM"/"SFP-10G-T" quirk entry in sfp_fixup_rollball_cc()
-> unconditionally forces MDIO_I2C_ROLLBALL for all modules matching that
-> vendor/part-number combination.  This works for modules that genuinely
-> implement a RollBall I2C-to-MDIO bridge, but silently breaks modules
-> that share the same EEPROM strings without having such a bridge.
-> 
-> The Realtek RTL8261BE-CG is one such module: a pure copper 10G SFP+
-> media converter with no I2C-to-MDIO bridge.  Its EEPROM reports
-> vendor="OEM", part="SFP-10G-T-I", and -- critically -- Vendor OUI
-> 00:00:00, making OUI-based differentiation impossible.  With
-> MDIO_I2C_ROLLBALL forced, the module silently ACKs the unlock password
-> write, the MDIO bus is created, but no PHY responds; the SFP state
-> machine cycles through the RollBall PHY-probe retry window before
-> reporting no PHY.
-> 
-> Move the probe into i2c_mii_init_rollball() in mdio-i2c.c, where the
-> RollBall protocol constants are already defined.  After sending the
-> unlock password, issue a CMD_READ and poll for CMD_DONE up to 200 ms
-> (10 x 20 ms, matching the existing rollball poll tolerance).  A genuine
-> RollBall bridge asserts CMD_DONE within that window; modules without a
-> bridge never do, so i2c_mii_init_rollball() returns -ENODEV.
-> mdio_i2c_alloc() propagates -ENODEV to the caller to signal that no
-> bridge is present and PHY probing should be skipped.
-> sfp_sm_add_mdio_bus() catches -ENODEV and transitions
-> sfp->mdio_protocol to MDIO_I2C_NONE so the rest of the state machine
-> skips PHY probing for this module.
-> 
-> Any I2C-level error (NACK, timeout) during the probe is also treated as
-> -ENODEV: if the module does not respond at I2C address 0x51 at all,
-> there is certainly no RollBall bridge there, and SFP initialization
-> should not abort.
-> 
-> The probe writes are safe with respect to SFP EEPROM integrity: only
-> modules explicitly listed in the quirk table enter this path, and the
-> RollBall password unlock write to 0x51 was already issued by
-> i2c_mii_init_rollball() before the probe for all such modules.  Any
-> module without a device at 0x51 NACKs the transfer and is treated as
-> -ENODEV.
-> 
-> Add "OEM"/"SFP-10G-T-I" to the quirk table so RTL8261BE modules enter
-> the probe path; genuine RollBall modules continue to work as before.
-> 
-> Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
-> 
-> Changes since v5 (Sashiko AI review):
->    - Treat I2C NACK/errors in i2c_mii_init_rollball() as -ENODEV so
->      modules without a 0x51 EEPROM do not abort SFP initialization
->    - Replace fixed 70 ms wait with 10 x 20 ms poll (total 200 ms),
->      matching the existing i2c_rollball_mii_poll() tolerance and
->      preventing false -ENODEV on slow RollBall bridges
-> 
-> Changes since v4 (feedback from Maxime Chevallier):
->    - Fix commit message: replace "stalls" with accurate description of
->      the RollBall PHY-probe retry window
->    - Fix variable declaration order in i2c_mii_probe_rollball() to
->      follow reverse-xmas tree (descending line length)
->    - Remove spurious alignment space on "SFP-10G-T" quirk entry
->    - Document that -ENODEV from mdio_i2c_alloc() means no bridge present,
->      PHY probing should be skipped
-> 
-> Changes since v3 (feedback from Jakub Kicinski):
->    - Drop spurious Tested-by: tag -- author and tester are the same person
->    - Use PATCH net-next subject prefix
->    - Move -ENODEV handling from sfp_i2c_mdiobus_create() into
->      sfp_sm_add_mdio_bus() so bus-creation code does not mutate
->      sfp->mdio_protocol; the state machine is the correct place for
->      protocol-state transitions
->    - Split combined variable declaration for clarity
-> 
-> Changes since v2:
->    - Compile-tested and hardware-tested on BPI-R4 (MT7988A, 6.12.87)
->    - RTL8261BE (OEM/SFP-10G-T-I): probes MDIO_I2C_NONE, link Up 10Gbps
->    - Genuine RollBall (OEM/SFP-10G-T): bridge detected, link Up 10Gbps
-> 
->   drivers/net/mdio/mdio-i2c.c | 65 ++++++++++++++++++++++++++++++------
->   drivers/net/phy/sfp.c       | 16 ++++++++--
->   2 files changed, 68 insertions(+), 13 deletions(-)
-> --- a/drivers/net/mdio/mdio-i2c.c
-> +++ b/drivers/net/mdio/mdio-i2c.c
-> @@ -352,6 +352,54 @@
->   	return 0;
->   }
->   
-> +static int i2c_mii_probe_rollball(struct i2c_adapter *i2c)
-> +{
-> +	u8 data_buf[] = { ROLLBALL_DATA_ADDR, 0x01, 0x00, 0x00 };
-> +	u8 cmd_buf[]  = { ROLLBALL_CMD_ADDR, ROLLBALL_CMD_READ };
-> +	u8 cmd_addr   = ROLLBALL_CMD_ADDR;
-> +	struct i2c_msg msgs[2];
-> +	u8 result;
-> +	int ret;
-> +	int i;
-> +
-> +	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-> +	msgs[0].flags = 0;
-> +	msgs[0].len   = sizeof(data_buf);
-> +	msgs[0].buf   = data_buf;
-> +	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-> +	msgs[1].flags = 0;
-> +	msgs[1].len   = sizeof(cmd_buf);
-> +	msgs[1].buf   = cmd_buf;
-> +
-> +	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-> +	if (ret < 0)
-> +		return -ENODEV;
-> +	if (ret)
-> +		return ret;
-> +
-> +	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
-> +	msgs[0].flags = 0;
-> +	msgs[0].len   = 1;
-> +	msgs[0].buf   = &cmd_addr;
-> +	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
-> +	msgs[1].flags = I2C_M_RD;
-> +	msgs[1].len   = 1;
-> +	msgs[1].buf   = &result;
-> +
-> +	for (i = 0; i < 10; i++) {
-> +		msleep(20);
-> +		ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
-> +		if (ret < 0)
-> +			return -ENODEV;
-> +		if (ret)
-> +			return ret;
+Remove unnecessary and dangerous re-initialisation of smc_v*_hashinfo.ht =
+in
+smc_init(); it is implicitly initialised to zero anyhow. Add
+HLIST_HEAD_INIT to the definitions for clarity.
 
-I think this check is not needed, it seems to me that 
-i2c_transfer_rollball() always returns either a negative number, or 
-zero. All the calls in i2c_transfer_rollball() end-up returning the 
-return value from __i2c_transfer_err(), which is always either negative 
-or 0.
+Fixes: f16a7dd5cf27 ("smc: netlink interface for SMC sockets")
+Suggested-by: Halil Pasic <pasic@linux.ibm.com>
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
+---
+ net/smc/af_smc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-There's a similar check below that can be simplified as well
-
-Maxime
-
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index dffbd529762d..b5db69073e20 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -188,10 +188,12 @@ static bool smc_hs_congested(const struct sock *sk)
+=20
+ struct smc_hashinfo smc_v4_hashinfo =3D {
+ 	.lock =3D __RW_LOCK_UNLOCKED(smc_v4_hashinfo.lock),
++	.ht =3D HLIST_HEAD_INIT,
+ };
+=20
+ struct smc_hashinfo smc_v6_hashinfo =3D {
+ 	.lock =3D __RW_LOCK_UNLOCKED(smc_v6_hashinfo.lock),
++	.ht =3D HLIST_HEAD_INIT,
+ };
+=20
+ int smc_hash_sk(struct sock *sk)
+@@ -3517,8 +3519,6 @@ static int __init smc_init(void)
+ 		pr_err("%s: sock_register fails with %d\n", __func__, rc);
+ 		goto out_proto6;
+ 	}
+-	INIT_HLIST_HEAD(&smc_v4_hashinfo.ht);
+-	INIT_HLIST_HEAD(&smc_v6_hashinfo.ht);
+=20
+ 	rc =3D smc_ib_register_client();
+ 	if (rc) {
+--=20
+2.51.0
 
 
