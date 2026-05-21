@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-290434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290435-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLIjIzsND2p7EgYAu9opvQ
-	(envelope-from <netdev+bounces-290434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:48:43 +0200
+	id MLxmL8oRD2pzEwYAu9opvQ
+	(envelope-from <netdev+bounces-290435-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:08:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B2215A63EA
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 15:48:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 372D65A6D8E
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 16:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2003132C6781
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:21:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A994D3305549
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 13:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0283DD50E;
-	Thu, 21 May 2026 13:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68BFA3E00B6;
+	Thu, 21 May 2026 13:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WHTKX+kr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cwnkry5N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f74.google.com (mail-vs1-f74.google.com [209.85.217.74])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098573CBE69
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:19:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FD438332E
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 13:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779369568; cv=none; b=jwv472cOsAJFhRfAcvKcOY9/mx2jmQq876f68kG3NhjvxpZVZTciZM3eCM7WrCxhQxl7AHsE7fXqXS7TiKsByvs/y4l+BvacwwooDlKha42keszVLm9RpNGa5Fnxq2sWh9T1lbyMKp8DLsbvlqXVTdHQepGukPC9VWBLHADmsdY=
+	t=1779369569; cv=none; b=JG2r/lmGvZbLwzmDNNlGw5Ag17ZBL0RXMI+tJJni1S2O6eAOADNu97moLZxl1ZhVFq5W3+lFzGNNu/QnOImdBVuUVLT5BW14ER/LdAtxBAy/YSsrjywKVfzlXPtv2puECGvbqvOyS6XbYEslc43gQkknl/tH0rCBrEbthHYF7Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779369568; c=relaxed/simple;
-	bh=OoFGuLUd2tkNBbXFcQJUzpT7hjCT7Ocksx/u0YUB35A=;
+	s=arc-20240116; t=1779369569; c=relaxed/simple;
+	bh=zOGULb7ajL+R3yoLcxIEMi+8032+JRRGHilgDHwOCLU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sKSuj1k0jwDP5UVHHGShPcxM8GDfupHoqC+R7Aka1DlIlrCCBbfGt6dbdJdmSexnDHqXEDrl7CrMpxdaOz11GDxLHUbvW+DaXyxFCfZvZ2rp9p5tvnf/IIsE/pEo1Gy3bqzMYTy7f4pttgelhn2H6mTKXgm9qjeJRFnNSgS6vfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WHTKX+kr; arc=none smtp.client-ip=209.85.217.74
+	 To:Cc:Content-Type; b=FIMXZ6fdbLpW5MO0TodWHKKbFQDvRG8LpgcNOV0a6OtTxyRD+ZoMkMRIUHF0ifP6oHtQBU4So8eSxQmbR04C6FEVsPLbZyHjoyzfx3S7cL+bvQGQ/uGQdcgXfxo8ytMZXSjdHA/o+mdut2u7dZreVQh0SYB4F7lxPQKsYkD6GcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cwnkry5N; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-vs1-f74.google.com with SMTP id ada2fe7eead31-631289505b8so3191418137.0
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:19:26 -0700 (PDT)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-51605cf3c60so73971121cf.0
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 06:19:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779369566; x=1779974366; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1779369567; x=1779974367; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XrXa7oLw561e1yfRozQ64g6UosDCCrr6GWOyzxmYFH8=;
-        b=WHTKX+krbjyHXyEmd4YDoULhNVTfGSxINzwi9TCej55eie3DtjFsnIhwC9E1OtZWzr
-         ipPTSIVVktdfHnJ0qzNK33aG6NljxIaw5o3YGZJCjQ8h3QcfZ2apFFbLps2bl4ErlAxb
-         X/cYvcchU2/O5pzcBLnl2+S/q2A+9T2qP+4yCAr0A+EtsNr9dmIilmFVrykLECdzawNC
-         i7nHf0HWooZFE8/29VHJgRT1q+llVdx8kjenPnz8xK3PofuX5zUfPv+I4OI027S6MCWL
-         sHEo2Sd5rdWAy4O/8YU4jfMRlrV3miCcrFaOrmOFVUIROmVFLX/WFNERuTyyUWEhuuWm
-         HJKA==
+        bh=5qXFYHo9PbtkkqJbmyHKb7fXZBpJcL6acph5TZjKHys=;
+        b=cwnkry5NuAq4/E4bpo/+lmJfTE/4BgckHu3YBF7nKlQVUDe/I4vWv0Upp5CzlUqZsZ
+         g9UHE73s9oSsG5cwMsKEO6IYOEBLFyhGNVygOVSX9DgzO5BdMKDr0gS5qa8HzzF7o+Rt
+         +E6jcWrUh8dqMRqNtwD1Kyuh8HogcZUaRInC9as+g9N/eRTGD0uEt9IYlUz6iYwOBC0Z
+         4MzdVqjxAQBlFyYMXYrHPF5HIv/QYSCXxooPP7V9ekWM9kC8mgvREbqxtjCUviFLDvVK
+         o7y3jZgToOZR7pgG9+0j5PcgO3u1JbszG+eFEADuChUHEzKubjbxGUOuL0CSlASzu47p
+         Bcmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779369566; x=1779974366;
+        d=1e100.net; s=20251104; t=1779369567; x=1779974367;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XrXa7oLw561e1yfRozQ64g6UosDCCrr6GWOyzxmYFH8=;
-        b=RR2j1Ve954VGim0g0DVrh9ZFpEMXFSCrXjqlr5wgxZizrByxm9ttqL+bHQL5f3O9EF
-         nDOFGs2ZQwg+DQoHxubVBD5I3Hcy1OyOXLBP6X588Qeb/5qrlI9jFnkr/kLGhEcqlQXi
-         3c5zqsW8zVDTIZGJE1yjqYzSFQYymT0eO1sUPfMNFQpF43y2IruwEnr3sF63SFXSP7iH
-         7eq/fne+WfFVVOlAjSoek9SpVfdJrzrBwrxG0mUgArrnex9zKcknLHsfJwh8cuXHeS75
-         htvrMKRDKb80whTfSRpMy/E5+5VYzEspRjtYRkAWF+vScRX9ilDyfxu0oeDXSXbC52Fj
-         Xc8g==
-X-Forwarded-Encrypted: i=1; AFNElJ8YvPTmb66oJGj2sYZjPpvYwsLSVjcU/QdzvJqXoLbY/5GpHH1ifLsDQSBb926rJGjoxp4JmmE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVs5kDEewsRUSaMUVGMHJeQCq+E9/YTb9eso/chap9fbcTguR1
-	XzebXWMfVN6vGTYLdjFkdPBLHbhIxcwhGtFRgh5XF9Ipczmtn4hEs2dfwojFEdiULie2Ebq2UEM
-	1tJm1WCtLwBtgew==
-X-Received: from qvhi4.prod.google.com ([2002:ad4:5c64:0:b0:89c:eb9f:c69f])
+        bh=5qXFYHo9PbtkkqJbmyHKb7fXZBpJcL6acph5TZjKHys=;
+        b=aGWD5nSyzn12OgPx5+JQwjW9UZ/HX12TAmDH47pLSxK9mJir3dB0w8S7+tMqPtQ/A4
+         xTVZB2rpZ9GOkzL+3A9/AAlBAnGc3/NCDRaOlpH144bhkVa5UDXkPvs5FuDetu3SUhJJ
+         RYii6IEd7Xrrf1KcaJA0dimgnzGygb1u2CHpcFhiKEtGBoVi24bj74zLgq9vmA2XZGHA
+         y6HqubQ/RiRU1S1q4i3UvFfctdXzVhUZSstxmC1W9KoFUVA50dzZrWw1X2DNSY2XXgoC
+         NZ5aeWOE6bNg0DrMe7yESCtELZEyIeJxhAiXxniz5zL5SBFpfP4SQdLdcKEnAsOlm7Uo
+         2MdA==
+X-Forwarded-Encrypted: i=1; AFNElJ9qM2Klzu59vrkN0eprgHYqvzXzPtwlA+oNmq+sQU61ujyyzI0stVeAeEf6a7bqPjdKugb6WIE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLR71xefD44/GaVa3Hk9OlXLNS337J4yllNE7BWc29qU7Ypo3n
+	ZcZdOBV0HcKJLy3pMo5nIy++QY+Dk6AsC78pchM9IVGSZQOmrD1O15RbK0YSM6mLQMrKGvR+mCz
+	deeR7t7Nj7UAdPg==
+X-Received: from qtto1.prod.google.com ([2002:ac8:6d01:0:b0:516:cbf0:55fd])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:4a85:b0:607:5cd7:d7c0 with SMTP id ada2fe7eead31-6739878b93emr1298120137.19.1779369565579;
- Thu, 21 May 2026 06:19:25 -0700 (PDT)
-Date: Thu, 21 May 2026 13:19:08 +0000
+ 2002:a05:622a:588c:b0:509:2527:d789 with SMTP id d75a77b69052e-516c53d6cfdmr38740241cf.6.1779369566863;
+ Thu, 21 May 2026 06:19:26 -0700 (PDT)
+Date: Thu, 21 May 2026 13:19:09 +0000
 In-Reply-To: <20260521131916.3627204-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260521131916.3627204-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.669.g59709faab0-goog
-Message-ID: <20260521131916.3627204-4-edumazet@google.com>
-Subject: [PATCH net-next 03/11] bridge: use BR_PROMISC_BIT
+Message-ID: <20260521131916.3627204-5-edumazet@google.com>
+Subject: [PATCH net-next 04/11] bridge: use BR_ADMIN_COST_BIT
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -91,7 +91,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290434-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290435-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -111,56 +111,46 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0B2215A63EA
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 372D65A6D8E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use BR_PROMISC_BIT and set_bit(), clear_bit() and test_bit() lockless
-functions.
+Use set_bit() and test_bit() lockless functions.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/bridge/br_if.c      | 4 ++--
- net/bridge/br_private.h | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ net/bridge/br_if.c     | 2 +-
+ net/bridge/br_stp_if.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
-index d39571e13744431f5e4c67f34ee7de34eb8bb6b0..3169fab686a534cf2a6458ff228eee2b6fc7e7e4 100644
+index 3169fab686a534cf2a6458ff228eee2b6fc7e7e4..0bd5cf925fa321b785e3578d6e99d8d7003fa89f 100644
 --- a/net/bridge/br_if.c
 +++ b/net/bridge/br_if.c
-@@ -110,7 +110,7 @@ static void br_port_set_promisc(struct net_bridge_port *p)
- 		return;
+@@ -75,7 +75,7 @@ void br_port_carrier_check(struct net_bridge_port *p, bool *notified)
+ 	struct net_device *dev = p->dev;
+ 	struct net_bridge *br = p->br;
  
- 	br_fdb_unsync_static(p->br, p);
--	p->flags |= BR_PROMISC;
-+	set_bit(BR_PROMISC_BIT, &p->flags);
- }
+-	if (!(p->flags & BR_ADMIN_COST) &&
++	if (!test_bit(BR_ADMIN_COST_BIT, &p->flags) &&
+ 	    netif_running(dev) && netif_oper_up(dev))
+ 		p->path_cost = port_cost(dev);
  
- static void br_port_clear_promisc(struct net_bridge_port *p)
-@@ -133,7 +133,7 @@ static void br_port_clear_promisc(struct net_bridge_port *p)
- 		return;
+diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
+index 28c1d3f7e22f6e0a0edd8b3b3f501ea7acc31394..b29dc97b9ad8a5b5c56517d34fe426abd00e2ad6 100644
+--- a/net/bridge/br_stp_if.c
++++ b/net/bridge/br_stp_if.c
+@@ -340,7 +340,7 @@ int br_stp_set_path_cost(struct net_bridge_port *p, unsigned long path_cost)
+ 	    path_cost > BR_MAX_PATH_COST)
+ 		return -ERANGE;
  
- 	dev_set_promiscuity(p->dev, -1);
--	p->flags &= ~BR_PROMISC;
-+	clear_bit(BR_PROMISC_BIT, &p->flags);
- }
- 
- /* When a port is added or removed or when certain port flags
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 02671e648dac7ab6fd59b80e044f62b00a8e4a8a..d55ea9516e3e369bb9e0045fca5b8d034ef5a45f 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -452,7 +452,7 @@ struct net_bridge_port {
- #define kobj_to_brport(obj)	container_of(obj, struct net_bridge_port, kobj)
- 
- #define br_auto_port(p) ((p)->flags & BR_AUTO_MASK)
--#define br_promisc_port(p) ((p)->flags & BR_PROMISC)
-+#define br_promisc_port(p) test_bit(BR_PROMISC_BIT, &(p)->flags)
- 
- static inline struct net_bridge_port *br_port_get_rcu(const struct net_device *dev)
- {
+-	p->flags |= BR_ADMIN_COST;
++	set_bit(BR_ADMIN_COST_BIT, &p->flags);
+ 	p->path_cost = path_cost;
+ 	br_configuration_update(p->br);
+ 	br_port_state_selection(p->br);
 -- 
 2.54.0.669.g59709faab0-goog
 
