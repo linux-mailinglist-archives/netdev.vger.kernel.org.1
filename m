@@ -1,178 +1,221 @@
-Return-Path: <netdev+bounces-290568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290570-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIjvKn5AD2qcIQYAu9opvQ
-	(envelope-from <netdev+bounces-290568-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:27:26 +0200
+	id CCHCI3FCD2qcIQYAu9opvQ
+	(envelope-from <netdev+bounces-290570-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:35:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BC805AA37E
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:27:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE3B5AA5AA
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 19:35:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB72332F84FE
-	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:13:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 958843058750
+	for <lists+netdev@lfdr.de>; Thu, 21 May 2026 17:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A6A3D9DDB;
-	Thu, 21 May 2026 17:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7453D7A05;
+	Thu, 21 May 2026 17:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nzBH2mki"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qo5LlFV9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2643D9041
-	for <netdev@vger.kernel.org>; Thu, 21 May 2026 17:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2AB3C81B7
+	for <netdev@vger.kernel.org>; Thu, 21 May 2026 17:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779383634; cv=none; b=rUdLe13WjSbunHcyzFY9IPN/pXx1Vs8FttukcSAslaRmqahyAZpBxFOxmnRkVeRMjD0sbjndg2dlnVd8I4KYXGvef+p6IpJUpxh1OcN6yj7dTJ/jNXyPUi0tOJ2CT2NYqyRe+WTMSBi+gNF4XSFa6og9Ntk0TuzMCi0+mN58YYw=
+	t=1779383684; cv=none; b=ZFDgaSzIzX9GY5nusHNDVfwT5h9mO+DaU1CXLhzldhG4CaQ/4yTfmEETmqo+k/wip448PWaZfOW47lNOjz93OOVAejxmrg5cL/t0a0ymwo3X8OiA8vhuZnTr6bKRntSX1UTFA4Z4pdndXa8eVVtQdV7h7zHS89Mjd2KROhol7zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779383634; c=relaxed/simple;
-	bh=X9MG1kwNUf8O8KAK/Sm8SuGe/dZdaTwPaR1MzEF3AHg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rfm+5uXyxTs5kxwB67VZogrKqLk1W+7sTpP2zkbDFDtL23283x605ma0x6vaESpf1tsm1n8nlWGoxFqZGB1NfFT70g1XTIk31rKdcL9I1fCWaPGlm9sg+4f8bfnUojIxhR2Vrv4QIKcr0awYnrmuii7vUldN/igJKBTFW5Lo/V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nzBH2mki; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-488b0e1b870so89652135e9.2
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 10:13:52 -0700 (PDT)
+	s=arc-20240116; t=1779383684; c=relaxed/simple;
+	bh=+qMm+CZXngmYum+X3iU0oSu6ny3aQDO1+h1osDkyNfw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UyGVTRuqJSJ0D3+pDieSzDw2Rs2U363E/3dn3zbbX7IRg0X4HM8cpRaVoPpTpdOD8PiU21s3tPotAsGzk8sgx5puzEFR3gPCf9ZuVlAp8y94WqeSEqodC+gcdFf+9M5JHoEj4OkbvztUAyGkV7FZHE7M002dMKZUNMyTRpKy7wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qo5LlFV9; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-7bd66ec877aso116020707b3.1
+        for <netdev@vger.kernel.org>; Thu, 21 May 2026 10:14:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779383631; x=1779988431; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zIuChPU1JlP7AlPyeu7nnCYpBOhiwGUpJRXAIqjmuvM=;
-        b=nzBH2mkicctXAN/292q5htBM8uJbtgNpVclJmeiZKdI2qZBJzQP7W0t8OkfXqX86a+
-         U9FNJkbdGMFuH1WuT5mjjd+aXL57+dA3HUPOPJrdtueEf8H/PeHL0dfOiBJdv5ZdbUEc
-         DEEd6F5mW+px4Cqdq3Z4sWqqWrHweRIdrrYt8k6W735dfAkvHALNt/obFyNQnGDjTwam
-         DKE5qj2VWkcmqngZnzjza3NOZoIjJHPK5GDe/CQnpCNJJJ9h6JdmWI67EqhKVibqNKPT
-         Z0100IzuYtrGo5eGLQMg7cgIc46ZruFAZAvLfMipIL0nLAsXeq8fTQRgHMTfwqNE6MMu
-         bkSQ==
+        d=google.com; s=20251104; t=1779383681; x=1779988481; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=typKCKjAl8enyMc6mN/oPci91CLIiINIAt/JYd7ZEAQ=;
+        b=qo5LlFV9/ChyioUR38GdhCkmkTWG4q/wCIQB6Y1T5yjIakE2ASF3EAbULiFrpwf/b2
+         tnU5Ceyv+2m4bQVbPf7rSzZugqm+JN1RM2GYnEQqYCKJqIYmXJVnyB9DDyHfgdCXvw96
+         d3edt427SW/Q8sXRXhJNJ/uM/McHe5me0NLpbWq8bys/vjzlnK8fO1qTOz90xRn0fwke
+         PocLTFazF/7Co1MphqOuPGRinpHXZ8s//9QaGv7YvU39UO9XcE5KBE62c+DfJl5VS8UR
+         9TewzwLEuDz4R6zPjSa/NHU/McVsQgsXXhm0O/Y802wpddTarGTEH4rpudk1vyEZFjMh
+         FnMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779383631; x=1779988431;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zIuChPU1JlP7AlPyeu7nnCYpBOhiwGUpJRXAIqjmuvM=;
-        b=qXke+yrriysywENO9NAbIh1x1ErMJj7FhM3lDFS6iKL7LI7nmvxHafhz6fB6mGFfDC
-         Q7sQCYL+5P1CdjTzZhaFCUMJzA4BkEX6nXqTBWmk+N3LKV86a77jzRAvfhAZGodF3npF
-         nwi4a0ilkwJy2NQLPwwqhkidx+Jy0Gq5I+hB49QKVIEnw/0Ye2CODi5P+1zdGrQKlLah
-         ggAMJj5qbIaFwfKcU2PPr+4ctIkg5Ry1rq99GQh60mZwXgrL0Xk7n35qi46+vG22r+KR
-         CP94S2nlCeXPKUUZrn94/LESkgmsQQIpL5dyDG7TwYPx6W86+m81HQlSiGWeYFwlwe8c
-         KFYQ==
-X-Gm-Message-State: AOJu0YwlTcR02Kzt609Y+gpeTLT13ak6aVUzU/FERCCvR28XH81/2CAK
-	dS6sZB3bROEeRR3KCNORUyup2tyAgQYhaZfs4z4p8ePFJ5GxGNcpB3zn
-X-Gm-Gg: Acq92OFB8QdU8m1UcGeWsHx6MgnMYiuG7oBZd+0rl68NMYH+Qr8hqHs8CKdecKph3yo
-	gqjAUd1Ud7nhyodMp8OhFHmcPgzkhOwzgJbD5t3epWH7Eepftd00hRHDcr79UXJbeiXmOrZ0NlZ
-	5omoi9mwv+ijqI53AGeJoH5NOSiX0aq8DnWw4HSJjreIz+ADPR67LUg5suqrnvEoGzveZBqeI6l
-	8JRk7MpuSPS8vSX+wekJ/0iX8m2Z0hHPhCdgsMMc+NV4nc96F7NVga1MXwz2B9a7t9bJg04UxzR
-	VQXvOxmt+ZlNzH+WJ7qpOtm5IW57tJ5D1sTDTzQnbRaNTV1/AO+M6EUVGD5OJHzfAJraB0MyMU8
-	kUJLUrPwxhGv5QkGyOO0tpiBYVTxETJU77OCvkeNYxBoZn0ZeEruYkGvV4ps8Z19KIm6YCP8DLD
-	GW1nJmnvDUmdVLtu6S789RDvCEA8WFVZtuIEMUbc5wNOs6XYcLNaW3ouhCnRqZXstK
-X-Received: by 2002:a05:600c:828c:b0:485:4eaf:eb53 with SMTP id 5b1f17b1804b1-4903606b5b2mr58827015e9.19.1779383630691;
-        Thu, 21 May 2026 10:13:50 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eaa7cf23bsm4086708f8f.5.2026.05.21.10.13.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 10:13:50 -0700 (PDT)
-Date: Thu, 21 May 2026 18:13:48 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Simon
- Horman <horms@kernel.org>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>,
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Jason Wang <jasowang@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Eric Dumazet <edumazet@google.com>,
- stable@vger.kernel.org
-Subject: Re: [PATCH net] vsock/virtio: fix skb overhead overflow on 32-bit
- builds
-Message-ID: <20260521181348.3d61858e@pumpkin>
-In-Reply-To: <20260521124732.125771-1-sgarzare@redhat.com>
-References: <20260521124732.125771-1-sgarzare@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        d=1e100.net; s=20251104; t=1779383681; x=1779988481;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=typKCKjAl8enyMc6mN/oPci91CLIiINIAt/JYd7ZEAQ=;
+        b=l/5ZFUnS66Z41Sy8/f1ujgSZQHsUyxU381wgmiq+tXUWGnEap991zHQTCKkjA961V9
+         6pjAy5ILvjqwtafUw6fEEBU52sHaRSCrF1iL0HnfNeJ6YTVi3zCe1oZoAJiWJrQiamRf
+         XPMOwOh6dGdg0Kuwm/mvydimnzNBpmrkIlZ0jjxkuWg+J+o7rIp9EzWYeVBmCd7+s3RL
+         5dVx6BVgVI1Xsk7BcBL6Wd+478xtTffnl0jVLHBhVUGSwU7j+LOgxtSHXqRX4jdwbju8
+         e9pDek+Vu1X4LMM1YLIzDWHKxItA0DqSNjyaXFEvzmNwlKMPcjQx8fRlbWdeHQGKhfPg
+         90ag==
+X-Forwarded-Encrypted: i=1; AFNElJ+63VVomSBq74c9qkTyEXCehEtK4pHQZnKj2PS2ov3lTB7KamXc47/zh3pluN+P4mnGJEMZiks=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycWlFQ+QAc2KfcO5aotYD/bNcEppD5+IKr2iEMGFXBOE3RkXAS
+	SRbPWzwJ0u5y1VEw85jK7cBC4Oi2QaqeIk1PWccXgN1LrJvNyLxFQWnnLwiT2+HgJJFaFN71b0+
+	E9jVszXjwhhL4MA==
+X-Received: from yweu3.prod.google.com ([2002:a05:690c:e763:b0:7c4:88d:4c27])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690c:6b87:b0:7bd:6a98:58d3 with SMTP id 00721157ae682-7d213655610mr32268307b3.18.1779383681390;
+ Thu, 21 May 2026 10:14:41 -0700 (PDT)
+Date: Thu, 21 May 2026 17:14:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
+Message-ID: <20260521171440.114956-1-edumazet@google.com>
+Subject: [PATCH net-next] dpll: change dpll_netdev_pin_handle_size() to assume
+ DPLL_A_PIN_ID will be used
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,linux.dev,intel.com,resnulli.us];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-290568-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290570-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url]
-X-Rspamd-Queue-Id: 3BC805AA37E
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,linux.dev:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,resnulli.us:email]
+X-Rspamd-Queue-Id: 1AE3B5AA5AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 21 May 2026 14:47:32 +0200
-Stefano Garzarella <sgarzare@redhat.com> wrote:
+We plan to no longer hold RTNL in "ip link show", and use RCU instead.
 
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> On 32-bit architectures, both skb_queue_len() and SKB_TRUESIZE(0) evaluate
-> to 32-bit values. The multiplication can overflow before being assigned to
-> the u64 skb_overhead variable, making the skb overhead check ineffective.
-> 
-> Cast skb_queue_len() to u64 so the multiplication is always performed in
-> 64-bit arithmetic.
-> 
-> This issue was reported by Sashiko while reviewing another patch.
-> 
-> Fixes: 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue")
-> Closes: https://sashiko.dev/#/patchset/20260518090656.134588-1-sgarzare%40redhat.com
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index df3b418e0392..71198bf23fc4 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -417,7 +417,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
->  					u32 len)
->  {
-> -	u64 skb_overhead = (skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0);
-> +	u64 skb_overhead = ((u64)skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0);
+Assume rtnl_fill_dpll_pin() will have to fill DPLL_A_PIN_ID.
 
-I was thinking this should use mul_u32_u32().
-But that is all moot.
-'skb_overhead' is a memory size in bytes, 'unsigned long' it more than big enough.
-No need for 64bit maths on 32bit.
+It is fine to over-estimate skb size (by 8 bytes) in if_nlmsg_size().
 
--- David
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: Jiri Pirko <jiri@resnulli.us>
+---
+ drivers/dpll/dpll_netlink.c | 11 -----------
+ include/linux/dpll.h        |  9 +++++++--
+ net/core/rtnetlink.c        |  6 +++---
+ 3 files changed, 10 insertions(+), 16 deletions(-)
 
->  
->  	/* Allow at most buf_alloc * 2 total budget (payload + overhead),
->  	 * similar to how SO_RCVBUF is doubled to reserve space for sk_buff
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 53ca24d0f191bc3268340543769fd96c836f9318..095ef8703c0b2687178a46c5312319376d518f79 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -89,17 +89,6 @@ static struct dpll_pin *dpll_netdev_pin(const struct net_device *dev)
+ 	return rcu_dereference_rtnl(dev->dpll_pin);
+ }
+ 
+-/**
+- * dpll_netdev_pin_handle_size - get size of pin handle attribute of a netdev
+- * @dev: netdev from which to get the pin
+- *
+- * Return: byte size of pin handle attribute, or 0 if @dev has no pin.
+- */
+-size_t dpll_netdev_pin_handle_size(const struct net_device *dev)
+-{
+-	return dpll_netdev_pin(dev) ? nla_total_size(4) : 0; /* DPLL_A_PIN_ID */
+-}
+-
+ int dpll_netdev_add_pin_handle(struct sk_buff *msg,
+ 			       const struct net_device *dev)
+ {
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index 82dfadd9f593b780c11d1d05cd00b62a32d4f534..4071fd974dd714eca92cae70e40bcde5a87a4706 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -13,6 +13,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/notifier.h>
+ #include <linux/rtnetlink.h>
++#include <net/netlink.h>
+ 
+ struct dpll_device;
+ struct dpll_pin;
+@@ -238,7 +239,11 @@ struct dpll_pin_notifier_info {
+ void dpll_netdev_pin_set(struct net_device *dev, struct dpll_pin *dpll_pin);
+ void dpll_netdev_pin_clear(struct net_device *dev);
+ 
+-size_t dpll_netdev_pin_handle_size(const struct net_device *dev);
++static inline size_t dpll_netdev_pin_handle_size(void)
++{
++	return nla_total_size(4); /* DPLL_A_PIN_ID */
++}
++
+ int dpll_netdev_add_pin_handle(struct sk_buff *msg,
+ 			       const struct net_device *dev);
+ 
+@@ -249,7 +254,7 @@ static inline void
+ dpll_netdev_pin_set(struct net_device *dev, struct dpll_pin *dpll_pin) { }
+ static inline void dpll_netdev_pin_clear(struct net_device *dev) { }
+ 
+-static inline size_t dpll_netdev_pin_handle_size(const struct net_device *dev)
++static inline size_t dpll_netdev_pin_handle_size(void)
+ {
+ 	return 0;
+ }
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 6a5e9ace55a0880d7b1e4303d12dc0a8b8b7c5ed..d64600aa8adfe9ce7a0c45677ae36db73ee3d886 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -1264,11 +1264,11 @@ static size_t rtnl_devlink_port_size(const struct net_device *dev)
+ 	return size;
+ }
+ 
+-static size_t rtnl_dpll_pin_size(const struct net_device *dev)
++static size_t rtnl_dpll_pin_size(void)
+ {
+ 	size_t size = nla_total_size(0); /* nest IFLA_DPLL_PIN */
+ 
+-	size += dpll_netdev_pin_handle_size(dev);
++	size += dpll_netdev_pin_handle_size();
+ 
+ 	return size;
+ }
+@@ -1349,7 +1349,7 @@ static noinline size_t if_nlmsg_size(const struct net_device *dev,
+ 	       + nla_total_size(4)  /* IFLA_MAX_MTU */
+ 	       + nla_total_size(MAX_ADDR_LEN) /* IFLA_PERM_ADDRESS */
+ 	       + rtnl_devlink_port_size(dev)
+-	       + rtnl_dpll_pin_size(dev)
++	       + rtnl_dpll_pin_size()
+ 	       + nla_total_size(8)  /* IFLA_MAX_PACING_OFFLOAD_HORIZON */
+ 	       + nla_total_size(2)  /* IFLA_HEADROOM */
+ 	       + nla_total_size(2)  /* IFLA_TAILROOM */
+-- 
+2.54.0.746.g67dd491aae-goog
 
 
