@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-290736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290737-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6E4rFuYhEGpzUAYAu9opvQ
-	(envelope-from <netdev+bounces-290736-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:29:10 +0200
+	id 0GwEAPMgEGqjTwYAu9opvQ
+	(envelope-from <netdev+bounces-290737-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:25:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7C5F5B130D
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:29:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E8F5B11EC
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:25:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B73A8309EFC0
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:22:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 00BAD3022647
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F00F3C37B6;
-	Fri, 22 May 2026 09:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3988F3BED66;
+	Fri, 22 May 2026 09:22:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="mAULDSb3"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="IT1+2d5i"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013071.outbound.protection.outlook.com [40.107.162.71])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011002.outbound.protection.outlook.com [52.101.65.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB453BB128;
-	Fri, 22 May 2026 09:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA813BED5A;
+	Fri, 22 May 2026 09:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.2
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779441737; cv=fail; b=DAafWPFb3fKsCAjevqTpxKwxk2GKJjXy6/qFdLTdWuzwWjsvzvYaBoHTdIElPGwIEiM2mDGsikEfpPzaOk6n82w/H81onb67/EkoRBQ8/2k7cgtTapFIQkJ0UXc6NrqgxpaGrsKbE0xfMZNIiu2ribl+m8W/UMZXLHxnh9H1yVw=
+	t=1779441742; cv=fail; b=eIhB8EJXBiCnvwD+qfkwveK/Jv1VZg3++G4WMoWkwxWXg2B9vhKhHbkpimi1spk6AEdFEarPxgmJk1bkbXB547aY6hsLRjz2ScWLoeK4FB8WEGFwdhEYfDYcyrYgei8Tlf57w3Pkfa9YQ0Je51Ermdzk+5SmdWg/xWCuEVM6xJw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779441737; c=relaxed/simple;
-	bh=0EhCXcP5UxG9O7Owjnt39sThFu7ZHcpZEkhXNt2+gDM=;
+	s=arc-20240116; t=1779441742; c=relaxed/simple;
+	bh=m35r0+vxiNfnW+TQUGz8EtyjqyGwAUryVUgBKlZsGUY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZAk7BEnwHL15wUGij+zWw6hCeQNKTxG3aRbPSjWMb/dkd2o1A5j/HDQBG5fty3kL71qR0hoGuUyzhlRJkZhSIXYDVK+sdZ5YBz1E+mZczbHUlABP91brHU/G2R/aH89n0Ip9tk32NXFlCr6IAkaae6/8qR79smjtuuvNEmadJHQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=mAULDSb3; arc=fail smtp.client-ip=40.107.162.71
+	 Content-Type:MIME-Version; b=HNvF8ILebssMryKY33jgq3EMmMzVO10mCvxQfr1jNVZiDxXEN3LRh6CDFIrkqwxE86SAmUpVWltZ+n4MS5kEU4t0Qf8F2WTIcbWA9oekXTVnZ9NZW/f6gIPNw4KBXplkIzXMQoRTbg2QN5rT8b5y4fl0PLLLVM942eybKXsXzXE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=IT1+2d5i; arc=fail smtp.client-ip=52.101.65.2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=St5DOOQNT//uP445wOQD42GLs/WC3geKwBoIXqwuqCG8lP0ZV8i/ANMVxabVGrMbNaCwevki9NDHm9G0P9pspLvtVUUjFhV7B4tJB6wdiWkkkf6+wIqkhlJ8a1ERNmp3n4QFB7cdnl+LITHxwT73vLdNNHH5+kevMrv6/sGFwlVXf3z55Dbk4uJ0YeGvpGBSJyT/g4Oib651e0gIhZn7EHksaUnMCEwxV7KBAlDvFUo8CGrrJT4/DcZvxevzfxeITGN2Ucza6MK58CenWl8+1K/m5OAbE9ugRFk2HXp9lXVY1tasUjwc0qUAgfKxb+rU7R8ZuS+zXxTjCZrt7lYsSw==
+ b=BfONF5Bqx++8TFPHzRGKdHhnh7ah8t6OLZ23SQlXnfW7CkZ5e1sJ0AY0+lbL51/Ximq7y615AfXTj9RwGkKevNHVS91XE+byLstQsQtoXh7F96r+FgXQ6jgOOJbDvFHXnAEvWz7yUK9UzJWcCC35nAMXCetYboUpAc3ZZjOnVvlxhE7CDC9EVO2poU0TzVjmW0xLWaghmpLxsOqD3i9fdIq5dBWRN3TyyLYb3eO5vjrGc1aXBEiqTKdsJi/THHSICt7p2CdVmikB6fGUQ73dPH4LDgmC6Dw+9ClsseBYlTb2UZIrsT9wikNLZ9ANlPYYwjD+VebgL1dCljIGyDG5ZQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qAZXwBJlEk6D8VWBkK+ZWIE4+U5w1Czqfyb+A8LrXDA=;
- b=xrnivyefEZ264I/ezaY/bzGvSU7p/0rItZ3Fnu3qbQMjr4sMj965PQFUOhqyWhnHJ+ij71smBDtMqMIuAZEpk3uGG6Wj8GSC/hMMABwZ0JiZZ2dAsJJ1uACCRXfF/viYjn5iCCScLYCzmAuRk00ydSkBYtb8V6/UEP+L1tagiDdbA/vrkGxChtwU/tNtw0+LTPe6k1pQB/hIvGHgNnkg1m91zd6pYli1WmUx83IrpN4abcrUv+32HYEOZQYVwbgvHmE91J9ZuqHHkqMZIZGMsowM+vvW/Y6w+0fblJa5LUSZGJWbLCiduC357GLZUZ81QfnXSFbRmyDZ0+6Rm9njjw==
+ bh=7kP81dT/0fx4TbxkilRVVPcnd3od94oG9LNMUjWkF2I=;
+ b=MdS89PJGwmUuIxKLfUMLfac4e5f4AfexBy6arBOxaKgOclSud2CrTR5f4TBfuGP9YLRvUQvPS2wfJA4hqHAlT6B7gj3s0YuqrqOS+uqgOwCAQmGi1uPPyQ3T4et6lKBq10yZhH8ZbZTZ+NJfct5tpWzUsjsSedZOTodvyOBKilXPl4RMiMcbiYQNVSQYcZPkaAF5ujGnChJOjxrn97rY8Llhbr6jraQ0CFKtw1axwmcS9U/jAN64elYRwfWPmQGuHw7WHTXDsxXw9ar4ZKswp+2+ttg2o+DqZJ45lghnVr0JIeOQkZbvzKUfbyjGryQ8gDGTMdz8RoHuylL+RmwJfg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qAZXwBJlEk6D8VWBkK+ZWIE4+U5w1Czqfyb+A8LrXDA=;
- b=mAULDSb39F+H7lnRVs/h+nSSxdcWIaRlaHDWmQw56+RuAu8PuNyUQJmBXE5PoX03UbIeAcMa/1706EwwmNkkF34qtlkNlIwIF/4m4PibKsE3rElEOrbgDRFik33bVM+V4El6U+sJHIN+kD26famfTPWrvKoKPTePfBd3W8pLTh7hnFrRGDnMBT8QMPXgO0yYwCZuhii7sFBVBR3OhnSqHONSZFdQiJ25+7qxCb3N4u2T5u/jwfD7k7fXbHqK5KYXfxya0S85nkn8APFsy9uoKbuifC3RnDyQc4dY+A9ofx8qzlwVLJ40VZiuBVQN5VhG5dgQl2ampOxg9jGBmyzI9w==
+ bh=7kP81dT/0fx4TbxkilRVVPcnd3od94oG9LNMUjWkF2I=;
+ b=IT1+2d5irwSEBrxU62xsMfdIfw62YxSdpREv06uZeVvvddUOouDwlLxweBe7W5uVZR8b7kj+Q4sdXrhBUWA8iajemNqLEb48V2+bjDx9r7T6NCqrVkoiDlT2qjbqHcaH3DIVcCwnHBW3RUkm87lp3AemdihzB0azaWJCJKyDfokHcmi6iwydKjCje56znvU+HcC7gqC78rYtLn/pYFIHPtWMXT78tuoBjU/kdyN96oglhOSWNvNMKjLBIpUcUwR4q5YprW8d5keOHJfBa3iJsL2CW1tnbJhEfiNiMo3PP6ZY5NA44hDKIYOzx1Z0eKrnPkndLdq3FKyuyWVo5KSqnw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
  by PA4PR04MB7949.eurprd04.prod.outlook.com (2603:10a6:102:cc::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Fri, 22 May
- 2026 09:22:13 +0000
+ 2026 09:22:18 +0000
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.21.0048.016; Fri, 22 May 2026
- 09:22:12 +0000
+ 09:22:17 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -71,9 +71,9 @@ To: claudiu.manoil@nxp.com,
 Cc: imx@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net-next 03/12] net: enetc: relocate SR-IOV configuration helper for common PF support
-Date: Fri, 22 May 2026 17:24:29 +0800
-Message-Id: <20260522092438.1264020-4-wei.fang@nxp.com>
+Subject: [PATCH v2 net-next 04/12] net: enetc: integrate enetc_msg.c into enetc-pf-common driver
+Date: Fri, 22 May 2026 17:24:30 +0800
+Message-Id: <20260522092438.1264020-5-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260522092438.1264020-1-wei.fang@nxp.com>
 References: <20260522092438.1264020-1-wei.fang@nxp.com>
@@ -90,57 +90,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|PA4PR04MB7949:EE_
-X-MS-Office365-Filtering-Correlation-Id: 28a3a6e3-d055-4107-947f-08deb7e39b55
+X-MS-Office365-Filtering-Correlation-Id: 775ae95b-4239-47d6-769a-08deb7e39de4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|366016|376014|1800799024|19092799006|22082099003|56012099003|18002099003|11063799006|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	BBPnWAjTlEMFJtsS7+GIaAGZnrZtbj4AzdyWscBpId2rCPUb0ENm20oLrTMfnNAz0yd7l1E8QrPj1UWfqpXaPMef1LBQ5lsyFfepYHMFQJ49NzTZlXfhVnnen+vcn+cHor3MquL3TwwssnoMeRswr4xO84/AKQ1+ZI4VseGMxZ2ss/ULP2njJYY5YN1hsLOpVFxXvF8ecLkI36id8OEVdSSE+RGEKSqrymN3WhHQTU0txfMDHNlpeJOwVsYAC3IJeyEQsAhmtGBaeIpbebXq61JPlLkUILQntSXzNIjj2acnGBXExdQTlp093dvO40f0EuqPWd7vRYprmSwuOZwBY6W649ML1NvNb0EqQPUFfcSLlN2OZA4mgrSV3yFTOcBqw/pM6lG/QMJ+jJk6aoOwZVdJo4VS1IFNd/vKNg9GUPvtsrMqSrO2i3u7QQ09VlaJE6nbROAeDS32r1cHQxF/RoZCgef0UDJM3avVeeFi6TOcNG8WfM/QTTyhMyeImQodGqFZu4gHwTj8SEUdItw5BGdCOKbEKJoQZuVqzko2w7ZcdVXVphQDv6cmCLoytuXsNhftDn517z2EDmEectEfI1Ugn3FKXPChVH0JKJQSuMMOKA0UeFeIUtL0Xt648ok6dj3jpRJum+M0v44s4WuR95IfqLV8FPK4vZSOuV8FHndDeWp2FyFIGR9XuvpYwDL4c9UfZ1XX/TFd9AAY+HVTlryoagrjNLAQJUzIOFAdgPaoyjFr94t/zSyrBZnhZRI1
+	0nARBJd9TqlE4Xm0Ntu5xm2CALocwM4EiEGAw8f7lDGbeSMFbLOf41kHXi/wC3FQ6uS9o4PQTezQXnPCUH/I3WpDNGtAQq4iZkDYh1AIsNA8G5mCRdQsksmTn97O6ALAUtvbUYDoHciROPRei9Wm+37cs+4UuI8jnBYiqu3FNqq8rfjdSh8IMa+eFwLtuAlWoWMutWw5q5DaxaonsS27Sb/pEEsYcZlbvDpd66D52MpNps7U0T1b6fZ14PgkkTFYTaGcVi6g8GHBepu6pHXjFxs57BTa9ERtt0He1UJital/T1WR6897wvda8bymoN5V6r2PoOPRGdzp/u3VhrLVO7VYLOxGcLJ8QL4PIw8NoIvjRNx66kCvu1aX5pka8/ryzqYZS5Z5poi4j/9XGoHIxiHe9X1R08JdDHG8GUgOQ/1/eNIH4yAkIY9B0zu+ezVfcEOvII+jSOqyZltWgNAClm30+EBmCnoadVtzoH7XzRhtJcYHYEf6KrOJy8Mu/kysJlvdpQVXMmojkfkpdWiHY6BMy898pjLXzJfekpmb/YlOeTmr9Nic/cItNVGwteW6uN8VOC/v1wZexJBc/rreeR5czw3WKKyStG2ce66CVRG2ljtzjJD4psuhA8bSDSW+k1q5Mx+tYzYpEkKGOiP/GwcuG+1vuQOdQc8yt72wLg7qm+wWANDOXYJ2UvN4nIJ/QAXfnpHDonJiiJ1cT8rEXQGOeHydQeANldVHbhWzTYZr6WPjVW1g4Ib3LUaJXb1H
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(366016)(376014)(1800799024)(19092799006)(22082099003)(56012099003)(18002099003)(11063799006)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JDpiZO5k13VhZpnHl1TVBxC9PvUyEKZzy1di0ts6IDFRnpt2TyWivdH2b0LT?=
- =?us-ascii?Q?SD/Knes70gpARwKfps/7qEPs539+1ELT9nxoc09IvMGG/eI5NLwQ4ANMvXLQ?=
- =?us-ascii?Q?Bak1bSqeJbhwIeYvJU59GJITMcPVGB9IGI3YR0pTrHpl6IiOABFvHDzJNcrS?=
- =?us-ascii?Q?sJ3ZzxnKhbe9KoCRjR3/7HcyLx86i5ck06FNJr5mgU4XijEZjngsXuZM4CLH?=
- =?us-ascii?Q?rJ0oOarFwHO5+GXsuXjbnSockVRW8K9vealXzqVCeQePPSF99hR1GxCO2eNE?=
- =?us-ascii?Q?BDOWvAJ49vkZwYnG6d4rVLM2LxIfasZZExVrtIxggMT5EW+xUFu6wvbODIFg?=
- =?us-ascii?Q?6dCGRinTBfUGaT+v3qJNxW6TbHwz+u16DZZlFyPvV26h+RrG3rNyn7JrpjFr?=
- =?us-ascii?Q?qYL8hwdD6R+XHaJZoYTKhXKSIVDPXWGIUh5HwIn0eSmhP3/0TnBHjW7/jZ9l?=
- =?us-ascii?Q?jms2MD4eEf/R1GmQb5bhVxWOKST01uX8eeM1qy7zIu4w3PkD5UkLZprHnuA4?=
- =?us-ascii?Q?306VyWn8D41bTn/ri6TGYB3F+w+ar/qJ881f+V0K3uY8rq5jxqtRge3HFfMi?=
- =?us-ascii?Q?/dTDP+ClSU7ii/OLEYQ5z+0ZY02fJZor4OqDCCxP+quwxWRulmDGBANQIc17?=
- =?us-ascii?Q?ph2YHq1TUF93wsK81gEd8LVWQHs4EoLvQO5NzvJp8OU0yvcNJbwUPG4wGyBG?=
- =?us-ascii?Q?MvJwOKfjpRlJF1zlejRzkFnKDRoYyJb9F7LvcW072lCwGf9c3MET8WUSf4BL?=
- =?us-ascii?Q?ovkCFmL7ARFNOvNvR8oEaERtbm1dgwFADMLkj4BDHBPCPuBDwdx+HKR1zqg+?=
- =?us-ascii?Q?OxaIErLFIOV38e2Yysbs88ggpIvPfPz/QtQ1FHHTEsdhUF3bNUj0oN0tuiCE?=
- =?us-ascii?Q?5ZyvEr+G5BgLzwemW/PfL1QG/ov6ClXN1QkrrvFr4zrtxlY/S7V8KIKNlFeH?=
- =?us-ascii?Q?OB8eb9dsAJxwNdWSO7yxHYpsnTDvLv1RImFF3rYnENPZCdgdXo1n6lZI3dwH?=
- =?us-ascii?Q?N/wqAELquaTNMcA21zEqQnp4mUcLrPZ/dA9G7VcncQOObJihsYpli8FlDUJn?=
- =?us-ascii?Q?L6QUF84aj7MDXBDvH6yT3TiZrk3C2557/OkR4bRUnL/js3UOWsQtVl9K2wdU?=
- =?us-ascii?Q?egOztU7tlk5gluWKAf/7sEggE7xY+JAWIujfe2wK+xxcq8y0ExK70qZHcMiE?=
- =?us-ascii?Q?eiKxfG9rcZdtN7xfL4eGHB2dzoxSvBze4DN46nwE+h2Cf7WapenzfIEBz0xJ?=
- =?us-ascii?Q?Nyct+uBNPn74JRPOxFnWvB1cxeh3ENv9Oj7xKpedxR7/xDyDr6bzxNIXjZLt?=
- =?us-ascii?Q?sjYaockoGizz/ABSzlU3blre8e3NxCycE/DA2KvWUR74z6rokDtONR9evGvH?=
- =?us-ascii?Q?YcRubStaQt0IjXqM6YE2lxViFhZQf5XHpMZnfAL+y/5nJj5Lq+BU+bKd5OEr?=
- =?us-ascii?Q?3GuyLXDH7RqHlgmn+MvMpz/8Z/p6OrHAejC0tI9XGVtQXpK0/jWckJcZeuTl?=
- =?us-ascii?Q?c/pqNgNVydc4uR+fxs+UISeZuPTTkVQhMyhCih6CjplC9MRFtVad5CO14ZLC?=
- =?us-ascii?Q?s+nwdREpPgxnEQpDlxiy18jbJMueoVwTjADzTkuLkdTJ7iwe/tFo+V7VfOHG?=
- =?us-ascii?Q?JqbK93duioWdUMprfcv7znomaOXw+Wmv8cAcd6/oBazv+Jq6lHosCOIWpVEG?=
- =?us-ascii?Q?TMJj5h2Frud+p7CqNsE5wxeag2xaT7RLcRnLfRqtF0c5laZJX/cvNPGZoz9L?=
- =?us-ascii?Q?LlbDHjQ1xQ=3D=3D?=
+	=?us-ascii?Q?CEZ21JaX6XGw6NMOOkS+3lpB5QddioWdYiNRLWfyqxdhi2e7O574iXkPMM2b?=
+ =?us-ascii?Q?VUMylDtvEm0BxMXoFMB5rZKhFJ3SVBHx2B2rlczbOFmSLjdQ/p5oQEjH+Vo9?=
+ =?us-ascii?Q?4ozrzkWFA/cOMmqrprlE9NBWcK+vECjErFYfStxLYuj7aGjVg65wBUjY+Ra3?=
+ =?us-ascii?Q?Ga/ee7iw2P/Dpqt/pbTB7fPdtGX3H2UwcjRa8iAT4/QOkH5HLWnPF5+YX0fu?=
+ =?us-ascii?Q?h/K1oB8J72Aox0wqbnOb29sqBgITUBLPTsFZrCImK8spjtjkIeQFFMidIxvf?=
+ =?us-ascii?Q?R6BXLTyndsNVBg+PqKCveFD6eNh++O2nnUZeQEGmuHgNBJkFLW6FCll6C0N+?=
+ =?us-ascii?Q?A40bs9JZjJomGG6ZoxDDpnouDtl35MrmzPU1nlFum+7nuFJZ6MtoPO2pUtfN?=
+ =?us-ascii?Q?G35PcikJZ15ExBtkQEj9u0WsKQ2DAFN3k0/TGuccLFcPa1hH2ybRlWW9zKtK?=
+ =?us-ascii?Q?pGpoiXIlS2GHadEJuICvjEWeiM6wVQjtFxh3VdXt+TeauG3EZU+KgDh4TWRp?=
+ =?us-ascii?Q?bik+kJkqdBwckGbp/sz2/WX5d65VH5XS8p8oqptVO5/OWUn04Ug7ZoD6OY1Q?=
+ =?us-ascii?Q?zWbtXg8VwXq9rmTuh+k2xuUuJHlUAvnmhE1OuXo0jJRe2IrsHeNhGnMKShyg?=
+ =?us-ascii?Q?F1+52YPPBBWXFP0YjG7e0NWxMDQDIeGgfuPvQ32jDEkKCf/FOQGOjmeHEGRA?=
+ =?us-ascii?Q?hyIcbOA4NOzKLpgNcvXfiVHzTg/ofoAmM/b1Mk8dB/cpCf9/lqJfMEvoTbb/?=
+ =?us-ascii?Q?Vre7OCLuVwNrzh7MPPAmEWnuAZzYxSQk5dtenX3yiz7Cy05l/+PzyBF0CgBP?=
+ =?us-ascii?Q?McoHe+D3rIKUPOH6mif2a0UZqKfD+KjN/Bl7vyRPIM32baOtpJ9/93cUxCul?=
+ =?us-ascii?Q?IgQR90hogpywYNs3eGzGRDbqLsDdxZi4Ux04UfXP0tSbM6VF/9GklgZQOdoL?=
+ =?us-ascii?Q?wmYBEZCMYsEPddufugid4Kcu3a68adHGndWMox9IlUl/x1OInPIBbXKSrgeq?=
+ =?us-ascii?Q?9iaF05J8YfJVhO6lWOtKgKjUQoH71rYzNUxJvBq38uRPCPUrM14kUCC6asDo?=
+ =?us-ascii?Q?uQ+J6sfWSDpWqmcsmqcDJeHX1D25DOVWdDnCQqS5yV+ZPnPEcacCa4yBfgMx?=
+ =?us-ascii?Q?OpZFjOONyfchn2GSHPNlFvyKjG+zh5Oc61VdcgsPmXqyBrm/U+VhARsnMTWa?=
+ =?us-ascii?Q?UX9dJcv8hSjoShgqXvyk46iYnorMKEMKCVbhdcRcGJ7o/O7gimfGs2kvAIBE?=
+ =?us-ascii?Q?YmVekJO9tmjNTReVYCr+jiiv51WT2zoPDUF+GE2W1Eq6tSvW76wIQqksFkJC?=
+ =?us-ascii?Q?1TB3dDHs7+HEGobEml78rYzYmIyFmb4jiv37f2TBU+4L52HORfw9ktG1Xhdb?=
+ =?us-ascii?Q?BwdOCtCzGFWuTGmFa7MxLsvgJMqQuQHwaxtjlLc6d4oDB+UxVw+lHR3mzvtN?=
+ =?us-ascii?Q?4uxA4fGnm45+tMwQcEYbMatx1tJC0ZgvngAhsNrW75dQ2iPFg5Jr6/AEVdbz?=
+ =?us-ascii?Q?WXzA9t5MiGAFEHw4FDTUePwGgDez7Aigs6RwoXveB8jUauLk4WnZmKQ2oDkQ?=
+ =?us-ascii?Q?DWvKSfj8NBAyb8n1mBojlopn2EsomzVjlFwhUsjvvm33GIBdWCL1gxqUG6dB?=
+ =?us-ascii?Q?GHsQmr5vZFrGZZewxS2/LUj2I28w2PsM0qnUXLQvEeXCq2lGeKdNwaRCUOil?=
+ =?us-ascii?Q?wU9rv0KAtoZTjKFWcD5m4MA6mX61cAn4dB5WwUbQSFXfJsLb?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 28a3a6e3-d055-4107-947f-08deb7e39b55
+X-MS-Exchange-CrossTenant-Network-Message-Id: 775ae95b-4239-47d6-769a-08deb7e39de4
 X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2026 09:22:12.8002
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2026 09:22:16.9744
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H8+SfRlbshvU0QwKyV73B4nFU9Dk0B4IrtM8wzWkcobsd3FL2KYoC2inF9IyzFQaKx0NSzB3KRO89D3YQ4atIg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 20+OWBvQQJdH3HoW/NtBMcXWcfiVkQ797ykZJUlaEVbHBZ8Aem+EHidbHQspX4X+Wr5DjqtuHik6U+dSafbvKQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7949
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -149,12 +148,12 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_FROM(0.00)[bounces-290736-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290737-lists,netdev=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -167,168 +166,58 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nxp.com:email,nxp.com:mid,nxp.com:dkim]
-X-Rspamd-Queue-Id: C7C5F5B130D
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,nxp.com:email,nxp.com:mid,nxp.com:dkim]
+X-Rspamd-Queue-Id: E9E8F5B11EC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Move enetc_sriov_configure() from enetc_pf.c to enetc_msg.c to prepare
-for integrating enetc_msg.c into the enetc-pf-common driver, where it
-will be shared between ENETC v1 and v4 PF drivers.
+Move enetc_msg.c from the fsl-enetc driver to the nxp-enetc-pf-common
+driver so that SR-IOV mailbox handling can be shared between ENETC v1
+and v4 PF drivers.
 
-Since enetc_msg_psi_init() and enetc_msg_psi_free() are now only called
-from enetc_sriov_configure() within the same file, make them static.
+Changes:
+- Move enetc_msg.o compilation from fsl-enetc to nxp-enetc-pf-common
+- Export enetc_sriov_configure() with EXPORT_SYMBOL_GPL for use by
+  both PF drivers
+
+The fsl-enetc driver now depends on nxp-enetc-pf-common for SR-IOV
+functionality.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
- .../net/ethernet/freescale/enetc/enetc_msg.c  | 40 ++++++++++++++++++-
- .../net/ethernet/freescale/enetc/enetc_pf.c   | 40 -------------------
- .../net/ethernet/freescale/enetc/enetc_pf.h   |  3 --
- .../freescale/enetc/enetc_pf_common.h         |  9 +++++
- 4 files changed, 47 insertions(+), 45 deletions(-)
+ drivers/net/ethernet/freescale/enetc/Makefile    | 2 +-
+ drivers/net/ethernet/freescale/enetc/enetc_msg.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/freescale/enetc/Makefile b/drivers/net/ethernet/freescale/enetc/Makefile
+index f1c5ad45fd76..10ab6694c314 100644
+--- a/drivers/net/ethernet/freescale/enetc/Makefile
++++ b/drivers/net/ethernet/freescale/enetc/Makefile
+@@ -5,13 +5,13 @@ fsl-enetc-core-y := enetc.o enetc_cbdr.o enetc_ethtool.o
+ 
+ obj-$(CONFIG_NXP_ENETC_PF_COMMON) += nxp-enetc-pf-common.o
+ nxp-enetc-pf-common-y := enetc_pf_common.o
++nxp-enetc-pf-common-$(CONFIG_PCI_IOV) += enetc_msg.o
+ 
+ obj-$(CONFIG_NXP_NETC_LIB) += nxp-netc-lib.o
+ nxp-netc-lib-y := ntmp.o
+ 
+ obj-$(CONFIG_FSL_ENETC) += fsl-enetc.o
+ fsl-enetc-y := enetc_pf.o
+-fsl-enetc-$(CONFIG_PCI_IOV) += enetc_msg.o
+ fsl-enetc-$(CONFIG_FSL_ENETC_QOS) += enetc_qos.o
+ 
+ obj-$(CONFIG_NXP_ENETC4) += nxp-enetc4.o
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc_msg.c b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-index 73da2018034e..fd1a42bbdcb1 100644
+index fd1a42bbdcb1..f696751c00ea 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc_msg.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-@@ -189,7 +189,7 @@ static void enetc_msg_free_mbx(struct enetc_si *si, int idx)
- 	memset(msg, 0, sizeof(*msg));
- }
+@@ -284,3 +284,4 @@ int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
  
--int enetc_msg_psi_init(struct enetc_pf *pf)
-+static int enetc_msg_psi_init(struct enetc_pf *pf)
- {
- 	struct enetc_si *si = pf->si;
- 	int vector, i, err;
-@@ -229,7 +229,7 @@ int enetc_msg_psi_init(struct enetc_pf *pf)
  	return err;
  }
- 
--void enetc_msg_psi_free(struct enetc_pf *pf)
-+static void enetc_msg_psi_free(struct enetc_pf *pf)
- {
- 	struct enetc_si *si = pf->si;
- 	int i;
-@@ -248,3 +248,39 @@ void enetc_msg_psi_free(struct enetc_pf *pf)
- 	for (i = 0; i < pf->num_vfs; i++)
- 		enetc_msg_free_mbx(si, i);
- }
-+
-+int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
-+{
-+	struct enetc_si *si = pci_get_drvdata(pdev);
-+	struct enetc_pf *pf = enetc_si_priv(si);
-+	int err;
-+
-+	if (!num_vfs) {
-+		pci_disable_sriov(pdev);
-+		enetc_msg_psi_free(pf);
-+		pf->num_vfs = 0;
-+	} else {
-+		pf->num_vfs = num_vfs;
-+
-+		err = enetc_msg_psi_init(pf);
-+		if (err) {
-+			dev_err(&pdev->dev, "enetc_msg_psi_init (%d)\n", err);
-+			goto err_msg_psi;
-+		}
-+
-+		err = pci_enable_sriov(pdev, num_vfs);
-+		if (err) {
-+			dev_err(&pdev->dev, "pci_enable_sriov err %d\n", err);
-+			goto err_en_sriov;
-+		}
-+	}
-+
-+	return num_vfs;
-+
-+err_en_sriov:
-+	enetc_msg_psi_free(pf);
-+err_msg_psi:
-+	pf->num_vfs = 0;
-+
-+	return err;
-+}
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index 67cc80adec72..fbe2c126082e 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -480,46 +480,6 @@ static void enetc_configure_port(struct enetc_pf *pf)
- 	enetc_port_wr(hw, ENETC_PMR, ENETC_PMR_EN);
- }
- 
--#ifdef CONFIG_PCI_IOV
--static int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
--{
--	struct enetc_si *si = pci_get_drvdata(pdev);
--	struct enetc_pf *pf = enetc_si_priv(si);
--	int err;
--
--	if (!num_vfs) {
--		pci_disable_sriov(pdev);
--		enetc_msg_psi_free(pf);
--		pf->num_vfs = 0;
--	} else {
--		pf->num_vfs = num_vfs;
--
--		err = enetc_msg_psi_init(pf);
--		if (err) {
--			dev_err(&pdev->dev, "enetc_msg_psi_init (%d)\n", err);
--			goto err_msg_psi;
--		}
--
--		err = pci_enable_sriov(pdev, num_vfs);
--		if (err) {
--			dev_err(&pdev->dev, "pci_enable_sriov err %d\n", err);
--			goto err_en_sriov;
--		}
--	}
--
--	return num_vfs;
--
--err_en_sriov:
--	enetc_msg_psi_free(pf);
--err_msg_psi:
--	pf->num_vfs = 0;
--
--	return err;
--}
--#else
--#define enetc_sriov_configure(pdev, num_vfs)	(void)0
--#endif
--
- static int enetc_pf_set_features(struct net_device *ndev,
- 				 netdev_features_t features)
- {
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-index 3b265ad8d845..5b4094f8d5d4 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-@@ -68,6 +68,3 @@ struct enetc_pf {
- 
- #define phylink_to_enetc_pf(config) \
- 	container_of((config), struct enetc_pf, phylink_config)
--
--int enetc_msg_psi_init(struct enetc_pf *pf);
--void enetc_msg_psi_free(struct enetc_pf *pf);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-index cef9fcc58e2f..c9b3512d4e2f 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-@@ -21,3 +21,12 @@ static inline u16 enetc_get_ip_revision(struct enetc_hw *hw)
- {
- 	return enetc_global_rd(hw, ENETC_G_EIPBRR0) & EIPBRR0_REVISION;
- }
-+
-+#if IS_ENABLED(CONFIG_PCI_IOV)
-+int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs);
-+#else
-+static inline int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
-+{
-+	return 0;
-+}
-+#endif
++EXPORT_SYMBOL_GPL(enetc_sriov_configure);
 -- 
 2.34.1
 
