@@ -1,155 +1,195 @@
-Return-Path: <netdev+bounces-290837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QO9SMuFNEGq5VwYAu9opvQ
-	(envelope-from <netdev+bounces-290837-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:36:49 +0200
+	id uFXyIqpSEGovWQYAu9opvQ
+	(envelope-from <netdev+bounces-290838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:57:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AC225B4318
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:36:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C41A5B49F2
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:57:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A3BAD300DE00
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:23:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 917EF30BF85B
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB81C37F731;
-	Fri, 22 May 2026 12:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6213BF67A;
+	Fri, 22 May 2026 12:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zTInwWpr";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4/wPnzbr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S9TdA1s9"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F1E37EFF2
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 12:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E758321FF21
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 12:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779452598; cv=none; b=bnYJYbuIimxj2G06t44iANhXK5NF6bk5ch/1MSFgceueFEzJasWiPXr3GJdvVtVtUjMkmHsWv2GELDqqcdOgh/BBwdADM7SWrU2NjVKItjR7Pa0jmcBSOeb5NJrvb52saEG+LS3DJr5Y6pAh+bOW7sMUctmFtWuTycy+dv9NYQI=
+	t=1779453932; cv=none; b=JBFmgKIBMtxbYimFBD6/90wJ3ZRvshA754DnG2/0aRsF5ANdNdEH+cGPBVlp1YhskMo3f7PIzJ2z+SRtOroOE4NaQMirPp+6m7rCAaW1NLVbhXQ1aWOa7Q0rAWW0PMTQFD8n1VfarcyDFwHnPBdcoiHgDqkmhqJP2FMvtiWYRGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779452598; c=relaxed/simple;
-	bh=tmYRf7Bmh2hZcMDwzAKTNTMXWsybObh18JBQhRfW30M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G/h5QYqMK5Vifi57j+0yn2WHvsSvAFava59lsoYMUty+eCg7SWKv+AHweGRnU/rffrJ9gNHTKXvvRIMYVydehlDE56Rfn2EjqPo/isRv7mmqCGvg5PCr2sAFg0Fx9uxlW0GKWTEuuY2vZSOX4gGm6grKoX3Gj14k2fQPmvc6+dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zTInwWpr; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4/wPnzbr; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 22 May 2026 14:23:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1779452595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Oj6JxJTYAxkFXydOgqe3O9kkBNjL+RXAgK7UWwnuCJs=;
-	b=zTInwWprlhBBHLiKjhsZqNaa2VohjaXBfwZa0TGKw/SqwupcmxSoFL71dKZwGi9qYcJUf5
-	THhImyJFgLYUtt9Wwwv9CMSgCZDz6xhC9ApD2sNaBQHq1z5miUrLOhgUrnWmn3lDRu5cDb
-	YNtV/coahVnV47DFaONLvbNeovYiwuHNMMXCrEE+xxHF3ebvbv1gB03N53opJlrBGZC9M/
-	Qr2Nf0wY5exWTlzGGzek9257qShAN2UJ9PUUMgJp9Nn2IVqhUm2YV9CdWrD0gsP4e9V/Qm
-	Iq/smVSRhHsF21o6q1C2UrD3Z7xf+EknAs2j02T1FQVfPGaHZaAfutHK4us+Tg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1779452595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Oj6JxJTYAxkFXydOgqe3O9kkBNjL+RXAgK7UWwnuCJs=;
-	b=4/wPnzbr+bjS2qV4cEkPrCST6u7SzmueT5tIHZOUNxIPY36snD6oe9rZnHx6SUOpOi22rr
-	UR6jt5T2TRnBq/AQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: netdev@vger.kernel.org, Jayachandran <j-rameshbabu@ti.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
-	Daolin Qiu <d-qiu@ti.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Neelima Muralidharan <neelima@ti.com>,
-	Paolo Abeni <pabeni@redhat.com>, Praneeth Bajjuri <praneeth@ti.com>,
-	Pratheesh Gangadhar TK <pratheesh@ti.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v4] hsr: Allow to send a specific port and with
- HSR header
-Message-ID: <20260522122314.4SY-dYPg@linutronix.de>
-References: <20260508-hsr_ptp-v4-1-aa19aa7c6a71@linutronix.de>
- <ag9NU2iGKLlSd6tz@thinkpad>
+	s=arc-20240116; t=1779453932; c=relaxed/simple;
+	bh=B6Wrx8wptznPEXE7GgI4oCIpRWZlbijf1SHKh604G6I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eWShlf7r/PNNUJnARAucr86B2+cdFPVGkfMDW/GWHBz/z16c/5d86Cjs7M7ONuL6NfuZS5YyoWWM1YC176iFloLmJa1GCj31uIfFBIqkH6inbY6lJ0z7lX99at60jihtwmZwU54Ar23KFdf2CKjKNaKfUe4yaqV+sIEdrz7gmdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S9TdA1s9; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5a858881ad2so9505747e87.3
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 05:45:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779453928; x=1780058728; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jEx08WhtJbuH9Jvv5ffuVG6XRuDs6AIyFWz3HRiJmYw=;
+        b=S9TdA1s9sU06k7pAAsQhZgPt6Jm2cy1jpfHiVjy/+4+phsKTB39AbQjFrUaHHvTuHa
+         7xcha/kC9qOvlrvOc+x2JTP+jZxZ/e3H1ei/X60CDqJpjGmR8Nzbf9OwEeh6jXSYmMe6
+         1lqGhLX9WLcsDUNoRDwB8RN2/7jcZGUB/8QVzZr9eANTujcgTuVz1xsDUvY1h5CzWkhw
+         CjjnUJzTgxZB4Xvh+ERZIfoeKsbVY7GHoFXwuSABK574IaI9xqc2uETLj3zU1ZFqV2YS
+         GuqN5wtrNjE3MnCX7eUhhI4j839ntAaSS2DRdL1e8/Q6vQSCXDKpTqbm32FekGdEJyes
+         Fk2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779453928; x=1780058728;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jEx08WhtJbuH9Jvv5ffuVG6XRuDs6AIyFWz3HRiJmYw=;
+        b=FtXADyAaPf/8R8+GMcK9EjtajgMKOF8U4V7Zgut8JBznS4fqK34axNg2LSivQYuC7H
+         ssDKxnBppBRu/rs+0GEGq8XPvaDNVBvnuHbdKBrrN7lo/TPsP/hONUhqJU87cBeB7t8u
+         GJ+Ri9BG8aGv7Kp15r3jOPRAdLFQdDbQVZmYfkL5A4SxfcLAeLX8/OKU9YdgXyfuaLze
+         K+Hj3/nzlGCSmj74JUd9AcKJ/an5mPpgmzkBjHFi7uITOYCkoVfiNNPZtcAHFpVMxwis
+         sgbU+O432a/v1smUBL0o2XycrcFrh8ys3Ng5/D+trM8eprkfxlTA8qC+BPK8iW0/rVSU
+         PdqQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9SH4CNvqepdP1QauaAbKxouzSS8S9qntN7ddIW6lA4FMewR/VO8e/JwICRlQPgbNliD870QhU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxn+EQBYQc/dFuckKeeDu+SupPNmxt3nEDYFL5xrZQGhxvEbsni
+	dcEIgNH7ESWD6oinFxQsMhLBOi71DbDbJM9dIVkuv4oRg4FJXT2pHDQz
+X-Gm-Gg: Acq92OGHj8EPa5clC9Xgc9yHACDiBVtHq58jgbKleNPfEI0itYyAusUbFhsg4qPa85M
+	BrKqUCdM63wJd3uTeppy5rbanNAQhMJw2dqLMd3ekooinOnEiG8w5zng0gScAEdHerkBI9OmCqy
+	yEFZnotzi0xYsm8B9OktzAmsAjwxsiyBkFLbY19Coa0iw5UUo+9DkVzldKJ5QziwNY/DEWqlmTc
+	G5XThxbFc6cL8QSOXAdpqa8wda+K8VToYT1OY0L5dggbLu6zL0sDMBDxPXmAmW3i08Yct2Np/c0
+	EhiCN/RDLschD6TFrwEawzeso1L95gZ6oWi+TMrDXgRJj0YgJ8Kh/Jl+kiE9hsBeLc7Xcav6sV6
+	Ni+NHz5bCEBD4E/UlRg+GoUU6fXS3ETgW9pTCDSV4QLDc3iGd171C//+qV15VKQKFgOMwNdWUG+
+	P8DKl3MdHTgpKlpMsk2zEKv7wgPLjkjp6cNLp+YTxn6Cj/Aoa7yjxZqd7CEZnDxW4q0W8VjhyiZ
+	vX7jmLY
+X-Received: by 2002:a05:6512:33c9:b0:5a8:64c4:38c4 with SMTP id 2adb3069b0e04-5aa32314258mr1031399e87.8.1779453927777;
+        Fri, 22 May 2026 05:45:27 -0700 (PDT)
+Received: from ?IPV6:2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703? ([2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5aa32cb37bfsm401018e87.11.2026.05.22.05.45.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 May 2026 05:45:27 -0700 (PDT)
+Message-ID: <55c36da0-6cc4-4c95-88ef-3dd5b2181b0d@gmail.com>
+Date: Fri, 22 May 2026 15:45:25 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ag9NU2iGKLlSd6tz@thinkpad>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/10] [v3] input: gpio-keys: make legacy gpiolib optional
+To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+ Christian Lamparter <chunkeey@googlemail.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Aaro Koskinen <aaro.koskinen@iki.fi>, Andreas Kemnade
+ <andreas@kemnade.info>, Kevin Hilman <khilman@baylibre.com>,
+ Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>,
+ Pavel Machek <pavel@kernel.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-wireless@vger.kernel.org, Linux-OMAP <linux-omap@vger.kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linux-sh@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-leds@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+References: <20260520183815.2510387-1-arnd@kernel.org>
+ <20260520183815.2510387-3-arnd@kernel.org>
+ <b79d8ad9-f36e-4769-9dc2-58baefe23000@gmail.com>
+ <681f328c-bc8a-4410-b876-f8c5f116325d@app.fastmail.com>
+Content-Language: en-US, en-AU, en-GB, en-BW
+From: Matti Vaittinen <mazziesaccount@gmail.com>
+In-Reply-To: <681f328c-bc8a-4410-b876-f8c5f116325d@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-290838-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290837-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,googlemail.com,sipsolutions.net,iki.fi,kemnade.info,baylibre.com,kernel.org,atomide.com,alpha.franken.de,physik.fu-berlin.de,redhat.com,alien8.de,linux.intel.com,zytor.com,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,lists.infradead.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[40];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mazziesaccount@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 5AC225B4318
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,arndb.de:email]
+X-Rspamd-Queue-Id: 4C41A5B49F2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-05-21 20:22:11 [+0200], Felix Maurer wrote:
-> Hi Sebastian,
-Hi Felix,
+On 22/05/2026 11:28, Arnd Bergmann wrote:
+> On Fri, May 22, 2026, at 06:55, Matti Vaittinen wrote:
+>> On 20/05/2026 21:38, Arnd Bergmann wrote:
+>>> From: Arnd Bergmann <arnd@arndb.de>
+>>>
+>>> The two Rohm PMIC drivers use a gpio-keys device without an actual GPIO,
+>>> passing an IRQ number instead. In order to keep this working both with
+>>> and with CONFIG_GPIOLIB_LEGACY, change the gpio-keys driver to ignore
+>>> the gpio number if an IRQ is passed.
+>>>
+>>
+>> I am (still) all fine with this, even though I like Dmitry's set. I
+>> suppose you already have a plan for merging this, but I still have to
+>> ask - why the MFD changes aren't in own patch? I feel it would have
+>> simplified merging, backporting, reviewing and reverting if needed.
+> 
+> Splitting it out would break bisection: The gpio-leds change without
+> the mfd change causes a build failure when assigning the .gpio
+> field, and the reverse causes a runtime failure when .gpio=0 is
+> a valid line.
 
-> I unfortunately didn't get to properly reviewing your patch before
-> leaving for vacation. But in general I like what you're proposing at the
-> moment. The inline header feels like a bit of magic to me still, but
-> it's probably necessary to have some amount of magic to make the
-> different sending options possible. Also seems like it doesn't put too
-> much burden on user space.
+Ah, yes. Thanks for explanation. (I feel a bit [a lot] stupid, as I 
+somehow missed the problem of .gpio = 0 being valid. That even though I 
+had it explicitly set to -1 myself :rolleyes: ).
 
-The inline header is the common ground I established with Willem.
+No further questions ;)
 
-> Skimming the patch, one thing came to my mind: maybe there is a simple
-> way to make user space opt-in to the inline header handling, e.g.,
-> something like a respect-hsr-inline-header flag at socket level(?) that
-> only gets checked in the hsr code. Without such flag, the special
-> parsing wouldn't happen at all, with the flag we still check for the
-> inline magic value to support sending normal frames and special frames.
-> But this is mostly an idea, probably not too well thought through yet.
+Yours,
+	-- Matti
 
-We would have to invent this flag and then af_packet would have to use
-it. In its current shape, we need to look at skb->protocol and is
-restricted to the PTP case. This shouldn't cause too much overhead.
+-- 
+---
+Matti Vaittinen
+Linux kernel developer at ROHM Semiconductors
+Oulu Finland
 
-> But I have one real ask: can you add a simple selftest for this? No need
-> to do any kind of real PTP, but just verify that we don't break any case
-> of the matrix "add header/includes header" x "send normally/send on
-> single port". Maybe just by tcpdump'ing on the other end of a veth?
-
-Okay. Sounds reasonable.
-
-> Thanks,
->    Felix
-
-Sebastian
+~~ When things go utterly wrong vim users can always type :help! ~~
 
