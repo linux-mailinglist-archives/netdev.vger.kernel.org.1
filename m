@@ -1,188 +1,239 @@
-Return-Path: <netdev+bounces-290693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290694-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eLLXKnUFEGqLSQYAu9opvQ
-	(envelope-from <netdev+bounces-290693-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:27:49 +0200
+	id iI4uKeIFEGqLSQYAu9opvQ
+	(envelope-from <netdev+bounces-290694-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:29:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 547C45AFFC1
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BFD55AFFFE
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:29:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8BDB33040224
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:25:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC2AB306B3B4
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2840C38E8D3;
-	Fri, 22 May 2026 07:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179F138E8C5;
+	Fri, 22 May 2026 07:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="F/wREpkW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJ0Md6du"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C72385D6F
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 07:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBA83905F8;
+	Fri, 22 May 2026 07:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779434720; cv=none; b=KsmNhnzb71HAkuwUVwDdBck6CoF3hnBxy09zWPNuU7sJqK6YmxAHLcUmVCXkFGYZC5Hhoos587TjaLGwhPt8ztbgTnMh5AzZLRye8LpzAfnLhwjU9iFCK3olDuUYRXD1VJqkBOvZ9WrX/n7MuuokQwngTA6YTOxCLRtB9GpB96M=
+	t=1779434735; cv=none; b=G5zyycp9MpJazKWx39x4OSnlBEAvZ943jU+GI1nZUZeWoddEHDAjZuHxRCs701zEcLGyhbiQ5oauhUNEh54qqGVllj11uz5jeoFLwxgRB9f4a5o+sxM4FGqgVUUdBjO5IEu7YVxDWPQbczedyYqZJMae6l1Yb0Ljg5x3ESztt+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779434720; c=relaxed/simple;
-	bh=DR1AkpCg19vmza3y1XhaOoXFEA45xJVCNkq6eE85JyM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O/yQmYkYU54t9BQA1DzEybmIS94yQVYlb09GnoZzZE3Bb3ly3G+Wi6pTTy/6bePZ67d6T9GRZJjqxf+gCYclMzVU0QijbzZrQccwFIJTbcksS9aov6wkrSuS6KLY1eZuZlKl3WF0633bD+d3mJylg4ZM6/6nOL1GBUBFDXiDRDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=F/wREpkW; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4891cd5927dso6368415e9.0
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 00:25:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1779434717; x=1780039517; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+sd+YQcPZ4Wvn7Tf8ziui+EYH4Lu3lY9BCWXszm0/a8=;
-        b=F/wREpkWGbxx9s/fyP+PbaJfHfeD6/GWtwCdsEtzDn8y3jvT6BqByijkYNejRW3Lj1
-         1N0wXy+xRDhEEiyoDc0I7FzacdIilbY8htE3JLcUROSZ9/vQ3RxRJpxYGeX04cBYm2bC
-         MCLPBrfw2N2cnOyCGowyjAli4Tt4B6x7jEc33BQNL9Fgw96MFDS0J7VSmQxJYiH6jUGw
-         s0CGTSGuTZrByLcHmC/2KdNclSgcsd9E/PW5rm0DabuDXQJHxanrD+dL7/YJJfvy34Eb
-         FcqyQAQr9yqgj3cHSnVHkvJ2kjG+cfzx/2j08gycv3xqs6zzLRGo3fczQh3uh2pMVk0K
-         RWpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779434717; x=1780039517;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+sd+YQcPZ4Wvn7Tf8ziui+EYH4Lu3lY9BCWXszm0/a8=;
-        b=Q+JCJOFFAMKXauWttPug4EUOy87gHto3CXIeRl9jfEmaoiB0R2m16pn3luzIO3+Xdv
-         piEssmhTthJvwhXsHGdBw3GwvUlJSPHbl5wFTqxGS6UH1iaUKYaDMO1jzGqPXUMa0C+r
-         jOj9ew2uxwmkwvwtjet+DgQl99VMDkClm3Lhc/Cnjniv0FWU8CDRF6FE8v92l6bJfcPs
-         Ix+tUnUIshRcPXIqUEEvjIHEBDBUgygKlvwY7yM8U5n0e56sN8s1NAwzJyObR81H0rkk
-         d6LLNc3bkxGmzdU3c4IzqOhd8AafxO7ZNgqqJ/xxnp3RP1umkagKyerYVJzWoNHZeJvv
-         vu6A==
-X-Forwarded-Encrypted: i=1; AFNElJ9xuul6KLNIxSMuMy8m2xTM9eTnPK8OKvN4CdWEC3vpbQlskoVR/hHpIjCz42jFaV2i0ev5I1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwafjDs9U8I6/rJOsuviQ72Xqy43JE0NjQDB4UPFoRvH/cp+8m/
-	QiPwqu+O1Zbovdlv2tsgO5MNIow2FAPphrjyjgWOvp5Ug50MzZYzUNkIytiajep+1gc=
-X-Gm-Gg: Acq92OGNeFX9JAtwbJ3XXZws2K1UnPqgJ0sibp2G2yJPCTh629W6QlgwApSHqf2B3g7
-	q4Bj4kynuPaeZ7Og0uKZ7uNBUjaNsOkA2VsLEcAPT0MEmin4mX+i7xV5igjiMRTaby/Djc2nrJy
-	zPwrq5BXR2S5I47eqsvlCQnt+HGP+5VtpZiCfLS3aX2+Q7ELMCHJhRzzSYvk6pfsKo2PCnfZkAH
-	n8JocJCOaXAp+ZKxRJiaIDbHSCl2dyJ1/xgpH9Z1AyMalO77+LMWAL3vWdXUiT2Ihg1Nycrfejz
-	eeZ8plKib4UOBQHj3YGpa6jlP0dz0jcDvPQysjeM8sgDScckTzQ+0cgNvp+BpRnIzbufufWB1C0
-	7jPaEZPevBZ/hr2H749hXB4lyS0LLN7WokWzj2VeTsMVaJRt01zsnZdHBntqq6qa/VYt7e1tNqo
-	YfJZnptcXGCyIufJwTOiQKsz2XPeNa3MedaaxTU5Wrsd/hL3sH3D88TgLEVwg0fip8yMlZ3ThLy
-	vgR
-X-Received: by 2002:a05:600c:c4a3:b0:485:c456:5e4f with SMTP id 5b1f17b1804b1-490422529aemr12940665e9.0.1779434716903;
-        Fri, 22 May 2026 00:25:16 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:ab7:2110:6a1d:efff:fe52:1959? ([2a01:e0a:ab7:2110:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904527f7f7sm41628455e9.7.2026.05.22.00.25.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 May 2026 00:25:16 -0700 (PDT)
-Message-ID: <c34e04b3-d807-4287-8c64-dfb3d7232802@6wind.com>
-Date: Fri, 22 May 2026 09:25:15 +0200
+	s=arc-20240116; t=1779434735; c=relaxed/simple;
+	bh=DOvrmSPgKlxZCC7RbEphO179i76aYP0QFkgrS/bkgMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JOP7OLrMdhfJw1CmP5Hw6DYR7cWNiE/dV2Ki1BkoC7T+yTnK9KXaZ/0SDgOc57hcc5UkVjQW0JLb1iM1BlfsmSdM2H0st2dZbzikvN7TpDM6Cca9IFyaY02Oe5ciaYDyNJ0dLGCSlDoIqzBrcv5qIycuCbsacs25kauNTWMiNHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJ0Md6du; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA79B1F00ADE;
+	Fri, 22 May 2026 07:25:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779434733;
+	bh=NyW+5g7DMTf1Y7Db+/rrVkUDzE+C2206FaaDl7KrUhM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=lJ0Md6duQ6sPRrIdwjugw9x6KqXsYx7A/mgn8Cm26WJcFPdIwrNirWmrk2y+oH2DM
+	 nRv7+D4/S2JZp/c0qo9faz1evc/9eej9fLq963ZdIYUufsnOC2pMQ/13L13gggxNR3
+	 EUeXdLQdS+9dclCJuCPVTSNZdvokzosq/nb6I/Qbhnz7JKjibv9yccuJHOmva5JwbO
+	 hnHGt3w/xkw7QAbPEzDy7zNRl5g712M2FLXy235+wnO6t8lFKU3OgxRuwWcftpUw1a
+	 3y3fJbv7Oy3hUuSWHdagmVRVVGStA5jyzIyeiXDnMUfK8/Ng3pFu4cVnUp9xxOYXR5
+	 N56f0BQcFPhvg==
+Date: Fri, 22 May 2026 12:55:15 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: Vikash Garodia <vikash.garodia@oss.qualcomm.com>
+Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch,
+	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
+	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>, pgujjula@qti.qualcomm.com
+Subject: Re: [PATCH v6 11/16] media: qcom: Switch to generic PAS TZ APIs
+Message-ID: <ahAE2_Eh-_H7ZtYq@sumit-xelite>
+References: <20260518072856.22790-1-sumit.garg@kernel.org>
+ <20260518072856.22790-12-sumit.garg@kernel.org>
+ <07cdbd20-f0c5-4be5-878a-ef23dc633767@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net v2 2/4] net: netlink: don't set nsid on local
- notifications
-To: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Kees Cook <kees@kernel.org>,
- Adrian Moreno <amorenoz@redhat.com>, Jiri Benc <jbenc@redhat.com>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Matteo Perin <matteo.perin@canonical.com>
-References: <20260520172317.175168-1-i.maximets@ovn.org>
- <20260520172317.175168-3-i.maximets@ovn.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20260520172317.175168-3-i.maximets@ovn.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07cdbd20-f0c5-4be5-878a-ef23dc633767@oss.qualcomm.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,canonical.com];
-	TAGGED_FROM(0.00)[bounces-290693-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290694-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ovn.org:email,canonical.com:email,6wind.com:replyto,6wind.com:email,6wind.com:mid,6wind.com:dkim]
-X-Rspamd-Queue-Id: 547C45AFFC1
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4BFD55AFFFE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Le 20/05/2026 à 19:22, Ilya Maximets a écrit :
-> In most cases, notifications on sockets with NETLINK_LISTEN_ALL_NSID
-> do not contain NSID in their ancillary data in case the event is local
-> to the listener.
+Hi Vikash,
+
+On Thu, May 21, 2026 at 12:10:41PM +0530, Vikash Garodia wrote:
 > 
-> However, when a self-referential NSID is allocated for a namespace,
-> every local notification starts sending this ID to the user space.
+> On 5/18/2026 12:58 PM, Sumit Garg wrote:
+> > diff --git a/drivers/media/platform/qcom/iris/iris_firmware.c b/drivers/media/platform/qcom/iris/iris_firmware.c
+> > index 5f408024e967..b3c5281aea91 100644
+> > --- a/drivers/media/platform/qcom/iris/iris_firmware.c
+> > +++ b/drivers/media/platform/qcom/iris/iris_firmware.c
+> > @@ -4,6 +4,7 @@
+> >    */
+> >   #include <linux/firmware.h>
+> > +#include <linux/firmware/qcom/qcom_pas.h>
+> >   #include <linux/firmware/qcom/qcom_scm.h>
+> >   #include <linux/of_address.h>
+> >   #include <linux/of_reserved_mem.h>
+> > @@ -79,7 +80,7 @@ int iris_fw_load(struct iris_core *core)
+> >   		return -ENOMEM;
+> >   	}
+> > -	ret = qcom_scm_pas_auth_and_reset(core->iris_platform_data->pas_id);
+> > +	ret = qcom_pas_auth_and_reset(core->iris_platform_data->pas_id);
+> >   	if (ret)  {
+> >   		dev_err(core->dev, "auth and reset failed: %d\n", ret);
+> >   		return ret;
+> > @@ -93,7 +94,7 @@ int iris_fw_load(struct iris_core *core)
+> >   						     cp_config->cp_nonpixel_size);
+> >   		if (ret) {
+> >   			dev_err(core->dev, "qcom_scm_mem_protect_video_var failed: %d\n", ret);
+> > -			qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
+> > +			qcom_pas_shutdown(core->iris_platform_data->pas_id);
+> >   			return ret;
+> >   		}
+> >   	}
+> > @@ -103,10 +104,10 @@ int iris_fw_load(struct iris_core *core)
+> >   int iris_fw_unload(struct iris_core *core)
+> >   {
+> > -	return qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
+> > +	return qcom_pas_shutdown(core->iris_platform_data->pas_id);
+> >   }
+> >   int iris_set_hw_state(struct iris_core *core, bool resume)
+> >   {
+> > -	return qcom_scm_set_remote_state(resume, 0);
+> > +	return qcom_pas_set_remote_state(resume, 0);
+> >   }
+> > diff --git a/drivers/media/platform/qcom/venus/Kconfig b/drivers/media/platform/qcom/venus/Kconfig
+> > index 63ee8c78dc6d..7997b8aa427a 100644
+> > --- a/drivers/media/platform/qcom/venus/Kconfig
+> > +++ b/drivers/media/platform/qcom/venus/Kconfig
+> > @@ -6,6 +6,7 @@ config VIDEO_QCOM_VENUS
+> >   	select OF_DYNAMIC if ARCH_QCOM
+> >   	select QCOM_MDT_LOADER
+> >   	select QCOM_SCM
+> > +	select QCOM_PAS
+> >   	select VIDEOBUF2_DMA_CONTIG
+> >   	select V4L2_MEM2MEM_DEV
+> >   	help
+> > diff --git a/drivers/media/platform/qcom/venus/firmware.c b/drivers/media/platform/qcom/venus/firmware.c
+> > index 1de7436713ed..3a38ff985822 100644
+> > --- a/drivers/media/platform/qcom/venus/firmware.c
+> > +++ b/drivers/media/platform/qcom/venus/firmware.c
+> > @@ -12,6 +12,7 @@
+> >   #include <linux/of_reserved_mem.h>
+> >   #include <linux/platform_device.h>
+> >   #include <linux/of_device.h>
+> > +#include <linux/firmware/qcom/qcom_pas.h>
+> >   #include <linux/firmware/qcom/qcom_scm.h>
+> >   #include <linux/sizes.h>
+> >   #include <linux/soc/qcom/mdt_loader.h>
+> > @@ -58,7 +59,7 @@ int venus_set_hw_state(struct venus_core *core, bool resume)
+> >   	int ret;
+> >   	if (core->use_tz) {
+> > -		ret = qcom_scm_set_remote_state(resume, 0);
+> > +		ret = qcom_pas_set_remote_state(resume, 0);
+> >   		if (resume && ret == -EINVAL)
+> >   			ret = 0;
+> >   		return ret;
+> > @@ -218,7 +219,7 @@ int venus_boot(struct venus_core *core)
+> >   	int ret;
+> >   	if (!IS_ENABLED(CONFIG_QCOM_MDT_LOADER) ||
+> > -	    (core->use_tz && !qcom_scm_is_available()))
+> > +	    (core->use_tz && !qcom_pas_is_available()))
+> >   		return -EPROBE_DEFER;
+> >   	ret = of_property_read_string_index(dev->of_node, "firmware-name", 0,
+> > @@ -236,7 +237,7 @@ int venus_boot(struct venus_core *core)
+> >   	core->fw.mem_phys = mem_phys;
+> >   	if (core->use_tz)
+> > -		ret = qcom_scm_pas_auth_and_reset(VENUS_PAS_ID);
+> > +		ret = qcom_pas_auth_and_reset(VENUS_PAS_ID);
+> >   	else
+> >   		ret = venus_boot_no_tz(core, mem_phys, mem_size);
+> > @@ -259,7 +260,7 @@ int venus_boot(struct venus_core *core)
+> >   						     res->cp_nonpixel_start,
+> >   						     res->cp_nonpixel_size);
+> >   		if (ret) {
+> > -			qcom_scm_pas_shutdown(VENUS_PAS_ID);
+> > +			qcom_pas_shutdown(VENUS_PAS_ID);
+> >   			dev_err(dev, "set virtual address ranges fail (%d)\n",
+> >   				ret);
+> >   			return ret;
 > 
-> This is problematic, because the listener cannot tell if those
-> notifications are local or not anymore without making extra requests
-> to figure out if the provided NSID is local or not.  The listener
-> can also not figure out the local NSID beforehand as it can be
-> allocated at any point in time by other processes, changing the
-> structure of the future notifications for everyone.
 > 
-> The value is practically not useful, since it's the namespace's own
-> ID that the application has to obtain from other sources in order to
-> figure out if it's the same or not.  So, for the application it's
-> just an extra busy work with no benefits.  Moreover, applications
-> that do not know about this quirk may be mishandling notifications
-> with NSID set as notifications from remote namespaces.  This is the
-> case for ovs-vswitchd and the iproute2's 'ip monitor' that stops
-> printing 'current' and starts printing the nsid number mid-session.
+> API "qcom_scm_mem_protect_video_var() would also need this migration, any
+> reason not to consider that ?
+
+This SCM call is very specific to the media subsystem and don't align
+with the generic PAS APIs. I rather think these kind of special SMCs can
+rather be treated as SiP calls supported in TF-A but we have to analyze
+if we even need these SCM calls for the open boot stack or not.
+
+However, with OP-TEE there is still work in progress to enable media upstream
+as Jorge posted in earlier versions on this patch-set due to IOMMU dependency.
+
 > 
-> Lack of clear documentation for this behavior is also not helping.
-> 
-> A search though open-source projects doesn't reveal any projects
-> that use NETNSA_NSID_NOT_ASSIGNED and rely on metadata to contain
-> self-referential NSIDs (expected, since the value is not useful).
-> Quite the opposite, as already mentioned, there are few applications
-> that rely on NSID to not be present in local events.
-> 
-> Since the value is not useful and actively harmful in some cases,
-> let's not report it for local events, making the notifications more
-> consistent.
-> 
-> Also adding some blank lines for readability.
-> 
-> Fixes: 59324cf35aba ("netlink: allow to listen "all" netns")
-> Reported-by: Matteo Perin <matteo.perin@canonical.com>
-> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
-Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> Could you please check, if any such usage of legacy *scm* APIs, like the one
+> i pointed above, can be enforced to err out at compile time ?
+
+It will error out at runtime automatically since TF-A doesn't support
+this SCM/SMC call as of now.
+
+-Sumit
 
