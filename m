@@ -1,200 +1,263 @@
-Return-Path: <netdev+bounces-290794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHuMJwZEEGrpVQYAu9opvQ
-	(envelope-from <netdev+bounces-290794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 13:54:46 +0200
+	id 4JsyBilEEGo6VgYAu9opvQ
+	(envelope-from <netdev+bounces-290795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 13:55:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 026D05B34CF
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 13:54:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F36B5B350A
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 13:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BBF4130557F6
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:47:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA8D13008749
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0AFC3EDE62;
-	Fri, 22 May 2026 11:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FADD3E9F96;
+	Fri, 22 May 2026 11:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="qRA2owQE"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gBip7CO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97753BB106
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 11:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779450470; cv=pass; b=hwib9WcvCsb2L/8ERBb50fmjknGb6EBNlthMv+kR7VSadSjm2VCsQvp6upbSblHHNL3jar2nAsotzAiSAKwbrqJRaflwRdIVDoNL4rziadIs5L1ee0Q/fB+eurkaoyQ8gQkU3qWZpFoBWNnzYn34mNCmZid8DhII9C2zZbg8eHk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779450470; c=relaxed/simple;
-	bh=DtP/eVOYRs3T8YSkm53eLvweRsIOUgAQV1RjxbgdAVU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eK16NsQjpGdBT2ALQfJECSsQ9IpTgf5cclYYzOChGxWoA7lFl3C20EkoMkDvYs184HKxcKiI6is3pW8U7YiFcXXvzORtktVK3Pc1EGkEoQsvIQ+lxebxnovNySsbNuSxbdrbzqztxI2SHolLLIwIS9QeJMkVqME2/R2Yz6YwnRk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=qRA2owQE; arc=pass smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82fa8d6425bso3314702b3a.0
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 04:47:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779450466; cv=none;
-        d=google.com; s=arc-20240605;
-        b=iFdzoyi33+mruZrBho12wp79m/JQt1uR9rZ8a+swy3H7DwGO6/doSoCPgd6A31CSHs
-         9VXRauRD8NM8JyPBBBAjqOwO3e9v+9KMtxn45EavGcxjZ8is47PQRolXeXKmDbaZSb+P
-         DA7e6Ba5nWRjayWX/E9/ng3hoIzY6/S9BYDsd1tHgqqQpUmxuZyNV6pPZcByW1Oq3oYG
-         lgtvj3PcXV10USRDIYHmiAXk3fh08jK0OPtU7Ok5JCQMWUhBKFGqmMIGi7WiJyYBTwcK
-         Eyq9tPyL3HiBwLSY/EvmOwH6gLFM6BujwNNJUOn6rOeNHfcmRdpQAAu3Mkk8fSSbAUBv
-         fEqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=DtP/eVOYRs3T8YSkm53eLvweRsIOUgAQV1RjxbgdAVU=;
-        fh=eSNXtOUuQJaQwksT3m7zj+cIKPrAP/ZV2HQfNTeTwmY=;
-        b=UaT4i16+xf3vzBEN2b4Nj2TbBSHIazn1h5afVKzUh6NFBofEfv7tHt/GpEiZb2Qoqw
-         FSbTJVFSaT8TEBkc7udZ7Zh04ITx5bkpm/cDlMnAo+lqQBxdHjPPryBkIAPCBNTXxG+q
-         D4X6VHSUcXp2PkVsNSBh4hDvGdOxAoLCqPNqPIFUn411Nh2RWJpd90qfUT765G9VASgA
-         VlG+OX81c43wdUpylwx+E/fW5gO9O8rq/1fLSKjOIbspAT1TOwfAkgMsxAAN7Gts9RYe
-         X8ZfPmvnE0Y802pt/yNQcnBfuAj6PkJxDxgtpARm5Ud2xa9gYkXacnEG/c4Ihv9KFOQ6
-         Up0w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779450466; x=1780055266; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DtP/eVOYRs3T8YSkm53eLvweRsIOUgAQV1RjxbgdAVU=;
-        b=qRA2owQEdXA0NRBqUiYV1TiGjZg+mMpy9rsGfaxQMZytRcrwLATGhNGh9v/eaixvu2
-         4bkMdfxrdEdSbRSaljUmO3S/BloguEbV4Hb5zN1/1CIph42Ti0XOqrHYVEh6kZEOgTm4
-         u9TdHFBskXexXqvORu22vyrMkjp49V6HxJ3HC4FDd8ZZGyMeUjE0crhy2aA4NVoVUZZf
-         rSq6K41qHdvgRqWHFgE0Up9GFlYTGHcRWIf32weiiXEblhpQHaXk4JvlnVsMISMG0EJp
-         9Q5w5Zisaz7nTOHasOFtuDN9rv2bPDo5ROA6nwPrzDsRUytJ7oG+3HSVr0H+CIfz+6Ct
-         Iqcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779450466; x=1780055266;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DtP/eVOYRs3T8YSkm53eLvweRsIOUgAQV1RjxbgdAVU=;
-        b=hhqY02Xmq86qk+5siX8vX5nS9Jmq6oYPC7nymRMNqh9Qwwk/JmDlg7ex3/+u2UmiSp
-         AbQ9PKkLpQi5QrgNPJbqFFM1jRS6Gr+WUI4HJx5zEWLhznLpL00KyJsQx+QFd2LmfKrS
-         n11upe7RPwODrQB5aAxWZCPRwAH34mb77UICqNyDM9ffLEZnNAWy7ve4zjbBI41/h6tB
-         Q1JFBBD473sIgcmN3gRpQbJbkMB7Yt21e7QRo8Hx78ypOxWr2TK6q8D9V2ndsumSPm8h
-         rEpoyhnb69SA72efAk8TAwRvCtUa4AHu2bAdcOFOCJMwmyLgwk3wf80sN6s/RmH8ROmB
-         k5Iw==
-X-Forwarded-Encrypted: i=1; AFNElJ//vZkArlmD7qodKZ5SMyykKCvSUzfz3swrWvOKk4oaxpgw8Gk2f+eWcVySAF9y51ciRPyg8ng=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXtw6SrfkSZhCq+W3ob0LEbJX1TAR5NTm7arr4OxJ3UooF5DgE
-	oALAadjtdIGX3LnY/YoGnyvWzc07Bb8r4ow2mF1g7/MlzGrCRfYoL+Mk7gXMN4+SMMM3BNUYl9y
-	BoYzXAIcnkQ+2eBj7oYSKsuKoE+zCMaIqiYT1tzie
-X-Gm-Gg: Acq92OHXvfMJap6gJ7xFKSRqJtL+zZEInBFK8cPJnuV/7VHNJ0lLVCWuJQNRXZpXHMr
-	vSmcRsysUIV4n1cNXJ4p2IDHVlDzU8Iq4N7K7JJBK2LGvc7msNTyFeHsK6Gw9QVVim4WhtDRc2m
-	Br4fjmbk79V7Ibr1gbheKLA9p66KBZ3amfy1GYOG+yaD6JffNASzsH+xRZM7UcPj4Xt2A5r8iq/
-	U58riiNpQlhVQkhGv5H2Gj7JjR2yqtixXMoxogzyxLaGw5ttySXABCfZlqpb5SdSV2vqhX6Gq9Z
-	zlLQIVOt4nooA0gf/Vo=
-X-Received: by 2002:a05:6a00:908b:b0:83d:446c:2a8c with SMTP id
- d2e1a72fcca58-8415f406c9amr3421713b3a.25.1779450465990; Fri, 22 May 2026
- 04:47:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7854C3CBE6B;
+	Fri, 22 May 2026 11:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779450540; cv=none; b=t7LcI0nIPMhpUy4wrSBBENwk9A5OQ8rqMUIPDvXpITHVbtO4OW9WOC2IVFiwaT0Tqt5LHDRDhHX71h9rtpqgPluLnkbzvGe4tdoxK58YehMRMLpqVeLWME3yGTNF5hZ4IaaSKqMdGUY8B4AHy4SvGd4DLC0Fg0ql/19w97q5/5g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779450540; c=relaxed/simple;
+	bh=6eyn1Jha3vDmyk2oxi9jurBu1zW/thPNp1/L6UVvqgI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D8CUt3/PyuE33s9m/pmabmsAZvKbptHIWy6gNp6I0T8loyzSjnzDpj2E+S69G9Ip+e8tyQbbJipnbAxzU6g6ouyhgGP5puslZ45NL7TSYAJHLy9gWdmmuNYoEstka9JAvj4hQPulOhEEsYB0HAKGEsO/4WvWJjQZip1M7EPJ61I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gBip7CO+; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64M4qJuY092449;
+	Fri, 22 May 2026 04:48:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=76lA5hDeG8LLZ60pzeSd7kSpw
+	fGaYTO7DJWvyEI4nug=; b=gBip7CO+RSoN8qpe/kE5F9usyARcRz5/5VD5UYfJZ
+	crOaxn7OPwSdKG5Yf17wqILngMtkWHBWvhm9qbN6PJgZZdu7oLnbrZlGWBdaWcYm
+	XPsXOItfPXc3X2t2vc4H6auOsXJTl4QhImDoYVNNN7Fj2Jsh9eW3ZoFUou1PN3Ma
+	QHWc810IUpqEEr4AweFRNzelOL+9fgimo/PsjM6vFKXpj3r9g4fcQT9FXex5B+O2
+	4sfv37L9pK9wGLUXm3jRWSd97k1lZoGPKyDyfZYzHgnq80TSgabIGoIpvDUcP6xp
+	11IpUnCByGHeW24+5jyJ9afSEQQye7RAuJevRv0PLUwsg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e9vjjccpy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 May 2026 04:48:16 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 22 May 2026 04:48:15 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 22 May 2026 04:48:15 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 1730C5B6949;
+	Fri, 22 May 2026 04:48:06 -0700 (PDT)
+Date: Fri, 22 May 2026 17:18:06 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <oss-drivers@corigine.com>
+CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
+        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
+        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
+        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
+        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
+        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
+        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
+        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
+        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
+        <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v16 net-next 7/9] octeontx2-af: npc: Support for custom
+ KPU profile from filesystem
+Message-ID: <ahBCdspfMKMJYPlW@rkannoth-OptiPlex-7090>
+References: <20260521095303.2395584-1-rkannoth@marvell.com>
+ <20260521095303.2395584-8-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAM0EoMkUPYSXKr2=+mR8YMq2a0TFdYPdzwPGob-UyU1fUWP9Ww@mail.gmail.com>
- <20260519033950.2037-1-rajat.gupta@oss.qualcomm.com> <CAM0EoMmj-9uDpKBN4vjJqzaLQL=OZ-sdFO_pHPFp6kL6hSVeRA@mail.gmail.com>
- <CAM0EoMkDwdmP94yeoX7W-DOY3Emcq84jGcPf73vtRTpDf1N3-w@mail.gmail.com>
- <CAM0EoMn-O7KU1R=b8jzb=DmMtRCuoEVmAH9hEsKehrdbmODAjA@mail.gmail.com>
- <CAM0EoM=sCnT69uPzB+HjOdRP9eQXVA+AcvPsBA80=dtQHi5sLQ@mail.gmail.com>
- <20260521073526.793d30c3@kernel.org> <CAM0EoMnvrAxGC=bty=ZUXG6XDN_hTNZiy9LSZhNicEdbe8DghQ@mail.gmail.com>
- <20260521084640.683c1ee6@kernel.org>
-In-Reply-To: <20260521084640.683c1ee6@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 22 May 2026 07:47:32 -0400
-X-Gm-Features: AVHnY4LU0ZbBpGkUm06N5maS2FO14JX25-hjKB8tLiWM7YD9IkHkDYESxs_1eTY
-Message-ID: <CAM0EoMmNWYzryfc5=4R0SkW+wfVhBxO3tAH+KeoMP3sPr6yrFA@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: fix pedit partial COW leading to page
- cache corruption
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Rajat Gupta <rajat.gupta@oss.qualcomm.com>, netdev@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
-	jiri@resnulli.us, yimingqian591@gmail.com, keenanat2000@gmail.com, 
-	2045gemini@gmail.com, rollkingzzc@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260521095303.2395584-8-rkannoth@marvell.com>
+X-Authority-Analysis: v=2.4 cv=O4kJeh9W c=1 sm=1 tr=0 ts=6a104280 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8
+ a=NlRZgN0ufz6fjOar1VwA:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: HIYrUHewJBAFBUAvIXL7nI5YC_SZaETQ
+X-Proofpoint-GUID: HIYrUHewJBAFBUAvIXL7nI5YC_SZaETQ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIyMDExOCBTYWx0ZWRfXxIZEWg2TUA3y
+ d/abet0caiHgyTSLcUIv++rf7wbTrdYKCq4AI8uCzlDnQK3wOxFUKNOZuZ8Ea0eqQLCHx/xt1bo
+ 3SffeK//CV6A3GDJrO65b6m9ioQwJ0WEzrnPthaMFlesG8ttdFRgU7EfcNJiUb4N41X5pv9ILPk
+ pQMRT0QYQyrIx/04k/bK2FL2TNDiQtcHN7PVTzyidecA/oJrpjVY6hNJEWK0ry2a+32TuduHapM
+ oNB3sPKI1kNTDZJmIGdiC0YpKIInWx6FVP/iv0QyzragbLkqvaBU7YtboEsEXYfpmlRBYhUf67M
+ b5ykz/dtQJMfn4ODoJZ1woB+JV99iZdzK59+DMawqiziEk581PaSfdEuqwLyl14XXnTrquQaFuf
+ CncJIqiIeWEEq9ZGQobeuIwOUN0jdDkbl1ZBBqJBdqexYDNNmzvncrUSdkPA4Qd4SgIKn9vs1HL
+ 8R6/PSta7zU211uognA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-22_03,2026-05-18_01,2025-10-01_01
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,marvell.com:email,marvell.com:dkim];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290794-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-290795-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,resnulli.us,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 026D05B34CF
+	RCPT_COUNT_TWELVE(0.00)[30];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 6F36B5B350A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 21, 2026 at 11:46=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Thu, 21 May 2026 11:16:35 -0400 Jamal Hadi Salim wrote:
-> > On Thu, May 21, 2026 at 10:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.or=
-g> wrote:
-> > > > To be precise, something like attached (untested, uncompiled)
-> > >
-> > > Can we not pull the headers? Do you know of anyone modifying payloads
-> > > with pedit?
-> >
-> > not sure - but it is not unreasonable if someone used it for such a cas=
-e.
->
-> Ack, we'd still support modifying any offset in the packet.
-> But not optimize for modifying frags until we know user exists.
->
-> > > The concept of "shared frags" is silly IMHO, if I'm checking right on=
-ly
-> > > rxrpc and xfrm think that it's a thing. I'm hoping to delete that and
-> > > reclaim the flag id in net-next...
-> >
-> > All these issues stem from the shared frags point, but the patchlet i
-> > showed is unrelated to SKBFL_SHARED_FRAG, it is more related to
-> > cloned+frags.
->
-> Right, right. Just pointing it out cause Rajat's patch adds another
-> skb_has_shared_frag(). Which we'll then have to delete in net-next :\
+On 2026-05-21 at 15:23:01, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> Flashing updated firmware on deployed devices is cumbersome. Provide a
+> mechanism to load a custom KPU (Key Parse Unit) profile directly from
+> the filesystem at module load time.
+
+>This commit introduces a mechanism to load custom KPU profiles from the
+>filesystem at module load time. It adds a kpu_profile module parameter
+>to read profiles from /lib/firmware/kpu.
+>> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+>> index 0e1744609ccfd..513e68711962f 100644
+>> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+>> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+>> @@ -1676,8 +1692,15 @@ int npc_cn20k_apply_custom_kpu(struct rvu *rvu,
+>>  	}
+>>
+>>  	for (kpu = 0; kpu < fw->kpus; kpu++) {
+>>  		fw_kpu = (struct npc_kpu_fwdata *)(fw->data + offset);
+>>  		if (fw_kpu->entries > KPU_CN20K_MAX_CST_ENT)
+>This is a pre-existing issue, but missing a check for negative entries here
+>allows bypassing bounds checks. If fw_kpu->entries is negative, multiplying it
+>by sizeof(*cam) causes an unsigned wraparound. The offset decreases,
+>potentially wrapping around the 64-bit address space to bypass bounds checks
+>later, leading to arbitrary backward out-of-bounds reads. Could we add a check
+>to ensure entries is non-negative?
+>This is also a pre-existing issue, but does missing a bounds check before
+>dereferencing the firmware structure fields lead to an out-of-bounds read?
+>The bounds check for rvu->kpu_fwdata_sz < hdr_sz + offset happens later, but
+>fw_kpu is located at fw->data + offset. If the firmware blob is truncated
+>exactly at hdr_sz + offset, reading fw_kpu->entries accesses 4 bytes out of
+>bounds. Can this be checked before accessing fw_kpu?
+
+Pre existing issue. Will prepare patch for net tree once this series is merged.
+
+>>
+>> +static int npc_alloc_kpu_cam2_n_action2(struct rvu *rvu, int kpu_num,
+>> +					int num_entries)
+>> +{
+>> +	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
+>> +	struct npc_kpu_profile *kpu;
+>> +
+>> +	kpu = &adapter->kpu[kpu_num];
+>> +
+>> +	kpu->cam2 = devm_kcalloc(rvu->dev, num_entries,
+>> +				 sizeof(*kpu->cam2), GFP_KERNEL);
+>Does storing device-managed memory in a shared static global array cause
+>use-after-free and data races? The adapter->kpu pointer references
+>npc_kpu_profiles, which is a static global array shared across all OcteonTX2
+>devices.
+>If multiple devices are probed, they will race to overwrite these pointers.
+>Furthermore, if a device is unbound, the devm framework frees the memory,
+>leaving dangling pointers in the global array which will trigger a
+>use-after-free on subsequent access.
 >
 
-With a note that the exploits currently take advantage of that
-specific cache issue. How about we allow it for net now and then
-schedule a follow-up phase to remove it when you get rid of "shared
-frags"?
+There is only one AF device per system.
 
-cheers,
-jamal
-
-> > If you remove it in net-next - does that necessitate removing all
-> > "fixes" that tried to address that issue? It seems like that would be
-> > sensible, but it makes me wonder why the shared frags concept exists
-> > in the first place.
+>> +	fw = rvu->kpu_fwdata;
+>>
+>> +	for (kpu = 0; kpu < fw->kpus; kpu++) {
+>> +		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
+>> +			dev_warn(rvu->dev,
+>> +				 "Profile size mismatch on KPU%i parsing\n",
+>> +				 kpu + 1);
+>> +			return -EINVAL;
+>> +		}
+>> +
+>> +		fw_kpu = (struct npc_kpu_fwdata *)(fw->data + offset);
+>> +		if (fw_kpu->entries < 0) {
+>Is there a missing bounds check before dereferencing fw_kpu? The bounds check
+>for rvu->kpu_fwdata_sz < hdr_sz + offset only verifies the start of the
+>structure.
+>Since fw_kpu is located at fw->data + offset, the structure itself resides
+>after hdr_sz + offset. If the firmware blob is truncated to exactly
+>hdr_sz + offset, reading fw_kpu->entries will access 4 bytes out of bounds.
 >
-> IDK. We have in the tree plenty of "good ideas that went nowhere"..
-> As I said elsewhere IMO having the maintain this flag correctly
-> 100% of the time will only create more CVEs, and there's no practical
-> reason to optimize for frags not being shared.
+
+This is an existing issue. I agree, even though we rearranged and renamed functions,
+mentioned bug exist. Will prepare a net-next patch to harden these parts once this series
+is merged.
+
+> +	profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
+>> +				      sizeof(ikpu_action_entries),
+>> +				      GFP_KERNEL);
+>> +	if (!profile->ikpu2)
+>> +		return -ENOMEM;
+>> +
+>> +	action = (struct npc_kpu_profile_action *)(fw->data + offset);
+>> +
+>> +	if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
+>> +		return -EINVAL;
+>> +
+>> +	/* The firmware layout does dependent on the internal size of
+>> +	 * ikpu_action_entries.
+>> +	 */
+>> +	memcpy((void *)profile->ikpu2, action, sizeof(ikpu_action_entries));
+>> +	offset += sizeof(ikpu_action_entries);
+>Does tying the firmware ABI to the kernel's internal array size break
+>backward and forward compatibility?
+>Since ikpu_action_entries is a statically sized kernel array, its size
+>increases whenever new port kinds are added in future kernel releases. Older
+>firmware binaries will either fail the bounds check or parse data from the
+>wrong offset, breaking firmware compatibility.
+
+NO. We keep the same size for all binaries (ikpu_action_entries). We cant introduce
+size variable in this structure as it will break backward compatability.
+
+>+	*fw_kpus = fw->kpus;
+>> +
+>> +	sfw = devm_kcalloc(rvu->dev, 1, sizeof(*sfw), GFP_KERNEL);
+>> +	if (!sfw)
+>> +		return -ENOMEM;
+>> +
+>> +	memcpy(sfw, fw, sizeof(*sfw));
+>Will calling memcpy directly on an IOMEM pointer cause faults on ARM64?
+>The KPU profile firmware can be loaded from the firmware database which maps
+>the profile as device memory. Using standard memcpy emits unaligned loads or
+>DC ZVA instructions that trigger hardware exceptions like alignment faults or
+>external aborts on device memory on ARM64 architectures.
+>Should memcpy_fromio be used here instead?
+>
+THis is not an IO memory. This fw loaded memory thru request_firmware_direct()
 
