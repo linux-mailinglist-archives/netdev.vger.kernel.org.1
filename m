@@ -1,1075 +1,314 @@
-Return-Path: <netdev+bounces-290885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QER3OwuNEGrEZQYAu9opvQ
-	(envelope-from <netdev+bounces-290885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:06:19 +0200
+	id wElUOPyOEGqcZgYAu9opvQ
+	(envelope-from <netdev+bounces-290886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:14:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 882195B7E90
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:06:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FFE5B8071
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C5FE230065CD
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:06:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 679163032070
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9F347B40D;
-	Fri, 22 May 2026 17:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96CF3A75A1;
+	Fri, 22 May 2026 17:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O7jVfnwK"
+	dkim=pass (2048-bit key) header.d=gmx.us header.i=len.bao@gmx.us header.b="ao9Bn1A8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27390477E35
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 17:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E557378D7D;
+	Fri, 22 May 2026 17:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779469567; cv=none; b=Y4e8VFabV74js+f0b1ky5wJl1qGzNkSel90gH5iFC46WwBxfyCMqak8TF+odHXldXakk5HRqJJVol4FlW1XIAaN1cJQxCdPls3djyslSGdJMLIAsz2DVv4/T+AtBBBfYH/ePEV7XGipGHwQuPPED91MkbFKcY1gELxjbAdW9kD8=
+	t=1779469753; cv=none; b=bN8NfCc6uwXKJvUiJAwLRlfbUC144EgJFkISagb6uyx+ycaJKExjnmhxyeMTN8YxTiwfm4gKBHSZYYMi8ygkOWTjn5t0QSd1Jn9QDqDsSsDh9/Mj41ta54VZOtjwNaGVSt0W96iTeCQLQvhUiZVRTOWS6s3/g9TGNhnzJwz3o4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779469567; c=relaxed/simple;
-	bh=f4HCJ2OM7YbYxnr4uCU99lpdNpAb7NbwMBpIeXtirZA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pQp1X1O9i8NpWJ4+58Y/Huf9gvmg056f/gWKk7tYZ0wmaneQ3AYxr1AZw6RHegxUT04anqKFvUi4JQqO/kPoeQe2wAho8GU//bMnasqStyzRji/YiUPYQVeDV54HFv0KCfzHlXe6Rb+9EqE8uwWPSTuY2vFdoNR3BMcL1jj/DVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O7jVfnwK; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 712FD1F0157A
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 17:05:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779469559;
-	bh=vhBz6+FER7gVadySruFBg+pjjqPZJ5HC+vntfE1g4Xw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=O7jVfnwKPdJszvk1wSKfHP8MV59g4SFWi+mjuuxf+o7vj+nVAHkLpiOaaX3otgQu7
-	 FbdoVR1UH1UXENQgWEm1qlnJ/jPkNbUFQ6kHYgb+einfs5eKvD9Ew/xxbu2gmK3sz1
-	 XM6rHBfJ5VdQcHrjdhjavSQAtEY8e4iPqD6inMqubZ6GK4TayOAu66oWE9eR/ZJ5Et
-	 8rdWWRsKaFyh+F15/s/ixNRWf25AYkhKhKYXHvOuLJuOBAgkMvqg4+N1qvUPh9S2NB
-	 QNIrwlN6EyrVlmX9b5Lxs1BHWgd2cI/mF1gNDo0OLwo23WxQ7ahyTXH/C4pITYaMWh
-	 nuXyw8OsXnONQ==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5a8738c178dso6853555e87.1
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:05:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9F1D0JyKpItbO+Qwf//JOYDLzOVdyrcxdpo00ND9jih/m5WDLca4Qh8/wdj6hCWyGdZYRdynY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3aK3Kt/UCeP1BvdY/UUwA/0HUkBt/ks3htT385cWwnUFgiGTA
-	qtUX/6THV7DlhQi+nVQVs1uXucS9K0Cjb+oJdZHWf1g7ftJ6td0rWd0J2X55a38He2hyypdOAZT
-	GokdiAJov74V3FPS8d/UKMW5dbA7mWmI=
-X-Received: by 2002:a05:6512:3b2c:b0:5aa:b6a:6027 with SMTP id
- 2adb3069b0e04-5aa323e952emr1451843e87.44.1779469557331; Fri, 22 May 2026
- 10:05:57 -0700 (PDT)
+	s=arc-20240116; t=1779469753; c=relaxed/simple;
+	bh=CYbWeSKJCqXiJ2U3Sic6SfFFShLy4GyRv/qjikLjRwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fQ7k71wzoMcEnSvklwld9Q76e/iKyh+4gHpkHDuNQA/oOeY96MOiuuotlaiQKI5NvSjlqRHdS9hYFkctvzDnKU1UWqqFJ/Z0PxfLEUPz5/W4IwwZwACYrwIFUa95BuMbcjI6ubmOzJ17E15iflrhrj1H5jyJcvWfcgzB8m4JY+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.us; spf=pass smtp.mailfrom=gmx.us; dkim=pass (2048-bit key) header.d=gmx.us header.i=len.bao@gmx.us header.b=ao9Bn1A8; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.us
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.us
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.us;
+	s=s31663417; t=1779469745; x=1780074545; i=len.bao@gmx.us;
+	bh=LGYeOwSG1iTqDcustC+vKuHflO7MW8KJtJYi7aDWPp8=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=ao9Bn1A8mFhnhhj/CkET1GJN8yvuRBKUq+JMPt0fyY3XqdZPqoXHtVta/DSteWef
+	 ++r4TJTCqa8oS6+b2R8G7sOeS1Hv7VWhzxA/Q2EQb2xwhXBDvA4IJ6oiFhNvmjuMz
+	 o7+6dIM2N1DSdlAQGgI+hGmo2YtqWMPGrqpCScy2ep+YjXmBt0GpB56/Qvf7Em6wB
+	 NyXR8lvacZ5cqs/LmC8gDQoIthHiR/Q986ngcga5/ux/ZX7EWhpLvRxVBNSkWKEAd
+	 WiLpW/9AK9Ok0YCiCjrVBP2UgPA0X3s7xEcgt1Sn5UdJ17O7HbFPqoD5wuhjtMsQE
+	 YjACXI+iJvkQAhbqdg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 1MowGa-1x7p3n2J26-00l1I8; Fri, 22
+ May 2026 19:09:05 +0200
+Date: Fri, 22 May 2026 17:08:46 +0000
+From: Len Bao <len.bao@gmx.us>
+To: Simon Horman <horms@kernel.org>
+Cc: len.bao@gmx.us, m.grzeschik@pengutronix.de, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] arcnet: com90xx: Mark cards and numcards variables as
+ __ro_after_init
+Message-ID: <ahCNnuSAr2QpLl37@ubuntu>
+References: <20260516134628.30672-1-len.bao@gmx.us>
+ <20260520201644.1528107-3-horms@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260521133315.work.845-kees@kernel.org> <20260521133326.2465264-10-kees@kernel.org>
-In-Reply-To: <20260521133326.2465264-10-kees@kernel.org>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Fri, 22 May 2026 19:05:43 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0gzCFu8Simqco8QZPU3-jmUSxhK_zsx4FqCrgLXQ5-UvQ@mail.gmail.com>
-X-Gm-Features: AVHnY4KZueAI2elz2nGM2Tw15Bwmvwem7axKj09aFX8s8cuqasGJRNZXvEKifnM
-Message-ID: <CAJZ5v0gzCFu8Simqco8QZPU3-jmUSxhK_zsx4FqCrgLXQ5-UvQ@mail.gmail.com>
-Subject: Re: [PATCH 10/11] treewide: Manually convert custom kernel_param_ops
- .get callbacks
-To: Kees Cook <kees@kernel.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Pengpeng Hou <pengpeng@iscas.ac.cn>, 
-	Petr Pavlu <petr.pavlu@suse.com>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>, Corey Minyard <corey@minyard.net>, 
-	Gabriel Somlo <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Bart Van Assche <bvanassche@acm.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
-	Hans de Goede <hansg@kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Hannes Reinecke <hare@suse.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Daniel Lezcano <daniel.lezcano@kernel.org>, 
-	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Alan Stern <stern@rowland.harvard.edu>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Jason Baron <jbaron@akamai.com>, Jim Cromie <jim.cromie@gmail.com>, 
-	Tiwei Bie <tiwei.btw@antgroup.com>, Benjamin Berg <benjamin.berg@intel.com>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	"David E. Box" <david.e.box@linux.intel.com>, "Maciej W. Rozycki" <macro@orcam.me.uk>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>, 
-	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	Aaron Tomlin <atomlin@atomlin.com>, Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	John Johansen <john.johansen@canonical.com>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Georgia Garcia <georgia.garcia@canonical.com>, kvm@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-modules@vger.kernel.org, 
-	kasan-dev@googlegroups.com, linux-mm@kvack.org, apparmor@lists.ubuntu.com, 
-	linux-security-module@vger.kernel.org, linux-um@lists.infradead.org, 
-	linux-acpi@vger.kernel.org, openipmi-developer@lists.sourceforge.net, 
-	qemu-devel@nongnu.org, intel-gfx@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-pm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-serial@vger.kernel.org, 
-	linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260520201644.1528107-3-horms@kernel.org>
+X-Provags-ID: V03:K1:FkFIbmyWPVErTNKRr2p46/63JcWX0tkcFT7Gv8/lTZDdzA1gtmd
+ tUlQ/DNrG5roIOrfMBnYvafxY3soMhVnolx3e9GeUXuTVgPRET9w86iz9E3dbhrYJLc8hdH
+ B1F8XdOr35g7eQZ50EH6GqrzmwaqSFddNofrrwrf/g7NqBDoKNK18IuKO9GCyYO4NbGFukh
+ OvjGZdAl1DTYE6vLnOgnQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:j5AmuKzv2O8=;mLFaNuy+APdk1qCEJUJkjkuCdZ2
+ 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
+ +KSPQQYk1IEIQZ4LlQ=
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmx.us,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmx.us:s=s31663417];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-290885-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,iscas.ac.cn,suse.com,nod.at,cambridgegreys.com,sipsolutions.net,minyard.net,cmu.edu,redhat.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,acm.org,ziepe.ca,ideasonboard.com,google.com,suse.de,hansenpartnership.com,oracle.com,arm.com,linuxfoundation.org,rowland.harvard.edu,linux.alibaba.com,akamai.com,antgroup.com,orcam.me.uk,infradead.org,linux.ibm.com,alien8.de,zytor.com,atomlin.com,linux-foundation.org,canonical.com,paul-moore.com,namei.org,hallyn.com,vger.kernel.org,googlegroups.com,kvack.org,lists.ubuntu.com,lists.infradead.org,lists.sourceforge.net,nongnu.org,lists.freedesktop.org,lists.ozlabs.org,lists.one-eyed-alien.net,lists.linux.dev];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rafael@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[99];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-290886-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[gmx.us,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[len.bao@gmx.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmx.us:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 882195B7E90
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmx.us]
+X-Rspamd-Queue-Id: 42FFE5B8071
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 21, 2026 at 3:33=E2=80=AFPM Kees Cook <kees@kernel.org> wrote:
->
-> Convert struct kernel_param_ops .get callbacks from legacy "char *" to
-> "struct seq_buf *".
->
-> Since seq_buf_printf() will return -1 on overflow, and struct
-> kernel_param_ops .get callbacks are expected to truncate without error,
-> we must ignore the return value from seq_buf_print() and always return 0
-> (as the length is calculated in the common dispatcher code).
->
-> No struct kernel_param_ops initializations need changing since
-> DEFINE_KERNEL_PARAM_OPS already routes the pointer to .get or .get_str
-> via _Generic based on the function signature, so converted callbacks
-> are automatically moved from the .get_str to the .get callback.
->
-> Signed-off-by: Kees Cook <kees@kernel.org>
-
-For ACPI:
-
-Acked-by: Rafael J. Wysocki (Intel) <rafael@kernel.org>
-
+On Wed, May 20, 2026 at 09:16:46PM +0100, Simon Horman wrote:
+> From: 'Simon Horman' <horms@kernel.org>
+>=20
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+>=20
+> Simon says: This is a driver that doesn't seem to have seen any
+>             real attention for some time. I do wonder if we should
+> 	    leave it be.
+>=20
+> 	    But as we are here, I'm passing on the AI generated review
+> 	    with some commentary.
+>=20
 > ---
->  include/linux/dynamic_debug.h            |  8 ++-
->  arch/um/drivers/vfio_kern.c              |  3 +-
->  arch/um/drivers/virtio_uml.c             | 12 ++--
->  drivers/acpi/button.c                    | 19 ++++--
->  drivers/acpi/sysfs.c                     | 83 +++++++++++-------------
->  drivers/char/ipmi/ipmi_watchdog.c        | 33 ++++------
->  drivers/firmware/qemu_fw_cfg.c           | 34 +++++-----
->  drivers/gpu/drm/i915/i915_mitigations.c  | 26 ++++----
->  drivers/infiniband/ulp/srp/ib_srp.c      |  7 +-
->  drivers/media/usb/uvc/uvc_driver.c       |  8 ++-
->  drivers/pci/pcie/aspm.c                  | 17 +++--
->  drivers/scsi/fcoe/fcoe_transport.c       | 22 +++----
->  drivers/thermal/intel/intel_powerclamp.c | 14 ++--
->  drivers/tty/hvc/hvc_iucv.c               | 18 ++---
->  drivers/usb/storage/usb.c                | 20 +++---
->  drivers/virtio/virtio_mmio.c             | 21 +++---
->  lib/dynamic_debug.c                      | 10 ++-
->  17 files changed, 178 insertions(+), 177 deletions(-)
->
-> diff --git a/include/linux/dynamic_debug.h b/include/linux/dynamic_debug.=
-h
-> index 05743900a116..999a25671b6a 100644
-> --- a/include/linux/dynamic_debug.h
-> +++ b/include/linux/dynamic_debug.h
-> @@ -334,8 +334,10 @@ void __dynamic_ibdev_dbg(struct _ddebug *descriptor,
->  extern int ddebug_dyndbg_module_param_cb(char *param, char *val,
->                                         const char *modname);
->  struct kernel_param;
-> +struct seq_buf;
->  int param_set_dyndbg_classes(const char *instr, const struct kernel_para=
-m *kp);
-> -int param_get_dyndbg_classes(char *buffer, const struct kernel_param *kp=
-);
-> +int param_get_dyndbg_classes(struct seq_buf *buffer,
-> +                            const struct kernel_param *kp);
->
->  #else
->
-> @@ -352,9 +354,11 @@ static inline int ddebug_dyndbg_module_param_cb(char=
- *param, char *val,
->  }
->
->  struct kernel_param;
-> +struct seq_buf;
->  static inline int param_set_dyndbg_classes(const char *instr, const stru=
-ct kernel_param *kp)
->  { return 0; }
-> -static inline int param_get_dyndbg_classes(char *buffer, const struct ke=
-rnel_param *kp)
-> +static inline int param_get_dyndbg_classes(struct seq_buf *buffer,
-> +                                          const struct kernel_param *kp)
->  { return 0; }
->
->  #endif
-> diff --git a/arch/um/drivers/vfio_kern.c b/arch/um/drivers/vfio_kern.c
-> index fb7988dc5482..7c1119d0d9c1 100644
-> --- a/arch/um/drivers/vfio_kern.c
-> +++ b/arch/um/drivers/vfio_kern.c
-> @@ -623,7 +623,8 @@ static int uml_vfio_cmdline_set(const char *device, c=
-onst struct kernel_param *k
->         return 0;
->  }
->
-> -static int uml_vfio_cmdline_get(char *buffer, const struct kernel_param =
-*kp)
-> +static int uml_vfio_cmdline_get(struct seq_buf *buffer,
-> +                               const struct kernel_param *kp)
->  {
->         return 0;
->  }
-> diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
-> index f9ae745f4586..cea806540625 100644
-> --- a/arch/um/drivers/virtio_uml.c
-> +++ b/arch/um/drivers/virtio_uml.c
-> @@ -1379,23 +1379,21 @@ static int vu_cmdline_get_device(struct device *d=
-ev, void *data)
->  {
->         struct platform_device *pdev =3D to_platform_device(dev);
->         struct virtio_uml_platform_data *pdata =3D pdev->dev.platform_dat=
-a;
-> -       char *buffer =3D data;
-> -       unsigned int len =3D strlen(buffer);
-> +       struct seq_buf *s =3D data;
->
-> -       snprintf(buffer + len, PAGE_SIZE - len, "%s:%d:%d\n",
-> -                pdata->socket_path, pdata->virtio_device_id, pdev->id);
-> +       seq_buf_printf(s, "%s:%d:%d\n",
-> +                      pdata->socket_path, pdata->virtio_device_id, pdev-=
->id);
->         return 0;
->  }
->
-> -static int vu_cmdline_get(char *buffer, const struct kernel_param *kp)
-> +static int vu_cmdline_get(struct seq_buf *buffer, const struct kernel_pa=
-ram *kp)
->  {
->         guard(mutex)(&vu_cmdline_lock);
->
-> -       buffer[0] =3D '\0';
->         if (vu_cmdline_parent_registered)
->                 device_for_each_child(&vu_cmdline_parent, buffer,
->                                       vu_cmdline_get_device);
-> -       return strlen(buffer) + 1;
-> +       return 0;
->  }
->
->  static DEFINE_KERNEL_PARAM_OPS(vu_cmdline_param_ops, vu_cmdline_set,
-> diff --git a/drivers/acpi/button.c b/drivers/acpi/button.c
-> index dc064a388c23..31c624bebc65 100644
-> --- a/drivers/acpi/button.c
-> +++ b/drivers/acpi/button.c
-> @@ -715,19 +715,24 @@ static int param_set_lid_init_state(const char *val=
-,
->         return 0;
->  }
->
-> -static int param_get_lid_init_state(char *buf, const struct kernel_param=
- *kp)
-> +static int param_get_lid_init_state(struct seq_buf *buf,
-> +                                   const struct kernel_param *kp)
->  {
-> -       int i, c =3D 0;
-> +       int i;
->
-> -       for (i =3D 0; i < ARRAY_SIZE(lid_init_state_str); i++)
-> +       for (i =3D 0; i < ARRAY_SIZE(lid_init_state_str); i++) {
->                 if (i =3D=3D lid_init_state)
-> -                       c +=3D sprintf(buf + c, "[%s] ", lid_init_state_s=
-tr[i]);
-> +                       seq_buf_printf(buf, "[%s] ", lid_init_state_str[i=
-]);
->                 else
-> -                       c +=3D sprintf(buf + c, "%s ", lid_init_state_str=
-[i]);
-> +                       seq_buf_printf(buf, "%s ", lid_init_state_str[i])=
-;
-> +       }
->
-> -       buf[c - 1] =3D '\n'; /* Replace the final space with a newline */
-> +       /* Replace the final space with a newline. */
-> +       if (!seq_buf_has_overflowed(buf) && buf->len > 0 &&
-> +           buf->buffer[buf->len - 1] =3D=3D ' ')
-> +               buf->buffer[buf->len - 1] =3D '\n';
->
-> -       return c;
-> +       return 0;
->  }
->
->  module_param_call(lid_init_state,
-> diff --git a/drivers/acpi/sysfs.c b/drivers/acpi/sysfs.c
-> index 5247ed7e05cc..dff7cc7da8bf 100644
-> --- a/drivers/acpi/sysfs.c
-> +++ b/drivers/acpi/sysfs.c
-> @@ -89,53 +89,49 @@ static const struct acpi_dlevel acpi_debug_levels[] =
-=3D {
->         ACPI_DEBUG_INIT(ACPI_LV_EVENTS),
->  };
->
-> -static int param_get_debug_layer(char *buffer, const struct kernel_param=
- *kp)
-> +static int param_get_debug_layer(struct seq_buf *buffer,
-> +                                const struct kernel_param *kp)
->  {
-> -       int result =3D 0;
->         int i;
->
-> -       result =3D sprintf(buffer, "%-25s\tHex        SET\n", "Descriptio=
-n");
-> +       seq_buf_printf(buffer, "%-25s\tHex        SET\n", "Description");
->
->         for (i =3D 0; i < ARRAY_SIZE(acpi_debug_layers); i++) {
-> -               result +=3D sprintf(buffer + result, "%-25s\t0x%08lX [%c]=
-\n",
-> -                                 acpi_debug_layers[i].name,
-> -                                 acpi_debug_layers[i].value,
-> -                                 (acpi_dbg_layer & acpi_debug_layers[i].=
-value)
-> -                                 ? '*' : ' ');
-> +               seq_buf_printf(buffer, "%-25s\t0x%08lX [%c]\n",
-> +                              acpi_debug_layers[i].name,
-> +                              acpi_debug_layers[i].value,
-> +                              (acpi_dbg_layer & acpi_debug_layers[i].val=
-ue)
-> +                              ? '*' : ' ');
->         }
-> -       result +=3D
-> -           sprintf(buffer + result, "%-25s\t0x%08X [%c]\n", "ACPI_ALL_DR=
-IVERS",
-> -                   ACPI_ALL_DRIVERS,
-> -                   (acpi_dbg_layer & ACPI_ALL_DRIVERS) =3D=3D
-> -                   ACPI_ALL_DRIVERS ? '*' : (acpi_dbg_layer & ACPI_ALL_D=
-RIVERS)
-> -                   =3D=3D 0 ? ' ' : '-');
-> -       result +=3D
-> -           sprintf(buffer + result,
-> -                   "--\ndebug_layer =3D 0x%08X ( * =3D enabled)\n",
-> -                   acpi_dbg_layer);
-> +       seq_buf_printf(buffer, "%-25s\t0x%08X [%c]\n", "ACPI_ALL_DRIVERS"=
-,
-> +                      ACPI_ALL_DRIVERS,
-> +                      (acpi_dbg_layer & ACPI_ALL_DRIVERS) =3D=3D ACPI_AL=
-L_DRIVERS
-> +                      ? '*' : (acpi_dbg_layer & ACPI_ALL_DRIVERS) =3D=3D=
- 0
-> +                      ? ' ' : '-');
-> +       seq_buf_printf(buffer, "--\ndebug_layer =3D 0x%08X ( * =3D enable=
-d)\n",
-> +                      acpi_dbg_layer);
->
-> -       return result;
-> +       return 0;
->  }
->
-> -static int param_get_debug_level(char *buffer, const struct kernel_param=
- *kp)
-> +static int param_get_debug_level(struct seq_buf *buffer,
-> +                                const struct kernel_param *kp)
->  {
-> -       int result =3D 0;
->         int i;
->
-> -       result =3D sprintf(buffer, "%-25s\tHex        SET\n", "Descriptio=
-n");
-> +       seq_buf_printf(buffer, "%-25s\tHex        SET\n", "Description");
->
->         for (i =3D 0; i < ARRAY_SIZE(acpi_debug_levels); i++) {
-> -               result +=3D sprintf(buffer + result, "%-25s\t0x%08lX [%c]=
-\n",
-> -                                 acpi_debug_levels[i].name,
-> -                                 acpi_debug_levels[i].value,
-> -                                 (acpi_dbg_level & acpi_debug_levels[i].=
-value)
-> -                                 ? '*' : ' ');
-> +               seq_buf_printf(buffer, "%-25s\t0x%08lX [%c]\n",
-> +                              acpi_debug_levels[i].name,
-> +                              acpi_debug_levels[i].value,
-> +                              (acpi_dbg_level & acpi_debug_levels[i].val=
-ue)
-> +                              ? '*' : ' ');
->         }
-> -       result +=3D
-> -           sprintf(buffer + result, "--\ndebug_level =3D 0x%08X (* =3D e=
-nabled)\n",
-> -                   acpi_dbg_level);
-> +       seq_buf_printf(buffer, "--\ndebug_level =3D 0x%08X (* =3D enabled=
-)\n",
-> +                      acpi_dbg_level);
->
-> -       return result;
-> +       return 0;
->  }
->
->  static DEFINE_KERNEL_PARAM_OPS(param_ops_debug_layer, param_set_uint,
-> @@ -247,16 +243,18 @@ static int param_set_trace_state(const char *val,
->         return 0;
->  }
->
-> -static int param_get_trace_state(char *buffer, const struct kernel_param=
- *kp)
-> +static int param_get_trace_state(struct seq_buf *buffer,
-> +                                const struct kernel_param *kp)
->  {
->         if (!(acpi_gbl_trace_flags & ACPI_TRACE_ENABLED))
-> -               return sprintf(buffer, "disable\n");
-> -       if (!acpi_gbl_trace_method_name)
-> -               return sprintf(buffer, "enable\n");
-> -       if (acpi_gbl_trace_flags & ACPI_TRACE_ONESHOT)
-> -               return sprintf(buffer, "method-once\n");
-> +               seq_buf_printf(buffer, "disable\n");
-> +       else if (!acpi_gbl_trace_method_name)
-> +               seq_buf_printf(buffer, "enable\n");
-> +       else if (acpi_gbl_trace_flags & ACPI_TRACE_ONESHOT)
-> +               seq_buf_printf(buffer, "method-once\n");
->         else
-> -               return sprintf(buffer, "method\n");
-> +               seq_buf_printf(buffer, "method\n");
-> +       return 0;
->  }
->
->  module_param_call(trace_state, param_set_trace_state, param_get_trace_st=
-ate,
-> @@ -272,14 +270,11 @@ MODULE_PARM_DESC(aml_debug_output,
->                  "To enable/disable the ACPI Debug Object output.");
->
->  /* /sys/module/acpi/parameters/acpica_version */
-> -static int param_get_acpica_version(char *buffer,
-> +static int param_get_acpica_version(struct seq_buf *buffer,
->                                     const struct kernel_param *kp)
->  {
-> -       int result;
-> -
-> -       result =3D sprintf(buffer, "%x\n", ACPI_CA_VERSION);
-> -
-> -       return result;
-> +       seq_buf_printf(buffer, "%x\n", ACPI_CA_VERSION);
-> +       return 0;
->  }
->
->  module_param_call(acpica_version, NULL, param_get_acpica_version, NULL, =
-0444);
-> diff --git a/drivers/char/ipmi/ipmi_watchdog.c b/drivers/char/ipmi/ipmi_w=
-atchdog.c
-> index 91a99417d204..2bfec85ef331 100644
-> --- a/drivers/char/ipmi/ipmi_watchdog.c
-> +++ b/drivers/char/ipmi/ipmi_watchdog.c
-> @@ -197,11 +197,11 @@ static DEFINE_KERNEL_PARAM_OPS(param_ops_timeout, s=
-et_param_timeout,
->                                param_get_int);
->  #define param_check_timeout param_check_int
->
-> -typedef int (*action_fn)(const char *intval, char *outval);
-> +typedef int (*action_fn)(const char *intval, struct seq_buf *outval);
->
-> -static int action_op(const char *inval, char *outval);
-> -static int preaction_op(const char *inval, char *outval);
-> -static int preop_op(const char *inval, char *outval);
-> +static int action_op(const char *inval, struct seq_buf *outval);
-> +static int preaction_op(const char *inval, struct seq_buf *outval);
-> +static int preop_op(const char *inval, struct seq_buf *outval);
->  static void check_parms(void);
->
->  static int set_param_str(const char *val, const struct kernel_param *kp)
-> @@ -227,20 +227,11 @@ static int set_param_str(const char *val, const str=
-uct kernel_param *kp)
->         return rv;
->  }
->
-> -static int get_param_str(char *buffer, const struct kernel_param *kp)
-> +static int get_param_str(struct seq_buf *buffer, const struct kernel_par=
-am *kp)
->  {
->         action_fn fn =3D (action_fn) kp->arg;
-> -       int rv, len;
->
-> -       rv =3D fn(NULL, buffer);
-> -       if (rv)
-> -               return rv;
-> -
-> -       len =3D strlen(buffer);
-> -       buffer[len++] =3D '\n';
-> -       buffer[len] =3D 0;
-> -
-> -       return len;
-> +       return fn(NULL, buffer);
->  }
->
->
-> @@ -1154,12 +1145,12 @@ static int action_op_set_val(const char *inval)
->         return 0;
->  }
->
-> -static int action_op(const char *inval, char *outval)
-> +static int action_op(const char *inval, struct seq_buf *outval)
->  {
->         int rv;
->
->         if (outval)
-> -               strcpy(outval, action);
-> +               seq_buf_printf(outval, "%s\n", action);
->
->         if (!inval)
->                 return 0;
-> @@ -1186,12 +1177,12 @@ static int preaction_op_set_val(const char *inval=
-)
->         return 0;
->  }
->
-> -static int preaction_op(const char *inval, char *outval)
-> +static int preaction_op(const char *inval, struct seq_buf *outval)
->  {
->         int rv;
->
->         if (outval)
-> -               strcpy(outval, preaction);
-> +               seq_buf_printf(outval, "%s\n", preaction);
->
->         if (!inval)
->                 return 0;
-> @@ -1214,12 +1205,12 @@ static int preop_op_set_val(const char *inval)
->         return 0;
->  }
->
-> -static int preop_op(const char *inval, char *outval)
-> +static int preop_op(const char *inval, struct seq_buf *outval)
->  {
->         int rv;
->
->         if (outval)
-> -               strcpy(outval, preop);
-> +               seq_buf_printf(outval, "%s\n", preop);
->
->         if (!inval)
->                 return 0;
-> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
-g.c
-> index c87a5449ba8c..4ebc1e327849 100644
-> --- a/drivers/firmware/qemu_fw_cfg.c
-> +++ b/drivers/firmware/qemu_fw_cfg.c
-> @@ -860,7 +860,8 @@ static int fw_cfg_cmdline_set(const char *arg, const =
-struct kernel_param *kp)
->         return PTR_ERR_OR_ZERO(fw_cfg_cmdline_dev);
->  }
->
-> -static int fw_cfg_cmdline_get(char *buf, const struct kernel_param *kp)
-> +static int fw_cfg_cmdline_get(struct seq_buf *buf,
-> +                             const struct kernel_param *kp)
->  {
->         /* stay silent if device was not configured via the command
->          * line, or if the parameter name (ioport/mmio) doesn't match
-> @@ -873,22 +874,25 @@ static int fw_cfg_cmdline_get(char *buf, const stru=
-ct kernel_param *kp)
->
->         switch (fw_cfg_cmdline_dev->num_resources) {
->         case 1:
-> -               return snprintf(buf, PAGE_SIZE, PH_ADDR_PR_1_FMT,
-> -                               resource_size(&fw_cfg_cmdline_dev->resour=
-ce[0]),
-> -                               fw_cfg_cmdline_dev->resource[0].start);
-> +               seq_buf_printf(buf, PH_ADDR_PR_1_FMT,
-> +                              resource_size(&fw_cfg_cmdline_dev->resourc=
-e[0]),
-> +                              fw_cfg_cmdline_dev->resource[0].start);
-> +               return 0;
->         case 3:
-> -               return snprintf(buf, PAGE_SIZE, PH_ADDR_PR_3_FMT,
-> -                               resource_size(&fw_cfg_cmdline_dev->resour=
-ce[0]),
-> -                               fw_cfg_cmdline_dev->resource[0].start,
-> -                               fw_cfg_cmdline_dev->resource[1].start,
-> -                               fw_cfg_cmdline_dev->resource[2].start);
-> +               seq_buf_printf(buf, PH_ADDR_PR_3_FMT,
-> +                              resource_size(&fw_cfg_cmdline_dev->resourc=
-e[0]),
-> +                              fw_cfg_cmdline_dev->resource[0].start,
-> +                              fw_cfg_cmdline_dev->resource[1].start,
-> +                              fw_cfg_cmdline_dev->resource[2].start);
-> +               return 0;
->         case 4:
-> -               return snprintf(buf, PAGE_SIZE, PH_ADDR_PR_4_FMT,
-> -                               resource_size(&fw_cfg_cmdline_dev->resour=
-ce[0]),
-> -                               fw_cfg_cmdline_dev->resource[0].start,
-> -                               fw_cfg_cmdline_dev->resource[1].start,
-> -                               fw_cfg_cmdline_dev->resource[2].start,
-> -                               fw_cfg_cmdline_dev->resource[3].start);
-> +               seq_buf_printf(buf, PH_ADDR_PR_4_FMT,
-> +                              resource_size(&fw_cfg_cmdline_dev->resourc=
-e[0]),
-> +                              fw_cfg_cmdline_dev->resource[0].start,
-> +                              fw_cfg_cmdline_dev->resource[1].start,
-> +                              fw_cfg_cmdline_dev->resource[2].start,
-> +                              fw_cfg_cmdline_dev->resource[3].start);
-> +               return 0;
->         }
->
->         /* Should never get here */
-> diff --git a/drivers/gpu/drm/i915/i915_mitigations.c b/drivers/gpu/drm/i9=
-15/i915_mitigations.c
-> index 6061eae84e9c..99cb38f355b6 100644
-> --- a/drivers/gpu/drm/i915/i915_mitigations.c
-> +++ b/drivers/gpu/drm/i915/i915_mitigations.c
-> @@ -95,33 +95,37 @@ static int mitigations_set(const char *val, const str=
-uct kernel_param *kp)
->         return 0;
->  }
->
-> -static int mitigations_get(char *buffer, const struct kernel_param *kp)
-> +static int mitigations_get(struct seq_buf *buffer,
-> +                          const struct kernel_param *kp)
->  {
->         unsigned long local =3D READ_ONCE(mitigations);
-> -       int count, i;
->         bool enable;
-> +       int i;
->
-> -       if (!local)
-> -               return scnprintf(buffer, PAGE_SIZE, "%s\n", "off");
-> +       if (!local) {
-> +               seq_buf_printf(buffer, "%s\n", "off");
-> +               return 0;
-> +       }
->
->         if (local & BIT(BITS_PER_LONG - 1)) {
-> -               count =3D scnprintf(buffer, PAGE_SIZE, "%s,", "auto");
-> +               seq_buf_printf(buffer, "%s,", "auto");
->                 enable =3D false;
->         } else {
->                 enable =3D true;
-> -               count =3D 0;
->         }
->
->         for (i =3D 0; i < ARRAY_SIZE(names); i++) {
->                 if ((local & BIT(i)) !=3D enable)
->                         continue;
-> -
-> -               count +=3D scnprintf(buffer + count, PAGE_SIZE - count,
-> -                                  "%s%s,", enable ? "" : "!", names[i]);
-> +               seq_buf_printf(buffer, "%s%s,", enable ? "" : "!", names[=
-i]);
->         }
->
-> -       buffer[count - 1] =3D '\n';
-> -       return count;
-> +       /* Replace the trailing comma with a newline. */
-> +       if (!seq_buf_has_overflowed(buffer) && buffer->len > 0 &&
-> +           buffer->buffer[buffer->len - 1] =3D=3D ',')
-> +               buffer->buffer[buffer->len - 1] =3D '\n';
-> +
-> +       return 0;
->  }
->
->  static DEFINE_KERNEL_PARAM_OPS(ops, mitigations_set, mitigations_get);
-> diff --git a/drivers/infiniband/ulp/srp/ib_srp.c b/drivers/infiniband/ulp=
-/srp/ib_srp.c
-> index a81515f52a4f..4f53e939eec1 100644
-> --- a/drivers/infiniband/ulp/srp/ib_srp.c
-> +++ b/drivers/infiniband/ulp/srp/ib_srp.c
-> @@ -161,14 +161,15 @@ static struct ib_client srp_client =3D {
->
->  static struct ib_sa_client srp_sa_client;
->
-> -static int srp_tmo_get(char *buffer, const struct kernel_param *kp)
-> +static int srp_tmo_get(struct seq_buf *buffer, const struct kernel_param=
- *kp)
->  {
->         int tmo =3D *(int *)kp->arg;
->
->         if (tmo >=3D 0)
-> -               return sysfs_emit(buffer, "%d\n", tmo);
-> +               seq_buf_printf(buffer, "%d\n", tmo);
->         else
-> -               return sysfs_emit(buffer, "off\n");
-> +               seq_buf_printf(buffer, "off\n");
-> +       return 0;
->  }
->
->  static int srp_tmo_set(const char *val, const struct kernel_param *kp)
-> diff --git a/drivers/media/usb/uvc/uvc_driver.c b/drivers/media/usb/uvc/u=
-vc_driver.c
-> index 2338cab7fef9..1c5c40ce852d 100644
-> --- a/drivers/media/usb/uvc/uvc_driver.c
-> +++ b/drivers/media/usb/uvc/uvc_driver.c
-> @@ -2451,12 +2451,14 @@ static int uvc_reset_resume(struct usb_interface =
-*intf)
->   * Module parameters
->   */
->
-> -static int uvc_clock_param_get(char *buffer, const struct kernel_param *=
-kp)
-> +static int uvc_clock_param_get(struct seq_buf *buffer,
-> +                              const struct kernel_param *kp)
->  {
->         if (uvc_clock_param =3D=3D CLOCK_MONOTONIC)
-> -               return sprintf(buffer, "CLOCK_MONOTONIC");
-> +               seq_buf_printf(buffer, "CLOCK_MONOTONIC");
->         else
-> -               return sprintf(buffer, "CLOCK_REALTIME");
-> +               seq_buf_printf(buffer, "CLOCK_REALTIME");
-> +       return 0;
->  }
->
->  static int uvc_clock_param_set(const char *val, const struct kernel_para=
-m *kp)
-> diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
-> index 925373b98dff..af2dd668fe4d 100644
-> --- a/drivers/pci/pcie/aspm.c
-> +++ b/drivers/pci/pcie/aspm.c
-> @@ -1572,16 +1572,19 @@ static int pcie_aspm_set_policy(const char *val,
->         return 0;
->  }
->
-> -static int pcie_aspm_get_policy(char *buffer, const struct kernel_param =
-*kp)
-> +static int pcie_aspm_get_policy(struct seq_buf *buffer,
-> +                               const struct kernel_param *kp)
->  {
-> -       int i, cnt =3D 0;
-> -       for (i =3D 0; i < ARRAY_SIZE(policy_str); i++)
-> +       int i;
-> +
-> +       for (i =3D 0; i < ARRAY_SIZE(policy_str); i++) {
->                 if (i =3D=3D aspm_policy)
-> -                       cnt +=3D sprintf(buffer + cnt, "[%s] ", policy_st=
-r[i]);
-> +                       seq_buf_printf(buffer, "[%s] ", policy_str[i]);
->                 else
-> -                       cnt +=3D sprintf(buffer + cnt, "%s ", policy_str[=
-i]);
-> -       cnt +=3D sprintf(buffer + cnt, "\n");
-> -       return cnt;
-> +                       seq_buf_printf(buffer, "%s ", policy_str[i]);
-> +       }
-> +       seq_buf_putc(buffer, '\n');
-> +       return 0;
->  }
->
->  module_param_call(policy, pcie_aspm_set_policy, pcie_aspm_get_policy,
-> diff --git a/drivers/scsi/fcoe/fcoe_transport.c b/drivers/scsi/fcoe/fcoe_=
-transport.c
-> index 88d85fc9a52a..aa10514ec46e 100644
-> --- a/drivers/scsi/fcoe/fcoe_transport.c
-> +++ b/drivers/scsi/fcoe/fcoe_transport.c
-> @@ -23,7 +23,8 @@ MODULE_LICENSE("GPL v2");
->
->  static int fcoe_transport_create(const char *, const struct kernel_param=
- *);
->  static int fcoe_transport_destroy(const char *, const struct kernel_para=
-m *);
-> -static int fcoe_transport_show(char *buffer, const struct kernel_param *=
-kp);
-> +static int fcoe_transport_show(struct seq_buf *buffer,
-> +                              const struct kernel_param *kp);
->  static struct fcoe_transport *fcoe_transport_lookup(struct net_device *d=
-evice);
->  static struct fcoe_transport *fcoe_netdev_map_lookup(struct net_device *=
-device);
->  static int fcoe_transport_enable(const char *, const struct kernel_param=
- *);
-> @@ -595,22 +596,21 @@ int fcoe_transport_detach(struct fcoe_transport *ft=
-)
->  }
->  EXPORT_SYMBOL(fcoe_transport_detach);
->
-> -static int fcoe_transport_show(char *buffer, const struct kernel_param *=
-kp)
-> +static int fcoe_transport_show(struct seq_buf *buffer,
-> +                              const struct kernel_param *kp)
->  {
-> -       int i, j;
->         struct fcoe_transport *ft =3D NULL;
->
-> -       i =3D j =3D sprintf(buffer, "Attached FCoE transports:");
-> +       seq_buf_printf(buffer, "Attached FCoE transports:");
->         mutex_lock(&ft_mutex);
-> -       list_for_each_entry(ft, &fcoe_transports, list) {
-> -               if (i >=3D PAGE_SIZE - IFNAMSIZ)
-> -                       break;
-> -               i +=3D snprintf(&buffer[i], IFNAMSIZ, "%s ", ft->name);
-> +       if (list_empty(&fcoe_transports)) {
-> +               seq_buf_printf(buffer, "none");
-> +       } else {
-> +               list_for_each_entry(ft, &fcoe_transports, list)
-> +                       seq_buf_printf(buffer, "%s ", ft->name);
->         }
->         mutex_unlock(&ft_mutex);
-> -       if (i =3D=3D j)
-> -               i +=3D snprintf(&buffer[i], IFNAMSIZ, "none");
-> -       return i;
-> +       return 0;
->  }
->
->  static int __init fcoe_transport_init(void)
-> diff --git a/drivers/thermal/intel/intel_powerclamp.c b/drivers/thermal/i=
-ntel/intel_powerclamp.c
-> index 98fbc6892714..50ec1a0ff1ab 100644
-> --- a/drivers/thermal/intel/intel_powerclamp.c
-> +++ b/drivers/thermal/intel/intel_powerclamp.c
-> @@ -101,15 +101,13 @@ static int duration_set(const char *arg, const stru=
-ct kernel_param *kp)
->         return ret;
->  }
->
-> -static int duration_get(char *buf, const struct kernel_param *kp)
-> +static int duration_get(struct seq_buf *buf, const struct kernel_param *=
-kp)
->  {
-> -       int ret;
-> -
->         mutex_lock(&powerclamp_lock);
-> -       ret =3D sysfs_emit(buf, "%d\n", duration / 1000);
-> +       seq_buf_printf(buf, "%d\n", duration / 1000);
->         mutex_unlock(&powerclamp_lock);
->
-> -       return ret;
-> +       return 0;
->  }
->
->  static DEFINE_KERNEL_PARAM_OPS(duration_ops, duration_set, duration_get)=
-;
-> @@ -192,12 +190,14 @@ static int cpumask_set(const char *arg, const struc=
-t kernel_param *kp)
->         return ret;
->  }
->
-> -static int cpumask_get(char *buf, const struct kernel_param *kp)
-> +static int cpumask_get(struct seq_buf *buf, const struct kernel_param *k=
-p)
->  {
->         if (!cpumask_available(idle_injection_cpu_mask))
->                 return -ENODEV;
->
-> -       return cpumap_print_to_pagebuf(false, buf, idle_injection_cpu_mas=
-k);
-> +       seq_buf_printf(buf, "%*pb\n", nr_cpu_ids,
-> +                      cpumask_bits(idle_injection_cpu_mask));
-> +       return 0;
->  }
->
->  static DEFINE_KERNEL_PARAM_OPS(cpumask_ops, cpumask_set, cpumask_get);
-> diff --git a/drivers/tty/hvc/hvc_iucv.c b/drivers/tty/hvc/hvc_iucv.c
-> index 29612a4a32cb..b27c1dfbd249 100644
-> --- a/drivers/tty/hvc/hvc_iucv.c
-> +++ b/drivers/tty/hvc/hvc_iucv.c
-> @@ -1256,36 +1256,32 @@ static int param_set_vmidfilter(const char *val, =
-const struct kernel_param *kp)
->
->  /**
->   * param_get_vmidfilter() - Get z/VM user ID filter
-> - * @buffer:    Buffer to store z/VM user ID filter,
-> - *             (buffer size assumption PAGE_SIZE)
-> + * @buffer:    seq_buf to store z/VM user ID filter
->   * @kp:                Kernel parameter pointing to the hvc_iucv_filter =
-array
->   *
->   * The function stores the filter as a comma-separated list of z/VM user=
- IDs
->   * in @buffer. Typically, sysfs routines call this function for attr sho=
-w.
->   */
-> -static int param_get_vmidfilter(char *buffer, const struct kernel_param =
-*kp)
-> +static int param_get_vmidfilter(struct seq_buf *buffer,
-> +                               const struct kernel_param *kp)
->  {
-> -       int rc;
->         size_t index, len;
->         void *start, *end;
->
->         if (!machine_is_vm() || !hvc_iucv_devices)
->                 return -ENODEV;
->
-> -       rc =3D 0;
->         read_lock_bh(&hvc_iucv_filter_lock);
->         for (index =3D 0; index < hvc_iucv_filter_size; index++) {
->                 start =3D hvc_iucv_filter + (8 * index);
->                 end   =3D memchr(start, ' ', 8);
->                 len   =3D (end) ? end - start : 8;
-> -               memcpy(buffer + rc, start, len);
-> -               rc +=3D len;
-> -               buffer[rc++] =3D ',';
-> +               if (index)
-> +                       seq_buf_putc(buffer, ',');
-> +               seq_buf_printf(buffer, "%.*s", (int)len, (char *)start);
->         }
->         read_unlock_bh(&hvc_iucv_filter_lock);
-> -       if (rc)
-> -               buffer[--rc] =3D '\0';    /* replace last comma and updat=
-e rc */
-> -       return rc;
-> +       return 0;
->  }
->
->  #define param_check_vmidfilter(name, p) __param_check(name, p, void)
-> diff --git a/drivers/usb/storage/usb.c b/drivers/usb/storage/usb.c
-> index 71dd623b95c9..637e1b8f622f 100644
-> --- a/drivers/usb/storage/usb.c
-> +++ b/drivers/usb/storage/usb.c
-> @@ -115,27 +115,22 @@ static int parse_delay_str(const char *str, int nde=
-cimals, const char *suffix,
->   * @val: The integer value to format, scaled by 10^(@ndecimals).
->   * @ndecimals: Number of decimal to scale down.
->   * @suffix: Suffix string to format.
-> - * @str: Where to store the formatted string.
-> - * @size: The size of buffer for @str.
-> + * @s: Where to store the formatted string.
->   *
->   * Format an integer value in @val scale down by 10^(@ndecimals) without=
- @suffix
->   * if @val is divisible by 10^(@ndecimals).
->   * Otherwise format a value in @val just as it is with @suffix
-> - *
-> - * Returns the number of characters written into @str.
->   */
-> -static int format_delay_ms(unsigned int val, int ndecimals, const char *=
-suffix,
-> -                       char *str, int size)
-> +static void format_delay_ms(unsigned int val, int ndecimals, const char =
-*suffix,
-> +                           struct seq_buf *s)
->  {
->         u64 delay_ms =3D val;
->         unsigned int rem =3D do_div(delay_ms, int_pow(10, ndecimals));
-> -       int ret;
->
->         if (rem)
-> -               ret =3D scnprintf(str, size, "%u%s\n", val, suffix);
-> +               seq_buf_printf(s, "%u%s\n", val, suffix);
->         else
-> -               ret =3D scnprintf(str, size, "%u\n", (unsigned int)delay_=
-ms);
-> -       return ret;
-> +               seq_buf_printf(s, "%u\n", (unsigned int)delay_ms);
->  }
->
->  static int delay_use_set(const char *s, const struct kernel_param *kp)
-> @@ -151,11 +146,12 @@ static int delay_use_set(const char *s, const struc=
-t kernel_param *kp)
->         return 0;
->  }
->
-> -static int delay_use_get(char *s, const struct kernel_param *kp)
-> +static int delay_use_get(struct seq_buf *s, const struct kernel_param *k=
-p)
->  {
->         unsigned int delay_ms =3D *((unsigned int *)kp->arg);
->
-> -       return format_delay_ms(delay_ms, 3, "ms", s, PAGE_SIZE);
-> +       format_delay_ms(delay_ms, 3, "ms", s);
-> +       return 0;
->  }
->
->  static DEFINE_KERNEL_PARAM_OPS(delay_use_ops, delay_use_set, delay_use_g=
-et);
-> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-> index f6df9c76ee81..81a7455e4643 100644
-> --- a/drivers/virtio/virtio_mmio.c
-> +++ b/drivers/virtio/virtio_mmio.c
-> @@ -728,24 +728,21 @@ static int vm_cmdline_set(const char *device,
->
->  static int vm_cmdline_get_device(struct device *dev, void *data)
->  {
-> -       char *buffer =3D data;
-> -       unsigned int len =3D strlen(buffer);
-> +       struct seq_buf *s =3D data;
->         struct platform_device *pdev =3D to_platform_device(dev);
->
-> -       snprintf(buffer + len, PAGE_SIZE - len, "0x%llx@0x%llx:%llu:%d\n"=
-,
-> -                       pdev->resource[0].end - pdev->resource[0].start +=
- 1ULL,
-> -                       (unsigned long long)pdev->resource[0].start,
-> -                       (unsigned long long)pdev->resource[1].start,
-> -                       pdev->id);
-> +       seq_buf_printf(s, "0x%llx@0x%llx:%llu:%d\n",
-> +                      pdev->resource[0].end - pdev->resource[0].start + =
-1ULL,
-> +                      (unsigned long long)pdev->resource[0].start,
-> +                      (unsigned long long)pdev->resource[1].start,
-> +                      pdev->id);
->         return 0;
->  }
->
-> -static int vm_cmdline_get(char *buffer, const struct kernel_param *kp)
-> +static int vm_cmdline_get(struct seq_buf *s, const struct kernel_param *=
-kp)
->  {
-> -       buffer[0] =3D '\0';
-> -       device_for_each_child(&vm_cmdline_parent, buffer,
-> -                       vm_cmdline_get_device);
-> -       return strlen(buffer) + 1;
-> +       device_for_each_child(&vm_cmdline_parent, s, vm_cmdline_get_devic=
-e);
-> +       return 0;
->  }
->
->  static DEFINE_KERNEL_PARAM_OPS(vm_cmdline_param_ops, vm_cmdline_set,
-> diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
-> index cf0405ba0dbd..123f061c2fb2 100644
-> --- a/lib/dynamic_debug.c
-> +++ b/lib/dynamic_debug.c
-> @@ -17,6 +17,7 @@
->  #include <linux/module.h>
->  #include <linux/moduleparam.h>
->  #include <linux/kallsyms.h>
-> +#include <linux/seq_buf.h>
->  #include <linux/types.h>
->  #include <linux/mutex.h>
->  #include <linux/proc_fs.h>
-> @@ -787,7 +788,8 @@ EXPORT_SYMBOL(param_set_dyndbg_classes);
->   * altered by direct >control.  Displays 0x for DISJOINT, 0-N for
->   * LEVEL Returns: #chars written or <0 on error
->   */
-> -int param_get_dyndbg_classes(char *buffer, const struct kernel_param *kp=
-)
-> +int param_get_dyndbg_classes(struct seq_buf *buffer,
-> +                            const struct kernel_param *kp)
->  {
->         const struct ddebug_class_param *dcp =3D kp->arg;
->         const struct ddebug_class_map *map =3D dcp->map;
-> @@ -796,11 +798,13 @@ int param_get_dyndbg_classes(char *buffer, const st=
-ruct kernel_param *kp)
->
->         case DD_CLASS_TYPE_DISJOINT_NAMES:
->         case DD_CLASS_TYPE_DISJOINT_BITS:
-> -               return scnprintf(buffer, PAGE_SIZE, "0x%lx\n", *dcp->bits=
-);
-> +               seq_buf_printf(buffer, "0x%lx\n", *dcp->bits);
-> +               return 0;
->
->         case DD_CLASS_TYPE_LEVEL_NAMES:
->         case DD_CLASS_TYPE_LEVEL_NUM:
-> -               return scnprintf(buffer, PAGE_SIZE, "%d\n", *dcp->lvl);
-> +               seq_buf_printf(buffer, "%d\n", *dcp->lvl);
-> +               return 0;
->         default:
->                 return -1;
->         }
-> --
-> 2.34.1
->
+> arcnet: com90xx: Mark cards and numcards variables as __ro_after_init
+>=20
+> This commit marks the cards and numcards variables as __ro_after_init si=
+nce
+> they are only initialized during the init phase and are never changed
+> afterward.
+>=20
+> > diff --git a/drivers/net/arcnet/com90xx.c b/drivers/net/arcnet/com90xx=
+.c
+> > index b3b287c165617..bdcdccbfb0017 100644
+> > --- a/drivers/net/arcnet/com90xx.c
+> > +++ b/drivers/net/arcnet/com90xx.c
+> > @@ -67,8 +67,8 @@ static void com90xx_copy_from_card(struct net_device=
+ *dev, int bufnum,
+> > =20
+> >  /* Known ARCnet cards */
+> > =20
+> > -static struct net_device *cards[16];
+> > -static int numcards;
+> > +static struct net_device *cards[16] __ro_after_init;
+> > +static int numcards __ro_after_init;
+>=20
+> Simon says: I believe this is an existing bug rather than a regression.
+>             But I am concerned that this patch may make it worse.
+> 	    So I'm wondering if it should be fixed at the same time
+> 	    by a series containing:
+> 	    1. a patch to fix this overflow
+> 	    2. this patch (to set __ro_after_init)
+>=20
+> Could this change exacerbate an existing regression where we overflow th=
+e
+> cards array?
+>=20
+> com90xx_probe() can test up to 32 default I/O ports. For each valid devi=
+ce
+> found, com90xx_found() unconditionally executes:
+>=20
+> drivers/net/arcnet/com90xx.c:com90xx_found() {
+>     ...
+> 	if (register_netdev(dev))
+> 		goto err_unmap;
+>=20
+> 	cards[numcards++] =3D dev;
+> 	return 0;
+>     ...
+> }
+>=20
+> If more than 16 devices are successfully probed, this writes past the ca=
+rds
+> array. Since this patch marks these variables as __ro_after_init, they a=
+re
+> now placed adjacently in memory.
+>=20
+> Is it possible that the overflow will now clobber numcards with a pointe=
+r
+> value, leading to an out-of-bounds index on the next iteration?
+>=20
+> Simon says: The issue flagged below also appears to be an existing bug
+>             rather than a regression. And I don't believe it impacts
+> 	    this patch or needs to block progress of it.
+>=20
+> Additionally, while reviewing this code, I noticed a second potential
+> regression in com90xx_found(). Are we registering the IRQ handler before
+> initializing the function pointers?
+>=20
+> drivers/net/arcnet/com90xx.c:com90xx_found() {
+>     ...
+> 	/* reserve the irq */
+> 	if (request_irq(airq, arcnet_interrupt, 0, "arcnet (90xx)", dev)) {
+> 		arc_printk(D_NORMAL, dev, "Can't get IRQ %d!\n", airq);
+> 		goto err_release_mem;
+> 	}
+> 	dev->irq =3D airq;
+>=20
+> 	/* Initialize the rest of the device structure. */
+> 	lp->card_name =3D "COM90xx";
+> 	lp->hw.command =3D com90xx_command;
+> 	lp->hw.status =3D com90xx_status;
+>     ...
+> }
+>=20
+> If an interrupt triggers immediately after request_irq() completes (e.g.=
+, due
+> to a spurious interrupt), arcnet_interrupt() will execute, evaluate
+> !netif_running(dev) as true, and invoke lp->hw.status(dev).
+>=20
+> Because alloc_arcdev() zero-allocates the private data, lp->hw.status is=
+ NULL
+> at this point. Can this lead to a NULL pointer dereference?
+
+Hi Simon,
+
+I'm a newbie in the linux kernel development and I believe I don't have th=
+e
+experience to fix all the issues showed in this review by myself.
+
+Also, you tell me to leave it be as is because it has no real attention.
+So, my question is:
+
+Is it worth that I try to solve the issues mentioned or not?
+I am totally confused.
+
+Best regards,
+
+Len
 
