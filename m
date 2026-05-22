@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-290679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290681-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gDkrNNLqD2omRgYAu9opvQ
-	(envelope-from <netdev+bounces-290679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:34:10 +0200
+	id KFB4CnnrD2omRgYAu9opvQ
+	(envelope-from <netdev+bounces-290681-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:36:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 539B95AF2F6
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 799505AF340
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:36:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E28B303C4D1
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 05:31:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1638D305B013
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 05:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F533A169D;
-	Fri, 22 May 2026 05:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A273A5E7A;
+	Fri, 22 May 2026 05:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJsF2ZtY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzSnbTOn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1499389DE3;
-	Fri, 22 May 2026 05:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4C239D6E5;
+	Fri, 22 May 2026 05:31:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779427869; cv=none; b=pLFoCFTgtVp1t9n+Oha0VYkV0UgY8utoPNdLorcOzBP2/Fz0dCemq7b2VEJvwdt0NCTyEbQqeP36GR/cPOsVNgpADPf8bRi3v/SnCS7GMWxpNOKQ7dnOD7enVQz+Ur32yJSUtefccUXECJa6es4KPE/n/hnNJqXJunfLRTjqca0=
+	t=1779427871; cv=none; b=e7owNSqzVw8S02EJ9iFGpdg06NPf26rjn3f/ZFuBJfY49PSYZ7jtuStYhGmPxYf5pziUZkHM4l9PXIpRCj8YPRsflbPu180s4Sr4nCY+Of+dnLBYCTI0v2PZl3KXrbA1if0AKV6S3LOAGyH67TcJVMFf+EJfx+W80vwiNFf7AJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779427869; c=relaxed/simple;
-	bh=olYUFSu6SpRXYOxnbxyXzaK1+ZLTFwClbiEhOovDBwY=;
+	s=arc-20240116; t=1779427871; c=relaxed/simple;
+	bh=AR2nEb1BVonvAdMGkQZ1BqhRzgsbWMLcsp9YHHUC2O4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rOqWLsY/C5C2LfSZH3A0tmuCwgeky2/S66cZ1Zz25WILoek8UyG85QnpdbuRP9cdSmkzSXtp4Qo9EtI6mKrk5IdJA4dB3Hlr8vAH9WMDVda72oDHPmnw8O+gL0BTwvQU0yoSpl3yZwrO/cTCQlozMVGUemLNN9+A3SMXENf2enc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJsF2ZtY; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 859B51F00A3E;
-	Fri, 22 May 2026 05:31:05 +0000 (UTC)
+	 MIME-Version; b=Ch/efxii4hjRYMgVCDgJonYy4+bA3B+en7yU7o1ZqKkZBHEDPnyC8x0uvgMMMcPv0cESBKw3uxnWFKsCHCVJD0CAfq0IWmfNSxnnt5j8ISHf7ZJ0TMf173VRenR9aVCE/Vq/cy14hrPSsvqDEtPY69RxTY1dlI1LpbwgNwk7N7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzSnbTOn; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B798F1F0155C;
+	Fri, 22 May 2026 05:31:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779427866;
-	bh=5cG91g8TflO4oqr+MQMSWsnVgz6/nNgqVLxInjxjlf0=;
+	s=k20260515; t=1779427867;
+	bh=4QQndDPWvh1YB8HkexAm4q1eabiEB73T4wQ84oA0onE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=IJsF2ZtYdzNtzuQZg3Ic5EeSNAHTEHe7KoTfhnj6b+BGH71tXhhxbFymJ1GMvt0Zv
-	 Ia9qEFNZKpU8IVXsVwyh6aknACjMil9DGwC7t940CWiIVJdEqU+4V320DEu2Js58cW
-	 qpa1iDsn0NknrlDliTaQ0im+DxbAgjDjF9sGYD+461OuZ2BtqjMUlRI3FVJe0Aw9mP
-	 EsAWC4m6bIFbU1XpMLyBzBc2nMW+SIMtIPljwYJ9F2kB3P/V1EC7wFl/WMjrOP6n6b
-	 vPf6e5c6F/uwNf+oBpnt83bT/9jsjEo8qjrn527J4PfdXFaSRvcrvzarIO2mC6ITXB
-	 TJ/s/9N32lw3w==
+	b=lzSnbTOn/XMNlD3+tQdExBgv0rIz2RsTJ1n3mmbofXN96ZKum/3ACo0ckijqWeXCm
+	 Xn/bBS8YCxV92B5V5HaGg5FqoOTOSZ41kyQFOG+ZaAuH6OuqhatSLOe2sBRp64uZJi
+	 Fvx9+ASKE8pJB144ytI3gDNnbX7GQAWEsd+UbBUeDQ4BzK5SkBfoRrgrnL1forjnLu
+	 GBHGRNgr80qDumtsM7cLdE2m/3zPVM+ntny/ot4AXn18Ab4538v4k637Izf9883w0V
+	 /YyQg9QWxXKUOyDwGf1pbbd/khpC5dfC8ZVl2anoXdNtTDzU6tk8/ee9rgIbVKN4u1
+	 49sSrAmk/5Oeg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Dmitry Safonov <0x7f454c46@gmail.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH net-next 4/6] crypto: api - Remove per-tfm refcount
-Date: Fri, 22 May 2026 00:30:26 -0500
-Message-ID: <20260522053028.91165-5-ebiggers@kernel.org>
+Subject: [PATCH net-next 5/6] crypto: api - Fold __crypto_alloc_tfmgfp() into __crypto_alloc_tfm()
+Date: Fri, 22 May 2026 00:30:27 -0500
+Message-ID: <20260522053028.91165-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260522053028.91165-1-ebiggers@kernel.org>
 References: <20260522053028.91165-1-ebiggers@kernel.org>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,zx2c4.com,gondor.apana.org.au,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-290679-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290681-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -102,113 +102,84 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 539B95AF2F6
+X-Rspamd-Queue-Id: 799505AF340
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This reverts commit ae131f4970f0 ("crypto: api - Add crypto_tfm_get").
+This reverts commit fa3b3565f3ac ("crypto: api - Add
+__crypto_alloc_tfmgfp").
 
-The refcount in struct crypto_tfm was added solely to support
-crypto_clone_tfm().  Before then it was a simple non-refcounted object.
-
-Since crypto_clone_tfm() has been removed, remove the refcount as well.
-
-Note that this eliminates an expensive atomic operation from every tfm
-freeing operation.  So this revert doesn't just remove unused code, but
-it also fixes a performance regression.
+Fold __crypto_alloc_tfmgfp() into its only remaining caller,
+__crypto_alloc_tfm().  Previously __crypto_alloc_tfmgfp() was called by
+crypto_clone_cipher(), but crypto_clone_cipher() was removed.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/api.c           | 4 ----
- crypto/internal.h      | 6 ------
- include/linux/crypto.h | 1 -
- 3 files changed, 11 deletions(-)
+ crypto/api.c      | 13 +++----------
+ crypto/internal.h |  2 --
+ 2 files changed, 3 insertions(+), 12 deletions(-)
 
 diff --git a/crypto/api.c b/crypto/api.c
-index d019d1979857..be9ee104ffc2 100644
+index be9ee104ffc2..5bd0db7fa665 100644
 --- a/crypto/api.c
 +++ b/crypto/api.c
-@@ -416,11 +416,10 @@ struct crypto_tfm *__crypto_alloc_tfmgfp(struct crypto_alg *alg, u32 type,
- 	tfm = kzalloc(tfm_size, gfp);
+@@ -403,19 +403,19 @@ void crypto_shoot_alg(struct crypto_alg *alg)
+ 	alg->cra_flags |= CRYPTO_ALG_DYING;
+ 	up_write(&crypto_alg_sem);
+ }
+ EXPORT_SYMBOL_GPL(crypto_shoot_alg);
+ 
+-struct crypto_tfm *__crypto_alloc_tfmgfp(struct crypto_alg *alg, u32 type,
+-					 u32 mask, gfp_t gfp)
++struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
++				      u32 mask)
+ {
+ 	struct crypto_tfm *tfm;
+ 	unsigned int tfm_size;
+ 	int err = -ENOMEM;
+ 
+ 	tfm_size = sizeof(*tfm) + crypto_ctxsize(alg, type, mask);
+-	tfm = kzalloc(tfm_size, gfp);
++	tfm = kzalloc(tfm_size, GFP_KERNEL);
  	if (tfm == NULL)
  		goto out_err;
  
  	tfm->__crt_alg = alg;
--	refcount_set(&tfm->refcnt, 1);
  
- 	if (!tfm->exit && alg->cra_init && (err = alg->cra_init(tfm)))
- 		goto cra_init_failed;
- 
- 	goto out;
-@@ -517,11 +516,10 @@ static void *crypto_alloc_tfmmem(struct crypto_alg *alg,
- 		return ERR_PTR(-ENOMEM);
- 
- 	tfm = (struct crypto_tfm *)(mem + tfmsize);
- 	tfm->__crt_alg = alg;
- 	tfm->node = node;
--	refcount_set(&tfm->refcnt, 1);
- 
- 	return mem;
+@@ -432,17 +432,10 @@ struct crypto_tfm *__crypto_alloc_tfmgfp(struct crypto_alg *alg, u32 type,
+ out_err:
+ 	tfm = ERR_PTR(err);
+ out:
+ 	return tfm;
  }
+-EXPORT_SYMBOL_GPL(__crypto_alloc_tfmgfp);
+-
+-struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
+-				      u32 mask)
+-{
+-	return __crypto_alloc_tfmgfp(alg, type, mask, GFP_KERNEL);
+-}
+ EXPORT_SYMBOL_GPL(__crypto_alloc_tfm);
  
- void *crypto_create_tfm_node(struct crypto_alg *alg,
-@@ -647,12 +645,10 @@ void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
- 	struct crypto_alg *alg;
- 
- 	if (IS_ERR_OR_NULL(mem))
- 		return;
- 
--	if (!refcount_dec_and_test(&tfm->refcnt))
--		return;
- 	alg = tfm->__crt_alg;
- 
- 	if (!tfm->exit && alg->cra_exit)
- 		alg->cra_exit(tfm);
- 	crypto_exit_ops(tfm);
+ /*
+  *	crypto_alloc_base - Locate algorithm and allocate transform
+  *	@alg_name: Name of algorithm
 diff --git a/crypto/internal.h b/crypto/internal.h
-index 96f84abfac91..b6e437f463d4 100644
+index b6e437f463d4..b0a10986f61e 100644
 --- a/crypto/internal.h
 +++ b/crypto/internal.h
-@@ -8,11 +8,10 @@
- #ifndef _CRYPTO_INTERNAL_H
- #define _CRYPTO_INTERNAL_H
+@@ -117,12 +117,10 @@ void crypto_alg_tested(const char *name, int err);
  
- #include <crypto/algapi.h>
- #include <linux/completion.h>
--#include <linux/err.h>
- #include <linux/jump_label.h>
- #include <linux/list.h>
- #include <linux/module.h>
- #include <linux/notifier.h>
- #include <linux/numa.h>
-@@ -207,12 +206,7 @@ static inline void crypto_yield(u32 flags)
- static inline int crypto_is_test_larval(struct crypto_larval *larval)
- {
- 	return larval->alg.cra_driver_name[0];
- }
- 
--static inline struct crypto_tfm *crypto_tfm_get(struct crypto_tfm *tfm)
--{
--	return refcount_inc_not_zero(&tfm->refcnt) ? tfm : ERR_PTR(-EOVERFLOW);
--}
--
- #endif	/* _CRYPTO_INTERNAL_H */
- 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index a2137e19be7d..b7c97f1c47c9 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -407,11 +407,10 @@ int crypto_has_alg(const char *name, u32 type, u32 mask);
-  * and core processing logic.  Managed via crypto_alloc_*() and
-  * crypto_free_*(), as well as the various helpers below.
-  */
- 
- struct crypto_tfm {
--	refcount_t refcnt;
- 
- 	u32 crt_flags;
- 
- 	int node;
+ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
+ 			  struct crypto_alg *nalg);
+ void crypto_remove_final(struct list_head *list);
+ void crypto_shoot_alg(struct crypto_alg *alg);
+-struct crypto_tfm *__crypto_alloc_tfmgfp(struct crypto_alg *alg, u32 type,
+-					 u32 mask, gfp_t gfp);
+ struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
+ 				      u32 mask);
+ void *crypto_create_tfm_node(struct crypto_alg *alg,
+ 			const struct crypto_type *frontend, int node);
  
 -- 
 2.54.0
