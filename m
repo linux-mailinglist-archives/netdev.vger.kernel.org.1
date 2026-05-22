@@ -1,126 +1,141 @@
-Return-Path: <netdev+bounces-290910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290911-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aEHLNcafEGpuawYAu9opvQ
-	(envelope-from <netdev+bounces-290910-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 20:26:14 +0200
+	id qCeuMXehEGpuawYAu9opvQ
+	(envelope-from <netdev+bounces-290911-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 20:33:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 993815B900B
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 20:26:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 212A35B9180
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 20:33:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2ABFF301D5AE
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 18:25:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07C4B30038D9
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 18:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2D037204A;
-	Fri, 22 May 2026 18:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B692636683D;
+	Fri, 22 May 2026 18:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qvgo6fGN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfIvkdJi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270E62F1FDE;
-	Fri, 22 May 2026 18:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE6E2F1FDE;
+	Fri, 22 May 2026 18:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779474321; cv=none; b=Jk3hEswcbYRbt2Jm04QohQitLPyE8Lgn3TQO1ECLpaaR7YysQzkSLwx4taalbX20uR0QxHaR8kcLZo5tJCNf4HUTwd/j+yibx++AlU2kmf0bMVrXSUi64DVctNOhLcE0skAkaXTpxCIhYI3Y8RBdI0/MSq7UuqadknZ4MIRw6mw=
+	t=1779474597; cv=none; b=ly1dQlvLoc4y2WGpYv7OgZ/FRTW2tL0Guy2Nb1xhUpySF71RlcteC4UoTVG6yK80A5s4ayPot4SKXokWg7AHN9s51BcLUwM+lpmFIwCyims9xmjqqPEBkEegr2I57xZB7JSfbPEOdHlV5YrMfGn9i+5DPjn17ICG5X14FcpNi8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779474321; c=relaxed/simple;
-	bh=xewNZVxD7OiAQJMZ0eU3MQI9VUqRN32jLI24bdZwnmY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A418hbyg1CrFYtDZN/LFOjuzwD3iTAAIhUXkLzVBE3V9mG6dMh/906A7zvnx8wF+Eu7lqEXviSJkkqY8auMsV88+GVjKibap4ZkuxOltetHKZ0C2eKzcuphKDsvK1z7WYe/fSfKRcU90ZY6ZGilWSDqarTfPYXTQx4Bg/CV46Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qvgo6fGN; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82CCE1F000E9;
-	Fri, 22 May 2026 18:25:19 +0000 (UTC)
+	s=arc-20240116; t=1779474597; c=relaxed/simple;
+	bh=5/AhXF9kGVhULDok/+rh/JjfPACpT4ecZvgjeEKRBIk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GOeq2KdjlvbJ8c9pUdCNeyJ3wXFPDEUIuvn2gVR1yHlC7yMBeTzJWb6Lfw/TkaqJpCy2HMhzi3OQqt4Ho4R9diHNxdqSlYNl2Of9FQ15++dfQeQ+FxAljBD9CRfbLjzmOQjEvsL7HuJr718htowmRmhb7EpoPxENLd3a8J/XfZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfIvkdJi; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406351F000E9;
+	Fri, 22 May 2026 18:29:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779474319;
-	bh=CNx7Y5Epk1GGzfGDUsLjJG2duJ/Gc9CxD9svr1n6R00=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Qvgo6fGNniRU0zvysx2nUwIgVUXfjsFJNeoGmfAvBFMqAX0gDcgLUfRnjHXX5RQXq
-	 GWZAwXVB/4fjKFUcod1DF6eOMwg8iT2KqhKAuECqfKMjLRtudw6rat+4IfsC45LwGH
-	 iP+Y9iuJbf1iUPp9fnj/1iqBEBwpv7MDq8Z8lDVPOVFTpZvO1lAopOKBqJn3wBizlD
-	 Bb+6dZvaCR45/n57blOlFTrje7useotgGvkyF0ptsAXOz88Ys6JaSSAXkPCXp6h3Yf
-	 zqN4aRY4H1qGGLQeQPSxVFEynbvl5n3GxXNitCBu+us7dadOydDYvE0xwcdrEBQi/x
-	 nmQcP/VLAQguA==
-Date: Fri, 22 May 2026 11:25:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, robh@kernel.org,
- devicetree@vger.kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v8 10/10] net: airoha: Support multiple LAN/WAN
- interfaces for hw MAC address configuration
-Message-ID: <20260522112514.1ad6e947@kicinski-fedora-PF5CM1Y0>
-In-Reply-To: <ag2t4eVe4DcfU2yZ@lore-desk>
-References: <20260519-airoha-eth-multi-serdes-v8-10-6bd70e329df6@kernel.org>
-	<20260520085934.54AD01F00894@smtp.kernel.org>
-	<ag2t4eVe4DcfU2yZ@lore-desk>
+	s=k20260515; t=1779474596;
+	bh=o8IBLuCs7YOJ3hdmxOMAExhPHKvXLTD+QeFBC0POzSQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=YfIvkdJi7cgsO3LpTKzl01+X3T1RD/v8HXscwZOe99Cy/0vW0rSevxv46G9+fylPX
+	 TVspgAhcerPGGr+LoM8c8tnd0WRnVdr90loef39n7lMg6xuikTObFs7VziqNKwWmfR
+	 X+Gc34lAYlT8/gWjgrtQPSr5vrgqu4MlYRNKw/UPJ/yb39642samKAzxPkwF8F519d
+	 PEGhu9XTCyyxBKo0ss5yEG0Jbmnz2/Y3TvgMTF2rE6LvnXfBuEZ+bAmhYINwX1Pr5Q
+	 2JjvwlLGA2N0CKzudI4ToKoO6WxjOLK+beL2JQjY25PfvfGfOhF5K/F9AdTN1GANiV
+	 6JJ3ftimjX3Fg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B683930FB9;
+	Fri, 22 May 2026 18:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] vsock: keep poll shutdown state consistent
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177947460540.1324219.4145730624585924301.git-patchwork-notify@kernel.org>
+Date: Fri, 22 May 2026 18:30:05 +0000
+References: <20260519165636.62542-1-ziyuzhang201@gmail.com>
+In-Reply-To: <20260519165636.62542-1-ziyuzhang201@gmail.com>
+To: Ziyu Zhang <ziyuzhang201@gmail.com>
+Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, acking@vmware.com,
+ georgezhang@vmware.com, dtor@vmware.com, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ longli@microsoft.com, stefanha@redhat.com, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ bryan-bt.tan@broadcom.com, vishnu.dasa@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, kvm@vger.kernel.org, baijiaju1990@gmail.com,
+ r33s3n6@gmail.com, gality369@gmail.com, zhenghaoran154@gmail.com,
+ hanguidong02@gmail.com, zzzccc427@gmail.com
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,vmware.com,microsoft.com,linux.alibaba.com,broadcom.com,lists.linux.dev,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-290911-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290910-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 993815B900B
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 212A35B9180
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 20 May 2026 14:49:37 +0200 Lorenzo Bianconi wrote:
-> > Does this strict OUI validation cause the driver probe to fail when MAC addresses
-> > are randomly generated?
-> > 
-> > If a MAC address is not provided in the device tree, the driver generates a random
-> > one via eth_hw_addr_random(). For multi-port configurations, each port receives an
-> > independently generated random MAC address.
-> > 
-> > Since the upper 3 bytes of these random addresses will almost certainly differ,
-> > when register_netdev() is called for the second port, its ndo_init callback
-> > (airoha_dev_init) will invoke airoha_set_macaddr() and hit this check. Returning
-> > -EINVAL will fail register_netdev() and abort the entire driver probe, leaving
-> > the system without networking.
-> > 
-> > Does this also prevent users from changing the MAC address OUI?
-> > 
-> > When an administrator attempts to change the MAC address via standard userspace
-> > tools, only one interface can be modified at a time. The driver will compare the
-> > new MAC against the existing MAC of the other port.
-> > 
-> > If the MSBs differ, the change is rejected. This makes it impossible to atomically
-> > change the OUI of both interfaces simultaneously, locking the MAC address OUI
-> > to its initial probe-time value.  
-> 
-> As pointed out before, this is a hw design requirement when multiple
-> net_devices are configured as LAN.
+Hello:
 
-What about Clashiko report about the MAC address?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 20 May 2026 00:56:36 +0800 you wrote:
+> vsock_poll() reads vsk->peer_shutdown before taking the socket lock
+> to set EPOLLHUP and EPOLLRDHUP, then reads it again after taking
+> the lock to report EOF readability. A shutdown packet can update
+> peer_shutdown while poll is waiting for the lock, so one poll invocation
+> can report EOF readability without the corresponding HUP/RDHUP bits.
+> 
+> For connectible sockets, take one peer_shutdown snapshot after
+> lock_sock() and use it for all peer-shutdown-derived poll bits. For
+> datagram sockets, which do not take lock_sock() in poll(), take one
+> lockless READ_ONCE() snapshot and pair it with WRITE_ONCE() on the
+> writer side.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] vsock: keep poll shutdown state consistent
+    https://git.kernel.org/netdev/net/c/aae9d8a5528b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
