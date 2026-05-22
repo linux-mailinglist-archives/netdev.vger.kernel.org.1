@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-290918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGFlF4/GEGoLdgYAu9opvQ
-	(envelope-from <netdev+bounces-290918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:11:43 +0200
+	id OJNJGHrGEGoLdgYAu9opvQ
+	(envelope-from <netdev+bounces-290919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:11:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B566E5BA440
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:11:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56E465BA42A
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:11:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5102730125D3
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 21:11:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4F5A930069BC
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 21:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A75E35A385;
-	Fri, 22 May 2026 21:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E42382F12;
+	Fri, 22 May 2026 21:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="1Ktj+xl/"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="saTeML+n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [45.157.188.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CD627AC31
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 21:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E1827AC31
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 21:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779484267; cv=none; b=j/UKlQc7w51M/Bc2Khyw3BWW0Ypxc3QcC5cWb1nqZFwhBgU1a5nL1dha4P3pDY68zSXHLWR2v478lh2+dlpRZzuwde7Kn8bw1xoOXqCmyQBpiQ3kkXMCgXno69krlK8clTz+BUJZFq41uBCKhOTilrm/mAEieI8d+koWkVFzuIU=
+	t=1779484277; cv=none; b=Mwka7LzDjQdm13lWY8M2Jboo9BUzhA1RgJasppnDCYJGUudgZ9nkzXT6MK/WsiaiNFsoaYtQmHIzxYPvgSICP4B+h5bn75o1xI4x2t1BdIwuvsyhzOxSt9pact2NDTz3f1gHaO+7NJqpzebNAkk+SYkN6/4E0ozV0qF5Qi5SsXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779484267; c=relaxed/simple;
-	bh=06HJRSrrUMzj7DL8RB8Ye1eXAEUrNCre6d9ye2wUcpk=;
+	s=arc-20240116; t=1779484277; c=relaxed/simple;
+	bh=h2GFs1INwVAMS2sqRnj9t3IUItHFsf2ChtRROEDhMw8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nqyd2tWqp1J7aljCRU8SwqnWsRgpyfJooN090+yK3lN7lZnHg6FH1x8TPmdYu24u0Y/zVDT/tz/Ar359jPkV++xrJ/NPUSLVOSgFCfZXRo3SSU7TrUku1pipJRZ+4rHD9wAU6iIyMOobLbkMuKnqfKJ0i/HcPHtXklIk4Gn8+Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=1Ktj+xl/; arc=none smtp.client-ip=45.157.188.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y7N4QPyfZ5t038T3AV5f4hvLRlyaLOR9UuaLI0K+1nmU3MFucXqIA1OAgVVQDWGSZZ1/AWZmx2T++TezCdXAShdQGUswunLVxGObobvDqP/hCvMuX1R1I0qbhQIx5sdbWjUCholeNUGUHsOJ9yagh6m7gA9Olt7W961DsxTqa4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=saTeML+n; arc=none smtp.client-ip=45.157.188.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246b])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4gMdH45TSBz87P;
-	Fri, 22 May 2026 23:10:56 +0200 (CEST)
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246c])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4gMdHP3bnJz9RW;
+	Fri, 22 May 2026 23:11:13 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1779484256;
-	bh=vpUyp6y8XSLwq9yCGVBTPnQHDjNH3wqxIcnZsgeppeg=;
+	s=20191114; t=1779484273;
+	bh=FwPqpug3mhni2511ExYt2r69AMlAupYN5pc73wELsto=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=1Ktj+xl/yykYj/fFkvKVEUrCd7y2PfIBuaA/hp19qCeaoK53pjyjzjHFMgbHgNw3N
-	 CsGknSbeiYMktDmQbTt/vY9ANDfDUMQ5Lh7lN3UTkYevCg0VD3/PyA+6iveT7ogJqG
-	 vhNiPRj66Lb7+a5N/vGFoYGTQmhBqoYO9f8ChgL0=
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4gMdH365QBzLxd;
-	Fri, 22 May 2026 23:10:55 +0200 (CEST)
-Date: Fri, 22 May 2026 23:10:53 +0200
+	b=saTeML+nuZCuAyauazFcabFoMzaeykq4Qd4aOnXSEMOjb4LIOkDZ3TfN8NXU1M9G7
+	 2sG5TH+n3fVq2+v2six5/7P+qpLzPV8ZGsHwpu3EqPNsTexpKoUvnbx8ILn5uLCJkq
+	 dbu5285sJ02D2i+iB+HcsU4gqe5GAmqTFEwC/sw8=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4gMdHN58qdzmTp;
+	Fri, 22 May 2026 23:11:12 +0200 (CEST)
+Date: Fri, 22 May 2026 23:11:11 +0200
 From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
 To: Matthieu Buffet <matthieu@buffet.re>
 Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
 	linux-security-module@vger.kernel.org, Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
-	konstantin.meskhidze@huawei.com, Tingmao Wang <m@maowtm.org>, netdev@vger.kernel.org, 
-	Paul Moore <paul@paul-moore.com>
-Subject: Re: [PATCH v4 3/7] landlock: Add UDP send access control
-Message-ID: <20260522.Shi4UuKeH6ch@digikod.net>
+	konstantin.meskhidze@huawei.com, Tingmao Wang <m@maowtm.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 7/7] landlock: Add documentation for UDP support
+Message-ID: <20260522.ieng0AeLahx1@digikod.net>
 References: <20260502124306.3975990-1-matthieu@buffet.re>
- <20260502124306.3975990-4-matthieu@buffet.re>
+ <20260502124306.3975990-8-matthieu@buffet.re>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,20 +64,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260502124306.3975990-4-matthieu@buffet.re>
+In-Reply-To: <20260502124306.3975990-8-matthieu@buffet.re>
 X-Infomaniak-Routing: alpha
 X-Spamd-Result: default: False [-0.95 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MIXED_CHARSET(0.71)[subject];
 	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[digikod.net:+];
-	TAGGED_FROM(0.00)[bounces-290918-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290919-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DMARC_NA(0.00)[digikod.net];
 	RCVD_TLS_LAST(0.00)[];
@@ -90,186 +88,196 @@ X-Spamd-Result: default: False [-0.95 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,audit_net.family:url,buffet.re:email]
-X-Rspamd-Queue-Id: B566E5BA440
+	DBL_BLOCKED_OPENRESOLVER(0.00)[buffet.re:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 56E465BA42A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, May 02, 2026 at 02:43:02PM +0200, Matthieu Buffet wrote:
-> Add the second half of LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP: control the
-> ability to specify an explicit destination when sending a datagram, to
-> override any remote peer set on a UDP socket (in sendto(), sendmsg(), and
-> sendmmsg()). It will make the right useful for clients which want to
-> send datagrams while specifying a destination address each time.
+On Sat, May 02, 2026 at 02:43:06PM +0200, Matthieu Buffet wrote:
+> Add example of UDP usage, without detailing the two access right.
+> Slightly change the example used in code blocks: build a ruleset for a
+> DNS client, so that it uses both TCP and UDP.
 > 
 > Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
 > ---
->  include/uapi/linux/landlock.h |  4 ++
->  security/landlock/net.c       | 70 ++++++++++++++++++++++++++++++++---
->  2 files changed, 68 insertions(+), 6 deletions(-)
+>  Documentation/userspace-api/landlock.rst | 89 ++++++++++++++++++------
+>  1 file changed, 68 insertions(+), 21 deletions(-)
 > 
-> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-> index 22c8cc63f30e..b147223efc97 100644
-> --- a/include/uapi/linux/landlock.h
-> +++ b/include/uapi/linux/landlock.h
-> @@ -396,6 +396,10 @@ struct landlock_net_port_attr {
->   *   - or grant %LANDLOCK_ACCESS_NET_BIND_UDP on a specific port, and
->   *     call :manpage:`bind(2)` on that port before trying to
->   *     :manpage:`connect(2)` or send datagrams.
-> + *
-> + * .. note:: Sending datagrams to an ``AF_UNSPEC`` destination address
-> + *   family is not supported for IPv6 UDP sockets: you will need to use a
-> + *   ``NULL`` address instead.
->   */
->  /* clang-format off */
->  #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
-> diff --git a/security/landlock/net.c b/security/landlock/net.c
-> index 045881f81295..8a53aebdb8c6 100644
-> --- a/security/landlock/net.c
-> +++ b/security/landlock/net.c
-> @@ -44,7 +44,8 @@ int landlock_append_net_rule(struct landlock_ruleset *const ruleset,
->  static int current_check_access_socket(struct socket *const sock,
->  				       struct sockaddr *const address,
->  				       const int addrlen,
-> -				       access_mask_t access_request)
-> +				       access_mask_t access_request,
-> +				       bool connecting)
->  {
->  	__be16 port;
->  	struct layer_access_masks layer_masks = {};
-> @@ -69,7 +70,8 @@ static int current_check_access_socket(struct socket *const sock,
->  	switch (address->sa_family) {
->  	case AF_UNSPEC:
->  		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP ||
-> -		    access_request == LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP) {
-> +		    (access_request == LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP &&
-> +		     connecting)) {
->  			/*
->  			 * Connecting to an address with AF_UNSPEC dissolves
->  			 * the remote association while retaining the socket
-> @@ -82,6 +84,35 @@ static int current_check_access_socket(struct socket *const sock,
->  			 * inconsistencies and return -EINVAL if needed.
->  			 */
->  			return 0;
-> +		} else if (access_request ==
-> +			   LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP) {
-> +			if (sock->sk->__sk_common.skc_family == AF_INET6) {
-> +				/*
-> +				 * We cannot allow sending UDP datagrams to an
-> +				 * explicit AF_UNSPEC address on IPv6 sockets,
-> +				 * even if AF_UNSPEC is treated as "no address"
-> +				 * on such sockets (so it should always be allowed).
-> +				 * That's because the socket's family can change under
-> +				 * our feet (if another thread calls setsockopt(IPV6_ADDRFORM))
-> +				 * to IPv4, which would then treat AF_UNSPEC as
-> +				 * AF_INET.
-> +				 */
-> +				audit_net.family = AF_UNSPEC;
+> diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
+> index fd8b78c31f2f..9d5da9896628 100644
+> --- a/Documentation/userspace-api/landlock.rst
+> +++ b/Documentation/userspace-api/landlock.rst
+> @@ -40,8 +40,8 @@ Filesystem rules
+>      and the related filesystem actions are defined with
+>      `filesystem access rights`.
+>  
+> -Network rules (since ABI v4)
+> -    For these rules, the object is a TCP port,
+> +Network rules (since ABI v4 for TCP and v10 for UDP)
+> +    For these rules, the object is a TCP or UDP port,
+>      and the related actions are defined with `network access rights`.
+>  
+>  Defining and enforcing a security policy
+> @@ -49,11 +49,11 @@ Defining and enforcing a security policy
+>  
+>  We first need to define the ruleset that will contain our rules.
+>  
+> -For this example, the ruleset will contain rules that only allow filesystem
+> -read actions and establish a specific TCP connection. Filesystem write
+> -actions and other TCP actions will be denied.
+> +For this example, the ruleset will contain rules that only allow some
+> +filesystem read actions and some specific UDP and TCP actions. Filesystem
+> +write actions and other TCP/UDP actions will be denied.
+>  
+> -The ruleset then needs to handle both these kinds of actions.  This is
+> +The ruleset then needs to handle all these kinds of actions.  This is
+>  required for backward and forward compatibility (i.e. the kernel and user
+>  space may not know each other's supported restrictions), hence the need
+>  to be explicit about the denied-by-default access rights.
+> @@ -81,7 +81,9 @@ to be explicit about the denied-by-default access rights.
+>              LANDLOCK_ACCESS_FS_RESOLVE_UNIX,
+>          .handled_access_net =
+>              LANDLOCK_ACCESS_NET_BIND_TCP |
+> -            LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +            LANDLOCK_ACCESS_NET_CONNECT_TCP |
+> +            LANDLOCK_ACCESS_NET_BIND_UDP |
+> +            LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP,
+>          .scoped =
+>              LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET |
+>              LANDLOCK_SCOPE_SIGNAL,
+> @@ -132,6 +134,12 @@ version, and only use the available subset of access rights:
+>      case 6 ... 8:
+>          /* Removes LANDLOCK_ACCESS_FS_RESOLVE_UNIX for ABI < 9 */
+>          ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_RESOLVE_UNIX;
+> +        __attribute__((fallthrough));
+> +    case 9:
+> +        /* Removes LANDLOCK_ACCESS_*_UDP for ABI < 10 */
+> +        ruleset_attr.handled_access_net &=
+> +            ~(LANDLOCK_ACCESS_NET_BIND_UDP |
+> +              LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP);
+>      }
+>  
+>  This enables the creation of an inclusive ruleset that will contain our rules.
+> @@ -180,21 +188,50 @@ this file descriptor.
+>  
+>  It may also be required to create rules following the same logic as explained
+>  for the ruleset creation, by filtering access rights according to the Landlock
+> -ABI version.  In this example, this is not required because all of the requested
+> -``allowed_access`` rights are already available in ABI 1.
+> +ABI version.  So far, this was not required because all of the requested
+> +``allowed_access`` rights have always been available, from ABI 1.
+>  
+> -For network access-control, we can add a set of rules that allow to use a port
+> -number for a specific action: HTTPS connections.
+> +For network access-control, we will add a set of rules to allow DNS
+> +queries, which requires both UDP and TCP. For TCP, we need to allow
+> +outbound connections to port 53, which can be handled and granted starting
+> +with ABI 4:
+>  
+>  .. code-block:: c
+>  
+> -    struct landlock_net_port_attr net_port = {
+> -        .allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> -        .port = 443,
+> -    };
+> +    if (ruleset_attr.handled_access_net & LANDLOCK_ACCESS_NET_CONNECT_TCP) {
+> +        struct landlock_net_port_attr net_port = {
+> +            .allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +            .port = 53,
+> +        };
+>  
+> -    err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -                            &net_port, 0);
+> +        err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +                                &net_port, 0);
+> +
+> +We also need to be able to send UDP datagrams to port 53, which requires
+> +granting ``LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP``. Since our DNS client will
+> +emit datagrams without explicitly binding to a specific source port, its UDP
+> +socket will automatically bind an ephemeral port. To allow this behaviour,
+> +we also need to grant ``LANDLOCK_ACCESS_NET_BIND_UDP`` on port 0, as if
+> +the program explicitly called :manpage:`bind(2)` on port 0.
 
-I sent this patch and I just merged it in my tree:
-https://lore.kernel.org/all/20260406143717.1815792-11-mic@digikod.net/
+Please follow the pattern in this new patch (already in my next branch):
+https://lore.kernel.org/all/20260513151856.148423-1-mic@digikod.net/
 
-Günther, could you please take a look at this patch too?
+> +
+> +.. code-block:: c
+> +
+> +    if (ruleset_attr.handled_access_net & LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP) {
+> +        const struct landlock_net_port_attr send_dst_port = {
+> +            .allowed_access = LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP,
+> +            .port = 53,
+> +        };
+> +        err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +                                &send_dst_port, 0);
+> +        [...]
+> +
+> +    if (ruleset_attr.handled_access_net & LANDLOCK_ACCESS_NET_BIND_UDP) {
+> +        const struct landlock_net_port_attr bind_src_port = {
+> +            .allowed_access = LANDLOCK_ACCESS_NET_BIND_UDP,
+> +            .port = 0,
+> +        };
+> +        err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +                                &bind_src_port, 0);
+>  
+>  When passing a non-zero ``flags`` argument to ``landlock_restrict_self()``, a
+>  similar backwards compatibility check is needed for the restrict flags
+> @@ -228,7 +265,7 @@ similar backwards compatibility check is needed for the restrict flags
+>  The next step is to restrict the current thread from gaining more privileges
+>  (e.g. through a SUID binary).  We now have a ruleset with the first rule
+>  allowing read and execute access to ``/usr`` while denying all other handled
+> -accesses for the filesystem, and a second rule allowing HTTPS connections.
+> +accesses for the filesystem, and two more rules allowing DNS queries.
+>  
+>  .. code-block:: c
+>  
+> @@ -716,6 +753,16 @@ Starting with the Landlock ABI version 9, it is possible to restrict
+>  connections to pathname UNIX domain sockets (:manpage:`unix(7)`) using
+>  the new ``LANDLOCK_ACCESS_FS_RESOLVE_UNIX`` right.
+>  
+> +UDP bind, connect, sendto, sendmsg and sendmmsg (ABI < 10)
 
-For consistency, we need to add `audit_net.sk = sock->sk;` here.
+nit: Make it a bit shorter because it is also use in link (#).  Maybe
+something like this:
 
-> +				landlock_init_layer_masks(
-> +					subject->domain, access_request,
-> +					&layer_masks, LANDLOCK_KEY_NET_PORT);
-> +				landlock_log_denial(
-> +					subject,
-> +					&(struct landlock_request){
-> +						.type = LANDLOCK_REQUEST_NET_ACCESS,
-> +						.audit.type =
-> +							LSM_AUDIT_DATA_NET,
-> +						.audit.u.net = &audit_net,
-> +						.access = access_request,
-> +						.layer_masks = &layer_masks,
-> +					});
-> +				return -EACCES;
-> +			}
->  		} else if (access_request == LANDLOCK_ACCESS_NET_BIND_TCP ||
->  			   access_request == LANDLOCK_ACCESS_NET_BIND_UDP) {
->  			/*
-> @@ -124,7 +155,10 @@ static int current_check_access_socket(struct socket *const sock,
->  		} else {
->  			WARN_ON_ONCE(1);
->  		}
-> -		/* Only for bind(AF_UNSPEC+INADDR_ANY) on IPv4 socket. */
-> +		/*
-> +		 * For bind(AF_UNSPEC+INADDR_ANY) on IPv4 socket and
-> +		 * for sending to AF_UNSPEC addresses on IPv4 socket.
-> +		 */
->  		fallthrough;
->  	case AF_INET: {
->  		const struct sockaddr_in *addr4;
-> @@ -257,7 +291,7 @@ static int current_check_autobind_udp_socket(struct socket *const sock)
->  
->  	return current_check_access_socket(sock, (struct sockaddr *)&port0,
->  					   sizeof(port0),
-> -					   LANDLOCK_ACCESS_NET_BIND_UDP);
-> +					   LANDLOCK_ACCESS_NET_BIND_UDP, false);
->  }
->  
->  static int hook_socket_bind(struct socket *const sock,
-> @@ -273,7 +307,7 @@ static int hook_socket_bind(struct socket *const sock,
->  		return 0;
->  
->  	return current_check_access_socket(sock, address, addrlen,
-> -					   access_request);
-> +					   access_request, false);
->  }
->  
->  static int hook_socket_connect(struct socket *const sock,
-> @@ -291,7 +325,7 @@ static int hook_socket_connect(struct socket *const sock,
->  		return 0;
->  
->  	ret = current_check_access_socket(sock, address, addrlen,
-> -					  access_request);
-> +					  access_request, true);
->  
->  	if (ret == 0 && sk_is_udp(sock->sk))
->  		ret = current_check_autobind_udp_socket(sock);
-> @@ -299,9 +333,33 @@ static int hook_socket_connect(struct socket *const sock,
->  	return ret;
->  }
->  
-> +static int hook_socket_sendmsg(struct socket *const sock,
-> +			       struct msghdr *const msg, const int size)
-> +{
-> +	struct sockaddr *const address = msg->msg_name;
-> +	const int addrlen = msg->msg_namelen;
-> +	access_mask_t access_request;
-> +	int ret = 0;
+  UDP bind, connect and send* (ABI < 10)
+
+...and specifying each syscall in the text below.
+
+> +----------------------------------------------------------
 > +
-> +	if (sk_is_udp(sock->sk))
-> +		access_request = LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP;
-> +	else
-> +		return 0;
+> +Starting with the Landlock ABI version 10, it is possible to restrict
+> +setting the local port of UDP sockets with the
+> +``LANDLOCK_ACCESS_NET_BIND_UDP`` right.
+> +The ``LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP`` right controls setting the
+> +remote port of UDP sockets, and sending datagrams to an explicit remote
+> +port (ignoring any destination set on UDP sockets).
 > +
-> +	if (address != NULL)
-> +		ret = current_check_access_socket(sock, address, addrlen,
-> +						  access_request, false);
-> +
-> +	if (ret == 0)
-> +		ret = current_check_autobind_udp_socket(sock);
-> +
-> +	return ret;
-> +}
-> +
->  static struct security_hook_list landlock_hooks[] __ro_after_init = {
->  	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
->  	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
-> +	LSM_HOOK_INIT(socket_sendmsg, hook_socket_sendmsg),
->  };
+>  .. _kernel_support:
 >  
->  __init void landlock_add_net_hooks(void)
+>  Kernel support
+> @@ -778,10 +825,10 @@ the boot loader.
+>  Network support
+>  ---------------
+>  
+> -To be able to explicitly allow TCP operations (e.g., adding a network rule with
+> -``LANDLOCK_ACCESS_NET_BIND_TCP``), the kernel must support TCP
+> +To be able to explicitly allow TCP or UDP operations (e.g., adding a network rule with
+> +``LANDLOCK_ACCESS_NET_BIND_TCP``), the kernel must support the TCP/IP protocol suite
+>  (``CONFIG_INET=y``).  Otherwise, sys_landlock_add_rule() returns an
+> -``EAFNOSUPPORT`` error, which can safely be ignored because this kind of TCP
+> +``EAFNOSUPPORT`` error, which can safely be ignored because this kind of TCP or UDP
+>  operation is already not possible.
+>  
+>  Questions and answers
 > -- 
 > 2.39.5
+> 
 > 
 
