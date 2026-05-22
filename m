@@ -1,435 +1,328 @@
-Return-Path: <netdev+bounces-290727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJcuA0kaEGoITgYAu9opvQ
-	(envelope-from <netdev+bounces-290727-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:56:41 +0200
+	id SAAyIRweEGrqTgYAu9opvQ
+	(envelope-from <netdev+bounces-290729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:13:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FB5E5B0C76
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:56:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8DE35B0EE6
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C69EC300DE25
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 08:56:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CBB40300332A
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777963A6F15;
-	Fri, 22 May 2026 08:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 479EE3B95F2;
+	Fri, 22 May 2026 09:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n/UDjgqG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nBsgu/lO"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C7921CFEF;
-	Fri, 22 May 2026 08:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779440193; cv=none; b=e97tg5mAj+KyV8PjWwTzIY7j43wbJbVqAhv4uerxFxBUZgcIOCHKQtt7V4Kiuc9t0dKHTj/9jHWcxBMHTTw0d7o9NgvsWYvNHBSr/gGTxlJcLJe960TSSDeDIeEXyCd52p95IpEk5SWmlScbF9WREiLYj8Jut0vPgmxcFYXDOuY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779440193; c=relaxed/simple;
-	bh=iMdtUTSphcxgR5mPLnjkJdlXKt10gYyydi0/6WuYMRc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fcvY8iQnNzfqA/wqkvPQtr2u6O3cP7C0MCVM+Xd/offorbW/40SRuUGWfGiusdNYjwkQXSCciauzdMk5icbZOIw9tfHtVA32UtdPd+38cPYq9kNALSV4t71wIY8M55r1SlbzyMOY+xWwPInkrPE/d067zcxDlOMDD9cwKK2YlHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=n/UDjgqG; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=fGTXx8zDgCTxno519hVyftj+I8teyWEZh+n6fhFE/d4=; b=n/UDjgqGoLxObQKWirnW3pbpNZ
-	Y7+BZJ0SyMdTROd1rlU5uSrUJuHWw5A0kvXLsSDhtpTlD9NvQGd4WsL6RsWiP35SJRzb6Heu7G/ZX
-	1Yc2qy2lCZKeY75gevdojy0z6jMxtayDRA5vRL30IYC9ysDaFhEelsP3Bo+kFKIYojv1kSoesljM9
-	4CJ4j1ueg2EL2GBg0W5fBjMADrlvbfISOoMPFDIm145kK8l+JJ+t3PHtr03B/fFOuFBmYJZPwewAy
-	T9V/Qhqe/doyR6O7uql5P8obGo4KXZqTanlDpb6ypE/NMROphB9O6FPKnOxYX6mNorrYl1LtS8oq/
-	LiSeqfTg==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.lumleys.internal)
-	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wQLg6-00000009qYh-3R6F;
-	Fri, 22 May 2026 08:56:23 +0000
-Message-ID: <0d13721307646d7ca2bf1aaf22926f0137b9de30.camel@infradead.org>
-Subject: Re: [PATCH net-next v8 3/3] gve: implement PTP gettimex64
-From: David Woodhouse <dwmw2@infradead.org>
-To: Thomas Gleixner <tglx@kernel.org>, Harshitha Ramamurthy
-	 <hramamurthy@google.com>, netdev@vger.kernel.org, Arthur Kiyanovski
-	 <akiyano@amazon.com>
-Cc: joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com,  jstultz@google.com, sboyd@kernel.org,
- willemb@google.com, nktgrg@google.com,  jfraker@google.com,
- ziweixiao@google.com, maolson@google.com,  jordanrhee@google.com,
- thostet@google.com, alok.a.tiwari@oracle.com,  pkaligineedi@google.com,
- horms@kernel.org, jacob.e.keller@intel.com,  yyd@google.com,
- jefrogers@google.com, linux-kernel@vger.kernel.org, Naman Gulati
- <namangulati@google.com>, Thomas =?ISO-8859-1?Q?Wei=DFschuh?=
- <thomas.weissschuh@linutronix.de>
-Date: Fri, 22 May 2026 09:56:22 +0100
-In-Reply-To: <877bovvq78.ffs@tglx>
-References: <20260514225842.110706-1-hramamurthy@google.com>
-	 <20260514225842.110706-4-hramamurthy@google.com>
-	 <cd5868258edee932fd9b4ed46a48b5a07b4c6da8.camel@infradead.org>
-	 <87tss0vdrj.ffs@tglx>
-	 <63ff978516925951df0f95aecbd4ea5d7bb2956e.camel@infradead.org>
-	 <87bje8v0xl.ffs@tglx>
-	 <38ded3d61878f319ad74869924a55665d8baadb9.camel@infradead.org>
-	 <877bovvq78.ffs@tglx>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-PeXr9S2O7mQaPYdbm9/X"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9610B3B8959
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 09:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779440782; cv=pass; b=bvEzUm9K6ot77R0JBTC9x922cfzg2HnoYh/lPF/wLcBIl8Kd6bkh1849IXdeKCSzgEXANzWnuImA/W3Z0ybTgIccbYrFI23X2tityEj+zPrXwOJMRlhPVHrVi8mB0wryDW+iHwdiy8rwbDJyZbsW6x5qsb/ZW939x2ZBK/0w8YA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779440782; c=relaxed/simple;
+	bh=R+S7aw8jm/S0niR/bgF2z9EKXggL1ReO5jO3N/+1zP4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jdStv3tLVlYE/jJjWKwyfNnym+VAqEh9rTQo2cFkM2aRI/Qk1J7uf9qrV+D2bfx8OzWK0oxta6ILu66RgV1wtPsHBvaGNgLwxAECP3uTxnQnXTPrcpHXR+tudWTe/EUKDYUvMX25ibcXCyfaZJ+JsMURgJK9biIDOaEmzJmGKaI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nBsgu/lO; arc=pass smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2baef9f5ecdso57175735ad.1
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 02:06:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779440780; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kvmOOEAwKDEkCy3646NZSz+0oUlvtes0q1t+TH+HotGPR2u1T6RsxE3gNoMDQlpz4C
+         M+cj1eflNB1pGqg6qSe39Kn1gu5T1lT7hP9JvA0WzBR8n+Nk90K5s8z89sgG9cvRdHaJ
+         GCMD0cxvpb0i5jJhB4gdhH68jUalpfGu5Eke2hr2N2EV19Rjqig9w8kVjYpRvjGtD9Qk
+         IJ6VXUStp1hNpV32Ta5vxH4r88GgFi76dHFuNK4SFj/cxt3W2Augw5ITqFj/ooNWKjbm
+         NAtWd/4pDnFEqiSkHK5YPFRIkT+m11/Mr3w+QGwNzAgl+Cw44IIKpqCe8DSas4PWiv/I
+         NTxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=/0g2cVKUQEj9Q4kYnLCnoahgGlOqxaRvFqX0zcp0b8M=;
+        fh=eR652PN6eGvsX3fUDoXjWL3D9a1S9ZXP63HvGJ2H8wU=;
+        b=B1IQKshgU/QPuKHHcpnssiG6rPteEeyEStJDgDqlsHUTB0C87sH0AlFu4yjzNnAo8B
+         FE1/zLafl8rPw8Wmnx+p8CoQVi9OK2gSCDFKmkc4dl+5R+FR//SceBjsn5Jj8+iN3Bm8
+         vVLVSrKh4wOj9CBjjwJSQARalS1Qhv6y0dirlfmFjuTqbZ2T+gjhMNzivbuxi0hZ/zFF
+         d+L+m+yrMnKzQ76LLWYy557JWKQXFvFLPGuj7+JBw1OgAAb3oBoCeQO74dwCsLbmfJWi
+         Tdlpk1btzpcl8ngQFZUrDSVqdqOmJqUxTQdCn71bqxWrshrYSfof1klLYekRA27X8Zm5
+         zjJw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779440780; x=1780045580; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/0g2cVKUQEj9Q4kYnLCnoahgGlOqxaRvFqX0zcp0b8M=;
+        b=nBsgu/lOM+L+g0xYW7sSm1uAkRersmD/hxD/ZkWGl8cY5lLvFHF84A2QchoMD18tfv
+         XCjNxC7pH8ja59asDOz8aVZywmwHkTDJMBUPEMYq8kU/ECIPh3eUNHEVXbhm8kQ2oKTI
+         OxISYWit8y2OYLK2LcqDai2lXxyzIgZuisXCAdMIj3YcwuBwdDetDCkOIUmIWSMLE17U
+         tCeI3gdhgaiG1MggcFTBD5n7760fh9oKDaAt0dsO2hjkA7BUGsYMsPHgQSFrT4AJlyjb
+         FOLH0VgvqIy4Gg1QyWsOn2KuUD1BGHP+Me+lq6I+ydLiHmdpE+yTguyktz3Bl74a3spw
+         KQbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779440780; x=1780045580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/0g2cVKUQEj9Q4kYnLCnoahgGlOqxaRvFqX0zcp0b8M=;
+        b=Q+zyq2UtdSpspbk2xQaILdVPMA37lzzQi+7EDfyfjB7a/T3juR+o51PtYY1v/uR6Gp
+         gftJczFd/r/vM+9k5HoKGf5loFyPmrhgREo8xz72aPUWXKxSEBnhCh5hMYLh5C3XJTrX
+         FJlUq3OSB72QTV2pKndXFZOG9cRk4+kgDj7XrilF71wEEeVJKMky1MaXKi+CD0pBhqgd
+         ifK3hePx+GvCJk4SwLZAFL7xjgQZQaHV8dEjRQ6eRkCg4IByMEWaqDypJrVde7TmiBXR
+         jSm+GaQ7RGd9g6DWh6w07GgAJdD+GuQp23clJBbVFy8/n09FqYKLNaTtsR85BX5eFNv2
+         1E0A==
+X-Forwarded-Encrypted: i=1; AFNElJ/KnXe1wmMgyFKhRFeftv769UzIIwH6thxV39Juvjfn3mOqYNyJ7eg9hMdqMzHOe2w/8ObhSrg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJJ0tJN6xJGfLzpK+wUmPXRFcx9eR5H5C4Cf+UUxXZYBixCDTS
+	9x1geCouSb0I6FS5U/cUp542gNacTYoSx2LBt9mkrC/fQkCQOo1d2OIR6HwvjgJDGFIOuwqdYCL
+	Wa90RpuJwl/cTwnN5k1qmg4J+7jhAFiU=
+X-Gm-Gg: Acq92OFbH1RopEl5U1TMPU2zAhvBMewPRCX/DTs5/R6q6amBaxlZxRHmbsAODeys05i
+	bAadRzzHGJPnfx6ynr1NZOtWatj05FTBPKM1ZNnQp2Ymk/Dgv7m/xcyyosXQFAH5Dfg+q+913CQ
+	0S5kZHMMKarMjLgcyqNnDvuDseU/BwhGdASj9Oq9p5ALbMwCIhQTPi3Avd9gf4lp03QIABFmQs+
+	YOClB3RU/Iic9woRhQMH0urh2OQa6SaEt9vJieO12LEh8c70YnAOOsCGG3+On9FS9SwnR8K4Kg6
+	RZmWMnuCXQ==
+X-Received: by 2002:a17:903:234e:b0:2b4:5931:bc4c with SMTP id
+ d9443c01a7336-2beb069806dmr27409495ad.15.1779440779790; Fri, 22 May 2026
+ 02:06:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+References: <20260520004244.55663-1-kerneljasonxing@gmail.com>
+ <20260520004244.55663-4-kerneljasonxing@gmail.com> <ag3c9/EF4h7DLQu3@boxer>
+ <CAL+tcoAvbEZ7U2oXBWwLAKeuC==gAHi=GXLZcrEPxbb4mQ9sfA@mail.gmail.com>
+ <ag70RrU4nGy0Nlna@boxer> <CAL+tcoAHnVDOFgmUvi1jfTdTHchxdUrRYppenQ6Ubiwyv8jmUg@mail.gmail.com>
+In-Reply-To: <CAL+tcoAHnVDOFgmUvi1jfTdTHchxdUrRYppenQ6Ubiwyv8jmUg@mail.gmail.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Fri, 22 May 2026 11:06:05 +0200
+X-Gm-Features: AVHnY4KiTvx6DrhHqiVR7wrSm7hruax0kEs4hqu-if92Ny5qh6-NW-NaDOy7_Ko
+Message-ID: <CAJ8uoz0bKHSiHjRvNmvVs_z3cWg58U=6wGKKs9_n65yCCcYbEw@mail.gmail.com>
+Subject: Re: [PATCH net v4 3/5] xsk: drain continuation descs after overflow
+ in xsk_build_skb()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, horms@kernel.org, andrew+netdev@lunn.ch, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290727-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290729-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,intel.com,vger.kernel.org,linutronix.de];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[magnuskarlsson@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[intel.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch,vger.kernel.org,tencent.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7FB5E5B0C76
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,intel.com:email]
+X-Rspamd-Queue-Id: C8DE35B0EE6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
---=-PeXr9S2O7mQaPYdbm9/X
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 2026-05-22 at 09:49 +0200, Thomas Gleixner wrote:
-> On Fri, May 22 2026 at 01:12, David Woodhouse wrote:
-> > On Fri, 2026-05-22 at 00:43 +0200, Thomas Gleixner wrote:
-> > > > So surely a device can only support this if it *does* have a precis=
-e
-> > > > hardware timestamp, e.g. from ART? And the corresponding sys_realti=
-me
-> > > > and sys_monoraw fields also have to be from the *same* value, surel=
-y?
-> > >=20
-> > > That is correct, but you still fail to explain how this new made up
-> > > att.counter_id/att.counter_value is filled in coherently without the
-> > > driver doing something abysmal?
-> > >=20
-> > > You can't explain it, because the only way to do that correctly is by
-> > > extending the cross time stamp struct and get_device_system_crosststa=
-mp().
-> >=20
-> > Yes. Isn't that what I asked Arthur to do?
->=20
-> You maybe asked him, but I can't see any evidence of it anywhere. All I
-> can see is a magic struct attr, which conveys CS related data that is
-> supposed to be produced magically at some undefined place.
-
-https://lore.kernel.org/all/8b8a748a2ac6e8e3d970f5e74a2774133e7e7d8c.camel@=
-infradead.org/
-
-> > > > Is that not how it works? If not.... WTF *is* it for?
-> > >=20
-> > > Yes, that's the way it works since get_device_system_crosststamp() go=
-t
-> > > introduced, but that does not give a random driver access to the actu=
-al
-> > > converted (TSC) counter value. The driver can only observe the PTM va=
-lue
-> > > which is ART on x86 and whatever on other architectures. So it does n=
-ot
-> > > know anything about it.
-> >=20
-> > Sure, the driver can only return what it *knows*.
-> >=20
-> > We're certainly missing some infrastructure here... maybe the pci_bus
-> > should have a CSID which corresponds to its PTM domain, which on x86
-> > would be CSID_X86_ART?
->=20
-> Yes, that's correct. But that does not solve the underlying problem:
->=20
-> ...
+On Thu, 21 May 2026 at 15:42, Jason Xing <kerneljasonxing@gmail.com> wrote:
 >
-> Q: How is a driver supposed to fill in attr->cs_cycles coherently?
->=20
-> A: Not at all.
->=20
+> On Thu, May 21, 2026 at 8:02=E2=80=AFPM Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
+> >
+> > On Thu, May 21, 2026 at 07:53:27AM +0800, Jason Xing wrote:
+> > > On Thu, May 21, 2026 at 12:10=E2=80=AFAM Maciej Fijalkowski
+> > > <maciej.fijalkowski@intel.com> wrote:
+> > > >
+> > > > On Wed, May 20, 2026 at 08:42:42AM +0800, Jason Xing wrote:
+> > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > >
+> > > > > When a multi-buffer packet exceeds MAX_SKB_FRAGS and triggers -EO=
+VERFLOW,
+> > > > > only the current descriptor is released from the TX ring. The rem=
+aining
+> > > > > continuation descriptors of the same packet stay in the ring. Sin=
+ce
+> > > > > xs->skb is set to NULL after the drop, the TX loop picks up these
+> > > > > leftover frags and misinterprets each one as the beginning of a n=
+ew
+> > > > > packet, corrupting the packet stream.
+> > > > >
+> > > > > Fix this by adding a drain_cont flag to xdp_sock. When overflow o=
+ccurs
+> > > > > and the dropped descriptor has XDP_PKT_CONTD set, the flag is rai=
+sed,
+> > > > > so we have a chance to examine and handle the potential remaining=
+ descs
+> > > > > of this big overflow'ed skb.
+> > > > >
+> > > > > When the last fragment (without XDP_PKT_CONTD) is processed, the =
+flag
+> > > > > is cleared and the loop continues to process subsequent descripto=
+rs
+> > > > > with the remaining budget. This behavior follows how previous xmi=
+t path
+> > > > > treats overflow packets.
+> > > > >
+> > > > > Closes: https://lore.kernel.org/all/20260425041726.85FB3C2BCB2@sm=
+tp.kernel.org/
+> > > > > Fixes: cf24f5a5feea ("xsk: add support for AF_XDP multi-buffer on=
+ Tx path")
+> > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > ---
+> > > > >  include/net/xdp_sock.h |  1 +
+> > > > >  net/xdp/xsk.c          | 19 +++++++++++++++++++
+> > > > >  2 files changed, 20 insertions(+)
+> > > > >
+> > > > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> > > > > index ebac60a3d8a1..8b51876efbed 100644
+> > > > > --- a/include/net/xdp_sock.h
+> > > > > +++ b/include/net/xdp_sock.h
+> > > > > @@ -80,6 +80,7 @@ struct xdp_sock {
+> > > > >        * call of __xsk_generic_xmit().
+> > > > >        */
+> > > > >       struct sk_buff *skb;
+> > > > > +     bool drain_cont;
+> > > > >
+> > > > >       struct list_head map_list;
+> > > > >       /* Protects map_list */
+> > > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > > > > index 0a6203c42576..f4add7be8c93 100644
+> > > > > --- a/net/xdp/xsk.c
+> > > > > +++ b/net/xdp/xsk.c
+> > > > > @@ -1062,11 +1062,30 @@ static int __xsk_generic_xmit(struct sock=
+ *sk)
+> > > > >                       goto out;
+> > > > >               }
+> > > > >
+> > > > > +             if (unlikely(xs->drain_cont)) {
+> > > >
+> > > > Hi Jason,
+> > > >
+> > > > could we get away from introducing dedicated boolean to xdp_sock fo=
+r
+> > > > handling this rare case?
+> > >
+> > > I've tried several ways, but they didn't work. Please see the short
+> > > conversation with Stan:
+> > > https://lore.kernel.org/all/CAL+tcoA6Cu3P-y2wYjJ_R9cSeRkW2tswY1LveqH=
+=3Duxd2McuR-w@mail.gmail.com/
+> > >
+> > > That means we always rely on a flag (that is either static or like
+> > > this patch) to recognize how we treat this abnormal descs.
+> > >
+> > > >
+> > > > > +                     unsigned long flags;
+> > > > > +                     u32 idx;
+> > > > > +
+> > > > > +                     spin_lock_irqsave(&xs->pool->cq_prod_lock, =
+flags);
+> > > > > +                     idx =3D xskq_get_prod(xs->pool->cq);
+> > > > > +                     xskq_prod_write_addr(xs->pool->cq, idx, des=
+c.addr);
+> > > > > +                     xskq_prod_submit_n(xs->pool->cq, 1);
+> > > > > +                     spin_unlock_irqrestore(&xs->pool->cq_prod_l=
+ock, flags);
+> > > >
+> > > > It feels a bit off to do this cleanup one-by-one.
+> > >
+> > > Actually no, it adheres to the basic send logic in copy mode.
+> >
+> > Not really. Here you are producer to cq which we have batched variants =
+for
+> > usage.
+> >
+> > But after second thoughts I don't think it would be worth to put any
+> > further effort onto optimizations here. Anyways, even though generic xm=
+it
+> > is a whole bunch of mess, maybe you could pull this out onto a helper
+> > function?
+>
+> Sure thing. My takeaway is that it will be refactored once as the
+> batch xmit feature lands in the tree.
 
-Let me rephrase that to check my full understanding of it in context:
+I agree that the code has become really messy since I get a headache
+when looking at it ;-). Do you want me to take a stab at simplifying
+it?
 
- Q: There are drivers today which operate on the TSC or arch counter,
-    and they're just fine. But how is a future driver which uses PCIe
-    PTM supposed to full in attr->cs_cycles coherently?
-
- A: Yeah, our PCI and platform code lack the proper arch-agnostic
-    support for interpreting PTM time values; a driver wanting to do
-    that is going to need to do some infrastructure work first to
-    enable a proper conversion. But that's literally what PTM/ART is
-    *for* so that work has to happen at some point anyway.
-
-
-> The consequence of this is that the next driver writer will just go and
-> do:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attr->cs_id =3D IS_ENABLED(X86) ? CS=
-ID_X86_TSC : CSID_ARM_COUNTER;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attr->cs_cycles =3D get_cycles();
-> =C2=A0=C2=A0 or
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attr->cs_cycles =3D ptm_cycles * pul=
-ledout_of_thin_air_factor +
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pu=
-lledout_of_thin_air_offset;
-
-Driver authors are crap, sure, but that would just be egregiously wrong
-and hopefully it would be caught in review. It has to be a literally
-*synchronous* capture or it's pointless.
-
-
-> The same applies to the pre/post timestamp mechanism for
-> gettimexattrs64().
-
-There's literally a ptp helper to generate those, which can use
-ktime_get_snapshot().
-
-> These new attr IOCTLs are not restricted to your favorite vmclock PTP
-> toy. They are available for every PTP driver which implements them, but
-> there is no infrastructure to actually provide the required data. That
-> ENA driver implementing gettimexattrs64() is demonstrating it. It at
-> least does not try to make them up, but that's just a matter of time to
-> happen.
-
-The ENA driver demonstrates nothing of the sort. It's *not* filling in
-those fields because it *doesn't* have PTM and it has nothing to fill
-in.
-
-Not *all* driver authors will fill in an optional field with random
-bytes just because they *can*, Thomas.
-
-> I know you don't care because that's outside of your sandpit,=C2=A0
-
-Thomas, I'd like you to stop saying that. It's insulting, and it's wrong.
-
-Of *course* I'm trying to solve things for the general case.
-
-But that doesn't extend to implementing random parts of PCI and
-platform infrastructure to allow for hypothetical future drivers which
-want to use PTM to implement the optional fields we're adding today.
-
-This yak is deep enough already :)
-
-And although we're having this discussion *in* the GVE thread, I've
-barely even *looked* at those patches and I think I'm still calling it
-a 'hypothetical future driver', because obviously if it's trying to use
-PTM then it's going to need that generic support.
-
-> Are you going to monitor drivers/net/ for those instances and make
-> sure they are burned before seeing the light of day?
->=20
-> Surely not and neither is netdev going to care as demonstrated with
-> this GEV mess.
-
-I think that message has been received loud and clear, Thomas :)
-
-> > Never get_cycles(). Let's perhaps make it *not* need unholy hacks to
-> > interpret a PTM counter value. Otherwise what's the point in ART and
-> > PTM at all?
->=20
-> Perhaps? There is no perhaps and aside of that I gave you the solution
-> for the problem already in the mail you just replied to, no?
-
-Hm, did you? I'm sorry, I must have missed it. Even rereading it this
-morning, I see a lot of 'is bonkers' and 'unholy hacks' and '_cannot_
-fill them in coherently' but I can't see a concrete constructive
-suggestion. You meant <87bje8v0xl.ffs@tglx>, yes?
-
-Maybe it's lost in the noise. Let's try to simplify.
-
- =E2=80=A2 Userspace would like to be able to use PTP clocks to discipline =
-the
-   actual counter which is directly accessible in userspace and by KVM
-   guests. Do do this, we only really need a system_counterval_t in
-   the pre/post timestamps, and the helpers can add that.
-
- =E2=80=A2 *Some* drivers can actually provide a system_counterval_t in the
-   device reading itself, either because they're naturally based on
-   the CPU counter or because they have PTM. Drivers should report
-   what=C2=A0they *do* know, in the correct time domain, and not make
-   crap up.
-
- =E2=80=A2 Any driver which actually wants to do this based on PTM in the
-   future will need to do the infrastructure work to make that work
-   cleanly, and avoid having to make crap up.
-
-And if I'm understanding correctly:
-
- =E2=80=A2 The GVE driver made crap up? Although they do so orthogonally to=
- the
-   patch set we're *actually* talking about in this thread, because
-   they did that entirely on their own *without* reference to Arthur's
-   userspace API changes?
-
-
-> I'm glad we agree on "Never get_cycles()" at least. May I ask you then
-> to get a stiff drink ready and run:
->=20
-> =C2=A0 # git blame drivers/ptp/ptp_vmclock.c | grep get_cycles
-
-That's different because it's actually using it for the *device* timestamp.
-But if you see an actual problem there, I'd love to know:
-
-                /*
-                 * When invoked for gettimex64(), fill in the pre/post syst=
-em
-                 * times. The simple case is when system time is based on t=
-he
-                 * same counter as st->cs_id, in which case all three times
-                 * will be derived from the *same* counter value.
-                 *
-                 * If the system isn't using the same counter, then the val=
-ue
-                 * from ktime_get_snapshot() will still be used as pre_ts, =
-and
-                 * ptp_read_system_postts() is called to populate postts af=
-ter
-                 * calling get_cycles().
-                 *
-                 * The conversion to timespec64 happens further down, outsi=
-de
-                 * the seq_count loop.
-                 */
-                if (sts) {
-                        ktime_get_snapshot(&systime_snapshot);
-                        if (systime_snapshot.cs_id =3D=3D st->cs_id) {
-                                cycle =3D systime_snapshot.cycles;
-                        } else {
-                                cycle =3D get_cycles();
-                                ptp_read_system_postts(sts);
-                        }
-                } else {
-                        cycle =3D get_cycles();
-                }
-
-                delta =3D cycle - le64_to_cpu(st->clk->counter_value);
-                ...
-
---=-PeXr9S2O7mQaPYdbm9/X
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUyMjA4NTYy
-MlowLwYJKoZIhvcNAQkEMSIEIKxvG6o1yb3qy7fMD1MhibvKO4vYiHdl5rFto48yCgRpMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAGN0aTw/e56cy
-r1N3CLwfNZkAsKNN4+O1D7dNo7nzAvnYdpmjft+kfeFnYboRV2b8obNm+ZxqoVd3IrY4mmhXGpG8
-04FSvJ6Iw/UY9EXVRQdpmlCs2S2MH6gB0T/aLN8WXX7u9S+QUS7q6T+KaAuFeeMQdPJcjpXbQKTG
-IkkvVLTxjOAgTl9//OCPdDQDAqPG1v1f/mxRLWfsS5AZDkcRtCksTjuG+uJQ62Ixdsu9VbGDUuD9
-YeKUdmkK1qBelTgQzL/BckDB+NxHTg8lrp0J4fNcmTyYidW2ikZ1n2ihJSCseCKscvoo0c/vb+YB
-Ablp4TB/sIaYOAF5LRkpjObtWNxwJgl4IfHN+gSfhapfK/KI/iFOLioEN1q/FjlSrcXv9+xXhzsQ
-VXveN1122xrGGOOGygd4JOD2i//8I9RzaecJOVmPDX068NismBjcXt5gw7tQXrR0glf427rV+zwR
-udZs8Nlm6MDswCKt51Wq1s9N8/x6+soY4AsCcRa2/OdFvOlEN+2sdVP5/gv+oahUDvZjGq+VqNcs
-QFBsxzINhmDRRea1ToVv8gtSwl84y3tnpWcSDZfQW0priAhlO/iTWPt9pHDSKc+fRFFIq/6zrIjz
-MCtUoOniiSzFgwz9C/yiJGFuVkgw1DyMo6Lxr9Fk5BSEBTNddxftGYgJtFRxCbgAAAAAAAA=
-
-
---=-PeXr9S2O7mQaPYdbm9/X--
+> Thanks,
+> Jason
+>
+> >
+> > >
+> > > >
+> > > > I wonder if it could be covered by xsk_drop_skb() where you would w=
+alk the
+> > > > tx ring and store addrs at xsk_addrs and then use xsk_cq_submit_add=
+r_locked() ?
+> > > >
+> > > > OTOH, in theory the amount of frags after we hit the overflow case =
+could
+> > > > be well over MAX_SKB_FRAGS again so xsk_addrs wouldn't be able to c=
+over
+> > > > them.
+> > >
+> > > Right, this is why we now put the logic into the xmit path just like
+> > > other kinds of descriptors. We need to check and send it under a
+> > > series of protections like the check of cq pressure and budget. I
+> > > don't think it's an exception to escape the check logic. The whole
+> > > process should be fast as there is no need to build skb and send it t=
+o
+> > > the driver as long as this case is recognized.
+> > >
+> > > Thanks,
+> > > Jason
+> > >
+> > > >
+> > > > > +
+> > > > > +                     xs->tx->invalid_descs++;
+> > > > > +                     xskq_cons_release(xs->tx);
+> > > > > +                     if (!xp_mb_desc(&desc))
+> > > > > +                             xs->drain_cont =3D false;
+> > > > > +                     continue;
+> > > > > +             }
+> > > > > +
+> > > > >               skb =3D xsk_build_skb(xs, &desc);
+> > > > >               if (IS_ERR(skb)) {
+> > > > >                       err =3D PTR_ERR(skb);
+> > > > >                       if (err !=3D -EOVERFLOW)
+> > > > >                               goto out;
+> > > > > +                     if (xp_mb_desc(&desc))
+> > > > > +                             xs->drain_cont =3D true;
+> > > > >                       err =3D 0;
+> > > > >                       continue;
+> > > > >               }
+> > > > > --
+> > > > > 2.43.7
+> > > > >
+>
 
