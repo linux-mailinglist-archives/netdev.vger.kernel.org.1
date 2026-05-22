@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-290739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290740-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EImCNFQhEGqjTwYAu9opvQ
-	(envelope-from <netdev+bounces-290739-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:26:44 +0200
+	id OIVWMsMgEGqjTwYAu9opvQ
+	(envelope-from <netdev+bounces-290740-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:24:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD3ED5B1264
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:26:43 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 594CB5B119A
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:24:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6AB413029CE3
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:23:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5859230170AA
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8353C3445;
-	Fri, 22 May 2026 09:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22C73C3789;
+	Fri, 22 May 2026 09:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="E/ZEh2b7"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="TsOO25vD"
 X-Original-To: netdev@vger.kernel.org
 Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011036.outbound.protection.outlook.com [52.101.65.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BCB3BF685;
-	Fri, 22 May 2026 09:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A85309EEB;
+	Fri, 22 May 2026 09:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.36
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779441752; cv=fail; b=NIoluMk7eGUXP1IoWEStvY4g05cnOsamhkoGAORJImrBvEGxcDI5/zNSTny6LoWWslggxy7+RCVwaqkk+I9x8ogabvooXWnq5yAcD8FwUsCoJpcbcjg9UstC5SL/QqOTboh45dtSTGwNBdx7ltEHLSFBncsO+n5VO439ffjvGbs=
+	t=1779441754; cv=fail; b=JWzgLl7cOcN+50kUe1uI1rQZCeaxwmZmBIVSQ1GfStMQ4LXJbv0TACD/fWXgYRJf3zwU9anv64sM8wPtNkbEbY/LZuNZB98bVHfYPfgAN6fO6V0Uf4vXw7tjgEUHNuM2LTlKQtVv14jFzSWD7ZGTPV8jTS/6cxldnwz5Ibti8Ek=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779441752; c=relaxed/simple;
-	bh=u6GpO6HDEgzHq7stJd7qU8hSBFzPbGl77KA/5Ibwm+Y=;
+	s=arc-20240116; t=1779441754; c=relaxed/simple;
+	bh=WXADH8RklLM1nxkINyg6vdExQxLDtHhRky1q78jYBVE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DRlsdxEk1y/JYNHX+bxGUGHlcbwDUqS+h1EaB74eA5dSW6BpEFJIqhXpa/0kQ3jBZzSscbsmrdE+mvle27C8Inu5XM8f/opQZjIG+1N4W4jICvKwssTZKoS9MR0MFBQwvLWayWv8sSKp0E5qG5BJ0g7r8Wrm5QxUMQNNUXlaLlw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=E/ZEh2b7; arc=fail smtp.client-ip=52.101.65.36
+	 Content-Type:MIME-Version; b=WE33t560YZO9RS+WTeLzvIrwOlUUSMqMiQqelGCVBaAXehff+OQsvlS+VKSzPAwNp+7153FsLFl7SlWNbSHn10zd5UxMNKDWU7GXffU0GeDBgsAzqCF/ot6RJm0eIpZ/X0+Kw0fbbmyo7ONLRZaOFxbdKwXYX2RJgiJQBsn+c3c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=TsOO25vD; arc=fail smtp.client-ip=52.101.65.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PonXoRyZ7yZ2Cnl2E6FN+oHQWYDZ4HjeW5dNgWNeceCNMtVrlV+IoHmXTuweEG3Zvzgqpg0newCosZiLZeL4co9IMqobOHBNZOv7NUxGuTgq9NQ+xNm1MbiIGdZ8FpSrtskp2DTlcUQhAbAHMvdfH9niqkNnYejCdN50U/jsnsP3BSR0MNCHP09wSKrBAWKJcPb1zsx3+TDAKf9RbehCjbJ0zyU3BanosLt8Zjo8KLV8G5DnvrxtIBTMf95oPVcb96GTgXVu+tGHKEHEIQJkmz6Z8wxMtTSzs+e/nCJvFGlUSqn405HmySAyFsllEm3kwhMiI7lfT+0SEQPX7e3mRw==
+ b=BdAOVaJhOctdZjCdzwVdjMdfilpZ/FEW5whV26nEg6kwpUMIgkEmQ6S1Ntk6YZR60BLN5vyFfObjACT1lSe1ze08XE4+Zsnp2IyXdLSB61GEIP1EBPTkNjt54dpMyx0MR1cqjzer79RbHS7AcsVTYmMVVpSsljm/61mIhKz60fZbsIXfzvzLGaVn17WR9cN4RF3qtyrTTXm1TQBS3HaELHNjlMCiLQljN2PnfM0OznJwgx7gvrU9xNTabh5evhue1PmdEO7OXxq3bomMNYUTLTWE6ETAkwYhOtlPwIvqL2CrZmYqhEtpTbCwf0Zk2hhqOu9NSGNk7MwG9nj1qxaEIg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HONltkVavojfK5OEoLbyx+Q106el8puzwaNKrcscfKo=;
- b=qpYdAHN4W54tc1ixHM6l+Gx+J7ph7knnXeYKfOQLTk0z0Sz2nbeKRjiPkRI4O+tp4wm88glzLBQ9NHO64aWLYyUY1a9ZzYSOG6j1tKA7mzRJVP1GYlHRpnZrlsmhN/vWKw/vZay6Esvgzd5izcGxQse4j+F1RTpB6nwh7Lj7+/X351NClG7hQnnkXD5/qVXe36eKVK+zqT2ixh6DpgAOVR63VyjAqFXjGTjMgoQOvLNglaIWGmTZVAoifhn2+dieLDk5bvjgUxJL7IbSxM0nuvPJCyi7DpqAwC9l+WEKzfd1/k+Oorhh1U6UGiGFzf+/ckGFWi4Mp8HZV4Pa3yPvUw==
+ bh=ruaErZIqK/b8/f1QNCxsWsqk+lb9Ky1zB1CJcLKqeCM=;
+ b=qwuGdwxd3cLdJXleWDhOAp5NCYAEDVFel2BRcchoxC5ByVeV/eDkWllHNsxeSMd8cZRgjRC9YiDNYWuNNhgpxdsw83U6ILPYfYLFTt6F3ZDOSKA7t09auCrY9L9AIL4RDGl0dKLHLvVqr9ifysETQ6c9QfTaV01icCYeJ3pYuku6WX7yN1GfdNp9KvwbJchPH7WMrDOPHUR7YQ9/o9xDb/ZkwEx4dyY83gmBXeTXulWIu0FSWKFX2THVsg4EzOB6gsCFcKaNlwwbgIUvymz+eGpHD1YE8p41zhBAhkq1GDv8UYc/dFdHtYm34rYfsCvBZOpkrnF/fOVU8E44oN5dvQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HONltkVavojfK5OEoLbyx+Q106el8puzwaNKrcscfKo=;
- b=E/ZEh2b7VmctPBt10G/TnE2WiZdXSWY3tn8n6fRt5oodzivJuEtSwfCbrAUCx/IzXycVLzSqNjxrnB2oSXRhKQbca6JwB+Klx5REJxPAJFo2RKePjVvHaXGIGkW7i4qO0fmR8NKVtWBxCS5kmMAa86BtCSq3n45mzATsuO4EeKq36E8lr0a9bmo0+4fVJiZS2HnFpaOgJ+BsIETZmv/xGkWpQjyTbVHh65cAPG70H9WxQbi+xINlPSvb7SaE9uOF/JHBta+07VqR4l35l6nCLvZ0wwLeqfvJSxyxPD+n6WNHxpdzov3H3XW9oyLAYpOdwoAt3fjZOYBwQg0UU2d35A==
+ bh=ruaErZIqK/b8/f1QNCxsWsqk+lb9Ky1zB1CJcLKqeCM=;
+ b=TsOO25vDxLshQ62NphTbQqo3WnmfkVCgr1+IvC7vYTpNrMgrMyaqQP/o/kSTICBZt/uhfofFJm1EHIx/M5Z+LuyozSRfFixV6kMQSmRvhPf8sAoAWpksFmmgfQc6eNwhCgMR32PQGPh/DPhSGXVIAf6a1b0DkIGPaOjPwQYPv7C+Xg20CSotY7Shtu9KnhBn8U8Y6GRwFo/ColakcO5y+XNoMHTzMpoQ6gx0nYJIlazSNS3NSip5tDhoji2r5ZjxCupQcoShtf61iHxYwY7JfDmoN2fx59LdNdGPH49qzm3oBXzqDpz0kE0sEM6u4A9iNeD4uh5W5D0UKLvhQXFokA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
  by PA4PR04MB7949.eurprd04.prod.outlook.com (2603:10a6:102:cc::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Fri, 22 May
- 2026 09:22:25 +0000
+ 2026 09:22:29 +0000
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.21.0048.016; Fri, 22 May 2026
- 09:22:25 +0000
+ 09:22:29 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -71,9 +71,9 @@ To: claudiu.manoil@nxp.com,
 Cc: imx@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net-next 06/12] net: enetc: convert mailbox messages to new formats
-Date: Fri, 22 May 2026 17:24:32 +0800
-Message-Id: <20260522092438.1264020-7-wei.fang@nxp.com>
+Subject: [PATCH v2 net-next 07/12] net: enetc: add VF-PF messaging support for IP minor revision query
+Date: Fri, 22 May 2026 17:24:33 +0800
+Message-Id: <20260522092438.1264020-8-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260522092438.1264020-1-wei.fang@nxp.com>
 References: <20260522092438.1264020-1-wei.fang@nxp.com>
@@ -90,56 +90,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|PA4PR04MB7949:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18df107c-ee1f-42ed-835d-08deb7e3a290
+X-MS-Office365-Filtering-Correlation-Id: f2ddeaa5-93a9-4907-adac-08deb7e3a4fe
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|366016|376014|1800799024|19092799006|3023799007|21046099003|22082099003|56012099003|18002099003|11063799006|38350700014|6133799003;
+	BCL:0;ARA:13230040|52116014|366016|376014|1800799024|19092799006|21046099003|22082099003|56012099003|18002099003|11063799006|38350700014|6133799003;
 X-Microsoft-Antispam-Message-Info:
-	Bh5na0nmNAZ3Y/7MS7q7QONzz8N0nS9WJLpYp8oiv9UDk+GZ2mLIOuTWZOjF8CpYhtE+mCJ8dMP+nhSGx0uVecMk2vXpMpINI0lXZjQLxGFUi49gSBbU3zHD94eO77wTi2svA471C7LHXWm1CM7uecNYbmmmhN3xQcAKCxvabm0cyjRPD/9hlwk7zTtP0ECHubyrsOx08CCbfNbS9BV8o4A9KTyM2OrwDK3a7bZPHvQMMq4XDsDCaPT+7X739XRZs5I8xB9h5PaldjrJGN8oMscroVxNnbauWu425YwQcJFomvrZWFKpsfHhXgv1oKP/lNtNwUknmmrygeTDaLe8+7Izckqj4p7eSiFxEO9jgswzlWey6DquC658rrTBxVDqHzNDP0hmnOWgujUimBUVTmQJbm+QVu4kIB58JIp1oAdTr+KuoeO5tXqDuoOdKQfP4YmB7HHiTmoSeQJ7yqCm6DMzlWnYuQ41V/eTTT3mEdAceTZEE7smsHVe7ExV9dreyVUTvzT8vW81bGs9kArnAjyonKEac6a/5LtJIMrLEBBh6vDSqAIGhDkfj91YWLS+7qOtHzeZNxFrfFpoFYZPBf8PRXLxldZC35lVTKLUxx485JKmGDqbyrY732iM5s6KaO7rmh41dLfZa20HmS0zZNPfFvrFcuUaOAypG+ZfLa0U6dokqVJDJA5Brzhex6+KoKDN2EtYjLPwLQBSTYXTdY9YFhTuohTF7TDQZm2HzO6v/AZfrziiG+sjFO+uFSho
+	S3TYl/51CvcbR0ksVmzDyut9vXpZGtYQ3G5HC+Ux5kccWMesnWdjn8IQw/GtcAY9TMHviYYROvI0k6YVKN+d+G2JRKB3nCF4q1PI0KmPEzkgH/BYBzdKKPizkicOwl0YuPRpKDikS2aCGAZSv8pLEQK3MFQl9mujJALPfq6Ciek04FkXLLOeb02LYpNgYzEp2/90TDp84dktv5AmQyKHMgSAdCoV6D2CNw2P4qEoGEX5zap0xfATIolURSaEPH3U9w+yx5YfMVDM8P18ot75FUSBg85OcffnrD9AK++i/FuqgLEhls/1B7NiXDULOdjr5wuy7TVXrBbIvAcAXM8sAFKqXbqur856+gfQNbQzDCmlLFUwtcwrpP8Djpt3hBOm/Bp2URcPwcNCSLVxqV1Lcab2kO3sX0g3NWK3Nl5+qY86c6QTnkAVaaxcWc4DX5yhDN7/6+ZQ+H2QePEvHzNGlZu8AjrDXqHTJQVUz3HrhNBw5bhWFQQpZOAy9TTn0KZ84Tu8y3F6FwYlk1eKvVf3f1HmbLIUbeycuqiUiHk7VX3YZZnGx991jMhptPWztT8D9kPwHUP6705yg7lgrELZH+U1zECDnkPCPcUVQ9V9bd4Acn9UFh7bD8J/3mhH33L7J8cJRcwSUCLNgX4IcgUcyzkPQv4OgWrhunAbch9uWfAy6vFRtlYxkCTeyuLZNKxsNcvAe3NAgCs4v7AFCofpO01jceGBmch8m1weJIFpPgiv3LW1d+jAssS78EJFqE/e
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(366016)(376014)(1800799024)(19092799006)(3023799007)(21046099003)(22082099003)(56012099003)(18002099003)(11063799006)(38350700014)(6133799003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(366016)(376014)(1800799024)(19092799006)(21046099003)(22082099003)(56012099003)(18002099003)(11063799006)(38350700014)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?gsxjdTn/0OHfM6qEDEaAdnAoBAHXLMpeq89CLtbQRChKsB0IJ7RNUhLlb+Wc?=
- =?us-ascii?Q?VeosIobDVoiBMBYTzYzJwoMsMsm+uJcdYQ08VxJSZfJ9a4a1upB3SOsLh162?=
- =?us-ascii?Q?wCmjg5EQgyCUTH/ctxSSujy2JUEFqnJcWlTMWJrOQeTa5vHEcCROIJMmf6Ye?=
- =?us-ascii?Q?Cw6idnncKsuN2VAqB3AkHWWqcrUpgiJTixAI1sOjp/9aLHIlhrNpJHITB2XV?=
- =?us-ascii?Q?OYgMsQg4iyd12HVyjQ/7OHMSUxdlDt7obdiu9fw3FY+ZywConsRycEgIcRzy?=
- =?us-ascii?Q?TRKZ1NLgp8S7zsLXvzII1JEuAu2/62AA6fbjms25mS018FuocpM38j+3JmHr?=
- =?us-ascii?Q?ymHYarAb9pNTVeOhYQvP+iNAOygHV/vT36RmEGV2TzoHeGlZG2nU6zkexBRP?=
- =?us-ascii?Q?K9FHvwAxIzunLPYCk0SNssXUx8aagVDaFd00YEfhgmtj/DahFAiBuGU5yqKl?=
- =?us-ascii?Q?4XJ/14gryUCscHjfD2eshCcCK4vEBYUo821ASc0xayZvPAiSL7oalaRT1LJt?=
- =?us-ascii?Q?m5ROK319n23jLM/+jKLXze2664h/ufQuPP1feBEBSLo+q47kbbLWmxrFrQhr?=
- =?us-ascii?Q?MomxCVtsdkMyOW3gjrNY8O3KlWPZAmG7lWPyP3pMTRZWJKdVFAMKJWuDIlhp?=
- =?us-ascii?Q?UHIJtciNoan09WodOtxw+RjoXS9m8aDRtgnoURSwElLToMQayi2mZHhXC/Tq?=
- =?us-ascii?Q?NXaRIa/JPnd3wzPjRU6utdiA1R4hxgkMobO9tyoHaHSf1neBnBcMCF94Dz/S?=
- =?us-ascii?Q?mB4i7CmHxs773GeTaTD/+6aIH/TPODpLnVLiyW4LJd6v+B2GBcbOWrjsoXvo?=
- =?us-ascii?Q?BcXj+jvt3IQTWQ03DX58BfYbn9fd0bgNyx36Z8ZqWJAdk0O8mvmWRp8TNviO?=
- =?us-ascii?Q?HDh9sN0vh5fWmnML/VUmaPWj5jU12GlTIXCaYlCWAldKxg3EmIQCBsOlFQUm?=
- =?us-ascii?Q?HDLkPiDf7dYEDAvUbgG0xY4bTBRktnxEftNpIRZiwBkNSJQSyfP7dIwiE++g?=
- =?us-ascii?Q?zpBgB6llgVXVPW5y6JDdulzBoZ3pFH8FclerLkGNA7r3n0IEW4TIgdhZL3cK?=
- =?us-ascii?Q?hw27f7cAl0Z7Ckm6gkhVo6+45TyTZttYV5emRGaQgYMprdQZcKu0bFJobyF3?=
- =?us-ascii?Q?Wg/vf1ec1jkJppomqea4b4P2qNawxXIPkEXK4OeuBC4C+KG/VsGgpQ6moWfI?=
- =?us-ascii?Q?qPvc4cGQKpeV9tKl6OluMyIOaoAmng39u+iKkt1xdB/kO7pLrOm7pZ/MU7ow?=
- =?us-ascii?Q?GpMtHSQdX0x/EQvaB3YCpM/il1TH85z9z1CVN0niQig7OS18TCrRquje4G8M?=
- =?us-ascii?Q?lj9l7VSw9Tf8BhOyWnssfAz8eQqwfMPcZLqDHD9sVEsq1aIvqctpUsLxeKV6?=
- =?us-ascii?Q?XdAu3dpt8psTK2gyQOGQ0NR+I2qE5l6SIq/kLYILuXpFCalVuspyhtFW2H1s?=
- =?us-ascii?Q?E3dtNkfTJnyJr5lACV3i0el+7lHg41oHHqVpxTByEnQ68scYzJ10ATKXrqOx?=
- =?us-ascii?Q?unU0DKN3x4Ue1aK5d5dnQi752BRLKtNimeeJqBb86PSN65iZE+TKwQ3CUwvI?=
- =?us-ascii?Q?Uosl94vbfKBwXQDNBvjAEH1yuRL7cZykmj/W+01GOUINnl6/cUpz2EuwcZ22?=
- =?us-ascii?Q?UAnjlrKRS/uwt0lT7GbpkS01xxC2gq4k8/Doqc3jsDlOM1I0P67d4BBjR72W?=
- =?us-ascii?Q?JELL38/8SQ1qpcjj+bxpRcMNGR6ao/RiVVZr+dy6mb2tWEod?=
+	=?us-ascii?Q?3x/+VXDY2EzikSsXuWH1SXsgQy332X2nBRUBvqJUfTiaqCyNXQCCPSt1j+f7?=
+ =?us-ascii?Q?lptW25/JdDoFmIfGACtloRcXNU7ce0w7mkmEmszH1n7hL2bCIMJEerqD4G53?=
+ =?us-ascii?Q?uD+MEpN0ULu+WVk1HOZ23Cibdmk26rCRll6IRLVIzJz1DjE2jwzQvUkerOMF?=
+ =?us-ascii?Q?HUSnEJuWdig1vONfQMvpyFzvntFgSszkjuuH0s33IhyzUx7k/+vGd+N/XM6g?=
+ =?us-ascii?Q?fIA0S2Arhc4CN+jHgOsWmtqNm5FhljEVGJAgRm7pCpDwhAI3PG0mrhsEBO2a?=
+ =?us-ascii?Q?qtNaVymShv+dlLu+xzEUUkzKwBGh+mqEZnUFqZbDuKAcSvKWTP2JfjO5kbpg?=
+ =?us-ascii?Q?t9F2xc+l3hwAiOQPuJTjgXwtQ+ieEoEULERwaQgYnQQmXMgLH16xlD9rghH7?=
+ =?us-ascii?Q?t2o7p2oxYE5hX1CT5FXBJDkbye1v2dgstwX9ijGS8WVR6kLi2houE6eWuruV?=
+ =?us-ascii?Q?0cFh5BswDfG3bDlNQqZtDILx4VjXWYhP9sxe0QdNOXgSD1S7jFuUcrzqj/BM?=
+ =?us-ascii?Q?lazA2OS5AhvGsAGSRjdg0RNqU4Q2jxb+ycs1BaYsR5toxijacwzdWvv+y6zP?=
+ =?us-ascii?Q?RZlS/hqGX5RcEDQ/iBK1ujJtrGz13ofD3fCsPwSS+rG0mDcitN3wEl9znL6a?=
+ =?us-ascii?Q?KNHRAZI3FPb+8AZj8YMsMqqA2wZKZsLOr0LTdwAkpy/i6ZeDIKBKuEfFcKfw?=
+ =?us-ascii?Q?SbLrqdB/ZZdVoO1bNfd3t/YN6Z6QoFTYWopQw+iSUKvzf7Q9jTdRZx3AIf07?=
+ =?us-ascii?Q?pwGyAOCz03RI359PtSLFeXocMbxU/ZSksJpbH23hWkw+BGHhjOWcpspaHBqE?=
+ =?us-ascii?Q?jrNnvcPASj6gPIC/DKMdHROK8fBuU5gi4JfqAwjy8VD5XWUHIaIbOvvHLXRe?=
+ =?us-ascii?Q?qrDrWsyiiUJV2JGtxBC1pFfBxm/av2KObV6DlLAviJmIm7ARAAQ2SR1wqcvz?=
+ =?us-ascii?Q?dH8RyhyC90f4uXrpw3EDGPJHox2ql/uj/Gykg0W/1IPSELDSqd7ZOHC7ThC0?=
+ =?us-ascii?Q?5dSkshHpKrWGvUdQNOxBBitCtvphw9VloUT8+lnhs4r0Q4vRR5XS6R52sOnO?=
+ =?us-ascii?Q?okr3qIBCQRjVK8rF5ctRQvd9BStCiGDlSOR5sFSb5+DGESv+3gVE+ipdzJnc?=
+ =?us-ascii?Q?mKnG1bFZiGIhyZ6h4xIEQkzVhh0ERKQWSyk9BQ8+dIU3V5xodWLcpUtu7vUm?=
+ =?us-ascii?Q?jAELh7atjX5o/FiRMPcXd5Nn+6yGi3rb+duGxdX1CR3ecffgjb07owPE48il?=
+ =?us-ascii?Q?mqB8qbEQmES8/BaqlFU8in3nadDdKqCNE+doaRuYlvN3u9kcLuh1/4MmaeRC?=
+ =?us-ascii?Q?5lS0IZOedS72BkvFnixd1pnAgQnJ+OWYvMRuW0R8xkqdTpVAaRnt79Zcj68k?=
+ =?us-ascii?Q?8vQ8L0Lx9HZjP6ugxgEiu1k4K7OpaWMNbJg1CGccSgbRhyy1WCHzQkl2kmAs?=
+ =?us-ascii?Q?fxP4KeWDmYZzsdPHRuZ/byUa5GJP64OTQc6UTqNa3Pxgm7T+KBloWw/EOhuL?=
+ =?us-ascii?Q?jxVUY/nYLV6NAmnYorMljCW3nROTxqEpBwU7aCvByCUn5vDjLLOUOlDadw4i?=
+ =?us-ascii?Q?TfuWfb5ugV0z4sI8D6GNtdXewdAdOCiFfgzWw1mVsGZUJYsHGZgLj2yg6gSO?=
+ =?us-ascii?Q?sdhaVKduXkzw+aN2Ha2u7VnpAmpMrJc4uHL6dsWUNnEa8bh6a5ZdsuRmSjJW?=
+ =?us-ascii?Q?fbWPGaZOgZRYq8OAAIxv2RvYtqKNZQ60iFjLvoKOv/xYYOUN?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18df107c-ee1f-42ed-835d-08deb7e3a290
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2ddeaa5-93a9-4907-adac-08deb7e3a4fe
 X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2026 09:22:24.9557
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2026 09:22:29.1041
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zxMT+wmtu3EucxoBwB6TeiG6FTdX/6Z+CIzZYC+WSzwbIeVdftUDzwZv6HflnvDL8eB3Ve0XgeVfdRfUDpqOhw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: e9Fk/XwtudeCO4c1G9vpruXqdN8HwnQSbp83cVW6m7E6PS9ZVckkol99yOV92w9IQAJbQ8L+RfHm/uZGE557Gg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7949
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -148,620 +148,268 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_FROM(0.00)[bounces-290739-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290740-lists,netdev=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.995];
 	RCVD_COUNT_FIVE(0.00)[5];
 	DKIM_TRACE(0.00)[nxp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_NONE(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[i.mx:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,nxp.com:email,nxp.com:mid,nxp.com:dkim]
-X-Rspamd-Queue-Id: CD3ED5B1264
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:mid,nxp.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 594CB5B119A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On the LS1028A platform, the PF-VF mailbox was only used to update the
-VF's MAC address. The original message format is minimal, lacks a clear
-structure, and provides no means for the receiver to validate message
-integrity, making it difficult to extend for new features.
+For ENETC v4, different SoCs use different minor revisions, such as
+i.MX95 v4.1, i.MX94 v4.3, and i.MX952 v4.6. Unlike the PF, the VF does
+not have access to a global register that exposes the IP minor revision.
+In the current driver model, the VF must select the appropriate driver
+data based on this revision information.
 
-With the introduction of i.MX ENETC v4, the interaction between PF and
-VF has become significantly more complex. Typical deployments now include
-scenarios where the PF is controlled by an M core while the VF is driven
-by either the Linux kernel or DPDK, or where the PF is controlled by the
-Linux kernel while the VF is controlled by DPDK. These heterogeneous
-driver combinations require a unified and extensible message format to
-ensure compatibility across different operating environments.
+To support this requirement, the VF now sends a minor revision query
+message to the PF through the VSI-to-PSI mailbox mechanism. The PF
+responds with the IP minor revision so that the VF can match the correct
+driver data.
 
-This patch introduces a newly defined PF-VF message structure and
-converts the existing MAC-update mechanism to use the new format. The
-redesigned message layout provides:
-
-  - extensibility to support future PF-VF features on ENETC v4,
-  - consistent framing for all message types,
-  - improved data integrity checking,
-  - a common protocol usable across Linux, M core firmware, and DPDK.
-
-Additional PF-VF message types will be added in subsequent patches.
-
-Note that switch to the new message format will not affect ENETC v1
-(LS1028A). Due to a hardware limitation of ENETC v1, the ENETC PF and
-VFs can only be controlled by the same OS. If the PF is controlled by
-the Linux kernel driver, then the VFs must also be controlled by the
-Linux kernel driver.
+This patch adds PF-side support for replying to the minor revision
+message and VF-side support for sending the query.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
- drivers/net/ethernet/freescale/enetc/Kconfig  |   2 +
- drivers/net/ethernet/freescale/enetc/enetc.h  |  15 +-
- .../net/ethernet/freescale/enetc/enetc4_pf.c  |   4 -
- .../ethernet/freescale/enetc/enetc_mailbox.h  | 151 ++++++++++++++++++
- .../net/ethernet/freescale/enetc/enetc_msg.c  | 127 +++++++++++----
- .../net/ethernet/freescale/enetc/enetc_vf.c   |  97 ++++++++---
- 6 files changed, 326 insertions(+), 70 deletions(-)
- create mode 100644 drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
+ .../ethernet/freescale/enetc/enetc_mailbox.h  | 19 +++++++
+ .../net/ethernet/freescale/enetc/enetc_msg.c  | 29 +++++++++++
+ .../net/ethernet/freescale/enetc/enetc_vf.c   | 52 +++++++++++++++++--
+ 3 files changed, 97 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/Kconfig b/drivers/net/ethernet/freescale/enetc/Kconfig
-index 117038104b69..db5c17a44613 100644
---- a/drivers/net/ethernet/freescale/enetc/Kconfig
-+++ b/drivers/net/ethernet/freescale/enetc/Kconfig
-@@ -10,6 +10,7 @@ config FSL_ENETC_CORE
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h b/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
+index 86a51bae19f3..d9677da38989 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
++++ b/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
+@@ -65,6 +65,9 @@
+  * (blocking requests), and
+  * 2) PSI_TX_control: PSIMSGSR[MC] - for PSI to VSI notification messages
+  * (async mode)
++ *
++ * Note that for some GET messages, there is no COOKIE field, and the CLASS
++ * CODE field is expanded to 8 bits.
+  */
  
- config NXP_ENETC_PF_COMMON
- 	tristate
-+	select CRC_ITU_T
- 	help
- 	  This module supports common functionality between drivers of
- 	  different versions of NXP ENETC PF controllers.
-@@ -70,6 +71,7 @@ config FSL_ENETC_VF
- 	select FSL_ENETC_MDIO
- 	select PHYLINK
- 	select DIMLIB
-+	select CRC_ITU_T
- 	help
- 	  This driver supports NXP ENETC gigabit ethernet controller PCIe
- 	  virtual function (VF) devices enabled by the ENETC PF driver.
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h b/drivers/net/ethernet/freescale/enetc/enetc.h
-index e691144e8756..b70b625328ea 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.h
-@@ -16,6 +16,7 @@
+ #ifndef __ENETC_MAILBOX_H
+@@ -84,6 +87,8 @@
+ /* The fileds of PSI-to-VSI message, the message is only 16-bit */
+ #define ENETC_PF_MSG_COOKIE			GENMASK(3, 0)
+ #define ENETC_PF_MSG_CLASS_CODE			GENMASK(7, 4)
++/* Extend the class code to 8-bit for GET messages without COOKIE */
++#define ENETC_PF_MSG_CLASS_CODE_U8		GENMASK(7, 0)
+ #define ENETC_PF_MSG_CLASS_ID			GENMASK(15, 8)
  
- #include "enetc_hw.h"
- #include "enetc4_hw.h"
-+#include "enetc_mailbox.h"
+ enum enetc_msg_class_id {
+@@ -102,12 +107,17 @@ enum enetc_msg_class_id {
  
- #define ENETC_MAC_MAXFRM_SIZE	9600
- #define ENETC_MAX_MTU		(ENETC_MAC_MAXFRM_SIZE - \
-@@ -257,12 +258,6 @@ static inline union enetc_rx_bd *enetc_rxbd_ext(union enetc_rx_bd *rxbd)
- 	return ++rxbd;
- }
- 
--struct enetc_msg_swbd {
--	void *vaddr;
--	dma_addr_t dma;
--	int size;
--};
--
- #define ENETC_REV1	0x1
- #define ENETC_REV4	0x4
- 
-@@ -490,14 +485,6 @@ struct enetc_ndev_priv {
- 	u64 sysclk_freq; /* NETC system clock frequency */
+ 	/* Common Class ID for PSI-to-VSI and VSI-to-PSI messages */
+ 	ENETC_MSG_CLASS_ID_MAC_FILTER		= 0x20,
++	ENETC_MSG_CLASS_ID_IP_REVISION		= 0xf0,
  };
  
--/* Messaging */
--
--/* VF-PF set primary MAC address message format */
--struct enetc_msg_cmd_set_primary_mac {
--	struct enetc_msg_cmd_header header;
--	struct sockaddr mac;
--};
--
- #define ENETC_CBD(R, i)	(&(((struct enetc_cbd *)((R).bd_base))[i]))
+ enum enetc_msg_mac_filter_cmd_id {
+ 	ENETC_MSG_SET_PRIMARY_MAC,
+ };
  
- #define ENETC_CBDR_TIMEOUT	1000 /* usecs */
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-index 56899f2254aa..4e771f852358 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-@@ -17,10 +17,6 @@
- #define ENETC_MAC_FILTER_TYPE_ALL	(ENETC_MAC_FILTER_TYPE_UC | \
- 					 ENETC_MAC_FILTER_TYPE_MC)
++enum enetc_msg_ip_revision_cmd_id {
++	ENETC_MSG_GET_IP_MN			= 1,
++};
++
+ /* Class-specific error return codes of MAC filter */
+ enum enetc_mac_filter_class_code {
+ 	ENETC_MF_CLASS_CODE_INVALID_MAC,
+@@ -148,4 +158,13 @@ struct enetc_msg_mac_exact_filter {
+ 	struct enetc_mac_addr mac[];
+ };
  
--struct enetc_mac_addr {
--	u8 addr[ETH_ALEN];
--};
--
- static void enetc4_get_port_caps(struct enetc_pf *pf)
- {
- 	struct enetc_hw *hw = &pf->si->hw;
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h b/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
-new file mode 100644
-index 000000000000..86a51bae19f3
---- /dev/null
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
-@@ -0,0 +1,151 @@
-+/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-+/*
-+ * Copyright 2025-2026 NXP
-+ *
-+ * The VSI-to-PSI message generic format:
-+ *
-+ * OFFSET  0                               16              24            31
-+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-+ *  0x0   |       CRC16 (big-endian)      |    CLASS ID   |     CMD ID    |
-+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-+ *  0x4   |   PROTO VER   |      LEN      |    RESV       | COOKIE|  RESV |
-+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-+ *  0x8   |                              RESV                             |
-+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-+ *  0xc   |                              RESV                             |
-+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-+ *  0x10  |                                                               |
-+ *  0x14  |                                                               |
-+ *  0x18  |                          Message Body                         |
-+ *  0x1c  |                                                               |
-+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-+ *  0x20  |                                                               |
-+ *    ~   |              Extended Message Body: LEN x 32B                 |
-+ *  0x3e0 |                                                               |
-+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-+ *
-+ * Field Descriptions:
-+ * CRC16 (16-bit): Big endian, CRC16 CCITT-FALSE algorithm, It provides the
-+ * equivalent data integrity check functionality as the FCS for standard
-+ * Ethernet frames.
-+ *
-+ * CLASS ID (8-bit) and CMD ID (8-bit): These are 8-bit fields identifying
-+ * the command class and the class-specific operations supported. For more
-+ * details, please refer to the definitions of the relevant class ID and
-+ * cmd ID in this document.
-+ *
-+ * PROTO VER (8-bit): Supported VSI-PSI command protocol version. Currently
-+ * only support version 0. To be incremented for future protocol extensions.
-+ *
-+ * LEN (8-bit): Extended message body length in increments of 32B. The upper
-+ * limit is given by the physical implementation of the NETC VSI-PSI Messaging
-+ * mechanism that supports message sizes of up to 1024B (including headers),
-+ * that are multiple of 32B.
-+ *
-+ * COOKIE (4-bit): Optional parameter, which, if not 0, indicates that the
-+ * command should be execute asynchronously on PSI side. If COOKIE is not 0
-+ * and the command cannot be executed instantly on the PSI side (it would
-+ * take longer time to complete), the PSI may enqueue the request in a command
-+ * queue of up to 15 entries per VSI and, later after command execution, the
-+ * PSI returns the COOKIE to VSI as part of an asynchronous notification
-+ * message that indicates the command completion status. If COOKIE is 0 then
-+ * the command is considered as blocking, the PSI will wait for the execution
-+ * of the command to complete before updating the PSIMSGRR[MC] field with the
-+ * corresponding return code.
-+ *
-+ * The PSI-to-VSI message generic format:
-+ *   0               4               8               12          15
-+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-+ * |       COOKIE      |   CLASS CODE  |          CLASS ID         |
-+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-+ *
-+ * The PSI to VSI message format is mapped to the following PSI message
-+ * registers/fields, depending on use case:
-+ * 1) PSI_RX_control: PSIMSGRR[MC] - for VSI command return code messages
-+ * (blocking requests), and
-+ * 2) PSI_TX_control: PSIMSGSR[MC] - for PSI to VSI notification messages
-+ * (async mode)
++/* The generic message format applies to the following messages:
++ * Get IP revision message, class_id 0xf0.
++ * cmd_id 1: get IP minor revision
 + */
-+
-+#ifndef __ENETC_MAILBOX_H
-+#define __ENETC_MAILBOX_H
-+
-+#include <linux/crc-itu-t.h>
-+
-+#define ENETC_CRC_INIT				0xffff
-+#define ENETC_MSG_ALIGN				32
-+/* s indicates the size of the message */
-+#define ENETC_MSG_EXT_BODY_LEN(s)		((s) / ENETC_MSG_ALIGN - 1)
-+/* l indicates the extended body len (LEN field) of the message */
-+#define ENETC_MSG_SIZE(l)			(((l) + 1) * ENETC_MSG_ALIGN)
-+
-+/* The cookie filed of VSI-to-PSI message */
-+#define ENETC_VF_MSG_COOKIE			GENMASK(3, 0)
-+/* The fileds of PSI-to-VSI message, the message is only 16-bit */
-+#define ENETC_PF_MSG_COOKIE			GENMASK(3, 0)
-+#define ENETC_PF_MSG_CLASS_CODE			GENMASK(7, 4)
-+#define ENETC_PF_MSG_CLASS_ID			GENMASK(15, 8)
-+
-+enum enetc_msg_class_id {
-+	/* Class ID for PSI-to-VSI messages */
-+	ENETC_MSG_CLASS_ID_CMD_SUCCESS		= 1,
-+	ENETC_MSG_CLASS_ID_PERMISSION_DENY,
-+	ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT,
-+	ENETC_MSG_CLASS_ID_PSI_BUSY,
-+	ENETC_MSG_CLASS_ID_CRC_ERROR,
-+	ENETC_MSG_CLASS_ID_PROTO_NOT_SUPPORT,
-+	ENETC_MSG_CLASS_ID_INVALID_MSG_LEN,
-+	ENETC_MSG_CLASS_ID_CMD_TIMEOUT,
-+	ENETC_MSG_CLASS_ID_CMD_NOT_PERMITTED,
-+	ENETC_MSG_CLASS_ID_CMD_FAIL, /* Generic error code for failure */
-+	ENETC_MSG_CLASS_ID_CMD_DEFERRED		= 0xf,
-+
-+	/* Common Class ID for PSI-to-VSI and VSI-to-PSI messages */
-+	ENETC_MSG_CLASS_ID_MAC_FILTER		= 0x20,
-+};
-+
-+enum enetc_msg_mac_filter_cmd_id {
-+	ENETC_MSG_SET_PRIMARY_MAC,
-+};
-+
-+/* Class-specific error return codes of MAC filter */
-+enum enetc_mac_filter_class_code {
-+	ENETC_MF_CLASS_CODE_INVALID_MAC,
-+};
-+
-+struct enetc_msg_swbd {
-+	void *vaddr;
-+	dma_addr_t dma;
-+	int size;
-+};
-+
-+/* The generic VSI-to-PSI message header */
-+struct enetc_msg_header {
-+	__be16 crc16;
-+	u8 class_id;
-+	u8 cmd_id;
-+	u8 proto_ver;
-+	u8 len;
-+	u8 resv0;
-+	u8 cookie;
-+	u8 resv2[8];
-+};
-+
-+struct enetc_mac_addr {
-+	u8 addr[ETH_ALEN]; /* Network byte order */
-+};
-+
-+/* Message format of class_id 0x20 for exact MAC filter.
-+ * cmd_id 0x0: set primary MAC
-+ * cmd_id 0x1: Add entries to MAC address filter table
-+ * cmd_id 0x2: Delete entries from MAC address filter table
-+ * Note that cmd_id 0x1 and 0x2 are not supported yet.
-+ */
-+struct enetc_msg_mac_exact_filter {
++struct enetc_msg_generic {
 +	struct enetc_msg_header hdr;
-+	u8 mac_cnt; /* No need to set for cmd_id 0 */
-+	u8 resv[3];
-+	struct enetc_mac_addr mac[];
++	u8 resv[16];
 +};
 +
-+#endif
+ #endif
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc_msg.c b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-index f696751c00ea..4ab123cbfbec 100644
+index 4ab123cbfbec..edc1277bb586 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc_msg.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-@@ -3,6 +3,11 @@
- 
- #include "enetc_pf_common.h"
- 
-+#define ENETC_PF_MSG_SUCCESS	FIELD_PREP(ENETC_PF_MSG_CLASS_ID, \
-+					   ENETC_MSG_CLASS_ID_CMD_SUCCESS)
-+#define ENETC_PF_MSG_NOTSUPP	FIELD_PREP(ENETC_PF_MSG_CLASS_ID, \
-+					   ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT)
-+
- static void enetc_msg_disable_mr_int(struct enetc_pf *pf)
- {
- 	struct enetc_hw *hw = &pf->si->hw;
-@@ -36,23 +41,35 @@ static irqreturn_t enetc_msg_psi_msix(int irq, void *data)
+@@ -101,6 +101,21 @@ static u16 enetc_msg_handle_mac_filter(struct enetc_pf *pf, int vf_id,
+ 	}
  }
  
- /* Messaging */
--static u16 enetc_msg_pf_set_vf_primary_mac_addr(struct enetc_pf *pf,
--						int vf_id, void *msg)
-+static bool enetc_msg_check_crc16(void *msg_addr, u32 msg_size)
-+{
-+	u32 data_size = msg_size - 2;
-+	u8 *data_buf = msg_addr + 2;
-+	u16 verify_val;
-+
-+	verify_val = crc_itu_t(ENETC_CRC_INIT, data_buf, data_size);
-+	verify_val = crc_itu_t(verify_val, msg_addr, 2);
-+	if (verify_val)
-+		return false;
-+
-+	return true;
-+}
-+
-+static u16 enetc_msg_set_vf_primary_mac_addr(struct enetc_pf *pf, int vf_id,
-+					     void *vf_msg)
- {
- 	struct enetc_vf_state *vf_state = &pf->vf_state[vf_id];
--	struct enetc_msg_cmd_set_primary_mac *cmd = msg;
-+	struct enetc_msg_mac_exact_filter *msg = vf_msg;
- 	struct device *dev = &pf->si->pdev->dev;
--	u16 cmd_id = cmd->header.id;
--	char *addr;
--
--	if (cmd_id != ENETC_MSG_CMD_MNG_ADD)
--		return ENETC_MSG_CMD_STATUS_FAIL;
-+	char *addr = msg->mac[0].addr;
- 
--	addr = cmd->mac.sa_data;
- 	if (!is_valid_ether_addr(addr)) {
- 		dev_err_ratelimited(dev, "VF%d attempted to set invalid MAC\n",
- 				    vf_id);
--		return ENETC_MSG_CMD_STATUS_FAIL;
-+		return (FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+				   ENETC_MSG_CLASS_ID_MAC_FILTER) |
-+			FIELD_PREP(ENETC_PF_MSG_CLASS_CODE,
-+				   ENETC_MF_CLASS_CODE_INVALID_MAC));
- 	}
- 
- 	mutex_lock(&vf_state->lock);
-@@ -61,53 +78,97 @@ static u16 enetc_msg_pf_set_vf_primary_mac_addr(struct enetc_pf *pf,
- 		dev_err_ratelimited(dev,
- 				    "VF%d attempted to override PF set MAC\n",
- 				    vf_id);
--		return ENETC_MSG_CMD_STATUS_FAIL;
-+		return FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+				  ENETC_MSG_CLASS_ID_CMD_NOT_PERMITTED);
- 	}
- 
- 	enetc_set_si_hw_addr(pf, vf_id + 1, addr);
- 	mutex_unlock(&vf_state->lock);
- 
--	return ENETC_MSG_CMD_STATUS_OK;
-+	return ENETC_PF_MSG_SUCCESS;
-+}
-+
-+static u16 enetc_msg_handle_mac_filter(struct enetc_pf *pf, int vf_id,
-+				       void *vf_msg)
++static u16 enetc_msg_handle_ip_revision(struct enetc_pf *pf, void *vf_msg)
 +{
 +	struct enetc_msg_header *msg_hdr = vf_msg;
 +
 +	switch (msg_hdr->cmd_id) {
-+	case ENETC_MSG_SET_PRIMARY_MAC:
-+		return enetc_msg_set_vf_primary_mac_addr(pf, vf_id, vf_msg);
++	case ENETC_MSG_GET_IP_MN:
++		return (FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
++				   ENETC_MSG_CLASS_ID_IP_REVISION) |
++			FIELD_PREP(ENETC_PF_MSG_CLASS_CODE_U8,
++				   pf->si->revision));
 +	default:
 +		return ENETC_PF_MSG_NOTSUPP;
 +	}
++}
++
+ static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id,
+ 				   u16 *pf_msg)
+ {
+@@ -158,10 +173,24 @@ static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id,
+ 		goto free_msg;
+ 	}
+ 
++	/* The new messages are currently only supported on ENETC v4. If v1
++	 * requires them, the current restriction can be lifted.
++	 */
++	if (is_enetc_rev1(pf->si) &&
++	    !(msg_hdr->class_id == ENETC_MSG_CLASS_ID_MAC_FILTER &&
++	      msg_hdr->cmd_id == ENETC_MSG_SET_PRIMARY_MAC)) {
++		dev_err_ratelimited(dev, "Unsupported message for ENETC v1\n");
++
++		goto free_msg;
++	}
++
+ 	switch (msg_hdr->class_id) {
+ 	case ENETC_MSG_CLASS_ID_MAC_FILTER:
+ 		*pf_msg = enetc_msg_handle_mac_filter(pf, vf_id, msg);
+ 		break;
++	case ENETC_MSG_CLASS_ID_IP_REVISION:
++		*pf_msg = enetc_msg_handle_ip_revision(pf, msg);
++		break;
+ 	default:
+ 		dev_err_ratelimited(dev,
+ 				    "Unsupported message class ID: 0x%x\n",
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+index 77c0eddba6e2..7d022b9c12d7 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+@@ -114,6 +114,9 @@ static int enetc_msg_vsi_send(struct enetc_si *si, struct enetc_msg_swbd *msg)
+ 		case ENETC_MSG_CLASS_ID_CMD_NOT_PERMITTED:
+ 			err = -EPERM;
+ 			break;
++		case ENETC_MSG_CLASS_ID_IP_REVISION:
++			err = FIELD_GET(ENETC_PF_MSG_CLASS_CODE_U8, pf_msg);
++			break;
+ 		case ENETC_MSG_CLASS_ID_CMD_FAIL:
+ 		case ENETC_MSG_CLASS_ID_CRC_ERROR:
+ 		case ENETC_MSG_CLASS_ID_CMD_DEFERRED:
+@@ -122,7 +125,7 @@ static int enetc_msg_vsi_send(struct enetc_si *si, struct enetc_msg_swbd *msg)
+ 		}
+ 	}
+ 
+-	if (err)
++	if (err < 0)
+ 		dev_err(dev, "Return error code from PSI: 0x%04x\n", pf_msg);
+ 
+ 	return err;
+@@ -151,6 +154,24 @@ static int enetc_msg_vsi_set_primary_mac_addr(struct enetc_ndev_priv *priv,
+ 	return enetc_msg_vsi_send(priv->si, &msg_swbd);
  }
  
- static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id,
--				   u16 *status)
-+				   u16 *pf_msg)
++static int enetc_vf_get_ip_minor_revision(struct enetc_si *si)
++{
++	struct device *dev = &si->pdev->dev;
++	struct enetc_msg_swbd msg_swbd;
++
++	msg_swbd.size = ALIGN(sizeof(struct enetc_msg_generic),
++			      ENETC_MSG_ALIGN);
++	msg_swbd.vaddr = dma_alloc_coherent(dev, msg_swbd.size,
++					    &msg_swbd.dma, GFP_KERNEL);
++	if (!msg_swbd.vaddr)
++		return -ENOMEM;
++
++	enetc_msg_fill_common_hdr(&msg_swbd, ENETC_MSG_CLASS_ID_IP_REVISION,
++				  ENETC_MSG_GET_IP_MN, 0, 0);
++
++	return enetc_msg_vsi_send(si, &msg_swbd);
++}
++
+ static int enetc_vf_set_mac_addr(struct net_device *ndev, void *addr)
  {
- 	struct enetc_msg_swbd *msg_swbd = &pf->rxmsg[vf_id];
-+	struct enetc_msg_header *msg_hdr = msg_swbd->vaddr;
-+	u32 msg_size = ENETC_MSG_SIZE(msg_hdr->len);
- 	struct device *dev = &pf->si->pdev->dev;
--	struct enetc_msg_cmd_header *cmd_hdr;
--	u16 cmd_type;
- 	u8 *msg;
+ 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
+@@ -202,6 +223,27 @@ static const struct net_device_ops enetc_ndev_ops = {
+ 	.ndo_hwtstamp_set	= enetc_hwtstamp_set,
+ };
  
--	msg = kzalloc_objs(*msg, msg_swbd->size);
-+	if (msg_size > ENETC_DEFAULT_MSG_SIZE) {
-+		dev_err_ratelimited(dev,
-+				    "Invalid message size: %u\n", msg_size);
-+		*pf_msg = FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+				     ENETC_MSG_CLASS_ID_INVALID_MSG_LEN);
++static void enetc_vf_get_revision(struct enetc_si *si)
++{
++	int ip_mn;
++
++	if (is_enetc_rev1(si)) {
++		si->revision = ENETC_REV_1_0;
 +		return;
 +	}
 +
-+	/* To prevent malicious VF from tampering with the original data by
-+	 * sending new messages after passing the check, the DMA buffer data
-+	 * is copied to the msg buffer before validation.
-+	 */
-+	msg = kzalloc_objs(*msg, msg_size);
- 	if (!msg) {
- 		dev_err_ratelimited(dev,
- 				    "Failed to allocate message buffer\n");
--		*status = ENETC_MSG_CMD_STATUS_FAIL;
-+		*pf_msg = FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+				     ENETC_MSG_CLASS_ID_CMD_FAIL);
- 		return;
- 	}
- 
--	/* Currently, only ENETC_MSG_CMD_MNG_MAC command is supported, so
--	 * only sizeof(struct enetc_msg_cmd_set_primary_mac) bytes need to
--	 * be copied. This data already includes the cmd_type field, so it
--	 * can correctly return an error code.
--	 */
--	memcpy(msg, msg_swbd->vaddr,
--	       sizeof(struct enetc_msg_cmd_set_primary_mac));
--	cmd_hdr = (struct enetc_msg_cmd_header *)msg;
--	cmd_type = cmd_hdr->type;
--
--	switch (cmd_type) {
--	case ENETC_MSG_CMD_MNG_MAC:
--		*status = enetc_msg_pf_set_vf_primary_mac_addr(pf, vf_id, msg);
-+	memcpy(msg, msg_swbd->vaddr, msg_size);
-+	if (!enetc_msg_check_crc16(msg, msg_size)) {
-+		dev_err_ratelimited(dev, "VSI to PSI Message CRC16 error\n");
-+		*pf_msg = FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+				     ENETC_MSG_CLASS_ID_CRC_ERROR);
-+
-+		goto free_msg;
++	ip_mn = enetc_vf_get_ip_minor_revision(si);
++	if (ip_mn >= 0) {
++		si->revision = (si->pdev->revision << 8) | ip_mn;
++		return;
 +	}
 +
-+	/* Default to not supported */
-+	*pf_msg = ENETC_PF_MSG_NOTSUPP;
-+	msg_hdr = (struct enetc_msg_header *)msg;
-+
-+	/* Currently, asynchronous actions are not supported */
-+	if (FIELD_GET(ENETC_VF_MSG_COOKIE, msg_hdr->cookie)) {
-+		dev_err_ratelimited(dev,
-+				    "Cookie field is not supported yet\n");
-+		goto free_msg;
-+	}
-+
-+	/* Currently only support protocol version 0 */
-+	if (msg_hdr->proto_ver) {
-+		dev_err_ratelimited(dev, "Unsupported protocol version %u\n",
-+				    msg_hdr->proto_ver);
-+		goto free_msg;
-+	}
-+
-+	switch (msg_hdr->class_id) {
-+	case ENETC_MSG_CLASS_ID_MAC_FILTER:
-+		*pf_msg = enetc_msg_handle_mac_filter(pf, vf_id, msg);
- 		break;
- 	default:
--		*status = ENETC_MSG_CMD_STATUS_FAIL;
- 		dev_err_ratelimited(dev,
--				    "command not supported (cmd_type: 0x%x)\n",
--				    cmd_type);
-+				    "Unsupported message class ID: 0x%x\n",
-+				    msg_hdr->class_id);
- 	}
- 
-+free_msg:
- 	kfree(msg);
- }
- 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-index 9065bdbd02aa..77c0eddba6e2 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-@@ -7,7 +7,29 @@
- 
- #define ENETC_DRV_NAME_STR "ENETC VF driver"
- 
--/* Messaging */
-+/* Note: This function should be called after filling the message body,
-+ * because the CRC16 needs to be calculated after all the data has been
-+ * filled.
-+ */
-+static void enetc_msg_fill_common_hdr(struct enetc_msg_swbd *msg_swbd,
-+				      u8 class_id, u8 cmd_id, u8 proto_ver,
-+				      u8 cookie)
-+{
-+	struct enetc_msg_header *hdr = msg_swbd->vaddr;
-+	u8 *data_buf = ((u8 *)msg_swbd->vaddr) + 2; /* skip crc16 field */
-+	u32 data_size = msg_swbd->size - 2;
-+	u16 crc16;
-+
-+	hdr->class_id = class_id;
-+	hdr->cmd_id = cmd_id;
-+	hdr->len = ENETC_MSG_EXT_BODY_LEN(msg_swbd->size);
-+	hdr->proto_ver = proto_ver;
-+	hdr->cookie = FIELD_PREP(ENETC_VF_MSG_COOKIE, cookie);
-+
-+	crc16 = crc_itu_t(ENETC_CRC_INIT, data_buf, data_size);
-+	hdr->crc16 = htons(crc16);
++	si->revision = ENETC_REV_4_1;
++	dev_info(&si->pdev->dev,
++		 "Failed to get revision, use compatible revision: 0x%04x\n",
++		 si->revision);
 +}
 +
- static void enetc_msg_vsi_write_msg(struct enetc_hw *hw,
- 				    struct enetc_msg_swbd *msg)
+ static void enetc_vf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
+ 				  const struct net_device_ops *ndev_ops)
  {
-@@ -30,6 +52,7 @@ static int enetc_msg_vsi_send(struct enetc_si *si, struct enetc_msg_swbd *msg)
+@@ -252,6 +294,7 @@ static int enetc_vf_probe(struct pci_dev *pdev,
+ 			  const struct pci_device_id *ent)
  {
- 	struct device *dev = &si->pdev->dev;
- 	u32 vsimsgsr;
-+	u16 pf_msg;
+ 	struct enetc_ndev_priv *priv;
++	struct enetc_msg_swbd msg;
+ 	struct net_device *ndev;
+ 	struct enetc_si *si;
  	int err;
+@@ -261,13 +304,13 @@ static int enetc_vf_probe(struct pci_dev *pdev,
+ 		return dev_err_probe(&pdev->dev, err, "PCI probing failed\n");
  
- 	/* The VSI mailbox may be busy if last message was not yet processed
-@@ -60,36 +83,72 @@ static int enetc_msg_vsi_send(struct enetc_si *si, struct enetc_msg_swbd *msg)
- 
- 	/* check for message delivery error */
- 	if (vsimsgsr & ENETC_VSIMSGSR_MS) {
--		dev_err(dev, "VSI command execute error: %d\n",
--			ENETC_SIMSGSR_GET_MC(vsimsgsr));
-+		dev_err(dev, "Transfer error when copying the data\n");
- 		return -EIO;
+ 	si = pci_get_drvdata(pdev);
+-	si->revision = ENETC_REV_1_0;
++	enetc_vf_get_revision(si);
+ 	si->ops = &enetc_vsi_ops;
+ 	err = enetc_get_driver_data(si);
+ 	if (err) {
+ 		dev_err_probe(&pdev->dev, err,
+ 			      "Could not get VF driver data\n");
+-		goto err_alloc_netdev;
++		goto err_get_driver_data;
  	}
  
--	return 0;
-+	pf_msg = ENETC_SIMSGSR_GET_MC(vsimsgsr);
-+	/* Check the user-defined completion status. */
-+	if (FIELD_GET(ENETC_PF_MSG_CLASS_ID, pf_msg) !=
-+	    ENETC_MSG_CLASS_ID_CMD_SUCCESS) {
-+		switch (FIELD_GET(ENETC_PF_MSG_CLASS_ID, pf_msg)) {
-+		case ENETC_MSG_CLASS_ID_PERMISSION_DENY:
-+			/* Intentionally returning early to prevent excessive
-+			 * error logs due to permission issues.
-+			 */
-+			return -EACCES;
-+		case ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT:
-+		case ENETC_MSG_CLASS_ID_PROTO_NOT_SUPPORT:
-+			err = -EOPNOTSUPP;
-+			break;
-+		case ENETC_MSG_CLASS_ID_PSI_BUSY:
-+			err = -EBUSY;
-+			break;
-+		case ENETC_MSG_CLASS_ID_CMD_TIMEOUT:
-+			err = -ETIME;
-+			break;
-+		case ENETC_MSG_CLASS_ID_INVALID_MSG_LEN:
-+		case ENETC_MSG_CLASS_ID_MAC_FILTER:
-+			err = -EINVAL;
-+			break;
-+		case ENETC_MSG_CLASS_ID_CMD_NOT_PERMITTED:
-+			err = -EPERM;
-+			break;
-+		case ENETC_MSG_CLASS_ID_CMD_FAIL:
-+		case ENETC_MSG_CLASS_ID_CRC_ERROR:
-+		case ENETC_MSG_CLASS_ID_CMD_DEFERRED:
-+		default:
-+			err = -EIO;
-+		}
-+	}
-+
-+	if (err)
-+		dev_err(dev, "Return error code from PSI: 0x%04x\n", pf_msg);
-+
-+	return err;
+ 	enetc_get_si_caps(si);
+@@ -327,7 +370,10 @@ static int enetc_vf_probe(struct pci_dev *pdev,
+ 	si->ndev = NULL;
+ 	free_netdev(ndev);
+ err_alloc_netdev:
++err_get_driver_data:
++	msg = si->msg;
+ 	enetc_pci_remove(pdev);
++	enetc_msg_dma_free(&pdev->dev, &msg);
+ 
+ 	return err;
  }
- 
- static int enetc_msg_vsi_set_primary_mac_addr(struct enetc_ndev_priv *priv,
- 					      struct sockaddr *saddr)
- {
--	struct enetc_msg_cmd_set_primary_mac *cmd;
--	struct enetc_msg_swbd msg;
--
--	msg.size = ALIGN(sizeof(struct enetc_msg_cmd_set_primary_mac), 64);
--	msg.vaddr = dma_alloc_coherent(priv->dev, msg.size, &msg.dma,
--				       GFP_KERNEL);
--	if (!msg.vaddr) {
--		dev_err(priv->dev, "Failed to alloc Tx msg (size: %d)\n",
--			msg.size);
-+	struct enetc_msg_mac_exact_filter *msg;
-+	struct enetc_msg_swbd msg_swbd;
-+	u32 msg_size;
-+
-+	msg_size = struct_size(msg, mac, 1);
-+	msg_swbd.size = ALIGN(msg_size, ENETC_MSG_ALIGN);
-+	msg_swbd.vaddr = dma_alloc_coherent(priv->dev, msg_swbd.size,
-+					    &msg_swbd.dma, GFP_KERNEL);
-+	if (!msg_swbd.vaddr)
- 		return -ENOMEM;
--	}
- 
--	cmd = (struct enetc_msg_cmd_set_primary_mac *)msg.vaddr;
--	cmd->header.type = ENETC_MSG_CMD_MNG_MAC;
--	cmd->header.id = ENETC_MSG_CMD_MNG_ADD;
--	memcpy(&cmd->mac, saddr, sizeof(struct sockaddr));
-+	msg = (struct enetc_msg_mac_exact_filter *)msg_swbd.vaddr;
-+	memcpy(&msg->mac[0].addr, saddr->sa_data, ETH_ALEN);
-+	enetc_msg_fill_common_hdr(&msg_swbd, ENETC_MSG_CLASS_ID_MAC_FILTER,
-+				  ENETC_MSG_SET_PRIMARY_MAC, 0, 0);
- 
- 	/* send the command and wait */
--	return enetc_msg_vsi_send(priv->si, &msg);
-+	return enetc_msg_vsi_send(priv->si, &msg_swbd);
- }
- 
- static int enetc_vf_set_mac_addr(struct net_device *ndev, void *addr)
 -- 
 2.34.1
 
