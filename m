@@ -1,642 +1,126 @@
-Return-Path: <netdev+bounces-290960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290961-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oGbgNq3sEGr+fQYAu9opvQ
-	(envelope-from <netdev+bounces-290960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:54:21 +0200
+	id 0O+7C6XtEGrlfgYAu9opvQ
+	(envelope-from <netdev+bounces-290961-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:58:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD46F5BBA05
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:54:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B4C5BBA2E
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id ABEDF3002F7B
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:54:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 32B583003481
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A3B38C42E;
-	Fri, 22 May 2026 23:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712F33932C3;
+	Fri, 22 May 2026 23:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="HprCEILq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jlOfNPrc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99913769F3
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.153.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779494054; cv=fail; b=bDusQZWiEu3+n47SnB1UXArnszvNnlXM7TglQIqAHGUQZXJCWQtaCJ8kLRm8ZGPlBYvHLEt80mIDSPA4fXl8veUkKaSOCSvSzwdDLGc361k5Hnr2MzNpuZc1WgqFLJh7Ci6BIGfzbY9ptJlKn/C944zFpTskFkzBHH0u8aQi1oY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779494054; c=relaxed/simple;
-	bh=DNlochln4KieL0hqL78IZaLMDPpl4uvB9y2dcgfjBMI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hGHbWB6+n35Cj4zFVQBbE8DMUyv5SmQEyuCB8RqdU2YNJZRRNzg2SLBO9U+6xQdhl5r1TrKsd0s4JIaaA4Nr9aEDTXSN5J0v3JgIdOmJyEif4f//4tQLTLrZ/iBqYqtT6cPoKbXrgPhDiP0H3gC9gdqkRA37SLiIkEKcC1dvR/4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=HprCEILq; arc=fail smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 64MEP0Re1927789
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 16:54:11 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=BJr1ZIFg0dApTPOKxEBWywjJAcZm+0SNH1wNhtJCPaQ=; b=HprCEILqoF+v
-	cvKFEdCNE4M+GpUSlWvyDFSrqaysRza2gDHyHcQxfxabuxsv4H4440tBNg3URcwe
-	IhKiL8qQoEkEObdZ8T4MddEVks4EE4PSO6CZXR/hQWgOqfq0Q+wppM2H8BL8krGN
-	uNuClSzb9I25LxnmtHxJuy+WHaYwlKKB9CDPtOCnGGkOzLjs9Gcv159bnoND0fCZ
-	RbT7A9qW88aYhXODSOz7vErLtRl5Ls2rPEGm2Ezmoy6XkEhIM094HhFeAV9vJhdS
-	beEubh96WirNIK+JJ8565yhP9ZS5sw9XApDZ6Hc8/1BAlCeyVndv+1AQyJfroCFI
-	je2kIFe8xg==
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
-	by m0089730.ppops.net (PPS) with ESMTPS id 4ea6t791t4-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 16:54:11 -0700 (PDT)
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7e60dfccf42so1682141a34.0
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 16:54:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779494051; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NK6fhbB7OkmuvgMDD7oWlXty0skzdHCfl46spCiaq01SqCXdUoNWtQTAruit/RLraI
-         aPhhjB6IumnBF1fh/FjZFlnoogHuNX9yUilT2ydiZKudvqEq2VEshxzDdC1x+M9C2r1X
-         Id2SN05EKQiS0V4JAGUMYkyeo5env6bgknt+swFOFYlSO93/J258PouKHZNOAw36oQqo
-         +NVVd2IjFhK1jd4O7w+zVYFwcGZPCxConv2ptFs5dfQxr54yc4ZI3nmcuMq8AEJPC2Qe
-         8gxPz3d530olCAg6ojW4S+ckO8hqS7iyb2FHCZwK6TE4yeihwgzyh9nncHes2oNeYEa7
-         /hYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=xPbccRhP9AzeKhw0/hE7Uzqn/4Emm7Q1lz66iybs3r8=;
-        fh=s17WoVmqSh+Zb4EnZYtn2QdSrkNdy1jb92Cb/TlybGg=;
-        b=X/c4GpkMIZLCtNFLW+VBDbtp1VW0QdXLRL4CAp2yFkg5GB7ZQNkclKaD/gHcc5qDJm
-         SXSFqSZIfQ/cT1Im04AuCi7SrwjJtO6zmZ5uPM5D5OgWyQ/CzNgXfUZ40CsdJxIp1Htm
-         VVAaabdCHQ07FIV4JmHC9dRm/BCK2RvJIZ+ZxeEG+lJVfPUwxxaNGUstgIaQwAlhsn74
-         0v2CZDupa2Z0NjJ2+hqVaaU1rX3Qr/3mw7qTyJx6oSlPBOrkzIWvmid//Jn41qGUriJu
-         9XVGlyqdYR57GZxZRrnnDTd+Bdcr8AmFidbUi7I/vEQi2fCNMLoT3UZq12CbMuMvEYwK
-         PoUQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779494051; x=1780098851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xPbccRhP9AzeKhw0/hE7Uzqn/4Emm7Q1lz66iybs3r8=;
-        b=p8Zppg9z+r0vC1Qq1QoDGAzcn2KrZngmfvlYTF8ZV3MdJ+99KknDeB0zeNCMcZvqnu
-         wbsvFuNEk+HQCbePB/MYyMdEG9namBMlIeQr6uCfzvs5XlfEud6CqlLrjSPOnjrTCgFM
-         QjVlTXmAaErIaCZSs8hceEs2z83oUg/YeFs+ZWspOSNYeaElqqyQLTeAOJhTmDjx8Mbp
-         y7L38YLkLBWUC6MvO3vaSB//gnWuVxhGpY51rvv/681/Zfa3vPyhuRShivrlgyHLffKn
-         x7mW8EpC0utU5ha+8PPZV40CXiHX9I4DtR39flQyf3lLvB1QkSxMxXUHvdD4ojhM4zCG
-         mhrA==
-X-Forwarded-Encrypted: i=1; AFNElJ/+KKhB5IzceKphvMK9EsWPw8PTCZZ2iM2JIKzl3kYj3lRR6jhLt3ai3ktjXCf7tJe5nAXNezw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuxgFm2Isth98R37u9IcHPmDxA5JXWJQEGqJJStnugV1P+iE9q
-	vyHnJiBnjy9ftfaKM0p8/zGKGjz8RIsDwig7WAd+hatCLq8Gy33ALpC2AgkKQnnB/xqLbXGG2m5
-	EiDcd7DP78XucTkTgzqfeZempS0QkIk0CUGcuIlTydSBwM0SsdU7h7xOYfQDgYVnCOYlyaR5tyd
-	Ft+Pt4OER5LZfzGnAOj46qFMFMzpTOGps2LVsL7Ku6Lw==
-X-Gm-Gg: Acq92OH3Kty4rXsaQtYawWgMq8mA2mya79uNS6NB50nbSEixzNdrsR6vPAY263Q7vXu
-	bFNSytGze499t80kNZ96INGNHb7q62wR/t0FjmS+999tN2BBgWGCBjVWfqqQQNkZ9wVQhJghdzA
-	QSveF7U5h5SXQEKJc09gzXbz0r4NClJeLJsmc/fpOfeWNpfREORXi2S4+9p6ZUc2gQUshK61nd8
-	o1YG992lEGQbf9EYaEMXQ3E59/4vPY=
-X-Received: by 2002:a05:6830:3789:b0:7dd:b184:1338 with SMTP id 46e09a7af769-7e5fed5b607mr3897073a34.6.1779494050718;
-        Fri, 22 May 2026 16:54:10 -0700 (PDT)
-X-Received: by 2002:a05:6830:3789:b0:7dd:b184:1338 with SMTP id
- 46e09a7af769-7e5fed5b607mr3897049a34.6.1779494050127; Fri, 22 May 2026
- 16:54:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E209238D6AD;
+	Fri, 22 May 2026 23:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779494303; cv=none; b=TwkqsZwfTdEbSY8LqrmAbiEGaM1NbHv0z+iibXMiS6YAEDhBf0WxSIu1+/7E5elRgJEXQJJ6ZoFSkFsCAO0C0I2puG2fHbzKZqrR+t5diKVfNllu9s83Wv+ichnEpurTzunJ3lxDpo60MKhWFj2MjjxeooIteApz08JxunIFTPs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779494303; c=relaxed/simple;
+	bh=brQup3uzoVSTciLB4KM72wyoJIE1Okg5dZ7B754vboY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h1nT0jHSrOkHOSF3wUQIvBrNv8GG86QjwHrqOkCEXLaYeJCnA72RXurNFsjFyDHp5cBOrthVAZ5WvuJo2zZmRap5B16a7vjo6tazIl/RoyixZfWwrcYGrSpXJwQhGeQftvpNUAFzdpIj2dDzxUa0Q4dpC13oXYOO6IotIP+kQJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jlOfNPrc; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A91E1F000E9;
+	Fri, 22 May 2026 23:58:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779494301;
+	bh=YVFRXy8GPhaOYTDXf0ot4kZNFo8f5iA0Ix5mvjPR5MI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=jlOfNPrcpKxcUgYfIpewHpiSotZIbmpK9wQmS5Nr5/OYcUJXxra2f/rIYi3UtKIhc
+	 37tIF/77l8fwnIkUlOLzRIi84xv/p/7FRnYJOAAJrtSrF4+/hox8iu03l8WlCW7C3R
+	 EVvrvUH0+XBeQQYGRGJ4sjbNXwJyCEMPOWkvbM83HwBUF3zYi8NwIr5XvwATKS8CbX
+	 cjhreQvjlxdH2QbpkogZWwmtA8xH4hW+LNrmZFfWEoK3++HcfJelRgg9TpXDscXZQn
+	 m4EQeEPGUJMpHb8QyMo0Sg4VwHA/PsdPgNNOQtT1HksR4NuOfkIkew7jPwNROm8QBP
+	 zC9Zs1GtraJdQ==
+Date: Fri, 22 May 2026 16:58:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: sashiko-reviews@lists.linux.dev, robh@kernel.org,
+ devicetree@vger.kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v8 10/10] net: airoha: Support multiple LAN/WAN
+ interfaces for hw MAC address configuration
+Message-ID: <20260522165820.04839729@kernel.org>
+In-Reply-To: <ahCtsVA1VhYmhZq-@lore-desk>
+References: <20260519-airoha-eth-multi-serdes-v8-10-6bd70e329df6@kernel.org>
+	<20260520085934.54AD01F00894@smtp.kernel.org>
+	<ag2t4eVe4DcfU2yZ@lore-desk>
+	<20260522112514.1ad6e947@kicinski-fedora-PF5CM1Y0>
+	<ahCtsVA1VhYmhZq-@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260519201401.1558410-1-zhipingz@meta.com> <20260519201401.1558410-2-zhipingz@meta.com>
- <20260521160412.4fa75406@shazbot.org>
-In-Reply-To: <20260521160412.4fa75406@shazbot.org>
-From: Zhiping Zhang <zhipingz@meta.com>
-Date: Fri, 22 May 2026 16:53:59 -0700
-X-Gm-Features: AVHnY4Kei3lLPfGxalIVqJuqv9pOsHiferZdcWI224JMky8geVIn4yYyhSSh2jY
-Message-ID: <CAH3zFs0ZUpHnc2WdyoLQBKuHRVDPNZDO6Zay-caW82Qk5ej+nw@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] vfio: add dma-buf get_tph callback and DMA_BUF_TPH feature
-To: Alex Williamson <alex@shazbot.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Bjorn Helgaas <helgaas@kernel.org>, kvm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-GUID: dfMK4Gy41CdE3IIe8M0fgKtSjpwRuko9
-X-Authority-Analysis: v=2.4 cv=fL0JG5ae c=1 sm=1 tr=0 ts=6a10eca3 cx=c_pps
- a=+3WqYijBVYhDct2f5Fivkw==:117 a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=855S8uPTkML1Oy45N9_h:22
- a=r1p2_3pzAAAA:8 a=VabnemYjAAAA:8 a=iTjJCpD9-klLVKPjRfgA:9 a=QEXdDO2ut3YA:10
- a=r_pkcD-q9-ctt7trBg_g:22 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-ORIG-GUID: dfMK4Gy41CdE3IIe8M0fgKtSjpwRuko9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIyMDIzOSBTYWx0ZWRfX3Ytkymi4HSt+
- XHyirUc/sVSfa4VhnXSEGyh1VtO77/2smXtcGISEYKTfZNb+R7Ht+MxbF1q1PauSq6f6D8AfIwV
- vIeuRUm31MJMU3gJyE0iabJtr4Zf2pOqetlWUCqaxpkbvkxOmRUQLFrQ5MWT8WEcK9VS377SS3c
- v6zIG6hfdtReWM7FQVyfmrHbdlJtq7UDzOmrh53lonnmdB7ejWGxzH8hScQlIQaAmEiBajKBYE4
- gVqNWoe2mqGJzUlc9//NHsIrQQbxzx5k5Gmlicx58ZwGTfImG2WzgTsgBe8wi+X9ojErn388796
- bLCJJ7KDwRPn1HX937QZDhDOzOmx0Pc4dnnk7+wGrsduIMNJA0ffmgDfBwI8T9shM1LSPvOvrNF
- n9aaQaHYDFRTkvS1498B7S3Ylk1tlf+CUErvSBoK2+VnnYbGzud4wqWtNlu1u3xRvnWvE/sVLnb
- 3lzQXOxsu8IAgscWHFQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-22_06,2026-05-18_01,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290960-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290961-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[meta.com:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,meta.com:email,meta.com:dkim]
-X-Rspamd-Queue-Id: CD46F5BBA05
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 25B4C5BBA2E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 21, 2026 at 3:04=E2=80=AFPM Alex Williamson <alex@shazbot.org> =
-wrote:
->
-> >
-> On Tue, 19 May 2026 13:13:49 -0700
-> Zhiping Zhang <zhipingz@meta.com> wrote:
->
-> > Add a dma-buf get_tph callback for exporters to return TPH
-> > (TLP Processing Hints) metadata, and add VFIO_DEVICE_FEATURE_DMA_BUF_TPH
-> > so userspace can attach that metadata to a VFIO-exported dma-buf.
->
-> This should be two patches, the first extending the dma-buf framework
-> for the get_tph callback for explicit approval from dma-buf maintainers
-> (who are not even copied here).  The second the vfio-pci implementation
-> of get_tph.
+On Fri, 22 May 2026 21:25:37 +0200 Lorenzo Bianconi wrote:
+> - What happens when device tree does not provide MAC addresses for two or
+>   more same-side GDM interfaces?
+>   - This is the same comment reported in [0].
+>     Since the hw exposes just a single register (REG_FE_LAN_MAC_H or
+>     REG_FE_WAN_MAC_H) for the LAN/WAN mac address MSBs, we need to
+>     require all the interfaces configured as LAN or WAN to share the
+>     mac address MSBs and the user needs to select the new mac address
+>     observing this limitation.
+>     Please note this limitation is only valid if multiple net_devices
+>     are configured as LAN (or WAN). Since in the current codebase we
+>     do not support multiple interfaces configured as LAN or WAN, we are
+>     not introducing any regression.
+>     I do not think selecting a "base" for the mac address is helpful
+>     if the user does not provide the mac address via the DTS or NVME
+>     (as suggested by sashiko) since it will not help us if the mac
+>     addresses configured via DTS are "wrong" (if they do not respect
+>     the limitation described above).  What do you think?
 
-Agreed, let me split. v5 will have:
-    1/2 dma-buf: add optional get_tph() callback
-    2/2 vfio/pci: implement get_tph and VFIO_DEVICE_FEATURE_DMA_BUF_TPH
-I will also add Sumit Semwal and Christian K=C3=B6nig, the dma-buf maintain=
-ers.
+If the MACs are not provided something is obviously wrong with the
+device. We should try to provide enough functionality for the user
+to be able to troubleshoot. For an AP perhaps that means SSH / remote
+logs? So switching/routing doesn't have to work, I'd think. 
 
->
-> > 8-bit ST and 16-bit Extended ST are distinct PCIe TPH namespaces; the
-> > uAPI carries both with explicit validity flags so importers get the
-> > value matching their requested width. SET is write-once per dma-buf;
-> > the existing VFIO_DEVICE_FEATURE_DMA_BUF uAPI is unchanged.
->
-> I didn't see what motivated this write-once change, I thought we
-> understood that it was a userspace problem that the tph values need to
-> be set before providing the dma-buf fd to the importer and that races
-> relative to that are a userspace ordering problem.  Write-once seems
-> unnecessarily restrictive and there's no justification provided here.
-
-Got it, yes the "set TPH before handing the fd to the importer" contract is=
- a
-userspace ordering problem. I'll drop write-once. I'll allow SET to
-overwrite and
-document the ordering requirement in the uAPI comment instead.
-
->
-> > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_core.c   |   3 +
-> >  drivers/vfio/pci/vfio_pci_dmabuf.c | 134 +++++++++++++++++++++++++++--
-> >  drivers/vfio/pci/vfio_pci_priv.h   |  12 +++
-> >  include/linux/dma-buf.h            |  21 +++++
-> >  include/uapi/linux/vfio.h          |  35 ++++++++
-> >  5 files changed, 198 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_p=
-ci_core.c
-> > index 3f8d093aacf8..94aa6dd95701 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -1534,6 +1534,9 @@ int vfio_pci_core_ioctl_feature(struct vfio_devic=
-e *device, u32 flags,
-> >               return vfio_pci_core_feature_token(vdev, flags, arg, args=
-z);
-> >       case VFIO_DEVICE_FEATURE_DMA_BUF:
-> >               return vfio_pci_core_feature_dma_buf(vdev, flags, arg, ar=
-gsz);
-> > +     case VFIO_DEVICE_FEATURE_DMA_BUF_TPH:
-> > +             return vfio_pci_core_feature_dma_buf_tph(vdev, flags, arg,
-> > +                                                      argsz);
-> >       default:
-> >               return -ENOTTY;
-> >       }
-> > diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio=
-_pci_dmabuf.c
-> > index f87fd32e4a01..be1c65385670 100644
-> > --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > @@ -19,7 +19,24 @@ struct vfio_pci_dma_buf {
-> >       u32 nr_ranges;
-> >       struct kref kref;
-> >       struct completion comp;
-> > -     u8 revoked : 1;
-> > +     /*
-> > +      * TPH metadata published by VFIO_DEVICE_FEATURE_DMA_BUF_TPH and
-> > +      * consumed by the @get_tph dma-buf callback.
-> > +      *
-> > +      * @tph_flags is the publish/consume gate: writers populate
-> > +      * @steering_tag, @steering_tag_ext and @ph first, then store
-> > +      * @tph_flags with smp_store_release(); readers do
-> > +      * smp_load_acquire(&tph_flags) before accessing the value fields.
-> > +      * @tph_flags =3D=3D 0 means "TPH not set". Writers publish a non=
--zero
-> > +      * value only once per dma-buf and serialize via vdev->memory_loc=
-k;
-> > +      * readers stay lockless to avoid AB-BA against the dma_resv_lock=
- held
-> > +      * by importers.
-> > +      */
->
-> Can you outline the ABBA hazard, I'm not seeing it.  You're acquiring
-> memory_lock in the feature SET and dma_resv_lock doesn't appear to be
-> held when calling .get_tph().  There's a lot of lockless complication
-> here balanced on this claim of avoiding a hazard that doesn't appear
-> present.
-
-You're right: the release/acquire scheme is solving a problem that
-doesn't exist.
-v5 will drop it; see the reply to your follow-up for the replacement.
-
->
-> > +     u32 tph_flags;
-> > +     u16 steering_tag_ext;
-> > +     u8 steering_tag;
-> > +     u8 ph;
-> > +     bool revoked;
->
-> If we still used memory_lock for tph, these could be:
->
->         u8 tph_st_valid:1; /* memory_lock */
->         u8 tph_st_ext_valid:1; /* memory_lock */
->         u8 tph_ph:2; /* memory_lock */
->         u8 tph_st;
->         u16 tph_st_ext;
->         u8 revoked:1; /* dma_resv_lock */
->
-> The existing change of @revoked from bitfield to bool has no rationale
-> noted for it in the commit log.
-
-Will adopt the bitfield layout you suggested in v5, with the lock annotatio=
-ns.
-
->
-> >  };
-> >
-> >  static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
-> > @@ -69,6 +86,36 @@ vfio_pci_dma_buf_map(struct dma_buf_attachment *atta=
-chment,
-> >       return ret;
-> >  }
-> >
-> > +static int vfio_pci_dma_buf_get_tph(struct dma_buf *dmabuf, u16 *steer=
-ing_tag,
-> > +                                 u8 *ph, u8 st_width)
-> > +{
-> > +     struct vfio_pci_dma_buf *priv =3D dmabuf->priv;
-> > +     u32 flags;
-> > +
-> > +     /* Pair with the smp_store_release() in VFIO_DEVICE_FEATURE_DMA_B=
-UF_TPH. */
-> > +     flags =3D smp_load_acquire(&priv->tph_flags);
-> > +     if (!flags)
-> > +             return -EOPNOTSUPP;
-> > +
-> > +     switch (st_width) {
-> > +     case 8:
-> > +             if (!(flags & VFIO_DMA_BUF_TPH_ST))
-> > +                     return -EOPNOTSUPP;
-> > +             *steering_tag =3D priv->steering_tag;
-> > +             break;
-> > +     case 16:
-> > +             if (!(flags & VFIO_DMA_BUF_TPH_ST_EXT))
-> > +                     return -EOPNOTSUPP;
-> > +             *steering_tag =3D priv->steering_tag_ext;
-> > +             break;
-> > +     default:
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     *ph =3D priv->ph;
-> > +     return 0;
-> > +}
-> > +
-> >  static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachme=
-nt,
-> >                                  struct sg_table *sgt,
-> >                                  enum dma_data_direction dir)
-> > @@ -84,16 +131,17 @@ static void vfio_pci_dma_buf_unmap(struct dma_buf_=
-attachment *attachment,
-> >  static void vfio_pci_dma_buf_release(struct dma_buf *dmabuf)
-> >  {
-> >       struct vfio_pci_dma_buf *priv =3D dmabuf->priv;
-> > +     struct vfio_pci_core_device *vdev =3D READ_ONCE(priv->vdev);
-> >
-> >       /*
-> >        * Either this or vfio_pci_dma_buf_cleanup() will remove from the=
- list.
-> >        * The refcount prevents both.
-> >        */
-> > -     if (priv->vdev) {
-> > -             down_write(&priv->vdev->memory_lock);
-> > +     if (vdev) {
-> > +             down_write(&vdev->memory_lock);
-> >               list_del_init(&priv->dmabufs_elm);
-> > -             up_write(&priv->vdev->memory_lock);
-> > -             vfio_device_put_registration(&priv->vdev->vdev);
-> > +             up_write(&vdev->memory_lock);
-> > +             vfio_device_put_registration(&vdev->vdev);
-> >       }
-> >       kfree(priv->phys_vec);
-> >       kfree(priv);
->
->
-> This seems unnecessary.  I think this is just because priv->vdev is now
-> (unnecessarily) set via WRITE_ONCE, right?  These are very well ordered
-> paths, prior to exposing the dma-buf, while the device is opened, during
-> release, after release. They don't seem to need the READ/WRITE_ONCE
-> treatment.  This looks like noise from trying to make it lockless.
-
-Got it, this is fallout from the lockless attempt. priv->vdev
-transitions are already
-well-ordered by memory_lock. I'll drop all the READ_ONCE/WRITE_ONCE on
-priv->vdev in v5 and leave the existing accesses as they were.
-
->
->
-> > @@ -101,6 +149,7 @@ static void vfio_pci_dma_buf_release(struct dma_buf=
- *dmabuf)
-> >
-> >  static const struct dma_buf_ops vfio_pci_dmabuf_ops =3D {
-> >       .attach =3D vfio_pci_dma_buf_attach,
-> > +     .get_tph =3D vfio_pci_dma_buf_get_tph,
-> >       .map_dma_buf =3D vfio_pci_dma_buf_map,
-> >       .unmap_dma_buf =3D vfio_pci_dma_buf_unmap,
-> >       .release =3D vfio_pci_dma_buf_release,
-> > @@ -269,7 +318,7 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_c=
-ore_device *vdev, u32 flags,
-> >               goto err_free_priv;
-> >       }
-> >
-> > -     priv->vdev =3D vdev;
-> > +     WRITE_ONCE(priv->vdev, vdev);
-> >       priv->nr_ranges =3D get_dma_buf.nr_ranges;
-> >       priv->size =3D length;
-> >       ret =3D vdev->pci_ops->get_dmabuf_phys(vdev, &priv->provider,
-> > @@ -331,6 +380,77 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_=
-core_device *vdev, u32 flags,
-> >       return ret;
-> >  }
-> >
-> > +int vfio_pci_core_feature_dma_buf_tph(struct vfio_pci_core_device *vde=
-v,
-> > +                                   u32 flags,
-> > +                                   struct vfio_device_feature_dma_buf_=
-tph __user *arg,
-> > +                                   size_t argsz)
-> > +{
-> > +     struct vfio_device_feature_dma_buf_tph set_tph;
-> > +     struct vfio_pci_dma_buf *priv;
-> > +     struct dma_buf *dmabuf;
-> > +     int ret;
-> > +
-> > +     ret =3D vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET,
-> > +                              sizeof(set_tph));
-> > +     if (ret !=3D 1)
-> > +             return ret;
-> > +
-> > +     if (copy_from_user(&set_tph, arg, sizeof(set_tph)))
-> > +             return -EFAULT;
-> > +
-> > +     if (set_tph.flags & ~(VFIO_DMA_BUF_TPH_ST | VFIO_DMA_BUF_TPH_ST_E=
-XT))
-> > +             return -EINVAL;
-> > +
-> > +     if (!set_tph.flags)
-> > +             return -EINVAL;
-> > +
-> > +     /* PCIe TLP Processing Hint is a 2-bit field. */
-> > +     if (set_tph.ph & ~0x3)
-> > +             return -EINVAL;
-> > +
-> > +     dmabuf =3D dma_buf_get(set_tph.dmabuf_fd);
-> > +     if (IS_ERR(dmabuf))
-> > +             return PTR_ERR(dmabuf);
-> > +
-> > +     if (dmabuf->ops !=3D &vfio_pci_dmabuf_ops) {
-> > +             ret =3D -EINVAL;
-> > +             goto out_put;
-> > +     }
-> > +
-> > +     priv =3D dmabuf->priv;
-> > +     down_write(&vdev->memory_lock);
-> > +     if (READ_ONCE(priv->vdev) !=3D vdev) {
-> > +             ret =3D -EINVAL;
-> > +             goto out_unlock;
-> > +     }
-> > +
-> > +     /*
-> > +      * TPH metadata is write-once per dma-buf so that lockless reader=
-s only
-> > +      * have to observe a single release-published transition from 0 -=
-> flags.
-> > +      */
-> > +     if (READ_ONCE(priv->tph_flags)) {
-> > +             ret =3D -EBUSY;
-> > +             goto out_unlock;
-> > +     }
-> > +
-> > +     priv->steering_tag =3D set_tph.steering_tag;
-> > +     priv->steering_tag_ext =3D set_tph.steering_tag_ext;
-> > +     priv->ph =3D set_tph.ph;
-> > +     /*
-> > +      * Publish the TPH values before the gate flag, so that lockless
-> > +      * readers in vfio_pci_dma_buf_get_tph() see fully-initialized
-> > +      * fields once they observe a non-zero tph_flags.
-> > +      */
-> > +     smp_store_release(&priv->tph_flags, set_tph.flags);
-> > +     ret =3D 0;
-> > +
-> > +out_unlock:
-> > +     up_write(&vdev->memory_lock);
-> > +out_put:
-> > +     dma_buf_put(dmabuf);
-> > +     return ret;
-> > +}
-> > +
-> >  void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool rev=
-oked)
-> >  {
-> >       struct vfio_pci_dma_buf *priv;
-> > @@ -388,7 +508,7 @@ void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_=
-device *vdev)
-> >
-> >               dma_resv_lock(priv->dmabuf->resv, NULL);
-> >               list_del_init(&priv->dmabufs_elm);
-> > -             priv->vdev =3D NULL;
-> > +             WRITE_ONCE(priv->vdev, NULL);
-> >               priv->revoked =3D true;
-> >               dma_buf_invalidate_mappings(priv->dmabuf);
-> >               dma_resv_wait_timeout(priv->dmabuf->resv,
-> > diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_p=
-ci_priv.h
-> > index fca9d0dfac90..c58f369be4b3 100644
-> > --- a/drivers/vfio/pci/vfio_pci_priv.h
-> > +++ b/drivers/vfio/pci/vfio_pci_priv.h
-> > @@ -118,6 +118,10 @@ static inline bool vfio_pci_is_vga(struct pci_dev =
-*pdev)
-> >  int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u=
-32 flags,
-> >                                 struct vfio_device_feature_dma_buf __us=
-er *arg,
-> >                                 size_t argsz);
-> > +int vfio_pci_core_feature_dma_buf_tph(struct vfio_pci_core_device *vde=
-v,
-> > +                                   u32 flags,
-> > +                                   struct vfio_device_feature_dma_buf_=
-tph __user *arg,
-> > +                                   size_t argsz);
-> >  void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device *vdev);
-> >  void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool rev=
-oked);
-> >  #else
-> > @@ -128,6 +132,14 @@ vfio_pci_core_feature_dma_buf(struct vfio_pci_core=
-_device *vdev, u32 flags,
-> >  {
-> >       return -ENOTTY;
-> >  }
-> > +
-> > +static inline int
-> > +vfio_pci_core_feature_dma_buf_tph(struct vfio_pci_core_device *vdev, u=
-32 flags,
-> > +                               struct vfio_device_feature_dma_buf_tph =
-__user *arg,
-> > +                               size_t argsz)
-> > +{
-> > +     return -ENOTTY;
-> > +}
-> >  static inline void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_devic=
-e *vdev)
-> >  {
-> >  }
-> > diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
-> > index d1203da56fc5..49eb6ad644a2 100644
-> > --- a/include/linux/dma-buf.h
-> > +++ b/include/linux/dma-buf.h
-> > @@ -113,6 +113,27 @@ struct dma_buf_ops {
-> >        */
-> >       void (*unpin)(struct dma_buf_attachment *attach);
-> >
-> > +     /**
-> > +      * @get_tph:
-> > +      * @dmabuf: DMA buffer for which to retrieve TPH metadata
-> > +      * @steering_tag: Returns the raw TPH steering tag for @st_width
-> > +      * @ph: Returns the TPH processing hint (2-bit value)
-> > +      * @st_width: Consumer's supported steering tag width in bits (8 =
-or 16)
-> > +      *
-> > +      * Return the TPH (TLP Processing Hints) metadata associated with=
- this
-> > +      * DMA buffer for the requested steering-tag width. 8-bit ST and =
-16-bit
-> > +      * Extended ST are distinct namespaces in the PCIe TPH ST table a=
-nd may
-> > +      * both be present with different values, so the exporter must se=
-lect the
-> > +      * value that matches @st_width and must not substitute one for t=
-he other.
-> > +      *
-> > +      * Return 0 on success, -EOPNOTSUPP if no metadata is available f=
-or the
-> > +      * requested width, or -EINVAL if @st_width is not 8 or 16.
-> > +      *
-> > +      * This callback is optional.
-> > +      */
-> > +     int (*get_tph)(struct dma_buf *dmabuf, u16 *steering_tag, u8 *ph,
-> > +                    u8 st_width);
-> > +
-> >       /**
-> >        * @map_dma_buf:
-> >        *
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 5de618a3a5ee..a9cb6cbc6ade 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -1534,6 +1534,41 @@ struct vfio_device_feature_dma_buf {
-> >   */
-> >  #define VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2  12
-> >
-> > +/**
-> > + * Upon VFIO_DEVICE_FEATURE_SET associate TPH (TLP Processing Hints) m=
-etadata
-> > + * with a vfio-exported dma-buf. The dma-buf must have been created by
-> > + * VFIO_DEVICE_FEATURE_DMA_BUF on this device.
-> > + *
-> > + * dmabuf_fd is the file descriptor returned by VFIO_DEVICE_FEATURE_DM=
-A_BUF.
-> > + *
-> > + * 8-bit ST (steering_tag) and 16-bit Extended ST (steering_tag_ext) a=
-re
-> > + * distinct namespaces in the PCIe TPH ST table and may both be presen=
-t with
-> > + * different values. Userspace should populate the value(s) it has fro=
-m the
-> > + * firmware ST table for this device and set the matching VFIO_DMA_BUF=
-_TPH_ST /
-> > + * VFIO_DMA_BUF_TPH_ST_EXT bit in @flags. An importer requests a speci=
-fic
-> > + * width and receives the matching value; if the requested width is not
-> > + * present, the importer is told TPH is unavailable for this dma-buf.
-> > + *
-> > + * ph is the 2-bit TLP Processing Hint and must be in the range [0, 3].
-> > + *
-> > + * The user must set TPH on the dma-buf before the importer consumes i=
-t.
-> > + * TPH metadata is write-once per dma-buf; a second SET returns -EBUSY.
-> > + *
-> > + * Return: 0 on success, -errno on failure.
-> > + */
-> > +#define VFIO_DEVICE_FEATURE_DMA_BUF_TPH 13
-> > +
-> > +#define VFIO_DMA_BUF_TPH_ST          (1 << 0)  /* steering_tag valid */
-> > +#define VFIO_DMA_BUF_TPH_ST_EXT              (1 << 1)  /* steering_tag=
-_ext valid */
-> > +
-> > +struct vfio_device_feature_dma_buf_tph {
-> > +     __s32   dmabuf_fd;
-> > +     __u32   flags;
-> > +     __u8    steering_tag;
-> > +     __u8    ph;
-> > +     __u16   steering_tag_ext;
-> > +};
->
-> Sure is tempting to make the ph field the first 2-bits of u8 flags.
-
-I went back and worked through the layout both ways and I'd actually
-like to keep ph as
-its own field. I think the separate ph field reads better and costs nothing.
-
-> Thanks,
->
-> Alex
-
-Thanks,
-Zhiping
+Will the user be able to log in when REG_FE_LAN_MAC_H does not match
+the MAC of a port?
 
