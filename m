@@ -1,105 +1,105 @@
-Return-Path: <netdev+bounces-290755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PAKJTkqEGpQUQYAu9opvQ
-	(envelope-from <netdev+bounces-290755-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:04:41 +0200
+	id mLFrGHEqEGpQUQYAu9opvQ
+	(envelope-from <netdev+bounces-290756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:05:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BC555B1A4A
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:04:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18EC95B1A8B
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A139130640B4
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:01:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A08C7307E2A4
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05733AFAE3;
-	Fri, 22 May 2026 10:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7878F3C584F;
+	Fri, 22 May 2026 10:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jqjpioQF";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="WMosYht3"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="RgzlyxGB";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="f4aQfsgI"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DB42E7623
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E7B2848A0
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779444077; cv=none; b=fiHoCkYMXVlN6vl3091isMbrGc9uG1Su7Eyol5bRKGHJBDmMxdXUSjN2qTgY6X/JGmHNX35Y1TvwdQudJzk6uNW+Dz22rB88NPw3j4eKV5W49869FuTKo3zSDkFU1ArE64AavcVwuF8lRTTuxBVj0VjXKAg/vehfLWi49/bv5kI=
+	t=1779444086; cv=none; b=Wp8XE7D1vytAjE5m4vqTjgP1KsbPO4IsbT8eoL6pAmMA3NxSKCo5v+0boN/mn1QdU9j09E41GisUhWh/hQ8gxj/dWVu5w3Ju7nwxKkYkQJunyImhrDY0GMz7ZSdTtwHDqCk5F5I9584dZ7erGKdLxIAbvPnbW2/136DDOmF3+dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779444077; c=relaxed/simple;
-	bh=y3Md+/LJdRoPfa8fSBTst//7iA3QrqSh3tsJRClRwKA=;
+	s=arc-20240116; t=1779444086; c=relaxed/simple;
+	bh=BhFCU11Vli0eY4peRB1YT42TDHVLDyHFog9G3pGgq0Q=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CMgjTbGfEd+oBizhGYGI22CXuIGS9v/H/xMwzRY/An9BsbXw80Ii3iYaDGHxwdpSOCExgGXEHclhHZTPiRVObAvBpoUKShjg6NNYBU/mab8KBVBQ3pozeLBEi8Q8NI2BAym9J7yhR6c/TgoTf+M4/zeUVcS93vfB1R3tXZG5eDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jqjpioQF; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=WMosYht3; arc=none smtp.client-ip=205.220.168.131
+	 In-Reply-To:To:Cc; b=pqNi8NQBXWnH4G7R2i4329p4tEd8CUeE9a54HQ4FETE7od6MOqObvKy38zc+rnbDsa9CV9NQA/2WsdN0pjPpQWYHxs47Clcy0Xv+Tar+Vs9E1YmAkBtBuE6dzjuyeYqjiWOGbdPLnmpg4Bm9v+EQuVGl6+g3oS3s4CyedoLSyKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=RgzlyxGB; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=f4aQfsgI; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64M8d9K63673893
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:01:15 GMT
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64M733081298195
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:01:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	89GZyqjxzP4kzPz+TzUkPQL4cVAEH+s+D1a55Or7dm0=; b=jqjpioQFFAri1m2v
-	HbJL84xCVFhlIq0d2UiQ47xNCEwDEpYfl4QL2066E9UNWXygtvKtJX6KVopUig/B
-	DNCs1cdIbKI7+ComLVYO15cK90mYoNtvznOcMR7Pw8RmqruWrK/FwqkO21zVgCBK
-	BGtMJPVA+o5ViB3j7kd4mCSt1nju/CF1aR0HxDv8B2oJFbuE0NkFGMdP0EDG41PL
-	2EARo6n8CCNkcRm9atfIEi0uo7M3xl0W6uCWvjaXHbMUrrZvkd43nV+sABOxFnxR
-	QFVHmfwgpIAYWljVCxKScvyUUXS3b4Wc3qsYtvf0yKf+zVnB4cPFQ+LMUzoQGMTs
-	inJCFg==
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ea4dc46yt-1
+	P+6QIFUay/hg2xkAFLiW+meafenw/9VGhbxcOU+YUEk=; b=RgzlyxGB94tPSA5n
+	VmceMUIf6T/pLYNQQdcpkxCalmE7Lg26vv2WwJqGcuj4W7nHxcjpcLM1mBh+iXE+
+	72/xMMGiPCSy7eXlSFdyXhFM5lU2AVcEYijhJ3Pvwg8nESKOBXpZmVgkT4GMycdv
+	ic8HSEjmbIz0XqwzDPbrZirpSCFDLRtUNlBVker1EaBUd4nnlU7n8EjkQSNIJLS4
+	8Z+eaVoJpuyr42ZlyZia5YePGd9O5XuqnE9GP7ajY929j37pU30rk4XZMrBPB8KH
+	5TmBdinMtcQfwbL69AJe9yj5FeSUdPjKDOny2ntiBeYmvcT8iiep0pyxYhJKlwvw
+	VQ3lWg==
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eaah0adgv-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:01:15 +0000 (GMT)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c850ff84ddfso3272778a12.2
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 03:01:15 -0700 (PDT)
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:01:24 +0000 (GMT)
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c8510f91ce8so1227527a12.2
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 03:01:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1779444075; x=1780048875; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1779444083; x=1780048883; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=89GZyqjxzP4kzPz+TzUkPQL4cVAEH+s+D1a55Or7dm0=;
-        b=WMosYht3MVMArPKL0lwi1xACPiyEN2Ockb3Yf2/a/yzCha+jqneKvO1Tfsx8pYHWjE
-         PvCO+WHPT5p3cwPbfeN8MvemJBKQFrfYkQaaIARbL586NayjWQ2sGct1tcR+Q9e2BnSr
-         3XIwKvInmRRBqelq74pEvIOPtZrFdUnR3PNaSWjB7r2J0Pel3rN4lyxxPeXDia4Z1sgQ
-         i74eg3J2DYQmvBKDzpmbpJK1OE8dUB5hX2yqK6WkCyqqZnwOr/yIAxQv+lP+VA75agyw
-         Pxja88xcWsUXsPPHeqhSSP+fOqXhMqNkx/9gyqVxHbtSvRJCXoQPbZ0OZ87vVCZCv06A
-         8YLg==
+        bh=P+6QIFUay/hg2xkAFLiW+meafenw/9VGhbxcOU+YUEk=;
+        b=f4aQfsgIMef3SiBknHfadiM5Nq9zyv0FFfVjVDmXaMfT7Ar01ufma5xf7Eq0G9djDi
+         jZ2hsDEw2h12kmd0SZDrcPLDq7duxVe9UA59IKgskOI4sQZpcwYaLCc9TgY67Ux7xRus
+         yljGHNnNmxowlUKaeQGuGDUdDpvL6XvyoUeoa/xSpJpXvDcvAlixbMeM9qdxI2mCsUq9
+         4p/CeGYm1jVy7MbjLLJyxN1NerDZ6w2QzpXhn1RaiMUgoaMYsftOLxjpiU+8YB6DBcD0
+         lha55/sPdstYlMJWAuylGikZ2g5Le+RYl1dLwvj/AWTzt8h3EuFsGzKHuRYL90ceIW4T
+         uXbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779444075; x=1780048875;
+        d=1e100.net; s=20251104; t=1779444083; x=1780048883;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=89GZyqjxzP4kzPz+TzUkPQL4cVAEH+s+D1a55Or7dm0=;
-        b=lqyPhZE3Istd/JcBDEV6Q1Ki+1r1iMZRAOnJeoKWRKZBMlpvfS1IOjIerEyuN0486w
-         4zCABakigAq7G86EeDoUoz6LrjL34dFF/0gaK2HSgc0vSsMkm+R3l0/G+vI77a06nZ3B
-         Gg8Can6VDBFEZMf1c8t0CWHnKRUDWcZm17HTnzZO4jgaT2Q/yqWvVZKvYFQrwbEgNyBV
-         nkq+m5wXR2AWA6olAfE4ZU/1y07qvJFxFiKqZyUu0NfyOpnxuVZOBDVcnsLRsQR6nSoO
-         +77imbeFeoFebmTPSLDGZ50YTlnSa0xPr85TpKqCFBDBgDjockH/AH+BKrDek3pmy5in
-         1WAg==
-X-Forwarded-Encrypted: i=1; AFNElJ/jAt079Rhq9AUrodajzyK5W/QcgKPEQbQwp3FrrllycLTxxef2O5k+x39OlJ9tmuzSW+EWscI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmvNBmTxrNNT6yAAyB6fFA3mkOyy2riy1sTr/PuhHmYQNBMCPu
-	Az/FOIEo4CX9DCPpv5kPYKvCeJT4yZRWeOFEc3lzCir9/qhwApdzQV7AjlumoyAXbTyU56CxKpQ
-	2S3nmogJMLIse96Dt2QQIZmSOQUPaAIwEtbXEQ7jZvr3pxMXGyvU4yUMzI1o=
-X-Gm-Gg: Acq92OGYvV7JWakIZe2nidZqdx2P3EcLd1t9p1CTq1FfPVZ4ZaDYs4maoHZ7B4/JatC
-	DhlojQ6ZY6YqBry3VKRucXWhWNqscSSaBdNoYVtQysjJaNnW7ZXlEeTA2gqhvkZoE74+MyyOLKs
-	dLshde2ZJmWFR/wA9O0JFyHFOvuypEpdKC8v+Hi2byAydH0/THjXKE0w+PEeGobmUeiNbRTOXnT
-	BePR+LgLNThy21mkBdvFGew9zTlXbiuC4ZCrETWtTgNP5IcnoHBRCqWZMFGsPCMba9GS28V0MxM
-	UCK0iRdd/CObG+nkbVLqDndh4sR5RkvvWIUjWfReSjsw/rIjEmaXMXnhtD3tD3Cm5SB83sBNucY
-	Vl5atK7DfrgJqAAnR2U+0dMxlAo8S2i7mfGiiBdKy/JLj+Amnm5WBNey6
-X-Received: by 2002:a05:6a00:1807:b0:81f:31c3:2e34 with SMTP id d2e1a72fcca58-8415f330494mr3326892b3a.25.1779444074807;
-        Fri, 22 May 2026 03:01:14 -0700 (PDT)
-X-Received: by 2002:a05:6a00:1807:b0:81f:31c3:2e34 with SMTP id d2e1a72fcca58-8415f330494mr3326808b3a.25.1779444074141;
-        Fri, 22 May 2026 03:01:14 -0700 (PDT)
+        bh=P+6QIFUay/hg2xkAFLiW+meafenw/9VGhbxcOU+YUEk=;
+        b=oQbe+CIl2PLPPbGr62WSML10tM/qIYzop2xR9gc7C65mJEQqGkyGNFpyOJWwSWYC5/
+         WV3pyYdcExyiZ+8AXsi+mhqXB8DqAl208CdhrQepT1uQXxG3KROqnBN4KU4A4V/cwLmg
+         4pMCMw0tP61aoU++2ZDdvHy3adTPlABubKg3HgsxqQOCBV3DxhjtKec7OAJm/4SUWC2I
+         xaEyXbKSj6ZjTlQ43bIDgqgmdcQPrA1CDvnXOkT3tf5KiyEZK7t+uiuMql+66VE7Rzhf
+         Qty8hW4mpl9rdDgJZrcpfoPPNNpBw4Febm/dZzkQ85MZtbTnSUkxN6n9gRiceDjo5Qem
+         fM2Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8W2h6unML73nQ+ID8bzvX5DEzspWICLr0oZv9+Pgdfb/bUn7DBOZuvKIW1+MPMTtBhfvxPjJ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyieWBTZQOBuDANnTpNOtADa0OIhkx9tRgtAzHs6z9ZxmLpSrPS
+	hTfH/TA7siV2Eo69jCRa5iRD9pkrAH9Ej4+P1d/lJ1oKN/LEz7WbjhA5++ZSRjTwbKxewWFa3oR
+	EUPRdeXyD/J4U86+a/DvWM15Jize8e0g9hScKmuOu9QTUDqVadWOjrwiOCbY=
+X-Gm-Gg: Acq92OHTlF0iNr47iAaGoKdBcgIhakut9KYRxbTDw8CmbfEJOC9B59+G0ahfD3f6di0
+	GYFI75HUARizdBHzVi4r4GVtYp85aOHZcnFtf6or4oCgEAxJJ7xAu4xov7sBAVrpgP0SUW6mCHC
+	j5eVeFAkdsnPMQIHW10Oc1nX+s/eQ6evDSw/p4mUXK1kKgm1RPjgZDHQzziTP9estgUOV+dICcq
+	V7zy0Y7dTdn2j6Xi4JUXNtOIL5rfcYhCgFY/i4Pm5fM8V+70S6Km/wzau4bfxjSQ6RsP4dqDuEu
+	9wTC0Qyb3gzSe3ndZZpUCVJTdCx8nsHEu8zzTRK7fjJudgvFx5U0+To596gFn1260edmZotBa6Q
+	gjbBNAx3N5Gbt1IVoW/zE6NsYiLODcH0M11zXmNf/mBjBCL6LTEpNBac9
+X-Received: by 2002:a05:6a00:438b:b0:82c:9f7e:518c with SMTP id d2e1a72fcca58-8415f32e17amr3015063b3a.25.1779444083355;
+        Fri, 22 May 2026 03:01:23 -0700 (PDT)
+X-Received: by 2002:a05:6a00:438b:b0:82c:9f7e:518c with SMTP id d2e1a72fcca58-8415f32e17amr3014968b3a.25.1779444082645;
+        Fri, 22 May 2026 03:01:22 -0700 (PDT)
 Received: from hu-krichai-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84164ac9b74sm1516641b3a.3.2026.05.22.03.01.06
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84164ac9b74sm1516641b3a.3.2026.05.22.03.01.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 May 2026 03:01:13 -0700 (PDT)
+        Fri, 22 May 2026 03:01:22 -0700 (PDT)
 From: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-Date: Fri, 22 May 2026 15:30:34 +0530
-Subject: [PATCH v2 3/6] net: mhi_net: Hold runtime PM during active data
- path operations
+Date: Fri, 22 May 2026 15:30:35 +0530
+Subject: [PATCH v2 4/6] net: qrtr: Hold runtime PM during active data path
+ operations
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,7 +108,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260522-mhi_runtimepm-v2-3-fbebf41a82bb@oss.qualcomm.com>
+Message-Id: <20260522-mhi_runtimepm-v2-4-fbebf41a82bb@oss.qualcomm.com>
 References: <20260522-mhi_runtimepm-v2-0-fbebf41a82bb@oss.qualcomm.com>
 In-Reply-To: <20260522-mhi_runtimepm-v2-0-fbebf41a82bb@oss.qualcomm.com>
 To: Manivannan Sadhasivam <mani@kernel.org>,
@@ -130,36 +130,36 @@ Cc: mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
         vivek.pernamitta@oss.qualcomm.com,
         Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779444039; l=4173;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779444039; l=5157;
  i=krishna.chundru@oss.qualcomm.com; s=20230907; h=from:subject:message-id;
- bh=y3Md+/LJdRoPfa8fSBTst//7iA3QrqSh3tsJRClRwKA=;
- b=s+sHbgZoUcbrkhk1NuhJt9uKCZYJuw6T6gtb1ZC0H9M7hSgDCA1Etn58jrZgjHnvT0SCRG62Q
- V7oqxMJp/lHBjYl/lZQf2obhPMwRXspe8hoAXlE3MFihEsy0yCkGb4V
+ bh=BhFCU11Vli0eY4peRB1YT42TDHVLDyHFog9G3pGgq0Q=;
+ b=UVBS6HbShn+y5fJQr2GY5SAYIopHLLknf3feWh42YxN8Cfo16vZuvf1XVAOydKz7dA3b3K6eD
+ /OQhLOIVtQKBDTOurt56nsyDbIEnzo5jjzEyQsOPqQr9m2m8ymwcde3
 X-Developer-Key: i=krishna.chundru@oss.qualcomm.com; a=ed25519;
  pk=10CL2pdAKFyzyOHbfSWHCD0X0my7CXxj8gJScmn1FAg=
-X-Authority-Analysis: v=2.4 cv=VefH+lp9 c=1 sm=1 tr=0 ts=6a10296b cx=c_pps
- a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIyMDA5OSBTYWx0ZWRfXxW4gA3TQSJo9
+ RXBPrD9RtfyV+MtDn/7mqej7r06x2pZ8nmIph+D9dgw8eDSkoB+jutQUmGkiFzYbMJFgEoXE0DX
+ bwGWDfGCRBinfpOEckHlJPjv/WewT9Ix/HGUKlzehLm00WX4yuxms2hPEea4yDHB+MprCUYgFgZ
+ SA1QKqyn/oYExv8UOqMqqL0EJRhVJh64Ued+Mf0xzqaIYhT3osGNHlhT76Xama+wudqn98LF/Iw
+ vhOfPsmUpgXD+bRTVacGGxHwkq3cf0Tge65FCnXKaoRw0QZNotoKzTMhYXErdOi8zat1S4UCVwF
+ n1lPmCELhGpIOTZsBVppsVHeEy1dAUauL/NNT9cuXRllVj/T6YwREy1bV+PUYzKeKmqa0/s+UDA
+ O4wCx0vGzJWcR9in/M0wJcr36s96etHUX67ffccvneP72JZ/g7P30iIikiaD9YsK4AXRexrJrRU
+ TQxGTsxRJ2WvRUlxEww==
+X-Proofpoint-GUID: sJ725JzXuitRYSXfk2N58suRl_a-py3a
+X-Authority-Analysis: v=2.4 cv=LNdWhpW9 c=1 sm=1 tr=0 ts=6a102974 cx=c_pps
+ a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
- a=EUspDBNiAAAA:8 a=-cKO2LIWXEwUer3o84gA:9 a=QEXdDO2ut3YA:10
- a=x9snwWr2DeNwDh03kgHS:22
-X-Proofpoint-GUID: qdNkiZNOL0GC5GSn6n-JaTFVHHUlUUJS
-X-Proofpoint-ORIG-GUID: qdNkiZNOL0GC5GSn6n-JaTFVHHUlUUJS
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIyMDA5OSBTYWx0ZWRfXz2yD/3ZFokNm
- OO23hrCB87boqrAv56N3U4EtXYheSVXZ5IjPtVEd0Iff/bOHJq3LEAiJ8i2C77nx0IWeJg2Ivvs
- lGkylyeHunKJIJXu+xN/jIxKP6pU0O8OIY9971BXk0B7cBtJwK5XET+fi8/tw63Zu7il7Oh4k7k
- 9ZiqYkfEV2zFoihijw57RNkJGZQqBeNrowhX6sufXRy5aYTVlDjKk9gzn4PB1mYo8wNQt2CYkcM
- o5mlaTj5ezgRQ5f97yDTmwi5+MqhFMSPjK05KjK8jIxByfQVkxHKl5DCRvpeaRhnn3xn+X2tkn+
- y0342oT/IxxRzzPY/nG4TxBY/KpizilTeYfbzFfz6xG+XgH09MGRGULo5KMTuCy5UcpGdm5lfZ7
- AeW/qOVMml90OolikP3pikaIlHwkpnA+WqfphZEfOKzVmXBtZa2cx2WtSJ76if33lEl+E0YrvkW
- RzCZc9pzfZTSU0M6VGA==
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=EUspDBNiAAAA:8 a=mqvsnErzViNTL7-QoTgA:9 a=QEXdDO2ut3YA:10
+ a=3WC7DwWrALyhR5TkjVHa:22
+X-Proofpoint-ORIG-GUID: sJ725JzXuitRYSXfk2N58suRl_a-py3a
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-05-22_02,2026-05-18_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- priorityscore=1501 bulkscore=0 spamscore=0 malwarescore=0 adultscore=0
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ adultscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 phishscore=0 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
  definitions=main-2605220099
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -171,7 +171,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290755-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290756-lists,netdev=lfdr.de];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oss.qualcomm.com:mid,oss.qualcomm.com:dkim,qualcomm.com:email,qualcomm.com:dkim];
 	FREEMAIL_TO(0.00)[kernel.org,oss.qualcomm.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,sipsolutions.net];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -190,136 +190,182 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 2BC555B1A4A
+X-Rspamd-Queue-Id: 18EC95B1A8B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The mhi_net driver does not coordinate with runtime PM, which allows the
-underlying MHI controller to be runtime-suspended while transmit, receive,
-or RX buffer refill operations are in progress. This can lead to stalled
-transfers or failed queueing once runtime PM is enabled in the MHI core.
+The QRTR MHI transport driver does not coordinate with runtime PM, which
+allows the underlying MHI controller to be runtime-suspended while
+transmit, receive, or RX buffer refill operations are in progress. This can
+lead to stalled transfers or failed buffer queueing once runtime PM is
+enabled in the MHI core.
 
-Add runtime PM reference counting to the mhi_net data path to keep the
-controller active for the duration of TX, RX, and buffer management
-operations. Enable runtime PM during probe and take/release references
-explicitly around these critical paths.
+Add runtime PM reference counting around TX, RX, and buffer management
+operations to keep the controller active for the duration of each critical
+section. Enable runtime PM during probe and take explicit references around
+these data path operations.
 
 Signed-off-by: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
 ---
- drivers/net/mhi_net.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ net/qrtr/mhi.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 54 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
-index ae169929a9d8..5d7f9ccdb17b 100644
---- a/drivers/net/mhi_net.c
-+++ b/drivers/net/mhi_net.c
-@@ -9,6 +9,7 @@
+diff --git a/net/qrtr/mhi.c b/net/qrtr/mhi.c
+index 80e341d2f8a4..cba7a5daf7a4 100644
+--- a/net/qrtr/mhi.c
++++ b/net/qrtr/mhi.c
+@@ -6,6 +6,7 @@
+ #include <linux/mhi.h>
  #include <linux/mod_devicetable.h>
  #include <linux/module.h>
- #include <linux/netdevice.h>
 +#include <linux/pm_runtime.h>
  #include <linux/skbuff.h>
- #include <linux/u64_stats_sync.h>
+ #include <net/sock.h>
  
-@@ -76,11 +77,19 @@ static netdev_tx_t mhi_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
- 	struct mhi_device *mdev = mhi_netdev->mdev;
- 	int err;
+@@ -38,11 +39,20 @@ static void qcom_mhi_qrtr_dl_callback(struct mhi_device *mhi_dev,
+ 	if (rc == -EINVAL)
+ 		dev_err(qdev->dev, "invalid ipcrouter packet\n");
  
-+	err = pm_runtime_get(&mdev->dev);
-+	if (err < 0 && err != -EINPROGRESS) {
-+		dev_err(&mdev->dev, "pm_runtime_get failed %d\n", err);
-+		pm_runtime_put_noidle(&mdev->dev);
-+		goto exit_drop;
-+	}
-+
- 	err = mhi_queue_skb(mdev, DMA_TO_DEVICE, skb, skb->len, MHI_EOT);
- 	if (unlikely(err)) {
- 		net_err_ratelimited("%s: Failed to queue TX buf (%d)\n",
- 				    ndev->name, err);
- 		dev_kfree_skb_any(skb);
-+		pm_runtime_put(&mdev->dev);
- 		goto exit_drop;
- 	}
- 
-@@ -251,6 +260,7 @@ static void mhi_net_ul_callback(struct mhi_device *mhi_dev,
- 		/* MHI layer stopping/resetting the UL channel */
- 		if (mhi_res->transaction_status == -ENOTCONN) {
- 			u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
-+			pm_runtime_put(&mdev->dev);
- 			return;
- 		}
- 
-@@ -261,6 +271,7 @@ static void mhi_net_ul_callback(struct mhi_device *mhi_dev,
- 	}
- 	u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
- 
-+	pm_runtime_put(&mdev->dev);
- 	if (netif_queue_stopped(ndev) && !mhi_queue_is_full(mdev, DMA_TO_DEVICE))
- 		netif_wake_queue(ndev);
- }
-@@ -277,6 +288,12 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
- 
- 	size = mhi_netdev->mru ? mhi_netdev->mru : READ_ONCE(ndev->mtu);
- 
-+	err = pm_runtime_resume_and_get(&mdev->dev);
-+	if (err) {
-+		dev_err(&mdev->dev, "pm_runtime_resume_and_get failed %d\n", err);
++	rc = pm_runtime_get(&qdev->mhi_dev->dev);
++	if (rc < 0 && rc != -EINPROGRESS) {
++		dev_err(&mhi_dev->dev, "pm_runtime_get failed %d\n", rc);
++		pm_runtime_put_noidle(&qdev->mhi_dev->dev);
 +		return;
 +	}
 +
- 	while (!mhi_queue_is_full(mdev, DMA_FROM_DEVICE)) {
- 		skb = netdev_alloc_skb(ndev, size);
- 		if (unlikely(!skb))
-@@ -296,6 +313,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
- 		cond_resched();
- 	}
- 
-+	pm_runtime_put(&mdev->dev);
- 	/* If we're still starved of rx buffers, reschedule later */
- 	if (mhi_get_free_desc_count(mdev, DMA_FROM_DEVICE) == mhi_netdev->rx_queue_sz)
- 		schedule_delayed_work(&mhi_netdev->rx_refill, HZ / 2);
-@@ -362,20 +380,41 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
- 
- 	SET_NETDEV_DEV(ndev, &mhi_dev->dev);
- 
-+	pm_runtime_no_callbacks(&mhi_dev->dev);
-+	err = devm_pm_runtime_set_active_enabled(&mhi_dev->dev);
-+	if (err)
-+		return err;
+ 	/* Done with the buffer, now recycle it for future use */
+ 	rc = mhi_queue_buf(mhi_dev, DMA_FROM_DEVICE, mhi_res->buf_addr,
+ 			   mhi_dev->mhi_cntrl->buffer_len, MHI_EOT);
+ 	if (rc)
+ 		dev_err(&mhi_dev->dev, "Failed to recycle the buffer: %d\n", rc);
 +
-+	err = pm_runtime_resume_and_get(&mhi_dev->dev);
-+	if (err) {
-+		dev_err(&mhi_dev->dev, "pm_runtime_resume_and_get failed %d\n", err);
-+		return err;
++	pm_runtime_put(&mhi_dev->dev);
+ }
+ 
+ /* From QRTR to MHI */
+@@ -54,6 +64,8 @@ static void qcom_mhi_qrtr_ul_callback(struct mhi_device *mhi_dev,
+ 	if (skb->sk)
+ 		sock_put(skb->sk);
+ 	consume_skb(skb);
++
++	pm_runtime_put(&mhi_dev->dev);
+ }
+ 
+ /* Send data over MHI */
+@@ -69,13 +81,21 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
+ 	if (rc)
+ 		goto free_skb;
+ 
++	rc = pm_runtime_resume_and_get(&qdev->mhi_dev->dev);
++	if (rc) {
++		dev_err(&qdev->mhi_dev->dev, "pm_runtime_resume_and_get failed %d\n", rc);
++		goto free_skb;
 +	}
 +
- 	err = mhi_net_newlink(mhi_dev, ndev);
- 	if (err) {
- 		free_netdev(ndev);
-+		pm_runtime_put(&mhi_dev->dev);
- 		return err;
+ 	rc = mhi_queue_skb(qdev->mhi_dev, DMA_TO_DEVICE, skb, skb->len,
+ 			   MHI_EOT);
+ 	if (rc)
+-		goto free_skb;
++		goto runtime_put;
+ 
+ 	return rc;
+ 
++runtime_put:
++	pm_runtime_put(&qdev->mhi_dev->dev);
+ free_skb:
+ 	if (skb->sk)
+ 		sock_put(skb->sk);
+@@ -90,20 +110,30 @@ static int qcom_mhi_qrtr_queue_dl_buffers(struct mhi_device *mhi_dev)
+ 	void *buf;
+ 	int ret;
+ 
++	ret = pm_runtime_resume_and_get(&mhi_dev->dev);
++	if (ret) {
++		dev_err(&mhi_dev->dev, "pm_runtime_resume_and_get failed %d\n", ret);
++		return ret;
++	}
++
+ 	free_desc = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
+ 	while (free_desc--) {
+ 		buf = devm_kmalloc(&mhi_dev->dev, mhi_dev->mhi_cntrl->buffer_len, GFP_KERNEL);
+-		if (!buf)
++		if (!buf) {
++			pm_runtime_put(&mhi_dev->dev);
+ 			return -ENOMEM;
++		}
+ 
+ 		ret = mhi_queue_buf(mhi_dev, DMA_FROM_DEVICE, buf, mhi_dev->mhi_cntrl->buffer_len,
+ 				    MHI_EOT);
+ 		if (ret) {
+ 			dev_err(&mhi_dev->dev, "Failed to queue buffer: %d\n", ret);
++			pm_runtime_put(&mhi_dev->dev);
+ 			return ret;
+ 		}
  	}
  
 +	pm_runtime_put(&mhi_dev->dev);
  	return 0;
  }
  
- static void mhi_net_remove(struct mhi_device *mhi_dev)
+@@ -121,12 +151,22 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+ 	qdev->dev = &mhi_dev->dev;
+ 	qdev->ep.xmit = qcom_mhi_qrtr_send;
+ 
++	pm_runtime_no_callbacks(&mhi_dev->dev);
++	rc = devm_pm_runtime_set_active_enabled(&mhi_dev->dev);
++	if (rc)
++		return rc;
++
++	rc = pm_runtime_resume_and_get(&mhi_dev->dev);
++	if (rc) {
++		dev_err(&mhi_dev->dev, "pm_runtime_resume_and_get failed %d\n", rc);
++		return rc;
++	}
+ 	dev_set_drvdata(&mhi_dev->dev, qdev);
+ 
+ 	/* start channels */
+ 	rc = mhi_prepare_for_transfer(mhi_dev);
+ 	if (rc)
+-		return rc;
++		goto runtime_put;
+ 
+ 	rc = qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
+ 	if (rc)
+@@ -138,12 +178,15 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+ 
+ 	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
+ 
++	pm_runtime_put(&mhi_dev->dev);
+ 	return 0;
+ 
+ err_unregister:
+ 	qrtr_endpoint_unregister(&qdev->ep);
+ err_unprepare:
+ 	mhi_unprepare_from_transfer(mhi_dev);
++runtime_put:
++	pm_runtime_put(&mhi_dev->dev);
+ 
+ 	return rc;
+ }
+@@ -151,10 +194,18 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+ static void qcom_mhi_qrtr_remove(struct mhi_device *mhi_dev)
  {
- 	struct mhi_net_dev *mhi_netdev = dev_get_drvdata(&mhi_dev->dev);
+ 	struct qrtr_mhi_dev *qdev = dev_get_drvdata(&mhi_dev->dev);
 +	int err;
 +
 +	err = pm_runtime_resume_and_get(&mhi_dev->dev);
 +	if (err)
 +		dev_err(&mhi_dev->dev, "pm_runtime_resume_and_get failed %d\n", err);
  
- 	mhi_net_dellink(mhi_dev, mhi_netdev->ndev);
+ 	qrtr_endpoint_unregister(&qdev->ep);
+ 	mhi_unprepare_from_transfer(mhi_dev);
+ 	dev_set_drvdata(&mhi_dev->dev, NULL);
 +
 +	if (!err)
 +		pm_runtime_put(&mhi_dev->dev);
  }
  
- static const struct mhi_device_info mhi_hwip0 = {
+ static const struct mhi_device_id qcom_mhi_qrtr_id_table[] = {
 
 -- 
 2.34.1
