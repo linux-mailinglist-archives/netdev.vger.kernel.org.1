@@ -1,203 +1,248 @@
-Return-Path: <netdev+bounces-290667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GGq3FkXjD2rGRAYAu9opvQ
-	(envelope-from <netdev+bounces-290667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:01:57 +0200
+	id mIvjDF3lD2pcRQYAu9opvQ
+	(envelope-from <netdev+bounces-290668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:10:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADDD55AED8F
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:01:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90DEB5AEFD8
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:10:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7AEB301950A
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 04:55:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8B69B301454C
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 05:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E6E360722;
-	Fri, 22 May 2026 04:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EABAC36403B;
+	Fri, 22 May 2026 05:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GbeIv5MT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOsL+y2f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6495E357D17
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 04:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5CE3624BC;
+	Fri, 22 May 2026 05:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779425727; cv=none; b=ZqHPcV+nRtffsiapKay4Pgl7CWMPmUQobHKKOHt7L6xBXlDu4itJbTMXan4aspqKK4JwHA60kq+egPWXz3ptljjSqTBkFoLkMeH01/KrDsEVd3GBswTHh2eC4UbPINDySJ74GurVZ9Fm2+gteekF6DoXiyy0/bQ5zBnnfw6wSjM=
+	t=1779426469; cv=none; b=sLAYjp1q0gdN5eZUy075S1k+4SUPBS7trswKY2B8tPk+hlzlgKe4KO/424QU5aVfq65QDc1i/p4glbDkTCaTRx3s83lHcj8rt1RVmYKulla8eD1T3ySok+VgN5HKpFM9qrKgp1/4O8xGktD2koTq8j6xhvwSjruTi9azWccmlb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779425727; c=relaxed/simple;
-	bh=B9CAhNAdGTp5Zt5LCmbUDLKXezoz9dQvKZMGvVbfxrs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V9+gCVj4IoPXGGKmhNTXcSI9mQSHhoVm54Rd4TQuHpE2sT+01IouSh4gDBjXkET8B4afYhAs2jlOEXHxazUf3yxdclCc7kraeRGUOuykgP0sCYNfFnfa7ViXsP9C3PvuctTBtacOyC/bvLa7GDWc77AmlMdLplIUYRL/Lyh+oQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GbeIv5MT; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5aa2d5a1d51so1060197e87.3
-        for <netdev@vger.kernel.org>; Thu, 21 May 2026 21:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779425724; x=1780030524; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2uaBSQpnXDZ0Lr2vqL2X8w5SaBUCpNSkuNqugybr2/A=;
-        b=GbeIv5MTw2u/PaO2jrKBK2QR0+f6vbEfqatUpYeF/bCRKRhpq6G8Yn6bHVqyKbI1nO
-         6aflGJoaJ4FzfLZN2vCoCXevRZkYXwZ0ohRvtIJXvxt2FB4+k9M4FpvxB9W3y197bLcX
-         jzZOqcdFQ6HV/axNzl0q6d65TSOGZM1FYwEzSzmHuAQfon6HxozChLLd9/L69PZ6wO+o
-         BkUjjOuiW5GpBTuadz6fKqNuP3bZ2aGwkn2/iHq1LfFsfqp/JKOnGWjKayLekJ9Bk1L2
-         iKO/ICx3ULCTvLSVIqiJXbMEUeDgTJ6tlBe24etov6zbxICSiBCXgQ+LB7PjnK3fwgt5
-         V9lQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779425724; x=1780030524;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2uaBSQpnXDZ0Lr2vqL2X8w5SaBUCpNSkuNqugybr2/A=;
-        b=lks8YfQ0pJuPgKHCPapj1r/oc7YM7LigkShKh5NQP62vlwHJoQ34Er1B7M8phdKlqL
-         FmV4BKRyrNnZwdD5Xjr9vMs9XDJQeD6ggKiIrAbd6mdtlz5g7FLGixc+OaWjkDGdKuEX
-         ZjIVulPaUu5mQLvB/lLUaP+bDfFk4i5xVICc0uWP70xWXlM90AhtnDN97wTPP2uSUqnQ
-         OKcf9FMPqG5AVJ1baO7M1uMh+YXGphfoYJQEldpeG7yoEBBhvkEP+WcU2mQkdI+bu7nl
-         i6ArPd2BB84b4TfP4NGxQU3zkkpc8aunl6apKXhoVhXpK9/rZbgk4RXjjLh7irtgO0SQ
-         LHuw==
-X-Forwarded-Encrypted: i=1; AFNElJ9uQLUnNBx2EYz71TzxFkM6M4JCcoCLdxUxjaVwY1xT8piesTl2qmMgmBLetMzWXRPM3TPllMo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRJ+zMpr9B84i8LCxuAU3EdY3eGyKmPRPd1YfqIv5hRS4kWXOx
-	F5YUUNJd+SDx3FdLFN6Y5yYn1Mz36rnBcrPKubXH6TydlwXxOw1/TRLV
-X-Gm-Gg: Acq92OEHMAzm1/4nv7mX1xlqJJqjxVUc/3k3hwo/gkpnOfIb4/nTgWA5aisOhGxggsM
-	HcKYZbAzPv+j26EtOE8lAlXSOOjHiZpaF1sMgYKeuRlEYiD/RQheuNVFefOJsb7QL8+g93GM8eg
-	EkY5FO6hU7/2jttZJRHeJLv13eZWScNkL1obcIBsmg/gF98B/kG7A0KJOPOAdXz4xLbaJVGXbFL
-	kI5Fb4ZNp4S8WHCuBi9ufKKJlrcXiEl44vCryslCqZUNdFN+ZIY8OoPuSjadm0qXa/Y09C+C4lA
-	EJaBrI6aFrzysxD6Cyw+L5ai4u1EvFV6oWX4l+f9T5igWVFfiskwKX7ZtHWKIKsAeYxtV1RLsUH
-	UtiFofIplvXor6k3huenPZ6iFqW8/kLnvvzIiLSyylJEWpJ4dUamf1mNtq/OxxlTt1uCiFBRp5V
-	aOECDtL6erG2WapOUDDk555yz/0t4laJehlYxMqrHP4hA5hXdQF/aNexVnOHHV/ssp/2EIfE6S1
-	pJ1mU7EDnMjtNVBx0g=
-X-Received: by 2002:a05:6512:2552:b0:5a8:9988:f1d5 with SMTP id 2adb3069b0e04-5aa323bc03emr387730e87.24.1779425723236;
-        Thu, 21 May 2026 21:55:23 -0700 (PDT)
-Received: from ?IPV6:2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703? ([2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5aa32cb36d2sm144533e87.13.2026.05.21.21.55.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2026 21:55:22 -0700 (PDT)
-Message-ID: <b79d8ad9-f36e-4769-9dc2-58baefe23000@gmail.com>
-Date: Fri, 22 May 2026 07:55:19 +0300
+	s=arc-20240116; t=1779426469; c=relaxed/simple;
+	bh=XRaP13Cx+jXI1HSp39tijTlJ/WCsJx+09g66+aMv3Bc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ttN2vDnk0GyBJ+3YkXvvHvhfjenbKFgYnYQjciTCj9ZKfLIiihYBKtZDNiZBJk5xEL/yNylx3ZXQwHNoiQbijp+72BvKhZrfqclumoteqbpS/CUhzQzcDO2Pntf1G+/OzZsi5FFKRLhvySILccsNtEj49eqLwqLfQa3hqCdxdWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mOsL+y2f; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541541F000E9;
+	Fri, 22 May 2026 05:07:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779426468;
+	bh=OirFU4J8edbnkGYQjSL4iBniGJ6v+txcWQW9mPXg3Dc=;
+	h=From:To:Cc:Subject:Date;
+	b=mOsL+y2fIgEFtvbqDaYm/64qDsnKq6W5Pdnq7jbIAx9SRBlLLVcOKG7HPOF0jK6qN
+	 X/EyN0urs9h4anT2Ru0BlLkErwCvGjasr8ho+wKHPtvi79v7qF17CbLmjvyQiR+VJT
+	 E3oCUa6qmKQ6/yRLaGf+YlW3OIK+4ej70+7BTQz06zJQydL5bDJjqgGxPdxf4xntsh
+	 hLVQtsh4rNed/3QZoTby7QF/atRjyj7Umltr36gvVFXJ9ra0VVHmvdqZl1fp5eopNA
+	 D1TqPXaIqWK/CjO+6ld6a24mKJcV4c0O4iLFRjJqRIZtVhKU+Jd1PDQywU7XiKiaIN
+	 HgCQjEDvr05AA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org,
+	linux-afs@lists.infradead.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH net-next v2 0/5] Consolidate FCrypt and PCBC code into net/rxrpc/
+Date: Fri, 22 May 2026 00:07:31 -0500
+Message-ID: <20260522050740.84561-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/10] [v3] input: gpio-keys: make legacy gpiolib optional
-To: Arnd Bergmann <arnd@kernel.org>, linux-gpio@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- Christian Lamparter <chunkeey@googlemail.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Aaro Koskinen <aaro.koskinen@iki.fi>, Andreas Kemnade
- <andreas@kemnade.info>, Kevin Hilman <khilman@baylibre.com>,
- Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>,
- Pavel Machek <pavel@kernel.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-wireless@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- linux-sh@vger.kernel.org, linux-input@vger.kernel.org,
- linux-leds@vger.kernel.org, netdev@vger.kernel.org
-References: <20260520183815.2510387-1-arnd@kernel.org>
- <20260520183815.2510387-3-arnd@kernel.org>
-Content-Language: en-US, en-AU, en-GB, en-BW
-From: Matti Vaittinen <mazziesaccount@gmail.com>
-In-Reply-To: <20260520183815.2510387-3-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290667-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290668-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,googlemail.com,sipsolutions.net,iki.fi,kemnade.info,baylibre.com,kernel.org,atomide.com,alpha.franken.de,physik.fu-berlin.de,redhat.com,alien8.de,linux.intel.com,zytor.com,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,lists.infradead.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mazziesaccount@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: ADDD55AED8F
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 90DEB5AEFD8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 20/05/2026 21:38, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Most users of gpio-keys and gpio-keys-polled use modern gpiolib
-> interfaces, but there are still number of ancient sh, arm32 and x86
-> machines that have never been converted.
-> 
-> Add an #ifdef block for the parts of the driver that are only used on
-> those legacy machines.
-> 
-> The two Rohm PMIC drivers use a gpio-keys device without an actual GPIO,
-> passing an IRQ number instead. In order to keep this working both with
-> and with CONFIG_GPIOLIB_LEGACY, change the gpio-keys driver to ignore
-> the gpio number if an IRQ is passed.
-> 
-> Link: https://lore.kernel.org/all/b3c94552-c104-42e3-be15-7e8362e8039e@gmail.com/
-> Link: https://lore.kernel.org/all/afJXG4_rtaj3l2Dk@google.com/
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v3: resend
-> v2: skip the fake GPIO number passing from mfd
-> 
-> The removal of the arm platforms using this is not yet going to happen
-> for 7.2, and Dmitry's changes for the Rohm drivers have not yet
-> made it into linux-next as of 2026-05-20, so for the moment I
-> would still like to see this patch get merged, even if we are
-> closing in on completely removing the legacy gpio support in
-> the gpio_keys driver, so we can make CONFIG_GPIOLIB_LEGACY
-> default-disabled sooner.
+The FCrypt "block cipher" and the PCBC mode of operation are obsolete
+and insecure.  Since their only user is net/rxrpc/, they belong there,
+not in the crypto API.
 
-I am (still) all fine with this, even though I like Dmitry's set. I 
-suppose you already have a plan for merging this, but I still have to 
-ask - why the MFD changes aren't in own patch? I feel it would have 
-simplified merging, backporting, reviewing and reverting if needed.
+Therefore, this series removes these algorithms from the crypto API and
+replaces them with local implementations in net/rxrpc/.
 
-Well, other than that:
+The local implementations are simpler too, as they avoid the crypto API
+boilerplate.
 
-Reviewed-by: Matti Vaittinen <mazziesaccount@gmail.com>
+I don't know how to test all the code in net/rxrpc/, but everything
+should still work.  I added a KUnit test for the crypto functions.
 
-Yours,
-	-- Matti
+Changed in v2:
+    - Added missing export of fcrypt_preparekey().
+    - Write "RxRPC crypto KUnit test" instead of "RxRPC KUnit test".
+    - Rebased onto latest net-next where decryption now happens in the
+      linear buffer rxrpc_call::rx_dec_buffer, simplifying the code.
 
----
-Matti Vaittinen
-Linux kernel developer at ROHM Semiconductors
-Oulu Finland
+Eric Biggers (5):
+  net/rxrpc: Add local FCrypt-PCBC implementation
+  net/rxrpc: Use local FCrypt-PCBC implementation
+  net/rxrpc: Reimplement DES-PCBC using DES library
+  crypto: fcrypt - Remove support for FCrypt block cipher
+  crypto: pcbc - Remove support for PCBC mode
 
-~~ When things go utterly wrong vim users can always type :help! ~~
+ arch/arm/configs/am200epdkit_defconfig        |   1 -
+ arch/arm/configs/dove_defconfig               |   1 -
+ arch/arm/configs/multi_v5_defconfig           |   1 -
+ arch/arm/configs/mv78xx0_defconfig            |   1 -
+ arch/arm/configs/mvebu_v5_defconfig           |   1 -
+ arch/arm/configs/omap1_defconfig              |   1 -
+ arch/arm/configs/orion5x_defconfig            |   1 -
+ arch/arm/configs/pxa_defconfig                |   2 -
+ arch/arm/configs/wpcm450_defconfig            |   1 -
+ arch/m68k/configs/amiga_defconfig             |   2 -
+ arch/m68k/configs/apollo_defconfig            |   2 -
+ arch/m68k/configs/atari_defconfig             |   2 -
+ arch/m68k/configs/bvme6000_defconfig          |   2 -
+ arch/m68k/configs/hp300_defconfig             |   2 -
+ arch/m68k/configs/mac_defconfig               |   2 -
+ arch/m68k/configs/multi_defconfig             |   2 -
+ arch/m68k/configs/mvme147_defconfig           |   2 -
+ arch/m68k/configs/mvme16x_defconfig           |   2 -
+ arch/m68k/configs/q40_defconfig               |   2 -
+ arch/m68k/configs/sun3_defconfig              |   2 -
+ arch/m68k/configs/sun3x_defconfig             |   2 -
+ arch/mips/configs/bigsur_defconfig            |   2 -
+ arch/mips/configs/decstation_64_defconfig     |   2 -
+ arch/mips/configs/decstation_defconfig        |   2 -
+ arch/mips/configs/decstation_r4k_defconfig    |   2 -
+ arch/mips/configs/fuloong2e_defconfig         |   1 -
+ arch/mips/configs/gpr_defconfig               |   1 -
+ arch/mips/configs/ip22_defconfig              |   2 -
+ arch/mips/configs/ip27_defconfig              |   2 -
+ arch/mips/configs/ip30_defconfig              |   2 -
+ arch/mips/configs/ip32_defconfig              |   2 -
+ arch/mips/configs/lemote2f_defconfig          |   2 -
+ arch/mips/configs/malta_defconfig             |   2 -
+ arch/mips/configs/malta_kvm_defconfig         |   2 -
+ arch/mips/configs/malta_qemu_32r6_defconfig   |   1 -
+ arch/mips/configs/maltaaprp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_eva_defconfig     |   1 -
+ arch/mips/configs/maltaup_defconfig           |   1 -
+ arch/mips/configs/maltaup_xpa_defconfig       |   2 -
+ arch/mips/configs/mtx1_defconfig              |   1 -
+ arch/mips/configs/rm200_defconfig             |   2 -
+ arch/mips/configs/sb1250_swarm_defconfig      |   2 -
+ arch/parisc/configs/generic-64bit_defconfig   |   2 -
+ arch/powerpc/configs/44x/akebono_defconfig    |   1 -
+ arch/powerpc/configs/44x/bamboo_defconfig     |   1 -
+ arch/powerpc/configs/44x/currituck_defconfig  |   1 -
+ arch/powerpc/configs/44x/ebony_defconfig      |   1 -
+ arch/powerpc/configs/44x/eiger_defconfig      |   1 -
+ arch/powerpc/configs/44x/fsp2_defconfig       |   1 -
+ arch/powerpc/configs/44x/icon_defconfig       |   1 -
+ arch/powerpc/configs/44x/iss476-smp_defconfig |   1 -
+ arch/powerpc/configs/44x/katmai_defconfig     |   1 -
+ arch/powerpc/configs/44x/rainier_defconfig    |   1 -
+ arch/powerpc/configs/44x/redwood_defconfig    |   1 -
+ arch/powerpc/configs/44x/sequoia_defconfig    |   1 -
+ arch/powerpc/configs/44x/taishan_defconfig    |   1 -
+ arch/powerpc/configs/52xx/cm5200_defconfig    |   1 -
+ arch/powerpc/configs/52xx/motionpro_defconfig |   1 -
+ arch/powerpc/configs/52xx/tqm5200_defconfig   |   1 -
+ arch/powerpc/configs/83xx/asp8347_defconfig   |   1 -
+ .../configs/83xx/mpc8313_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc8315_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc832x_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc834x_itx_defconfig        |   1 -
+ .../configs/83xx/mpc834x_itxgp_defconfig      |   1 -
+ .../configs/83xx/mpc837x_rdb_defconfig        |   1 -
+ arch/powerpc/configs/amigaone_defconfig       |   1 -
+ arch/powerpc/configs/cell_defconfig           |   1 -
+ arch/powerpc/configs/chrp32_defconfig         |   1 -
+ arch/powerpc/configs/ep8248e_defconfig        |   1 -
+ arch/powerpc/configs/fsl-emb-nonhw.config     |   1 -
+ arch/powerpc/configs/g5_defconfig             |   1 -
+ arch/powerpc/configs/linkstation_defconfig    |   1 -
+ arch/powerpc/configs/mgcoge_defconfig         |   1 -
+ arch/powerpc/configs/mpc83xx_defconfig        |   1 -
+ arch/powerpc/configs/mvme5100_defconfig       |   1 -
+ arch/powerpc/configs/pmac32_defconfig         |   1 -
+ arch/powerpc/configs/powernv_defconfig        |   1 -
+ arch/powerpc/configs/ppc44x_defconfig         |   1 -
+ arch/powerpc/configs/ppc64_defconfig          |   1 -
+ arch/powerpc/configs/ppc64e_defconfig         |   1 -
+ arch/powerpc/configs/ppc6xx_defconfig         |   2 -
+ arch/powerpc/configs/ps3_defconfig            |   1 -
+ arch/s390/configs/debug_defconfig             |   2 -
+ arch/s390/configs/defconfig                   |   2 -
+ arch/sh/configs/hp6xx_defconfig               |   1 -
+ arch/sh/configs/r7780mp_defconfig             |   1 -
+ arch/sh/configs/r7785rp_defconfig             |   1 -
+ arch/sh/configs/se7712_defconfig              |   1 -
+ arch/sh/configs/sh2007_defconfig              |   2 -
+ arch/sparc/configs/sparc32_defconfig          |   1 -
+ arch/sparc/configs/sparc64_defconfig          |   2 -
+ crypto/Kconfig                                |  18 -
+ crypto/Makefile                               |   2 -
+ crypto/pcbc.c                                 | 195 --------
+ crypto/tcrypt.c                               |   4 -
+ crypto/testmgr.c                              |  15 -
+ crypto/testmgr.h                              |  45 --
+ net/rxrpc/.kunitconfig                        |   6 +
+ net/rxrpc/Kconfig                             |  13 +-
+ net/rxrpc/Makefile                            |   3 +-
+ net/rxrpc/ar-internal.h                       |  21 +-
+ {crypto => net/rxrpc}/fcrypt.c                | 330 ++++++--------
+ net/rxrpc/key.c                               |   1 -
+ net/rxrpc/rxkad.c                             | 429 +++++-------------
+ net/rxrpc/server_key.c                        |   1 -
+ net/rxrpc/tests/Makefile                      |   3 +
+ net/rxrpc/tests/rxrpc_kunit.c                 | 140 ++++++
+ 109 files changed, 427 insertions(+), 925 deletions(-)
+ delete mode 100644 crypto/pcbc.c
+ create mode 100644 net/rxrpc/.kunitconfig
+ rename {crypto => net/rxrpc}/fcrypt.c (65%)
+ create mode 100644 net/rxrpc/tests/Makefile
+ create mode 100644 net/rxrpc/tests/rxrpc_kunit.c
+
+
+base-commit: 1a1f055318d82e64485a6ff8420e5f70b4267998
+-- 
+2.54.0
+
 
