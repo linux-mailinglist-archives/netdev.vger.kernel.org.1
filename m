@@ -1,147 +1,185 @@
-Return-Path: <netdev+bounces-290637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GE4CbuyD2rmOgYAu9opvQ
-	(envelope-from <netdev+bounces-290637-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 03:34:51 +0200
+	id OP8fHM+0D2oMPAYAu9opvQ
+	(envelope-from <netdev+bounces-290638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 03:43:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A85A5ADB24
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 03:34:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 106925ADBBD
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 03:43:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 54AFC300FC5E
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 01:32:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1D42F300B06B
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 01:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89BD246788;
-	Fri, 22 May 2026 01:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736592BFC7B;
+	Fri, 22 May 2026 01:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="a9nb0QVT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="imgSMDL/"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C27202997;
-	Fri, 22 May 2026 01:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5605F29AB1A;
+	Fri, 22 May 2026 01:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779413558; cv=none; b=cbP8N+Y8h8zwQamrW7RAyM5goYD0jlK9UcUiVxQZ3TvFUsNFhc5ZlpxrqhvRBX+sgTUdmo8cIJoRxxjY+dmBg82ec0RZOdeD2pCJihJsAB4Zsm+jFvU3tS+JWd6QVecrCiqr3YRJgCSUhtMQhRzxUPe48u4iZrDILIf9iaYOuN0=
+	t=1779414219; cv=none; b=NQqrtoOwoBSNvEcYDKs99Jm1OXps5kw4eBF+Ox+8YT9UZhJcEQSmTfNsM2a1YNB5sfXWjhCvY0K0k2RizK1e6sNS1j2h56A+OJrE3KgY9bKM7I9jIJhv0Oq/dGimvpGDSdWWwqbOkzIyuosfgtrklEXzzk1aO6srj4XbLlwmQKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779413558; c=relaxed/simple;
-	bh=I6tFDsviSls0ujJbhE+o0zIxIjbVvq9RV/5NG12trhY=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=e9q8sT2SFEVwzAfTZxYSALpfl748yk/fKSUY0ac0e3/EfwrN22zkVuGJFL0feQpSzJ0V8da7DgppOCfFDHeLS4NfuSVo5RbhxiqXYZNseWyn4ULU1oP+RON9Ru6vCBONazIYhThS+ACB0WiYc04MvEAcqSJi08uQVaWFNCyWIvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=a9nb0QVT; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=gVprGHcyp7zNtbmaE8h+q0n2zo10k+cWa8PJBUTrGG0=;
-	b=a9nb0QVTQ5QW6BdiS0BXtVQxRcAlpksM3cp7FiNzC4yNoBPCUv+fe1cH022eZ5jmRmlH8Qk43
-	0XD9I4REf18tfOYgOr34CW9agpBzKp3Kvv+rq0ZEWt6yftEw5tiWvHYauq5R7UuSMFpyPrrCrpE
-	w3OKWOJcb1xyUevp7+ztPN8=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gM6yB1tnyznTW4;
-	Fri, 22 May 2026 09:24:34 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 70C8540539;
-	Fri, 22 May 2026 09:32:34 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 22 May 2026 09:32:33 +0800
-Message-ID: <b85d6dd0-f102-4b1f-be10-f75b8cb2cd42@huawei.com>
-Date: Fri, 22 May 2026 09:32:33 +0800
+	s=arc-20240116; t=1779414219; c=relaxed/simple;
+	bh=4I8SKiS20Z/7q42MiaJBjPn2Uoqdn+ZnpyTaADyFsNA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EO8H1gb5NRGJayiObJzJAo6n3k/si5TTTR4IwU1rozIA/uiv8eOFKvXhyfOiLCB9qTrrQlnDWwRzyIdMZi3rrrszu98XrdgErIh/By/4rFuNHbJUWtNBVMdAsBd9JlYymhN8AR8CU3bgVFJSFhjf6NmlfT/IhDtm+tNMTvc89LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=imgSMDL/; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38E3C1F000E9;
+	Fri, 22 May 2026 01:43:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779414218;
+	bh=q6+SNYW/xUh69dC0qmMUCa0+3iyoltH4mGvYvt3ieKc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=imgSMDL/MaRmwFXfyLINS56OSbxstpjcvmu+xCt06W20cAmAIWE1MrphQAYirKOVA
+	 E0IgfTVN8nd1/LHU4S6Edhb1D63+7gEYc6QzR2ecSDk+5egi+MO8lgBi1LZaBaVR35
+	 tUpxhtrWMmffwBU+xAbQNA+e4rJVuAdAyqyt1MTi0b84Prqfx1+LLfMB+kstUOIq4A
+	 eqSH6d9ALdg40074AWVA5LGFlgE+blUGtxPyWizQ0enEtmwRrqG7nJAVpo3KQsGTEt
+	 BoSbtqOKd+GNLFy//UxKpsfWQvs8fIpOe9/lUeztLAW+g5h0fN9n6rxn5xCczJhcfI
+	 o9ST8YzTyh7jg==
+Message-ID: <357a49a0-0742-47a6-bba9-6c406dbd6888@kernel.org>
+Date: Fri, 22 May 2026 11:43:09 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
-	<yangshuaisong@h-partners.com>, <shiyongbang@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2 net 1/2] net: hibmcge: disable Relaxed Ordering to fix
- RX packet corruption
-To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>
-References: <20260518144253.1568118-1-shaojijie@huawei.com>
- <20260518144253.1568118-2-shaojijie@huawei.com>
- <545dd8a4-662b-49de-a5cf-793d20989571@redhat.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <545dd8a4-662b-49de-a5cf-793d20989571@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemk100013.china.huawei.com (7.202.194.61)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v2] selftests: net: add tests for PPPoL2TP
+Content-Language: fr
+To: Qingfang Deng <qingfang.deng@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Felix Maurer <fmaurer@redhat.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Petr Machata <petrm@nvidia.com>, linux-kernel@vger.kernel.org,
+ linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20260514015743.37869-1-qingfang.deng@linux.dev>
+ <92da057f-7e97-405c-877f-ad6a64e3553e@kernel.org>
+ <0e6fa578-15b2-43c5-b5f5-a6e0a34c103b@linux.dev>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <0e6fa578-15b2-43c5-b5f5-a6e0a34c103b@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290637-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290638-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:mid,huawei.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7A85A5ADB24
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 106925ADBBD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Qingfang,
 
-on 2026/5/21 21:54, Paolo Abeni wrote:
-> On 5/18/26 4:42 PM, Jijie Shao wrote:
->> When SMMU is disabled, the hibmcge driver may receive corrupted packets.
->> The hardware writes packet data and descriptors to the same page, but
->> with Relaxed Ordering enabled, PCI write transactions may not be
->> strictly ordered. This can cause the driver to observe a valid
->> descriptor before the corresponding packet data is fully written.
+On 21/05/2026 17:18, Qingfang Deng wrote:
+> Hi,
+> 
+> On 2026/5/21 10:24, Matthieu Baerts wrote:
+>> Hi Qingfang,
 >>
->> Fix this by clearing PCI_EXP_DEVCTL_RELAX_EN in the PCI bridge control
->> register to ensure strict write ordering between packet data and
->> descriptors.
+>> On 14/05/2026 11:57, Qingfang Deng wrote:
+>>> Add ping, iperf3, and recursion tests for PPPoL2TP.
+>> Thank you for the new test!
 >>
->> Fixes: f72e25594061 ("net: hibmcge: Implement rx_poll function to receive packets")
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->> ---
->>   drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c | 2 ++
->>   1 file changed, 2 insertions(+)
+>> I recently modified NIPA to be able to execute this test by adding
+>> xl2tpd 1.3.20, but it looks like this test is flaky:
 >>
->> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> index 068da2fd1fea..319551caf047 100644
->> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> @@ -420,6 +420,8 @@ static int hbg_pci_init(struct pci_dev *pdev)
->>   		return -ENOMEM;
->>   
->>   	pci_set_master(pdev);
->> +	pcie_capability_clear_word(pdev, PCI_EXP_DEVCTL,
->> +				   PCI_EXP_DEVCTL_RELAX_EN);
-> Sashiko noted this will not survive a device reset - that performs
-> pci_restore_state - and you should likelly call pci_save_state(pdev)
-> afterwards.
+>>    https://netdev.bots.linux.dev/contest.html?skip=0&test=pppol2tp-sh
+>>
+>> The results are now ignored.
+>>
+>> Do you mind fixing that, please?
+> 
+> 
+> Looks like pppd exited unexpectedly, but I could not locally reproduce
+> this issue.
+> 
+> You can start a socat instance to listen on syslog (as done in pppoe.sh
+> test) to see what's going on.
 
-Yes, thank you. I will fix it in v3.
-Jijie Shao
+If it is already done in another test, and if this is not creating more
+troubles, it might be more interesting if this debug mode is always
+enabled. I would then recommend sending a patch doing that, than
+applying temp modifications only in NIPA, with a risk of causing other
+troubles. WDYT?
 
+Cheers,
+Matt
 
