@@ -1,129 +1,167 @@
-Return-Path: <netdev+bounces-290852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290853-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qRwYFYBjEGroWwYAu9opvQ
-	(envelope-from <netdev+bounces-290852-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 16:09:04 +0200
+	id gI/oIIFmEGoKXAYAu9opvQ
+	(envelope-from <netdev+bounces-290853-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 16:21:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD9A5B5DE9
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 16:09:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0419A5B60E7
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 16:21:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6E8803038A62
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 13:57:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 27841304BBF9
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895DA405C2B;
-	Fri, 22 May 2026 13:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FCE39D3C1;
+	Fri, 22 May 2026 14:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmYAAOj5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y+NZZA+z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66BB407565;
-	Fri, 22 May 2026 13:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAA1410D3E
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 14:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779458233; cv=none; b=pzdhqFI41RdVmdTRNG44Z5QXbQ9vlwxWxQzCjh4QQAyNX0aZ8UExuZEGGN/Rx6wbkHxYfGJdRBTuqBd3vfuYlSeqCQzTUR9UXOA9YMT2FHUqc7TSrBfJYRW+5XUIru7tWi5VED9BGibA9oXcPNFL57teBMcAXyWet9r/RSC71bk=
+	t=1779458484; cv=none; b=q3YVYPiX2/UAptmsERgyCH8AhrbY8wnzTEZ0SXxBAHmfGBzAWCPg8iRCOntc8O7rQ9GyGpcJVnqlQUqDqA7zb7X67A1Hq3LBU/Yu54lZPBd4Z3GCSrjeWAE2hDbz8dXqOfID4WTFIpIkBeLTB4k/fuBVLuYvnT8tEBTNrjy5Gls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779458233; c=relaxed/simple;
-	bh=a3ND9OvD3CTrT94oU9J6m7tOAZfAuSPF4/GgkSuvY3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gNDDyqdiact4a7viHrO9yp4E+CpwEwAWxpf5N3+VL/pP4z5zdOz65PlWu3bQacjHqPK8EmHi7v4L1iATGsNoW4aVVmlNYql2ykROoY0xSZuJR1bN1w86Fx2mZ0E/7iKi5bqwPqa1vFJVzbD6zDka9zUrzVpBZ9mnx5BGg51+vMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmYAAOj5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E320D1F000E9;
-	Fri, 22 May 2026 13:57:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779458228;
-	bh=K1noXykKhAShRph5zaNh5F3qdcPueU9kCqVJG4yvFuc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=BmYAAOj5Yy7k1hfxxXU6ONoytM0zYua3S/Afani5X6uPo+2kjh+CUp+ShN9eabTPq
-	 Be9GRh1G4OPOS9QD8R5aghWguOWhXzEkA13Rv7mvb/x0n5rShtEoAHWX2sBl1dihSw
-	 NgWDeT0Ww4XNyInMy407tmvvjH6J1pJsCMgDwKrgUkiFWYU2vUxTAsTyYIKt/ZqaUo
-	 RvSVUCZI5CTO6Y5RZ1U+Vc7uIasX8QXJQRmAQiGTirUzzLjkwTSFyEeRtufk/8PFA1
-	 IzgAAn3bwugkCpxJXaPHLyXX4+fBNUHIESDVz2XyyBBjlElCiKTFisdFPMBLpZUVJ6
-	 5KLyR+n6U7ziA==
-Date: Fri, 22 May 2026 06:57:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Cc: Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org, Jacob Keller
- <jacob.e.keller@intel.com>, Mohsin Bashir <mohsin.bashr@gmail.com>, "Mike
- Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>, Pavel Begunkov
- <asml.silence@gmail.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] fbnic: Track BDQ fragment geometry per
- ring
-Message-ID: <20260522065707.0599c216@kernel.org>
-In-Reply-To: <20260522113225.241337-2-bjorn@kernel.org>
-References: <20260522113225.241337-1-bjorn@kernel.org>
-	<20260522113225.241337-2-bjorn@kernel.org>
+	s=arc-20240116; t=1779458484; c=relaxed/simple;
+	bh=fs/ta8eTlNchNJaArsAGnEER3GZ1R+4RmEbZCM6gFs8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fGPjEhD4TkWpsDznyh6XL8/3RZTRU9/rmFqaSC0c3po0Xw2Tgnx6r5+GXnasprqSulmI3rdEB4p4Q5nEGKYrtFU6vlZKe07ALRswXvVgX0wLmW2Bq508sqPP8v2ou3iqksWUYfG3agMdzteyDwa3FS23G/vfDjNqi+uClgmOQNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y+NZZA+z; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-516cdd89225so34929651cf.0
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 07:01:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779458479; x=1780063279; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VT1kGtaD7Jw3U73S4KtEzPxOgq6cSfhZQjpotpbOvys=;
+        b=Y+NZZA+zxcVjoTWA/xbgizM0iftkN/XI31liLDCRl9JoSIgvduR0QOiVmG1ZPpNj1u
+         7irU4hbNvQbAENKT9cmDtFKZDEkO0Ib2WmWEi2d5PSeAflAKJKoYb9V+M1rrvSHZ4qAH
+         icacVvD54aEVONDwAwGsyYNJgA5Uu+9r6JnCL6Rit0/t195s/S7DFZ9KOuxexcpQnu3x
+         uB1OQT0SDdYyahibBwJFpW7A1ug0DoeBdPOdCqd/IbDNz9ECFVlMkvAKc997vrWPbOww
+         7/CA0DneJ/qHKOb15FsBPAJn+4gRyNGC/Qop5Vhs9J+Qr3MYDhxr7a8U72RtE/AlZ7gu
+         g93A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779458479; x=1780063279;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VT1kGtaD7Jw3U73S4KtEzPxOgq6cSfhZQjpotpbOvys=;
+        b=HY4C8YMLC9e/Gpf1QUs3FMHY/qsV7iUXlar2BGnej1jUhgnoz3/XnYCmhvsJQgNw97
+         a6HRxxYTooRNbIv8VIcSumweI+DjCDqXwDi2cPKjEn6K6JgWafnh+3S8a9gRVJgD/88a
+         yMJJBYv9pWnyXKIfYkuQ2MycGd7a4jRfoB1P4JtCRVkZVmEZtcCDAnR5QeIz2qrtAFFW
+         SwxIo8cE1Yzpri0/D57VHn5tT/ujQVrSnoo7/rZ3nhDRBWjubmaJGOm+QrI9FNXI5+q/
+         gfZU8ROGDT/LNRg1jSl5yPMM76Z1j7rW76dY9d724t/cexCXh1lszsFfBKApqV55EEvu
+         /2pA==
+X-Forwarded-Encrypted: i=1; AFNElJ/gRwezRJNXPWPqzWdQWoEs3IdPVCqw4s5qhVNct4esgygAfOI5gfMcBoMMKKdGa6aUczjvbhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVBa5cwt8VkWbX77x2Ivv++2mfk9yQ0A02XA9LHnzFvShXNyqW
+	OC4KOTw1Xa9ofBadPnl7tzIcsUn/ZiGKAPEYMQ5Ihgid/HG1WSXGsJTe+IOzWhNhDzvKFXzqkcD
+	SgCU/bTmj9khJjA==
+X-Received: from qtpb1.prod.google.com ([2002:ac8:6781:0:b0:516:82ba:172e])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:182a:b0:50d:a4e6:997f with SMTP id d75a77b69052e-516d4419a15mr54998241cf.15.1779458446526;
+ Fri, 22 May 2026 07:00:46 -0700 (PDT)
+Date: Fri, 22 May 2026 14:00:45 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
+Message-ID: <20260522140045.1836961-1-edumazet@google.com>
+Subject: [PATCH net] inet: frags: fix a possible frag_mem_limit drift
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	Damiano Melotti <melotti@google.com>, Florian Westphal <fw@strlen.de>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Peter Oskolkov <posk@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290852-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290853-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org,intel.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,strlen.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.949];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: DFD9A5B5DE9
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 0419A5B60E7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 22 May 2026 13:32:20 +0200 Bj=C3=B6rn T=C3=B6pel wrote:
-> Fbnic programs BDQs in 4 KiB fragments, but the driver has so far
-> decoded buffer IDs using PAGE_SIZE-derived constants. That works while
-> HPQ and PPQ both use PAGE_SIZE buffers, but it makes the fragment
-> layout global even though the layout really belongs to the queue.
->=20
-> Store the fragment shift on each BDQ and use it when programming
-> buffer descriptors and decoding receive completions. HPQ and PPQ still
-> get the same PAGE_SIZE-derived value, so this does not change behavior
-> yet.
->=20
-> This prepares PPQ to use a larger io_uring zcrx buffer size without
-> changing the HPQ layout.
+During IP fragment reassembly, when an incoming fragment completes
+the reassembly but is not the first fragment
+(the head != skb branch in inet_frag_reasm_prepare),
+the code creates a clone fp of the incoming fragment skb and
+swaps it into the rbtree.
 
-PAGE_SIZE can be 64kB, I'd have expected the first commit to change
-"page size" from a compile time constant to a runtime knob.
+The original fragment (skb) had its truesize added to the fragmentation
+memory limit fqdir->mem during ip_frag_queue.
 
-> -	unsigned int pg_idx =3D FIELD_GET(FBNIC_RCD_AL_BUFF_PAGE_MASK, rcd);
-> +	struct fbnic_ring *ppq =3D &qt->sub1;
-> +	unsigned int pg_idx =3D fbnic_rcd_bdq_idx(ppq, rcd);
+However, the clone fp can have a different truesize.
 
-This patch breaks reverse xmas tree in a lot of places.
---=20
-pw-bot: cr
+When the reassembly finishes, inet_frag_reasm_finish traverses the tree
+and subtracts the different fp->truesize from fqdir->mem.
+
+We probably never have seen this issue in the wild because
+most NIC are cooking packets with a constant skb->truesize
+regardless of the fragment size (Assuming MTU <= 1500).
+
+However this could be exploited for NIC implementing copybreak
+(copying small payload in skb->head), or MTU >= 4096
+and NIC using 1 to 3 4K pages for jumbo frames.
+
+Fixes: 1706d58763c3 ("[IPV4]: Make ip_defrag return the same packet")
+Reported-by: Damiano Melotti <melotti@google.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+Cc: Florian Westphal <fw@strlen.de>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Peter Oskolkov <posk@google.com>
+---
+ net/ipv4/inet_fragment.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
+index 393770920abd794a47a933f2694afe3e2d08d25a..3222cc2ac235e9628da88db6637498755749b07d 100644
+--- a/net/ipv4/inet_fragment.c
++++ b/net/ipv4/inet_fragment.c
+@@ -539,6 +539,9 @@ void *inet_frag_reasm_prepare(struct inet_frag_queue *q, struct sk_buff *skb,
+ 		FRAG_CB(skb)->next_frag = FRAG_CB(head)->next_frag;
+ 		rb_replace_node(&head->rbnode, &skb->rbnode,
+ 				&q->rb_fragments);
++		delta = skb->truesize - head->truesize;
++		if (delta)
++			add_frag_mem_limit(q->fqdir, delta);
+ 		consume_skb(head);
+ 		head = skb;
+ 	}
+-- 
+2.54.0.746.g67dd491aae-goog
+
 
