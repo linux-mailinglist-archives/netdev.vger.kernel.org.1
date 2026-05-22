@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-290943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290944-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YPvVHq/jEGqOfAYAu9opvQ
-	(envelope-from <netdev+bounces-290943-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:15:59 +0200
+	id aLPLHb7jEGqOfAYAu9opvQ
+	(envelope-from <netdev+bounces-290944-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:16:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE1A5BB698
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:15:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C97365BB69F
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3704630087AF
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:13:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45B943023504
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:13:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC47C368941;
-	Fri, 22 May 2026 23:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6773438E8CE;
+	Fri, 22 May 2026 23:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpCYcNTK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VQhKkhpu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FC22222CC
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2B123ABA8
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779491604; cv=none; b=PTC1Vi2v/iSu7TC31viUYL6l/WbfywTgjWOEdY7EizQLZkenb1f8R6FrKukVjCXyt09JWE0oR84f21jkf76yz3yOaEpw1XitU3mWCrPrdZxsWLegC90IV+s7vg3WV2HLHDCTNcxOd5Q7CULeUmKb0r69moCC/ZV3lEGGBtl+XX4=
+	t=1779491605; cv=none; b=XSrFVwWHHQF6l2lMX/5LiqClYCTmDwo/aaHWc0EFNHOq2OgeNDzQpS05oEYMZCLU0gzoC22x8AdBSVUhkvoKjm+mt59z656xYn+doeZcgl0u70S2sdUnUuNbOA+S5B0Tf05OzMO+B5Ru2n/rXM/Ha0Dlp8jkVlqwLjB6/jQ0cUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779491604; c=relaxed/simple;
-	bh=040Ejc4FUvNnpzZsHJnlKEb/EZclA8AdlmcFM2ADZVc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GQG2o4LHb579QdB13evvjGVm5N09uHUMe9GozXJGKcRzE5duinebg3wBuMvSuGKIKdR9ybGX8H9BSDvNMwVSKqFpTCTYEUiHAaiBZPXgzomoPb3CKlSYFsXd+PE1DakD4gGIBevMgLDgOiB2oOjYShcFmLQVU0oZcQziIPZIf9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpCYcNTK; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE7E61F000E9;
-	Fri, 22 May 2026 23:13:22 +0000 (UTC)
+	s=arc-20240116; t=1779491605; c=relaxed/simple;
+	bh=abXX7AXHW6QaogY51ksdN7xygCujEszt7GE0X+z74SY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=c8AkSze1q6UcIXfgkHhqB0Xnwq2FZ7OTdGkWYPj2YwCK/Qzo73k6cJHz5Mp6y0SD9pOXD/RN4r5iidhi1H8JCFLkH/bTgVIHz6VTSrH0NiFqzsPskMi8o1FBEd6hx+1kDwqsslk7WwBZ3KIcVb1cqZCmjS8bUg0mTJo/mmN2LSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VQhKkhpu; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A52B1F00A3F;
+	Fri, 22 May 2026 23:13:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779491603;
-	bh=vIF2EbefxDJPm+EDgW5WEQyB8VRovxZpg+xTLYEruaU=;
-	h=From:To:Cc:Subject:Date;
-	b=QpCYcNTKCWvyR7OwSw82c/Uav6ShuQ8XkKmcEwuQ5ZBrIusGiI4nfNhUBzcLNtHCT
-	 vWkM+GwIS0FmGDkLsSAN7ZGOT1cOCztwAv0uqICjFQ41A80zjs+L/W5uk9sQSdxkUQ
-	 E3q9wz9jbe+jbVeI4Z9llK/zHcgs8FQxYD/wDZUbrjD6cxNii77h9E/xN2QjiO6r6G
-	 Tm8OzVritKlsJ/MbA3Do8ufqbVS6fkJ18bioqqH4WzQFAYP18LyYeCdrbmhSENLphI
-	 TqFmMNCi9YoDBDB9KlcVc8LgRlBPCcyyqF0miCo+w595TpqdbyXiDz/Ce0bWD++MFj
-	 ejkE/m+l7iD7Q==
+	s=k20260515; t=1779491604;
+	bh=y+36ZqKniXdxOxZDU6nFoLdq9vRCZU8TV8XqVrBc5K8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=VQhKkhpuYGkjgFvlDVpzUqnUWJuxugnTpoL0qO09QYi7pwOy4IB216tCbDngBStxC
+	 x2j24b5N2Bs3kjCMNyOMwAeoJz3+Mbs8vFbJB1v4yvUonRHRYtGkc8mdvnfYbSaSCq
+	 Ow4nCWpvToiPlFIyy6CiSDeuUxtAr+MGwWadfKceue56XQYUIyP0QMVr+i6Sb65l+c
+	 83UcOegiElGxPTpibhFRN0TGyBUsYBzhIkeCyW6VnUnANtu6UPpnCBsk8wPiEFM5+w
+	 AQn/aLo5mY7q0S219s8QLswgvreLvx9rHHCjSdlhg6370igFyBR+3Ocy+HDbheZ04G
+	 py+LgUpTBD2OQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,11 +56,15 @@ Cc: netdev@vger.kernel.org,
 	petrm@nvidia.com,
 	o.rempel@pengutronix.de,
 	idosch@nvidia.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 0/9] ethtool: module: fix a handful of small bugs
-Date: Fri, 22 May 2026 16:13:03 -0700
-Message-ID: <20260522231312.1710836-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	andrew@lunn.ch,
+	kees@kernel.org
+Subject: [PATCH net 1/9] ethtool: module: call ethnl_ops_complete() on module flash errors
+Date: Fri, 22 May 2026 16:13:04 -0700
+Message-ID: <20260522231312.1710836-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260522231312.1710836-1-kuba@kernel.org>
+References: <20260522231312.1710836-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,8 +83,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-290943-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-290944-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -94,38 +99,43 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0EE1A5BB698
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email]
+X-Rspamd-Queue-Id: C97365BB69F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-I've been poking at the locking in ethtool and it appears
-that the FW flashing is not currently taking the ops lock.
-Existing drivers which implement module FW flashing seem
-to have their own locking, so this series doesn't actually
-add the ops lock (I'll add it in net-next). But a number
-of other errors have been surfaced in the process.
+When validate() fails we are skipping over ethnl_ops_complete()
+even tho we already called ethnl_ops_begin().
 
-Jakub Kicinski (9):
-  ethtool: module: call ethnl_ops_complete() on module flash errors
-  ethtool: module: avoid leaking a netdev ref on module flash errors
-  ethtool: module: avoid racy updates to dev->ethtool bitfield
-  ethtool: module: check fw_flash_in_progress under rtnl_lock
-  ethtool: module: fix cleanup if socket used for flashing multiple
-    devices
-  ethtool: cmis: require exact CDB reply length
-  ethtool: cmis: fix u16-to-u8 truncation of msleep_pre_rpl
-  ethtool: cmis: validate start_cmd_payload_size from module
-  ethtool: cmis: validate fw->size against start_cmd_payload_size
+Fixes: 32b4c8b53ee7 ("ethtool: Add ability to flash transceiver modules' firmware")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: andrew@lunn.ch
+CC: kees@kernel.org
+CC: maxime.chevallier@bootlin.com
+CC: petrm@nvidia.com
+CC: danieller@nvidia.com
+---
+ net/ethtool/module.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- net/ethtool/cmis.h           |  4 ++--
- net/ethtool/netlink.h        |  4 ++--
- net/ethtool/cmis_cdb.c       |  9 ++++++--
- net/ethtool/cmis_fw_update.c | 44 ++++++++++++++++++++++++------------
- net/ethtool/module.c         | 41 ++++++++++++++++++++-------------
- net/ethtool/netlink.c        |  4 ++--
- 6 files changed, 68 insertions(+), 38 deletions(-)
-
+diff --git a/net/ethtool/module.c b/net/ethtool/module.c
+index cad2eb25b5a4..741f6fb25d45 100644
+--- a/net/ethtool/module.c
++++ b/net/ethtool/module.c
+@@ -427,10 +427,11 @@ int ethnl_act_module_fw_flash(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	ret = ethnl_module_fw_flash_validate(dev, info->extack);
+ 	if (ret < 0)
+-		goto out_unlock;
++		goto out_complete;
+ 
+ 	ret = module_flash_fw(dev, tb, skb, info);
+ 
++out_complete:
+ 	ethnl_ops_complete(dev);
+ 
+ out_unlock:
 -- 
 2.54.0
 
