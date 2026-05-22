@@ -1,81 +1,79 @@
-Return-Path: <netdev+bounces-290759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290760-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNNbIessEGqSUgYAu9opvQ
-	(envelope-from <netdev+bounces-290759-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:16:11 +0200
+	id EHBgKT4zEGqqUwYAu9opvQ
+	(envelope-from <netdev+bounces-290760-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:43:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02EA15B1D8D
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 040155B25E4
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4C84304F215
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:10:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 972DA302BDF6
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F5D3B8955;
-	Fri, 22 May 2026 10:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8253CAE63;
+	Fri, 22 May 2026 10:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fZeqg77N"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lYqy/jqb"
 X-Original-To: netdev@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284C63C3BE6;
-	Fri, 22 May 2026 10:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6AE3B2FE5;
+	Fri, 22 May 2026 10:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779444640; cv=none; b=eYs3gJkxwfgPgGJeH4271BywNSM1nU9GRlV5se/QmbkuenVoO8AHeQ3jIgHmBFIlWaFe35rWmWpYMLKxdFauRUXEQxpY+l6jZQyC9eQnE7+9eAIJHc3HVfcBfzpIZXhdegEjU1+RxKq9I2tP+fDU2iIMk5cggaIIplEU0n/ylJE=
+	t=1779446103; cv=none; b=WBABXDDahv40L4q0xZiCwr1PctJqO8vN8uYjNRvnZSmcHnzJXpxiXLkV6jmSGCxqFp9YDd/uphOnixuU2NgsPsdf9sziaaB9LRWPqxXhFJQwa2nyvQ55tVETp1k2vpaq4kYOfFacxy3tlSK495XxXw904AiiBPtkAlWD0hls9Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779444640; c=relaxed/simple;
-	bh=+PeRY5NE71yNsHAswCRvdBEnH0BACO2qp1hYw4F0/Dk=;
+	s=arc-20240116; t=1779446103; c=relaxed/simple;
+	bh=rR60BJO7B9L4b6QE4wRlnUA0XJuNiL54x0/rrtZ7Jxo=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Gr6e5/KHLMV+pex68MLirIFS3diT/7YrtThyMi3BgiWI2mr0MzdqJNOW860lGX304yF+pTR4D6+rWRkxZQy9ZFDuzb4tKLg3sTIJe0WSZBO+iRGDNy+yg6MxKXmq//UYX7eQYwzOmmDIdqd2CaIuuVQKv22xzSMgiOKeqFcFwpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fZeqg77N; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=aAoaOytr9ZretdHpEj86pITItUjhMRnO7eDZF5BZ4VtwDdv6ugVu/jaC37Wm33J3gevaY12hTMLDpBsKhzcbTuzaa5yuob4c0U3TjqFJjk8STv9aEF7Xsv4YvirXsEezLRgbfcfSOy2R6wbb12rg9zvs+odnlR8z4Hf3rQ4CFh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lYqy/jqb; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=igjkzYGkIQ0wNxT27ro5D2TRPyeGF8LWA+YcqT2TVeY=; b=fZeqg77Nza/tMldhc9RlVaqkZZ
-	Vr0gVDzijdY/zpslodt71wa1zOOA/+UFRBvbbDbrWSqTg1wTUWNZKQ6GVIB2IDoN07JarcDNvdx/4
-	/JKa0gFieiaOT5QJhPq67503HlN+0Q8YdHO6Pk3XPN9BUTiuX1ktUF/Wh6p+bbqTL2JkAzdmoy7Ba
-	wVqgu0lr9uqeTMdIYZc+HlZfPtNaxiPIhkpeEmigW96mYC5Rw0ek1nZxf2lL8b1jeZjZ/ETclRwOb
-	0JeEkZVHnOBCg4gScbCSB6tprbhWWeT6HH7EZ1Qr20Pj1npdtyBNiKuLSccD3IYKVlgyY+6fjPFCd
-	Ml+65hGg==;
+	bh=OJwuH4/OnrJV5YoA7eVdj2CwUhyRm0uifDW/z1AQiok=; b=lYqy/jqbqz2GxyemXoZigaw2zP
+	7+hSFB26Nf08rW8eefYZcBQGSgGifYRB2mggbeW25KiAD2i/dwSM9H6cm7bxXyuYituxVHmwZVrPv
+	j1AtEIi9BUidopV2blRBvuUJULniB7LB9IM6E2YyF5lxTR9AtEnF46ICyTa3msF7MeExh+MtTx6qy
+	3W50iX0Tip5WpoY95bu6Zj5e72QJa/4zQye8ca237oM4HtVFSrvLzhwkI6gnz/o558b0uFY9SBy73
+	EInRuZ6+zTL/DIRr4fasyjxfNk+xk1t8U5e5fH6njgJ0aN41aYDnnlOj2ajAOS8S9eA/WB+lN8tor
+	KUu7kIEg==;
 Received: from 54-240-197-238.amazon.com ([54.240.197.238] helo=freeip.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wQMpu-00000009vyD-3v0y;
-	Fri, 22 May 2026 10:10:35 +0000
-Message-ID: <112f6d6adfe0022f8db7edc9a75e1b7fa5e6ef5d.camel@infradead.org>
-Subject: Re: [PATCH v3 net-next 1/7] ptp: Add ioctls for PHC timestamps with
- quality attributes
+	id 1wQNDU-00000009xam-34T7;
+	Fri, 22 May 2026 10:34:56 +0000
+Message-ID: <aee6f77138e5f173d36f3f4ce65cc2acc4e4ae69.camel@infradead.org>
+Subject: Re: [PATCH net-next v8 3/3] gve: implement PTP gettimex64
 From: David Woodhouse <dwmw2@infradead.org>
-To: Arthur Kiyanovski <akiyano@amazon.com>, David Miller
- <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org
-Cc: Richard Cochran <richardcochran@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Thomas Gleixner
- <tglx@linutronix.de>, Miroslav Lichvar <mlichvar@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Wen Gu <guwen@linux.alibaba.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, David Woodhouse <dwmw@amazon.com>, Yonatan
- Sarna <ysarna@amazon.com>, Zorik Machulsky <zorik@amazon.com>, Alexander
- Matushevsky <matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, Matt
- Wilson <msw@amazon.com>,  Anthony Liguori <aliguori@amazon.com>, Nafea
- Bshara <nafea@amazon.com>, Evgeny Schmeilin <evgenys@amazon.com>,  Netanel
- Belgazal <netanel@amazon.com>, Ali Saidi <alisaidi@amazon.com>, Benjamin
- Herrenschmidt <benh@amazon.com>,  Noam Dagan <ndagan@amazon.com>, David
- Arinzon <darinzon@amazon.com>, Evgeny Ostrovsky <evostrov@amazon.com>, Ofir
- Tabachnik <ofirt@amazon.com>, Amit Bernstein <amitbern@amazon.com>,
- linux-kselftest@vger.kernel.org, shuah@kernel.org, 
- vadim.fedorenko@linux.dev
-Date: Fri, 22 May 2026 11:10:33 +0100
-In-Reply-To: <20260515164033.6403-2-akiyano@amazon.com>
-References: <20260515164033.6403-1-akiyano@amazon.com>
-	 <20260515164033.6403-2-akiyano@amazon.com>
+To: Thomas Gleixner <tglx@kernel.org>, Harshitha Ramamurthy
+	 <hramamurthy@google.com>, netdev@vger.kernel.org, Arthur Kiyanovski
+	 <akiyano@amazon.com>
+Cc: joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com,  jstultz@google.com, sboyd@kernel.org,
+ willemb@google.com, nktgrg@google.com,  jfraker@google.com,
+ ziweixiao@google.com, maolson@google.com,  jordanrhee@google.com,
+ thostet@google.com, alok.a.tiwari@oracle.com,  pkaligineedi@google.com,
+ horms@kernel.org, jacob.e.keller@intel.com,  yyd@google.com,
+ jefrogers@google.com, linux-kernel@vger.kernel.org, Naman Gulati
+ <namangulati@google.com>, Thomas =?ISO-8859-1?Q?Wei=DFschuh?=
+ <thomas.weissschuh@linutronix.de>
+Date: Fri, 22 May 2026 11:34:55 +0100
+In-Reply-To: <87bje8v0xl.ffs@tglx>
+References: <20260514225842.110706-1-hramamurthy@google.com>
+	 <20260514225842.110706-4-hramamurthy@google.com>
+	 <cd5868258edee932fd9b4ed46a48b5a07b4c6da8.camel@infradead.org>
+	 <87tss0vdrj.ffs@tglx>
+	 <63ff978516925951df0f95aecbd4ea5d7bb2956e.camel@infradead.org>
+	 <87bje8v0xl.ffs@tglx>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-KnEh/YFGQxf78vF0S+XP"
+	boundary="=-pDrdbFyYJXrhnDe/A9mi"
 User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,81 +92,153 @@ X-Spamd-Result: default: False [-2.76 / 15.00];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290759-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290760-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[32];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	FROM_HAS_DN(0.00)[];
 	HAS_ATTACHMENT(0.00)[];
 	DKIM_TRACE(0.00)[infradead.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,redhat.com,linutronix.de,lunn.ch,linux.alibaba.com,amazon.com,vger.kernel.org,kernel.org,linux.dev];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,intel.com,vger.kernel.org,linutronix.de];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,infradead.org:mid,infradead.org:dkim]
-X-Rspamd-Queue-Id: 02EA15B1D8D
+X-Rspamd-Queue-Id: 040155B25E4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
---=-KnEh/YFGQxf78vF0S+XP
+--=-pDrdbFyYJXrhnDe/A9mi
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2026-05-15 at 16:40 +0000, Arthur Kiyanovski wrote:
+On Fri, 2026-05-22 at 00:43 +0200, Thomas Gleixner wrote:
 >=20
-> +static long ptp_sys_offset_precise_attrs(struct ptp_clock *ptp, void __u=
-ser *arg)
-> +{
-> +	struct ptp_sys_offset_precise_attrs precise_offset_attrs;
-> +	struct system_device_crosststamp xtstamp;
-> +	struct ptp_clock_attributes att =3D {};
-> +	struct timespec64 ts;
-> +	int err;
-> +
-> +	if (!ptp->info->getcrosststampattrs)
-> +		return -EOPNOTSUPP;
-> +
-> +	err =3D ptp->info->getcrosststampattrs(ptp->info, &xtstamp, &att);
-> +	if (err)
-> +		return err;
-> +
-> +	memset(&precise_offset_attrs, 0, sizeof(precise_offset_attrs));
-> +	ts =3D ktime_to_timespec64(xtstamp.device);
-> +	precise_offset_attrs.device.pct.sec =3D ts.tv_sec;
-> +	precise_offset_attrs.device.pct.nsec =3D ts.tv_nsec;
-> +	precise_offset_attrs.device.att.error_bound =3D att.error_bound;
-> +	precise_offset_attrs.device.att.timescale =3D att.timescale;
-> +	precise_offset_attrs.device.att.status =3D att.status;
-> +	precise_offset_attrs.device.att.counter_id =3D att.counter_id;
-> +	precise_offset_attrs.device.att.counter_value =3D att.counter_value;
-> +
+> Fine, but you can only do that accurately if you have the relevant
+> parameters:
+>=20
 
-Here you're relying on the driver to populate the counter_id and value
-in the attributes. We've already talked about the need to use a
-system_counterval_t, and that the system_counterval_t should be part of
-each timestamp.
+I had elided this discussion about KVM migration as a digression, but
+I'm coming back to it because I think it could use the
+clock_get_reference_time() thing we were talking about.
 
-To clarify: in this case you should be using *THE* system_counterval_t
-that get_device_system_crosststamp() already has on its local stack.
-Make it copy that into the xtstamp structure, don't expect drivers to
-fill it in separately in the attributes.
+> =C2=A0=C2=A0=C2=A0=C2=A0 1) Guest TSC value at freeze
+> =C2=A0=C2=A0=C2=A0=C2=A0 2) Guest nominal TSC frequency
+> =C2=A0=C2=A0=C2=A0=C2=A0 3) Old host REALTIME at freeze - Ideally you use=
+ TAI
+> =C2=A0=C2=A0=C2=A0=C2=A0 4) New host TSC frequency
+> =C2=A0=C2=A0=C2=A0=C2=A0 5) New host TSC/REALTIME/TAI snapshot
+>=20
+> =C2=A0 #1 is a KVM problem, but see #3
+> =C2=A0=20
+> =C2=A0 #2 ideally communicated from the guest to the host after early
+> =C2=A0=C2=A0=C2=A0=C2=A0 initialization at boot.
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0 You really want this information because the gue=
+st won't change the
+> =C2=A0=C2=A0=C2=A0=C2=A0 mult/shift pair for it ever.
 
-In this case we are only allowing userspace to see the
-system_counterval_t that is *already* being populated by the drivers
-that support PTP_SYS_OFFSET_PRECISE / getcrosststamp.
+If *tell* the guest the frequency in CPUID, then it shouldn't be trying
+to manually calibrate it against an emulated PIT while suffering steal
+time, and its mult/shift should have a little bit less entropy.
+
+Even a system which *has* to do that crappy calibration still does it
+with a lot more *precision* than accuracy, so I suspect we ought to be
+rounding the result to the nearest 1MHz as long as that's within 10PPM
+or something like that. But that really *is* a digression :)
+
+> =C2=A0=C2=A0=C2=A0=C2=A0 That is more accurate than using the scaling fac=
+tor on the old host
+> =C2=A0=C2=A0=C2=A0=C2=A0 plus the old host frequency. Especially if you a=
+re migrating the VM
+> =C2=A0=C2=A0=C2=A0=C2=A0 several times because every migration results ob=
+viously in rounding
+> =C2=A0=C2=A0=C2=A0=C2=A0 errors, while if you use the nominal guest frequ=
+ency you keep this
+> =C2=A0=C2=A0=C2=A0=C2=A0 back and forth conversions and the resulting err=
+ors out of the way.
+>=20
+> =C2=A0 #3 That's obviously related to #1
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0 The old host knows the guest TSC scaling and the=
+ guest offset, so
+> =C2=A0=C2=A0=C2=A0=C2=A0 it can take a coherent snapshot on the host side=
+ of REALTIME/TAI
+> =C2=A0=C2=A0=C2=A0=C2=A0 and the host TSC value, which is convertible to =
+the guest TSC
+> =C2=A0=C2=A0=C2=A0=C2=A0 value.
+>=20
+> =C2=A0 #4, 5
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0 are obviously required to set up the new host sc=
+aling/offset for
+> =C2=A0=C2=A0=C2=A0=C2=A0 the guest TSC, but if based on the nominal assum=
+ed TSC frequency of
+> =C2=A0=C2=A0=C2=A0=C2=A0 the guest it becomes actually accurate and usabl=
+e across several
+> =C2=A0=C2=A0=C2=A0=C2=A0 migrations.
+>=20
+> Anything else is just crystal ball magic, which is what KVM has today....
+
+The model I'm enabling and documenting for KVM migration is basically
+within the noise of what you describe above, yes.
+
+But if we want to give the illusion of the TSC just ticking away while
+the guest happens to experience a little steal time, when in fact it's
+been completely migrated to a new host, we actually want to work with
+the *true* running frequency of the TSC at the moment of migration.
+
+So...=20
+
+ 1)=C2=A0Use clock_get_time_reference() to get a { host tsc, time, rate }
+    from the source host at 'freeze' time.=20
+
+ 2) Use clock_get_time_reference() to get a { host tsc, time, rate }
+    from the destination host, when resuming.
+
+ 3) (Optionally) scale the guest's TSC frequency, not by the *nominal*=C2=
+=A0
+    rates, but by the *actual* ratio of the rates from (1) and (2)
+    above (plus any original nominal scaling of the guest's TSC from
+    the original host).
+
+ 4) Calculate the guest TSC *offset* in order to convey the effect
+    that the guest's TSC continued to tick at the rate from (1),
+    during the time period between (1) and (2).
+
+ 5) (Optionally) Once the guest is running, slowly undo the scaling
+    in=C2=A0(1) in order to get the guest back to a nice simple unscaled
+    TSC (or scaled only by nominal frequencies as it was when launched)
+
+
+Obviously, a dedicated environment which disciplines its TSC directly
+can do all of that right now already because it *has* all the
+information it would get from clock_get_time_reference().
+
+But as you know perfectly well, Thomas, I'm never happy to keep the
+blinkers on and focus only on my specific use case at hand; I want this
+to work for the *general* case, including people running QEMU in a
+fairly standard environment. And I think clock_get_time_reference()
+might be a reasonable way of doing that, and a fairly clean counterpart
+to the clock_set_time_reference() you suggested?
 
 
 
---=-KnEh/YFGQxf78vF0S+XP
+
+
+
+
+
+--=-pDrdbFyYJXrhnDe/A9mi
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -247,22 +317,22 @@ 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
-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
+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
-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
+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
 
 
---=-KnEh/YFGQxf78vF0S+XP--
+--=-pDrdbFyYJXrhnDe/A9mi--
 
