@@ -1,327 +1,217 @@
-Return-Path: <netdev+bounces-290699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290701-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJohH4MJEGpXSwYAu9opvQ
-	(envelope-from <netdev+bounces-290699-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:45:07 +0200
+	id OEuiIF8KEGpqSwYAu9opvQ
+	(envelope-from <netdev+bounces-290701-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:48:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C765B0251
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:45:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004FF5B0307
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D02E5300F113
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:44:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 42F503016912
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF48E3A544C;
-	Fri, 22 May 2026 07:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41B23612ED;
+	Fri, 22 May 2026 07:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vf/t7jKs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aPlNA/Nx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDAF1E49F;
-	Fri, 22 May 2026 07:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E32C33F58E
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 07:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779435851; cv=none; b=JmdE1YMcJ0FClapmEqIkRYfXKDtinkT6wF+Zspu8knzliKPDQoDaWSwNMXok4fY/KqQz83E9AABFREL9GG5o+7VTkbu35eh05Zxq7N4FTwA9TpuFkeCj90rHXOg3yIFK+cWBUu9qgsLdYTi0av3UU95JAVffSIyK+gg2jWMzjfM=
+	t=1779435967; cv=none; b=XtNr8m44li904r7U2yC880WmHLeTezEvgnEHhKUIR6VuQTDxwTwvul5UaBQE+yrf/9KrytUk1UA2GmcFzF5L1iRObyMX5UQ2XJcAvsM4tb7D+rAorfmBY4fzrobdYMVq+p/hDh0BKlleecXBCOlxyi/MFspOEhwYwHxUSxUAuxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779435851; c=relaxed/simple;
-	bh=5bHFpjEEFUoqVuL5uo5C5zJNjk2npHys5cbdOrqnQ4I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ni0f77zWSIDnzOE0a3pjICutsJ6OhXU3XeU2OHYjO1vn0ljPtL1IImmLF38R/ng1q/1BMUJp36hxewXkfpa54nVc3DEJ0znyYT/7TMO91NivR2/hayOh+jPznII6HB3ykjjisn0doEIBJ4wWyXxWg9A8vwe1WB1kNXyZqgMObc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vf/t7jKs; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D331F00A3D;
-	Fri, 22 May 2026 07:43:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779435849;
-	bh=VrXF29bFOvYEg9sO118+umVcO0JfkNNCWZdK/cFtHow=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Vf/t7jKsSIO+qe+6tRxPYGoD9FkkGxUyqleh8qsf5JEmI5yAFfQfd6bWqmNwSLqFE
-	 JC1TPXCMF1wNkSklStK+IGJs47944uD9x7MBKjfQgdgfl8tW7eoK4r0LozYPT16OSk
-	 zNL62XYTRBBIGmsJRtf6asAsSmE3/aCIv1kBwwLpDZLof0FtkOLEOa5exGdWXmuxUt
-	 bFE0ONHq/F/EWqPTTVS6/mUik8viyElQpIT1jkmP/iY6duPIpIsWC4+qVlonn0dS0k
-	 TONP00VWjfoGsNyvjSJiz5gWGYonLoCjznbVnwQF8PFC5pFQxJhMGJy2Tk71iGze9o
-	 NxaiQGYc4GsMw==
-Date: Fri, 22 May 2026 13:13:51 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
-	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: Re: [PATCH v6 00/16] firmware: qcom: Add OP-TEE PAS service support
-Message-ID: <ahAJN_GEmKHA5tn3@sumit-xelite>
-References: <20260518072856.22790-1-sumit.garg@kernel.org>
- <bc3eb187-d0a4-40ce-b72c-1724b33e28ea@oss.qualcomm.com>
+	s=arc-20240116; t=1779435967; c=relaxed/simple;
+	bh=YtuyIdQZY+eul6VUiynURNGynwN0UeTB6J/R8fpgDyM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=P4z0G5EbAg6RNb9R6mI0zgKJHaFdGrem+I8mH+SM7D44rCWuWzoyBCohyUBvdLdpVN/7sTHEaChdYMGuq355C/Gdechhp1TGRuDqxrqcv1JrVh9VtxN2RG0T+BAhNiQS8oHDsSAVTVFLyRSle+YX6Ph9AwkSDs+OxEOYDEDaRg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aPlNA/Nx; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2baf7378ad0so74203245ad.0
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 00:46:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779435965; x=1780040765; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=L4N3hOfAzGfaW5hWnhwkjve/GusrE1zFUOtYHsUbX90=;
+        b=aPlNA/NxZL9SyhsXSRP47saw3l7/ESbzyt1JlsYI6hCVzISdIHdY8a2S/BXnwh9hs+
+         sieTUDDCjGQiFcrB7VdsM9wu6xHM97kRRIuLR/QahUwC6Eti9j0c59RsQk4IHWr9oVfA
+         lLN8GPW4nZ3sf/pDFivDBkGN6i8o7W5e4ZvAByZ/spwmHdQbHE0dWsYMM3N00SyvXJQS
+         kLfKUK4BaMaLvfHpXi/DTUPqxI6w9yTVcqZzMBCxNCtuFB5Nq/uDnaHbeuCzC50g0qbJ
+         nP/pARjDmkblzBIHRKevSTWP1mEa8cge25Xvg2iDeSTFQYzvjgRxd5d0ZeEk+3cu7Alh
+         QdyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779435965; x=1780040765;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L4N3hOfAzGfaW5hWnhwkjve/GusrE1zFUOtYHsUbX90=;
+        b=aJiSwuQSYuaf8OCswgFpapNMv+Fz2iYSfqU6kcDVY1qUjugzQ5y/HAubfj5cjLzs2P
+         RwAH1v4kH7jUNs7BRK/9sXS0UjRmpvOwa5iGQuIlxIVy9yzWrn8yY7c3dhC6EAN49+be
+         mMznLtd8yKEZRNliC4zKBRdQdPhzgxZXpE6ZDN5okgNk8FL0/WATIy7a+upCdiraQInj
+         nrSym1unL1PmfUiLdncfu8nygAjQYZRDFXDd5gkX7S1fZH7TlgRMh/yGA21sKnyfFrXa
+         sRFo+L3mwBEsTOxHPFh3GLTKIaX34QQNxrEOhxnxo6zlcJakH2VsKdP9pqfMM2e5muJl
+         /JAw==
+X-Forwarded-Encrypted: i=1; AFNElJ9X3NvJk1LytYjuje7HljCQx/YtWz8PLHkuL1LBNVXcXaicVrXYlB2yN0ioUt13m9ljOEwtNAg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvB/5kGIRq9Mp7o9W/oTzQnUefCLoRyMWsEiW4bWA5oA2ykiCz
+	tffzpmYQUryTJaJOUDF8XOwYJPAHp7yR9Ul/ZaSlWRVbrwcJCQg+6GxzFWDB397DBgf/QMiryiV
+	tpThu1w==
+X-Received: from plek17.prod.google.com ([2002:a17:903:4511:b0:2bd:9574:2958])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c94f:b0:2b0:608d:d8a8
+ with SMTP id d9443c01a7336-2beb0366400mr25021195ad.1.1779435965129; Fri, 22
+ May 2026 00:46:05 -0700 (PDT)
+Date: Fri, 22 May 2026 07:44:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc3eb187-d0a4-40ce-b72c-1724b33e28ea@oss.qualcomm.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
+Message-ID: <20260522074601.1658705-1-kuniyu@google.com>
+Subject: [PATCH v2 bpf-next 00/11] bpf: Add SOCK_OPS hooks for TCP AutoLOWAT.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Tenzin Ukyab <ukyab@berkeley.edu>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290699-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290701-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:email]
-X-Rspamd-Queue-Id: 26C765B0251
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.960];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 004FF5B0307
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 09:27:05AM -0700, Jeff Johnson wrote:
-> On 5/18/2026 12:28 AM, Sumit Garg wrote:
-> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > 
-> > Qcom platforms has the legacy of using non-standard SCM calls
-> > splintered over the various kernel drivers. These SCM calls aren't
-> > compliant with the standard SMC calling conventions which is a
-> > prerequisite to enable migration to the FF-A specifications from Arm.
-> > 
-> > OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
-> > support these non-standard SCM calls. And even for newer architectures
-> > using S-EL2 with Hafnium support, QTEE won't be able to support SCM
-> > calls either with FF-A requirements coming in. And with both OP-TEE
-> > and QTEE drivers well integrated in the TEE subsystem, it makes further
-> > sense to reuse the TEE bus client drivers infrastructure.
-> > 
-> > The added benefit of TEE bus infrastructure is that there is support
-> > for discoverable/enumerable services. With that client drivers don't
-> > have to manually invoke a special SCM call to know the service status.
-> > 
-> > So enable the generic Peripheral Authentication Service (PAS) provided
-> > by the firmware. It acts as the common layer with different TZ
-> > backends plugged in whether it's an SCM implementation or a proper
-> > TEE bus based PAS service implementation.
-> > 
-> > The TEE PAS service ABI is designed to be extensible with additional API
-> > as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
-> > extensions of the PAS service needed while still maintaining backwards
-> > compatibility.
-> > 
-> > Currently OP-TEE support is being added to provide the backend PAS
-> > service implementation which can be found as part of this PR [1].
-> > This implementation has been tested on Kodiak/RB3Gen2 board with lemans
-> > EVK board being the next target. In addition to that WIN/IPQ targets
-> > planning to use OP-TEE will use this service too. Surely the backwards
-> > compatibility is maintained and tested for SCM backend.
-> > 
-> > Note that kernel PAS service support while running in EL2 is at parity
-> > among OP-TEE vs QTEE. Especially the media (venus/iris) support depends
-> > on proper IOMMU support being worked out on the PAS client end.
-> > 
-> > Patch summary:
-> > - Patch #1: adds Kodiak EL2 overlay since boot stack with TF-A/OP-TEE
-> >   only allow UEFI and Linux to boot in EL2.
-> > - Patch #2: adds generic PAS service.
-> > - Patch #3: migrates SCM backend to generic PAS service.
-> > - Patch #4: adds TEE/OP-TEE backend for generic PAS service.
-> > - Patch #5-#14: migrates all client drivers to generic PAS service.
-> > - Patch #15: drops legacy PAS SCM exported APIs.
-> > 
-> > The patch-set is based on v7.1-rc4 tag and can be found in git tree here
-> > [2].
-> > 
-> > Merge strategy:
-> > 
-> > It is expected due to APIs dependency, the entire patch-set to go via
-> > the Qcom tree. All other subsystem maintainers, it will be great if I
-> > can get acks for the corresponding subsystem patches.
-> > 
-> > [1] https://github.com/OP-TEE/optee_os/pull/7721 (already merged)
-> > [2] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/log/?h=qcom-pas-v6
-> > 
-> > ---
-> > Changes in v6:
-> > - Rebased to v7.1-rc4 tag.
-> > - Patch #14: fixed ret error print.
-> > - Add Kconfig descriptions for PAS symbols such that they are visible
-> >   in menuconfig to update.
-> > 
-> > Changes in v5:
-> > - Incorporated misc. comments from Mukesh.
-> > - Split up patch #11 into 2 to add an independent commit for passing
-> >   proper PAS ID to set_remote_state API.
-> > - Picked up tags.
-> > 
-> > Changes in v4:
-> > - Incorporate misc. comments on patch #4.
-> > - Picked up an ack for patch #10.
-> > - Clarify in cover letter about state of media support.
-> > 
-> > Changes in v3:
-> > - Incorporated some style and misc. comments for patch #2, #3 and #4.
-> > - Add QCOM_PAS Kconfig dependency for various subsystems.
-> > - Switch from pseudo TA to proper TA invoke commands.
-> > 
-> > Changes in v2:
-> > - Fixed kernel doc warnings.
-> > - Polish commit message and comments for patch #2.
-> > - Pass proper PAS ID in set_remote_state API for media firmware drivers.
-> > - Added Maintainer entry and dropped MODULE_AUTHOR.
-> > 
-> > Mukesh Ojha (1):
-> >   arm64: dts: qcom: kodiak: Add EL2 overlay
-> > 
-> > Sumit Garg (15):
-> >   firmware: qcom: Add a generic PAS service
-> >   firmware: qcom_scm: Migrate to generic PAS service
-> >   firmware: qcom: Add a PAS TEE service
-> >   remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
-> >   remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
-> >   soc: qcom: mdtloader: Switch to generic PAS TZ APIs
-> >   remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
-> >   remoteproc: qcom: Select QCOM_PAS generic service
-> >   drm/msm: Switch to generic PAS TZ APIs
-> >   media: qcom: Switch to generic PAS TZ APIs
-> >   media: qcom: Pass proper PAS ID to set_remote_state API
-> >   net: ipa: Switch to generic PAS TZ APIs
-> >   wifi: ath12k: Switch to generic PAS TZ APIs
-> >   firmware: qcom_scm: Remove SCM PAS wrappers
-> >   MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
-> > 
-> >  MAINTAINERS                                   |   9 +
-> >  arch/arm64/boot/dts/qcom/Makefile             |   2 +
-> >  arch/arm64/boot/dts/qcom/kodiak-el2.dtso      |  35 ++
-> >  drivers/firmware/qcom/Kconfig                 |  21 +-
-> >  drivers/firmware/qcom/Makefile                |   2 +
-> >  drivers/firmware/qcom/qcom_pas.c              | 291 +++++++++++
-> >  drivers/firmware/qcom/qcom_pas.h              |  50 ++
-> >  drivers/firmware/qcom/qcom_pas_tee.c          | 476 ++++++++++++++++++
-> >  drivers/firmware/qcom/qcom_scm.c              | 302 ++++-------
-> >  drivers/gpu/drm/msm/Kconfig                   |   1 +
-> >  drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
-> >  drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
-> >  drivers/media/platform/qcom/iris/Kconfig      |  25 +-
-> >  .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
-> >  drivers/media/platform/qcom/venus/Kconfig     |   1 +
-> >  drivers/media/platform/qcom/venus/firmware.c  |  11 +-
-> >  drivers/net/ipa/Kconfig                       |   2 +-
-> >  drivers/net/ipa/ipa_main.c                    |  13 +-
-> >  drivers/net/wireless/ath/ath12k/Kconfig       |   2 +-
-> >  drivers/net/wireless/ath/ath12k/ahb.c         |  10 +-
-> >  drivers/remoteproc/Kconfig                    |   4 +-
-> >  drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
-> >  drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
-> >  drivers/remoteproc/qcom_wcnss.c               |  12 +-
-> >  drivers/soc/qcom/mdt_loader.c                 |  12 +-
-> >  include/linux/firmware/qcom/qcom_pas.h        |  43 ++
-> >  include/linux/firmware/qcom/qcom_scm.h        |  29 --
-> >  include/linux/soc/qcom/mdt_loader.h           |   6 +-
-> >  28 files changed, 1119 insertions(+), 320 deletions(-)
-> >  create mode 100644 arch/arm64/boot/dts/qcom/kodiak-el2.dtso
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas.c
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas.h
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
-> >  create mode 100644 include/linux/firmware/qcom/qcom_pas.h
-> > 
-> 
-> In my automation I do bisection builds and it fails when I bisect.
+This series introduces BPF_SOCK_OPS_RCVQ_CB, a new type of opt-in
+hooks for BPF SOCK_OPS prog.
 
-Thanks for this report. It's really rather a directly dependency of
-qcom_q6v5_pas on mdt_loader. Switching them individually is causing this
-git bisection problem. I don't see any other way to fix this apart from
-mergging patch 5/16 and 7/16. Will do that for v7.
+The hooks can be enabled on per-socket basis by bpf_setsockopt():
 
-> 
-> At "remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs":
-> 
-> ../drivers/remoteproc/qcom_q6v5_pas.c: In function 'qcom_pas_load':
-> ../drivers/remoteproc/qcom_q6v5_pas.c:244:44: error: passing argument 1 of 'qcom_mdt_pas_load' from incompatible pointer type [-Wincompatible-pointer-types]
->   244 |                 ret = qcom_mdt_pas_load(pas->dtb_pas_ctx, pas->dtb_firmware,
->       |                                         ~~~^~~~~~~~~~~~~
->       |                                            |
->       |                                            struct qcom_pas_context *
-> In file included from ../drivers/remoteproc/qcom_q6v5_pas.c:27:
-> ../include/linux/soc/qcom/mdt_loader.h:23:52: note: expected 'struct qcom_scm_pas_context *' but argument is of type 'struct qcom_pas_context *'
->    23 | int qcom_mdt_pas_load(struct qcom_scm_pas_context *ctx, const struct firmware *fw,
->       |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
-> ../drivers/remoteproc/qcom_q6v5_pas.c: In function 'qcom_pas_start':
-> ../drivers/remoteproc/qcom_q6v5_pas.c:322:36: error: passing argument 1 of 'qcom_mdt_pas_load' from incompatible pointer type [-Wincompatible-pointer-types]
->   322 |         ret = qcom_mdt_pas_load(pas->pas_ctx, pas->firmware, rproc->firmware,
->       |                                 ~~~^~~~~~~~~
->       |                                    |
->       |                                    struct qcom_pas_context *
-> ../include/linux/soc/qcom/mdt_loader.h:23:52: note: expected 'struct qcom_scm_pas_context *' but argument is of type 'struct qcom_pas_context *'
->    23 | int qcom_mdt_pas_load(struct qcom_scm_pas_context *ctx, const struct firmware *fw,
->       |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
-> make[5]: *** [../scripts/Makefile.build:289: drivers/remoteproc/qcom_q6v5_pas.o] Error 1
-> 
-> 
-> At "remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs":
-> 
-> ../drivers/remoteproc/qcom_q6v5_pas.c: In function 'qcom_pas_load':
-> ../drivers/remoteproc/qcom_q6v5_pas.c:244:44: error: passing argument 1 of 'qcom_mdt_pas_load' from incompatible pointer type [-Wincompatible-pointer-types]
->   244 |                 ret = qcom_mdt_pas_load(pas->dtb_pas_ctx, pas->dtb_firmware,
->       |                                         ~~~^~~~~~~~~~~~~
->       |                                            |
->       |                                            struct qcom_pas_context *
-> In file included from ../drivers/remoteproc/qcom_q6v5_pas.c:27:
-> ../include/linux/soc/qcom/mdt_loader.h:23:52: note: expected 'struct qcom_scm_pas_context *' but argument is of type 'struct qcom_pas_context *'
->    23 | int qcom_mdt_pas_load(struct qcom_scm_pas_context *ctx, const struct firmware *fw,
->       |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
-> ../drivers/remoteproc/qcom_q6v5_pas.c: In function 'qcom_pas_start':
-> ../drivers/remoteproc/qcom_q6v5_pas.c:322:36: error: passing argument 1 of 'qcom_mdt_pas_load' from incompatible pointer type [-Wincompatible-pointer-types]
->   322 |         ret = qcom_mdt_pas_load(pas->pas_ctx, pas->firmware, rproc->firmware,
->       |                                 ~~~^~~~~~~~~
->       |                                    |
->       |                                    struct qcom_pas_context *
-> ../include/linux/soc/qcom/mdt_loader.h:23:52: note: expected 'struct qcom_scm_pas_context *' but argument is of type 'struct qcom_pas_context *'
->    23 | int qcom_mdt_pas_load(struct qcom_scm_pas_context *ctx, const struct firmware *fw,
->       |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
-> make[5]: *** [../scripts/Makefile.build:289: drivers/remoteproc/qcom_q6v5_pas.o] Error 1
-> 
-> 
-> This is because the 5/16 patch depends upon changes in the 7/16 patch.
+  int flag = BPF_SOCK_OPS_RCVQ_CB_FLAG;
 
-It is rather because of direct dependency of 5/16 on 7/16, I will merge
-them both.
+  bpf_setsockopt(sk, SOL_TCP, TCP_BPF_SOCK_OPS_CB_FLAGS,
+                 &flags, sizeof(flags));
 
--Sumit
+or via the SOCK_OPS specific helper:
+
+  bpf_sock_ops_cb_flags_set(skops, BPF_SOCK_OPS_RCVQ_CB_FLAG);
+
+Once activated, the BPF prog will be invoked with bpf_sock_ops.op
+set to BPF_SOCK_OPS_RCVQ_CB upon the following events:
+
+  1. TCP stack enqueues skb to sk->sk_receive_queue
+  2. TCP recvmsg() completes
+
+This allows the BPF prog to dynamically adjust sk->sk_rcvlowat,
+suppressing unnecessary EPOLLIN wakeups until sufficient data
+is available in the receive queue.
+
+This functionality, which we call "TCP AutoLOWAT", was originally
+developed in 2020 by Tenzin Ukyab with the help of Soheil Hassas
+Yeganeh, Arjun Roy, and Eric Dumazet.  It has served Google RPC
+workloads for more than 5 years.
+
+Combined with TCP RX zerocopy, this typically allows us to read an
+entire RPC frame with just a single wakeup and a single system call.
+
+While the original implementation was specialised for our
+internal RPC format, this series introduces a more flexible
+version by leveraging BPF.
+
+The BPF SOCK_OPS prog in the last selftest patch closely mirrors
+the core logic of the original implementation to provide a real-world
+example.
+
+Overview:
+
+  Patch  1      : misc cleanup for testing
+  Patch  2      : Add BPF_SOCK_OPS_RCVQ_CB with no actual hooks
+  Patch  3 -  5 : Add bpf helpers
+  Patch  6 -  8 : Add safe guard for BPF_SOCK_OPS_RCVQ_CB
+  Patch  9 - 10 : Add BPF_SOCK_OPS_RCVQ_CB hooks
+  Patch 11      : selftest
+
+
+Changes:
+  v2:
+    Add Patch 6 - 8
+    Patch  2: s/BPF_SOCK_OPS_RCVLOWAT_CB/BPF_SOCK_OPS_RCVQ_CB/g
+    Patch  3: Explain why using ____ version instead of __ version
+    Patch 10: Add explanation of tcp_bpf_rcvlowat() placement.
+    Patch 11: Make copy_len u64 and swap validation order for it
+               to pass no_alu32 test case
+
+  v1: https://lore.kernel.org/bpf/20260508073355.3916746-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (11):
+  selftest: bpf: Use BPF_SOCK_OPS_ALL_CB_FLAGS + 1 for bad_cb_test_rv.
+  bpf: tcp: Introduce BPF_SOCK_OPS_RCVQ_CB.
+  bpf: tcp: Support bpf_skb_load_bytes() for BPF_SOCK_OPS_RCVQ_CB.
+  tcp: Split out __tcp_set_rcvlowat().
+  bpf: tcp: Add kfunc to adjust sk->sk_rcvlowat.
+  bpf: tcp: Make BPF_SOCK_OPS_RCVQ_CB and SOCKMAP mutually exclusive.
+  bpf: mptcp: Don't support BPF_SOCK_OPS_RCVQ_CB.
+  bpf: tcp: Reject BPF_SOCK_OPS_RCVQ_CB if receive queue is not empty.
+  bpf: tcp: Factorise bpf_skops_established().
+  bpf: tcp: Add SOCK_OPS rcvlowat hook.
+  selftest: bpf: Add test for BPF_SOCK_OPS_RCVQ_CB.
+
+ include/net/tcp.h                             |  13 +
+ include/uapi/linux/bpf.h                      |  18 +-
+ net/core/filter.c                             |  89 ++++-
+ net/ipv4/tcp.c                                |  14 +-
+ net/ipv4/tcp_bpf.c                            |   2 +
+ net/ipv4/tcp_fastopen.c                       |   2 +
+ net/ipv4/tcp_input.c                          |  25 +-
+ tools/include/uapi/linux/bpf.h                |  18 +-
+ tools/testing/selftests/bpf/bpf_kfuncs.h      |   4 +
+ .../selftests/bpf/prog_tests/tcp_autolowat.c  | 350 ++++++++++++++++++
+ .../selftests/bpf/prog_tests/tcpbpf_user.c    |   3 +-
+ .../selftests/bpf/progs/bpf_tracing_net.h     |   2 +
+ .../selftests/bpf/progs/tcp_autolowat.c       | 326 ++++++++++++++++
+ .../selftests/bpf/progs/test_tcpbpf_kern.c    |   3 +-
+ 14 files changed, 855 insertions(+), 14 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tcp_autolowat.c
+ create mode 100644 tools/testing/selftests/bpf/progs/tcp_autolowat.c
+
+-- 
+2.54.0.746.g67dd491aae-goog
+
 
