@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-290705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290706-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MO/XOtUKEGpqSwYAu9opvQ
-	(envelope-from <netdev+bounces-290705-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:50:45 +0200
+	id aBPZLd8JEGpqSwYAu9opvQ
+	(envelope-from <netdev+bounces-290706-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:46:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BFD65B035D
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:50:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32F385B0287
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 29D0B3068E4E
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:46:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E99D302428F
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F1B3A63E7;
-	Fri, 22 May 2026 07:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198F239061D;
+	Fri, 22 May 2026 07:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vYnV+H9d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dl/2HTwM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A1C3911CE
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 07:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31F93A4F5E
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 07:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779435971; cv=none; b=jbvAQbukgV9/cIArWr+GmPBvmb6d8GAjhQzq5E3/Td6HQwsQ1YRjNJJDrpQ3WdJFiLqNESUtjE/nwP+LR62kvMVqREJDzGTIx3n7c0QOr2+5/a+2M5RJlCX9KjOBGDoxyGJp4GVgWTsNZbEE+C+uKNmIgyT257hAYpFg+aeFko0=
+	t=1779435974; cv=none; b=rNo0MednhtUvenMcj+GX9HOF1zNHYFD9pKXz4IcaCQMDSZoamrX96+mqr/VMyq5Jz0oOIRzDnsVc4hL1BL5sCOaDSV0Uo55zvVpDnpWY9OE+IwwqUVWQUO74vWCnvHa73Vyx+27Y7Et0dEGx8JfPETjGTDVtQOQ5W9IukBW10Wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779435971; c=relaxed/simple;
-	bh=kIv6gMdGhCbK7oa+mQvZvqU1S5H4TI4D7YmZRRwaok4=;
+	s=arc-20240116; t=1779435974; c=relaxed/simple;
+	bh=ZyD9AQscuylwqpRs04xemnKsI72mnSLQlWHwuv5SjUY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dP36Cmv/+xeOu/sHVfa0KK8EyWJZ9hwNa3NUA45gbjY8IyMM3z0M25shlf2Mi4WlZjFUN3vmKASaRlxLEo/jdKo9uk/9R9p7Yceyg8nr4ylFwdS1sY8f+IG3BWkPSDu6cOi5DiImftx/TK9Wf+bMzlTmxK60CLXvX/2UBwbEJMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vYnV+H9d; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=MNxyseOFMH+S8kspCIqQDGRXiAznT03EhGEw2SGaXaj3K2yFSrklmCJk4i2/KKQzD1Uz7RO6bCyiupq/f6TWmQYUFE0XLo/3OzYO0oU1atwmABVTgx1lvT5G66/JOC5ZFAD9hl48DIUuu6gaMZjZI2Z2htUkVpbWJmgJ9P+EbB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dl/2HTwM; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-366ded5ab5fso14257132a91.0
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 00:46:09 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c850ff84ddfso3129928a12.2
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 00:46:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779435969; x=1780040769; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1779435970; x=1780040770; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=owxhD9mQnHUJh1ExIyWD5qidKDlNDQsR0/L9BsuO+yM=;
-        b=vYnV+H9dayCKE7lgtqIHtm86FI/eZCG+5/9RJ1Et0eDSLChphFi/qjOFtgxoncN0sq
-         ZBA2tJfu8eg4Ydc3Pka/XZJHK3JcJbvuzWenj/xU9pg49f3xKuYfPgX5aB1M8XeOQfIE
-         0vlPhJffuMW8YYEXrfoEQZTdCHqCeB0k282mIt9zjS2Pj/EN4Jm6It4ItMp+xSdFk9ow
-         etOL2cPD3wDhVJ3kqBCxT3TTyO8d0BLACGkfvQljtuYljaX9H48UZTWg96MBxr0If+x1
-         Re4RJGGrrJY56yxJ+PaaYuvczISa+xU12GDHWv9HD7lA5ROpBmkj4Q7MEPlrNxmHdU/l
-         WfBw==
+        bh=qXW60/1sU7ehwE+s4YZIIMUDlvA6FNdHZ/Kq8opfaUQ=;
+        b=Dl/2HTwMPnUkG1rrt4Kc88/y0qFr9NeOLFKMRdm+m+mLr7qB8PhmoKpPwoaW/McPPY
+         jngdl/zKFppcdA6A/GfgboQpXYcpvKmCmIgdCVGXBSK86D1xbGeF+craYwx8AiZL3ls7
+         kF9vf+Y3kyQYlIOrwF/v0vMT/y55POO83lv4pC0/ZH/sdOLOeBvaCHtAM2zsvYm+Rb46
+         GXiXy+jBpDkVpZl9HHszG0ewZ6cyPgGcUWVSuscPfyRJIrrHETBYLJ0cZjqvgT/M2wiO
+         LeMwoYtgcVfaC4bCxEXSHrw0lKCMWcyhL2BbpS9bFq/Su6Axe7wSsFhevG2UySNwT6J1
+         C0Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779435969; x=1780040769;
+        d=1e100.net; s=20251104; t=1779435970; x=1780040770;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=owxhD9mQnHUJh1ExIyWD5qidKDlNDQsR0/L9BsuO+yM=;
-        b=Yaza1DP58n6Y/+QyySF2pDRm9nfVsaXIkW+668/FMqJg1iK2dEPoy8PlBR1l6ITGsx
-         dJ7lItoxrJJ6NE15RfHkl/hJ94gjm6lb6gXQWfeqBLmYmq2+BfGuKWbuvX5UoWLqS9/6
-         8gegjv0Y3JIMiwD2Qo8A5BoH9Ogxbdq5/U7VtdsU99Y6Y7m4MSMOQATjLHuWeM80cFNL
-         tXggN9dRDC0SgSjUy9bcg+edfDJiK3cIU2CZMX4BGDZ9SrB2RBv31WlQD3XXl6Hb27KP
-         AEyHCS7A5Mu9ggcReLmfagrfgD86KcleSoG1H1jgpBH+sAQHvRat0jYSIBJgWx+F6Cp4
-         ws4Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9mENqQg4R3yL/HW6+ItDLMWN6WvkLVy5rS+w0C8TjTJYxBbsvMwWvtYdzxH+2E2idtQ1FJf3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yym2GLufELQcQ3WIL97I5ITeF1GOxLi5HJd6uGpA5dB33M2KZRf
-	dBt+8gr8/+oRS51Nd/eKKqoxMFLjXghLRZ1AaYhVoBYpBs1gtrQaNa7OcLjO2G1idg35geGqB1W
-	fqwGYyQ==
-X-Received: from pgmm20.prod.google.com ([2002:a05:6a02:5514:b0:c82:7c27:98c3])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:2983:b0:398:a060:a967
- with SMTP id adf61e73a8af0-3b328cb9b95mr2606936637.11.1779435968667; Fri, 22
- May 2026 00:46:08 -0700 (PDT)
-Date: Fri, 22 May 2026 07:44:55 +0000
+        bh=qXW60/1sU7ehwE+s4YZIIMUDlvA6FNdHZ/Kq8opfaUQ=;
+        b=EG6zQ167eRKQgK5YEVl9qht1HoS+OgSfNXxjAkLLXLZ/2ksigzCYMSYYtfvWpJeoij
+         gX+/YD7lqUbUJCLimjq+bNjkP1O6dtCE4s0VbuHE5XA6pomSHE4sYdFINGR7+XogV/gI
+         Sc4Re5rxUEOyjSn1Y1GEsm2APoHifQtImH3J8L8n22RmKdtVIa/EPk9KrP0DBLRlX4UZ
+         Emi4ueXku8dBJaF2EQ+8IJlAvYG6sHuGhflAk9ZKC4U4NH6VsSofAM9MqZzVBUzuW7PF
+         YBVtt27RAOuQui80Ngogc787OmY/7GBid+yCZmLb6zpaCoUpgRGhZZ1bOrCAigBoA2so
+         LceA==
+X-Forwarded-Encrypted: i=1; AFNElJ/q6ZslrZE/2X6oV/GO3XMd/cJEQF6rpGTfh7ccuOt6wVu/as+hm9k1g/lyLt/+Msxpz5cu58E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjRlMzEnDNPMCS2oud3EiEA4yn4I8EbmTmZAOMH2ouJ0I7mc7F
+	gOs1RcQjKFtj6DcVj+HLM5CxvYZYhe8hN7KKsBsuI7VKRDJyZCZ5XTFc2X5RspFRQZ5q0sfRzYi
+	ublXOtA==
+X-Received: from pfbea10.prod.google.com ([2002:a05:6a00:4c0a:b0:82c:70d1:f303])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:391e:b0:837:27f4:ffe5
+ with SMTP id d2e1a72fcca58-8415f18266dmr2605287b3a.19.1779435969517; Fri, 22
+ May 2026 00:46:09 -0700 (PDT)
+Date: Fri, 22 May 2026 07:44:56 +0000
 In-Reply-To: <20260522074601.1658705-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260522074601.1658705-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260522074601.1658705-5-kuniyu@google.com>
-Subject: [PATCH v2 bpf-next 04/11] tcp: Split out __tcp_set_rcvlowat().
+Message-ID: <20260522074601.1658705-6-kuniyu@google.com>
+Subject: [PATCH v2 bpf-next 05/11] bpf: tcp: Add kfunc to adjust sk->sk_rcvlowat.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
 	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
@@ -95,7 +95,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290705-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290706-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -112,88 +112,88 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.849];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.846];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 6BFD65B035D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 32F385B0287
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-We will add a kfunc for BPF_SOCK_OPS_RCVQ_CB hooks to
-adjust sk->sk_rcvlowat.
-
-These hooks will be triggered when:
+We will invoke BPF SOCK_OPS prog with BPF_SOCK_OPS_RCVQ_CB
+to adjust sk->sk_rcvlowat when
 
   1. TCP stack enqueues skb to sk->sk_receive_queue
   2. TCP recvmsg() completes
 
-In the enqueue path, tcp_data_ready() is always called
-after the hooks in tcp_queue_rcv() and tcp_ofo_queue().
+Let's provide a kfunc to set sk->sk_rcvlowat.
 
-If tcp_set_rcvlowat() were used as is, tcp_data_ready()
-could be called twice for the same skb, which is redundant
-and also confusing.
+Negative values are clamped to INT_MAX, consistent with SO_RCVLOWAT.
 
-Let's split out __tcp_set_rcvlowat() and add a flag to
-control wakeup behaviour.
+The wakeup flag is determined based on bpf_sock_ops_kern.skb:
+
+  * For the enqueue hook, skb is always non-NULL, and wakeup is
+    set to false because
+
+    * tcp_data_ready() is always called after the hooks in
+       tcp_queue_rcv() and tcp_ofo_queue().
+
+    * when tcp_fastopen_add_skb() is called for TFO SYN,
+       the socket is not yet accept()ed, and when called
+       for TFO SYN+ACK, the socket is woken up by
+       sk->sk_state_change() anyway.
+
+  * For the recvmsg() hook, skb is always NULL, and wakeup is set
+    to true because tcp_data_ready() is not called in the path.
+
+An alternative would be to support bpf_setsockopt() by adding
+BPF_SOCK_OPS_RCVQ_CB to is_locked_tcp_sock_ops().
+
+However, that approach involves excessive conditionals and an
+unnecessary memcpy(), costs we do not want to pay for every skb
+in the TCP fast path.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- include/net/tcp.h |  1 +
- net/ipv4/tcp.c    | 12 +++++++++---
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ net/core/filter.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index ecbadcb3a744..c6a6853909c4 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -515,6 +515,7 @@ void tcp_set_keepalive(struct sock *sk, int val);
- void tcp_syn_ack_timeout(const struct request_sock *req);
- int tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		int flags);
-+int __tcp_set_rcvlowat(struct sock *sk, int val, bool wakeup);
- int tcp_set_rcvlowat(struct sock *sk, int val);
- void tcp_set_rcvbuf(struct sock *sk, int val);
- int tcp_set_window_clamp(struct sock *sk, int val);
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 432fa28e47d4..3afeb69a547a 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1829,8 +1829,7 @@ int tcp_peek_len(struct socket *sock)
- 	return tcp_inq(sock->sk);
+diff --git a/net/core/filter.c b/net/core/filter.c
+index fa8a7c7d86eb..3608036632a8 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -12388,6 +12388,22 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct __sk_buff *s, struct sock *sk,
+ #endif
  }
  
--/* Make sure sk_rcvbuf is big enough to satisfy SO_RCVLOWAT hint */
--int tcp_set_rcvlowat(struct sock *sk, int val)
-+int __tcp_set_rcvlowat(struct sock *sk, int val, bool wakeup)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	int space, cap;
-@@ -1843,7 +1842,8 @@ int tcp_set_rcvlowat(struct sock *sk, int val)
- 	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
- 
- 	/* Check if we need to signal EPOLLIN right now */
--	tcp_data_ready(sk);
-+	if (wakeup)
-+		tcp_data_ready(sk);
- 
- 	if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
- 		return 0;
-@@ -1858,6 +1858,12 @@ int tcp_set_rcvlowat(struct sock *sk, int val)
- 	return 0;
- }
- 
-+/* Make sure sk_rcvbuf is big enough to satisfy SO_RCVLOWAT hint */
-+int tcp_set_rcvlowat(struct sock *sk, int val)
++__bpf_kfunc int bpf_sock_ops_tcp_set_rcvlowat(struct bpf_sock_ops_kern *skops,
++					      int rcvlowat)
 +{
-+	return __tcp_set_rcvlowat(sk, val, true);
++#ifdef CONFIG_INET
++	if (skops->op != BPF_SOCK_OPS_RCVQ_CB)
++		return -EOPNOTSUPP;
++
++	if (rcvlowat < 0)
++		rcvlowat = INT_MAX;
++
++	return __tcp_set_rcvlowat(skops->sk, rcvlowat, !skops->skb);
++#else
++	return -EOPNOTSUPP;
++#endif
 +}
 +
- void tcp_set_rcvbuf(struct sock *sk, int val)
+ __bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops,
+ 					      u64 flags)
  {
- 	tcp_set_window_clamp(sk, tcp_win_from_space(sk, val));
+@@ -12539,6 +12555,7 @@ BTF_KFUNCS_END(bpf_kfunc_check_set_tcp_reqsk)
+ 
+ BTF_KFUNCS_START(bpf_kfunc_check_set_sock_ops)
+ BTF_ID_FLAGS(func, bpf_sock_ops_enable_tx_tstamp)
++BTF_ID_FLAGS(func, bpf_sock_ops_tcp_set_rcvlowat)
+ BTF_KFUNCS_END(bpf_kfunc_check_set_sock_ops)
+ 
+ static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
 -- 
 2.54.0.746.g67dd491aae-goog
 
