@@ -1,114 +1,184 @@
-Return-Path: <netdev+bounces-290855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290856-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id zfPyKetmEGpJXAYAu9opvQ
-	(envelope-from <netdev+bounces-290855-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 16:23:39 +0200
+	id cN7hEKpmEGoKXAYAu9opvQ
+	(envelope-from <netdev+bounces-290856-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 16:22:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A4AD5B612D
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 16:23:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABFA05B6114
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 16:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22EBB3037997
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:05:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2C86F300B9B9
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534754219E3;
-	Fri, 22 May 2026 14:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7B2401A1E;
+	Fri, 22 May 2026 14:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ih6VV6iL"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="y5oLDx4M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB27402BB7;
-	Fri, 22 May 2026 14:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7CA421EED;
+	Fri, 22 May 2026 14:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779458723; cv=none; b=fvdv++YowkNr31ppb1u9Dy7BoYTuirOBSjqy43LGd3sF0Mi2rocGwJMcOAFAA7uIwUrgyGQzIulXQkPMSuRN1NQ3a1EmnX+lR/m7FlU4Dykhn4wkLN700cVMQdbRB+v1Q7/HAE6fCmbF5OppKEkoA4eDgCTKVck3uWjKJYCKu6A=
+	t=1779459311; cv=none; b=Jf7Ik2QeHcPAtbT1KFHcMs7Wg6NLzePzvYpz6afIUT7fgE8wD77z9S4NQFmvrEZieKcBo+KfohJ1e8MZxjiLfwHg6bBNv5uMgd6qBbNcTkFcULlkbTZnyyDnZLXhppXIzhGJgF1xBeMGGuun9/i5FlQhpKo8tSX0TMjhooLqtCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779458723; c=relaxed/simple;
-	bh=RqcLh2LnvS6fXzVR5beWGIhEjU/YJR1gHxXKe4vDf+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j410poMn9hqF9MvZtYNbbO9qndpUn8Sbmu++CNf9yQvm1ldEB6IKuYpdEtsYZksvtNR3FYKVTjWTBS7g50v1L47rnsDH78EcKT0/5F78eBUqu9AG5ynv4HqDyVYjE8O+heaIfhrY5ne9bENNQ8QxWFBltKigyKIHM14aVXjx23Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ih6VV6iL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 786941F000E9;
-	Fri, 22 May 2026 14:05:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779458717;
-	bh=jZBuRXNonSLJinDq4udon3aMozFZI9+NktV5rS+ed34=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ih6VV6iLK1YrGAueUjmW1vxc8p1E2PJYy6A5JjOnkRU4LnN4uKVxO2lAUDYZFoZh1
-	 xISyDCD206o9TB2Kogw5E6A2oTvtTtJxVelSsQGgUnxh72X9najNQrT2DUEFIa1waJ
-	 Xf03YklXttLaWf+ajCph6B8Rf74ygNtAw6JE6wKQXTIH5NQBssZ87p2LUvF8TpJJCR
-	 HVp/ephzmTq14Ic+gOCvx+Y3b2i5YcO1f4t1sBw+KyVhQgYa/+LXWPYrEYnSFDhWIa
-	 f0DaVi+nT1Tws9GvGQ+5GMyA+y2TZCQcueumowMpH9Itq+Mq8ekTvS2mAAUgKDWZnr
-	 3W3dSJO8AHMEw==
-Date: Fri, 22 May 2026 07:05:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Cc: Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org, Jacob Keller
- <jacob.e.keller@intel.com>, Mohsin Bashir <mohsin.bashr@gmail.com>, "Mike
- Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>, Pavel Begunkov
- <asml.silence@gmail.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] fbnic: Support larger io_uring zcrx
- buffers
-Message-ID: <20260522070515.044d7d97@kernel.org>
-In-Reply-To: <20260522113225.241337-1-bjorn@kernel.org>
-References: <20260522113225.241337-1-bjorn@kernel.org>
+	s=arc-20240116; t=1779459311; c=relaxed/simple;
+	bh=iUfrRNrL8o05DROqoAZ/tpBV/SaDUV4QX0kt8nQ2MpI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:From:To:Subject:
+	 References:In-Reply-To; b=R81hoIC7HhoyKBWiv9Dq6nu+uULrKjesPn3Mn5vK2ZSILG2gr9mSJg063mNCFGq3UjnQrxZ/UK06ZuMOkKWVZ0nQyOyykCCh+01BFIupvqwYyfZbyVJYDDwLhfdUnHZdxxDeggI0MBeamBqw6drAjSn1Sc/vV91mgGMNLi88wN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=y5oLDx4M; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id AB689C2C65D;
+	Fri, 22 May 2026 14:15:51 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 02B006003C;
+	Fri, 22 May 2026 14:14:57 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5BB6F108114CA;
+	Fri, 22 May 2026 16:14:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779459294; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=MCr0vkGm9xcy3EIrUUYMtpoAG6We8dBTUowneJJEzqk=;
+	b=y5oLDx4MGy2qc7YsUG7iHN1xn8YtdnwJTaS+MweXzZYeTNKztTrSK6FkTS5hegoJZRjtx/
+	+KPJ88pozLnoBFId69yh0BFSmYr2Oid0fQhr2rdZXSEViLMGh37HZ3wFYq3sXIwaltcL4H
+	Ru8nuWXTFrJ7XB1LT7TKvjf55JQe+Wwr57sEwswqTCVrHvSyCZl6RSGSFe4rzRp/5LcBlt
+	U9OC+4uUcAsfHb7a6LexLMZh7y7JlLFFF5SVyh2/PQsumMTUzuN7QBIlOn2LRCblqP/6xx
+	dRGN6BEjblEu7ydOpdyrpOiH0emrXZ12KjrfkRuxO1yuH60EFy2zP3F5X5BPHQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 22 May 2026 16:14:38 +0200
+Message-Id: <DIP9O3BEWG3C.2BAHKYUIA4H4E@bootlin.com>
+Cc: "Andrey Konovalov" <andreyknvl@gmail.com>, "Alexei Starovoitov"
+ <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii
+ Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
+ <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
+ <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "John Fastabend"
+ <john.fastabend@gmail.com>, "David S. Miller" <davem@davemloft.net>, "David
+ Ahern" <dsahern@kernel.org>, "Thomas Gleixner" <tglx@kernel.org>, "Ingo
+ Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>, "Dave Hansen"
+ <dave.hansen@linux.intel.com>, "X86 ML" <x86@kernel.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, "Shuah Khan" <shuah@kernel.org>, "Maxime Coquelin"
+ <mcoquelin.stm32@gmail.com>, "Alexandre Torgue"
+ <alexandre.torgue@foss.st.com>, "Andrey Ryabinin" <ryabinin.a.a@gmail.com>,
+ "Alexander Potapenko" <glider@google.com>, "Dmitry Vyukov"
+ <dvyukov@google.com>, "Vincenzo Frascino" <vincenzo.frascino@arm.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>, <ebpf@linuxfoundation.org>,
+ "Bastien Curutchet" <bastien.curutchet@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>, "Xu Kuohai" <xukuohai@huawei.com>, "bpf"
+ <bpf@vger.kernel.org>, "LKML" <linux-kernel@vger.kernel.org>, "Network
+ Development" <netdev@vger.kernel.org>, "open list:KERNEL SELFTEST
+ FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>, "linux-arm-kernel"
+ <linux-arm-kernel@lists.infradead.org>, "kasan-dev"
+ <kasan-dev@googlegroups.com>, "linux-mm" <linux-mm@kvack.org>
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+To: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>,
+ =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Subject: Re: [PATCH RFC bpf-next 3/8] bpf: add BPF_JIT_KASAN for KASAN
+ instrumentation of JITed programs
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
+ <20260413-kasan-v1-3-1a5831230821@bootlin.com>
+ <CA+fCnZf-o8tiv_tX9YB5eBUGx17OpztKZsEB6Awjw3WAqBAiUw@mail.gmail.com>
+ <DHSWSSYRPUVC.2W3G3OU27L3HG@bootlin.com>
+ <CAADnVQLj=UosnsC-4V2+mN92Fe0-kW++U+m-O9c93kk6BwiXgw@mail.gmail.com>
+In-Reply-To: <CAADnVQLj=UosnsC-4V2+mN92Fe0-kW++U+m-O9c93kk6BwiXgw@mail.gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290855-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org,intel.com,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-290856-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,bootlin.com];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,iogearbox.net,linux.dev,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org,linuxfoundation.org,bootlin.com,huawei.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,googlegroups.com,kvack.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexis.lothore@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.490];
+	RCPT_COUNT_TWELVE(0.00)[41];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 3A4AD5B612D
+X-Rspamd-Queue-Id: ABFA05B6114
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 22 May 2026 13:32:19 +0200 Bj=C3=B6rn T=C3=B6pel wrote:
->  drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  29 +--
->  .../net/ethernet/meta/fbnic/fbnic_debugfs.c   |   5 +-
->  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 168 ++++++++++++++----
->  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |   6 +
->  .../selftests/drivers/net/hw/iou-zcrx.c       |  28 ++-
->  5 files changed, 176 insertions(+), 60 deletions(-)
+On Tue Apr 14, 2026 at 4:38 PM CEST, Alexei Starovoitov wrote:
+> On Tue, Apr 14, 2026 at 6:24=E2=80=AFAM Alexis Lothor=C3=A9
+> <alexis.lothore@bootlin.com> wrote:
+>>
+>> On Tue Apr 14, 2026 at 12:20 AM CEST, Andrey Konovalov wrote:
+>> > On Mon, Apr 13, 2026 at 8:29=E2=80=AFPM Alexis Lothor=C3=A9 (eBPF Foun=
+dation)
+>> > <alexis.lothore@bootlin.com> wrote:
 
-Hm. What's merging the frags? the hw will serve them back to us in 4kB
-chunks. Frankly the iou zc hurts me less that the fact that we run
-out of nr_frags in GRO :(
+[...]
+
+>> >> +config BPF_JIT_KASAN
+>> >> +       bool
+>> >> +       depends on HAVE_EBPF_JIT_KASAN
+>> >> +       default y if BPF_JIT && KASAN_GENERIC
+>> >
+>> > Should this be "depends on KASAN && KASAN_GENERIC"?
+>>
+>> Meaning, making it an explicit user-selectable option ?
+>>
+>> If so, the current design choice is voluntary and based on the feedback
+>> received on the original RFC, where I have been suggested to
+>> automatically enable the KASAN instrumentation in BPF programs if KASAN
+>> support is enabled in the kernel ([1]). But if a user-selectable toggle
+>> is eventually a better solution, I'm fine with changing it.
+>
+> Let's not add more config knobs.
+> Even this patch looks redundant.
+> Inside JIT do instrumentation when KASAN_GENERIC is set.
+
+(with quite some delay) I think it would be better to keep this new
+BPF_JIT_KASAN, because aside from the possibility to use it in
+bpf_jit_comp.c, it allows to update tests affected by KASAN
+instrumentation in a nicer way. For example, the test_loader subtests
+that monitor JITted instructions are confused by KASAN. I can either
+skip them or make them smarter when KASAN is enabled for BPF, but in
+both cases, it would be nicer to just adapt the behavior based on a
+generic CONFIG_BPF_JIT_KASAN, rather than sprinkling some "if
+jit_enabled AND CONFIG_KASAN_GENERIC AND ARCH_X86" in selftests. That
+still does not make it a config knob, that just creates an internal
+Kconfig option that is automatically turned on when KASAN and JIT are
+enabled at build time.
+
+
+--=20
+Alexis Lothor=C3=A9, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
