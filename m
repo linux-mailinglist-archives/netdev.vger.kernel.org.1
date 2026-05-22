@@ -1,170 +1,293 @@
-Return-Path: <netdev+bounces-290800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290801-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oHgaGD5FEGpyVgYAu9opvQ
-	(envelope-from <netdev+bounces-290800-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 13:59:58 +0200
+	id oAb+CvBGEGryVgYAu9opvQ
+	(envelope-from <netdev+bounces-290801-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:07:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D15415B3625
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 13:59:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DC6B5B38A5
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 14:07:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2DBBB30A22F4
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:55:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CEB283081465
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 12:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6323F5BD0;
-	Fri, 22 May 2026 11:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3B93F65EA;
+	Fri, 22 May 2026 12:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZncANVqf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZVH6xi94"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2523ED5C8
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 11:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E75037C916;
+	Fri, 22 May 2026 12:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779450916; cv=none; b=aJbR72Dvp3lCCKaI73/z8aTi/xaVpQIV+pAmZIjLbnjLNaTd6XHGhXzGEh2IeyrFFsoTqB49L/LrRTrbWLbZL+2u4iBDwWM1fBrvOvsgsGlPzQDGScv7BrkL2XpJMPR4yN0qc/cy2cRvVdHj2wg/JBZJGZZ/tvaavSR6qppkOqA=
+	t=1779451204; cv=none; b=j3/3KYkSHuni7kYzb4DrC09OBJT2FEoRqiTVet3CiC+nU2/U4aE8c2TICVq2RppkSSwbeFntB6EPgIbA5YHE/OzRGF3cQ60VgYYizUZPj0jfdinHEg5tWoLGA4rql+9Xl+tMlYdJ3zNhvGvHdFt1BQf3hutKLg1eRPkoNc50YnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779450916; c=relaxed/simple;
-	bh=nCqUD/K+laV0zC7GE/7Q79w435/NySyOe35dTciAaVs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=P1c3D8gWN7tWR2mRao97y0QlOHa0rKR0/MUto767zOR4oK4w5s+GuK3QKSp3/9y2cz9Y1N+b/JxBB4Fm0jQVMri00XjkgwuNJT98jT/DwbiHgCf/3r/RBJw6Fng/EKt/FKdM8YiCvOLuYxhqzZfQkEjfH0G3dtOEjkxEyBgVU00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZncANVqf; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8b7105dfb5eso212642456d6.2
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 04:55:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779450914; x=1780055714; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=j/wkpv54GBSdWAoduA39aS1FLzx7lj+JTvE39xAjatQ=;
-        b=ZncANVqfn0RyJbWw2L5iipZQglgu19qfiMtpV22Yk0XP1McaQUSVuKz1wrpTis7vkI
-         +7s1I/R4KhQt5rkE/MFBdaNnGtFAbAtEiyutFkZs6ZyeDk0iE87iy3VasJJKm/HFf3gB
-         ADAb6tylaqCISSm9MYm6glDa53OFMb5JbQ7j88gkJzEUcHWJ8JOhBEmO6HTXvPjXxiQ6
-         YsVv71pbpoJDlWuTAMA0cs3DQ2g8Z/OO0x/IS4QioZckhKEN2koxEGpHvvon8LGk/B38
-         oBpJHykpAue5rXy377bF/t0vVIJ9Pc1V/3vEyGT0T+RUFFHaVHEqCE2JtlTRilOIpL2y
-         vJDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779450914; x=1780055714;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j/wkpv54GBSdWAoduA39aS1FLzx7lj+JTvE39xAjatQ=;
-        b=ASz9/LcZnCqE38rgZOVK4fSP4z7aPBIuPaYDz5sOpgHOSbc6pbJiHGhAAVSv2xxU1H
-         zkE7sr9O0vORvZ4Jvx7qhuuPNVUE+i+rHic7Bvi3xg1x1Gxz2yzMd30BrzqmKUV07YrK
-         ld5pCJmSOn5t6E/8DfDLVuN/Xyl96T1cZBfBfhIRMsymP0ddR0VI9IAxqe1dHQWxlRcy
-         66PRnw9BTeNuB36Vfp32S0zqhKlFEply3MCr6lauvqsYQSZBQNTtgS2DqWHVcXpWVfvt
-         Ht2rWBoDt4sWkF711iXHphTDhWAPMAHVYosvosPHvzQAHFrTs768nX7QOIixlthcMgxx
-         iTIw==
-X-Forwarded-Encrypted: i=1; AFNElJ+rXQi/cgVuoTce5zIax63kGBuP4Kvo9LIwlnUBGHLYMQhDF97HKs2r6L7HUHyYuMbm91ePQz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHJhOHTs9l5YJ79d8sta8eMwPGYEl4Emu4C4VcT9mKxuhYpGXw
-	c6WeB19DeLdpgppK6x28+esMJhQCqgPSm+tVd8Jh1ZYWMtDnMI9oQfaGW6F2Lr01XY2ZOy2JXJI
-	4NC88aoDpqWszaw==
-X-Received: from qvqg15.prod.google.com ([2002:ad4:514f:0:b0:8ca:b44:ec0a])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:2aa6:b0:8bf:87c5:fa21 with SMTP id 6a1803df08f44-8cc7b69e13emr57629656d6.49.1779450913321;
- Fri, 22 May 2026 04:55:13 -0700 (PDT)
-Date: Fri, 22 May 2026 11:55:12 +0000
+	s=arc-20240116; t=1779451204; c=relaxed/simple;
+	bh=SmZcJZXorNb+Yab2QxhkWRzjWOLwsVVvEpjJOV9fsjQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J5JfpkSbWAG+XRHK3bZbvILFfsNAAsdI1WY3AzLjoAN0Wwn7Gohz7szvqObPDfVOKV6lkpUwhI/9qpHFJ3aBM6z3OaYenzYnI0EhUzQIabXM4nB3p2s8b0NtW1IIT6e7sscaCToRRzsxAYDXIZL2s7+AWvlSoVv07VIBnNc5sxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZVH6xi94; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B63841F000E9;
+	Fri, 22 May 2026 11:59:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779451202;
+	bh=orsQ/3B/8QAHWo5lX2VAA+xhFpdBEOMpIc6G11y+I6c=;
+	h=From:To:Cc:Subject:Date;
+	b=ZVH6xi94UgkimrbMsAq2ppoh/yYzSyfmwhLmpsnWSfOMxYXgjKlU4etKAupjra0pS
+	 qPEuei1dOb46uAMDCQzLS8FnfBn5JPEbD2oqHThWjkZeLD8rrdw2jxRq9ylckD5w72
+	 xsdOIaO2N7V+fhctYE2hJLDHR6+CFVOBBw6cVDYKD8kCEidLKcJJUqErslJOFwmMuA
+	 9yz4fiXxEMEzXaW4IAt6jTdziyw17D1e2jP1ZB+g2kNpKDskQBlspxvfdNmTbF/x8f
+	 3gX5/J4GoIbkfSZJaQnjIFLHUFWUn92pselyZECCsrRRbrfNvQWWTNt2JH8CaGmzGZ
+	 81+B74xnXReZg==
+From: Sumit Garg <sumit.garg@kernel.org>
+To: andersson@kernel.org
+Cc: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org,
+	konradybcio@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com,
+	sean@poorly.run,
+	akhilpo@oss.qualcomm.com,
+	lumag@kernel.org,
+	abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com,
+	marijn.suijten@somainline.org,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com,
+	bod@kernel.org,
+	mchehab@kernel.org,
+	elder@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jjohnson@kernel.org,
+	mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com,
+	mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com,
+	jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com,
+	vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com,
+	jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org,
+	apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com,
+	linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: [PATCH v7 00/15] firmware: qcom: Add OP-TEE PAS service support
+Date: Fri, 22 May 2026 17:29:21 +0530
+Message-ID: <20260522115936.201208-1-sumit.garg@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260522115512.1519110-1-edumazet@google.com>
-Subject: [PATCH net] tunnels: do not assume transport header in iptunnel_pmtud_check_icmp()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Damiano Melotti <melotti@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	TAGGED_FROM(0.00)[bounces-290801-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290800-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.950];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D15415B3625
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7DC6B5B38A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In some cases, iptunnel_pmtud_check_icmp() can be called while
-skb transport header is not set.
+From: Sumit Garg <sumit.garg@oss.qualcomm.com>
 
-This triggers an out-of-bound access, because
-(typeof(skb->transport_header))~0U is 65535.
+Qcom platforms has the legacy of using non-standard SCM calls
+splintered over the various kernel drivers. These SCM calls aren't
+compliant with the standard SMC calling conventions which is a
+prerequisite to enable migration to the FF-A specifications from Arm.
 
-Access the icmp header based on IPv4 network header,
-after making sure icmp->type is present in skb linear part.
+OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
+support these non-standard SCM calls. And even for newer architectures
+using S-EL2 with Hafnium support, QTEE won't be able to support SCM
+calls either with FF-A requirements coming in. And with both OP-TEE
+and QTEE drivers well integrated in the TEE subsystem, it makes further
+sense to reuse the TEE bus client drivers infrastructure.
 
-Note that iptunnel_pmtud_check_icmpv6()) is fine.
+The added benefit of TEE bus infrastructure is that there is support
+for discoverable/enumerable services. With that client drivers don't
+have to manually invoke a special SCM call to know the service status.
 
-Fixes: 4cb47a8644cc ("tunnels: PMTU discovery support for directly bridged IP packets")
-Reported-by: Damiano Melotti <melotti@google.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+So enable the generic Peripheral Authentication Service (PAS) provided
+by the firmware. It acts as the common layer with different TZ
+backends plugged in whether it's an SCM implementation or a proper
+TEE bus based PAS service implementation.
+
+The TEE PAS service ABI is designed to be extensible with additional API
+as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
+extensions of the PAS service needed while still maintaining backwards
+compatibility.
+
+Currently OP-TEE support is being added to provide the backend PAS
+service implementation which can be found as part of this PR [1].
+This implementation has been tested on Kodiak/RB3Gen2 board with lemans
+EVK board being the next target. In addition to that WIN/IPQ targets
+planning to use OP-TEE will use this service too. Surely the backwards
+compatibility is maintained and tested for SCM backend.
+
+Note that kernel PAS service support while running in EL2 is at parity
+among OP-TEE vs QTEE. Especially the media (venus/iris) support depends
+on proper IOMMU support being worked out on the PAS client end.
+
+Patch summary:
+- Patch #1: adds Kodiak EL2 overlay since boot stack with TF-A/OP-TEE
+  only allow UEFI and Linux to boot in EL2.
+- Patch #2: adds generic PAS service.
+- Patch #3: migrates SCM backend to generic PAS service.
+- Patch #4: adds TEE/OP-TEE backend for generic PAS service.
+- Patch #5-#13: migrates all client drivers to generic PAS service.
+- Patch #14: drops legacy PAS SCM exported APIs.
+
+The patch-set is based on qcom tree tip [2] and can be found in git tree
+here [3].
+
+Merge strategy:
+
+It is expected due to APIs dependency, the entire patch-set to go via
+the Qcom tree. All other subsystem maintainers, it will be great if I
+can get acks for the corresponding subsystem patches.
+
+[1] https://github.com/OP-TEE/optee_os/pull/7721 (already merged)
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/qcom/linux.git/log/?h=for-next
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/log/?h=qcom-pas-v7
+
 ---
- net/ipv4/ip_tunnel_core.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Changes in v7:
+- Rebased to qcom tree (for-next branch) tip.
+- Merged patch #5 and #7 due to build dependency.
+- Disabled modem for kodiak EL2 as it isn't tested yet.
+- Fix an issue found out by sashiko-bot for patch #4.
 
-diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
-index 2667f53482bdaf1e693907fc527063d0ddd45580..5f82d84f0f1d0bf863716d8e777f1007f871b9b3 100644
---- a/net/ipv4/ip_tunnel_core.c
-+++ b/net/ipv4/ip_tunnel_core.c
-@@ -281,7 +281,6 @@ static int iptunnel_pmtud_build_icmp(struct sk_buff *skb, int mtu)
-  */
- static int iptunnel_pmtud_check_icmp(struct sk_buff *skb, int mtu)
- {
--	const struct icmphdr *icmph = icmp_hdr(skb);
- 	const struct iphdr *iph = ip_hdr(skb);
- 
- 	if (mtu < 576 || iph->frag_off != htons(IP_DF))
-@@ -292,9 +291,17 @@ static int iptunnel_pmtud_check_icmp(struct sk_buff *skb, int mtu)
- 	    ipv4_is_lbcast(iph->saddr)  || ipv4_is_multicast(iph->saddr))
- 		return 0;
- 
--	if (iph->protocol == IPPROTO_ICMP && icmp_is_err(icmph->type))
--		return 0;
-+	if (iph->protocol == IPPROTO_ICMP) {
-+		const struct icmphdr *icmph;
- 
-+		if (!pskb_network_may_pull(skb, iph->ihl * 4 +
-+						offsetofend(struct icmphdr, type)))
-+			return 0;
-+		iph = ip_hdr(skb);
-+		icmph = (void *)iph + iph->ihl * 4;
-+		if (icmp_is_err(icmph->type))
-+			return 0;
-+	}
- 	return iptunnel_pmtud_build_icmp(skb, mtu);
- }
- 
+Changes in v6:
+- Rebased to v7.1-rc4 tag.
+- Patch #14: fixed ret error print.
+- Add Kconfig descriptions for PAS symbols such that they are visible
+  in menuconfig to update.
+
+Changes in v5:
+- Incorporated misc. comments from Mukesh.
+- Split up patch #11 into 2 to add an independent commit for passing
+  proper PAS ID to set_remote_state API.
+- Picked up tags.
+
+Changes in v4:
+- Incorporate misc. comments on patch #4.
+- Picked up an ack for patch #10.
+- Clarify in cover letter about state of media support.
+
+Changes in v3:
+- Incorporated some style and misc. comments for patch #2, #3 and #4.
+- Add QCOM_PAS Kconfig dependency for various subsystems.
+- Switch from pseudo TA to proper TA invoke commands.
+
+Changes in v2:
+- Fixed kernel doc warnings.
+- Polish commit message and comments for patch #2.
+- Pass proper PAS ID in set_remote_state API for media firmware drivers.
+- Added Maintainer entry and dropped MODULE_AUTHOR.
+
+Mukesh Ojha (1):
+  arm64: dts: qcom: kodiak: Add EL2 overlay
+
+Sumit Garg (14):
+  firmware: qcom: Add a generic PAS service
+  firmware: qcom_scm: Migrate to generic PAS service
+  firmware: qcom: Add a PAS TEE service
+  remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
+  remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
+  remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
+  remoteproc: qcom: Select QCOM_PAS generic service
+  drm/msm: Switch to generic PAS TZ APIs
+  media: qcom: Switch to generic PAS TZ APIs
+  media: qcom: Pass proper PAS ID to set_remote_state API
+  net: ipa: Switch to generic PAS TZ APIs
+  wifi: ath12k: Switch to generic PAS TZ APIs
+  firmware: qcom_scm: Remove SCM PAS wrappers
+  MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
+
+ MAINTAINERS                                   |   9 +
+ arch/arm64/boot/dts/qcom/Makefile             |   2 +
+ arch/arm64/boot/dts/qcom/kodiak-el2.dtso      |  39 ++
+ drivers/firmware/qcom/Kconfig                 |  21 +-
+ drivers/firmware/qcom/Makefile                |   2 +
+ drivers/firmware/qcom/qcom_pas.c              | 291 +++++++++++
+ drivers/firmware/qcom/qcom_pas.h              |  50 ++
+ drivers/firmware/qcom/qcom_pas_tee.c          | 477 ++++++++++++++++++
+ drivers/firmware/qcom/qcom_scm.c              | 302 ++++-------
+ drivers/gpu/drm/msm/Kconfig                   |   1 +
+ drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
+ drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
+ drivers/media/platform/qcom/iris/Kconfig      |  25 +-
+ .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
+ drivers/media/platform/qcom/venus/Kconfig     |   1 +
+ drivers/media/platform/qcom/venus/firmware.c  |  11 +-
+ drivers/net/ipa/Kconfig                       |   2 +-
+ drivers/net/ipa/ipa_main.c                    |  13 +-
+ drivers/net/wireless/ath/ath12k/Kconfig       |   2 +-
+ drivers/net/wireless/ath/ath12k/ahb.c         |  10 +-
+ drivers/remoteproc/Kconfig                    |   4 +-
+ drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
+ drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
+ drivers/remoteproc/qcom_wcnss.c               |  12 +-
+ drivers/soc/qcom/mdt_loader.c                 |  12 +-
+ include/linux/firmware/qcom/qcom_pas.h        |  43 ++
+ include/linux/firmware/qcom/qcom_scm.h        |  29 --
+ include/linux/soc/qcom/mdt_loader.h           |   6 +-
+ 28 files changed, 1124 insertions(+), 320 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/qcom/kodiak-el2.dtso
+ create mode 100644 drivers/firmware/qcom/qcom_pas.c
+ create mode 100644 drivers/firmware/qcom/qcom_pas.h
+ create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
+ create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+
 -- 
-2.54.0.746.g67dd491aae-goog
+2.51.0
 
 
