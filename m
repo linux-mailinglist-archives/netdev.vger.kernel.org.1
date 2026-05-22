@@ -1,62 +1,68 @@
-Return-Path: <netdev+bounces-290913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wH4CHrutEGqPcQYAu9opvQ
-	(envelope-from <netdev+bounces-290913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 21:25:47 +0200
+	id eHGdMlOuEGqPcQYAu9opvQ
+	(envelope-from <netdev+bounces-290914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 21:28:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18A0F5B96DE
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 21:25:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE46F5B9705
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 21:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9AA64300EF86
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:25:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 79E09300F9CC
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDE9377EAF;
-	Fri, 22 May 2026 19:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7C8379C35;
+	Fri, 22 May 2026 19:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W5e/dvoX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ds6ZMMcg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F166B3563C7;
-	Fri, 22 May 2026 19:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C969F2BFC60;
+	Fri, 22 May 2026 19:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779477942; cv=none; b=NJdb+XFNkszDxmTsaifV0XAZ531T8K1fr5EdMv/tQw4SOG82p8dYv9tgKtN7e6C4JfmCefzMHrEhQnE5QOCkLYEq8smzGAVxaaZ+8n8qcNnDb6TN092R44uug4n4jyYFYd409d7CYxoEbu9/FRDP7dyeHfDjah4u8Z539TulLJM=
+	t=1779478030; cv=none; b=Tifet1NdcU7cvcSheyNzUwSDJVWJ0skqiUwkQUtcVKwVd4z2yK+XOto75VYjlvLzjbutUJa+gi0CffSNT0PA0XRm5bpovLqJMXZ5hQUcyyXk9pwx+xbHh2MfVNWaWsHqZQ6ddM0gupk09atpd9THF1OMLfMbJ9m0b3ZELbsCQP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779477942; c=relaxed/simple;
-	bh=Or5fQ1YCPE+2AHxAOKBFXorPm++H3+m8dRzh+3qm7fc=;
+	s=arc-20240116; t=1779478030; c=relaxed/simple;
+	bh=IGMQNUimH8l7rxqgopJApvlEAnOyx7C3tZgxMYyTmLw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wui6DQlLU3j3BZ3unWP3tfglKRIIgr6KU5uOx6h9LgouqSQ0OLbAbaw4HM5pHsGhuomj4rI9oI6JkDhlU5tNKTRWwYZxwywQM40PL+17JlvXX470H1pZFUaiIaPKG3oLtztHE3TvUREt2WggbgyStHkgy2F7xtccb+q7gJs9ji8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W5e/dvoX; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0873A1F000E9;
-	Fri, 22 May 2026 19:25:39 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=i26UxWNQ+OwZhYd4KeHuhb54g4ets2GQ1p6i9koIcZ3kaXOkpi9lPedY/mpjR/nPSGNlPuqHN3GxAHUKJRM3HDTKqwUJUbeSNZ3NkaAInE7LTVY+KhL0FlPG3v2RQDo3b6Bn9+B6uGgnLfXZax4LYvaiPi5da6oCpMxQrM8nWvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ds6ZMMcg; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0483F1F000E9;
+	Fri, 22 May 2026 19:27:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779477940;
-	bh=RojEkkbyfvmtTftKGHnFUwJgtWSamSkZZu/jQFeaWSc=;
+	s=k20260515; t=1779478029;
+	bh=FCl2h1w1gG7xQ2IOq1++c0XrFQCqGCY1qfeW5ss3aJU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=W5e/dvoXBpz2FofolimiQYP+RaRBPpqcZjGq1ebug4W41tbnF9zi7GkVRIDtLVw+s
-	 iqMvWvp9vTm3lqR0yCO4fJYZBeG9aI/sGngE+Mi/fBIE0KJ9ORB73zkdmBDc73AObG
-	 KXXMsf0zRcRa3AaiIxPdL+6d5mAHiy6VzbmpakfIurGwOrkSvxGO83W/u/7GaEVxOH
-	 cQ2MStyqhRn2XKeCH2zhh3sYQnr1jXWaGT3EWWvekpGWy92kSStx9VVvqgPb88QCh/
-	 DFLGz3eFjYrBqsn7Rs2kea6GIvZhgf1/IlCYNfp8giQlCxJbPENSSzv8uu6UjvrRgR
-	 RJjy5X/OMKc9Q==
-Date: Fri, 22 May 2026 21:25:37 +0200
+	b=ds6ZMMcgx5EDAgUl1oWgYyadlaRI2Wa4jbbhZo8AQztef+B93krJNaxzks2mO5nGN
+	 zs3brK3XUN3Vkp7C69SA4iKK0s59G61zOndjX8ehKMihlTbCJyLAatdcDbqsjdswgF
+	 yd/SApE5kY4Y8oQhvlSUYujUIEvHc2S+06ugEXPAMAx8i7bS+ba85G20ioe/s1AoVa
+	 4jN4HvjZ4qUijyR5GPyHyYif4NaXLCivIk7qhJiirKJQcd9u999dSwTrR8+m5VVcvS
+	 3d3zfANxA6AE7SjyUCYvMqzgPTfTNkjy8qosxmUDrPtZX4BpfwZ81971jS1Z0/Qfdt
+	 KtTHxsV04Ln4g==
+Date: Fri, 22 May 2026 21:27:07 +0200
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, robh@kernel.org,
-	devicetree@vger.kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v8 10/10] net: airoha: Support multiple LAN/WAN
- interfaces for hw MAC address configuration
-Message-ID: <ahCtsVA1VhYmhZq-@lore-desk>
-References: <20260519-airoha-eth-multi-serdes-v8-10-6bd70e329df6@kernel.org>
- <20260520085934.54AD01F00894@smtp.kernel.org>
- <ag2t4eVe4DcfU2yZ@lore-desk>
- <20260522112514.1ad6e947@kicinski-fedora-PF5CM1Y0>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Benjamin Larsson <benjamin.larsson@genexis.eu>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v8 01/10] dt-bindings: net: airoha: Add GDM port
+ ethernet child node
+Message-ID: <ahCuC3TgK3Pnuz_w@lore-desk>
+References: <20260519-airoha-eth-multi-serdes-v8-0-6bd70e329df6@kernel.org>
+ <20260519-airoha-eth-multi-serdes-v8-1-6bd70e329df6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,136 +70,168 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="jukOReBCAgX4Obp/"
+	protocol="application/pgp-signature"; boundary="qZn/vsQETJzcLfna"
 Content-Disposition: inline
-In-Reply-To: <20260522112514.1ad6e947@kicinski-fedora-PF5CM1Y0>
-X-Spamd-Result: default: False [-3.76 / 15.00];
+In-Reply-To: <20260519-airoha-eth-multi-serdes-v8-1-6bd70e329df6@kernel.org>
+X-Spamd-Result: default: False [-2.26 / 15.00];
 	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290913-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TAGGED_FROM(0.00)[bounces-290914-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,linux.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 18A0F5B96DE
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,0.0.0.1:email,0.0.0.0:email,0.0.0.4:email]
+X-Rspamd-Queue-Id: AE46F5B9705
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
---jukOReBCAgX4Obp/
+--qZn/vsQETJzcLfna
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On May 22, Jakub Kicinski wrote:
-> On Wed, 20 May 2026 14:49:37 +0200 Lorenzo Bianconi wrote:
-> > > Does this strict OUI validation cause the driver probe to fail when M=
-AC addresses
-> > > are randomly generated?
-> > >=20
-> > > If a MAC address is not provided in the device tree, the driver gener=
-ates a random
-> > > one via eth_hw_addr_random(). For multi-port configurations, each por=
-t receives an
-> > > independently generated random MAC address.
-> > >=20
-> > > Since the upper 3 bytes of these random addresses will almost certain=
-ly differ,
-> > > when register_netdev() is called for the second port, its ndo_init ca=
-llback
-> > > (airoha_dev_init) will invoke airoha_set_macaddr() and hit this check=
-=2E Returning
-> > > -EINVAL will fail register_netdev() and abort the entire driver probe=
-, leaving
-> > > the system without networking.
-> > >=20
-> > > Does this also prevent users from changing the MAC address OUI?
-> > >=20
-> > > When an administrator attempts to change the MAC address via standard=
- userspace
-> > > tools, only one interface can be modified at a time. The driver will =
-compare the
-> > > new MAC against the existing MAC of the other port.
-> > >=20
-> > > If the MSBs differ, the change is rejected. This makes it impossible =
-to atomically
-> > > change the OUI of both interfaces simultaneously, locking the MAC add=
-ress OUI
-> > > to its initial probe-time value. =20
-> >=20
-> > As pointed out before, this is a hw design requirement when multiple
-> > net_devices are configured as LAN.
->=20
-> What about Clashiko report about the MAC address?
+> EN7581 and AN7583 SoCs support connecting multiple external SerDes to GDM3
+> or GDM4 ports via a hw arbiter that manages the traffic in a TDM manner.
+> As a result multiple net_devices can connect to the same GDM{3,4} port
+> and there is a theoretical "1:n" relation between GDM ports and
+> net_devices.
+> Introduce the ethernet node child of a specific GDM port in order to model
+> a given net_device that is connected via the external arbiter to the
+> GDM{3,4} port. This new ethernet node is defined by the "airoha,eth-port"
+> compatible string. Please note GDM1 and GDM2 does not support the
+> connection with the external arbiter and they are represented by an
+> ethernet node defined by the "airoha,eth-mac" compatible string.
 
-Do you the following one?
-https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260519-airoha-eth-mul=
-ti-serdes-v8-0-6bd70e329df6%40kernel.org
+Hi Rob, Krzysztof and Conor,
 
-- What happens when device tree does not provide MAC addresses for two or
-  more same-side GDM interfaces?
-  - This is the same comment reported in [0].
-    Since the hw exposes just a single register (REG_FE_LAN_MAC_H or
-    REG_FE_WAN_MAC_H) for the LAN/WAN mac address MSBs, we need to
-    require all the interfaces configured as LAN or WAN to share the
-    mac address MSBs and the user needs to select the new mac address
-    observing this limitation.
-    Please note this limitation is only valid if multiple net_devices
-    are configured as LAN (or WAN). Since in the current codebase we
-    do not support multiple interfaces configured as LAN or WAN, we are
-    not introducing any regression.
-    I do not think selecting a "base" for the mac address is helpful
-    if the user does not provide the mac address via the DTS or NVME
-    (as suggested by sashiko) since it will not help us if the mac
-    addresses configured via DTS are "wrong" (if they do not respect
-    the limitation described above).  What do you think?
-=20
-- If airoha_set_macaddr() succeeds (and has just widened the shared
-  [lmin, lmax] range to include this dev) and airoha_set_gdm2_loopback()
-  then fails, airoha_dev_init() returns the error but there is no=20
-  airoha_dev_uninit / ndo_uninit to roll the LMIN/LMAX update back.=20
-  The shared range is then wider than the set of currently-registered peers.
-  - I guess it is not harmful to keep the already configured mac address
-    range if airoha_set_gdm2_loopback() fails and I decided to not unwind
-    the changes to keep the code simple.  Moreover, in the current codebase,
-    if ndo_init() fails, the airoha_probe() will fail.
+do you have any comment about this patch? Thanks in advance.
 
 Regards,
 Lorenzo
 
-[0] https://sashiko.dev/#/patchset/20260519-airoha-eth-multi-serdes-v8-0-6b=
-d70e329df6%40kernel.org
+>=20
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  .../devicetree/bindings/net/airoha,en7581-eth.yaml | 56 ++++++++++++++++=
++++++-
+>  1 file changed, 55 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml=
+ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> index fbe2ddcdd909..17fe2edf4886 100644
+> --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> @@ -130,6 +130,42 @@ patternProperties:
+>          maximum: 4
+>          description: GMAC port identifier
+> =20
+> +    allOf:
+> +      - if:
+> +          properties:
+> +            reg:
+> +              contains:
+> +                items:
+> +                  - enum:
+> +                      - 3
+> +                      - 4
+> +        then:
+> +          properties:
+> +            '#address-cells':
+> +              const: 1
+> +
+> +            '#size-cells':
+> +              const: 0
+> +
+> +          patternProperties:
+> +            "^ethernet@[0-5]$":
+> +              type: object
+> +              unevaluatedProperties: false
+> +              $ref: ethernet-controller.yaml#
+> +              description: External ethernet port ID available on the GD=
+M port
+> +
+> +              properties:
+> +                compatible:
+> +                  const: airoha,eth-port
+> +
+> +                reg:
+> +                  maximum: 5
+> +                  description: External ethernet port identifier
+> +
+> +              required:
+> +                - reg
+> +                - compatible
+> +
+>      required:
+>        - reg
+>        - compatible
+> @@ -191,9 +227,27 @@ examples:
+>          #address-cells =3D <1>;
+>          #size-cells =3D <0>;
+> =20
+> -        mac: ethernet@1 {
+> +        ethernet@1 {
+>            compatible =3D "airoha,eth-mac";
+>            reg =3D <1>;
+>          };
+> +
+> +        ethernet@4 {
+> +          compatible =3D "airoha,eth-mac";
+> +          reg =3D <4>;
+> +
+> +          #address-cells =3D <1>;
+> +          #size-cells =3D <0>;
+> +
+> +          ethernet@0 {
+> +            compatible =3D "airoha,eth-port";
+> +            reg =3D <0>;
+> +          };
+> +
+> +          ethernet@1 {
+> +            compatible =3D "airoha,eth-port";
+> +            reg =3D <1>;
+> +          };
+> +        };
+>        };
+>      };
+>=20
+> --=20
+> 2.54.0
+>=20
 
---jukOReBCAgX4Obp/
+--qZn/vsQETJzcLfna
 Content-Type: application/pgp-signature; name=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCahCtsQAKCRA6cBh0uS2t
-rN/wAQCIS+axnhlXTKcfCUsWDcOYLeS/TGc95axOtNeEY9ZKrgEAyXH5klwWATaf
-0r/GIfveXTyaKFrvvGF7YTBMOsdbOgE=
-=UJ1t
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCahCuCwAKCRA6cBh0uS2t
+rFFmAP9bCqqNxm9iUo7L09S4mXpuCBZOetsy0kzJc0wz9A/t/QEAheGcPN75acWD
+xrt8EQrZhwP7W2N6/vJzmXpYge3IQQQ=
+=NoQd
 -----END PGP SIGNATURE-----
 
---jukOReBCAgX4Obp/--
+--qZn/vsQETJzcLfna--
 
