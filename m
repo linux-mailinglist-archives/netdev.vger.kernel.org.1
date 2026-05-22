@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-290951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290952-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eK1CAUjkEGqOfAYAu9opvQ
-	(envelope-from <netdev+bounces-290951-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:18:32 +0200
+	id mHNKO1zkEGqOfAYAu9opvQ
+	(envelope-from <netdev+bounces-290952-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:18:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 591BC5BB6E3
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:18:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 573D65BB6ED
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:18:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44C673045A9D
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:13:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 22EE230477FF
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AA239524D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3654390614;
 	Fri, 22 May 2026 23:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0IIt51h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VOi7taJk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA95C391E57
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B98D392806
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779491610; cv=none; b=gdh4F7drSYF9Y42+MG80iYVjBNS+URmbY3OwkULQvWuWhZz7j/q9PAn0fqkK4OpWrg0vUGpuaduxq4HLkfYmv/yoSYpsbz+i+j9gAb027/QADkcUbLACSSHaWa5nzKrEZ5L/eFBKQbtrwpf8aJzas4GjKo0BZeVwPhG7EOni92Y=
+	t=1779491610; cv=none; b=bmThzCgetB8cLn5t0B3R189OBVsxxQgECe6ld8LO9a0FukQdFxl3JwjCvWj8e8Wu7/FwrQ9VGYyttB/a3xPvY/7oKQnlBcfjtjTRednMD7pustPyfJ+GO9cMwq1pouB6RV3Mmwugw/eRVBXc1kQ0SSfIxrfZYj4xiebHReoGv9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779491610; c=relaxed/simple;
-	bh=Z7hnlvtj5Ik3uAVwvIVYx6v4ghpCKtw1Ln2dai5pvBA=;
+	bh=+dO38vWVnPntzPMa6uWC5oXOE+r4y4zZiPcV234zR58=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GmFLmX7tBy7wfwcJE31OERvO4NDJrjEGCj/oI7ZbSH0Sj0gE8u1dEX6O8QxdQu6IIDWIYho7+/nQbipRDNR1QQZIdR8K1wimd7Nsokx9afrbSBP8tmlg04IQHncd4Xc+3O6Q6dWfSNvb2W25aHt1md+SgfkXZmfXLJvErYu7BLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0IIt51h; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471791F0155C;
+	 MIME-Version; b=dyk3ZL7qhg7/h2tsiQjI8VqK5X50vxLFDOGf/xwjRsxKhdn2uAssi3vkEeLqAmsr+2oAcxrLVw67zhdeM0j+HN+5sAoAGhkbJJMUCy7GrXs2c+8vR6LALqBqMrV4wkd02eZT47fpsZ1Y4kV2UfTysrdejEexC3R1OGJZlgTsRi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOi7taJk; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC4771F00A3D;
 	Fri, 22 May 2026 23:13:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779491608;
-	bh=tP0biwvWC1/s+P3Ason7wOdHO18Zo5vp+Onyw877N74=;
+	s=k20260515; t=1779491609;
+	bh=FrLOXVycPbX1V8Qou87V+wl/TjWQPo0IAe2l/b5YCBc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=L0IIt51hBpt6xNaQdCBdTzogH3VcfyoAcMBbAvP/sDF64Bp76eatAsHFSTH+rOGyk
-	 aVA1fcjs9nQKKuClkg15bzcp0UGXNqoqT2NXzicP1foe9aOE7yusp2AyhaVnZu/jBa
-	 94mMl+736LE8Q0mc8DjFE4wEGAKsbgU30ZAuB3JVkzh/7Qfh/ix5j9XaJCBsAYT8JL
-	 CaYn45cT8zPcOy/q1dhETuOv69TGL+rOUIy+5EWxKN1T6Mq/8VrGSOTh2Yc0QWNKxt
-	 /oZdWR1H4m6G/Ru7UAPR1KYI1hKogSPm3ZfRZK8HW27/scu8BwcuIZtfH75XoqWJ5O
-	 ohKE/EHZUlzRA==
+	b=VOi7taJkeV4gT0yx2oTOQRPrkh8gdN8WVjOYSt64+68M+/8OTx3DFHNrjyW14IB3J
+	 nDENDecKfRFkIaOZezgbbo9Tf+ChwbYXJa6F3gRkHHg9YDGZ7q08QrHZalp2O3pBSW
+	 xT8QYlwiiOnDOj0/9eBsXqXbjNlIMJ2pwCx2c8kYVi/59OIm8xo2H4vVQ2fn+rznri
+	 TuQMDBRs/UGLgHFADeuiRarU9MaaDqsw5snqmxhoevztvhmGo1y+hTJqV6/DbmJtI4
+	 Z7fkQNzDs1k73JOIfu6dyKH4WH1VR9SEdjQZ/6iWemKJnX2Y12ImpRZEeff8qTNRTx
+	 4YArulAG+aFzg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	idosch@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>,
 	andrew@lunn.ch
-Subject: [PATCH net 8/9] ethtool: cmis: validate start_cmd_payload_size from module
-Date: Fri, 22 May 2026 16:13:11 -0700
-Message-ID: <20260522231312.1710836-9-kuba@kernel.org>
+Subject: [PATCH net 9/9] ethtool: cmis: validate fw->size against start_cmd_payload_size
+Date: Fri, 22 May 2026 16:13:12 -0700
+Message-ID: <20260522231312.1710836-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260522231312.1710836-1-kuba@kernel.org>
 References: <20260522231312.1710836-1-kuba@kernel.org>
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-290951-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290952-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -94,99 +94,51 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.995];
+	NEURAL_HAM(-0.00)[-0.996];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:email]
-X-Rspamd-Queue-Id: 591BC5BB6E3
+X-Rspamd-Queue-Id: 573D65BB6ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The CMIS firmware update code reads start_cmd_payload_size from
-the module's FW Management Features CDB reply and uses it directly
-as the byte count for memcpy. The destination buffer is 112 bytes
-(ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH - 8). So a malicious
-module (or corrupted response) can cause a OOB write later on in
-cmis_fw_update_start_download().
+cmis_fw_update_start_download() copies start_cmd_payload_size bytes
+from the firmware blob into the CDB LPL vendor_data[] payload without
+validating that the FW has enough data.
 
-Let's error out. If modules that expect longer LPL writes actually
-exist we should revisit.
-
-struct cmis_cdb_start_fw_download_pl's definition has to move,
-no change there.
+Since the start_cmd_payload_size can only be ~120B an image too short
+is most likely corrupted, so reject it.
 
 Fixes: c4f78134d45c ("ethtool: cmis_fw_update: add a layer for supporting firmware update using CDB")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
 CC: andrew@lunn.ch
-CC: petrm@nvidia.com
 CC: danieller@nvidia.com
+CC: petrm@nvidia.com
 ---
- net/ethtool/cmis_fw_update.c | 36 ++++++++++++++++++++++--------------
- 1 file changed, 22 insertions(+), 14 deletions(-)
+ net/ethtool/cmis_fw_update.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/net/ethtool/cmis_fw_update.c b/net/ethtool/cmis_fw_update.c
-index df5f344209c4..16190c97e1f7 100644
+index 16190c97e1f7..291d04d2776a 100644
 --- a/net/ethtool/cmis_fw_update.c
 +++ b/net/ethtool/cmis_fw_update.c
-@@ -44,6 +44,20 @@ enum cmis_cdb_fw_write_mechanism {
- 	CMIS_CDB_FW_WRITE_MECHANISM_BOTH	= 0x11,
- };
+@@ -130,6 +130,14 @@ cmis_fw_update_start_download(struct ethtool_cmis_cdb *cdb,
+ 	u8 lpl_len;
+ 	int err;
  
-+/* See section 9.7.2 "CMD 0101h: Start Firmware Download" in CMIS standard
-+ * revision 5.2.
-+ * struct cmis_cdb_start_fw_download_pl is a structured layout of the
-+ * flat array, ethtool_cmis_cdb_request::payload.
-+ */
-+struct cmis_cdb_start_fw_download_pl {
-+	__struct_group(cmis_cdb_start_fw_download_pl_h, head, /* no attrs */,
-+			__be32	image_size;
-+			__be32	resv1;
-+	);
-+	u8 vendor_data[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH -
-+		sizeof(struct cmis_cdb_start_fw_download_pl_h)];
-+};
-+
- static int
- cmis_fw_update_fw_mng_features_get(struct ethtool_cmis_cdb *cdb,
- 				   struct net_device *dev,
-@@ -86,6 +100,14 @@ cmis_fw_update_fw_mng_features_get(struct ethtool_cmis_cdb *cdb,
- 	 */
- 	cdb->read_write_len_ext = rpl->read_write_len_ext;
- 	fw_mng->start_cmd_payload_size = rpl->start_cmd_payload_size;
-+	if (fw_mng->start_cmd_payload_size >
-+	    sizeof_field(struct cmis_cdb_start_fw_download_pl, vendor_data)) {
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Start cmd payload size exceeds max LPL payload",
++	if (fw_update->fw->size < vendor_data_size) {
++		ethnl_module_fw_flash_ntf_err(fw_update->dev,
++					      &fw_update->ntf_params,
++					      "Firmware image too small for module's start payload",
 +					      NULL);
 +		return -EINVAL;
 +	}
 +
- 	fw_mng->write_mechanism =
- 		rpl->write_mechanism == CMIS_CDB_FW_WRITE_MECHANISM_LPL ?
- 		CMIS_CDB_FW_WRITE_MECHANISM_LPL :
-@@ -97,20 +119,6 @@ cmis_fw_update_fw_mng_features_get(struct ethtool_cmis_cdb *cdb,
- 	return 0;
- }
+ 	pl.image_size = cpu_to_be32(fw_update->fw->size);
+ 	memcpy(pl.vendor_data, fw_update->fw->data, vendor_data_size);
  
--/* See section 9.7.2 "CMD 0101h: Start Firmware Download" in CMIS standard
-- * revision 5.2.
-- * struct cmis_cdb_start_fw_download_pl is a structured layout of the
-- * flat array, ethtool_cmis_cdb_request::payload.
-- */
--struct cmis_cdb_start_fw_download_pl {
--	__struct_group(cmis_cdb_start_fw_download_pl_h, head, /* no attrs */,
--			__be32	image_size;
--			__be32	resv1;
--	);
--	u8 vendor_data[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH -
--		sizeof(struct cmis_cdb_start_fw_download_pl_h)];
--};
--
- static int
- cmis_fw_update_start_download(struct ethtool_cmis_cdb *cdb,
- 			      struct ethtool_cmis_fw_update_params *fw_update,
 -- 
 2.54.0
 
