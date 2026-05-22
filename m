@@ -1,224 +1,200 @@
-Return-Path: <netdev+bounces-290721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290722-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDV3GmcSEGryTAYAu9opvQ
-	(envelope-from <netdev+bounces-290721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:23:03 +0200
+	id cEf2KUUUEGryTAYAu9opvQ
+	(envelope-from <netdev+bounces-290722-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:31:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F905B0798
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:23:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 470AB5B09B4
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3AA64301678B
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 08:22:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F3A01301CF99
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 08:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717573A9D95;
-	Fri, 22 May 2026 08:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F463A7F50;
+	Fri, 22 May 2026 08:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FMA3q+vG"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="mVwc49J1";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EUpK2Ma9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from flow-b4-smtp.messagingengine.com (flow-b4-smtp.messagingengine.com [202.12.124.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B2F3A75B5;
-	Fri, 22 May 2026 08:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3163A782E;
+	Fri, 22 May 2026 08:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779438147; cv=none; b=JWH2wqE+ybMakFKaQtyjPRIGoZdT2yS0jqd8hvh7WlGJa94+coVb3A//JXlT6EJ3d/6RmiWtB6sFG7rMI1IYRNuLu6NP2ingIFZ0iUZwvG05tHXWnE5G+Cha8hcn6NTieqHw34Kow2ramq6AxR2pTqnuuJvoko2azKihBSgAS3M=
+	t=1779438566; cv=none; b=XMVDNsOFWMNGK/U+dUZbXzWLKM5NReDiqfpyl9jAuvDXeTQxquSeZvdz2y831CC6Rba8lH8NR73vJzcNk00sg72K8z90OFZN/vF4yNnkZZc1//zF2tq9pbqfa0ZOuUzyYakyC9XjwQpryvyzHUVrJ+x9fidYDw9thSjhJR9ry/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779438147; c=relaxed/simple;
-	bh=B/xGfeChgr6/kPR5j4YOpgmcwKPdHD81LbJcH8DaJ2c=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=fDuiEbEohR4hVYQ5ocA2b4t0XTeWjveJAfVLFKRCKxlJzXFuWKAOUyCM5kcjfGcRtg2+DNccHLkslIpqTMGPXDE2U2gxpVK2CM1/NnvEXTPc7ibqoI/bUhXdzMjHr8DYpXWA/6MRBloeJZh9n1EcBWhBXY8huLarilcQoRGmjz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FMA3q+vG; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F34701F000E9;
-	Fri, 22 May 2026 08:22:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779438145;
-	bh=0klMbvMEy7RHVrJx+uOFj1zuxukGYA2wIZh4U69i/uw=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=FMA3q+vG6Am6XZUfCVz+ONQAgxPluVrLo+FAeU8qWa13lx7otEHddJsYOaSDHGv5B
-	 xiQuv8UHVThqJHWAw3zaNjBkYRKXnlfP122fAKxMg7KmRK+WSiudGxCl6ANrBKIJkL
-	 n/JCQ3P3HX31s16Ke2ytlDYvy1AIlUfzgUZWd/nb0RhxVPnKvbWXvyVLuT7F/YBEmg
-	 xvTBf+RlGHOsyfeYARVQ9McjUYBjN1nylOxX634g+lYc2sDgX/zXH88Sdw3EHRj2UT
-	 VlJMd+5FaOK7dKvY9oDAnduVG3b1AiIKjrW+YFEL4gqB6FOKj5CjFfc+oic1wPkJek
-	 j9oXJOJqK7uyg==
-Content-Type: multipart/mixed; boundary="===============3122944525735123887=="
+	s=arc-20240116; t=1779438566; c=relaxed/simple;
+	bh=S/W1IYFida+NA2QNwOCu8W2HVuY1ZiNPLNAJKV7ynfc=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=T8Ot1vGhQAXfuorkXLJ2Q07UZtq8oW+Zohhuw9QhOFbrYENlbc6pjOok5Ydgev/uT834dJilujrHukQYkYI/ghvLTz9+OafjLk3bWWtFajMXgRDsKvxOVnoPIpA5piA7ScOVV4GgC5LqCJ+S8UmF9RnWFpIqKuwOvj/UzZUfahE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=mVwc49J1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EUpK2Ma9; arc=none smtp.client-ip=202.12.124.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailflow.stl.internal (Postfix) with ESMTP id A289D1300C0A;
+	Fri, 22 May 2026 04:29:21 -0400 (EDT)
+Received: from phl-imap-05 ([10.202.2.95])
+  by phl-compute-04.internal (MEProxy); Fri, 22 May 2026 04:29:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1779438561;
+	 x=1779445761; bh=K5cjv15MjjTF6ypOnMSrJMsfRdW4W+PPYBrqMoqvt/A=; b=
+	mVwc49J1HBgWVrb4a/RQur0w8olfdgWprB68y5AQaHQKBXoXAw3WMCwEvlADbMZa
+	woiU2CWyZVzvL2un+K4ZfXUVGVBgKvyaQ0waPfX2dovAGmipmnmch7wjsSyi/ggj
+	ohAEcrvXX5Z0ybA87lR6nVxg8FUHxwcTSyOhBGWli/U5ZI3FFQHzJPoeA18Pj7tw
+	WAaIfYhDuniH4wQYakbqBIqXipGGe7Q6iA/y8AH/jRUUp9jaJyz83OGlqauvsNRl
+	rpMGWRSLrUqU7/F+jxwMoRP5CzwzEnViHkJJseLL5Q1bw4WbZj2UZdUWAHb3lRyb
+	eisQnAsYJ9pqbcu6duBM7A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779438561; x=
+	1779445761; bh=K5cjv15MjjTF6ypOnMSrJMsfRdW4W+PPYBrqMoqvt/A=; b=E
+	UpK2Ma9OrlBOcJrfk89xSalmv14z71Y742I7yR9JDliM14zAQQ2D0cod6aACcGDv
+	or6qSJ5INamWzeACSQjuA5hI6ZLYdQEYo8D90K9A9ckq1h7ucOe4khbynAMoJmoU
+	2jZlm1NbFEdfiEHDaHOQ9dyPCyfontUTL2xT5bKY2J3W3JULBFjZyHFEzd8Ffd/x
+	r2c+GRqVhLktgnWrOX0BdRygD96QKeVSyX+h3cT02YUnqR8yUGFgvP2rhzjiicPB
+	iFTzxEAz1miglA2jKtOukdD4J0Ev0bzzJWVVWN0LXq2Bzp53I6Bdp/yeUz4MI2RH
+	/uj8Y5FZdiY/g20nRwOZA==
+X-ME-Sender: <xms:3xMQahOCKCWvL9cv3XYQbv-EJY-5JR2Ia3Z8PelDswJneSd0az0qXQ>
+    <xme:3xMQauxHL3Ysx8fPaX7uC9mP24hgJ3O2F6ot0-P89fFwGJCA-Pi66GK3iqAML5BWX
+    DXESTg8zojzG3LmMWF90NYfAhSsRpPntHRCHDoS9Nqa7p6e3dONFos>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugeelkeegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
+    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepgedtpdhmohguvgepshhmthhpohhu
+    thdprhgtphhtthhopegsphesrghlihgvnhekrdguvgdprhgtphhtthhopehtshgsohhgvg
+    hnugesrghlphhhrgdrfhhrrghnkhgvnhdruggvpdhrtghpthhtohepthhonhihsegrthho
+    mhhiuggvrdgtohhmpdhrtghpthhtohepkhhhihhlmhgrnhessggrhihlihgsrhgvrdgtoh
+    hmpdhrtghpthhtohepfhhlohhrihgrnhdrfhgrihhnvghllhhisegsrhhorggutghomhdr
+    tghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
+    htohepughmihhtrhihrdhtohhrohhkhhhovhesghhmrghilhdrtghomhdprhgtphhtthho
+    pehjohhnrghsrdhgohhrshhkihesghhmrghilhdrtghomhdprhgtphhtthhopehmrgiiii
+    hivghsrggttghouhhnthesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:3xMQajUbzWzIk3zJRKelcJqH9lLTGk9j2eynxhQmHiq1OWCr-y2h7Q>
+    <xmx:3xMQagPV0Bm4Ic_tW8YWwZ4nVopqiUkfLtl5ahxzvvDHs8X1byqK1A>
+    <xmx:3xMQanj7n1H0NO7fxP9CXn6-QWSG6sJlhU37QwHWB4VHx5UbVNaABA>
+    <xmx:3xMQaofwiLNKXI5cNztemqeU__Yl9-r92W2KmBm3ZqqMImvXPQDa6A>
+    <xmx:4RMQahUK73IMw50Jbey2YC6mFhyLbz4f8YjWlvxlDLB-FK75_RuEeQg8>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 708B7182007A; Fri, 22 May 2026 04:29:19 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <5d9fbf4b64d5684f423bcdb540d72734b962752adbbf69958138cfbc9c907f5a@mail.kernel.org>
-In-Reply-To: <20260522074601.1658705-3-kuniyu@google.com>
-References: <20260522074601.1658705-3-kuniyu@google.com>
-Subject: Re: [PATCH v2 bpf-next 02/11] bpf: tcp: Introduce BPF_SOCK_OPS_RCVQ_CB.
-From: bot+bpf-ci@kernel.org
-To: kuniyu@google.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,memxor@gmail.com
-Cc: yonghong.song@linux.dev,john.fastabend@gmail.com,sdf@fomichev.me,edumazet@google.com,ncardwell@google.com,willemb@google.com,ukyab@berkeley.edu,kuniyu@google.com,kuni1840@gmail.com,bpf@vger.kernel.org,netdev@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 22 May 2026 08:22:24 +0000 (UTC)
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-ThreadId: ArrYli9DFPON
+Date: Fri, 22 May 2026 10:28:59 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Matti Vaittinen" <mazziesaccount@gmail.com>,
+ "Arnd Bergmann" <arnd@kernel.org>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+ "Christian Lamparter" <chunkeey@googlemail.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Aaro Koskinen" <aaro.koskinen@iki.fi>,
+ "Andreas Kemnade" <andreas@kemnade.info>,
+ "Kevin Hilman" <khilman@baylibre.com>,
+ "Roger Quadros" <rogerq@kernel.org>, "Tony Lindgren" <tony@atomide.com>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
+ "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
+ "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, "Linus Walleij" <linusw@kernel.org>,
+ "Bartosz Golaszewski" <brgl@kernel.org>,
+ "Dmitry Torokhov" <dmitry.torokhov@gmail.com>,
+ "Lee Jones" <lee@kernel.org>, "Pavel Machek" <pavel@kernel.org>,
+ "Florian Fainelli" <florian.fainelli@broadcom.com>,
+ "Jonas Gorski" <jonas.gorski@gmail.com>, "Andrew Lunn" <andrew@lunn.ch>,
+ "Vladimir Oltean" <olteanv@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, linux-wireless@vger.kernel.org,
+ Linux-OMAP <linux-omap@vger.kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linux-sh@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-leds@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+Message-Id: <681f328c-bc8a-4410-b876-f8c5f116325d@app.fastmail.com>
+In-Reply-To: <b79d8ad9-f36e-4769-9dc2-58baefe23000@gmail.com>
+References: <20260520183815.2510387-1-arnd@kernel.org>
+ <20260520183815.2510387-3-arnd@kernel.org>
+ <b79d8ad9-f36e-4769-9dc2-58baefe23000@gmail.com>
+Subject: Re: [PATCH 02/10] [v3] input: gpio-keys: make legacy gpiolib optional
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290721-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org,kernel.org,iogearbox.net,meta.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+];
+	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-290722-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[google.com,kernel.org,iogearbox.net,linux.dev,gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[40];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,googlemail.com,sipsolutions.net,iki.fi,kemnade.info,baylibre.com,kernel.org,atomide.com,alpha.franken.de,physik.fu-berlin.de,redhat.com,alien8.de,linux.intel.com,zytor.com,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,lists.infradead.org];
+	NEURAL_HAM(-0.00)[-0.988];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 47F905B0798
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,app.fastmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,arndb.de:email,arndb.de:dkim]
+X-Rspamd-Queue-Id: 470AB5B09B4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---===============3122944525735123887==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index aec171ccb6ef..31130e1b63ea 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-
-[ ... ]
-
-> @@ -7031,8 +7034,16 @@ enum {
->  	 * options first before the BPF program does.
->  	 */
->  	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
-> +	/* Call bpf when TCP payload is queued to sk->sk_receive_queue
-> +	 * and after recvmsg().  The bpf prog will be called under
-> +	 * sock_ops->op == BPF_SOCK_OPS_RCVQ_CB.
-> +	 *
-> +	 * It can be used to adjust sk->sk_rcvlowat and suppress
-> +	 * unnecessary wakeups before sufficient data is available.
-> +	 */
-> +	BPF_SOCK_OPS_RCVQ_CB_FLAG = (1<<7),
->  /* Mask of all currently supported cb flags */
-> -	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
-> +	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
->  };
-
-The BPF subsystem requires multi-line comments to have the opening /* on
-its own line. This comment starts with text on the same line as /*:
-
-	/* Call bpf when TCP payload is queued to sk->sk_receive_queue
-
-Should it be formatted as:
-
-	/*
-	 * Call bpf when TCP payload is queued to sk->sk_receive_queue
-	 * and after recvmsg().  The bpf prog will be called under
-	 * sock_ops->op == BPF_SOCK_OPS_RCVQ_CB.
-	 *
-	 * It can be used to adjust sk->sk_rcvlowat and suppress
-	 * unnecessary wakeups before sufficient data is available.
-	 */
-
-[ ... ]
-
-> @@ -7176,6 +7187,11 @@ enum {
->  					 * sendmsg timestamp with corresponding
->  					 * tskey.
->  					 */
-> +	BPF_SOCK_OPS_RCVQ_CB,		/* Called when TCP payload is queued to
-> +					 * sk->sk_receive_queue and after recvmsg()
-> +					 * to allow adjusting sk->sk_rcvlowat and
-> +					 * to suppress early wakeups.
-> +					 */
->  };
-
-The multi-line comment here also starts with text on the same line as /*:
-
-	BPF_SOCK_OPS_RCVQ_CB,		/* Called when TCP payload is queued to
-
-Should it be reformatted with the opening /* on its own line?
-
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 9590877b0714..4a50fe2cd863 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -6002,7 +6002,8 @@ BPF_CALL_2(bpf_sock_ops_cb_flags_set, struct bpf_sock_ops_kern *, bpf_sock,
->  	struct sock *sk = bpf_sock->sk;
->  	int val = argval & BPF_SOCK_OPS_ALL_CB_FLAGS;
+On Fri, May 22, 2026, at 06:55, Matti Vaittinen wrote:
+> On 20/05/2026 21:38, Arnd Bergmann wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>>
+>> The two Rohm PMIC drivers use a gpio-keys device without an actual GPIO,
+>> passing an IRQ number instead. In order to keep this working both with
+>> and with CONFIG_GPIOLIB_LEGACY, change the gpio-keys driver to ignore
+>> the gpio number if an IRQ is passed.
+>> 
 >
-> -	if (!is_locked_tcp_sock_ops(bpf_sock))
-> +	if (!is_locked_tcp_sock_ops(bpf_sock) &&
-> +	    bpf_sock->op != BPF_SOCK_OPS_RCVQ_CB)
->  		return -EOPNOTSUPP;
->
->  	if (!IS_ENABLED(CONFIG_INET) || !sk_fullsock(sk))
->  		return -EINVAL;
->
->  	tcp_sk(sk)->bpf_sock_ops_cb_flags = val;
->
->  	return argval & (~BPF_SOCK_OPS_ALL_CB_FLAGS);
+> I am (still) all fine with this, even though I like Dmitry's set. I 
+> suppose you already have a plan for merging this, but I still have to 
+> ask - why the MFD changes aren't in own patch? I feel it would have 
+> simplified merging, backporting, reviewing and reverting if needed.
 
-The patch allows bpf_sock_ops_cb_flags_set() to modify
-tcp_sk(sk)->bpf_sock_ops_cb_flags without holding the socket lock when
-bpf_sock->op == BPF_SOCK_OPS_RCVQ_CB. However, the same field can also
-be modified through bpf_setsockopt() which requires the socket lock.
+Splitting it out would break bisection: The gpio-leds change without
+the mfd change causes a build failure when assigning the .gpio
+field, and the reverse causes a runtime failure when .gpio=0 is
+a valid line.
 
-Can there be a race between concurrent modifications?
+It would be possible to only do the gpio-led driver patch without
+the header file change first. This would let us apply the last
+patch in the series without regression, but it would risk having
+not catching other drivers that incorrectly set the .gpio field
+while CONFIG_GPIOLIB_LEGACY is disabled.
 
-When a BPF program in BPF_SOCK_OPS_RCVQ_CB context (unlocked) calls
-bpf_sock_ops_cb_flags_set():
-
-	bpf_sock_ops_cb_flags_set()
-	    tcp_sk(sk)->bpf_sock_ops_cb_flags = val;
-
-Another BPF program in a locked context could simultaneously call
-bpf_setsockopt():
-
-	do_tcp_setsockopt()
-	    sock_owned_by_me(sk);
-	    ...
-	    tp->bpf_sock_ops_cb_flags = flags;
-
-Both perform full writes (= val), not atomic operations. The
-tcp_sock.bpf_sock_ops_cb_flags field is a plain u8, not atomic_t, and
-no READ_ONCE/WRITE_ONCE is used. While byte writes are atomic on most
-architectures, the lack of synchronization means one write can completely
-overwrite the other.
-
-Would this lead to incorrect callback flag state if two updates race?
-
-> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> index 37142e6d911a..3b8f392d8c69 100644
-> --- a/tools/include/uapi/linux/bpf.h
-> +++ b/tools/include/uapi/linux/bpf.h
-
-[ ... ]
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/26275674572
---===============3122944525735123887==--
+      Arnd
 
