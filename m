@@ -1,177 +1,157 @@
-Return-Path: <netdev+bounces-290718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290719-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFF5Bh8SEGryTAYAu9opvQ
-	(envelope-from <netdev+bounces-290718-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:21:51 +0200
+	id eGs7BIoSEGryTAYAu9opvQ
+	(envelope-from <netdev+bounces-290719-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:23:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8265B072C
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:21:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2AE65B07D5
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:23:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 758EF304CF77
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 08:21:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9EAB630621DE
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 08:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EEB3A75A0;
-	Fri, 22 May 2026 08:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221293A71AA;
+	Fri, 22 May 2026 08:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b5DcLO9G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h+yijezQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5149B3A7F41
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 08:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3ED43A6F0C;
+	Fri, 22 May 2026 08:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779438053; cv=none; b=prxCdvlz/f0LE0IQNnMYALrnu3TIADWJML3DEizgyT4optJKTFk5bVfk/xYgAUBn3e/UhmbbunLr8KJ1jmUgE6PR5hQa2UDlYoogsqTAPsPLILIW/HXYE6R6nfmRQBNt6CbwFpNI1Uub31P7fzqGEjzpnZUnWD5jmxeQo53gLr4=
+	t=1779438143; cv=none; b=TfnqK+9AjWuiRltsIVYGCNF6KhRMKBjQ4lZLxa7FK8HhRdqt1mESB2VdEPo/NZNs4ZHFB6ECumT7mW2wyQmZWufpVyO7J7vJC9uLn+CtaydXeNC3+7EhD9HzDmgvQq9I4ELWzJSrcilcUvc/6kG61G2nX+TOKMrlx7wrGacUZ1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779438053; c=relaxed/simple;
-	bh=y3gO1/IRDX9AoOFixAaefYA8zXXxRvfVy4cVwEKXiFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fxiY9bxpegi6fbSA1Bc8Gy3tFbtrIcDMONTgY+E8d8iwx4Z02TjerAM2C6TTmgk7rdpA1viH6JWvt1A9fCr04Jk871zjxZlhPq/D0pStcziY70E2fDcMZjdzV20xuh8KJBIaxUamm5FyFaxB/6jckz0kuRf+D/s14WllDXivykY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b5DcLO9G; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-44b330c5cc6so5283085f8f.1
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 01:20:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779438049; x=1780042849; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FtBUHZ5NTfzEhm+9SPa+wbOEFPDSpIs8MinMBuqfMJM=;
-        b=b5DcLO9GA8hDubB2tbBsRUXaFsFbl1WJwxLjAHY0kKjfVRFzFKiqtC8OBwSWwa4fwC
-         Yhw4Zwpj/cA9sWKHopD+O1Q9XcVI19WDQhoXFNHVGD3dTg8rKwYfkQrERm1AcHbSkPp+
-         4vgS6f7No46dqCt6Cy/aI3Ix4RbVvYlZjY1Lp9+21rzVC3rmtxPrvLY7Zkm3LYWYwX8e
-         oiAFAEyWCw+rf7SUb2TvL7gH6k+dVvJqJJgjjWyF79vNk82YECPtchi8AsL9nS6Jfxjy
-         RWJUXUxBqa8UU+EIiCd27YVkg/QBmC47SZDRvQZUTOB0PUsk3cSVFL9KNHbmj/ql1iGM
-         wx2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779438049; x=1780042849;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FtBUHZ5NTfzEhm+9SPa+wbOEFPDSpIs8MinMBuqfMJM=;
-        b=iTeksG3EDW6lGBZ25MQCZ+P3hJbBWMaUFl3c6BPiDH4vRerJROqHz8sOJA1WcWbFBS
-         f3szlWmXSJYVxcHlmKTsG0lMFaHnjOLmnYSlBDQlPy2Kxz7Bfg4G8ECTmqKYwh8vqUzR
-         JxwgjdJFqVQqBUqAfbKWLhZidG+4/Gbhmb/Mn0458Z5l8+/a4lyTn0LkYEDa0TSUSu9W
-         lXe8UG/A759VrcSN7kX+7OHzEstigICz+tRCi0QO+MjeJZfkQvymyuhnu/cos4IPqEHy
-         LvOt0YNi17hMGie0nYP3ozc+r6LoEtBw+pqXZ8D8qJ0fw3xFuor6BbojxeqPGdTim8eh
-         ac9w==
-X-Forwarded-Encrypted: i=1; AFNElJ8tlHJlythKmXY/fHwPqmIpTUAtqAAHfqfliNrKtP7JFUDpshgahANZZ7xJZS5GDsg/eSUTvJg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy482Zjrn7jTwwBj0mozMrbOgZuH1EKrL+FFZsmtH6cGopSj5hs
-	CpH71sp6h9YEDNjjZMHLtADnmiB9QVh8n2xX00GGoRoSyha0WTuayoeU
-X-Gm-Gg: Acq92OEAgEg54J0LRY7Och5D/byR81LY+EC5Vx0cfRCigxCNDFNCiNZCAq+JJ7c1W1S
-	bTcSJMD1gaWxkciwN9Vr3PMwA0CYGkwYfV86KWfpOgnTdTnj6X5sDXGu8W0AAmXnDnU8YqDAb8r
-	gRFlPCqR9NQRPs8uutawFfT+C/YXBy/HP7aI/Dl8wRMdEbk0xawY1vqbdjjB2tjwXsikqiLuN/b
-	T5YrrJ8WfQLZsIYBpNXaVErzt/1FOcdQKupopOwIP98ZpRWT+Fbu9LuD1xQdu1mbVHydTcTfv7Z
-	6QMg23xxjnZN90IcRjKSEfyVv67YWikYMbVScRgGbDBUUWz9gUvFdQD43vh9qTF+vnnv8PuvlcA
-	2k9HtIa2KufMTqzBBmSRxkvnRxq4wYipTmxGJDuQRKIuTUulDZdoIKjB6RMZptU+2Qypf3f+CZG
-	iHW/QMojvlYFsGZk5LJE8ffuP/VEWCoj+e+hsyGKE6IO5Ywy4TLyAevkEdW/GuaFMzyl0iCdANy
-	eU=
-X-Received: by 2002:a05:6000:1446:b0:43d:7a97:78af with SMTP id ffacd0b85a97d-45eb38e04e3mr3459686f8f.42.1779438048957;
-        Fri, 22 May 2026 01:20:48 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6d49132sm2187929f8f.24.2026.05.22.01.20.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 May 2026 01:20:48 -0700 (PDT)
-Date: Fri, 22 May 2026 09:20:42 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Ashwin Gundarapu <linuxuser509@zohomail.in>
-Cc: "anthonylnguyen" <anthony.l.nguyen@intel.com>,
- "anthony.l.nguyen@intel.com" <przemyslaw.kitszel@intel.com>, "andrewnetdev"
- <andrew+netdev@lunn.ch>, "davem" <davem@davemloft.net>, "edumazet"
- <edumazet@google.com>, "kuba" <kuba@kernel.org>, "pabeni"
- <pabeni@redhat.com>, "intel-wired-lan" <intel-wired-lan@lists.osuosl.org>,
- "netdev" <netdev@vger.kernel.org>, "linux-kernel"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: e100: remove redundant static variable
- initializations
-Message-ID: <20260522092042.5773213f@pumpkin>
-In-Reply-To: <19e4e74ff40.601fab765713.9212104302286035517@zohomail.in>
-References: <19e4e74ff40.601fab765713.9212104302286035517@zohomail.in>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1779438143; c=relaxed/simple;
+	bh=Gaiiz+IZDH5noZ4hjHUdHGUKZSATfQw00+iuBYAzzRU=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=Odby/kNlJvSEKKYYOdFo20pWelfD/rsWzjxU8rMMc7CpL5UAmcp8HCO4kgZ4R06rFbAWdXTdxywBGP0nxjlrpA4DL0pfVRoOZI/9u968vYcLW37P/2DbBDCY0jz+FIkzbPTMdHbbxsJFDGmKcpAPrQ1AjC3/xe42iiclNow2DJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h+yijezQ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 401C41F000E9;
+	Fri, 22 May 2026 08:22:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779438141;
+	bh=uglbIFHHQy2ryBVfyMo/CXYPOKjc5dRxb8rx3hfcCdQ=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date;
+	b=h+yijezQDhv5zpXErW9JxB4WEhkYiCx8N06OBbtLFvH+GE86VX8qQ2LZmFxTHKz7J
+	 OvCYduZEVQZzsTrIYJmuxasbM3xUQ21d1nGNRX3zKwzT//WWpiDGepyPg5iTF70YF0
+	 WcgTWU44rOn3++CDgoZ/4iYPZ5kUZVyOcKsi5ajMYRFFv1K9bJee+g5AWQ2bpdBxTN
+	 Fi9Wski0Xaa+zi8bfOj3IG0hTUdX/7wSaSbX4885aaIaQ+cH5Hu8AkLeYma6Ffw9c1
+	 xJ6mOgt7AMwkYpAV/5bPWGRhwS7YDmeI6sHanZiTHcbFJQVB3/Y9xDwp3VDuj9WMgQ
+	 L4I63CcTeJpCA==
+Content-Type: multipart/mixed; boundary="===============8360733971623066269=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Message-Id: <6c6b45f7ff66adefe9d470c2f2c9f0f3664877afc3f019249d1a92e8bd9125c8@mail.kernel.org>
+In-Reply-To: <20260522074601.1658705-2-kuniyu@google.com>
+References: <20260522074601.1658705-2-kuniyu@google.com>
+Subject: Re: [PATCH v2 bpf-next 01/11] selftest: bpf: Use BPF_SOCK_OPS_ALL_CB_FLAGS + 1 for bad_cb_test_rv.
+From: bot+bpf-ci@kernel.org
+To: kuniyu@google.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,memxor@gmail.com
+Cc: yonghong.song@linux.dev,john.fastabend@gmail.com,sdf@fomichev.me,edumazet@google.com,ncardwell@google.com,willemb@google.com,ukyab@berkeley.edu,kuniyu@google.com,kuni1840@gmail.com,bpf@vger.kernel.org,netdev@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Fri, 22 May 2026 08:22:21 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290718-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290719-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org,kernel.org,iogearbox.net,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_TO(0.00)[google.com,kernel.org,iogearbox.net,linux.dev,gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[zohomail.in:email,checkpatch.pl:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8E8265B072C
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: C2AE65B07D5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 22 May 2026 12:22:30 +0530
-Ashwin Gundarapu <linuxuser509@zohomail.in> wrote:
+--===============8360733971623066269==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> From: Ashwin Gundarapu <linuxuser509@zohomail.in>
-> Date: Fri, 22 May 2026 12:20:23 +0530
-> Subject: [PATCH] net: e100: remove redundant static variable initializations
-> 
-> Remove '= 0' from static variables eeprom_bad_csum_allow and use_io.
-> Static variables are zero-initialized by default.
-> 
-> Found by checkpatch.pl
+> diff --git a/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c b/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
+> index 7e8fe1bad03f..e4849d2a2956 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
+> @@ -26,7 +26,8 @@ static void verify_result(struct tcpbpf_globals *result)
+>  	ASSERT_EQ(result->bytes_acked, 1002, "bytes_acked");
+>  	ASSERT_EQ(result->data_segs_in, 1, "data_segs_in");
+>  	ASSERT_EQ(result->data_segs_out, 1, "data_segs_out");
+> -	ASSERT_EQ(result->bad_cb_test_rv, 0x80, "bad_cb_test_rv");
+> +	ASSERT_EQ(result->bad_cb_test_rv, BPF_SOCK_OPS_ALL_CB_FLAGS + 1,
+> +		  "bad_cb_test_rv");
+>  	ASSERT_EQ(result->good_cb_test_rv, 0, "good_cb_test_rv");
+>  	ASSERT_EQ(result->num_listen, 1, "num_listen");
+>
 
-Not worth the churn for existing code.
+[ ... ]
 
--- David
+> diff --git a/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c b/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
+> index 6935f32eeb8f..e30cb1fab079 100644
+> --- a/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
+> +++ b/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
+> @@ -92,7 +92,8 @@ int bpf_testcb(struct bpf_sock_ops *skops)
+>  		break;
+>  	case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
+>  		/* Test failure to set largest cb flag (assumes not defined) */
+> -		global.bad_cb_test_rv = bpf_sock_ops_cb_flags_set(skops, 0x80);
+> +		global.bad_cb_test_rv = bpf_sock_ops_cb_flags_set(skops,
+> +								  BPF_SOCK_OPS_ALL_CB_FLAGS + 1);
 
-> 
-> Signed-off-by: Ashwin Gundarapu <linuxuser509@zohomail.in>
-> ---
->  drivers/net/ethernet/intel/e100.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
-> index bfacf877ca40..bdddd4315cbb 100644
-> --- a/drivers/net/ethernet/intel/e100.c
-> +++ b/drivers/net/ethernet/intel/e100.c
-> @@ -167,8 +167,8 @@ MODULE_FIRMWARE(FIRMWARE_D101S);
->  MODULE_FIRMWARE(FIRMWARE_D102E);
-> 
->  static int debug = 3;
-> -static int eeprom_bad_csum_allow = 0;
-> -static int use_io = 0;
-> +static int eeprom_bad_csum_allow;
-> +static int use_io;
->  module_param(debug, int, 0);
->  module_param(eeprom_bad_csum_allow, int, 0444);
->  module_param(use_io, int, 0444);
-> --
-> 2.43.0
-> 
+Could BPF_SOCK_OPS_ALL_CB_FLAGS + 1 break on future kernels?
 
+When this test is compiled, BPF_SOCK_OPS_ALL_CB_FLAGS + 1 evaluates to a
+hardcoded value. If the compiled test runs on a future kernel where this
+value is supported, the helper will successfully set the flag and return 0,
+causing the test to fail.
+
+The test also assumes contiguous bitmasks. If a flag is ever deprecated or
+skipped, adding 1 could overlap with valid bits.
+
+Would a safely distant bit like 1 << 30 be more robust for forward
+compatibility?
+
+(Reference: https://lore.kernel.org/bpf/20260508190227.AFAE9C2BD00@smtp.kernel.org/)
+
+>  		/* Set callback */
+>  		global.good_cb_test_rv = bpf_sock_ops_cb_flags_set(skops,
+>  						 BPF_SOCK_OPS_STATE_CB_FLAG);
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/26275674572
+--===============8360733971623066269==--
 
