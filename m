@@ -1,120 +1,141 @@
-Return-Path: <netdev+bounces-290640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290641-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gNnVL1G8D2oyPQYAu9opvQ
-	(envelope-from <netdev+bounces-290640-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 04:15:45 +0200
+	id untSBnfAD2q8PQYAu9opvQ
+	(envelope-from <netdev+bounces-290641-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 04:33:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34EFF5ADE91
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 04:15:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56EA5AE069
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 04:33:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A480030205C5
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 02:15:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BA33300EABB
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 02:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F542E5B02;
-	Fri, 22 May 2026 02:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KsSDRojK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DF41A6829;
+	Fri, 22 May 2026 02:29:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA44E2236F0
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 02:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FA623C4E9;
+	Fri, 22 May 2026 02:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779416142; cv=none; b=JsG8t2cOLV7UGRbV50llHU4+dM5wX0Ir/MGrLux/A8oubW+ckhZY6mWkR1PNqDnTS+rHIwFF0QAVNYTl9ZWyYrkASI+NnZbct41joe5EtPjZTKILZNa5VkpQSr303Ke1p//F3hWzJ9Kk/VlWxogfzsZRBcY4/LOiBNMaWoltHEg=
+	t=1779416975; cv=none; b=aWKeuTShRvnxYbNEzYEJHdLN9/pa0/bwZNl2jdHIHNK5f/Or3WabR6UZSa8qRkxk+Nr8PGmZrsf91IWo805H/q6rnbzcprHCmXvxAZ04pFNKmHz77KVadOxcmpr6cCUZHqqIZx7W+mVer40UYfUubDfhwKum8cNEO8MF/MmHRxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779416142; c=relaxed/simple;
-	bh=fVER6ZeXBuKT1ycM4JdAgghqvGVZ+f8q3woknWLvfMQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S+pYNq8HrEVnAfJvL+4C1b/QkEHtHR+y0/sPRwT3fNEi3/8CsaJGUvgp1ggCR0ISndlt/ftx214M+YYDBh7EwJmd3L5cP4Qkx0fppYki1PrU39wgy4t97Z76qvDT2Vg+YBpymL1N1l1fXgvlyM0hLTb6BBNn3mp/qO9Es/IcrkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KsSDRojK; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9ac27ab1-1891-4734-9029-156a64e24c03@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779416128;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fVER6ZeXBuKT1ycM4JdAgghqvGVZ+f8q3woknWLvfMQ=;
-	b=KsSDRojKwiLs48+EBILo/SbPnmb9OxdTxgAFTBYwVePjqKvc1mSD84YPqqhgDfbhIlGfwm
-	U4xHtoc1as21G5+9AB1O41hGCSHskiDmus1wb4eidePCNwpdr8ZqK5MJ8x1lhYfbcVaMPi
-	4L6PgBxx011XvvX094PNhL/JXM4t3v0=
-Date: Fri, 22 May 2026 10:15:00 +0800
+	s=arc-20240116; t=1779416975; c=relaxed/simple;
+	bh=qzcGSDxxyYYW8CcK7yiCpbMPrs8Ajt9rlfG5BskC9Jo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y0ZoUhFNGlx28+ZIf7O7pC8+wnc+TgQ5ozvkIsT2kBofVYJ3JiCQqnfELrNXX4X2qyet5eugSAeMEUrBWVu0qRaca9iYdTfLbacV8WukxrJIwxr98AYYEYvrN8ogFCT/JnfcZgLnw+odf1cPydJouwQyM859S6js0vItMkxGlNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 0c6d3c94558611f1aa26b74ffac11d73-20260522
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
+	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:b5996770-c199-483b-9d3e-e57d00f007ee,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:10
+X-CID-INFO: VERSION:1.3.12,REQID:b5996770-c199-483b-9d3e-e57d00f007ee,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:10
+X-CID-META: VersionHash:e7bac3a,CLOUDID:3aeeec564260224753cad92fff441500,BulkI
+	D:2605221029276ZG6313P,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
+	|865|898|915,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bul
+	k:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0
+	,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 0c6d3c94558611f1aa26b74ffac11d73-20260522
+X-User: zhaochenguang@kylinos.cn
+Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <zhaochenguang@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 974459536; Fri, 22 May 2026 10:29:24 +0800
+From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+To: Paul Moore <paul@paul-moore.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+	netdev@vger.kernel.org,
+	linux-security-module@vger.kernel.org
+Subject: [net-next] netlabel: fix IPv6 unlabeled address add error handling
+Date: Fri, 22 May 2026 10:29:10 +0800
+Message-Id: <20260522022910.398416-1-zhaochenguang@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2] selftests: net: add tests for PPPoL2TP
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Felix Maurer <fmaurer@redhat.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Petr Machata <petrm@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260514015743.37869-1-qingfang.deng@linux.dev>
- <92da057f-7e97-405c-877f-ad6a64e3553e@kernel.org>
- <0e6fa578-15b2-43c5-b5f5-a6e0a34c103b@linux.dev>
- <357a49a0-0742-47a6-bba9-6c406dbd6888@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Qingfang Deng <qingfang.deng@linux.dev>
-In-Reply-To: <357a49a0-0742-47a6-bba9-6c406dbd6888@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-290641-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290640-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[kylinos.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.966];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,pppoe.sh:url,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: 34EFF5ADE91
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,kylinos.cn:mid,kylinos.cn:email]
+X-Rspamd-Queue-Id: C56EA5AE069
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026/5/22 9:43, Matthieu Baerts wrote:
-> Hi Qingfang,
->
-> On 21/05/2026 17:18, Qingfang Deng wrote:
->> Looks like pppd exited unexpectedly, but I could not locally reproduce
->> this issue.
->>
->> You can start a socat instance to listen on syslog (as done in pppoe.sh
->> test) to see what's going on.
-> If it is already done in another test, and if this is not creating more
-> troubles, it might be more interesting if this debug mode is always
-> enabled. I would then recommend sending a patch doing that, than
-> applying temp modifications only in NIPA, with a risk of causing other
-> troubles. WDYT?
-Sure thing.
+netlbl_unlhsh_add_addr6() always returned zero after
+netlbl_af6list_add(), masking failures such as duplicate
+IPv6 static label entries.
+
+Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+---
+ net/netlabel/netlabel_unlabeled.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/netlabel/netlabel_unlabeled.c b/net/netlabel/netlabel_unlabeled.c
+index ca7a9e2a3de7..0ab825d7f637 100644
+--- a/net/netlabel/netlabel_unlabeled.c
++++ b/net/netlabel/netlabel_unlabeled.c
+@@ -295,7 +295,7 @@ static int netlbl_unlhsh_add_addr6(struct netlbl_unlhsh_iface *iface,
+ 
+ 	if (ret_val != 0)
+ 		kfree(entry);
+-	return 0;
++	return ret_val;
+ }
+ #endif /* IPv6 */
+ 
+-- 
+2.25.1
+
 
