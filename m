@@ -1,154 +1,147 @@
-Return-Path: <netdev+bounces-290636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290637-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8QkJOqeuD2rmOgYAu9opvQ
-	(envelope-from <netdev+bounces-290636-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 03:17:27 +0200
+	id 0GE4CbuyD2rmOgYAu9opvQ
+	(envelope-from <netdev+bounces-290637-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 03:34:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A8D5ADA12
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 03:17:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A85A5ADB24
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 03:34:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 71D5B3024536
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 01:17:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 54AFC300FC5E
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 01:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0439224AF9;
-	Fri, 22 May 2026 01:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89BD246788;
+	Fri, 22 May 2026 01:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C+jTNclZ"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="a9nb0QVT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2159D11CAF;
-	Fri, 22 May 2026 01:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C27202997;
+	Fri, 22 May 2026 01:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779412639; cv=none; b=HWGGE4ItcBP67LZJLrUrOxR5x19u0AOq/8VI2CMBseZF52XBxXi0sOvmUgJXxXdT+0nYXy8yz9HjahyXunGmPodWknFJCrVnKGhlAqSJhMxZUh6WBbjVtbsJaudksmJbESZnCmGOLe4zMQSCDbQzrcLoLDANfQpjJXq1Aqfx0oY=
+	t=1779413558; cv=none; b=cbP8N+Y8h8zwQamrW7RAyM5goYD0jlK9UcUiVxQZ3TvFUsNFhc5ZlpxrqhvRBX+sgTUdmo8cIJoRxxjY+dmBg82ec0RZOdeD2pCJihJsAB4Zsm+jFvU3tS+JWd6QVecrCiqr3YRJgCSUhtMQhRzxUPe48u4iZrDILIf9iaYOuN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779412639; c=relaxed/simple;
-	bh=8SDtOnmUdsIHETLv+JxXHaX2XfvnSGeokYjGqmuI6O4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OgWnG1PGxrRo/zc8hC17p6MvfM/oxbpV6eQY32c96kq9UFCe3OD8/sXf6UimK6u61zRzRxyTRcpc/ncAQQ3Tc/Xv2nzt1dMJO2x3RnB4D0zMm+5GOCnclGXsYE5jC9qWoPS9aOfnRCDRWU3wEuztRadUNZw6bq6u9t6RNEThIJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C+jTNclZ; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779412634;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=IKJ+X1WNjuIEeqP8tG1jQwI+VA6DwxQun0tsoICkQG8=;
-	b=C+jTNclZYDSG9TXOzP3At9TXYuQYkHD+rKJPiGxNUcGfHgeOLOvcBEG5UeI5au9MgtU0bV
-	YwX2baOyfDD7j4g/OlHZZzKfsV+VzJ9Ynjd6+DtqBP4G96yuGoshGfT3tjxp8VXFH4BL/H
-	6NW/aH+Nv0ZVKKMYvvlOoO5FfK7k7rs=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	syzbot+fbf3648ae7f5bdb05c59@syzkaller.appspotmail.com,
-	Allison Henderson <achender@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andy Grover <andy.grover@oracle.com>,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] rds: annotate data-race around rs_seen_congestion
-Date: Fri, 22 May 2026 09:16:20 +0800
-Message-ID: <20260522011621.304470-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1779413558; c=relaxed/simple;
+	bh=I6tFDsviSls0ujJbhE+o0zIxIjbVvq9RV/5NG12trhY=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=e9q8sT2SFEVwzAfTZxYSALpfl748yk/fKSUY0ac0e3/EfwrN22zkVuGJFL0feQpSzJ0V8da7DgppOCfFDHeLS4NfuSVo5RbhxiqXYZNseWyn4ULU1oP+RON9Ru6vCBONazIYhThS+ACB0WiYc04MvEAcqSJi08uQVaWFNCyWIvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=a9nb0QVT; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=gVprGHcyp7zNtbmaE8h+q0n2zo10k+cWa8PJBUTrGG0=;
+	b=a9nb0QVTQ5QW6BdiS0BXtVQxRcAlpksM3cp7FiNzC4yNoBPCUv+fe1cH022eZ5jmRmlH8Qk43
+	0XD9I4REf18tfOYgOr34CW9agpBzKp3Kvv+rq0ZEWt6yftEw5tiWvHYauq5R7UuSMFpyPrrCrpE
+	w3OKWOJcb1xyUevp7+ztPN8=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gM6yB1tnyznTW4;
+	Fri, 22 May 2026 09:24:34 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 70C8540539;
+	Fri, 22 May 2026 09:32:34 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Fri, 22 May 2026 09:32:33 +0800
+Message-ID: <b85d6dd0-f102-4b1f-be10-f75b8cb2cd42@huawei.com>
+Date: Fri, 22 May 2026 09:32:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
+	<yangshuaisong@h-partners.com>, <shiyongbang@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2 net 1/2] net: hibmcge: disable Relaxed Ordering to fix
+ RX packet corruption
+To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>
+References: <20260518144253.1568118-1-shaojijie@huawei.com>
+ <20260518144253.1568118-2-shaojijie@huawei.com>
+ <545dd8a4-662b-49de-a5cf-793d20989571@redhat.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <545dd8a4-662b-49de-a5cf-793d20989571@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-290636-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-290637-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.996];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,fbf3648ae7f5bdb05c59];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email]
-X-Rspamd-Queue-Id: 12A8D5ADA12
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:mid,huawei.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7A85A5ADB24
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-rs_seen_congestion is read in rds_poll() and written in rds_sendmsg()
-and rds_poll() without any lock.  Use READ_ONCE()/WRITE_ONCE() to
-annotate these lockless accesses and silence KCSAN.
 
-Fixes: b98ba52f96e7 ("RDS: only put sockets that have seen congestion on the poll_waitq")
-Reported-by: syzbot+fbf3648ae7f5bdb05c59@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6a0f8d94.050a0220.6b33c.0000.GAE@google.com/
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- net/rds/af_rds.c | 4 ++--
- net/rds/send.c   | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+on 2026/5/21 21:54, Paolo Abeni wrote:
+> On 5/18/26 4:42 PM, Jijie Shao wrote:
+>> When SMMU is disabled, the hibmcge driver may receive corrupted packets.
+>> The hardware writes packet data and descriptors to the same page, but
+>> with Relaxed Ordering enabled, PCI write transactions may not be
+>> strictly ordered. This can cause the driver to observe a valid
+>> descriptor before the corresponding packet data is fully written.
+>>
+>> Fix this by clearing PCI_EXP_DEVCTL_RELAX_EN in the PCI bridge control
+>> register to ensure strict write ordering between packet data and
+>> descriptors.
+>>
+>> Fixes: f72e25594061 ("net: hibmcge: Implement rx_poll function to receive packets")
+>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>> ---
+>>   drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+>> index 068da2fd1fea..319551caf047 100644
+>> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+>> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+>> @@ -420,6 +420,8 @@ static int hbg_pci_init(struct pci_dev *pdev)
+>>   		return -ENOMEM;
+>>   
+>>   	pci_set_master(pdev);
+>> +	pcie_capability_clear_word(pdev, PCI_EXP_DEVCTL,
+>> +				   PCI_EXP_DEVCTL_RELAX_EN);
+> Sashiko noted this will not survive a device reset - that performs
+> pci_restore_state - and you should likelly call pci_save_state(pdev)
+> afterwards.
 
-diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-index 76f625986a7f..93b2da63ed42 100644
---- a/net/rds/af_rds.c
-+++ b/net/rds/af_rds.c
-@@ -219,7 +219,7 @@ static __poll_t rds_poll(struct file *file, struct socket *sock,
- 
- 	poll_wait(file, sk_sleep(sk), wait);
- 
--	if (rs->rs_seen_congestion)
-+	if (READ_ONCE(rs->rs_seen_congestion))
- 		poll_wait(file, &rds_poll_waitq, wait);
- 
- 	read_lock_irqsave(&rs->rs_recv_lock, flags);
-@@ -247,7 +247,7 @@ static __poll_t rds_poll(struct file *file, struct socket *sock,
- 
- 	/* clear state any time we wake a seen-congested socket */
- 	if (mask)
--		rs->rs_seen_congestion = 0;
-+		WRITE_ONCE(rs->rs_seen_congestion, 0);
- 
- 	return mask;
- }
-diff --git a/net/rds/send.c b/net/rds/send.c
-index d8b14ff9d366..e5d58c29aabe 100644
---- a/net/rds/send.c
-+++ b/net/rds/send.c
-@@ -1388,7 +1388,7 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
- 
- 	ret = rds_cong_wait(conn->c_fcong, dport, nonblock, rs);
- 	if (ret) {
--		rs->rs_seen_congestion = 1;
-+		WRITE_ONCE(rs->rs_seen_congestion, 1);
- 		goto out;
- 	}
- 	while (!rds_send_queue_rm(rs, conn, cpath, rm, rs->rs_bound_port,
--- 
-2.43.0
+Yes, thank you. I will fix it in v3.
+Jijie Shao
 
 
