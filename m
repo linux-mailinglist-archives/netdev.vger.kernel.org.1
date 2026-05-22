@@ -1,159 +1,178 @@
-Return-Path: <netdev+bounces-290870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290871-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WMHqBaB7EGrdXwYAu9opvQ
-	(envelope-from <netdev+bounces-290870-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:52:00 +0200
+	id KAl6HXB8EGrdXwYAu9opvQ
+	(envelope-from <netdev+bounces-290871-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:55:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D93E75B72AB
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:51:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E337A5B7389
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:55:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 58132303895E
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 15:44:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B223E30DDD70
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 15:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D0347B439;
-	Fri, 22 May 2026 15:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FAB376A02;
+	Fri, 22 May 2026 15:41:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcTp1XiC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="maFg3rz2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FD947886E;
-	Fri, 22 May 2026 15:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956AF25B0A0
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 15:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779464454; cv=none; b=Z74Aimy63QK4OMLaH830Q6PoSo45DEw98N/hVL9skQ/w2wnGgx8sMBXRJ5Jj1hybC0dD/HyK1MgSY2/qSNDSPPGwTIOo/YeUop8StcEnRASwdRYV2L6Q0mF6n23gv9lIJM8/EYZFB93qFz3SJ7kYj41xYbpZ5sRtEtRyptGHjbY=
+	t=1779464491; cv=none; b=IBx6EN7xL8ZgnN6tnB2Uy1tnHOAgkZ1EW+63nG5iUifIWnjYA+6KURqHcZjZqv5k9Ijt0KnFTk1eCPyNKiPK3KlJ3otEWBiVZT0uSzmkVD51wToPzuk5/VVvL8UcVfW3ziBkFNByKwVrAq2s+6lw37YkfWZOwcDbsDndbu/9EVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779464454; c=relaxed/simple;
-	bh=3qj4sp2Ygz+GWSr0uS4CCK2PDHsALrwUnuiNRcnu8Zs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jqjzacEsUacc6XjXxGpytqZDGiXZ2K7NVljyCh1LEFeQ4Bl/xSlUelA6E0b5FfxYyprhOSzuYq48BTbjRzVluCn414prZjs3SFWEhFUeIphNCXGMHTJavCbsrsJ2SaatE0dL7DYaT6De4b7Bf0vBJXhJ2cmZTN5WnRKSmc06ReE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcTp1XiC; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 807471F000E9;
-	Fri, 22 May 2026 15:40:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779464452;
-	bh=kK1Z8+G5JdzrtL4yJcz0BSXEx9OH0SiwFwGqYTVQ8SY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=BcTp1XiCPzBqdBetmpMEKQsoJCjoKq1KCqPblX+GuDLN6HLCTiYJy+Ncaw6zBdTLj
-	 aj9LthNxvTVZind+bRZ8Nj9rxma1ZZdpt9wYUJdj0pWkbHzM8yqP5yKnPJht785Pww
-	 NYLSIsxJqhFxsJ+YngCvSkL8fwliNNpjIhKSIxsJyc80ikI8Y8HbFGgnfYJ31ZnFSf
-	 EsLAllrN3L6cN9oGbLZPndMqOATS0Bf0XPHHGe2CZc6sK3mSLc0uuE89dKC/HoJLEm
-	 bHh5wf1pOcTaAcCn4wNUEvbPK7A6xVCFhvQ+ZgTg/banKd0TpH2CdJAHB91alOrq2K
-	 I3/YTuS9bwygA==
-Date: Fri, 22 May 2026 08:40:50 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
- <edumazet@google.com>, <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
- <przemyslaw.kitszel@intel.com>, <sridhar.samudrala@intel.com>,
- <anjali.singhai@intel.com>, <michal.swiatkowski@linux.intel.com>,
- <maciej.fijalkowski@intel.com>, <emil.s.tantilov@intel.com>,
- <madhu.chittim@intel.com>, <joshua.a.hay@intel.com>,
- <jacob.e.keller@intel.com>, <jayaprakash.shanmugam@intel.com>,
- <jiri@resnulli.us>, <horms@kernel.org>, <corbet@lwn.net>,
- <richardcochran@gmail.com>, <linux-doc@vger.kernel.org>,
- <tatyana.e.nikolova@intel.com>, <krzysztof.czurylo@intel.com>,
- <jgg@ziepe.ca>, <leon@kernel.org>, <linux-rdma@vger.kernel.org>, Samuel
- Salin <Samuel.salin@intel.com>, Aleksandr Loktionov
- <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next v3 01/14] virtchnl: create
- 'include/linux/intel' and move necessary header files
-Message-ID: <20260522084050.5ba31f38@kernel.org>
-In-Reply-To: <5426379b-1201-4707-8d18-21dca3d1424e@intel.com>
-References: <20260515224443.2772147-1-anthony.l.nguyen@intel.com>
-	<20260515224443.2772147-2-anthony.l.nguyen@intel.com>
-	<20260520175201.72f83c4a@kernel.org>
-	<ag7QUgfpM5UAAE2z@soc-5CG4396X81.clients.intel.com>
-	<20260521065609.248c7009@kernel.org>
-	<5426379b-1201-4707-8d18-21dca3d1424e@intel.com>
+	s=arc-20240116; t=1779464491; c=relaxed/simple;
+	bh=mQGHAvVaULvUTzHfl5O0N2R9WyRsRACnUIolwju07yE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JdnWbhpq7TBl46yhClJ2Cdh65sXO6A0FDqLzzHv0s4oJHAeupQoZf3Y0HDgYWC77qvS4vuOBmD+R9Qo4wE/i53qBQ38upT1CtmynNIaEzQjq7ZVBSG1WvkcyO4Wu/oMd+ZwAdTGmwNhehlhgqED0VkA48dKd9U5Izn1CosLThWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=maFg3rz2; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-367d88b9940so4877248a91.1
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 08:41:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779464490; x=1780069290; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WYpGjrpcI/QWRW0u6cXWL87F6QxybhFOh1NZVYhUS8Q=;
+        b=maFg3rz2SlbRluoIRGxievTyvsUN6hHKuh+Rb7rB4Z1S9/pGKPp/lBNFLg8qbw4gvE
+         MzaR6CA0nNVhxS/SPJBQXjxGwol1pLaZG9rbABe02NI7/9Fi8NSv0yAccbhUxI3oLbrv
+         iLqlmLsZQD5cY8/ZwVRmkpgGPzNClV4nz6fABYh3DwptwsScrVktVxin6Vi5lcMb1QID
+         yxTf9n+wXR905YhcWH3aYgMRThiMK/h0/pmezP4T+1D01v/HjnwTE1e6o11R9uKcOLhn
+         7oOW7llm9bjc+MsYdc0fbl/gfdYPF2QFrjvte8BFuMvYXvMh4JN/y9yPxdDfl5uLQJ2O
+         ovaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779464490; x=1780069290;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WYpGjrpcI/QWRW0u6cXWL87F6QxybhFOh1NZVYhUS8Q=;
+        b=mwlnf5rRde1eE4uL1Wa77DW7MNGhSVSl/1Bf7dIwXyiHADURLB58VD+itk5I7GlKHv
+         Z7WegVwdfgpc9zrfnihqgSF3cdQgFFP0Fmtebx8f77gpRemmxX6R3WA4a9lBRMuQYNHO
+         iL/xny+mBQsBu5M35uiLG+0SAOU4soSJFVkIFWLIvHFlBYs2iSgGbzItccFAOeffO4pN
+         iJSnUfcfYxYoAUj6k+nodbvfM+jheE89F5vIN0AN8vQAxwXgpPwhZngvM+OD7bP3KOf/
+         w944KopaNx4lZqFo75YUKDnOzw2Wll9WGsClPje/9cxmjc2uPZ0/fO7fC301In2725ey
+         Y4DQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8gWG9rQjcVrpnP6iarBtHs3ffB71C84KskYWK5O+3VZ3npEXPw45iOsRNu/23BAMl4YafvUTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxogkIigEQQJu/gYtIhKXk/tXgYnCgmn1Dgdjpe4oq8DQ6WDumy
+	6iZ6Fwg/GaN7CLxkQ6PP8o0El78FeHBQmlsMNdJxjiXODXwFRcvcHKN7
+X-Gm-Gg: Acq92OFiMj+tFYDsbSt1i7uNELwSNB0JHkV6fbxyipEHxwFdtNGEzbqtP5Js5CiEXAm
+	SIvBOmVfJb/cNeRILV8Ppr4uPOLROxzSIZUrVT9B2FF8vQtLBVf1UrC9KL5ScwuFmTo62hE9NAv
+	YZOwshLqf6p722b3L+eAUe6YI+3M9CcqzdugQZ7yMRXdk0ixgC93C/6z7YTObrcR9AnmCHVADlq
+	v8qutO6P5frrAzHJmZVRsK1oGv+xgLNnxGj3biHdmUSI6ISVwJulVnx1Knc2H5JQt9PQhlkqfTA
+	3KTGZM5SfN0WAoqbkSfhG+lxRRM7e2BXvDjUfwMiowRvfrVWMtlikIpwEMAd3zOryB5308FoJQU
+	SnepfoXnDE0jK21u2QhAmUkeHtfV7PceKV8cSWtzGNhJ4/sPnM7TDqFPo2/KZqbLc3cogAhMY0L
+	quFT2OX1Xl1q/hbVpJ3T267hYm2Y/W4Nf6NlLBwGgoEk67d0EQ
+X-Received: by 2002:a17:90b:3887:b0:369:7433:2fe with SMTP id 98e67ed59e1d1-36a676f5e4cmr4109664a91.6.1779464489866;
+        Fri, 22 May 2026 08:41:29 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a7212aa06sm1365450a91.3.2026.05.22.08.41.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 May 2026 08:41:29 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: Petr Machata <petrm@nvidia.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: List iterator used after loop in mlxsw_sp_fid_port_vid_list_add?
+Date: Fri, 22 May 2026 23:41:25 +0800
+Message-Id: <20260522154125.121895-1-maoyixie.tju@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	SUBJECT_ENDS_QUESTION(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290870-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,davemloft.net,redhat.com,google.com,lunn.ch,vger.kernel.org,linux.intel.com,resnulli.us,kernel.org,lwn.net,gmail.com,ziepe.ca];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D93E75B72AB
+	TAGGED_FROM(0.00)[bounces-290871-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,maoyixie.com:url,usenix.org:url]
+X-Rspamd-Queue-Id: E337A5B7389
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 22 May 2026 13:08:08 +0200 Alexander Lobakin wrote:
-> >> There are at least
-> >>
-> >> include/linux/mlx4, include/linux/mlx5 and include/linux/bnxt.
-> >>
-> >> Those are per-driver and not per-vendor, but intel ethernet has too many drivers 
-> >> to have separate folders for them.
-> >>
-> >> I just do not think this creates a precedent neccessarily.  
-> > 
-> > You just said the other ones are for specific drivers.  
-> 
-> Right, but according to your earlier suggestion they belong to
-> include/net, not include/linux.
-> 
-> My understanding is that they're under include/linux, not include/net as
-> mlx5 is not only about Ethernet, but also RDMA etc. The same applies to
-> Intel's headers.
-> 
-> What's your position after all this? Still include/net/intel? This
-> commit is about stopping scattering Intel headers all over include/linux
-> and set one place for them.
+Hi all,
 
-I strongly dislike the idea there are "intel" headers. Header files
-are not sorted by vendors. That gives off way too much "Intel's corner
-of the kernel" vibe. "net+Intel" is fine, but Intel by itself is too
-broad.
+I came across what looks like an iterator used after the loop
+ends in drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
+(linux-7.1-rc1), in mlxsw_sp_fid_port_vid_list_add(). I would
+appreciate your input on whether this is worth fixing or whether
+I am misreading the pattern.
 
-So IDK. include/net/intel is fine. So is the current layout. Or stick 
-to driver / module by module like other vendors.
+  list_for_each_entry(tmp_port_vid, &fid->port_vid_list, list) {
+      if (tmp_port_vid->local_port > local_port)
+          break;
+  }
 
-> >> Folder structure is for you to decide as a maintainer, but it would be nice to 
-> >> have known about such doubts earlier.  
-> > 
-> > I'd love to know if you any suggestions for improving the process.
-> > Otherwise please keep your venting off list.  
-> 
-> I think Larysa just wanted to say that you disliked this commit after
-> the series went through several iterations on IWL and 3 iterations here,
-> nothing more. It's not about the overall process.
+  list_add_tail(&port_vid->list, &tmp_port_vid->list);
 
-Intel has a strongly negative reviewer score right now.
-IMHO it's not appropriate for y'all to complain about upstream
-reviews, or how long it takes to get your patches merged...
+When the loop walks the whole list without break (the new
+local_port is larger than every existing one), `tmp_port_vid`
+walks past the end of the list and `&tmp_port_vid->list` aliases
+the list head via container_of() offset cancellation, so
+list_add_tail() resolves to inserting at the tail. That is the
+intended behaviour for the case where the loop falls through.
+The dereference of the iterator after the loop ends is the part
+I am unsure about. Same shape as the Koschel cleanups from 2022
+(99d8ae4ec8a tracing, 2966a9918df clockevents, dc1acd5c946 dlm,
+and others) and the "controlled container confusion" pattern
+described in [1].
+
+I drafted a candidate fix that initialises an explicit
+`insert_before` pointer to &fid->port_vid_list (the list head)
+and overwrites it to &tmp_port_vid->list only on early break,
+then passes insert_before to list_add_tail(). The iterator is
+no longer dereferenced after the loop and the diff is 5+/2-.
+
+I built spectrum_fid.o on x86_64 with MLXSW_CORE + MLXSW_PCI +
+MLXSW_SPECTRUM + NET_SWITCHDEV + VLAN_8021Q at W=1 and the
+object compiles clean with no warnings. I also ran a small
+userspace mock of the two versions across seven scenarios:
+empty list, single entry with the new local_port above, below,
+and equal to the existing one, and multi-entry insertion at
+head, middle, and tail (fall through). The final list ordering
+matches in every case.
+
+Does this look like something worth a [PATCH]? Happy to send
+one if so, or to drop it if the shape here is fine.
+
+Thanks,
+Maoyi
+https://maoyixie.com/
+
+[1] Jakob Koschel et al., "UNCONTAINED: Uncovering Container
+    Confusion in the Linux Kernel", USENIX Security 2023.
+    https://www.usenix.org/conference/usenixsecurity23/presentation/koschel
 
