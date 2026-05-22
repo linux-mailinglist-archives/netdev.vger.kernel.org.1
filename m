@@ -1,95 +1,56 @@
-Return-Path: <netdev+bounces-290750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WNRCHQ4lEGoYUQYAu9opvQ
-	(envelope-from <netdev+bounces-290750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:42:38 +0200
+	id EKCZM44mEGpQUQYAu9opvQ
+	(envelope-from <netdev+bounces-290751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:49:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8DA35B162F
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:42:37 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C87725B1722
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 11:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 07919304B89A
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:39:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 70249300A661
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B3E3A7F78;
-	Fri, 22 May 2026 09:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXiy0TE6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7513C3BF4;
+	Fri, 22 May 2026 09:42:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6373BED7D
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 09:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8E73BAD95
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 09:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779442754; cv=none; b=ia5SuIbZCNdl5/Dnx7hKdr07CrSduNWtkKusF3lTzYjDqzWil+/h8HynGZSC9bFd1jkCClPkhgbE1tJCOPbx5mRzXdyiIWsDkP2504c2I/0rxMtteZvsbHACpBCY8Hp6+0cbpUlD/MuA+mCtiYklHCZeMTok2ZGZbDhQuhNY2ho=
+	t=1779442966; cv=none; b=hyCjIMGeN/oTMyEH7Bn+PPHWeJ+Jtz6g3TcaaA5EA81OOssWy46pwj3AiNdUcnICBXhgfZpqcTxk9TSRDiRqU+NbXRXbKB0bY5GGB2v4ruLQ926BblsUoT9+dCMJBhniPpOeFynMAGQ9jyowIUlbpdHNJofxbh2P2aDEqx2yF+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779442754; c=relaxed/simple;
-	bh=5QGYs42lyFwntdmixcH6+eNnje4QIYhJJDtxvLMqdSs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fIjFJWHuJXp2v+5JR5uS7z8qfnXKGZr3Vwd8CFEaoq2Ow08+1tZMJVgb6eCRwnNB0FHV2J2j95ualSScUM0GwaHhv2d6D5mpSp1jxcISGTd3ayuJY/rdbSKn6o/yYbCH7S1T3Z6h658IUm/6uhDleP19s6IiqmrPt9oL9Y1nH/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXiy0TE6; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-367c26471f5so4522030a91.1
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 02:39:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779442752; x=1780047552; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nGjuCeQt6QetUshdYR+q3g5AvWut7tP0yHLeANA3bjE=;
-        b=QXiy0TE67UlIjrhao50ZCpavmQg8gGr2y7XcZq53YHdixWhw9hbgv/Jp2kZxmQpgYV
-         lH/TNEIw9vkie+W3rSFhQs4b9iQMopa5Kg9P7K8l9b3TG8MGzTg75i2P3SkCXxB+Wzv/
-         vN8dfgXygaZ34adpnlm4KA05m/yTnUkts12ymNWgUYgsxFNMTHnkFLjQLDPT42lyMdSs
-         sAQILWkOxE2iSEFh7p5Csy9+2GaGSMVnz22Y6I/ylj+n2LQyrHou705IKjVPmCJ2mTM1
-         qXEa2xx2MquTtEzpfURpfBLYQWKyuyd6MkiJZooMyEKTxMwxKaxV63+dWHiusWwSfdyV
-         /Eeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779442752; x=1780047552;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nGjuCeQt6QetUshdYR+q3g5AvWut7tP0yHLeANA3bjE=;
-        b=IG5iKNTd+RlL5dwkCtX+QJadIsFU5i+zNRR3Tm3zWVx48eOCKHVJYvjsLcCWaP9Hix
-         zYy9LOfY6vlz91ipVMS8wuLLjAY9OqDhYq2L3QM7d+SFFQATXnZYc8u/cYKzpP9Gn1pB
-         M86oIjik5S80cmMnjTdOq6/7WgZu0QA4kCY3bwpINrefgdA8tpu7JCTtDMotCuvvGsgt
-         RxFNumMKq02oS3brfYbVBN322DGxwLH/MGXO5Vc3ogC61LsI5WZqnL33txreEhVzgF1V
-         gWLI4sg8dxM7M4dPU8K5+iDFP5eJDPhsvAUE0LvzXcUDElp9ePzPqpcLYjcMbVzEO8KN
-         AUFw==
-X-Forwarded-Encrypted: i=1; AFNElJ993FRptLkw/wQois6tdTR9i+JeVqGjicGb7oMgRLz4x7Fq0BM26SYqJNDlfFKbD1iug0zRBtQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywne08r1oCwjR+mSZ0igoDu/EX0l2NjpAs8ytHda1LcXwnIAa9V
-	/AxctXj0TF5lc2HMDnrV9A19w6YFpB37hJZchP4Ble1SwMhoSZ8bIEK5
-X-Gm-Gg: Acq92OFPeKpchzDqc4911TiFnxl3tx5pB9wIqCx4PUInL40QjuigZE3ZrkrgLTUeHe2
-	THwTeXDiQY+c454OAhq+DLCK9Fus5ZS5EKZHNcLYNK0GgPBDdb9aS2uRV2bM14xBkpQ/OUamw65
-	qvdGdUwSCqQDHftMueAn0ykI0FJFqJTHAofC1JvVaEI8Yolk94GXBciWoKzKusEzAmy4Hm45EV+
-	Y8oNi0+tqyklaqJfAxHPQQNYHdiVxASP6YxGIQYRM9qJvnoAmCrUQtYKl/3KeOy9Q5/a/9zB1Id
-	8toNenxVM8k436xKu86yFSPr8NkuR/9Obg5vkZZbVmRtCV5Lgew9qXE5j3PSCbEXSFd9v7kzPVj
-	KFnwIKmrckKb7yVotWTKWTakhK678BswLYJoeZavxoYhTaCVWdqLp9s9b+BGhLPvXHgTU9MUVLb
-	8zyjBgH3d9hn+rsdLujdhiP4lzLYYGWZRWxjYkeNoufN9X81o6Vfay
-X-Received: by 2002:a17:90b:4e84:b0:368:a297:bd3d with SMTP id 98e67ed59e1d1-36a676f0614mr3005668a91.3.1779442751819;
-        Fri, 22 May 2026 02:39:11 -0700 (PDT)
-Received: from m-upc-A520M-HDV.flets-east.jp ([2400:2410:3f60:500:24b2:bbd8:eef:e038])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a6ec5a287sm871668a91.0.2026.05.22.02.39.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 May 2026 02:39:11 -0700 (PDT)
-From: Yuyang Huang <sigefriedhyy@gmail.com>
-To: Yuyang Huang <sigefriedhyy@gmail.com>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2] ipv4: igmp: annotate data-races around im->users
-Date: Fri, 22 May 2026 18:39:06 +0900
-Message-ID: <20260522093906.39764-1-sigefriedhyy@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1779442966; c=relaxed/simple;
+	bh=1Zc506SkdHZdBVJk9N1s254WhNZcNiLvcITfMcmTimQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Dte1U9rQwtDjXWRXiTNqOrs1OZyfORRXqkCXGFsh94NcfAvvAE/XxaM9iT5McWiVOTMXn1D4dwSU/FHpZL8nzDDBzQmm1rOVc6U0iVHhoujNFMl21oaGKliBtjlGdwtuRpvzM/wYKLHlAcdPX7iTpvb2l45a5qAXYynqi3Qfp+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
+	by app2 (Coremail) with SMTP id zQmowABnAwsHJRBqLc4KAA--.15341S3;
+	Fri, 22 May 2026 17:42:34 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: dsahern@kernel.org,
+	idosch@nvidia.com,
+	yoshfuji@linux-ipv6.org,
+	nakam@linux-ipv6.org,
+	davem@davemloft.net,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	tr0jan@lzu.edu.cn,
+	zcliangcn@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] ipv6: exthdrs: refresh nh after handling HAO option
+Date: Fri, 22 May 2026 17:42:26 +0800
+Message-ID: <7aba1debc2196189172499e5769802b026f8caf8.1779247873.git.zcliangcn@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1779247873.git.zcliangcn@gmail.com>
+References: <cover.1779247873.git.zcliangcn@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,98 +58,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-CM-TRANSID:zQmowABnAwsHJRBqLc4KAA--.15341S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr13uw4ftF4DZFy5trWxXrb_yoW8GrW8p3
+	y3GryfKrZrGr48Kw1kAFyfWrZ8JFs8GFy7WFs8Aw4q9rn5Wr48Ja48Kr42gF15C3yxCayF
+	vFn0vFZ8GFZ8ZrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r10
+	6r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU13ku3UUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQwPCWoP8-AEcQAAsY
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_FROM(0.00)[bounces-290750-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sigefriedhyy@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.998];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,linux-ipv6.org,davemloft.net,gmail.com,lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290751-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E8DA35B162F
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email]
+X-Rspamd-Queue-Id: C87725B1722
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-/proc/net/igmp walks IPv4 multicast memberships under RCU and
-prints im->users without holding RTNL, while multicast join and leave
-paths update the field while holding RTNL. Annotate this intentional
-lockless snapshot with READ_ONCE() and the matching writers with
-WRITE_ONCE().
+From: Zhengchuan Liang <zcliangcn@gmail.com>
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
+ip6_parse_tlv() caches skb_network_header(skb) in nh while walking
+IPv6 TLVs.
+
+ipv6_dest_hao() may call pskb_expand_head() for a cloned skb, which can
+move the skb head and invalidate the cached network header pointer.
+Refresh nh after ipv6_dest_hao() returns so any trailing padding or TLVs
+are parsed from the current skb head.
+
+This matches the existing pattern used in ip6_parse_tlv() after helpers
+that can modify skb header storage.
+
+Fixes: a831f5bbc89a ("[IPV6] MIP6: Add inbound interface of home address option.")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Co-developed-by: Luxing Yin <tr0jan@lzu.edu.cn>
+Signed-off-by: Luxing Yin <tr0jan@lzu.edu.cn>
+Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+Assisted-by: Codex:gpt-5.4
 ---
-Changes in v2:
-  - Added Fixes: tag
+ net/ipv6/exthdrs.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
- net/ipv4/igmp.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-index 27d120183779..f2aca659b29c 100644
---- a/net/ipv4/igmp.c
-+++ b/net/ipv4/igmp.c
-@@ -1541,7 +1541,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
- 	}
- 
- 	if  (im) {
--		im->users++;
-+		WRITE_ONCE(im->users, im->users + 1);
- 		ip_mc_add_src(in_dev, &addr, mode, 0, NULL, 0);
- 		goto out;
- 	}
-@@ -1550,7 +1550,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
- 	if (!im)
- 		goto out;
- 
--	im->users = 1;
-+	WRITE_ONCE(im->users, 1);
- 	im->interface = in_dev;
- 	in_dev_hold(in_dev);
- 	im->multiaddr = addr;
-@@ -1784,7 +1784,10 @@ void __ip_mc_dec_group(struct in_device *in_dev, __be32 addr, gfp_t gfp)
- 	     (i = rtnl_dereference(*ip)) != NULL;
- 	     ip = &i->next_rcu) {
- 		if (i->multiaddr == addr) {
--			if (--i->users == 0) {
-+			int new_users = i->users - 1;
+diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+index 47c5502a34a2..751e07392aae 100644
+--- a/net/ipv6/exthdrs.c
++++ b/net/ipv6/exthdrs.c
+@@ -201,6 +201,8 @@ static bool ip6_parse_tlv(bool hopbyhop,
+ 				case IPV6_TLV_HAO:
+ 					if (!ipv6_dest_hao(skb, off))
+ 						return false;
 +
-+			WRITE_ONCE(i->users, new_users);
-+			if (new_users == 0) {
- 				ip_mc_hash_remove(in_dev, i);
- 				*ip = i->next_rcu;
- 				in_dev->mc_count--;
-@@ -2977,7 +2980,7 @@ static int igmp_mc_seq_show(struct seq_file *seq, void *v)
- 		delta = im->timer.expires - jiffies;
- 		seq_printf(seq,
- 			   "\t\t\t\t%08X %5d %d:%08lX\t\t%d\n",
--			   im->multiaddr, im->users,
-+			   im->multiaddr, READ_ONCE(im->users),
- 			   im->tm_running,
- 			   im->tm_running ? jiffies_delta_to_clock_t(delta) : 0,
- 			   im->reporter);
++					nh = skb_network_header(skb);
+ 					break;
+ #endif
+ 				default:
 -- 
-2.43.0
+2.47.3
 
 
