@@ -1,194 +1,170 @@
-Return-Path: <netdev+bounces-290900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290901-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QDSZGuWVEGqBZwYAu9opvQ
-	(envelope-from <netdev+bounces-290900-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:44:05 +0200
+	id KLQ+A+SXEGpTaAYAu9opvQ
+	(envelope-from <netdev+bounces-290901-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:52:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D534F5B8747
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:44:04 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6545B8941
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:52:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 81B72309C7EA
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:30:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E2500306AD32
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3C5366560;
-	Fri, 22 May 2026 17:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CC033ADA9;
+	Fri, 22 May 2026 17:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h+rUo6yn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dd6PW8sm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C8E3644C1
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 17:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D68026D4C3
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 17:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779471015; cv=none; b=ChC4GqxVa3cTh9sDhwutdSGw4OMNWCJrrvj0GcP65gOHumBn1ITj7pxLxyrOyhJ7D5Z6CXJMtnYpU+0NUAzW/oNyFURLo8Jg+67qudim/DgWhrBr6kCXCG6BwcIH9vmqpIpN2kZEv9GpCuOTtKslCkgCMi3rNFgdcnHCyAYmiJ0=
+	t=1779471732; cv=none; b=Q7K0bbtX9Vluej6onMLUuReCCXsTBoFQEqxglvYpF8YbWMJ+opqdpvTL6C8Kl8Kj3LygulPmodMvjIPV6eeC4W//1fyS3euulhE0WRA3ulMooNoMfnktCRNoLDqzb3491OAvZYRBuUXrdAETynbykFEnJYc1aYX1MH8ddGEbORo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779471015; c=relaxed/simple;
-	bh=gUWxxZtnOL+o2PDS6FjvoFzYc9lSlREbNCTzDrL1p8U=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VlWLmCTgwHKW/1o3a23nKFtxd8Lr5rsAAPi4sVPZQbC9TP/8uFKR/xuOXPB8huQEzUy38lJU9Bv8mGDJKvApkVN3Rn0TyNO0FLYF2noTA3vWdlDodBWdCRMNtEGTCIQahTaOaYo+Uah8pR3sxDcZHnSiV6YxEETkF0i9pvp3haI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h+rUo6yn; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8c3bdb60dadso83469406d6.1
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:30:13 -0700 (PDT)
+	s=arc-20240116; t=1779471732; c=relaxed/simple;
+	bh=u6wtHNhFTRqLLr1t9S+Eiq5E9hnMWjG6K0GkuLdPLsk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QIQ4mx9Epk2iDzB7WvdUOgrL8NaDoIQmzqWXNHGAJgta9cclyHbMa651clY1TRMtihS2YucOUXNxyDvrITIHvdPrA6O5BONJP8zGAt/3Ze1C33fufh/ixd44A7gS3erq1Z5SW9kO9ez/8ozwdXmEAymVRa3fyg88lQuDseCmAsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dd6PW8sm; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-479ef2b7979so6147312b6e.3
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:42:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779471013; x=1780075813; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ez59jbxLWEDb4JbB3+cibH4bU1bZop/VeuMqn4Rqju4=;
-        b=h+rUo6ynYD4Yhs+0h9CgiFBvNy44R4EbPQ6Jh2dMeZNiyl1X1NvIBt9XEZLgUeE4Vc
-         Z/qhmIqnkp49QLFXm7R96oBCzg2ntKVNbXd7m5R0uZY8bvixB284hsxprlp2UAM9XJPz
-         AWu/6I0yX79aygVuLg3Ymo4Xe0HKdCD+/kAxXJsb3d0Ncj6smYw+RErVNNv6lLhYumst
-         iO7DrHXENi2Bc47GZKm8kGtQ+gu1/K4HdDc6R6VvHWkj6P0YymRvoBlRp1wecagYN9yK
-         OnzvW983ZHBHyXvEJs5Ke8xL1GCw4U9xWhX4hgvP6Dl7sWeWFLjCiMjKNlIdXpjpa2Xr
-         n8RQ==
+        d=gmail.com; s=20251104; t=1779471730; x=1780076530; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZeXxrM0kZa3YPA9Ohf3mdyVm4nVnxBbJRk8LRmf+jog=;
+        b=dd6PW8smL5IjYtVs+lb9Cz3uI0KZCb3nHyBlecVt9agzssAkcAA83B0DVTBskHh/7t
+         TEwqlbTGm7Hd4qFWt6mymafX83VBbqjGLpr+L+2+RDQaN/SBDwJMkEupgSyEX0KRoiFh
+         oxoHfcf6ymyW4jmiV/S4eO5Xj1BgNOQ1xVZK3jXOjUIO3rrOhHClOjvKERXGclDPTasa
+         YPmkvSmBiI29gxjOoc1oSr8GXudWW9FvnhUbBeQCBlVgTJQWHw7N7+hQQY0ys1wf1VDa
+         OZYyQyoRxCQSYxdfV0hMqbYfg6LHaHg8rqhfUVeHOzFJEz6PD4gK/kJoEcoYcYUNqQzV
+         otGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779471013; x=1780075813;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ez59jbxLWEDb4JbB3+cibH4bU1bZop/VeuMqn4Rqju4=;
-        b=J/4Pw1Uh8ZV4php+EsLBzU2MiMd+aPn5joPCx4jDf29J3yqP40BaWhwNh61Vf/xS4y
-         bvG5hDJa4129HcIgEIpV2kEobHJGbHaqpOM6tmDkQAx6+jeiNed4q1QZ/j2Wxj+9K8Ic
-         SntEQjcqVQveWxgeOleBQx+B1J/bYf+71/75rPfciS4see7ezuwKb6QYZsS1uDjxDajK
-         mVAaMAB6YaBCiyr6KO44v0HJUM34yc5zjkwhqtfqNg27U7zRJsvnJtNdNgnzjMtw+kpC
-         R028K8o2grbvu/soyqYDfe0qiYENHSHzc6mqfk2OUuTwFDf725eggJRQR0dSbQOHBV3n
-         UbIw==
-X-Forwarded-Encrypted: i=1; AFNElJ8CUUEk2Lut5M/yI95cgRVXIQriB3F42GYMgrDRQpNoogECoi5vbblvndREJtDuPsc7HK0epC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLHKCjXCUzMKUEJqS/6eMCVXDqULBPpPp0AcHOQmC630NJT51h
-	KhSFT43D2QLOIER6m/HyjMIquYZyn4NAs0ZdqlS7uJlY02TFfmXvFHGkjgWlJ+TTnDP1NtVz+Fx
-	nQh4xR6OdrACATA==
-X-Received: from qtwu4.prod.google.com ([2002:a05:622a:104:b0:516:cb75:f20f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:8588:b0:50f:de06:45e2 with SMTP id d75a77b69052e-516d436f402mr52670431cf.31.1779471012421;
- Fri, 22 May 2026 10:30:12 -0700 (PDT)
-Date: Fri, 22 May 2026 17:30:02 +0000
-In-Reply-To: <20260522173002.2181677-1-edumazet@google.com>
+        d=1e100.net; s=20251104; t=1779471730; x=1780076530;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZeXxrM0kZa3YPA9Ohf3mdyVm4nVnxBbJRk8LRmf+jog=;
+        b=M+KqWqALMiaZcx4yUNQvW9v8wk03vK4X4MblKngo8uOttz3Md/qwsGXzEovxxwa7Xl
+         4dJQ8R+dIBBTDsa/N2enJaDeamW/4hpZK8EBLaAwzH5iOkIK3VkHbvt2/XqJZsOrrJHk
+         Mn5wiAbTfhQEjBiF6SmHiECtMC9IjoyzCCRL4Qs9mpAuMDQo0crCkvcqmtupC+nag/gW
+         2/URavIjNq9LhIpugPuEvBsMMa+lG48LnrKYqHtfORNAlpJmhaquHezn9CmdLcdwWysV
+         hXvPGv1XboBIE4b8rqkyjKVPB8utYhg6GjxHSSIH++BNuYtn9wIusjueLd5i4Kl4CJF/
+         H8/Q==
+X-Gm-Message-State: AOJu0YwfAxFdlcv9kS2o2+V2aLWyYU9WXFwW4HXxC8tMfluWuxRwEn1l
+	2ekorN1eliViJB/VBAAEbOMDhDX4M/XW8ui8GBNTOmjuHzxZZ+c+t7nm/VEivvdM
+X-Gm-Gg: Acq92OFfWO0X/iz4U4m+R8JPdvnvCSjd13gvsZYtKtqotLsCjK+b0Zw4Fexz4iNjj+J
+	F5M7is8eHHDCOKonXDujJ8ugIZGjqm5ZYDGGUbCvTcPqawZFHrY70+asdR+dM6flSbCFkZlSuZF
+	9nSuDiNgm1PIgA50UdseMH2NarwyNcoeAuyREDVWVBIr6BMhN6mglFKWDD4Lp32kdoTThKIzPjP
+	56uI0YEv5NkSwUi5DshMa8XlfZyu6RJKgxu4dJYuWevWa56dyfOQ3IqBGk+mzREs1Vne+Be7aQf
+	mhJ+A4MwIanB0KiamF9tito73hQEiPB69V5quyxbrka5l+qv/B/4fT/N+9RuVhXmw+U+R3Z9uve
+	5blWPa3JoElObSSWCLE2oyVVN45TuMtUYrWh9rzAC098q1EbaIs/rg/z+K5ckIrvjaaeNgVictG
+	6XarS454PlgqRyrVU=
+X-Received: by 2002:a05:6808:158a:b0:485:467f:a324 with SMTP id 5614622812f47-4854a47ed15mr2619039b6e.34.1779471729811;
+        Fri, 22 May 2026 10:42:09 -0700 (PDT)
+Received: from houminxi ([72.244.37.221])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b635d26b5sm2287249fac.6.2026.05.22.10.42.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 May 2026 10:42:09 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: donald.hunter@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	aconole@redhat.com,
+	linux-kernel@vger.kernel.org,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next v5 0/2] Add OVS packet family YNL spec and unicast notification support
+Date: Sat, 23 May 2026 01:41:52 +0800
+Message-ID: <20260522174154.720293-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260522173002.2181677-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260522173002.2181677-6-edumazet@google.com>
-Subject: [PATCH v4 net-next 5/5] rtnetlink: add RTEXT_FILTER_NAME_ONLY support
- to rtnl_dump_ifinfo()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290900-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-290901-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.936];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D534F5B8747
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 7E6545B8941
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When user requests RTEXT_FILTER_NAME_ONLY flag, we limit the dump
-parts to:
+This series adds a YAML netlink spec for the OVS_PACKET_FAMILY genetlink
+family and a bind-only ntf_bind() helper for receiving unicast
+notifications.
 
- - struct nlmsghdr
- - IFLA_IFNAME
- - IFLA_PROP_LIST (alternate names)
+Changes in v5:
+- rebase on net-next to resolve conflict with Ilya Maximets'
+  ntf_listen_all_nsid() (requested by Jakub Kicinski)
 
-- This saves space in the dump, pushing more devices per system call.
-- This can be done without acquiring RTNL.
+Changes in v4:
+- patch 2: rename ntf_listen() to ntf_bind(addr=(0, 0)); the name
+  listen() was misleading since the operation is a bind(), and the
+  address is now an explicit argument defaulting to (0, 0)
+  (suggested by Jakub Kicinski)
 
-I still have a long term goal to avoid RTNL in rtnl_dump_ifinfo()
-regardless of RTEXT_FILTER_NAME_ONLY being used.
+Changes in v3:
+- patch 1: add missing document start "---" after SPDX comment
+  (yamllint warning in v2)
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/rtnetlink.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+Changes in v2:
+- patch 1: use YAML anchor (&event-attrs / *event-attrs) to avoid
+  repeating the same attribute list for miss and action events
+  (suggested by Donald Hunter)
+- patch 1: fix enum-name from ovs-packet-attrs to ovs-packet-attr
+  to match the kernel enum name ovs_packet_attr
+- patch 2: add ntf_bind() to the YnlFamily docstring under the
+  "Notification API" heading (suggested by Donald Hunter)
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index bad036ef7614ffae52a65c447344ac1314f5521b..9045285ba2f8be8d7ff32e4f90ee546651f1a05f 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2499,6 +2499,7 @@ static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
- 	int ops_srcu_index;
- 	int master_idx = 0;
- 	int netnsid = -1;
-+	bool need_rtnl;
- 	int err, i;
- 
- 	err = rtnl_valid_dump_ifinfo_req(nlh, cb->strict_check, tb, extack);
-@@ -2548,6 +2549,12 @@ static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
- 
- walk_entries:
- 	err = 0;
-+	need_rtnl = !(ext_filter_mask & RTEXT_FILTER_NAME_ONLY);
-+	if (need_rtnl)
-+		rtnl_lock();
-+	else
-+		rcu_read_lock();
-+
- 	for_each_netdev_dump(tgt_net, dev, ctx->ifindex) {
- 		if (link_dump_filtered(dev, master_idx, kind_ops))
- 			continue;
-@@ -2559,11 +2566,13 @@ static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
- 		if (err < 0)
- 			break;
- 	}
--
--
--	cb->seq = tgt_net->dev_base_seq;
-+	cb->seq = READ_ONCE(tgt_net->dev_base_seq);
- 	nl_dump_check_consistent(cb, nlmsg_hdr(skb));
- 
-+	if (need_rtnl)
-+		rtnl_unlock();
-+	else
-+		rcu_read_unlock();
- out:
- 
- 	if (kind_ops)
-@@ -7159,7 +7168,9 @@ static const struct rtnl_msg_handler rtnetlink_rtnl_msg_handlers[] __initconst =
- 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETLINK, .doit = rtnl_getlink,
- 	 .dumpit = rtnl_dump_ifinfo,
--	 .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE | RTNL_FLAG_DOIT_UNLOCKED},
-+	 .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE |
-+		  RTNL_FLAG_DOIT_UNLOCKED |
-+		  RTNL_FLAG_DUMP_UNLOCKED},
- 	{.msgtype = RTM_SETLINK, .doit = rtnl_setlink,
- 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETADDR, .dumpit = rtnl_dump_all},
+Minxi Hou (2):
+  netlink: specs: add OVS packet family specification
+  tools: ynl: add unicast notification receive support
+
+ Documentation/netlink/specs/ovs_packet.yaml | 130 ++++++++++++++++++++
+ tools/net/ynl/pyynl/lib/ynl.py              |   5 +
+ 2 files changed, 135 insertions(+)
+ create mode 100644 Documentation/netlink/specs/ovs_packet.yaml
+
 -- 
-2.54.0.746.g67dd491aae-goog
+2.54.0
 
 
