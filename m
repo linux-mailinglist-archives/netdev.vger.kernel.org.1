@@ -1,485 +1,435 @@
-Return-Path: <netdev+bounces-290728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290727-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMOTD1IaEGoITgYAu9opvQ
-	(envelope-from <netdev+bounces-290728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:56:50 +0200
+	id KJcuA0kaEGoITgYAu9opvQ
+	(envelope-from <netdev+bounces-290727-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:56:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C09085B0C7D
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:56:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FB5E5B0C76
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 10:56:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 37DBD3017037
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 08:56:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C69EC300DE25
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 08:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CB93ACF00;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777963A6F15;
 	Fri, 22 May 2026 08:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NX34oLgK"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n/UDjgqG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8245C33D6FC
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 08:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779440193; cv=pass; b=Fmj4P7CLFEyLDdrm/CinKZugxlOfPkse5IRHA2wZ+6p8gsK3lYCwFr6D0JSUgzscVTGv4CNcXGBChsGsMsHi4+hT8EN9imhDBbfYNr5vmoD11HNAEvickGvoJRs4hHP7bYDmH0unbITRkqjUwfAAQv66PEy+wO7uOXMefuq0wyo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C7921CFEF;
+	Fri, 22 May 2026 08:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779440193; cv=none; b=e97tg5mAj+KyV8PjWwTzIY7j43wbJbVqAhv4uerxFxBUZgcIOCHKQtt7V4Kiuc9t0dKHTj/9jHWcxBMHTTw0d7o9NgvsWYvNHBSr/gGTxlJcLJe960TSSDeDIeEXyCd52p95IpEk5SWmlScbF9WREiLYj8Jut0vPgmxcFYXDOuY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779440193; c=relaxed/simple;
-	bh=4rrMUbEJIIgM9povErBphB6bszN6Fu8IR043oLR2Pro=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A72MD6DKM0c0xTHQpLYgtlEdI5wYzvuDnTyVGhtRr5IcpZiafzpAEy+l7pZeXIkQupMjcfCzX2Bc+MleLfK3J9CVAWTFVm0LiOKoCCnFWWgk8CGHRGPIPjdYLHopk0umZnVuyaav9twAaP59OkWEYT27SbwDZg2YKhAfzur2mkg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NX34oLgK; arc=pass smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5a74ac8b40aso7436760e87.1
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 01:56:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779440190; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jcIsqvZYFvDj1eAOjR6UNkWCd2hyXmunM9iHwWpg6+eTZVUZj3nqXU8d8OEpM4Q53s
-         RLo5iP6VmzCsrtcPoqFA8DB3Aozvtwm55nKPebvs5HIwUflsZ2Vfol64cYnXXgNafZGN
-         vwZQfDzfoeOA2aDBnq6/dJ60saJrMg0lCw59Qz90QmGTyI2cklUCoDurXWtAltCbsY4A
-         gaEw2oKNjI2q5f7weuZqIb99xz2wt+myfHy97EWZamljV38mQzdHnKRtHhE8wkKATyTk
-         TDZfs5AL39ggHr4lRsnABIs6ziM7YSqsnHFtUHKrykwWSLJS27Ye32U2Vy/EIvIbAjQ/
-         mGDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=yaFACCq8ZE1W2u6S3A9eiVCMv+PJt7R0BZzbYwKupQ0=;
-        fh=3Yr6D+5hRjcjqqD+TUeMMQyF9fQz7xBepeJB5RZsay0=;
-        b=UYOtHgu//Hh2RNN6au1oza9igvTFVbUB1/idxrYwiH5gOLhTC0Id60zzfKWLIzsxcK
-         BP5P08ut7VYLwb3GuC8+ANL9OBsBgMmSIh8fNCiS47tJYy0LI1Y4glFFdvmcuBLoxw9X
-         fBuKXiSaVlmV1j6Uuu9NgCOMblS6XrvDJpUkzFe/zQ4x9sGDbVJIaUfzbzaX0orM70eU
-         Q09q5Ylgj/JQ7p6XCwz1bd3X4h2KyvIHnu23kXoPsZmEa52gdbc5Ghr9h/Koiq6XgsMp
-         urTmUQewQl/oWaZwKq1hdywFoDG/yknN02iFaUSJr476MkrvrAY2EZCFoBOyJucA7Mf4
-         aHEQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779440190; x=1780044990; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yaFACCq8ZE1W2u6S3A9eiVCMv+PJt7R0BZzbYwKupQ0=;
-        b=NX34oLgKjprIH4I4VA0PZ7xAibN9XNPkVV2lq4SUn4BbV5zlKPYweCCnchvEYmug/v
-         Y/MwlDRGbNODArWGBP4OUjVCKqol3WeJasVol7rifdNG3FhBio+//E02yheOAtlBt+nI
-         RS4UQfU/sr6jM32fofx3+pLLGV1aDFgtCfRCX+mOvVFCc33e3drPpVg4V59nUgOB7wCC
-         P/gi40SEA7WbMhIZBoRz1tbeypeEPXNve3fEz1eAeEOsC89Uv5/XuNwTw5MKuUnl+oyG
-         pwOQuMuFn6yYBQ2Dbzj1n9e5DkWXtKQDu1V9QtBsQnFjs9/eUovayhei4CSazQsVZpwo
-         tNPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779440190; x=1780044990;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yaFACCq8ZE1W2u6S3A9eiVCMv+PJt7R0BZzbYwKupQ0=;
-        b=EO2L27gP4G7jUt/xe3CO5BMZ8QOhzEkq9hh+lw3Mm4un5217PnFz+pX4iZFyzYZmgg
-         YkP3p49KzSY1hfbLU+YJYx9RVME41869KUgjlmJa3WfsrHcy1Px1VpSte8d6wfergmj6
-         OpM1TiihigxSBRiUaWpxlIvrfTongc06nosZy2hVC0OPeVijr2w9Ueh0IdG9bbxbfh9y
-         i8s7WXfuj2sj3F2OWhsXTPldQCaDS3FxjePPbU3uAIM0sWDKKdshI0kOCihXBUCGGQQa
-         l4gkKJupZMDaUcZzUBTdXTQ5+jorxWfzhgkT48FLNOiBgbQ/D5IcqJ778GSkAVOyxBxo
-         Mz2Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/hIiA9bpgIhI2p4VqGx1FBCUNvQwgAgpvIoG2v5dBojsIGzzx65LXWgpsl8lHrCjrmNFrsfb4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyprFZ9YqD/iL/O2Lcox+67hlCPa9HB/Z98QTm1yfO5DDHISC5E
-	bS0QLxf6yvbN+RINycMaT34vSEJ2/899R043ohidd2t1eAFutnGn2piT/RVx69LbAolhKEUUdtl
-	ijE1Vbcp5avSQ7ycsOGFeYbHzSJkfcKU=
-X-Gm-Gg: Acq92OGjaXgiAyVDwpLh8G4FQ+DtowEWreS3lBlrheUM/WHo6Kfnupiqc4/UgzFCo1T
-	ymOPagIpxy5QVod3EMADutxd/xpWmwm5BCsKUMgt5R8HtQlVvg7rNkUdX1Op3iW4Vt+4UmsMuit
-	QP7pyIVQYknFn7VabpFKNuSyFvGUxMgKY5ck5ZF3TxnBOC7W3bYQsVD9Bhf2yAsQ24VUHPGUHkT
-	LPguiHCdSLkExSuvax6vNg+tPLec8Q8FGx5V5CUotVs3OGJXmAnTawGnLA54+CK1Q+EixZ0XMLr
-	nZ/i1uzmGhRMqW/jHp2XA7Gr/F8n5qBF081OUCtSq597rBpmr1Y6xh3EJJYxZw==
-X-Received: by 2002:a05:6512:230d:b0:5a4:6f5:6c2d with SMTP id
- 2adb3069b0e04-5aa323b28d0mr931877e87.31.1779440189321; Fri, 22 May 2026
- 01:56:29 -0700 (PDT)
+	bh=iMdtUTSphcxgR5mPLnjkJdlXKt10gYyydi0/6WuYMRc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fcvY8iQnNzfqA/wqkvPQtr2u6O3cP7C0MCVM+Xd/offorbW/40SRuUGWfGiusdNYjwkQXSCciauzdMk5icbZOIw9tfHtVA32UtdPd+38cPYq9kNALSV4t71wIY8M55r1SlbzyMOY+xWwPInkrPE/d067zcxDlOMDD9cwKK2YlHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=n/UDjgqG; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=fGTXx8zDgCTxno519hVyftj+I8teyWEZh+n6fhFE/d4=; b=n/UDjgqGoLxObQKWirnW3pbpNZ
+	Y7+BZJ0SyMdTROd1rlU5uSrUJuHWw5A0kvXLsSDhtpTlD9NvQGd4WsL6RsWiP35SJRzb6Heu7G/ZX
+	1Yc2qy2lCZKeY75gevdojy0z6jMxtayDRA5vRL30IYC9ysDaFhEelsP3Bo+kFKIYojv1kSoesljM9
+	4CJ4j1ueg2EL2GBg0W5fBjMADrlvbfISOoMPFDIm145kK8l+JJ+t3PHtr03B/fFOuFBmYJZPwewAy
+	T9V/Qhqe/doyR6O7uql5P8obGo4KXZqTanlDpb6ypE/NMROphB9O6FPKnOxYX6mNorrYl1LtS8oq/
+	LiSeqfTg==;
+Received: from [172.31.31.148] (helo=u09cd745991455d.lumleys.internal)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wQLg6-00000009qYh-3R6F;
+	Fri, 22 May 2026 08:56:23 +0000
+Message-ID: <0d13721307646d7ca2bf1aaf22926f0137b9de30.camel@infradead.org>
+Subject: Re: [PATCH net-next v8 3/3] gve: implement PTP gettimex64
+From: David Woodhouse <dwmw2@infradead.org>
+To: Thomas Gleixner <tglx@kernel.org>, Harshitha Ramamurthy
+	 <hramamurthy@google.com>, netdev@vger.kernel.org, Arthur Kiyanovski
+	 <akiyano@amazon.com>
+Cc: joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com,  jstultz@google.com, sboyd@kernel.org,
+ willemb@google.com, nktgrg@google.com,  jfraker@google.com,
+ ziweixiao@google.com, maolson@google.com,  jordanrhee@google.com,
+ thostet@google.com, alok.a.tiwari@oracle.com,  pkaligineedi@google.com,
+ horms@kernel.org, jacob.e.keller@intel.com,  yyd@google.com,
+ jefrogers@google.com, linux-kernel@vger.kernel.org, Naman Gulati
+ <namangulati@google.com>, Thomas =?ISO-8859-1?Q?Wei=DFschuh?=
+ <thomas.weissschuh@linutronix.de>
+Date: Fri, 22 May 2026 09:56:22 +0100
+In-Reply-To: <877bovvq78.ffs@tglx>
+References: <20260514225842.110706-1-hramamurthy@google.com>
+	 <20260514225842.110706-4-hramamurthy@google.com>
+	 <cd5868258edee932fd9b4ed46a48b5a07b4c6da8.camel@infradead.org>
+	 <87tss0vdrj.ffs@tglx>
+	 <63ff978516925951df0f95aecbd4ea5d7bb2956e.camel@infradead.org>
+	 <87bje8v0xl.ffs@tglx>
+	 <38ded3d61878f319ad74869924a55665d8baadb9.camel@infradead.org>
+	 <877bovvq78.ffs@tglx>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-PeXr9S2O7mQaPYdbm9/X"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260520004244.55663-1-kerneljasonxing@gmail.com>
- <ag75Xicuk6JwkTkC@boxer> <CAL+tcoAJ3i-WGnVx-9ASF29gPNAaP2ucw76x3ftLog-b1TPf_w@mail.gmail.com>
- <ag8ByhbrNNJaESYi@boxer> <CAL+tcoA8BkJc5jy3de3cBE69UboR66SCbLVD6B-0ffHGhXp_gw@mail.gmail.com>
- <ag8VgX2TxYIMJZB/@boxer>
-In-Reply-To: <ag8VgX2TxYIMJZB/@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 22 May 2026 16:55:50 +0800
-X-Gm-Features: AVHnY4JL4e7IMmtzqtx8iskPvHmzBHYpcYZL5sXLnGdy2P0JBtjNFLQxw_-vWZY
-Message-ID: <CAL+tcoBy5bb2iqOfYw1Ayr85WBRRDmsPqxmquSojNgM1U21UXg@mail.gmail.com>
-Subject: Re: [PATCH net v4 0/5] xsk: fix meta and publish of cq issues
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: multipart/mixed; boundary="000000000000624e6406526434ef"
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-290727-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290728-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch,vger.kernel.org,tencent.com];
-	HAS_ATTACHMENT(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FROM_HAS_DN(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,intel.com,vger.kernel.org,linutronix.de];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,intel.com:email,tencent.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C09085B0C7D
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7FB5E5B0C76
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---000000000000624e6406526434ef
+
+--=-PeXr9S2O7mQaPYdbm9/X
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 21, 2026 at 10:24=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Thu, May 21, 2026 at 09:07:30PM +0800, Jason Xing wrote:
-> > On Thu, May 21, 2026 at 9:00=E2=80=AFPM Maciej Fijalkowski
-> > <maciej.fijalkowski@intel.com> wrote:
-> > >
-> > > On Thu, May 21, 2026 at 08:41:08PM +0800, Jason Xing wrote:
-> > > > On Thu, May 21, 2026 at 8:24=E2=80=AFPM Maciej Fijalkowski
-> > > > <maciej.fijalkowski@intel.com> wrote:
-> > > > >
-> > > > > On Wed, May 20, 2026 at 08:42:39AM +0800, Jason Xing wrote:
-> > > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > > >
-> > > > > > The series is the product of previous review from sashiko[1].
-> > > > > >
-> > > > > > 1) META
-> > > > > > patch 1: address TOCTOU around metadata.
-> > > > > >
-> > > > > > 2) PUBLISH of CQ
-> > > > > > patch 2: make sure xsk_addr->addrs[] can be published to cq whe=
-n
-> > > > > >          overflow occurs.
-> > > > > > patch 3: keep cleaning up the continuation descs (more than 17)=
- and
-> > > > > >          publish its address when overflow occurs.
-> > > > > > patch 4: like patch 3, but only handles the invalid descs cases=
-.
-> > > > > >
-> > > > > > [1]: https://lore.kernel.org/all/20260502200722.53960-1-kernelj=
-asonxing@gmail.com/
-> > > > > >
-> > > > > > ---
-> > > > > > V4
-> > > > > > Link: https://lore.kernel.org/all/20260517063311.28921-1-kernel=
-jasonxing@gmail.com/
-> > > > > > 1. correct the description of xmit path in patch 3 (sashiko)
-> > > > > > 2. move set logic into xmit path in patch 3 (Stan)
-> > > > > >
-> > > > > > V3
-> > > > > > Link: https://lore.kernel.org/all/20260515123018.80147-1-kernel=
-jasonxing@gmail.com/
-> > > > > > 1. avoid breaking previous usage of sendto, and siliently handl=
+On Fri, 2026-05-22 at 09:49 +0200, Thomas Gleixner wrote:
+> On Fri, May 22 2026 at 01:12, David Woodhouse wrote:
+> > On Fri, 2026-05-22 at 00:43 +0200, Thomas Gleixner wrote:
+> > > > So surely a device can only support this if it *does* have a precis=
 e
-> > > > > > overflow case (Stan, sashiko)
-> > > > > > 2. add one particular exception process in patch 4 (sashiko)
-> > > > > > 3. adjust the selftest to make sure it passes in either virutal=
- or
-> > > > > > physical machines, which includes add usleep to support physica=
-l machine.
-> > > > > >
-> > > > > > V2
-> > > > > > Link: https://lore.kernel.org/all/20260510012310.88570-1-kernel=
-jasonxing@gmail.com/
-> > > > > > 1. adjust selftests (Jakub)
-> > > > > > 2. add READ_ONCE in patch 1 (Stan)
-> > > > >
-> > > > > FWIW I still get test failures (yes with patch 5 applied). PTAL.
-> > > >
-> > > > Thanks for the test. But I've tried with ixgbe driver...
-> > > >
-> > > > I noticed there are some flaky tests which have nothing to do with =
+> > > > hardware timestamp, e.g. from ART? And the corresponding sys_realti=
+me
+> > > > and sys_monoraw fields also have to be from the *same* value, surel=
+y?
+> > >=20
+> > > That is correct, but you still fail to explain how this new made up
+> > > att.counter_id/att.counter_value is filled in coherently without the
+> > > driver doing something abysmal?
+> > >=20
+> > > You can't explain it, because the only way to do that correctly is by
+> > > extending the cross time stamp struct and get_device_system_crosststa=
+mp().
+> >=20
+> > Yes. Isn't that what I asked Arthur to do?
+>=20
+> You maybe asked him, but I can't see any evidence of it anywhere. All I
+> can see is a magic struct attr, which conveys CS related data that is
+> supposed to be produced magically at some undefined place.
+
+https://lore.kernel.org/all/8b8a748a2ac6e8e3d970f5e74a2774133e7e7d8c.camel@=
+infradead.org/
+
+> > > > Is that not how it works? If not.... WTF *is* it for?
+> > >=20
+> > > Yes, that's the way it works since get_device_system_crosststamp() go=
+t
+> > > introduced, but that does not give a random driver access to the actu=
+al
+> > > converted (TSC) counter value. The driver can only observe the PTM va=
+lue
+> > > which is ART on x86 and whatever on other architectures. So it does n=
+ot
+> > > know anything about it.
+> >=20
+> > Sure, the driver can only return what it *knows*.
+> >=20
+> > We're certainly missing some infrastructure here... maybe the pci_bus
+> > should have a CSID which corresponds to its PTM domain, which on x86
+> > would be CSID_X86_ART?
+>=20
+> Yes, that's correct. But that does not solve the underlying problem:
+>=20
+> ...
+>
+> Q: How is a driver supposed to fill in attr->cs_cycles coherently?
+>=20
+> A: Not at all.
+>=20
+
+Let me rephrase that to check my full understanding of it in context:
+
+ Q: There are drivers today which operate on the TSC or arch counter,
+    and they're just fine. But how is a future driver which uses PCIe
+    PTM supposed to full in attr->cs_cycles coherently?
+
+ A: Yeah, our PCI and platform code lack the proper arch-agnostic
+    support for interpreting PTM time values; a driver wanting to do
+    that is going to need to do some infrastructure work first to
+    enable a proper conversion. But that's literally what PTM/ART is
+    *for* so that work has to happen at some point anyway.
+
+
+> The consequence of this is that the next driver writer will just go and
+> do:
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attr->cs_id =3D IS_ENABLED(X86) ? CS=
+ID_X86_TSC : CSID_ARM_COUNTER;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attr->cs_cycles =3D get_cycles();
+> =C2=A0=C2=A0 or
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attr->cs_cycles =3D ptm_cycles * pul=
+ledout_of_thin_air_factor +
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pu=
+lledout_of_thin_air_offset;
+
+Driver authors are crap, sure, but that would just be egregiously wrong
+and hopefully it would be caught in review. It has to be a literally
+*synchronous* capture or it's pointless.
+
+
+> The same applies to the pre/post timestamp mechanism for
+> gettimexattrs64().
+
+There's literally a ptp helper to generate those, which can use
+ktime_get_snapshot().
+
+> These new attr IOCTLs are not restricted to your favorite vmclock PTP
+> toy. They are available for every PTP driver which implements them, but
+> there is no infrastructure to actually provide the required data. That
+> ENA driver implementing gettimexattrs64() is demonstrating it. It at
+> least does not try to make them up, but that's just a matter of time to
+> happen.
+
+The ENA driver demonstrates nothing of the sort. It's *not* filling in
+those fields because it *doesn't* have PTM and it has nothing to fill
+in.
+
+Not *all* driver authors will fill in an optional field with random
+bytes just because they *can*, Thomas.
+
+> I know you don't care because that's outside of your sandpit,=C2=A0
+
+Thomas, I'd like you to stop saying that. It's insulting, and it's wrong.
+
+Of *course* I'm trying to solve things for the general case.
+
+But that doesn't extend to implementing random parts of PCI and
+platform infrastructure to allow for hypothetical future drivers which
+want to use PTM to implement the optional fields we're adding today.
+
+This yak is deep enough already :)
+
+And although we're having this discussion *in* the GVE thread, I've
+barely even *looked* at those patches and I think I'm still calling it
+a 'hypothetical future driver', because obviously if it's trying to use
+PTM then it's going to need that generic support.
+
+> Are you going to monitor drivers/net/ for those instances and make
+> sure they are burned before seeing the light of day?
+>=20
+> Surely not and neither is netdev going to care as demonstrated with
+> this GEV mess.
+
+I think that message has been received loud and clear, Thomas :)
+
+> > Never get_cycles(). Let's perhaps make it *not* need unholy hacks to
+> > interpret a PTM counter value. Otherwise what's the point in ART and
+> > PTM at all?
+>=20
+> Perhaps? There is no perhaps and aside of that I gave you the solution
+> for the problem already in the mail you just replied to, no?
+
+Hm, did you? I'm sorry, I must have missed it. Even rereading it this
+morning, I see a lot of 'is bonkers' and 'unholy hacks' and '_cannot_
+fill them in coherently' but I can't see a concrete constructive
+suggestion. You meant <87bje8v0xl.ffs@tglx>, yes?
+
+Maybe it's lost in the noise. Let's try to simplify.
+
+ =E2=80=A2 Userspace would like to be able to use PTP clocks to discipline =
 the
-> > > > series. Can you confirm that it's not caused because of the series?
-> > >
-> > > That explains the different results as i am using i40e/ice which have
-> > > multi-buffer support whereas ixgbe does not even support mbuf at XDP.
-> > > Broken tests are from mbuf cases.
-> >
-> > That's weird. I never expected the failed tests to be about multi-buffe=
-r.
-> >
-> > Are they the same as the output you attached last time? Or something
-> > new? Could you please share it so that I can investigate the root
-> > cause?
->
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 21 FAIL: SKB ALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 33 FAIL: SKB UNALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 57 FAIL: DRV ALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 69 FAIL: DRV UNALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 93 FAIL: ZC ALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [11], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> ---------------------------------------
-> not ok 94 FAIL: ZC TOO_MANY_FRAGS
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 105 FAIL: ZC UNALIGNED_INV_DESC_MULTI_BUFF
->
-> # 4 skipped test(s) detected. Consider enabling relevant config options t=
-o improve coverage.
-> # Totals: pass:96 fail:8 xfail:0 xpass:0 skip:4 error:0
-> XSK_SELFTESTS_ens259f1np1_SOFTIRQ: [ FAIL ]
-> 1..108
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 21 FAIL: SKB BUSY-POLL ALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 33 FAIL: SKB BUSY-POLL UNALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 57 FAIL: DRV BUSY-POLL ALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 69 FAIL: DRV BUSY-POLL UNALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 93 FAIL: ZC BUSY-POLL ALIGNED_INV_DESC_MULTI_BUFF
-> # [is_frag_valid] expected pkt_nb [11], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> ---------------------------------------
-> # [is_frag_valid] expected pkt_nb [10], got pkt_nb [0]
-> # DEBUG>> L2: dst mac: # 55# 44# 33# 22# 11# 01#
-> DEBUG>> L2: src mac: # 55# 44# 33# 22# 11# 00#
-> DEBUG>> L5: seqnum: # 0:0 # 0:1 # 0:2 # 0:3 # 0:4 # 0:5 # 0:6 # 0:7 # 0:8=
- # 0:9 # 0:10 # 0:11 # 0:0 # 0:0 # 0:0 # 0:0 # ....#
-> .... # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # 0:0 # =
-0:0 # 0:0 # 0:0 # 0:0 # 0:0 #
-> ---------------------------------------
-> not ok 105 FAIL: ZC BUSY-POLL UNALIGNED_INV_DESC_MULTI_BUFF
->
-> # 4 skipped test(s) detected. Consider enabling relevant config options t=
-o improve coverage.
-> # Totals: pass:96 fail:8 xfail:0 xpass:0 skip:4 error:0
-> XSK_SELFTESTS_ens259f1np1_BUSY_POLL: [ FAIL ]
->
-> Summary:
-> XSK_SELFTESTS_ens259f1np1_SOFTIRQ: [ FAIL ]
-> XSK_SELFTESTS_ens259f1np1_BUSY_POLL: [ FAIL ]
+   actual counter which is directly accessible in userspace and by KVM
+   guests. Do do this, we only really need a system_counterval_t in
+   the pre/post timestamps, and the helpers can add that.
 
-Sorry, Maciej. I managed to get one server with i40e nic but still
-couldn't reproduce it. Can you try the attachment (that is the
-replacement for v4-0005) instead? I removed those nasty CONT test
-cases...
+ =E2=80=A2 *Some* drivers can actually provide a system_counterval_t in the
+   device reading itself, either because they're naturally based on
+   the CPU counter or because they have PTM. Drivers should report
+   what=C2=A0they *do* know, in the correct time domain, and not make
+   crap up.
 
-Really I don't think I have much time to spend on these tests which
-makes me feel extremely annoyed... It's not easy to analyze the code
-without a reproducer. The good news is that now I highly suspect that
-this kind of CONT test cases pollute the whole cq which affects other
-tests. Before I give up on the 0003/0004 patches, I'd like to hear
-some advice from you. Thank you.
+ =E2=80=A2 Any driver which actually wants to do this based on PTM in the
+   future will need to do the infrastructure work to make that work
+   cleanly, and avoid having to make crap up.
 
-My original intention was to push batch xmit forward but at that time
-sashiko pointed out some unrelated bugs accidentally.
+And if I'm understanding correctly:
 
-Thanks,
-Jason
+ =E2=80=A2 The GVE driver made crap up? Although they do so orthogonally to=
+ the
+   patch set we're *actually* talking about in this thread, because
+   they did that entirely on their own *without* reference to Arthur's
+   userspace API changes?
 
->
-> >
-> > Thanks,
-> > Jason
-> >
-> > >
-> > > >
-> > > > Thanks,
-> > > > Jason
-> > > >
-> > > >
-> > > > >
-> > > > > >
-> > > > > >
-> > > > > > Jason Xing (5):
-> > > > > >   xsk: cache csum_start/csum_offset to fix TOCTOU in xsk_skb_me=
-tadata()
-> > > > > >   xsk: fix buffer leak in xsk_drop_skb() for AF_XDP multi-buffe=
-r Tx
-> > > > > >   xsk: drain continuation descs after overflow in xsk_build_skb=
-()
-> > > > > >   xsk: drain continuation descs on invalid descriptor in
-> > > > > >     __xsk_generic_xmit()
-> > > > > >   selftests/xsk: drain CQ to wait for TX completion
-> > > > > >
-> > > > > >  include/net/xdp_sock.h                        |  1 +
-> > > > > >  net/xdp/xsk.c                                 | 44 +++++++++++=
-++----
-> > > > > >  .../selftests/bpf/prog_tests/test_xsk.c       | 48 +++++++++++=
---------
-> > > > > >  3 files changed, 63 insertions(+), 30 deletions(-)
-> > > > > >
-> > > > > > --
-> > > > > > 2.43.7
-> > > > > >
 
---000000000000624e6406526434ef
-Content-Type: application/octet-stream; name="test.patch.1"
-Content-Disposition: attachment; filename="test.patch.1"
+> I'm glad we agree on "Never get_cycles()" at least. May I ask you then
+> to get a stiff drink ready and run:
+>=20
+> =C2=A0 # git blame drivers/ptp/ptp_vmclock.c | grep get_cycles
+
+That's different because it's actually using it for the *device* timestamp.
+But if you see an actual problem there, I'd love to know:
+
+                /*
+                 * When invoked for gettimex64(), fill in the pre/post syst=
+em
+                 * times. The simple case is when system time is based on t=
+he
+                 * same counter as st->cs_id, in which case all three times
+                 * will be derived from the *same* counter value.
+                 *
+                 * If the system isn't using the same counter, then the val=
+ue
+                 * from ktime_get_snapshot() will still be used as pre_ts, =
+and
+                 * ptp_read_system_postts() is called to populate postts af=
+ter
+                 * calling get_cycles().
+                 *
+                 * The conversion to timespec64 happens further down, outsi=
+de
+                 * the seq_count loop.
+                 */
+                if (sts) {
+                        ktime_get_snapshot(&systime_snapshot);
+                        if (systime_snapshot.cs_id =3D=3D st->cs_id) {
+                                cycle =3D systime_snapshot.cycles;
+                        } else {
+                                cycle =3D get_cycles();
+                                ptp_read_system_postts(sts);
+                        }
+                } else {
+                        cycle =3D get_cycles();
+                }
+
+                delta =3D cycle - le64_to_cpu(st->clk->counter_value);
+                ...
+
+--=-PeXr9S2O7mQaPYdbm9/X
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
-Content-ID: <f_mpgoomwv0>
-X-Attachment-Id: f_mpgoomwv0
 
-ZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2JwZi9wcm9nX3Rlc3RzL3Rlc3Rf
-eHNrLmMgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9icGYvcHJvZ190ZXN0cy90ZXN0X3hzay5j
-CmluZGV4IDc5NTBjNTA0ZWQyOC4uNGViODM1NjUyM2FhIDEwMDY0NAotLS0gYS90b29scy90ZXN0
-aW5nL3NlbGZ0ZXN0cy9icGYvcHJvZ190ZXN0cy90ZXN0X3hzay5jCisrKyBiL3Rvb2xzL3Rlc3Rp
-bmcvc2VsZnRlc3RzL2JwZi9wcm9nX3Rlc3RzL3Rlc3RfeHNrLmMKQEAgLTIwNzAsMzEgKzIwNzAs
-MjUgQEAgaW50IHRlc3RhcHBfaW52YWxpZF9kZXNjX21iKHN0cnVjdCB0ZXN0X3NwZWMgKnRlc3Qp
-CiAJCS8qIFZhbGlkIHBhY2tldCBmb3Igc3luY2ggdG8gc3RhcnQgd2l0aCAqLwogCQl7MCwgTUlO
-X1BLVF9TSVpFLCAwLCB0cnVlLCAwfSwKIAkJLyogWmVybyBmcmFtZSBsZW4gaXMgbm90IGxlZ2Fs
-ICovCi0JCXswLCBYU0tfVU1FTV9fTEFSR0VfRlJBTUVfU0laRSwgMCwgZmFsc2UsIFhEUF9QS1Rf
-Q09OVER9LAotCQl7MCwgWFNLX1VNRU1fX0xBUkdFX0ZSQU1FX1NJWkUsIDAsIGZhbHNlLCBYRFBf
-UEtUX0NPTlREfSwKIAkJezAsIDAsIDAsIGZhbHNlLCAwfSwKLQkJLyogSW52YWxpZCBhZGRyZXNz
-IGluIHRoZSBzZWNvbmQgZnJhbWUgKi8KLQkJezAsIFhTS19VTUVNX19MQVJHRV9GUkFNRV9TSVpF
-LCAwLCBmYWxzZSwgWERQX1BLVF9DT05URH0sCi0JCXt1bWVtX3NpemUsIFhTS19VTUVNX19MQVJH
-RV9GUkFNRV9TSVpFLCAwLCBmYWxzZSwgWERQX1BLVF9DT05URH0sCi0JCS8qIEludmFsaWQgbGVu
-IGluIHRoZSBtaWRkbGUgKi8KLQkJezAsIFhTS19VTUVNX19MQVJHRV9GUkFNRV9TSVpFLCAwLCBm
-YWxzZSwgWERQX1BLVF9DT05URH0sCi0JCXswLCBYU0tfVU1FTV9fSU5WQUxJRF9GUkFNRV9TSVpF
-LCAwLCBmYWxzZSwgWERQX1BLVF9DT05URH0sCi0JCS8qIEludmFsaWQgb3B0aW9ucyBpbiB0aGUg
-bWlkZGxlICovCi0JCXswLCBYU0tfVU1FTV9fTEFSR0VfRlJBTUVfU0laRSwgMCwgZmFsc2UsIFhE
-UF9QS1RfQ09OVER9LAotCQl7MCwgWFNLX1VNRU1fX0xBUkdFX0ZSQU1FX1NJWkUsIDAsIGZhbHNl
-LCBYU0tfREVTQ19fSU5WQUxJRF9PUFRJT059LAorCQkvKiBJbnZhbGlkIGFkZHJlc3MgKi8KKwkJ
-e3VtZW1fc2l6ZSwgWFNLX1VNRU1fX0xBUkdFX0ZSQU1FX1NJWkUsIDAsIGZhbHNlLCAwfSwKKwkJ
-LyogSW52YWxpZCBsZW4gKi8KKwkJezAsIFhTS19VTUVNX19JTlZBTElEX0ZSQU1FX1NJWkUsIDAs
-IGZhbHNlLCAwfSwKKwkJLyogSW52YWxpZCBvcHRpb25zICovCisJCXswLCBYU0tfVU1FTV9fTEFS
-R0VfRlJBTUVfU0laRSwgMCwgZmFsc2UsCisJCSBYU0tfREVTQ19fSU5WQUxJRF9PUFRJT04gJiB+
-WERQX1BLVF9DT05URH0sCiAJCS8qIFRyYW5zbWl0IDIgZnJhZ3MsIHJlY2VpdmUgMyAqLwogCQl7
-MCwgWFNLX1VNRU1fX01BWF9GUkFNRV9TSVpFLCAwLCB0cnVlLCBYRFBfUEtUX0NPTlREfSwKIAkJ
-ezAsIFhTS19VTUVNX19NQVhfRlJBTUVfU0laRSwgMCwgdHJ1ZSwgMH0sCiAJCS8qIE1pZGRsZSBm
-cmFtZSBjcm9zc2VzIGNodW5rIGJvdW5kYXJ5IHdpdGggc21hbGwgbGVuZ3RoICovCi0JCXswLCBY
-U0tfVU1FTV9fTEFSR0VfRlJBTUVfU0laRSwgMCwgZmFsc2UsIFhEUF9QS1RfQ09OVER9LAogCQl7
-LU1JTl9QS1RfU0laRSAvIDIsIE1JTl9QS1RfU0laRSwgMCwgZmFsc2UsIDB9LAogCQkvKiBWYWxp
-ZCBwYWNrZXQgZm9yIHN5bmNoIHNvIHRoYXQgc29tZXRoaW5nIGlzIHJlY2VpdmVkICovCiAJCXsw
-LCBNSU5fUEtUX1NJWkUsIDAsIHRydWUsIDB9fTsKIAogCWlmICh1bWVtLT51bmFsaWduZWRfbW9k
-ZSkgewogCQkvKiBDcm9zc2luZyBhIGNodW5rIGJvdW5kYXJ5IGFsbG93ZWQgKi8KLQkJcGt0c1sx
-Ml0udmFsaWQgPSB0cnVlOwotCQlwa3RzWzEzXS52YWxpZCA9IHRydWU7CisJCXBrdHNbN10udmFs
-aWQgPSB0cnVlOwogCX0KIAogCXRlc3QtPm10dSA9IE1BWF9FVEhfSlVNQk9fU0laRTsKQEAgLTIy
-MjksNyArMjIyMyw3IEBAIGludCB0ZXN0YXBwX3Rvb19tYW55X2ZyYWdzKHN0cnVjdCB0ZXN0X3Nw
-ZWMgKnRlc3QpCiAJCW1heF9mcmFncyArPSAxOwogCX0KIAotCXBrdHMgPSBjYWxsb2MoMiAqIG1h
-eF9mcmFncyArIDIsIHNpemVvZihzdHJ1Y3QgcGt0KSk7CisJcGt0cyA9IGNhbGxvYyhtYXhfZnJh
-Z3MgKyAyLCBzaXplb2Yoc3RydWN0IHBrdCkpOwogCWlmICghcGt0cykKIAkJcmV0dXJuIFRFU1Rf
-RkFJTFVSRTsKIApAQCAtMjI0NywyMCArMjI0MSwxMSBAQCBpbnQgdGVzdGFwcF90b29fbWFueV9m
-cmFncyhzdHJ1Y3QgdGVzdF9zcGVjICp0ZXN0KQogCX0KIAlwa3RzW21heF9mcmFnc10ub3B0aW9u
-cyA9IDA7CiAKLQkvKiBBbiBpbnZhbGlkIHBhY2tldCB3aXRoIHRoZSBtYXggYW1vdW50IG9mIGZy
-YWdzIGJ1dCBzaWduYWxzIHBhY2tldAotCSAqIGNvbnRpbnVlcyBvbiB0aGUgbGFzdCBmcmFnCi0J
-ICovCi0JZm9yIChpID0gbWF4X2ZyYWdzICsgMTsgaSA8IDIgKiBtYXhfZnJhZ3MgKyAxOyBpKysp
-IHsKLQkJcGt0c1tpXS5sZW4gPSBNSU5fUEtUX1NJWkU7Ci0JCXBrdHNbaV0ub3B0aW9ucyA9IFhE
-UF9QS1RfQ09OVEQ7Ci0JCXBrdHNbaV0udmFsaWQgPSBmYWxzZTsKLQl9Ci0KIAkvKiBWYWxpZCBw
-YWNrZXQgZm9yIHN5bmNoICovCi0JcGt0c1syICogbWF4X2ZyYWdzICsgMV0ubGVuID0gTUlOX1BL
-VF9TSVpFOwotCXBrdHNbMiAqIG1heF9mcmFncyArIDFdLnZhbGlkID0gdHJ1ZTsKKwlwa3RzW21h
-eF9mcmFncyArIDFdLmxlbiA9IE1JTl9QS1RfU0laRTsKKwlwa3RzW21heF9mcmFncyArIDFdLnZh
-bGlkID0gdHJ1ZTsKIAotCWlmIChwa3Rfc3RyZWFtX2dlbmVyYXRlX2N1c3RvbSh0ZXN0LCBwa3Rz
-LCAyICogbWF4X2ZyYWdzICsgMikpIHsKKwlpZiAocGt0X3N0cmVhbV9nZW5lcmF0ZV9jdXN0b20o
-dGVzdCwgcGt0cywgbWF4X2ZyYWdzICsgMikpIHsKIAkJZnJlZShwa3RzKTsKIAkJcmV0dXJuIFRF
-U1RfRkFJTFVSRTsKIAl9Cg==
---000000000000624e6406526434ef--
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUyMjA4NTYy
+MlowLwYJKoZIhvcNAQkEMSIEIKxvG6o1yb3qy7fMD1MhibvKO4vYiHdl5rFto48yCgRpMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAGN0aTw/e56cy
+r1N3CLwfNZkAsKNN4+O1D7dNo7nzAvnYdpmjft+kfeFnYboRV2b8obNm+ZxqoVd3IrY4mmhXGpG8
+04FSvJ6Iw/UY9EXVRQdpmlCs2S2MH6gB0T/aLN8WXX7u9S+QUS7q6T+KaAuFeeMQdPJcjpXbQKTG
+IkkvVLTxjOAgTl9//OCPdDQDAqPG1v1f/mxRLWfsS5AZDkcRtCksTjuG+uJQ62Ixdsu9VbGDUuD9
+YeKUdmkK1qBelTgQzL/BckDB+NxHTg8lrp0J4fNcmTyYidW2ikZ1n2ihJSCseCKscvoo0c/vb+YB
+Ablp4TB/sIaYOAF5LRkpjObtWNxwJgl4IfHN+gSfhapfK/KI/iFOLioEN1q/FjlSrcXv9+xXhzsQ
+VXveN1122xrGGOOGygd4JOD2i//8I9RzaecJOVmPDX068NismBjcXt5gw7tQXrR0glf427rV+zwR
+udZs8Nlm6MDswCKt51Wq1s9N8/x6+soY4AsCcRa2/OdFvOlEN+2sdVP5/gv+oahUDvZjGq+VqNcs
+QFBsxzINhmDRRea1ToVv8gtSwl84y3tnpWcSDZfQW0priAhlO/iTWPt9pHDSKc+fRFFIq/6zrIjz
+MCtUoOniiSzFgwz9C/yiJGFuVkgw1DyMo6Lxr9Fk5BSEBTNddxftGYgJtFRxCbgAAAAAAAA=
+
+
+--=-PeXr9S2O7mQaPYdbm9/X--
 
