@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-290898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290899-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Bo1LX+VEGqBZwYAu9opvQ
-	(envelope-from <netdev+bounces-290898-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:42:23 +0200
+	id 4NKpAt+VEGqBZwYAu9opvQ
+	(envelope-from <netdev+bounces-290899-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:43:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C8A45B86FF
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:42:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A33135B8739
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 19:43:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 55CDD3091B04
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:30:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6FED230FA0EE
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 17:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD483655F1;
-	Fri, 22 May 2026 17:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC662366542;
+	Fri, 22 May 2026 17:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="maCgFLOj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Knvj3zFk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382173624D7
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 17:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F738366560
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 17:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779471011; cv=none; b=SSRebin6mDb6BCAj3AGT/psnE61qwqbVDNCyvocjxN6XC6JzNyyVFpCx2hPv4muUZWrxeybERSszIUdTgUwuM6Qw9mXySVkWKhq9LP713z+pM0gec2e6buZCpQSJPy/868F2lF1zTg6z2JiGhtO3mn7Nwvv2iKfQm3b6ueArgjE=
+	t=1779471013; cv=none; b=KpleKsHlf5XE51wX247rIjwDqnXEO/iHZw67pBTuJlrYiVgKaTNP/mucxNG8qJM8TtupsYw3xtuzykYNb6vDsfq5s8c5QWvKl5LpNR7kXN624kWRsJj24FRQZBOaKdH2CrCLXIqf4qaLOuGQxP6sx3ImLscZ5qmrEjGPlmpayQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779471011; c=relaxed/simple;
-	bh=BxF9v5+ffFqoUpnieZXSb+2HdA1RPnoIhVyTsHQsmNE=;
+	s=arc-20240116; t=1779471013; c=relaxed/simple;
+	bh=y93T6R3ZPaoHK8S1fzJ5zBOeWQKcY8DLsLD5LRPVkmU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tEG9gp1ocj8ucvrNHJnNRPcx8D5gh8W4M++Rve9eu7yfI8ZpTQZsiJRHf4C9lneKdTvptRjaETIhvC1E1E/UisPPaFgRiWxKZ+2S3xoyV8pQiU0N9+PyHykEl8CUZy/xPhyJk5p0tINYy3QeUIgZL3nvPQwfmfTID+712F0rKNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=maCgFLOj; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=N5bkOKp5LyRQebSMKaULHCZfSxaZ/ZrNAmWz0Sl3DHsUxqtV40qqRXppbwiNGEVaf0hoaa7xTlw55aNVJ/uma+HuGWljlbJDSxJji5vIoMUUDnzKh6CW+SWxwg7bCAd6IFHUgq/wW95HW/9Wva78Vd67VpzEk8QE0F22SsevIyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Knvj3zFk; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-516458449d4so120950131cf.1
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:30:10 -0700 (PDT)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-914b11441aeso254483185a.0
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 10:30:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779471009; x=1780075809; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1779471011; x=1780075811; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IgYbFHQVjVdfgkcjxtpt6q/JNpqCA1bsfuWHSIx92OA=;
-        b=maCgFLOjiPXQP0b7/n/KrZlr5CAuH2ubsLZ/98k9e7aM7f2fqcjKLX8hYqlgTTvnB4
-         7vdsVt44QDuLBgBFg1hB8PhFg1f3EupnB133lbxl/eGUiM21Boe7jeMU+OlTT/kXIOj5
-         2bZzV7gAvfbLE3H+YW09PIFwJbhojGBbXIcPmAc+pcnavp8QwuheSBVJvvle/7oHI/jX
-         AhwQQbHoPNyDzhfVtm+1nJKcWrPXkSEggZh8sVAyEYFVywrPCwvEb1q0qWK5E0QwFc9B
-         HTjfZ/LLqD20KIR8Z6l8Q65a9mJshCFgJhwd/KR+Z2Sd209MnSEB4Hu/GcjuCCwUEjGx
-         4VLg==
+        bh=HpHmmZYZTmVF1LVFIqwlKvtmdWVBJK/BRseLdxPSIGE=;
+        b=Knvj3zFkHg7CJMHA2GdQ/fhpeGK2Hqhxr3HKzVpc0V4MuvMIuYNmj+ihSfSbsI01TX
+         iSEaAjPt8W7/bGgfroxUOdt+QUG+IHBk52yiWaUku1bgyZijcygXP2tF2n5jtdRLqqFR
+         +/cRDqrJ0wLgogaxtXwzuEtY0Cl0BnJKhzOHQiRtHDLLkd8DDoETCf0VbzFbU8goV1dh
+         Z03i4tJRdAlTiONLErvyiYzySb7UzOyS9IgYzcFFbUa50oqHnsy7N1HRe7PiuUexGvnM
+         sQzwuF4sI6I6/WON4FdVve5kPGoaDljkEm54lILNj4p0h9si3pNt2HLwx8C/delpez5a
+         SB7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779471009; x=1780075809;
+        d=1e100.net; s=20251104; t=1779471011; x=1780075811;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IgYbFHQVjVdfgkcjxtpt6q/JNpqCA1bsfuWHSIx92OA=;
-        b=kqoBnyPtK6fjjw3NlOBQGZI4oIrUPUANZY09OzScCOVTbxmtKY7FaE1SURVNPJyLlF
-         mQrH0VHQNNS7iP8oD4P59VomoiRnlxsGRjhZaxNrYcLnZ5GAo6dImLbqZpVo/SQXL/LU
-         ZySJeUQIxYvwF7tbZdfPQHgKrt+CQ6+ayfoF2aw61SPjv5ptdziwC44Xde0cg68hdSbl
-         uEKuNBUkNU2ueElJ96gh8LwHWyexR/kVLPdGiTc93u9hns9B0Z/3I64O5XXf/mi2a25t
-         PxUljRyTqfsZHMzqrFff82KximjL3Cs+sKp+tysoMRQbdROQ0OoqsczgURGRM1ZsX47A
-         f/0g==
-X-Forwarded-Encrypted: i=1; AFNElJ9S8ZfGAMAGb2LHZO45eKuuTujdyAc9lSvSdcsyPVCYaW4Ou/k8DmEASKS9Gg6vXkPUwF07opM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziPxVKWFZdnps/Mn66YncGdxgkNXX42C0DhhEwm5NRRobRXDzB
-	O94492zYHyG9d53Rtws1giwvcpIMOKcAivGnR15eRpYtKSs6fYeF8yCAhTOMZlRV3aZKwUbUMYJ
-	3FVVzrQew2wCJmw==
-X-Received: from qtaw16.prod.google.com ([2002:ac8:57d0:0:b0:50d:e722:4fa7])
+        bh=HpHmmZYZTmVF1LVFIqwlKvtmdWVBJK/BRseLdxPSIGE=;
+        b=S0UMFsrGQALPBYsPka3gRY/Dl5b3kHHWeuWJW/yz/kR4C0lO4Unnq/eaGWbs3dncBh
+         0N4PRmt6ZMd5wlYGr3foCwWPtxveaxlpt+Dj+Juvu0mU2xAKF1QP81p/V012qLn+J9hM
+         5i/dWxeHJ17O6V+CzHubS/RQU+ybtI9JmYmcq+/dcYvZt7Je4hLNwmeJ+0y/aNwl+Fnf
+         Oqsv8eU8wkdmWFVtAB2laRhvN0KReuO2zkDiHgKhWJnLrXtPgVFVYIwbMJs2jp587maE
+         xuqkbbS7W+8xRL22astBZ8Ee9IJZ4mrNl9YDXdQtfLYdX16B5IufGUMuLxkwBDLWHZpX
+         xurQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/7g5YnEWPcRwO/u3BeqcqhJ9lUWxGdkns6Lgmvs03dktH/Qs/9ssqRSu7/WE0vCOsg8AP3jsw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzamGh9GXLqPIcBr/3cdZG6kOfO52gtVb/hfLk1BtO8mMUXvRYa
+	rXRshGVufkaXQww7aVybjkQrA9s7y/gR1cqEGaRqF2BnikZz12QcjWd8s0qAZnKD1yuVtK3gZGx
+	k002M6/pXTzTMgw==
+X-Received: from qkkp25.prod.google.com ([2002:a05:620a:1139:b0:90d:670f:7021])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7152:0:b0:50f:c2f8:4075 with SMTP id d75a77b69052e-516d4428a0emr46944051cf.1.1779471009014;
- Fri, 22 May 2026 10:30:09 -0700 (PDT)
-Date: Fri, 22 May 2026 17:30:00 +0000
+ 2002:a05:620a:390e:b0:90e:dc5a:c07 with SMTP id af79cd13be357-914b48d66dfmr696579185a.8.1779471010607;
+ Fri, 22 May 2026 10:30:10 -0700 (PDT)
+Date: Fri, 22 May 2026 17:30:01 +0000
 In-Reply-To: <20260522173002.2181677-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260522173002.2181677-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260522173002.2181677-4-edumazet@google.com>
-Subject: [PATCH v4 net-next 3/5] rtnetlink: do not acquire RTNL in
- rtnl_getlink() with RTEXT_FILTER_NAME_ONLY
+Message-ID: <20260522173002.2181677-5-edumazet@google.com>
+Subject: [PATCH v4 net-next 4/5] rtnetlink: do not assume RTNL is held in link_master_filtered()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -101,7 +100,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290898-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290899-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -109,185 +108,56 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.939];
+	NEURAL_HAM(-0.00)[-0.940];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3C8A45B86FF
+X-Rspamd-Queue-Id: A33135B8739
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When RTEXT_FILTER_NAME_ONLY is requested, rtnl_fill_ifinfo()
-is dumping device attributes which do not need RTNL protection.
-
-Many shell scripts invoke iproute2 commands specifying a device by
-its name. After this patch, they will no longer add RTNL pressure.
+RTNL might be no longer held by the caller in the following patch.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/rtnetlink.c | 94 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 67 insertions(+), 27 deletions(-)
+ net/core/rtnetlink.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 3dfa28927c7f92f906a0d89b7a1812b975d13854..c342b22528e4478a61f22e204a3934ba1a48cb3c 100644
+index c342b22528e4478a61f22e204a3934ba1a48cb3c..bad036ef7614ffae52a65c447344ac1314f5521b 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -2068,7 +2068,6 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 	struct nlmsghdr *nlh;
- 	struct Qdisc *qdisc;
- 
--	ASSERT_RTNL();
- 	nlh = nlmsg_put(skb, pid, seq, type, sizeof(*ifm), flags);
- 	if (nlh == NULL)
- 		return -EMSGSIZE;
-@@ -2091,6 +2090,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 	if (ext_filter_mask & RTEXT_FILTER_NAME_ONLY)
- 		goto end;
- 
-+	ASSERT_RTNL();
- 	if (tgt_netnsid >= 0 &&
- 	    nla_put_s32(skb, IFLA_TARGET_NETNSID, tgt_netnsid))
- 		goto nla_put_failure;
-@@ -3468,6 +3468,21 @@ static struct net_device *rtnl_dev_get(struct net *net,
- 	return __dev_get_by_name(net, ifname);
- }
- 
-+static struct net_device *rtnl_dev_get_rcu(struct net *net,
-+					   struct nlattr *tb[])
-+{
-+	char ifname[ALTIFNAMSIZ];
-+
-+	if (tb[IFLA_IFNAME])
-+		nla_strscpy(ifname, tb[IFLA_IFNAME], IFNAMSIZ);
-+	else if (tb[IFLA_ALT_IFNAME])
-+		nla_strscpy(ifname, tb[IFLA_ALT_IFNAME], ALTIFNAMSIZ);
-+	else
-+		return NULL;
-+
-+	return dev_get_by_name_rcu(net, ifname);
-+}
-+
- static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			struct netlink_ext_ack *extack)
+@@ -2371,22 +2371,24 @@ static struct rtnl_link_ops *linkinfo_to_kind_ops(const struct nlattr *nla,
+ static bool link_master_filtered(struct net_device *dev, int master_idx)
  {
-@@ -4187,14 +4202,16 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			struct netlink_ext_ack *extack)
- {
- 	struct net *net = sock_net(skb->sk);
-+	struct nlattr *tb[IFLA_MAX + 1];
-+	netdevice_tracker dev_tracker;
-+	struct net_device *dev = NULL;
- 	struct net *tgt_net = net;
-+	u32 ext_filter_mask = 0;
- 	struct ifinfomsg *ifm;
--	struct nlattr *tb[IFLA_MAX+1];
--	struct net_device *dev = NULL;
- 	struct sk_buff *nskb;
- 	int netnsid = -1;
-+	bool need_rtnl;
- 	int err;
--	u32 ext_filter_mask = 0;
+ 	struct net_device *master;
++	bool res = false;
  
- 	err = rtnl_valid_getlink_req(skb, nlh, tb, extack);
- 	if (err < 0)
-@@ -4214,43 +4231,65 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (tb[IFLA_EXT_MASK])
- 		ext_filter_mask = nla_get_u32(tb[IFLA_EXT_MASK]);
+ 	if (!master_idx)
+ 		return false;
  
--	err = -EINVAL;
- 	ifm = nlmsg_data(nlh);
--	if (ifm->ifi_index > 0)
--		dev = __dev_get_by_index(tgt_net, ifm->ifi_index);
--	else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
--		dev = rtnl_dev_get(tgt_net, tb);
--	else
+-	master = netdev_master_upper_dev_get(dev);
 +	rcu_read_lock();
-+	if (ifm->ifi_index > 0) {
-+		dev = dev_get_by_index_rcu(tgt_net, ifm->ifi_index);
-+	} else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME]) {
-+		dev = rtnl_dev_get_rcu(tgt_net, tb);
-+	} else {
-+		rcu_read_unlock();
-+		err = -EINVAL;
- 		goto out;
-+	}
-+	netdev_hold(dev, &dev_tracker, GFP_ATOMIC);
++	master = netdev_master_upper_dev_get_rcu(dev);
+ 
+ 	/* 0 is already used to denote IFLA_MASTER wasn't passed, therefore need
+ 	 * another invalid value for ifindex to denote "no master".
+ 	 */
+ 	if (master_idx == -1)
+-		return !!master;
+-
+-	if (!master || master->ifindex != master_idx)
+-		return true;
++		res = !!master;
++	else if (!master || master->ifindex != master_idx)
++		res = true;
 +	rcu_read_unlock();
  
- 	err = -ENODEV;
- 	if (dev == NULL)
- 		goto out;
+-	return false;
++	return res;
+ }
  
-+	need_rtnl = !(ext_filter_mask & RTEXT_FILTER_NAME_ONLY);
-+
-+retry:
-+	if (need_rtnl) {
-+		rtnl_lock();
-+		/* Synchronize the carrier state so we don't report a state
-+		 * that we're not actually going to honour immediately; if
-+		 * the driver just did a carrier off->on transition, we can
-+		 * only TX if link watch work has run, but without this we'd
-+		 * already report carrier on, even if it doesn't work yet.
-+		 */
-+		linkwatch_sync_dev(dev);
-+	}
-+
- 	err = -ENOBUFS;
- 	nskb = nlmsg_new_large(if_nlmsg_size(dev, ext_filter_mask));
--	if (nskb == NULL)
--		goto out;
-+	if (nskb)
-+		err = rtnl_fill_ifinfo(nskb, dev, net,
-+				       RTM_NEWLINK, NETLINK_CB(skb).portid,
-+				       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
-+				       0, NULL, 0, netnsid, GFP_KERNEL);
- 
--	/* Synchronize the carrier state so we don't report a state
--	 * that we're not actually going to honour immediately; if
--	 * the driver just did a carrier off->on transition, we can
--	 * only TX if link watch work has run, but without this we'd
--	 * already report carrier on, even if it doesn't work yet.
--	 */
--	linkwatch_sync_dev(dev);
-+	if (need_rtnl)
-+		rtnl_unlock();
- 
--	err = rtnl_fill_ifinfo(nskb, dev, net,
--			       RTM_NEWLINK, NETLINK_CB(skb).portid,
--			       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
--			       0, NULL, 0, netnsid, GFP_KERNEL);
- 	if (err < 0) {
--		/* -EMSGSIZE implies BUG in if_nlmsg_size */
--		WARN_ON(err == -EMSGSIZE);
- 		kfree_skb(nskb);
--	} else
-+		if (err == -EMSGSIZE) {
-+			if (!need_rtnl) {
-+				/* Some altnames were added, retry with RTNL. */
-+				need_rtnl = true;
-+				goto retry;
-+			}
-+			/* -EMSGSIZE implies BUG in if_nlmsg_size */
-+			WARN_ON_ONCE(1);
-+		}
-+	} else {
- 		err = rtnl_unicast(nskb, net, NETLINK_CB(skb).portid);
-+	}
- out:
-+	netdev_put(dev, &dev_tracker);
- 	if (netnsid >= 0)
- 		put_net(tgt_net);
- 
-@@ -7117,7 +7156,8 @@ static const struct rtnl_msg_handler rtnetlink_rtnl_msg_handlers[] __initconst =
- 	{.msgtype = RTM_DELLINK, .doit = rtnl_dellink,
- 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETLINK, .doit = rtnl_getlink,
--	 .dumpit = rtnl_dump_ifinfo, .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
-+	 .dumpit = rtnl_dump_ifinfo,
-+	 .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE | RTNL_FLAG_DOIT_UNLOCKED},
- 	{.msgtype = RTM_SETLINK, .doit = rtnl_setlink,
- 	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETADDR, .dumpit = rtnl_dump_all},
+ static bool link_kind_filtered(const struct net_device *dev,
 -- 
 2.54.0.746.g67dd491aae-goog
 
