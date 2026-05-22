@@ -1,239 +1,143 @@
-Return-Path: <netdev+bounces-290694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iI4uKeIFEGqLSQYAu9opvQ
-	(envelope-from <netdev+bounces-290694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:29:38 +0200
+	id KBppDlYGEGqLSQYAu9opvQ
+	(envelope-from <netdev+bounces-290695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:31:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BFD55AFFFE
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:29:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8976D5B0033
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 09:31:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC2AB306B3B4
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:25:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F30130022B1
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179F138E8C5;
-	Fri, 22 May 2026 07:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B6834CFAE;
+	Fri, 22 May 2026 07:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJ0Md6du"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PVnczy+t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBA83905F8;
-	Fri, 22 May 2026 07:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A034181334
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 07:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779434735; cv=none; b=G5zyycp9MpJazKWx39x4OSnlBEAvZ943jU+GI1nZUZeWoddEHDAjZuHxRCs701zEcLGyhbiQ5oauhUNEh54qqGVllj11uz5jeoFLwxgRB9f4a5o+sxM4FGqgVUUdBjO5IEu7YVxDWPQbczedyYqZJMae6l1Yb0Ljg5x3ESztt+E=
+	t=1779434833; cv=none; b=Gcdd6SoF+C0WhBoUhQiHyISBTGyI2oTDL2PrZSn/BYSxaMCVBktH63GH/MFzynTHIxVfVH7Ia1cGKVoxJQ4CpV4Pf05MNv/AqwHc/1QAk6YM6qGU4uTBQy5qMdBU1eNdPIl471Jy1ZIocxl+WNq5DDa3TSacdCHkJ22Ap4JDZAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779434735; c=relaxed/simple;
-	bh=DOvrmSPgKlxZCC7RbEphO179i76aYP0QFkgrS/bkgMU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JOP7OLrMdhfJw1CmP5Hw6DYR7cWNiE/dV2Ki1BkoC7T+yTnK9KXaZ/0SDgOc57hcc5UkVjQW0JLb1iM1BlfsmSdM2H0st2dZbzikvN7TpDM6Cca9IFyaY02Oe5ciaYDyNJ0dLGCSlDoIqzBrcv5qIycuCbsacs25kauNTWMiNHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJ0Md6du; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA79B1F00ADE;
-	Fri, 22 May 2026 07:25:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779434733;
-	bh=NyW+5g7DMTf1Y7Db+/rrVkUDzE+C2206FaaDl7KrUhM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lJ0Md6duQ6sPRrIdwjugw9x6KqXsYx7A/mgn8Cm26WJcFPdIwrNirWmrk2y+oH2DM
-	 nRv7+D4/S2JZp/c0qo9faz1evc/9eej9fLq963ZdIYUufsnOC2pMQ/13L13gggxNR3
-	 EUeXdLQdS+9dclCJuCPVTSNZdvokzosq/nb6I/Qbhnz7JKjibv9yccuJHOmva5JwbO
-	 hnHGt3w/xkw7QAbPEzDy7zNRl5g712M2FLXy235+wnO6t8lFKU3OgxRuwWcftpUw1a
-	 3y3fJbv7Oy3hUuSWHdagmVRVVGStA5jyzIyeiXDnMUfK8/Ng3pFu4cVnUp9xxOYXR5
-	 N56f0BQcFPhvg==
-Date: Fri, 22 May 2026 12:55:15 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Vikash Garodia <vikash.garodia@oss.qualcomm.com>
-Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch,
-	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
-	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>, pgujjula@qti.qualcomm.com
-Subject: Re: [PATCH v6 11/16] media: qcom: Switch to generic PAS TZ APIs
-Message-ID: <ahAE2_Eh-_H7ZtYq@sumit-xelite>
-References: <20260518072856.22790-1-sumit.garg@kernel.org>
- <20260518072856.22790-12-sumit.garg@kernel.org>
- <07cdbd20-f0c5-4be5-878a-ef23dc633767@oss.qualcomm.com>
+	s=arc-20240116; t=1779434833; c=relaxed/simple;
+	bh=cBIIzKRtPzAS7TxxLFteQjXJWf4etq8VBj2AuHXebv8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PpVKaDSzJm9vzmB87hIEeU0jP/QFqCtPas3wJWoEwE+QCG0DlB6RjR15+WUECmTKYRP3gxmbmAxqKd5pi3CNbpom+Cdz+ZzJN9VC1Z4CYm2Rp0xNVG/1grcsg/m7lsuUMDRtoEnXqZrdAJ2laAfQDbxPERdyuj/pq+w1kiNLaEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PVnczy+t; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 4CAD6C2C656;
+	Fri, 22 May 2026 07:28:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A39BD6003C;
+	Fri, 22 May 2026 07:27:08 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8449B107E8C9D;
+	Fri, 22 May 2026 09:27:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779434827; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=r7DiGSD8fFaoe5sMzVIi8WS8FbDmeVFtAB0hYij7sPE=;
+	b=PVnczy+tfci59N4HQ+pIRo6sqDjeRG5LfyVii3CmDXzTlveudrCYgquS1gcyAfhak2yclw
+	lxPzIM5581zbzSsAurO5h7zih/RET+b2+u1perD3u8BGp6hbCdqLQ1Pe5ip3TvVkm9EZXe
+	92grLx/VkLI9r/8CIsFQTqR+it5TOgQkJxINxIR+NbR5FJir1s4YnTg4X2EJ0Ka5jBo2Dj
+	UsGG5aDkuIq8BW966p6XTgVefaktc00dFCvsXMpMK+TEu9zYUH3Yu082OBGu4tljHNd9J4
+	i314+Pglua1Iwe4OohJ9mRenOI0MmbGjR2rc/hg42v8isZ2GonZsmiuomcUmlQ==
+Message-ID: <e2bbdb18-2af5-4b3d-ab2b-87615581e6bd@bootlin.com>
+Date: Fri, 22 May 2026 09:26:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <07cdbd20-f0c5-4be5-878a-ef23dc633767@oss.qualcomm.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next] net: txgbe: fix phylink leak on AML init failure
+To: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+ Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
+ <mengyuanlou@net-swift.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20260522070749.1634542-1-zhaochenguang@kylinos.cn>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260522070749.1634542-1-zhaochenguang@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-290694-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290695-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.995];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 4BFD55AFFFE
+X-Rspamd-Queue-Id: 8976D5B0033
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Vikash,
+Hi,
 
-On Thu, May 21, 2026 at 12:10:41PM +0530, Vikash Garodia wrote:
-> 
-> On 5/18/2026 12:58 PM, Sumit Garg wrote:
-> > diff --git a/drivers/media/platform/qcom/iris/iris_firmware.c b/drivers/media/platform/qcom/iris/iris_firmware.c
-> > index 5f408024e967..b3c5281aea91 100644
-> > --- a/drivers/media/platform/qcom/iris/iris_firmware.c
-> > +++ b/drivers/media/platform/qcom/iris/iris_firmware.c
-> > @@ -4,6 +4,7 @@
-> >    */
-> >   #include <linux/firmware.h>
-> > +#include <linux/firmware/qcom/qcom_pas.h>
-> >   #include <linux/firmware/qcom/qcom_scm.h>
-> >   #include <linux/of_address.h>
-> >   #include <linux/of_reserved_mem.h>
-> > @@ -79,7 +80,7 @@ int iris_fw_load(struct iris_core *core)
-> >   		return -ENOMEM;
-> >   	}
-> > -	ret = qcom_scm_pas_auth_and_reset(core->iris_platform_data->pas_id);
-> > +	ret = qcom_pas_auth_and_reset(core->iris_platform_data->pas_id);
-> >   	if (ret)  {
-> >   		dev_err(core->dev, "auth and reset failed: %d\n", ret);
-> >   		return ret;
-> > @@ -93,7 +94,7 @@ int iris_fw_load(struct iris_core *core)
-> >   						     cp_config->cp_nonpixel_size);
-> >   		if (ret) {
-> >   			dev_err(core->dev, "qcom_scm_mem_protect_video_var failed: %d\n", ret);
-> > -			qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
-> > +			qcom_pas_shutdown(core->iris_platform_data->pas_id);
-> >   			return ret;
-> >   		}
-> >   	}
-> > @@ -103,10 +104,10 @@ int iris_fw_load(struct iris_core *core)
-> >   int iris_fw_unload(struct iris_core *core)
-> >   {
-> > -	return qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
-> > +	return qcom_pas_shutdown(core->iris_platform_data->pas_id);
-> >   }
-> >   int iris_set_hw_state(struct iris_core *core, bool resume)
-> >   {
-> > -	return qcom_scm_set_remote_state(resume, 0);
-> > +	return qcom_pas_set_remote_state(resume, 0);
-> >   }
-> > diff --git a/drivers/media/platform/qcom/venus/Kconfig b/drivers/media/platform/qcom/venus/Kconfig
-> > index 63ee8c78dc6d..7997b8aa427a 100644
-> > --- a/drivers/media/platform/qcom/venus/Kconfig
-> > +++ b/drivers/media/platform/qcom/venus/Kconfig
-> > @@ -6,6 +6,7 @@ config VIDEO_QCOM_VENUS
-> >   	select OF_DYNAMIC if ARCH_QCOM
-> >   	select QCOM_MDT_LOADER
-> >   	select QCOM_SCM
-> > +	select QCOM_PAS
-> >   	select VIDEOBUF2_DMA_CONTIG
-> >   	select V4L2_MEM2MEM_DEV
-> >   	help
-> > diff --git a/drivers/media/platform/qcom/venus/firmware.c b/drivers/media/platform/qcom/venus/firmware.c
-> > index 1de7436713ed..3a38ff985822 100644
-> > --- a/drivers/media/platform/qcom/venus/firmware.c
-> > +++ b/drivers/media/platform/qcom/venus/firmware.c
-> > @@ -12,6 +12,7 @@
-> >   #include <linux/of_reserved_mem.h>
-> >   #include <linux/platform_device.h>
-> >   #include <linux/of_device.h>
-> > +#include <linux/firmware/qcom/qcom_pas.h>
-> >   #include <linux/firmware/qcom/qcom_scm.h>
-> >   #include <linux/sizes.h>
-> >   #include <linux/soc/qcom/mdt_loader.h>
-> > @@ -58,7 +59,7 @@ int venus_set_hw_state(struct venus_core *core, bool resume)
-> >   	int ret;
-> >   	if (core->use_tz) {
-> > -		ret = qcom_scm_set_remote_state(resume, 0);
-> > +		ret = qcom_pas_set_remote_state(resume, 0);
-> >   		if (resume && ret == -EINVAL)
-> >   			ret = 0;
-> >   		return ret;
-> > @@ -218,7 +219,7 @@ int venus_boot(struct venus_core *core)
-> >   	int ret;
-> >   	if (!IS_ENABLED(CONFIG_QCOM_MDT_LOADER) ||
-> > -	    (core->use_tz && !qcom_scm_is_available()))
-> > +	    (core->use_tz && !qcom_pas_is_available()))
-> >   		return -EPROBE_DEFER;
-> >   	ret = of_property_read_string_index(dev->of_node, "firmware-name", 0,
-> > @@ -236,7 +237,7 @@ int venus_boot(struct venus_core *core)
-> >   	core->fw.mem_phys = mem_phys;
-> >   	if (core->use_tz)
-> > -		ret = qcom_scm_pas_auth_and_reset(VENUS_PAS_ID);
-> > +		ret = qcom_pas_auth_and_reset(VENUS_PAS_ID);
-> >   	else
-> >   		ret = venus_boot_no_tz(core, mem_phys, mem_size);
-> > @@ -259,7 +260,7 @@ int venus_boot(struct venus_core *core)
-> >   						     res->cp_nonpixel_start,
-> >   						     res->cp_nonpixel_size);
-> >   		if (ret) {
-> > -			qcom_scm_pas_shutdown(VENUS_PAS_ID);
-> > +			qcom_pas_shutdown(VENUS_PAS_ID);
-> >   			dev_err(dev, "set virtual address ranges fail (%d)\n",
-> >   				ret);
-> >   			return ret;
-> 
-> 
-> API "qcom_scm_mem_protect_video_var() would also need this migration, any
-> reason not to consider that ?
+On 5/22/26 09:07, Chenguang Zhao wrote:
+> Destroy the phylink instance when fixed-link setup fails.
 
-This SCM call is very specific to the media subsystem and don't align
-with the generic PAS APIs. I rather think these kind of special SMCs can
-rather be treated as SiP calls supported in TF-A but we have to analyze
-if we even need these SCM calls for the open boot stack or not.
-
-However, with OP-TEE there is still work in progress to enable media upstream
-as Jorge posted in earlier versions on this patch-set due to IOMMU dependency.
+This should probably be a fix then, targeting the 'net' tree with a 
+Fixes tag.
 
 > 
-> Could you please check, if any such usage of legacy *scm* APIs, like the one
-> i pointed above, can be enforced to err out at compile time ?
+> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
 
-It will error out at runtime automatically since TF-A doesn't support
-this SCM/SMC call as of now.
+With the above comment sorted out,
 
--Sumit
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
+> ---
+>   drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+> index f0514251d4f3..8e301e7d1148 100644
+> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+> @@ -521,6 +521,7 @@ int txgbe_phylink_init_aml(struct txgbe *txgbe)
+>   	err = phylink_set_fixed_link(phylink, &state);
+>   	if (err) {
+>   		wx_err(wx, "Failed to set fixed link\n");
+> +		phylink_destroy(phylink);
+>   		return err;
+>   	}
+>   
+
 
