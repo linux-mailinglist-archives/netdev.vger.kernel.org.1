@@ -1,213 +1,213 @@
-Return-Path: <netdev+bounces-290923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290924-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCIKKczKEGpAdwYAu9opvQ
-	(envelope-from <netdev+bounces-290923-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:29:48 +0200
+	id oK9+LHzMEGrydwYAu9opvQ
+	(envelope-from <netdev+bounces-290924-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:37:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 104595BA748
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:29:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 147995BA855
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:36:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46594300823B
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 21:29:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88624300A60C
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 21:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABEB5388E48;
-	Fri, 22 May 2026 21:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D674D386424;
+	Fri, 22 May 2026 21:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RHeziVPr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XTVc4vUd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FC5332913
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 21:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F732F28E3
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 21:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779485385; cv=none; b=PcVq+/0f1XgvXySMeR5h1r6jZkM+/iUYYxusyIp+OnH2bOv3J+976yydxh/7zooQlzOTbSQPfjH7Qrov7/4L9KTiyYDpS+gNRNlN3m8zNGUULvVRrVRJkoghwreVVxNxR8b0E1DQb2uxpcxVEVHv47jrcqUQ3AWQLPbD9LzLVbE=
+	t=1779485795; cv=none; b=eo8sbvKOcIXEOh9zBnpurHdfgCsbWmhq49883AaWaN6Y4GRUS2kdtw0NRVVaxw/JkFB0Y+YPGOm7LufTEXlWkT8hf6CzyIbDbI1A852EU3OCAKZK9lWVVFKbfK4W+6g1s1dPhMOkC9tB1dsLBa9RvlQnGpNXfNOIwFVVNQlwWr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779485385; c=relaxed/simple;
-	bh=KEoHFxqSfZiubgBPdzO5owVDC1W2g07FnrUTXRZq5uU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HWxdi0B8HtErEGtsRVQlJW+60ISCT3E54t1crwEbJD5l4fZY+oSy0eBsjLlPzRL2nYcUciMH5nuCHr9wIZHZarP9DJuHrONymhMewjo+jELu5G9NqA772Ii8ypUDlOrLICiv9r0m0WT6YxtO0nIlNn9rQSUcSt9eau/06tuSoCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RHeziVPr; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCFBD1F000E9;
-	Fri, 22 May 2026 21:29:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779485384;
-	bh=vpHPzYq8EHD4VOAOrwxPgkdGpp/U7ktYggD4F+J6uM4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=RHeziVPripSIyezIb+Fv1nLJJggPWENUEumdLUqGIsOTo32yencMcrXR9hFVfKd98
-	 9cDjsLDcuXdyrwTHS7BUagr+TqgisReDUS1EWGVZuWB9hgKpw9URxt2jsh2CKltIBd
-	 KFno+hDilTWTzrWOuvlnSlonkZzqKH9d8IRe1sqJKcJM9X5RfGjAIYpaIco993E2pL
-	 9XoX+ZJXwZR00D1qPcvZkPQztfqe1uonSdWvJPROKzdlt+derjzfu6+/FYDoV6oSAE
-	 qQhMC6MnMCmu5sQWagfQHNZDyIzvQ46+RajRiY5ddAc89kYei4vfCBZXsjjNZDZMIf
-	 n41NtDr1OdSFw==
-Date: Fri, 22 May 2026 14:29:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH v4 net-next 0/5] rtnetlink: RTNL avoidance in
- rtnl_getlink() and rtnl_dump_ifinfo()
-Message-ID: <20260522142942.36973ef6@kernel.org>
-In-Reply-To: <20260522173002.2181677-1-edumazet@google.com>
-References: <20260522173002.2181677-1-edumazet@google.com>
+	s=arc-20240116; t=1779485795; c=relaxed/simple;
+	bh=aIS7cZHGJDd3LFnie+bBtN7lwbtQRDS9zwaybw0o58g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d2I031WrYEM+AgrPzKci9xYUp59mSQOE/fbGM4dwho/GJNLXp8mbt9HVF1ZyApmkK5JpT9zqRy58SBbk+OQkLkiWcS9uBWu+JoJo2OeLDgDTT+/fXnP6L6dAVpinRgys+scCyyiKDorwLna/Wfe/95kDgZsGMvlyVM5Mw1xD48g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XTVc4vUd; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-49042aeeb75so18695455e9.1
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 14:36:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779485792; x=1780090592; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vfZtpNg/xxd2BsQF/1l2YYHH7lYt774iHWExpAvOxcg=;
+        b=XTVc4vUde4GNLTUcS7qivqmTFnWu1GhQVOxSWAWTZb4siKJu89ICaOF0y2EgeXYRXa
+         E7pBhuteMDU6cCsYlb7zsMCZBCBnEuoqjaAfHpDX1DZvPX6Oh0Lodj+TL56QKeR6X7Dn
+         Frb0SJwjAYBnNexDdaMYtxdG6RarY7/78usteD6uNKONhj/h4b/dyGQaNuw9lp2JCI+O
+         ZF7I6nqArM0ShJ4sS+VYofvfJKgtr3HXRJMJNNpFvd+i/1b9g/KbgFSg+i20lt8Sxh73
+         guUndM0EQ36VDXZH6oAOcCDk9VOMAWgajYUHMKI8Id5eH1bXvLaV/6VHDiyjW4ognpvB
+         6vkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779485792; x=1780090592;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vfZtpNg/xxd2BsQF/1l2YYHH7lYt774iHWExpAvOxcg=;
+        b=aCvE/QX+fFGKD3wBJU5Dmxl0MkU3s8Yl0H148qHEju/5iPhpvOs41rLKv5ADOYrMyJ
+         NrqmSltOQTd1a16cbME3YEHovgh7ct/6GgQK/9G9frD5PO0yEHuaJKuOTwyX193Wq2MS
+         gbRAhd48JXgjCaZLRHbwqkzALXnFO43s9Ly32BmkIDsUBATsnWsL1hLy/pan004A3CXa
+         zsNdS3WHPg1HvgvjM3Gs9uYwHAp5Vvd5dzRxXTMaUSXfqIHKywk1P+hH5x2yMTft1fjE
+         f1aWKpmeEzTUChIQkqj5DVxLaGzJGgufeQrrBkR6oQdqwYrNf0kgnE8lB1MIX5ndI6WU
+         WXSw==
+X-Forwarded-Encrypted: i=1; AFNElJ8ljnLbNnPZlLNh0Lx5AjpI9+dIYW+5NYTDVmrUYX0452lK10wXTSKHSW42N3eL6pSh8kPsgYE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9xjMJ+7vvqLkVT0R1LqCLjghlE/l6B/8xaNNEGoSZMwX9vQ+8
+	NWuzstvzD0IaRTMDiH7S3USpX6qGl+0IUwHtRbdWYlcHxGQNQjQiWKzP
+X-Gm-Gg: Acq92OG090fgeFTmSWqXnWvCOqQVaDWZceRNHWRyWfBOL/w0QA7XMI5F4aj/fTIdnm/
+	jRT8dd+txVPcWHzDa6iwCzemEzsYQgDVcpoEYCkC67Cc9uxdP6ylTfoowfNLIBvgGdnp9gLfogD
+	t1QLQqTSHGpzZ5/xzntmc0MblaEViMjGAT1tCnttJ8WeIU/BDimkULEZNDds7xIDtv2ZSNJpWst
+	BJjYG9zHMAi7NZNHvUZ7Ijj7ACZF2vu8bFPBiJNp81Xae0Za0xJXyyarh6/JPIXihrvv3JVppDD
+	CL0pcunWd/XbH0ASSq3Eq193QKnVJncop5ULunnBlir6CPaKMiRQkI2vU7ktmJFRqn90c6bX9Ya
+	whLsoCeu2mCxuNu05EoUuSW1UixbFo/Np3Gb8tfDsNyig8shYnZepaSX4vlxwRSkgXFS92CMRmj
+	irfCQSoHNp6MlsaJJlJuo5QEd6KFVmS2l7CILd+g7mdOkeHPlVf0WA5U0vrfuGeJEVEmqLd3Cu0
+	NiDrw01xLIw3zb2GbIAEbmlfg0PZ0z673pI1Kbw4NyNkzw=
+X-Received: by 2002:a05:600c:a213:b0:48e:8741:fd42 with SMTP id 5b1f17b1804b1-490424ada3bmr53332355e9.12.1779485792276;
+        Fri, 22 May 2026 14:36:32 -0700 (PDT)
+Received: from ?IPV6:2001:9e8:f11f:2b01:59e8:aae0:c8be:3081? ([2001:9e8:f11f:2b01:59e8:aae0:c8be:3081])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904527dbf3sm63950535e9.6.2026.05.22.14.36.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 May 2026 14:36:31 -0700 (PDT)
+Message-ID: <4a1b13f4-9c68-4f4c-a676-fd61e2aeeab0@gmail.com>
+Date: Fri, 22 May 2026 23:36:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 1/2] net: sfp: apply I2C adapter quirks to
+ limit block size
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bjorn@mork.no, horms@kernel.org
+References: <20260516135442.2234729-2-jelonek.jonas@gmail.com>
+ <20260520234204.565333-1-kuba@kernel.org>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <20260520234204.565333-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-290923-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,bootlin.com,vger.kernel.org,mork.no,kernel.org];
+	TAGGED_FROM(0.00)[bounces-290924-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 104595BA748
+X-Rspamd-Queue-Id: 147995BA855
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 22 May 2026 17:29:57 +0000 Eric Dumazet wrote:
-> Many shell scripts invoke iproute2 commands specifying a device by
-> its name.
-> 
-> This series improves their performance avoiding RTNL acquisition
-> for their (repeated) name->index conversion.
-> 
-> v3: insert patch 2/3 in the series (Jakub reported a KASAN splat)
-> v4: Addressed Sashiko's feedback.
->     added 2 patches for rtnl_dump_ifinfo().
+Hi,
 
-The CI looks fried, various errors:
+On 21.05.26 01:42, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net: sfp: apply I2C adapter quirks to limit block size
+>
+> This patch modifies the SFP driver to respect I2C adapter quirks when
+> configuring the I2C block size. It restricts the maximum block size
+> based on the adapter's max_read_len and max_write_len fields.
+>
+>> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+>> index bd970f753beb6..e58e29a1e8d27 100644
+>> --- a/drivers/net/phy/sfp.c
+>> +++ b/drivers/net/phy/sfp.c
+>> @@ -807,21 +807,29 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
+>>  
+>>  static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
+>>  {
+> [ ... ]
+>
+>>  	} else {
+>>  		sfp->i2c = NULL;
+>>  		return -EINVAL;
+>>  	}
+>>  
+>> +	if (i2c->quirks && i2c->quirks->max_read_len)
+>> +		max_block_size = min(max_block_size, i2c->quirks->max_read_len);
+>> +	if (i2c->quirks && i2c->quirks->max_write_len)
+>> +		max_block_size = min(max_block_size, i2c->quirks->max_write_len);
+> Does this limit the read block size incorrectly based on the write limit?
+>
+> The write portion of an I2C read transfer is always 1 byte for the EEPROM
+> offset, regardless of the read block size.
+>
+> If an adapter has a max_write_len of 1, max_block_size will drop to 1.
+> Since sfp_hwmon_probe() checks if sfp->i2c_max_block_size < 2 to ensure
+> atomic 16-bit reads, does this inadvertently disable hardware monitoring for
+> adapters that have a small write limit but sufficient read capabilities?
+>
+> Also, for actual write transfers, sfp_i2c_write() prepends a 1-byte register
+> address to the payload. If max_block_size is set exactly to max_write_len,
+> won't the resulting message length be 1 + max_write_len, which still exceeds
+> the adapter's quirk limit?
+>
+> Additionally, looking at sfp_i2c_write(), it does not appear to loop or
+> chunk the buffer using sfp->i2c_max_block_size. Does this mean the new
+> limit will be ignored during writes, and the function will still attempt
+> to transfer the entire buffer in a single operation?
 
-# 0.02 [+0.02] RTNETLINK answers: File exists
-# 0.02 [+0.00] Failed to create netif
+Valid concern but it seems like this doesn't have a practical impact right
+now. Having a closer look at in-tree drivers shows that
 
-# CMD: ip -d -j link show dev eth8
-#   EXIT: 1
-#   STDOUT: []
-#   STDERR: RTNETLINK answers: Message too long
-#           Cannot send link get request: Message too long
+(a) i2c-tegra (read-cap: 4096 | write-cap: 4084)
+(b) i2c-tegra194 (read-cap: no | write-cap: 65524)
+(c) i2c-mlxbf (read-cap: 128 | write-cap: 127)
+(d) i2c-qcom-cci (read-cap: 12 | write-cap: 10/11)
 
-At boot we hit:
+seem to have an asymmetry between read cap and write cap. However,
+the actual limits for (1), (2) and (3) are far beyond the 16 bytes the SFP
+driver uses. For (d) it is below but would trigger the hwmon disable.
+Moreover, qcom-cci seems to be a driver running camera sensors,
+nothing that will ever be used for SFP cages. Thus I would acknowledge
+this but not add a fix for that.
 
-[    0.661578] ------------[ cut here ]------------
-[    0.661608] WARNING: net/core/rtnetlink.c:4296 at rtnl_getlink+0x457/0x5e0, CPU#3: ip/71
-[    0.661656] Modules linked in:
-[    0.661681] CPU: 3 UID: 0 PID: 71 Comm: ip Tainted: G        W           7.1.0-rc4-virtme #1 PREEMPT(lazy) 
-[    0.661735] Tainted: [W]=WARN
-[    0.661756] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[    0.661795] RIP: 0010:rtnl_getlink+0x457/0x5e0
-[    0.661831] Code: ff ff 89 c3 48 83 c4 38 e8 76 44 fe ff 85 db 48 8b 7c 24 08 0f 84 2c 01 00 00 48 89 fe ba 02 00 00 00 31 ff e8 4a b7 fb ff 90 <0f> 0b 90 b8 a6 ff ff ff 49 8b 94 24 40 05 00 00 65 ff 0a 80 7c 24
-[    0.661928] RSP: 0018:ff87a370c027b7a8 EFLAGS: 00010296
-[    0.661956] RAX: 0000000000000010 RBX: 00000000ffffffa6 RCX: ff368f1541d3ef00
-[    0.661998] RDX: ff368f157edadda0 RSI: 0000000000000011 RDI: ff368f15411ffa00
-[    0.662041] RBP: ff368f1541e60b00 R08: ff368f1541845810 R09: ffffffff9ec3bbe6
-[    0.662076] R10: ffd7c3a340079800 R11: ff368f15411ffa00 R12: ff368f1541e31000
-[    0.662126] R13: ffffffff9fe4f700 R14: 0000000000000009 R15: ffffffff9fe4f700
-[    0.662176] FS:  00007fa9d67e0600(0000) GS:ff368f15df00c000(0000) knlGS:0000000000000000
-[    0.662219] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    0.662253] CR2: 00007fff3c059c78 CR3: 000000000190f005 CR4: 0000000000771ef0
-[    0.662294] PKRU: 55555554
-[    0.662307] Call Trace:
-[    0.662319]  <TASK>
-[    0.662338]  ? rtnl_fill_ifinfo.isra.0+0x1670/0x1670
-[    0.662366]  rtnetlink_rcv_msg+0x39f/0x460
-[    0.662390]  ? rtnl_calcit.isra.0+0x160/0x160
-[    0.662420]  netlink_rcv_skb+0xca/0x140
-[    0.662445]  netlink_unicast+0x26b/0x3a0
-[    0.662467]  netlink_sendmsg+0x1e2/0x430
-[    0.662489]  ____sys_sendmsg+0x14c/0x2b0
-[    0.662511]  ___sys_sendmsg+0xe1/0x120
-[    0.662539]  __sys_sendmsg+0xad/0x100
-[    0.662560]  do_syscall_64+0x104/0xfc0
-[    0.662585]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[    0.662609] RIP: 0033:0x7fa9d6a1808e
-[    0.662631] Code: 4d 89 d8 e8 94 bd 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 03 ff ff ff 0f 1f 00 f3 0f 1e fa
-[    0.662733] RSP: 002b:00007fff3c059b50 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
-[    0.662775] RAX: ffffffffffffffda RBX: 00007fff3c05ce1d RCX: 00007fa9d6a1808e
-[    0.662823] RDX: 0000000000000000 RSI: 00007fff3c059c00 RDI: 0000000000000004
-[    0.662864] RBP: 00007fff3c059b60 R08: 0000000000000000 R09: 0000000000000000
-[    0.662907] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-[    0.662947] R13: 000000006a10c531 R14: 00007fff3c059ca0 R15: 00007fff3c05ce1d
-[    0.662982]  </TASK>
-[    0.662998] ---[ end trace 0000000000000000 ]---
-[    0.663079] ------------[ cut here ]------------
-[    0.663110] WARNING: net/core/rtnetlink.c:4523 at rtmsg_ifinfo_build_skb+0xc8/0x110, CPU#3: ip/71
-[    0.663162] Modules linked in:
-[    0.663186] CPU: 3 UID: 0 PID: 71 Comm: ip Tainted: G        W           7.1.0-rc4-virtme #1 PREEMPT(lazy) 
-[    0.663235] Tainted: [W]=WARN
-[    0.663256] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[    0.663289] RIP: 0010:rtmsg_ifinfo_build_skb+0xc8/0x110
-[    0.663319] Code: 80 00 00 00 e8 59 d9 ff ff 48 83 c4 38 85 c0 75 18 48 83 c4 08 4c 89 f8 5b 5d 41 5c 41 5d 41 5e 41 5f c3 44 8b 48 08 eb b4 90 <0f> 0b 90 ba 02 00 00 00 4c 89 fe 31 ff e8 36 ab fb ff b9 a6 ff ff
-[    0.663414] RSP: 0018:ff87a370c027b720 EFLAGS: 00010286
-[    0.663439] RAX: 00000000ffffffa6 RBX: 0000000000000001 RCX: 0000000000000000
-[    0.663485] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ff368f1541e60700
-[    0.663527] RBP: 0000000000000000 R08: ff368f1541845810 R09: ff368f154298f02c
-[    0.663569] R10: ff368f1541e31120 R11: fefefefefefefeff R12: 0000000000000000
-[    0.663612] R13: 0000000000000010 R14: ff368f1541e31000 R15: ff368f1541e60700
-[    0.663655] FS:  00007fa9d67e0600(0000) GS:ff368f15df00c000(0000) knlGS:0000000000000000
-[    0.663699] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    0.663730] CR2: 000055ed56288988 CR3: 000000000190f005 CR4: 0000000000771ef0
-[    0.663774] PKRU: 55555554
-[    0.663787] Call Trace:
-[    0.663803]  <TASK>
-[    0.663821]  rtmsg_ifinfo+0x3c/0xa0
-[    0.663845]  __dev_notify_flags+0xb1/0xf0
-[    0.663867]  ? rtnl_getlink+0x456/0x5e0
-[    0.663887]  netif_change_flags+0x54/0x70
-[    0.663913]  do_setlink.isra.0+0x3a2/0x1500
-[    0.663939]  ? __nla_validate_parse+0x76/0xf20
-[    0.663970]  rtnl_newlink+0x9d3/0xd90
-[    0.663993]  ? do_setlink.isra.0+0x1500/0x1500
-[    0.664015]  rtnetlink_rcv_msg+0x39f/0x460
-[    0.664035]  ? get_page_from_freelist+0x157a/0x16a0
-[    0.664068]  ? rtnl_calcit.isra.0+0x160/0x160
-[    0.664091]  netlink_rcv_skb+0xca/0x140
-[    0.664118]  netlink_unicast+0x26b/0x3a0
-[    0.664140]  netlink_sendmsg+0x1e2/0x430
-[    0.664162]  ____sys_sendmsg+0x14c/0x2b0
-[    0.664182]  ___sys_sendmsg+0xe1/0x120
-[    0.664204]  __sys_sendmsg+0xad/0x100
-[    0.664226]  do_syscall_64+0x104/0xfc0
-[    0.664248]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[    0.664275] RIP: 0033:0x7fa9d6a1808e
-[    0.664295] Code: 4d 89 d8 e8 94 bd 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 03 ff ff ff 0f 1f 00 f3 0f 1e fa
-[    0.664397] RSP: 002b:00007fff3c05b1b0 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
-[    0.664437] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fa9d6a1808e
-[    0.664478] RDX: 0000000000000000 RSI: 00007fff3c05b260 RDI: 0000000000000003
-[    0.664520] RBP: 00007fff3c05b1c0 R08: 0000000000000000 R09: 0000000000000000
-[    0.664559] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
-[    0.664604] R13: 000000006a10c531 R14: 000055ed1cfb1040 R15: 0000000000000000
-[    0.664645]  </TASK>
-[    0.664658] ---[ end trace 0000000000000000 ]---
+On other opinions, please raise your hand. Then I might provide
+another patch implementing per-direction caps, or any other
+suggested solution.
+
+>> +
+>> +	sfp->i2c_max_block_size = max_block_size;
+>>  	return 0;
+>>  }
+
+Regards,
+Jonas
 
