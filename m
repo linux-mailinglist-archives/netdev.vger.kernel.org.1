@@ -1,129 +1,150 @@
-Return-Path: <netdev+bounces-290674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sHexBIjnD2q5RQYAu9opvQ
-	(envelope-from <netdev+bounces-290674-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:20:08 +0200
+	id 2EIAEhvqD2omRgYAu9opvQ
+	(envelope-from <netdev+bounces-290675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:31:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D2D65AF0B2
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:20:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E79F5AF279
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 07:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9C6F0301724B
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 05:20:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89AA83007CA8
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 05:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A08939185A;
-	Fri, 22 May 2026 05:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A7939D6FD;
+	Fri, 22 May 2026 05:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AqaEYa0P"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967D6391851;
-	Fri, 22 May 2026 05:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C6E389DE3;
+	Fri, 22 May 2026 05:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779427204; cv=none; b=HCuqd2AvYCEGMESesjq4qrkomC7NruOZfKzPII8rKZ2dr6lLASx0VSB3dhKHkFvEEbegT88iF3kVIJPJwBJ7IEQnPX6rxrMr4EPX6i8Z+aE0DxYTerSlw82ZBgQ5AaAl96ambLqHwO/SqygvIvGtzYJjTYZhIC14B8dN4YuxWAo=
+	t=1779427863; cv=none; b=B9k9IZYKRSUa+wlFZNqo9D+tewTpf7Z+nPA7Cw6/37GJLP9LkihXfdy8uOimbGpmEsxUwFL+3RTcLZHo9jNxeHmu26RujVR2QHqRpQSNz/ASHN8DBsqCMmkMti8k9qLI7cLFdGdXGxIXlpNmu2l2ooYIN9WDVDcpsGmBwEuj7e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779427204; c=relaxed/simple;
-	bh=d94ENTgaahbOkQMH8t51whIljGLTrs4yR5S2GWvbB8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RjTzYlRe8SD31RSNtVLlybYYTgoQ5EdpU7kbKanCB1cnDB5MJYViyfRiuQUWskI/whyAUlEODmd+BICGn18PHPKazQqRLfEh9wMxNa70primHA47CZtQAtMynylylydy9e2BsTY63G3RJEck+UMv+f8xjnzEPjts6N8F4Q5dmU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 10C4760345; Fri, 22 May 2026 07:19:58 +0200 (CEST)
-Date: Fri, 22 May 2026 07:19:56 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Marco Crivellari <marco.crivellari@suse.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Michal Hocko <mhocko@suse.com>, Simon Horman <horms@verge.net.au>,
+	s=arc-20240116; t=1779427863; c=relaxed/simple;
+	bh=4a51hc2OqCTO0TD8iSPD8Qltbc9P/HKHbU9SClbKCj0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BqAjv5ZZx+7gPI2Lf+Or0Y7+mf9IniDVG5EAh1vtpWfxASa3IMhJkfOHHZEXmLTttbBIWV3RunxwQ3YgiBtDQPK8r8MB4p0lhZSZjaMGLpBy1U+Mx04paGCDDxWrnIqpDgk7pFhi7rqLd2S2qtNmvEGU3NCefCu9M5RPxA79Om0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AqaEYa0P; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A01E81F000E9;
+	Fri, 22 May 2026 05:31:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779427861;
+	bh=8YCnnam31m4N89+V9ic9Yg6pDBZ5mnBZ7cSItXVc85s=;
+	h=From:To:Cc:Subject:Date;
+	b=AqaEYa0PiodfmveN3Z50Agvn52AsP3Dyij9bfuTwG0DnzmqNXYsaYaZBMswDJ8HvV
+	 q7M+YL5HbMIzK1tYBkikxLruJ8cnmER0RFlSGDQtQgBks9+JgHZZh5ufbv0TEIWwwp
+	 JA/N7PkzI7QFhDTZcaYZg4W5vDJR5Ij+faPRxt/jbzdJsgAmsJ2EZ58lRS9hqU72iE
+	 tk7S8mztIVSD+79i15BzBAFJqRHtfnSJ+YYf/E9bIRY7n2oM/pt8ZxcQ963MNmg8DK
+	 iu+DgBzHj0Y1Y7SJJxQ8ESMIaAWZiSZJ7FKnUsEHocWEFSldK1hIMsh/w+pEF4LaNA
+	 2FhiUhz/Zig3Q==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
 	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
-	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: Re: [PATCH v2 net-next 2/2] ipvs: Replace use of system_unbound_wq
- with system_dfl_long_wq
-Message-ID: <ag_nfJAqqBkZi2dy@strlen.de>
-References: <20260515135143.259669-1-marco.crivellari@suse.com>
- <20260515135143.259669-3-marco.crivellari@suse.com>
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH net-next 0/6] Remove unused support for crypto tfm cloning
+Date: Fri, 22 May 2026 00:30:22 -0500
+Message-ID: <20260522053028.91165-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260515135143.259669-3-marco.crivellari@suse.com>
-X-Spamd-Result: default: False [-1.46 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290674-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,linutronix.de,suse.com,verge.net.au,google.com,davemloft.net,redhat.com,ssi.bg,netfilter.org,nwl.cc];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,zx2c4.com,gondor.apana.org.au,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-290675-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7D2D65AF0B2
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 9E79F5AF279
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Marco Crivellari <marco.crivellari@suse.com> wrote:
-> This patch continues the effort to refactor workqueue APIs, which has begun
-> with the changes introducing new workqueues and a new alloc_workqueue flag:
-> 
->    commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
->    commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
-> 
-> The point of the refactoring is to eventually alter the default behavior of
-> workqueues to become unbound by default so that their workload placement is
-> optimized by the scheduler.
-> 
-> Before that to happen, workqueue users must be converted to the better named
-> new workqueues with no intended behaviour changes:
-> 
->    system_wq -> system_percpu_wq
->    system_unbound_wq -> system_dfl_wq
-> 
-> This way the old obsolete workqueues (system_wq, system_unbound_wq) can be
-> removed in the future.
-> 
-> This specific work is considered long, so enqueue it using
-> system_dfl_long_wq instead of system_dfl_wq.
+This series is targeting net-next because it depends on
+"net/tcp: Remove tcp_sigpool".  So far no commits in cryptodev conflict
+with this, so I suggest that this be taken through net-next for 7.2.
 
-While 5522d65d81a7 ("ipvs: avoid possible loop in ip_vs_dst_event on resizing")
-is now in nf-next, this patch doesn't apply (anymore):
+This series removes support for transformation cloning from the crypto
+API.  Now that the TCP-AO and TCP-MD5 code no longer uses it, it no
+longer has a user.  And it's unlikely that a new one will appear, as the
+library API solves the problem in a much simpler and more efficient way.
 
-git am -s v2-net-next-2-2-ipvs-Replace-use-of-system_unbound_wq-with-system_dfl_long_wq.patch
-Applying: ipvs: Replace use of system_unbound_wq with system_dfl_long_wq
-error: patch failed: net/netfilter/ipvs/ip_vs_ctl.c:800
-error: net/netfilter/ipvs/ip_vs_ctl.c: patch does not apply
-Patch failed at 0001 ipvs: Replace use of system_unbound_wq with system_dfl_long_wq
+This feature also regressed performance for all crypto API users, since
+it changed crypto transformation objects into reference-counted objects.
+That added expensive atomic operations.  The refcount is reverted by
+this series, thus fixing the performance regression.
 
-Would you mind sending a new version? Thanks.
+A subset of this was previously sent in
+https://lore.kernel.org/r/20260307224341.5644-1-ebiggers@kernel.org
+Compared to that version, this version is a bit more comprehensive.
+
+Eric Biggers (6):
+  crypto: hash - Remove support for cloning hash tfms
+  crypto: cipher - Remove crypto_clone_cipher()
+  crypto: api - Remove crypto_clone_tfm()
+  crypto: api - Remove per-tfm refcount
+  crypto: api - Fold __crypto_alloc_tfmgfp() into __crypto_alloc_tfm()
+  crypto: api - Fold crypto_alloc_tfmmem() into crypto_create_tfm_node()
+
+ crypto/ahash.c                   | 70 -----------------------------
+ crypto/api.c                     | 76 +++++---------------------------
+ crypto/cipher.c                  | 28 ------------
+ crypto/cmac.c                    | 16 -------
+ crypto/cryptd.c                  | 16 -------
+ crypto/hmac.c                    | 31 -------------
+ crypto/internal.h                | 10 -----
+ crypto/shash.c                   | 37 ----------------
+ include/crypto/hash.h            |  8 ----
+ include/crypto/internal/cipher.h |  2 -
+ include/linux/crypto.h           |  1 -
+ 11 files changed, 10 insertions(+), 285 deletions(-)
+
+
+base-commit: 1a1f055318d82e64485a6ff8420e5f70b4267998
+-- 
+2.54.0
+
 
