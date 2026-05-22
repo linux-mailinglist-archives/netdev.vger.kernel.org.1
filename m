@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-290936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMZNF6DiEGpqfAYAu9opvQ
-	(envelope-from <netdev+bounces-290936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:11:28 +0200
+	id KLP+JbjiEGpqfAYAu9opvQ
+	(envelope-from <netdev+bounces-290937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:11:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74005BB5FC
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:11:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA4B5BB617
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94AC43008D3F
-	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:07:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73812302974B
+	for <lists+netdev@lfdr.de>; Fri, 22 May 2026 23:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F40F3876C1;
-	Fri, 22 May 2026 23:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697C638CFE8;
+	Fri, 22 May 2026 23:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MYfI4Lp/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VU2Xidto"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6474337E2E6
-	for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4510382866
+	for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779491223; cv=none; b=O2vgs1OOHl/SCcNzCypJj6VKUuv75nJ6rhRTOObgyOmvRGikkl+OP4V1pXHJvecoGr5+67Vm+mzGEPyO3s5Sq/YFHLB1+y4vGcXYmeHmaLsj+MVUMAqgU8p/OTdNFqYXGQC5xu7ZnMNQj4Y3TSiE6h+MdZGfvftsYK8Acyumx38=
+	t=1779491224; cv=none; b=Hy7qCSTNNOsI/Uq6Kynt+UzzsNHhfiSrxZye/FSQpUuA/q9bAT/DWPQE0oBjNN/2MNUvYg5JRyEROJtZ9W6bDTUEWrYmA8tFnkWwZdRNML7hkYRsE1I9uHQk+omrGTcnO3DCv/Mjn7+96me4yS0Ru50T9LPbOVi/m7UY+4Qd2rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779491223; c=relaxed/simple;
-	bh=VHuekFtuuwBInoW8rnwmfFZANefl/pAEZSsrph9dI9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TTXyYz7DOosDjf1rILLpc/HtxD5CUxCnPN0KPqAbwo42nKJXBPRl1rtbtn4/vUN8hrulbC5SyeCQiDgb9z6cXVmPMvX/E/phQupxhHnnraE8AAAFxY1agYL686jT8LdEUkmVi54OSR4VZq81oV1VwovUr5Ep661VhEwNSOPUtTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MYfI4Lp/; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2BDB1F000E9;
-	Fri, 22 May 2026 23:07:01 +0000 (UTC)
+	s=arc-20240116; t=1779491224; c=relaxed/simple;
+	bh=bByBtITJ0CvKFHBvxRWfZQ2V9xHUTysGdPyT6ZLjZog=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZYsislBjdENmwWY188qNvef9qvAF6TlGcse7IL2SzpdM/RNRcD5wMTaYgffFmEZ4z1GqMn+Pa3SemldYbPH9laS62OHttQVC1Yj4W/aoiO4mSsfzF4wT8+SMC81sQeZDatHV+yWlNMCEKn03mtNnLwOJU5iaxMXzWpr978bNak0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VU2Xidto; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB8E51F00A3D;
+	Fri, 22 May 2026 23:07:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779491222;
-	bh=lXME3GH2qea3svR7EPFJCxTxYNc5dEqQVVNGS99A5kM=;
-	h=From:To:Cc:Subject:Date;
-	b=MYfI4Lp/dFiZGO8pQmAe29cveF51wN6ouafsd3mMStQDVkqcWaFD+g0BnvC1oBFxw
-	 ot7j7qZ5QYK6PTX1/k4Zh1M85okaR9wrjC+xdQCGHIFvovXJNzJHu7eAY7DFkuc4g1
-	 XRvUtrM87Hn96uTHSPsxtdFTCys3iEkLI+Tbehj7aCw+CfvaslVq+PFg3mIvR/gk+L
-	 70iIEgjqvJj8JGEi5eQPRYTkkKyP3majufxECYcwiBmBYqdo1rUfXUTP1hNeiA8sj1
-	 YKW3ZZZB6v5ejfB+t3E2lE4/6/1ClJMhiZwl8gd8904L+gXI61+DMUxA4CNJFdv4NS
-	 HYx2Ldl+tUIxA==
+	s=k20260515; t=1779491223;
+	bh=ocU0C81LVhiuatd6m0R41vAaq7UqdSt2bU19xf+K+rY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=VU2XidtonAejoxF6+rdNy1yauLohQRSfeGqyVRoN0NSzUV4nj3nvTY/EFYDrb6+i4
+	 AX1uVTuWUlrxS2DkjDN8QfACHs6zIm1L3su3eVY0BVt0NfpJU+/Shj525QnY/z1Z1b
+	 szIB2LNOMhcRpzv/XzVaCkGwSj8IyJC9W9/ns79jQFNu24iEG5nxaNj05hx6OBsN/v
+	 6hpF9mHqiOrqOznqYCn1+MadAtK2FN6x2BYALf2iW2QAENJJjA0L73MO5QcyWndYFK
+	 3Xg+uqANdn9ZP77nD/YkENwWe6CZn06lSPk7axjKTpvzJ/aa9c//sa0bJEQzuJgs26
+	 q9a+P78rEwy5g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,11 +52,14 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	gal@nvidia.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 0/6] ethtool: rss: fix a handful of small bugs
-Date: Fri, 22 May 2026 16:06:41 -0700
-Message-ID: <20260522230647.1705600-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	andrew@lunn.ch
+Subject: [PATCH net 1/6] ethtool: rss: avoid modifying the RSS context response
+Date: Fri, 22 May 2026 16:06:42 -0700
+Message-ID: <20260522230647.1705600-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260522230647.1705600-1-kuba@kernel.org>
+References: <20260522230647.1705600-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,7 +82,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290936-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290937-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -88,26 +92,75 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.996];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D74005BB5FC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:email]
+X-Rspamd-Queue-Id: EFA4B5BB617
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Fix a handful of small bugs in the ethtool Netlink RSS code.
+Gemini says that we're modifying the RSS_CREATE response skb.
+I think it's right, the comment says that unicast() should
+unshare the skb but I'm not entirely sure what I meant there.
+netlink_trim() does a copy but only if skb is not well sized
+(it's at least 2x larger than necessary for the payload).
 
-Jakub Kicinski (6):
-  ethtool: rss: avoid modifying the RSS context response
-  ethtool: rss: add missing errno on RSS context delete
-  ethtool: rss: fix falsely ignoring indir table updates
-  ethtool: rss: fix indir_table and hkey leak on get_rxfh failure
-  ethtool: rss: fix hkey leak when indir_size is 0
-  ethtool: rss: avoid device context leak on reply-build failure
+Fixes: a166ab7816c5 ("ethtool: rss: support creating contexts via Netlink")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: andrew@lunn.ch
+CC: gal@nvidia.com
+---
+ net/ethtool/rss.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
- net/ethtool/rss.c | 37 +++++++++++++++++++++++--------------
- 1 file changed, 23 insertions(+), 14 deletions(-)
-
+diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
+index 353110b862ab..8ffec9785efa 100644
+--- a/net/ethtool/rss.c
++++ b/net/ethtool/rss.c
+@@ -981,11 +981,17 @@ ethnl_rss_create_validate(struct net_device *dev, struct genl_info *info)
+ }
+ 
+ static void
+-ethnl_rss_create_send_ntf(struct sk_buff *rsp, struct net_device *dev)
++ethnl_rss_create_send_ntf(const struct sk_buff *rsp, struct net_device *dev)
+ {
+-	struct nlmsghdr *nlh = (void *)rsp->data;
+ 	struct genlmsghdr *genl_hdr;
++	struct nlmsghdr *nlh;
++	struct sk_buff *ntf;
+ 
++	ntf = skb_copy_expand(rsp, 0, 0, GFP_KERNEL);
++	if (!ntf)
++		return;
++
++	nlh = nlmsg_hdr(ntf);
+ 	/* Convert the reply into a notification */
+ 	nlh->nlmsg_pid = 0;
+ 	nlh->nlmsg_seq = ethnl_bcast_seq_next();
+@@ -993,7 +999,7 @@ ethnl_rss_create_send_ntf(struct sk_buff *rsp, struct net_device *dev)
+ 	genl_hdr = nlmsg_data(nlh);
+ 	genl_hdr->cmd =	ETHTOOL_MSG_RSS_CREATE_NTF;
+ 
+-	ethnl_multicast(rsp, dev);
++	ethnl_multicast(ntf, dev);
+ }
+ 
+ int ethnl_rss_create_doit(struct sk_buff *skb, struct genl_info *info)
+@@ -1104,12 +1110,8 @@ int ethnl_rss_create_doit(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	genlmsg_end(rsp, hdr);
+ 
+-	/* Use the same skb for the response and the notification,
+-	 * genlmsg_reply() will copy the skb if it has elevated user count.
+-	 */
+-	skb_get(rsp);
+-	ret = genlmsg_reply(rsp, info);
+ 	ethnl_rss_create_send_ntf(rsp, dev);
++	ret = genlmsg_reply(rsp, info);
+ 	rsp = NULL;
+ 
+ exit_unlock:
 -- 
 2.54.0
 
