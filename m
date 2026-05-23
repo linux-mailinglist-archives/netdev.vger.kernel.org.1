@@ -1,238 +1,340 @@
-Return-Path: <netdev+bounces-291121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291122-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4LBaHjDDEWpDpgYAu9opvQ
-	(envelope-from <netdev+bounces-291121-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 17:09:36 +0200
+	id 0G9vN3TFEWr9pgYAu9opvQ
+	(envelope-from <netdev+bounces-291122-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 17:19:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2ED45BF90E
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 17:09:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D65B25BF9CE
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 17:19:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BFC52300952D
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 15:08:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 53177300721F
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 15:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CAD2E0B58;
-	Sat, 23 May 2026 15:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2EE2EC086;
+	Sat, 23 May 2026 15:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.us header.i=len.bao@gmx.us header.b="o4oM3L0O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EBKfviHs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8892DF13E;
-	Sat, 23 May 2026 15:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940A527A47F
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 15:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779548906; cv=none; b=FrY7JpLGzJWyILh8su1Vma4IweKarDD41/dBsbHO2r8PDJIEmYQFLIdL6tU+ln7X8bJSVO/+9EyBJDZAcKxXjnglEVl5iggGizV89S3VZpUkTF6czJKnU5k6qQokG5uFbf6etTHPlWCB1XnatLgPxMS3j9732NSYjZWIds6KigQ=
+	t=1779549548; cv=none; b=ezWImtP3JAsXuCNw5VVWdM4AYLnU1enwh5/4gbVne4FRUy+OSifx9lQtSAKkPWqcjPcdFedYapgC7mbb1XGpDKGeWjW0XmtRoN3HvLy1Shrm6Qe7dEnVG4wi/7VcJLhR8YdxvgOkRnO9R3Bdb34b1hw7mdIC1P9Yz3nfkFYhK8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779548906; c=relaxed/simple;
-	bh=82NSXEFFd4WZzMrDPwcXU9JvSq4k+i+r57OuVwqdf2w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S26UDi03tAyTO5WuKl6kydE3QuelPmCFdK3VE0cqDIw3ZEd8I0fZyX86MbJnaE6j8L6bke8/5CsR013taBJNQrHYO0N0IOTrVeH3CLnB//Nf6ilGfesI7421AUZqXstvujroTkpnw+KEEOC8NMhS4qejwteSdvMBdKicDvTfmvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.us; spf=pass smtp.mailfrom=gmx.us; dkim=pass (2048-bit key) header.d=gmx.us header.i=len.bao@gmx.us header.b=o4oM3L0O; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.us
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.us
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.us;
-	s=s31663417; t=1779548888; x=1780153688; i=len.bao@gmx.us;
-	bh=M1PtxixyZK4GcxsbhumggAhD3tRUbNOr0CDeoNrgEXo=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=o4oM3L0OuVzXYAzozEWSFBeOtYIqiUtkV51Ns4roQ6/CKvpN1EwhgMd5sOxyXK26
-	 hJ7CsfjvswRO3Giq+i/DLotU0RLWP1u6VPa4zllA7M7YC/V84Gwp36Iz13jlqZpiM
-	 h4qBzscSZrUw00E1zzGvwL480PjXWiwPd9J5Pi/uIK1EZJtTjcFQc6tgxx8+qYen9
-	 sxlO6Dn4BV9eRyGm7UOb5ED4g3gPoNu/MxaWzbIvD2tDjHVAV8q7oFvkBwxr3CKFg
-	 bkGW+sTdxV7hse00qeS9d++jY+om4IpnTBcKSjok+WyHitAFQbmpQAGKV95vaWYDU
-	 geGK6uPP2haU1I7RFA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MGQnP-1wYILS0Hb3-00BHR2; Sat, 23
- May 2026 17:08:08 +0200
-From: Len Bao <len.bao@gmx.us>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Len Bao <len.bao@gmx.us>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] eth: dpaa2: constify dpaa2_ethtool_stats and dpaa2_ethtool_extras
-Date: Sat, 23 May 2026 15:07:35 +0000
-Message-ID: <20260523150737.36988-1-len.bao@gmx.us>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1779549548; c=relaxed/simple;
+	bh=vz71qJEbBcDlpKWN0PxoSnCxG34BC1gAh28THLKQFl4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dhuSjvC+RHwfZmVrmONygsKG6P6EVL/FXstXLV04gDAKiee2D2eSdXss08rjZDgmRe+C3CeDT0mo3Ki2w3RHyy4BhZz4X7peR+WLkxfLbsxoSOIvt4P9H0+yqaZfG3ZewFNFB/1aQxS5f+QOf3R7Eu3xK5GXRmPxvQmvWOAK4/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EBKfviHs; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-49039a8851fso27727255e9.2
+        for <netdev@vger.kernel.org>; Sat, 23 May 2026 08:19:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779549545; x=1780154345; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qMgDahtrFCXXY7J8kNXrJQw4x08PqM0mxJ2Gu2fN2io=;
+        b=EBKfviHs16UbXtyaSwTBTnZ1469xPuxVeCJnp6V8Gs+54G2XGXdyW4r4OWTa+hEIK3
+         1ic5STbB1DQxCYyejS6fel+D4+uJDpAS/b0k0+YS29iQeug9jBzxIxMZRT/6o54gULpL
+         znQv1P15AjJqMr7vV97AijlC8Zka6DE7ayUD6Ez4csjYxN0ngwFIa0nL9HGhZhphO8zF
+         7BZpBbMEfYss5lxkSRLh0OTrf+jk0+zSy6aNdC80cqxIkwiy4VDIdOmpo4av+40LlU1v
+         Ewt9UXIO8S/kRwPpTl6Y67o8esvD4yPcNvGcDU3xSqtlfzWJ1n6zPE2RZ0dvFaT+xRYB
+         3kFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779549545; x=1780154345;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qMgDahtrFCXXY7J8kNXrJQw4x08PqM0mxJ2Gu2fN2io=;
+        b=jwiWWFIld84F66IFfsEpFhYQWIUzi/UALtPwcQvyslX/RLc/XxGWAyi18MfiyeOodY
+         F7ukhbAqcmvL7LSkzAJ3GteENf5Nat93Yh5XJl1hn7TH+M1NRx8CaNtW0iGSvMACeMpC
+         5t2bjYDeFrQUJg53RDsiVuxhAMGrzFKDmGKX+Jz5JtZyzmKV2358ICj5ydabj1Sf0DBh
+         Mmgq7NWlSQfJSWUVH+yWOE0t5+KK+20R53zc43Zf2BKj3lFaOSjVK3y9EoSUHg/jQ29y
+         bFZ3HiLs79ma7fT+ZQUuBca6q+iLS8r0ncYqcm5Z/xduFgLD3qQtlVfDYEyBPzR+Fhz+
+         Ygtw==
+X-Gm-Message-State: AOJu0YyMN00KA81weHTw32rUo6jD+VzZyo0FCq9V9UtW8L1Y6jE0xSKn
+	07nW0PTR0ZHKFw0y00yKgKcL9B6xkf83wCKli2lN2Lba4bdjhL5YeWI3ScQy2Usq
+X-Gm-Gg: Acq92OEZ75/V4CnuMHWYvPwmdKE4SgO9L9vhbBN5KijhnrdtffhXHdpJZsR2P3hc5CP
+	O3pKs4r8SYC5igZyezKd6rIiHUycumxeQCd8l3Yf8Y1ubmiL+xtnbIrJxfbZRFX9GtDENnfHFpr
+	pIUrT5mvsvLjLXJxpeLzjP5+uPaTB/2FzfaWA7jP/NBXi9E7C1A+Ykfc/b1YaO8TKGgpc5FC5BY
+	i0AspIsdsZTym9o3JujTScrup4CTQ1/Ya5ucW8wzKps+0avJMxjnLW0D13++t4dULQOVDAvE8xr
+	mMwlPLQvSXtQSWiLkg3vU9CrVULjNXjHSkpX6Xh1vprJaRkd1IgzYAO4rU4TasNZWsPH1OjwDFD
+	WZHVgOrL2b7CqSPSL7Zr6RJBwG3t5z46gdG1ebbfde6hG89bJTHFBPViOPN2TyXi4DWydf6CAUo
+	U6KhQgkzqK4EbVsOW1/iK5Xg0NWzj/cCMi8TQtx9P+4NwAk7vVRTYppJUCFlwt+mkGE7JQXxJmU
+	Xrm/qhDjYpw/kz44g==
+X-Received: by 2002:a05:600c:6383:b0:490:4717:970f with SMTP id 5b1f17b1804b1-4904717984dmr110577425e9.14.1779549544789;
+        Sat, 23 May 2026 08:19:04 -0700 (PDT)
+Received: from localhost.localdomain (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904527dbf3sm111897405e9.6.2026.05.23.08.19.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 May 2026 08:19:02 -0700 (PDT)
+From: Petr Wozniak <petr.wozniak@gmail.com>
+To: netdev@vger.kernel.org
+Cc: maxime.chevallier@bootlin.com,
+	bjorn@mork.no,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-phy@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	jan@3e8.eu,
+	Petr Wozniak <petr.wozniak@gmail.com>
+Subject: [PATCH net-next v7] net: phy: sfp: probe for RollBall I2C-to-MDIO bridge in mdio-i2c
+Date: Sat, 23 May 2026 17:18:59 +0200
+Message-ID: <20260523151859.1665-1-petr.wozniak@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:EbexVjdeiW8vBjD+8Pf4bwCgH/Pf409FEHKLg6jTu+GV986aKtg
- JkV6c5yBtzsIyqTe1Yu7I87r+nZkcZxZLm9RTbaxxAeZaEIhD0aCTRQC9Xo8rD8cqWYLe5b
- 3JWi6TMJF3fQVkr9aUlsI3xn2LVooFeudabKieEQ1WBiNesqMv91rnDAhVzakf+nGlrJnfT
- KiGM783bV5SaXki04O89w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:NqrnVigbh8A=;RXDU8PVwlLfXrWkVXoQba/BBF7k
- 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
- tGfP85LJMn7n12r5dY=
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmx.us,quarantine];
-	R_DKIM_ALLOW(-0.20)[gmx.us:s=s31663417];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmx.us,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[bootlin.com,mork.no,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,lists.infradead.org,vger.kernel.org,3e8.eu];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-291121-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmx.us];
+	TAGGED_FROM(0.00)[bounces-291122-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[len.bao@gmx.us,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmx.us:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-0.996];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,gmx.us:email,gmx.us:mid,gmx.us:dkim]
-X-Rspamd-Queue-Id: F2ED45BF90E
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email]
+X-Rspamd-Queue-Id: D65B25BF9CE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The 'dpaa2_ethtool_stats' and 'dpaa2_ethtool_extras' structures are
-initialized in their declarations and never changed. So, constify them
-to reduce the attack surface.
+The "OEM"/"SFP-10G-T" quirk entry in sfp_fixup_rollball_cc()
+unconditionally forces MDIO_I2C_ROLLBALL for all modules matching that
+vendor/part-number combination.  This works for modules that genuinely
+implement a RollBall I2C-to-MDIO bridge, but silently breaks modules
+that share the same EEPROM strings without having such a bridge.
 
-Before the patch (size dpaa2-ethtool.o):
+The Realtek RTL8261BE-CG is one such module: a pure copper 10G SFP+
+media converter with no I2C-to-MDIO bridge.  Its EEPROM reports
+vendor="OEM", part="SFP-10G-T-I", and -- critically -- Vendor OUI
+00:00:00, making OUI-based differentiation impossible.  With
+MDIO_I2C_ROLLBALL forced, the module silently ACKs the unlock password
+write, the MDIO bus is created, but no PHY responds; the SFP state
+machine cycles through the RollBall PHY-probe retry window before
+reporting no PHY.
 
-   text	   data	    bss	    dec	    hex
-  33433	   5992	      0	  39425	   9a01
+Move the probe into i2c_mii_init_rollball() in mdio-i2c.c, where the
+RollBall protocol constants are already defined.  After sending the
+unlock password, issue a CMD_READ and poll for CMD_DONE up to 200 ms
+(10 x 20 ms, matching the existing rollball poll tolerance).  A genuine
+RollBall bridge asserts CMD_DONE within that window; modules without a
+bridge never do, so i2c_mii_init_rollball() returns -ENODEV.
+mdio_i2c_alloc() propagates -ENODEV to the caller to signal that no
+bridge is present and PHY probing should be skipped.
+sfp_sm_add_mdio_bus() catches -ENODEV and transitions
+sfp->mdio_protocol to MDIO_I2C_NONE so the rest of the state machine
+skips PHY probing for this module.
 
-After the patch (size dpaa2-ethtool.o):
+Any I2C-level error (NACK, timeout) during the probe is also treated as
+-ENODEV: if the module does not respond at I2C address 0x51 at all,
+there is certainly no RollBall bridge there, and SFP initialization
+should not abort.
 
-   text	   data	    bss	    dec	    hex
-  34937	   4488	      0	  39425	   9a01
+The probe writes are safe with respect to SFP EEPROM integrity: only
+modules explicitly listed in the quirk table enter this path, and the
+RollBall password unlock write to 0x51 was already issued by
+i2c_mii_init_rollball() before the probe for all such modules.  Any
+module without a device at 0x51 NACKs the transfer and is treated as
+-ENODEV.
 
-Signed-off-by: Len Bao <len.bao@gmx.us>
-=2D--
- drivers/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Add "OEM"/"SFP-10G-T-I" to the quirk table so RTL8261BE modules enter
+the probe path; genuine RollBall modules continue to work as before.
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c b/driver=
-s/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c
-index 59f5c778d..fcc0a30a9 100644
-=2D-- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-ethtool.c
-@@ -10,7 +10,7 @@
- #include "dpaa2-eth.h"
-=20
- /* To be kept in sync with DPNI statistics */
--static char dpaa2_ethtool_stats[][ETH_GSTRING_LEN] =3D {
-+static const char dpaa2_ethtool_stats[][ETH_GSTRING_LEN] =3D {
- 	"[hw] rx frames",
- 	"[hw] rx bytes",
- 	"[hw] rx mcast frames",
-@@ -37,7 +37,7 @@ static char dpaa2_ethtool_stats[][ETH_GSTRING_LEN] =3D {
-=20
- #define DPAA2_ETH_NUM_STATS	ARRAY_SIZE(dpaa2_ethtool_stats)
-=20
--static char dpaa2_ethtool_extras[][ETH_GSTRING_LEN] =3D {
-+static const char dpaa2_ethtool_extras[][ETH_GSTRING_LEN] =3D {
- 	/* per-cpu stats */
- 	"[drv] tx conf frames",
- 	"[drv] tx conf bytes",
-=2D-=20
-2.43.0
+Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
 
+Changes since v6 (feedback from Maxime Chevallier):
+  - Remove redundant if (ret) checks after i2c_transfer_rollball() calls;
+    the function never returns a positive value (always 0 or negative),
+    so these branches were dead code
+
+Changes since v5 (Sashiko AI review):
+  - Treat I2C NACK/errors in i2c_mii_init_rollball() as -ENODEV so
+    modules without a 0x51 EEPROM do not abort SFP initialization
+  - Replace fixed 70 ms wait with 10 x 20 ms poll (total 200 ms),
+    matching the existing i2c_rollball_mii_poll() tolerance and
+    preventing false -ENODEV on slow RollBall bridges
+
+Changes since v4 (feedback from Maxime Chevallier):
+  - Fix commit message: replace "stalls" with accurate description of
+    the RollBall PHY-probe retry window
+  - Fix variable declaration order in i2c_mii_probe_rollball() to
+    follow reverse-xmas tree (descending line length)
+  - Remove spurious alignment space on "SFP-10G-T" quirk entry
+  - Document that -ENODEV from mdio_i2c_alloc() means no bridge present,
+    PHY probing should be skipped
+
+Changes since v3 (feedback from Jakub Kicinski):
+  - Drop spurious Tested-by: tag -- author and tester are the same person
+  - Use PATCH net-next subject prefix
+  - Move -ENODEV handling from sfp_i2c_mdiobus_create() into
+    sfp_sm_add_mdio_bus() so bus-creation code does not mutate
+    sfp->mdio_protocol; the state machine is the correct place for
+    protocol-state transitions
+  - Split combined variable declaration for clarity
+
+Changes since v2:
+  - Compile-tested and hardware-tested on BPI-R4 (MT7988A, 6.12.87)
+  - RTL8261BE (OEM/SFP-10G-T-I): probes MDIO_I2C_NONE, link Up 10Gbps
+  - Genuine RollBall (OEM/SFP-10G-T): bridge detected, link Up 10Gbps
+
+ drivers/net/mdio/mdio-i2c.c | 61 ++++++++++++++++++++++++++++++------
+ drivers/net/phy/sfp.c       | 16 ++++++++--
+ 2 files changed, 64 insertions(+), 13 deletions(-)
+--- a/drivers/net/mdio/mdio-i2c.c
++++ b/drivers/net/mdio/mdio-i2c.c
+@@ -352,6 +352,50 @@
+ 	return 0;
+ }
+ 
++static int i2c_mii_probe_rollball(struct i2c_adapter *i2c)
++{
++	u8 data_buf[] = { ROLLBALL_DATA_ADDR, 0x01, 0x00, 0x00 };
++	u8 cmd_buf[]  = { ROLLBALL_CMD_ADDR, ROLLBALL_CMD_READ };
++	u8 cmd_addr   = ROLLBALL_CMD_ADDR;
++	struct i2c_msg msgs[2];
++	u8 result;
++	int ret;
++	int i;
++
++	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
++	msgs[0].flags = 0;
++	msgs[0].len   = sizeof(data_buf);
++	msgs[0].buf   = data_buf;
++	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
++	msgs[1].flags = 0;
++	msgs[1].len   = sizeof(cmd_buf);
++	msgs[1].buf   = cmd_buf;
++
++	ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
++	if (ret < 0)
++		return -ENODEV;
++
++	msgs[0].addr  = ROLLBALL_PHY_I2C_ADDR;
++	msgs[0].flags = 0;
++	msgs[0].len   = 1;
++	msgs[0].buf   = &cmd_addr;
++	msgs[1].addr  = ROLLBALL_PHY_I2C_ADDR;
++	msgs[1].flags = I2C_M_RD;
++	msgs[1].len   = 1;
++	msgs[1].buf   = &result;
++
++	for (i = 0; i < 10; i++) {
++		msleep(20);
++		ret = i2c_transfer_rollball(i2c, msgs, ARRAY_SIZE(msgs));
++		if (ret < 0)
++			return -ENODEV;
++		if (result == ROLLBALL_CMD_DONE)
++			return 0;
++	}
++
++	return -ENODEV;
++}
++
+ static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
+ {
+ 	struct i2c_msg msg;
+@@ -371,11 +415,11 @@
+ 
+ 	ret = i2c_transfer(i2c, &msg, 1);
+ 	if (ret < 0)
+-		return ret;
+-	else if (ret != 1)
++		return -ENODEV;
++	if (ret != 1)
+ 		return -EIO;
+-	else
+-		return 0;
++
++	return i2c_mii_probe_rollball(i2c);
+ }
+ 
+ struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
+@@ -399,9 +443,12 @@
+ 	case MDIO_I2C_ROLLBALL:
+ 		ret = i2c_mii_init_rollball(i2c);
+ 		if (ret < 0) {
+-			dev_err(parent,
+-				"Cannot initialize RollBall MDIO I2C protocol: %d\n",
+-				ret);
++			if (ret != -ENODEV)
++				dev_err(parent,
++					"Cannot initialize RollBall MDIO I2C protocol: %d\n",
++					ret);
++			/* -ENODEV propagates to caller: no bridge present,
++			 * PHY probing should be skipped for this module. */
+ 			mdiobus_free(mii);
+ 			return ERR_PTR(ret);
+ 		}
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -607,6 +607,7 @@
+ 	SFP_QUIRK_S("TP-LINK", "TL-SM410U", sfp_quirk_oem_2_5g),
+ 
+ 	SFP_QUIRK_F("ETU", "ESP-T5-R", sfp_fixup_rollball_cc),
++	SFP_QUIRK_F("OEM", "SFP-10G-T-I", sfp_fixup_rollball),
+ 	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
+ 	SFP_QUIRK_S("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
+ 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
+@@ -2029,10 +2030,18 @@
+ 	dev_info(sfp->dev, "probing phy device through the [%s] protocol\n",
+ 		 mdio_i2c_proto_type(sfp->mdio_protocol));
+ 
+-	if (sfp->mdio_protocol != MDIO_I2C_NONE)
+-		return sfp_i2c_mdiobus_create(sfp);
++	int ret;
+ 
+-	return 0;
++	if (sfp->mdio_protocol == MDIO_I2C_NONE)
++		return 0;
++
++	ret = sfp_i2c_mdiobus_create(sfp);
++	if (ret == -ENODEV) {
++		/* Probe confirmed no bridge present; skip PHY discovery. */
++		sfp->mdio_protocol = MDIO_I2C_NONE;
++		return 0;
++	}
++	return ret;
+ }
+ 
+ /* Probe a SFP for a PHY device if the module supports copper - the PHY
+--
+2.51.0
 
