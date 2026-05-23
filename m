@@ -1,170 +1,162 @@
-Return-Path: <netdev+bounces-291126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291127-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eLjuJn3XEWoorQYAu9opvQ
-	(envelope-from <netdev+bounces-291126-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 18:36:13 +0200
+	id 2J79COnXEWoorQYAu9opvQ
+	(envelope-from <netdev+bounces-291127-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 18:38:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A8A5BFDAA
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 18:36:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DBE95BFDC2
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 18:38:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6132301051A
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 16:36:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4AE0B3002FA5
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 16:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B212031E83E;
-	Sat, 23 May 2026 16:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C9E31DDBB;
+	Sat, 23 May 2026 16:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ns5JaW3q"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="2FsLWUtm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LI1OL268";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="2FsLWUtm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LI1OL268"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A354317155
-	for <netdev@vger.kernel.org>; Sat, 23 May 2026 16:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6659A3195FA
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 16:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779554162; cv=none; b=BrwIa6sXTXvlzcrg+SM184Peihj4/QqjvhFp6eGK6qPPzOwb/jElUc0hBucfUmtFXXEVJTHVPVPQ+v20Bxbl9j38dpXJf8epY7oWvxzJCrBuTGryPRVM6SX22hulWYwRW3LkdHXJ99+DuhbmrnW3N23LD1ha98jnAAobypKNndI=
+	t=1779554207; cv=none; b=X9znBgb0lw6/ZZsBGyW1/859h7wOlivAfz5lGfBUHf0iH9Ie/fU0grUPEDSnhleXXVtqIPq0HyPdjsfUfmKX/EHX/0blWRRT1fszDm8L0ennHiEwrMCOcLewKqqUoh6UHvmX2cQ1o0B1/VrVGnFaPaH7rWsQg7la7O22Oz/2aVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779554162; c=relaxed/simple;
-	bh=SnLk0HaLAeDp9CB1O+cT5QTtRXJhfOlf8pVOAJpSIsI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HmqiTACty9agSPMEXU65vlWoXCwiJwUjW/QiETnKbW8P6bG9XgPa+N+BpzxkEo9z6cqVf08mOanfiv8DibJ8ccOWZvewJzZFZ/EAN5pQmjeQysW6JgW9QrWu7sKcGj/MFEn6/ET0YBSna4AbiKKJshf9gwOPXX3wB/LMBE2ieW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ns5JaW3q; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-44ce78ab5feso6851935f8f.0
-        for <netdev@vger.kernel.org>; Sat, 23 May 2026 09:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779554159; x=1780158959; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Iqbi0SmV4l8cOiZU/jCD2RWz3CBg4dHUkTOED22sLyI=;
-        b=ns5JaW3qxh1lKB1A1AMfQL/YNs5W71qvnoee8vLAr5LSlbmqX2Dqx/ltWDQ0JyqyQq
-         j9Dyrhxwh+elQ1GwyrdeuUJ0eERgcDjdOIGbJ78IdpOsbkLY18/bJ4NlDgPuPnJclrlV
-         IT4M8ixDjUtmC78JvcnUc0TZooSMJxLoKwDLeobqUeM5+CH0cc9ol1c0ntLESuS1H1Hb
-         eEPuU+gpiJo7bagCd1eekOZIz/EU7Lt5ci9GXppLJqY2qCUBk7/qW5c6/QpMr/Rusbo7
-         p2QWaZwx5gO9PUHjRAzf0HEFly+cqoeLuBvDSkzfQErmOz/PoG2DHXu0ERATHhxuDCSh
-         2w0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779554159; x=1780158959;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Iqbi0SmV4l8cOiZU/jCD2RWz3CBg4dHUkTOED22sLyI=;
-        b=DcsvOo5Bk0M7J/PEfv1BxR9uX3ELMl47Ob3Fo+ff9Sut8dGzuCPn0Xpl5o+9yYLgAZ
-         HCkb+Y/3OHHF+JXolohJCCBX3+CRiORnbYBmlgySoEFjfcHcJTT9wilpr+8NdRCZm3jh
-         MxDRSVgH7gRWdVoe9QggfmxxiR7piiaLnfrlhS/PfPbO8YcI0wSXcU/J7xBNE6E+e3EM
-         kAYpsSih9IoMsNi5Zx6ScJfj+T9sUHs43L6UYVfs+fAm+4VjbDd3Osr8NBT0Sf1g2/vE
-         2ajJg5BlSQ9+unTtoQIrlusuYTHv5r3qMloDIwM93UtxErt/6Rt80Ha+JZiXb+DR1vS6
-         SVUQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8X5FrybB4f2slZX4CqiQoA5lCXzFfR6sgqpTp8c+juBk607b9rce8TFqViE6+A23L+uunjO3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMIQzxj8jw7RX6ZNIC6RLCNwnpJoyNIcdx8Wcs1LtmtU3l5J87
-	tMiKXZW2+svgqJrp3pj0i/4D6bHzz5V/4jfGEa0Wbkl3CfoNXd6mAkYC
-X-Gm-Gg: Acq92OH7GVHz3aEfVGOLLCXT9VLfdFovz2OoTFG5TEDWp17k67W8qbkngTMvQXguYbv
-	EtdOg6KN+2wrUmRX0UrBmih2zOEqqpE2N1XN0XiMu2rGKLbcBE8ovAJEKKzyFf5LufL5ewirJ3M
-	Boh8Otz1xF5IKrG+LR1P4CgiENI5eb4Qdy80iBBKUvTGOoP1ZxnaObxTEpc8kV11i0SVB9bEMW7
-	Tl11JK6XowcrrEONHIyzs7m4QF3ShZWAZoQMMco8oEpgf+uI69aiiNVYXEuvdmUjGAFf49Lwddt
-	ce6ZZKA4Bc+HpV8xCGALwyF4Sr7NLwbj945rsXqL3dPKsHlxeGZunAn9UHhA1bHwoQElkvDS4nG
-	tD0eM1z0MG2HpG3yKojX2GTksaU+63mQb4LsbuNgurM2TCH3vFtP1hpVmfWl5LPC2Lkj0lGD9+Z
-	+aXMdgv67TLTvU+ONnIt2XjnaRPB+Flz7tDzF6wRZAEtn/77jw0wBnIwLBXKowyJoJ
-X-Received: by 2002:a05:6000:29d3:b0:45d:3cbf:bdda with SMTP id ffacd0b85a97d-45eb38bb000mr9671985f8f.20.1779554159363;
-        Sat, 23 May 2026 09:35:59 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6d493dfsm13521078f8f.23.2026.05.23.09.35.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 May 2026 09:35:59 -0700 (PDT)
-Date: Sat, 23 May 2026 17:35:57 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org,
- xuanzhuo@linux.alibaba.com, horms@kernel.org,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kuba@kernel.org, eperezma@redhat.com,
- pabeni@redhat.com, mst@redhat.com, davem@davemloft.net,
- jasowang@redhat.com, stefanha@redhat.com, edumazet@google.com,
- stable@vger.kernel.org
-Subject: Re: [PATCH net] vsock/virtio: fix skb overhead overflow on 32-bit
- builds
-Message-ID: <20260523173557.5cc4f4f6@pumpkin>
-In-Reply-To: <177950282964.1445071.6600517211632117224.git-patchwork-notify@kernel.org>
-References: <20260521124732.125771-1-sgarzare@redhat.com>
-	<177950282964.1445071.6600517211632117224.git-patchwork-notify@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1779554207; c=relaxed/simple;
+	bh=uL/GSy/4G1kddyWzvQwCkODqz5Q0fmwGeI3mzKoC8qY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MQN14qQmlRcTLnok+brieNfia4Gy/+ZIsvKFpLFpxjIKgtVghZ+9TQ2kYklehV2jFjeMa06pcTf8AI8WpphoRrqk2ar76rREYODcAT7nN56co+W8Bg4gWuRIcdhs/vqFRB/pH71OTSpR9wZP9+wuxIKlnL1KO+gx/3fXa+U45DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=2FsLWUtm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LI1OL268; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=2FsLWUtm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LI1OL268; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B62F96772E;
+	Sat, 23 May 2026 16:36:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779554204; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eYdi17A2OVq3cfx9eNeME4CnZMn3rzio6O6dOXtzgKE=;
+	b=2FsLWUtmCt7++8iPHKt+P6CFjK3H4q1ehVZFQ00cbUelH78oOwmV9GcK5OEg0vzwLr6F/S
+	8PHut5MT10v1BPcJqd0coO1IfuUpkMVAWi6HilVrtp5R0RaulqQrYnNpfsEmsuydVJg1SS
+	e4IG86OGR0dDnHnEg+7rk764SvLooNE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779554204;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eYdi17A2OVq3cfx9eNeME4CnZMn3rzio6O6dOXtzgKE=;
+	b=LI1OL2687IfK86f2MfsjxvYPB3tKkPV8YtOKokPPll79O9YpTr+ML1cwkHodGoxcNdFN5j
+	u6iSnLSbTcRI0CDQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779554204; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eYdi17A2OVq3cfx9eNeME4CnZMn3rzio6O6dOXtzgKE=;
+	b=2FsLWUtmCt7++8iPHKt+P6CFjK3H4q1ehVZFQ00cbUelH78oOwmV9GcK5OEg0vzwLr6F/S
+	8PHut5MT10v1BPcJqd0coO1IfuUpkMVAWi6HilVrtp5R0RaulqQrYnNpfsEmsuydVJg1SS
+	e4IG86OGR0dDnHnEg+7rk764SvLooNE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779554204;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eYdi17A2OVq3cfx9eNeME4CnZMn3rzio6O6dOXtzgKE=;
+	b=LI1OL2687IfK86f2MfsjxvYPB3tKkPV8YtOKokPPll79O9YpTr+ML1cwkHodGoxcNdFN5j
+	u6iSnLSbTcRI0CDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E21C7593A8;
+	Sat, 23 May 2026 16:36:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id nSzIMZvXEWpOKQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sat, 23 May 2026 16:36:43 +0000
+Message-ID: <e29caf20-8652-4747-8cb4-636c63d0e4e1@suse.de>
+Date: Sat, 23 May 2026 18:36:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7] net: hsr: require valid EOT supervision TLV
+To: luka.gejak@linux.dev, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Felix Maurer <fmaurer@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260523130420.62144-1-luka.gejak@linux.dev>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260523130420.62144-1-luka.gejak@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291126-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291127-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,netdevbpf];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 21A8A5BFDAA
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,suse.de:email,suse.de:mid,suse.de:dkim]
+X-Rspamd-Queue-Id: 4DBE95BFDC2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, 23 May 2026 02:20:29 +0000
-patchwork-bot+netdevbpf@kernel.org wrote:
-
-> Hello:
+On 5/23/26 3:04 PM, luka.gejak@linux.dev wrote:
+> From: Luka Gejak <luka.gejak@linux.dev>
 > 
-> This patch was applied to netdev/net.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
-
-Did anyone else notice that is isn't a bug?
-
-There is no way that a 'count of bytes of kernel memory' can overflow
-the size of 'long'.
-
--- David
- 
+> Supervision frames are only valid if terminated with a zero-length EOT
+> TLV. The current check fails to reject non-EOT entries as the terminal
+> TLV, potentially allowing malformed supervision traffic.
 > 
-> On Thu, 21 May 2026 14:47:32 +0200 you wrote:
-> > From: Stefano Garzarella <sgarzare@redhat.com>
-> > 
-> > On 32-bit architectures, both skb_queue_len() and SKB_TRUESIZE(0) evaluate
-> > to 32-bit values. The multiplication can overflow before being assigned to
-> > the u64 skb_overhead variable, making the skb overhead check ineffective.
-> > 
-> > Cast skb_queue_len() to u64 so the multiplication is always performed in
-> > 64-bit arithmetic.
-> > 
-> > [...]  
+> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT with
+> a length of zero.
 > 
-> Here is the summary with links:
->   - [net] vsock/virtio: fix skb overhead overflow on 32-bit builds
->     https://git.kernel.org/netdev/net/c/4157501b9a8f
-> 
-> You are awesome, thank you!
+> Assisted-by: Gemini:Gemini-3.1-flash
+> Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
 
+Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
 
