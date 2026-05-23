@@ -1,69 +1,75 @@
-Return-Path: <netdev+bounces-291019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291020-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AA2JD4kNEWpJgwYAu9opvQ
-	(envelope-from <netdev+bounces-291019-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 04:14:33 +0200
+	id iB0gK3IPEWq0gwYAu9opvQ
+	(envelope-from <netdev+bounces-291020-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 04:22:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 003985BC815
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 04:14:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AF015BC953
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 04:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 67313301911C
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:14:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C152430433F3
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881002DCC04;
-	Sat, 23 May 2026 02:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB38C346FAE;
+	Sat, 23 May 2026 02:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KcJwzuvw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SGvOk/sl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A851B2D8DC4;
-	Sat, 23 May 2026 02:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4BB331A65
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 02:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779502467; cv=none; b=Vm4T5kLSekisKSsHrtY7zoxL8k9hN5yzvBM6bq/GwJVcD3nmfQtIbQ8D2w4O3NS4ZnU3VYujXse7cEpDb6z0se0i6scwFolL8ds5MM9eHAeMroB6T++rin4nKHpl7CPrSa+Cmw2r3PKXAlTGh/9kkUL6ZKyVbbe/SDJxoLQ7co4=
+	t=1779502820; cv=none; b=GEeHQpoZqFhlU3t9P8Th4ioVoNIlxdCGY+V+AzhNIoqfcT9xqVdV20zmp1arBBeaxr/BgVZDaNy92WPF9fPrqWKJCps/d2/zJujmWalzQ7tttPThMNdqpb+CLeubeovNNNoeEqou809/4/KnHfQg/wKDEQb1kmYyY8yb5lNKFZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779502467; c=relaxed/simple;
-	bh=eifHLiwQHg1aF9I796N6YR/CYPSbbOq0SCt85xsNLyE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Oh+R+qkXzcJjaXxMD97RsoWdtaQANlZCAqw1MW91PbrPF4PGZhO0fkDsWF39qj6eyNGC2aoR83/CDaZJ/W1jZxPFaTlmcUcsTVgkyhbBWmsPndVIL8Vzph0lkosTf6SxBZNh7b5/Fd23xpdv4zgNZ+QGbpJMPU8MnwHBHCtjbcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KcJwzuvw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4991F000E9;
-	Sat, 23 May 2026 02:14:24 +0000 (UTC)
+	s=arc-20240116; t=1779502820; c=relaxed/simple;
+	bh=ssaTZv7Mg/5lEblpP4N9hSsvaFHhCxYJRiim6Dqr8iQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jk+hatTY0PJ9GYeuGA8km8DZ2ZZ6p69vo1ZP36E8/DPBh8joBTDqmu2EKXpv1sqxdHKy/RxGdGrI1uRIeChG7YBz3+dRiCt50EJ4AIBIBnPLtDgLGM+xS0Fx3dpQ5LzQpWYulaOoKa3M/GuVk9ou6OusG7CHZtuI1XdAU7LZtVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SGvOk/sl; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D0CB1F00A3A;
+	Sat, 23 May 2026 02:20:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779502464;
-	bh=q9HDQpu0SYwrmVMHlU6yKLpIzh2dGvhhVXbCDWhJ6oU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=KcJwzuvwEwP+iOdB5KVCOVzd6iYxXj3kFxzLgDvD1jQOr8bpvP25cI5eRiVbAcLAi
-	 F4HfM9gt9OxTT0RMg4h5rbhKV3HDNZfnGvq/M9QcokEK3x2/xkbR1YgZr8Eo53V7eG
-	 1ynzCEK+RE/hoGyX9nvUfLlb5JEOEDXZwMjFnEy+f4t1XmXWLk1E11xrL5AL73RRp3
-	 gBSRQ99pttcBa619m0/uNfygr7vvplpQr9XpCcWBysOo9aZIJJxjIWIKbNhUyp/+dJ
-	 NZ/ox/pmD7FQ7DFKhD4KykfvP/0kNu6BRVlXXKPoFdbnXO2FXXJ2ED0M7q44VWZxSP
-	 5LqB0AhXor9nQ==
-Date: Fri, 22 May 2026 19:14:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Allison Henderson <achender@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- horms@kernel.org, linux-kselftest@vger.kernel.org, shuah@kernel.org
-Subject: Re: [PATCH net-next v1 0/3] selftests: rds: ROCE support follow ups
-Message-ID: <20260522191423.3ade3031@kernel.org>
-In-Reply-To: <585a18b53dbd2545224185a9f4d9f9c05ddc7e24.camel@kernel.org>
-References: <20260522215430.3748226-1-achender@kernel.org>
-	<20260522174601.3c2c2b46@kernel.org>
-	<585a18b53dbd2545224185a9f4d9f9c05ddc7e24.camel@kernel.org>
+	s=k20260515; t=1779502819;
+	bh=kwzV/ta8LuWnYcKklJQXKcxoSaA8I9oFeFFH4tehJho=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=SGvOk/slv2pTZ2mfgnlV2vvnPY59EbAku5KiCJTwCJZe8hVsbag/uqvpTnDrwb5/F
+	 uE/h6DNpJh9YZ0R3qVLvkJvOud5x4T2fWsdQekgwMUy2E1jjeRTzTOAqLOF/SX6sOt
+	 tqSSsdNtdL5BqWrktQ0Sp93n9TEvoE3ekxitV2lj87luQ4jjzhxEffirMQJgSDJp6U
+	 zkbOsPMhsMIsubB0Sni2f6mHmci2jJX9gLhTUr+U8xjDj206nBSOgDu0RY+i0muEhS
+	 pAwYRMpHVDg32C6jLi6e57Pg3uKZbKxISQ8E3pQZLkBgGMuG8nGmQijD7uOzI3zfij
+	 bpk4fi4hXAL3A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93C3D3808205;
+	Sat, 23 May 2026 02:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] ipv4: free net->ipv4.sysctl_local_reserved_ports
+ after
+ unregister_net_sysctl_table()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177950282813.1445071.14526089934970978870.git-patchwork-notify@kernel.org>
+Date: Sat, 23 May 2026 02:20:28 +0000
+References: <20260521122147.3584624-1-edumazet@google.com>
+In-Reply-To: <20260521122147.3584624-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, idosch@nvidia.com, dsahern@kernel.org,
+ eric.dumazet@gmail.com, eilaimemedsnaimel@gmail.com, xiyou.wangcong@gmail.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
@@ -71,46 +77,56 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-291019-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-291020-lists,netdev=lfdr.de,netdevbpf];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,nvidia.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 003985BC815
+X-Rspamd-Queue-Id: 4AF015BC953
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 22 May 2026 18:19:35 -0700 Allison Henderson wrote:
-> On Fri, 2026-05-22 at 17:46 -0700, Jakub Kicinski wrote:
-> > On Fri, 22 May 2026 14:54:27 -0700 Allison Henderson wrote: =20
-> > > This is a follow up series to the "Add ROCE support to rds selftests"
-> > > series.  The first patch renames run.sh to rds_run.sh, and also adds
-> > > two wrappers to the TEST_PROGS target to run the same test over the
-> > > rdma and tcp transports.  The wrappers rds_rdma_run.sh and
-> > > rds_tcp_run.sh also provide self-describing names that appear on the
-> > > netdev CI dashboard. =20
-> >=20
-> > Could you make the RDMA test return XFAIL rather than skip when RXE
-> > is not available? We try to use SKIP for cases which are easy to
-> > fix, like a tool missing. We won't be running RDMA tests in netdev.. =20
->=20
-> Sure, if you want I could also drop the wrappers since rds_run.sh default=
-s to tcp. =C2=A0
-> Then patch 1 would just be a rename.  Let me know what you prefer.
+Hello:
 
-Dropping the new wrapper SGTM. But IIRC Matthieu suggested the split,
-we should let him also chime in.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 21 May 2026 12:21:47 +0000 you wrote:
+> ipv4_sysctl_exit_net() is currently freeing net->ipv4.sysctl_local_reserved_ports
+> too soon.
+> 
+> Only after unregister_net_sysctl_table() we can be sure no threads can possibly
+> use the sysctls, including /proc/sys/net/ipv4/ip_local_reserved_ports.
+> 
+> Fixes: 122ff243f5f1 ("ipv4: make ip_local_reserved_ports per netns")
+> Reported-by: Ji'an Zhou <eilaimemedsnaimel@gmail.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Cong Wang <xiyou.wangcong@gmail.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] ipv4: free net->ipv4.sysctl_local_reserved_ports after unregister_net_sysctl_table()
+    https://git.kernel.org/netdev/net/c/87a1e0fe7776
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
