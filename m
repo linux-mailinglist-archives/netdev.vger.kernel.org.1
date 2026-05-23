@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-291057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291058-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BBDFs5lEWoelgYAu9opvQ
-	(envelope-from <netdev+bounces-291057-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:31:10 +0200
+	id GKbhN9NlEWr7lQYAu9opvQ
+	(envelope-from <netdev+bounces-291058-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:31:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC3ED5BDE4C
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:31:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C37D5BDE5A
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:31:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 248423024976
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F4BC302633F
 	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 08:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82C535676B;
-	Sat, 23 May 2026 08:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04AAD357CE5;
+	Sat, 23 May 2026 08:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jh1k61Og"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="myzaeVHJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF39A351C27
-	for <netdev@vger.kernel.org>; Sat, 23 May 2026 08:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE0F357CFD
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 08:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779525008; cv=none; b=rya5e11sMO2I/zr2eRXwVXlQ+krMPeMLMSiYH44v4QuWbgKviQ3zeNz06+UvQ9YEoT9XQ3jqasje+jbWSc6G/8db0eExlHt9lQzhmiCS+IaF54VJjKVetvlcCfJf0j2QRtc/mas2cLg1pNNEfradK4K2jlQ1oJKDlXNPdSMk5Yo=
+	t=1779525008; cv=none; b=tqEKQx6exulRozjhdTmaHRP+88jkegnX24v13s1omlinm+EoSc2iFhjodgULhMuGYt0XXiP7rvrt94orN6gs1YeyEtV2tzSa0xnFC5gBqRw2Y9r0TimY4EPW6PnedGYDEm5kpi+MngsdTp7xBFocS1S3EEjP6vJarhuwI2zPaiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779525008; c=relaxed/simple;
-	bh=wpfP9iaC4NcOUpR4U8log0eGACMjzwD9P5ShdZk1/Nk=;
+	bh=YGrfI2hL0wwPAhTinlsXS+ugZFdc+65ByQaIbLZr3QM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vq52pOL6/bxqyVFKxGdYdP2A+mTELjLlHNqDQZietkrWZs7YCx4quNxsvGx61HkD1dwethpaxBGv6XjelGy6OeVP/pu46mMA7nLzuridvcMpDL/nxQArEyB1g7uNYU2U8KfnXtdri0AZ4WC75Knk26buUEOcgXeN49S/HuhO7to=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jh1k61Og; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=ZmTfTADJpGg7bjXnb5ucPFNzq2Di4zcDCrzxskxXiKWbNCHYxHw+WO/UKVmC3BaQP4oKLHcuNPkn6qriVmtbGyhPOc3lVDqiTGpufDpxGRVFqv0/RTEno+YbDJtbrKQhi9v2oS6zGimupVZhIEUTVhLdwm5Qt+cYTNJsn8kGloE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=myzaeVHJ; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2bd04e4fe3dso150969905ad.3
-        for <netdev@vger.kernel.org>; Sat, 23 May 2026 01:30:06 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2bc763c7256so179838435ad.3
+        for <netdev@vger.kernel.org>; Sat, 23 May 2026 01:30:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779525006; x=1780129806; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1779525007; x=1780129807; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CZ6Da+zB+tQ14oHQfrt2FvNqy1zoi5M1iY7vb9vKFTs=;
-        b=Jh1k61Ognl4nKPK6gNRbO3Tl9ISBZdpYQiAxZXGNFi+WzVbp0rhGRVaj3gwar6lGMA
-         +I6x81AhQkS1nF5hzIWGnjIDGwOY4+mR+DDa97xTInqcjntnL1ZAqn0TlfftXS0pzc5r
-         zO/QpKFrxfIRj9glvM9BqMc3qPWoPgzhKBBV5V5sogtPwdQyDguCJzusXPxmB++DzDik
-         rbElVzJbkK0VyYaAvIynCKnEoeegVjb8GPVu6XuUDHV2N9PKKXTw9C80lYCqL4QwGAYB
-         OdN4QTelzUG1n3HtuYlxS7l6Dko5B/XB1APhwEBTc6kumBbuu6KWVq3QPAifa0c4WWql
-         2d8A==
+        bh=j9LfzZEWp6FpHKgSQGvAVVGBFaWBqSJ7AoOM9fQmKEs=;
+        b=myzaeVHJns+3Y5NeTf3eFTFyE7GdKMDpxDdb28r6yhLAMT1JiHDiNXFMXMD2gbVH+x
+         vyWMmOe1JwKO4eTCDVsdg6OCQcUQpwWdjmyNqGP6BoNh2x3zrUl0C3HdV/udhKAWzer5
+         88eFaEuTe0wAHIfdVdJS9OPOZ7LJrsnZpNvHPycl0E1BDwx0+wKlJIVOvJvz3I4fczoF
+         6VLnhmyc7t6tV4Nmbd/p0DAMbiz3vJ97DPvWPkR0aS42z7spoGfSbGEbBpkRy0TYNAdm
+         4RjcbHBiuur1TGNpv1gHJzE4zHfVYev0s92iXdk0uFkHPRVtkUKJh6/1INHb1l7n5iAb
+         IxwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779525006; x=1780129806;
+        d=1e100.net; s=20251104; t=1779525007; x=1780129807;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CZ6Da+zB+tQ14oHQfrt2FvNqy1zoi5M1iY7vb9vKFTs=;
-        b=Ac9AVdk5YQzg3l3Wiu2vYzGI7y2H+7oURy2Y/sGyWvejD/ilJHonF0Vdx0Pn1RNdl+
-         P8ZTLMw3MiIkwC8pv6Dw9uEN+4/ECmr0uBF0fJfZYMhaNQgx1fwMHFM+Hjok4QDPSKwh
-         Bbrdra0kRw/NvcjAVRpQKhtSVTOi8hCwFpZkvdo+LEcgTrXui3hByo0AYqvODuH5CiK6
-         Tfk4zrkZvmz8UaW0mmVVsUPck6HeyoYpQ9p6F/2pWjBvuxUvtc+YFszV3+2nqBCbQxYO
-         T3IPRLaAOIF930boFmwU4vG2HHvITAsTFzbL5o+XvvLJM7etRbjd1XsAnBRRvkkRwV8I
-         57iQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9LBQlKSV2oPgfBmaleI6XkN3b759Ogj1mvz/zhdQR3Ho68Mq286XwyXV3IW6jfDuuqPITYqPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxwv2RTXIL7JhbDMZEho7dAdgLGVaR2vHXxK2awmyF4H3jshxn2
-	H9K9FbuxbSRkRV4MBE0lm+WkNKe8hquQ4OL/4aq5W2Xr8pGSrc3AL4vEzQzQqihYFJvfnfwGNFp
-	qyXcetA==
-X-Received: from plll13.prod.google.com ([2002:a17:902:d04d:b0:2b0:c9c5:109b])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e885:b0:2bc:e62a:979b
- with SMTP id d9443c01a7336-2beb0699cdemr77192945ad.30.1779525005751; Sat, 23
- May 2026 01:30:05 -0700 (PDT)
-Date: Sat, 23 May 2026 08:29:31 +0000
+        bh=j9LfzZEWp6FpHKgSQGvAVVGBFaWBqSJ7AoOM9fQmKEs=;
+        b=ZGTLD67SItEUZydreeu114WlT3ChwwSxbNYXHDTuxMyjJtJ4OALJ4X4hCpx7RMnchr
+         E0RmUTM2RXGj1RlbSTQlKyyepXSExHr4SOvR3aqeSxhw3MV/jh5Jw3X76V6eG6VrKXMO
+         eZVSXdFHvSBI2th/AgImGqVB4zqqHsf1hmmwyiP/08CBoHX5IwTVjkf0TidbLWNHdipX
+         XMujC/bLT76aEp0hkUhlRBveXZ5IvyfRqetGxiNL1g12RGO936O9BdRX7ySS0j+i3cjX
+         8gseaXA9Q9NHGyQtpOrAP6Q3iyPcARWJbDrmtr6iU+gVeh7Jqm10FDfZhVwpdvet51AT
+         xAdQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+X/rbT3GxmzJIA8tq9jKKnu0eHLOvMZ1tdzXFRHt3fPudaRFP+ksUdhF+R2sbJaHiYsVhQq5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNVW0nBS/Ew9oXb4VAoJHdfZYeKWNw20mSzl5CHEG5OfbtJhE1
+	aHnTnNRp1zb7Fts91EFiPpY26VrzHB+sj3V+oIvabQO1Bw/JBkf+vxQDYlo/tRIIM+Heesjj1CG
+	8uiFD9w==
+X-Received: from plht3.prod.google.com ([2002:a17:903:2f03:b0:2ba:903:90e2])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c951:b0:2b4:5aff:de60
+ with SMTP id d9443c01a7336-2beb06fc2c0mr82433795ad.22.1779525006541; Sat, 23
+ May 2026 01:30:06 -0700 (PDT)
+Date: Sat, 23 May 2026 08:29:32 +0000
 In-Reply-To: <20260523083001.2911931-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260523083001.2911931-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260523083001.2911931-3-kuniyu@google.com>
-Subject: [PATCH v3 bpf-next 02/11] bpf: tcp: Introduce BPF_SOCK_OPS_RCVQ_CB.
+Message-ID: <20260523083001.2911931-4-kuniyu@google.com>
+Subject: [PATCH v3 bpf-next 03/11] bpf: tcp: Support bpf_skb_load_bytes() for BPF_SOCK_OPS_RCVQ_CB.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
 	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
@@ -95,7 +95,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291057-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291058-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -112,153 +112,98 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.857];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.939];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: DC3ED5BDE4C
+X-Rspamd-Queue-Id: 3C37D5BDE5A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-We will introduce a new type of opt-in hooks for BPF SOCK_OPS prog.
+When a TCP skb is queued to sk->sk_receive_queue, BPF SOCK_OPS
+prog can be called with BPF_SOCK_OPS_RCVQ_CB.
 
-The hooks can be enabled on per-socket basis by bpf_setsockopt():
+In this hook, we want to parse the RPC descriptor in the skb
+and adjust sk->sk_rcvlowat based on the RPC frame size.
 
-  int flag = BPF_SOCK_OPS_RCVQ_CB_FLAG;
+However, we cannot access payload via bpf_sock_ops.data on
+modern NICs with TCP header/data split on as the payload is
+not placed in the linear area.
 
-  bpf_setsockopt(sk, SOL_TCP, TCP_BPF_SOCK_OPS_CB_FLAGS,
-                 &flags, sizeof(flags));
+Let's support bpf_skb_load_bytes() for BPF_SOCK_OPS_RCVQ_CB.
 
-or via the SOCK_OPS specific helper:
+Three notes:
 
-  bpf_sock_ops_cb_flags_set(skops, BPF_SOCK_OPS_RCVQ_CB_FLAG);
+  1) bpf_sock_ops_kern.skb will be NULL when the BPF prog is
+      invoked from recvmsg().
 
-Once activated, the BPF prog will be invoked with bpf_sock_ops.op
-set to BPF_SOCK_OPS_RCVQ_CB upon the following events:
+  2) Access to bpf_sock_ops.data will be disabled by passing
+      0 end_offset to bpf_skops_init_skb().
 
-  1. TCP stack enqueues skb to sk->sk_receive_queue
-  2. TCP recvmsg() completes
-
-This will allow the BPF prog to dynamically adjust sk->sk_rcvlowat,
-suppressing unnecessary EPOLLIN wakeups until sufficient data
-(e.g., a full RPC frame) is available in the receive queue.
-
-Note that is_locked_tcp_sock_ops() is left unchanged not to enable
-bpf_setsockopt() unnecessarily, but bpf_sock_ops_cb_flags_set() is
-supported at BPF_SOCK_OPS_RCVQ_CB to disable by itself.
+  3) ____bpf_skb_load_bytes() is called directly instead of
+     __bpf_skb_load_bytes() to allow compilers to inline it
+     instead of generating a tail-call.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-v2: s/BPF_SOCK_OPS_RCVLOWAT_CB/BPF_SOCK_OPS_RCVQ_CB/g
+v2: Explain why using ____ version instead of __
 ---
- include/uapi/linux/bpf.h       | 18 +++++++++++++++++-
- net/core/filter.c              |  3 ++-
- tools/include/uapi/linux/bpf.h | 18 +++++++++++++++++-
- 3 files changed, 36 insertions(+), 3 deletions(-)
+ net/core/filter.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index aec171ccb6ef..31130e1b63ea 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -6960,6 +6960,9 @@ struct bpf_sock_ops {
- 	 *					the 3WHS.
- 	 * BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB: The ACK that concludes
- 	 *					the 3WHS.
-+	 * BPF_SOCK_OPS_RCVQ_CB : No header included.  The payload is only
-+	 *			  accessible by passing bpf_sock_ops to
-+	 *			  bpf_skb_load_bytes().
- 	 *
- 	 * bpf_load_hdr_opt() can also be used to read a particular option.
- 	 */
-@@ -7031,8 +7034,16 @@ enum {
- 	 * options first before the BPF program does.
- 	 */
- 	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
-+	/* Call bpf when TCP payload is queued to sk->sk_receive_queue
-+	 * and after recvmsg().  The bpf prog will be called under
-+	 * sock_ops->op == BPF_SOCK_OPS_RCVQ_CB.
-+	 *
-+	 * It can be used to adjust sk->sk_rcvlowat and suppress
-+	 * unnecessary wakeups before sufficient data is available.
-+	 */
-+	BPF_SOCK_OPS_RCVQ_CB_FLAG = (1<<7),
- /* Mask of all currently supported cb flags */
--	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
-+	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
- };
- 
- enum {
-@@ -7176,6 +7187,11 @@ enum {
- 					 * sendmsg timestamp with corresponding
- 					 * tskey.
- 					 */
-+	BPF_SOCK_OPS_RCVQ_CB,		/* Called when TCP payload is queued to
-+					 * sk->sk_receive_queue and after recvmsg()
-+					 * to allow adjusting sk->sk_rcvlowat and
-+					 * to suppress early wakeups.
-+					 */
- };
- 
- /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
 diff --git a/net/core/filter.c b/net/core/filter.c
-index 9590877b0714..4a50fe2cd863 100644
+index 4a50fe2cd863..fa8a7c7d86eb 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -6002,7 +6002,8 @@ BPF_CALL_2(bpf_sock_ops_cb_flags_set, struct bpf_sock_ops_kern *, bpf_sock,
- 	struct sock *sk = bpf_sock->sk;
- 	int val = argval & BPF_SOCK_OPS_ALL_CB_FLAGS;
- 
--	if (!is_locked_tcp_sock_ops(bpf_sock))
-+	if (!is_locked_tcp_sock_ops(bpf_sock) &&
-+	    bpf_sock->op != BPF_SOCK_OPS_RCVQ_CB)
- 		return -EOPNOTSUPP;
- 
- 	if (!IS_ENABLED(CONFIG_INET) || !sk_fullsock(sk))
-diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-index 37142e6d911a..3b8f392d8c69 100644
---- a/tools/include/uapi/linux/bpf.h
-+++ b/tools/include/uapi/linux/bpf.h
-@@ -6960,6 +6960,9 @@ struct bpf_sock_ops {
- 	 *					the 3WHS.
- 	 * BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB: The ACK that concludes
- 	 *					the 3WHS.
-+	 * BPF_SOCK_OPS_RCVQ_CB : No header included.  The payload is only
-+	 *			  accessible by passing bpf_sock_ops to
-+	 *			  bpf_skb_load_bytes().
- 	 *
- 	 * bpf_load_hdr_opt() can also be used to read a particular option.
- 	 */
-@@ -7031,8 +7034,16 @@ enum {
- 	 * options first before the BPF program does.
- 	 */
- 	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
-+	/* Call bpf when TCP payload is queued to sk->sk_receive_queue
-+	 * and after recvmsg().  The bpf prog will be called under
-+	 * sock_ops->op == BPF_SOCK_OPS_RCVQ_CB.
-+	 *
-+	 * It can be used to adjust sk->sk_rcvlowat and suppress
-+	 * unnecessary wakeups before sufficient data is available.
-+	 */
-+	BPF_SOCK_OPS_RCVQ_CB_FLAG = (1<<7),
- /* Mask of all currently supported cb flags */
--	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
-+	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
+@@ -7760,6 +7760,38 @@ static const struct bpf_func_proto bpf_sk_assign_proto = {
+ 	.arg3_type	= ARG_ANYTHING,
  };
  
- enum {
-@@ -7176,6 +7187,11 @@ enum {
- 					 * sendmsg timestamp with corresponding
- 					 * tskey.
- 					 */
-+	BPF_SOCK_OPS_RCVQ_CB,		/* Called when TCP payload is queued to
-+					 * sk->sk_receive_queue and after recvmsg()
-+					 * to allow adjusting sk->sk_rcvlowat and
-+					 * to suppress early wakeups.
-+					 */
- };
- 
- /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
++BPF_CALL_4(bpf_sock_ops_skb_load_bytes, struct bpf_sock_ops_kern *, bpf_sock,
++	   u32, offset, void *, to, u32, len)
++{
++	int err;
++
++	if (bpf_sock->op != BPF_SOCK_OPS_RCVQ_CB) {
++		err = -EOPNOTSUPP;
++		goto err_clear;
++	}
++
++	if (!bpf_sock->skb) {
++		err = -EPERM;
++		goto err_clear;
++	}
++
++	return ____bpf_skb_load_bytes(bpf_sock->skb, offset, to, len);
++
++err_clear:
++	memset(to, 0, len);
++	return err;
++}
++
++static const struct bpf_func_proto bpf_sock_ops_skb_load_bytes_proto = {
++	.func		= bpf_sock_ops_skb_load_bytes,
++	.gpl_only	= false,
++	.ret_type	= RET_INTEGER,
++	.arg1_type	= ARG_PTR_TO_CTX,
++	.arg2_type	= ARG_ANYTHING,
++	.arg3_type	= ARG_PTR_TO_UNINIT_MEM,
++	.arg4_type	= ARG_CONST_SIZE,
++};
++
+ static const u8 *bpf_search_tcp_opt(const u8 *op, const u8 *opend,
+ 				    u8 search_kind, const u8 *magic,
+ 				    u8 magic_len, bool *eol)
+@@ -8616,6 +8648,8 @@ sock_ops_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+ 	case BPF_FUNC_get_netns_cookie:
+ 		return &bpf_get_netns_cookie_sock_ops_proto;
+ #ifdef CONFIG_INET
++	case BPF_FUNC_skb_load_bytes:
++		return &bpf_sock_ops_skb_load_bytes_proto;
+ 	case BPF_FUNC_load_hdr_opt:
+ 		return &bpf_sock_ops_load_hdr_opt_proto;
+ 	case BPF_FUNC_store_hdr_opt:
 -- 
 2.54.0.746.g67dd491aae-goog
 
