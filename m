@@ -1,200 +1,168 @@
-Return-Path: <netdev+bounces-291072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291073-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0L8DK1ttEWpLlwYAu9opvQ
-	(envelope-from <netdev+bounces-291072-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:03:23 +0200
+	id BgqVMCBuEWoLmAYAu9opvQ
+	(envelope-from <netdev+bounces-291073-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:06:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E8C5BE174
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:03:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CC605BE1B9
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D67B8300B137
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 09:03:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 95F433004F22
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 09:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D07237CD3A;
-	Sat, 23 May 2026 09:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F6E383337;
+	Sat, 23 May 2026 09:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nbhsukAp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANJ879tc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D749A346798
-	for <netdev@vger.kernel.org>; Sat, 23 May 2026 09:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C234037648D;
+	Sat, 23 May 2026 09:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779526992; cv=none; b=BUEDtHcJVsqe+5WuJ5maMUd1HiRYIPaQAUX8pUpOELC1pV7PS9jq3W7qCLKlLFe8b/O4hvXgTcQ6IS8b4hc9L861CSGTKxi6WlpJ5Bvx2tZJ0yfJICsBX+vEHFLmTGaAFNWzQoLzYOAbzTbEG0LVqDZokFpTUU0g5lvNWc4I+o4=
+	t=1779527198; cv=none; b=Ct7ISnSnIxlxZOMeqTMx/JIXpn2mplhM9Y/pJCLW3rky1bS0BLz6HWJwNixfrRtoWWBiK9eIiCIBC+Tqie/nBkR32AhKc3nxF5U5vEkNYq8MyGi5/e+Z3NGaa7Z6/pBVv2DLe+CjaEmYnyxaiTWU2AU1pLAPHrYlwf6VBv92Zfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779526992; c=relaxed/simple;
-	bh=NyOrWaSzjDO04+EJ0r5MjIKBFB0Wus/T/TpI1QhQ40w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N5GKqcbgbXYAMquc2Xttgpr2wz8NzIOI0IA3TWMP5MAonrFH2tDurIsZKGk2sIfSjJ/oZ8QdmgLxCiHwQ3AjbbDdH7YHemJVU1tNb52TZrVIh24PmWR0jQ3bG9ypT68ybGxp7hDh6kgf1yvBIL5JtRLRWrX+w9tTAdvtiwfAWTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nbhsukAp; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-365deee00c3so741642a91.1
-        for <netdev@vger.kernel.org>; Sat, 23 May 2026 02:03:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779526990; x=1780131790; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dlf3lX6f/Toq78lh77so2DPy7wd2/N6OZVLGcG+13uI=;
-        b=nbhsukApuv7jU/TZH/PpxrPYSUo0KZJ22kqkbqyrj3KWxSK0JH/Z/uioU78vOe9df4
-         NLh7TD8vMf4CBdTzRF/89czukZ0j6oVgZwAgOg7Ebpk74AORYV5RpD7JzeM7Nqn/yme3
-         al4KFfhXfu87EyG+yZlBS1quBZSKjZm0Rg7jFy8dYSo9+YL4uGKuIhWmelPP62IjsU68
-         SmLMr/yZCDKxdhdxdjlea/2UD06oyWWD2U7wNLdk/tzjj/jOQuyyPBWO7GNGk8Oru/HZ
-         11yBYb8WgPxQEUW37iYd74mUJblOfJ4GrNwi2QopG7zSzog1Jg/rePJJ7oGUbf8lVBxd
-         8dBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779526990; x=1780131790;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dlf3lX6f/Toq78lh77so2DPy7wd2/N6OZVLGcG+13uI=;
-        b=dSckk8XBL/dhI0DeUaQgz6dSzGV3A9HEXbXsxtO7bOXB67rvTrn95wBbGJxyBbbU2C
-         f4j2b1qsqocVWwzzrIZsFP5PWVAEbVNDp9q2+CQH4nrde9iWF1ZI7pbXlJ2y1xKe074V
-         8ycoAvgwyPlyzd25wA2k5jQI0r1ZCA2SAGdQyMCqOwxnlVy9jL+XeRchGt5HpsJnS/RR
-         PhJSX4abgt/0HMmutqCC38NK3R/ZLb9kieCqTU43WQz6fbgaZO05yRUUptBChPrpbr79
-         KW+Mvu9caMcm7fe9zZbyTCy+YKoMBiw/Djg6msEOyPB0pVK1lpBaZkmondkTkKiVUvNE
-         R01A==
-X-Forwarded-Encrypted: i=1; AFNElJ+Kh6WoFN0QLYoWO/FrQq/PHMMIGHLbmoY1E3/UiWxZLzrHKzHUl1lj2k9fMtQWLPChtA5/HAI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcoORsco39k4OFjYR7HnrR76qWTJ53Br05Ln2ed2Lp5FgoJsf5
-	mt4J6HG/C44ltfr92sE2CoatDa9e9W8INKpy5IYS6Ju8e5SOjeODdALV
-X-Gm-Gg: Acq92OEvkZOyV+uGWn2hi/vImmcAt9q+x9h5lRlyp7fGizQDk6FV76/5qj4x0lvYauX
-	TbJdNeEFsFNhVWIM3oQ8YZRoXjkzF6+wdOE1iotJM/NMXPmPoVdjpA0yXtaR7NRQmT6nDwKmiUR
-	SWZIXY0hK7WTXx57/khZAedbx9ENDdaQcPWi+vNzjsj4oNvZ1TT5VgYAStbnKToNNY5ClbXOXFj
-	XmZiTaSM0KMJRpjDw2cHF2tq2mZbmrOWRWbTpQYraPJ88IFUcxLNyyNbBwss4nJrS67Ske/OQHZ
-	bBYp8A6v44wbZiIIbW9y6GPFUJFEIJkXj4w1ZSExhItjy7iI72N91nPxy3b/4TG33kVq0bhf6lF
-	VohaB/CWs91xy9zYYL9Yjj9Kgoc/APDYSyVO0Z+ip5umfQ85D3X5foBx7Cd0lh7IxEZwnJTmc0S
-	VhGQCZJzzFjiPS55/7Lg==
-X-Received: by 2002:a17:90b:3807:b0:368:58d4:de03 with SMTP id 98e67ed59e1d1-36a676216b9mr4370598a91.6.1779526990059;
-        Sat, 23 May 2026 02:03:10 -0700 (PDT)
-Received: from kali ([2402:e280:3d7c:a2:536a:b505:93f5:9d5d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a6f0baca7sm2525148a91.2.2026.05.23.02.03.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 May 2026 02:03:09 -0700 (PDT)
-From: Pavitra Jha <jhapavitra98@gmail.com>
-To: antonio@openvpn.net
-Cc: sd@queasysnail.net,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Pavitra Jha <jhapavitra98@gmail.com>
-Subject: [PATCH v3] ovpn: fix peer refcount leak in TCP error paths
-Date: Sat, 23 May 2026 05:02:43 -0400
-Message-ID: <20260523090244.504790-1-jhapavitra98@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1779527198; c=relaxed/simple;
+	bh=5l6abIQ7HNGT2ZBSyGjD9jIV1/NsXpd4VXJXx+IX+s4=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=PxouBp7G5uKiFAZN/F32TynCyol+pQkaj+4HUgnDXMby/QHjBKkPj0qNMw85p0Nx4KCM03QT4E11bWjrlenca1cSE09XTQCTY6+cjvLgW3b5ues6B83JzlAj0X/zfGr2OBQkV/ClBxsyh5gXwOpqU8i2GzK8gUty3lj3izgujms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANJ879tc; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA11E1F000E9;
+	Sat, 23 May 2026 09:06:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779527196;
+	bh=9rITIiaTLuvKKcwDlr54X1faBMmyRX9mCNb905DOPBs=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date;
+	b=ANJ879tcUzInPJTrjMcVh0cRtLVa+ps0oVcGGl6YIZTgHBkpKpu/aXYQjUP7EZF2s
+	 2ffGVgSFJAdQ46MZdkH5Falk4OitMCCeJD8lrqNnqOEC+AlyD3BC4Q1hykTiaj7Jqc
+	 mBz54OPochkUkl90NNzxOP7XwjR9+uBH/e9og1Xd9lC6bL6N3QTwbqAEVWj5Cuo2/f
+	 EnpE5pXf3DnERmybD7k8D6AALMRJAvPy+TpKHmSdzzbYVmfeKoQvI70ckB31VbaDIX
+	 AnhoeTBuwDIgNzZfyDDuhovQgL9RynuFvxkyc3kwp2Z7+S1n2pEH1ejkJBkAK3TpMy
+	 7EyxUqHzDMV6A==
+Content-Type: multipart/mixed; boundary="===============0315934236863334226=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Message-Id: <62e1fa8bbaec28d58c3f2e1f21eb5e75e306c9299b8e95d08d5ec48cb4c1508b@mail.kernel.org>
+In-Reply-To: <20260523083001.2911931-6-kuniyu@google.com>
+References: <20260523083001.2911931-6-kuniyu@google.com>
+Subject: Re: [PATCH v3 bpf-next 05/11] bpf: tcp: Add kfunc to adjust sk->sk_rcvlowat.
+From: bot+bpf-ci@kernel.org
+To: kuniyu@google.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,memxor@gmail.com
+Cc: yonghong.song@linux.dev,john.fastabend@gmail.com,sdf@fomichev.me,edumazet@google.com,ncardwell@google.com,willemb@google.com,ukyab@berkeley.edu,kuniyu@google.com,kuni1840@gmail.com,bpf@vger.kernel.org,netdev@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Sat, 23 May 2026 09:06:35 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[queasysnail.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-291073-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org,kernel.org,iogearbox.net,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291072-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[google.com,kernel.org,iogearbox.net,linux.dev,gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhapavitra98@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.998];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 11E8C5BE174
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 5CC605BE1B9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When either the TCP RX or TX error path calls ovpn_peer_hold() followed
-by schedule_work(&peer->tcp.defer_del_work), and the work item is already
-pending from the other path, schedule_work() returns false and the work
-runs only once. Since ovpn_tcp_peer_del_work() calls ovpn_peer_put()
-exactly once, the extra reference taken by the losing path is never
-dropped, leaking the peer object.
+--===============0315934236863334226==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The race window:
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index fa8a7c7d86eb..3608036632a8 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -12388,6 +12388,22 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct __sk_buff *s, struct sock *sk,
+>  #endif
+>  }
+>
+> +__bpf_kfunc int bpf_sock_ops_tcp_set_rcvlowat(struct bpf_sock_ops_kern *skops,
+> +					      int rcvlowat)
+> +{
+> +#ifdef CONFIG_INET
+> +	if (skops->op != BPF_SOCK_OPS_RCVQ_CB)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (rcvlowat < 0)
+> +		rcvlowat = INT_MAX;
+> +
+> +	return __tcp_set_rcvlowat(skops->sk, rcvlowat, !skops->skb);
 
-  CPU0 (strparser/RX error):       CPU1 (tcp_tx_work/TX error):
-  ovpn_peer_hold()   <- refcnt+1   ovpn_peer_hold()   <- refcnt+2
-  schedule_work()    <- queued      schedule_work()    <- NO-OP
-                                    (work already pending)
-  ovpn_tcp_peer_del_work runs:
-    ovpn_peer_del()
-    ovpn_peer_put()  <- refcnt+1
-                                   <- peer never freed
+Should this kfunc prevent operation on MPTCP subflows? Bjorn Topel
+raised this concern in v1, noting the issue that commit fcf4692fa39e
+("mptcp: prevent BPF accessing lowat from a subflow socket.") was
+designed to prevent.
 
-Fix by checking the return value of schedule_work() in both paths and
-calling ovpn_peer_put() to drop the extra reference if the work was
-already pending. ovpn_peer_hold() is kept unconditional in the TX path
-as it cannot fail at that point.
+You acknowledged this and stated you would drop MPTCP support for now,
+mentioning that a subsequent patch (patch 7 in the v3 series: "bpf:
+mptcp: Don't support BPF_SOCK_OPS_RCVQ_CB.") would disable the callback
+for MPTCP.
 
-Fixes: a6a5e87b3ee4 ("ovpn: avoid sleep in atomic context in TCP RX error path")
-Cc: stable@vger.kernel.org
-Signed-off-by: Pavitra Jha <jhapavitra98@gmail.com>
+However, the current code lacks any MPTCP check. Without either disabling
+BPF_SOCK_OPS_RCVQ_CB for MPTCP subflows in the callback registration or
+adding a check like:
+
+	if (sk_is_mptcp(skops->sk))
+		return -EOPNOTSUPP;
+
+couldn't a BPF program invoke this kfunc on MPTCP subflows and trigger
+the same problem that fcf4692fa39e was designed to prevent?
+
+Reference: https://lore.kernel.org/bpf/87ik8ujfa1.fsf@all.your.base.are.belong.to.us/
+
+> +#else
+> +	return -EOPNOTSUPP;
+> +#endif
+> +}
+> +
+>  __bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops,
+>  					      u64 flags)
+>  {
+> @@ -12539,6 +12555,7 @@ BTF_KFUNCS_END(bpf_kfunc_check_set_tcp_reqsk)
+>
+>  BTF_KFUNCS_START(bpf_kfunc_check_set_sock_ops)
+>  BTF_ID_FLAGS(func, bpf_sock_ops_enable_tx_tstamp)
+> +BTF_ID_FLAGS(func, bpf_sock_ops_tcp_set_rcvlowat)
+>  BTF_KFUNCS_END(bpf_kfunc_check_set_sock_ops)
+>
+>  static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
+
+
 ---
-Changes since v2:
-  - Include RX path fix in the diff (was missing from v2)
-  - Link: https://lore.kernel.org/netdev/20260522091718.270956-1-jhapavitra98@gmail.com/
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-Changes since v1:
-  - TX path: keep ovpn_peer_hold() unconditional per Antonio Quartulli's
-    review; only check schedule_work() return value
-  - Link: https://lore.kernel.org/netdev/20260521083739.65061-1-jhapavitra98@gmail.com/
----
- drivers/net/ovpn/tcp.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ovpn/tcp.c b/drivers/net/ovpn/tcp.c
-index 5499c1572..2c7d830e7 100644
---- a/drivers/net/ovpn/tcp.c
-+++ b/drivers/net/ovpn/tcp.c
-@@ -151,7 +151,8 @@ static void ovpn_tcp_rcv(struct strparser *strp, struct sk_buff *skb)
- 	/* take reference for deferred peer deletion. should never fail */
- 	if (WARN_ON(!ovpn_peer_hold(peer)))
- 		goto err_nopeer;
--	schedule_work(&peer->tcp.defer_del_work);
-+	if (!schedule_work(&peer->tcp.defer_del_work))
-+		ovpn_peer_put(peer);
- 	dev_dstats_rx_dropped(peer->ovpn->dev);
- err_nopeer:
- 	kfree_skb(skb);
-@@ -283,7 +284,8 @@ static void ovpn_tcp_send_sock(struct ovpn_peer *peer, struct sock *sk)
- 			 * stream therefore we abort the connection
- 			 */
- 			ovpn_peer_hold(peer);
--			schedule_work(&peer->tcp.defer_del_work);
-+			if (!schedule_work(&peer->tcp.defer_del_work))
-+				ovpn_peer_put(peer);
- 
- 			/* we bail out immediately and keep tx_in_progress set
- 			 * to true. This way we prevent more TX attempts
--- 
-2.53.0
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/26328541814
+--===============0315934236863334226==--
 
