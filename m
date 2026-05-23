@@ -1,166 +1,166 @@
-Return-Path: <netdev+bounces-291053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291054-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPf4MlViEWpclQYAu9opvQ
-	(envelope-from <netdev+bounces-291053-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:16:21 +0200
+	id EEwNIyNkEWrMlQYAu9opvQ
+	(envelope-from <netdev+bounces-291054-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:24:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A04D5BDD42
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:16:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 396035BDD7C
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:24:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 065BA3006B74
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 08:16:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 651863015473
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 08:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40C52DE6FF;
-	Sat, 23 May 2026 08:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A207346A11;
+	Sat, 23 May 2026 08:23:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="yfx2bChS";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="r0SMmnlv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GqqpCmA0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138D61A0728;
-	Sat, 23 May 2026 08:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69615282F04;
+	Sat, 23 May 2026 08:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779524175; cv=none; b=XEHcCYvAlBbQxTnd/+orkaAsoPI8t+xiukyd8e4i9NPdcxO2v2iFn912ekBRGLlVEsZYXUUvVtbeEKcIUCj7ZShVmEh8zMGFoU53Wu4bUIaFui9bYuY9jLE3AkNvJ14Jp+1uiHr7rWheDeqWXjDb4okXaLFGaWqgOLcTOTxtbNA=
+	t=1779524639; cv=none; b=ffTebBZqaFcrSTb4OxgPE0AkwAnm3pVZ933IsOuxvLk/p89XocHE85Pxcyq3buRMFK+BjC4SlegeE6XBLKJYqdoIiMInjSjTVx0fmpxKIFOiNJ7WY1p4VUJXCwqP5Awqb3HQGeqRSyqUcfS9PUkj+m8xD6N0NPQPMzvk+7cHNJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779524175; c=relaxed/simple;
-	bh=ASHPTjOnvm5f6LP7g0blhOe5w7Qd29Z8iScIUHb+ZfM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nEtgTz++An0UYHZPVrSHzm0EpL9nQ4PwV5fv5gLIr8NmbHpRJwQphIvn8tqqqjp3scK/TsqAljdxnSDxX0lTxheABkfctIxMrry83IYXO5vTJWZr0hgNkm599UO1xSbo8jd3dxhuelC79KfqN/bkS6jBzlc7Tz7gDqzj5HnKiYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=yfx2bChS; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=r0SMmnlv; arc=none smtp.client-ip=91.198.250.237
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4gMw2f6lptzB0yg;
-	Sat, 23 May 2026 10:16:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1779524171;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3+TB+1iXKC+oEhr9lDwhe4/BMpmiFavf8+dndQZOTfs=;
-	b=yfx2bChS3HtcJ4ZsgB8HvGGnKDZBycZqWAp0xeqtSpv4myxuPseCUUjb4xNhbin1O4XMul
-	qqanMQD60w0tXNyroeeXkE6aqgPyqpiOkibGaBULuxvojjREE7LBDg7P4TK+wVryA3f4tB
-	q2/csx0lJiDcuSJTd4R8CiOZxwet2uQTGt0Vz/KBoX0GtdtZmGDOtiVodOK4GD5q1NCB+R
-	qkSC7h7ZyKV++2KfIfPxOdAgqWUsbCtDbipWcvBHuFpmNNsUrwt9MENajDvl2N9rvDl7D8
-	v+G9AN84n1eJruUBDHJcIERfE5kQYgQEyi9/qWGi4ivDoqdF5ec8OQ2TQehJgQ==
-From: Qing Ming <a0yami@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1779524169;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3+TB+1iXKC+oEhr9lDwhe4/BMpmiFavf8+dndQZOTfs=;
-	b=r0SMmnlvkHHMbAMpfs25i7d5aapH+7xi8g+udsGKlCji2ma3tyllEfl4b8HqaLKLBER7+s
-	GUajbhRjdq+EDlEJZzS0fjxH/aJcA6MQex3pzgOScueRIN7jR1Jy0EJJ2hMLe+wZP8HYWK
-	D0Y1PbOYPzoyeHFuZlb6a/RzY2R+dYWSH1LEf68vufeujvU2vGOG4l5zJkRPjD4R2zNAWT
-	HPkR3ZaJETwfK2XNu0WbHexbhMlqGPiYEL0N/U6YdLWjaGL22dgSEr9pBPJvzMrRxylyBN
-	J25DPEHwpKX+qIofdpQgfsYoFt1UR8Wh31iWOVK/ZQXYQg8/Keoc/5QVOuf0fQ==
-To: Antonio Quartulli <antonio@openvpn.net>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Qing Ming <a0yami@mailbox.org>
-Subject: [PATCH] ovpn: avoid putting unrelated P2P peer on socket release
-Date: Sat, 23 May 2026 16:15:43 +0800
-Message-ID: <20260523081543.94507-1-a0yami@mailbox.org>
+	s=arc-20240116; t=1779524639; c=relaxed/simple;
+	bh=VyWl2ecvljRK2GJztgVl5Y3zngaCuLCGUKi7ecECibo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tugUn3t4Xn9S36IOPjJtbn6jAwMaT23R0Y8RobjVLKnQ+Aoc88HGANfVXUS0LLDHIf2Jmih6xqMvywvzKc2lBqX1jyCoLOXuC+WBWPZv3Q3pJOrjdH+yiRcIotcxm99ZnZliYX/HjsmC+2W+dP+OEX+omJPIUUfEzs3nrNstEJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GqqpCmA0; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6098D1F000E9;
+	Sat, 23 May 2026 08:23:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779524637;
+	bh=wxHCvPrMAEVSLpBwem3bgINi0YyoThXY2qqtvVEvhn8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=GqqpCmA0dNpHxxb5cnkJ7n6z97RBSqjKwx4p0TgT1FHkNHATcdkvTuPQMc6Qonhwa
+	 882BPQrbSmPLPdPBvRdVeWPZ/pw4rOy6qb1Ew5GD66uVqsx8G+AnluEQY/LbCmZ52P
+	 Cax/kd8CbgDKKUOdMgqu/8zgOkVAvGhCgp/H+lcr26i75Xi8Wx6Tm3nF04kOQ3QWsb
+	 iI8q1uAWzN7MNFe1HaX8QInERGvjwVppy4/Yrd0I1edwosfWJxcg7FDvqCujlx8nLl
+	 x8rGEC0ViN/RmiFvBdvbUPsdakDUKiOxcZrNbIej4QtICP+6d7zMzXP6K5DSAB+xQL
+	 pRUqX3X91kLAg==
+Date: Sat, 23 May 2026 10:23:55 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: sashiko-reviews@lists.linux.dev, robh@kernel.org,
+	devicetree@vger.kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v8 10/10] net: airoha: Support multiple LAN/WAN
+ interfaces for hw MAC address configuration
+Message-ID: <ahFkG32jFRJ7W_cv@lore-desk>
+References: <20260519-airoha-eth-multi-serdes-v8-10-6bd70e329df6@kernel.org>
+ <20260520085934.54AD01F00894@smtp.kernel.org>
+ <ag2t4eVe4DcfU2yZ@lore-desk>
+ <20260522112514.1ad6e947@kicinski-fedora-PF5CM1Y0>
+ <ahCtsVA1VhYmhZq-@lore-desk>
+ <20260522165820.04839729@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: s1ii7quzkwapaeiyukwpkaqydhe4tdr3
-X-MBO-RS-ID: b7e33da714da48b7d5d
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="PftFpCMBcfSTQMSG"
+Content-Disposition: inline
+In-Reply-To: <20260522165820.04839729@kernel.org>
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291053-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291054-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[a0yami@mailbox.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mailbox.org:email,mailbox.org:mid,mailbox.org:dkim]
-X-Rspamd-Queue-Id: 6A04D5BDD42
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 396035BDD7C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ovpn_peer_release_p2p() is called when an OVPN UDP socket is being
-destroyed. It checks the currently published P2P peer and releases it only
-if that peer still uses the socket being destroyed.
 
-A peer replacement can publish a new peer before the old UDP socket is
-destroyed. When the old socket destruction path runs afterwards,
-ovpn_peer_release_p2p() observes the new peer through ovpn->peer. Since the
-new peer uses a different socket, the function takes the socket mismatch
-branch.
+--PftFpCMBcfSTQMSG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-That branch still calls ovpn_peer_put(peer). At this point, however, peer
-is the currently published replacement peer, not the peer associated with
-the socket being destroyed. Dropping its reference can free it while
-ovpn->peer still points to it, leading to later use-after-free accesses
-from the peer and socket cleanup paths.
+On May 22, Jakub Kicinski wrote:
+> On Fri, 22 May 2026 21:25:37 +0200 Lorenzo Bianconi wrote:
+> > - What happens when device tree does not provide MAC addresses for two =
+or
+> >   more same-side GDM interfaces?
+> >   - This is the same comment reported in [0].
+> >     Since the hw exposes just a single register (REG_FE_LAN_MAC_H or
+> >     REG_FE_WAN_MAC_H) for the LAN/WAN mac address MSBs, we need to
+> >     require all the interfaces configured as LAN or WAN to share the
+> >     mac address MSBs and the user needs to select the new mac address
+> >     observing this limitation.
+> >     Please note this limitation is only valid if multiple net_devices
+> >     are configured as LAN (or WAN). Since in the current codebase we
+> >     do not support multiple interfaces configured as LAN or WAN, we are
+> >     not introducing any regression.
+> >     I do not think selecting a "base" for the mac address is helpful
+> >     if the user does not provide the mac address via the DTS or NVME
+> >     (as suggested by sashiko) since it will not help us if the mac
+> >     addresses configured via DTS are "wrong" (if they do not respect
+> >     the limitation described above).  What do you think?
+>=20
+> If the MACs are not provided something is obviously wrong with the
+> device. We should try to provide enough functionality for the user
+> to be able to troubleshoot. For an AP perhaps that means SSH / remote
+> logs? So switching/routing doesn't have to work, I'd think.=20
+>=20
+> Will the user be able to log in when REG_FE_LAN_MAC_H does not match
+> the MAC of a port?
 
-KASAN reports this as a slab-use-after-free on the kmalloc-1k ovpn_peer
-object. In the reproducer, the object is allocated from ovpn_peer_new() via
-ovpn_nl_peer_new_doit(), and freed through ovpn_peer_release_rcu() from RCU
-callback processing. Observed access sites include ovpn_peer_remove(),
-ovpn_socket_release(), ovpn_nl_peer_del_notify(), and unlock_ovpn().
+REG_FE_LAN_MAC_H and REG_FE_WAN_MAC_H regs are used by the FE module to
+hw accelerate forwarded traffic and does not prevent the user to log into
+the device even if they are set to a different values with respect to the
+configured mac addresses (just hw acceleration will not work properly).
+To prove it, I set to 0 REG_FE_WAN_MAC_H, REG_FE_WAN_MAC_LMIN and
+REG_FE_WAN_MAC_LMAX and I still able to ping the device via the WAN
+interface.
+I guess the easiest solution is to neglect errors from airoha_set_macaddr()
+in airoha_dev_init() (as it is in the current codebase) in order to allow
+the device to probe successfully and provide a warning message to the user
+regarding the mac address misconfiguration. What do you think?
 
-Fix this by returning from the socket mismatch branch without putting the
-peer.
+Regards,
+Lorenzo
 
-Fixes: f6226ae7a0cd ("ovpn: introduce the ovpn_socket object")
-Signed-off-by: Qing Ming <a0yami@mailbox.org>
----
- drivers/net/ovpn/peer.c | 1 -
- 1 file changed, 1 deletion(-)
+--PftFpCMBcfSTQMSG
+Content-Type: application/pgp-signature; name=signature.asc
 
-diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
-index a09d61296425..1844d97154ce 100644
---- a/drivers/net/ovpn/peer.c
-+++ b/drivers/net/ovpn/peer.c
-@@ -1167,7 +1167,6 @@ static void ovpn_peer_release_p2p(struct ovpn_priv *ovpn, struct sock *sk,
- 		ovpn_sock = rcu_access_pointer(peer->sock);
- 		if (!ovpn_sock || ovpn_sock->sk != sk) {
- 			spin_unlock_bh(&ovpn->lock);
--			ovpn_peer_put(peer);
- 			return;
- 		}
- 	}
--- 
-2.53.0
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCahFkGwAKCRA6cBh0uS2t
+rPmIAP9wU8SEqG9TRUqQMAbsMKcXJ8lwb52gxAfRso+cI/KHdgD+NMFXbDB6lGko
+mytUyoxheWixRWBj+SLLqp5Gl4dV7gQ=
+=jXTB
+-----END PGP SIGNATURE-----
+
+--PftFpCMBcfSTQMSG--
 
