@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-291043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291044-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UkR5DQBFEWpfjQYAu9opvQ
-	(envelope-from <netdev+bounces-291043-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 08:11:12 +0200
+	id Wy/lEl5GEWqUjQYAu9opvQ
+	(envelope-from <netdev+bounces-291044-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 08:17:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 950365BD662
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 08:11:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8999D5BD676
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 08:17:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6D76E300F157
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 06:11:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0AC513014960
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 06:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214FF23D28C;
-	Sat, 23 May 2026 06:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745731DF748;
+	Sat, 23 May 2026 06:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IZ3EJvlV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jESf02C8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889AF2032D
-	for <netdev@vger.kernel.org>; Sat, 23 May 2026 06:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28703128CF
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 06:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779516668; cv=none; b=oI3qCwMP45SdoWfwGOIApmkb7SzKJ8eA7FEUi9wPQJJUQsY5tbaPjM5/a+WiwGF8zKL219R5iDF4TbhvTmy3ysfn6DBmNHD0rC8ltbhAC5M+SX8jMgJUvz2kESm4HnO4carpr15Iqc6Dp+EmAakxGXv4oHLtnm13R5CoaRVHXvw=
+	t=1779517019; cv=none; b=TJSaYQznp2V7NJoU2YaY+9tqqnFvk53h9U2OyGNbSORWjXGnSb7rBP7hD5NT/21ewuasE6+GkDjrXvo3GB8CKjiVQl1H5z0duOjAT+4UjJVhYInXJphY/WH5xB1Av3OIer7V7am8P0z8BcGRMRK830LAusf4Fap5lYgntcmdny8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779516668; c=relaxed/simple;
-	bh=vqnWN2ioluozPyX1eyS1YK2taR8Iu8K5F9NrXyGVE8I=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=g4kjKDW1648LPGYWJ5jN2tz7mgUqKiGa1AvXnrejb2ha59tCnMehR1YNK9ANV5Cnwcevk9FqGIllah1dq7w9ai1Jj2937pWW02Ib4VIVknqkUQ2r7VS7JVxu4J+fLUCijPxoCXD4ZGXfKsZFfoMGqCJUbaPFBfWsiyOHdwy+rJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IZ3EJvlV; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1779517019; c=relaxed/simple;
+	bh=6vWtXTV5AWRrQwdRE02h91apgPdmqZFkLk4HMjD1Ufs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UKVkR+1HjiE8R95vjfjzc3hukKDTx/51vcfOB4+tOiCeK77qMKeh4wckj0fV2WIMVD8R8LT37K78z5YJtH58kEy9Vgaya0hm2DbWZ79DDoN/l4CTNxhbg5ky44uYX5zSoJgvTwYj+fEVoj0UW10A8rAbYx9X/Y/sRbmrzRZFfRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jESf02C8; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2babc42244aso187206355ad.3
-        for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:11:06 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2bd6aeb3637so194279385ad.2
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 23:16:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779516666; x=1780121466; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1779517017; x=1780121817; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=r7QlYiuvrP6p778+lt+iroZIc3lCFiuMK40pLLMk8fY=;
-        b=IZ3EJvlVNfQtSFLTXXUZ8331Cv7bspP14xoG1OnkyZJ9tPXhCRq/bo92aoumB5ivcu
-         /0qj4W5aEpyx0HAOBfIZ8zQjOs+NHxyDOhZchQLj/wv+nAJZccS7JlUUfeIEbkJGlnuW
-         87oK9T7FkJonwzkDQC+D69FoFv3oBAQw9c1ZNfFEFRFqJFqKI3g4x16/4kBEAr63sXhu
-         6SfsLpm5fWbbVv0duBrgqfFMy56xcNDOFp0+IDSWd2VjY17nuyGMnDDFaBuOlIYqawcl
-         vZ/drkCHk+a37BIrVDw88U9W/Azu7YgZYvKU+tv7W8fBK/BOD/yArugZs8lU0xvgUPsw
-         CxwQ==
+        bh=BVLuCd4qtjaZyU+GZy+jf9vxfy1McvpJWrAdrS22ygI=;
+        b=jESf02C8ERsv2A8lQB6ViQcWvEqm4/cmNhXooyf10kn6B3Q/rgMaiwAKaT9sa1YIv8
+         csHLf6owVFWn2ArLlBfHRB/nWjl4TmfGU8apmxIE1szR8TFTg5eUr8nvBzHDcR0ycOMv
+         6yoOLzTFPBS1CMmAlzj/x2idzc4nyujhJz1fG850+urYTKTaguFhKriC9M2b5zHTCn4o
+         4tLrsNz92tO/zM7aA1XCJdi7HZqMrB8ylBgSzLG9I+ZKTgDt0Orn6yfsLxVaBWRC5eoU
+         9W9VH6SQHd2aZLOrb+TM5VsILkSfr2hYL0c4qjYasnSfL9f7IKXU5NtJWEuiTFy4/TJb
+         g0KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779516666; x=1780121466;
+        d=1e100.net; s=20251104; t=1779517017; x=1780121817;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=r7QlYiuvrP6p778+lt+iroZIc3lCFiuMK40pLLMk8fY=;
-        b=Qwq29/S7HkTynWUThvhSkSLshobaPzzh+JKLOKEcAED8xJRw8sXe6ych38cOoJsuak
-         mBvLZp06paCM502f+ojGaj56TsDgrf2xbBARnopj69NbNZSA2QlzupNhG7/GFatD17eu
-         gQZfGPPylLeiuLZ8y2QLZVP76a81jkLfHsS+BY7s09bP7vNq2lXGQmJ5te5OD8pnM6ln
-         RCBfNfxROtdTjPwJqNQCs6oMWNhdrj+RmIEjLpBzEgYT04e+u8CN47bTB9DMufb42Hfp
-         wUQnFUTws5fe5XrE+qvcW7OacKZFsUf6S9yiJGQSZUb0RFxRlaax74Ulo3LcYVdlgrSS
-         J8sg==
-X-Forwarded-Encrypted: i=1; AFNElJ8HKGF/rWzBZl9KAcVOj7Xzv3Un3v252oBUC1Dg2ObALhYM2qI0hZd3CW6HNlCbPtEt37ZmRSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFjnY6+jE3XJDWVaTpJcSnVCeviIblLjwP9xrzEL/ROVkMZdXl
-	w1SdS272lVAX0SIxOC/lABTlDpRv8CZta5G2a4Fod3CnWWCGmNRUIUG0oUzRMy8/XnYrFbEtzoc
-	yGvSZ0A==
-X-Received: from pgmk13.prod.google.com ([2002:a63:5a4d:0:b0:c79:39f0:12f2])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:594:b0:3aa:f5a5:1c37
- with SMTP id adf61e73a8af0-3b328cb9665mr6548867637.11.1779516665423; Fri, 22
- May 2026 23:11:05 -0700 (PDT)
-Date: Sat, 23 May 2026 06:10:58 +0000
+        bh=BVLuCd4qtjaZyU+GZy+jf9vxfy1McvpJWrAdrS22ygI=;
+        b=QgqN8u5gMWEJ9L3YLo+ydjcJ8c2yOIQpDx9M3BPlzVbOfHdSsL9zadCAV16PgrEajU
+         1JgLbX4RGUvAo04oOQX0lKdVyObrnxwaAJ9JJTmCemrw+aEXiyhYwX/eqp9+CrAaby1K
+         9wDaP4T7lMLtnFjmpwwxkvcyHDIC9O1u0Rn2t2Ud/+YHQeGipMA3q983Ln+YCHhWNUN6
+         YHEGyOFQeSq/V80RwpSpPsWrLFM52MBQy01UrK2DPourk9XsBaJtt+Z59cNnnJRBQwgq
+         GesxRJJ+kbAw7Z4bYSczCFe3AgVBdP6xiIwAkqi21OUBxvQnCbBuwxohjDu5iVLe0XFY
+         urRg==
+X-Forwarded-Encrypted: i=1; AFNElJ94okLxEy2ua1pmCGoeaHVLeAQvry1mapgGNZlI596J0DYS34YZ3BMExbPfhJt00bv+s7WMnCk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyLV4I9oCBM+BnxXFAircugdUPRJES9cqc8/MrpktIKs0A54Xi
+	AdzKRUcvsibT8JozKDC6X9QHVNFp9EneIdx8RakIlzvHi8ZwwquDj0UpQOZGNRY+JL+iN5hAuBn
+	A7bm03A==
+X-Received: from pgbbw34.prod.google.com ([2002:a05:6a02:4a2:b0:c80:ca29:73c6])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f70e:b0:2bc:8ebd:af76
+ with SMTP id d9443c01a7336-2beb03466afmr71738405ad.0.1779517016457; Fri, 22
+ May 2026 23:16:56 -0700 (PDT)
+Date: Sat, 23 May 2026 06:16:23 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,189 +73,74 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
-Message-ID: <20260523061102.2762452-1-kuniyu@google.com>
-Subject: [PATCH v1 iproute2-next] iplink_geneve: Support IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6.
+Message-ID: <20260523061654.2767060-1-kuniyu@google.com>
+Subject: [PATCH v1 net-next 0/5] geneve: Allow binding UDP socket to a
+ specific address.
 From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Stephen Hemminger <stephen@networkplumber.org>, David Ahern <dsahern@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Stephen Hemminger <stephen@networkplumber.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291043-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291044-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.983];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,saddr.family:url]
-X-Rspamd-Queue-Id: 950365BD662
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 8999D5BD676
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6 allow specifying a local
-IPv4/IPv6 address for the backend UDP socket of a GENEVE devcie.
+By default, a GENEVE device bind()s its underlying UDP socket(s) to
+the IPv4 or IPv6 wildcard address because there is no way to specify
+a specific local IP address to bind() to.
 
-Let's support the attributes with the "local" keyword.
+This prevents deploying multiple GENEVE devices on a multi-homed host
+where each device should be isolated and bound to a different local IP
+address on the same UDP port.
 
-  # for i in $(seq 1 2);
-  do
-          ip link add geneve4_${i} type geneve local 192.168.0.${i} external
-          ip addr add 192.168.0.${i}/24 dev geneve4_${i}
-          ip link set geneve4_${i} up
+This series introduces two options to specify local IPv4 or IPv6
+addresses for a GENEVE device.
 
-          ip link add geneve6_${i} type geneve local 2001:9292::${i} external
-          ip addr add 2001:9292::${i}/64 dev geneve6_${i} nodad
-          ip link set geneve6_${i} up
-  done
+The corresponding iproute2 patch is here:
+https://lore.kernel.org/netdev/20260523061102.2762452-1-kuniyu@google.com/
 
-  # ip -d l | grep geneve
-  9: geneve4_1: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-      geneve external id 0 local 192.168.0.1 ...
-  10: geneve6_1: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-      geneve external id 0 local 2001:9292::1 ...
-  11: geneve4_2: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-      geneve external id 0 local 192.168.0.2 ...
-  12: geneve6_2: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-      geneve external id 0 local 2001:9292::2 ...
 
-  # ss -ua | grep geneve
-  UNCONN 0      0         192.168.0.2:geneve      0.0.0.0:*
-  UNCONN 0      0         192.168.0.1:geneve      0.0.0.0:*
-  UNCONN 0      0      [2001:9292::2]:geneve            *:*
-  UNCONN 0      0      [2001:9292::1]:geneve            *:*
+Kuniyuki Iwashima (5):
+  geneve: Reuse ipv6_addr_type() result in geneve_nl2info().
+  geneve: Pass struct geneve_dev to geneve_create_sock().
+  geneve: Pass struct geneve_dev to geneve_find_sock().
+  geneve: Add dualstack flag to struct geneve_config.
+  geneve: Introduce IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6.
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-The corresponding kernel patch will be posted separately.
----
- include/uapi/linux/if_link.h |  2 ++
- ip/iplink_geneve.c           | 43 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 44 insertions(+), 1 deletion(-)
+ drivers/net/geneve.c         | 228 ++++++++++++++++++++++++++++-------
+ include/uapi/linux/if_link.h |   2 +
+ 2 files changed, 186 insertions(+), 44 deletions(-)
 
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index a8c64be26f2c..d692d466da6b 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1487,6 +1487,8 @@ enum {
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
- 	IFLA_GENEVE_PORT_RANGE,
- 	IFLA_GENEVE_GRO_HINT,
-+	IFLA_GENEVE_LOCAL,
-+	IFLA_GENEVE_LOCAL6,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
-diff --git a/ip/iplink_geneve.c b/ip/iplink_geneve.c
-index 62c61bce138b..8d21722b598c 100644
---- a/ip/iplink_geneve.c
-+++ b/ip/iplink_geneve.c
-@@ -18,6 +18,7 @@ static void print_explain(FILE *f)
- 	fprintf(f,
- 		"Usage: ... geneve id VNI\n"
- 		"		remote ADDR\n"
-+		"		[ local ADDR ]\n"
- 		"		[ ttl TTL ]\n"
- 		"		[ tos TOS ]\n"
- 		"		[ df DF ]\n"
-@@ -56,7 +57,7 @@ static void check_duparg(__u64 *attrs, int type, const char *key,
- static int geneve_parse_opt(struct link_util *lu, int argc, char **argv,
- 			  struct nlmsghdr *n)
- {
--	inet_prefix daddr;
-+	inet_prefix daddr, saddr;
- 	__u32 vni = 0;
- 	__u32 label = 0;
- 	__u8 ttl = 0;
-@@ -72,6 +73,7 @@ static int geneve_parse_opt(struct link_util *lu, int argc, char **argv,
- 	bool inner_proto_inherit = false;
- 
- 	inet_prefix_reset(&daddr);
-+	inet_prefix_reset(&saddr);
- 
- 	while (argc > 0) {
- 		if (!matches(*argv, "id") ||
-@@ -88,6 +90,13 @@ static int geneve_parse_opt(struct link_util *lu, int argc, char **argv,
- 			get_addr(&daddr, *argv, AF_UNSPEC);
- 			if (!is_addrtype_inet_not_multi(&daddr))
- 				invarg("invalid remote address", *argv);
-+		} else if (!matches(*argv, "local")) {
-+			NEXT_ARG();
-+			check_duparg(&attrs, IFLA_GENEVE_LOCAL, "local",
-+				     *argv);
-+			get_addr(&saddr, *argv, AF_UNSPEC);
-+			if (!is_addrtype_inet_not_multi(&saddr))
-+				invarg("invalid local address", *argv);
- 		} else if (!matches(*argv, "ttl") ||
- 			   !matches(*argv, "hoplimit")) {
- 			unsigned int uval;
-@@ -221,8 +230,17 @@ static int geneve_parse_opt(struct link_util *lu, int argc, char **argv,
- 	if (is_addrtype_inet(&daddr)) {
- 		int type = (daddr.family == AF_INET) ? IFLA_GENEVE_REMOTE :
- 						       IFLA_GENEVE_REMOTE6;
-+
- 		addattr_l(n, 1024, type, daddr.data, daddr.bytelen);
- 	}
-+
-+	if (is_addrtype_inet(&saddr)) {
-+		int type = (saddr.family == AF_INET) ? IFLA_GENEVE_LOCAL :
-+						       IFLA_GENEVE_LOCAL6;
-+
-+		addattr_l(n, 1024, type, saddr.data, saddr.bytelen);
-+	}
-+
- 	if (!set_op || GENEVE_ATTRSET(attrs, IFLA_GENEVE_LABEL))
- 		addattr32(n, 1024, IFLA_GENEVE_LABEL, label);
- 	if (!set_op || GENEVE_ATTRSET(attrs, IFLA_GENEVE_TTL))
-@@ -285,6 +303,29 @@ static void geneve_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		}
- 	}
- 
-+	if (tb[IFLA_GENEVE_LOCAL]) {
-+		__be32 addr = rta_getattr_u32(tb[IFLA_GENEVE_LOCAL]);
-+
-+		if (addr)
-+			print_string(PRINT_ANY,
-+				     "local",
-+				     "local %s ",
-+				     format_host(AF_INET, 4, &addr));
-+	} else if (tb[IFLA_GENEVE_LOCAL6]) {
-+		struct in6_addr addr;
-+
-+		memcpy(&addr, RTA_DATA(tb[IFLA_GENEVE_LOCAL6]), sizeof(struct in6_addr));
-+		if (!IN6_IS_ADDR_UNSPECIFIED(&addr)) {
-+			if (!IN6_IS_ADDR_MULTICAST(&addr))
-+				print_string(PRINT_ANY,
-+					     "local6",
-+					     "local %s ",
-+					     format_host(AF_INET6,
-+							 sizeof(struct in6_addr),
-+							 &addr));
-+		}
-+	}
-+
- 	if (tb[IFLA_GENEVE_TTL_INHERIT] &&
- 	    rta_getattr_u8(tb[IFLA_GENEVE_TTL_INHERIT])) {
- 		print_string(PRINT_FP, NULL, "ttl %s ", "inherit");
 -- 
 2.54.0.746.g67dd491aae-goog
 
