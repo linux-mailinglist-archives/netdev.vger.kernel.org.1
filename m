@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-291096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291097-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHWTCnyaEWpSoAYAu9opvQ
-	(envelope-from <netdev+bounces-291096-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 14:15:56 +0200
+	id IM07BKmaEWpSoAYAu9opvQ
+	(envelope-from <netdev+bounces-291097-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 14:16:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 766075BED7D
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 14:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47ABD5BED8D
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 14:16:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A655F30134BB
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:15:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7B0F30276AE
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:15:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6DF385D7B;
-	Sat, 23 May 2026 12:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9419C33E35B;
+	Sat, 23 May 2026 12:15:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jt2/qmco"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqFuQuuy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C0834FF74
-	for <netdev@vger.kernel.org>; Sat, 23 May 2026 12:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D601E3876DE
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 12:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779538542; cv=none; b=t83++X/4gj1vICxvNNUwy3obY42tQFBppAPTz/8U+nX/wxw2EG1a2kYOgAzoczwg+re1FZKMnURcmdv6azaWmi7tU6Z7ThtFiqpnlauYFqQttt2NiX/bzE2VOTy3SkaYBk3WrR8OsyazujujW84UWuKk6dwPwCaHnoQlDbuYPiU=
+	t=1779538546; cv=none; b=i7r95aE9jT8bPlrsCqTuFSRZzGrczJFKAdaEFC+cgU0LlGk/VNfJVRRlGdtReca73D7MCIDFCI9dR4GCZ5V7Ok5ckqHLOTz0jAA/mWI+/1PvTkC5wRWaY+Nus/hg3orA3ORgUf/2d3xLSJkW55h056nfKk3mrw+6ZcLQ7ErAf/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779538542; c=relaxed/simple;
-	bh=WhlLcVVQjPEplzTRwPQy01UeCnAZv2FoMEU1WX5UEfo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dEkx4RG7j8q6qnwde7UweZTpDtkmlT+bCeXCojLx412KrmMNI/jo2dxMvZBvGGLdgQF7caBIubLn6x+hj0yapUpaU1ODSxTOsEkX3zlGN8PGATRRxsgjSiDe0qVBLIYE2UzuIqVzwJUlSB78YHUnvbgc5cm6AqLJFuuEEtCWPDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jt2/qmco; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1779538546; c=relaxed/simple;
+	bh=8l4tyC4y5/Ak0oYZbkuWnFYCquWoCgn8Deh8zHDa4TM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=n0VdrLEiNPHvs9YTbk30sv5i003/7xDONZarCaTqFOpWHYGf8EcwNdmG77XRX6K2293nrPi8RdNdIVi3Y8hTNy7yLTxwMKWLpIfodOxQedgXylnyUyFy9OSLxX/LCHHWJ1LuxFa/T3BDMOByx6wHxmAigrdHxDr8So0hqxy/Yk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NqFuQuuy; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2ba17c8cfacso84627265ad.2
-        for <netdev@vger.kernel.org>; Sat, 23 May 2026 05:15:41 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2ba1e9d3687so54630425ad.3
+        for <netdev@vger.kernel.org>; Sat, 23 May 2026 05:15:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779538541; x=1780143341; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DK7qqqpT4fnZlS3XGu6aIqnYT1MOPYfSV+g6L0GEpFY=;
-        b=Jt2/qmcot64yPJ0VtmTXTp0qPREKBhDCt9IuYIdrMiluV8X5By8vGaC1S3TKy6aCyM
-         v4hmUl9355+tz/ODSd+DEPfST5uEAOdfdYPOuag/zFDQRQMmDZfe6zyZ0g2TBmLNiIrT
-         cV3awhasHJDSQOM1uYsNmK+9Zf54nM2V6AO3WDSwL9XhBfw1Yz4FbObgaCMlVN9g3A4V
-         y8mlRr+UkaJWX/SLrouy+FmOdyO955UQ9FnWTCPdhiIjk5ldc/tJHcYDeu4X3CM2DEUn
-         WkA1bAnqecMF3+g2IYYqnW7U8dH0DKp9axU3HASL42p9VUhQJpsPssSwXSeli0nqjonw
-         VZ4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779538541; x=1780143341;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779538544; x=1780143344; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DK7qqqpT4fnZlS3XGu6aIqnYT1MOPYfSV+g6L0GEpFY=;
-        b=dRICGMuUvQUFklbiky4xock2nxZfSEjPU3lFN96MNcsyUlbQ/j12CQfeNShR/r4ula
-         XpwGQd3otLpMGU1orzc1pOC0BugdN+lm7FltiN6l4FUKkAO1TZ/dZbCVU9ziN8zEh74L
-         vWM7T1bl0RiRbx8qSwo7kP88gJSAWWN07Wqd02TgROlVlQWljEdEqJ0RG5ib6wjaIEYj
-         hdjKB9HLDw4+zMbT0xTFADE+7A+Pil3/oBTI27DNAvc43tT+H66apncADJRy1mTkCtc4
-         DrvCX8D1OeqCZdYkmz8UGsmMT90GeKhUmScH7BJNQBmSbmuK9kR2KUOg7mDAkbdGvqqk
-         e+Fg==
-X-Forwarded-Encrypted: i=1; AFNElJ+cOBYN2qzOJ+jSe+ptTCJbvd7LYjhDjUbcVWHBNkfltf9Fq6pBUp2P9us26S4zZNndIZ9pbds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWXyuYhMsRnCBC6csPAzcxZYfuisDwTjGNjzJKFLg3knR3j6YH
-	KHdTvVV9c1lVB7c3Q+pPGNMWFi8b3ZBHPYFraJvF84ncrzjnhJe8rPD5
-X-Gm-Gg: Acq92OF64TkBfwSq+coCDqiEgCDqNYqjW7+vRxrT2TqhvADrQB/PuxgZK7CYFqEepc9
-	/Xdcnbct5Nau5QCo64SjgiYrBcuMzBEvaGcbThGYnmKFTi4SPzsy6+kuPcQUZCxGQUTTS3GO1AC
-	L1N/6pNccdf1r505gFZd1B4qOOysDpjtk7ziNvwDI5uiMd0JZQB67WV8WDEO7IoO0ndVOZ1Xz0x
-	ED9EifgA7JkLLQSSFv/pd4Mf4J4NsmEnnLCxggB+yCqAteSptAp+6U+NX5GjJDXlpWUdbw7Uq65
-	8em97dV9sueGzKGkMzkDODl5mGHjNJfeGC7S6cYsrqkUzcVBBunO+GO8rkKsghHeuneQiH2LEkk
-	EkenMIqrdELpBE+P4nQT+N6jTzYjZPGj67O9kftBHHtFgk+TZo70aEJvg7x8feuAbvWle1XgAq1
-	EBdWJKRuRTqlN8iTdsj4Fi5MNT
-X-Received: by 2002:a17:903:388c:b0:2bc:a577:70c2 with SMTP id d9443c01a7336-2beb06292f1mr83238405ad.31.1779538540585;
-        Sat, 23 May 2026 05:15:40 -0700 (PDT)
+        bh=ptBan/oDFwIr7VXZlN8TdNfSiKDV9ouul3U9bPm2km8=;
+        b=NqFuQuuyrFcUeHomeDO7Hu7KciKYD0AtdvZe5Fq1EApZxDErm6dOjtTJpdQaALo+qn
+         INy/62H2MX0W9Vz2YkYQVAmNjYSZBT3JtCEDGnT1UWoKuwzPoNl3LPjDJ0LQQXwpN0z0
+         m8CXesgDEjaCGeQIjPoOHNedW/w92IAsMHVfjcoSVdwRPb6te8P16e3FxKqtz/crX8zR
+         w2mxQXLCCSmpgwqM8Ub3vUNz0rgYSqzmPj7i+kR79vn6LmNjqIm+RT5MeKW5Uj7oFDeU
+         F0MRQSZebF4NqTm2IVL8F7Ii6a9VVE71qneF+H2nq1e+S/JbmuCkWsqZRhy3+TS0RTUq
+         Wvdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779538544; x=1780143344;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ptBan/oDFwIr7VXZlN8TdNfSiKDV9ouul3U9bPm2km8=;
+        b=tVe1QBo1SwNx9DJrs0IQ3wz6vqgbhEPONoLZ58B9n2hxfzOxGswfy2q+Y/GBT4Z3UV
+         tUl9Kk+pt2XOQCa0S0rYVJLv8/KVCcppol+lpTR/rIap5Rdh4R+QgMDRBRQ4MMXe97Kp
+         hvHdixbEG72J+A6Ktzvc+VuvflicBcPyboeuQg4qNSgV4U1F3yG/Y90vAkL7etvBp3WJ
+         mCu15emoAx3h3nXZ0goAEaCPsSobAuhqMX+GedUE5Gq9i8DmWJ/ZsDn+3Aiwrm/rzhPf
+         +VWTLfvU/M9JbrcYm6D0R7z5KqKTrwuTpBo1o7oqm7T1gE59y6n+cW8yN6Zl/Me5JD+1
+         /AjQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/Q+5IQ80/qHzrSwqfHrUBenxjvt/EoG+q+Fv2QKBQZ/i5tshLzzKhJsrJz4BzE7XSQUqTx3mk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxCI7UKZ5+hS7Pg/j2NgYpZvuVa87IMNubPGveNE8ZO2mnfDZF
+	LLHL5vl+ugJViyaya/jM33G3cZN2kF3sFVGWyn7zXNojm+Rc/dRFqea2
+X-Gm-Gg: Acq92OFl9f7hchqgLoHxDYVR2OztG9UsGc/diePaVu3oySDlGo/ER3JTdecBAhkTlQg
+	vz2um1yxBTre2I3Xtzk31vk2h1gTxwul1EpaSQdWYqOKo/ZhobNPuKMKRULqx8kXueDmp6xVvu7
+	JPwe4edLSk4gpw9JEkn0yuiNN5g9vdJhPAz3qL4rc836xygDk80rgG9cQxflWxVA8KubN9jU4FX
+	p6c0U12Dy9giHHedIP//2HELtpuAmPEfMGmnkRNu6bQpK80yOIWdjANRonUC22m0dM92IXu/jKN
+	6czhCIwlm/51/XqgAhK6OzR8XIAUzdY8gJGjYOtedew8bupQRXNRDarAxIJpTg/ODsN7yimh54T
+	NURxhFXzZFxfX2qW+Ge2oEEKHmd/FfAyaosQJt38SJntKrG25Gq+8+YztozBKjBMpHeoC+B5FPs
+	cHCsmWEiEfFEHclelNj3g5/cXQ80W5uxCmee0=
+X-Received: by 2002:a17:903:3d10:b0:2bc:6784:5260 with SMTP id d9443c01a7336-2beb06eb0e4mr90794065ad.37.1779538543856;
+        Sat, 23 May 2026 05:15:43 -0700 (PDT)
 Received: from mincom1 ([125.149.177.227])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56ce4easm41746305ad.30.2026.05.23.05.15.37
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56ce4easm41746305ad.30.2026.05.23.05.15.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 May 2026 05:15:40 -0700 (PDT)
+        Sat, 23 May 2026 05:15:43 -0700 (PDT)
 From: Jihong Min <hurryman2212@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Antoine Tenart <atenart@kernel.org>,
@@ -92,10 +94,12 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-mediatek@lists.infradead.org,
 	netdev@vger.kernel.org,
 	Jihong Min <hurryman2212@gmail.com>
-Subject: [PATCH 0/3] Add packet-mode ESP offload for Airoha/EIP93
-Date: Sat, 23 May 2026 21:15:19 +0900
-Message-ID: <20260523121522.3023992-1-hurryman2212@gmail.com>
+Subject: [PATCH 1/3] xfrm: extend ESP offload infrastructure for packet engines
+Date: Sat, 23 May 2026 21:15:20 +0900
+Message-ID: <20260523121522.3023992-2-hurryman2212@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260523121522.3023992-1-hurryman2212@gmail.com>
+References: <20260523121522.3023992-1-hurryman2212@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,7 +120,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-291096-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291097-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
@@ -130,92 +134,232 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.993];
+	NEURAL_HAM(-0.00)[-0.991];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 766075BED7D
+X-Rspamd-Queue-Id: 47ABD5BED8D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This series adds the missing plumbing for ESP offload engines that
-operate on whole ESP packets instead of only exposing AES/HMAC through
-the crypto API AEAD interface.
+Some ESP offload engines operate on whole ESP packets rather than the
+generic software trailer layout. They can generate outbound ESP padding,
+next-header and ICV bytes in hardware, and inbound decapsulation can
+return an already-trimmed packet with the recovered next-header value.
 
-The normal ESP software path can already call into accelerated AEAD
-algorithms, but packet-mode engines such as EIP93 can also generate and
-consume ESP packet framing: padding, pad length, next header and ICV.
-That needs a slightly different XFRM offload contract so the netdev
-driver can hand the skb to a packet backend rather than trying to make
-hardware fit the software trailer layout.
+Add a netdev offload callback for drivers to opt into hardware-generated
+ESP TX trailers, carry the reserved ESP TX tail length in xfrm_offload,
+and let ESP input skip software trailer removal when hardware has already
+done it.
 
-Patch 1 extends the ESP offload infrastructure for packet engines while
-preserving the existing behavior for drivers that do not opt in.
-Patch 2 exposes an EIP93 ESP packet backend for encapsulation and
-decapsulation.
-Patch 3 wires Airoha Ethernet GDM netdevs and DSA user ports to that
-backend through xfrmdev_ops. ESP GSO and ESP TX checksum offload remain
-disabled.
+This keeps the default ESP offload behavior unchanged for existing devices
+while providing the infrastructure needed by packet-mode ESP engines.
 
-Runtime testing was done on a Gemtek W1700K2 running OpenWrt with the
-same changes applied on top of a 6.18.31-based kernel.
+Assisted-by: Codex:gpt-5.5
+Signed-off-by: Jihong Min <hurryman2212@gmail.com>
+---
+ include/linux/netdevice.h |  3 +++
+ include/net/xfrm.h        |  8 +++++++-
+ net/ipv4/esp4.c           |  6 +++++-
+ net/ipv4/esp4_offload.c   | 29 ++++++++++++++++++++++++++++-
+ net/ipv6/esp6.c           |  6 +++++-
+ net/ipv6/esp6_offload.c   | 29 ++++++++++++++++++++++++++++-
+ 6 files changed, 76 insertions(+), 5 deletions(-)
 
-Test parameters:
-
-  - Static IPv4 transport-mode XFRM SAs between the AP and host.
-  - ESP transform: auth hmac(sha1), enc cbc(aes) with a 128-bit AES key.
-  - iperf3 TCP test, AP as client and host as server:
-        iperf3 -c <host_ip> -P 4 -t 10
-  - The host always used normal Linux XFRM software processing.
-  - With AP ESP offload disabled, the AP also used the Linux XFRM
-    software path; in this setup, EIP93-backed AEAD crypto was still
-    available to that path.
-
-Network-relevant test setup:
-
-  - AP: Gemtek W1700K2, Airoha AN7581/EN7581, 4x Arm Cortex-A53 at
-    1.4 GHz, 2 GiB RAM, airoha_eth wan (GDM2) netdev, 10Gb/s full-duplex,
-    MTU 9200, EIP93 crypto and IPsec packet engine present.
-  - Host: AMD Ryzen 9 9950X3D, 16 cores/32 threads, Open vSwitch,
-    MTU 9978, backed by a ConnectX-6 Dx 10Gb/s full-duplex link.
-
-AP to host iperf3 result:
-
-  AP offload      Sender          Receiver        Retransmits
-  on              918.2 Mbit/s    913.6 Mbit/s    0
-  off             782.4 Mbit/s    778.6 Mbit/s    3569
-
-This is a 17.3% receiver-side throughput improvement for the AP TX ESP
-path in this setup, with retransmits eliminated in the offloaded run.
-
-Jihong Min (3):
-  xfrm: extend ESP offload infrastructure for packet engines
-  crypto: inside-secure: add EIP93 ESP packet backend
-  net: airoha: add EIP93-backed ESP XFRM offload
-
- MAINTAINERS                                   |    1 +
- drivers/crypto/inside-secure/eip93/Kconfig    |   10 +
- drivers/crypto/inside-secure/eip93/Makefile   |    1 +
- .../crypto/inside-secure/eip93/eip93-ipsec.c  | 1413 ++++++++++++++++
- .../crypto/inside-secure/eip93/eip93-main.c   |   69 +-
- .../crypto/inside-secure/eip93/eip93-main.h   |   38 +-
- drivers/net/ethernet/airoha/Kconfig           |   11 +
- drivers/net/ethernet/airoha/Makefile          |    1 +
- drivers/net/ethernet/airoha/airoha_eth.c      |   51 +-
- drivers/net/ethernet/airoha/airoha_eth.h      |   69 +
- drivers/net/ethernet/airoha/airoha_xfrm.c     | 1474 +++++++++++++++++
- include/crypto/eip93-ipsec.h                  |  132 ++
- include/linux/netdevice.h                     |    3 +
- include/net/xfrm.h                            |    8 +-
- net/ipv4/esp4.c                               |    6 +-
- net/ipv4/esp4_offload.c                       |   29 +-
- net/ipv6/esp6.c                               |    6 +-
- net/ipv6/esp6_offload.c                       |   29 +-
- 18 files changed, 3324 insertions(+), 27 deletions(-)
- create mode 100644 drivers/crypto/inside-secure/eip93/eip93-ipsec.c
- create mode 100644 drivers/net/ethernet/airoha/airoha_xfrm.c
- create mode 100644 include/crypto/eip93-ipsec.h
-
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0e1e581efc5a..b6ff04c3df78 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1043,6 +1043,9 @@ struct xfrmdev_ops {
+ 				      struct xfrm_state *x);
+ 	bool	(*xdo_dev_offload_ok) (struct sk_buff *skb,
+ 				       struct xfrm_state *x);
++	/* Return true when the device generates the ESP trailer/ICV itself. */
++	bool	(*xdo_dev_esp_tx_hw_trailer)(struct sk_buff *skb,
++					     struct xfrm_state *x);
+ 	void	(*xdo_dev_state_advance_esn) (struct xfrm_state *x);
+ 	void	(*xdo_dev_state_update_stats) (struct xfrm_state *x);
+ 	int	(*xdo_dev_policy_add) (struct xfrm_policy *x, struct netlink_ext_ack *extack);
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 10d3edde6b2f..160069901e0a 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -1141,7 +1141,7 @@ struct xfrm_offload {
+ #define	CRYPTO_FALLBACK		8
+ #define	XFRM_GSO_SEGMENT	16
+ #define	XFRM_GRO		32
+-/* 64 is free */
++#define	XFRM_ESP_NO_TRAILER	64
+ #define	XFRM_DEV_RESUME		128
+ #define	XFRM_XMIT		256
+ 
+@@ -1158,6 +1158,12 @@ struct xfrm_offload {
+ 	/* Used to keep whole l2 header for transport mode GRO */
+ 	__u16			orig_mac_len;
+ 
++	/*
++	 * ESP packet engines can reserve tailroom in the generic ESP path and
++	 * generate padding, next-header and ICV bytes during device TX.
++	 */
++	__u16			esp_tx_tailen;
++
+ 	__u8			proto;
+ 	__u8			inner_ipproto;
+ };
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 6a5febbdbee4..f21c8f2e60f7 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -720,7 +720,11 @@ int esp_input_done2(struct sk_buff *skb, int err)
+ 	if (unlikely(err))
+ 		goto out;
+ 
+-	err = esp_remove_trailer(skb);
++	/* Hardware ESP decapsulation can already remove pad/trailer/ICV. */
++	if (xo && (xo->flags & XFRM_ESP_NO_TRAILER))
++		err = xo->proto;
++	else
++		err = esp_remove_trailer(skb);
+ 	if (unlikely(err < 0))
+ 		goto out;
+ 
+diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
+index abd77162f5e7..f00fff98b69f 100644
+--- a/net/ipv4/esp4_offload.c
++++ b/net/ipv4/esp4_offload.c
+@@ -270,8 +270,10 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
+ 	struct xfrm_offload *xo;
+ 	struct ip_esp_hdr *esph;
+ 	struct crypto_aead *aead;
++	struct sk_buff *trailer;
+ 	struct esp_info esp;
+ 	bool hw_offload = true;
++	bool hw_trailer = false;
+ 	__u32 seq;
+ 	int encap_type = 0;
+ 
+@@ -281,6 +283,7 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
+ 
+ 	if (!xo)
+ 		return -EINVAL;
++	xo->esp_tx_tailen = 0;
+ 
+ 	if ((!(features & NETIF_F_HW_ESP) &&
+ 	     !(skb->dev->gso_partial_features & NETIF_F_HW_ESP)) ||
+@@ -303,13 +306,37 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
+ 	esp.clen = ALIGN(skb->len + 2 + esp.tfclen, blksize);
+ 	esp.plen = esp.clen - skb->len - esp.tfclen;
+ 	esp.tailen = esp.tfclen + esp.plen + alen;
++	if (esp.tailen > U16_MAX)
++		return -EINVAL;
+ 
+ 	esp.esph = ip_esp_hdr(skb);
+ 
+ 	if (x->encap)
+ 		encap_type = x->encap->encap_type;
+ 
+-	if (!hw_offload || !skb_is_gso(skb) || (hw_offload && encap_type == UDP_ENCAP_ESPINUDP)) {
++	if (hw_offload && !skb_is_gso(skb) && !encap_type && x->xso.dev &&
++	    x->xso.dev->xfrmdev_ops &&
++	    x->xso.dev->xfrmdev_ops->xdo_dev_esp_tx_hw_trailer)
++		hw_trailer =
++			x->xso.dev->xfrmdev_ops->xdo_dev_esp_tx_hw_trailer(skb, x);
++
++	if (hw_trailer) {
++		int esph_offset;
++
++		/*
++		 * The device packet engine will write ESP padding, next-header
++		 * and ICV bytes. Keep skb->len unchanged here, but make sure the
++		 * later DMA writer owns enough linear tailroom.
++		 */
++		esph_offset = (unsigned char *)esp.esph - skb_transport_header(skb);
++		esp.nfrags = skb_cow_data(skb, esp.tailen, &trailer);
++		if (esp.nfrags < 0)
++			return esp.nfrags;
++		esp.esph = (struct ip_esp_hdr *)(skb_transport_header(skb) +
++						 esph_offset);
++		xo->esp_tx_tailen = esp.tailen;
++	} else if (!hw_offload || !skb_is_gso(skb) ||
++		   (hw_offload && encap_type == UDP_ENCAP_ESPINUDP)) {
+ 		esp.nfrags = esp_output_head(x, skb, &esp);
+ 		if (esp.nfrags < 0)
+ 			return esp.nfrags;
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 9c06c5a1419d..730588f8eaba 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -751,7 +751,11 @@ int esp6_input_done2(struct sk_buff *skb, int err)
+ 	if (unlikely(err))
+ 		goto out;
+ 
+-	err = esp_remove_trailer(skb);
++	/* Hardware ESP decapsulation can already remove pad/trailer/ICV. */
++	if (xo && (xo->flags & XFRM_ESP_NO_TRAILER))
++		err = xo->proto;
++	else
++		err = esp_remove_trailer(skb);
+ 	if (unlikely(err < 0))
+ 		goto out;
+ 
+diff --git a/net/ipv6/esp6_offload.c b/net/ipv6/esp6_offload.c
+index 22895521a57d..d124493da40b 100644
+--- a/net/ipv6/esp6_offload.c
++++ b/net/ipv6/esp6_offload.c
+@@ -308,8 +308,10 @@ static int esp6_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features
+ 	int blksize;
+ 	struct xfrm_offload *xo;
+ 	struct crypto_aead *aead;
++	struct sk_buff *trailer;
+ 	struct esp_info esp;
+ 	bool hw_offload = true;
++	bool hw_trailer = false;
+ 	__u32 seq;
+ 
+ 	esp.inplace = true;
+@@ -318,6 +320,7 @@ static int esp6_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features
+ 
+ 	if (!xo)
+ 		return -EINVAL;
++	xo->esp_tx_tailen = 0;
+ 
+ 	if (!(features & NETIF_F_HW_ESP) || x->xso.dev != skb->dev) {
+ 		xo->flags |= CRYPTO_FALLBACK;
+@@ -338,8 +341,32 @@ static int esp6_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features
+ 	esp.clen = ALIGN(skb->len + 2 + esp.tfclen, blksize);
+ 	esp.plen = esp.clen - skb->len - esp.tfclen;
+ 	esp.tailen = esp.tfclen + esp.plen + alen;
++	if (esp.tailen > U16_MAX)
++		return -EINVAL;
+ 
+-	if (!hw_offload || !skb_is_gso(skb)) {
++	if (hw_offload && !skb_is_gso(skb) && !x->encap && x->xso.dev &&
++	    x->xso.dev->xfrmdev_ops &&
++	    x->xso.dev->xfrmdev_ops->xdo_dev_esp_tx_hw_trailer)
++		hw_trailer =
++			x->xso.dev->xfrmdev_ops->xdo_dev_esp_tx_hw_trailer(skb, x);
++
++	if (hw_trailer) {
++		int esph_offset;
++
++		/*
++		 * The device packet engine will write ESP padding, next-header
++		 * and ICV bytes. Keep skb->len unchanged here, but make sure the
++		 * later DMA writer owns enough linear tailroom.
++		 */
++		esp.esph = ip_esp_hdr(skb);
++		esph_offset = (unsigned char *)esp.esph - skb_transport_header(skb);
++		esp.nfrags = skb_cow_data(skb, esp.tailen, &trailer);
++		if (esp.nfrags < 0)
++			return esp.nfrags;
++		esp.esph = (struct ip_esp_hdr *)(skb_transport_header(skb) +
++						 esph_offset);
++		xo->esp_tx_tailen = esp.tailen;
++	} else if (!hw_offload || !skb_is_gso(skb)) {
+ 		esp.nfrags = esp6_output_head(x, skb, &esp);
+ 		if (esp.nfrags < 0)
+ 			return esp.nfrags;
 -- 
 2.53.0
+
 
