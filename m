@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-290967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qOi2EvjxEGp7fwYAu9opvQ
-	(envelope-from <netdev+bounces-290967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:16:56 +0200
+	id cPD7IB3yEGp7fwYAu9opvQ
+	(envelope-from <netdev+bounces-290968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:17:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD3865BBB91
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:16:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10435BBB99
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:17:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7CD273022FA5
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 00:16:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45DE4300D860
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 00:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CC935959;
-	Sat, 23 May 2026 00:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDF6823DD;
+	Sat, 23 May 2026 00:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H79qEhG4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/WG9zmD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE0F1A6809
-	for <netdev@vger.kernel.org>; Sat, 23 May 2026 00:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F98E883F
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 00:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779495366; cv=none; b=rVSbQCCsKOCAcfJqaBnt3dkUgUMO2mV7eBczZjkGIG/WPS3iJOwkxWsuIE0Eo71AQYNv1AmOlQgCxyogyQ3E0uMaR9v5eLQUgPc9gmevsECSwhyZMoPE1xci5PprAmhvXIL3BzmZq+Z8W/j2IQvbjAsc225VOcra7Qfksf7cYpA=
+	t=1779495370; cv=none; b=db41rytEorLSXqm/jcNFGCrjiZeqYkF4vXv6WjtesPArpBJ6Mvhy2wLolc893fHjxe5CIbrG9Zg+83LNsmdhtzle2O1sjk+7PEgWbKQnCWiVee86lNjIbzbdew/PUL61BObtnMKGtcHSOnUaCF2/oohCCYG/aYxvb/2ojk2sUAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779495366; c=relaxed/simple;
-	bh=qr1ofEGZGt8K3+fujjKW21dSxUE5CFF4wmGaDlTW8EI=;
+	s=arc-20240116; t=1779495370; c=relaxed/simple;
+	bh=pqANEDQq6zDCS4CgMqK+OjNETcQPXePEXauzPxRjM7s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gxhefgg2y/J3XIpInOMsewpdnRR+pG9AI2ZBNP9G/zdGP4Fy3j38GaxLCl14c1zzE4p1aYxEonP/55Kmk658ZGI70vdHcPNSuVhuNfEzKqq9OeltbclWBfdQWk3NsNeOV1pA/sACSmbqlh6LLlFaWblLGIKacAYh5Au0e2Yq4cM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H79qEhG4; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1C221F000E9;
-	Sat, 23 May 2026 00:16:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=YBqlkX6VZ/+G2Y8W5UouD1DXnfMth5Fu+RABqsvIahfeQUQ5kYZ8PlFZxVksc6mz9ig6jwzMBnKrUu46LXEq+pkRsdl98bPZvJ4RBNqdFeWvciAlEHwz1B7i4KzHCP4U8ZCzlYJ5sMat7yK5QKnph9oz6TK9nC/CAl3dG05L6Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O/WG9zmD; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FB641F000E9;
+	Sat, 23 May 2026 00:16:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779495365;
-	bh=kBlOihFOZnCz3NRpfROo2YSMQD+dbwjUKmkwTTJFi1M=;
+	s=k20260515; t=1779495368;
+	bh=QAchjD30N80ZHHDySttwPLfyZnIFsWgmlxS4j0SO9PU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=H79qEhG4kRyBjbkf42C2KyhhOMVLrEmh8Y/imoRh6vvt3CPSnbr8LH71jjvj/TWS0
-	 aIuNtyebC/Il126Zwk/hNoHGJpEkeDYQkiLvRKC3Z6m67zwqPcvHk/pR4KxtgwzVQE
-	 99I4peZQirKIGcndGZl2aBaGpWK0ejT51aV0U4dPFn2n6mSAZwi0HM+oiyrj3B6uX5
-	 yNBxSnr2Bg6bvi5Q/nX5kYJuHezrwzlnC6c/8bvT7mMxY4GKOyTbchVbgNnkpF8bmf
-	 U7Rk4gkLSJdTYm20EMT6wVJVtKRaGlJPg6ENZosyKCj5iQYtqVxCFCgbtJmQxZgNmw
-	 VYhovXENprpFQ==
+	b=O/WG9zmDBY5TCGlTXkmI2ImA+1Fl9D9Tv02cN36wbfEEiUiBMn6jc+W2/W3ocetf5
+	 vP1ZXoiipeVJzqAnryhVOrrWATQe9lcw1cnXe1u3euk0l0p61YO9n1oU8vMZ9wPpo6
+	 UpruCybCMLBEsnUII2TIuWPAfDLR7914583LNL/3/vxsRhqoczU5PGOtz/VB47Mz+Y
+	 gJrvw1pnmuNammVs9brCCGhG8RJRyXCan/mANb5WFcGGgSHP8aSFSJMNqMTWY9N5UK
+	 tPyNYRV1ujamHUFT4x3n16rbRLCQ2zKaXmNvLcX1gEgcS26u0HEFiFvwXfk+RvbRsq
+	 uxbOCKL2CMKNQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: anthony.l.nguyen@intel.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -54,198 +54,387 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	vinschen@redhat.com,
 	alexander.nowlin@intel.com
-Subject: Re: [PATCH net 6/8] ice: skip unnecessary VF reset when setting trust
-Date: Fri, 22 May 2026 17:16:04 -0700
-Message-ID: <20260523001604.1756999-1-kuba@kernel.org>
+Subject: Re: [PATCH net 8/8] ixgbe: only access vfinfo and mv_list under RCU lock
+Date: Fri, 22 May 2026 17:16:05 -0700
+Message-ID: <20260523001605.1757032-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260520183501.3360810-7-anthony.l.nguyen@intel.com>
-References: <20260520183501.3360810-7-anthony.l.nguyen@intel.com>
+In-Reply-To: <20260520183501.3360810-9-anthony.l.nguyen@intel.com>
+References: <20260520183501.3360810-9-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-290968-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290967-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: AD3865BBB91
+X-Rspamd-Queue-Id: E10435BBB99
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-Based on my verification, all three findings are confirmed. Let me now generate the report.
+ixgbe: only access vfinfo and mv_list under RCU lock
 
-commit 848ee33529de0af7967f298f70c37bfb75ea5498
-Author: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+This change drops the vfs_lock spinlock in favour of RCU protection
+for adapter->vfinfo and adapter->mv_list, marking them __rcu and
+converting readers to rcu_dereference()/rcu_read_lock() and writers
+to rcu_replace_pointer()/kfree_rcu(). The goal is to address a
+crash observed when ixgbe_disable_sriov() races with
+ixgbe_service_task() / ixgbe_msg_task() readers.
 
-ice: skip unnecessary VF reset when setting trust
-
-This patch makes ice_set_vf_trust() skip the VF reset for both the
-grant-trust path and for revocation when the VF has not configured
-LLDP filters or promiscuous mode. When a reset is still needed, it
-reorders the work so the reset runs before the LLDP filter teardown.
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> index 7e00e091756d..3c64ed1b41a8 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> @@ -1399,11 +1416,19 @@ int ice_set_vf_trust(struct net_device *netdev, int vf_id, bool trusted)
->  
->  	mutex_lock(&vf->cfg_lock);
->  
-> -	while (!trusted && vf->num_mac_lldp)
-> -		ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf), false);
-> -
-> +	/* Reset only if revoking trust and VF has advanced features configured */
-> +	if (!trusted &&
-> +	    (vf->num_mac_lldp > 0 ||
-> +	     test_bit(ICE_VF_STATE_UC_PROMISC, vf->vf_states) ||
-> +	     test_bit(ICE_VF_STATE_MC_PROMISC, vf->vf_states))) {
-> +		ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-
-[Critical]
-Can the privilege capability bit get left set after revocation here?
-
-The actual trust check used at runtime is ice_is_vf_trusted(), which
-reads the bit, not vf->trusted:
-
-  bool ice_is_vf_trusted(struct ice_vf *vf)
-  {
-          return test_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-  }
-
-The new code calls ice_reset_vf() while vf->trusted is still true (the
-assignment is deferred to after the reset so ice_vf_is_lldp_ena() works
-during cleanup). Inside the reset, the rebuild path runs:
-
-  ice_reset_vf()
-    -> ice_vf_post_vsi_rebuild()
-       -> ice_vf_rebuild_host_cfg()
-          -> ice_vf_set_host_trust_cfg()
-             assign_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE,
-                        &vf->vf_caps, vf->trusted);
-
-Because vf->trusted is still true at that moment, the bit gets
-re-asserted to 1. After the reset returns, vf->trusted is set to false,
-but ice_setup_vf_trust(vf, false) is only called in the else branch, so
-the privilege bit is never cleared on this path.
-
-After this returns, ice_is_vf_trusted() still returns true, which gates
-ice_can_vf_change_mac(), ice_vc_handle_mac_addr_msg(),
-ice_vc_cfg_promiscuous_mode_msg() and ice_vf_has_max_vlans(). The kernel
-log says "VF X is now untrusted" but the trust-gated capabilities remain
-available to the guest.
-
-Would calling ice_setup_vf_trust(vf, false) (or assigning vf->trusted
-before the reset, as the previous code did) be necessary to actually
-clear the bit on this path?
-
-> +		while (vf->num_mac_lldp)
-> +			ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf), false);
-
-[High]
-Is this loop reachable after the reset above?
-
-ice_reset_vf() goes through ice_vf_pre_vsi_rebuild() which calls
-ice_vf_clear_counters():
-
-  static void ice_vf_clear_counters(struct ice_vf *vf)
-  {
-          struct ice_vsi *vsi = ice_get_vf_vsi(vf);
-
-          if (vsi)
-                  vsi->num_vlan = 0;
-
-          vf->num_mac = 0;
-          vf->num_mac_lldp = 0;
-          ...
-  }
-
-By the time control returns to ice_set_vf_trust(), vf->num_mac_lldp is
-already zero, so the while loop never iterates and
-ice_vf_update_mac_lldp_num() -> ice_vsi_cfg_sw_lldp(vsi, false, false)
-never runs.
-
-ice_vf_reconfig_vsi() inside the reset does invoke ice_fltr_remove_all()
-for per-VSI rules, but ice_vsi_cfg_sw_lldp() also drives the AQ-based
-ice_lldp_fltr_add_remove() removal, gated by the PF-wide
-ICE_FLAG_LLDP_AQ_FLTR flag, which is not torn down by ice_fltr_remove_all().
-On firmware that uses the AQ fallback (set when the per-VSI rule add
-fails), the AQ LLDP filter rule installed when trust was granted stays
-in place, and the VF can keep receiving LLDP frames after revocation.
-
-The commit message says:
-
-    When we do reset (MAC LLDP case), we fix the race condition by
-    resetting first to clear VF state (which blocks new MAC LLDP filter
-    additions), then delete existing filters safely.
-
-Does the deletion step actually run, given that the loop counter is
-zeroed by the reset before the loop is reached? Would saving
-num_mac_lldp before ice_reset_vf() and using that saved value (or
-unconditionally calling ice_vsi_cfg_sw_lldp(vsi, false, false) when an
-LLDP rule was present) be needed for the intended teardown to happen?
-
-> +	} else {
-> +		ice_setup_vf_trust(vf, trusted);
-> +	}
->  	vf->trusted = trusted;
-> -	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-> +
->  	dev_info(ice_pf_to_dev(pf), "VF %u is now %strusted\n",
->  		 vf_id, trusted ? "" : "un");
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> index 9b8217523fd2..8849b9f42bf6 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> @@ -808,10 +810,10 @@ struct ixgbe_adapter {
+>  	/* SR-IOV */
+>  	DECLARE_BITMAP(active_vfs, IXGBE_MAX_VF_FUNCTIONS);
+>  	unsigned int num_vfs;
+> -	struct vf_data_storage *vfinfo;
+> +	struct vf_data_storage __rcu *vfinfo;
+>  	int vf_rate_link_speed;
+>  	struct vf_macvlans vf_mvs;
+> -	struct vf_macvlans *mv_list;
+> +	struct vf_macvlans __rcu *mv_list;
 
 [Medium]
-Is the predicate that selects the reset path complete?
+After this conversion, is ixgbe_handle_mdd_event() in
+drivers/net/ethernet/intel/ixgbe/ixgbe_main.c still consistent
+with the new annotations? It contains:
 
-The condition only covers num_mac_lldp and the UC/MC promisc state bits.
-While trusted, however, a VF can also:
+    if (adapter->vfinfo && ixgbe_check_mdd_event(adapter)) {
 
-  - override the host-set MAC and add unicast MACs beyond
-    ICE_MAX_MACADDR_PER_VF (ice_can_vf_change_mac() and
-    ice_vc_handle_mac_addr_msg() consult ice_is_vf_trusted())
-  - add VLAN filters beyond ICE_MAX_VLAN_PER_VF
-    (ice_vf_has_max_vlans() / ice_vc_get_max_vlan_fltrs() grant a higher
-    cap when ice_is_vf_trusted() is true)
+That bare load of an __rcu pointer is not wrapped in
+rcu_read_lock() and does not use rcu_access_pointer() or
+rcu_dereference(), so sparse will flag it and the access
+bypasses the RCU discipline used elsewhere in the file. The
+commit message says RCU is used "throughout the driver" — was
+this site simply missed during the conversion?
 
-A VF that used these higher quotas but is not currently in promisc mode
-and has no LLDP filter takes the no-reset path, and the over-quota MAC
-and VLAN filters carry over past trust revocation. The previous
-unconditional ice_reset_vf() rebuilt the VSI through
-ice_vf_rebuild_host_mac_cfg(), which restored only the host-set MAC and
-dropped VF-added extras.
+[ ... ]
 
-The commit message says the reset is taken "if the VF has actually
-configured advanced features that require cleanup". Should the
-condition also account for VF-installed MAC and VLAN filters that
-exceed the untrusted limits?
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index 2646ee6f295f..d82c7dfc6580 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+
+[ ... ]
+
+> @@ -8267,22 +8293,27 @@ static void ixgbe_watchdog_flush_tx(struct ixgbe_adapter *adapter)
+> @@ -8309,9 +8340,15 @@ static void ixgbe_check_for_bad_vf(struct ixgbe_adapter *adapter)
+>  
+>  	/* check status reg for all VFs owned by this PF */
+>  	for (vf = 0; vf < adapter->num_vfs; ++vf) {
+> -		struct pci_dev *vfdev = adapter->vfinfo[vf].vfdev;
+> +		struct vf_data_storage *vfinfo;
+> +		struct pci_dev *vfdev = NULL;
+>  		u16 status_reg;
+>  
+> +		rcu_read_lock();
+> +		vfinfo = rcu_dereference(adapter->vfinfo);
+> +		if (vfinfo)
+> +			vfdev = vfinfo[vf].vfdev;
+> +		rcu_read_unlock();
+>  		if (!vfdev)
+>  			continue;
+>  		pci_read_config_word(vfdev, PCI_STATUS, &status_reg);
+
+[High]
+Can vfdev still be used safely after rcu_read_unlock() here?
+
+The RCU section only protects the lifetime of the vfinfo array,
+not the lifetime of the pci_dev whose pointer was stored in it.
+ixgbe_disable_sriov() drops the reference taken by
+ixgbe_get_vfs() with pci_dev_put(vfdev) and then proceeds to
+pci_disable_sriov(), either of which can free the pci_dev
+concurrently with the subsequent pci_read_config_word() and the
+pcie_flr(vfdev) reached through ixgbe_bad_vf_abort().
+
+Should this path take pci_dev_get(vfdev) before dropping the
+rcu_read_unlock(), and pci_dev_put() after the config-space
+access and FLR are complete?
+
+This appears to predate this patch (the prior code dereferenced
+vfdev outside any lifetime-extending section as well), but the
+RCU conversion seems like a natural opportunity to address it.
+
+[ ... ]
+
+> @@ -10071,20 +10114,26 @@ static int handle_redirect_action(struct ixgbe_adapter *adapter, int ifindex,
+>  {
+>  	struct ixgbe_ring_feature *vmdq = &adapter->ring_feature[RING_F_VMDQ];
+>  	unsigned int num_vfs = adapter->num_vfs, vf;
+> +	struct vf_data_storage *vfinfo;
+>  	struct netdev_nested_priv priv;
+>  	struct upper_walk_data data;
+>  	struct net_device *upper;
+>  
+>  	/* redirect to a SRIOV VF */
+> -	for (vf = 0; vf < num_vfs; ++vf) {
+> -		upper = pci_get_drvdata(adapter->vfinfo[vf].vfdev);
+> -		if (upper->ifindex == ifindex) {
+> -			*queue = vf * __ALIGN_MASK(1, ~vmdq->mask);
+> -			*action = vf + 1;
+> -			*action <<= ETHTOOL_RX_FLOW_SPEC_RING_VF_OFF;
+> -			return 0;
+> +	rcu_read_lock();
+> +	vfinfo = rcu_dereference(adapter->vfinfo);
+> +	if (vfinfo)
+> +		for (vf = 0; vf < num_vfs; ++vf) {
+> +			upper = pci_get_drvdata(vfinfo[vf].vfdev);
+
+[High]
+Can the captured num_vfs and the freshly-dereferenced vfinfo
+disagree in size here?
+
+num_vfs is sampled from adapter->num_vfs before rcu_read_lock(),
+while vfinfo is observed inside the RCU section. ixgbe_disable_sriov()
+runs under PCI device_lock (not rtnl), sets adapter->num_vfs = 0,
+and rcu_replace_pointer()s vfinfo. A subsequent
+__ixgbe_enable_sriov(N2) can publish a smaller vfinfo array of
+size N2 < num_vfs before the loop runs. The access vfinfo[vf]
+for vf >= N2 is then a heap out-of-bounds read.
+
+Should num_vfs be sampled inside the rcu_read_lock() and bounded
+by the actual size of the published vfinfo, or should
+adapter->num_vfs be updated as part of the same rcu_assign_pointer
+publication so readers can rely on a consistent pair?
+
+[ ... ]
+
+> @@ -9744,15 +9781,21 @@ static int ixgbe_ndo_get_vf_stats(struct net_device *netdev, int vf,
+>  				  struct ifla_vf_stats *vf_stats)
+>  {
+>  	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
+> +	struct vf_data_storage *vfinfo;
+>  
+>  	if (vf < 0 || vf >= adapter->num_vfs)
+>  		return -EINVAL;
+>  
+> -	vf_stats->rx_packets = adapter->vfinfo[vf].vfstats.gprc;
+> -	vf_stats->rx_bytes   = adapter->vfinfo[vf].vfstats.gorc;
+> -	vf_stats->tx_packets = adapter->vfinfo[vf].vfstats.gptc;
+> -	vf_stats->tx_bytes   = adapter->vfinfo[vf].vfstats.gotc;
+> -	vf_stats->multicast  = adapter->vfinfo[vf].vfstats.mprc;
+> +	rcu_read_lock();
+> +	vfinfo = rcu_dereference(adapter->vfinfo);
+> +	if (vfinfo) {
+> +		vf_stats->rx_packets = vfinfo[vf].vfstats.gprc;
+> +		vf_stats->rx_bytes   = vfinfo[vf].vfstats.gorc;
+> +		vf_stats->tx_packets = vfinfo[vf].vfstats.gptc;
+> +		vf_stats->tx_bytes   = vfinfo[vf].vfstats.gotc;
+> +		vf_stats->multicast  = vfinfo[vf].vfstats.mprc;
+> +	}
+> +	rcu_read_unlock();
+
+[High]
+This pattern recurs in many of the rtnl ndo handlers (set_vf_mac,
+set_vf_spoofchk, set_vf_rss_query_en, set_vf_trust, set_vf_vlan,
+set_vf_bw, get_vf_config, get_vf_stats): the bound check
+
+    if (vf >= adapter->num_vfs)
+        return -EINVAL;
+
+is performed before rcu_read_lock(). Between that check and the
+later rcu_dereference, ixgbe_disable_sriov() (under PCI device_lock,
+not rtnl) can set num_vfs = 0 and __ixgbe_enable_sriov() can
+republish vfinfo at a smaller size N2.
+
+For ixgbe_ndo_get_vf_config() the resulting OOB read is then
+memcpy'd into struct ifla_vf_info and returned to userspace via
+netlink, which would expose adjacent kernel heap. For the setter
+ndos and the mailbox-driven setters, this is an out-of-bounds
+write.
+
+Should the vf range check be repeated against the size of the
+freshly observed vfinfo, ideally with num_vfs and vfinfo
+published together so the pair is self-consistent?
+
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+> index 431d77da15a5..80f22a8e7af4 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+
+[ ... ]
+
+> @@ -206,31 +214,28 @@ int ixgbe_disable_sriov(struct ixgbe_adapter *adapter)
+>  {
+>  	unsigned int num_vfs = adapter->num_vfs, vf;
+>  	struct ixgbe_hw *hw = &adapter->hw;
+> -	unsigned long flags;
+> +	struct vf_data_storage *vfinfo;
+> +	struct vf_macvlans *mv_list;
+>  	int rss;
+>  
+> -	spin_lock_irqsave(&adapter->vfs_lock, flags);
+> -	/* set num VFs to 0 to prevent access to vfinfo */
+> +	/* set num VFs to 0 so readers bail out early */
+>  	adapter->num_vfs = 0;
+> -	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
+> +
+> +	vfinfo = rcu_replace_pointer(adapter->vfinfo, NULL, 1);
+> +	mv_list = rcu_replace_pointer(adapter->mv_list, NULL, 1);
+
+[Low]
+The lockdep predicate passed to rcu_replace_pointer() is the
+literal 1, which makes the writer-side assertion always succeed
+and provides no verification. The patch simultaneously removes
+vfs_lock and shifts to an implicit (undocumented) reliance on
+some caller serialization for the writer.
+
+Could lockdep_is_held() of the actual writer-side lock (for
+example the PCI device_lock or rtnl_lock, whichever is intended)
+be used here so a future regression that calls
+ixgbe_disable_sriov() outside that context is caught by lockdep?
+
+[ ... ]
+
+> @@ -643,10 +668,16 @@ static void ixgbe_clear_vf_vlans(struct ixgbe_adapter *adapter, u32 vf)
+>  static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
+>  				int vf, int index, unsigned char *mac_addr)
+>  {
+> -	struct vf_macvlans *entry;
+> +	struct vf_macvlans *mv_list, *entry;
+>  	bool found = false;
+>  	int retval = 0;
+>  
+> +	lockdep_assert_in_rcu_read_lock();
+> +	/* vf_mvs entries point into the mv_list array */
+> +	mv_list = rcu_dereference(adapter->mv_list);
+> +	if (!mv_list)
+> +		return 0;
+> +
+>  	if (index <= 1) {
+>  		list_for_each_entry(entry, &adapter->vf_mvs.l, l) {
+
+[High]
+Is non-RCU list iteration safe here while only rcu_read_lock()
+is held?
+
+The list head &adapter->vf_mvs.l is mutated by the writer side
+without RCU-aware primitives. ixgbe_alloc_vf_macvlans() does:
+
+    INIT_LIST_HEAD(&adapter->vf_mvs.l);
+    ...
+    list_add(&mv_list[i].l, &adapter->vf_mvs.l);
+
+and ixgbe_disable_sriov() kfree_rcu()s mv_list but never
+reinitialises &adapter->vf_mvs.l, so on a subsequent
+re-enable the writer concurrently zeros and re-links the head
+while a reader walks it.
+
+Should list_for_each_entry() be list_for_each_entry_rcu(), and
+the writer use INIT_LIST_HEAD_RCU() / list_add_rcu()? Otherwise
+the reader can observe torn next/prev loads or follow into
+freed/re-used entries.
+
+[ ... ]
+
+> @@ -780,16 +816,25 @@ static void ixgbe_vf_clear_mbx(struct ixgbe_adapter *adapter, u32 vf)
+>  static int ixgbe_set_vf_mac(struct ixgbe_adapter *adapter,
+>  			    int vf, unsigned char *mac_addr)
+>  {
+> +	struct vf_data_storage *vfinfo;
+>  	int retval;
+>  
+> -	ixgbe_del_mac_filter(adapter, adapter->vfinfo[vf].vf_mac_addresses, vf);
+> +	rcu_read_lock();
+> +	vfinfo = rcu_dereference(adapter->vfinfo);
+> +	if (!vfinfo) {
+> +		rcu_read_unlock();
+> +		return -EINVAL;
+> +	}
+> +
+> +	ixgbe_del_mac_filter(adapter, vfinfo[vf].vf_mac_addresses, vf);
+>  	retval = ixgbe_add_mac_filter(adapter, mac_addr, vf);
+>  	if (retval >= 0)
+> -		memcpy(adapter->vfinfo[vf].vf_mac_addresses, mac_addr,
+> +		memcpy(vfinfo[vf].vf_mac_addresses, mac_addr,
+>  		       ETH_ALEN);
+
+[ ... ]
+
+> @@ -1537,21 +1677,34 @@ void ixgbe_ping_all_vfs(struct ixgbe_adapter *adapter)
+>  int ixgbe_ndo_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
+>  {
+>  	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
+> +	struct vf_data_storage *vfinfo;
+>  	int retval;
+>  
+>  	if (vf >= adapter->num_vfs)
+>  		return -EINVAL;
+>  
+> +	rcu_read_lock();
+> +	vfinfo = rcu_dereference(adapter->vfinfo);
+> +	if (!vfinfo) {
+> +		rcu_read_unlock();
+> +		return 0;
+> +	}
+> +
+>  	if (is_valid_ether_addr(mac)) {
+>  		dev_info(&adapter->pdev->dev, "setting MAC %pM on VF %d\n",
+>  			 mac, vf);
+>  		dev_info(&adapter->pdev->dev, "Reload the VF driver to make this change effective.");
+>  
+>  		retval = ixgbe_set_vf_mac(adapter, vf, mac);
+>  		if (retval >= 0) {
+> -			adapter->vfinfo[vf].pf_set_mac = true;
+> +			vfinfo[vf].pf_set_mac = true;
+
+[High]
+Can vfinfo here and the vfinfo observed inside ixgbe_set_vf_mac()
+end up pointing at different objects?
+
+ixgbe_ndo_set_vf_mac() captures vfinfo via its own rcu_dereference,
+then calls ixgbe_set_vf_mac() which independently does:
+
+    rcu_read_lock();
+    vfinfo = rcu_dereference(adapter->vfinfo);
+    ...
+    memcpy(vfinfo[vf].vf_mac_addresses, mac_addr, ETH_ALEN);
+
+Nesting rcu_read_lock() is fine, but each rcu_dereference()
+observes whatever pointer is currently published. If
+ixgbe_disable_sriov() followed by __ixgbe_enable_sriov() races
+between the two dereferences, the inner copy lands in the new
+array while the outer pf_set_mac = true write lands in the old
+array. The two pieces of state then disagree, which seems to
+break the "attempted to override administratively set MAC"
+enforcement on subsequent VF mailbox messages. If the new
+vfinfo is shorter than vf, the inner memcpy is also a heap
+out-of-bounds write.
+
+Should ixgbe_ndo_set_vf_mac() pass its already-captured vfinfo
+into ixgbe_set_vf_mac() so both writes go to the same object,
+or otherwise structure the call so a single rcu_dereference
+covers all writes for one operation?
 
