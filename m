@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-291084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291085-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4hUKB2qHEWqdnAYAu9opvQ
-	(envelope-from <netdev+bounces-291084-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:54:34 +0200
+	id OJcBFnmHEWqdnAYAu9opvQ
+	(envelope-from <netdev+bounces-291085-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:54:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AB0B5BE91D
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:54:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADF525BE92F
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:54:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 602FA300F9C5
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:54:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E0EE7301C3EA
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0AA32860F;
-	Sat, 23 May 2026 10:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289F83876A7;
+	Sat, 23 May 2026 10:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="qTQYoXQC"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="BMYCOxLG"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892631991D4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9782DE6FF;
 	Sat, 23 May 2026 10:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779533670; cv=none; b=mC4U0U8s3ZX7ShhzJeJCCu795Us5DvB+oCCTW7RKqHjEGEV92lQqlRIeyncWuYm5cDWdymrQfMDTfHwRkCvoDyPjBXfedVOXl6ZQH3d/SOkYYFQCAvQ/O+fGgmiaLjqUWel0WJaGLdpN4qsgz4Quyt27kOjSEsEVRMOaXlPHqe8=
+	t=1779533671; cv=none; b=nZTZAN62N7x5hBPaXmIKljH1iCmAJj7lT5DZ5IQJLaLSozlM/XyGUTZ5w3KbkRfnXhH0oDLkVc3HfBafrhu30E8ZP7CnZZ3kJ0u6GZz/gP9GfSPGoCSsVAMj84WxujNFw3IHnzRDr7LjfPEmb8y84T0pu00UsWR6tJBBN1fZ7Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779533670; c=relaxed/simple;
-	bh=Swbx9eyynEokKKR/wwqf9s/qC/zsk5Ve97QyIjamFGs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i5Pu+TqWF0v1wZ4UWmJGr/qqzETtH3bQCz/aQz3BZEfv9WE6D8qCAwj1uVpPMQNR7pBhmUmKL+7AU/IIM24PqvZ30UoFoBMSWFKgX4SsHnPR68dxrDIgmOxpqgM+R2PJPYqF4ex70YMV6Nq+SDZXjXwjeczJqMAdx5zSS6c3CQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=qTQYoXQC; arc=none smtp.client-ip=83.149.199.84
+	s=arc-20240116; t=1779533671; c=relaxed/simple;
+	bh=zTz9Xujk5okwTtSW/xMyTH8S2TiMnq0G+0JeauP3jgg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=f62NERpQLIuFNCYCJB4dsnGd+6olX4okDDxt1VuiS9yIHkNZKVPgoId3M8ER+3AP6NOkrkBhbk9ot6+fF/Wy9YI0CpNI/Sew2/iI5eay1R8UBbC32YqBJro3PTjUt1VQJgtrhn+q9j1TKYf8yUL9v2nXU+O5Bb4JH4IUTF/flvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=BMYCOxLG; arc=none smtp.client-ip=83.149.199.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
 Received: from debian.intra.ispras.ru (unknown [10.10.165.7])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 35D5445F7992;
-	Sat, 23 May 2026 10:48:37 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 35D5445F7992
+	by mail.ispras.ru (Postfix) with ESMTPSA id 8FB8445F79A5;
+	Sat, 23 May 2026 10:48:38 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 8FB8445F79A5
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1779533317;
-	bh=5rhMn95wNx50e9E5MEKylgbrKweX3eByB6xbBWS3V4M=;
-	h=From:To:Cc:Subject:Date:From;
-	b=qTQYoXQCgWs20LtrXIiNWGH4GHzK3cXJB/mbS/4qfSc4gyszGUqVKLgUe+bmJCH2Z
-	 5b/gNyZJC2/kh96DSYYzxVKy9GJEy5pnj2SO93N4bC15F51EAtwiFKIYJdVGB2DhqX
-	 X/9o4rU645IuboB8elVyWduwzqQeQa8rnKpgY1qE=
+	s=default; t=1779533318;
+	bh=8I718NLjrOXhp1MUXTCsy+d8AWGiFC7W1rspmjLD5AY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=BMYCOxLGrOrud9ScziUNDU1ygAidUlF95YB1j+UDO4VAinUZRe4nufDZYRf3yp+4o
+	 1hAGxGkzEvwngHl3OUm1BOvlL29qN45K90jazRSwbPp6Wd4SNlMlbTAMLCh/5wrqV1
+	 bQ2U1uus6rCn94zb0F3C5OeRiAxt5JMfrTa/FIjU=
 From: Fedor Pchelkin <pchelkin@ispras.ru>
 To: Jose Abreu <Jose.Abreu@synopsys.com>
 Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
@@ -55,12 +56,13 @@ Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
 	Jie Deng <Jie.Deng1@synopsys.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: [PATCH net 1/2] net: dwc-xlgmac: fix channel count initialization
-Date: Sat, 23 May 2026 13:45:27 +0300
-Message-ID: <20260523104740.295650-1-pchelkin@ispras.ru>
+	lvc-project@linuxtesting.org
+Subject: [PATCH net 2/2] net: dwc-xlgmac: handle hw initialization failure in xlgmac_start()
+Date: Sat, 23 May 2026 13:45:28 +0300
+Message-ID: <20260523104740.295650-2-pchelkin@ispras.ru>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260523104740.295650-1-pchelkin@ispras.ru>
+References: <20260523104740.295650-1-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,52 +72,49 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[ispras.ru,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[ispras.ru:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-291084-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291085-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ispras.ru:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[pchelkin@ispras.ru,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ispras.ru:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qemu.org:url,ispras.ru:email,ispras.ru:mid,ispras.ru:dkim]
-X-Rspamd-Queue-Id: 3AB0B5BE91D
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ispras.ru:email,ispras.ru:mid,ispras.ru:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qemu.org:url]
+X-Rspamd-Queue-Id: ADF525BE92F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The number of channels used by the driver is determined by the maximum
-value of TX and RX rings.  Currently it is initialized once during the
-driver's probing phase.  However, the value is zeroed inside
-xlgmac_free_channels() when closing the interface.  The further attempts
-to transmit data after reopening the interface fail with a crash because
-xlgmac_alloc_channels() "allocates" a ZERO_SIZE_PTR channel_head now which
-is directly dereferenced in xmit path.
+hw_ops->init() can fail, thus leaving uninitialized TX and RX descriptor
+objects.  Later when they are updated in xlgmac_dev_xmit(), there is a
+NULL pointer dereference.
 
-general protection fault, probably for non-canonical address 0xdffffc0000000005: 0000 [#1] PREEMPT SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
-CPU: 1 PID: 21 Comm: kworker/1:0 Not tainted 6.1.164 #116
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 31 Comm: kworker/1:1 Not tainted 6.1.164+ #122
 Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
 Workqueue: mld mld_ifc_work
-RIP: 0010:xlgmac_xmit+0xde/0x13f0 drivers/net/ethernet/synopsys/dwc-xlgmac-net.c:716
+RIP: 0010:xlgmac_dev_xmit+0x62f/0x1260 drivers/net/ethernet/synopsys/dwc-xlgmac-hw.c:827
 Call Trace:
  <TASK>
+ xlgmac_xmit+0xa14/0x1196 drivers/net/ethernet/synopsys/dwc-xlgmac-net.c:766
  __netdev_start_xmit include/linux/netdevice.h:4896 [inline]
  netdev_start_xmit include/linux/netdevice.h:4910 [inline]
  xmit_one net/core/dev.c:3683 [inline]
@@ -142,82 +141,37 @@ Call Trace:
  kthread+0x2e1/0x3a0 kernel/kthread.c:376
  ret_from_fork+0x22/0x30 arch/x86/entry/entry_64.S:295
 
-Move the pdata->channel_count initialization into xlgmac_alloc_channels()
-where it logically belongs.  Nothing should touch the channel-related
-properties before this function succeeds anyway.
-
-This also makes it similar to the pattern of pdata->channel_count handling
-preferred in akin amd-xgbe driver.
-
 Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
 
 Fixes: 65e0ace2c5cd ("net: dwc-xlgmac: Initial driver for DesignWare Enterprise Ethernet")
-Cc: stable@vger.kernel.org
 Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 ---
- drivers/net/ethernet/synopsys/dwc-xlgmac-common.c | 6 +-----
- drivers/net/ethernet/synopsys/dwc-xlgmac-desc.c   | 9 +++++----
- 2 files changed, 6 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/synopsys/dwc-xlgmac-net.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/synopsys/dwc-xlgmac-common.c b/drivers/net/ethernet/synopsys/dwc-xlgmac-common.c
-index 131786aa4d5b..9275f64401e4 100644
---- a/drivers/net/ethernet/synopsys/dwc-xlgmac-common.c
-+++ b/drivers/net/ethernet/synopsys/dwc-xlgmac-common.c
-@@ -98,8 +98,7 @@ static int xlgmac_init(struct xlgmac_pdata *pdata)
- 		return ret;
- 	}
+diff --git a/drivers/net/ethernet/synopsys/dwc-xlgmac-net.c b/drivers/net/ethernet/synopsys/dwc-xlgmac-net.c
+index 37101dc50d04..1a6906f8fc44 100644
+--- a/drivers/net/ethernet/synopsys/dwc-xlgmac-net.c
++++ b/drivers/net/ethernet/synopsys/dwc-xlgmac-net.c
+@@ -564,7 +564,9 @@ static int xlgmac_start(struct xlgmac_pdata *pdata)
+ 	struct net_device *netdev = pdata->netdev;
+ 	int ret;
  
--	/* Channel and ring params initializtion
--	 *  pdata->channel_count;
-+	/* Ring params initialization
- 	 *  pdata->tx_ring_count;
- 	 *  pdata->rx_ring_count;
- 	 *  pdata->tx_desc_count;
-@@ -145,9 +144,6 @@ static int xlgmac_init(struct xlgmac_pdata *pdata)
- 		return ret;
- 	}
+-	hw_ops->init(pdata);
++	ret = hw_ops->init(pdata);
++	if (ret)
++		goto err_init;
+ 	xlgmac_napi_enable(pdata, 1);
  
--	pdata->channel_count =
--		max_t(unsigned int, pdata->tx_ring_count, pdata->rx_ring_count);
+ 	ret = xlgmac_request_irqs(pdata);
+@@ -580,7 +582,7 @@ static int xlgmac_start(struct xlgmac_pdata *pdata)
+ err_napi:
+ 	xlgmac_napi_disable(pdata, 1);
+ 	hw_ops->exit(pdata);
 -
- 	/* Initialize RSS hash key and lookup table */
- 	netdev_rss_key_fill(pdata->rss_key, sizeof(pdata->rss_key));
- 
-diff --git a/drivers/net/ethernet/synopsys/dwc-xlgmac-desc.c b/drivers/net/ethernet/synopsys/dwc-xlgmac-desc.c
-index 2a40257ab47c..e08cd28c8699 100644
---- a/drivers/net/ethernet/synopsys/dwc-xlgmac-desc.c
-+++ b/drivers/net/ethernet/synopsys/dwc-xlgmac-desc.c
-@@ -230,10 +230,11 @@ static int xlgmac_alloc_channels(struct xlgmac_pdata *pdata)
- {
- 	struct xlgmac_channel *channel_head, *channel;
- 	struct xlgmac_ring *tx_ring, *rx_ring;
-+	unsigned int i, count;
- 	int ret = -ENOMEM;
--	unsigned int i;
- 
--	channel_head = kzalloc_objs(struct xlgmac_channel, pdata->channel_count);
-+	count = max_t(unsigned int, pdata->tx_ring_count, pdata->rx_ring_count);
-+	channel_head = kzalloc_objs(struct xlgmac_channel, count);
- 	if (!channel_head)
- 		return ret;
- 
-@@ -248,8 +249,7 @@ static int xlgmac_alloc_channels(struct xlgmac_pdata *pdata)
- 	if (!rx_ring)
- 		goto err_rx_ring;
- 
--	for (i = 0, channel = channel_head; i < pdata->channel_count;
--		i++, channel++) {
-+	for (i = 0, channel = channel_head; i < count; i++, channel++) {
- 		snprintf(channel->name, sizeof(channel->name), "channel-%u", i);
- 		channel->pdata = pdata;
- 		channel->queue_index = i;
-@@ -281,6 +281,7 @@ static int xlgmac_alloc_channels(struct xlgmac_pdata *pdata)
- 	}
- 
- 	pdata->channel_head = channel_head;
-+	pdata->channel_count = count;
- 
- 	return 0;
++err_init:
+ 	return ret;
+ }
  
 -- 
 2.53.0
