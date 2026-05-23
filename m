@@ -1,51 +1,58 @@
-Return-Path: <netdev+bounces-291111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UErzCBa7EWpVpQYAu9opvQ
-	(envelope-from <netdev+bounces-291111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 16:35:02 +0200
+	id GLw/BQK8EWo5pQYAu9opvQ
+	(envelope-from <netdev+bounces-291112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 16:38:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19325BF695
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 16:35:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F9E5BF6DD
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 16:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17AEE301F5FD
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 14:34:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BC32B30156CC
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 14:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D382E0B5C;
-	Sat, 23 May 2026 14:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD5A2D94A0;
+	Sat, 23 May 2026 14:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRuMNnEn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QWgADDgv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA292D1F44;
-	Sat, 23 May 2026 14:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8402DA76C
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 14:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779546882; cv=none; b=TZ28NaEJ21p2r2wEl0juj4JNAlfa0d8Zk55q3vw7GwSNIYb4ny73SBa8VDce7Sm1gItueIC5iUmZI5I70dVYnGAtWpYdPkKGMTndtCTviXLmlKATldJVWqAq4C2Iw2qGKKBUHi7kbXssbqvUIYEnCNdLMR+kpIS8ImQuwgjcqk4=
+	t=1779547126; cv=none; b=LspgpR7lRj9rYb4T3435WyoaTpd008EWrb7zPoSZuLSdT/g5Cj2qv3RpbPNFzpdIPWV8Svk6iV5HJFrk+890cD8P+cTaJWPL/WAN0Bm265n3XUATJ/S9pEJy4uh+MPKcf8as8sa7LwNCcTGSx1UMPLs9sueXDI4k+slMFdQBB48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779546882; c=relaxed/simple;
-	bh=wRmeeDFW9aLsG7APMHX0/TFOJPnEO5M+u+iIvZF5X3s=;
+	s=arc-20240116; t=1779547126; c=relaxed/simple;
+	bh=tRrvJBKOEBkdccRzhAjYgkildSCpKTIRySaJUR81nlw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UfAoYqkfVo+nb8j2/4qJ/YJ6fCncSjThRH+dMzrhqaA1uu/dFkKeJdPOIlRdKOQk0eaMZtHFXJk2A4GWh6zxI/09flg334G8L8AyjUFYIvpideJGtfSrvL1PfocBhAInOUGCApiQcaUQX+5TTMehfeqSvI7QXvxSNNqbKMkmxEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRuMNnEn; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15A8F1F000E9;
-	Sat, 23 May 2026 14:34:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779546881;
-	bh=m0RMW+vUTF/Kw0EclT9JxUQS8BolCI+Rfe/P5jHnTs0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=fRuMNnEnaU3pUZeCti0/1FjuF1JXjZLBPgmMnv61LrJySZ6X8EFw4h2BCpGe3W364
-	 f+9TH0AgdXEX9X7yLx0+VKbn0qgcbuAO51gJuiY2p1d+A/K6NqWlqTun1KP2N5Qd1u
-	 9/yPoL0gp7BNmbXkMwnk20TdBUFwagzYOSTEaD2Ww0In+zde2qnzcSAcBA5S4vFz/1
-	 i1k+D0fxc9jwqqB0D96e1yuj5vzgO3x0eJY8B8QPTXwXDcHwhvQHiQfJ3SyX3YnzuA
-	 8cpCjfk1Cu/tjjhiI9kllFtuwCkOTVqsyDsk/+ZQ4bT+UY/+1Q+KXZm0s45qWVf0FB
-	 XkiIfM2Ewr0dw==
-Message-ID: <0592b09b-a084-4d9d-bcbf-1b77e45226cf@kernel.org>
-Date: Sat, 23 May 2026 23:34:07 +0900
+	 In-Reply-To:Content-Type; b=PofyGtW/7P4JExRJDLNyLzVtW6A9xOvxpLQcm9vKg6aRNtShMk0/qQhE4wDfMIAQTA5nBm0YRiR6bT+KuIrRH95H6k++AG6+gFgZvxWFZg0uo+CrEWpH8UsqM6+dxAk4jyQLHUYciuGPC1G8xDFhSLKe33GzZsfKDX24deALKSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QWgADDgv; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id E69B6C2C663;
+	Sat, 23 May 2026 14:39:36 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BAC9060733;
+	Sat, 23 May 2026 14:38:41 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2A15010811D8A;
+	Sat, 23 May 2026 16:38:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779547120; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=ddFRcA+O9W2Uto6DriotJyHR7FQDKv1K4PA8XhsjtVk=;
+	b=QWgADDgv4Gv/1hP9IpotoA/W7we728U+dt1fCbE9vbNcV2V66FaGKY/6v0F3LfTFapFPJl
+	dmrdmOA11A4KpEWdWbh8pddqsXciYSCeHYOEP71/FVwVfpGwl7hS0c8sIRqe81/g3PFzob
+	bev6Suvc+bJRfIhzKG9wWvvQY/I4R0jHbBl7pleHpuXm7qLTv3ElBSlwPiaeCyLCTal0tt
+	aGk5C5LLcoxLljBaLACO5jw3/yJBc64TuUcGsaS1ecMQYeZT7UgaY+zClCPdnSfGPC0cks
+	kZRkpoPt+i/xmlmVr5OUwXTaVN37BDfbSU8xsV+m1TZYV1BrIHlZ9T4mDwQdVg==
+Message-ID: <1736d16f-ee77-44b2-94a0-33b8f14c4885@bootlin.com>
+Date: Sat, 23 May 2026 16:38:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,130 +60,111 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: DEPT (the dependency tracker) as AI review prompt?
-To: Yunseong Kim <ysk@kzalloc.com>
-Cc: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org,
- kernel_team@skhynix.com, torvalds@linux-foundation.org,
- damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
- adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com,
- peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
- rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
- daniel.vetter@ffwll.ch, duyuyang@gmail.com, johannes.berg@intel.com,
- tj@kernel.org, tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
- amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
- linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
- minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
- sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
- penberg@kernel.org, rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, jack@suse.cz,
- jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
- djwong@kernel.org, dri-devel@lists.freedesktop.org,
- rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
- hamohammed.sa@gmail.com, harry.yoo@oracle.com, chris.p.wilson@intel.com,
- gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
- boqun.feng@gmail.com, longman@redhat.com, yunseong.kim@ericsson.com,
- yeoreum.yun@arm.com, netdev@vger.kernel.org, matthew.brost@intel.com,
- her0gyugyu@gmail.com, corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de,
- x86@kernel.org, hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
- gustavo@padovan.org, christian.koenig@amd.com, andi.shyti@kernel.org,
- arnd@arndb.de, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- rppt@kernel.org, surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com,
- da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org,
- frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
- josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com,
- jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com,
- neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
- trondmy@kernel.org, anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
- clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
- kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, broonie@kernel.org,
- kevin.brodsky@arm.com, dwmw@amazon.co.uk, shakeel.butt@linux.dev,
- ast@kernel.org, ziy@nvidia.com, yuzhao@google.com,
- baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
- joel.granados@kernel.org, richard.weiyang@gmail.com,
- geert+renesas@glider.be, tim.c.chen@linux.intel.com, linux@treblig.org,
- alexander.shishkin@linux.intel.com, lillian@star-ark.net,
- chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com,
- link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org,
- brauner@kernel.org, thomas.weissschuh@linutronix.de, oleg@redhat.com,
- mjguzik@gmail.com, andrii@kernel.org, wangfushuai@baidu.com,
- linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-i2c@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-modules@vger.kernel.org, rcu@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev,
- 2407018371@qq.com, dakr@kernel.org, miguel.ojeda.sandonis@gmail.com,
- neilb@ownmail.net, bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
- dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
- alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
- tmgross@umich.edu, rust-for-linux@vger.kernel.org, Chris Mason
- <clm@meta.com>, Roman Gushchin <roman.gushchin@linux.dev>,
- Josef Bacik <josef@toxicpanda.com>, Yunseong Kim <yunseong.kim@est.tech>
-References: <20251205071855.72743-1-byungchul@sk.com>
- <6b2a816f-eb3b-4e0c-a024-ee2e3743eb04@kernel.org>
- <CA+7O06GxeDLR9RcKDN2i-Rgc4kgzz6BfF4b0XAH4tFx=A723Nw@mail.gmail.com>
+Subject: Re: [PATCH net 3/9] ethtool: module: avoid racy updates to
+ dev->ethtool bitfield
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, danieller@nvidia.com,
+ petrm@nvidia.com, o.rempel@pengutronix.de, idosch@nvidia.com, andrew@lunn.ch
+References: <20260522231312.1710836-1-kuba@kernel.org>
+ <20260522231312.1710836-4-kuba@kernel.org>
 Content-Language: en-US
-From: Harry Yoo <harry@kernel.org>
-In-Reply-To: <CA+7O06GxeDLR9RcKDN2i-Rgc4kgzz6BfF4b0XAH4tFx=A723Nw@mail.gmail.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260522231312.1710836-4-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[sk.com,vger.kernel.org,skhynix.com,linux-foundation.org,opensource.wdc.com,dilger.ca,redhat.com,infradead.org,kernel.org,linutronix.de,goodmis.org,joelfernandes.org,ffwll.ch,gmail.com,intel.com,mit.edu,fromorbit.com,linuxfoundation.org,lge.com,kvack.org,cmpxchg.org,linux.com,google.com,suse.cz,vflare.org,lists.freedesktop.org,oracle.com,ericsson.com,arm.com,lwn.net,alien8.de,zytor.com,linaro.org,padovan.org,amd.com,arndb.de,suse.com,nvidia.com,joshtriplett.org,efficios.com,linux.dev,suse.de,brown.name,talpey.com,huawei.com,amazon.co.uk,linux.alibaba.com,glider.be,linux.intel.com,treblig.org,star-ark.net,valla.it,vivo.com,baidu.com,lists.infradead.org,lists.linaro.org,lists.linux.dev,qq.com,ownmail.net,sang-engineering.com,linux-m68k.org,garyguo.net,protonmail.com,umich.edu,meta.com,toxicpanda.com,est.tech];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291111-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-291112-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_GT_50(0.00)[169];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[harry@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C19325BF695
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,lunn.ch:email,nvidia.com:email]
+X-Rspamd-Queue-Id: 84F9E5BF6DD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi,
 
+On 5/23/26 01:13, Jakub Kicinski wrote:
+> When reviewing other changes Gemini points out that we currently
+> update module_fw_flash_in_progress without holding any locks.
+> Since module_fw_flash_in_progress is part of a bitfield this
+> is not great, updates to other fields may be lost.
+> 
+> We could use a bool and sprinkle some READ_ONCE/WRITE_ONCE here
+> but seems like the issue is rather than the work is an unusual
+> writer. The other writers already hold the right locks. So just
+> very briefly take these locks when the work completes.
+> 
+> Note that nothing ever cancels the FW update work, so there's
+> no concern with deadlocks vs cancel.
+> 
+> Fixes: 32b4c8b53ee7 ("ethtool: Add ability to flash transceiver modules' firmware")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On 5/23/26 11:00 PM, Yunseong Kim wrote:
-> I've previously experimented with running DEPT alongside syzkaller fuzzing,
-> and many hung tasks missed by lockdep are caught by DEPT, but the resulting
-> high volume of reports makes it easy for issues to get lost in the massive
-> log output. Sorting through that output manually is a huge bottleneck, so
-> leveraging a well-crafted AI prompt to triage the warnings and filter out
-> the false positives would be incredibly valuable.
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-I mean both 1) detection of deadlock issues AND 2) false positive 
-elimination with AI.
+Maxime
 
-If the review prompt is only used to eliminate DEPT's false positives, I 
-think that would be quite hard to get broad use.
-
-Someone would have to build out-of-tree DEPT, collect the reports, and 
-then feed those back into the AI. I don't think building that kind of 
-pipeline would actually work well in practice.
-
--- 
-Cheers,
-Harry / Hyeonggon
+> ---
+> CC: andrew@lunn.ch
+> CC: petrm@nvidia.com
+> CC: danieller@nvidia.com
+> ---
+>   net/ethtool/module.c | 12 ++++++++++--
+>   1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ethtool/module.c b/net/ethtool/module.c
+> index 392c03935e5e..cdb85e19a23b 100644
+> --- a/net/ethtool/module.c
+> +++ b/net/ethtool/module.c
+> @@ -221,14 +221,22 @@ static void module_flash_fw_work_list_del(struct list_head *list)
+>   static void module_flash_fw_work(struct work_struct *work)
+>   {
+>   	struct ethtool_module_fw_flash *module_fw;
+> +	struct net_device *dev;
+>   
+>   	module_fw = container_of(work, struct ethtool_module_fw_flash, work);
+> +	dev = module_fw->fw_update.dev;
+>   
+>   	ethtool_cmis_fw_update(&module_fw->fw_update);
+>   
+>   	module_flash_fw_work_list_del(&module_fw->list);
+> -	module_fw->fw_update.dev->ethtool->module_fw_flash_in_progress = false;
+> -	netdev_put(module_fw->fw_update.dev, &module_fw->dev_tracker);
+> +
+> +	rtnl_lock();
+> +	netdev_lock_ops(dev);
+> +	dev->ethtool->module_fw_flash_in_progress = false;
+> +	netdev_unlock_ops(dev);
+> +	rtnl_unlock();
+> +
+> +	netdev_put(dev, &module_fw->dev_tracker);
+>   	release_firmware(module_fw->fw_update.fw);
+>   	kfree(module_fw);
+>   }
 
 
