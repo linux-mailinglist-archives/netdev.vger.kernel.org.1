@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-290998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290999-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBnnDPoBEWq2gQYAu9opvQ
-	(envelope-from <netdev+bounces-290998-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 03:25:14 +0200
+	id qANdARsCEWq2gQYAu9opvQ
+	(envelope-from <netdev+bounces-290999-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 03:25:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2B2F5BC4E2
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 03:25:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4983E5BC4F1
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 03:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 280F0301A423
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:25:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FD62301589D
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 01:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D082367B8;
-	Sat, 23 May 2026 01:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1AB23C4E9;
+	Sat, 23 May 2026 01:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SE8XusBq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+tYEeYf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563441519B4;
-	Sat, 23 May 2026 01:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC06A1624C5;
+	Sat, 23 May 2026 01:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779499508; cv=none; b=hW5nHFQJ1IgVQwUfZt/nDbU4xF0HwVmZ4YDGmZwBn3o1jE/i8lzYHLHLrsk8a3LtfL6ETnl/Hkyt2N1u/ca6enOFMhNh8ObIMagHICZrrA3LFsRebueyPv6bR5T+q0AFafG7HwNj+LkzvfzHLW4+MP3QoVynxe/aA9ohNs3IGqU=
+	t=1779499543; cv=none; b=hmfhrD5myLJqrX7eqPZqom+dvND9x5pluwGobIOxnH0e9fmZkUesgRUyKcs0oVg7sBEDk5gdMBJAAIT1LTj+FG/5aKeRnWPRlF7bCphfxOrU8PXVA9EcOEZBnlZ4oikjcvy+iA/vOmMKRrWXPC0kXNme1keiHgtFPwCmPNWiIOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779499508; c=relaxed/simple;
-	bh=B7IQLDbup+DStCtBuB7NuAYcjvgCDC5FeoogmhU8GIE=;
+	s=arc-20240116; t=1779499543; c=relaxed/simple;
+	bh=MLMhYJplsTO8o5Wto2Tr8QtmP41JShX3JbBIjK22gNU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ol9GEcZwMmZ9x5YqQlJXpVMq9lEAuq1WcD83UShkb/5KuvJfd6Ak41GKX3bNdYAkIp5J5T/jpr95/T2YLwozsQJq4bx4GawsMQhED/I4l4WMrJLne8/FPNZ6cbp3KmKEvMxXDZtrmuQN44RMFUIOUgD6Cjwdy7gi1EfM7EfRNtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SE8XusBq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F6091F000E9;
-	Sat, 23 May 2026 01:25:06 +0000 (UTC)
+	 MIME-Version; b=nkqHdza84KDDkXLNQsfwolYztIQViJ6RtoN/a+fv9ntQwiKpQxaycc5VawqOubRd1I+2LKhdBf51KKo5MwtOLS0UvksFYHiMG6uzhFzBiLRdKIFJut5zW2o+dPPbtV9ZjOetXy4HAx4d1GXUNh9VyPhHMZ4wFisz9OEUl5U0LoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+tYEeYf; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E744D1F000E9;
+	Sat, 23 May 2026 01:25:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779499507;
-	bh=ad46GsGU0D8pwsNiSgcCsfOxeZc0ksjRFk5Ah2BqwC4=;
+	s=k20260515; t=1779499542;
+	bh=A03yyyfJ9j/jKBpOX0Y4SEk0RJCh/ieN0kIHXHT3N5k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=SE8XusBqHhnO9fVz8W6Vk1i+R8XeaBK6FNhOnBEyb1O+/8Ts+dJIDzsNucg5GRYhW
-	 gVLNCG3FJ+yePpOJJ2NnbGb1TlVo67SJtONdIZUkWd6+n0lk0G5YtBn4fO/ZNNB9SE
-	 8kbx4s4l/MmRBcNU2RtzeDDp3YujYCv14AI1lBKE47eMSd3MZmcLVmcZ9nh735BRJU
-	 k3x1vpIpH89i6ZJF5vVN22Ma2Bw5qTeuBHZ1UorJeChuF7v/zWcLM4aJd7mF6PCGEA
-	 bXb9w3NcTiLNV5Fe+51sE+frLY9qTt2SGdjsqQbLnPu25V16bHd1GC64RoUkTRMHwj
-	 JlAj3CglBA43A==
+	b=O+tYEeYfmC2FYfk12BabIsLLKG29AUaY7GtLPP8jPpildL61DsFiSz7peKPhuNJUU
+	 BvZGZc+hSAKL+fytVv+quNAMpZhf7ML+1culRAZR3+zedjThVGqoH6UGSer6imjvtJ
+	 ZkUAKY2HCcT5oq6OgvPw+CjCbzXxAZEi/0zM7No8p8HaVu+T3eCCtOQLv3vWIN4HGW
+	 emt3v8AAuUc1bGW0D1XCXYKnV8pdPe8GL4ZjQBfEoW4wbqlbIzaDXdXgn0cVOjPZa3
+	 K92j4CQ2r3NoM5sF9Ss5nJUCV9nxEH2AZiaIcCb00QXV8xa0G3w5Qs3wDoQB4u5QCl
+	 irL6p7SD3m3Xg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: sukhdeeps@marvell.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -55,12 +55,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	horms@kernel.org,
 	vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next v3 10/12] net: atlantic: add AQC113 PTP hardware ops in hw_atl2
-Date: Fri, 22 May 2026 18:25:02 -0700
-Message-ID: <20260523012502.1823591-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v3 11/12] net: atlantic: add AQC113 TX timestamp polling and PTP TX classification
+Date: Fri, 22 May 2026 18:25:08 -0700
+Message-ID: <20260523012507.1823651-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260520141046.2151-11-sukhdeeps@marvell.com>
-References: <20260520141046.2151-11-sukhdeeps@marvell.com>
+In-Reply-To: <20260520141046.2151-12-sukhdeeps@marvell.com>
+References: <20260520141046.2151-12-sukhdeeps@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,7 +74,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -83,9 +83,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290998-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-290999-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -95,127 +95,88 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A2B2F5BC4E2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4983E5BC4F1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: atlantic: add AQC113 PTP hardware ops in hw_atl2
+net: atlantic: add AQC113 TX timestamp polling and PTP TX classification
 
-This commit adds the hardware-layer PTP implementation for AQC113 (Antigua).
-It includes TSG clock programming, RX/TX timestamping mechanisms, and PPS
-output generation via the TSG pulse generator.
+This commit adds PTP TX classification for IPv4 and IPv6 packets. It also
+introduces a polling mechanism for hardware TX timestamps in the driver's
+ring cleanup path.
 
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
-> index 39d84576ca519..d6a97a1ec5c65 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_main.c b/drivers/net/ethernet/aquantia/atlantic/aq_main.c
+> index 4ef4fe64b8ac1..1da14786fe5cc 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/aq_main.c
+> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_main.c
 [ ... ]
-> @@ -888,6 +924,151 @@ static struct aq_stats_s *hw_atl2_utils_get_hw_stats(struct aq_hw_s *self)
-[ ... ]
-> +static u64 hw_atl2_hw_ring_tx_ptp_get_ts(struct aq_ring_s *ring)
-> +{
-> +	struct hw_atl2_txts_s *txts;
-> +	u32 ctrl;
-> +
-> +	txts = (struct hw_atl2_txts_s *)&ring->dx_ring[ring->sw_head *
-> +						HW_ATL2_TXD_SIZE];
-> +	/* DD + TS_VALID */
-> +	ctrl = READ_ONCE(txts->ctrl);
-> +	if ((ctrl & HW_ATL2_TXTS_DD) && (ctrl & HW_ATL2_TXTS_TS_VALID)) {
-
-[Severity: High]
-Will this fail to recognize valid TX timestamps on big-endian architectures?
-
-The struct hw_atl2_txts_s is a hardware DMA structure, and the ctrl field
-is defined as a native u32. When reading it via READ_ONCE(txts->ctrl) on a
-big-endian system, the little-endian word is loaded into the CPU register
-natively without byte-swapping, so ctrl & HW_ATL2_TXTS_DD will test the
-wrong bit.
-
-Should this field be defined as __le32 and accessed with le32_to_cpu()
-instead?
-
-> +		dma_rmb();
-> +		return le64_to_cpu(txts->ts);
-> +	}
-> +
-> +	return 0;
-> +}
-[ ... ]
-> +static int hw_atl2_adj_sys_clock(struct aq_hw_s *self, s64 delta)
-> +{
-> +	s8 clk_sel = READ_ONCE(self->clk_select);
-> +
-> +	if (clk_sel < 0)
-> +		return -ENODEV;
-> +	if (delta >= 0)
-> +		hw_atl2_tsg_clock_add(self, clk_sel, (u64)delta);
-> +	else
-> +		hw_atl2_tsg_clock_sub(self, clk_sel, (u64)(-delta));
-> +
-> +	return 0;
-> +}
-> +
-> +static int hw_atl2_adj_clock_freq(struct aq_hw_s *self, s32 ppb)
-> +{
-> +	u32 freq = AQ2_HW_PTP_COUNTER_HZ;
-> +	u64 divisor = 0, base_ns;
-> +	u32 nsi_frac = 0, nsi;
-> +	u32 nsi_rem;
-> +	s8 clk_sel;
-> +
-> +	base_ns = div_u64((u64)((s64)ppb + NSEC_PER_SEC) * NSEC_PER_SEC, freq);
-> +	nsi = (u32)div_u64_rem(base_ns, NSEC_PER_SEC, &nsi_rem);
-> +	if (nsi_rem != 0) {
-> +		divisor = div_u64(mul_u32_u32(NSEC_PER_SEC, NSEC_PER_SEC),
-> +				  nsi_rem);
-> +		nsi_frac = (u32)div64_u64(AQ_FRAC_PER_NS * NSEC_PER_SEC,
-> +					  divisor);
-> +	}
-> +
-> +	clk_sel = READ_ONCE(self->clk_select);
-> +	if (clk_sel < 0)
-> +		return -ENODEV;
-> +	hw_atl2_tsg_clock_increment_set(self, clk_sel, nsi, nsi_frac);
-
-[Severity: High]
-Could these two clock adjustment functions race when writing to the hardware
-command registers?
-
-The core PTP operations execute adjfine holding
-mutex_lock(&aq_nic->fwreq_mutex) and execute adjtime holding
-spin_lock_irqsave(&aq_ptp->ptp_lock). Since hw_atl2_adj_sys_clock()
-and hw_atl2_adj_clock_freq() are protected by different locks, can
-concurrent calls from userspace interleave writes to the same
-CLOCK_MODIF_CTRL hardware register and corrupt the PTP hardware clock state?
-
-> +
-> +	return 0;
-> +}
-[ ... ]
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h
-> index c84955bc14ae4..ee7f444f6d07d 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h
-> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h
-> @@ -8,6 +8,16 @@
+> @@ -68,14 +70,6 @@ int aq_ndev_open(struct net_device *ndev)
+>  	if (err < 0)
+>  		goto err_exit;
 >  
->  #include "aq_hw.h"
->  
-> +/* Hardware tx launch time descriptor */
-> +struct hw_atl2_txts_s {
-> +	__le64 ts;
-> +	u32 ctrl;
+> -	err = aq_reapply_rxnfc_all_rules(aq_nic);
+> -	if (err < 0)
+> -		goto err_exit;
+> -
+> -	err = aq_filters_vlans_update(aq_nic);
+> -	if (err < 0)
+> -		goto err_exit;
 
 [Severity: High]
-Does this ctrl field need to be __le32? Since this is a hardware DMA
-structure, declaring it as a native u32 causes endianness issues when read
-on big-endian systems, as mentioned in the hw_atl2_hw_ring_tx_ptp_get_ts()
-function above.
+The commit message mentions removing a stale PTP call, but doesn't this
+remove the restoration of RX flow rules and VLAN filters when the device is
+brought up? It doesn't look like these were moved to aq_nic_start().
 
-> +	u32 reserved;
-> +};
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+> index e270327e47fd8..87d680590ef2f 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+[ ... ]
+> @@ -311,6 +311,26 @@ bool aq_ring_tx_clean(struct aq_ring_s *self)
+>  		if (likely(!buff->is_eop))
+>  			goto out;
+>  
+> +		if (unlikely(buff->request_ts) &&
+> +		    self->aq_nic->aq_hw_ops->hw_ring_tx_ptp_get_ts) {
+> +			u64 ts = self->aq_nic->aq_hw_ops->hw_ring_tx_ptp_get_ts(self);
+> +
+> +			if (!ts) {
+> +				if (time_after(jiffies,
+> +					       self->ptp_ts_deadline)) {
+
+[Severity: High]
+Where is self->ptp_ts_deadline initialized?
+
+If it is never initialized and defaults to 0, will this condition always
+evaluate to true on the very first poll since jiffies is typically greater
+than 0, causing all PTP packets to immediately time out and be dropped?
+
+> +					/* Timeout: free skb, unblock ring */
+> +					buff->request_ts = 0;
+> +					dev_kfree_skb_any(buff->skb);
+> +					buff->skb = NULL;
+
+[Severity: High]
+If a timeout occurs, buff->skb is freed and set to NULL, but there is no
+break or continue here. Doesn't execution then fall through to calling
+aq_ptp_tx_hwtstamp() while the SKB is already freed, leading to a
+use-after-free when the PTP logic attempts to access the SKB to report
+the timeout?
+
+Additionally, since buff->skb is now NULL, won't this skip the subsequent
+transmission statistics update block?
+
+> +				} else {
+> +					buff->is_mapped = 0;
+> +					buff->pa = 0U;
+> +					break;
+> +				}
+> +			}
+> +
+> +			aq_ptp_tx_hwtstamp(self->aq_nic, ts);
+> +		}
 
