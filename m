@@ -1,98 +1,95 @@
-Return-Path: <netdev+bounces-291071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291072-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oK2vFjJsEWpLlwYAu9opvQ
-	(envelope-from <netdev+bounces-291071-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:58:26 +0200
+	id 0L8DK1ttEWpLlwYAu9opvQ
+	(envelope-from <netdev+bounces-291072-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:03:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596295BE0F2
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:58:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E8C5BE174
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A8C1A30046BD
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 08:58:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D67B8300B137
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 09:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7090937FF57;
-	Sat, 23 May 2026 08:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D07237CD3A;
+	Sat, 23 May 2026 09:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R86vouQV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nbhsukAp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5D637F8D0
-	for <netdev@vger.kernel.org>; Sat, 23 May 2026 08:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D749A346798
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 09:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779526700; cv=none; b=gK2N0+kNzpE4kY4jyQeEMiEIegAws9lg3+9FijeHnVrESH/adPCYDpjDc+F8hAcDcHt/JpYH6MAwkcKqKp6F9WGLGm2BpfXaZKMn12lU7oDrVxf4ZuM9AjwKTwsqfkF4U5inP7LLhkEt3huxAhXWQBoVRVDJx8eqfhDrQm8alvo=
+	t=1779526992; cv=none; b=BUEDtHcJVsqe+5WuJ5maMUd1HiRYIPaQAUX8pUpOELC1pV7PS9jq3W7qCLKlLFe8b/O4hvXgTcQ6IS8b4hc9L861CSGTKxi6WlpJ5Bvx2tZJ0yfJICsBX+vEHFLmTGaAFNWzQoLzYOAbzTbEG0LVqDZokFpTUU0g5lvNWc4I+o4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779526700; c=relaxed/simple;
-	bh=HFuauo/R/DdqeAYPIpnc7Zt+6L1MoBuerEr2NwcI18A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kv2v8qSyiOXW6GXrNEDd/noCfn42XgqS+GuvBsOgkCuhKPvhwFxIEIIMMDu/C8z/WHteFVVK8Ee+nAahwhmSaM1lRsXHTN3MD0Bmukfe1Ata9JKSsjLTtYUbN8ycsYOweEpEEEz2jBzjclZRggrnVRFQD3/3J99/KJ0PQG4Jatk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R86vouQV; arc=none smtp.client-ip=209.85.216.42
+	s=arc-20240116; t=1779526992; c=relaxed/simple;
+	bh=NyOrWaSzjDO04+EJ0r5MjIKBFB0Wus/T/TpI1QhQ40w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N5GKqcbgbXYAMquc2Xttgpr2wz8NzIOI0IA3TWMP5MAonrFH2tDurIsZKGk2sIfSjJ/oZ8QdmgLxCiHwQ3AjbbDdH7YHemJVU1tNb52TZrVIh24PmWR0jQ3bG9ypT68ybGxp7hDh6kgf1yvBIL5JtRLRWrX+w9tTAdvtiwfAWTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nbhsukAp; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3695bf7d082so7341676a91.0
-        for <netdev@vger.kernel.org>; Sat, 23 May 2026 01:58:18 -0700 (PDT)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-365deee00c3so741642a91.1
+        for <netdev@vger.kernel.org>; Sat, 23 May 2026 02:03:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779526698; x=1780131498; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ta9Hhm/O5mRGfpKzafCBp6sb1vl/zPPnwuKJ/b1Ef4U=;
-        b=R86vouQViAFR7Lz9U4suLf/Xuc3dNWArhge3NXamXAPTSIYRYakIfpGZgZOyED+r2p
-         +96KiiNmj90I3ega8+nO9SJxlEvcAk9je6YB2NaJmMvTdmayuw0I/r/EZtcPIlhrpNCJ
-         DinHqofISWVufsybpVjJTv1acvWCRp2WtJ8jhdykbtSLZ1Yq/xjPdNKI2uAOdkG9Makw
-         zz2mirkeKw/LUK6WusX+vafZm9vYXcpEXL9eXv20FvVONxtkAtdqy8WChclGpLx5Q7MX
-         G1wlF6Y3tcRRWBsC8z2coAtbhkkITlXBDAaZq+zD7OZOJhHNMRiwq8Ju5obSdnvk7Yoo
-         4r/g==
+        d=gmail.com; s=20251104; t=1779526990; x=1780131790; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dlf3lX6f/Toq78lh77so2DPy7wd2/N6OZVLGcG+13uI=;
+        b=nbhsukApuv7jU/TZH/PpxrPYSUo0KZJ22kqkbqyrj3KWxSK0JH/Z/uioU78vOe9df4
+         NLh7TD8vMf4CBdTzRF/89czukZ0j6oVgZwAgOg7Ebpk74AORYV5RpD7JzeM7Nqn/yme3
+         al4KFfhXfu87EyG+yZlBS1quBZSKjZm0Rg7jFy8dYSo9+YL4uGKuIhWmelPP62IjsU68
+         SmLMr/yZCDKxdhdxdjlea/2UD06oyWWD2U7wNLdk/tzjj/jOQuyyPBWO7GNGk8Oru/HZ
+         11yBYb8WgPxQEUW37iYd74mUJblOfJ4GrNwi2QopG7zSzog1Jg/rePJJ7oGUbf8lVBxd
+         8dBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779526698; x=1780131498;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Ta9Hhm/O5mRGfpKzafCBp6sb1vl/zPPnwuKJ/b1Ef4U=;
-        b=C1WfWF6m0R0Nx0/LBdk6LGIL+/Qrw+YuERnk/7J5gZR4J1cmDrFmyZpO4wVtogMtAD
-         SSSI2GjdJDc9XD58abegB12sdawVhEWx3wCQi9k1F2/9KrURiouqlmaZRqLUX58goiYD
-         S0SsYtDuSzkfTJsBb1ucWlR71exS2Gtwx2Y5IxZ/8mRn0GKqGFHvst3yDhXN7xsPzE3z
-         qAh/fONhoBdOypduhgeYpSwrYV72uh1VYRb656fPDJ6W0NScUDuoWUvP4J+HKwSNqJHK
-         6ejKI3dHcxKyMlZxrItvixfnPm4lJJfAslKwgtKY3HKnbyWhDeY3hch/6Gx7wbHOK3nd
-         AeIQ==
-X-Gm-Message-State: AOJu0YwMD6FNfA350td/zb0RvViYB4VwFJo9VjJvc4G9az3ItoWZGb4o
-	d3BH/ON/+amB7b8H1m0PnSbT3LcD6sUy3H6FnLpS0PNkJ3O7pZ5St7zkLE2w23Djqcm0FQ==
-X-Gm-Gg: Acq92OE4AtxMmPv2GKG3jrSMPVV8FFqYsJDCskW1Y5+nuUZddACaKBtwu7T7mbcZirh
-	GcFagScrGPsA1YSnnp+LGNlWpdkQfOPaQVUA82zvRYvzkbhTNHhgJ6SRX1RBp+YxW3NAdsiOSPo
-	0qr7IoakQU6ZODSLv2hu/rNZXoWdOqu16p3MOhf/1Ok+ib9d6Uok62489PKlljlUY3Tawo5ccCD
-	mI6CTQPKkJ2/XGGg1vMdSJm5G84PpCPd6flpigDSNhu+dxayERpcP+xA5XRMjX/LGdRNzIxwi1N
-	+jlyA5s4r12dVaoW2wAkZlCPb9Xyobw6O/e1yZpyktr2hAS1ezzg2zZPTSz3RbRHekE/CnyI875
-	bAD5eOUkz/zK9PaczeN0tKM9UbPW15JwKn+oSnuVJG104XcQAiBcR7htufKbrF0645ipft+2GrX
-	50j6CNoYdlkDGVyLQRg9QhFOJJLjR4Y/MBi7f+Etau
-X-Received: by 2002:a17:90b:3505:b0:35c:30a8:330 with SMTP id 98e67ed59e1d1-36a671ddedcmr7040382a91.0.1779526698191;
-        Sat, 23 May 2026 01:58:18 -0700 (PDT)
-Received: from ip6-dynamic-adsl.viettel.vn ([2a09:bac5:55f8:25af::3c1:44])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a723cee01sm3873352a91.14.2026.05.23.01.58.13
+        d=1e100.net; s=20251104; t=1779526990; x=1780131790;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dlf3lX6f/Toq78lh77so2DPy7wd2/N6OZVLGcG+13uI=;
+        b=dSckk8XBL/dhI0DeUaQgz6dSzGV3A9HEXbXsxtO7bOXB67rvTrn95wBbGJxyBbbU2C
+         f4j2b1qsqocVWwzzrIZsFP5PWVAEbVNDp9q2+CQH4nrde9iWF1ZI7pbXlJ2y1xKe074V
+         8ycoAvgwyPlyzd25wA2k5jQI0r1ZCA2SAGdQyMCqOwxnlVy9jL+XeRchGt5HpsJnS/RR
+         PhJSX4abgt/0HMmutqCC38NK3R/ZLb9kieCqTU43WQz6fbgaZO05yRUUptBChPrpbr79
+         KW+Mvu9caMcm7fe9zZbyTCy+YKoMBiw/Djg6msEOyPB0pVK1lpBaZkmondkTkKiVUvNE
+         R01A==
+X-Forwarded-Encrypted: i=1; AFNElJ+Kh6WoFN0QLYoWO/FrQq/PHMMIGHLbmoY1E3/UiWxZLzrHKzHUl1lj2k9fMtQWLPChtA5/HAI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcoORsco39k4OFjYR7HnrR76qWTJ53Br05Ln2ed2Lp5FgoJsf5
+	mt4J6HG/C44ltfr92sE2CoatDa9e9W8INKpy5IYS6Ju8e5SOjeODdALV
+X-Gm-Gg: Acq92OEvkZOyV+uGWn2hi/vImmcAt9q+x9h5lRlyp7fGizQDk6FV76/5qj4x0lvYauX
+	TbJdNeEFsFNhVWIM3oQ8YZRoXjkzF6+wdOE1iotJM/NMXPmPoVdjpA0yXtaR7NRQmT6nDwKmiUR
+	SWZIXY0hK7WTXx57/khZAedbx9ENDdaQcPWi+vNzjsj4oNvZ1TT5VgYAStbnKToNNY5ClbXOXFj
+	XmZiTaSM0KMJRpjDw2cHF2tq2mZbmrOWRWbTpQYraPJ88IFUcxLNyyNbBwss4nJrS67Ske/OQHZ
+	bBYp8A6v44wbZiIIbW9y6GPFUJFEIJkXj4w1ZSExhItjy7iI72N91nPxy3b/4TG33kVq0bhf6lF
+	VohaB/CWs91xy9zYYL9Yjj9Kgoc/APDYSyVO0Z+ip5umfQ85D3X5foBx7Cd0lh7IxEZwnJTmc0S
+	VhGQCZJzzFjiPS55/7Lg==
+X-Received: by 2002:a17:90b:3807:b0:368:58d4:de03 with SMTP id 98e67ed59e1d1-36a676216b9mr4370598a91.6.1779526990059;
+        Sat, 23 May 2026 02:03:10 -0700 (PDT)
+Received: from kali ([2402:e280:3d7c:a2:536a:b505:93f5:9d5d])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a6f0baca7sm2525148a91.2.2026.05.23.02.03.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 May 2026 01:58:17 -0700 (PDT)
-From: lazyming <minhnguyen.080505@gmail.com>
-X-Google-Original-From: lazyming <nvminh232@clc.fitus.edu.vn>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
+        Sat, 23 May 2026 02:03:09 -0700 (PDT)
+From: Pavitra Jha <jhapavitra98@gmail.com>
+To: antonio@openvpn.net
+Cc: sd@queasysnail.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	w@1wt.eu,
-	security@kernel.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: skbuff: fix missing zerocopy reference in pskb_carve helpers
-Date: Sat, 23 May 2026 15:58:09 +0700
-Message-ID: <20260523085809.26331-1-nvminh232@clc.fitus.edu.vn>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260521121628.309924-1-minhnguyen.080505@gmail.com>
-References: <20260521121628.309924-1-minhnguyen.080505@gmail.com>
+	stable@vger.kernel.org,
+	Pavitra Jha <jhapavitra98@gmail.com>
+Subject: [PATCH v3] ovpn: fix peer refcount leak in TCP error paths
+Date: Sat, 23 May 2026 05:02:43 -0400
+Message-ID: <20260523090244.504790-1-jhapavitra98@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,54 +97,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[minhnguyen080505@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291071-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[queasysnail.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291072-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,clc.fitus.edu.vn:mid]
-X-Rspamd-Queue-Id: 596295BE0F2
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhapavitra98@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 11E8C5BE174
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-I reviewed the Sashiko AI review of this patch and it raised two
-issues worth noting:
+When either the TCP RX or TX error path calls ovpn_peer_hold() followed
+by schedule_work(&peer->tcp.defer_del_work), and the work item is already
+pending from the other path, schedule_work() returns false and the work
+runs only once. Since ovpn_tcp_peer_del_work() calls ovpn_peer_put()
+exactly once, the extra reference taken by the losing path is never
+dropped, leaking the peer object.
 
-1. Stale shinfo after skb_orphan_frags (vhost_net path) -- this can
-   lead to UAF when skb_zcopy_clear() fires on a destructor_arg that
-   was already freed by skb_copy_ubufs().
+The race window:
 
-2. SKBFL_MANAGED_FRAG_REFS page ref leak (io_uring path) -- page refs
-   from skb_frag_ref() are never released because skb_release_data()
-   skips __skb_frag_unref() when MANAGED_FRAG_REFS is set.
+  CPU0 (strparser/RX error):       CPU1 (tcp_tx_work/TX error):
+  ovpn_peer_hold()   <- refcnt+1   ovpn_peer_hold()   <- refcnt+2
+  schedule_work()    <- queued      schedule_work()    <- NO-OP
+                                    (work already pending)
+  ovpn_tcp_peer_del_work runs:
+    ovpn_peer_del()
+    ovpn_peer_put()  <- refcnt+1
+                                   <- peer never freed
 
-Both are pre-existing bugs in the carve helpers, not introduced by
-this patch. This patch only fixes the missing net_zcopy_get() for the
-MSG_ZEROCOPY TCP path (SKBFL_ZEROCOPY_ENABLE without SKBFL_SHARED_FRAG),
-which is unrelated to either issue above.
+Fix by checking the return value of schedule_work() in both paths and
+calling ovpn_peer_put() to drop the extra reference if the work was
+already pending. ovpn_peer_hold() is kept unconditional in the TX path
+as it cannot fail at that point.
 
-Could you re-review this patch? Issue 1 in particular looks genuinely
-dangerous and probably deserves a separate fix from someone familiar
-with the vhost_net zcopy path.
+Fixes: a6a5e87b3ee4 ("ovpn: avoid sleep in atomic context in TCP RX error path")
+Cc: stable@vger.kernel.org
+Signed-off-by: Pavitra Jha <jhapavitra98@gmail.com>
+---
+Changes since v2:
+  - Include RX path fix in the diff (was missing from v2)
+  - Link: https://lore.kernel.org/netdev/20260522091718.270956-1-jhapavitra98@gmail.com/
+
+Changes since v1:
+  - TX path: keep ovpn_peer_hold() unconditional per Antonio Quartulli's
+    review; only check schedule_work() return value
+  - Link: https://lore.kernel.org/netdev/20260521083739.65061-1-jhapavitra98@gmail.com/
+---
+ drivers/net/ovpn/tcp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ovpn/tcp.c b/drivers/net/ovpn/tcp.c
+index 5499c1572..2c7d830e7 100644
+--- a/drivers/net/ovpn/tcp.c
++++ b/drivers/net/ovpn/tcp.c
+@@ -151,7 +151,8 @@ static void ovpn_tcp_rcv(struct strparser *strp, struct sk_buff *skb)
+ 	/* take reference for deferred peer deletion. should never fail */
+ 	if (WARN_ON(!ovpn_peer_hold(peer)))
+ 		goto err_nopeer;
+-	schedule_work(&peer->tcp.defer_del_work);
++	if (!schedule_work(&peer->tcp.defer_del_work))
++		ovpn_peer_put(peer);
+ 	dev_dstats_rx_dropped(peer->ovpn->dev);
+ err_nopeer:
+ 	kfree_skb(skb);
+@@ -283,7 +284,8 @@ static void ovpn_tcp_send_sock(struct ovpn_peer *peer, struct sock *sk)
+ 			 * stream therefore we abort the connection
+ 			 */
+ 			ovpn_peer_hold(peer);
+-			schedule_work(&peer->tcp.defer_del_work);
++			if (!schedule_work(&peer->tcp.defer_del_work))
++				ovpn_peer_put(peer);
+ 
+ 			/* we bail out immediately and keep tx_in_progress set
+ 			 * to true. This way we prevent more TX attempts
+-- 
+2.53.0
+
 
