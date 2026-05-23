@@ -1,303 +1,210 @@
-Return-Path: <netdev+bounces-290975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-290976-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKrQCfDxEGp7fwYAu9opvQ
-	(envelope-from <netdev+bounces-290975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:16:48 +0200
+	id iVDzKs72EGoxgAYAu9opvQ
+	(envelope-from <netdev+bounces-290976-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:37:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51F05BBB8A
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:16:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 205F55BC0ED
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 02:37:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C49C03006683
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 00:16:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C247D30B5A26
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 00:27:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C18613B7AE;
-	Sat, 23 May 2026 00:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542FC23C4E9;
+	Sat, 23 May 2026 00:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TkQJ7vE2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oXfrZJ7X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF261A7264
-	for <netdev@vger.kernel.org>; Sat, 23 May 2026 00:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779495405; cv=none; b=AKpCnL4cA7Hr08UnichgaBPlJ3OaomdsscZkOyrtw8sx00SL5kMWsV3cZpo+dLxmLNov/0QukH/3jsT/lX4q4QL9nhufBJX78JVG0DDnnExG+rkFGKE09g/PD5sFHJDydO6FejpIQPi+TSsEfqFXoE396bYixwjygZFUfptuHp0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779495405; c=relaxed/simple;
-	bh=7xld6dKWRJ7RHnX+D7yLww0lZHyYEBuXHAFtZ1hSYIA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PwcCzcdRTkmGC0flevQ6rIc6DE5pExG+756GY2vVJ4Sr/9eOxmvMsQDxpOGRBNP0oKDjvUGFfBiNlP+iXBEyk1K8tSHpN2peKF/uN2kMaBq9QllMpyoeJNOPjs5EtHcA1V/V665qQVzQDvLS3RN98ElNzll+KBcKPO3IAXx+etk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TkQJ7vE2; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 615E41F000E9;
-	Sat, 23 May 2026 00:16:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779495403;
-	bh=UPbF7rCHXS7gA8xsC32cNmwQBDN3MoGWzE3ExNZn7ng=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=TkQJ7vE24wLj6fPWeV6Tv4Rr2V8m4+2ICA4WVNz0SkdUJ6xKfm0rCxQGIUuwoXgUM
-	 tqkwaDVeX9ZkOc0/up2dm5Boaa5H6fgHTTV9NATnfPaiHaFgTJTFD8iRAltEdcacIA
-	 XG7+HJivwoCW1y2Gtk/dWNp06XCrFZBpfkEaAvpHLdoGIJhxEPIBsNofd2LYU3TTcj
-	 ngLW0adzOtUmNpqTzL56Nmioiv8ZtVa545oxP9EQbl5dI07427xxJjroaJ8B6tCKg6
-	 GJeKqC0KPkZzOh3Jf1ONRrCPxo6EdBy77MEK81TrABtOFNnf8uSHaNawArl91ansdP
-	 e5MQPNPmx3/sA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: anthony.l.nguyen@intel.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org,
-	vinschen@redhat.com,
-	alexander.nowlin@intel.com
-Subject: Re: [PATCH net 8/8] ixgbe: only access vfinfo and mv_list under RCU lock
-Date: Fri, 22 May 2026 17:16:42 -0700
-Message-ID: <20260523001642.1758535-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260520183501.3360810-9-anthony.l.nguyen@intel.com>
-References: <20260520183501.3360810-9-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1E11FC110
+	for <netdev@vger.kernel.org>; Sat, 23 May 2026 00:21:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779495683; cv=pass; b=JNSg8kOcku8rXO3y394W7rzYPmDB3OMDwjFvftWt6a9P5nrxiA4Ee+uQ6xt154L8h1esEFJ9WgnVnHv7Ni/NQylJScN7RS1d3GehpB4da0UHETH/bCKwUYG/uXz/sBr0tAm+Pgn/VuhACkmhutMIMxzmZJ+BAy5NNsM9F/01bwU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779495683; c=relaxed/simple;
+	bh=D4mJ8FPVD1YjGkYCg49HEYymj35lmCHehpyNdIcT9kI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ts3jORU9SUfxndI2MOH7ATnLNApgFzvaUzqNP9hu0yc+urnet+IAm3EH8hLJCSMzY5T8b9j8q5FmtfA80NtcmNb1hwBGOu7eXXOr3VSD4msAW7Eu2BrScbEfRdlv1sYZgV5lHpAB5mDOetLwF4B5Ywt9w0wxRAQ6B2XF5RsQpbo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oXfrZJ7X; arc=pass smtp.client-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-130c9dcbd25so5191734c88.1
+        for <netdev@vger.kernel.org>; Fri, 22 May 2026 17:21:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779495680; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PU59iJiDRdgqommU6zCtUhl2t9ORxoqiBb8SWyZL+QggxW2s31oZlMk8xeT/9oIwJ1
+         ibVbSuzBDDqP+4IVB90JbZH2YHHrpWbjKFjOu8803cfUvg510XsEjkT1g7UcHuTIhTT3
+         8TaTGif6asWdX3UbAyGp1Vb5qKv0n7HBP3C2T1IfswIOoJnhNgwL2K/edjx8Pnw7ZRJD
+         Qv5z1u4FFhbrbB2B3Br+B7xVKIvViajeCVUvkfPV0a+WKPIg9athh8FvS7u2Oj2b1rt/
+         f2v3QkKxzlv5QFvtZdTgnZLgV/3781emyv/rB1P7htMd6+kV9985fihKcL5qIe/DH1k2
+         4N8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=KiTRmoMTsTluTUU/2DSUVxylkh745cLyHVvfMEMV7To=;
+        fh=y2ZCoJWFNHiu0e7FEpdCbKvfC9EMJ7X/6w5P9G11Okk=;
+        b=GxVYgm0zIS22L7dhNrtnedgkZuMHazSz2XrTKQpXkEIKbNL+biTkn7K+bJfU145Kbb
+         fEnsa/ZLgYKRe9q6eEeK0F7+FH4oZLaDg4QW2KJFxyu3e6TDv0Eu6ogGE/HTLoM2WNF6
+         C9hW2N+YvQrlmpvRVPcQ5v26w4JI5LTYnQmUMvzfESLId0uyIyPaO3+FOp3PBn3Zarag
+         lVHC2fqyDCUR0cTC4s5FUEb0YH6EHLAbrX7DuG1j0uBO4vdsYGlRRBTAFhlR/6ieoSJ7
+         sNjPB6gsJ3lXlqj3x9YdmTWTOTDWpznOJMB4L18UHJfgThDckWj5LwplAO18gg6oDmqe
+         wAxw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779495680; x=1780100480; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KiTRmoMTsTluTUU/2DSUVxylkh745cLyHVvfMEMV7To=;
+        b=oXfrZJ7XEdYbE2gNV6Z+eeknlVX1u2cgiuCa8/ZjUBIl8N0aqibJCsA0s2oXHryWEy
+         Mpvw3YVyhEXPLKmZv6BqFdJtLmJgQh+EtmV9NGDEm/NbZSYFqEgFxIF+AlZi/JLENxHa
+         Y/u7sUYSnxgPys4/zbaU/SH1nH2+Hm6pa32uOIVzcWqmoxDG3EFfocW+fuS23rq8du8j
+         4abWAg4T3fsihV5+n76pIFYLcj+I90O9fRnbFZTzypYPlZiVLgSeCqm7tQDjNP6p7L/L
+         Xz3OshajrqRIrgalbJrScup6WyrxyM3SIFX2W8rdSqzWZVfukNm9YEpb1jSqBUYlBFWy
+         Th8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779495680; x=1780100480;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=KiTRmoMTsTluTUU/2DSUVxylkh745cLyHVvfMEMV7To=;
+        b=tXH5h6HVM6Mo6xpg2RVneJZlYzv/HRTgOIvSiYPgE9f4tEF2ZROPOJJWRarZhR54CI
+         HtW3XFZ7m7YeZ4IwYiCW4OMnIydPk2NZbzr50V7tiSiX8m+l7bw2RLlnrH0sUeW50BMH
+         GwU+lkBFVLPfS+gtSzYK4AI+JkcwV+4U0IPoj/nOEiaMeY3YYpqEYbVFp13NNgyX/iS+
+         RQbyEbmBGcnTmdH9vHtTSU2aIzvvIZasmKmzYfUtfQA00v4rDqRM91YBZAa24XJBG788
+         jtmTKaBzKePEVxITWg9Khiif5MQiyNcgT5vN9hTnGYe/N1jRPieXvdaUvignj2AesUde
+         KcWw==
+X-Forwarded-Encrypted: i=1; AFNElJ/IPIk78dm6ItAr9Ty5JFSbmE3qSbQBlsR84KXPoF+aONrTyEUU1QeUdAozZoFqkiO0/oE1wWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxH1eDKiQpCSAPduFuKOD0jNsP0eVXhvq4QGcAVJCubMzyvVelr
+	DXbz8z2PKEZA59/nQk74QgJ+bQcwX0kmkhKMn7VzgQvh+RfhvLQyKGyLkPN1dFiq6zs/mwnlcnw
+	iq/eq+2okgwaYobIUZZH8PscIbrjlXp2wMbKLFiPo
+X-Gm-Gg: Acq92OHyzpjvOCJENmfFsbRbDdYziYYx13xz7fDzXa2k17OWe9H27WgqHM9gh46AWN4
+	h+gB7zK2L8QU0aDkgIyqcGw+hi8XTK2zJLSDGYI180iEfZPHdBtQ0CTbuz1BM678VzAjxJ3Tke4
+	1EUibRPCl/P4mdMSLNPdXC1vkXyuUv+ZGKvOC3QHVaVPPmB4rF0LLx9aGZJnkfhfQLSAY/eI8ww
+	KH9XOapba0u4LkbcsoKXOzGfal6nU7cALcflOV9g0s+ihubR23sZPR3k6N9MuvDX3123vbhpHbw
+	+LgP9iBnHoGWiNjLSvPdjXVAft7bQcPSrlrSedz4e/0DGhqSTc+ruz6ehBPe9appESxPeog1RZY
+	Dbfy67a0W+pq9VrjZIoCrIBQLRsB8v4wplOIlweYunap9pWjBxrQ1XUxpDz542Vg=
+X-Received: by 2002:a05:7022:41a5:b0:12a:8122:24a9 with SMTP id
+ a92af1059eb24-136341cd515mr3579257c88.22.1779495679240; Fri, 22 May 2026
+ 17:21:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <20260522074601.1658705-3-kuniyu@google.com> <5d9fbf4b64d5684f423bcdb540d72734b962752adbbf69958138cfbc9c907f5a@mail.kernel.org>
+In-Reply-To: <5d9fbf4b64d5684f423bcdb540d72734b962752adbbf69958138cfbc9c907f5a@mail.kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Fri, 22 May 2026 17:21:06 -0700
+X-Gm-Features: AVHnY4LDyBEijob0AU0ht4MUtMSwXuaQK-_gazG06ym8XCz2Jt6ctHmtZZT7Aug
+Message-ID: <CAAVpQUBMpV3WyuuYZ74VjD7Wc94QdnSYBYSz16rgD5g8J2ocMg@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next 02/11] bpf: tcp: Introduce BPF_SOCK_OPS_RCVQ_CB.
+To: bot+bpf-ci@kernel.org
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, eddyz87@gmail.com, memxor@gmail.com, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, sdf@fomichev.me, 
+	edumazet@google.com, ncardwell@google.com, willemb@google.com, 
+	ukyab@berkeley.edu, kuni1840@gmail.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, martin.lau@kernel.org, clm@meta.com, 
+	ihor.solodrai@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-290976-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org,meta.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-290975-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C51F05BBB8A
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 205F55BC0ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-Subject: ixgbe: only access vfinfo and mv_list under RCU lock
+On Fri, May 22, 2026 at 1:22=E2=80=AFAM <bot+bpf-ci@kernel.org> wrote:
+>
+> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> > index aec171ccb6ef..31130e1b63ea 100644
+> > --- a/include/uapi/linux/bpf.h
+> > +++ b/include/uapi/linux/bpf.h
+>
+> [ ... ]
+>
+> > @@ -7031,8 +7034,16 @@ enum {
+> >        * options first before the BPF program does.
+> >        */
+> >       BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG =3D (1<<6),
+> > +     /* Call bpf when TCP payload is queued to sk->sk_receive_queue
+> > +      * and after recvmsg().  The bpf prog will be called under
+> > +      * sock_ops->op =3D=3D BPF_SOCK_OPS_RCVQ_CB.
+> > +      *
+> > +      * It can be used to adjust sk->sk_rcvlowat and suppress
+> > +      * unnecessary wakeups before sufficient data is available.
+> > +      */
+> > +     q =3D (1<<7),
+> >  /* Mask of all currently supported cb flags */
+> > -     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0x7F,
+> > +     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0xFF,
+> >  };
+>
+> The BPF subsystem requires multi-line comments to have the opening /* on
+> its own line. This comment starts with text on the same line as /*:
 
-This patch drops the spinlock protecting the adapter info in favor of RCU to
-avoid lock contention and crashes when setting sriov_numvfs to zero. It
-modifies the accesses to vfinfo and mv_list across the driver to use RCU
-primitives.
+All SOCK_OPS comments are written in the netdev style.
 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index 2646ee6f295f0..d82c7dfc6580a 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-[ ... ]
-> @@ -8309,9 +8340,15 @@ static void ixgbe_check_for_bad_vf(struct ixgbe_adapter *adapter)
->  
->  	/* check status reg for all VFs owned by this PF */
->  	for (vf = 0; vf < adapter->num_vfs; ++vf) {
-> -		struct pci_dev *vfdev = adapter->vfinfo[vf].vfdev;
-> +		struct vf_data_storage *vfinfo;
-> +		struct pci_dev *vfdev = NULL;
->  		u16 status_reg;
->  
-> +		rcu_read_lock();
-> +		vfinfo = rcu_dereference(adapter->vfinfo);
-> +		if (vfinfo)
-> +			vfdev = vfinfo[vf].vfdev;
-> +		rcu_read_unlock();
->  		if (!vfdev)
->  			continue;
->  		pci_read_config_word(vfdev, PCI_STATUS, &status_reg);
 
-[Severity: High]
-Is it safe to dereference vfdev outside the RCU read-side critical
-section? By dropping the RCU read lock before calling pci_read_config_word(),
-the grace period can expire and a concurrent execution of
-ixgbe_disable_sriov() could free the pci_dev object, resulting in a
-use-after-free.
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 9590877b0714..4a50fe2cd863 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -6002,7 +6002,8 @@ BPF_CALL_2(bpf_sock_ops_cb_flags_set, struct bpf_=
+sock_ops_kern *, bpf_sock,
+> >       struct sock *sk =3D bpf_sock->sk;
+> >       int val =3D argval & BPF_SOCK_OPS_ALL_CB_FLAGS;
+> >
+> > -     if (!is_locked_tcp_sock_ops(bpf_sock))
+> > +     if (!is_locked_tcp_sock_ops(bpf_sock) &&
+> > +         bpf_sock->op !=3D BPF_SOCK_OPS_RCVQ_CB)
+> >               return -EOPNOTSUPP;
+> >
+> >       if (!IS_ENABLED(CONFIG_INET) || !sk_fullsock(sk))
+> >               return -EINVAL;
+> >
+> >       tcp_sk(sk)->bpf_sock_ops_cb_flags =3D val;
+> >
+> >       return argval & (~BPF_SOCK_OPS_ALL_CB_FLAGS);
+>
+> The patch allows bpf_sock_ops_cb_flags_set() to modify
+> tcp_sk(sk)->bpf_sock_ops_cb_flags without holding the socket lock when
+> bpf_sock->op =3D=3D BPF_SOCK_OPS_RCVQ_CB.
 
-[ ... ]
-> @@ -10071,20 +10114,26 @@ static int handle_redirect_action(struct ixgbe_adapter *adapter, int ifindex,
->  {
->  	struct ixgbe_ring_feature *vmdq = &adapter->ring_feature[RING_F_VMDQ];
->  	unsigned int num_vfs = adapter->num_vfs, vf;
-> +	struct vf_data_storage *vfinfo;
->  	struct netdev_nested_priv priv;
->  	struct upper_walk_data data;
->  	struct net_device *upper;
->  
->  	/* redirect to a SRIOV VF */
-> -	for (vf = 0; vf < num_vfs; ++vf) {
-> -		upper = pci_get_drvdata(adapter->vfinfo[vf].vfdev);
-> -		if (upper->ifindex == ifindex) {
-> -			*queue = vf * __ALIGN_MASK(1, ~vmdq->mask);
-> -			*action = vf + 1;
-> -			*action <<= ETHTOOL_RX_FLOW_SPEC_RING_VF_OFF;
-> -			return 0;
-> +	rcu_read_lock();
-> +	vfinfo = rcu_dereference(adapter->vfinfo);
-> +	if (vfinfo)
-> +		for (vf = 0; vf < num_vfs; ++vf) {
-
-[Severity: High]
-Does reading adapter->num_vfs outside the RCU lock create a time-of-check to
-time-of-use (TOCTOU) race? If SR-IOV is disabled and rapidly re-enabled, a
-reader can cache an older, larger num_vfs value before acquiring the RCU
-lock, but then fetch the newer, smaller vfinfo array. Iterating up to the old
-num_vfs would then cause an out-of-bounds memory access.
-
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-> index 431d77da15a5f..80f22a8e7af43 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-[ ... ]
-> @@ -123,6 +125,7 @@ static int __ixgbe_enable_sriov(struct ixgbe_adapter *adapter,
->  static void ixgbe_get_vfs(struct ixgbe_adapter *adapter)
->  {
->  	struct pci_dev *pdev = adapter->pdev;
-> +	struct vf_data_storage *vfinfo;
->  	u16 vendor = pdev->vendor;
->  	struct pci_dev *vfdev;
->  	int vf = 0;
-> @@ -134,18 +137,23 @@ static void ixgbe_get_vfs(struct ixgbe_adapter *adapter)
->  		return;
->  	pci_read_config_word(pdev, pos + PCI_SRIOV_VF_DID, &vf_id);
->  
-> -	vfdev = pci_get_device(vendor, vf_id, NULL);
-> -	for (; vfdev; vfdev = pci_get_device(vendor, vf_id, vfdev)) {
-> -		if (!vfdev->is_virtfn)
-> -			continue;
-> -		if (vfdev->physfn != pdev)
-> -			continue;
-> -		if (vf >= adapter->num_vfs)
-> -			continue;
-> -		pci_dev_get(vfdev);
-> -		adapter->vfinfo[vf].vfdev = vfdev;
-> -		++vf;
-> +	rcu_read_lock();
-> +	vfinfo = rcu_dereference(adapter->vfinfo);
-> +	if (vfinfo) {
-> +		vfdev = pci_get_device(vendor, vf_id, NULL);
-> +		for (; vfdev; vfdev = pci_get_device(vendor, vf_id, vfdev)) {
-
-[Severity: High]
-Does this code call a sleeping function inside an RCU read-side critical
-section? pci_get_device() internally acquires the pci_bus_sem read-write
-semaphore, which can sleep. Sleeping inside an RCU read section will
-trigger a 'scheduling while atomic' BUG.
-
-[ ... ]
-> @@ -206,31 +214,28 @@ int ixgbe_disable_sriov(struct ixgbe_adapter *adapter)
->  {
->  	unsigned int num_vfs = adapter->num_vfs, vf;
->  	struct ixgbe_hw *hw = &adapter->hw;
-> -	unsigned long flags;
-> +	struct vf_data_storage *vfinfo;
-> +	struct vf_macvlans *mv_list;
->  	int rss;
->  
-> -	spin_lock_irqsave(&adapter->vfs_lock, flags);
-> -	/* set num VFs to 0 to prevent access to vfinfo */
-> +	/* set num VFs to 0 so readers bail out early */
->  	adapter->num_vfs = 0;
-> -	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
-> +
-> +	vfinfo = rcu_replace_pointer(adapter->vfinfo, NULL, 1);
-> +	mv_list = rcu_replace_pointer(adapter->mv_list, NULL, 1);
->  
->  	/* put the reference to all of the vf devices */
->  	for (vf = 0; vf < num_vfs; ++vf) {
-> -		struct pci_dev *vfdev = adapter->vfinfo[vf].vfdev;
-> +		struct pci_dev *vfdev = vfinfo[vf].vfdev;
->  
->  		if (!vfdev)
->  			continue;
-> -		adapter->vfinfo[vf].vfdev = NULL;
-> +		vfinfo[vf].vfdev = NULL;
->  		pci_dev_put(vfdev);
->  	}
-
-[Severity: High]
-Can RCU readers observe these synchronous mutations before the grace
-period ends? The vfinfo array is modified in-place and pci_dev_put() is
-called on the devices synchronously. If the final reference is dropped,
-the pci_dev could be freed while an RCU reader (like
-handle_redirect_action()) is concurrently accessing it, leading to a
-use-after-free.
-
-[ ... ]
-> @@ -643,10 +668,16 @@ static void ixgbe_clear_vf_vlans(struct ixgbe_adapter *adapter, u32 vf)
->  static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
->  				int vf, int index, unsigned char *mac_addr)
->  {
-> -	struct vf_macvlans *entry;
-> +	struct vf_macvlans *mv_list, *entry;
->  	bool found = false;
->  	int retval = 0;
->  
-> +	lockdep_assert_in_rcu_read_lock();
-> +	/* vf_mvs entries point into the mv_list array */
-> +	mv_list = rcu_dereference(adapter->mv_list);
-> +	if (!mv_list)
-> +		return 0;
-> +
->  	if (index <= 1) {
->  		list_for_each_entry(entry, &adapter->vf_mvs.l, l) {
-
-[Severity: High]
-Are standard list operations safe here under RCU? The adapter->vf_mvs.l
-list is traversed using list_for_each_entry() under rcu_read_lock().
-Concurrently, ixgbe_alloc_vf_macvlans() can re-initialize the list head
-and add entries using list_add(). Without the appropriate RCU list
-primitives, concurrent list modifications can cause data races and
-corrupted pointers.
-
-[ ... ]
-> @@ -952,14 +1013,20 @@ static int ixgbe_set_vf_mac_addr(struct ixgbe_adapter *adapter,
->  				 u32 *msgbuf, u32 vf)
->  {
->  	u8 *new_mac = ((u8 *)(&msgbuf[1]));
-> +	struct vf_data_storage *vfinfo;
->  
->  	if (!is_valid_ether_addr(new_mac)) {
->  		e_warn(drv, "VF %d attempted to set invalid mac\n", vf);
->  		return -1;
->  	}
->  
-> -	if (adapter->vfinfo[vf].pf_set_mac && !adapter->vfinfo[vf].trusted &&
-> -	    !ether_addr_equal(adapter->vfinfo[vf].vf_mac_addresses, new_mac)) {
-> +	lockdep_assert_in_rcu_read_lock();
-> +	vfinfo = rcu_dereference(adapter->vfinfo);
-> +	if (!vfinfo)
-> +		return 0;
-
-[Severity: Medium]
-Will this send false ACKs to the VF when vfinfo is NULL? The caller,
-ixgbe_rcv_msg_from_vf(), interprets a return value of 0 as success and
-sends an ACK (IXGBE_VT_MSGTYPE_ACK) to the VF. Returning 0 here means
-the operation is silently ignored but acknowledged as successful. Could
-this return an error like -EINVAL instead?
+This is clearly wrong.  BPF_SOCK_OPS_RCVQ_CB is under
+lock_sock() or bh_lock_sock().
 
