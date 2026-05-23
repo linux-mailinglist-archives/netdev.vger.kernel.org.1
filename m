@@ -1,68 +1,66 @@
-Return-Path: <netdev+bounces-291085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291087-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJcBFnmHEWqdnAYAu9opvQ
-	(envelope-from <netdev+bounces-291085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:54:49 +0200
+	id gDyDBtSHEWqdnAYAu9opvQ
+	(envelope-from <netdev+bounces-291087-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:56:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADF525BE92F
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:54:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AA535BE962
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 12:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0EE7301C3EA
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:54:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E25543018D7B
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 10:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289F83876A7;
-	Sat, 23 May 2026 10:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D123876CA;
+	Sat, 23 May 2026 10:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="BMYCOxLG"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="eemmzHzZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9782DE6FF;
-	Sat, 23 May 2026 10:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3320356775;
+	Sat, 23 May 2026 10:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779533671; cv=none; b=nZTZAN62N7x5hBPaXmIKljH1iCmAJj7lT5DZ5IQJLaLSozlM/XyGUTZ5w3KbkRfnXhH0oDLkVc3HfBafrhu30E8ZP7CnZZ3kJ0u6GZz/gP9GfSPGoCSsVAMj84WxujNFw3IHnzRDr7LjfPEmb8y84T0pu00UsWR6tJBBN1fZ7Kg=
+	t=1779533721; cv=none; b=RXOHy9aTZl5/+yLtUbjr7G6cR+1zd++oJjFbqhF/Bt0utXvmHPz/SQaBfpSnnAdNXmoZPhxyCGOS8oJw6RjO1utQMeDuzacAISKuR40ref4vgliZXremrOWOJIS1+naZOU1mItMHXCVWe606BXv59JyBltfWTZYHMNKpRzpqWFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779533671; c=relaxed/simple;
-	bh=zTz9Xujk5okwTtSW/xMyTH8S2TiMnq0G+0JeauP3jgg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f62NERpQLIuFNCYCJB4dsnGd+6olX4okDDxt1VuiS9yIHkNZKVPgoId3M8ER+3AP6NOkrkBhbk9ot6+fF/Wy9YI0CpNI/Sew2/iI5eay1R8UBbC32YqBJro3PTjUt1VQJgtrhn+q9j1TKYf8yUL9v2nXU+O5Bb4JH4IUTF/flvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=BMYCOxLG; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from debian.intra.ispras.ru (unknown [10.10.165.7])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 8FB8445F79A5;
-	Sat, 23 May 2026 10:48:38 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 8FB8445F79A5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1779533318;
-	bh=8I718NLjrOXhp1MUXTCsy+d8AWGiFC7W1rspmjLD5AY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BMYCOxLGrOrud9ScziUNDU1ygAidUlF95YB1j+UDO4VAinUZRe4nufDZYRf3yp+4o
-	 1hAGxGkzEvwngHl3OUm1BOvlL29qN45K90jazRSwbPp6Wd4SNlMlbTAMLCh/5wrqV1
-	 bQ2U1uus6rCn94zb0F3C5OeRiAxt5JMfrTa/FIjU=
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-To: Jose Abreu <Jose.Abreu@synopsys.com>
-Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jie Deng <Jie.Deng1@synopsys.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH net 2/2] net: dwc-xlgmac: handle hw initialization failure in xlgmac_start()
-Date: Sat, 23 May 2026 13:45:28 +0300
-Message-ID: <20260523104740.295650-2-pchelkin@ispras.ru>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260523104740.295650-1-pchelkin@ispras.ru>
-References: <20260523104740.295650-1-pchelkin@ispras.ru>
+	s=arc-20240116; t=1779533721; c=relaxed/simple;
+	bh=Z0XnwtJLwnPUgzcwlDcKDlQypcOn8FH44HNqVCSzORk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dNRB71A6Tj6yo8gePgAjO+flXeanwF6QwlUfTakXn+mDahzxmASGMtKUp4vfpXMMR0JPSBCHVf3P8Yz+L3pmmEWx3xYSIvELeUgyR2YFb0GQR1OxqIwd/cXSPpvCAH2pR3Os3ZRIPXhbruOJ6KlE3WqTCnIfQ2rnLW1u3TX/c2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=eemmzHzZ; arc=none smtp.client-ip=113.46.200.224
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=sNJlfzD7Z00tXyJTPBX7EjDaUa0gzHTASAG7spOpnZA=;
+	b=eemmzHzZZFTZUNQ22pCreCHH2+V4fmPUhV2pUcdVysDl+at5YKXsDZBR2zefNOY9jUgU++sTt
+	VM2QNv1mYe9jBlTvahv0s83Hzi5+8HhmpwhmXAOBK3uQ8LX4HGr7H49qdVgENTrHMfjwGg4hsF4
+	Sfb/BurKzZhu8VQLmxGh6sA=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4gMzPB2ZWnz1cyQG;
+	Sat, 23 May 2026 18:47:26 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5E40D40561;
+	Sat, 23 May 2026 18:55:08 +0800 (CST)
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Sat, 23 May 2026 18:55:07 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
+	<yangshuaisong@h-partners.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
+Subject: [PATCH V2 net-next 0/6] net: hns3: enhance tc flow offload support
+Date: Sat, 23 May 2026 18:54:43 +0800
+Message-ID: <20260523105449.661848-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,110 +68,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ispras.ru,none];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ispras.ru:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291085-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[ispras.ru:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pchelkin@ispras.ru,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-291087-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ispras.ru:email,ispras.ru:mid,ispras.ru:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qemu.org:url]
-X-Rspamd-Queue-Id: ADF525BE92F
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:mid,huawei.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6AA535BE962
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-hw_ops->init() can fail, thus leaving uninitialized TX and RX descriptor
-objects.  Later when they are updated in xlgmac_dev_xmit(), there is a
-NULL pointer dereference.
+This patchset enhances the tc flow offload support for hns3 driver:
 
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 31 Comm: kworker/1:1 Not tainted 6.1.164+ #122
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
-Workqueue: mld mld_ifc_work
-RIP: 0010:xlgmac_dev_xmit+0x62f/0x1260 drivers/net/ethernet/synopsys/dwc-xlgmac-hw.c:827
-Call Trace:
- <TASK>
- xlgmac_xmit+0xa14/0x1196 drivers/net/ethernet/synopsys/dwc-xlgmac-net.c:766
- __netdev_start_xmit include/linux/netdevice.h:4896 [inline]
- netdev_start_xmit include/linux/netdevice.h:4910 [inline]
- xmit_one net/core/dev.c:3683 [inline]
- dev_hard_start_xmit+0x126/0x680 net/core/dev.c:3699
- sch_direct_xmit+0x18a/0x7e0 net/sched/sch_generic.c:345
- __dev_xmit_skb net/core/dev.c:3920 [inline]
- __dev_queue_xmit+0x19ef/0x3da0 net/core/dev.c:4325
- dev_queue_xmit include/linux/netdevice.h:3051 [inline]
- neigh_resolve_output net/core/neighbour.c:1568 [inline]
- neigh_resolve_output+0x563/0x880 net/core/neighbour.c:1548
- neigh_output include/net/neighbour.h:545 [inline]
- ip6_finish_output2+0xb4f/0x2390 net/ipv6/ip6_output.c:138
- __ip6_finish_output+0x48c/0x1300 net/ipv6/ip6_output.c:205
- ip6_finish_output net/ipv6/ip6_output.c:216 [inline]
- NF_HOOK_COND include/linux/netfilter.h:291 [inline]
- ip6_output+0x250/0x910 net/ipv6/ip6_output.c:237
- dst_output include/net/dst.h:453 [inline]
- NF_HOOK.constprop.0+0x111/0x8a0 include/linux/netfilter.h:302
- mld_sendpack+0x67b/0xd40 net/ipv6/mcast.c:1825
- mld_send_cr net/ipv6/mcast.c:2126 [inline]
- mld_ifc_work+0x7a5/0xd80 net/ipv6/mcast.c:2656
- process_one_work+0x97f/0x1470 kernel/workqueue.c:2292
- worker_thread+0x5a1/0x1090 kernel/workqueue.c:2439
- kthread+0x2e1/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x22/0x30 arch/x86/entry/entry_64.S:295
+- Patch 1: Refactor hclge_add_cls_flower() to support more actions
+- Patch 2: Improve unused_tuple parameter setting for separate src/dst configuration
+- Patch 3: Add support for HCLGE_FD_ACTION_SELECT_QUEUE and HCLGE_FD_ACTION_DROP_PACKET actions
+- Patch 4: Add support for FLOW_DISSECTOR_KEY_IP and FLOW_DISSECTOR_KEY_ENC_KEYID dissectors
+- Patch 5: Add debugfs support for dumping FD rules
+- Patch 6: Move FD code to a separate file (hclge_fd.c) for better code organization
 
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Fixes: 65e0ace2c5cd ("net: dwc-xlgmac: Initial driver for DesignWare Enterprise Ethernet")
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 ---
- drivers/net/ethernet/synopsys/dwc-xlgmac-net.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ChangeLog:
+v1 -> v2:
+  - Fixed warnings similar to "warning: restricted __le32 degrades to integer",
+    pointed out by Jakub
+  - Fixed warnings related to
+    "warning: diagnostic behavior may be improved by adding the 'format(printf, 5, 7)'",
+    pointed out by Jakub
+  v1: https://lore.kernel.org/all/20260518093526.1109595-1-shaojijie@huawei.com/
+---
 
-diff --git a/drivers/net/ethernet/synopsys/dwc-xlgmac-net.c b/drivers/net/ethernet/synopsys/dwc-xlgmac-net.c
-index 37101dc50d04..1a6906f8fc44 100644
---- a/drivers/net/ethernet/synopsys/dwc-xlgmac-net.c
-+++ b/drivers/net/ethernet/synopsys/dwc-xlgmac-net.c
-@@ -564,7 +564,9 @@ static int xlgmac_start(struct xlgmac_pdata *pdata)
- 	struct net_device *netdev = pdata->netdev;
- 	int ret;
- 
--	hw_ops->init(pdata);
-+	ret = hw_ops->init(pdata);
-+	if (ret)
-+		goto err_init;
- 	xlgmac_napi_enable(pdata, 1);
- 
- 	ret = xlgmac_request_irqs(pdata);
-@@ -580,7 +582,7 @@ static int xlgmac_start(struct xlgmac_pdata *pdata)
- err_napi:
- 	xlgmac_napi_disable(pdata, 1);
- 	hw_ops->exit(pdata);
--
-+err_init:
- 	return ret;
- }
- 
+Jijie Shao (6):
+  net: hns3: adjust add_cls_flower() for support more action
+  net: hns3: improve the unused_tuple parameter setting
+  net: hns3: support two more actions for tc flow
+  net: hns3: support IP and tunnel VNI dissectors for tc flow
+  net: hns3: debugfs support for dumping fd rules
+  net: hns3: move fd code to a separate file
+
+ drivers/net/ethernet/hisilicon/hns3/Makefile  |    1 +
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |    3 +-
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    |    6 +
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |    3 +-
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.c     |  150 +
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_fd.c | 2575 +++++++++++++++++
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_fd.h |   33 +
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 2514 +---------------
+ .../hisilicon/hns3/hns3pf/hclge_main.h        |    6 +
+ 9 files changed, 2817 insertions(+), 2474 deletions(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_fd.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_fd.h
+
 -- 
-2.53.0
+2.33.0
 
 
