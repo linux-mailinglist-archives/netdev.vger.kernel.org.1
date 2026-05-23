@@ -1,250 +1,184 @@
-Return-Path: <netdev+bounces-291077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iB8/CoNxEWq5mAYAu9opvQ
-	(envelope-from <netdev+bounces-291077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:21:07 +0200
+	id 6CBvBZRzEWpKmQYAu9opvQ
+	(envelope-from <netdev+bounces-291078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:29:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCCD65BE2CA
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:21:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD9A5BE34D
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 11:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C1D663007515
-	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 09:21:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F2CBD3011C63
+	for <lists+netdev@lfdr.de>; Sat, 23 May 2026 09:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15980385D91;
-	Sat, 23 May 2026 09:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8y2TV6t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1364346A18;
+	Sat, 23 May 2026 09:29:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFDB3859E9;
-	Sat, 23 May 2026 09:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D0627281E;
+	Sat, 23 May 2026 09:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779528054; cv=none; b=pGs6iN1vwgVCONB++3oq3zwIepKczqaPn7uDgnrIZnvCiBIfSkinWvfqJge0KLTy2k6KkCfMgmXqZdtKgHTssugJJTjCKbq9y8LdkVJ2or7mrnD5I4AliE//Z/3RRpMqHF8fJFvdvXo3cE7Q1QorOwywhPEaPSGmYHkAAOu/w8Y=
+	t=1779528593; cv=none; b=fWQzRlaor8ybhBgqnmNxqrGpnDxXxq5fLX0gdSk4dRXQzvSnOqEhFQr29Yf4WB8n7odGDSYryp3JBsRmr2/3FYPa68o1nYMeWHq8tWa6HHsOiiNn84Zp++fAAs7jMF22kgb2gZ/NwuqYT+Nezdwcij9q0hhOiTXM7/eNjOJFrps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779528054; c=relaxed/simple;
-	bh=0Bo391fQLc8HvX5KY/9fQS1og9DlFVijIbtn5gxFwM0=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=VO5YzACNOIuyygIkKdpEDPnA2Jichn2NAFIkmv6rT2jMA6W+qePjKzmHxKc29hb0koHlAX++Wqf+CCMBWza/i2owsnmWqZsNxSXzjWB/ICE+ct92dZs1JRMqIToRREmwR8xONxgzcjBO25c1N2fz9Rkqk7lQASZidJDFldA+Afs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8y2TV6t; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09ECE1F00A3D;
-	Sat, 23 May 2026 09:20:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779528051;
-	bh=o4GCMZQCtKTmkJr7KIm5wGVtLoy3y9Uu3eGH/9pW5ok=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=A8y2TV6tDlQLkpdXE2tjKGqvo2ip0UkzMVwwNdclMScW6z1kR4micEgUt+nGfaRk+
-	 MZ/5t2fZ9Dn+TIS08liCXHVMnfPyYCb89S+MD90r3ixb+XhFLeuPjqT1jvOo36QD4I
-	 GJRvSPjcU6lcv8YeUSe1M8BpeeMztkLHAgZiYExbje0CqPtV2mXjw5ZtIjbmC6p89u
-	 /E5L/0c1+LUsJ7A/xAYDh8iIHn05iGvkj71Q/96jpqnYt+rwOsK8RZaMSswtNhIiDs
-	 YUPSltJ/A0WgLbX5qq4DQVGLqzSinlYFxKOpeNrrXlGB3u6xxOZjO2nZhyCYILjOUo
-	 IhmJsOPi+wpEw==
-Content-Type: multipart/mixed; boundary="===============3434856789991386713=="
+	s=arc-20240116; t=1779528593; c=relaxed/simple;
+	bh=IW6R/yqro8ElmofiJfeasd++lmBqdR2DmjN23iqlWy0=;
+	h=Message-ID:Date:Mime-Version:From:To:Cc:Subject:Content-Type; b=EVWwRKayz+TRF3WQqVpaTxL0nGDGe7IU28owK8pEKSsXaeS3qkAJUSMVZZxCHtUDhNuFyOWOKjgNaEhUYiwStwnByArRvSV/OERaG6n27k3gJ1KZFeiy23UKeTff1IRFZrz9EIN07qq99vhKUjA9Mn/smNZB2GqNjcStTTvyFfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4gMxgV2j2Rz8XrrJ;
+	Sat, 23 May 2026 17:29:42 +0800 (CST)
+Received: from njy2app08.zte.com.cn ([10.40.13.206])
+	by mse-fl2.zte.com.cn with SMTP id 64N9TVtP099191;
+	Sat, 23 May 2026 17:29:31 +0800 (+08)
+	(envelope-from han.junyang@zte.com.cn)
+Received: from mapi (njy2app03[null])
+	by mapi (Zmail) with MAPI id mid204;
+	Sat, 23 May 2026 17:29:34 +0800 (CST)
+X-Zmail-TransId: 2afb6a11737edc2-d6e81
+X-Mailer: Zmail v1.0
+Message-ID: <20260523172934240Y6DiW-tAAQJHNvbVct4-M@zte.com.cn>
+Date: Sat, 23 May 2026 17:29:34 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-Id: <0c3701f35cdef6411722a91c596d736cc9e88e3d7a14564caf5354302eb92d98@mail.kernel.org>
-In-Reply-To: <20260523083001.2911931-7-kuniyu@google.com>
-References: <20260523083001.2911931-7-kuniyu@google.com>
-Subject: Re: [PATCH v3 bpf-next 06/11] bpf: tcp: Make BPF_SOCK_OPS_RCVQ_CB and SOCKMAP mutually exclusive.
-From: bot+bpf-ci@kernel.org
-To: kuniyu@google.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,memxor@gmail.com
-Cc: yonghong.song@linux.dev,john.fastabend@gmail.com,sdf@fomichev.me,edumazet@google.com,ncardwell@google.com,willemb@google.com,ukyab@berkeley.edu,kuniyu@google.com,kuni1840@gmail.com,bpf@vger.kernel.org,netdev@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Sat, 23 May 2026 09:20:51 +0000 (UTC)
-X-Spamd-Result: default: False [0.34 / 15.00];
+Mime-Version: 1.0
+From: <han.junyang@zte.com.cn>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <han.junyang@zte.com.cn>, <ran.ming@zte.com.cn>,
+        <han.chengfei@zte.com.cn>, <zhang.yanze@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY0IDAvMl0gQWRkIFpURSBEaW5nSGFpIEV0aGVybmV0IFBGIGRyaXZlcg==?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 64N9TVtP099191
+X-TLS: YES
+X-ENVELOPE-SENDER: han.junyang@zte.com.cn
+X-SOURCE-IP: 10.5.228.133 unknown Sat, 23 May 2026 17:29:42 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6A117386.000/4gMxgV2j2Rz8XrrJ
+X-Spamd-Result: default: False [2.14 / 15.00];
+	SUBJ_EXCESS_BASE64(1.50)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291077-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org,kernel.org,iogearbox.net,meta.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+];
+	NEURAL_SPAM(0.00)[0.505];
+	TAGGED_FROM(0.00)[bounces-291078-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[google.com,kernel.org,iogearbox.net,linux.dev,gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: BCCD65BE2CA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 5FD9A5BE34D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---===============3434856789991386713==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Junyang Han <han.junyang@zte.com.cn>
 
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index c6a6853909c4..bc95d8e7b62e 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -2853,6 +2853,7 @@ struct sk_msg;
->  struct sk_psock;
->
->  #ifdef CONFIG_BPF_SYSCALL
-> +bool tcp_in_sockmap(const struct sock *sk);
->  int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore);
->  void tcp_bpf_clone(const struct sock *sk, struct sock *newsk);
->  #ifdef CONFIG_BPF_STREAM_PARSER
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 3608036632a8..1fb63b264b18 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
+This series adds initial support for the ZTE DingHai Ethernet controller,
+a high-performance PCIe Ethernet device supporting SR-IOV, hardware
+offloading, and advanced virtualization features.
 
-[ ... ]
+Changes from v3:
+- Merged patches 1 and 2: 
+  Combined initial framework with logging infrastructure
+  for better code organization and reduced patch count. This was done because
+  the logging infrastructure now uses Linux's built-in dev_err(), dev_info(),
+  dev_warn(), etc. macros instead of a custom logging system.
+- Removed unnecessary variable initialization: 
+  Fixed "don't initialise variables".
+- Fixed variable declaration order: 
+  Applied "Reverse Christmas tree" ordering with variables
+  declared from longest to shortest line length.
+- Code quality improvements:
+  Fixed all checkpatch.pl issues (alignment, formatting, etc.).
 
-> @@ -5382,12 +5382,34 @@ static int bpf_sol_tcp_getsockopt(struct sock *sk, int optname,
->  	return 0;
->  }
->
-> +static int __bpf_sock_ops_cb_flags_set(struct sock *sk, int val)
-> +{
-> +	if (!(val & BPF_SOCK_OPS_RCVQ_CB_FLAG) ||
-> +	    tcp_sk(sk)->bpf_sock_ops_cb_flags & BPF_SOCK_OPS_RCVQ_CB_FLAG) {
-> +		tcp_sk(sk)->bpf_sock_ops_cb_flags = val;
-> +		return 0;
-> +	}
-> +
-> +	write_lock_bh(&sk->sk_callback_lock);
-> +
-> +	if (unlikely(tcp_in_sockmap(sk))) {
-> +		write_unlock_bh(&sk->sk_callback_lock);
-> +		return -EBUSY;
-> +	}
-> +
-> +	tcp_sk(sk)->bpf_sock_ops_cb_flags = val;
-> +
-> +	write_unlock_bh(&sk->sk_callback_lock);
-> +
-> +	return 0;
-> +}
-> +
+Changes from v2:
+- Address maintainer feedback from v2 review:
+  * Remove meaningless initialization
+  * Change dh_pf_pci_table to static const for better encapsulation
+  * Simplify MODULE_DESCRIPTION for brevity
+- Coding style improvements:
+  * Ensure all lines are within 80-column limit
+  * Use kernel types (u32/u8) consistently throughout
+  * Improve code readability with better formatting
 
-[ ... ]
 
-> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-> index cc0bd73f36b6..7e7966b095f9 100644
-> --- a/net/ipv4/tcp_bpf.c
-> +++ b/net/ipv4/tcp_bpf.c
-> @@ -705,6 +705,16 @@ int tcp_bpf_strp_read_sock(struct strparser *strp, read_descriptor_t *desc,
->  }
->  #endif /* CONFIG_BPF_STREAM_PARSER */
->
-> +bool tcp_in_sockmap(const struct sock *sk)
-> +{
-> +	const struct proto *prot = sk->sk_prot;
-> +
-> +	lockdep_assert_held(&sk->sk_callback_lock);
-> +
-> +	return &tcp_bpf_prots[0][0] <= prot &&
-> +		prot <= &tcp_bpf_prots[TCP_BPF_NUM_PROTS - 1][TCP_BPF_NUM_CFGS - 1];
-> +}
-> +
->  int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
->  {
->  	int family = sk->sk_family == AF_INET6 ? TCP_BPF_IPV6 : TCP_BPF_IPV4;
-> @@ -729,6 +739,8 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
->  			sock_replace_proto(sk, psock->sk_proto);
->  		}
->  		return 0;
-> +	} else if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_RCVQ_CB_FLAG)) {
-> +		return -EBUSY;
-                   ^^^^
+Changes from v1 (addressing feedback from AndrewLunn):
+- Update copyright years to 2022-2026
+- Remove DRV_VERSION, MODULE_VERSION and related boilerplate
+- Fix MODULE_AUTHOR to use person with email address
+- Use module_pci_driver() instead of manual init/exit
+- Remove empty suspend/resume callbacks
+- Replace char priv[] flexible array with void *priv + kzalloc
+- Switch logging from printk wrappers to dev_*() based macros
+- Remove dh_helper.h and dh_log.c, simplify to dh_log.h only
+- Fix variable declaration ordering (reverse Christmas tree)
+- Remove unnecessary NULL check in remove and pf_dev=NULL in probe
+- Fix indentation and remove unnecessary type casts
+- Use kernel idiomatic "if (ret)" style
 
-A subsystem pattern flags this as potentially concerning: the commit
-message explains that write_lock_bh(&sk->sk_callback_lock) is taken to
-synchronise with tcp_bpf_update_proto(), but does tcp_bpf_update_proto()
-actually take sk->sk_callback_lock?
+This is the initial submission and only includes the PF (Physical Function)
+driver. The VF (Virtual Function) driver will be submitted separately.
 
-Looking at the call chain, tcp_bpf_update_proto() is invoked from the
-SOCKMAP path through:
+Junyang Han (2):
+  net/ethernet: add ZTE network driver support
+  net/ethernet/zte/dinghai: add hardware register access and PCI
+    capability scanning
 
-sock_map_link() in net/core/sock_map.c
-  -> sock_map_init_proto()
-     -> tcp_bpf_update_proto()
-
-In sock_map_link(), sk_callback_lock is acquired after sock_map_init_proto()
-completes, not before. The lock is taken when setting sk_user_data to the
-psock, but sock_map_init_proto() runs outside the lock and calls
-sock_replace_proto() to write sk->sk_prot without holding sk_callback_lock.
-
-Is there a race here? Consider this interleaving (the commit message
-acknowledges sock_map_update_elem only holds bh_lock_sock(), so it can run
-concurrently with setsockopt that holds the socket lock):
-
-  CPU 0 (sockmap path)                   CPU 1 (BPF setsockopt RCVQ_CB)
-  sock_map_link():                       __bpf_sock_ops_cb_flags_set():
-    sk_psock_init():                       (val has RCVQ_CB, current=0)
-      lock sk_callback_lock
-      set sk_user_data = psock
-      unlock sk_callback_lock
-    sock_map_init_proto():
-      tcp_bpf_update_proto():
-        BPF_SOCK_OPS_TEST_FLAG: 0
-        (no flag yet, check passes)
-                                           write_lock_bh(sk_callback_lock)
-                                           tcp_in_sockmap(sk): sk_prot
-                                           still old, returns false
-                                           tp->bpf_sock_ops_cb_flags = val
-                                           (RCVQ_CB set)
-                                           write_unlock_bh
-        sock_replace_proto(sk,
-          &tcp_bpf_prots[][])
-        (sk_prot now in tcp_bpf_prots)
-
-Final state: sk_prot is in tcp_bpf_prots[][] AND bpf_sock_ops_cb_flags has
-BPF_SOCK_OPS_RCVQ_CB_FLAG. Both features are now enabled, which violates the
-mutual exclusion goal.
-
-The validation checks in tcp_bpf_update_proto() and __bpf_sock_ops_cb_flags_set()
-each check shared state before the exclusion point, not under common exclusion.
-Running a lockset analysis on the two shared variables:
-
-  bpf_sock_ops_cb_flags: written by __bpf_sock_ops_cb_flags_set under
-  sk_callback_lock; read by tcp_bpf_update_proto with no lock.
-  Lockset intersection = {sk_callback_lock} intersect {} = {}.
-
-  sk->sk_prot: read by tcp_in_sockmap under sk_callback_lock; written by
-  sock_replace_proto (called from tcp_bpf_update_proto) with no lock.
-  Lockset intersection = {} intersect {sk_callback_lock} = {}.
-
-Could the synchronization be strengthened so both paths access both variables
-under the same lock?
-
->  	}
->
->  	if (sk->sk_family == AF_INET6) {
-
+ MAINTAINERS                                 |   6 +
+ drivers/net/ethernet/Kconfig                |   1 +
+ drivers/net/ethernet/Makefile               |   1 +
+ drivers/net/ethernet/zte/Kconfig            |  20 +
+ drivers/net/ethernet/zte/Makefile           |   6 +
+ drivers/net/ethernet/zte/dinghai/Kconfig    |  34 ++
+ drivers/net/ethernet/zte/dinghai/Makefile   |  10 +
+ drivers/net/ethernet/zte/dinghai/dh_queue.h |  71 +++
+ drivers/net/ethernet/zte/dinghai/en_pf.c    | 631 ++++++++++++++++++++
+ drivers/net/ethernet/zte/dinghai/en_pf.h    | 132 ++++
+ 10 files changed, 912 insertions(+)
+ create mode 100644 drivers/net/ethernet/zte/Kconfig
+ create mode 100644 drivers/net/ethernet/zte/Makefile
+ create mode 100644 drivers/net/ethernet/zte/dinghai/Kconfig
+ create mode 100644 drivers/net/ethernet/zte/dinghai/Makefile
+ create mode 100644 drivers/net/ethernet/zte/dinghai/dh_queue.h
+ create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.c
+ create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.h
 
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+A quick note: I've refined my email sending approach after the previous
+series encountered some formatting issues. I've now tested the transmission
+method and confirmed that the patches maintain proper formatting.
+Thanks for your understanding!
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/26328541814
---===============3434856789991386713==--
+-- 
+2.27.0
 
