@@ -1,214 +1,201 @@
-Return-Path: <netdev+bounces-291186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291187-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ArLjEV8EE2qV6AYAu9opvQ
-	(envelope-from <netdev+bounces-291186-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 15:59:59 +0200
+	id 4C0PAcwFE2rU6AYAu9opvQ
+	(envelope-from <netdev+bounces-291187-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 16:06:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3C125C2A1C
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 15:59:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A71355C2A66
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 16:06:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B29B63009012
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 13:59:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 22AA7300AB22
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 14:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379D13955F4;
-	Sun, 24 May 2026 13:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78349392C52;
+	Sun, 24 May 2026 14:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="e3glXIPk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PyTeYXKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012033.outbound.protection.outlook.com [40.107.209.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B561622068D;
-	Sun, 24 May 2026 13:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44752DCF55
+	for <netdev@vger.kernel.org>; Sun, 24 May 2026 14:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.176
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779631194; cv=fail; b=Or8DPbl9kvOnXIrIVV6iTarzcVi1ZiGy/jjEBBNY6a8wrAv6EIyo6RwuIFQs/J655xrpqq4Me/lcZHTMRDJ5Nnht0+tr1wUy6lQl4tdOmEUi3d/Mo5hJJD0lAjucIRkN0f2rTXSfyTCsRSBtH3QvZcSbh3aEq9R9AvsotEt5HQA=
+	t=1779631558; cv=pass; b=ud9NCoui7IkZuv/QPvdVMXP+Id/8yMNxfSHnimlEAQWloRDpvBvYwMUqoqWL8I8+Ad2rW+CkFCcXRzy5DMvY5G9xqz0E4xRdHVn7EpT4IK3Ph3AezVkdTuhsyxU83dl4lshu1lBJg1sZ2tU2Z+ChSWRPkG+UUj8GHIbqdrRZeHg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779631194; c=relaxed/simple;
-	bh=s4pBLCsD/8DIc+fy0s2c6A4/j7u4+sybFuARbYirqCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=p2hdJXcfuYgQqHfbxxjFWLfWVgT7Zhqr9hnanc4139qZ7uXRhTUu8TjSIdppqBHwYUMMOfQPRi0QkABXJwPYEeM8aptRsNBoKTMyCELwY+gzzKLNNsMDVT/S3/IeiUFI/VlhDgdxWLu9t0Bx3QN/d5lh0V8ZdbiyTn3Wmp461xc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=e3glXIPk; arc=fail smtp.client-ip=40.107.209.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JOpdfGNIDFxpmSiBIJCJMS9jxsjuwyU10YGEELnL8fMGQfIp3IbQv/rZg80GmqldPwQV1F/Dd84T6oDN03hUvQktXX4n6l1zN2FUGjDO6UnfKm5s3PoL1nnM+6A2qegz6blYF2UHm+RNUURjnUQ3dwbQSO1BOvkn3dW9INB9QgKHaLtIe5s/nLPO6JAVgreaBuywBDbBAsQgYOd7eV3iSkrw8RNlu9l3ZZ5NIY+Fvt7xaJHTOh15tBtwOOC14bnq3leiTQtmioUgcxoZwFCPhM6XXO3OTJV39FNuEY49V3uTWJpgiRtinJ5brN90s9dQoebsZxrDjN4GfL97SU0beQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=01fb5jjp1aHvJDY0hWKo21+Pv4f21sAknkI8B8lX83k=;
- b=Hvp+8wkHS19Um+H/y84bslH/Lt7Sdw1oGrxwkwqYOC2a5AYb08QlcKw7ORXVjL5DbjVvzZn5pMl5ET/NUSsSspVZSjhfr0zk3CsxJ0/MUbGreSYUGNEjXHGHWDB7wpAZ/P0PsFs4aw+TvrEMadEtMXkSBo3LhidlMs6MQtWl5Yq/quuwBftzCrdp4UoslAuMAFK7ewepyluvXKn+hryV6SsluCpbXLx7y6NxkWTy4aHK8VW45LBqEwA11uzGH95V+4zHve1yZWQ0C6GJipmy/J4O99cT627ceLpOL1zHROz0iF8MXLaMrUPmNUSFFFqzhKRcdW9u8xSflCEnY5Zsfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=01fb5jjp1aHvJDY0hWKo21+Pv4f21sAknkI8B8lX83k=;
- b=e3glXIPk2dZYdxh29p2CYOakvB+A19SqLHHdFczzlGv22RrtYBkPtz1+VIkgvQE9ctM8zhUu3/e2+UtC71TDR8pyxQp2dUOrBYu64uTHBRhekb3KPrW6zkYpUR/jChpmoNr9d7YqSy3p69XiHHTFzO/AyGiovJCE1ExOrlBBPOGfNJKgVadU/pcbNd9RdI8lkdWeEROBCG7uFe7AfGzrXpVl8X120IZL3vf9ZzfseG0dFPVlKc22gBqtPV5uEF5YHMY8VF1LtMbzCObQ9lCSTLo6Ne7m8iqGgekSoj0A8jiAVZP2XR+aOwwooX8ZIbfUQwPbCMwSidcxxcpagyiWBQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by SN7PR12MB7910.namprd12.prod.outlook.com (2603:10b6:806:34b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.19; Sun, 24 May
- 2026 13:59:48 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0048.016; Sun, 24 May 2026
- 13:59:48 +0000
-Date: Sun, 24 May 2026 16:59:38 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Yuyang Huang <sigefriedhyy@gmail.com>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2] ipv4: igmp: annotate data-races around
- im->users
-Message-ID: <20260524135938.GA86099@shredder>
-References: <20260522093906.39764-1-sigefriedhyy@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260522093906.39764-1-sigefriedhyy@gmail.com>
-X-ClientProxiedBy: FR4P281CA0386.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f7::14) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	s=arc-20240116; t=1779631558; c=relaxed/simple;
+	bh=8TQjkN5esIY4JTkBWoE3kbw8zEGScDUqZgudxPBLziU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y8SP626KwA7hgovZmbx9KdOqjDC+R1RywJ2ed8mjEgBsaXztbi1oMnn1KWCs/hOE2W0Fw9NTo5wXY9AyAXu/sOyVD5TWmQtq9liwyzUouG3Zv/vfN1g28K+KTjNwjMP5ikm+hcSbzDQZVUIUutn2nQfCbcAOqxzKULAWqd11dT0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PyTeYXKE; arc=pass smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-39394e1e8f3so84286711fa.1
+        for <netdev@vger.kernel.org>; Sun, 24 May 2026 07:05:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779631555; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WWWPKafbwBOB++3RnCeXaQefAwkeLP5CYRFMz93awQHjLFofHNhfwoD6kbxwfeOROR
+         eMasAoa1LvL29i8pUnJhQ4ZY02Liq2KnwWYS4IW4YE3sdB6NCiu38/bvR0eAmaG5q+zM
+         rjPsO3G18+kNP44xiRNIScPm6IkaDLaWeSL6PS/nBUr4RkbwyYTI16Hsx8xZXvKGWjqt
+         TSKotHlT3v1O2nocbQ6odVCmjuv70FfnEnY/Z0wlqgXcsPIjIzZDZ5gYzQronYGgmCtT
+         bvEtHmHmjBpOTizLJBhCu+Eb5384NcjGLk5OV1YOgqD4DaLe62r5xUnuzNDH4twfmSZG
+         +bOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bdZwTivBnLw8YN6rzJBlkMLCMU1ux19W3OI491gIMvA=;
+        fh=pX1MLrLh4qS9s3SYNntMEwhmAhGZImmbWJsHiFoUEOY=;
+        b=CEiBWKo0XyvFWJ/ptGppPdZEOpxfxbqOM5a2wt6OK5Y+mR6rih+4m6Ovf9fy+gwpI0
+         uFDIVPHFVl8ULLIrslDTvPTOuPs1wVBRRkAMQzFEC0KSa2zJyg01OEInUye1aUlSJcZt
+         /hO8q7+anURMmaPKEYKCku4zW04z/3i7B9uhXqFqFlDcNs/8JgulIFXuhqWp7zC6gVjn
+         AjvE6hSmGrxUq9+MfJoIe0WBnZNprjD89S+JdCC/jltgA1EO7BHmDmdMitXefrKAoRzc
+         0Q2h9LELtXHw5MmKZ1KLo5YD8/lTmzHMWa9cl6pP1OMhWp2dNFuO7iOppl0eXtYVXcoc
+         E1Zw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779631555; x=1780236355; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bdZwTivBnLw8YN6rzJBlkMLCMU1ux19W3OI491gIMvA=;
+        b=PyTeYXKEnDYryCe3Uf4m0Ry0tQSsiiXuU8lYOlmFSevojg5rbohBjMuird80Ct7qqt
+         /izAsxF1DqMHAZsDlTP2VdFslzQndhO+d0Jx4ckWyzIaMXImfJaRiFgwIE8Giz01ushQ
+         b0TEXGg5OaJwLxS4nOXDgdysxmSXS+9GZJgzhULDBvatH1EFAB4aZRTtwCclwyW9Abc3
+         TuAypxlvC3H8WerKYfCtl4T2a0Pu3mhux5b2SSmNFG9pW2WsSziMLD8Gx6WfLfUebt5s
+         XmzUokhdlDfW1Fu4I+wsDvSVAcEQMey2CPsqpFLzx0BbS03rrrG1MfJGQXZxrMuq1zH7
+         2K/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779631555; x=1780236355;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bdZwTivBnLw8YN6rzJBlkMLCMU1ux19W3OI491gIMvA=;
+        b=RLISgRQwu4K8Q5rzCVuK68sWnwZO42z03JP76nB2J7tB9iHKpDXQpkbRh3fJsUwI/X
+         I6+4tPMEYpNn4X+VQXxaZPe/87rcdGe2ZpguMMweL3thkobgdnI73RoomtT5x1qAGM+O
+         y3x+vOcTbDRU54x51oM5B1FxhKKRJ9t+/1sueSrnda9zDOrYtQ0Z3SYrV1ADZgvGyuRH
+         0WelgtN47zIv6B/63TIZzpjiacmd5rubQfirmnZa4iM6SyB6L0Ojv9d9rzm2Be9XxH4f
+         pnH84IOvVajN91R2XBg2YEagPgHmw4NWQfjshhdY6klswFQ2gU11Y11qTxIyZGkOiNZP
+         mNcA==
+X-Forwarded-Encrypted: i=1; AFNElJ/NFsQuHLOxEIfYMc5yPrVrv1DbRA68aMFAFFAMGtcm0UnKJodTELKzbb+CgeMoMPaU1Y8F9b0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPskYIxM5aFAPGXXfCPKsU+PYVz+mlhn5ja5akEl6oDNjc2iKG
+	ypygwoudU73lntQ3fLESJyuvcfdyqBrixjIfME63mduM6TKE3DY5o7yTkx1w+a0TLxyY5zxWgNS
+	BbxXKFrt4A2He9Sq1nRzwvxabcjQpY3U=
+X-Gm-Gg: Acq92OFbl22/Dtj8/fitG9QOQ2jPZXSa/VT49J6l/PpaPkfwRKZ4XhOX180ICsqlKCo
+	Ejaz5IAXgC8T+kz6QLrvEkeTsOJ8WyEfC2xNJKCXuXdLtC8KqK5V8smJqRWUAJ9mRpJ/sN4g7eT
+	TsZEa61nnOAHkZUrAjiE3KLMOnmI3834xUyKLRTPGv3BMYqCiO9/8VYZrzY8wY+nEDS3nokhvaK
+	5KrFV5D1GhT6u08svgHoSvJEQY3tRoXJbSojbE67Yet0gn/x4eM2Pk21IWK3BDa0cbbRogAURLy
+	LGyRFfq8bFWWLuH1wDMGxbrzMwEt95bX3q6NCmv0
+X-Received: by 2002:a2e:940f:0:b0:395:7b52:6b09 with SMTP id
+ 38308e7fff4ca-395d8d62838mr25850021fa.26.1779631554617; Sun, 24 May 2026
+ 07:05:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SN7PR12MB7910:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce7ed74e-b741-4edf-8c0a-08deb99cb7a6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|22082099003|56012099003|18002099003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	CPyMtmRel23Rq6MNhsnpIO4STThbHWjTFKHzmg6PMz4EmK0Df1rrGkZTTFAEuqMmW+ScVTL2AO/2S0I9zTkHFMBagbGSjIaZNXJLUn/0JgI/3xTYtuVRrZqldDd7S4k1jsmy43fYmitQ56khfd+Jqvlfx/hSVsXRE4KQz1tuMaYtUnqACSUGZSEiJ8vCWiJ0/A3kHVj1yXQCTXUj6aE8K+JQD222OayJFoGHYxGEEnEzhAdTS+COrALbxfUtwZp8IT/+HYNqYerPrqhB4yhd3eC28mgTqocP+Jp1X4LttK5MOUhzRGQ8MaTl5xHdUwujLIu2Hyz6u5+29J1h4BHEDgZWt9iOAzIiynNefAUVbnaC/8FKqcuTJOotYXWnOW92pHlq8ZI9aGcSoyt9j4mWl0hW3YuBhoViks0gEGReETVdvGClc0aWV4etUM0hqdeHTWhdEhtIyGUBqY6YX4P4FDZQhMyA3pMge2a91Z1kNbFcVy96GanPgPEmwBsQR/fHg+VTJe0y7FjrCw+q8zwF5aWjh1cdPKww5IPA4f2ot54O541f2PKkv/PVFPMOS+rdgWB2SvmIwV9F+cYaHGhyJgqAS9m5nk3GP7gHXdCny2tiXkB0bB/BWmgcddAbXZisNyfY1bcTNfKDaLqgjg0IrKg3sx3Z9oIsbbKQJ5aqzlOKam68ya80ljzxM0wlaGsE
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(22082099003)(56012099003)(18002099003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?pGQk/5y241Orc52qhm48bk40CgWrg554OeyRDwaeyoIqvMa+wEl1h14+MdR5?=
- =?us-ascii?Q?FlnqYZHib1X8fXfsHCmWsAEfHGJEPze7kKgn1oRpD8W4Vt2awyzKkMgPa3v2?=
- =?us-ascii?Q?XVNjs9igkNrQM76I9zaLMjeBni/9SJjvJn5+nsZ4L4lzb/hx1ysUCnj5mMQO?=
- =?us-ascii?Q?9m06zlKse3jOdzgqOKC/tm5M75EK49kOOiIepXHWYEtNe7Gf0nmJ93HZUhWM?=
- =?us-ascii?Q?sWtVWdBSv7gbl2QhQsoeYyJDbgSpg4jGvYPINfmI2ApNbE/hhiOgvBb27j0X?=
- =?us-ascii?Q?cq3/lOnqk7jgvQPipANtz1cWeoWJGA5mFZtsOmalr6jWftiRSh7BFBFT0uyx?=
- =?us-ascii?Q?Vbi3TKi7+upcgkJZn42z5/u+6sLsmsDeQbC4wn3Ibp0Q9iWsVmWLnbHbDSoc?=
- =?us-ascii?Q?J5Vfzf6dHbe1ZHMANrgJ8mpEfi3GHaytv2KYRKQOKBFJhaf78POzgtX6HnPB?=
- =?us-ascii?Q?gRAbDQ1yYPThQDz6JRLOCFp5oEsgaaM4X5hf400SawNffhrBc/ue9PpeF9Bj?=
- =?us-ascii?Q?jiJUy7tZjqadYy5WtR6d9lsuMbGAJbsaFldqVFkimBs4ThsZCUXWhazYOSHy?=
- =?us-ascii?Q?eiapFmy0J/MyQMHTzf+dtu7thL5FN2bdodRN/W9q8JvONHN5mNgUeYOMUMZH?=
- =?us-ascii?Q?HQc58aDR8fI7/PfuUDt99LCA9ekqff0u/2sow2/WLx4rOrdiz6af/3/FzeUo?=
- =?us-ascii?Q?NHdxH5/s3EH2C6ZGwCggfXmCa+JHfT4UN9X4BqoWKc8xvz0nxq7zBqb1v5I4?=
- =?us-ascii?Q?kIE7d29+PGP60eS1jnCxSV2wJindFRqkgEQyQoy7VAULw9lH+rNJsLvUBHFT?=
- =?us-ascii?Q?qzq9v3qTIh4tw2wjxHKNCHJSFWthPid1FrcHz5+eKwV3dejVOKOOcIlmAAAF?=
- =?us-ascii?Q?ybBnEfemLYuYTu4p2jbqJBpxlsK3fRc5WaQ+o3neyatO8ytqDbhNaoWYY2wZ?=
- =?us-ascii?Q?98dchy4X92HWQN8JcXqOLnggOggGlxpDax+6ZN+YQ2u3uSQUH0s+qGbOgaxx?=
- =?us-ascii?Q?Aod7Cm1LoWsB+EdklwcLENyCR2m1IVh/Y0/Ag6FLcTR58qh0Sg5eYgq8rxcH?=
- =?us-ascii?Q?OnvJs/xRlvqft1YPXVFxUILrZkyPmhniEK69lj8Uj/BpmNPESlqqbvlR9Rdw?=
- =?us-ascii?Q?JWfV811I2jjotxZyQGeUp01XgSG8qt5UU0T8o89PP4iqpQI6nUJQO/aNWwoR?=
- =?us-ascii?Q?UrtDmQEg2wY2LJ853DmMeJ5kwu1ntOeYJlbjXfVQo50zEBxeZcbvGoAgdLij?=
- =?us-ascii?Q?yErC6lCrierkjVX0kbkjstTjIRZfCVEHjqAqVGpwEVuWz3nPNol3ndyHZEzu?=
- =?us-ascii?Q?vsuSvAsR06p1a8Oictp0ZQtnu/InVEmqPXerXFxON0wVvq8IpdsBW4sjoEih?=
- =?us-ascii?Q?8xUDRfHtSpj8YwNT0A4utVrleK0nRYITzn+cZfluGotKF/LJQsVewS8V7Kju?=
- =?us-ascii?Q?AJIUQy3yg7/pf0BzvFvJOhEiLecpnltewPvPzS/0plL/cvIqXrQOrzlKaLMo?=
- =?us-ascii?Q?K+/pByDqiOF26FzljDTp1iYOje5efq862SRgJT3UlS+tTK/N0kVJFRmrYjMl?=
- =?us-ascii?Q?6jIOyrpcv/8wUIgtgxN/fAR0/Sv/IQiLw5frdTmSBPkqhAts1CG8RDCY28b6?=
- =?us-ascii?Q?EkvYAY7YaWc+HZy/SH4k9MxQ694W8s2Npfap7DI4fpyMFlvVJ/46ar1UTgxP?=
- =?us-ascii?Q?8sJQQ2gSZel1lxZsTUvcNow8bcFDESOMUU+bxAIkf0exqm5N?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce7ed74e-b741-4edf-8c0a-08deb99cb7a6
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2026 13:59:48.1574
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EIhrPhQMhQw1VWowpKt7uZzuYpdYGTECaCgLSpzaQVu0EGiQYeKZVwDu+cDA237f/NGOtT/ESkcuggLOja13tA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7910
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+References: <20260522093906.39764-1-sigefriedhyy@gmail.com> <20260524135938.GA86099@shredder>
+In-Reply-To: <20260524135938.GA86099@shredder>
+From: Yuyang Huang <sigefriedhyy@gmail.com>
+Date: Sun, 24 May 2026 23:05:43 +0900
+X-Gm-Features: AVHnY4Kqvee_yxbiE5R0nFswj8TtcIKzHC4McO20sgJpwTUIO-vbgk5TbvB2Vz0
+Message-ID: <CA+7S2vJc7F__vWiprT9bT__+CUwSN_=jssAiu=GiLZG-Ho662Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] ipv4: igmp: annotate data-races around im->users
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291186-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-291187-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sigefriedhyy@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,Nvidia.com:dkim]
-X-Rspamd-Queue-Id: A3C125C2A1C
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid,nvidia.com:email]
+X-Rspamd-Queue-Id: A71355C2A66
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, May 22, 2026 at 06:39:06PM +0900, Yuyang Huang wrote:
-> /proc/net/igmp walks IPv4 multicast memberships under RCU and
-> prints im->users without holding RTNL, while multicast join and leave
-> paths update the field while holding RTNL. Annotate this intentional
-> lockless snapshot with READ_ONCE() and the matching writers with
-> WRITE_ONCE().
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
+>This one isn't necessary since the object was just allocated and not yet
+>published
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Thanks for the comment. I did consider not modifying it when writing
+the patch, but decided to keep it for consistency, it makes the code
+easier to reason about later. If you feel strongly about removing it,
+I'm happy to send a v3.
 
-> ---
-> Changes in v2:
->   - Added Fixes: tag
-> 
->  net/ipv4/igmp.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-> index 27d120183779..f2aca659b29c 100644
-> --- a/net/ipv4/igmp.c
-> +++ b/net/ipv4/igmp.c
-> @@ -1541,7 +1541,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
->  	}
->  
->  	if  (im) {
-> -		im->users++;
-> +		WRITE_ONCE(im->users, im->users + 1);
->  		ip_mc_add_src(in_dev, &addr, mode, 0, NULL, 0);
->  		goto out;
->  	}
-> @@ -1550,7 +1550,7 @@ static void ____ip_mc_inc_group(struct in_device *in_dev, __be32 addr,
->  	if (!im)
->  		goto out;
->  
-> -	im->users = 1;
-> +	WRITE_ONCE(im->users, 1);
-
-This one isn't necessary since the object was just allocated and not yet
-published
+On Sun, May 24, 2026 at 10:59=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> w=
+rote:
+>
+> On Fri, May 22, 2026 at 06:39:06PM +0900, Yuyang Huang wrote:
+> > /proc/net/igmp walks IPv4 multicast memberships under RCU and
+> > prints im->users without holding RTNL, while multicast join and leave
+> > paths update the field while holding RTNL. Annotate this intentional
+> > lockless snapshot with READ_ONCE() and the matching writers with
+> > WRITE_ONCE().
+> >
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
+>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+>
+> > ---
+> > Changes in v2:
+> >   - Added Fixes: tag
+> >
+> >  net/ipv4/igmp.c | 11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+> > index 27d120183779..f2aca659b29c 100644
+> > --- a/net/ipv4/igmp.c
+> > +++ b/net/ipv4/igmp.c
+> > @@ -1541,7 +1541,7 @@ static void ____ip_mc_inc_group(struct in_device =
+*in_dev, __be32 addr,
+> >       }
+> >
+> >       if  (im) {
+> > -             im->users++;
+> > +             WRITE_ONCE(im->users, im->users + 1);
+> >               ip_mc_add_src(in_dev, &addr, mode, 0, NULL, 0);
+> >               goto out;
+> >       }
+> > @@ -1550,7 +1550,7 @@ static void ____ip_mc_inc_group(struct in_device =
+*in_dev, __be32 addr,
+> >       if (!im)
+> >               goto out;
+> >
+> > -     im->users =3D 1;
+> > +     WRITE_ONCE(im->users, 1);
+>
+> This one isn't necessary since the object was just allocated and not yet
+> published
 
