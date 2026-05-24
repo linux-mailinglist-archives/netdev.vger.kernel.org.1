@@ -1,148 +1,170 @@
-Return-Path: <netdev+bounces-291183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291184-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qAhNB2r7Empj5wYAu9opvQ
-	(envelope-from <netdev+bounces-291183-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 15:21:46 +0200
+	id 0BZdORz/EmrK5wYAu9opvQ
+	(envelope-from <netdev+bounces-291184-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 15:37:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7757C5C28B6
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 15:21:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643865C2951
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 15:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B5240300A746
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 13:21:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A6EAF3009B36
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 13:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B6839732C;
-	Sun, 24 May 2026 13:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688BC396D2C;
+	Sun, 24 May 2026 13:37:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ZT7Uli7R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="djlXhBzD"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC2D3955C2;
-	Sun, 24 May 2026 13:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B372396B68
+	for <netdev@vger.kernel.org>; Sun, 24 May 2026 13:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779628880; cv=none; b=f95S/iNGoOUJEHwBMZlxLdYjs/zonAEh1D4o1vmR58Ddlew4Tu7pyKlDehr+rczuOeJJQdchoiF1dtm//mVSa5Ilo9hUpNf0ESjtloyfrTBuUME3f+c4Uzbf0LmPusMCgZEHI6ig+CTRcdwqk8uPj98rgJC9k5R772sXnvl2e8M=
+	t=1779629848; cv=none; b=Uz5IJmeByk3DioQIoDb7lras15Mw3x5R+rXilxwjKjnyPJMgs6Ta8A3HVhZNifrJPa5yT74RBFp+TdwOKOGoUjp6PIj2CMhcpRqH0Rrkj9/TIE2FvxmsY2hodCialTiRKgZehBBXT9GBDVl9SEZrPL8YmQ1Y59bvgw0uxWFg4Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779628880; c=relaxed/simple;
-	bh=U6Uf8gD7jpIRXQOX34jo0SNl+xvkQ6aC8EQr/68qdQ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R8DsdJRbLu7Cr0hsGIQM+1awOk7mjUn25HFxcWUdWNbd4Z5VIAMg+ltT20RZJ7Blsu3fssMKbLMQJJCzjUX3WJSBNLMKcLSrWmp6uN3n6nYUUxXb6AapWLkuEa3ukGh6Mxk5jvqludFDEDd1CkRvYcVXaKipeI2ViIMmYIuY5o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ZT7Uli7R; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=E2
-	bTdkxwgCOhmO5j4fNkWYF5jL+DpS/ehtig1jwq3Mc=; b=ZT7Uli7RhFX+B7Mu9N
-	iReEt/IZP0NqTC77fXCRNOodJuYlNB14wGLf2lzyCjgmjcVXQlqyapV4+ce6//Kt
-	oXK3sEe7Dr+rg1iFptyc6c1gDqfgb6u61haVA7yrYeZVV2jLcnyRfNzd3FMqPLM7
-	mj9jcRSGqRfKrFFqrnTv5aSu0=
-Received: from computer (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wA372Ax+xJqDI6KDA--.707S4;
-	Sun, 24 May 2026 21:20:49 +0800 (CST)
-From: Wei Qisen <weixiansen574@163.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	avinash.duduskar@gmail.com,
-	linux-kernel@vger.kernel.org,
-	Wei Qisen <weixiansen574@163.com>
-Subject: [PATCH v2] net: sfp: add quirk for OEM 2.5G optical modules
-Date: Sun, 24 May 2026 21:20:27 +0800
-Message-ID: <20260524132027.1550-1-weixiansen574@163.com>
-X-Mailer: git-send-email 2.54.0.windows.1
-In-Reply-To: <20260520151629.905-1-weixiansen574@163.com>
-References: <20260520151629.905-1-weixiansen574@163.com>
+	s=arc-20240116; t=1779629848; c=relaxed/simple;
+	bh=P7flB7wlJlTemBMOJ1CJhIGMof7wEnYxAdHRWvkO2pE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=j1dcKkd45/eyYBiEZ0wdZKc5BJoOmKhd5rBnKiuWUAz9LywbwipYUY0Uqw7QmUlJhUxTCZp4bbSpa6cx81kYpYWNmdjByIz8tH/6AVukAFZ98EG4S8X9fBniE3tHNDESJAlZjlsXHb0FP0cTV5lc8KM0Ev4JH5VU+NFeP4kGwRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=djlXhBzD; arc=none smtp.client-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-65c2cd216c9so7343569d50.3
+        for <netdev@vger.kernel.org>; Sun, 24 May 2026 06:37:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779629846; x=1780234646; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5YzZR/UW8yRfScwxVy4k+9Cx7IebnzhqtMNHTkpEuco=;
+        b=djlXhBzDweCzyq4p7iDDi1cLfxZyGhDt1ZNBnvkn+i8WQa1UVt6N9w9M1Y86PTYwxC
+         GLznfND7Jq/u35m69RY520XAg25CrHu/d4RG5rbIJWnShGT2V2prC10is7aq6K26OxjT
+         GFV4adNaVtfcKk4Urz4yCJF0Gswyk3PQ5fT70vUygD6/wOEzbC/2ePFM3K+3VIRRksq8
+         218A8S2lr/PyGGQOTo8OAqOmyX/D69DzgREWRmgluI8Nnv+754FpXp8GRX+HgnDsRH3u
+         xeZCQXFVuZCNQlKfcl6nybchf6/qzh2aGnlKUyEfQYMyhrvxG2kd2xdERuviZS7mKs7d
+         GL1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779629846; x=1780234646;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5YzZR/UW8yRfScwxVy4k+9Cx7IebnzhqtMNHTkpEuco=;
+        b=T/CELe4QEyKFD5lx6BEastlzuvzDhzEoSjH2wnQocwa2B9nkKlwTTF8oDFVm8gR3pn
+         7oi9FkKJFqRJweaqu/WHuZuK6NA1qNCo/aYTtMtqC5fyeyNtOmS1V68Ikkkx1ZTp5CCK
+         TqKn2M6Txg2a0RLqkDB+rFdY92CFIeb9AYZfOD71S73+ogQhhM1xCwpxGKih2doiHTru
+         aZZ99S3GXsTMIPDt4ziWLOl33H9KZLBtRv5xYeZesVYBqKUz/rpULvYrncBUyC31H1CT
+         26QLIAQqVx44K04rExmwjpZNkFM+OGgTfSOtD2ZKzrI5izS+fMZpWPe8h39LHUqaD2F1
+         +0ww==
+X-Forwarded-Encrypted: i=1; AFNElJ8EkX0NDETDv2rsemo6Ie4aMUvrjnep8LEtLMllsA87HVYODUiAFnH8j/Zeizz/WodTTBygmh4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkkCdvJqZqY0b6rRAkFFlCECRoKCHXYT6V1oS88tINTFeYxxxk
+	3EXpgJO833j01pUukFrl83uqHITVBzWzp7k+BlNrKUZd7qYvl8aK+DYz
+X-Gm-Gg: Acq92OGfuwWiif4fxy2xARpeINPbdGlcZbExsZduXaXeu+Dna0PBSjSplr8Wu6GHOmx
+	L6JBcdlpTdsjEMLY1xr41jHHPduIX5trHHJZrzmZiEhjXU5UuIBB9qMkKTSqrxgpN1QnUtkYiPU
+	lf9FW8du53hXPACWbjdvJAXm1HDUTOZxUCMzt0fELgf8JXcJliSe/KpG4/P5ycBV3Jc1EL+RS2N
+	CwXu3vTq9EcvEdAPTPg7bmJpSH1dGGV4f3e8vmr8MmtY0LfSecawvDt586hxJ1gHHKBuINq+5/X
+	Z8hN81lJclB+gj6R+VaxdbSMxG9kfub6wqf8ic4L/uUc6V9NATTk54msL6qsdDBcnVWT3YgnUXH
+	1HJvjdk3PyMaLtCc+W79QkwzaA+Sn2ZQ/67V0Hbi7fFg+bAu7J/++9uDkqqZMNnmxCocW8SHN4A
+	wlupzcigFWg8l9oTWi9WhbCEd1IeIkdcYDpfDqEa/q7EIbmktShNjIoUNvMpT0wSoRwQjELTJH4
+	8T196I=
+X-Received: by 2002:a53:c04e:0:20b0:65c:65aa:df7c with SMTP id 956f58d0204a3-65ec98ea7d8mr8460898d50.33.1779629845849;
+        Sun, 24 May 2026 06:37:25 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65ecfdf4bd7sm3163017d50.19.2026.05.24.06.37.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 May 2026 06:37:24 -0700 (PDT)
+Date: Sun, 24 May 2026 09:37:24 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: lazyming <minhnguyen.080505@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ w@1wt.eu, 
+ security@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ lazyming <minhnguyen.080505@gmail.com>, 
+ stable@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.10f46164d2a79@gmail.com>
+In-Reply-To: <20260521121628.309924-1-minhnguyen.080505@gmail.com>
+References: <20260521121628.309924-1-minhnguyen.080505@gmail.com>
+Subject: Re: [PATCH net] net: skbuff: fix missing zerocopy reference in
+ pskb_carve helpers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wA372Ax+xJqDI6KDA--.707S4
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJr1UWw45tF1fCw1xJr4ruFg_yoW8Xr43pF
-	W5Cwna9F93JF1Sya18AwsFkFyrWa42yFy0grWak3yruw45ua48Za4jqFyrtr1qvrs7Ga95
-	KrsxGFyfArn0kF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRvD7sUUUUU=
-X-CM-SenderInfo: xzhl5xpdqvv0qvxuqiywtou0bp/xtbC3BIq8WoS+zJLrQAA3C
-X-Spamd-Result: default: False [0.84 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-291184-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
-	TAGGED_FROM(0.00)[bounces-291183-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,163.com];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
-	FROM_NEQ_ENVFROM(0.00)[weixiansen574@163.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DKIM_TRACE(0.00)[163.com:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,1wt.eu,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 7757C5C28B6
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.385];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 643865C2951
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Some OEM-branded SFP modules are incorrectly detected as
-1000Base-X and fail to establish link on 2.5G-capable ports.
+lazyming wrote:
+> pskb_carve_inside_header() and pskb_carve_inside_nonlinear() both copy
+> the old skb_shared_info header into a new buffer via memcpy(), which
+> includes the destructor_arg pointer (uarg) for MSG_ZEROCOPY skbs.
 
-These modules do not properly advertise 2500Base-X capability
-in their EEPROM and require forcing the correct SerDes mode.
+These functions are not supposed to maintain zerocopy frags.
 
-Add sfp_quirk_2500basex for:
+Both call skb_orphan_frags.
 
-  - OEM SFP-2.5G-LH03-B
-  - OEM SFP-2.5G-LH20-A
+I think what may need to happen is to invert the order of that call
+and the memcpy. Current code:
 
-Both modules report:
+        memcpy((struct skb_shared_info *)(data + size),
+               skb_shinfo(skb), offsetof(struct skb_shared_info, frags[0]));
+        if (skb_orphan_frags(skb, gfp_mask)) {
+                skb_kfree_head(data);
+                return -ENOMEM;
+        }
 
-  Vendor name: OEM
-  Vendor PN: SFP-2.5G-LH03-B / SFP-2.5G-LH20-A
 
-Tested on OpenWrt with successful 2.5G link establishment.
-
-Signed-off-by: Wei Qisen <weixiansen574@163.com>
-
----
-
-v2:
- - Use a proper real name in Signed-off-by
- - Sort quirk entries alphabetically
----
- drivers/net/phy/sfp.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index bd970f753..7a865f69a 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -583,6 +583,8 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
- 	SFP_QUIRK_S("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
-+	SFP_QUIRK_S("OEM", "SFP-2.5G-LH03-B", sfp_quirk_2500basex),
-+	SFP_QUIRK_S("OEM", "SFP-2.5G-LH20-A", sfp_quirk_2500basex),
- 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
- 	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
- 	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
--- 
-2.54.0.windows.1
-
+> Neither function calls net_zcopy_get() for the new shinfo, creating an
+> unaccounted holder: every skb_shared_info with destructor_arg set will
+> call skb_zcopy_clear() once when freed, but the corresponding
+> net_zcopy_get() was never called for the new copy. Repeated calls
+> drive uarg->refcnt to zero prematurely, freeing ubuf_info_msgzc while
+> TX skbs still hold live destructor_arg pointers.
 
