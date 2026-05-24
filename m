@@ -1,460 +1,212 @@
-Return-Path: <netdev+bounces-291147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id c7EXC12dEmq21gYAu9opvQ
-	(envelope-from <netdev+bounces-291147-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 08:40:29 +0200
+	id u1WFOgupEmrL2QYAu9opvQ
+	(envelope-from <netdev+bounces-291148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 09:30:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A9DB5C18AB
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 08:40:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF195C198C
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 09:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C18DE300D338
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 06:40:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E1E3E3004CB7
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 07:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712F738D3FD;
-	Sun, 24 May 2026 06:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7B6390214;
+	Sun, 24 May 2026 07:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dZLjI4YC"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Keyt6rSv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010016.outbound.protection.outlook.com [52.101.69.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15A038D3E8
-	for <netdev@vger.kernel.org>; Sun, 24 May 2026 06:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779604824; cv=none; b=kEV7mddrAlgbcz0T8GbfoiOuRPnRNY23Fin3W44Xh1zWazfsF/SVZij18w6yOc9PYOCaAznuVX+Z9F9KLyEaV3Ge2xX1SgBS6nEisC8RRr4+vditH4L7ZPtjzGDBlUcSVDFufHFgyzi1jxOghUjaX0nLHeh9pAmV8K2Sa3H1sbg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779604824; c=relaxed/simple;
-	bh=P04mb+mT20DBKkOXv2/0VC5JxFWirmaqXYsC4UcBdPM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QFIp3vzWrpj8Mo2buuZIo4Q2r5cQEbviD0I8UZEK4ZhF8y6Hc4MaND79+oTsZINF5a9jjyAyTINvuMNt+T3l4iPtWN7Uq76KtxIoVvehhLcykdapusMHqgY03LNu3+olABfXjDohAXynPjcGwz96ErBlG6Ih47WXf1Mrn0nmlMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dZLjI4YC; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-36ad15213fbso21332a91.0
-        for <netdev@vger.kernel.org>; Sat, 23 May 2026 23:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779604822; x=1780209622; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6KsHEd7B27KwA9RN6kTdcgaeBrmbNHF/YD5HQcWnwWk=;
-        b=dZLjI4YC/Fiw0Q4PkQOtx6jT5xoTEYqvSgPkX89c/edADz4ac9OG4+WLCa0kj4a8s/
-         BOV9enCOpsdlVxnfrSSQgBlqXbbXUna+uISjDurqSjYOn++bmksdo9ur6V6o7kGm6WFQ
-         poiIVnUjo27BmGeLAv0v6+UoQg+iL/djo4uIf1KPO+Nkcux/MAjm4oZMYyFTREUX6Vr/
-         VAW2WgBdOXeT/zOFkPYJAse7l6ap8XTeYRD0lspATLAXvseFD27YCq4QE8/QSuXdrjJS
-         YDEru7FObq9tdpO7z7k8kMY3vwTXVFKwdSQz5KrMfymMpQNHWbG4kSRf5po7M6inLXf4
-         GYfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779604822; x=1780209622;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6KsHEd7B27KwA9RN6kTdcgaeBrmbNHF/YD5HQcWnwWk=;
-        b=WzqdJziwagzWzsQUC2ylFxzq0rOucXcsOZPJyMcQ/TEKK0EBhZRsOgKbxuIil21HiJ
-         r37kzqDpAkShBsSd2kpP2PF8Mpfw4SRnTClZWy/ylNKDN+R/wKAh3KiQDMusshC47ToB
-         LVgk/CZzUthVHKg7tjrbP2cs2Xk8wKWJHpJxj7/Nq8lSiklTXMuz5QKA6cnHg8Bn2QA/
-         5pp14ZC94wyT+ZCT0D1gYSyMMwI1DhTbA4A2NKY37yKgZkTcWW80BinGHLc80QD9datS
-         7vmtuN7sellJQjEmEzYnb+Zx45Bz3ZGFEa2kyeqPIw7tHSWzPzlss+asMlXtMxcIfaNt
-         oMEA==
-X-Forwarded-Encrypted: i=1; AFNElJ8ezujooJKKyTKkCgSmoE8s8VikJj14PyczBfTow4yDYgJp+JSbDgPB5lLLbr7vbI2BMQjdtSI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzj3n0jTBkA7mjgCpleV5g/9kO6NQUd/8Ze6/rQHnV6ZMeX5EHy
-	3fU0QrjW2l+c3QZBB4q08RUF8YRxnU8x60VESmnevs5XqgLF9Cild91Q
-X-Gm-Gg: Acq92OERJM0ISFT7TMA/SDaJd/NB7gdOP7ZsgTMOEeEm/KMyElNNvG79YOrHKNqBNLe
-	thKUsNzQstEsluUSPKumI51n3Mys2jz2EewhQXrer7w+iJFNTzVYNVY580UKrhbH4+Wq0mrolHY
-	c0bfUIeECUkkkwCp5bnBMCfc3I1gtk9Jh7bNBfELjP6IRiMUY7c1tQE4X2bCNvED6Ug/vmmKtOO
-	YPyrgToPuQZStjx93e/6VdE1g1hUDwIYiaI0WjzeJQQPUxWvp25MNleRMQGN5rGa8hS5temugUL
-	XsoNy1sBevi5pQYhqev3lRV4mCQwpHerXnT5YTmsvvcz6FXhPMJYZCxl6D3LvjLbBpJ5QoXD/9M
-	hJ36WWnjGXG78hOfcWTIza3BtXD3V2D782AX82R6S6j0XqZ7z1Tcd/p0eYogwO0KBSGU8eNTnoU
-	Kbc6VVxHrziyWpLzGorcC1ZZSEgfXUUxxRit7CHVjs1ohHuRgOq2ViTba9iPx4LTgOakZOjeLnG
-	avCfNzQG37CSxyctoISMg==
-X-Received: by 2002:a17:90b:5385:b0:366:346a:6891 with SMTP id 98e67ed59e1d1-36a67836e6fmr10002511a91.16.1779604822056;
-        Sat, 23 May 2026 23:40:22 -0700 (PDT)
-Received: from localhost.localdomain (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a72c913a1sm5745659a91.15.2026.05.23.23.40.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 May 2026 23:40:21 -0700 (PDT)
-From: "Lucien.Jheng" <lucienzx159@gmail.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635BE38F636;
+	Sun, 24 May 2026 07:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779607813; cv=fail; b=DiHqqzvKUFzYQJtC0siiSIH+EfzaRMDbyeMfCNCEETLSgVfKI4WhuQbOsuphjmhpAWbvdzt+fuvdDbaXIXX+vOrHvcZseXcujfg1EClDgr2hxOj4PHO8f34YBiaxWubk9CKz0Ox+TesNwtZwx/U8oYvOHzAOI59ogU4NYmzN6z0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779607813; c=relaxed/simple;
+	bh=OqxY+YP86DaRdPF7sMB0z66qrDRty9KWlrcAcURxVHs=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Mo2jBpLxwCmRNNIlYosFTxks8XXgryoSplZ0cdBLx9VUPp6OpYi3kBrMts83wLfbuwNUobtMF1qgCDUoXhEUjINQsMlFgBTJ3iH5bQbOnZhw6yE+eGMCxSFWMTHSnKtForndrK7MF567jebTQ37s93J5PpRrEnN7gOlUiZ6BDxM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Keyt6rSv; arc=fail smtp.client-ip=52.101.69.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=K6x/GgJP6rGOhCcKkNbS2LDGHLG++O9RwV4P3Z6ZZHUFHVBhjfRFkbsqT3gCf0VTDhwqGP+hzbQJiutza/KrVFPOeoGOE1X4wgzW9LRhJae1ox3O3fkgEGFLD9mk9KcmHijOB8PoJRa4hzrgfw9hu17n6MMR4JWdJ3c+sE9e4Le1uEg1IvLSGiTRwz52vyHB8rHpnfA85S/hkZl9O9n9Un5Tr0DCNc97BF11JGfBFPvEiXS+CSiTtESpb4bMlUoIGj+VDYi1AYmYolVPTJerswJeehhfmGhs2R18CIxZdT9Y/vUftocfyFaY9ovD/bYH3KnDJ2zL/CNyZTpcXqft1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=frqcSUZ/Qf+pPkcSzwOP1bg+8n0Dko7++QmvKILKwVU=;
+ b=i5eKSu/Gd/M2Bip+/NMaiS+jD34S4XfJPKlZMpmnShtqSQMjWnbGQu6iSIfF4l6lCishm4LleLhmXk82917KgwZJ5zo9/cEIWCbrz4Paf1LFRNTyk70n8cNuvZv6xjaqS6ASOxrI3TK46X9GxfOlZw4C1DiT2O/N0/Og/LOWdljmyyrgNnv7IUq3YqoOGFg8rGz8+3Fk2naonplyBLuO3NLgixY/1Tko6AEA7AhixCMB6QXJQaUNcpXHHjK+HpT5zhjwYAbCaW01c0UiVOTQntfRmE3mr2JDPFHMWlRY0yyxYwfHBEEPe/SmSU11M6RwFmC8bnaR4XdK3sgvWpzsfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=frqcSUZ/Qf+pPkcSzwOP1bg+8n0Dko7++QmvKILKwVU=;
+ b=Keyt6rSvmxWm+WOWX+AiuyKCapYqhBFM9j6SLJ//LRzrIa/e8+mVmobiQL8f5sfUsX4Do3AQPgtMYak0sJiNr5/GXYWvWm4WzxUa+/uNDXRYBDRYqY4k+C3hC27+O+Hg5RlPfeIoFwr0mCszwWhNnnahAzAQzzwXvxSTKGdn2+vBVRu67Q5MLdezMX4pU23ycvsV2xCkVy7tzWRTuIL15ncZTq/a8bWhnYbBlzL/Zi4wjrK2DTnx8p3FE3YvDB9pF/j9dlCtkPUvSANPZpqDDFXCGqXluqaNcSId7nFX0G5qDE3x96aWP80rjctT/45aMV6oDdbphIWl3/aqMbMabw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by VI0PR04MB11784.eurprd04.prod.outlook.com (2603:10a6:800:2ea::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.19; Sun, 24 May
+ 2026 07:30:07 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.21.0048.016; Sun, 24 May 2026
+ 07:30:06 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	olteanv@gmail.com
+Cc: imx@lists.linux.dev,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bjorn@mork.no
-Cc: ericwouds@gmail.com,
-	frank-w@public-files.de,
-	daniel@makrotopia.org,
-	lucien.jheng@airoha.com,
-	albert-al.lee@airoha.com,
-	"Lucien.Jheng" <lucienzx159@gmail.com>
-Subject: [PATCH v6] net: phy: air_en8811h: add AN8811HB MCU assert/deassert support
-Date: Sun, 24 May 2026 14:39:15 +0800
-Message-Id: <20260524063915.47961-1-lucienzx159@gmail.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: dsa: netc: fix unmet Kconfig dependencies for NET_DSA_NETC_SWITCH
+Date: Sun, 24 May 2026 15:03:10 +0800
+Message-Id: <20260524070310.2429819-1-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI1PR02CA0025.apcprd02.prod.outlook.com
+ (2603:1096:4:1f4::13) To DBBPR04MB7500.eurprd04.prod.outlook.com
+ (2603:10a6:10:1f4::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|VI0PR04MB11784:EE_
+X-MS-Office365-Filtering-Correlation-Id: d265b288-ac42-4894-d927-08deb9664724
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|19092799006|376014|52116014|1800799024|38350700014|56012099003|18002099003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	Moq8dHK1Zkuq89c5YogWzg5JMpIU+lHSXUWWvYp6Lrii52iBYctT/ap5vKDG1RlS5rXz+zz+zpUDaEbf6UzCQVnepkeo7X/yG1yGXe1Xl9aia6kUtf7mUuQM1POxhn873UZiAdEixiAV5BEqPAkj4Ivj+xWIRcBYsIx9cxEI8EG7IDv6gi/J7m2Ya6Kxc8sGZ5HEHrxdY5qz+mfRNn5AhdbmULSw8OT/9vxmzSoE4T1J8GU+zWA+//wIxdcypRX/iarBVF90hCl7PWA2vdqmyUhlto+g80+b8Gzqx4179kKoyK9nNhlLPMQeN/Qz71A17P65QW07C6VPFdNkbqYzOKpl9abbyDabADGGyrDnXfUwBK6uXWxnjDwIQZQpYFzBUKP3rq1GNmHZJ3LYG5uEPHBzFLIJt4vn+WLRk5sX/oNT8YhavIgSYyQktTlCO97HN6uk4KQEnKeIHYB3m+x208Cg/21jqnaJtcPxsMsDxQIeKk7n0UB2rIaXk3zdowHLZrNmmAziaiAWGZRLHGBb/m7iHE+AKNxtoWryM5/Mhk7megkjAYSNg0TQGcGsSQdIfCy1YUXqugryvJIY5kP8ITb/9Wx5VeSlUgc70TJSLDQ+C68YmyETYuu4eVAgPkSzSYRJTjC2RNpr8vDN6xxN3EPUhjhWvjf0WovSbtniDIyQCKyMVN+ipDGrJxaBnHWoOhczONht5I/gGT3fC7kKyGGBhlL5hHgG49mRV5c2gMKNh2WKk89G2Z93b6BLdSa6
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(376014)(52116014)(1800799024)(38350700014)(56012099003)(18002099003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?SjUP30OUtBaD82u37IxnrBWbo0zBxL5Mz2YakH/EAIPMr7mcOpOw3+5iCF1J?=
+ =?us-ascii?Q?jsWnILfPdB6OpPMQyXiEfnjFhiN+0jY7OCpU05AngO/ZMF42hNNSfDXfr1cQ?=
+ =?us-ascii?Q?1mCtmKE+0aBYNJNGp3MAMXy7G5tiP0BjUJ3so5rqkk+yaVv25QsYM+lC97cT?=
+ =?us-ascii?Q?KQrT1H49UoGpvBHqo75VEGTip83Xg2dbfJGx1fN6ZclFcTkBjq5LJnEfo5on?=
+ =?us-ascii?Q?PEsAM2QwPIJXmWYTs9nVWhMaYTmOvj+dvZKlllhJ61XCBrcJOIN/iHPoq0QE?=
+ =?us-ascii?Q?Tp9UuDwJym2sJp8uxQsAwsWVc547K464+0pvdeupKxabuPW1Cgku/S78TX1T?=
+ =?us-ascii?Q?ALiT04SxnnqBEl4em53valdtqha13/ohbOuxcmdQzfBmK96/JtMStUej7yEw?=
+ =?us-ascii?Q?ZB0VDcq0JVwqND7qJ54V3A6vUOHL2OGPnSdhKTNvJYiQfT0Fbq0HljibDWxT?=
+ =?us-ascii?Q?PA5qvtU0jnyWIRzxgpELL/hFj2pvsrPr26lHsjChcOs5wJrvd3hEgTQ+6xps?=
+ =?us-ascii?Q?iOFwA7boCj6ZsjECu39zBYUqFrkMlhk1mHRZ5y+2vNZAyYbZiMLMYScGO6MS?=
+ =?us-ascii?Q?aN2EmZ0EmbJtoojtqTaspyo71csFX0C3TafaJrsr/SttLWwbdCFKKhXacLyZ?=
+ =?us-ascii?Q?YL+f9wIoMeTGLAIfvqEtlQYsbMTGMmc1AZmHD9j+gshPVInJo/4n81GjhfvI?=
+ =?us-ascii?Q?v8vryEszG2AnFUDXUiRLT92t01/XUEPHx2g6C+DqoDh9+H97n1rAOA6Tl4tZ?=
+ =?us-ascii?Q?CPLID+cImWxneUAHfWIAp8VR1+Ovg7muRoW8w+WGs+DeW/WM84cC629fYv3/?=
+ =?us-ascii?Q?cBTQKdTznKXPqWP/2zPw0LckE1RFCv3ijnB6WOO7dnvlpyzfxux75jdhPz2k?=
+ =?us-ascii?Q?vpSvfW3p3ddbYosn4MTTN0l0IHL7tpEhPZ+ASk0SU1mA1IdCAgVmzsT0HhsY?=
+ =?us-ascii?Q?N+eoaF2/YVwkyzh0IRQc5ArncmKBSI1F61WX9xlASyq6ufBmGwuXXBfLy+aT?=
+ =?us-ascii?Q?98cM4C4T+c9ZlcrIlqLDMtLukTJu4RgBtsgt8xp2LhmeasHVcOFfi9T4cFLu?=
+ =?us-ascii?Q?felsqbQ3x02rBWH93FxwUYnk1IQCHqk0VHtHBNuj3QN0TL5tejD5yhhub98l?=
+ =?us-ascii?Q?wQj6s6RPzKv2II4+seLcMK6MQHN5qoeeVqGjQBsvp52GVTCWDg5igzaKkMYL?=
+ =?us-ascii?Q?qVk5dY1RXjyKoCtlN2UPTGbpdRdwzrP+USzvA2ysrQHo6E4nvXs4aNlOaKp+?=
+ =?us-ascii?Q?SFXJLHDP0CG77Mda3cbdM9J/gZeqp6b2oWLOzYtut9aqKmfDg8aWT29hewPi?=
+ =?us-ascii?Q?ScaXTAWmoTIiOju6W1iFSswJ0WiBY8UTFHoBAWMmAnBfu6BfKQEe99QRuy+b?=
+ =?us-ascii?Q?OtohPLf8Zu1HAfRNBmZHHp7WXh40BE8lxEJo0Y8ntfAZ6I43oOASNwgD7PBM?=
+ =?us-ascii?Q?KCXwJeAx1/iLb9LW4TJEDohn9R7MRyuWyKAc/FQ/IBw6gqXNHbYlwySIIUra?=
+ =?us-ascii?Q?cHtvT4QCuLfcdt7R2jutB81p+1fV4gGzUNIfk8L2Y2HKYs83Y7SKrAcyU5m8?=
+ =?us-ascii?Q?BJ8GBEJJuiOCdz5ES7KVw/Uy9tIyeg+9XhYIO6u61shddG12DsbGXb/tCOS5?=
+ =?us-ascii?Q?0H+KUtmdnoAre+9JjzAGzNr3j6G65P8L5CgLh+Wz25TNs8GWCcoqGf8iiJQ9?=
+ =?us-ascii?Q?1+LUVoVoYfHRvDuDA3GyJE+g9J/A9iWulYzYXNLdzGY6frM78pv4m2gCysHg?=
+ =?us-ascii?Q?VKOxcDVIKw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d265b288-ac42-4894-d927-08deb9664724
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2026 07:30:06.6973
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TGyDd3BqEU6P3xNYmSVp4ZYJCBqUTGUA+TEDUTCQSIW/GhD4MSRxOy4MVAuQ40pp61RodFSEwIevLXVH4yv+Nw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB11784
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291147-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,public-files.de,makrotopia.org,airoha.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-291148-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienzx159@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 6A9DB5C18AB
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: DAF195C198C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
-Assert the MCU (hold it in reset) and immediately deassert (release)
-via a dedicated PBUS register pair (0x5cf9f8 / 0x5cf9fc), accessed
-through a registered mdio_device at PHY-addr+8.
+NET_DSA_NETC_SWITCH selects NXP_NTMP, NXP_NETC_LIB and FSL_ENETC_MDIO,
+but these symbols depend on NET_VENDOR_FREESCALE which may not be
+enabled. This results in Kconfig warnings and linker errors like:
 
-Add __air_pbus_reg_write() as a low-level helper taking a struct
-mdio_device *, create and register the PBUS mdio_device in
-an8811hb_probe() and store it in priv->pbusdev, then implement
-an8811hb_mcu_assert() / _deassert() on top of it. Add
-an8811hb_remove() to unregister the PBUS device on teardown. Wire
-both calls into an8811hb_load_firmware() and en8811h_restart_mcu()
-so every firmware load or MCU restart on AN8811HB correctly sequences
-the reset control registers.
+  undefined reference to `ntmp_bpt_update_entry'
+  undefined reference to `ntmp_fdbt_search_port_entry'
+  undefined reference to `ntmp_free_cbdr'
+  undefined reference to `enetc_hw_alloc'
+  ...
 
-Fixes: 5afda1d734ed ("net: phy: air_en8811h: add Airoha AN8811HB support")
-Signed-off-by: Lucien Jheng <lucienzx159@gmail.com>
+Therefore, add "depends on NET_VENDOR_FREESCALE" to NET_DSA_NETC_SWITCH,
+ensuring that the selected symbols NXP_NTMP, NXP_NETC_LIB and
+FSL_ENETC_MDIO, which all depend on NET_VENDOR_FREESCALE, can only be
+selected when that dependency is already satisfied.
 
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202605240046.8MvKuOMg-lkp@intel.com/
+Closes: https://lore.kernel.org/oe-kbuild-all/202605240706.EuGmnrz5-lkp@intel.com/
+Fixes: 187fbae024c8 ("net: dsa: netc: introduce NXP NETC switch driver for i.MX94")
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
-Changes in v6:
-- Include <linux/bitfield.h> and use FIELD_GET() in __air_pbus_reg_write()
-  for PBUS register index extraction.
-- Introduce AIR_PBUS_REG_ADDR_HIGH_MASK and AIR_PBUS_REG_ADDR_LOW_MASK
-  macros to avoid open-coded bit operations.
-- Add an8811hb_probe() comment documenting PHY strap constraints
-  (addr 8-15), explaining why PHY addr + 8 stays within the valid
-  0-31 MDIO address range.
+ drivers/net/dsa/netc/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-Changes in v5:
-- Move the version changelog out of the commit message;
-  keep it only in the patch changelog section.
-
-Changes in v4:
-- Correct Fixes tag to 5afda1d734ed.
-- Refine an8811hb_probe() error paths: split cleanup into err_dev_free and
-  err_dev_create so an unregistered PBUS mdio_device is only freed, while a
-  registered one is removed then freed. Simplify with fallthrough pattern.
-
-Changes in v3:
-- Register a dedicated mdio_device for the PBUS node (addr+8) in
-  an8811hb_probe() and store it in priv->pbusdev, replacing the
-  inline addr+8 computation in v2.
-- Change __air_pbus_reg_write() to take struct mdio_device * instead
-  of struct phy_device *.
-- Add an8811hb_remove() to unregister and free the PBUS device.
-- Fix error handling in an8811hb_probe() with goto error paths to
-  ensure the PBUS device is always cleaned up on failure.
-
-Changes in v2:
-- Rewrite commit message: The previous wording was ambiguous,
-  as it suggested the MCU remains asserted during the entire
-  firmware loading process, rather than a quick reset cycle
-  before it starts.
-  Clarify that assert and deassert is an immediate soft-reset
-  cycle to clear MCU state before firmware loading begins.
-- Add Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB
-  support").
-- Change phydev_info() to phydev_dbg() in an8811hb_mcu_assert() and
-  an8811hb_mcu_deassert() to avoid noise during normal boot.
-
- drivers/net/phy/air_en8811h.c | 153 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 149 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
-index 29ae73e65..a86129ce6 100644
---- a/drivers/net/phy/air_en8811h.c
-+++ b/drivers/net/phy/air_en8811h.c
-@@ -17,6 +17,7 @@
- #include <linux/phy.h>
- #include <linux/phy/phy-common-props.h>
- #include <linux/firmware.h>
-+#include <linux/bitfield.h>
- #include <linux/property.h>
- #include <linux/wordpart.h>
- #include <linux/unaligned.h>
-@@ -170,9 +171,23 @@
- #define   AN8811HB_CLK_DRV_CKO_LDPWD		BIT(13)
- #define   AN8811HB_CLK_DRV_CKO_LPPWD		BIT(14)
-
-+#define AN8811HB_MCU_SW_RST		0x5cf9f8
-+#define   AN8811HB_MCU_SW_RST_HOLD		BIT(16)
-+#define   AN8811HB_MCU_SW_RST_RUN		(BIT(16) | BIT(0))
-+#define AN8811HB_MCU_SW_START		0x5cf9fc
-+#define   AN8811HB_MCU_SW_START_EN		BIT(16)
-+
-+/* MII register constants for PBUS access (PHY addr + 8) */
-+#define AIR_PBUS_ADDR_HIGH		0x1c
-+#define AIR_PBUS_DATA_HIGH		0x10
-+#define AIR_PBUS_REG_ADDR_HIGH_MASK	GENMASK(15, 6)
-+#define AIR_PBUS_REG_ADDR_LOW_MASK	GENMASK(5, 2)
-+
- /* Led definitions */
- #define EN8811H_LED_COUNT	3
-
-+#define EN8811H_PBUS_ADDR_OFFS	8
-+
- /* Default LED setup:
-  * GPIO5 <-> LED0  On: Link detected, blink Rx/Tx
-  * GPIO4 <-> LED1  On: Link detected at 2500 or 1000 Mbps
-@@ -201,6 +216,7 @@ struct en8811h_priv {
- 	struct clk_hw		hw;
- 	struct phy_device	*phydev;
- 	unsigned int		cko_is_enabled;
-+	struct mdio_device	*pbusdev;
- };
-
- enum {
-@@ -254,6 +270,31 @@ static int air_phy_write_page(struct phy_device *phydev, int page)
- 	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
- }
-
-+static int __air_pbus_reg_write(struct mdio_device *mdiodev,
-+				u32 pbus_reg, u32 pbus_data)
-+{
-+	int ret;
-+
-+	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_EXT_PAGE_ACCESS,
-+			      upper_16_bits(pbus_reg));
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_ADDR_HIGH,
-+			      FIELD_GET(AIR_PBUS_REG_ADDR_HIGH_MASK, pbus_reg));
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr,
-+			      FIELD_GET(AIR_PBUS_REG_ADDR_LOW_MASK, pbus_reg),
-+			      lower_16_bits(pbus_data));
-+	if (ret < 0)
-+		return ret;
-+
-+	return __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_DATA_HIGH,
-+			       upper_16_bits(pbus_data));
-+}
-+
- static int __air_buckpbus_reg_write(struct phy_device *phydev,
- 				    u32 pbus_address, u32 pbus_data)
- {
-@@ -570,10 +611,67 @@ static int an8811hb_load_file(struct phy_device *phydev, const char *name,
- 	return ret;
- }
-
-+static int an8811hb_mcu_assert(struct phy_device *phydev)
-+{
-+	struct en8811h_priv *priv = phydev->priv;
-+	int ret;
-+
-+	phy_lock_mdio_bus(phydev);
-+
-+	ret = __air_pbus_reg_write(priv->pbusdev, AN8811HB_MCU_SW_RST,
-+				   AN8811HB_MCU_SW_RST_HOLD);
-+	if (ret < 0)
-+		goto unlock;
-+
-+	ret = __air_pbus_reg_write(priv->pbusdev, AN8811HB_MCU_SW_START, 0);
-+	if (ret < 0)
-+		goto unlock;
-+
-+	msleep(50);
-+	phydev_dbg(phydev, "MCU asserted\n");
-+
-+unlock:
-+	phy_unlock_mdio_bus(phydev);
-+	return ret;
-+}
-+
-+static int an8811hb_mcu_deassert(struct phy_device *phydev)
-+{
-+	struct en8811h_priv *priv = phydev->priv;
-+	int ret;
-+
-+	phy_lock_mdio_bus(phydev);
-+
-+	ret = __air_pbus_reg_write(priv->pbusdev, AN8811HB_MCU_SW_START,
-+				   AN8811HB_MCU_SW_START_EN);
-+	if (ret < 0)
-+		goto unlock;
-+
-+	ret = __air_pbus_reg_write(priv->pbusdev, AN8811HB_MCU_SW_RST,
-+				   AN8811HB_MCU_SW_RST_RUN);
-+	if (ret < 0)
-+		goto unlock;
-+
-+	msleep(50);
-+	phydev_dbg(phydev, "MCU deasserted\n");
-+
-+unlock:
-+	phy_unlock_mdio_bus(phydev);
-+	return ret;
-+}
-+
- static int an8811hb_load_firmware(struct phy_device *phydev)
- {
- 	int ret;
-
-+	ret = an8811hb_mcu_assert(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = an8811hb_mcu_deassert(phydev);
-+	if (ret < 0)
-+		return ret;
-+
- 	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
- 				     EN8811H_FW_CTRL_1_START);
- 	if (ret < 0)
-@@ -662,6 +760,16 @@ static int en8811h_restart_mcu(struct phy_device *phydev)
- {
- 	int ret;
-
-+	if (phy_id_compare_model(phydev->phy_id, AN8811HB_PHY_ID)) {
-+		ret = an8811hb_mcu_assert(phydev);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = an8811hb_mcu_deassert(phydev);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
- 	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
- 				     EN8811H_FW_CTRL_1_START);
- 	if (ret < 0)
-@@ -1166,6 +1274,7 @@ static int en8811h_leds_setup(struct phy_device *phydev)
-
- static int an8811hb_probe(struct phy_device *phydev)
- {
-+	struct mdio_device *mdiodev;
- 	struct en8811h_priv *priv;
- 	int ret;
-
-@@ -1175,10 +1284,28 @@ static int an8811hb_probe(struct phy_device *phydev)
- 		return -ENOMEM;
- 	phydev->priv = priv;
-
-+	/*
-+	 * The AN8811HB PHY address is restricted to 8-15 (decimal),
-+	 * depending on the board hardware strapping.
-+	 * This means the PBUS address is only in the range 16-21 (decimal),
-+	 * so we do not need to handle the case
-+	 * where the PBUS address exceeds 31 (decimal).
-+	 */
-+	mdiodev = mdio_device_create(phydev->mdio.bus,
-+				     phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS);
-+	if (IS_ERR(mdiodev))
-+		return PTR_ERR(mdiodev);
-+
-+	ret = mdio_device_register(mdiodev);
-+	if (ret)
-+		goto err_dev_free;
-+
-+	priv->pbusdev = mdiodev;
-+
- 	ret = an8811hb_load_firmware(phydev);
- 	if (ret < 0) {
- 		phydev_err(phydev, "Load firmware failed: %d\n", ret);
--		return ret;
-+		goto err_dev_create;
- 	}
-
- 	en8811h_print_fw_version(phydev);
-@@ -1191,22 +1318,29 @@ static int an8811hb_probe(struct phy_device *phydev)
-
- 	ret = en8811h_leds_setup(phydev);
- 	if (ret < 0)
--		return ret;
-+		goto err_dev_create;
-
- 	priv->phydev = phydev;
- 	/* Co-Clock Output */
- 	ret = an8811hb_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
- 	if (ret)
--		return ret;
-+		goto err_dev_create;
-
- 	/* Configure led gpio pins as output */
- 	ret = air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
- 				      AN8811HB_GPIO_OUTPUT_345,
- 				      AN8811HB_GPIO_OUTPUT_345);
- 	if (ret < 0)
--		return ret;
-+		goto err_dev_create;
-
- 	return 0;
-+
-+err_dev_create:
-+	mdio_device_remove(mdiodev);
-+
-+err_dev_free:
-+	mdio_device_free(mdiodev);
-+	return ret;
- }
-
- static int en8811h_probe(struct phy_device *phydev)
-@@ -1561,6 +1695,16 @@ static int en8811h_suspend(struct phy_device *phydev)
- 	return genphy_suspend(phydev);
- }
-
-+static void an8811hb_remove(struct phy_device *phydev)
-+{
-+	struct en8811h_priv *priv = phydev->priv;
-+
-+	if (priv->pbusdev) {
-+		mdio_device_remove(priv->pbusdev);
-+		mdio_device_free(priv->pbusdev);
-+	}
-+}
-+
- static struct phy_driver en8811h_driver[] = {
- {
- 	PHY_ID_MATCH_MODEL(EN8811H_PHY_ID),
-@@ -1587,6 +1731,7 @@ static struct phy_driver en8811h_driver[] = {
- 	PHY_ID_MATCH_MODEL(AN8811HB_PHY_ID),
- 	.name			= "Airoha AN8811HB",
- 	.probe			= an8811hb_probe,
-+	.remove			= an8811hb_remove,
- 	.get_features		= en8811h_get_features,
- 	.config_init		= an8811hb_config_init,
- 	.get_rate_matching	= en8811h_get_rate_matching,
---
+diff --git a/drivers/net/dsa/netc/Kconfig b/drivers/net/dsa/netc/Kconfig
+index d2f78d74ac23..793f7691a24f 100644
+--- a/drivers/net/dsa/netc/Kconfig
++++ b/drivers/net/dsa/netc/Kconfig
+@@ -3,6 +3,7 @@ config NET_DSA_NETC_SWITCH
+ 	tristate "NXP NETC Ethernet switch support"
+ 	depends on ARM64 || COMPILE_TEST
+ 	depends on NET_DSA && PCI
++	depends on NET_VENDOR_FREESCALE
+ 	select NET_DSA_TAG_NETC
+ 	select FSL_ENETC_MDIO
+ 	select NXP_NTMP
+-- 
 2.34.1
+
 
