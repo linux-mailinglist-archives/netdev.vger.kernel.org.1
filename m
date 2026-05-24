@@ -1,210 +1,126 @@
-Return-Path: <netdev+bounces-291145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291146-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPKTBV17Emom0AYAu9opvQ
-	(envelope-from <netdev+bounces-291145-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 06:15:25 +0200
+	id PmsMGXqaEmrr1QYAu9opvQ
+	(envelope-from <netdev+bounces-291146-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 08:28:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7ADE5C15C9
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 06:15:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3B1E5C183A
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 08:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 23B4F300599B
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 04:15:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 80A7E300B622
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 06:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 982832D238F;
-	Sun, 24 May 2026 04:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7RoGsNK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15CC2D5926;
+	Sun, 24 May 2026 06:28:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304FE2F0C74
-	for <netdev@vger.kernel.org>; Sun, 24 May 2026 04:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A434810F2;
+	Sun, 24 May 2026 06:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779596113; cv=none; b=qtiff/upRBW308L0GG1PuiR4l972ef1wAB28IfRQRpjJFXmGl+M0Sxh5w2wenGAMBbGXuEcak3EcBSDGUFK+cMIyqOk7ytppU+WaRjJBfINl0Rek9Oc/qXbTuXlbCf/UVm+A4AgUDy3n7jOCmEpltDB49u7BioTlml20wpvJrQY=
+	t=1779604086; cv=none; b=JuwsVjvlv8rc1TaTfFYFdZs6Q08leaXkOpfB31w7IKcVlkjeNVAFvBf/unjSo7ym6excR0bko4nKXML+tmlwp4ml9ZAt9uT/OFzWKfICAM6euv5/Q6IFv+XmAp4o2VM1ztzveAOtydWN5PhJC57w8gzh9r0DzJ3EmhbnZwNmunU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779596113; c=relaxed/simple;
-	bh=KH3T/whTjIb1nZ/b0yTDsfG9KkcuwAxRR09DzkU+xNQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iz10lSaG6l+BPUct0bx4aHyIyNBNV91xHxPTnNNBYmG1k3aHBM0O9320ALj//CFPeSxey2PPHi+6TUJwt5Wv3/WVoreTM7kkgBCd2MgDo9WFjLJjShTKK4PqZ8JJIXWZ3mAkU0QvKhL+wigBNhtkKEeGVbcXeGykw8iq9qKLgB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H7RoGsNK; arc=none smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-303dbfbec77so9888736eec.0
-        for <netdev@vger.kernel.org>; Sat, 23 May 2026 21:15:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779596111; x=1780200911; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A9LtOZi90LiMAb4rReSd7b/FTuCWT41FjVk4dArDYLo=;
-        b=H7RoGsNKfHksixA8fGglZ21fsi0pPZayRJANuBU/FgXkN29yOahhFYOQCuUZYo6YMr
-         1imFmsl++Jc+UgZnhOsg4qz4aBxJbWqJeIOAGtP9d+Ik4ELufuThbu6bU/1MR6gt4cJb
-         ouSZMdF/HnFAfZH0PX2px+eb++y4cCzDtM9oQxK5JXUTH8QGgfgLmFlaURz2sU3ewyv2
-         fD2O1sVsQfCVa3C6wKtqvC9ZiVxfZXCwl0LWcGOzMLNObiMA1BUERsqOVsSqsZBLuBhN
-         vQt1p1uhprDRHwxxLHdLY0ZhBmksbiuCs3kKY2EMxaRK1jLpBaxD55TLjxzs1Xvq4SFI
-         kVrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779596111; x=1780200911;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=A9LtOZi90LiMAb4rReSd7b/FTuCWT41FjVk4dArDYLo=;
-        b=h+ppQhD7+H7xRgebYwSmtC/8MjVV3lhad8lFBg5OyfuO0G3P9OJB3T12UPnHhWcm1H
-         j84bpvSkZsq5ZcuO7HunDDHCsOIkyTbzdMKVHyP3RRfwzwG2HDrhzRdqprUj7bcIzLGh
-         UYlKvnpIE36hz5NcLQLbkl1PK9BOKyNS+g+p9B4X9Tgep1ucDUFjMixSS5rRlt6rO48u
-         lrS42brfA92GLgBXqqXpS0bmOr2B1CFGM7F/FQ2TjCUomC4a/g2vKrMByeXaJPIcEWuW
-         fn/SCkbhRyxMuT2wHp28RhSUyjfwIbQdZshqCxnI4Louz91fl4LscGtok+VqUhvthn0a
-         +Arg==
-X-Gm-Message-State: AOJu0YxuC+TVFAlEGPA/l0km8u+E0nebAapouC1fUQnxw/S1RpIBVM+1
-	eehzCpXAcbShmOhsiLjGL0xSDKW3fphNCqKfR4n8GxnUoGUPKQ/iTL2K
-X-Gm-Gg: Acq92OHWCJ0UrylIUr9GoTwY6FBK4YfYjcZbZ/7/oQ+hy8t4uUntUNQn+P3l/lEdmXX
-	uPtQVtldp5f3qlPm52UtD8w5nzaaScbKnPUI76WjbsSjY2BhgddYzFhezxXD+2LjPBRQu5l+Npt
-	q0BOU1N/sJ/SH+hhSmnbpFVc6rJnfTUrw+6ZrLAHO6B/b1R98eWSoVnGX9Op/AeBWbirNfOc66i
-	j6Kuo9S4asxE6xfmSoT615HaM6ZdGrHsJrrgFqi1dRS2QvE8nCXnpA2f/1xjPIFIBXcLsErNURP
-	WWtcDE15s/HzwsWNIYkiR6TjVwaqjVwG46OLQmdk7gLYruC3UWUBgvXOjwmnMfkhOTO9fWqS9cF
-	zIDpbDYBUVKchb93OTFsv0nwXS6icBKsd0c9ki0zqw7L3DLvIECHULu0vOIch3BLZVThrzZKywl
-	cAJwbLaRAaEISyTE9B5GZDBdtyoifwtQ0wmTozYx1u/3qQ
-X-Received: by 2002:a05:7301:608e:b0:2f2:b544:2fca with SMTP id 5a478bee46e88-304490e65femr4581119eec.33.1779596111441;
-        Sat, 23 May 2026 21:15:11 -0700 (PDT)
-Received: from localhost.localdomain ([148.135.103.3])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3045245d6aesm4522133eec.26.2026.05.23.21.15.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 May 2026 21:15:10 -0700 (PDT)
-From: Qi Tang <tpluszz77@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: netdev@vger.kernel.org,
-	fw@strlen.de,
-	lyutoon@gmail.com,
-	stable@vger.kernel.org,
-	Qi Tang <tpluszz77@gmail.com>,
-	Paul Moore <paul@paul-moore.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-security-module@vger.kernel.org
-Subject: [PATCH net v2 4/4] netlabel: validate CIPSO option against skb tail in netlbl_skbuff_getattr
-Date: Sun, 24 May 2026 12:14:38 +0800
-Message-ID: <20260524041442.2432071-5-tpluszz77@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260524041442.2432071-1-tpluszz77@gmail.com>
-References: <20260524041442.2432071-1-tpluszz77@gmail.com>
+	s=arc-20240116; t=1779604086; c=relaxed/simple;
+	bh=C56XPEmyiutI6uU+IC8A8y7eRsd2kZmjmJDlh7z1wV0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ilZDvAACMM/CfWJRIf9VK2uZvFM4XerMORAyk4jCsndNGpWyGpcUCFLnuDUp5SSIEupXTR9aHZZcmWZ2mymTzHrw0LruWAQVCcNrguw9i3EuhwQXf84TLHxa6QSxKKXoIVdecsMIt5pf4vuccJfSnxE8yId9lT5XeaLjnyvXdG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from ja.int.chopps.org.chopps.org (unknown [47.225.56.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id D79B37D08D;
+	Sun, 24 May 2026 06:19:54 +0000 (UTC)
+From: Christian Hopps <chopps@chopps.org>
+To: Takao Sato <takaosato1997@gmail.com>
+Cc: netdev@vger.kernel.org,  steffen.klassert@secunet.com,  w@1wt.eu,
+  davem@davemloft.net,  herbert@gondor.apana.org.au,
+  stable@vger.kernel.org
+Subject: Re: [PATCH net v3] xfrm: iptfs: preserve shared-frag marker in
+ iptfs_consume_frags()
+In-Reply-To: <20260522142504.1394864-1-takaosato1997@gmail.com> (Takao Sato's
+	message of "Fri, 22 May 2026 11:25:04 -0300")
+References: <20260522142504.1394864-1-takaosato1997@gmail.com>
+User-Agent: mu4e 1.14.1; emacs 30.2
+Date: Sun, 24 May 2026 02:19:53 -0400
+Message-ID: <m2se7h1g8m.fsf@ja.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; format=flowed
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,strlen.de,gmail.com,paul-moore.com,kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-291145-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-291146-lists,netdev=lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	DMARC_NA(0.00)[chopps.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.877];
+	FROM_NEQ_ENVFROM(0.00)[chopps@chopps.org,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: B7ADE5C15C9
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,labn.net:email,ja.int.chopps.org:mid]
+X-Rspamd-Queue-Id: B3B1E5C183A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-netlbl_skbuff_getattr() locates the CIPSO option in the IPv4 IP header
-via cipso_v4_optptr() and hands the bare pointer to cipso_v4_getattr().
-The consumer re-reads cipso[1] (option length), cipso[6] (tag type),
-and then cipso_v4_parsetag_*() re-reads further bytes from the skb.
+Takao Sato <takaosato1997@gmail.com> writes:
 
-__ip_options_compile() validates these bytes only at parse time.  An
-nftables LOCAL_IN payload write reachable from an unprivileged user
-namespace can rewrite them after parse and before the SELinux/Smack
-peer-label consume path (selinux_sock_rcv_skb_compat ->
-selinux_netlbl_sock_rcv_skb -> netlbl_skbuff_getattr).  This is the
-IPv4 analogue of the CALIPSO IPv6 trust-after-modification fixed in
-the previous patch: the tag parsers walk the option using attacker-
-controlled length bytes, producing slab-out-of-bounds reads whose
-contents feed into the MLS access decision.
+> iptfs_consume_frags() transfers paged fragments from one socket buffer
+> to another but fails to propagate the SKBFL_SHARED_FRAG flag. This is
+> the same class of bug that was fixed in skb_try_coalesce() for
+> CVE-2026-46300: when fragments backed by read-only page-cache pages are
+> merged, the marker indicating their shared nature must be preserved so
+> that ESP can decide correctly whether in-place encryption is safe.
+>
+> Apply the same two-line fix used in skb_try_coalesce() to
+> iptfs_consume_frags().
+>
+> Fixes: b96ba312e21c ("xfrm: iptfs: share page fragments of inner packets")
+> Cc: stable@vger.kernel.org # 6.8+
+> Signed-off-by: Takao Sato <takaosato1997@gmail.com>
+> ---
+>  net/xfrm/xfrm_iptfs.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+> index 97bc979e5..4db85e158 100644
+> --- a/net/xfrm/xfrm_iptfs.c
+> +++ b/net/xfrm/xfrm_iptfs.c
+> @@ -2168,6 +2168,8 @@ static void iptfs_consume_frags(struct sk_buff *to, struct sk_buff *from)
+> 	memcpy(&toi->frags[toi->nr_frags], fromi->frags,
+> 	       sizeof(fromi->frags[0]) * fromi->nr_frags);
+> 	toi->nr_frags += fromi->nr_frags;
+> +	if (fromi->nr_frags)
+> +		toi->flags |= fromi->flags & SKBFL_SHARED_FRAG;
+> 	fromi->nr_frags = 0;
+> 	from->data_len = 0;
+> 	from->len = 0;
 
-Validate the option fits within skb_tail_pointer(skb) before invoking
-cipso_v4_getattr().  The pre-tag-walk guard "ptr + 8 > tail" covers
-the CIPSO option header (type + length + DOI = 6 bytes) plus the
-first tag header (type + length = 2 bytes), which are the bytes
-cipso_v4_getattr() reads to dispatch on the tag.  When the bounds
-check fails the packet has been mutated after parse, so return
--EINVAL rather than fall through to the unlabeled path.
+LGTM, Thanks!
 
-Runtime confirmation (Smack peer-label policy + nft LOCAL_IN
-mutation of tag_len): UdpInDatagrams increments to 1 and recvfrom
-returns the payload, showing netlbl_skbuff_getattr ->
-cipso_v4_getattr -> cipso_v4_parsetag_rbm -> netlbl_bitmap_walk runs
-end-to-end past the option's true bound; with this patch the
-consume path returns -EINVAL at the bounds check and the counter
-stays 0.
-
-Cc: stable@vger.kernel.org
-Reported-by: Qi Tang <tpluszz77@gmail.com>
-Reported-by: Tong Liu <lyutoon@gmail.com>
-Fixes: 04f81f0154e4 ("cipso: don't use IPCB() to locate the CIPSO IP option")
-Signed-off-by: Qi Tang <tpluszz77@gmail.com>
----
- net/netlabel/netlabel_kapi.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
-index d0d6220b8d59d..c2d3ea751f4e1 100644
---- a/net/netlabel/netlabel_kapi.c
-+++ b/net/netlabel/netlabel_kapi.c
-@@ -1393,11 +1393,24 @@ int netlbl_skbuff_getattr(const struct sk_buff *skb,
- 	unsigned char *ptr;
- 
- 	switch (family) {
--	case AF_INET:
-+	case AF_INET: {
-+		const unsigned char *tail = skb_tail_pointer(skb);
-+		u8 opt_len, tag_len;
-+
- 		ptr = cipso_v4_optptr(skb);
--		if (ptr && cipso_v4_getattr(ptr, secattr) == 0)
-+		if (!ptr)
-+			break;
-+		/* CIPSO header (type+len+DOI = 6) + first tag header (type+len = 2) */
-+		if (ptr + 8 > tail)
-+			return -EINVAL;
-+		opt_len = ptr[1];	/* total CIPSO option length */
-+		tag_len = ptr[7];	/* first tag length */
-+		if (ptr + opt_len > tail || ptr + 6 + tag_len > tail)
-+			return -EINVAL;
-+		if (cipso_v4_getattr(ptr, secattr) == 0)
- 			return 0;
- 		break;
-+	}
- #if IS_ENABLED(CONFIG_IPV6)
- 	case AF_INET6: {
- 		const unsigned char *tail = skb_tail_pointer(skb);
--- 
-2.47.3
-
+Reviewed-by: Christian Hopps <chopps@labn.net>
 
