@@ -1,211 +1,160 @@
-Return-Path: <netdev+bounces-291164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291166-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gGeVKITfEmrL4wYAu9opvQ
-	(envelope-from <netdev+bounces-291164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 13:22:44 +0200
+	id NMVNO6zmEmrf5AYAu9opvQ
+	(envelope-from <netdev+bounces-291166-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 13:53:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 136BD5C230C
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 13:22:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 418BD5C23DC
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 13:53:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 26FDB3009035
-	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 11:22:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CAC8E300875B
+	for <lists+netdev@lfdr.de>; Sun, 24 May 2026 11:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D970392820;
-	Sun, 24 May 2026 11:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0471037754E;
+	Sun, 24 May 2026 11:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fyW8SkrH"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b="LQofYPbK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from out-12.smtp.spacemail.com (out-12.smtp.spacemail.com [198.54.127.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967D22E65D
-	for <netdev@vger.kernel.org>; Sun, 24 May 2026 11:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779621761; cv=pass; b=likhSbiWkSUffWgKfF1e0OhTQA4iQR5RI3YFasfUxMAJ1+zcf6inVgUZqQb3ppu4m4zI9H79d43ILo0iAvSesr1/gDdd75vMvVuMkOpJm3q6wgnl7vb2n85MMvCN/8nCk1wykftOBVRY09MxdB2Suv2aYV0dl7vIiSl69X2Tt7k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779621761; c=relaxed/simple;
-	bh=O+JZPaK3uRnpTVdRdyFVDzHP/W2oZHJawf02YCzFly4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mHtaQfp11VzYt3b0DybrmjQx27F9xFP7nWguB1IPyPAEW4zVbp+gIMhczk3S982yB3BA14Nm0lpuVHq7XN7zA6hqGPUAr9/sc8sAa31vUkBbPlntNF68WShZYGLOYNFo4+HXOip1y6XDXqDaRDK1053l94wKWsKP2vhPtVx7ADw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fyW8SkrH; arc=pass smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-43d76dd4ee8so4763477f8f.2
-        for <netdev@vger.kernel.org>; Sun, 24 May 2026 04:22:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779621758; cv=none;
-        d=google.com; s=arc-20240605;
-        b=P/8m7ktVnsnpFr8F1lXRJSpUF9vV294owZZ8UarHJhIT8xFH5ijBbsN0SYttTJlrSw
-         LxWmmqj1Ekhytfqb4wfSEALmBmGYbOn11gRZZYE+rPz56lQVfEQQvn3TPtFcopK9qpde
-         IMg9XVP/N3x91aw65aMG1uX8QUZi4KonTG5diIxzaDBrhfmT0nT4NWoAQoBAXKYXvFbR
-         zuwDHo8gHmxaNs3QyzQCPWR2dO10YdW/90hk6luIa/krei1hLflRqN+fXES60WnL8dze
-         7Agkbv47ah7SJXPFnflZmCck0RjEVgv6ja+BzKbbM5DJTDUWZUYPMsY3lLCnditqUuVJ
-         fWyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=JYSKa/1O4kDWFIkCrrL8W7AexNe9Onv81BeAx+bBfI8=;
-        fh=WLjUlYFOTTDQOYsy4QBZHrTVpzWCcHt1gYdqy2ia/HI=;
-        b=AzsUFJBvdIOCGApRPM99iS+OYx84BtY+qjfr1ptadUZIhLqa52WuKgibVs3+u92y9G
-         qRdOfEAd/iZIJ17WJqaLfmiq+9i8zZhZBK0GLnJOk4r3ublzbC5BQB3Nt1NSjSlU8Zlr
-         x4y0Sq1epMDhPsp1/txPsWjWHbve1z6NEgCYSXUN17bqtzo+gLSuXv84XnUiuED0PG7n
-         49OTZrd2HuACDlgxWRex5KCyqOlmCHR7Wg3CKl3qRaCkbYlkTDzGrpeU/EAqktOoJ3Qa
-         zNWbKUDWjG0Gl/JPbPIcgMaqiQMjNzOeFdWovqyCvKQjHWdH4kaz/QBzC9KAifpABqOp
-         o9lw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779621758; x=1780226558; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JYSKa/1O4kDWFIkCrrL8W7AexNe9Onv81BeAx+bBfI8=;
-        b=fyW8SkrHpdAp0E10iPgLN4TZJpk2OlISyv5ozXCIVPOd7D2/eDJDYOH2p2jYkuoptK
-         tzuaRtnwbECR2zjnISJcnL6m70BdPShM8C44Plua/pKRwW5E4j5RehDSkgIY6iEohDNw
-         yHofDReNq1PN2D5LKlFEvPRUXYNWqJaQRqqnA/CbCo3gtfX22ZiCRM6J64G6jBkuq1Uz
-         6IG8sczDjWpQ7MMJe6rDWMfmWumb7dFedFWztRBBc6hnbXrA9aiqhLcFmecXbm04GPAr
-         V1wguZkwSSLZm8TaY886ZJ3n8UBqg3aOsfTmB2pSlsbnyzi03ArfyVp1cU9VaRTsXV3u
-         6YPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779621758; x=1780226558;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JYSKa/1O4kDWFIkCrrL8W7AexNe9Onv81BeAx+bBfI8=;
-        b=k9XUjQ2Yl+Drzs/EvUNfYKpcK9i7B7WwvIkh8gYEfq+RwETVyoBVS6IYE/981aJdk2
-         pcnBr5sr8SNHdnjxvxgZvqVbjl9RuRJCMPqrAcDil2/GJeEVJPMgu6orMLOiWkvaaqTg
-         1oousNXaLQ+XpOl6HsoIm8KKDneGlSlcs647a4U8SiiB2GVBw5h8jM7JXB+JLoRlcvy5
-         lZm/fZCa6NRqxwoDx6l9azXH4iRtnj6xPrh6v86jBOhl0J6Bz/FOnlXD08LKpGz6MJfL
-         r61igf1Z0/gx0O1dyPVhhiCl4CLb4gL7y501dMTHP+/tmeUMLyT9+ElLy/kfbXQOrs2K
-         ssjw==
-X-Forwarded-Encrypted: i=1; AFNElJ/ozKW+6+HRQi+F63FrpC+KS0yG64sCe0DdHyz1qOsUNJbcR7yC8Izgb77iMlqvqtXE/V0TzS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMDy5xXRky/m2Re9uR0u8zuOGJPRC61WfJ4SP30g4U4x6mR7TZ
-	jPywzKWkdkov04+lA5vz236FCFxNnVSxB1JSHofQxlQd1BnO9+xgXx/OuYOcIgk6Hlr4/Pt9SgP
-	hggUsmeuQfUXTpxIbvD7Xn2g+ITdu/C8=
-X-Gm-Gg: Acq92OFmrDOeZ9K28N63nvowF06dpZ/9OuGlibBA6EFQepPXJVy32b/KYRcaHCbZ0/v
-	7jKUPASJiD6H/Y2WXc/rFypKi604S5tVzSp1I83sOTkw8a2e78GeXFD547/2Gs+0wIryZ3mlFGX
-	v1ool8mB03CR2UY/rKF9y1urJeGM55ajjQKbdLYElqOSMpsCKegC/zpmViERekWLS62rUVfGqSg
-	DuA3asrCV+PRAguDvk1JgffT4AL86CxYb48wQ8KHDSsOXE8nTznaIWU3bdX+htZkt3ZEOuExGal
-	sTS9g1smxABpfp6h9AphXlhsNNbvdUzRlwWWk1WkMfO7LAhTQ4vOo2Pfq/t+aGl8xEjIuA==
-X-Received: by 2002:a05:6000:468c:b0:43b:5b25:67f8 with SMTP id
- ffacd0b85a97d-45eb38b392bmr12088047f8f.20.1779621757808; Sun, 24 May 2026
- 04:22:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DBC145FE0;
+	Sun, 24 May 2026 11:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.54.127.83
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779623592; cv=none; b=Dz+ObL+zYeyL49WJT7NiCKiYOuZTO/JGcKMm0YLH4k8F8y3zM8fOQ7vTgNVtjI41kW/SeaOY6WdKkBRnLB9xXIVZfU7uJuVeeITGZE+Rv3M2W2/S0nSuEKqQs01qMIdEsKgylHNf6cLz/2G9MbxuHfXKSr4UvHY9LWAqeahjBAo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779623592; c=relaxed/simple;
+	bh=jpZM8/zLddTDsq5GlC6TnbfoQOrGlwYCgXANTpOTf3s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=u11lKiGl90+huAvomVr7CCesqnekinUTCmQle6YiR1Zg5hBXguJ2AmH7/9MoYjtz5qpn9xLk4siVKZrK+rNXbS6pTkVzTqNelnMsPZ46E3HRitVq0LyPCAC1GaQhP5auEd5KU5GoOBYasBQ1LZBUs33jArM2d+BO1JSvhsMS39g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai; spf=pass smtp.mailfrom=rexion.ai; dkim=fail (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b=LQofYPbK reason="key not found in DNS"; arc=none smtp.client-ip=198.54.127.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rexion.ai
+Received: from Kyren (unknown [49.207.213.66])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4gNcpT51RNz6tkK;
+	Sun, 24 May 2026 11:53:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rexion.ai;
+	s=spacemail; t=1779623588;
+	bh=j7VFnmR8Q2imsbnf/iLbK4SfOgvuJSNYrz/bMqfO1ZA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LQofYPbKaoyo4c3Cs7rJ41Oma/8rPwklkdBzSB1aJPRVsOH/MFGpUOzY81JdNxMC2
+	 exzk+/KUf5xL5ifCIuxxebcuLO+qZnQ0+gG1Y5TCfoDqHnD1dCD8e6g8b0CtDhtjw5
+	 HsV4QcAyTBnb7nj90s6hUCrqqTviK5jnjeo8ySP8T7PNWbKZjhhwIk1/MqYiARqGr3
+	 Tsj6G2Q9pKchZcFC7ArQWpNT9QuOESqIhn/hiUoMKxsCN2Rmp/l50WaEYyxnu1K420
+	 rpAbkB1Ne3v2JkCna10AGyMZCV/Ggv+nfYN+mlqT9tCPmiqf01A2bd/kwrePrKsK2o
+	 Lnnbv7N+K0Bhg==
+From: Rahul <rc@rexion.ai>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Alexander Aring <alex.aring@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Rahul <rc@rexion.ai>
+Subject: [PATCH net v2] ipv6: rpl: fix hdrlen overflow in ipv6_rpl_srh_decompress()
+Date: Sun, 24 May 2026 17:23:01 +0530
+Message-ID: <20260524115301.905478-1-rc@rexion.ai>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260501164242.419cc17e@kernel.org>
+References: <20260501164242.419cc17e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260515071504.2054786-2-yuyanghuang@google.com>
- <2e08eb1ca27a9a2f8ad29e1c24f779b579621b0a648589f7044799d91c5e00f5@mail.kernel.org>
- <CADXeF1GVtFHNZJb8xwFh6aadR=H19S+kja8rF185XB5=fg0D0Q@mail.gmail.com>
-In-Reply-To: <CADXeF1GVtFHNZJb8xwFh6aadR=H19S+kja8rF185XB5=fg0D0Q@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 24 May 2026 13:22:26 +0200
-X-Gm-Features: AVHnY4I78oJkw5wlqyzmj1cIkIp7UAJvj1KW0IsPVe2CbVCPVcMgnKOQ0enezFI
-Message-ID: <CAADnVQ+42+Th6OFGq2KawzvyKUAykazb4fXh2_uqss-T+R8VCg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/2] bpf: align syscall writeback behavior with
- caller-declared size
-To: Yuyang Huang <yuyanghuang@google.com>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: bot+bpf-ci@kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Andrii Nakryiko <andrii@kernel.org>, Eduard <eddyz87@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>, Martin KaFai Lau <martin.lau@kernel.org>, Chris Mason <clm@meta.com>, 
-	Ihor Solodrai <ihor.solodrai@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Envelope-From: rc@rexion.ai
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291164-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,google.com,linux.dev,blackwall.org,redhat.com,fomichev.me,vger.kernel.org,meta.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291166-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[rexion.ai];
+	R_DKIM_PERMFAIL(0.00)[rexion.ai:s=spacemail];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,rexion.ai];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 136BD5C230C
+	FROM_NEQ_ENVFROM(0.00)[rc@rexion.ai,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[rexion.ai:~];
+	NEURAL_HAM(-0.00)[-0.912];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rexion.ai:mid,rexion.ai:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 418BD5C23DC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 21, 2026 at 1:41=E2=80=AFPM Yuyang Huang <yuyanghuang@google.co=
-m> wrote:
->
-> >This looks like a bug fix for an out-of-bounds write vulnerability.
-> >Should this include a Fixes: tag to identify which commit introduced the
-> >unconditional copy_to_user() calls for query.revision without checking
-> >the user-provided buffer size?
->
->  > Fixes: 3fe213c040b3 ("adding ci files")
->
-> I completely missed this checkpatch comment. I will add the Fixes tag
-> in v2 if there is a consensus that this patch is the right approach to
-> resolve the issue.
+ipv6_rpl_srh_decompress() computes:
 
-AI is wrong.
-The fixes tag should probably point to 053c8e1f235dc or a subsequent patch?
+    outhdr->hdrlen = (((n + 1) * sizeof(struct in6_addr)) >> 3);
 
-bpf_mprog_query() and tcx_prog_query() were only introduced there.
-How come your userspace passes shorter uatter to query newer
-BPF_TCX_EGRESS attachment?
+hdrlen is __u8. For n >= 127 the result exceeds 255 and silently
+truncates. With n=127 (cmpri=15, cmpre=15, pad=0, hdrlen=16):
 
-Please provide more details.
+    (128 * 16) >> 3 = 256, truncated to 0 as __u8
 
-I'm still not convinced that what you're saying:
-"
-For example, our Android net_test  suite uses this legacy 40-byte
-Python ctypes struct layout:
+The caller in ipv6_rpl_srh_rcv() then places the compressed header
+at buf + ((ohdr->hdrlen + 1) << 3). With hdrlen=0 this is buf + 8,
+but the decompressed region occupies buf[0..2055] (8-byte header
+plus 128 full addresses). The compressed header overlaps the
+decompressed data, and ipv6_rpl_srh_compress() writes into this
+overlap, corrupting the routing header of the forwarded packet.
 
-  # legacy 40-byte layout (pre-revision field)
-  BpfAttrProgQuery =3D cstruct.Struct(
-    "bpf_attr_prog_query", "=3DIIIIQI4xQ",
-    "target_fd attach_type query_flags attach_flags prog_ids_ptr
-prog_cnt prog_attach_flags"
-  )
-  # Invoked via: syscall(__NR_bpf, BPF_PROG_QUERY, &attr, 40)
-"
-is a kernel bug.
+The existing guard at exthdrs.c:546 checks (n + 1) > 255, which
+prevents n+1 from overflowing unsigned char (the segments_left
+field), but does not prevent the computed hdrlen from overflowing
+__u8. n=127 passes because 128 <= 255, yet hdrlen=256 does not
+fit.
 
-Looks like user space is querying new attachment types
-with old structure.
-Potentially the check can only be around:
-        case BPF_TCX_INGRESS:
-        case BPF_TCX_EGRESS:
-                return tcx_prog_query(attr, uattr);
+Tighten the bound to (n + 1) > 127. This caps n at 126, giving
+hdrlen = (127 * 16) >> 3 = 254, which fits in __u8. The compressed
+header then lands at buf + ((254 + 1) << 3) = buf + 2040, exactly
+past the decompressed region (buf[0..2039]). No overlap. 127
+segments is well beyond any realistic RPL deployment.
 
-to be nice to broken user space,
-but, really, attr->query.attach_type shouldn't be equal to BPF_TCX_EGRESS
-with a smaller uattr.
+Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
+Signed-off-by: Rahul <rc@rexion.ai>
+---
+ net/ipv6/exthdrs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-pw-bot: cr
+diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+index 95558fd6f..35a02584f 100644
+--- a/net/ipv6/exthdrs.c
++++ b/net/ipv6/exthdrs.c
+@@ -543,7 +543,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+ 	 * unsigned char which is segments_left field. Should not be
+ 	 * higher than that.
+ 	 */
+-	if (r || (n + 1) > 255) {
++	if (r || (n + 1) > 127) {
+ 		kfree_skb(skb);
+ 		return -1;
+ 	}
+-- 
+2.54.0
+
 
