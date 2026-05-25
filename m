@@ -1,99 +1,92 @@
-Return-Path: <netdev+bounces-291232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AARQOAa7E2r/FAcAu9opvQ
-	(envelope-from <netdev+bounces-291232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 04:59:18 +0200
+	id +FAcHXu+E2qyFQcAu9opvQ
+	(envelope-from <netdev+bounces-291233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 05:14:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CC055C57E5
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 04:59:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA5565C5883
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 05:14:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0117D300B3D0
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 02:59:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CAC3301348F
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 03:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06ACD2BE051;
-	Mon, 25 May 2026 02:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992132D7D59;
+	Mon, 25 May 2026 03:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gujYcriI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dziHZ3HQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F44A3438B5
-	for <netdev@vger.kernel.org>; Mon, 25 May 2026 02:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C5A2D661C
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 03:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779677950; cv=none; b=r4S8egYPRnB/Z2hF3elaEt+zKpCnfW1xLTNNZUz3xijuWxYc0f+X9wuUwlTBNMDQ7T+v7mLLt5Ym/OvhPr1cz3yHuG59HqyL03FjYBQuTWGrEDMa//AMlvfMiTZMxAQ6TDUh7R7br1jrKSmXa4LqnfMnIF9/q5NwEd0Wr5Z+n5Q=
+	t=1779678810; cv=none; b=h0QkjVjyjpMjED92M+laPm5JmchqmBE9W59Yksdrx3foUPUjNaCqjT29I68xIHrBMMP/HMrJtMn3ebfzftPXBPkRf0kvGoUuzeL05ASsDKg2LHv6xJYEqm9xPTygXy0tO10QUZfQGou7GkVYC7W5YhE939pypu1fg70OZQPfjbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779677950; c=relaxed/simple;
-	bh=5ZFQ3ioeI1AY7JkHhLJipr22pTr8CzAU/pick9VFC1Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iSIBkkW7gqNOr/cf1/ho3QIXOTrRbkIfN6xFYxlV9ggFhKfzhusYTfSBwbhol9fIq4mVT8Yn9fTkH5KAhNZtax56rqz8JLu6IiMwf6x225XoZ3Dm4XEAAzx4C2rA2Ks9GJpfEvkjXWBKUrAamRIA2HwGheSTVorqfC8xPr/MELo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gujYcriI; arc=none smtp.client-ip=209.85.216.44
+	s=arc-20240116; t=1779678810; c=relaxed/simple;
+	bh=KbCWJ56Ztr142YoKNAdVXlh/YvFieGfstI9Yb2Sqkrc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=a4PyFu7QL3fvXW72nZSLWcOIEaEUpH73zRUKym2jhjDa4/7N4dPubndWQO7utoStPTdw1MWYL34p5ECsh4+HjLV7CNYWH6zmpo2yltWC9cIt1gnB6Gp9LzbylVxiOHx8C2xf7FJOfLIS/VKmYV9ud158+qIWi2cHFFA3e97tOzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dziHZ3HQ; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-36a7bbb9698so1384586a91.2
-        for <netdev@vger.kernel.org>; Sun, 24 May 2026 19:59:07 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-82faf871346so7109004b3a.0
+        for <netdev@vger.kernel.org>; Sun, 24 May 2026 20:13:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779677947; x=1780282747; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xI1NKIYyb75g5GjRIKULuvy86/0Bdgcx6L8+8GI99ps=;
-        b=gujYcriITDZBMa6p7PvVHMsEFvZpFovG7ITBswaxzIY7oJiHvyA29a49265MoxeEVN
-         DEfKJTqhxKjFE8WcoFZav8VcSbX92UkAikhnIQVvYXmn8NmbsabDNaGUVe1IQSBWPyP1
-         IHr1je5SsYpx+xX2EI0raim4QW0qioUeWTRR22W+TB7Haf7vdU/cM5wHCfC+JiQw1sR7
-         do5lH5ibTioD6tFFNqvbIdQDlU0pUKj6OHRuIUXaeOnTgfwTunIFewdsXO4uPZm/A1GT
-         o0ZaxFNZRTNkAbSSef2pXSMRZsb3dgn8l9qsqXkK1l9NCaDMjJ080LUowajWl2zhjC9r
-         qwhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779677947; x=1780282747;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779678808; x=1780283608; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xI1NKIYyb75g5GjRIKULuvy86/0Bdgcx6L8+8GI99ps=;
-        b=HEzanjmsf7ahbo+FV5EuESf21kYxaPHpWidx/K1ZPgzwoV6M2bOw8sSYJyaI3pCYot
-         alFM3NNKRn9F8lCfWtYNb0NFQViRn3DKQE53sZm0MEYeSPiJTrs/qJUtwnfsYbELidDL
-         sMB8lqV+cOTte7MEAJApNEMPNyHhgHtJ0Bn1RoKGg9FCt0EUMdpONkKD1BfhTbZpQI7U
-         kAPWxuYln1vXr3O4G58aCCqoc8Kj+wLGWXSUVx48l76wlnxZ1f6rJym/VSKgvGYBtiHQ
-         ycE3gLVWm25JPZAC8HHvD2aFPZDXsRTdiU7w+tw4RX2X3eeusSXLFfXEM8LNYOJh6cq0
-         hgPg==
-X-Forwarded-Encrypted: i=1; AFNElJ92YYIj7WX4ddaUx/ltQAgwLvVbTaIRfhyFp/8EyQpfWg2mPRHV8nsgGcE8AiZCcoiDdBEd24U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvUqbNHEFGmD7NaZo17KUpLW+SyTDMkZ39khIvgqqahwn5zr6a
-	+9XiTPxU+5/CDa2I99f3bfJn/xDesEvhUEfrS9yjIQqJvOwrQnz3XtEa
-X-Gm-Gg: Acq92OGLMnIcV/8vtz8YJHTeqmNbOqHuRHVQY9U4RhxMQQ791ma7q08aJV803M+aX4A
-	1rdjSgaiMd12l25I+61M05lVnk77eLnUELHeyZx8PZFf61SdSy6+Xb/I+BLAazQS0AmkwnlZHqN
-	tgAIe4pfEIFcI3xNQZZ+mUDF8UQlbX931S64badeEGkPlI5Z8S4HgQ9RsLOjIoDxqKgs91wzwFV
-	cHtvauquo3u3Me876ha85sUMX0Dyxf8II3GxpGph83Ftob3cWmbLCUcB7NuQLajR2PxlHSLrJe5
-	Tao9KK2WvGr8+teDlE112riLyc/F0FpEbxN1TLy1ymYPj7+9RfRxhcJ/Vo3cpM9QS60bA7j4G2O
-	gW6G2sog6//9iuUTbN2Y9vJcgAVAK+08KqW+4JVf8Cy1cYNlJEAf4sVQOkag3h/JLfT3ru2sPS1
-	0/S4mlBbzw4CT5s22dYp1qrJcfdBg3wU/+Tnq21SNj1OjatC8igcKfBaEEsbR4Ydk=
-X-Received: by 2002:a17:90b:3149:b0:36a:ee1:fc1c with SMTP id 98e67ed59e1d1-36a674c5677mr12829799a91.8.1779677947243;
-        Sun, 24 May 2026 19:59:07 -0700 (PDT)
-Received: from localhost.localdomain ([2409:891f:1b84:8280:c87f:5f1:b071:95f8])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a723dfa2dsm8029365a91.16.2026.05.24.19.59.02
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 24 May 2026 19:59:06 -0700 (PDT)
-From: Chuang Wang <nashuiliang@gmail.com>
-To: 
-Cc: Chuang Wang <nashuiliang@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf.kernel@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5] net: reduce RFS/ARFS flow updates by checking LLC affinity
-Date: Mon, 25 May 2026 10:58:42 +0800
-Message-ID: <20260525025854.13982-1-nashuiliang@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        bh=OwxZUNNLw1PFWW1oO7q8KXR63/wpofHqbMGlju32jag=;
+        b=dziHZ3HQiJS2CYJQNWfaAAv0fRjST6sPpVLLsx6wgICuym214dd2PFYMo9kqJjKMSW
+         fkuW8JmP3VrRw7fdiOMWFNw4HDKuXMDRIqIzdfBA8fiED8fWKGjZz6ZWRdHxCcOKw7JI
+         t1LtNqgnCztFGeDcrmbG7X9TajFS/yCbPwCITD2xqLbGXqneD7e219eB6vrrZrTvSbdF
+         jMQIntd14O/+MT1bE/GvYQmdA7kGjUZOv55Rr6NxLGwJ+3TY2S9i3t1tmBo9OPLCWaOz
+         OhfQWrmL0K2aVFbFPZgpJR10cZgCN/Qmh6/uqEfUR0ygFTAzIQSjftWLqmhQ7M36nvpP
+         sbKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779678808; x=1780283608;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OwxZUNNLw1PFWW1oO7q8KXR63/wpofHqbMGlju32jag=;
+        b=ONoexYYDlNOaYtIViq3XJX//fl/2JcbLRyzefy23pKpdrBp65fiPv0I6q+bSS6KJRH
+         eJ726hnIODmsFtzMuQAwuaIpL4TQV2de9kuNDZTKLX98fDCJfdhgKYkmX0aNzE8r4fDI
+         8St92KM45P3tAAcAlyOGIvMyB1DPz9VT2BbGVQl5SX1+N83YeJJyhEjX2EYq+DWA1hXv
+         4kr9k5ZvxQTf/ZJoDjaYLh3uFn/zPYXe7Rfr6v/HnCjGWKdgNa9zGURB4j/qFKC34g28
+         qTrqqT3QGPc94D0sNzTQFxOMW7rLT7nDiWri2GtNpUQJXh/YgcM5jhh4EMYqrjmX2Mn0
+         c3aw==
+X-Gm-Message-State: AOJu0YzSWWiwiTHJLWLjfR/5ATvFVmwFKEVhPMw7Zkos8biCztcf8ubr
+	vLdjX+35QClgtSAsWJC+HrbVdxlKxju5uuR2CCbQC8QAQbypgiRJJgqFGHw8gIOz
+X-Gm-Gg: Acq92OGlmayfD9HAGLlWpMizhZvlA5gV5pyrSVNn83Lw5OI3GlYyva9w90VjLCVlUFx
+	mIYgb31EpKgm7/I0Fpb8btJFAGEn0RpZx2BmhldRdijQ2ZIyUmyNrBngVU+qPXnuFhQxup80prg
+	lu4yWGgtSA8dvttnHYHe1nmjeatX3zKPQetLSRFjQuKJo939hxgg87Rmz0ZTydibuMwq9CVz6g2
+	LSWtJW+NDujr3bf7W/Yr+orFVAFSVoVGoM4rHn9qMHbJBrPikal72B3W3bEH+Yigh4Sf4D/C9PJ
+	yLOUakiRvo0N9v16oPMkVnaoax4Disn23DG7qig/scUwOAkskM314ZulQAStIGhtIcZdYhSxHEi
+	TcGkhU0+C9sJAkIeqpfZz96KZOWg9OJ0U1KpDxBrBQosyk0lgZVHWBb14KuHbwg2FX1UMQv7ZyS
+	ue+Xcp+bR3auPbsKEmD6aW91yB1r3zMnTfDZm4yzQfZAWvYkZiOJTfVOXnhWPf
+X-Received: by 2002:a05:6a00:188c:b0:835:6e77:1bbc with SMTP id d2e1a72fcca58-8415f61b465mr11516369b3a.36.1779678808333;
+        Sun, 24 May 2026 20:13:28 -0700 (PDT)
+Received: from u.. (61-222-64-201.hinet-ip.hinet.net. [61.222.64.201])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84164ac9a42sm9134237b3a.8.2026.05.24.20.13.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 May 2026 20:13:27 -0700 (PDT)
+From: Tim JH Chen <tim770802@gmail.com>
+X-Google-Original-From: Tim JH Chen <tim.jh.chen@wnc.com.tw>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	tim.jh.chen@wnc.com.tw,
+	Chih.Hung.Huang@wnc.com.tw
+Subject: [PATCH] net: wwan: t7xx: fix race between TX thread and system PM suspend
+Date: Mon, 25 May 2026 11:13:20 +0800
+Message-ID: <20260525031320.519435-1-tim.jh.chen@wnc.com.tw>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <5315a3b0-4fc8-4d74-8e27-d7b84bd794c9@redhat.com>
+References: <5315a3b0-4fc8-4d74-8e27-d7b84bd794c9@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,328 +94,182 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-291232-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nashuiliang@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-291233-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 5CC055C57E5
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tim770802@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: CA5565C5883
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The current implementation of rps_record_sock_flow() updates the flow
-table every time a socket is processed on a different CPU. In high-load
-scenarios, especially with Accelerated RFS (ARFS), this triggers
-frequent flow steering updates via ndo_rx_flow_steer.
+v2: Address two concerns raised in AI-assisted code review of v1:
 
-For drivers like mlx5 that implement hardware flow steering, these
-constant updates lead to significant contention on internal driver locks
-(e.g., arfs_lock). This contention often becomes a performance
-bottleneck that outweighs the steering benefits.
+1. [High] t7xx_dpmaif_resume() was unconditionally restoring state to
+   DPMAIF_STATE_PWRON regardless of the state before suspend.  If the
+   modem had already been moved to DPMAIF_STATE_PWROFF by
+   t7xx_dpmaif_md_state_callback() (MD_STATE_EXCEPTION or
+   MD_STATE_STOPPED) prior to system suspend, resume would incorrectly
+   re-arm the TX kthread guard, allowing TX HW writes against a modem
+   the MD state machine considers stopped or in exception.
 
-This patch introduces a cache-aware update strategy: the flow record is
-only updated if the flow migrates across Last Level Cache (LLC)
-boundaries. This minimizes expensive hardware reconfigurations while
-preserving cache locality for the application. A new sysctl,
-net.core.rps_feat_llc_affinity, is added to toggle this feature.
+   Fix: save dpmaif_ctrl->state into pre_suspend_state at the start of
+   t7xx_dpmaif_suspend() and restore that saved value in
+   t7xx_dpmaif_resume(), so a pre-suspend PWROFF is preserved across
+   the suspend/resume cycle.
 
-Additionally, export sock_rps_record_flow_hash() and
-sock_rps_record_flow(). This resolves a symbol visibility compilation
-error triggered by 'tun' using sock_rps_record_flow_hash() in
-tun_flow_update() when CONFIG_TUN is built as a module. The same logic
-is applied to SCTP, allowing it to use sock_rps_record_flow() safely
-when built as a module.
+2. [Medium] The v1 second state check before pm_runtime_resume_and_get()
+   only narrowed the TOCTOU window -- it did not close it.  The state
+   field was a plain enum read and written without any lock or
+   READ_ONCE/WRITE_ONCE annotation.  After the check passed on one CPU,
+   the suspend path on another CPU could still set state=PWROFF and
+   begin PM teardown before the kthread reached pm_runtime_resume_and_get(),
+   reproducing the deadlock.
 
-Performance Test Results:
-The patch was tested in a K8s environment (AMD CPU 128*2, 16-core Pod
-with CPU pinning, mlx5 NIC) using brpc[1] echo_server and rpc_press.
+   Fix: introduce tx_pm_lock (struct mutex) held by the kthread across
+   the [state check -> pm_runtime_resume_and_get -> pm_runtime_put]
+   sequence.  t7xx_dpmaif_suspend() acquires this lock before setting
+   DPMAIF_STATE_PWROFF, which serialises with any in-progress kthread
+   PM section and guarantees the kthread cannot enter
+   pm_runtime_resume_and_get() after the state flag is set.
+   READ_ONCE/WRITE_ONCE are added at every access point of the state
+   flag that crosses the suspend/resume boundary to prevent
+   compiler-visible tearing.
 
-rpc_press Commands:
+The original v1 description of the root cause and tested fix still
+applies (deadlock between t7xx_dpmaif_tx_hw_push_thread calling
+pm_runtime_resume_and_get() and the system PM suspend path, triggered
+with ASPM L1 enabled after repeated suspend/resume cycles).
 
-  for i in {1..8}; do
-    ./rpc_press -proto=./echo.proto -method=example.EchoService.Echo
-    -server=<IP>:8000 -input='{"message":"hello"}'
-    -qps=0 -thread_num=512 -connection_type=pooled &
-  done
+Tested: no soft lockup over 500+ suspend/resume cycles with SIM
+registered and ASPM L1 enabled (previously triggered in < 300).
 
-Monitor mlx5e_rx_flow_steer frequency:
-
-  /usr/share/bcc/tools/funccount -i 1 mlx5e_rx_flow_steer
-
-Frequency of mlx5e_rx_flow_steer (via funccount[2]):
-
-  Before: ~335,000 counts/sec
-  After:   ~23,000 counts/sec (reduced by ~93%)
-
-System Metrics (after enabling rps_feat_llc_affinity):
-
-  CPU Utilization: 38% -> 32%
-  CPU PSI (Pressure Stall Information): 20% -> 10%
-
-These results demonstrate that filtering updates by LLC affinity
-significantly reduces driver lock contention and improves overall
-CPU efficiency under heavy network load.
-
-[1] https://github.com/apache/brpc/
-[2] https://github.com/iovisor/bcc/blob/master/tools/funccount.py
-
-Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
+Fixes: 05f7e89ab ("Linux 6.19")
+Signed-off-by: Tim JH Chen <tim.jh.chen@wnc.com.tw>
 ---
-v4 -> v5: fix 'modpost: "rps_llc_check" [net/sctp/sctp.ko] undefined!' by kernel test robot
-v3 -> v4: add rps_llc_check by Eric Dumazet
-v2 -> v3: patch net -> net-next by Jakub Kicinski
-v1 -> v2: add rps_feat_llc_affinity; add brpc tests
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif.c    |  6 ++++++
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif.h    |  3 +++
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif_tx.c | 16 +++++++++++++---
+ 3 files changed, 22 insertions(+), 3 deletions(-)
 
- include/net/rps.h          | 28 ++++----------
- net/core/dev.c             | 76 ++++++++++++++++++++++++++++++++++++++
- net/core/sysctl_net_core.c | 35 ++++++++++++++++++
- 3 files changed, 119 insertions(+), 20 deletions(-)
-
-diff --git a/include/net/rps.h b/include/net/rps.h
-index e33c6a2fa8bb..6dacf0888a6c 100644
---- a/include/net/rps.h
-+++ b/include/net/rps.h
-@@ -12,6 +12,7 @@
+diff --git a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif.c b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif.c
+index 7ff33c1d6ac7..e1f3eeb2c947 100644
+--- a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif.c
++++ b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif.c
+@@ -412,6 +412,11 @@ static int t7xx_dpmaif_suspend(struct t7xx_pci_dev *t7xx_dev, void *param)
+ 	struct dpmaif_ctrl *dpmaif_ctrl = param;
  
- extern struct static_key_false rps_needed;
- extern struct static_key_false rfs_needed;
-+extern struct static_key_false rps_feat_llc_affinity;
+ 	t7xx_dpmaif_tx_stop(dpmaif_ctrl);
++	dpmaif_ctrl->pre_suspend_state = READ_ONCE(dpmaif_ctrl->state);
++	mutex_lock(&dpmaif_ctrl->tx_pm_lock);
++	WRITE_ONCE(dpmaif_ctrl->state, DPMAIF_STATE_PWROFF);
++	mutex_unlock(&dpmaif_ctrl->tx_pm_lock);
++	wake_up(&dpmaif_ctrl->tx_wq);
+ 	t7xx_dpmaif_hw_stop_all_txq(&dpmaif_ctrl->hw_info);
+ 	t7xx_dpmaif_hw_stop_all_rxq(&dpmaif_ctrl->hw_info);
+ 	t7xx_dpmaif_disable_irq(dpmaif_ctrl);
+@@ -451,6 +456,7 @@ static int t7xx_dpmaif_resume(struct t7xx_pci_dev *t7xx_dev, void *param)
+ 	if (!dpmaif_ctrl)
+ 		return 0;
  
- /*
-  * This structure holds an RPS map which can be of variable length.  The
-@@ -55,11 +56,14 @@ struct rps_sock_flow_table {
++	WRITE_ONCE(dpmaif_ctrl->state, dpmaif_ctrl->pre_suspend_state);
+ 	t7xx_dpmaif_start_txrx_qs(dpmaif_ctrl);
+ 	t7xx_dpmaif_enable_irq(dpmaif_ctrl);
+ 	t7xx_dpmaif_unmask_dlq_intr(dpmaif_ctrl);
+diff --git a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif.h b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif.h
+index 0ce4505e813d..670ed2cca761 100644
+--- a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif.h
++++ b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif.h
+@@ -20,6 +20,7 @@
  
- #define RPS_NO_CPU 0xffff
+ #include <linux/bitmap.h>
+ #include <linux/mm_types.h>
++#include <linux/mutex.h>
+ #include <linux/netdevice.h>
+ #include <linux/sched.h>
+ #include <linux/skbuff.h>
+@@ -172,6 +173,8 @@ struct dpmaif_ctrl {
+ 	struct t7xx_pci_dev		*t7xx_dev;
+ 	struct md_pm_entity		dpmaif_pm_entity;
+ 	enum dpmaif_state		state;
++	enum dpmaif_state		pre_suspend_state;
++	struct mutex			tx_pm_lock;
+ 	bool				dpmaif_sw_init_done;
+ 	struct dpmaif_hw_info		hw_info;
+ 	struct dpmaif_tx_queue		txq[DPMAIF_TXQ_NUM];
+diff --git a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_tx.c b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_tx.c
+index 236d632cf591..197c0ab3fd39 100644
+--- a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_tx.c
++++ b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_tx.c
+@@ -449,10 +449,10 @@ static int t7xx_dpmaif_tx_hw_push_thread(void *arg)
  
-+bool rps_llc_check(u32 old_val, u32 new_val);
+ 	while (!kthread_should_stop()) {
+ 		if (t7xx_tx_lists_are_all_empty(dpmaif_ctrl) ||
+-		    dpmaif_ctrl->state != DPMAIF_STATE_PWRON) {
++		    READ_ONCE(dpmaif_ctrl->state) != DPMAIF_STATE_PWRON) {
+ 			if (wait_event_interruptible(dpmaif_ctrl->tx_wq,
+ 						     (!t7xx_tx_lists_are_all_empty(dpmaif_ctrl) &&
+-						     dpmaif_ctrl->state == DPMAIF_STATE_PWRON) ||
++						     READ_ONCE(dpmaif_ctrl->state) == DPMAIF_STATE_PWRON) ||
+ 						     kthread_should_stop()))
+ 				continue;
+ 
+@@ -460,14 +460,23 @@ static int t7xx_dpmaif_tx_hw_push_thread(void *arg)
+ 				break;
+ 		}
+ 
++		mutex_lock(&dpmaif_ctrl->tx_pm_lock);
++		if (READ_ONCE(dpmaif_ctrl->state) != DPMAIF_STATE_PWRON) {
++			mutex_unlock(&dpmaif_ctrl->tx_pm_lock);
++			continue;
++		}
 +
- static inline void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+ 		ret = pm_runtime_resume_and_get(dpmaif_ctrl->dev);
+-		if (ret < 0 && ret != -EACCES)
++		if (ret < 0 && ret != -EACCES) {
++			mutex_unlock(&dpmaif_ctrl->tx_pm_lock);
+ 			return ret;
++		}
+ 
+ 		t7xx_pci_disable_sleep(dpmaif_ctrl->t7xx_dev);
+ 		t7xx_do_tx_hw_push(dpmaif_ctrl);
+ 		t7xx_pci_enable_sleep(dpmaif_ctrl->t7xx_dev);
+ 		pm_runtime_put_autosuspend(dpmaif_ctrl->dev);
++		mutex_unlock(&dpmaif_ctrl->tx_pm_lock);
+ 	}
+ 
+ 	return 0;
+@@ -475,6 +484,7 @@ static int t7xx_dpmaif_tx_hw_push_thread(void *arg)
+ 
+ int t7xx_dpmaif_tx_thread_init(struct dpmaif_ctrl *dpmaif_ctrl)
  {
- 	unsigned int index = hash & rps_tag_to_mask(tag_ptr);
- 	u32 val = hash & ~net_hotdata.rps_cpu_mask;
- 	struct rps_sock_flow_table *table;
-+	u32 old_val;
- 
- 	/* We only give a hint, preemption can change CPU under us */
- 	val |= raw_smp_processor_id();
-@@ -68,7 +72,8 @@ static inline void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
- 	/* The following WRITE_ONCE() is paired with the READ_ONCE()
- 	 * here, and another one in get_rps_cpu().
- 	 */
--	if (READ_ONCE(table[index].ent) != val)
-+	old_val = READ_ONCE(table[index].ent);
-+	if (old_val != val && rps_llc_check(old_val, val))
- 		WRITE_ONCE(table[index].ent, val);
- }
- 
-@@ -136,25 +141,8 @@ static inline bool rfs_is_needed(void)
- #endif
- }
- 
--static inline void sock_rps_record_flow_hash(__u32 hash)
--{
--#ifdef CONFIG_RPS
--	if (!rfs_is_needed())
--		return;
--
--	_sock_rps_record_flow_hash(hash);
--#endif
--}
--
--static inline void sock_rps_record_flow(const struct sock *sk)
--{
--#ifdef CONFIG_RPS
--	if (!rfs_is_needed())
--		return;
--
--	_sock_rps_record_flow(sk);
--#endif
--}
-+void sock_rps_record_flow_hash(__u32 hash);
-+void sock_rps_record_flow(const struct sock *sk);
- 
- static inline void sock_rps_delete_flow(const struct sock *sk)
- {
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 26ac8eb9b259..f98216ddaec1 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4997,6 +4997,8 @@ struct static_key_false rps_needed __read_mostly;
- EXPORT_SYMBOL(rps_needed);
- struct static_key_false rfs_needed __read_mostly;
- EXPORT_SYMBOL(rfs_needed);
-+struct static_key_false rps_feat_llc_affinity __read_mostly;
-+EXPORT_SYMBOL(rps_feat_llc_affinity);
- 
- static u32 rfs_slot(u32 hash, rps_tag_ptr tag_ptr)
- {
-@@ -5208,6 +5210,58 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 	return cpu;
- }
- 
-+/**
-+ * rps_llc_check - Determine if RPS flow table should be updated
-+ * @old_val: Previous flow record value
-+ * @new_val: Target flow record value
-+ *
-+ * Returns true if the record needs an update.
-+ */
-+bool rps_llc_check(u32 old_val, u32 new_val)
-+{
-+	u32 old_cpu = old_val & ~net_hotdata.rps_cpu_mask;
-+	u32 new_cpu = new_val & ~net_hotdata.rps_cpu_mask;
-+
-+	if (old_val == new_val)
-+		return false;
-+
-+	/*
-+	 * RPS LLC Affinity Feature:
-+	 * Reduce RFS/ARFS flow updates by checking LLC affinity.
-+	 *
-+	 * Frequent flow table updates can trigger constant hardware steering
-+	 * reconfigurations (e.g., ndo_rx_flow_steer), leading to significant
-+	 * contention on driver internal locks (like mlx5's arfs_lock).
-+	 *
-+	 * This strategy only updates the flow record if it migrates across LLC
-+	 * boundaries. This minimizes expensive hardware updates while preserving
-+	 * cache locality for the application.
-+	 */
-+	if (static_branch_unlikely(&rps_feat_llc_affinity)) {
-+		/* Force update if the recorded CPU is invalid or has gone offline */
-+		if (old_cpu >= nr_cpu_ids || !cpu_active(old_cpu))
-+			return true;
-+
-+		/*
-+		 * Force an update if the current task is no longer permitted
-+		 * to run on the old_cpu.
-+		 */
-+		if (!cpumask_test_cpu(old_cpu, current->cpus_ptr))
-+			return true;
-+
-+		/*
-+		 * If CPUs do not share a cache, allow the update to prevent
-+		 * expensive remote memory accesses and cache misses.
-+		 */
-+		if (!cpus_share_cache(old_cpu, new_cpu))
-+			return true;
-+
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- #ifdef CONFIG_RFS_ACCEL
- 
- /**
-@@ -5249,6 +5303,28 @@ bool rps_may_expire_flow(struct net_device *dev, u16 rxq_index,
- }
- EXPORT_SYMBOL(rps_may_expire_flow);
- 
-+void sock_rps_record_flow_hash(__u32 hash)
-+{
-+#ifdef CONFIG_RPS
-+	if (!rfs_is_needed())
-+		return;
-+
-+	_sock_rps_record_flow_hash(hash);
-+#endif
-+}
-+EXPORT_SYMBOL(sock_rps_record_flow_hash);
-+
-+void sock_rps_record_flow(const struct sock *sk)
-+{
-+#ifdef CONFIG_RPS
-+	if (!rfs_is_needed())
-+		return;
-+
-+	_sock_rps_record_flow(sk);
-+#endif
-+}
-+EXPORT_SYMBOL(sock_rps_record_flow);
-+
- #endif /* CONFIG_RFS_ACCEL */
- 
- /* Called from hardirq (IPI) context */
-diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index b508618bfc12..b6d4ebcbb6a6 100644
---- a/net/core/sysctl_net_core.c
-+++ b/net/core/sysctl_net_core.c
-@@ -210,6 +210,33 @@ static int rps_sock_flow_sysctl(const struct ctl_table *table, int write,
- 	kvfree_rcu_mightsleep(tofree);
- 	return ret;
- }
-+
-+static int rps_feat_llc_affinity_sysctl(const struct ctl_table *table, int write,
-+					void *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	u8 curr_state;
-+	int ret;
-+	const struct ctl_table tmp = {
-+		.data = &curr_state,
-+		.maxlen = sizeof(curr_state),
-+		.mode = table->mode,
-+		.extra1 = table->extra1,
-+		.extra2 = table->extra2
-+	};
-+
-+	curr_state = static_branch_unlikely(&rps_feat_llc_affinity) ? 1 : 0;
-+
-+	ret = proc_dou8vec_minmax(&tmp, write, buffer, lenp, ppos);
-+	if (write && ret == 0) {
-+		if (curr_state && !static_branch_unlikely(&rps_feat_llc_affinity))
-+			static_branch_enable(&rps_feat_llc_affinity);
-+		else if (!curr_state && static_branch_unlikely(&rps_feat_llc_affinity))
-+			static_branch_disable(&rps_feat_llc_affinity);
-+	}
-+
-+	return ret;
-+}
-+
- #endif /* CONFIG_RPS */
- 
- #ifdef CONFIG_NET_FLOW_LIMIT
-@@ -554,6 +581,14 @@ static struct ctl_table net_core_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= rps_sock_flow_sysctl
- 	},
-+	{
-+		.procname   = "rps_feat_llc_affinity",
-+		.maxlen     = sizeof(u8),
-+		.mode       = 0644,
-+		.proc_handler   = rps_feat_llc_affinity_sysctl,
-+		.extra1     = SYSCTL_ZERO,
-+		.extra2     = SYSCTL_ONE
-+	},
- #endif
- #ifdef CONFIG_NET_FLOW_LIMIT
- 	{
++	mutex_init(&dpmaif_ctrl->tx_pm_lock);
+ 	init_waitqueue_head(&dpmaif_ctrl->tx_wq);
+ 	dpmaif_ctrl->tx_thread = kthread_run(t7xx_dpmaif_tx_hw_push_thread,
+ 					     dpmaif_ctrl, "dpmaif_tx_hw_push");
 -- 
-2.47.3
+2.43.0
 
 
