@@ -1,201 +1,140 @@
-Return-Path: <netdev+bounces-291291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291292-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OOZJLncqFGraKQcAu9opvQ
-	(envelope-from <netdev+bounces-291291-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 12:54:47 +0200
+	id EH1KFOEtFGpYKgcAu9opvQ
+	(envelope-from <netdev+bounces-291292-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:09:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C0575C980C
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 12:54:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E32735C9AEE
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ECC973018410
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:53:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 58C1830058F6
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 11:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D794E3E9F69;
-	Mon, 25 May 2026 10:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3D837E2EE;
+	Mon, 25 May 2026 11:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTgqzR8h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAj5P0AN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360A13E9C27
-	for <netdev@vger.kernel.org>; Mon, 25 May 2026 10:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8330837D136
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 11:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779706399; cv=none; b=nfLEwSfBKI/W9+IRmiTb89Zj75ONVPWjj/HHz5Q8uDzPXgylRaOYFBJPRM9RVKR9Qu4ZPYFu3mgEkEDhIJocJD90l4LV5ucIpLuF6gklS7nqYMMuZLriz5sfs6mIMfmyvk+fkPuW2q0edNgy66vdZoPuxYmIphlnGaquVLA7liM=
+	t=1779707356; cv=none; b=SS/g8dduJOL4VonZUPF4hFtrr3wXBygVhmzI3iwul2XKXSk98hsxrb+mWdMroC9ECndrkvl5R7xYOe9DOm+IO3AcH0Gtrrj+g9fhZrlOMUz2RoKXr+cXZiN+3iEyG+pODsCuu4njvG5SOrHE6MBqV+r0s3qXEBKowSVGm5/TQ3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779706399; c=relaxed/simple;
-	bh=rCoOpEyyUCy5izIH7PFgiOzmcy6juASzPqw0DoJcH0A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rcNsZp20pGztTDZzWHMfYzIBfm+LhdWkuatK75VzaAooLD7Wtj8ySNNPpyzxlLtwsEMd6SooobduM66NDIHwWcNUOkTKctpmcII39E1sJegwmvLChA5mI5j3aCPQLmsoYGrOxuXnNeztLyofKypbbXgE7DOqDIguQIEc6mXl0uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JTgqzR8h; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4905529b933so12169915e9.0
-        for <netdev@vger.kernel.org>; Mon, 25 May 2026 03:53:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779706396; x=1780311196; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hIaUsl5OR/SB9imIspw1g7Ej0mCc49YZbthvw9ulBV0=;
-        b=JTgqzR8hYkHOKVq6LvCHMzI0UwunfbBdpl/kEjtAGqhI2I7iKdjb3u8htt8q3YB9ts
-         ha7iOGO3j7TsCDYZrDTwZXZN5qnWneBCiiJrN0gZmfTP71m+TAnkmixGpGfXMYlFXLuh
-         jOOkwKLGWqpVtCeS3Mrw2+SkkfDazmU9QwETwepYvxlj/z4HxlcXSZxOno+Se6LB3Y65
-         apXE8bM7gRw4SA+Nb9040sqIvK2Rx3Q9BQGGpo+ObaOTNGJXB6N+/bJQZHUiZ89vGUAT
-         n8b9ei+uZqcVnbG2clDOzFjzpS3Q8Snqg1RztkVmkKgDVnlZmA93NWsLguUXR7Rf98iB
-         kObg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779706396; x=1780311196;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hIaUsl5OR/SB9imIspw1g7Ej0mCc49YZbthvw9ulBV0=;
-        b=CXmzxsXZXESnDnGv0SMbZ5HUijMZPJ3dYizGn6ZNlOpw9N1ejvcMJlg9p7pUi7wsOS
-         IZDDVlUIFBoAXkCuQlR0GqPAaDOxlngr0J+AX0F9js/MxjwH5M7QqsGn7YqubL/q6NEQ
-         Erp3TP8yNyPwOEOY8mFprDO7WF34c14mpWlqquASoOWtmPmlAV5iTnk4y4UKKhV16NSi
-         yfl5WucBqfDWYziREKfoS7uHGA6fx0e2Mu1P8J9pBq/4AG146OQGDSb7jfLz4Kak03oa
-         Uu7uTrpX3Ak3yZSjQuWEt45HoQR6R0T6z4NAEPo1+UfJiOpb5e8+Qs2i55cCPgwGOxEe
-         xAnA==
-X-Forwarded-Encrypted: i=1; AFNElJ+o68uGUUG6zSpRWjr5dseARrnq6ZgFF3VqF3usFw+MKrQimqn9lW/t7P19s8WGcWfU12q1Fhk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7xJNiHFa/sA87a2PE655YZzZPIShj6rcYCYc0Ng2O33+sE7lm
-	+8nsLsVRAwtX5xfDhWu2tCHLvSVpgUt50tT072XKKKk72FiOYZrzKC8u
-X-Gm-Gg: Acq92OFPFDeBUbCh7YYVL25qG46v7n8LSyhLVAMygQ9r0LZRsioNO4prxqVw65fUJHR
-	5/8HkShfWijQwantfee2eCcQYV+QN6jLG/6JROjeMSGmiOnuwOuddX7Jk6UbIDfBtAji0OZGSVx
-	RS1njdmSYnKkuw1pXzdPoj6H8b47IHyRB1vsiPRGTz0Sr6vVqfojo6ZGIBIkwQ1yk5STfhJ7Gko
-	xZPNM5bMt21pqsApcQ1aSRCLUvuoD7ZiGyOwION52LE2TzCs1QAKnTuvkPQsOQzRMDANS2P9LhZ
-	reoGHNJkI1IujjW4/VUT7YS/wArY4ieQQ/Kw3q7lbipClkRUlKW/SE6YMsdkxCwWPnlN7Dyte/6
-	zpNdb5fAh/WxyIavd8YLwV9Ok1MJlxq9AjfzF/F254FlhCxxfUdc3G2a7XSY9ryoVw8mS+FJSJw
-	/pwJjeRXPwiK7unlpbuGK3eaLlRmh+C8f/QXch/uSLdSBn03rT9FUnrlv+QxzOijoY
-X-Received: by 2002:a05:600c:468a:b0:490:3d62:f5df with SMTP id 5b1f17b1804b1-490428e5a6amr234019415e9.30.1779706396365;
-        Mon, 25 May 2026 03:53:16 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904561a33dsm222417485e9.11.2026.05.25.03.53.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2026 03:53:15 -0700 (PDT)
-Date: Mon, 25 May 2026 11:53:14 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, netdev@vger.kernel.org,
- xuanzhuo@linux.alibaba.com, horms@kernel.org,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kuba@kernel.org, eperezma@redhat.com,
- pabeni@redhat.com, mst@redhat.com, davem@davemloft.net,
- jasowang@redhat.com, stefanha@redhat.com, edumazet@google.com,
- stable@vger.kernel.org
-Subject: Re: [PATCH net] vsock/virtio: fix skb overhead overflow on 32-bit
- builds
-Message-ID: <20260525115314.3cf310e6@pumpkin>
-In-Reply-To: <ahQbVxvbBEJZ3TBU@sgarzare-redhat>
-References: <20260521124732.125771-1-sgarzare@redhat.com>
-	<177950282964.1445071.6600517211632117224.git-patchwork-notify@kernel.org>
-	<20260523173557.5cc4f4f6@pumpkin>
-	<ahQbVxvbBEJZ3TBU@sgarzare-redhat>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1779707356; c=relaxed/simple;
+	bh=g4o1dpIg6Wql0HWF21Ncd1Zu05FLlgYRwwP4h4IKfdc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fbULazY/cqCWVnwDlFVSPokBNovCNod7TSWtOMOWsY/I4jjn3IYwdj8nzSCaaQ5Zj6Qa/Ao+DpEXYFf4Gdvfkl7ghjh3vBqKwp/vl/QfX/6QWdzxUnBZN/JukhB6c3VMWbT5yblgCq5lWg2GVNqfS/FCm1u6PVc/nXKkstP950o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAj5P0AN; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 479DF1F0155E
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 11:09:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779707351;
+	bh=Ti8F6+ipYsvuGrD4TuxYp5AKRgNH5B7oF+X/muBpZZ8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=PAj5P0ANFYqOyNCn/pCy94Jz70WdiPUDbOsUbaW4Tu3qfJRwT+v/ui0DsQaeU5/nZ
+	 nVVVXLEh/b/nttcnz6IsPeR7PdLXP4pkbWEV5EKykUxlZFQAYUipgr0FzbAq9IYKs0
+	 19rLyQZ+OJrzwH9bICfx0PM5hD1PvxI6j20+WPwEwy7+ZeG4PFR2u8ovmyWTOIIeVj
+	 CXeTKcG8etsXXWeNA+YdZiYjHwMcOWzl0Cnw3QrevxLDmLAeGRmKepqkboJvoMz5em
+	 K2Mg2/Qmk+LSC4qIlwLokdcJbIrGN3/VFo2XI+Cvjj/ldZNHfr/jir55z7xVRnWldJ
+	 5aYdqrVfl3jig==
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-6324ee4040cso3229532137.0
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 04:09:11 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ9InWA9OdjkMgU8POCxm5AmXmmOhbMovyWG10+2jI+nEUWsJ6kExy6YzNWS8Oj+orw8WiCeS6g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdSGTQzy7I3lce1mwUJtxwjxHS8tGN2E8O15MwxKgwKGoeeYro
+	N+XEGsS1/lEmA9Doe9TFEXNUCvp8XmY3HwbTW3sA2iJ+wf5/chxSqt5yHuBMnBDyvsvqU1mmiBt
+	CE4WSAbGZVHImmhd+xjoP5lZB3l/L7tE=
+X-Received: by 2002:a05:6102:5ccb:b0:634:5339:33bf with SMTP id
+ ada2fe7eead31-67c7d977844mr6305680137.18.1779707350376; Mon, 25 May 2026
+ 04:09:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+References: <20260522113225.241337-1-bjorn@kernel.org> <20260522070515.044d7d97@kernel.org>
+In-Reply-To: <20260522070515.044d7d97@kernel.org>
+From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Date: Mon, 25 May 2026 13:08:59 +0200
+X-Gmail-Original-Message-ID: <CAJ+HfNjE8e1Lj1yDEPYXk_KPspjN166rDbHon+zwiJb1rPqSrA@mail.gmail.com>
+X-Gm-Features: AVHnY4JLYHa3GAzQN4bj9M_WDpfipku0Hpu51IZUTpE6XJB_0rmfNrcwqqfjO5Q
+Message-ID: <CAJ+HfNjE8e1Lj1yDEPYXk_KPspjN166rDbHon+zwiJb1rPqSrA@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/3] fbnic: Support larger io_uring zcrx buffers
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
+	Mohsin Bashir <mohsin.bashr@gmail.com>, 
+	"Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [0.01 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_MIXED_CHARSET(0.67)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-291291-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org,intel.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-291292-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,netdevbpf];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2C0575C980C
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: E32735C9AEE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 25 May 2026 11:57:45 +0200
-Stefano Garzarella <sgarzare@redhat.com> wrote:
+Hey!
 
-> On Sat, May 23, 2026 at 05:35:57PM +0100, David Laight wrote:
-> >On Sat, 23 May 2026 02:20:29 +0000
-> >patchwork-bot+netdevbpf@kernel.org wrote:
-> >  
-> >> Hello:
-> >>
-> >> This patch was applied to netdev/net.git (main)
-> >> by Jakub Kicinski <kuba@kernel.org>:  
-> >
-> >Did anyone else notice that is isn't a bug?
-> >
-> >There is no way that a 'count of bytes of kernel memory' can overflow
-> >the size of 'long'.  
-> 
-> It's more of an estimate than an actual calculation of memory usage if 
-> we queue the incoming packet. In theory, an overflow could occur if the 
-> user sets `buf_alloc` to 4GB. In practice, though, I think you're right: 
-> the memory should run out before we get to that check.
+On Fri, 22 May 2026 at 16:05, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Fri, 22 May 2026 13:32:19 +0200 Bj=C3=B6rn T=C3=B6pel wrote:
+> >  drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  29 +--
+> >  .../net/ethernet/meta/fbnic/fbnic_debugfs.c   |   5 +-
+> >  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 168 ++++++++++++++----
+> >  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |   6 +
+> >  .../selftests/drivers/net/hw/iou-zcrx.c       |  28 ++-
+> >  5 files changed, 176 insertions(+), 60 deletions(-)
+>
+> Hm. What's merging the frags? the hw will serve them back to us in 4kB
+> chunks. Frankly the iou zc hurts me less that the fact that we run
+> out of nr_frags in GRO :(
 
-The calculation is:
+Thanks for taking a look, Jakub!
 
-	u64 skb_overhead = (skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0); 
+The driver relies on the generic XDP frag coalescing
+(xdp_buff_add_frag()). So, adjacent 4K completions are extended into
+the same frag. IOW, GRO should see coalesced skb frab, rather than one
+graf per HW BDQ frag
 
-skb_queue_len() will be the number of items on the queue.
-SKB_TRUESIZE(0) is the memory taken up by a zero length skb (basically sizeof(skb)).
+I'll address all the other comments in the next rev!
 
-Unless you either corrupt the queue length or manage to allocate skb that use
-less than the minimum about of memory that product can't overflow 'unsigned long'.
 
-The later calculations might wrap - but the multiply can't.
-
--- David
-
-> 
-> Thanks,
-> Stefano
-> 
-> >
-> >-- David
-> >  
-> >>
-> >> On Thu, 21 May 2026 14:47:32 +0200 you wrote:  
-> >> > From: Stefano Garzarella <sgarzare@redhat.com>
-> >> >
-> >> > On 32-bit architectures, both skb_queue_len() and SKB_TRUESIZE(0) evaluate
-> >> > to 32-bit values. The multiplication can overflow before being assigned to
-> >> > the u64 skb_overhead variable, making the skb overhead check ineffective.
-> >> >
-> >> > Cast skb_queue_len() to u64 so the multiplication is always performed in
-> >> > 64-bit arithmetic.
-> >> >
-> >> > [...]  
-> >>
-> >> Here is the summary with links:
-> >>   - [net] vsock/virtio: fix skb overhead overflow on 32-bit builds
-> >>     https://git.kernel.org/netdev/net/c/4157501b9a8f
-> >>
-> >> You are awesome, thank you!  
-> >  
-> 
-
+Bj=C3=B6rn
 
