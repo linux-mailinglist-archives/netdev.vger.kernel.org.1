@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-291476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id XW/HGgq9FGp1PwcAu9opvQ
-	(envelope-from <netdev+bounces-291476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 23:20:10 +0200
+	id mMf9Bie9FGp1PwcAu9opvQ
+	(envelope-from <netdev+bounces-291477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 23:20:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3D565CED8F
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 23:20:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0FE5CEDAC
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 23:20:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 722A03006B66
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 21:20:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A63530071C4
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 21:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5753735F5E3;
-	Mon, 25 May 2026 21:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833033998AF;
+	Mon, 25 May 2026 21:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dhTLduo/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GroZkdTX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327E51FDE31;
-	Mon, 25 May 2026 21:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64688380FFB;
+	Mon, 25 May 2026 21:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779744005; cv=none; b=sXrcjBRobSSeDGb+A+lAaCB8QbkCOGJLF5/hxckWpF0RtgIjS9DArUKa12YBI8ovi6b7Gluuflj38rC1Ha+9d86Vb/xyozuzNrUVEnuspSiwZr52Y2kdCpkTZEFrdQFuId6LyirWWksaMMA0JVypCMvp/pGzpasBoH6bRP8quhw=
+	t=1779744006; cv=none; b=AOl9CHZ195naCtQAAAk1TB8aeELh2pMI59yH6vOPichy8fECEyP0w9AfFF5QJ7bnv75xQuc+JnNXfIwGQ4Us9fTB71PDn0+UIk7fIpTiPLMn2Sx4aSq7FIVDQ3ateVKz94wR54aH9iqnpcmvjXQ6rohfSOqxa/TS0vuJFhxI/tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779744005; c=relaxed/simple;
-	bh=LN2dRJ7yVrNP7yxIah/U/xei+R3GLx1w8LABCfzHcbE=;
+	s=arc-20240116; t=1779744006; c=relaxed/simple;
+	bh=CL0xoIhbrnvE/u8dX7oF5lI0HV7nSqUuK+GhV4t5ojk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JXEuQIJNpktSjOoxMfuQb3nsej/S6Mq083V7+jWOuk1iFBPEexNXudLASA17cFXA0QX7CLWCmjW/tAXZZfbtK7NaEXF6L5f2I+P7e/FbTKqc8gj5LvK0kmOzU+NebSQ2kBBcWZJ5JKnlKxaddkLj9ovnXcyxZtyv3EyolUZnukI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dhTLduo/; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C60D41F000E9;
-	Mon, 25 May 2026 21:20:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bC+22dCf6E0UwMa8za5ZCmtu3cLL0Jc/i8tPFY9tttO1MOWNWrqAptv87YrCkXwD3h0z5XHb8mzjnNlnCzrOkVHW1no9nw9LJBF57mZXMhCBdbRkABej5Knlw0kyL12ZRVsU/B7fYSMvXsiisgC/kVUStFn4stg06rYzGA3us1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GroZkdTX; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 488DD1F00A3A;
+	Mon, 25 May 2026 21:20:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779744003;
-	bh=Wvu8FqFU2M+kxGlMQrMRRPYcqPazeZSRxIHtjb/FEQk=;
+	s=k20260515; t=1779744005;
+	bh=CyKtoOC7IsGIcUSRMwnu75jDP8u+4hZzRfx3RonCIUA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=dhTLduo/TAywqwokywEm2JV9AR/NN5wE4xSfPGGpmyLiomo99gA4ijkGqY2z4n9Er
-	 CnHuGW1Cq37wsIr1JcLHcWyU4sKOpaz0a9bZs4DvWJ70R4XGkNrzZ3FNWDOl1qfNW1
-	 4vg2J68EyEiXU7GxENwhRX1RN0OGF04WL5+FV0N18pqlO9TgRJwXOO+IuVcejuQtzB
-	 JGOy8ql5y+YddKnHmKdeMr9ujDXQrfAEM7ogYllKlmAJUPaWrm3fVBxDtb2Amv+/Qe
-	 SwpKI2fhdz4HkuEPIWxFIG4++EUFpSnjGBFR30XAHzPqn3Y3tOqAGnZpHSiPkZ96su
-	 kcfeCXb5qC/Tw==
+	b=GroZkdTX9elX5y/JMOrKqiJgPXdFQhtut4QQQrs8fh1nyT/Kb5E+256WwNU5geO1n
+	 n4U3GMWmiSCR/1L1P4JM/Jw+e66a2NVFRVRLzl5WlYnLILWBu3n8G4qCRKsmrd0uPs
+	 30WmwLVz80r87X5JIox7W7vll6QeOgUGdXfpnIsJrikUimUXAuqHRn5Nd1rmV5qU4z
+	 SP6VGWNYUbG6+lm5OC5Owdtl6D38li6RuiI3S1RsxgIxVC5DPK1syGgIZRhIB7TiLg
+	 4IhtJm4TidZWxe4Ozbu2VD8ouWUseSySA2qXBpL3PmW0liOxYSa/ysraY5nHIJwZoi
+	 /j6hn3CM7MQrA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93C91380AA76;
-	Mon, 25 May 2026 21:20:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1996F380AA76;
+	Mon, 25 May 2026 21:20:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,92 +55,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v16 net-next 0/9] octeontx2-af: npc: Enhancements.
+Subject: Re: [PATCH] net: ibm: emac: Use napi_gro_receive() for Rx packets
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177974401040.3119043.5181275756301070393.git-patchwork-notify@kernel.org>
-Date: Mon, 25 May 2026 21:20:10 +0000
-References: <20260521095303.2395584-1-rkannoth@marvell.com>
-In-Reply-To: <20260521095303.2395584-1-rkannoth@marvell.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, oss-drivers@corigine.com, akiyano@amazon.com,
- andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com,
- arkadiusz.kubalewski@intel.com, brett.creeley@amd.com, darinzon@amazon.com,
- davem@davemloft.net, donald.hunter@gmail.com, edumazet@google.com,
- horms@kernel.org, idosch@nvidia.com, ivecera@redhat.com, jiri@resnulli.us,
- kuba@kernel.org, leon@kernel.org, mbloch@nvidia.com,
- michael.chan@broadcom.com, pabeni@redhat.com, pavan.chebbi@broadcom.com,
- petrm@nvidia.com, Prathosh.Satish@microchip.com,
- przemyslaw.kitszel@intel.com, saeedm@nvidia.com, sgoutham@marvell.com,
- tariqt@nvidia.com, vadim.fedorenko@linux.dev
+ <177974401164.3119043.10280506460095261853.git-patchwork-notify@kernel.org>
+Date: Mon, 25 May 2026 21:20:11 +0000
+References: <20260521215908.257118-1-rosenp@gmail.com>
+In-Reply-To: <20260521215908.257118-1-rosenp@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,corigine.com,amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-291476-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-291477-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: B3D565CED8F
+X-Rspamd-Queue-Id: 7A0FE5CEDAC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 21 May 2026 15:22:54 +0530 you wrote:
-> This series extends Marvell octeontx2-af support for CN20K NPC (MCAM
-> debuggability, allocation policy, default-rule lifetime, optional KPU
-> profiles from firmware files, X2/X4 MCAM keyword handling in flows and
-> defaults, and dynamic CN20K NPC private state), adds a devlink mechanism
-> for multi-value parameters, and adjusts devlink param netlink helpers
-> and mlx5 so stack usage stays within -Wframe-larger-than limits once union
-> devlink_param_value grows.
+On Thu, 21 May 2026 14:59:08 -0700 you wrote:
+> emac_poll_rx() already runs in NAPI context and TAH-equipped EMACs set
+> CHECKSUM_UNNECESSARY on verified frames, which lets GRO coalesce TCP
+> segments without a software checksum on the merge path. Replace the
+> per-poll rx_list batched with netif_receive_skb_list() with direct
+> napi_gro_receive() calls so the stack can merge segments into super-skbs
+> and skip a full traversal per packet -- a meaningful win on the slow
+> 4xx-class CPUs this driver targets.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v16,net-next,1/9] octeontx2-af: npc: cn20k: debugfs enhancements
-    (no matching commit)
-  - [v16,net-next,2/9] net/mlx5e: Reduce stack use reading PCIe congestion thresholds
-    https://git.kernel.org/netdev/net-next/c/e57516529a5b
-  - [v16,net-next,3/9] devlink: pass param values by pointer
-    https://git.kernel.org/netdev/net-next/c/d603517771d8
-  - [v16,net-next,4/9] devlink: Implement devlink param multi attribute nested data values
-    (no matching commit)
-  - [v16,net-next,5/9] octeontx2-af: npc: cn20k: add subbank search order control
-    (no matching commit)
-  - [v16,net-next,6/9] octeontx2: cn20k: Coordinate default rules with NIX LF lifecycle
-    (no matching commit)
-  - [v16,net-next,7/9] octeontx2-af: npc: Support for custom KPU profile from filesystem
-    (no matching commit)
-  - [v16,net-next,8/9] octeontx2: cn20k: Respect NPC MCAM X2/X4 profile in flows and DFT alloc
-    (no matching commit)
-  - [v16,net-next,9/9] octeontx2-af: npc: cn20k: Allocate npc_priv and dstats dynamically.
-    (no matching commit)
+  - net: ibm: emac: Use napi_gro_receive() for Rx packets
+    https://git.kernel.org/netdev/net-next/c/da91508bdd1d
 
 You are awesome, thank you!
 -- 
