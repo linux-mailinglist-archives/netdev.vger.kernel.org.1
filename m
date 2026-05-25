@@ -1,162 +1,197 @@
-Return-Path: <netdev+bounces-291264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291266-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOwhMj0KFGrVJAcAu9opvQ
-	(envelope-from <netdev+bounces-291264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:37:17 +0200
+	id cIQCDmMLFGr6JAcAu9opvQ
+	(envelope-from <netdev+bounces-291266-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:42:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77C935C7DC0
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:37:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0E205C7ED5
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:42:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 44354300668A
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 08:36:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 92545300680E
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 08:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAB13E3C57;
-	Mon, 25 May 2026 08:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77173E3C70;
+	Mon, 25 May 2026 08:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oXmCfaTY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M2SmpWiw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62C1332621
-	for <netdev@vger.kernel.org>; Mon, 25 May 2026 08:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779698206; cv=pass; b=tbhrw1o8ukyyIKuVC481eae9PikBR9P/QdpwwTR/06Umzhfg1iau7YR1zr07XSjHQbjW2KFvO/zcL7axhLLWTsKgT5u5VCIif+dO7azedM4773wNjbs+6CAUWetoJm01jBvciXU9xeKx4UL3SCLaADrsgB8gec+LrgH8M/vA/Yw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779698206; c=relaxed/simple;
-	bh=ApcNSED45L+0kzP+fBMWpFPp7gsyfcR2kTrCY/D25Z0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aGhFR6bcoeKVrte7RwL6K6Gis83vm9LSgOhcZnFhN1jJY5+b5WetJ3ZnqFcIrZqE2brbzHS+30LnMnWt9oPjzEr2ud+gym3ynIuN8oaI3zHCAvVzrhh9hDtC9GaCAOW29W74lAxryF4s8iVokS95RyDLD0b5eHdBD0uC/V3u4R0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oXmCfaTY; arc=pass smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-914b4be9c4bso296681785a.0
-        for <netdev@vger.kernel.org>; Mon, 25 May 2026 01:36:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779698202; cv=none;
-        d=google.com; s=arc-20240605;
-        b=CC9Gi3Xfb8oXveP1xbzkhGzLXVM9UF88PIkEeYINnnRF2pujtsVR1vyHTF3VOZfrON
-         eGfR020/kOOvB9NrA99TMZ/+baQN24d0rtpDohWdQYRA9ANJ0J2vQdUNti3K5ylGgtjt
-         b7Jga8B17ZmzotX1PGLJQF5VWXqH/RSE5GSiYnVBOvUxcy48X/wYgk/x0hO2YRsnrOhs
-         zH/ooJ5mpDOW2vAVY6PDj1F+jka3FWPU/vV6HVwajYMV4Kz6PSNTNTIWjO4DcJ6jqWLc
-         hJHhAkY8l1iK1mXE/E0O0PmrCSfUID5o4Ot4j3ESGxGtNwRslY1QwXGB0DYqSopk3zMx
-         EwHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ApcNSED45L+0kzP+fBMWpFPp7gsyfcR2kTrCY/D25Z0=;
-        fh=mRibXN4zu9S9SiO1Fl0pzgNKlEEGFJ9wYnyZ5OHs/64=;
-        b=lLmM04bEVKNLw1FHT98F71wtt2YJDHOpdEZj1OS1uGa9ktTEnyeGYRO7th71GKRC80
-         qBtxMszuOqGAKqz4bYb6g5LyHt7MbGtTtJvjV31QCt2ho1ZerpVL+dk00HB4rmWeC8EJ
-         NCDBb7lUign3eSEO858vLcziHlcL4WzJe2MYGn2Fc2hQjSMZRc++dBtv5T2a+TV/TBzk
-         Oq8qe1ffkqXMdLeQUVm6ed1lebsRcPcI/RUmUVP+9Q3+RHwBlpTwyEyz1Mnk7Kbuz3lQ
-         nL0S44yn5dVli/t/Biz7GI1eqLk07XOOpVlb3pW3ejTDytg2b3ZBQxqMHocpT+dNX0z+
-         gQ/w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779698202; x=1780303002; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ApcNSED45L+0kzP+fBMWpFPp7gsyfcR2kTrCY/D25Z0=;
-        b=oXmCfaTYmv7I4gTpoTpuyGkx/pmzug5MEL3iH+Z8jQW9fM4q7OsfRcpqTrDjIuvUYf
-         hdAacG2bEsGo6FMdVGOYjYjjPRoM8O2QZrZmYHuPdmlkoE7XACGF4EakEStfAVl7tHbQ
-         RMrSvQsjOTJH4n1kwVNbWM4J/BaYAg+euHWpzZVj/wWrpuJuYauYxMMDazFyWEgoRyET
-         Ue9HlswPzMyKStnNlowbVz9eDTEuz7+9r1PE/m6FT0zJL3c6ehkbEFC0BfYU/7TBqoQk
-         HjhNTicIfHGxfWpkJLfa7K7vpZY5BBbBjx+mHWy5Hgiu2H6AdC8iyCUiNVWOgRnrHtKl
-         rAKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779698202; x=1780303002;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ApcNSED45L+0kzP+fBMWpFPp7gsyfcR2kTrCY/D25Z0=;
-        b=ah4KcjQqey9H1IJs5oBhLs3IxcB1Ac47WLLSFsh9pZ5lPcNdGEwQrI/9ykQiNyitbE
-         xkvJXenrIMdPhen1ulTkDTFCsPUVyTOXtaDLCElZbPxEH36WnTkFdHs/QR/bAWZLyPGY
-         psunrViUQwVEL8qyuACWvUybTsOf4ipxjDs3jKdyfBzGbNZppCRS0p1zyUlhRkwocVxo
-         ZtIQhkuc0SMmTKlhpWJzGTubxSk+AqSrDQurHwJQI82O+ftHPTXADDHvTgvDlNXjXm6o
-         kKwQi8G0xPp9vu3MCBqoeFfS3vodWdAOf7CLNRQqILMNAy1Hfjb/2KTCsxt/y9sTKlC5
-         WEog==
-X-Forwarded-Encrypted: i=1; AFNElJ+iI5fvlr7Qt0/GdEiXcQAGj5iGh7TPQ4mo6AhuLX/eJ/XKt2qLhykpC2jmXGwYjXb1wuU35Lg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgoYJZBUSsbJMTJdcGN5v4phqCSQHeU6ivnNM2TXrBnMr1ggwN
-	EDCvZsdW9eDVatYLw379Azizx1E47hMsDK9EqOpVAo4pMNPbdrKAIaij+W8np9p26muJhqBs4QO
-	p528Yl3o2xp0G9PJ6WZju0ag+vwMYYK/6S5NI68Ka
-X-Gm-Gg: Acq92OHXW/9a6gpoKdhiI/rS/RZ41oHAWU30UmVg223/AaZYSY3PZ6L3ScG1Nx4S8rF
-	eeJb3CyjAlQXc/hbS2a+6KcjByLLiE/b2FQAxaYHat98IZvoClwSiKXzqSXRAy8k/hovYQx//6R
-	54auixRIX/pj39fS0HQDgxmWVbXPdUR1BIDl+X51eEMGxrGYcvY0a+kVLuad5m4xtALe9mjArpM
-	r8m60oJ9GkD9IMba6QlbpM8GBCkw1Kk/XlVUo3/9zLO9x5PQM0lPNbeMkSdqMyzaSWYpktBjWFf
-	0USrb0UOOmQd1by1Bhp9U5+f13YBRRIcCBm6s6xqOVFNK1uvRJjVAg1JDlXJZSWpNnKVmuydOe5
-	M8BP1Bbrpd8swfRQ/s1O0GaQ+dBsFYTM9hSHYbjFWLJeTijw6lV0v9MVsc3HKoDX5
-X-Received: by 2002:a05:620a:448e:b0:912:bb4b:a900 with SMTP id
- af79cd13be357-914b49cdbf4mr1876317085a.40.1779698201108; Mon, 25 May 2026
- 01:36:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2A73E16B9;
+	Mon, 25 May 2026 08:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779698522; cv=none; b=tpHyglNODZzDzaWbwkN5xMrY3ZOyWFeTJiBlQ9apXAyz/97xz8qebHuqs+2zY1fO2Aocgu83uw7i/hx2kGl1DUDWatPB8v52w0xdCBdf/tjhiiFVdjBWIbF5psNDwIM7fBOqruxyN0iVijwXw1sdlCqH6Dzte7MX4DoN12rmiug=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779698522; c=relaxed/simple;
+	bh=rhZeCAfuClKv/Mu8IFHZ3hmztx6GzmMheK7IXKONEDg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IZm82wG1iLYjBg7F7Ji4nMAxm12qFjUQtO312DE7C11pAdNO0E0I+h2I0BZpq8jb6hl4mn/IwFzEHHPtLdwGZ2xDgV/BgErSru6YtJcZmWvE28C1U6ysKqE7FwIQSKicvHc4gGBtSdTYyp+tEqjBPCg0bKWbO01h2D7Jecj+1BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M2SmpWiw; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779698521; x=1811234521;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rhZeCAfuClKv/Mu8IFHZ3hmztx6GzmMheK7IXKONEDg=;
+  b=M2SmpWiwM0cva0+rg4A5dkAa2cbJj3/y/7i8Bp/Zft2MFu1Dgj58ZVPB
+   ZzmXK+BJwKpqKVF8Xdv6oTTdT6PO/czOy54/JfrtCFI6u90NQrCCZXmIf
+   zYLk6JsJFu5gL7D4YVJtJWNI7DA6VlnMHTUptf6cb6rh52WZhAkrlE6Js
+   QVcu0vYCpViR4gJV+qsXNqvL+3sVWgVItGH4oOFzLqURDRtpKwxobUCmD
+   ViP6CA8Y3p1zKSNUcJ3uFWVE2JV9kHTcHvNAEnQW+2Ibn+ATd7xXWbdRR
+   b4q8/mUgysmxuKB2oj3xkLjQ15IhMv/f5hHLqRQxEubsxLltCpnGkw6UR
+   Q==;
+X-CSE-ConnectionGUID: QPFixwk6RUioEcpzYnBNmQ==
+X-CSE-MsgGUID: BWfETJeEQDiq0BhpT3n0Og==
+X-IronPort-AV: E=McAfee;i="6800,10657,11796"; a="80573297"
+X-IronPort-AV: E=Sophos;i="6.24,167,1774335600"; 
+   d="scan'208";a="80573297"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2026 01:42:01 -0700
+X-CSE-ConnectionGUID: kyp2uXDUTJ6ArQirl/1Tzw==
+X-CSE-MsgGUID: V03PED3bTZuB4SL2IOJGfQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,167,1774335600"; 
+   d="scan'208";a="238968451"
+Received: from gklab-003-014.igk.intel.com ([10.91.173.44])
+  by fmviesa008.fm.intel.com with ESMTP; 25 May 2026 01:41:58 -0700
+From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	konstantin.ilichev@intel.com,
+	aleksander.lobakin@intel.com,
+	Przemyslaw Korba <przemyslaw.korba@intel.com>,
+	stable@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-net] idpf: add padding to PTP virtchnl structures
+Date: Mon, 25 May 2026 10:38:03 +0200
+Message-ID: <20260525083835.481974-1-przemyslaw.korba@intel.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260525001745.1251640-1-kuniyu@google.com> <20260525001745.1251640-3-kuniyu@google.com>
-In-Reply-To: <20260525001745.1251640-3-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 25 May 2026 01:36:29 -0700
-X-Gm-Features: AVHnY4LMf1jmAedPLnLhmGeDz_h9SBTH0uMA0ohKmzcYLZRyCV_m485u_n4lx04
-Message-ID: <CANn89iLx0L+q0A=_+-a0P=jS4hLF_ivZrRW-V4e+yZEp35MWWw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 2/5] geneve: Pass struct geneve_dev to geneve_create_sock().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,kernel.org,redhat.com,networkplumber.org,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-291264-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-291266-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[intel.com:+];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 77C935C7DC0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: D0E205C7ED5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 24, 2026 at 5:17=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
->
-> This is a prep patch to make a subsequent patch clean.
->
-> We will need to access geneve_dev->cfg.info.key.u.{ipv4,ipv6}.src
-> in geneve_create_sock() later.
->
-> Let's pass down struct geneve_dev from geneve_sock_add() to
-> geneve_create_sock() instead of individual config fields.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Add padding to virtchnl2 PTP structures to match the Control Plane
+expected message sizes:
+* virtchnl2_ptp_get_dev_clk_time: 8 -> 16 bytes
+* virtchnl2_ptp_set_dev_clk_time: 8 -> 16 bytes
+* virtchnl2_ptp_get_cross_time: 16 -> 24 bytes
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+The FW expects the above sizes and PTP negotiation fails due to the
+mismatch. Previously neither the FW nor the driver checked message/reply
+sizes strictly, so the problem appeared only after recent validation
+improvements.
+
+reproduction steps:
+ptp4l -i <pf> -m
+Observe: failed to open /dev/ptp0: Permission denied
+
+Fixes: bf27283ba594 ("virtchnl: add PTP virtchnl definitions")
+Cc: stable@vger.kernel.org
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+---
+ drivers/net/ethernet/intel/idpf/virtchnl2.h | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
+index 02ae447cc24a..39fea65c075c 100644
+--- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
++++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
+@@ -1572,13 +1572,15 @@ VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_ptp_get_vport_tx_tstamp_latches);
+  * struct virtchnl2_ptp_get_dev_clk_time - Associated with message
+  *					   VIRTCHNL2_OP_PTP_GET_DEV_CLK_TIME.
+  * @dev_time_ns: Device clock time value in nanoseconds
++ * @pad: Padding for future extensions
+  *
+  * PF/VF sends this message to receive the time from the main timer.
+  */
+ struct virtchnl2_ptp_get_dev_clk_time {
+ 	__le64 dev_time_ns;
++	u8 pad[8];
+ };
+-VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_ptp_get_dev_clk_time);
++VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_ptp_get_dev_clk_time);
+ 
+ /**
+  * struct virtchnl2_ptp_get_cross_time: Associated with message
+@@ -1586,26 +1588,30 @@ VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_ptp_get_dev_clk_time);
+  * @sys_time_ns: System counter value expressed in nanoseconds, read
+  *		 synchronously with device time
+  * @dev_time_ns: Device clock time value expressed in nanoseconds
++ * @pad: Padding for future extensions
+  *
+  * PF/VF sends this message to receive the cross time.
+  */
+ struct virtchnl2_ptp_get_cross_time {
+ 	__le64 sys_time_ns;
+ 	__le64 dev_time_ns;
++	u8 pad[8];
+ };
+-VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_ptp_get_cross_time);
++VIRTCHNL2_CHECK_STRUCT_LEN(24, virtchnl2_ptp_get_cross_time);
+ 
+ /**
+  * struct virtchnl2_ptp_set_dev_clk_time: Associated with message
+  *					  VIRTCHNL2_OP_PTP_SET_DEV_CLK_TIME.
+  * @dev_time_ns: Device time value expressed in nanoseconds to set
++ * @pad: Padding for future extensions
+  *
+  * PF/VF sends this message to set the time of the main timer.
+  */
+ struct virtchnl2_ptp_set_dev_clk_time {
+ 	__le64 dev_time_ns;
++	u8 pad[8];
+ };
+-VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_ptp_set_dev_clk_time);
++VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_ptp_set_dev_clk_time);
+ 
+ /**
+  * struct virtchnl2_ptp_adj_dev_clk_fine: Associated with message
+
+base-commit: 4548d565aa80aad80274e2f3bff4d7cd914c703e
+-- 
+2.47.3
+
 
