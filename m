@@ -1,204 +1,164 @@
-Return-Path: <netdev+bounces-291293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291294-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SE28NXYwFGqUKgcAu9opvQ
-	(envelope-from <netdev+bounces-291293-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:20:22 +0200
+	id AFQTOS4wFGqUKgcAu9opvQ
+	(envelope-from <netdev+bounces-291294-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:19:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3335C9E36
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:20:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F34B55C9E10
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A7153025712
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 11:15:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E8C723003498
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 11:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476293446B9;
-	Mon, 25 May 2026 11:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD84D349CED;
+	Mon, 25 May 2026 11:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="mPQs3cdK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XOqMUpme"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445B62DC321;
-	Mon, 25 May 2026 11:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3674A37E2EB
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 11:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779707728; cv=none; b=PMJHUdnylZ3dIE0C3i3Tyd2mR3KE0EUBmE95cmEfsaSzk+4hv2cI7J7U6xG64+zKCTOb3hZ4gcjyFvs2/a1HlI/iN+wytg5MPY+6UlLwD4S+qTlNryqL5/UB9tNnE2azlQu5yDVAbOKiBcmUwBGZTECrwjFUBzA2Wr9EUvJgJyc=
+	t=1779707945; cv=none; b=k3wKdWo16P5Ipkd2cUA3mK7KkB1Y1OOySdIq2baLJSI6gtRt8Cr2QTwLgjq3dWDpCHhqMrxHXbzyOf7j8M/vYvxZwkW6SJFpGPaVBH8BQc24WbCo0N7ICcUmz6t1zVq/UUoXPz+O3gJDWKtdQfwVW1NCf6dxJwyEotojYO9rysE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779707728; c=relaxed/simple;
-	bh=EbzlufNXW6YBgeATlTQezHzXvQyS5Z8qWV+S44goOcU=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=k66vQEnSmkmc6+nqajAoeZcai8VxteXYVT2vG+mgT3Q6lsK37MukxBvKlPdUbj7pR4yFTZeKFnIOh72uw8vpLreBQ84ViuZNuURXuvOOgjJtqMjeTsAPsXIhwgeif9IlbxEAvRCrLm3ncfoG/FH8fDp2VnCCmv46QCk/JSsbtd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=mPQs3cdK; arc=none smtp.client-ip=113.46.200.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Un59sVCYBVbCELbPAJniZwPhDx+Hpg7qitcILgjJSZo=;
-	b=mPQs3cdKtpmGn+KOuFPZGV+r7Uk+h7yeuJ57vWiCIxhAip7CNQ0vK09k7WGHCMXoRi1lxQHmo
-	JCYabtvaQbvWAfgtqk8utmV1YbkC67gDNh5EapUrYd/GGXzoAMPJ49rtvVxtg8n2S6B1BAhfInw
-	K5Ij0nIl63hX1u/d51wcV9c=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4gPClM3p7JzmV6J;
-	Mon, 25 May 2026 19:07:27 +0800 (CST)
-Received: from kwepemr200009.china.huawei.com (unknown [7.202.195.137])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3912640562;
-	Mon, 25 May 2026 19:15:13 +0800 (CST)
-Received: from kwepemr200017.china.huawei.com (7.202.195.7) by
- kwepemr200009.china.huawei.com (7.202.195.137) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 25 May 2026 19:15:12 +0800
-Received: from kwepemr200017.china.huawei.com ([7.202.195.7]) by
- kwepemr200017.china.huawei.com ([7.202.195.7]) with mapi id 15.02.1544.011;
- Mon, 25 May 2026 19:15:12 +0800
-From: "malin (R)" <malin89@huawei.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>, tanjingguo
-	<tanjingguo@huawei.com>, "mst@redhat.com" <mst@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>, "xuanzhuo@linux.alibaba.com"
-	<xuanzhuo@linux.alibaba.com>, "eperezma@redhat.com" <eperezma@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>, "sgarzare@redhat.com"
-	<sgarzare@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>
-CC: Chenzhe <chenzhe@huawei.com>, cenxianlong <cenxianlong@huawei.com>,
-	cuirongzhen <cuirongzhen@huawei.com>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, tanjingguo
-	<tanjingguo@huawei.com>
-Subject: [PATCH net] vsock/virtio: bind uarg before filling zerocopy skb
-Thread-Topic: [PATCH net] vsock/virtio: bind uarg before filling zerocopy skb
-Thread-Index: AdzsNwDXM3GXlP0rSUS4BU76FCpiCg==
-Date: Mon, 25 May 2026 11:15:12 +0000
-Message-ID: <9fece5ea269049f883f367642c07eaa0@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1779707945; c=relaxed/simple;
+	bh=PUZ0UICi1ovBbjSz2x1Ovz2G2i3u+uWN1AUA1O+p3CQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=asZlVx9+dQGBeb6jSMnpYnHnxTE/t/eH+DX0MOSdnSa+Gbqh4JTqxulKPmsp44/sIiuiLo69kxOvzXCPu4YyQrsNmJ/LLk3U5OE+RcPERa4qiU20LGoZrjvGMzphSqCIqRVOdw8gi7lBpjEMypzsp5/cad7+lroQyU0Q9FpiPKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XOqMUpme; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D257E1F000E9
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 11:19:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779707943;
+	bh=qtDJ93rsJYs083vmRe/7jpJ6l0bXjgpZ0j5Uu1p7nxA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=XOqMUpmep/eTpUCxeW7saOYu+vXLvFBvYDhx0feNndYCTtMHC7u8LuiK+KprGhnGE
+	 U0ZBOHa5Otg+mTlEKCURGpVsJHz/jw5FYy6zsT2DFkN4tLhgygBYAWP7sXANifHHzi
+	 Ue/a9Tg2BPHNAh1MFWMi5CakDqCbc2rrcKUIiZfmTuKOQXpMDO5G7RUgXBCH0fb46Q
+	 X91YTeNVphhswVro45GBe0tuacnZckd43Ufh/YHMSVqgZrK5fmHkzXTqngCTzcHkTX
+	 bwACriyMPeYBUXQN1C0v676neDwOFfd60U0x1XDO45WQU2IpNWSgIDlPIPslGQ5HGK
+	 8WqTSJ+inqzNQ==
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8b7105dfb35so126391596d6.3
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 04:19:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+BY/cgZsuM/bQAYGA4Bqn3C0VUOaq6w/WDXjz9VXNXAAjC133j9MeezSSrNeI4oIipECbrXRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw88VQq5QEyvysv1aNuA4O2HbeVZm3AkINMNmEP2W1d4uc5F1J6
+	nY4KO61NlVBI2MOBH22+D8keUGCXutv3J7k3sIuWj5t0ru66v5QaKyejLz/FxSGncjNdydl0J8h
+	nrvNN/30LeHIOxJmC5MjLt6OTAnxVFXI=
+X-Received: by 2002:a05:6214:242a:b0:8cc:c85:8aac with SMTP id
+ 6a1803df08f44-8cc7b57ee02mr241678216d6.21.1779707943141; Mon, 25 May 2026
+ 04:19:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-2.16 / 15.00];
+References: <20260522120643.242974-1-bjorn@kernel.org> <ahB2VbotEW5GD8K5@gmail.com>
+In-Reply-To: <ahB2VbotEW5GD8K5@gmail.com>
+From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Date: Mon, 25 May 2026 13:18:51 +0200
+X-Gmail-Original-Message-ID: <CAJ+HfNh6pYEQKPhKxDp=8VgtweqwTZysHAfOEj3g5pJZJYYq0Q@mail.gmail.com>
+X-Gm-Features: AVHnY4IhQVe8DuFMlKW7ZZLoP_5FhHNvi5cK3hRxVJ_uuJ17L1O_B-HPDwF1AGo
+Message-ID: <CAJ+HfNh6pYEQKPhKxDp=8VgtweqwTZysHAfOEj3g5pJZJYYq0Q@mail.gmail.com>
+Subject: Re: [PATCH net] net: Avoid checksumming unreadable skb tail on trim
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Mina Almasry <almasrymina@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.45 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_MIXED_CHARSET(0.71)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DKIM_TRACE(0.00)[huawei.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-291293-lists,netdev=lfdr.de];
+	URIBL_MULTI_FAIL(0.00)[mail.gmail.com:server fail,sin.lore.kernel.org:server fail];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291294-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:email,huawei.com:mid,huawei.com:dkim];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[malin89@huawei.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 7C3335C9E36
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: F34B55C9E10
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From 9eea4f61a4dca97f56c23e12267219bf791a20d1 Mon Sep 17 00:00:00 2001
-From: Jingguo Tan <tanjingguo@huawei.com>
-Date: Fri, 22 May 2026 19:53:45 +0800
-Subject: [PATCH net] vsock/virtio: bind uarg before filling zerocopy skb
+On Fri, 22 May 2026 at 17:39, Breno Leitao <leitao@debian.org> wrote:
+>
+> On Fri, May 22, 2026 at 02:06:40PM +0200, Bj=C3=B6rn T=C3=B6pel wrote:
+> > pskb_trim_rcsum_slow() keeps CHECKSUM_COMPLETE valid by subtracting
+> > the checksum of the bytes removed from the skb tail. That assumes the
+> > removed bytes can be read.
+> >
+> > io_uring zcrx skbs may contain unreadable net_iov frags. With fbnic
+> > header/data split, small TCP/IPv4 packets can carry Ethernet padding
+> > in such a frag. ip_rcv_core() trims the skb to iph->tot_len before TCP
+> > sees it, and the CHECKSUM_COMPLETE adjustment then calls
+> > skb_checksum() on the padding.
+> >
+> > This is exposed by IPv4 because small TCP/IPv4 frames can be shorter
+> > than the Ethernet minimum payload. TCP/IPv6 frames are large enough in
+> > the normal zcrx path, so they do not hit the same padding trim.
+> >
+> > Keep the existing checksum adjustment for readable skbs. If the
+> > remaining packet is fully linear, drop CHECKSUM_COMPLETE and let the
+> > stack validate the packet after trimming. If unreadable payload would
+> > remain, fail the trim; the checksum cannot be adjusted without reading
+> > the trimmed tail.
+> >
+> > Also clear skb->unreadable when trimming removes all frags.
+> >
+> > Fixes: 65249feb6b3d ("net: add support for skbs with unreadable frags")
+> > Signed-off-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
+>
+> Reviewed-by: Breno Leitao <leitao@debian.org>
 
-virtio_transport_send_pkt_info() allocates or reuses the zerocopy uarg
-before entering the send loop, but virtio_transport_alloc_skb() still
-fills the skb before it inherits that uarg. When fixed-buffer vectored
-zerocopy hits MAX_SKB_FRAGS, io_sg_from_iter() may partially attach
-managed frags and return -EMSGSIZE. The rollback path calls kfree_skb()
-to free an skb that carries SKBFL_MANAGED_FRAG_REFS but no uarg, so
-skb_release_data() falls through to ordinary frag unref.
+Thanks, Breno!
 
-Pass the uarg into virtio_transport_alloc_skb() and bind it immediately
-before virtio_transport_fill_skb(). This keeps control or no-payload skbs
-untouched while ensuring success and rollback share one lifetime rule.
+> > +static int pskb_trim_rcsum_complete(struct sk_buff *skb, unsigned int =
+len)
+> > +{
+> > +     int delta =3D skb->len - len;
+>
+> I suppose this is not unsigned/size_t because csum_block_sub() requires
+> an 'int', is this right?
 
-Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-Signed-off-by: Lin Ma <malin89@huawei.com>
-Signed-off-by: Rongzhen Cui <cuirongzhen@huawei.com>
-Signed-off-by: Jingguo Tan <tanjingguo@huawei.com>
----
+Yup, both skb_checksum() length and csum_block_sub() offset are int,
+and it also keeps the existing parent function's local type unchanged
+after the move.
 
- net/vmw_vsock/virtio_transport_common.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+> >  /* Note : use pskb_trim_rcsum() instead of calling this directly
+> >   */
+>
+> I think you can make this a one-line comment, or just a proper kdoc.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio=
-_transport_common.c
-index df3b418e0392..73f58925ff72 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -205,6 +205,7 @@ static u16 virtio_transport_get_type(struct sock *sk)
- static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_=
-info *info,
- 						  size_t payload_len,
- 						  bool zcopy,
-+						  struct ubuf_info *uarg,
- 						  u32 src_cid,
- 						  u32 src_port,
- 						  u32 dst_cid,
-@@ -245,6 +246,11 @@ static struct sk_buff *virtio_transport_alloc_skb(stru=
-ct virtio_vsock_pkt_info *
- 	if (info->msg && payload_len > 0) {
- 		int err;
-=20
-+		/* Bind the zerocopy lifetime before filling frags so error rollback
-+		 * frees managed fixed-buffer pages through the uarg-aware path.
-+		 */
-+		skb_zcopy_set(skb, uarg, NULL);
-+
- 		err =3D virtio_transport_fill_skb(skb, info, payload_len, zcopy);
- 		if (err)
- 			goto out;
-@@ -364,6 +370,7 @@ static int virtio_transport_send_pkt_info(struct vsock_=
-sock *vsk,
- 		skb_len =3D min(max_skb_len, rest_len);
-=20
- 		skb =3D virtio_transport_alloc_skb(info, skb_len, can_zcopy,
-+						 uarg,
- 						 src_cid, src_port,
- 						 dst_cid, dst_port);
- 		if (!skb) {
-@@ -371,8 +378,6 @@ static int virtio_transport_send_pkt_info(struct vsock_=
-sock *vsk,
- 			break;
- 		}
-=20
--		skb_zcopy_set(skb, uarg, NULL);
--
- 		virtio_transport_inc_tx_pkt(vvs, skb);
-=20
- 		ret =3D t_ops->send_pkt(skb, info->net);
-@@ -1183,7 +1188,7 @@ static int virtio_transport_reset_no_sock(const struc=
-t virtio_transport *t,
- 	if (!t)
- 		return -ENOTCONN;
-=20
--	reply =3D virtio_transport_alloc_skb(&info, 0, false,
-+	reply =3D virtio_transport_alloc_skb(&info, 0, false, NULL,
- 					   le64_to_cpu(hdr->dst_cid),
- 					   le32_to_cpu(hdr->dst_port),
- 					   le64_to_cpu(hdr->src_cid),
---=20
-2.53.0
+Yes, but note that this was not an addition from me. I can fix it up
+if there are more changes required!
+
+
+Thanks!
+Bj=C3=B6rn
 
