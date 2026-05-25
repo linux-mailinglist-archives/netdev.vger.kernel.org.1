@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-291345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291346-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MIC+IqJgFGqgMwcAu9opvQ
-	(envelope-from <netdev+bounces-291345-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:45:54 +0200
+	id oHRdBrZgFGqgMwcAu9opvQ
+	(envelope-from <netdev+bounces-291346-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:46:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26EA75CBDB4
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:45:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 702135CBDC3
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 745C53013486
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 14:45:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB5EB301E970
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 14:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892673815DF;
-	Mon, 25 May 2026 14:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBCB3EDE43;
+	Mon, 25 May 2026 14:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="injRb0a1"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="h6obLB2k"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B8C282F3E;
-	Mon, 25 May 2026 14:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34C31FB1;
+	Mon, 25 May 2026 14:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779720349; cv=none; b=HxgWzJ1gwGuj5yT0It5jZhKzphbApxJ88Diz86Fiw+4nyBgq7lFk3y5ZKZsw+AGbr1/67P/1XwzBX+iuImoWStgC/icYp+l3iFmsCIs3QvPjXoF55GR5955aIa43YFQjJCvISdkRlnnBpt+lBF/azFbaTuVTTT+lRF2/i8J3Q1I=
+	t=1779720350; cv=none; b=TBMJFNxsqs2Fjy+zYgKljuS4/i2YkQdaO1oKF9gkfA6CBdKAaDM225f6QuUBpmnAunfPc7jxxDTwQkfZq6jJa5PfHsFeJ7gD2sk2HA7KqpiA53lVEL38Ncl1ZxG1wbyt7CPuMedX4XrUJ7SdxeO9LUSozBYrhpq4JaQYe5oIXZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779720349; c=relaxed/simple;
-	bh=RDoVbYkYyJ9I1Of507KaR3BPkeX1aBtX87LItO1PIJA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q4t/YegzFptwYoF9pVF6iyCNR+5s0Y+jN8jUGyAs01v9PFcPzJTZdvk2gv7z3HPvJMpYBfcpUMcxTdUMHknEeHwm0HEHkRjBGD6/k1qdHuv9hPkw2LjNF2hYP+WFWMWzX1NdfzI+CAUzH4eTQqd1ZqasJhpwcLsrezUkubvxs0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=injRb0a1; arc=none smtp.client-ip=113.46.200.221
+	s=arc-20240116; t=1779720350; c=relaxed/simple;
+	bh=mqUR9mm4+qgMq9TWEYi4FehGJJfMx8/x0BGyAYolc04=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q3BDibLjcOe/YsaUKvVNICFlN6LoWuXTE+/3QwhbmTWZtzInh10JeAZmj/C9LbqEsWFN0lhvZd/TM4a3bZ6OsSgb3rGNHDbe+nM7SaB2zJTrFjtDDVSjOwReEnmrxv6B7JpSvv9IEmAhLOihgeom8MyuPImx+CBZe0gxkOtIolU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=h6obLB2k; arc=none smtp.client-ip=113.46.200.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=iJIDC2YMFMFz0JjsgAcjYc8Q6nfBkl4VswVMHkOKMcI=;
-	b=injRb0a1vv6UAdrqUAULEoj+4lpLVOkYzq40MlirytU/dnqQCvIT1jksK7i/OdNJk2VkYxKdj
-	j9EU9UUSb+aK+FkZL6359EGBxqyFUmDzSReL+8UEb8fKa8ZB0VJzfeGoe/MM0GAW+0f2/RVedrw
-	NGximxs4GHy2rR5xGIlMh8s=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4gPJQF58BdzRhRG;
-	Mon, 25 May 2026 22:37:57 +0800 (CST)
+	bh=m7qplFOFzzBXU4xfVPjGTX4ipP5o/gekOhkMSJBC8HA=;
+	b=h6obLB2kMGj0bb/kwhcXQif1IYnu8NydUmAoAW6oAJY8lmyGGF3ib9COINEzKOFvTpKKNKoqB
+	DAKCTLLU+hNZygxsN2lwImVmW849NbKnF4sityGOiPl5pAaoB+XXpxDEW2JfKDX1Sokw7DNEDyU
+	tqOLZWm7R4wpmx+mwCHzPKs=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gPJQg2VCqzpStH;
+	Mon, 25 May 2026 22:38:19 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E0FCC40537;
-	Mon, 25 May 2026 22:45:41 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 4BE46202E6;
+	Mon, 25 May 2026 22:45:42 +0800 (CST)
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -58,10 +59,12 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<yangshuaisong@h-partners.com>, <shiyongbang@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<shaojijie@huawei.com>
-Subject: [PATCH V3 net 0/2] hibmcge: fix RX packet corruption issue
-Date: Mon, 25 May 2026 22:45:23 +0800
-Message-ID: <20260525144525.94884-1-shaojijie@huawei.com>
+Subject: [PATCH V3 net 1/2] net: hibmcge: disable Relaxed Ordering to fix RX packet corruption
+Date: Mon, 25 May 2026 22:45:24 +0800
+Message-ID: <20260525144525.94884-2-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20260525144525.94884-1-shaojijie@huawei.com>
+References: <20260525144525.94884-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,12 +82,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291345-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291346-lists,netdev=lfdr.de];
 	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -93,43 +96,52 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[huawei.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:mid,huawei.com:dkim]
-X-Rspamd-Queue-Id: 26EA75CBDB4
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:mid,huawei.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 702135CBDC3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This series fixes an RX packet corruption issue observed when SMMU is
-disabled on the hibmcge driver. The fixes include disabling PCI Relaxed
-Ordering and correcting the order of DMA barrier operations in the RX
-data sync path.
+When SMMU is disabled, the hibmcge driver may receive corrupted packets.
+The hardware writes packet data and descriptors to the same page, but
+with Relaxed Ordering enabled, PCI write transactions may not be
+strictly ordered. This can cause the driver to observe a valid
+descriptor before the corresponding packet data is fully written.
 
+Fix this by clearing PCI_EXP_DEVCTL_RELAX_EN in the PCI bridge control
+register to ensure strict write ordering between packet data and
+descriptors.
+
+Fixes: f72e25594061 ("net: hibmcge: Implement rx_poll function to receive packets")
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
 ChangeLog:
 v2 -> v3:
   - Use pci_save_state () to ensure that Relaxed Ordering is disabled after the reset,
     suggested Paolo.
   v2: https://lore.kernel.org/all/20260518144253.1568118-2-shaojijie@huawei.com/
-v1 -> v2:
-  - Split original single patch into two independent patches,
-    suggested Jakub
-  - Remove MODULE_VERSION change, pointed out by Jakub
-  v1: https://lore.kernel.org/all/20260512123456.3786635-1-shaojijie@huawei.com/
 ---
-
-Jijie Shao (2):
-  net: hibmcge: disable Relaxed Ordering to fix RX packet corruption
-  net: hibmcge: move dma_rmb() after dma_sync_single_for_cpu() in RX
-    path
-
  drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c | 3 +++
- drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 6 +++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+index 068da2fd1fea..f721e9893804 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+@@ -420,6 +420,9 @@ static int hbg_pci_init(struct pci_dev *pdev)
+ 		return -ENOMEM;
+ 
+ 	pci_set_master(pdev);
++	pcie_capability_clear_word(pdev, PCI_EXP_DEVCTL,
++				   PCI_EXP_DEVCTL_RELAX_EN);
++	pci_save_state(pdev);
+ 	return 0;
+ }
+ 
 -- 
 2.33.0
 
