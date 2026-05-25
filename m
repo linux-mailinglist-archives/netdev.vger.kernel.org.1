@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-291327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPYpKd9SFGopMgcAu9opvQ
-	(envelope-from <netdev+bounces-291327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:47:11 +0200
+	id 0NiMEGdUFGp2MgcAu9opvQ
+	(envelope-from <netdev+bounces-291328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:53:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3205CB59D
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:47:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A755CB614
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:53:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3908B300D17F
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:47:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AE43B3001FB9
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A0D33DEC2;
-	Mon, 25 May 2026 13:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF8A384229;
+	Mon, 25 May 2026 13:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="44H9Tv3o"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rlEXQO0o"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3964C1A9FB7;
-	Mon, 25 May 2026 13:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8D23845B3
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 13:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779716828; cv=none; b=UzQOy1sF24Si1MvAqP8+ioxP6znsSnfYfOHY4eGRZgpv9roDobWAvPNbfkwCS/xyxI326CXYPEZ7T+q5qyuP54wl+IAV5edFdBmNkHZGDIcsRewkOqqNR6nyY4NyAXfNuoENuqTdYrSoG3g7Bvp48eHhcvmdEBRqzO8tVtTi160=
+	t=1779717217; cv=none; b=cZ1DzfvuFMoyu5CSmlaoh6tZ5bctzNlqjz/vMjLyJL1DAycuZnNGUokmVOPijeAFqmDVr6K9rPG1G49OhKwZBFIZz4P7rDD6m+hkglVGP9NlSP3i816/I9rWqjfgKmKWbMMz7LYhMkMJIkqlSg9wza3/GLs99F8SFGsQHkocu1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779716828; c=relaxed/simple;
-	bh=+smIya5lm8hQoqXXzv8KCjOV1fJEMbHjx+8oqMm6QJ0=;
+	s=arc-20240116; t=1779717217; c=relaxed/simple;
+	bh=kkV++uKVZm7p3+IQDKtGfpSqDT5XyDknnuAx8eY8wtk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z1Hf08zLiRP9joksH9MvX0b6FdhIrMZQObM15zEthZNk4KHMkSlaIgacsCG/aJAf5yRAXH5mg/BYcuJkscoG78LP71s/8DsUaRB/XJzpYdx0D6pGFbTPjiMVAmFrVuJg/eUgOi41MnKH9Kwtlhjg+1roT36oLY/anB/UEtxzKfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=44H9Tv3o; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=trVziVJ0KV6SABE5c436FMh3X6j5Ayn2nPiB5zhaRisfDg0nxvFL9srepUCAprPG0ShXwqh3ZXsEsC0vMA5X6puC+KeTZmHt/bjkbH6UNufDK4H72Frsc8gvF6mOTb/K717Uq1wX0/RrXKwRMRVy0Z7u+jjY7VI/mNk3LZY59sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rlEXQO0o; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,24 +39,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7ROzJMGxgGji9kSxPsQTiQtOcWhXTsX9E1VNaJINSl8=; b=44H9Tv3oI6aUay45FA2s/0JwiI
-	xqcZvzNObbjcHkA6ToiaO/D7Cuf0OhXKHMdhwy1Xt5F42Bctpy69ENTOH9kJakxHi0bPq0uOzIYRY
-	lRWdycm2s0D7GniP/JyOjR73J5Db7qTxK0HNZ148D0+QZZmS1Bb2MZbGMzYL+FSdcC0M=;
+	bh=1LYU8Wk8YjgmFsCB1ccS9Gtg4b9qZK+4tWsYlj8yLdU=; b=rlEXQO0oU8zE/6TeYSPtQSL2x5
+	yt2mOAvAdifhfp2x8Uqwy27hG15/IUBtnVkUPXzjy4Tb9bLvIZzYAH6nZP95QEHM/R+vqopojD5US
+	BVHPUQaLFXXqDgk47oHybGWNxykeM7S+2sYa0qge4srNNsiZ9PlhERKinRP+Yi3OnGDk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wRVdY-004TZz-Ek; Mon, 25 May 2026 15:46:32 +0200
-Date: Mon, 25 May 2026 15:46:32 +0200
+	id 1wRVkL-004Tbf-Lr; Mon, 25 May 2026 15:53:33 +0200
+Date: Mon, 25 May 2026 15:53:33 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: muhammad.nazim.amirul.nazle.asmade@altera.com
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk, maxime.chevallier@bootlin.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: stmmac: Improve Tx timer arm logic further
-Message-ID: <3766daef-80d0-4657-935a-579bf17a11d4@lunn.ch>
-References: <20260525061653.22548-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+To: Oscar Maes <oscmaes92@gmail.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 1/2] pcnet32: stop holding device spin lock
+ during napi_complete_done
+Message-ID: <01fd91eb-36c4-4585-bace-c1b6ec15c556@lunn.ch>
+References: <20260525125437.4061-1-oscmaes92@gmail.com>
+ <20260525125437.4061-2-oscmaes92@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,82 +63,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260525061653.22548-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260525125437.4061-2-oscmaes92@gmail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-291327-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	TAGGED_FROM(0.00)[bounces-291328-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev,kernel];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim,altera.com:email]
-X-Rspamd-Queue-Id: 0C3205CB59D
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 45A755CB614
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 24, 2026 at 11:16:53PM -0700, muhammad.nazim.amirul.nazle.asmade@altera.com wrote:
-> From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+On Mon, May 25, 2026 at 02:54:36PM +0200, Oscar Maes wrote:
+> napi_complete_done may call gro_flush_normal (though not currently, as GRO
+> is unsupported at the moment), which may result in packet TX. This will
+> eventually result in calling pcnet32_start_xmit - resulting in a deadlock
+> while trying to re-acquire the already locked spin lock.
 > 
-> Currently hrtimer_start is called even if hrtimer is
-> active. This is unnecessary and expensive in some targets.
-> This patch avoids calling hrtimer_start unnecessarily.
+> It is safe to split the spinlock block into two, because the hardware
+> registers are still protected from concurrent access, and the two blocks
+> perform unrelated operations that don't need to happen atomically. The call
+> to napi_complete_done does not require external locking.
 > 
-> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
-> Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 3591755ea30b..35da51c26248 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -3341,12 +3341,14 @@ static void stmmac_tx_timer_arm(struct stmmac_priv *priv, u32 queue)
->  	 * Try to cancel any timer if napi is scheduled, timer will be armed
->  	 * again in the next scheduled napi.
->  	 */
-> -	if (unlikely(!napi_is_scheduled(napi)))
-> -		hrtimer_start(&tx_q->txtimer,
-> -			      STMMAC_COAL_TIMER(tx_coal_timer),
-> -			      HRTIMER_MODE_REL);
-> -	else
-> +	if (unlikely(!napi_is_scheduled(napi))) {
-> +		if (unlikely(!(hrtimer_active(&tx_q->txtimer))))
-> +			hrtimer_start(&tx_q->txtimer,
-> +				      STMMAC_COAL_TIMER(tx_coal_timer),
-> +				      HRTIMER_MODE_REL);
+> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
 
-Is there a race condition here? I've not thought about it enough to
-know if there is/is not.
-
-Also, does this change the meaning of tx_coal_timer?
-
-I think the commit message needs expanding, to cover these issues. For
-performance changes, it is also normal to include some performance
-numbers, before/after, in the commit message.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
     Andrew
-
----
-pw-bot: cr
 
