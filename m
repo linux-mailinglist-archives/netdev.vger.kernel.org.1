@@ -1,212 +1,236 @@
-Return-Path: <netdev+bounces-291392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id /vknBfyMFGpcOQcAu9opvQ
-	(envelope-from <netdev+bounces-291392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 19:55:08 +0200
+	id rnN1A42OFGqTOQcAu9opvQ
+	(envelope-from <netdev+bounces-291393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 20:01:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BE675CD792
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 19:55:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 609485CD844
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 20:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E6B4A3011F1A
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:55:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 53B573013711
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2842F7EF7;
-	Mon, 25 May 2026 17:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B2132573F;
+	Mon, 25 May 2026 18:01:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HdXstT5G"
+	dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b="E5UBQEQA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAC432B128;
-	Mon, 25 May 2026 17:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7ACE2DFF3F
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 18:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779731702; cv=none; b=BzOZM2Xwj6JePFPK6dWzEDZKRIO4u8O9N3esqli2LrQ1NGqhpzvzBlnXPVt9Zu7bFNG82DUTALLRXaSwvhA7Nh6o72yqo/uach/umX4KAxsSKutPf6swzwZl+/Jgzm/MeNOeYGjKwM1BF6sGuCTv3uIB5lAirSB1w0eNpq3Ndjc=
+	t=1779732106; cv=none; b=hGBs5KOXBRITd27gIsIffIdZt/14wetxx/v4qHvoDMANDeRW1Tn4CBScfFffewG0dCXvyICDN9SMnA4WUNss8LdYtsiLejdOfXuG7GnnCrZ2Ew7IqDzKXCFmMjqkYkVqvYJZgvcgGum5U2khcvRB3f4DA22aOBofPycOSRPmSo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779731702; c=relaxed/simple;
-	bh=dSxlyObc+C0UptMww3e1YvrtNpTonTJ4UTyos4bl4pg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uhUSI8y9iiXjwX8v73WygNiDfuiGoLA3o3T4cJgNs4RV4m1hybc7AIlzftjoeYrPE4AkCsPW/ZgajIgTTwB+BPOrrW26pDpNvadDLEnlFJYTWe/4UpkN0cAixVYp+o0t1ChiTeu/dp20JDn9iBUad1g2ab5tqgSV0L7lyjM4Als=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HdXstT5G; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F6451F000E9;
-	Mon, 25 May 2026 17:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779731701;
-	bh=i3awmoKb3g0un6o2OqMNnbAwu1xN9Id/3mZAgRhVXds=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=HdXstT5G4xedlaNW4Qkr+Imx0xeT8ldZmtqwX2u5G0Lzi7409/tibkTUkY7ziTDLp
-	 L9JUpvSeDrsspQkkEp6WV6YiJN9EPFshjYPelaUEOYfLwksAd90qRqfu/CtPK4/TSe
-	 Yz+vKpke0m0h8YLfJvbSHLfsoQ6UET2L4LHBge+zHpPJP+ja+eko88aaCIIIIX4Vmm
-	 dyyaciNfHXSCNHpiCRC6aTdgvUjTWMdLQoCaGjQV/yZ/Uae4XTQmIatBnHV0k1Vi1d
-	 sUhHd++mTFzgk2BRl9JCUSkyxNFms3rl/mPqatXzikhgR2fHY93Elmv703jMRb70W4
-	 QV3WaaBc9ojDw==
-Date: Mon, 25 May 2026 10:54:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Yeonju Bae <iwasbaeyz@gmail.com>, netdev@vger.kernel.org,
- gregkh@linuxfoundation.org, security@kernel.org, john.fastabend@gmail.com,
- sd@queasysnail.net, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH net] tls: avoid zc receive for file-backed pages
-Message-ID: <20260525105459.5ae73c2b@kernel.org>
-In-Reply-To: <20260521165328.16112-1-iwasbaeyz@gmail.com>
-References: <2026052150-stylus-germicide-780e@gregkh>
-	<20260521165328.16112-1-iwasbaeyz@gmail.com>
+	s=arc-20240116; t=1779732106; c=relaxed/simple;
+	bh=uQDtGl1GZehCkeUJvy50GOF0qMnGqzE+lOEJiutJFMI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=Bta2tjJ1B3ud/yHlb4BnqC2KRmrlhk9oRPmVfgLt3kYdZXzpw7/Nfz1uK197BybO7tayVUHwihT2EgSefCiAjwGgQ6uoSTAh28xVGI+Hr/rTR06F96mTsDWG5KiAs38j6MkGYjjkp/gEoBl/uuTsnU9hw9CZGCZPsQtOGyeuVAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=E5UBQEQA; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1329fc4bf77so7608125c88.1
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 11:01:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1779732104; x=1780336904; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fzor4pOAcoXrq0r/dQWN3ieh5O1PmvSJQr5rj+ToVL8=;
+        b=E5UBQEQAnOUrlMiUQguDe1X4CPzHyqtORL9Him/enfTHhgntKUJq8sb++nZzg5UVH8
+         Cs6koqmuY+OjrtnYp5zwe5qPrGNPJX6OHnGK/ovag6PakFRACMjqo8mqAhmXbxJCGE8p
+         9cGsPqMxKL5NApvUdNIV1jd92SLxwOpCz/W32Wc4iy6ncJL2JZQTe+D9m7boXFV/GABY
+         7+Q0sR28LVPOmFt2TxxPQnUFeWJ1oyhOmKi92Z3joVWWmrXp256ZGgaNsUPixq3gVnmT
+         mUxC8KU93bv3Tz2H3/7gM5rt4tTpbkBDbChuqf+bB4R0ZKqJofgD473Z8m5tvID/Las6
+         2FqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779732104; x=1780336904;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fzor4pOAcoXrq0r/dQWN3ieh5O1PmvSJQr5rj+ToVL8=;
+        b=EJ11GrhMRYrqQ9+DqayjLAB1z5upjZUCTp46VTLdzmOiUM9V++dcbZnozM85dKplk3
+         OPxYByMejJ6OWVYqRPafZxPKD57Q2zTFDUAaXUyNCm1JcynUtCehNG8TWCJoY+h9z2kX
+         PuKe+nPI4Q4IEhTJgEn4IpGpgeQKskyFeDyb/i1EK4bPZhNJWhf2CJuza84cbARMnvc0
+         1WJTpvqSAVJ7AgROlz9dJGU9x/dxohP32VOfbXs1bMBrnRBRDaucNZM4t7GdtyT+vDRt
+         VPRS5q+nYVgpMqdUWQbP3q5Fbent4Jv3JlQDfIymvn3MOrHhsAtZrleOAoidDR526Wwm
+         6/8g==
+X-Forwarded-Encrypted: i=1; AFNElJ9/ReJhHg3+usUWtwaCURSN9KW0AP+NqHVWRnY6Pfv9weOK9ePAQmdEGCZfN41w2woOQFQXGHs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMvUMhE2DRE8Z4Nk72mcWo6OqrfHMO8KsDVoN6fvHR1x1QKo4z
+	Np9Py1JA2wxikWIt4iF3FKu22C5hpe7CYOyqErY53XSBkHrxekWEqzBaUcsO/MKfMEY=
+X-Gm-Gg: Acq92OE0xu04ciLOancD6hjnJmqIfd60tShiKGmUFD5l4BZVUgTrTtGxrmRXHwklkWi
+	cd1C4qynLhhyRQp+RYYnIXrOkFwKiYZpIv8hPO7O30YvDNon4HdLyNZzN21RIwLjNmeEvHHUTIk
+	gnmXrLOf2twp3vjhynR3WeFSlPJspCCY/1ZALskLJwK5MJRZonfw+HJN4ym0JZEpvDYjQPldoRz
+	DkIqCn3/mwftXK7qawTEqrqTQYTRyZK6mTyk4oADww8YCWhqxXPc4UEFFbmUl6X8gj9ewk2jjka
+	bKEBWm7FDvsVjhdlMGJgt2twCIQnxPBeiPQyIC+HR/aB+kvvdWNTphe+VfJrEcJZtg6km3d881u
+	/fwfoi8baesXeSxGvzWnPvC+htIeJmorpV5H6UpLrw1IFafWivOqxCMGEHyD0pFY5q1glItY+wP
+	TGk7w=
+X-Received: by 2002:a05:7022:ef01:b0:12c:8f92:c6ba with SMTP id a92af1059eb24-1365fc7b48cmr5378838c88.34.1779732103455;
+        Mon, 25 May 2026 11:01:43 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:600::cc2])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1366a2e634csm7642048c88.2.2026.05.25.11.01.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 May 2026 11:01:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 25 May 2026 14:01:33 -0400
+Message-Id: <DIRYDGLWJJWI.1PACVYJDRYBJ2@etsalapatis.com>
+Subject: Re: [PATCH RFC bpf-next 3/8] bpf: add BPF_JIT_KASAN for KASAN
+ instrumentation of JITed programs
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+To: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>, "Emil
+ Tsalapatis" <emil@etsalapatis.com>, "Alexei Starovoitov"
+ <alexei.starovoitov@gmail.com>
+Cc: "Andrey Konovalov" <andreyknvl@gmail.com>, "Alexei Starovoitov"
+ <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii
+ Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
+ <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
+ <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "John Fastabend"
+ <john.fastabend@gmail.com>, "David S. Miller" <davem@davemloft.net>, "David
+ Ahern" <dsahern@kernel.org>, "Thomas Gleixner" <tglx@kernel.org>, "Ingo
+ Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>, "Dave Hansen"
+ <dave.hansen@linux.intel.com>, "X86 ML" <x86@kernel.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, "Shuah Khan" <shuah@kernel.org>, "Maxime Coquelin"
+ <mcoquelin.stm32@gmail.com>, "Alexandre Torgue"
+ <alexandre.torgue@foss.st.com>, "Andrey Ryabinin" <ryabinin.a.a@gmail.com>,
+ "Alexander Potapenko" <glider@google.com>, "Dmitry Vyukov"
+ <dvyukov@google.com>, "Vincenzo Frascino" <vincenzo.frascino@arm.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>, <ebpf@linuxfoundation.org>,
+ "Bastien Curutchet" <bastien.curutchet@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>, "Xu Kuohai" <xukuohai@huawei.com>, "bpf"
+ <bpf@vger.kernel.org>, "LKML" <linux-kernel@vger.kernel.org>, "Network
+ Development" <netdev@vger.kernel.org>, "open list:KERNEL SELFTEST
+ FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>, "linux-arm-kernel"
+ <linux-arm-kernel@lists.infradead.org>, "kasan-dev"
+ <kasan-dev@googlegroups.com>, "linux-mm" <linux-mm@kvack.org>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
+ <20260413-kasan-v1-3-1a5831230821@bootlin.com>
+ <CA+fCnZf-o8tiv_tX9YB5eBUGx17OpztKZsEB6Awjw3WAqBAiUw@mail.gmail.com>
+ <DHSWSSYRPUVC.2W3G3OU27L3HG@bootlin.com>
+ <CAADnVQLj=UosnsC-4V2+mN92Fe0-kW++U+m-O9c93kk6BwiXgw@mail.gmail.com>
+ <DIP9O3BEWG3C.2BAHKYUIA4H4E@bootlin.com>
+ <DIPDH3PCUDDG.EGYL0SYSG1IO@etsalapatis.com>
+ <DIRMYUXFYOVY.1LQV9E3OHGGBK@bootlin.com>
+In-Reply-To: <DIRMYUXFYOVY.1LQV9E3OHGGBK@bootlin.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291392-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,linuxfoundation.org,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291393-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DMARC_NA(0.00)[etsalapatis.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[bootlin.com,etsalapatis.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[42];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,iogearbox.net,linux.dev,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org,linuxfoundation.org,bootlin.com,huawei.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,googlegroups.com,kvack.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.247];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 5BE675CD792
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:email]
+X-Rspamd-Queue-Id: 609485CD844
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 22 May 2026 01:53:28 +0900 Yeonju Bae wrote:
-> kTLS RX zc decrypt writes unauthenticated AEAD output directly into
-> pages pinned from the recvmsg iterator via tls_setup_from_iter().
-> For MAP_SHARED, PROT_WRITE file-backed destinations, those pages are
-> live page-cache pages rather than anonymous copies: MAP_SHARED does not
-> trigger copy-on-write, so FOLL_WRITE returns the actual page-cache page.
-> 
-> crypto_aead_decrypt() writes CTR-mode decryption output into the
-> scatter-gather list before the authentication tag is verified.  If the
-> tag check fails (-EBADMSG), the plaintext-like output is already
-> resident in the page-cache page.  exit_free_pages() calls put_page()
-> without any content cleanup, so the modification persists through the
-> backing file.  An independent open(O_RDONLY)/read() of the same file
-> returns different content and its SHA-256 changes.  MAP_PRIVATE is safe
-> via COW; PROT_READ-only destinations fail at iov_iter_get_pages2()
-> before any decryption occurs.
-> 
-> Avoid zc receive for file-backed destination pages.  In
-> tls_setup_from_iter(), after iov_iter_get_pages2() pins pages, check
-> each page with folio_mapping(page_folio(page)).  If any pinned page is
-> file-backed (mapping != NULL), release the pinned pages and return
-> -EOPNOTSUPP.  Handle -EOPNOTSUPP in tls_decrypt_sw() by clearing
-> darg->zc and retrying, which causes tls_decrypt_sg() to allocate a
-> kernel bounce buffer instead.  Decryption output never reaches the
-> file-backed page; on tag failure the bounce buffer is discarded.
-> 
-> This follows the existing opportunistic zc retry pattern already used
-> for TLS 1.3 record type mismatches in tls_decrypt_sw().
-> 
-> Verified on linux-7.0-rc3 QEMU (x86-64), four destination types:
->   MAP_SHARED+RW:   file_changed=0  (was 4077/4096 bytes before patch)
->   MAP_PRIVATE+RW:  file_changed=0  (COW isolation; unchanged)
->   anonymous heap:  no file backing  (unchanged)
->   PROT_READ only:  file_changed=0  (EFAULT before decrypt; unchanged)
+On Mon May 25, 2026 at 5:05 AM EDT, Alexis Lothor=C3=A9 wrote:
+> On Fri May 22, 2026 at 7:13 PM CEST, Emil Tsalapatis wrote:
+>> On Fri May 22, 2026 at 10:14 AM EDT, Alexis Lothor=C3=A9 wrote:
+>>> On Tue Apr 14, 2026 at 4:38 PM CEST, Alexei Starovoitov wrote:
+>>>> On Tue, Apr 14, 2026 at 6:24=E2=80=AFAM Alexis Lothor=C3=A9
+>>>> <alexis.lothore@bootlin.com> wrote:
+>>>>>
+>>>>> On Tue Apr 14, 2026 at 12:20 AM CEST, Andrey Konovalov wrote:
+>>>>> > On Mon, Apr 13, 2026 at 8:29=E2=80=AFPM Alexis Lothor=C3=A9 (eBPF F=
+oundation)
+>>>>> > <alexis.lothore@bootlin.com> wrote:
+>>>
+>>> [...]
+>>>
+>>>>> >> +config BPF_JIT_KASAN
+>>>>> >> +       bool
+>>>>> >> +       depends on HAVE_EBPF_JIT_KASAN
+>>>>> >> +       default y if BPF_JIT && KASAN_GENERIC
+>>>>> >
+>>>>> > Should this be "depends on KASAN && KASAN_GENERIC"?
+>>>>>
+>>>>> Meaning, making it an explicit user-selectable option ?
+>>>>>
+>>>>> If so, the current design choice is voluntary and based on the feedba=
+ck
+>>>>> received on the original RFC, where I have been suggested to
+>>>>> automatically enable the KASAN instrumentation in BPF programs if KAS=
+AN
+>>>>> support is enabled in the kernel ([1]). But if a user-selectable togg=
+le
+>>>>> is eventually a better solution, I'm fine with changing it.
+>>>>
+>>>> Let's not add more config knobs.
+>>>> Even this patch looks redundant.
+>>>> Inside JIT do instrumentation when KASAN_GENERIC is set.
+>>>
+>>> (with quite some delay) I think it would be better to keep this new
+>>> BPF_JIT_KASAN, because aside from the possibility to use it in
+>>> bpf_jit_comp.c, it allows to update tests affected by KASAN
+>>> instrumentation in a nicer way. For example, the test_loader subtests
+>>> that monitor JITted instructions are confused by KASAN. I can either
+>>> skip them or make them smarter when KASAN is enabled for BPF, but in
+>>> both cases, it would be nicer to just adapt the behavior based on a
+>>> generic CONFIG_BPF_JIT_KASAN, rather than sprinkling some "if
+>>> jit_enabled AND CONFIG_KASAN_GENERIC AND ARCH_X86" in selftests. That
+>>> still does not make it a config knob, that just creates an internal
+>>> Kconfig option that is automatically turned on when KASAN and JIT are
+>>> enabled at build time.
+>>
+>> Having a togglable config knob gives us the option to set up KASAN for
+>> the kernel but not for BPF, and I don't see why we'd want that. Imo we a=
+re
+>> already paying the cost of KASAN for the rest of the kernel, there is no
+>> incentive to not run it for the BPF JIT. Having to eat the complexity co=
+st
+>> in the selftests seems reasonable if the alternative means a cleaner
+>> interface for the user (preventing them from choosing an unreasonable
+>> combination of options).
+>
+> Again, this does not expose a togglable knob, this is a purely internal
+> kconfig, automatically enabled if CONFIG_KASAN_GENERIC is set and if the
+> architecture-specific Kconfig defines HAVE_EBPF_JIT_KASAN (since we want
+> it for x86 only), and there would be no way to enable KASAN for kernel
+> only and not for BPF, or the other way around. What I am proposing is
+> just an internal, architecture-agnostice kconfig to avoid conditioning
+> some selftests to any architecture.=20
 
-I'm not seeing anything unusual here from high level API use size. 
-We feed the iov_iter constructed by recvmsg in socket code into 
-iov_iter_get_pages2(). Either:
- - the way we construct the iov_iter is wrong; or
- - iov_iter_get_pages2() should be return an error; or
- - we should use a different iov_* API; or
- - the current behavior you describe is expected / correct.
+Makes sense, in this case this seems reasonable.
 
-I don't think that TLS open-coding page checks is the right move.
-
-Al, would you mind glancing over this?
-I have no idea what's the expect page cache behavior in this scenario.
-
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index a977b0434..c312a83b4 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -36,6 +36,7 @@
->   */
->  
->  #include <linux/bug.h>
-> +#include <linux/pagemap.h>
->  #include <linux/sched/signal.h>
->  #include <linux/module.h>
->  #include <linux/kernel.h>
-> @@ -1443,6 +1444,34 @@ static int tls_setup_from_iter(struct iov_iter *from,
->  
->  		length -= copied;
->  		size += copied;
-> +		/* Reject file-backed destination pages.  Writing unauthenticated
-> +		 * AEAD output into a page-cache page before tag verification
-> +		 * leaves the backing file modified even when recvmsg() returns
-> +		 * -EBADMSG.  Return -EOPNOTSUPP so the caller retries via the
-> +		 * non-ZC bounce-buffer path.
-> +		 */
-> +		{
-> +			ssize_t remain = copied;
-> +			size_t  off    = offset;
-> +			int     np = 0, j;
-> +
-> +			while (remain > 0) {
-> +				remain -= min_t(ssize_t, remain,
-> +						(ssize_t)(PAGE_SIZE - off));
-> +				off = 0;
-> +				np++;
-> +			}
-> +			for (j = 0; j < np; j++) {
-> +				if (folio_mapping(page_folio(pages[j]))) {
-> +					int k;
-> +
-> +					for (k = 0; k < np; k++)
-> +						put_page(pages[k]);
-> +					rc = -EOPNOTSUPP;
-> +					goto out;
-> +				}
-> +			}
-> +		}
->  		while (copied) {
->  			use = min_t(int, copied, PAGE_SIZE - offset);
->  
-> @@ -1699,6 +1728,14 @@ tls_decrypt_sw(struct sock *sk, struct tls_context *tls_ctx,
->  	if (err < 0) {
->  		if (err == -EBADMSG)
->  			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSDECRYPTERROR);
-> +		if (err == -EOPNOTSUPP && darg->zc) {
-> +			/* tls_setup_from_iter detected file-backed destination
-> +			 * pages; retry without ZC via the bounce-buffer path.
-> +			 */
-> +			darg->zc = false;
-> +			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSDECRYPTRETRY);
-> +			return tls_decrypt_sw(sk, tls_ctx, msg, darg);
-> +		}
->  		return err;
->  	}
->  	/* keep going even for ->async, the code below is TLS 1.3 */
+>
+> Alexis
 
 
