@@ -1,439 +1,254 @@
-Return-Path: <netdev+bounces-291324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291325-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBN7MxBNFGqnMQcAu9opvQ
-	(envelope-from <netdev+bounces-291324-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:22:24 +0200
+	id eLGGO9lOFGqnMQcAu9opvQ
+	(envelope-from <netdev+bounces-291325-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:30:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542CF5CB0AD
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:22:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BADB5CB225
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 080ED30570DB
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:17:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 72C75303F04F
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 13:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BBF384242;
-	Mon, 25 May 2026 13:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A13384CFF;
+	Mon, 25 May 2026 13:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jAEyjkse"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="aQ7LUXtW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90166384CE2
-	for <netdev@vger.kernel.org>; Mon, 25 May 2026 13:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA36B3859D3
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 13:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779715070; cv=none; b=V2PvZ3vfUP8xRL6HSC4N4J7mriJpeJxDFL6fu/pWdHIacpPwl0SYaFnl3fm6Cf6VteAhr0Hn1uFmicG0vR9gPytxRxB1NC/sHCPSLUqWY4pDlxx5I+5k+UgK3cqV5PvhONMZYIwBz0fUQI6zJLu64B1nJUliOxgEmRxrYQSJbJc=
+	t=1779715641; cv=none; b=Bwtbw8EStnXODp3lPMdB8mMxMw8mY0ZVYFzJzuMDrI7YJHnrVrNPtftoUCTJp8MdoYe3k9F/mbX20Y81YDPmPiFBMRFrG65ncZGuXUqzykidz5hwj2433RoR4N9/cfID+lOC+IoRRZsNfsxt/z1ZLvCvhtpYerGAhFju6b/lAuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779715070; c=relaxed/simple;
-	bh=cXkggUMWdYmJT2UG2mDh/fQnlEuCCAgIFTLuPJak0FE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RULpxVcYxTOrtcxliYmAoBZW1ViPO3UJQ5UCWyRJvKQmrEMtKDn5zNCkgDb4KuFe3nf5zlCNEgEn92T+ZNYWDi2sZYuPjv5vImR2xUK7LuKFtajuFHScaUA+/9H10MGS9U3Z/3aU5yFBtuvmqZd1lIj0Ejf8LRuSsHxCYDBTbwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jAEyjkse; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-48fe40b61a3so61802855e9.3
-        for <netdev@vger.kernel.org>; Mon, 25 May 2026 06:17:46 -0700 (PDT)
+	s=arc-20240116; t=1779715641; c=relaxed/simple;
+	bh=C94U0R51pf0+NwK55ZN6EU/K9cssUS28krlgs1NAXvo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tSQPE9cBpZ+Y7oaAuUAOE+zD9ROydr1d8P2bfM4h8JTNkJCM0ysXIQsCe4DgNhrj9eL6V9ghbmgKq+XK5LfAEcgBPEaeCxQvmtYEsGzJrjxbHcZPuwJ+6Y7JqRY41f1j7ChZTSS4LPibiSsfcH5IMio0aESM6vfs+VS7/CzrgKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=aQ7LUXtW; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4891e86fabeso121366045e9.1
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 06:27:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779715065; x=1780319865; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KNbG2HJ2MZ13W/tRCu38pNn9hGvLRzMifdYB/tdu2zc=;
-        b=jAEyjkseISXtOamMDEmaKkn4G+KlZliUg+FrJMzqvwGG/o7q/nrHcwuN5JUPcQmVBg
-         hGT60bzLx2s957d0uXuZjpm/CQ9J0Fj3vW0fmu7k4RbrW2mjhAwExq5U4UHDUJCNzPD3
-         Zyd/j7NP4P12hmJPjQvXX9FS24aCSrpScUAe8e9VKPMyeBs50XGYd+G0WQA6ayhV9XQU
-         pq1WpA08NwHzVE5irB4Lr9weolfRUFmg/MFiZICvlJlz4dkldwj+2jeU5W4AH9flltYX
-         rOT0QOkZJGafujA+aksk4EJvvgB/Y7QdGo6HlkIrfPPlO71nGi0ODyG9GkS+TAs5vapb
-         0U4w==
+        d=suse.com; s=google; t=1779715637; x=1780320437; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ij+l12dR+ISDUAaA9eJOw0SDQ47xwS4UQDqlRXMB76c=;
+        b=aQ7LUXtW5bxOb+tWWbnJ9LI9Hu4ho2cWZv/3AUVlb7neykv3e+8w6/VBaL6Xr0dGge
+         z1KK2LMTAA72OCAu5AxD12Qy5s1M0/sw9ULxv7vFq7+upKOnBYr2wRR1ZvodcmgkysM4
+         sWabOR3Ubm2vqDtISC9F8a7yRMxFSNpxL+BvdxucPoZsLwmwpi+VqhZI8mUejTHqAsHt
+         us9KcbeyES8MwfL9wN5iAnDDh83sw6VahdIZeophjTkDCT9NWqrub1WwEH9gCU2y0gYZ
+         Rh2ajrWgiGd+BqSe3mipr5Mst8DS1o2/LF66I805h9zC41cP2I0l1MO9ZLDfwi8MxZFB
+         EZDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779715065; x=1780319865;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KNbG2HJ2MZ13W/tRCu38pNn9hGvLRzMifdYB/tdu2zc=;
-        b=r/G2VIzN25VlN58cKP1onySfDv6gNyf0y9WjlvdxpRSMIq6/eUnu4XP8j3nVdFapZa
-         5dAmoRdXmtF/sGdSAUy8cEbuVSml+sL5hmasG6SVAyz86lrWGsF16GC0bE7GOVBSPgeH
-         gMeKG9fFkiKf6jMOC0l6bFCFU9RzzlTo5viuY6PnNHTlU0WKuCT+Bl/Bj+uTDU5AicwF
-         PxwecArkIVy72YfvtTc9lS61SrT0XkXSb719q56iNZWSruRpyEQhtd+oMe1q6G9A+nkY
-         u276qnQEVH5u82C6fkbL00ek98xPjbINI9YzN9BQ33OkJ0hgnHeW/k2m/zhA4FfTYURP
-         rWFw==
-X-Forwarded-Encrypted: i=1; AFNElJ83j+E7bnnrmXKxyos+lP9GtOCrvQQJIa0aJBXVHyVda3neltCBPvknDKOatUeb4eT3YwlfFvc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7lhaSGktK4Fsg0ffhsKl+f+lQODheTlY2xTkuY14BXopmtozI
-	XJw2JOi/yR7jOIS05taGG78CgL8vVGN52lm5SRBMmvuA5oWWBEBygKjlj0zqdbWhf/xoT4XEQeH
-	V65xSbjpKEA2rJGm0jQ==
-X-Received: from wmep20.prod.google.com ([2002:a05:600c:4314:b0:489:1f97:aec7])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4f52:b0:490:4f91:5519 with SMTP id 5b1f17b1804b1-4904f91568dmr207512105e9.18.1779715064610;
- Mon, 25 May 2026 06:17:44 -0700 (PDT)
-Date: Mon, 25 May 2026 13:17:28 +0000
-In-Reply-To: <20260525-binder-netlink-v5-0-a90e2923ebeb@google.com>
+        d=1e100.net; s=20251104; t=1779715637; x=1780320437;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ij+l12dR+ISDUAaA9eJOw0SDQ47xwS4UQDqlRXMB76c=;
+        b=ovmBeNer6K4bjTS51k+19A2Uyw6z/gwrolaSQLhP0XjUBqB5M65MDjBkA7pUvxUqpQ
+         ytEcgcPxl+tR7LGId4aFpYdp87SjoZ9pWd4wg/wq8pB4F/0ttlU5aV6+iSpRZPi7k3j1
+         QXkPlQ009MTm7EJfnXamMFfE0JtL1SOVHdz9tLiFnKdayIbjcnkfFT08P0DI3hXvGBoY
+         W1oVbr7NiA1D3L8KLTung8kL0hpCwZw9/z/F23Z56qi2UbUuGzgh9wvPo9QqkDa2zXxR
+         Jkm+QoGnxHJ6Un+JkU6wkGm2YXf9whtSMSIJr5isUyCQSXM/lTfug9G6pgbTYsf3qi0y
+         QZgg==
+X-Forwarded-Encrypted: i=1; AFNElJ9N2ut8d5soCmX2JSmDaT+kgNsR620cE+sLmCBtmWN/t2uTqMi7oIZtHFojA/hAu6oNvfFaS30=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqtH8zUjQFzVf+I1bfTLffIyv3g14crSy7yCMxp2MpQDC/GMfb
+	UJV8QPVjy3UEcJ20xg35vOsBp5lKA02I05JoEXxxHoapdd2OLIZ9He/nPRV5g/fPaH8=
+X-Gm-Gg: Acq92OEU7sTbbUR9XZqhumRtCyeiU9WhNTPaqe0b+QVoSSPc4yqzrnPs27WHz4oO4bw
+	7cQ4POkoUaBOjOVcHsjsstqFFqRXqU+8P6+gYb/LUwSZlq6nOuKsX60Zbxxc4HdiB0cz4by8Je7
+	ptvFVenpV+buHFpjGWXWn6LmYRnKYQ8L1iMQTSnPMU83+/tGQRphU5JYB+ynF4FyGa37OfWwaev
+	6SLcqc+5aGJUICHsqrXbIudOENPzw6UamIXDnJcWxwPQa0n25QlarHUTF7oAijeDjnCjrtjO2KK
+	m5tQSz1FXDFXFZCR+NNccOO3izpIq1BdfUpZz+Fm73Qshes2yPEHydhTc26XTGqOK/kU695UWvR
+	+tVVqto4tNxWq1LdceYs+DUTRwZ3jMgjGTWkAlxWoEtribjkQHPUEb4wlSRVEOXQriX/0q4joMa
+	CRUYk+InFHLlNkzalonnbbCZxFvaBvRO/G9lf8S56XWipNsUXsZ7bfXVTjWFfGRMvhaWANQzP+S
+	JtxlGtAlAAWzvqFwUVXtFd/9GqZ0e5eKseO0z7mqwOXF2VLVjyxKssDDwTOghEjta0KwKVZCLyd
+	qPyz
+X-Received: by 2002:a05:600c:3b02:b0:48f:e1ac:c94f with SMTP id 5b1f17b1804b1-490424b3938mr247672645e9.10.1779715636631;
+        Mon, 25 May 2026 06:27:16 -0700 (PDT)
+Received: from ?IPV6:2a00:1028:838d:271e:8e3b:4aff:fe4c:a100? (dynamic-2a00-1028-838d-271e-8e3b-4aff-fe4c-a100.ipv6.o2.cz. [2a00:1028:838d:271e:8e3b:4aff:fe4c:a100])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490454b1ab3sm284841905e9.14.2026.05.25.06.27.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 May 2026 06:27:16 -0700 (PDT)
+Message-ID: <1c21f66f-0d0f-4a8b-835b-23408242cff1@suse.com>
+Date: Mon, 25 May 2026 15:27:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260525-binder-netlink-v5-0-a90e2923ebeb@google.com>
-X-Developer-Key: i=aliceryhl@google.com; a=openpgp; fpr=49F6C1FAA74960F43A5B86A1EE7A392FDE96209F
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11302; i=aliceryhl@google.com;
- h=from:subject:message-id; bh=oqg7PkgyuFpdSHZMroM+y5quqYpOBs1htUkwsJ8R/8c=;
- b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBqFEvznwLPvxPxyuavoTjmHREwRQvXPngCSNim/
- CTdbY12tbmJAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCahRL8wAKCRAEWL7uWMY5
- RprCD/9w73QGw1Svtvfz2T7YBtimsZyxq7IWWS3bpjB2bI8ZZFIC9pUGZDvY3ATeRO1lpC4Td01
- JK42P3vJbgkVTVq3YD3pm/JKPWSwX+qCXf5QOZluwwPik4gMk8aHXp19q8kDk1zAXszGuhx7VKo
- HDkK9D03UtTX+BrXMfnG2aoIZwmhlnC+EVr8f3Rhno1ag0wYL8BuuuFNGdGSmbqse7rSqx81+37
- XXnZQ/Aoly9MCRgETIqg+QUC+2uJG6/0EN5SnGsa6537FnNGB1xjm5zXCwAx2qrxke8yzeQy+jw
- B68SIF8AMrNmnf9PncumjNvKI0SjM40nZJPGkRN4sAz1GQzSbXwiP3R0dmvZzBl9/aUlIgXW89m
- Lj/tEXXOv90kvn30Km0LCtYR7XPU9sSo4WC/WrlUMLrrax150g21tnVp+4mdDia+vHcwDMsycht
- M5aKCHleLzj2BJ0kuVYpBdweAdJQWQWxpRbMGc0x0llEHXLlgg/BGPDrdvEIO8WkVzecXaQVZYY
- K+nP3iNEHuOmBZuTQaUldlmCz16GUeg0nIJ/xUV0aCm0Vi2nstrrTJuW4ONLE+udU9fOudBmVnV
- iZgLhiR6J8ZmhRPSV3nf4q6OMnloBQS7xUBZcCnxBDdLsh+U/yPXloVKoxv9VHjURBpeiwmVKhZ YUs7/3Kv/bed5Dw==
-X-Mailer: b4 0.14.3
-Message-ID: <20260525-binder-netlink-v5-2-a90e2923ebeb@google.com>
-Subject: [PATCH v5 2/2] rust_binder: report netlink transactions
-From: Alice Ryhl <aliceryhl@google.com>
-To: Carlos Llamas <cmllamas@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Andrew Lunn <andrew@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Matthew Maurer <mmaurer@google.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?q?Bj=C3=B6rn_Roy_Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, 
-	Alice Ryhl <aliceryhl@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/11] moduleparam: Add DEFINE_KERNEL_PARAM_OPS macro
+ family
+To: Kees Cook <kees@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Pengpeng Hou
+ <pengpeng@iscas.ac.cn>, Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
+ Corey Minyard <corey@minyard.net>, Gabriel Somlo <somlo@cmu.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Bart Van Assche <bvanassche@acm.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ Hans de Goede <hansg@kernel.org>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Hannes Reinecke <hare@suse.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>,
+ Lukasz Luba <lukasz.luba@arm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Alan Stern <stern@rowland.harvard.edu>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Jason Baron <jbaron@akamai.com>, Jim Cromie <jim.cromie@gmail.com>,
+ Tiwei Bie <tiwei.btw@antgroup.com>, Benjamin Berg <benjamin.berg@intel.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ "David E. Box" <david.e.box@linux.intel.com>,
+ "Maciej W. Rozycki" <macro@orcam.me.uk>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Peter Zijlstra <peterz@infradead.org>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Vinod Koul <vkoul@kernel.org>,
+ Frank Li <Frank.Li@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
+ Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Andrew Morton
+ <akpm@linux-foundation.org>, John Johansen <john.johansen@canonical.com>,
+ Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Georgia Garcia <georgia.garcia@canonical.com>, kvm@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-modules@vger.kernel.org,
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-acpi@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
+ qemu-devel@nongnu.org, intel-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-pm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-serial@vger.kernel.org,
+ linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
+ virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, netdev@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20260521133315.work.845-kees@kernel.org>
+ <20260521133326.2465264-3-kees@kernel.org>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20260521133326.2465264-3-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291324-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,linuxfoundation.org,lunn.ch,gmail.com,kernel.org,davemloft.net,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,iscas.ac.cn,nod.at,cambridgegreys.com,sipsolutions.net,minyard.net,cmu.edu,redhat.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,acm.org,ziepe.ca,ideasonboard.com,google.com,suse.de,HansenPartnership.com,oracle.com,arm.com,linuxfoundation.org,rowland.harvard.edu,linux.alibaba.com,akamai.com,antgroup.com,orcam.me.uk,infradead.org,linux.ibm.com,alien8.de,zytor.com,atomlin.com,linux-foundation.org,canonical.com,paul-moore.com,namei.org,hallyn.com,vger.kernel.org,googlegroups.com,kvack.org,lists.ubuntu.com,lists.infradead.org,lists.sourceforge.net,nongnu.org,lists.freedesktop.org,lists.ozlabs.org,lists.one-eyed-alien.net,lists.linux.dev];
+	DKIM_TRACE(0.00)[suse.com:+];
+	TAGGED_FROM(0.00)[bounces-291325-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,vger.kernel.org,google.com];
-	NEURAL_HAM(-0.00)[-0.873];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 542CF5CB0AD
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[98];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6BADB5CB225
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Carlos Llamas <cmllamas@google.com>
+On 5/21/26 3:33 PM, Kees Cook wrote:
+> Add macros that define a struct kernel_param_ops initializer through a
+> macro so the underlying field layout can evolve without touching every
+> call site. Three variants cover the three cases:
+> 
+>  DEFINE_KERNEL_PARAM_OPS(name, set, get) // basic
+>  DEFINE_KERNEL_PARAM_OPS_NOARG(name, set, get) // set KERNEL_PARAM_OPS_FL_NOARG
+>  DEFINE_KERNEL_PARAM_OPS_FREE(name, set, get, free) // also set .free
+> 
+> Callers prefix their own visibility qualifiers, e.g.:
+> 
+>   static DEFINE_KERNEL_PARAM_OPS(my_ops, my_set, my_get);
+> 
+> Also update module_param_call() and STANDARD_PARAM_DEF() to use
+> DEFINE_KERNEL_PARAM_OPS internally so the generated ops table will go
+> through the same macro as everything else.
+> 
+> Subsequent commits convert all open-coded struct kernel_param_ops
+> definitions to use these macros, in preparation for migrating to a
+> seq_buf .get API.
+> 
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+>  include/linux/moduleparam.h | 36 ++++++++++++++++++++++++++++++++++--
+>  kernel/params.c             |  6 ++----
+>  2 files changed, 36 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/linux/moduleparam.h b/include/linux/moduleparam.h
+> index 075f28585074..26bf45b36d02 100644
+> --- a/include/linux/moduleparam.h
+> +++ b/include/linux/moduleparam.h
+> @@ -68,6 +68,39 @@ struct kernel_param_ops {
+>  	void (*free)(void *arg);
+>  };
+>  
+> +/*
+> + * Define a const struct kernel_param_ops initializer. Callers prefix with
+> + * any required visibility qualifiers (typically "static"):
+> + *
+> + *   static DEFINE_KERNEL_PARAM_OPS(my_ops, my_set, my_get);
+> + *
+> + * Routing the @_set and @_get function pointers through the macro
+> + * (rather than naming the struct fields at every call site) lets the
+> + * field layout change in one place when callbacks are migrated to a
+> + * new signature.
+> + */
 
-The Android Binder driver supports a netlink API that reports
-transaction *failures* to a userspace daemon. This allows devices to
-monitor processes with many failed transactions so that it can e.g. kill
-misbehaving apps.
+Nit: The newly introduced DEFINE_KERNEL_PARAM_OPS*() macros remain in
+place at the end of the series after the migration is complete and this
+comment is removed in patch 7. It would be helpful to describe in the
+commit message why these macros are generally preferable to defining
+kernel_param_ops instances directly.
 
-One very important thing that this monitors is when many oneway messages
-are sent to a frozen process, so there is special handling to ensure
-this scenario is surfaced over netlink.
-
-Signed-off-by: Carlos Llamas <cmllamas@google.com>
-Co-developed-by: Alice Ryhl <aliceryhl@google.com>
-Signed-off-by: Alice Ryhl <aliceryhl@google.com>
----
- drivers/android/Kconfig                    |   2 +-
- drivers/android/binder/netlink.rs          | 110 +++++++++++++++++++++++++++++
- drivers/android/binder/rust_binder_main.rs |   8 ++-
- drivers/android/binder/thread.rs           |  10 +++
- drivers/android/binder/transaction.rs      |  40 +++++++++++
- rust/uapi/uapi_helper.h                    |   1 +
- 6 files changed, 168 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/android/Kconfig b/drivers/android/Kconfig
-index e2e402c9d175..606a9d07f774 100644
---- a/drivers/android/Kconfig
-+++ b/drivers/android/Kconfig
-@@ -16,7 +16,7 @@ config ANDROID_BINDER_IPC
- 
- config ANDROID_BINDER_IPC_RUST
- 	bool "Rust version of Android Binder IPC Driver"
--	depends on RUST && MMU && !ANDROID_BINDER_IPC
-+	depends on RUST && MMU && NET && !ANDROID_BINDER_IPC
- 	help
- 	  This enables the Rust implementation of the Binder driver.
- 
-diff --git a/drivers/android/binder/netlink.rs b/drivers/android/binder/netlink.rs
-new file mode 100644
-index 000000000000..818ac6f2536d
---- /dev/null
-+++ b/drivers/android/binder/netlink.rs
-@@ -0,0 +1,110 @@
-+// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+/* Based on: Documentation/netlink/specs/binder.yaml */
-+
-+#![allow(unreachable_pub, clippy::wrong_self_convention)]
-+use kernel::netlink::{Family, MulticastGroup};
-+use kernel::prelude::*;
-+
-+pub static BINDER_NL_FAMILY: Family = Family::const_new(
-+    &crate::THIS_MODULE,
-+    kernel::uapi::BINDER_FAMILY_NAME,
-+    kernel::uapi::BINDER_FAMILY_VERSION,
-+    &BINDER_NL_FAMILY_MCGRPS,
-+);
-+
-+static BINDER_NL_FAMILY_MCGRPS: [MulticastGroup; 1] = [MulticastGroup::const_new(c"report")];
-+
-+/// A multicast event sent to userspace subscribers to notify them about
-+/// binder transaction failures. The generated report provides the full
-+/// details of the specific transaction that failed. The intention is for
-+/// programs to monitor these events and react to the failures as needed.
-+pub struct Report {
-+    skb: kernel::netlink::GenlMsg,
-+}
-+
-+impl Report {
-+    /// Create a new multicast message.
-+    pub fn new(
-+        size: usize,
-+        portid: u32,
-+        seq: u32,
-+        flags: kernel::alloc::Flags,
-+    ) -> Result<Self, kernel::alloc::AllocError> {
-+        const BINDER_CMD_REPORT: u8 = kernel::uapi::BINDER_CMD_REPORT as u8;
-+        let skb = kernel::netlink::NetlinkSkBuff::new(size, flags)?;
-+        let skb = skb.genlmsg_put(portid, seq, &BINDER_NL_FAMILY, BINDER_CMD_REPORT)?;
-+        Ok(Self { skb })
-+    }
-+
-+    /// Broadcast this message.
-+    pub fn multicast(self, portid: u32, flags: kernel::alloc::Flags) -> Result {
-+        self.skb.multicast(&BINDER_NL_FAMILY, portid, 0, flags)
-+    }
-+
-+    /// Check if this message type has listeners.
-+    pub fn has_listeners() -> bool {
-+        BINDER_NL_FAMILY.has_listeners(0)
-+    }
-+
-+    /// The enum binder_driver_return_protocol returned to the sender.
-+    pub fn error(&mut self, val: u32) -> Result {
-+        const BINDER_A_REPORT_ERROR: c_int = kernel::uapi::BINDER_A_REPORT_ERROR as c_int;
-+        self.skb.put_u32(BINDER_A_REPORT_ERROR, val)
-+    }
-+
-+    /// The binder context where the transaction occurred.
-+    pub fn context(&mut self, val: &CStr) -> Result {
-+        const BINDER_A_REPORT_CONTEXT: c_int = kernel::uapi::BINDER_A_REPORT_CONTEXT as c_int;
-+        self.skb.put_string(BINDER_A_REPORT_CONTEXT, val)
-+    }
-+
-+    /// The PID of the sender process.
-+    pub fn from_pid(&mut self, val: u32) -> Result {
-+        const BINDER_A_REPORT_FROM_PID: c_int = kernel::uapi::BINDER_A_REPORT_FROM_PID as c_int;
-+        self.skb.put_u32(BINDER_A_REPORT_FROM_PID, val)
-+    }
-+
-+    /// The TID of the sender thread.
-+    pub fn from_tid(&mut self, val: u32) -> Result {
-+        const BINDER_A_REPORT_FROM_TID: c_int = kernel::uapi::BINDER_A_REPORT_FROM_TID as c_int;
-+        self.skb.put_u32(BINDER_A_REPORT_FROM_TID, val)
-+    }
-+
-+    /// The PID of the recipient process. This attribute may not be present
-+    /// if the target could not be determined.
-+    pub fn to_pid(&mut self, val: u32) -> Result {
-+        const BINDER_A_REPORT_TO_PID: c_int = kernel::uapi::BINDER_A_REPORT_TO_PID as c_int;
-+        self.skb.put_u32(BINDER_A_REPORT_TO_PID, val)
-+    }
-+
-+    /// The TID of the recipient thread. This attribute may not be present
-+    /// if the target could not be determined.
-+    pub fn to_tid(&mut self, val: u32) -> Result {
-+        const BINDER_A_REPORT_TO_TID: c_int = kernel::uapi::BINDER_A_REPORT_TO_TID as c_int;
-+        self.skb.put_u32(BINDER_A_REPORT_TO_TID, val)
-+    }
-+
-+    /// When present, indicates the failed transaction is a reply.
-+    pub fn is_reply(&mut self) -> Result {
-+        const BINDER_A_REPORT_IS_REPLY: c_int = kernel::uapi::BINDER_A_REPORT_IS_REPLY as c_int;
-+        self.skb.put_flag(BINDER_A_REPORT_IS_REPLY)
-+    }
-+
-+    /// The bitmask of enum transaction_flags from the transaction.
-+    pub fn flags(&mut self, val: u32) -> Result {
-+        const BINDER_A_REPORT_FLAGS: c_int = kernel::uapi::BINDER_A_REPORT_FLAGS as c_int;
-+        self.skb.put_u32(BINDER_A_REPORT_FLAGS, val)
-+    }
-+
-+    /// The application-defined code from the transaction.
-+    pub fn code(&mut self, val: u32) -> Result {
-+        const BINDER_A_REPORT_CODE: c_int = kernel::uapi::BINDER_A_REPORT_CODE as c_int;
-+        self.skb.put_u32(BINDER_A_REPORT_CODE, val)
-+    }
-+
-+    /// The transaction payload size in bytes.
-+    pub fn data_size(&mut self, val: u32) -> Result {
-+        const BINDER_A_REPORT_DATA_SIZE: c_int = kernel::uapi::BINDER_A_REPORT_DATA_SIZE as c_int;
-+        self.skb.put_u32(BINDER_A_REPORT_DATA_SIZE, val)
-+    }
-+}
-diff --git a/drivers/android/binder/rust_binder_main.rs b/drivers/android/binder/rust_binder_main.rs
-index dc1941cd2407..bbef68993b8d 100644
---- a/drivers/android/binder/rust_binder_main.rs
-+++ b/drivers/android/binder/rust_binder_main.rs
-@@ -38,6 +38,7 @@
- mod deferred_close;
- mod defs;
- mod error;
-+mod netlink;
- mod node;
- mod page_range;
- mod process;
-@@ -288,19 +289,22 @@ fn ptr_align(value: usize) -> Option<usize> {
- // SAFETY: We call register in `init`.
- static BINDER_SHRINKER: Shrinker = unsafe { Shrinker::new() };
- 
--struct BinderModule {}
-+struct BinderModule {
-+    _netlink: kernel::netlink::Registration,
-+}
- 
- impl kernel::Module for BinderModule {
-     fn init(_module: &'static kernel::ThisModule) -> Result<Self> {
-         // SAFETY: The module initializer never runs twice, so we only call this once.
-         unsafe { crate::context::CONTEXTS.init() };
- 
-+        let netlink = crate::netlink::BINDER_NL_FAMILY.register()?;
-         BINDER_SHRINKER.register(c"android-binder")?;
- 
-         // SAFETY: The module is being loaded, so we can initialize binderfs.
-         unsafe { kernel::error::to_result(binderfs::init_rust_binderfs())? };
- 
--        Ok(Self {})
-+        Ok(Self { _netlink: netlink })
-     }
- }
- 
-diff --git a/drivers/android/binder/thread.rs b/drivers/android/binder/thread.rs
-index 97d5f31e8fe3..aa4e93a877ac 100644
---- a/drivers/android/binder/thread.rs
-+++ b/drivers/android/binder/thread.rs
-@@ -1263,6 +1263,15 @@ fn transaction(self: &Arc<Self>, cmd: u32, reader: &mut UserSliceReader) -> Resu
-             }
-         }
- 
-+        if info.oneway_spam_suspect {
-+            // If this is both a oneway spam suspect and a failure, we report it twice. This is
-+            // useful in case the transaction failed with BR_TRANSACTION_PENDING_FROZEN.
-+            info.report_netlink(BR_ONEWAY_SPAM_SUSPECT, &self.process.ctx);
-+        }
-+        if info.reply != 0 {
-+            info.report_netlink(info.reply, &self.process.ctx);
-+        }
-+
-         Ok(())
-     }
- 
-@@ -1332,6 +1341,7 @@ fn reply_inner(self: &Arc<Self>, info: &mut TransactionInfo) -> BinderResult {
-             );
-             let reply = Err(BR_FAILED_REPLY);
-             orig.from.deliver_reply(reply, &orig);
-+            info.reply = BR_FAILED_REPLY;
-             err.reply = BR_TRANSACTION_COMPLETE;
-             err
-         });
-diff --git a/drivers/android/binder/transaction.rs b/drivers/android/binder/transaction.rs
-index 47d5e4d88b07..3fa7091ed8a6 100644
---- a/drivers/android/binder/transaction.rs
-+++ b/drivers/android/binder/transaction.rs
-@@ -3,6 +3,7 @@
- // Copyright (C) 2025 Google LLC.
- 
- use kernel::{
-+    netlink::GENLMSG_DEFAULT_SIZE,
-     prelude::*,
-     seq_file::SeqFile,
-     seq_print,
-@@ -17,6 +18,7 @@
-     allocation::{Allocation, TranslatedFds},
-     defs::*,
-     error::{BinderError, BinderResult},
-+    netlink::Report,
-     node::{Node, NodeRef},
-     process::{Process, ProcessInner},
-     ptr_align,
-@@ -49,6 +51,44 @@ impl TransactionInfo {
-     pub(crate) fn is_oneway(&self) -> bool {
-         self.flags & TF_ONE_WAY != 0
-     }
-+
-+    pub(crate) fn report_netlink(&self, reply: u32, ctx: &crate::Context) {
-+        if let Err(err) = self.report_netlink_inner(reply, ctx) {
-+            pr_warn!(
-+                "{}:{} netlink report failed: {err:?}\n",
-+                self.from_pid,
-+                self.from_tid
-+            );
-+        }
-+    }
-+
-+    fn report_netlink_inner(&self, reply: u32, ctx: &crate::Context) -> kernel::error::Result {
-+        if !Report::has_listeners() {
-+            return Ok(());
-+        }
-+        let mut report = Report::new(GENLMSG_DEFAULT_SIZE, 0, 0, GFP_KERNEL)?;
-+
-+        report.error(reply)?;
-+        report.context(&ctx.name)?;
-+        report.from_pid(self.from_pid as u32)?;
-+        report.from_tid(self.from_tid as u32)?;
-+        if self.to_pid != 0 {
-+            report.to_pid(self.to_pid as u32)?;
-+        }
-+        if self.to_tid != 0 {
-+            report.to_tid(self.to_tid as u32)?;
-+        }
-+
-+        if self.is_reply {
-+            report.is_reply()?;
-+        }
-+        report.flags(self.flags)?;
-+        report.code(self.code)?;
-+        report.data_size(self.data_size as u32)?;
-+
-+        report.multicast(0, GFP_KERNEL)?;
-+        Ok(())
-+    }
- }
- 
- use core::mem::offset_of;
-diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
-index 06d7d1a2e8da..86c7b6b284b0 100644
---- a/rust/uapi/uapi_helper.h
-+++ b/rust/uapi/uapi_helper.h
-@@ -11,6 +11,7 @@
- #include <uapi/drm/nova_drm.h>
- #include <uapi/drm/panthor_drm.h>
- #include <uapi/linux/android/binder.h>
-+#include <uapi/linux/android/binder_netlink.h>
- #include <uapi/linux/mdio.h>
- #include <uapi/linux/mii.h>
- #include <uapi/linux/ethtool.h>
+I assume the motivation is that the structure is simple enough and using
+macros then makes defining kernel_param_ops instances a bit more
+concise. A minor disadvantage is that some analysis tools, such as
+ctags, may no longer see the generated definition, but that is also the
+case for DEFINE_MUTEX() and other similar macros.
 
 -- 
-2.54.0.746.g67dd491aae-goog
-
+Thanks,
+Petr
 
