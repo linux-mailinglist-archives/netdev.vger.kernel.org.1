@@ -1,127 +1,102 @@
-Return-Path: <netdev+bounces-291477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMf9Bie9FGp1PwcAu9opvQ
-	(envelope-from <netdev+bounces-291477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 23:20:39 +0200
+	id 6f+3DQK/FGqfPwcAu9opvQ
+	(envelope-from <netdev+bounces-291478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 23:28:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A0FE5CEDAC
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 23:20:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A39525CEDD8
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 23:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7A63530071C4
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 21:20:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89DB93007F77
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 21:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833033998AF;
-	Mon, 25 May 2026 21:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GroZkdTX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A866F35F5E3;
+	Mon, 25 May 2026 21:28:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64688380FFB;
-	Mon, 25 May 2026 21:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5465C282F3A;
+	Mon, 25 May 2026 21:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779744006; cv=none; b=AOl9CHZ195naCtQAAAk1TB8aeELh2pMI59yH6vOPichy8fECEyP0w9AfFF5QJ7bnv75xQuc+JnNXfIwGQ4Us9fTB71PDn0+UIk7fIpTiPLMn2Sx4aSq7FIVDQ3ateVKz94wR54aH9iqnpcmvjXQ6rohfSOqxa/TS0vuJFhxI/tQ=
+	t=1779744510; cv=none; b=MVYGyFwW55ra7C9eJ9zB0NXsXcpy5LVaI71+iKJ/qT+DbQO0Xc/cvtyWFj8tKASWz+ai9B8B7ogJ4PMW6okf2Sb6NxAW4w04FQr5r7R01OSVkz2DW1EjXvp7UHehgV89zpjGX84YypWTsPMHdGWdhqLmh3cJQal+aJ02ljpvGs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779744006; c=relaxed/simple;
-	bh=CL0xoIhbrnvE/u8dX7oF5lI0HV7nSqUuK+GhV4t5ojk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bC+22dCf6E0UwMa8za5ZCmtu3cLL0Jc/i8tPFY9tttO1MOWNWrqAptv87YrCkXwD3h0z5XHb8mzjnNlnCzrOkVHW1no9nw9LJBF57mZXMhCBdbRkABej5Knlw0kyL12ZRVsU/B7fYSMvXsiisgC/kVUStFn4stg06rYzGA3us1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GroZkdTX; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 488DD1F00A3A;
-	Mon, 25 May 2026 21:20:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779744005;
-	bh=CyKtoOC7IsGIcUSRMwnu75jDP8u+4hZzRfx3RonCIUA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=GroZkdTX9elX5y/JMOrKqiJgPXdFQhtut4QQQrs8fh1nyT/Kb5E+256WwNU5geO1n
-	 n4U3GMWmiSCR/1L1P4JM/Jw+e66a2NVFRVRLzl5WlYnLILWBu3n8G4qCRKsmrd0uPs
-	 30WmwLVz80r87X5JIox7W7vll6QeOgUGdXfpnIsJrikUimUXAuqHRn5Nd1rmV5qU4z
-	 SP6VGWNYUbG6+lm5OC5Owdtl6D38li6RuiI3S1RsxgIxVC5DPK1syGgIZRhIB7TiLg
-	 4IhtJm4TidZWxe4Ozbu2VD8ouWUseSySA2qXBpL3PmW0liOxYSa/ysraY5nHIJwZoi
-	 /j6hn3CM7MQrA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1996F380AA76;
-	Mon, 25 May 2026 21:20:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1779744510; c=relaxed/simple;
+	bh=NxfKHXKFzTRr4Oqqb2sCTYtuUY7xmavYX+nFDIByQ2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Eq5fY3ZeIwBFQeDnRevOr7YjrwM5mp8uPWGQe35W6MrLhL1gR54H67vbs2NVvS36IUb59sDcsOjezNofJpPoTiznEnS29VEryuggAI4qjEwY2G/pN12c2s16m3DJ2vm+8mRQqgMfLfVoLTOWcXOabNm8+Qy6u7JTW1DhE2svI1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 15F6B602AB; Mon, 25 May 2026 23:28:26 +0200 (CEST)
+Date: Mon, 25 May 2026 23:28:25 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Kacper Kokot <kacper.kokot.44@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] netfilter: TCPMSS: fix dropped packets when MSS option
+ is unaligned
+Message-ID: <ahS--cPlhv6NHAcO@strlen.de>
+References: <20260525201116.407338-2-kacper.kokot.44@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: ibm: emac: Use napi_gro_receive() for Rx packets
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177974401164.3119043.10280506460095261853.git-patchwork-notify@kernel.org>
-Date: Mon, 25 May 2026 21:20:11 +0000
-References: <20260521215908.257118-1-rosenp@gmail.com>
-In-Reply-To: <20260521215908.257118-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260525201116.407338-2-kacper.kokot.44@gmail.com>
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[strlen.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291477-lists,netdev=lfdr.de,netdevbpf];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291478-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.564];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 7A0FE5CEDAC
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A39525CEDD8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+Kacper Kokot <kacper.kokot.44@gmail.com> wrote:
+> Padding TCP options with NOPs is optional, so it is legal to send an
+> MSS option that is not aligned to a word boundary and therefore not
+> aligned for checksum calculation. The current TCPMSS target is not
+> robust to this: when the MSS option is unaligned it produces an
+> invalid checksum, and the packet is dropped.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Is this an actual, real world bug?  This code is 20+ years old, all that
+this hints at is that they are always aligned in reality?
 
-On Thu, 21 May 2026 14:59:08 -0700 you wrote:
-> emac_poll_rx() already runs in NAPI context and TAH-equipped EMACs set
-> CHECKSUM_UNNECESSARY on verified frames, which lets GRO coalesce TCP
-> segments without a software checksum on the merge path. Replace the
-> per-poll rx_list batched with netif_receive_skb_list() with direct
-> napi_gro_receive() calls so the stack can merge segments into super-skbs
-> and skip a full traversal per packet -- a meaningful win on the slow
-> 4xx-class CPUs this driver targets.
-> 
-> [...]
-
-Here is the summary with links:
-  - net: ibm: emac: Use napi_gro_receive() for Rx packets
-    https://git.kernel.org/netdev/net-next/c/da91508bdd1d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+(Not disputing theoretical problem).
 
