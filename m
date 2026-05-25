@@ -1,199 +1,449 @@
-Return-Path: <netdev+bounces-291351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AFVkKKBoFGr5NAcAu9opvQ
-	(envelope-from <netdev+bounces-291351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:20:00 +0200
+	id SJiVL6JoFGr5NAcAu9opvQ
+	(envelope-from <netdev+bounces-291352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:20:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2F355CC31A
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:19:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6818F5CC321
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:20:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24524302EE8B
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:18:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B482830067A5
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB1C3F39D4;
-	Mon, 25 May 2026 15:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD30A3EDE6E;
+	Mon, 25 May 2026 15:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Po4hqblZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGXk0T1A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A873F0A94
-	for <netdev@vger.kernel.org>; Mon, 25 May 2026 15:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485B33EDE5E;
+	Mon, 25 May 2026 15:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779722305; cv=none; b=aT3Q58dNDmfUeaEhkX7Q6ksLxBsFtcaO4Hye5FF81zrSOTpcE9YnD5+RDJa/d4DPUoiiG/8fuXglEKO6pCKa08AQ32EKFKayB4UcadDRhd9S85GVylK4ALEdJstZ2Y05LNXSrP5oBB8wk66jGgZ+CwenKhmvq3jbG9vwb/RC+50=
+	t=1779722400; cv=none; b=LISi55tzi7/jcNlPDUFXdn6fCFb7uyGFA41UrsU/xj3vqAYjBCs9C2UU5MTgSVFMmINHTr/qNR82ZqikqOBzDk35fAZU9x4kebDpFXtvi1tsoU7ElM01Ls7nBJTPj2/aoPPqcpA8lQGgEZrkOQG+0M76sJOtfEia1//Z3pQa508=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779722305; c=relaxed/simple;
-	bh=RrEqVF+8xKgB6XVFvEeQqJQjcR+TR2wOKi3CXTAfdsQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=UjlDKPwWbUieQG1MRot4oz2qS5jyf1XGLbwCkDzAZLJdbIEfIgkfZtVNXSHgEDpQEWrTIYxT/nEvI8JUwLBa3dzLjR+EWHnXGVkkzvkF0lkncr66DWyx4ehUsQWft4qnVlPaw7aF1uQj7o8Osfm5S2jdeVeJYv+IqqDLNwPdfUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Po4hqblZ; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7bf1eaba464so88491137b3.1
-        for <netdev@vger.kernel.org>; Mon, 25 May 2026 08:18:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779722303; x=1780327103; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hJgfyL6MECDYmfEnLLSB0agIRcEUB1GBMWOs44zbde4=;
-        b=Po4hqblZ60rhzEvXZ5SfvAAH9lXG+njQtyC/7PPqoR3IY6ZpcrwDk8FNKZg/yFwwDt
-         oGW+ZjkN6kUXLUlzhwltziwFLxrFFy+syW2o132g7NpVibIgY2Yfjru6JndiTpAjDVGn
-         /lt2miy5PLO7X2lfe0n4wP2yT1jCF8tlOnJCYOvk8Z/4/gLC7o3tiEA2SmY3bu4lVyn4
-         2ZgkefgmrrA4KE0R3LUm+IAgoMJoizEx+uMw9lRyo/cQFm90uqurEFrqWAcuCZAEuQem
-         Rf+5QCODThx/wgepsvJTJl1EfMgKT3YYHwm0VNt4grHt7JQcd9Xfigjcel5FGH7qJpLz
-         mTrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779722303; x=1780327103;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hJgfyL6MECDYmfEnLLSB0agIRcEUB1GBMWOs44zbde4=;
-        b=e117FhQYK0OXKBg9Ro9Iw2ykv7vrtcWtzA7UkyG/RPf5es66SDMGqKopy2whvwWCsC
-         sMf3cuxLdr15546pRqz/OlknYCWcxrvNcZdA6/NaYUC4K/kJQssjjfjB5o2dn45qrLXT
-         qyG16tyIWEJgvjmv5ch22z1KE2GHhEUhapTYrtK4P++WdbfVbCFAn9q+TBJ33GN7+o2h
-         Nrs1gvjch6sVt4ZDXu/KXkcx1Y5+LeTwXRoGSzL9EIAa3M+uktJJUYcsS4CigYZcWUJ2
-         l6MPYiSJlmIHarV2K/p64/hZS037LpmfwUnOvQ5plTYOz6Zr82eRY8UQ3SS4VMuVOSaF
-         XSmw==
-X-Forwarded-Encrypted: i=1; AFNElJ/Pzxzo4Bf3XNTkV5RdwoM4BH+o1Gr5IijSPCAHj1rysiVrgzpShhUcspzb23oNzBhPNQT8uHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7Fg1qSUd0FbjRu5oa2XMSi0lfkXJXRSNi75tB/AZnvp84k3vz
-	8b7p4fz9hxXkruwAQqRs2OTkNSOSviWlwr7mxp4e/SGe0JlG+rMjWinx
-X-Gm-Gg: Acq92OHHbYmFMNwY7yhUJ1VW0Mp8QzAkGQhDogZifdAaTaFLnCabt1LPfXB4Tb89lg9
-	QfGJk/boUmk29GUqtA47ztkkxNCxI8SCYZt79qJWNFqHWCK7HG5qiCCjrAoJFqgKvJRzDKR0VbO
-	EG3uSnxuaeB59FdPvj8ozPPG3wfUqS1zYPEO7qby8kCj5KQsm1w1cdA5JMU70g2ei5i+vXrT02V
-	TDxWloh0I9CK2BrWtpdtRH+9mPKTol3jyqvrl5AYhYCWAHP84itJQgRkq7YjaDzL9Hd8LsC4hOV
-	9jUby1O46lzNhVt1bl2obqjq2YmayWfhPi5IU+92N6OOvc3dGW+/jRi35dTIOeUcQV7KGxub20a
-	enrWP92XwYzSri7HAYMYlCjOtjHrFJHzCweqTUK2HYLzf3lNyrSd7TKCuRpsqTgAHXTNlV0RBPl
-	5jcmMTGgwQk3mVROjhXn/lSsP5rczvrIe4tLD5kemRbsuh4iO1PWEIupk0MqdDIiKuj6IcZeVL/
-	fH1T2E=
-X-Received: by 2002:a05:690c:6908:b0:7bd:8ce4:92c with SMTP id 00721157ae682-7d335fbccdamr167856177b3.31.1779722302763;
-        Mon, 25 May 2026 08:18:22 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7d38be2dc84sm47407027b3.29.2026.05.25.08.18.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2026 08:18:21 -0700 (PDT)
-Date: Mon, 25 May 2026 11:18:21 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- lazyming <minhnguyen.080505@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- w@1wt.eu, 
- security@kernel.org, 
- linux-kernel@vger.kernel.org, 
- lazyming <minhnguyen.080505@gmail.com>, 
- stable@vger.kernel.org, 
- asml.silence@gmail.com, 
- achender@kernel.org, 
- mst@redhat.com, 
- jasowang@redhat.com
-Message-ID: <willemdebruijn.kernel.1ddcb33fec832@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.27d7990b24613@gmail.com>
-References: <20260521121628.309924-1-minhnguyen.080505@gmail.com>
- <willemdebruijn.kernel.10f46164d2a79@gmail.com>
- <willemdebruijn.kernel.27d7990b24613@gmail.com>
-Subject: Re: [PATCH net] net: skbuff: fix missing zerocopy reference in
- pskb_carve helpers
+	s=arc-20240116; t=1779722400; c=relaxed/simple;
+	bh=pSipNew+wrgpHGLe25WtdAfk6At5BR4VLdpO4FmUd9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ijBBxPwiqCh1J+FU1AP/PS6YhV8PovTNffDQJkW72DDjL6SxLzZsV2szbwmKVgm/2Q3ZHwNXfFicLPH9m/aoEqL6Q5WzUXwiEoK2Uj1Fd5qleT9VhCu2JDeG8KpP/fmlUwItSqnyxeK5VOdmAUEUthEIZuzHrWg5aSrU/tcdysQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGXk0T1A; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B2DC1F000E9;
+	Mon, 25 May 2026 15:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779722398;
+	bh=3Ldrpg8oGe2gxlwuergjpDOcn7wyRCXPWMyE5KdnSBs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=DGXk0T1A+H1gESuuyQ5x5VrWTQf8d+JqQR4HgWhUrnxXyZMYilodVayOEJXIKOwa8
+	 Tbl2YyRR9d/3kGHnADosTRsALHWge78POVUYyzHL9qvgvEjvGwCf+bTcW5cttZZ6HW
+	 d9EF7ivVlXL7U8vcUW0dWDSNGcK6bGosNtY8jul0+1trm1u5jeqxk/lcbmxaUpcW8C
+	 fhnjqQ38PwMhk5dzCInddnUiSidLSSC8DZlnGpyxaBsG2Z48aRXnNkpfHQefj13jh/
+	 NcVqvyTJK/N3kRJ/0tAWS2cHwAl+8j9h2gF2R+rLGJFpWObG54J++xzZgKMV+Nh6Dd
+	 iKApsQzAJwVcA==
+Date: Mon, 25 May 2026 17:19:56 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jihong Min <hurryman2212@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: bind WLAN-bound flows on PPE
+ driver L2 cache miss
+Message-ID: <ahRonGRDCqdFTBQm@lore-desk>
+References: <20260524224330.3995807-1-hurryman2212@gmail.com>
+ <ahQDon-nio0STA4E@lore-desk>
+ <a08289e7-641c-489e-8d89-6eae9f092f90@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Gg8YQr2jQ3M7KWtf"
+Content-Disposition: inline
+In-Reply-To: <a08289e7-641c-489e-8d89-6eae9f092f90@gmail.com>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291351-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291352-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,1wt.eu,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.418];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F2F355CC31A
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6818F5CC321
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Willem de Bruijn wrote:
-> Willem de Bruijn wrote:
-> > lazyming wrote:
-> > > pskb_carve_inside_header() and pskb_carve_inside_nonlinear() both copy
-> > > the old skb_shared_info header into a new buffer via memcpy(), which
-> > > includes the destructor_arg pointer (uarg) for MSG_ZEROCOPY skbs.
-> > 
-> > These functions are not supposed to maintain zerocopy frags.
-> > 
-> > Both call skb_orphan_frags.
-> > 
-> > I think what may need to happen is to invert the order of that call
-> > and the memcpy. Current code:
-> > 
-> >         memcpy((struct skb_shared_info *)(data + size),
-> >                skb_shinfo(skb), offsetof(struct skb_shared_info, frags[0]));
-> >         if (skb_orphan_frags(skb, gfp_mask)) {
-> >                 skb_kfree_head(data);
-> >                 return -ENOMEM;
-> >         }
-> 
-> Never mind. This actually corresponds to the first Sashiko report you
-> mentioned: if zerocopy skbs are converted, then the memcpy prior to
-> that call will have stale state.
-> 
-> For skbs where skb_orphan_frags does not do a deep copy, we do need to
-> take this extra reference.
-> 
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Not sure the potential preexisting issue is reachable.
+--Gg8YQr2jQ3M7KWtf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Vhost-net and other zerocopy that predates MSG_ZEROCOPY does not
-refcount ubuf_info. Instead it calls skb_copy_ubufs on skb_clone.
+>=20
+>=20
+> On 5/25/26 17:09, Lorenzo Bianconi wrote:
+> >> The Linux bridge FDB can resolve a destination station to WDMA even wh=
+en
+> >> the Airoha PPE driver's L2 offload cache has no entry for that MAC pai=
+r.
+> >> The normal bind path only checks the PPE driver's L2 offload cache, so=
+ an
+> >> unbound PPE hit for WLAN egress can stay unbound even though the bridge
+> >> already knows the right output path, unless a later offload event fills
+> >> that PPE driver cache.
+> >>
+> >> This matters for bridge-visible WLAN egress, such as wired-to-WLAN
+> >> forwarding or WLAN peer forwarding across another BSS, radio or MLO li=
+nk.
+> >> Same-link or same-radio intra-BSS forwarding can stay inside the WLAN
+> >> datapath and is not covered.
+> >=20
+> > Hi Jihong,
+>=20
+> Hi, Lorenzo.
+>=20
+> >=20
+> > In order to offload L2 flows, I assume you are using the OpenWrt bridger
+> > package, right?
+>=20
+> Actually, no.
+>=20
+> I am using Fanboy's OpenWrt `test` build for the Lumen W1700K2,
+> together with several of my other patches. It does not include the
+> bridger package specifically. It now uses native nft-based offloading
+> with `kmod-br-netfilter`.
 
-So if such an skb reaches pskb_expand_head, it should be guaranteed to
-not be a clone. Same for the carve methods added later.
+according to my understanding this is not merged yet, right? I guess the
+patches should be based on official/accepted code.
 
-But, the commit that added zerocopy, commit a6686f2f382b
-("skbuff: skb supports zero-copy buffers"), included this 
-pksb_expand_head call to skb_copy_ubufs from the start. That implies
-that was expected to be reachable. I just don't see how yet.
+>=20
+> > IIUC the issue you want to resolve is we are not adding PPE L2 entries =
+for
+> > the specified cases (same-link or same-radio intra-BSS forwarding), cor=
+rect?
+>=20
+> No. As written in the patch message, this specifically addresses
+> bridge-visible WLAN egress, such as:
+>=20
+> 1. wired-to-WLAN forwarding
+> 2. WLAN peer forwarding across another BSS, radio, or MLO link
+>=20
+> Same-link or same-radio intra-BSS forwarding can stay inside the WLAN
+> datapath and is not covered by this patch, although it did show poor
+> performance, whether that is due to shared airtime or not. That case
+> appears to belong to the Wi-Fi stack/driver datapath, such as the
+> mac80211/mt76/mt7996 path, rather than to this Airoha PPE fallback path.
 
-If it is reachable, then all that is needed is to clear shinfo->flags.
-Or more neatly,
+according to my understanding the l2 nft-based offloading solution should
+add the missing info to PPE flow-table. As I pointed out, it should be
+in-sync with hw flow-table. It seems a bug in the nft code to me.
 
-    skb_shinfo(skb)->flags &= ~SKBFL_ALL_ZEROCOPY;
+>=20
+> > Using this approach, we are breaking the assumption PPE flow-table and =
+hw
+> > flow-table are in sync. If the issue is the one described above, why not
+> > fixing the problem directly in the bridger package?
+>=20
+> Again, this problem exists in an environment without bridger.
+
+In order to offload L2 traffic bridger is mandatory. Do you mean the issue
+occurs even on L3 scenario?
+
+>=20
+> > Moreover, I see you developed the patch using Codex:gpt-5.5. Have you t=
+ested it
+> > on a real hw?
+>=20
+> Yes. This has been tested on my Lumen W1700K2 with the environment
+> described above. MLO Wi-Fi P2P communication and some wired-to-WLAN
+> cases were indeed left unbound by PPE. CPU usage was high, and the
+> unbound throughput was close to 50% of what this patch achieves now.
+
+ack
+
+Regards,
+Lorenzo
+
+>=20
+> >=20
+> > Some comments inline.
+> >=20
+> > Regards,
+> > Lorenzo
+> > >>
+> >> Before touching the PPE table, resolve the destination MAC through the
+> >> bridge device above the ingress netdev. If the PPE driver's L2 offload
+> >> cache lookup misses, bind the hardware flow to the resolved CDM4/WDMA
+> >> path.
+> >>
+> >> Assisted-by: Codex:gpt-5.5
+> >> Signed-off-by: Jihong Min <hurryman2212@gmail.com>
+> >> ---
+> >>  drivers/net/ethernet/airoha/airoha_ppe.c | 138 +++++++++++++++++++----
+> >>  1 file changed, 119 insertions(+), 19 deletions(-)
+> >>
+> >> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/et=
+hernet/airoha/airoha_ppe.c
+> >> index 26da519236bf..ea932e6d87f6 100644
+> >> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
+> >> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+> >> @@ -803,65 +803,163 @@ static void airoha_ppe_foe_flow_remove_entry(st=
+ruct airoha_ppe *ppe,
+> >>  }
+> >> =20
+> >>  static int
+> >> -airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
+> >> -				    struct airoha_flow_table_entry *e,
+> >> -				    u32 hash, bool rx_wlan)
+> >> +airoha_ppe_foe_commit_subflow(struct airoha_ppe *ppe,
+> >> +			      const struct airoha_foe_entry *bridge,
+> >=20
+> > maybe l2_hwe instead of bridge?
+> >=20
+> >> +			      u32 hash, bool rx_wlan)
+> >>  {
+> >>  	u32 mask =3D AIROHA_FOE_IB1_BIND_PACKET_TYPE | AIROHA_FOE_IB1_BIND_U=
+DP;
+> >>  	struct airoha_foe_entry *hwe_p, hwe;
+> >> -	struct airoha_flow_table_entry *f;
+> >>  	int type;
+> >> =20
+> >>  	hwe_p =3D airoha_ppe_foe_get_entry_locked(ppe, hash);
+> >>  	if (!hwe_p)
+> >>  		return -EINVAL;
+> >> =20
+> >> -	f =3D kzalloc_obj(*f, GFP_ATOMIC);
+> >> -	if (!f)
+> >> -		return -ENOMEM;
+> >> -
+> >> -	hlist_add_head(&f->l2_subflow_node, &e->l2_flows);
+> >> -	f->type =3D FLOW_TYPE_L2_SUBFLOW;
+> >> -	f->hash =3D hash;
+> >> -
+> >>  	memcpy(&hwe, hwe_p, sizeof(*hwe_p));
+> >> -	hwe.ib1 =3D (hwe.ib1 & mask) | (e->data.ib1 & ~mask);
+> >> +	hwe.ib1 =3D (hwe.ib1 & mask) | (bridge->ib1 & ~mask);
+> >> =20
+> >>  	type =3D FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, hwe.ib1);
+> >>  	if (type >=3D PPE_PKT_TYPE_IPV6_ROUTE_3T) {
+> >> -		memcpy(&hwe.ipv6.l2, &e->data.bridge.l2, sizeof(hwe.ipv6.l2));
+> >> -		hwe.ipv6.ib2 =3D e->data.bridge.ib2;
+> >> +		memcpy(&hwe.ipv6.l2, &bridge->bridge.l2,
+> >> +		       sizeof(hwe.ipv6.l2));
+> >> +		hwe.ipv6.ib2 =3D bridge->bridge.ib2;
+> >>  		/* setting smac_id to 0xf instruct the hw to keep original
+> >>  		 * source mac address
+> >>  		 */
+> >>  		hwe.ipv6.l2.src_mac_hi =3D FIELD_PREP(AIROHA_FOE_MAC_SMAC_ID,
+> >>  						    0xf);
+> >>  	} else {
+> >> -		memcpy(&hwe.bridge.l2, &e->data.bridge.l2,
+> >> +		memcpy(&hwe.bridge.l2, &bridge->bridge.l2,
+> >>  		       sizeof(hwe.bridge.l2));
+> >> -		hwe.bridge.ib2 =3D e->data.bridge.ib2;
+> >> +		hwe.bridge.ib2 =3D bridge->bridge.ib2;
+> >>  		if (type =3D=3D PPE_PKT_TYPE_IPV4_HNAPT)
+> >>  			memcpy(&hwe.ipv4.new_tuple, &hwe.ipv4.orig_tuple,
+> >>  			       sizeof(hwe.ipv4.new_tuple));
+> >>  	}
+> >> =20
+> >> -	hwe.bridge.data =3D e->data.bridge.data;
+> >> -	airoha_ppe_foe_commit_entry(ppe, &hwe, hash, rx_wlan);
+> >> +	hwe.bridge.data =3D bridge->bridge.data;
+> >> +
+> >> +	return airoha_ppe_foe_commit_entry(ppe, &hwe, hash, rx_wlan);
+> >> +}
+> >> +
+> >> +static int
+> >> +airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
+> >> +				    struct airoha_flow_table_entry *e,
+> >> +				    u32 hash, bool rx_wlan)
+> >> +{
+> >> +	struct airoha_flow_table_entry *f;
+> >> +	int err;
+> >> +
+> >> +	f =3D kzalloc_obj(*f, GFP_ATOMIC);
+> >> +	if (!f)
+> >> +		return -ENOMEM;
+> >> +
+> >> +	err =3D airoha_ppe_foe_commit_subflow(ppe, &e->data, hash, rx_wlan);
+> >> +	if (err) {
+> >> +		kfree(f);
+> >> +		return err;
+> >> +	}
+> >> +
+> >> +	hlist_add_head(&f->l2_subflow_node, &e->l2_flows);
+> >> +	f->type =3D FLOW_TYPE_L2_SUBFLOW;
+> >> +	f->hash =3D hash;
+> >> =20
+> >>  	return 0;
+> >>  }
+> >> =20
+> >> +static bool
+> >> +airoha_ppe_foe_prepare_wdma_subflow_dev(struct airoha_ppe *ppe,
+> >> +					struct net_device *dev,
+> >> +					struct airoha_flow_data *data,
+> >> +					struct airoha_foe_entry *hwe)
+> >> +{
+> >> +	u32 pse_port;
+> >> +	int err;
+> >> +
+> >> +	err =3D airoha_ppe_foe_entry_prepare(ppe->eth, hwe, dev,
+> >> +					   PPE_PKT_TYPE_BRIDGE, data, 0);
+> >> +	if (err)
+> >> +		return false;
+> >> +
+> >> +	pse_port =3D FIELD_GET(AIROHA_FOE_IB2_PSE_PORT, hwe->bridge.ib2);
+> >> +	if (pse_port !=3D FE_PSE_PORT_CDM4)
+> >> +		return false;
+> >> +
+> >> +	return true;
+> >=20
+> > 	return pse_port =3D=3D FE_PSE_PORT_CDM4;
+> >=20
+> >> +}
+> >> +
+> >> +static struct net_device *
+> >> +airoha_ppe_foe_get_bridge_master(struct net_device *dev)
+> >> +{
+> >> +	struct net_device *master =3D NULL;
+> >> +
+> >> +	rcu_read_lock();
+> >> +	master =3D netdev_master_upper_dev_get_rcu(dev);
+> >> +	if (master && netif_is_bridge_master(master))
+> >> +		dev_hold(master);
+> >> +	else
+> >> +		master =3D NULL;
+> >> +	rcu_read_unlock();
+> >> +
+> >> +	return master;
+> >> +}
+> >> +
+> >> +static bool
+> >> +airoha_ppe_foe_prepare_wdma_subflow(struct airoha_ppe *ppe,
+> >> +				    struct sk_buff *skb,
+> >> +				    struct airoha_foe_entry *hwe)
+> >> +{
+> >> +	struct ethhdr *eh =3D eth_hdr(skb);
+> >> +	struct airoha_flow_data data =3D {};
+> >> +	struct net_device *master;
+> >> +
+> >> +	if (!is_valid_ether_addr(eh->h_source) ||
+> >> +	    !is_valid_ether_addr(eh->h_dest))
+> >> +		return false;
+> >> +
+> >> +	ether_addr_copy(data.eth.h_dest, eh->h_dest);
+> >> +	ether_addr_copy(data.eth.h_source, eh->h_source);
+> >> +
+> >> +	if (!skb->dev)
+> >> +		return false;
+> >> +
+> >> +	/* WLAN egress unbound hits can arrive before flowtable creates the
+> >> +	 * L2 master flow normally used for subflow binding. Resolve only
+> >> +	 * through the bridge master so dev_fill_forward_path() must use the
+> >> +	 * bridge FDB for the destination MAC. Calling the ingress AP netdev
+> >> +	 * directly can describe the source station's WDMA path and would
+> >> +	 * corrupt Wi-Fi-to-wired flows whose real egress is not WDMA.
+> >> +	 */
+> >> +	master =3D airoha_ppe_foe_get_bridge_master(skb->dev);
+> >> +	if (!master)
+> >> +		return false;
+> >> +
+> >> +	if (airoha_ppe_foe_prepare_wdma_subflow_dev(ppe, master, &data,
+> >> +						    hwe)) {
+> >> +		dev_put(master);
+> >> +		return true;
+> >> +	}
+> >> +
+> >> +	dev_put(master);
+> >> +	return false;
+> >=20
+> > maybe something like:
+> >=20
+> > 	ret =3D airoha_ppe_foe_prepare_wdma_subflow_dev();
+> > 	dev_put(master);
+> >=20
+> > 	return ret;
+> >=20
+> >> +}
+> >> +
+> >>  static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
+> >>  					struct sk_buff *skb,
+> >>  					u32 hash, bool rx_wlan)
+> >>  {
+> >> +	struct airoha_foe_entry wdma_hwe =3D {};
+> >>  	struct airoha_flow_table_entry *e;
+> >>  	struct airoha_foe_bridge br =3D {};
+> >>  	struct airoha_foe_entry *hwe;
+> >>  	bool commit_done =3D false;
+> >> +	bool wdma_ready =3D false;
+> >>  	struct hlist_node *n;
+> >>  	u32 index, state;
+> >> =20
+> >> +	wdma_ready =3D airoha_ppe_foe_prepare_wdma_subflow(ppe, skb,
+> >> +							 &wdma_hwe);
+> >> +
+> >>  	spin_lock_bh(&ppe_lock);
+> >> =20
+> >>  	hwe =3D airoha_ppe_foe_get_entry_locked(ppe, hash);
+> >> @@ -899,6 +997,8 @@ static void airoha_ppe_foe_insert_entry(struct air=
+oha_ppe *ppe,
+> >>  				   airoha_l2_flow_table_params);
+> >>  	if (e)
+> >>  		airoha_ppe_foe_commit_subflow_entry(ppe, e, hash, rx_wlan);
+> >> +	else if (wdma_ready)
+> >> +		airoha_ppe_foe_commit_subflow(ppe, &wdma_hwe, hash, rx_wlan);
+> >>  unlock:
+> >>  	spin_unlock_bh(&ppe_lock);
+> >>  }
+> >> --=20
+> >> 2.53.0
+> >>
+>=20
+> All inline code-style review comments will be addressed in the next
+> submission of the patch set, together with the responses to Sashiko's
+> review, if any.
+
+--Gg8YQr2jQ3M7KWtf
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCahRonAAKCRA6cBh0uS2t
+rJZGAQDwpUicbHSPKJS6GK7b2MnRJslrwf6DaJXFQK68IpbKPwD8D7bnTKU0rC9V
+nZsd+kM9Ljjo6+NVbSOgVeXt+vAwzQY=
+=GgNT
+-----END PGP SIGNATURE-----
+
+--Gg8YQr2jQ3M7KWtf--
 
