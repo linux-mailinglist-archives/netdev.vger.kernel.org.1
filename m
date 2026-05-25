@@ -1,151 +1,156 @@
-Return-Path: <netdev+bounces-291251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291254-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eLA9IdQCFGoGIwcAu9opvQ
-	(envelope-from <netdev+bounces-291251-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:05:40 +0200
+	id GMatI5sEFGqaIwcAu9opvQ
+	(envelope-from <netdev+bounces-291254-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:13:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E655C76CF
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:05:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F5625C787B
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E4B83036ECE
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 08:04:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C2617300847A
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 08:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA623D8132;
-	Mon, 25 May 2026 08:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07123DE450;
+	Mon, 25 May 2026 08:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FW65Xy4+"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="RfEgDkAz"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9735639A05E;
-	Mon, 25 May 2026 08:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B04C3DEACA;
+	Mon, 25 May 2026 08:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779696254; cv=none; b=M9ecfzriVRwS9SNQJdB8NFZQDKvfr3Kf0BiF0tzbaA7QN3+oqkMSgmW+3QjNooO4dT/GEZakLASrdCNUJslhGjLk7AJIDo9n37jR4XfYqUC8gzJW8PRcYsm790hwB+M4WrgZOCxHQismEXtf+Pe8tAfRIjG53fFr8OgMUljcQiI=
+	t=1779696750; cv=none; b=Q6SB+GC9X71dLjbBeDo9wZEUvNHuDZ4KNc/dv31Z2QAyLC5l3yQiaIOayJS4fVMxjMZCvQv8ufVbi6QF95fAniyycoQTjGdABnfRBFfogKaIEc1dt9UoX9TchXuBR29Liw5IpHln2y5iqWGhre2+zM+iN41oEFa36W8x6Og0+MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779696254; c=relaxed/simple;
-	bh=73vrApxNrpCy4XDyoCbJ2fXnIkf1Vpko4vO94TZdns8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cN1VoO4DQwfUfX/j5vZksq7ZjpfjonYFabSeppCKF92dt54ypmEvY37essWO1xFAd6UPdwoDYG/cfvofO86LVn/xFRQVYY9RpVCudkk80A/UbVdlIwtXWKTJaVeEusSfFrsjE7o9CpZgw4+k4nCylYAYP9LO+i04LYQ3qTSjJXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FW65Xy4+; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GfaKXox8b6tZQOz6rQuRsRCazGocmiCFA5bwNHls9ME=; b=FW65Xy4+/qqB/Y4d5VUshtof0n
-	B1qpRzV3dT6ABeoVvQLisbxpMvMaLmHHgGUuotvM13Oq8y+yYLeQUSVwda+11TXZK3v0fokYftvXJ
-	cyWpf4mLpjcN7aUkfNHq+sYYEb/nm/olSXmzzlszTr6RS+YrGR5SbSFBiuylLbHU2l7PiwKaxINv9
-	zqxKyu3Wj4flIUFqFwr3fZR9CFduLqMY65OMTt+ohC5o+j4imP0wqxfk44LoJSsz7r+/EsHjXAsCV
-	JIjPnzXn4055g+A/20FRnLo3CteESpuvFsQL6/iYeYE3DODc1ZSpv4PLAZGgxPgQc3C1wwAp+US+/
-	R7/FwfoA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wRQHt-0000000GaTu-1YS9;
-	Mon, 25 May 2026 08:03:49 +0000
-Date: Mon, 25 May 2026 01:03:49 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: demiobenour@gmail.com
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	James Clark <james.clark@linaro.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Eric Biggers <ebiggers@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
-	netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
-	linux-api@vger.kernel.org
-Subject: Re: [PATCH 1/3] net: Remove support for AIO on sockets
-Message-ID: <ahQCZQNoyO8GQt3H@infradead.org>
-References: <20260523-af-alg-harden-v1-0-c76755c3a5c5@gmail.com>
- <20260523-af-alg-harden-v1-1-c76755c3a5c5@gmail.com>
+	s=arc-20240116; t=1779696750; c=relaxed/simple;
+	bh=hRQ0me5CbZEyBfO7tkqlH9qgYZ65fbsPko7igW1e4hY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=c4COYv/XkYFmbm6x4gtTo4lJtnPNTDJyCVf+TwhPeLXsJwCqsKJci8QXhghf+grL2uan/kBDHBVsZqPttzw/qyh7C4bn7dPo8qDf3/fRKjIFDqdkhY7bjZvZ6SIiY4TAP7fZaf3LzNknyXdI34FlOJiOM4A1lmn/IbMr901B/nM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=RfEgDkAz; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id B291220B7166;
+	Mon, 25 May 2026 01:12:05 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B291220B7166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1779696725;
+	bh=h5zycZZ8L/qFpkXhbHcyu6Sj4Vjn/Be0BxFeEgx8Wbc=;
+	h=From:To:Subject:Date:From;
+	b=RfEgDkAzmLG5pn5fsmi7QgZCl3n/8HaVHUhZA+wJAYGWPnnjSGTSMzsqrnM7/boLW
+	 RA2K74/sKb3z6KVbrS3er76geDgCLcqRqh6HL+NLSj85LHLpXKVuLX2uLJGPODF+v5
+	 ONo2tIDWlF+R6I1kXllehuds1yOuwabQO2SU+Tkc=
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	leon@kernel.org,
+	longli@microsoft.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org,
+	jacob.e.keller@intel.com,
+	dipayanroy@microsoft.com,
+	leitao@debian.org,
+	kees@kernel.org,
+	john.fastabend@gmail.com,
+	hawk@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	sdf@fomichev.me,
+	yury.norov@gmail.com,
+	pavan.chebbi@broadcom.com
+Subject: [PATCH net v3 0/2] net: mana: Fix NULL dereferences during teardown after attach failure
+Date: Mon, 25 May 2026 01:08:23 -0700
+Message-ID: <20260525081129.1230035-1-dipayanroy@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260523-af-alg-harden-v1-1-c76755c3a5c5@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291251-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[32];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me,broadcom.com];
+	TAGGED_FROM(0.00)[bounces-291254-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hch@infradead.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,infradead.org:mid,infradead.org:dkim]
-X-Rspamd-Queue-Id: E0E655C76CF
+	NEURAL_HAM(-0.00)[-0.984];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.microsoft.com:mid,linux.microsoft.com:dkim]
+X-Rspamd-Queue-Id: 8F5625C787B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, May 23, 2026 at 03:43:02PM -0400, Demi Marie Obenour via B4 Relay wrote:
-> From: Demi Marie Obenour <demiobenour@gmail.com>
-> 
-> The only user of msg->msg_iocb was AF_ALG, but that's deprecated.
-> It can be removed entirely at the cost of only supporting synchronous
-> operations.  This doesn't break userspace, which will silently block
-> (for a bounded amount of time) in io_submit instead of operating
-> asynchronously.
-> 
-> This also makes struct msghdr smaller, helping every other caller of
-> sendmsg().
+When mana_attach() fails (e.g. during queue allocation), the error
+cleanup frees apc->tx_qp and apc->rxqs and sets them to NULL. Multiple
+subsequent teardown paths can then dereference these NULL pointers,
+causing kernel panics.
 
-So we just had a discussion at LLC about how networking needs to support
-AIO better for zero copy.
+Patch 1 adds NULL guards in the low-level teardown functions
+(mana_fence_rqs, mana_destroy_vport, mana_dealloc_queues) so they are
+safe to call regardless of queue initialization state. This covers all
+callers: mana_remove(), mana_change_mtu() recovery, and internal error
+paths in mana_alloc_queues().
 
-The current TCP zerocopy implementation provides completion notification
-through the socket error code, which is freaking weird and doesn't
-integrate well with either io_uring or in-kernel callers.
+Patch 2 adds an early exit in mana_detach() for already-detached ports,
+making it safe for non-close callers. This allows the queue reset
+handler to safely retry mana_attach() without redundant teardown.
 
-So we really want to pass the iocb down into networking and have it
-call ki_complete on completion, with something higher up in the stack
-adding that to the error queue for the legacy user interface.
+Changes in v3:
+  - Patch 1: Fixed commit message and fixes tag.
+Changes in v2:
+  - Patch 2: moved netif_device_present() check into mana_detach() as
+    an early exit instead of using goto in the work handler 
 
-Now I'm not sure if we wouldn't be better off passing that iocb
-explicitly instead of in a weird hidden way, but this seemed like
-a good place to bring this up.
+Dipayaan Roy (2):
+  net: mana: Add NULL guards in teardown path to prevent panic on attach
+    failure
+  net: mana: Skip redundant detach on already-detached port
+
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 76 ++++++++++++-------
+ 1 file changed, 47 insertions(+), 29 deletions(-)
+
+-- 
+2.43.0
 
 
