@@ -1,380 +1,213 @@
-Return-Path: <netdev+bounces-291268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291255-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0I08FewQFGpeJQcAu9opvQ
-	(envelope-from <netdev+bounces-291268-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 11:05:48 +0200
+	id kFcwKcsGFGpSIwcAu9opvQ
+	(envelope-from <netdev+bounces-291255-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:22:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C26705C8537
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 11:05:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 511DD5C7AA0
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:22:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1002C30053F2
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 09:01:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D1391301E7C8
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 08:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9809F3D3324;
-	Mon, 25 May 2026 09:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F473E1704;
+	Mon, 25 May 2026 08:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YIEcyMxu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbdoETWZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4130C3955C8;
-	Mon, 25 May 2026 09:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1124D3E16A5
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 08:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779699663; cv=none; b=J5sD8vhA+ccq3zCRuEC7htj+KhzzdllmqwyUIaPaHWw9VBk6dFsPFxSpcDyR0AUn0F/sUZwbxQH+ivwsnmypy4jwPzePfc4Gxkf0ixEVwid+1vkmQ09Yx8v83jPr/LhfaWdRV5cJa1vbnNp+qiAaaYn2cpPpAnPKgZDKA2x2BPs=
+	t=1779697275; cv=none; b=ZBCbb+rYZEj+QH+LTVt/U7fyk8imMmg48AEpcpwG8kP4VylyAc8UbZcCZQRVFl+njCHae2aul47uirf8WqTAM8zYTcZizIvtsTDw/KgojEB/joqb6u8YQhBPMr3N0RwQLKeWdLWggC9tYkqkQNOu9m1dQ2spo3xsEBWhsK0+X+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779699663; c=relaxed/simple;
-	bh=FEDOyaRnFzj0vOGFA0I7k72mNoN7ZMCSvVN8Konghnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DLKPEqlxHwMSaue0FxRT0Na6eDqE9+5Xb/yf4/h+LEN+zZhQ0n2hxK2rrjJD+zLVu57tNtFev6ilgqSl1A86FlAsikIvYpkL28CF7kRMmoWVMSOH8WL7nsJLUOAm0wsC/sMoxKp1uEOxrrah2Vvm3VXGPzANLw7hjL9l9YAuBZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YIEcyMxu; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65DD81F000E9;
-	Mon, 25 May 2026 09:01:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779699661;
-	bh=UeoHQch1oMdstyCnYZH7EQlEUf3dGM6B7qt7LqarNNU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YIEcyMxuUeexI/PCE4FsPcLXgrNNaULxh2vwgKcnQTWIApzhV1Wpy8pxfeiuRDLZ5
-	 hEFWY6+4m4TxUaSobQSuGragaXcISFUa/WzkCTpkiUnZx7dKvEEdXyuKJKYtPDS9SQ
-	 5MyEagbtmM8T12ovSi2n8uw4zcEGGqdl9TY6zDDEHkO3GvkkGjcs7OTTrwE2eEkpja
-	 akNJH1Sq2E5wx2/j6F7mBHEC05/Gyrdtscfk4EUHToU3KJoVrLa1pM82iFil3spp4d
-	 vj4ou/en0GLntrDY0AZdUOnlEuT1Ra95GM+6n/X1xiyG1pnbTDIQd0X6kvesMkUiXg
-	 HiY+GanVH3MIQ==
-Date: Mon, 25 May 2026 10:09:06 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jihong Min <hurryman2212@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: bind WLAN-bound flows on PPE
- driver L2 cache miss
-Message-ID: <ahQDon-nio0STA4E@lore-desk>
-References: <20260524224330.3995807-1-hurryman2212@gmail.com>
+	s=arc-20240116; t=1779697275; c=relaxed/simple;
+	bh=cnpeNyrRTMfn71Iw1My7ZiOgcb+W5DMHV+tEtk3Jprw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j9p0z2NcpVZ0UwqvKl8Z2xTH6Jz7OM3P987aGXBsTqfFGeDLI4n8NI+rubpKTBBUw28E7rYpTuLrKuiSkJfZ7+NrkDoe9WlSLbDVw8hCyR2jMr/GV0zllTBNDJ7vUrsdLRrAPVe77ZBuPFk8ogpLockEcop/5R/nEjRxNKGpanM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbdoETWZ; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2b941cd869cso59749635ad.1
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 01:21:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779697272; x=1780302072; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h73HPPR4b8cE2zhlXM66PdYigBOxMozGSruLRQEyEiQ=;
+        b=MbdoETWZnVu54cAdDYI+IcH7dP3KiMFUYIRxUXnG2Ab/xV7Ss0URUFR6Odm+pBRpqf
+         PekTC9McdvzdVJcyapSELOrilu+qAdhIZMQkgfX3bzBJJlSpBT6lOJBe5RnBY06WK+t2
+         XcXOt6hEq2rJaZMJP1daWYE41gC3xYCUUWXRW9vF3PdL7iu5fQyrjtJypt/BqxaRC2nl
+         ltjyta0KdmPnzj7zUjF65Er4+TvQHtZi3QA19E1SbY1lC9pjbtnhxyP5GQQTFBDbLZcw
+         D0wII5njH1rwFNM3iByK1cDPDckSOx6/yR5JW5IADz2NYgTq+koaLTdKR4mlCbSeRsuj
+         1bJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779697272; x=1780302072;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h73HPPR4b8cE2zhlXM66PdYigBOxMozGSruLRQEyEiQ=;
+        b=FFGi6bVwQOURpYVFSFHn4GFvxVKysPT6QMExZXScYqIK36VchH9QCOqqL1KZYDfz7E
+         ich9/OLXRPpurQbmrvBU8KX1/5w0lEZP3ak218mI/8K+jun/thL0WG3HklACW6Azt8HY
+         VNlpossUeP9hfd1r4P8K7czz7zzi/AL7KFoGM9F1fwgClvzQxf7GB3EgN32fL/hPJ6RB
+         6mnCN0aW5+cVReiuXvsa7y9ofejoTAr/uk9Xj1pwL9Ew4RGn+0yhrU4b2asz7I12I0Ou
+         39v4Zd5lozBT13Mzj1LTJ4CkzWdQ1oSad7mW3BuYS/7gtGgQbu6bkyHaP9GSTg4lCFM0
+         ujLw==
+X-Forwarded-Encrypted: i=1; AFNElJ9vr5ezx+8sYFuCm91dsVm7SpkO/Z9lxO2RBhMq9ygA7cL/xPu+J/UuL7GANIR8wxrmEj6h7co=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCCo644rdatxGhn8AnkIVqOdkA0YliPWd7DnVuhvH9u2tHK5/n
+	27ohjrO8mXpCPumEIhEWab53hkgyrlos7lQkE+xd7vXOuLRYuUU6OT9v
+X-Gm-Gg: Acq92OG4AVZTE3rqtuqZwDYvUVwTGfWR5a4p8Zzv1WqYsSfCDm9SNAN93fVbaWTGAUy
+	9er+SNuqO8tDVmoEvOZC4zEk1bvl2ICspXmR1bJDlIkWjm+YtFvHZfC1uTcFWMqsasHb84rPJKq
+	sEHkTtuYz71839eG01gwnbWISbBBliRI1w2hVfFq6jSWeuHLn9SS4bspsTYZYc5QHztDpgOeRrk
+	yreQbzlrqvSk1qDiMQGAmnhzGOO2jsT8fNIqQH6JdEG5HUZ1YaKGmzVCjPu3g/ok6cZu4Wn8WBq
+	1ZgB9DW+nrzpXC0FTSgIHZ2nLLHW3if9yrOCXhG+Mtoy8RNapMGbJlVkUqtoMSv8EjonLD9d1Cg
+	7kjabC9IQq4LUItqXe0yfsOP3ETZ3GQS51uK+lgNUJi3PsVQbKeeVEYx0BpCZDvS9XdTRXXIGfL
+	6VqfDKWFt5egwrdVdLen9zf6gLBiL3n6NNWPtCNgQm9dtBtds6IxzYzpXbf6LvBV7NkA==
+X-Received: by 2002:a17:902:e74b:b0:2bc:7d09:dcef with SMTP id d9443c01a7336-2beb06bc155mr153249445ad.29.1779697272248;
+        Mon, 25 May 2026 01:21:12 -0700 (PDT)
+Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb58b3bb6sm88798165ad.47.2026.05.25.01.21.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 May 2026 01:21:11 -0700 (PDT)
+From: a0282524688@gmail.com
+To: tmyu0@nuvoton.com,
+	linusw@kernel.org,
+	brgl@kernel.org,
+	linux@roeck-us.net,
+	andi.shyti@kernel.org,
+	lee@kernel.org,
+	mkl@pengutronix.de,
+	mailhol@kernel.org,
+	alexandre.belloni@bootlin.com,
+	wim@linux-watchdog.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	Ming Yu <a0282524688@gmail.com>
+Subject: [PATCH v5 0/7] mfd: nct6694: Refactor transport layer and add HIF (eSPI) support
+Date: Mon, 25 May 2026 16:20:49 +0800
+Message-Id: <20260525082049.2906283-1-a0282524688@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rpTEQ6n3Q6FSHVWF"
-Content-Disposition: inline
-In-Reply-To: <20260524224330.3995807-1-hurryman2212@gmail.com>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291268-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-291255-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[a0282524688@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: C26705C8537
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 511DD5C7AA0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+From: Ming Yu <a0282524688@gmail.com>
 
---rpTEQ6n3Q6FSHVWF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The Nuvoton NCT6694 is a peripheral expander that provides GPIO, I2C,
+CAN-FD, Watchdog, HWMON, PWM, and RTC sub-devices. Currently, the
+driver only supports USB as the host transport interface.
 
-> The Linux bridge FDB can resolve a destination station to WDMA even when
-> the Airoha PPE driver's L2 offload cache has no entry for that MAC pair.
-> The normal bind path only checks the PPE driver's L2 offload cache, so an
-> unbound PPE hit for WLAN egress can stay unbound even though the bridge
-> already knows the right output path, unless a later offload event fills
-> that PPE driver cache.
->=20
-> This matters for bridge-visible WLAN egress, such as wired-to-WLAN
-> forwarding or WLAN peer forwarding across another BSS, radio or MLO link.
-> Same-link or same-radio intra-BSS forwarding can stay inside the WLAN
-> datapath and is not covered.
+This series refactors the NCT6694 MFD core to support multiple transport
+backends and adds a new Host Interface (HIF) transport driver that
+communicates over eSPI using Super-I/O shared memory.
 
-Hi Jihong,
+Changes since version 4:
+- Split the monolithic refactoring and HIF support patch into a series of
+  smaller, logical commits to improve reviewability and adhere to the
+  single logical change principle.
+- Decoupled USB-specific data into a dedicated 'nct6694_usb_data' 
+  structure.
+- Abstracted device I/O operations by introducing 'read_msg' and 
+  'write_msg' function pointers in the core structure.
+- Renamed the existing driver to 'nct6694-usb.c' to strictly identify its
+  transport boundary, alongside Kconfig/Makefile updates.
+- Extracted transport-agnostic device management (IRQ domain setup, IDA
+  initialization, and MFD cell registration) into a standalone
+  'nct6694-core.c' module.
+- Added the 'nct6694-hif' eSPI transport driver clean on top of the new
+  core abstraction.
 
-In order to offload L2 flows, I assume you are using the OpenWrt bridger
-package, right?
-IIUC the issue you want to resolve is we are not adding PPE L2 entries for
-the specified cases (same-link or same-radio intra-BSS forwarding), correct?
-Using this approach, we are breaking the assumption PPE flow-table and hw
-flow-table are in sync. If the issue is the one described above, why not
-fixing the problem directly in the bridger package?
-Moreover, I see you developed the patch using Codex:gpt-5.5. Have you teste=
-d it
-on a real hw?
+Changes since version 3:
+- Remove redundant module type macro definitions from sub-device drivers
+  that are now provided by the shared header <linux/mfd/nct6694.h>,
+  fixing -Wmacro-redefined warnings.
 
-Some comments inline.
+Changes since version 2:
+- Restore per-device IDA and mfd_add_hotplug_devices()/PLATFORM_DEVID_AUTO
+  to avoid child device ID conflicts with multiple NCT6694 chips.
+- Validate irq_find_mapping() return value before dispatching IRQs.
+- Check superio_enter() return value in nct6694_irq_init().
 
-Regards,
-Lorenzo
+Changes since version 1:
+- Reworked the Super-I/O access helpers.
 
->=20
-> Before touching the PPE table, resolve the destination MAC through the
-> bridge device above the ingress netdev. If the PPE driver's L2 offload
-> cache lookup misses, bind the hardware flow to the resolved CDM4/WDMA
-> path.
->=20
-> Assisted-by: Codex:gpt-5.5
-> Signed-off-by: Jihong Min <hurryman2212@gmail.com>
-> ---
->  drivers/net/ethernet/airoha/airoha_ppe.c | 138 +++++++++++++++++++----
->  1 file changed, 119 insertions(+), 19 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ether=
-net/airoha/airoha_ppe.c
-> index 26da519236bf..ea932e6d87f6 100644
-> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
-> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-> @@ -803,65 +803,163 @@ static void airoha_ppe_foe_flow_remove_entry(struc=
-t airoha_ppe *ppe,
->  }
-> =20
->  static int
-> -airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
-> -				    struct airoha_flow_table_entry *e,
-> -				    u32 hash, bool rx_wlan)
-> +airoha_ppe_foe_commit_subflow(struct airoha_ppe *ppe,
-> +			      const struct airoha_foe_entry *bridge,
+Ming Yu (7):
+  mfd: nct6694: Move module type macros to shared header
+  mfd: nct6694: Refactor USB-specific data into nct6694_usb_data
+  mfd: nct6694: Introduce transport abstraction with function pointers
+  mfd: nct6694: Rename static I/O functions with _usb_ prefix
+  mfd: nct6694: Rename driver to nct6694-usb and update Kconfig
+  mfd: nct6694: Extract core device management into a separate module
+  mfd: nct6694: Add Host Interface (HIF) eSPI transport driver
 
-maybe l2_hwe instead of bridge?
+ MAINTAINERS                              |   2 +-
+ drivers/gpio/gpio-nct6694.c              |   7 -
+ drivers/hwmon/nct6694-hwmon.c            |  21 -
+ drivers/i2c/busses/i2c-nct6694.c         |   7 -
+ drivers/mfd/Kconfig                      |  38 +-
+ drivers/mfd/Makefile                     |   4 +-
+ drivers/mfd/nct6694-core.c               | 136 ++++++
+ drivers/mfd/nct6694-hif.c                | 529 +++++++++++++++++++++++
+ drivers/mfd/{nct6694.c => nct6694-usb.c} | 185 +++-----
+ drivers/net/can/usb/nct6694_canfd.c      |   6 -
+ drivers/rtc/rtc-nct6694.c                |   7 -
+ drivers/watchdog/nct6694_wdt.c           |   7 -
+ include/linux/mfd/nct6694.h              |  63 ++-
+ 13 files changed, 821 insertions(+), 191 deletions(-)
+ create mode 100644 drivers/mfd/nct6694-core.c
+ create mode 100644 drivers/mfd/nct6694-hif.c
+ rename drivers/mfd/{nct6694.c => nct6694-usb.c} (62%)
 
-> +			      u32 hash, bool rx_wlan)
->  {
->  	u32 mask =3D AIROHA_FOE_IB1_BIND_PACKET_TYPE | AIROHA_FOE_IB1_BIND_UDP;
->  	struct airoha_foe_entry *hwe_p, hwe;
-> -	struct airoha_flow_table_entry *f;
->  	int type;
-> =20
->  	hwe_p =3D airoha_ppe_foe_get_entry_locked(ppe, hash);
->  	if (!hwe_p)
->  		return -EINVAL;
-> =20
-> -	f =3D kzalloc_obj(*f, GFP_ATOMIC);
-> -	if (!f)
-> -		return -ENOMEM;
-> -
-> -	hlist_add_head(&f->l2_subflow_node, &e->l2_flows);
-> -	f->type =3D FLOW_TYPE_L2_SUBFLOW;
-> -	f->hash =3D hash;
-> -
->  	memcpy(&hwe, hwe_p, sizeof(*hwe_p));
-> -	hwe.ib1 =3D (hwe.ib1 & mask) | (e->data.ib1 & ~mask);
-> +	hwe.ib1 =3D (hwe.ib1 & mask) | (bridge->ib1 & ~mask);
-> =20
->  	type =3D FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, hwe.ib1);
->  	if (type >=3D PPE_PKT_TYPE_IPV6_ROUTE_3T) {
-> -		memcpy(&hwe.ipv6.l2, &e->data.bridge.l2, sizeof(hwe.ipv6.l2));
-> -		hwe.ipv6.ib2 =3D e->data.bridge.ib2;
-> +		memcpy(&hwe.ipv6.l2, &bridge->bridge.l2,
-> +		       sizeof(hwe.ipv6.l2));
-> +		hwe.ipv6.ib2 =3D bridge->bridge.ib2;
->  		/* setting smac_id to 0xf instruct the hw to keep original
->  		 * source mac address
->  		 */
->  		hwe.ipv6.l2.src_mac_hi =3D FIELD_PREP(AIROHA_FOE_MAC_SMAC_ID,
->  						    0xf);
->  	} else {
-> -		memcpy(&hwe.bridge.l2, &e->data.bridge.l2,
-> +		memcpy(&hwe.bridge.l2, &bridge->bridge.l2,
->  		       sizeof(hwe.bridge.l2));
-> -		hwe.bridge.ib2 =3D e->data.bridge.ib2;
-> +		hwe.bridge.ib2 =3D bridge->bridge.ib2;
->  		if (type =3D=3D PPE_PKT_TYPE_IPV4_HNAPT)
->  			memcpy(&hwe.ipv4.new_tuple, &hwe.ipv4.orig_tuple,
->  			       sizeof(hwe.ipv4.new_tuple));
->  	}
-> =20
-> -	hwe.bridge.data =3D e->data.bridge.data;
-> -	airoha_ppe_foe_commit_entry(ppe, &hwe, hash, rx_wlan);
-> +	hwe.bridge.data =3D bridge->bridge.data;
-> +
-> +	return airoha_ppe_foe_commit_entry(ppe, &hwe, hash, rx_wlan);
-> +}
-> +
-> +static int
-> +airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
-> +				    struct airoha_flow_table_entry *e,
-> +				    u32 hash, bool rx_wlan)
-> +{
-> +	struct airoha_flow_table_entry *f;
-> +	int err;
-> +
-> +	f =3D kzalloc_obj(*f, GFP_ATOMIC);
-> +	if (!f)
-> +		return -ENOMEM;
-> +
-> +	err =3D airoha_ppe_foe_commit_subflow(ppe, &e->data, hash, rx_wlan);
-> +	if (err) {
-> +		kfree(f);
-> +		return err;
-> +	}
-> +
-> +	hlist_add_head(&f->l2_subflow_node, &e->l2_flows);
-> +	f->type =3D FLOW_TYPE_L2_SUBFLOW;
-> +	f->hash =3D hash;
-> =20
->  	return 0;
->  }
-> =20
-> +static bool
-> +airoha_ppe_foe_prepare_wdma_subflow_dev(struct airoha_ppe *ppe,
-> +					struct net_device *dev,
-> +					struct airoha_flow_data *data,
-> +					struct airoha_foe_entry *hwe)
-> +{
-> +	u32 pse_port;
-> +	int err;
-> +
-> +	err =3D airoha_ppe_foe_entry_prepare(ppe->eth, hwe, dev,
-> +					   PPE_PKT_TYPE_BRIDGE, data, 0);
-> +	if (err)
-> +		return false;
-> +
-> +	pse_port =3D FIELD_GET(AIROHA_FOE_IB2_PSE_PORT, hwe->bridge.ib2);
-> +	if (pse_port !=3D FE_PSE_PORT_CDM4)
-> +		return false;
-> +
-> +	return true;
+-- 
+2.34.1
 
-	return pse_port =3D=3D FE_PSE_PORT_CDM4;
-
-> +}
-> +
-> +static struct net_device *
-> +airoha_ppe_foe_get_bridge_master(struct net_device *dev)
-> +{
-> +	struct net_device *master =3D NULL;
-> +
-> +	rcu_read_lock();
-> +	master =3D netdev_master_upper_dev_get_rcu(dev);
-> +	if (master && netif_is_bridge_master(master))
-> +		dev_hold(master);
-> +	else
-> +		master =3D NULL;
-> +	rcu_read_unlock();
-> +
-> +	return master;
-> +}
-> +
-> +static bool
-> +airoha_ppe_foe_prepare_wdma_subflow(struct airoha_ppe *ppe,
-> +				    struct sk_buff *skb,
-> +				    struct airoha_foe_entry *hwe)
-> +{
-> +	struct ethhdr *eh =3D eth_hdr(skb);
-> +	struct airoha_flow_data data =3D {};
-> +	struct net_device *master;
-> +
-> +	if (!is_valid_ether_addr(eh->h_source) ||
-> +	    !is_valid_ether_addr(eh->h_dest))
-> +		return false;
-> +
-> +	ether_addr_copy(data.eth.h_dest, eh->h_dest);
-> +	ether_addr_copy(data.eth.h_source, eh->h_source);
-> +
-> +	if (!skb->dev)
-> +		return false;
-> +
-> +	/* WLAN egress unbound hits can arrive before flowtable creates the
-> +	 * L2 master flow normally used for subflow binding. Resolve only
-> +	 * through the bridge master so dev_fill_forward_path() must use the
-> +	 * bridge FDB for the destination MAC. Calling the ingress AP netdev
-> +	 * directly can describe the source station's WDMA path and would
-> +	 * corrupt Wi-Fi-to-wired flows whose real egress is not WDMA.
-> +	 */
-> +	master =3D airoha_ppe_foe_get_bridge_master(skb->dev);
-> +	if (!master)
-> +		return false;
-> +
-> +	if (airoha_ppe_foe_prepare_wdma_subflow_dev(ppe, master, &data,
-> +						    hwe)) {
-> +		dev_put(master);
-> +		return true;
-> +	}
-> +
-> +	dev_put(master);
-> +	return false;
-
-maybe something like:
-
-	ret =3D airoha_ppe_foe_prepare_wdma_subflow_dev();
-	dev_put(master);
-
-	return ret;
-
-> +}
-> +
->  static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
->  					struct sk_buff *skb,
->  					u32 hash, bool rx_wlan)
->  {
-> +	struct airoha_foe_entry wdma_hwe =3D {};
->  	struct airoha_flow_table_entry *e;
->  	struct airoha_foe_bridge br =3D {};
->  	struct airoha_foe_entry *hwe;
->  	bool commit_done =3D false;
-> +	bool wdma_ready =3D false;
->  	struct hlist_node *n;
->  	u32 index, state;
-> =20
-> +	wdma_ready =3D airoha_ppe_foe_prepare_wdma_subflow(ppe, skb,
-> +							 &wdma_hwe);
-> +
->  	spin_lock_bh(&ppe_lock);
-> =20
->  	hwe =3D airoha_ppe_foe_get_entry_locked(ppe, hash);
-> @@ -899,6 +997,8 @@ static void airoha_ppe_foe_insert_entry(struct airoha=
-_ppe *ppe,
->  				   airoha_l2_flow_table_params);
->  	if (e)
->  		airoha_ppe_foe_commit_subflow_entry(ppe, e, hash, rx_wlan);
-> +	else if (wdma_ready)
-> +		airoha_ppe_foe_commit_subflow(ppe, &wdma_hwe, hash, rx_wlan);
->  unlock:
->  	spin_unlock_bh(&ppe_lock);
->  }
-> --=20
-> 2.53.0
->=20
-
---rpTEQ6n3Q6FSHVWF
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCahQDogAKCRA6cBh0uS2t
-rN93AP0YUr9JwzmpTsYtCD1Nc5tVXTHXsLjdT1ptc+8TMXpdNgD5AYKClz/UwHmf
-1eU6vGiJ+33bsHSq9QKC3z76zf/tNA8=
-=zPLM
------END PGP SIGNATURE-----
-
---rpTEQ6n3Q6FSHVWF--
 
