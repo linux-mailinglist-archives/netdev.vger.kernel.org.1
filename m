@@ -1,276 +1,280 @@
-Return-Path: <netdev+bounces-291373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eDoaOL93FGokNgcAu9opvQ
-	(envelope-from <netdev+bounces-291373-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:24:31 +0200
+	id CINfFTR4FGq3NgcAu9opvQ
+	(envelope-from <netdev+bounces-291374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:26:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E1C5CCD41
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:24:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A96F65CCD9A
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:26:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9EE5C3034640
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:22:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D7D89302C162
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CD03F5BF4;
-	Mon, 25 May 2026 16:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911293F65E6;
+	Mon, 25 May 2026 16:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="uvSqmoQx"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VdZk1QbN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7622C3F5BD0
-	for <netdev@vger.kernel.org>; Mon, 25 May 2026 16:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779726174; cv=pass; b=k2FWoRZkmOzSw/OGTtdevDdlsQrWrdWKX6NOehrV/nw6oDq1C1sKJ2pt2h4L+gI/LLqaKUydaqh3BWC3Vb4lNWG+AM+moW5QT5ltu8N0UmK1nw90jPSumQu4Vn0W4XbktjxWiYT5oMvvtDJuy6OAMnk5AI7IiLZ8Jj0piY4dO2Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779726174; c=relaxed/simple;
-	bh=XwMolNIpVC/KsDcWBM1y2Ytjqf5vf6MeZhYqlok18Mo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cg+ZcdrdcBM0cqou09WV3Gw0RKsoJdZJZz6KdxWYp9FrQuoR5uOHnYhjT57VTK2U3QlNjR0OSft7o+TjWcT5XjgpF2UlRuT85jLzIJCqBaYvjQcUH3Xgs9DGRcX6mq0N4VlSbt8KBYwTph3Ehn0+CYUVwnQnaZ4L04DGQ6RpQh4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=uvSqmoQx; arc=pass smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c80227b1f6cso3627379a12.1
-        for <netdev@vger.kernel.org>; Mon, 25 May 2026 09:22:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779726172; cv=none;
-        d=google.com; s=arc-20240605;
-        b=aNnhsujgP6Dke0d96BFkxccOkQ6g4X1Txd3OZpE+jS/j0w0t1zqVotcoxv0z1i+lt1
-         kTXqZrjz9/Yo9+MK1r6ppQodU1zTvrKEnt88LN/x+rpyD/CO2fU9koKtpLdnjBz/ELWI
-         uH2BV+bCjQ4eYwMFnBmuppz6akf2zduJxz0qcVai2+VrVceEnfwzAkGv97jN2olaqRpR
-         z7zOQPDQ3BEgmsvdbUmqyNdHHBpUWaLFhucl4vFqU1sVY4VXjPQmvzOU9n+LCjLzKovE
-         GIcBE4KH+nLFemEz5wSpWMAFPmnymr65a+TzvHM5lj88oeBdIvXJEQ5PcF9h61XXzQ7N
-         dm4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=xvpXGGWbwY60OwBtxDOf2B0WBSKcW0jPpy1/sHrxLrM=;
-        fh=ZZM5AYCbfqHsFaGoNjVu+2UpEz1DtHGsShXTlDlq3Gw=;
-        b=dAZpTmja4kuZHI3YwXf+H/f0HRUQ1pGVbYjqGtY0kqyqmw7riIGUB7/Ja0D9zOOdyu
-         JRSdpH375Qluixs40eYEkH8s1a3hf0p6OHWem///WZvd6wNjcZYPyrPoJ0DGQ2mE7nF2
-         eJ2WFQK+u6ydWgNkqPjGZAGc4MxF9GhXlKdCvINF0QfKRm+Er27ui6Blyn5aSr92GZ+9
-         RNiIA2BpFaG+cc61idwh7ilkFpXAOVW9fF+l+vfdhkWyz4KKTifDhp0l0q/oloS8QHnI
-         oyVbn2um/G6VUiAZaICPUwncKTDc9KcVB+I4QqRZJNQI/PJ9OHlLjMlyOO7SyqUNmqcZ
-         Ne2Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBBE3ECBFE
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 16:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779726255; cv=none; b=LgRaK6nY6Z+SAZo2ayoMZkRPt8v4SgJ/4ZaUdfs/EVHrPLjrNcuM8OuJ6lwYSBgnWOd8GMXnZZD7nEKMr1wuGUl3kvO0tMm2nukaRWGZP9fT/IDqg+6QKR5hewI4W+BhUupESu6QkihT2CLhyeTBlIMTtKKzfXpLbUcyCMdxEUM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779726255; c=relaxed/simple;
+	bh=Ix5V9VVReiSoQo6AB3QETxLfhu0cCyAdGQjvJGHnDxc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hc7Q3naZV+tHtxIKVG2WRUdeMfEDSrio+rt6nC22xNVkDciDI8B/nGeHsw9aPJ202I60zNFH7iNmwckNMTFlV7e6PQ60ueP3M0XTdmMD6xcHMqDBZNpZ1FJrvu221TY9w9YmeIT49aCHAaoKWTEOe898gtUj+0topwFYTBDMqQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VdZk1QbN; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-452169ae568so6258580f8f.3
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 09:24:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779726172; x=1780330972; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xvpXGGWbwY60OwBtxDOf2B0WBSKcW0jPpy1/sHrxLrM=;
-        b=uvSqmoQxAmgBodjPFPoF0n3m/zk7fssTMCd3h4fhIYJ3+zNKVyTttKmNzc3hfHnRTs
-         SpFaoH98eXFMp6O/OuT3yoAf4ilimMbYG08JSQr0JIWo2+Axm1aXaPuTyIn6yvpIfdK4
-         myTj/SHKHImZ4UJuNbfI2tR/SK6tJAkjw06RW+BP6S+2LTXVJrakBmlI5DI1vefVHjnM
-         AE4CzJ38FNRNJ7bOlg5r2C+EElIMWle5JaRSIpnz81xcyDkF78MPRgQ9H1W9Hs+F9xO5
-         AImEyyUVMhFKqGt69XlBUn4IFHjo/wSTbnKzkmlsNHnXvP4/K+xl/lJYljNHniGwEbEx
-         +w3g==
+        d=suse.com; s=google; t=1779726251; x=1780331051; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WThGrJlj0+d9TTzzXLAp8aZigkvM5HszOOE/MfwSIgg=;
+        b=VdZk1QbNytpFbuiKsbE3wW+kpdUiwO8Oy0pgmIL3aXlcs3cEHrAyW3jehgTlLTi83n
+         wNh17lNTxLLkgF2MNP6aUmiJt0rCd+jWtZnbWylWlzXlbassqIWZOQCLLOffSEkhSbua
+         +xQlxnJ9qX8lxTNaTtv21kd2cKIugw5nnDeVK3GmUj9N/fqumL9jVllnCfVPprFZDh/q
+         LoGx1NaFUjwhYiOVtB2Bo+Ks5HuJmMsqFtXlcMGYkbS3CeNG7DthkcDMBrct+OJR510y
+         SClO2VskO/kDqNdoapbvTguZijtUGevTSuelHBqTta1LS7zaFq3R8yRear0hL0uSsY1S
+         vaYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779726172; x=1780330972;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xvpXGGWbwY60OwBtxDOf2B0WBSKcW0jPpy1/sHrxLrM=;
-        b=JakpqPiiZ981XPLOJgHGEMJEZigfkEn+jBNdGylGJJQcBdWhuf7DPE+SSM2oW89z52
-         UTZ9BsQRn5O2BowL9QMeRzRereeoq2q7arlQWjhFGI6kaDu3D1VEhIMkJp8ZM+/BSZsN
-         CswfEV6iGdff3n15sR4eWFcNKvgU1zgxDy6S1r3kSDIfZ2Nuto5VAOWDFdXHrSf75yqW
-         2amep6SyVNuA+hK10/40+QqtGrjMPS17zeOMtlgZufWfrDKEcXK+csCxtj5VQI2uhQaK
-         yg0gSKiG0/I5te5Bfll+Cl3+dLf0qzSrqZmAxRn2eR6PUKDYzLshuJygLTx0KoaFs041
-         tNww==
-X-Forwarded-Encrypted: i=1; AFNElJ9BMJ3IX7v96Qb/Uc9uBZerv5IVwGjmm7bEnMCGK1t78KwZCovt0WbeDmfRo6+vLu8nIhismWw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLiOdYvyW24wHPm+XFTHWpllxxxZMo7c6WqEHJlA5BcmAIG1M6
-	lMlaKxaTih4SBNLdk+ELBEXBHXJHjqPt+RYIJ4timfq9hdPIeyqfjSqS0v7ynwwXO+k06qnlau1
-	5JvNuiDGRwS6dxmkb6j2bZ2icaOPzpwPgbOawViJbsAXDEXJ2o9bYPajd
-X-Gm-Gg: Acq92OF5SdTvsu5z56vBEtDQfV2Mf8b54MgNdmhsMfmiIxjoJp/DdzJUZoFczhX+TNm
-	MUTdJ5M6zhsre8Oj488EI4dsbAtovyl8SAAtr+iVltsDJsjpbqJ+TFYhTBmumnW7IuNgi1WbUxu
-	EZcrWVBgqKVhDEN+r3L10rOVrGJ0DFOBg5OXdhYvogbznqX9DWId68/6ptGvI+GGwfAXgW0BazL
-	UCNx9uFRp78pdgeE6a9VzxeqBLJnWPfsywOR0wMuxpIURwixaZBfBvbKuuSAlHXBFUxxH4MYQqM
-	ggJ1qq9mnv/VUtZVeW0=
-X-Received: by 2002:a05:6a21:594:b0:3b3:1ee3:2796 with SMTP id
- adf61e73a8af0-3b328caba50mr14978881637.1.1779726171702; Mon, 25 May 2026
- 09:22:51 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779726251; x=1780331051;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WThGrJlj0+d9TTzzXLAp8aZigkvM5HszOOE/MfwSIgg=;
+        b=cpLy1Ej6FepQgkGSAwjjtqfLFvQ+gIZxSduhB7OZKpImkJju0d2jqkKo5vep9rxqsE
+         IQJb3K6B8wsn6X0n5Fe0iplTXgN/RMqvA2e7qWHBqknTeeLpeURJbb9EJLPhfv6Vbgxr
+         7Y/mMYMUhcatI15Q8qTZJqIaZ9WKYbYyk77sLEyjbJ7TTnDVad/kQNWAvcl/ENRr85HD
+         JyiYIVvyu1JCp5+qt0NEUHrCfZFfy7I9nDh8WtEgFHEmJcd6AwEYT7AlOmVt2LOk6nOL
+         fEhxIdEKyvxbv1tavpzbVq89YTcGTuzH4sNd6m2/CGX54qDdsAll18IYpmwYcTtAt9oU
+         X6rg==
+X-Forwarded-Encrypted: i=1; AFNElJ+ucRgVeKnl2OBFbz6e7MmtWITGlQgdc/QGRBQLhXf1iWec3fC6BFvjTp48GmbFccYRLCKDS68=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEiPVmUSdoDQu1SvY3mkyw91Xra41/fKcdS+pA4n98baGm5Jf4
+	DYwsjxND564gak6gsgyNbkqKD+wvUx8v3UnMRdAFlRVMMzC4dpcTZvMtmzAbbp1gebc=
+X-Gm-Gg: Acq92OGq9cpP52UeIXGBF1aoRqR4lILxl8cSl/LOgZJFY8e7md/v3bqPI0OZ5/HG6Oa
+	xzzb7oXqYch1KjS9K4DG5o2zznO7xVQvB2Y9fHB/s4Nvp2KWPnppJHeJ5DYeE6bOh7HeTiEXw2C
+	RA8IufIdYHif2no81jNM5GhFZ985xSDy+NF+fR9QGyEdTNK1vr6PvGYMyfSIUyPI+IMRwxBgWh2
+	Mu+2cnGIJlYp64ch7lArU5Spi11en9VVVxaKnWgi5BVgkDLVfhKZAQI6Dd/TG35Tf9dHGlAETAq
+	/0VoXpX3ZJ2xd8grj4TB/MupGzT4AVRZ7TXfgG5Ehw8o2rH8ru28AgFF3SgxxSDXbsdA5KnraDi
+	6OszpBISKf7WZqnzZekSKKzXj0Tr3+4G9AX47KQImF1Z/94iUFDwR5/mssNmVCCmfeLBzVoytY9
+	KQPd1Uga+QE87ZtiklEzlBv3snwuHCcVIaBXiXKuhxUpnPf/6+gf/T6b2cw5/CHxkxVlGCz72u6
+	AL67r/jS/xPnI0L2m7usF79t1qeEDDXFPacZv9pPOSzrGBozBP9bfL+q69e7ynHW7CAWw==
+X-Received: by 2002:a05:6000:26cf:b0:45e:b215:12e9 with SMTP id ffacd0b85a97d-45eb368903emr24724531f8f.6.1779726250728;
+        Mon, 25 May 2026 09:24:10 -0700 (PDT)
+Received: from ?IPV6:2a00:1028:838d:271e:8e3b:4aff:fe4c:a100? (dynamic-2a00-1028-838d-271e-8e3b-4aff-fe4c-a100.ipv6.o2.cz. [2a00:1028:838d:271e:8e3b:4aff:fe4c:a100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6d47b82sm28202483f8f.19.2026.05.25.09.24.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 May 2026 09:24:10 -0700 (PDT)
+Message-ID: <4e54ae4a-4f7b-451d-9b37-97f30b8fefba@suse.com>
+Date: Mon, 25 May 2026 18:24:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAM0EoMkUPYSXKr2=+mR8YMq2a0TFdYPdzwPGob-UyU1fUWP9Ww@mail.gmail.com>
- <CAM0EoMkDwdmP94yeoX7W-DOY3Emcq84jGcPf73vtRTpDf1N3-w@mail.gmail.com>
- <CAM0EoMn-O7KU1R=b8jzb=DmMtRCuoEVmAH9hEsKehrdbmODAjA@mail.gmail.com>
- <CAM0EoM=sCnT69uPzB+HjOdRP9eQXVA+AcvPsBA80=dtQHi5sLQ@mail.gmail.com>
- <20260521073526.793d30c3@kernel.org> <CAM0EoMnvrAxGC=bty=ZUXG6XDN_hTNZiy9LSZhNicEdbe8DghQ@mail.gmail.com>
- <20260521084640.683c1ee6@kernel.org> <CAM0EoMmNWYzryfc5=4R0SkW+wfVhBxO3tAH+KeoMP3sPr6yrFA@mail.gmail.com>
- <20260522084611.390fd0a6@kernel.org> <CAM0EoMmKQc3oqDDiz5jGmwc8D3eTWd2wgst0MWEvXpPZHn-C7A@mail.gmail.com>
- <CAM0EoM=Db_AD1tqcG5w18pJKh8ysbUUHyzgP4c3thHTmeXLVyw@mail.gmail.com>
- <20260522175507.02b4fe83@kernel.org> <CAM0EoMkh3CF4EpNQDHUogxJLyqdw8gMFfvXQFOE+N4dLZY6gJQ@mail.gmail.com>
- <CAM0EoMnDjLJ=_+p+2xuHrbWFhtNCdQhONu21z_S7eZK+OFMibw@mail.gmail.com>
- <20260523094641.2bef6580@kernel.org> <CAM0EoMmOeqdwZnxAf0LNJSVVnJwJg=G5Ao3zqvC12J72WQeMtw@mail.gmail.com>
- <20260525083932.234f26df@kernel.org>
-In-Reply-To: <20260525083932.234f26df@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 25 May 2026 12:22:40 -0400
-X-Gm-Features: AVHnY4Jj9u4GV4d54QyPbONnULigOfs1P9DZn1Q6loLojyaaBCtfomP_kjR8OgM
-Message-ID: <CAM0EoMmjg+qrc=E+1nSVcCUPFh9yUfw59ASLCOM4jcEvRtw4jg@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: fix pedit partial COW leading to page
- cache corruption
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Rajat Gupta <rajat.gupta@oss.qualcomm.com>, netdev@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
-	jiri@resnulli.us, yimingqian591@gmail.com, keenanat2000@gmail.com, 
-	2045gemini@gmail.com, rollkingzzc@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/11] moduleparam: Route DEFINE_KERNEL_PARAM_OPS get
+ pointer via _Generic
+To: Kees Cook <kees@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Pengpeng Hou
+ <pengpeng@iscas.ac.cn>, Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
+ Corey Minyard <corey@minyard.net>, Gabriel Somlo <somlo@cmu.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Bart Van Assche <bvanassche@acm.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ Hans de Goede <hansg@kernel.org>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Hannes Reinecke <hare@suse.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>,
+ Lukasz Luba <lukasz.luba@arm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Alan Stern <stern@rowland.harvard.edu>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Jason Baron <jbaron@akamai.com>, Jim Cromie <jim.cromie@gmail.com>,
+ Tiwei Bie <tiwei.btw@antgroup.com>, Benjamin Berg <benjamin.berg@intel.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ "David E. Box" <david.e.box@linux.intel.com>,
+ "Maciej W. Rozycki" <macro@orcam.me.uk>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Peter Zijlstra <peterz@infradead.org>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Vinod Koul <vkoul@kernel.org>,
+ Frank Li <Frank.Li@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
+ Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Andrew Morton
+ <akpm@linux-foundation.org>, John Johansen <john.johansen@canonical.com>,
+ Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Georgia Garcia <georgia.garcia@canonical.com>, kvm@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-modules@vger.kernel.org,
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-acpi@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
+ qemu-devel@nongnu.org, intel-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-pm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-serial@vger.kernel.org,
+ linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
+ virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, netdev@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20260521133315.work.845-kees@kernel.org>
+ <20260521133326.2465264-7-kees@kernel.org>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20260521133326.2465264-7-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291373-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,resnulli.us,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,iscas.ac.cn,nod.at,cambridgegreys.com,sipsolutions.net,minyard.net,cmu.edu,redhat.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,acm.org,ziepe.ca,ideasonboard.com,google.com,suse.de,HansenPartnership.com,oracle.com,arm.com,linuxfoundation.org,rowland.harvard.edu,linux.alibaba.com,akamai.com,antgroup.com,orcam.me.uk,infradead.org,linux.ibm.com,alien8.de,zytor.com,atomlin.com,linux-foundation.org,canonical.com,paul-moore.com,namei.org,hallyn.com,vger.kernel.org,googlegroups.com,kvack.org,lists.ubuntu.com,lists.infradead.org,lists.sourceforge.net,nongnu.org,lists.freedesktop.org,lists.ozlabs.org,lists.one-eyed-alien.net,lists.linux.dev];
+	DKIM_TRACE(0.00)[suse.com:+];
+	TAGGED_FROM(0.00)[bounces-291374-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[98];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu-com.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 11E1C5CCD41
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:mid,suse.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A96F65CCD9A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 25, 2026 at 11:39=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Sat, 23 May 2026 12:57:08 -0400 Jamal Hadi Salim wrote:
-> > On Sat, May 23, 2026 at 12:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.or=
-g> wrote:
-> > >
-> > > On Sat, 23 May 2026 08:13:21 -0400 Jamal Hadi Salim wrote:
-> >  [...]
-> >  [...]
-> > > >
-> > > > The other thing (i may be over thinking) with pskb_may_pull is: if =
-the
-> > > > data is already linear (in a clone), wouldn't we corrupt the shared
-> > > > linear data of the clone?
-> > >
-> > > I said
-> > >
-> > >   for the portion of the problem that's "we are writing to frags"
-> > >
-> > > IOW not replacing the rest of the patch (assuming we care).
-> >
-> > So as an alternative to the piece i posted? i.e this:
-> >
-> > diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-> > index 79921b8d89ba..8f0f84b50c85 100644
-> > --- a/net/sched/act_pedit.c
-> > +++ b/net/sched/act_pedit.c
-> > @@ -474,6 +474,12 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff=
- *skb,
-> >                 if (write_offset < 0) {
-> >                         if (skb_cow(skb, -write_offset))
-> >                                 goto bad;
-> > +                       if (write_offset + (int)sizeof(hdata) > 0) {
-> > +                               if (skb_ensure_writable(skb,
-> > +                                               min_t(int, skb->len,
-> > +                                                     write_offset + (i=
-nt)sizeof(hdata))))
-> > +                                       goto bad;
-> > +                       }
-> >                 } else {
-> >                         if (unlikely(check_add_overflow(write_offset,
-> >                                                         (int)sizeof(hda=
-ta),
->
-> Yup! Even better.
+On 5/21/26 3:33 PM, Kees Cook wrote:
+> Make the DEFINE_KERNEL_PARAM_OPS family route their _get argument to
+> either .get (struct seq_buf *) or .get_str (char *) at compile time
+> based on the pointer's actual function signature. Two helper macros
+> do the routing:
+> 
+>   _KERNEL_PARAM_OPS_GET     - return the pointer if it has the seq_buf
+>                               signature, otherwise NULL of that type
+>   _KERNEL_PARAM_OPS_GET_STR - mirror image for the char * signature
+> 
+> Both use _Generic; only the two valid function-pointer types are
+> listed, so any third-party type is a compile error rather than
+> silently falling through.
+> 
+> Now a callback whose body has been migrated from char * to struct
+> seq_buf * needs no change at its kernel_param_ops initialization site,
+> because the macro picks up the new type automatically and assigns to
+> the correct field.
+> 
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+>  include/linux/moduleparam.h | 33 ++++++++++++++++++++++++++-------
+>  1 file changed, 26 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/linux/moduleparam.h b/include/linux/moduleparam.h
+> index c52120f6ac28..795bc7c654ef 100644
+> --- a/include/linux/moduleparam.h
+> +++ b/include/linux/moduleparam.h
+> @@ -85,15 +85,32 @@ struct kernel_param_ops {
+>   *
+>   *   static DEFINE_KERNEL_PARAM_OPS(my_ops, my_set, my_get);
+>   *
+> - * Routing the @_set and @_get function pointers through the macro
+> - * (rather than naming the struct fields at every call site) lets the
+> - * field layout change in one place when callbacks are migrated to a
+> - * new signature.
+> + * @_get may be either of:
+> + *   int (*)(struct seq_buf *, const struct kernel_param *) (seq_buf)
+> + *   int (*)(char *, const struct kernel_param *)           (legacy)
+> + *
+> + * The macro uses _Generic to route the function pointer to the
+> + * matching field (.get or .get_str) at compile time, leaving the
+> + * other field NULL. Each helper matches the wrong prototype signature
+> + * and returns NULL, falling through to the default branch otherwise;
+> + * if @_get has neither expected signature the assignment to the
+> + * fields gets a normal compile-time type-mismatch error.
+>   */
+> +#define _KERNEL_PARAM_OPS_GET(_get)					\
+> +	_Generic((_get),						\
+> +	    int (*)(char *, const struct kernel_param *): NULL,		\
+> +	    default: (_get))
+> +
+> +#define _KERNEL_PARAM_OPS_GET_STR(_get)					\
+> +	_Generic((_get),						\
+> +	    int (*)(struct seq_buf *, const struct kernel_param *): NULL, \
+> +	    default: (_get))
+> +
+>  #define DEFINE_KERNEL_PARAM_OPS(_name, _set, _get)			\
+>  	const struct kernel_param_ops _name = {				\
+>  		.set = (_set),						\
+> -		.get_str = (_get),					\
+> +		.get = _KERNEL_PARAM_OPS_GET(_get),			\
+> +		.get_str = _KERNEL_PARAM_OPS_GET_STR(_get),		\
+>  	}
+>  
+>  /* As DEFINE_KERNEL_PARAM_OPS, with KERNEL_PARAM_OPS_FL_NOARG set. */
+> @@ -101,14 +118,16 @@ struct kernel_param_ops {
+>  	const struct kernel_param_ops _name = {				\
+>  		.flags = KERNEL_PARAM_OPS_FL_NOARG,			\
+>  		.set = (_set),						\
+> -		.get_str = (_get),					\
+> +		.get = _KERNEL_PARAM_OPS_GET(_get),			\
+> +		.get_str = _KERNEL_PARAM_OPS_GET_STR(_get),		\
+>  	}
+>  
+>  /* As DEFINE_KERNEL_PARAM_OPS, with an additional .free callback. */
+>  #define DEFINE_KERNEL_PARAM_OPS_FREE(_name, _set, _get, _free)		\
+>  	const struct kernel_param_ops _name = {				\
+>  		.set = (_set),						\
+> -		.get_str = (_get),					\
+> +		.get = _KERNEL_PARAM_OPS_GET(_get),			\
+> +		.get_str = _KERNEL_PARAM_OPS_GET_STR(_get),		\
+>  		.free = (_free),					\
+>  	}
+>  
 
-Dude, it's hard to follow you sometimes ;-> It's hard to grok what you
-mean the problem of "we are writing to frags".
-Let me try to be verbose and you can narrow it down. There are _two_
-codelets dealing with "frags" both of which can be written to.
+Reviewed-by: Petr Pavlu <petr.pavlu@suse.com>
 
-1) The patch from Rajat deals with zero copy from app with shared
-flags. That's whats being exploited in the wild.
-There's a piece of code there that does this in Rajat's patch to handle it:
-
-+       /*
-+        * If the skb has shared frags the user is likely using zero-copy
-+        * (e.g. sendfile).  Those page frags may point to page-cache pages=
-;
-+        * writing into them would silently corrupt the page cache.
-+        * Linearize so pedit operates on a private copy.
-+        * TL;DR: if you want zero-copy, don't use pedit.
-+        */
-+       if (skb_has_shared_frag(skb)) {
-+               if (__skb_linearize(skb))
-+                       goto bad;
-+       }
-
-After you posted, i thought this is the "we are writing to frags"
-issue you were referring to.
-I if-zeroed that code and indeed it does not seem that the exploit can
-be executed even with that taken out.
-
-2) There's the frags coming from the other (driver) direction in
-particular when skbs get cloned. That is what sashiko2 (nipa variant)
-pointed out. IOW, there's no active report for that specific one but
-Han Guidong responded after i posted this:
-
---- a/net/sched/act_pedit.c
-+++ b/net/sched/act_pedit.c
-@@ -474,6 +474,12 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *sk=
-b,
-                if (write_offset < 0) {
-                        if (skb_cow(skb, -write_offset))
-                                goto bad;
-+                       if (write_offset + (int)sizeof(hdata) > 0) {
-+                               if (skb_ensure_writable(skb,
-+                                               min_t(int, skb->len,
-+                                                     write_offset +
-(int)sizeof(hdata))))
-+                                       goto bad;
-+                       }
-                } else {
-                        if (unlikely(check_add_overflow(write_offset,
-                                                        (int)sizeof(hdata),
-
-Saying he was able to recreate that scenario with a kernel module. And
-that this patchlet fixed it.
-
-Hope you are still following at this point ;->
-So when you said we can use skb pulls - I thought you were referring
-to removing the above patchlet and instead to use an skb pull approach
-(for which you posted a sample patch). I mentioned the two issues:
-1) It will likely break the negative offset that work with pedit
-already (skb pull could conceivably be tricked to assume a large
-positive number)
-2) that skb clones could result in writting into the shared data
-(which i said i may be overthinking).
-
-So which one of the two are you referring to? Or maybe it is both.
-Should we keep #1? or this the one that should be replaced?
-Are you ok with patchlet for number #2? Or do you want that replaced?
-
-Provide as much context as you can so we dont go back and forth ;->
-
-cheers,
-jamal
+-- Petr
 
