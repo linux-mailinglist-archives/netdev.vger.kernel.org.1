@@ -1,493 +1,204 @@
-Return-Path: <netdev+bounces-291375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GK/MG6Z5FGokNgcAu9opvQ
-	(envelope-from <netdev+bounces-291375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:32:38 +0200
+	id kHvGDxl+FGowNwcAu9opvQ
+	(envelope-from <netdev+bounces-291376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:51:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238385CCE93
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:32:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF35F5CD0FE
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 906833011074
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:32:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6510030065F8
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D0A31A556;
-	Mon, 25 May 2026 16:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E902D0620;
+	Mon, 25 May 2026 16:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqD4pyse"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CS9iD+vq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E021A23A4;
-	Mon, 25 May 2026 16:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AE22BF3D7;
+	Mon, 25 May 2026 16:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779726755; cv=none; b=thmQPw3ib8vqT2psy154zoaArkeHhp2R6ogQHY61ldrTfkKpxpfVdFDbkdBPO2E33X0GONDcWwSoCPsEAjPGF47UKwXVB7f9b0fxmOMBgqisNgn8/OmJKUx+FloctQFpNc4XaQNIKhSQFmRVu4HQ6eJySfIEYOuaOjd96TcjA5E=
+	t=1779727893; cv=none; b=nHPkaMRYm/NACq/pHU44zgrlMRM1XBYKrQYq9JHCLQ3KEY/mYHf4jVf2MJ5sTBTm3aq4qAufMDIotiIRlasj6UT3E9hA7zzU8PR8gRHlQxF+BgS2QpihX5LmrpqyACt8D7UJqVVKCAMR0Mr0DYM240bbUZS9Li3j0EtUpUywyco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779726755; c=relaxed/simple;
-	bh=JMn/jTvIEqbk1Bge6YUiC7sc/IUKCtFePbxfn77QRdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GR973Kyq77HAeLS1cz7ZlvRt7MgGFyszJZpvioJvRMPw/oIlmNa9OpwuIvvIyQNbPWlfquSl5Ghh8TJ5VdVV1xmm5lYu9uCFeCnOcCcLaxS3qPrXTZ0SvX9HWIStUouzW4v/ziIPV4CHXmVebSJac5pufUNP2cfq120I7EyEB5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqD4pyse; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A30711F000E9;
-	Mon, 25 May 2026 16:32:33 +0000 (UTC)
+	s=arc-20240116; t=1779727893; c=relaxed/simple;
+	bh=GvTDjam6ruQwEDM6OVKE0WQabQyhk+Y0lXRkOjTpfEw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QC6bni2mBVg1eYiBPiLr/qVGyrx5gb2B5WvnlJkPXex6Je0rbglPcLXHVRL6v/m4N2FaF556kB9LHwdSkr0+RKuIYdsVc9IE6NJjl7OyGRq51sROCNsm7iVk/OYGNxiJ7+pRQVtY3gcFpTh0VhrPbbxycVqKuGiBxto1NAj8AKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CS9iD+vq; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8E641F000E9;
+	Mon, 25 May 2026 16:51:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779726754;
-	bh=m7y95Inmu9m2zm/tI9luqN9D8svSjAdVhUGbDgOWXbs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oqD4pysedSXXv9rZF3HWuQZu0ErxZTWhkSry6CslLEV9GlOIxzcVU90tILNM7or0n
-	 TYMdFCfSZbdWpJSQplFbP/5LGLNLAjMGtF/2vAyKCMxQoCCi0/IMqqgO45BMx0jVQD
-	 y+6/VqRyU+Y+hgku10ijRPQc8GTmSfswEfpE6x/MSQrT5JdztfsBPSW0rg7XCTa3AU
-	 er91jqcUao48ZsxK+9wTcHAMwMi4KA6agsqXgtpZLxHNEZT+9s2XzbLotPiW2s3OgD
-	 kdWivBKnzuLqSIRnpvc0nwAH/x6qx8MIKE0SMc3rYhrtyb9hX/l4CVIAsPj/wWEjwp
-	 LZLxF9of+AzPg==
-Date: Mon, 25 May 2026 18:32:31 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jihong Min <hurryman2212@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: bind WLAN-bound flows on PPE
- driver L2 cache miss
-Message-ID: <ahR5n-fdQ6b4q_MA@lore-desk>
-References: <20260524224330.3995807-1-hurryman2212@gmail.com>
- <ahQDon-nio0STA4E@lore-desk>
- <a08289e7-641c-489e-8d89-6eae9f092f90@gmail.com>
- <ahRonGRDCqdFTBQm@lore-desk>
- <82d0e4a5-76b1-4c86-a153-2500c60e8063@gmail.com>
+	s=k20260515; t=1779727891;
+	bh=FbcGJkRkbagmQAlyIHUAsEmLq39wb78AB89XfL80OeI=;
+	h=From:Subject:Date:To:Cc;
+	b=CS9iD+vqjHrmh4orujpwww76w5tDcVoPNm/1HQCyDFBw+doetdYK4Lsd/SEu9XNQm
+	 9c2EpKY8x/I23kaLV2nUxUeTmKRsJPE+hw/Dlpi0qjGhM2HXCi+txr7IjMYPreRr9p
+	 +5DwH+0u/wURjeeoQ5JicHyopYPPSgcuWyOAiU5PAYO/teWHoPrgUTtDyK3POr8B7k
+	 KhUPhwLMsN/aNQfXSSm/XRI1FgOsK8il1GMqXBk/8wXGhH/gl1Iui33zMTgs6zT+2c
+	 BlJ9IZfSpGklXRaIq1nSJjtjE7JHdCD6wteJlOznhhf7eBEoCD9OUyNXDcP/81PKav
+	 WtLVCCtmKAL9g==
+From: Chuck Lever <cel@kernel.org>
+Subject: [PATCH net v3 0/8] net/handshake: anchor request lifetime to a
+ pinned file reference
+Date: Mon, 25 May 2026 12:51:14 -0400
+Message-Id: <20260525-handshake-file-pin-v3-0-66c616906ead@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="52YazzJl1iU1tUud"
-Content-Disposition: inline
-In-Reply-To: <82d0e4a5-76b1-4c86-a153-2500c60e8063@gmail.com>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22OzQ7CIBCEX6XhLAr0V0++h/HAz2JXKxiojcb03
+ aXVgyY9zuzMt/MiEQJCJLvsRQIMGNG7JPJVRnQr3QkomqSJYKJiJa9oMk1s5QWoxQ7oDR0VPN8
+ yW9q85DlJxVsAi48ZeiAOenL8mPGuzqD7CTfFlIxAVZBOt5OVgpurRDedWoy9D8951cBnzndAs
+ zRg4JTRQimtaqiENXLvg9QdrLW/zs8H8cMQfJEhEkNtjTS6qEVTsD/GOI5v3Gw1aisBAAA=
+X-Change-ID: 20260516-handshake-file-pin-21390f5f3513
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Chris Mason <clm@meta.com>, Christian Brauner <brauner@kernel.org>, 
+ kernel-tls-handshake@lists.linux.dev, linux-nvme@lists.infradead.org, 
+ netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>, 
+ Hannes Reinecke <hare@kernel.org>, 
+ Alistair Francis <alistair.francis@wdc.com>
+X-Mailer: b4 0.16-dev-da966
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4296;
+ i=chuck.lever@oracle.com; h=from:subject:message-id;
+ bh=GvTDjam6ruQwEDM6OVKE0WQabQyhk+Y0lXRkOjTpfEw=;
+ b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBqFH4K+n3aOBrQb+kVVmywjVPaGmJfJ+56t9uqq
+ qExmpm9UeuJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCahR+CgAKCRAzarMzb2Z/
+ l/Y4EACKXt9PB65+GRACXl/7hBSiKwiKZXsV2dktTDJpjJKWaHVLTXFr7ufpXPGoWmJxtacyWdN
+ yOraX3Z3C6yfOrQohiCtWarUuHu4Hi38aELwbCZrvZDOzWnEKg5j09SxE8yCSvM4s/v9plLhOb8
+ mNxWFxbH7vnK39AtcCvsO+kdMLMkNSDw7z+ZWjtJZFDKN/08ifvnMceCiIfHoKmMDy8gbig7zmr
+ pvx6XPqOsKFni5XR8HJ03yh71qGZEHk6j8YAazXpg0eHrfWRYiH6vNeAnXGSnSswQPJhd7lMhtb
+ zpNDOulgi6TWTRfaVL9T2Wo1O2tDAQN9gF4MhVUHfjQfy+GvR/NPc/vStFmbjXq2x3vjzuOCM1m
+ g02loLQ8BF0dfgXqM502ClX3wn/IhcEbZ22dX+tdmNuBGmSezB5HePqN2qIRWdrNEMOlObLqWMS
+ LryOSk+QtRVulXVTxghUqBVaCwrr2q5A6DRCa0Jp4HeZw78mtgpr4grgYavkyXq8zIAut1cPjSP
+ jSLq/+gEVNmN5v/Wa1uK1teIllL3TzUS1fp5QUfs8Wp743RGW7AlpK3CJ4C7ivcMe0Lcr84qWAY
+ BK8UnI7vgXk3nZGM30WBqFepjLyIopGZ6gfGzi8ssi609J7SzeSf7wMyW4hv0gRVocYsgjD9u+m
+ Z+mS3L5KGbraKPA==
+X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
+ fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291375-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TAGGED_FROM(0.00)[bounces-291376-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 238385CCE93
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,msgid.link:url]
+X-Rspamd-Queue-Id: BF35F5CD0FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+handshake_nl_accept_doit() has accumulated four follow-on fixes
+since 3b3009ea8abb ("net/handshake: Create a NETLINK service for
+handling handshake requests"): 7ea9c1ec66bc, 7798b59409c3,
+fe67b063f687, and dabac51b8102.  Each was a local refcount or
+NULL-check correction; none moved where the file reference is
+owned, and the same code keeps producing the same class of bug.
+Reworking the ownership is what breaks the pattern.
 
---52YazzJl1iU1tUud
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For the duration of a request, sock->file has no single owner.
+Submit publishes the request without taking a file reference;
+accept_doit acquires one inside the handler, after the request
+has already left the pending list.  The consumer can drop its
+own reference at any time, including the moment between
+handshake_req_next() popping the request and accept_doit
+reaching get_file().  The submit-side sock_hold() pins only
+struct sock; struct socket and sock->file remain under the
+consumer's control via the file descriptor.
 
->=20
->=20
-> On 5/26/26 00:19, Lorenzo Bianconi wrote:
-> >>
-> >>
-> >> On 5/25/26 17:09, Lorenzo Bianconi wrote:
-> >>>> The Linux bridge FDB can resolve a destination station to WDMA even =
-when
-> >>>> the Airoha PPE driver's L2 offload cache has no entry for that MAC p=
-air.
-> >>>> The normal bind path only checks the PPE driver's L2 offload cache, =
-so an
-> >>>> unbound PPE hit for WLAN egress can stay unbound even though the bri=
-dge
-> >>>> already knows the right output path, unless a later offload event fi=
-lls
-> >>>> that PPE driver cache.
-> >>>>
-> >>>> This matters for bridge-visible WLAN egress, such as wired-to-WLAN
-> >>>> forwarding or WLAN peer forwarding across another BSS, radio or MLO =
-link.
-> >>>> Same-link or same-radio intra-BSS forwarding can stay inside the WLAN
-> >>>> datapath and is not covered.
-> >>>
-> >>> Hi Jihong,
-> >>
-> >> Hi, Lorenzo.
-> >>
-> >>>
-> >>> In order to offload L2 flows, I assume you are using the OpenWrt brid=
-ger
-> >>> package, right?
-> >>
-> >> Actually, no.
-> >>
-> >> I am using Fanboy's OpenWrt `test` build for the Lumen W1700K2,
-> >> together with several of my other patches. It does not include the
-> >> bridger package specifically. It now uses native nft-based offloading
-> >> with `kmod-br-netfilter`.
-> >=20
-> > according to my understanding this is not merged yet, right? I guess the
-> > patches should be based on official/accepted code.
-> >=20
->=20
-> Yes, you are right. I just checked current net-next and realized that the
-> bridge/L2 nft_flow_offload pieces used in my test environment are not
-> merged upstream yet. Sorry, I should have checked this before submitting
-> the patch.
+This series places the file reference under unambiguous
+ownership.  handshake_req_submit() pins it on the request and
+completion or cancel drops it (patches 4-5); the submit-side
+sock_hold() then becomes redundant, and dropping it also closes
+a publish-before-pin race the late sock_hold itself opened
+(patch 6).  The handshake_complete() API and its consumers move
+to a uniform negative-errno sign convention (patch 3), with the
+matching sign correction in nvme-tcp (patch 2).  Patch 1
+hardens hn_lock for BH context, the netns-exit drain fix
+builds on the new file-pin infrastructure (patch 8), and new
+KUnit file-count assertions verify the refcount contract
+(patch 7).
 
-ack, no worries ;)
+Three things in this restructuring want a careful look.  In
+handshake_complete(), the fput() of the request's file
+reference has to come after hp_done() -- fput() can transitively
+run handshake_sk_destruct() and free the request, so the patch
+stashes hr_file in a local first.  handshake_sk_destruct()
+itself is kept on purpose: it owns rhashtable removal and
+kfree, and remains the backstop if a consumer path bypasses
+handshake_complete() entirely.  Third, handshake_req_next() now
+returns its request with an extra get_file() held under
+hn_lock; accept_doit must consume that reference (FD_PREPARE on
+success, explicit fput on the fdf.err path), and any future
+caller has to honor the same contract.
 
->=20
-> Since I cannot properly test the current upstream code plus bridger at the
-> moment, I will put this patch on hold.
->=20
-> I will also check whether this should instead be fixed on the
-> nft_flow_offload side.
-
-ack.
-
-Regards,
-Lorenzo
-
->=20
->=20
-> Sincerely,
-> Jihong Min
->=20
-> >>
-> >>> IIUC the issue you want to resolve is we are not adding PPE L2 entrie=
-s for
-> >>> the specified cases (same-link or same-radio intra-BSS forwarding), c=
-orrect?
-> >>
-> >> No. As written in the patch message, this specifically addresses
-> >> bridge-visible WLAN egress, such as:
-> >>
-> >> 1. wired-to-WLAN forwarding
-> >> 2. WLAN peer forwarding across another BSS, radio, or MLO link
-> >>
-> >> Same-link or same-radio intra-BSS forwarding can stay inside the WLAN
-> >> datapath and is not covered by this patch, although it did show poor
-> >> performance, whether that is due to shared airtime or not. That case
-> >> appears to belong to the Wi-Fi stack/driver datapath, such as the
-> >> mac80211/mt76/mt7996 path, rather than to this Airoha PPE fallback pat=
-h.
-> >=20
-> > according to my understanding the l2 nft-based offloading solution shou=
-ld
-> > add the missing info to PPE flow-table. As I pointed out, it should be
-> > in-sync with hw flow-table. It seems a bug in the nft code to me.
-> >=20
-> >>
-> >>> Using this approach, we are breaking the assumption PPE flow-table an=
-d hw
-> >>> flow-table are in sync. If the issue is the one described above, why =
-not
-> >>> fixing the problem directly in the bridger package?
-> >>
-> >> Again, this problem exists in an environment without bridger.
-> >=20
-> > In order to offload L2 traffic bridger is mandatory. Do you mean the is=
-sue
-> > occurs even on L3 scenario?
-> >=20
-> >>
-> >>> Moreover, I see you developed the patch using Codex:gpt-5.5. Have you=
- tested it
-> >>> on a real hw?
-> >>
-> >> Yes. This has been tested on my Lumen W1700K2 with the environment
-> >> described above. MLO Wi-Fi P2P communication and some wired-to-WLAN
-> >> cases were indeed left unbound by PPE. CPU usage was high, and the
-> >> unbound throughput was close to 50% of what this patch achieves now.
-> >=20
-> > ack
-> >=20
-> > Regards,
-> > Lorenzo
-> >=20
-> >>
-> >>>
-> >>> Some comments inline.
-> >>>
-> >>> Regards,
-> >>> Lorenzo
-> >>>>>
-> >>>> Before touching the PPE table, resolve the destination MAC through t=
-he
-> >>>> bridge device above the ingress netdev. If the PPE driver's L2 offlo=
-ad
-> >>>> cache lookup misses, bind the hardware flow to the resolved CDM4/WDMA
-> >>>> path.
-> >>>>
-> >>>> Assisted-by: Codex:gpt-5.5
-> >>>> Signed-off-by: Jihong Min <hurryman2212@gmail.com>
-> >>>> ---
-> >>>>  drivers/net/ethernet/airoha/airoha_ppe.c | 138 +++++++++++++++++++-=
 ---
-> >>>>  1 file changed, 119 insertions(+), 19 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/=
-ethernet/airoha/airoha_ppe.c
-> >>>> index 26da519236bf..ea932e6d87f6 100644
-> >>>> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
-> >>>> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-> >>>> @@ -803,65 +803,163 @@ static void airoha_ppe_foe_flow_remove_entry(=
-struct airoha_ppe *ppe,
-> >>>>  }
-> >>>> =20
-> >>>>  static int
-> >>>> -airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
-> >>>> -				    struct airoha_flow_table_entry *e,
-> >>>> -				    u32 hash, bool rx_wlan)
-> >>>> +airoha_ppe_foe_commit_subflow(struct airoha_ppe *ppe,
-> >>>> +			      const struct airoha_foe_entry *bridge,
-> >>>
-> >>> maybe l2_hwe instead of bridge?
-> >>>
-> >>>> +			      u32 hash, bool rx_wlan)
-> >>>>  {
-> >>>>  	u32 mask =3D AIROHA_FOE_IB1_BIND_PACKET_TYPE | AIROHA_FOE_IB1_BIND=
-_UDP;
-> >>>>  	struct airoha_foe_entry *hwe_p, hwe;
-> >>>> -	struct airoha_flow_table_entry *f;
-> >>>>  	int type;
-> >>>> =20
-> >>>>  	hwe_p =3D airoha_ppe_foe_get_entry_locked(ppe, hash);
-> >>>>  	if (!hwe_p)
-> >>>>  		return -EINVAL;
-> >>>> =20
-> >>>> -	f =3D kzalloc_obj(*f, GFP_ATOMIC);
-> >>>> -	if (!f)
-> >>>> -		return -ENOMEM;
-> >>>> -
-> >>>> -	hlist_add_head(&f->l2_subflow_node, &e->l2_flows);
-> >>>> -	f->type =3D FLOW_TYPE_L2_SUBFLOW;
-> >>>> -	f->hash =3D hash;
-> >>>> -
-> >>>>  	memcpy(&hwe, hwe_p, sizeof(*hwe_p));
-> >>>> -	hwe.ib1 =3D (hwe.ib1 & mask) | (e->data.ib1 & ~mask);
-> >>>> +	hwe.ib1 =3D (hwe.ib1 & mask) | (bridge->ib1 & ~mask);
-> >>>> =20
-> >>>>  	type =3D FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, hwe.ib1);
-> >>>>  	if (type >=3D PPE_PKT_TYPE_IPV6_ROUTE_3T) {
-> >>>> -		memcpy(&hwe.ipv6.l2, &e->data.bridge.l2, sizeof(hwe.ipv6.l2));
-> >>>> -		hwe.ipv6.ib2 =3D e->data.bridge.ib2;
-> >>>> +		memcpy(&hwe.ipv6.l2, &bridge->bridge.l2,
-> >>>> +		       sizeof(hwe.ipv6.l2));
-> >>>> +		hwe.ipv6.ib2 =3D bridge->bridge.ib2;
-> >>>>  		/* setting smac_id to 0xf instruct the hw to keep original
-> >>>>  		 * source mac address
-> >>>>  		 */
-> >>>>  		hwe.ipv6.l2.src_mac_hi =3D FIELD_PREP(AIROHA_FOE_MAC_SMAC_ID,
-> >>>>  						    0xf);
-> >>>>  	} else {
-> >>>> -		memcpy(&hwe.bridge.l2, &e->data.bridge.l2,
-> >>>> +		memcpy(&hwe.bridge.l2, &bridge->bridge.l2,
-> >>>>  		       sizeof(hwe.bridge.l2));
-> >>>> -		hwe.bridge.ib2 =3D e->data.bridge.ib2;
-> >>>> +		hwe.bridge.ib2 =3D bridge->bridge.ib2;
-> >>>>  		if (type =3D=3D PPE_PKT_TYPE_IPV4_HNAPT)
-> >>>>  			memcpy(&hwe.ipv4.new_tuple, &hwe.ipv4.orig_tuple,
-> >>>>  			       sizeof(hwe.ipv4.new_tuple));
-> >>>>  	}
-> >>>> =20
-> >>>> -	hwe.bridge.data =3D e->data.bridge.data;
-> >>>> -	airoha_ppe_foe_commit_entry(ppe, &hwe, hash, rx_wlan);
-> >>>> +	hwe.bridge.data =3D bridge->bridge.data;
-> >>>> +
-> >>>> +	return airoha_ppe_foe_commit_entry(ppe, &hwe, hash, rx_wlan);
-> >>>> +}
-> >>>> +
-> >>>> +static int
-> >>>> +airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
-> >>>> +				    struct airoha_flow_table_entry *e,
-> >>>> +				    u32 hash, bool rx_wlan)
-> >>>> +{
-> >>>> +	struct airoha_flow_table_entry *f;
-> >>>> +	int err;
-> >>>> +
-> >>>> +	f =3D kzalloc_obj(*f, GFP_ATOMIC);
-> >>>> +	if (!f)
-> >>>> +		return -ENOMEM;
-> >>>> +
-> >>>> +	err =3D airoha_ppe_foe_commit_subflow(ppe, &e->data, hash, rx_wlan=
-);
-> >>>> +	if (err) {
-> >>>> +		kfree(f);
-> >>>> +		return err;
-> >>>> +	}
-> >>>> +
-> >>>> +	hlist_add_head(&f->l2_subflow_node, &e->l2_flows);
-> >>>> +	f->type =3D FLOW_TYPE_L2_SUBFLOW;
-> >>>> +	f->hash =3D hash;
-> >>>> =20
-> >>>>  	return 0;
-> >>>>  }
-> >>>> =20
-> >>>> +static bool
-> >>>> +airoha_ppe_foe_prepare_wdma_subflow_dev(struct airoha_ppe *ppe,
-> >>>> +					struct net_device *dev,
-> >>>> +					struct airoha_flow_data *data,
-> >>>> +					struct airoha_foe_entry *hwe)
-> >>>> +{
-> >>>> +	u32 pse_port;
-> >>>> +	int err;
-> >>>> +
-> >>>> +	err =3D airoha_ppe_foe_entry_prepare(ppe->eth, hwe, dev,
-> >>>> +					   PPE_PKT_TYPE_BRIDGE, data, 0);
-> >>>> +	if (err)
-> >>>> +		return false;
-> >>>> +
-> >>>> +	pse_port =3D FIELD_GET(AIROHA_FOE_IB2_PSE_PORT, hwe->bridge.ib2);
-> >>>> +	if (pse_port !=3D FE_PSE_PORT_CDM4)
-> >>>> +		return false;
-> >>>> +
-> >>>> +	return true;
-> >>>
-> >>> 	return pse_port =3D=3D FE_PSE_PORT_CDM4;
-> >>>
-> >>>> +}
-> >>>> +
-> >>>> +static struct net_device *
-> >>>> +airoha_ppe_foe_get_bridge_master(struct net_device *dev)
-> >>>> +{
-> >>>> +	struct net_device *master =3D NULL;
-> >>>> +
-> >>>> +	rcu_read_lock();
-> >>>> +	master =3D netdev_master_upper_dev_get_rcu(dev);
-> >>>> +	if (master && netif_is_bridge_master(master))
-> >>>> +		dev_hold(master);
-> >>>> +	else
-> >>>> +		master =3D NULL;
-> >>>> +	rcu_read_unlock();
-> >>>> +
-> >>>> +	return master;
-> >>>> +}
-> >>>> +
-> >>>> +static bool
-> >>>> +airoha_ppe_foe_prepare_wdma_subflow(struct airoha_ppe *ppe,
-> >>>> +				    struct sk_buff *skb,
-> >>>> +				    struct airoha_foe_entry *hwe)
-> >>>> +{
-> >>>> +	struct ethhdr *eh =3D eth_hdr(skb);
-> >>>> +	struct airoha_flow_data data =3D {};
-> >>>> +	struct net_device *master;
-> >>>> +
-> >>>> +	if (!is_valid_ether_addr(eh->h_source) ||
-> >>>> +	    !is_valid_ether_addr(eh->h_dest))
-> >>>> +		return false;
-> >>>> +
-> >>>> +	ether_addr_copy(data.eth.h_dest, eh->h_dest);
-> >>>> +	ether_addr_copy(data.eth.h_source, eh->h_source);
-> >>>> +
-> >>>> +	if (!skb->dev)
-> >>>> +		return false;
-> >>>> +
-> >>>> +	/* WLAN egress unbound hits can arrive before flowtable creates the
-> >>>> +	 * L2 master flow normally used for subflow binding. Resolve only
-> >>>> +	 * through the bridge master so dev_fill_forward_path() must use t=
-he
-> >>>> +	 * bridge FDB for the destination MAC. Calling the ingress AP netd=
-ev
-> >>>> +	 * directly can describe the source station's WDMA path and would
-> >>>> +	 * corrupt Wi-Fi-to-wired flows whose real egress is not WDMA.
-> >>>> +	 */
-> >>>> +	master =3D airoha_ppe_foe_get_bridge_master(skb->dev);
-> >>>> +	if (!master)
-> >>>> +		return false;
-> >>>> +
-> >>>> +	if (airoha_ppe_foe_prepare_wdma_subflow_dev(ppe, master, &data,
-> >>>> +						    hwe)) {
-> >>>> +		dev_put(master);
-> >>>> +		return true;
-> >>>> +	}
-> >>>> +
-> >>>> +	dev_put(master);
-> >>>> +	return false;
-> >>>
-> >>> maybe something like:
-> >>>
-> >>> 	ret =3D airoha_ppe_foe_prepare_wdma_subflow_dev();
-> >>> 	dev_put(master);
-> >>>
-> >>> 	return ret;
-> >>>
-> >>>> +}
-> >>>> +
-> >>>>  static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
-> >>>>  					struct sk_buff *skb,
-> >>>>  					u32 hash, bool rx_wlan)
-> >>>>  {
-> >>>> +	struct airoha_foe_entry wdma_hwe =3D {};
-> >>>>  	struct airoha_flow_table_entry *e;
-> >>>>  	struct airoha_foe_bridge br =3D {};
-> >>>>  	struct airoha_foe_entry *hwe;
-> >>>>  	bool commit_done =3D false;
-> >>>> +	bool wdma_ready =3D false;
-> >>>>  	struct hlist_node *n;
-> >>>>  	u32 index, state;
-> >>>> =20
-> >>>> +	wdma_ready =3D airoha_ppe_foe_prepare_wdma_subflow(ppe, skb,
-> >>>> +							 &wdma_hwe);
-> >>>> +
-> >>>>  	spin_lock_bh(&ppe_lock);
-> >>>> =20
-> >>>>  	hwe =3D airoha_ppe_foe_get_entry_locked(ppe, hash);
-> >>>> @@ -899,6 +997,8 @@ static void airoha_ppe_foe_insert_entry(struct a=
-iroha_ppe *ppe,
-> >>>>  				   airoha_l2_flow_table_params);
-> >>>>  	if (e)
-> >>>>  		airoha_ppe_foe_commit_subflow_entry(ppe, e, hash, rx_wlan);
-> >>>> +	else if (wdma_ready)
-> >>>> +		airoha_ppe_foe_commit_subflow(ppe, &wdma_hwe, hash, rx_wlan);
-> >>>>  unlock:
-> >>>>  	spin_unlock_bh(&ppe_lock);
-> >>>>  }
-> >>>> --=20
-> >>>> 2.53.0
-> >>>>
-> >>
-> >> All inline code-style review comments will be addressed in the next
-> >> submission of the patch set, together with the responses to Sashiko's
-> >> review, if any.
->=20
+Changes in v3:
+- Gate submit error path fput with test_and_set_bit to prevent double fput from concurrent cancel
+- Convert hn->hn_lock to spin_lock_bh (cancel reachable from softirq via nvmet-tcp)
+- Pin file references during netns drain to prevent use-after-free on local list
+- Series re-ordered to improve bisectability
+- Link to v2: https://patch.msgid.link/20260521-handshake-file-pin-v2-0-b9dadc472840@oracle.com
 
---52YazzJl1iU1tUud
-Content-Type: application/pgp-signature; name=signature.asc
+Changes in v2:
+- Patch 3: move HANDSHAKE_A_DONE_STATUS upper bound into netlink policy (Jakub)
+- Link to v1: https://patch.msgid.link/20260518-handshake-file-pin-v1-0-4bbcb7e62fda@oracle.com
 
------BEGIN PGP SIGNATURE-----
+---
+Chuck Lever (8):
+      net/handshake: Use spin_lock_bh for hn_lock
+      nvme-tcp: store negative errno in queue->tls_err
+      net/handshake: Pass negative errno through handshake_complete()
+      net/handshake: Take a long-lived file reference at submit
+      net/handshake: hand off the pinned file reference to accept_doit
+      net/handshake: Close the submit-side sock_hold race
+      net/handshake: Verify file-reference balance in submit paths
+      net/handshake: Drain pending requests at net namespace exit
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCahR5nwAKCRA6cBh0uS2t
-rAcOAP9c+fG1BhTl1BK7HSHTc7vovg9KvZx1Bzth+zGJL2oQtgEA7G0u+TABG3U6
-LJacdnw/QSATbtqn40ZK3tCi6T5x2wU=
-=IvCl
------END PGP SIGNATURE-----
+ Documentation/netlink/specs/handshake.yaml |  8 +++
+ drivers/nvme/host/tcp.c                    |  2 +-
+ net/handshake/genl.c                       |  3 +-
+ net/handshake/genl.h                       |  1 +
+ net/handshake/handshake-test.c             | 38 +++++++++++++-
+ net/handshake/handshake.h                  |  6 ++-
+ net/handshake/netlink.c                    | 29 +++++------
+ net/handshake/request.c                    | 81 ++++++++++++++++++++++--------
+ net/handshake/tlshd.c                      |  6 ++-
+ 9 files changed, 129 insertions(+), 45 deletions(-)
+---
+base-commit: 87a1e0fe7776da7ab411be332b4be58ac8840d10
+change-id: 20260516-handshake-file-pin-21390f5f3513
 
---52YazzJl1iU1tUud--
+Best regards,
+--  
+Chuck Lever <chuck.lever@oracle.com>
+
 
