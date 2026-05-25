@@ -1,219 +1,312 @@
-Return-Path: <netdev+bounces-291384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291385-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPVIFeN+FGowNwcAu9opvQ
-	(envelope-from <netdev+bounces-291384-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:54:59 +0200
+	id +JA1HreCFGrhNwcAu9opvQ
+	(envelope-from <netdev+bounces-291385-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 19:11:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F0965CD153
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 18:54:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA8675CD342
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 19:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D2285303B6EF
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 16:51:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45BBB302DB79
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0623F54A0;
-	Mon, 25 May 2026 16:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75CA3F888D;
+	Mon, 25 May 2026 17:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QggBvHIa"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GQr1PYm1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBE93ACF11;
-	Mon, 25 May 2026 16:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5910E3F7A87
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 17:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779727901; cv=none; b=ST0pC9B+i6ZxSToS0GBa5962skrxx57TfrpVVtWWR2L+Qy+eNQ3LBYd3YBc67SZH6M6NNMpHf/JQqSa8IVLfqtk0T647zepyXmV2O0OTIPlIrqa3cjVKV+WTrfoc/o0ZnZ/k7FCGilaQjFWpLd1Gla1PkaigNJEcCxqPk/UuoC4=
+	t=1779729012; cv=none; b=NxADLAFwdGuZ6yZ/G/UJubQ1DqcMSTLcRgTDf5sAP8QfoE19m5/sLVksliDVKxVCMGLe5SQbt0ZQbGdcdfkE44gPoOtLi24dyEVWfOVfTgSczBzHQtq7ID5tYLnPzwFgMZ55RPubvBtYKlUcBkAUkiJJeq4e45UOqYIVahbdF/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779727901; c=relaxed/simple;
-	bh=admae0ikcPZmndy4BF7pn5X3ZSqnpP8hq0sKDNqalmk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Sr09s1x04RuzfQsNbEbz763RHYAEOHJtLJx02DUSwM6x8ctXe2c+sqo0QVjWDhhJyxs67yopLFhMcrtYkdhiqrF+6kmjazhUJNsaQWFv5trNU7RTn7byWyHRlIUyV6ECnAZjODiYe83z8zM2hOJDuMtFZp4Xv/itqt8DAXhhmvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QggBvHIa; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 437D91F00A3E;
-	Mon, 25 May 2026 16:51:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779727900;
-	bh=T5lTmWuuWaMPiOjTHMCXGVFaJdiWeerfyg6lzH6gsP4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=QggBvHIaRoKo1wymS4OJr18A2jiubdvZg1DPmgLT31hCAa4LCABnnD9G2QUIfERjv
-	 kNOjsdhHjKpHXrhloBejUh4AB47B0vtSPnx20sqWfPnzkoB64/oNSKlcz+HxHRM5KR
-	 wojjGXJq7h/xGvLfS/3y+c4lafrpSrnptWlT8NNrjz/LYV58CEw21sm+pKArvmFhE+
-	 iXDjaqP3tc4D7Km8MflxUkY6sFwzmN4MLmSLsadQCv8OQM+UJjud/0nHTVFZVBVQgi
-	 dAT6psDcD5eUrmN7lLdLELIdEkewtS5zdLyZMabFDEDiClTl3IKBugrLgVpZYcKe4k
-	 26/b3oEZg0Lcg==
-From: Chuck Lever <cel@kernel.org>
-Date: Mon, 25 May 2026 12:51:22 -0400
-Subject: [PATCH net v3 8/8] net/handshake: Drain pending requests at net
- namespace exit
+	s=arc-20240116; t=1779729012; c=relaxed/simple;
+	bh=PTNg3RyBjtWL4NnI8O0q7hXUoY8uPF4RaVnZMbEInR0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Pt5Vimhru+oCr2PqElf24QZt053RiHn/tAESZYVQNh/elPA8DdnPQvAYeYRLzjcIZ7MXCucuL5UyoyJOObhlHYowmlTCoh4BVIjhY3+3zVVA3AmJCCFtnjl/adT9lX/efI18xmw79j3fFVPtWLB4J/9QrpsBzCdk1a0tBg5fwAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GQr1PYm1; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-490388fd0dbso41525935e9.0
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 10:10:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1779729007; x=1780333807; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=izugkSqOYsBmSyQ8jfD9m1SVj73YG14U78pRBc6Lai0=;
+        b=GQr1PYm1QRIrfgBC/EILAtR9O17tFRT933ldDJCayUjXIyRMiDnumrFP9i4iPLQuP/
+         bWYj6u/50hd5AlTl8fnNFXZxscNWQsfvT08lWT2g7USA76CFTeDeB9CAGnGBLt+Jk5Kd
+         lX3x9dDR55Y2wg8pVl8cBGmVyZoFj8APvHLhilXEkRN6z7J5HsqQkRDuiJpcpmZ76bBE
+         nunnNO0efpqrh3Mg+srvekhGI13bTspzjyxHMZeoT7BQvRd6lyijtBc2rfmKjAaENr6C
+         i+8SY1MRgNki/ClY1lWgGG4FXSsH+ZhGYZ0VK7FSfIVhFbKqAWGdmu0VyhcviooSpQ7X
+         9jYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779729007; x=1780333807;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=izugkSqOYsBmSyQ8jfD9m1SVj73YG14U78pRBc6Lai0=;
+        b=I8f0plgppKKnTJtpufHZRj1HMz8TmR1ToT/feEdA2HOrqmPNfjE/9qxFQS9dGVBAp0
+         944dlJCqf9MJY6VFK5YQKc5BjbwOf5YP8HCm6lvdlOY7coTYdm/ONrojhTcKJbFZGU9o
+         ZZEBEQ5WmY/sZMr2sEoiQh2XWrW1xmdav3z+d3jZfOtSJ4FjdWI8CQW4D+xMD2J6tyPD
+         xO3ixpoTDDriTJbCbzeE9YuRRUrXAgk/vXU2jZl6nTK96QE4eBboOkUJM11lV6VMzd/c
+         EDo4049addSwjlYMMmGo4kTHUVp1D1EiRNMgVEDNtTn1jeXjqNqhhEQWhG9nN1G2Xesr
+         VfGw==
+X-Forwarded-Encrypted: i=1; AFNElJ86OvYXIiyzS0lKYK1EdbEMUvRMwpfFqU9vSmUXI514+SfxHTMlFoL4Ke7oDNv4GovjlwY+lXM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXc+6tQ52FWFtH7hz+GegHWwQHI9+p5NAzxPEn06dytp2fYvoF
+	fTSFo1tiCYX0xAzPjrvnT84b9QvvvLJfTvsjKO32qz/sS+dEJ4o130gmpVRJK4TJwxY=
+X-Gm-Gg: Acq92OG7n6OneGiEIu5cttUN6CKgs3Egv9Hcx3Q6O9llk/x3Z48idagTBSNyhCVhA+A
+	Ks+GhgN/PPJ1XnDb/XUYnoFD8BPVCouskaGmTNrra8ylIWFmSDvmitD+U3CjNjX5nJwBlf26NFZ
+	rMKZamIwvrTw2DYczOEoJKbLanY1rpb042spCETWF1tLUUXTBAU543weMscqSkjZVow662ZqI4J
+	6MN8EN2Z4a8rA1zP08bN74sS2j+YLw/x0ExRV9QPsY/wWmxt9zmn46Lj3UHDXKOUFvkanUJs1iQ
+	HK7BhxsvcjLkudvVswsjn1CvBnNk4IG/I3dWaCImqd9JMvPOmIlxUaUzB0izkE0Vyyh/5CVPuQk
+	J6gAIR2a2jCAyzTr64MkrTR+jxkf7D3KA8SVS1QTpycXWU9NfbTZWUr/vBseXG3xsHZXnaSk/8b
+	/ceoIiOpDGMwwGXUB1t0GEo1l+xbuKFcRKrKe5ogxXSnssEWnwAiOAkZzAE77Gu31LGmk49/WKn
+	EN48sIKOQMqXYCXwA9lQWype6jqZ3wvuy+n8p8ce8QIJ7hRl7jldLULZXVL1fkvpyKxe8Hwv7kO
+	O0ygjcAm0wpQoyQ=
+X-Received: by 2002:a05:600c:35cf:b0:490:44eb:c1e5 with SMTP id 5b1f17b1804b1-49044ebc257mr277307095e9.31.1779729006482;
+        Mon, 25 May 2026 10:10:06 -0700 (PDT)
+Received: from ?IPV6:2a00:1028:838d:271e:8e3b:4aff:fe4c:a100? (dynamic-2a00-1028-838d-271e-8e3b-4aff-fe4c-a100.ipv6.o2.cz. [2a00:1028:838d:271e:8e3b:4aff:fe4c:a100])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904526c926sm456877405e9.1.2026.05.25.10.10.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 May 2026 10:10:06 -0700 (PDT)
+Message-ID: <a192eb5c-5d16-483d-862e-d937fa1b8269@suse.com>
+Date: Mon, 25 May 2026 19:10:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260525-handshake-file-pin-v3-8-66c616906ead@oracle.com>
-References: <20260525-handshake-file-pin-v3-0-66c616906ead@oracle.com>
-In-Reply-To: <20260525-handshake-file-pin-v3-0-66c616906ead@oracle.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Chris Mason <clm@meta.com>, Christian Brauner <brauner@kernel.org>, 
- kernel-tls-handshake@lists.linux.dev, linux-nvme@lists.infradead.org, 
- netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>, 
- Hannes Reinecke <hare@kernel.org>
-X-Mailer: b4 0.16-dev-da966
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4231;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=Z3FNtFN+AsR1CzlrdFXZjc/eykqu5b0u0GKUw75gq6k=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBqFH4S3jAuaw2WLUG21fibHEltq6Hlp6vrIUqsS
- 75whnEpAOqJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCahR+EgAKCRAzarMzb2Z/
- l8ocEACY9buDtmzu4r2zV+YM5nwGIgw1W073jhnqcbhNN9aZVn+MJ8q+rnsEf1bd5e/1PNsd5Yq
- QEG8o7efxnzRPGbxzccXNsw3GI9G+qNzFyRS6r+6iT6A2m4TH9kbYE6tXk6hql73P68m+bK8SlW
- zCNYt00H/pm4lhAfw4EhUf8D2FHgtNjtUhJHpy/5zku+n5E4pN3B9nMit1wlQi4fHJu5Dn8fSPT
- GrABns7n4yaH3GQsLWiLMmR+IPoh/qjX4tTEdQXfTiUoKQzuQLXktOcTPS6QfErHUxxESm9KbwE
- lTdGlnt2lfRNcGulIUnuqnfiWoSXEMeOznXgS9/6UfUpogQF5f13kUC+q3YhgK9raWDM39o7Kq8
- BXTIntkahJe/NW8O7CExHRs8gYTiajHMV1aJszUposW9bdIOo4fh1YxpeyHsk9sS+Wi7R5ttca4
- Fv0QvEbqKJw40e6c6IpDLCQDQcTEJAvu2cQA294xi3tJeA20O+rQVFLxvxpG/SQLm9+m0TR3U+w
- 5SE48quDp91yYat+LIhCz3CbewT1qhKwPwo4FKyLwqN2he8tHJXq9nFBuLDXxFhL4i3Bv3/z/9c
- g8Mm74dskNAx7uKuQxzAXCIKBf+wd6NVSOq6BBPh6HayjyGKIBRjGQgPfhU9PxTkktQhe5q3xjx
- TobcID3QYJC2MYw==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
-X-Spamd-Result: default: False [-2.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 08/11] params: Convert generic kernel_param_ops .get
+ helpers to seq_buf
+To: Kees Cook <kees@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Pengpeng Hou
+ <pengpeng@iscas.ac.cn>, Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
+ Corey Minyard <corey@minyard.net>, Gabriel Somlo <somlo@cmu.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Bart Van Assche <bvanassche@acm.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ Hans de Goede <hansg@kernel.org>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Hannes Reinecke <hare@suse.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>,
+ Lukasz Luba <lukasz.luba@arm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Alan Stern <stern@rowland.harvard.edu>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Jason Baron <jbaron@akamai.com>, Jim Cromie <jim.cromie@gmail.com>,
+ Tiwei Bie <tiwei.btw@antgroup.com>, Benjamin Berg <benjamin.berg@intel.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ "David E. Box" <david.e.box@linux.intel.com>,
+ "Maciej W. Rozycki" <macro@orcam.me.uk>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Peter Zijlstra <peterz@infradead.org>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Vinod Koul <vkoul@kernel.org>,
+ Frank Li <Frank.Li@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
+ Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Andrew Morton
+ <akpm@linux-foundation.org>, John Johansen <john.johansen@canonical.com>,
+ Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Georgia Garcia <georgia.garcia@canonical.com>, kvm@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-modules@vger.kernel.org,
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-acpi@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
+ qemu-devel@nongnu.org, intel-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-pm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-serial@vger.kernel.org,
+ linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
+ virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, netdev@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20260521133315.work.845-kees@kernel.org>
+ <20260521133326.2465264-8-kees@kernel.org>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20260521133326.2465264-8-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291384-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,iscas.ac.cn,nod.at,cambridgegreys.com,sipsolutions.net,minyard.net,cmu.edu,redhat.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,acm.org,ziepe.ca,ideasonboard.com,google.com,suse.de,HansenPartnership.com,oracle.com,arm.com,linuxfoundation.org,rowland.harvard.edu,linux.alibaba.com,akamai.com,antgroup.com,orcam.me.uk,infradead.org,linux.ibm.com,alien8.de,zytor.com,atomlin.com,linux-foundation.org,canonical.com,paul-moore.com,namei.org,hallyn.com,vger.kernel.org,googlegroups.com,kvack.org,lists.ubuntu.com,lists.infradead.org,lists.sourceforge.net,nongnu.org,lists.freedesktop.org,lists.ozlabs.org,lists.one-eyed-alien.net,lists.linux.dev];
+	DKIM_TRACE(0.00)[suse.com:+];
+	TAGGED_FROM(0.00)[bounces-291385-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[98];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:mid,oracle.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 9F0965CD153
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: CA8675CD342
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Chuck Lever <chuck.lever@oracle.com>
+On 5/21/26 3:33 PM, Kees Cook wrote:
+> Convert the generic struct kernel_param_ops .get helpers in
+> kernel/params.c directly to the seq_buf signature, drop their legacy
+> "char *" form, and refresh prototypes in <linux/moduleparam.h>:
+> 
+>   param_get_byte/short/ushort/int/uint/long/ulong/ullong/hexint
+>   param_get_charp/bool/invbool/string
+>   param_array_get
+> 
+> The STANDARD_PARAM_DEF() macro expands to a seq_buf body for every
+> numeric helper. param_array_get() now writes element output directly
+> into the parent seq_buf when the element ops provide .get; it only
+> allocates the per-call PAGE_SIZE bounce buffer when the element ops
+> still use the legacy .get_str path. The common "rewrite the prior
+> element's trailing newline as a comma" step lives outside both
+> branches so the two paths share it.
+> 
+> The non-core changes in this commit (arch/x86/kvm, mm/kfence,
+> drivers/dma/dmatest, security/apparmor) are the small set of callers that
+> directly invoke one of the converted generic helpers from their own .get
+> callback (e.g. an apparmor wrapper that adds a capability check and then
+> delegates to param_get_bool()). Because the helpers' signature changes
+> here, these wrappers must move in lockstep. Each of them is updated
+> to take "struct seq_buf *" and pass it through; param_get_debug() in
+> apparmor also pulls aa_print_debug_params() (and its val_mask_to_str()
+> helper, in security/apparmor/lib.c) over to seq_buf, since that is the
+> only consumer. No other behavioural change is intended.
+> 
+> Custom .get callbacks that do not delegate to a generic helper (and
+> therefore still match the .get_str signature) are routed automatically
+> to the .get_str field by the DEFINE_KERNEL_PARAM_OPS _Generic dispatcher
+> and are deliberately left alone here, to be changed separately within
+> their respective subsystems.
+> 
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+> [...]
+> @@ -453,36 +457,46 @@ static int param_array_set(const char *val, const struct kernel_param *kp)
+>  			   arr->num ?: &temp_num);
+>  }
+>  
+> -static int param_array_get(char *buffer, const struct kernel_param *kp)
+> +static int param_array_get(struct seq_buf *s, const struct kernel_param *kp)
+>  {
+> -	int i, off, ret;
+> -	char *elem_buf;
+>  	const struct kparam_array *arr = kp->arr;
+>  	struct kernel_param p = *kp;
+> +	char *elem_buf = NULL;
+> +	int i, ret = 0;
+>  
+> -	elem_buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
+> -	if (!elem_buf)
+> -		return -ENOMEM;
+> +	for (i = 0; i < (arr->num ? *arr->num : arr->max); i++) {
+> +		size_t before = s->len;
+>  
+> -	for (i = off = 0; i < (arr->num ? *arr->num : arr->max); i++) {
+>  		p.arg = arr->elem + arr->elemsize * i;
+>  		check_kparam_locked(p.mod);
+> -		ret = arr->ops->get_str(elem_buf, &p);
+> -		if (ret < 0)
+> -			goto out;
+> -		ret = min(ret, (int)(PAGE_SIZE - 1 - off));
+> -		if (!ret)
+> +
+> +		if (arr->ops->get) {
+> +			ret = arr->ops->get(s, &p);
+> +			if (ret < 0)
+> +				goto out;
+> +		} else {
+> +			if (!elem_buf) {
+> +				elem_buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
+> +				if (!elem_buf) {
+> +					ret = -ENOMEM;
+> +					goto out;
+> +				}
+> +			}
+> +			ret = arr->ops->get_str(elem_buf, &p);
+> +			if (ret < 0)
+> +				goto out;
+> +			seq_buf_putmem(s, elem_buf, ret);
+> +		}
+> +
+> +		/* Nothing got written (e.g. overflow) — stop. */
+> +		if (s->len == before)
+>  			break;
+> +
+>  		/* Replace the previous element's trailing newline with a comma. */
+> -		if (i)
+> -			buffer[off - 1] = ',';
+> -		memcpy(buffer + off, elem_buf, ret);
+> -		off += ret;
+> -		if (off == PAGE_SIZE - 1)
+> -			break;
+> +		if (i && s->buffer[before - 1] == '\n')
+> +			s->buffer[before - 1] = ',';
+>  	}
+> -	buffer[off] = '\0';
+> -	ret = off;
+> +	ret = 0;
+>  out:
+>  	kfree(elem_buf);
+>  	return ret;
 
-The arguments to list_splice_init() in handshake_net_exit() are
-reversed. The call moves the local empty "requests" list onto
-hn->hn_requests, leaving the local list empty, so the subsequent
-drain loop runs zero iterations. Pending handshake requests that
-had not yet been accepted are not torn down when the net namespace
-is destroyed; each one keeps a reference on a socket file and on
-the handshake_req allocation.
+Since you're almost completely rewriting the logic in param_array_get(),
+I suggest tightening it up a bit. The function could warn or return an
+error when a kernel_param_ops::get/get_str() call adds a string that
+doesn't terminate with '\n', specifically, when the call adds either
+a zero-length string or a non-zero-length string that ends with
+a different character (unless an overflow occurred).
 
-Pass the source and destination in the documented order
-(list_splice_init(list, head) moves list onto head) so the pending
-list is transferred to the local scratch list and drained through
-handshake_complete().
-
-Fixing the splice direction exposes a list-corruption race. After
-the splice each req->hr_list still has non-empty link pointers,
-threading the stack-local scratch list rather than hn_requests.
-A concurrent handshake_req_cancel() -- for example, from sunrpc's
-TLS timeout on a kernel socket whose netns reference was not
-taken -- finds the request through the rhashtable, calls
-remove_pending(), and sees !list_empty(&req->hr_list).
-__remove_pending_locked() then list_del_init()s an entry off the
-scratch list while the drain iterates, corrupting it. The same
-call arriving after the drain loop has run list_del() on an
-entry hits LIST_POISON instead.
-
-Have remove_pending() check HANDSHAKE_F_NET_DRAINING under
-hn_lock and report not-found when drain is in progress. The
-drain has already taken ownership; handshake_complete()'s existing
-test_and_set on HANDSHAKE_F_REQ_COMPLETED still arbitrates
-between drain and cancel for who calls the consumer's hp_done. Use
-list_del_init() rather than list_del() in the drain so req->hr_list
-does not carry LIST_POISON after drain releases the entry.
-
-The DRAINING guard in remove_pending() makes cancel return false,
-but cancel still falls through to test_and_set_bit on
-HANDSHAKE_F_REQ_COMPLETED and drops the request's hr_file reference.
-Without another pin, if that is the last reference, sk_destruct frees
-the request while it is still linked on the drain loop's local list.
-Pin each request's hr_file under hn_lock before releasing the list,
-and drop that drain pin after the loop finishes with the request.
-
-Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for handling handshake requests")
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
----
- net/handshake/netlink.c | 10 ++++++++--
- net/handshake/request.c |  5 ++++-
- 2 files changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
-index 21d6cbd52fcd..3fd4fef9bab1 100644
---- a/net/handshake/netlink.c
-+++ b/net/handshake/netlink.c
-@@ -201,13 +201,19 @@ static void __net_exit handshake_net_exit(struct net *net)
- 	 */
- 	spin_lock_bh(&hn->hn_lock);
- 	set_bit(HANDSHAKE_F_NET_DRAINING, &hn->hn_flags);
--	list_splice_init(&requests, &hn->hn_requests);
-+	list_splice_init(&hn->hn_requests, &requests);
-+	list_for_each_entry(req, &requests, hr_list)
-+		get_file(req->hr_file);
- 	spin_unlock_bh(&hn->hn_lock);
- 
- 	while (!list_empty(&requests)) {
-+		struct file *file;
-+
- 		req = list_first_entry(&requests, struct handshake_req, hr_list);
--		list_del(&req->hr_list);
-+		file = req->hr_file;
-+		list_del_init(&req->hr_list);
- 		handshake_complete(req, -ETIMEDOUT, NULL);
-+		fput(file);
- 	}
- }
- 
-diff --git a/net/handshake/request.c b/net/handshake/request.c
-index bd3d9467ab91..cd30d54d0501 100644
---- a/net/handshake/request.c
-+++ b/net/handshake/request.c
-@@ -163,13 +163,16 @@ static void __remove_pending_locked(struct handshake_net *hn,
-  * otherwise %false.
-  *
-  * If @req was on a pending list, it has not yet been accepted.
-+ * Returns %false when the net namespace is draining; the drain
-+ * loop has taken ownership of the pending list.
-  */
- static bool remove_pending(struct handshake_net *hn, struct handshake_req *req)
- {
- 	bool ret = false;
- 
- 	spin_lock_bh(&hn->hn_lock);
--	if (!list_empty(&req->hr_list)) {
-+	if (!test_bit(HANDSHAKE_F_NET_DRAINING, &hn->hn_flags) &&
-+	    !list_empty(&req->hr_list)) {
- 		__remove_pending_locked(hn, req);
- 		ret = true;
- 	}
+The updated code silently stops the loop when a get call returns
+a zero-length string. Similarly, handling of a string not terminated by
+'\n' is halfway there because of the added check
+"s->buffer[before - 1] == '\n'".
 
 -- 
-2.54.0
-
+Thanks,
+Petr
 
