@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-291282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291280-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aBJrLpYfFGpGKAcAu9opvQ
-	(envelope-from <netdev+bounces-291282-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 12:08:22 +0200
+	id qLl0BlofFGobKAcAu9opvQ
+	(envelope-from <netdev+bounces-291280-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 12:07:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 587B35C8FF8
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 12:08:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 647825C8FBD
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 12:07:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6F9C301231A
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:08:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF2DA3019B92
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:07:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35D233BBC0;
-	Mon, 25 May 2026 10:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5504B33F588;
+	Mon, 25 May 2026 10:07:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1CC2F7EE7
-	for <netdev@vger.kernel.org>; Mon, 25 May 2026 10:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8748C18B0F
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 10:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779703698; cv=none; b=NU4MTnZ9Jj/FejWVxeNzauQMZEBSoba3pbi1+ipVBjFiFgDA448cSzJ9pnAFupbwxB2mCQ3as8KNCp/l+n6OPLKPdmry7dR85DSTQUClfL0kQepJMlMy9IjDIzQmFeyw3cbdGkD/rQqFCF6xUFsFV+J5YUK1XEiX5ObEZ5w8B+k=
+	t=1779703621; cv=none; b=CV0gipYUd2QGD1cTx6c98pqOuEZ6IRihgjkmYYNGtBwlI1xu55riOub6yhaMfI0ZSH3rAzIH83U/wj/fW1nexWjDODSt9KH8WH0fV1uIMvNMFpt7QWEMeUD2TQvoMmprjGUGBc+QfRCrYUQyMT7hEWWHHh03AAYpjq3wfYRi+4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779703698; c=relaxed/simple;
-	bh=TEb6cmuYJfPTENVrAfCtApqrrcbJHz/gheUSvizeR88=;
+	s=arc-20240116; t=1779703621; c=relaxed/simple;
+	bh=TA8dPnMNyx8DJ2tuomc5fktwCh7iL/ZqAt0Qho2boDQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aiC1f/LFv8S6No/prDgF18V+E/cK/E1uYojypwSX0xpqzvQ0sh1/ikfJCgs4pHzlA2A/y2dxICjXShzpVd5AfWUDrrgufD7jhmyv4/ciZgXziPdn1hPJFyuVZ7uasvytPpGp4BNvQsinQ3v9TfVmgupqjLw85HTaxvEvLO3VSss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
+	 MIME-Version; b=MOul9qd4aKzRSeHTTD9JHX3VAlOCDjJfOV4pDLFwuOMNzbGDzD0MrX3EokNJ7GV36kL6qtnyJYZpHvYb4gyhw7OJ4PjdtuMGCd1whSbf1eU8JDQvOdgvD3TTA4ZzH/+w+niZkydrb2E8e41TZfu/Cxk0gbZdEM6C0HzqURtteB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpgz11t1779703557ta607b378
-X-QQ-Originating-IP: LiPXhzScXza1pb6rJY7YzYvPcr17Etb5NpO/jieDNdw=
+X-QQ-mid: esmtpgz11t1779703560tc2982445
+X-QQ-Originating-IP: gTcJGyVfsanwjMMXWVUGKt7q3WE13Tojls+Kte3cdho=
 Received: from lap-jiawenwu.trustnetic.com ( [122.231.28.113])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 25 May 2026 18:05:56 +0800 (CST)
+	id ; Mon, 25 May 2026 18:05:58 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 944353387482229234
+X-BIZMAIL-ID: 3612791413146679667
 EX-QQ-RecipientCnt: 12
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org
@@ -54,9 +54,9 @@ Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
 	Larysa Zaremba <larysa.zaremba@intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2 2/3] net: wangxun: avoid statistics updates during device teardown
-Date: Mon, 25 May 2026 18:05:42 +0800
-Message-Id: <20260525100543.27140-3-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 3/3] net: txgbe: rework service event handling
+Date: Mon, 25 May 2026 18:05:43 +0800
+Message-Id: <20260525100543.27140-4-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20260525100543.27140-1-jiawenwu@trustnetic.com>
 References: <20260525100543.27140-1-jiawenwu@trustnetic.com>
@@ -69,94 +69,167 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MABkn+BX1UZ4ovff1MRaRd8Sf+mpvRixVkWMNIlNAqCYarciDxJGb/yR
-	cIvGb3InyZf3uKiqprXns8pitGcm0LwAvp9DGai5kiHOnIjYSzbT8r/ZUhE8xUl6OYnOhPx
-	lLnjiO0pNV3tXxpd36JK7c8QFz91IbhyQwmxwRhkBF/UeqMF0cE+1hXArzINrJTMVFaZHrQ
-	ssG7wvj9LYnsFqL+LNUBWUBiutstV/a6kAAeqq1KM2jXPK34LO35tfAWW36YJD4OjzDBzcK
-	mAC9rVQjRPTQc4ZoouI5MJe/Lz8sU4jN4QpRi2pw/fAmy04myB6TSxmwCpkSz1u3U9ICnFr
-	sQGTXRCXR1wo1emQYV05/3dH/mMQPcHLi30+GB7IvqqvG6oc6tZHljVTtO0yI34XEAJOcRh
-	NlFdG4+zlUNlTLJBFAlq3fAkwsAYPPV2EL4F+N/S7c8ULL07UZ6MgV6ei//MKugtUTO/eCt
-	Ky+OlZpLK5qE99+el5cXK5WoDl8pGc1q9JDSWnYNoVlTKqvixb4JReihle7NuXXHMEKbJ8/
-	q9VT240xDDCGsZGjMhlo0jNvps15pH/py6V09wIU2iVr1mMj3EkQwLgem1veYi+xlHohdZR
-	pjAZFuwU6RaTyNYJyfC2gJAsKfyINLqfyWmie4MviyD8NEAeW2fM8FbxJUvXXb3s3PrqYu0
-	ZIJwONO74Z0lQaB5RPrgOCgoTS5/GoI1Ohp3XkfD9CbzYHw2kEerHWJCoBZhV5cHPhBX2KQ
-	q+FmZPZUNjgQ7KYBvKblDxh6x/EyD3F3J09zTRexe8MSjEFvzeebpaK5AO5E7FxC2oxC0S1
-	bYn156iqRZuksiwFmnfVEBm8q8X1FNgSbEK4nzuuThxsj9xuiCY/fF3rHliQ5KUmH0B8369
-	XHak5XRoZWfoiOehWDPunzktgx6E99zFKrWfUcekPYlBEYixeurderd4weEP2d0j9x/DlHT
-	B+BBUBFoz9U5vI5uZ+SYRMwySwpRzgGbVaIX7w9aaN0IyTtQ/deTPZUBuZB0EZ0+shjJgEl
-	+S0Rjsg8rU9WPwNX260CjfuBFBenEFF4E4D+r1WvlGRU26ER1hXk+qhI0VVt3G230esD1cA
-	Q==
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+X-QQ-XMAILINFO: NC4p7XQIBeahMnnXmKR6cp0FIH9IOo0YOI3wSRA1ywZK/9803+J1esiD
+	A4EtOX4YBBNS5T9itqu3SSG0PI++QD/UPukv5zELbyxm+H6f4pdgBXD7tY1y+pOecRURRpd
+	+e1pQFhE7vMUAGEF2Vs6rvi1pcFApWJ09eNisjitzxteXEipfsbOuj4/XxEv90sRFcWg046
+	m/KrYzvBHpQf/knsqQwuynK6RSrODjAPGnpRrSr/a3GHCXyBDeB6dp6fFssufJ345Ct4jib
+	Cv11SKl95fmYFkkCXmtWWXVxSAwh6KxHMUy4LegQX2vOrzZvlKRY0w24FxQ1CLJwfQYuai+
+	r+yxy/J24sZBEtm04yZecKmItBoKTsS5QR5sJyIJKp0WIb6bbM1yIawe37SFXahex8vHDMG
+	u6dp1QMQ2OK5YLVJsqSZTBX0nSl9JjWWerNXFPd94eqQnJ1PABkShwo9Un/mLX5okmsIPzN
+	DlJp2aY97UbVLKad7QUSGtdFIG8xSg9K53ykNaEoDSKXi8SV0wXzdlqyZdEbEhTfW2DnCP5
+	T82y23Nwy4P9MRooG2n1F57t2YUF98SorDpd2ZUz/ywBP5/DExnyoWdpnrBB4mWKBerkwA8
+	RJI1RYNq0grIB0zc/QkQJ+XVchSS50NKdJyEyosDCwsl4HTDXnfjK0d1fsY50C2gYlqEh+6
+	xD6Pv8SO1iIN4tOoj/luNmpnOME4PogjDJrVfXCu6VbRIWv24HuBj6DAfhgjn2Wq3JGzl7M
+	tQOvFk7jC37Yi9vqmo/y0gRoe9ysAEgiht8Us4ADJZbMqckAn/sD1t2DfFA2IAeNDIhY11C
+	1SYXFQiHent+c3b24b3/imm22Yfe8jHm3rtyJIo3rd4eqccLUNx6B8yyFqWBIZ5Ry8Z4l59
+	fiO083rHm0RyzjvtS9NV5MPt7cowp2oDZyFptVZJv9bWfwE5CQhVwou3llWa+3Fmr0geT/7
+	2AdiXrACmIaEWklyB5HKRLlFBCXjkGL4glKNRW+NgsuxdfMxeWiWEzMLEAly2zDgRtU6UBc
+	67AmhAPQ6AjqJhAuhbI03jhWxyacJgEr5fII4rDO1QwqwBQZZKBPagcZRlD9lQ8BTX9glSW
+	GF6fhgsaqXqQb1xtIsyOpi50gHA3pdyrA==
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
 X-QQ-RECHKSPAM: 0
 X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-291282-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291280-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	DMARC_NA(0.00)[trustnetic.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.489];
+	NEURAL_HAM(-0.00)[-0.484];
 	TAGGED_RCPT(0.00)[netdev];
 	R_DKIM_NA(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 587B35C8FF8
+X-Rspamd-Queue-Id: 647825C8FBD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-After introducing WX_STATE_DOWN, wx_update_stats() now explicitly skips
-statistics collection while the device is in teardown or reset state.
-Calling wx_update_stats() from the device disable path therefore becomes
-redundant.
+Convert to use test_and_clear_bit() for link event subtasks. Only re-arm
+the WX_FLAG_NEED_MODULE_RESET flag when module is absent. Unsupported or
+invalid modules no longer cause the service task to continuously retry
+module identification.
 
-Remove wx_update_stats() calls from ngbe_disable_device() and
-txgbe_disable_device().
+Additionally, explicitly cancel service_task during device teardown to
+ensure no pending asynchronous service work survives after the device
+has entered the DOWN state.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c   | 2 --
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 2 --
- 2 files changed, 4 deletions(-)
+ .../net/ethernet/wangxun/txgbe/txgbe_aml.c    | 10 +++-------
+ .../net/ethernet/wangxun/txgbe/txgbe_aml.h    |  2 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 19 ++++++-------------
+ 3 files changed, 10 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index f4a2dd6fa493..8678c49b892a 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -404,8 +404,6 @@ static void ngbe_disable_device(struct wx *wx)
- 
- 		wr32(wx, WX_PX_TR_CFG(reg_idx), WX_PX_TR_CFG_SWFLSH);
- 	}
--
--	wx_update_stats(wx);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+index f0514251d4f3..da1d3976ed33 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+@@ -186,19 +186,15 @@ static void txgbe_get_mac_link(struct wx *wx, int *speed)
+ 		*speed = SPEED_UNKNOWN;
  }
  
- static void ngbe_reset(struct wx *wx)
+-int txgbe_set_phy_link(struct wx *wx)
++void txgbe_set_phy_link(struct wx *wx)
+ {
+ 	int speed, autoneg, duplex, err;
+ 
+ 	txgbe_get_link_capabilities(wx, &speed, &autoneg, &duplex);
+ 
+ 	err = txgbe_set_phy_link_hostif(wx, speed, autoneg, duplex);
+-	if (err) {
++	if (err)
+ 		wx_err(wx, "Failed to setup link\n");
+-		return err;
+-	}
+-
+-	return 0;
+ }
+ 
+ static int txgbe_sfp_to_linkmodes(struct wx *wx, struct txgbe_sff_id *id)
+@@ -362,7 +358,7 @@ int txgbe_identify_module(struct wx *wx)
+ 	    id->identifier != TXGBE_SFF_IDENTIFIER_QSFP_PLUS &&
+ 	    id->identifier != TXGBE_SFF_IDENTIFIER_QSFP28) {
+ 		wx_err(wx, "Invalid module\n");
+-		return -ENODEV;
++		return -EINVAL;
+ 	}
+ 
+ 	if (id->transceiver_type == 0xFF)
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
+index 4f6df0ee860b..379c74ad19c6 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
+@@ -10,7 +10,7 @@ int txgbe_test_hostif(struct wx *wx);
+ int txgbe_read_eeprom_hostif(struct wx *wx,
+ 			     struct txgbe_hic_i2c_read *buffer,
+ 			     u32 length, u8 *data);
+-int txgbe_set_phy_link(struct wx *wx);
++void txgbe_set_phy_link(struct wx *wx);
+ int txgbe_identify_module(struct wx *wx);
+ void txgbe_setup_link(struct wx *wx);
+ int txgbe_phylink_init_aml(struct txgbe *txgbe);
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index f9cd1caaf0a4..6755464b4637 100644
+index 6755464b4637..ce82e13aa8ae 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -265,8 +265,6 @@ static void txgbe_disable_device(struct wx *wx)
+@@ -93,31 +93,23 @@ static void txgbe_module_detection_subtask(struct wx *wx)
+ {
+ 	int err;
  
- 	/* Disable the Tx DMA engine */
- 	wr32m(wx, WX_TDM_CTL, WX_TDM_CTL_TE, 0);
+-	if (!test_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags))
++	if (!test_and_clear_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags))
+ 		return;
+ 
+ 	/* wait for SFF module ready */
+ 	msleep(200);
+ 
+ 	err = txgbe_identify_module(wx);
+-	if (err)
+-		return;
 -
--	wx_update_stats(wx);
+-	clear_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags);
++	if (err == -ENODEV)
++		set_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags);
  }
  
- void txgbe_down(struct wx *wx)
+ static void txgbe_link_config_subtask(struct wx *wx)
+ {
+-	int err;
+-
+-	if (!test_bit(WX_FLAG_NEED_LINK_CONFIG, wx->flags))
++	if (!test_and_clear_bit(WX_FLAG_NEED_LINK_CONFIG, wx->flags))
+ 		return;
+ 
+-	err = txgbe_set_phy_link(wx);
+-	if (err)
+-		return;
+-
+-	clear_bit(WX_FLAG_NEED_LINK_CONFIG, wx->flags);
++	txgbe_set_phy_link(wx);
+ }
+ 
+ /**
+@@ -233,6 +225,7 @@ static void txgbe_disable_device(struct wx *wx)
+ 	wx_napi_disable_all(wx);
+ 
+ 	timer_delete_sync(&wx->service_timer);
++	cancel_work_sync(&wx->service_task);
+ 
+ 	if (wx->bus.func < 2)
+ 		wr32m(wx, TXGBE_MIS_PRB_CTL, TXGBE_MIS_PRB_CTL_LAN_UP(wx->bus.func), 0);
 -- 
 2.51.0
 
