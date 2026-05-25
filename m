@@ -1,291 +1,122 @@
-Return-Path: <netdev+bounces-291468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291470-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLzkDNa1FGpbPgcAu9opvQ
-	(envelope-from <netdev+bounces-291468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 22:49:26 +0200
+	id 2IbKJkm4FGq8PgcAu9opvQ
+	(envelope-from <netdev+bounces-291470-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 22:59:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC555CEC0B
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 22:49:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E26525CEC8B
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 22:59:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E5813066A94
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 20:41:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A71F3010DBD
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 20:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3AC3A543F;
-	Mon, 25 May 2026 20:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E41A30FF36;
+	Mon, 25 May 2026 20:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJTW7o39"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1VaOLBF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B968B380FE9;
-	Mon, 25 May 2026 20:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057DD281532;
+	Mon, 25 May 2026 20:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779741685; cv=none; b=OSgmjUkQG4P6oD6pcNo5Oi6TFzAk0Jv2S8m1ibdNHz56valsSSrddNhUAr+rQ5PTVY86q9zXRLxwYCHD8BGrLxtCmrrQAbsvNwxFEvXbbrU8Q6pap38PyFZfjlyt0oqpNxFYsg35pGuP0d+AbjWUS9FK+FsT80Af0pYioMWyjCA=
+	t=1779742788; cv=none; b=OdakuffmErCqJ2qvAL11UDpGA2qLnzrs6cALUxrAfKjzR3z8z5BaNp5Z2o8CCUse/KvtsqPF6iZ8fuxkuGguhl5SDfspQ+IKbs1PAs3y/mqFkHTfcJ1hzvoAF8Nys2mzuQ4Y25Nk+XpUlovSGQbYONMKqtWgZYHdk7HpUglA7i8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779741685; c=relaxed/simple;
-	bh=U5+ZuQ65d3tnD/MADat0Me3W1/1R+VsYenecOypJvw4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m2oewrfqrD3TpHvHf70TyXITMprNw/4PDO9epxm00ja69YUwhjDomWq5AszPuxMvgkxnTqT6XJ/c9peTbkYaSCG+PNTjldNh/37n73r7fzvwUJ6gIskQf0OXx0msfanxo4xx0+tMa3F3CUOle2ivi2KE97HNrc2nLRVAQY6sMkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJTW7o39; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 153B41F00A3A;
-	Mon, 25 May 2026 20:41:23 +0000 (UTC)
+	s=arc-20240116; t=1779742788; c=relaxed/simple;
+	bh=mrWLulCeZBG/eZdd3kuW8W3jBb3wHhtur0/JQyQu52c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iGQ2NoPj/HVikZxdv54rzKMb87wj6qQM3p7Oqqo8zKZxDOOIaH9eQmpcqupGFaetwjmO9bNyU2+7E2GYSwJYkChRN8+e/zOent77Xnc15twYsUJab6XWuy6hN89exkYMisZsyE1mdLLu/mRQd7H3A0Q4+EqRPIEKEV3JaXGcmbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j1VaOLBF; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899281F000E9;
+	Mon, 25 May 2026 20:59:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779741683;
-	bh=81DhbawtDqBc+BFbY7juQMfdTUE8jBfq49tDkSyVcXo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QJTW7o39apLnP7yq3O9L8Sg7SPeWyHiDmXCSqXqU3iiqoUMngkHoGdkrDn+37NJ9Q
-	 c0hcamU1GX4iNPieJbzhwJIo/GlLg4txieMm2kKVnhZjXzh2eHMwt+eAGiWeh7ui43
-	 VgSYPc1a7R9a6Q3Uc9o5lWlGFE2NyMiMXxPP60rXd8+DV2Q3IsbL4V+JveVBhPl/cw
-	 GiDTwdh/NgKpnRxysd4BLp7oje5OvL9TAb+Cjm7JRLw/s+LT88TbpyBr7ob2xc/RIV
-	 gNFAacJwKTbfm8Fr3RwWGfz4APuUVdNfX+kSSG06q80+X7OhQRSNvXOuf12B99o9jI
-	 /DMXaRPcL7jjw==
+	s=k20260515; t=1779742786;
+	bh=yUD6UxnK7HW4Boqv2TCaO67dtaloiSS48KysPRLAf9M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=j1VaOLBFVGn2NDJ//VY1ZQjV3NXIU2X+5VxxaLOtPGlyPI7VL3M0ixXVCkBlHBzt6
+	 4HzQ+Mr8Oe02dt+4M1YCjHckfhKTUZ3O7J3M9BXFN5a9MJHNNl23CS2TO/v0PEyvjp
+	 YCYAaIcylZ2OHq6jq1AR0GkPXjtOZAWITC8FAQWdUixnSl4n7LZFfCCeDa28L7kYhm
+	 FgtD3BGMAHHbiPs7dX8mYBdY+oBogTJNYD6v9aaUuKjVAglbscxlskGKbyPqCIbEg1
+	 DAmMWzRLrnfx9MKOqEHqP2L5hzzAKox+JYyumVI4Sm/KTyor2aTjUkXPOqwh8mfl8o
+	 X+IaFpH6LSusA==
+Date: Mon, 25 May 2026 13:59:44 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: michael.dege@renesas.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	yoshihiro.shimoda.uh@renesas.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	niklas.soderlund@ragnatech.se,
-	paul@pbarker.dev,
-	richardcochran@gmail.com,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 14/14] net: renesas: rswitch: add vlan aware switching
-Date: Mon, 25 May 2026 13:41:22 -0700
-Message-ID: <20260525204122.2471553-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260522-rswitch_add_vlans-v5-14-53589d944a9f@renesas.com>
-References: <20260522-rswitch_add_vlans-v5-14-53589d944a9f@renesas.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <oss-drivers@corigine.com>, <akiyano@amazon.com>,
+ <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
+ <arkadiusz.kubalewski@intel.com>, <brett.creeley@amd.com>,
+ <darinzon@amazon.com>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+ <edumazet@google.com>, <horms@kernel.org>, <idosch@nvidia.com>,
+ <ivecera@redhat.com>, <jiri@resnulli.us>, <leon@kernel.org>,
+ <mbloch@nvidia.com>, <michael.chan@broadcom.com>, <pabeni@redhat.com>,
+ <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
+ <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
+ <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
+ <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v16 net-next 1/9] octeontx2-af: npc: cn20k: debugfs
+ enhancements
+Message-ID: <20260525135944.63d57e95@kernel.org>
+In-Reply-To: <20260521095303.2395584-2-rkannoth@marvell.com>
+References: <20260521095303.2395584-1-rkannoth@marvell.com>
+	<20260521095303.2395584-2-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291470-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291468-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,renesas.com,lunn.ch,davemloft.net,google.com,redhat.com,ragnatech.se,pbarker.dev,gmail.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,corigine.com,amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 8CC555CEC0B
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: E26525CEC8B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-Subject: net: renesas: rswitch: add vlan aware switching
+On Thu, 21 May 2026 15:22:55 +0530 Ratheesh Kannoth wrote:
+> Improve MCAM visibility and field debugging for CN20K NPC.
+> 
+> - Extend "mcam_layout" to show enabled (+) or disabled state per entry
+>   so status can be verified without parsing the full "mcam_entry" dump.
+> - Add "dstats" debugfs entry: reports recently hit MCAM indices with
+>   packet counts; stats are cleared on read so each read shows deltas.
+> - Add "mismatch" debugfs entry: lists MCAM entries that are enabled
+>   but not explicitly allocated, helping diagnose allocation/field issues.
 
-This patch adds VLAN support to the L2 HW bridge for the Renesas switch.
-It implements the standard switchdev callbacks for configuring STP state,
-aging time, and VLAN filtering. The implementation works around hardware
-limitations by keeping all ports in a default VLAN.
-
-> diff --git a/drivers/net/ethernet/renesas/rswitch_l2.c b/drivers/net/ethernet/renesas/rswitch_l2.c
-> --- a/drivers/net/ethernet/renesas/rswitch_l2.c
-> +++ b/drivers/net/ethernet/renesas/rswitch_l2.c
-[ ... ]
-> +static void rswitch_update_vlan_filtering(struct rswitch_private *priv,
-> +					  bool vlan_filtering)
-> +{
-> +	if (vlan_filtering)
-> +		rswitch_modify(priv->addr, FWPC0(AGENT_INDEX_GWCA),
-> +			       0, FWPC0_VLANSA | FWPC0_VLANRU);
-> +	else
-> +		rswitch_modify(priv->addr, FWPC0(AGENT_INDEX_GWCA),
-> +			       FWPC0_VLANSA | FWPC0_VLANRU, 0);
-> +}
-
-[Severity: Medium]
-Does this properly synchronize the VLAN filtering state to the physical
-switch ports? This seems to update the FWPC0 registers only for the CPU
-port (AGENT_INDEX_GWCA) without iterating over the external physical
-ports, which might leave the hardware in an inconsistent state.
-
-[ ... ]
-> +static int rswitch_handle_port_attr_set(struct net_device *ndev,
-> +					struct notifier_block *nb,
-> +					struct switchdev_notifier_port_attr_info *info)
-> +{
-[ ... ]
-> +	switch (attr->id) {
-> +	case SWITCHDEV_ATTR_ID_PORT_STP_STATE:
-> +		err = rswitch_port_update_stp_state(ndev, attr->u.stp_state);
-> +
-> +		break;
-[ ... ]
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	if (err < 0)
-> +		return err;
-> +
-> +	info->handled = true;
-> +
-> +	return NOTIFY_DONE;
-> +}
-
-[Severity: High]
-Could this block switchdev configurations for other network devices on the
-system? 
-
-The switchdev notifiers are broadcast globally, and without a check
-verifying the target ndev belongs to this driver, the default case here
-returns -EOPNOTSUPP for unrelated devices. When passed to
-notifier_from_errno(), this stops the global notifier chain.
-
-[ ... ]
-> +static int rswitch_gwca_set_vlan_tag(struct rswitch_private *priv,
-> +				     struct switchdev_obj_port_vlan *p_vlan,
-> +				     bool delete)
-> +{
-> +	u32 vem_val;
-> +	int err;
-> +
-> +	err = rswitch_gwca_change_mode(priv, GWMC_OPC_CONFIG);
-
-[Severity: High]
-This isn't a bug introduced by this patch, but there appears to be a self-
-deadlock in rswitch_gwca_change_mode() when trying to enable the agent
-clock:
-
-drivers/net/ethernet/renesas/rswitch_main.c:rswitch_gwca_change_mode() {
-        if (!rswitch_agent_clock_is_enabled(priv->addr, priv->gwca.index)) {
-                spin_lock(&priv->agent_lock);
-                rswitch_agent_clock_ctrl(priv->addr, priv->gwca.index, 1);
-                spin_lock(&priv->agent_lock);
-        }
-...
-}
-
-Will the second spin_lock() cause a deadlock on the same CPU?
-
-> +	if (err < 0)
-> +		return err;
-
-[ ... ]
-> +static int rswitch_port_obj_do_add_gwca(struct net_device *ndev,
-> +					struct rswitch_private *priv,
-> +					struct switchdev_obj_port_vlan *p_vlan)
-> +{
-> +	int err;
-> +
-> +	if (!(p_vlan->flags & BRIDGE_VLAN_INFO_BRENTRY))
-> +		return NOTIFY_DONE;
-> +
-> +	/* Set Rswitch VLAN mode */
-> +	iowrite32(br_vlan_enabled(ndev) ? FIELD_PREP(FWGC_SVM, C_TAG) : 0, priv->addr + FWGC);
-
-[Severity: High]
-Is it safe to pass ndev directly to br_vlan_enabled() here? 
-
-Because the notifier runs globally and routes non-rdev devices into this
-function, ndev might be an unrelated physical port rather than a bridge
-master. This seems like it could lead to out-of-bounds memory reads when
-the function dereferences the foreign driver's private data.
-
-[ ... ]
-> +static int rswitch_port_obj_do_del(struct net_device *ndev,
-> +				   struct switchdev_obj_port_vlan *p_vlan)
-> +{
-> +	struct rswitch_device *rdev = netdev_priv(ndev);
-> +	struct rswitch_private *priv = rdev->priv;
-> +	struct rswitch_etha *etha = rdev->etha;
-> +	int err;
-> +
-> +	err = rswitch_port_set_vlan_tag(etha, p_vlan, true);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	rswitch_modify(priv->addr, FWPC0(etha->index), FWPC0_VLANSA | FWPC0_VLANRU, 0);
-> +	rswitch_modify(priv->addr, FWPC2(AGENT_INDEX_GWCA), 0,
-> +		       FIELD_PREP(FWPC2_LTWFW, BIT(etha->index)));
-> +	rswitch_modify(priv->addr, FWPC2(rdev->port),
-> +		       0, FIELD_PREP(FWPC2_LTWFW, GENMASK(RSWITCH_NUM_AGENTS - 1, 0)));
-
-[Severity: High]
-Does this unconditionally break connectivity for all remaining active VLANs
-on this port? 
-
-When handling a VLAN deletion event, clearing these forwarding masks happens
-regardless of whether the port is still a member of other VLANs.
-
-> +
-> +	return rswitch_erase_vlan_table(priv, p_vlan->vid, etha->index);
-> +}
-
-[ ... ]
->  static int rswitch_switchdev_blocking_event(struct notifier_block *nb,
-> -					    unsigned long event, void *ptr)
-> +					    unsigned long event,
-> +					    void *ptr)
->  {
->  	struct net_device *ndev = switchdev_notifier_info_to_dev(ptr);
-> -	int ret;
->  
->  	switch (event) {
->  	case SWITCHDEV_PORT_OBJ_ADD:
-> -		return -EOPNOTSUPP;
-> +		err = rswitch_handle_port_obj_add(ndev, nb, ptr);
-> +
-> +		return notifier_from_errno(err);
->  	case SWITCHDEV_PORT_OBJ_DEL:
-> -		return -EOPNOTSUPP;
-> +		err = rswitch_handle_port_obj_del(ndev, nb, ptr);
-> +
-> +		return notifier_from_errno(err);
->  	case SWITCHDEV_PORT_ATTR_SET:
-> -		ret = switchdev_handle_port_attr_set(ndev, ptr,
-> -						     is_rdev,
-> -						     rswitch_port_attr_set);
-> -		break;
-> -	default:
-> -		if (is_rdev(ndev))
-> -			return -EOPNOTSUPP;
-> -		return NOTIFY_DONE;
-> +		err = rswitch_handle_port_attr_set(ndev, nb, ptr);
-> +
-> +		return notifier_from_errno(err);
->  	}
-
-[Severity: High]
-Could removing the is_rdev check from the attribute and object handler
-paths cause the driver to wrongly modify its own MMIO registers based on
-events meant for other hardware? 
-
-Since switchdev_handle_port_attr_set previously guarded against unrelated
-devices, removing it exposes the handlers to global broadcast events.
+debugfs file which clears state seems quite odd.
+Does any user need this?
+This looks like a crutch for badly written tests TBH.
 
