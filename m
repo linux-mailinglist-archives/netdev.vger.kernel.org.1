@@ -1,213 +1,322 @@
-Return-Path: <netdev+bounces-291255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291256-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kFcwKcsGFGpSIwcAu9opvQ
-	(envelope-from <netdev+bounces-291255-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:22:35 +0200
+	id mGkoOmMIFGrVJAcAu9opvQ
+	(envelope-from <netdev+bounces-291256-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:29:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 511DD5C7AA0
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:22:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFF95C7C44
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 10:29:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D1391301E7C8
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 08:21:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BD0493045EDF
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 08:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F473E1704;
-	Mon, 25 May 2026 08:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F843D413C;
+	Mon, 25 May 2026 08:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbdoETWZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SnqLbpZQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1124D3E16A5
-	for <netdev@vger.kernel.org>; Mon, 25 May 2026 08:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DEB3E16B0
+	for <netdev@vger.kernel.org>; Mon, 25 May 2026 08:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779697275; cv=none; b=ZBCbb+rYZEj+QH+LTVt/U7fyk8imMmg48AEpcpwG8kP4VylyAc8UbZcCZQRVFl+njCHae2aul47uirf8WqTAM8zYTcZizIvtsTDw/KgojEB/joqb6u8YQhBPMr3N0RwQLKeWdLWggC9tYkqkQNOu9m1dQ2spo3xsEBWhsK0+X+E=
+	t=1779697520; cv=none; b=qlJze7s53Pg+v0OpY4Y1LsvBQ/B7evwsxum/s9psK+yKKFu3G1p2hSHEU+KaFZE2o7FImBmsS6I96pG3elMTLbdY7ICP/TvviyxludPQQNoLX9Pccm6JZ/T7kQcvZFX5XJm8A0Rp4r9X74UjEFy1oNIeHNun0g07AqDLzYy4T38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779697275; c=relaxed/simple;
-	bh=cnpeNyrRTMfn71Iw1My7ZiOgcb+W5DMHV+tEtk3Jprw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j9p0z2NcpVZ0UwqvKl8Z2xTH6Jz7OM3P987aGXBsTqfFGeDLI4n8NI+rubpKTBBUw28E7rYpTuLrKuiSkJfZ7+NrkDoe9WlSLbDVw8hCyR2jMr/GV0zllTBNDJ7vUrsdLRrAPVe77ZBuPFk8ogpLockEcop/5R/nEjRxNKGpanM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbdoETWZ; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2b941cd869cso59749635ad.1
-        for <netdev@vger.kernel.org>; Mon, 25 May 2026 01:21:12 -0700 (PDT)
+	s=arc-20240116; t=1779697520; c=relaxed/simple;
+	bh=tXR5adZ+hiNuzu19P523m38I5BN212Afmab4/7CyniE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Iew4QXRHXPobO6UOech1TmBtptmxaBdYzIKdAOq4IJE1QlqQUS2smCscFp+0+NCElJlohysVuyk0z5TpL5zX9CHiWoChQ9xzy756LIkKdPC85xFxRq3KIuXp0Ze8Y910IgiRMyTRc5afMh8NuiPXUaGcUP4Ntce9gyiFaH24+o4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SnqLbpZQ; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-914a8522bd2so828664185a.1
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 01:25:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779697272; x=1780302072; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=h73HPPR4b8cE2zhlXM66PdYigBOxMozGSruLRQEyEiQ=;
-        b=MbdoETWZnVu54cAdDYI+IcH7dP3KiMFUYIRxUXnG2Ab/xV7Ss0URUFR6Odm+pBRpqf
-         PekTC9McdvzdVJcyapSELOrilu+qAdhIZMQkgfX3bzBJJlSpBT6lOJBe5RnBY06WK+t2
-         XcXOt6hEq2rJaZMJP1daWYE41gC3xYCUUWXRW9vF3PdL7iu5fQyrjtJypt/BqxaRC2nl
-         ltjyta0KdmPnzj7zUjF65Er4+TvQHtZi3QA19E1SbY1lC9pjbtnhxyP5GQQTFBDbLZcw
-         D0wII5njH1rwFNM3iByK1cDPDckSOx6/yR5JW5IADz2NYgTq+koaLTdKR4mlCbSeRsuj
-         1bJw==
+        d=google.com; s=20251104; t=1779697517; x=1780302317; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+TBR5KfJd1HD1SwhtfgdP1LdbhTmYV08rwQMllL6LI4=;
+        b=SnqLbpZQ8ZG7hwGBiRqOb+kVYOXRhek8oHvlN4i7kBJOeL55RSbh7E3FRWVOofg91G
+         n06s1A/FgEjFfov8tAjqbo/ZXWVxyjvCOjNjtApQzf0ZmT8oDC2Ly9fJqirmV2N7oIVW
+         0PQ899EpxlzZHTQIeMMpLOGXv60YANDSVkALpyscF4DTtBACFYL7Ekum4CPWFCkAyITI
+         eolRdqnG/Uo/eQ+fwXfP5RV4+pyFRbWWXqJfEp3FY7l5J8gzVA7UR37Q1DJvEBojowEC
+         ba8rDgLqj4+SHdOLwDKeNaSXhfpn3P2R72Q5mUUlfQk5Zsp+qg7Kcg5E6MqVybnmV5G1
+         lb1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779697272; x=1780302072;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h73HPPR4b8cE2zhlXM66PdYigBOxMozGSruLRQEyEiQ=;
-        b=FFGi6bVwQOURpYVFSFHn4GFvxVKysPT6QMExZXScYqIK36VchH9QCOqqL1KZYDfz7E
-         ich9/OLXRPpurQbmrvBU8KX1/5w0lEZP3ak218mI/8K+jun/thL0WG3HklACW6Azt8HY
-         VNlpossUeP9hfd1r4P8K7czz7zzi/AL7KFoGM9F1fwgClvzQxf7GB3EgN32fL/hPJ6RB
-         6mnCN0aW5+cVReiuXvsa7y9ofejoTAr/uk9Xj1pwL9Ew4RGn+0yhrU4b2asz7I12I0Ou
-         39v4Zd5lozBT13Mzj1LTJ4CkzWdQ1oSad7mW3BuYS/7gtGgQbu6bkyHaP9GSTg4lCFM0
-         ujLw==
-X-Forwarded-Encrypted: i=1; AFNElJ9vr5ezx+8sYFuCm91dsVm7SpkO/Z9lxO2RBhMq9ygA7cL/xPu+J/UuL7GANIR8wxrmEj6h7co=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCCo644rdatxGhn8AnkIVqOdkA0YliPWd7DnVuhvH9u2tHK5/n
-	27ohjrO8mXpCPumEIhEWab53hkgyrlos7lQkE+xd7vXOuLRYuUU6OT9v
-X-Gm-Gg: Acq92OG4AVZTE3rqtuqZwDYvUVwTGfWR5a4p8Zzv1WqYsSfCDm9SNAN93fVbaWTGAUy
-	9er+SNuqO8tDVmoEvOZC4zEk1bvl2ICspXmR1bJDlIkWjm+YtFvHZfC1uTcFWMqsasHb84rPJKq
-	sEHkTtuYz71839eG01gwnbWISbBBliRI1w2hVfFq6jSWeuHLn9SS4bspsTYZYc5QHztDpgOeRrk
-	yreQbzlrqvSk1qDiMQGAmnhzGOO2jsT8fNIqQH6JdEG5HUZ1YaKGmzVCjPu3g/ok6cZu4Wn8WBq
-	1ZgB9DW+nrzpXC0FTSgIHZ2nLLHW3if9yrOCXhG+Mtoy8RNapMGbJlVkUqtoMSv8EjonLD9d1Cg
-	7kjabC9IQq4LUItqXe0yfsOP3ETZ3GQS51uK+lgNUJi3PsVQbKeeVEYx0BpCZDvS9XdTRXXIGfL
-	6VqfDKWFt5egwrdVdLen9zf6gLBiL3n6NNWPtCNgQm9dtBtds6IxzYzpXbf6LvBV7NkA==
-X-Received: by 2002:a17:902:e74b:b0:2bc:7d09:dcef with SMTP id d9443c01a7336-2beb06bc155mr153249445ad.29.1779697272248;
-        Mon, 25 May 2026 01:21:12 -0700 (PDT)
-Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb58b3bb6sm88798165ad.47.2026.05.25.01.21.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2026 01:21:11 -0700 (PDT)
-From: a0282524688@gmail.com
-To: tmyu0@nuvoton.com,
-	linusw@kernel.org,
-	brgl@kernel.org,
-	linux@roeck-us.net,
-	andi.shyti@kernel.org,
-	lee@kernel.org,
-	mkl@pengutronix.de,
-	mailhol@kernel.org,
-	alexandre.belloni@bootlin.com,
-	wim@linux-watchdog.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	Ming Yu <a0282524688@gmail.com>
-Subject: [PATCH v5 0/7] mfd: nct6694: Refactor transport layer and add HIF (eSPI) support
-Date: Mon, 25 May 2026 16:20:49 +0800
-Message-Id: <20260525082049.2906283-1-a0282524688@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20251104; t=1779697517; x=1780302317;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+TBR5KfJd1HD1SwhtfgdP1LdbhTmYV08rwQMllL6LI4=;
+        b=lnMpJxkPZdDCMZPZDT9ErOT4TYdvGmd9NzpgYaJv5NVB0KPaGKgvZ61Y01jMqt7bXw
+         2ZlQl3iziOtNv0vUkpjMorJu53MU5mmX9lsB1v5wHsiS0nBl7CBnwO91P3B5pKicbeKw
+         wup2vctB06F/H4gviIJM1doBePrgRsBT8jqC57ITvuNxKlxor5BdAIZom+ZOSOG3KUy8
+         AJqaC0Za4fyDZqMbmiw3TaU2AGHSfVyroaaEEozRPL2Nn+w2y9kjWpnGd9SaMPBCF10B
+         NjM/kzemWEXvtFFvW7c/s8dMqCR/p21f+qVQwnfNefbpGOz9xNICvzNDcxBHHjp/Zdtn
+         HMCQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8Alo1kLpQ0gqL5Hh2+rgWDDRZXqwR7hEURMQpIfziw6ObLPHfFh/w//7gaczLjaE++v9RoL9g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOrODNidKO9iaPZjLofcnr4mlqmMjaCgTzeuzFwSvh1AEZvjoN
+	0TS9IAQv7fYRpaJ8O0sKloPLp1HNxL/3SU6h3TjQt3ibrsHiuhsVhYzy7elOTNFy3G7Gk78au/u
+	dWJMnsq0+HHTKMQ==
+X-Received: from qtiz3.prod.google.com ([2002:ac8:1003:0:b0:50b:4963:99fa])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:418b:b0:50e:635b:5562 with SMTP id d75a77b69052e-516d587d00fmr145303881cf.22.1779697517167;
+ Mon, 25 May 2026 01:25:17 -0700 (PDT)
+Date: Mon, 25 May 2026 08:25:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
+Message-ID: <20260525082510.1554447-1-edumazet@google.com>
+Subject: [PATCH net-next] ipv6: ifrags: cleanup __IP6_INC_STATS() confusion
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-291255-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291256-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[a0282524688@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.985];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 511DD5C7AA0
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 5CFF95C7C44
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Ming Yu <a0282524688@gmail.com>
+After commits e1ae5c2ea478 ("vrf: Increment Icmp6InMsgs on the original
+netdev") and bdb7cc643fc9 ("ipv6: Count interface receive statistics
+on the ingress netdev") net/ipv6/reassembly.c uses three different
+ways to reach idev in various __IP6_INC_STATS() calls.
 
-The Nuvoton NCT6694 is a peripheral expander that provides GPIO, I2C,
-CAN-FD, Watchdog, HWMON, PWM, and RTC sub-devices. Currently, the
-driver only supports USB as the host transport interface.
+- ip6_dst_idev(skb_dst(skb))
+- __in6_dev_get_safely(skb->dev)
+- __in6_dev_stats_get(skb->dev)
 
-This series refactors the NCT6694 MFD core to support multiple transport
-backends and adds a new Host Interface (HIF) transport driver that
-communicates over eSPI using Super-I/O shared memory.
+Lets centralize this from ipv6_frag_rcv() and use __in6_dev_stats_get().
 
-Changes since version 4:
-- Split the monolithic refactoring and HIF support patch into a series of
-  smaller, logical commits to improve reviewability and adhere to the
-  single logical change principle.
-- Decoupled USB-specific data into a dedicated 'nct6694_usb_data' 
-  structure.
-- Abstracted device I/O operations by introducing 'read_msg' and 
-  'write_msg' function pointers in the core structure.
-- Renamed the existing driver to 'nct6694-usb.c' to strictly identify its
-  transport boundary, alongside Kconfig/Makefile updates.
-- Extracted transport-agnostic device management (IRQ domain setup, IDA
-  initialization, and MFD cell registration) into a standalone
-  'nct6694-core.c' module.
-- Added the 'nct6694-hif' eSPI transport driver clean on top of the new
-  core abstraction.
+Note that ipv6_frag_rcv() tests if skb->dev could be NULL already, so
+I chose to also guard against NULL, but we probably can remove the
+tests in a followup patch, because I do not think skb->dev could be NULL.
 
-Changes since version 3:
-- Remove redundant module type macro definitions from sub-device drivers
-  that are now provided by the shared header <linux/mfd/nct6694.h>,
-  fixing -Wmacro-redefined warnings.
+iif = skb->dev ? skb->dev->ifindex : 0;
 
-Changes since version 2:
-- Restore per-device IDA and mfd_add_hotplug_devices()/PLATFORM_DEVID_AUTO
-  to avoid child device ID conflicts with multiple NCT6694 chips.
-- Validate irq_find_mapping() return value before dispatching IRQs.
-- Check superio_enter() return value in nct6694_irq_init().
+idev can be NULL, __IP6_INC_STATS() deals with this possibility.
 
-Changes since version 1:
-- Reworked the Super-I/O access helpers.
+Small code size reduction as a bonus.
 
-Ming Yu (7):
-  mfd: nct6694: Move module type macros to shared header
-  mfd: nct6694: Refactor USB-specific data into nct6694_usb_data
-  mfd: nct6694: Introduce transport abstraction with function pointers
-  mfd: nct6694: Rename static I/O functions with _usb_ prefix
-  mfd: nct6694: Rename driver to nct6694-usb and update Kconfig
-  mfd: nct6694: Extract core device management into a separate module
-  mfd: nct6694: Add Host Interface (HIF) eSPI transport driver
+$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 0/0 grow/shrink: 0/2 up/down: 0/-116 (-116)
+Function                                     old     new   delta
+ipv6_frag_rcv                               2492    2474     -18
+ip6_frag_reasm                               807     709     -98
+Total: Before=24655281, After=24655165, chg -0.00%
 
- MAINTAINERS                              |   2 +-
- drivers/gpio/gpio-nct6694.c              |   7 -
- drivers/hwmon/nct6694-hwmon.c            |  21 -
- drivers/i2c/busses/i2c-nct6694.c         |   7 -
- drivers/mfd/Kconfig                      |  38 +-
- drivers/mfd/Makefile                     |   4 +-
- drivers/mfd/nct6694-core.c               | 136 ++++++
- drivers/mfd/nct6694-hif.c                | 529 +++++++++++++++++++++++
- drivers/mfd/{nct6694.c => nct6694-usb.c} | 185 +++-----
- drivers/net/can/usb/nct6694_canfd.c      |   6 -
- drivers/rtc/rtc-nct6694.c                |   7 -
- drivers/watchdog/nct6694_wdt.c           |   7 -
- include/linux/mfd/nct6694.h              |  63 ++-
- 13 files changed, 821 insertions(+), 191 deletions(-)
- create mode 100644 drivers/mfd/nct6694-core.c
- create mode 100644 drivers/mfd/nct6694-hif.c
- rename drivers/mfd/{nct6694.c => nct6694-usb.c} (62%)
+Fixes: e1ae5c2ea478 ("vrf: Increment Icmp6InMsgs on the original netdev")
+Fixes: bdb7cc643fc9 ("ipv6: Count interface receive statistics on the ingress netdev")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv6/reassembly.c | 46 ++++++++++++++++++++-----------------------
+ 1 file changed, 21 insertions(+), 25 deletions(-)
 
+diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
+index 11f9144bebbe2cf0152992c526fb6728f83f462d..05c51f669754a1a10e944bb7c4433565bcaacb40 100644
+--- a/net/ipv6/reassembly.c
++++ b/net/ipv6/reassembly.c
+@@ -69,7 +69,7 @@ static struct inet_frags ip6_frags;
+ 
+ static int ip6_frag_reasm(struct frag_queue *fq, struct sk_buff *skb,
+ 			  struct sk_buff *prev_tail, struct net_device *dev,
+-			  int *refs);
++			  struct inet6_dev *idev, int *refs);
+ 
+ static void ip6_frag_expire(struct timer_list *t)
+ {
+@@ -107,7 +107,8 @@ fq_find(struct net *net, __be32 id, const struct ipv6hdr *hdr, int iif)
+ static int ip6_frag_queue(struct net *net,
+ 			  struct frag_queue *fq, struct sk_buff *skb,
+ 			  struct frag_hdr *fhdr, int nhoff,
+-			  u32 *prob_offset, int *refs)
++			  u32 *prob_offset, int *refs,
++			  struct inet6_dev *idev)
+ {
+ 	int offset, end, fragsize;
+ 	struct sk_buff *prev_tail;
+@@ -133,8 +134,7 @@ static int ip6_frag_queue(struct net *net,
+ 		 * we do not free it here.
+ 		 */
+ 		inet_frag_kill(&fq->q, refs);
+-		__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
+-				IPSTATS_MIB_REASMFAILS);
++		__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASMFAILS);
+ 		return -1;
+ 	}
+ 
+@@ -167,8 +167,7 @@ static int ip6_frag_queue(struct net *net,
+ 			 */
+ 			*prob_offset = offsetof(struct ipv6hdr, payload_len);
+ 			inet_frag_kill(&fq->q, refs);
+-			__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
+-					IPSTATS_MIB_REASMFAILS);
++			__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASMFAILS);
+ 			return -1;
+ 		}
+ 		if (end > fq->q.len) {
+@@ -227,7 +226,7 @@ static int ip6_frag_queue(struct net *net,
+ 		unsigned long orefdst = skb->_skb_refdst;
+ 
+ 		skb->_skb_refdst = 0UL;
+-		err = ip6_frag_reasm(fq, skb, prev_tail, dev, refs);
++		err = ip6_frag_reasm(fq, skb, prev_tail, dev, idev, refs);
+ 		skb->_skb_refdst = orefdst;
+ 		return err;
+ 	}
+@@ -242,12 +241,10 @@ static int ip6_frag_queue(struct net *net,
+ 		goto err;
+ 	}
+ 	err = -EINVAL;
+-	__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
+-			IPSTATS_MIB_REASM_OVERLAPS);
++	__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASM_OVERLAPS);
+ discard_fq:
+ 	inet_frag_kill(&fq->q, refs);
+-	__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
+-			IPSTATS_MIB_REASMFAILS);
++	__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASMFAILS);
+ err:
+ 	kfree_skb_reason(skb, reason);
+ 	return err;
+@@ -262,7 +259,7 @@ static int ip6_frag_queue(struct net *net,
+  */
+ static int ip6_frag_reasm(struct frag_queue *fq, struct sk_buff *skb,
+ 			  struct sk_buff *prev_tail, struct net_device *dev,
+-			  int *refs)
++			  struct inet6_dev *idev, int *refs)
+ {
+ 	struct net *net = fq->q.fqdir->net;
+ 	unsigned int nhoff;
+@@ -311,7 +308,7 @@ static int ip6_frag_reasm(struct frag_queue *fq, struct sk_buff *skb,
+ 	skb_postpush_rcsum(skb, skb_network_header(skb),
+ 			   skb_network_header_len(skb));
+ 
+-	__IP6_INC_STATS(net, __in6_dev_stats_get(dev, skb), IPSTATS_MIB_REASMOKS);
++	__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASMOKS);
+ 	fq->q.rb_fragments = RB_ROOT;
+ 	fq->q.fragments_tail = NULL;
+ 	fq->q.last_run_head = NULL;
+@@ -323,7 +320,7 @@ static int ip6_frag_reasm(struct frag_queue *fq, struct sk_buff *skb,
+ out_oom:
+ 	net_dbg_ratelimited("ip6_frag_reasm: no memory for reassembly\n");
+ out_fail:
+-	__IP6_INC_STATS(net, __in6_dev_stats_get(dev, skb), IPSTATS_MIB_REASMFAILS);
++	__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASMFAILS);
+ 	inet_frag_kill(&fq->q, refs);
+ 	return -1;
+ }
+@@ -332,15 +329,18 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
+ {
+ 	const struct ipv6hdr *hdr = ipv6_hdr(skb);
+ 	struct net *net = skb_dst_dev_net(skb);
++	struct inet6_dev *idev;
+ 	struct frag_hdr *fhdr;
+ 	struct frag_queue *fq;
+ 	u8 nexthdr;
+ 	int iif;
+ 
++	idev = skb->dev ? __in6_dev_stats_get(skb->dev, skb) : NULL;
++
+ 	if (IP6CB(skb)->flags & IP6SKB_FRAGMENTED)
+ 		goto fail_hdr;
+ 
+-	__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_REASMREQDS);
++	__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASMREQDS);
+ 
+ 	/* Jumbo payload inhibits frag. header */
+ 	if (hdr->payload_len == 0)
+@@ -356,8 +356,7 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
+ 	if (!(fhdr->frag_off & htons(IP6_OFFSET | IP6_MF))) {
+ 		/* It is not a fragmented frame */
+ 		skb->transport_header += sizeof(struct frag_hdr);
+-		__IP6_INC_STATS(net,
+-				ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_REASMOKS);
++		__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASMOKS);
+ 
+ 		IP6CB(skb)->nhoff = (u8 *)fhdr - skb_network_header(skb);
+ 		IP6CB(skb)->flags |= IP6SKB_FRAGMENTED;
+@@ -374,8 +373,7 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
+ 	 */
+ 	nexthdr = hdr->nexthdr;
+ 	if (ipv6frag_thdr_truncated(skb, skb_network_offset(skb) + sizeof(struct ipv6hdr), &nexthdr)) {
+-		__IP6_INC_STATS(net, __in6_dev_get_safely(skb->dev),
+-				IPSTATS_MIB_INHDRERRORS);
++		__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+ 		icmpv6_param_prob(skb, ICMPV6_HDR_INCOMP, 0);
+ 		return -1;
+ 	}
+@@ -391,14 +389,13 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
+ 
+ 		fq->iif = iif;
+ 		ret = ip6_frag_queue(net, fq, skb, fhdr, IP6CB(skb)->nhoff,
+-				     &prob_offset, &refs);
++				     &prob_offset, &refs, idev);
+ 
+ 		spin_unlock(&fq->q.lock);
+ 		rcu_read_unlock();
+ 		inet_frag_putn(&fq->q, refs);
+ 		if (prob_offset) {
+-			__IP6_INC_STATS(net, __in6_dev_get_safely(skb->dev),
+-					IPSTATS_MIB_INHDRERRORS);
++			__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+ 			/* icmpv6_param_prob() calls kfree_skb(skb) */
+ 			icmpv6_param_prob(skb, ICMPV6_HDR_FIELD, prob_offset);
+ 		}
+@@ -406,13 +403,12 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
+ 	}
+ 	rcu_read_unlock();
+ 
+-	__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_REASMFAILS);
++	__IP6_INC_STATS(net, idev, IPSTATS_MIB_REASMFAILS);
+ 	kfree_skb(skb);
+ 	return -1;
+ 
+ fail_hdr:
+-	__IP6_INC_STATS(net, __in6_dev_get_safely(skb->dev),
+-			IPSTATS_MIB_INHDRERRORS);
++	__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+ 	icmpv6_param_prob(skb, ICMPV6_HDR_FIELD, skb_network_header_len(skb));
+ 	return -1;
+ }
 -- 
-2.34.1
+2.54.0.746.g67dd491aae-goog
 
 
