@@ -1,122 +1,120 @@
-Return-Path: <netdev+bounces-291359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291360-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKMAIZJsFGoTNQcAu9opvQ
-	(envelope-from <netdev+bounces-291359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:36:50 +0200
+	id OPeYD/FrFGoTNQcAu9opvQ
+	(envelope-from <netdev+bounces-291360-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:34:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 565A85CC5E2
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:36:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 408EF5CC552
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 17:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 82F81304C073
-	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:33:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3725A3003832
+	for <lists+netdev@lfdr.de>; Mon, 25 May 2026 15:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4345B3E51D3;
-	Mon, 25 May 2026 15:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2CC29BD8C;
+	Mon, 25 May 2026 15:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azwrMXHG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0Zde2rW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773D62F1FD7;
-	Mon, 25 May 2026 15:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB2021CA03;
+	Mon, 25 May 2026 15:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779723207; cv=none; b=HJyN0mnU2IeL+tlaDmJJpR3wE5OQbTa7lF/T67Xzg9jYaD4JbD0pVz8U20ULEvv4fe3sLTLP/1V36yxbyTRy732oJNicYOYPFhBJnXlAJaVYOcWE+AXzVAPo7qkfdVu3ocjBrSEkStXW5kvNVbWb/lS5KD9K21Rwieo8p2129+w=
+	t=1779723244; cv=none; b=u1sp6qJRrzX5Ni+CPvEP86cY2N/eqLCEsu2EED9uGDXb/bfCrseHNykLKhtc/UT7W2g5ksYYbH4HgaVrXn1GPQf4hrihrnJFytiDXBFiTtma8Dy3Ioj0W1jDIsxDU4sUJxSlBL7Do81NjE38P6O/v/OyomsX3SjuSv2woFV3FgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779723207; c=relaxed/simple;
-	bh=mQTx8+JBjwtGWNdI6X6iCqFOHJjgIcQCDH+F3K8GLIs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=svZ+Zp9KMnjbHcOPc/fNmZKREgTlR5s3fFI/rBRP+zJOwmNyLnEozOPHJLh4Y8kCGpcjLls2tOejZ/SNpr7kwNioNIQdDwKnud37HMIoulvMekAAyjbKqFZY06GojbclxwtV9Y5fH7MeAxiB+kPVX1Hdm8klzn8wxwRnZ3o9tdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=azwrMXHG; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D07831F00A3A;
-	Mon, 25 May 2026 15:33:19 +0000 (UTC)
+	s=arc-20240116; t=1779723244; c=relaxed/simple;
+	bh=x8uJeJQCOHo2oeYel8I5Mw+AW5j9oNrB2LOkztpnBjM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ef01V23YjUq4L0iZr3WubRQkrGDDvLBstjiFAT3hJ6TicQgh0kawm8x3Ahgo2+Ashsq209/PqCYS+VhEjGBQs9m6l4REtRNdD983UFuJtwx2a5FrtMuv/jGoksl5f9i8f809Gttx2TbOi2hsiQuWbz7ABNY+S9RQhRIxCyfhKu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0Zde2rW; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 437511F000E9;
+	Mon, 25 May 2026 15:34:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779723201;
-	bh=CISIR7dvUTWnzBwx6HUS+J6/gYB4qxLC3p5u6kWh6Js=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=azwrMXHGWHvfkZE8WdMWs1J45ib4tQrjaE7kdf217mEPtxAr26opsAHQ2ONWHYcX9
-	 aX8YMmlWgWWTx2Eoq1c78JvAUf2g0wh5uZcrU+gcx7VZ9+DlQ+fU9MAXh7Lsq4nXmV
-	 xBuCu81SDF3Q9NtrsEfLRNFgqCutmrIQlIFGTO/vmlMBkMD7WLSa82/MgebTjQU6yD
-	 jMTUhqV10K2LL0ZqCDK1XIbBb7cJCWZN1SmaUTySQKZ7aBsx71A/yuJ9WSlB1d/Wq7
-	 Q1OpRO3J/MZhZGp87PBdOYyMFjPyvPbE/6MxNq8G9l8H2gHdKdEYlIOE+sMV1B03DF
-	 d00ej9iM3TTFA==
-From: Sasha Levin <sashal@kernel.org>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	kartikey406@gmail.com
-Cc: Sasha Levin <sashal@kernel.org>,
-	patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	johannes.berg@intel.com,
-	Li hongliang <1468888505@139.com>
-Subject: Re: [PATCH 5.15.y] wifi: mac80211: check tdls flag in ieee80211_tdls_oper
-Date: Mon, 25 May 2026 11:33:07 -0400
-Message-ID: <20260525152512.agent5-0004@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260525060336.2460138-1-1468888505@139.com>
-References: <20260525060336.2460138-1-1468888505@139.com>
+	s=k20260515; t=1779723242;
+	bh=WlsZXpJt4K24hjMSYoSjU2iL3sBxP5CwjJ+Nd/gbYhs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=d0Zde2rWYN46IQyAFXPz8SyIprd2PLTUcbft1e+INH+96h7u4DT+umwzDDKxvd8tv
+	 VALnTMnSN9+vwRfraCVQebgcVxHY8LhlMD0tHOWCihBVbVGjcU/jZpsT+STm+eL07H
+	 /9Y31FLGyv2sjfigTQp74xtJZT95ZyfQ/qFmRQNzRbU+wKooqKAuxGK97N0vIgVJMY
+	 Ud4Ud92JklyasfZHxwLpd0FKvlpLpvfahmmk6uqGpoAj0AnHXVSLXs3uwOxUcwiut0
+	 ehPLpm+LQVFK/G4qFQWemP/t4OR/a8cPKZen3uNdjrJCIe/6UNSW5doNniVKF7MBWq
+	 NAwkAMaJfiYKw==
+Date: Mon, 25 May 2026 08:34:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Yevgeny Kliteynik <kliteyn@nvidia.com>, Prathamesh Deshpande
+ <prathameshdeshpande7@gmail.com>, Simon Horman <horms@kernel.org>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Moshe
+ Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v1] net/mlx5: HWS: Reject unsupported remove-header
+ action
+Message-ID: <20260525083401.38a7c15d@kernel.org>
+In-Reply-To: <433cd37c-bdf8-4739-a85d-7f47e36a9d0d@nvidia.com>
+References: <20260506000054.51797-1-prathameshdeshpande7@gmail.com>
+	<20260509132508.GR15617@horms.kernel.org>
+	<744adbc1-ba3d-47c6-9129-439a59636f14@nvidia.com>
+	<433cd37c-bdf8-4739-a85d-7f47e36a9d0d@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-291359-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,lists.linux.dev,vger.kernel.org,sipsolutions.net,davemloft.net,google.com,redhat.com,intel.com,139.com];
-	FREEMAIL_TO(0.00)[linuxfoundation.org,vger.kernel.org,gmail.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-291360-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 565A85CC5E2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,nvidia.com:email]
+X-Rspamd-Queue-Id: 408EF5CC552
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 25, 2026 at 02:03:36PM +0800, Li hongliang wrote:
-> From: Deepanshu Kartikey <kartikey406@gmail.com>
->
-> [ Upstream commit 7d73872d949c488a1d7c308031d6a9d89b5e0a8b ]
->
-> When NL80211_TDLS_ENABLE_LINK is called, the code only checks if the
-> station exists but not whether it is actually a TDLS station.
+On Mon, 25 May 2026 13:34:32 +0300 Tariq Toukan wrote:
+> On 10/05/2026 11:10, Yevgeny Kliteynik wrote:
+> > On 09-May-26 16:25, Simon Horman wrote:  
+> >> On Wed, May 06, 2026 at 01:00:31AM +0100, Prathamesh Deshpande wrote:  
+> >> Reviewed-by: Simon Horman <horms@kernel.org>  
+> > 
+> > Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+> 
+> I guess this is still pending my ack after Yevgeny's review?
+> 
+> Here:
+> Acked-by: Tariq Toukan <tariqt@nvidia.com>
 
-Queued for 5.15, thanks.
-
--- 
-Thanks,
-Sasha
+Yes, for us to apply directly we need an ack from the person who sends
+us the company PR. Too many false positive otherwise. Even people
+listed in MAINTAINERS are not considered sufficient by other companies
+so we play it safe :|
 
