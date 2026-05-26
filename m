@@ -1,155 +1,173 @@
-Return-Path: <netdev+bounces-291833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291834-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFPKJ9vWFWrRcwcAu9opvQ
-	(envelope-from <netdev+bounces-291833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:22:35 +0200
+	id +NOZBzXaFWowdQcAu9opvQ
+	(envelope-from <netdev+bounces-291834-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:36:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1DF5DA91A
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:22:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71BC15DAC5F
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4BD9B30A0EA6
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:06:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B6FC310F567
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8730402BAA;
-	Tue, 26 May 2026 17:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC83409E0A;
+	Tue, 26 May 2026 17:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L74nACt4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TiWLiWZE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889FD38E5D7
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 17:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E391402B99;
+	Tue, 26 May 2026 17:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779815207; cv=none; b=r9npOOv6skXBoU1Y+u4P/Mu04abQVb230Vjv1E5+NSA3UpmzXKyoBWAP7BhCj2RFs70ahTVQ3KJ7g/nJYITgHwLhwb4W9+Tj36CERJb/dFABiseSoZ/auJk0lJ5O7Cwx3SMqWNHMn0YCa3/6VZI//ugtVNLG4LO9wFTtfKehfvc=
+	t=1779815617; cv=none; b=m/4/WuTYixawuyi82iorDuVSNcDgLesARXYaV7BikSHHwCezRcvfzIPGURW4wIzqIG+f/xdfZWIhI68h0BXmIh21/3+lFsiiNYLHLImIvt+UhMaIFNEx5WVfDznTp+0ZILinmjxYVB5qYs1ojwPKK+yf6nTmCC1tNL7w78BtxSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779815207; c=relaxed/simple;
-	bh=5uI+TZfmbe+zgoA46MydWQGF/tG9ydpeVZNef3lT8pU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dMI0Ndke4C9ZhGdkfNsroOC/BfL4DkfzccFblF4yHV2bfqWe6ACgdTIDjWBHPToJlBg29wf37u5/cCpK0Fp7cbqbT+pKMtNcWChBEOvY7ZKfif+AVaNaRjUoHCdWxSu0Wre+hWWt/O4xHUN4SfItQGI1r1GERjZUCWv8JzcVQK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L74nACt4; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2B761F000E9;
-	Tue, 26 May 2026 17:06:44 +0000 (UTC)
+	s=arc-20240116; t=1779815617; c=relaxed/simple;
+	bh=T3aDw62QgaJPdgPM5fyZHuVaFNW6CtrC1JugliHQVUs=;
+	h=Date:Message-ID:From:To:Cc:Subject; b=HFSitilLK0njWQptKVkOmgc4GCdicqfhj/RZ00L0WLrRm1hYaofrHYg2C+oLGWja5Bv6lb+lbdNbVppFuabqF91ztvcFVMkbNa3Vt5sizZ1Crrk7D4m3zoaji87OB/RVUP3S20n9PUN/bB4CFOeH4g5lmsdzC0vPsh/6qBo/1Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TiWLiWZE; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 4B2B11F000E9;
+	Tue, 26 May 2026 17:13:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779815206;
-	bh=n11Yvwqz+rqZT/ZKP/UpHkRhFhWQS/84ypYO7E9okBA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=L74nACt4vDpTQ1KQExp061+LDxI5s2krwDeWN78xNPBref7J6thsPR6qAf/5kO7kt
-	 aATz9hKovOTTaQ18g359htOPn+NvTMcKe5Zj7+Y4riJ69VD2G5Zj0I+y73i/kw4i/c
-	 I1B7rE1i/SG/cTjLHasSy0Uzvlwvq2z4UY3abPM/aXqwNXeHtr2ju1RDb8oYLuPY7k
-	 zZwRWW/x5tGsL/Zyr7yFBhWodkABOjqWKrcCAZNPHeww9UtJxMcygKVOv9u0ILCaeb
-	 9XlGnd7Nt8g5V8n8mUkISvrfIsxvK12QrFfWvhkw3c192PUHaABUUg1qxhUeOPH6DQ
-	 8iCfyYm8QmLWw==
-Date: Tue, 26 May 2026 18:06:42 +0100
-From: Simon Horman <horms@kernel.org>
-To: Przemyslaw Korba <przemyslaw.korba@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com, arkadiusz.kubalewski@intel.com
-Subject: Re: [PATCH iwl-net v3] ice: support SBQ posted writes with
- non-posted support for CGU
-Message-ID: <20260526170642.GA2256768@horms.kernel.org>
-References: <20260520105311.5336-1-przemyslaw.korba@intel.com>
+	s=k20260515; t=1779815612;
+	bh=Uy0V1zhnjEjksxlqK8ls+jYCj1jGvamk9ZvvNPf1nY4=;
+	h=Date:From:To:Cc:Subject;
+	b=TiWLiWZE0n1A9A/fwtyZiNaNpQBWAAJ/UBJvVPCBqTE2D304Iz5VwpS2AF8RpdCp5
+	 qoy7pa44RDYgc0smqnZ26PP3Ty9o2Gp5u88IMsmAlfiJfEjFZtAJpuzhNsHJI+ZREE
+	 O0Sw+gLWIj/U8wOmdjYTgqE8ReyfcJiNqtfSMUNVmIUdO3qhQuhnlVyNLNf7tYQELt
+	 BlXx+3mNneoPULh81Wg3tUrg+4XrIp1dilB9E1XbM/XKDmrjOU/A0+iUWGRhYfQghi
+	 KSzrl4SIh1MoXTcZnck4++4+fCygZn8hi0t5JX3OOO1TFwFMVPoClzHpB1KRPWzJX0
+	 FHzHJLfhQUuig==
+Date: Tue, 26 May 2026 19:13:28 +0200
+Message-ID: <20260526165826.392227559@kernel.org>
+User-Agent: quilt/0.68
+From: Thomas Gleixner <tglx@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+ Miroslav Lichvar <mlichvar@redhat.com>,
+ John Stultz <jstultz@google.com>,
+ Stephen Boyd <sboyd@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ thomas.weissschuh@linutronix.de,
+ Arthur Kiyanovski <akiyano@amazon.com>,
+ Rodolfo Giometti <giometti@enneenne.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ kvmarm@lists.linux.dev,
+ Oliver Upton <oupton@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org,
+ Takashi Iwai <tiwai@suse.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ Johannes Berg <johannes.berg@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ Peter Hilber <peter.hilber@oss.qualcomm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev,
+ linux-wireless@vger.kernel.org,
+ linux-sound@vger.kernel.org
+Subject: [patch 00/24] timekeeping/ptp: Expand snapshot functionality
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260520105311.5336-1-przemyslaw.korba@intel.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_FROM(0.00)[bounces-291834-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-291833-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,vger.kernel.org,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 0B1DF5DA91A
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 71BC15DAC5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 20, 2026 at 12:52:03PM +0200, Przemyslaw Korba wrote:
-> From: Karol Kolacinski <karol.kolacinski@intel.com>
-> 
-> Sideband queue (SBQ) is a HW queue with very short completion time. All
-> SBQ writes were posted by default, which means that the driver did not
-> have to wait for completion from the neighbor device, because there was
-> none. This introduced unnecessary delays, where only those delays were
-> "ensuring" that the command is "completed" and this was a potential race
-> condition.
-> 
-> Add the possibility to perform non-posted writes where it's necessary to
-> wait for completion, instead of relying on fake completion from the FW,
-> where only the delays are guarding the writes.
-> 
-> Flush the SBQ by reading address 0 from the PHY 0 before issuing SYNC
-> command to ensure that writes to all PHYs were completed and skip SBQ
-> message completion if it's posted.
-> 
-> E810 only supports opcode 0x01, but its FW always sends completion
-> responses for this opcode, so the driver waits for each write to complete.
-> This makes E810 writes synchronous and eliminates the need for SBQ flush.
-> 
-> To analyze if delays are gone, look for and compare time spent in
-> ice_sq_send_cmd — posted writes should return immediately after the wr32.
-> That can be done for example by adjusting phc time with phc_ctl on E830
-> device, for less than 2 seconds to use this new mechanism. Without it,
-> command below will fail.
-> 
-> Reproduction steps:
-> phc_ctl eth13 adj 1
-> phc_ctl[4478170.994]: adjusted clock by 1.000000 seconds
-> 
-> Check trace for timing for comparisions:
-> echo ice_sbq_send_cmd > /sys/kernel/debug/tracing/set_ftrace_filter
-> echo function_graph > /sys/kernel/debug/tracing/current_tracer
-> cat /sys/kernel/debug/tracing/trace
-> 
-> Tested on:
->   - Intel E830 NIC (FW version 1.00)
->   - Kernel 6.19.0+
-> 
-> Fixes: 8f5ee3c477a8 ("ice: add support for sideband messages")
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> ---
-> v3:
-> - include information in comments and commit message about different
-> E810 behavior
-> v2:
-> https://lore.kernel.org/intel-wired-lan/20260508102247.826375-1-przemyslaw.korba@intel.com/
+Sorry for the large CC list, but changing the inner workings touches
+unfortunately a lot of places in one go.
 
-Thanks for the update.
+PTP wants to grow new snapshot functionality, which provides not only the
+captured CLOCK* values, but also the underlying clocksource counter value.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+   https://lore.kernel.org/20260515164033.6403-1-akiyano@amazon.com
 
+There was quite some discussion in seemingly related threads how to capture
+these values and how to provide core infrastructure so that driver writers
+have something to work with
+
+   https://lore.kernel.org/20260514225842.110706-1-hramamurthy@google.com
+   https://lore.kernel.org/20260520135207.37826-1-dwmw2@infradead.org
+
+This series implements the timekeeping related mechanisms to:
+
+     1) Capture CLOCK values along with the clocksource counter value for
+     	non-hardware based sampling
+
+     2) Expanding the hardware cross time stamp mechanism to hand back the
+     	clocksource counter value, which was captured by the device, along
+     	with the related CLOCK values
+
+     3) Adding AUX clock support to the hardware cross timestamping core
+
+It's based on v7.1-rc2 and also available from git:
+
+    git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timekeeping-ptp-extend-v1
+
+Thanks to David for rebasing his PTP/timekeeping work on top and providing
+feedback, fixes and testing.
+
+Thanks,
+
+	tglx
+---
+ arch/arm64/kvm/hyp_trace.c                          |    8 
+ arch/arm64/kvm/hypercalls.c                         |    6 
+ drivers/net/dsa/sja1105/sja1105_main.c              |    8 
+ drivers/net/ethernet/intel/ice/ice_ptp.c            |    5 
+ drivers/net/ethernet/intel/igc/igc.h                |    1 
+ drivers/net/ethernet/intel/igc/igc_ptp.c            |    4 
+ drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c |    4 
+ drivers/net/wireless/intel/iwlwifi/mld/ptp.c        |    5 
+ drivers/net/wireless/intel/iwlwifi/mvm/ptp.c        |    7 
+ drivers/pps/generators/pps_gen-dummy.c              |    6 
+ drivers/pps/generators/pps_gen_tio.c                |    6 
+ drivers/ptp/ptp_chardev.c                           |   18 +
+ drivers/ptp/ptp_ocp.c                               |   11 -
+ drivers/ptp/ptp_vmclock.c                           |   25 --
+ drivers/virtio/virtio_rtc_ptp.c                     |    2 
+ include/linux/pps_kernel.h                          |    8 
+ include/linux/ptp_clock_kernel.h                    |   15 -
+ include/linux/timekeeping.h                         |   54 ++---
+ kernel/time/timekeeping.c                           |  211 ++++++++++++--------
+ sound/hda/common/controller.c                       |    4 
+ 20 files changed, 236 insertions(+), 172 deletions(-)
 
