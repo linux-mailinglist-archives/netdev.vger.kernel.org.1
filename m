@@ -1,156 +1,285 @@
-Return-Path: <netdev+bounces-291882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291890-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLTSFBjtFWogfAcAu9opvQ
-	(envelope-from <netdev+bounces-291882-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:57:28 +0200
+	id qN9yKJLwFWp7fQcAu9opvQ
+	(envelope-from <netdev+bounces-291890-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:12:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 051535DBA1D
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:57:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEAF25DBD43
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:12:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BE16C3036FBA
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:56:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A27230A044B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0B63C09E2;
-	Tue, 26 May 2026 18:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5793C09EE;
+	Tue, 26 May 2026 19:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CwYOinqr"
+	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="nGrIY5vx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from oak.phenome.org (oak.phenome.org [193.110.157.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3C83C063B
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 18:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204CE3C0A11;
+	Tue, 26 May 2026 19:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779821814; cv=none; b=pUvVwbyuXzXbjAx/DUhpIVhhG1iqqH7STsVZHNBxnXdNl+S6DmoURv8+HIHsvARpJ6fGhpCnNybB4GGWEHxqjRxHXspgviH5PukiWJx21XSBb6qGO1zNZQADYg0b1tykS4PhFLNx2e+0Unr2kImn96bmDTPRO2ucIvRUagIsd2g=
+	t=1779822460; cv=none; b=FoTfpXJruBCOY0IqnS3gwDrSwp+qQNsXixMj1p2mldk4YFk4PIL00xqc4hPXLBGU7NVG8IU7t3GvGJNN5LuLS1m26NGzTEsYFuMVtPgz7PsrA6dPYWsOHv/imr1Fa2X0PPAi5OCFhyOSbnyIdYcgkNArjFATWMmqwzF9WD+dtKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779821814; c=relaxed/simple;
-	bh=DFEJvy4/kZErZG7uAiAHXJzMGIBUD2dQ9EYHr4sKilg=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=G4X+HXwq31dB9xkXTIwg/0hx3IwFHuTRa17o+lep6KhWxT+HmMi9mE8MrOHG/0z4RDidEwQF3B0uQNaN9PJkkvPueS4uhvGhZ7+wW7JT/vAzAEUAYi1nAWWU5Gc0EBSz7XZh8qSdNHJlZ+SSsRdJpYBss76oTAWazF82l8McJFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CwYOinqr; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7c2fa14795aso86463867b3.1
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 11:56:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779821812; x=1780426612; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X06M8fe6ArW+TP7qkYaP7LiibL4twhyfnPdPwC6BYEg=;
-        b=CwYOinqrKEDVy+gSpe8fOy9mFf2+BEyLfGn6EM+DyLweZTSdS60/+4+UmzKEAPlBj0
-         gSk9t4MUfQewzAC6IvidIPH8npVgY2RQ2SuLk4ufbNp5p2THbRbw3n6uJBmdmfhBnWl8
-         kYoQfYWZ+MRIw1B1+UyyiWLpZAjBZNnpec98l+UV2evOj3FH+gqovnUUmgxus5t1M/cJ
-         yg9pf+8kbuf4XesQyy0jww745hu2kIwqF3b5kxyx+rwrUTd4U+wpP0dCGkT6sjFMLav2
-         tZwrG1ovDxgKx6Px84kb2E6j8tS0kFZl+dnygtNIldqf7ld/s75eL+ftP2CQrvZVR7oh
-         gvLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779821812; x=1780426612;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X06M8fe6ArW+TP7qkYaP7LiibL4twhyfnPdPwC6BYEg=;
-        b=napzBD03xX82D+PV368MYnF8u0zeuPMgZkaT5Tx6R1VGVFZwpQ9D1F8uZkKjqce5PI
-         4TqPPkGBJXT16EYvDPeh93G04N0PLmSu1slsxB6rgysM0pEzR9oWIrQX7MZc90U68Ku0
-         V74fBmKuhmIh3XDmxdsk/bhCi+ZZ7g6Hvm7wJeDVRzPmJ8BO/AIVibHbveWY5F8ppefO
-         WsUUXQNJOw4RChBu6IEg8pp7rW5WN9WOK7yhveKFhK0rnYetAjS9tLyXivb3nin//I6I
-         qClLoktGrIpZM1F/o4rLWVPPVAcuyUogZDLNFSxHyQaG6rXSEo4z7FHsz2/+2RB1gojK
-         hKRw==
-X-Gm-Message-State: AOJu0YyBepnkO+AxcGgRDOyOUrgLvEimkzU5b8QW04sJTEneRqx7MlkL
-	2uUTtjckniX2vAPDLNh/GouDk96eNruwDaJwRIMxdwM6TsmJiVojE3rz
-X-Gm-Gg: Acq92OHek4HqmOoL99koJW36G55BaeRWrhTgdF9YqG3KEljs6Ifya0LVsXgO74wmdfS
-	hPffF8TVsWQv1e2ua04KteP98khDqcos/Bh50lkjk9XkMQK8EHileXPaMNnginut5flWOsv3s1e
-	SfNODhPxj62qUNc5LtpkjWqV3nxh2TvC94Shp/l6siQo8x4zJi21GMoLjAaUrMHgv4HBzESKlXy
-	d5cLO6NPabEf47npBwrNN1jr5iYlN71QgNVoBEbeaYM45NXU4Zim9WjNn+jz39NTJ2/1lTe/MCZ
-	qTprLQUXrJEsu1BBaXIUbtRrSYILM6xHpYCBAQkesZM3poXv6auQsTaT/IWSwZ7+YUrIQZD3UY5
-	mM22pOF/bFQIwDqbIybRjkiVHgX1SXbwaoSCGNI5TJM1a6B0tE/ow9e0O15mk8+0xVeaXT526IW
-	rvwGiE3XtSooFTLA8hTuSpxwmitLbjq9uD05cJ7pzGlK2xi7DizW8RDtgeOKFwnBQRt4gAJxS1T
-	h8TcasKCzoc0z+ddQ==
-X-Received: by 2002:a05:690c:4a05:b0:7bd:8952:1338 with SMTP id 00721157ae682-7d339f5eac4mr210805757b3.25.1779821812504;
-        Tue, 26 May 2026 11:56:52 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7d3898167besm64991967b3.1.2026.05.26.11.56.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 11:56:52 -0700 (PDT)
-Date: Tue, 26 May 2026 14:56:51 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- corbet@lwn.net, 
- vladimir.oltean@nxp.com, 
- willemb@google.com, 
- sdf.kernel@gmail.com, 
- ecree.xilinx@gmail.com, 
- jesse.brandeburg@intel.com, 
- linux-doc@vger.kernel.org, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <willemdebruijn.kernel.2e79bc9a2ae8a@gmail.com>
-In-Reply-To: <20260526160151.2793354-10-kuba@kernel.org>
-References: <20260526160151.2793354-1-kuba@kernel.org>
- <20260526160151.2793354-10-kuba@kernel.org>
-Subject: Re: [PATCH net-next 09/10] docs: net: render the checksum comment in
- checksum-offloads.rst
+	s=arc-20240116; t=1779822460; c=relaxed/simple;
+	bh=M/g5qZJAEi3c0rfXk/iGFYVZpdLPlDrwWEcToZ1Muw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CTD+ZviWKwwyMr1WGJv0sQueTanGwkPPBFpJ4qli34T0hqGgJcGuTrlAKI+B+xdnKor8meiHdwVLNL1SLrzsYKwWWKwwm+hauRrS3rDZRdv5iv5tnxCLfFouarFo3bZoOwqnTQFL5RUXKtZrYeBhPW9jsCxRg9qxQYp0WOPL9Fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=nGrIY5vx; arc=none smtp.client-ip=193.110.157.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
+Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
+ reason="pass (just generated, assumed good)" header.d=phenome.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
+	in-reply-to:content-transfer-encoding:content-disposition
+	:content-type:content-type:mime-version:references:message-id
+	:subject:subject:from:from:date:date:received; s=oak1; t=
+	1779822100; x=1780686101; bh=M/g5qZJAEi3c0rfXk/iGFYVZpdLPlDrwWEc
+	ToZ1Muw8=; b=nGrIY5vx1rXmnNUZGjHv9MnabMFkaZtEgQWFNG5dwhF0Xds0/LI
+	2su/3AdgVLFjsAwqEC7SQ+Rx1YWDccGzNGrLUIJhrpcwb6YCR+Hn0fjs+pBdvJoL
+	EbzHgIdaapUc/FgGSIPmnMuSSo33q87VZvOTLbe0eDO4AZtTwluL9Lw4IelPOA0v
+	4gcyIPH7sNqMORPh7uFRAsnGcfUZVRWT9kVQF0UnxyTTc9pbY/IBuB156WnYl5zQ
+	I+uLmjkjJoG+RImahCaGP+qHFtsW53bMpFvopTrYXzsLFDQZV+cyUmhkYFc3QINh
+	3SLvXBNcKgXhO64friL3of5Lkebp2NPQDxw==
+X-Virus-Scanned: amavisd at oak.phenome.org
+Received: by oak.phenome.org (Postfix);
+	Tue, 26 May 2026 21:01:37 +0200 (CEST)
+Date: Tue, 26 May 2026 21:01:35 +0200
+From: Antony Antony <antony@phenome.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Antony Antony <antony.antony@secunet.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Masahide NAKAMURA <nakam@linux-ipv6.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, selinux@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Chiachang Wang <chiachangwang@google.com>,
+	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org
+Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v8 12/14] xfrm: add
+ XFRM_MSG_MIGRATE_STATE for single SA migration
+Message-ID: <ahXuD2XrvCzN5HyR@Antony2201.local>
+References: <migrate-state-v8-0-4578fb016965@secunet.com>
+ <migrate-state-v8-12-4578fb016965@secunet.com>
+ <agGdwbo2GFhPP78z@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <agGdwbo2GFhPP78z@krikkit>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291882-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,nxp.com,gmail.com,intel.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-291890-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org,vger.kernel.org,linux-ipsec.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.760];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 051535DBA1D
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[phenome.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[phenome.org:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: EEAF25DBD43
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Jakub Kicinski wrote:
-> checksum-offloads.rst seems like a better place to render
-> the checksum comment than skbuff.rst.
-> 
-> Remove the stale references to sections in that comment
-> (it no longer has A, B, C, D, E sections).
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Mon, May 11, 2026 at 11:13:37AM +0200, Sabrina Dubroca wrote:
+> 2026-05-05, 06:34:29 +0200, Antony Antony wrote:
+>
+> [...]
+>  include/net/xfrm.h          |  16 ++-
+>  include/uapi/linux/xfrm.h   |  21 ++++
+>  net/xfrm/xfrm_device.c      |   2 +-
+>  net/xfrm/xfrm_policy.c      |  19 +++
+>  net/xfrm/xfrm_state.c       |  29 +++--
+>  net/xfrm/xfrm_user.c        | 281 +++++++++++++++++++++++++++++++++++++++++++-
+>  security/selinux/nlmsgtab.c |   3 +-
+>  7 files changed, 357 insertions(+), 14 deletions(-)
+>
+> If the omission of xfrm_compat.c is intentional, maybe worth
+> making a note of that?
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Fixed in v9.
+
+> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> @@ -684,12 +684,20 @@ struct xfrm_migrate {
+> +	struct xfrm_mark        old_mark;
+> +	struct xfrm_mark       *new_mark;
+> +	struct xfrm_mark        smark;
+> +	u16			msg_type;
+> +	u32			flags;
+> +	u32			new_reqid;
+> +	u32			nat_keepalive_interval;
+> +	u32			mapping_maxage;
+> +	const struct xfrm_selector *new_sel;
+>
+> afkey doesn't zero its array of xfrm_migrate, so those new fields will
+> contain garbage there. Hopefully nobody is using it, but...
+
+Fixed in v9: set msg_type = XFRM_MSG_MIGRATE explicitly in
+xfrm_migrate_copy_old() so the PF_KEY path always takes the correct
+selector branch regardless of whether the caller zeroes the array.
+
+> @@ -2104,7 +2112,7 @@
+> -		       struct xfrm_user_offload *xuo,
+> +		       const struct xfrm_user_offload *xuo,
+>
+> nit: unrelated clean up
+
+Split out into a separate patch in v9.
+
+> +/* Flags for xfrm_user_migrate_state.flags */
+> +enum xfrm_migrate_state_flags {
+> +	XFRM_MIGRATE_STATE_NO_OFFLOAD = 1,
+>
+> nit: maybe XFRM_MIGRATE_STATE_CLEAR_OFFLOAD?
+
+Done in v9.
+
+> +	XFRM_MIGRATE_STATE_UPDATE_SEL = 2,
+>
+> "update sel" to me sounds more like "overwrite the whole thing" than
+> "copy some bits, fix up others". The name is already long, but maybe
+> "XFRM_MIGRATE_STATE_UPDATE_H2H_SEL"?
+
+Done in v9.
+
+> +static void xfrm_migrate_copy_old(struct xfrm_migrate *mp,
+> +				  const struct xfrm_state *x,
+> +				  struct xfrm_mark *new_mark_buf)
+> +{
+> +	*new_mark_buf              = x->mark;
+> +	mp->new_mark               = new_mark_buf;
+>
+> Do you really need a separate buffer for that? Or could you just use
+>     mp->new_mark = &x->mark;
+> and skip the new_marks array in xfrm_migrate()?
+> I find that new_marks array quite ugly, so I'd like to get rid of
+> it. If that doesn't work, I'd prefer to stuff new_mark_buf directly
+> inside struct xfrm_migrate, and then set mp->new_mark pointing to it.
+
+Done in v9: new_marks[] removed, mp->new_mark = &x->mark directly.
+new_mark in struct xfrm_migrate changed to const struct xfrm_mark *.
+
+> +			xfrm_migrate_copy_old(mp, x, &new_marks[i]);
+>
+> nit: maybe swap mp and x, just to match the order of xfrm_state_migrate()?
+>
+> It would also be a bit easier to review if you split this refactoring
+> (and the corresponding changes to xfrm_state_clone_and_setup) into a
+> separate patch.
+
+> -	memcpy(&x->sel, &orig->sel, sizeof(x->sel));
+> +	...
+> +		} else {
+> +			x->sel = *m->new_sel;
+>
+> nit: the mix of copy styles (memcpy and struct assignment) within this
+> function, but especially here for x->sel, is a bit unpleasant.
+
+fixed.
+
+> -	struct xfrm_migrate m[XFRM_MAX_DEPTH];
+> +	struct xfrm_migrate m[XFRM_MAX_DEPTH] = {};
+>
+> I'm not really opposed to this change, but what prompted it?
+
+It was prompted after v6 review — when xuo was an embedded struct,
+mp->xuo.ifindex could be uninitialized when xuo was NULL. However, in
+v9 xuo reverted to a pointer, so the = {} is no longer necessary, kept it
+as defensive programming.
+
+
+> +	if ((um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD) &&
+> +	    attrs[XFRMA_OFFLOAD_DEV]) {
+>
+> Not a strong objection, but they don't really have to be? "don't
+> inherit and set it from the one provided" sounds ok.
+> XFRMA_OFFLOAD_DEV with !XFRM_MIGRATE_STATE_NO_OFFLOAD (inherit and
+> also set from request) seems more problematic.
+
+Agreed. Exclusivity check dropped in v9. XFRMA_OFFLOAD_DEV takes
+precedence via if/else so NO_OFFLOAD is redundant when both are set.
+The "inherit AND set" case doesn't exist in the code.
+
+> +		if (x->sel.prefixlen_s != x->sel.prefixlen_d ||
+> +		    x->sel.prefixlen_d != prefixlen ||
+> +		    !xfrm_addr_equal(&x->sel.daddr, &x->id.daddr, x->sel.family) ||
+> +		    !xfrm_addr_equal(&x->sel.saddr, &x->props.saddr, x->sel.family)) {
+>
+> I think we need to be careful about families here too. id and sel
+> could have different ones.
+
+Fixed in v9: use x->props.family for prefixlen and xfrm_addr_equal.
+AF_UNSPEC selector falls through to IPv4 comparison — this fixes it.
+Mixed-family transport mode sounds odd and hopefully not allowed in
+practice; this fix rejects it naturally.
+
+> +	if (attrs[XFRMA_NAT_KEEPALIVE_INTERVAL] &&
+> +	    nla_get_u32(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL]) && !m.encap) {
+>
+> if (nla_get_u32_default(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL], 0) && !m.encap)
+
+> +	} else if (!(um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD) && x->xso.dev) {
+>
+> nit: this would be a bit more readable with
+>     bool inherit_offload = !(um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD);
+>
+> copy_user_offload is doing almost exactly the same thing (copy from
+> and xso to an xuo). It would be better to extract some helper
+> (xso_to_xuo() ?) and use it in both places, otherwise they'll almost
+> certainly get out of sync.
+
+Done in v9.
+
+> +	m.mapping_maxage = attrs[XFRMA_MTIMER_THRESH] ?
+> +		nla_get_u32(attrs[XFRMA_MTIMER_THRESH]) : x->mapping_maxage;
+>
+> m.mapping_maxage = nla_get_u32_default(attrs[XFRMA_MTIMER_THRESH], x->mapping_maxage);
+
+thanks.
+
+> +	m.nat_keepalive_interval = attrs[XFRMA_NAT_KEEPALIVE_INTERVAL] ?
+> +		nla_get_u32(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL]) :
+> +		x->nat_keepalive_interval;
+>
+> m.nat_keepalive_interval = nla_get_u32_default(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL], x->nat_keepalive_interval);
+
+fixed in v9
+
+-antony
 
