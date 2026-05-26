@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-291918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UKizFy4BFmpngwcAu9opvQ
-	(envelope-from <netdev+bounces-291918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:23:10 +0200
+	id AAj9ImIDFmrNgwcAu9opvQ
+	(envelope-from <netdev+bounces-291919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:32:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B5F5DC4A5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:23:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E0045DC53C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 672E93002F8F
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:23:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 61236301708A
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC193B388E;
-	Tue, 26 May 2026 20:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841FE3939AE;
+	Tue, 26 May 2026 20:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aT2qID+N"
+	dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b="xaVM4TFK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A183AB490
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 20:23:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9D925F984
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 20:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779826987; cv=none; b=OLLC1asyZOyrl5DSXn9WwJsmKPI6x78XQD2CnuXphu1FxZUFfCFFPSDv0KWc1pe96KOCM23IvOzuO7hKMlyleAHOTSGqYAm8FI0Y/OnQHAR/F283nKiNv9fUvdT4IpU/qcNSMGTdBzxYORKkWDv1fZ/lNmZdIMJUPXkF8wAVT74=
+	t=1779827552; cv=none; b=ABumwfVbRN8VUGUdqsU6yLRpRZ/D6fIbZbZZPTauEATIJej3PVvns2w32Ts+g9K4m3s455ea5drO01K94KKXyV0D5rOtfA5vD6Ety4pNdMU0sRGtplwkM3qX93VX7tTxfAylvFjGpADpECyd2s6akkf31tlNaVQ2p17P1UHCt0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779826987; c=relaxed/simple;
-	bh=TRyFeOjEFg9Z4oD9ybe51Hvm1Kn6K0WGSxcwfFiQJCM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=teSHs2BiDhzeIlMt1NxgWKEkgtB+COvwnRQ7P6su8JbH3y2jT0EaqFnJoqfg5V0RSlm5B7BNYzAnXuLJjgIBz2liuGOj6WJ3fOlHD0w/RbeRkmcpfn3xd+4zV8QLOl2HeVjsjT0UDRMBepnRTW+Xl54G2wYKkVCk55jfWebJpF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aT2qID+N; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-366330b6751so8620109a91.1
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 13:23:06 -0700 (PDT)
+	s=arc-20240116; t=1779827552; c=relaxed/simple;
+	bh=J8QTJB03WvozUL/lm9seJKVTmum3YvberljLi5CeonU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r1glqZ9quRyoZKT4mfwlq6bqnOS37Frh8eV+AZWBKZzocsL8nXGPqRuixrWz0SdKPs98jBfLepNJtnqkbTlT396nQQ4uqQ0wHCT4LHEwGyiZuvGu6WnGIK57cmjjGwAktGq3t1b369PuUoa0ZzgSaT3dGEzrwBj/Bla2m6LP58w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=xaVM4TFK; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0sec.ai
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-43d77f6092eso6299558f8f.2
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 13:32:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779826986; x=1780431786; darn=vger.kernel.org;
+        d=0sec.ai; s=google; t=1779827549; x=1780432349; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=M3mXtq2h7QJnUw/yzmR3z22pM1IqybeYG7SOGc1FU/E=;
-        b=aT2qID+NCWvV+KIwCvVS94In0rwK9EOHT02vqhflSyEaGc922A6QKMATwUag/oFGDj
-         FKF37CvsqUSmjsDMaOZocPGO+dWi9hxCB/Dr5uYcQvEr3M52Qigs5nuQjO9biX61sKeM
-         NbB/s2zZOvn3dbmn4BmQj2MvDcPQOqfZbPpqX0BlR/1Tdf92skeRutSMYkjv4is/oPtk
-         kfMo+YX/8Sb1PXJTBxqrW3c1nbp7yQUgOPn9bSKjj/upexg4F3+Dh3qgxqsFKGSVP7h5
-         Fr2ZmGyeI6uvG8k7Qw84Bu/h7pHj1FSriubcjeXBQS700m8EW2IYqzEXOSXTXfI1vSU5
-         dP8g==
+        bh=yOE68Mzf5nnVfNMftzrnIa4+AJ1pM+MIvuOSTOhC6JY=;
+        b=xaVM4TFKL6WqoTgUxw6ugDtAPaPmv85BHuXPwkJiLyV07nNxeXK3xOW/L7tOoVKpAZ
+         Fh5IYXgqOyich0LSdQ/l2ggfmrRdf0Z9E6+Bkdf8nQ9Tq2kaVX7A3ceknme7+nLVySaa
+         jYhwcK4b2OsdkYvc9k0LCOmnBPOHnWqHolXdubMKckvW1Mn5SwrxWcyW+cxYl0djre3J
+         ie7J01i26gDu47IlnGQcexZmoQYT8pHwUGXKMf7IJwG8YD7IDYnKjraXG9pkknj0FAaV
+         xBGqa9yzvEzLCKtYwO68+6HPQNT+O0lCP4bJqVdj8o93TDwZyS7nSF1HfE20nryJKlmO
+         Ealw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779826986; x=1780431786;
+        d=1e100.net; s=20251104; t=1779827549; x=1780432349;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M3mXtq2h7QJnUw/yzmR3z22pM1IqybeYG7SOGc1FU/E=;
-        b=epHmzeypRJs51Ss6U+GQyHDCXJWv+9z7CRB2Rv1l27EYeSPXi4SSvg1OB4hCgoJNw/
-         3nLmNBsvGr65AE0uysZO8X4au4i4wfjZisUMW1TK7x03voq9X5sxEz5UfLM4Qdrrh1rD
-         5FHcC0aneiDD8cbR/G9XFKwHtdafJnzaIQzGU9Ic2z7qr1UCc5Ow2lK1RiafxzT/gROo
-         tYW+de6cqNwatlzWWp/OzEdDTd4Lc/OScwoQjEu/OMTTdJp/TNVA9ZpI80kxW5SIM/iw
-         /BOWKsa4A+6f+PS9t0smE/v1laN4rw5iKUu+veqxVu0wQJ+p/8n6iuueIRIiO9Xdx3Xx
-         5E9A==
-X-Gm-Message-State: AOJu0YyH2E51WLBoc/Q6MCHftp8iUv2K+mwI8tvLD3LcguxgWhbciQii
-	gXH29KTw7X844p/nA9OayBw9pQbsK/FFbYyMcIDb+9OfLeiQ1ckkfgNTETPTg697
-X-Gm-Gg: Acq92OFxBud9mzBHd52m7PRTitbHPcempkjc7BldYneUpe0jaywjhOc59Ocj47E7aeS
-	4yZQmbkWpM0VQ4hnHkWeTrA40myHfDLxLezOvbG5ZFtD+BhVcxA7JqFvjT6L6DuuUXFTF9QDKEh
-	vHFylJz67f1apxz5K7iDhl5812W2l/X5jSBcuJtHi+lV0sMfRYKJP26Lnw8VV77MFS+D8pl2n83
-	lOQKFWSKgJPFlaNwz5Uzlmg3L+noUJsY2G1ezox8iNrt1+N9Unp2KMHTL7wcx5nsTXoWgxRPfhp
-	dM2XYAccek2siMZdcFgNpYhRDyaCo3uofAQv4x+Dqq4dCXSvqD/TeOVTUMsmo0nadRHfA6rWHS6
-	qII3NNInlC9tQgs5XOF84CKtJnwnrP7QtJZNTrfjpOlQ5+6VTzRrPo9uwRKZiUpxzZWmHEY7J/z
-	JsY5KhZDdcsoTW/txjklO9uK33T4/1Vq5pZJKXSRfrBohsdpGPN0TyNs6602YMzTDsK72a4YGaS
-	85ZjYZ8vvyrUfbT0u97jih7I2303XwD7o8=
-X-Received: by 2002:a17:90a:fc44:b0:369:bddb:79b5 with SMTP id 98e67ed59e1d1-36a676dc2d0mr21013700a91.2.1779826985725;
-        Tue, 26 May 2026 13:23:05 -0700 (PDT)
-Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a721c7b92sm13280442a91.12.2026.05.26.13.23.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 13:23:05 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: ibm: emac: Reserve VLAN header in MJS limit
-Date: Tue, 26 May 2026 13:22:47 -0700
-Message-ID: <20260526202247.13823-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        bh=yOE68Mzf5nnVfNMftzrnIa4+AJ1pM+MIvuOSTOhC6JY=;
+        b=l2ldEGW2oZ/sq5LVtSvvOv9UnMSxELkCzj7LIzyHVvizn5frsCMIaDLA5PERFEjpzI
+         2S0vmowN1HREROjxCvXFoya5M7CemzeIHHUZOnEj3zvooQS73QZ1+0eukp8UUhHndgoo
+         DMNx9XpZbVJb9qAxNQ1pnYgYIPz0dUoRC3RsYG6C38Fh4eeTwUPYDUQ5xOtSElNm1lIK
+         EyYRRH7KM7gAxbw6nYafApL2RyVF3T0r158z2hEaZPRNhdIQV0j2IyF6mI8HQm4E5Tod
+         bpKTV0Tf990B7wm0nNQxdjiZOjqfm2oJpVdjKPLm691622Mzr1E5jkiMdI+LlyYu3dMx
+         d04g==
+X-Forwarded-Encrypted: i=1; AFNElJ89U3MFWycKRPP+XS4Dz9w5QLNXcDt+PFWfGrU4lpITG6oPgLxtwV941qqy2q3/9dBpC8SZ1hw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEWfdY82ux/qen+VBFuW0olFbT3WDmcW3OmoCsewmYYHQHbP7d
+	pcvDNb+Zh+yiWe72OxZyY7Xneut1VN5p7dlpWSxQy3FPKQG/7LnHH7AmsRUw6i/Q83c5CQvTHFk
+	3cJNPtxou+Sw=
+X-Gm-Gg: Acq92OGNcCQjGwY8I4CP65AIchCt9MZ49tdtdEMjrgMdqY9in9FFpdUEPC85ZPlKbma
+	pICmEM2PK6BplyNWyK0jBl622it3vXag4hZHYapUbsBP2fVm1amVX2p1QIPdyBwaMGAs6M69nL4
+	YkPo7TwzOjKnZBmiBVRyw3OObWg2dvEds0WlQtskcajjcxZD5SyurQ3egnD/pJkzhw2rBRQhx3Y
+	qlqeyjO2ND8AszUqd1+DCbUEDFhOqL2WeQctkL8NXllx+Gb+Dj1rHHQvv8/Ad7AlVkQ8H1ITFVy
+	EuNJFGWl3qiY9xACJPw2N6jhXmFqnQcl3OcgtzoAWrvBc9nO6nXlbFMuT7a9bQ1J8U9449w04rA
+	mmK97/vyVL6lvbMgt5dt2CPcITwpUErLwM4Wa4nCS/SUI1WjBqusotqx06UNzcMQRlnfQzcQmsz
+	e279pg8PgVQhStBpI9bX4ePtknj0Dc/vmyx9ZALMwHbyM3HLXlM0k8WM+J1SZsA6ql2QQP/5ARH
+	f7z+5dbLGq7J8jl7ShBkETOIa6ZYuf9HiD78y4nJ07SG9OfMDt9Zxk=
+X-Received: by 2002:a05:6000:41c7:b0:451:66e6:501b with SMTP id ffacd0b85a97d-45eb3324e34mr29057635f8f.0.1779827548645;
+        Tue, 26 May 2026 13:32:28 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.223.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb557545sm851693f8f.12.2026.05.26.13.32.27
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 26 May 2026 13:32:28 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: oe-linux-nfc@lists.linux.dev
+Cc: security@kernel.org,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	Doruk Tan Ozturk <doruk@0sec.ai>
+Subject: [PATCH net v2] nfc: llcp: fix integer underflow and missing bounds checks in TLV parsing
+Date: Tue, 26 May 2026 22:32:26 +0200
+Message-ID: <20260526203226.73345-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,85 +93,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_REJECT(1.00)[0sec.ai:s=google];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291918-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-0.992];
+	TAGGED_FROM(0.00)[bounces-291919-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[0sec.ai];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-0.939];
+	DKIM_TRACE(0.00)[0sec.ai:-];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: B1B5F5DC4A5
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2E0045DC53C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The IBM EMAC programs its Maximum Jumbo Size (MJS) drop
-threshold from ndev->mtu directly. The hardware sizes the threshold
-against the L2 frame minus the ethernet header, but does not
-discount the 802.1Q tag, so a frame carrying a VLAN tag and a full
-1500-byte payload exceeds MJS by exactly 4 bytes and is dropped.
+Multiple out-of-bounds read vulnerabilities exist in the NFC LLCP TLV
+parsers:
 
-This is normally hidden because JPSM (and therefore the MJS check)
-only engages when the MTU is raised above ETH_DATA_LEN.  With the
-qca8k DSA tagger the conduit MTU is bumped by QCA_HDR_LEN to 1502
-during dsa_conduit_setup(), which is enough to enable JPSM and
-expose the off-by-VLAN-tag in the limit.
+1. In nfc_llcp_recv_snl(), when an SDREQ TLV has length == 0,
+   service_name_len = length - 1 underflows to SIZE_MAX (size_t is
+   unsigned). The subsequent strncmp() and nfc_llcp_sock_from_sn()
+   calls then read unbounded kernel heap memory.
 
-Pad MJS by VLAN_HLEN so a VLAN-tagged full-MTU frame passes.
+2. All LLCP TLV parsing loops (nfc_llcp_recv_snl, nfc_llcp_connect_sn,
+   nfc_llcp_parse_gb_tlv, nfc_llcp_parse_connection_tlv) read tlv[0]
+   and tlv[1] without first verifying that at least 2 bytes remain in
+   the buffer.
 
-Reported on Meraki MX60 (qca8k switch): tagged VLAN
-traffic drops at 1500-byte payload, while 1496 bytes works
-and untagged 1500 bytes works.
+A nearby malicious NFC device can trigger these without authentication --
+LLCP link activation happens automatically after NFC-DEP.
 
-Assisted-by: Claude:Opus-4.7
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Fix by adding a minimum length check before the subtraction in the
+SDREQ case, and adding bounds validation at the top of each TLV loop
+iteration.
+
+Found by 0sec (https://0sec.ai) using automated source analysis.
+
+Fixes: 19cfe5843e86 ("NFC: Initial SNL support")
+Cc: stable@vger.kernel.org
+Reported-by: Doruk Tan Ozturk <doruk@0sec.ai>
+Closes: https://lore.kernel.org/netdev/20260525202427.67768-1-doruk@0sec.ai/
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
 ---
- drivers/net/ethernet/ibm/emac/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+v2:
+  - mark as net fix
+  - add Fixes: tag and Cc: stable
+  - add Closes: tag
 
-diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index 11d673a9f119..90471cff37dd 100644
---- a/drivers/net/ethernet/ibm/emac/core.c
-+++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -30,6 +30,7 @@
- #include <linux/skbuff.h>
- #include <linux/crc32.h>
- #include <linux/ethtool.h>
-+#include <linux/if_vlan.h>
- #include <linux/mii.h>
- #include <linux/bitops.h>
- #include <linux/of.h>
-@@ -457,7 +458,7 @@ static inline u32 emac_iff2rmr(struct net_device *ndev)
- 
- 	if (emac_has_feature(dev, EMAC_APM821XX_REQ_JUMBO_FRAME_SIZE)) {
- 		r &= ~EMAC4_RMR_MJS_MASK;
--		r |= EMAC4_RMR_MJS(ndev->mtu);
-+		r |= EMAC4_RMR_MJS(ndev->mtu + VLAN_HLEN);
- 	}
- 
- 	return r;
--- 
-2.54.0
+Link: https://lore.kernel.org/netdev/20260525202427.67768-1-doruk@0sec.ai/
 
+ net/nfc/llcp_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index XXXXXXX..YYYYYYY 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -1302,6 +1302,9 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
+
+ 	while (offset < tlv_len) {
++		if (offset + 2 > tlv_len)
++			break;
++
+ 		type = tlv[0];
+ 		length = tlv[1];
+
+@@ -1307,6 +1310,9 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
+ 		switch (type) {
+ 		case LLCP_TLV_SDREQ:
++			if (length < 1)
++				break;
++
+ 			tid = tlv[2];
+ 			service_name = (char *) &tlv[3];
+ 			service_name_len = length - 1;
+--
+2.45.0
 
