@@ -1,290 +1,257 @@
-Return-Path: <netdev+bounces-291766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Hn1HNHAFWoiaQcAu9opvQ
-	(envelope-from <netdev+bounces-291766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:48:33 +0200
+	id CEGsCtTKFWqQbgcAu9opvQ
+	(envelope-from <netdev+bounces-291768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:31:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5295D9064
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:48:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 803745D9BA5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:31:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D014F314E1AA
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:38:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 93AD431C090B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE667378D9E;
-	Tue, 26 May 2026 15:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE18377EA5;
+	Tue, 26 May 2026 15:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O4qqI6iA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AkTYc6DN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C164377543
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 15:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779809854; cv=none; b=LEo7wPpfKw/srMtb8bSE3wfVZSqOfOnh+n9sVijUoO8OBFJ9EsAYBWO9JqQZlRokscCnX+erToKOrnfQCY8xiDObRSBeQaTKKV/XmaIapNgqxE87nksJfqrvaHtOYB0tk9DFy5TlTrZguP4yOsP0InNSvWNLMEHBaRH7pM8oEZI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779809854; c=relaxed/simple;
-	bh=aHiP5iPDgTnfx2MlFNZtRtLLl24SwK+8MfSYE5ZAVhE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a9ON3HPh8btlnWmnXeViYcrwISiaTpiWfSYvjnR4FWa/dtnJkVyS7dkq56BEqY2nyT99qnCfvjwIEwIBXrcUYbmryk2506YTQtV+C3Tl5nsxMcmmDq/emXmYuReuaolRlgqFmlrLn2+1caNWFPgi+y0TMEXh6Iq5GVWNllkxu9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O4qqI6iA; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-49040362e4aso51688975e9.0
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 08:37:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779809851; x=1780414651; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X9PBIjlRM30LWt9CU8BNuDCg7sgYuhWgWgktG0ZmDLI=;
-        b=O4qqI6iAhdOgkB4aYzm3DT3o7HJiI+uzEE+cr1mN0076ylsVg0bBBftDtX4OBWihpd
-         D4GueLSK62FXwTHox+B0W0jOFf9//4c459AlDHrv15iPy1HoNR0DgSwVtd5kGdNHZa7N
-         56BRqnFL9XSFYsiOtcD4Yv+52kq1gH99gB25F1Ddw+7ksI3UczURRfHAxOBJqNM0274z
-         DixwogMr5ddkngvpVgTkK/sLUtjziu1S9cbs4uB4zjLFarMbhNtw+jRfOZk5tvkTyfQ7
-         Bx2gWBLRn2NLpI46eponPmoQvJF+gLMR/vVRaQiW4JRRFzdg4xaWcOVg/H/NDPWzAyEK
-         UrsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779809851; x=1780414651;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=X9PBIjlRM30LWt9CU8BNuDCg7sgYuhWgWgktG0ZmDLI=;
-        b=dWUut2xEBOADhH84KyInMF2X7ZXyuN7/WrFgKUqOg9+Z967QoDkVBDZE5G5hqc2IhU
-         mpaqCm+1yIk9MwKsLM8V5sz10gmwLTkiloFEEXQS51mePJcOCXBziafk9IS0DQ0K60sx
-         6jt5bfakBnVwaS539ZDTcvk54gFERFnwlPMyDjWyPa0QESl9Bxxx8yMCkh2N0jUIgtKu
-         O7AIi+q1QC7C2mwzIU1nRh7mqFWtehAgx3SPEHl/hqqM7tzuKcJuAMssEC8FAbYZkvVG
-         xnUbsLmOWtFnHA94y6Z63+SJXsw3fKTWz2NxWNbKS2VRo7OAsm7rE/3B+bOijyW/Zf28
-         kdtg==
-X-Forwarded-Encrypted: i=1; AFNElJ9IISo3fwAn7qZFsFoVT9HVXQ9Tff9nXIlv5NeZnYeIATZAvDm49+H4gGNfPpWS0ZAkPv1oWLU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEvtFlCInctHB9+60rRDwXNSsNG1ZgxxrolAjlu+ed4DAZW0DF
-	pqo1RmEKv1u4SSah8AXeYqauPfyR9e5s5zsTu4VjCC2s3LY8erT+FyWD
-X-Gm-Gg: Acq92OFmAweqfLxbeK1Kd6s5sZobC4J3DPmGRIL/XMNQXS+n9oYnJPgyIVf6mTVwsAl
-	+UpuFuq+5DaXgDk5sI1SNPbV/ThuMhM5hJj/GWGt2DbgvGANHKaELaqGrxrZWlDL1fHiFN1lKqR
-	LDpLSbqPno1U5pFRBIhG5dGKat7rqgAxIsAwj2dqs4wx3nkCTpJIxOyelzFcM1ctlE/751aOTPN
-	ubZ1MVqK/OXwgCxKySzeISf0AFKhp70t0VVUMDYTlxIrFzL3WIDUY/uXgTRRmlshauNvbO5LkdY
-	/VRTTE7f+ZsHfOYqRA4+mvufO0gywsQCYrG3vOe0p5HSeaSmaOOY4CI2fYurohMEplc4hv43RD9
-	rUqiEPa4J87SCtP33Z+cA/iuGrfFsYgXFqbsZG/DhtvUogbZdaU2XgYliYgbg/zhpslSyWpMthv
-	A8yZE06YVOvdk5l0Ruq188wH6AjHw=
-X-Received: by 2002:a05:600c:1992:b0:48a:9428:5522 with SMTP id 5b1f17b1804b1-490426bc7dcmr316962155e9.16.1779809851296;
-        Tue, 26 May 2026 08:37:31 -0700 (PDT)
-Received: from mtardy-friendly-lvh-runner.local ([2600:1900:4010:1a8::])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4907df9edeasm1083655e9.9.2026.05.26.08.37.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 08:37:30 -0700 (PDT)
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: bpf@vger.kernel.org
-Cc: martin.lau@linux.dev,
-	daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	ast@kernel.org,
-	andrii@kernel.org,
-	yonghong.song@linux.dev,
-	jordan@jrife.io,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Mahe Tardy <mahe.tardy@gmail.com>
-Subject: [PATCH bpf-next v7 7/7] selftests/bpf: add bpf_icmp_send recursion test
-Date: Tue, 26 May 2026 15:37:08 +0000
-Message-Id: <20260526153708.279717-8-mahe.tardy@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260526153708.279717-1-mahe.tardy@gmail.com>
-References: <20260526153708.279717-1-mahe.tardy@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7033637757F;
+	Tue, 26 May 2026 15:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779810039; cv=fail; b=P/kjI4M3PHw6QgH3w92kDrZQ7GP3Ydlj7BW2EMeYQu5PCIGSTP5cAJlp1I/S/HVT/40CXR6aXhAbTWXuRNCdqE1EjDUWIOkYgY073X9xVriIYCiSqssEW8knLmvkunkT4kBh2yf6v1jDXWeP+gZh0+yBGHCP61wBQbCaB2vlErw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779810039; c=relaxed/simple;
+	bh=0Ph+5tYYCIxrjQYqbunNE9qSYd8yRuQ/zzOq5EGYxLw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ucEhWSx2RQ8GtoEWhfaskpTet9fSdiobqaqDHPu+JXcD1zeLVaLGLI1uhr7vyWtTbN9FlXhSxIxDQj/2h5QOOjqQu5kerJXiXCvCxydjF23HBpQardM+xqIWSziiqUV3hfGOvewPozXWFa3TxssPxYRYNOXGkpje46o4kdQG2RM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AkTYc6DN; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779810039; x=1811346039;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0Ph+5tYYCIxrjQYqbunNE9qSYd8yRuQ/zzOq5EGYxLw=;
+  b=AkTYc6DNNK6VwfoeoYPc4OOyRnmxXO3Kw3oq4f2KmfxfgCE2L5tFglVo
+   uRTTSno1hJtCG+9IhAUjLueiDKPM/yOaAR0qJ/18pnNhJvyrAuyp6IxAu
+   eHL9/Y1IfkNqqH/d2TFJIb9Pm/QmwDLbdqHFOarB8Uf11V0q3yNvQhpUi
+   6n6bJehh/KKlktW0FzCsW86ZDbtIbIwFxDJq2yqVstW3lellBftMkLJhl
+   MuV6/IElLgC6zpAZduXj5zz6DTg7yzmG3vKwIAYAYELsG8hmem3fNd22N
+   Lsv2C8wlx0QIskKdC9e/tqWj9lsGJIs1Hsk4nj8jO3ST+DiXqYap2pdvg
+   Q==;
+X-CSE-ConnectionGUID: KufFatrYRCSOqfzWDdMnXA==
+X-CSE-MsgGUID: keouW0O9QimKLTIeES7FKg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11797"; a="92099540"
+X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
+   d="scan'208";a="92099540"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 08:40:38 -0700
+X-CSE-ConnectionGUID: 0UvmZHY2QJWCIpxsQmTInw==
+X-CSE-MsgGUID: twpQgLq3SR6XecCKFLYscA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
+   d="scan'208";a="265565885"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 08:40:36 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 26 May 2026 08:40:36 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 26 May 2026 08:40:36 -0700
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.1) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 26 May 2026 08:40:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EP2eJLakVJHArHu7yPq3lGPQlfaxNiLjYTQDCZQ61Z/GeVFKuNWGVP+tpzPsycnf0xpB4MpkrGon5ogaQjF9VO/lyP4g4GgnoNh33itpFmU2eISoh8erQkZ5CGyVyTNPprnBvxmwih7U5dxjAr/KIvcs8OeimxsJxSUNVcZEvvsxwX/bpSua2dZRsVeYQQJNknz1jIdlztwIWuIpIDpgY1/obyATkMJhpJ4pmTcCDL5XxQnCjagVVNM+8sLOkvFwfvDjRK4Acrn+rgywp+EKep3laezwDp+oXi546IKb/9rfsBUv/vz4S7DMsxDjYeHEvSiKPAE6XvYIUMkkF1RLyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nptmqvQkJifwSGXJSo87xDxCzEjDL0mGd1JgxH/qDl0=;
+ b=T87Fhwq5dNwORxG2C9Cc1EQ7bWUiUfM+pbMurTxCX/uAj28N9QDwC4qWMDfk4x35vwo2gct7pYMFjbX92VE66XnHS+NZmf/GFF1EUJBLyp/t0+IPHyhU3/dYBjQAe9SXAZcS016Px+gxbEaTivchY5+ht899aQ3M8985Tjm11fxk5lPkCOIKjxuQloqePLp2uQVg9wAmhtL0qgxRoAp23HbG4gKmeNWSeJr5OUCecDGCCERb/vhjLLo+hisBD4IMC/+GEWJbOqbTI7yK5/nOgomwt/An6QZybuEdnAoCmXrj83429+i2sNYU1pWqxubKt59Jdlly1BiFA5uURF87MA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.11; Tue, 26 May
+ 2026 15:40:33 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c%5]) with mapi id 15.21.0071.011; Tue, 26 May 2026
+ 15:40:32 +0000
+Message-ID: <53216152-cfec-49de-856b-0378c9cb37ee@intel.com>
+Date: Tue, 26 May 2026 17:40:27 +0200
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] net/ipv6: icmp: fix is_ineligible() to block errors for
+ Redirect packets
+To: Sayooj K Karun <sayooj@aerlync.com>
+CC: <netdev@vger.kernel.org>, <dsahern@kernel.org>, <idosch@nvidia.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20260526101622.38536-1-sayooj@aerlync.com>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20260526101622.38536-1-sayooj@aerlync.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR08CA0244.eurprd08.prod.outlook.com
+ (2603:10a6:803:dc::17) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS0PR11MB7529:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9166795c-dea9-4b8d-b222-08debb3d1f40
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|11063799006|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info: /TkqD1ZNQQm3S5LIWqB0JjdpTzpGhpMRo5AGzveW7/Gt/fdI6ky3rscdb6z2pV/n9F6opA51ZdiheA02MYxLqsbH0zmwBp6mWqs0y1pHns/YPWSSjPBcQKn4eNP2P4Lo7ubFNTOv70vNYDJw0uJ2Y/Ey6Bg8boP+6wiZ4lnLZTBjZe18I0NINM2F98U6mnNd31r2eyJG0Y7B/EU63aXRrMiMY5orL25mZUvcuPoccu3BgHAv60HqV/Zbtodcn73LACeV5DW+tBsCZj7Hf3GXAvGvwYFLI+qhp5Ka1TNOf3bgxiRAsV61brk6tPWiMVwwlvHzs3nemmV1Qs8KEAXnJ2fsJUEJnKkgDakSkQZFFjD7/UXpgXVrGCpiEWytplNQ5VVsTa0H5uFxxImXnc/BcxebN5gk72ORF8Zi2aNyY1DL0aUzYHDoLkoe4xtwyqmP62+ZecUATcdiGCBtLdAV3My/2cTmnv7iJuzIhTM8kdxbwDbX6YAAUXYZTm3Inehfrvwm5B30RJc+P78p/WkuTBBMxW+ST1VsPT0e9oEsulhp2I7yd+IyeLfzgKLIXCjvXWaH/UuRzaA5qlgnH301Ivyg1nj8eiskuiYPGSPjMyGzff5K/fCwCnqdLgwRkpdUcynx9bhNSZMdNU78kda2Zt9cM6hwopVD9tSV8rEaVHPrkIVGH7jge5VaPbRPzBvE
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(11063799006)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MUpXTmhGT0FnenF4TlJJUFd1L1FDL3hOMkhqbEl0MDJYODQzL2RpKzMxZ2Jn?=
+ =?utf-8?B?MXRYbExIenE1ZlFGK21mTllMVTJFYk42TTZFbE90RVc0azhDVWJRL1JJNklM?=
+ =?utf-8?B?dmFlR05peXlvMGxSZE13dWxEM2NhMXR5U3BDNzhmRVJ4Tm9CL3pYaXpIc043?=
+ =?utf-8?B?d0NNRGhQdE5QWHk0ZFVIV1o0L01Idm9TNE5yYmN4aDR2bVROOWRrbUplN0RC?=
+ =?utf-8?B?Wmp0WXJlcmFlUTNndHJsMmphamF6a1o5dUFHRzg3K1R6dDc0M2lZaHhwN1BL?=
+ =?utf-8?B?cG1ncE9tWU53MmtCKzl0NkJMOVZjdFRzUGF1S2hVbzhNWTNEclZuOGVUV2gy?=
+ =?utf-8?B?aGtOQVg3RVNaTGxFNXpHalR1em1iaXpYQlJxREJIYVEwcVZScmpaU0VTVVlq?=
+ =?utf-8?B?Um53UmZaamJxU0hqQzNCNVROLzRqWFdLMGhhQXoraTYvUFBmNEhackVtd3hS?=
+ =?utf-8?B?aFpBczlMeEhQaUxLYUdnSVJQMTZ3U1A4NHB1M0Jhd0UxVEM5Z2VRbkxJaDZC?=
+ =?utf-8?B?Z0g2ZTdoMGFLNFRNU01VeXRGVjRTOTI2YjNOU3JjY3pkMmI5M1Z4ajRJUjhS?=
+ =?utf-8?B?aGxwaFBEcUQwRXArY21RV2FRRHBtYzV6U2N1cU9uSDFoK04rU0hqVk9ZaVMz?=
+ =?utf-8?B?VGxERStVSms2ZjlYWmpUWUJROURmVE1CbVBMY3VjKzhsR3NJZThmR1h0NFJm?=
+ =?utf-8?B?WWRGUFdGTm5TQ0hUZW05Z09kbi9uTlBITnB1N1ljSEJXNEtVdDBsc3FxZzRw?=
+ =?utf-8?B?TDZoa0hVY2VFaEJkQWQzMHRWQnVtaitHUHZNQlptSWpMdUh6QmdTTVNTenBx?=
+ =?utf-8?B?bnYrUTYrY1JDay9EWDk1QUd3b2xZekttdjZMckgvQWJJWWtVQldCaDA5bk44?=
+ =?utf-8?B?WDcxbDhuRmJsalF5eG01YnJMR28rdCtUbVlRN2NKSkRjcmU0Z3ovMlByazNH?=
+ =?utf-8?B?TFlmWHF0UU5hVkNNU1J5OEtHOUszTHprUEdSV29SZWRPS09JS0w1aHpMQlNq?=
+ =?utf-8?B?Q2d6MHNRbXBDcnBlQktmZjJ5WStieW1rQWs2YW1CUUUrUmw4aFhPVFZibkt2?=
+ =?utf-8?B?VUF6QjBaOU90WnRtUVZRS0E2c09EemdqR2FoR0EyM2k4SjBUMm9RU3d2bWkx?=
+ =?utf-8?B?b2QrOWlub0pGZENsM3NDVWVLa081SElGZDZ0WEhaeXgwUDVzSFVrTnBUM3k0?=
+ =?utf-8?B?SEF1ei8yUWh4dWQ2ancyMjNlVUNvRDdoaWU1bkVsWEdjUDVMK3RlZTVvK0hj?=
+ =?utf-8?B?YU5GWTVwTVVYV0NhYUphVlFVUFdWTFZFWlpkNkJiakRBQjg0bDZqMnZDakVv?=
+ =?utf-8?B?aW9oUUY5NEZVNkd4MnVEdDV3b3VzeVlKTUo2SnZMOUFRMkQ1YWhYRUZGOSs2?=
+ =?utf-8?B?TjRXUGxLVXoxK2dBNmFnM2lMZWkzVCtGbFY3UWtpNGhKMFQzY0I3SjdDRS9o?=
+ =?utf-8?B?aUlQMzNWYjluSXJlY25BYW9sZDY3eDA3RTdZbFRSSGlDY1g4MGo1b1BJaTJ5?=
+ =?utf-8?B?cGdWNEdRam1BcXg1R3ZrdXRGY1Vselh4SEU2ZEVUZ0syOUJOR2hTbUNHRkcy?=
+ =?utf-8?B?N0Vmak5GbUZBbXRMYS95ZlZSL0RZQ0N1aUlaY3ByQjVqWHd5QlgrWmF0VTFD?=
+ =?utf-8?B?VllGWE1ZRFpqRWlJSnA5NEE2LzdrYS9XM3k0REhJUnRabzNVN3FJaHl6YTZX?=
+ =?utf-8?B?cG9oR3hHZENFek5LbmRFSGNmelhtZVIyYkZobXV6VjU0OTlUT1ZPOVZ0WnE5?=
+ =?utf-8?B?bDZSRlR6YmVNQy9Jc1ZVM3VSa3l6R3ZLSXhDOE5SdHEyRTlPSWNTeHRCb3NY?=
+ =?utf-8?B?TzJobExjb1huUkVlMUVFTFFqLy9uZGVmZVhIUUxjeFNyc3RpZytoemlFeXI2?=
+ =?utf-8?B?bXdhWFllUkdpVEc4UlJmSFU4V1NZUGlGcCtUbFQwaXhKMy8wNG1DMWlFUVIv?=
+ =?utf-8?B?aHVSY2FpMG9NSi8rRk45Z2dXWUN0VUMwdFlkZnYyRVdYQnlWWVp0elJRZHI5?=
+ =?utf-8?B?bVpqM0pHd2hWQUdKWm5KaW9uMDIwc0NXRG1ObkhhbWg0djhaMFVaNzJaVUd3?=
+ =?utf-8?B?WVd2Qk14SmlWMk9jWjZGaXFLSVZOVzFVSDVVZGh6R3MvZXNjdWFjb3FMOXpC?=
+ =?utf-8?B?SHk0bmo5MWwweHZwSUhxMW05MTJ5RWVYYVNucnA0Q1VPUWxrNmVFbTZ5WjU2?=
+ =?utf-8?B?M3hxZW5sd1FTcWVZSVN2dnNDNnZaVDBZbXFSaU9TQmMxay9ZcitJd2ZWRmR5?=
+ =?utf-8?B?VDNrSVV5Q0VvRXZSUnFadHJXUDNaUE9JRmUxSm5VMk14ZEVqMU0xZy9RTWFn?=
+ =?utf-8?B?VjIvNlB3QWpZN0V3NGpoSDBnd1VaRFQrR2tzQUZ4UER0Nmc3eVFoRUdXc2pV?=
+ =?utf-8?Q?b3Eg6q9fGlLYq3UI=3D?=
+X-Exchange-RoutingPolicyChecked: DH9geS2++KTPUMrnDwRLvDGYY9TxZ8b2huuHrYhWyeR0EKscCvEjdjZCxiPKruhkTCNxlR/LrFzcjUt6jcsT2sIGUcHVcUGp/FVeaSPvgDvW6rYcxLSQy8qOUcACM1BMAuVXuVgZ33AqyX5LoyZWS/MfRfXE/KYULKypEz6SKo8weMydxQylLsDo9C242Ea3z1hVRrUB5Wl3q4PXOV9A9Uy4WJqbwcw2OK4DmxUIzejWARqy/lreKJXop4EujVvC9DyXp5/UiXfTefszfQDzVzZdNUA0Ko+aQVbezz73+ADn6VoM+dw07ynK1rnEFpTisw4kckXPRlH4ucUtFLXNog==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9166795c-dea9-4b8d-b222-08debb3d1f40
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 15:40:32.8883
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dq5FXk8SJVMCVa7t8sdCknDaa2qVLyZnrQ7IGFktGWtPQo9SgAwk4eR5ELEYTQlKRNrWWfT+QeQ6Dkuep7ixpFrg9VlBeXghNP0dJgbOS1M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7529
+X-OriginatorOrg: intel.com
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,gmail.com,kernel.org,jrife.io,vger.kernel.org,google.com,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291766-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291768-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8F5295D9064
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 803745D9BA5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This test is similar to test_icmp_send_unreach_cgroup but checks that,
-in case of recursion, meaning that the BPF program calling the kfunc was
-re-triggered by the icmp_send done by the kfunc, the kfunc will stop
-early and return -EBUSY.
+From: Sayooj K Karun <sayooj@aerlync.com>
+Date: Tue, 26 May 2026 15:46:22 +0530
 
-The test attaches to the root cgroup to ensure the ICMP packet generated
-by the kfunc re-triggers the BPF program. Since it's attached only for
-this recursion test, it should not disrupt the whole network.
+> [PATCH] net/ipv6: icmp: fix is_ineligible() to block errors for Redirect packets
 
-Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
----
- .../bpf/prog_tests/icmp_send_kfunc.c          | 42 +++++++++++++++++-
- tools/testing/selftests/bpf/progs/icmp_send.c | 44 +++++++++++++++++++
- 2 files changed, 85 insertions(+), 1 deletion(-)
+Is this a fix or a feature? The subject prefix must contain either
+"net-next" (if targeting the feature tree) or "net" (if targeting the
+fixes tree)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c b/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
-index 51f809ea6896..f48e1d41e3ed 100644
---- a/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
-+++ b/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <test_progs.h>
- #include <network_helpers.h>
-+#include <cgroup_helpers.h>
- #include <linux/errqueue.h>
- #include <poll.h>
- #include "icmp_send.skel.h"
-@@ -10,6 +11,7 @@
- #define ICMP_DEST_UNREACH 3
- #define ICMPV6_DEST_UNREACH 1
+> RFC 4443 section 2.4(e.2) mandates that an ICMPv6 error message MUST NOT
+> be originated in response to an ICMPv6 Redirect message (type 137).
+> 
+> Add check for NDISC_REDIRECT (137) so that redirect packets become
+> ineligible and error packets are not generated for Redirect messages.
 
-+#define ICMP_HOST_UNREACH 1
- #define ICMP_FRAG_NEEDED 4
- #define NR_ICMP_UNREACH 15
- #define ICMPV6_REJECT_ROUTE 6
-@@ -193,7 +195,6 @@ void test_icmp_send_unreach_tc(void)
+...for I didn't understand from the commit message which tree this
+should be taken to and whether this should be considered for backporting.
 
- 	if (test__start_subtest("ipv4"))
- 		run_icmp_test(skel, AF_INET, "127.0.0.1", NR_ICMP_UNREACH);
--
- 	if (test__start_subtest("ipv6"))
- 		run_icmp_test(skel, AF_INET6, "::1", ICMPV6_REJECT_ROUTE);
+I'd also like to hear about real life scenarios where this misbehaves
+and what gets affected by this.
 
-@@ -201,3 +202,42 @@ void test_icmp_send_unreach_tc(void)
- 	bpf_link__destroy(link);
- 	icmp_send__destroy(skel);
- }
-+
-+void test_icmp_send_unreach_recursion(void)
-+{
-+	struct icmp_send *skel;
-+	int cgroup_fd = -1;
-+
-+	skel = icmp_send__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	if (setup_cgroup_environment()) {
-+		fprintf(stderr, "Failed to setup cgroup environment\n");
-+		goto cleanup;
-+	}
-+
-+	cgroup_fd = get_root_cgroup();
-+	if (!ASSERT_GE(cgroup_fd, 0, "get_root_cgroup"))
-+		goto cleanup;
-+
-+	skel->links.recursion =
-+		bpf_program__attach_cgroup(skel->progs.recursion, cgroup_fd);
-+	if (!ASSERT_OK_PTR(skel->links.recursion, "prog_attach_cgroup"))
-+		goto cleanup;
-+
-+	trigger_prog_read_icmp_errqueue(skel, ICMP_HOST_UNREACH, AF_INET,
-+					"127.0.0.1");
-+
-+	/* Because there's recursion involved, the first call will return at
-+	 * index 1 since it will return the second, and the second call will
-+	 * return at index 0 since it will return the first.
-+	 */
-+	ASSERT_EQ(skel->data->rec_kfunc_rets[0], -EBUSY, "kfunc_rets[0]");
-+	ASSERT_EQ(skel->data->rec_kfunc_rets[1], 0, "kfunc_rets[1]");
-+
-+cleanup:
-+	cleanup_cgroup_environment();
-+	icmp_send__destroy(skel);
-+	close(cgroup_fd);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/icmp_send.c b/tools/testing/selftests/bpf/progs/icmp_send.c
-index 5fa5467bdb70..c899fb7b28d2 100644
---- a/tools/testing/selftests/bpf/progs/icmp_send.c
-+++ b/tools/testing/selftests/bpf/progs/icmp_send.c
-@@ -14,6 +14,9 @@ int unreach_type = 0;
- int unreach_code = 0;
- int kfunc_ret = -1;
+IOW very poor description to be reviewable.
 
-+unsigned int rec_count = 0;
-+int rec_kfunc_rets[] = { -1, -1 };
-+
- SEC("cgroup_skb/egress")
- int egress(struct __sk_buff *skb)
- {
-@@ -125,4 +128,45 @@ int tc_egress(struct __sk_buff *skb)
- 	return TCX_DROP;
- }
+> 
+> Signed-off-by: Sayooj K Karun <sayooj@aerlync.com>
+> ---
+>  net/ipv6/icmp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+> index efb23807a026..3fdb3a97dd8e 100644
+> --- a/net/ipv6/icmp.c
+> +++ b/net/ipv6/icmp.c
+> @@ -157,7 +157,8 @@ static bool is_ineligible(const struct sk_buff *skb)
+>  		 */
+>  		if (!tp && frag_off != 0)
+>  			return false;
+> -		else if (!tp || !(*tp & ICMPV6_INFOMSG_MASK))
+> +		else if (!tp || !(*tp & ICMPV6_INFOMSG_MASK) ||
+> +			 *tp == NDISC_REDIRECT)
+>  			return true;
+>  	}
+>  	return false;
 
-+SEC("cgroup_skb/egress")
-+int recursion(struct __sk_buff *skb)
-+{
-+	void *data = (void *)(long)skb->data;
-+	void *data_end = (void *)(long)skb->data_end;
-+	struct tcphdr *tcph;
-+	struct iphdr *iph;
-+	int ret;
-+
-+	iph = data;
-+	if ((void *)(iph + 1) > data_end || iph->version != 4)
-+		return SK_PASS;
-+
-+	if (iph->daddr != bpf_htonl(SERVER_IP))
-+		return SK_PASS;
-+
-+	if (iph->protocol == IPPROTO_TCP) {
-+		tcph = (void *)iph + iph->ihl * 4;
-+		if ((void *)(tcph + 1) > data_end ||
-+		    tcph->dest != bpf_htons(server_port))
-+			return SK_PASS;
-+	} else if (iph->protocol != IPPROTO_ICMP) {
-+		return SK_PASS;
-+	}
-+
-+	/* This call will provoke a recursion: the ICMP packet generated by the
-+	 * kfunc will re-trigger this program since we are in the root cgroup in
-+	 * which the kernel ICMP socket belongs. However when re-entering the
-+	 * kfunc, it should return EBUSY.
-+	 */
-+	ret = bpf_icmp_send(skb, unreach_type, unreach_code);
-+	rec_kfunc_rets[rec_count & 1] = ret;
-+	__sync_fetch_and_add(&rec_count, 1);
-+
-+	/* Let the first ICMP error message pass */
-+	if (iph->protocol == IPPROTO_ICMP)
-+		return SK_PASS;
-+
-+	return SK_DROP;
-+}
-+
- char LICENSE[] SEC("license") = "Dual BSD/GPL";
---
-2.34.1
-
+Thanks,
+Olek
 
