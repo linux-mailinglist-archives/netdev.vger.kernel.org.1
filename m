@@ -1,170 +1,137 @@
-Return-Path: <netdev+bounces-291864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291865-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GFFGLdvZFWpYdAcAu9opvQ
-	(envelope-from <netdev+bounces-291864-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:35:23 +0200
+	id kL75FvLeFWqCdgcAu9opvQ
+	(envelope-from <netdev+bounces-291865-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:57:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6065E5DAC11
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:35:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABDB85DB071
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5A92F30355EE
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:30:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 797DF3132211
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0639C40B6D0;
-	Tue, 26 May 2026 17:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F4B41C2FC;
+	Tue, 26 May 2026 17:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aaqGH2Tb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0me14/J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C751409134
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 17:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C489141B35C;
+	Tue, 26 May 2026 17:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779816621; cv=none; b=XGQozjQRNOEf11IqjLgQ9gNAKpBVPXZb4i+VHA8EK2qiL1nnhippGKcaPPPI6dJyYXa3Gu6+QE0soz0VfXbgQIIpsNoxI/btawSGquDDKEyaaui4z+WRfewzMedxJo+hlpS8YWxSKEm1mGvrfj1bLWs1U+ODh79b+aVDxtd8VSc=
+	t=1779816837; cv=none; b=bSoMuvgUBwanjxVLjKJURo11D3wHGSi2VZ7nTGD4BeXBocJU7CyW/PdDVOBEwSksbVyAdwV/Sm1BnzvKFAmBlAT21yYnuKvkXR4aqHqepTZaNW6v+XpSuu4Hvfi5g4iRjcwnNnu2abZ7Rs6480tTpUKNaE8TlIC6wB1MD3hjq3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779816621; c=relaxed/simple;
-	bh=Dv5uPsCAT/1j1WstcpocTP7TcL21F91ECEcH4+6Ny3g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hA1bBYrbPmhxE1FK+I1LJvPTNYU6KaUtu0Zzd1GUooVwvCNhsnzhQ+xlopnPfePwlMscQ9x1ofjqrpksVVxacAKXXnw733ICULtbhtBPUC0nqDNMTCg6u4I5FjlloiklHEworexDINEBrGUvAwF3MFTyupfmA3v8p0Hiu82/zfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aaqGH2Tb; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id DF4A94E42D61;
-	Tue, 26 May 2026 17:30:17 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 99E596011D;
-	Tue, 26 May 2026 17:30:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BFD27108889CC;
-	Tue, 26 May 2026 19:30:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779816616; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=Ix6O67LPhQjcw0qkAU/4CFtYmXqn5WjrGZujIJogIOM=;
-	b=aaqGH2TbqtjPP8Cw+wNKbeFmVjacNlu4RLja4Jwv8PVCl+9qsTzx+7IgMGDjMgdUiC36KC
-	h7zGMOnTOVMofKNJPp7tQh0N+87QV6XknVqUspBoB2vZKiXhpeAIP0fe4bOc/Pd3wmCCar
-	AmCp9W0D4perHtb1bxgHSqjMKE2pROLL+7rMePOIJF81RYfySlowiBy5m7y2FoAvU7NVg6
-	s08587mH+SpPH4zTLjZWQ92Y561Ns5jCVnLaD6ZZOvmOAIPfwjljk7hkvyW9ssilNfAhqB
-	1Pr3SWFK7ARF/1uLrhIjOM4Sj5cKqNdqGd5mKElnp/wjE6BLe/hVUJLGIWWFlg==
-Message-ID: <ab46e47a-bb95-44c9-a43a-c5f208607a6c@bootlin.com>
-Date: Tue, 26 May 2026 19:30:12 +0200
+	s=arc-20240116; t=1779816837; c=relaxed/simple;
+	bh=GsILhnnbVdoVwhECB8dRPg9InXwIw88e24tD7opTjpU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K37kcuO/SINETxmAUlq8FV4+rofHyB/7bPpQ/zHc9crooqoomp8PaYDVQ+pqjjk7ycJbdMb86ZZvrxKZRVHOgnrDOrGvus95FkYw4ZpmbhLGYePtmxyidgTmxpsxje9z6m9E8LhtobeTe6Sk4mKuKvT/EFu0ta1lnRtuTqWZTiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0me14/J; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F080C1F000E9;
+	Tue, 26 May 2026 17:33:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779816836;
+	bh=gjpURTv2c2v2N9HFm7TiQlpaPA7lIpsocmrTHwzlbC8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=D0me14/JXHDqcpJ5hAQo4YDQ9P52gJBHzw8bO+6KZ4YoJ6FP2H1vzhnvT4bXKpxba
+	 hMEITNQlUiJAQ/KWnaay0rduiIE7hrsHNjcgtHtyHmaIwbxryQq/++sD37bsrqGvy+
+	 qWQTFAnGM+nx864ARTLkHXpfTskJ5QQhkVeHK6xFRD1NLkpFRBlDscHXqmGn0RBXal
+	 AN144hIuXT3zFjXVcWQ4Y1pE/HkUE4v5XAkadJoAOyoEIL4RAhOoIw2xowA2P2H4KY
+	 AY23x0qszNBQvPEFjc4tEwg8Milo/z1ajdMbfUgOS6fC0fJ0G04q03KMUjSQPrGuBP
+	 pu3z3BeOvjh6g==
+Date: Tue, 26 May 2026 18:33:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, David Heidelberg <david+nfc@ixit.cz>,
+	Samuel Ortiz <sameo@linux.intel.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	oe-linux-nfc@lists.linux.dev, kernel-team@meta.com
+Subject: Re: [PATCH net v2 0/2] nfc: llcp: two fixes for nfc_llcp_getsockopt()
+Message-ID: <20260526173351.GB2256768@horms.kernel.org>
+References: <20260521-fix_llc-v2-0-ab44cc09179c@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 10/10] ethtool: eeprom: add more safeties to EEPROM
- Netlink fallback
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, o.rempel@pengutronix.de,
- kory.maincent@bootlin.com, haiyangz@microsoft.com, andrew@lunn.ch,
- vladyslavt@nvidia.com
-References: <20260526153533.2779187-1-kuba@kernel.org>
- <20260526153533.2779187-11-kuba@kernel.org>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260526153533.2779187-11-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260521-fix_llc-v2-0-ab44cc09179c@debian.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291864-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291865-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:email,nvidia.com:email,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 6065E5DAC11
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,msgid.link:url,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: ABDB85DB071
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
-
-On 5/26/26 17:35, Jakub Kicinski wrote:
-> The Netlink fallback path for reading module EEPROM
-> (fallback_set_params()) validates that offset < eeprom_len,
-> but does not check that offset + length stays within eeprom_len.
-> The ioctl equivalent (ethtool_get_any_eeprom() in ioctl.c) has
-> always enforced both bounds:
+On Thu, May 21, 2026 at 07:32:08AM -0700, Breno Leitao wrote:
+> While converting the NFC LLCP socket layer to the new getsockopt_iter()
+> API, I noticed that nfc_llcp_getsockopt() unconditionally stores four
+> bytes through a (u32 __user *) cast regardless of the caller-supplied
+> optlen, overflowing the user buffer when optlen < 4. Patch 1 adds an
+> explicit length check (with a signed-int guard so a negative optlen
+> cannot slip past it) and is what I originally sent as v1.
 > 
->    if (eeprom.offset + eeprom.len > total_len)
->        return -EINVAL;
+> While reviewing v1, Simon/sashiko[1] pointed out that llcp_sock->local
+> is read outside lock_sock(sk) and can be freed by a concurrent
+> llcp_sock_bind() error path before getsockopt() dereferences it. Patch
+> 2 moves the load and the NULL check inside the lock. Both fixes target
+> the same original commit, so they are now sent together as a two-patch
+> series.
 > 
-> This could lead to surprises in both drivers and device FW.
-> Add the missing offset + length validation to fallback_set_params(),
-> mirroring the ioctl.
+> Note: These fixes were compile-tested.
 > 
-> Similarly - ethtool core in general, and ethtool_get_any_eeprom()
-> in particular tries to zero-init all buffers passed to the drivers
-> to avoid any extra work of zeroing things out. eeprom_fallback()
-> uses a plain kmalloc(), change it to zalloc.
+> [1] https://lore.kernel.org/all/20260513-fix_llc-v1-1-33c76f931ff6@debian.org/
 > 
-> Fixes: 96d971e307cc ("ethtool: Add fallback to get_module_eeprom from netlink command")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 > ---
-> CC: andrew@lunn.ch
-> CC: maxime.chevallier@bootlin.com
-> CC: vladyslavt@nvidia.com
-> ---
->   net/ethtool/eeprom.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ethtool/eeprom.c b/net/ethtool/eeprom.c
-> index 836316df3092..0b8cfeddb014 100644
-> --- a/net/ethtool/eeprom.c
-> +++ b/net/ethtool/eeprom.c
-> @@ -44,6 +44,9 @@ static int fallback_set_params(struct eeprom_req_info *request,
->   	if (offset >= modinfo->eeprom_len)
->   		return -EINVAL;
->   
-> +	if (length > modinfo->eeprom_len - offset)
-> +		return -EINVAL;
-> +
->   	eeprom->cmd = ETHTOOL_GMODULEEEPROM;
->   	eeprom->len = length;
->   	eeprom->offset = offset;
-> @@ -69,7 +72,7 @@ static int eeprom_fallback(struct eeprom_req_info *request,
->   	if (err < 0)
->   		return err;
->   
-> -	data = kmalloc(eeprom.len, GFP_KERNEL);
-> +	data = kzalloc(eeprom.len, GFP_KERNEL);
->   	if (!data)
->   		return -ENOMEM;
->   	err = ethtool_get_module_eeprom_call(dev, &eeprom, data);
+> Changes in v2:
+> - Guard the length check against negative optlen (Simon Horman / sashiko).
+> - Add patch 2: move llcp_sock->local read inside lock_sock(sk) to close
+>   a UAF race with llcp_sock_bind() (Simon Horman / sashiko).
+> - Link to v1: https://patch.msgid.link/20260513-fix_llc-v1-1-33c76f931ff6@debian.org
+
+Thanks for the update.
+
+There is an AI-generated review of this patch on sashiko.dev.
+It looks like it flags pre-existing issue that doesn't directly
+impact the intent of this patch-set. So I don't believe it should delay
+progress of this patch-set.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
