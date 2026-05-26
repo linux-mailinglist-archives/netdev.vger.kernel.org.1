@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-291889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6D7lL07wFWp7fQcAu9opvQ
-	(envelope-from <netdev+bounces-291889-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:11:10 +0200
+	id kDa3CdfwFWp7fQcAu9opvQ
+	(envelope-from <netdev+bounces-291891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:13:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D355DBCD9
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:11:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98955DBD76
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:13:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6BEED3030286
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:07:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 80E4A30416E6
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6EE3C09EE;
-	Tue, 26 May 2026 19:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41CC33C0A0B;
+	Tue, 26 May 2026 19:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="LcSOkN5X"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="I3qHY1Qr"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5803C09E9;
-	Tue, 26 May 2026 19:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CFC3C09E9;
+	Tue, 26 May 2026 19:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779822454; cv=none; b=TBsYIl6RXOrApim+LO4zSAhxjkjGxygEmO8IVzmGwI1eGxGItfM8JGcgcD7dzCeJtWSe3ulegZ5v/Dt2Q6k75EucEn0kzAJBAwMPSnXW15mR2H8Jkf8a4jlEJRh8w4jLWDMIrc3M2BAW0+nH7L8w4zMR2csQ1+II7OIq7IyT7hU=
+	t=1779822468; cv=none; b=G8/8x0zzWe2gGTDgfVS5nYbXyxW3gjRHMyOk/xho0J20ljM5Ot5lg4Ex30kLrFoKrQvc4rQigyUs5iquMcwi+Miczpyi59hxPIGLUI8NGi2G4/SUOPqp+0MRNcNbH67Dhg3yyxXvP+9tkL150Uu8sP1xEzJl6E6QxBCIcJUb7Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779822454; c=relaxed/simple;
-	bh=r4hFjJGCOQ3H2tIbEfEClomCP23YzdPBlr41HX63Gao=;
+	s=arc-20240116; t=1779822468; c=relaxed/simple;
+	bh=Q4NHhl9ZAEwg4p0tFeYbLxM4xJad4JGgfbz9Dvgy3S8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X62xsG0hBIvXh6fffb1dKjbNu06PZlPZIknkbsZbtGmE981GiUw+djIlL2LiW76RIvKyi4xF00YOPYuvFWKGUKAfbd5mVI23iQpuj8aAiEE36Ry+tq3TlVeLeRjQhLJCDgPr+1x6UUdQyKf3PparQxdw+3nMlQHRW6Y5uvkb10A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=LcSOkN5X; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=GAi8AqH79mlAtA6/bOUV6Cr4poWgGkSUCDPMuLbhdK6YPM4vN7LpOiOf/pxNcXEhqsOmesDUiPyHJ4b/X3QE4ry55yoaTixF1CWLHwYNDvsOxyz6Q7zuMT23mwhP22nnuUn5s75+Bz/ueszw8ggm5X5Qa1EmZIqMp8087UzyLmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=I3qHY1Qr; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id DB732201E4;
-	Tue, 26 May 2026 21:07:31 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 51683206B1;
+	Tue, 26 May 2026 21:07:45 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7eRVCOh7PcIi; Tue, 26 May 2026 21:07:31 +0200 (CEST)
+ with ESMTP id XqqCRniUrAeh; Tue, 26 May 2026 21:07:44 +0200 (CEST)
 Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 2C307201A7;
-	Tue, 26 May 2026 21:07:31 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 2C307201A7
+	by mx1.secunet.com (Postfix) with ESMTPS id 8E1FD201A7;
+	Tue, 26 May 2026 21:07:44 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 8E1FD201A7
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1779822451;
-	bh=VndmE5aKA1c8Yxvg0TEdv6C7T34K3myq94Z7JC+XXHQ=;
+	s=202301; t=1779822464;
+	bh=nFBV3Hh9bYsWTBcJDt3K+jDQ7Biwup3fJVaFus+8pOU=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=LcSOkN5XSrQwiXaub47UaDh8qqDaFg33EZSysmWm/tmdaDDlSPqehUp9c7iY7wV5y
-	 eTFA9gU/SZew02oN+Cj5QMH+LahW465IVBCDoQQdJIMeJQII+Dck9Vl4JGSpmuk6Vt
-	 mg9nJ7v2kCLQnvaN0J8lq16SlqsMBCmuvBSzOz24wDwGK7Dbo2tIJXgskWk010Lprt
-	 5pBq6y8xODOpXqcRmszfAjTxVsjK0IqrQt8CJtDa+bqOZA3ksFnQQNw6hrZG0WBXih
-	 J1d1xdQxAn+c55W9uyUAQD+/ufAuq45qB0jEoiTt+uJGLQPokHhVp7CSrkwPfy4JuQ
-	 Wyh6IBcuX4WiQ==
+	b=I3qHY1QrYqOTKJSfwjl5a5cfqWk18wZ52NvIPBDg2ZE9/hLrV4Gl0I8zvDqcdeerd
+	 NIxEBgq+RKuss4gdG2JpI6nRfiGd7H7QNwUdbbHGI7MYFNmfEGIDrWN+pFMZSUUlzv
+	 Du1/mysa7Hbrjm2SezH/Ij1geI4o+h8WLB5R3SMJ5e6h7x8gOJXULPTfyXC3cEaG95
+	 g6DV5i8p8j6K4N540kjTQMHk+LyGC9ZjulUGv9itgdxkyOmekiFdAZa5hfEwkt/DLV
+	 KrRcrg3QJzAh6aBIg+xJ4tWMEEjLxKUNYQ5wA+0YlEDnsbip3Emy5HS95PAANwh1vP
+	 E65j78a9LX4cw==
 Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
  (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 26 May
- 2026 21:07:26 +0200
+ 2026 21:07:42 +0200
 From: Antony Antony <antony.antony@secunet.com>
 To: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
 	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
@@ -75,9 +75,9 @@ CC: Sabrina Dubroca <sd@queasysnail.net>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <selinux@vger.kernel.org>,
 	<linux-doc@vger.kernel.org>, Chiachang Wang <chiachangwang@google.com>, Yan
  Yan <evitayan@google.com>, <devel@linux-ipsec.org>
-Subject: [PATCH ipsec-next v9 05/16] xfrm: rename reqid in xfrm_migrate
-Date: Tue, 26 May 2026 21:07:15 +0200
-Message-ID: <migrate-state-v9-5-ad9947e4ae74@secunet.com>
+Subject: [PATCH ipsec-next v9 06/16] xfrm: split xfrm_state_migrate into create and install functions
+Date: Tue, 26 May 2026 21:07:30 +0200
+Message-ID: <migrate-state-v9-6-ad9947e4ae74@secunet.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <migrate-state-v9-0-ad9947e4ae74@secunet.com>
 References: <migrate-state-v9-0-ad9947e4ae74@secunet.com>
@@ -90,164 +90,186 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 X-Mailer: b4 0.15-dev
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-02.secunet.de
+X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-02.secunet.de
  (10.32.0.172)
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291889-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291891-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:email,secunet.com:mid,secunet.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:email,secunet.com:mid,secunet.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,queasysnail.net:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
-	NEURAL_HAM(-0.00)[-0.986];
+	NEURAL_HAM(-0.00)[-0.987];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 18D355DBCD9
+X-Rspamd-Queue-Id: A98955DBD76
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In preparation for a later patch in this series s/reqid/old_reqid/.
+To prepare for subsequent patches, split
+xfrm_state_migrate() into two functions:
+- xfrm_state_migrate_create(): creates the migrated state
+- xfrm_state_migrate_install(): installs it into the state table
+
+splitting will help to avoid SN/IV reuse when migrating AEAD SA.
+
+And add const whenever possible.
 No functional change.
 
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 Signed-off-by: Antony Antony <antony.antony@secunet.com>
 ---
- include/net/xfrm.h     |  2 +-
- net/key/af_key.c       | 10 +++++-----
- net/xfrm/xfrm_policy.c |  4 ++--
- net/xfrm/xfrm_state.c  |  6 +++---
- net/xfrm/xfrm_user.c   |  4 ++--
- 5 files changed, 13 insertions(+), 13 deletions(-)
+v8->v9: move comment reflow into this patch (Sabrina)
+v4->v5: added this patch
+---
+ include/net/xfrm.h    | 11 ++++++++
+ net/xfrm/xfrm_state.c | 73 +++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 64 insertions(+), 20 deletions(-)
 
 diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 0c035955d87d..368b1dc22e5c 100644
+index 368b1dc22e5c..4137986f15e2 100644
 --- a/include/net/xfrm.h
 +++ b/include/net/xfrm.h
-@@ -685,7 +685,7 @@ struct xfrm_migrate {
- 	u8			proto;
- 	u8			mode;
- 	u16			reserved;
--	u32			reqid;
-+	u32			old_reqid;
- 	u16			old_family;
- 	u16			new_family;
- };
-diff --git a/net/key/af_key.c b/net/key/af_key.c
-index 842bf5786e3f..1f0201d97b4f 100644
---- a/net/key/af_key.c
-+++ b/net/key/af_key.c
-@@ -2554,7 +2554,7 @@ static int ipsecrequests_to_migrate(struct sadb_x_ipsecrequest *rq1, int len,
- 	if ((mode = pfkey_mode_to_xfrm(rq1->sadb_x_ipsecrequest_mode)) < 0)
- 		return -EINVAL;
- 	m->mode = mode;
--	m->reqid = rq1->sadb_x_ipsecrequest_reqid;
-+	m->old_reqid = rq1->sadb_x_ipsecrequest_reqid;
- 
- 	return ((int)(rq1->sadb_x_ipsecrequest_len +
- 		      rq2->sadb_x_ipsecrequest_len));
-@@ -3655,15 +3655,15 @@ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 		if (mode < 0)
- 			goto err;
- 		if (set_ipsecrequest(skb, mp->proto, mode,
--				     (mp->reqid ?  IPSEC_LEVEL_UNIQUE : IPSEC_LEVEL_REQUIRE),
--				     mp->reqid, mp->old_family,
-+				     (mp->old_reqid ? IPSEC_LEVEL_UNIQUE : IPSEC_LEVEL_REQUIRE),
-+				     mp->old_reqid, mp->old_family,
- 				     &mp->old_saddr, &mp->old_daddr) < 0)
- 			goto err;
- 
- 		/* new ipsecrequest */
- 		if (set_ipsecrequest(skb, mp->proto, mode,
--				     (mp->reqid ? IPSEC_LEVEL_UNIQUE : IPSEC_LEVEL_REQUIRE),
--				     mp->reqid, mp->new_family,
-+				     (mp->old_reqid ? IPSEC_LEVEL_UNIQUE : IPSEC_LEVEL_REQUIRE),
-+				     mp->old_reqid, mp->new_family,
- 				     &mp->new_saddr, &mp->new_daddr) < 0)
- 			goto err;
- 	}
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index c944327ce66c..fd505adf080e 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -4538,7 +4538,7 @@ static int migrate_tmpl_match(const struct xfrm_migrate *m, const struct xfrm_tm
- 	int match = 0;
- 
- 	if (t->mode == m->mode && t->id.proto == m->proto &&
--	    (m->reqid == 0 || t->reqid == m->reqid)) {
-+	    (m->old_reqid == 0 || t->reqid == m->old_reqid)) {
- 		switch (t->mode) {
- 		case XFRM_MODE_TUNNEL:
- 		case XFRM_MODE_BEET:
-@@ -4632,7 +4632,7 @@ static int xfrm_migrate_check(const struct xfrm_migrate *m, int num_migrate,
- 				    sizeof(m[i].old_saddr)) &&
- 			    m[i].proto == m[j].proto &&
- 			    m[i].mode == m[j].mode &&
--			    m[i].reqid == m[j].reqid &&
-+			    m[i].old_reqid == m[j].old_reqid &&
- 			    m[i].old_family == m[j].old_family) {
- 				NL_SET_ERR_MSG(extack, "Entries in the MIGRATE attribute's list must be unique");
- 				return -EINVAL;
+@@ -1895,6 +1895,17 @@ int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	       const struct xfrm_encap_tmpl *encap);
+ struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *net,
+ 						u32 if_id);
++struct xfrm_state *xfrm_state_migrate_create(struct xfrm_state *x,
++					     const struct xfrm_migrate *m,
++					     const struct xfrm_encap_tmpl *encap,
++					     struct net *net,
++					     struct xfrm_user_offload *xuo,
++					     struct netlink_ext_ack *extack);
++int xfrm_state_migrate_install(const struct xfrm_state *x,
++			       struct xfrm_state *xc,
++			       const struct xfrm_migrate *m,
++			       struct xfrm_user_offload *xuo,
++			       struct netlink_ext_ack *extack);
+ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+ 				      struct xfrm_migrate *m,
+ 				      struct xfrm_encap_tmpl *encap,
 diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index b9de931d84c1..5424f2becbaf 100644
+index 5424f2becbaf..85fd80520184 100644
 --- a/net/xfrm/xfrm_state.c
 +++ b/net/xfrm/xfrm_state.c
-@@ -2081,14 +2081,14 @@ struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *n
+@@ -1966,8 +1966,8 @@ static inline int clone_security(struct xfrm_state *x, struct xfrm_sec_ctx *secu
+ }
  
- 	spin_lock_bh(&net->xfrm.xfrm_state_lock);
+ static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
+-					   struct xfrm_encap_tmpl *encap,
+-					   struct xfrm_migrate *m)
++					   const struct xfrm_encap_tmpl *encap,
++					   const struct xfrm_migrate *m)
+ {
+ 	struct net *net = xs_net(orig);
+ 	struct xfrm_state *x = xfrm_state_alloc(net);
+@@ -2125,12 +2125,12 @@ struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *n
+ }
+ EXPORT_SYMBOL(xfrm_migrate_state_find);
  
--	if (m->reqid) {
-+	if (m->old_reqid) {
- 		h = xfrm_dst_hash(net, &m->old_daddr, &m->old_saddr,
--				  m->reqid, m->old_family);
-+				  m->old_reqid, m->old_family);
- 		hlist_for_each_entry(x, xfrm_state_deref_prot(net->xfrm.state_bydst, net) + h, bydst) {
- 			if (x->props.mode != m->mode ||
- 			    x->id.proto != m->proto)
- 				continue;
--			if (m->reqid && x->props.reqid != m->reqid)
-+			if (m->old_reqid && x->props.reqid != m->old_reqid)
- 				continue;
- 			if (if_id != 0 && x->if_id != if_id)
- 				continue;
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index ae144d1e4a65..273ea6fdb8ad 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3104,7 +3104,7 @@ static int copy_from_user_migrate(struct xfrm_migrate *ma,
+-struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+-				      struct xfrm_migrate *m,
+-				      struct xfrm_encap_tmpl *encap,
+-				      struct net *net,
+-				      struct xfrm_user_offload *xuo,
+-				      struct netlink_ext_ack *extack)
++struct xfrm_state *xfrm_state_migrate_create(struct xfrm_state *x,
++					     const struct xfrm_migrate *m,
++					     const struct xfrm_encap_tmpl *encap,
++					     struct net *net,
++					     struct xfrm_user_offload *xuo,
++					     struct netlink_ext_ack *extack)
+ {
+ 	struct xfrm_state *xc;
  
- 		ma->proto = um->proto;
- 		ma->mode = um->mode;
--		ma->reqid = um->reqid;
-+		ma->old_reqid = um->reqid;
+@@ -2145,24 +2145,57 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+ 	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
+ 		goto error;
  
- 		ma->old_family = um->old_family;
- 		ma->new_family = um->new_family;
-@@ -3187,7 +3187,7 @@ static int copy_to_user_migrate(const struct xfrm_migrate *m, struct sk_buff *sk
- 	memset(&um, 0, sizeof(um));
- 	um.proto = m->proto;
- 	um.mode = m->mode;
--	um.reqid = m->reqid;
-+	um.reqid = m->old_reqid;
- 	um.old_family = m->old_family;
- 	memcpy(&um.old_daddr, &m->old_daddr, sizeof(um.old_daddr));
- 	memcpy(&um.old_saddr, &m->old_saddr, sizeof(um.old_saddr));
+-	/* add state */
++	return xc;
++error:
++	xc->km.state = XFRM_STATE_DEAD;
++	xfrm_state_put(xc);
++	return NULL;
++}
++EXPORT_SYMBOL(xfrm_state_migrate_create);
++
++int xfrm_state_migrate_install(const struct xfrm_state *x,
++			       struct xfrm_state *xc,
++			       const struct xfrm_migrate *m,
++			       struct xfrm_user_offload *xuo,
++			       struct netlink_ext_ack *extack)
++{
+ 	if (xfrm_addr_equal(&x->id.daddr, &m->new_daddr, m->new_family)) {
+-		/* a care is needed when the destination address of the
+-		   state is to be updated as it is a part of triplet */
++		/*
++		 * Care is needed when the destination address
++		 * of the state is to be updated as it is a part of triplet.
++		 */
+ 		xfrm_state_insert(xc);
+ 	} else {
+-		if (xfrm_state_add(xc) < 0)
+-			goto error_add;
++		if (xfrm_state_add(xc) < 0) {
++			if (xuo)
++				xfrm_dev_state_delete(xc);
++			xc->km.state = XFRM_STATE_DEAD;
++			xfrm_state_put(xc);
++			return -EEXIST;
++		}
+ 	}
+ 
++	return 0;
++}
++EXPORT_SYMBOL(xfrm_state_migrate_install);
++
++struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
++				      struct xfrm_migrate *m,
++				      struct xfrm_encap_tmpl *encap,
++				      struct net *net,
++				      struct xfrm_user_offload *xuo,
++				      struct netlink_ext_ack *extack)
++{
++	struct xfrm_state *xc;
++
++	xc = xfrm_state_migrate_create(x, m, encap, net, xuo, extack);
++	if (!xc)
++		return NULL;
++
++	if (xfrm_state_migrate_install(x, xc, m, xuo, extack) < 0)
++		return NULL;
++
+ 	return xc;
+-error_add:
+-	if (xuo)
+-		xfrm_dev_state_delete(xc);
+-error:
+-	xc->km.state = XFRM_STATE_DEAD;
+-	xfrm_state_put(xc);
+-	return NULL;
+ }
+ EXPORT_SYMBOL(xfrm_state_migrate);
+ #endif
 
 -- 
 2.47.3
