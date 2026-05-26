@@ -1,134 +1,186 @@
-Return-Path: <netdev+bounces-291877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAFrC1zpFWqXegcAu9opvQ
-	(envelope-from <netdev+bounces-291877-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:41:32 +0200
+	id IK+2GoLqFWqXegcAu9opvQ
+	(envelope-from <netdev+bounces-291879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:46:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C21955DB78D
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:41:31 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B6C5DB84D
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:46:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1FF683015719
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:41:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 37E533014833
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0DA40B6DB;
-	Tue, 26 May 2026 18:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CDB3446B0;
+	Tue, 26 May 2026 18:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Nz6bHEkR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZzsmxkpU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A081156CA
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 18:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062602DEA7B
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 18:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779820886; cv=none; b=hq5ajKV0lrWeTkOJMNXBfF6fVqv+OoeTbFVTLl7MWEI/Hu4hzfqcV7BfJwfUuoFTdr5cn1gwcR8Drm/+DA8M0xO9QJB6oCD7dTHP6e/vZlbkD5lJzAItf7+GWYCF5gLCQdgNEBnNV0DYGlknttoi8qv79sbfoqqZ5b47TH4Cr9Q=
+	t=1779821184; cv=none; b=Gz0R+JXgnS4+e4XL2WIJjant4jkq80OmFbo52LjNR+uIFE/m59nP8KJxrvO3uEaZ3hcVv3VjZlNt5DvNF1IWTf0CKQpjFNPGaN45tozJ9TkogN9bV400RQvZ3qOkYOPxA3tKvJV8iTZMZPnnfOi0loufJa9pbKXMenHpwX+L2v0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779820886; c=relaxed/simple;
-	bh=RkW0Bv1L0Js8MNsa7V7ZK7EapQX1yrgXE71yF21qq5A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m/I/FzK9F4JxFKTkURNw5Jlz5sgKgC7IqLwAcQC0EP6yYferJACIhG2bSpTBdBMwDWKXMkmwv93Dx8FQPNDMGQvmtL4N3feCIXjQDKzrZYG7oRFWu/s5cmOyOz842+uMxnueGIjTVYdGhRTii+FXrRkYyP945PYijxheaqvyUYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Nz6bHEkR; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 1455F4E42D63;
-	Tue, 26 May 2026 18:41:22 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id AC1C66011D;
-	Tue, 26 May 2026 18:41:21 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B77FE10888A19;
-	Tue, 26 May 2026 20:41:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779820880; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=PIYj6/EhK5ecVCOsnUMdIrM77xOW3tv5CbH8SY6+uiQ=;
-	b=Nz6bHEkRxZkrj8vpiUPjypNGWtvq3iwyzcEPzXlDt/ZjsnM2mMc3ZBQKVKFjDosV/fSwYu
-	TOmGaW4YA4bya7sR3S4VRXWbjxOpLwxVUkYcTIzeH9yvppmgf+UE2XxwA2DtNexdyEWFXu
-	iz2b30KR6R+VPfzeSyqkdDfQFfBZkJztustGXA6DEeAUVW33kuNQTEPilC6NIV1EASdwS2
-	YPc2a4cYBJjKpk3PjVi+s5KrE3BdkWIWMzjn+LoZt7JGk1FPEhfqGi8MSeEa7qn8zr/UDQ
-	G8ZiYPgKccD3Y68+Y/bPGnsmFohUlBOjNBjLOByh08kocJcnVajrTzn5ZsUtmQ==
-Message-ID: <422219d6-8377-423c-8ccd-641b2fccaa1a@bootlin.com>
-Date: Tue, 26 May 2026 20:41:10 +0200
+	s=arc-20240116; t=1779821184; c=relaxed/simple;
+	bh=XdW9He5EDu8NwLUMQOJO5rBU9vk4TninkbjLV/S6asg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=FokF+OTyEgeqtjUMNiFoVigedO36clASe0J2HNleblArdjjVC8TdwckiCJEI4h2X77AhpBq+EDdC2uftt+T+ltOHpQujkv6IOjMa98rJN403XnAPhWU1QraeGxKKc/CPd7r0vjErb1T5C14D880F+DWm3rlFeIbVI8NVgxodE/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZzsmxkpU; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7c23248f3a3so115576177b3.1
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 11:46:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779821182; x=1780425982; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sr3UqMOgY8Q0sOVcNzul/LXQuYjMqGkRarSoqlIbOyM=;
+        b=ZzsmxkpUc05f7wiPWwm7aNDiOKxACVbJl3J/NATKTztPi+CYy3kd/YjhMFmXvvZHBD
+         iz/mcuQkT36erQydBwzaaII8V+uZGugdYhrcZnWRNnwYW2j8SmMSne4kQv3hMz5gfB9l
+         HTdAQEYsPBEYI+MM/JS45lKMR08Spa0FGOfym7gOJ2b+ToI3hE2LprcLxrWTZaeDo1ue
+         RzDHSGyAkOv+TjLuiRvaGFqYdy0S/g0yr7KddA+S3Jh2JB6RDkbSC0cmWIYqQqiU9/3q
+         YdBCSB5/ljq1dSZLMVdfrbSUfuIx0G/jC59N/KLSyFedogwOTPjMZUn3VSVqbHP1QeQW
+         KgMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779821182; x=1780425982;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sr3UqMOgY8Q0sOVcNzul/LXQuYjMqGkRarSoqlIbOyM=;
+        b=s30O+Hi4Wx7fCbxJyzH8ge6dDQHWORSIB5jT4TXi6fb2VuozC8BWx2tXGoWmLFCR4w
+         WUpieR8/E/3kxStqMglDAgzys0Tl5pOj+0HGamZ5hMCoAhb5OFopNAznzi5NYXfKTwpk
+         OsWYauaMj7oEbZqYNVkjh2BcNLBivnBzt0Bv0m73JMUmK1GZ5OM8X+DLPOivF0u+ZO5t
+         gZz7quKxa1cGWBhJEyPRmaaTLOUgLNpjrUOZIOC2TengWdFTi7SsISCQWXYObptCwdYz
+         gjnWYs9zV01T5c+gYiqYkBhLpYqBAnUj7dSYoYQXsbI2pSYUO5/O+zkenfG0dtVvE3Df
+         Q/rQ==
+X-Gm-Message-State: AOJu0Yypdeq/CbQvq7gogoGm9yid2Y5qGbmrIV47JLG4rKieOBUvEuPJ
+	NV+Y+pTooDU6e4oqLb6YhiD/IuVpxdCY1UeNgCJm+ywaNINmKqG82ZErqkUHhg==
+X-Gm-Gg: Acq92OHaj3o5Nr8ali1LxveX5uplHIzpAbmezR1t/M0ui9JP1+SMVr0mrToXy6XsJvH
+	bkasxJBwLga6+L+twh5irpM2dWXynMLCjPOqXI7fHFVgRIoUjMqT7ef6TkjiEZEZ1v97YsrFYP6
+	4xaw3pgDrEuakPU8PFmObD1gClCf0QRfA2puAhmDCGkU1MgNq7epAneygbXroa4SC0+LaJtLPXP
+	6pbMzamR+dC7Cgu7mJVim8fQNSwvFhUVtsm4yDkcvhcwPPyPeV+5rEagPZ2l0w7NlWc81Q5MrzT
+	hYZYNUSvqifEdnbuEQZx5Vgg3zdfhSXYytVb+pennwO6l8gvhKhb0qmfl2J8gcHKOcNKgCJ+t1E
+	mWmpQEPz4jqv6dvD3yMT7YFg/9/5NCLLE+llaZt4ezZdTVgEuL+ASZbbL2F+xvKVCgH6ygxXKeQ
+	3RX9kNbJJEi7EvLnxjbUeCfMps/ypnHF/S7tazTAJTwsr0S4s2eVQi3PXxAvFBxaIsHycoj1pf/
+	yQlklHvQFawz6xViw==
+X-Received: by 2002:a05:690c:3388:b0:7bd:9ce7:164c with SMTP id 00721157ae682-7d338682c32mr218938457b3.43.1779821181917;
+        Tue, 26 May 2026 11:46:21 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7d389813ee6sm64269647b3.2.2026.05.26.11.46.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2026 11:46:20 -0700 (PDT)
+Date: Tue, 26 May 2026 14:46:20 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ richardcochran@gmail.com, 
+ yangbo.lu@nxp.com, 
+ kuniyu@google.com, 
+ willemb@google.com, 
+ matttbe@kernel.org
+Message-ID: <willemdebruijn.kernel.178a41a53d041@gmail.com>
+In-Reply-To: <20260526153650.2779821-1-kuba@kernel.org>
+References: <20260526153650.2779821-1-kuba@kernel.org>
+Subject: Re: [PATCH net] ethtool: vclock: propagate errors from
+ ptp_get_vclocks_index()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 06/10] docs: net: refresh netdev feature guidance
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- vladimir.oltean@nxp.com, willemb@google.com, sdf.kernel@gmail.com,
- ecree.xilinx@gmail.com, jesse.brandeburg@intel.com, linux-doc@vger.kernel.org
-References: <20260526160151.2793354-1-kuba@kernel.org>
- <20260526160151.2793354-7-kuba@kernel.org>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260526160151.2793354-7-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291877-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,nxp.com,gmail.com,intel.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291879-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,nxp.com];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.764];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: C21955DB78D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 05B6C5DB84D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub
+Jakub Kicinski wrote:
+> ptp_get_vclocks_index() was written with sock_timestamping_bind_phc()
+> in mind. Any return <= 0 will get converted to EINVAL by the virtue
+> of sock_timestamping_bind_phc() not finding a matching vclock.
+> 
+> ethtool's phc_vclocks_prepare_data(), however, should not be silently
+> returning empty messages on allocation errors or when PHC does not
+> exist at all.
+> 
+> Commit c156174a6707 ("ethtool: add a new command for getting PHC virtual
+> clocks") added phc_vclocks_prepare_data(), but let's not treat this
+> as a fix in case some user space app now depends on the failures being
+> silent.
+> 
+> The check in sock_timestamping_bind_phc() is not strickly necessary,
 
-On 5/26/26 18:01, Jakub Kicinski wrote:
+strictly
 
->   
->    1. netdev->hw_features set contains features whose state may possibly
->       be changed (enabled or disabled) for a particular device by user's
-> -    request.  This set should be initialized in ndo_init callback and not
-> -    changed later.
-> +    request.  Drivers normally initialize this set before registration or
-> +    in the ndo_init callback. Changes after registration should be made
-> +    very carefully as other parts of the code may assume hw_features are
-> +    static. At the very least changes must be made under rtnl_lock and
-> +    the netdev instance lock, and followed by netdev_update_features().
-Feel free to keep this description as-is, but can we get somewhere the
-actual meaning of "hw" in "hw_features" ? I've seen this cause confusion
-before as this is sometimes wrongly interpreted as "Hardware features",
-which isn't correct as the hardware may do stuff without allowing users
-to change that behaviour.
+> but include it just for clarity.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-I vaguely recall something along the lines of "Host-Writeable features",
-but I am not sure at all about that...
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Maxime
+>  
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index b37b664b6eb9..9e33e979a283 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -870,6 +870,8 @@ static int sock_timestamping_bind_phc(struct sock *sk, int phc_index)
+>  
+>  	num = ethtool_get_phc_vclocks(dev, &vclock_index);
+>  	dev_put(dev);
+> +	if (num < 0)
+> +		return num;
+>  
+>  	for (i = 0; i < num; i++) {
+>  		if (*(vclock_index + i) == phc_index) {
+
+Not for this patch:
+
+This is called by sk_setsockopt and by MPTCP for every subflow.
+Apparently MPTCP does not check the return value. Should it?
 
