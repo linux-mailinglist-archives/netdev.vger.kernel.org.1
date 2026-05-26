@@ -1,277 +1,242 @@
-Return-Path: <netdev+bounces-291929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291930-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Hp8KsYLFmrYhAcAu9opvQ
-	(envelope-from <netdev+bounces-291929-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:08:22 +0200
+	id QGDBIAkPFmojhQcAu9opvQ
+	(envelope-from <netdev+bounces-291930-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:22:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258305DC9A5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:08:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 888925DCA6B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 127F73015486
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:08:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 11D213002906
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99AB3C1F40;
-	Tue, 26 May 2026 21:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED873C141F;
+	Tue, 26 May 2026 21:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHknQda5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vQhNTL8+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DD73BFAF5
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 21:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779829698; cv=none; b=RToqS57HlboY+ey0L46yfQnSZbsfNsoIIDwz2tWK48JvH8APqmILIFwQU2BSAt4F9gSidxgzXZECUolmk6Rcsg3lLJIKVNEHPVai01CL68Vz0ScHnHsw8Pxbi8914yTuCjCkNFhBxDFpYvvMSZtENKAs3e1BuwIOw19On6vQUVk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779829698; c=relaxed/simple;
-	bh=BjO37vgihnHtOM0z27OHzSTx5mNySfd4p7FBq7HL9dU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GYAMKySsAumeD4qG6lQyiju1TuxJmeeQEl1T7cPexMFCGLzziwDrLXoXzyx1nmWjnWFH5ofQ/ifjWB8xuRy9V7t6a7S+HnQeVCESqwr5Y8NW217qBSj6LOB8yEiV2tCA6SaN7PVaqoMrxpg43/yQYdzD3C/n6fMnYFhYVJN2l0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHknQda5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A20151F000E9;
-	Tue, 26 May 2026 21:08:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779829697;
-	bh=QzwgwypkHaL96nsdzAkl5yH0GD0dCTKW1kcyCj3G6qA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hHknQda5xEYsK9IBnCJXCvpT/FS27W7drakg0GHskeVSZn3m8q0ZmlNMkcyN5h5YA
-	 xhdm2eb6Kscy68HoKwokIZwV2L0HeGQBunFBGntDQr08jbMfr/gTrhBJfxzOT41nsZ
-	 tFLfzr9nBhUwUXNS6QWyfM25blqoolgKL10jc3mJdn3i4Wkw2KThlx8zEwv999YSie
-	 wbs5eXxXfCzy7MT7epDG9kC729+BkZYxdMRal8G/kOKFc/hpDZRRFli5njkIPfGi6e
-	 OemMvy2bVODCYRN+x7au9+WjbNqWRWuJSg3jcBT3KVxTNjyDhl1I9j0z9zNBMl8wCE
-	 xH8AmfaG2r4kg==
-Date: Tue, 26 May 2026 23:08:14 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	Madhur Agrawal <madhur.agrawal@airoha.com>
-Subject: Re: [PATCH RFC net-next v2] net: airoha: Add TCP LRO support
-Message-ID: <ahYLvlIYH60cvkWB@lore-desk>
-References: <20260526-airoha-eth-lro-v2-1-24e2a9e7a397@kernel.org>
- <7473204e-2ccd-44d8-b703-5a5dbcb29b61@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04AA3C13FF
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 21:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779830532; cv=pass; b=KsUf88sBor5axqlWz/1CDExC1i6cViPS5Cm6CeGHYhYu159Kvji5LCA1IQ4GskAYz2h6GPz1NZAPWYsA3Wy+AcuvrssgpaVB/CADJRqkNgJ0s1rAc3FMDVmDRb8KpdUWvT6ethfIp7kqqMG/r7oOzDCCEn4J+nIPFqP37lEdVQM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779830532; c=relaxed/simple;
+	bh=h2pRzbCs5OlGfRvvPszd4XwFbSVhfsO5zU3RTXajg64=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eWlVPmJ+oNy5d3Xy/LF2a2U4AuALnSZjup1/w9RKMgqMfKmzvsHDNFcOvuP5UfEZmZQK+t/CEaHxU5drGSrf66vnotQyvfU8zYc2BKTWKp6zwNybj/hTPw1xWjXOH/kh4+6ESYuMdLzsN4qgmLV4oK7u/5WsafJnAPlz8KeCEMQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vQhNTL8+; arc=pass smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1363e78746eso6538373c88.1
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 14:22:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779830530; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ckNo+LUc11rJ8myP1gUJpFEVlmJAZ5A9MFTccox2v7kTIEFI96RII2YkwTosrRUUVy
+         o8kGAakBuSzothmFNlxAqWi6Nx/3x/yYZqSdZSF9FqYVTWaUPYnbjMCNofoMEF9mdBqB
+         +Pnb6DRdj91hQzFOtFMx6O0b6TU6/tqyXNwimIjPuYT4kfVu7folMYMQqjARVgZ6PVAI
+         GRNvtSYtXW7hMsJnEuVtKBWeGfJM66WZuroLKQZgUawhZTY8KY3Ld34IRV7G/NqAmJtq
+         MvZtD9PK6cFiSngf5/w9RF546WHQCkMNq3ePnz459n7PaMFCptALJ0HYZQNjAkAj9Uk1
+         90Mw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=VP4mbJpM8WH2IyEvSBYTVLRBzgCHnu41ehX3TVFH8Hk=;
+        fh=lmpjazLiDPEHelNBNAmEXTrjt2HbRm5bWAtaKZQNkZM=;
+        b=clUV7Xwh9MAVa3QiHY9FLtDGdqQsvNWRwXa2PXGAtR2071TIuF7copPGtwfMxZIce/
+         gQmLINeEh8l1PDIeyAh00BxwGQJ8g/r5PJBe9uyPQ5HMzgJ97eHCEyO15Qb+EAe7B1Yz
+         DHmk6BZtqXw8eTQNqj718bqRr2wWK2/Om/GjtoAOvycqx3h3aaeVi8Z4IL6JgNebQ+WH
+         1q+W85H4rfnhwUjKGFvlc5jPFDnhWV66uOIajt0Vl+DXR7PfTJ8wWpop7L9mGwOCTdvC
+         twpuZQ/rrDkGRqo40XJkSoH+IU/XWgQN3W50s6FHfUsg4dRWlkTzxMzD0FIEIfULmsMX
+         1ecQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779830530; x=1780435330; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VP4mbJpM8WH2IyEvSBYTVLRBzgCHnu41ehX3TVFH8Hk=;
+        b=vQhNTL8+e8b5J1mAiDM8tKggXDpSqD8JOqidf7yV9ca6HZZDKcd1o1WjjM1ZQXWKA9
+         LItYMBazZHJI+tHwaCjs7XEXNbQS5IkGvDcb4fYZ/KsIBlQrSQIEsmZSZmblRtxJTHuo
+         Gw72fhDTFDrNJPYtKjqF+IpYjOEmH8w3tXTqqYd9eadAoEQctuii7r5maoy7A5nQAG/i
+         REjmy/kLXNQsIMHLh9Jo23HngDyxGACMkb+fBrU2Mk3hyZ3ji3eHaM20LM2qLgymLe/N
+         ZJNq4hPjB3kglGQwK2f5jP0As5OIaYjBrxeFJ6/g5P9bXdAeY7N4fxh5FzGe+yA+lrnv
+         AegA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779830530; x=1780435330;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VP4mbJpM8WH2IyEvSBYTVLRBzgCHnu41ehX3TVFH8Hk=;
+        b=Tcnv5GAs+Risb20xNQ/J/OmFqD9QEhj+vs5jF4QHXm5nzhRsfGHiZhw538QW8YxGmv
+         XWMV12kSc6pBBxI3UsAfSr2nmtiwB8zZICs3MJLh7BQn2JcjKp/WXZiXvRHFOh7EZwFS
+         xhb8iWS2ur8b4sK4Zww4R/vYzA9sZWjA1detc3EHZFJ64hXiUgasmwB+T/pkGBnf462l
+         t8xphmuFQ7SlC7m9zZSRjXqtt4i5wYfF2WQ1k24p5EWpi5HZHp7NiudmVJR6J0VPWAjV
+         x/9Ye48kTmn+bX2Tz8XHW01nB8HjfaargMYytqTUviYwKTUr7oNKhBWX71+oMefHvYca
+         9LlA==
+X-Forwarded-Encrypted: i=1; AFNElJ+8/23CZmcSUPZpigWjHYpVI4koRsPSffiBjKzuGfbDNGbU5/3/mZnqg1RAdmFPQBlvHgeaodI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPeAZVlX3fk2v1e2L5EmkA6Rfn0h+UFzsKYPDhpLvxSImOMZyw
+	WTb/vJB7ApCPb/ZzRKiWhggweSEUml/BnWwzVsnt8BU2Z+LI9C9H91h8TzVWeflbfhOVu/wUWDP
+	WtpNxQeM6E9H4800M8ls3yn/97UJamEb2pbLDg+sb
+X-Gm-Gg: Acq92OHz7FsFwoUt+LocXOAzIlm2NX3iDtwpBehnAZRu2V8V2TtBU0fCui71PJefDBb
+	/jSRICqHoeZKuyYaTpxu6/dC+Guze4C3B7IHjWn2BggIjaNY6PaFbTpDLc9Yru4nmQJh8xu3mWr
+	9XAteDjvZ7shpAeqBSOIovkfDwSl++xvG7oeR1/fLfMfY85DwKMHvQZ/8krijutADm5UOW4wOqI
+	0hX3MnaR20WiaYxepT0BQXrEVgSOszJffIF4kUR7dN8zh4ozqQy1FtGdyYfegNFrJ33zC1IZoFr
+	hqAkctq2veZsZ9Q0TtLlWePTKjDfwTQpPbgVfLLkN16Lj+8WemASylr2sw2NJDwISayiuh+r8cM
+	8bAjEFoinXfejQg8YMJ7vWOIv1ReTIdTtljL+X0vYNc9EERwtsT7wdHFpYa7C
+X-Received: by 2002:a05:7022:e997:b0:134:feba:40e with SMTP id
+ a92af1059eb24-1365f600934mr6305256c88.6.1779830529265; Tue, 26 May 2026
+ 14:22:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="EScZYE8yc4PJ+rAl"
-Content-Disposition: inline
-In-Reply-To: <7473204e-2ccd-44d8-b703-5a5dbcb29b61@intel.com>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+References: <20260523083001.2911931-1-kuniyu@google.com> <20260523083001.2911931-4-kuniyu@google.com>
+ <202652620632.prOx.martin.lau@linux.dev>
+In-Reply-To: <202652620632.prOx.martin.lau@linux.dev>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 26 May 2026 14:21:56 -0700
+X-Gm-Features: AVHnY4IrxL6GuXy1gEDVGjcRdn1esdgGUIAOzsUq5l9tkNCP9wmrwYPRcO3ehEA
+Message-ID: <CAAVpQUA0UNhR8AWfd0WC-krYJeXb0ebNs-V4u9kgweyNw_XHtg@mail.gmail.com>
+Subject: Re: [PATCH v3 bpf-next 03/11] bpf: tcp: Support bpf_skb_load_bytes()
+ for BPF_SOCK_OPS_RCVQ_CB.
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Tenzin Ukyab <ukyab@berkeley.edu>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291929-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291930-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,iogearbox.net,linux.dev,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[airoha.com:email]
-X-Rspamd-Queue-Id: 258305DC9A5
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linux.dev:email,bpf_sock_ops.data:url]
+X-Rspamd-Queue-Id: 888925DCA6B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
---EScZYE8yc4PJ+rAl
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> From: Lorenzo Bianconi <lorenzo@kernel.org>
-> Date: Tue, 26 May 2026 08:58:05 +0200
->=20
-> > Add hardware TCP Large Receive Offload (LRO) support to the airoha_eth
-> > driver, leveraging the EN7581/AN7583 SoC's 8 dedicated LRO hardware que=
-ues
-> > mapped to RX queues 24=E2=80=9331. LRO hw offloading does not support
-> > Scatter-Gather (SG) so it is required to increase the page_pool allocat=
-ion
-> > order to 2 for RX queues 24=E2=80=9331 (LRO queues).
-> >=20
-> > Performance comparison between GRO and hw LRO has been carried out using
-> > a 10Gbps NIC:
-> >=20
-> > GRO: ~2.7 Gbps
-> > LRO: ~8.1 Gbps
-> >=20
-> > Please note with respect to the previous implementation, page_pool
-> > allocation order has been reduced from 5 to 2.
-> >=20
-> > Tested-by: Madhur Agrawal <madhur.agrawal@airoha.com>
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> [...]
->=20
-> > @@ -587,6 +630,85 @@ static int airoha_qdma_get_gdm_port(struct airoha_=
-eth *eth,
-> >  	return port >=3D ARRAY_SIZE(eth->ports) ? -EINVAL : port;
-> >  }
-> > =20
-> > +static int airoha_qdma_lro_rx_process(struct airoha_queue *q,
-> > +				      struct airoha_qdma_desc *desc)
+On Tue, May 26, 2026 at 1:34=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On Sat, May 23, 2026 at 08:29:32AM +0000, Kuniyuki Iwashima wrote:
+> > When a TCP skb is queued to sk->sk_receive_queue, BPF SOCK_OPS
+> > prog can be called with BPF_SOCK_OPS_RCVQ_CB.
+> >
+> > In this hook, we want to parse the RPC descriptor in the skb
+> > and adjust sk->sk_rcvlowat based on the RPC frame size.
+> >
+> > However, we cannot access payload via bpf_sock_ops.data on
+> > modern NICs with TCP header/data split on as the payload is
+> > not placed in the linear area.
+> >
+> > Let's support bpf_skb_load_bytes() for BPF_SOCK_OPS_RCVQ_CB.
+> >
+> > Three notes:
+> >
+> >   1) bpf_sock_ops_kern.skb will be NULL when the BPF prog is
+> >       invoked from recvmsg().
+> >
+> >   2) Access to bpf_sock_ops.data will be disabled by passing
+> >       0 end_offset to bpf_skops_init_skb().
+> >
+> >   3) ____bpf_skb_load_bytes() is called directly instead of
+> >      __bpf_skb_load_bytes() to allow compilers to inline it
+> >      instead of generating a tail-call.
+>
+> Some observations below.
+>
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > ---
+> > v2: Explain why using ____ version instead of __
+> > ---
+> >  net/core/filter.c | 34 ++++++++++++++++++++++++++++++++++
+> >  1 file changed, 34 insertions(+)
+> >
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 4a50fe2cd863..fa8a7c7d86eb 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -7760,6 +7760,38 @@ static const struct bpf_func_proto bpf_sk_assign=
+_proto =3D {
+> >       .arg3_type      =3D ARG_ANYTHING,
+> >  };
+> >
+> > +BPF_CALL_4(bpf_sock_ops_skb_load_bytes, struct bpf_sock_ops_kern *, bp=
+f_sock,
+> > +        u32, offset, void *, to, u32, len)
 > > +{
-> > +	u32 desc_ctrl =3D le32_to_cpu(READ_ONCE(desc->ctrl));
-> > +	u32 msg1 =3D le32_to_cpu(READ_ONCE(desc->msg1));
-> > +	u32 msg2 =3D le32_to_cpu(READ_ONCE(desc->msg2));
-> > +	u32 msg3 =3D le32_to_cpu(READ_ONCE(desc->msg3));
->=20
-> Why are these READ_ONCE()s needed? Does desc come from the HW (sorry I
-> didn't follow the whole code flow) or...?
+> > +     int err;
+> > +
+> > +     if (bpf_sock->op !=3D BPF_SOCK_OPS_RCVQ_CB) {
+>
+> bpf_dynptr_from_skb() and bpf_dynptr_slice() kfunc could also be consider=
+ed.
+> One less bpf_sock->op check in filter.c to maintain and could also avoid
+> a data copy. There is a bpf_cast_to_kern_ctx() to get to a trusted
+> skops_kern pointer but this will need changes in verifier.c to get to
+> skops_kern->skb (e.g. in type_is_trusted_or_null) and this is the tradeof=
+f.
 
-Correct, ctrl, msg1, msg2 and msg3 are subfields of the DMA descriptor read=
- by
-airoha_qdma_rx_process() from the NIC. I guess here we have a similar issue=
- as
-the one fixed in [0]
+Maybe a dumb question, but does it add extra cost (extra dynptr
+function call?) if data overlaps two frags, or can dynptr handle it
+seamlessly with a single bpf_dynptr_slice() ?
 
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?=
-id=3D4ae0604a0673e11e2075b178387151fcad5111b5
+In our case, the data copy is ~16 bytes, so the cost will not be
+a big problem I think.
 
->=20
-> > +	struct sk_buff *skb =3D q->skb;
-> > +	u32 len, th_off, tcp_ack_seq;
-> > +	u16 tcp_win, l2_len;
-> > +	struct tcphdr *th;
-> > +	bool ipv4, ipv6;
-> > +
-> > +	if (FIELD_GET(QDMA_ETH_RXMSG_AGG_COUNT_MASK, msg2) <=3D 1)
-> > +		return 0;
-> > +
-> > +	ipv4 =3D FIELD_GET(QDMA_ETH_RXMSG_IP4_MASK, msg1);
-> > +	ipv6 =3D FIELD_GET(QDMA_ETH_RXMSG_IP6_MASK, msg1);
-> > +	if (!ipv4 && !ipv6)
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	l2_len =3D FIELD_GET(QDMA_ETH_RXMSG_L2_LEN_MASK, msg2);
-> > +	len =3D FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
-> > +	if (ipv4) {
-> > +		struct iphdr *iph;
-> > +
-> > +		if (!pskb_may_pull(skb, l2_len + sizeof(*iph)))
-> > +			return -EINVAL;
-> > +
-> > +		iph =3D (struct iphdr *)(skb->data + l2_len);
-> > +		if (iph->protocol !=3D IPPROTO_TCP)
-> > +			return -EOPNOTSUPP;
-> > +
-> > +		iph->tot_len =3D cpu_to_be16(len - l2_len);
-> > +		iph->check =3D 0;
-> > +		iph->check =3D ip_fast_csum((void *)iph, iph->ihl);
-> > +		th_off =3D l2_len + (iph->ihl << 2);
-> > +	} else {
-> > +		struct ipv6hdr *ip6h;
-> > +
-> > +		if (!pskb_may_pull(skb, l2_len + sizeof(*ip6h)))
-> > +			return -EINVAL;
-> > +
-> > +		ip6h =3D (struct ipv6hdr *)(skb->data + l2_len);
-> > +		if (ip6h->nexthdr !=3D NEXTHDR_TCP)
-> > +			return -EOPNOTSUPP;
-> > +
-> > +		ip6h->payload_len =3D cpu_to_be16(len - l2_len - sizeof(*ip6h));
-> > +		th_off =3D l2_len + sizeof(*ip6h);
-> > +	}
-> > +
-> > +	tcp_win =3D FIELD_GET(QDMA_ETH_RXMSG_TCP_WIN_MASK, msg3);
-> > +	tcp_ack_seq =3D le32_to_cpu(READ_ONCE(desc->data));
-> > +
-> > +	if (!pskb_may_pull(skb, th_off + sizeof(*th)))
-> > +		return -EINVAL;
-> > +
-> > +	th =3D (struct tcphdr *)(skb->data + th_off);
-> > +	th->ack_seq =3D cpu_to_be32(tcp_ack_seq);
-> > +	th->window =3D cpu_to_be16(tcp_win);
-> > +
-> > +	/* Check tcp timestamp option */
-> > +	if (th->doff =3D=3D (sizeof(*th) + TCPOLEN_TSTAMP_ALIGNED) / 4) {
-> > +		__be32 *topt =3D (__be32 *)(th + 1);
->=20
-> Make sure you checked the code with sparse (sometimes it's needed to
-> mark casts as __force, not this one tho)
 
-$ make C=3D2 CHECK=3Dsparse drivers/net/ethernet/airoha/
-  CHECK   scripts/mod/empty.c
-  DESCEND objtool
-  INSTALL libsubcmd_headers
-  DESCEND bpf/resolve_btfids
-  INSTALL libsubcmd_headers
-  CHECK   drivers/net/ethernet/airoha/airoha_eth.c
-  CHECK   drivers/net/ethernet/airoha/airoha_ppe.c
-  CHECK   drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
-  CHECK   drivers/net/ethernet/airoha/airoha_npu.c
+>
+> If this new rcvq callback is added to the 'bpf_tcp_ops' proposal [1],
+> all this will go away. 'struct sk_buff *skb' can be directly passed to an
+> ops of the 'bpf_tcp_ops'. Supporting '*skb' in a struct_ops has already
+> been done in the bpf_qdisc.
+>
+> [1]: https://lore.kernel.org/bpf/20260519215841.2984970-11-martin.lau@lin=
+ux.dev/
 
-$ sparse --version
-v0.6.5-rc1
+Oh I missed the series, the struct_ops conversion looks nice !
+Since this work isn't urgent, I can wait for your series if mine
+churns it.
 
->=20
-> > +
-> > +		if (*topt =3D=3D cpu_to_be32((TCPOPT_NOP << 24) |
->=20
-> Shouldn't this be `((u32)TCPOPT_NOP) << 24` to avoid sign issues?
-
-I guess this is same approach used in [1]. Am I missing something?
-
-[1] https://github.com/torvalds/linux/blob/master/net/ipv4/tcp_ipv4.c#L823
-
-Regards,
-Lorenzo
-
->=20
-> > +					 (TCPOPT_NOP << 16) |
-> > +					 (TCPOPT_TIMESTAMP << 8) |
-> > +					 TCPOLEN_TIMESTAMP)) {
-> > +			__le32 tcp_ts_reply =3D READ_ONCE(desc->tcp_ts_reply);
-> > +
-> > +			put_unaligned_be32(le32_to_cpu(tcp_ts_reply),
-> > +					   topt + 2);
-> > +		}
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> Thanks,
-> Olek
-
---EScZYE8yc4PJ+rAl
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCahYLvgAKCRA6cBh0uS2t
-rD5IAQDm649Y+OIXgnX3tqPjEv0sZKv9Zt+HPJ2Car7wGP9blAD/QhomlYinsEb6
-cOFaX+lWBwG7XoOzG8IhnE4orgKEuA8=
-=Ypxv
------END PGP SIGNATURE-----
-
---EScZYE8yc4PJ+rAl--
+Jason's series is adding a new op, and I guess this can be
+integrated too ?
+https://lore.kernel.org/bpf/20260521135244.40869-5-kerneljasonxing@gmail.co=
+m/
 
