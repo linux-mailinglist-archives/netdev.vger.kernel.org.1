@@ -1,70 +1,115 @@
-Return-Path: <netdev+bounces-291512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291510-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDyLOH8GFWokSQcAu9opvQ
-	(envelope-from <netdev+bounces-291512-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:33:35 +0200
+	id UDuYIioGFWokSQcAu9opvQ
+	(envelope-from <netdev+bounces-291510-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:32:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 499205CFF44
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:33:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A7D85CFF20
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 233B83040ABF
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 02:28:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A648A303CF8C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 02:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E314308F26;
-	Tue, 26 May 2026 02:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD46E3093B5;
+	Tue, 26 May 2026 02:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jxnhjdmJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u+OBhwgH"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0241E305671;
-	Tue, 26 May 2026 02:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C38305696;
+	Tue, 26 May 2026 02:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779762535; cv=none; b=dk6LmtYOvUdF1Ipei44hYsR3tHVLcgr39hCA1ZEhpRTFN4HwwujglvPZKX2dOHwX6R6Sy3SvYQO/kO8lseEFVUNW61vnO7LQPobafxKbOZ6KAjJEN4tFnjqpR27QgxmPB7WTqPDV5AvpLlieAS+KJk197iMxS5Et35DvRdJoCWw=
+	t=1779762512; cv=none; b=DzHa+MKYtgQoyxyZBXgNVleZFX+HWogNJYdTPwakyVxw/KPRsWgrszay9xiRenfbmT9qCE0NWyRl3CN0sgpHPnYoLMq/Hj8XY3lSo9ra2JpVpvJOhobgfI609OPU6+nYMEBIKENvD53RTKb32HAwRCg0zHSBzdxqkHsP1glqAqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779762535; c=relaxed/simple;
-	bh=7IXeQffTMEUb8jyLeaSLPHna3ot2oBn5fu3R2GLVAys=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gpUDID1+ZHMzuuN/AOpZck8YAr20dgdmPlfJfw81FF25/SM34Yf5eYTnTEgXOaZHHgAL03aEm6UakkiGpy4ieCizxtf7y69TeuLdVg7m1czbSV1ORb+DDxa0JtFkB6b0NoXP39NZMVgxYDRCGeD3Zx3ci8SYl7jDvnos+ksLDYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jxnhjdmJ; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=lw
-	4/4FT2rvt0MC5tdmiJL7oUXfl2ms2f6Q38CmkzsO0=; b=jxnhjdmJVIWAml/kE5
-	u5qCxxbg0JHWtE27q94QEN9ZgRfopHORr6sfGxYz1NZj7FaDA1/9eB+xaknOY9Ie
-	BZDnTh7i1h1pU7pbh58mw8+I8Nu2niWqaT6BYmbdYe4TT3890Ei02po91Cb0MizK
-	EsP3WPZNPJtsPzguS+4p3VVOw=
-Received: from PC-YLX4CAEK.company.local (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wAX0JUKBRVqTduMDQ--.20654S2;
-	Tue, 26 May 2026 10:27:23 +0800 (CST)
-From: Ding Hui <dinghui1111@163.com>
-To: andrew@lunn.ch,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1779762512; c=relaxed/simple;
+	bh=PhTbPAXU0oh4RHyr8WZhdjadx4blhl2K4PslbE2HiVE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JOkp9Wu6XGYZgaxMXxUQ6L/QhiyDQ+zGBSxIECEcx6gFmnmPZwmo/sev84hJP4FAspUflThKsTA70AM/ILxMklfxKiXQGXsGsfn2Ue+zL7wj7bSwHkDbxpfetuhtQAwVD+nPsTSTWsEBaX1+4FnrxtHg0xCKfa/FTvAtdbw225Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u+OBhwgH; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779762508;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IvkZWXPTCl+S70lg431XAc/NqFXphJXLE3UltUPGFag=;
+	b=u+OBhwgHyQzfoVd9lAzv0TIz8bmU0/usJ47HXAhTYO7GY84MUfYO57hSO7U40EGgyGQGfH
+	1BVXw8FwkxIO9cHiYVFTSRyoxyIreuB2LHK+hQBvhJfhDigbmUhuUroRxSu7kP/MzB2590
+	mI/XNhQ4g7XrJLtdtiSyIut7hdrKAZ0=
+From: Hui Zhu <hui.zhu@linux.dev>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	JP Kobryn <inwardvessel@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Shuah Khan <shuah@kernel.org>,
+	davem@davemloft.net,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ding Hui <dinghui@lixiang.com>,
-	netdev@vger.kernel.org (open list:STMMAC ETHERNET DRIVER),
-	linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 ARCHITECTURE),
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 ARCHITECTURE),
-	linux-kernel@vger.kernel.org (open list)
-Cc: xiasanbo@lixiang.com,
-	yangchen11@lixiang.com,
-	liuxuanjun@lixiang.com
-Subject: [PATCH v2] net: stmmac: fix fatal bus error on resume by reinitializing RX buffers
-Date: Tue, 26 May 2026 10:26:17 +0800
-Message-Id: <20260526022620.501229-1-dinghui1111@163.com>
-X-Mailer: git-send-email 2.34.1
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	KP Singh <kpsingh@kernel.org>,
+	Tao Chen <chen.dylane@linux.dev>,
+	Mykyta Yatsenko <yatsenko@meta.com>,
+	Leon Hwang <leon.hwang@linux.dev>,
+	Anton Protopopov <a.s.protopopov@gmail.com>,
+	Amery Hung <ameryhung@gmail.com>,
+	Tobias Klauser <tklauser@distanz.ch>,
+	Eyal Birger <eyal.birger@gmail.com>,
+	Rong Tao <rongtao@cestc.cn>,
+	Hao Luo <haoluo@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Jeff Xu <jeffxu@chromium.org>,
+	mkoutny@suse.com,
+	Jan Hendrik Farr <kernel@jfarr.cc>,
+	Christian Brauner <brauner@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Paul Chaignon <paul.chaignon@gmail.com>,
+	Chen Ridong <chenridong@huaweicloud.com>,
+	Lance Yang <lance.yang@linux.dev>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: geliang@kernel.org,
+	baohua@kernel.org,
+	Hui Zhu <zhuhui@kylinos.cn>
+Subject: [RFC PATCH bpf-next v7 09/11] selftests/bpf: Add test for memcg_bpf_ops hierarchies
+Date: Tue, 26 May 2026 10:27:54 +0800
+Message-ID: <f2740b58570c06c275946f31f60858e875d7bdfe.1779760876.git.zhuhui@kylinos.cn>
+In-Reply-To: <cover.1779760876.git.zhuhui@kylinos.cn>
+References: <cover.1779760876.git.zhuhui@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,213 +117,147 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAX0JUKBRVqTduMDQ--.20654S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3AF4UCFWfAr45uw1fKFyUWrg_yoWxAryrpa
-	yayw4DKr1kJrs3Gw4rJw48ZFy5Aan0yFW3Ww4xXw4a9a1a9r9avF1ayrWYya4UGr4kZr92
-	yr4DA39rCF1DAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jtiSdUUUUU=
-X-CM-SenderInfo: pglqwx1xlriiqr6rljoofrz/xtbC8wwkUGoVBQw11QAA3d
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-291510-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,lixiang.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,cmpxchg.org,linux-foundation.org,davemloft.net,fomichev.me,meta.com,distanz.ch,cestc.cn,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,huaweicloud.com,vger.kernel.org,kvack.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-291512-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[163.com:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dinghui1111@163.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[59];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	NEURAL_HAM(-0.00)[-0.986];
+	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.966];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lixiang.com:email]
-X-Rspamd-Queue-Id: 499205CFF44
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 2A7D85CFF20
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Ding Hui <dinghui@lixiang.com>
+From: Hui Zhu <zhuhui@kylinos.cn>
 
-On suspend, stmmac_suspend() calls stmmac_disable_all_queues() which
-stops the RX NAPI, but the RX DMA engine may still be running for a
-short window before stmmac_stop_all_dma() takes effect. During that
-window the hardware can write incoming frames into the buffers pointed
-to by the RX descriptors and write back the descriptors (clearing the
-OWN bit and overwriting RDES0/1/2 with status/timestamp data). Because
-NAPI is already disabled, the driver never refills these descriptors,
-so the RX ring is left in a "consumed but not refilled" state with
-stale content in the descriptor buffer-address fields.
+Add a new selftest, `test_memcg_ops_hierarchies`, to validate the
+behavior of attaching `memcg_bpf_ops` in a nested cgroup hierarchy,
+specifically testing the `BPF_F_ALLOW_OVERRIDE` flag.
 
-On resume, stmmac_clear_descriptors() only re-arms the OWN bit and
-does not repopulate the RX buffer address fields. When the DMA is
-restarted it dereferences these stale addresses and triggers a fatal
-bus error.
+The test case performs the following steps:
+1. Creates a three-level deep cgroup hierarchy: `/cg`, `/cg/cg`, and
+   `/cg/cg/cg`.
+2. Attaches a BPF struct_ops to the top-level cgroup (`/cg`) with the
+   `BPF_F_ALLOW_OVERRIDE` flag.
+3. Successfully attaches a new struct_ops to the middle cgroup
+   (`/cg/cg`) without the flag, overriding the inherited one.
+4. Asserts that attaching another struct_ops to the deepest cgroup
+   (`/cg/cg/cg`) fails with -EBUSY, because its parent did not specify
+   `BPF_F_ALLOW_OVERRIDE`.
 
-Fix this without any allocation by introducing
-stmmac_reinit_rx_descriptors(), called from stmmac_resume() before
-stmmac_clear_descriptors(). The helper iterates every RX descriptor
-slot and re-programs its buffer address fields:
+This test ensures that the attachment logic correctly enforces the
+override rules across a cgroup subtree.
 
- - For normal (page_pool) queues: restore RDES0/1 from buf->addr and
-   RDES2 from buf->sec_addr. The DMA mapping has remained valid across
-   suspend/resume because no pages were freed.
-
- - For AF_XDP zero-copy queues: restore the DMA address from
-   xsk_buff_xdp_get_dma(buf->xdp). Slots with buf->xdp == NULL (TX-only
-   XSK socket) are skipped to avoid a NULL-pointer dereference.
-
- - For chain mode: call stmmac_mode_init() to rebuild the des3 next-
-   descriptor pointer chain, which hardware may have overwritten with
-   a PTP timestamp value (as noted in chain_mode.c:refill_desc3()).
-
-This approach keeps all RX buffers alive across the PM transition and
-avoids any allocation in the resume path, eliminating the OOM risk
-raised against the previous approach of freeing and re-allocating
-buffers.
-
-Signed-off-by: Ding Hui <dinghui@lixiang.com>
+Signed-off-by: Barry Song <baohua@kernel.org>
+Signed-off-by: Geliang Tang <geliang@kernel.org>
+Signed-off-by: Hui Zhu <zhuhui@kylinos.cn>
 ---
+ .../selftests/bpf/prog_tests/memcg_ops.c      | 73 +++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-Changes in v2:
-- Introducing stmmac_reinit_rx_descriptors() to reinitializing rx
-  buffers without any allocation.
-- Modify commit log.
-- Link to v1:
-  https://lore.kernel.org/netdev/20260515053856.2310369-1-dinghui1111@163.com/
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 90 +++++++++++++++++++
- 1 file changed, 90 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 3591755ea30b..0dc27d8c66a0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1642,6 +1642,79 @@ static void stmmac_clear_descriptors(struct stmmac_priv *priv,
- 		stmmac_clear_tx_descriptors(priv, dma_conf, queue);
+diff --git a/tools/testing/selftests/bpf/prog_tests/memcg_ops.c b/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
+index 19fd4fde2266..b4084e9327eb 100644
+--- a/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
++++ b/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
+@@ -559,3 +559,76 @@ void test_memcg_ops_below_min_over_high(void)
+ 	close(low_cgroup_fd);
+ 	cleanup_cgroup_environment();
  }
- 
-+/**
-+ * stmmac_reinit_rx_descriptors - re-program RX descriptors from existing
-+ *				   buffers (allocation-free)
-+ * @priv: driver private structure
-+ * @dma_conf: structure holding the dma data
-+ * @queue: RX queue index
-+ *
-+ * Description: walk rx_q->buf_pool[] and re-program every RX descriptor's
-+ * buffer-address fields from the buffers that are already attached to the
-+ * queue. This is intended for the resume path: between suspend and resume
-+ * the descriptor buffer-address fields may have been overwritten by HW
-+ * writeback (RDESx are reused for status/length on completion), but the
-+ * underlying RX buffers (page_pool pages or XSK frames) are still alive
-+ * in buf_pool[]. By re-using them we avoid any allocation on resume,
-+ * which is unsafe under memory pressure.
-+ *
-+ * This helper is expected to be called only in stmmac_resume.
-+ */
-+static void stmmac_reinit_rx_descriptors(struct stmmac_priv *priv,
-+					 struct stmmac_dma_conf *dma_conf,
-+					 u32 queue)
++
++void test_memcg_ops_hierarchies(void)
 +{
-+	struct stmmac_rx_queue *rx_q = &dma_conf->rx_queue[queue];
-+	int i;
++	int ret, first = -1, second = -1, third = -1;
++	struct memcg_ops *skel = NULL;
++	struct bpf_map *map;
++	struct bpf_link *link1 = NULL, *link2 = NULL, *link3 = NULL;
++	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
 +
-+	for (i = 0; i < dma_conf->dma_rx_size; i++) {
-+		struct stmmac_rx_buffer *buf = &rx_q->buf_pool[i];
-+		struct dma_desc *p = stmmac_get_rx_desc(priv, rx_q, i);
++	ret = setup_cgroup_environment();
++	if (!ASSERT_OK(ret, "setup_cgroup_environment"))
++		goto cleanup;
 +
-+		if (rx_q->xsk_pool) {
-+			dma_addr_t dma_addr;
++	first = create_and_get_cgroup("/cg");
++	if (!ASSERT_GE(first, 0, "create_and_get_cgroup /cg"))
++		goto cleanup;
++	ret = enable_controllers("/cg", "memory");
++	if (!ASSERT_OK(ret, "enable_controllers"))
++		goto cleanup;
 +
-+			/* The XSK pool may not be fully populated (e.g.
-+			 * xdpsock TX-only); skip empty slots.
-+			 */
-+			if (!buf->xdp)
-+				continue;
++	second = create_and_get_cgroup("/cg/cg");
++	if (!ASSERT_GE(second, 0, "create_and_get_cgroup /cg/cg"))
++		goto cleanup;
++	ret = enable_controllers("/cg/cg", "memory");
++	if (!ASSERT_OK(ret, "enable_controllers"))
++		goto cleanup;
 +
-+			dma_addr = xsk_buff_xdp_get_dma(buf->xdp);
-+			stmmac_set_desc_addr(priv, p, dma_addr);
-+			stmmac_set_desc_sec_addr(priv, p, 0, false);
-+		} else {
-+			/* Theoretically unreachable: napi_disable() in
-+			 * stmmac_suspend() ensures all initialized slots
-+			 * have a valid page before we get here.
-+			 * Defensive check only.
-+			 */
-+			if (!buf->page)
-+				continue;
++	third = create_and_get_cgroup("/cg/cg/cg");
++	if (!ASSERT_GE(third, 0, "create_and_get_cgroup /cg/cg/cg"))
++		goto cleanup;
++	ret = enable_controllers("/cg/cg/cg", "memory");
++	if (!ASSERT_OK(ret, "enable_controllers"))
++		goto cleanup;
 +
-+			stmmac_set_desc_addr(priv, p, buf->addr);
-+			stmmac_set_desc_sec_addr(priv, p, buf->sec_addr,
-+						 priv->sph_active &&
-+						 buf->sec_page);
++	skel = memcg_ops__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "memcg_ops__open_and_load"))
++		goto cleanup;
 +
-+			if (dma_conf->dma_buf_sz == BUF_SIZE_16KiB)
-+				stmmac_init_desc3(priv, p);
-+		}
++	map = bpf_object__find_map_by_name(skel->obj, "low_mcg_ops");
++	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name low_mcg_ops"))
++		goto cleanup;
++
++	opts.target_fd = first;
++	opts.flags = BPF_F_ALLOW_OVERRIDE | BPF_F_CGROUP_FD;
++	link1 = bpf_map__attach_struct_ops_opts(map, &opts);
++	if (!ASSERT_OK_PTR(link1, "bpf_map__attach_struct_ops_opts"))
++		goto cleanup;
++
++	opts.target_fd = second;
++	opts.flags = BPF_F_CGROUP_FD;
++	link2 = bpf_map__attach_struct_ops_opts(map, &opts);
++	if (!ASSERT_OK_PTR(link2, "bpf_map__attach_struct_ops_opts"))
++		goto cleanup;
++
++	opts.target_fd = third;
++	opts.flags = BPF_F_CGROUP_FD;
++	link3 = bpf_map__attach_struct_ops_opts(map, &opts);
++	if (!ASSERT_ERR_PTR(link3, "bpf_map__attach_struct_ops_opts"))
++		goto cleanup;
++
++cleanup:
++	bpf_link__destroy(link1);
++	bpf_link__destroy(link2);
++	bpf_link__destroy(link3);
++	if (skel) {
++		memcg_ops__detach(skel);
++		memcg_ops__destroy(skel);
 +	}
-+
-+	/* Chain mode: re-link descriptor 'next' pointers. This is
-+	 * allocation-free; it just rewrites the per-descriptor next
-+	 * field which may have been clobbered by HW writeback.
-+	 */
-+	if (priv->descriptor_mode == STMMAC_CHAIN_MODE) {
-+		void *des = priv->extend_desc ? (void *)rx_q->dma_erx
-+					      : (void *)rx_q->dma_rx;
-+
-+		stmmac_mode_init(priv, des, rx_q->dma_rx_phy,
-+				 dma_conf->dma_rx_size, priv->extend_desc);
-+	}
++	close(first);
++	close(second);
++	close(third);
++	cleanup_cgroup_environment();
 +}
-+
- /**
-  * stmmac_init_rx_buffers - init the RX descriptor buffer.
-  * @priv: driver private structure
-@@ -8272,6 +8345,7 @@ int stmmac_resume(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
- 	struct stmmac_priv *priv = netdev_priv(ndev);
-+	u32 queue;
- 	int ret;
- 
- 	if (priv->plat->resume) {
-@@ -8316,6 +8390,22 @@ int stmmac_resume(struct device *dev)
- 
- 	mutex_lock(&priv->lock);
- 
-+	/* Re-program the RX descriptors from the buffers that are still
-+	 * attached to priv->dma_conf.rx_queue[].buf_pool[]. The buffer-
-+	 * address fields of the RX descriptors may have been overwritten
-+	 * by HW writeback while the DMA was being stopped on suspend
-+	 * (RDESx are reused for status/length on completion), so they
-+	 * must be repopulated before the DMA is restarted in
-+	 * stmmac_hw_setup() below; otherwise the controller would
-+	 * dereference stale addresses and trigger a fatal bus error.
-+	 *
-+	 * This path is allocation-free: it relies entirely on the RX
-+	 * buffers preserved across suspend, which makes the resume path
-+	 * safe under memory pressure.
-+	 */
-+	for (queue = 0; queue < priv->plat->rx_queues_to_use; queue++)
-+		stmmac_reinit_rx_descriptors(priv, &priv->dma_conf, queue);
-+
- 	stmmac_reset_queues_param(priv);
- 
- 	stmmac_free_tx_skbufs(priv);
 -- 
-2.34.1
+2.43.0
 
 
