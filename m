@@ -1,319 +1,276 @@
-Return-Path: <netdev+bounces-291813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291817-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kP1uIc3NFWoTcAcAu9opvQ
-	(envelope-from <netdev+bounces-291813-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:43:57 +0200
+	id VANXDp7IFWrfbQcAu9opvQ
+	(envelope-from <netdev+bounces-291817-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:21:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD3E15D9EA5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:43:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2CC75D9925
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:21:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD9833186E72
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:13:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2CAEA306288E
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B6A3B0AFB;
-	Tue, 26 May 2026 16:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3593C3B0ACA;
+	Tue, 26 May 2026 16:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpQ4xLvT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GJt0uat0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027FC3B0AF3;
-	Tue, 26 May 2026 16:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779812015; cv=none; b=f3MfrkLmZ5wBRVR+uD19Wfj3bJOhUo7JwvFTWDqeAM17tOqYcUpq6MDG8dm9YSwp58Fv7JIMTvrxeZYfw6Z0+5RDgPmQ9odzEZtrg8SdTBUBBLNvHROPZYqgiBuXDEQ4ijU0M8i0cmd2csPDp98qI4ju1Sf33UdFn9Hsx+i8fMs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779812015; c=relaxed/simple;
-	bh=xW7mQnwXGedcSKCCtrk1aQP/FL3phBCCx5+Hkemnwac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qNSpMQpPsN7jvvBuLP065QSTefo8xdkX18U3h2fl/Oz/Qdn2Chr7gfE/893lddsd96ZrZgenVF4pii8auqwmCwnpQFt3+bV+568//4ePhWAWViwsuvyG+9NvRPScrB1UoFcbaihf64P2b7CM8uvIhRJvMNyi9i02LbyaKxPN8ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpQ4xLvT; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B75F1F000E9;
-	Tue, 26 May 2026 16:13:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779812013;
-	bh=HoQ502gwpeiNp5KJxRq0pIgzkr0RP/tEx2RDysEICWw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=OpQ4xLvTA4MJ2XS4/Vzdju1ys4yv/uQ85topgEYflLbhAA+30vT7ARUmzmvcB/T77
-	 s1M3fGkNAq2adWMicf7Qw3bch7WWAf11yxvEGYj8io1m1Rs94FPDZ6bzh3UvkO5Owy
-	 5SMqjHw6gSZfdvJZOi+Qk+Sw6+qwprY11fe6oU5YpprUv9BPObJ16z4A8NQ21DAsBo
-	 BFgwbdoLUSLINdcXBiS25P4kP2OcrQgYYHLpItpcamJFTyGyVJQhyNYTsnMLowV6/9
-	 wXK0teGW1H8GSpIOWjz1Q0VXcoLj3vt0G/R8kD1l8WeX61h64NZ3Nq79MJ28Z5pDRC
-	 GqjLQst7v2aYw==
-Date: Tue, 26 May 2026 21:43:19 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: bod@kernel.org
-Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-	dikshita.agarwal@oss.qualcomm.com, mchehab@kernel.org,
-	elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	jjohnson@kernel.org, mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: Re: [PATCH v7 00/15] firmware: qcom: Add OP-TEE PAS service support
-Message-ID: <ahXGn4wrEozWd_Ur@sumit-xelite>
-References: <20260522115936.201208-1-sumit.garg@kernel.org>
- <177975399325.14006.12128272008783925649.b4-reply@b4>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F1837F739;
+	Tue, 26 May 2026 16:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779812033; cv=fail; b=gfad6qkPDs+R9J2jTnr8z4cMJhoLPy+WrDCLWyhZxq8+uEaWmHIDmzO+xXF+x1RjhnBpbMNDeX9R7jSxzmnZKJznDcNai5qWaEJY6Oupwj50n6wwG5A1nW4yAK3SBXwmaEfxBdLo3Bi03SRsV+KgQettTRzqC09uxkn6XzlMZzI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779812033; c=relaxed/simple;
+	bh=133CtybARFZhuydgUo/i/QmU00Fn1C1jU1+RlEl90H0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=F38LoN9mxv8I2phgCenrDEF4W6LqZIhwF956AgeKcA6psuCwooUJ2T0fl+Lj4x2QKlRbseRCGFrrP1tgZ79GTtRDEVKwp+U5N38mWyouiVb5kwKsRMAPLbl5rm5Cro+euS5VL5CSsNvdbdgzuq5QPkfp3HrCy/JyDOCLx/lrAHo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GJt0uat0; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779812031; x=1811348031;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=133CtybARFZhuydgUo/i/QmU00Fn1C1jU1+RlEl90H0=;
+  b=GJt0uat0KhvDCjG4P+9ESMuP7cgNzyII8dNI9w5sEKzklQYUDljEZW09
+   pMbK+URg0d0Z8crZkN7FVFlfNX9SfF5hBpK5O9GeWdQOtCzew9S6X8Hz2
+   42B58I/WxJhlfQ8xdETyKqwuoHIuK2DOGRYGCAQHZ2+FEOxGcI1zJL9eX
+   qTmQ6Do8ricJSVFci166fPAlZ4epPqpaIfpXaslHhWcvJWGgTuGr1Cd4n
+   hRXQT6JiJy+0n7fQVfWCdibVvNlQneCrbugQIw54Yzinv7sgpjw9GI7AL
+   u7XQDxjhAOMIE6cU2PODbAuhqODc/Rro9KiP1n4Bs/sI5Di6DCgNLFFtl
+   g==;
+X-CSE-ConnectionGUID: +PO9sLE/QEeKCmkboaHxDg==
+X-CSE-MsgGUID: UnFI6FQOTN617Dc0ZFQCPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11797"; a="68153668"
+X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
+   d="scan'208";a="68153668"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 09:13:50 -0700
+X-CSE-ConnectionGUID: cqzTjLnRTZ6NKTdughKzPw==
+X-CSE-MsgGUID: JV3IKk75SbunTnAyyhdV+w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
+   d="scan'208";a="247046904"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 09:13:50 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 26 May 2026 09:13:49 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 26 May 2026 09:13:49 -0700
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.22) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 26 May 2026 09:13:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AOvZBpHT5nI/HD+F+Ys06L3O2OOj/ZneTVDj349ZeN5XIbZ34qwZ8DSrGUN/WMlJEpD5JbC4pHuoN8QySgSJGGxPayEbS7rowJsw/Xc+LD8hKfwiELmemjYKXSnFuMWdyv6m6s3BZKBwCzajPQfVOeBKboefIDKrMyP7XEwuyhsp1M4qRbMHBtpXQDkAY1/w6apCgaQGFpAylnk2528YmYM8vDuNoUl7UTOgV0zsWSRv5NaPRMA6BEe0KUGXHIY+r205Xy2BnfTwNoWIs1ipw3wF0PWFpRAH95WhFwkRBwFPQ1Xm6ReuL+dem/J3qPL5jnoGsTHRxgVb7w9AMldefA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1X14pi8QK11VEB++slEscBPVJtvLYtEH8NO8yjwxMb0=;
+ b=I+l590/YU4JUJBpb7I9/N/M29hbk6rshZTtisp6ULh58doHc4pa4SXlIGZw9dDczjb6yGZwOEfS+Ifu0nxaoFGTxC/tVB6kF53DoheMsqRKtfb+yY/j7smA9K/CdLqFsHpFKf5uxolJCyccgIoGBNmat6ZvDehKcwteVDo5VZ11WlQC7Pg4sAv1H2EuUN/XVrrM/k734GaeB/WQjMKKModNI+lqu47VV1UvpF0AoSnOXAPPKFBGLKt93RcNUyE4R/YsKFmkOnluaByLEFyrGtw8MLUDa4djO7OGFjsAaJnX/obvJ/GzxszE5CpFKcypwKE8+hCXdkH+qDbhAepni4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by SJ0PR11MB5053.namprd11.prod.outlook.com (2603:10b6:a03:2af::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.11; Tue, 26 May
+ 2026 16:13:47 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c%5]) with mapi id 15.21.0071.011; Tue, 26 May 2026
+ 16:13:47 +0000
+Message-ID: <7145a02d-88c4-4065-b436-90a8159ec868@intel.com>
+Date: Tue, 26 May 2026 18:13:40 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] mac802154: llsec: add skb_cow_data() before in-place
+ crypto
+To: Doruk Tan Ozturk <doruk@0sec.ai>
+CC: <alex.aring@gmail.com>, <stefan@datenfreihafen.org>,
+	<miquel.raynal@bootlin.com>, <linux-wpan@vger.kernel.org>,
+	<security@kernel.org>, <netdev@vger.kernel.org>, <stable@vger.kernel.org>
+References: <20260525161806.96158-1-doruk@0sec.ai>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20260525161806.96158-1-doruk@0sec.ai>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR10CA0120.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:803:28::49) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <177975399325.14006.12128272008783925649.b4-reply@b4>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SJ0PR11MB5053:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1503c9c-0456-4c33-9e41-08debb41c3df
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|11063799006|3023799007|18002099003|22082099003|56012099006;
+X-Microsoft-Antispam-Message-Info: oXLybI7Nqii+H0395UH/csp+6zmPxS/FHxMk6QnStDv8v7mToScjDMvbB+jlmutfhBFpIIczDl11y1cIER2DyOleDCUCO6jXswqbmOaszsafcg/ZHw5zUmdUyu3yzylYhsfc3Px1u50bF9gT1YfQfdl1ZngKAumh2sW105u5f+BCympJxP/edGJCrZDtTQeni2tCmuVDUmQsViui+gL2PicTtneltM6vG+XlSIKAdW3G/hpk+GqoFAG41ckHcie2WYHuNoO+IbYXScY9Mny1zzgiOPAbX3+Qy7ikaRbqVZe858ELmd++9CkBRjN/Cpz+3vm3/XIbAj/+3LoG8HjVQndfnpNEYSxoYWv4rKQJYagPuu5lAihQk/2+lt9FchoFeEOEINlgjTqhRwZNpxG3PoacfsW2AO9zpPCKN6xl3MjSACBsVKNCjme/VI26ZwgJhwI6NHpAJuzziOBNy81X2mfAQE4JPnWRWtc/qeAsIyUIUqGmSd9oTCqBvsX9n8XxgCam1aUC/b9XhLik4zxNfkvpAJHqENbDFEXhXO1fzDByezQepD3+1dMgpfbjIAzeAMRvJXINHyc1Vod76NYWgx5Zaa9a1NU/Ru+F+5O3wiiOjF90UGjTqT+y3yQErjq0NSGmf2xZwAd8DKONZpdfOll4OcaxJzC1BcoZlt1/YxL7Nb+5nNEGAJEaxbtNo3gFnMXGiBuAHopDk7ldPUw2ew==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(11063799006)(3023799007)(18002099003)(22082099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YTkvZ2U5dFZEMGZyR0k3Rzh5am5tSnJOc3d2VWM3dzNjV1ByM0F0emN6VDRG?=
+ =?utf-8?B?WG1TQjYybDZKT3R3ZHUwV1hIZnQ3MFZRNXVQbHdaRTM2TFhoOTdvMGMzdTZq?=
+ =?utf-8?B?akJnK2xobGZIQ1NhK0d5K2FQRmh2bzRVTmozT3hTdW5sK3pWSUlPUlVxRWQ2?=
+ =?utf-8?B?TDIxR0dzQlN0bnQxc3FNOXZSQW9UWkRmZHdIb0NJSmJ2cGtmaW05TmlhZUgx?=
+ =?utf-8?B?RStSaHBVaTcwc2xtTFNTMTEyWkI1a1Y0NjBlMWx4aTBrcGMxMWRiN2pCN3pZ?=
+ =?utf-8?B?elZ3MFU4UGxyOCs1M2toLzExVkUrRVhEc05XR1U3UU9uWHc0eDNYTWduTzR4?=
+ =?utf-8?B?REVFMmdnb3IrOUVmcXAzdjQ4YURrNFhmbkFBZlNidkZ1a0dmbWF1Q2E4c3ZG?=
+ =?utf-8?B?dnQ5U0pQS1NXVFRkUVY1L0l5RWhrRjBFRkFLek8wRWRER09nelZkR3ovZFdt?=
+ =?utf-8?B?RDhhdzlYV2lrUzg3UExWT1JRMVFZeGNnelRqa1NNSmtQR05RSjNCUERTem9J?=
+ =?utf-8?B?RWZiT1NGT2dsOExmekpHNXhPVTFBM3Q3VXVqU0NCS2pTTmR3bVBFRGxncW1Z?=
+ =?utf-8?B?ZnZnMlJSdkhSTVRraFM3THNzRXRBRG84NTBaNUl3aGtDaitVUDQra2lpRUls?=
+ =?utf-8?B?Rkw2MzZudUNMeGJpSmt6bllyTGN6RUFCZDU2NFNESkJKYlNkVVhhMjRDbnk0?=
+ =?utf-8?B?WXp1VHA5a0FDbDhBUmpPV3g0WXRXbjVKN1RiUnE1MFpSWUx0Mml1Y2t4L1VE?=
+ =?utf-8?B?Y0h1SWRmUzFJZWgxeTI4bkc1NG1mQ1JFZUt3eUM3OWNpQjA0Um5mbGdRQVdk?=
+ =?utf-8?B?RlJUMGVQVkxQb3VvbHpWUzliQmNuMFJJZzVJMUVHTnNXeHFYY0QyQjd0Rkt1?=
+ =?utf-8?B?UExNUm1VeFo0WXZ6Y1huN2FNUDRYaGdhTzk0MU9IZG0rdlZFVVBxd2JjTHJ0?=
+ =?utf-8?B?L05kUjlSRE9iSVgzN3ZPWk5yNklBcTJHVEJPbGNqcG1nekZHRGYxOGVzOEFz?=
+ =?utf-8?B?czh3U290QzgxUmVQN2oxSk9SSjM0TWN5ZnE2dllpN2xZa1lLS2hCNkNCVndz?=
+ =?utf-8?B?VkFpemJGWmpJN2s4MmRYbzJqUXJmTlMxV1hQV1pzQkRqQmUxVnpxc1ppZkR6?=
+ =?utf-8?B?c0lQejdaUmNzZDZWbWlZMFY3b0JydEhWcHdzWWF5eHNOSG85S2tJV01BaXlE?=
+ =?utf-8?B?dFF2VGd4ZFdSM0U1aU10RXVHT213RjFCMzNqb2NMeFp0cFBQMkdXQmRISjVS?=
+ =?utf-8?B?cHIvZ1lIQmlCa2FZSUlnSDAzVHNkSkZtUzBEeW4rNmU3WFNDY0FlcDM1bU15?=
+ =?utf-8?B?YkFianJScFpoMHdGdDJhSmVvTjIzSDRwdjZHY3I5NnRJSmpubnl4TE5Lbkhi?=
+ =?utf-8?B?djZHWFBPU0sxTjFKN05mYUhVWlM0ZThpRVdpeDFFRmEveWt2c0VYVStPb3VB?=
+ =?utf-8?B?WXhraXNWajJxUTdHVjdIdVhBWnZpazY2K0RLR05BVUljL3ZNNU1VT1hCRXlD?=
+ =?utf-8?B?WHZFcWIrZGxOTlhyQTRhYnlUTXVCK28zMkhJOGxsdGNpaVNyQXNVNDZFM2J4?=
+ =?utf-8?B?L2NRcGlMTnZ2eDRlYjVRR2lqWmNaZlF0UmxrQkI4aDhnaFlhdEppZ1RxcFYz?=
+ =?utf-8?B?dGZ1WFVNa05TQy9waU5INzgxem5pbGhlK0xNdFBKMzkxWDlYNWllSTlDOHpT?=
+ =?utf-8?B?YVAzTXJhYWlwWW5MQWNzcHlwQ3lWcWZ0YmJwS05GeTArbU1TNEtjRjJvSEtW?=
+ =?utf-8?B?Q0EzZ1lKa0QzS2ZMMEU3Y0Z1ZWRJMTZJRDd2WVlvdU1rL0xTS29CenlxUzU1?=
+ =?utf-8?B?am1CSWpxb3BwWkZtT3ozL1pkdFN5VC8vYkZlVnJCdkhQOWhBbHNRVXIyekY5?=
+ =?utf-8?B?dHlkSnMxMXdiTkxwUEhmcVZsTmxPcVJVWHpMVlV1V0RWZS9Xb1JRWTAxUWRH?=
+ =?utf-8?B?M3QzblF6VWVvQ1d6Mkl3cS9DcWdXb090NTBVblZhTlZtZ09DcWtQOWFvVksy?=
+ =?utf-8?B?QUMzemV1ZEZRc0dTOFhQSE1CODRxU3J5L1pTNHRrYVJZTGloekxsclg5SFBB?=
+ =?utf-8?B?ajgyYitjLzdCak9YTDZpbkduZ2ZEb3U5eFFUM1ZmazVlTjhmdEczZ2toQnpZ?=
+ =?utf-8?B?dE9RQS9YWnVZeFQwUUdxTkl2T3RSTGtNL1NMQnd1QWNreFcyQUpPUitIRFUx?=
+ =?utf-8?B?UG05Q2U0ejdBYWdiNktRTEFScHpEVWk1YWFSR3V2VlpnSnMrc3BhTFdqRjND?=
+ =?utf-8?B?ci9mSkdGZ3QzeE03RUdJZTBNdkFMZEdjQmFTcEx2Ylc5a3B5cWZkU3h1ckoy?=
+ =?utf-8?B?U3FEZHhOK2pSbGhlQ2NBbWNWblJaRUdBSW9TM3BuWGdsTlJPOWNwbE9ITVk5?=
+ =?utf-8?Q?LpMKvrvjldZIpP/4=3D?=
+X-Exchange-RoutingPolicyChecked: pKg3VzKgrxfRHNOhMTLmMILaj2PfHuDxlorwQ6RcjOp6Q9jAywVxV/Z+pqFkJmVk+80NpAPH0xkSxNX9+b4jyFAeaKcCRHXl5n8mNbdrD65egXR6g/ytRgFfPeMRPCSgOhnASNOPUZdIulDt65jDTg8KmDKPZDdlWoTQRa+QPADgcI3twwsGYy8bsHboMfMa9TPExjoSBFtu//iQVD06FPuWPnwUq1tLQjxKR4rK3UqDm2+CvzeHc9/ad+/c8s3hxlKRtdNAsAYP+Xx3eFEG9fmrA76Q9C+Co3P87dWgXPYQfGvB3dMTVtTFisSKcrs3fpgGG8HizFGkZk8gdsu3NA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1503c9c-0456-4c33-9e41-08debb41c3df
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 16:13:46.9509
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3oe2j6re/ZRtPipQrio0RV7QfAbnCALt9vzONaXKMGwhnuNndhx5T3AOAvP42ux4XdqZN9dUXN5CR8Hum4/hneTVdxpVVNYIqjR5HP0WcEY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5053
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291813-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,datenfreihafen.org,bootlin.com,vger.kernel.org,kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email,intel.com:mid,intel.com:dkim,0sec.ai:email];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[49];
+	TAGGED_FROM(0.00)[bounces-291817-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: CD3E15D9EA5
+	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: D2CC75D9925
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hey Brian,
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+Date: Mon, 25 May 2026 18:18:06 +0200
 
-On Tue, May 26, 2026 at 01:06:33AM +0100, bod@kernel.org wrote:
-> On 2026-05-22 17:29 +0530, Sumit Garg wrote:
-> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > 
-> > Qcom platforms has the legacy of using non-standard SCM calls
-> > splintered over the various kernel drivers. These SCM calls aren't
-> > compliant with the standard SMC calling conventions which is a
-> > prerequisite to enable migration to the FF-A specifications from Arm.
-> > 
-> > OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
-> > support these non-standard SCM calls. And even for newer architectures
-> > using S-EL2 with Hafnium support, QTEE won't be able to support SCM
-> > calls either with FF-A requirements coming in. And with both OP-TEE
-> > and QTEE drivers well integrated in the TEE subsystem, it makes further
-> > sense to reuse the TEE bus client drivers infrastructure.
-> > 
-> > The added benefit of TEE bus infrastructure is that there is support
-> > for discoverable/enumerable services. With that client drivers don't
-> > have to manually invoke a special SCM call to know the service status.
-> > 
-> > So enable the generic Peripheral Authentication Service (PAS) provided
-> > by the firmware. It acts as the common layer with different TZ
-> > backends plugged in whether it's an SCM implementation or a proper
-> > TEE bus based PAS service implementation.
-> > 
-> > The TEE PAS service ABI is designed to be extensible with additional API
-> > as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
-> > extensions of the PAS service needed while still maintaining backwards
-> > compatibility.
-> > 
-> > Currently OP-TEE support is being added to provide the backend PAS
-> > service implementation which can be found as part of this PR [1].
-> > This implementation has been tested on Kodiak/RB3Gen2 board with lemans
-> > EVK board being the next target. In addition to that WIN/IPQ targets
-> > planning to use OP-TEE will use this service too. Surely the backwards
-> > compatibility is maintained and tested for SCM backend.
-> > 
-> > Note that kernel PAS service support while running in EL2 is at parity
-> > among OP-TEE vs QTEE. Especially the media (venus/iris) support depends
-> > on proper IOMMU support being worked out on the PAS client end.
-> > 
-> > Patch summary:
-> > - Patch #1: adds Kodiak EL2 overlay since boot stack with TF-A/OP-TEE
-> >   only allow UEFI and Linux to boot in EL2.
-> > - Patch #2: adds generic PAS service.
-> > - Patch #3: migrates SCM backend to generic PAS service.
-> > - Patch #4: adds TEE/OP-TEE backend for generic PAS service.
-> > - Patch #5-#13: migrates all client drivers to generic PAS service.
-> > - Patch #14: drops legacy PAS SCM exported APIs.
-> > 
-> > The patch-set is based on qcom tree tip [2] and can be found in git tree
-> > here [3].
-> > 
-> > Merge strategy:
-> > 
-> > It is expected due to APIs dependency, the entire patch-set to go via
-> > the Qcom tree. All other subsystem maintainers, it will be great if I
-> > can get acks for the corresponding subsystem patches.
+> [PATCH] mac802154: llsec: add skb_cow_data() before in-place crypto
 
-It looks like you missed this merge strategy part of the cover letter.
+Pls mark as "PATCH net".
 
-> > 
-> > [1] https://github.com/OP-TEE/optee_os/pull/7721 (already merged)
-> > [2] https://git.kernel.org/pub/scm/linux/kernel/git/qcom/linux.git/log/?h=for-next
-> > [3] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/log/?h=qcom-pas-v7
-> > 
-> > ---
-> > Changes in v7:
-> > - Rebased to qcom tree (for-next branch) tip.
-> > - Merged patch #5 and #7 due to build dependency.
-> > - Disabled modem for kodiak EL2 as it isn't tested yet.
-> > - Fix an issue found out by sashiko-bot for patch #4.
+> llsec_do_encrypt_unauth(), llsec_do_encrypt_auth(),
+> llsec_do_decrypt_unauth(), and llsec_do_decrypt_auth() all perform
+> in-place cryptographic transformations on skb data.  They build a
+> scatterlist with sg_init_one() pointing into the skb's linear data area
+> and then pass the same scatterlist as both src and dst to the crypto API
+> (e.g. crypto_skcipher_encrypt/decrypt, crypto_aead_encrypt/decrypt).
 > 
-> This whole series needs to be broken up into different parts and sent in
-> smaller chunks landing the core changes into the firmware, the drivers and
-> finally the dts.
-
-The DTS EL2 change for Kodiak is totally independent one and that's why
-it's the first one in this series which can be picked independently.
-
+> On the RX path, __ieee802154_rx_handle_packet() clones the received skb
+> before handing it to each subscriber via ieee802154_subif_frame().  The
+> cloned skb shares the same underlying data buffer via reference
+> counting.  When llsec_do_decrypt() subsequently modifies this shared
+> buffer in place, it corrupts data that other clones -- potentially
+> belonging to other sockets or subsystems -- still reference.
 > 
-> For example applying the Iris stuff is impossible until the remoteproc
-> stuff lands.
+> On the TX path, similar data sharing can occur when an skb's head has
+> been cloned (skb_cloned() returns true).
 > 
-> Instead of sending one giant series which no one maintainer can apply send
-> a number of series where one posts a dependency on the other.
-
-The subsystem changes like for Iris are just about renaming of the
-firmware APIs to be used which is moving away from SCM specific API to
-the generic PAS API. I don't think there is any clean way to merge the
-API renaming changes independently of when the new API gets introduced.
-
+> The fix is to call skb_cow_data() before performing any in-place crypto
+> operation.  skb_cow_data() ensures that the skb's data area is not
+> shared: if the skb head is cloned or the data spans multiple fragments,
+> it copies the data into a private buffer that can be safely modified in
+> place.  This is the same pattern used by:
 > 
-> Lumping the TEE stuff in with video encoder, wifi, dts is spanning too many
-> things and makes merging a NAK.
+>   - ESP (net/ipv4/esp4.c, net/ipv6/esp6.c)
+>   - MACsec (drivers/net/macsec.c)
+>   - WireGuard (drivers/net/wireguard/receive.c)
+>   - TIPC (net/tipc/crypto.c)
 > 
-> Break this up into logical chunks and sequence a one series on top of the
-> other - accpeting that you might, likely will have to keep on top of the
-> various series and resend/rebase as things get merged.
-
-I tried my best for the logical split of the patches here keeping the
-subsystems changes to very minimal required (only renaming firmware
-APIs). I would be open to any further suggestions.
-
-However, if you are happy with firmware APIs renaming for the media
-subsystem then it will be nice to get ack from you. I hope Bjorn can
-then pickup the entire series.
-
--Sumit
-
+> Without this guard, in-place crypto on shared skb data leads to:
+>   - Silent data corruption of other skb clones
+>   - Use-after-free when the crypto API scatterwalk writes through a
+>     page that has already been freed by another clone's kfree_skb()
+>   - Kernel crashes under concurrent 802.15.4 traffic with security
+>     enabled (KASAN/KMSAN reports slab-use-after-free)
 > 
-> > Changes in v6:
-> > - Rebased to v7.1-rc4 tag.
-> > - Patch #14: fixed ret error print.
-> > - Add Kconfig descriptions for PAS symbols such that they are visible
-> >   in menuconfig to update.
-> > 
-> > Changes in v5:
-> > - Incorporated misc. comments from Mukesh.
-> > - Split up patch #11 into 2 to add an independent commit for passing
-> >   proper PAS ID to set_remote_state API.
-> > - Picked up tags.
-> > 
-> > Changes in v4:
-> > - Incorporate misc. comments on patch #4.
-> > - Picked up an ack for patch #10.
-> > - Clarify in cover letter about state of media support.
-> > 
-> > Changes in v3:
-> > - Incorporated some style and misc. comments for patch #2, #3 and #4.
-> > - Add QCOM_PAS Kconfig dependency for various subsystems.
-> > - Switch from pseudo TA to proper TA invoke commands.
-> > 
-> > Changes in v2:
-> > - Fixed kernel doc warnings.
-> > - Polish commit message and comments for patch #2.
-> > - Pass proper PAS ID in set_remote_state API for media firmware drivers.
-> > - Added Maintainer entry and dropped MODULE_AUTHOR.
-> > 
-> > Mukesh Ojha (1):
-> >   arm64: dts: qcom: kodiak: Add EL2 overlay
-> > 
-> > Sumit Garg (14):
-> >   firmware: qcom: Add a generic PAS service
-> >   firmware: qcom_scm: Migrate to generic PAS service
-> >   firmware: qcom: Add a PAS TEE service
-> >   remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
-> >   remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
-> >   remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
-> >   remoteproc: qcom: Select QCOM_PAS generic service
-> >   drm/msm: Switch to generic PAS TZ APIs
-> >   media: qcom: Switch to generic PAS TZ APIs
-> >   media: qcom: Pass proper PAS ID to set_remote_state API
-> >   net: ipa: Switch to generic PAS TZ APIs
-> >   wifi: ath12k: Switch to generic PAS TZ APIs
-> >   firmware: qcom_scm: Remove SCM PAS wrappers
-> >   MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
-> > 
-> >  MAINTAINERS                                   |   9 +
-> >  arch/arm64/boot/dts/qcom/Makefile             |   2 +
-> >  arch/arm64/boot/dts/qcom/kodiak-el2.dtso      |  39 ++
-> >  drivers/firmware/qcom/Kconfig                 |  21 +-
-> >  drivers/firmware/qcom/Makefile                |   2 +
-> >  drivers/firmware/qcom/qcom_pas.c              | 291 +++++++++++
-> >  drivers/firmware/qcom/qcom_pas.h              |  50 ++
-> >  drivers/firmware/qcom/qcom_pas_tee.c          | 477 ++++++++++++++++++
-> >  drivers/firmware/qcom/qcom_scm.c              | 302 ++++-------
-> >  drivers/gpu/drm/msm/Kconfig                   |   1 +
-> >  drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
-> >  drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
-> >  drivers/media/platform/qcom/iris/Kconfig      |  25 +-
-> >  .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
-> >  drivers/media/platform/qcom/venus/Kconfig     |   1 +
-> >  drivers/media/platform/qcom/venus/firmware.c  |  11 +-
-> >  drivers/net/ipa/Kconfig                       |   2 +-
-> >  drivers/net/ipa/ipa_main.c                    |  13 +-
-> >  drivers/net/wireless/ath/ath12k/Kconfig       |   2 +-
-> >  drivers/net/wireless/ath/ath12k/ahb.c         |  10 +-
-> >  drivers/remoteproc/Kconfig                    |   4 +-
-> >  drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
-> >  drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
-> >  drivers/remoteproc/qcom_wcnss.c               |  12 +-
-> >  drivers/soc/qcom/mdt_loader.c                 |  12 +-
-> >  include/linux/firmware/qcom/qcom_pas.h        |  43 ++
-> >  include/linux/firmware/qcom/qcom_scm.h        |  29 --
-> >  include/linux/soc/qcom/mdt_loader.h           |   6 +-
-> >  28 files changed, 1124 insertions(+), 320 deletions(-)
-> >  create mode 100644 arch/arm64/boot/dts/qcom/kodiak-el2.dtso
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas.c
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas.h
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
-> >  create mode 100644 include/linux/firmware/qcom/qcom_pas.h
-> > 
-> > -- 
-> > 2.51.0
-> > 
-> > 
+> This vulnerability was identified using 0sec.ai, an open-source
+> automated security auditing platform (https://github.com/0sec-labs).
 > 
-> 
+> Fixes: 4c14a2fb5d14 ("mac802154: add llsec decryption method")
+> Fixes: 03556e4d0dbb ("mac802154: add llsec encryption method")
+> Cc: stable@vger.kernel.org
+> Reported-by: Doruk Tan Ozturk <doruk@0sec.ai>
+
+Did you report this on LKML? If so, you should add
+
+Closes: <link to your mail on lore>
+
+right after the Reported-by.
+
+> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+Other than that,
+
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+
+Thanks,
+Olek
 
