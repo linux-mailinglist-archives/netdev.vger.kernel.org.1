@@ -1,145 +1,154 @@
-Return-Path: <netdev+bounces-291832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Oh9GcvRFWogcgcAu9opvQ
-	(envelope-from <netdev+bounces-291832-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:00:59 +0200
+	id OFPKJ9vWFWrRcwcAu9opvQ
+	(envelope-from <netdev+bounces-291833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:22:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3FC65DA479
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:00:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B1DF5DA91A
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:22:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB7AE3048F1C
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:52:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4BD9B30A0EA6
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBD43F7865;
-	Tue, 26 May 2026 16:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8730402BAA;
+	Tue, 26 May 2026 17:06:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ce3YhG1O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L74nACt4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD063FADF8;
-	Tue, 26 May 2026 16:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889FD38E5D7
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 17:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779814345; cv=none; b=MyAmFk/sWO7gKKufzyBZYJ83Ch+fGgkS9tnlCcAlCnkzTMZM4C9Sem9rYd1nfUgbF7qnphKEQDG3aUDbew6i4koliCtYGhUUmLhI0YcCTaID4l3DKrnX6ZWuf3HtoxfuenQzOZZvWojjFkRJuxUJvVWL0mseZwb8KLVInZGbFG0=
+	t=1779815207; cv=none; b=r9npOOv6skXBoU1Y+u4P/Mu04abQVb230Vjv1E5+NSA3UpmzXKyoBWAP7BhCj2RFs70ahTVQ3KJ7g/nJYITgHwLhwb4W9+Tj36CERJb/dFABiseSoZ/auJk0lJ5O7Cwx3SMqWNHMn0YCa3/6VZI//ugtVNLG4LO9wFTtfKehfvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779814345; c=relaxed/simple;
-	bh=b70iNpOAo4J1yd5gqLr3hNmrHnjVkz1gDv12JovZ6so=;
+	s=arc-20240116; t=1779815207; c=relaxed/simple;
+	bh=5uI+TZfmbe+zgoA46MydWQGF/tG9ydpeVZNef3lT8pU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y1V9yTvaVK+cAT7zGn4+1r3VQgePGzNAMx/Gw6P8VCr1PHcsY0ggb0SuXVkBlhFzDtIlbaEyQQF07oZBH/jVTIYX0JhjAukJXK8/oRBs6VTqt+Wmc+fUWQ/J91S31ALAtTJ89uGkRLUP+qkLK+HYoysMTt5a+KwGQigDujSMDJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ce3YhG1O; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A0541F000E9;
-	Tue, 26 May 2026 16:52:21 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dMI0Ndke4C9ZhGdkfNsroOC/BfL4DkfzccFblF4yHV2bfqWe6ACgdTIDjWBHPToJlBg29wf37u5/cCpK0Fp7cbqbT+pKMtNcWChBEOvY7ZKfif+AVaNaRjUoHCdWxSu0Wre+hWWt/O4xHUN4SfItQGI1r1GERjZUCWv8JzcVQK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L74nACt4; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2B761F000E9;
+	Tue, 26 May 2026 17:06:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779814344;
-	bh=iqZU0VSF4u3exzFmb0oOCc3SQ132DKj9diAAdClssVY=;
+	s=k20260515; t=1779815206;
+	bh=n11Yvwqz+rqZT/ZKP/UpHkRhFhWQS/84ypYO7E9okBA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ce3YhG1O2J0oru3Kpta03Xyl24U6CeF3FrqDEnNPAAo8F57X5JGvA4xtrefe9wSdG
-	 FkEWdSronUB0iXZ5dAJllwKKbA/IrDQs5QLtvLSRjZlb7qjYkzMMnHHh/YInsv9UUF
-	 o3f86Ls0FmSkeSp/gb/u5U6x/G5HHDcBZJYzHQP+hZ/zBOdmJ0MLCdvRsITF3LdxIM
-	 /LUYz0Qyb3W7o3CpplGKMQN9x1ZEGNyZ5/qFm1peqWvDSAmWoWDKdbSo+zeXd0CQjE
-	 5V5A/8flfwnbVBOkMO6wtblSRoV2RR+bWAoVNCnVsi8V75l+tUHTPLRo6fhlgbX3i/
-	 30SpQDMZjCrhw==
-Date: Tue, 26 May 2026 17:52:18 +0100
+	b=L74nACt4vDpTQ1KQExp061+LDxI5s2krwDeWN78xNPBref7J6thsPR6qAf/5kO7kt
+	 aATz9hKovOTTaQ18g359htOPn+NvTMcKe5Zj7+Y4riJ69VD2G5Zj0I+y73i/kw4i/c
+	 I1B7rE1i/SG/cTjLHasSy0Uzvlwvq2z4UY3abPM/aXqwNXeHtr2ju1RDb8oYLuPY7k
+	 zZwRWW/x5tGsL/Zyr7yFBhWodkABOjqWKrcCAZNPHeww9UtJxMcygKVOv9u0ILCaeb
+	 9XlGnd7Nt8g5V8n8mUkISvrfIsxvK12QrFfWvhkw3c192PUHaABUUg1qxhUeOPH6DQ
+	 8iCfyYm8QmLWw==
+Date: Tue, 26 May 2026 18:06:42 +0100
 From: Simon Horman <horms@kernel.org>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	James Chapman <jchapman@katalix.com>,
-	Tom Parkin <tparkin@katalix.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>, Kees Cook <kees@kernel.org>,
-	netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] l2tp: use refcount_inc_not_zero in
- l2tp_session_get_by_ifname
-Message-ID: <20260526165218.GM1506108@horms.kernel.org>
-References: <20260523023423.2568972-1-michael.bommarito@gmail.com>
+To: Przemyslaw Korba <przemyslaw.korba@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	aleksandr.loktionov@intel.com, arkadiusz.kubalewski@intel.com
+Subject: Re: [PATCH iwl-net v3] ice: support SBQ posted writes with
+ non-posted support for CGU
+Message-ID: <20260526170642.GA2256768@horms.kernel.org>
+References: <20260520105311.5336-1-przemyslaw.korba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260523023423.2568972-1-michael.bommarito@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260520105311.5336-1-przemyslaw.korba@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291832-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-291833-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: F3FC65DA479
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 0B1DF5DA91A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, May 22, 2026 at 10:34:23PM -0400, Michael Bommarito wrote:
-> A reader in l2tp_session_get_by_ifname() can return a pointer to a
-> session whose refcount has reached zero. The getter takes its
-> reference with plain refcount_inc(), but every other session getter
-> in the same file (l2tp_v2_session_get, l2tp_v3_session_get, and the
-> corresponding _get_next variants) uses refcount_inc_not_zero()
-> because the IDR/RCU lookup can race with refcount_dec_and_test() ->
-> l2tp_session_free() -> kfree_rcu(). The ifname getter is the only
-> outlier; the inconsistency was raised on-list after 979c017803c4
-> ("l2tp: use list_del_rcu in l2tp_session_unhash").
+On Wed, May 20, 2026 at 12:52:03PM +0200, Przemyslaw Korba wrote:
+> From: Karol Kolacinski <karol.kolacinski@intel.com>
 > 
-> A reader inside rcu_read_lock_bh() that matches session->ifname can
-> be preempted between the strcmp() and the refcount_inc(). If the
-> last reference drops on another CPU in that window, the reader's
-> refcount_inc() runs on a counter that has reached zero. refcount_t
-> catches the addition-on-zero, prints "refcount_t: addition on 0;
-> use-after-free", saturates the counter, and returns the saturated
-> pointer to the caller. Session memory is held live by the in-flight
-> RCU read section, but the kfree_rcu() callback queued from
-> l2tp_session_free() will free it once the grace period closes; a
-> caller that dereferences the returned session past that point hits
-> a slab-use-after-free. On PREEMPT_RT local_bh_disable() is a per-CPU
-> sleeping lock and the preemption window is real; on stock PREEMPT
-> kernels local_bh_disable() is a preempt_count increment that closes
-> the cross-CPU race in practice (see below).
+> Sideband queue (SBQ) is a HW queue with very short completion time. All
+> SBQ writes were posted by default, which means that the driver did not
+> have to wait for completion from the neighbor device, because there was
+> none. This introduced unnecessary delays, where only those delays were
+> "ensuring" that the command is "completed" and this was a potential race
+> condition.
 > 
-> Use refcount_inc_not_zero() and continue the list walk on failure,
-> matching the other session getters in the file. The ifname getter
-> is the only session getter in net/l2tp/ that still uses the bare
-> refcount_inc() pattern; this change restores file-internal
-> consistency. The success path is unchanged.
+> Add the possibility to perform non-posted writes where it's necessary to
+> wait for completion, instead of relying on fake completion from the FW,
+> where only the delays are guarding the writes.
 > 
-> Fixes: abe7a1a7d0b6 ("l2tp: improve tunnel/session refcount helpers")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+> Flush the SBQ by reading address 0 from the PHY 0 before issuing SYNC
+> command to ensure that writes to all PHYs were completed and skip SBQ
+> message completion if it's posted.
+> 
+> E810 only supports opcode 0x01, but its FW always sends completion
+> responses for this opcode, so the driver waits for each write to complete.
+> This makes E810 writes synchronous and eliminates the need for SBQ flush.
+> 
+> To analyze if delays are gone, look for and compare time spent in
+> ice_sq_send_cmd — posted writes should return immediately after the wr32.
+> That can be done for example by adjusting phc time with phc_ctl on E830
+> device, for less than 2 seconds to use this new mechanism. Without it,
+> command below will fail.
+> 
+> Reproduction steps:
+> phc_ctl eth13 adj 1
+> phc_ctl[4478170.994]: adjusted clock by 1.000000 seconds
+> 
+> Check trace for timing for comparisions:
+> echo ice_sbq_send_cmd > /sys/kernel/debug/tracing/set_ftrace_filter
+> echo function_graph > /sys/kernel/debug/tracing/current_tracer
+> cat /sys/kernel/debug/tracing/trace
+> 
+> Tested on:
+>   - Intel E830 NIC (FW version 1.00)
+>   - Kernel 6.19.0+
+> 
+> Fixes: 8f5ee3c477a8 ("ice: add support for sideband messages")
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> ---
+> v3:
+> - include information in comments and commit message about different
+> E810 behavior
+> v2:
+> https://lore.kernel.org/intel-wired-lan/20260508102247.826375-1-przemyslaw.korba@intel.com/
+
+Thanks for the update.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
