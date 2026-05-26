@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-291630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELOrLGltFWojVAcAu9opvQ
-	(envelope-from <netdev+bounces-291630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:52:41 +0200
+	id wHRcMjdvFWojVAcAu9opvQ
+	(envelope-from <netdev+bounces-291631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:00:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59B6B5D3B94
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:52:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01E905D3D9B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:00:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4176B303071F
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:49:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1564033D0ED5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA5E3DF018;
-	Tue, 26 May 2026 09:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DF03DFC6F;
+	Tue, 26 May 2026 09:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="127YGpCF"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ce7/Zz/F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BB53DE44B
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 09:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98CD3DD87B
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 09:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779788881; cv=none; b=RXd9jMEe2jMf2IJ+1TKXDHt8STrRKUagLcJQUrUsdPOCoMCkwGlXfJtKv9uR0kbEwc0XyrvFhComvBBNdxLm/zVbE9ZKuezwu9s/0ouVQ7DvGP6Njy3ihQcUSDSCc/7u44h6jp3H6+zQBCtUAOjebGetJnhHmnCdUeR5WkbMQH8=
+	t=1779788884; cv=none; b=YwvWNa16CxrxSmDsKwBKt4mXP2fVGiJu6VnEDnuHcbkep4A6gauuPVQNqp4TBkOFCmoM557hRl5vCJkReopeQ0iSx4nXxkv0IEJXVaDsv4mlfg8sSNt1myPTRwPf7U5VWkcGidorT39M1oVfH83FqWZRX63Wf31BahQtqIxGq/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779788881; c=relaxed/simple;
-	bh=hzRu9sY1TexaOQYaEXbujNtRV7bArS5rlfB7GNAN8Kc=;
+	s=arc-20240116; t=1779788884; c=relaxed/simple;
+	bh=TJAsHonXH7rQdWgbjJwmPvFrpTQNxpZnfdHNYkOvLBc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dKvDXgGM45I5+9jj0OmWWTTPS1uRG9giZscXCqkg5X0SV2SVGi1kjg3GVIwDvu8dJx2NRRSJWb+UMc/ji9u5KasWmlyITSgzJxAKZ1yJZODioFxV74V1zm231TsT4CQYqaOHAzd1IMsYSnvLZzSEJdoIxLiVCX2SrUF+J+gegh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=127YGpCF; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=FqPgtbWb5pp574Z3Vwi63mAKbILOvvvcqd2FtY81dtOD8dlrDS4T8CkISzPJva7PWqy5Ny+Uughoq9dYKLyNrZ/1kayE2AQRAlIv3QkRWLcwf29OS39dx/6Z/ljxFxc3KiN1g6gkPxnrLxYwO7CgzJ3RnI1B1upYwCmLn0rGyDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ce7/Zz/F; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 59A631A36CE;
-	Tue, 26 May 2026 09:47:56 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 4B395C79AB7;
+	Tue, 26 May 2026 09:47:57 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2C27B60732;
-	Tue, 26 May 2026 09:47:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9D42710888582;
-	Tue, 26 May 2026 11:47:53 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 030AD60732;
+	Tue, 26 May 2026 09:47:58 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7699210888589;
+	Tue, 26 May 2026 11:47:55 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779788875; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1779788877; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=nHWkjNMpqsqTnSKiOm8i7Nm0HYKAvN1ZNA2K3QcMkbo=;
-	b=127YGpCFUWQlfirVvSc3f+axLVo2v9OBZWqUlcNPu9xs3Xct67fVO3MFMLBlXiy/80eodn
-	tf19sgH9GOVJbEhwn/POViPLttz+hEOcadsoyTWsRK06SuHszttonkgP313zoMsD6Be5SJ
-	zU5A51P8/i0fPBJGNCuPCKg/0vSxYxrtejTwU5Szf72C0LbAyasysmhcoquALrV8LqgEt4
-	4EnyZVjJftmON1eHOe9zf6xiL+/1AdWl5IvtpDN0eDCIlk7U4cd+4qQ+AvCOoT0PZx8bK7
-	ZQCujPYVKQtrB7AxcBqw+lhRBIdfSccmUBYr4yn8+BDjoWiVyzhWqbrMNIg2+w==
+	bh=iilN8KF8C83AesyPJyQQ0xVeNXqiT5pjrbqiZCp3vjs=;
+	b=Ce7/Zz/F/3FzQzfOWLzwZn3NuDGiOd6kf5rBKPMu2RebOvYCd6nN6h2qb3Il22oD0Ua5mz
+	TwK9qW+6qZJGheMu//2cxhYEJ4IcRMYgWT9pl+kXl5LOmzAtnXWSgpTdaxAZLhdsvXDex/
+	4CGX+kaj9CAMkKdH28u+1F3IUeTz+2Md0u7b0zqndqmM5E5RMT7VyY7UzRuUnwUsNGVAPf
+	pV3EyX/hlEQcdH6E+6r5QvaKNWxV/clE5vBd8KTBf5rwSVzDX9G8ARxlPYH6nhjej8jkSJ
+	20pruq4Rny+3WiMu0HWscQk7Sn+CZo2pTxdIY7i5G/jg1HLcHPwb1H6uKkKI5A==
 From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Tue, 26 May 2026 11:47:34 +0200
-Subject: [PATCH net-next 8/9] net: dsa: microchip: implement
- lan937x-specific MDIO registration
+Date: Tue, 26 May 2026 11:47:35 +0200
+Subject: [PATCH net-next 9/9] net: dsa: microchip: implement port_teardown
+ only if needed
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,8 +62,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260526-clean-ksz-3rd-v1-8-5b63e732149a@bootlin.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260526-clean-ksz-3rd-v1-9-5b63e732149a@bootlin.com>
 References: <20260526-clean-ksz-3rd-v1-0-5b63e732149a@bootlin.com>
 In-Reply-To: <20260526-clean-ksz-3rd-v1-0-5b63e732149a@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -82,12 +82,12 @@ X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291630-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291631-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -106,298 +106,137 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 59B6B5D3B94
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 01E905D3D9B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-All the switches use a common mdio_register() function that uses two
-ksz_dev_ops callbacks (.mdio_bus_preinit() and .create_phy_addr_map())
-to handle the lan937x specific case. These two callbacks are used only
-at this place in the code.
+The port_teardown() operation is optional. Yet, it is implemented by all
+the KSZ switches through a common function that doesn't do anything for
+the switches that aren't part of the ksz9477 family
 
-Implement a new lan937x-specific MDIO registration functions that uses
-these two lan937x-specific functions. The lan937x bindings don't
-have any 'interrupts' property so this lan937x_mdio_register() doesn't
-call ksz_irq_phy_setup().
-Expose the common ksz_*_mdio_{read/write} functions so they can be used
-in lan937x.c
-Remove the callbacks from ksz_dev_ops.
+Remove the implementation from the switches that don't need it.
+Implement instead a ksz9477-specific port_teardown.
 
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
- drivers/net/dsa/microchip/ksz_common.c   | 30 +++-------
- drivers/net/dsa/microchip/ksz_common.h   | 42 ++------------
- drivers/net/dsa/microchip/lan937x_main.c | 99 +++++++++++++++++++++++++++++++-
- 3 files changed, 110 insertions(+), 61 deletions(-)
+ drivers/net/dsa/microchip/ksz8.c         |  3 ---
+ drivers/net/dsa/microchip/ksz9477.c      | 10 +++++++++-
+ drivers/net/dsa/microchip/ksz_common.c   | 19 -------------------
+ drivers/net/dsa/microchip/ksz_common.h   |  1 -
+ drivers/net/dsa/microchip/lan937x_main.c |  1 -
+ 5 files changed, 9 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 404399737cea..708dddf2c6cf 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2256,7 +2256,7 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
- 	dev->dev_ops->cfg_port_member(dev, port, port_member | cpu_port);
+diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+index bea66183238e..e5d4ade0b29a 100644
+--- a/drivers/net/dsa/microchip/ksz8.c
++++ b/drivers/net/dsa/microchip/ksz8.c
+@@ -2450,7 +2450,6 @@ const struct dsa_switch_ops ksz8463_switch_ops = {
+ 	.port_bridge_leave	= ksz_port_bridge_leave,
+ 	.port_set_mac_address	= ksz_port_set_mac_address,
+ 	.port_stp_state_set	= ksz_port_stp_state_set,
+-	.port_teardown		= ksz_port_teardown,
+ 	.port_pre_bridge_flags	= ksz_port_pre_bridge_flags,
+ 	.port_bridge_flags	= ksz_port_bridge_flags,
+ 	.port_fast_age		= ksz8_flush_dyn_mac_table,
+@@ -2499,7 +2498,6 @@ const struct dsa_switch_ops ksz87xx_switch_ops = {
+ 	.port_bridge_leave	= ksz_port_bridge_leave,
+ 	.port_set_mac_address	= ksz_port_set_mac_address,
+ 	.port_stp_state_set	= ksz_port_stp_state_set,
+-	.port_teardown		= ksz_port_teardown,
+ 	.port_pre_bridge_flags	= ksz_port_pre_bridge_flags,
+ 	.port_bridge_flags	= ksz_port_bridge_flags,
+ 	.port_fast_age		= ksz8_flush_dyn_mac_table,
+@@ -2554,7 +2552,6 @@ const struct dsa_switch_ops ksz88xx_switch_ops = {
+ 	.port_bridge_leave	= ksz_port_bridge_leave,
+ 	.port_set_mac_address	= ksz_port_set_mac_address,
+ 	.port_stp_state_set	= ksz_port_stp_state_set,
+-	.port_teardown		= ksz_port_teardown,
+ 	.port_pre_bridge_flags	= ksz_port_pre_bridge_flags,
+ 	.port_bridge_flags	= ksz_port_bridge_flags,
+ 	.port_fast_age		= ksz8_flush_dyn_mac_table,
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index d7903814a2a5..c2220afd7466 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -1940,6 +1940,14 @@ static void ksz9477_duplex_flowctrl(struct ksz_device *dev, int port, int duplex
+ 	ksz_prmw8(dev, port, regs[P_XMII_CTRL_0], mask, val);
  }
  
--static int ksz_sw_mdio_read(struct mii_bus *bus, int addr, int regnum)
-+int ksz_sw_mdio_read(struct mii_bus *bus, int addr, int regnum)
- {
- 	struct ksz_device *dev = bus->priv;
- 	struct dsa_switch *ds = dev->ds;
-@@ -2264,8 +2264,7 @@ static int ksz_sw_mdio_read(struct mii_bus *bus, int addr, int regnum)
- 	return ds->ops->phy_read(ds, addr, regnum);
- }
- 
--static int ksz_sw_mdio_write(struct mii_bus *bus, int addr, int regnum,
--			     u16 val)
-+int ksz_sw_mdio_write(struct mii_bus *bus, int addr, int regnum, u16 val)
- {
- 	struct ksz_device *dev = bus->priv;
- 	struct dsa_switch *ds = dev->ds;
-@@ -2286,7 +2285,7 @@ static int ksz_sw_mdio_write(struct mii_bus *bus, int addr, int regnum,
-  *
-  * Return: Value of the PHY register, or a negative error code on failure.
-  */
--static int ksz_parent_mdio_read(struct mii_bus *bus, int addr, int regnum)
-+int ksz_parent_mdio_read(struct mii_bus *bus, int addr, int regnum)
- {
- 	struct ksz_device *dev = bus->priv;
- 
-@@ -2306,8 +2305,7 @@ static int ksz_parent_mdio_read(struct mii_bus *bus, int addr, int regnum)
-  *
-  * Return: 0 on success, or a negative error code on failure.
-  */
--static int ksz_parent_mdio_write(struct mii_bus *bus, int addr, int regnum,
--				 u16 val)
-+int ksz_parent_mdio_write(struct mii_bus *bus, int addr, int regnum, u16 val)
- {
- 	struct ksz_device *dev = bus->priv;
- 
-@@ -2415,8 +2413,8 @@ static void ksz_irq_phy_free(struct ksz_device *dev)
-  *
-  * Return: 0 on success, or a negative error code on failure.
-  */
--static int ksz_parse_dt_phy_config(struct ksz_device *dev, struct mii_bus *bus,
--				   struct device_node *mdio_np)
-+int ksz_parse_dt_phy_config(struct ksz_device *dev, struct mii_bus *bus,
-+			    struct device_node *mdio_np)
- {
- 	struct device_node *phy_node, *phy_parent_node;
- 	bool phys_are_valid = true;
-@@ -2519,20 +2517,8 @@ int ksz_mdio_register(struct ksz_device *dev)
- 		goto put_mdio_node;
- 	}
- 
--	if (dev->dev_ops->mdio_bus_preinit) {
--		ret = dev->dev_ops->mdio_bus_preinit(dev, !!parent_bus);
--		if (ret)
--			goto put_mdio_node;
--	}
--
--	if (dev->dev_ops->create_phy_addr_map) {
--		ret = dev->dev_ops->create_phy_addr_map(dev, !!parent_bus);
--		if (ret)
--			goto put_mdio_node;
--	} else {
--		for (i = 0; i < dev->info->port_cnt; i++)
--			dev->phy_addr_map[i] = i;
--	}
-+	for (i = 0; i < dev->info->port_cnt; i++)
-+		dev->phy_addr_map[i] = i;
- 
- 	bus->priv = dev;
- 	if (parent_bus) {
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index c8f9ac6c3a38..a7fc23ced38c 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -362,42 +362,6 @@ struct ksz_dev_ops {
- 	u32 (*get_port_addr)(int port, int offset);
- 	void (*cfg_port_member)(struct ksz_device *dev, int port, u8 member);
- 
--	/**
--	 * @mdio_bus_preinit: Function pointer to pre-initialize the MDIO bus
--	 *                    for accessing PHYs.
--	 * @dev: Pointer to device structure.
--	 * @side_mdio: Boolean indicating if the PHYs are accessed over a side
--	 *             MDIO bus.
--	 *
--	 * This function pointer is used to configure the MDIO bus for PHY
--	 * access before initiating regular PHY operations. It enables either
--	 * SPI/I2C or side MDIO access modes by unlocking necessary registers
--	 * and setting up access permissions for the selected mode.
--	 *
--	 * Return:
--	 *  - 0 on success.
--	 *  - Negative error code on failure.
--	 */
--	int (*mdio_bus_preinit)(struct ksz_device *dev, bool side_mdio);
--
--	/**
--	 * @create_phy_addr_map: Function pointer to create a port-to-PHY
--	 *                       address map.
--	 * @dev: Pointer to device structure.
--	 * @side_mdio: Boolean indicating if the PHYs are accessed over a side
--	 *             MDIO bus.
--	 *
--	 * This function pointer is responsible for mapping switch ports to PHY
--	 * addresses according to the configured access mode (SPI or side MDIO)
--	 * and the device’s strap configuration. The mapping setup may vary
--	 * depending on the chip variant and configuration. Ensures the correct
--	 * address mapping for PHY communication.
--	 *
--	 * Return:
--	 *  - 0 on success.
--	 *  - Negative error code on failure (e.g., invalid configuration).
--	 */
--	int (*create_phy_addr_map)(struct ksz_device *dev, bool side_mdio);
- 	void (*r_mib_cnt)(struct ksz_device *dev, int port, u16 addr,
- 			  u64 *cnt);
- 	void (*r_mib_pkt)(struct ksz_device *dev, int port, u16 addr,
-@@ -493,6 +457,12 @@ int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
- int ksz_suspend(struct dsa_switch *ds);
- int ksz_resume(struct dsa_switch *ds);
- 
-+int ksz_parse_dt_phy_config(struct ksz_device *dev, struct mii_bus *bus,
-+			    struct device_node *mdio_np);
-+int ksz_sw_mdio_read(struct mii_bus *bus, int addr, int regnum);
-+int ksz_sw_mdio_write(struct mii_bus *bus, int addr, int regnum, u16 val);
-+int ksz_parent_mdio_read(struct mii_bus *bus, int addr, int regnum);
-+int ksz_parent_mdio_write(struct mii_bus *bus, int addr, int regnum, u16 val);
- int ksz_mdio_register(struct ksz_device *dev);
- int ksz_pirq_setup(struct ksz_device *dev, u8 p);
- int ksz_girq_setup(struct ksz_device *dev);
-diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
-index 742b919ae4df..73ad99dac72d 100644
---- a/drivers/net/dsa/microchip/lan937x_main.c
-+++ b/drivers/net/dsa/microchip/lan937x_main.c
-@@ -7,6 +7,7 @@
- #include <linux/module.h>
- #include <linux/iopoll.h>
- #include <linux/phy.h>
-+#include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/if_bridge.h>
- #include <linux/if_vlan.h>
-@@ -681,6 +682,100 @@ static int lan937x_switch_init(struct ksz_device *dev)
- 	return 0;
- }
- 
-+/**
-+ * lan937x_mdio_register - Register and configure the MDIO bus for the LAN937x.
-+ * @dev: Pointer to the KSZ device structure.
-+ *
-+ * This function sets up and registers an MDIO bus for a LAN937x switch,
-+ * allowing access to its internal PHYs. If the device supports side MDIO,
-+ * the function will configure the external MDIO controller specified by the
-+ * "mdio-parent-bus" device tree property to directly manage internal PHYs.
-+ * Otherwise, SPI or I2C access is set up for PHY access.
-+ *
-+ * Return: 0 on success, or a negative error code on failure.
-+ */
-+static int lan937x_mdio_register(struct ksz_device *dev)
++static void ksz9477_port_teardown(struct dsa_switch *ds, int port)
 +{
-+	struct device_node *parent_bus_node;
-+	struct mii_bus *parent_bus = NULL;
-+	struct dsa_switch *ds = dev->ds;
-+	struct device_node *mdio_np;
-+	struct mii_bus *bus;
-+	int ret;
++	struct ksz_device *dev = ds->priv;
 +
-+	mdio_np = of_get_child_by_name(dev->dev->of_node, "mdio");
-+	if (!mdio_np)
-+		return 0;
-+
-+	parent_bus_node = of_parse_phandle(mdio_np, "mdio-parent-bus", 0);
-+	if (parent_bus_node && !dev->info->phy_side_mdio_supported) {
-+		dev_err(dev->dev, "Side MDIO bus is not supported for this HW, ignoring 'mdio-parent-bus' property.\n");
-+		ret = -EINVAL;
-+
-+		goto put_mdio_node;
-+	} else if (parent_bus_node) {
-+		parent_bus = of_mdio_find_bus(parent_bus_node);
-+		if (!parent_bus) {
-+			ret = -EPROBE_DEFER;
-+
-+			goto put_mdio_node;
-+		}
-+
-+		dev->parent_mdio_bus = parent_bus;
-+	}
-+
-+	bus = devm_mdiobus_alloc(ds->dev);
-+	if (!bus) {
-+		ret = -ENOMEM;
-+		goto put_mdio_node;
-+	}
-+
-+	ret = lan937x_mdio_bus_preinit(dev, !!parent_bus);
-+	if (ret)
-+		goto put_mdio_node;
-+
-+	ret = lan937x_create_phy_addr_map(dev, !!parent_bus);
-+	if (ret)
-+		goto put_mdio_node;
-+
-+	bus->priv = dev;
-+	if (parent_bus) {
-+		bus->read = ksz_parent_mdio_read;
-+		bus->write = ksz_parent_mdio_write;
-+		bus->name = "KSZ side MDIO";
-+		snprintf(bus->id, MII_BUS_ID_SIZE, "ksz-side-mdio-%d",
-+			 ds->index);
-+	} else {
-+		bus->read = ksz_sw_mdio_read;
-+		bus->write = ksz_sw_mdio_write;
-+		bus->name = "ksz user smi";
-+		if (ds->dst->index != 0)
-+			snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d-%d", ds->dst->index, ds->index);
-+		else
-+			snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d", ds->index);
-+	}
-+
-+	ret = ksz_parse_dt_phy_config(dev, bus, mdio_np);
-+	if (ret)
-+		goto put_mdio_node;
-+
-+	ds->phys_mii_mask = bus->phy_mask;
-+	bus->parent = ds->dev;
-+
-+	ds->user_mii_bus = bus;
-+
-+	ret = devm_of_mdiobus_register(ds->dev, bus, mdio_np);
-+	if (ret)
-+		dev_err(ds->dev, "unable to register MDIO bus %s\n",
-+			bus->id);
-+
-+put_mdio_node:
-+	of_node_put(mdio_np);
-+	of_node_put(parent_bus_node);
-+
-+	return ret;
++	if (dsa_is_user_port(ds, port))
++		ksz9477_port_acl_free(dev, port);
 +}
 +
- static int lan937x_setup(struct dsa_switch *ds)
- {
- 	struct ksz_device *dev = ds->priv;
-@@ -794,7 +889,7 @@ static int lan937x_setup(struct dsa_switch *ds)
- 		goto port_release;
- 	}
+ void ksz9477_phylink_mac_link_up(struct phylink_config *config,
+ 				 struct phy_device *phydev,
+ 				 unsigned int mode,
+@@ -2072,7 +2080,7 @@ const struct dsa_switch_ops ksz9477_switch_ops = {
+ 	.port_hsr_leave		= ksz9477_hsr_leave,
+ 	.port_set_mac_address	= ksz_port_set_mac_address,
+ 	.port_stp_state_set	= ksz_port_stp_state_set,
+-	.port_teardown		= ksz_port_teardown,
++	.port_teardown		= ksz9477_port_teardown,
+ 	.port_pre_bridge_flags	= ksz_port_pre_bridge_flags,
+ 	.port_bridge_flags	= ksz_port_bridge_flags,
+ 	.port_fast_age		= ksz9477_flush_dyn_mac_table,
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 708dddf2c6cf..3f5b1c4e7169 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2953,25 +2953,6 @@ void ksz_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+ 	ksz_update_port_member(dev, port);
+ }
  
--	ret = ksz_mdio_register(dev);
-+	ret = lan937x_mdio_register(dev);
- 	if (ret < 0) {
- 		dev_err(dev->dev, "failed to register the mdio");
- 		goto out_ptp_clock_unregister;
-@@ -857,8 +952,6 @@ const struct phylink_mac_ops lan937x_phylink_mac_ops = {
- const struct ksz_dev_ops lan937x_dev_ops = {
- 	.get_port_addr = ksz9477_get_port_addr,
- 	.cfg_port_member = ksz9477_cfg_port_member,
--	.mdio_bus_preinit = lan937x_mdio_bus_preinit,
--	.create_phy_addr_map = lan937x_create_phy_addr_map,
- 	.r_mib_cnt = ksz9477_r_mib_cnt,
- 	.r_mib_pkt = ksz9477_r_mib_pkt,
- 	.r_mib_stat64 = ksz_r_mib_stats64,
+-void ksz_port_teardown(struct dsa_switch *ds, int port)
+-{
+-	struct ksz_device *dev = ds->priv;
+-
+-	switch (dev->chip_id) {
+-	case KSZ8563_CHIP_ID:
+-	case KSZ8567_CHIP_ID:
+-	case KSZ9477_CHIP_ID:
+-	case KSZ9563_CHIP_ID:
+-	case KSZ9567_CHIP_ID:
+-	case KSZ9893_CHIP_ID:
+-	case KSZ9896_CHIP_ID:
+-	case KSZ9897_CHIP_ID:
+-	case LAN9646_CHIP_ID:
+-		if (dsa_is_user_port(ds, port))
+-			ksz9477_port_acl_free(dev, port);
+-	}
+-}
+-
+ int ksz_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+ 			      struct switchdev_brport_flags flags,
+ 			      struct netlink_ext_ack *extack)
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index a7fc23ced38c..80cb4265dbdc 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -387,7 +387,6 @@ int ksz_switch_suspend(struct device *dev);
+ int ksz_switch_resume(struct device *dev);
+ 
+ void ksz_teardown(struct dsa_switch *ds);
+-void ksz_port_teardown(struct dsa_switch *ds, int port);
+ 
+ void ksz_init_mib_timer(struct ksz_device *dev);
+ bool ksz_is_port_mac_global_usable(struct dsa_switch *ds, int port);
+diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
+index 73ad99dac72d..084ee811f6e2 100644
+--- a/drivers/net/dsa/microchip/lan937x_main.c
++++ b/drivers/net/dsa/microchip/lan937x_main.c
+@@ -978,7 +978,6 @@ const struct dsa_switch_ops lan937x_switch_ops = {
+ 	.port_bridge_leave	= ksz_port_bridge_leave,
+ 	.port_set_mac_address	= ksz_port_set_mac_address,
+ 	.port_stp_state_set	= ksz_port_stp_state_set,
+-	.port_teardown		= ksz_port_teardown,
+ 	.port_pre_bridge_flags	= ksz_port_pre_bridge_flags,
+ 	.port_bridge_flags	= ksz_port_bridge_flags,
+ 	.port_fast_age		= ksz9477_flush_dyn_mac_table,
 
 -- 
 2.54.0
