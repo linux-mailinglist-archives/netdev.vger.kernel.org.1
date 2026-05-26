@@ -1,44 +1,45 @@
-Return-Path: <netdev+bounces-291523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291522-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aLypGIQVFWpoSgcAu9opvQ
-	(envelope-from <netdev+bounces-291523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:37:40 +0200
+	id q+wAInMVFWpoSgcAu9opvQ
+	(envelope-from <netdev+bounces-291522-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:37:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04C595D0602
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:37:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F8D85D05EF
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:37:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B306030090A9
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 03:37:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BE371300187B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 03:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F943B9D9B;
-	Tue, 26 May 2026 03:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548A038AC9C;
+	Tue, 26 May 2026 03:37:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.155.80.173])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66C83B811F;
-	Tue, 26 May 2026 03:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.155.80.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965CB313534;
+	Tue, 26 May 2026 03:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779766645; cv=none; b=Qg0a0jjG2VCygCcDMIkKaJeQrPM004SqQBfCdhU+EN2wM0LRF6HRzfjStgHdrKwAQuvnsGL4yBUU8yjo24+PZrN/E8mMw4AMvsTDqEK8mgBydiOq0a3WzEOo1EQeUUwqvGoaGw+0bZi9sMwqK8XIiB0sJ53TII05S5XpDVPF51I=
+	t=1779766636; cv=none; b=ZE3uWJRe6lZs7nbiyJrr3ukoGZyeKmf1l1sr9uWgH8HYsjjslXGOmMJnHPQ1yxEBnQ0A8nQF23nRT7EvRnKsF0nvaSSumykyeRsAeO/vmgwqOr0gmfktSFk6qmyCdiX9Lso8IbSSw8IGJIcAhCfuUAWOR/aHu3Zm4xMwgkSE9EA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779766645; c=relaxed/simple;
-	bh=Boux7FNQ+JAW0truX1BJUobiczz2+qoUKFqZPwokV38=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=BPJ1olFQUjZTiXHGWrmvno+hOvJPpm7Kaz3iera+QaG1VLMlGETO/qLw5NpxOFgvtMz6LeR8Grx3Q18sdxCUgWK6cTPGiU6GeaY88VQ9ZzMpfgKh03QPo/nSQx0tIS3vt8kBCFbPlwKpFqV72WZ/w4olCgoFtIUDYgFkstcti9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=43.155.80.173
+	s=arc-20240116; t=1779766636; c=relaxed/simple;
+	bh=MeN+BFlRoM3RIsRzzm4TZesjKqBCXRVNv4xFY2g1c08=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=dS+GO6jTpPc8p/3D0ZoOK6wGYGR5QRrCZcZGifwSwf/RLBWyJcZI3vY2vzjTi23MV9NjEpAZ9i3q7p49svLuqKYCj0eECIH2sSF2nNOYYzuejUselQjCC7RIc/0wh3xrbyEd/FogNP21Ip5SubzD4O5IXtK2qh0ss7FHlzOy4d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.207.22.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpsz6t1779766549t11c3806c
-X-QQ-Originating-IP: GqAAEkPdS2iwzbzs74pIeRAmWesvkmadLSOuxExARKs=
+X-QQ-mid: zesmtpsz6t1779766557t594358d1
+X-QQ-Originating-IP: InF65VhQy95TTiteWJI2Ffs8Cbk6D2Hc1EA87YTCzoo=
 Received: from localhost.localdomain ( [203.174.112.180])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 26 May 2026 11:35:47 +0800 (CST)
+	id ; Tue, 26 May 2026 11:35:51 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 1407884131310676841
+X-BIZMAIL-ID: 7363361465858097979
 EX-QQ-RecipientCnt: 12
 From: Dong Yibo <dong100@mucse.com>
 To: andrew+netdev@lunn.ch,
@@ -53,498 +54,1034 @@ Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	dong100@mucse.com,
 	yaojun@mucse.com
-Subject: [PATCH net-next v4 0/4] net: rnpgbe: Add TX/RX and link status support
-Date: Tue, 26 May 2026 11:35:35 +0800
-Message-Id: <20260526033539.164061-1-dong100@mucse.com>
+Subject: [PATCH net-next v4 1/4] net: rnpgbe: Add interrupt handling
+Date: Tue, 26 May 2026 11:35:36 +0800
+Message-Id: <20260526033539.164061-2-dong100@mucse.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260526033539.164061-1-dong100@mucse.com>
+References: <20260526033539.164061-1-dong100@mucse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
-X-QQ-XMAILINFO: MABkn+BX1UZ4XOSz50mEiNzrJYu+bzeETf2Q2VCGpDkOmKMmepRLajsC
-	pbfLkZDUarb14e4Yj9QeuLe4zAHZ3KkAqHC4VkrSTE1VpliBJryNKs5RaNALhnHyxXm0NhA
-	zHvqgR0sJUGpwLldczb4OxBF8PTwBKFTxJiLUupqMT1P6Zi1SEtu9WMmdA+//VLbFS7TOid
-	WUGcXhdBd5ottWsQiPj6qIupLAT2/KbOAeJ2DIu6E6XUI4MZKCLMVqJUCd67ntdh53qqYeY
-	RPpt2HX4m4kRvMQHCoK5x49jSk5hKXuvbmGj88xbTkwisU/uh6JXhsZrPxuXUOfjr4b18H4
-	16vJwWlwAOQdN8AlNMHFFCJnZ5TeCJ3+Mlvypkn4p4VNP9ZiABNfY59axj8rrmvlDZCcbIr
-	tmtg3dTbXNr+f06+UhzmRuK3XEY0A+Gc6R1tULN6M+WcNOfiJj6T+2EmGLCip3rXJQvEJvA
-	JOj3jYGIVL+xN/iGzOkeNl19u6CmPElUOfrrsERWWvEz1Azs9fn3xoL8AEhACPc11RLTtCs
-	cw2PL2mqDgkNPwcyCd4t9FONxSTHQnF+GEoQO1F2kx75u/TjKbtmT8A2mIXesyrzRhdYwNF
-	gUEIPdBb+oq3oCng8qCg8REa0iY3V0+2A+sZQbMkPpkZW+4HxgB6U9lSlGw5jX5fXCogA7I
-	lkThfj2exbcvJ9YpWEvojfzmWjuQWxls08ifxq3XQuJKeJ0pEZUOnR6mn4ERom8aieCADsj
-	T6OXYKUUH7zq1i1TvSYgnLuDQ+TheClzlNH9jcTaFEBsPChtWs2S0pVvIT8bqmB0j2ZKRwv
-	Dtp17xmPagXjkrxoA9bTMh75S317Dd1qTffk9gQEg4sbSx2YwGpSPrclUtrF7bgSv9cljqN
-	eMPkSv+hkjs64dEhEQ0oKdA0+RqOVN2fB/Xa9JpAuPoj0GioScxHOt9viJOG7LN3mR0JHA1
-	SBdFr+Z8DVL6MNz9F9/HV/eAGkG1Aea1wWiVzT/TUWOrlPv1a5lFF+CUgyslx3sqaFMEmie
-	JbK2rd2c7sPmclIxN0xU9zP5CNBW8i+yJDjVOy/jKChoR+gKim8V3Kq9oIJDc=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+X-QQ-XMAILINFO: ORUI1iMO4+PIIkdQE5AqZWlDti5MCin/jJpFKpgaN9ynL5YZeDpbmC9v
+	zjEMtsx5uFOUYnuPWwKAT0xbzqRoePHgpUMUns+4Lim+J1eokDZ9tzUXHZtQUw4zYki5TR+
+	Wd22dZWonwE5yEcQtZp4bfUyk4XxIB2+a9h1BswhtY0IhLXyFekrayyzpF6DD8Y0XztDVUx
+	QhHYFlxHXArPfzCfKDp6acowzgRqbizQNdVtDQWBLtZCQzLE3re/WKaQVdyubuxw7fMOp1K
+	bY2IRi3+TU/PF5nuZ/8pUu9OGF46liB3aUIlx11FzxNQzb0zeDXt40Kj06C4fHzAWxeX4NF
+	iVqpmgbIJiXG11Z6YQLEXudSxBSED7ImhMD+ghuQvejBYVZdSwa5Xml97pTxMeQXiXaq4ZG
+	k7qswd/5+KSywv6USy9Ztz2beanO7hbnKScgA0FOfkp7yFFEox29kAeXGuN5c58FHbuv8MM
+	WApjziMXotCozuCdvZQwctkJoQNbPDlXxo1avp6zlwojUHh1wmOFXmUp61Dm2JTJZ+3UULD
+	RzpVsdTHjPJDux4MnSB0co5EZph3B2tysgenPWdZl05Mr7C/bPuWtUqBbbiZnsfWQDi3Ukk
+	n3PxCOamDX1pp4N46VmKlsESBMerA9wGvXE2RYq4YOtYs8YKoZ49uQcmR7FUwDT31HFWz4l
+	yeE0XCf593mBhlKIezqqwnIgejiaMhFfu8hBjCQmJFWMtBTi1JoNVBPMtNYWDP5NGUdTfbG
+	mJGD5Vj7zcuXmOPNoGURbG8TlkfCrDR0Bi7ygbyk2HOFY6eEa7qfEP/y+GDhfPwaOCF8n8O
+	NJ5kDDZ9JaROa5HqEOdbddkWshBeO5j8p3apRGfBqqL4SsJZvxveJZgUV+dwDY2nyBjs9Ni
+	BQS7YZwnh4Y50qKMm+YydThP6Bb3IezisQ6i9yI2TisNA3cm4NNpdBFruqqYqJbDc8DfwCj
+	fz3BtMy9w81gUZ1E+uKWoZsjcd7I6VMoOx9i3THy4nz7bF9aCvWJGnRlMnl702E7KBU+KQ/
+	Cc+C/gQCSi49BJbwDLF2gA86I0Q+9MgTNAbJa7YTtTgD5MSkv7hjEtsKR13Bw=
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
 X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-291523-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[mucse.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DMARC_NA(0.00)[mucse.com];
 	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291522-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.951];
+	NEURAL_HAM(-0.00)[-0.539];
+	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mucse.com:mid]
-X-Rspamd-Queue-Id: 04C595D0602
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7F8D85D05EF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi maintainers,
+Add comprehensive interrupt handling for the RNPGBE driver:
+- Implement msi-x/msi interrupt configuration and management
+- Create library functions for interrupt registration and cleanup
 
-This patch series adds the packet transmission, reception, and link status
-management features to the RNPGBE driver, building upon the previously
-introduced mailbox communication and basic driver infrastructure.
+This infrastructure enables proper interrupt handling for the
+RNPGBE driver.
 
-The series introduces:
-- Msix/msi interrupt handling with NAPI support
-- TX path with scatter-gather DMA and completion handling
-- RX path with page pool buffer management
-- Link status monitoring and carrier management
-
-These changes enable the RNPGBE driver to support basic tx/rx
-network operations.
-
-Changelog:
-v3 -> v4:
-
-[patch 1/4]:
-1. Use min3 to optimize code. (Vadim Fedorenko)
-2. Setup RING_VECTOR in msi mode. (Sashiko)
-3. Call 'pci_set_drvdata(pdev, NULL)' in err_free_net. (Sashiko)
-4. Move remove_mbx_irq after unregister_netdev. (Sashiko) 
-5. Remove '-1' for snprintf in rnpgbe_request_irq, (Sashiko)
-6. Fix mucse->num_tx_queues and mucse->num_rx_queues after
-   rnpgbe_alloc_q_vector. (Sashiko)
-[patch 2/4]:
-1. Convert tx dropped to atomic. (Sashiko)
-2. Sum stats.dropped into stats->tx_dropped. (Sashiko)
-3. use dma_set_mask_and_coherent in probe. (Sashiko)
-4. Flush TX_START before free or change dma address. (Sashiko)
-5. Don't cost desc for 0 length frags in rnpgbe_tx_map. (Sashiko)
-6. Flush irq mask before synchronize_irq. (Sashiko)
-[patch 3/4]:
-1. Add commit to descript rx size guarantees. (Sashiko)
-2. Add dma_wmb before update rx tail. (Sashiko)
-3. Remove unreachable code in rnpgbe_cleanup_headers. (Sashiko) 
-4. Fix "not without advancing next_to_clean" in drop_status. (Sashiko)
-5. Fix "page leap" when skb failed, then close interfce. (Sashiko)
-6. Flush RX_START before free or change dma address. (Sashiko)
-7. Remove no-used mucse_rx_bufsz define. (Sashiko)
-8. Call dma_sync_single_range_for_device when reuse page. (Sashiko)
-[patch 4/4]:
-1. Add BUILD_BUG_ON in mucse_mbx_fw_reply_handler. (Sashiko)
-2. Call rnpgbe_set_rx in rnpgbe_down. (Sashiko)
-3. Fix hw->link race in rnpgbe_watchdog_subtask. (Sashiko)
-4. Fix reinit_completion in mucse_fw_send_cmd_wait_resp. (Sashiko)
-5. Rename rnpgbe_watchdog_update_link to rnpgbe_process_link_event.
-6. Rename rnpgbe_watchdog_link_is_up to rnpgbe_link_is_up.
-7. Rename rnpgbe_watchdog_link_is_down to rnpgbe_link_is_down.
-8. Rename rnpgbe_watchdog_subtask to rnpgbe_process_link_subtask.
-
-links:
+Signed-off-by: Dong Yibo <dong100@mucse.com>
 ---
-v1: https://lore.kernel.org/netdev/20260325091204.94015-1-dong100@mucse.com/
-v2: https://lore.kernel.org/netdev/20260403025713.527841-1-dong100@mucse.com/
-v3: https://lore.kernel.org/netdev/20260507081539.171844-1-dong100@mucse.com
-
-Additional Notes:
-1.
-Sashiko:
->  static int rnpgbe_open(struct net_device *netdev)
->  {
-> +     struct mucse *mucse = netdev_priv(netdev);
-> +     int err;
-> +
-> +     err = rnpgbe_request_irq(mucse);
-> +     if (err)
-> +             return err;
-> +
-> +     err = netif_set_real_num_queues(netdev, mucse->num_tx_queues,
-> +                                     mucse->num_rx_queues);
-> +     if (err)
-> +             goto err_free_irqs;
-> +
-> +     rnpgbe_up_complete(mucse);
-Could this sequence lead to a queue stall?
-If an interrupt arrives immediately after rnpgbe_request_irq(), the handler
-will mask the interrupt and call napi_schedule_irqoff(). Since NAPI is not
-yet enabled, the scheduling request is silently dropped.
-When rnpgbe_up_complete() later enables NAPI, the interrupt remains masked
-and the queue stalls. Should NAPI be enabled before requesting the IRQ?
-
-Answer: The sequence is safe because the hardware cannot generate any Rx/Tx or link
-interrupts until rnpgbe_up_complete() enables DMA engines and interrupt
-sources. There is no race window where an interrupt can arrive before
-NAPI is ready. Therefore no stall can occur.
-
-2. 
-Sashiko:
-> +static bool rnpgbe_cleanup_headers(struct sk_buff *skb)
-> +{
-> +	if (IS_ERR(skb))
-> +		return true;
-> +	/* place header in linear portion of buffer */
-> +	if (!skb_headlen(skb))
-> +		rnpgbe_pull_tail(skb);
-> +	/* if eth_skb_pad returns an error the skb was freed */
-> +	if (eth_skb_pad(skb))
-> +		return true;
-> +
-> +	return false;
-> +}
-If the first hardware descriptor provides a size between 1 and 13 bytes,
-skb_headlen(skb) will be greater than 0, causing this to skip the
-rnpgbe_pull_tail() call.
-When eth_type_trans() is called later, it assumes a full 14 byte header and
-calls __skb_pull(skb, ETH_HLEN). If the packet spans multiple fragments,
-could subtracting 14 from skb->len cause it to drop below skb->data_len,
-triggering the BUG_ON in __skb_pull() and crashing the kernel?
-
-Answer:
-This issue is not reproducible:
-Hardware enforces a minimum packet size of 33 bytes (no 1–13 bytes
-descriptor sizes). Multiple descriptors are only used Format
-frames >1536(M_DEFAULT_SG is 96) bytes; all small packets use a single
-descriptor (no skb fragmentation). Thus the problematic __skb_pull() condition
-cannot occur.
-
-3
-Sashiko:
-> +static int rnpgbe_clean_rx_irq(struct mucse_q_vector *q_vector,
-> +			       struct mucse_ring *rx_ring,
-> +			       int budget)
-> +{
-> +	unsigned int total_rx_bytes = 0, total_rx_packets = 0;
-> +	u16 cleaned_count = mucse_desc_unused_rx(rx_ring);
-> +	bool fail_alloc = false;
-> +
-> +	while (likely(total_rx_packets < budget)) {
-> +		struct mucse_rx_buffer *rx_buffer;
-> +		union rnpgbe_rx_desc *rx_desc;
-> +		struct sk_buff *skb;
-> +		unsigned int size;
-[ ... ]
-> +		/* This memory barrier is needed to keep us from reading
-> +		 * any other fields out of the rx_desc until we know the
-> +		 * descriptor has been written back
-> +		 */
-> +		dma_rmb();
-> +		size = le16_to_cpu(rx_desc->wb.len);
-> +		rx_buffer = rnpgbe_get_buffer(rx_ring, &skb, size);
-Is the size value validated against the allocated page size anywhere?
-If a hardware device provides an oversized length, such as 65535, could this
-cause dma_sync_single_range_for_cpu() to operate out of bounds?
-Additionally, since size is passed to rnpgbe_build_skb() which uses
-__skb_put(), could this cause skb->tail and skb->len to advance beyond the
-allocated linear buffer?
-
-Answer:
-Can not happen, hardware splits data into multiple descs with 1536 bytes
-(M_DEFAULT_SG is 96) for each desc.
-
-4.
-Sashiko:
-> +		if (!size)
-> +			break;
-If size is zero, does this cause an infinite loop? By breaking here, the
-driver doesn't advance rx_ring->next_to_clean or clear the descriptor's DD
-bit. On subsequent NAPI polls, it will examine the exact same descriptor, see
-the DD bit set and size 0, and immediately break again, locking up the CPU in
-softirq context.
-
-Answer:
-No, an infinite loop cannot occur here.The hardware guarantees that the
-descriptor size is always non-zero when writing back the DD (Descriptor Done) bit.
-
-5.
-Sashiko:
-> +static void rnpgbe_configure_rx_ring(struct mucse *mucse,
-> +				     struct mucse_ring *ring)
-> +{
-[ ... ]
-> +	mucse_ring_wr32(ring, RNPGBE_RX_LEN, ring->count);
-> +	ring->tail = ring->ring_addr + RNPGBE_RX_TAIL;
-> +	ring->next_to_clean = mucse_ring_rd32(ring, RNPGBE_RX_HEAD);
-> +	ring->next_to_use = ring->next_to_clean;
-Can RNPGBE_RX_HEAD contain a value greater than or equal to ring->count?
-If the device register holds an out-of-bounds value, it looks like it will be
-directly used as an index into rx_ring->rx_buffer_info[] and by M_RX_DESC(),
-causing an out-of-bounds memory access.
-
-Answer:
-No out-of-bounds risk:
-RNPGBE_RX_HEAD is 0 after hardware reset (always valid).
-This is just driver/hardware sync for queue down/up (no full reset).
-If ring->count changes, a full reset sets head back to 0.
-Head value always stays within valid index rang.
-
-6.
-Sashiko:
-> +static void mucse_mbx_fw_req_handler(struct mucse_hw *hw,
-> +				     struct mbx_fw_cmd_req *req)
-> +{
-> +	struct mucse *mucse = container_of(hw, struct mucse, hw);
-> +	u32 magic = le32_to_cpu(req->link_stat.port_magic);
-> +	unsigned long flags;
-> +
-> +	if (le16_to_cpu(req->opcode) == LINK_CHANGE_EVT) {
-> +		spin_lock_irqsave(&mucse->link_lock, flags);
-> +
-> +		if (le16_to_cpu(req->link_stat.port_status))
-> +			hw->link = true;
-Does this correctly handle multi-port link events?
-        
-Since req->link_stat.port_status is a bitmask of changed ports, checking it
-as a simple boolean might cause this port to process events meant for other
-ports on the same NIC. Additionally, this unconditionally reads from st[0],
-which would cause all ports to adopt the speed and duplex of port 0
-whenever any port changes state.
-
-Answer:
-This driver follows a 1:1 mapping — one PF (Physical Function) corresponds
-to exactly one port. The multi-port bitmask (port_status) and multi-port structure
-definitions in the firmware command are only for forward compatibility interfacethe
-driver-firmware communication interface, to support both multi-port and
-single-port designs.
-
-7.
-Sashiko:
-> +void rnpgbe_set_rx(struct mucse_hw *hw, bool enable)
-> +{
-> +	u32 value = mucse_hw_rd32(hw, GMAC_CONTROL);
-> +
-> +	if (enable)
-> +		value |= GMAC_CONTROL_RE;
-> +	else
-> +		value &= ~GMAC_CONTROL_RE;
-> +
-> +	mucse_hw_wr32(hw, GMAC_CONTROL, value);
-> +
-> +	value = mucse_hw_rd32(hw, GMAC_FRAME_FILTER);
-> +	mucse_hw_wr32(hw, GMAC_FRAME_FILTER, value | BIT(0));
-Does this lockless read-modify-write race with standard network operations
-like ndo_set_rx_mode?
-Answer:
-No race here, ndo_set_rx_mode is not added now. Even in the future,
-GMAC_FRAME_FILTER will not controlled in ndo_set_rx_mode, hw has other register
-to control promiscuous mode.
-
-8.
-Sashiko:
-> +/**
-> + * register_mbx_irq - Register mbx routine
-> + * @mucse: pointer to private structure
-> + *
-> + * @return: 0 on success, negative on failure
-> + **/
-> +int register_mbx_irq(struct mucse *mucse)
-> +{
-> +	struct pci_dev *pdev = mucse->pdev;
-> +	int err = 0;
-> +
-> +	snprintf(mucse->mbx_name, sizeof(mucse->mbx_name),
-> +		 "rnpgbe-mbx:%s", pci_name(pdev));
-> +
-> +	if (mucse->flags & M_FLAG_MSIX_EN) {
-> +		err = request_irq(pci_irq_vector(pdev, 0),
-> +				  rnpgbe_msix_other, 0, mucse->mbx_name,
-> +				  mucse);
-> +	}
-> +
-> +	return err;
-> +}
-Is it intentional that register_mbx_irq() only installs a handler when
-M_FLAG_MSIX_EN is set?
-In MSIX_SINGLE_EN and MSI modes, the mailbox is serviced only through
-the multiplexed rnpgbe_int_single() that rnpgbe_open() registers and
-rnpgbe_close() tears down. Between the end of probe and the first
-open, and again between every close and the next open, there appears
-to be no handler attached to the interrupt that firmware can signal
-through.
-Does that leave a window where a firmware-initiated mailbox interrupt
-in those modes has no registered handler?
-Combined with the empty body of mucse_fw_irq_handler(), how does this
-match the commit message wording:
->     Add comprehensive interrupt handling for the RNPGBE driver:
-
-Answer:
-Fw only tirg irq after driver set mucse_fw_link_report_en true (in
-rnpgbe_up_complete). So this is not 'no handler attached' contition.
-
-9.
-Sashiko:
-> +static int rnpgbe_set_interrupt_capability(struct mucse *mucse)
-> +{
-> +     int v_budget;
-> +
-> +     v_budget = min_t(int, mucse->num_tx_queues, mucse->num_rx_queues);
-> +     v_budget = min_t(int, v_budget, MAX_Q_VECTORS);
-> +     v_budget = min_t(int, v_budget, num_online_cpus());
-> +     /* add one vector for mbx */
-> +     v_budget += 1;
-> +     v_budget = pci_alloc_irq_vectors(mucse->pdev, 1, v_budget,
-> +                                      PCI_IRQ_MSI | PCI_IRQ_MSIX);
-> +     if (v_budget < 0)
-> +             return v_budget;
-> +
-> +     if (mucse->pdev->msix_enabled) {
-> +             /* q_vector not include mbx */
-> +             if (v_budget > 1) {
-> +                     mucse->flags |= M_FLAG_MSIX_EN;
-> +                     mucse->num_q_vectors = v_budget - 1;
-> +             } else {
-> +                     mucse->flags |= M_FLAG_MSIX_SINGLE_EN;
-> +                     mucse->num_q_vectors = 1;
-> +             }
-> +     } else {
-> +             /* msi use only 1 irq */
-> +             mucse->num_q_vectors = 1;
-> +             mucse->flags |= M_FLAG_MSI_EN;
-> +     }
-> +
-> +     return 0;
-> +}
-If the PCI subsystem allocates multiple MSI vectors because v_budget > 1
-and the device supports Multiple Message MSI, does this code leak the
-unused vectors? It looks like num_q_vectors is forced to 1 and the
-remaining allocated vectors are ignored.
-Answer:
-Hw only suports 1 msi. MSI mode should falls back to single vector.
-
-10.
-Sashiko:
-> +static void rnpgbe_configure_rx_ring(struct mucse *mucse,
-> +                                  struct mucse_ring *ring)
-> +{
-> +     struct mucse_hw *hw = &mucse->hw;
-> +
-> +     /* disable queue to avoid issues while updating state */
-> +     mucse_ring_wr32(ring, RNPGBE_RX_START, 0);
-[ ... ]
-> +     mucse_ring_wr32(ring, RNPGBE_RX_INT_PKTCNT, M_DEFAULT_RX_INT_PKTCNT);
-> +     rnpgbe_alloc_rx_buffers(ring, mucse_desc_unused_rx(ring));
-> +}
-The return value of rnpgbe_alloc_rx_buffers() is discarded here.  If
-the very first population fails under memory pressure, the ring is
-left partially populated (the remaining descriptors keep the zeroed
-contents from dma_alloc_coherent()), and rnpgbe_up_complete() then
-writes RNPGBE_RX_START=1 unconditionally.  When hardware walks into
-one of those zeroed descriptors, it will DMA an incoming packet to an
-invalid address (just fun_id, or 0 if pfvfnum == 0).  Because
-rnpgbe_configure_rx() returns void, rnpgbe_open() returns success and
-the failure is invisible to callers.  Should the allocation failure
-propagate up and unwind RX resources?
-Answer:
-Cannot happen, hw only start request rx descriptors after driver
-update rx_tail(which is only update after desc is write correct with
-memory alloc success).
-
-11.
-Sashiko:
-> +static void rnpgbe_pull_tail(struct sk_buff *skb)
-> +{
-> +     skb_frag_t *frag = &skb_shinfo(skb)->frags[0];
-> +     unsigned int pull_len;
-> +     unsigned char *va;
-> +
-> +     va = skb_frag_address(frag);
-> +     pull_len = eth_get_headlen(skb->dev, va, M_RX_HDR_SIZE);
-Because rnpgbe_build_skb() places the first descriptor's data into the linear
-SKB area, skb_headlen(skb) equals the descriptor's size. This means
-rnpgbe_pull_tail() is only called from rnpgbe_cleanup_headers() if size
-is 0.
-If a 0-length descriptor with EOP is received, nr_frags will be 0. Can this
-code then dereference skb_shinfo(skb)->frags[0], leading to an out-of-bounds
-read on uninitialized memory?
-This could result in a severe length underflow in skb_frag_size_sub() since it
-passes a hardcoded M_RX_HDR_SIZE (256) to eth_get_headlen().
-Answer:
-Cannot happen, hw never writeback 0-size descriptor.
-
-12. 
-Sashiko:
-> +void rnpgbe_set_rx(struct mucse_hw *hw, bool enable)
-> +{
-> +     u32 value = mucse_hw_rd32(hw, GMAC_CONTROL);
-> +
-> +     if (enable)
-> +             value |= GMAC_CONTROL_RE;
-> +     else
-> +             value &= ~GMAC_CONTROL_RE;
-> +
-> +     mucse_hw_wr32(hw, GMAC_CONTROL, value);
-> +
-> +     if (enable)
-> +             mucse_hw_wr32(hw, GMAC_FRAME_FILTER, GMAC_RX_ALL);
-> +     else
-> +             mucse_hw_wr32(hw, GMAC_FRAME_FILTER, 0);
-> +}
-On the DesignWare GMAC block this driver is using (GMAC_CONTROL at MAC
-offset 0x0, GMAC_FRAME_FILTER at 0x4), bit 31 of the frame filter is RA
-(Receive All) and bit 0 is PR (Promiscuous Mode).
-Given:
-        #define GMAC_RX_ALL    (BIT(31) | BIT(0))
-every link-up transition forces both bits on, with no destination-address
-filtering applied at all.  Is that the intended steady-state receive
-configuration for this NIC?
-Also, because rnpgbe_watchdog_link_is_up() re-applies this filter on every
-link change, any future ndo_set_rx_mode() would be overwritten on the
-next carrier flap.  Would a perfect-match filter driven by netdev->flags
-and the uc/mc lists be more appropriate?
-Answer:
-This is intentional for the initial submission. The hardware has a
-separate register set for MAC/promiscuous filtering beyond the standard
-DW GMAC frame filter; full Rx mode management will be added together
-with ndo_set_rx_mode() in a follow-up series. The current GMAC_RX_ALL
-ensures basic connectivity works without packet loss.
-
-Dong Yibo (4):
-  net: rnpgbe: Add interrupt handling
-  net: rnpgbe: Add basic TX packet transmission support
-  net: rnpgbe: Add RX packet reception support
-  net: rnpgbe: Add link status handling support
-
- drivers/net/ethernet/mucse/Kconfig            |    1 +
- drivers/net/ethernet/mucse/rnpgbe/Makefile    |    3 +-
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  197 +-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |   41 +-
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   19 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    | 2111 +++++++++++++++++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.h    |   84 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |   96 +-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    |   23 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |    1 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c |  205 +-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |   39 +
- 12 files changed, 2801 insertions(+), 19 deletions(-)
+ drivers/net/ethernet/mucse/rnpgbe/Makefile    |   3 +-
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  48 ++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |   4 +
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   2 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    | 631 ++++++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.h    |  34 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |  47 +-
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c |   8 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |   1 +
+ 9 files changed, 775 insertions(+), 3 deletions(-)
  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
 
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
+index de8bcb7772ab..17574cad392a 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/Makefile
++++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
+@@ -8,4 +8,5 @@ obj-$(CONFIG_MGBE) += rnpgbe.o
+ rnpgbe-objs := rnpgbe_main.o\
+ 	       rnpgbe_chip.o\
+ 	       rnpgbe_mbx.o\
+-	       rnpgbe_mbx_fw.o
++	       rnpgbe_mbx_fw.o\
++	       rnpgbe_lib.o
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+index 5b024f9f7e17..cbe60f168346 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+@@ -6,6 +6,10 @@
+ 
+ #include <linux/types.h>
+ #include <linux/mutex.h>
++#include <linux/netdevice.h>
++#include <linux/if.h>
++
++#include "rnpgbe_hw.h"
+ 
+ enum rnpgbe_boards {
+ 	board_n500,
+@@ -35,21 +39,63 @@ enum {
+ 
+ struct mucse_hw {
+ 	void __iomem *hw_addr;
++	void __iomem *ring_msix_base;
+ 	struct pci_dev *pdev;
+ 	struct mucse_mbx_info mbx;
+ 	int port;
+ 	u8 pfvfnum;
+ };
+ 
++struct mucse_ring {
++	struct mucse_ring *next;
++	struct mucse_q_vector *q_vector;
++	void __iomem *ring_addr;
++	void __iomem *irq_mask;
++	void __iomem *trig;
++	u8 queue_index;
++	/* hw ring idx */
++	u8 rnpgbe_queue_idx;
++} ____cacheline_internodealigned_in_smp;
++
++struct mucse_ring_container {
++	struct mucse_ring *ring;
++	u16 count;
++};
++
++struct mucse_q_vector {
++	struct mucse *mucse;
++	int v_idx;
++	struct mucse_ring_container rx, tx;
++	struct napi_struct napi;
++	char name[IFNAMSIZ + 18];
++	/* for dynamic allocation of rings associated with this q_vector */
++	struct mucse_ring ring[] ____cacheline_internodealigned_in_smp;
++};
++
+ struct mucse_stats {
+ 	u64 tx_dropped;
+ };
+ 
++#define MAX_Q_VECTORS 8
++
+ struct mucse {
+ 	struct net_device *netdev;
+ 	struct pci_dev *pdev;
+ 	struct mucse_hw hw;
+ 	struct mucse_stats stats;
++#define M_FLAG_MSI_EN              BIT(0)
++#define M_FLAG_MSIX_SINGLE_EN      BIT(1)
++#define M_FLAG_MSIX_EN             BIT(2)
++	u32 flags;
++	struct mucse_ring *tx_ring[RNPGBE_MAX_QUEUES]
++		____cacheline_aligned_in_smp;
++	struct mucse_ring *rx_ring[RNPGBE_MAX_QUEUES]
++		____cacheline_aligned_in_smp;
++	struct mucse_q_vector *q_vector[MAX_Q_VECTORS];
++	int num_tx_queues;
++	int num_q_vectors;
++	int num_rx_queues;
++	char mbx_name[32];
+ };
+ 
+ int rnpgbe_get_permanent_mac(struct mucse_hw *hw, u8 *perm_addr);
+@@ -68,4 +114,6 @@ int rnpgbe_init_hw(struct mucse_hw *hw, int board_type);
+ 
+ #define mucse_hw_wr32(hw, reg, val) \
+ 	writel((val), (hw)->hw_addr + (reg))
++#define mucse_hw_rd32(hw, reg) \
++	readl((hw)->hw_addr + (reg))
+ #endif /* _RNPGBE_H */
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+index ebc7b3750157..921cc325a991 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+@@ -89,6 +89,8 @@ static void rnpgbe_init_n500(struct mucse_hw *hw)
+ {
+ 	struct mucse_mbx_info *mbx = &hw->mbx;
+ 
++	hw->ring_msix_base = hw->hw_addr + MUCSE_N500_RING_MSIX_BASE;
++
+ 	mbx->fwpf_ctrl_base = MUCSE_N500_FWPF_CTRL_BASE;
+ 	mbx->fwpf_shm_base = MUCSE_N500_FWPF_SHM_BASE;
+ }
+@@ -104,6 +106,8 @@ static void rnpgbe_init_n210(struct mucse_hw *hw)
+ {
+ 	struct mucse_mbx_info *mbx = &hw->mbx;
+ 
++	hw->ring_msix_base = hw->hw_addr + MUCSE_N210_RING_MSIX_BASE;
++
+ 	mbx->fwpf_ctrl_base = MUCSE_N210_FWPF_CTRL_BASE;
+ 	mbx->fwpf_shm_base = MUCSE_N210_FWPF_SHM_BASE;
+ }
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+index e77e6bc3d3e3..0dce78e4a91b 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+@@ -6,10 +6,12 @@
+ 
+ #define MUCSE_N500_FWPF_CTRL_BASE      0x28b00
+ #define MUCSE_N500_FWPF_SHM_BASE       0x2d000
++#define MUCSE_N500_RING_MSIX_BASE      0x28700
+ #define MUCSE_GBE_PFFW_MBX_CTRL_OFFSET 0x5500
+ #define MUCSE_GBE_FWPF_MBX_MASK_OFFSET 0x5700
+ #define MUCSE_N210_FWPF_CTRL_BASE      0x29400
+ #define MUCSE_N210_FWPF_SHM_BASE       0x2d900
++#define MUCSE_N210_RING_MSIX_BASE      0x29000
+ 
+ #define RNPGBE_DMA_AXI_EN              0x0010
+ 
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
+new file mode 100644
+index 000000000000..8ebf73824722
+--- /dev/null
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
+@@ -0,0 +1,631 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright(c) 2020 - 2025 Mucse Corporation. */
++
++#include <linux/pci.h>
++#include <linux/netdevice.h>
++
++#include "rnpgbe_lib.h"
++#include "rnpgbe.h"
++#include "rnpgbe_mbx_fw.h"
++
++/**
++ * rnpgbe_msix_other - Other irq handler
++ * @irq: irq num
++ * @data: private data
++ *
++ * @return: IRQ_HANDLED
++ **/
++static irqreturn_t rnpgbe_msix_other(int irq, void *data)
++{
++	struct mucse *mucse = (struct mucse *)data;
++
++	mucse_fw_irq_handler(&mucse->hw);
++
++	return IRQ_HANDLED;
++}
++
++static void rnpgbe_irq_disable_queues(struct mucse_q_vector *q_vector)
++{
++	struct mucse_ring *ring;
++
++	/* tx/rx use one register, different bit */
++	mucse_for_each_ring(ring, q_vector->tx) {
++		writel(INT_VALID, ring->trig);
++		writel((RX_INT_MASK | TX_INT_MASK), ring->irq_mask);
++	}
++}
++
++static void rnpgbe_irq_enable_queues(struct mucse_q_vector *q_vector)
++{
++	struct mucse_ring *ring;
++
++	/* tx/rx use one register, different bit */
++	mucse_for_each_ring(ring, q_vector->tx) {
++		writel(0, ring->irq_mask);
++		writel(INT_VALID | TX_INT_MASK | RX_INT_MASK, ring->trig);
++	}
++}
++
++/**
++ * rnpgbe_poll - NAPI Rx polling callback
++ * @napi: structure for representing this polling device
++ * @budget: how many packets driver is allowed to clean
++ *
++ * @return: work done in this call
++ * This function is used for legacy and MSI, NAPI mode
++ **/
++static int rnpgbe_poll(struct napi_struct *napi, int budget)
++{
++	struct mucse_q_vector *q_vector =
++		container_of(napi, struct mucse_q_vector, napi);
++	int work_done = 0;
++
++	/* Exit if we are called by netpoll */
++	if (unlikely(!budget))
++		return 0;
++
++	if (likely(napi_complete_done(napi, work_done)))
++		rnpgbe_irq_enable_queues(q_vector);
++
++	return work_done;
++}
++
++/**
++ * register_mbx_irq - Register mbx routine
++ * @mucse: pointer to private structure
++ *
++ * In MSIX mode, register a dedicated handler for vector 0 (mailbox)
++ * In MSI/MSI-X_SINGLE mode, mailbox is multiplexed through
++ * data tx/rx handler.
++ *
++ * @return: 0 on success, negative on failure
++ **/
++int register_mbx_irq(struct mucse *mucse)
++{
++	struct pci_dev *pdev = mucse->pdev;
++	int err = 0;
++
++	snprintf(mucse->mbx_name, sizeof(mucse->mbx_name),
++		 "rnpgbe-mbx:%s", pci_name(pdev));
++
++	if (mucse->flags & M_FLAG_MSIX_EN) {
++		err = request_irq(pci_irq_vector(pdev, 0),
++				  rnpgbe_msix_other, 0, mucse->mbx_name,
++				  mucse);
++	}
++
++	return err;
++}
++
++/**
++ * remove_mbx_irq - Remove mbx routine
++ * @mucse: pointer to private structure
++ **/
++void remove_mbx_irq(struct mucse *mucse)
++{
++	struct pci_dev *pdev = mucse->pdev;
++
++	if (mucse->flags & M_FLAG_MSIX_EN)
++		free_irq(pci_irq_vector(pdev, 0), mucse);
++}
++
++/**
++ * rnpgbe_set_num_queues - Allocate queues for device, feature dependent
++ * @mucse: pointer to private structure
++ *
++ * Determine tx/rx queue nums
++ **/
++static void rnpgbe_set_num_queues(struct mucse *mucse)
++{
++	/* start from 1 queue */
++	mucse->num_tx_queues = 1;
++	mucse->num_rx_queues = 1;
++}
++
++/**
++ * rnpgbe_set_interrupt_capability - Set MSI-X or MSI if supported
++ * @mucse: pointer to private structure
++ *
++ * Attempt to configure the interrupts using the best available
++ * capabilities of the hardware.
++ *
++ * @return: 0 on success, negative on failure
++ **/
++static int rnpgbe_set_interrupt_capability(struct mucse *mucse)
++{
++	int v_budget;
++
++	v_budget = min3(mucse->num_tx_queues, mucse->num_rx_queues,
++			MAX_Q_VECTORS);
++	v_budget = min_t(int, v_budget, num_online_cpus());
++	/* add one vector for mbx */
++	v_budget += 1;
++
++	/* Hardware limitation: only 1 MSI vector is supported even
++	 * if multiple messages are requested. MSI mode falls back
++	 * to single vector automatically.
++	 */
++	v_budget = pci_alloc_irq_vectors(mucse->pdev, 1, v_budget,
++					 PCI_IRQ_MSI | PCI_IRQ_MSIX);
++	if (v_budget < 0)
++		return v_budget;
++
++	if (mucse->pdev->msix_enabled) {
++		/* q_vector not include mbx */
++		if (v_budget > 1) {
++			mucse->flags |= M_FLAG_MSIX_EN;
++			mucse->num_q_vectors = v_budget - 1;
++		} else {
++			mucse->flags |= M_FLAG_MSIX_SINGLE_EN;
++			mucse->num_q_vectors = 1;
++		}
++	} else {
++		/* hw only support 1 msi irq */
++		mucse->num_q_vectors = 1;
++		mucse->flags |= M_FLAG_MSI_EN;
++	}
++
++	return 0;
++}
++
++/**
++ * mucse_add_ring - Add ring to ring container
++ * @ring: ring to be added
++ * @head: ring container
++ **/
++static void mucse_add_ring(struct mucse_ring *ring,
++			   struct mucse_ring_container *head)
++{
++	ring->next = head->ring;
++	head->ring = ring;
++	head->count++;
++}
++
++/**
++ * rnpgbe_alloc_q_vector - Allocate memory for a single interrupt vector
++ * @mucse: pointer to private structure
++ * @eth_queue_idx: queue_index idx for this q_vector
++ * @v_idx: index of vector used for this q_vector
++ * @r_idx: total number of rings to allocate
++ * @r_count: ring count
++ * @step: ring step
++ *
++ * @return: 0 on success. If allocation fails we return -ENOMEM.
++ **/
++static int rnpgbe_alloc_q_vector(struct mucse *mucse,
++				 int eth_queue_idx, int v_idx, int r_idx,
++				 int r_count, int step)
++{
++	int rxr_idx = r_idx, txr_idx = r_idx;
++	struct mucse_hw *hw = &mucse->hw;
++	struct mucse_q_vector *q_vector;
++	int txr_count, rxr_count, idx;
++	struct mucse_ring *ring;
++	int ring_count;
++
++	txr_count = r_count;
++	rxr_count = r_count;
++	ring_count = txr_count + rxr_count;
++
++	q_vector = kzalloc_flex(*q_vector, ring, ring_count);
++	if (!q_vector)
++		return -ENOMEM;
++
++	netif_napi_add(mucse->netdev, &q_vector->napi, rnpgbe_poll);
++	/* tie q_vector and mucse together */
++	mucse->q_vector[v_idx] = q_vector;
++	q_vector->mucse = mucse;
++	q_vector->v_idx = v_idx;
++	/* if mbx use separate irq, we should add 1 */
++	if (mucse->flags & M_FLAG_MSIX_EN)
++		q_vector->v_idx++;
++
++	ring = q_vector->ring;
++
++	for (idx = 0; idx < txr_count; idx++) {
++		mucse_add_ring(ring, &q_vector->tx);
++		ring->queue_index = eth_queue_idx + idx;
++		ring->rnpgbe_queue_idx = txr_idx;
++		ring->ring_addr = hw->hw_addr + RING_OFFSET(txr_idx);
++		ring->irq_mask = ring->ring_addr + RNPGBE_DMA_INT_MASK;
++		ring->trig = ring->ring_addr + RNPGBE_DMA_INT_TRIG;
++		mucse->tx_ring[ring->queue_index] = ring;
++		txr_idx += step;
++		ring++;
++	}
++
++	for (idx = 0; idx < rxr_count; idx++) {
++		mucse_add_ring(ring, &q_vector->rx);
++		ring->queue_index = eth_queue_idx + idx;
++		ring->rnpgbe_queue_idx = rxr_idx;
++		ring->ring_addr = hw->hw_addr + RING_OFFSET(rxr_idx);
++		ring->irq_mask = ring->ring_addr + RNPGBE_DMA_INT_MASK;
++		ring->trig = ring->ring_addr + RNPGBE_DMA_INT_TRIG;
++		mucse->rx_ring[ring->queue_index] = ring;
++		rxr_idx += step;
++		ring++;
++	}
++
++	return 0;
++}
++
++/**
++ * rnpgbe_free_q_vector - Free memory allocated for specific interrupt vector
++ * @mucse: pointer to private structure
++ * @v_idx: index of vector to be freed
++ *
++ * This function frees the memory allocated to the q_vector.  In addition if
++ * NAPI is enabled it will delete any references to the NAPI struct prior
++ * to freeing the q_vector.
++ **/
++static void rnpgbe_free_q_vector(struct mucse *mucse, int v_idx)
++{
++	struct mucse_q_vector *q_vector = mucse->q_vector[v_idx];
++	struct mucse_ring *ring;
++
++	mucse_for_each_ring(ring, q_vector->tx)
++		mucse->tx_ring[ring->queue_index] = NULL;
++	mucse_for_each_ring(ring, q_vector->rx)
++		mucse->rx_ring[ring->queue_index] = NULL;
++	mucse->q_vector[v_idx] = NULL;
++	netif_napi_del(&q_vector->napi);
++	kfree(q_vector);
++}
++
++/**
++ * rnpgbe_alloc_q_vectors - Allocate memory for interrupt vectors
++ * @mucse: pointer to private structure
++ *
++ * @return: 0 if success. if allocation fails we return -ENOMEM.
++ **/
++static int rnpgbe_alloc_q_vectors(struct mucse *mucse)
++{
++	int err, ring_cnt, v_remaing = mucse->num_q_vectors;
++	int r_remaing = min_t(int, mucse->num_tx_queues,
++			      mucse->num_rx_queues);
++	int q_vector_nums = 0;
++	int eth_queue_idx = 0;
++	int ring_step = 1;
++	int ring_idx = 0;
++	int v_idx = 0;
++
++	for (; r_remaing > 0 && v_remaing > 0; v_remaing--) {
++		ring_cnt = DIV_ROUND_UP(r_remaing, v_remaing);
++		err = rnpgbe_alloc_q_vector(mucse, eth_queue_idx,
++					    v_idx, ring_idx, ring_cnt,
++					    ring_step);
++		if (err)
++			goto err_free_q_vector;
++		ring_idx += ring_step * ring_cnt;
++		eth_queue_idx += ring_cnt;
++		r_remaing -= ring_cnt;
++		q_vector_nums++;
++		v_idx++;
++	}
++	/* Fix the real used q_vectors_nums */
++	mucse->num_q_vectors = q_vector_nums;
++	mucse->num_tx_queues = eth_queue_idx;
++	mucse->num_rx_queues = eth_queue_idx;
++
++	return 0;
++
++err_free_q_vector:
++	mucse->num_tx_queues = 0;
++	mucse->num_rx_queues = 0;
++	mucse->num_q_vectors = 0;
++
++	while (v_idx--)
++		rnpgbe_free_q_vector(mucse, v_idx);
++
++	return err;
++}
++
++/**
++ * rnpgbe_reset_interrupt_capability - Reset irq capability setup
++ * @mucse: pointer to private structure
++ **/
++static void rnpgbe_reset_interrupt_capability(struct mucse *mucse)
++{
++	pci_free_irq_vectors(mucse->pdev);
++	mucse->flags &= ~(M_FLAG_MSIX_EN |
++			M_FLAG_MSIX_SINGLE_EN |
++			M_FLAG_MSI_EN);
++}
++
++/**
++ * rnpgbe_init_interrupt_scheme - Determine proper interrupt scheme
++ * @mucse: pointer to private structure
++ *
++ * We determine which interrupt scheme to use based on...
++ * - Hardware queue count
++ * - cpu numbers
++ * - irq mode (msi/legacy force 1)
++ *
++ * @return: 0 on success, negative on failure
++ **/
++int rnpgbe_init_interrupt_scheme(struct mucse *mucse)
++{
++	int err;
++
++	rnpgbe_set_num_queues(mucse);
++
++	err = rnpgbe_set_interrupt_capability(mucse);
++	if (err)
++		return err;
++
++	err = rnpgbe_alloc_q_vectors(mucse);
++	if (err) {
++		rnpgbe_reset_interrupt_capability(mucse);
++		return err;
++	}
++
++	return 0;
++}
++
++/**
++ * rnpgbe_free_q_vectors - Free memory allocated for interrupt vectors
++ * @mucse: pointer to private structure
++ *
++ * This function frees the memory allocated to the q_vectors.  In addition if
++ * NAPI is enabled it will delete any references to the NAPI struct prior
++ * to freeing the q_vector.
++ **/
++static void rnpgbe_free_q_vectors(struct mucse *mucse)
++{
++	int v_idx = mucse->num_q_vectors;
++
++	mucse->num_rx_queues = 0;
++	mucse->num_tx_queues = 0;
++	mucse->num_q_vectors = 0;
++
++	while (v_idx--)
++		rnpgbe_free_q_vector(mucse, v_idx);
++}
++
++/**
++ * rnpgbe_clear_interrupt_scheme - Clear the current interrupt scheme settings
++ * @mucse: pointer to private structure
++ *
++ * Clear interrupt specific resources and reset the structure
++ **/
++void rnpgbe_clear_interrupt_scheme(struct mucse *mucse)
++{
++	mucse->num_tx_queues = 0;
++	mucse->num_rx_queues = 0;
++	rnpgbe_free_q_vectors(mucse);
++	rnpgbe_reset_interrupt_capability(mucse);
++}
++
++/**
++ * rnpgbe_msix_clean_rings - Msix irq handler for ring irq
++ * @irq: irq num
++ * @data: private data
++ *
++ * rnpgbe_msix_clean_rings handle irq from ring, start napi
++ * @return: IRQ_HANDLED
++ **/
++static irqreturn_t rnpgbe_msix_clean_rings(int irq, void *data)
++{
++	struct mucse_q_vector *q_vector = (struct mucse_q_vector *)data;
++
++	rnpgbe_irq_disable_queues(q_vector);
++	if (q_vector->rx.ring || q_vector->tx.ring)
++		napi_schedule_irqoff(&q_vector->napi);
++
++	return IRQ_HANDLED;
++}
++
++/**
++ * rnpgbe_int_single - Msix-signle/msi irq handler
++ * @irq: irq num
++ * @data: private data
++ * @return: IRQ_HANDLED
++ **/
++static irqreturn_t rnpgbe_int_single(int irq, void *data)
++{
++	struct mucse *mucse = (struct mucse *)data;
++	struct mucse_q_vector *q_vector;
++
++	mucse_fw_irq_handler(&mucse->hw);
++
++	q_vector = mucse->q_vector[0];
++	rnpgbe_irq_disable_queues(q_vector);
++	if (q_vector->rx.ring || q_vector->tx.ring)
++		napi_schedule_irqoff(&q_vector->napi);
++
++	return IRQ_HANDLED;
++}
++
++/**
++ * rnpgbe_request_irq - Initialize interrupts
++ * @mucse: pointer to private structure
++ *
++ * Attempts to configure interrupts using the best available
++ * capabilities of the hardware and kernel.
++ *
++ * @return: 0 on success, negative value on failure
++ **/
++int rnpgbe_request_irq(struct mucse *mucse)
++{
++	struct net_device *netdev = mucse->netdev;
++	struct pci_dev *pdev = mucse->pdev;
++	struct mucse_q_vector *q_vector;
++	int err, i;
++
++	if (mucse->flags & M_FLAG_MSIX_EN) {
++		for (i = 0; i < mucse->num_q_vectors; i++) {
++			q_vector = mucse->q_vector[i];
++
++			snprintf(q_vector->name, sizeof(q_vector->name),
++				 "%s-%s-%d", netdev->name, "TxRx", i);
++
++			err = request_irq(pci_irq_vector(pdev, i + 1),
++					  rnpgbe_msix_clean_rings, 0,
++					  q_vector->name,
++					  q_vector);
++			if (err) {
++				dev_err(&pdev->dev, "MSI-X req err %d: %d\n",
++					i + 1, err);
++				goto err_free_irqs;
++			}
++		}
++	} else {
++		/* msi/msix_single */
++		err = request_irq(pci_irq_vector(pdev, 0),
++				  rnpgbe_int_single, 0, netdev->name,
++				  mucse);
++		if (err)
++			return err;
++	}
++
++	return 0;
++err_free_irqs:
++	while (i--) {
++		q_vector = mucse->q_vector[i];
++		synchronize_irq(pci_irq_vector(pdev, i + 1));
++		free_irq(pci_irq_vector(pdev, i + 1), q_vector);
++	}
++
++	return err;
++}
++
++/**
++ * rnpgbe_free_irq - Free interrupts
++ * @mucse: pointer to private structure
++ *
++ * Attempts to free interrupts according initialized type.
++ **/
++void rnpgbe_free_irq(struct mucse *mucse)
++{
++	struct pci_dev *pdev = mucse->pdev;
++	struct mucse_q_vector *q_vector;
++
++	if (mucse->flags & M_FLAG_MSIX_EN) {
++		for (int i = 0; i < mucse->num_q_vectors; i++) {
++			q_vector = mucse->q_vector[i];
++			if (!q_vector)
++				continue;
++
++			free_irq(pci_irq_vector(pdev, i + 1), q_vector);
++		}
++	} else {
++		free_irq(pci_irq_vector(pdev, 0), mucse);
++	}
++}
++
++/**
++ * rnpgbe_set_ring_vector - Set the ring_vector registers,
++ * mapping interrupt causes to vectors
++ * @mucse: pointer to private structure
++ * @queue: queue to map the corresponding interrupt to
++ * @vector: the vector num to map to the corresponding queue
++ *
++ */
++static void rnpgbe_set_ring_vector(struct mucse *mucse,
++				   u8 queue, u8 vector)
++{
++	struct mucse_hw *hw = &mucse->hw;
++	u32 data;
++
++	data = hw->pfvfnum << 24;
++	data |= (vector << 8);
++	data |= vector;
++	writel(data, hw->ring_msix_base + RING_VECTOR(queue));
++}
++
++/**
++ * rnpgbe_configure_msi - Configure MSI hardware
++ * @mucse: pointer to private structure
++ *
++ * rnpgbe_configure_msi sets up the hardware to properly generate MSI
++ * interrupts.
++ **/
++static void rnpgbe_configure_msi(struct mucse *mucse)
++{
++	struct mucse_q_vector *q_vector = mucse->q_vector[0];
++	struct mucse_ring *ring;
++
++	/* tx/rx use one register, different bit */
++	mucse_for_each_ring(ring, q_vector->tx)
++		rnpgbe_set_ring_vector(mucse, ring->rnpgbe_queue_idx, 0);
++}
++
++/**
++ * rnpgbe_configure_msix - Configure MSI-X hardware
++ * @mucse: pointer to private structure
++ *
++ * rnpgbe_configure_msix sets up the hardware to properly generate MSI-X
++ * interrupts.
++ **/
++static void rnpgbe_configure_msix(struct mucse *mucse)
++{
++	struct mucse_q_vector *q_vector;
++
++	for (int i = 0; i < mucse->num_q_vectors; i++) {
++		struct mucse_ring *ring;
++
++		q_vector = mucse->q_vector[i];
++		/* tx/rx use one register, different bit */
++		mucse_for_each_ring(ring, q_vector->tx) {
++			rnpgbe_set_ring_vector(mucse, ring->rnpgbe_queue_idx,
++					       q_vector->v_idx);
++		}
++	}
++}
++
++static void rnpgbe_irq_enable(struct mucse *mucse)
++{
++	for (int i = 0; i < mucse->num_q_vectors; i++)
++		rnpgbe_irq_enable_queues(mucse->q_vector[i]);
++}
++
++/**
++ * rnpgbe_irq_disable - Mask off interrupt generation on the NIC
++ * @mucse: board private structure
++ **/
++void rnpgbe_irq_disable(struct mucse *mucse)
++{
++	struct pci_dev *pdev = mucse->pdev;
++
++	if (mucse->flags & M_FLAG_MSIX_EN) {
++		for (int i = 0; i < mucse->num_q_vectors; i++) {
++			rnpgbe_irq_disable_queues(mucse->q_vector[i]);
++			synchronize_irq(pci_irq_vector(pdev, i + 1));
++		}
++	} else {
++		rnpgbe_irq_disable_queues(mucse->q_vector[0]);
++		synchronize_irq(pci_irq_vector(pdev, 0));
++	}
++}
++
++static void rnpgbe_napi_enable_all(struct mucse *mucse)
++{
++	for (int i = 0; i < mucse->num_q_vectors; i++)
++		napi_enable(&mucse->q_vector[i]->napi);
++}
++
++static void rnpgbe_napi_disable_all(struct mucse *mucse)
++{
++	for (int i = 0; i < mucse->num_q_vectors; i++)
++		napi_disable(&mucse->q_vector[i]->napi);
++}
++
++void rnpgbe_down(struct mucse *mucse)
++{
++	rnpgbe_napi_disable_all(mucse);
++	rnpgbe_irq_disable(mucse);
++}
++
++/**
++ * rnpgbe_up_complete - Final step for port up
++ * @mucse: pointer to private structure
++ **/
++void rnpgbe_up_complete(struct mucse *mucse)
++{
++	if (mucse->flags & (M_FLAG_MSIX_EN | M_FLAG_MSIX_SINGLE_EN))
++		rnpgbe_configure_msix(mucse);
++	else
++		rnpgbe_configure_msi(mucse);
++	rnpgbe_napi_enable_all(mucse);
++	rnpgbe_irq_enable(mucse);
++}
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
+new file mode 100644
+index 000000000000..baee4430a3a9
+--- /dev/null
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright(c) 2020 - 2025 Mucse Corporation. */
++
++#ifndef _RNPGBE_LIB_H
++#define _RNPGBE_LIB_H
++
++struct mucse;
++struct mucse_hw;
++
++#define RING_OFFSET(n)            (0x1000 + 0x100 * (n))
++#define RNPGBE_DMA_INT_MASK       0x24
++#define TX_INT_MASK               BIT(1)
++#define RX_INT_MASK               BIT(0)
++#define INT_VALID                 (BIT(16) | BIT(17))
++#define RNPGBE_DMA_INT_TRIG       0x2c
++/* |  31:24   | .... |    15:8   |    7:0    | */
++/* |  pfvfnum |      | tx vector | rx vector | */
++#define RING_VECTOR(n)            (0x04 * (n))
++
++#define mucse_for_each_ring(pos, head)\
++	for (typeof((head).ring) __pos = (head).ring;\
++	     __pos ? ({ pos = __pos; 1; }) : 0;\
++	     __pos = __pos->next)
++
++int rnpgbe_init_interrupt_scheme(struct mucse *mucse);
++void rnpgbe_clear_interrupt_scheme(struct mucse *mucse);
++int register_mbx_irq(struct mucse *mucse);
++void remove_mbx_irq(struct mucse *mucse);
++int rnpgbe_request_irq(struct mucse *mucse);
++void rnpgbe_free_irq(struct mucse *mucse);
++void rnpgbe_irq_disable(struct mucse *mucse);
++void rnpgbe_down(struct mucse *mucse);
++void rnpgbe_up_complete(struct mucse *mucse);
++#endif
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+index 316f941629d4..ce74fe1eca35 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+@@ -7,6 +7,7 @@
+ 
+ #include "rnpgbe.h"
+ #include "rnpgbe_hw.h"
++#include "rnpgbe_lib.h"
+ #include "rnpgbe_mbx_fw.h"
+ 
+ static const char rnpgbe_driver_name[] = "rnpgbe";
+@@ -32,11 +33,28 @@ static struct pci_device_id rnpgbe_pci_tbl[] = {
+  * The open entry point is called when a network interface is made
+  * active by the system (IFF_UP).
+  *
+- * Return: 0
++ * Return: 0 on success, negative value on failure
+  **/
+ static int rnpgbe_open(struct net_device *netdev)
+ {
++	struct mucse *mucse = netdev_priv(netdev);
++	int err;
++
++	err = rnpgbe_request_irq(mucse);
++	if (err)
++		return err;
++
++	err = netif_set_real_num_queues(netdev, mucse->num_tx_queues,
++					mucse->num_rx_queues);
++	if (err)
++		goto err_free_irqs;
++
++	rnpgbe_up_complete(mucse);
++
+ 	return 0;
++err_free_irqs:
++	rnpgbe_free_irq(mucse);
++	return err;
+ }
+ 
+ /**
+@@ -50,6 +68,11 @@ static int rnpgbe_open(struct net_device *netdev)
+  **/
+ static int rnpgbe_close(struct net_device *netdev)
+ {
++	struct mucse *mucse = netdev_priv(netdev);
++
++	rnpgbe_down(mucse);
++	rnpgbe_free_irq(mucse);
++
+ 	return 0;
+ }
+ 
+@@ -166,11 +189,28 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
+ 		goto err_powerdown;
+ 	}
+ 
++	err = rnpgbe_init_interrupt_scheme(mucse);
++	if (err) {
++		dev_err(&pdev->dev, "init interrupt failed %d\n", err);
++		goto err_powerdown;
++	}
++
++	err = register_mbx_irq(mucse);
++	if (err) {
++		dev_err(&pdev->dev, "register mbx irq failed %d\n", err);
++		goto err_clear_interrupt;
++	}
++
+ 	err = register_netdev(netdev);
+ 	if (err)
+-		goto err_powerdown;
++		goto err_remove_mbx;
+ 
+ 	return 0;
++
++err_remove_mbx:
++	remove_mbx_irq(mucse);
++err_clear_interrupt:
++	rnpgbe_clear_interrupt_scheme(mucse);
+ err_powerdown:
+ 	/* notify powerdown only powerup ok */
+ 	if (!err_notify) {
+@@ -180,6 +220,7 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
+ 				 err_notify);
+ 	}
+ err_free_net:
++	pci_set_drvdata(pdev, NULL);
+ 	free_netdev(netdev);
+ 	return err;
+ }
+@@ -253,9 +294,11 @@ static void rnpgbe_rm_adapter(struct pci_dev *pdev)
+ 		return;
+ 	netdev = mucse->netdev;
+ 	unregister_netdev(netdev);
++	remove_mbx_irq(mucse);
+ 	err = rnpgbe_send_notify(hw, false, mucse_fw_powerup);
+ 	if (err)
+ 		dev_warn(&pdev->dev, "Send powerdown to hw failed %d\n", err);
++	rnpgbe_clear_interrupt_scheme(mucse);
+ 	free_netdev(netdev);
+ }
+ 
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+index 8c8bd5e8e1db..05684d716792 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+@@ -189,3 +189,11 @@ int mucse_mbx_get_macaddr(struct mucse_hw *hw, int pfvfnum,
+ 
+ 	return 0;
+ }
++
++/**
++ * mucse_fw_irq_handler - Try to handle a req from hw
++ * @hw: pointer to the HW structure
++ **/
++void mucse_fw_irq_handler(struct mucse_hw *hw)
++{
++}
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+index fb24fc12b613..aa26c729588c 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+@@ -85,4 +85,5 @@ int mucse_mbx_powerup(struct mucse_hw *hw, bool is_powerup);
+ int mucse_mbx_reset_hw(struct mucse_hw *hw);
+ int mucse_mbx_get_macaddr(struct mucse_hw *hw, int pfvfnum,
+ 			  u8 *mac_addr, int port);
++void mucse_fw_irq_handler(struct mucse_hw *hw);
+ #endif /* _RNPGBE_MBX_FW_H */
 -- 
 2.25.1
 
