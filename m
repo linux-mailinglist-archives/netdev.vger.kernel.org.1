@@ -1,203 +1,203 @@
-Return-Path: <netdev+bounces-291925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291926-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WNtbKq8HFmpNhAcAu9opvQ
-	(envelope-from <netdev+bounces-291925-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:50:55 +0200
+	id nwFkGK8IFmqBhAcAu9opvQ
+	(envelope-from <netdev+bounces-291926-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:55:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CBA45DC762
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:50:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB2465DC80F
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:55:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8C813022606
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:50:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E301A303FBA6
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F92F3BB12C;
-	Tue, 26 May 2026 20:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E783C0A05;
+	Tue, 26 May 2026 20:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="Rj0TPyz1"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="BiQ+/ToJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222A626C3BD;
-	Tue, 26 May 2026 20:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779828634; cv=none; b=l62os8h7raXqPCHhggfKzE+cf6PPZ0x8migiFIxA1+H+tmpFvUuwEnlk1wOyqElhHKVPXdW2gQNaL7XdDRwlQ7u4l7gfiwIVIGvLMaq8Ez/umNeUbaxneiNOUnH0/Mz9BfC9gxjbJPDwSGwLC3g40+ikK91f0iwkkd7E1o7LDl4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779828634; c=relaxed/simple;
-	bh=3MsbVQMRlkWyRmM+scobE8Chf8BwX3w2hipiqBeSQuE=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=tcHCawQ3etM7n0JwXKDjwgkdgpxqnBor9Wcoy++cb9AKFjNxbL5LpQ8s90nsDF1OegbNJOqFZBp3vemvupHJoWbh/Z5zEx25BgF8JMf0mYIdQA9wDDRJUfVAEHnoNdMu7OvFnK8psIFKAEpLmyMvbqhLNTQGBxQf3LMroKuscSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Rj0TPyz1; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 82ECBA4B47;
-	Tue, 26 May 2026 22:50:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1779828627; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=YxIv+z1i7BXKHKGu2iZTSaCZuD3KwsuMfvkF03U6b30=;
-	b=Rj0TPyz16ddOVcu6NGLZel8fDz+TRyxwiP4+JhzkJZbzWYsOSGIZ+zObP76tXE4Vs5QK29
-	HS9XbmZxA973Zhq+wp7AqhnIAoYUSw5bAJcNkOPsBlrhyMdCJ4AI86DDxYL1GqiA5zhMbj
-	jHtb+DsScJyyz1kBTr1vd5LjhYu1PaFDH8sRCGCSUjkSfhmsKHXAu00wAVEjOKMLvrUlrg
-	gB/SssvHnFNn5m20rHtdf0W3QOrCYChbZYYPwkskWplqnKrS9k0lrXnWrW7Eazy3wwCaEa
-	rReEkauXZOLjZRN1nWhfLRZd30kQPfntTyLJN4DMIT60rpErwd06e/CZ64yv0A==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E21926C3BD
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 20:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779828851; cv=pass; b=jnYWc8unfDaerGUyUaUfDy9Wi0kLYmP6AT2lXTgzyd7xO+FcF6EtsI+QC1XqNR6Rd7YO0pR/3qEEA4/F/TkUVX8HzVFA+w/YNdgTDArw7Q2yii03ct0iLvjbljeCjE2CNSoy21VGjVI1ZZ93COQbb27Pe8vYhcSNYkTAd0jLSVY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779828851; c=relaxed/simple;
+	bh=g3tAHZlmjqVB8F58Yb4ZWVoVwqFrZlKYWsPBDFTsCxI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OlmCpdq5hm+XeDO6xSipWiocSDOwNgKf9AErEMhrVx/43hLdLYcWwljyrG0fSUIibk8rKwdCjXpHnp3fiHAZpEKw3T85+/oNy0V5hzKzRMkiGasey3s8Qry/FsHeOMjKFmTf4/1pJ3L8CyiQgYCWmSDk58O9Kzl7NzudiXsaGe0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=BiQ+/ToJ; arc=pass smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-366375c4076so4774793a91.3
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 13:54:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779828849; cv=none;
+        d=google.com; s=arc-20240605;
+        b=K+5B8/OnZueCZ8hQ1i/S9NhXOUE0qNwu/0a30b9tzJKKYbqP/IZuTbEY6pcqQ9uFHq
+         XxEkCrT3ihvXEyt2vd6yHZPmUw/aKj/fgBzcVrFQGajDFQxvgSm6hp8wuAgcyLy5nszc
+         9fAX+qpEAMZXuG68RdihSbZGbk0/W96WOWbNAgr0/6mdeJwiwSv/UBit9j96h0uO7qul
+         bFHtS8AUOQCEQ9+QjnA8MOsEppOBsqQ5ArRcaKUln5NMHHHOi75QfIJDpn8r5zZJIIxc
+         03RsV7Qp4ZWXVFeNgNru4Qfd0Wa5HvQ1c5qCgAZXNR/c6Vj86U1ftVz3esfxLpdTCoWE
+         FquQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cKoGVXp9VQvZ/qhGKuiAhQLobh3aS2Nh5IGMtLCVpaw=;
+        fh=w+oPBCSbNeQWbB15qMFeZ7kiUbTooHiYpYMqfZ3hNnk=;
+        b=UvR8PZT3LzLGdCy/zrt99kqLC5KPXS6Us8sZAZnLUIaZMluxTg0RIn01aAEPgdBaAX
+         YujhhEn/VjuXz9Y5qzT+3tTJV5ARMN7cN8sHD5dX4pn1E/gJMCTmGzPUaL+eDQ10bEMu
+         aE9RYi6SwiwmYh8GVhtKZMBTQgZmgJVgbE6mU2hpgoaccCA6Ir+QA4yxWlKCTgbVM5kI
+         AK6tdwotC4FF2bqniuhEiRit/SdVSeeqb+FNy7Odq7PE/1AEvFdrCfZlxz1DVajHeiDL
+         bS61cc3pVAbfRnr+5FMp7CamPKdFY+PRMhv6EkLKVnqPJ2gdHXe31RVH/6N3r1hhnx2S
+         AI0A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1779828849; x=1780433649; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cKoGVXp9VQvZ/qhGKuiAhQLobh3aS2Nh5IGMtLCVpaw=;
+        b=BiQ+/ToJHIOJ55puvWhOri2tKGmpGGparX1e0GFnXBYuKD7cD7HLhJL3/RT6x0k0Mc
+         +044LWaf0Eqo7dHy7ZyYq8VqldtRi9TbiHejuNUccz6K2v+LCrm/Fy/2BjqrM4S7lnmI
+         aBUslhqQCdLC3FN0OkvXqPRTIy1AB72PAg9Y7nzZ1jnptayjWJWj/dCtzl8pp43eOkIM
+         eAfvfpHuIGiYtfps3WrHxfMEeMr3BA4Cl1plNDuCpUWZpU2KAUHOgGFo+ToiShNlSxUk
+         GZNsyD/L5id63VoJWhlOBlA8X7qS24HRclASh0sXi64rcqwQCW8z1X+RDaprUwwd8WA4
+         8Z9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779828849; x=1780433649;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cKoGVXp9VQvZ/qhGKuiAhQLobh3aS2Nh5IGMtLCVpaw=;
+        b=DMUzvC6lrgX7XU3o4bPU80GHR89LHhMU6+60/IQR6CNnHnDCg5ZFqciDuabHFU6e0X
+         9HK57L8JyiZaNxLHGSW0UJXAPwuxrOscUM/geFGQJMfH4xOlhxYgUtU7eV5ny5+dWy/c
+         BcnI7IOpKweGtPw/34KYSzATt7XvjUYYLdpeHrIru8z6NjNpoiqkFanH3+KMrIE6ee5U
+         KTdrNo7dE0a3ph0N9HVOo8iAVaCCclYkg4XnrMAG45G0QYRtMp98v4pFqHpOqiQgGW2W
+         ccXwIU0O7JtP6ZMopEyS6w3VIcvxXMWoco5hfiR8STLLofIWu9uxjUR04Ms7gmLCpTii
+         yz2g==
+X-Forwarded-Encrypted: i=1; AFNElJ/V72Y5J6oXaoPXtCgqkFEfFTrhROBl6w2qcXEUsylWJ78SwDQKG4Bvxu3depgayoHyBI3fm9c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyJGXOEQa0FrFE5A10iN6CMaLshahWdBP9ODlox4AFtHpi8jc0
+	IhCFtkX2sq0uS2VZ0Sezl/XC7Fvp3uLkDa8z10OcLkmnHtsSLC2/9ddWaG9wcNwzOfCuqoun4Wr
+	SFLnUmsH8zTDSXw05LLG8CIOQt3gxwfwQZsExMMqh
+X-Gm-Gg: Acq92OHjzK8frutQ6CNatEBHWyBKLzZJ8Z/3CHSvwOz6mYmAwuMNlncFny/fzc9IQzj
+	6PtoXv7gZnEiRExH6fVJS1WtszttuBF6uwNbtbJY8CULyGbXE71D8g/nw9ibkrpDKbWE4Ze5Jb7
+	kaTXP213oprS8yKuUKzh0hW7lWdtLybOZ4p2UO/+OrIh44cBW2jPKhjYpPCruMbom/mbRmbjvg3
+	ZMMqZD/TFgQeVbgeJF8jDnZTbYg27+/1bGicbFQF+JrfTCB/J/3fFVebVlF3Fsxlzmp7KcXz4QV
+	n5xIloE=
+X-Received: by 2002:a17:90b:1a8e:b0:368:78da:803 with SMTP id
+ 98e67ed59e1d1-36a674f81fbmr20198798a91.12.1779828849269; Tue, 26 May 2026
+ 13:54:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 26 May 2026 22:50:20 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: "Alexander A. Klimov" <grandmaster@al2klimov.de>
-Cc: Haren Myneni <haren@linux.ibm.com>, Rick Lindsley
- <ricklind@linux.ibm.com>, Nick Child <nnac123@linux.ibm.com>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)"
- <chleroy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Thomas Falcon
- <tlfalcon@linux.vnet.ibm.com>, Desnes Augusto Nunes do Rosario
- <desnesn@linux.vnet.ibm.com>, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ibmvnic: fix krealloc() memory leak
-In-Reply-To: <20260526184105.18962-6-grandmaster@al2klimov.de>
-References: <20260526184105.18962-1-grandmaster@al2klimov.de>
- <20260526184105.18962-6-grandmaster@al2klimov.de>
-Message-ID: <fc74cefb2e0167514f1c3c0c3d6133ec@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+References: <20260513172443.1128496-1-rrobaina@redhat.com> <20260518173507.2f2529c9@kernel.org>
+In-Reply-To: <20260518173507.2f2529c9@kernel.org>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 26 May 2026 16:53:57 -0400
+X-Gm-Features: AVHnY4JL0a8xLE4fxERdMP_DngilckfsvKCCxAGn7xyy829c-DKtroKv7TSAUyk
+Message-ID: <CAHC9VhSs5MQ5sF6rLGVDj=jYJXnUM2omc5tG+7ELkCg9t7aPMw@mail.gmail.com>
+Subject: Re: [PATCH v2] netlink, audit: prevent false ENOBUFS on timeout expiry
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ricardo Robaina <rrobaina@redhat.com>, audit@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, eparis@redhat.com, 
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
+	Steve Grubb <sgrubb@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[paul-moore.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[paul-moore.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291925-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-291926-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.vnet.ibm.com,vger.kernel.org,lists.ozlabs.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[paul-moore.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[al2klimov.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0CBA45DC762
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[paul@paul-moore.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: AB2465DC80F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Alex
+On Mon, May 18, 2026 at 8:35=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+> On Wed, 13 May 2026 14:24:43 -0300 Ricardo Robaina wrote:
+> > When auditd is bottlenecked (e.g., by slow disk I/O), kauditd blocks on
+> > the netlink socket.
+>
+> Holding socket lock during slow IO sounds very wrong. One could say -
+> that's abuse of the socket lock?
 
-You patch is missing the prefix with the target tree. Please have
-a look at [1] for more details on the workflow.
+It's no different than any other kernel subsystem sending netlink
+packets to userspace, although in some configurations the rate at
+which audit sends netlink traffic is likely much higher than the
+majority of netlink users.
 
-On 26.5.2026 20:41, Alexander A. Klimov wrote:
-> Don't just overwrite the original pointer passed to krealloc()
-> with its return value without checking latter:
-> 
->     MEM = krealloc(MEM, SZ, GFP);
-> 
-> If krealloc() returns NULL, that erases the pointer
-> to the still allocated memory, hence leaks this memory.
-> Instead, use a temporary variable, check it's not NULL
-> and only then assign it to the original pointer:
-> 
->     TMP = krealloc(MEM, SZ, GFP);
->     if (!TMP) return;
->     MEM = TMP;
-> 
-> Fixes: 4e6759be28e4 ("ibmvnic: Feature implementation of Vital Product 
-> Data (VPD) for the ibmvnic driver")
-> Signed-off-by: Alexander A. Klimov <grandmaster@al2klimov.de>
-> ---
->  drivers/net/ethernet/ibm/ibmvnic.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.c 
-> b/drivers/net/ethernet/ibm/ibmvnic.c
-> index 5a510eed335e..25d1d844ad19 100644
-> --- a/drivers/net/ethernet/ibm/ibmvnic.c
-> +++ b/drivers/net/ethernet/ibm/ibmvnic.c
-> @@ -1761,8 +1761,9 @@ static int ibmvnic_get_vpd(struct ibmvnic_adapter 
-> *adapter)
->  	union ibmvnic_crq crq;
->  	int len = 0;
->  	int rc;
-> +	unsigned char *buff = adapter->vpd->buff;
+Arguably, audit probably never should have used netlink, but that
+decision happened a long time ago and there were other issues
+complicating the decision.
 
-Should be reverse x-mas tree (longest to shortest).
+> > If the wait timeout fully expires (timeo =3D=3D 0),
+> > netlink mistakenly interprets the zeroed timeout as a non-blocking
+> > request. It then triggers netlink_overrun that drops the event,
+> > completely bypassing the audit subsystem's internal retry queue, and
+> > falsely returns ENOBUFS to user-space, resulting in the following error=
+:
+> >
+> >  auditd[]: Error receiving audit netlink packet (No buffer space availa=
+ble)
+> >
+> > Fix this by detecting when a blocking sender's timeout has expired
+> > (timeo =3D=3D 0 && !nonblock) in netlink_unicast(). In this case, inste=
+ad
+> > of retrying with timeo=3D0 (which would incorrectly trigger netlink_ove=
+rrun
+> > on the next iteration), safely free the skb and return -EAGAIN, allowin=
+g
+> > the audit subsystem to gracefully enqueue the pending event into its
+> > internal backlog.
+>
+> The socket _is_ the queue, normally.
 
-> 
-> -	if (adapter->vpd->buff)
-> +	if (buff)
->  		len = adapter->vpd->len;
-> 
->  	mutex_lock(&adapter->fw_lock);
-> @@ -1788,17 +1789,17 @@ static int ibmvnic_get_vpd(struct 
-> ibmvnic_adapter *adapter)
->  	if (!adapter->vpd->len)
->  		return -ENODATA;
-> 
-> -	if (!adapter->vpd->buff)
-> -		adapter->vpd->buff = kzalloc(adapter->vpd->len, GFP_KERNEL);
-> +	if (!buff)
-> +		buff = kzalloc(adapter->vpd->len, GFP_KERNEL);
->  	else if (adapter->vpd->len != len)
-> -		adapter->vpd->buff =
-> -			krealloc(adapter->vpd->buff,
-> -				 adapter->vpd->len, GFP_KERNEL);
-> +		buff = krealloc(buff,
-> +				adapter->vpd->len, GFP_KERNEL);
+There is a joke in there about audit and "normal", but I'll leave that
+as an exercise for the reader.  I will say that audit has a lot of
+unique requirements regarding queue management and that dictates a lot
+of the wacky stuff audit has to do with it's record queue; the
+standard socket buffer functionality doesn't have everything, and I
+wouldn't want to ask for it to be augmented in a way that satisfies
+audit.
 
-Dead branch? The only caller, init_resources(), kzalloc()s a fresh vpd
-right before, and resets run release_vpd_data() first, so vpd->buff is
-always NULL here and kzalloc() above always wins. The leak can't 
-trigger,
-which makes the Fixes tag misleading.
+> Please explore fixing this in audit?
 
-> 
-> -	if (!adapter->vpd->buff) {
-> +	if (!buff) {
->  		dev_err(dev, "Could allocate VPD buffer\n");
->  		return -ENOMEM;
->  	}
-> +	adapter->vpd->buff = buff;
+Ricardo, I was kinda hoping not to have to do this in audit, but I
+think you can probably get away with just open-coding
+netlink_unicast() in audit and then going from there ... we might want
+to do some other things differently, but let's see what a basic patch
+looks like before we spend a lot time redesigning it.
 
-If you keep it anyway: on failure the old buffer stays in vpd->buff 
-while
-vpd->len is already the new size, a mismatch the original avoided by
-NULLing. kfree() it (krealloc() does not free on failure) and NULL 
-before
--ENOMEM.
-
-> 
->  	adapter->vpd->dma_addr =
->  		dma_map_single(dev, adapter->vpd->buff, adapter->vpd->len,
-
-[1] https://docs.kernel.org/process/maintainer-netdev.html
-
-Thanks,
-Nicolai
+--=20
+paul-moore.com
 
