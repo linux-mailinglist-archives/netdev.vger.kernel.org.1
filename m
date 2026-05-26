@@ -1,156 +1,131 @@
-Return-Path: <netdev+bounces-291773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291774-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MENtC0vMFWq6bwcAu9opvQ
-	(envelope-from <netdev+bounces-291773-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:37:31 +0200
+	id OD21OVbEFWqxawcAu9opvQ
+	(envelope-from <netdev+bounces-291774-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:03:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 719EA5D9D01
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:37:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 686305D9412
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 235C7311B3D1
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:49:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 403DB303AFAC
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDCB38C2A5;
-	Tue, 26 May 2026 15:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78308390C95;
+	Tue, 26 May 2026 15:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zJxgAVbC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/fwzVk7"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E9338BF61;
-	Tue, 26 May 2026 15:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C0638E5DE;
+	Tue, 26 May 2026 15:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779810577; cv=none; b=GiY+XfSQqH0ZjwhmtakdDCQoIQOlP4sggJZKGp0AvV3vISXdYlc5uVOIO49M0dK4QALI6Q/P4kci6izzRVXEukvAWsAMv84ovWnK3zIwPhvkoqWNpzNAD4nkrTu3oS2TC4BhWbIx1vJFGlXf+f9gnEFoigVedLVuIbxvQMI6kT4=
+	t=1779811052; cv=none; b=CVG521LGtJy5nIp8yiQsMHc2wmJ5Qx/k26wofBu+03Aqu0nrXxGU0yN8v/Z+KKqKmDkDQL9K82K0T5a8XsvpbBgnuxRGafLM7TBzfbD2Nb889HPxs4HA8YbvCv3g1YqhD5b+TFrFGC5UR2ojwY+NvvXw9KzDtADFEZbtIWeoI90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779810577; c=relaxed/simple;
-	bh=bSz/62TfAqq/8gzYrk8R+TYG1iLmauSpvyJibARX5uo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=asgKkN7SMA+7qEEk/Xg8PIRhX9lCkkq7BsDXZSV4DBsScGSqo9rWDsaglAElQrV/aLK8r3qRBjjQsJ97J0/8iJI8BxpxjfhMkFO+aeBpe6ZGyu+/vDooH3PyGNmTu0zeHVGUfyYAVxPI7drdCjv/dKPK0nRZd78PatrTFDfEpSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zJxgAVbC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0gWncl3uxE+EJguZ8+TDtEb7FKZBeKXbaT+exSDCCSs=; b=zJxgAVbCiWSgUDS9eapMPwB/EJ
-	Tvg7hkwts0A/FJiFOa5zaWhilHXL/Y+o2+uVplFVhKuAuSNbpgaFfPu+onjLpkwVfzz4rQmdO64UJ
-	0Ui2Ta8T6HkpdpTtj0Ms3mpZGlViz7/oeP+/iK05+vWe53nPxa4ro3BgFPravptX5CAg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wRu1z-004bYx-2E; Tue, 26 May 2026 17:49:23 +0200
-Date: Tue, 26 May 2026 17:49:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: cedric.jehasse@luminex.be
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: dsa: mv88e6xxx: add support for
- credit based shaper
-Message-ID: <4d270516-a8ae-4bed-b316-c28a321c304e@lunn.ch>
-References: <20260526-net-next-mv88e6xxx-cbs-v2-0-13eb49c29b83@luminex.be>
- <20260526-net-next-mv88e6xxx-cbs-v2-2-13eb49c29b83@luminex.be>
+	s=arc-20240116; t=1779811052; c=relaxed/simple;
+	bh=35P5ihs62d+8XuLSFRE194a4DoNxFDAiihBX4nTgms8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CgKwlu3VWaHi/ttIpN7ysUTQtwJeelZpxzLPPNw0o3snP5C/X7FBG0cdas+IAAEhYJN9N9NzH38RpE0iq24FwtwZBOlTozBSlIVJn4eWAYZ9R/PRigGvIc6VebaZdAxxS0m0+TAlPCnBh1/ToNaf51oZNUzhhsaN8oZ/syBfPCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c/fwzVk7; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 856F11F000E9;
+	Tue, 26 May 2026 15:57:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779811051;
+	bh=11mCCtQpMU2T/iL799+eV5Hyo+Wjyfzw/iY1pN7ROms=;
+	h=From:To:Cc:Subject:Date;
+	b=c/fwzVk7UcQBrw3pFvvCdOsQCYYVOZk+DloGXX0a8wcz0b4XFuUffcDMyBzWV2KE2
+	 I38luRI+J+EiAIzzDvCSqlKK+ngMooqAQFbc1LpIGQ7u9qpK4RMDSrtxVG0RiZtSNi
+	 dZwRISt06mGi+RFkXABNpf9AdgkPKMrdi4Ryf4AAUaEvkF9TBOjyRZa9YoabhXHfLi
+	 +3NLGePddljH5TCgOVYjND4l/bJ77Ou2JpkWKpe5AQvN+U2iDEsl1x+tQuvpAF3oYE
+	 SARQ9JZB+b33TqbkS+cW7sM1BwXmuQfDIHRsyPjOgfpenQoOS6iG2JDdAFlb/Iu08d
+	 9OQxCmlWYU4Cw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	corbet@lwn.net,
+	tariqt@nvidia.com,
+	dtatulea@nvidia.com,
+	linux-doc@vger.kernel.org,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/4] docs: page_pool: tweaks and updates
+Date: Tue, 26 May 2026 08:57:18 -0700
+Message-ID: <20260526155722.2790742-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260526-net-next-mv88e6xxx-cbs-v2-2-13eb49c29b83@luminex.be>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-291773-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-291774-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 719EA5D9D01
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 686305D9412
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> +static int mv88e6xxx_setup_tc_cbs(struct dsa_switch *ds, int port,
-> +				  struct tc_cbs_qopt_offload *cbs)
-> +{
-> +	struct mv88e6xxx_chip *chip = ds->priv;
-> +	const struct mv88e6xxx_ops *ops = chip->info->ops;
-> +	const struct mv88e6xxx_avb_ops *avb_ops;
-> +	const struct mv88e6xxx_qav_info *qav;
+I'm hoping to start feeding our docs into the AI review tools, instead
+of maintaining a separate repo with review prompts. To experiment with
+that we have to refresh the docs a little bit.
 
-Reverse Christmas tree. Longest first please.
+This set exclusively focuses on the page pool API. First patch is
+a straightforward fix for information which is now out of date.
+Second one attempts to clarify the NAPI linking requirements.
+Third drops the dedicated section about the stats; the document
+is primarily developer-facing and the stats should require no
+development effort in most cases. Last but not least minor
+API cleanup.
 
-> +	int rate_reg;
-> +	int hilimit_reg;
-> +	u8 queue_bit;
-> +	u16 rate = 0;
-> +	u16 hi_limit;
-> +	int err;
-> +
-> +	avb_ops = ops->avb_ops;
-> +	qav = chip->info->qav;
+Jakub Kicinski (4):
+  docs: net: page_pool: drop reference to removed PP_FLAG_PAGE_FRAG
+  docs: clarify page pool NAPI consumer requirement
+  docs: page_pool: drop the mention of the legacy stats API
+  net: make page_pool_get_stats() void
 
-You might be able to move this into the variable declarations? But not
-always, depending on reverse Christmas.
+ Documentation/networking/page_pool.rst        | 60 +++++++------------
+ include/net/page_pool/helpers.h               |  2 +-
+ .../ethernet/mellanox/mlx5/core/en_stats.c    |  3 +-
+ net/core/page_pool.c                          | 10 ++--
+ net/core/page_pool_user.c                     |  3 +-
+ 5 files changed, 28 insertions(+), 50 deletions(-)
 
-> +	if (!qav || !avb_ops || !avb_ops->port_qav_write ||
-> +	    !ops->port_set_scheduling_mode)
-> +		return -EOPNOTSUPP;
-> +
-> +	if (!dsa_is_user_port(ds, port))
-> +		return -EOPNOTSUPP;
-> +
-> +	if (cbs->queue < 0 || cbs->queue >= chip->info->num_tx_queues)
-> +		return -EINVAL;
-> +
-> +	if (!(qav->queue_mask & BIT(cbs->queue)))
-> +		return -EOPNOTSUPP;
-> +
-> +	queue_bit = BIT(cbs->queue);
-> +	rate_reg = cbs->queue * 2;
-> +	hilimit_reg = rate_reg + 1;
-> +
-> +	if (cbs->enable) {
-> +		if (cbs->idleslope <= 0 ||
-> +		    cbs->idleslope > qav->max_rate ||
-> +		    cbs->sendslope >= 0 || cbs->hicredit <= 0 ||
-> +		    cbs->hicredit > qav->hi_limit_mask)
-> +			return -ERANGE;
-> +
-> +		rate = DIV_ROUND_UP(cbs->idleslope, qav->rate_unit);
+-- 
+2.54.0
 
-In the commit message, you mentioned 20Mbps, for a 1G link. Does the
-link speed actually matter? I don't see it here.
-
-	Andrew
 
