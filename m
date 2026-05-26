@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-291505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291506-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KSoCDIEFWroSAcAu9opvQ
-	(envelope-from <netdev+bounces-291505-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:23:46 +0200
+	id EGWhGwoEFWoOSQcAu9opvQ
+	(envelope-from <netdev+bounces-291506-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:23:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B945CFDFD
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:23:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C08D55CFDB8
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:23:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8136B302DE2A
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 02:21:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B94B13010B96
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 02:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0292F7EF6;
-	Tue, 26 May 2026 02:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B902FD696;
+	Tue, 26 May 2026 02:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PZjgjlwc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c2O+nEAy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50B12F8E89
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 02:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1272F8E9A
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 02:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779762112; cv=none; b=seifv5JCQuu/xapl1vngbaDhu6llWBYyk655gwgyGS1xnh6+JeTRV/iL80/pDDllx5CDDd46kIQ8yK8+sgjubV92zrJQap1Y53SqxTF1n2UuBiaXXGczhsg8joj0BJZvHD4uw8u/LbkTVtKSK/5SSiI5zvp7QZxn07twIs2/Xc8=
+	t=1779762125; cv=none; b=mXAkEmJyUF9OBlyHtn6KQZLLXbdG+tgeZk3CI9G5bzyWqmfy6Zp5/MX61TEzs72lI40Jd5M7iN5WPOJynVJzlDziHx2Tu6PTU/5gVZilQqddnpBh0d1lc8neazipMT6ndB7U+FLrp8P/lK3oFF1wsx2WZwOjPWSe0TF5J/PRPbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779762112; c=relaxed/simple;
-	bh=uZi3xorIb1H9ikhi5wArkjVayXHTg+sbCnE50nHmo5w=;
+	s=arc-20240116; t=1779762125; c=relaxed/simple;
+	bh=SEBbyqm64/gGH282eDZdksbO6ZyqWL7e1qiXAOqBBAU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tjp9KXabOL+7EiM3ppXijtpCylO38qMKygyKL4eZbLdnJ/zuyklSPDV7RbAMl4AYzppAxqNa4z4Qg9G49gXaIhaAISTvBG49mWoaD13KTwCxFzKR94B1EECdnwZuzUxif2GWTVwW3OVnra7nP+kj0LG9ODInHR6z4aqEUo37ulQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PZjgjlwc; arc=none smtp.client-ip=95.215.58.174
+	 MIME-Version; b=Bl4GBrfnZVXinB9g9MJ1ZbatqE2YOhoz6BLMyTCe4T+3NByT5EZVBB7Yirz+PxaGCmP6Wq8vNik9Z1Wy1a1TIcwY7KiXzLgrHfkAAsuCZuRMchljSIh3GAYCLtcSuJ8h03XcUaKttmJ/vJc05gh3m/xxyuEpAhIZJNCfsFsnUkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c2O+nEAy; arc=none smtp.client-ip=95.215.58.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779762107;
+	t=1779762121;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=K7Bh9sNsoNgUnqOqmMKX4zg5u4PI6PFUbnydcfDlgqU=;
-	b=PZjgjlwcve5jLdLXC3W81a3ws371QG0/VRoWhYadFvjsVk98w+mAqx47aeLN8a6ph9YnUf
-	wYAyBEJ/yMLAYymhs/N9jK+9yoIBpF574W/zXiDvjjYETKv45kx5umPmOt44LK4shgxJNN
-	OIxwgn8cnfbIglwOOZDZKFLyxXRjcnE=
+	bh=ykiWx+jJ41AIlhwvxbQbM9j1opOnC375H9pPJ40SXbc=;
+	b=c2O+nEAyiCLBgt1zDhG69wQnZW5jG1GOvhIAkS/3ahbNDoa2JXUWTtBHLIpIPmmTsrcTHw
+	E7ET8yOilbOSmQScbO1THS6NERx1Jr5ftkIeTh+p7iVuI0PQRMbIxkf3lCS1NAjYDcGI31
+	mgH24x8RVaZxRBEWf4/wk7MRvCI/96E=
 From: Hui Zhu <hui.zhu@linux.dev>
 To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
@@ -103,10 +103,11 @@ To: Alexei Starovoitov <ast@kernel.org>,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
 Cc: geliang@kernel.org,
-	baohua@kernel.org
-Subject: [RFC PATCH bpf-next v7 04/11] libbpf: introduce bpf_map__attach_struct_ops_opts()
-Date: Tue, 26 May 2026 10:20:04 +0800
-Message-ID: <20bdaa33cc19364f5f10208c79ef94fe43bd5ac1.1779760876.git.zhuhui@kylinos.cn>
+	baohua@kernel.org,
+	Hui Zhu <zhuhui@kylinos.cn>
+Subject: [RFC PATCH bpf-next v7 05/11] bpf: Pass flags in bpf_link_create for struct_ops
+Date: Tue, 26 May 2026 10:20:05 +0800
+Message-ID: <8dfc661158419f7331cc645368b051a424229fdc.1779760876.git.zhuhui@kylinos.cn>
 In-Reply-To: <cover.1779760876.git.zhuhui@kylinos.cn>
 References: <cover.1779760876.git.zhuhui@kylinos.cn>
 Precedence: bulk
@@ -123,11 +124,11 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291505-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291506-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -140,116 +141,113 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[58];
+	RCPT_COUNT_GT_50(0.00)[59];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.960];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,kylinos.cn:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 90B945CFDFD
+	NEURAL_HAM(-0.00)[-0.967];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,kylinos.cn:mid,kylinos.cn:email]
+X-Rspamd-Queue-Id: C08D55CFDB8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Roman Gushchin <roman.gushchin@linux.dev>
+From: Hui Zhu <zhuhui@kylinos.cn>
 
-Introduce bpf_map__attach_struct_ops_opts(), an extended version of
-bpf_map__attach_struct_ops(), which takes additional struct
-bpf_struct_ops_opts argument.
+To support features like allowing overrides in cgroup hierarchies,
+we need a way to pass flags from userspace to the kernel when
+attaching a struct_ops.
 
-This allows to pass a target_fd argument and the BPF_F_CGROUP_FD flag
-and attach the struct ops to a cgroup as a result.
+Extend `bpf_struct_ops_link` to include a `flags` field. This field
+is populated from `attr->link_create.flags` during link creation. This
+will allow struct_ops implementations, such as the upcoming memory
+controller ops, to interpret these flags and modify their attachment
+behavior accordingly.
 
-Signed-off-by: Roman Gushchin <roman.gushchin@linux.dev>
+The flags validation in bpf_struct_ops_link_create() is updated
+to explicitly permit BPF_F_ALLOW_OVERRIDE in addition to the
+already-allowed BPF_F_CGROUP_FD. Any other flag combination
+will still be rejected with -EINVAL.
+
+UAPI Change:
+This patch updates the comment in include/uapi/linux/bpf.h to reflect
+that the cgroup-bpf attach flags (such as BPF_F_ALLOW_OVERRIDE) are
+now applicable to both BPF_PROG_ATTACH and BPF_LINK_CREATE commands.
+Previously, these flags were only documented for BPF_PROG_ATTACH.
+
+The actual flag definitions remain unchanged, so this is a compatible
+extension of the existing API. Older userspace will continue to work
+(by not passing flags), and newer userspace can opt-in to the new
+functionality by setting appropriate flags.
+
+Signed-off-by: Barry Song <baohua@kernel.org>
+Signed-off-by: Geliang Tang <geliang@kernel.org>
+Signed-off-by: Hui Zhu <zhuhui@kylinos.cn>
 ---
- tools/lib/bpf/libbpf.c   | 20 +++++++++++++++++---
- tools/lib/bpf/libbpf.h   | 14 ++++++++++++++
- tools/lib/bpf/libbpf.map |  1 +
- 3 files changed, 32 insertions(+), 3 deletions(-)
+ include/linux/bpf.h            | 1 +
+ include/uapi/linux/bpf.h       | 2 +-
+ kernel/bpf/bpf_struct_ops.c    | 4 +++-
+ tools/include/uapi/linux/bpf.h | 2 +-
+ 4 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-index 1e8688975d16..a1b54da1ded2 100644
---- a/tools/lib/bpf/libbpf.c
-+++ b/tools/lib/bpf/libbpf.c
-@@ -13683,11 +13683,18 @@ static int bpf_link__detach_struct_ops(struct bpf_link *link)
- 	return close(link->fd);
- }
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 743b4f0546b5..aae7f9837944 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1915,6 +1915,7 @@ struct bpf_struct_ops_link {
+ 	bool cgroup_removed;
+ 	struct list_head list;
+ 	wait_queue_head_t wait_hup;
++	u32 flags;
+ };
  
--struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
-+struct bpf_link *bpf_map__attach_struct_ops_opts(const struct bpf_map *map,
-+						 const struct bpf_struct_ops_opts *opts)
- {
-+	DECLARE_LIBBPF_OPTS(bpf_link_create_opts, link_opts);
- 	struct bpf_link_struct_ops *link;
-+	int err, fd, target_fd;
- 	__u32 zero = 0;
--	int err, fd;
-+
-+	if (!OPTS_VALID(opts, bpf_struct_ops_opts)) {
-+		pr_warn("map '%s': invalid opts\n", map->name);
-+		return libbpf_err_ptr(-EINVAL);
-+	}
+ struct bpf_link_primer {
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index f547613986cc..85ab5bdf81ac 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -1194,7 +1194,7 @@ enum bpf_perf_event_type {
+ 	BPF_PERF_EVENT_EVENT = 6,
+ };
  
- 	if (!bpf_map__is_struct_ops(map)) {
- 		pr_warn("map '%s': can't attach non-struct_ops map\n", map->name);
-@@ -13724,7 +13731,9 @@ struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
- 		return &link->link;
+-/* cgroup-bpf attach flags used in BPF_PROG_ATTACH command
++/* cgroup-bpf attach flags used in BPF_PROG_ATTACH and BPF_LINK_CREATE command
+  *
+  * NONE(default): No further bpf programs allowed in the subtree.
+  *
+diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+index 5333290957cb..1d15c667a300 100644
+--- a/kernel/bpf/bpf_struct_ops.c
++++ b/kernel/bpf/bpf_struct_ops.c
+@@ -1389,7 +1389,8 @@ int bpf_struct_ops_link_create(union bpf_attr *attr)
+ 	struct cgroup *cgrp;
+ 	int err;
+ 
+-	if (attr->link_create.flags & ~BPF_F_CGROUP_FD)
++	if (attr->link_create.flags & ~(BPF_F_CGROUP_FD |
++					BPF_F_ALLOW_OVERRIDE))
+ 		return -EINVAL;
+ 
+ 	map = bpf_map_get(attr->link_create.map_fd);
+@@ -1427,6 +1428,7 @@ int bpf_struct_ops_link_create(union bpf_attr *attr)
+ 			goto err_out;
+ 		}
  	}
++	link->flags = attr->link_create.flags;
  
--	fd = bpf_link_create(map->fd, 0, BPF_STRUCT_OPS, NULL);
-+	link_opts.flags = OPTS_GET(opts, flags, 0);
-+	target_fd = OPTS_GET(opts, target_fd, 0);
-+	fd = bpf_link_create(map->fd, target_fd, BPF_STRUCT_OPS, &link_opts);
- 	if (fd < 0) {
- 		free(link);
- 		return libbpf_err_ptr(fd);
-@@ -13736,6 +13745,11 @@ struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
- 	return &link->link;
- }
+ 	err = bpf_link_prime(&link->link, &link_primer);
+ 	if (err)
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index fa075dc3b7eb..8a2b1f865d2b 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -1194,7 +1194,7 @@ enum bpf_perf_event_type {
+ 	BPF_PERF_EVENT_EVENT = 6,
+ };
  
-+struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
-+{
-+	return bpf_map__attach_struct_ops_opts(map, NULL);
-+}
-+
- /*
-  * Swap the back struct_ops of a link with a new struct_ops map.
-  */
-diff --git a/tools/lib/bpf/libbpf.h b/tools/lib/bpf/libbpf.h
-index bba4e8464396..18af178547ad 100644
---- a/tools/lib/bpf/libbpf.h
-+++ b/tools/lib/bpf/libbpf.h
-@@ -945,6 +945,20 @@ bpf_program__attach_cgroup_opts(const struct bpf_program *prog, int cgroup_fd,
- struct bpf_map;
- 
- LIBBPF_API struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map);
-+
-+struct bpf_struct_ops_opts {
-+	/* size of this struct, for forward/backward compatibility */
-+	size_t sz;
-+	__u32 flags;
-+	__u32 target_fd;
-+	__u64 expected_revision;
-+	size_t :0;
-+};
-+#define bpf_struct_ops_opts__last_field expected_revision
-+
-+LIBBPF_API struct bpf_link *
-+bpf_map__attach_struct_ops_opts(const struct bpf_map *map,
-+				const struct bpf_struct_ops_opts *opts);
- LIBBPF_API int bpf_link__update_map(struct bpf_link *link, const struct bpf_map *map);
- 
- struct bpf_iter_attach_opts {
-diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
-index dfed8d60af05..6105619b5ecf 100644
---- a/tools/lib/bpf/libbpf.map
-+++ b/tools/lib/bpf/libbpf.map
-@@ -454,6 +454,7 @@ LIBBPF_1.7.0 {
- 		bpf_prog_assoc_struct_ops;
- 		bpf_program__assoc_struct_ops;
- 		btf__permute;
-+		bpf_map__attach_struct_ops_opts;
- } LIBBPF_1.6.0;
- 
- LIBBPF_1.8.0 {
+-/* cgroup-bpf attach flags used in BPF_PROG_ATTACH command
++/* cgroup-bpf attach flags used in BPF_PROG_ATTACH and BPF_LINK_CREATE command
+  *
+  * NONE(default): No further bpf programs allowed in the subtree.
+  *
 -- 
 2.43.0
 
