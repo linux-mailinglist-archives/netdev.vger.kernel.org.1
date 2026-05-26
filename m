@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-291777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291778-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKhsOJXEFWoAagcAu9opvQ
-	(envelope-from <netdev+bounces-291777-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:04:37 +0200
+	id 6ABtIlbEFWqxawcAu9opvQ
+	(envelope-from <netdev+bounces-291778-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:03:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C72A5D9456
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:04:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BDF85D9413
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3FAC4307B248
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:57:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8F9853042E70
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10043932C0;
-	Tue, 26 May 2026 15:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5161039A800;
+	Tue, 26 May 2026 15:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AoRjyv2k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nX0LLqET"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D92D3932DC;
-	Tue, 26 May 2026 15:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AE3397B1D;
+	Tue, 26 May 2026 15:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779811054; cv=none; b=L9FQggPAAYJhUCfrfB1iwMf2jbIqSv3FNsH0850hyVfHPbJXkMuu5Sgipb5OoO29+lVNj66uFnOCs8UWAUEyCISZ38I6jLFn6kh4q7BbvDPwONcurhEgu1cqtYRTQNMW36QSU2o5hoXxDIB6U76YibRZXiitO3/sCw9giVPdtwI=
+	t=1779811055; cv=none; b=apfaKXHsaB2cpzhjtk18GXJx/Mgw4qZNg29aUlmp52JWlkYKBfVuyChdW5tknYhUY2D+9JjDDU5x07/N8tPO5Absw8s6tqA+60Ij0mjsgAERHGtk5YtO7b9c1ENfnONwb+uTA3EKKkDl9BapR2j2+rAeXSIavSv3RkfH8oXxcSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779811054; c=relaxed/simple;
-	bh=7BUnKQlQnsSRu76MaXbERMZocERHqHq+PaCl/0/8YWg=;
+	s=arc-20240116; t=1779811055; c=relaxed/simple;
+	bh=0Gs4eaJHHYJn3YI9i+VzaDQ8SVoakTViO9trjVjDd8c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gkvIVhFNjklES3d0JJsbXQnM7va+iVwTAkMuDkvQ0pwMxfTQSqHzvwJKKeWBTNASikAkakerElOMHaji9e/8eO/N8q65J7QUTBnpckP0pl1iD1jO5JZNv7u5esVltCsOkppcKId8AbF0Lz9z88BqJ7nEbXyKWC8+vWplYHBz3sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AoRjyv2k; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A77871F000E9;
-	Tue, 26 May 2026 15:57:32 +0000 (UTC)
+	 MIME-Version; b=Pwf3MvelLxviUZ9W1Qze723eeWTStin7sUNIdsc6T63IA1vOvluGsJA+PMgjFAgWa9Q8kcyZ/HkqixUt5WeFnGMUpjNTs79XPeP735fN3eWwnjasKM+JoOvvpqy/con2wakvLh5Iim/SZKrVl2FJRQj8O39ofTxN/BMCQXxLdgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nX0LLqET; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DB031F00A3D;
+	Tue, 26 May 2026 15:57:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1779811053;
-	bh=GnLT08qG5QSAn28bNc5BTlLJ/q7kSOQ3CElbUNqFIlM=;
+	bh=/kgx1aIktyIXxLHyLL5nUxq2BcZWZyQAxi/lCwJwhvY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=AoRjyv2kuRklJ8YQ4HDwUfMtfZm+kxvDlqWu2M4B4mgLEjB7KVl9FcLHiEKTJrG1p
-	 OPAZ6PGRbd/Yrxm6QDBI53Joiilp9+v5T1ElbJ3FS16mVyKC4M5IuuWnB99kgkgUW7
-	 ux+ftXWxNb4uVO8RJ4/UDPqvH3RBhXRNCSEikE5WQadc5QexCBsFwdLufUbJfEWboR
-	 Bff9aH8PyS0iVGAymB4z8QnOaBh2MHddvrAqzuYnVoUwT+gU+DSq1XGvNIG90iyPJs
-	 grhR3HrsTlLiDWufZ1ppFUMBU5l5B1Rw+shJlQZmneBgzBV+efl3MDmNDh8T89gnfs
-	 wP+GTAp0g0DSw==
+	b=nX0LLqETWQK97vWl0nBUulTAAbjE1W7FipkRUyXY9drvDHRph+9VNQJrP+DfO96tF
+	 72+Ne6G1rY9KiGqqh/k+vfA9NCrQDs4j9Q22hvZSzwos0ro89642Vv7UUpDqLKH28w
+	 zeuIOFDJC0JEKXhA6Y1FywUItNWaeT5DnjZFRIg8d7sAl98mWAdW8R5NFHicBxExrd
+	 EdwP1odYpitvKHCcCAXd07UKSPyOzx8RxZKtTfdh5wLohP+jrik80OutYuA7Es5tkg
+	 b+O/B7vJ2Ym6HuC7QF9iwt0eZ8r6Fui4Jj5IkqxdKNaLec8kfqpjynfYpPwmSXYDOk
+	 kfjN2N8xTVA3w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	hawk@kernel.org,
 	ilias.apalodimas@linaro.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 3/4] docs: page_pool: drop the mention of the legacy stats API
-Date: Tue, 26 May 2026 08:57:21 -0700
-Message-ID: <20260526155722.2790742-4-kuba@kernel.org>
+Subject: [PATCH net-next 4/4] net: make page_pool_get_stats() void
+Date: Tue, 26 May 2026 08:57:22 -0700
+Message-ID: <20260526155722.2790742-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260526155722.2790742-1-kuba@kernel.org>
 References: <20260526155722.2790742-1-kuba@kernel.org>
@@ -78,12 +78,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-291777-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291778-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -97,120 +97,97 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-0.995];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 9C72A5D9456
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6BDF85D9413
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The Netlink support for querying page pool stats has been
-proven out in production, let's remove the mention of the
-helper meant for dumping page pool stats into ethtool -S
-from the docs.
-
-Call out in the kdoc that this API is deprecated.
-Some drivers may not be able to use the Netlink API
-(if page pool is shared across netdevs). So the old API
-is not _completely_ dead. But we shouldn't advertise it.
+The kdoc for page_pool_get_stats() is missing a Returns: statement.
+Looking at this function, I have no idea what is the purpose of
+the bool it returns. My guess was that maybe the static inline
+stub returns false if CONFIG_PAGE_POOL_STATS=n but such static
+inline helper doesn't exist at all. All callers pass a pointer
+to a struct on the stack. Make this function void.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/networking/page_pool.rst | 46 +++++++-------------------
- net/core/page_pool.c                   |  3 ++
- 2 files changed, 15 insertions(+), 34 deletions(-)
+ include/net/page_pool/helpers.h                    | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c | 3 +--
+ net/core/page_pool.c                               | 7 +------
+ net/core/page_pool_user.c                          | 3 +--
+ 4 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/networking/page_pool.rst b/Documentation/networking/page_pool.rst
-index 5409c68be3fc..817f8b78d246 100644
---- a/Documentation/networking/page_pool.rst
-+++ b/Documentation/networking/page_pool.rst
-@@ -43,8 +43,17 @@ Architecture overview
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index 3247026e096a..e2730dd273b2 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -64,7 +64,7 @@ int page_pool_ethtool_stats_get_count(void);
+ u8 *page_pool_ethtool_stats_get_strings(u8 *data);
+ u64 *page_pool_ethtool_stats_get(u64 *data, const void *stats);
  
- Monitoring
- ==========
--Information about page pools on the system can be accessed via the netdev
--genetlink family (see Documentation/netlink/specs/netdev.yaml).
-+Information about allocated page pools, their memory use, recycling statistics
-+etc. can be accessed via the netdev genetlink family
-+(see Documentation/netlink/specs/netdev.yaml).
-+
-+Statistics
-+----------
-+
-+.. kernel-doc:: include/net/page_pool/types.h
-+   :identifiers: struct page_pool_recycle_stats
-+		 struct page_pool_alloc_stats
-+		 struct page_pool_stats
+-bool page_pool_get_stats(const struct page_pool *pool,
++void page_pool_get_stats(const struct page_pool *pool,
+ 			 struct page_pool_stats *stats);
+ #else
+ static inline int page_pool_ethtool_stats_get_count(void)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+index 1a3ecf073913..7f33261ba655 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+@@ -496,8 +496,7 @@ static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
+ 	struct page_pool *pool = c->rq.page_pool;
+ 	struct page_pool_stats stats = { 0 };
  
- API interface
- =============
-@@ -74,7 +83,7 @@ that NAPI context, the page pool may safely access consumer-side resources
- 		 page_pool_get_dma_addr page_pool_get_dma_dir
+-	if (!page_pool_get_stats(pool, &stats))
+-		return;
++	page_pool_get_stats(pool, &stats);
  
- .. kernel-doc:: net/core/page_pool.c
--   :identifiers: page_pool_put_page_bulk page_pool_get_stats
-+   :identifiers: page_pool_put_page_bulk
- 
- DMA sync
- --------
-@@ -109,22 +118,6 @@ Unless the driver author really understands page pool internals
- it's recommended to always use ``offset = 0``, ``max_len = PAGE_SIZE``
- with fragmented page pools.
- 
--Stats API and structures
--------------------------
--If the kernel is configured with ``CONFIG_PAGE_POOL_STATS=y``, the API
--page_pool_get_stats() and structures described below are available.
--It takes a  pointer to a ``struct page_pool`` and a pointer to a struct
--page_pool_stats allocated by the caller.
--
--Older drivers expose page pool statistics via ethtool or debugfs.
--The same statistics are accessible via the netlink netdev family
--in a driver-independent fashion.
--
--.. kernel-doc:: include/net/page_pool/types.h
--   :identifiers: struct page_pool_recycle_stats
--		 struct page_pool_alloc_stats
--		 struct page_pool_stats
--
- Coding examples
- ===============
- 
-@@ -178,21 +171,6 @@ NAPI poller
-         }
-     }
- 
--Stats
-------
--
--.. code-block:: c
--
--	#ifdef CONFIG_PAGE_POOL_STATS
--	/* retrieve stats */
--	struct page_pool_stats stats = { 0 };
--	if (page_pool_get_stats(page_pool, &stats)) {
--		/* perhaps the driver reports statistics with ethool */
--		ethtool_print_allocation_stats(&stats.alloc_stats);
--		ethtool_print_recycle_stats(&stats.recycle_stats);
--	}
--	#endif
--
- Driver unload
- -------------
- 
+ 	rq_stats->pp_alloc_fast = stats.alloc_stats.fast;
+ 	rq_stats->pp_alloc_slow = stats.alloc_stats.slow;
 diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 6e576dec80db..9a87062134d4 100644
+index 9a87062134d4..84ec603d1bb3 100644
 --- a/net/core/page_pool.c
 +++ b/net/core/page_pool.c
-@@ -76,6 +76,9 @@ static const char pp_stats[][ETH_GSTRING_LEN] = {
-  * @pool:	pool from which page was allocated
-  * @stats:	struct page_pool_stats to fill in
-  *
-+ * Deprecated driver API for querying stats. Page pool stats can be queried
-+ * via netdev Netlink.
-+ *
-  * Retrieve statistics about the page_pool. This API is only available
-  * if the kernel has been configured with ``CONFIG_PAGE_POOL_STATS=y``.
-  * A pointer to a caller allocated struct page_pool_stats structure
+@@ -85,14 +85,11 @@ static const char pp_stats[][ETH_GSTRING_LEN] = {
+  * is passed to this API which is filled in. The caller can then report
+  * those stats to the user (perhaps via ethtool, debugfs, etc.).
+  */
+-bool page_pool_get_stats(const struct page_pool *pool,
++void page_pool_get_stats(const struct page_pool *pool,
+ 			 struct page_pool_stats *stats)
+ {
+ 	int cpu = 0;
+ 
+-	if (!stats)
+-		return false;
+-
+ 	/* The caller is responsible to initialize stats. */
+ 	stats->alloc_stats.fast += pool->alloc_stats.fast;
+ 	stats->alloc_stats.slow += pool->alloc_stats.slow;
+@@ -111,8 +108,6 @@ bool page_pool_get_stats(const struct page_pool *pool,
+ 		stats->recycle_stats.ring_full += pcpu->ring_full;
+ 		stats->recycle_stats.released_refcnt += pcpu->released_refcnt;
+ 	}
+-
+-	return true;
+ }
+ EXPORT_SYMBOL(page_pool_get_stats);
+ 
+diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+index 01509d1b3cba..fb5d3f9de936 100644
+--- a/net/core/page_pool_user.c
++++ b/net/core/page_pool_user.c
+@@ -127,8 +127,7 @@ page_pool_nl_stats_fill(struct sk_buff *rsp, const struct page_pool *pool,
+ 	struct nlattr *nest;
+ 	void *hdr;
+ 
+-	if (!page_pool_get_stats(pool, &stats))
+-		return 0;
++	page_pool_get_stats(pool, &stats);
+ 
+ 	hdr = genlmsg_iput(rsp, info);
+ 	if (!hdr)
 -- 
 2.54.0
 
