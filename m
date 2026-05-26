@@ -1,1061 +1,234 @@
-Return-Path: <netdev+bounces-291947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id rH7uBz0WFmrOhQcAu9opvQ
-	(envelope-from <netdev+bounces-291947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:53:01 +0200
+	id 2NxiLugWFmrOhQcAu9opvQ
+	(envelope-from <netdev+bounces-291948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:55:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 193235DCEB7
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:53:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF395DCFCF
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:55:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E3118300F798
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:52:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 56EE63049711
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16773CB8EB;
-	Tue, 26 May 2026 21:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1423C3C8C65;
+	Tue, 26 May 2026 21:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJUdRVBE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QpqaCeut"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677A73C4B88;
-	Tue, 26 May 2026 21:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779832340; cv=none; b=Qq9F+ibPi4FnzCNVIsWCeCX7DNQ1y4SXOynWzSmBqqRWC7jffoERr2D3HRArYXazr39iWDJ6unVg1yuss+uLX78PDg58fEtwCA1o16V7S+cFG/rUH7fIPZVdlAcjM7VHJCOO0gKBRNY18FFtk5adEh7Kt1lzr9J1DLuprVm3PDY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779832340; c=relaxed/simple;
-	bh=sdPG8AeUzxjVhIFMC3VhLuoCdZLuPynN7MopuoQ2b6Y=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dJ2L4/wMuVeeQmppunuIT9k6Q9PAB/GozKvkCcr+DlV7uz4A/+Kp9UhST5IlKUsuKKVoFsGEYW6ySvE5Aq3Zq1Y9lEdImd51W/3Tg5Fun83FVkITFP2TsN/r/xpEvRrtDFyvPnH4iJAT9zykIZ8FcgPBuo8Zm5PCMlm/tZNImbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJUdRVBE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 45FDEC4AF0D;
-	Tue, 26 May 2026 21:52:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779832340;
-	bh=sdPG8AeUzxjVhIFMC3VhLuoCdZLuPynN7MopuoQ2b6Y=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=aJUdRVBEVOPsYAn+ZIWpN3FsMLD34fSx/rc54PhlB6zt637LkmsT2fopHvhdr8Uu+
-	 ZTctls1B8uuXWb4b9EZxTjLQjOZ4u6QOPebYfdt6pwt0GciGZNua6UMqD1CaPwYwQP
-	 SNP0lTn0MHQubcTKHK7XyiTb+zkrqymUif/A8nm/eJTe5h3sbUFQvzqSudD080RsRI
-	 2BOWc/g19/VGUMcwO6cTKR6eeA54puYRIynzD6i2jOAENwbLjU7082nE1QHZRSU0a+
-	 IvQD8jncig49A8ditjJG7GAeGiEBOLquEn0YFHdykV01EUmwDQGAyzJoa7utj9ynFg
-	 9tajuJAdNw1SA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF4CCD6E43;
-	Tue, 26 May 2026 21:52:20 +0000 (UTC)
-From: Ciprian Regus via B4 Relay <devnull+ciprian.regus.analog.com@kernel.org>
-Date: Wed, 27 May 2026 00:51:55 +0300
-Subject: [PATCH net-next v2 10/10] net: ethernet: adi: Add a driver for the
- ADIN1140 MACPHY
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0C12609E3;
+	Tue, 26 May 2026 21:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779832369; cv=fail; b=ASgfv+P+eZcC9wnteVIA3XsJ5cR8n+ostNeCzyWNIU2ecEP61LZLXFWG3v1YzcZTmboC6Vx8FCcKNSiKRsECyacIdJGNPmacCwFKzDYZzY3KvVD6GZLpz6Iy/TTajIB3FBVWa0niGKlQOkqbT8k2DJLi7QjWulc+aoOVuClaZzM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779832369; c=relaxed/simple;
+	bh=RLHFYuQomkE/FL/BJqVi6pWq6kernahDptqIvS2+CJM=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=JWLqD/DJd9NQBMZta8ETFCO5w67CmBagC9jp+UorQyVwRAMT8SwS6HeZh9Hxe4FWpewksdd60/8sY4hgj0mkzkhy4LVRXZly2dXm8CG4Xns5yYyQloGhryDUa3tv6XbQWFHOYmF/0QVvczXl6B8VwxCs+gqKd+vrkuXgxwFvYio=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QpqaCeut; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779832368; x=1811368368;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=RLHFYuQomkE/FL/BJqVi6pWq6kernahDptqIvS2+CJM=;
+  b=QpqaCeutWxbvNQjOFW10yOiZF2vFoz/feIsVDRducOaQ4184KSnDa2zC
+   dO9pyCe1zXwfVxPKzG1XqnM/KngOOoos+QUmw8HkBboYmDI/NPRp1CLr3
+   067QCtKTTIPmCMumIZ6zC0R3xVyJJwTe/v/tKv+9u1UNS+uM0ho9qAwaZ
+   1PBPTvrGvrEWzf+Msa5X9Nb65Eb2Qn8295aWZfJnXqasYE38s5SihN8X5
+   ehbUYER/pNNm3HnD0xohlGZ5uIzg3W9T4uAiU1gIK93CV7TwTw1yN5ho4
+   3SyTxt0Nxd1M/OlXDKUIIZatrYhawaJzoGeuq119B/5q9c1UK5ruKn4uV
+   A==;
+X-CSE-ConnectionGUID: 3GFiduB8S8+rAS/KFSbfqQ==
+X-CSE-MsgGUID: 0RBaJIUFTqe/SiviipMZ0g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11798"; a="98083861"
+X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
+   d="scan'208";a="98083861"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 14:52:46 -0700
+X-CSE-ConnectionGUID: 9ZYCPn2vS5yNAGjsaY8J1w==
+X-CSE-MsgGUID: XnPHaSwST/WEsRCEhOgHOw==
+X-ExtLoop1: 1
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 14:52:45 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 26 May 2026 14:52:43 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 26 May 2026 14:52:43 -0700
+Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.47) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 26 May 2026 14:52:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=b7VSruFLd/ul9EtPpQzZOKs48ValMSxAhzEKMJx4+XkA59qpmNnaeXcTi/3UYmcOWhV2zYX2w48cUgBWb18XX1bHy+fD1iG9bYRXVmyqlKHPn20V6lJ8yTrwXxRG7BR/IgysW85xzf2IGcV/MZUAMjvquHScGB80YYkdjMewX2fIMkxO+mY7EUG9IIhKn5b3jkC3Cz+tSdXPdbw55nZeKiUiuzOzuPYzps5UZ5iRAIw3IECzBISm+usocX1fpXQRFa3YbBRdvJzoBzsdm2VT4lZB2TkWlTL8HNXdVkXgWKx4m5IiN7I28L8vrusNL6NcLxN0esgbrpjCcs9o6wSXjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=clHd+kmbDfHNAw+xb9D8jsgqKzpNCoVD6oS+S8pwL3E=;
+ b=kwey+Qwd/IWWrG5SWSlEGprrlFsrkonVbIA4nJq7X62GJmPT+AIA0P1aOIajkh70msYmuSI+zB08hh1gfE4J+KHN4bU1KmynT/JyAob9ohf6uZAihyQ3pTJPzw4742UQZcAJqMQiVgAd7Uf/R1joaHoEAVXCuJcm/sI4HrHF/oXwYbUR8Fn5b0K/TnZwnXNkbAlaIaOhLZPZFmj9ah3PjwULqhnzVn8c18omJAwRaaH5soA9NEksjSxBK9UhondHHGg2/Koz770rgw/pG0rMWDGqxxoMCzSanbq45l5LbO6gC+u4vigYUEX6+BPKfgLQnspLoTJa0x7SYPmspw7Lgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7381.namprd11.prod.outlook.com (2603:10b6:8:134::14)
+ by PH0PR11MB4888.namprd11.prod.outlook.com (2603:10b6:510:32::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.20; Tue, 26 May
+ 2026 21:52:41 +0000
+Received: from DS0PR11MB7381.namprd11.prod.outlook.com
+ ([fe80::4c39:dfe6:d6dc:6f58]) by DS0PR11MB7381.namprd11.prod.outlook.com
+ ([fe80::4c39:dfe6:d6dc:6f58%5]) with mapi id 15.21.0071.011; Tue, 26 May 2026
+ 21:52:41 +0000
+Message-ID: <91ab0907-017f-4d18-9090-dd5ae7cd7a23@intel.com>
+Date: Tue, 26 May 2026 14:52:37 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch 08/24] timekeeping: Remove system_time_snapshot::real/boot
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Thomas Gleixner <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+CC: David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar
+	<mlichvar@redhat.com>, John Stultz <jstultz@google.com>, Stephen Boyd
+	<sboyd@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, "Frederic
+ Weisbecker" <frederic@kernel.org>, <thomas.weissschuh@linutronix.de>, "Arthur
+ Kiyanovski" <akiyano@amazon.com>, Rodolfo Giometti <giometti@enneenne.com>,
+	Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, <kvmarm@lists.linux.dev>, Oliver Upton
+	<oupton@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+	<netdev@vger.kernel.org>, Takashi Iwai <tiwai@suse.com>, Miri Korenblit
+	<miriam.rachel.korenblit@intel.com>, Johannes Berg <johannes.berg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Peter Hilber <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, <virtualization@lists.linux.dev>,
+	<linux-wireless@vger.kernel.org>, <linux-sound@vger.kernel.org>
+References: <20260526165826.392227559@kernel.org>
+ <20260526171223.300914258@kernel.org>
+ <9819b5ee-1f03-4687-9a36-9284741e19a4@intel.com>
+Content-Language: en-US
+In-Reply-To: <9819b5ee-1f03-4687-9a36-9284741e19a4@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0212.namprd03.prod.outlook.com
+ (2603:10b6:303:b9::7) To DS0PR11MB7381.namprd11.prod.outlook.com
+ (2603:10b6:8:134::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260527-adin1140-driver-v2-10-37e5c8d4e0a0@analog.com>
-References: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
-In-Reply-To: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, devicetree@vger.kernel.org, 
- Ciprian Regus <ciprian.regus@analog.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779832338; l=29144;
- i=ciprian.regus@analog.com; s=20260330; h=from:subject:message-id;
- bh=Eon0exvkWbcaGq8ytIR6Wrldgn6CO2XLL/IEhuzN5gs=;
- b=CN3yCFrI1doCBHx7wEcmIQqTPmmT3RlULfU8FGXGNvACzyJLZlRx/H+keP+kkzQlbdAQ+S6Vu
- fPDScG87U4rBBPUb5QA99NX1N+qocVvh+/8PpZ8QCb63MTJDOwVPK8p
-X-Developer-Key: i=ciprian.regus@analog.com; a=ed25519;
- pk=8WoNhI0kQcQUl8YqJO5ZevROYk9HP8lOIeIgIYgjfbc=
-X-Endpoint-Received: by B4 Relay for ciprian.regus@analog.com/20260330 with
- auth_id=703
-X-Original-From: Ciprian Regus <ciprian.regus@analog.com>
-Reply-To: ciprian.regus@analog.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7381:EE_|PH0PR11MB4888:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2185a8b5-ba93-46d3-22a5-08debb711c3c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|18002099003|22082099003|56012099006|11063799006|4143699003;
+X-Microsoft-Antispam-Message-Info: qBUZdIn1FDE/l2S9hWfCCf9NdA9MHbOWsyp+X9qHw5hn5yEIkvx7kExR6y3VfSdqptt6pG/z7o8IiMapRshBSwXIRi5V+mWPcro4X5Q1k7n4C2meT2lhAAxdyRo/cH3P7exZD0JWRdNyrIA5QTZRpliy5ccroFE1uPcSOc/zXzVYlzqgeiK0R4xXr6uhX1W4HofSTuf1MPn+6lONdBl8QDZMNYeMfVwBMnxYoZhMLNznLiW4MckGRIvX3RqdZbiLU5HACl6RSjQOrKNUoh/znpbeHtz3waanfRE9ES7uDpb9qvv0WBC+LfQPTwlgcQV8E8ViKiH3jsxUioGokK7+hmr5MxwJtFLxy2rkmpOQYDQV+9Bsf55cEHsBzHSHBKMRc+lNb2ynne5cfcRbsMDtjjtjBHbP4ld9e8xgvifDmLbiQK9Vnh7i4J/PV18hyMM4d/3lWzuJHegsE5Ep8BFGw4c0I8GpOfqXudca7y8nTjFJvJs3kdM5gZvlkikLZTu0of1ciqwSwigAeHmrQkYUM46gL5f25h9Vc10SPncgalM78hc8TjztcmpXtDXVnhKS98XvVeQCUbrmzDnoC5vlduxKYK7P9wtfso7xgV3ngEclCcT58OHq0dBHqRhNL4YC+Pex4ARFOIe526QGrEZwriRYFvkLgT/ek1c1Im6i7v65jUxhgBnUA+bzzzu1yMNZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7381.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(18002099003)(22082099003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TWFZR2prd05KcUpweEpIeXFnVEtjRElUYU9hYW5lSlNIM1h5anpvT2VpNUZN?=
+ =?utf-8?B?QXhZZ3FtTDRlQVlKSjVrQVJ6VFNRdkRYaVZ1WnpXTlZ3Y3UvdndHL3JKZC9S?=
+ =?utf-8?B?bkw4ZFIvMldaczZLaGFuT0RRYTh6U0ZKS3RqV0hITkRqMHFieFJTR3JCZDQx?=
+ =?utf-8?B?Y3pXbGttRkZtQUg4U2JwQVRXVXNaSnk0Y2RlZnFIb0ZIVWNQQWlwSWZkTGVo?=
+ =?utf-8?B?QmFKYklnT2hLZ2s4Yy94WkpWcmMzN0o5Rnh2dG5MVmJxTnI5THRYWDZodmF0?=
+ =?utf-8?B?ZjE0bXJIeDNUUThFTDJ1T0dKZVZrcWdncFRtSDlZZGkveTQ1NHJML0hGbG1R?=
+ =?utf-8?B?cE5tMXhMQ01XR1d0a2ZBRWRKZ01KUHpzTEdoTGNkU2RQQzVUQTFJTTM0emU5?=
+ =?utf-8?B?RzNZM1NicThWNDY4N2U3elI5REFFcmY5WDU2RC9EaVZOR2Q5dUl2blhhTllJ?=
+ =?utf-8?B?VHNSZ0dYMVczbm9vSGVESFFqTUZRai80Tll5RitBaVVGN2tGRzUrRUhCMzZq?=
+ =?utf-8?B?a3lBQjJkZ1U2VUg4bXFDZnFYZjkxMHFQeXlTcVlDV1U0RmQrbmh5RHRRZk5p?=
+ =?utf-8?B?WmxKcGNYak40Nmh1T3ZRdDJyd2JiWEFWa3Z6VEQwdVRUbXpWWE9MUnZhMmtj?=
+ =?utf-8?B?Y3I2MTRacXdNQk1ZSE1obVJFVVR1dXFuOTh3RG5oYk5Mc1FoNDRiNHk1ZVRK?=
+ =?utf-8?B?WEJkeG5RY241ZWw4cXNnRnBreklLVGIzWXYyeU9HL2pYMkpZME5CaUNPOWli?=
+ =?utf-8?B?UmkvTEtTK1VVMk5jcUR6aGd6RS8zUnc5SU1yb3VNTG91RUpBM2plQTRYSlNR?=
+ =?utf-8?B?WkVGVXFhbkpXZWZlSzV1KzBVaVUxbE9CSml2MmVWOEVqbU1tSlE3VElMRWd4?=
+ =?utf-8?B?UG04b1h1WEx3K1hWSVdwTHZiT2hpWkljeGtuM3AwbVZ0S3hlNVdMaXQwL2V0?=
+ =?utf-8?B?K2NJVjQ1enBuQjJnSWxxU1pUbWZZeWNqRmJGYXZuM0ZBa2RmT0cxNjlmYllS?=
+ =?utf-8?B?RW5NbkRWVXNlb3BEc1BTcTB1cVIyS0RHelB2bk1PRzU5THBkNTFmQmFPbnJt?=
+ =?utf-8?B?TzdPZ0FsRCtldXE3a0JRMW1qVWZJTWVmdFUrNTFRL3QxZTFoa3NMdEVHTU95?=
+ =?utf-8?B?M2MyRCtTa2VGWDJIWmxMN2FJbEp2MzhQYm56b1NNdGFWZXV6aFZKdEluTDlG?=
+ =?utf-8?B?Z2YrYmpCczlKdnBvQnI3V0svSXJjUEdWZVBER0U2TUZwaVpnUnNwRlptQ1RS?=
+ =?utf-8?B?V2dJOXF0SFNvdU00TmwrNCtveVd1cUx0em1WOUFEbVZPU2JibEpDMnFpdS9L?=
+ =?utf-8?B?eVIvU0FFTWRhUmRYbmxSR2R4ZWRNckpwZWszeXRFWDJXT2pTcDNHdmFJZm9i?=
+ =?utf-8?B?VXlUa0N4QzJYSXp2RUlPL01JbDlGL1pSemQ4TTlWQkw3dDI3RHY5eS9iUnV0?=
+ =?utf-8?B?MlN6cnJVOEpOQ2d5aEVwaUh1aksyNldjT3Zud2g4NysrQS9IU25yR0RUSVBa?=
+ =?utf-8?B?ZzFCSmVVTWpOcjhKOU85N25RK0RwNkN3aVcxck9mUjhjT3lTMmQ1SG9YNzN3?=
+ =?utf-8?B?MXB0bFZsTHppWWYzYkpyK3RpMWs4VmsxNzQvclhFUlVnMWNnVXk5MTFQcmdH?=
+ =?utf-8?B?dVZ1eDd6RmNjaEh4ZUk3MlhURHU4NmRrVlBmUHJreEtNRlIrN0d2T2J6RmEv?=
+ =?utf-8?B?ejZKcXBpMG9ZQ3pEUHpBNFpBM0kzUENxb0ZxT3BLUndKOGV3bzg4NmRNUzB1?=
+ =?utf-8?B?cktobWc3RVVBdVgyUWhwV2UvYUdsaHEvY0RNTzRKWEVQd2F3NzdEdVRXc21Z?=
+ =?utf-8?B?emRPeUV0THpCOUhFWmxoZDUvaDNPbzBYeC9SbGRsTVpxVEMzZzhxcFhDZjFi?=
+ =?utf-8?B?N29RaExoNW1kZDZPN0VUNlZwYWwxdnJJc05CYmN2WHNRaWd6UFNFdmp4Y2hp?=
+ =?utf-8?B?RDhzUmFvditJZnUyZWw3TTZ5YVh3TnVnbElkSXltaVZzaGttbVBxQ2pGLzBp?=
+ =?utf-8?B?R1ZTMFE4NmFDamhwdUNhUWt6aFQyQ1NaSkJRVkd4c3VsTDAyR0djN3VwU0Jw?=
+ =?utf-8?B?a055RGpQd0lFRUNGTktxL003QkJpL05IWmJZUTBIOWJTME9VanNvd2piOTZE?=
+ =?utf-8?B?b1RQODk3UmlGVUhGVENFMkNrT3BBd1NVZnFVbEF6Y3BFMFlmUjB5OTRGeUg0?=
+ =?utf-8?B?NWpNN3VrUThtOVROQXFJdWVLOGNxZ2dieUNNL0pkbWxKT3Q5bWZRaDF1dVJu?=
+ =?utf-8?B?WVVnZElKZjRVNHI2Q1llWUVNKzV2MjhDYWJja3Fvc0tRMU80ekhZUmU0VnBv?=
+ =?utf-8?B?MHVUY29VS0xEU1RDR3pmNXQrcWVWUWpTZzFKRVRLZzFFTk1OOHZwUT09?=
+X-Exchange-RoutingPolicyChecked: deRclGY9vYli/wgBTQAYYhjE9eBRsvsIeU7GFABe99C07NcdVUDM2wtHD0AOAuOB70NV+8OVg/AGdcxHLtSc8deqlvD4KRQGQuwAQuz+b2kspRU2Ee9vpxHuYtAtJIGyRYkXB/5A5DepeDMz3XOsNR9q8G3a/0DpDyHpb7Z8e7D7uRz17JrabPpvVl0kj61WFWGUXCr6+yVGMm2dAn6cIUSCZIY9OUY/eumOzCU0Vogc89Vc3KbAMW+vKRJZdMoneE+o2NcnaCuIAll+8PqvZpnAR/8NMoxaGjgfrWaatNdwZUwYnTEJIFhCnpDs+c4Lj10x3O4DEVRu6VHBzHq9Bw==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2185a8b5-ba93-46d3-22a5-08debb711c3c
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7381.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 21:52:41.3518
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2jLpYw1N9oMPdHTzg7G3PpZDA1viTvFT6V7hd1Jut0Hwve8dOLtm42ObDvbt15ecqGycRtr0C/zyI5fBXFRZwgMYZSOp2rJnjUxp8DlHAB4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4888
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291947-lists,netdev=lfdr.de,ciprian.regus.analog.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	HAS_REPLYTO(0.00)[ciprian.regus@analog.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_FROM(0.00)[bounces-291948-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,vger.kernel.org,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:mid,intel.com:dkim];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,analog.com:url,analog.com:replyto,analog.com:mid,analog.com:email]
-X-Rspamd-Queue-Id: 193235DCEB7
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 3CF395DCFCF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Ciprian Regus <ciprian.regus@analog.com>
+On 5/26/2026 2:49 PM, Jacob Keller wrote:
+> On 5/26/2026 10:14 AM, Thomas Gleixner wrote:
+>> All users are converted over to ktime_get_snapshot_id() and
+>> system_time_snapshot::sys.
+>>
+> 
+> I would have expected this to also remove ktime_get_snapshot() since the
+> description claims all users are converted to ktime_get_snapshot_id().
+> 
 
-Add a driver for ADIN1140. The device is a 10BASE-T1S MAC-PHY
-(integrated in the same package) that connects to a CPU over an SPI bus,
-and implements the Open Alliance TC6 protocol for control and frame
-transfers. As such, this driver relies on oa_tc6 for the communication
-with the device. The device has an alternative name (AD3306), so the
-driver can be probed using one of the two compatible strings.
-
-For control transactions, ADIN1140 only implements the protected mode.
-The driver has a custom implementation for the mii_bus access methods as a
-workaround for hardware issues:
-
-1. The OA TC6 standard defines the direct and indirect access modes for
-   MDIO transactions. The ADIN1140 incorrectly advertises indirect mode
-   only (supported capabilities register - 0x2, bit 9), while actually
-   implementing just the direct mode. We cannot rely on the CAP register
-   to choose an access method (which oa_tc6 does by default, even though
-   it only implements the direct mode), so the driver has to use its
-   own.
-2. The ADIN1140 cannot access the C22 register space of the internal
-   PHY, while the PHY is busy receiving frames. If that happens, the
-   CONFIG0 and CONFIG2 registers of the MAC will get corrupted and the
-   data transfer will stop. Those two registers configure settings for
-   the transfer protocol between the MAC and host, so the value for some
-   of their subfields shouldn't be changed while the netdev is up.
-   Since we know the PHY is internal, the MAC driver can implement a
-   custom mii_bus, which can intercept C22 accesses. Most of the
-   registers mapped in the 0x0 - 0x3 range (the only ones the PHY offers)
-   are read only, and their value can be read from somewhere else (e.g
-   the PHYID 1 & 2 have the same value as 0x1 in the MAC memory map).
-   For the fields that are R/W (loopback and AN/reset) in the control
-   register, the PHY driver already implements the set_loopback() and
-   config_aneg() functions. The C22 write function of the driver is a
-   no-op and is used to protect against the ioctl MDIO access path.
-   C45 accesses do not cause this issue, so we can properly implement
-   them.
-
-Update the oa_tc6 header file to include definitions for the standard
-registers used by the adin1140 driver.
-
-Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
-
----
-v2 changelog:
- - Exported statistics that match the ethtool_stats entries as such and
-   kept the other ones custom, using ethtool strings.
- - Used phy_do_ioctl_running() for ndo_eth_ioctl.
- - Adapted the mii_bus and PHY handling to the newly added
-   OA_TC6_BROKEN_PHY flag for oa_tc6.
- - Used the oa_tc6_mdiobus_read_c45/oa_tc6_mdiobus_write_c45 functions
-   for the C45 read/write mii_bus operations.
- - Removed OA TC6 register definitions (e.g CONFIG2) from the adin1140
-   driver and instead used the ones exported from oa_tc6.h
- - Used OA_TC6_MMS_REG to define MMS registers instead of
-   ADIN1140_MMS_REG.
- - Returned default values for the MII_PHYSID1/MII_PHYSID2.
- - Set the mii_bus->phy_mask, since the the same PHY will be registered
-   32 times otherwise.
- - Updated the MAINTAINERS entry to include the dt-bindings.
----
- MAINTAINERS                         |   8 +
- drivers/net/ethernet/adi/Kconfig    |  12 +
- drivers/net/ethernet/adi/Makefile   |   1 +
- drivers/net/ethernet/adi/adin1140.c | 811 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 832 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index eda74f3154dc..3d6da16c4312 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1857,6 +1857,14 @@ S:	Supported
- W:	https://ez.analog.com/linux-software-drivers
- F:	drivers/dma/dma-axi-dmac.c
- 
-+ANALOG DEVICES INC ETHERNET DRIVERS
-+M:	Ciprian Regus <ciprian.regus@analog.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+W:	https://ez.analog.com/linux-software-drivers
-+F:	Documentation/devicetree/bindings/net/adi,adin1140.yaml
-+F:	drivers/net/ethernet/adi/adin1140.c
-+
- ANALOG DEVICES INC ETHERNET PHY DRIVERS
- M:	Ciprian Regus <ciprian.regus@analog.com>
- L:	netdev@vger.kernel.org
-diff --git a/drivers/net/ethernet/adi/Kconfig b/drivers/net/ethernet/adi/Kconfig
-index 760a9a60bc15..bdb8ff7d15da 100644
---- a/drivers/net/ethernet/adi/Kconfig
-+++ b/drivers/net/ethernet/adi/Kconfig
-@@ -26,4 +26,16 @@ config ADIN1110
- 	  Say yes here to build support for Analog Devices ADIN1110
- 	  Low Power 10BASE-T1L Ethernet MAC-PHY.
- 
-+config ADIN1140
-+	tristate "Analog Devices ADIN1140 MAC-PHY"
-+	depends on SPI
-+	select ADIN1140_PHY
-+	select OA_TC6
-+	help
-+	  Say yes here to build support for Analog Devices, Inc. ADIN1140
-+	  10BASE-T1S Ethernet MAC-PHY.
-+
-+	  To compile this driver as a module, choose M here. The module will be
-+	  called adin1140.
-+
- endif # NET_VENDOR_ADI
-diff --git a/drivers/net/ethernet/adi/Makefile b/drivers/net/ethernet/adi/Makefile
-index d0383d94303c..0390ca8ccc49 100644
---- a/drivers/net/ethernet/adi/Makefile
-+++ b/drivers/net/ethernet/adi/Makefile
-@@ -4,3 +4,4 @@
- #
- 
- obj-$(CONFIG_ADIN1110) += adin1110.o
-+obj-$(CONFIG_ADIN1140) += adin1140.o
-diff --git a/drivers/net/ethernet/adi/adin1140.c b/drivers/net/ethernet/adi/adin1140.c
-new file mode 100644
-index 000000000000..671bfc08ce38
---- /dev/null
-+++ b/drivers/net/ethernet/adi/adin1140.c
-@@ -0,0 +1,811 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Driver for Analog Devices, Inc. ADIN1140 10BASE-T1S MAC-PHY
-+ *
-+ * Copyright 2026 Analog Devices Inc.
-+ */
-+
-+#include <linux/etherdevice.h>
-+#include <linux/kernel.h>
-+#include <linux/mdio.h>
-+#include <linux/module.h>
-+#include <linux/oa_tc6.h>
-+#include <linux/phy.h>
-+
-+#define ADIN1140_CONFIG2_FWD_UNK2HOST	BIT(2)
-+
-+#define ADIN1140_MAC_P1_LOOP_ADDR_REG	OA_TC6_MMS_REG(0x1, 0xC4)
-+
-+#define ADIN1140_MAC_ADDR_FILT_UPR_REG		OA_TC6_MMS_REG(0x1, 0x50)
-+#define ADIN1140_MAC_ADDR_FILT_APPLY2PORT1	BIT(30)
-+#define ADIN1140_MAC_ADDR_FILT_TO_HOST		BIT(16)
-+
-+#define ADIN1140_MAC_ADDR_FILT_LWR_REG		OA_TC6_MMS_REG(0x1, 0x51)
-+
-+#define ADIN1140_MAC_ADDR_MASK_UPR_REG	OA_TC6_MMS_REG(0x1, 0x70)
-+#define ADIN1140_MAC_ADDR_MASK_LWR_REG	OA_TC6_MMS_REG(0x1, 0x71)
-+
-+#define ADIN1140_MAC_FILT_MC_SLOT	0U
-+#define ADIN1140_MAC_FILT_BC_SLOT	1U
-+#define ADIN1140_MAC_FILT_UC_SLOT	2U
-+#define ADIN1140_MAC_FILT_MAX_SLOT	16U
-+
-+#define ADIN1140_RX_FRAME_CNT		OA_TC6_MMS_REG(0x1, 0xA1)
-+#define ADIN1140_RX_BC_FRAME_CNT	OA_TC6_MMS_REG(0x1, 0xA2)
-+#define ADIN1140_RX_MC_FRAME_CNT	OA_TC6_MMS_REG(0x1, 0xA3)
-+#define ADIN1140_RX_UC_FRAME_CNT	OA_TC6_MMS_REG(0x1, 0xA4)
-+#define ADIN1140_RX_CRC_ERR_CNT		OA_TC6_MMS_REG(0x1, 0xA5)
-+#define ADIN1140_RX_ALIGN_ERR_CNT	OA_TC6_MMS_REG(0x1, 0xA6)
-+#define ADIN1140_RX_PREAMBLE_ERR_CNT	OA_TC6_MMS_REG(0x1, 0xA7)
-+#define ADIN1140_RX_SHORT_ERR_CNT	OA_TC6_MMS_REG(0x1, 0xA8)
-+#define ADIN1140_RX_LONG_ERR_CNT	OA_TC6_MMS_REG(0x1, 0xA9)
-+#define ADIN1140_RX_PHY_ERR_CNT		OA_TC6_MMS_REG(0x1, 0xAA)
-+#define ADIN1140_RX_DRP_FULL_CNT	OA_TC6_MMS_REG(0x1, 0xAB)
-+#define ADIN1140_RX_DRP_FILTER_CNT	OA_TC6_MMS_REG(0x1, 0xAD)
-+#define ADIN1140_RX_IFG_ERR_CNT		OA_TC6_MMS_REG(0x1, 0xAE)
-+#define ADIN1140_TX_FRAME_CNT		OA_TC6_MMS_REG(0x1, 0xB1)
-+#define ADIN1140_TX_BC_FRAME_CNT	OA_TC6_MMS_REG(0x1, 0xB2)
-+#define ADIN1140_TX_MC_FRAME_CNT	OA_TC6_MMS_REG(0x1, 0xB3)
-+#define ADIN1140_TX_UC_FRAME_CNT	OA_TC6_MMS_REG(0x1, 0xB4)
-+#define ADIN1140_TX_SINGLE_COL_CNT	OA_TC6_MMS_REG(0x1, 0xB5)
-+#define ADIN1140_TX_MULTI_COL_CNT	OA_TC6_MMS_REG(0x1, 0xB6)
-+#define ADIN1140_TX_DEFERRED_CNT	OA_TC6_MMS_REG(0x1, 0xB7)
-+#define ADIN1140_TX_LATE_COL_CNT	OA_TC6_MMS_REG(0x1, 0xB8)
-+#define ADIN1140_TX_EXCESS_COL_CNT	OA_TC6_MMS_REG(0x1, 0xB9)
-+#define ADIN1140_TX_UNDERRUN_CNT	OA_TC6_MMS_REG(0x1, 0xBA)
-+
-+/* ADIN1140_MAC_FILT_MAX_SLOT - 3 (multicast, broadcast and unicast
-+ * reserved slots)
-+ */
-+#define ADIN1140_MAC_FILT_AVAIL	13U
-+
-+#define ADIN1140_PHY_CTRL_DEFAULT	0x1000
-+#define ADIN1140_PHY_STATUS_DEFAULT	0x082D
-+#define ADIN1140_PHY_ID1		0x0283
-+#define ADIN1140_PHY_ID2		0xBE00
-+
-+#define ADIN1140_STATS_CHECK_DELAY	(3 * HZ)
-+
-+enum adin1140_statistics_entry {
-+	rx_frames,
-+	rx_bc_frames,
-+	rx_mc_frames,
-+	rx_uc_frames,
-+	rx_crc_errors,
-+	rx_align_errors,
-+	rx_preamble_errors,
-+	rx_short_frame_errors,
-+	rx_long_frame_errors,
-+	rx_phy_errors,
-+	rx_fifo_full_dropped,
-+	rx_addr_filter_dropped,
-+	rx_ifg_errors,
-+	tx_frames,
-+	tx_bc_frames,
-+	tx_mc_frames,
-+	tx_uc_frames,
-+	tx_single_collision,
-+	tx_multi_collision,
-+	tx_deferred,
-+	tx_late_collision,
-+	tx_excess_collision,
-+	tx_underrun,
-+	ADIN1140_STATS_CNT,
-+};
-+
-+struct adin1140_statistics_reg {
-+	const char *name;
-+	enum adin1140_statistics_entry idx;
-+};
-+
-+struct adin1140_priv {
-+	struct net_device *netdev;
-+	struct oa_tc6 *tc6;
-+	struct mii_bus *mdiobus;
-+	struct phy_device *phydev;
-+	struct work_struct rx_mode_work;
-+	struct delayed_work stats_work;
-+
-+	/* Protects stats[] from concurrent updates in adin1140_stats_work
-+	 * and reads in the get_stats functions
-+	 */
-+	spinlock_t stat_lock;
-+	u64 stats[ADIN1140_STATS_CNT];
-+};
-+
-+static const u32 adin1140_stat_regs[] = {
-+	[rx_frames] = ADIN1140_RX_FRAME_CNT,
-+	[rx_bc_frames] = ADIN1140_RX_BC_FRAME_CNT,
-+	[rx_mc_frames] = ADIN1140_RX_MC_FRAME_CNT,
-+	[rx_uc_frames] = ADIN1140_RX_UC_FRAME_CNT,
-+	[rx_crc_errors] = ADIN1140_RX_CRC_ERR_CNT,
-+	[rx_align_errors] = ADIN1140_RX_ALIGN_ERR_CNT,
-+	[rx_preamble_errors] = ADIN1140_RX_PREAMBLE_ERR_CNT,
-+	[rx_short_frame_errors]	= ADIN1140_RX_SHORT_ERR_CNT,
-+	[rx_long_frame_errors] = ADIN1140_RX_LONG_ERR_CNT,
-+	[rx_phy_errors] = ADIN1140_RX_PHY_ERR_CNT,
-+	[rx_fifo_full_dropped] = ADIN1140_RX_DRP_FULL_CNT,
-+	[rx_addr_filter_dropped] = ADIN1140_RX_DRP_FILTER_CNT,
-+	[rx_ifg_errors] = ADIN1140_RX_IFG_ERR_CNT,
-+	[tx_frames] = ADIN1140_TX_FRAME_CNT,
-+	[tx_bc_frames] = ADIN1140_TX_BC_FRAME_CNT,
-+	[tx_mc_frames] = ADIN1140_TX_MC_FRAME_CNT,
-+	[tx_uc_frames] = ADIN1140_TX_UC_FRAME_CNT,
-+	[tx_single_collision] = ADIN1140_TX_SINGLE_COL_CNT,
-+	[tx_multi_collision] = ADIN1140_TX_MULTI_COL_CNT,
-+	[tx_deferred] = ADIN1140_TX_DEFERRED_CNT,
-+	[tx_late_collision] = ADIN1140_TX_LATE_COL_CNT,
-+	[tx_excess_collision] = ADIN1140_TX_EXCESS_COL_CNT,
-+	[tx_underrun] = ADIN1140_TX_UNDERRUN_CNT,
-+};
-+
-+static const struct adin1140_statistics_reg adin1140_stats[] = {
-+	{.name = "rx_unicast_frames", .idx = rx_uc_frames},
-+	{.name = "rx_preamble_errors", .idx = rx_preamble_errors},
-+	{.name = "rx_ifg_errors", .idx = rx_ifg_errors},
-+	{.name = "rx_addr_filter_dropped", .idx = rx_addr_filter_dropped},
-+	{.name = "tx_unicast_frames", .idx = tx_uc_frames},
-+};
-+
-+static int adin1140_mac_filter_set(struct adin1140_priv *priv,
-+				   const u8 *addr, const u8 *mask,
-+				   u8 slot)
-+{
-+	u32 mask_reg;
-+	u32 val;
-+	int ret;
-+
-+	if (slot >= ADIN1140_MAC_FILT_MAX_SLOT)
-+		return -ENOSPC;
-+
-+	ret = oa_tc6_write_register(priv->tc6,
-+				    ADIN1140_MAC_ADDR_FILT_UPR_REG + 2 * slot,
-+				    get_unaligned_be16(&addr[0]) |
-+				    ADIN1140_MAC_ADDR_FILT_APPLY2PORT1 |
-+				    ADIN1140_MAC_ADDR_FILT_TO_HOST);
-+	if (ret)
-+		return ret;
-+
-+	ret = oa_tc6_write_register(priv->tc6,
-+				    ADIN1140_MAC_ADDR_FILT_LWR_REG + 2 * slot,
-+				    get_unaligned_be32(&addr[2]));
-+	if (ret)
-+		return ret;
-+
-+	val = get_unaligned_be16(&mask[0]);
-+	mask_reg = ADIN1140_MAC_ADDR_MASK_UPR_REG + (2 * slot);
-+
-+	ret = oa_tc6_write_register(priv->tc6, mask_reg, val);
-+	if (ret)
-+		return ret;
-+
-+	val = get_unaligned_be32(&mask[2]);
-+	mask_reg = ADIN1140_MAC_ADDR_MASK_LWR_REG + (2 * slot);
-+
-+	return oa_tc6_write_register(priv->tc6, mask_reg, val);
-+}
-+
-+static int adin1140_mac_filter_clear(struct adin1140_priv *priv, u8 slot)
-+{
-+	u8 mask[ETH_ALEN];
-+	u8 addr[ETH_ALEN];
-+
-+	memset(mask, 0xFF, ETH_ALEN);
-+	memset(addr, 0x0, ETH_ALEN);
-+
-+	return adin1140_mac_filter_set(priv, addr, mask, slot);
-+}
-+
-+static int adin1140_filter_unicast(struct adin1140_priv *priv)
-+{
-+	u8 mask[ETH_ALEN];
-+
-+	memset(mask, 0xFF, ETH_ALEN);
-+
-+	return adin1140_mac_filter_set(priv, priv->netdev->dev_addr, mask,
-+				       ADIN1140_MAC_FILT_UC_SLOT);
-+}
-+
-+static int adin1140_filter_all_multicast(struct adin1140_priv *priv, bool en)
-+{
-+	u8 multicast_addr[ETH_ALEN] = {1, 0, 0, 0, 0, 0};
-+
-+	if (en)
-+		return adin1140_mac_filter_set(priv, multicast_addr,
-+					       multicast_addr,
-+					       ADIN1140_MAC_FILT_MC_SLOT);
-+
-+	return adin1140_mac_filter_clear(priv, ADIN1140_MAC_FILT_MC_SLOT);
-+}
-+
-+static int adin1140_filter_broadcast(struct adin1140_priv *priv, bool enabled)
-+{
-+	u8 mask[ETH_ALEN];
-+
-+	if (enabled) {
-+		memset(mask, 0xFF, ETH_ALEN);
-+		return adin1140_mac_filter_set(priv, mask, mask,
-+					       ADIN1140_MAC_FILT_BC_SLOT);
-+	}
-+
-+	return adin1140_mac_filter_clear(priv, ADIN1140_MAC_FILT_BC_SLOT);
-+}
-+
-+static int adin1140_default_filter_config(struct adin1140_priv *priv)
-+{
-+	int ret;
-+
-+	ret = adin1140_filter_broadcast(priv, true);
-+	if (ret)
-+		return ret;
-+
-+	return adin1140_filter_unicast(priv);
-+}
-+
-+static int adin1140_promiscuous_mode(struct adin1140_priv *priv, bool enabled)
-+{
-+	int ret;
-+	u32 val;
-+
-+	ret = oa_tc6_read_register(priv->tc6, OA_TC6_REG_CONFIG2, &val);
-+	if (ret)
-+		return ret;
-+
-+	if (enabled)
-+		val |= ADIN1140_CONFIG2_FWD_UNK2HOST;
-+	else
-+		val &= ~ADIN1140_CONFIG2_FWD_UNK2HOST;
-+
-+	return oa_tc6_write_register(priv->tc6, OA_TC6_REG_CONFIG2, val);
-+}
-+
-+static void adin1140_rx_mode_work(struct work_struct *work)
-+{
-+	struct adin1140_priv *priv = container_of(work, struct adin1140_priv,
-+						  rx_mode_work);
-+	struct netdev_hw_addr *ha;
-+	bool all_multi, promisc;
-+	u8 mask[ETH_ALEN];
-+	u8 start, end;
-+	u32 mac_addrs;
-+	u8 slot, i;
-+	int ret;
-+
-+	/* The ADIN1140 has 16 dest MAC address filter slots:
-+	 * 0 - reserved for all multicast filter.
-+	 * 1 - reserved for broadcast filter.
-+	 * 2 - reserved for the device's own unicast MAC.
-+	 * 3 -> 15 - available for other unicast/multicast filters.
-+	 */
-+
-+	mac_addrs = netdev_uc_count(priv->netdev) +
-+		    netdev_mc_count(priv->netdev);
-+
-+	if (priv->netdev->flags & IFF_PROMISC) {
-+		promisc = true;
-+		all_multi = false;
-+	} else if (priv->netdev->flags & IFF_ALLMULTI) {
-+		promisc = false;
-+		all_multi = true;
-+	} else if (mac_addrs <= ADIN1140_MAC_FILT_AVAIL) {
-+		promisc = false;
-+		all_multi = false;
-+
-+		slot = ADIN1140_MAC_FILT_UC_SLOT + 1;
-+		memset(mask, 0xFF, ETH_ALEN);
-+
-+		netdev_for_each_uc_addr(ha, priv->netdev) {
-+			ret = adin1140_mac_filter_set(priv, ha->addr, mask,
-+						      slot);
-+			if (ret)
-+				return;
-+
-+			slot++;
-+		}
-+
-+		netdev_for_each_mc_addr(ha, priv->netdev) {
-+			ret = adin1140_mac_filter_set(priv, ha->addr, mask,
-+						      slot);
-+			if (ret)
-+				return;
-+
-+			slot++;
-+		}
-+	} else {
-+		/* The filter table is full. Enable promisc mode. */
-+		promisc = true;
-+		all_multi = false;
-+
-+		start = ADIN1140_MAC_FILT_UC_SLOT + 1;
-+		end = ADIN1140_MAC_FILT_MAX_SLOT;
-+		for (i = start; i < end; i++) {
-+			ret = adin1140_mac_filter_clear(priv, i);
-+			if (ret)
-+				return;
-+		}
-+	}
-+
-+	ret = adin1140_promiscuous_mode(priv, promisc);
-+	if (ret)
-+		return;
-+
-+	adin1140_filter_all_multicast(priv, all_multi);
-+}
-+
-+static void adin1140_rx_mode(struct net_device *netdev)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	schedule_work(&priv->rx_mode_work);
-+}
-+
-+static void adin1140_stats_work(struct work_struct *work)
-+{
-+	struct delayed_work *dwork = to_delayed_work(work);
-+	u64 stat_buff[ADIN1140_STATS_CNT] = {};
-+	struct adin1140_priv *priv;
-+	u32 reg_val;
-+	int ret;
-+	u32 i;
-+
-+	priv = container_of(dwork, struct adin1140_priv, stats_work);
-+
-+	for (i = 0; i < ARRAY_SIZE(adin1140_stat_regs); i++) {
-+		ret = oa_tc6_read_register(priv->tc6, adin1140_stat_regs[i],
-+					   &reg_val);
-+		if (ret)
-+			break;
-+
-+		stat_buff[i] = reg_val;
-+	}
-+
-+	spin_lock(&priv->stat_lock);
-+	memcpy(&priv->stats, stat_buff, sizeof(priv->stats));
-+	spin_unlock(&priv->stat_lock);
-+
-+	schedule_delayed_work(dwork, ADIN1140_STATS_CHECK_DELAY);
-+}
-+
-+static int adin1140_configure(struct adin1140_priv *priv)
-+{
-+	int ret;
-+
-+	ret = oa_tc6_zero_align_receive_frame_enable(priv->tc6);
-+	if (ret)
-+		return ret;
-+
-+	/* Disable MAC loopback */
-+	ret = oa_tc6_write_register(priv->tc6, ADIN1140_MAC_P1_LOOP_ADDR_REG,
-+				    0x0);
-+	if (ret)
-+		return ret;
-+
-+	return adin1140_default_filter_config(priv);
-+}
-+
-+static int adin1140_open(struct net_device *netdev)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	schedule_delayed_work(&priv->stats_work, ADIN1140_STATS_CHECK_DELAY);
-+
-+	phy_start(netdev->phydev);
-+	netif_start_queue(netdev);
-+
-+	return 0;
-+}
-+
-+static int adin1140_close(struct net_device *netdev)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	cancel_delayed_work_sync(&priv->stats_work);
-+
-+	netif_stop_queue(netdev);
-+	phy_stop(netdev->phydev);
-+
-+	return 0;
-+}
-+
-+static netdev_tx_t adin1140_start_xmit(struct sk_buff *skb,
-+				       struct net_device *netdev)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	/* Pad frames to minimum Ethernet frame size (60 bytes without FCS).
-+	 * The MAC will append the FCS, but we need to ensure the frame is
-+	 * at least ETH_ZLEN bytes.
-+	 */
-+	if (skb_put_padto(skb, ETH_ZLEN))
-+		return NETDEV_TX_OK;
-+
-+	return oa_tc6_start_xmit(priv->tc6, skb);
-+}
-+
-+static int adin1140_set_mac_address(struct net_device *netdev, void *addr)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+	struct sockaddr *address = addr;
-+	u8 mask[ETH_ALEN];
-+	int ret;
-+
-+	ret = eth_prepare_mac_addr_change(netdev, addr);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (ether_addr_equal(address->sa_data, netdev->dev_addr))
-+		return 0;
-+
-+	memset(mask, 0xFF, ETH_ALEN);
-+	ret = adin1140_mac_filter_set(priv, address->sa_data, mask,
-+				      ADIN1140_MAC_FILT_UC_SLOT);
-+	if (ret)
-+		return ret;
-+
-+	eth_commit_mac_addr_change(netdev, addr);
-+
-+	return 0;
-+}
-+
-+static void adin1140_ndo_get_stats64(struct net_device *dev,
-+				     struct rtnl_link_stats64 *storage)
-+{
-+	struct adin1140_priv *priv = netdev_priv(dev);
-+
-+	storage->rx_packets = priv->netdev->stats.rx_packets;
-+	storage->tx_packets = priv->netdev->stats.tx_packets;
-+
-+	storage->rx_bytes = priv->netdev->stats.rx_bytes;
-+	storage->tx_bytes = priv->netdev->stats.tx_bytes;
-+
-+	spin_lock(&priv->stat_lock);
-+
-+	storage->rx_errors = priv->stats[rx_crc_errors] +
-+			     priv->stats[rx_align_errors] +
-+			     priv->stats[rx_preamble_errors] +
-+			     priv->stats[rx_short_frame_errors] +
-+			     priv->stats[rx_long_frame_errors] +
-+			     priv->stats[rx_phy_errors] +
-+			     priv->stats[rx_ifg_errors];
-+
-+	storage->tx_errors = priv->stats[tx_excess_collision] +
-+			     priv->stats[tx_underrun];
-+
-+	storage->rx_dropped = priv->stats[rx_fifo_full_dropped] +
-+			      priv->stats[rx_addr_filter_dropped];
-+
-+	storage->multicast = priv->stats[rx_mc_frames];
-+
-+	storage->collisions = priv->stats[tx_single_collision] +
-+			      priv->stats[tx_multi_collision];
-+
-+	storage->rx_length_errors = priv->stats[rx_short_frame_errors] +
-+				    priv->stats[rx_long_frame_errors];
-+	storage->rx_over_errors = priv->stats[rx_fifo_full_dropped];
-+	storage->rx_crc_errors = priv->stats[rx_crc_errors];
-+	storage->rx_frame_errors = priv->stats[rx_align_errors];
-+	storage->rx_missed_errors = priv->stats[rx_fifo_full_dropped];
-+
-+	storage->tx_aborted_errors = priv->stats[tx_excess_collision];
-+	storage->tx_fifo_errors = priv->stats[tx_underrun];
-+	storage->tx_window_errors = priv->stats[tx_late_collision];
-+
-+	spin_unlock(&priv->stat_lock);
-+}
-+
-+static void adin1140_get_drvinfo(struct net_device *netdev,
-+				 struct ethtool_drvinfo *info)
-+{
-+	strscpy(info->driver, "ADIN1140", sizeof(info->driver));
-+	strscpy(info->bus_info, dev_name(netdev->dev.parent),
-+		sizeof(info->bus_info));
-+}
-+
-+static void adin1140_get_ethtool_stats(struct net_device *netdev,
-+				       struct ethtool_stats *stats, u64 *data)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+	u32 i;
-+
-+	spin_lock(&priv->stat_lock);
-+	for (i = 0; i < ARRAY_SIZE(adin1140_stats); i++)
-+		data[i] = priv->stats[adin1140_stats[i].idx];
-+	spin_unlock(&priv->stat_lock);
-+}
-+
-+static void adin1140_get_ethtool_strings(struct net_device *netdev, u32 sset,
-+					 u8 *p)
-+{
-+	u32 i;
-+
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		for (i = 0; i < ARRAY_SIZE(adin1140_stats); i++)
-+			ethtool_puts(&p, adin1140_stats[i].name);
-+
-+		break;
-+	}
-+}
-+
-+static int adin1140_get_sset_count(struct net_device *netdev, int sset)
-+{
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		return ARRAY_SIZE(adin1140_stats);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static void adin1140_get_eth_mac_stats(struct net_device *netdev,
-+				       struct ethtool_eth_mac_stats *mac_stats)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	spin_lock(&priv->stat_lock);
-+
-+	mac_stats->FramesReceivedOK = priv->stats[rx_frames];
-+	mac_stats->BroadcastFramesReceivedOK = priv->stats[rx_bc_frames];
-+	mac_stats->MulticastFramesReceivedOK = priv->stats[rx_mc_frames];
-+	mac_stats->FrameCheckSequenceErrors = priv->stats[rx_crc_errors];
-+	mac_stats->AlignmentErrors = priv->stats[rx_align_errors];
-+	mac_stats->FrameTooLongErrors = priv->stats[rx_long_frame_errors];
-+	mac_stats->FramesLostDueToIntMACRcvError =
-+					priv->stats[rx_fifo_full_dropped];
-+	mac_stats->FramesTransmittedOK = priv->stats[tx_frames];
-+	mac_stats->BroadcastFramesXmittedOK = priv->stats[tx_bc_frames];
-+	mac_stats->MulticastFramesXmittedOK = priv->stats[tx_mc_frames];
-+	mac_stats->SingleCollisionFrames = priv->stats[tx_single_collision];
-+	mac_stats->MultipleCollisionFrames = priv->stats[tx_multi_collision];
-+	mac_stats->FramesWithDeferredXmissions = priv->stats[tx_deferred];
-+	mac_stats->LateCollisions = priv->stats[tx_late_collision];
-+	mac_stats->FramesAbortedDueToXSColls = priv->stats[tx_excess_collision];
-+	mac_stats->FramesLostDueToIntMACXmitError = priv->stats[tx_underrun];
-+
-+	spin_unlock(&priv->stat_lock);
-+}
-+
-+static int adin1140_mdiobus_read(struct mii_bus *bus, int addr, int regnum)
-+{
-+	/* The ADIN1140's standard PHY C22 register map (OA TC6 0xFF00 -
-+	 * 0xFF1F), of which only 0xFF00 - 0xFF03 are implemented) cannot be
-+	 * accessed while frames are being received by the PHY. In case this
-+	 * happens the CONFIG0 and CONFIG2 register values will get corrupted,
-+	 * getting a random value. Both reads and writes cause the same
-+	 * behavior. This is a workaround that avoids MDIO accesses all
-+	 * together. Since this is a 10BASE-T1S PHY, only the loopback and
-+	 * reset (AN) bits in the control register (0x0) can be written.
-+	 * These functionalities have custom implementations in the PHY
-+	 * driver. C45 accesses do not cause this issue.
-+	 */
-+
-+	switch (regnum) {
-+	case MII_BMCR:
-+		return ADIN1140_PHY_CTRL_DEFAULT;
-+	case MII_BMSR:
-+		return ADIN1140_PHY_STATUS_DEFAULT;
-+	case MII_PHYSID1:
-+		return ADIN1140_PHY_ID1;
-+	case MII_PHYSID2:
-+		return ADIN1140_PHY_ID2;
-+	default:
-+		return 0xFFFF;
-+	}
-+}
-+
-+static int adin1140_mdiobus_write(struct mii_bus *bus, int addr, int regnum,
-+				  u16 val)
-+{
-+	return -EIO;
-+}
-+
-+static int adin1140_mdio_register(struct adin1140_priv *priv,
-+				  struct spi_device *spidev)
-+{
-+	int ret;
-+
-+	priv->mdiobus = mdiobus_alloc();
-+	if (!priv->mdiobus) {
-+		netdev_err(priv->netdev, "MDIO bus alloc failed\n");
-+		return -ENOMEM;
-+	}
-+
-+	priv->mdiobus->name = "adin1140-mdiobus";
-+	priv->mdiobus->priv = priv->tc6;
-+	priv->mdiobus->parent = &spidev->dev;
-+	priv->mdiobus->phy_mask = ~BIT(0);
-+	priv->mdiobus->read = adin1140_mdiobus_read;
-+	priv->mdiobus->write = adin1140_mdiobus_write;
-+	priv->mdiobus->read_c45 = oa_tc6_mdiobus_read_c45;
-+	priv->mdiobus->write_c45 = oa_tc6_mdiobus_write_c45;
-+
-+	snprintf(priv->mdiobus->id, MII_BUS_ID_SIZE, "adin1140-%s.%u",
-+		 dev_name(&spidev->dev), spi_get_chipselect(spidev, 0));
-+
-+	ret = mdiobus_register(priv->mdiobus);
-+	if (ret) {
-+		netdev_err(priv->netdev, "Could not register MDIO bus\n");
-+		mdiobus_free(priv->mdiobus);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void adin1140_handle_link_change(struct net_device *netdev)
-+{
-+	phy_print_status(netdev->phydev);
-+}
-+
-+static int adin1140_phy_init(struct adin1140_priv *priv,
-+			     struct spi_device *spidev)
-+{
-+	int ret;
-+
-+	ret = adin1140_mdio_register(priv, spidev);
-+	if (ret)
-+		return ret;
-+
-+	priv->phydev = phy_find_first(priv->mdiobus);
-+	if (!priv->phydev) {
-+		netdev_err(priv->netdev, "No PHY found\n");
-+		ret = -ENODEV;
-+		goto free_mdio;
-+	}
-+
-+	priv->phydev->is_internal = true;
-+	ret = phy_connect_direct(priv->netdev, priv->phydev,
-+				 &adin1140_handle_link_change,
-+				 PHY_INTERFACE_MODE_INTERNAL);
-+	if (ret) {
-+		netdev_err(priv->netdev, "Can't attach PHY to %s\n",
-+			   priv->mdiobus->id);
-+		goto unregister_mdio;
-+	}
-+
-+	phy_attached_info(priv->phydev);
-+
-+	return 0;
-+
-+unregister_mdio:
-+	mdiobus_unregister(priv->mdiobus);
-+free_mdio:
-+	mdiobus_free(priv->mdiobus);
-+
-+	return ret;
-+}
-+
-+static void adin1140_phy_remove(struct adin1140_priv *priv)
-+{
-+	phy_disconnect(priv->phydev);
-+	mdiobus_unregister(priv->mdiobus);
-+	mdiobus_free(priv->mdiobus);
-+}
-+
-+static const struct ethtool_ops adin1140_ethtool_ops = {
-+	.get_drvinfo = adin1140_get_drvinfo,
-+	.get_link = ethtool_op_get_link,
-+	.get_ethtool_stats = adin1140_get_ethtool_stats,
-+	.get_sset_count = adin1140_get_sset_count,
-+	.get_strings = adin1140_get_ethtool_strings,
-+	.get_link_ksettings = phy_ethtool_get_link_ksettings,
-+	.set_link_ksettings = phy_ethtool_set_link_ksettings,
-+	.get_eth_mac_stats = adin1140_get_eth_mac_stats,
-+};
-+
-+static const struct net_device_ops adin1140_netdev_ops = {
-+	.ndo_open = adin1140_open,
-+	.ndo_stop = adin1140_close,
-+	.ndo_start_xmit	= adin1140_start_xmit,
-+	.ndo_set_mac_address = adin1140_set_mac_address,
-+	.ndo_validate_addr = eth_validate_addr,
-+	.ndo_set_rx_mode = adin1140_rx_mode,
-+	.ndo_eth_ioctl = phy_do_ioctl_running,
-+	.ndo_get_stats64 = adin1140_ndo_get_stats64,
-+};
-+
-+static int adin1140_probe(struct spi_device *spi)
-+{
-+	struct oa_tc6_config tc6_config = {};
-+	struct net_device *netdev;
-+	struct adin1140_priv *priv;
-+	int ret;
-+
-+	netdev = alloc_etherdev(sizeof(struct adin1140_priv));
-+	if (!netdev)
-+		return -ENOMEM;
-+
-+	priv = netdev_priv(netdev);
-+	priv->netdev = netdev;
-+	spi_set_drvdata(spi, priv);
-+	spin_lock_init(&priv->stat_lock);
-+
-+	tc6_config.spi = spi;
-+	tc6_config.netdev = netdev;
-+	tc6_config.quirk_flags = OA_TC6_BROKEN_PHY;
-+
-+	priv->tc6 = oa_tc6_init(&tc6_config);
-+	if (!priv->tc6) {
-+		ret = -ENODEV;
-+		goto netdev_free;
-+	}
-+
-+	ret = adin1140_phy_init(priv, spi);
-+	if (ret)
-+		goto oa_tc6_exit;
-+
-+	if (device_get_ethdev_address(&spi->dev, netdev))
-+		eth_hw_addr_random(netdev);
-+
-+	ret = adin1140_configure(priv);
-+	if (ret)
-+		goto phy_exit;
-+
-+	INIT_WORK(&priv->rx_mode_work, adin1140_rx_mode_work);
-+	INIT_DELAYED_WORK(&priv->stats_work, adin1140_stats_work);
-+
-+	netdev->if_port = IF_PORT_10BASET;
-+	netdev->irq = spi->irq;
-+	netdev->netdev_ops = &adin1140_netdev_ops;
-+	netdev->ethtool_ops = &adin1140_ethtool_ops;
-+	netdev->netns_immutable = true;
-+	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
-+			      IFF_UNICAST_FLT;
-+
-+	ret = register_netdev(netdev);
-+	if (ret) {
-+		dev_err(&spi->dev, "Failed to register netdev (%d)", ret);
-+		goto phy_exit;
-+	}
-+
-+	return 0;
-+
-+phy_exit:
-+	adin1140_phy_remove(priv);
-+oa_tc6_exit:
-+	oa_tc6_exit(priv->tc6);
-+netdev_free:
-+	free_netdev(priv->netdev);
-+
-+	return ret;
-+}
-+
-+static void adin1140_remove(struct spi_device *spi)
-+{
-+	struct adin1140_priv *priv = spi_get_drvdata(spi);
-+
-+	cancel_work_sync(&priv->rx_mode_work);
-+	unregister_netdev(priv->netdev);
-+	adin1140_phy_remove(priv);
-+	oa_tc6_exit(priv->tc6);
-+	free_netdev(priv->netdev);
-+}
-+
-+static const struct spi_device_id adin1140_spi_id[] = {
-+	{ .name = "ad3306" },
-+	{ .name = "adin1140" },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(spi, adin1140_spi_id);
-+
-+static const struct of_device_id adin1140_match_table[] = {
-+	{ .compatible = "adi,ad3306" },
-+	{ .compatible = "adi,adin1140" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, adin1140_match_table);
-+
-+static struct spi_driver adin1140_driver = {
-+	.driver = {
-+		.name = "adin1140",
-+		.of_match_table = adin1140_match_table,
-+	 },
-+	.probe = adin1140_probe,
-+	.remove = adin1140_remove,
-+	.id_table = adin1140_spi_id,
-+};
-+module_spi_driver(adin1140_driver);
-+
-+MODULE_DESCRIPTION("Analog Devices, Inc. ADIN1140 10BASE-T1S MAC-PHY");
-+MODULE_AUTHOR("Ciprian Regus <ciprian.regus@analog.com>");
-+MODULE_LICENSE("GPL");
-
--- 
-2.43.0
-
-
+Ah. All the users of the real/boot paramaters have been updated, but
+drivers still use ktime_get_snapshot() until later in the series. Ok,
+that makes sense.
 
