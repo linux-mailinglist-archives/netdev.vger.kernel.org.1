@@ -1,266 +1,154 @@
-Return-Path: <netdev+bounces-291873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iFU1HxfcFWpzdQcAu9opvQ
-	(envelope-from <netdev+bounces-291873-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:44:55 +0200
+	id 8I+6EFjgFWo6dwcAu9opvQ
+	(envelope-from <netdev+bounces-291874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:03:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87E6A5DAE14
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:44:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 776725DB211
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AE1AB300C7EE
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:44:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D7ECF301379B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:47:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D34C3DA7E4;
-	Tue, 26 May 2026 17:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7368D3C5DCE;
+	Tue, 26 May 2026 17:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="aPcZnY0s"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MmZqekZv"
 X-Original-To: netdev@vger.kernel.org
-Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11011044.outbound.protection.outlook.com [40.107.74.44])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CE8403EB2;
-	Tue, 26 May 2026 17:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.74.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779817487; cv=fail; b=srw7OUkHh6dMBfCAS44zUYYR6YqzBxHsPXh1qmcyFw4zhfpEtDyUtrMUV3IeZPUScdHLRtnRQJ17glH/ROPqlaLaxPnJmsUyH9iKWqxpJlelO3khnaQfbl/XDfZCCsaYmS+ErMn77NsNhWdhn9OjRmTj+kpyx3KZqIRgDZNbVwg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779817487; c=relaxed/simple;
-	bh=AyhSl+ZRCy7K7stpsAHD0+IF84GVPFuA3H1cFeDrlNw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=A7OwIURyf/A9rjmg6HyKnYBUO6mxvOR0Tahv6ujBsTBHShfeEpGs8vlVFx45jn+gL1bfwylzSN11IQotbWm3ZbUwcvfuRAHMsgGXaVY79DVHoyNv/wWw0QufpsDTPD/VJNxgkgoCJwZ4ipW0TylxdBrujpXKntLfZJFVe1MtqQg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=aPcZnY0s; arc=fail smtp.client-ip=40.107.74.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a5ivpCn5odzaS1rcwxwWe4QOmf7VqSDbEKFgAvDAQyQHHNoE+SMNvFxH+uHCYSddjcfn/+Mi8TYL9ZJd458Oi9sf16Xr3cFzzijo3VBeR0PHRAloYDN4uOeM9JYpfPK2tnccNhVBGwQL4dtDT73LyEmJVn2SfFVFRdMX2dPj3okghtusmhIZGs62mQk7aohgHeXpz9ESqCuwWX05EfuDr61E9fkjSs0++VFKro/FFmLfS1OM/Wgvv1lAyemWWwEvgLNBZJLwW5pRN/sGXFbtCPy8kuBGiJcZsRZR29aGfcKUDVd+i4jKi6611ptA3b07T5UblOk0oZtWR51AUIJPzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/YmZVoJEbJoh53NmiXyKtSLHN2sh8bpaD4ie7IOehTE=;
- b=ZaAzTqw6YQj5H4OA9d+dcT/qnHOgPEmczPopdpV6Bl/4L41lLubtenPgjUSFVSn0dgcOb2Eg8F9b0zZQDGeQp/6+8Qp2UM12L9VreWO0vX/BqcN937a8pQC5Ssio4NKc6cvY6JfY3+Olo0va1DZyD4Yr9nDzJH56+fKak34LNlsxcrchit8gd+iEuezEKJ+BNTjJBjmb1uK5I4EsEDPX6QoZsmbgR2/4eJpqFQMRKCTSxusdp+6EDSYoab+7rL3qV2yl13u77SWHGQ0KQ650DzsCKHcfe82CrJak8LvOWoJKx7YMwfM19NPUgVJ5j2DlGM3+vmiDijE7GvrVPDCo6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/YmZVoJEbJoh53NmiXyKtSLHN2sh8bpaD4ie7IOehTE=;
- b=aPcZnY0sZjLpuphVo6aftMlI2sZLthhgcLTr1o+QfogmPgYkUHe9Ro81E6HTBkdALRpb6y6MjR1BML6lvzXtVSGMM8LypzwUdtqZEJ7co5TnghGUOvuDky3GuWfIUgjWoPvRbrXmc2L0pA/yyeMGzT7yHkWYk3D61x99U/7Yl5w=
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com (2603:1096:405:20d::9)
- by OS9PR01MB16891.jpnprd01.prod.outlook.com (2603:1096:604:408::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.12; Tue, 26 May
- 2026 17:44:42 +0000
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a]) by TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a%5]) with mapi id 15.21.0048.019; Tue, 26 May 2026
- 17:44:40 +0000
-From: Michael Dege <michael.dege@renesas.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, niklas.soderlund
-	<niklas.soderlund@ragnatech.se>, "paul@pbarker.dev" <paul@pbarker.dev>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next v5 08/14] net: renesas: rswitch: add locking for
- agent clock control
-Thread-Topic: [PATCH net-next v5 08/14] net: renesas: rswitch: add locking for
- agent clock control
-Thread-Index: AQHc6eRi1pYOqHPL60CPnlV+4dd91rYfOd8AgAFgKQA=
-Date: Tue, 26 May 2026 17:44:40 +0000
-Message-ID:
- <TY4PR01MB1428279E78F8BF79FF1F40C39820B2@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-References: <20260522-rswitch_add_vlans-v5-8-53589d944a9f@renesas.com>
- <20260525204114.2471390-1-kuba@kernel.org>
-In-Reply-To: <20260525204114.2471390-1-kuba@kernel.org>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY4PR01MB14282:EE_|OS9PR01MB16891:EE_
-x-ms-office365-filtering-correlation-id: 12f1eae0-4557-4255-33c3-08debb4e76ab
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|1800799024|7416014|18002099003|22082099003|56012099006|38070700021|5023799004|11063799006|6133799003|4143699003;
-x-microsoft-antispam-message-info:
- QcukeoLI1VJOg5SzCBo0Ysjbhum+vEmfvZywQ5JBBwqtOfk2dp1nV5SGhU2KVhmSUIHDlbcVX5CCXN7PYJplXDSXB42hwLWWEM/SF13ymAJckemzR0UrcY1QMBf8T6DX9CIyOk+I9YzAWYcDyWtaKSjRZNlWnwbkjmvMIh+vXBUWzZ2e1KjGjjyddae2JwXTcIfimS2OdNo29Aix3/06ts/adnLB/WgIy3btYqS/6R160wcxZCfH7aYSguW5yk9ATUy0ZGlTvJMeYbNo/K6riVOw/EXXIQwaZGiX+ENIaBCOfvAyjkCfwcnepqSC0ULUjyBfTnCqYT3Xxzmx69cU5c04drRzL37rQtwU9fcG0dHdoW16BXF5EmW8UroeIwPfN7ZO58Ut8x5T/oU8nPeDOzN9KfbgOAM3P/uxTBJvYTDt4A/KI8IHEGwp9xPgHk1U/5AmEnrDwyfFmH2MkVKwara9i7fpwWSuov+IlS25BNK33abGyeTxME6FsE/gRjR1I8PYAGxr+V/pewe9DtjT7xqx7rpaxPL5uNuIsL62osD02pJjExuSUYIN6fh9kpaNnfIvswhE6bKHtlbOVjeua7GSSi7lXgULpIID0Agl6kZv0xMApADrIBcQWWAl7XnP2ViiZb3a9BEaNQm2Mp7dPbql4KEdgzMorZRErTdh023if59080fOh3FAYpphWGE2gHF0ID6wCcwkWfqE9P1cbvKIxMrrT8BX+wSM2y9rGBoHCUVr1mc9sV5CnRvSILEX
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY4PR01MB14282.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014)(18002099003)(22082099003)(56012099006)(38070700021)(5023799004)(11063799006)(6133799003)(4143699003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?VEhjLXgZ62svhx3/E27nQ8hR6tp5/VS+pFN3mgfS/tooHV+Likz41hdnuJIr?=
- =?us-ascii?Q?03j6DJgpXtxtlGlNUbt6j9sMEiMUZfVem/fGg4TKhqCc/bhJK5lDRxVIzVU1?=
- =?us-ascii?Q?enKafly9D8B0pVeBcgVMmT5Op8KM6uaFbj3++r+R6R2qVnD1dhJuZ9wGAAxL?=
- =?us-ascii?Q?xgp+AEqXK80sgEG701DQVWIpRRAk3lXobF3XXtJPcdvPdYnROjvzK1pganTc?=
- =?us-ascii?Q?3qgpj2mV/Obya2Jsm6Km3mHvWaqOEJeph1tLnMC3/7euJfNuoGblkgrwvSgn?=
- =?us-ascii?Q?8E4ebMCg9iZtnQMMFLfw1H+SR5VDEPBEHOmQ4YMKAiIuccyB+PoeahTBlrTR?=
- =?us-ascii?Q?yNhjydt9Uql+nCmCNRAYh+aY0zcWKfPSbL1aibBEaf7qxd4GOJk1g+ipy9Vi?=
- =?us-ascii?Q?SlogpLLiUq8/gJE3h9M8+b3CWxqzQxDDoGEyhwNpUjeJqW+eBBmmT1XHw0ll?=
- =?us-ascii?Q?l/ZXM5uNADHpcVpXhJLKvbLFhrHzmuFFwfV5a0icMUJrr3I645/BtPoEOyeO?=
- =?us-ascii?Q?8zaXanMO+wXe5JrNL+1usd4k8PE3p+m78cggwTfN6AwuUc0MS5efxt1kupta?=
- =?us-ascii?Q?ZVrynWfh0cXJP3aD9KdxARwZwM+uEGg/zBl+LMgALwSHXIAR6bufIlki3NKF?=
- =?us-ascii?Q?OzB6BKqgVKQn4Z51u9NcB6/zna2ph78qVWF6i2MKVrOkw4+V3++XRCbAHHVw?=
- =?us-ascii?Q?yIAbu4GXx6Vsi7aJw+jbEx+L/9LnRihAYe2GcW5NnvH8gcj4a8ODbfPo0oOC?=
- =?us-ascii?Q?Iygcgfo62FRq8ycFVlJXH9mupsUDKMLtum7ihRwigDw9jMSbAaS6XLJavnu1?=
- =?us-ascii?Q?aTPD3NTO9Ex09SwQJG3a9E5uknJ8EDdnPU/ok2u/7Rw8YatGLgbJvJZD1Wok?=
- =?us-ascii?Q?u/QvHOAFZaUJwhnrWFTCrK9N7Ab5aBHe5CZefPN/kXRnRU91+3GbTXiZovGe?=
- =?us-ascii?Q?kODMx6dGP/hhj3F+IWRYQylnueho7g1ENPwEh/CONFmV9EtLrcYfrNRH0S0l?=
- =?us-ascii?Q?C9VjI95egN7vsaK3lZluG9sjyBMT99KZgmF71565EDIdRbhbqKAhzmGcqXpb?=
- =?us-ascii?Q?bI79a/+jizyMTPOMvBPfnoMpOZPfEC7P2uolwpmBpK/aXlENibYEGMisV+4y?=
- =?us-ascii?Q?FZv7GkVOQz8ITnMN0AyiGWLmu5t5HJsJ5R/uJFkUSslMRPpnP0PHc4adLp8l?=
- =?us-ascii?Q?JVcDepEh69vQ2sZLSwtz4v95VofGyHUG/Ax2g0pmYKB4IcrkZL9YuUf7W8ai?=
- =?us-ascii?Q?vhV1AKLHAKmwbmKaI+TIJvHDEMoo+qnDBnsgR/d6LmNcaC5+At0jZgze7Cwc?=
- =?us-ascii?Q?REo2W2G9Jj5k0xOSgOYB1xt+34qm9cqAUT0rIUg6zsAcwxmEM9mQLZ8u3z7G?=
- =?us-ascii?Q?v1yAIDQ4E0y3gsQyLarOR02HtMnr5YGvn1yPHhvJR6BsWUuBdpgDTCUgRtML?=
- =?us-ascii?Q?CbeqBnxnbuZ2mCZGeoVmOd9+reZkZCgf1S6tfvsstyRf1MhrDAPF3gU5bgNB?=
- =?us-ascii?Q?G/mGmCnKbJabAf/7Dmt9FheXETHPqH/DxrjRnQEX+skTY9PBJStbLpxGrgNN?=
- =?us-ascii?Q?K/YYqDuncOBkFuzBLRfS4kQuBl+bDpnpEpSQRJ5sQ1TJUb+n1x00ebDFNEBm?=
- =?us-ascii?Q?kmAgfF1cPOZD92gvSxZ5DlEX9SbufRIwDZOj1nBNZtZZjwoQ4ltlJOIoDXVu?=
- =?us-ascii?Q?fzwYjgTr9furYCdYYJtTi5jF4ZHeWEkRikw6zGMGHqY2PT4lI5bLhc/XPtir?=
- =?us-ascii?Q?otze3Eq0+g=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5D9410D06
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 17:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779817628; cv=none; b=EXRF1RMfGK49BRKM29+CYMUpO86BDV7u3qmgGNSIqxFR9fDHYVki++BTjWWdcBvRUut44vJvo6+Q4Xsk5Gr3L+7Q/dYcWMwfGWQHpMuu2Ewo6IIeN3VSttFZ1vTdVzvWNUlGvP42PumJsLWO8og76munyWEg1OQY5NOb/sQaP0A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779817628; c=relaxed/simple;
+	bh=TLesoEoiCAfLI3uupikvinn+TFASbXk8rqOJGh9e1VY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rjm4KZBj/5VEhSvehDKOO2J49gpUNi5D6OiUHDtnfFLupkBUEihwF/FKiDh6GtUR6dkH6r9QYtikgdrK7kkuqsJ2k0Dj8ZNFMqMKDu2yguTIEUalB9yxZNjDMvn27rOTSIZ4HX7guHgBdC8MuqTQl6eZkOk0KAnHnN0cX6G4tUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MmZqekZv; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id A0A91C79ABF;
+	Tue, 26 May 2026 17:47:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0D4646011D;
+	Tue, 26 May 2026 17:47:04 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 737FF108889E1;
+	Tue, 26 May 2026 19:46:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779817623; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=quOHQzwdS+5HN7n9+dcVJkNaXla1ATVSNcbbILKyics=;
+	b=MmZqekZvnQEjHCa2I/3jqxF4a7UwFtcr7hNhpsD9WBHqc9Q4jK99pUg2O7EdZJDBFByFO/
+	TeM9iuDbPzhdLHLFAN6JL4g4gWWhCKXBcSp/AuByDy892dZOfz66HOCh+q6Dh+rlvTxyiH
+	4d+A4DnjpbJKCjE5DuKKgS35/c9FbuAsmqsQXyk/Tm1Zl6Rzt9mutDoPUOutlso7OMOBET
+	Bh1fjaADzWehAIUCQ9G7mtHNuSuro/HjRCsyDjjTCiWkRqvXj4CrX6Df7uya/nE86MciY1
+	9tNjthmMp4rjp4dgcfggnL67n4hBdwyyDwFILejACHw3FFLOcKmteNDNR0/yFQ==
+Message-ID: <f7c262de-d60a-4029-9833-e83257983ea7@bootlin.com>
+Date: Tue, 26 May 2026 19:46:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY4PR01MB14282.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12f1eae0-4557-4255-33c3-08debb4e76ab
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 May 2026 17:44:40.5365
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LnQqvEY05s33ZTxzVz2gc5Pq4GXVdrjqc2GS3uT02jsVaIfJwc1Czd48llvFO/QvabLFgaoYnsBsTAeaWwftmw37e87o8ikCk7rYh4qysag=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS9PR01MB16891
-X-Spamd-Result: default: False [1.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 07/10] ethtool: tsinfo: don't pass ERR_PTR to
+ genlmsg_cancel on prepare failure
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, o.rempel@pengutronix.de,
+ kory.maincent@bootlin.com, haiyangz@microsoft.com, andrew@lunn.ch
+References: <20260526153533.2779187-1-kuba@kernel.org>
+ <20260526153533.2779187-8-kuba@kernel.org>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260526153533.2779187-8-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[renesas.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291873-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[renesas.com,lunn.ch,davemloft.net,google.com,redhat.com,ragnatech.se,pbarker.dev,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291874-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[renesas.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.995];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 87E6A5DAE14
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,lunn.ch:email]
+X-Rspamd-Queue-Id: 776725DB211
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Jakub,
+Hi,
 
-Thank you for your comment.
+On 5/26/26 17:35, Jakub Kicinski wrote:
+> The goto err label leads to:
+> 
+> 	genlmsg_cancel(skb, ehdr);
+> 	return ret;
+> 
+> If ethnl_tsinfo_prepare_dump() failed, it has not started a genlmsg.
+> There's nothing to cancel, and passing an error pointer to
+> genlmsg_cancel() would cause a crash.
+> 
+> Fixes: b9e3f7dc9ed9 ("net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Monday, May 25, 2026 10:41 PM
-> To: Michael Dege <michael.dege@renesas.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>; Yoshihiro Shimoda <yoshihiro.shimod=
-a.uh@renesas.com>;
-> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com; pabeni@r=
-edhat.com; niklas.soderlund
-> <niklas.soderlund@ragnatech.se>; paul@pbarker.dev; richardcochran@gmail.c=
-om; netdev@vger.kernel.org;
-> linux-renesas-soc@vger.kernel.org; linux-kernel@vger.kernel.org
-> Subject: Re: [PATCH net-next v5 08/14] net: renesas: rswitch: add locking=
- for agent clock control
->=20
-> This is an AI-generated review of your patch. The human sending this emai=
-l has considered the AI
-> review valid, or at least plausible.
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
 > ---
-> net: renesas: rswitch: add locking for agent clock control
->=20
-> This commit introduces an agent_lock to serialize access to the shared RC=
-EC and RCDC agent clock
-> registers. This aims to prevent potential race conditions between ETHA an=
-d GWCA ports when enabling or
-> disabling clocks.
->=20
-> > diff --git a/drivers/net/ethernet/renesas/rswitch.h
-> > b/drivers/net/ethernet/renesas/rswitch.h
-> > --- a/drivers/net/ethernet/renesas/rswitch.h
-> > +++ b/drivers/net/ethernet/renesas/rswitch.h
-> [ ... ]
-> > @@ -1207,6 +1208,8 @@ struct rswitch_private {
-> >  	struct list_head port_list;
-> >
-> >  	spinlock_t lock;	/* lock interrupt registers' control */
-> > +	spinlock_t agent_lock;	/* rswitch agent clock control */
-> > +
->=20
-> [Severity: High]
-> Is this lock initialized anywhere before it is used?
->=20
-> It looks like agent_lock is added to the structure, but spin_lock_init() =
-is missing from the driver
-> probe path. Depending on kzalloc for zero-initialization is not valid for=
- spinlocks and can cause
-> issues on architectures or kernel configurations that require explicit in=
-itialization.
->=20
+> CC: andrew@lunn.ch
+> CC: maxime.chevallier@bootlin.com
+> CC: kory.maincent@bootlin.com
+> ---
+>   net/ethtool/tsinfo.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
+> index f54fe6b662b2..14bf01e3b55c 100644
+> --- a/net/ethtool/tsinfo.c
+> +++ b/net/ethtool/tsinfo.c
+> @@ -407,10 +407,8 @@ static int ethnl_tsinfo_dump_one_netdev(struct sk_buff *skb,
+>   			continue;
+>   
+>   		ehdr = ethnl_tsinfo_prepare_dump(skb, dev, reply_data, cb);
+> -		if (IS_ERR(ehdr)) {
+> -			ret = PTR_ERR(ehdr);
+> -			goto err;
+> -		}
+> +		if (IS_ERR(ehdr))
+> +			return PTR_ERR(ehdr);
+>   
+>   		reply_data->ts_info.phc_qualifier = ctx->pos_phcqualifier;
+>   		ret = ops->get_ts_info(dev, &reply_data->ts_info);
 
-Good point fixed this.
-
-> > diff --git a/drivers/net/ethernet/renesas/rswitch_main.c
-> > b/drivers/net/ethernet/renesas/rswitch_main.c
-> > --- a/drivers/net/ethernet/renesas/rswitch_main.c
-> > +++ b/drivers/net/ethernet/renesas/rswitch_main.c
-> > @@ -173,8 +173,12 @@ int rswitch_gwca_change_mode(struct
-> > rswitch_private *priv,  {
-> >  	int ret;
-> >
-> > -	if (!rswitch_agent_clock_is_enabled(priv->addr, priv->gwca.index))
-> > +	if (!rswitch_agent_clock_is_enabled(priv->addr, priv->gwca.index)) {
-> > +		spin_lock(&priv->agent_lock);
-> >  		rswitch_agent_clock_ctrl(priv->addr, priv->gwca.index, 1);
-> > +		spin_lock(&priv->agent_lock);
-> > +	}
->=20
-> [Severity: High]
-> Does this code cause an immediate deadlock?
->=20
-> Because spin_lock() is called twice consecutively without a spin_unlock()=
-, it appears the CPU will
-> spin indefinitely waiting for the lock it already holds.
-
-This is a bug. I also fixed it.
-
-Best regards,
-
-Michael
 
