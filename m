@@ -1,94 +1,88 @@
-Return-Path: <netdev+bounces-291638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HUSCg1zFWpbVAcAu9opvQ
-	(envelope-from <netdev+bounces-291638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:16:45 +0200
+	id kJJqNj5zFWpbVAcAu9opvQ
+	(envelope-from <netdev+bounces-291639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:17:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BE235D406C
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:16:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 786405D409A
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 38E9630055D7
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:16:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5F7AF3010BAA
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A72C3D891F;
-	Tue, 26 May 2026 10:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61AC3D9035;
+	Tue, 26 May 2026 10:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=aerlync.com header.i=@aerlync.com header.b="MbufjXYK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cnv5CC8A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FD63D3016
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 10:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57119231829
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 10:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779790598; cv=none; b=V53zcXM74qIyZ5FYrZ7BC2scaVt8CBF/xtucSBVhCPaPOsWcDRUXlKcwjkCv1viXfD/j2N0A7tJUSQDYI++yBxoug2yYRN8ce23GAVNj3HVixvuVE+jBOBUOpq2fBGCd/xh1k4YnoLEGUfyh4AT2EBts82/VBYD3g/WFgVDLwVw=
+	t=1779790652; cv=none; b=gLWh3kzrI1qEA0G+eueainDdEstWfPTM3q8/rE+FZgRqUX2ug6DENLgnT9BrPpbHJY40P4O7kKPXBCOXvbXHILYZ17e7JXV6sAnXy9lbLFariuN6bm5N5aAjXf2YnFMT6NeE3d7Ewj2OpU37b9//wKqK44c1TMjPTQilQrPBvs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779790598; c=relaxed/simple;
-	bh=Nh+C+Fy0FqiBHKrNXaY08YwYU34+UqfXLUWTYrNpkdk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LxSDhUq1mVjLqyQhB6UAllm5tgJaWOPtcuxQeTk0KYwO5gO2neUoyNEHPBQwrwNnUJRz8rhc7OEMDxiNgwLSX5e+hz0Zyii8fa/3bZQi4j9TI8WFRSm+ceJcTGRkUEx9Ztez4p2aquYEPjF2I21i3diLW8t0tI7AnudnekQi7ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aerlync.com; spf=pass smtp.mailfrom=aerlync.com; dkim=fail (0-bit key) header.d=aerlync.com header.i=@aerlync.com header.b=MbufjXYK reason="key not found in DNS"; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aerlync.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aerlync.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-366330b6751so8163802a91.1
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 03:16:37 -0700 (PDT)
+	s=arc-20240116; t=1779790652; c=relaxed/simple;
+	bh=6N77agkMlPlDs2FQWT5UHiMAbCGXqJ3ogGviMdt8G/c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QboAzml5ikBOEb5tVp3ATfpgtiNLv2BDTp9rsdm6X4vnmW6H5TJf+TMb9bV7kuWPn3kAUKsNERMSzCmdZaFBriK70zzg0kkejsHpyNg6I7HS0PhorILYM06u2d50J5GVE/UCXtQY0E5v9FVnzMAAfzjM+w117DvP394EpnxsL8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cnv5CC8A; arc=none smtp.client-ip=209.85.210.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-8354461da74so4726733b3a.1
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 03:17:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=aerlync.com; s=google; t=1779790597; x=1780395397; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779790651; x=1780395451; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XrZ4NvK5jrlaPy7QvhC9XeQXCUzbUpfIVsVCaVJAXRU=;
-        b=MbufjXYKrB08/BqOEE5RCssY4owMi0cOiWdNN7OjPdiTTaWqawCuC78DrHZOpQbikj
-         wFIzwXjFi2YP3BNvJ957LkNZVZE/bdWVS6se2WyLE0y0xpcln7JSIn5uxi47/zpvKnoh
-         Jtt7Ji8KmlqUMBlRzGCS6nEioaH9oa4021XxBU65NiHAoptHBTlT4ajFUm37DAUIfGrB
-         n0xtQ23tFOCfrvBQDOQhPyRmP8TgNedusvs7qnzL2eUlWXvMQnHFfy79EEwOsLAtKftX
-         pkL0/XxoOIbqxeDqtxgzE8fBtVPoSIVk77Dc8HlQ+ln1BsHGa008ftjBzo7FepyeYATn
-         2aTA==
+        bh=+uIV2cz4HzSSZVOFRjcZFH+o3S0t/SI2v9CRVV9MLk4=;
+        b=cnv5CC8AzJUPKhyPjhTqbGDU16xbyZLjMrfSp3T+5/ZIEXiSsCR5yeLfCzLVh3TKZL
+         Wkx9zrFuw65nl7nGvrDJofxMSVIaxKIrsSYMFab6nZ4Vyiwpvd6jJNNuzAf0z03Qw+zb
+         nBjK/2UzBVE5kmea7oeHEdpVr/YizQxIRfVu/BzuNXH9LAUP1U3I6QFT7AnzWpHpbRVT
+         D3K2KRN+x6BR/AvcNvcDy6LLFIWnAyOdt/cmqDe38YQ6KHBNEYwqgdWGOxw0gYSSanc8
+         f6s4zixJYYWLhzxJ/Bv83+ihsemFrOmKmM4guDpQY+F6xHzqYth3q9QabRz6Zn4VZbrO
+         79Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779790597; x=1780395397;
+        d=1e100.net; s=20251104; t=1779790651; x=1780395451;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XrZ4NvK5jrlaPy7QvhC9XeQXCUzbUpfIVsVCaVJAXRU=;
-        b=hlfFH4BGPKFxVFlA4zRJyIF13dq6hMmIMXWP+dZtzyW6Pfyu5Td6viyhbCl6cyXADG
-         19dpnHrLEU4zQMfz0fbPVONTnzMhgbSO0gz+6rEzz/nNqpd30LH87PPMx2/U0b4hT1ml
-         t219uw/rK+w6yjg9pJVQe7yXsx9cVg1G+LoEzw8iY7OO9lQZMgWjw8WYDPEhrQ8Ab+m2
-         bMhHPqB7fFuRcTcsi3vSVGBIG83oGbbFmkvbyi7f+OZfFiYBDYA7IFin26p0GSA+6VfK
-         trF2CFJbETXI2i7obYfdzVphB0VUiOhrnC1e0mXkMpnyIwzcVI4Z57rlxAljowTAG/Uk
-         RaqQ==
-X-Gm-Message-State: AOJu0YysABzk5S1ZZG/suwmTcrvcFUSQy9ipeq/3mKUOk1TJcMbFDiXI
-	pNCRHCTN6oFTSuU6OdgU/JZf8xtsBd4pyXl0c0f25MHMX1QgoTDIULUG9oP6zvUGcTm+ksmg6I6
-	Y+sq6
-X-Gm-Gg: Acq92OHmWZpDxYovTdOLpzSDt8q4bNvOVZ/FmOvIgndu3qrWlxdNU8fkublxNTYTC66
-	u+rMfYjpt/1RmYS+ZfG6KxDTN8XzIZMsKXY7rrDcbzyHoPMUaTUrGj6wTKoe/4bNIj802EmBUNj
-	4BqZbxVUEo1maLwcD7QWYzZC/LsoIwSRQIFeYwevA+9LJYqgxu+72kSJKfXpHXIdKdcoNw/PCZS
-	cEVHj0+bue3qsnrsY+wh2V9klRTzOj6FYOVZFYHC75KmGUPb3jz4ag7Vn/tjYGA8lZFt93k1Ho6
-	fB9+ZBBC/WOj4jbl3FkCmwjFWNshDMhFc9engUrMvdpBelTDUq15g6X07amHI9L7m0AaIG9/ETR
-	wAj9Om6swDKtsBi3/5LPI0X6ohZ0pIMsybm2Vsh6jhfYLf8rsOPPcWdAzg7YQFEs68TmADXfIxV
-	6DwN/en9oWhlBveA1GgWFr/vlBTzjZa+z8kXUGP4Kcrvp2nPE+Tl3Ztad50AcDATk1TEaKbw==
-X-Received: by 2002:a17:903:3bcf:b0:2ba:df8c:11d3 with SMTP id d9443c01a7336-2beb06c0336mr204209215ad.32.1779790597039;
-        Tue, 26 May 2026 03:16:37 -0700 (PDT)
-Received: from manjaro ([103.186.230.13])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56bc46esm127812265ad.25.2026.05.26.03.16.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 03:16:36 -0700 (PDT)
-From: Sayooj K Karun <sayooj@aerlync.com>
-To: netdev@vger.kernel.org
-Cc: dsahern@kernel.org,
-	idosch@nvidia.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sayooj K Karun <sayooj@aerlync.com>
-Subject: [PATCH] net/ipv6: icmp: fix is_ineligible() to block errors for Redirect packets
-Date: Tue, 26 May 2026 15:46:22 +0530
-Message-ID: <20260526101622.38536-1-sayooj@aerlync.com>
-X-Mailer: git-send-email 2.53.0
+        bh=+uIV2cz4HzSSZVOFRjcZFH+o3S0t/SI2v9CRVV9MLk4=;
+        b=iiHQY9BJFtXob3nE0K7qtlI95Fajb4sjKV2no+1kS6k6CkHcJysG3YA4/MNSKE0P35
+         vWUI0a2uH9I1vdlqJ50zLTmgBDIDuU8rsq3Mhhy0i7IbC7xhvI+iL811vt70e0v00K2e
+         3pj3ZYV/gbhTx68vfR/RWF9I47OduNpM2ZaAT+W6W5pCTbsGxeV+n+H1giZ0IHhL6E/1
+         DttAG8ZxZ3phazFngedbcbP7FWTG04gRYtRCAaCx+d9Yqo2pbrsI1+99qx92sSCDBZyd
+         8FzKbW7q8SsTz41VKX1qkrXP8sBkI5biJEBeyAJudzj6yH1I2bTqIm6SPGnzXZwL4s1q
+         hgrw==
+X-Gm-Message-State: AOJu0Yx2R6lU+tBeYNMO5Jg6wVZ/UciAhX/t+YbMKYEstMecVP2ebfyF
+	yk89EjlXOJ4vVsQkpJSw2BFj9usnf2xLc6VPfSE/bF0bKe3H1PyCTq0z
+X-Gm-Gg: Acq92OHE+3Y9URyCg+sYhXRBott0jR0n7phoV1dDF1dQ7f9LREwVtNLeCf01ajsojbh
+	b5MUiu8xUY7NkVEfMGLPMtSjqkD5Z6pYUZm7Tj02RKP5JRsLHqQr2NAcYe37506CvXbVkjE3rpx
+	5umxNtpoY3XFXhZhkQRok3M3xj34LUkgpkQl8hKh09qZaL1p3XJvkK0IadVnCfFAGcswhkRXyH3
+	gKCRUdOk4YuWiirVyJrOAtu6UV1hxOyHaQ4KSN3H6LKg8aH/WelzIDH/c3+c87pIFeObZzvP3qP
+	kJp5X25C/ky5d7jmd0cMQ4SQV2HG6Gakke7aBTrsoqWVG+XBBlodSUwxQbdrOmxVNLkAL5URwZ6
+	p1qq1s99ve1J61iRQZrrpw3tr9xsBaABuPDc+ixOZanztzpjHp8HE8unSV0y8OHkGqeYveghS66
+	GF4xp+6YOVpbIVkP8GSj59wd0LLdQliig6f1vw5yeHQzthWOxus/RaYMA4FiQI
+X-Received: by 2002:a05:6a00:2e1f:b0:82f:5c3f:94c6 with SMTP id d2e1a72fcca58-8415f5a60f1mr16937977b3a.28.1779790650578;
+        Tue, 26 May 2026 03:17:30 -0700 (PDT)
+Received: from KIPREYXIAO-MC2.tencent.com ([43.132.141.25])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84164e9e635sm13333206b3a.38.2026.05.26.03.17.28
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 26 May 2026 03:17:29 -0700 (PDT)
+From: Zhenghang Xiao <kipreyyy@gmail.com>
+To: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	Zhenghang Xiao <kipreyyy@gmail.com>
+Subject: [PATCH xfrm] xfrm: vti: hold device reference for tunnel pointer stored in skb cb
+Date: Tue, 26 May 2026 18:17:24 +0800
+Message-ID: <20260526101724.69508-1-kipreyyy@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,63 +90,152 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.14 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[aerlync.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[aerlync.com:~];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-291638-lists,netdev=lfdr.de];
-	R_DKIM_PERMFAIL(0.00)[aerlync.com:s=google];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-291639-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sayooj@aerlync.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kipreyyy@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.987];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 2BE235D406C
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 786405D409A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-RFC 4443 section 2.4(e.2) mandates that an ICMPv6 error message MUST NOT
-be originated in response to an ICMPv6 Redirect message (type 137).
+vti_input() and vti6_input_proto() stash a tunnel device pointer in
+XFRM_TUNNEL_SKB_CB(skb)->tunnel without taking a device reference.
+When xfrm processes the packet asynchronously (hardware crypto or
+pcrypt workqueue), the completion callback vti_rcv_cb() / vti6_rcv_cb()
+dereferences this pointer from workqueue context. If the tunnel is
+destroyed between stash and callback, the pointer references freed memory.
 
-Add check for NDISC_REDIRECT (137) so that redirect packets become
-ineligible and error packets are not generated for Redirect messages.
+Add dev_hold() when stashing the tunnel pointer and dev_put() in the
+receive callbacks after use, matching the existing dev_hold(skb->dev)
+pattern in xfrm_input() for the physical ingress device.
 
-Signed-off-by: Sayooj K Karun <sayooj@aerlync.com>
+Fixes: df3893c176e9 ("vti: Update the ipv4 side to use it's own receive hook.")
+Signed-off-by: Zhenghang Xiao <kipreyyy@gmail.com>
 ---
- net/ipv6/icmp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/ipv4/ip_vti.c  |  8 +++++++-
+ net/ipv6/ip6_vti.c | 10 ++++++++--
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-index efb23807a026..3fdb3a97dd8e 100644
---- a/net/ipv6/icmp.c
-+++ b/net/ipv6/icmp.c
-@@ -157,7 +157,8 @@ static bool is_ineligible(const struct sk_buff *skb)
- 		 */
- 		if (!tp && frag_off != 0)
- 			return false;
--		else if (!tp || !(*tp & ICMPV6_INFOMSG_MASK))
-+		else if (!tp || !(*tp & ICMPV6_INFOMSG_MASK) ||
-+			 *tp == NDISC_REDIRECT)
- 			return true;
+diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
+index 95b6bb78fcd2..3be298c5a80c 100644
+--- a/net/ipv4/ip_vti.c
++++ b/net/ipv4/ip_vti.c
+@@ -62,6 +62,7 @@ static int vti_input(struct sk_buff *skb, int nexthdr, __be32 spi,
+ 			goto drop;
+ 
+ 		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4 = tunnel;
++		dev_hold(tunnel->dev);
+ 
+ 		if (update_skb_dev)
+ 			skb->dev = tunnel->dev;
+@@ -112,6 +113,7 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
+ 	if (err) {
+ 		DEV_STATS_INC(dev, rx_errors);
+ 		DEV_STATS_INC(dev, rx_dropped);
++		dev_put(dev);
+ 
+ 		return 0;
  	}
- 	return false;
+@@ -125,6 +127,7 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
+ 		if (inner_mode == NULL) {
+ 			XFRM_INC_STATS(dev_net(skb->dev),
+ 				       LINUX_MIB_XFRMINSTATEMODEERROR);
++			dev_put(dev);
+ 			return -EINVAL;
+ 		}
+ 	}
+@@ -135,12 +138,15 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
+ 	ret = xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family);
+ 	skb->mark = orig_mark;
+ 
+-	if (!ret)
++	if (!ret) {
++		dev_put(dev);
+ 		return -EPERM;
++	}
+ 
+ 	skb_scrub_packet(skb, !net_eq(tunnel->net, dev_net(skb->dev)));
+ 	skb->dev = dev;
+ 	dev_sw_netstats_rx_add(dev, skb->len);
++	dev_put(dev);
+ 
+ 	return 0;
+ }
+diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+index ad5290be4dd6..367a3325cf9c 100644
+--- a/net/ipv6/ip6_vti.c
++++ b/net/ipv6/ip6_vti.c
+@@ -317,9 +317,10 @@ static int vti6_input_proto(struct sk_buff *skb, int nexthdr, __be32 spi,
+ 			goto discard;
+ 		}
+ 
++		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 = t;
++		dev_hold(t->dev);
+ 		rcu_read_unlock();
+ 
+-		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 = t;
+ 		XFRM_SPI_SKB_CB(skb)->family = AF_INET6;
+ 		XFRM_SPI_SKB_CB(skb)->daddroff = offsetof(struct ipv6hdr, daddr);
+ 		return xfrm_input(skb, nexthdr, spi, encap_type);
+@@ -356,6 +357,7 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
+ 	if (err) {
+ 		DEV_STATS_INC(dev, rx_errors);
+ 		DEV_STATS_INC(dev, rx_dropped);
++		dev_put(dev);
+ 
+ 		return 0;
+ 	}
+@@ -369,6 +371,7 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
+ 		if (inner_mode == NULL) {
+ 			XFRM_INC_STATS(dev_net(skb->dev),
+ 				       LINUX_MIB_XFRMINSTATEMODEERROR);
++			dev_put(dev);
+ 			return -EINVAL;
+ 		}
+ 	}
+@@ -379,12 +382,15 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
+ 	ret = xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family);
+ 	skb->mark = orig_mark;
+ 
+-	if (!ret)
++	if (!ret) {
++		dev_put(dev);
+ 		return -EPERM;
++	}
+ 
+ 	skb_scrub_packet(skb, !net_eq(t->net, dev_net(skb->dev)));
+ 	skb->dev = dev;
+ 	dev_sw_netstats_rx_add(dev, skb->len);
++	dev_put(dev);
+ 
+ 	return 0;
+ }
 -- 
-2.53.0
+2.50.1 (Apple Git-155)
 
 
