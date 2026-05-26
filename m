@@ -1,185 +1,153 @@
-Return-Path: <netdev+bounces-291564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SA9PO2hOFWpMUQcAu9opvQ
-	(envelope-from <netdev+bounces-291564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:40:24 +0200
+	id AO7wAtNOFWpMUQcAu9opvQ
+	(envelope-from <netdev+bounces-291565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:42:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE8E95D1CB3
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:40:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 886B15D1D25
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:42:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EE5C2300EC43
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 07:39:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D82FE3008243
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 07:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8F23CC7CE;
-	Tue, 26 May 2026 07:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821783CC306;
+	Tue, 26 May 2026 07:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="JtjTg5IY"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="NKvgWCRK"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011ED3CC7C7
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C492D8382
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779781168; cv=none; b=jz4FvpwP9Bs5Ai/tDe1MKCKtgW15bT5Hu7JELFUQyURV66PxK7BvGnRKoQwh72fQBswmpxNkqqt89Y81jJLdqz0ZE+uQ68JHdqTNoKiHi5S3dPJl4M0P1iZRjsqoj3iTtXKMK6kWD0bwPbkhrfBjDidyKAWRnMXSk/SK4gBMvms=
+	t=1779781326; cv=none; b=iKnGyZ82iwyxCMHb1gOlhR8/8Q8mrnCV03BzuMucS4FTMvH6vl72JGL77IVQ6UckiJpyANoEEsyiUshEdx7TcwiOiP7Sc+e+/BYvQzOsTado2ych7cSqCaJD8JYWe6ehLZWsl6NwmxDURbRwwoee7i+jJ8IWFhdDaTCLpNR1cDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779781168; c=relaxed/simple;
-	bh=QXUB4koQJ6aAx9nBR/nI3YHGS5rYPl82ofS/Ingrzas=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bwlOifVdRpaG+2Vjm7eFXAt0ArDWkWh1GRlLvfOS6K9PYSGyNTejZZYXaWxBZ421NsCT+VdBwNZx7tFyjwNC2Oi5EjuTP2PXOLmoxGgpBBeLgifQaKCz3Abcy7oqjgi6eMHL41i2vQDov5Kufa1nPKaaflplX6ViwLLGJI5i7YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=JtjTg5IY; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-Received: by dvalin.narfation.org (Postfix) id A520C1FE2A;
-	Tue, 26 May 2026 07:30:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1779780610;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NvBuL1voqSEN0oLWaKKw+NjOufd3aAtSPxxpVUGOPIQ=;
-	b=JtjTg5IY5niVsR9IQBrb0/h/cOAmb0mBqCv0HPtFh+KU4iuBaSingsT5CFBe3Zr0EqjbJ3
-	1BqyK3Tmmn6iuUkfiEMxzSTNuXZ/amCyAeMiiYu8CAsEX9WI1VVu1dvu/kdjOqgpulq+8Z
-	sjY1NS2arWDN7DZRWtwjRArZi5XOBno=
-From: Sven Eckelmann <sven@narfation.org>
-To: b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- Soowan Park <swan2718@snu.ac.kr>
-Cc: marek.lindner@mailbox.org, sw@simonwunderlich.de, antonio@mandelbit.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, Soowan Park <swan2718@snu.ac.kr>, Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH] batman-adv: fix DAT purge use-after-free on teardown
-Date: Tue, 26 May 2026 09:30:07 +0200
-Message-ID: <14018241.uLZWGnKmhe@ripper>
-In-Reply-To: <20260526064835.2233822-1-swan2718@snu.ac.kr>
-References: <20260526064835.2233822-1-swan2718@snu.ac.kr>
+	s=arc-20240116; t=1779781326; c=relaxed/simple;
+	bh=E/qFLtmVUNW34+Ixf++D++sSrm9KXhLgjM3d4kgyiZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=feHjUeiJtGJFwrcnW11Goi5CL1Ru6QZy/v9/c8Cnolyz4OUsjR2vEHAh0Bf36PqLnJoYP7y6TmDCfUtYnZA4fFbtDDoQC+Aadca/JW/iLqfzHapAvieC0C/L6hcb3eNB0m9r1CuAGf41Wg6IXOQnDjUrOesIHIQKH66azlw+gyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=NKvgWCRK; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-44985f4ab0fso5668587f8f.0
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 00:42:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1779781320; x=1780386120; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E/qFLtmVUNW34+Ixf++D++sSrm9KXhLgjM3d4kgyiZI=;
+        b=NKvgWCRKQAxei3XOKqtyPqJk4M3SHlJ4ifdvYXIiwEnQ5aXiynfRwcz/nSWDaopK3l
+         ZEMPiaD3qWuu0edhQkZ3vVixgGfySaFwv9jmPkLfcOqcNePhiVj1n6IavLhPh8Ro6OSL
+         Fbc73d+w0KDbvdkxjN2eAiePbpEpeCLH+NYf6OuBHKlOwBrjQ9z1RwRcS9Qr/FlO3oGu
+         bfVYvC/V5QgLXZTgmVOrMhg5H73tsSqvJQlHkfZBlkcX068aCzp7hXoBe0IMoE76dRHE
+         T9NMKheRAOvBFZmmWKRyw/P7H2HJ+IJpQoJU2ZTOhVL4DFZpiuCov+OzZ/xo2pGAiTJ1
+         8CTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779781320; x=1780386120;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E/qFLtmVUNW34+Ixf++D++sSrm9KXhLgjM3d4kgyiZI=;
+        b=RLregIFWrxES1ih1MtQi8r3NYfZb7FQq8aDcCCRTqklpQGJRYmp5rQxyeOqaA07RWt
+         CeFMljz4ikbkq7eCVgS+3PhmE9GHy0HN+HCIeaVRl0/bimJhzkWHd16X2vycbai+0sEf
+         tBO8T31LqUVB3bK1sbRiwi/0R6AaUpix4299j6XBD7KqacEoOQQeQ6QdbNBXnxN6qRcM
+         4GMqXrURCAa0XHbMs1CeZNbl7+pG/nauz0ToxxpTR+eG2t6TOPnVY7EqI0GvKvNEcsR8
+         fnkGbnTNV/BTeK5GzTf3IzLfcat50FGO/+lZA8CcaM9a3HT6S/SCDwBL8MlxdkqHUWcr
+         oEpg==
+X-Forwarded-Encrypted: i=1; AFNElJ9LTeVLLbe+fQm+kFi6Z3t6HN9cAwn5Vfcbft9bNZEafLtl0Fxv0xHS3sUza8IXnc2JUekBWcQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKqJhw2BhDCyas98WuOEUdboCiAgngbd1xu49GPl88lHJHj/ad
+	F90L9FiE0rg4iA8BGJJdbPkU7fKu6l0j1kFVUlVj8dv0yvp9ecVo8wWKDp99whNCJOc=
+X-Gm-Gg: Acq92OHGNA1GFuO0AiDYg680kQZUlkRhb6XETKpvLQwrRGWstbjqAySLU+px7aCeqqm
+	wrUrbgCZOoI/PDm/gIvFlNaJxIAStk0rzdCbxnaLquVE5eVekpE0ZksIqlBrcQmCprR+ZpLkl1C
+	LcVi8dMXWCyrl2NMww5Y2rt4+WGmcZxYq6o41uXYXTiksa/boPbVJf21JzboPICAVKHSX4JbqGk
+	ZvDo2qqhPoG9hYTdhvCepsKdTsgy0Pgvhpr1/JvF2D+w/t1uoeBH1ZfkE/hhPqQCTqWMmnC1Tlk
+	1eP8oJkKhUohlc/nc4k+w7GUoZDD9GCX3A6AvIcPINdKML1g37zHvzAGz0R/mWs1vf8oCGLDyxg
+	xRBVTyE87P61OGQxUPGpvKNA728ekkIEB2Y/G8+4ZJDx7VCE/pXC2WGQb7wsVqFTlv+wy9QSFNL
+	RTZycNddVQtiENbkOjHuSXlHfw7f9z5G+U3PkE31bwu4E=
+X-Received: by 2002:a05:600c:c83:b0:48e:60a3:220a with SMTP id 5b1f17b1804b1-49042250219mr286320275e9.0.1779781320072;
+        Tue, 26 May 2026 00:42:00 -0700 (PDT)
+Received: from localhost ([140.209.217.212])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6d5caeesm34281078f8f.29.2026.05.26.00.41.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2026 00:41:59 -0700 (PDT)
+Date: Tue, 26 May 2026 09:41:56 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, 
+	"Borislav Petkov (AMD)" <bp@alien8.de>, Andrew Morton <akpm@linux-foundation.org>, 
+	Randy Dunlap <rdunlap@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Petr Mladek <pmladek@suse.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, 
+	Tejun Heo <tj@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	Feng Tang <feng.tang@linux.alibaba.com>, Christian Brauner <brauner@kernel.org>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, 
+	Li RongQing <lirongqing@baidu.com>, Eric Biggers <ebiggers@kernel.org>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, Gal Pressman <gal@nvidia.com>, 
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next 0/3] devlink: Add boot-time eswitch mode defaults
+Message-ID: <ahVOlJdfgkRa5z0Y@FV6GYCPJ69>
+References: <20260521072434.362624-1-tariqt@nvidia.com>
+ <20260525124256.650fbd9d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart3046581.e9J7NaK4W3";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260525124256.650fbd9d@kernel.org>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[narfation.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[narfation.org:s=20121];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291564-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TAGGED_FROM(0.00)[bounces-291565-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[36];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sven@narfation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[narfation.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.990];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,narfation.org:dkim]
-X-Rspamd-Queue-Id: EE8E95D1CB3
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,resnulli-us.20251104.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 886B15D1D25
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---nextPart3046581.e9J7NaK4W3
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Date: Tue, 26 May 2026 09:30:07 +0200
-Message-ID: <14018241.uLZWGnKmhe@ripper>
-In-Reply-To: <20260526064835.2233822-1-swan2718@snu.ac.kr>
-References: <20260526064835.2233822-1-swan2718@snu.ac.kr>
-MIME-Version: 1.0
+Mon, May 25, 2026 at 09:42:56PM +0200, kuba@kernel.org wrote:
+>On Thu, 21 May 2026 10:24:31 +0300 Tariq Toukan wrote:
+>> This series adds a devlink_eswitch_mode= kernel command line parameter
+>> for applying a default devlink eswitch mode during device
+>> initialization.
+>
+>Jiri? Are you okay with this?
 
-On Tuesday, 26 May 2026 08:48:35 CEST Soowan Park wrote:
-> batadv_dat_purge() is a periodic delayed work that re-queues itself via
-> batadv_dat_start_timer() at the end of each run. When the mesh interface
-> is torn down, batadv_dat_free() calls cancel_delayed_work_sync() to stop
-> the purge work before freeing the DAT hash table.
->=20
-> However, cancel_delayed_work_sync() leaves the work in an enabled state.
-> If the purge work is currently executing and re-queues itself before
-> cancel_delayed_work_sync() internally marks it for cancellation, the
-> newly queued work escapes cancellation. This re-queued work then fires
-> after batadv_dat_hash_free() has already freed the hash table but before
-> the pointer is set to NULL, causing __batadv_dat_purge() to operate on a
-> dangling pointer that passes the NULL check, and spin indefinitely on a
-> spinlock in freed memory.
-
-
-You are talking about a re-queue by batadv_dat_start_timer(). This only=20
-happens when the DAT gets initialized or via the worker (batadv_dat_purge)=
-=20
-itself. How can the worker which is cancelled (with sync) re-queue itself?=
-=20
-Isn't this breaking a guarantee of cancel_delayed_work_sync() or did I=20
-misunderstand this part of the documentation?
-
-
-"This is cancel_work_sync() for delayed works." [1]
-
-"Cancel work and wait for its execution to finish. This function can be use=
-d=20
-even if the work re-queues itself or migrates to another workqueue. On retu=
-rn=20
-from this function, work is guaranteed to be not pending or executing on an=
-y=20
-CPU as long as there aren=E2=80=99t racing enqueues." [2]
-
-(the part "This function can be used even if the work re-queues itself" is
-the important part here).
-
-
-> Replace cancel_delayed_work_sync() with disable_delayed_work_sync(),
-> which additionally disables the work so that any concurrent
-> queue_delayed_work() call from the running batadv_dat_purge() is
-> silently rejected. This guarantees no re-queued work can fire after
-> disable_delayed_work_sync() returns.
-
-I have no problem with using "disabled_*" everywhere (I even have a pending=
-=20
-patchset to use it - just to avoid problems with code changes in the future=
-).=20
-But since this is a fix which I don't get in the moment, I would like to=20
-understand the problem you are describing better before applying it.
-
-Regards,
-	Sven
-
-
-[1] https://www.kernel.org/doc/html/v7.0/core-api/workqueue.html#c.cancel_d=
-elayed_work_sync
-[2] https://www.kernel.org/doc/html/v7.0/core-api/workqueue.html#c.cancel_w=
-ork_sync
---nextPart3046581.e9J7NaK4W3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCahVL/wAKCRBND3cr0xT1
-y38WAPwLlc/180rzpcmO7N4qmYg2RQ8w5oxAKnvdfgyknBNaKwEA8cOumQjNSrey
-d3jt9GblIoJWiBGN3V2wgfsHvDwVWAI=
-=KaNu
------END PGP SIGNATURE-----
-
---nextPart3046581.e9J7NaK4W3--
-
-
-
+In general, yes. Couple of details perhaps. Let me check it more deep.
 
