@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-291797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291798-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ZyRSAzjGFWqMbAcAu9opvQ
-	(envelope-from <netdev+bounces-291797-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:11:36 +0200
+	id 8HOlNzfGFWqxawcAu9opvQ
+	(envelope-from <netdev+bounces-291798-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:11:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE215D9673
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BD85D9672
 	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D83D1306BE8C
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:02:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2C6330C92AD
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44193AFB03;
-	Tue, 26 May 2026 16:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEA43AF67F;
+	Tue, 26 May 2026 16:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d64m0iwx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iR53INpP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F5D3AE6E9;
-	Tue, 26 May 2026 16:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4549F3AEB35;
+	Tue, 26 May 2026 16:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779811333; cv=none; b=lggwRjxVA83aAJ714bZow9F153Xsso7HHBJnyec/ppgs8CjRHNVyAclhj+n+nLKaKocuL6L3IpaleuCiZnnThyODKbOPk6KZ1c1IrpCoHm+rrtLbZYlNl3jqXnzcGoTtwxw3P97O+5eHFNJ0vRYrELG8Ax22MMaER5R4cHjWIEo=
+	t=1779811334; cv=none; b=Dt1U2jCGfYC0Iatam+nHFSWwn0fwHLJWQEDlUsidIvfhyfILs2hfINoAX/9/zI8dENTEihTbJpLIeV+67zZ1zgA4m0eryGUvvMGiYzOiQwa0PcdBe6bqNN32vlMqG7K5wvORKsu+vCRI4B/e5b5kephWW/3nMYarXZczZdKAqFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779811333; c=relaxed/simple;
-	bh=YQPSNgU+71Te1YxKqrqlXJjJT4/0JscaUKGNsvsT6eU=;
+	s=arc-20240116; t=1779811334; c=relaxed/simple;
+	bh=ARXfsjvpbWr3CjKrwxt9Lji4HOVeeGtUFplvuYKqyWY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GYIAKC7opscJWCnaIKUx8qUAULQ+g+FRe7Ydel2L8bPcu3hFGIsKjHpEO83HDKvuRhGXKZ+caZ3FZmbQUq84nOerquYqhujXSowxaUruUj9DUvJ/9ELjP9tHhZmZT55/0ftofq/tSDkNE1k6MHuc8hO55ATIV/rVfi6OMKLRNz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d64m0iwx; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD00F1F00A3E;
-	Tue, 26 May 2026 16:02:11 +0000 (UTC)
+	 MIME-Version; b=T3sqgQPfYVfERr2xBw7c/WyBhJhsUjebfdknQ/j1wmzT9dWXSOSFffwMeYiWuXFIu0G89OKbwWhBZs7XD953dCbZAF6nlzGGpwNuxKLYRjZVKjRpz0XaF7WGuQJk+puMc0QkU2dUkPFt4ouciEZCiHQfe1S6dkMbVHXVMq8viJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iR53INpP; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9422F1F00A3A;
+	Tue, 26 May 2026 16:02:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779811332;
-	bh=+ciTda9JPKyJSdZUoLUl6m4Ql8P2BNxw9mPnBa35ydI=;
+	s=k20260515; t=1779811333;
+	bh=Eqi9ELBAbYp2SpC0lQWFiyGLnq7pA7MCAdzWH1HoE7Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=d64m0iwxfsNScDASIvZukmROUhrgSzY9WEyHmk8F5fH6D96TmCI+zi4/xtP9gTg55
-	 tf1FKJi0ofIbiNqlMcC49yP9ew9d7ekGh6L+QvVBG5txgKKyBy3U5J0NzXc3dKNGz8
-	 jdd3GXuysEFDuOkbl2YV13YaoG4i0LPVmRJnS5vvkIMrDVagYg82VON6iNq7KuMxId
-	 5RIgiFtQdhq7dRd7Lc2om8oWZ6nHZglbWu6kKgiX+h0iJTDwUnwCBdJmquj9DpJpIK
-	 4Bm+ZRmVxVpJ5j789VfJoUicmFpaZUaspD1dYA3pwbGdnEF4x+Me6tF1prZZD0ZHbH
-	 rRbjnO8GlTxZg==
+	b=iR53INpPb7jJHGBV0HhUkNKSIjOUYVNY6iDAggU470kauMnnE1U9dB43QpeHu3b4Z
+	 1ClOP/eyjcs7ohUv3LQsF9g4x/T5RSFITVlcobtxh2yxiP3FaMPJntm5O/EmTBw351
+	 Ix/Z2ud0qJSBNWxrBhcsv1rdH5UoyTxb+M0JwfYXwuujCmXh4Ebp1+7/sFqSoc5u0t
+	 KvtGufuhDOpVNjf1ijl6pL0JTRYmi0ap/vxtr2H00XEVNSTFg0aFL8uV03508r2OhE
+	 UlC3ITKdnFJCqGMgGt+8bx/si2n1MHMFHgaymHK5t5InoJ9I68571RAb77jlmPIAov
+	 EsttZL0Wyoa+A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: netdev@vger.kernel.org,
 	jesse.brandeburg@intel.com,
 	linux-doc@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 09/10] docs: net: render the checksum comment in checksum-offloads.rst
-Date: Tue, 26 May 2026 09:01:50 -0700
-Message-ID: <20260526160151.2793354-10-kuba@kernel.org>
+Subject: [PATCH net-next 10/10] docs: net: fix minor issues with segmentation offloads
+Date: Tue, 26 May 2026 09:01:51 -0700
+Message-ID: <20260526160151.2793354-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260526160151.2793354-1-kuba@kernel.org>
 References: <20260526160151.2793354-1-kuba@kernel.org>
@@ -79,7 +79,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291797-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291798-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,nxp.com,gmail.com,intel.com];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -98,85 +98,104 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: CEE215D9673
+X-Rspamd-Queue-Id: 69BD85D9672
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-checksum-offloads.rst seems like a better place to render
-the checksum comment than skbuff.rst.
+Update the segmentation offload documentation to match current GSO types:
 
-Remove the stale references to sections in that comment
-(it no longer has A, B, C, D, E sections).
+- clarify csum_start for encapsulated TSO
+- document TCP AccECN GSO and NETIF_F_GSO_ACCECN
+- distinguish legacy UFO from UDP L4 GSO
+- add ESP and fraglist GSO entries
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/networking/checksum-offloads.rst | 18 ++++++++++--------
- Documentation/networking/skbuff.rst            |  6 ------
- 2 files changed, 10 insertions(+), 14 deletions(-)
+ .../networking/segmentation-offloads.rst      | 37 ++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/networking/checksum-offloads.rst b/Documentation/networking/checksum-offloads.rst
-index d838fe5c1606..d4ded890011b 100644
---- a/Documentation/networking/checksum-offloads.rst
-+++ b/Documentation/networking/checksum-offloads.rst
-@@ -25,10 +25,8 @@ take advantage of checksum offload capabilities of various NICs.
- TX Checksum Offload
- ===================
+diff --git a/Documentation/networking/segmentation-offloads.rst b/Documentation/networking/segmentation-offloads.rst
+index 72f69b22b28c..25a8b7eca847 100644
+--- a/Documentation/networking/segmentation-offloads.rst
++++ b/Documentation/networking/segmentation-offloads.rst
+@@ -14,10 +14,13 @@ to take advantage of segmentation offload capabilities of various NICs.
+ The following technologies are described:
+  * TCP Segmentation Offload - TSO
+  * UDP Fragmentation Offload - UFO
++ * UDP Segmentation Offload - USO
+  * IPIP, SIT, GRE, and UDP Tunnel Offloads
+  * Generic Segmentation Offload - GSO
+  * Generic Receive Offload - GRO
+  * Partial Generic Segmentation Offload - GSO_PARTIAL
++ * ESP Segmentation Offload
++ * Fraglist Generic Segmentation Offload - GSO_FRAGLIST
+  * SCTP acceleration with GSO - GSO_BY_FRAGS
  
--The interface for offloading a transmit checksum to a device is explained in
--detail in comments near the top of include/linux/skbuff.h.
--
--In brief, it allows to request the device fill in a single ones-complement
-+In brief, Tx checksum offload allows to request the device fill in a single
-+ones-complement
- checksum defined by the sk_buff fields skb->csum_start and skb->csum_offset.
- The device should compute the 16-bit ones-complement checksum (i.e. the
- 'IP-style' checksum) from csum_start to the end of the packet, and fill in the
-@@ -47,8 +45,7 @@ mechanism such as LCO or RCO.
- SCTP CRC32c can also be offloaded using this interface, by means of filling
- skb->csum_start and skb->csum_offset as described above, setting
- skb->csum_not_inet, and advertising NETIF_F_SCTP_CRC. Drivers must not treat
--ordinary IP checksum offload as SCTP CRC32c support. See the skbuff.h comment
--(section 'D') for more details.
-+ordinary IP checksum offload as SCTP CRC32c support.
  
- No offloading of the IP header checksum is performed; it is always done in
- software.  This is OK because when we build the IP header, we obviously have it
-@@ -56,8 +53,7 @@ in cache, so summing it isn't expensive.  It's also rather short.
+@@ -38,7 +41,8 @@ In order to support TCP segmentation offload it is necessary to populate
+ the network and transport header offsets of the skbuff so that the device
+ drivers will be able determine the offsets of the IP or IPv6 header and the
+ TCP header.  In addition as CHECKSUM_PARTIAL is required csum_start should
+-also point to the TCP header of the packet.
++also point to the TCP header of the packet, or to the inner transport header
++for encapsulated TSO.
  
- The requirements for GSO are more complicated, because when segmenting an
- encapsulated packet both the inner and outer checksums may need to be edited or
--recomputed for each resulting segment.  See the skbuff.h comment (section 'E')
--for more details.
-+recomputed for each resulting segment.
+ For IPv4 segmentation we support one of two types in terms of the IP ID.
+ The default behavior is to increment the IP ID with every segment.  If the
+@@ -57,6 +61,10 @@ DF bit is not set on the outer header, in which case the device driver must
+ guarantee that the IP ID field is incremented in the outer header with every
+ segment.
  
- A driver declares its offload capabilities in netdev->hw_features; see
- Documentation/networking/netdev-features.rst for more. NETIF_F_IP_CSUM and
-@@ -154,3 +150,9 @@ or left at ``CHECKSUM_NONE``. Drivers **must not discard** packets with
- bad TCP/UDP checksum and must not configure the device to drop them.
- Checksum validation is relatively inexpensive and having bad packets reflected
- in SNMP counters is crucial for network monitoring.
++SKB_GSO_TCP_ACCECN is a modifier used with TCP segmentation offload for
++AccECN packets where the CWR bit must not be cleared during segmentation.
++Devices advertise support for this using NETIF_F_GSO_ACCECN.
 +
-+skb checksum documentation
-+==========================
-+
-+.. kernel-doc:: include/linux/skbuff.h
-+   :doc: skb checksums
-diff --git a/Documentation/networking/skbuff.rst b/Documentation/networking/skbuff.rst
-index 5b74275a73a3..94681523e345 100644
---- a/Documentation/networking/skbuff.rst
-+++ b/Documentation/networking/skbuff.rst
-@@ -29,9 +29,3 @@ dataref and headerless skbs
  
- .. kernel-doc:: include/linux/skbuff.h
-    :doc: dataref and headerless skbs
--
--Checksum information
----------------------
--
--.. kernel-doc:: include/linux/skbuff.h
--   :doc: skb checksums
+ UDP Fragmentation Offload
+ =========================
+@@ -71,6 +79,16 @@ still receive them from tuntap and similar devices. Offload of UDP-based
+ tunnel protocols is still supported.
+ 
+ 
++UDP Segmentation Offload
++========================
++
++UDP segmentation offload allows a device to segment a large UDP packet into
++multiple UDP datagrams.  Unlike UFO, these are not IP fragments.  The payload
++size of each datagram is specified in skb_shinfo()->gso_size and the GSO type
++is SKB_GSO_UDP_L4.  Devices advertise support for this using
++NETIF_F_GSO_UDP_L4.
++
++
+ IPIP, SIT, GRE, UDP Tunnel, and Remote Checksum Offloads
+ ========================================================
+ 
+@@ -154,6 +172,23 @@ that the IPv4 ID field is incremented in the case that a given header does
+ not have the DF bit set.
+ 
+ 
++ESP Segmentation Offload
++========================
++
++ESP segmentation offload uses SKB_GSO_ESP to mark packets that require
++IPsec ESP segmentation.  This type is set by the XFRM output path for GSO
++packets handled by ESP hardware offload.
++
++
++Fraglist Generic Segmentation Offload
++=====================================
++
++Fraglist GSO uses SKB_GSO_FRAGLIST to mark packets whose segments are
++already arranged as a list of skbs.  The segmentation path splits the skb
++based on that list rather than by creating segments of skb_shinfo()->gso_size
++bytes from the linear and page-fragment data.
++
++
+ SCTP acceleration with GSO
+ ===========================
+ 
 -- 
 2.54.0
 
