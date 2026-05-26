@@ -1,225 +1,223 @@
-Return-Path: <netdev+bounces-291549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291556-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIWxBbxBFWrJTwcAu9opvQ
-	(envelope-from <netdev+bounces-291549-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:46:20 +0200
+	id qAdONCZDFWoOUAcAu9opvQ
+	(envelope-from <netdev+bounces-291556-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:52:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A735D14AE
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:46:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3ECD5D156B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D6D8303FAC5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:44:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D1DDF3008FEB
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9B33C3798;
-	Tue, 26 May 2026 06:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFF33C4141;
+	Tue, 26 May 2026 06:52:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i0h5xWi6"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="qIFyhMsp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D515E3C197F
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 06:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4E23C37AC;
+	Tue, 26 May 2026 06:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779777888; cv=none; b=munwPtVgx98L1xYnglkW7iOfy6l2o9GdPJE+gBvZHpd/8cw9NFJC/BatSqn5Q1nZwEtyAhsZuCw+VctqblvJErUxDG2IB5JGi9eBKllOhVF3lsXNACYK2qZ9789CNbOQVOyV+y5gnDhciKFZLVE/AdQXmvdRasbwfqw7vHUlu+0=
+	t=1779778330; cv=none; b=OektnI777rxA13pGqY9bEBBx6SDTJEMDLqZwIF+mBq/4neFlNhMUUitLrDkynKXqawneTgj36v0+8FEqbtHYdcjrIIkMAMfSmD0eOoI8ot1nZOTEMBARl9CwasryMjgHWRgGMgHhNv5lekoj1oppaeI0j9NgbC0F8i4QuHDeBmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779777888; c=relaxed/simple;
-	bh=cLgEFYb9vPxgOhRC0ZF0n+Bf95kheC+pGLWemGnfodE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HOesS0ucj/xXlBQzYWRMJR+dk7S2ZLyiDd+ME3FkFz2kL9lrk26ux1pdiEOHuWcOdOBD6kAkujlbjVqZpMd/wVUu05GRxT1CGHEgvIo8rM+cN4E4egZi95iU+SUsInuWOiB0bcImhzDjUkfLi9KAkrhacH9LG0VGkh63aqLp0Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i0h5xWi6; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d92bc603-e345-4dee-9ae9-6ad45e4e6642@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779777874;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DeEV2RRWQsIvQLf46WVN6yblZQZCu/TNWjyKT0rKgO4=;
-	b=i0h5xWi64e1mCrdbRhD8PWRHV36oUuAj4/VLRHWQReoudCWnkWInwKKpUcV7qG/JaiPp8i
-	pMroPjWZ2cxNNWigqTfR5/p7JtasT6W6NfOXGiP0mAsqmSnXTXB1uai1/rxxp4LaEwV42c
-	4MGluiNqz8aHSOst79LbTtdz0t7WSNc=
-Date: Tue, 26 May 2026 14:44:24 +0800
+	s=arc-20240116; t=1779778330; c=relaxed/simple;
+	bh=UZRc3kggpT5xBfJ5QCpE42yQBKoEj6SjU+Ar6L61mr8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=BMfQ/bSOvPoFFyUie+65mMy1u9ZAHjVUl4zRe+qVboW96J+J39y+rwh98M1EfQVpAmOqKf1zSpeIWLXjrBjGS0ZoQk9d2JSwAV2QVNgQqe/W6yjk56CBVl1kWJ+C9cdRALFIEgIDRFaXFKiAopKvMXwV7r8q8opFGsnBtac21f0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=qIFyhMsp; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from [192.168.2.17] (82-69-108-24.dsl.in-addr.zen.co.uk [82.69.108.24])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 4D0DB7D4AA;
+	Tue, 26 May 2026 07:44:32 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1779777872; bh=UZRc3kggpT5xBfJ5QCpE42yQBKoEj6SjU+Ar6L61mr8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:From;
+	z=Message-ID:=20<c08da2f1-750f-257a-180e-f1af47451647@katalix.com>|
+	 Date:=20Tue,=2026=20May=202026=2007:44:31=20+0100|MIME-Version:=20
+	 1.0|To:=20Michael=20Bommarito=20<michael.bommarito@gmail.com>,=0D=
+	 0A=20"David=20S=20.=20Miller"=20<davem@davemloft.net>,=20Eric=20Du
+	 mazet=0D=0A=20<edumazet@google.com>,=20Jakub=20Kicinski=20<kuba@ke
+	 rnel.org>,=0D=0A=20Paolo=20Abeni=20<pabeni@redhat.com>|Cc:=20Tom=2
+	 0Parkin=20<tparkin@katalix.com>,=20Guillaume=20Nault=20<gnault@red
+	 hat.com>,=0D=0A=20Simon=20Horman=20<horms@kernel.org>,=0D=0A=20Seb
+	 astian=20Andrzej=20Siewior=20<bigeasy@linutronix.de>,=0D=0A=20Clar
+	 k=20Williams=20<clrkwllms@kernel.org>,=20Steven=20Rostedt=20<roste
+	 dt@goodmis.org>,=0D=0A=20Kees=20Cook=20<kees@kernel.org>,=20netdev
+	 @vger.kernel.org,=0D=0A=20linux-rt-devel@lists.linux.dev,=20linux-
+	 kernel@vger.kernel.org|References:=20<20260523023423.2568972-1-mic
+	 hael.bommarito@gmail.com>|From:=20James=20Chapman=20<jchapman@kata
+	 lix.com>|Subject:=20Re:=20[PATCH=20net]=20l2tp:=20use=20refcount_i
+	 nc_not_zero=20in=0D=0A=20l2tp_session_get_by_ifname|In-Reply-To:=2
+	 0<20260523023423.2568972-1-michael.bommarito@gmail.com>;
+	b=qIFyhMsp37rN+Wj54G2Ha2xelNHnO2G37L3YHpj/VNJTWAxSwZJbx2cVEIMoiG77f
+	 6qmer9QWiZudbszcoERZ87MQuW+zepLi2LSwJFEJL7Me0uAiemzKRKfk53ZJp9p2/L
+	 lzGKS2uqwSS7tlzJ8yv3yY9FDy5xuFSQ87pVzL3eKp44sRvA2uxVUCa3DrlHXPbMh6
+	 hgEuJhWfD4RPpC+Q08qVmy/bbfYtLUEF7IRRa93Z4RWVKIDnqVfW10IUvlOh1dVocK
+	 CmwDOA05OzcpqUEYkpwKKPXrCnaR6Y5ugrLAVBwEFt9bROwGqsKBcCQjY3X4DczASf
+	 9yuW3awYTactA==
+Message-ID: <c08da2f1-750f-257a-180e-f1af47451647@katalix.com>
+Date: Tue, 26 May 2026 07:44:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v3] net: tls: use sync AEAD for sk_msg BPF sockets
-To: Christopher Lusk <clusk@northecho.dev>, Jakub Kicinski <kuba@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Sabrina Dubroca <sd@queasysnail.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20260526025154.60607-1-clusk@northecho.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <20260526025154.60607-1-clusk@northecho.dev>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To: Michael Bommarito <michael.bommarito@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Tom Parkin <tparkin@katalix.com>, Guillaume Nault <gnault@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Kees Cook <kees@kernel.org>, netdev@vger.kernel.org,
+ linux-rt-devel@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20260523023423.2568972-1-michael.bommarito@gmail.com>
+From: James Chapman <jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+Subject: Re: [PATCH net] l2tp: use refcount_inc_not_zero in
+ l2tp_session_get_by_ifname
+In-Reply-To: <20260523023423.2568972-1-michael.bommarito@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[katalix.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[katalix.com:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291549-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,queasysnail.net,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-291556-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jchapman@katalix.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[katalix.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[northecho.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 65A735D14AE
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: C3ECD5D156B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On 23/05/2026 03:34, Michael Bommarito wrote:
 
-On 5/26/26 10:51 AM, Christopher Lusk wrote:
-> The kTLS TX path can hand an open record to a sk_msg verdict
-> program before encryption.  If the verdict applies fewer bytes
-> than the open record contains, tls_push_record() splits
-> ctx->open_rec into the record being encrypted and a remainder.
-> The synchronous path reattaches that remainder before continuing.
+> A reader in l2tp_session_get_by_ifname() can return a pointer to a
+> session whose refcount has reached zero. The getter takes its
+> reference with plain refcount_inc(), but every other session getter
+> in the same file (l2tp_v2_session_get, l2tp_v3_session_get, and the
+> corresponding _get_next variants) uses refcount_inc_not_zero()
+> because the IDR/RCU lookup can race with refcount_dec_and_test() ->
+> l2tp_session_free() -> kfree_rcu(). The ifname getter is the only
+> outlier; the inconsistency was raised on-list after 979c017803c4
+> ("l2tp: use list_del_rcu in l2tp_session_unhash").
 >
-> With an async AEAD provider, crypto_aead_encrypt() can return
-> -EINPROGRESS after ctx->open_rec has been unhooked but before the
-> split remainder is reattached.  The remainder is no longer
-> reachable through ctx->open_rec or ctx->tx_list, silently dropping
-> transmitted data and leaking the unreachable tls_rec.  The same
-> composition also entangles the user-page zerocopy lifetime rules
-> with an async completion path.
+> A reader inside rcu_read_lock_bh() that matches session->ifname can
+> be preempted between the strcmp() and the refcount_inc(). If the
+> last reference drops on another CPU in that window, the reader's
+> refcount_inc() runs on a counter that has reached zero. refcount_t
+> catches the addition-on-zero, prints "refcount_t: addition on 0;
+> use-after-free", saturates the counter, and returns the saturated
+> pointer to the caller. Session memory is held live by the in-flight
+> RCU read section, but the kfree_rcu() callback queued from
+> l2tp_session_free() will free it once the grace period closes; a
+> caller that dereferences the returned session past that point hits
+> a slab-use-after-free. On PREEMPT_RT local_bh_disable() is a per-CPU
+> sleeping lock and the preemption window is real; on stock PREEMPT
+> kernels local_bh_disable() is a preempt_count increment that closes
+> the cross-CPU race in practice (see below).
 >
-> A sockmap cannot be attached to a socket after an inet ULP is
-> installed: sk_psock_init() returns -EINVAL when
-> inet_csk_has_ulp() is true.  So the supported ordering for
-> sockmap + kTLS TX is sockmap first, TLS_TX setup second.  When
-> TLS_TX setup sees an existing sk_psock, allocate the AEAD with
-> CRYPTO_ALG_ASYNC masked out and latch the TX zerocopy gate
-> (sw_ctx_tx->async_capable) so the buggy composition becomes
-> structurally unreachable.  Ordinary kTLS sockets without sk_msg
-> BPF attached are unaffected and continue to use async-capable
-> providers.
+> Use refcount_inc_not_zero() and continue the list walk on failure,
+> matching the other session getters in the file. The ifname getter
+> is the only session getter in net/l2tp/ that still uses the bare
+> refcount_inc() pattern; this change restores file-internal
+> consistency. The success path is unchanged.
 >
-> Fixes: d3b18ad31f93 ("tls: add bpf support to sk_msg handling")
-> Cc: stable@vger.kernel.org # 4.20+
-> Signed-off-by: Christopher Lusk <clusk@northecho.dev>
-> Assisted-by: Codex:gpt-5.5
+> Fixes: abe7a1a7d0b6 ("l2tp: improve tunnel/session refcount helpers")
+> Cc: stable@vger.kernel.org
 > Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 > ---
+> Distro reachability:
 >
-> Changes since v2 [1]:
-> - Per netdev maintainer guidance [2], replace the Option-C
->    drain-on-error fix with a setup-time surface narrowing in
->    tls_set_sw_offload(): when a sockmap is already attached at
->    TLS_TX setup, request a synchronous AEAD (CRYPTO_ALG_ASYNC in
->    the allocation mask) and set sw_ctx_tx->async_capable = 1.
->    Both moves are needed: latching async_capable alone disables
->    zerocopy but tls_do_encryption() can still return -EINPROGRESS
->    on the copy path; selecting a sync provider removes that return
->    path for sk_msg-attached sockets.
-> - Drop the selftest from the series per Jakub's note that the
->    existing sockmap + TLS coverage at
->    tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c exercises
->    this configuration [3].  That suite covers sockmap + kTLS
->    policy paths broadly; the specific async-pcrypt pass-then-drop
->    failure mode from the v2 reproducer was validated for v3 on
->    QEMU/KVM with a KASAN+LOCKDEP-instrumented kernel against net
->    base 2156a29aecff before send.
-> - Single-patch series.
+> l2tp_core and l2tp_netlink autoload via the genl family alias
+> net-pf-16-proto-16-family-l2tp on first AF_NETLINK CTRL_CMD_GETFAMILY
+> lookup; pppol2tp autoloads on demand via net-l2tp-type-7 from
+> L2TP_CMD_SESSION_CREATE with pw_type=L2TP_PWTYPE_PPP. Neither
+> autoload requires CAP_SYS_MODULE. SESSION_GET / SESSION_CREATE /
+> SESSION_DELETE are GENL_UNS_ADMIN_PERM, so CAP_NET_ADMIN in the
+> netns user namespace suffices and is reachable from `unshare -Urn`
+> on Debian 11/12, Ubuntu 22.04 LTS / 23.10+ / 24.04+, Arch, Alpine;
+> RHEL/Fedora blacklist l2tp_netlink by default but on hosts running
+> NetworkManager-l2tp, xl2tpd, or any L2TPv3 endpoint the gate is open
+> there too. PREEMPT_RT ships on Ubuntu Pro Realtime, RHEL 9 RT, SUSE
+> RT, and Yocto-RT.
 >
-> Changes since v1:
-> - v1's remainder-rooting fix was incomplete; Sashiko AI review
->    surfaced a real UAF in the v2 follow-up that John Fastabend
->    endorsed on the v1 thread [4].  The surface-narrowing approach
->    in v3 makes both failure modes unreachable by avoiding the
->    async + sk_msg composition entirely rather than patching each
->    continuation point.
+> Reproduced on x86_64 QEMU/KVM. Under tracefs-kprobe widening at the
+> refcount-inc instruction, a PREEMPT_RT build hits "refcount_t:
+> addition on 0; use-after-free" through l2tp_session_get_by_ifname at
+> 533 s; patched runs 1800 s clean. A stock PREEMPT (non-RT) build
+> with the same widening ran 1800 s without firing: local_bh_disable()
+> on non-RT prevents preemption inside the RCU section so the
+> cross-CPU window does not open at observable rates.
 >
-> [1] https://lore.kernel.org/all/20260521025840.976378-1-clusk@northecho.dev/
-> [2] https://lore.kernel.org/all/20260525133028.58494274@kernel.org/
-> [3] https://lore.kernel.org/all/20260525133048.2dc6d8d3@kernel.org/
-> [4] https://lore.kernel.org/all/huduxtn6parzgiaf5cyiyrrvjjvx6jsdedowvrd4nkwmuyeind@j6migjgofh2i/
+>   net/l2tp/l2tp_core.c | 9 +++++----
+>   1 file changed, 5 insertions(+), 4 deletions(-)
 >
->   net/tls/tls_sw.c | 15 ++++++++++++++-
->   1 file changed, 14 insertions(+), 1 deletion(-)
+> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+> index 1455f67e01ddb..0000000000000 100644
+> --- a/net/l2tp/l2tp_core.c
+> +++ b/net/l2tp/l2tp_core.c
+> @@ -441,12 +441,13 @@ struct l2tp_session *l2tp_session_get_by_ifname(const struct net *net,
+>   	idr_for_each_entry_ul(&pn->l2tp_tunnel_idr, tunnel, tmp, tunnel_id) {
+>   		if (tunnel) {
+>   			list_for_each_entry_rcu(session, &tunnel->session_list, list) {
+> -				if (!strcmp(session->ifname, ifname)) {
+> -					refcount_inc(&session->ref_count);
+> -					rcu_read_unlock_bh();
+> +				if (strcmp(session->ifname, ifname))
+> +					continue;
+> +				if (!refcount_inc_not_zero(&session->ref_count))
+> +					continue;
+> +				rcu_read_unlock_bh();
 >
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index 964ebc268..0000000 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -2867,7 +2867,20 @@ int tls_set_sw_offload(struct sock *sk, int tx,
->   	rec_seq = crypto_info_rec_seq(src_crypto_info, cipher_desc);
->
->   	if (!*aead) {
-> -		*aead = crypto_alloc_aead(cipher_desc->cipher_name, 0, 0);
-> +		u32 mask = 0;
-> +
-> +		if (tx) {
-> +			struct sk_psock *psock;
-> +
-> +			psock = sk_psock_get(sk);
-> +			if (psock) {
-> +				mask = CRYPTO_ALG_ASYNC;
-> +				sw_ctx_tx->async_capable = 1;
-> +				sk_psock_put(sk, psock);
-> +			}
-> +		}
-> +
-> +		*aead = crypto_alloc_aead(cipher_desc->cipher_name, 0, mask);
->   		if (IS_ERR(*aead)) {
->   			rc = PTR_ERR(*aead);
->   			*aead = NULL;
+> -					return session;
+> -				}
+> +				return session;
+>   			}
+>   		}
+>   	}
 > --
-> 2.54.0
-
-If async_capable is set to 1, the zerocopy path in tls_sw_sendmsg() is 
-skipped.
-Unfortunately ktls with bpf_msg_pop_data() does not work correctly under 
-this
-copy path.
-
-tls_clone_plaintext_msg() aliases msg_pl onto msg_en's plaintext area 
-(in-place encryption).
-
-BPF runs bpf_msg_pop_data(msg, 0, 2). This shifts msg_pl's SG entry 
-forward by 2 bytes.
-The two SGs now point to the same page at different offsets. Physical 
-memory overlaps but the start of
-address differ.
-
-I think selecting a sync provider via mask = CRYPTO_ALG_ASYNC is 
-sufficient to
-remove the -EINPROGRESS return path.
-
-May be time to remove skmsg from ktls? (disable by default first, 
-re-enable via a new ktls module_param?)
+> 2.46.0
+>
+Reviewed-by: James Chapman <jchapman@katalix.com>
 
 
 
