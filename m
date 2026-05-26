@@ -1,330 +1,191 @@
-Return-Path: <netdev+bounces-291822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291823-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sClWNDzQFWrkcAcAu9opvQ
-	(envelope-from <netdev+bounces-291822-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:54:20 +0200
+	id 8BcsK6TJFWpEbgcAu9opvQ
+	(envelope-from <netdev+bounces-291823-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:26:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31ACC5DA2A7
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:54:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E2905D9A60
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:26:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AEC5C3036D69
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:23:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 75C953006522
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FEC3B6C03;
-	Tue, 26 May 2026 16:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190863B52FB;
+	Tue, 26 May 2026 16:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="McGYWAVT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="REdH+39Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177A7390223
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 16:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9977138D6BD
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 16:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779812622; cv=none; b=PA7PczSRNtrdR+AkEZVgOvfjbca9yg1NEwg+FKIZox75XJ4MXvB8LfE72ISPtndfvvsI78Y2M1HfLCJ4cmaqPljMgxvuD0jrn4VeR9+P5FlUtofsW3S+wuOtehoTrJbS8m4HN39RNmF8CyBRR3rQ2JJXeyFzwRpTqeWvclocRb4=
+	t=1779812655; cv=none; b=JijAzJa+jbr717xpLNkr8ov/3i4k/O6T34uX/iDuKZc33043cSAUXAyH7w39S69HSe25LtH1iLOX5C22DLR7O74b9qxaaCyHYBAddYLijjTbZJ5pnMXSym5vHpg3IBpJ38+1R5d393qfUEw5f28YijlXWHusjgCcvCyWs1XdXJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779812622; c=relaxed/simple;
-	bh=/guMXgQW93OWipJLT8Mg8akWH/y+aqGs8oksgRHFwb0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l1WBhPMynS2KSZncexlD6MK45XwOfP05O7a6tVnWQ5NeNdTo+d9aad7W9qoG/3aWwe0bY2OJGJub/CQYSocvluQjiharHYknFcH9lkCvK2SD3mTD9VQSKN8vIgjbCcmpTjhylCJatMlzQ7pyawIhrW/8WLbFGbqmdrF/h3SXdK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=McGYWAVT; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-45ed9336049so603139f8f.0
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 09:23:36 -0700 (PDT)
+	s=arc-20240116; t=1779812655; c=relaxed/simple;
+	bh=CtEKZlYFL8aDfjvz0FjwX5jq5ZaEQyaskrTeMkjM7JU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=I8gRmFOAfDeqmLFQTGle1W9OKeWq8RMrR3vh9szmnwUbpjoNtE8gnOQaWCaLUW8Ll9R1DBCw00jzbfwsTcoTEh3nkzOVsK/TiN7j3WCnTar9Vd7Pu3KyX0Z7H0sVPhjyqIC0fPLU2wAlD+IcyiuBmpp7hXKlHOTWQI6eF3a8Kj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--bgeffon.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=REdH+39Q; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--bgeffon.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-914f037b7dfso234604485a.3
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 09:24:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1779812615; x=1780417415; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sLZvkzp6ATjH3l5+aCHSeZgpKYTRGGuT+8/f+7jWDUA=;
-        b=McGYWAVTbwMXqgEdQk8ZvRP61Eno8f2trDAHxIk2ytoHfJFVzRN6EChxoOK5tjZC57
-         tBPfDcIvpqpBw5/hG5mj7MwahTHn1hZaA32H8wFbeOofQtULyPsMN9k14mFP9fGjPFln
-         ETuBgg4tX25Zyt7bD9X7V3RopNICPY83QUyjqDgj7CNJcMR4OIsvoc4Ei8YlNoKbi27L
-         7KisFlfoxbtSNkTPfSx466bWc5EmtMS2BZaj1s8Xi4Fb0GLJTtHghxMPcrsdQTmTHUAK
-         X+e+602Z2Q41aAmFpnPDNP1yP8lc5FDRH6r+nt9dLfK+S9oSq4hzS8rplBUWdjrWS/1w
-         XW2g==
+        d=google.com; s=20251104; t=1779812652; x=1780417452; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+RKfc3SD8L9S7pRMEqhVofQlZ8awVFm1p7D7m0PbHu0=;
+        b=REdH+39QFVD39Cv/J/4ScsBeMwAKpeEkiko018sBg8bl9IrIfK21exDAZWAertyNha
+         Y1dUpjeuXafHM48hDFRwtKod0yfmpZZvxfcWxDDnFsoRgbGqgffCdosNVL4/xCaxWMMP
+         sZjgRybdfaZR2gCZBTuyXVXkGEFUO4oz0O+ZjsP1tXPD+YKU6cz6VTR/6DzP8So5i7sW
+         CJx9JIqkmerhATqCIr9m7KZGp8oglHUzCZB4KETmsrpOWmrFOS0tFFfC9iXIWOLF0nYr
+         p/f+8iouZM2Cij16xIZX8LXQaam5xENK+ImcxOoMMDaQlMm1+i/8kk8P4ivOaJd5zt7V
+         cveQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779812615; x=1780417415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sLZvkzp6ATjH3l5+aCHSeZgpKYTRGGuT+8/f+7jWDUA=;
-        b=R5ImF+1nMehnMIUaiGlhZjSZbIb8S59BuD+Rrc5FBxJEMm57KGucURycQXpZfM8871
-         TJr6ceq2V+5D+UrQh8sK+QjoCbA1SeuwZm9OJkeEjmYEjgVWyuWZq7cgt9TNXAyp2Ou3
-         hPXKhQUFsmf2qfTKPqwZo7vNxNvy6ptifI1KFiGdf/T+ditlts+9iLdEhbGrpciws5qv
-         BX6N5j5PJX756ky6knCWOHO2k6WkJqb4EQu9u+BxUMG6u8SlQr9DhDmhEqelQSR9KDMP
-         M6lPxWYv/GBxzXt2eXJhpZrZs1Q+ZiAgzJKdt5yMjTthkq/toBB5BnVuIie01VJeOTh9
-         jEnA==
-X-Forwarded-Encrypted: i=1; AFNElJ+/MGgXWPKW9TE+dZqH4rxQEVt8Tk7hUN8XMnFWT8cLkR1ldQVm/rMiS8MumZkmUNc5nM1Gkh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2NMmaNQjl3fEMtfROrhI21L6O0lr4zf9/ueXDlJIm5erWZYNk
-	8t/ARljFIWrSDUjh4psaOKP9H515+RTmBotPLMWDAzTf0wnRyY+sHtuGCrNrFHjdhZ8=
-X-Gm-Gg: Acq92OHaT6Rh3So8HxoIGGzvsYbrpopP0JOgoRncpu7j0+1JqZvL9dhfPh82kuwrDlr
-	cTQs8nySWjWDcTfSdvzkkiIM99FPj1jK+8mThQthoiV1fPhkvjrYtn5VXI9D3Rj8w4ukNudRpHG
-	kvaQFLBu+fu6tshRS8GXn8imNFPI3gBCutHDEp4SM4zTA2Kb9afg4La4XdHpASZrN3iGYADOYm/
-	2Q+lpyh8Glpnt/Yb+z0TnzXnMGcMkmMWOw4zikzWyDjDVFnKyJxNJZf+mxPxPisTAbrcQR4XbOW
-	x4TnDnogCSFGbbaIrtHHzxt9wLuvBRw5cJwJovfuOyZZyXi/QyC84X8DUjcuax3b+ksRDe/19Bx
-	EHL5GjKHj6SeRGu5W+orohW9TliZtGGIF2uckrvZ2gNz5V9tzEERxhrxSbOgeCSoYpANoxkZi9l
-	2CfcPy81fsOdkKMrTgORlCH/JxPXbX6Gt0efbdBWCyYes=
-X-Received: by 2002:a05:6000:401e:b0:45d:4b37:7fcf with SMTP id ffacd0b85a97d-45eb367fac4mr33534428f8f.15.1779812614061;
-        Tue, 26 May 2026 09:23:34 -0700 (PDT)
-Received: from localhost ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6cd1780sm39478805f8f.16.2026.05.26.09.23.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 09:23:33 -0700 (PDT)
-Date: Tue, 26 May 2026 18:23:29 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, "Borislav Petkov (AMD)" <bp@alien8.de>, 
-	Andrew Morton <akpm@linux-foundation.org>, Randy Dunlap <rdunlap@infradead.org>, 
-	Thomas Gleixner <tglx@kernel.org>, Petr Mladek <pmladek@suse.com>, 
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>, Tejun Heo <tj@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Feng Tang <feng.tang@linux.alibaba.com>, Christian Brauner <brauner@kernel.org>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, 
-	Li RongQing <lirongqing@baidu.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, Gal Pressman <gal@nvidia.com>, 
-	Dragos Tatulea <dtatulea@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Shay Drori <shayd@nvidia.com>, 
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: Re: [PATCH net-next 3/3] net/mlx5: Apply devlink default eswitch
- mode during init
-Message-ID: <ahXF2aQZNOwHdCG_@FV6GYCPJ69>
-References: <20260521072434.362624-1-tariqt@nvidia.com>
- <20260521072434.362624-4-tariqt@nvidia.com>
- <ahVPASuh4BZGOfx0@FV6GYCPJ69>
- <8c8df8da-62a9-49e8-84eb-572d54cfeb1f@nvidia.com>
- <ahWm4NXph9gdazV_@FV6GYCPJ69>
- <9aa7c295-35cb-428b-9031-13a2f507ae4b@nvidia.com>
+        d=1e100.net; s=20251104; t=1779812652; x=1780417452;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+RKfc3SD8L9S7pRMEqhVofQlZ8awVFm1p7D7m0PbHu0=;
+        b=COWaeS1KjuMwAe4S+/IhcCob1RcLSF+01tqrTy5iWIXDn7+JvwaYxevmm22AoOQu6B
+         43ZVS34IjXaV7/doMiSWzj4YVmLpyi19alc1FJecoBpgBHDWJHBQwweG5zVDDICwZhqj
+         SH2ZUBfddH4RnLVYXwCIy6H/Qf0qIWK89V8U3jHzQS0bhEBfTVPQa34BWubJDGo4g7dX
+         +vLJAZ4natr069ur6J+lTozNSNsVWLeHIUdMes3ElTllcC+XlDeOe++ivTjkNHOiQPxG
+         g446frLuCIvTRTBDqaFjowKetHmmYPJSj1KWMICHEM4DQSlSwaUX75/H+G5lo72eCGfZ
+         5X5Q==
+X-Forwarded-Encrypted: i=1; AFNElJ90qUHAuG9gRyPk+9CLFAmgDK4eoo8zWqXJt5d7Fy3fn3d/L7n+YS80inf6L0xEmkHGoljr8/Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+RllIlAPuEtMGWwZE0l/fhD1CH/rVW5cRznjSK7sj+xMn3ssx
+	Nyva2Q2N4W3IFG/HxBML3bUYQCwXPcAIv4BAaS+O/ntPOXoJBHds6feRtao6IcriIRvldR1xBok
+	yNr7jvjxqYQ==
+X-Received: from qkmy24.prod.google.com ([2002:a05:620a:e18:b0:90f:dbd8:afc0])
+ (user=bgeffon job=prod-delivery.src-stubby-dispatcher) by 2002:a05:620a:2242:10b0:914:babf:9f59
+ with SMTP id af79cd13be357-914babfc9a7mr1745744085a.34.1779812652345; Tue, 26
+ May 2026 09:24:12 -0700 (PDT)
+Date: Tue, 26 May 2026 16:23:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9aa7c295-35cb-428b-9031-13a2f507ae4b@nvidia.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
+Message-ID: <20260526162338.4134776-2-bgeffon@google.com>
+Subject: sctp: COOKIE_ECHO can cause an out-of-bounds read and leak kernel memory
+From: Brian Geffon <bgeffon@google.com>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Cc: Xin Long <lucien.xin@gmail.com>, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	TAGGED_FROM(0.00)[bounces-291822-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291823-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.989];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli-us.20251104.gappssmtp.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:email]
-X-Rspamd-Queue-Id: 31ACC5DA2A7
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bgeffon@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.845];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4E2905D9A60
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Tue, May 26, 2026 at 05:03:57PM +0200, mbloch@nvidia.com wrote:
->
->
->On 26/05/2026 17:07, Jiri Pirko wrote:
->> Tue, May 26, 2026 at 11:44:46AM +0200, mbloch@nvidia.com wrote:
->>>
->>>
->>> On 26/05/2026 10:44, Jiri Pirko wrote:
->>>> Thu, May 21, 2026 at 09:24:34AM +0200, tariqt@nvidia.com wrote:
->>>>> From: Mark Bloch <mbloch@nvidia.com>
->>>>>
->>>>> Apply devlink default eswitch mode for mlx5 devices after successful
->>>>> device initialization while holding the devlink instance lock.
->>>>>
->>>>> At this point the devlink instance is registered and the mlx5 devlink
->>>>> operations are available, so the default eswitch mode can be applied to
->>>>> the matching PCI devlink handle.
->>>>>
->>>>> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
->>>>> Reviewed-by: Shay Drori <shayd@nvidia.com>
->>>>> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
->>>>> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
->>>>> ---
->>>>> drivers/net/ethernet/mellanox/mlx5/core/main.c | 17 +++++++++++++++++
->>>>> 1 file changed, 17 insertions(+)
->>>>>
->>>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>>>> index 0c6e4efe38c8..4528097f3d84 100644
->>>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>>>> @@ -1391,6 +1391,21 @@ static void mlx5_unload(struct mlx5_core_dev *dev)
->>>>> 	mlx5_free_bfreg(dev, &dev->priv.bfreg);
->>>>> }
->>>>>
->>>>> +static void mlx5_devl_apply_default_esw_mode(struct mlx5_core_dev *dev)
->>>>> +{
->>>>> +	struct devlink *devlink = priv_to_devlink(dev);
->>>>> +	int err;
->>>>> +
->>>>> +	if (!MLX5_ESWITCH_MANAGER(dev))
->>>>> +		return;
->>>>> +
->>>>> +	devl_assert_locked(devlink);
->>>>> +	err = devl_apply_default_esw_mode(devlink);
->>>>> +	if (err)
->>>>> +		mlx5_core_warn(dev, "Couldn't apply default eswitch mode, err %d\n",
->>>>> +			       err);
->>>>> +}
->>>>> +
->>>>> int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->>>>> {
->>>>> 	bool light_probe = mlx5_dev_is_lightweight(dev);
->>>>> @@ -1437,6 +1452,7 @@ int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->>>>> 		mlx5_core_err(dev, "mlx5_hwmon_dev_register failed with error code %d\n", err);
->>>>>
->>>>> 	mutex_unlock(&dev->intf_state_mutex);
->>>>> +	mlx5_devl_apply_default_esw_mode(dev);
->>>>
->>>> I wonder how we can make this work for all. I mean, other driver would
->>>> silently ignore this command like arg, right? Any idea how to make all
->>>> drivers follow the arg from very beginning?
->>>>
->>>
->>> I have a follow-up series that adds the call to all drivers which support
->>> setting eswitch mode. When going over the other drivers, what I found is
->>> that the right point to apply the default is driver specific, drivers
->>> I have patch for:
->>>
->>> 46e16c6d9836 net: Apply devlink esw mode defaults
->>> ab4f54102ba9 bnxt_en: Apply devlink default eswitch mode during init
->>> b48cce1607bb liquidio: Apply devlink default eswitch mode during init
->>> 4ea54b0fe04a ice: Apply devlink default eswitch mode during init
->>> b7faddaa1c90 octeontx2-af: Apply devlink default eswitch mode during init
->>> 74b0c22c47b9 octeontx2-pf: Apply devlink default eswitch mode during init
->>> 5000e4c3d768 nfp: Apply devlink default eswitch mode during init
->>> 97a218e95e41 netdevsim: Apply devlink default eswitch mode during init
->>>
->>> I don't think doing this generically from devlink is realistic. devlink
->>> doesn't really know when a given driver is ready to change eswitch mode.
->>> Some drivers need SR-IOV state, representor setup, or other init pieces to
->>> be ready first, and the locking is not identical across drivers either.
->> 
->> 
->> Low hanging fruit would be just to call ops->eswitch_mode_set at the end
->> of register. Multiple reasons:
->> 
->> 1) end of devl_register is exactly the point userspace is free to issue
->>    the eswitch mode set. Driver should be ready to handle it.
->> 2) all drivers would transparently get this functionality, without
->>    actually knowing this kernel command line arg ever existed, without
->>    odd wiring call of related exported function. I prefer that stongly.
->> 3) you should add a there warning for the case this arg is passed yet
->>    the driver does not implement eswitch_mode_set. User should
->>    get a feedback like this, not silent ignore.
->> 
->> The only loose end is see it the void return of devl_register().
->> Multiple ways to handle the possibly failed eswitch_mode_set(). I would
->> probably just go for pr_warn, seems to be the most correct.
->> 
->> Make sense?
->
->I see the point, but I don't think devl_register() (at least not the only place)
->is the right place.
->
->There is a small but important difference between userspace doing
->"devlink eswitch set" after register is done, and devlink core calling
->eswitch_mode_set() from inside the register flow.
->
->Some drivers call devlink_register() while holding the device lock.
->liquidio is one example. If devlink core calls ops->eswitch_mode_set() from
->there, we may start the full eswitch mode change while holding that lock.
->That mode change can create representors, register netdevs, take rtnl,
->allocate resources, etc. I don't think we want this to become an implicit
->side effect of devlink registration.
+Hi,
+When a listening SCTP server receives a COOKIE_ECHO chunk, sctp_unpack_cook=
+ie() is called to reconstruct the association. If HMAC is disabled ("none")=
+, the signature check is bypassed, and the server directly processes the ca=
+ched peer INIT chunk (peer_init) stored immediately after the cookie layout=
+:
 
-I believe your AI may untagle liquidio locking :)
+    peer_init =3D (struct sctp_init_chunk *)(chunk->subh.cookie_hdr + 1);
 
+To parse the optional parameters embedded in this cached peer INIT chunk, s=
+ctp_process_init() uses the sctp_walk_params() macro. This macro blindly tr=
+usts the peer_init->chunk_hdr.length value to determine the loop boundary:
 
->
->For mlx5, the placement after intf_state_mutex is also intentional:
->
->mutex_unlock(&dev->intf_state_mutex);
->mlx5_devl_apply_default_esw_mode(dev);
->
->We can't call it while holding intf_state_mutex because the mode set path
->takes it internally, and switchdev mode may also create IB representors.
->
->Also, devl_register() only covers the first registration. The mlx5 call in
->mlx5_load_one_devl_locked() is for reload/fw reset recovery kind of flows.
->In those flows devlink is already registered, so devl_register() is not
->called again, but the driver state was rebuilt and we may need to apply the
->default again.
+    #define sctp_walk_params(pos, chunk)\
+    _sctp_walk_params((pos), (chunk), ntohs((chunk)->chunk_hdr.length))
 
-Call it from reload too, right?
+However, the kernel does not validate that peer_init->chunk_hdr.length is a=
+ctually within the physical bounds of the received COOKIE_ECHO chunk.
 
+If an attacker injects a forged cookie where peer_init->chunk_hdr.length is=
+ inflated (e.g., 65535) while the actual payload is small, the parameter wa=
+lk loop will continue out of bounds. If the walk encounters a parameter of =
+type SCTP_PARAM_STATE_COOKIE, the switch case inside sctp_process_param() p=
+erforms a memory copy directly using the unchecked parameter length:
 
->
->Same for reload, fw reset and pci recovery in general. If the driver tears
->down and rebuilds eswitch related state, the place to apply the default is
->in that driver's reinit flow, not in devl_register().
->
->When I went over the other drivers, the right place was not always the same
->as devlink registration. I'm not an expert in any of them, so I hope I got
->the details right, but for example octeontx2 AF needs sr-iov and the
->representor switch state to be initialized first. nfp can do it after
->app/vNIC init while the devlink lock is already held. liquidio should do it
->only after dropping the PCI device lock.
+    case SCTP_PARAM_STATE_COOKIE:
+        asoc->peer.cookie_len =3D
+            ntohs(param.p->length) - sizeof(struct sctp_paramhdr);
+        kfree(asoc->peer.cookie);
+        asoc->peer.cookie =3D kmemdup(param.cookie->body, asoc->peer.cookie=
+_len, gfp);
 
-Idk, perhaps do it from devlink_post_register_work of some kind? That
-would allow you to have the same locking ordering as a userspace call.
+If param.p->length is also inflated (e.g., 30000), kmemdup() will attempt t=
+o read up to 29,996 bytes from the sk_buff data buffer, which is limited to=
+ the actual received packet size. This triggers a KASAN slab-out-of-bounds =
+read or can leak adjacent memory on non-KASAN builds. I do have a working r=
+eproduction of this that allows an unprivledged user to leak kernel memory,=
+ I can share it with the maintainers upon request. Because net.sctp.cookie_=
+hmac_alg=3Dnone can be set per-namespace this is fairly easy to reproduce.
 
->
->Mark
->
->> 
->> 
->>>
->>> Also, since this knob is only about eswitch mode, I don't think we need to
->>> touch every devlink driver. Drivers that don't implement eswitch_mode_set()
->>> would just ignore it anyway. The follow-up only wires the default into
->>> drivers that actually support changing eswitch mode.
->>>
->>> Mark
->>>
->>>>
->>>>> 	return 0;
->>>>>
->>>>> err_register:
->>>>> @@ -1538,6 +1554,7 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
->>>>> 		goto err_attach;
->>>>>
->>>>> 	mutex_unlock(&dev->intf_state_mutex);
->>>>> +	mlx5_devl_apply_default_esw_mode(dev);
->>>>> 	return 0;
->>>>>
->>>>> err_attach:
->>>>> -- 
->>>>> 2.44.0
->>>>>
->>>
->
+The issue was verified on Linux 7.1-rc5. KASAN detected the following slab-=
+out-of-bounds read:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+BUG: KASAN: slab-out-of-bounds in kmemdup_noprof+0x3b/0x50
+Read of size 29996 at addr ffff88810fa76900 by task repro/666
+CPU: 11 UID: 0 PID: 666 Comm: repro Not tainted 7.1.0-rc5-virtme #1 PREEMPT=
+(lazy)
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1=
+.16.3-2 04/01/2014
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0x4d/0x70
+ print_report+0x153/0x4c6
+ ? kmemdup_noprof+0x3b/0x50
+ ? sctp_process_init+0x11f2/0x2bc0
+ kasan_report+0xda/0x110
+ ? kmemdup_noprof+0x3b/0x50
+ kasan_check_range+0x125/0x200
+ __asan_memcpy+0x23/0x60
+ kmemdup_noprof+0x3b/0x50
+ sctp_process_init+0x11f2/0x2bc0
+ ? __pfx_sctp_process_init+0x10/0x10
+ ? printk+0x9e/0xc0
+ ? __pfx_printk+0x10/0x10
+ ? sctp_assoc_add_peer+0x1ff/0xd20
+ ? sctp_cmp_addr_exact+0x3b/0xb0
+ ? sctp_assoc_add_peer+0x2a0/0xd20
+ sctp_sf_do_5_1D_ce+0x585/0x1700
+...
 
