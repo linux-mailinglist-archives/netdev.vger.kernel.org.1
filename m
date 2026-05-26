@@ -1,176 +1,195 @@
-Return-Path: <netdev+bounces-291653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cL7NMBx6FWrHVAcAu9opvQ
-	(envelope-from <netdev+bounces-291653-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:46:52 +0200
+	id YJHtFp56FWp8VgcAu9opvQ
+	(envelope-from <netdev+bounces-291654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:49:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67BD35D45A7
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:46:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3B385D461A
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0343A304C7DF
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:44:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36E1A3025938
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915843DD877;
-	Tue, 26 May 2026 10:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A3B3DC4A8;
+	Tue, 26 May 2026 10:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="reJXFF/c"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hPPpA8S1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EEA3DD856
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 10:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8483D34CFCD;
+	Tue, 26 May 2026 10:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779792269; cv=none; b=U9CeN3ollPSRb8RNq6d9xPhXQeRjGzXX0C21+2xSs+MXCUagm6GNKcAOOQAAX1xnuaNsnBaaOOTkad9im1SuhJoRbFAU3n6vLLdFIecIa2of/9sHRBwA6UNz+vEDvdvKM5L3T+5YezY0N1WTFSkXV6HzJWPVhXD+xuhE0gXVMLw=
+	t=1779792477; cv=none; b=G04KC8f6D3UI1fTqv2HAuWcDU26fpl5EVAuO+/jH6OWCDGQMV8W/C6Lo6uBuxk+PH4D1w3EfLeh0iT0nRRogNf0qEC8kzaoz7i/1eC9eeOJPy/Y4xP3FBGN0nmjcqacI7aTruTlwN7LA4oWwh6h8JoEbJPrqzzfiAI9giuiVpCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779792269; c=relaxed/simple;
-	bh=mRpirCObCLZqN6l4iv03pml9AZxIqV3ehKRFmi90YGo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TJ8/TeeDlRnMjHNv+rLUqQ7JPV1diMEDY7a4a0owK+9QAjm7QSQdWGxMzyZKBrklDU/aFIpbmVWTwTCRBMCwp/dWU11yHC7kU7e23TPl3n0/RIgyVks3sw4ODcHLKuR8L/rxsXRS7bNqe2W+AQ0FZZTScdJjE77YBpsgXDRf9+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=reJXFF/c; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8379e010b01so4474797b3a.1
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 03:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779792267; x=1780397067; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PsmUW9tamcq3E3x3Xj8H36QoMdq6sDlAu1sIPsLwdow=;
-        b=reJXFF/c78UJzqnKBd0YF1788g8Aq4MTuEdjHKYodYH8J6siskR9kZmN1tT86MG08t
-         BBk2yttOebGV87gYtvtQcuhcj8dEKDN7Bq/k6/f65h7pXcydDNTUBcguyTfydAcrCqCd
-         QOzS33DpQCzHl5l9k76Q/4SjeSBqMyqOjW/4DbfiAbAmuNXWaEKax7uzJnynUDowOx8B
-         p8b4JFP78Gz/CBk0kd3QJ8YErdgYvP7re2Z7Ffz8w3pZncDRwV2lvIsaOBHpQL/7qkHa
-         zn2OrPEYYAcvpCxUAD2sTG2RpP9r7qzoeLRMX+46XvNIpqymTtRofJbNMJdIKoC2LvBN
-         YpWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779792267; x=1780397067;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PsmUW9tamcq3E3x3Xj8H36QoMdq6sDlAu1sIPsLwdow=;
-        b=opJenKaWUeIaTFAL8Boerlyv9Te9SHzLWH1bJi4NSvKH2abGtsDh63rChpququXDBQ
-         0zilxM7pIK8dRx02nLM8cziWRQJeMhQAhqrunf4deXjCr9DHxLGm9xcYrgAn+5mh3HON
-         OUVB8nXivhcN4pjVgW01g2fgoQ24KmNE1h/3hNzxAzTmtXL10uiku2ERwRcifT9FGCgh
-         YxleOQeklirO6cHZo2GBLDkd7ywuT/vHrpjnv9+9pRHpwW6UIyDLJWOgRIUusgd/aLPk
-         4QkVs5PYPgqnfIuQCiIbSCQ9CfnhwMPH1kx35IImq+dsunTMBV2hJlCWQuR3wyf0Y4Nf
-         5OOQ==
-X-Gm-Message-State: AOJu0YxqOvJyHBd9++xNITqSf/UOnSkP2J2wQUba60ssRGPD8QX1c+eE
-	0JALgvyQOIZ9JD6OyPp2ZzdQFy2xMEhPeRkHvnisNlTGYLFSZYq1Up4gnInGjdtWXjK8qu0=
-X-Gm-Gg: Acq92OGRGgJBnzBMRXkzfjw/BQKQInauw5nhJSM09hEKderBpXWkywRBFdccTKgC994
-	aneyPzRsdv3G3wuK+Kt8+bhwbTQ9dIkuw/kxkoNtv79soLF+UsZb9r623sgBPpKES7ewjOjWDhc
-	3HKeY3pa3Yn9JQdLVkGSXqDh0ZSZn6bG5AdDvB0NXy63HJ8btYqMDSu/rXRr3gZ0PmuW9Dcikwq
-	cFaqPke4d8fLeMW9FCW8LjqtQ0kgycA5/aiEWzQOIwum83jeCD2Uq/NjiaABVjErG3Ph3EByIkb
-	y5TcC1DBhPfAmPc5LcojoNmRoFFWFjaNHWbTA6if9Wp5tFo0uUhLqCPxk5h5uBknOIxkalbIpaO
-	yfEU53G9GEjXlltK/3bcmU8RoyeRRX1ez9Z8YZ/z2LUw199SpuR9GlPpN7Ag6WuSK6c+8DaOfYS
-	w+una7X6PerYc8UdNXYDYhZzcal79Z19KPXbgTa6IB1BqSAaRQyQESni6AJOAlAfEtq0c=
-X-Received: by 2002:a05:6a00:4c07:b0:82c:6b23:6d10 with SMTP id d2e1a72fcca58-8415f580e58mr17482367b3a.3.1779792267413;
-        Tue, 26 May 2026 03:44:27 -0700 (PDT)
-Received: from raf.tailb4a862.ts.net ([153.124.163.116])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84164affc22sm12235270b3a.21.2026.05.26.03.44.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 03:44:26 -0700 (PDT)
-From: Raf Dickson <rafdog35@gmail.com>
-To: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: sgarzare@redhat.com,
-	stefanha@redhat.com,
-	bryan-bt.tan@broadcom.com,
-	vishnu.dasa@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	stable@vger.kernel.org,
-	Raf Dickson <rafdog35@gmail.com>
-Subject: [PATCH] vsock/vmci: fix sk_ack_backlog leak on failed handshake
-Date: Tue, 26 May 2026 10:43:56 +0000
-Message-ID: <20260526104356.469928-1-rafdog35@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1779792477; c=relaxed/simple;
+	bh=qHwSDXLH8uF7rDuy+ncmgr+Ep/hEmSC7eLTXc8CMOtM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SyCyyPkXqHgy+31/kWwZ4I/rMsURCLL5VbWd/CLghMWI3jKM/pCWO90g8btLGNnVaJQHj6BByN0Ia4kFpClGQABuGuSBM4uER2XDhjWSrjLMDdmEebErwKZ3KLHhhfWcxSCdtQe8aRjlP9nM6rdZw0ZeJfOxT5O29LnXgGj6wzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hPPpA8S1; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64PLmlDd1306274;
+	Tue, 26 May 2026 03:47:34 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=AkvO4txROLxeP2ercTtpzWZnnrZRWF/vialTRPE0iYg=; b=hPP
+	pA8S1OL5XT8e9MmvXo9830b3PzATZbldExF/e6pHnJ/fAJwamn4NzifBGGF8BvZy
+	QGMSKGdkgTEHulqN8RbmY5dYW8MWXBuMRBJnXXMZy0Csqh0LEZ0rawLDcmY715kV
+	VSE5hdRB1MJQFjW1fMDQ4cD2HCb0hsJvO9ov+aHDHSoEcpyDNtBMyvu+aquKPu1n
+	ZsSNgVAN1s3lU0DtK53WFwG/L2THa37LwpC/Yh6Nz5R2HA3kR6azhlPicDHHAqsl
+	2u00CsaszrH2URHgkYyI6HI8lOlwnFLrip0+TtKe7XlHxoBRTlfEw6DV8jS/9nwt
+	WvGvlRsQwdDUlv2K5sw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ecb6tvggt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 May 2026 03:47:34 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 26 May 2026 03:47:33 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 26 May 2026 03:47:33 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id 41C7F3F7045;
+	Tue, 26 May 2026 03:47:30 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <bbhushan2@marvell.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Subbaraya
+ Sundeep" <sbhatta@marvell.com>
+Subject: [net-next PATCH v6 0/5] octeontx2: CN20K NPA Halo context support
+Date: Tue, 26 May 2026 16:17:22 +0530
+Message-ID: <1779792447-5593-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI2MDA5MyBTYWx0ZWRfX29t0G8ytnfWl
+ r2zhsrZHtzMcusP1pr7NDAwqs1ROLhwibHCR0XqnIu84+/xB1pqf8yCkpCTMHJJqM8kes3rTxc7
+ nBs/Fkp/aHhnEkEQL7IRzzwa1xlOP++wKsktzrbIZbaxfvasQhRGGYZwmtmcJD3NUsn/kwxOoyR
+ bS3XKZOLW9fnJUnZNvhedf6tedFSY5HDmSKeNZIpCvK4lD1RWj7FeOE7wzODIAlFbbb+N9/KwLq
+ 3C2ZPnguMCF4zA2+Qpcl9r4wmCx/dcPppL0BjX1lYljAONsWrbrSSo8/ia2TMAN4qiM9YDqWfVc
+ 967AIUqZiLjBvQj8FWpYxsbVchQYvnwvstioWSSzUEeEiJmVBawhKnRJB31JkIaXPwUgUX4XVcc
+ CW9kclacqZbJiGGB8bn8vyKrqCPHrYHL3qrX/+daQ3ewzQs1n3ELYJG+sQ7/Yxviykoj6Doju2N
+ ardC5UaJE61HCBjkIIw==
+X-Authority-Analysis: v=2.4 cv=JtbBas4C c=1 sm=1 tr=0 ts=6a157a46 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=Apbl8yOqu0udmtBCm5gA:9
+X-Proofpoint-GUID: 4YYt3SVIzlNH10li9qRAeJXG2Sril1IU
+X-Proofpoint-ORIG-GUID: 4YYt3SVIzlNH10li9qRAeJXG2Sril1IU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-05-26_02,2026-05-26_01,2025-10-01_01
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,broadcom.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-291653-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rafdog35@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291654-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.996];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:mid,marvell.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 67BD35D45A7
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: D3B385D461A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When vmci_transport_recv_connecting_server() returns an error,
-vmci_transport_recv_listen() calls vsock_remove_pending() but never
-calls sk_acceptq_removed(). This leaves sk_ack_backlog incremented
-permanently.
+This series adds NPA Halo support for CN20K in the octeontx2 AF and
+PF drivers. On CN20K, NPA supports a unified "Halo" context that combines
+aura and pool contexts in a single structure. This is a simplification
+in hardware so that there is no need to initialize both Aura and Pool
+contexts for queues. Separate Aura and Pool contexts are needed say if
+we have to point many Auras to a single pool but we always use 1:1 Aura
+and Pool map in Octeontx2 netdev driver. Hence for CN20K use Halo
+context for netdevs.
 
-Repeated handshake failures (malformed packets, queue pair alloc
-failure, event subscribe failure) cause sk_ack_backlog to climb
-toward sk_max_ack_backlog. Once it reaches the limit the listener
-permanently refuses all new connections with -ECONNREFUSED, a
-silent denial of service requiring a process restart to recover.
+The series:
 
-The two existing sk_acceptq_removed() calls in af_vsock.c do not
-cover this path: line 764 checks vsock_is_pending() which returns
-false after vsock_remove_pending(), and line 1889 is only reached
-on successful accept().
+  1) Adds Halo context type, mbox handling, and halo_bmap tracking in AF.
+  2) Adds NPA DPC (diagnostic/performance counters) 32 counters with
+     per-LF permit registers, mbox alloc/free, and teardown handling.
+  3) Adds debugfs for Halo (halo_ctx file and NPA context display/write
+     for HALO ctype).
+  4) Switches the CN20K PF driver to use the unified Halo context and
+     allocates a DPC counter for the NPA LF.
 
-Fix by balancing sk_acceptq_added() with sk_acceptq_removed() on
-the error path.
+Changes for v6:
+ Fixed possibility of stack corruption and double free
+ errors as per Sashiko reviews. 
+Changes for v5:
+ Fixed double free of DPC counter in error path as per AI review
+ Modified commit message to state that backpressure
+ is not supported currently
+Changes for v4:
+ Fixed DPC counter leak as per AI review
+Changes for v3:
+ Fixed all AI reviews
+ Removed inline for npa_ctype_invalid(as per Simon)
 
-Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
-Cc: stable@vger.kernel.org
-Signed-off-by: Raf Dickson <rafdog35@gmail.com>
----
- net/vmw_vsock/vmci_transport.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Changes for v2:
+ Fixed all AI reviews
+ Removed inline and added const for npa_ctype_str(as per Simon)
+ Fixed build warning flagged with W=1
 
-diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-index d2579380f5..88ccc55455 100644
---- a/net/vmw_vsock/vmci_transport.c
-+++ b/net/vmw_vsock/vmci_transport.c
-@@ -980,8 +980,10 @@ static int vmci_transport_recv_listen(struct sock *sk,
- 			err = -EINVAL;
- 		}
- 
--		if (err < 0)
-+		if (err < 0) {
- 			vsock_remove_pending(sk, pending);
-+			sk_acceptq_removed(sk);
-+		}
- 
- 		release_sock(pending);
- 		vmci_transport_release_pending(pending);
+
+Linu Cherian (3):
+  octeontx2-af: npa: cn20k: Add NPA Halo support
+  octeontx2-af: npa: cn20k: Add DPC support
+  octeontx2-af: npa: cn20k: Add debugfs for Halo
+
+Subbaraya Sundeep (2):
+  octeontx2-af: Simplify NPA context writing and reading
+  octeontx2-pf: cn20k: Use unified Halo context
+
+ .../ethernet/marvell/octeontx2/af/cn20k/api.h |   3 +
+ .../marvell/octeontx2/af/cn20k/debugfs.c      |  60 +++++
+ .../marvell/octeontx2/af/cn20k/debugfs.h      |   2 +
+ .../ethernet/marvell/octeontx2/af/cn20k/npa.c | 139 ++++++++++++
+ .../ethernet/marvell/octeontx2/af/cn20k/reg.h |   7 +
+ .../marvell/octeontx2/af/cn20k/struct.h       |  81 +++++++
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  25 +++
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   4 +
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  71 +++++-
+ .../ethernet/marvell/octeontx2/af/rvu_npa.c   |  96 ++++++--
+ .../marvell/octeontx2/af/rvu_struct.h         |   7 +
+ .../ethernet/marvell/octeontx2/nic/cn20k.c    | 209 +++++++++---------
+ .../ethernet/marvell/octeontx2/nic/cn20k.h    |   3 +
+ .../marvell/octeontx2/nic/otx2_common.h       |   3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   8 +
+ 15 files changed, 587 insertions(+), 131 deletions(-)
+
 -- 
-2.54.0
+2.48.1
 
 
