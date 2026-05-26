@@ -1,122 +1,202 @@
-Return-Path: <netdev+bounces-291708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291709-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8K0fKWOqFWpsXgcAu9opvQ
-	(envelope-from <netdev+bounces-291708-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:12:51 +0200
+	id wOvINUmrFWpuXgcAu9opvQ
+	(envelope-from <netdev+bounces-291709-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:16:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C44DE5D736E
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:12:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCB7C5D7479
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:16:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8FBAE30230CF
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 14:09:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0D00F3017E9C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 14:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02EA93FFAB0;
-	Tue, 26 May 2026 14:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0780E3FE348;
+	Tue, 26 May 2026 14:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zdY34fYX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gXJGWyn/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8433FE36E;
-	Tue, 26 May 2026 14:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779804539; cv=none; b=Ct7OQw+EmMU7TXU1BEVLcRkzObdxM+nP50gjIqmYKDCmrpRb9J1sYEGHeLCY4PhcXVd5yEgr+Yutv7DuZohHWNpqCAOxI+UP2mqAtFPVl5yJu3bhONrIFwW2wJxjGO1veTnfs9RR15KUknl5SNqoV7JWeQU8ZWu9ZQBeeuJVp+c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779804539; c=relaxed/simple;
-	bh=drZNbivCi2A038pOUJFPa3TBsMVcWQnN7UKzLfONLwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cXGbkHCXLJ9hs77ZgkCbMbW/Iy+Gi0SNrWEQIbVIlqQRQxagf+a3BoH0G6WML+FkKF8rcgttDmR/SMzZnD5B0Rzuro3UOi3xtu48blPcMWvqNreZt4BCSew+HYjxDcOvxZbJuYgCrESBnmz8ITW4T6m09fmlh5gozt43mvAR0l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zdY34fYX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gi1BDbh4UmeuiwuUW6TVcxqnSQf4WY53/P3UBwkJOU4=; b=zdY34fYXBm6exGHIEF01vzLXFU
-	2898yu1gaIojOjvq6x6pr6a5aNtgPWoutgyX7K7oBHPHa80e/Za6InlpemggTJg5A3ltOCUv/COED
-	4d2AhzXTy6Kjz9IboLluM0cdIcTCSSRWGM3OoKcM697J6rAcCc5qmrw7suXQDGnkdenA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wRsSL-004aig-F9; Tue, 26 May 2026 16:08:29 +0200
-Date: Tue, 26 May 2026 16:08:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Lucien.Jheng" <lucienzx159@gmail.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@mork.no,
-	ericwouds@gmail.com, frank-w@public-files.de, daniel@makrotopia.org,
-	lucien.jheng@airoha.com, albert-al.lee@airoha.com
-Subject: Re: [PATCH v6] net: phy: air_en8811h: add AN8811HB MCU
- assert/deassert support
-Message-ID: <a0d3143d-df3d-4324-bde3-44846482370d@lunn.ch>
-References: <20260524063915.47961-1-lucienzx159@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644993F5BF5
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 14:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779804807; cv=pass; b=HrzUMsHdjDtkX8otkcXug6XTH8rdgfw+nyJ80gXfnNnHlvSuFnHygG+5SveHY/6TXDk2moy2xq/rCO6vczwp04LxtOIcfwVHN7UBcqEysrD/fWRjFQ8/Jg3jjm3Ovz6f8q7Q+ssbl8qty2CxcrQO9bnewn1ySD9sHPXi+Nxhlc8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779804807; c=relaxed/simple;
+	bh=szMB5rJIZwyDr8Co1iszMrMWL6CuTDsrGcSVaie+nAQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=StXrGRL5mlMuq+STWM3byKFjVBVtuRSp8X+95f8G6AkKXce8oG3pISsVQxMVgEGxSvnE0Z5uUfVxvqXR5M3qKDa5fqS4rpv6CeBKsAosKXtNTr3oblZirRAmi7OOfP+6Y3H96pejckqA+oE7UyGmPa9+95haF96vzyZxiTmx7e8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gXJGWyn/; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-51306c9f2e1so125867231cf.0
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:13:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779804805; cv=none;
+        d=google.com; s=arc-20240605;
+        b=F9h3yE5E+V7wTGKnFo+gBGDLMPgOaVR2Xv5u33m8loJssMPDszELjVfh7PoEfO5fkF
+         QGSbqTcsl0blds4hg5ZqB1jiXI6jBbUNE9wt2xBOvUaAWMk23AfcsX9jqRn7S917ONbW
+         HZwEzsQHnyld6hybEQMmsbBV5QKTvn25C989Rtt7FJE+Mni44q7JtehXGsuZXsGaJBO/
+         Cja29RY/SS+7DvDvSAme6XxDdBhY9ag2TA0ALYDeMBAP3rU/iLn7e39e/SQj1oPFSCod
+         aarB4FK687fW4e5H2zT3pcqlerRQOtisKpSq8AaiVllkuLC94NKniHY6ZX1dMkoYv03R
+         vDNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=aL/4GbBmhemP4ITHOZqu5kMdGwyvnVCuB/ahWK9Tni0=;
+        fh=NoLVXJuS1x4ZE683FNE3t0+No8sraQUzMSowQd2Bm1s=;
+        b=czF53cSB6h4QNui3Lw7A4SXNhrGT+DvWNLeSfO7U6/JObpOYkpAXcZ9hk9lqBOzn5w
+         6LqO/b5n6L9OfHsihRuYUpvMUgiIHb1Fca5jKG8JFEkr2o2h/1E/EA0zJ4ri8rdyjNXQ
+         I+UzWm5RI0qnKSpp7tlNL6+8pz8bpOPQmySDUE1MZNT/0rdFnYHtr9/ZfzhAb1/L8/Ys
+         tIAC151hpcwX/RJ99DmsQA+RG/1IxlMv1vuraZasWHEMulNb7aKqi3YkycdlximkjEFf
+         rp1OdbhtXih9Dq6HGp0QQCR3L4mDWY8O4TePbhxfPPaoaJbduisMP3WmkZiWECtzC0RH
+         MPcg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779804805; x=1780409605; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aL/4GbBmhemP4ITHOZqu5kMdGwyvnVCuB/ahWK9Tni0=;
+        b=gXJGWyn/JgGOdkqhr2uX4MLFEt6+yIbIlDIwLdCB6jlw63zRCYC9RQr66pgBKlOwCG
+         dkKWFb3onwaXK5o4jv/Q1ZKfbsgYVlJPfqjKI+Onn39hYxgCO5bG3Cj1xmYJGZBGRKQf
+         yS3+/67LPv6TDnVfI9GMSCWOo+lolKNflenhEPrSk+sEcWauuU22xvqggxTQGvkw7/tz
+         YnKIYqgtboqL6d9wkYKBzo4oHFGGILa2+xWOrqMFgXSlk7EBOhppaMiGaoHuznmahwWn
+         jI/zHEy5pACP9mc1xSbtAeWPu47ps9vDj0dfQ5Dqph/rlMiYreKJzmDkTDWxC2JHVjF9
+         FlZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779804805; x=1780409605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=aL/4GbBmhemP4ITHOZqu5kMdGwyvnVCuB/ahWK9Tni0=;
+        b=dIBh+nBWOgEVRMZbpSJkYA9eTYHD3aTfY6wfMeTWMvh+bqaDp+3/PfIG9wEbMy5Shu
+         x5pQrR+rkwJ9ES8kG6GtoVRNjGbdY3LsbW9dh5fMLCQZmr/LRuvpyW8zjCkJ+kmACYnz
+         XQleNiVVLZCEmyyqrYVaYzpqmnfJdQTxCEaU2pyca7WRMxcLgOdfrqnT3FOnstPH7EA6
+         1VydFZTX+40Bq/3VIropTQsyGzHJOWgDwannJnrXozL4sbzY0smu+8owr5Y+DZOoT+EQ
+         A2P4MA3uHuDQhDv5kbEkEKQwUJ2dTvEyMArJEWQ9Ksb1aHsPbKlKH/XBriAhLgEP/rR0
+         AUIw==
+X-Forwarded-Encrypted: i=1; AFNElJ/Qq6tsVau1R09NOmGr6wF8WB0+02UXrfH6CbrRChBm7fSOUIWFNbqgNG+1Ao+sEy1q7D4ksdo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxj4HIASKqyS0rksyKdUmcM71F6tmrZ2PQ2eHc+rPyjSzuPfWC+
+	eWsIlV5UBjTVPIFJkFtYKb/hTNf8QYlvt6uGbvQ81IluwXbNVCBfd6AVoemQWkLCnRn/hOfAczc
+	OOx2AG2YhF+4ESf1vHUwsvjw0ncKPspBZ3wA0Vx5M
+X-Gm-Gg: Acq92OFoNODeM/cKQMcwQGjwLxqVWw1gz4YYevGZXosp1oPYsEPUEbIEgdEXV8Q8/ye
+	KCY+CDZl2aky/FPuQ7XPLJgD8/QavYNtJ+YGrIB+HYGBlxQv8ROCot01t7QrkDR65FsxnJeXHae
+	8BHpODtxhaTARSzR/SMS1SdXPWNfPdGGkVZztjufNneJy2GMvjexK7WiGQ/LZsKjUplJ1Z+KqHD
+	LsN1vmh05EKDQ2eWhpz7kK7Ja/G6AlDHK14MnHj82LMFFOY/TxAWv1jdsEhxONEZ6nDfYtsdwDe
+	KvglEkXQ1O9P9Yen9pLgXB5gOl2a43sVyj5pcAZOhICLv32aZfvHbh7z58jYuRo+sPdJIKtY1du
+	MAjM5UPnlhF1HBqEJPCiHbWw0BqMzm8vQezQtK4FWQEXA7e8zx59f4euAe5v0bp8=
+X-Received: by 2002:a05:622a:410d:b0:50e:a1ab:114c with SMTP id
+ d75a77b69052e-516d43cb2f2mr241460991cf.32.1779804804276; Tue, 26 May 2026
+ 07:13:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260524063915.47961-1-lucienzx159@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+References: <20260525082510.1554447-1-edumazet@google.com>
+In-Reply-To: <20260525082510.1554447-1-edumazet@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 26 May 2026 07:13:12 -0700
+X-Gm-Features: AVHnY4I7fof_CPcJ3XmtxWlzZc4qPBB3VhSZzBNfqI65xRDpIFjzvX5ENYi5afw
+Message-ID: <CANn89i+x3-u_H5favLmR5OFn_3nPE3GPMV9iBFpSMVWek09Jvw@mail.gmail.com>
+Subject: Re: [PATCH net-next] ipv6: ifrags: cleanup __IP6_INC_STATS() confusion
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291708-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no,public-files.de,makrotopia.org,airoha.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-291709-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: C44DE5D736E
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vmlinux.new:url]
+X-Rspamd-Queue-Id: DCB7C5D7479
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 24, 2026 at 02:39:15PM +0800, Lucien.Jheng wrote:
-> AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
-> Assert the MCU (hold it in reset) and immediately deassert (release)
-> via a dedicated PBUS register pair (0x5cf9f8 / 0x5cf9fc), accessed
-> through a registered mdio_device at PHY-addr+8.
-> 
-> Add __air_pbus_reg_write() as a low-level helper taking a struct
-> mdio_device *, create and register the PBUS mdio_device in
-> an8811hb_probe() and store it in priv->pbusdev, then implement
-> an8811hb_mcu_assert() / _deassert() on top of it. Add
-> an8811hb_remove() to unregister the PBUS device on teardown. Wire
-> both calls into an8811hb_load_firmware() and en8811h_restart_mcu()
-> so every firmware load or MCU restart on AN8811HB correctly sequences
-> the reset control registers.
-> 
-> Fixes: 5afda1d734ed ("net: phy: air_en8811h: add Airoha AN8811HB support")
-> Signed-off-by: Lucien Jheng <lucienzx159@gmail.com>
+On Mon, May 25, 2026 at 1:25=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> After commits e1ae5c2ea478 ("vrf: Increment Icmp6InMsgs on the original
+> netdev") and bdb7cc643fc9 ("ipv6: Count interface receive statistics
+> on the ingress netdev") net/ipv6/reassembly.c uses three different
+> ways to reach idev in various __IP6_INC_STATS() calls.
+>
+> - ip6_dst_idev(skb_dst(skb))
+> - __in6_dev_get_safely(skb->dev)
+> - __in6_dev_stats_get(skb->dev)
+>
+> Lets centralize this from ipv6_frag_rcv() and use __in6_dev_stats_get().
+>
+> Note that ipv6_frag_rcv() tests if skb->dev could be NULL already, so
+> I chose to also guard against NULL, but we probably can remove the
+> tests in a followup patch, because I do not think skb->dev could be NULL.
+>
+> iif =3D skb->dev ? skb->dev->ifindex : 0;
+>
+> idev can be NULL, __IP6_INC_STATS() deals with this possibility.
+>
+> Small code size reduction as a bonus.
+>
+> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+> add/remove: 0/0 grow/shrink: 0/2 up/down: 0/-116 (-116)
+> Function                                     old     new   delta
+> ipv6_frag_rcv                               2492    2474     -18
+> ip6_frag_reasm                               807     709     -98
+> Total: Before=3D24655281, After=3D24655165, chg -0.00%
+>
+> Fixes: e1ae5c2ea478 ("vrf: Increment Icmp6InMsgs on the original netdev")
+> Fixes: bdb7cc643fc9 ("ipv6: Count interface receive statistics on the ing=
+ress netdev")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Sashiko says:
 
-    Andrew
+This is a pre-existing issue, but could this cause a NULL pointer dereferen=
+ce
+if the physical interface was concurrently unregistered?
+If skb->dev is a VRF master device, __in6_dev_stats_get() will attempt to
+resolve the original physical interface via dev_get_by_index_rcu().
+If the interface is unregistered, dev_get_by_index_rcu() returns NULL.
+__in6_dev_stats_get() passes this result directly to __in6_dev_get(dev)
+without checking for NULL. __in6_dev_get() blindly dereferences dev->ip6_pt=
+r,
+leading to a kernel panic.
+While this existed in __in6_dev_stats_get() prior to this patch,
+evaluating it unconditionally at the start of ipv6_frag_rcv() before any
+
+I will add tests to __in6_dev_stats_get() in V2
+
+pw-bot: cr
 
