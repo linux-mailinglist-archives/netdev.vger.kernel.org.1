@@ -1,223 +1,200 @@
-Return-Path: <netdev+bounces-291556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qAdONCZDFWoOUAcAu9opvQ
-	(envelope-from <netdev+bounces-291556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:52:22 +0200
+	id qKC7KGlCFWrJTwcAu9opvQ
+	(envelope-from <netdev+bounces-291551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:49:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3ECD5D156B
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:52:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 806D15D1509
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:49:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D1DDF3008FEB
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:52:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 51A6030072BC
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFF33C4141;
-	Tue, 26 May 2026 06:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049053BFAF7;
+	Tue, 26 May 2026 06:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="qIFyhMsp"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="O3ns/sBj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011069.outbound.protection.outlook.com [52.101.62.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4E23C37AC;
-	Tue, 26 May 2026 06:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779778330; cv=none; b=OektnI777rxA13pGqY9bEBBx6SDTJEMDLqZwIF+mBq/4neFlNhMUUitLrDkynKXqawneTgj36v0+8FEqbtHYdcjrIIkMAMfSmD0eOoI8ot1nZOTEMBARl9CwasryMjgHWRgGMgHhNv5lekoj1oppaeI0j9NgbC0F8i4QuHDeBmo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779778330; c=relaxed/simple;
-	bh=UZRc3kggpT5xBfJ5QCpE42yQBKoEj6SjU+Ar6L61mr8=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=BMfQ/bSOvPoFFyUie+65mMy1u9ZAHjVUl4zRe+qVboW96J+J39y+rwh98M1EfQVpAmOqKf1zSpeIWLXjrBjGS0ZoQk9d2JSwAV2QVNgQqe/W6yjk56CBVl1kWJ+C9cdRALFIEgIDRFaXFKiAopKvMXwV7r8q8opFGsnBtac21f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=qIFyhMsp; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from [192.168.2.17] (82-69-108-24.dsl.in-addr.zen.co.uk [82.69.108.24])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id 4D0DB7D4AA;
-	Tue, 26 May 2026 07:44:32 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1779777872; bh=UZRc3kggpT5xBfJ5QCpE42yQBKoEj6SjU+Ar6L61mr8=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:From;
-	z=Message-ID:=20<c08da2f1-750f-257a-180e-f1af47451647@katalix.com>|
-	 Date:=20Tue,=2026=20May=202026=2007:44:31=20+0100|MIME-Version:=20
-	 1.0|To:=20Michael=20Bommarito=20<michael.bommarito@gmail.com>,=0D=
-	 0A=20"David=20S=20.=20Miller"=20<davem@davemloft.net>,=20Eric=20Du
-	 mazet=0D=0A=20<edumazet@google.com>,=20Jakub=20Kicinski=20<kuba@ke
-	 rnel.org>,=0D=0A=20Paolo=20Abeni=20<pabeni@redhat.com>|Cc:=20Tom=2
-	 0Parkin=20<tparkin@katalix.com>,=20Guillaume=20Nault=20<gnault@red
-	 hat.com>,=0D=0A=20Simon=20Horman=20<horms@kernel.org>,=0D=0A=20Seb
-	 astian=20Andrzej=20Siewior=20<bigeasy@linutronix.de>,=0D=0A=20Clar
-	 k=20Williams=20<clrkwllms@kernel.org>,=20Steven=20Rostedt=20<roste
-	 dt@goodmis.org>,=0D=0A=20Kees=20Cook=20<kees@kernel.org>,=20netdev
-	 @vger.kernel.org,=0D=0A=20linux-rt-devel@lists.linux.dev,=20linux-
-	 kernel@vger.kernel.org|References:=20<20260523023423.2568972-1-mic
-	 hael.bommarito@gmail.com>|From:=20James=20Chapman=20<jchapman@kata
-	 lix.com>|Subject:=20Re:=20[PATCH=20net]=20l2tp:=20use=20refcount_i
-	 nc_not_zero=20in=0D=0A=20l2tp_session_get_by_ifname|In-Reply-To:=2
-	 0<20260523023423.2568972-1-michael.bommarito@gmail.com>;
-	b=qIFyhMsp37rN+Wj54G2Ha2xelNHnO2G37L3YHpj/VNJTWAxSwZJbx2cVEIMoiG77f
-	 6qmer9QWiZudbszcoERZ87MQuW+zepLi2LSwJFEJL7Me0uAiemzKRKfk53ZJp9p2/L
-	 lzGKS2uqwSS7tlzJ8yv3yY9FDy5xuFSQ87pVzL3eKp44sRvA2uxVUCa3DrlHXPbMh6
-	 hgEuJhWfD4RPpC+Q08qVmy/bbfYtLUEF7IRRa93Z4RWVKIDnqVfW10IUvlOh1dVocK
-	 CmwDOA05OzcpqUEYkpwKKPXrCnaR6Y5ugrLAVBwEFt9bROwGqsKBcCQjY3X4DczASf
-	 9yuW3awYTactA==
-Message-ID: <c08da2f1-750f-257a-180e-f1af47451647@katalix.com>
-Date: Tue, 26 May 2026 07:44:31 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75928368D78
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 06:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779778146; cv=fail; b=Gso06R8qwhQRhtDRAkFRKO1ivveF0br7iTD7c/iI+Z4VI+ZBaNKjWaPB4Tycs2Yxz55exC5lmALbyBcSCLFovC6MXK3ln1FNUUJWD0qTDAlfaIUU2ebhndZFwkuPSKCbqbUmmeui9GnuYvkfNtNNL7J8PzNpBEoEhI8Weky35hY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779778146; c=relaxed/simple;
+	bh=j6xr5kWQapOCKjEgMdR+pAY2oaurGTME35R4NfN73rU=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=qCsoMri5ldMbrNzosHgGxk4DybDlzzoibZpleNBTZB4tclEacWP9Od2Mn2pvUWYIjAhDuQiVpv8NYnV/34RyHcJBST7McDpcOtUG9a3cNHeGbNYQ6mlOD7YNu9Hlymq4Jo97/T8WIekKfLksgzMhjixTTNRfLftre1nFuxkHjRs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=O3ns/sBj; arc=fail smtp.client-ip=52.101.62.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eKBQ3w0vpWZIgmzur20PNHH+lrQDRMvWCrdjHKhQ0iCj8RtNtD/bsSaCBV7Nkyh0PBxysQ6PPf3aYybOHi3QgoiBXj6S99xU33RpP4UMPBO+dNLcbdLSa/vjPXjezlWug7OmkEZqAHYyZV2WbF4hftDLrfa4ORcTZxfDzGXz6eh8fHv9+XOrnmr5EfPIgbDb707HcyXBawuYl7G5rd2+cZ/EnHStQsEvy8UUmhAxTT9ipXVEnegvaCVCXI7SL9N6lWdYPIRdz9NVt4V6AUB0HX50/HjMbH+M1XaOZszhX5WebcPvTIgv9AGA/1Z3sDHqcitQMwZihmqZPMJb9xG7jg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CnL36JsjEZQW2Qii3ZrPrPnF3SHXm6NnRWdx0V0LjKw=;
+ b=eX5f5m7m8w+aBCuQpErYGi2n4rXfxKRRxA7b2d8U9BLbwpv2XAuksLMeXYVG7EWPJhsLD/pE1Y2KJlF619U1k3q4Y8hP/2ZlPCNCq0ETVIy1m+bu+B4Ar+c8S24QhSzqjmH4NBCCooEbD/j98TDOM+5YaENiHsZgttY6ZAZs1k+m6d8XrQCE9ibaxNI7LLd3Oi0IpP4a2rVvfzcFmlZKtqa+KQrTA5oDQKqJLyp8axrBAIjii5Tf/YZVa402XByPA0QgD7q0o3Og2xmDFGuy9zV2z24IdLSHtWwj7nJJ/Ny4B5WSLH6/HRB17GEr3PuI/slUTxty9p+FeFsSU5oQUg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CnL36JsjEZQW2Qii3ZrPrPnF3SHXm6NnRWdx0V0LjKw=;
+ b=O3ns/sBjizN27M6Spvs27iDigyRTmc2zIXrmgLAaEqi9WNQTZTghqVNqOt1LzemVz5Ce/UlEG77cgdmoHB06R53qGMu8Gc6rUiRlyVqj1vsJ0kbK6l/OI2FRjydrB9kp74/x/+4SfQv4VPmXdY8ZWhCVu5iGbGcnG7jUFWxWI+st4QYmKxpl3jXTjG5EdDEnW05B9AdvByw1QTJVjW2xRcsWaX/yfb5CWV+TergBV/r+yRjgIKub6mBBS3jZVibfryzV2pdYu4PXsszP7Zh2eecIlLL7eh4veFoDCL8vS7lIJCVdztByQy1ibVFDXJawerKo1tx73cKy90MK6p6h+A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by DS7PR12MB6069.namprd12.prod.outlook.com (2603:10b6:8:9f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.12; Tue, 26 May
+ 2026 06:48:59 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0048.019; Tue, 26 May 2026
+ 06:48:59 +0000
+From: Ido Schimmel <idosch@nvidia.com>
+To: netdev@vger.kernel.org,
+	bridge@lists.linux.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	razor@blackwall.org,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net 0/3] bridge: Fix sleep in atomic context
+Date: Tue, 26 May 2026 09:48:15 +0300
+Message-ID: <20260526064818.272516-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.54.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR4P281CA0419.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:d0::18) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To: Michael Bommarito <michael.bommarito@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Tom Parkin <tparkin@katalix.com>, Guillaume Nault <gnault@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- Kees Cook <kees@kernel.org>, netdev@vger.kernel.org,
- linux-rt-devel@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20260523023423.2568972-1-michael.bommarito@gmail.com>
-From: James Chapman <jchapman@katalix.com>
-Organization: Katalix Systems Ltd
-Subject: Re: [PATCH net] l2tp: use refcount_inc_not_zero in
- l2tp_session_get_by_ifname
-In-Reply-To: <20260523023423.2568972-1-michael.bommarito@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[katalix.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[katalix.com:s=mail];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS7PR12MB6069:EE_
+X-MS-Office365-Filtering-Correlation-Id: 77492528-da83-4f67-836b-08debaf2dd5f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|366016|6133799003|11063799006|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	usXmLdisQqIZtlI2yyLNWtHZixrKFTSeWE3UyRa6LkBv2EeJ8q7NLGOoJ4403UJz5u4U+OmHPEaJDfGe3jymSpbYOerPkh0W90pQLpEXbwi30L4jP/iIVzu9sCqUUsFa/Y7FVD679ntj67Dy7LGr6iBGRi0yEMwMSJmimEBSWwQHI6kHB7jPHzEJi0q4ILMHVt8mAPk0WF/Np7RTS1ll5HX7wTeLWgZQZr11u9Z2IHFGdIMLAraxD6FfNiy/PmFqX5sMb9Iwh3h7mENew5zritVAAf+xmKKum4tZr3JR1x4AwdmLc59ousW68BWv//Pk2dPVh9gmI2+m1/csjxsmfUdMd/0tppUTEonVwuWkGKag9IYGOrIva0L2DJa2z7pvlflhu4cBumrUNx5NCp7wwuom1kgcXorKNEG/oPAw04Oqpcb/JflgdoM993VAgtDP4yq2izh3FX0zi2Bvbsiut7+oNzlKZrizgBtLBbXA2CjWsg02G2aowYwiecQcQdL+C5zihGDK+ClZd6PoYi6pOH1YvYzNAl1vuQd5WJ6Guk6Pj4G5K3X7GH9BxCqw46WsbeFjLUergB+Yvsasg9VItzq9jWQF2KeqrHWmFwy6xdvo75GMKaiZYoDdqgi9MxTI4kajuzv3HXCg+T8WAp0fwimWHdTKvXhzwk/VkBCptOJ+JlqVm5cVHTr60SC+TLhb
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(6133799003)(11063799006)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?tXSmjz2fNgLuhQ9nfeSDh5pTQjxcdqDeg6DVumyRz7fvlZc3LErOaUGBTJN6?=
+ =?us-ascii?Q?TC1U2nSDCVWEPCXfnub5n253Md78n+6S6DsS22b0RlfrTfOi+W5orrV26uhp?=
+ =?us-ascii?Q?bJ8HdnE597gWhg7EquVXsWbovKFlpcFddQezWcEQvJkk7Gn94xKaNeD3Fgl7?=
+ =?us-ascii?Q?fdnUbf+tA5jTXtuDkP6z4Xy2HzfnvZ9pZUb+GxnAJhYEU6QcSImkII/x8tXe?=
+ =?us-ascii?Q?amtZnMH/uiYq1LfybNThaJ2Kza8mZPBNC92aULy+/lwpSxhSFrNmJFVa6hu+?=
+ =?us-ascii?Q?3dMvzLagUBL5ljN3C6sw24IiNCz2B9aIN/XrMtj9yEt6FVkw+jba375UTB91?=
+ =?us-ascii?Q?xkd16JBADTBzJKlAtPX3XX1EuO88S0PlTTwDSAUip83hANNHEeRhqnNFMFed?=
+ =?us-ascii?Q?Kistud33LLfhrd+Cun43tg+WxZyHpaWdIYm5LM7ynWEjdeyrwU/r8wOuAfJ5?=
+ =?us-ascii?Q?D1HHoPawXq9ue9O8UGt5hOeHQXSL5683B/9bLW42fFrXZKZwKxFAxxzrRcja?=
+ =?us-ascii?Q?JUMG0GodlP8bmsQ4AjDiVnX8lIRgMbjDUq29+2pw4PAuOYsMWdCozDCZ5c9R?=
+ =?us-ascii?Q?mOx0kJpgTGg7TUVuqBxy+yNqr5mE74V1SBdA+iUVOo7f7JIIJLQCYAC1OuxS?=
+ =?us-ascii?Q?KzM8jI1YPNXrjjfd4dwsbYBjHYcOFUzjSBDJuBe44Xoxq5fo6DPxI3fFJSDO?=
+ =?us-ascii?Q?8tshDp/03b3ZnQdJmi3+1hma5RoxdHn5AEfUoof6vkW/ImyE6fDC13+kz5hN?=
+ =?us-ascii?Q?Sm66U2YnAWB7ThDPGBG7jFCOVpXu3uAHL7b6Xnsapze4eag2+VA8GyW5EMeu?=
+ =?us-ascii?Q?hnj+LUcmtsSAgs4vHfPFEgFA37NDoIfulUo+k9BFKQVJb8kCqfYSE5298L9k?=
+ =?us-ascii?Q?b0h3vFj+jrJq7HPCI9OQZuythwysael8HGozfB5vtw2qAoyPikWSwtRTLCl/?=
+ =?us-ascii?Q?+QpYQaYtBX5O9CHHrFNjjzJW96ssx76t4RmOQq87nX4H7dGphPl5tDgacHXn?=
+ =?us-ascii?Q?91ViFyCeefSnaFVeZVNMHDp13X16OuuKmLllq0nDB6mdl65emSgnv87fmMeO?=
+ =?us-ascii?Q?LzqfrQI+tquGixFmgfQ8+5E/CY0oBHEQ1047GTdEvbBN1A5IGdJa026A44b4?=
+ =?us-ascii?Q?xw6KO9sp2nL+rlScCEY1PDxCBepZ0cYk7JQjnM3TDAOUL58NyD9cYJg7jcUM?=
+ =?us-ascii?Q?eFKCQbVMBOdYAkSpbUvClNPHuiqKs5ZNQhGo2NHPOXpEeCv7NDFu8UjQ9F24?=
+ =?us-ascii?Q?4dU8YanniM/CtYe2FtSMxFNmDIpPimeSKm7/EMdiGOTXxPPUp7zVT1rjotLx?=
+ =?us-ascii?Q?z5G6DHaJo/KS2qVzrbJXt5RG6T8gahoctok3ubZwkGxmuMxcUlrjgOqgxwQ5?=
+ =?us-ascii?Q?AhVpRp5dR9Kr30W1wtu3VnOHgh0wc8UjmpMmoG0gS8DZBXIsYjm4wS4HBqw4?=
+ =?us-ascii?Q?430/eVIsy5m6kZ1EW36jDpCIEW83ai+jmJy8UNR4dYFdZkXFASjoIoCGtvKS?=
+ =?us-ascii?Q?eS4ZW7PQawYiieYlQXXkCxRM2EPm66xyjDkT9PxKo4l4qKesi2D9uFM+Kjp8?=
+ =?us-ascii?Q?d/P8D4BEKNUBi2La2vo2TtFZDWTVp+4cmm2UuB6OE2RgKo4pw+OBbmoNoDJR?=
+ =?us-ascii?Q?2dQNkeUktCHNhqys9s8SNYc0jAm5Is/eLUv0s/JmRjcMc18pLs/jZBt4Il6v?=
+ =?us-ascii?Q?c+WyC/x8v4wQpnu5QgCTViSwTpTeM6lnrHPaO7rJlTSTfq02?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77492528-da83-4f67-836b-08debaf2dd5f
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 06:48:59.3039
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IVKbtWZxCSnaU41gqLjjoAFfnazhS3C78axrV6Z+gq/vY+tbKR+3CdcsutoCPRFGNY8JWBMEnz0rd0srZmHtZQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6069
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291556-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291551-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jchapman@katalix.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[katalix.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C3ECD5D156B
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,rtnetlink.sh:url]
+X-Rspamd-Queue-Id: 806D15D1509
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 23/05/2026 03:34, Michael Bommarito wrote:
+Under certain circumstances the bridge driver can call
+dev_set_promiscuity() while holding the bridge spin lock. This is a
+problem as dev_set_promiscuity() might sleep.
 
-> A reader in l2tp_session_get_by_ifname() can return a pointer to a
-> session whose refcount has reached zero. The getter takes its
-> reference with plain refcount_inc(), but every other session getter
-> in the same file (l2tp_v2_session_get, l2tp_v3_session_get, and the
-> corresponding _get_next variants) uses refcount_inc_not_zero()
-> because the IDR/RCU lookup can race with refcount_dec_and_test() ->
-> l2tp_session_free() -> kfree_rcu(). The ifname getter is the only
-> outlier; the inconsistency was raised on-list after 979c017803c4
-> ("l2tp: use list_del_rcu in l2tp_session_unhash").
->
-> A reader inside rcu_read_lock_bh() that matches session->ifname can
-> be preempted between the strcmp() and the refcount_inc(). If the
-> last reference drops on another CPU in that window, the reader's
-> refcount_inc() runs on a counter that has reached zero. refcount_t
-> catches the addition-on-zero, prints "refcount_t: addition on 0;
-> use-after-free", saturates the counter, and returns the saturated
-> pointer to the caller. Session memory is held live by the in-flight
-> RCU read section, but the kfree_rcu() callback queued from
-> l2tp_session_free() will free it once the grace period closes; a
-> caller that dereferences the returned session past that point hits
-> a slab-use-after-free. On PREEMPT_RT local_bh_disable() is a per-CPU
-> sleeping lock and the preemption window is real; on stock PREEMPT
-> kernels local_bh_disable() is a preempt_count increment that closes
-> the cross-CPU race in practice (see below).
->
-> Use refcount_inc_not_zero() and continue the list walk on failure,
-> matching the other session getters in the file. The ifname getter
-> is the only session getter in net/l2tp/ that still uses the bare
-> refcount_inc() pattern; this change restores file-internal
-> consistency. The success path is unchanged.
->
-> Fixes: abe7a1a7d0b6 ("l2tp: improve tunnel/session refcount helpers")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> ---
-> Distro reachability:
->
-> l2tp_core and l2tp_netlink autoload via the genl family alias
-> net-pf-16-proto-16-family-l2tp on first AF_NETLINK CTRL_CMD_GETFAMILY
-> lookup; pppol2tp autoloads on demand via net-l2tp-type-7 from
-> L2TP_CMD_SESSION_CREATE with pw_type=L2TP_PWTYPE_PPP. Neither
-> autoload requires CAP_SYS_MODULE. SESSION_GET / SESSION_CREATE /
-> SESSION_DELETE are GENL_UNS_ADMIN_PERM, so CAP_NET_ADMIN in the
-> netns user namespace suffices and is reachable from `unshare -Urn`
-> on Debian 11/12, Ubuntu 22.04 LTS / 23.10+ / 24.04+, Arch, Alpine;
-> RHEL/Fedora blacklist l2tp_netlink by default but on hosts running
-> NetworkManager-l2tp, xl2tpd, or any L2TPv3 endpoint the gate is open
-> there too. PREEMPT_RT ships on Ubuntu Pro Realtime, RHEL 9 RT, SUSE
-> RT, and Yocto-RT.
->
-> Reproduced on x86_64 QEMU/KVM. Under tracefs-kprobe widening at the
-> refcount-inc instruction, a PREEMPT_RT build hits "refcount_t:
-> addition on 0; use-after-free" through l2tp_session_get_by_ifname at
-> 533 s; patched runs 1800 s clean. A stock PREEMPT (non-RT) build
-> with the same widening ran 1800 s without firing: local_bh_disable()
-> on non-RT prevents preemption inside the RCU section so the
-> cross-CPU window does not open at observable rates.
->
->   net/l2tp/l2tp_core.c | 9 +++++----
->   1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-> index 1455f67e01ddb..0000000000000 100644
-> --- a/net/l2tp/l2tp_core.c
-> +++ b/net/l2tp/l2tp_core.c
-> @@ -441,12 +441,13 @@ struct l2tp_session *l2tp_session_get_by_ifname(const struct net *net,
->   	idr_for_each_entry_ul(&pn->l2tp_tunnel_idr, tunnel, tmp, tunnel_id) {
->   		if (tunnel) {
->   			list_for_each_entry_rcu(session, &tunnel->session_list, list) {
-> -				if (!strcmp(session->ifname, ifname)) {
-> -					refcount_inc(&session->ref_count);
-> -					rcu_read_unlock_bh();
-> +				if (strcmp(session->ifname, ifname))
-> +					continue;
-> +				if (!refcount_inc_not_zero(&session->ref_count))
-> +					continue;
-> +				rcu_read_unlock_bh();
->
-> -					return session;
-> -				}
-> +				return session;
->   			}
->   		}
->   	}
-> --
-> 2.46.0
->
-Reviewed-by: James Chapman <jchapman@katalix.com>
+Patches #1-#2 fix the problem in the netlink and sysfs configuration
+paths by only taking the lock where it is actually needed, thereby
+avoiding calling dev_set_promiscuity() from an atomic context.
 
+Patch #3 adds test cases for both configuration paths in rtnetlink.sh
+which already includes test cases for similar issues.
+
+Note that dev_set_promiscuity() can sleep either when it takes the net
+device mutex or when calling netif_rx_mode_sync(). I encountered the
+problem with the latter, but blamed the former since it came earlier.
+
+Ido Schimmel (3):
+  bridge: Fix sleep in atomic context in netlink path
+  bridge: Fix sleep in atomic context in sysfs path
+  selftests: rtnetlink: Add bridge promiscuity tests
+
+ net/bridge/br_netlink.c                  | 17 +++----
+ net/bridge/br_switchdev.c                |  1 -
+ net/bridge/br_sysfs_if.c                 | 30 ++++++++---
+ tools/testing/selftests/net/rtnetlink.sh | 63 ++++++++++++++++++++++++
+ 4 files changed, 92 insertions(+), 19 deletions(-)
+
+-- 
+2.54.0
 
 
