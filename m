@@ -1,102 +1,89 @@
-Return-Path: <netdev+bounces-291593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBoTBdxcFWp7UgcAu9opvQ
-	(envelope-from <netdev+bounces-291593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:42:04 +0200
+	id 4D/hHL1gFWoiUwcAu9opvQ
+	(envelope-from <netdev+bounces-291594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:58:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C23C55D294F
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:42:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E4F5D2D33
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:58:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 66C5A300D788
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:41:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C9C04300C812
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B5A3CF04E;
-	Tue, 26 May 2026 08:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15583D0BFB;
+	Tue, 26 May 2026 08:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Tumgtoe4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="abUwY5JN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f99.google.com (mail-wr1-f99.google.com [209.85.221.99])
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CB63CCA12
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 08:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6E3CC33D
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 08:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779784870; cv=none; b=e0dxfER6aOjRIyLOsqOkvj+UZ+QZUb/oXyeOo8hrznLgeUz1WZwLZc8OL+dJl5WHwU9BXYUngLqqdXUNJn/1Kr6voKQqjB6BnA6vNt1lkGtOZEKxh1DMEQE/RhHEaZLDgGZCwzbudt+bxde5EWaNb+a2zgPRvzmpWRKsg2xZqOs=
+	t=1779785871; cv=none; b=iLi+rLB9jEonDQNRw6HMJWzaplqu1D7ZlOfvJEqp1mdpQe6EAxV086p0RN6Pl3oNjx7ybNcxSmqRECcejGMskO9xqK5o3+LEQR8rUoJQ4SsK8BIs47ZBPMLwmSZxKEv9xVkqPQVmjHbXXvsLMShwkpwX8f0WaLdQ3Fc1DfC0aBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779784870; c=relaxed/simple;
-	bh=KM0VbMqec8wRuf4GHSUncHf17yUJAf/1FnQ3++EcDJo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Xu7KOfJjuJ12ueQQ7i0GV8X6r7n0TtaVb7Mygt7cpo9cyRft0/g5SwzHuDeyK5dNvHaVTywhOu4/+UdI6cNt/mKt9wDr1LAvMvZ49TOgBjM/iMBZ0j5JQl2hhF60K/z830MdLxm/gNNSvafC1V3RlKrWmIY4J6pdTe3z+EgRHrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Tumgtoe4; arc=none smtp.client-ip=209.85.221.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f99.google.com with SMTP id ffacd0b85a97d-45ea19f412aso2892741f8f.3
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 01:41:06 -0700 (PDT)
+	s=arc-20240116; t=1779785871; c=relaxed/simple;
+	bh=Z5KBPZCcPU+MaBqAiYS5stC35AH1mL4g3zz4ejevnkI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XzvpXv5wqcJikQRtR8GgYXAUJ9eWEasuXxUpOJLs5R2qaJBWuUShHL9Qk1UOwJy8d++U+B6sKiGE3FNqoI0jy87JR+YB85bOJo/jhq9JJuOARa7M5O9pXuUObs8VehDASj9Wj9KqzGIr+SL6LNwYkgujB7ng8WtD9S3Gzti8TeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=abUwY5JN; arc=none smtp.client-ip=209.85.215.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-c801912c903so4560658a12.0
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 01:57:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1779784865; x=1780389665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PntmpFQ60OHxGG0FPMFqDHTwURgy/Ezf3Oo2r7FwdjU=;
-        b=Tumgtoe4U9+WJWaPCd08eYenuybfmzBVnp9Qk91Ez4O2PRauh9AN4KLxPfK0BWTdXS
-         txJWCr3o/pBJeMeJcGPfZUXQq4VNenbcfSMNLtILbSgsFRB1wlVMwKt/UhYcCq5jNN6I
-         yJNSBXXco2GggFodhDJcIqcmXTmAJCOTKcNcxKI4zCeAhVIe8F+zpEckascbkow4ouOU
-         DKb2PxOj8POwQE/S/3ipxJzQvhe2vO5CB7IbV//Vus974z4QDXcXx4VqZFz8NRSKCB6b
-         t9phahxYfOtzPayxSPHb/V0E3pe34csrPK/XnyYgKRORIi1ipGuON54nbHyBwC3WeS9Z
-         wk4Q==
+        d=gmail.com; s=20251104; t=1779785863; x=1780390663; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KunGhSCrk96qTBkynTCA5j2HMdY8U+GRQlqdEqrz/o0=;
+        b=abUwY5JNcFCZJ9cHKIEWwDK9wQO7uGTE+w+l4+edZUhRfkktRCAtpp8dXmPotMbZvF
+         wSJVOVGBzQMd+6192uGpeehGiTc2MyyxkGNCkBNEjT8dltQInieGSKcA7Ki9NqFYVIhi
+         wTCB5GCSCe0mZDdm29+gJNFEsHTo2KD1XJ+Jqa4NsTFRSWwps7xkPPtrpipBwVCPfVml
+         gHWdZSq3GfnFrYInQ4JyiD5iNSP20nnv4JS2jYZP5oQjKi6n7qmHHik/HoPR4E5wYlro
+         qPI7fLioJLNF0nVvfRm4O5ud5SqTHpyAocRCbJmFBCBJvzRFfWvlcyrph6dRs9yHtX3E
+         yPoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779784865; x=1780389665;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PntmpFQ60OHxGG0FPMFqDHTwURgy/Ezf3Oo2r7FwdjU=;
-        b=evR3aDpkgM2hSaS1bx9fUjDoT4RP/XqRE/sJe1gNE9E+SYFhcfzORUnz9a8nZvaefF
-         wZfs73wu+Y54MVYhfyOdsHR/8oCvKM1XaiUurinY/kKFfuykXTr/wOfbA8w7uCl6287F
-         Qf0EV6ZMaFaMiiaY4Ik+sq9iXpwI+LHtcgiNWMbgDfdyF8Np299FnZw+PfvIVU8CNDyb
-         8LzToSYsw9posuFanK6sqK4tft+yNss6rcQHA1KIMPOejUzlM/BiD+Gr9Hn8Agz+GKbN
-         TePnMM3wek15EMyp5bI+ByhRhlmycSCx3U7osYmRNcC/IXFJuKEuRrah4ZmPgInN14zL
-         Oq/g==
-X-Gm-Message-State: AOJu0YyW6WbpPBvFbSEsBxMJxfNJWl9kcAjORp5Nbi2/Vrlj9hR9ScMk
-	V99/jFmNzePlGmjY/EgYeGzMCzMM+szFhFq7DgBdvF/Q8RWwmMKFP8hP2hds/gUUhHrk/MC8xiv
-	xMXaEx2sAV0xLYhw4zwHVqLETAMxkcAHxYP6j
-X-Gm-Gg: Acq92OGdk6g1lZco2nen77y7ZwpZ/zYSdtcrFe1s7X0dp48JQcNBrIRP5YFVmy4cwKo
-	jnxjwgsW9odc4ZOi162ovSEhlD7unoIZQJ0EdBoNPMg/sT7VXbpGeZ9YoFx4/JpSfG461XlazkZ
-	+RYGu2MgcW0Y5HYtcc41u+FB13AJ0zruy6DrFFtxvK3UOMxHkNSS4yDrIJZA9QMEYfEKALXkOBv
-	8lA91wfdlEL80PhZ07q+gyxEBepqrnQ/GxtQvm6Uc23dA9C+T6C05zfpjJ+1TRPslo6S4vufVS/
-	HNJhDJFgHEYz3D/QedBT4Xox5Wgf48OXu63jgZ1qpym6bOgpKfBTBu/LuhF+n1AwxtAJXLaW2i1
-	XOMRSj+PV1hDkBpwHZNvYLzslyYxUYeouLca+jhz0OHERdhtZxet73cqlnzKY/AY=
-X-Received: by 2002:a5d:5d82:0:b0:454:a12c:6cdb with SMTP id ffacd0b85a97d-45eb36b0b6cmr29853434f8f.2.1779784865429;
-        Tue, 26 May 2026 01:41:05 -0700 (PDT)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-45eb6d6e57bsm501878f8f.23.2026.05.26.01.41.05;
-        Tue, 26 May 2026 01:41:05 -0700 (PDT)
-X-Relaying-Domain: 6wind.com
-Received: from stryper.dev.6wind.com (stryper.dev.6wind.com [10.17.2.5])
-	by smtpservice.6wind.com (Postfix) with ESMTP id 50F7B124B3;
-	Tue, 26 May 2026 10:41:05 +0200 (CEST)
-From: Louis Scalbert <louis.scalbert@6wind.com>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	jv@jvosburgh.net,
+        d=1e100.net; s=20251104; t=1779785863; x=1780390663;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KunGhSCrk96qTBkynTCA5j2HMdY8U+GRQlqdEqrz/o0=;
+        b=iTy3frVMrfQ3CVerkcT7QAZnIT0R3Hj3XMyZ7WcvYEyXcOQdBxcEutNeedE5TuUif6
+         2UF52fFUvit9WUbEsZg/EljHvl7ztd6kgiTvhu1yUejOsZXBCccarhJLw1NK+sltdtwf
+         VWSXpy9JzdUmZAK7PMg3fWicFAMvhKcbNun1+AXLpEXrOSgmL7uaoMGg1YoyG75NkQFy
+         K2gJLmed4uz6kd4aooJ6TY8+xqOOQX+A2vrztIxxqBpEOSyY7Gd7+pNc+egYIErpWUau
+         B+N/KJmUZT64NDlGvo3WSB+mccyPPPy2T7J9nXc02/ouDZTVeOWFLujMZ42tlYHF6m7W
+         i/Hg==
+X-Gm-Message-State: AOJu0YyQzZ2ZyAzduILi/ilE6R0Ff5/J4LUyKYLrEbq6UvnSxsTbaEy0
+	lrZeMXbuOYXTQ+10llhsMvtmzb4ixkNgkM+GQt/2m1a22MtlDbfzo3nC
+X-Gm-Gg: Acq92OHFzbf+4PYJmZrR6JbFraTUgaanWSXe+5Bdfie+hTAv9XJAmyAE9ltX5WGz/jZ
+	kx7KJPFP1ejyvBK6YOLlWVnktRQSEXDL3X640x7JyavOJnbQo+1ToRcwjwwz36pQNv1TJTjby+w
+	b7sA9W+joH8MmX7eAuonNZolkiGSLOZ83iksFPp2+uRjweRqrs3Dqk19eeSFEpefMbbkiAmu4Gl
+	rUNcZ1H4bt6zzJEiGZ0bOq+BJUGn+97fIHBjcQJFVppofu+AyJd0Y37T8bVioWgX/VZMvFron78
+	Qs1jL2KYTvScw0QJXef+WN2MBbEk7jzrtL6R6A0c+ZEvge7ePd5Nk/L4xKMuMNpdDDrfbL6h8eL
+	wb1wTfM0PPQbq6seE8gqeU3SDvI4IDnobud0Sjf2jpt40qpRcp97vbRCYhk6EcHzp+gpPHLHvk0
+	d5Z7M+pJH3L27Wf4fJVvPkXB3/itk4j7zYSLtZ0ecxQEpp0p/xsmA1i2JU3+7i
+X-Received: by 2002:a05:6a20:7350:b0:3a2:e0d3:37ea with SMTP id adf61e73a8af0-3b328c7070cmr18010782637.11.1779785862795;
+        Tue, 26 May 2026 01:57:42 -0700 (PDT)
+Received: from KIPREYXIAO-MC2.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84164ac9b5asm11808516b3a.12.2026.05.26.01.57.40
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 26 May 2026 01:57:42 -0700 (PDT)
+From: Zhenghang Xiao <kipreyyy@gmail.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	fbl@redhat.com,
-	andy@greyhouse.net,
-	shemminger@vyatta.com,
-	maheshb@google.com,
-	jonas.gorski@gmail.com,
-	Louis Scalbert <louis.scalbert@6wind.com>
-Subject: [PATCH net v7 6/6] selftests: bonding: add test for lacp_strict mode
-Date: Tue, 26 May 2026 10:40:48 +0200
-Message-Id: <20260526084048.1696544-7-louis.scalbert@6wind.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20260526084048.1696544-1-louis.scalbert@6wind.com>
-References: <20260526084048.1696544-1-louis.scalbert@6wind.com>
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Zhenghang Xiao <kipreyyy@gmail.com>
+Subject: [PATCH net] appletalk: fix use-after-free in atalk_sendmsg due to route lookup race
+Date: Tue, 26 May 2026 16:57:35 +0800
+Message-ID: <20260526085735.61445-1-kipreyyy@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,412 +91,206 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,jvosburgh.net,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com,6wind.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-291593-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291594-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[kipreyyy@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: C23C55D294F
+X-Rspamd-Queue-Id: E7E4F5D2D33
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a test for the bonding lacp_strict mode.
+atrtr_find() returns a raw pointer after releasing atalk_routes_lock.
+In atalk_sendmsg(), both the primary route (rt) and loopback route
+(rt_lo) pointers are held across sock_alloc_send_skb() which can sleep.
+Concurrent atrtr_delete() or atrtr_device_down() can kfree() the route
+during this window, causing UAF when rt->flags, rt->gateway, or
+rt_lo->dev are accessed.
 
-Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+Fix by deferring route frees with kfree_rcu() and caching all needed
+route fields under rcu_read_lock() before the sleeping allocation.
+Take dev_hold() on both route devices to prevent disappearance after
+the route's dev_put() in the delete path.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Zhenghang Xiao <kipreyyy@gmail.com>
 ---
- .../selftests/drivers/net/bonding/Makefile    |   1 +
- .../drivers/net/bonding/bond_lacp_strict.sh   | 347 ++++++++++++++++++
- 2 files changed, 348 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh
+ include/linux/atalk.h |  1 +
+ net/appletalk/ddp.c   | 52 +++++++++++++++++++++++++++----------------
+ 2 files changed, 34 insertions(+), 19 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
-index 9af5f84edd37..be130bf585a4 100644
---- a/tools/testing/selftests/drivers/net/bonding/Makefile
-+++ b/tools/testing/selftests/drivers/net/bonding/Makefile
-@@ -8,6 +8,7 @@ TEST_PROGS := \
- 	bond-lladdr-target.sh \
- 	bond_ipsec_offload.sh \
- 	bond_lacp_prio.sh \
-+	bond_lacp_strict.sh \
- 	bond_macvlan_ipvlan.sh \
- 	bond_options.sh \
- 	bond_passive_lacp.sh \
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh b/tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh
-new file mode 100755
-index 000000000000..f1a93a1d952f
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh
-@@ -0,0 +1,347 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Testing if bond lacp_strict works
-+#
-+#          Partner (p_ns)
-+#  +--------------------------+
-+#  |          bond0           |
-+#  |            +             |
-+#  |      eth0  |  eth1       |
-+#  |        +---+---+         |
-+#  |        |       |         |
-+#  +--------------------------+
-+#  |        | eth0  | eth1    |
-+#  |        |       |         |
-+#  |(br_ns) | br0   | br1     |
-+#  |        |       |         |
-+#  |        | eth2  | eth3    |
-+#  +--------------------------+
-+#  |        |       |         |
-+#  |        +---+---+         |
-+#  |      eth0  |  eth1       |
-+#  |            +             |
-+#  |          bond0           |
-+#  +--------------------------+
-+#         Dut (d_ns)
-+
-+lib_dir=$(dirname "$0")
-+# shellcheck disable=SC1090
-+source "$lib_dir"/../../../net/lib.sh
-+
-+COLLECTING_DISTRIBUTING_MASK=48
-+COLLECTING_DISTRIBUTING=48
-+FAILED=0
-+
-+setup_links()
-+{
-+	# shellcheck disable=SC2154
-+	ip -n "${p_ns}" link add eth0 type veth peer name eth0 netns "${br_ns}"
-+	ip -n "${p_ns}" link add eth1 type veth peer name eth1 netns "${br_ns}"
-+	ip -n "${d_ns}" link add eth0 type veth peer name eth2 netns "${br_ns}"
-+	ip -n "${d_ns}" link add eth1 type veth peer name eth3 netns "${br_ns}"
-+
-+	ip -n "${br_ns}" link add br0 type bridge
-+	ip -n "${br_ns}" link add br1 type bridge
-+
-+	ip -n "${br_ns}" link set dev br0 type bridge stp_state 0
-+	ip -n "${br_ns}" link set dev br1 type bridge stp_state 0
-+
-+	ip -n "${br_ns}" link set eth0 master br0
-+	ip -n "${br_ns}" link set eth2 master br0
-+	ip -n "${br_ns}" link set eth1 master br1
-+	ip -n "${br_ns}" link set eth3 master br1
-+
-+	# Allow LACP trames forwarding on bridge ports
-+	ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+	ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+	ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+	ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+
-+	ip -n "${br_ns}" link set eth0 up
-+	ip -n "${br_ns}" link set eth2 up
-+	ip -n "${br_ns}" link set eth1 up
-+	ip -n "${br_ns}" link set eth3 up
-+
-+	ip -n "${br_ns}" link set br0 up
-+	ip -n "${br_ns}" link set br1 up
-+
-+	ip -n "${d_ns}" link add bond0 type bond mode 802.3ad miimon 100 \
-+		lacp_rate fast min_links 1
-+	ip -n "${p_ns}" link add bond0 type bond mode 802.3ad miimon 100 \
-+		lacp_rate fast min_links 1
-+
-+	ip -n "${d_ns}" link set eth0 master bond0
-+	ip -n "${d_ns}" link set eth1 master bond0
-+	ip -n "${p_ns}" link set eth0 master bond0
-+	ip -n "${p_ns}" link set eth1 master bond0
-+
-+	ip -n "${d_ns}" link set bond0 up
-+	ip -n "${p_ns}" link set bond0 up
-+}
-+
-+test_master_carrier() {
-+	local expected=$1
-+	local mode_name=$2
-+	local carrier
-+
-+	carrier=$(ip netns exec "${d_ns}" cat /sys/class/net/bond0/carrier)
-+	[ "$carrier" == "1" ] && carrier="up" || carrier="down"
-+
-+	[ "$carrier" == "$expected" ] && return
-+
-+	echo "FAIL: Expected carrier $expected in lacp_strict $mode_name mode, got $carrier"
-+
-+	RET=1
-+
-+}
-+
-+compare_state() {
-+	local actual_state=$1
-+	local expected_state=$2
-+	local iface=$3
-+	local last_attempt=$4
-+
-+    [ $((actual_state & COLLECTING_DISTRIBUTING_MASK)) -eq "$expected_state" ] \
-+		&& return 0
-+
-+	[ "$last_attempt" -ne 1 ] && return 1
-+
-+	printf "FAIL: Expected LACP %s actor state to " "$iface"
-+	if [ "$expected_state" -eq $COLLECTING_DISTRIBUTING ]; then
-+		echo "be in Collecting/Distributing state"
-+	else
-+		echo "have neither Collecting nor Distributing set."
-+	fi
-+
-+	return 1
-+}
-+
-+_test_lacp_port_state() {
-+	local interface=$1
-+	local expected=$2
-+	local last_attempt=$3
-+	local eth0_actor_state eth1_actor_state
-+	local ret=0
-+
-+	# shellcheck disable=SC2016
-+	while IFS='=' read -r k v; do
-+		printf -v "$k" '%s' "$v"
-+	done < <(
-+		ip netns exec "${d_ns}" awk '
-+		/^Slave Interface: / { iface=$3 }
-+		/details actor lacp pdu:/ { ctx="actor" }
-+		/details partner lacp pdu:/ { ctx="partner" }
-+		/^[[:space:]]+port state: / {
-+			if (ctx == "actor") {
-+				gsub(":", "", iface)
-+				printf "%s_%s_state=%s\n", iface, ctx, $3
-+			}
+diff --git a/include/linux/atalk.h b/include/linux/atalk.h
+index a55bfc6567d0..932cb72379c2 100644
+--- a/include/linux/atalk.h
++++ b/include/linux/atalk.h
+@@ -12,6 +12,7 @@ struct atalk_route {
+ 	struct atalk_addr  gateway;
+ 	int		   flags;
+ 	struct atalk_route *next;
++	struct rcu_head	   rcu;
+ };
+ 
+ /**
+diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
+index 30a6dc06291c..2c754378fa08 100644
+--- a/net/appletalk/ddp.c
++++ b/net/appletalk/ddp.c
+@@ -603,7 +603,7 @@ static int atrtr_delete(struct atalk_addr *addr)
+ 		     tmp->target.s_node == addr->s_node)) {
+ 			*r = tmp->next;
+ 			dev_put(tmp->dev);
+-			kfree(tmp);
++			kfree_rcu(tmp, rcu);
+ 			goto out;
+ 		}
+ 		r = &tmp->next;
+@@ -628,7 +628,7 @@ static void atrtr_device_down(struct net_device *dev)
+ 		if (tmp->dev == dev) {
+ 			*r = tmp->next;
+ 			dev_put(dev);
+-			kfree(tmp);
++			kfree_rcu(tmp, rcu);
+ 		} else
+ 			r = &tmp->next;
+ 	}
+@@ -1553,10 +1553,13 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ 	int loopback = 0;
+ 	struct sockaddr_at local_satalk, gsat;
+ 	struct sk_buff *skb;
+-	struct net_device *dev;
++	struct net_device *dev = NULL;
++	struct net_device *dev_lo = NULL;
+ 	struct ddpehdr *ddp;
+ 	int size, hard_header_len;
+ 	struct atalk_route *rt, *rt_lo = NULL;
++	int rt_flags;
++	struct atalk_addr rt_gateway;
+ 	int err;
+ 
+ 	if (flags & ~(MSG_DONTWAIT|MSG_CMSG_COMPAT))
+@@ -1600,6 +1603,7 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ 	/* For headers */
+ 	size = sizeof(struct ddpehdr) + len + ddp_dl->header_length;
+ 
++	rcu_read_lock();
+ 	if (usat->sat_addr.s_net || usat->sat_addr.s_node == ATADDR_ANYNODE) {
+ 		rt = atrtr_find(&usat->sat_addr);
+ 	} else {
+@@ -1610,29 +1614,38 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ 
+ 		rt = atrtr_find(&at_hint);
+ 	}
+-	err = -ENETUNREACH;
+-	if (!rt)
++	if (!rt) {
++		rcu_read_unlock();
++		err = -ENETUNREACH;
+ 		goto out;
++	}
+ 
+ 	dev = rt->dev;
+-
+-	net_dbg_ratelimited("SK %p: Size needed %d, device %s\n",
+-			sk, size, dev->name);
++	dev_hold(dev);
++	rt_flags = rt->flags;
++	rt_gateway = rt->gateway;
+ 
+ 	hard_header_len = dev->hard_header_len;
+ 	/* Leave room for loopback hardware header if necessary */
+ 	if (usat->sat_addr.s_node == ATADDR_BCAST &&
+-	    (dev->flags & IFF_LOOPBACK || !(rt->flags & RTF_GATEWAY))) {
++	    (dev->flags & IFF_LOOPBACK || !(rt_flags & RTF_GATEWAY))) {
+ 		struct atalk_addr at_lo;
+ 
+ 		at_lo.s_node = 0;
+ 		at_lo.s_net  = 0;
+ 
+ 		rt_lo = atrtr_find(&at_lo);
+-
+-		if (rt_lo && rt_lo->dev->hard_header_len > hard_header_len)
+-			hard_header_len = rt_lo->dev->hard_header_len;
++		if (rt_lo) {
++			dev_lo = rt_lo->dev;
++			dev_hold(dev_lo);
++			if (dev_lo->hard_header_len > hard_header_len)
++				hard_header_len = dev_lo->hard_header_len;
 +		}
-+		' /proc/net/bonding/bond0
-+	)
+ 	}
++	rcu_read_unlock();
 +
-+	if [ "$interface" == "eth0" ] || [ "$interface" == "both" ]; then
-+		compare_state "$eth0_actor_state" "$expected" eth0 "$last_attempt" || ret=1
-+	fi
-+
-+	if [ "$interface" == "eth1" ] || [ "$interface" == "both" ]; then
-+		compare_state "$eth1_actor_state" "$expected" eth1 "$last_attempt" || ret=1
-+	fi
-+
-+	return $ret
-+}
-+
-+test_lacp_port_state() {
-+	local interface=$1
-+	local expected=$2
-+	local retry=$3
-+	local last_attempt=0
-+	local attempt=1
-+	local ret=1
-+
-+	while [ $attempt -le $((retry + 1)) ]; do
-+		[ $attempt -eq $((retry + 1)) ] && last_attempt=1
-+		_test_lacp_port_state "$interface" "$expected" "$last_attempt" && return
-+		((attempt++))
-+		sleep 1
-+	done
-+
-+	RET=1
-+}
-+
-+
-+trap cleanup_all_ns EXIT
-+setup_ns d_ns p_ns br_ns
-+setup_links
-+
-+# Initial state
-+RET=0
-+mode=off
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 3
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 up"
-+
-+# partner eth0 down, eth1 up
-+# (replicate eth0 state to dut eth0 by shutting a bridge port)
-+RET=0
-+ip -n "${p_ns}" link set eth0 down
-+ip -n "${br_ns}" link set eth2 down
-+test_lacp_port_state eth0 $FAILED 5
-+test_lacp_port_state eth1 $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 down"
-+
-+# partner eth0 and eth1 down
-+RET=0
-+ip -n "${p_ns}" link set eth1 down
-+ip -n "${br_ns}" link set eth3 down
-+test_lacp_port_state both $FAILED 5
-+test_master_carrier down $mode # down because of min_links
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 down"
-+
-+# partner eth0 up, eth1 down
-+RET=0
-+ip -n "${p_ns}" link set eth0 up
-+ip -n "${br_ns}" link set eth2 up
-+test_lacp_port_state eth0 $COLLECTING_DISTRIBUTING 60
-+test_lacp_port_state eth1 $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 up, eth1 down"
-+
-+# partner eth0 and eth1 up
-+RET=0
-+ip -n "${p_ns}" link set eth1 up
-+ip -n "${br_ns}" link set eth3 up
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 60
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 up"
-+
-+# partner eth0 stops LACP and eth1 up
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+test_lacp_port_state eth0 $FAILED 5
-+test_lacp_port_state eth1 $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 stopped sending LACP"
-+
-+# partner eth0 and eth1 stop LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+test_lacp_port_state both $FAILED 5
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 stopped sending LACP"
-+
-+# switch to lacp_strict on
-+RET=0
-+mode=on
-+ip -n "${d_ns}" link set dev bond0 type bond lacp_strict $mode
-+test_lacp_port_state both $FAILED 1
-+test_master_carrier down $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 stopped sending LACP"
-+
-+# switch back to lacp_strict off mode
-+RET=0
-+mode=off
-+ip -n "${d_ns}" link set dev bond0 type bond lacp_strict $mode
-+test_lacp_port_state both $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 stopped sending LACP"
-+
-+# eth0 recovers LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+test_lacp_port_state eth0 $COLLECTING_DISTRIBUTING 60
-+test_lacp_port_state eth1 $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 recovered and eth1 stopped sending LACP"
-+
-+# eth1 recovers LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 60
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 recovered LACP"
-+
-+# switch to lacp_strict on
-+RET=0
-+mode=on
-+ip -n "${d_ns}" link set dev bond0 type bond lacp_strict $mode
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 up"
-+
-+# partner eth0 down, eth1 up
-+RET=0
-+ip -n "${p_ns}" link set eth0 down
-+ip -n "${br_ns}" link set eth2 down
-+test_lacp_port_state eth0 $FAILED 5
-+test_lacp_port_state eth1 $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 down"
-+
-+# partner eth0 and eth1 down
-+RET=0
-+ip -n "${p_ns}" link set eth1 down
-+ip -n "${br_ns}" link set eth3 down
-+test_lacp_port_state both $FAILED 5
-+test_master_carrier down $mode # down because of min_links
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 down"
-+
-+# partner eth0 up, eth1 down
-+RET=0
-+ip -n "${p_ns}" link set eth0 up
-+ip -n "${br_ns}" link set eth2 up
-+test_lacp_port_state eth0 $COLLECTING_DISTRIBUTING 60
-+test_lacp_port_state eth1 $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 up, eth1 down"
-+
-+# partner eth0 and eth1 up
-+RET=0
-+ip -n "${p_ns}" link set eth1 up
-+ip -n "${br_ns}" link set eth3 up
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 60
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 up"
-+
-+# partner eth0 stops LACP and eth1 up
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+test_lacp_port_state eth0 $FAILED 5
-+test_lacp_port_state eth1 $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 stopped sending LACP"
-+
-+# partner eth0 and eth1 stop LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+test_lacp_port_state both $FAILED 5
-+test_master_carrier down $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 stopped sending LACP"
-+
-+# eth0 recovers LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+test_lacp_port_state eth0 $COLLECTING_DISTRIBUTING 60
-+test_lacp_port_state eth1 $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 recovered and eth1 stopped sending LACP"
-+
-+# eth1 recovers LACP
-+# shellcheck disable=SC2034
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 60
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 recovered LACP"
-+
-+exit "${EXIT_STATUS}"
++	net_dbg_ratelimited("SK %p: Size needed %d, device %s\n",
++			sk, size, dev->name);
+ 
+ 	size += hard_header_len;
+ 	release_sock(sk);
+@@ -1675,7 +1688,7 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ 	 * to group we are in)
+ 	 */
+ 	if (ddp->deh_dnode == ATADDR_BCAST &&
+-	    !(rt->flags & RTF_GATEWAY) && !(dev->flags & IFF_LOOPBACK)) {
++	    !(rt_flags & RTF_GATEWAY) && !(dev->flags & IFF_LOOPBACK)) {
+ 		struct sk_buff *skb2 = skb_copy(skb, GFP_KERNEL);
+ 
+ 		if (skb2) {
+@@ -1693,19 +1706,18 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ 		/* loop back */
+ 		skb_orphan(skb);
+ 		if (ddp->deh_dnode == ATADDR_BCAST) {
+-			if (!rt_lo) {
++			if (!dev_lo) {
+ 				kfree_skb(skb);
+ 				err = -ENETUNREACH;
+ 				goto out;
+ 			}
+-			dev = rt_lo->dev;
+-			skb->dev = dev;
++			skb->dev = dev_lo;
+ 		}
+-		ddp_dl->request(ddp_dl, skb, dev->dev_addr);
++		ddp_dl->request(ddp_dl, skb, skb->dev->dev_addr);
+ 	} else {
+ 		net_dbg_ratelimited("SK %p: send out.\n", sk);
+-		if (rt->flags & RTF_GATEWAY) {
+-		    gsat.sat_addr = rt->gateway;
++		if (rt_flags & RTF_GATEWAY) {
++		    gsat.sat_addr = rt_gateway;
+ 		    usat = &gsat;
+ 		}
+ 
+@@ -1718,6 +1730,8 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ 
+ out:
+ 	release_sock(sk);
++	dev_put(dev);
++	dev_put(dev_lo);
+ 	return err ? : len;
+ }
+ 
 -- 
-2.39.2
+2.50.1 (Apple Git-155)
 
 
