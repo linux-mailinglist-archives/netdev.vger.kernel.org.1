@@ -1,236 +1,233 @@
-Return-Path: <netdev+bounces-291949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sH+1BjcXFmrOhQcAu9opvQ
-	(envelope-from <netdev+bounces-291949-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:57:11 +0200
+	id +IBtIz4WFmrOhQcAu9opvQ
+	(envelope-from <netdev+bounces-291938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:53:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D210F5DD010
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:57:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2915DCECE
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6F00309546F
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:53:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B94E0303457D
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:52:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73CD23C3C0F;
-	Tue, 26 May 2026 21:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB353C343F;
+	Tue, 26 May 2026 21:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mrQAtd+u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rM1SMVo/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA05379EDA;
-	Tue, 26 May 2026 21:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779832408; cv=fail; b=qhPS6YW6GeIRxGlJn/5zSli9iQxsv4sN4tmlm9W841LCi7olPsKZ8GqKLoreBYSOTUMlBUfYAvN2P/IUfD8dSU20C9sEVcxGLEbdu0WLeycPTaYIEz5iOZQdqzP2plwUv492O/GJSSAMt58k0vbmMNoxk6HtVgzmCiWcGrH3pNY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779832408; c=relaxed/simple;
-	bh=Ehpq5MMJ78x3kY6o+isS8MWpCiwhOWFQUu1qPysZH+Q=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=IsTU4FZISomMS1LztowFwoUhMdLCtypbuxckxqf7NQnugKYa6AU98EHi9OB4fFFKOry6zD3N1IfsgQIvhrdhX2+qR8aLCXyxFGzE3+xPgBeOqmKsJ18hFvrGdGCoWjYJytyg73IxL4WpoE1gtpH3qVRHAVLyvIBQJj7+MzVil2s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mrQAtd+u; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779832407; x=1811368407;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Ehpq5MMJ78x3kY6o+isS8MWpCiwhOWFQUu1qPysZH+Q=;
-  b=mrQAtd+uHroDnw9etzaFQ+qIVzR7V6lfl15ZBfHo1AvVR6MjLWpzzqci
-   ji/z4R7jaI5P9aTkvmo9kq35w/71zQVjR5SVzb0mB5ze6jCF6Dg9O2Pdy
-   8LZ/yN5Ov1AE7aO54gx5TzmF4t9VNHr7zkOuUHErfNzlYQxdVkQwWFdj3
-   4Pa+cJAaIFzwoCXClNxEuyHctPdMuhinX4nLYOGQKeqOMVZpMMw8PM3YB
-   R5nT4jpU9U6HxXQmAaUhfOUeBvCAQGrkArw+w6HhQA6/LhWq6RtS+3rpY
-   nJKNdSCO6Ta9fbErL3Z/UQ+Hgawk430NiAS8ZMXVjaTnCmkMeKIqmD8sq
-   A==;
-X-CSE-ConnectionGUID: 6rl4DyNKTS2ty+ucIIIv8Q==
-X-CSE-MsgGUID: yFNmvLDtQLe4jrN6hDmnVQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11798"; a="80690929"
-X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
-   d="scan'208";a="80690929"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 14:51:34 -0700
-X-CSE-ConnectionGUID: OJwx9vI8SguGo4pm/+GW8Q==
-X-CSE-MsgGUID: xrVOy99nRbKI3yW/2ubO4Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
-   d="scan'208";a="241884609"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 14:51:33 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 26 May 2026 14:51:32 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 26 May 2026 14:51:32 -0700
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.48) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 26 May 2026 14:51:31 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r+g5Sl3V7TZ9yYpU0UmqYJwquYgnuMXIQJRKF0aLkzmFF6G53qUzJ3LMty9Nvn/rmIeAVsT5fA9n+GCcSdbnBb2XvSg+gU1aZGLAjd0jEmMUsEbtdszEwhEoqOQPuXtcgbg8XrZdIDst9NT2l2+yZ2edKuel8yvrpC87QCaxk6FHjZE7yqf0q0V9Xcc2e7grfElR7UNNUHSo38+oRlfswR2OOMqfhyHXOoSK1WzYTk5BjKLSpzfoYPXXLmowH1ogKNQVqOTrIfqOT2/hRGwJjzSlWtce2knhlu7rP7m5iBKd+XCdB81RXG+qndpFrVtXg138fCJehCpdDI2v/JE3iA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QT4AWX/94iElNwSTJnq1v0b26qqTaJFlSPWg3VoiDyM=;
- b=MzEsrrb9DLrifTelB8cUC/JDehJLO35cYZvolgFy0XQphwDIPfOnzRvuj/U/d+JPfz9RJaxnT8sXkT6YWPLAJGwCdolHzrMYTBPo3Cf5/cnJ4zbpI6QHjHBjevZKpkoqJVID+RvzLRkysLmFZYJmo3VXd85l836asof1mckzWnTrYN/wxCMhQuRiP9vzykZbP9D0angA8jBeIhPOHiFFKHrQmoxLXUetGKBHFymFFdnSwoTvciKD01sPx2s2yT8sJVLsnWCDGt4o5p8czSTCcBW8M4yHQFw33KLse6lQCXxe5SqC01WMjbNmzI6pH5xKXwsfPY02a1AdfGafTu4MNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com (2603:10b6:8:134::14)
- by PH0PR11MB4888.namprd11.prod.outlook.com (2603:10b6:510:32::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.20; Tue, 26 May
- 2026 21:51:26 +0000
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58]) by DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58%5]) with mapi id 15.21.0071.011; Tue, 26 May 2026
- 21:51:26 +0000
-Message-ID: <9e6cf709-c59f-47ca-96ff-cfe3ea1a2e94@intel.com>
-Date: Tue, 26 May 2026 14:51:23 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [patch 13/24] ice/ptp: Use provided clock ID for history snapshot
-To: Thomas Gleixner <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-CC: David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar
-	<mlichvar@redhat.com>, John Stultz <jstultz@google.com>, Stephen Boyd
-	<sboyd@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, "Frederic
- Weisbecker" <frederic@kernel.org>, <thomas.weissschuh@linutronix.de>, "Arthur
- Kiyanovski" <akiyano@amazon.com>, Rodolfo Giometti <giometti@enneenne.com>,
-	Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>, <kvmarm@lists.linux.dev>, Oliver Upton
-	<oupton@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
-	<netdev@vger.kernel.org>, Takashi Iwai <tiwai@suse.com>, Miri Korenblit
-	<miriam.rachel.korenblit@intel.com>, Johannes Berg <johannes.berg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Peter Hilber <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, <virtualization@lists.linux.dev>,
-	<linux-wireless@vger.kernel.org>, <linux-sound@vger.kernel.org>
-References: <20260526165826.392227559@kernel.org>
- <20260526171223.670955218@kernel.org>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20260526171223.670955218@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0275.namprd04.prod.outlook.com
- (2603:10b6:303:89::10) To DS0PR11MB7381.namprd11.prod.outlook.com
- (2603:10b6:8:134::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041933B4E83;
+	Tue, 26 May 2026 21:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779832340; cv=none; b=dXvQDe4OVOrMMc0Fpelgysce8fbgbcam/rgXqamydbJ2GSOTCyH5+pjOf9XSyBRDrw3GzM5Izir1mDv99LgFbLwEkQP2Mnh1//ahDT0CAi6XeU4b+d2c+DBg3VK1qKplXQTyJLZcGqFqSjpgiC2eLjXutUyn+60l1l+LcJYxtI8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779832340; c=relaxed/simple;
+	bh=qkV3wqiPc1gtpJtbhMXrlyafax8/y9M8/g7Z6MlDhOU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=uQ5MfiCvV8qdon3gBJezttEMgcd6pZnWhHuzfMaMOZaZ6Aw3My/t+yuG75sOGuEPKYS4IoR8Pz1j2/XoeBgVYQ6lEDaBl93mMoexcjwcfYIGB6BoSJnlKJeDTfq3PBzRIVXU3wNCL2r9LDMtN3EkUT71WsZQjdbUI5fVBFfdgcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rM1SMVo/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A4185C2BCC4;
+	Tue, 26 May 2026 21:52:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779832339;
+	bh=qkV3wqiPc1gtpJtbhMXrlyafax8/y9M8/g7Z6MlDhOU=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=rM1SMVo/51AfaSXHxHJr3XooO8PODu/tWig6uTWQnAmYQs9ut5QhI+IGrrY2NroPa
+	 pERvg9aVZLl6KZQCmx0QP2cwQ0loIihIWVx5cFwBpbJxP7eLlF7IS9RHa9XkP7ohAk
+	 Ck2LNbTt9gWm6+L6o6/0OQ31KZ1qQDC+eGsovp8m+8OwhEMXtn8Q6bbk2DhwvjCyc6
+	 MaYoFEUdtNj3bkvOc/sW3rChnoV79PlK7iLlX9LKQBpqUL+cCdb2QO4wp4yuk5zQPX
+	 2m1jRfVvf3+FrqCcGg3j48KqeqvVGEHxJizkjKloXtG8PwsR1xn+QQ2BiTB3ljlfoh
+	 HCwHJjX60JT+w==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD83CD5BD5;
+	Tue, 26 May 2026 21:52:19 +0000 (UTC)
+From: Ciprian Regus via B4 Relay <devnull+ciprian.regus.analog.com@kernel.org>
+Subject: [PATCH net-next v2 00/10] net: Add ADIN1140 support
+Date: Wed, 27 May 2026 00:51:45 +0300
+Message-Id: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7381:EE_|PH0PR11MB4888:EE_
-X-MS-Office365-Filtering-Correlation-Id: f2607674-d946-4282-9a8e-08debb70efa3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|18002099003|22082099003|56012099006|11063799006|4143699003;
-X-Microsoft-Antispam-Message-Info: /JC1Q/T2zlHTUaJe2pQS3Tt96l7dfmNK8Ftz/+rYJETuKdPMLfRNndSXHFPx2B2bBztbWfEkrIeFhGxQEFXIfU9CJdWnGi1i8O3CLTqKWCFUcpttYw/howIxI8MHLIUgkBC5lF4H56qtrjt031nshyLtO1cq/0DuIP6wcq/StHSxjME6j3GX1XF0zEO9dHuqBhMifVzKNs9Q7OeNYXp/bYa5UQ8dZvvZyVQ8KbA9cGnuRdbgfX9wvZtBl48K2uD033NnnkuhB434UMCspoE47Tsti8wddn83e6IQ9ECMZmF3UuJC8ddYFoykHksK8xql/gS/3qPimKcVUZOuK2q5uUIWgA8Dw2XXkACgr6kv56exfJ1Qjtc68oprUT6+v4BJ/90HVNRW9f4l2Hda1JHqKNwXviNW3JDeWRRQGRPjLA5y9DCHJWH3gnkoeDf0WKMRVgn05KnrjrO3C1sH5a8Shn9nWM4o9Vp7BvN3SkPOE0EewpruZmopgABDVyjhSbKcs0h/clQPAw63982bco1ywdupoidFeXkqg2Up4dSGWB85auu3y8CZIDUdyFx6Tdm/XWVYJYtspOkupj8r5JNv0xLQ4qYWnaS0W53BEJSMCS6AciO7nfeMgCY3rLbW+lEp9koymeejFr3r9HNYAfGh5/6vRCLdfrpGlLqRTWP0QaD+BOmGh5MfBgyCFnPJn9Ci
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7381.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(18002099003)(22082099003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UlN6YmNGUnN0cjRKVjZucS9VUHFjbGdpZE1Hc1VuN2dIWXhGUmJuTThaUDdr?=
- =?utf-8?B?M1dpRnZPUWI0Zm9ROUY2Yk9aMEd1OFJzemQyM0FKQ0xEWUJua2taMTZjQVBC?=
- =?utf-8?B?NTRwb3JubUVGRjdVWTFrZlMzZmxWeW1SeWt3V3FRQ2xFNWQwRFBaR3Z3YllF?=
- =?utf-8?B?Tk5kbFJYRjZKWENNV05ycjlDT1ZQTmphSWs5RDAvN2d0K1Jpc2dRVGpXSmNl?=
- =?utf-8?B?bDRzMlRwTjNQMW96ZWNacEIrc3A0S2UwditUNDk3WGZMWlV0NGVWL3ZQdkhr?=
- =?utf-8?B?WW5EcGJOY2xJejdYMVNvYjBtSHdEYWZXUVVUMU5PMGgwaGhyQWpLaWNtc1Nn?=
- =?utf-8?B?emU3bjBOa1RveWVIVCswK0daY2phKzRYVlcvSTBFeGlTUEY2eFE4MVY1R0xK?=
- =?utf-8?B?cjViQXV1bTdVY2pNTVpLeFlsN2kxUVZyNzFCYWJZbTFJa0VoZ0toYW5US1lN?=
- =?utf-8?B?Y08rdGo2QmVBTlVLNWh2NDhkWmd0RXJ3YXJOczQ4cVBCd3JraG1DY1NSSHZi?=
- =?utf-8?B?ZUNURHBKV0RMWGJMWDBpT2UvQ3kxeTlHVlcrTXU1b1pkdFlTb3lZcjJ1Q1Y1?=
- =?utf-8?B?T2pZNi9wVHBaNzYxcHVzQW5lMXlNeWxGV0pleXFRUHMvT09SYXJkTkM4bWFQ?=
- =?utf-8?B?L24rM2J0TFJKOXVYeXNueEl6YjNDdFVRTERWd29jOG4vOTNLNEcvZmJnODJL?=
- =?utf-8?B?MC9zK0k4OERRYXBZbXhOc0VGQlIveCthdzJtZ0xSazh4YUp4RXcrT2UrOEtL?=
- =?utf-8?B?b2FwMDJOVE5SeUpxUmtUbGhKZkhHYW1qNE5oTVFvMFVvQmtsN2lRMWc2QnFD?=
- =?utf-8?B?UFNxeXFQRVZaRzZPb1hLK01LNGM3Um5TS0I2QlYxNEprK1NOQnZVak9DTFow?=
- =?utf-8?B?NnBMT011RlJDRThvU3FITnpLY21Pb1E3ZlU1UU0xMk5ubDZGL1pPL0pRSFY0?=
- =?utf-8?B?aUJ6YlJTK1B3QzhoUk1aeC9MWnZkUkRFWGZQZ3pPSDdJdE15cjY3ZDBScmtO?=
- =?utf-8?B?dVc1dlBSWTlnZEt2U3IzWisrci9kNXVEMEZpYWFFc1ZYdUtiem5CaXQxQ1F0?=
- =?utf-8?B?NVU5WDB1a015UFE4N1BJTWhYTU1US0JaLzR6TWVBMGo3am91bzhSL0JYYVdP?=
- =?utf-8?B?aWpWMjZEMjRtRmVjZjhmaXVEOG9kQ1dxMVFPNnJ4L0VhNUVDenM5YkY0QmRE?=
- =?utf-8?B?MWU1aXBRN25xNGowNmRPRjJXN1I1VGR6MjNoVmMrVHJWMGJ3TnJKMXR0c25V?=
- =?utf-8?B?QzdISFJiRVFldWw1Q0g2LzJybGVDb2tkWHpSTDZSUDlkV1pzVzU2Q241d0pI?=
- =?utf-8?B?bGxacHBnRm1hSjNIQVE5dXBGRXdCa3E0TzMwODltbDA4TVZKWE41UG9MNFlr?=
- =?utf-8?B?YjM2RHZGNkIzSGRGYzI2ZGY3QUdIdTM5VmhhczhzdmZUUHljRlcycVpvVGdW?=
- =?utf-8?B?b1FzZmF2aU9CWkdIVnU1K2t6YUJZa0d1ek9XMHdEL2lFa2t4SHhzNTJySFlj?=
- =?utf-8?B?UjJOMzJNdXdHa3FuWWUxZTNSTm1neCtDT0VmV0QrZ3lrS3ZKN0l6eUttcDMz?=
- =?utf-8?B?aW5CWUlURGo1MGNLWUZ2VmpneDduelBsSW5XTElqUUZ4T1NHbGloQ0Y0VThs?=
- =?utf-8?B?ckwrZzJWak1iQXZLRWhETzI0dmg3dEp4WnhoOEtCNG9iN0E1azNxS0R5WnZ3?=
- =?utf-8?B?MGdCL2dlbFdMN1U2cTZjYWZZNG92MVR3U1psdzdhZExSR3diTEdZSnUyRVFK?=
- =?utf-8?B?RXlVeVRlK3diRkFuY1R2dGZMdkJZS3h0bnh5Wndkamw3a2hOSi9qdEN5ME9k?=
- =?utf-8?B?cUQ2T1I1ZjdOQmhYcHVHQUtleDhJL2RFcVY3ZzBkU0xaUFRiSitOdGFRSG9Y?=
- =?utf-8?B?dUZWL05rV2hhd3dtc3FKVGQySENmQkRwSFZIcmN4ZXFWOVZGRURMb3JSUmEv?=
- =?utf-8?B?a0lJK2pZVDFpWC9ZQmtsVHc1ZFlHdWVqSGo1aU9pNjMzZ01wcWxwM1FNL3B2?=
- =?utf-8?B?VWlZa3h2dk02WjUwUzJlb0ZXRHpkTmNyd1NuNzBXYUZGSW9tMld1NG1oT2Vu?=
- =?utf-8?B?dDRYNUhiN04xMXpmbEFYZnlrdUxpNjVhRlhOUXhmdVI2K3MzN2dKMVRoTFNo?=
- =?utf-8?B?QWhtMDlFaCs3U3ZaUEdockh1eXIvOXU2cnFrbzh0ZmhHZUFtZCtQNTQ0NEor?=
- =?utf-8?B?dm9FYllQdUFpMmFnMjkzaVlDbmtOcDA4N1ZzdGFHU0U1cFJvWWtXaU05a3dM?=
- =?utf-8?B?UWRnM3dWOFdjQkdKblRyVCtZTkFGeXZGVTZsNGZGQXdHUFRRZzFxcm5teVps?=
- =?utf-8?B?VWVrMkNOWEV0Vk5zVHVnajdkcGx1amtLby9zSGxUZWpRdHduZnUzUT09?=
-X-Exchange-RoutingPolicyChecked: i2Ytn8yFA3C6BrHpmIqmQuNR+GKhDLfQ/7dyse7kkAQ3S0evPPe3sTJ5YQsRrfeDqqplUw2+PONAY8WnTdvndNaK4O7E6mIJAJ1VGXRT46/CwQHoG241Y+Gww7ZzNz54OCH981Kr4rcDvuEMbUe/zZxzYI/BwY6QU+PHEasea6kbvPSTgE0Yhq6rIjc9yMSyYkcXBkdmNs9xU6ZhYUqtR5r7zOLR3Er7YpXmRJ8IOlMwoblMZEu1TnoF/bpllmlR/RK6uEC1Ah2igEGkLqSSch3OrwntwBwb+FtxLU/bwU5EzHJp/EgG8EA+5gLKDNYTM8iQEMbZjI6uB/X1zMZDJQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: f2607674-d946-4282-9a8e-08debb70efa3
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7381.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 21:51:26.5850
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G/vwxSWCTjWnchT3TppAZg6lMeiQOHDIdYtJDo1B9FEagYh8yx1I9i+80ZqJi39tAYYDsZIV3j1W2kKw595CmVX6dNSYloHEAKu4spwdbs0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4888
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPEVFmoC/2WNwQrCMBBEf6Xs2cgmqbV68j+kh9DdtguaSFJCp
+ fTfDbl6m8cwb3ZIHIUT3JsdImdJEnwBc2pgXJyfWQkVBoOmw9bclCPxWreoKErmqG7WMZK9dlb
+ 3UFafyJNs1fgEz6vyvK0wlGaRtIb4rVdZ175aL2j/rFmrkglbOxL1/YQP590rzOcxvGE4juMHU
+ edR9rkAAAA=
+To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org, 
+ Ciprian Regus <ciprian.regus@analog.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779832338; l=5877;
+ i=ciprian.regus@analog.com; s=20260330; h=from:subject:message-id;
+ bh=qkV3wqiPc1gtpJtbhMXrlyafax8/y9M8/g7Z6MlDhOU=;
+ b=cmkxchONzMnbGnAMVlKNZCnrkikd8TFL0iz7in8o2Pl4GaMAePC9zkw2gKZqK1W+CxPvQTd6E
+ LsKRcdEpmTNC8cB99GwnGT8Fdu07W5EuW8Qm1QDIVQetKpkJekSaBYM
+X-Developer-Key: i=ciprian.regus@analog.com; a=ed25519;
+ pk=8WoNhI0kQcQUl8YqJO5ZevROYk9HP8lOIeIgIYgjfbc=
+X-Endpoint-Received: by B4 Relay for ciprian.regus@analog.com/20260330 with
+ auth_id=703
+X-Original-From: Ciprian Regus <ciprian.regus@analog.com>
+Reply-To: ciprian.regus@analog.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	TAGGED_FROM(0.00)[bounces-291949-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,vger.kernel.org,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:email,intel.com:mid,intel.com:dkim];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291938-lists,netdev=lfdr.de,ciprian.regus.analog.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: D210F5DD010
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	HAS_REPLYTO(0.00)[ciprian.regus@analog.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[analog.com:replyto,analog.com:mid,analog.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2D2915DCECE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/26/2026 10:14 AM, Thomas Gleixner wrote:
-> The PTP core indicates in system_device_crosststamp::clock_id the clock ID
-> for which then system time stamp should be taken. That allows to utilize
-> hardware timestamps with e.g. AUX clocks.
-> 
-> Save the provided clock ID and use it in ice_capture_crosststamp() for
-> taking the history snapshot.
-> 
-> No functional change.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Cc: Jacob Keller <jacob.e.keller@intel.com>
+This series introduces support for the ADIN1140 (also called AD3306)
+10BASE-T1S single port MACPHY. The device integrates the MAC and PHY in
+the same package. The communication with the host CPU is done through an
+SPI interface, using the Open Alliance TC6 protocol for control and data
+transactions. As a result, the oa_tc6 framework is used to implement
+the communication with the device (register accesses and Ethernet frame
+RX/TX).
 
-Acked-by: Jacob Keller <jacob.e.keller@intel.com>
+The MAC and PHY are connected internally using an MII and MDIO bus.
+
+The PHY is a half duplex 10Mbps device, which implements both the PLCA
+RS (IEEE 802.3 clause 148) and CSMA/CD methods of accessing the Ethernet
+medium. The 10BASE-T1S standard allows multiple PHY devices to be
+connected (in parallel) on the same single twisted pair network segment,
+so PLCA can be configured in order to provide a fair access scheme to
+all the nodes and reduce the jitter introduced by the unordered CSMA/CD
+transmits. The PHY's internal register map can be accessed using the
+direct MDIO mode of the OA TC6. The control, status, phy id 1 & 2 C22
+registers are mapped to the 0xFF00 - 0xFF03 range. As for C45
+addressable devices, the PHY has PCS, PMA and PLCA blocks.
+
+The oa_tc6 framework patches are changes that would make the library
+usable by the subsequent ADIN1140 MAC driver.
+
+The protected mode patch is required because the ADIN1140 only allows
+protected mode OA TC6 control transactions, which the oa_tc6 framework
+doesn't currently implement.
+
+The OA_TC6_BROKEN_PHY quirk patch is required in order to allow the MAC
+driver to have a custom implementation for the mii_bus access methods as a
+workaround for hardware issues:
+
+1. The OA TC6 standard defines the direct and indirect access modes for
+   MDIO transactions. The ADIN1140 incorrectly advertises indirect mode
+   only (supported capabilities register - 0x2, bit 9), while actually
+   implementing just the direct mode. We cannot rely on the CAP register
+   to choose an access method (which oa_tc6 does by default, even though
+   it only implements the direct mode), so the driver has to use its
+   own.
+2. The ADIN1140 cannot access the C22 register space of the internal
+   PHY, while the PHY is busy receiving frames. If that happens, the
+   CONFIG0 and CONFIG2 registers of the MAC will get corrupted and the
+   data transfer will stop. Those two registers configure settings for
+   the transfer protocol between the MAC and host, so the value for some
+   of their subfields shouldn't be changed while the netdev is up.
+   Since we know the PHY is internal, the MAC driver can implement a
+   custom mii_bus, which can intercept C22 accesses. Most of the
+   registers mapped in the 0x0 - 0x3 range (the only ones the PHY offers)
+   are read only, and their value can be read from somewhere else (e.g
+   the PHYID 1 & 2 have the same value as 0x1 in the MAC memory map).
+   C45 accesses do not cause this issue, so we can properly implement
+   them.
+
+Even though they have different driver, the MAC one cannot function
+without the PHY driver, since the PHY is not compatible with the generic
+c22 driver. As such CONFIG_ADIN1140 selects CONFIG_ADIN1140_PHY.
+
+Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
+---
+Changes in v2:
+- Add the OA_TC6_BROKEN_PHY quirk flag to the oa_tc6 framework in order
+  to allow ethernet drivers to manage their own mii_bus struct and PHY.
+- Move the OA TC6 standard register definitions in the oa_tc6.h header
+  so other drivers can use them. Do the same for the C45 access
+  functions
+- Add the genphy_read_mmd_c45 and genphy_write_mmd_c45 functions to
+  genphy, which allow drivers that have been discovered over C22 to make
+  direct C45 operations, without using the 0xD and 0xE register. The
+  change was implemented based on the suggestion in this thread:
+  https://lore.kernel.org/all/CY8PR02MB9249CDA8F2C560FDD0F662D883382@CY8PR02MB9249.namprd02.prod.outlook.com/
+- Link to v1: https://lore.kernel.org/r/20260503-adin1140-driver-v1-0-dd043cdd88f0@analog.com
+
+---
+Ciprian Regus (10):
+      dt-bindings: net: Add ADIN1140
+      net: ethernet: oa_tc6: Handle the OA TC6 SPI protected mode
+      net: ethernet: oa_tc6: add OA_TC6_BROKEN_PHY quirk flag
+      net: ethernet: oa_tc6: Export the C45 access functions
+      net: ethernet: oa_tc6: Export standard defined registers
+      net: ethernet: oa_tc6: Add MMS register formatting macro
+      net: phy: add generic helpers for direct C45 MMD access
+      net: phy: microchip-t1s: use generic C45 MMD access helpers
+      net: phy: Add support for the ADIN1140 PHY
+      net: ethernet: adi: Add a driver for the ADIN1140 MACPHY
+
+ .../devicetree/bindings/net/adi,adin1140.yaml      |  69 ++
+ Documentation/networking/oa-tc6-framework.rst      |   3 +-
+ MAINTAINERS                                        |  15 +
+ drivers/net/ethernet/adi/Kconfig                   |  12 +
+ drivers/net/ethernet/adi/Makefile                  |   1 +
+ drivers/net/ethernet/adi/adin1140.c                | 811 +++++++++++++++++++++
+ drivers/net/ethernet/microchip/lan865x/lan865x.c   |   6 +-
+ drivers/net/ethernet/oa_tc6.c                      | 202 ++---
+ drivers/net/phy/Kconfig                            |   6 +
+ drivers/net/phy/Makefile                           |   1 +
+ drivers/net/phy/adin1140-phy.c                     |  72 ++
+ drivers/net/phy/microchip_t1s.c                    |  32 +-
+ drivers/net/phy/phy_device.c                       |  25 +
+ include/linux/oa_tc6.h                             |  63 +-
+ include/linux/phy.h                                |   3 +
+ 15 files changed, 1203 insertions(+), 118 deletions(-)
+---
+base-commit: b217a5c25fe4a5fdb63f57d028a88da470601f57
+change-id: 20260429-adin1140-driver-93ae0d376318
+
+Best regards,
+-- 
+Ciprian Regus <ciprian.regus@analog.com>
+
+
 
