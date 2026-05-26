@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-291964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBmMJzkgFmp/hwcAu9opvQ
-	(envelope-from <netdev+bounces-291964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:35:37 +0200
+	id GAspGKQgFmp/hwcAu9opvQ
+	(envelope-from <netdev+bounces-291966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:37:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E2225DD384
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:35:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1AAA5DD3CF
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:37:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E5AAA302E0CB
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:35:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C5413029E75
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83B83C583B;
-	Tue, 26 May 2026 22:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025F33C8C47;
+	Tue, 26 May 2026 22:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rv3hJ1HF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DtIR2Glq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE74A3A8730;
-	Tue, 26 May 2026 22:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02593C5823;
+	Tue, 26 May 2026 22:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779834934; cv=none; b=UvF1AJcdD3wVu296UwDz1fFf5uzvm9g+NO7PlWpgU00vfHSLcoultGvxCcKhfqWCd+odg9rsgUqAYi1F4L9l4tVvcGosnGKAbLW4T5nXX/stepOTCoZ6cikj3jY7zN0ORz0gmF9KxNOIFWHKlWzBrbd04QeC7DsWHplGyw+5ikw=
+	t=1779835041; cv=none; b=RiJ8PgjyLRI27kbik5XxoDPkh6tPA5e/hJM5/wXtVFSx1hc6fyrxadY80ij0vP2omFI11OqSsFSST3WO0eXm2p4CZgDyK1O51iAo7+gcxjl4cDFyIDYX0JCkyGXij0jfWmZeZeKKcP3lF8qv9ly1yUnnm83gBY6F5bSTuEA8qGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779834934; c=relaxed/simple;
-	bh=aFkL6P7F55JAmBj2/k/48cfMzu+PjW0K9b9VVAYu3KE=;
+	s=arc-20240116; t=1779835041; c=relaxed/simple;
+	bh=t3DDdLoiDpa5mzDeyTIAK0ED3ZALYS30CX3shJvZjNM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=idcB+b/Wlw7TvpZlD6UtEf5AqfSpjXAsszvAa+olA836h9uaBIMr1+4KOgkLZOT6F94m/bRDXCZqGyo/fpIdGPMkpy0WjMVy1QTe3lSMAZc4FnRaFfps48su0KYBOSifh777VuqKd+aeNjyAFt4Vqzcfa1K5rtuHyPN8f16UUiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rv3hJ1HF; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFFCF1F000E9;
-	Tue, 26 May 2026 22:35:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=b0phnpGx/F+yPEGtXWI1NENA4rB91QvV6zXSgPJ4E+1dT0JfTekXLsHoQO4LEdG+mC3eMt2LewbQzqqXB1UFPP9go7zDiu6DQz0nBa9TXVZflrlgJTC/pqdflhckNqjfAVRNV9wRQhjJQP3Do5I4uW3JB3ZYb5yewHpcgV2buss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DtIR2Glq; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 082271F000E9;
+	Tue, 26 May 2026 22:37:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779834933;
-	bh=NbleJdTCwKs5WoryYxaNmlGpyfGAhKVE5VL3jARcpFw=;
+	s=k20260515; t=1779835040;
+	bh=t3DDdLoiDpa5mzDeyTIAK0ED3ZALYS30CX3shJvZjNM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Rv3hJ1HFd+aYHvPfkEGfJrsaeXoukMH/cV65Hr4wleI21YGRR3t/4j+Efenv8m5TM
-	 z+oOQsUDimGWsY2tTrWuMDno0gVVhfisfDT77Zqtp+sO21Yv9raxWZW1J9q96/0L6+
-	 bJpi2Binpy4NVokXl6FYyrN+j15k8vphTYS99Y2s9AwbBAY22XjWhUu8ieJbt+Xs8L
-	 7N+setAOQoWZNEovazZKDnQ697gkPP4v1g7sRdC16btdM0GnnTRhjRcSjPpkuBhRaf
-	 r0XlqJP39kDZRwWwMmZ5ny+wLnPV810VqY8mEQE8UKxykWBhaF7FrI3JAkQdzp1PrH
-	 qSlVi/IO5HQHw==
-Date: Tue, 26 May 2026 15:35:32 -0700
+	b=DtIR2GlqYowlJKZ/IiOqFfgZPFXIFmw+EyJGl8R2Oi6Nv5TM9WfpLxSMQlXsc53rU
+	 q3oy3eg8h/BsMh6eGUMMmQO2dA1Osw6VmkvlJw5p3WFUjyD9SvP9YWqzsxMDhIb3Q7
+	 l5jFMpAMZwOS9LgPsD2wvvRpUZfR4ccsby+Tke0YdupjlppBLcEWaOZqDIR96V5FQ0
+	 R5CK4U08pLzhgP7CvR/DTDm40QByuiy4KYUVjnTn8cfVD/NseLl8ATrqw3MVppYyoV
+	 2TwW2iSGVBWNM+zl8ORfUR48vEbZ0SiJLcL+MYBLyCIgfZeUqIUPvSOneFQPpLNCfm
+	 f9vCHAebIY1bQ==
+Date: Tue, 26 May 2026 15:37:19 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Randy Dunlap <rdunlap@infradead.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
  pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
  vladimir.oltean@nxp.com, willemb@google.com, sdf.kernel@gmail.com,
  ecree.xilinx@gmail.com, jesse.brandeburg@intel.com,
  linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next 06/10] docs: net: refresh netdev feature
- guidance
-Message-ID: <20260526153532.7979b43c@kernel.org>
-In-Reply-To: <422219d6-8377-423c-8ccd-641b2fccaa1a@bootlin.com>
+Subject: Re: [PATCH net-next 00/10] docs: net: updates for old and cobwebbed
+ docs
+Message-ID: <20260526153719.7261b7f2@kernel.org>
+In-Reply-To: <1c341b25-e720-4f63-9db1-99348c8ebed9@infradead.org>
 References: <20260526160151.2793354-1-kuba@kernel.org>
-	<20260526160151.2793354-7-kuba@kernel.org>
-	<422219d6-8377-423c-8ccd-641b2fccaa1a@bootlin.com>
+	<1c341b25-e720-4f63-9db1-99348c8ebed9@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,11 +71,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291964-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291966-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -94,46 +93,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0E2225DD384
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: E1AAA5DD3CF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 26 May 2026 20:41:10 +0200 Maxime Chevallier wrote:
-> >   
-> >    1. netdev->hw_features set contains features whose state may possibly
-> >       be changed (enabled or disabled) for a particular device by user's
-> > -    request.  This set should be initialized in ndo_init callback and not
-> > -    changed later.
-> > +    request.  Drivers normally initialize this set before registration or
-> > +    in the ndo_init callback. Changes after registration should be made
-> > +    very carefully as other parts of the code may assume hw_features are
-> > +    static. At the very least changes must be made under rtnl_lock and
-> > +    the netdev instance lock, and followed by netdev_update_features().  
-> Feel free to keep this description as-is, but can we get somewhere the
-> actual meaning of "hw" in "hw_features" ? I've seen this cause confusion
-> before as this is sometimes wrongly interpreted as "Hardware features",
-> which isn't correct as the hardware may do stuff without allowing users
-> to change that behaviour.
-> 
-> I vaguely recall something along the lines of "Host-Writeable features",
-> but I am not sure at all about that...
+On Tue, 26 May 2026 11:48:41 -0700 Randy Dunlap wrote:
+> WARNING: ../include/linux/netdevice.h:2622 Excess struct member 'ax25_ptr' description in 'net_device'
 
-Hm. I assumed the hw in hw_features stands for hardware.
-The magic behavior of host controllable vs hardwired was
-probably added later without renaming the field.
+I wonder how that sneaked in? ;) ;)
 
-As you indicate the usual confusion is that it's legal to have 
-a feature in ->features which is not set in ->hw_features which 
-means that features is hardwired "on", it can't be disabled by
-the user.
-
-The current text does say this: "features whose state may [..]
-be changed [..] by user's request". But perhaps it's not emphatic
-enough.
-
-Main question is whether this series should be clarifying
-this or our criteria is that the series doesn't _add_ confusion,
-even if it doesn't clarify all the potential confusion points? :)
+I'll clean this up separately, hopefully we haven't regressed too many
+things while the script was broken :(
 
