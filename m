@@ -1,183 +1,145 @@
-Return-Path: <netdev+bounces-291644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291645-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kL03JfR2FWrHVAcAu9opvQ
-	(envelope-from <netdev+bounces-291644-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:33:24 +0200
+	id 6OecMwx3FWrHVAcAu9opvQ
+	(envelope-from <netdev+bounces-291645-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:33:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F05535D4382
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:33:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D38725D4391
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:33:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E63931AFC12
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:26:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B57A130985C5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA443DD872;
-	Tue, 26 May 2026 10:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2403DD52E;
+	Tue, 26 May 2026 10:26:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZRAEpwtd"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="uUSnBmdV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DA13DD85D
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 10:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8593D891B
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 10:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779791167; cv=none; b=Cko8qlVV1JdOa8BeELfyuNGszwmPPf+qS8DV9fICfs+uZvnSdFwjOBjSuZva1/J7yilBLdczQGcWfIYUTqy4MZ8q2frH7KJyJ9n97Q7CLxyeWJqu/KPu+l+MFZIXHOOpsbMjiQ5S2kum8iqcVNIySVbh+zRDrXe1maaPPsvyOLE=
+	t=1779791185; cv=none; b=d61721D7I3DFxPAda7XVW9oVrlyUEi+W8HVUXrMZDzuWmvd0eoErYDaoueF+UJ4ktRPsZkFoTHoqPNcaZhIBUDfNj7WYjT3FoD88P9Ci9zYWf7amUy6YSr67gmIL3FB0XYvUHuGyz3OYjrQ/TQ2niUENFhy8I6/Oq93b78dhBUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779791167; c=relaxed/simple;
-	bh=ugdezamtbLqV8zRH5HK62q+0UmZzSIYuy75obV6uFz8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ILpaTyboqmGHb9UWJ0gOnpCYcSmxEGIunYdwlT2mmHvNyyLPekWdvGHi6/3LHERmM62IMN/awjFScC3m+jktiNIupQavOE5NOTln+63J3ZUU0YtWG2MaNPoZDRqImA+doXuZsKpnXsKNFBaY/zpS699Iypb2HY2j4k5jIYgaNu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZRAEpwtd; arc=none smtp.client-ip=209.85.216.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-36af4b7840aso1006165a91.3
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 03:26:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779791165; x=1780395965; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UWfI8BI/45zELXfcQ9+WErn1G2kjuN1/82K6JhNrzNQ=;
-        b=ZRAEpwtdw9VXHstM5ILhOp4s170vtBKc+mnvwfomkkQtn1Hv8AtlgwHk0KFyzVZ7DX
-         Hug/H8Hakd5y7pk9VTdSwFObWKa+oyBdPkdgKIQM/b18Gur1p61K2AXoUfOKMlLxVp9Y
-         fzcYoogKl1kZ+2mSHr4JUAkMFy0XP4NITAW5pkeZzxhK3KfqnscH5R0GPYowk3nodVUN
-         dt9+wyJRBGii2qCUe2Y6gvU65uIlvRDbQEfGTH1oRzHkPiPI+8UiofElXe/BQpZxRH+e
-         ZMgjNlZiqc6SdwDffp7XaY5Em1v14+DZx3WnbxdT5IWb/Xwd2lbYdxZqLWOACMNK96bK
-         6RUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779791165; x=1780395965;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UWfI8BI/45zELXfcQ9+WErn1G2kjuN1/82K6JhNrzNQ=;
-        b=gkjJl6QdBQEzmqSmNbdTXrdDZCGEpbiJHQMUP8IR43ZkeVyewvd8Q6zKokCw1bQ9qV
-         AtBR19CpkGVtjwGMEKqCW9arKuVi4lq+NY4LvUjWDzScHgoj0GVViNNLPclsjLrvZCp1
-         tWaXzTQ2RCF+56gaFm80ZqusZiwt2WHHFPMoAIe/7UA/yIqDKAnCNetGZwjb/TyWnu27
-         COUzx2xfRsSMcfWrYqu1N7igFWLxNHWNsQZZ/JYA05MG59RNFlAtfqVtVmHZ6+BdK/2J
-         i9xGYDZbJXQBYo/+dQf6xiefEN34ctWJZLLgGFHGY2LMPU7Y3J5wlsSkyOLT0jWxMKfg
-         1yzQ==
-X-Gm-Message-State: AOJu0YwUXmKfjmEE5HdCbHQ79iOgHssaECcI7mn5Z4PbsSr8JVGXRUQq
-	OzZ58hBKM/J+kFJtbmjlZ6+BKKerW76/lDiGAkiq2lGNpzwTc8LNGNiQ
-X-Gm-Gg: Acq92OE0JyJ0EBOjO1ByiNAwkCmGAh7Mr5Zw0Au5n+nKcHV51L5p9+ZSSS3hmLCSBxU
-	5nAYbZhJ46iO0pqtp+LqpUU8TV3XZS1aYN8pJUUqcRRfZMFJnP/i4+S7+lfNdPa4xcsLuUL+ikf
-	5PMSuIM5xspxXM2HRFQDcsJIFGdtd5+asrObmaEAOCkMs2GUpvE8b0WME8CVuO/FpeqTjstz8WZ
-	ce19hRhU/2HFmxurCbr15KSlV+iTFr+8wykZc0ifsZb6yDZN1xkUTgDnStrO33t7ResP0QIvRrn
-	7RLRFVTHpfKsTg1UudwzXPKqlN0B4HDI+ldWEHsN/Q+y6PUAMjzWHYqIB7RIf7SZPzMbB6TMAzF
-	knftYyhihyWGMY9NzFkEhTbjl/+oN7rGA9WiEDYQ8Uid8CPC9WwlvNYDzeIJ55hVl13j2jvZftd
-	NH4RzUZUd3hDDbOcWTR0LlfTIqMr/KMx44l9QmIzS8YdFwceoP7jqz0ZyoDf5JIZEZ9XC9C20=
-X-Received: by 2002:a17:90b:2d44:b0:369:a74b:28cc with SMTP id 98e67ed59e1d1-36a674f3475mr16588346a91.18.1779791165456;
-        Tue, 26 May 2026 03:26:05 -0700 (PDT)
-Received: from KIPREYXIAO-MC2.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a72c4ca35sm12416647a91.9.2026.05.26.03.26.03
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 26 May 2026 03:26:05 -0700 (PDT)
-From: Zhenghang Xiao <kipreyyy@gmail.com>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: netdev@vger.kernel.org,
-	Zhenghang Xiao <kipreyyy@gmail.com>
-Subject: [PATCH net] amt: fix use-after-free in amt_source_work
-Date: Tue, 26 May 2026 18:25:59 +0800
-Message-ID: <20260526102559.31926-1-kipreyyy@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1779791185; c=relaxed/simple;
+	bh=t7xAFcJcddCqBkMtbx99nB+3gb9bAOWTdZMQyotFhYY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MCSuLlIBG9yaG6q5GOT106BeFEj2+s5J2PhYRusZDnutKsnT6PTnZgFfDv/xFWhAETcPBnGP5pV1kLzR+Z3Nf8bG2sc02rW9iOKg7qpd6wWWgBzYi95XZxhOafi32/KI1nKmZ0m5OiDPvwRPw91UAoTTimu+9XC4/aiYoNXb8uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=uUSnBmdV; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id E2FDA20185;
+	Tue, 26 May 2026 12:26:21 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id gfXsX9NTBRdF; Tue, 26 May 2026 12:26:20 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id E6405205DD;
+	Tue, 26 May 2026 12:26:19 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com E6405205DD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1779791179;
+	bh=CJesOZBlLhbJMyqWSry7232znwrcg76vehuiWe92sek=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=uUSnBmdVUqaxzTLHHQg2O2Ol5jjJbr7LgnoMMWah/szr/9E+xZBv3qehMW2bZTEHr
+	 kB1xvBmjWw56DzokpCda9ydzt9TQFQfpG5QwqT6OC0nxxyl72Vo1lSG5jl3efkod86
+	 Mihwv8CGXYSVVvfnkSaZ8VslndyKg+Y4mQx90muyuHrptIMV3gAU8xHXOGKVg8QYPi
+	 t65I07pyKVa/LRea4pxkur+HAf98k+vgyYLBCm+5JrR+NOcUqSY6895UQHCU46Axu5
+	 /szrjAm5dk1SDxFV9B9Ao2+EOnH9pDzEPgH7tyQd8jpEYFVAeFPf7j0A5vrI4p3N/i
+	 Eco73M9gYEdrQ==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 26 May
+ 2026 12:26:18 +0200
+Received: (nullmailer pid 225246 invoked by uid 1000);
+	Tue, 26 May 2026 10:26:18 -0000
+Date: Tue, 26 May 2026 12:26:18 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Ren Wei <n05ec@lzu.edu.cn>
+CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <sd@queasysnail.net>, <yuantan098@gmail.com>,
+	<bird@lzu.edu.cn>, <tr0jan@lzu.edu.cn>, <zcliangcn@gmail.com>
+Subject: Re: [PATCH net 1/1] xfrm: input: hold netns during deferred
+ transport reinjection
+Message-ID: <ahV1SnF_EnN_c2qe@secunet.com>
+References: <cover.1779308659.git.zcliangcn@gmail.com>
+ <a7cc27e87359c7624522fa5bb8c6a2d9af928824.1779308659.git.zcliangcn@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <a7cc27e87359c7624522fa5bb8c6a2d9af928824.1779308659.git.zcliangcn@gmail.com>
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-291644-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gondor.apana.org.au,davemloft.net,queasysnail.net,gmail.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-291645-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,secunet.com:mid,secunet.com:dkim,lzu.edu.cn:email];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_THREE(0.00)[3];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kipreyyy@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F05535D4382
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: D38725D4391
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-amt_source_work() dereferences gnode->amt and gnode->tunnel_list before
-acquiring rcu_read_lock() or tunnel->lock. A concurrent teardown
-(amt_clear_groups -> amt_del_group) can free gnode via kfree_rcu between
-the pointer read and dereference because cancel_delayed_work() in
-amt_destroy_source() does not wait for already-running work.
+On Fri, May 22, 2026 at 05:31:55PM +0800, Ren Wei wrote:
+> From: Zhengchuan Liang <zcliangcn@gmail.com>
+> 
+> Transport-mode reinjection stores a struct net pointer in skb->cb and
+> uses it later from xfrm_trans_reinject(). That pointer must stay valid
+> until the deferred callback runs.
+> 
+> Take a netns reference when queueing deferred reinjection work and drop
+> it after the callback completes. Use maybe_get_net() so the queueing
+> path does not revive a namespace that is already being torn down.
+> 
+> This keeps the existing workqueue design and fixes the netns lifetime
+> handling in one place for all users of xfrm_trans_queue_net().
+> 
+> Fixes: 7b3801927e52 ("xfrm: introduce xfrm_trans_queue_net")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Co-developed-by: Luxing Yin <tr0jan@lzu.edu.cn>
+> Signed-off-by: Luxing Yin <tr0jan@lzu.edu.cn>
+> Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> Assisted-by: Codex:gpt-5.4
 
-Move rcu_read_lock() before the gnode dereferences so kfree_rcu cannot
-reclaim the memory while the work handler is accessing it. After
-acquiring tunnel->lock, verify the source node is still on gnode's hash
-via amt_lookup_src() to handle the case where teardown already processed
-this source.
-
-Fixes: bc54e49c140b ("amt: add multicast(IGMP) report message handler")
-Signed-off-by: Zhenghang Xiao <kipreyyy@gmail.com>
----
- drivers/net/amt.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index f2f3139e38a5..f70d49cca285 100644
---- a/drivers/net/amt.c
-+++ b/drivers/net/amt.c
-@@ -291,13 +291,18 @@ static void amt_source_work(struct work_struct *work)
- 	struct amt_source_node *snode = container_of(to_delayed_work(work),
- 						     struct amt_source_node,
- 						     source_timer);
--	struct amt_group_node *gnode = snode->gnode;
--	struct amt_dev *amt = gnode->amt;
-+	struct amt_group_node *gnode;
-+	struct amt_dev *amt;
- 	struct amt_tunnel_list *tunnel;
- 
-+	rcu_read_lock();
-+	gnode = snode->gnode;
-+	amt = gnode->amt;
- 	tunnel = gnode->tunnel_list;
- 	spin_lock_bh(&tunnel->lock);
--	rcu_read_lock();
-+	if (!amt_lookup_src(tunnel, gnode, AMT_FILTER_ALL,
-+			    &snode->source_addr))
-+		goto unlock;
- 	if (gnode->filter_mode == MCAST_INCLUDE) {
- 		amt_destroy_source(snode);
- 		if (!gnode->nr_sources)
-@@ -308,8 +313,9 @@ static void amt_source_work(struct work_struct *work)
- 		 */
- 		snode->status = AMT_SOURCE_STATUS_D_FWD;
- 	}
--	rcu_read_unlock();
-+unlock:
- 	spin_unlock_bh(&tunnel->lock);
-+	rcu_read_unlock();
- }
- 
- static void amt_act_src(struct amt_tunnel_list *tunnel,
--- 
-2.50.1 (Apple Git-155)
-
+Applied, thanks a lot!
 
