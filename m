@@ -1,160 +1,158 @@
-Return-Path: <netdev+bounces-291917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291916-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ALoPImT8FWovggcAu9opvQ
-	(envelope-from <netdev+bounces-291917-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:02:44 +0200
+	id uPeVLSj8FWovggcAu9opvQ
+	(envelope-from <netdev+bounces-291916-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:01:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7BEB5DC304
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:02:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 170995DC2F5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5E513044BAE
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:01:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E53533007F77
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4158A395AC3;
-	Tue, 26 May 2026 20:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF02395AC3;
+	Tue, 26 May 2026 20:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="W8MdF+32"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUAlP0dm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4DB78F29;
-	Tue, 26 May 2026 20:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F62230C16D;
+	Tue, 26 May 2026 20:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779825702; cv=none; b=hk9HDCAOl3cbVkATHEy7xcPrTeNpF3Rxle9qLwyTb6VoMJd+CNfEgn+d2i4meAYLgk9IWLp5oSazhlkiaxRMjqGH3RBIU7n6VrpBeDeWClKy/mUD/wVffJHSHq2N2RVz9k1nxue+HHsIjFi1nenVo1X5grzIiNgjemAeu46FGR0=
+	t=1779825680; cv=none; b=Dx+xZthcTV3Yl9BAl3yJ9F+zL8f6F3dHLwMeatX4eaE44pFNACabhdW+S+XLuAhxdIq0wiSzwnF1lv7waHQI1cVr1QaH3JgJFdKKONzQbf2YhwhezlYV2xotMujrFSzgnTtrY7qqRIFXZFU6TgaZf9XFRVPNBW42ZYKk5ldFnoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779825702; c=relaxed/simple;
-	bh=EWeYygjlxL6KyEBUVWUn+gT2zvpNxEN5Cn6tnKd6LK0=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=qVynH/ryKmWFGQl7j652aHMcsDq7ld+FR+xKBuPoaXzemE60iZHL8oe1mYmJ/oCwBoOIpBSUTSzUuSHAGmJ4tXzqGlw8DjCCLdPUE/Q4pskq5KW1Ss1ZVWpfe0QXw7FIQqTAR4gVm8hD06Vh2g9YJQrLp58GLbepoXFXVd+KB1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=W8MdF+32; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 962A6A4B47;
-	Tue, 26 May 2026 21:59:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1779825547; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=jOrchRnk366irtCmn98ATNtNR02m9R8pA0+cw+MMDHM=;
-	b=W8MdF+32/ZiAdVuVekmZdnnvy3s2jbVBCRzwaQiEozI511pqI7dWe+1gLI/CkN7TpCyKlR
-	hXT8qfZYIehSb42VulCr+mlRFBIGR7bfanpxsRhYI4kcobUj7UTof492OdEGVQ1+U9rtrQ
-	2LFuGdcjAK9sdFfQwKPqwFsNFTSe1RQnBWNiZOxEqJFo/Vvnoks9dBGff2vMC2To8Ab3Oc
-	rsUU7diu5wjm8M3VDH5TGLcwjfqK1OoTLTGAvMqylyMajRzz8uohHrZZQ7XatXcMUj4DqP
-	cNTQwgNagAu58SMJio+O9DIzRTco+VojhieYDTN2B/CmQLkRx4VCXpf/8sZCUw==
+	s=arc-20240116; t=1779825680; c=relaxed/simple;
+	bh=nd+IYyFSAp07KyOd1BzNPpyJpQXcGhkRGMogWzI40tE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JuogTkQHOLgJDhevMZt26WJmkBm+MjWOxblEZW3uN+x3of0zxrkH3PJWX/yqCe17DGR0hyHakGkrxXqWDurjJQZo8npiDJq+pnf7RHZr0Hyd5RdYQOf4JXRAkhZJ0Lb1TGS/YT9eS39KuCekxvCBXx1ibnXBSsr3RcTgrIn1uvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUAlP0dm; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC84F1F000E9;
+	Tue, 26 May 2026 20:01:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779825678;
+	bh=1qxnmKQGUKtoFj3/nGD5Rn2Gfy5r6REEQNVEGh2K3ms=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=XUAlP0dm/G60yd+smYcUeLELrUuSSrHXbnAXU/Q1+cjxZlg/jZGq5x/8aQ9k/lp2/
+	 75qT1tMlIyHUDx14RtalRuKuqkKqC8XTO4xf40eSqk8kGMSRI1W/sLGMy6+tmmDErx
+	 sSZAyp3JucSrQEkEjIY2KLW6wuLFNU0dXlzak8CdRg/LcUk+jdCg2btwH3M4NAXuIo
+	 ta1bepz6hgmjF13VWpiqaDUZ8cnOzG8cEDiz1Iam/Pw3sN7Lep0xIjKRNYHBq9fD/G
+	 Amr42UO8/ZtBc1rqraAWIzPxzn0wqy/AanF5JMxvlsm7V6WQB/s+SQ01uD/mbePgGu
+	 0E+JZaGxaZsPg==
+Date: Tue, 26 May 2026 21:01:14 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ashwin Gundarapu <linuxuser509@zohomail.in>
+Cc: anthonylnguyen <anthony.l.nguyen@intel.com>,
+	"anthony.l.nguyen@intel.com" <przemyslaw.kitszel@intel.com>,
+	andrewnetdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>,
+	edumazet <edumazet@google.com>, kuba <kuba@kernel.org>,
+	pabeni <pabeni@redhat.com>,
+	intel-wired-lan <intel-wired-lan@lists.osuosl.org>,
+	netdev <netdev@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] e1000e: fix memory leak of msix_entries on
+ MSI-X failure
+Message-ID: <20260526200114.GD2256768@horms.kernel.org>
+References: <19e537fa55c.56218d6244367.1765806925055659075@zohomail.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 26 May 2026 21:59:06 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Thangaraj Samynathan <thangaraj.s@microchip.com>,
- netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: lan743x: add support for RMII
- interface
-In-Reply-To: <48510d22-bc14-427a-b12e-17655ca95ad5@lunn.ch>
-References: <20260526154054.19829-1-thangaraj.s@microchip.com>
- <20260526154054.19829-3-thangaraj.s@microchip.com>
- <48510d22-bc14-427a-b12e-17655ca95ad5@lunn.ch>
-Message-ID: <b24c34f91726681ef5797af10b3d1e9a@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <19e537fa55c.56218d6244367.1765806925055659075@zohomail.in>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291917-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291916-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_ALL(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.986];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D7BEB5DC304
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,sashiko.dev:url,horms.kernel.org:mid,zohomail.in:email]
+X-Rspamd-Queue-Id: 170995DC2F5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Andrew
-
-On 26.5.2026 18:49, Andrew Lunn wrote:
-> On Tue, May 26, 2026 at 09:10:54PM +0530, Thangaraj Samynathan wrote:
->> Enable RMII interface in the lan743x driver for PHY and MAC
->> configuration.
->> 
->> - Select RMII interface in lan743x_phy_interface_select().
->> - Update phylink supported_interfaces and MAC capabilities.
->> - Enable RMII via RMII_CTL in lan743x_hardware_init().
->> - Define RMII_CTL register and enable bit in lan743x_main.h.
+On Sat, May 23, 2026 at 11:52:14AM +0530, Ashwin Gundarapu wrote:
+> From: Ashwin Gundarapu <linuxuser509@zohomail.in>
+> Date: Sat, 23 May 2026 11:49:40 +0530
+> Subject: [PATCH] e1000e: fix memory leak of msix_entries on MSI-X failure
 > 
->> +	case PHY_INTERFACE_MODE_RMII:
->> +		__set_bit(PHY_INTERFACE_MODE_RMII,
->> +			  adapter->phylink_config.supported_interfaces);
->> +		adapter->phylink_config.lpi_capabilities = 0;
+> When MSI-X initialization fails, the driver falls through to try
+> MSI or legacy interrupts. However, the msix_entries array allocated
+> earlier is not freed, causing a memory leak. Free it and set to
+> NULL before falling through to the MSI fallback path.
 > 
-> So EEE is not supporting with RMII? This is not mentioned in the
-> commit message.
+> Found by code inspection.
 > 
-> Humm, is this an 802.3 limitation, or a limitation of this hardware?
-
-I do not think this is specific to the lan743x. Linux drives EEE from
-the MAC side, so mac_enable_tx_lpi() has to signal "assert LPI" to the
-PHY across the xMII. On MII and GMII the MAC signals LPI using TX_ER,
-and AFAICT RMII has a reduced pin set with no TX_ER, so the MAC has no
-standard way to request LPI over RMII. So IMHO EEE does not really
-apply to RMII in general, not only on this controller. Please correct
-me if I am missing something here.
-
-Today drivers seem to express this themselves through lpi_interfaces.
-stmmac is the clearest example I found, in stmmac_phy_setup():
-
-	/* The GMAC 3.74a databook states that EEE is only supported
-	 * in MII, GMII, and RGMII interfaces.
-	 */
-	__set_bit(PHY_INTERFACE_MODE_MII, config->lpi_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_GMII, config->lpi_interfaces);
-	phy_interface_set_rgmii(config->lpi_interfaces);
-
-It deliberately leaves RMII out, and phylink_activate_lpi() then
-refuses LPI when cur_interface is not in lpi_interfaces.
-
-> If this is 802.3, then this should be in phylink, not drivers.
-
-Since this seems generic, I agree it belongs in phylink rather than
-each driver. I can send a patch excluding RMII (and probably REVRMII)
-from EEE centrally, so drivers do not need to special-case it.
-
+> Signed-off-by: Ashwin Gundarapu <linuxuser509@zohomail.in>
+> ---
+>  drivers/net/ethernet/intel/e1000e/netdev.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
-> 	Andrew
+> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+> index 7ce0cc8ab8f4..1526069d7fc1 100644
+> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+> @@ -2065,10 +2065,12 @@ void e1000e_set_interrupt_capability(struct e1000_adapter *adapter)
+>  							    a->num_vectors);
+>  				if (err > 0)
+>  					return;
+> -			}
+> -			/* MSI-X failed, so fall through and try MSI */
+> -			e_err("Failed to initialize MSI-X interrupts.  Falling back to MSI interrupts.\n");
+> -			e1000e_reset_interrupt_capability(adapter);
+> +                        }
+> +                        /* MSI-X failed, so fall through and try MSI */
+> +                        e_err("Failed to initialize MSI-X interrupts.  Falling back to MSI interrupts.\n");
+> +                        kfree(adapter->msix_entries);
+> +                        adapter->msix_entries = NULL;
+> +                        e1000e_reset_interrupt_capability(adapter);
 
-Nicolai
+Hi Ashwin,
+
+e1000e_reset_interrupt_capability() already handles freeing (and NULLing)
+msix_entries, and it does so after calling pci_disable_msix().
+
+This patch seems to have the effect of bypassing the call to
+pci_disable_msix().
+
+Are you sure this is fixing a memory leak as described?
+
+Flagged by https://sashiko.dev/ and https://netdev-ai.bots.linux.dev/sashiko/
+
+>  		}
+>  		adapter->int_mode = E1000E_INT_MODE_MSI;
+>  		fallthrough;
+> --
+> 2.43.0
+> 
+> 
 
