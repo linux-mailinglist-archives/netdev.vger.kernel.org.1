@@ -1,166 +1,311 @@
-Return-Path: <netdev+bounces-291828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291829-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KGpaMYXNFWoTcAcAu9opvQ
-	(envelope-from <netdev+bounces-291828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:42:45 +0200
+	id WK9FIQDQFWrkcAcAu9opvQ
+	(envelope-from <netdev+bounces-291829-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:53:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7A25D9E63
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:42:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02DD35DA263
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 946DD300EE8A
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:42:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 234D83064A4B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473663CF67D;
-	Tue, 26 May 2026 16:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E133FF1D5;
+	Tue, 26 May 2026 16:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="I9oo1pEj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G1k9pJfo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F34C3C583E
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 16:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD853F7865;
+	Tue, 26 May 2026 16:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779813750; cv=none; b=JasvkrBQVZio3KBxrr0X/2CSkBddLmpMs+w8a2Qo4+tNd3wxn/DUlprMMbkN+uAGR7KRMyCFhMqgCzO3s292fnQOJej9dmBcjg135FZAER/KPhcCZueO+RB4zj3WauEW8+AgvK1DbBEL+llcwBefmTf7vISEB6AJp7xJW5r+8lQ=
+	t=1779814016; cv=none; b=YMKxsVQ9mffn23vxTmphoaArxitETKy7jZu0wPEU+ly/6LVGY+28i3phosBz0vpnY47RxkfVvdJTKn3iDbycCanF78+hF2Zow8tUxZhUh/DFstACikSvpf6+AiuzyE9YeMikkWlI1JGW9WHgJZJ3j1PAAU75qO3oI1WJ/TTJgiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779813750; c=relaxed/simple;
-	bh=5+ghzdOAeYiPC10bfdvW7qLblT51mD+e1870yn8q5IM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=m7gW6vA0PRqYuiBdBs99nUrZMm24mCzsx4F0iGQB7UcGSEsU/NHwKN8pe08KX3PX7HcZSsX7ggF+5U6dEheR5wEVEsP41OxnrKDzg7oyhXJ4HasMG6j+SV0sppe842fQQrzL0MVVIdc/S2kyRYlFaJslXZBcDKU52f/fMl1tsx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=I9oo1pEj; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7e612d0693eso3196766a34.3
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 09:42:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779813747; x=1780418547; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1ZYtlrVR2dEham7O0YH+Al9z1p1eXpPP2GpFWfv22t8=;
-        b=I9oo1pEjfmyW84aL9PvG+v6a605DHSb1Sbo0NsFtW6JrKKswGpwRudySa+/Po7yUWt
-         megT8bQa/BvOM9/WgE98WvHKSnBAnoAoxGfF6pytX93UZJKb6afDbg55P4sHq3pJTTA1
-         KhEOGvw42u7ckZsBbpVePVTrLtV3yGR1wBefS92iLdUAFCAHEKxkJ0gxFoqnwRiDZwX2
-         gQye4ogV7j1Sf51cQOUxuTcDMQSCXFw2ag+u5PScLLdyBI5hPvy1+Rol54JiBpV0EGKS
-         FBsuz2TIpxXuYU+BpRmhbh4EBLMABOPUbwSU0nUvUVpzTO6iqzghMhh8+yFmwMlxGpLG
-         djJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779813747; x=1780418547;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1ZYtlrVR2dEham7O0YH+Al9z1p1eXpPP2GpFWfv22t8=;
-        b=sp+FqCBnjyWNw6LSUuYOcc6xnBQMdnsRWOuymccHv3zYxg/n+5pthgPayvfAgR0URv
-         U95r9mYnAjp3ia2JMtW2KMfycevBebYrV+BFQMhIwlUoUcg5caNBzC0FqYPDcd/80++c
-         CbHr2SZOHTUNSZjh6OFQeMue1KMqnZTEFbpQkPfQHhtIjJ00ZsEg18fmsfkXRlSSN10c
-         B3ZKEyrp9mmKhA85cTXPtPuBHvGClKtmxu+TwixkeLrcvtOOHbc2WCzCjskEGc0BZ6lM
-         ayrXo+sUjej/qcu8L6PzKC+UxbGIDa9n5sNfdgf/Zv08pB0kPo56YmHOLtJdu9TsNh4R
-         1T6A==
-X-Gm-Message-State: AOJu0Yx0tvDMYV2zor3XudSl2+ty7cIpZL2a/oRAveSNiKUDl/buMMSu
-	IbS57Xf0R6T4ZtqVpkfdL+OI0ANir1KlDzandTrVhSjnewfQaVsgRm/S0rXtx4ImmkM=
-X-Gm-Gg: Acq92OFIFuOLzAvFqLGIxqGJRxnbRo8c1773RPLIEnQPJsqPzMRSrdkoy1dC0ZT1lZ1
-	IrtjOrm8quAKNOvGn1s8sc+U4dCBJyTCZSfldqNA6JjFE8YVLlX1UfpZZ2DG+HswG6ASoi0gwPk
-	hQBWa+eaO6C1KD4MuVeh/LuIwklnSZzATGPPVA8RsyS0E9jXY02/QcOw9+5OBG14++SXydFAD1T
-	R7UqzyEklH9cvnZjAYeJO1EUI07IrLV5AuuAsF0y5jXrLXrppRScf1CG3Vtj++sM2t/kxM0OAsl
-	bkEtUCYlR7FViEyjhCiG7RYCFCzcuaeWlkzAQWzOUIh1pQ2SZxrqAZRpm6zi526JT/PAJvG6Qwf
-	aZWfnSsJzIXXZpownUkCrL8IaNAqTLGiUWNwu/dvJXKarq5gH1ko2dF1+5GZuXuyV+qfbclAksO
-	VjDDXqvDU5Q5PDBtGtW5aODoWLwB9v1+C9E4vaN9xInpJXYNLhtTJsJgGu3+TSXPF+knNGoPMKT
-	V8=
-X-Received: by 2002:a05:6830:4705:b0:7d9:b2b8:e06f with SMTP id 46e09a7af769-7e5feec29damr12084262a34.21.1779813747421;
-        Tue, 26 May 2026 09:42:27 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e606482473sm9585235a34.8.2026.05.26.09.42.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 09:42:25 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org
-In-Reply-To: <cover.1779189667.git.asml.silence@gmail.com>
-References: <cover.1779189667.git.asml.silence@gmail.com>
-Subject: Re: [PATCH 0/8] first zcrx updates for 7.2
-Message-Id: <177981374538.466119.13708830919237773602.b4-ty@b4>
-Date: Tue, 26 May 2026 10:42:25 -0600
+	s=arc-20240116; t=1779814016; c=relaxed/simple;
+	bh=eyExZQ5qOIW5RPYesIfSIwMzdqiF+4kYY3+m5Mx4eCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uAdNK80mIsxcCIaHQX8F+lDSSIddQZL6J8T66R31cAnOgRrt+sC6Ey2QWx1llRAA5WR6liSVzClxT1svu8cx3xQpSYP3/1FDTK7xBvYz9E4wMyO2zazYH/XaRVi1XPWkYfn322GeEkvquAHcl982Ip0f5+X7w/jNaODoys2rbn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G1k9pJfo; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779814007; x=1811350007;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eyExZQ5qOIW5RPYesIfSIwMzdqiF+4kYY3+m5Mx4eCw=;
+  b=G1k9pJfoPQ555I3QJP6MDp204LAQin7Vfu7QrHfiVkjPGI4zAQFysVVM
+   Gk1B/i5shGhjnfuUAXr84LVsSlu+ZjJ++WXSOehq71HZPzEGNJIRd8qSo
+   qK76SqomQpcFAK6xRLbIXyqGLTIam0i3HDKvpBE3q8IS3gQ903uwjpnaH
+   mQf30DOfCm7Ps96twPlCe6LsZKhT2FO7yGvsOSPRI9LwEiUVlyNSjfClJ
+   rnCB/5WB0CWldqS0yEpqLn9us89C39wtwbZ4HdDWFJleMP7iPv30Cs2j/
+   eQH2f/oRWUt/7lxEV1QiufplsNDfvSNHNI54UgV3ZDjHb5oPgPxBqlUwZ
+   g==;
+X-CSE-ConnectionGUID: zOg1gK0MQCylJWnrcJNJXw==
+X-CSE-MsgGUID: zIpjYBTUQe+5RFyPrpzVmg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11798"; a="84259144"
+X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
+   d="scan'208";a="84259144"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2026 09:46:40 -0700
+X-CSE-ConnectionGUID: UNAdDtUdT/SRr0ZI7k3ocQ==
+X-CSE-MsgGUID: a1/CbnR7SmmuIJrUzv2LRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,170,1774335600"; 
+   d="scan'208";a="237805852"
+Received: from igk-lkp-server01.igk.intel.com (HELO bdf09bfdbd5f) ([10.211.93.152])
+  by fmviesa010.fm.intel.com with ESMTP; 26 May 2026 09:46:36 -0700
+Received: from kbuild by bdf09bfdbd5f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wRuvI-00000000CSH-1d07;
+	Tue, 26 May 2026 16:46:32 +0000
+Date: Tue, 26 May 2026 18:46:16 +0200
+From: kernel test robot <lkp@intel.com>
+To: Kacper Kokot <kacper.kokot.44@gmail.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, stable@vger.kernel.org,
+	Kacper Kokot <kacper.kokot.44@gmail.com>
+Subject: Re: [PATCH] netfilter: TCPMSS: fix dropped packets when MSS option
+ is unaligned
+Message-ID: <202605261807.YY0PWuhX-lkp@intel.com>
+References: <20260525201116.407338-2-kacper.kokot.44@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260525201116.407338-2-kacper.kokot.44@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-291829-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-291828-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[kernel.dk];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel-dk.20251104.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kernel-dk.20251104.gappssmtp.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 6E7A25D9E63
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,01.org:url,git-scm.com:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 02DD35DA263
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Kacper,
 
-On Tue, 19 May 2026 12:44:26 +0100, Pavel Begunkov wrote:
-> First batch of zcrx updates for 7.2. The main part is patches 5-8,
-> which add notifications from zcrx to userspace via asynchronous
-> CQE posting about events like allocation failures and copying, and
-> statistics. It's accompanied by relevant query updates. Patches 1-4
-> are general cleanups.
-> 
-> Bertie Tryner (1):
->   io_uring/zcrx: reorder fd allocation in zcrx_export()
-> 
-> [...]
+kernel test robot noticed the following build warnings:
 
-Applied, thanks!
+[auto build test WARNING on nf-next/main]
+[also build test WARNING on netfilter-nf/main linus/master v6.16-rc1 next-20260526]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-[1/8] io_uring/zcrx: make scrubbing more reliable
-      commit: 74fc9a9b50d43ed473ea2449682000da43e17175
-[2/8] io_uring/zcrx: poison pointers on unregistration
-      commit: e57b44039bc54bbdf3d1511021458356858a4a12
-[3/8] io_uring/zcrx: remove extra ifq close
-      commit: 98f07b0f74b65284ebe0d021505b461d4be6bf07
-[4/8] io_uring/zcrx: reorder fd allocation in zcrx_export()
-      commit: 84f7d0931c42cb0690615a431738cf6913d265f2
-[5/8] io_uring/zcrx: add ctx pointer to zcrx
-      commit: 8503f2de11f7fe78a7fdb87746255c8d02897279
-[6/8] io_uring/zcrx: notify user when out of buffers
-      commit: 0719e10d826aa0ba4840917d0261986eaead9a51
-[7/8] io_uring/zcrx: notify user on frag copy fallback
-      commit: 255180f7034f48aa5b0c8df70228307394bddbb9
-[8/8] io_uring/zcrx: add shared-memory notification statistics
-      commit: 6935f631465f5f60205978a59228a26db4723d51
+url:    https://github.com/intel-lab-lkp/linux/commits/Kacper-Kokot/netfilter-TCPMSS-fix-dropped-packets-when-MSS-option-is-unaligned/20260526-041308
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git main
+patch link:    https://lore.kernel.org/r/20260525201116.407338-2-kacper.kokot.44%40gmail.com
+patch subject: [PATCH] netfilter: TCPMSS: fix dropped packets when MSS option is unaligned
+config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20260526/202605261807.YY0PWuhX-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260526/202605261807.YY0PWuhX-lkp@intel.com/reproduce)
 
-Best regards,
--- 
-Jens Axboe
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202605261807.YY0PWuhX-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/netfilter/xt_TCPMSS.c:140:45: warning: & has lower precedence than !=; != will be evaluated first [-Wparentheses]
+     140 |                         if (((char *)&opt[i + 2] - (char *)tcph) & 0x1 != 0) {
+         |                                                                  ^~~~~~~~~~
+   net/netfilter/xt_TCPMSS.c:140:45: note: place parentheses around the '!=' expression to silence this warning
+     140 |                         if (((char *)&opt[i + 2] - (char *)tcph) & 0x1 != 0) {
+         |                                                                  ^         
+         |                                                                    (       )
+   net/netfilter/xt_TCPMSS.c:140:45: note: place parentheses around the & expression to evaluate it first
+     140 |                         if (((char *)&opt[i + 2] - (char *)tcph) & 0x1 != 0) {
+         |                                                                  ^
+         |                             (                                         )
+   1 warning generated.
 
 
+vim +140 net/netfilter/xt_TCPMSS.c
 
+    69	
+    70	static int
+    71	tcpmss_mangle_packet(struct sk_buff *skb,
+    72			     const struct xt_action_param *par,
+    73			     unsigned int family,
+    74			     unsigned int tcphoff,
+    75			     unsigned int minlen)
+    76	{
+    77		const struct xt_tcpmss_info *info = par->targinfo;
+    78		struct tcphdr *tcph;
+    79		int len, tcp_hdrlen;
+    80		unsigned int i;
+    81		__be16 oldval;
+    82		u16 newmss;
+    83		u8 *opt;
+    84	
+    85		/* This is a fragment, no TCP header is available */
+    86		if (par->fragoff != 0)
+    87			return 0;
+    88	
+    89		if (skb_ensure_writable(skb, skb->len))
+    90			return -1;
+    91	
+    92		len = skb->len - tcphoff;
+    93		if (len < (int)sizeof(struct tcphdr))
+    94			return -1;
+    95	
+    96		tcph = (struct tcphdr *)(skb_network_header(skb) + tcphoff);
+    97		tcp_hdrlen = tcph->doff * 4;
+    98	
+    99		if (len < tcp_hdrlen || tcp_hdrlen < sizeof(struct tcphdr))
+   100			return -1;
+   101	
+   102		if (info->mss == XT_TCPMSS_CLAMP_PMTU) {
+   103			struct net *net = xt_net(par);
+   104			unsigned int in_mtu = tcpmss_reverse_mtu(net, skb, family);
+   105			unsigned int min_mtu = min(dst_mtu(skb_dst(skb)), in_mtu);
+   106	
+   107			if (min_mtu <= minlen) {
+   108				net_err_ratelimited("unknown or invalid path-MTU (%u)\n",
+   109						    min_mtu);
+   110				return -1;
+   111			}
+   112			newmss = min_mtu - minlen;
+   113		} else
+   114			newmss = info->mss;
+   115	
+   116		opt = (u_int8_t *)tcph;
+   117		for (i = sizeof(struct tcphdr); i <= tcp_hdrlen - TCPOLEN_MSS; i += optlen(opt, i)) {
+   118			if (opt[i] == TCPOPT_MSS && opt[i+1] == TCPOLEN_MSS) {
+   119				u_int16_t oldmss;
+   120				u16 csum_oldmss, csum_newmss;
+   121	
+   122				oldmss = (opt[i+2] << 8) | opt[i+3];
+   123	
+   124				/* Never increase MSS, even when setting it, as
+   125				 * doing so results in problems for hosts that rely
+   126				 * on MSS being set correctly.
+   127				 */
+   128				if (oldmss <= newmss)
+   129					return 0;
+   130	
+   131				opt[i+2] = (newmss & 0xff00) >> 8;
+   132				opt[i+3] = newmss & 0x00ff;
+   133	
+   134				csum_oldmss = htons(oldmss);
+   135				csum_newmss = htons(newmss);
+   136	
+   137				/* MSS may be unaligned; fix up the incremental checksum
+   138				 * to avoid an invalid checksum and a dropped packet.
+   139				 */
+ > 140				if (((char *)&opt[i + 2] - (char *)tcph) & 0x1 != 0) {
+   141					csum_oldmss = swab16(csum_oldmss);
+   142					csum_newmss = swab16(csum_newmss);
+   143				}
+   144	
+   145				inet_proto_csum_replace2(&tcph->check, skb,
+   146							 csum_oldmss, csum_newmss,
+   147							 false);
+   148				return 0;
+   149			}
+   150		}
+   151	
+   152		/* There is data after the header so the option can't be added
+   153		 * without moving it, and doing so may make the SYN packet
+   154		 * itself too large. Accept the packet unmodified instead.
+   155		 */
+   156		if (len > tcp_hdrlen)
+   157			return 0;
+   158	
+   159		/* tcph->doff has 4 bits, do not wrap it to 0 */
+   160		if (tcp_hdrlen >= 15 * 4)
+   161			return 0;
+   162	
+   163		/*
+   164		 * MSS Option not found ?! add it..
+   165		 */
+   166		if (skb_tailroom(skb) < TCPOLEN_MSS) {
+   167			if (pskb_expand_head(skb, 0,
+   168					     TCPOLEN_MSS - skb_tailroom(skb),
+   169					     GFP_ATOMIC))
+   170				return -1;
+   171			tcph = (struct tcphdr *)(skb_network_header(skb) + tcphoff);
+   172		}
+   173	
+   174		skb_put(skb, TCPOLEN_MSS);
+   175	
+   176		/*
+   177		 * IPv4: RFC 1122 states "If an MSS option is not received at
+   178		 * connection setup, TCP MUST assume a default send MSS of 536".
+   179		 * IPv6: RFC 2460 states IPv6 has a minimum MTU of 1280 and a minimum
+   180		 * length IPv6 header of 60, ergo the default MSS value is 1220
+   181		 * Since no MSS was provided, we must use the default values
+   182		 */
+   183		if (xt_family(par) == NFPROTO_IPV4)
+   184			newmss = min(newmss, (u16)536);
+   185		else
+   186			newmss = min(newmss, (u16)1220);
+   187	
+   188		opt = (u_int8_t *)tcph + sizeof(struct tcphdr);
+   189		memmove(opt + TCPOLEN_MSS, opt, len - sizeof(struct tcphdr));
+   190	
+   191		inet_proto_csum_replace2(&tcph->check, skb,
+   192					 htons(len), htons(len + TCPOLEN_MSS), true);
+   193		opt[0] = TCPOPT_MSS;
+   194		opt[1] = TCPOLEN_MSS;
+   195		opt[2] = (newmss & 0xff00) >> 8;
+   196		opt[3] = newmss & 0x00ff;
+   197	
+   198		inet_proto_csum_replace4(&tcph->check, skb, 0, *((__be32 *)opt), false);
+   199	
+   200		oldval = ((__be16 *)tcph)[6];
+   201		tcph->doff += TCPOLEN_MSS/4;
+   202		inet_proto_csum_replace2(&tcph->check, skb,
+   203					 oldval, ((__be16 *)tcph)[6], false);
+   204		return TCPOLEN_MSS;
+   205	}
+   206	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
