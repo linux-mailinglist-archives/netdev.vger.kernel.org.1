@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-291794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EA3lIHjHFWqMbAcAu9opvQ
-	(envelope-from <netdev+bounces-291794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:16:56 +0200
+	id iDw2I37HFWqMbAcAu9opvQ
+	(envelope-from <netdev+bounces-291795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:17:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 918935D980B
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:16:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 981F65D9812
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:17:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 58A36304EFF5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:02:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DAA4D30504AC
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1483AF64E;
-	Tue, 26 May 2026 16:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F5E3AF672;
+	Tue, 26 May 2026 16:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUe4K29I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q7rMHvmK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688703AEB35;
-	Tue, 26 May 2026 16:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A5E3AEF3F;
+	Tue, 26 May 2026 16:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779811331; cv=none; b=U6XQO4tFpjILEnAnYiNZRxXMLWj330SmNOFlu1EEKdtYmFecjPZqusTku8Dm8eQ3rKLdLLVl73+MF+G2RloG7VrS4aXxX6W0omp/5LTzztyumdTGURYfEPH6TktPHrKI28lyxy6iho46rxYeRsnMSNIR45BEoaQvWrlLi9M2lxk=
+	t=1779811332; cv=none; b=a0kbju2SnKcQVfnBwputRaSZjTej4SgxYHOZ8CSNFFSkcsiQn6sd2rIXuUOVv5iAKgxVpjfOPcvAkwhIwZSqXVF8jn8f7Zqb0d1n+AMcQhimP/pjPquOHUrvQUnThkulDwhzUhyfGDaypi4P0a0BLNFWFiHms0PXCCTfIa+V1VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779811331; c=relaxed/simple;
-	bh=nh/YYFnk+2QRmeaTsH+fiTBTVmt8pXusmpWaEqS5+CA=;
+	s=arc-20240116; t=1779811332; c=relaxed/simple;
+	bh=+6JonLfnR49JoVbven1hZlBSlCZtIJ2DwjmUTj9B1a8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qYSsDTt4x73bXkW/eyk+NEtGjZu5sl4K9rKlYxQz+QR3WEfZWDABfp4zoViw44Jcg8jt9jmA9U53oYv0Jmthz8l5su1SbQtl9kzeM9A3kUL4gbCiePwxeZOObm4lfNEREJZBWrAdk/CMglWZS4vo8c6Is959/NJTSFY4tSgQCUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUe4K29I; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCA511F00A3A;
-	Tue, 26 May 2026 16:02:09 +0000 (UTC)
+	 MIME-Version; b=cB5AuuwyBua2QQMxyC1cglRQUh+Nc5rv/Sxzj1lP6/TWMrYExPaES3jwGwrqQYXhOqjd/rlaZHq7b1UsqkDl5oSskdmmwVP+M+v9li03NLwAhxB0JxJCn73RqmGlIn0iy5QjX+tm4isauJbtoCk2Oua098wT91r86nzQKV4mrs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q7rMHvmK; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7924E1F00ADE;
+	Tue, 26 May 2026 16:02:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779811330;
-	bh=b/+90Thpn5dTUDtiUqr9hBwUI0Y/MG0FBjpBpf9OJUg=;
+	s=k20260515; t=1779811331;
+	bh=bEANdEjU06ApuaPqpYPEr2/kktelC2YCUEohwHJFl1c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XUe4K29IeEeQRIlhVF4iyFXBEJWG6gx0D64wHNrR20NwmYDP7c7DwK/IirFEuFDu5
-	 +D97zJSKZoYpgpnV51qjFC9blMCuPY4YemRAawslW4SPSZhnGl60kXiiS5SgzVlzdt
-	 rfj8R0bo17/AMltVoruNA+p12IQZo76bFnJCT8LFhF5nns2EG1J0YXRs2hD7/GPjR/
-	 6P/X5z2/XgzcNquVKXjFi6qYfqH2g6hfcaOYr/Jl2dWBPRwLV5aIKFJAT4qMRRTR0T
-	 JDIy/Fzd9GzRCysjPUDo1dsCIpfjWJmvLz8Ug1mAVzRFwfL9wQzuVVWTzNv6i+ZPY0
-	 iepJ802+q+Xfg==
+	b=Q7rMHvmKQjquledVR6Co8gkhBijRB+IwjDoH2kp9Bvl15MMcqY1+ucp/yTd+oGa+q
+	 a3jHCk1wzGuH+9DP2taFwjwU0b4Y88uz6Debbq0TogOBT7P38lOOh+NQDlRSJlwMUc
+	 /cgXtceeyU3sFsUqQZDeli5mIcgvDNf3Tf2VMQXPFh6Jp9qL+yfv68bkBHq89MbgRo
+	 0TlYtsbmorhwy6JWAyskdqUXWW1MTbQl4h4DnVNlKVCCNbtlGd+eoTXhAV+o5ko3Uk
+	 EkEe8lJBr6AH+l6Xr1+c2g7gyCHrshM9agw0hVvwhHv7ADOURtfYDecODVpMylDRQH
+	 1PYSUjQxBeWbg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: netdev@vger.kernel.org,
 	jesse.brandeburg@intel.com,
 	linux-doc@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 06/10] docs: net: refresh netdev feature guidance
-Date: Tue, 26 May 2026 09:01:47 -0700
-Message-ID: <20260526160151.2793354-7-kuba@kernel.org>
+Subject: [PATCH net-next 07/10] docs: net: fix minor issues with checksum offloads
+Date: Tue, 26 May 2026 09:01:48 -0700
+Message-ID: <20260526160151.2793354-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260526160151.2793354-1-kuba@kernel.org>
 References: <20260526160151.2793354-1-kuba@kernel.org>
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,nxp.com,gmail.com,intel.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-291794-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291795-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -96,135 +96,96 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 918935D980B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,ietf.org:url]
+X-Rspamd-Queue-Id: 981F65D9812
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Update netdev feature documentation for current locking rules and
-feature semantics. Clarify hw_features updates and netdev_update_features()
-locking, keep the NETIF_F_NEVER_CHANGE rule with the VLAN challenged
-exception, fix the HSR duplication wording, and document netdev->netmem_tx
-as a device flag rather than a feature bit.
+Update the checksum offload documentation to match current code:
 
-Split the list of basic feature sets from the "extra" ones like
-vlan_features. A bunch of the newer fields weren't documented and
-having them all together would be confusing.
+- SCTP CRC32c offload requires NETIF_F_SCTP_CRC, not ordinary IP
+  checksum offload
+- NETIF_F_IP_CSUM and NETIF_F_IPV6_CSUM are restricted legacy
+  features; new devices should use NETIF_F_HW_CSUM
+- GRE LCO is handled by the shared gre_build_header() helper used by
+  both IPv4 and IPv6 GRE
+- VXLAN_F_REMCSUM_TX is a VXLAN configuration flag, not a field of
+  struct vxlan_rdst
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/networking/netdev-features.rst | 60 +++++++++++++-------
- 1 file changed, 39 insertions(+), 21 deletions(-)
+ .../networking/checksum-offloads.rst          | 36 +++++++++----------
+ 1 file changed, 17 insertions(+), 19 deletions(-)
 
-diff --git a/Documentation/networking/netdev-features.rst b/Documentation/networking/netdev-features.rst
-index 02bd7536fc0c..6293d47e5b09 100644
---- a/Documentation/networking/netdev-features.rst
-+++ b/Documentation/networking/netdev-features.rst
-@@ -18,29 +18,38 @@ that relieve an OS of various tasks like generating and checking checksums,
- splitting packets, classifying them.  Those capabilities and their state
- are commonly referred to as netdev features in Linux kernel world.
+diff --git a/Documentation/networking/checksum-offloads.rst b/Documentation/networking/checksum-offloads.rst
+index 69b23cf6879e..907aed9f3a3b 100644
+--- a/Documentation/networking/checksum-offloads.rst
++++ b/Documentation/networking/checksum-offloads.rst
+@@ -45,9 +45,11 @@ encapsulation is used, the packet may have multiple checksum fields in
+ different header layers, and the rest will have to be handled by another
+ mechanism such as LCO or RCO.
  
--There are currently three sets of features relevant to the driver, and
--one used internally by network core:
-+There are currently three main sets of features on each netdevice,
-+first and second are initialized by the driver:
+-CRC32c can also be offloaded using this interface, by means of filling
+-skb->csum_start and skb->csum_offset as described above, and setting
+-skb->csum_not_inet: see skbuff.h comment (section 'D') for more details.
++SCTP CRC32c can also be offloaded using this interface, by means of filling
++skb->csum_start and skb->csum_offset as described above, setting
++skb->csum_not_inet, and advertising NETIF_F_SCTP_CRC. Drivers must not treat
++ordinary IP checksum offload as SCTP CRC32c support. See the skbuff.h comment
++(section 'D') for more details.
  
-  1. netdev->hw_features set contains features whose state may possibly
-     be changed (enabled or disabled) for a particular device by user's
--    request.  This set should be initialized in ndo_init callback and not
--    changed later.
-+    request.  Drivers normally initialize this set before registration or
-+    in the ndo_init callback. Changes after registration should be made
-+    very carefully as other parts of the code may assume hw_features are
-+    static. At the very least changes must be made under rtnl_lock and
-+    the netdev instance lock, and followed by netdev_update_features().
+ No offloading of the IP header checksum is performed; it is always done in
+ software.  This is OK because when we build the IP header, we obviously have it
+@@ -59,14 +61,12 @@ recomputed for each resulting segment.  See the skbuff.h comment (section 'E')
+ for more details.
  
-  2. netdev->features set contains features which are currently enabled
-     for a device.  This should be changed only by network core or in
-     error paths of ndo_set_features callback.
+ A driver declares its offload capabilities in netdev->hw_features; see
+-Documentation/networking/netdev-features.rst for more.  Note that a device
+-which only advertises NETIF_F_IP[V6]_CSUM must still obey the csum_start and
+-csum_offset given in the SKB; if it tries to deduce these itself in hardware
+-(as some NICs do) the driver should check that the values in the SKB match
+-those which the hardware will deduce, and if not, fall back to checksumming in
+-software instead (with skb_csum_hwoffload_help() or one of the
+-skb_checksum_help() / skb_crc32c_csum_help functions, as mentioned in
+-include/linux/skbuff.h).
++Documentation/networking/netdev-features.rst for more. NETIF_F_IP_CSUM and
++NETIF_F_IPV6_CSUM are restricted legacy features and are being deprecated in
++favor of NETIF_F_HW_CSUM. New devices should use NETIF_F_HW_CSUM to advertise
++generic checksum offload. The skb_csum_hwoffload_help() helper can resolve
++CHECKSUM_PARTIAL according to the device's advertised checksum capabilities,
++falling back to software when needed.
  
-- 3. netdev->vlan_features set contains features whose state is inherited
--    by child VLAN devices (limits netdev->features set).  This is currently
--    used for all VLAN devices whether tags are stripped or inserted in
--    hardware or software.
--
-- 4. netdev->wanted_features set contains feature set requested by user.
-+ 3. netdev->wanted_features set contains feature set requested by user.
-     This set is filtered by ndo_fix_features callback whenever it or
-     some device-specific conditions change. This set is internal to
-     networking core and should not be referenced in drivers.
+ The stack should, for the most part, assume that checksum offload is supported
+ by the underlying device.  The only place that should check is
+@@ -108,11 +108,9 @@ LCO is performed by the stack when constructing an outer UDP header for an
+ encapsulation such as VXLAN or GENEVE, in udp_set_csum().  Similarly for the
+ IPv6 equivalents, in udp6_set_csum().
  
-+On top of those three main sets, each netdev has:
+-It is also performed when constructing an IPv4 GRE header, in
+-net/ipv4/ip_gre.c:build_header().  It is *not* currently performed when
+-constructing an IPv6 GRE header; the GRE checksum is computed over the whole
+-packet in net/ipv6/ip6_gre.c:ip6gre_xmit2(), but it should be possible to use
+-LCO here as IPv6 GRE still uses an IP-style checksum.
++It is also performed when constructing GRE headers with the shared
++gre_build_header() helper in include/net/gre.h, which is used by both IPv4 and
++IPv6 GRE.
  
-+ 1. Sets which control features inherited by child devices (VLAN, MPLS,
-+    hw_enc for L3/L4 tunnels). These sets allow the driver to limit which
-+    netdev->features are propagated, in case HW cannot perform the offloads
-+    with the extra headers present.
-+
-+ 2. netdev->mangleid_features, TSO features which are supported only when
-+    IP ID field can be mangled (constant instead of incrementing) during TSO.
-+
-+ 3. netdev->gso_partial_features, additional TSO features which HW can
-+    support via NETIF_F_GSO_PARTIAL.
+ All of the LCO implementations use a helper function lco_csum(), in
+ include/linux/skbuff.h.
+@@ -138,6 +136,6 @@ For this reason, it is disabled by default.
+ * https://tools.ietf.org/html/draft-herbert-vxlan-rco-00
  
- Part II: Controlling enabled features
- =====================================
-@@ -62,11 +71,15 @@ ndo_*_features callbacks are called with rtnl_lock held. Missing callbacks
- are treated as always returning success.
- 
- A driver that wants to trigger recalculation must do so by calling
--netdev_update_features() while holding rtnl_lock. This should not be done
--from ndo_*_features callbacks. netdev->features should not be modified by
--driver except by means of ndo_fix_features callback.
--
-+netdev_update_features() while holding rtnl_lock. If the device uses the
-+netdev instance lock, that lock must be held as well. This should not be
-+done from ndo_*_features callbacks. netdev->features should not be modified
-+by driver except by means of ndo_fix_features callback.
- 
-+ndo_features_check is called for each skb before that skb is passed to
-+ndo_start_xmit. Driver may perform any non-trivial checks (e.g. exact
-+header geometry / length) and withdraw features like HW_CSUM or TSO,
-+requesting the networking stack to fall back to the software implementation.
- 
- Part III: Implementation hints
- ==============================
-@@ -83,8 +96,9 @@ stateless).  It can be called multiple times between successive
- ndo_set_features calls.
- 
- Callback must not alter features contained in NETIF_F_SOFT_FEATURES or
--NETIF_F_NEVER_CHANGE sets. The exception is NETIF_F_VLAN_CHALLENGED but
--care must be taken as the change won't affect already configured VLANs.
-+NETIF_F_NEVER_CHANGE, except that NETIF_F_VLAN_CHALLENGED may be changed.
-+Care must be taken as changes to NETIF_F_VLAN_CHALLENGED won't affect already
-+configured VLANs.
- 
-  * ndo_set_features:
- 
-@@ -186,10 +200,14 @@ Redundancy) frames from one port to another in hardware.
- * hsr-dup-offload
- 
- This should be set for devices which duplicate outgoing HSR (High-availability
--Seamless Redundancy) or PRP (Parallel Redundancy Protocol) tags automatically
--frames in hardware.
-+Seamless Redundancy) or PRP (Parallel Redundancy Protocol) frames
-+automatically in hardware.
- 
--* netmem-tx
-+Part V: Related device flags
-+============================
- 
--This should be set for devices which support netmem TX. See
--Documentation/networking/netmem.rst
-+* netdev->netmem_tx
-+
-+This is not a netdev feature bit. Drivers support netmem TX by setting
-+netdev->netmem_tx to one of the values in enum netmem_tx_mode.
-+See Documentation/networking/netmem.rst.
+ In Linux, RCO is implemented individually in each encapsulation protocol, and
+-most tunnel types have flags controlling its use.  For instance, VXLAN has the
+-flag VXLAN_F_REMCSUM_TX (per struct vxlan_rdst) to indicate that RCO should be
+-used when transmitting to a given remote destination.
++most tunnel types have flags controlling its use. For instance, VXLAN has the
++configuration flag VXLAN_F_REMCSUM_TX to indicate that RCO should be used when
++transmitting.
 -- 
 2.54.0
 
