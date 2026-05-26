@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-291784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291785-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBiYNBjFFWqxawcAu9opvQ
-	(envelope-from <netdev+bounces-291784-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:06:48 +0200
+	id QBoIJUTFFWqxawcAu9opvQ
+	(envelope-from <netdev+bounces-291785-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:07:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8367F5D94E7
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:06:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B3BD5D9537
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 236763058880
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:00:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9FEE1305FBD5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8E23A1686;
-	Tue, 26 May 2026 15:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729A33A8744;
+	Tue, 26 May 2026 16:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MmAr6hKh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ad/kb6s6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419D839AD32;
-	Tue, 26 May 2026 15:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8186F3A7F7C;
+	Tue, 26 May 2026 16:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779811199; cv=none; b=VouNm3dsK75Zb68YC4xHuenpFabE13uDFitHvDp0/U7uFCO8Lm0W6oU9LuebZhPqr4Dl2i+V4sZFrY7RkW9K911uVxbcC6ng+V2S654GfvjaqfwO2/aQhdI+LRXpKToyac63kuOfzXQDutGYZ/RNG30ZUsrb1TImBlEbFhDdvFE=
+	t=1779811205; cv=none; b=Ei7XFumpDNVNJNEhfkDloRRODCY8ZdqidZjNLx1Fh3TDPp+kAo/chi2/ftveAYln/2hhLBXdD0fGMLZ9e4RbBxkbCKS/o4WYgHrivhpp9ZJZlTGF6GR+ohlYPbI0Qb3POKy6S+tsyTWvGrQbb3iqjrQ+cdYFi+0Vj8Zbr8ts2iM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779811199; c=relaxed/simple;
-	bh=fLsapKOT3aTUXNDco8WB/enxQ8OcbZpAv/0LF/rHZyo=;
+	s=arc-20240116; t=1779811205; c=relaxed/simple;
+	bh=jFzwPnhqxhi1uLCMoNbAfMNQu+LpXyh0yUKk3pir0KA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=IQR1Ml4bXZxjl8eMxtIIxoyPJJxBhNPyAnnBEscPP3n0SOPNKCgv7qRqSAdPhMF6TEOz+ETIPkWF7q3jwThEOQxLUIuoEkofVbD5tivb3sRlQt/dWbxHrXo//k+xV5ycFh9nTTO/fQ0sJMkGS6yFxa0XJneULZmdm4t3HUxkaBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MmAr6hKh; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD5461F00A3A;
-	Tue, 26 May 2026 15:59:53 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IytKUgIbcg3a+Ltn/0iVNXSb4IH4tt7aI5DUxe2tFaFbgvWGIkXDidZHlJIFBbulhhF/OM2RDw04RadWwckRL0jJiLAex5rxH2mmMTywLRS9q40aZGj0DMHKSy8YXbj3ib8Py8PvszcSi8+qJ+ImrWiI6B5lDRK0vcyCOFmfwWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ad/kb6s6; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D071F00A3C;
+	Tue, 26 May 2026 15:59:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779811197;
-	bh=+J/ldw/+ZWEAmB4OZdSFPZfdWklUzPNnd0GlsTjafnE=;
+	s=k20260515; t=1779811203;
+	bh=QRoZmgvp3f43b7yHnaudyoxYw6PtNi/QxqKXs9/VZ10=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=MmAr6hKhdm/7NaxOC+WEMbRRzvD3JwkYh70f4sdkkl+qZEUyBcaUaN9IdMyv7qPwb
-	 cZw1EOFw0Rq7qehg3ohic9Q6OIC4el+8hN2xx9Yk4CEDN5tbdyeOOz2jDNSNXh7Qkr
-	 ZetoOjkKzEffzekC502NEyrvrsqUYgAXCZQ9Wsvo3pxtnGXmoQO++lYwccZBP+mKhR
-	 Apjo/fDMkHRmQT2b8ybsztmBAqul1FmnaHcCw1N+OwTaRXaL5q8lXhM636I0hMtcHv
-	 k1y22aqI5Q5DPFSMtp3GuvuUycyrVh1VUOCzy+nh95R99zYoI80Z2/u9Tn8utNRxfm
-	 o+wgDk5/aSDEg==
+	b=ad/kb6s6NYV50Y08gBGFuEpv+hFchIie5bNb8MC0OfLSN7Jzhi6pbwWSgdWaf5/3G
+	 GzjVZ/QW3thFueYEO50QxO3/7uSkX2EhfaIchgkyRtzisRmo2ndqwn5XFeCNsZu9Z4
+	 KsE5TTaE7DllV0nqIVSPwYJwZAOSr4FBfzmqo5slWu23JVZWYVBKyXm0VGxHL3EfRZ
+	 aCJXDyjjCbF0YaWcprbcPiOBr6DviZwmpnWM6cQuPyAgCpyP2Idltg3fALPbu7GCnL
+	 zRNo2q4NC+88BTWPuR3wnDteKQLOO6VPYknHM7i63xHO/oxEf3xoqhBfJrC4ooEu1Q
+	 8WK2r/vXdyaWw==
 From: Linus Walleij <linusw@kernel.org>
-Date: Tue, 26 May 2026 17:59:33 +0200
-Subject: [PATCH net-next v3 3/5] net: dsa: tag_ks8995: Add the KS8995 tag
- handling
+Date: Tue, 26 May 2026 17:59:34 +0200
+Subject: [PATCH net-next v3 4/5] net: dsa: microchip: Support Microchip
+ KSZ8995XA / KS8995XA
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260526-ks8995-to-ksz8-v3-3-c530f651989f@kernel.org>
+Message-Id: <20260526-ks8995-to-ksz8-v3-4-c530f651989f@kernel.org>
 References: <20260526-ks8995-to-ksz8-v3-0-c530f651989f@kernel.org>
 In-Reply-To: <20260526-ks8995-to-ksz8-v3-0-c530f651989f@kernel.org>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -74,12 +74,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291784-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291785-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -97,225 +97,650 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8367F5D94E7
+X-Rspamd-Queue-Id: 5B3BD5D9537
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The KS8995 100Mbit switch can do proper DSA per-port tagging
-with the proper set-up. This adds the code to handle ingress
-and egress KS8995 tags.
+This adds support for the Microchip KSZ8995XA also known as the
+Micrel KS8995XA switch to the KSZ driver.
 
-The tag is a modified 0x8100 ethertype tag where a bit in the
-last nybble is set for each target port.
+Notice: there are also KSZ8995E and KSZ8995MA. These are BOTH
+different from the KSZ8995XA.
+
+The helper macros are named ksz_is_ksz8995xa() to make it
+possible to add E and MA support in the future.
 
 Signed-off-by: Linus Walleij <linusw@kernel.org>
 ---
- MAINTAINERS          |   1 +
- include/net/dsa.h    |   2 +
- net/dsa/Kconfig      |   6 +++
- net/dsa/Makefile     |   1 +
- net/dsa/tag_ks8995.c | 132 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 142 insertions(+)
+ drivers/net/dsa/microchip/Kconfig           |   1 +
+ drivers/net/dsa/microchip/ksz8.c            | 170 +++++++++++++++++++++++-----
+ drivers/net/dsa/microchip/ksz8.h            |   2 +
+ drivers/net/dsa/microchip/ksz8_reg.h        |   7 ++
+ drivers/net/dsa/microchip/ksz_common.c      |  58 ++++++++--
+ drivers/net/dsa/microchip/ksz_common.h      |  11 +-
+ drivers/net/dsa/microchip/ksz_spi.c         |  18 ++-
+ include/linux/platform_data/microchip-ksz.h |   1 +
+ 8 files changed, 230 insertions(+), 38 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ca6c7425b45f..eef6ac0e1200 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17409,6 +17409,7 @@ F:	Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
- F:	drivers/net/dsa/microchip/*
- F:	include/linux/dsa/ksz_common.h
- F:	include/linux/platform_data/microchip-ksz.h
-+F:	net/dsa/tag_ks8995.c
- F:	net/dsa/tag_ksz.c
+diff --git a/drivers/net/dsa/microchip/Kconfig b/drivers/net/dsa/microchip/Kconfig
+index c71d3fd5dfeb..75c9b2114afd 100644
+--- a/drivers/net/dsa/microchip/Kconfig
++++ b/drivers/net/dsa/microchip/Kconfig
+@@ -2,6 +2,7 @@
+ menuconfig NET_DSA_MICROCHIP_KSZ_COMMON
+ 	tristate "Microchip KSZ8XXX/KSZ9XXX/LAN937X series switch support"
+ 	depends on NET_DSA
++	select NET_DSA_TAG_KS8995
+ 	select NET_DSA_TAG_KSZ
+ 	select NET_DSA_TAG_NONE
+ 	select NET_IEEE8021Q_HELPERS
+diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+index 0f84b2e7d25d..18541a8efc39 100644
+--- a/drivers/net/dsa/microchip/ksz8.c
++++ b/drivers/net/dsa/microchip/ksz8.c
+@@ -3,6 +3,7 @@
+  * Microchip KSZ8XXX series switch driver
+  *
+  * It supports the following switches:
++ * - KSZ8995XA (the oldest ancestor)
+  * - KSZ8463
+  * - KSZ8863, KSZ8873 aka KSZ88X3
+  * - KSZ8895, KSZ8864 aka KSZ8895 family
+@@ -137,7 +138,18 @@ static int ksz8_pme_pwrite8(struct ksz_device *dev, int port, int offset, u8 dat
  
- MICROCHIP LAN743X ETHERNET DRIVER
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 8c16ef23cc10..abd159527782 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -59,6 +59,7 @@ struct tc_action;
- #define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		31
- #define DSA_TAG_PROTO_MXL862_VALUE		32
- #define DSA_TAG_PROTO_NETC_VALUE		33
-+#define DSA_TAG_PROTO_KS8995_VALUE		34
+ static int ksz8_reset_switch(struct ksz_device *dev)
+ {
+-	if (ksz_is_ksz88x3(dev)) {
++	if (ksz_is_ksz8995xa(dev)) {
++		unsigned int port;
++
++		/* KSZ8995XA is "reset" by stopping the switch and starting it */
++		ksz_cfg(dev, REG_SW_ID_1, SW_START_SWITCH, false);
++		usleep_range(10, 100);
++		ksz_cfg(dev, REG_SW_ID_1, SW_START_SWITCH, true);
++
++		/* Often boot loaders have fun with ports, so reset them */
++		for (port = 0; port < dev->info->port_cnt; port++)
++			ksz_port_cfg(dev, port, 0x0f, BIT(4), true);
++	} else if (ksz_is_ksz88x3(dev)) {
+ 		/* reset switch */
+ 		ksz_cfg(dev, KSZ8863_REG_SW_RESET,
+ 			KSZ8863_GLOBAL_SOFTWARE_RESET | KSZ8863_PCS_RESET, true);
+@@ -161,8 +173,14 @@ static int ksz8_reset_switch(struct ksz_device *dev)
+ static int ksz8863_change_mtu(struct ksz_device *dev, int frame_size)
+ {
+ 	u8 ctrl2 = 0;
++	unsigned int legalsz;
++
++	if (ksz_is_ksz8995xa(dev))
++		legalsz = KSZ8995XA_LEGAL_PACKET_SIZE;
++	else
++		legalsz = KSZ8_LEGAL_PACKET_SIZE;
  
- enum dsa_tag_protocol {
- 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
-@@ -95,6 +96,7 @@ enum dsa_tag_protocol {
- 	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
- 	DSA_TAG_PROTO_MXL862		= DSA_TAG_PROTO_MXL862_VALUE,
- 	DSA_TAG_PROTO_NETC		= DSA_TAG_PROTO_NETC_VALUE,
-+	DSA_TAG_PROTO_KS8995		= DSA_TAG_PROTO_KS8995_VALUE,
+-	if (frame_size <= KSZ8_LEGAL_PACKET_SIZE)
++	if (frame_size <= legalsz)
+ 		ctrl2 |= KSZ8863_LEGAL_PACKET_ENABLE;
+ 	else if (frame_size > KSZ8863_NORMAL_PACKET_SIZE)
+ 		ctrl2 |= KSZ8863_HUGE_PACKET_ENABLE;
+@@ -207,6 +225,7 @@ static int ksz8_change_mtu(struct dsa_switch *ds, int port, int mtu)
+ 	case KSZ88X3_CHIP_ID:
+ 	case KSZ8864_CHIP_ID:
+ 	case KSZ8895_CHIP_ID:
++	case KSZ8995XA_CHIP_ID:
+ 		return ksz8863_change_mtu(dev, frame_size);
+ 	}
+ 
+@@ -826,6 +845,10 @@ static int ksz8_r_phy_ctrl(struct ksz_device *dev, int port, u16 *val)
+ 	if (reg_val & PORT_MDIX_STATUS)
+ 		*val |= KSZ886X_CTRL_MDIX_STAT;
+ 
++	/* KSZ8995XA has no fancy features in register 0xA */
++	if (ksz_is_ksz8995xa(dev))
++		return 0;
++
+ 	ret = ksz_pread8(dev, port, REG_PORT_LINK_MD_CTRL, &reg_val);
+ 	if (ret < 0)
+ 		return ret;
+@@ -924,8 +947,10 @@ static int ksz8_r_phy_bmcr(struct ksz_device *dev, u16 port, u16 *val)
+ 	if (ctrl & PORT_FORCE_FULL_DUPLEX)
+ 		*val |= BMCR_FULLDPLX;
+ 
+-	if (speed & PORT_HP_MDIX)
+-		*val |= KSZ886X_BMCR_HP_MDIX;
++	if (!ksz_is_ksz8995xa(dev)) {
++		if (speed & PORT_HP_MDIX)
++			*val |= KSZ886X_BMCR_HP_MDIX;
++	}
+ 
+ 	if (restart & PORT_FORCE_MDIX)
+ 		*val |= KSZ886X_BMCR_FORCE_MDI;
+@@ -1020,6 +1045,9 @@ static int ksz8_r_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 *val)
+ 			data |= LPA_LPACK;
+ 		break;
+ 	case PHY_REG_LINK_MD:
++		if (ksz_is_ksz8995xa(dev))
++			return -EOPNOTSUPP;
++
+ 		ret = ksz_pread8(dev, p, REG_PORT_LINK_MD_CTRL, &val1);
+ 		if (ret)
+ 			return ret;
+@@ -1147,13 +1175,15 @@ static int ksz8_w_phy_bmcr(struct ksz_device *dev, u16 port, u16 val)
+ 	if (val & BMCR_RESET)
+ 		return 0;
+ 
+-	speed = 0;
+-	if (val & KSZ886X_BMCR_HP_MDIX)
+-		speed |= PORT_HP_MDIX;
++	if (!ksz_is_ksz8995xa(dev)) {
++		speed = 0;
++		if (val & KSZ886X_BMCR_HP_MDIX)
++			speed |= PORT_HP_MDIX;
+ 
+-	ret = ksz_prmw8(dev, port, regs[P_SPEED_STATUS], PORT_HP_MDIX, speed);
+-	if (ret)
+-		return ret;
++		ret = ksz_prmw8(dev, port, regs[P_SPEED_STATUS], PORT_HP_MDIX, speed);
++		if (ret)
++			return ret;
++	}
+ 
+ 	ctrl = 0;
+ 	if (ksz_is_ksz88x3(dev)) {
+@@ -1263,11 +1293,17 @@ static int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
+ 		}
+ 		break;
+ 	case PHY_REG_LINK_MD:
++		if (ksz_is_ksz8995xa(dev))
++			return -EOPNOTSUPP;
++
+ 		if (val & PHY_START_CABLE_DIAG)
+ 			ksz_port_cfg(dev, p, REG_PORT_LINK_MD_CTRL, PORT_START_CABLE_DIAG, true);
+ 		break;
+ 
+ 	case PHY_REG_PHY_CTRL:
++		if (ksz_is_ksz8995xa(dev))
++			return -EOPNOTSUPP;
++
+ 		ret = ksz8_w_phy_ctrl(dev, p, val);
+ 		if (ret)
+ 			return ret;
+@@ -1477,7 +1513,7 @@ static int ksz8_port_vlan_filtering(struct dsa_switch *ds, int port, bool flag,
+ {
+ 	struct ksz_device *dev = ds->priv;
+ 
+-	if (ksz_is_ksz88x3(dev) || ksz_is_ksz8463(dev))
++	if (ksz_is_ksz88x3(dev) || ksz_is_ksz8463(dev) || ksz_is_ksz8995xa(dev))
+ 		return -ENOTSUPP;
+ 
+ 	/* Discard packets with VID not enabled on the switch */
+@@ -1693,14 +1729,16 @@ static void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
+ 		offset = P1CR1;
+ 	ksz_port_cfg(dev, port, offset, PORT_BROADCAST_STORM, true);
+ 
+-	ksz8_port_queue_split(dev, port, dev->info->num_tx_queues);
++	if (!ksz_is_ksz8995xa(dev)) {
++		ksz8_port_queue_split(dev, port, dev->info->num_tx_queues);
+ 
+-	/* replace priority */
+-	offset = P_802_1P_CTRL;
+-	if (ksz_is_ksz8463(dev))
+-		offset = P1CR2;
+-	ksz_port_cfg(dev, port, offset,
+-		     masks[PORT_802_1P_REMAPPING], false);
++		/* replace priority */
++		offset = P_802_1P_CTRL;
++		if (ksz_is_ksz8463(dev))
++			offset = P1CR2;
++		ksz_port_cfg(dev, port, offset,
++			     masks[PORT_802_1P_REMAPPING], false);
++	}
+ 
+ 	if (cpu_port)
+ 		member = dsa_user_ports(ds);
+@@ -1709,6 +1747,19 @@ static void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
+ 
+ 	ksz8_cfg_port_member(dev, port, member);
+ 
++	if (ksz_is_ksz8995xa(dev)) {
++		/*
++		 * The KSZ8995XA has a special tag format in the front of the frame
++		 * that need to be inserted by the CPU and then removed by each
++		 * port. PORT_REMOVE_TAG simply means "remove tags coming from the
++		 * CPU port" it does not affect ingress packets.
++		 */
++		if (cpu_port)
++			ksz_port_cfg(dev, port, REG_PORT_CTRL_0, PORT_INSERT_TAG, true);
++		else
++			ksz_port_cfg(dev, port, REG_PORT_CTRL_0, PORT_REMOVE_TAG, true);
++	}
++
+ 	/* Disable all WoL options by default. Otherwise
+ 	 * ksz_switch_macaddr_get/put logic will not work properly.
+ 	 * CPU port 4 has no WoL functionality.
+@@ -1756,7 +1807,9 @@ static void ksz8_config_cpu_port(struct dsa_switch *ds)
+ 	masks = dev->info->masks;
+ 	regs = dev->info->regs;
+ 
+-	ksz_cfg(dev, regs[S_TAIL_TAG_CTRL], masks[SW_TAIL_TAG_ENABLE], true);
++	/* KSZ8995XA uses a tag in the header instead of the tail */
++	if (!ksz_is_ksz8995xa(dev))
++		ksz_cfg(dev, regs[S_TAIL_TAG_CTRL], masks[SW_TAIL_TAG_ENABLE], true);
+ 
+ 	ksz8_port_setup(dev, dev->cpu_port, true);
+ 
+@@ -1958,6 +2011,10 @@ static int ksz8_enable_stp_addr(struct ksz_device *dev)
+ {
+ 	struct alu_struct alu;
+ 
++	/* KSZ8995XA lacks STP */
++	if (ksz_is_ksz8995xa(dev))
++		return 0;
++
+ 	/* Setup STP address for STP operation. */
+ 	memset(&alu, 0, sizeof(alu));
+ 	ether_addr_copy(alu.mac, eth_stp_addr);
+@@ -1976,6 +2033,7 @@ static int ksz8_setup(struct dsa_switch *ds)
+ 	struct ksz_port *p;
+ 	const u16 *regs;
+ 	int i, ret;
++	u8 val;
+ 
+ 	regs = dev->info->regs;
+ 
+@@ -2041,9 +2099,10 @@ static int ksz8_setup(struct dsa_switch *ds)
+ 	 * Make sure unicast VLAN boundary is set as default and
+ 	 * enable no excessive collision drop.
+ 	 */
+-	ret = ksz_rmw8(dev, REG_SW_CTRL_2,
+-		       UNICAST_VLAN_BOUNDARY | NO_EXC_COLLISION_DROP,
+-		       UNICAST_VLAN_BOUNDARY | NO_EXC_COLLISION_DROP);
++	val = NO_EXC_COLLISION_DROP;
++	if (!ksz_is_ksz8995xa(dev))
++		val |= UNICAST_VLAN_BOUNDARY;
++	ret = ksz_rmw8(dev, REG_SW_CTRL_2, val, val);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -2051,11 +2110,15 @@ static int ksz8_setup(struct dsa_switch *ds)
+ 
+ 	ksz_cfg(dev, S_MIRROR_CTRL, SW_MIRROR_RX_TX, false);
+ 
+-	if (!ksz_is_ksz88x3(dev) && !ksz_is_ksz8463(dev))
++	if (ksz_is_ksz8995xa(dev))
++		ksz_cfg(dev, REG_SW_CTRL_9, SW_SPECIAL_TAG, true);
++	else if (!ksz_is_ksz88x3(dev) && !ksz_is_ksz8463(dev))
+ 		ksz_cfg(dev, REG_SW_CTRL_19, SW_INS_TAG_ENABLE, true);
+ 
+-	for (i = 0; i < (dev->info->num_vlans / 4); i++)
+-		ksz8_r_vlan_entries(dev, i);
++	if (!ksz_is_ksz8995xa(dev)) {
++		for (i = 0; i < (dev->info->num_vlans / 4); i++)
++			ksz8_r_vlan_entries(dev, i);
++	}
+ 
+ 	/* Make sure PME (WoL) is not enabled. If requested, it will
+ 	 * be enabled by ksz_wol_pre_shutdown(). Otherwise, some PMICs
+@@ -2115,9 +2178,15 @@ static int ksz8_setup(struct dsa_switch *ds)
+ 		goto out_ptp_clock_unregister;
+ 	}
+ 
+-	ret = ksz_dcb_init(dev);
+-	if (ret)
+-		goto out_ptp_clock_unregister;
++	/* TODO: the KSZ8995XA does have TOS priority control registers albeit
++	 * 7 instead of 15 and in a different location. Revisit this and attempt
++	 * to enable DCB on the KS8995XA.
++	 */
++	if (!ksz_is_ksz8995xa(dev)) {
++		ret = ksz_dcb_init(dev);
++		if (ret)
++			goto out_ptp_clock_unregister;
++	}
+ 
+ 	/* start switch */
+ 	regmap_update_bits(ksz_regmap_8(dev), regs[S_START_CTRL],
+@@ -2281,6 +2350,13 @@ static int ksz8_switch_init(struct ksz_device *dev)
+ 	return 0;
+ }
+ 
++static enum dsa_tag_protocol ksz8995xa_get_tag_protocol(struct dsa_switch *ds,
++							int port,
++							enum dsa_tag_protocol mp)
++{
++	return DSA_TAG_PROTO_KS8995;
++}
++
+ static enum dsa_tag_protocol ksz8463_get_tag_protocol(struct dsa_switch *ds,
+ 						      int port,
+ 						      enum dsa_tag_protocol mp)
+@@ -2377,6 +2453,16 @@ const struct phylink_mac_ops ksz8_phylink_mac_ops = {
+ 	.mac_enable_tx_lpi = ksz_phylink_mac_enable_tx_lpi,
  };
  
- struct dsa_switch;
-diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
-index d5e725b90d78..bbdf324addac 100644
---- a/net/dsa/Kconfig
-+++ b/net/dsa/Kconfig
-@@ -119,6 +119,12 @@ config NET_DSA_TAG_MXL_GSW1XX
- 	  Say Y or M if you want to enable support for tagging frames for
- 	  MaxLinear GSW1xx switches.
- 
-+config NET_DSA_TAG_KS8995
-+	tristate "Tag driver for Micrel KS8995 switch"
-+	help
-+	  Say Y if you want to enable support for tagging frames for the
-+	  Micrel KS8995 switch.
-+
- config NET_DSA_TAG_KSZ
- 	tristate "Tag driver for Microchip 8795/937x/9477/9893 families of switches"
- 	help
-diff --git a/net/dsa/Makefile b/net/dsa/Makefile
-index b8c2667cd14a..a9c2a0569e9e 100644
---- a/net/dsa/Makefile
-+++ b/net/dsa/Makefile
-@@ -25,6 +25,7 @@ obj-$(CONFIG_NET_DSA_TAG_BRCM_COMMON) += tag_brcm.o
- obj-$(CONFIG_NET_DSA_TAG_DSA_COMMON) += tag_dsa.o
- obj-$(CONFIG_NET_DSA_TAG_GSWIP) += tag_gswip.o
- obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) += tag_hellcreek.o
-+obj-$(CONFIG_NET_DSA_TAG_KS8995) += tag_ks8995.o
- obj-$(CONFIG_NET_DSA_TAG_KSZ) += tag_ksz.o
- obj-$(CONFIG_NET_DSA_TAG_LAN9303) += tag_lan9303.o
- obj-$(CONFIG_NET_DSA_TAG_MTK) += tag_mtk.o
-diff --git a/net/dsa/tag_ks8995.c b/net/dsa/tag_ks8995.c
-new file mode 100644
-index 000000000000..5bdb18271582
---- /dev/null
-+++ b/net/dsa/tag_ks8995.c
-@@ -0,0 +1,132 @@
-+// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Copyright (C) 2026 Linus Walleij <linusw@kernel.org>
++ * The KS(Z)8995XA has no indirect access, meaning no MIB counters,
++ * no FDB access, and no VLAN handling.
 + */
-+#include <linux/etherdevice.h>
-+#include <linux/log2.h>
-+#include <linux/list.h>
-+#include <linux/slab.h>
-+
-+#include "tag.h"
-+
-+/* The Micrel KS8995XA / Microchip KSZ8995XA Special Tag Packet ID (STPID)
-+ * pushes its tag in a modified VLAN (802.1Q) tag.
-+ * -----------------------------------------------------------
-+ * | MAC DA | MAC SA | 2 bytes tag | 2 bytes TCI | EtherType |
-+ * -----------------------------------------------------------
-+ * The tag is: 0x8100 |= BIT(port), ports 0,1,2,3
-+ */
-+
-+#define KS8995_NAME "ks8995"
-+
-+#define KS8995M_STPID_STD	GENMASK(15, 4)
-+#define KS8995M_STPID_PORTMASK	GENMASK(3, 0)
-+#define KS8995M_STPID(portmask)	htons(ETH_P_8021Q | FIELD_PREP(KS8995M_STPID_PORTMASK, portmask))
-+
-+static struct sk_buff *ks8995_xmit(struct sk_buff *skb, struct net_device *dev)
-+{
-+	struct vlan_ethhdr *hdr = vlan_eth_hdr(skb);
-+	bool have_hwaccel_tag = false;
-+	u16 tci = 0, portmask;
-+
-+	/* Prepare the special KS8995 tags */
-+	portmask = dsa_xmit_port_mask(skb, dev);
-+
-+	if (skb_vlan_tag_present(skb) && skb->vlan_proto == htons(ETH_P_8021Q)) {
-+		tci = skb_vlan_tag_get(skb);
-+		__vlan_hwaccel_clear_tag(skb);
-+		have_hwaccel_tag = true;
-+	}
-+
-+	if (have_hwaccel_tag || hdr->h_vlan_proto != htons(ETH_P_8021Q)) {
-+		skb = vlan_insert_tag(skb, KS8995M_STPID(portmask), tci);
-+		if (!skb)
-+			return NULL;
-+		hdr = vlan_eth_hdr(skb);
-+		netdev_dbg(dev, "%s: inserted VLAN TAG %04x TCI %04x\n",
-+			   __func__, hdr->h_vlan_proto, hdr->h_vlan_TCI);
-+	} else {
-+		/* VLAN tag already exists in skb head, modify it in place */
-+		hdr = vlan_eth_hdr(skb);
-+		hdr->h_vlan_proto = KS8995M_STPID(portmask);
-+		netdev_dbg(dev, "%s: modified VLAN TAG %04x\n",
-+			   __func__, hdr->h_vlan_proto);
-+	}
-+
-+	return skb;
-+}
-+
-+static struct sk_buff *ks8995_rcv(struct sk_buff *skb, struct net_device *dev)
-+{
-+	int portmask;
-+	u16 etype;
-+
-+	/* We are expecting all received packets to have a mangled VLAN
-+	 * TPID, so drop anything else. Because of the non-standard TPID,
-+	 * don't even bother looking for a tag in the hwaccel area.
-+	 *
-+	 * We have to inspect the ethertype directly because skb->protocol
-+	 * will contain garbage.
-+	 */
-+	etype = ntohs(*(__be16 *)dsa_etype_header_pos_rx(skb));
-+	if ((etype & KS8995M_STPID_STD) != ETH_P_8021Q) {
-+		netdev_dbg(dev, "%s: dropped ethertype 0x%04x\n",
-+			   __func__, etype);
-+		return NULL;
-+	}
-+	netdev_dbg(dev, "%s: received ethertype %04x\n",
-+		   __func__, etype);
-+
-+	/* Move the custom DSA+VLAN tag into the hwaccel area and strip
-+	 * it from the skb head
-+	 */
-+	skb = skb_vlan_untag(skb);
-+	if (!skb) {
-+		netdev_err(dev, "%s: unable to untag skb\n", __func__);
-+		return NULL;
-+	}
-+
-+	portmask = FIELD_GET(KS8995M_STPID_PORTMASK, etype);
-+	netdev_dbg(dev, "%s: etype %04x portmask %04x (%d)\n",
-+		   __func__, etype, portmask, ilog2(portmask));
-+	skb->dev = dsa_conduit_find_user(dev, 0, ilog2(portmask));
-+	if (!skb->dev)
-+		return NULL;
-+
-+	/* Preserve the VLAN tag if it contains a non-zero VID which is not
-+	 * identical to 0x001, or PCP, and restore its TPID to the standard
-+	 * value.
-+	 *
-+	 * If this is just an ordinary inbound package the datasheet claims
-+	 * it will "replace null VID with ingress port VID", which means
-+	 * VID set to 1: 0x8101 0001 for port 0 or 0x8102 0001 for port 1.
-+	 * So in the DSA driver we will set the default port VID to 0 so
-+	 * we can properly detect non-VLAN frames.
-+	 */
-+	if (!skb->vlan_tci) {
-+		netdev_dbg(dev, "%s: clear VLAN tag from frame\n", __func__);
-+		__vlan_hwaccel_clear_tag(skb);
-+	} else {
-+		skb->vlan_proto = htons(ETH_P_8021Q);
-+		netdev_dbg(dev, "%s: vlan_tci = 0x%04x VLAN frame\n",
-+			   __func__, skb->vlan_tci);
-+	}
-+
-+	dsa_default_offload_fwd_mark(skb);
-+
-+	return skb;
-+}
-+
-+static const struct dsa_device_ops ks8995_netdev_ops = {
-+	.name = KS8995_NAME,
-+	.proto	= DSA_TAG_PROTO_KS8995,
-+	.xmit = ks8995_xmit,
-+	.rcv = ks8995_rcv,
-+	.needed_headroom = VLAN_HLEN,
++const struct ksz_dev_ops ksz8995xa_dev_ops = {
++	.get_port_addr = ksz8_get_port_addr,
++	.cfg_port_member = ksz8_cfg_port_member,
++	.init = ksz8_switch_init,
 +};
 +
-+MODULE_DESCRIPTION("DSA tag driver for Micrel KS8995 family of switches");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KS8995, KS8995_NAME);
+ const struct ksz_dev_ops ksz8463_dev_ops = {
+ 	.get_port_addr = ksz8463_get_port_addr,
+ 	.cfg_port_member = ksz8_cfg_port_member,
+@@ -2416,6 +2502,34 @@ const struct ksz_dev_ops ksz88xx_dev_ops = {
+ 	.pme_pwrite8 = ksz8_pme_pwrite8,
+ };
+ 
++/*
++ * Restricted operations for KSZ8995XA, so many things are not supported
++ * by this old switch that we need diet DSA operations.
++ */
++const struct dsa_switch_ops ksz8995xa_switch_ops = {
++	.get_tag_protocol	= ksz8995xa_get_tag_protocol,
++	.get_phy_flags		= ksz_get_phy_flags,
++	.setup			= ksz8_setup,
++	.teardown		= ksz_teardown,
++	.phy_read		= ksz8_phy_read16,
++	.phy_write		= ksz8_phy_write16,
++	.phylink_get_caps	= ksz8_phylink_get_caps,
++	.port_setup		= ksz8_dsa_port_setup,
++	.port_bridge_join	= ksz_port_bridge_join,
++	.port_bridge_leave	= ksz_port_bridge_leave,
++	.port_set_mac_address	= ksz_port_set_mac_address,
++	.port_stp_state_set	= ksz_port_stp_state_set,
++	.port_teardown		= ksz_port_teardown,
++	.port_pre_bridge_flags	= ksz_port_pre_bridge_flags,
++	.port_bridge_flags	= ksz_port_bridge_flags,
++	.port_fast_age		= ksz8_flush_dyn_mac_table,
++	.port_mirror_add	= ksz8_port_mirror_add,
++	.port_mirror_del	= ksz8_port_mirror_del,
++	.port_change_mtu	= ksz8_change_mtu,
++	.port_max_mtu		= ksz_max_mtu,
++	/* TODO: add .port_get/set_apptrust() when we implement priority */
++};
 +
-+module_dsa_tag_driver(ks8995_netdev_ops);
+ const struct dsa_switch_ops ksz8463_switch_ops = {
+ 	.get_tag_protocol	= ksz8463_get_tag_protocol,
+ 	.connect_tag_protocol   = ksz8463_connect_tag_protocol,
+diff --git a/drivers/net/dsa/microchip/ksz8.h b/drivers/net/dsa/microchip/ksz8.h
+index bc371cc26c6f..9b37c56c9617 100644
+--- a/drivers/net/dsa/microchip/ksz8.h
++++ b/drivers/net/dsa/microchip/ksz8.h
+@@ -12,11 +12,13 @@
+ #include <net/dsa.h>
+ #include "ksz_common.h"
+ 
++extern const struct ksz_dev_ops ksz8995xa_dev_ops;
+ extern const struct ksz_dev_ops ksz8463_dev_ops;
+ extern const struct ksz_dev_ops ksz87xx_dev_ops;
+ extern const struct ksz_dev_ops ksz88xx_dev_ops;
+ extern const struct phylink_mac_ops ksz88x3_phylink_mac_ops;
+ extern const struct phylink_mac_ops ksz8_phylink_mac_ops;
++extern const struct dsa_switch_ops ksz8995xa_switch_ops;
+ extern const struct dsa_switch_ops ksz8463_switch_ops;
+ extern const struct dsa_switch_ops ksz87xx_switch_ops;
+ extern const struct dsa_switch_ops ksz88xx_switch_ops;
+diff --git a/drivers/net/dsa/microchip/ksz8_reg.h b/drivers/net/dsa/microchip/ksz8_reg.h
+index 332408567b47..2a1f6dd53b9d 100644
+--- a/drivers/net/dsa/microchip/ksz8_reg.h
++++ b/drivers/net/dsa/microchip/ksz8_reg.h
+@@ -30,6 +30,11 @@
+ #define KSZ88X3_REG_FVID_AND_HOST_MODE  0xC6
+ #define KSZ88X3_PORT3_RMII_CLK_INTERNAL BIT(3)
+ 
++#define REG_SW_ID_0			0x00
++#define REG_SW_ID_1			0x01
++
++#define SW_START_SWITCH			BIT(0)
++
+ #define REG_SW_CTRL_0			0x02
+ 
+ #define SW_NEW_BACKOFF			BIT(7)
+@@ -95,6 +100,8 @@
+ #define SW_LED_LINK_ACT_DUPLEX		2
+ #define SW_LED_LINK_DUPLEX		3
+ 
++#define SW_SPECIAL_TAG			BIT(0) /* KSZ8995XA only */
++
+ #define REG_SW_CTRL_10			0x0C
+ 
+ #define SW_PASS_PAUSE			BIT(0)
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 57c8abfe0147..ac27beb3054b 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -554,6 +554,20 @@ static const u8 ksz8895_shifts[] = {
+ 	[DYNAMIC_MAC_SRC_PORT]		= 24,
+ };
+ 
++static const u16 ksz8995xa_regs[] = {
++	[REG_SW_MAC_ADDR]		= 0x68,
++	[P_FORCE_CTRL]			= 0x0C,
++	[P_LINK_STATUS]			= 0x0E,
++	[P_LOCAL_CTRL]			= 0x0C,
++	[P_NEG_RESTART_CTRL]		= 0x0D,
++	[P_REMOTE_STATUS]		= 0x0E,
++	[P_SPEED_STATUS]		= 0x09,
++	[P_STP_CTRL]			= 0x02,
++	[S_START_CTRL]			= 0x01,
++	[S_BROADCAST_CTRL]		= 0x06,
++	[S_MULTICAST_CTRL]		= 0x04,
++};
++
+ static const u16 ksz9477_regs[] = {
+ 	[REG_SW_MAC_ADDR]		= 0x0302,
+ 	[P_STP_CTRL]			= 0x0B04,
+@@ -1485,6 +1499,21 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.internal_phy = {true, true, true, true, false},
+ 	},
+ 
++	[KSZ8995XA] = {
++		.chip_id = KSZ8995XA_CHIP_ID, /* Also known as KS8995XA */
++		.dev_name = "KSZ8995XA",
++		.cpu_ports = 0x10,	/* can be configured as cpu port */
++		.port_cnt = 5,		/* total cpu and user ports */
++		.num_tx_queues = 4,
++		.num_ipms = 4,
++		.ops = &ksz8995xa_dev_ops,
++		.switch_ops = &ksz8995xa_switch_ops,
++		.phylink_mac_ops = &ksz88x3_phylink_mac_ops,
++		.regs = ksz8995xa_regs,
++		.supports_mii = {true, true, true, true, true},
++		.internal_phy = {true, true, true, true, false},
++	},
++
+ 	[KSZ9477] = {
+ 		.chip_id = KSZ9477_CHIP_ID,
+ 		.dev_name = "KSZ9477",
+@@ -2826,6 +2855,10 @@ void ksz_init_mib_timer(struct ksz_device *dev)
+ {
+ 	int i;
+ 
++	/* KSZ8995XA lacks MiB features */
++	if (ksz_is_ksz8995xa(dev))
++		return;
++
+ 	INIT_DELAYED_WORK(&dev->mib_read, ksz_mib_read_work);
+ 
+ 	for (i = 0; i < dev->info->port_cnt; i++) {
+@@ -3049,6 +3082,7 @@ int ksz_max_mtu(struct dsa_switch *ds, int port)
+ 	case KSZ88X3_CHIP_ID:
+ 	case KSZ8864_CHIP_ID:
+ 	case KSZ8895_CHIP_ID:
++	case KSZ8995XA_CHIP_ID:
+ 		return KSZ8863_HUGE_PACKET_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN;
+ 	case KSZ8563_CHIP_ID:
+ 	case KSZ8567_CHIP_ID:
+@@ -3315,11 +3349,15 @@ static int ksz_switch_detect(struct ksz_device *dev)
+ 			return -ENODEV;
+ 		break;
+ 	case KSZ8895_FAMILY_ID:
+-		if (id2 == KSZ8895_CHIP_ID_95 ||
+-		    id2 == KSZ8895_CHIP_ID_95R)
++		if (id2 == KSZ8895_CHIP_ID_95XA) {
++			dev->chip_id = KSZ8995XA_CHIP_ID;
++			break;
++		} else if (id2 == KSZ8895_CHIP_ID_95 ||
++			   id2 == KSZ8895_CHIP_ID_95R) {
+ 			dev->chip_id = KSZ8895_CHIP_ID;
+-		else
++		} else {
+ 			return -ENODEV;
++		}
+ 		ret = ksz_read8(dev, REG_KSZ8864_CHIP_ID, &id4);
+ 		if (ret)
+ 			return ret;
+@@ -4662,6 +4700,10 @@ int ksz_switch_register(struct ksz_device *dev)
+ 	if (ret)
+ 		return ret;
+ 
++	/* Override ops with something simpler for this legacy chip */
++	if (ksz_is_ksz8995xa(dev))
++		dev->ds->ops = &ksz8995xa_switch_ops;
++
+ 	dev->dev_ops = dev->info->ops;
+ 
+ 	ret = dev->dev_ops->init(dev);
+@@ -4744,11 +4786,13 @@ int ksz_switch_register(struct ksz_device *dev)
+ 	if (ret)
+ 		return ret;
+ 
+-	/* Read MIB counters every 30 seconds to avoid overflow. */
+-	dev->mib_read_interval = msecs_to_jiffies(5000);
++	if (!ksz_is_ksz8995xa(dev)) {
++		/* Read MIB counters every 30 seconds to avoid overflow. */
++		dev->mib_read_interval = msecs_to_jiffies(5000);
+ 
+-	/* Start the MIB timer. */
+-	schedule_delayed_work(&dev->mib_read, 0);
++		/* Start the MIB timer. */
++		schedule_delayed_work(&dev->mib_read, 0);
++	}
+ 
+ 	return ret;
+ }
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index b67038cf1bd0..661a82026e47 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -235,6 +235,7 @@ enum ksz_model {
+ 	KSZ88X3,
+ 	KSZ8864,
+ 	KSZ8895,
++	KSZ8995XA,
+ 	KSZ9477,
+ 	KSZ9896,
+ 	KSZ9897,
+@@ -751,7 +752,13 @@ static inline bool ksz_is_ksz88x3(struct ksz_device *dev)
+ static inline bool ksz_is_8895_family(struct ksz_device *dev)
+ {
+ 	return dev->chip_id == KSZ8895_CHIP_ID ||
+-	       dev->chip_id == KSZ8864_CHIP_ID;
++	       dev->chip_id == KSZ8864_CHIP_ID ||
++	       dev->chip_id == KSZ8995XA_CHIP_ID;
++}
++
++static inline bool ksz_is_ksz8995xa(struct ksz_device *dev)
++{
++	return dev->chip_id == KSZ8995XA_CHIP_ID;
+ }
+ 
+ static inline bool is_ksz8(struct ksz_device *dev)
+@@ -822,6 +829,7 @@ static inline bool ksz_is_sgmii_port(struct ksz_device *dev, int port)
+ #define KSZ87_CHIP_ID_94		0x6
+ #define KSZ87_CHIP_ID_95		0x9
+ #define KSZ88_CHIP_ID_63		0x3
++#define KSZ8895_CHIP_ID_95XA		0x0
+ #define KSZ8895_CHIP_ID_95		0x4
+ #define KSZ8895_CHIP_ID_95R		0x6
+ 
+@@ -885,6 +893,7 @@ static inline bool ksz_is_sgmii_port(struct ksz_device *dev, int port)
+ #define KSZ8863_HUGE_PACKET_SIZE	1916
+ #define KSZ8863_NORMAL_PACKET_SIZE	1536
+ #define KSZ8_LEGAL_PACKET_SIZE		1518
++#define KSZ8995XA_LEGAL_PACKET_SIZE	1522
+ #define KSZ9477_MAX_FRAME_SIZE		9000
+ 
+ #define KSZ8873_REG_GLOBAL_CTRL_12	0x0e
+diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
+index 77aecac32466..2c55014246e5 100644
+--- a/drivers/net/dsa/microchip/ksz_spi.c
++++ b/drivers/net/dsa/microchip/ksz_spi.c
+@@ -161,7 +161,8 @@ static int ksz_spi_probe(struct spi_device *spi)
+ 		 chip->chip_id == KSZ8794_CHIP_ID ||
+ 		 chip->chip_id == KSZ8765_CHIP_ID)
+ 		regmap_config = ksz8795_regmap_config;
+-	else if (chip->chip_id == KSZ8895_CHIP_ID ||
++	else if (chip->chip_id == KSZ8995XA_CHIP_ID ||
++		 chip->chip_id == KSZ8895_CHIP_ID ||
+ 		 chip->chip_id == KSZ8864_CHIP_ID)
+ 		regmap_config = ksz8863_regmap_config;
+ 	else
+@@ -185,7 +186,10 @@ static int ksz_spi_probe(struct spi_device *spi)
+ 		dev->pdata = spi->dev.platform_data;
+ 
+ 	/* setup spi */
+-	spi->mode = SPI_MODE_3;
++	if (chip->chip_id == KSZ8995XA_CHIP_ID)
++		spi->mode = SPI_MODE_0;
++	else
++		spi->mode = SPI_MODE_3;
+ 	ret = spi_setup(spi);
+ 	if (ret)
+ 		return ret;
+@@ -239,6 +243,10 @@ static const struct of_device_id ksz_dt_ids[] = {
+ 		.compatible = "micrel,ksz8795",
+ 		.data = &ksz_switch_chips[KSZ8795]
+ 	},
++	{
++		.compatible = "micrel,ks8995",
++		.data = &ksz_switch_chips[KSZ8995XA]
++	},
+ 	{
+ 		.compatible = "microchip,ksz8463",
+ 		.data = &ksz_switch_chips[KSZ8463]
+@@ -271,6 +279,10 @@ static const struct of_device_id ksz_dt_ids[] = {
+ 		.compatible = "microchip,ksz8895",
+ 		.data = &ksz_switch_chips[KSZ8895]
+ 	},
++	{
++		.compatible = "microchip,ksz8995xa",
++		.data = &ksz_switch_chips[KSZ8995XA]
++	},
+ 	{
+ 		.compatible = "microchip,ksz9477",
+ 		.data = &ksz_switch_chips[KSZ9477]
+@@ -332,6 +344,7 @@ static const struct of_device_id ksz_dt_ids[] = {
+ MODULE_DEVICE_TABLE(of, ksz_dt_ids);
+ 
+ static const struct spi_device_id ksz_spi_ids[] = {
++	{ "ks8995" },
+ 	{ "ksz8463" },
+ 	{ "ksz8765" },
+ 	{ "ksz8794" },
+@@ -340,6 +353,7 @@ static const struct spi_device_id ksz_spi_ids[] = {
+ 	{ "ksz8864" },
+ 	{ "ksz8873" },
+ 	{ "ksz8895" },
++	{ "ksz8995" },
+ 	{ "ksz9477" },
+ 	{ "ksz9896" },
+ 	{ "ksz9897" },
+diff --git a/include/linux/platform_data/microchip-ksz.h b/include/linux/platform_data/microchip-ksz.h
+index 028781ad4059..d8eddd21c3c7 100644
+--- a/include/linux/platform_data/microchip-ksz.h
++++ b/include/linux/platform_data/microchip-ksz.h
+@@ -31,6 +31,7 @@ enum ksz_chip_id {
+ 	KSZ88X3_CHIP_ID = 0x8830,
+ 	KSZ8864_CHIP_ID = 0x8864,
+ 	KSZ8895_CHIP_ID = 0x8895,
++	KSZ8995XA_CHIP_ID = 0x8995,
+ 	KSZ9477_CHIP_ID = 0x00947700,
+ 	KSZ9896_CHIP_ID = 0x00989600,
+ 	KSZ9897_CHIP_ID = 0x00989700,
 
 -- 
 2.54.0
