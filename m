@@ -1,194 +1,174 @@
-Return-Path: <netdev+bounces-291778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291779-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6ABtIlbEFWqxawcAu9opvQ
-	(envelope-from <netdev+bounces-291778-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:03:34 +0200
+	id 4LA1OY3EFWoAagcAu9opvQ
+	(envelope-from <netdev+bounces-291779-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:04:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BDF85D9413
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:03:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 897B35D944F
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:04:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8F9853042E70
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:57:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8A632300D4FA
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5161039A800;
-	Tue, 26 May 2026 15:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49F63955C0;
+	Tue, 26 May 2026 15:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nX0LLqET"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="OaEzKCoY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AE3397B1D;
-	Tue, 26 May 2026 15:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52CB25782A
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 15:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779811055; cv=none; b=apfaKXHsaB2cpzhjtk18GXJx/Mgw4qZNg29aUlmp52JWlkYKBfVuyChdW5tknYhUY2D+9JjDDU5x07/N8tPO5Absw8s6tqA+60Ij0mjsgAERHGtk5YtO7b9c1ENfnONwb+uTA3EKKkDl9BapR2j2+rAeXSIavSv3RkfH8oXxcSo=
+	t=1779811115; cv=none; b=BT7t/ciM1vw8sacPZRlH0WFYFL+UhhS+kjNUiiwll8K13XN464jjGk+lbE/4lfIL3Wu/dWdL1omKkpTKCR6sxtq+vonGvQr+xUIvK59cbV+YiX97wZeevxcOkg7frnxK/z33i7hkBdCRy5wabYloZ3A3EUHaXcIa6NwsQI5iWoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779811055; c=relaxed/simple;
-	bh=0Gs4eaJHHYJn3YI9i+VzaDQ8SVoakTViO9trjVjDd8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pwf3MvelLxviUZ9W1Qze723eeWTStin7sUNIdsc6T63IA1vOvluGsJA+PMgjFAgWa9Q8kcyZ/HkqixUt5WeFnGMUpjNTs79XPeP735fN3eWwnjasKM+JoOvvpqy/con2wakvLh5Iim/SZKrVl2FJRQj8O39ofTxN/BMCQXxLdgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nX0LLqET; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DB031F00A3D;
-	Tue, 26 May 2026 15:57:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779811053;
-	bh=/kgx1aIktyIXxLHyLL5nUxq2BcZWZyQAxi/lCwJwhvY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=nX0LLqETWQK97vWl0nBUulTAAbjE1W7FipkRUyXY9drvDHRph+9VNQJrP+DfO96tF
-	 72+Ne6G1rY9KiGqqh/k+vfA9NCrQDs4j9Q22hvZSzwos0ro89642Vv7UUpDqLKH28w
-	 zeuIOFDJC0JEKXhA6Y1FywUItNWaeT5DnjZFRIg8d7sAl98mWAdW8R5NFHicBxExrd
-	 EdwP1odYpitvKHCcCAXd07UKSPyOzx8RxZKtTfdh5wLohP+jrik80OutYuA7Es5tkg
-	 b+O/B7vJ2Ym6HuC7QF9iwt0eZ8r6Fui4Jj5IkqxdKNaLec8kfqpjynfYpPwmSXYDOk
-	 kfjN2N8xTVA3w==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	corbet@lwn.net,
-	tariqt@nvidia.com,
-	dtatulea@nvidia.com,
-	linux-doc@vger.kernel.org,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 4/4] net: make page_pool_get_stats() void
-Date: Tue, 26 May 2026 08:57:22 -0700
-Message-ID: <20260526155722.2790742-5-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260526155722.2790742-1-kuba@kernel.org>
-References: <20260526155722.2790742-1-kuba@kernel.org>
+	s=arc-20240116; t=1779811115; c=relaxed/simple;
+	bh=luCcXwP82NKzZTQdXDuXXpas0iy8/T2cK1g8ZZZMa+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Be68b45byFLbn3GXlgmYrc4fM/weIePPAy+kvNPgeQSLmSXbhM/GK6EZmXDTP6hm0zSwWWz3lZJYlWaJZsUV8N+81ZyCFNA4rHgOlr2jII/7lDyN3aEeP2gChVEfhdsnPfF5sqw2pbRRtonw0/2OMY0ofznwWqH7bHFUWlykw+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=OaEzKCoY; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-47c6f914617so5109695b6e.1
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 08:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779811113; x=1780415913; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DBREw0EFwsoyVbz1ezFdLWJUb0tEhym45QW/V9DqyOc=;
+        b=OaEzKCoYTjDFupGXgDqHvA60tQHvH8uhQAJf0FF3+yd8Lp09r59r6JN0ReiOo5Sg/H
+         R03Js4qy31KLSLJsCFDOMwOuWryqT8e3gV1RpxO38tDzlwDne7YJ31V+eveOUM8kd8yy
+         pvMFMygUkXBGF0/DjasxuUwyERKQXO0nFTZYOu8KPjchCzA90V3w5+XFG4NrCDxM0sOS
+         iNJsXY5R+e1Gl3paQi49m9A9fWg7n+v+xW/81ORc8TQppKvYD6psMNykD5jY6VKjwJv/
+         l7N/yyb1s2SXYcKLb0vKuTmtV4LnWCaaHg2WWM9yoILbupaZL7vzq4pzzmGjTZGJXxIy
+         WNjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779811113; x=1780415913;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DBREw0EFwsoyVbz1ezFdLWJUb0tEhym45QW/V9DqyOc=;
+        b=crLIXgkOm1q8R39g2l1h5+Y5YHB4Pqv5MR/+hcCbzjoCZUyh7hB6Ffebmd34RWQSMV
+         ITnlsC9FuG50DENwKTjIRU8OA//R6xLmRKQI4AVtqjqkg+SsiyNo+8k47ryN9LXqZ0eB
+         GCjYW9fByvWtf2KAePkHBsXfGVCabM72pVw/l7TGCh33aLFVLAd2bnHQYwjrWGivAkgh
+         7gQNUnXV5U86YaT+dgCotrH168vCSV+eelH/y/lf1qV0pmdp7GnlqWlIxD47VreoyGXM
+         cA5G3/x4yeFetmpnrc91C1rcK4O6h0uD8MIbMSSl5x5L2K0mZkNPY+SKO07bOBeTc2JQ
+         8UUg==
+X-Forwarded-Encrypted: i=1; AFNElJ8AG7KwLgpuHADpmtB2fewbzldAlhDB2SEy7BBoSMQUcAkUvFV0l/2+n31Ub/A5yYdQF918JJw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqhit/8fuJTneoHeicjLWe6Uo+ncDx8GM7c22ff44Vd7QGBZJs
+	HXpLKjMSORxUJ3LP9viDrGvRbGP2ZxuprcXWsRw4AuvW8a/JY21qaMJ2jWDIw1zoi4E=
+X-Gm-Gg: Acq92OES4JPzvOFrwRfipggZ+LP+AM6eswiXC8cnyk6jKFXyFC5FvklKJ+jS6eM7nH9
+	QL/hHqd5DwcL1yO8ZR/8stznm7vMLjDNvNhaQmMAvlDojhjRWjLB2+iBCzYZZqhAfAAYQI0fKN7
+	ACQQZ3smywIMXUy0mrEbio+wr+iNrv734zskSm0r5uSLN7AZKn82WZI3EUXPuQQ1HszfYFV6Fur
+	Dt3maEqvTXYoaOc4Nhke8okLKWGJEe0Rxb3uI2rCUZByTyQw9j5Tm5nKxJsNxSM9+RDTkRoKeSU
+	tAlqUvfuTAR9lcoStZOnXX1/y53JKtvd2O+PwX2TQKTwyH2UDWhNqUvkbLXJS2e8Y9p1RXp5oa9
+	kilD+JLRQOsr1hzzTTbUvvs0ioyv0ZO0TW42RQ7krdUKvRBF4QV6W8EYCbogv1U+ZXNjBCp/vpf
+	pFLRNjUBoWOS66piWJUx5yK2f6L/zlOMlB7o6RCIdEudwjxDe7f13lmMrJPuZ6IgsvgMMPLVqXZ
+	UzbO5viSdHMvic6HZ8=
+X-Received: by 2002:a05:6808:1a1c:b0:479:e96e:65aa with SMTP id 5614622812f47-4854a2ab967mr10906128b6e.42.1779811112545;
+        Tue, 26 May 2026 08:58:32 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-485544e320csm6341688b6e.5.2026.05.26.08.58.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 May 2026 08:58:31 -0700 (PDT)
+Message-ID: <92db3ff0-8f0b-4b61-a167-5004ffcf9025@kernel.dk>
+Date: Tue, 26 May 2026 09:58:27 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] net: Remove support for AIO on sockets
+To: Christoph Hellwig <hch@infradead.org>, demiobenour@gmail.com
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, James Clark
+ <james.clark@linaro.org>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Eric Biggers <ebiggers@google.com>,
+ Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-doc@vger.kernel.org, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>, linux-api@vger.kernel.org
+References: <20260523-af-alg-harden-v1-0-c76755c3a5c5@gmail.com>
+ <20260523-af-alg-harden-v1-1-c76755c3a5c5@gmail.com>
+ <ahQCZQNoyO8GQt3H@infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ahQCZQNoyO8GQt3H@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel-dk.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-291778-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291779-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.995];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_TO(0.00)[infradead.org,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[kernel.dk];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel-dk.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 6BDF85D9413
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kernel-dk.20251104.gappssmtp.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 897B35D944F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The kdoc for page_pool_get_stats() is missing a Returns: statement.
-Looking at this function, I have no idea what is the purpose of
-the bool it returns. My guess was that maybe the static inline
-stub returns false if CONFIG_PAGE_POOL_STATS=n but such static
-inline helper doesn't exist at all. All callers pass a pointer
-to a struct on the stack. Make this function void.
+On 5/25/26 2:03 AM, Christoph Hellwig wrote:
+> On Sat, May 23, 2026 at 03:43:02PM -0400, Demi Marie Obenour via B4 Relay wrote:
+>> From: Demi Marie Obenour <demiobenour@gmail.com>
+>>
+>> The only user of msg->msg_iocb was AF_ALG, but that's deprecated.
+>> It can be removed entirely at the cost of only supporting synchronous
+>> operations.  This doesn't break userspace, which will silently block
+>> (for a bounded amount of time) in io_submit instead of operating
+>> asynchronously.
+>>
+>> This also makes struct msghdr smaller, helping every other caller of
+>> sendmsg().
+> 
+> So we just had a discussion at LLC about how networking needs to support
+> AIO better for zero copy.
+> 
+> The current TCP zerocopy implementation provides completion notification
+> through the socket error code, which is freaking weird and doesn't
+> integrate well with either io_uring or in-kernel callers.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- include/net/page_pool/helpers.h                    | 2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.c | 3 +--
- net/core/page_pool.c                               | 7 +------
- net/core/page_pool_user.c                          | 3 +--
- 4 files changed, 4 insertions(+), 11 deletions(-)
+We already have that via io_uring, and without needing msg_kiocb or the
+(very) weird socket error code retrieving.
 
-diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-index 3247026e096a..e2730dd273b2 100644
---- a/include/net/page_pool/helpers.h
-+++ b/include/net/page_pool/helpers.h
-@@ -64,7 +64,7 @@ int page_pool_ethtool_stats_get_count(void);
- u8 *page_pool_ethtool_stats_get_strings(u8 *data);
- u64 *page_pool_ethtool_stats_get(u64 *data, const void *stats);
- 
--bool page_pool_get_stats(const struct page_pool *pool,
-+void page_pool_get_stats(const struct page_pool *pool,
- 			 struct page_pool_stats *stats);
- #else
- static inline int page_pool_ethtool_stats_get_count(void)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-index 1a3ecf073913..7f33261ba655 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-@@ -496,8 +496,7 @@ static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
- 	struct page_pool *pool = c->rq.page_pool;
- 	struct page_pool_stats stats = { 0 };
- 
--	if (!page_pool_get_stats(pool, &stats))
--		return;
-+	page_pool_get_stats(pool, &stats);
- 
- 	rq_stats->pp_alloc_fast = stats.alloc_stats.fast;
- 	rq_stats->pp_alloc_slow = stats.alloc_stats.slow;
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 9a87062134d4..84ec603d1bb3 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -85,14 +85,11 @@ static const char pp_stats[][ETH_GSTRING_LEN] = {
-  * is passed to this API which is filled in. The caller can then report
-  * those stats to the user (perhaps via ethtool, debugfs, etc.).
-  */
--bool page_pool_get_stats(const struct page_pool *pool,
-+void page_pool_get_stats(const struct page_pool *pool,
- 			 struct page_pool_stats *stats)
- {
- 	int cpu = 0;
- 
--	if (!stats)
--		return false;
--
- 	/* The caller is responsible to initialize stats. */
- 	stats->alloc_stats.fast += pool->alloc_stats.fast;
- 	stats->alloc_stats.slow += pool->alloc_stats.slow;
-@@ -111,8 +108,6 @@ bool page_pool_get_stats(const struct page_pool *pool,
- 		stats->recycle_stats.ring_full += pcpu->ring_full;
- 		stats->recycle_stats.released_refcnt += pcpu->released_refcnt;
- 	}
--
--	return true;
- }
- EXPORT_SYMBOL(page_pool_get_stats);
- 
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 01509d1b3cba..fb5d3f9de936 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -127,8 +127,7 @@ page_pool_nl_stats_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 	struct nlattr *nest;
- 	void *hdr;
- 
--	if (!page_pool_get_stats(pool, &stats))
--		return 0;
-+	page_pool_get_stats(pool, &stats);
- 
- 	hdr = genlmsg_iput(rsp, info);
- 	if (!hdr)
 -- 
-2.54.0
-
+Jens Axboe
 
