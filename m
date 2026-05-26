@@ -1,121 +1,114 @@
-Return-Path: <netdev+bounces-291908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPqjHq/zFWqzfwcAu9opvQ
-	(envelope-from <netdev+bounces-291908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:25:35 +0200
+	id QLRaGjz0FWpCgAcAu9opvQ
+	(envelope-from <netdev+bounces-291909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:27:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E3655DBF6A
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:25:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09EF65DBFAB
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 180B4303AF86
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:25:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 44CE7301424B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC8F3C0621;
-	Tue, 26 May 2026 19:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F295E372EF1;
+	Tue, 26 May 2026 19:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="I+q/8a5j"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hW2lLrdU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B805352C52;
-	Tue, 26 May 2026 19:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B32C13D503
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 19:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779823528; cv=none; b=Hvfbk/H17ow4G5GBHYRFqverQPaHwwlBDH7EJ1zBwmbPvBmO4d+ZEO64TOC4LtRMWvlgxPCoHT2FTZDKyzgztxDK+cFWr2jwvH6vbuEj7IsLC3MvpxZJChAEkLd1SZAQvRzpcxKhSHiuBOwRsszyC+rIFaa1KGvT7ofO0y7rEWI=
+	t=1779823672; cv=none; b=FbCa58J61fB5klHFy37Mih5jjb9119O6nZzsAmGjzrCpqBZBQCkqtnUoEgzy64beIube8kNgGf9YHxWNdoVv/STMoI+qAHVrlWUrxOyEkHZ7ulvxcjPhdqr19fOzVGctBaZUKzXGztyqWrdnS6EJYRMtrFSegskpDv3vJXSG1DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779823528; c=relaxed/simple;
-	bh=W4LIlDQOM+MhDJlLpJo59skrrnE14/No7Tn7xOpv7JQ=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=u7+Sc6e3haUvPkxq79DojBvA/Kgk4zSq0pYorc9mKVqwf3MFp+pYVtYYK1JRtNppC8JW7FXvBHqkiw4wZUHjmfG15Qps6Si3BnjnzCdKf7dOACoL2fv9wrr8Yqydpu4+xe08TmW+BE/VXq4nM7FaDlbtGKyegEUKthP4p9dlS8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=I+q/8a5j; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EE260A4B73;
-	Tue, 26 May 2026 21:25:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1779823524; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=AzVsY1iGJmoJBD2ByM8HX35fkw5gcS3qmwSaMiT/Jsk=;
-	b=I+q/8a5j3BEOT5wS5T4V+6KYivD4+SAjVBFwYaOUzoMAu0LpWId4L5n08/G3jue3wMYmx1
-	BVizIqmx4LAbqIcwe8oc16ymPArGTP74eZYnXgiVaGKrcowxCtjF+3LqK7WggjvBNMNbIc
-	mowrAI6b30ggbhlnmlbT2kk8LxRWOHsosb4AhvKd1fHZX3RzV41UvMrx5eATXfoQOr7XyI
-	mcP3450HnlBCGnRFvWFcTGHPfBB6M7kQWOX7d14SAZlzsNyd1UJi/TYbuNRRgYiwHtlhbj
-	cm+WwbLX9aCl+/Vq/l9+mh6/qqZ54h3N3No2h1U7Sa1w8y8FnIGptZmMCEDLsQ==
+	s=arc-20240116; t=1779823672; c=relaxed/simple;
+	bh=o8ORo6sJ1fPhEVSNyUrL0oxCdecfR5IDBsK5tzfyPhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AgKkTdwlGxXpy2HPr0r0ZnRulS6lTO6cCKqpHr4fjDVJKwY14SzwgumovCWSrtXdcZa8L1rJqpTMmAR+xNCD0ZhZOeIoGZ/DVl+gNZFlT1lCWHTHyDngh/8dZzHdy5brtzNXTKR3QvWL9B1+12ouJOk+HG2V5BhvERdtfw2ZtVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hW2lLrdU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=jZkUpXo9DyNeZR9ojfq2twwAnnPFbl2L59aGFu5SGQE=; b=hW2lLrdUsFdC0hWzClA447JKMx
+	UZJHfLb5wGSx53mPmqnzm4+g4zs5y0RqOPs68dpww5BqxUzCbV5Bj24iwZiImaLo3enX4LQ8VUJ7D
+	KEKKdBsLD5Rr076NFVb3C+y0Mrph3kSW7cUN1E4YDeHgRafSADdbgK87K7+BnYxvfaY4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wRxR7-004dbS-1W; Tue, 26 May 2026 21:27:33 +0200
+Date: Tue, 26 May 2026 21:27:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Markus Stockhausen <markus.stockhausen@gmx.de>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
+	daniel@makrotopia.org
+Subject: Re: [PATCH net-next 1/5] net: mdio: realtek-rtl9300: provide generic
+ command runner
+Message-ID: <4c270a3b-c12a-4f3a-82ae-1c6a35a89aeb@lunn.ch>
+References: <20260526174344.1186832-1-markus.stockhausen@gmx.de>
+ <20260526174344.1186832-2-markus.stockhausen@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 26 May 2026 21:25:23 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- tariqt@nvidia.com, dtatulea@nvidia.com, linux-doc@vger.kernel.org,
- hawk@kernel.org, ilias.apalodimas@linaro.org
-Subject: Re: [PATCH net-next 3/4] docs: page_pool: drop the mention of the
- legacy stats API
-In-Reply-To: <20260526155722.2790742-4-kuba@kernel.org>
-References: <20260526155722.2790742-1-kuba@kernel.org>
- <20260526155722.2790742-4-kuba@kernel.org>
-Message-ID: <0ba941849c110930ffa4fecc4f257703@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260526174344.1186832-2-markus.stockhausen@gmx.de>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291909-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[tipi-net.de];
-	TAGGED_FROM(0.00)[bounces-291908-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmx.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:email,tipi-net.de:mid,tipi-net.de:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3E3655DBF6A
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 09EF65DBFAB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 26.5.2026 17:57, Jakub Kicinski wrote:
-> The Netlink support for querying page pool stats has been
-> proven out in production, let's remove the mention of the
-> helper meant for dumping page pool stats into ethtool -S
-> from the docs.
-> 
-> Call out in the kdoc that this API is deprecated.
-> Some drivers may not be able to use the Netlink API
-> (if page pool is shared across netdevs). So the old API
-> is not _completely_ dead. But we shouldn't advertise it.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> +static struct otto_emdio_priv *otto_emdio_bus_to_priv(struct mii_bus *bus)
+> +{
+> +	return ((struct otto_emdio_chan *)bus->priv)->priv;
 
-> [...]
+Assuming priv is a void *, you should not need the cast.  You might
+however need an intermediary variable.
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+> +	scoped_guard(mutex, &priv->lock)
+> +		ret = (*priv->info->write_c45)(bus, port, dev_addr, regnum, value);
+
+The (* ) should not be needed.
+
+	Andrew
 
