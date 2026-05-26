@@ -1,220 +1,128 @@
-Return-Path: <netdev+bounces-291974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291973-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +I2YGHUrFmqdigcAu9opvQ
-	(envelope-from <netdev+bounces-291974-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:23:33 +0200
+	id yDKNJw0rFmqdigcAu9opvQ
+	(envelope-from <netdev+bounces-291973-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:21:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2625DD82E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:23:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E4C5DD7E9
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 594223050F71
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:21:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9299B300CF08
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64E13CB2C7;
-	Tue, 26 May 2026 23:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8883CDBA8;
+	Tue, 26 May 2026 23:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZoF8Uarq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wx5seO9x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EA43BB661
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 23:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779837712; cv=pass; b=FchI2/O/Ho2CLnK8j9jjV29A26GCvYaSsCGaucvV+x1qJtiEdN5NCzxMo5N2kSj1Kzy5cTR9Y37SMA8ZQw+Hj3ch/b/waFSbVvfQxi9NwW9VfRkUaHX9DtZ0ipKs7O8XydU/kTUW7WKzuAtS0fkezG+bYTUdCrPsnqrzt4Ntc6Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779837712; c=relaxed/simple;
-	bh=u5AZ6lDvJHN6hkOMWJlEHdIYy+BPs1w8b0bOdZZRyJY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J8P1loUVUomiiqG9jxUxwmMUebwmX8mlQo+8Wpdy0jft0r43JcylwcnNbckyPyjoJFck8OCFktOuizbYdXtThk41HbgyFc4aVq2TynN5Q1N8nv3tM9JIwgnVvn2FjUsLWDOX4WWGLoZnoITs+NEORCwa+iygIRfRq/nriaBScMg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZoF8Uarq; arc=pass smtp.client-ip=209.85.160.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-43bf6230cffso1231950fac.0
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 16:21:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779837710; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bxeHUtN/4y6ENY9HlZ9co6fhXhhM2f2bvWm0KOKHV2ywvjr5JuQIfsC8FvedcCsDAP
-         LCyvZLVS/qTjyjANg4n35in17v30Xq9lJxFpquuz0M1MX/Br/4JNsjGoazSKjdpMubFk
-         pkY58nz5XtgERMl7pLXJEPWmLalq92npcITp7i94MFv1wpw1M2E5PZn/vW8qPb1ZRn7m
-         yu7R0V97j5ExXU6XbePdjjEyKxU1URXR5hoRwqM5PJEH7kTcbe0emJXS3dIclXtO46YM
-         SfmxAR0LyB+E0fRJKMpBOJqcPQ00G5A2owxeyuVRr4cdumTF+nkbNeLvdmUO1vDFV/aW
-         YqrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=HujuVBuKdWWEfICM8n6u8a8X3rF3iweG2fpAlmRVj68=;
-        fh=XLym8Egy2CGh+uoCatzHlxuZSbhF7HWk8+vDF0CH5r8=;
-        b=L2xlpOb2l1XjhgHhzduXC52Hf9kv4fb8/axdJF8BqWoiaB/IzRy12eMQNY76orB9Zc
-         NZhmQDWbHnOQ9UBGplg2VcgbuFf7tpMPyKbIYHmhb7eB17cpOakijgVjokFd4rufLuIV
-         J5HARzJbXv4Iqq+mjZVqyleS6kwz01CsqXT5xi/3hJ2IqxrnB38J2UwG1KRsna6STLTa
-         ExcfYiuPySHnVjbgAH8RTD2t3LHdDhpEcqVCjMSpuI2vnAjO+Bkm24LlgPoGDjF4nc5P
-         zFdQ6TJ3FG1TQtygNgk4b30VoAxHUUtZfLLg8wJGWSsqHQjKCMUznj70c6MiXjgO+Crq
-         WEuw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779837710; x=1780442510; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HujuVBuKdWWEfICM8n6u8a8X3rF3iweG2fpAlmRVj68=;
-        b=ZoF8Uarq/TldyaYIzCoGeNZ4a27AC5yVtMW2qA6Tq9NzzWaOekALVchygvW560Li57
-         VEI7YHopZ1NPwR5c4jDdIWBBGBy5szAPuY2g8Sebgwsu6Srwp+6KIZMbFR26UksalAqR
-         /Ar4cOnt3DJDonqFEM5D8vyKYvVSvGsfoInObizwy3IygcHiBMTU9RUkLaauWzZGhZN4
-         sJ8H7IfBEpqPZyeaRUURQi+O8KCm0ESpIrzqou+SbZh7vqjIF77HWQzXdCYKNcE2p5ja
-         XdTYZPCEWLbvOKLLf6BiiK24XjBh+QgJlYovwsMDMFUdvrOkh/ahAXlltSyXVJPE7efq
-         phmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779837710; x=1780442510;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HujuVBuKdWWEfICM8n6u8a8X3rF3iweG2fpAlmRVj68=;
-        b=dYNYuZiMJpE4Yqgr6TOcuXmvrXESevC+X1WMGJH3v3YHQBSaQ8x3yg3n+kKqYWpq/U
-         VrPpgN1QLBUfctmdCgAXjKV9XVi59gcpCLBFsGGLyxXG1Ju1rFugBMxtKGc0uzxvoiop
-         N9T9dMkiPOr901+jd6FNLRtfOnOl7e8e+0ntM62D9bnO6EeKg5yMncNfTcjEnR/d/1s7
-         V0xzcCz3jp61w9AVhGQ7ERGFqnQTiJwn0aZnOXbh0Xr3CvL/n1iHMJrIZAOBA6B7IUcM
-         OBe6o7XhdV6fBmlLrKF/eYi1uQLMgoZXPeNV9LExr9if/1hDfBM4z2JYZIEjcL+RIipz
-         D2Eg==
-X-Forwarded-Encrypted: i=1; AFNElJ/y51C+MvzTvn+hhB1hUhCIY9rTvKHX/dS9z2EfcRr6A0hlLUuOs2oDrq/ff/fPrG00Zi9+Ku0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyD6+fOqO/vQ89YhGBq3Ya66JjWRZjV2BSzHvnCEp0rGIR2dtd/
-	0uuUmUiP9VFXrqlWUtq9Nep10UAuN2/OL9u+qqxaPRelVMW9axeswX9llcHEXhmAbe49xDD1Cxh
-	7GbK93bemznuFkHUrbjvn58b1exxQGLc=
-X-Gm-Gg: Acq92OELQqMq6SGG3HNgf5ViZCrev7UC6JfjOelrGfV2PKohSbGH+9UcA8HVkLsO/da
-	cAvNbytpHvKKonbrS/p6gIEPT92SscMJjhqyCuPZuMHLgdHFmerg5SfynisMFVSh5O4Fx3Yne4P
-	7vnfD3tCb2ggZoFbWDR2smQf8RsOvUgCU+67JSRNv4sgmQH5l8UDyuDTG8XxXBpKK+smka+EFtH
-	7rH0Acqol3cK5h0exQ7RVq9j4TflwyYZ/T/xgUcZu3FDpHoClDJj+ZS9AxmI/oCQUXLbD75qlNU
-	mWScSZIYF1t94QJV2B61iOrByCE=
-X-Received: by 2002:a4a:e903:0:b0:694:9e2f:cfac with SMTP id
- 006d021491bc7-69d7fcb51b6mr8951696eaf.9.1779837709977; Tue, 26 May 2026
- 16:21:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0DA3C0628;
+	Tue, 26 May 2026 23:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779837703; cv=none; b=qoNtiQwN5xTOQkUtMe6oEpRmf8vCuHDKGwPBqIN4CLJfbXJOCbAGkPBGOyY7oXIXrUMJSFYMmSwptO2815BVXfZwAdsbNLYZylCoEoTbSn/6Mr/V3hxtsiDIgQPrTvudn7PCfWaHYRXk31UKJyy0tqVaM0EPbVMJAfbwHYT+FL8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779837703; c=relaxed/simple;
+	bh=3JtiWl0vRydfWQsGBpovYwdHgc4CmQTwlFTcACuBDQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q/hiVuONLHbsZ4ANFAJ/z9QpaSKkwXvmA2LEqxYJmRdI7K3rOrqZ2WVcWlGdnxmkYaT8mLMAH36U0Cy/G2iTdeMbYWX32ktJg95lmgppWm0XvepatGP8sBsaHk0mHhI5VnD3miK663Y13tdL5/huEPEW90bJfJwzomUdzC/7amg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wx5seO9x; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3FB51F000E9;
+	Tue, 26 May 2026 23:21:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779837702;
+	bh=yJt45ObCHCD/H8x09SxlAekMdKt4JVSvNjsARTZrmS4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Wx5seO9x3Qhd0dQn/I4XHEcajF6tFXKfoJbKbEQUAkSMioemkM8axOki4sSSCY+YP
+	 wktrLa9DKl0uP9r3gBWXxdl9Rn88nWIkbWlbQnfAj00tg9AFN3lHvd38srCqvx0T6k
+	 5gPSu/uF0Rm2Xk9H3GebR52z1Q+W7IzascSSiSpSmEb3UNGlz1MThc4Cq2ggAbE9ic
+	 PWRXBwG2c5RKRAXGhaI+CF9M9LUmHMmifUthY13f89HfWE9L/gIMy/BUtcT2Y8X/W3
+	 W4cmK/4EE0/5Ggqgde1Wn/TX1Ep+pvidq+PlCdxoGZS4Q7Aro66AN2JH5k6hAv3BVD
+	 4HeYW6a2bl4rA==
+Date: Tue, 26 May 2026 16:21:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "illusion.wang" <illusion.wang@nebula-matrix.com>
+Cc: dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
+ sam.chen@nebula-matrix.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
+ corbet@lwn.net, horms@kernel.org, linux-doc@vger.kernel.org,
+ pabeni@redhat.com, vadim.fedorenko@linux.dev, lukas.bulwahn@redhat.com,
+ edumazet@google.com, enelsonmoore@gmail.com, skhan@linuxfoundation.org,
+ hkallweit1@gmail.com, linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH v16 net-next 00/11] nbl driver for Nebulamatrix NICs
+Message-ID: <20260526162140.38d055b4@kernel.org>
+In-Reply-To: <20260526035453.2359-1-illusion.wang@nebula-matrix.com>
+References: <20260526035453.2359-1-illusion.wang@nebula-matrix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260525201116.407338-2-kacper.kokot.44@gmail.com> <202605261807.YY0PWuhX-lkp@intel.com>
-In-Reply-To: <202605261807.YY0PWuhX-lkp@intel.com>
-From: Kacper Kokot <kacper.kokot.44@gmail.com>
-Date: Wed, 27 May 2026 00:21:38 +0100
-X-Gm-Features: AVHnY4IeURuAw-7kug8a-6xqNpmP-8aoIQEcxEzrITr5eMpT52Lzw3oZg7lhaRo
-Message-ID: <CAG-Fur7edB8_4iLnP4QWh+K96bGFBgYyfdoy8H7zvqa8NYdyow@mail.gmail.com>
-Subject: Re: [PATCH] netfilter: TCPMSS: fix dropped packets when MSS option is unaligned
-To: kernel test robot <lkp@intel.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291974-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291973-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,kernel.org,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kacperkokot44@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 0F2625DD82E
+X-Rspamd-Queue-Id: A2E4C5DD7E9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> AFAICS, these issues are not present in real environments as MSS option
-> is placed at the beginning of the options block making it aligned by
-> default usually.
+On Tue, 26 May 2026 11:54:37 +0800 illusion.wang wrote:
+> This patch series represents the first phase. We plan to integrate it in
+> two phases: the first phase covers mailbox and chip configuration,
+> while the second phase involves net dev configuration.
+> Together, they will provide basic PF-based Ethernet port transmission and
+> reception capabilities.
+> 
+> After that, we will consider other features, such as ethtool support,
+> flow management, adminq messaging, VF support, debugfs support, etc.
 
-I agree, I haven't observed it in any real environment and wouldn't expect to.
-I found it by reading the code and had to craft a SYN to reproduce. That said
-the spec permits unaligned options and the kernel shouldn't silently drop legal
-packets just because nobody sends them today. I can note in the v2 commit
-message that this is a theoretical fix.
+The coccicheck bot flagged a new Coccinelle warning introduced by the
+nebula-matrix driver series:
 
-> > I wonder, if we are touching this code, we could use the opportunity
-> > to make it use get_unaligned_be16() instead.
->
-> gcc and clang convert x[0] << 8 | x[1] (etc) to the appropriate single
-> instruction (and maybe byteswap) on cpu that support misaligned accesses.
-> So there is little to gain from doing it any other way.
+  drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c:187:45-52:
+    WARNING: Consider using %pe to print PTR_ERR()
 
-Happy to go with whichever you prefer for v2.
+The scripts/coccinelle/misc/ptr_err.cocci rule fires when a PTR_ERR()
+value is passed to a format string without using the %pe specifier,
+which is the kernel-preferred way to print error pointers (it displays
+both the numeric value and the symbolic name).
 
-> and, of course, the code works fine because 0x1 != 0 is 1.
+Please fix nbl_main.c line 187 to use %pe instead of passing the raw
+PTR_ERR() value to %ld or similar.
 
-Ha - accidentally correct. I'll add the parens in v2 tomorrow.
-
-Also the reproducer I sent with v1 was clunky. Here's a better
-one with some results below:
-
-  #!/usr/bin/env python3
-  import argparse
-  from scapy.all import *
-
-  parser = argparse.ArgumentParser()
-  parser.add_argument("target_ip")
-  parser.add_argument("target_port", type=int)
-  args = parser.parse_args()
-
-  def gen_mss_syn_options(nops=0):
-      return nops * [("NOP", None)] + [("MSS", 1460)]
-
-  def syn_check(opts):
-      sport = RandShort()
-      ip = IP(dst=args.target_ip)
-      syn = TCP(sport=sport, dport=args.target_port, flags="S",
-seq=1000, options=opts)
-      synack = sr1(ip/syn, timeout=1, verbose=False)
-      send(ip/TCP(sport=sport, dport=args.target_port, flags="R",
-seq=syn.seq+1),
-           verbose=False)
-      return not not (synack and synack.haslayer(TCP) and
-synack[TCP].flags == 0x12)
-
-  for i in range(7):
-      n = 5
-      ok = sum(syn_check(gen_mss_syn_options(i)) for _ in range(n))
-      print(f"{i} nops + mss, {ok}/{n} probes responded")
-
-Before:
-
-  0 nops + mss, 5/5 probes responded
-  1 nops + mss, 0/5 probes responded
-  2 nops + mss, 5/5 probes responded
-  3 nops + mss, 0/5 probes responded
-  4 nops + mss, 5/5 probes responded
-  5 nops + mss, 0/5 probes responded
-  6 nops + mss, 5/5 probes responded
-
-After:
-
-  0 nops + mss, 5/5 probes responded
-  1 nops + mss, 5/5 probes responded
-  2 nops + mss, 5/5 probes responded
-  3 nops + mss, 5/5 probes responded
-  4 nops + mss, 5/5 probes responded
-  5 nops + mss, 5/5 probes responded
-  6 nops + mss, 5/5 probes responded
+For example, change something like:
+  pr_err("...: %ld\n", PTR_ERR(ptr));
+to:
+  pr_err("...: %pe\n", ptr);
 
