@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-291757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wFo9KgLFFWqxawcAu9opvQ
-	(envelope-from <netdev+bounces-291757-lists+netdev=lfdr.de@vger.kernel.org>)
+	id SEB7GgLFFWqxawcAu9opvQ
+	(envelope-from <netdev+bounces-291756-lists+netdev=lfdr.de@vger.kernel.org>)
 	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:06:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 028055D94CA
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF68C5D94C9
 	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 853273112338
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:36:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A91D311231F
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FF9377018;
-	Tue, 26 May 2026 15:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A2B377016;
+	Tue, 26 May 2026 15:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fdzijFiG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUaP4b7z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CFC371D17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F7F37106E
 	for <netdev@vger.kernel.org>; Tue, 26 May 2026 15:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779809762; cv=none; b=LTXSsybyTAjpjTVb0cusb/BTLBJH/GFJ8Lgwu7rIwS1LKz+doHC3hqA0g9Akp+fcw0y7wGDvR/TxZcUUyzBt8mKq2Np/naZPg7IGunB7j4KpNbNPjsaGg2gTVLGCJi2enPlpGK6tZjX6cvsC2iRu2PTwKWMQ1tEBdNy/oEzj46g=
+	t=1779809760; cv=none; b=Qc58XLZfxNki53UlNsBz5FIN7DQB/TT2X5Ng4A13eC6LNy8VmBe9EC79LtE1ulScEBEHXTQsfClNYtwCmXwh02XKgXmvXx9v8oo/psckJOWsv/I4V28INR8kbkd9h8oiIxt6xFDmUjNdixToU/TcV9guyVve2tliCuUXVcktkIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779809762; c=relaxed/simple;
-	bh=3EhAbhkgcmk5382ypkBUbZ3XSu+54FLZWyI2yLnldWk=;
+	s=arc-20240116; t=1779809760; c=relaxed/simple;
+	bh=B6hPYFl40/eyJ3MFPl5GUICMKp0Ryg0OTJcAUc5VR3w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hjebZBzzGLAEGr2/i26v8gqm3GBcsiuetkFjSdLyvMROp0OeLZwABxImLXDYmMwmxxpYx+fki7xl732AjfKQhNQR7ZwQgJOgkZzyiyjxxycBbSAcS8g+H9BGhWavWGzexI2vdSADNlJenKGgiR4NeWQMvqT+OXfs6DyTZUrk1CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fdzijFiG; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0DAF1F00A3C;
-	Tue, 26 May 2026 15:35:54 +0000 (UTC)
+	 MIME-Version; b=gqW0/wG4HeRQCZ2ReQYIv8fF+VmNA0iNaM3ci20h1ucn7IjncBwCkla+DNuekU3oZ59eL9y59+xvSsLUls2X6RpIpBXEViiSGClriF9a7S+Da5odJ3W5Pf24w/yxmKICH+kYFlAdKp7i1DCHUaDc4Dt1hb6CHvbkKCeNeegScuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUaP4b7z; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 543451F00ADE;
+	Tue, 26 May 2026 15:35:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1779809755;
-	bh=18iR4P7xryhRqH+56uCBSVcaDxv3nz6Ko9WwPv276vU=;
+	bh=xOiuISXPGiIOAbgR3O8B5UDVVXGCmQiwSwSdvlIsyxs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fdzijFiGBec2aWAi2RLlyL/ClIJddfi5VllIUe6DhAugLGmUI7OOiAbcm4mexjB7a
-	 rWUEmXqNcbEjFn17Mwff0TX9AbbCa+0TKuTzLBM0lQEKcI5Xuyhdp/Zw7K+jGaqCMa
-	 RdIKqzZVEkubXsFvcWiu14rLEw32WMsLTh+egw/qqJzPAM0CT984sb8x8i1ZSYiXHQ
-	 T9lve4swXB6S3QD7OiN3bl7HZ60NPAHY3sJx3r7idGnRqhHeOTjR5LZOkglMplO4MW
-	 m3z7+gJBM/XZeyv4+kvdKqoAUcR+PK4lTXtzUxWiVm0CUZO6FPAWu1Lekdf/I8R4x5
-	 lcKCWXBIS7WdQ==
+	b=eUaP4b7zqKiIWS9lxorsSMFZwFY0nqdhrwLznkTfcU3o3SRxx0AZa9ThXTz2hT9TL
+	 EFQ9f07SaO8v6k6k+f48VuLNiiiZVJsOyCjacv+nBdz57LOv04GWxiGubj/C+WvKpn
+	 FQQPe1Jm64R2Td63MUHfwZYip5T0GWVANdhdJSyvgj+4DV7A+6WlDzINI020SHAf7C
+	 6mG/UilEYyRYeDxt4ViXlfqnZD117ELkrDWBmrrA3MeTrxdqnpSnyp2OgbQd8qAqWy
+	 PhAjGzWKlHZQaoFliQZPqfmPAzf1h0pTdRzEyLiTysqhAlklF4lsXmBPa7cvuGbMsw
+	 Ku95PdbsqyptQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,10 +56,11 @@ Cc: netdev@vger.kernel.org,
 	maxime.chevallier@bootlin.com,
 	haiyangz@microsoft.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch
-Subject: [PATCH net 09/10] ethtool: eeprom: add missing ethnl_ops_begin() / _complete() during fallback
-Date: Tue, 26 May 2026 08:35:32 -0700
-Message-ID: <20260526153533.2779187-10-kuba@kernel.org>
+	andrew@lunn.ch,
+	vladyslavt@nvidia.com
+Subject: [PATCH net 10/10] ethtool: eeprom: add more safeties to EEPROM Netlink fallback
+Date: Tue, 26 May 2026 08:35:33 -0700
+Message-ID: <20260526153533.2779187-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260526153533.2779187-1-kuba@kernel.org>
 References: <20260526153533.2779187-1-kuba@kernel.org>
@@ -77,12 +78,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-291757-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-291756-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -93,50 +94,66 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.995];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:email,page_data.data:url]
-X-Rspamd-Queue-Id: 028055D94CA
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email,nvidia.com:email,lunn.ch:email]
+X-Rspamd-Queue-Id: AF68C5D94C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-All ethtool driver op calls should be sandwiched between
-ethnl_ops_begin() / ethnl_ops_complete(). In Netlink eeprom code,
-if the paged access failed we fall back to old API, but we
-first call _complete() and the fallback never does its own
-ethnl_ops_begin(). Move the fallback into the _begin() / _complete()
-section.
+The Netlink fallback path for reading module EEPROM
+(fallback_set_params()) validates that offset < eeprom_len,
+but does not check that offset + length stays within eeprom_len.
+The ioctl equivalent (ethtool_get_any_eeprom() in ioctl.c) has
+always enforced both bounds:
+
+  if (eeprom.offset + eeprom.len > total_len)
+      return -EINVAL;
+
+This could lead to surprises in both drivers and device FW.
+Add the missing offset + length validation to fallback_set_params(),
+mirroring the ioctl.
+
+Similarly - ethtool core in general, and ethtool_get_any_eeprom()
+in particular tries to zero-init all buffers passed to the drivers
+to avoid any extra work of zeroing things out. eeprom_fallback()
+uses a plain kmalloc(), change it to zalloc.
 
 Fixes: 96d971e307cc ("ethtool: Add fallback to get_module_eeprom from netlink command")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
 CC: andrew@lunn.ch
 CC: maxime.chevallier@bootlin.com
+CC: vladyslavt@nvidia.com
 ---
- net/ethtool/eeprom.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/ethtool/eeprom.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/net/ethtool/eeprom.c b/net/ethtool/eeprom.c
-index a557e3996c85..836316df3092 100644
+index 836316df3092..0b8cfeddb014 100644
 --- a/net/ethtool/eeprom.c
 +++ b/net/ethtool/eeprom.c
-@@ -141,12 +141,11 @@ static int eeprom_prepare_data(const struct ethnl_req_info *req_base,
- 	return 0;
+@@ -44,6 +44,9 @@ static int fallback_set_params(struct eeprom_req_info *request,
+ 	if (offset >= modinfo->eeprom_len)
+ 		return -EINVAL;
  
- err_ops:
-+	if (ret == -EOPNOTSUPP)
-+		ret = eeprom_fallback(request, reply);
- 	ethnl_ops_complete(dev);
- err_free:
- 	kfree(page_data.data);
--
--	if (ret == -EOPNOTSUPP)
--		return eeprom_fallback(request, reply);
- 	return ret;
- }
++	if (length > modinfo->eeprom_len - offset)
++		return -EINVAL;
++
+ 	eeprom->cmd = ETHTOOL_GMODULEEEPROM;
+ 	eeprom->len = length;
+ 	eeprom->offset = offset;
+@@ -69,7 +72,7 @@ static int eeprom_fallback(struct eeprom_req_info *request,
+ 	if (err < 0)
+ 		return err;
  
+-	data = kmalloc(eeprom.len, GFP_KERNEL);
++	data = kzalloc(eeprom.len, GFP_KERNEL);
+ 	if (!data)
+ 		return -ENOMEM;
+ 	err = ethtool_get_module_eeprom_call(dev, &eeprom, data);
 -- 
 2.54.0
 
