@@ -1,479 +1,210 @@
-Return-Path: <netdev+bounces-291658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291660-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLVaMGt7FWp8VgcAu9opvQ
-	(envelope-from <netdev+bounces-291658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:52:27 +0200
+	id mDPqMMZ6FWp8VgcAu9opvQ
+	(envelope-from <netdev+bounces-291660-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:49:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B2875D4686
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:52:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 433CE5D4638
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:49:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 459A6306BCD0
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:48:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 469963028CB9
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4063DDDA5;
-	Tue, 26 May 2026 10:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9846E3DD856;
+	Tue, 26 May 2026 10:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iaJ6pvSO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZN0FtFXJ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="V8pQOHMv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56C93DDDD5;
-	Tue, 26 May 2026 10:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C513D16EA
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 10:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779792492; cv=none; b=VU0w6M8HlRfp4vwItUFxKWZZtsyEfsm8161jpz62y2+RPCk4C8cXpO5AzVQq+JtUon3Ca5PHkMepAV3BQ5bNkoIgPVGLS+VqjaCpwBLGysZ31b+mH30QlenJOxl21dyw43kO5WUwTROic58A5o/SiIOiTvSxJWL3g+WTid+Y89U=
+	t=1779792580; cv=none; b=o9YkHyjEIjh5R2Po3T1bNqcdkmQXqlO4FfBBX4IawxG14t3kRxn+SLdRhuEj0MaCTdp0/Vc8DEfETM+1jrucFhLyeLdCuFgY8uaY25bla8o/ZD9DgOWdaVW1mKGvi1inOeBFSA1vSr/4zyLsdOUQhaWcqGktvVUVhbrU8YUr4lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779792492; c=relaxed/simple;
-	bh=Nf0EnF6iqOkAmosCCrHdvWG/EG2O/ZPOWpfDeCRtY9M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e9Q0g56aR5/pAx60aq3mw7xPvMJtpEOP4G1sBum1nDI6YS+W5rmRuWZDUdxMJ/Fgc/QqxoPJ3hmIqoFON5NqoU2DnW+BW/4Jsk9PuCf2AcZbvBJZWyrUPFOtOUHOOh0pV7zDZjqWJgs3Fy1wPsahb+Xa0zvfzGUSX75RiSmQkjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iaJ6pvSO; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64Q9sYsf1201198;
-	Tue, 26 May 2026 03:47:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=IBm0+zDbTzFmwnrElL6Gzsdbb
-	oyLUGhN+JRNYfLW3Dc=; b=iaJ6pvSOjQ0AgQ1VBE41sQSUGJlL+DZZNckK2tpFv
-	U+5+P5zkIbNZwzc2GxvQ2MI5iJlQNdt2NYmOhZT71rOtbDw0pQ6ht1aFy3qxYtxP
-	6c4eKNXh3ivq5FoVqZdgCig2kSBJ4oT+cJPJMzx/DZoWGRImZeaLgtqLcJ6FhYlV
-	qma/kf4Evl/d/UwQXNQcpSUjsd0IqYHBNmRISFbDclz9uq5pe2IR96c27En0bsJZ
-	6iBymdmxNlbxbo9heLAF4xuiMmPYh7XubN0FnMKNFN+66ze9RHP8EbX4Y6F5x1HW
-	joBOoHV/aXuIvGMwFfGWg/KwByEbHnYCSk/KntkN8mM0w==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ebbrf7unu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 May 2026 03:47:54 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 26 May 2026 03:47:53 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 26 May 2026 03:47:53 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 887703F7045;
-	Tue, 26 May 2026 03:47:50 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <bbhushan2@marvell.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>
-Subject: [net-next PATCH v6 5/5] octeontx2-pf: cn20k: Use unified Halo context
-Date: Tue, 26 May 2026 16:17:27 +0530
-Message-ID: <1779792447-5593-6-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1779792447-5593-1-git-send-email-sbhatta@marvell.com>
-References: <1779792447-5593-1-git-send-email-sbhatta@marvell.com>
+	s=arc-20240116; t=1779792580; c=relaxed/simple;
+	bh=JQ5BrlLA7NRE52ecTfeDwXHuvHRkEmiz2LzsJBj9lv8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dGtXRx3W008ihSJzQoRJ6dQixMZykTUSBKKP4A4bFKZT0WlMfYG1EMQjC8rhRSUmlcYFKD7QiNtS/7tA7+mNgN7DHct0V7mlrFH+LfmlxgWHYuqUDcCvwf0A9pVZPmGZLc362c7bbiiBrc2iJ9bszkFQHrCOoqTIoRCMCiopngw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZN0FtFXJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=V8pQOHMv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779792578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8Xb91WiXPazwge7GQc97YpLKCGyGlIds3mAgEY7YBag=;
+	b=ZN0FtFXJ707EpvevpD4F4MVJFq3N1lpJQEJcE14r2LbZWsc+F5m31heDt40GZ2IjFtp5IO
+	5yQ+2iVZ64NOgLssFqRBb8UF5utS1eFgYuFbEkgFJ4+WsHEZt2oxM70atBBfuWIQpHfGuI
+	P9Cyua7zJGNDr1I/nRIQt6IfbrWUbzE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-222-CD6b-n7NN1yrzEc3Ssi1QA-1; Tue, 26 May 2026 06:49:36 -0400
+X-MC-Unique: CD6b-n7NN1yrzEc3Ssi1QA-1
+X-Mimecast-MFC-AGG-ID: CD6b-n7NN1yrzEc3Ssi1QA_1779792575
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-490479c2911so43953415e9.2
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 03:49:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779792575; x=1780397375; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8Xb91WiXPazwge7GQc97YpLKCGyGlIds3mAgEY7YBag=;
+        b=V8pQOHMvGZvMPjcn8dU1zSLhridApTsW8NLudsCkBKUv4sycjzdiWk8m9ly1Lwq1wh
+         EXr8hh0gwqCTntIy4sFULArqYMbOgEPuMmB9BOWirpgoaDZ1BZtQ0950qIHclUg/A2iH
+         qAYM/8DPTjxaCBzf1FFbkix5yyy3efKVyNsfpUi8WXudTUDDyiOAtxeJBO2t1Y9pB/2X
+         nqO1kI89mi30kK06azQar72rEb4E5u2yAzHmewQpLXWVdhE/IQ3Y8Ukzanr2HeSaLyWL
+         ssOh/kpNmqGjHsP26ph2pDhN67FTYkRLW7N2mI2R/o7/YpfCvPO4YeiqCaZyN4YurQZi
+         iO2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779792575; x=1780397375;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8Xb91WiXPazwge7GQc97YpLKCGyGlIds3mAgEY7YBag=;
+        b=gSnrhRDMV37RJBxID6ZbqKM0OdERYCed6I7ABV7ldhnRoh2JvxGWtM3rV2PifNZEVM
+         yFtLBPcIjl59PqotqZOY2DCES7Pj0XgQR+VRlFiUCYRNRCu9povQFtPlsEJIQ/0P/wPi
+         V5uC6bCcbZuLWAdK0cCz+7DyoKhKAV0TCMEEBkOQqC2DCu4G30hVVZjoD3PLQJb20l4d
+         OnO6g76Yz5klXFr0aM8k6SaUdPeo3w0pj440bDi9VIH4fEpaRPSlU0MqwJTJ0sbeORQZ
+         lNGyWGiwYJlDsCEDT3XsXdnLnqMx51PITVl/STmEZd0ZPY4S12SpXNr+7p1i/uwehfRi
+         MlVg==
+X-Forwarded-Encrypted: i=1; AFNElJ/M314qpfubkl8xcwX67fle8j4JDOZ6me/Wh5ArDllvvPDKimkBcfr2XM6pey8errKPCnr1t8w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaQrrhiyWAbGuHLO/db9rf7y1v1DYqXtEaPcwguZb30wFNkO8q
+	UsYkaXz4iFk0Tp+p/8gav0plgvfwU7vsVW4ee+VzHP2AP7Kvz1oeT7uPLo6UA/79wxRgvmN+fM4
+	G6eAbacAQca+RonXrW/PBlk2jcskYFIj5WVqKv4q4purXoj5SvHx6Y/1sRKRPrJtCkA==
+X-Gm-Gg: Acq92OHYn7uXLqTVS3LilyshlVAq76xrUmB/lMErr+tzDpYjDMGg+qDXjvxf/OLOwGx
+	GqCPp/vHcLYPK5cYUlkk1aeGVXHiQPrjRfNr8JkvSRhcw6RRC9jFaBGfc+O8M6fqUuhMhuWN/UM
+	kusWk5kreqAob7TnOfS9QhrD5GkfPKiJyokQpK8yj0Bk4Fr3E6H0UaFcCgimfv6Hm9lTBPPVu5c
+	jC01LFzYctwCpSvE7DCSqB3qTC4vkNbU6q2jeo/2YGYdioJAtgyaaONsSCJf1me838ZxBpDjShB
+	6G4piTo24f2kanlGisaa7Yl3EXDMLkbrP8fWa4tHmzeBCxLA/yBBFaymXzt5Y0RDLAlm+BYCq1Q
+	I9ZLv6vRhTNu7TklZ5Un/K7WXnwjBxhbHy9Fnw5LzEl3scBxCaUadUsvh1w==
+X-Received: by 2002:a05:600c:8b12:b0:490:5191:6e1a with SMTP id 5b1f17b1804b1-490519170d7mr255826025e9.24.1779792575167;
+        Tue, 26 May 2026 03:49:35 -0700 (PDT)
+X-Received: by 2002:a05:600c:8b12:b0:490:5191:6e1a with SMTP id 5b1f17b1804b1-490519170d7mr255825705e9.24.1779792574774;
+        Tue, 26 May 2026 03:49:34 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.155.152])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904174a145sm148632185e9.0.2026.05.26.03.49.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 May 2026 03:49:34 -0700 (PDT)
+Message-ID: <e86545c6-d647-44c3-be72-5390a211b9d4@redhat.com>
+Date: Tue, 26 May 2026 12:49:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=epTvCIpX c=1 sm=1 tr=0 ts=6a157a5b cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=5QXT97Cb7cX96sVZDOwA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: mQNedy8tfzuaJ7cTsZwIZRnKibpPLvki
-X-Proofpoint-GUID: mQNedy8tfzuaJ7cTsZwIZRnKibpPLvki
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI2MDA5MyBTYWx0ZWRfX3oRbFvIpNRDP
- yzQVYp70dgHUR9OApwWX5Aci018ILhsd71qJeMZHTYad+XHbPxeJHoxaNqUoklf8AaTA5rhaBoS
- dhM74GVyaxnUbJQnWvGeLaQphMZDjhTyY+6NbUeguZJ3AJLU/gIWOoqoR8tTtfFoF+wYs94sWLe
- o42upV/fQ/quzJcnWCa4edLy+OHAG6cBU/K09CLu/0UwRuzJSpGEEMx2Ic7gBrhFL38zc1xXBFb
- eNyUMuBDowBEz5LUBcW2WbtHUvofdgHH1SeTLuEweIxULD2hukaXdKgczpMhPCi+6pZQxrw+S9z
- TZjrSYxS8Sf4Wq8yDTpfAmRVgYdqEdOgqA6nSo0HZsTLg5y1EtVKRYR6DbYM5FvsOB5dIpatsp4
- nagWCt0gf+VKzv3pPcjQhNgBLhLeo0GSxcIYDfdNgknELveLe0oqQpxSQ7ILm7AzBUvEMPYeL8g
- tR7/89Y0IwMIUakW5xg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-05-26_02,2026-05-26_01,2025-10-01_01
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: stmmac: fix RX DMA leak on TX alloc failure
+To: Abid Ali <dev.taqnialabs@gmail.com>,
+ devnull+dev.taqnialabs.gmail.com@kernel.org
+Cc: alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org
+References: <20260522-stmmac-rx-desc-cleanup-v2-1-76e78eb471e1@gmail.com>
+ <20260523121708.564-1-dev.taqnialabs@gmail.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260523121708.564-1-dev.taqnialabs@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291658-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291660-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.998];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:mid,marvell.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev,dev.taqnialabs.gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 1B2875D4686
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 433CE5D4638
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use unified Halo context present in CN20K hardware for
-octeontx2 netdevs instead of aura and pool contexts.
-Note that with this halo context in place RQ backpressure
-is not being configured and the same will be supported
-later.
+On 5/23/26 2:17 PM, Abid Ali wrote:
+>> 	ret = alloc_dma_tx_desc_resources(priv, dma_conf);
+>> +	if (ret)
+>> +		free_dma_rx_desc_resources(priv, dma_conf);
+>>
+>> 	return ret;
+>> }
+> 
+> The sashiko-gemini analysis [1] flagged two issues.
+> 
+> 1) Double-free via XDP path:
+> 
+> stmmac_xdp_set_prog() ignores the return of stmmac_xdp_open(), so
+> if alloc_dma_tx_desc_resources() fails inside that path,
+> rx_q->buf_pool and rx_q->dma_rx are freed for Rx queues.
+> 
+> The interface stays UP, so a later stmmac_release() calls
+> free_dma_desc_resources() on the same freed pointers.
+> 
+> Without this patch, the same failure path leaks RX resources
+> instead. Either way the root cause seems to be stmmac_xdp_set_prog() not
+> handling errors from stmmac_xdp_open().
+> 
+> The reported issue seems to be valid, but I'm not sure why XDP doesn't handle
+> a possible error in reinit in the first place.
+> 
+> 2) NULL deref on partial queue alloc:
+> 
+> If alloc_dma_rx_desc_resources() fails for queue N,
+> e.g. rx_q->page_pool = page_pool_create() fails, buf_pool is NULL.
+> The cleanup free_dma_rx_desc_resources() iterates through all
+> queues and will hit a NULL pointer deref in:
+> 
+> static void stmmac_free_rx_buffer(struct stmmac_priv *priv,
+> 				  struct stmmac_rx_queue *rx_q,
+> 				  int i)
+> {
+> 	struct stmmac_rx_buffer *buf = &rx_q->buf_pool[i];
+> 
+> The same could happen without the patch, and similar risk exists for
+> rx_q->buf_pool, rx_q->dma_rx, and rx_q->dma_erx which are all freed
+> without guards in __free_dma_rx_desc_resources().
+> 
+> I can add the necessary NULL guards in __free_dma_rx_desc_resources()
+> for V3 if necessary.
+My take is following: even if the sashiko reported issues are
+pre-existing, they are so strictly tied to this code path that it makes
+sense to address all of them together (different patches in the same
+series).
 
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
- .../ethernet/marvell/octeontx2/nic/cn20k.c    | 209 +++++++++---------
- .../ethernet/marvell/octeontx2/nic/cn20k.h    |   3 +
- .../marvell/octeontx2/nic/otx2_common.h       |   3 +
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   8 +
- 4 files changed, 120 insertions(+), 103 deletions(-)
+Also all of the above looks like 'net' material, deserving fixes tag in
+each patch.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-index dbf173196608..721721dc1564 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-@@ -242,15 +242,6 @@ int cn20k_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
- 
- #define RQ_BP_LVL_AURA   (255 - ((85 * 256) / 100)) /* BP when 85% is full */
- 
--static u8 cn20k_aura_bpid_idx(struct otx2_nic *pfvf, int aura_id)
--{
--#ifdef CONFIG_DCB
--	return pfvf->queue_to_pfc_map[aura_id];
--#else
--	return 0;
--#endif
--}
--
- static int cn20k_tc_get_entry_index(struct otx2_flow_config *flow_cfg,
- 				    struct otx2_tc_flow *node)
- {
-@@ -517,15 +508,22 @@ int cn20k_tc_alloc_entry(struct otx2_nic *nic,
- 	return 0;
- }
- 
--static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
--			      int pool_id, int numptrs)
-+static int cn20k_halo_aq_init(struct otx2_nic *pfvf, u16 pool_id,
-+			      int stack_pages, int numptrs, int buf_size,
-+			      int type)
- {
-+	struct page_pool_params pp_params = { 0 };
- 	struct npa_cn20k_aq_enq_req *aq;
- 	struct otx2_pool *pool;
--	u8 bpid_idx;
--	int err;
-+	struct page_pool *pp;
-+	int err, sz;
- 
- 	pool = &pfvf->qset.pool[pool_id];
-+	/* Alloc memory for stack which is used to store buffer pointers */
-+	err = qmem_alloc(pfvf->dev, &pool->stack,
-+			 stack_pages, pfvf->hw.stack_pg_bytes);
-+	if (err)
-+		return err;
- 
- 	/* Allocate memory for HW to update Aura count.
- 	 * Alloc one cache line, so that it fits all FC_STYPE modes.
-@@ -536,6 +534,8 @@ static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
- 			return err;
- 	}
- 
-+	pool->rbsize = buf_size;
-+
- 	/* Initialize this aura's context via AF */
- 	aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
- 	if (!aq) {
-@@ -548,49 +548,60 @@ static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
- 			return -ENOMEM;
- 	}
- 
--	aq->aura_id = aura_id;
--
--	/* Will be filled by AF with correct pool context address */
--	aq->aura.pool_addr = pool_id;
--	aq->aura.pool_caching = 1;
--	aq->aura.shift = ilog2(numptrs) - 8;
--	aq->aura.count = numptrs;
--	aq->aura.limit = numptrs;
--	aq->aura.avg_level = 255;
--	aq->aura.ena = 1;
--	aq->aura.fc_ena = 1;
--	aq->aura.fc_addr = pool->fc_addr->iova;
--	aq->aura.fc_hyst_bits = 0; /* Store count on all updates */
--
--	/* Enable backpressure for RQ aura */
--	if (aura_id < pfvf->hw.rqpool_cnt && !is_otx2_lbkvf(pfvf->pdev)) {
--		aq->aura.bp_ena = 0;
--		/* If NIX1 LF is attached then specify NIX1_RX.
--		 *
--		 * Below NPA_AURA_S[BP_ENA] is set according to the
--		 * NPA_BPINTF_E enumeration given as:
--		 * 0x0 + a*0x1 where 'a' is 0 for NIX0_RX and 1 for NIX1_RX so
--		 * NIX0_RX is 0x0 + 0*0x1 = 0
--		 * NIX1_RX is 0x0 + 1*0x1 = 1
--		 * But in HRM it is given that
--		 * "NPA_AURA_S[BP_ENA](w1[33:32]) - Enable aura backpressure to
--		 * NIX-RX based on [BP] level. One bit per NIX-RX; index
--		 * enumerated by NPA_BPINTF_E."
--		 */
--		if (pfvf->nix_blkaddr == BLKADDR_NIX1)
--			aq->aura.bp_ena = 1;
--
--		bpid_idx = cn20k_aura_bpid_idx(pfvf, aura_id);
--		aq->aura.bpid = pfvf->bpid[bpid_idx];
-+	aq->aura_id = pool_id;
- 
--		/* Set backpressure level for RQ's Aura */
--		aq->aura.bp = RQ_BP_LVL_AURA;
-+	aq->halo.stack_base = pool->stack->iova;
-+	aq->halo.stack_caching = 1;
-+	aq->halo.ena = 1;
-+	aq->halo.buf_size = buf_size / 128;
-+	aq->halo.stack_max_pages = stack_pages;
-+	aq->halo.shift = ilog2(numptrs) - 8;
-+	aq->halo.ptr_start = 0;
-+	aq->halo.ptr_end = ~0ULL;
-+
-+	aq->halo.avg_level = 255;
-+	aq->halo.fc_ena = 1;
-+	aq->halo.fc_addr = pool->fc_addr->iova;
-+	aq->halo.fc_hyst_bits = 0; /* Store count on all updates */
-+
-+	if (pfvf->npa_dpc_valid) {
-+		aq->halo.op_dpc_ena = 1;
-+		aq->halo.op_dpc_set = pfvf->npa_dpc;
- 	}
-+	aq->halo.unified_ctx = 1;
- 
- 	/* Fill AQ info */
--	aq->ctype = NPA_AQ_CTYPE_AURA;
-+	aq->ctype = NPA_AQ_CTYPE_HALO;
- 	aq->op = NPA_AQ_INSTOP_INIT;
- 
-+	if (type != AURA_NIX_RQ) {
-+		pool->page_pool = NULL;
-+		return 0;
-+	}
-+
-+	sz = ALIGN(ALIGN(SKB_DATA_ALIGN(buf_size), OTX2_ALIGN), PAGE_SIZE);
-+	pp_params.order = get_order(sz);
-+	pp_params.flags = PP_FLAG_DMA_MAP;
-+	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
-+	pp_params.nid = NUMA_NO_NODE;
-+	pp_params.dev = pfvf->dev;
-+	pp_params.dma_dir = DMA_FROM_DEVICE;
-+
-+	pp = page_pool_create(&pp_params);
-+	if (IS_ERR(pp)) {
-+		netdev_err(pfvf->netdev, "Creation of page pool failed\n");
-+		pool->page_pool = NULL;
-+		return PTR_ERR(pp);
-+	}
-+
-+	pool->page_pool = pp;
-+
-+	return 0;
-+}
-+
-+static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
-+			      int pool_id, int numptrs)
-+{
- 	return 0;
- }
- 
-@@ -598,71 +609,63 @@ static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
- 			      int stack_pages, int numptrs, int buf_size,
- 			      int type)
- {
--	struct page_pool_params pp_params = { 0 };
--	struct npa_cn20k_aq_enq_req *aq;
--	struct otx2_pool *pool;
--	int err, sz;
-+	return cn20k_halo_aq_init(pfvf, pool_id, stack_pages,
-+				  numptrs, buf_size, type);
-+}
- 
--	pool = &pfvf->qset.pool[pool_id];
--	/* Alloc memory for stack which is used to store buffer pointers */
--	err = qmem_alloc(pfvf->dev, &pool->stack,
--			 stack_pages, pfvf->hw.stack_pg_bytes);
-+int cn20k_npa_alloc_dpc(struct otx2_nic *nic)
-+{
-+	struct npa_cn20k_dpc_alloc_req *req;
-+	struct npa_cn20k_dpc_alloc_rsp *rsp;
-+	int err;
-+
-+	req = otx2_mbox_alloc_msg_npa_cn20k_dpc_alloc(&nic->mbox);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	/* Count successful ALLOC requests only */
-+	req->dpc_conf = 1ULL << 4;
-+
-+	err = otx2_sync_mbox_msg(&nic->mbox);
- 	if (err)
- 		return err;
- 
--	pool->rbsize = buf_size;
-+	rsp = (struct npa_cn20k_dpc_alloc_rsp *)otx2_mbox_get_rsp(&nic->mbox.mbox,
-+								  0, &req->hdr);
-+	if (IS_ERR(rsp))
-+		return PTR_ERR(rsp);
- 
--	/* Initialize this pool's context via AF */
--	aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
--	if (!aq) {
--		/* Shared mbox memory buffer is full, flush it and retry */
--		err = otx2_sync_mbox_msg(&pfvf->mbox);
--		if (err) {
--			qmem_free(pfvf->dev, pool->stack);
--			pool->stack = NULL;
--			return err;
--		}
--		aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
--		if (!aq) {
--			qmem_free(pfvf->dev, pool->stack);
--			pool->stack = NULL;
--			return -ENOMEM;
--		}
--	}
-+	nic->npa_dpc = rsp->cntr_id;
-+	nic->npa_dpc_valid = true;
- 
--	aq->aura_id = pool_id;
--	aq->pool.stack_base = pool->stack->iova;
--	aq->pool.stack_caching = 1;
--	aq->pool.ena = 1;
--	aq->pool.buf_size = buf_size / 128;
--	aq->pool.stack_max_pages = stack_pages;
--	aq->pool.shift = ilog2(numptrs) - 8;
--	aq->pool.ptr_start = 0;
--	aq->pool.ptr_end = ~0ULL;
-+	return 0;
-+}
- 
--	/* Fill AQ info */
--	aq->ctype = NPA_AQ_CTYPE_POOL;
--	aq->op = NPA_AQ_INSTOP_INIT;
-+int cn20k_npa_free_dpc(struct otx2_nic *nic)
-+{
-+	struct npa_cn20k_dpc_free_req *req;
-+	int err;
- 
--	if (type != AURA_NIX_RQ) {
--		pool->page_pool = NULL;
-+	if (!nic->npa_dpc_valid)
- 		return 0;
--	}
- 
--	sz = ALIGN(ALIGN(SKB_DATA_ALIGN(buf_size), OTX2_ALIGN), PAGE_SIZE);
--	pp_params.order = get_order(sz);
--	pp_params.flags = PP_FLAG_DMA_MAP;
--	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
--	pp_params.nid = NUMA_NO_NODE;
--	pp_params.dev = pfvf->dev;
--	pp_params.dma_dir = DMA_FROM_DEVICE;
--	pool->page_pool = page_pool_create(&pp_params);
--	if (IS_ERR(pool->page_pool)) {
--		netdev_err(pfvf->netdev, "Creation of page pool failed\n");
--		return PTR_ERR(pool->page_pool);
-+	mutex_lock(&nic->mbox.lock);
-+
-+	req = otx2_mbox_alloc_msg_npa_cn20k_dpc_free(&nic->mbox);
-+	if (!req) {
-+		mutex_unlock(&nic->mbox.lock);
-+		return -ENOMEM;
- 	}
- 
--	return 0;
-+	req->cntr_id = nic->npa_dpc;
-+
-+	err = otx2_sync_mbox_msg(&nic->mbox);
-+	if (!err)
-+		nic->npa_dpc_valid = false;
-+
-+	mutex_unlock(&nic->mbox.lock);
-+
-+	return err;
- }
- 
- static int cn20k_sq_aq_init(void *dev, u16 qidx, u8 chan_offset, u16 sqb_aura)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-index b5e527f6d7eb..16a69d84ea79 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-@@ -28,4 +28,7 @@ int cn20k_tc_alloc_entry(struct otx2_nic *nic,
- 			 struct otx2_tc_flow *new_node,
- 			 struct npc_install_flow_req *dummy);
- int cn20k_tc_free_mcam_entry(struct otx2_nic *nic, u16 entry);
-+int cn20k_npa_alloc_dpc(struct otx2_nic *nic);
-+int cn20k_npa_free_dpc(struct otx2_nic *nic);
-+
- #endif /* CN20K_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index eecee612b7b2..f997dfc0fedd 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -592,6 +592,9 @@ struct otx2_nic {
- 	struct cn10k_ipsec	ipsec;
- 	/* af_xdp zero-copy */
- 	unsigned long		*af_xdp_zc_qidx;
-+
-+	bool			npa_dpc_valid;
-+	u8			npa_dpc; /* NPA DPC counter id */
- };
- 
- static inline bool is_otx2_lbkvf(struct pci_dev *pdev)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index ee623476e5ff..2b5fe67d297c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1651,6 +1651,9 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
- 	if (!is_otx2_lbkvf(pf->pdev))
- 		otx2_nix_config_bp(pf, true);
- 
-+	if (is_cn20k(pf->pdev))
-+		cn20k_npa_alloc_dpc(pf);
-+
- 	/* Init Auras and pools used by NIX RQ, for free buffer ptrs */
- 	err = otx2_rq_aura_pool_init(pf);
- 	if (err) {
-@@ -1726,6 +1729,8 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
- 	otx2_ctx_disable(mbox, NPA_AQ_CTYPE_AURA, true);
- 	otx2_aura_pool_free(pf);
- err_free_nix_lf:
-+	if (pf->npa_dpc_valid)
-+		cn20k_npa_free_dpc(pf);
- 	mutex_lock(&mbox->lock);
- 	free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
- 	if (free_req) {
-@@ -1790,6 +1795,9 @@ void otx2_free_hw_resources(struct otx2_nic *pf)
- 
- 	otx2_free_sq_res(pf);
- 
-+	if (is_cn20k(pf->pdev))
-+		cn20k_npa_free_dpc(pf);
-+
- 	/* Free RQ buffer pointers*/
- 	otx2_free_aura_ptr(pf, AURA_NIX_RQ);
- 
--- 
-2.48.1
+/P
 
 
