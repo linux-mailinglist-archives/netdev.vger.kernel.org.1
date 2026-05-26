@@ -1,221 +1,536 @@
-Return-Path: <netdev+bounces-291557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291558-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLfNAYZDFWokUAcAu9opvQ
-	(envelope-from <netdev+bounces-291557-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:53:58 +0200
+	id wJUgB89EFWprUAcAu9opvQ
+	(envelope-from <netdev+bounces-291558-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:59:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F3305D161B
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA625D1698
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AECA43033AA5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:53:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0335E3033ABB
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C8D3C4B8A;
-	Tue, 26 May 2026 06:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A693C417F;
+	Tue, 26 May 2026 06:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TR/s+dSF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JeVRqH7c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011EF3C3459
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 06:53:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54ED83C4165
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 06:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779778394; cv=none; b=hT9M/VFnwrJETZHxbRX/KjH9ENtFUMdvwEYKMYyP10Us0WyN6xvqFa8/whLO3009OHMWLnyD1TyumwVQwxSx4DgJok+6HIpjHosjM5t8p/o00Cr7IlApoiYbqurSfXXXWnYRcBJx7NsansPegXQMSYG6Ld5tmDcvDRJ6wCvDE7E=
+	t=1779778710; cv=none; b=sXFVNXeyAgAon0RGiK01qf9VlC8P44JprjFjq57j5owgGK5B/JI1IGHxIPVxIKLG5NpsmfRLAAIQqhZfkswrZTLFjPqjsC8A7k+uYULXWW7azIsDo16ggXrpbkptEdjN2gzAYJqabR8goP0EzzFhmfHByaW1a5nEP3ZbJy6goOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779778394; c=relaxed/simple;
-	bh=lI94k3K5Kcc20pekEfGAOaAomJ1QgkYtP6G74MUe9gk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QlMMXgdXAIflrYZOpk0qlh13zPfPAx9zc/J0435IU5r3QSS6GNw82craNubKQNa7dBcIiI12eVgj/1JGk2quup+W+m3aTDDcjTtMCIb6o7jzuXb7HWtQl6edBkVQ7n+znZrSTSZEQKuTEYE+Eo34l+h60yHtwM2RJ0YfQrVkBrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TR/s+dSF; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-459bf19e87bso5943352f8f.1
-        for <netdev@vger.kernel.org>; Mon, 25 May 2026 23:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1779778389; x=1780383189; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yXWASYjT/jE4WzpKhE8nVhHkzGwmPlTITkkcMF0D8BI=;
-        b=TR/s+dSFI2Vk05JY9oKvhTkUPLyGjERphtpAPMGuiQxvuv3fbFSbN1th4lK+bttysm
-         cFb/iWCpkNb08kRUbTcn9WjfJUaB3xcjwa8CXEuHNu8ztYYWGwWQbD8loHo0HuyuciOC
-         0TwcL+CxgU01vXU93n3aCg4f5dmgC1/3cis8o9d493p1B0tb+ArlTCB5LaW6RVOHuZSe
-         xFgNBY2Ddet/gPdHUxjFVULwbZSkZetwjzSKlyv7KFRavsith7RHUAc5uHnKUJqDu/G4
-         H3+i6q7GH893mbCE8FjnHXqiv6/6t+5ocWoYo60XT6575r8A+rywJ8KG4tumaLrCo8Ff
-         W8Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779778389; x=1780383189;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yXWASYjT/jE4WzpKhE8nVhHkzGwmPlTITkkcMF0D8BI=;
-        b=YZXfJbQnepMY/xHras5VsZI+ReiNrTWOpz7SOCjiOuY2mHJ/j5O/gQBpMjsvMfeSg8
-         JB/6WqmfrxePPyHOOuHWMJhH6sKOj8DU/piYcL58rADw5hfc4FZhIE/pOIJAMq70YLEI
-         NHV1q5xZZu3aUvdXeCJNujJam9buU2pBbNsQ9ht60V5O1xbcvWCrroh7yFwxZk4b+qBf
-         uSMjHrlTC2n0P7HqSagVSFSk5ZmYpkeyA6jA2jKkZbhtERP0ZkftcobtUEoVxFalt+lS
-         yHE1XzZIb8oofGHP+CzOmn7wDrBrK4iUlsIDa2V1ch1A0reakR19e85rMrf50QXC/SwU
-         xQ/g==
-X-Forwarded-Encrypted: i=1; AFNElJ/O1UgrHsU28W8tGcaZzVQ8Eo/lCtwEt2f4LMOOPdc4BhMmbaFKsnmHfHqXM0wI2twWCq+1QJU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/JYeDP0O21nqf9va4M850dyjUnYCGIjg1K/hinOPC5YfHXSUj
-	haflSHeyvPTREzyMVLxVA6dvTWLh9fqYFE/1cSiZ2KrRfPWWKw+l0bfNWIfNhtzHnXQ=
-X-Gm-Gg: Acq92OFow+bwps/ewkL0WXVZuK3tkdTiI+/YAfHzrpydjrjR/K8OMoC9VPzoNudAA91
-	Jak9XkU7AkOqDVVSELsehq0A4Jt1yPS7KBOc4JIil7VE/HxZ3Ctqx1i9DMaCNJ9IA3k2u2pGPLA
-	0szPIg0sYAMdHUQp4+5YEp94ZaXyYy52tr6NEpOBK27fK/JnJyVmt7K77MlqWGxxa/M3edcV4XL
-	GJCQXGG+lL6wRylWuI9vpRgInMvCNvbfAqs1oAaXiqZsaR4cx4LZ+Fvf6nrHzy3Ac0MbyTUBz2m
-	lUbTveUh07dfujZKNWKaBhJU3oLe9tpSh2eYSU7PLEkH4WXZ2qKJfGvIxY9i9edVnTW/8ZnkqNG
-	VIiStZ1FR5na6ZeIIeBcIzqctACm66bIQ+lGgU715uucdAvK5e1zvMcAVPaJYJqMcGq6dnSZSVa
-	HKMiBCgAAcgsYgKBiOFdT+RbubWjY4nF272638HvBJvpy6NhkH/6w9C7Qe0Z12de4tJ8cidcZ/3
-	wVVCduqFAOLy/MRa8GnbY3aaF0rlVAlkgFHgSaep+/sV0dwGdJGhq0Ngb8WvD7LIplQM877B5gE
-	4nal
-X-Received: by 2002:a05:6000:2003:b0:43b:4136:1e6f with SMTP id ffacd0b85a97d-45eb38e4b46mr29516257f8f.38.1779778389230;
-        Mon, 25 May 2026 23:53:09 -0700 (PDT)
-Received: from ?IPV6:2a00:1028:838d:271e:8e3b:4aff:fe4c:a100? (dynamic-2a00-1028-838d-271e-8e3b-4aff-fe4c-a100.ipv6.o2.cz. [2a00:1028:838d:271e:8e3b:4aff:fe4c:a100])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6c9ba2esm33848641f8f.8.2026.05.25.23.53.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 May 2026 23:53:08 -0700 (PDT)
-Message-ID: <88c5ca1d-eeda-4023-bc7a-397b92780db9@suse.com>
-Date: Tue, 26 May 2026 08:53:06 +0200
+	s=arc-20240116; t=1779778710; c=relaxed/simple;
+	bh=CLQZXDlr/FahKtYE5UBiPMQ+O10SWecPxjEjdDRUf9k=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=NXz6+iwIeSdczqa5JR9esq5D5rZ1MxRU1cJarABheHoyORuwfld7bThED5NVZrsu073QayEFM806NA9oQSBb9LJvE9pxCxLvl6+T/jktmOjpOwrexhCLDykPpxGIAgmH8GD9W7wVJvw0tpt7q1PUod8tyuhVnugGaFjDEgYQGXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JeVRqH7c; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744F71F000E9;
+	Tue, 26 May 2026 06:58:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779778709;
+	bh=Z7b2hUwG6+YnBfBMmHjYGQwh5dGHfQEVaggyyf/in4s=;
+	h=From:Date:Subject:To:Cc;
+	b=JeVRqH7cgXgDuw4uQ4LxwIKjnuqfJL7i9oJF1k6s+3NllQOjaRb4k2oknMPtJPRe/
+	 u0hGFKyZ/0GW1KaiCjDqVHLQ1PkwJrFOQCvTVxgZ9+s+C6oRllEs00dqeiegnjEMj7
+	 Ev1ecp/eGkDSUoP6pCuDaGYflOgZd5P4j8qET2l56Y8baqBVXzoybrXx2AZlpWzmgi
+	 wkS0gCjbRcseZiisWpfrMkhwrEVQjBE9VWulsoPkwvIKlYLwyGGp7sYNm5DGOpyxb1
+	 uXtQpjN0TOWo6lRcH1YqklFNuORoCiXvAvFWcFqZvl/2hfb64BcSkcD1w+5JkhNqio
+	 JmVdzxrljLuig==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 26 May 2026 08:58:05 +0200
+Subject: [PATCH RFC net-next v2] net: airoha: Add TCP LRO support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/11] Convert moduleparams to seq_buf
-To: Kees Cook <kees@kernel.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Pengpeng Hou
- <pengpeng@iscas.ac.cn>, Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
- Corey Minyard <corey@minyard.net>, Gabriel Somlo <somlo@cmu.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
- <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Bart Van Assche <bvanassche@acm.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
- Hans de Goede <hansg@kernel.org>, Mauro Carvalho Chehab
- <mchehab@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Hannes Reinecke <hare@suse.de>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>,
- Lukasz Luba <lukasz.luba@arm.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jiri Slaby <jirislaby@kernel.org>, Alan Stern <stern@rowland.harvard.edu>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Jason Baron <jbaron@akamai.com>, Jim Cromie <jim.cromie@gmail.com>,
- Tiwei Bie <tiwei.btw@antgroup.com>, Benjamin Berg <benjamin.berg@intel.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- "David E. Box" <david.e.box@linux.intel.com>,
- "Maciej W. Rozycki" <macro@orcam.me.uk>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
- Peter Zijlstra <peterz@infradead.org>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Vinod Koul <vkoul@kernel.org>,
- Frank Li <Frank.Li@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
- Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
- Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>,
- Dmitry Vyukov <dvyukov@google.com>, Andrew Morton
- <akpm@linux-foundation.org>, John Johansen <john.johansen@canonical.com>,
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Georgia Garcia <georgia.garcia@canonical.com>, kvm@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-modules@vger.kernel.org,
- kasan-dev@googlegroups.com, linux-mm@kvack.org, apparmor@lists.ubuntu.com,
- linux-security-module@vger.kernel.org, linux-um@lists.infradead.org,
- linux-acpi@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
- qemu-devel@nongnu.org, intel-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
- linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-pm@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-serial@vger.kernel.org,
- linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, netdev@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20260521133315.work.845-kees@kernel.org>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <20260521133315.work.845-kees@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260526-airoha-eth-lro-v2-1-24e2a9e7a397@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNTQrCMBCFr1JmbaRJaLSuBMEDuJUuQjo2gyWRS
+ SiVkrsbupe3+nh/GyRkwgSXZgPGhRLFUEEdGnDehgkFjZVBtcq0nWqFJY7eCsxezByF7UbptNH
+ yLCXU0ofxRes++ITH/dYEzCLgmmGorqeUI3/3t0XumX/DixRVqndO65Mx2F/fyAHnY+QJhlLKD
+ 6g7IjS7AAAA
+X-Change-ID: 20260520-airoha-eth-lro-a5d1c3631811
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Madhur Agrawal <madhur.agrawal@airoha.com>
+X-Mailer: b4 0.14.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-291558-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,iscas.ac.cn,nod.at,cambridgegreys.com,sipsolutions.net,minyard.net,cmu.edu,redhat.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,acm.org,ziepe.ca,ideasonboard.com,google.com,suse.de,HansenPartnership.com,oracle.com,arm.com,linuxfoundation.org,rowland.harvard.edu,linux.alibaba.com,akamai.com,antgroup.com,orcam.me.uk,infradead.org,linux.ibm.com,alien8.de,zytor.com,atomlin.com,linux-foundation.org,canonical.com,paul-moore.com,namei.org,hallyn.com,vger.kernel.org,googlegroups.com,kvack.org,lists.ubuntu.com,lists.infradead.org,lists.sourceforge.net,nongnu.org,lists.freedesktop.org,lists.ozlabs.org,lists.one-eyed-alien.net,lists.linux.dev];
-	DKIM_TRACE(0.00)[suse.com:+];
-	TAGGED_FROM(0.00)[bounces-291557-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_GT_50(0.00)[98];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.com:mid,suse.com:dkim]
-X-Rspamd-Queue-Id: 8F3305D161B
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 6FA625D1698
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/21/26 3:33 PM, Kees Cook wrote:
-> Hi,
-> 
-> I tried to trim the CC list here, but it's still pretty huge...
-> 
-> We've had a long-standing issue with "write to a string pointer" callbacks
-> that don't bounds check the destination (and for which the bounds is
-> also not part of the callback prototype, even if it is "known" to be
-> PAGE_SIZE, which sysfs_emit() depends on). Both moduleparams and sysfs
-> use this pattern. As a first step, and to test the migration method,
-> migrate moduleparams first.
-> 
-> There are 2 "mechanical" treewide patches that are handled by Coccinelle:
-> - treewide: Convert struct kernel_param_ops initializers to DEFINE_KERNEL_PARAM_OPS
-> - treewide: Convert custom kernel_param_ops .get callbacks to seq_buf via cocci
-> 
-> The last treewide patch is manual, and may need to be broken up into
-> per-subsystem patches, though I'd prefer to avoid this, as it would
-> extend the migration from 1 relase to at least 2 releases. (1 to
-> release the migration infrastructure, then 1 release to collect all the
-> subsystem changes, and possibly 1 more release to remove the migration
-> infrastructure.)
-> 
-> Thoughts, questions?
+Add hardware TCP Large Receive Offload (LRO) support to the airoha_eth
+driver, leveraging the EN7581/AN7583 SoC's 8 dedicated LRO hardware queues
+mapped to RX queues 24–31. LRO hw offloading does not support
+Scatter-Gather (SG) so it is required to increase the page_pool allocation
+order to 2 for RX queues 24–31 (LRO queues).
 
-This looks reasonable to me. I added a few minor comments on the patches
-but they already look solid.
+Performance comparison between GRO and hw LRO has been carried out using
+a 10Gbps NIC:
 
+GRO: ~2.7 Gbps
+LRO: ~8.1 Gbps
+
+Please note with respect to the previous implementation, page_pool
+allocation order has been reduced from 5 to 2.
+
+Tested-by: Madhur Agrawal <madhur.agrawal@airoha.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in RFC v2:
+- Improve performances fixing buf_size computation.
+- Fix possible overflow in REG_CDM_LRO_LIMIT() register configuration.
+- Require the device to be not running before configuring LRO.
+- Fix configuration order in airoha_fe_lro_is_enabled().
+- Check skb header length in airoha_qdma_lro_rx_process().
+- Do not check net_device feature in airoha_qdma_rx_process() before
+  executing airoha_qdma_lro_rx_process() but rely on
+  airoha_qdma_lro_rx_process() logic.
+- Fix possible double recycle in airoha_qdma_rx_process() for LRO
+  packets.
+- Always use AIROHA_RXQ_LRO_MAX_AGG_COUNT macro for max LRO aggregated
+  fragments in airoha_fe_lro_init_rx_queue().
+- Link to v1: https://lore.kernel.org/r/20260520-airoha-eth-lro-v1-1-129cc33766e9@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_eth.c  | 217 +++++++++++++++++++++++++++---
+ drivers/net/ethernet/airoha/airoha_eth.h  |  24 ++++
+ drivers/net/ethernet/airoha/airoha_regs.h |  22 ++-
+ 3 files changed, 247 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 6418fe0c9f80..c8e5abe8942a 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -12,6 +12,7 @@
+ #include <net/dst_metadata.h>
+ #include <net/page_pool/helpers.h>
+ #include <net/pkt_cls.h>
++#include <net/tcp.h>
+ #include <uapi/linux/ppp_defs.h>
+ 
+ #include "airoha_regs.h"
+@@ -431,6 +432,48 @@ static void airoha_fe_crsn_qsel_init(struct airoha_eth *eth)
+ 				 CDM_CRSN_QSEL_Q1));
+ }
+ 
++static void airoha_fe_lro_init_rx_queue(struct airoha_eth *eth, int qdma_id,
++					int lro_queue_index, int qid,
++					int buf_size)
++{
++	int id = qdma_id + 1;
++
++	airoha_fe_rmw(eth, REG_CDM_LRO_LIMIT(id),
++		      CDM_LRO_AGG_NUM_MASK | CDM_LRO_AGG_SIZE_MASK,
++		      FIELD_PREP(CDM_LRO_AGG_SIZE_MASK, buf_size) |
++		      FIELD_PREP(CDM_LRO_AGG_NUM_MASK,
++				 AIROHA_RXQ_LRO_MAX_AGG_COUNT));
++	airoha_fe_rmw(eth, REG_CDM_LRO_AGE_TIME(id),
++		      CDM_LRO_AGE_TIME_MASK | CDM_LRO_AGG_TIME_MASK,
++		      FIELD_PREP(CDM_LRO_AGE_TIME_MASK,
++				 AIROHA_RXQ_LRO_MAX_AGE_TIME) |
++		      FIELD_PREP(CDM_LRO_AGG_TIME_MASK,
++				 AIROHA_RXQ_LRO_MAX_AGG_TIME));
++	airoha_fe_rmw(eth, REG_CDM_LRO_RXQ(id, lro_queue_index),
++		      LRO_RXQ_MASK(lro_queue_index),
++		      __field_prep(LRO_RXQ_MASK(lro_queue_index), qid));
++	airoha_fe_set(eth, REG_CDM_LRO_EN(id), BIT(lro_queue_index));
++}
++
++static void airoha_fe_lro_disable(struct airoha_eth *eth, int qdma_id)
++{
++	int i, id = qdma_id + 1;
++
++	airoha_fe_clear(eth, REG_CDM_LRO_EN(id), LRO_RXQ_EN_MASK);
++	airoha_fe_clear(eth, REG_CDM_LRO_LIMIT(id),
++			CDM_LRO_AGG_NUM_MASK | CDM_LRO_AGG_SIZE_MASK);
++	airoha_fe_clear(eth, REG_CDM_LRO_AGE_TIME(id),
++			CDM_LRO_AGE_TIME_MASK | CDM_LRO_AGG_TIME_MASK);
++	for (i = 0; i < AIROHA_MAX_NUM_LRO_QUEUES; i++)
++		airoha_fe_clear(eth, REG_CDM_LRO_RXQ(id, i), LRO_RXQ_MASK(i));
++}
++
++static bool airoha_fe_lro_is_enabled(struct airoha_eth *eth, int qdma_id)
++{
++	return airoha_fe_get(eth, REG_CDM_LRO_EN(qdma_id + 1),
++			     LRO_RXQ_EN_MASK);
++}
++
+ static int airoha_fe_init(struct airoha_eth *eth)
+ {
+ 	airoha_fe_maccr_init(eth);
+@@ -587,6 +630,85 @@ static int airoha_qdma_get_gdm_port(struct airoha_eth *eth,
+ 	return port >= ARRAY_SIZE(eth->ports) ? -EINVAL : port;
+ }
+ 
++static int airoha_qdma_lro_rx_process(struct airoha_queue *q,
++				      struct airoha_qdma_desc *desc)
++{
++	u32 desc_ctrl = le32_to_cpu(READ_ONCE(desc->ctrl));
++	u32 msg1 = le32_to_cpu(READ_ONCE(desc->msg1));
++	u32 msg2 = le32_to_cpu(READ_ONCE(desc->msg2));
++	u32 msg3 = le32_to_cpu(READ_ONCE(desc->msg3));
++	struct sk_buff *skb = q->skb;
++	u32 len, th_off, tcp_ack_seq;
++	u16 tcp_win, l2_len;
++	struct tcphdr *th;
++	bool ipv4, ipv6;
++
++	if (FIELD_GET(QDMA_ETH_RXMSG_AGG_COUNT_MASK, msg2) <= 1)
++		return 0;
++
++	ipv4 = FIELD_GET(QDMA_ETH_RXMSG_IP4_MASK, msg1);
++	ipv6 = FIELD_GET(QDMA_ETH_RXMSG_IP6_MASK, msg1);
++	if (!ipv4 && !ipv6)
++		return -EOPNOTSUPP;
++
++	l2_len = FIELD_GET(QDMA_ETH_RXMSG_L2_LEN_MASK, msg2);
++	len = FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
++	if (ipv4) {
++		struct iphdr *iph;
++
++		if (!pskb_may_pull(skb, l2_len + sizeof(*iph)))
++			return -EINVAL;
++
++		iph = (struct iphdr *)(skb->data + l2_len);
++		if (iph->protocol != IPPROTO_TCP)
++			return -EOPNOTSUPP;
++
++		iph->tot_len = cpu_to_be16(len - l2_len);
++		iph->check = 0;
++		iph->check = ip_fast_csum((void *)iph, iph->ihl);
++		th_off = l2_len + (iph->ihl << 2);
++	} else {
++		struct ipv6hdr *ip6h;
++
++		if (!pskb_may_pull(skb, l2_len + sizeof(*ip6h)))
++			return -EINVAL;
++
++		ip6h = (struct ipv6hdr *)(skb->data + l2_len);
++		if (ip6h->nexthdr != NEXTHDR_TCP)
++			return -EOPNOTSUPP;
++
++		ip6h->payload_len = cpu_to_be16(len - l2_len - sizeof(*ip6h));
++		th_off = l2_len + sizeof(*ip6h);
++	}
++
++	tcp_win = FIELD_GET(QDMA_ETH_RXMSG_TCP_WIN_MASK, msg3);
++	tcp_ack_seq = le32_to_cpu(READ_ONCE(desc->data));
++
++	if (!pskb_may_pull(skb, th_off + sizeof(*th)))
++		return -EINVAL;
++
++	th = (struct tcphdr *)(skb->data + th_off);
++	th->ack_seq = cpu_to_be32(tcp_ack_seq);
++	th->window = cpu_to_be16(tcp_win);
++
++	/* Check tcp timestamp option */
++	if (th->doff == (sizeof(*th) + TCPOLEN_TSTAMP_ALIGNED) / 4) {
++		__be32 *topt = (__be32 *)(th + 1);
++
++		if (*topt == cpu_to_be32((TCPOPT_NOP << 24) |
++					 (TCPOPT_NOP << 16) |
++					 (TCPOPT_TIMESTAMP << 8) |
++					 TCPOLEN_TIMESTAMP)) {
++			__le32 tcp_ts_reply = READ_ONCE(desc->tcp_ts_reply);
++
++			put_unaligned_be32(le32_to_cpu(tcp_ts_reply),
++					   topt + 2);
++		}
++	}
++
++	return 0;
++}
++
+ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
+ {
+ 	enum dma_data_direction dir = page_pool_get_dma_dir(q->page_pool);
+@@ -634,11 +756,15 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
+ 
+ 			skb_reserve(q->skb, AIROHA_RX_HEADROOM);
+ 			__skb_put(q->skb, len);
+-			skb_mark_for_recycle(q->skb);
+ 			q->skb->dev = port->dev;
+-			q->skb->protocol = eth_type_trans(q->skb, port->dev);
+ 			q->skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 			skb_record_rx_queue(q->skb, qid);
++
++			if (airoha_qdma_lro_rx_process(q, desc) < 0)
++				goto free_frag;
++
++			q->skb->protocol = eth_type_trans(q->skb, port->dev);
++			skb_mark_for_recycle(q->skb);
+ 		} else { /* scattered frame */
+ 			struct skb_shared_info *shinfo = skb_shinfo(q->skb);
+ 			int nr_frags = shinfo->nr_frags;
+@@ -727,23 +853,18 @@ static int airoha_qdma_rx_napi_poll(struct napi_struct *napi, int budget)
+ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
+ 				     struct airoha_qdma *qdma, int ndesc)
+ {
+-	const struct page_pool_params pp_params = {
+-		.order = 0,
+-		.pool_size = 256,
++	struct page_pool_params pp_params = {
+ 		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+ 		.dma_dir = DMA_FROM_DEVICE,
+-		.max_len = PAGE_SIZE,
+ 		.nid = NUMA_NO_NODE,
+ 		.dev = qdma->eth->dev,
+ 		.napi = &q->napi,
+ 	};
++	int pp_order, qid = q - &qdma->q_rx[0], thr;
+ 	struct airoha_eth *eth = qdma->eth;
+-	int qid = q - &qdma->q_rx[0], thr;
+ 	dma_addr_t dma_addr;
+ 
+-	q->buf_size = PAGE_SIZE / 2;
+ 	q->qdma = qdma;
+-
+ 	q->entry = devm_kzalloc(eth->dev, ndesc * sizeof(*q->entry),
+ 				GFP_KERNEL);
+ 	if (!q->entry)
+@@ -754,6 +875,11 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
+ 	if (!q->desc)
+ 		return -ENOMEM;
+ 
++	pp_order = airoha_qdma_is_lro_queue(q) ? AIROHA_LRO_PAGE_ORDER : 0;
++	pp_params.order = pp_order;
++	pp_params.pool_size = 256;
++	pp_params.max_len = PAGE_SIZE << pp_order;
++
+ 	q->page_pool = page_pool_create(&pp_params);
+ 	if (IS_ERR(q->page_pool)) {
+ 		int err = PTR_ERR(q->page_pool);
+@@ -762,6 +888,8 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
+ 		return err;
+ 	}
+ 
++	q->buf_size = airoha_qdma_is_lro_queue(q) ? pp_params.max_len
++						  : pp_params.max_len / 2;
+ 	q->ndesc = ndesc;
+ 	netif_napi_add(eth->napi_dev, &q->napi, airoha_qdma_rx_napi_poll);
+ 
+@@ -1993,6 +2121,67 @@ int airoha_get_fe_port(struct airoha_gdm_port *port)
+ 	}
+ }
+ 
++static int airoha_dev_set_features(struct net_device *dev,
++				   netdev_features_t features)
++{
++	netdev_features_t diff = dev->features ^ features;
++	struct airoha_gdm_port *port = netdev_priv(dev);
++	struct airoha_qdma *qdma = port->qdma;
++	struct airoha_eth *eth = qdma->eth;
++	int qdma_id = qdma - &eth->qdma[0];
++	int i;
++
++	if (!(diff & NETIF_F_LRO))
++		return 0;
++
++	if (netif_running(dev))
++		return -EBUSY;
++
++	/* reset LRO configuration */
++	if (features & NETIF_F_LRO) {
++		int lro_queue_index = 0;
++
++		if (airoha_fe_lro_is_enabled(eth, qdma_id))
++			return 0;
++
++		for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
++			struct airoha_queue *q = &qdma->q_rx[i];
++			u32 size;
++
++			if (!q->ndesc)
++				continue;
++
++			if (!airoha_qdma_is_lro_queue(q))
++				continue;
++
++			size = SKB_WITH_OVERHEAD(AIROHA_RX_LEN(q->buf_size));
++			size = min_t(u32, size, CDM_LRO_AGG_SIZE_MASK);
++			airoha_fe_lro_init_rx_queue(eth, qdma_id,
++						    lro_queue_index, i, size);
++			lro_queue_index++;
++		}
++	} else {
++		for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
++			struct airoha_gdm_port *p = eth->ports[i];
++
++			if (!p)
++				continue;
++
++			if (p->qdma != qdma)
++				continue;
++
++			if (p->dev == dev)
++				continue;
++
++			if (p->dev->features & NETIF_F_LRO)
++				return 0;
++		}
++		airoha_fe_lro_disable(eth, qdma_id);
++	}
++
++	return 0;
++}
++
+ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 				   struct net_device *dev)
+ {
+@@ -2892,6 +3081,7 @@ static const struct net_device_ops airoha_netdev_ops = {
+ 	.ndo_stop		= airoha_dev_stop,
+ 	.ndo_change_mtu		= airoha_dev_change_mtu,
+ 	.ndo_select_queue	= airoha_dev_select_queue,
++	.ndo_set_features	= airoha_dev_set_features,
+ 	.ndo_start_xmit		= airoha_dev_xmit,
+ 	.ndo_get_stats64        = airoha_dev_get_stats64,
+ 	.ndo_set_mac_address	= airoha_dev_set_macaddr,
+@@ -2989,12 +3179,9 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
+ 	dev->ethtool_ops = &airoha_ethtool_ops;
+ 	dev->max_mtu = AIROHA_MAX_MTU;
+ 	dev->watchdog_timeo = 5 * HZ;
+-	dev->hw_features = NETIF_F_IP_CSUM | NETIF_F_RXCSUM |
+-			   NETIF_F_TSO6 | NETIF_F_IPV6_CSUM |
+-			   NETIF_F_SG | NETIF_F_TSO |
+-			   NETIF_F_HW_TC;
+-	dev->features |= dev->hw_features;
+-	dev->vlan_features = dev->hw_features;
++	dev->hw_features = AIROHA_HW_FEATURES | NETIF_F_LRO;
++	dev->features |= AIROHA_HW_FEATURES;
++	dev->vlan_features = AIROHA_HW_FEATURES;
+ 	dev->dev.of_node = np;
+ 	SET_NETDEV_DEV(dev, eth->dev);
+ 
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index d3781103abb5..aed5077d3db5 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -43,6 +43,18 @@
+ 	 (_n) == 15 ? 128 :		\
+ 	 (_n) ==  0 ? 1024 : 16)
+ 
++#define AIROHA_LRO_PAGE_ORDER		2
++#define AIROHA_MAX_NUM_LRO_QUEUES	8
++#define AIROHA_RXQ_LRO_EN_MASK		0xff000000
++#define AIROHA_RXQ_LRO_MAX_AGG_COUNT	64
++#define AIROHA_RXQ_LRO_MAX_AGG_TIME	100
++#define AIROHA_RXQ_LRO_MAX_AGE_TIME	2000 /* 1ms */
++
++#define AIROHA_HW_FEATURES			\
++	(NETIF_F_IP_CSUM | NETIF_F_RXCSUM |	\
++	 NETIF_F_TSO6 | NETIF_F_IPV6_CSUM |	\
++	 NETIF_F_SG | NETIF_F_TSO | NETIF_F_HW_TC)
++
+ #define PSE_RSV_PAGES			128
+ #define PSE_QUEUE_RSV_PAGES		64
+ 
+@@ -661,6 +673,18 @@ static inline bool airoha_is_7583(struct airoha_eth *eth)
+ 	return eth->soc->version == 0x7583;
+ }
+ 
++static inline bool airoha_qdma_is_lro_queue(struct airoha_queue *q)
++{
++	struct airoha_qdma *qdma = q->qdma;
++	int qid = q - &qdma->q_rx[0];
++
++	/* EN7581 SoC supports at most 8 LRO rx queues */
++	BUILD_BUG_ON(hweight32(AIROHA_RXQ_LRO_EN_MASK) >
++		     AIROHA_MAX_NUM_LRO_QUEUES);
++
++	return !!(AIROHA_RXQ_LRO_EN_MASK & BIT(qid));
++}
++
+ int airoha_get_fe_port(struct airoha_gdm_port *port);
+ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
+ 			      struct airoha_gdm_port *port);
+diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
+index 436f3c8779c1..dfc786583774 100644
+--- a/drivers/net/ethernet/airoha/airoha_regs.h
++++ b/drivers/net/ethernet/airoha/airoha_regs.h
+@@ -122,6 +122,20 @@
+ #define CDM_CRSN_QSEL_REASON_MASK(_n)	\
+ 	GENMASK(4 + (((_n) % 4) << 3),	(((_n) % 4) << 3))
+ 
++#define REG_CDM_LRO_RXQ(_n, _m)		(CDM_BASE(_n) + 0x78 + ((_m) & 0x4))
++#define LRO_RXQ_MASK(_n)		GENMASK(4 + (((_n) & 0x3) << 3), ((_n) & 0x3) << 3)
++
++#define REG_CDM_LRO_EN(_n)		(CDM_BASE(_n) + 0x80)
++#define LRO_RXQ_EN_MASK			GENMASK(7, 0)
++
++#define REG_CDM_LRO_LIMIT(_n)		(CDM_BASE(_n) + 0x84)
++#define CDM_LRO_AGG_NUM_MASK		GENMASK(23, 16)
++#define CDM_LRO_AGG_SIZE_MASK		GENMASK(15, 0)
++
++#define REG_CDM_LRO_AGE_TIME(_n)	(CDM_BASE(_n) + 0x88)
++#define CDM_LRO_AGE_TIME_MASK		GENMASK(31, 16)
++#define CDM_LRO_AGG_TIME_MASK		GENMASK(15, 0)
++
+ #define REG_GDM_FWD_CFG(_n)		GDM_BASE(_n)
+ #define GDM_PAD_EN_MASK			BIT(28)
+ #define GDM_DROP_CRC_ERR_MASK		BIT(23)
+@@ -883,9 +897,15 @@
+ #define QDMA_ETH_RXMSG_SPORT_MASK	GENMASK(25, 21)
+ #define QDMA_ETH_RXMSG_CRSN_MASK	GENMASK(20, 16)
+ #define QDMA_ETH_RXMSG_PPE_ENTRY_MASK	GENMASK(15, 0)
++/* RX MSG2 */
++#define QDMA_ETH_RXMSG_AGG_COUNT_MASK	GENMASK(31, 24)
++#define QDMA_ETH_RXMSG_L2_LEN_MASK	GENMASK(6, 0)
++/* RX MSG3 */
++#define QDMA_ETH_RXMSG_AGG_LEN_MASK	GENMASK(31, 16)
++#define QDMA_ETH_RXMSG_TCP_WIN_MASK	GENMASK(15, 0)
+ 
+ struct airoha_qdma_desc {
+-	__le32 rsv;
++	__le32 tcp_ts_reply;
+ 	__le32 ctrl;
+ 	__le32 addr;
+ 	__le32 data;
+
+---
+base-commit: 3baa7ba4ab98af452925926ffc2ee58c683e3f28
+change-id: 20260520-airoha-eth-lro-a5d1c3631811
+
+Best regards,
 -- 
-Thanks,
-Petr
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
