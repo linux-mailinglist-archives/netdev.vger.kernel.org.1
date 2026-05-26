@@ -1,115 +1,70 @@
-Return-Path: <netdev+bounces-291509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291512-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLv0NFIFFWroSAcAu9opvQ
-	(envelope-from <netdev+bounces-291509-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:28:34 +0200
+	id KDyLOH8GFWokSQcAu9opvQ
+	(envelope-from <netdev+bounces-291512-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:33:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 356E95CFE87
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:28:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 499205CFF44
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C0CE1300A3A6
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 02:26:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 233B83040ABF
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 02:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FAA308F0A;
-	Tue, 26 May 2026 02:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E314308F26;
+	Tue, 26 May 2026 02:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aIqbJCo0"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jxnhjdmJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140B58460
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 02:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0241E305671;
+	Tue, 26 May 2026 02:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779762360; cv=none; b=VBtWxb5ABPAx0QHV7i7NSls11ugyyqmRNy9jA7l/yiRZB+BT02MrB30tFQX7HjJrTDJqy8oeknA9FHBfym8siBrH94V/0bPxZVnilpHFYAVgqZ8MKH24oXRfhy6IROS+6Qg56DrLQ/E8h7Rs3qfYzAMIHUlLkdeKspuyiatEHGI=
+	t=1779762535; cv=none; b=dk6LmtYOvUdF1Ipei44hYsR3tHVLcgr39hCA1ZEhpRTFN4HwwujglvPZKX2dOHwX6R6Sy3SvYQO/kO8lseEFVUNW61vnO7LQPobafxKbOZ6KAjJEN4tFnjqpR27QgxmPB7WTqPDV5AvpLlieAS+KJk197iMxS5Et35DvRdJoCWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779762360; c=relaxed/simple;
-	bh=NZsybeCaQAY2gJXlMxVE7V8Ip8oqeh1zeTnxdRrNEMI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oEg36PsHaQmDy5i1WN/Vp/kbLL2WK0aPSEskNSj1lLMPJIbDAmKW3xFO+pz/wDht6L7LDp5jkDEQJBREupQcpk+3xa7qj4nTtmpoPHdL4W16uUG9ZFQweMH5blqlE6cJjCxUeMpz46ZAQzypECSspfsq+N787WfoSBGmac9P42s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aIqbJCo0; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779762355;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=33PG31psqtzKKyL9YlsX5pLdBGFtUZt06yU1qeQL7VI=;
-	b=aIqbJCo0XQEKgTA2YA4Re8D8hMf0LPQrvtJE5STgVqdePPrMM/0xYlncquHOhe+FAkuR39
-	9giU5M3c6dqhw1IC6AqCwezcAbQ63csRN7nitGTrACbCh5vdfNYOqH7yOJaC4odiXOuAbM
-	D8A/ow9PzQSU27qPcVKzgHEglhxdnUQ=
-From: Hui Zhu <hui.zhu@linux.dev>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Shuah Khan <shuah@kernel.org>,
-	davem@davemloft.net,
+	s=arc-20240116; t=1779762535; c=relaxed/simple;
+	bh=7IXeQffTMEUb8jyLeaSLPHna3ot2oBn5fu3R2GLVAys=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gpUDID1+ZHMzuuN/AOpZck8YAr20dgdmPlfJfw81FF25/SM34Yf5eYTnTEgXOaZHHgAL03aEm6UakkiGpy4ieCizxtf7y69TeuLdVg7m1czbSV1ORb+DDxa0JtFkB6b0NoXP39NZMVgxYDRCGeD3Zx3ci8SYl7jDvnos+ksLDYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jxnhjdmJ; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=lw
+	4/4FT2rvt0MC5tdmiJL7oUXfl2ms2f6Q38CmkzsO0=; b=jxnhjdmJVIWAml/kE5
+	u5qCxxbg0JHWtE27q94QEN9ZgRfopHORr6sfGxYz1NZj7FaDA1/9eB+xaknOY9Ie
+	BZDnTh7i1h1pU7pbh58mw8+I8Nu2niWqaT6BYmbdYe4TT3890Ei02po91Cb0MizK
+	EsP3WPZNPJtsPzguS+4p3VVOw=
+Received: from PC-YLX4CAEK.company.local (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wAX0JUKBRVqTduMDQ--.20654S2;
+	Tue, 26 May 2026 10:27:23 +0800 (CST)
+From: Ding Hui <dinghui1111@163.com>
+To: andrew@lunn.ch,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	KP Singh <kpsingh@kernel.org>,
-	Tao Chen <chen.dylane@linux.dev>,
-	Mykyta Yatsenko <yatsenko@meta.com>,
-	Leon Hwang <leon.hwang@linux.dev>,
-	Anton Protopopov <a.s.protopopov@gmail.com>,
-	Amery Hung <ameryhung@gmail.com>,
-	Tobias Klauser <tklauser@distanz.ch>,
-	Eyal Birger <eyal.birger@gmail.com>,
-	Rong Tao <rongtao@cestc.cn>,
-	Hao Luo <haoluo@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Jeff Xu <jeffxu@chromium.org>,
-	mkoutny@suse.com,
-	Jan Hendrik Farr <kernel@jfarr.cc>,
-	Christian Brauner <brauner@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Paul Chaignon <paul.chaignon@gmail.com>,
-	Chen Ridong <chenridong@huaweicloud.com>,
-	Lance Yang <lance.yang@linux.dev>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: geliang@kernel.org,
-	baohua@kernel.org,
-	Hui Zhu <zhuhui@kylinos.cn>
-Subject: [RFC PATCH bpf-next v7 08/11] selftests/bpf: Add tests for memcg_bpf_ops
-Date: Tue, 26 May 2026 10:24:56 +0800
-Message-ID: <722df14b403dfbb123f1a1df3c72fbbfb998a31f.1779760876.git.zhuhui@kylinos.cn>
-In-Reply-To: <cover.1779760876.git.zhuhui@kylinos.cn>
-References: <cover.1779760876.git.zhuhui@kylinos.cn>
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Ding Hui <dinghui@lixiang.com>,
+	netdev@vger.kernel.org (open list:STMMAC ETHERNET DRIVER),
+	linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 ARCHITECTURE),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 ARCHITECTURE),
+	linux-kernel@vger.kernel.org (open list)
+Cc: xiasanbo@lixiang.com,
+	yangchen11@lixiang.com,
+	liuxuanjun@lixiang.com
+Subject: [PATCH v2] net: stmmac: fix fatal bus error on resume by reinitializing RX buffers
+Date: Tue, 26 May 2026 10:26:17 +0800
+Message-Id: <20260526022620.501229-1-dinghui1111@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -117,803 +72,213 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-CM-TRANSID:_____wAX0JUKBRVqTduMDQ--.20654S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3AF4UCFWfAr45uw1fKFyUWrg_yoWxAryrpa
+	yayw4DKr1kJrs3Gw4rJw48ZFy5Aan0yFW3Ww4xXw4a9a1a9r9avF1ayrWYya4UGr4kZr92
+	yr4DA39rCF1DAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jtiSdUUUUU=
+X-CM-SenderInfo: pglqwx1xlriiqr6rljoofrz/xtbC8wwkUGoVBQw11QAA3d
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291509-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,cmpxchg.org,linux-foundation.org,davemloft.net,fomichev.me,meta.com,distanz.ch,cestc.cn,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,huaweicloud.com,vger.kernel.org,kvack.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,lixiang.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-291512-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[163.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dinghui1111@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[59];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.966];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	NEURAL_HAM(-0.00)[-0.986];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,kylinos.cn:mid,kylinos.cn:email]
-X-Rspamd-Queue-Id: 356E95CFE87
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lixiang.com:email]
+X-Rspamd-Queue-Id: 499205CFF44
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Hui Zhu <zhuhui@kylinos.cn>
+From: Ding Hui <dinghui@lixiang.com>
 
-Add a comprehensive selftest suite for the `memcg_bpf_ops`
-functionality. These tests validate that BPF programs can correctly
-influence memory cgroup throttling behavior by implementing the new
-hooks.
+On suspend, stmmac_suspend() calls stmmac_disable_all_queues() which
+stops the RX NAPI, but the RX DMA engine may still be running for a
+short window before stmmac_stop_all_dma() takes effect. During that
+window the hardware can write incoming frames into the buffers pointed
+to by the RX descriptors and write back the descriptors (clearing the
+OWN bit and overwriting RDES0/1/2 with status/timestamp data). Because
+NAPI is already disabled, the driver never refills these descriptors,
+so the RX ring is left in a "consumed but not refilled" state with
+stale content in the descriptor buffer-address fields.
 
-The test suite is added in `prog_tests/memcg_ops.c` and covers
-several key scenarios:
+On resume, stmmac_clear_descriptors() only re-arms the OWN bit and
+does not repopulate the RX buffer address fields. When the DMA is
+restarted it dereferences these stale addresses and triggers a fatal
+bus error.
 
-1. `test_memcg_ops_over_high`:
-   Verifies that a BPF program can trigger throttling on a low-priority
-   cgroup by returning a delay from the `get_high_delay_ms` hook when a
-   high-priority cgroup is under pressure.
+Fix this without any allocation by introducing
+stmmac_reinit_rx_descriptors(), called from stmmac_resume() before
+stmmac_clear_descriptors(). The helper iterates every RX descriptor
+slot and re-programs its buffer address fields:
 
-2. `test_memcg_ops_below_low_over_high`:
-   Tests the combination of the `below_low` and `get_high_delay_ms`
-   hooks, ensuring they work together as expected.
+ - For normal (page_pool) queues: restore RDES0/1 from buf->addr and
+   RDES2 from buf->sec_addr. The DMA mapping has remained valid across
+   suspend/resume because no pages were freed.
 
-3. `test_memcg_ops_below_min_over_high`:
-   Validates the interaction between the `below_min` and
-   `get_high_delay_ms` hooks.
+ - For AF_XDP zero-copy queues: restore the DMA address from
+   xsk_buff_xdp_get_dma(buf->xdp). Slots with buf->xdp == NULL (TX-only
+   XSK socket) are skipped to avoid a NULL-pointer dereference.
 
-The test framework sets up a cgroup hierarchy with high and low
-priority groups, attaches BPF programs, runs memory-intensive
-workloads, and asserts that the observed throttling (measured by
-workload execution time) matches expectations.
+ - For chain mode: call stmmac_mode_init() to rebuild the des3 next-
+   descriptor pointer chain, which hardware may have overwritten with
+   a PTP timestamp value (as noted in chain_mode.c:refill_desc3()).
 
-The BPF program (`progs/memcg_ops.c`) uses a tracepoint on
-`memcg:count_memcg_events` (specifically PGFAULT) to detect memory
-pressure and trigger the appropriate hooks in response. This test
-suite provides essential validation for the new memory control
-mechanisms.
+This approach keeps all RX buffers alive across the PM transition and
+avoids any allocation in the resume path, eliminating the OOM risk
+raised against the previous approach of freeing and re-allocating
+buffers.
 
-Signed-off-by: Barry Song <baohua@kernel.org>
-Signed-off-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Hui Zhu <zhuhui@kylinos.cn>
+Signed-off-by: Ding Hui <dinghui@lixiang.com>
 ---
- MAINTAINERS                                   |   2 +
- .../selftests/bpf/prog_tests/memcg_ops.c      | 561 ++++++++++++++++++
- tools/testing/selftests/bpf/progs/memcg_ops.c | 132 +++++
- 3 files changed, 695 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/memcg_ops.c
- create mode 100644 tools/testing/selftests/bpf/progs/memcg_ops.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index dfc621ff629d..1be243e544da 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6567,6 +6567,8 @@ F:	mm/memcontrol-v1.h
- F:	mm/page_counter.c
- F:	mm/swap_cgroup.c
- F:	samples/cgroup/*
-+F:	tools/testing/selftests/bpf/prog_tests/memcg_ops.c
-+F:	tools/testing/selftests/bpf/progs/memcg_ops.c
- F:	tools/testing/selftests/cgroup/memcg_protection.m
- F:	tools/testing/selftests/cgroup/test_hugetlb_memcg.c
- F:	tools/testing/selftests/cgroup/test_kmem.c
-diff --git a/tools/testing/selftests/bpf/prog_tests/memcg_ops.c b/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
-new file mode 100644
-index 000000000000..19fd4fde2266
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
-@@ -0,0 +1,561 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Memory controller eBPF struct ops test
+Changes in v2:
+- Introducing stmmac_reinit_rx_descriptors() to reinitializing rx
+  buffers without any allocation.
+- Modify commit log.
+- Link to v1:
+  https://lore.kernel.org/netdev/20260515053856.2310369-1-dinghui1111@163.com/
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 90 +++++++++++++++++++
+ 1 file changed, 90 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 3591755ea30b..0dc27d8c66a0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1642,6 +1642,79 @@ static void stmmac_clear_descriptors(struct stmmac_priv *priv,
+ 		stmmac_clear_tx_descriptors(priv, dma_conf, queue);
+ }
+ 
++/**
++ * stmmac_reinit_rx_descriptors - re-program RX descriptors from existing
++ *				   buffers (allocation-free)
++ * @priv: driver private structure
++ * @dma_conf: structure holding the dma data
++ * @queue: RX queue index
++ *
++ * Description: walk rx_q->buf_pool[] and re-program every RX descriptor's
++ * buffer-address fields from the buffers that are already attached to the
++ * queue. This is intended for the resume path: between suspend and resume
++ * the descriptor buffer-address fields may have been overwritten by HW
++ * writeback (RDESx are reused for status/length on completion), but the
++ * underlying RX buffers (page_pool pages or XSK frames) are still alive
++ * in buf_pool[]. By re-using them we avoid any allocation on resume,
++ * which is unsafe under memory pressure.
++ *
++ * This helper is expected to be called only in stmmac_resume.
 + */
-+
-+#include <test_progs.h>
-+#include <bpf/btf.h>
-+#include <sys/mman.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include "cgroup_helpers.h"
-+
-+struct local_config {
-+	u64 threshold;
-+	u64 high_cgroup_id;
-+	bool use_below_low;
-+	bool use_below_min;
-+	unsigned int over_high_ms;
-+} local_config;
-+
-+#include "memcg_ops.skel.h"
-+
-+#define TRIGGER_THRESHOLD 1
-+#define OVER_HIGH_MS 2000
-+#define FILE_SIZE (64 * 1024 * 1024ul)
-+#define BUFFER_SIZE (4096)
-+#define CG_LIMIT (120 * 1024 * 1024ul)
-+
-+#define CG_DIR "/memcg_ops_test"
-+#define CG_HIGH_DIR CG_DIR "/high"
-+#define CG_LOW_DIR CG_DIR "/low"
-+
-+static int
-+setup_high_low_cgroups(u64 *high_cgroup_id, int *low_cgroup_fd,
-+		       int *high_cgroup_fd)
++static void stmmac_reinit_rx_descriptors(struct stmmac_priv *priv,
++					 struct stmmac_dma_conf *dma_conf,
++					 u32 queue)
 +{
-+	int ret;
-+	char limit_buf[20];
++	struct stmmac_rx_queue *rx_q = &dma_conf->rx_queue[queue];
++	int i;
 +
-+	ret = setup_cgroup_environment();
-+	if (!ASSERT_OK(ret, "setup_cgroup_environment"))
-+		goto cleanup;
++	for (i = 0; i < dma_conf->dma_rx_size; i++) {
++		struct stmmac_rx_buffer *buf = &rx_q->buf_pool[i];
++		struct dma_desc *p = stmmac_get_rx_desc(priv, rx_q, i);
 +
-+	ret = create_and_get_cgroup(CG_DIR);
-+	if (!ASSERT_GE(ret, 0, "create_and_get_cgroup "CG_DIR))
-+		goto cleanup;
-+	close(ret);
-+	ret = enable_controllers(CG_DIR, "memory");
-+	if (!ASSERT_OK(ret, "enable_controllers"))
-+		goto cleanup;
-+	snprintf(limit_buf, 20, "%lu", CG_LIMIT);
-+	ret = write_cgroup_file(CG_DIR, "memory.max", limit_buf);
-+	if (!ASSERT_OK(ret, "write_cgroup_file memory.max"))
-+		goto cleanup;
-+	ret = write_cgroup_file(CG_DIR, "memory.swap.max", "0");
-+	if (!ASSERT_OK(ret, "write_cgroup_file memory.swap.max"))
-+		goto cleanup;
++		if (rx_q->xsk_pool) {
++			dma_addr_t dma_addr;
 +
-+	ret = create_and_get_cgroup(CG_HIGH_DIR);
-+	if (!ASSERT_GE(ret, 0, "create_and_get_cgroup "CG_HIGH_DIR))
-+		goto cleanup;
-+	if (high_cgroup_fd)
-+		*high_cgroup_fd = ret;
-+	else
-+		close(ret);
-+	*high_cgroup_id = get_cgroup_id(CG_HIGH_DIR);
-+	if (!ASSERT_GT(*high_cgroup_id, 0, "get_cgroup_id"))
-+		goto cleanup;
++			/* The XSK pool may not be fully populated (e.g.
++			 * xdpsock TX-only); skip empty slots.
++			 */
++			if (!buf->xdp)
++				continue;
 +
-+	ret = create_and_get_cgroup(CG_LOW_DIR);
-+	if (!ASSERT_GE(ret, 0, "create_and_get_cgroup "CG_LOW_DIR))
-+		goto cleanup;
-+	if (low_cgroup_fd)
-+		*low_cgroup_fd = ret;
-+	else
-+		close(ret);
++			dma_addr = xsk_buff_xdp_get_dma(buf->xdp);
++			stmmac_set_desc_addr(priv, p, dma_addr);
++			stmmac_set_desc_sec_addr(priv, p, 0, false);
++		} else {
++			/* Theoretically unreachable: napi_disable() in
++			 * stmmac_suspend() ensures all initialized slots
++			 * have a valid page before we get here.
++			 * Defensive check only.
++			 */
++			if (!buf->page)
++				continue;
 +
-+	return 0;
++			stmmac_set_desc_addr(priv, p, buf->addr);
++			stmmac_set_desc_sec_addr(priv, p, buf->sec_addr,
++						 priv->sph_active &&
++						 buf->sec_page);
 +
-+cleanup:
-+	cleanup_cgroup_environment();
-+	return -1;
-+}
-+
-+int write_file(const char *filename)
-+{
-+	int ret = -1;
-+	size_t written = 0;
-+	char *buffer;
-+	FILE *fp;
-+
-+	fp = fopen(filename, "wb");
-+	if (!fp)
-+		goto out;
-+
-+	buffer = malloc(BUFFER_SIZE);
-+	if (!buffer)
-+		goto cleanup_fp;
-+
-+	memset(buffer, 'A', BUFFER_SIZE);
-+
-+	while (written < FILE_SIZE) {
-+		size_t to_write = (FILE_SIZE - written < BUFFER_SIZE) ?
-+				   (FILE_SIZE - written) :
-+				   BUFFER_SIZE;
-+
-+		if (fwrite(buffer, 1, to_write, fp) != to_write)
-+			goto cleanup;
-+		written += to_write;
-+	}
-+
-+	ret = 0;
-+cleanup:
-+	free(buffer);
-+cleanup_fp:
-+	fclose(fp);
-+out:
-+	return ret;
-+}
-+
-+int read_file(const char *filename, int iterations)
-+{
-+	int ret = -1;
-+	long page_size = sysconf(_SC_PAGESIZE);
-+	char *p;
-+	char *map;
-+	size_t i;
-+	int fd;
-+	struct stat sb;
-+
-+	fd = open(filename, O_RDONLY);
-+	if (fd == -1)
-+		goto out;
-+
-+	if (fstat(fd, &sb) == -1)
-+		goto cleanup_fd;
-+
-+	if (sb.st_size != FILE_SIZE) {
-+		fprintf(stderr, "File size mismatch: expected %lu, got %lu\n",
-+			(unsigned long)FILE_SIZE, (unsigned long)sb.st_size);
-+		goto cleanup_fd;
-+	}
-+
-+	map = mmap(NULL, FILE_SIZE, PROT_READ, MAP_PRIVATE, fd, 0);
-+	if (map == MAP_FAILED)
-+		goto cleanup_fd;
-+
-+	for (int iter = 0; iter < iterations; iter++) {
-+		for (i = 0; i < FILE_SIZE; i += page_size) {
-+			/* access a byte to trigger page fault */
-+			p = &map[i];
-+			__asm__ __volatile__("" : : "r"(p) : "memory");
++			if (dma_conf->dma_buf_sz == BUF_SIZE_16KiB)
++				stmmac_init_desc3(priv, p);
 +		}
-+
-+		if (env.verbosity >= VERBOSE_NORMAL)
-+			printf("%s %d %d done\n", __func__, getpid(), iter);
 +	}
 +
-+	if (munmap(map, FILE_SIZE) == -1)
-+		goto cleanup_fd;
++	/* Chain mode: re-link descriptor 'next' pointers. This is
++	 * allocation-free; it just rewrites the per-descriptor next
++	 * field which may have been clobbered by HW writeback.
++	 */
++	if (priv->descriptor_mode == STMMAC_CHAIN_MODE) {
++		void *des = priv->extend_desc ? (void *)rx_q->dma_erx
++					      : (void *)rx_q->dma_rx;
 +
-+	ret = 0;
-+
-+cleanup_fd:
-+	close(fd);
-+out:
-+	return ret;
-+}
-+
-+static int
-+real_test_memcg_ops_child_work(const char *cgroup_path,
-+			       char *data_filename,
-+			       char *time_filename,
-+			       int read_times)
-+{
-+	struct timeval start, end;
-+	double elapsed;
-+	FILE *fp;
-+	int ret = -1;
-+
-+	if (!ASSERT_OK(join_parent_cgroup(cgroup_path), "join_parent_cgroup"))
-+		goto out;
-+
-+	if (env.verbosity >= VERBOSE_NORMAL)
-+		printf("%s %d begin\n", __func__, getpid());
-+
-+	gettimeofday(&start, NULL);
-+
-+	if (!ASSERT_OK(write_file(data_filename), "write_file"))
-+		goto out;
-+
-+	if (env.verbosity >= VERBOSE_NORMAL)
-+		printf("%s %d write_file done\n", __func__, getpid());
-+
-+	if (!ASSERT_OK(read_file(data_filename, read_times), "read_file"))
-+		goto out;
-+
-+	gettimeofday(&end, NULL);
-+
-+	elapsed = (end.tv_sec - start.tv_sec) +
-+		  (end.tv_usec - start.tv_usec) / 1000000.0;
-+
-+	if (env.verbosity >= VERBOSE_NORMAL)
-+		printf("%s %d end %.6f\n", __func__, getpid(), elapsed);
-+
-+	fp = fopen(time_filename, "w");
-+	if (!ASSERT_OK_PTR(fp, "fopen"))
-+		goto out;
-+	fprintf(fp, "%.6f", elapsed);
-+	fclose(fp);
-+
-+	ret = 0;
-+out:
-+	return ret;
-+}
-+
-+static int get_time(char *time_filename, double *time)
-+{
-+	int ret = -1;
-+	FILE *fp;
-+	char buf[64];
-+
-+	fp = fopen(time_filename, "r");
-+	if (!ASSERT_OK_PTR(fp, "fopen"))
-+		goto out;
-+
-+	if (!ASSERT_OK_PTR(fgets(buf, sizeof(buf), fp), "fgets"))
-+		goto cleanup;
-+
-+	if (sscanf(buf, "%lf", time) != 1) {
-+		PRINT_FAIL("sscanf %s", buf);
-+		goto cleanup;
++		stmmac_mode_init(priv, des, rx_q->dma_rx_phy,
++				 dma_conf->dma_rx_size, priv->extend_desc);
 +	}
-+
-+	ret = 0;
-+cleanup:
-+	fclose(fp);
-+out:
-+	return ret;
 +}
 +
-+static void real_test_memcg_ops(int read_times)
-+{
-+	int ret;
-+	char data_file1[] = "/tmp/test_data_1_XXXXXX";
-+	char data_file2[] = "/tmp/test_data_2_XXXXXX";
-+	char time_file1[] = "/tmp/test_time_1_XXXXXX";
-+	char time_file2[] = "/tmp/test_time_2_XXXXXX";
-+	pid_t pid1, pid2;
-+	double time1, time2;
-+	int status;
-+
-+	ret = mkstemp(data_file1);
-+	if (!ASSERT_GE(ret, 0, "mkstemp"))
-+		return;
-+	close(ret);
-+	ret = mkstemp(data_file2);
-+	if (!ASSERT_GE(ret, 0, "mkstemp"))
-+		goto cleanup_data_file1;
-+	close(ret);
-+	ret = mkstemp(time_file1);
-+	if (!ASSERT_GE(ret, 0, "mkstemp"))
-+		goto cleanup_data_file2;
-+	close(ret);
-+	ret = mkstemp(time_file2);
-+	if (!ASSERT_GE(ret, 0, "mkstemp"))
-+		goto cleanup_time_file1;
-+	close(ret);
-+
-+	pid1 = fork();
-+	if (!ASSERT_GE(pid1, 0, "fork"))
-+		goto cleanup;
-+	if (pid1 == 0) {
-+		exit(real_test_memcg_ops_child_work(CG_LOW_DIR,
-+						    data_file1,
-+						    time_file1,
-+						    read_times));
-+	}
-+
-+	pid2 = fork();
-+	if (!ASSERT_GE(pid2, 0, "fork")) {
-+		/* Reap first child to avoid a zombie if second fork fails. */
-+		(void)waitpid(pid1, NULL, 0);
-+		goto cleanup;
-+	}
-+	if (pid2 == 0) {
-+		exit(real_test_memcg_ops_child_work(CG_HIGH_DIR,
-+						    data_file2,
-+						    time_file2,
-+						    read_times));
-+	}
-+
-+	ret = waitpid(pid1, &status, 0);
-+	if (!ASSERT_GT(ret, 0, "child1 waitpid"))
-+		goto cleanup;
-+	if (!ASSERT_TRUE(WIFEXITED(status), "child1 exited normally"))
-+		goto cleanup;
-+	if (!ASSERT_EQ(WEXITSTATUS(status), 0, "child1 exit status"))
-+		goto cleanup;
-+
-+	ret = waitpid(pid2, &status, 0);
-+	if (!ASSERT_GT(ret, 0, "child2 waitpid"))
-+		goto cleanup;
-+	if (!ASSERT_TRUE(WIFEXITED(status), "child2 exited normally"))
-+		goto cleanup;
-+	if (!ASSERT_EQ(WEXITSTATUS(status), 0, "child2 exit status"))
-+		goto cleanup;
-+
-+	if (get_time(time_file1, &time1))
-+		goto cleanup;
-+
-+	if (get_time(time_file2, &time2))
-+		goto cleanup;
-+
-+	if (time1 < time2 || time1 - time2 <= 1)
-+		PRINT_FAIL("Low priority cgroup not slower: low=%f vs high=%f",
-+			   time1, time2);
-+
-+cleanup:
-+	unlink(time_file2);
-+cleanup_time_file1:
-+	unlink(time_file1);
-+cleanup_data_file2:
-+	unlink(data_file2);
-+cleanup_data_file1:
-+	unlink(data_file1);
-+}
-+
-+void test_memcg_ops_over_high(void)
-+{
-+	int err, map_fd;
-+	struct memcg_ops *skel = NULL;
-+	struct bpf_map *map;
-+	struct memcg_ops__bss *bss_data;
-+	__u32 key = 0;
-+	struct bpf_program *prog = NULL;
-+	struct bpf_link *link = NULL, *link2 = NULL;
-+	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
-+	u64 high_cgroup_id;
-+	int low_cgroup_fd = -1;
-+
-+	err = setup_high_low_cgroups(&high_cgroup_id, &low_cgroup_fd, NULL);
-+	if (!ASSERT_OK(err, "setup_high_low_cgroups"))
-+		goto out;
-+
-+	skel = memcg_ops__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "memcg_ops__open_and_load"))
-+		goto out;
-+
-+	map = bpf_object__find_map_by_name(skel->obj, ".bss");
-+	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name .bss"))
-+		goto out;
-+
-+	map_fd = bpf_map__fd(map);
-+	bss_data = calloc(1, bpf_map__value_size(map));
-+	if (!ASSERT_OK_PTR(bss_data, "calloc(1, bpf_map__value_size(map))"))
-+		goto out;
-+	bss_data->local_config.high_cgroup_id = high_cgroup_id;
-+	bss_data->local_config.threshold = TRIGGER_THRESHOLD;
-+	bss_data->local_config.use_below_low = false;
-+	bss_data->local_config.use_below_min = false;
-+	bss_data->local_config.over_high_ms = OVER_HIGH_MS;
-+	err = bpf_map_update_elem(map_fd, &key, bss_data, BPF_EXIST);
-+	free(bss_data);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+		goto out;
-+
-+	prog = bpf_object__find_program_by_name(skel->obj,
-+						"handle_count_memcg_events");
-+	if (!ASSERT_OK_PTR(prog, "bpf_object__find_program_by_name"))
-+		goto out;
-+
-+	link = bpf_program__attach(prog);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach"))
-+		goto out;
-+
-+	map = bpf_object__find_map_by_name(skel->obj, "low_mcg_ops");
-+	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name low_mcg_ops"))
-+		goto out;
-+
-+	opts.flags = BPF_F_CGROUP_FD;
-+	opts.target_fd = low_cgroup_fd;
-+	link2 = bpf_map__attach_struct_ops_opts(map, &opts);
-+	if (!ASSERT_OK_PTR(link2, "bpf_map__attach_struct_ops_opts"))
-+		goto out;
-+
-+	real_test_memcg_ops(5);
-+
-+out:
-+	bpf_link__destroy(link);
-+	bpf_link__destroy(link2);
-+	if (skel) {
-+		memcg_ops__detach(skel);
-+		memcg_ops__destroy(skel);
-+	}
-+	close(low_cgroup_fd);
-+	cleanup_cgroup_environment();
-+}
-+
-+void test_memcg_ops_below_low_over_high(void)
-+{
-+	int err, map_fd;
-+	struct memcg_ops *skel = NULL;
-+	struct bpf_map *map;
-+	struct memcg_ops__bss *bss_data;
-+	__u32 key = 0;
-+	struct bpf_program *prog = NULL;
-+	struct bpf_link *link = NULL, *link_high = NULL, *link_low = NULL;
-+	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
-+	u64 high_cgroup_id;
-+	int high_cgroup_fd = -1, low_cgroup_fd = -1;
-+
-+	err = setup_high_low_cgroups(&high_cgroup_id, &low_cgroup_fd,
-+				     &high_cgroup_fd);
-+	if (!ASSERT_OK(err, "setup_high_low_cgroups"))
-+		goto out;
-+
-+	skel = memcg_ops__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "memcg_ops__open_and_load"))
-+		goto out;
-+
-+	map = bpf_object__find_map_by_name(skel->obj, ".bss");
-+	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name .bss"))
-+		goto out;
-+
-+	map_fd = bpf_map__fd(map);
-+	bss_data = calloc(1, bpf_map__value_size(map));
-+	if (!ASSERT_OK_PTR(bss_data, "calloc(1, bpf_map__value_size(map))"))
-+		goto out;
-+	bss_data->local_config.high_cgroup_id = high_cgroup_id;
-+	bss_data->local_config.threshold = TRIGGER_THRESHOLD;
-+	bss_data->local_config.use_below_low = true;
-+	bss_data->local_config.use_below_min = false;
-+	bss_data->local_config.over_high_ms = OVER_HIGH_MS;
-+	err = bpf_map_update_elem(map_fd, &key, bss_data, BPF_EXIST);
-+	free(bss_data);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+		goto out;
-+
-+	prog = bpf_object__find_program_by_name(skel->obj,
-+						"handle_count_memcg_events");
-+	if (!ASSERT_OK_PTR(prog, "bpf_object__find_program_by_name"))
-+		goto out;
-+
-+	link = bpf_program__attach(prog);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach"))
-+		goto out;
-+
-+	map = bpf_object__find_map_by_name(skel->obj, "high_mcg_ops");
-+	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name high_mcg_ops"))
-+		goto out;
-+	opts.flags = BPF_F_CGROUP_FD;
-+	opts.target_fd = high_cgroup_fd;
-+	link_high = bpf_map__attach_struct_ops_opts(map, &opts);
-+	if (!ASSERT_OK_PTR(link_high, "bpf_map__attach_struct_ops_opts"))
-+		goto out;
-+
-+	map = bpf_object__find_map_by_name(skel->obj, "low_mcg_ops");
-+	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name low_mcg_ops"))
-+		goto out;
-+	opts.target_fd = low_cgroup_fd;
-+	link_low = bpf_map__attach_struct_ops_opts(map, &opts);
-+	if (!ASSERT_OK_PTR(link_low, "bpf_map__attach_struct_ops_opts"))
-+		goto out;
-+
-+	real_test_memcg_ops(50);
-+
-+out:
-+	bpf_link__destroy(link);
-+	bpf_link__destroy(link_high);
-+	bpf_link__destroy(link_low);
-+	if (skel) {
-+		memcg_ops__detach(skel);
-+		memcg_ops__destroy(skel);
-+	}
-+	close(high_cgroup_fd);
-+	close(low_cgroup_fd);
-+	cleanup_cgroup_environment();
-+}
-+
-+void test_memcg_ops_below_min_over_high(void)
-+{
-+	int err, map_fd;
-+	struct memcg_ops *skel = NULL;
-+	struct bpf_map *map;
-+	struct memcg_ops__bss *bss_data;
-+	__u32 key = 0;
-+	struct bpf_program *prog = NULL;
-+	struct bpf_link *link = NULL, *link_high = NULL, *link_low = NULL;
-+	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
-+	u64 high_cgroup_id;
-+	int high_cgroup_fd = -1, low_cgroup_fd = -1;
-+
-+	err = setup_high_low_cgroups(&high_cgroup_id, &low_cgroup_fd,
-+				     &high_cgroup_fd);
-+	if (!ASSERT_OK(err, "setup_high_low_cgroups"))
-+		goto out;
-+
-+	skel = memcg_ops__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "memcg_ops__open_and_load"))
-+		goto out;
-+
-+	map = bpf_object__find_map_by_name(skel->obj, ".bss");
-+	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name .bss"))
-+		goto out;
-+
-+	map_fd = bpf_map__fd(map);
-+	bss_data = calloc(1, bpf_map__value_size(map));
-+	if (!ASSERT_OK_PTR(bss_data, "calloc(1, bpf_map__value_size(map))"))
-+		goto out;
-+	bss_data->local_config.high_cgroup_id = high_cgroup_id;
-+	bss_data->local_config.threshold = TRIGGER_THRESHOLD;
-+	bss_data->local_config.use_below_low = false;
-+	bss_data->local_config.use_below_min = true;
-+	bss_data->local_config.over_high_ms = OVER_HIGH_MS;
-+	err = bpf_map_update_elem(map_fd, &key, bss_data, BPF_EXIST);
-+	free(bss_data);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+		goto out;
-+
-+	prog = bpf_object__find_program_by_name(skel->obj,
-+						"handle_count_memcg_events");
-+	if (!ASSERT_OK_PTR(prog, "bpf_object__find_program_by_name"))
-+		goto out;
-+
-+	link = bpf_program__attach(prog);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach"))
-+		goto out;
-+
-+	map = bpf_object__find_map_by_name(skel->obj, "high_mcg_ops");
-+	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name high_mcg_ops"))
-+		goto out;
-+	opts.flags = BPF_F_CGROUP_FD;
-+	opts.target_fd = high_cgroup_fd;
-+	link_high = bpf_map__attach_struct_ops_opts(map, &opts);
-+	if (!ASSERT_OK_PTR(link_high, "bpf_map__attach_struct_ops_opts"))
-+		goto out;
-+
-+	map = bpf_object__find_map_by_name(skel->obj, "low_mcg_ops");
-+	if (!ASSERT_OK_PTR(map, "bpf_object__find_map_by_name low_mcg_ops"))
-+		goto out;
-+	opts.target_fd = low_cgroup_fd;
-+	link_low = bpf_map__attach_struct_ops_opts(map, &opts);
-+	if (!ASSERT_OK_PTR(link_low, "bpf_map__attach_struct_ops_opts"))
-+		goto out;
-+
-+	real_test_memcg_ops(50);
-+
-+out:
-+	bpf_link__destroy(link);
-+	bpf_link__destroy(link_high);
-+	bpf_link__destroy(link_low);
-+	if (skel) {
-+		memcg_ops__detach(skel);
-+		memcg_ops__destroy(skel);
-+	}
-+	close(high_cgroup_fd);
-+	close(low_cgroup_fd);
-+	cleanup_cgroup_environment();
-+}
-diff --git a/tools/testing/selftests/bpf/progs/memcg_ops.c b/tools/testing/selftests/bpf/progs/memcg_ops.c
-new file mode 100644
-index 000000000000..4a1d817c1d9c
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/memcg_ops.c
-@@ -0,0 +1,132 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+#define ONE_SECOND_NS	1000000000
-+
-+struct local_config {
-+	u64 threshold;
-+	u64 high_cgroup_id;
-+	bool use_below_low;
-+	bool use_below_min;
-+	unsigned int over_high_ms;
-+} local_config;
-+
-+struct AggregationData {
-+	u64 sum;
-+	u64 window_start_ts;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, u32);
-+	__type(value, struct AggregationData);
-+} aggregation_map SEC(".maps");
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, u32);
-+	__type(value, u64);
-+} trigger_ts_map SEC(".maps");
-+
-+SEC("tp/memcg/count_memcg_events")
-+int
-+handle_count_memcg_events(struct trace_event_raw_memcg_rstat_events *ctx)
-+{
-+	u32 key = 0;
-+	struct AggregationData *data;
-+	u64 current_ts;
-+
-+	if (ctx->id != local_config.high_cgroup_id ||
-+	    (ctx->item != PGFAULT))
-+		goto out;
-+
-+	data = bpf_map_lookup_elem(&aggregation_map, &key);
-+	if (!data)
-+		goto out;
-+
-+	current_ts = bpf_ktime_get_ns();
-+
-+	if (current_ts - data->window_start_ts < ONE_SECOND_NS) {
-+		data->sum += ctx->val;
-+	} else {
-+		data->window_start_ts = current_ts;
-+		data->sum = ctx->val;
-+	}
-+
-+	if (data->sum > local_config.threshold) {
-+		bpf_map_update_elem(&trigger_ts_map, &key, &current_ts,
-+				    BPF_ANY);
-+		data->sum = 0;
-+		data->window_start_ts = current_ts;
-+	}
-+
-+out:
-+	return 0;
-+}
-+
-+static bool need_threshold(void)
-+{
-+	u32 key = 0;
-+	u64 *trigger_ts;
-+	bool ret = false;
-+	u64 current_ts;
-+
-+	trigger_ts = bpf_map_lookup_elem(&trigger_ts_map, &key);
-+	if (!trigger_ts || *trigger_ts == 0)
-+		goto out;
-+
-+	current_ts = bpf_ktime_get_ns();
-+
-+	if (current_ts - *trigger_ts < ONE_SECOND_NS)
-+		ret = true;
-+
-+out:
-+	return ret;
-+}
-+
-+SEC("struct_ops/below_low")
-+bool below_low_impl(struct mem_cgroup *memcg, unsigned long elow,
-+		    unsigned long usage)
-+{
-+	if (!local_config.use_below_low)
-+		return false;
-+
-+	return need_threshold();
-+}
-+
-+SEC("struct_ops/below_min")
-+bool below_min_impl(struct mem_cgroup *memcg, unsigned long emin,
-+		    unsigned long usage)
-+{
-+	if (!local_config.use_below_min)
-+		return false;
-+
-+	return need_threshold();
-+}
-+
-+SEC("struct_ops/memcg_charged")
-+unsigned int memcg_charged_impl(struct mem_cgroup *memcg, unsigned int nr_pages)
-+{
-+	if (local_config.over_high_ms && need_threshold())
-+		return local_config.over_high_ms;
-+
-+	return 0;
-+}
-+
-+SEC(".struct_ops.link")
-+struct memcg_bpf_ops high_mcg_ops = {
-+	.below_low = (void *)below_low_impl,
-+	.below_min = (void *)below_min_impl,
-+};
-+
-+SEC(".struct_ops.link")
-+struct memcg_bpf_ops low_mcg_ops = {
-+	.memcg_charged = (void *)memcg_charged_impl,
-+};
-+
-+char LICENSE[] SEC("license") = "GPL";
+ /**
+  * stmmac_init_rx_buffers - init the RX descriptor buffer.
+  * @priv: driver private structure
+@@ -8272,6 +8345,7 @@ int stmmac_resume(struct device *dev)
+ {
+ 	struct net_device *ndev = dev_get_drvdata(dev);
+ 	struct stmmac_priv *priv = netdev_priv(ndev);
++	u32 queue;
+ 	int ret;
+ 
+ 	if (priv->plat->resume) {
+@@ -8316,6 +8390,22 @@ int stmmac_resume(struct device *dev)
+ 
+ 	mutex_lock(&priv->lock);
+ 
++	/* Re-program the RX descriptors from the buffers that are still
++	 * attached to priv->dma_conf.rx_queue[].buf_pool[]. The buffer-
++	 * address fields of the RX descriptors may have been overwritten
++	 * by HW writeback while the DMA was being stopped on suspend
++	 * (RDESx are reused for status/length on completion), so they
++	 * must be repopulated before the DMA is restarted in
++	 * stmmac_hw_setup() below; otherwise the controller would
++	 * dereference stale addresses and trigger a fatal bus error.
++	 *
++	 * This path is allocation-free: it relies entirely on the RX
++	 * buffers preserved across suspend, which makes the resume path
++	 * safe under memory pressure.
++	 */
++	for (queue = 0; queue < priv->plat->rx_queues_to_use; queue++)
++		stmmac_reinit_rx_descriptors(priv, &priv->dma_conf, queue);
++
+ 	stmmac_reset_queues_param(priv);
+ 
+ 	stmmac_free_tx_skbufs(priv);
 -- 
-2.43.0
+2.34.1
 
 
