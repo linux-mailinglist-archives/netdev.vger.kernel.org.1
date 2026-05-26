@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-291937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCnWJDkWFmq7hQcAu9opvQ
-	(envelope-from <netdev+bounces-291937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:52:57 +0200
+	id qCg7F14WFmrOhQcAu9opvQ
+	(envelope-from <netdev+bounces-291940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:53:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 347E55DCEA9
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:52:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED70B5DCF23
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:53:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 583B43031CE5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:52:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E7AB304EA07
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294A63C2B80;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5707A3C4177;
 	Tue, 26 May 2026 21:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avnk7d6w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlJkpjRG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041022609E3;
-	Tue, 26 May 2026 21:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6ED3C3451;
+	Tue, 26 May 2026 21:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779832340; cv=none; b=o7i9fpmXLeRD0ZcuOTKgbnFtxY6Enegh3wlGp4ALhP9AJEJQyC3Xj+gtrRv2GjukxORSbmsiHPpC5fw6hK0gqTEXGOOOvT7eAMRf3agcfWNg4uwRsXZIIbcOplF3eTDmmXl6EfAQxFAFrAcpbZrwVnVSolR9yl8Ha0Qph32FlYU=
+	t=1779832340; cv=none; b=dxwApRefs1wgpK0YWa9l2H/8Un/8i8rpuonxUtFdNBdSS1dAhjq1lTacrjumP6dt4enKBl0olnBNI94taXZStje9G9xdpejlYBFTgvXf5AljV0EYKaplZxZmelLRMINJ3Flvy00hTyOL7eSvukh0Qx4P7cl6sf2YM3ft2a2hyHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779832340; c=relaxed/simple;
-	bh=hBpZJqzIKkIMa0o5/UN2VhueexgYznTR0lfWQhW6fHE=;
+	bh=xwlNj4vnY4PMilpPWPjQt3BWMmoV1vdfGS56+EF0V7A=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hKzuI7/7J4pmHD7lbOqK/0RExmpv3OMS3fN8QiUOcnv+H6xpA1C4OvEdBwgfLoNZYOxZEqwAn0Onj6N5wZ8wn6XyBOkiy0hnrZA2fWN1QQVgGoZ43qBnvK5s7QhdpOVUbIfylTWE0AVlgutuZfIzq5wkwrzjdrcHfJKZPB2FSOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avnk7d6w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B2C48C2BCB3;
+	 In-Reply-To:To:Cc; b=NoRdQi/OY642f44lEAm08Bj5LrBZ7QtYXQwR30lI/KDaXiij2mgrs7GUlj87Z/iRF21ESynzhDiCs6Qm/k6AJC+nrh2kYeGKy/SA3EOJHhgmUErIkYvjfgo+Byr4/gK6ldBjI9z1H24UkZ8WMZ4GNyLF14wCqivhT+6kGwQd0Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlJkpjRG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BFFD3C2BCC6;
 	Tue, 26 May 2026 21:52:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1779832339;
-	bh=hBpZJqzIKkIMa0o5/UN2VhueexgYznTR0lfWQhW6fHE=;
+	bh=xwlNj4vnY4PMilpPWPjQt3BWMmoV1vdfGS56+EF0V7A=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=avnk7d6wa6M32zelIYNiUxwi7u7v+79xnz4BXpZT5ERYXZC4Ev/ywAqXxR5xdrcYp
-	 7S3oCuC6QNP39H6P0Pmqp3pKsCDAYWnh3IAPkTcPexgJ57vzarmfYiNOgfuTQ8bhSm
-	 7OtkdDpwWWsr8UhyMrv9mWCHoOCcdDFG3g/OcsEATJy33gIqKvE9pxvSfM2Xc/0YRP
-	 ePSo5sMnljyngXK0WPNkkkRdH5jUNnjw+Y1RN2WQ1KGHKtS6GPWrDkquEPCVMLqnnr
-	 GWRUZjNXqSdSRej1JCz38kee8cIQXiqWIQQCa2QKBvWGUcTgkIa2pDUDJvWFXzGmhz
-	 RD6hbkdT4sD9A==
+	b=LlJkpjRGyQG42KfCw0/3lYsCw5zUHXdGXgzrkXr/5v71BdhF2ouSrxg1bqY45H+JP
+	 n/+7npwtCajB7Up1KLOOTwBzjej/8KY+vOSrlrJXDmEhzlk10DgvT9BOazpNlcoCJQ
+	 Rqd9d/NRl1Doa19lij4Ls4v8rnXTFwMsAYb5/Vt4pNElSAjOQcp9ND04SVme/unfoc
+	 8AbHfxtka/qa+7fXvl5V5bewPNYwuEzaRhoiSkrLb3BvhOKhkbh40ieSaFtJ4XbbBW
+	 v3Iu9ZqrXvURbzX01T+qwByd5E/wDLYbFqWAI/8K9g6laOvdAesqfxg9q0E8JJGBTA
+	 1oDphWaeYiBXg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB4ACD5BD2;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC417CD6E40;
 	Tue, 26 May 2026 21:52:19 +0000 (UTC)
 From: Ciprian Regus via B4 Relay <devnull+ciprian.regus.analog.com@kernel.org>
-Date: Wed, 27 May 2026 00:51:46 +0300
-Subject: [PATCH net-next v2 01/10] dt-bindings: net: Add ADIN1140
+Date: Wed, 27 May 2026 00:51:47 +0300
+Subject: [PATCH net-next v2 02/10] net: ethernet: oa_tc6: Handle the OA TC6
+ SPI protected mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260527-adin1140-driver-v2-1-37e5c8d4e0a0@analog.com>
+Message-Id: <20260527-adin1140-driver-v2-2-37e5c8d4e0a0@analog.com>
 References: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
 In-Reply-To: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
 To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
@@ -75,11 +76,11 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-doc@vger.kernel.org, devicetree@vger.kernel.org, 
  Ciprian Regus <ciprian.regus@analog.com>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779832338; l=2907;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779832338; l=8718;
  i=ciprian.regus@analog.com; s=20260330; h=from:subject:message-id;
- bh=JlftDcHzI6Sedemvx0vq0rArN9pb+7G+DJh0bC/HRsA=;
- b=ldO/ufoMM8dwCDnfygQsluxwJlSHRKcej8SZQMzJkaSJFQetIuxEybBYdFbWggX2ZA6sIp08T
- 4hnzSsSI8ZnDm8mfL9PjfJ4qecIT+qgUcjsBQZdX7BPB+2Vatz/W5K7
+ bh=IW5iHGuR2REc3ASn2CJYH948sOEAxihITnt2zuS2lDc=;
+ b=GZ9SjxpvVEYWTtGJIKfEZHoH1r/uuoNmOA8R7MvvjSlU7NJozXJKIAv6SDLq4gDDRmTTpyML1
+ QgTf2MaWGx6BcrZSzGRZ4Aiqv4Gh+SdZpl2eeWVMotOoBPjY2KMBYTx
 X-Developer-Key: i=ciprian.regus@analog.com; a=ed25519;
  pk=8WoNhI0kQcQUl8YqJO5ZevROYk9HP8lOIeIgIYgjfbc=
 X-Endpoint-Received: by B4 Relay for ciprian.regus@analog.com/20260330 with
@@ -91,131 +92,286 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291937-lists,netdev=lfdr.de,ciprian.regus.analog.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291940-lists,netdev=lfdr.de,ciprian.regus.analog.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk];
 	TO_DN_SOME(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[20];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[ciprian.regus@analog.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	DBL_PROHIBIT(0.00)[0.0.0.0:email];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	HAS_REPLYTO(0.00)[ciprian.regus@analog.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devicetree.org:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,analog.com:replyto,analog.com:mid,analog.com:email]
-X-Rspamd-Queue-Id: 347E55DCEA9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[analog.com:replyto,analog.com:mid,analog.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: ED70B5DCF23
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Ciprian Regus <ciprian.regus@analog.com>
 
-The ADIN1140 is a single port 10BASE-T1S Ethernet controller that
-includes both the MAC and a PHY in the same package.
+Implement the OA TC6 standard defined protected mode for control (register
+access) transactions. In addition to the current register access formats
+the oa_tc6 driver handles, 1's complement values of the data field
+are included (by both the host and the MACPHY) in the SPI transfer frames.
+This feature acts as an integrity check.
+
+Control write transactions look like this:
+
+          |<- 32 bits ->|<--- data_size --->|<- 32 bits ->|
+    MOSI: | ctrl header | reg write data    | ignored     |
+    MISO: | (discard)   | echoed ctrl hdr   | echoed data |
+
+    data_size (LEN = number of registers to read in a sequence):
+      Unprotected: 32 x (LEN + 1) bits
+      Protected:   2 x 32 x (LEN + 1) bits
+
+Control read transaction:
+
+          |<- 32 bits ->|<--- 32 bits --> |<- data_size ->|
+    MOSI: | ctrl header | ignored ...                     |
+    MISO: | (discard)   | echoed ctrl hdr | reg read data |
+
+    data_size (LEN = number of registers to read in a sequence):
+      Unprotected: 32 x (LEN + 1) bits
+      Protected:   2 x 32 x (LEN + 1) bits
+
+Register data format ("reg write data" and "reg read data"):
+
+    Unprotected:
+      | W1 (normal) | W2 (normal) | ... | Wx (normal) |
+
+    Protected:
+    | W1 (normal) | W1 (complement) | ... | Wx (normal) | Wx (complement)|
+
+The protected mode state can be read from the bit 5 of CONFIG0 (0x4)
+register, and this setting is usually only configured during the
+MACPHY's reset (depending on the device it can be done by setting the
+state of a pin). We can read the protected mode configuration before any
+other register access and since the SPI transfer is initially sized for an
+unprotected read, the MACPHY's complement words are never clocked out
+and no checking is required. The data transactions (Ethernet frames)
+remain unchanged.
 
 Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
 
 ---
 v2 changelog:
- - Reorder the compatible entries in the dt schema (ad3306, adin1140).
- - Removed "dt-bindings" from the commit title and message.
- - Updated the DT example to use IRQ_TYPE_LEVEL_LOW instead of
-   IRQ_TYPE_EDGE_FALLING for the interrupt trigger condition.
- - "implements" -> "tries to implement" in the description.
- - Removed the MAINTAINERS entry, as it will be added in a later patch
-   in the series.
- - Reordered as the first patch of the series
+ - Updated OA_TC6_CTRL_SPI_BUF_SIZE to always alloc the control
+   transaction buffer size required by the protected mode, instead of
+   calling krealloc if the PROTE bit is set.
+ - Formatting to fit the 80 character column limit.
 ---
- .../devicetree/bindings/net/adi,adin1140.yaml      | 69 ++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
+ drivers/net/ethernet/oa_tc6.c | 93 +++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 76 insertions(+), 17 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/adi,adin1140.yaml b/Documentation/devicetree/bindings/net/adi,adin1140.yaml
-new file mode 100644
-index 000000000000..518ff6b36c46
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/adi,adin1140.yaml
-@@ -0,0 +1,69 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/adi,adin1140.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+index 91a906a7918a..baba5aad84df 100644
+--- a/drivers/net/ethernet/oa_tc6.c
++++ b/drivers/net/ethernet/oa_tc6.c
+@@ -24,6 +24,7 @@
+ #define OA_TC6_REG_CONFIG0			0x0004
+ #define CONFIG0_SYNC				BIT(15)
+ #define CONFIG0_ZARFE_ENABLE			BIT(12)
++#define CONFIG0_PROTE				BIT(5)
+ 
+ /* Status Register #0 */
+ #define OA_TC6_REG_STATUS0			0x0008
+@@ -87,14 +88,17 @@
+ #define OA_TC6_PHY_C45_AUTO_NEG_MMS5		5	/* MMD 7 */
+ #define OA_TC6_PHY_C45_POWER_UNIT_MMS6		6	/* MMD 13 */
+ 
++#define OA_TC6_CTRL_PROT_REPLY_SIZE		4
+ #define OA_TC6_CTRL_HEADER_SIZE			4
+ #define OA_TC6_CTRL_REG_VALUE_SIZE		4
+ #define OA_TC6_CTRL_IGNORED_SIZE		4
+ #define OA_TC6_CTRL_MAX_REGISTERS		128
+-#define OA_TC6_CTRL_SPI_BUF_SIZE		(OA_TC6_CTRL_HEADER_SIZE +\
+-						(OA_TC6_CTRL_MAX_REGISTERS *\
+-						OA_TC6_CTRL_REG_VALUE_SIZE) +\
+-						OA_TC6_CTRL_IGNORED_SIZE)
++#define OA_TC6_CTRL_SPI_BUF_SIZE	(OA_TC6_CTRL_HEADER_SIZE +\
++					(OA_TC6_CTRL_MAX_REGISTERS *\
++					(OA_TC6_CTRL_REG_VALUE_SIZE +\
++					OA_TC6_CTRL_PROT_REPLY_SIZE)) +\
++					OA_TC6_CTRL_IGNORED_SIZE)
 +
-+title: ADI ADIN1140 10BASE-T1S MAC-PHY
+ #define OA_TC6_CHUNK_PAYLOAD_SIZE		64
+ #define OA_TC6_DATA_HEADER_SIZE			4
+ #define OA_TC6_CHUNK_SIZE			(OA_TC6_DATA_HEADER_SIZE +\
+@@ -129,6 +133,7 @@ struct oa_tc6 {
+ 	u8 rx_chunks_available;
+ 	bool rx_buf_overflow;
+ 	bool int_flag;
++	bool prot_ctrl;
+ };
+ 
+ enum oa_tc6_header_type {
+@@ -212,25 +217,36 @@ static void oa_tc6_update_ctrl_write_data(struct oa_tc6 *tc6, u32 value[],
+ {
+ 	__be32 *tx_buf = tc6->spi_ctrl_tx_buf + OA_TC6_CTRL_HEADER_SIZE;
+ 
+-	for (int i = 0; i < length; i++)
++	for (int i = 0; i < length; i++) {
+ 		*tx_buf++ = cpu_to_be32(value[i]);
++		if (tc6->prot_ctrl)
++			*tx_buf++ = cpu_to_be32(~value[i]);
++	}
+ }
+ 
+-static u16 oa_tc6_calculate_ctrl_buf_size(u8 length)
++static u16 oa_tc6_calculate_ctrl_buf_size(u8 length, bool ctrl_prot)
+ {
++	u32 reply_size = OA_TC6_CTRL_REG_VALUE_SIZE;
 +
-+maintainers:
-+  - Ciprian Regus <ciprian.regus@analog.com>
++	if (ctrl_prot)
++		reply_size += OA_TC6_CTRL_PROT_REPLY_SIZE;
 +
-+description: |
-+  The ADIN1140 (also called AD3306) is a low power single port
-+  10BASE-T1S MAC-PHY. It integrates an Ethernet PHY with a MAC
-+  and all the associated analog circuitry.
-+  The device tries to implement the Open Alliance TC6 10BASE-T1x MAC-PHY
-+  Serial Interface specification and is compliant with the
-+  IEEE 802.3cg-2019 Ethernet standard for 10 Mbps single pair
-+  Ethernet (SPE). The device has a 4-wire SPI interface for
-+  communication between the MAC and host processor.
+ 	/* Control command consists 4 bytes header + 4 bytes register value for
+-	 * each register + 4 bytes ignored value.
++	 * each register (+ 4 bytes for the register value complement in case
++	 * protected mode is used) + 4 bytes ignored value.
+ 	 */
+-	return OA_TC6_CTRL_HEADER_SIZE + OA_TC6_CTRL_REG_VALUE_SIZE * length +
++	return OA_TC6_CTRL_HEADER_SIZE + reply_size * length +
+ 	       OA_TC6_CTRL_IGNORED_SIZE;
+ }
+ 
+ static void oa_tc6_prepare_ctrl_spi_buf(struct oa_tc6 *tc6, u32 address,
+ 					u32 value[], u8 length,
+-					enum oa_tc6_register_op reg_op)
++					enum oa_tc6_register_op reg_op,
++					u16 buf_size)
+ {
+ 	__be32 *tx_buf = tc6->spi_ctrl_tx_buf;
+ 
++	memset(tx_buf, 0, buf_size);
+ 	*tx_buf = oa_tc6_prepare_ctrl_header(address, length, reg_op);
+ 
+ 	if (reg_op == OA_TC6_CTRL_REG_WRITE)
+@@ -253,10 +269,12 @@ static int oa_tc6_check_ctrl_write_reply(struct oa_tc6 *tc6, u8 size)
+ 	return 0;
+ }
+ 
+-static int oa_tc6_check_ctrl_read_reply(struct oa_tc6 *tc6, u8 size)
++static int oa_tc6_check_ctrl_read_reply(struct oa_tc6 *tc6, u8 length)
+ {
+-	u32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE;
+-	u32 *tx_buf = tc6->spi_ctrl_tx_buf;
++	__be32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE;
++	__be32 *tx_buf = tc6->spi_ctrl_tx_buf;
++	u32 complement;
++	u32 reply;
+ 
+ 	/* The echoed control read header must match with the one that was
+ 	 * transmitted.
+@@ -264,6 +282,20 @@ static int oa_tc6_check_ctrl_read_reply(struct oa_tc6 *tc6, u8 size)
+ 	if (*tx_buf != *rx_buf)
+ 		return -EPROTO;
+ 
++	if (tc6->prot_ctrl) {
++		/* Skip past the echoed header to the value/complement pairs */
++		rx_buf += 1;
++		for (int i = 0; i < length; i++) {
++			reply = be32_to_cpu(rx_buf[0]);
++			complement = be32_to_cpu(rx_buf[1]);
 +
-+allOf:
-+  - $ref: /schemas/net/ethernet-controller.yaml#
-+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
++			if (complement != ~reply)
++				return -EPROTO;
 +
-+properties:
-+  compatible:
-+    enum:
-+      - adi,ad3306
-+      - adi,adin1140
++			rx_buf += 2;
++		}
++	}
 +
-+  reg:
-+    maxItems: 1
+ 	return 0;
+ }
+ 
+@@ -273,8 +305,13 @@ static void oa_tc6_copy_ctrl_read_data(struct oa_tc6 *tc6, u32 value[],
+ 	__be32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE +
+ 			 OA_TC6_CTRL_HEADER_SIZE;
+ 
+-	for (int i = 0; i < length; i++)
++	for (int i = 0; i < length; i++) {
+ 		value[i] = be32_to_cpu(*rx_buf++);
 +
-+  spi-max-frequency:
-+    maximum: 25000000
++		/* skip complement word */
++		if (tc6->prot_ctrl)
++			rx_buf++;
++	}
+ }
+ 
+ static int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 address, u32 value[],
+@@ -283,10 +320,10 @@ static int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 address, u32 value[],
+ 	u16 size;
+ 	int ret;
+ 
+-	/* Prepare control command and copy to SPI control buffer */
+-	oa_tc6_prepare_ctrl_spi_buf(tc6, address, value, length, reg_op);
++	size = oa_tc6_calculate_ctrl_buf_size(length, tc6->prot_ctrl);
+ 
+-	size = oa_tc6_calculate_ctrl_buf_size(length);
++	/* Prepare control command and copy to SPI control buffer */
++	oa_tc6_prepare_ctrl_spi_buf(tc6, address, value, length, reg_op, size);
+ 
+ 	/* Perform SPI transfer */
+ 	ret = oa_tc6_spi_transfer(tc6, OA_TC6_CTRL_HEADER, size);
+@@ -301,7 +338,7 @@ static int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 address, u32 value[],
+ 		return oa_tc6_check_ctrl_write_reply(tc6, size);
+ 
+ 	/* Check echoed/received control read command reply for errors */
+-	ret = oa_tc6_check_ctrl_read_reply(tc6, size);
++	ret = oa_tc6_check_ctrl_read_reply(tc6, length);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -1224,6 +1261,20 @@ netdev_tx_t oa_tc6_start_xmit(struct oa_tc6 *tc6, struct sk_buff *skb)
+ }
+ EXPORT_SYMBOL_GPL(oa_tc6_start_xmit);
+ 
++static int oa_tc6_check_ctrl_protection(struct oa_tc6 *tc6)
++{
++	u32 regval;
++	int ret;
 +
-+  interrupts:
-+    maxItems: 1
-+    description: Interrupt from the MAC-PHY for receive data available
-+      and error conditions
++	ret = oa_tc6_read_register(tc6, OA_TC6_REG_CONFIG0, &regval);
++	if (ret)
++		return ret;
 +
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - spi-max-frequency
++	tc6->prot_ctrl = FIELD_GET(CONFIG0_PROTE, regval);
 +
-+unevaluatedProperties: false
++	return 0;
++}
 +
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
+ /**
+  * oa_tc6_init - allocates and initializes oa_tc6 structure.
+  * @spi: device with which data will be exchanged.
+@@ -1276,6 +1327,14 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
+ 	if (!tc6->spi_data_rx_buf)
+ 		return NULL;
+ 
++	/* Check the PROTE bit status so that we can reset the device */
++	ret = oa_tc6_check_ctrl_protection(tc6);
++	if (ret) {
++		dev_err(&tc6->spi->dev,
++			"Failed to check the protection mode: %d\n", ret);
++		return NULL;
++	}
 +
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethernet@0 {
-+            compatible = "adi,adin1140";
-+            reg = <0>;
-+            spi-max-frequency = <23000000>;
-+
-+            interrupt-parent = <&gpio>;
-+            interrupts = <6 IRQ_TYPE_LEVEL_LOW>;
-+
-+            local-mac-address = [ 00 11 22 33 44 55 ];
-+        };
-+    };
+ 	ret = oa_tc6_sw_reset_macphy(tc6);
+ 	if (ret) {
+ 		dev_err(&tc6->spi->dev,
 
 -- 
 2.43.0
