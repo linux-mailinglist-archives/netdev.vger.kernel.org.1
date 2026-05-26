@@ -1,214 +1,288 @@
-Return-Path: <netdev+bounces-291674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFCFGASLFWrUWQcAu9opvQ
-	(envelope-from <netdev+bounces-291674-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 13:59:00 +0200
+	id 2Ex2BQGLFWrUWQcAu9opvQ
+	(envelope-from <netdev+bounces-291675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 13:58:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E305D53A2
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 13:58:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 619425D5393
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 13:58:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 302C53058E33
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF4A23059021
 	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7373F54C8;
-	Tue, 26 May 2026 11:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2403B47F7;
+	Tue, 26 May 2026 11:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="NqL57GyA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+nm0zio"
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012037.outbound.protection.outlook.com [52.101.43.37])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1090C3F6C2F;
-	Tue, 26 May 2026 11:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779796382; cv=fail; b=L2hJqQ69Mukzq2OhpoZ+bQVaXZJ4s6KP5Gx2HoF8ivrxGfAU3q3ZT+dgq0W/VzkIExR6mt2iTYdRYljzzW7qDGlBnoJ8GFL9iWSnXCzcCtKHNASU9Wc1HoBmQWSWkBYCBQ9cqhmyYNLwtL1AQYZ9HUa3vvTARqT6z5bOjpCtBEs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A600F3F7887
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 11:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779796382; cv=none; b=GFwTqtW3HIw7ltAwwA/5O9RYQiaPY9fe1jD2y2M45WOnbo1i7LALN+xJwxzHDhVSMxMD2oTjHqMC7xh2z3QMxaqBp6zes4JrSlzpbAOtUMuyREK5r8wxyFb3MsN6Um7QwZJY71VxvayPM2yrZAln8qWPShTY1eqnL/bc7DtP/5s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779796382; c=relaxed/simple;
-	bh=y0c3qLCtraulT1lChHoF0Q4FFQKWOwRBDsnVS0lQ0TA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ErxX/X2VRQdNTPOY5aU15aNqn0haY+7ULHV7w/NmIi+CwtkPUxIdxP43xrJx/Q5X1EH5cInHvfq4egURF+QhpRA0k45QBIYYMpGfbTsvO/DgbHNRCw1VLdGMuDfxcjjnJiinh15wE/wtz0aQbQOW/HObVg6j1b81aEs/MTrk2G4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=NqL57GyA; arc=fail smtp.client-ip=52.101.43.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EytFJ/mpV9jAjrSR1dOdFL6OKBFvnrFqwPa9azN6CHyXPa1ncPWnqbXVxWb4i2mnWVt1VvpPMXCUr8Vp87GA/XkUCe550zclQYRwQarWOxIX++ov0DhfmKMHcIHvNYkRyec845aS3c3bqAwEVfYLPX/0DvipoGGwgEVQRxMOE7IRaNkalvNNH5NLWbZhMrdBMy/ieScdz839AEhbPJRq+/+4WT/uUIINpnGyDUFRsM7lt6x8qiu86D78CiHrIS+toQTvufbS4t2vRG4gwrj8RND4p2B6Z+GvC45y1Iqc/6JWzT6epXyRf7wRl3hkaqievE1x9J+CPpqgr256SyxEiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7RFfsGAYoOvy/AlHmBfGGYsPu7cYnjwOCKNoBfcKIzI=;
- b=UTfjxprArLAv26LEr1/0s8kpoZghOXacnBOSJS5qC5xCpe9OlkLS1H6Pgf3qxxtYPTYaIB5im1XxBgEqt4SSQp1r8PtMw4xKKfJAtMesR86Dg8llbH+HmoyNl6VyhZHwUiz92dqQcLc5ZHT/rLZiVFO4XR7Ww6+DSoNhJ1xfU88sFd9kbakjUqkqNfck6gM/sk9H9LEVWUrce1RZ0gMOOLqnLECU+SVccto7dgpjoLiU3nGDO+/O4thFz1nJazjdT+GblrVlN7crAKVRM2sIKdmuDgOsE5aFh4ppUMPyMVT7bR1azmAJT8mM+/new5Kw5t961FphgTGQX2NorKudnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.195) smtp.rcpttodomain=ew.tq-group.com smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7RFfsGAYoOvy/AlHmBfGGYsPu7cYnjwOCKNoBfcKIzI=;
- b=NqL57GyAZbrbUv2oHS9llwzJgZHcf1wU69DjUTb3zjFi5amTIj8G+EEXlZaBd0fp2229teub8Qigm5GY69EGAsav7bQhoSiK1DbhnyRu2C9Y7d4Up+cydPcWtXCL75INdGuH57unsYmz+/9zdfhx6oksX/F2kTUo2TpKv9lzM94=
-Received: from BL1PR13CA0357.namprd13.prod.outlook.com (2603:10b6:208:2c6::32)
- by CO6PR10MB5792.namprd10.prod.outlook.com (2603:10b6:303:14d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.20; Tue, 26 May
- 2026 11:52:47 +0000
-Received: from BL02EPF00021F69.namprd02.prod.outlook.com
- (2603:10b6:208:2c6:cafe::e) by BL1PR13CA0357.outlook.office365.com
- (2603:10b6:208:2c6::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.71.12 via Frontend Transport; Tue, 26
- May 2026 11:52:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
-Received: from lewvzet201.ext.ti.com (198.47.23.195) by
- BL02EPF00021F69.mail.protection.outlook.com (10.167.249.5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.71.7 via Frontend Transport; Tue, 26 May 2026 11:52:46 +0000
-Received: from DLEE205.ent.ti.com (157.170.170.85) by lewvzet201.ext.ti.com
- (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 26 May
- 2026 06:52:45 -0500
-Received: from DLEE204.ent.ti.com (157.170.170.84) by DLEE205.ent.ti.com
- (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 26 May
- 2026 06:52:45 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE204.ent.ti.com
- (157.170.170.84) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
- Transport; Tue, 26 May 2026 06:52:44 -0500
-Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 64QBqi9E816194;
-	Tue, 26 May 2026 06:52:44 -0500
-From: Nishanth Menon <nm@ti.com>
-To: Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>,
-	Nora Schiffer <nora.schiffer@ew.tq-group.com>
-CC: Nishanth Menon <nm@ti.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Siddharth
- Vadapalli" <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, "Rob
- Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
- Dooley" <conor+dt@kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-phy@lists.infradead.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux@ew.tq-group.com>
-Subject: Re: (subset) [PATCH v4 0/5] J722S SGMII support
-Date: Tue, 26 May 2026 06:52:43 -0500
-Message-ID: <177979634620.2039539.2170816510689676943.b4-ty@b4>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <cover.1775559102.git.nora.schiffer@ew.tq-group.com>
-References: <cover.1775559102.git.nora.schiffer@ew.tq-group.com>
+	bh=8j67dEe3OJYfkLf/PSQqW8XTiIg9IpUg9riDOc20xGE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OUQjTq2drNAv/cY5jSr/optJGelZsztMBKBx71BJuqjkgwnDxE5zFQ1MeA9rpGTOzHq1hy0aBzFE9lk808Pr49yqHzNkWQyBKtrEggR9P5UBXc+52s5BLT8HBLDwSEi4P6FIG0c8/Q0cSjqJkmqs0fkgt9aZWtqRBRdmM2zrH8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E+nm0zio; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779796371;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=r860YEu10I/j6XaU1aczaKpBn6RBqB079yn7D1Hxon4=;
+	b=E+nm0ziobaXm4o0XdSbLcWJ8+LBrtRpGUR9J4EK1wvsBFLd5cP4Zef9SvrAJ0dQe2cjUcB
+	TmDi5O7ZQ1iVGnPHhkUZ9P3ge+/KfhB4OBT+RQ0U4f3jXFLgx4sp6wEbKUbN90k28uCdOd
+	DI2c4yycwnpegefLLlkgmOgIIDL1KoU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-645-Jj_shR6OO3ucWLOuOhGMZQ-1; Tue,
+ 26 May 2026 07:52:50 -0400
+X-MC-Unique: Jj_shR6OO3ucWLOuOhGMZQ-1
+X-Mimecast-MFC-AGG-ID: Jj_shR6OO3ucWLOuOhGMZQ_1779796369
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 899B418002D7;
+	Tue, 26 May 2026 11:52:49 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.44.33.232])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A1F8519560A3;
+	Tue, 26 May 2026 11:52:47 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org,
+	dsahern@kernel.org,
+	stephen@networkplumber.org
+Cc: ivecera@redhat.com,
+	vgrinber@redhat.com,
+	Petr Oros <poros@redhat.com>
+Subject: [PATCH iproute2-next v2] dpll: monitor: add -t/--timestamp and --tshort options
+Date: Tue, 26 May 2026 13:52:45 +0200
+Message-ID: <20260526115245.64824-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F69:EE_|CO6PR10MB5792:EE_
-X-MS-Office365-Filtering-Correlation-Id: 757dc2b5-ea7c-46ff-4bde-08debb1d4da1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|82310400026|36860700016|376014|1800799024|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	FCMnxqJAh0TSbVl5o3cIR0ikR9c7LEfQqvUn1goFoh9ijxqQ8Mmw6BsISnYNmZqBw35meaRGxboM45Zpomg4YY/tmyI2iZ3osDbbNiqao3fMg2b9tQLiGijjcUXWBXFdoqCbImyd1Twrw4/a+ZPRIw8x/uzaadBblggvhfcwszhLOfWnrOXbgB7KmJmB8MO4KVu17gbO8Inb0EnhFqUnaDXMaDnw8cxPBk6JactNxUx0xmifQMd1hZZADq+A2VCFOchgS70ggmhn+J6XVUhoEZrnuRKVkG33GuE1f0EzjSTnMDKGCR//Ja/muAtY6R+LP/zXHiIhA2nSUPGKwXWI9rCjIBsDU3n10ohjrrpIjemXug9KkO1KOeM8piRjAjxFeE7+b8c/pW6aw1/1tG64uc5BsZa6a6GUiJCDt7Z53lzP8K+PMcytSzEAiTMS3n6bqh2BS+KEaFOZ1FEB4LMrroWPKdnsy3GPgY++Ap2zyfZJ1iAgIt34WRf4esnwuf61h5o1HIhY+Pc5816ko4OUeoxxECGZNpjDyt8HO+xJxoz5G1x5hwSgCu76ropIP4FkxoBvz8caIelH90cGlVnePWjNbQFZDUXQ9yGMtftUZpKi9HvKgCcbgFZwMMhXRn5bC18c1TN/qcOAW9xSKirXifjFStAHQkIg/yFk8Q2dEW4gNSRFIZIV1YKRWPBkoc+97ywXREweSdA+9gK7RL1LboaoxDAwnzDy7EHAJdfsulU=
-X-Forefront-Antispam-Report:
-	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(82310400026)(36860700016)(376014)(1800799024)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	F3xQi+zeBSP0Jxb9B1mJCAIeRhIV7I1lWljsIfSuC7tk0F1FuyGcs0wPJKqYozDQZ1qkXqEnxGf60zfUJf3XXkFUMueBBpRyUoiRfk5X5A4Y2FGYqi+PSD3OAnM5cuKcZ4fn3LK4M8CaegdjHQfIFeSp2ds82TwHdTdiI4WciQ6tFf+adHHq/UH9P8NBDpGhUWm6by+SPdEqzPrmENgc5d4qPq9ChWBQMhYGkEa006dFxodbjnKb9eqGbaXTnh0esNRRiXw5aJwxvEyKhZycYgZWMs0Mvm38Ss451/DErlK4yO/W+5yKtxtLbtO670FbTmrFPs1hmT06fJ2UMjqT6zknCmDonYc9Ih4uBxHJdWgtPq/XMGyuZAif7dWNeR5kQD1nfo2+AVr65ThLoEqvXPUoV876VghSA/sQ+UuMpjdXXmIUtxigyXxF4KTmRG2F
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 11:52:46.2835
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 757dc2b5-ea7c-46ff-4bde-08debb1d4da1
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F69.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR10MB5792
-X-Spamd-Result: default: False [1.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291674-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ti.com:url,ti.com:dkim];
-	DKIM_TRACE(0.00)[ti.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nm@ti.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291675-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: E8E305D53A2
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 619425D5393
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Nora Schiffer,
+Bring dpll monitor in line with the rest of iproute2 by allowing each
+received notification to be prefixed with a wall-clock timestamp.
 
-On Tue, 07 Apr 2026 13:42:32 +0200, Nora Schiffer wrote:
-> The J722S CPSW and SERDES are very similar to the variants found on the
-> AM64, but they additionally support SGMII. Introduce new compatible
-> strings for the J722S to add this support to the drivers.
-> 
-> This is a prerequisite for the Single-Pair Ethernet interface of the
-> TQ-Systems MBa67xx baseboard for the TQMa67xx SoM, which will be
-> submitted separately.
-> 
-> [...]
+  -t / --timestamp  emit a separate "Timestamp:" line before each event,
+                    using the default text form of print_timestamp()
+                    (matches ip / bridge / tc -t monitor)
+  --tshort          emit a compact ISO 8601 prefix
+                    "[YYYY-MM-DDTHH:MM:SS.uuuuuu]" inline instead
+                    (matches ip -ts monitor)
 
-I have applied the following to branch ti-k3-dts-next on [1].
-Thank you!
+When combined with -j, the timestamp shows up as a "timestamp" /
+"timestamp_short" field on each notification object, the same way
+ip -j -t mptcp monitor integrates the helper.
 
-[5/5] arm64: dts: ti: k3-j722s-main: use J722S compatibles for WIZ, gmii-sel and CPSW3G
-      commit: 2bdc0ea4e7304f6aa7e87089609fd902d9de7a2d
+The flag is parsed globally but only consulted from the monitor
+callback, so passing -t to non-monitor commands is a no-op.
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent up the chain during
-the next merge window (or sooner if it is a relevant bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
+--tshort has no short alias, so its long_options entry uses an
+identifier above the ASCII range (OPT_TSHORT = 256) following the
+iproute2 convention used in misc/ss.c, instead of consuming an
+ASCII letter that could later collide with a real short option.
 
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
+Reviewed-by: Ivan Vecera <ivecera@redhat.com>
+Signed-off-by: Petr Oros <poros@redhat.com>
+---
+v2:
+- Rebased on current iproute2-next; the previous 1/2 of the series
+  ("dpll: align help and man notation with actual option parsing")
+  is now upstream as 62d47c2dbc0e, so only this patch is resent.
+- Collected Ivan's Reviewed-by.
 
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
+v1: https://lore.kernel.org/all/20260512135225.167158-2-poros@redhat.com/
+---
+ bash-completion/dpll |  8 ++++++--
+ dpll/dpll.c          | 21 +++++++++++++++++++--
+ man/man8/dpll.8      | 23 ++++++++++++++++++++++-
+ 3 files changed, 47 insertions(+), 5 deletions(-)
 
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/ti/linux.git
+diff --git a/bash-completion/dpll b/bash-completion/dpll
+index 9ff38a46c27968..8b11f8d0c34fad 100644
+--- a/bash-completion/dpll
++++ b/bash-completion/dpll
+@@ -304,7 +304,7 @@ _dpll_monitor()
+ _dpll()
+ {
+     local cur prev words cword
+-    local opt='--Version --json --pretty'
++    local opt='--Version --json --pretty --timestamp --tshort'
+     local objects="device pin monitor"
+ 
+     _init_completion || return
+@@ -331,7 +331,11 @@ _dpll()
+                 return 0
+                 ;;
+             -j|--json)
+-                COMPREPLY=( $( compgen -W "--pretty $objects" -- "$cur" ) )
++                COMPREPLY=( $( compgen -W "--pretty --timestamp --tshort $objects" -- "$cur" ) )
++                return 0
++                ;;
++            -t|--timestamp|--tshort)
++                COMPREPLY=( $( compgen -W "monitor" -- "$cur" ) )
+                 return 0
+                 ;;
+             *)
+diff --git a/dpll/dpll.c b/dpll/dpll.c
+index cf5a69111c56f2..60404e134d0a50 100644
+--- a/dpll/dpll.c
++++ b/dpll/dpll.c
+@@ -29,7 +29,10 @@
+ 
+ #define pr_err(args...) fprintf(stderr, ##args)
+ 
++#define OPT_TSHORT 256
++
+ int json;
++int timestamp;
+ 
+ struct dpll {
+ 	struct mnlu_gen_socket nlg;
+@@ -576,7 +579,8 @@ static void help(void)
+ {
+ 	pr_err("Usage: dpll [ OPTIONS ] OBJECT { COMMAND | help }\n"
+ 	       "where  OBJECT := { device | pin | monitor }\n"
+-	       "       OPTIONS := { -V | --Version | -j | --json | -p | --pretty }\n");
++	       "       OPTIONS := { -V | --Version | -j | --json | -p | --pretty |\n"
++	       "                    -t | --timestamp | --tshort }\n");
+ }
+ 
+ static int cmd_device(struct dpll *dpll);
+@@ -640,9 +644,11 @@ int main(int argc, char **argv)
+ 		{ "Version", no_argument, NULL, 'V' },
+ 		{ "json", no_argument, NULL, 'j' },
+ 		{ "pretty", no_argument, NULL, 'p' },
++		{ "timestamp", no_argument, NULL, 't' },
++		{ "tshort", no_argument, NULL, OPT_TSHORT },
+ 		{ NULL, 0, NULL, 0 }
+ 	};
+-	const char *opt_short = "Vjp";
++	const char *opt_short = "Vjpt";
+ 	struct dpll *dpll;
+ 	int err, opt, ret;
+ 
+@@ -665,6 +671,13 @@ int main(int argc, char **argv)
+ 		case 'p':
+ 			pretty = true;
+ 			break;
++		case 't':
++			timestamp = 1;
++			break;
++		case OPT_TSHORT:
++			timestamp = 1;
++			timestamp_short = 1;
++			break;
+ 		default:
+ 			pr_err("Unknown option.\n");
+ 			help();
+@@ -2370,6 +2383,8 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
+ 
+ 		new_json_obj_plain(json);
+ 		open_json_object(NULL);
++		if (timestamp)
++			print_timestamp(stdout);
+ 		print_string(PRINT_JSON, "name", NULL, json_name);
+ 		open_json_object("msg");
+ 		print_string(PRINT_FP, NULL, "[%s] ", cmd_name);
+@@ -2399,6 +2414,8 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
+ 
+ 		new_json_obj_plain(json);
+ 		open_json_object(NULL);
++		if (timestamp)
++			print_timestamp(stdout);
+ 		print_string(PRINT_JSON, "name", NULL, json_name);
+ 		open_json_object("msg");
+ 		print_string(PRINT_FP, NULL, "[%s] ", cmd_name);
+diff --git a/man/man8/dpll.8 b/man/man8/dpll.8
+index 3047aa8f1c9ea8..74f4fdaa94eb46 100644
+--- a/man/man8/dpll.8
++++ b/man/man8/dpll.8
+@@ -29,7 +29,9 @@ dpll \- Digital Phase Locked Loop (DPLL) subsystem management
+ .IR OPTIONS " := { "
+ \fB\-V\fR | \fB\-\-Version\fR |
+ \fB\-j\fR | \fB\-\-json\fR |
+-\fB\-p\fR | \fB\-\-pretty\fR }
++\fB\-p\fR | \fB\-\-pretty\fR |
++\fB\-t\fR | \fB\-\-timestamp\fR |
++\fB\-\-tshort\fR }
+ 
+ .SH DESCRIPTION
+ The
+@@ -58,6 +60,25 @@ Output results in JavaScript Object Notation (JSON).
+ When combined with \-j, generates a pretty JSON output with indentation
+ and newlines for better human readability.
+ 
++.TP
++.BR "\-t" , " \-\-timestamp"
++When used with the
++.B monitor
++object, print a
++.B Timestamp:
++line before each received notification, in the same format used by
++.BR "ip monitor" .
++
++.TP
++.B "\-\-tshort"
++Like
++.BR \-t ,
++but emits a more compact, ISO 8601 inline prefix
++.RB \(lq [ YYYY-MM-DD T HH:MM:SS . uuuuuu ] \(rq
++in front of each notification instead of a separate
++.B Timestamp:
++line.
++
+ .SH DEVICE COMMANDS
+ 
+ .SS dpll device show [ id ID ] [ module-name NAME ] [ clock-id ID ] [ type TYPE ] [ mode MODE ] [ lock-status STATUS ]
 -- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
-https://ti.com/opensource
+2.53.0
 
 
