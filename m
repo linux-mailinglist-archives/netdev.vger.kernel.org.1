@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-291568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291569-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLU/DeVPFWpMUQcAu9opvQ
-	(envelope-from <netdev+bounces-291568-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:46:45 +0200
+	id cLEhEiNQFWpMUQcAu9opvQ
+	(envelope-from <netdev+bounces-291569-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:47:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2DB75D1DE7
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0DEB5D1E0C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:47:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12125303BB22
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 07:45:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92FC330488ED
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 07:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822B83CC7FD;
-	Tue, 26 May 2026 07:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCC83CAA50;
+	Tue, 26 May 2026 07:45:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzqpke1F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iGyxuoFk"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E143CC7EC
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD83E3CC7D5
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779781540; cv=none; b=QrAnEv5Xd0yeoU+iFHXoSS1XILf1z9Le5lTaSf2Oeo0bUbMegVslQpq5LJm/nEKRJBN81DjQKsxGsJo+eWQiic/fbFkkeMf6MZpmv9gOV0wQDK5f/q4sx/KeQTDSTuBQgNt75rs8UXIuDJfzibaT+bzfbF6uIM5UFnTXWgngLNc=
+	t=1779781545; cv=none; b=cjcIbYb7gEh/kB5RgM+q+wfpnyzGIdsG9Tk3tcnTEdll1Uuve2uiiRKK5qhHN1ZF0NZA+0hWNXP6pmEkX2U4muIyhGFgTSTL1hpxYdu8KG8+wd6AL8VY926UtvSStHu8COmNAjC418L7dtNIwYkWJmS+Ipeunm1YG71rgPX2jKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779781540; c=relaxed/simple;
-	bh=dzD4bc6V/oUDibuM4AToGSaxbDMRBoPYOsmyRHbdMdc=;
+	s=arc-20240116; t=1779781545; c=relaxed/simple;
+	bh=IC247OPJSELP3TYeABidbmiWh+x8QU4VGt5tZ8I7fnA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uVVIyFEftd2ezxHoyh/0XvPOwfmOXvzGYonLO1kwYNlC40AIESkfF+39S80LxF87Y/PvK1ID4MJPR7YT52odKQG2RWzfUWVvTlGNf4Mq8aHrRC44uoWb2uVnQtBT2ZPL3KwbZ05qLIr+DbJTm9wQNKRJO3xRrgxPYeo619iztLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gzqpke1F; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=qdwY/kxj+oqjTdz9LQ+Rs0HZnwoFfnp91afLP+kzIn9nv+9lT2su3Bmc9vCJAheIlPIIFQj0t7ZxvkmJkHd84RIx0cZlDt0d9+vYjnXJUKu56tFBvf8ozDbDKEa2+uqqUItX/83adUDD74l7WmJSYlowVY/SAWUpRcJw2IwS1rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iGyxuoFk; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779781537;
+	s=mimecast20190719; t=1779781538;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=S9HIX5k4A0YH7zbZMexPpDcifj2A36GK+V459xIGOwE=;
-	b=gzqpke1FVhZVh1D2jDbeiAqI9p/+jc1Ca8vH4J+QDY7fYqakmvoMT9lDxO8TCf7paHioGQ
-	5xKgCHgI1lhWR29o41UAzhPlv/c4MWllFwbjBSRQ00MXIe4NmBW91cbbOnSNP3p617+3nw
-	6zv+r7psHkO/Pvl5L69lC7STn3HvXO8=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=+fJWKfO43mFIzbUJOvX1Sg4iP/PsSAXPESJ1EGfBCRA=;
+	b=iGyxuoFkW+ai023eR//sK62D5x70TzjTH+c10a2/wpjVTs2ib/UZIqx8T/Eyr0gIKDvdZT
+	oRB+ghhEpDrcjng/V6dCWHd+OndCDM8vn3+W1lg0l4VB7cg6aRrQO8IO+RTKUzJ3+IYcKm
+	DYy8O6DCBImkxLIUuxeAtTTkOybzxw8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-423-7Fkf5yM5PPuEdG_kSAc_PA-1; Tue,
- 26 May 2026 03:45:34 -0400
-X-MC-Unique: 7Fkf5yM5PPuEdG_kSAc_PA-1
-X-Mimecast-MFC-AGG-ID: 7Fkf5yM5PPuEdG_kSAc_PA_1779781533
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-253-Wk5ksTO-Mcqw1KHqXGg65A-1; Tue,
+ 26 May 2026 03:45:36 -0400
+X-MC-Unique: Wk5ksTO-Mcqw1KHqXGg65A-1
+X-Mimecast-MFC-AGG-ID: Wk5ksTO-Mcqw1KHqXGg65A_1779781535
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D624195608A;
-	Tue, 26 May 2026 07:45:32 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 717211800610;
+	Tue, 26 May 2026 07:45:35 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.44.33.138])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CD8D8180034E;
-	Tue, 26 May 2026 07:45:29 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F28331800576;
+	Tue, 26 May 2026 07:45:32 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
@@ -69,9 +69,9 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Petr Oros <poros@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 1/3] dpll: export __dpll_device_change_ntf() for use under dpll_lock
-Date: Tue, 26 May 2026 09:45:23 +0200
-Message-ID: <20260526074525.1451008-2-ivecera@redhat.com>
+Subject: [PATCH net 2/3] dpll: zl3073x: use __dpll_device_change_ntf() and remove change_work
+Date: Tue, 26 May 2026 09:45:24 +0200
+Message-ID: <20260526074525.1451008-3-ivecera@redhat.com>
 In-Reply-To: <20260526074525.1451008-1-ivecera@redhat.com>
 References: <20260526074525.1451008-1-ivecera@redhat.com>
 Precedence: bulk
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291568-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291569-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -109,63 +109,109 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A2DB75D1DE7
+X-Rspamd-Queue-Id: B0DEB5D1E0C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Export __dpll_device_change_ntf() so that drivers can send device
-change notifications from within device callbacks, which are already
-called under dpll_lock. Using dpll_device_change_ntf() in that
-context would deadlock.
+The change_work was introduced to send device change notifications
+from DPLL device callbacks without deadlocking on dpll_lock, since
+the callbacks are already invoked under that lock. Now that
+__dpll_device_change_ntf() is exported for callers that already
+hold dpll_lock, use it directly and remove the change_work
+infrastructure entirely.
 
-Add lockdep_assert_held() to catch misuse without the lock held.
+This eliminates a race condition where change_work could be
+re-scheduled after cancel_work_sync() during device teardown,
+potentially causing the handler to dereference a freed or NULL
+dpll_dev pointer.
 
+Fixes: 9363b4837659 ("dpll: zl3073x: Allow to configure phase offset averaging factor")
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- drivers/dpll/dpll_netlink.c | 13 +++++++++++--
- include/linux/dpll.h        |  1 +
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ drivers/dpll/zl3073x/dpll.c | 26 +++++++++-----------------
+ drivers/dpll/zl3073x/dpll.h |  2 --
+ 2 files changed, 9 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index 0ff1658c2dc1..75e3ae0c16d0 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -829,12 +829,21 @@ int dpll_device_delete_ntf(struct dpll_device *dpll)
- 	return dpll_device_event_send(DPLL_CMD_DEVICE_DELETE_NTF, dpll);
+diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
+index 64b4e9e3e8fe..0770bd895de9 100644
+--- a/drivers/dpll/zl3073x/dpll.c
++++ b/drivers/dpll/zl3073x/dpll.c
+@@ -1079,15 +1079,6 @@ zl3073x_dpll_phase_offset_avg_factor_get(const struct dpll_device *dpll,
+ 	return 0;
  }
  
--static int
--__dpll_device_change_ntf(struct dpll_device *dpll)
-+/**
-+ * __dpll_device_change_ntf - notify that the dpll device has been changed
-+ * @dpll: registered dpll pointer
-+ *
-+ * Context: caller must hold dpll_lock. Suitable for use inside device
-+ *          callbacks which are already invoked under dpll_lock.
-+ * Return: 0 if succeeds, error code otherwise.
-+ */
-+int __dpll_device_change_ntf(struct dpll_device *dpll)
+-static void
+-zl3073x_dpll_change_work(struct work_struct *work)
+-{
+-	struct zl3073x_dpll *zldpll;
+-
+-	zldpll = container_of(work, struct zl3073x_dpll, change_work);
+-	dpll_device_change_ntf(zldpll->dpll_dev);
+-}
+-
+ static int
+ zl3073x_dpll_phase_offset_avg_factor_set(const struct dpll_device *dpll,
+ 					 void *dpll_priv, u32 factor,
+@@ -1113,8 +1104,10 @@ zl3073x_dpll_phase_offset_avg_factor_set(const struct dpll_device *dpll,
+ 	 * we have to send a notification for other DPLL devices.
+ 	 */
+ 	list_for_each_entry(item, &zldpll->dev->dplls, list) {
+-		if (item != zldpll)
+-			schedule_work(&item->change_work);
++		struct dpll_device *dpll_dev = READ_ONCE(item->dpll_dev);
++
++		if (item != zldpll && dpll_dev)
++			__dpll_device_change_ntf(dpll_dev);
+ 	}
+ 
+ 	return 0;
+@@ -1627,13 +1620,13 @@ zl3073x_dpll_device_register(struct zl3073x_dpll *zldpll)
+ static void
+ zl3073x_dpll_device_unregister(struct zl3073x_dpll *zldpll)
  {
-+	lockdep_assert_held(&dpll_lock);
- 	dpll_device_notify(dpll, DPLL_DEVICE_CHANGED);
- 	return dpll_device_event_send(DPLL_CMD_DEVICE_CHANGE_NTF, dpll);
+-	WARN(!zldpll->dpll_dev, "DPLL device is not registered\n");
++	struct dpll_device *dpll_dev = READ_ONCE(zldpll->dpll_dev);
+ 
+-	cancel_work_sync(&zldpll->change_work);
++	WARN(!dpll_dev, "DPLL device is not registered\n");
+ 
+-	dpll_device_unregister(zldpll->dpll_dev, &zldpll->ops, zldpll);
+-	dpll_device_put(zldpll->dpll_dev, &zldpll->tracker);
+-	zldpll->dpll_dev = NULL;
++	WRITE_ONCE(zldpll->dpll_dev, NULL);
++	dpll_device_unregister(dpll_dev, &zldpll->ops, zldpll);
++	dpll_device_put(dpll_dev, &zldpll->tracker);
  }
-+EXPORT_SYMBOL_GPL(__dpll_device_change_ntf);
  
  /**
-  * dpll_device_change_ntf - notify that the dpll device has been changed
-diff --git a/include/linux/dpll.h b/include/linux/dpll.h
-index f8037f1ab20b..2dbe8567eafc 100644
---- a/include/linux/dpll.h
-+++ b/include/linux/dpll.h
-@@ -284,6 +284,7 @@ void dpll_pin_on_pin_unregister(struct dpll_pin *parent, struct dpll_pin *pin,
- int dpll_pin_ref_sync_pair_add(struct dpll_pin *pin,
- 			       struct dpll_pin *ref_sync_pin);
+@@ -1926,7 +1919,6 @@ zl3073x_dpll_alloc(struct zl3073x_dev *zldev, u8 ch)
+ 	zldpll->dev = zldev;
+ 	zldpll->id = ch;
+ 	INIT_LIST_HEAD(&zldpll->pins);
+-	INIT_WORK(&zldpll->change_work, zl3073x_dpll_change_work);
  
-+int __dpll_device_change_ntf(struct dpll_device *dpll);
- int dpll_device_change_ntf(struct dpll_device *dpll);
+ 	return zldpll;
+ }
+diff --git a/drivers/dpll/zl3073x/dpll.h b/drivers/dpll/zl3073x/dpll.h
+index 434c32a7db12..c8bc8437a709 100644
+--- a/drivers/dpll/zl3073x/dpll.h
++++ b/drivers/dpll/zl3073x/dpll.h
+@@ -21,7 +21,6 @@
+  * @tracker: tracking object for the acquired reference
+  * @lock_status: last saved DPLL lock status
+  * @pins: list of pins
+- * @change_work: device change notification work
+  */
+ struct zl3073x_dpll {
+ 	struct list_head		list;
+@@ -35,7 +34,6 @@ struct zl3073x_dpll {
+ 	dpll_tracker			tracker;
+ 	enum dpll_lock_status		lock_status;
+ 	struct list_head		pins;
+-	struct work_struct		change_work;
+ };
  
- int __dpll_pin_change_ntf(struct dpll_pin *pin);
+ struct zl3073x_dpll *zl3073x_dpll_alloc(struct zl3073x_dev *zldev, u8 ch);
 -- 
 2.53.0
 
