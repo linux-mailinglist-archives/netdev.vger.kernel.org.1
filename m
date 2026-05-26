@@ -1,178 +1,146 @@
-Return-Path: <netdev+bounces-291831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291832-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CCbpC53RFWogcgcAu9opvQ
-	(envelope-from <netdev+bounces-291831-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:00:13 +0200
+	id 0Oh9GcvRFWogcgcAu9opvQ
+	(envelope-from <netdev+bounces-291832-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:00:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3C965DA44A
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:00:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3FC65DA479
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:00:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 77DD53035F35
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:51:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EB7AE3048F1C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C0C3D6466;
-	Tue, 26 May 2026 16:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBD43F7865;
+	Tue, 26 May 2026 16:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="d5+wmFmH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ce3YhG1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B323F7865
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 16:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD063FADF8;
+	Tue, 26 May 2026 16:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779814299; cv=none; b=OopH0FEU1Kwt5gnpFj4ITM9/UwLgU1QcTheueD2YrD0NvCpBh7WIn4EbH0cD5tr9OjpRzV8JPi9dhsqyzQNuCFqEl4BpafpZjLYWK4FK4eq7XD1SZsy38fKJD8LejTAz+4eLDCofSxKftQloBPyH1/partYML03mLzj/YT5A8w8=
+	t=1779814345; cv=none; b=MyAmFk/sWO7gKKufzyBZYJ83Ch+fGgkS9tnlCcAlCnkzTMZM4C9Sem9rYd1nfUgbF7qnphKEQDG3aUDbew6i4koliCtYGhUUmLhI0YcCTaID4l3DKrnX6ZWuf3HtoxfuenQzOZZvWojjFkRJuxUJvVWL0mseZwb8KLVInZGbFG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779814299; c=relaxed/simple;
-	bh=5AymClZEoPoN1I/ayZKrb1HYUqU4OLw4SF80hR8uPws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LTg7ACo+5tq8ZDfo6rRJF0F/yc+7JOyKaKS69r4YODHrbB02qZcHhPl+eiB1jxft78IylIUAjCwjAGO899Ja4n1CaXYyTy5Qrf0xJGb5lz/u0b2MysFBsDIzdllNOmlh7+n4yr6+R7tM90+i7tQuH9n4y10qpms7MdRw2E7V8w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=d5+wmFmH; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 051CD4E42D61;
-	Tue, 26 May 2026 16:51:35 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A5DB26011D;
-	Tue, 26 May 2026 16:51:34 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 17D861088899F;
-	Tue, 26 May 2026 18:51:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779814293; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=j/A/hn15fCwY/6fIjA55PwASVVJRiR8tXpbm3BxnJto=;
-	b=d5+wmFmHSsj+K6t3jxCfNV+75cVuNz+pYZTtSNuqqlGtTL0jrsBh8zbyyWH/O2l8er6PqI
-	l55BmTMtKshMAI1rEQGqT0DnLCdacOXduo7VgFTHZbKNFYbwDn1yDGDxVB/UQUqj7car+Z
-	qOoEPlCzsjrk+Ps/NTmBN9KdTAfI6v9aK1mpEJtWvGytqNDoUNaWtkgM2NpkrxejphxNxM
-	w0BN1bV6uJglZqibTfgrFNW7yVKc+t0M6lwYmC/bYVTayoQRCAM91hETdCwUjgJ+jX7K+M
-	TlLmUgpHBAvcRvzIFbl7rAWK/bbnMy0Scr43mAGnk9RT7zsK3SzNoJK7Tn9kCg==
-Message-ID: <d16bf6d2-94b3-4e7f-b71e-04215dc66965@bootlin.com>
-Date: Tue, 26 May 2026 18:51:29 +0200
+	s=arc-20240116; t=1779814345; c=relaxed/simple;
+	bh=b70iNpOAo4J1yd5gqLr3hNmrHnjVkz1gDv12JovZ6so=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y1V9yTvaVK+cAT7zGn4+1r3VQgePGzNAMx/Gw6P8VCr1PHcsY0ggb0SuXVkBlhFzDtIlbaEyQQF07oZBH/jVTIYX0JhjAukJXK8/oRBs6VTqt+Wmc+fUWQ/J91S31ALAtTJ89uGkRLUP+qkLK+HYoysMTt5a+KwGQigDujSMDJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ce3YhG1O; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A0541F000E9;
+	Tue, 26 May 2026 16:52:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779814344;
+	bh=iqZU0VSF4u3exzFmb0oOCc3SQ132DKj9diAAdClssVY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ce3YhG1O2J0oru3Kpta03Xyl24U6CeF3FrqDEnNPAAo8F57X5JGvA4xtrefe9wSdG
+	 FkEWdSronUB0iXZ5dAJllwKKbA/IrDQs5QLtvLSRjZlb7qjYkzMMnHHh/YInsv9UUF
+	 o3f86Ls0FmSkeSp/gb/u5U6x/G5HHDcBZJYzHQP+hZ/zBOdmJ0MLCdvRsITF3LdxIM
+	 /LUYz0Qyb3W7o3CpplGKMQN9x1ZEGNyZ5/qFm1peqWvDSAmWoWDKdbSo+zeXd0CQjE
+	 5V5A/8flfwnbVBOkMO6wtblSRoV2RR+bWAoVNCnVsi8V75l+tUHTPLRo6fhlgbX3i/
+	 30SpQDMZjCrhw==
+Date: Tue, 26 May 2026 17:52:18 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	James Chapman <jchapman@katalix.com>,
+	Tom Parkin <tparkin@katalix.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>, Kees Cook <kees@kernel.org>,
+	netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] l2tp: use refcount_inc_not_zero in
+ l2tp_session_get_by_ifname
+Message-ID: <20260526165218.GM1506108@horms.kernel.org>
+References: <20260523023423.2568972-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 04/10] ethtool: pse-pd: fix missing
- ethnl_ops_complete()
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, o.rempel@pengutronix.de,
- kory.maincent@bootlin.com, haiyangz@microsoft.com, andrew@lunn.ch,
- chleroy@kernel.org
-References: <20260526153533.2779187-1-kuba@kernel.org>
- <20260526153533.2779187-5-kuba@kernel.org>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260526153533.2779187-5-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260523023423.2568972-1-michael.bommarito@gmail.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291831-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-291832-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.995];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,pengutronix.de:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E3C965DA44A
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: F3FC65DA479
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
-
-On 5/26/26 17:35, Jakub Kicinski wrote:
-> pse_prepare_data() is missing ethnl_ops_complete() if
-> ethnl_req_get_phydev() returned an error. Move getting
-> phydev up so that we don't have to worry about this
-> (similar order to linkstate_prepare_data()).
+On Fri, May 22, 2026 at 10:34:23PM -0400, Michael Bommarito wrote:
+> A reader in l2tp_session_get_by_ifname() can return a pointer to a
+> session whose refcount has reached zero. The getter takes its
+> reference with plain refcount_inc(), but every other session getter
+> in the same file (l2tp_v2_session_get, l2tp_v3_session_get, and the
+> corresponding _get_next variants) uses refcount_inc_not_zero()
+> because the IDR/RCU lookup can race with refcount_dec_and_test() ->
+> l2tp_session_free() -> kfree_rcu(). The ifname getter is the only
+> outlier; the inconsistency was raised on-list after 979c017803c4
+> ("l2tp: use list_del_rcu in l2tp_session_unhash").
 > 
-> Note that phydev may still be NULL (this is checked in
-> pse_get_pse_attributes()), the goal isn't really to avoid
-> the _begin() / _complete() calls, only to simplify the error
-> handling.
+> A reader inside rcu_read_lock_bh() that matches session->ifname can
+> be preempted between the strcmp() and the refcount_inc(). If the
+> last reference drops on another CPU in that window, the reader's
+> refcount_inc() runs on a counter that has reached zero. refcount_t
+> catches the addition-on-zero, prints "refcount_t: addition on 0;
+> use-after-free", saturates the counter, and returns the saturated
+> pointer to the caller. Session memory is held live by the in-flight
+> RCU read section, but the kfree_rcu() callback queued from
+> l2tp_session_free() will free it once the grace period closes; a
+> caller that dereferences the returned session past that point hits
+> a slab-use-after-free. On PREEMPT_RT local_bh_disable() is a per-CPU
+> sleeping lock and the preemption window is real; on stock PREEMPT
+> kernels local_bh_disable() is a preempt_count increment that closes
+> the cross-CPU race in practice (see below).
 > 
-> While at it propagate the original error. Why this code
-> overrides the error with -ENODEV but !phydev generates
-> -EOPNOTSUPP is unclear to me...
-
-The logic is that ethnl_req_get_phydev() may return -ENODEV,
-meaning "you passed a phy index for a PHY that doesn't
-exist", which is different than "there's no PHY, setting PSE-PD
-params isn't supported then."
-
-But there's no real sense overriding the phydev ERR_PTR with the same
-value :) Your fix should be fine :) Thanks for this !
-
+> Use refcount_inc_not_zero() and continue the list walk on failure,
+> matching the other session getters in the file. The ifname getter
+> is the only session getter in net/l2tp/ that still uses the bare
+> refcount_inc() pattern; this change restores file-internal
+> consistency. The success path is unchanged.
 > 
-> Fixes: 31748765bed3 ("net: ethtool: pse-pd: Target the command to the requested PHY")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Fixes: abe7a1a7d0b6 ("l2tp: improve tunnel/session refcount helpers")
+> Cc: stable@vger.kernel.org
+> Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
-> ---
-> CC: o.rempel@pengutronix.de
-> CC: kory.maincent@bootlin.com
-> CC: andrew@lunn.ch
-> CC: maxime.chevallier@bootlin.com
-> CC: chleroy@kernel.org
-> ---
->   net/ethtool/pse-pd.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-> index 2eb9bdc2dcb9..757c9e0cc856 100644
-> --- a/net/ethtool/pse-pd.c
-> +++ b/net/ethtool/pse-pd.c
-> @@ -62,14 +62,14 @@ static int pse_prepare_data(const struct ethnl_req_info *req_base,
->   	struct phy_device *phydev;
->   	int ret;
->   
-> -	ret = ethnl_ops_begin(dev);
-> -	if (ret < 0)
-> -		return ret;
-> -
->   	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PSE_HEADER,
->   				      info->extack);
->   	if (IS_ERR(phydev))
-> -		return -ENODEV;
-> +		return PTR_ERR(phydev);
-> +
-> +	ret = ethnl_ops_begin(dev);
-> +	if (ret < 0)
-> +		return ret;
->   
->   	ret = pse_get_pse_attributes(phydev, info->extack, data);
->   
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
