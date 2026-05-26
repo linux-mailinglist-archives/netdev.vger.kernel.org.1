@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-291569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291570-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLEhEiNQFWpMUQcAu9opvQ
-	(envelope-from <netdev+bounces-291569-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:47:47 +0200
+	id UD0uA8hPFWpMUQcAu9opvQ
+	(envelope-from <netdev+bounces-291570-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:46:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0DEB5D1E0C
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:47:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8101F5D1DD1
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:46:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 92FC330488ED
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 07:45:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 47BE6302BBDE
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 07:45:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCC83CAA50;
-	Tue, 26 May 2026 07:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0A43CC7CA;
+	Tue, 26 May 2026 07:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iGyxuoFk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgzPZUAl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD83E3CC7D5
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4949C3CC338
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779781545; cv=none; b=cjcIbYb7gEh/kB5RgM+q+wfpnyzGIdsG9Tk3tcnTEdll1Uuve2uiiRKK5qhHN1ZF0NZA+0hWNXP6pmEkX2U4muIyhGFgTSTL1hpxYdu8KG8+wd6AL8VY926UtvSStHu8COmNAjC418L7dtNIwYkWJmS+Ipeunm1YG71rgPX2jKw=
+	t=1779781547; cv=none; b=BMsZNynRCt1mAkTg47H/v3WcF0rALEk09mOMAcJP59FsAYp1DjNyYffgHlZ4t2KDbYy3s64nD3yL5onCe6pY2LJQ/w9MRhBu2qRE9FvgrSUlsMBH6G6Dk1tGhurFTulUiVbGoniGOp8hkfDSAwgICFIkHGEfc3UBoPTrSR4Yfzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779781545; c=relaxed/simple;
-	bh=IC247OPJSELP3TYeABidbmiWh+x8QU4VGt5tZ8I7fnA=;
+	s=arc-20240116; t=1779781547; c=relaxed/simple;
+	bh=ygXd+5zAiuT0OPbl2WhlAJJvLUB6id7WDPFZaGehUio=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qdwY/kxj+oqjTdz9LQ+Rs0HZnwoFfnp91afLP+kzIn9nv+9lT2su3Bmc9vCJAheIlPIIFQj0t7ZxvkmJkHd84RIx0cZlDt0d9+vYjnXJUKu56tFBvf8ozDbDKEa2+uqqUItX/83adUDD74l7WmJSYlowVY/SAWUpRcJw2IwS1rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iGyxuoFk; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=mynP6pNakuh23e5dzsf13crno/jlX2s8aKNxWehhl5WNkXitYAfHpS6mGU4++HX1kZA9v+6j7v7tK+iv8qAUBtN8BlmAFjmHU6N3dvuTEWa+S+0QQMiD/LWxQ7knOvQ9WVIGutUSAqtUWgwzTTOkJXHmQc13c5g7NJ0NVa0nsJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UgzPZUAl; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779781538;
+	s=mimecast20190719; t=1779781545;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+fJWKfO43mFIzbUJOvX1Sg4iP/PsSAXPESJ1EGfBCRA=;
-	b=iGyxuoFkW+ai023eR//sK62D5x70TzjTH+c10a2/wpjVTs2ib/UZIqx8T/Eyr0gIKDvdZT
-	oRB+ghhEpDrcjng/V6dCWHd+OndCDM8vn3+W1lg0l4VB7cg6aRrQO8IO+RTKUzJ3+IYcKm
-	DYy8O6DCBImkxLIUuxeAtTTkOybzxw8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=Iz3MlEfb0H6qdVr9/ytwIUo1zGOfV+YQvCMvxpC2NyE=;
+	b=UgzPZUAlDy1xUH64vmiYe6BlJ+BZ0mxZe8S4lTDgbnQoKMJh1JN0H2ib4Mnhnkz+Kn2s+Y
+	xvUGNHVpL1skhv1q2XvzlGT54EG5Rc/AboqLIKTIMZYdaCsKfDP6VayzTe9XzWPwfQ5R23
+	XaOOXYMH6CFDtsSryJpEZTuA0xBg0cQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-253-Wk5ksTO-Mcqw1KHqXGg65A-1; Tue,
- 26 May 2026 03:45:36 -0400
-X-MC-Unique: Wk5ksTO-Mcqw1KHqXGg65A-1
-X-Mimecast-MFC-AGG-ID: Wk5ksTO-Mcqw1KHqXGg65A_1779781535
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-500-8x15vvB_M5iaG8N-l8agww-1; Tue,
+ 26 May 2026 03:45:40 -0400
+X-MC-Unique: 8x15vvB_M5iaG8N-l8agww-1
+X-Mimecast-MFC-AGG-ID: 8x15vvB_M5iaG8N-l8agww_1779781538
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 717211800610;
-	Tue, 26 May 2026 07:45:35 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C34C1956096;
+	Tue, 26 May 2026 07:45:38 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.44.33.138])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F28331800576;
-	Tue, 26 May 2026 07:45:32 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DAB141800465;
+	Tue, 26 May 2026 07:45:35 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
@@ -69,9 +69,9 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Petr Oros <poros@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/3] dpll: zl3073x: use __dpll_device_change_ntf() and remove change_work
-Date: Tue, 26 May 2026 09:45:24 +0200
-Message-ID: <20260526074525.1451008-3-ivecera@redhat.com>
+Subject: [PATCH net 3/3] dpll: zl3073x: make frequency monitor a per-device attribute
+Date: Tue, 26 May 2026 09:45:25 +0200
+Message-ID: <20260526074525.1451008-4-ivecera@redhat.com>
 In-Reply-To: <20260526074525.1451008-1-ivecera@redhat.com>
 References: <20260526074525.1451008-1-ivecera@redhat.com>
 Precedence: bulk
@@ -88,12 +88,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291569-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291570-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -106,112 +106,189 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: B0DEB5D1E0C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 8101F5D1DD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The change_work was introduced to send device change notifications
-from DPLL device callbacks without deadlocking on dpll_lock, since
-the callbacks are already invoked under that lock. Now that
-__dpll_device_change_ntf() is exported for callers that already
-hold dpll_lock, use it directly and remove the change_work
-infrastructure entirely.
+The frequency monitoring feature uses shared hardware registers
+that measure input reference frequencies independently of
+individual DPLL channels. However, the freq_monitor flag was
+incorrectly placed in the per-DPLL structure, causing each
+channel to track its own enable/disable state independently.
 
-This eliminates a race condition where change_work could be
-re-scheduled after cancel_work_sync() during device teardown,
-potentially causing the handler to dereference a freed or NULL
-dpll_dev pointer.
+Since the DPLL core calls measured_freq_get() only for the first
+pin registration, the measured_freq_check() in the periodic worker
+was gated by the per-DPLL freq_monitor flag of whichever channel
+happens to be checked. If the first DPLL channel had frequency
+monitoring disabled while another had it enabled, measurements
+were never reported.
 
-Fixes: 9363b4837659 ("dpll: zl3073x: Allow to configure phase offset averaging factor")
+Move freq_monitor from struct zl3073x_dpll to struct zl3073x_dev
+so all DPLL channels share a single flag, matching the hardware
+behavior. Update freq_monitor_set() to notify other DPLL devices
+about the change (like phase_offset_avg_factor_set() already does)
+and remove the mode-dependent guard in zl3073x_dpll_changes_check()
+since all input pin monitoring (pin state, phase offset, FFO, and
+measured frequency) works correctly in all DPLL modes.
+
+Fixes: bfc923b642874 ("dpll: zl3073x: implement frequency monitoring")
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- drivers/dpll/zl3073x/dpll.c | 26 +++++++++-----------------
+ drivers/dpll/zl3073x/core.c | 19 ++++++++-----------
+ drivers/dpll/zl3073x/core.h |  4 +++-
+ drivers/dpll/zl3073x/dpll.c | 29 ++++++++++++++---------------
  drivers/dpll/zl3073x/dpll.h |  2 --
- 2 files changed, 9 insertions(+), 19 deletions(-)
+ 4 files changed, 25 insertions(+), 29 deletions(-)
 
+diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
+index 5f1e70f3e40a..0a133b0f2d97 100644
+--- a/drivers/dpll/zl3073x/core.c
++++ b/drivers/dpll/zl3073x/core.c
+@@ -762,18 +762,15 @@ zl3073x_dev_periodic_work(struct kthread_work *work)
+ 		dev_warn(zldev->dev, "Failed to update phase offsets: %pe\n",
+ 			 ERR_PTR(rc));
+ 
+-	/* Update measured input reference frequencies if any DPLL has
+-	 * frequency monitoring enabled.
++	/* Update measured input reference frequencies if frequency
++	 * monitoring is enabled.
+ 	 */
+-	list_for_each_entry(zldpll, &zldev->dplls, list) {
+-		if (zldpll->freq_monitor) {
+-			rc = zl3073x_ref_freq_meas_update(zldev);
+-			if (rc)
+-				dev_warn(zldev->dev,
+-					 "Failed to update measured frequencies: %pe\n",
+-					 ERR_PTR(rc));
+-			break;
+-		}
++	if (zldev->freq_monitor) {
++		rc = zl3073x_ref_freq_meas_update(zldev);
++		if (rc)
++			dev_warn(zldev->dev,
++				 "Failed to update measured frequencies: %pe\n",
++				 ERR_PTR(rc));
+ 	}
+ 
+ 	/* Update references' fractional frequency offsets */
+diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
+index 99440620407d..addba378b0df 100644
+--- a/drivers/dpll/zl3073x/core.h
++++ b/drivers/dpll/zl3073x/core.h
+@@ -57,6 +57,7 @@ struct zl3073x_chip_info {
+  * @work: periodic work
+  * @clock_id: clock id of the device
+  * @phase_avg_factor: phase offset measurement averaging factor
++ * @freq_monitor: is frequency monitor enabled
+  */
+ struct zl3073x_dev {
+ 	struct device			*dev;
+@@ -77,9 +78,10 @@ struct zl3073x_dev {
+ 	struct kthread_worker		*kworker;
+ 	struct kthread_delayed_work	work;
+ 
+-	/* Devlink parameters */
++	/* Per-chip parameters */
+ 	u64			clock_id;
+ 	u8			phase_avg_factor;
++	bool			freq_monitor;
+ };
+ 
+ extern const struct regmap_config zl3073x_regmap_config;
 diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index 64b4e9e3e8fe..0770bd895de9 100644
+index 0770bd895de9..0bfcbae2109f 100644
 --- a/drivers/dpll/zl3073x/dpll.c
 +++ b/drivers/dpll/zl3073x/dpll.c
-@@ -1079,15 +1079,6 @@ zl3073x_dpll_phase_offset_avg_factor_get(const struct dpll_device *dpll,
- 	return 0;
- }
+@@ -1212,7 +1212,7 @@ zl3073x_dpll_freq_monitor_get(const struct dpll_device *dpll,
+ {
+ 	struct zl3073x_dpll *zldpll = dpll_priv;
  
--static void
--zl3073x_dpll_change_work(struct work_struct *work)
--{
--	struct zl3073x_dpll *zldpll;
--
--	zldpll = container_of(work, struct zl3073x_dpll, change_work);
--	dpll_device_change_ntf(zldpll->dpll_dev);
--}
--
- static int
- zl3073x_dpll_phase_offset_avg_factor_set(const struct dpll_device *dpll,
- 					 void *dpll_priv, u32 factor,
-@@ -1113,8 +1104,10 @@ zl3073x_dpll_phase_offset_avg_factor_set(const struct dpll_device *dpll,
- 	 * we have to send a notification for other DPLL devices.
- 	 */
- 	list_for_each_entry(item, &zldpll->dev->dplls, list) {
--		if (item != zldpll)
--			schedule_work(&item->change_work);
+-	if (zldpll->freq_monitor)
++	if (zldpll->dev->freq_monitor)
+ 		*state = DPLL_FEATURE_STATE_ENABLE;
+ 	else
+ 		*state = DPLL_FEATURE_STATE_DISABLE;
+@@ -1226,9 +1226,19 @@ zl3073x_dpll_freq_monitor_set(const struct dpll_device *dpll,
+ 			      enum dpll_feature_state state,
+ 			      struct netlink_ext_ack *extack)
+ {
+-	struct zl3073x_dpll *zldpll = dpll_priv;
++	struct zl3073x_dpll *item, *zldpll = dpll_priv;
+ 
+-	zldpll->freq_monitor = (state == DPLL_FEATURE_STATE_ENABLE);
++	zldpll->dev->freq_monitor = (state == DPLL_FEATURE_STATE_ENABLE);
++
++	/* The frequency monitoring is common for all DPLL channels so after
++	 * change we have to send a notification for other DPLL devices.
++	 */
++	list_for_each_entry(item, &zldpll->dev->dplls, list) {
 +		struct dpll_device *dpll_dev = READ_ONCE(item->dpll_dev);
 +
 +		if (item != zldpll && dpll_dev)
 +			__dpll_device_change_ntf(dpll_dev);
- 	}
++	}
  
  	return 0;
-@@ -1627,13 +1620,13 @@ zl3073x_dpll_device_register(struct zl3073x_dpll *zldpll)
- static void
- zl3073x_dpll_device_unregister(struct zl3073x_dpll *zldpll)
- {
--	WARN(!zldpll->dpll_dev, "DPLL device is not registered\n");
-+	struct dpll_device *dpll_dev = READ_ONCE(zldpll->dpll_dev);
- 
--	cancel_work_sync(&zldpll->change_work);
-+	WARN(!dpll_dev, "DPLL device is not registered\n");
- 
--	dpll_device_unregister(zldpll->dpll_dev, &zldpll->ops, zldpll);
--	dpll_device_put(zldpll->dpll_dev, &zldpll->tracker);
--	zldpll->dpll_dev = NULL;
-+	WRITE_ONCE(zldpll->dpll_dev, NULL);
-+	dpll_device_unregister(dpll_dev, &zldpll->ops, zldpll);
-+	dpll_device_put(dpll_dev, &zldpll->tracker);
  }
+@@ -1745,7 +1755,7 @@ zl3073x_dpll_pin_measured_freq_check(struct zl3073x_dpll_pin *pin)
+ 	u8 ref_id;
+ 	u32 freq;
  
- /**
-@@ -1926,7 +1919,6 @@ zl3073x_dpll_alloc(struct zl3073x_dev *zldev, u8 ch)
- 	zldpll->dev = zldev;
- 	zldpll->id = ch;
- 	INIT_LIST_HEAD(&zldpll->pins);
--	INIT_WORK(&zldpll->change_work, zl3073x_dpll_change_work);
+-	if (!zldpll->freq_monitor)
++	if (!zldpll->dev->freq_monitor)
+ 		return false;
  
- 	return zldpll;
- }
+ 	ref_id = zl3073x_input_pin_ref_get(pin->id);
+@@ -1778,10 +1788,8 @@ zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll)
+ 	struct zl3073x_dev *zldev = zldpll->dev;
+ 	enum dpll_lock_status lock_status;
+ 	struct device *dev = zldev->dev;
+-	const struct zl3073x_chan *chan;
+ 	struct zl3073x_dpll_pin *pin;
+ 	int rc;
+-	u8 mode;
+ 
+ 	zldpll->check_count++;
+ 
+@@ -1800,15 +1808,6 @@ zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll)
+ 		dpll_device_change_ntf(zldpll->dpll_dev);
+ 	}
+ 
+-	/* Input pin monitoring does make sense only in automatic
+-	 * or forced reference modes.
+-	 */
+-	chan = zl3073x_chan_state_get(zldev, zldpll->id);
+-	mode = zl3073x_chan_mode_get(chan);
+-	if (mode != ZL_DPLL_MODE_REFSEL_MODE_AUTO &&
+-	    mode != ZL_DPLL_MODE_REFSEL_MODE_REFLOCK)
+-		return;
+-
+ 	/* Update phase offset latch registers for this DPLL if the phase
+ 	 * offset monitor feature is enabled.
+ 	 */
 diff --git a/drivers/dpll/zl3073x/dpll.h b/drivers/dpll/zl3073x/dpll.h
-index 434c32a7db12..c8bc8437a709 100644
+index c8bc8437a709..21adcc18e45e 100644
 --- a/drivers/dpll/zl3073x/dpll.h
 +++ b/drivers/dpll/zl3073x/dpll.h
-@@ -21,7 +21,6 @@
+@@ -15,7 +15,6 @@
+  * @id: DPLL index
+  * @check_count: periodic check counter
+  * @phase_monitor: is phase offset monitor enabled
+- * @freq_monitor: is frequency monitor enabled
+  * @ops: DPLL device operations for this instance
+  * @dpll_dev: pointer to registered DPLL device
   * @tracker: tracking object for the acquired reference
-  * @lock_status: last saved DPLL lock status
-  * @pins: list of pins
-- * @change_work: device change notification work
-  */
- struct zl3073x_dpll {
- 	struct list_head		list;
-@@ -35,7 +34,6 @@ struct zl3073x_dpll {
+@@ -28,7 +27,6 @@ struct zl3073x_dpll {
+ 	u8				id;
+ 	u8				check_count;
+ 	bool				phase_monitor;
+-	bool				freq_monitor;
+ 	struct dpll_device_ops		ops;
+ 	struct dpll_device		*dpll_dev;
  	dpll_tracker			tracker;
- 	enum dpll_lock_status		lock_status;
- 	struct list_head		pins;
--	struct work_struct		change_work;
- };
- 
- struct zl3073x_dpll *zl3073x_dpll_alloc(struct zl3073x_dev *zldev, u8 ch);
 -- 
 2.53.0
 
