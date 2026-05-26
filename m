@@ -1,992 +1,315 @@
-Return-Path: <netdev+bounces-291524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cAKfL6kVFWptSgcAu9opvQ
-	(envelope-from <netdev+bounces-291524-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:38:17 +0200
+	id aLlfGiEWFWpoSgcAu9opvQ
+	(envelope-from <netdev+bounces-291527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:40:17 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3213C5D0617
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:38:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D66455D0670
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:40:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4DFB3302FA35
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 03:37:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E3D96304860C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 03:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385853B9DAE;
-	Tue, 26 May 2026 03:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4F53BA249;
+	Tue, 26 May 2026 03:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Pmk+3Lh7"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.155.80.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f99.google.com (mail-oa1-f99.google.com [209.85.160.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D660E3B7778;
-	Tue, 26 May 2026 03:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.155.80.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4243B2FE6
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 03:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779766646; cv=none; b=ZDzTwXT1/uL/HlpKk+cjvJ24bbCpw8A7Faim2NK7aKXgJtWBVOXsI1vIOBlkRutKJDTnt6fowmDgLDDqOmo/MiHT19Lg8ry8kTcCvsX7akQ0kEHpB9ob/XG4bJ6tLSv0H81y15WQD/Eht7Yo4291mkAjbS4jxEh5F75f8dgcnZE=
+	t=1779766658; cv=none; b=fAvzgGGrSRLZdHgo4NRQYQWNsfBBufSZS64dMWaOCBXE1hXNUgjpJc8W8+J8cdL/tSJhzjvThXrJFmjFxQWK+aOjnWZBLAJMei0t/bGjL85gGPlNavH5qNXgenzmBxTDNzhhPRBchQPHBAilH1Nan9/rUwvhK0w8jdoYux6ySbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779766646; c=relaxed/simple;
-	bh=TeDgUK1CL1hUX2xIygoo9Cgz0WlILUdUzYZTuB8vj0c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G+iJSpEPWbs/YDRPmpgHnJ0JQxi+95xA2z3kva1k7A9uP2lpZBhAQd71W/2i/4ngE5K/4IoDuZ+mo/jmfY8zV6KWuqL6S8j+1iYNqZMEZ6Wo5vzX6WFWkCBOA172kQozfwTx98AowfhhWAgXxlsuGWCmf9tNmYB2mqYPyCItehA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=43.155.80.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpsz6t1779766567tb27a65a0
-X-QQ-Originating-IP: td6s61SMnNL8LRjVpX/Km80trvtTScaBofIFAxxcSaI=
-Received: from localhost.localdomain ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 26 May 2026 11:36:05 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 10864712323845709411
-EX-QQ-RecipientCnt: 12
-From: Dong Yibo <dong100@mucse.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	danishanwar@ti.com,
-	vadim.fedorenko@linux.dev,
-	horms@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dong100@mucse.com,
-	yaojun@mucse.com
-Subject: [PATCH net-next v4 4/4] net: rnpgbe: Add link status handling support
-Date: Tue, 26 May 2026 11:35:39 +0800
-Message-Id: <20260526033539.164061-5-dong100@mucse.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260526033539.164061-1-dong100@mucse.com>
-References: <20260526033539.164061-1-dong100@mucse.com>
+	s=arc-20240116; t=1779766658; c=relaxed/simple;
+	bh=bGQlDNgGOSef7J/2LxJi7wjJWxPYlxKfnJzZN9PKnVY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KsPNWT7MGgqbjYzJnDaLSBE3cwOnUiR4aoPJfLL+ZyYoO+GJANYrWjYSpbz9IdIcOl6yK+Mt/LksSEs9w4MFxxlNAiPx94iU/cvXAyVPfqT0lPcrWrKvxmaCa9T9vMdCMPyfj2dXdtwkC/+c+04uHQ2f/9gn7jkGpfvE5WdOENY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Pmk+3Lh7; arc=none smtp.client-ip=209.85.160.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oa1-f99.google.com with SMTP id 586e51a60fabf-43bf95c1faaso394381fac.0
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 20:37:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779766656; x=1780371456;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qa/waU9ZL+XF7EOKbLxT5xE9+7/fpaPEa1bGbzaWN7k=;
+        b=dn7GD5hLUINleh+ZEzEO/Bflyd3Uy3Ni8qFzirP3RAtKYL57ewzfGySsiHRlFu13Gz
+         2bMlc+ezMYWZikZyl0nmfxTKWiYvDVZXJ0Xl5OP4qYhZ0AjmP/KGIg3iCV3ZwAglZTq9
+         PrN1l7cUIDZ7d0fDg8Plq+ZD/fncrcSbFLPcPwAY9Suuu7Ped/oG/YFD29ehyUPTnpUS
+         wNgdF6Tvq+nqXcREZeWPBcg/3xnFNHw4iNBtQAP/h7lTZ+D70XvC8XZK0J5jWPATd6HZ
+         89usGy+0H0AcOwsFMq0El1V9XSHO/sqbMUc0Ak8dB9hcGXOWg5I6a4XcSt8o8V2hYNWE
+         Kr4Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9RiUiz5zNDv+EjTLb+lKZGV79NuJEAQzeEvUUf5YLhvPwmpl3COyQAIHojb49dRIlHZf081M8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQEMB2LgovVL87T0uLb4tPdHotTxygL8K6EzrZ+v6176ac93U1
+	tZtXefYX4IpucqQpD17kiMz5JoLl4tWHld6yly5Ga5YeSzNnnSTuUUsy8l3HpVWYRR6M03atMib
+	kDtwGBvso6OA2XhhutaiCR1ZjKzXU1dmtfMHGBW5Vcwdn6vCfDPRc5t9ZpKP5ISswrPRq2jvjSZ
+	Q/cfKI4u2HIERq7UoDYrDe5NQL/lDPPYoUkiJKUYzFzmilglTeXs7d3Z2GiyZC9gLwiodfFZaeG
+	bUyaD6eSNHvDg==
+X-Gm-Gg: Acq92OH/e3H5DuoNwwzabVkPe5WqGy4dwmyn6z+VcFz2NEs/PqxGxxX44VQICYlV+dA
+	t2nUWLl2v6VZJZO07doBnoOePW4q7Fpv3Hfo3LMmrY19LunLy5IPxmQ3I5bdR+k/4byBWYMamIx
+	a/FbYRJT8nTYA/SlmaMGlBp4n6A0c0qCztWDb2LybsaXr7XMuplk+r/QdSRSzOnHbMrUbwx5jys
+	xNKF7DPH26hxdCsZVjWVo26H6eZBBd9ssjH0v5vMicqSOurnU4ddCxH0O1SoLJ12LT2/0cHqqpn
+	L2qlpnePid3A6IkSJo2PjSaQEqmju6f4m0ZT7FkbnFNLRQxAs5SvV+NI4gZ6mmN9fssT+BDjsX/
+	/PHmLEzwT1IGz+etZWz8kB/RXU2HGrCRf33PefOVTKji1V9UIfs1+Fu6rna1m1/7mQKSODUd72D
+	7RM8QlIJZPKtd4GlopBsp/iJIXcLMyBbEbEyKlq5zOg/qcmfzH8N/IZpahq+Y=
+X-Received: by 2002:a05:6871:339f:b0:433:d14c:2416 with SMTP id 586e51a60fabf-43b5aa375ecmr10119589fac.7.1779766655576;
+        Mon, 25 May 2026 20:37:35 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-43b6362cf3fsm1509771fac.6.2026.05.25.20.37.35
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 25 May 2026 20:37:35 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-be2ac42926dso31612166b.3
+        for <netdev@vger.kernel.org>; Mon, 25 May 2026 20:37:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1779766654; x=1780371454; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qa/waU9ZL+XF7EOKbLxT5xE9+7/fpaPEa1bGbzaWN7k=;
+        b=Pmk+3Lh7i64GMTigjsZNCi7w8+Zb3nojQe0akM5i9sZGsCdAR2GWcHR7TGJE4QvBbY
+         uUy52rNReREXqq94VzISWEYoezROMX/KJatbFgDiKo+0LBPOn+7gBe5++srdc44Xis2t
+         HqiMKYsZxZCivDOaV0IkrlJwyEn7Og5YFlZ8Y=
+X-Forwarded-Encrypted: i=1; AFNElJ/6+KIZBKXgQik4ZaU+nwG4ffGpp8APAheaWJpTq+BAInEVqxmNECrxY8tTBEfbMHjqfJNNUw4=@vger.kernel.org
+X-Received: by 2002:a17:907:761b:b0:bb8:fdf7:e132 with SMTP id a640c23a62f3a-bdd25ced638mr733102166b.18.1779766653731;
+        Mon, 25 May 2026 20:37:33 -0700 (PDT)
+X-Received: by 2002:a17:907:761b:b0:bb8:fdf7:e132 with SMTP id
+ a640c23a62f3a-bdd25ced638mr733100866b.18.1779766653162; Mon, 25 May 2026
+ 20:37:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
-X-QQ-XMAILINFO: MzA1H0ZcBW3DrA0HIj79cb9vLtbcOEkRJaeTKQe/i9W1C+vWu+tNnrlk
-	wuYCynTJCHG3j7zlWyr/xZwtN61+Qy6tFTOCv3F+A0x68Of+ioy7kel+TZJeICTPpY9ymN5
-	LJEjHzWl1Zuvx/igkRa7br+n9bGA29CvyBb9n0FN1lNcFWBBCdtaah5fRe33JBiOqjv0XJt
-	Xk9AYImPS4iTKSYLrfotMDc6JtEFx1x2zgKEpeairmkOe85CyZmelQ0yfcRdADMOuQrI9z5
-	LjAA4q6fl9PSfWSJwnm5O0fgzYfb1kiTtRGm8n3gKJcxsBFsiHCDIZ3TKKytQubV13SYpC/
-	jWRhRE8hPO3jxSXmirSEzpGOu91kGC9Vu/+oU8Ednsw9IT5iJbXBL8KreI4XQGVXkSKZQDp
-	6z3ZcyR7CbhqfB6i0YTM6FE2JJVDoJjaBZDUs4jGIXkV1DKPb2JcSsHhhAr/xct4QSdVG2U
-	mkkzlbBwWW4eyRp9VvIu3ldWrzORN7nbYYhev9FIGzIrKWQu6zReI8iw6PI+b5h9RY6mDFo
-	qME8NzBy7PHjvdzzJBtwhUYyqz6/DYsN+yMnOw0pDcy9pSEjXd0iU+pYLN9jQXcBQ/a42BM
-	Ti9eSIfn0qPRCbP+CXqK4GCP6DOTTbp+RqH/zVr3tT+qPb5coztNvho7OSJljCuobRrCvBX
-	N5bn3X8mr8NYjxeLL7NloCHa8rNyD9urfYLh7s0Kyo++xid3uTFn1kUHBbIfM6LZWKrF7tz
-	SevvqB/HCce8/gFeXNmH4K/cANhT2VNG8TctPx6rw+MySYeId9kRKuwZOSYG9IDXeDsQNX8
-	8H1ExG4nAGtLJFvknZZAakOI5FC9J3cL+wpKC2pPZFbNNMVMJrDhDk0fV71OpjHxjod1dA0
-	9n0ZYuoydJdeQ5KtCza6Ur18RtceHl4qA3yMQbuHENG8oUxq3Z0LOdSEvp9MHdAiRCGlTeu
-	xNbZ8WcHbUAKsq+AgLvc2Ah7QJPM45hUOLVzUcE7oFR4EAnA7J2HgzJ2xwo6Uj70UlEGTft
-	8h57vzZZN56weO/KBZhrcKBSS8V5dJ00IE/P8IHBMQpmLQFwwDtc6Gb6bpnIeXGmo0DlVct
-	7SAr8W91dEzu/4JmzXAmyCrlwEQ7Spq3nE8csjbdus1
-X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
-X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [1.54 / 15.00];
+References: <CAPzpGcTMARhkcdt46bV=nWWx+AD5dX2ztWCEEx_4y2V=D-1THg@mail.gmail.com>
+In-Reply-To: <CAPzpGcTMARhkcdt46bV=nWWx+AD5dX2ztWCEEx_4y2V=D-1THg@mail.gmail.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Tue, 26 May 2026 09:07:19 +0530
+X-Gm-Features: AVHnY4Kv5ooRoUDxWNyhaMdg5tHK_sbCGS1pwivVufGHCdiYtkUGFo9R1FsaXWw
+Message-ID: <CALs4sv3D5n7pciO_1G+XjxNi-YSdM98t2hTHVM7b=c4Dpa06ng@mail.gmail.com>
+Subject: Re: [PATCH net v3] net: tg3: guard napi_disable and
+ pci_disable_device calls
+To: Yury Murashka <yurypm@arista.com>
+Cc: mchan@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000330acd0652b0375b"
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mucse.com];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291524-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291527-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.795];
-	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pavan.chebbi@broadcom.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mucse.com:mid,mucse.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,serv_task.work:url]
-X-Rspamd-Queue-Id: 3213C5D0617
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,broadcom.com:email,broadcom.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,arista.com:email]
+X-Rspamd-Queue-Id: D66455D0670
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add link status management infrastructure to the rnpgbe driver:
-- Add link status related data structures (speed, duplex, link state)
-- Implement firmware link event handling via mailboxa
-  (fw controls link states, don't support phylink)
-- Add service task for periodic link status monitoring
-- Implement carrier status management (netif_carrier_on/off)
-- Add port up/down notification to firmware
+--000000000000330acd0652b0375b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This enables the driver to properly track and report link status changes.
+On Mon, May 25, 2026 at 3:19=E2=80=AFPM Yury Murashka <yurypm@arista.com> w=
+rote:
+>
+> During PCIe hot-plug events, uncorrectable errors can be reported and
+> AER recovery for the tg3 device is initiated by the AER kernel driver.
+> The tg3_io_error_detected function is the AER error recovery handler.
+>
+> From tg3_io_error_detected, we call tg3_netif_stop->tg3_napi_disable->
+> napi_disable and return PCI_ERS_RESULT_NEED_RESET on non-fatal error.
+> We expect that during AER recovery tg3_io_slot_reset and tg3_io_resume
+> will be called. But AER error recovery can fail. For example, when one
+> of PCIe devices on the same bus reports PCI_ERS_RESULT_NO_AER_DRIVER.
+> As a result, tg3_io_slot_reset and tg3_io_resume are not called, PCIe
+> device is disabled and NAPI is disabled (pci_disable_device and
+> napi_disable are called from tg3_io_error_detected). Then we can try to
+> disable PCIe link and napi_disable will be called again:
+>
+>   napi_disable+0x1b/0x1b0
+>   tg3_napi_disable+0x89/0xa0 [tg3]
+>   tg3_netif_stop+0x37/0xe3 [tg3]
+>   tg3_stop+0x30/0x160 [tg3]
+>   tg3_close+0x2a/0x60 [tg3]
+>   __dev_close_many+0xad/0x130
+>   dev_close_many+0xb2/0x190
+>   unregister_netdevice_many_notify+0x19d/0xa00
+>   unregister_netdevice_queue+0xf8/0x140
+>   unregister_netdev+0x1c/0x30
+>   tg3_remove_one+0xaa/0x150 [tg3]
+>   pci_device_remove+0x42/0xb0
+>   device_release_driver_internal+0x19c/0x200
+>   pci_stop_bus_device+0x85/0xb0
+>   pci_stop_bus_device+0x2c/0xb0
+>   pci_stop_bus_device+0x2c/0xb0
+>   pci_stop_and_remove_bus_device+0x12/0x20
+>   pciehp_unconfigure_device+0x9f/0x160
+>   pciehp_disable_slot+0x67/0x100
+>   pciehp_handle_presence_or_link_change+0x77/0x350
+>
+> This is not expected by napi_disable and a thread can be locked in
+> napi_disable forever. We have pcierr_recovery to cover a similar issue,
+> but for fatal errors. We cannot reuse this flag because it is reset in
+> tg3_io_resume, but it is not called when AER recovery fails.
+>
+> Similarly, if an AER error is reported and tg3_io_error_detected calls
+> pci_disable_device, a subsequent device removal via tg3_remove_one or
+> tg3_shutdown will call pci_disable_device again for the already-disabled
+> device.
+>
+> Add a napi_enabled flag to struct tg3 to track whether napi_enable has
+> been called. Guard tg3_napi_disable() so it returns early if NAPI was
+> not previously enabled. Also guard pci_disable_device() calls in
+> tg3_remove_one() and tg3_shutdown() with pci_is_enabled() to avoid
+> disabling an already-disabled device.
+>
+> Fixes: b45aa2f6192e ("tg3: Add EEH support")
+> Signed-off-by: Yury Murashka <yurypm@arista.com>
+> ---
+>  drivers/net/ethernet/broadcom/tg3.c | 14 ++++++++++++--
+>  drivers/net/ethernet/broadcom/tg3.h |  1 +
+>  2 files changed, 13 insertions(+), 2 deletions(-)
+>
 
-Signed-off-by: Dong Yibo <dong100@mucse.com>
----
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  26 ++-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  33 ++-
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  13 ++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    | 179 +++++++++++++++-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.h    |   1 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |   5 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    |  23 ++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |   1 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 197 +++++++++++++++++-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |  38 ++++
- 10 files changed, 505 insertions(+), 11 deletions(-)
+LGTM.
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+nit: The revision-change log for the patch is missing..
 
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-index 36c170a6e3fc..acdca0a05eae 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-@@ -16,25 +16,33 @@ enum rnpgbe_boards {
- 	board_n210
- };
- 
-+struct mbx_req_cookie {
-+	int timeout;
-+	struct completion comp;
-+	/* must match sizeof(struct mbx_fw_cmd_reply) */
-+	u8 cmd[56];
-+};
-+
- struct mucse_mbx_info {
- 	u32 timeout_us;
- 	u32 delay_us;
- 	u16 fw_req;
- 	u16 fw_ack;
-+	struct mbx_req_cookie cookie;
- 	/* lock for only one use mbx */
- 	struct mutex lock;
- 	/* fw <--> pf mbx */
-+	bool irq_en;
- 	u32 fwpf_shm_base;
- 	u32 pf2fw_mbx_ctrl;
- 	u32 fwpf_mbx_mask;
- 	u32 fwpf_ctrl_base;
- };
- 
--/* Enum for firmware notification modes,
-- * more modes (e.g., portup, link_report) will be added in future
-- **/
- enum {
- 	mucse_fw_powerup,
-+	mucse_fw_portup,
-+	mucse_fw_link_report_en,
- };
- 
- struct mucse_hw {
-@@ -43,8 +51,11 @@ struct mucse_hw {
- 	struct pci_dev *pdev;
- 	struct mucse_mbx_info mbx;
- 	int port;
-+	int speed;
-+	bool link;
- 	u16 cycles_per_us;
- 	u8 pfvfnum;
-+	u8 duplex;
- };
- 
- struct rnpgbe_tx_desc {
-@@ -189,6 +200,10 @@ struct mucse_q_vector {
- #define M_DEFAULT_RXD     512
- #define M_DEFAULT_TX_WORK 256
- 
-+enum mucse_state_t {
-+	__MUCSE_DOWN,
-+};
-+
- struct mucse {
- 	struct net_device *netdev;
- 	struct pci_dev *pdev;
-@@ -196,6 +211,7 @@ struct mucse {
- #define M_FLAG_MSI_EN              BIT(0)
- #define M_FLAG_MSIX_SINGLE_EN      BIT(1)
- #define M_FLAG_MSIX_EN             BIT(2)
-+#define M_FLAG_NEED_LINK_UPDATE    BIT(3)
- 	u32 flags;
- 	struct mucse_ring *tx_ring[RNPGBE_MAX_QUEUES]
- 		____cacheline_aligned_in_smp;
-@@ -209,6 +225,9 @@ struct mucse {
- 	int rx_ring_item_count;
- 	int num_rx_queues;
- 	char mbx_name[32];
-+	unsigned long state;
-+	struct delayed_work serv_task;
-+	spinlock_t link_lock; /* spinlock for link update */
- };
- 
- int rnpgbe_get_permanent_mac(struct mucse_hw *hw, u8 *perm_addr);
-@@ -217,6 +236,7 @@ int rnpgbe_send_notify(struct mucse_hw *hw,
- 		       bool enable,
- 		       int mode);
- int rnpgbe_init_hw(struct mucse_hw *hw, int board_type);
-+void rnpgbe_set_rx(struct mucse_hw *hw, bool enable);
- 
- /* Device IDs */
- #define PCI_VENDOR_ID_MUCSE               0x8848
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-index 291e77d573fe..8986bd325306 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-@@ -66,11 +66,17 @@ int rnpgbe_send_notify(struct mucse_hw *hw,
- 		       int mode)
- {
- 	int err;
--	/* Keep switch struct to support more modes in the future */
-+
- 	switch (mode) {
- 	case mucse_fw_powerup:
- 		err = mucse_mbx_powerup(hw, enable);
- 		break;
-+	case mucse_fw_portup:
-+		err = mucse_mbx_phyup(hw, enable);
-+		break;
-+	case mucse_fw_link_report_en:
-+		err = mucse_mbx_link_report(hw, enable);
-+		break;
- 	default:
- 		err = -EINVAL;
- 	}
-@@ -149,3 +155,28 @@ int rnpgbe_init_hw(struct mucse_hw *hw, int board_type)
- 
- 	return 0;
- }
-+
-+/**
-+ * rnpgbe_set_rx - Setup rx state
-+ * @hw: hw information structure
-+ * @enable: set rx on or off
-+ *
-+ * rnpgbe_set_rx setup rx enable
-+ *
-+ **/
-+void rnpgbe_set_rx(struct mucse_hw *hw, bool enable)
-+{
-+	u32 value = mucse_hw_rd32(hw, GMAC_CONTROL);
-+
-+	if (enable)
-+		value |= GMAC_CONTROL_RE;
-+	else
-+		value &= ~GMAC_CONTROL_RE;
-+
-+	mucse_hw_wr32(hw, GMAC_CONTROL, value);
-+
-+	if (enable)
-+		mucse_hw_wr32(hw, GMAC_FRAME_FILTER, GMAC_RX_ALL);
-+	else
-+		mucse_hw_wr32(hw, GMAC_FRAME_FILTER, 0);
-+}
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-index 03688586b447..4d1a9a386e9d 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-@@ -17,7 +17,20 @@
- 
- #define TX_AXI_RW_EN                   0xc
- #define RX_AXI_RW_EN                   0x03
-+/* mask all valid info */
-+#define M_ST_MASK                      0xff000f11
-+/* 31:28 set 0xa to valid it is a driver set info */
-+#define M_DEFAULT_ST                   0xa0000000
-+/* driver setup this by own info */
-+/*bit:   25:24   |  11:8   |     4   | 0       */
-+/*fun:   pause   |  speed  |  duplex | up/down */
-+#define RNPGBE_LINK_ST                 0x000c
- #define RNPGBE_DMA_AXI_EN              0x0010
- 
-+#define MUCSE_GMAC_OFF(_n)             (0x20000 + (_n))
-+#define GMAC_CONTROL_RE                0x00000004
-+#define GMAC_CONTROL                   MUCSE_GMAC_OFF(0)
-+#define GMAC_RX_ALL                    (BIT(31) | BIT(0))
-+#define GMAC_FRAME_FILTER              MUCSE_GMAC_OFF(0x4)
- #define RNPGBE_MAX_QUEUES 8
- #endif /* _RNPGBE_HW_H */
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-index 3457b5d5d2bc..da2164f5e3b4 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-@@ -596,11 +596,16 @@ static int rnpgbe_poll(struct napi_struct *napi, int budget)
- 			clean_complete = false;
- 	}
- 
-+	if (test_bit(__MUCSE_DOWN, &q_vector->mucse->state))
-+		clean_complete = true;
-+
- 	if (!clean_complete)
- 		return budget;
- 
--	if (likely(napi_complete_done(napi, work_done)))
--		rnpgbe_irq_enable_queues(q_vector);
-+	if (likely(napi_complete_done(napi, work_done))) {
-+		if (!test_bit(__MUCSE_DOWN, &q_vector->mucse->state))
-+			rnpgbe_irq_enable_queues(q_vector);
-+	}
- 
- 	return work_done;
- }
-@@ -618,6 +623,7 @@ static int rnpgbe_poll(struct napi_struct *napi, int budget)
- int register_mbx_irq(struct mucse *mucse)
- {
- 	struct pci_dev *pdev = mucse->pdev;
-+	struct mucse_hw *hw = &mucse->hw;
- 	int err = 0;
- 
- 	snprintf(mucse->mbx_name, sizeof(mucse->mbx_name),
-@@ -627,6 +633,8 @@ int register_mbx_irq(struct mucse *mucse)
- 		err = request_irq(pci_irq_vector(pdev, 0),
- 				  rnpgbe_msix_other, 0, mucse->mbx_name,
- 				  mucse);
-+		if (!err)
-+			hw->mbx.irq_en = true;
- 	}
- 
- 	return err;
-@@ -639,9 +647,12 @@ int register_mbx_irq(struct mucse *mucse)
- void remove_mbx_irq(struct mucse *mucse)
- {
- 	struct pci_dev *pdev = mucse->pdev;
-+	struct mucse_hw *hw = &mucse->hw;
- 
--	if (mucse->flags & M_FLAG_MSIX_EN)
-+	if (mucse->flags & M_FLAG_MSIX_EN) {
- 		free_irq(pci_irq_vector(pdev, 0), mucse);
-+		hw->mbx.irq_en = false;
-+	}
- }
- 
- /**
-@@ -994,6 +1005,7 @@ int rnpgbe_request_irq(struct mucse *mucse)
- {
- 	struct net_device *netdev = mucse->netdev;
- 	struct pci_dev *pdev = mucse->pdev;
-+	struct mucse_hw *hw = &mucse->hw;
- 	struct mucse_q_vector *q_vector;
- 	int err, i;
- 
-@@ -1021,6 +1033,7 @@ int rnpgbe_request_irq(struct mucse *mucse)
- 				  mucse);
- 		if (err)
- 			return err;
-+		hw->mbx.irq_en = true;
- 	}
- 
- 	return 0;
-@@ -1043,6 +1056,7 @@ int rnpgbe_request_irq(struct mucse *mucse)
- void rnpgbe_free_irq(struct mucse *mucse)
- {
- 	struct pci_dev *pdev = mucse->pdev;
-+	struct mucse_hw *hw = &mucse->hw;
- 	struct mucse_q_vector *q_vector;
- 
- 	if (mucse->flags & M_FLAG_MSIX_EN) {
-@@ -1055,6 +1069,7 @@ void rnpgbe_free_irq(struct mucse *mucse)
- 		}
- 	} else {
- 		free_irq(pci_irq_vector(pdev, 0), mucse);
-+		hw->mbx.irq_en = false;
- 	}
- }
- 
-@@ -1260,7 +1275,35 @@ static void rnpgbe_clean_all_rx_rings(struct mucse *mucse)
- void rnpgbe_down(struct mucse *mucse)
- {
- 	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+	unsigned long flags;
-+	int err;
-+
-+	set_bit(__MUCSE_DOWN, &mucse->state);
-+	cancel_delayed_work_sync(&mucse->serv_task);
-+
-+	spin_lock_irqsave(&mucse->link_lock, flags);
-+	hw->link = false;
-+	hw->speed = 0;
-+	hw->duplex = 0;
-+	mucse->flags &= ~M_FLAG_NEED_LINK_UPDATE;
-+	spin_unlock_irqrestore(&mucse->link_lock, flags);
-+	rnpgbe_set_rx(hw, false);
-+
-+	err = rnpgbe_send_notify(hw, false, mucse_fw_link_report_en);
-+	if (err) {
-+		dev_warn(&hw->pdev->dev, "Send link report to hw failed %d\n",
-+			 err);
-+		dev_warn(&hw->pdev->dev, "Fw will still report link event\n");
-+	}
- 
-+	err = rnpgbe_send_notify(hw, false, mucse_fw_portup);
-+	if (err) {
-+		dev_warn(&hw->pdev->dev, "Send port down to hw failed %d\n",
-+			 err);
-+		dev_warn(&hw->pdev->dev, "Port is not truly down\n");
-+	}
-+	netif_carrier_off(netdev);
- 	netif_tx_stop_all_queues(netdev);
- 	netif_tx_disable(netdev);
- 	rnpgbe_napi_disable_all(mucse);
-@@ -1276,17 +1319,38 @@ void rnpgbe_down(struct mucse *mucse)
- void rnpgbe_up_complete(struct mucse *mucse)
- {
- 	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+	int err;
- 
- 	if (mucse->flags & (M_FLAG_MSIX_EN | M_FLAG_MSIX_SINGLE_EN))
- 		rnpgbe_configure_msix(mucse);
- 	else
- 		rnpgbe_configure_msi(mucse);
- 
-+	clear_bit(__MUCSE_DOWN, &mucse->state);
- 	rnpgbe_napi_enable_all(mucse);
- 	rnpgbe_irq_enable(mucse);
- 	netif_tx_start_all_queues(netdev);
- 	for (int i = 0; i < mucse->num_rx_queues; i++)
- 		mucse_ring_wr32(mucse->rx_ring[i], RNPGBE_RX_START, 1);
-+
-+	err = rnpgbe_send_notify(hw, true, mucse_fw_portup);
-+	if (err) {
-+		dev_warn(&hw->pdev->dev, "Send portup to hw failed %d\n", err);
-+		dev_warn(&hw->pdev->dev, "Port is not truly up\n");
-+	}
-+
-+	err = rnpgbe_send_notify(hw, true, mucse_fw_link_report_en);
-+	if (err) {
-+		dev_warn(&hw->pdev->dev, "Send link report to hw failed %d\n",
-+			 err);
-+		dev_warn(&hw->pdev->dev, "Fw will not report link event\n");
-+	}
-+
-+	/* echo driver down to hw */
-+	mucse_hw_wr32(hw, RNPGBE_LINK_ST, M_DEFAULT_ST);
-+	queue_delayed_work(system_wq, &mucse->serv_task,
-+			   msecs_to_jiffies(500));
- }
- 
- /**
-@@ -1936,3 +2000,112 @@ void rnpgbe_configure_rx(struct mucse *mucse)
- 	dma_axi_ctl |= RX_AXI_RW_EN;
- 	mucse_hw_wr32(hw, RNPGBE_DMA_AXI_EN, dma_axi_ctl);
- }
-+
-+/**
-+ * rnpgbe_process_link_event - Update the link status
-+ * @mucse: pointer to the device private structure
-+ *
-+ * @return: link status
-+ **/
-+static int rnpgbe_process_link_event(struct mucse *mucse)
-+{
-+	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+	unsigned long flags;
-+	bool link;
-+	int speed;
-+	u8 duplex;
-+
-+	if (!(mucse->flags & M_FLAG_NEED_LINK_UPDATE))
-+		return hw->link;
-+
-+	spin_lock_irqsave(&mucse->link_lock, flags);
-+
-+	link = hw->link;
-+	speed = hw->speed;
-+	duplex = hw->duplex;
-+
-+	mucse->flags &= ~M_FLAG_NEED_LINK_UPDATE;
-+	spin_unlock_irqrestore(&mucse->link_lock, flags);
-+
-+	if (link) {
-+		netdev_info(netdev, "NIC Link is Up %d Mbps, %s Duplex\n",
-+			    speed,
-+			    duplex ? "Full" : "Half");
-+	}
-+
-+	return link;
-+}
-+
-+/**
-+ * rnpgbe_link_is_up - Update netif_carrier status and
-+ * print link up message
-+ * @mucse: pointer to the device private structure
-+ **/
-+static void rnpgbe_link_is_up(struct mucse *mucse)
-+{
-+	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+
-+	/* Only continue if link was previously down */
-+	if (netif_carrier_ok(netdev))
-+		return;
-+	rnpgbe_set_rx(hw, true);
-+	netif_carrier_on(netdev);
-+}
-+
-+/**
-+ * rnpgbe_link_is_down - Update netif_carrier status and
-+ * print link down message
-+ * @mucse: pointer to the private structure
-+ **/
-+static void rnpgbe_link_is_down(struct mucse *mucse)
-+{
-+	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+
-+	/* Only continue if link was up previously */
-+	if (!netif_carrier_ok(netdev))
-+		return;
-+	netdev_info(netdev, "NIC Link is Down\n");
-+	rnpgbe_set_rx(hw, false);
-+	netif_carrier_off(netdev);
-+}
-+
-+/**
-+ * rnpgbe_process_link_subtask - Check and bring link up
-+ * @mucse: pointer to the device private structure
-+ **/
-+static void rnpgbe_process_link_subtask(struct mucse *mucse)
-+{
-+	/* if interface is down do nothing */
-+	if (test_bit(__MUCSE_DOWN, &mucse->state))
-+		return;
-+
-+	if (rnpgbe_process_link_event(mucse))
-+		rnpgbe_link_is_up(mucse);
-+	else
-+		rnpgbe_link_is_down(mucse);
-+}
-+
-+/**
-+ * rnpgbe_service_task - Manages and runs subtasks
-+ * @work: pointer to work_struct containing our data
-+ **/
-+void rnpgbe_service_task(struct work_struct *work)
-+{
-+	struct mucse *mucse = container_of(work, struct mucse, serv_task.work);
-+
-+	if (test_bit(__MUCSE_DOWN, &mucse->state))
-+		return;
-+
-+	rnpgbe_process_link_subtask(mucse);
-+
-+	/* Periodic requeue is intentional: future patches will add
-+	 * statistics polling and other housekeeping tasks beyond
-+	 * link state handling.
-+	 */
-+	if (!test_bit(__MUCSE_DOWN, &mucse->state))
-+		queue_delayed_work(system_wq, &mucse->serv_task,
-+				   msecs_to_jiffies(500));
-+}
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
-index 9a8e6712d016..06bd0a44410d 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
-@@ -80,4 +80,5 @@ void rnpgbe_get_stats64(struct net_device *netdev,
- void rnpgbe_clean_rx_ring(struct mucse_ring *rx_ring);
- int rnpgbe_setup_all_rx_resources(struct mucse *mucse);
- void rnpgbe_free_all_rx_resources(struct mucse *mucse);
-+void rnpgbe_service_task(struct work_struct *work);
- #endif
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-index 8fcd1c922153..49d86ee2da86 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-@@ -52,6 +52,7 @@ static int rnpgbe_open(struct net_device *netdev)
- 	struct mucse *mucse = netdev_priv(netdev);
- 	int err;
- 
-+	netif_carrier_off(netdev);
- 	err = rnpgbe_request_irq(mucse);
- 	if (err)
- 		return err;
-@@ -181,6 +182,7 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
- 		dev_err(&pdev->dev, "Init hw err %d\n", err);
- 		goto err_free_net;
- 	}
-+
- 	/* Step 1: Send power-up notification to firmware (no response expected)
- 	 * This informs firmware to initialize hardware power state, but
- 	 * firmware only acknowledges receipt without returning data. Must be
-@@ -223,6 +225,9 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
- 		goto err_powerdown;
- 	}
- 
-+	INIT_DELAYED_WORK(&mucse->serv_task, rnpgbe_service_task);
-+	spin_lock_init(&mucse->link_lock);
-+
- 	err = rnpgbe_init_interrupt_scheme(mucse);
- 	if (err) {
- 		dev_err(&pdev->dev, "init interrupt failed %d\n", err);
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-index de5e29230b3c..3891e94dbdca 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-@@ -247,6 +247,26 @@ int mucse_poll_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
- 	return mucse_read_mbx_pf(hw, msg, size);
- }
- 
-+/**
-+ * mucse_check_and_read_mbx - check if there is notification and receive message
-+ * @hw: pointer to the HW structure
-+ * @msg: the message buffer
-+ * @size: length of buffer
-+ *
-+ * Return: 0 if it successfully received a message notification and
-+ * copied it into the receive buffer, negative errno on failure
-+ **/
-+int mucse_check_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
-+{
-+	int err;
-+
-+	err = mucse_check_for_msg_pf(hw);
-+	if (err)
-+		return err;
-+
-+	return mucse_read_mbx_pf(hw, msg, size);
-+}
-+
- /**
-  * mucse_mbx_get_fwack - Read fw ack from reg
-  * @mbx: pointer to the MBX structure
-@@ -402,5 +422,8 @@ void mucse_init_mbx_params_pf(struct mucse_hw *hw)
- 	mbx->delay_us = 100;
- 	mbx->timeout_us = 4 * USEC_PER_SEC;
- 	mutex_init(&mbx->lock);
-+	init_completion(&mbx->cookie.comp);
-+	mbx->cookie.timeout = 5 * HZ;
-+	mbx->irq_en = false;
- 	mucse_mbx_reset(hw);
- }
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-index e6fcc8d1d3ca..cba54a07a7fa 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-@@ -17,4 +17,5 @@
- int mucse_write_and_wait_ack_mbx(struct mucse_hw *hw, u32 *msg, u16 size);
- void mucse_init_mbx_params_pf(struct mucse_hw *hw);
- int mucse_poll_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size);
-+int mucse_check_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size);
- #endif /* _RNPGBE_MBX_H */
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-index 05684d716792..9503d273d60c 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-@@ -3,6 +3,7 @@
- 
- #include <linux/if_ether.h>
- #include <linux/bitfield.h>
-+#include <linux/ethtool.h>
- 
- #include "rnpgbe.h"
- #include "rnpgbe_mbx.h"
-@@ -23,19 +24,36 @@ static int mucse_fw_send_cmd_wait_resp(struct mucse_hw *hw,
- 				       struct mbx_fw_cmd_req *req,
- 				       struct mbx_fw_cmd_reply *reply)
- {
-+	struct mbx_req_cookie *cookie = &hw->mbx.cookie;
- 	int len = le16_to_cpu(req->datalen);
- 	int retry_cnt = 3;
- 	int err;
- 
-+	BUILD_BUG_ON(sizeof(struct mbx_fw_cmd_reply) != 56);
-+
- 	mutex_lock(&hw->mbx.lock);
-+
-+	if (hw->mbx.irq_en)
-+		reinit_completion(&cookie->comp);
-+
- 	err = mucse_write_and_wait_ack_mbx(hw, (u32 *)req, len);
- 	if (err)
- 		goto out;
- 	do {
--		err = mucse_poll_and_read_mbx(hw, (u32 *)reply,
--					      sizeof(*reply));
--		if (err)
--			goto out;
-+		if (hw->mbx.irq_en) {
-+			err = wait_for_completion_timeout(&cookie->comp,
-+							  cookie->timeout);
-+			if (err) {
-+				memcpy((u8 *)reply, cookie->cmd,
-+				       sizeof(*reply));
-+				err = 0;
-+			}
-+		} else {
-+			err = mucse_poll_and_read_mbx(hw, (u32 *)reply,
-+						      sizeof(*reply));
-+			if (err)
-+				goto out;
-+		}
- 		/* mucse_write_and_wait_ack_mbx return 0 means fw has
- 		 * received request, wait for the expect opcode
- 		 * reply with 'retry_cnt' times.
-@@ -190,10 +208,181 @@ int mucse_mbx_get_macaddr(struct mucse_hw *hw, int pfvfnum,
- 	return 0;
- }
- 
-+/**
-+ * mucse_mbx_phyup - Echo fw let the phy up
-+ * @hw: pointer to the HW structure
-+ * @is_phyup: true for up, false for down
-+ *
-+ * mucse_mbx_phyup echo fw to change phy status
-+ *
-+ * Return: 0 on success, negative errno on failure
-+ **/
-+int mucse_mbx_phyup(struct mucse_hw *hw, bool is_phyup)
-+{
-+	struct mbx_fw_cmd_req req = {
-+		.datalen = cpu_to_le16(sizeof(req.phy_status) +
-+				       MUCSE_MBX_REQ_HDR_LEN),
-+		.opcode  = cpu_to_le16(SET_PHY_UP),
-+		.phy_status = {
-+			.port_mask = cpu_to_le32(BIT(hw->port)),
-+			.status  = cpu_to_le32(is_phyup ? 1 : 0),
-+		},
-+	};
-+	int len, err;
-+
-+	len = le16_to_cpu(req.datalen);
-+	mutex_lock(&hw->mbx.lock);
-+	err = mucse_write_and_wait_ack_mbx(hw, (u32 *)&req, len);
-+	mutex_unlock(&hw->mbx.lock);
-+
-+	return err;
-+}
-+
-+/**
-+ * mucse_mbx_link_report - Echo fw report link change event or not
-+ * @hw: pointer to the HW structure
-+ * @is_report: true for report, false for no
-+ *
-+ * mucse_mbx_link_eventup echo fw to change event report state
-+ *
-+ * Return: 0 on success, negative errno on failure
-+ **/
-+int mucse_mbx_link_report(struct mucse_hw *hw, bool is_report)
-+{
-+	struct mbx_fw_cmd_req req = {
-+		.datalen = cpu_to_le16(sizeof(req.report_status) +
-+				       MUCSE_MBX_REQ_HDR_LEN),
-+		.opcode  = cpu_to_le16(LINK_REPORT_EN),
-+		.report_status = {
-+			.port_mask = cpu_to_le16(BIT(hw->port)),
-+			.status  = cpu_to_le16(is_report ? 1 : 0),
-+		},
-+	};
-+	int len, err;
-+
-+	len = le16_to_cpu(req.datalen);
-+	mutex_lock(&hw->mbx.lock);
-+	err = mucse_write_and_wait_ack_mbx(hw, (u32 *)&req, len);
-+	mutex_unlock(&hw->mbx.lock);
-+
-+	return err;
-+}
-+
-+/**
-+ * mucse_update_link_status_reg - update driver speed inf to reg
-+ * @hw: pointer to the HW structure
-+ * @req: pointer to req data
-+ *
-+ * mucse_update_link_status_reg update reg according to driver info,
-+ * fw will send irq if status is differ with reg
-+ *
-+ **/
-+static void mucse_update_link_status_reg(struct mucse_hw *hw,
-+					 struct mbx_fw_cmd_req *req)
-+{
-+	u16 status = le16_to_cpu(req->link_stat.st.status);
-+	u32 value;
-+
-+	value = mucse_hw_rd32(hw, RNPGBE_LINK_ST);
-+	value &= ~M_ST_MASK;
-+	value |= M_DEFAULT_ST;
-+
-+	if (le16_to_cpu(req->link_stat.port_status)) {
-+		value |= BIT(0);
-+		switch (hw->speed) {
-+		case 10:
-+			value |= (mucse_speed_10 << 8);
-+			break;
-+		case 100:
-+			value |= (mucse_speed_100 << 8);
-+			break;
-+		case 1000:
-+			value |= (mucse_speed_1000 << 8);
-+			break;
-+		default:
-+			/* invalid speed do nothing */
-+			break;
-+		}
-+
-+		value |= FIELD_PREP(BIT(4), !!hw->duplex);
-+		value |= FIELD_PREP(GENMASK_U32(25, 24),
-+				    status & GENMASK(1, 0));
-+	} else {
-+		value &= ~BIT(0);
-+	}
-+
-+	if (status & ST_STATUS_LLDP_STATUS_MASK)
-+		value |= BIT(6);
-+	else
-+		value &= ~BIT(6);
-+
-+	mucse_hw_wr32(hw, RNPGBE_LINK_ST, value);
-+}
-+
-+/**
-+ * mucse_mbx_fw_req_handler - Handle fw req
-+ * @hw: pointer to the HW structure
-+ * @req: pointer to req data
-+ *
-+ * rnpgbe_mbx_fw_req_handler handler fw req, such as a link event req.
-+ *
-+ * @return: 0 on success, negative on failure
-+ **/
-+static void mucse_mbx_fw_req_handler(struct mucse_hw *hw,
-+				     struct mbx_fw_cmd_req *req)
-+{
-+	struct mucse *mucse = container_of(hw, struct mucse, hw);
-+	u32 magic = le32_to_cpu(req->link_stat.port_magic);
-+	unsigned long flags;
-+
-+	if (le16_to_cpu(req->opcode) == LINK_CHANGE_EVT) {
-+		spin_lock_irqsave(&mucse->link_lock, flags);
-+
-+		if (le16_to_cpu(req->link_stat.port_status))
-+			hw->link = true;
-+		else
-+			hw->link = false;
-+
-+		if (magic == ST_VALID_MAGIC) {
-+			hw->speed = le16_to_cpu(req->link_stat.st.speed);
-+			hw->duplex = req->link_stat.st.flags & DUPLEX_BIT;
-+			/* update regs to notify link info is received */
-+			mucse_update_link_status_reg(hw, req);
-+		} else {
-+			hw->speed = 0;
-+			hw->duplex = 0;
-+			mucse_hw_wr32(hw, RNPGBE_LINK_ST, M_DEFAULT_ST);
-+		}
-+		mucse->flags |= M_FLAG_NEED_LINK_UPDATE;
-+		spin_unlock_irqrestore(&mucse->link_lock, flags);
-+	}
-+}
-+
-+static void mucse_mbx_fw_reply_handler(struct mucse_hw *hw,
-+				       struct mbx_fw_cmd_reply *reply)
-+{
-+	struct mbx_req_cookie *cookie = &hw->mbx.cookie;
-+
-+	BUILD_BUG_ON(sizeof(struct mbx_fw_cmd_reply) != 56);
-+
-+	memcpy(cookie->cmd, (u8 *)reply, sizeof(*reply));
-+	complete(&cookie->comp);
-+}
-+
- /**
-  * mucse_fw_irq_handler - Try to handle a req from hw
-  * @hw: pointer to the HW structure
-  **/
- void mucse_fw_irq_handler(struct mucse_hw *hw)
- {
-+	struct mbx_fw_cmd_reply reply = {};
-+
-+	/* try to check and read fw req */
-+	if (mucse_check_and_read_mbx(hw, (u32 *)&reply, sizeof(reply)))
-+		return;
-+
-+	if (le16_to_cpu(reply.flags) & FLAGS_REPLY)
-+		mucse_mbx_fw_reply_handler(hw, &reply);
-+	else
-+		mucse_mbx_fw_req_handler(hw, (struct mbx_fw_cmd_req *)&reply);
- }
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-index aa26c729588c..044d8dfd2c2b 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-@@ -14,6 +14,9 @@ enum MUCSE_FW_CMD {
- 	GET_HW_INFO     = 0x0601,
- 	GET_MAC_ADDRESS = 0x0602,
- 	RESET_HW        = 0x0603,
-+	LINK_CHANGE_EVT = 0x0608,
-+	LINK_REPORT_EN  = 0x0613,
-+	SET_PHY_UP      = 0x0800,
- 	POWER_UP        = 0x0803,
- };
- 
-@@ -36,6 +39,16 @@ struct mucse_hw_info {
- 	__le32 ext_info;
- } __packed;
- 
-+#define ST_STATUS_LLDP_STATUS_MASK        BIT(12)
-+
-+#define DUPLEX_BIT                        BIT(0)
-+struct st_status {
-+	u8 phyid;
-+	u8 flags;
-+	__le16 speed;
-+	__le16 status;
-+} __packed;
-+
- struct mbx_fw_cmd_req {
- 	__le16 flags;
- 	__le16 opcode;
-@@ -55,10 +68,27 @@ struct mbx_fw_cmd_req {
- 			__le32 port_mask;
- 			__le32 pfvf_num;
- 		} get_mac_addr;
-+		struct {
-+			__le32 port_mask;
-+			__le32 status;
-+		} phy_status;
-+		struct {
-+			__le16 status;
-+			__le16 port_mask;
-+		} report_status;
-+		struct {
-+			__le16 changed_lanes;
-+			__le16 port_status;
-+			__le32 port_magic;
-+#define ST_VALID_MAGIC 0xa4a6a8a9
-+			struct st_status st;
-+		} link_stat;
- 	};
- } __packed;
- 
- struct mbx_fw_cmd_reply {
-+#define FLAGS_REPLY       BIT(0)
-+#define FLAGS_ERR         BIT(2)
- 	__le16 flags;
- 	__le16 opcode;
- 	__le16 error_code;
-@@ -80,10 +110,18 @@ struct mbx_fw_cmd_reply {
- 	};
- } __packed;
- 
-+enum mucse_speed {
-+	mucse_speed_10,
-+	mucse_speed_100,
-+	mucse_speed_1000,
-+};
-+
- int mucse_mbx_sync_fw(struct mucse_hw *hw);
- int mucse_mbx_powerup(struct mucse_hw *hw, bool is_powerup);
- int mucse_mbx_reset_hw(struct mucse_hw *hw);
- int mucse_mbx_get_macaddr(struct mucse_hw *hw, int pfvfnum,
- 			  u8 *mac_addr, int port);
-+int mucse_mbx_phyup(struct mucse_hw *hw, bool is_phyup);
-+int mucse_mbx_link_report(struct mucse_hw *hw, bool is_report);
- void mucse_fw_irq_handler(struct mucse_hw *hw);
- #endif /* _RNPGBE_MBX_FW_H */
--- 
-2.25.1
+--000000000000330acd0652b0375b
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
+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
+/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
+ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
+NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
+MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
+miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
+QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
+Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
+CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
+jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
+6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
+PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
+eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
+Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
+a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCBWlg9x
+Tb5KVAq5oS+d/yV1uim6C8IgL5btSn3g5MkGhzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA1MjYwMzM3MzRaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB89rFufRTuROsB49HO9M1YD5Kb3YfgMZIZOCjoDJGZ
+brpasEXqNrxkExEm2vXfTtblj2zgF4uqdu1KxjWM0bklsLIs+W26PUHrMfyyk5e/TLZA3+OSiRAo
+2rDse+SbjS4CvgLuteDLX9rzDiwKv0oT8hgxr/E27MNt3kk2wvWyM4i7Ifg7Pp7oamtujHvUDN+B
+uV1lWQtwXVsz6H/BXYj9jMCVjpOovUOJ4jL5P/nv+LefOItqeIkucePzJY0o9hmijFo61Rk9LDvd
+UnhxFhSzyp079seBJZeK5p9kWnwT6H1c9B+vqQQ9hiq0Q0jsSv+FQdkLJoDQcFbynmUoCXan
+--000000000000330acd0652b0375b--
 
