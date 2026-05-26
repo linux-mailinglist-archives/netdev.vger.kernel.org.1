@@ -1,158 +1,177 @@
-Return-Path: <netdev+bounces-291916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291918-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPeVLSj8FWovggcAu9opvQ
-	(envelope-from <netdev+bounces-291916-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:01:44 +0200
+	id UKizFy4BFmpngwcAu9opvQ
+	(envelope-from <netdev+bounces-291918-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:23:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 170995DC2F5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:01:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B5F5DC4A5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:23:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E53533007F77
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:01:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 672E93002F8F
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF02395AC3;
-	Tue, 26 May 2026 20:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC193B388E;
+	Tue, 26 May 2026 20:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUAlP0dm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aT2qID+N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F62230C16D;
-	Tue, 26 May 2026 20:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A183AB490
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 20:23:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779825680; cv=none; b=Dx+xZthcTV3Yl9BAl3yJ9F+zL8f6F3dHLwMeatX4eaE44pFNACabhdW+S+XLuAhxdIq0wiSzwnF1lv7waHQI1cVr1QaH3JgJFdKKONzQbf2YhwhezlYV2xotMujrFSzgnTtrY7qqRIFXZFU6TgaZf9XFRVPNBW42ZYKk5ldFnoU=
+	t=1779826987; cv=none; b=OLLC1asyZOyrl5DSXn9WwJsmKPI6x78XQD2CnuXphu1FxZUFfCFFPSDv0KWc1pe96KOCM23IvOzuO7hKMlyleAHOTSGqYAm8FI0Y/OnQHAR/F283nKiNv9fUvdT4IpU/qcNSMGTdBzxYORKkWDv1fZ/lNmZdIMJUPXkF8wAVT74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779825680; c=relaxed/simple;
-	bh=nd+IYyFSAp07KyOd1BzNPpyJpQXcGhkRGMogWzI40tE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JuogTkQHOLgJDhevMZt26WJmkBm+MjWOxblEZW3uN+x3of0zxrkH3PJWX/yqCe17DGR0hyHakGkrxXqWDurjJQZo8npiDJq+pnf7RHZr0Hyd5RdYQOf4JXRAkhZJ0Lb1TGS/YT9eS39KuCekxvCBXx1ibnXBSsr3RcTgrIn1uvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUAlP0dm; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC84F1F000E9;
-	Tue, 26 May 2026 20:01:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779825678;
-	bh=1qxnmKQGUKtoFj3/nGD5Rn2Gfy5r6REEQNVEGh2K3ms=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=XUAlP0dm/G60yd+smYcUeLELrUuSSrHXbnAXU/Q1+cjxZlg/jZGq5x/8aQ9k/lp2/
-	 75qT1tMlIyHUDx14RtalRuKuqkKqC8XTO4xf40eSqk8kGMSRI1W/sLGMy6+tmmDErx
-	 sSZAyp3JucSrQEkEjIY2KLW6wuLFNU0dXlzak8CdRg/LcUk+jdCg2btwH3M4NAXuIo
-	 ta1bepz6hgmjF13VWpiqaDUZ8cnOzG8cEDiz1Iam/Pw3sN7Lep0xIjKRNYHBq9fD/G
-	 Amr42UO8/ZtBc1rqraAWIzPxzn0wqy/AanF5JMxvlsm7V6WQB/s+SQ01uD/mbePgGu
-	 0E+JZaGxaZsPg==
-Date: Tue, 26 May 2026 21:01:14 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ashwin Gundarapu <linuxuser509@zohomail.in>
-Cc: anthonylnguyen <anthony.l.nguyen@intel.com>,
-	"anthony.l.nguyen@intel.com" <przemyslaw.kitszel@intel.com>,
-	andrewnetdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>,
-	edumazet <edumazet@google.com>, kuba <kuba@kernel.org>,
-	pabeni <pabeni@redhat.com>,
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>,
-	netdev <netdev@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] e1000e: fix memory leak of msix_entries on
- MSI-X failure
-Message-ID: <20260526200114.GD2256768@horms.kernel.org>
-References: <19e537fa55c.56218d6244367.1765806925055659075@zohomail.in>
+	s=arc-20240116; t=1779826987; c=relaxed/simple;
+	bh=TRyFeOjEFg9Z4oD9ybe51Hvm1Kn6K0WGSxcwfFiQJCM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=teSHs2BiDhzeIlMt1NxgWKEkgtB+COvwnRQ7P6su8JbH3y2jT0EaqFnJoqfg5V0RSlm5B7BNYzAnXuLJjgIBz2liuGOj6WJ3fOlHD0w/RbeRkmcpfn3xd+4zV8QLOl2HeVjsjT0UDRMBepnRTW+Xl54G2wYKkVCk55jfWebJpF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aT2qID+N; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-366330b6751so8620109a91.1
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 13:23:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779826986; x=1780431786; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=M3mXtq2h7QJnUw/yzmR3z22pM1IqybeYG7SOGc1FU/E=;
+        b=aT2qID+NCWvV+KIwCvVS94In0rwK9EOHT02vqhflSyEaGc922A6QKMATwUag/oFGDj
+         FKF37CvsqUSmjsDMaOZocPGO+dWi9hxCB/Dr5uYcQvEr3M52Qigs5nuQjO9biX61sKeM
+         NbB/s2zZOvn3dbmn4BmQj2MvDcPQOqfZbPpqX0BlR/1Tdf92skeRutSMYkjv4is/oPtk
+         kfMo+YX/8Sb1PXJTBxqrW3c1nbp7yQUgOPn9bSKjj/upexg4F3+Dh3qgxqsFKGSVP7h5
+         Fr2ZmGyeI6uvG8k7Qw84Bu/h7pHj1FSriubcjeXBQS700m8EW2IYqzEXOSXTXfI1vSU5
+         dP8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779826986; x=1780431786;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M3mXtq2h7QJnUw/yzmR3z22pM1IqybeYG7SOGc1FU/E=;
+        b=epHmzeypRJs51Ss6U+GQyHDCXJWv+9z7CRB2Rv1l27EYeSPXi4SSvg1OB4hCgoJNw/
+         3nLmNBsvGr65AE0uysZO8X4au4i4wfjZisUMW1TK7x03voq9X5sxEz5UfLM4Qdrrh1rD
+         5FHcC0aneiDD8cbR/G9XFKwHtdafJnzaIQzGU9Ic2z7qr1UCc5Ow2lK1RiafxzT/gROo
+         tYW+de6cqNwatlzWWp/OzEdDTd4Lc/OScwoQjEu/OMTTdJp/TNVA9ZpI80kxW5SIM/iw
+         /BOWKsa4A+6f+PS9t0smE/v1laN4rw5iKUu+veqxVu0wQJ+p/8n6iuueIRIiO9Xdx3Xx
+         5E9A==
+X-Gm-Message-State: AOJu0YyH2E51WLBoc/Q6MCHftp8iUv2K+mwI8tvLD3LcguxgWhbciQii
+	gXH29KTw7X844p/nA9OayBw9pQbsK/FFbYyMcIDb+9OfLeiQ1ckkfgNTETPTg697
+X-Gm-Gg: Acq92OFxBud9mzBHd52m7PRTitbHPcempkjc7BldYneUpe0jaywjhOc59Ocj47E7aeS
+	4yZQmbkWpM0VQ4hnHkWeTrA40myHfDLxLezOvbG5ZFtD+BhVcxA7JqFvjT6L6DuuUXFTF9QDKEh
+	vHFylJz67f1apxz5K7iDhl5812W2l/X5jSBcuJtHi+lV0sMfRYKJP26Lnw8VV77MFS+D8pl2n83
+	lOQKFWSKgJPFlaNwz5Uzlmg3L+noUJsY2G1ezox8iNrt1+N9Unp2KMHTL7wcx5nsTXoWgxRPfhp
+	dM2XYAccek2siMZdcFgNpYhRDyaCo3uofAQv4x+Dqq4dCXSvqD/TeOVTUMsmo0nadRHfA6rWHS6
+	qII3NNInlC9tQgs5XOF84CKtJnwnrP7QtJZNTrfjpOlQ5+6VTzRrPo9uwRKZiUpxzZWmHEY7J/z
+	JsY5KhZDdcsoTW/txjklO9uK33T4/1Vq5pZJKXSRfrBohsdpGPN0TyNs6602YMzTDsK72a4YGaS
+	85ZjYZ8vvyrUfbT0u97jih7I2303XwD7o8=
+X-Received: by 2002:a17:90a:fc44:b0:369:bddb:79b5 with SMTP id 98e67ed59e1d1-36a676dc2d0mr21013700a91.2.1779826985725;
+        Tue, 26 May 2026 13:23:05 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36a721c7b92sm13280442a91.12.2026.05.26.13.23.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2026 13:23:05 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: ibm: emac: Reserve VLAN header in MJS limit
+Date: Tue, 26 May 2026 13:22:47 -0700
+Message-ID: <20260526202247.13823-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <19e537fa55c.56218d6244367.1765806925055659075@zohomail.in>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291916-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_ALL(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-291918-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.992];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,sashiko.dev:url,horms.kernel.org:mid,zohomail.in:email]
-X-Rspamd-Queue-Id: 170995DC2F5
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: B1B5F5DC4A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, May 23, 2026 at 11:52:14AM +0530, Ashwin Gundarapu wrote:
-> From: Ashwin Gundarapu <linuxuser509@zohomail.in>
-> Date: Sat, 23 May 2026 11:49:40 +0530
-> Subject: [PATCH] e1000e: fix memory leak of msix_entries on MSI-X failure
-> 
-> When MSI-X initialization fails, the driver falls through to try
-> MSI or legacy interrupts. However, the msix_entries array allocated
-> earlier is not freed, causing a memory leak. Free it and set to
-> NULL before falling through to the MSI fallback path.
-> 
-> Found by code inspection.
-> 
-> Signed-off-by: Ashwin Gundarapu <linuxuser509@zohomail.in>
-> ---
->  drivers/net/ethernet/intel/e1000e/netdev.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-> index 7ce0cc8ab8f4..1526069d7fc1 100644
-> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
-> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-> @@ -2065,10 +2065,12 @@ void e1000e_set_interrupt_capability(struct e1000_adapter *adapter)
->  							    a->num_vectors);
->  				if (err > 0)
->  					return;
-> -			}
-> -			/* MSI-X failed, so fall through and try MSI */
-> -			e_err("Failed to initialize MSI-X interrupts.  Falling back to MSI interrupts.\n");
-> -			e1000e_reset_interrupt_capability(adapter);
-> +                        }
-> +                        /* MSI-X failed, so fall through and try MSI */
-> +                        e_err("Failed to initialize MSI-X interrupts.  Falling back to MSI interrupts.\n");
-> +                        kfree(adapter->msix_entries);
-> +                        adapter->msix_entries = NULL;
-> +                        e1000e_reset_interrupt_capability(adapter);
+The IBM EMAC programs its Maximum Jumbo Size (MJS) drop
+threshold from ndev->mtu directly. The hardware sizes the threshold
+against the L2 frame minus the ethernet header, but does not
+discount the 802.1Q tag, so a frame carrying a VLAN tag and a full
+1500-byte payload exceeds MJS by exactly 4 bytes and is dropped.
 
-Hi Ashwin,
+This is normally hidden because JPSM (and therefore the MJS check)
+only engages when the MTU is raised above ETH_DATA_LEN.  With the
+qca8k DSA tagger the conduit MTU is bumped by QCA_HDR_LEN to 1502
+during dsa_conduit_setup(), which is enough to enable JPSM and
+expose the off-by-VLAN-tag in the limit.
 
-e1000e_reset_interrupt_capability() already handles freeing (and NULLing)
-msix_entries, and it does so after calling pci_disable_msix().
+Pad MJS by VLAN_HLEN so a VLAN-tagged full-MTU frame passes.
 
-This patch seems to have the effect of bypassing the call to
-pci_disable_msix().
+Reported on Meraki MX60 (qca8k switch): tagged VLAN
+traffic drops at 1500-byte payload, while 1496 bytes works
+and untagged 1500 bytes works.
 
-Are you sure this is fixing a memory leak as described?
+Assisted-by: Claude:Opus-4.7
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/ibm/emac/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Flagged by https://sashiko.dev/ and https://netdev-ai.bots.linux.dev/sashiko/
+diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
+index 11d673a9f119..90471cff37dd 100644
+--- a/drivers/net/ethernet/ibm/emac/core.c
++++ b/drivers/net/ethernet/ibm/emac/core.c
+@@ -30,6 +30,7 @@
+ #include <linux/skbuff.h>
+ #include <linux/crc32.h>
+ #include <linux/ethtool.h>
++#include <linux/if_vlan.h>
+ #include <linux/mii.h>
+ #include <linux/bitops.h>
+ #include <linux/of.h>
+@@ -457,7 +458,7 @@ static inline u32 emac_iff2rmr(struct net_device *ndev)
+ 
+ 	if (emac_has_feature(dev, EMAC_APM821XX_REQ_JUMBO_FRAME_SIZE)) {
+ 		r &= ~EMAC4_RMR_MJS_MASK;
+-		r |= EMAC4_RMR_MJS(ndev->mtu);
++		r |= EMAC4_RMR_MJS(ndev->mtu + VLAN_HLEN);
+ 	}
+ 
+ 	return r;
+-- 
+2.54.0
 
->  		}
->  		adapter->int_mode = E1000E_INT_MODE_MSI;
->  		fallthrough;
-> --
-> 2.43.0
-> 
-> 
 
