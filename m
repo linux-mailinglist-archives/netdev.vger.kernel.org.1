@@ -1,180 +1,160 @@
-Return-Path: <netdev+bounces-291578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291583-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yAjcG4pVFWqmUQcAu9opvQ
-	(envelope-from <netdev+bounces-291578-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:10:50 +0200
+	id OOa1HNpVFWqmUQcAu9opvQ
+	(envelope-from <netdev+bounces-291583-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:12:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CEB05D23EE
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:10:49 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 196285D242B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:12:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8E4CC300B628
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:10:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C691C300C328
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872B33B6C15;
-	Tue, 26 May 2026 08:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E438E3CE0B8;
+	Tue, 26 May 2026 08:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZEVe0GMC"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="RO0T8GVX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9F93988FA;
-	Tue, 26 May 2026 08:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84543C5823;
+	Tue, 26 May 2026 08:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779783046; cv=none; b=BS8m1tY4LKPKYbILg6RmzwzOkAR/nfmR2I7FUAazCDcIhvYSxBcUgL/YRmFgBYrlnfvwjpblnQmkbal44HBI73jgDHQypwHzUvCIf500cHIQ11chcV0Dm6/fAZseb97dueF/2uiXvfnWJdB725M0XsJR1f2l+qpT/XzRRQNz3Qs=
+	t=1779783118; cv=none; b=JyEgLpJ6AC5CXH3+sB24qtnj1Q/HE+PSS9Lg6XKlG43HClATyy7t1On6NhdfUpo0Rk9HNlPmxmRSr2tJruHMrFOr6lBUIvjXv0aRu9KFNzOfK4Hmdu5s4aGJeZUhMleYs75AamPPVhQ7O6rS8tUDMX2L2JyUl+OUmUn4V9wtfKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779783046; c=relaxed/simple;
-	bh=7+P21v8PKy6WPQLGNUdKJkj6++b1AoG1GuGVdd3Fi4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=fpoYI4g3fhsVBVMvTocBmpAlKWkvieN0BrpJQZiQZSgLVTFy6GLFLh3BeOpTUO+Op0uJNYDLERYLp2Zv08tNRF9Yt9Feo3fWliYCY7oiPew2SQ5DGEZbTm9lRnnEWA9krlw91LgI5iYAPgOtAoSv8arleV9jRsU2xuZhJo6DqKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZEVe0GMC; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5C201F000E9;
-	Tue, 26 May 2026 08:10:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779783045;
-	bh=w6w02oI6+o30DuASdm5GqYgfStFcdEWDlbBDI6D2XvI=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To;
-	b=ZEVe0GMChvryfhCCnLxY1QzloxR6WR5xGz7/TluH+luYNqtxAu21f1T0tLe0Iz7mO
-	 cqdSktEcT8MCwqoUHaeEr90Xz14mlhS4K/5WT22d7S7mMCZ5ak1Zt9sxsQgzPU7UQi
-	 MZc6V8b8roipgFAbteuYChopmfxKcIaMV/jez4ZWQqPpWPUuSPMdEj8H+4m1bS5t/U
-	 iBXfMuxiHs1e/5ucljJ0aAMtRAFMp4BYobcWoy95YlioWuoXVT3BNc1UsMkBHU+gks
-	 ClC3IeYrMJDtsBYLAZOl4V2moENNDgG7tJWk2eo4Z29T9xsedbn/rSCY2uBmaP11eG
-	 pOB8Nt+6C4Ahg==
-Message-ID: <60b50562-3351-49da-ab6b-953270380314@kernel.org>
-Date: Tue, 26 May 2026 18:10:37 +1000
+	s=arc-20240116; t=1779783118; c=relaxed/simple;
+	bh=fFXfdZ2p2C3G2fwlnNaBXEIlxloQp0Ra7Zf8YHUvVPc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fa0AnaKEAYHz3IGh/y6gDPGUAqFG0VaSynHJnIhSi6M8gxSRXdipDYdbHyoplWtd3akxr5/tdfLcpYsJU8vpPJKd0SDQyIMjIcfXNcFXXCMcBhmyF2satRXDAOMYulJsgYmUEe2IqjkhsVSuUUqWCg+7YJnH0Dnfjcq1lQronMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=RO0T8GVX; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 64Q8BJl641615336, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1779783080;
+	bh=dWuNPbQdYkjT8ZrQ+iYSb/x7s4JQwiLhXVhe4QVxCH4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=RO0T8GVXVXJpJTCFQ0DE7nFLZfQq/pmLs3QDV6i6P1IZjnwsPMs1eZSc9XFzgtPtl
+	 baOBuwkcSiaW2Btt3IEWxtXp2AJyWqUoH2FSLflW6J6O85Hnyn6rGSjTjNB8DMlkhG
+	 JPOPMXVr+hhS3dGnGfm1sBbqafx0ACon34ZdAN47GcVf9XfcYbqaI61+9wCLqAmdP3
+	 KzGeJGE5MsaAoM6WGytV2BqzdH6pYqlnbPCmETsXgfI9/dewcgKBTSMEkAKKvKH39K
+	 dai/h+xQAm8UcZJ5d2vpGdLN/O+K+rWU3Z9fUsdfu6vKq/4yXekIG6/sn1lUSdl5H9
+	 Ib1/FZkOCZoGQ==
+Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 64Q8BJl641615336
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 26 May 2026 16:11:20 +0800
+Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
+ RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 May 2026 16:11:19 +0800
+Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
+ (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Tue, 26 May 2026 16:11:19 +0800
+From: javen <javen_xu@realsil.com.cn>
+To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Javen Xu
+	<javen_xu@realsil.com.cn>
+Subject: [Patch net-next v6 0/7] r8169: add RSS support for RTL8127
+Date: Tue, 26 May 2026 16:11:10 +0800
+Message-ID: <20260526081117.173-1-javen_xu@realsil.com.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] selftests: net: add socat syslog for PPPoL2TP
-Content-Language: fr
-To: Qingfang Deng <qingfang.deng@linux.dev>
-References: <20260526014152.532505-1-qingfang.deng@linux.dev>
-From: Matthieu Baerts <matttbe@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shuah Khan <shuah@kernel.org>, linux-ppp@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260526014152.532505-1-qingfang.deng@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291578-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-291583-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	NEURAL_HAM(-0.00)[-0.994];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 0CEB05D23EE
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 196285D242B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Qingfang,
+From: Javen Xu <javen_xu@realsil.com.cn>
 
-On 26/05/2026 11:41, Qingfang Deng wrote:
-> As done in pppoe.sh, start socat as the syslog listener. In case the
-> test fails, dump its log to see what's going on.
+This patch series adds RSS (Receive Side Scaling) support for the r8169
+ethernet driver, specifically for RTL8127 (RTL_GIGA_MAC_VER_80).
 
-(...)
+RSS enables packet distribution across multiple receive queues, which can
+significantly improve network throughput on multi-core systems by allowing
+parallel processing of incoming packets.
 
-> diff --git a/tools/testing/selftests/net/ppp/pppol2tp.sh b/tools/testing/selftests/net/ppp/pppol2tp.sh
-> index 5b592785f1f9..96786267ccc7 100755
-> --- a/tools/testing/selftests/net/ppp/pppol2tp.sh
-> +++ b/tools/testing/selftests/net/ppp/pppol2tp.sh
+Key features:
+- Multi-queue RX support (up to 8 queues)
+- MSI-X interrupt with vector mapping
+- Dynamic queue configuration via ethtool (-L)
+- RSS hash computation for flow classification
 
-(...)
+Experiments:
+Platform: AMD Ryzen Embedded R2514 with Radeon Graphics(4 Cores/8 Threads)
+Arch: x86_64
+Test command: 
+  Server: iperf3 -s
+  Client: iperf3 -c 192.168.2.1 -P 20 -t 3600
+Monitor: mpstat -P ALL 1
 
-> +# Dump syslog messages if the test failed
-> +if [ "$RET" -ne 0 ]; then
+Before this patch (Without RSS):
+  Throughput: Unstable, fluctuating between 3.76 Gbits/sec and
+  8.2 Gbits/sec.
+  CPU Usage: A single CPU core is fully occupied with softirq reaching 
+  up to 96%.
 
-This only checks for errors with the first test, not with the second one
-below. Should you create a new helper and call it here and below? Or
-only once at the end, using ${EXIT_STATUS} instead?
+After this patch (With RSS enabled):
+  Throughput: Stable at 9.42 Gbits/sec.
+  CPU Usage: The traffic load is evenly distributed across multiple CPU
+  cores. The maximum softirq on a single core dropped to 63%.
+  
+Other Experiments:
+Link: https://lore.kernel.org/netdev/0A5279953D81BB9C+f50c9b49-3e5d-467f-b69a-7e49ed223383@radxa.com/
 
-> +	while read -r _sign _date _time len _from _to
-> +	do      len=${len##*=}
-> +		read -n "$len" -r LINE
-> +		echo "$LINE"
-> +	done < "$PPPOL2TP_LOG"
-> +fi
-> +
->  # Recursion test
->  RET=0
->  # Delete route to LNS IP
+Javen Xu (7):
+  r8169: add support for multi irqs
+  r8169: add support for multi rx queues
+  r8169: add support for new interrupt mapping
+  r8169: enable new interrupt mapping
+  r8169: add support and enable rss
+  r8169: move struct ethtool_ops
+  r8169: support setting rx queue numbers via ethtool
 
-Cheers,
-Matt
+ drivers/net/ethernet/realtek/r8169_main.c | 1118 ++++++++++++++++++---
+ 1 file changed, 977 insertions(+), 141 deletions(-)
+
+-- 
+2.43.0
 
 
