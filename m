@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-291657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7kRqDnh7FWpEVwcAu9opvQ
-	(envelope-from <netdev+bounces-291657-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:52:40 +0200
+	id YOmjEnZ6FWp8VgcAu9opvQ
+	(envelope-from <netdev+bounces-291659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:48:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C4F5D4676
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:51:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DAF75D460B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:48:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 29706305A8B2
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:48:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A91A4301135A
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48D63DD856;
-	Tue, 26 May 2026 10:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FB33DDDA5;
+	Tue, 26 May 2026 10:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kTo6wBbq"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YZlId1mu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29853DC850;
-	Tue, 26 May 2026 10:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019F23DDDA0;
+	Tue, 26 May 2026 10:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779792486; cv=none; b=g83wNQBqNNuQwkfrFVmUX/sfOZuJ9CUqHzLNZcD+DCqjaFdpzZdAHbHAoLPXjUT0EzpxWkU/NxTVPSnCDg8F+7Cj55I97PX8XX5wCYlryelQGMSc4SgZm9ErwmofnNCcVlyMwKJ/3FLhEfTQ+0z/a8IGGuWbqC14QZPm1v5Hy5o=
+	t=1779792493; cv=none; b=etFcW8XZiHgZmJANbKNta67zlsCSQd3z6rC8NfY2jL2fWCWFoi4nvg4sheRG2drvMG+Lr63Dw36UGgMEGedqlfG9WQhwmZ017c88L2q+GtctVH/INBFhLIJXEVFdQDlN8Upt/W6tX78ApOhDXno9TUKLbMv74duu64P+EeN6Z9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779792486; c=relaxed/simple;
-	bh=UO9ArN0/GP4BIu7TXgBtfuDSksIKYKASNV5DMJNjRA0=;
+	s=arc-20240116; t=1779792493; c=relaxed/simple;
+	bh=SGCwMQKuLkuX0bmXEV17FwKe8LJLci23vksY/j9WnZs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QkGZTE6upnRw/2jraMQgdoO5FRkE2ZkIrz43bmGLBp766Ya2HDJeYS+4H12hATZwX6ODMDTk4gXE9VQYL6Z6UKNDSWo2q8raknzXy79wRchDrnmoAnj5tzN9crtR+7xRtMdJmP6+UIxiCsw/qQPc4XHgcNHlEKjCSJwsqeCiVFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kTo6wBbq; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=EJsixScuthnv7C2nWHccSw0H8te6hwGhDUa5n5DZIekZkQoU80crhjkQPDtuQfhKwTkpf1mGDas2uT+0ktYOLdHuOuP+Q7eD/ZesZN2xMdI5HwIrsZCdDDMyc9omUuAytErYVDZTQRowia7fXZEDkGZ+c+HAM/NV6L2uPB0GIQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=YZlId1mu; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64Q6kRdI2935095;
-	Tue, 26 May 2026 03:47:47 -0700
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64Q5cmUT1065235;
+	Tue, 26 May 2026 03:47:51 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=KZjoSY1iftfjhRK6YVsK2pJH9
-	DIm781meXoamOYUg10=; b=kTo6wBbqA0D7E/nBxeikrVkzJjyD2AJCXjhDUs918
-	BMMrnpcTBGvUS+5rR3aWfurzJZgBlrJSRx22AnR7UX5iPmt4rqxRkjgwsBDRk3rf
-	SOXPKGmrwD1/pVH9pe5ZwzgetlQp1oCMFpnHgdHvg0+erYa3JAyrFb1SE5advq10
-	QVaEHOZBrGIEN6vZyEN8OLZM9ZGLmoy8EMThQmdWRKln7VPeGfcK4ob1zKqq4R1m
-	tRBD00kRhM1+8cwZskx60k7MBlCpaXYFQ42LJyw6gG5jjv7/SUFDRIEaUcNGfsqR
-	0PMMYUKiCo0qW5DCQ+tJjy5t7TeI4MjGasp+dHiqfuv6A==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ebbrf7unp-1
+	:references:subject:to; s=pfpt0220; bh=uX6HmDRcmBydKl345jjRdrhps
+	xRDZ6maBJgWdNwBsLg=; b=YZlId1mugG/hj5xsr57iFo672pn38IYraXbSY5PNg
+	SVBMoqDCmqtMgdk7ctqLq8I1nIj8UdPjahaqa8L0KW3GCRcicL4WLaMCEH9XJ7ZU
+	JoUVCN+LnYjmIt6eFdVboPK7xSnp5P3eCJpQS/SFowSC8nfKD+8Td28I+d1Efwkh
+	m6UE/ftZYxEGUMa9Nl3WSH/E4Kmj4LTc3AJblA/Vmw8AixmTZEYNm1ehDXyUVePA
+	5+wXmkYVfbKRPe5Rfvw1WCGIZ5gqhI82U+JeNmWylc1KggOnIDAwIR1RIgGV2mRU
+	UL/70TM2gryMpc0muU2o+A6UhM4iZtUs0ICmohQgZcFUA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ec0g6dpjm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 May 2026 03:47:46 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Tue, 26 May 2026 03:47:51 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 26 May 2026 03:47:45 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 26 May 2026 03:47:45 -0700
+ 15.2.1544.25; Tue, 26 May 2026 03:47:50 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 26 May 2026 03:47:50 -0700
 Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 39C163F7052;
-	Tue, 26 May 2026 03:47:41 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 61C1C3F7045;
+	Tue, 26 May 2026 03:47:46 -0700 (PDT)
 From: Subbaraya Sundeep <sbhatta@marvell.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
@@ -68,9 +68,9 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Linu Cherian
 	<lcherian@marvell.com>,
         Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [net-next PATCH v6 3/5] octeontx2-af: npa: cn20k: Add DPC support
-Date: Tue, 26 May 2026 16:17:25 +0530
-Message-ID: <1779792447-5593-4-git-send-email-sbhatta@marvell.com>
+Subject: [net-next PATCH v6 4/5] octeontx2-af: npa: cn20k: Add debugfs for Halo
+Date: Tue, 26 May 2026 16:17:26 +0530
+Message-ID: <1779792447-5593-5-git-send-email-sbhatta@marvell.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1779792447-5593-1-git-send-email-sbhatta@marvell.com>
 References: <1779792447-5593-1-git-send-email-sbhatta@marvell.com>
@@ -81,21 +81,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=epTvCIpX c=1 sm=1 tr=0 ts=6a157a53 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+X-Authority-Analysis: v=2.4 cv=BK6DalQG c=1 sm=1 tr=0 ts=6a157a57 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=MAZRZ2gKoPIzyDCOxB0A:9
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=xE7MTFBHVDZtU5icdfMA:9
  a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: mIYPf1Vr6sjB4SbcCrEmEixXZvr4hie9
-X-Proofpoint-GUID: mIYPf1Vr6sjB4SbcCrEmEixXZvr4hie9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI2MDA5MyBTYWx0ZWRfX6nMaD0yIz79L
- FQvoUHG6IGsFETmTfEWO53VRnMZtHwjePXpiSw0WXk414smtgdpCVPaJ+4NL8JmFf5skLyaowe0
- UAw9fezWcwVp/0JRh4Ppck2nts4WlbMOO2AHSDWMpitax+Ac5kcaAdEMT0pyGOogzpyUBRA3Lfi
- JD+go1kySQCdS5YXzmWFx2ZEzjVhLn5WYm23tFuW1uBqJgukZvPLet0SHskRlsq2qi7c+aCgot/
- 7qzYCYTabey85X40JokCEjGXG511xTQuZJqvCkR/vlTCHrG8JhvyJI/vw5Og+dbOPPxCjdlVtOh
- ENHhf2xCU/T+Kxf5dix0Q3U6RX6OdAQN1x8EU8k5hSq1bFHzf4qhkDJCghrwe/NEXwac9VUo9lf
- SL1EeCqq05JHhHX1PQ71P4r24akXfI8sQ6mTM10fqUxEGlsuv6wYDbQ/ljmfeUAkFgpXJ5AHh/A
- Ef1glktDl0FoCgDtlQA==
+X-Proofpoint-GUID: CvMwmKf-IZRJdLsDuCKyIbXg0hJU3m6w
+X-Proofpoint-ORIG-GUID: CvMwmKf-IZRJdLsDuCKyIbXg0hJU3m6w
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI2MDA5MyBTYWx0ZWRfX0dYlxheeLhzd
+ zTGROsjKwad1JUF/6ttxx7PPdwi1RAe1whs+Ae/mb6DeNM3y2EHSu3ZdNAjSB1n4PL3PLqUi8ep
+ wc8fVJwcyN7+QUK15UgGiwWet6jcrR+s7MCJg5Zk+6uDfJOOVIF3lfP+UVnF62AK2tSzAYpEuAK
+ 2oHCeoobU+Tjo3CTB5hFdXk25BiJGPd0ab6dr8m5mvqpHQOt4cSaklg/zPRld0w8PgXPlhhUT6j
+ bHgXBlLb1G+9w1nYUFCFnIKQlBQCo43jyfDSFfnuOFlW8VkV81bKgDDAgH5GOGOFm1glhvtpAVl
+ LGCl98I3Br5qiH46jXQA6WF4i7T5flBBCmYUPSyIibnvZZD9obOoPqU9X+8VqDMmyXbc+Iq0gND
+ IUTNzK7z/jeKTlV5e5aNYYBB7i6gYtRS/eKNC/l9ud5TDHG9o+jrRgFxM+oU0euz/BLGKKFKJIL
+ inVCT3ioVseu4tXGg6w==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-26_02,2026-05-26_01,2025-10-01_01
@@ -106,7 +106,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -114,342 +114,307 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-291657-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-291659-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:mid,marvell.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:mid,marvell.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
+	NEURAL_HAM(-0.00)[-0.996];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 26C4F5D4676
+X-Rspamd-Queue-Id: 0DAF75D460B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Linu Cherian <lcherian@marvell.com>
 
-CN20k introduces 32 diagnostic and performance
-counters that are shared across all NPA LFs.
+Similar to other hardware contexts add debugfs support for
+unified Halo context.
 
-Counters being shared, each PF driver need to request
-for a counter with the required configuration to the AF,
-so that a counter can be allocated and mapped to the
-respective LF with the requested configuration.
+Sample output on cn20k::
+/sys/kernel/debug/cn20k/npa # cat halo_ctx
+======halo : 2=======
+W0: Stack base          ffffff790000
+W1: ena                 1
+W1: nat_align           0
+W1: stack_caching       1
+W1: aura drop ena       0
+W1: aura drop           0
+W1: buf_offset          0
+W1: buf_size            32
+W1: ref_cnt_prof                0
+W2: stack_max_pages     13
+W2: stack_pages         11
+W3: bp_0                0
+W3: bp_1                0
+W3: bp_2                0
 
-Add new mbox messages, npa_dpc_alloc/free to handle this.
-
-Also ensure all the LF to DPC counter mappings are cleared
-at the time of LF free/teardown.
+snip ..
 
 Signed-off-by: Linu Cherian <lcherian@marvell.com>
 Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
 ---
- .../ethernet/marvell/octeontx2/af/cn20k/api.h |   3 +
- .../ethernet/marvell/octeontx2/af/cn20k/npa.c | 139 ++++++++++++++++++
- .../ethernet/marvell/octeontx2/af/cn20k/reg.h |   7 +
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  19 +++
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |   3 +
- .../ethernet/marvell/octeontx2/af/rvu_npa.c   |  17 ++-
- 6 files changed, 187 insertions(+), 1 deletion(-)
+ .../marvell/octeontx2/af/cn20k/debugfs.c      | 60 ++++++++++++++++
+ .../marvell/octeontx2/af/cn20k/debugfs.h      |  2 +
+ .../marvell/octeontx2/af/rvu_debugfs.c        | 71 ++++++++++++++++---
+ 3 files changed, 125 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
-index 4285b5d6a6a2..53050f63eb81 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
-@@ -29,4 +29,7 @@ int cn20k_mbox_setup(struct otx2_mbox *mbox, struct pci_dev *pdev,
- 		     void *reg_base, int direction, int ndevs);
- void cn20k_rvu_enable_afvf_intr(struct rvu *rvu, int vfs);
- void cn20k_rvu_disable_afvf_intr(struct rvu *rvu, int vfs);
-+
-+void npa_cn20k_dpc_free_all(struct rvu *rvu, u16 pcifunc);
-+
- #endif /* CN20K_API_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
-index fe8f926c8b75..7c9cd28de3ee 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npa.c
-@@ -8,6 +8,8 @@
- #include <linux/module.h>
- #include <linux/pci.h>
- 
-+#include "cn20k/api.h"
-+#include "cn20k/reg.h"
- #include "struct.h"
- #include "../rvu.h"
- 
-@@ -19,3 +21,140 @@ int rvu_mbox_handler_npa_cn20k_aq_enq(struct rvu *rvu,
- 				   (struct npa_aq_enq_rsp *)rsp);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
+index 6f13296303cb..22c2bd32188d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
+@@ -476,3 +476,63 @@ void print_npa_cn20k_pool_ctx(struct seq_file *m,
+ 		   pool->thresh_qint_idx, pool->err_qint_idx);
+ 	seq_printf(m, "W8: fc_msh_dst\t\t%d\n", pool->fc_msh_dst);
  }
- EXPORT_SYMBOL(rvu_mbox_handler_npa_cn20k_aq_enq);
 +
-+static int npa_cn20k_dpc_alloc(struct rvu *rvu,
-+			       struct npa_cn20k_dpc_alloc_req *req,
-+			       struct npa_cn20k_dpc_alloc_rsp *rsp)
++void print_npa_cn20k_halo_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
 +{
-+	struct rvu_hwinfo *hw = rvu->hw;
-+	u16 pcifunc = req->hdr.pcifunc;
-+	int cntr, lf, blkaddr, ridx;
-+	struct rvu_block *block;
-+	struct rvu_pfvf *pfvf;
-+	u64 val, lfmask;
++	struct npa_cn20k_aq_enq_rsp *cn20k_rsp;
++	struct npa_cn20k_halo_s *halo;
 +
-+	pfvf = rvu_get_pfvf(rvu, pcifunc);
++	cn20k_rsp = (struct npa_cn20k_aq_enq_rsp *)rsp;
++	halo = &cn20k_rsp->halo;
 +
-+	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPA, 0);
-+	if (!pfvf->npalf || blkaddr < 0)
-+		return NPA_AF_ERR_AF_LF_INVALID;
++	seq_printf(m, "W0: Stack base\t\t%llx\n", halo->stack_base);
 +
-+	mutex_lock(&rvu->rsrc_lock);
-+
-+	block = &hw->block[blkaddr];
-+	lf = rvu_get_lf(rvu, block, pcifunc, 0);
-+	if (lf < 0) {
-+		mutex_unlock(&rvu->rsrc_lock);
-+		return NPA_AF_ERR_AF_LF_INVALID;
-+	}
-+
-+	/* allocate a new counter */
-+	cntr = rvu_alloc_rsrc(&rvu->npa_dpc);
-+	if (cntr < 0) {
-+		mutex_unlock(&rvu->rsrc_lock);
-+		return cntr;
-+	}
-+
-+	rsp->cntr_id = cntr;
-+
-+	/* Consumers can configure to count ALLOC/FREE requests only */
-+	rvu_write64(rvu, blkaddr, NPA_AF_DPCX_CFG(cntr), req->dpc_conf);
-+
-+	/* 0 to 63 lfs -> idx 0, 64 - 127 lfs -> idx 1 */
-+	ridx = lf >> 6;
-+	lfmask = BIT_ULL(ridx ? lf - NPA_DPC_LFS_PER_REG : lf);
-+
-+	ridx = 2 * cntr + ridx;
-+	/* Give permission for LF access */
-+	val = rvu_read64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx));
-+	val |= lfmask;
-+	rvu_write64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx), val);
-+
-+	mutex_unlock(&rvu->rsrc_lock);
-+
-+	return 0;
++	seq_printf(m, "W1: ena \t\t%d\nW1: nat_align \t\t%d\n",
++		   halo->ena, halo->nat_align);
++	seq_printf(m, "W1: stack_caching\t%d\n",
++		   halo->stack_caching);
++	seq_printf(m, "W1: aura drop ena\t%d\n", halo->aura_drop_ena);
++	seq_printf(m, "W1: aura drop\t\t%d\n", halo->aura_drop);
++	seq_printf(m, "W1: buf_offset\t\t%d\nW1: buf_size\t\t%d\n",
++		   halo->buf_offset, halo->buf_size);
++	seq_printf(m, "W1: ref_cnt_prof\t\t%d\n", halo->ref_cnt_prof);
++	seq_printf(m, "W2: stack_max_pages \t%d\nW2: stack_pages\t\t%d\n",
++		   halo->stack_max_pages, halo->stack_pages);
++	seq_printf(m, "W3: bp_0\t\t%d\nW3: bp_1\t\t%d\nW3: bp_2\t\t%d\n",
++		   halo->bp_0, halo->bp_1, halo->bp_2);
++	seq_printf(m, "W3: bp_3\t\t%d\nW3: bp_4\t\t%d\nW3: bp_5\t\t%d\n",
++		   halo->bp_3, halo->bp_4, halo->bp_5);
++	seq_printf(m, "W3: bp_6\t\t%d\nW3: bp_7\t\t%d\nW3: bp_ena_0\t\t%d\n",
++		   halo->bp_6, halo->bp_7, halo->bp_ena_0);
++	seq_printf(m, "W3: bp_ena_1\t\t%d\nW3: bp_ena_2\t\t%d\n",
++		   halo->bp_ena_1, halo->bp_ena_2);
++	seq_printf(m, "W3: bp_ena_3\t\t%d\nW3: bp_ena_4\t\t%d\n",
++		   halo->bp_ena_3, halo->bp_ena_4);
++	seq_printf(m, "W3: bp_ena_5\t\t%d\nW3: bp_ena_6\t\t%d\n",
++		   halo->bp_ena_5, halo->bp_ena_6);
++	seq_printf(m, "W3: bp_ena_7\t\t%d\n", halo->bp_ena_7);
++	seq_printf(m, "W4: stack_offset\t%d\nW4: shift\t\t%d\nW4: avg_level\t\t%d\n",
++		   halo->stack_offset, halo->shift, halo->avg_level);
++	seq_printf(m, "W4: avg_con \t\t%d\nW4: fc_ena\t\t%d\nW4: fc_stype\t\t%d\n",
++		   halo->avg_con, halo->fc_ena, halo->fc_stype);
++	seq_printf(m, "W4: fc_hyst_bits\t%d\nW4: fc_up_crossing\t%d\n",
++		   halo->fc_hyst_bits, halo->fc_up_crossing);
++	seq_printf(m, "W4: update_time\t\t%d\n", halo->update_time);
++	seq_printf(m, "W5: fc_addr\t\t%llx\n", halo->fc_addr);
++	seq_printf(m, "W6: ptr_start\t\t%llx\n", halo->ptr_start);
++	seq_printf(m, "W7: ptr_end\t\t%llx\n", halo->ptr_end);
++	seq_printf(m, "W8: bpid_0\t\t%d\n", halo->bpid_0);
++	seq_printf(m, "W8: err_int \t\t%d\nW8: err_int_ena\t\t%d\n",
++		   halo->err_int, halo->err_int_ena);
++	seq_printf(m, "W8: thresh_int\t\t%d\nW8: thresh_int_ena \t%d\n",
++		   halo->thresh_int, halo->thresh_int_ena);
++	seq_printf(m, "W8: thresh_up\t\t%d\nW8: thresh_qint_idx\t%d\n",
++		   halo->thresh_up, halo->thresh_qint_idx);
++	seq_printf(m, "W8: err_qint_idx \t%d\n", halo->err_qint_idx);
++	seq_printf(m, "W9: thresh\t\t%llu\n", (u64)halo->thresh);
++	seq_printf(m, "W9: fc_msh_dst\t\t%d\n", halo->fc_msh_dst);
++	seq_printf(m, "W9: op_dpc_ena\t\t%d\nW9: op_dpc_set\t\t%d\n",
++		   halo->op_dpc_ena, halo->op_dpc_set);
++	seq_printf(m, "W9: stream_ctx\t\t%d\nW9: unified_ctx\t\t%d\n",
++		   halo->stream_ctx, halo->unified_ctx);
 +}
-+
-+int rvu_mbox_handler_npa_cn20k_dpc_alloc(struct rvu *rvu,
-+					 struct npa_cn20k_dpc_alloc_req *req,
-+					 struct npa_cn20k_dpc_alloc_rsp *rsp)
-+{
-+	if (!is_cn20k(rvu->pdev))
-+		return -EOPNOTSUPP;
-+
-+	return npa_cn20k_dpc_alloc(rvu, req, rsp);
-+}
-+
-+static int npa_cn20k_dpc_free(struct rvu *rvu,
-+			      struct npa_cn20k_dpc_free_req *req)
-+{
-+	struct rvu_hwinfo *hw = rvu->hw;
-+	u16 pcifunc = req->hdr.pcifunc;
-+	int cntr, lf, blkaddr, ridx;
-+	struct rvu_block *block;
-+	struct rvu_pfvf *pfvf;
-+	u64 val, lfmask;
-+
-+	pfvf = rvu_get_pfvf(rvu, pcifunc);
-+
-+	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPA, 0);
-+	if (!pfvf->npalf || blkaddr < 0)
-+		return NPA_AF_ERR_AF_LF_INVALID;
-+
-+	block = &hw->block[blkaddr];
-+	lf = rvu_get_lf(rvu, block, pcifunc, 0);
-+	if (lf < 0)
-+		return NPA_AF_ERR_AF_LF_INVALID;
-+
-+	if (req->cntr_id >= NPA_DPC_MAX)
-+		return NPA_AF_ERR_PARAM;
-+
-+	mutex_lock(&rvu->rsrc_lock);
-+
-+	/* 0 to 63 lfs -> idx 0, 64 - 127 lfs -> idx 1 */
-+	ridx = lf >> 6;
-+	lfmask = BIT_ULL(ridx ? lf - NPA_DPC_LFS_PER_REG : lf);
-+	cntr = req->cntr_id;
-+
-+	ridx = 2 * cntr + ridx;
-+
-+	val = rvu_read64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx));
-+	/* Check if the counter is allotted to this LF */
-+	if (!(val & lfmask)) {
-+		mutex_unlock(&rvu->rsrc_lock);
-+		return 0;
-+	}
-+
-+	/* Revert permission */
-+	val &= ~lfmask;
-+	rvu_write64(rvu, blkaddr, NPA_AF_DPC_PERMITX(ridx), val);
-+
-+	/* Free this counter */
-+	rvu_free_rsrc(&rvu->npa_dpc, req->cntr_id);
-+
-+	mutex_unlock(&rvu->rsrc_lock);
-+
-+	return 0;
-+}
-+
-+void npa_cn20k_dpc_free_all(struct rvu *rvu, u16 pcifunc)
-+{
-+	struct npa_cn20k_dpc_free_req req;
-+	int i;
-+
-+	req.hdr.pcifunc = pcifunc;
-+	for (i = 0; i < NPA_DPC_MAX; i++) {
-+		req.cntr_id = i;
-+		npa_cn20k_dpc_free(rvu, &req);
-+	}
-+}
-+
-+int rvu_mbox_handler_npa_cn20k_dpc_free(struct rvu *rvu,
-+					struct npa_cn20k_dpc_free_req *req,
-+					struct msg_rsp *rsp)
-+{
-+	if (!is_cn20k(rvu->pdev))
-+		return -EOPNOTSUPP;
-+
-+	return npa_cn20k_dpc_free(rvu, req);
-+}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
-index 8bfaa507ee50..9b49e376878e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
-@@ -143,4 +143,11 @@
- 	offset = (0xb000000ull | (a) << 4 | (b) << 20);		\
- 	offset; })
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h
+index 0c5f05883666..7e00c7499e35 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.h
+@@ -27,5 +27,7 @@ void print_npa_cn20k_aura_ctx(struct seq_file *m,
+ 			      struct npa_cn20k_aq_enq_rsp *rsp);
+ void print_npa_cn20k_pool_ctx(struct seq_file *m,
+ 			      struct npa_cn20k_aq_enq_rsp *rsp);
++void print_npa_cn20k_halo_ctx(struct seq_file *m,
++			      struct npa_aq_enq_rsp *rsp);
  
-+/* NPA Registers */
-+#define NPA_AF_DPCX_CFG(a)		(0x800 | (a) << 6)
-+#define NPA_AF_DPC_PERMITX(a)		(0x1000 | (a) << 3)
-+
-+#define NPA_DPC_MAX			32
-+#define NPA_DPC_LFS_PER_REG		64
-+
- #endif /* RVU_MBOX_REG_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 4a97bd93d882..b29ec26b66b7 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -213,6 +213,10 @@ M(NPA_AQ_ENQ,		0x402, npa_aq_enq, npa_aq_enq_req, npa_aq_enq_rsp)   \
- M(NPA_HWCTX_DISABLE,	0x403, npa_hwctx_disable, hwctx_disable_req, msg_rsp)\
- M(NPA_CN20K_AQ_ENQ,	0x404, npa_cn20k_aq_enq, npa_cn20k_aq_enq_req,	\
- 				npa_cn20k_aq_enq_rsp)			\
-+M(NPA_CN20K_DPC_ALLOC,	0x405, npa_cn20k_dpc_alloc, npa_cn20k_dpc_alloc_req, \
-+				npa_cn20k_dpc_alloc_rsp)		\
-+M(NPA_CN20K_DPC_FREE,	0x406, npa_cn20k_dpc_free, npa_cn20k_dpc_free_req, \
-+				msg_rsp)				\
- /* SSO/SSOW mbox IDs (range 0x600 - 0x7FF) */				\
- /* TIM mbox IDs (range 0x800 - 0x9FF) */				\
- /* CPT mbox IDs (range 0xA00 - 0xBFF) */				\
-@@ -910,6 +914,21 @@ struct npa_cn20k_aq_enq_rsp {
- 	};
- };
- 
-+struct npa_cn20k_dpc_alloc_req {
-+	struct mbox_msghdr hdr;
-+	u16 dpc_conf;
-+};
-+
-+struct npa_cn20k_dpc_alloc_rsp {
-+	struct mbox_msghdr hdr;
-+	u8 cntr_id;
-+};
-+
-+struct npa_cn20k_dpc_free_req {
-+	struct mbox_msghdr hdr;
-+	u8 cntr_id;
-+};
-+
- /* Disable all contexts of type 'ctype' */
- struct hwctx_disable_req {
- 	struct mbox_msghdr hdr;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index 0c4dae6d0967..90ad2c138898 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -663,6 +663,9 @@ struct rvu {
- 	/* CPT interrupt lock */
- 	spinlock_t		cpt_intr_lock;
- 
-+	/* NPA */
-+	struct rsrc_bmap	npa_dpc;
-+
- 	struct mutex		mbox_lock; /* Serialize mbox up and down msgs */
- 	u16			rep_pcifunc;
- 	bool			altaf_ready;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
-index d15e6969ee56..30c067399660 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npa.c
-@@ -8,6 +8,8 @@
- #include <linux/module.h>
- #include <linux/pci.h>
- 
-+#include "cn20k/api.h"
-+#include "cn20k/reg.h"
- #include "rvu_struct.h"
- #include "rvu_reg.h"
- #include "rvu.h"
-@@ -494,6 +496,8 @@ int rvu_mbox_handler_npa_lf_free(struct rvu *rvu, struct msg_req *req,
- 		return NPA_AF_ERR_LF_RESET;
+ #endif
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index fa461489acdd..0ac59103b4a4 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -968,6 +968,9 @@ static void print_npa_qsize(struct seq_file *m, struct rvu_pfvf *pfvf)
+ 		seq_printf(m, "Aura count : %d\n", pfvf->aura_ctx->qsize);
+ 		seq_printf(m, "Aura context ena/dis bitmap : %*pb\n",
+ 			   pfvf->aura_ctx->qsize, pfvf->aura_bmap);
++		if (pfvf->halo_bmap)
++			seq_printf(m, "Halo context ena/dis bitmap : %*pb\n",
++				   pfvf->aura_ctx->qsize, pfvf->halo_bmap);
  	}
  
-+	if (is_cn20k(rvu->pdev))
-+		npa_cn20k_dpc_free_all(rvu, pcifunc);
- 	npa_ctx_free(rvu, pfvf);
+ 	if (!pfvf->pool_ctx) {
+@@ -1195,6 +1198,20 @@ static void print_npa_pool_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
+ 		seq_printf(m, "W8: fc_msh_dst\t\t%d\n", pool->fc_msh_dst);
+ }
  
- 	return 0;
-@@ -559,12 +563,19 @@ static int npa_aq_init(struct rvu *rvu, struct rvu_block *block)
- int rvu_npa_init(struct rvu *rvu)
++static const char *npa_ctype_str(int ctype)
++{
++	switch (ctype) {
++	case NPA_AQ_CTYPE_AURA:
++		return "aura";
++	case NPA_AQ_CTYPE_HALO:
++		return "halo";
++	case NPA_AQ_CTYPE_POOL:
++		return "pool";
++	default:
++		return "unknown";
++	}
++}
++
+ /* Reads aura/pool's ctx from admin queue */
+ static int rvu_dbg_npa_ctx_display(struct seq_file *m, void *unused, int ctype)
  {
- 	struct rvu_hwinfo *hw = rvu->hw;
--	int blkaddr;
-+	int err, blkaddr;
+@@ -1211,6 +1228,7 @@ static int rvu_dbg_npa_ctx_display(struct seq_file *m, void *unused, int ctype)
  
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPA, 0);
- 	if (blkaddr < 0)
- 		return 0;
- 
-+	if (is_cn20k(rvu->pdev)) {
-+		rvu->npa_dpc.max = NPA_DPC_MAX;
-+		err = rvu_alloc_bitmap(&rvu->npa_dpc);
-+		if (err)
-+			return err;
-+	}
-+
- 	/* Initialize admin queue */
- 	return npa_aq_init(rvu, &hw->block[blkaddr]);
- }
-@@ -581,6 +592,9 @@ void rvu_npa_freemem(struct rvu *rvu)
- 
- 	block = &hw->block[blkaddr];
- 	rvu_aq_free(rvu, block->aq);
-+
-+	if (is_cn20k(rvu->pdev))
-+		kfree(rvu->npa_dpc.bmap);
- }
- 
- void rvu_npa_lf_teardown(struct rvu *rvu, u16 pcifunc, int npalf)
-@@ -601,6 +615,7 @@ void rvu_npa_lf_teardown(struct rvu *rvu, u16 pcifunc, int npalf)
- 	if (is_cn20k(rvu->pdev)) {
- 		ctx_req.ctype = NPA_AQ_CTYPE_HALO;
- 		npa_lf_hwctx_disable(rvu, &ctx_req);
-+		npa_cn20k_dpc_free_all(rvu, pcifunc);
+ 	switch (ctype) {
+ 	case NPA_AQ_CTYPE_AURA:
++	case NPA_AQ_CTYPE_HALO:
+ 		npalf = rvu->rvu_dbg.npa_aura_ctx.lf;
+ 		id = rvu->rvu_dbg.npa_aura_ctx.id;
+ 		all = rvu->rvu_dbg.npa_aura_ctx.all;
+@@ -1235,6 +1253,9 @@ static int rvu_dbg_npa_ctx_display(struct seq_file *m, void *unused, int ctype)
+ 	} else if (ctype == NPA_AQ_CTYPE_POOL && !pfvf->pool_ctx) {
+ 		seq_puts(m, "Pool context is not initialized\n");
+ 		return -EINVAL;
++	} else if (ctype == NPA_AQ_CTYPE_HALO && !pfvf->aura_ctx) {
++		seq_puts(m, "Halo context is not initialized\n");
++		return -EINVAL;
  	}
  
- 	npa_ctx_free(rvu, pfvf);
+ 	memset(&aq_req, 0, sizeof(struct npa_aq_enq_req));
+@@ -1244,6 +1265,9 @@ static int rvu_dbg_npa_ctx_display(struct seq_file *m, void *unused, int ctype)
+ 	if (ctype == NPA_AQ_CTYPE_AURA) {
+ 		max_id = pfvf->aura_ctx->qsize;
+ 		print_npa_ctx = print_npa_aura_ctx;
++	} else if (ctype == NPA_AQ_CTYPE_HALO) {
++		max_id = pfvf->aura_ctx->qsize;
++		print_npa_ctx = print_npa_cn20k_halo_ctx;
+ 	} else {
+ 		max_id = pfvf->pool_ctx->qsize;
+ 		print_npa_ctx = print_npa_pool_ctx;
+@@ -1251,8 +1275,7 @@ static int rvu_dbg_npa_ctx_display(struct seq_file *m, void *unused, int ctype)
+ 
+ 	if (id < 0 || id >= max_id) {
+ 		seq_printf(m, "Invalid %s, valid range is 0-%d\n",
+-			   (ctype == NPA_AQ_CTYPE_AURA) ? "aura" : "pool",
+-			max_id - 1);
++			   npa_ctype_str(ctype), max_id - 1);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -1265,12 +1288,19 @@ static int rvu_dbg_npa_ctx_display(struct seq_file *m, void *unused, int ctype)
+ 		aq_req.aura_id = aura;
+ 
+ 		/* Skip if queue is uninitialized */
++		if (ctype == NPA_AQ_CTYPE_AURA &&
++		    !test_bit(aura, pfvf->aura_bmap))
++			continue;
++
++		if (ctype == NPA_AQ_CTYPE_HALO &&
++		    !test_bit(aura, pfvf->halo_bmap))
++			continue;
++
+ 		if (ctype == NPA_AQ_CTYPE_POOL && !test_bit(aura, pfvf->pool_bmap))
+ 			continue;
+ 
+-		seq_printf(m, "======%s : %d=======\n",
+-			   (ctype == NPA_AQ_CTYPE_AURA) ? "AURA" : "POOL",
+-			aq_req.aura_id);
++		seq_printf(m, "======%s : %d=======\n", npa_ctype_str(ctype),
++			   aq_req.aura_id);
+ 		rc = rvu_npa_aq_enq_inst(rvu, &aq_req, &rsp);
+ 		if (rc) {
+ 			seq_puts(m, "Failed to read context\n");
+@@ -1299,6 +1329,12 @@ static int write_npa_ctx(struct rvu *rvu, bool all,
+ 			return -EINVAL;
+ 		}
+ 		max_id = pfvf->aura_ctx->qsize;
++	} else if (ctype == NPA_AQ_CTYPE_HALO) {
++		if (!pfvf->aura_ctx) {
++			dev_warn(rvu->dev, "Halo context is not initialized\n");
++			return -EINVAL;
++		}
++		max_id = pfvf->aura_ctx->qsize;
+ 	} else if (ctype == NPA_AQ_CTYPE_POOL) {
+ 		if (!pfvf->pool_ctx) {
+ 			dev_warn(rvu->dev, "Pool context is not initialized\n");
+@@ -1309,13 +1345,14 @@ static int write_npa_ctx(struct rvu *rvu, bool all,
+ 
+ 	if (id < 0 || id >= max_id) {
+ 		dev_warn(rvu->dev, "Invalid %s, valid range is 0-%d\n",
+-			 (ctype == NPA_AQ_CTYPE_AURA) ? "aura" : "pool",
++			 npa_ctype_str(ctype),
+ 			max_id - 1);
+ 		return -EINVAL;
+ 	}
+ 
+ 	switch (ctype) {
+ 	case NPA_AQ_CTYPE_AURA:
++	case NPA_AQ_CTYPE_HALO:
+ 		rvu->rvu_dbg.npa_aura_ctx.lf = npalf;
+ 		rvu->rvu_dbg.npa_aura_ctx.id = id;
+ 		rvu->rvu_dbg.npa_aura_ctx.all = all;
+@@ -1374,12 +1411,12 @@ static ssize_t rvu_dbg_npa_ctx_write(struct file *filp,
+ 				     const char __user *buffer,
+ 				     size_t count, loff_t *ppos, int ctype)
+ {
+-	char *cmd_buf, *ctype_string = (ctype == NPA_AQ_CTYPE_AURA) ?
+-					"aura" : "pool";
++	const char *ctype_string = npa_ctype_str(ctype);
+ 	struct seq_file *seqfp = filp->private_data;
+ 	struct rvu *rvu = seqfp->private;
+ 	int npalf, id = 0, ret;
+ 	bool all = false;
++	char *cmd_buf;
+ 
+ 	if ((*ppos != 0) || !count)
+ 		return -EINVAL;
+@@ -1417,6 +1454,21 @@ static int rvu_dbg_npa_aura_ctx_display(struct seq_file *filp, void *unused)
+ 
+ RVU_DEBUG_SEQ_FOPS(npa_aura_ctx, npa_aura_ctx_display, npa_aura_ctx_write);
+ 
++static ssize_t rvu_dbg_npa_halo_ctx_write(struct file *filp,
++					  const char __user *buffer,
++					  size_t count, loff_t *ppos)
++{
++	return rvu_dbg_npa_ctx_write(filp, buffer, count, ppos,
++				     NPA_AQ_CTYPE_HALO);
++}
++
++static int rvu_dbg_npa_halo_ctx_display(struct seq_file *filp, void *unused)
++{
++	return rvu_dbg_npa_ctx_display(filp, unused, NPA_AQ_CTYPE_HALO);
++}
++
++RVU_DEBUG_SEQ_FOPS(npa_halo_ctx, npa_halo_ctx_display, npa_halo_ctx_write);
++
+ static ssize_t rvu_dbg_npa_pool_ctx_write(struct file *filp,
+ 					  const char __user *buffer,
+ 					  size_t count, loff_t *ppos)
+@@ -2798,6 +2850,9 @@ static void rvu_dbg_npa_init(struct rvu *rvu)
+ 			    &rvu_dbg_npa_qsize_fops);
+ 	debugfs_create_file("aura_ctx", 0600, rvu->rvu_dbg.npa, rvu,
+ 			    &rvu_dbg_npa_aura_ctx_fops);
++	if (is_cn20k(rvu->pdev))
++		debugfs_create_file("halo_ctx", 0600, rvu->rvu_dbg.npa, rvu,
++				    &rvu_dbg_npa_halo_ctx_fops);
+ 	debugfs_create_file("pool_ctx", 0600, rvu->rvu_dbg.npa, rvu,
+ 			    &rvu_dbg_npa_pool_ctx_fops);
+ 
 -- 
 2.48.1
 
