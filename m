@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-291890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291883-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qN9yKJLwFWp7fQcAu9opvQ
-	(envelope-from <netdev+bounces-291890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:12:18 +0200
+	id AKuSF0fuFWp7fQcAu9opvQ
+	(envelope-from <netdev+bounces-291883-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:02:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEAF25DBD43
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:12:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3884E5DBA8C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:02:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7A27230A044B
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:07:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1F917300A5BA
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5793C09EE;
-	Tue, 26 May 2026 19:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0F635028C;
+	Tue, 26 May 2026 19:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="nGrIY5vx"
+	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="SbeF8Lh3"
 X-Original-To: netdev@vger.kernel.org
 Received: from oak.phenome.org (oak.phenome.org [193.110.157.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204CE3C0A11;
-	Tue, 26 May 2026 19:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DB428A3FA;
+	Tue, 26 May 2026 19:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779822460; cv=none; b=FoTfpXJruBCOY0IqnS3gwDrSwp+qQNsXixMj1p2mldk4YFk4PIL00xqc4hPXLBGU7NVG8IU7t3GvGJNN5LuLS1m26NGzTEsYFuMVtPgz7PsrA6dPYWsOHv/imr1Fa2X0PPAi5OCFhyOSbnyIdYcgkNArjFATWMmqwzF9WD+dtKM=
+	t=1779822146; cv=none; b=L7xm2rdmOLwyPzdEPWI0pskRYXek3JSUlyeK4kRLjql1q71OOPWoMVW7xHRG8k3eTIkV5jqYjUwm3lv5FabmWRky8/sN7MYLXtGQd1dgJY5GjyIc1MimW/YTdtz/Zz2R90v4V4H0y6t+XX1b3fA3BnpLDTvbliSFbxS/Ep+hxZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779822460; c=relaxed/simple;
-	bh=M/g5qZJAEi3c0rfXk/iGFYVZpdLPlDrwWEcToZ1Muw8=;
+	s=arc-20240116; t=1779822146; c=relaxed/simple;
+	bh=Dg25kT/nldcEh4mtki/4UVWoKJniYzPKsYOYb9IHb6U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CTD+ZviWKwwyMr1WGJv0sQueTanGwkPPBFpJ4qli34T0hqGgJcGuTrlAKI+B+xdnKor8meiHdwVLNL1SLrzsYKwWWKwwm+hauRrS3rDZRdv5iv5tnxCLfFouarFo3bZoOwqnTQFL5RUXKtZrYeBhPW9jsCxRg9qxQYp0WOPL9Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=nGrIY5vx; arc=none smtp.client-ip=193.110.157.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=EfU00UsSvdHeF1sDrjGdGE/zK3rdDBJBCFUl09MMyrp+RkkUbxYT49k9qPdX18AXuYKm/M35t8C6wHKDK/2+eA1zgSp0jqciOyb/8zdPDwR5g4d16K0Eorsajdr0uccZ4+gePLy+4eOkNjwZvJUHsoAM8GuHtG9mYGyZjCkGmtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=SbeF8Lh3; arc=none smtp.client-ip=193.110.157.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
 Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
@@ -40,17 +40,17 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
 	in-reply-to:content-transfer-encoding:content-disposition
 	:content-type:content-type:mime-version:references:message-id
 	:subject:subject:from:from:date:date:received; s=oak1; t=
-	1779822100; x=1780686101; bh=M/g5qZJAEi3c0rfXk/iGFYVZpdLPlDrwWEc
-	ToZ1Muw8=; b=nGrIY5vx1rXmnNUZGjHv9MnabMFkaZtEgQWFNG5dwhF0Xds0/LI
-	2su/3AdgVLFjsAwqEC7SQ+Rx1YWDccGzNGrLUIJhrpcwb6YCR+Hn0fjs+pBdvJoL
-	EbzHgIdaapUc/FgGSIPmnMuSSo33q87VZvOTLbe0eDO4AZtTwluL9Lw4IelPOA0v
-	4gcyIPH7sNqMORPh7uFRAsnGcfUZVRWT9kVQF0UnxyTTc9pbY/IBuB156WnYl5zQ
-	I+uLmjkjJoG+RImahCaGP+qHFtsW53bMpFvopTrYXzsLFDQZV+cyUmhkYFc3QINh
-	3SLvXBNcKgXhO64friL3of5Lkebp2NPQDxw==
+	1779822140; x=1780686141; bh=Dg25kT/nldcEh4mtki/4UVWoKJniYzPKsYO
+	Yb9IHb6U=; b=SbeF8Lh3UU5RWqR0JADOdVy+Eslse5/aPQhwjXnkgdBTliOI0jF
+	F1WX7PELbSS/jd/EUXwHQarswb6yyVOCq/zwza8yL1ajp2/lXhpsngWe7BuoZV35
+	y+MiPqWPTUb8HT7IWCW1mTDkVP7WCKq2mZ8Gu9C46e6apD4EKJHy+2V90uVxk6Zi
+	68Mv8z8XcjwzdbMXxrCqWabkxZJczm4ZHkPib3aheEFKGotwm9B/+W19D2X80n+k
+	N1GoUVg1qrvT6VZd1XZy/L3RAxWnmxS/kpNGGybk0+7kpRvunDyy6P0GfB7LRqg2
+	9UmEMi+lidg8yeglMn3kwnebb2ErtpXdIcw==
 X-Virus-Scanned: amavisd at oak.phenome.org
 Received: by oak.phenome.org (Postfix);
-	Tue, 26 May 2026 21:01:37 +0200 (CEST)
-Date: Tue, 26 May 2026 21:01:35 +0200
+	Tue, 26 May 2026 21:02:20 +0200 (CEST)
+Date: Tue, 26 May 2026 21:02:18 +0200
 From: Antony Antony <antony@phenome.org>
 To: Sabrina Dubroca <sd@queasysnail.net>
 Cc: Antony Antony <antony.antony@secunet.com>,
@@ -70,12 +70,12 @@ Cc: Antony Antony <antony.antony@secunet.com>,
 	linux-doc@vger.kernel.org,
 	Chiachang Wang <chiachangwang@google.com>,
 	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org
-Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v8 12/14] xfrm: add
- XFRM_MSG_MIGRATE_STATE for single SA migration
-Message-ID: <ahXuD2XrvCzN5HyR@Antony2201.local>
+Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v8 14/14] xfrm: add
+ documentation for XFRM_MSG_MIGRATE_STATE
+Message-ID: <ahXuOr8Wz4CMcZXu@Antony2201.local>
 References: <migrate-state-v8-0-4578fb016965@secunet.com>
- <migrate-state-v8-12-4578fb016965@secunet.com>
- <agGdwbo2GFhPP78z@krikkit>
+ <migrate-state-v8-14-4578fb016965@secunet.com>
+ <agHSPUBZg0tHezM-@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,18 +85,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <agGdwbo2GFhPP78z@krikkit>
+In-Reply-To: <agHSPUBZg0tHezM-@krikkit>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291890-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291883-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -108,178 +108,187 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[phenome.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[phenome.org:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EEAF25DBD43
+	DBL_BLOCKED_OPENRESOLVER(0.00)[phenome.org:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 3884E5DBA8C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 11, 2026 at 11:13:37AM +0200, Sabrina Dubroca wrote:
-> 2026-05-05, 06:34:29 +0200, Antony Antony wrote:
+On Mon, May 11, 2026 at 02:57:33PM +0200, Sabrina Dubroca wrote:
+> Overall a very document, thanks. Some comments:
+>
+> 2026-05-05, 06:34:55 +0200, Antony Antony wrote:
+> > +    struct xfrm_user_migrate_state {
+> > +        struct xfrm_usersa_id  id;       /* spi, daddr, proto, family */
+> > +        xfrm_address_t         new_daddr;
+> > +        xfrm_address_t         new_saddr;
+> > +        struct xfrm_mark       old_mark; /* SA lookup: key = v & m */
+> > +        struct xfrm_selector   new_sel;  /* new selector (see Flags) */
+> > +        __u32                  new_reqid;
+> > +        __u32                  flags;    /* XFRM_MIGRATE_STATE_* */
+> > +        __u16                  new_family;
+> > +        __u16                  reserved;
+> > +    };
+>
+> Thinking about the UAPI a bit more, maybe this would be a good time to
+> start introducing a "proper" netlink API for XFRM? Instead of having
+> the main properties in a fixed struct, and a few attributes as an
+> afterthought, use attributes as the main way to exchange information?
+>
+> Then we can start adding the attributes as alternative to the fixed
+> headers in some other ops, and later start deprecating the current
+> API?
+>
+> (for some reason this thought only popped up when I had the html
+> rendering in front of me, sorry it's so late in the process)
+
+Interesting thought. However, when adding selector support I considered
+this, and realized it would require introducing several new XFRMA attributes to
+cover the fields currently in several fixed struct. That is a larger
+change and out of scope for this series.
+In general I go back forward on this.
+
+> [...]
+> > +Flags
+> > +=====
+> > +
+> > +The ``flags`` field in ``xfrm_user_migrate_state`` controls optional
+> > +migration behaviour. Unknown flag bits are ignored.
+>
+> Maybe better to reject unknown flag bits (as well as unknown
+> attributes beyond XFRMA_MAX), so that we can fully control their
+> behavior, and not risk incorrectly migrating an SA if a "too-recent"
+> userspace passes attributes we don't know (then if we fail to handle
+> them in the kernel, the SA may not handle the traffic).
+>
+> (Steffen and you will have a much better understanding of the security
+> risks here than me)
+
+Good point. Done in v9.
+
+Unknown flag bits are now rejected with -EINVAL. The extended ACK message
+reports the specific unrecognised bits, e.g.:
+
+  "Unknown flags: 0x4"
+
+A new UAPI constant XFRM_MIGRATE_STATE_KNOWN_FLAGS is added to
+<linux/xfrm.h> so userspace can validate flags before sending:
+
+  if (flags & ~XFRM_MIGRATE_STATE_KNOWN_FLAGS)
+          /* flag not known to this kernel header version */
+
+Note: this constant reflects the flags defined in the header userspace
+was compiled against, which may differ from what the running kernel
+accepts. The documentation is updated accordingly.
+
+-migration behaviour. Unknown flag bits are ignored.
++migration behaviour. Unknown flag bits are rejected with ``-EINVAL``; the
++extended ACK message identifies the unrecognised bits (e.g. ``"Unknown flags:
++0x4"``). Userspace can use ``XFRM_MIGRATE_STATE_KNOWN_FLAGS`` (defined in
++``<linux/xfrm.h>``) to validate flags before sending; note that this constant
++reflects the flags known to the header version userspace was compiled against,
++which may differ from what the running kernel accepts.
+
+>
+>
+> > +Migration Steps
+> > +===============
+>
+> maybe add:
+>
+> Userspace is expected to:
+>
+> > +#. Install a block policy to drop traffic on the affected selector.
+> > +#. Remove the old policy.
+> > +#. Call ``XFRM_MSG_MIGRATE_STATE`` for each SA.
+> > +#. Reinstall the policies.
+> > +#. Remove the block policy.
+
+The section is restructured in v9 into Outgoing SA and Incoming SA
+subsections. The outgoing procedure is introduced with "To prevent
+cleartext traffic leaks, install a block policy before migrating:"
+rather than a  mandate - userspace can make an informed choice
+depending on the AEAD in use. The incoming section explains that no
+block policy is needed and advises being liberal in acceptance to
+avoid packet loss during the migration window.
+
+> > +
+> > +Block Policy and IV Safety
+> > +--------------------------
+> > +
+> > +Installing a block policy before migration is required to prevent
+> > +traffic leaks and IV reuse in counter mode.
+> > +
+> > +AES-GCM IV uniqueness is critical: reusing a (key, IV) pair allows
+> > +an attacker to recover the authentication subkey and forge
+> > +authentication tags, breaking both confidentiality and integrity.
+> > +
+> > +``XFRM_MSG_MIGRATE_STATE`` atomically copies the sequence number and
+> > +replay window from the old SA to the new SA and deletes the old SA.
+> > +The block policy ensures no outgoing packets are sent in the migration
+> > +window, preventing IV reuse under the same key.
+>
+> Does it matter that the copy is done atomically if we expect userspace
+> to install a block policy? (without the block, I'll have to recheck to
+> convince myself whether it would be safe, and TBH I'm still a bit
+> confused by patch 8)
+
+The Block Policy and IV Safety section is clarified in v9. The block
+policy serves two purposes: (1) prevent cleartext traffic leaks during
+the migration window, and (2) for AES-GCM, prevent IV reuse by
+ensuring no outgoing packets are sent under the same key.
+
+The atomic copy complements the block policy for outgoing — together
+they eliminate both risks. For incoming SAs the atomic copy is the
+primary mechanism: it ensures replay protection continues without a
+gap. The block policy is not needed on the incoming side.
+>
+> > +Feature Detection
+> > +=================
+> > +
+> > +Userspace can probe for kernel support by sending a minimal
+> > +``XFRM_MSG_MIGRATE_STATE`` message with a non-existent SPI:
+> > +
+> > +- ``-ENOPROTOOPT``: not supported (``CONFIG_XFRM_MIGRATE`` not enabled)
+> > +- any other error: supported
+>
+>
+> xfrm_user_rcv_msg
+>
+> if (type > XFRM_MSG_MAX)
+>         return -EINVAL;
+>
+>
+> Userspace will hit that on a kernel that may have migrate but not
+> XFRM_MSG_MIGRATE_STATE, no?
+
+Good catch. Fixed in v9: three cases are now documented — -EINVAL
+(kernel predates the message type), -ENOPROTOOPT (CONFIG_XFRM_MIGRATE
+disabled), -ESRCH (supported). Probe uses a non-zero non-existent SPI
+to avoid conflating the SPI=0 validation -EINVAL with the
+type-out-of-range -EINVAL.
+
+>
 >
 > [...]
->  include/net/xfrm.h          |  16 ++-
->  include/uapi/linux/xfrm.h   |  21 ++++
->  net/xfrm/xfrm_device.c      |   2 +-
->  net/xfrm/xfrm_policy.c      |  19 +++
->  net/xfrm/xfrm_state.c       |  29 +++--
->  net/xfrm/xfrm_user.c        | 281 +++++++++++++++++++++++++++++++++++++++++++-
->  security/selinux/nlmsgtab.c |   3 +-
->  7 files changed, 357 insertions(+), 14 deletions(-)
+> > +Error Handling
+> > +==============
+> > +
+> > +If the target SA tuple (daddr, SPI, proto, family) is occupied by an existing
+> > +unrelated SA, the operation returns ``-EEXIST``.
 >
-> If the omission of xfrm_compat.c is intentional, maybe worth
-> making a note of that?
+> All this happens under xfrm_cfg_mutex, so if we did an initial lookup
+> for the new SA before starting the operation, we could ensure there's
+> no dupe, and the mutex would guarantee no insertion. No?
 
-Fixed in v9.
-
-> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> @@ -684,12 +684,20 @@ struct xfrm_migrate {
-> +	struct xfrm_mark        old_mark;
-> +	struct xfrm_mark       *new_mark;
-> +	struct xfrm_mark        smark;
-> +	u16			msg_type;
-> +	u32			flags;
-> +	u32			new_reqid;
-> +	u32			nat_keepalive_interval;
-> +	u32			mapping_maxage;
-> +	const struct xfrm_selector *new_sel;
->
-> afkey doesn't zero its array of xfrm_migrate, so those new fields will
-> contain garbage there. Hopefully nobody is using it, but...
-
-Fixed in v9: set msg_type = XFRM_MSG_MIGRATE explicitly in
-xfrm_migrate_copy_old() so the PF_KEY path always takes the correct
-selector branch regardless of whether the caller zeroes the array.
-
-> @@ -2104,7 +2112,7 @@
-> -		       struct xfrm_user_offload *xuo,
-> +		       const struct xfrm_user_offload *xuo,
->
-> nit: unrelated clean up
-
-Split out into a separate patch in v9.
-
-> +/* Flags for xfrm_user_migrate_state.flags */
-> +enum xfrm_migrate_state_flags {
-> +	XFRM_MIGRATE_STATE_NO_OFFLOAD = 1,
->
-> nit: maybe XFRM_MIGRATE_STATE_CLEAR_OFFLOAD?
-
-Done in v9.
-
-> +	XFRM_MIGRATE_STATE_UPDATE_SEL = 2,
->
-> "update sel" to me sounds more like "overwrite the whole thing" than
-> "copy some bits, fix up others". The name is already long, but maybe
-> "XFRM_MIGRATE_STATE_UPDATE_H2H_SEL"?
-
-Done in v9.
-
-> +static void xfrm_migrate_copy_old(struct xfrm_migrate *mp,
-> +				  const struct xfrm_state *x,
-> +				  struct xfrm_mark *new_mark_buf)
-> +{
-> +	*new_mark_buf              = x->mark;
-> +	mp->new_mark               = new_mark_buf;
->
-> Do you really need a separate buffer for that? Or could you just use
->     mp->new_mark = &x->mark;
-> and skip the new_marks array in xfrm_migrate()?
-> I find that new_marks array quite ugly, so I'd like to get rid of
-> it. If that doesn't work, I'd prefer to stuff new_mark_buf directly
-> inside struct xfrm_migrate, and then set mp->new_mark pointing to it.
-
-Done in v9: new_marks[] removed, mp->new_mark = &x->mark directly.
-new_mark in struct xfrm_migrate changed to const struct xfrm_mark *.
-
-> +			xfrm_migrate_copy_old(mp, x, &new_marks[i]);
->
-> nit: maybe swap mp and x, just to match the order of xfrm_state_migrate()?
->
-> It would also be a bit easier to review if you split this refactoring
-> (and the corresponding changes to xfrm_state_clone_and_setup) into a
-> separate patch.
-
-> -	memcpy(&x->sel, &orig->sel, sizeof(x->sel));
-> +	...
-> +		} else {
-> +			x->sel = *m->new_sel;
->
-> nit: the mix of copy styles (memcpy and struct assignment) within this
-> function, but especially here for x->sel, is a bit unpleasant.
-
-fixed.
-
-> -	struct xfrm_migrate m[XFRM_MAX_DEPTH];
-> +	struct xfrm_migrate m[XFRM_MAX_DEPTH] = {};
->
-> I'm not really opposed to this change, but what prompted it?
-
-It was prompted after v6 review — when xuo was an embedded struct,
-mp->xuo.ifindex could be uninitialized when xuo was NULL. However, in
-v9 xuo reverted to a pointer, so the = {} is no longer necessary, kept it
-as defensive programming.
-
-
-> +	if ((um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD) &&
-> +	    attrs[XFRMA_OFFLOAD_DEV]) {
->
-> Not a strong objection, but they don't really have to be? "don't
-> inherit and set it from the one provided" sounds ok.
-> XFRMA_OFFLOAD_DEV with !XFRM_MIGRATE_STATE_NO_OFFLOAD (inherit and
-> also set from request) seems more problematic.
-
-Agreed. Exclusivity check dropped in v9. XFRMA_OFFLOAD_DEV takes
-precedence via if/else so NO_OFFLOAD is redundant when both are set.
-The "inherit AND set" case doesn't exist in the code.
-
-> +		if (x->sel.prefixlen_s != x->sel.prefixlen_d ||
-> +		    x->sel.prefixlen_d != prefixlen ||
-> +		    !xfrm_addr_equal(&x->sel.daddr, &x->id.daddr, x->sel.family) ||
-> +		    !xfrm_addr_equal(&x->sel.saddr, &x->props.saddr, x->sel.family)) {
->
-> I think we need to be careful about families here too. id and sel
-> could have different ones.
-
-Fixed in v9: use x->props.family for prefixlen and xfrm_addr_equal.
-AF_UNSPEC selector falls through to IPv4 comparison — this fixes it.
-Mixed-family transport mode sounds odd and hopefully not allowed in
-practice; this fix rejects it naturally.
-
-> +	if (attrs[XFRMA_NAT_KEEPALIVE_INTERVAL] &&
-> +	    nla_get_u32(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL]) && !m.encap) {
->
-> if (nla_get_u32_default(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL], 0) && !m.encap)
-
-> +	} else if (!(um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD) && x->xso.dev) {
->
-> nit: this would be a bit more readable with
->     bool inherit_offload = !(um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD);
->
-> copy_user_offload is doing almost exactly the same thing (copy from
-> and xso to an xuo). It would be better to extract some helper
-> (xso_to_xuo() ?) and use it in both places, otherwise they'll almost
-> certainly get out of sync.
-
-Done in v9.
-
-> +	m.mapping_maxage = attrs[XFRMA_MTIMER_THRESH] ?
-> +		nla_get_u32(attrs[XFRMA_MTIMER_THRESH]) : x->mapping_maxage;
->
-> m.mapping_maxage = nla_get_u32_default(attrs[XFRMA_MTIMER_THRESH], x->mapping_maxage);
-
-thanks.
-
-> +	m.nat_keepalive_interval = attrs[XFRMA_NAT_KEEPALIVE_INTERVAL] ?
-> +		nla_get_u32(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL]) :
-> +		x->nat_keepalive_interval;
->
-> m.nat_keepalive_interval = nla_get_u32_default(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL], x->nat_keepalive_interval);
-
-fixed in v9
+Done in v9. A pre-check lookup is added before cloning when the SA
+tuple changes (new daddr or new family). If the new tuple is already
+occupied -EEXIST is returned while the old SA is still intact, safe
+to retry. The install failure path comment is updated to reflect it
+is now a safety net only.
 
 -antony
 
