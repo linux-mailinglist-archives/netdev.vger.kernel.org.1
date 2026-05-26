@@ -1,259 +1,329 @@
-Return-Path: <netdev+bounces-291687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291688-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJXZJ1+WFWp9WgcAu9opvQ
-	(envelope-from <netdev+bounces-291687-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 14:47:27 +0200
+	id 2OVGKHmWFWp9WgcAu9opvQ
+	(envelope-from <netdev+bounces-291688-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 14:47:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABFE55D5BF0
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 14:47:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BA755D5BF8
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 14:47:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3351930091C7
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:47:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8AB2A300EDA4
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05DF202C46;
-	Tue, 26 May 2026 12:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A571FECCD;
+	Tue, 26 May 2026 12:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ajvfM8AI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hmblpXFq";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hli0c0lI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F8E199FAC
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 12:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E533F1F3BA2
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 12:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779799640; cv=none; b=eF3HK3QZxifvG+HuJXjHz0tYp1qr2KzWB3ak7ldW/qdOtnhh1u4nFmxlylv+NljBeWQVYUjZKm4LkuHKfWMnuiUftI6UUjm4c7/ssQBQG2cISWT1RqNSXYZR+nTdYmPP+p/IQ3pGwWwBim8LZwrZuE7E+kSmfsNhj4GrIlS/t98=
+	t=1779799670; cv=none; b=AketSzLd7uTZ8JfXg9SwhG0bSKJiZ/mcj6YaOZJimGEvivjyod7QRejPxLa+1ImB/knROuAzgxn1+nrmUGriIdpnRWldgF54QpWkpU3AI2jgQMSZYTBxmmk197q+gY7L31BAzyQy34fVSI0ykjHFrqi1LOhZ+aq2iwJszsoqX8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779799640; c=relaxed/simple;
-	bh=hMcRAkYldHJ78uX0deYIHqN6LL8j+EL56qjjoEgiwwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tsqey11JbOq/LHEM1pJQX/y4lUz2YGhcRnDdp6egKccQMLkCi27iof647BWE7srhSMagInLf3Hyo5PiL4w9KVNxKN1eVhMAwA4VlYTso38hCXYfsTDN4R670FKedUMToGGhHW2NjBRpH3DmMi3/Q/z/d95vmTCoc4wcQi0KnLOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ajvfM8AI; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43d73422431so7463370f8f.2
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 05:47:18 -0700 (PDT)
+	s=arc-20240116; t=1779799670; c=relaxed/simple;
+	bh=qdAHZY/R6V7jBr84z92m0h1ql/ogeK6NNj6mvqYpaHc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aJJ6Q7hP8sE83hQuiFzYg+14DY9oa7cJAhmLHn7as8/TTOuHMgDKd3uibAKdvQH2LxbkKet+Rjf/GhS3eJwUr8YtIE8vsiwtju146IeaX1HA6PgNDkcMu7im6Tb8dHnGA0tm1l4HL25ZTijOOOzrzePGOLTv2xndghO1Eb2F2Vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hmblpXFq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hli0c0lI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779799667;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5kwiZ88aMCCOMgCKv+ZUerR8iXVNCA9hIs6rASmQTCk=;
+	b=hmblpXFqe8mt6vgAC0AQZre9Jn4q9yER2rHfb2SmoGjSN242gJ7mz/QNbVGTQtpr+iNjlQ
+	Hh6d7ooCsPLOwoPkbu57J2D7rvorXNJ6P9O43ztfO5Tk5fwvrOnl/idgEcjbCXAHFhFqJs
+	pCa9ZDLJQe1Imc/Usk9MV+SNaSh8i6k=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-282-73b6GwR1N7eNSuk-rXZE3Q-1; Tue, 26 May 2026 08:47:46 -0400
+X-MC-Unique: 73b6GwR1N7eNSuk-rXZE3Q-1
+X-Mimecast-MFC-AGG-ID: 73b6GwR1N7eNSuk-rXZE3Q_1779799665
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-45e2f74da10so10277434f8f.2
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 05:47:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779799637; x=1780404437; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZcEqXbrIbOE1ZYxntxe5FIRRwiUUUrNk8UQv35w52MU=;
-        b=ajvfM8AIFOut+CyUoYFPzEjQVgG0Fo8sThEO+/MeIgDylpQm1RcigzV7muqwz3n/GC
-         eKXFnv87KTqkldPbELh9rfTxfljTiBPYbi6zKqpdsO9NB34/XK+EgWzjULOrE5sauIxc
-         yUtukd/laK1MiFH9PkCJ6/TZmBfFcMR3XmSLKuXZXjoyrrif30pNg2+XUGDJaI8oe23E
-         7EGj1MLuBL4dSwm4tp9W/9O+m/57vDRfLTSoPJd781WStyxZfBGgWsiAEtOw4BJ6V5Xd
-         MJZsWjVT4Icz6yw32dfwm0TTaMlHBmiIOjI9WuWxMTmxdCaizjdnvSOXE3fRyAl8smAE
-         VTGg==
+        d=redhat.com; s=google; t=1779799665; x=1780404465; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5kwiZ88aMCCOMgCKv+ZUerR8iXVNCA9hIs6rASmQTCk=;
+        b=hli0c0lI4eQDLqoeO7rJdbE4h854DhQhYKGW+V6BWsyG1uB9rt5DqjaYC8gocGgde/
+         G1V0nkGLEUk+ERD2uheTbLBI67k6cxMXix0zFG2YOCz2NiT10JFILIrjdk4w188Fp8nL
+         OTUkTstP9SptMjcGqlqSTl4E/z/RysAcbD0JNEwAGq/fb6dNtTSNPsDKH9qtuOUJ2yuF
+         JHp3Hu5F77ETnn6EzvQAoKJttGtm5QtWZOo3cPOzAX3J+gyfzOXmN/1it/h+sAIAhgBf
+         OrNGakdKLKd5bTRepQf3DCR1XTYm6sWbx44WA61JW0SE7QWUpEVDq+xr4EC1e062N+LH
+         63hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779799637; x=1780404437;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZcEqXbrIbOE1ZYxntxe5FIRRwiUUUrNk8UQv35w52MU=;
-        b=ALd55pdEn0CALF59mYI5YVYPby77sCkZ7YRdRbWQyNAYHgavZPh/9ID2ROd5lbxmJn
-         QFAboru/1Ppt9X2hA9kEKcF45X9SBelOGmyxTfP5atbp2VSj/qOMb/RxKc8JqV5/s5/C
-         HM2Yj5RoU4OyVrV6lDV5DsfTRadbTz0rK+cYxvVKBGs7Roe/spHThIlepI0QeaB3mZ8Y
-         JZyFY+I7fo2ZndLpBbWzqDSh0T39d55OT3GnXhym4NYswM/mxOv9APKbNLRj2+3sI1sv
-         EciEGdk/2SopVxIicJ67Q1Eo520SZKSWicL90e19I/FEjOIw5zsa29Cg5tzhP8565a7X
-         8yJw==
-X-Forwarded-Encrypted: i=1; AFNElJ8DDrRfbtmpPz7KrB9liP5lYKX1LwzXFP4UQMgA33zYjuMMKSqZcJrxyDcZ2xm/qp2k0BvYwXU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFIyARHMjUG+Mfy7hdurByp7HsyFJ5hXzQCOAv8lOzgwDaTPac
-	y0MuJn2dwnd4m3lGAdIeUjr/uzLbFxybcWxOMAf75DhN1FYrrzO7QdK8mY2Vqd32
-X-Gm-Gg: Acq92OFWLQeQ6LRYf6nhTMwfFVH7oVmqRjPrhgckRxSvtEZbpqt31CumQgZ92tJqYJY
-	yZOmeex1fORBhewsSPQ53z911XEEgD2/0darkac+kkCBfT/nbqlXJWC29DNQbMtdAu4zl8Na7H0
-	JJTSs9Wc0tORxz0qY9Zg9p4ct+uqPrDpId6quW5jXKHBBcSxrJWFyuWeIPQSE/ZFgYF9NsFpaDz
-	viqiNgGMEcx7Wcri/pbXKTBHYrK4s4pbSwz6/rwh3l9PptsPEgULS7y38VesFdap0uQPoZjYmuc
-	SkZM19cL7NqiLq9V94qq0/dCw8DmVFDEGqehwQ9FPVRpUYZpU9UxI0Bt8nycNdwwfxr/1GdryNG
-	n56fwBmIc71O2U0kq1M9tI+x2GHr5lQrIga474d7PerZz60Xgl7jEH3pDyAsibt0tG5IKGNhhKX
-	lza9cMTy7GYczgInF5QziUozANgZyojrCbWALZNfDZeips+rhSCcVcIL8HP1Qp8+bnTbqJTNjaD
-	a0=
-X-Received: by 2002:a5d:59c4:0:b0:44a:9b52:8891 with SMTP id ffacd0b85a97d-45eb36909d9mr27773186f8f.11.1779799637018;
-        Tue, 26 May 2026 05:47:17 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6d493dfsm36096114f8f.23.2026.05.26.05.47.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 05:47:16 -0700 (PDT)
-Date: Tue, 26 May 2026 13:47:15 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Rajat Gupta <rajat.gupta@oss.qualcomm.com>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
- yimingqian591@gmail.com, keenanat2000@gmail.com, 2045gemini@gmail.com,
- rollkingzzc@gmail.com
-Subject: Re: [PATCH net] net/sched: fix pedit partial COW leading to page
- cache corruption
-Message-ID: <20260526134715.49d0f4a3@pumpkin>
-In-Reply-To: <CAM0EoMmNnPj-UO_7PN2Z3vaWKSqo4M6PzcSnn80Kzm_H1JTptA@mail.gmail.com>
-References: <CAM0EoMkUPYSXKr2=+mR8YMq2a0TFdYPdzwPGob-UyU1fUWP9Ww@mail.gmail.com>
-	<20260519033950.2037-1-rajat.gupta@oss.qualcomm.com>
-	<20260526105306.48a2bee7@pumpkin>
-	<CAM0EoMmNnPj-UO_7PN2Z3vaWKSqo4M6PzcSnn80Kzm_H1JTptA@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        d=1e100.net; s=20251104; t=1779799665; x=1780404465;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5kwiZ88aMCCOMgCKv+ZUerR8iXVNCA9hIs6rASmQTCk=;
+        b=f5LUQh26u1FqoY0mRrC1ZAq1nGicDXav60JosSkOhsOts2lv7irtbXYs7F3nIpFTGU
+         3nZhOzpudvB6YdJ60kzki7wCQjEPTx36owzlFjXJJSdysFlijAOwAxg/L33Nv/MUiUSp
+         OUgcDLOl2Cf5e3cOZDMZ34b6kXhTniQWsa2fMc1JGUkle4c2doeyMh89sCVqupeEX7Eq
+         8FOhZCKsPbTY922+EY/CaNDWPH4uhHl0UeY71yN7zxTQ7tLUnPJUz9E2eWfuhMmIXUAJ
+         91C87lH9/0V0KM4O50/z1hYN5R58ekwYohDfEv4+tE262B0rBb0Cg2gGMP7JmaE+2LUE
+         BbSA==
+X-Forwarded-Encrypted: i=1; AFNElJ+wjI101ufOl1DSusAvju3ESQ77YZNdonGNqUi3WkhN78C8CjOzqBBtMNNHH3O4p8wQF/hYBTU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTc0j9SsZIwwq6PvHWNda6nesA2/Y4VCOa+Tez1DkfmSSK7Tbj
+	TY3lRjuzXDhJWnvgxF2YdZIe1P/AwT/tFM/ekEQUA5D61YvDueBmolP38bk96Bqu6RfuzFRR0lM
+	0bbNWAvOecCvmbu6LUJxZaa1LzKTTI5Xp1jl3k3stG0ORxpE2hn7/8jg4Fw==
+X-Gm-Gg: Acq92OGVZqnfBuD8EfKa3WNsTX34bl34rDkLSTWQEVqv/hqzPbIYR5qou0p7n2+w4LZ
+	fjnlRqTfE3giKNsN/H8AO7sYuF6ZPAt1ygQhtn62irdLn60FVPu8TmrNTwNKjvEhFy3WxVEtuDA
+	lxJwFTM6vuQsjzHWpfxVwF2ivhDwvqBNdbo4/cuApp9wzxcP2WuJ9bhbMcB/JSQuVYnrshZwCx3
+	dz4yZYPOCwwVwltTMI+TJKG7vyKMSCvoQEsFoCnEi5wdjp4rq5S4zgeA6GQD1yxkDgwgfr2dzQf
+	v8l8sZ9VqGuHytnkcb/cffumStxec0JOuWFCxGqjhuDNOKcBLgUi6a4xfd+CPUhQrwtsIiILqN4
+	+ZKUHb7NH
+X-Received: by 2002:a05:6000:1a85:b0:43d:762e:76ba with SMTP id ffacd0b85a97d-45eb367fb35mr31041319f8f.17.1779799665240;
+        Tue, 26 May 2026 05:47:45 -0700 (PDT)
+X-Received: by 2002:a05:6000:1a85:b0:43d:762e:76ba with SMTP id ffacd0b85a97d-45eb367fb35mr31041262f8f.17.1779799664691;
+        Tue, 26 May 2026 05:47:44 -0700 (PDT)
+Received: from [10.43.3.161] ([213.175.37.14])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6c9f6ffsm35518540f8f.1.2026.05.26.05.47.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 May 2026 05:47:43 -0700 (PDT)
+Message-ID: <e1ce1387-ae6b-4b43-b5d8-a1141c4a4f1c@redhat.com>
+Date: Tue, 26 May 2026 14:47:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net v3] ice: fix packet corruption due
+ to extraneous page flip
+To: Jacob Keller <jacob.e.keller@intel.com>,
+ David Laight <david.laight.linux@gmail.com>,
+ John Ousterhout <ouster@cs.stanford.edu>
+Cc: stable@vger.kernel.org, anthony.l.nguyen@intel.com,
+ intel-wired-lan@lists.osuosl.org, przemyslaw.kitszel@intel.com,
+ netdev@vger.kernel.org
+References: <20260512181953.1689-1-ouster@cs.stanford.edu>
+ <20260513100732.499e3f49@pumpkin>
+ <CAGXJAmzK+56DHnitD1g263mPSgWg9jZyq2z6R+vd8bV_c4ZbuQ@mail.gmail.com>
+ <20260513214927.17a8dd45@pumpkin>
+ <CAGXJAmx4LaVv=QJ=SanvF6iayJ8+SiLyUqht+jMxouXPX=54-g@mail.gmail.com>
+ <20260514110112.12bdf5ff@pumpkin>
+ <30dc284c-8cc0-4bae-b7b0-99d6d71a66e3@intel.com>
+Content-Language: en-US
+From: Petr Oros <poros@redhat.com>
+In-Reply-To: <30dc284c-8cc0-4bae-b7b0-99d6d71a66e3@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291687-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[intel.com,gmail.com,cs.stanford.edu];
+	TAGGED_FROM(0.00)[bounces-291688-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: ABFE55D5BF0
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 3BA755D5BF8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 26 May 2026 08:01:08 -0400
-Jamal Hadi Salim <jhs@mojatatu.com> wrote:
 
-> On Tue, May 26, 2026 at 5:53=E2=80=AFAM David Laight
-> <david.laight.linux@gmail.com> wrote:
-> >
-> > On Mon, 18 May 2026 20:39:50 -0700
-> > Rajat Gupta <rajat.gupta@oss.qualcomm.com> wrote:
-> > =20
-> > > tcf_pedit_act() computes the COW range for skb_ensure_writable()
-> > > once before the key loop using tcfp_off_max_hint, but the hint does
-> > > not account for the runtime header offset added by typed keys. This
-> > > can leave part of the write region un-COW'd.
-> > >
-> > > Fix by moving skb_ensure_writable() inside the per-key loop where
-> > > the actual write offset is known, and add overflow checking on the
-> > > offset arithmetic. For negative offsets (e.g. Ethernet header edits
-> > > at ingress), use skb_cow() to COW the headroom instead. Guard
-> > > offset_valid() against INT_MIN, where negation is undefined.
-> > >
-> > > Additionally, linearize skbs with shared frags upfront to prevent
-> > > silent data corruption when pedit operates on zero-copy pages
-> > > (e.g. from sendfile).
-> > >
-> > > Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is =
-writable")
-> > > Reported-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-> > > Reported-by: Yiming Qian <yimingqian591@gmail.com>
-> > > Reported-by: Keenan Dong <keenanat2000@gmail.com>
-> > > Reported-by: Han Guidong <2045gemini@gmail.com>
-> > > Reported-by: Zhang Cen <rollkingzzc@gmail.com>
-> > > Tested-by: Han Guidong <2045gemini@gmail.com>
-> > > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> > > Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-> > > ---
-> > >  net/sched/act_pedit.c | 54 ++++++++++++++++++++++++++++++++---------=
---
-> > >  1 file changed, 41 insertions(+), 13 deletions(-)
-> > >
-> > > diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-> > > index bc20f08a2..79921b8d8 100644
-> > > --- a/net/sched/act_pedit.c
-> > > +++ b/net/sched/act_pedit.c
-> > > @@ -16,6 +16,7 @@
-> > >  #include <linux/ip.h>
-> > >  #include <linux/ipv6.h>
-> > >  #include <linux/slab.h>
-> > > +#include <linux/overflow.h>
-> > >  #include <net/ipv6.h>
-> > >  #include <net/netlink.h>
-> > >  #include <net/pkt_sched.h>
-> > > @@ -323,8 +324,10 @@ static bool offset_valid(struct sk_buff *skb, in=
-t offset)
-> > >       if (offset > 0 && offset > skb->len)
-> > >               return false;
-> > >
-> > > -     if  (offset < 0 && -offset > skb_headroom(skb))
-> > > -             return false;
-> > > +     if (offset < 0) {
-> > > +             if (offset =3D=3D INT_MIN || -offset > skb_headroom(skb=
-))
-> > > +                     return false;
-> > > +     } =20
-> >
-> > Can't you negate skb_headroom() instead - that cannot be INT_MIN.
-> > So:
-> >         if (offset < 0 && offset < -skb_headroom(skb))
-> > =20
->=20
-> You mean something like this? if (offset < 0 && offset <
-> -(int)skb_headroom(skb))
->  That does feel cleaner, yes.
+On 5/14/26 18:43, Jacob Keller wrote:
+> On 5/14/2026 3:01 AM, David Laight wrote:
+>> On Wed, 13 May 2026 21:47:11 -0700
+>> John Ousterhout <ouster@cs.stanford.edu> wrote:
+>>
+>>> On Wed, May 13, 2026 at 1:49 PM David Laight
+>>> <david.laight.linux@gmail.com> wrote:
+>>>> On Wed, 13 May 2026 09:28:40 -0700
+>>>> John Ousterhout <ouster@cs.stanford.edu> wrote:
+>>>>   
+>>>>> On Wed, May 13, 2026 at 2:07 AM David Laight
+>>>>> <david.laight.linux@gmail.com> wrote:
+>>>>>> On Tue, 12 May 2026 11:19:53 -0700
+>>>>>> John Ousterhout <ouster@cs.stanford.edu> wrote:
+>>>>>>   
+>>>>>>> Consider the following sequence of events:
+>>>>>>> * The bottom half of a buffer page is filled with data from
+>>>>>>>    packet A. The page has a net reference count (reference count
+>>>>>>>    - bias) of 1. The page is returned to the NIC, flipped to
+>>>>>>>    use the top half.
+>>>>>>> * Before the reference on the page is released, the NIC returns
+>>>>>>>    the page with no data in it ('size' is zero in ice_clean_rx_irq).
+>>>>>>>    In this case the bias does not get decremented. The page still
+>>>>>>>    has a net reference count of 1, so it gets returned to the NIC.
+>>>>>>>    However, ice_put_rx_mbuf flipped the page so that the bottom
+>>>>>>>    half is active.
+>>>>>>> * If the NIC stores another packet in the page before packet A
+>>>>>>>    has released its reference, the data in packet A will be
+>>>>>>>    overwritten with data from the new packet.
+>>>>>>> * Unfortunately zero-length buffers occur frequently: they seem
+>>>>>>>    to occur whenever a packet uses every available byte in a
+>>>>>>>    buffer, ending precisely at the end of the buffer. When this
+>>>>>>>    happens the NIC seems to generate an extra zero-length
+>>>>>>>    buffer.
+>>>>>>> The fix is for ice_put_rx_mbuf not to flip pages that have a
+>>>>>>> size of 0.
+>>>>>> How is this different from packet B (in the top half) being
+>>>>>> freed before packet A (in the bottom half)?
+>>>>> I'm not sure exactly what you're referring to here. Are you asking
+>>>>> about a situation where both halves of the page get filled with packet
+>>>>> data and then the second half to be filled is the first to be freed? I
+>>>>> believe that the ICE driver abandons a page if both halves are ever
+>>>>> occupied simultaneously; the page will be returned to the system once
+>>>>> both halves have dropped their references. Thus it doesn't matter
+>>>>> which half is freed first.
+>>>> That is what I was thinking, seems like the logic is over complicated.
+>>>>
+>>>> If you need to put 4k pages into some kind of iommu rather than 2k buffers
+>>>> (to contain 1536 byte ethernet packets) then I'd have thought you'd
+>>>> initially put both halves into adjacent tx ring entries.
+>>>> If a rx buffer is discarded (eg a zero length fragment or a CRC error,
+>>>> or even 'copy break' for short packets) then, as an optimisation,
+>>>> you could reuse the buffer for another receive.
+>>>> The same could be done if the page is freed by an application.
+>>>>
+>>>> However it sounds like it doesn't use the 2nd half until the first
+>>>> completes - otherwise you'd never 'flip' to make the other half
+>>>> active.
+>>>>
+>>>> Thinks...
+>>>> By only putting half of each 4k 'page' into the rx ring the code
+>>>> will usually save (expensive) iommu setup in the (probably) normal
+>>>> case where the buffers are freed 'reasonably quickly'.
+>>>> But that really requires a 'free/with_nic/busy' state for each half
+>>>> rather then trying to guess from a reference count.
+>>>>
+>>>> But if the low-level code is recycling the rx buffer (for any reason)
+>>>> it wants to use the same buffer.
+>>>>
+>>>> The ethernet driver I wrote (a long time ago, early 90s) allocated
+>>>> 64k as 128 512byte buffers and did an aligned word-sized copy of
+>>>> every receive frame - most frames were in contiguous memory.
+>>>> The simplicity of it made up for the cost of the copy, especially
+>>>> since that was an iommu system.
+>>> I'm not here to defend the logic (and it has been replaced with
+>>> something that is probably simpler and more efficient); I'm just
+>>> suggesting a bug fix for the stable releases that still have this
+>>> logic.
+> Right. We definitely want a fix for the possible data corruption in
+> stable. Ideally one as simple as possible.
+>
+>> You've forced me to look at all of the function :-)
+>> I've noticed a few things:
+>> - If ice_add_xdp_frag() fails (because there are too many fragments)
+>>    then the rest of the fragments are left in the tx ring (instead
+>>    of being discarded) - so are likely to be treated as a full packet
+>>    later on.
+>> - Frames with status errors (crc, framing etc) are discarded after
+>>    the skb is built - surely that should happen before the xdp 'program'
+>>    is called.
+>> - If the remote system send a very very long frame (traditionally the PHY's
+>>    'jabber detect' didn't always work) you can end up with all of the rx
+>>    ring being full of a single partial packet.
+>>
+>> I think you need to avoid calling ice_add_xdp_frag() when 'size == 0'.
+>> Then in ice_put_rx_mbuf() unconditionally call ice_put_rx_buf() for
+>> zero length fragments.
+>> The comment would be 'zero length fragments can always be reused'.
+>>
+> That seems correct.
+>
+>> The zero length fragments almost certainly exist because the mac hardware
+>> advances the the new buffer expecting more data - but only gets the
+>> 4 byte CRC. So the zero length buffer contains the receive status.
+>>
+> That matches my understanding.
+Hi John,
 
-yes - it does need the cast...
+I have been looking at the same area in the pre-page-pool ice code and
+I want to ask whether you observed memory growth during your Homa runs
+that exposed the corruption, because in my testing the same bias mismatch
+also produces a slow page leak that your v3 does not close.
 
--- David
+Short version of the leak path, in the PASS (!CONSUMED) branch:
 
->=20
-> > >
-> > >       return true;
-> > >  }
-> > > @@ -393,17 +396,21 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_b=
-uff *skb,
-> > >       struct tcf_pedit_key_ex *tkey_ex;
-> > >       struct tcf_pedit_parms *parms;
-> > >       struct tc_pedit_key *tkey;
-> > > -     u32 max_offset;
-> > >       int i;
-> > >
-> > >       parms =3D rcu_dereference_bh(p->parms);
-> > >
-> > > -     max_offset =3D (skb_transport_header_was_set(skb) ?
-> > > -                   skb_transport_offset(skb) :
-> > > -                   skb_network_offset(skb)) +
-> > > -                  parms->tcfp_off_max_hint;
-> > > -     if (skb_ensure_writable(skb, min(skb->len, max_offset)))
-> > > -             goto done;
-> > > +     /*
-> > > +      * If the skb has shared frags the user is likely using zero-co=
-py
-> > > +      * (e.g. sendfile).  Those page frags may point to page-cache p=
-ages;
-> > > +      * writing into them would silently corrupt the page cache.
-> > > +      * Linearize so pedit operates on a private copy.
-> > > +      * TL;DR: if you want zero-copy, don't use pedit.
-> > > +      */
-> > > +     if (skb_has_shared_frag(skb)) {
-> > > +             if (__skb_linearize(skb))
-> > > +                     goto bad;
-> > > +     } =20
-> >
-> > Should there be a way of 'unsharing' frags by just copying the frags
-> > rather than doing a full linearize?
-> > That would be much less likely to fail for big skb.
-> > =20
->=20
-> It has been agreed that this chunk is unnecessary, so it will be
-> removed in the next update.
->=20
-> cheers,
-> jamal
+   1. ice_get_rx_buf(size=0) does pagecnt_bias-- unconditionally
+      (added by commit ef68094cb09e ("ice: Fix kernel panic due to page
+      refcount underflow") as the fix for the matching panic).
+   2. ice_add_xdp_frag() then returns 0 for size==0, so that page is
+      never attached to the xdp_buff/SKB. Nobody downstream will ever
+      call put_page() to balance the pagecnt_bias-- from step 1.
+   3. Your v3 in ice_put_rx_mbuf() correctly skips the page flip for
+      size==0, which closes the corruption window. But it does not
+      restore pagecnt_bias for that zero size buffer, so the page is
+      handed back to ice_reuse_rx_page() with a permanent deficit of 1.
+   4. On the next reuse of that page with size > 0, pagecnt_bias drops
+      again. ice_can_reuse_rx_page() now sees pgcnt - bias == 2 and
+      drains via __page_frag_cache_drain(page, pagecnt_bias). Because
+      pagecnt_bias is one too low, the drain undershoots by 1: page
+      refcount stays at 2 instead of 1.
+   5. The SKB eventually releases its reference (refcount -> 1), but
+      nothing ever brings it to 0. The page is leaked.
+      ice_alloc_rx_bufs() just allocates a fresh page to fill the slot.
+
+At the zero size frequency you mentioned (thousands per second), this
+adds up to roughly MB/s of leaked page cache, which Jaroslav Pulchart
+originally reported against 6.13.y on NUMA nodes and which motivated
+the libeth/page_pool conversion in mainline. So in stable trees the
+leak side of this bug is still live.
+
+Two questions:
+
+   - Did you monitor RSS / page allocator stats over the duration of
+     your Homa runs? If you did and did not see growth, I would like
+     to understand what is different about your setup, because by my
+     reading of the code the leak should fire whenever both halves of
+     a page end up in SKBs simultaneously and one of them carried a
+     zero size descriptor along the way.
+
+   - If your focus was specifically the corruption, would you be open
+     to extending v3 (or replacing it) with a fix that also restores
+     pagecnt_bias for the size==0 case? The minimal extension is one
+     extra branch in ice_put_rx_mbuf:
+
+         if (verdict != ICE_XDP_CONSUMED && size != 0)
+                 ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+         else
+                 buf->pagecnt_bias++;
+
+     which restores bias on every path where the page is not actually
+     going out to an SKB. (I have a slightly different variant that
+     tracks has_data in struct ice_rx_buf to also handle the broken
+     positional 'i <= xdp_frags' counter in the CONSUMED path, where
+     zero size descriptors in the middle of a frame steal bias++ slots
+     from real fragments. Happy to share it if useful.)
+
+Regards,
+Petr
 
 
