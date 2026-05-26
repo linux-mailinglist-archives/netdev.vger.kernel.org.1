@@ -1,300 +1,327 @@
-Return-Path: <netdev+bounces-291620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sF3pIdFrFWoBVAcAu9opvQ
-	(envelope-from <netdev+bounces-291620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:45:53 +0200
+	id 2MOBLTdsFWoBVAcAu9opvQ
+	(envelope-from <netdev+bounces-291621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:47:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AAE65D39E5
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:45:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C8FD5D3A81
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:47:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 81D21300B441
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:45:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DF32C3045B4B
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6B33D966B;
-	Tue, 26 May 2026 09:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5851F3B9949;
+	Tue, 26 May 2026 09:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dZlEUseG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hZ6p7JhY";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cF2nCzyJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010060.outbound.protection.outlook.com [52.101.61.60])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2443D9686;
-	Tue, 26 May 2026 09:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779788703; cv=fail; b=QR0UYHVQCP6nY+1lGSR+Y2/yR9Mu96+epwej/znTxH4mrY6eAALClqx/r0fWPgXVKTZSTSOmmme1ysvEPO90E3EuU19FMfhJak/w5GPD4Xgl+wAPnHnXZRndo7vh5dHtO8yqlgOHCrcJqDUZySTqXVCjOPNYYrygy5shxXDWv/8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779788703; c=relaxed/simple;
-	bh=C/FIZmtl9CknSz/KKIRjbqc/qA54+5wYIUC/lg+BlAI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nwkt0OB+CRAA78fyQy54JUE+Vg02iJZSdfOGhd1L17gnjM0XD/DBEHRQAyZu8F3DJMjb7xea0pNf6HU00pVP4W9knBhIpuYIg6uNLqIPl8NCjL86dOVrGwN2x8MH3n9/Ob1HUiDTySVpgb55aytDmFUYyGXNvqknyFcTrCZV3eA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dZlEUseG; arc=fail smtp.client-ip=52.101.61.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HvHg/mCFBNgtQyEdIVsKp0zFEFY8+UmpN8fDo0SgUNafS/ievR+Q023fPnCwsdCBxhaPLkxTl8rV4MxZ1DY02xbM8oyxOdHidRMEAVp+SEOF9uoo8Yph7I1YsZM3ipTkijoRjzlDCrW+cSNTQbDDcPvkwzmhFgYkDAcmPQNvFgl6HMBPaesf57xpW0rznXAY5dKatnyWCDwuFQkoZ05/quJue5YN8I0PU6476h9P4/zY+U2+9odHYJLEnwBaVaqHjUqOxuxeZQwU+QznDjpOHffMv4FkFssw7iJdRdQhVsEsbcscTSkg7MhZYoqroBxPR0UlD3reoY4zh3Ni6AC8DQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lc8cSg4nAHsAVrzhTgAqG/L52U3podFzdrHz6plNjnU=;
- b=OUsuqX/P7Lk0XnYfUQIuVil16bfZNDLkAQk4W1WlvBAk7rTyZFj9OTPAP1zkT2AXq27sIYBk4FRZ+TTEc4MIrL6hEqC6ZGeWFFbEra+cZ75QCO94ltBXLCRveSL6Prbmu1cc2gCtEdVgT3THVeBq9ce3SYrhizYZ2ZruvkkidUULKDfzrZcrhbPjIcjpNLelgGsbV5FgoFDk3aTOll5ipMXv+hD7JYykPt61RFA7T4+U7Ble0ZOoIwU4bwyBndu19o8gDhrjFwxgKYu9IS0YFnYhj6G7RLxd5CeJsLAtrWltQC3pBp9ltEbvc5edpxNDhmQurVFZGjfEvSeuVES4QQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lc8cSg4nAHsAVrzhTgAqG/L52U3podFzdrHz6plNjnU=;
- b=dZlEUseGhw7AtGWMF6gfkxm4Enq2Ub0k/YNNeQ5DKa9HBg8eCg+vwg8vRDf4/Z7ZKbUK07Qxsk3huzIf1zbU5VQ9cF4gXfKu8gbMnuG/72R0yqEWueiWFVT6zuswc44NEJzq6OpZLrGXuNG2B4sM1vHJOjIaheMr8qzbBS73iNW7lsWvxrMKrnC7AyW141WhG9jSI4zholmN2SJ8hGDGFxDqDgxKvWeYEBfjD8ccYgS0LDqJhW1ckS694vTewe2AfLAruvIKGai+ADr2SOCBbfzUfFZuLuIYE86IhcJCwnXDc/OkM6GUz2B+yyBF/85fhVV7bk/Ctt0SYIsRODGMEg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by BL1PR12MB5969.namprd12.prod.outlook.com (2603:10b6:208:398::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.11; Tue, 26 May
- 2026 09:44:55 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.21.0048.019; Tue, 26 May 2026
- 09:44:55 +0000
-Message-ID: <8c8df8da-62a9-49e8-84eb-572d54cfeb1f@nvidia.com>
-Date: Tue, 26 May 2026 12:44:46 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net/mlx5: Apply devlink default eswitch mode
- during init
-To: Jiri Pirko <jiri@resnulli.us>, Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- "Borislav Petkov (AMD)" <bp@alien8.de>,
- Andrew Morton <akpm@linux-foundation.org>,
- Randy Dunlap <rdunlap@infradead.org>, Thomas Gleixner <tglx@kernel.org>,
- Petr Mladek <pmladek@suse.com>, "Peter Zijlstra (Intel)"
- <peterz@infradead.org>, Tejun Heo <tj@kernel.org>,
- Vlastimil Babka <vbabka@kernel.org>, Feng Tang
- <feng.tang@linux.alibaba.com>, Christian Brauner <brauner@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>,
- Marco Elver <elver@google.com>, Li RongQing <lirongqing@baidu.com>,
- Eric Biggers <ebiggers@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Shay Drori <shayd@nvidia.com>,
- Moshe Shemesh <moshe@nvidia.com>
-References: <20260521072434.362624-1-tariqt@nvidia.com>
- <20260521072434.362624-4-tariqt@nvidia.com> <ahVPASuh4BZGOfx0@FV6GYCPJ69>
-Content-Language: en-US
-From: Mark Bloch <mbloch@nvidia.com>
-In-Reply-To: <ahVPASuh4BZGOfx0@FV6GYCPJ69>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0414.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:d0::7) To CH3PR12MB7548.namprd12.prod.outlook.com
- (2603:10b6:610:144::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B215F3CFF67
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 09:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779788744; cv=none; b=EN31uXEdcqFgztEX0a7Ap8tROueBuuvYJU+mSbt4PKP1MPm3mywo86Mrkoh0D+XNSCN2kZfcIOcAggmxVii0+TkJOdJ04eGBQStrr2olO4rwyt/jnDM8/TyufaBo34YYNDqmCWmvmkgDk7JAjQsYd5ROOIs8yX/51Y8aJZXmMzM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779788744; c=relaxed/simple;
+	bh=BpmP5pIyxKOzZZqt7U1hcUbz2VjT1H6zAtvYEIyeqvg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NdFeKl7lLIfgV5IqZAWYsVHMyqfnW5oN7K7CWs+ns+RWRvRtcjul6eO88P5JjJG9oIc3CrS6OXZwKDf9izvWKubSC7KQZbFCTRVJulBlNwtXtARD7ZUa7zKNOkU9E/6KvL9ApTaz/78I3UN4bNHY3l5tfCTYYsljOHp5MX1TOCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hZ6p7JhY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cF2nCzyJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779788741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JSV8zFrfc5JTKclTo1Bn9H/Wy/w7YQlqN4eIQfiBwh4=;
+	b=hZ6p7JhYBcYxAeHJROnBj0gZ6oXMAfXasxIin/QYz2fDwgnEmjAajmi+7Q44f+31u3L4Wk
+	cbloS9S2oa85NJsYOQco+4axHEd9Fp+wf6Uc+rCkKWK/Rsqi7+iGisShmXUlk0h/JW/C10
+	dH5NTlbEVz5U3jJe/SvdNVoLX8ADa8I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-688-VZGNjGBuM6CFvMhpo6Rrog-1; Tue, 26 May 2026 05:45:39 -0400
+X-MC-Unique: VZGNjGBuM6CFvMhpo6Rrog-1
+X-Mimecast-MFC-AGG-ID: VZGNjGBuM6CFvMhpo6Rrog_1779788739
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48e79219704so72086325e9.1
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 02:45:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779788738; x=1780393538; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JSV8zFrfc5JTKclTo1Bn9H/Wy/w7YQlqN4eIQfiBwh4=;
+        b=cF2nCzyJr/wZkQDI6do8UzF4NkUo8fiQBdIxErsTQqYXg6W7Aqf7CV/reTf3WzQmrc
+         NFk+VqpJreFOIq3Y1GPEW62JiYxOWNhRIfYBpOSF9qkXdjte8za0NKCuzHl+w1mE0swN
+         QKkSmC1viPKdc4INAoOecXmQ8wN6UB0qoi7bpbu/omgWn/raQ0qoOzqfpS/Xf/wh4+2u
+         4Qe5EEcnx7q5b/j03tDcFVQ5ozNaVM3loG+BtmKj+ZVNrz3ChtVerMBuSdWBzwU+cTSY
+         0G5DNr0N8YwR27yTwJ2uoGFE84LtZRtBbt7zYMAz17NRSXExiUXM/S27cIi5I4wQnYAY
+         ZaJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779788738; x=1780393538;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JSV8zFrfc5JTKclTo1Bn9H/Wy/w7YQlqN4eIQfiBwh4=;
+        b=YwWp/iq96McQOCRPRvPLHnp0Yj1bUW/e8xojo6Z58oQYvu9bIT+q/MnQ3KzQCnVdio
+         EaE4//44IMol+CGkxZgVvbK/rOuKkz+UgHoYnjBCzYzQnABIAm2yraNz8+bErLkPH3/6
+         a+Fxp4Fp/T8wbWjHPjO6TOBkCYLKZYnZzCt7ferf1/6J8wdD/V3tAbvIjT4AVxErWsxr
+         a+w70QnOWTS/JRFlBKTQGI9ejscJHft6UEPt0WsWX4Z1WNQR9DuHmP0k0kJixODs+RLq
+         c5YRD6rT2CKJgXBdSrwRvdhehs9Rhh44NxKMMnp1LAqQ1qqyjuygHpN9ZPoT6usD9zD1
+         fzhA==
+X-Forwarded-Encrypted: i=1; AFNElJ+wMElexUQWMKyx5zKRaqRLyiGG1DQHeP1swev5EpcasgkU7OlDo9noRifaqtBDbKOQwVw+yks=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAlwcUDh53oXSF2UMifbg26rT+q+6hFsMwychi5G20PybTpmCO
+	rtDosv0hrKAiPgU8aEcxQEn30FsLe9zr+soG4PeWOzR4lNkh8E5yeWIYZ7R27kz+dGmKXlxgHSS
+	qvKNYXf33dw3OhsSfY1nnGtEjy5gzxlYU4xyrb/1JWNNj5SCGf7YjwWVP7w==
+X-Gm-Gg: Acq92OFecgwAWBXgM4Fw2xE/dnfxZOzZDee0S/X//1NbnQ5OqUAdkuVk/6z5nqpZ51+
+	gYoIlHM7/L3t3EVmxjrlgCn060CCSszhd8WNQ3SjOJUAaWZ3G9pPWoLG6gq9ta2rqXFaEaNQ/ad
+	sm6Bfc6TyRVkGzT2CRU7PUy/y6cuPfGxJmFf6IKOeQZrhtOpBiKZWAd/8mgPZiDuSdkbR7Pgdbt
+	axqkMYAiK5bdxKKuM0GDSLdAB2K75XvuMPVttGHhQYPPIJv0X+Q5ED3zprOjsTJUOZl3sLMSaGj
+	E5v+tQ5W/VdXonzv1m+CVanbKR1ooXi4zgzlGtDoRTIzEc0JhFgAk5McyiLS8LWCSQTPcBUUGCw
+	luYY1So6Q4v3HDKCGyjGqMnTqouLps5FmtnXMhhjNxIU+c8iCYTn+kq3/Dw==
+X-Received: by 2002:a05:600d:8486:10b0:48a:563c:c8e2 with SMTP id 5b1f17b1804b1-4904249d1ecmr211861505e9.3.1779788738589;
+        Tue, 26 May 2026 02:45:38 -0700 (PDT)
+X-Received: by 2002:a05:600d:8486:10b0:48a:563c:c8e2 with SMTP id 5b1f17b1804b1-4904249d1ecmr211860915e9.3.1779788737985;
+        Tue, 26 May 2026 02:45:37 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.155.152])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49045620c05sm312170795e9.14.2026.05.26.02.45.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 May 2026 02:45:37 -0700 (PDT)
+Message-ID: <d22446ec-d5bd-4950-998f-2af15a46bfea@redhat.com>
+Date: Tue, 26 May 2026 11:45:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_|BL1PR12MB5969:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e694420-d688-460b-41ba-08debb0b713b
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|18002099003|22082099003|56012099003|11062099010|7136999003|6133799003|4143699003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	IYcxF4lplPB+OtIugmJe0RJbR0gp0+SstACS1f6l92mEnvk+ufCL/8kFE+nozDIwV5xqAYYFJGEmmGguAWjxpfGtjEXdNc9hhK4BUfmSNgfdjRRtsn/nfmQWd0H4cj2eiLyvj17f6PWx8ei4Psd5F+znPYXvcYbI6aqh7ohLmWV/DCfXDfgNJXDtBltHgeTZOIsHEv8slFHAlsb/PkM7L3yn4riWeikUvaJnxsRa6P+gKLDMx/I1S9xHspOsxRQmEApyDDxObdtJKaan08fABV94OMrpPgKt9tCmo0D1iMX9ymYXcoX8Iw3tkzXM85tIchAsPAPYGxNCUdf7UmWQStLPUuFu2LvZI3LNz3FnGP/PD8wzl6kv/LTmogXlEMXbxJqQCrqm2OQWdo1NmrMGXiCz4wugY2PQT1mOkDPpcgcw6jqS5JohYOdxT7UDRkTb9jrjKY/er9TeGNZMRVZDLH3IT7cm6WaA8Ng+NY/DWhFMQcemEba5tR1NRUBI99QjuEQ2/a/WoQf9rOohEPMqi5Ke//zxU+wjgCIToXnUjUOaAC+ylPS6SzC6WeEiZVZ7Yt8WR9Pmb8i3lccd3fO+DMuFLvDGZC9J3Yh2QwWsYkH1dRIc6HcoZaeZUUEFeeAENOIG+I2U2+LMKoOg/MtXiocHGzXNSlfi6buIs1hap54f9zUb7UziwpZ8ACkQByd3
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(18002099003)(22082099003)(56012099003)(11062099010)(7136999003)(6133799003)(4143699003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VEhEMkhXc3dOS2htYkM3Zko2eEt2czlrM3FxV0YvalNGck4zZUNKQytaUG9W?=
- =?utf-8?B?RE5YQ29QdTNHZTF2TDJpRnYvbjlaeGxaMlBJSXVBVmdQa0puUGxqdlRxZ0Zn?=
- =?utf-8?B?cXlLUGZFR0M3ZUc1WnpnSWorOFBzZWI5MU5BZjJOYktqK1I2cFVyNFh3aWF1?=
- =?utf-8?B?aTRZc205bzhRc3hIb3ZodmdGSWRiS2tpY2ViVmNpTmp0M05SWTZxOEpxdkdz?=
- =?utf-8?B?blk3N3FBUHhmbVNURC8wdnZhYjNncFZ4UlFBVHRoN3NLYjB2TlRkRk1qU0Q0?=
- =?utf-8?B?Zzk3dWQ2a2IzanZjNnh3UkxvZXlVZi9NeHdQMG5vYm9pdHQyUUFhV2p3dkgw?=
- =?utf-8?B?bUFmODFOaC9rQTFPdTkzZWUxcnlnOEg2NjVIbHkxbmNDNytic210WW4yaDli?=
- =?utf-8?B?czBrV2tibU1oNTh1eHJhRlU0YUI4UUsyM0FlakRsc0VOOG81NlJGVlExcjFa?=
- =?utf-8?B?VS9NMGhvL2tSb2dQMEhFRGlQbm9hRFBRVzNFY1FkUktUTWhjbkx4d2dMTmIz?=
- =?utf-8?B?NERqM3gxbUNFTnlWTytXcnVRQ2x6TjZ2eEdYdWNXNW5INzl6S0ZKWTlKUmhs?=
- =?utf-8?B?T3lIREpBTEpPRWJZaCtGemR6TEZ1SnRTMjZxODQzM2V0UTB0VEtvbDR1c1FU?=
- =?utf-8?B?azEyTkNGWW5Sd250R09EdVlrdkE1alBQU2VXbWJhNjBVR09LendVdXpEK05T?=
- =?utf-8?B?ZmRiZzB3VG1XYW9nT2daUnlWd2pjOGRwUkVNZzNDeTdBdklpMHQrSDZuemxU?=
- =?utf-8?B?cjJ0bXVHSDUrSi91d1Rqb3krdjRHWWg0T25hbjlmQUhFNm1RNExURENEcTlK?=
- =?utf-8?B?V0VUc29hZ28vdmFmcnFONVdzaUcwS05MRmhRT09nVHNiR2hBbENtbGZOcUtJ?=
- =?utf-8?B?M2NDWnVwbElTRWlpa3NoMUxJMlVTaXF1akgzR1FDWWNGdzAyWGdXM2VWUGlJ?=
- =?utf-8?B?bUFJbjdERmFoaTg5TVBDaXBpZGlkSmRWMVhlcWszcmNGM0JFVGsvMDlhalNS?=
- =?utf-8?B?YlEvYUZCbUc3b1dCUjhvRnJkZm56TUJUcUVLeHBsbUlLeEVBcjU2djFZMy83?=
- =?utf-8?B?WlpHRVM2UDRuWEpvTFhRT1FjQzVsZm9kSzlHTEo1R1oyYzdsTFkvQmIzdWU1?=
- =?utf-8?B?TkwzMWhxTjJmbGdQQTNVdFBCaHhPd0VTRHBVYjFqTlhlT015VlN3d1Fhc25r?=
- =?utf-8?B?eWdOQkZ0eEcyVVlCZUlWeU1Cd0lnc2ZBcVpQc2VzRU5tVVNaS3dVRGUrRTlW?=
- =?utf-8?B?NnNQMHhrNTkvUm5NYUI4cU9GQ1RPaHJzZ3hGSCtrdVg3cGNQUitZQ3c3THds?=
- =?utf-8?B?LzZrK1dENC9pY3d3cncyOGoxdGNuUE1uN0d6bHN3SEU3TFdueFltc1RhWG44?=
- =?utf-8?B?UUJ4b3RHNkhJa1IrOUFSTitCcWdlZWtpM1YzcHFadFkrYk11M014djRRYTdB?=
- =?utf-8?B?cmQwaCs0Yk1RTGVyVzFMTzI1MUVPM2Q5WnhMYTVrSkFHTU54TldtbVBNb0gw?=
- =?utf-8?B?V3BpZFpnL01qN3pDcSthSE5pWk9mS0JGUWVDQm80bHJnS29yZmU2N3ZEb1Jk?=
- =?utf-8?B?THNYNTBMV2p3NVU3N1NjcHZmNHIwdjNPa0FtS2hHSGlWQjZBSjNLbEl6V0tZ?=
- =?utf-8?B?WlhmV2ZUSjdlWTRnYndVb2owTEtCandhTUo5bkFsbmowYXVmZzd4N0pEZzQ3?=
- =?utf-8?B?V1B5K0NNc0JkOGNKV25aQ2dPbkd6M1dLdVdwMUZLMXNKNURwZ3Z6UWdmYlNj?=
- =?utf-8?B?NTRDTnZKOG1EanhHZTNKV1U0MHBXTjlESm1abnNySHV6WkhZN2JTbHY5NWRQ?=
- =?utf-8?B?YlRhU1RZbW9NUFdLcy9DdGpYVzhSQmpGbng3bzlJZXZUUDFBeDBzK2JQeEMw?=
- =?utf-8?B?VGxoVlVyK3kzazZYb0w0VzRvNlI1bkd5RjJFWnZFeTJLeXEvRjk0eHQwRSth?=
- =?utf-8?B?anZNT0Fmd0JFdktoVUgrWWNyMGVjVjFzM2hubkdrZjdGVm40RkpLSmlnYTFq?=
- =?utf-8?B?bFI5TUZlSjF2V3FzUzFpTktHaUNwbzdqd1lISW5lbGJHcnVFWUFydzR6Nmtv?=
- =?utf-8?B?S2JFcFVZamRwR1RXdWVNSjFOREZJU01WQ3B4MnFnSVE0UXhTdENoRDgyOXNE?=
- =?utf-8?B?Uzc1ZHFGWVZweTUrR1lya29tZzFtMmJ2SVVyYm1yMnRuR3pmT1NnaGxYZ1hp?=
- =?utf-8?B?YnU4SkV2MWNrYi90Nmg2ZzQ5SExYVm9YRUdFdmV2MURjRng3WGpZa0xZVHlX?=
- =?utf-8?B?bmtkdUVyN1NIUk9yNmF0T3RvWGNzaHQvdlVMZUh6TXRCSmY1SkFlUGNIcTl5?=
- =?utf-8?B?Nk5hQm1rUm04aDllV1pZb1R3L2c5UGdBUG0zakUvL1NuUnN1VXAvQT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e694420-d688-460b-41ba-08debb0b713b
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 09:44:55.4332
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Zps6QqT3tu70vDvhSEmxRLP/8cPjHX+sckxNGaAZNwZcM4TS6I+YswDFUpzt5cXOTu60ASxWATTFptN6df5HsQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5969
-X-Spamd-Result: default: False [1.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net 1/1] geneve: fix Use-After-Free in RX path
+To: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ horms@kernel.org, victor@mojatatu.com, andrew+netdev@lunn.ch,
+ rajat.gupta@oss.qualcomm.com
+References: <20260521131436.748832-1-jhs@mojatatu.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260521131436.748832-1-jhs@mojatatu.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	TAGGED_FROM(0.00)[bounces-291620-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291621-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nvidia.com:mid,nvidia.com:email]
-X-Rspamd-Queue-Id: 2AAE65D39E5
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4C8FD5D3A81
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
 
-On 26/05/2026 10:44, Jiri Pirko wrote:
-> Thu, May 21, 2026 at 09:24:34AM +0200, tariqt@nvidia.com wrote:
->> From: Mark Bloch <mbloch@nvidia.com>
->>
->> Apply devlink default eswitch mode for mlx5 devices after successful
->> device initialization while holding the devlink instance lock.
->>
->> At this point the devlink instance is registered and the mlx5 devlink
->> operations are available, so the default eswitch mode can be applied to
->> the matching PCI devlink handle.
->>
->> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
->> Reviewed-by: Shay Drori <shayd@nvidia.com>
->> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
->> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
->> ---
->> drivers/net/ethernet/mellanox/mlx5/core/main.c | 17 +++++++++++++++++
->> 1 file changed, 17 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->> index 0c6e4efe38c8..4528097f3d84 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->> @@ -1391,6 +1391,21 @@ static void mlx5_unload(struct mlx5_core_dev *dev)
->> 	mlx5_free_bfreg(dev, &dev->priv.bfreg);
->> }
->>
->> +static void mlx5_devl_apply_default_esw_mode(struct mlx5_core_dev *dev)
->> +{
->> +	struct devlink *devlink = priv_to_devlink(dev);
->> +	int err;
->> +
->> +	if (!MLX5_ESWITCH_MANAGER(dev))
->> +		return;
->> +
->> +	devl_assert_locked(devlink);
->> +	err = devl_apply_default_esw_mode(devlink);
->> +	if (err)
->> +		mlx5_core_warn(dev, "Couldn't apply default eswitch mode, err %d\n",
->> +			       err);
->> +}
->> +
->> int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->> {
->> 	bool light_probe = mlx5_dev_is_lightweight(dev);
->> @@ -1437,6 +1452,7 @@ int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->> 		mlx5_core_err(dev, "mlx5_hwmon_dev_register failed with error code %d\n", err);
->>
->> 	mutex_unlock(&dev->intf_state_mutex);
->> +	mlx5_devl_apply_default_esw_mode(dev);
+On 5/21/26 3:14 PM, Jamal Hadi Salim wrote:
+> Context: This commit fixes a UAF in Geneve. The UAF component was discovered
+> because it is triggered by a buggy 'pedit' action[1]. the buggy pedit uses
+> skb_store_bits() and can write into shared or non-linear data without copying
+> the entire skb head. The Geneve device invoking either pskb_may_pull() or
+> iptunnel_pull_header() is much more likely to reallocate the skb head, freeing
+> the memory pointed to by geneve's stale geneveh pointer.
 > 
-> I wonder how we can make this work for all. I mean, other driver would
-> silently ignore this command like arg, right? Any idea how to make all
-> drivers follow the arg from very beginning?
+> Note, although the patch looks big it's mostly re-arranging functions to avoid
+> forward declaration.
 > 
-
-I have a follow-up series that adds the call to all drivers which support
-setting eswitch mode. When going over the other drivers, what I found is
-that the right point to apply the default is driver specific, drivers
-I have patch for:
-
-46e16c6d9836 net: Apply devlink esw mode defaults
-ab4f54102ba9 bnxt_en: Apply devlink default eswitch mode during init
-b48cce1607bb liquidio: Apply devlink default eswitch mode during init
-4ea54b0fe04a ice: Apply devlink default eswitch mode during init
-b7faddaa1c90 octeontx2-af: Apply devlink default eswitch mode during init
-74b0c22c47b9 octeontx2-pf: Apply devlink default eswitch mode during init
-5000e4c3d768 nfp: Apply devlink default eswitch mode during init
-97a218e95e41 netdevsim: Apply devlink default eswitch mode during init
-
-I don't think doing this generically from devlink is realistic. devlink
-doesn't really know when a given driver is ready to change eswitch mode.
-Some drivers need SR-IOV state, representor setup, or other init pieces to
-be ready first, and the locking is not identical across drivers either.
-
-Also, since this knob is only about eswitch mode, I don't think we need to
-touch every devlink driver. Drivers that don't implement eswitch_mode_set()
-would just ignore it anyway. The follow-up only wires the default into
-drivers that actually support changing eswitch mode.
-
-Mark
-
+> Sample UAF below:
+> ....
+> BUG: KASAN: slab-use-after-free in geneve_udp_encap_recv+0x2e8c/0x3190
+> Read of size 1 at addr ffff88811bab3c08 by task kworker/u32:1/62
 > 
->> 	return 0;
->>
->> err_register:
->> @@ -1538,6 +1554,7 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
->> 		goto err_attach;
->>
->> 	mutex_unlock(&dev->intf_state_mutex);
->> +	mlx5_devl_apply_default_esw_mode(dev);
->> 	return 0;
->>
->> err_attach:
->> -- 
->> 2.44.0
->>
+> CPU: 4 UID: 0 PID: 62 Comm: kworker/u32:1 Not tainted 7.1.0-rc3-00182-g0e3e91779b94 #551 PREEMPT(full)
+> Workqueue: ipv6_addrconf addrconf_dad_work
+> Call Trace:
+>  <IRQ>
+>  dump_stack_lvl+0x8c/0xd0
+>  print_report+0xce/0x5e0
+>  ? geneve_udp_encap_recv+0x2e8c/0x3190
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  ? kasan_complete_mode_report_info+0x80/0x200
+>  ? geneve_udp_encap_recv+0x2e8c/0x3190
+>  kasan_report+0xd6/0x110
+>  ? geneve_udp_encap_recv+0x2e8c/0x3190
+>  __asan_report_load1_noabort+0x18/0x20
+>  geneve_udp_encap_recv+0x2e8c/0x3190
+>  ? get_stack_info+0x38/0xc0
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  ? __pfx_geneve_udp_encap_recv+0x10/0x10
+>  ? udp4_lib_lookup2+0x31c/0x700
+>  ? __pfx_udp_ehashfn+0x10/0x10
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  ? __xfrm_policy_check2.constprop.0+0x40/0x5b0
+>  udp_queue_rcv_one_skb+0x65e/0xd20
+>  udp_queue_rcv_skb+0x142/0xb00
+>  udp_unicast_rcv_skb+0xd3/0x2c0
+>  udp_rcv+0x198f/0x2570
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  ip_protocol_deliver_rcu+0x1f8/0x3c0
+>  ip_local_deliver_finish+0x362/0x5d0
+> ....
+> 
+> [1]https://lore.kernel.org/netdev/20260519033950.2037-1-rajat.gupta@oss.qualcomm.com/
+> Fixes: fd0dd796576e ("geneve: use GRO hint option in the RX path")
+> Reported-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+> Tested-by: Victor Nogueira <victor@mojatatu.com>
+> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> ---
+> v1->v2 Address gemini-sashiko.
+> 1. local variable "len" initialization in geneve_post_decap_hint()
+>    Although doesnt contribute to the fix, it was introduced in fd0dd796576e
+> 2. resolve out-of-bounds transport header for non-GSO packets
+> ---
+>  drivers/net/geneve.c   | 174 ++++++++++++++++++++++-------------------
+>  include/linux/skbuff.h |   5 ++
+>  2 files changed, 98 insertions(+), 81 deletions(-)
+> 
+> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+> index c6563367d382..dc5f5394836a 100644
+> --- a/drivers/net/geneve.c
+> +++ b/drivers/net/geneve.c
+> @@ -256,6 +256,79 @@ static struct geneve_dev *geneve_lookup_skb(struct geneve_sock *gs,
+>  	return NULL;
+>  }
+>  
+> +/*
+> + * Look for GRO hint in the genenve options; if not found or does not pass basic
+> + * sanitization return 0, otherwise the offset WRT the geneve hdr start.
+> + */
+> +static unsigned int
+> +geneve_opt_gro_hint_off(const struct genevehdr *gh, __be16 *type,
+> +			unsigned int *gh_len)
+> +{
+> +	struct geneve_opt *opt = (void *)(gh + 1);
+> +	unsigned int id, opt_len = gh->opt_len;
+> +	struct geneve_opt_gro_hint *gro_hint;
+> +
+> +	while (opt_len >= (GENEVE_OPT_GRO_HINT_SIZE >> 2)) {
+> +		if (opt->opt_class == htons(GENEVE_OPT_NETDEV_CLASS) &&
+> +		    opt->type == GENEVE_OPT_GRO_HINT_TYPE &&
+> +		    opt->length == GENEVE_OPT_GRO_HINT_LEN)
+> +			goto found;
+> +
+> +		/* check for bad opt len */
+> +		if (opt->length + 1 >= opt_len)
+> +			return 0;
+> +
+> +		/* next opt */
+> +		opt_len -= opt->length + 1;
+> +		opt = ((void *)opt) + ((opt->length + 1) << 2);
+> +	}
+> +	return 0;
+> +
+> +found:
+> +	gro_hint = (struct geneve_opt_gro_hint *)opt->opt_data;
+> +
+> +	/*
+> +	 * Sanitize the hinted hdrs: the nested transport is UDP and must fit
+> +	 * the overall hinted hdr size.
+> +	 */
+> +	if (gro_hint->nested_tp_offset + sizeof(struct udphdr) >
+> +	    gro_hint->nested_hdr_len)
+> +		return 0;
+> +
+> +	if (gro_hint->nested_nh_offset +
+> +	    (gro_hint->nested_is_v6 ? sizeof(struct ipv6hdr) :
+> +				      sizeof(struct iphdr)) >
+> +	    gro_hint->nested_tp_offset)
+> +		return 0;
+> +
+> +	/* Allow only supported L2. */
+> +	id = gro_hint->inner_proto_id;
+> +	if (id >= ARRAY_SIZE(proto_id_map))
+> +		return 0;
+> +
+> +	*type = proto_id_map[id];
+> +	*gh_len += gro_hint->nested_hdr_len;
+> +
+> +	return (void *)gro_hint - (void *)gh;
+> +}
+> +
+> +static const struct geneve_opt_gro_hint *
+> +geneve_opt_gro_hint(const struct genevehdr *gh, unsigned int hint_off)
+> +{
+> +	return (const struct geneve_opt_gro_hint *)((void *)gh + hint_off);
+> +}
+> +
+> +static unsigned int
+> +geneve_sk_gro_hint_off(const struct sock *sk, const struct genevehdr *gh,
+> +		       __be16 *type, unsigned int *gh_len)
+> +{
+> +	const struct geneve_sock *gs = rcu_dereference_sk_user_data(sk);
+> +
+> +	if (!gs || !gs->gro_hint)
+> +		return 0;
+> +	return geneve_opt_gro_hint_off(gh, type, gh_len);
+> +}
+> +
+>  /* geneve receive/decap routine */
+>  static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
+>  		      struct sk_buff *skb, const struct genevehdr *gnvh)
+> @@ -299,6 +372,21 @@ static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
+>  	if (tun_dst)
+>  		skb_dst_set(skb, &tun_dst->dst);
+>  
+> +	if (skb->encapsulation) {
+> +		unsigned int len = 0, hint_off;
+> +		__be16 p;
+> +
+> +		hint_off = geneve_sk_gro_hint_off(gs->sock->sk, gnvh, &p, &len);
+> +		if (hint_off && len <= skb_headlen(skb)) {
+> +			const struct geneve_opt_gro_hint *gro_hint;
+> +
+> +			gro_hint = geneve_opt_gro_hint(gnvh, hint_off);
+> +			skb_set_transport_header(skb, gro_hint->nested_tp_offset);
+> +		}
+> +	} else {
+> +		skb_unset_transport_header(skb);
+> +	}
+
+It's not clear to me why the above chunk is needed. Why can't
+geneve_post_decap_hint() retain the transport header set in the current
+place? it would make this patch much shorter.
+
+If the above is really needed, I think it would be better to move the
+code around in a separate, pre-req, patch.
+
+Thanks,
+
+Paolo
 
 
